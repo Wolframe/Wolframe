@@ -248,42 +248,66 @@ public:
 		Yield		//< call interrupted with request for a network operation
 	};
 
-	friend class CallContext;
-	struct CallContext
-	{
-	public:
-		CallContext( const FormFunction& f)
-			:m_state(0)
-			,m_lastres(Ok)
-			,m_data(std::calloc( f.m_api_param->size() + f.m_api_result->size(), 1), std::free)
-			,m_api_param(f.m_api_param)
-			,m_api_result(f.m_api_result){}
-
-		~CallContext();
-
-		const char* getLastError() const
-		{
-			return m_ctx.getLastError();
-		}
-
-	private:
-		friend class FormFunction;
-		int m_state;
-		CallResult m_lastres;
-		boost::shared_ptr<void> m_data;
-		serialize::FiltermapParseStateStack m_parsestk;
-		serialize::FiltermapPrintStateStack m_printstk;
-		serialize::Context m_ctx;
-		const serialize::FiltermapDescriptionBase* m_api_param;
-		const serialize::FiltermapDescriptionBase* m_api_result;
-	};
-
-	CallResult call( InputFilter& ifl, OutputFilter& ofl, CallContext& ctx);
-
+	const serialize::FiltermapDescriptionBase* api_param() const	{return m_api_param;}
+	const serialize::FiltermapDescriptionBase* api_result() const	{return m_api_result;}
+	Call* call() const						{return m_call;}
 private:
 	Call* m_call;
 	const serialize::FiltermapDescriptionBase* m_api_param;
 	const serialize::FiltermapDescriptionBase* m_api_result;
+};
+
+///\class FormFunctionClosure
+///\brief Closure with calling state of called FormFunction
+class FormFunctionClosure :public FormFunction
+{
+public:
+	FormFunctionClosure( const FormFunction& f)
+		:FormFunction(f)
+		,m_state(0)
+		,m_lastres(Ok)
+		,m_data(std::calloc( f.api_param()->size() + f.api_result()->size(), 1), std::free)
+		{}
+
+	FormFunctionClosure( const FormFunctionClosure& o)
+		:FormFunction(o)
+		,m_state(o.m_state)
+		,m_lastres(o.m_lastres)
+		,m_data(o.m_data)
+		,m_parsestk(o.m_parsestk)
+		,m_printstk(o.m_printstk)
+		,m_ctx(o.m_ctx)
+		,m_inputfilter(o.m_inputfilter)
+		,m_outputfilter(o.m_outputfilter)
+		{}
+
+	~FormFunctionClosure();
+
+	const char* getLastError() const
+	{
+		return m_ctx.getLastError();
+	}
+
+	CallResult call();
+
+	void init( const TypedInputFilterR& i, const TypedOutputFilterR& o)
+	{
+		m_inputfilter = i;
+		m_outputfilter = o;
+	}
+
+	const TypedInputFilterR& inputfilter() const	{return m_inputfilter;}
+	const TypedOutputFilterR& outputfilter() const	{return m_outputfilter;}
+
+private:
+	int m_state;
+	CallResult m_lastres;
+	boost::shared_ptr<void> m_data;
+	serialize::FiltermapParseStateStack m_parsestk;
+	serialize::FiltermapPrintStateStack m_printstk;
+	serialize::Context m_ctx;
+	TypedInputFilterR m_inputfilter;
+	TypedOutputFilterR m_outputfilter;
 };
 
 

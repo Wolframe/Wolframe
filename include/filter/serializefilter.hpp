@@ -78,7 +78,7 @@ public:
 	///\brief Destructor
 	virtual ~SerializeOutputFilter(){}
 
-	///\brief Implementation of TypedOutputFilter::print( ElementType type, const Element& element)
+	///\brief Implementation of TypedOutputFilter::print( ElementType,const Element&)
 	virtual bool print( ElementType type, const Element& element);
 
 private:

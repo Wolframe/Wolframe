@@ -37,6 +37,7 @@ Project Wolframe.
 #include "filter/typedfilter.hpp"
 #include "langbind/luaException.hpp"
 #include <vector>
+#include <stdexcept>
 
 #if WITH_LUA
 extern "C" {
@@ -52,8 +53,7 @@ class LuaInputFilter :public TypedInputFilter, public LuaExceptionHandlerScope
 {
 public:
 	///\brief Constructor
-	///\remark Expects the table to iterate as top element (-1) on the lua stack
-	///\remark Expects that the lua stack is not modified by anyone but this class in its lifetime
+	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaInputFilter::getNext(ElementType&,Element&)
 	LuaInputFilter( lua_State* ls);
 
 	///\brief Copy constructor
@@ -69,6 +69,7 @@ public:
 	virtual ~LuaInputFilter(){}
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
+	///\remark Expects the table to iterate as top element (-1) on the lua stack
 	virtual bool getNext( ElementType& type, Element& element);
 
 private:
@@ -105,9 +106,13 @@ class LuaOutputFilter :public TypedOutputFilter, public LuaExceptionHandlerScope
 {
 public:
 	///\brief Constructor
-	///\remark Creates the output filter result as top element (-1) on the lua stack
-	///\remark Expects that the lua stack is not modified by anyone but this class in its lifetime
-	LuaOutputFilter( lua_State* ls);
+	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaOutputFilter::print(ElementType,const Element&)
+	LuaOutputFilter( lua_State* ls)
+		:LuaExceptionHandlerScope(ls)
+		,m_ls(ls)
+		,m_depth(0)
+		,m_type(OpenTag)
+		,m_isinit(false){}
 
 	///\brief Copy constructor
 	///\param[in] o lua output filter to copy
@@ -116,12 +121,16 @@ public:
 		,LuaExceptionHandlerScope(o)
 		,m_ls(o.m_ls)
 		,m_depth(o.m_depth)
-		,m_type(o.m_type){}
+		,m_type(o.m_type)
+		,m_isinit(o.m_isinit)
+	{
+		if (m_isinit) throw std::runtime_error( "copy of lua output filter not allowed in this state");
+	}
 
 	///\brief Destructor
 	virtual ~LuaOutputFilter(){}
 
-	///\brief Implementation of TypedOutputFilter::print( ElementType type, const Element& element)
+	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
 	virtual bool print( ElementType type, const Element& element);
 
 private:
@@ -134,6 +143,7 @@ private:
 	lua_State* m_ls;
 	int m_depth;
 	ElementType m_type;
+	bool m_isinit;
 };
 
 }}//namespace

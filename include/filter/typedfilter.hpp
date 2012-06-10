@@ -82,6 +82,11 @@ private:
 	State m_state;					//< state
 };
 
+///\typedef TypedInputFilterR
+///\brief Shared input filter reference
+typedef CountedReference<TypedInputFilter> TypedInputFilterR;
+
+
 
 ///\class TypedOutputFilter
 ///\brief Output filter with atomic values having a type
@@ -120,6 +125,9 @@ private:
 	State m_state;				//< state
 };
 
+///\typedef TypedOutputFilterR
+///\brief Shared output filter reference
+typedef CountedReference<TypedOutputFilter> TypedOutputFilterR;
 
 
 }}//namespace

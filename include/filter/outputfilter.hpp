@@ -139,7 +139,7 @@ private:
 };
 
 ///\typedef OutputFilterR
-///\brief Shared input filter reference
+///\brief Shared output filter reference
 typedef CountedReference<OutputFilter> OutputFilterR;
 
 }}//namespace

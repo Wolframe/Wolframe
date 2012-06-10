@@ -39,12 +39,11 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
-bool FiltermapDescriptionBase::parse( void* obj, langbind::InputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const
+bool FiltermapDescriptionBase::parse( void* obj, langbind::TypedInputFilter& tin, Context& ctx, FiltermapParseStateStack& stk) const
 {
 	bool rt = true;
 	try
 	{
-		langbind::SerializeInputFilter tin( &in);
 		if (stk.size() == 0)
 		{
 			if (!m_parse) throw std::runtime_error( "null parser called");
@@ -67,12 +66,11 @@ bool FiltermapDescriptionBase::parse( void* obj, langbind::InputFilter& in, Cont
 	return rt;
 }
 
-bool FiltermapDescriptionBase::print( const void* obj, langbind::OutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk) const
+bool FiltermapDescriptionBase::print( const void* obj, langbind::TypedOutputFilter& tout, Context& ctx, FiltermapPrintStateStack& stk) const
 {
 	bool rt = true;
 	try
 	{
-		langbind::SerializeOutputFilter tout( &out);
 		if (stk.size() == 0)
 		{
 			if (!m_print) throw std::runtime_error( "null printer called");

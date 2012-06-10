@@ -91,7 +91,7 @@ bool LuaInputFilter::getValue( int idx, TypedFilterBase::Element& element)
 bool LuaInputFilter::firstTableElem( const char* tag=0)
 {
 	FetchState fs;
-	lua_pushnil( m_ls);			//... push first key
+	lua_pushnil( m_ls);
 	if (!lua_next( m_ls, -2))
 	{
 		return false;
@@ -209,14 +209,6 @@ bool LuaInputFilter::getNext( ElementType& type, Element& element)
 	return rt;
 }
 
-LuaOutputFilter::LuaOutputFilter( lua_State* ls)
-	:LuaExceptionHandlerScope(ls)
-	,m_ls(ls)
-	,m_depth(0)
-	,m_type(OpenTag)
-{
-	lua_newtable( m_ls);
-}
 
 bool LuaOutputFilter::pushValue( const Element& element)
 {
@@ -290,6 +282,11 @@ bool LuaOutputFilter::closeAttribute( const Element& element)
 
 bool LuaOutputFilter::print( ElementType type, const Element& element)
 {
+	if (!m_isinit)
+	{
+		lua_newtable( m_ls);
+		m_isinit = true;
+	}
 	switch (type)
 	{
 		case OpenTag:

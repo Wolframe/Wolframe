@@ -37,9 +37,11 @@ Project Wolframe.
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include "logger-v1.hpp"
 #include "filter/filter.hpp"
+#include "filter/serializefilter.hpp"
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
 #include "filter/token_filter.hpp"
+#include "filter/expression_filter.hpp"
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <cctype>
@@ -147,99 +149,110 @@ bool DDLFormMap::getForm( const std::string& name, DDLFormR& rt) const
 	return getObject( m_map, name, *rt.get());
 }
 
-FormFunction::CallResult FormFunction::call( InputFilter& ifl, OutputFilter& ofl, CallContext& ctx)
-{
-	if (ctx.m_lastres == Error) return Error;
-	void* param_struct = ctx.m_data.get();
-	void* result_struct = (void*)((char*)ctx.m_data.get() + ctx.m_api_param->size());
 
-	switch (ctx.m_state)
+FormFunction::CallResult FormFunctionClosure::call()
+{
+	if (m_lastres == Error) return Error;
+	void* param_struct = m_data.get();
+	void* result_struct = (void*)((char*)m_data.get() + api_param()->size());
+
+	switch (m_state)
 	{
 		case 0:
-			ctx.m_ctx.clear();
-			if (!ctx.m_api_param->init( param_struct))
+			m_ctx.clear();
+			if (!api_param()->init( param_struct))
 			{
-				ctx.m_ctx.setError( "could not initialize api input object for form function");
-				return ctx.m_lastres=Error;
+				m_ctx.setError( "could not initialize api input object for form function");
+				return m_lastres=Error;
 			}
-			ctx.m_state = 1;
+			m_state = 1;
 		case 1:
-			if (!ctx.m_api_result->init( result_struct))
+			if (!api_result()->init( result_struct))
 			{
-				ctx.m_ctx.setError( "could not initialize api result object for form function");
-				return ctx.m_lastres=Error;
+				m_ctx.setError( "could not initialize api result object for form function");
+				return m_lastres=Error;
 			}
-			ctx.m_state = 2;
+			m_state = 2;
 		case 2:
-			if (!ctx.m_api_param->parse( param_struct, ifl, ctx.m_ctx, ctx.m_parsestk))
+			if (!m_inputfilter.get())
 			{
-				switch (ifl.state())
+				m_ctx.setError( "no input filter defined for form function");
+				return m_lastres=Error;
+			}
+			if (!api_param()->parse( param_struct, *m_inputfilter, m_ctx, m_parsestk))
+			{
+				switch (m_inputfilter->state())
 				{
 					case InputFilter::Open:
-						if (ctx.m_ctx.getLastError())
+						if (m_ctx.getLastError())
 						{
-							return ctx.m_lastres=Error;
+							return m_lastres=Error;
 						}
 						break;
 
 					case InputFilter::EndOfMessage:
-						return ctx.m_lastres=Yield;
+						return m_lastres=Yield;
 
 					case InputFilter::Error:
-						ctx.m_ctx.setError( ifl.getError());
-						return ctx.m_lastres=Error;
+						m_ctx.setError( m_inputfilter->getError());
+						return m_lastres=Error;
 				}
 			}
-			ctx.m_state = 3;
+			m_state = 3;
 		case 3:
 			try
 			{
-				ctx.m_ctx.clear();
-				int rt = m_call( result_struct, param_struct);
+				m_ctx.clear();
+				int rt = FormFunction::call()( result_struct, param_struct);
 				if (rt != 0)
 				{
-					ctx.m_ctx.setError( "error in call of form function");
-					return ctx.m_lastres=Error;
+					m_ctx.setError( "error in call of form function");
+					return m_lastres=Error;
 				}
 			}
 			catch (const std::exception& e)
 			{
-				ctx.m_ctx.setError( e.what());
-				return ctx.m_lastres=Error;
+				m_ctx.setError( e.what());
+				return m_lastres=Error;
 			}
-			ctx.m_state = 4;
+			m_state = 4;
 		case 4:
-			if (!ctx.m_api_param->print( result_struct, ofl, ctx.m_ctx, ctx.m_printstk))
+			if (!m_outputfilter.get())
 			{
-				switch (ofl.state())
+				m_ctx.setError( "no output filter defined for form function result");
+				return m_lastres=Error;
+			}
+			if (!api_param()->print( result_struct, *m_outputfilter, m_ctx, m_printstk))
+			{
+				switch (m_outputfilter->state())
 				{
 					case OutputFilter::Open:
-						return ctx.m_lastres=Error;
+						return m_lastres=Error;
 
 					case OutputFilter::EndOfBuffer:
-						return ctx.m_lastres=Yield;
+						return m_lastres=Yield;
 
 					case OutputFilter::Error:
-						ctx.m_ctx.setError( ofl.getError());
-						return ctx.m_lastres=Error;
+						m_ctx.setError( m_outputfilter->getError());
+						return m_lastres=Error;
 				}
 			}
-			ctx.m_state = 5;
+			m_state = 5;
 		case 5:
-			ctx.m_api_param->done( param_struct);
-			ctx.m_api_result->done( result_struct);
-			std::memset( ctx.m_data.get(), 0, ctx.m_api_param->size() + ctx.m_api_result->size());
-			ctx.m_state = 0;
+			api_param()->done( param_struct);
+			api_result()->done( result_struct);
+			std::memset( m_data.get(), 0, api_param()->size() + api_result()->size());
+			m_state = 0;
 	}
-	return ctx.m_lastres=Ok;
+	return m_lastres=Ok;
 }
 
-FormFunction::CallContext::~CallContext()
+FormFunctionClosure::~FormFunctionClosure()
 {
 	if (m_state >= 0)
 	{
 		void* param_struct = m_data.get();
-		void* result_struct = (void*)((char*)m_data.get() + m_api_param->size());
+		void* result_struct = (void*)((char*)m_data.get() + api_param()->size());
 
 		switch (m_state)
 		{
@@ -249,9 +262,9 @@ FormFunction::CallContext::~CallContext()
 			case 4:
 			case 3:
 			case 2:
-				m_api_result->done( result_struct);
+				api_result()->done( result_struct);
 			case 1:
-				m_api_param->done( param_struct);
+				api_param()->done( param_struct);
 		}
 	}
 }
@@ -281,6 +294,8 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 	cmd->setInputBuffer( inbuf, inbufsize);
 	cmd->setOutputBuffer( outbuf, outbufsize, 0);
 	m_cmdwriter->setOutputBuffer( inbuf, inbufsize);
+	SerializeOutputFilter tcmdwriter( m_cmdwriter.get());
+	SerializeInputFilter tresultreader( m_resultreader.get());
 
 	std::string resultstr;
 	cmdbind::CommandHandler::Operation op = cmdbind::CommandHandler::READ;
@@ -291,7 +306,7 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 		{
 			case cmdbind::CommandHandler::READ:
 			{
-				if (!serialize::print( param.m_struct, *m_cmdwriter, m_ctx, m_printstk))
+				if (!serialize::print( param.m_struct, tcmdwriter, m_ctx, m_printstk))
 				{
 					const char* err = m_ctx.getLastError();
 					if (err)
@@ -311,7 +326,7 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 				cmd->getOutput( data, datasize);
 
 				m_resultreader->putInput( data, datasize, false);
-				if (!serialize::parse( result.m_struct, *m_resultreader, m_ctx, m_parsestk))
+				if (!serialize::parse( result.m_struct, tresultreader, m_ctx, m_parsestk))
 				{
 					const char* err = m_ctx.getLastError();
 					if (err)
@@ -326,7 +341,7 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 			case cmdbind::CommandHandler::CLOSED:
 			{
 				m_resultreader->putInput( "", 0, true);
-				if (!serialize::parse( result.m_struct, *m_resultreader, m_ctx, m_parsestk))
+				if (!serialize::parse( result.m_struct, tresultreader, m_ctx, m_parsestk))
 				{
 					const char* err = m_ctx.getLastError();
 					if (err)

@@ -34,6 +34,7 @@ Project Wolframe.
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/luaDebug.hpp"
 #include "langbind/luaException.hpp"
+#include "filter/luafilter.hpp"
 #include "logger-v1.hpp"
 #include <fstream>
 #include <iostream>
@@ -57,9 +58,9 @@ namespace luaname
 	static const char* Output = "wolframe.Output";
 	static const char* Filter = "wolframe.Filter";
 	static const char* DDLForm = "wolframe.DDLForm";
-	static const char* FormFunction = "wolframe.FormFunction";
 	static const char* GlobalContext = "wolframe.ctx";
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
+	static const char* FormFunctionClosure = "wolframe.FormFunctionClosure";
 }
 
 namespace
@@ -70,9 +71,9 @@ template <> const char* metaTableName<Input>()				{return luaname::Input;}
 template <> const char* metaTableName<Output>()				{return luaname::Output;}
 template <> const char* metaTableName<Filter>()				{return luaname::Filter;}
 template <> const char* metaTableName<DDLForm>()			{return luaname::DDLForm;}
-template <> const char* metaTableName<FormFunction>()			{return luaname::FormFunction;}
 template <> const char* metaTableName<GlobalContext>()			{return luaname::GlobalContext;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
+template <> const char* metaTableName<FormFunctionClosure>()		{return luaname::FormFunctionClosure;}
 }//anonymous namespace
 
 static const luaL_Reg empty_methodtable[ 1] =
@@ -387,6 +388,101 @@ static int function_inputFilter( lua_State* ls)
 	return luaL_error( ls, "illegal state produced by input filter fetch");
 }
 
+
+static bool get_operand_TypedOutputFilter( lua_State* ls, int idx, langbind::TypedOutputFilterR& flt)
+{
+	switch (lua_type( ls, idx))
+	{
+		case LUA_TTABLE:
+			flt.reset( new langbind::LuaOutputFilter( ls));
+			return true;
+		case LUA_TUSERDATA:
+		default:
+			return false;
+	}
+}
+
+static bool get_operand_TypedInputFilter( lua_State* ls, int idx, langbind::TypedInputFilterR& flt)
+{
+	switch (lua_type( ls, idx))
+	{
+		case LUA_TTABLE:
+			flt.reset( new langbind::LuaInputFilter( ls));
+			return true;
+		case LUA_TUSERDATA:
+		default:
+			return false;
+	}
+}
+
+static int push_result_TypedOutputFilter( lua_State* ls, const langbind::TypedOutputFilterR& flt)
+{
+	langbind::LuaOutputFilter* lf = dynamic_cast<langbind::LuaOutputFilter*>( flt.get());
+	if (lf)
+	{
+		if (!lua_istable( ls, -1))
+		{
+			luaL_error( ls, "result is not a lua table as expected");
+			return 0;
+		}
+		/* result table already on the stack */
+		return 1;
+	}
+	luaL_error( ls, "runtime error. cannot fetch result");
+	return 0;
+}
+
+static int function_formfunction_call( lua_State* ls)
+{
+	FormFunctionClosure* closure = (FormFunctionClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
+	try
+	{
+		int ctx;
+		if (lua_getctx( ls, &ctx) != LUA_YIELD)
+		{
+			if (lua_gettop( ls) != 2)
+			{
+				return luaL_error( ls, "two arguments expected for call of formfunction");
+			}
+			else
+			{
+				langbind::TypedInputFilterR inp;
+				if (!get_operand_TypedInputFilter( ls, 1, inp))
+				{
+					luaL_error( ls, "error in form function call (%s)", "1st argument is not a table, form or filter");
+				}
+				langbind::TypedOutputFilterR outp;
+				if (!get_operand_TypedOutputFilter( ls, 2, outp))
+				{
+					return luaL_error( ls, "error in form function call (%s)", "2nd argument is not a table, form or filter");
+				}
+				closure->init( inp, outp);
+			}
+		}
+		langbind::FormFunction::CallResult res = closure->call();
+		switch (res)
+		{
+			case langbind::FormFunction::Yield:
+				lua_yieldk( ls, 0, 1, function_formfunction_call);
+
+			case langbind::FormFunction::Ok:
+				return push_result_TypedOutputFilter( ls, closure->outputfilter());
+
+			case langbind::FormFunction::Error:
+				return luaL_error( ls, "error in form function call (%s)", closure->getLastError());
+		}
+	}
+	catch (const std::bad_alloc&)
+	{
+		return luaL_error( ls, "out of memory calling form function call");
+	}
+	catch (const std::exception& e)
+	{
+		return luaL_error( ls, "got exception in form function call: (%s)", e.what());
+	}
+	return luaL_error( ls, "illegal state produced by form function call");
+}
+
 static const char* get_printop( lua_State* ls, int index, std::size_t& size)
 {
 	const char* rt = 0;
@@ -586,7 +682,8 @@ static int function_formfunction( lua_State* ls)
 	{
 		return luaL_error( ls, "got exception in function 'formfunction': (%s)", e.what());
 	}
-	LuaObject<FormFunction>::push_luastack( ls, func);
+	LuaObject<FormFunctionClosure>::push_luastack( ls, FormFunctionClosure( func));
+	lua_pushcclosure( ls, function_formfunction_call, 1);
 	return 1;
 }
 
@@ -725,7 +822,7 @@ static int function_printlog( lua_State *ls)
 	int ii,nn = lua_gettop(ls);
 	if (nn <= 0)
 	{
-		LOG_ERROR << "no arguments passed to 'printlog'";
+		luaL_error( ls, "no arguments passed to 'printlog'");
 		return 0;
 	}
 	const char *logLevel = luaL_checkstring( ls, 1);
@@ -735,13 +832,15 @@ static int function_printlog( lua_State *ls)
 	{
 		if (!getDescription( ls, ii, logmsg))
 		{
-			LOG_ERROR << "failed to map 'printLog' arguments to a string";
+			luaL_error( ls, "failed to map 'printLog' arguments to a string");
+			return 0;
 		}
 	}
 	_Wolframe::log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
 	if (lv == _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED)
 	{
-		LOG_ERROR << "'printLog' called with undefined loglevel '" << logLevel << "' as first argument";
+		luaL_error( ls, "'printLog' called with undefined loglevel '%s' as first argument", logLevel);
+		return 0;
 	}
 	else
 	{

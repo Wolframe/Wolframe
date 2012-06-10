@@ -39,6 +39,7 @@
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLPrint.hpp"
 #include "filter/token_filter.hpp"
+#include "filter/serializefilter.hpp"
 #if WITH_LUA
 #include "cmdbind/luaCommandHandler.hpp"
 #include "langbind/luaObjects.hpp"
@@ -222,14 +223,18 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		FormFunction ffunc;
 		if (gc->getFormFunction( proc.c_str(), ffunc))
 		{
-			langbind::FormFunction::CallContext ctx( ffunc);
-			langbind::FormFunction::CallResult rt = ffunc.call( *flt.inputfilter(), *flt.outputfilter(), ctx);
+			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
+			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
+
+			langbind::FormFunctionClosure ctx( ffunc);
+			ctx.init( inp, outp);
+			langbind::FormFunction::CallResult rt = ctx.call();
 			while (rt == langbind::FormFunction::Yield)
 			{
 				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
 				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
 				{
-					rt = ffunc.call( *flt.inputfilter(), *flt.outputfilter(), ctx);
+					rt = ctx.call();
 				}
 			}
 			if (rt == langbind::FormFunction::Ok)
@@ -251,8 +256,10 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			serialize::Context ctx;
 			serialize::FiltermapDDLParseStateStack parsestk;
 			serialize::FiltermapDDLPrintStateStack printstk;
+			langbind::SerializeInputFilter tin( flt.inputfilter().get());
+			langbind::SerializeOutputFilter tout( flt.outputfilter().get());
 
-			while (!serialize::parse( df->m_struct, *flt.inputfilter(), ctx, parsestk))
+			while (!serialize::parse( df->m_struct, tin, ctx, parsestk))
 			{
 				const char* err = ctx.getLastError();
 				if (err)
@@ -263,7 +270,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) break;
 				continue;
 			}
-			while (!serialize::print( df->m_struct, *flt.outputfilter(), ctx, printstk))
+			while (!serialize::print( df->m_struct, tout, ctx, printstk))
 			{
 				const char* err = ctx.getLastError();
 				if (err)

@@ -75,8 +75,8 @@ public:
 	FiltermapDescriptionBase()
 		:m_typename(0),m_ofs(0),m_size(0),m_nof_attributes(0),m_type(Atomic),m_parse(0),m_print(0){}
 
-	bool parse( void* obj, langbind::InputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const;
-	bool print( const void* obj, langbind::OutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk) const;
+	bool parse( void* obj, langbind::TypedInputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const;
+	bool print( const void* obj, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk) const;
 
 	bool init( void* obj) const
 	{
