@@ -90,6 +90,18 @@ protected:
 
 static std::string selectedTestName;
 
+static bool directoryExists( boost::filesystem::path& pt)
+{
+	try
+	{
+		return boost::filesystem::exists( pt) && boost::filesystem::is_directory( pt);
+	}
+	catch (const std::exception&)
+	{
+		return false;
+	}
+}
+
 TEST_F( WolfilterTest, tests)
 {
 	enum {ibarsize=11,obarsize=7,EoDBufferSize=4};
@@ -134,11 +146,11 @@ TEST_F( WolfilterTest, tests)
 	{
 		// [2.1] Remove old temporary files:
 		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
-		if (boost::filesystem::exists( tempdir) && boost::filesystem::is_directory( tempdir))
+		if (directoryExists( tempdir))
 		{
 			boost::filesystem::remove_all( tempdir);
-			boost::filesystem::create_directory( tempdir);
 		}
+		boost::filesystem::create_directory( tempdir);
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{
