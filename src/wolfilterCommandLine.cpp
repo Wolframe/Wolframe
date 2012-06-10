@@ -53,12 +53,12 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, const char** argv)
 	fopt.add_options()
 		( "version,v", "print version" )
 		( "help,h", "print help message" )
-		( "input", po::value<std::string>(), "specify input file to process by path" )
-		( "module", po::value< std::vector<std::string> >(), "specify module to load by path" )
-		( "script", po::value< std::vector<std::string> >(), "specify script to load by path" )
+		( "input,f", po::value<std::string>(), "specify input file to process by path" )
+		( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
+		( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
 		( "cmd", po::value<std::string>(), "name of the command to execute")
-		( "input-filter", po::value<std::string>(), "specify input filter by name" )
-		( "output-filter", po::value<std::string>(), "specify output filter by name" )
+		( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
+		( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
 		;
 
 	po::positional_options_description popt;

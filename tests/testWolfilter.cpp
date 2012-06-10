@@ -56,10 +56,10 @@ static char* g_gtest_ARGV[2] = {0, 0};
 
 using namespace _Wolframe;
 
+///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
 static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 {
-	langbind::GlobalContext* gct = new langbind::GlobalContext();
-	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
+	langbind::GlobalContext* gct = langbind::getGlobalContext();
 
 	gct->defineFormFunction( "employee_assignment_convert",
 					langbind::FormFunction(
@@ -78,7 +78,6 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 		}
 	}
 }
-
 
 class WolfilterTest : public ::testing::Test
 {

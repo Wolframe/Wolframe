@@ -36,8 +36,11 @@
 #include <cstring>
 #include <cstdlib>
 #include <stdexcept>
+#include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
 #include "wolfilterCommandLine.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
 
@@ -46,6 +49,24 @@ static const unsigned short APP_MAJOR_VERSION = 0;
 static const unsigned short APP_MINOR_VERSION = 0;
 static const unsigned short APP_REVISION = 5;
 static const unsigned short APP_BUILD = 0;
+
+///\brief Loads the modules, scripts, etc. defined in the command line into the global context
+static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
+{
+	langbind::GlobalContext* gct = langbind::getGlobalContext();
+
+	std::vector<std::string>::const_iterator itr = cmdline.scripts().begin(), end = cmdline.scripts().end();
+	for (; itr != end; ++itr)
+	{
+		boost::filesystem::path scriptpath( boost::filesystem::current_path() / "temp" / *itr);
+		langbind::LuaScript script( scriptpath.string());
+		std::vector<std::string>::const_iterator fi = script.functions().begin(), fe = script.functions().end();
+		for (; fi != fe; ++fi)
+		{
+			gct->defineLuaFunction( *fi, script);
+		}
+	}
+}
 
 int main( int argc, const char **argv )
 {
@@ -65,6 +86,8 @@ int main( int argc, const char **argv )
 			doExit = true;
 		}
 		if (doExit) return 0;
+
+		loadGlobalContext( cmdline);
 
 		if (!langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), std::cin, std::cout))
 		{
