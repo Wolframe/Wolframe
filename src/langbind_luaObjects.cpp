@@ -854,6 +854,7 @@ static int function_printlog( lua_State *ls)
 LuaScript::LuaScript( const std::string& path_)
 	:m_path(path_)
 {
+	// Load the source of the script from file
 	char buf;
 	std::fstream ff;
 	ff.open( path_.c_str(), std::ios::in);
@@ -867,6 +868,21 @@ LuaScript::LuaScript( const std::string& path_)
 		throw std::runtime_error( "read lua script from file");
 	}
 	ff.close();
+
+	// Check the script syntax and get the list of all global functions
+	LuaScriptInstance instance( this);
+	lua_State* ls = instance.ls();
+
+	lua_rawgeti( ls, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
+	lua_pushnil(ls);
+	while (lua_next( ls, -2))
+	{
+		if (lua_isfunction( ls, -1) && lua_isstring( ls, -2))
+		{
+			m_functions.push_back( lua_tostring( ls, -2));
+		}
+		lua_pop( ls, 1);
+	}
 }
 
 LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
@@ -958,8 +974,7 @@ void LuaFunctionMap::defineLuaFunction( const std::string& name, const LuaScript
 	else
 	{
 		scriptId = m_ar.size();
-		m_ar.push_back( new LuaScript( script));	//< load its content from file
-		LuaScriptInstance( m_ar.back());		//< check, if it can be compiled
+		m_ar.push_back( new LuaScript( script));
 		m_pathmap[ script.path()] = scriptId;
 	}
 	m_procmap[ nam] = scriptId;

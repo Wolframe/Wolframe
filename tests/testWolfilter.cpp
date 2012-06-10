@@ -56,15 +56,29 @@ static char* g_gtest_ARGV[2] = {0, 0};
 
 using namespace _Wolframe;
 
-static void prepareTest()
+static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 {
-	langbind::GlobalContext* gct = langbind::getGlobalContext();
+	langbind::GlobalContext* gct = new langbind::GlobalContext();
+	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
+
 	gct->defineFormFunction( "employee_assignment_convert",
 					langbind::FormFunction(
 						test::convertAssignmentListDoc,
 						test::AssignmentListDoc::getFiltermapDescription(),
 						test::AssignmentListDoc::getFiltermapDescription()));
+	std::vector<std::string>::const_iterator itr = cmdline.scripts().begin(), end = cmdline.scripts().end();
+	for (; itr != end; ++itr)
+	{
+		boost::filesystem::path scriptpath( boost::filesystem::current_path() / "temp" / *itr);
+		langbind::LuaScript script( scriptpath.string());
+		std::vector<std::string>::const_iterator fi = script.functions().begin(), fe = script.functions().end();
+		for (; fi != fe; ++fi)
+		{
+			gct->defineLuaFunction( *fi, script);
+		}
+	}
 }
+
 
 class WolfilterTest : public ::testing::Test
 {
@@ -157,17 +171,19 @@ TEST_F( WolfilterTest, tests)
 		{
 			cmdargv[ci] = cmd[ci-1].c_str();
 		}
-		config::WolfilterCommandLine testOptions( cmdargc, cmdargv);
+		config::WolfilterCommandLine cmdline( cmdargc, cmdargv);
 
 		// [2.5] Call iostreamfilter
-		if (testOptions.printhelp()) std::cerr << "ignored option --help" << std::endl;
-		if (testOptions.printversion()) std::cerr << "ignored option --version" << std::endl;
-		if (testOptions.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
+		if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;
+		if (cmdline.printversion()) std::cerr << "ignored option --version" << std::endl;
+		if (cmdline.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
+
+		loadGlobalContext( cmdline);
 
 		std::istringstream in( td.input, std::ios::in | std::ios::binary);
 		std::ostringstream out( std::ios::out | std::ios::binary);
 
-		bool trt = langbind::iostreamfilter( testOptions.cmd(), testOptions.inputfilter(), ib, testOptions.outputfilter(), ob, in, out);
+		bool trt = langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
 		if (!trt)
 		{
 			boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
@@ -208,7 +224,6 @@ TEST_F( WolfilterTest, tests)
 
 int main( int argc, char **argv )
 {
-	prepareTest();
 	g_gtest_ARGC = 1;
 	g_gtest_ARGV[0] = argv[0];
 	if (argc > 2)
