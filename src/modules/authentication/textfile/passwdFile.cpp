@@ -41,45 +41,23 @@
 namespace _Wolframe {
 namespace AAAA {
 
-PasswordFile::PasswordFile()
-{
-}
-
-PasswordFile::PasswordFile( const std::string& /*filename*/ )
-{
-}
-
-bool PasswordFile::open()
-{
-	return true;
-}
-
-bool PasswordFile::open( const std::string& /*filename*/, bool /*create*/ )
-{
-	return true;
-}
-
-bool PasswordFile::create( const std::string& /*filename*/ )
-{
-	return true;
-}
-
-bool PasswordFile::addUser( const std::string& /*user*/, const std::string& /*password*/,
+void PasswordFile::addUser( const std::string& /*user*/, const std::string& /*password*/,
 			    const std::string& /*userInfo*/, const std::string& /*comment*/ )
 {
-	return true;
 }
 
-bool PasswordFile::modifyUser(const std::string& /*user*/, const std::string& /*password*/,
-			      const std::string& /*userInfo*/, const std::string& /*comment*/ )
+bool getUser( const std::string& /*user*/, std::string& /*password*/,
+	      std::string& /*userInfo*/, std::string& /*comment*/ )
 {
 	return true;
 }
 
-bool PasswordFile::addOrModifyUser(const std::string& /*user*/, const std::string& /*password*/,
-				   const std::string& /*userInfo*/, const std::string& /*comment*/ )
+bool getUser( const std::string& /*response*/,
+	      std::string& /*user*/, std::string& /*password*/,
+	      std::string& /*userInfo*/, std::string& /*comment*/ )
 {
 	return true;
 }
+
 
 }} // namepspace _Wolframe::AAAA

@@ -46,21 +46,20 @@ namespace AAAA {
 class PasswordFile
 {
 public:
-	PasswordFile();
-	PasswordFile( const std::string& filename );
+	PasswordFile( const std::string& filename, bool create = false )
+		: m_filename( filename ), m_create( create )	{}
 
-	bool open();
-	bool open( const std::string& filename, bool create = false );
-	bool create( const std::string& filename );
-
-	bool addUser( const std::string& user, const std::string& password,
+	void addUser( const std::string& user, const std::string& password,
 		      const std::string& userInfo, const std::string& comment );
-	bool modifyUser(const std::string& user, const std::string& password,
-			const std::string& userInfo, const std::string& comment );
-	bool addOrModifyUser(const std::string& user, const std::string& password,
-			     const std::string& userInfo, const std::string& comment );
+
+	bool getUser( const std::string& user, std::string& password,
+		      std::string& userInfo, std::string& comment );
+	bool getUser( const std::string& response,
+		      std::string& user, std::string& password,
+		      std::string& userInfo, std::string& comment );
 private:
 	const std::string	m_filename;
+	const bool		m_create;
 };
 
 }} // namepspace _Wolframe::AAAA
