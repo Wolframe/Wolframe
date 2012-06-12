@@ -206,16 +206,23 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			int rt = lua_resume( sc->thread(), NULL, 0);
 			while (rt == LUA_YIELD)
 			{
-				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) break;
-				rt = lua_resume( sc->thread(), NULL, 0);
+				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
+				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+				{
+					rt = lua_resume( sc->thread(), NULL, 0);
+				}
 			}
-			if (rt)
+			if (rt == LUA_OK)
+			{
+				writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+				return true;
+			}
+			else
 			{
 				const char* msg = lua_tostring( sc->thread(), -1);
 				LOG_ERROR << "error in lua script: '" << msg << "'";
 				return false;
 			}
-			return true;
 		}
 	}
 #endif
@@ -235,6 +242,10 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
 				{
 					rt = ctx.call();
+				}
+				else
+				{
+					break;
 				}
 			}
 			if (rt == langbind::FormFunction::Ok)

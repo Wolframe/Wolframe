@@ -56,12 +56,23 @@ public:
 		Error		//< have to stop processing with an error
 	};
 
+	///\brief Default constructor
 	OutputFilter()
 		:m_state(Open)
 		,m_buf(0)
 		,m_size(0)
 		,m_pos(0){}
 
+	///\brief Copy constructor
+	///\param[in] o output filter to copy
+	OutputFilter( const OutputFilter& o)
+		:FilterBase(o)
+		,m_state(o.m_state)
+		,m_buf(o.m_buf)
+		,m_size(o.m_size)
+		,m_pos(o.m_pos){}
+
+	///\brief Destructor
 	virtual ~OutputFilter(){}
 
 	///\brief self copy

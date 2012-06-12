@@ -78,7 +78,6 @@ struct InputFilterImpl:public InputFilter
 		,m_srcsize(0)
 		,m_srcend(false){}
 
-
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)

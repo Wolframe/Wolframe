@@ -983,7 +983,12 @@ public:
 	///\brief Copy constructor
 	///\param [in] o scanner to copy
 	XMLScanner( const XMLScanner& o)
-			:state(o.state),m_doTokenize(o.m_doTokenize),error(o.error),m_src(o.m_src),m_entityMap(o.m_entityMap),m_outputBuf(o.m_outputBuf)
+		:state(o.state)
+		,m_doTokenize(o.m_doTokenize)
+		,error(o.error)
+		,m_src(o.m_src)
+		,m_entityMap(o.m_entityMap)
+		,m_outputBuf(o.m_outputBuf)
 	{}
 
 	///\brief Assign something to the source iterator while keeping the state

@@ -54,13 +54,14 @@ public:
 	Context( Flags f=None);
 	~Context(){}
 
-	const char* getLastError() const		{return m_lasterror[0]?m_lasterror:0;}
+	const char* getLastError() const				{return m_lasterror[0]?m_lasterror:0;}
 	void clear();
 
 	void setTag( const char* tag);
 	void setError( const char* msg, const char* msgparam=0);
+	void setError( const char* msg, const std::string& p)		{return setError( msg, p.c_str());}
 
-	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}
+	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
 private:
 	char m_lasterror[ 256];
 	Flags m_flags;

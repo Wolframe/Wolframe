@@ -84,10 +84,22 @@ private:
 			TableIterValue,		//< the opening tag has been fetched and the value is to fetch next or a new iterator has to be opened and pushed on the stack
 			TableIterClose,		//< the value has been processed and the close tag is to fetch next
 			TableIterNext,		//< the close tag has been fetched and a skip to the next element has to be done
+			VectorIterValue,	//< same as TableIterValue for a vector
+			VectorIterClose,	//< close for elements except the last one
+			VectorIterReopen,	//< reopen for elements except the last one
 			Done			//< finishing operation for this state
 		};
+
+		static const char* idName( Id i)
+		{
+			static const char* ar[] = {"Init","TableIterOpen","TableIterValue","TableIterClose","TableIterNext","VectorIterValue","VectorIterClose","VectorIterReopen","Done"};
+			return ar[ (int)i];
+		}
 		Id id;				//< state identifier
 		const char* tag;		//< caller tag, used enclosing tag by arrays
+		std::size_t tagsize;		//< size of tag
+
+		void getTagElement( Element& e);
 	};
 
 	bool getValue( int idx, Element& e);	//< fetch the element with index 'idx' as atomic value

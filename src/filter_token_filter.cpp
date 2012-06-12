@@ -81,7 +81,9 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:OutputFilter(o),m_elembuf(o.m_elembuf),m_elemitr(o.m_elemitr){}
+		:OutputFilter(o)
+		,m_elembuf(o.m_elembuf)
+		,m_elemitr(o.m_elemitr){}
 
 	///\brief self copy
 	///\return copy of this
@@ -176,7 +178,7 @@ struct InputFilterImpl :public InputFilter
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:InputFilter( o)
+		:InputFilter(o)
 		,m_itr(o.m_itr)
 		,m_tag(o.m_tag)
 		,m_elembuf(o.m_elembuf)

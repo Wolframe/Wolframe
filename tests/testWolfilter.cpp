@@ -59,7 +59,8 @@ using namespace _Wolframe;
 ///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
 static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 {
-	langbind::GlobalContext* gct = langbind::getGlobalContext();
+	langbind::GlobalContext* gct = new langbind::GlobalContext();
+	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
 
 	gct->defineFormFunction( "employee_assignment_convert",
 					langbind::FormFunction(
@@ -142,7 +143,7 @@ TEST_F( WolfilterTest, tests)
 
 	// [2] Execute tests:
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
-	for (testno=0; itr != end; ++itr,++testno)
+	for (testno=1; itr != end; ++itr,++testno)
 	{
 		// [2.1] Remove old temporary files:
 		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");

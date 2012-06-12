@@ -44,6 +44,9 @@ namespace langbind {
 class FilterBase
 {
 public:
+	FilterBase();
+	FilterBase( const FilterBase& o);
+
 	///\enum ElementType
 	///\brief Content element type that describes the role of the element in the structured input
 	enum ElementType

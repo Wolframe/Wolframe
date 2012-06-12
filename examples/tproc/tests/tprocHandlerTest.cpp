@@ -154,6 +154,18 @@ public:
 
 static std::string selectedTestName;
 
+static bool directoryExists( boost::filesystem::path& pt)
+{
+	try
+	{
+		return boost::filesystem::exists( pt) && boost::filesystem::is_directory( pt);
+	}
+	catch (const std::exception&)
+	{
+		return false;
+	}
+}
+
 TEST_F( TProcHandlerTest, tests)
 {
 	enum {NOF_IB=6,NOF_OB=4};
@@ -195,11 +207,11 @@ TEST_F( TProcHandlerTest, tests)
 	{
 		// Remove old temporary files:
 		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
-		if (boost::filesystem::exists( tempdir) && boost::filesystem::is_directory( tempdir))
+		if (directoryExists( tempdir))
 		{
 			boost::filesystem::remove_all( tempdir);
-			boost::filesystem::create_directory( tempdir);
 		}
+		boost::filesystem::create_directory( tempdir);
 		// Read test description:
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())

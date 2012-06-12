@@ -31,6 +31,7 @@
 
 ************************************************************************/
 #include "langbind/luaDebug.hpp"
+#include <stdexcept>
 #include "logger-v1.hpp"
 #include <boost/lexical_cast.hpp>
 
@@ -71,6 +72,10 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, int dept
 		case LUA_TTABLE:
 			if (depth > 0)
 			{
+				if (!lua_checkstack( ls, 10))
+				{
+					throw std::runtime_error( "lua stack overflow");
+				}
 				rt.append( "{ ");
 				lua_pushvalue( ls, index);
 				lua_pushnil( ls);

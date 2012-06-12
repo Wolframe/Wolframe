@@ -48,8 +48,12 @@ class BufferingInputFilter :public InputFilter
 public:
 	BufferingInputFilter( InputFilter* ref)
 		:m_ref(ref->copy()),m_end(false){}
+
 	BufferingInputFilter( const BufferingInputFilter& o)
-		:m_ref(o.m_ref->copy()),m_end(o.m_end){}
+		:InputFilter(o)
+		,m_ref(o.m_ref->copy())
+		,m_end(o.m_end){}
+
 	virtual ~BufferingInputFilter()
 	{
 		delete m_ref;

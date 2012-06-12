@@ -49,10 +49,12 @@ public:
 	///\brief Constructor
 	explicit SerializeInputFilter( InputFilter* inp=0)
 		:m_inputfilter(inp){}
+
 	///\brief Copy constructor
 	///\param[in] o input filter to copy
 	SerializeInputFilter( const SerializeInputFilter& o)
 		:TypedInputFilter(o),m_inputfilter(o.m_inputfilter){}
+
 	///\brief Destructor
 	virtual ~SerializeInputFilter(){}
 
@@ -71,10 +73,12 @@ public:
 	///\brief Constructor
 	SerializeOutputFilter( OutputFilter* out=0)
 		:m_outputfilter(out){}
+
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
 	SerializeOutputFilter( const SerializeOutputFilter& o)
 		:TypedOutputFilter(o),m_outputfilter(o.m_outputfilter){}
+
 	///\brief Destructor
 	virtual ~SerializeOutputFilter(){}
 

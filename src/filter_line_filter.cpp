@@ -56,7 +56,9 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:OutputFilter(o),m_elemitr(o.m_elemitr){}
+		:OutputFilter(o)
+		,m_elembuf(o.m_elembuf)
+		,m_elemitr(o.m_elemitr){}
 
 	///\brief self copy
 	///\return copy of this
