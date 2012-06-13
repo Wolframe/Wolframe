@@ -29,47 +29,35 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/mapContext.hpp
-///\brief Defines the error handling of serialization/deserialization functions
-
-#ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#include <string>
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
+///\file langbind/luaException.hpp
+///\brief interface for throwing C++ exceptions for lua functions called in a C++ context (outside the interpreter)
+#ifndef _Wolframe_langbind_LUA_EXCEPTION_HPP_INCLUDED
+#define _Wolframe_langbind_LUA_EXCEPTION_HPP_INCLUDED
+extern "C" {
+	#include <lua.h>
+}
 
 namespace _Wolframe {
-namespace serialize {
+namespace langbind {
 
-class Context
+///\class LuaExceptionHandlerScope
+///\brief Marking a scope during lifetime (RAII) where lua exceptions are translated into C++ exceptions
+///\remark This class should be used when calling lua functions and both C++ exceptions and Lua exceptions may be thrown
+class LuaExceptionHandlerScope
 {
 public:
-	enum Flags
-	{
-		None=0x00,
-		ValidateAttributes=0x01,
-		CheckComplete=0x02
-	};
-
-	Context( Flags f=None);
-	~Context(){}
-
-	const char* getLastError() const				{return m_lasterror[0]?m_lasterror:0;}
-	void clear();
-
-	void setTag( const char* tag);
-	void setError( const char* msg, const char* msgparam=0);
-	void setError( const char* msg, const std::string& p)		{return setError( msg, p.c_str());}
-
-	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
+	explicit LuaExceptionHandlerScope( lua_State* ls);
+	LuaExceptionHandlerScope( const LuaExceptionHandlerScope& o)
+		:m_panicf(o.m_panicf){}
+	~LuaExceptionHandlerScope();
 private:
-	char m_lasterror[ 256];
-	Flags m_flags;
-
-	void setMsg( const char* m1, char dd, const char* m2, const char* m3=0);
+	lua_State* m_ls;
+	lua_CFunction m_panicf;
 };
 
-
-}}
+}}//namespace
 #endif
+
+
+
 

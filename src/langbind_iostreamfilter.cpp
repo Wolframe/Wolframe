@@ -39,6 +39,7 @@
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLPrint.hpp"
 #include "filter/token_filter.hpp"
+#include "filter/serializefilter.hpp"
 #if WITH_LUA
 #include "cmdbind/luaCommandHandler.hpp"
 #include "langbind/luaObjects.hpp"
@@ -205,40 +206,78 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			int rt = lua_resume( sc->thread(), NULL, 0);
 			while (rt == LUA_YIELD)
 			{
-				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) break;
-				rt = lua_resume( sc->thread(), NULL, 0);
-			}
-			if (rt)
-			{
-				const char* msg = lua_tostring( sc->thread(), -1);
-				LOG_ERROR << "error in lua script: '" << msg << "'";
-				return false;
-			}
-			return true;
-		}
-	}
-#endif
-	{
-		PluginFunction pf;
-		if (gc->getPluginFunction( proc.c_str(), pf))
-		{
-			langbind::PluginFunction::CallResult rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
-			while (rt == langbind::PluginFunction::Yield)
-			{
 				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
 				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
 				{
-					rt = pf.call( *flt.inputfilter(), *flt.outputfilter());
+					rt = lua_resume( sc->thread(), NULL, 0);
 				}
 			}
-			if (rt == langbind::PluginFunction::Ok)
+			if (rt == LUA_OK)
 			{
 				writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 				return true;
 			}
 			else
 			{
-				LOG_ERROR << "error in plugin function: '" << pf.getLastError() << "'";
+				const char* msg = lua_tostring( sc->thread(), -1);
+				LOG_ERROR << "error in lua script: '" << msg << "'";
+				return false;
+			}
+		}
+	}
+#endif
+	{
+		FormFunction ffunc;
+		if (gc->getFormFunction( proc.c_str(), ffunc))
+		{
+			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
+			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
+			langbind::FormFunctionClosure closure( ffunc);
+			closure.init( inp);
+			langbind::FormFunction::CallResult rt = closure.call();
+			while (rt == langbind::FormFunction::Yield)
+			{
+				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
+				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+				{
+					rt = closure.call();
+				}
+				else
+				{
+					break;
+				}
+			}
+			if (rt == langbind::FormFunction::Ok)
+			{
+				langbind::FormFunctionResult res = closure.result();
+				res.init( outp);
+				rt = res.fetch();
+				while (rt == langbind::FormFunction::Yield)
+				{
+					if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
+					|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+					{
+						rt = res.fetch();
+					}
+					else
+					{
+						break;
+					}
+				}
+				if (rt == langbind::FormFunction::Ok)
+				{
+					writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+					return true;
+				}
+				else
+				{
+					LOG_ERROR << "error fetching form function result: '" << res.getLastError() << "'";
+					return false;
+				}
+			}
+			else
+			{
+				LOG_ERROR << "error in form function: '" << closure.getLastError() << "'";
 				return false;
 			}
 		}
@@ -250,8 +289,10 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			serialize::Context ctx;
 			serialize::FiltermapDDLParseStateStack parsestk;
 			serialize::FiltermapDDLPrintStateStack printstk;
+			langbind::SerializeInputFilter tin( flt.inputfilter().get());
+			langbind::SerializeOutputFilter tout( flt.outputfilter().get());
 
-			while (!serialize::parse( df->m_struct, *flt.inputfilter(), ctx, parsestk))
+			while (!serialize::parse( df->m_struct, tin, ctx, parsestk))
 			{
 				const char* err = ctx.getLastError();
 				if (err)
@@ -262,7 +303,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) break;
 				continue;
 			}
-			while (!serialize::print( df->m_struct, *flt.outputfilter(), ctx, printstk))
+			while (!serialize::print( df->m_struct, tout, ctx, printstk))
 			{
 				const char* err = ctx.getLastError();
 				if (err)

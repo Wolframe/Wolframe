@@ -249,12 +249,11 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 }
 
 
-bool _Wolframe::serialize::parse( ddl::StructType& st, langbind::InputFilter& in, Context& ctx, std::vector<FiltermapDDLParseState>& stk)
+bool _Wolframe::serialize::parse( ddl::StructType& st, langbind::TypedInputFilter& tin, Context& ctx, std::vector<FiltermapDDLParseState>& stk)
 {
 	bool rt = true;
 	try
 	{
-		langbind::SerializeInputFilter tin( &in);
 		if (stk.size() == 0)
 		{
 			stk.push_back( FiltermapDDLParseState( &st));

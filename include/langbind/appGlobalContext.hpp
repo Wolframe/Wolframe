@@ -50,7 +50,7 @@ class GlobalContext
 	,public DDLFormMap
 	,public TransactionFunctionMap
 	,public DDLCompilerMap
-	,public PluginFunctionMap
+	,public FormFunctionMap
 #if WITH_LUA
 	,public LuaFunctionMap
 #endif

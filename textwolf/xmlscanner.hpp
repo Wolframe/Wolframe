@@ -38,6 +38,7 @@
 #include "textwolf/charset_interface.hpp"
 #include "textwolf/exception.hpp"
 #include "textwolf/textscanner.hpp"
+#include <map>
 #include <cstddef>
 
 namespace textwolf {
@@ -231,7 +232,6 @@ public:
 		ErrExpectedOpenTag,			//< expected an open tag in this state
 		ErrExpectedXMLTag,			//< expected an <?xml tag in this state
 		ErrUnexpectedEndOfText,			//< unexpected end of text in the middle of the XML definition
-		ErrOutputBufferTooSmall,		//< scaned element in XML to big to fit in the buffer provided for it
 		ErrSyntaxToken,				//< a specific string expected as token in XML but does not match
 		ErrStringNotTerminated,			//< attribute string in XML not terminated on the same line
 		ErrUndefinedCharacterEntity,		//< named entity is not defined in the entity map
@@ -824,15 +824,16 @@ public:
 	///\return true on success
 	bool skipToken( const IsTokenCharMap& isTok)
 	{
-		for (;;)
+		do
 		{
 			ControlCharacter ch;
 			while (isTok[ (unsigned char)(ch=m_src.control())] || ch == Amp)
 			{
 				m_src.skip();
 			}
-			if (m_src.control() != Any) return true;
 		}
+		while (m_src.control() == Any);
+		return true;
 	}
 
 	///\brief Parse a token that must be the same as a given string
@@ -982,7 +983,12 @@ public:
 	///\brief Copy constructor
 	///\param [in] o scanner to copy
 	XMLScanner( const XMLScanner& o)
-			:state(o.state),m_doTokenize(o.m_doTokenize),error(o.error),m_src(o.m_src),m_entityMap(o.m_entityMap),m_outputBuf(o.m_outputBuf)
+		:state(o.state)
+		,m_doTokenize(o.m_doTokenize)
+		,error(o.error)
+		,m_src(o.m_src)
+		,m_entityMap(o.m_entityMap)
+		,m_outputBuf(o.m_outputBuf)
 	{}
 
 	///\brief Assign something to the source iterator while keeping the state

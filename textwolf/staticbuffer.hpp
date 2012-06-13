@@ -36,6 +36,9 @@
 #define __TEXTWOLF_STATIC_BUFFER_HPP__
 #include "textwolf/exception.hpp"
 #include <cstddef>
+#include <cstring>
+#include <cstdlib>
+#include <stdexcept>
 
 namespace textwolf {
 
@@ -46,18 +49,45 @@ class StaticBuffer :public throws_exception
 public:
 	///\brief Constructor
 	explicit StaticBuffer( std::size_t n)
-		:m_pos(0),m_size(n),m_ar(0),m_allocated(true) {m_ar=new char[n];}
+		:m_pos(0),m_size(n),m_ar(0),m_allocated(true)
+	{
+		m_ar = (char*)std::calloc( n, sizeof(char));
+		if (!m_ar) throw std::bad_alloc();
+	}
 
 	///\brief Constructor
 	StaticBuffer( char* p, std::size_t n, std::size_t i=0)
-		:m_pos(i),m_size(n),m_ar(p),m_allocated(false),m_overflow(false) {}
+		:m_pos(i)
+		,m_size(n)
+		,m_ar(p)
+		,m_allocated(false)
+		,m_overflow(false) {}
+
+	///\brief Copy constructor
+	StaticBuffer( const StaticBuffer& o)
+		:m_pos(o.m_pos)
+		,m_size(o.m_size)
+		,m_ar(0)
+		,m_allocated(o.m_allocated)
+		,m_overflow(o.m_overflow)
+	{
+		m_ar = (char*)std::malloc( m_size * sizeof(char));
+		if (!m_ar) throw std::bad_alloc();
+		std::memcpy( m_ar, o.m_ar, m_size);
+	}
 
 	///\brief Destructor
 	~StaticBuffer()
-		{if (m_allocated) delete [] m_ar;}
+	{
+		if (m_allocated && m_ar) std::free(m_ar);
+	}
 
 	///\brief Clear the buffer content
-	void clear()				{m_pos=0;m_overflow=false;}
+	void clear()
+	{
+		m_pos = 0;
+		m_overflow = false;
+	}
 
 	///\brief Append one character
 	///\param[in] ch the character to append
@@ -132,6 +162,8 @@ public:
 	///\brief check for array bounds write
 	///\return true if a push_back would have caused an array bounds write
 	bool overflow() const			{return m_overflow;}
+private:
+	StaticBuffer(){}
 private:
 	std::size_t m_pos;			//< current cursor position of the buffer (number of added characters)
 	std::size_t m_size;			//< allocation size of the buffer in bytes

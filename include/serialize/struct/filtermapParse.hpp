@@ -101,7 +101,7 @@ bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Cont
 			FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
 			if (itr == descr->end())
 			{
-				ctx.setError( "unknown element");
+				ctx.setError( "unknown element ", element.tostring());
 				return false;
 			}
 			std::size_t idx = itr - descr->begin();
@@ -186,7 +186,7 @@ bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Cont
 			return true;
 		}
 	}
-	ctx.setError( "illegal state");
+	ctx.setError( "illegal state in parse structure");
 	return false;
 }
 
@@ -259,7 +259,7 @@ static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& in
 			}
 			return true;
 	}
-	ctx.setError( "illegal state");
+	ctx.setError( "illegal state in parse atomic value");
 	return false;
 }
 

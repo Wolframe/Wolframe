@@ -36,6 +36,7 @@
 #include "langbind/iostreamfilter.hpp"
 #include "logger-v1.hpp"
 #include "langbind/appGlobalContext.hpp"
+#include "wolfilterCommandLine.hpp"
 #include "wolfilter/src/employee_assignment_print.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
@@ -55,14 +56,28 @@ static char* g_gtest_ARGV[2] = {0, 0};
 
 using namespace _Wolframe;
 
-static void prepareTest()
+///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
+static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 {
-	langbind::GlobalContext* gct = langbind::getGlobalContext();
-	gct->definePluginFunction( "employee_assignment_convert",
-					langbind::PluginFunction(
+	langbind::GlobalContext* gct = new langbind::GlobalContext();
+	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
+
+	gct->defineFormFunction( "employee_assignment_convert",
+					langbind::FormFunction(
 						test::convertAssignmentListDoc,
 						test::AssignmentListDoc::getFiltermapDescription(),
 						test::AssignmentListDoc::getFiltermapDescription()));
+	std::vector<std::string>::const_iterator itr = cmdline.scripts().begin(), end = cmdline.scripts().end();
+	for (; itr != end; ++itr)
+	{
+		boost::filesystem::path scriptpath( boost::filesystem::current_path() / "temp" / *itr);
+		langbind::LuaScript script( scriptpath.string());
+		std::vector<std::string>::const_iterator fi = script.functions().begin(), fe = script.functions().end();
+		for (; fi != fe; ++fi)
+		{
+			gct->defineLuaFunction( *fi, script);
+		}
+	}
 }
 
 class WolfilterTest : public ::testing::Test
@@ -76,6 +91,18 @@ protected:
 
 static std::string selectedTestName;
 
+static bool directoryExists( boost::filesystem::path& pt)
+{
+	try
+	{
+		return boost::filesystem::exists( pt) && boost::filesystem::is_directory( pt);
+	}
+	catch (const std::exception&)
+	{
+		return false;
+	}
+}
+
 TEST_F( WolfilterTest, tests)
 {
 	enum {ibarsize=11,obarsize=7,EoDBufferSize=4};
@@ -84,6 +111,7 @@ TEST_F( WolfilterTest, tests)
 	std::vector<std::string> tests;
 	std::size_t testno;
 
+	// [1] Selecting tests to execute:
 	boost::filesystem::recursive_directory_iterator ditr( boost::filesystem::current_path() / "wolfilter" / "data"), dend;
 	if (selectedTestName.size())
 	{
@@ -113,20 +141,29 @@ TEST_F( WolfilterTest, tests)
 	}
 	std::sort( tests.begin(), tests.end());
 
+	// [2] Execute tests:
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
-	for (testno=0; itr != end; ++itr,++testno)
+	for (testno=1; itr != end; ++itr,++testno)
 	{
-		boost::filesystem::remove_all( boost::filesystem::current_path() / "temp" );
-		boost::filesystem::create_directory( boost::filesystem::current_path() / "temp");
-
+		// [2.1] Remove old temporary files:
+		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
+		if (directoryExists( tempdir))
+		{
+			boost::filesystem::remove_all( tempdir);
+		}
+		boost::filesystem::create_directory( tempdir);
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{
+			// [2.2] Skip tests when disabled
 			std::cerr << "skipping test '" << *itr << "' ( is " << td.requires << ")" << std::endl;
 			continue;
 		}
+		// [2.3] Define I/O buffer sizes
 		std::size_t ib = ibar[ testno % ibarsize];
 		std::size_t ob = obar[ testno % obarsize];
+
+		// [2.4] Parse command line in config section of the test description
 		std::vector<std::string> cmd;
 		std::string cmdstr( td.config);
 		boost::algorithm::trim( cmdstr);
@@ -137,34 +174,28 @@ TEST_F( WolfilterTest, tests)
 			for (; vi != ve; ++vi) if (!vi->empty()) cmd.push_back( *vi);
 		}
 		std::cerr << "processing test '" << *itr << "'" << std::endl;
+		enum {MaxNofArgs=31};
+		int cmdargc = cmd.size()+1;
+		const char* cmdargv[MaxNofArgs+1];
+		if (cmdargc > MaxNofArgs) throw std::runtime_error( "too many arguments in test");
+		cmdargv[0] = g_gtest_ARGV[0];
+		for (int ci=1; ci<cmdargc; ++ci)
+		{
+			cmdargv[ci] = cmd[ci-1].c_str();
+		}
+		config::WolfilterCommandLine cmdline( cmdargc, cmdargv);
 
-		std::string infiltername;
-		std::string outfiltername;
-		std::string procname;
+		// [2.5] Call iostreamfilter
+		if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;
+		if (cmdline.printversion()) std::cerr << "ignored option --version" << std::endl;
+		if (cmdline.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
 
-		if (cmd.size() == 3)
-		{
-			procname = cmd[0];
-			infiltername = cmd[1];
-			outfiltername = cmd[2];
-		}
-		else if (cmd.size() == 2)
-		{
-			procname = cmd[0];
-			infiltername = cmd[1];
-			outfiltername = cmd[1];
-		}
-		else
-		{
-			std::cerr << "illegal number of arguments in test '" << *itr << "' (" << cmd.size() << ")" << std::endl;
-			EXPECT_EQ( 3, cmd.size());;
-			continue;
-		}
+		loadGlobalContext( cmdline);
 
 		std::istringstream in( td.input, std::ios::in | std::ios::binary);
 		std::ostringstream out( std::ios::out | std::ios::binary);
 
-		bool trt = langbind::iostreamfilter( procname, infiltername, ib, outfiltername, ob, in, out);
+		bool trt = langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
 		if (!trt)
 		{
 			boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
@@ -174,6 +205,7 @@ TEST_F( WolfilterTest, tests)
 		EXPECT_EQ( true, trt);
 		if (td.expected != out.str())
 		{
+			// [2.6] Dump test contents to files in case of error
 			boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
 			std::fstream oo( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
 			oo.write( out.str().c_str(), out.str().size());
@@ -204,7 +236,6 @@ TEST_F( WolfilterTest, tests)
 
 int main( int argc, char **argv )
 {
-	prepareTest();
 	g_gtest_ARGC = 1;
 	g_gtest_ARGV[0] = argv[0];
 	if (argc > 2)

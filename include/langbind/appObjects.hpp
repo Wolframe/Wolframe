@@ -211,45 +211,33 @@ private:
 	std::map<std::string,DDLForm> m_map;
 };
 
-///\class PluginFunction
-class PluginFunction
+///\class FormFunction
+class FormFunction
 {
 public:
 	typedef int (Call)( void* res, const void* param);
 
 	///\brief Default constructor
-	PluginFunction()
-		:m_state(-1)
-		,m_lastres(Error)
-		,m_call(0)
+	FormFunction()
+		:m_call(0)
 		,m_api_param(0)
 		,m_api_result(0){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
-	PluginFunction( const PluginFunction& o)
-		:m_state(o.m_state)
-		,m_lastres(o.m_lastres)
-		,m_data(o.m_data)
-		,m_call(o.m_call)
+	FormFunction( const FormFunction& o)
+		:m_call(o.m_call)
 		,m_api_param(o.m_api_param)
-		,m_api_result(o.m_api_result)
-		,m_parsestk(o.m_parsestk)
-		,m_printstk(o.m_printstk)
-		,m_ctx(o.m_ctx)
-	{
-		if (m_state > 0) throw std::runtime_error( "illegal copy of plugin function not in initial state");
-	}
+		,m_api_result(o.m_api_result){}
 
 	///\brief Constructor
 	///\param[in] c function to call
 	///\param[in] p part of the api describing the input
 	///\param[in] r part of the api describing the function result
-	PluginFunction( Call c, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
-		:m_state(0),m_lastres(Ok),m_data(std::calloc( p->size() + r->size(), 1), std::free),m_call(c),m_api_param(p),m_api_result(r){}
-
-	///\brief Destructor
-	~PluginFunction();
+	FormFunction( Call c, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
+		:m_call(c)
+		,m_api_param(p)
+		,m_api_result(r){}
 
 	///\enum CallResult
 	///\brief Enumeration of call states of a function call processing
@@ -259,34 +247,112 @@ public:
 		Error,		//< termination of call with error (not completed)
 		Yield		//< call interrupted with request for a network operation
 	};
-	CallResult call( InputFilter& ifl, OutputFilter& ofl);
 
-	const char* getLastError() const		{return m_ctx.getLastError();}
-
+	const serialize::FiltermapDescriptionBase* api_param() const	{return m_api_param;}
+	const serialize::FiltermapDescriptionBase* api_result() const	{return m_api_result;}
+	Call* call() const						{return m_call;}
 private:
-	int m_state;
-	CallResult m_lastres;
-	boost::shared_ptr<void> m_data;
 	Call* m_call;
 	const serialize::FiltermapDescriptionBase* m_api_param;
 	const serialize::FiltermapDescriptionBase* m_api_result;
-	serialize::FiltermapParseStateStack m_parsestk;
-	serialize::FiltermapPrintStateStack m_printstk;
-	serialize::Context m_ctx;
 };
 
-///\class PluginFunctionMap
-///\brief Map of available transaction functions seen from scripting language binding
-class PluginFunctionMap
+
+///\class FormFunctionResult
+///\brief Result of a FormFunction call
+class FormFunctionResult
 {
 public:
-	PluginFunctionMap(){}
-	~PluginFunctionMap(){}
+	FormFunctionResult( const FormFunction& f);
 
-	void definePluginFunction( const std::string& name, const PluginFunction& f);
-	bool getPluginFunction( const std::string& name, PluginFunction& rt) const;
+	FormFunctionResult( const FormFunctionResult& o)
+		:m_description(o.m_description)
+		,m_state(o.m_state)
+		,m_data(o.m_data)
+		,m_ctx(o.m_ctx)
+		,m_printstk(o.m_printstk){}
+
+	~FormFunctionResult();
+
+	const char* getLastError() const
+	{
+		return m_ctx.getLastError();
+	}
+
+	FormFunction::CallResult fetch();
+
+	void init( const TypedOutputFilterR& o)
+	{
+		m_outputfilter = o;
+	}
+
 private:
-	std::map<std::string,PluginFunction> m_map;
+	friend class FormFunctionClosure;
+	const serialize::FiltermapDescriptionBase* m_description;
+	int m_state;
+	boost::shared_ptr<void> m_data;
+	serialize::Context m_ctx;
+	serialize::FiltermapPrintStateStack m_printstk;
+	TypedOutputFilterR m_outputfilter;
+};
+
+
+///\class FormFunctionClosure
+///\brief Closure with calling state of called FormFunction
+class FormFunctionClosure :public FormFunction
+{
+public:
+	FormFunctionClosure( const FormFunction& f);
+
+	FormFunctionClosure( const FormFunctionClosure& o)
+		:FormFunction(o)
+		,m_state(o.m_state)
+		,m_result(o.m_result)
+		,m_data(o.m_data)
+		,m_parsestk(o.m_parsestk)
+		,m_ctx(o.m_ctx)
+		,m_inputfilter(o.m_inputfilter)
+		{}
+
+	~FormFunctionClosure();
+
+	const char* getLastError() const
+	{
+		return m_ctx.getLastError();
+	}
+
+	CallResult call();
+
+	void init( const TypedInputFilterR& i)
+	{
+		m_inputfilter = i;
+	}
+
+	const TypedInputFilterR& inputfilter() const	{return m_inputfilter;}
+	const FormFunctionResult& result() const	{return m_result;}
+
+private:
+	int m_state;
+	FormFunctionResult m_result;
+	boost::shared_ptr<void> m_data;
+	serialize::FiltermapParseStateStack m_parsestk;
+	serialize::Context m_ctx;
+	TypedInputFilterR m_inputfilter;
+};
+
+
+///\class FormFunctionMap
+///\brief Map of available transaction functions seen from scripting language binding
+class FormFunctionMap
+{
+public:
+	FormFunctionMap(){}
+	~FormFunctionMap(){}
+
+	void defineFormFunction( const std::string& name, const FormFunction& f);
+	bool getFormFunction( const std::string& name, FormFunction& rt) const;
+private:
+	std::map<std::string,FormFunction> m_map;
 };
 
 

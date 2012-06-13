@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/pipe.hpp
-///\brief Interface for a pipe (istream|ostream) through wolframe mappings like filters, forms, functions
+///\file langbind/iostreamfilter.hpp
+///\brief Interface for mapping istream to ostream by filters, forms, functions
 #ifndef _Wolframe_langbind_IOSTREAMFILTER_HPP_INCLUDED
 #define _Wolframe_langbind_IOSTREAMFILTER_HPP_INCLUDED
 #include <string>

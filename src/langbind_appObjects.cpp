@@ -37,9 +37,11 @@ Project Wolframe.
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include "logger-v1.hpp"
 #include "filter/filter.hpp"
+#include "filter/serializefilter.hpp"
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
 #include "filter/token_filter.hpp"
+#include "filter/expression_filter.hpp"
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <cctype>
@@ -147,128 +149,149 @@ bool DDLFormMap::getForm( const std::string& name, DDLFormR& rt) const
 	return getObject( m_map, name, *rt.get());
 }
 
-PluginFunction::CallResult PluginFunction::call( InputFilter& ifl, OutputFilter& ofl)
+FormFunctionResult::FormFunctionResult( const FormFunction& f)
+	:m_description(f.api_result())
+	,m_state(0)
+	,m_data(std::calloc( f.api_result()->size(), 1), std::free)
 {
-	if (m_lastres == Error) return Error;
+	void* result_struct = m_data.get();
+	if (!result_struct || !m_description->init( result_struct))
+	{
+		m_ctx.setError( "could not initialize api result object for form function");
+	}
+	else
+	{
+		m_state = 1;
+	}
+}
+
+FormFunctionResult::~FormFunctionResult()
+{
+	if (m_state)
+	{
+		m_description->done( m_data.get());
+		std::memset( m_data.get(), 0, m_description->size());
+		if (m_state == 2) m_state = 1;
+	}
+}
+
+FormFunction::CallResult FormFunctionResult::fetch()
+{
+	if (m_state == 0) return FormFunction::Error;
+	if (m_state == 2) return FormFunction::Ok;
+	const void* result_struct = m_data.get();
+	if (!m_outputfilter.get())
+	{
+		m_ctx.setError( "no output filter defined for fetching the form function result");
+		return FormFunction::Error;
+	}
+	if (!m_description->print( result_struct, *m_outputfilter, m_ctx, m_printstk))
+	{
+		switch (m_outputfilter->state())
+		{
+			case OutputFilter::Open:
+				return FormFunction::Error;
+
+			case OutputFilter::EndOfBuffer:
+				return FormFunction::Yield;
+
+			case OutputFilter::Error:
+				m_ctx.setError( m_outputfilter->getError());
+				return FormFunction::Error;
+		}
+	}
+	m_ctx.clear();
+	m_printstk.clear();
+	return FormFunction::Ok;
+}
+
+FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
+	:FormFunction(f)
+	,m_state(0)
+	,m_result(f)
+	,m_data(std::calloc( f.api_param()->size(), 1), std::free)
+{
+	if (!m_data.get() || !m_result.m_data.get() || !f.api_param()->init( m_data.get()))
+	{
+		m_ctx.setError( "could not initialize objects for form function");
+	}
+	else
+	{
+		m_state = 1;
+	}
+}
+
+FormFunctionClosure::~FormFunctionClosure()
+{
+	if (m_state)
+	{
+		api_param()->done( m_data.get());
+		std::memset( m_data.get(), 0, api_param()->size());
+	}
+}
+
+FormFunction::CallResult FormFunctionClosure::call()
+{
+	if (m_state < 1) return Error;
 	void* param_struct = m_data.get();
-	void* result_struct = (void*)((char*)m_data.get() + m_api_param->size());
 
 	switch (m_state)
 	{
-		case 0:
-			m_ctx.clear();
-			if (!m_api_param->init( param_struct))
-			{
-				LOG_ERROR << "could not initialize api input object for plugin function";
-				return m_lastres=Error;
-			}
-			m_state = 1;
 		case 1:
-			if (!m_api_result->init( result_struct))
-			{
-				LOG_ERROR << "could not initialize api result object for plugin function";
-				return m_lastres=Error;
-			}
+			m_ctx.clear();
 			m_state = 2;
 		case 2:
-			if (!m_api_param->parse( param_struct, ifl, m_ctx, m_parsestk))
+			if (!m_inputfilter.get())
 			{
-				switch (ifl.state())
+				m_ctx.setError( "no input filter defined for form function");
+				return Error;
+			}
+			if (!api_param()->parse( param_struct, *m_inputfilter, m_ctx, m_parsestk))
+			{
+				switch (m_inputfilter->state())
 				{
 					case InputFilter::Open:
 						if (m_ctx.getLastError())
 						{
-							LOG_ERROR << "API parameter: " << m_ctx.getLastError();
-							return m_lastres=Error;
+							return Error;
 						}
 						break;
 
 					case InputFilter::EndOfMessage:
-						return m_lastres=Yield;
+						return Yield;
 
 					case InputFilter::Error:
-						m_ctx.setError( ifl.getError());
-						LOG_ERROR << "input filter error: " << m_ctx.getLastError();
-						return m_lastres=Error;
+						m_ctx.setError( m_inputfilter->getError());
+						return Error;
 				}
 			}
 			m_state = 3;
 		case 3:
 			try
 			{
-				m_ctx.clear();
-				int rt = m_call( result_struct, param_struct);
+				int rt = FormFunction::call()( m_result.m_data.get(), param_struct);
 				if (rt != 0)
 				{
-					LOG_ERROR << "error in call of plugin function. error code = " << rt;
-					return m_lastres=Error;
+					m_ctx.setError( "error in call of form function");
+					return Error;
 				}
 			}
 			catch (const std::exception& e)
 			{
-				LOG_ERROR << "exception in plugin function call: " << e.what();
-				return m_lastres=Error;
+				m_ctx.setError( e.what());
+				return Error;
 			}
 			m_state = 4;
-		case 4:
-			if (!m_api_param->print( result_struct, ofl, m_ctx, m_printstk))
-			{
-				switch (ofl.state())
-				{
-					case OutputFilter::Open:
-						if (m_ctx.getLastError())
-						{
-							LOG_ERROR << "API result: " << m_ctx.getLastError();
-						}
-						return m_lastres=Error;
-
-					case OutputFilter::EndOfBuffer:
-						return m_lastres=Yield;
-
-					case OutputFilter::Error:
-						m_ctx.setError( ofl.getError());
-						LOG_ERROR << "output filter error: " << m_ctx.getLastError();
-						return m_lastres=Error;
-				}
-			}
-			m_state = 5;
-		case 5:
-			m_api_param->done( param_struct);
-			m_api_result->done( result_struct);
-			std::memset( m_data.get(), 0, m_api_param->size() + m_api_result->size());
-			m_state = 0;
 	}
-	return m_lastres=Ok;
+	return Ok;
 }
 
-PluginFunction::~PluginFunction()
-{
-	if (m_state >= 0)
-	{
-		void* param_struct = m_data.get();
-		void* result_struct = (void*)((char*)m_data.get() + m_api_param->size());
-
-		switch (m_state)
-		{
-			case 0:
-				break;
-			case 5:
-			case 4:
-			case 3:
-			case 2:
-				m_api_result->done( result_struct);
-			case 1:
-				m_api_param->done( param_struct);
-		}
-	}
-}
-
-void PluginFunctionMap::definePluginFunction( const std::string& name, const PluginFunction& f)
+void FormFunctionMap::defineFormFunction( const std::string& name, const FormFunction& f)
 {
 	defineObject( m_map, name, f);
 }
 
-bool PluginFunctionMap::getPluginFunction( const std::string& name, PluginFunction& rt) const
+bool FormFunctionMap::getFormFunction( const std::string& name, FormFunction& rt) const
 {
 	return getObject( m_map, name, rt);
 }
@@ -288,6 +311,8 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 	cmd->setInputBuffer( inbuf, inbufsize);
 	cmd->setOutputBuffer( outbuf, outbufsize, 0);
 	m_cmdwriter->setOutputBuffer( inbuf, inbufsize);
+	SerializeOutputFilter tcmdwriter( m_cmdwriter.get());
+	SerializeInputFilter tresultreader( m_resultreader.get());
 
 	std::string resultstr;
 	cmdbind::CommandHandler::Operation op = cmdbind::CommandHandler::READ;
@@ -298,7 +323,7 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 		{
 			case cmdbind::CommandHandler::READ:
 			{
-				if (!serialize::print( param.m_struct, *m_cmdwriter, m_ctx, m_printstk))
+				if (!serialize::print( param.m_struct, tcmdwriter, m_ctx, m_printstk))
 				{
 					const char* err = m_ctx.getLastError();
 					if (err)
@@ -318,7 +343,7 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 				cmd->getOutput( data, datasize);
 
 				m_resultreader->putInput( data, datasize, false);
-				if (!serialize::parse( result.m_struct, *m_resultreader, m_ctx, m_parsestk))
+				if (!serialize::parse( result.m_struct, tresultreader, m_ctx, m_parsestk))
 				{
 					const char* err = m_ctx.getLastError();
 					if (err)
@@ -333,7 +358,7 @@ bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
 			case cmdbind::CommandHandler::CLOSED:
 			{
 				m_resultreader->putInput( "", 0, true);
-				if (!serialize::parse( result.m_struct, *m_resultreader, m_ctx, m_parsestk))
+				if (!serialize::parse( result.m_struct, tresultreader, m_ctx, m_parsestk))
 				{
 					const char* err = m_ctx.getLastError();
 					if (err)

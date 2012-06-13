@@ -74,6 +74,7 @@ LOCAL_STATIC_LIB = \
 LOCAL_STATIC_LIB_OBJS = \
 	version.o \
 	commandLine.o \
+	wolfilterCommandLine.o \
 	serviceConfig.o \
 	serviceBanner.o \
 	appConfig.o \
@@ -95,6 +96,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_char_filter.o \
 	filter_line_filter.o \
 	filter_token_filter.o \
+	filter_expression_filter.o \
 	serialize_struct_filtermapBase.o \
 	serialize_ddl_filtermapPrint.o \
 	serialize_ddl_filtermapParse.o \
@@ -117,6 +119,7 @@ LOCAL_STATIC_LIB_OBJS += \
 	filter_luafilter.o \
 	langbind_luaObjects.o \
 	langbind_luaDebug.o \
+	langbind_luaException.o \
 	langbind_luaBignum.o \
 	cmdbind_luaCommandHandler.o
 endif

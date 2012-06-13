@@ -75,6 +75,14 @@ public:
 		,m_end(m_itr+size)
 		,m_eof(eof){}
 
+	SrcIterator& operator=( const SrcIterator& o)
+	{
+		m_itr = o.m_itr;
+		m_end = o.m_end;
+		m_eof = o.m_eof;
+		return *this;
+	}
+
 	///\brief access operator (required by textwolf for an input iterator)
 	char operator*()
 	{

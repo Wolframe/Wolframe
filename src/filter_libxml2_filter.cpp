@@ -118,7 +118,8 @@ struct InputFilterImpl :public InputFilter
 		,m_encoding(e){}
 
 	InputFilterImpl( const InputFilterImpl& o)
-		:m_doc(o.m_doc)
+		:InputFilter(o)
+		,m_doc(o.m_doc)
 		,m_node(o.m_node)
 		,m_value(o.m_value)
 		,m_prop(o.m_prop)

@@ -4,6 +4,16 @@
 using namespace _Wolframe;
 using namespace langbind;
 
+FilterBase::FilterBase()
+{
+	m_errorbuf[0] = '\0';
+}
+
+FilterBase::FilterBase( const FilterBase& o)
+{
+	setError( o.m_errorbuf);
+}
+
 void FilterBase::setError( const char* msg)
 {
 	if (msg)

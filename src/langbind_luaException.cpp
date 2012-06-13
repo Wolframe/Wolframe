@@ -29,47 +29,35 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/mapContext.hpp
-///\brief Defines the error handling of serialization/deserialization functions
+///\file langbind_luaException.cpp
+///\brief implementation of throwing C++ exceptions for lua functions called in a C++ context (outside the interpreter)
+#include "langbind/luaException.hpp"
+#include <stdexcept>
+#include <cstring>
 
-#ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#include <string>
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
+extern "C" {
+	#include <lualib.h>
+	#include <lauxlib.h>
+	#include <lua.h>
+}
 
-namespace _Wolframe {
-namespace serialize {
+using namespace _Wolframe;
+using namespace langbind;
 
-class Context
+static int luaException( lua_State* ls)
 {
-public:
-	enum Flags
-	{
-		None=0x00,
-		ValidateAttributes=0x01,
-		CheckComplete=0x02
-	};
+	const char* errmsg = lua_tostring( ls, -1);
+	throw std::runtime_error( errmsg?errmsg:"unspecified lua exception");
+	return 0;
+}
 
-	Context( Flags f=None);
-	~Context(){}
+LuaExceptionHandlerScope::LuaExceptionHandlerScope( lua_State* ls)
+	:m_ls(ls)
+	,m_panicf( lua_atpanic( ls, luaException))
+{}
 
-	const char* getLastError() const				{return m_lasterror[0]?m_lasterror:0;}
-	void clear();
-
-	void setTag( const char* tag);
-	void setError( const char* msg, const char* msgparam=0);
-	void setError( const char* msg, const std::string& p)		{return setError( msg, p.c_str());}
-
-	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
-private:
-	char m_lasterror[ 256];
-	Flags m_flags;
-
-	void setMsg( const char* m1, char dd, const char* m2, const char* m3=0);
-};
-
-
-}}
-#endif
+LuaExceptionHandlerScope::~LuaExceptionHandlerScope()
+{
+	lua_atpanic( m_ls, m_panicf);
+}
 

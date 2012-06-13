@@ -35,7 +35,9 @@ Project Wolframe.
 #ifndef _Wolframe_LUA_FILTER_HPP_INCLUDED
 #define _Wolframe_LUA_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "langbind/luaException.hpp"
 #include <vector>
+#include <stdexcept>
 
 #if WITH_LUA
 extern "C" {
@@ -47,25 +49,27 @@ namespace langbind {
 
 ///\class class LuaInputFilter
 ///\brief Lua table as typed input filter
-class LuaInputFilter :public TypedInputFilter
+class LuaInputFilter :public TypedInputFilter, public LuaExceptionHandlerScope
 {
 public:
 	///\brief Constructor
-	///\remark Expects the table to iterate as top element (-1) on the lua stack
-	///\remark Expects that the lua stack is not modified by anyone but this class in its lifetime
+	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaInputFilter::getNext(ElementType&,Element&)
 	LuaInputFilter( lua_State* ls);
 
 	///\brief Copy constructor
+	///\param[in] o lua input filter to copy
 	LuaInputFilter( const LuaInputFilter& o)
-		:m_ls(o.m_ls)
-		,m_panicf(o.m_panicf)
+		:TypedInputFilter(o)
+		,LuaExceptionHandlerScope(o)
+		,m_ls(o.m_ls)
 		,m_stk(o.m_stk){}
 
 	///\brief Destructor
 	///\remark Leaves the iterated table as top element (-1) on the lua stack
-	virtual ~LuaInputFilter();
+	virtual ~LuaInputFilter(){}
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
+	///\remark Expects the table to iterate as top element (-1) on the lua stack
 	virtual bool getNext( ElementType& type, Element& element);
 
 private:
@@ -80,10 +84,22 @@ private:
 			TableIterValue,		//< the opening tag has been fetched and the value is to fetch next or a new iterator has to be opened and pushed on the stack
 			TableIterClose,		//< the value has been processed and the close tag is to fetch next
 			TableIterNext,		//< the close tag has been fetched and a skip to the next element has to be done
+			VectorIterValue,	//< same as TableIterValue for a vector
+			VectorIterClose,	//< close for elements except the last one
+			VectorIterReopen,	//< reopen for elements except the last one
 			Done			//< finishing operation for this state
 		};
+
+		static const char* idName( Id i)
+		{
+			static const char* ar[] = {"Init","TableIterOpen","TableIterValue","TableIterClose","TableIterNext","VectorIterValue","VectorIterClose","VectorIterReopen","Done"};
+			return ar[ (int)i];
+		}
 		Id id;				//< state identifier
 		const char* tag;		//< caller tag, used enclosing tag by arrays
+		std::size_t tagsize;		//< size of tag
+
+		void getTagElement( Element& e);
 	};
 
 	bool getValue( int idx, Element& e);	//< fetch the element with index 'idx' as atomic value
@@ -92,32 +108,41 @@ private:
 
 private:
 	lua_State* m_ls;			//< lua state
-	lua_CFunction m_panicf;			//< panic function for not mixing C++/lua exception handling
 	std::vector<FetchState> m_stk;		//< stack of iterator states
 };
 
 
 ///\class class LuaOutputFilter
 ///\brief Lua table as typed output filter
-class LuaOutputFilter :public TypedOutputFilter
+class LuaOutputFilter :public TypedOutputFilter, public LuaExceptionHandlerScope
 {
 public:
 	///\brief Constructor
-	///\remark Creates the output filter result as top element (-1) on the lua stack
-	///\remark Expects that the lua stack is not modified by anyone but this class in its lifetime
-	LuaOutputFilter( lua_State* ls);
+	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaOutputFilter::print(ElementType,const Element&)
+	LuaOutputFilter( lua_State* ls)
+		:LuaExceptionHandlerScope(ls)
+		,m_ls(ls)
+		,m_depth(0)
+		,m_type(OpenTag)
+		,m_isinit(false){}
 
 	///\brief Copy constructor
+	///\param[in] o lua output filter to copy
 	LuaOutputFilter( const LuaOutputFilter& o)
-		:m_ls(o.m_ls)
-		,m_panicf(o.m_panicf)
+		:TypedOutputFilter(o)
+		,LuaExceptionHandlerScope(o)
+		,m_ls(o.m_ls)
 		,m_depth(o.m_depth)
-		,m_type(o.m_type){}
+		,m_type(o.m_type)
+		,m_isinit(o.m_isinit)
+	{
+		if (m_isinit) throw std::runtime_error( "copy of lua output filter not allowed in this state");
+	}
 
 	///\brief Destructor
-	virtual ~LuaOutputFilter();
+	virtual ~LuaOutputFilter(){}
 
-	///\brief Implementation of TypedOutputFilter::print( ElementType type, const Element& element)
+	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
 	virtual bool print( ElementType type, const Element& element);
 
 private:
@@ -128,9 +153,9 @@ private:
 
 private:
 	lua_State* m_ls;
-	lua_CFunction m_panicf;
 	int m_depth;
 	ElementType m_type;
+	bool m_isinit;
 };
 
 }}//namespace

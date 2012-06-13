@@ -48,6 +48,10 @@ namespace langbind {
 class TypedFilterBase :public FilterBase
 {
 public:
+	TypedFilterBase(){}
+	TypedFilterBase( const TypedFilterBase& o)
+		:FilterBase(o){}
+
 	///\class Element
 	///\brief Element of the filter
 	struct Element

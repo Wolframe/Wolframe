@@ -154,6 +154,18 @@ public:
 
 static std::string selectedTestName;
 
+static bool directoryExists( boost::filesystem::path& pt)
+{
+	try
+	{
+		return boost::filesystem::exists( pt) && boost::filesystem::is_directory( pt);
+	}
+	catch (const std::exception&)
+	{
+		return false;
+	}
+}
+
 TEST_F( TProcHandlerTest, tests)
 {
 	enum {NOF_IB=6,NOF_OB=4};
@@ -193,15 +205,22 @@ TEST_F( TProcHandlerTest, tests)
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (; itr != end; ++itr)
 	{
-		boost::filesystem::remove_all( boost::filesystem::current_path() / "temp" );
-		boost::filesystem::create_directory( boost::filesystem::current_path() / "temp");
-
+		// Remove old temporary files:
+		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
+		if (directoryExists( tempdir))
+		{
+			boost::filesystem::remove_all( tempdir);
+		}
+		boost::filesystem::create_directory( tempdir);
+		// Read test description:
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{
+			// Skip tests when disabled:
 			std::cerr << "skipping test '" << *itr << "' ( is " << td.requires << ")" << std::endl;
 			continue;
 		}
+		// Run test:
 		std::cerr << "processing test '" << *itr << "'" << std::endl;
 		TestConfiguration testConfiguration;
 		for (int ii=0; ii<NOF_IB; ii++)

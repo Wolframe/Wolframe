@@ -180,13 +180,12 @@ static bool printObject( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 	return true;
 }
 
-bool _Wolframe::serialize::print( const ddl::StructType& st, langbind::OutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+bool _Wolframe::serialize::print( const ddl::StructType& st, langbind::TypedOutputFilter& tout, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
 	langbind::TypedFilterBase::Element elem;
 	bool rt = true;
 	try
 	{
-		langbind::SerializeOutputFilter tout( &out);
 		if (stk.size() == 0)
 		{
 			stk.push_back( FiltermapDDLPrintState( &st, elem));

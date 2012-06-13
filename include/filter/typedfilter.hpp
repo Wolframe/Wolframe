@@ -51,7 +51,15 @@ class TypedInputFilter :public TypedFilterBase
 public:
 	typedef InputFilter::State State;
 
-	TypedInputFilter(){}
+	///\brief Constructor
+	TypedInputFilter()
+		:m_state(InputFilter::Open) {}
+	///\brief Copy constructor
+	///\param[in] o typed output filter to copy
+	TypedInputFilter( const TypedInputFilter& o)
+		:TypedFilterBase(o),m_state(o.m_state){}
+
+	///\brief Destructor
 	virtual ~TypedInputFilter(){}
 
 	///\brief Get next element
@@ -74,6 +82,11 @@ private:
 	State m_state;					//< state
 };
 
+///\typedef TypedInputFilterR
+///\brief Shared input filter reference
+typedef CountedReference<TypedInputFilter> TypedInputFilterR;
+
+
 
 ///\class TypedOutputFilter
 ///\brief Output filter with atomic values having a type
@@ -82,7 +95,14 @@ class TypedOutputFilter :public TypedFilterBase
 public:
 	typedef OutputFilter::State State;
 
-	TypedOutputFilter(){}
+	///\brief Constructor
+	TypedOutputFilter()
+		:m_state(OutputFilter::Open) {}
+	///\brief Copy constructor
+	///\param[in] o typed output filter to copy
+	TypedOutputFilter( const TypedOutputFilter& o)
+		:TypedFilterBase(o),m_state(o.m_state){}
+	///\brief Destructor
 	virtual ~TypedOutputFilter(){}
 
 	///\brief Get next element
@@ -105,6 +125,9 @@ private:
 	State m_state;				//< state
 };
 
+///\typedef TypedOutputFilterR
+///\brief Shared output filter reference
+typedef CountedReference<TypedOutputFilter> TypedOutputFilterR;
 
 
 }}//namespace

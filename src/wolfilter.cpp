@@ -35,81 +35,75 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <stdexcept>
+#include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
+#include "wolfilterCommandLine.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
 
-static void printUsage()
-{
-	std::cerr << "wolfilter <cmd> <inputfilter> [ <outputfilter> ]" << std::endl;
-	std::cerr << "cmd          :Name of the command to execute ('-' for no command)" << std::endl;
-	std::cerr << "inputfilter  :Name of the input filter plus an optional '/' plus buffer size" << std::endl;
-	std::cerr << "outputfilter :Name of the output filter plus an optional '/' plus buffer size"<< std::endl;
-	std::cerr << "              If not specified, then output filter equals input filter"  << std::endl  << std::endl;
+///\TODO Not to be defined here
+static const unsigned short APP_MAJOR_VERSION = 0;
+static const unsigned short APP_MINOR_VERSION = 0;
+static const unsigned short APP_REVISION = 5;
+static const unsigned short APP_BUILD = 0;
 
-	std::cerr << "   example: 'filter - xml:textwolf/256 xml:textwolf:UTF-8/128'" << std::endl;
-	std::cerr << "      input = xml:textwolf/256 = using textwolf XML with a buffer of 256 bytes" << std::endl;
-	std::cerr << "      output = xml:textwolf:UTF-16/128 = using textwolf XML with UTF-8 encoding and a buffer of 128 bytes" << std::endl;
+///\brief Loads the modules, scripts, etc. defined in the command line into the global context
+static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
+{
+	langbind::GlobalContext* gct = langbind::getGlobalContext();
+
+	std::vector<std::string>::const_iterator itr = cmdline.scripts().begin(), end = cmdline.scripts().end();
+	for (; itr != end; ++itr)
+	{
+		boost::filesystem::path scriptpath( boost::filesystem::current_path() / "temp" / *itr);
+		langbind::LuaScript script( scriptpath.string());
+		std::vector<std::string>::const_iterator fi = script.functions().begin(), fe = script.functions().end();
+		for (; fi != fe; ++fi)
+		{
+			gct->defineLuaFunction( *fi, script);
+		}
+	}
 }
 
 int main( int argc, const char **argv )
 {
-	std::string infiltername;
-	std::string outfiltername;
-	std::string procname;
-	std::size_t inputbufsize = 1024;
-	std::size_t outputbufsize = 1024;
+	bool doExit = false;
+	try
+	{
+		config::WolfilterCommandLine cmdline( argc, argv);
+		if (cmdline.printversion())
+		{
+			std::cerr << "wolfilter version ";
+			std::cerr << APP_MAJOR_VERSION << "." << APP_MINOR_VERSION << "." << APP_REVISION << "." << APP_BUILD << std::endl;
+			doExit = true;
+		}
+		if (cmdline.printhelp())
+		{
+			cmdline.print( std::cerr);
+			doExit = true;
+		}
+		if (doExit) return 0;
 
-	if (argc == 4)
-	{
-		procname = argv[1];
-		infiltername = argv[2];
-		outfiltername = argv[3];
-	}
-	else if (argc == 3)
-	{
-		procname = argv[1];
-		infiltername = argv[2];
-		outfiltername = argv[2];
-	}
-	else if (argc > 4)
-	{
-		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
-		printUsage();
-		return 1;
-	}
-	else if (argc < 3)
-	{
-		std::cerr << "too few arguments passed to " << argv[0] << std::endl;
-		printUsage();
-		return 2;
-	}
-	const char* bp;
+		loadGlobalContext( cmdline);
 
-	bp = std::strchr( infiltername.c_str(), '/');
-	if (bp)
-	{
-		inputbufsize = (std::size_t)atoi( bp+1);
-		infiltername.resize( bp-infiltername.c_str());
+		if (!langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), std::cin, std::cout))
+		{
+			std::cerr << "conversion error" << std::endl;
+			return -3;
+		}
 	}
-	bp = std::strchr( outfiltername.c_str(), '/');
-	if (bp)
+	catch (const std::bad_alloc& e)
 	{
-		outputbufsize = (std::size_t)atoi( bp+1);
-		outfiltername.resize( bp-outfiltername.c_str());
+		std::cerr << "out of memory in wolfilter" << std::endl;
+		return -1;
 	}
-	if ((int)inputbufsize <= 0)
+	catch (const std::exception& e)
 	{
-		std::cerr << "illegal size of input buffer: " << (int)inputbufsize << std::endl;
-	}
-	if ((int)outputbufsize <= 0)
-	{
-		std::cerr << "illegal size of output buffer: " << (int)outputbufsize << std::endl;
-	}
-	if (!langbind::iostreamfilter( procname, infiltername, inputbufsize, outfiltername, outputbufsize, std::cin, std::cout))
-	{
-		std::cerr << "conversion error" << std::endl;
-		return 3;
+		std::cerr << "error in wolfilter: " << e.what() << std::endl;
+		return -2;
 	}
 	return 0;
 }

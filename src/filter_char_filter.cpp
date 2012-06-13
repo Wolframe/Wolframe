@@ -142,6 +142,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
 		:OutputFilter(o)
+		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr){}
 
 	///\brief self copy

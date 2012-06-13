@@ -75,12 +75,10 @@ public:
 	///\return current character
 	char operator* ()
 	{
-		char ch;
-
 		for (;;)
 		{
 			if (m_cnt0 >= 4) return 0;
-			ch = cur();
+			char ch = cur();
 			switch (m_state)
 			{
 				case Left0:
@@ -169,6 +167,12 @@ private:
 		Rest,
 		End
 	};
+
+	static const char* stateName( State i)
+	{
+		static const char* ar[] = {"Left0","Right0","Src","Rest","End"};
+		return ar[ (int)i];
+	}
 	State m_state;			//< header parsing state
 	std::size_t m_cnt0;		//< counter of 0
 };

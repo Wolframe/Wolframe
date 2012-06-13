@@ -88,10 +88,10 @@ struct ScriptCommandConfigStruct
 	static const config::DescriptionBase* description();
 };
 
-struct PluginModuleAPIConfigStruct
+struct FormFunctionConfigStruct
 {
-	std::string name;						//< name of the plug-in function
-	std::string modulepath;						//< path of filter module with the API form definition and the function implementation
+	std::string name;						//< name of the form function
+	std::string modulepath;						//< path of module with the function definition and implementation
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
@@ -104,7 +104,7 @@ struct EnvironmentConfigStruct
 	std::vector<FilterConfigStruct> filter;				//< definitions of filters
 	std::vector<TransactionFunctionConfigStruct> transaction;	//< definitions of transaction functions
 	std::vector<ScriptCommandConfigStruct> script;			//< definitions of script functions
-	std::vector<PluginModuleAPIConfigStruct> plugin;		//< definitions of the plugin APIs
+	std::vector<FormFunctionConfigStruct> formfunction;		//< definitions of the form functions
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();

@@ -29,47 +29,24 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/mapContext.hpp
-///\brief Defines the error handling of serialization/deserialization functions
+///\file expression_filter.hpp
+///\brief Filter reading/writing expressions
 
-#ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#include <string>
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
+#ifndef _Wolframe_FILTER_EXPRESSION_HPP_INCLUDED
+#define _Wolframe_FILTER_EXPRESSION_HPP_INCLUDED
+#include "filter/filter.hpp"
 
 namespace _Wolframe {
-namespace serialize {
+namespace langbind {
 
-class Context
+class ExpressionFilterFactory :public FilterFactory
 {
 public:
-	enum Flags
-	{
-		None=0x00,
-		ValidateAttributes=0x01,
-		CheckComplete=0x02
-	};
-
-	Context( Flags f=None);
-	~Context(){}
-
-	const char* getLastError() const				{return m_lasterror[0]?m_lasterror:0;}
-	void clear();
-
-	void setTag( const char* tag);
-	void setError( const char* msg, const char* msgparam=0);
-	void setError( const char* msg, const std::string& p)		{return setError( msg, p.c_str());}
-
-	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
-private:
-	char m_lasterror[ 256];
-	Flags m_flags;
-
-	void setMsg( const char* m1, char dd, const char* m2, const char* m3=0);
+	ExpressionFilterFactory(){}
+	virtual ~ExpressionFilterFactory(){}
+	virtual Filter create( const char* encoding) const;
 };
 
-
-}}
+}}//namespace
 #endif
 

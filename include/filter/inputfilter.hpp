@@ -54,10 +54,17 @@ public:
 		EndOfMessage,	//< have to yield processing because end of message reached
 		Error		//< have to stop processing with an error
 	};
-
+	///\brief Default constructor
 	InputFilter()
 		:m_state(Open){}
 
+	///\brief Copy constructor
+	///\param[in] o input filter to copy
+	InputFilter( const InputFilter& o)
+		:FilterBase(o)
+		,m_state(o.m_state){}
+
+	///\brief Destructor
 	virtual ~InputFilter(){}
 
 	///\brief self copy

@@ -46,7 +46,7 @@ namespace charset {
 ///\brief character set encoding UTF-8
 struct UTF8
 {
-	enum {MaxChar=0xFFFFFFFF};
+	enum {MaxChar=0x7FFFFFFF};
 	enum {
 		B11111111=0xFF,
 		B01111111=0x7F,
