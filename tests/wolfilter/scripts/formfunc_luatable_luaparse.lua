@@ -85,6 +85,6 @@ function run()
 
 	t = readTable( input:get())
 	r = formfunction("employee_assignment_convert")( t)
-	printTable( r)
+	printTable( r:table())
 end
 

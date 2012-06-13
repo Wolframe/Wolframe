@@ -36,7 +36,6 @@ Project Wolframe.
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <cstring>
-/*[-]*/#include <iostream>
 
 extern "C" {
 	#include <lualib.h>
@@ -283,15 +282,6 @@ bool LuaOutputFilter::pushValue( const Element& element)
 	}
 	setState( OutputFilter::Error, "illegal value type printed");
 	return false;
-}
-
-/*[-]*/static void stacktrace( const char* title, lua_State* ls, int depht)
-{
-	while (depht < 0)
-	{
-		std::cout << "STACK " << title << " " << depht << " : " << getDescription( ls, depht) << std::endl;
-		depht++;
-	}
 }
 
 bool LuaOutputFilter::openTag( const Element& element)

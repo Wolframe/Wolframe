@@ -232,16 +232,15 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		{
 			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
 			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
-
-			langbind::FormFunctionClosure ctx( ffunc);
-			ctx.init( inp, outp);
-			langbind::FormFunction::CallResult rt = ctx.call();
+			langbind::FormFunctionClosure closure( ffunc);
+			closure.init( inp);
+			langbind::FormFunction::CallResult rt = closure.call();
 			while (rt == langbind::FormFunction::Yield)
 			{
 				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
 				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
 				{
-					rt = ctx.call();
+					rt = closure.call();
 				}
 				else
 				{
@@ -250,12 +249,35 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			}
 			if (rt == langbind::FormFunction::Ok)
 			{
-				writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-				return true;
+				langbind::FormFunctionResult res = closure.result();
+				res.init( outp);
+				rt = res.fetch();
+				while (rt == langbind::FormFunction::Yield)
+				{
+					if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
+					|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+					{
+						rt = res.fetch();
+					}
+					else
+					{
+						break;
+					}
+				}
+				if (rt == langbind::FormFunction::Ok)
+				{
+					writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+					return true;
+				}
+				else
+				{
+					LOG_ERROR << "error fetching form function result: '" << res.getLastError() << "'";
+					return false;
+				}
 			}
 			else
 			{
-				LOG_ERROR << "error in form function: '" << ctx.getLastError() << "'";
+				LOG_ERROR << "error in form function: '" << closure.getLastError() << "'";
 				return false;
 			}
 		}

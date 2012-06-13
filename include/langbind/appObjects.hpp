@@ -257,28 +257,61 @@ private:
 	const serialize::FiltermapDescriptionBase* m_api_result;
 };
 
+
+///\class FormFunctionResult
+///\brief Result of a FormFunction call
+class FormFunctionResult
+{
+public:
+	FormFunctionResult( const FormFunction& f);
+
+	FormFunctionResult( const FormFunctionResult& o)
+		:m_description(o.m_description)
+		,m_state(o.m_state)
+		,m_data(o.m_data)
+		,m_ctx(o.m_ctx)
+		,m_printstk(o.m_printstk){}
+
+	~FormFunctionResult();
+
+	const char* getLastError() const
+	{
+		return m_ctx.getLastError();
+	}
+
+	FormFunction::CallResult fetch();
+
+	void init( const TypedOutputFilterR& o)
+	{
+		m_outputfilter = o;
+	}
+
+private:
+	friend class FormFunctionClosure;
+	const serialize::FiltermapDescriptionBase* m_description;
+	int m_state;
+	boost::shared_ptr<void> m_data;
+	serialize::Context m_ctx;
+	serialize::FiltermapPrintStateStack m_printstk;
+	TypedOutputFilterR m_outputfilter;
+};
+
+
 ///\class FormFunctionClosure
 ///\brief Closure with calling state of called FormFunction
 class FormFunctionClosure :public FormFunction
 {
 public:
-	FormFunctionClosure( const FormFunction& f)
-		:FormFunction(f)
-		,m_state(0)
-		,m_lastres(Ok)
-		,m_data(std::calloc( f.api_param()->size() + f.api_result()->size(), 1), std::free)
-		{}
+	FormFunctionClosure( const FormFunction& f);
 
 	FormFunctionClosure( const FormFunctionClosure& o)
 		:FormFunction(o)
 		,m_state(o.m_state)
-		,m_lastres(o.m_lastres)
+		,m_result(o.m_result)
 		,m_data(o.m_data)
 		,m_parsestk(o.m_parsestk)
-		,m_printstk(o.m_printstk)
 		,m_ctx(o.m_ctx)
 		,m_inputfilter(o.m_inputfilter)
-		,m_outputfilter(o.m_outputfilter)
 		{}
 
 	~FormFunctionClosure();
@@ -290,24 +323,21 @@ public:
 
 	CallResult call();
 
-	void init( const TypedInputFilterR& i, const TypedOutputFilterR& o)
+	void init( const TypedInputFilterR& i)
 	{
 		m_inputfilter = i;
-		m_outputfilter = o;
 	}
 
 	const TypedInputFilterR& inputfilter() const	{return m_inputfilter;}
-	const TypedOutputFilterR& outputfilter() const	{return m_outputfilter;}
+	const FormFunctionResult& result() const	{return m_result;}
 
 private:
 	int m_state;
-	CallResult m_lastres;
+	FormFunctionResult m_result;
 	boost::shared_ptr<void> m_data;
 	serialize::FiltermapParseStateStack m_parsestk;
-	serialize::FiltermapPrintStateStack m_printstk;
 	serialize::Context m_ctx;
 	TypedInputFilterR m_inputfilter;
-	TypedOutputFilterR m_outputfilter;
 };
 
 

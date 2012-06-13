@@ -149,35 +149,102 @@ bool DDLFormMap::getForm( const std::string& name, DDLFormR& rt) const
 	return getObject( m_map, name, *rt.get());
 }
 
+FormFunctionResult::FormFunctionResult( const FormFunction& f)
+	:m_description(f.api_result())
+	,m_state(0)
+	,m_data(std::calloc( f.api_result()->size(), 1), std::free)
+{
+	void* result_struct = m_data.get();
+	if (!result_struct || !m_description->init( result_struct))
+	{
+		m_ctx.setError( "could not initialize api result object for form function");
+	}
+	else
+	{
+		m_state = 1;
+	}
+}
+
+FormFunctionResult::~FormFunctionResult()
+{
+	if (m_state)
+	{
+		m_description->done( m_data.get());
+		std::memset( m_data.get(), 0, m_description->size());
+		if (m_state == 2) m_state = 1;
+	}
+}
+
+FormFunction::CallResult FormFunctionResult::fetch()
+{
+	if (m_state == 0) return FormFunction::Error;
+	if (m_state == 2) return FormFunction::Ok;
+	const void* result_struct = m_data.get();
+	if (!m_outputfilter.get())
+	{
+		m_ctx.setError( "no output filter defined for fetching the form function result");
+		return FormFunction::Error;
+	}
+	if (!m_description->print( result_struct, *m_outputfilter, m_ctx, m_printstk))
+	{
+		switch (m_outputfilter->state())
+		{
+			case OutputFilter::Open:
+				return FormFunction::Error;
+
+			case OutputFilter::EndOfBuffer:
+				return FormFunction::Yield;
+
+			case OutputFilter::Error:
+				m_ctx.setError( m_outputfilter->getError());
+				return FormFunction::Error;
+		}
+	}
+	m_ctx.clear();
+	m_printstk.clear();
+	return FormFunction::Ok;
+}
+
+FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
+	:FormFunction(f)
+	,m_state(0)
+	,m_result(f)
+	,m_data(std::calloc( f.api_param()->size(), 1), std::free)
+{
+	if (!m_data.get() || !m_result.m_data.get() || !f.api_param()->init( m_data.get()))
+	{
+		m_ctx.setError( "could not initialize objects for form function");
+	}
+	else
+	{
+		m_state = 1;
+	}
+}
+
+FormFunctionClosure::~FormFunctionClosure()
+{
+	if (m_state)
+	{
+		api_param()->done( m_data.get());
+		std::memset( m_data.get(), 0, api_param()->size());
+	}
+}
 
 FormFunction::CallResult FormFunctionClosure::call()
 {
-	if (m_lastres == Error) return Error;
+	if (m_state < 1) return Error;
 	void* param_struct = m_data.get();
-	void* result_struct = (void*)((char*)m_data.get() + api_param()->size());
 
 	switch (m_state)
 	{
-		case 0:
-			m_ctx.clear();
-			if (!api_param()->init( param_struct))
-			{
-				m_ctx.setError( "could not initialize api input object for form function");
-				return m_lastres=Error;
-			}
-			m_state = 1;
 		case 1:
-			if (!api_result()->init( result_struct))
-			{
-				m_ctx.setError( "could not initialize api result object for form function");
-				return m_lastres=Error;
-			}
+			m_ctx.clear();
 			m_state = 2;
 		case 2:
 			if (!m_inputfilter.get())
 			{
 				m_ctx.setError( "no input filter defined for form function");
-				return m_lastres=Error;
+				return Error;
 			}
 			if (!api_param()->parse( param_struct, *m_inputfilter, m_ctx, m_parsestk))
 			{
@@ -186,87 +253,37 @@ FormFunction::CallResult FormFunctionClosure::call()
 					case InputFilter::Open:
 						if (m_ctx.getLastError())
 						{
-							return m_lastres=Error;
+							return Error;
 						}
 						break;
 
 					case InputFilter::EndOfMessage:
-						return m_lastres=Yield;
+						return Yield;
 
 					case InputFilter::Error:
 						m_ctx.setError( m_inputfilter->getError());
-						return m_lastres=Error;
+						return Error;
 				}
 			}
 			m_state = 3;
 		case 3:
 			try
 			{
-				m_ctx.clear();
-				int rt = FormFunction::call()( result_struct, param_struct);
+				int rt = FormFunction::call()( m_result.m_data.get(), param_struct);
 				if (rt != 0)
 				{
 					m_ctx.setError( "error in call of form function");
-					return m_lastres=Error;
+					return Error;
 				}
 			}
 			catch (const std::exception& e)
 			{
 				m_ctx.setError( e.what());
-				return m_lastres=Error;
+				return Error;
 			}
 			m_state = 4;
-		case 4:
-			if (!m_outputfilter.get())
-			{
-				m_ctx.setError( "no output filter defined for form function result");
-				return m_lastres=Error;
-			}
-			if (!api_param()->print( result_struct, *m_outputfilter, m_ctx, m_printstk))
-			{
-				switch (m_outputfilter->state())
-				{
-					case OutputFilter::Open:
-						return m_lastres=Error;
-
-					case OutputFilter::EndOfBuffer:
-						return m_lastres=Yield;
-
-					case OutputFilter::Error:
-						m_ctx.setError( m_outputfilter->getError());
-						return m_lastres=Error;
-				}
-			}
-			m_state = 5;
-		case 5:
-			api_param()->done( param_struct);
-			api_result()->done( result_struct);
-			std::memset( m_data.get(), 0, api_param()->size() + api_result()->size());
-			m_state = 0;
 	}
-	return m_lastres=Ok;
-}
-
-FormFunctionClosure::~FormFunctionClosure()
-{
-	if (m_state >= 0)
-	{
-		void* param_struct = m_data.get();
-		void* result_struct = (void*)((char*)m_data.get() + api_param()->size());
-
-		switch (m_state)
-		{
-			case 0:
-				break;
-			case 5:
-			case 4:
-			case 3:
-			case 2:
-				api_result()->done( result_struct);
-			case 1:
-				api_param()->done( param_struct);
-		}
-	}
+	return Ok;
 }
 
 void FormFunctionMap::defineFormFunction( const std::string& name, const FormFunction& f)

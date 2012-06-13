@@ -61,6 +61,7 @@ namespace luaname
 	static const char* GlobalContext = "wolframe.ctx";
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
 	static const char* FormFunctionClosure = "wolframe.FormFunctionClosure";
+	static const char* FormFunctionResult = "wolframe.FormFunctionResult";
 }
 
 namespace
@@ -74,6 +75,7 @@ template <> const char* metaTableName<DDLForm>()			{return luaname::DDLForm;}
 template <> const char* metaTableName<GlobalContext>()			{return luaname::GlobalContext;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
 template <> const char* metaTableName<FormFunctionClosure>()		{return luaname::FormFunctionClosure;}
+template <> const char* metaTableName<FormFunctionResult>()		{return luaname::FormFunctionResult;}
 }//anonymous namespace
 
 static const luaL_Reg empty_methodtable[ 1] =
@@ -411,28 +413,6 @@ static int function_inputFilter( lua_State* ls)
 }
 
 
-static bool get_operand_TypedOutputFilter( lua_State* ls, int idx, langbind::TypedOutputFilterR& flt)
-{
-	switch (lua_type( ls, idx))
-	{
-		case LUA_TTABLE:
-			flt.reset( new langbind::LuaOutputFilter( ls));
-			return true;
-		case LUA_TUSERDATA:
-		default:
-			return false;
-	}
-}
-
-/*[-]*/static void stacktrace( const char* title, lua_State* ls, int depht)
-{
-	while (depht < 0)
-	{
-		std::cout << "STACK " << title << " " << depht << " : " << getDescription( ls, depht) << std::endl;
-		depht++;
-	}
-}
-
 static bool get_operand_TypedInputFilter( lua_State* ls, int idx, langbind::TypedInputFilterR& flt)
 {
 	int typ = lua_type( ls, idx);
@@ -451,21 +431,41 @@ static bool get_operand_TypedInputFilter( lua_State* ls, int idx, langbind::Type
 	}
 }
 
-static int push_result_TypedOutputFilter( lua_State* ls, const langbind::TypedOutputFilterR& flt)
+static int function_formfunctionresult_table( lua_State* ls)
 {
-	langbind::LuaOutputFilter* lf = dynamic_cast<langbind::LuaOutputFilter*>( flt.get());
-	if (lf)
+	LuaErrorMessage luaerr;
+	int ctx;
+	FormFunctionResult* result = LuaObject<FormFunctionResult>::getSelf( ls, "FormFunctionResult", "table");
+	try
 	{
-		if (!lua_istable( ls, -1))
+		if (lua_getctx( ls, &ctx) != LUA_YIELD)
 		{
-			luaL_error( ls, "result is not a lua table as expected");
-			return 0;
+			result->init( new langbind::LuaOutputFilter( ls));
 		}
-		/* result table already on the stack */
-		return 1;
+		langbind::FormFunction::CallResult res = result->fetch();
+		switch (res)
+		{
+			case langbind::FormFunction::Yield:
+				lua_yieldk( ls, 0, 1, function_formfunctionresult_table);
+
+			case langbind::FormFunction::Ok:
+				/* table is already toplevel element on the stack */
+				return 1;
+
+			case langbind::FormFunction::Error:
+				throw std::runtime_error( result->getLastError());
+		}
+
 	}
-	luaL_error( ls, "runtime error. cannot fetch result");
-	return 0;
+	catch (const std::bad_alloc&)
+	{
+		luaerr.init( "out of memory calling form function fetch result as table");
+	}
+	catch (const std::exception& e)
+	{
+		luaerr.init( e.what());
+	}
+	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by form function fetch result as table");
 }
 
 static int function_formfunction_call( lua_State* ls)
@@ -488,12 +488,7 @@ static int function_formfunction_call( lua_State* ls)
 				{
 					throw std::runtime_error( "error in form function call. 1st argument is not a table, form or filter");
 				}
-				langbind::TypedOutputFilterR outp;
-				if (!get_operand_TypedOutputFilter( ls, 1, outp))
-				{
-					throw std::logic_error( "illegal state in form function call");
-				}
-				closure->init( inp, outp);
+				closure->init( inp);
 			}
 		}
 		langbind::FormFunction::CallResult res = closure->call();
@@ -503,7 +498,8 @@ static int function_formfunction_call( lua_State* ls)
 				lua_yieldk( ls, 0, 1, function_formfunction_call);
 
 			case langbind::FormFunction::Ok:
-				return push_result_TypedOutputFilter( ls, closure->outputfilter());
+				LuaObject<FormFunctionResult>::push_luastack( ls, closure->result());
+				return 1;
 
 			case langbind::FormFunction::Error:
 				throw std::runtime_error( closure->getLastError());
@@ -863,6 +859,12 @@ static const luaL_Reg output_methodtable[ 5] =
 	{0,0}
 };
 
+static const luaL_Reg formfunctionresult_methodtable[ 2] =
+{
+	{"table",&function_formfunctionresult_table},
+	{0,0}
+};
+
 static int function_printlog( lua_State *ls)
 {
 	/* first parameter maps to a log level, rest gets printed depending on
@@ -1069,6 +1071,7 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
 			LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<FormFunctionClosure>::createMetatable( ls, 0, 0, 0);
+			LuaObject<FormFunctionResult>::createMetatable( ls, 0, 0, formfunctionresult_methodtable);
 			setGlobalSingletonPointer<GlobalContext>( ls, gc);
 			lua_pushcfunction( ls, &function_yield);
 			lua_setglobal( ls, "yield");
