@@ -46,13 +46,17 @@ void PasswordFile::addUser( const std::string& /*user*/, const std::string& /*pa
 {
 }
 
+bool PasswordFile::delUser( const std::string& /*user*/ )
+{
+}
+
 bool getUser( const std::string& /*user*/, std::string& /*password*/,
 	      std::string& /*userInfo*/, std::string& /*comment*/ )
 {
 	return true;
 }
 
-bool getUser( const std::string& /*response*/,
+bool getUser( const std::string& /*challenge*/, const std::string& /*response*/,
 	      std::string& /*user*/, std::string& /*password*/,
 	      std::string& /*userInfo*/, std::string& /*comment*/ )
 {

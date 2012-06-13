@@ -175,9 +175,20 @@ int main( int argc, char* argv[] )
 		}
 
 		// All parameters are OK
-		std::cout << "Delete user '" << args[1] << "' from password file '"
-			  << args[0] << "'";
-		// do the job
+		WA::PasswordFile pwdFile( args[0] );
+		try	{
+			if ( pwdFile.delUser( args[1] ))
+				std::cout << "User '" << args[1] << "' removed from password file '"
+					  << args[0] << "'";
+			else
+				std::cout << "User '" << args[1] << "' not found in password file '"
+					  << args[0] << "'";
+		}
+		catch( std::exception& e )	{
+			std::cerr << "Error removing user '" << args[1] << "' from password file '"
+				  << args[0] << ": " << e.what();
+			return 1;
+		}
 	}
 	// normal operation
 	else	{

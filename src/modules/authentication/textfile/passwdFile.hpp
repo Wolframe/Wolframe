@@ -52,9 +52,11 @@ public:
 	void addUser( const std::string& user, const std::string& password,
 		      const std::string& userInfo, const std::string& comment );
 
+	bool delUser( const std::string& user );
+
 	bool getUser( const std::string& user, std::string& password,
 		      std::string& userInfo, std::string& comment );
-	bool getUser( const std::string& response,
+	bool getUser( const std::string& challenge, const std::string& response,
 		      std::string& user, std::string& password,
 		      std::string& userInfo, std::string& comment );
 private:

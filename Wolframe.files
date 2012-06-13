@@ -315,6 +315,7 @@ include/ddl/structType.hpp
 include/ErrorCode.hpp
 include/filter/bufferingfilter.hpp
 include/filter/char_filter.hpp
+include/filter/expression_filter.hpp
 include/filter/filterbase.hpp
 include/filter/filter.hpp
 include/filter/inputfilter.hpp
@@ -339,6 +340,7 @@ include/langbind/appObjects.hpp
 include/langbind/iostreamfilter.hpp
 include/langbind/luaBignum.hpp
 include/langbind/luaDebug.hpp
+include/langbind/luaException.hpp
 include/langbind/luaObjects.hpp
 include/langbind/luaTypeArithmetic.hpp
 include/langbind/luaTypeTraits.hpp
@@ -382,6 +384,7 @@ include/SSLcertificateInfo.hpp
 include/standardConfigs.hpp
 include/types/bignum.hpp
 include/version.hpp
+include/wolfilterCommandLine.hpp
 INSTALL.Unix
 INSTALL.Windows
 libgmp/assert.c
@@ -1080,6 +1083,7 @@ src/ddl_compiler_simpleFormCompiler.cpp
 src/ddl_structType.cpp
 src/exceptionBase.hpp
 src/filter_char_filter.cpp
+src/filter_expression_filter.cpp
 src/filter_filterbase.cpp
 src/filter_libxml2_filter.cpp
 src/filter_line_filter.cpp
@@ -1098,6 +1102,7 @@ src/langbind_appObjects.cpp
 src/langbind_iostreamfilter.cpp
 src/langbind_luaBignum.cpp
 src/langbind_luaDebug.cpp
+src/langbind_luaException.cpp
 src/langbind_luaObjects.cpp
 src/libwolframe/byte2hex.c
 src/libwolframe/CRAM.cpp
@@ -1242,6 +1247,7 @@ src/SSLcertificateInfo.cpp
 src/types_bignum.cpp
 src/version.cpp
 src/winMain.cpp
+src/wolfilterCommandLine.cpp
 src/wolfilter.cpp
 src/wolframe.conf
 src/wolframed.cpp
@@ -1325,6 +1331,7 @@ tests/rlib/testrlib1.cpp
 tests/rlib/testrlib2.cpp
 tests/singletonTest.cpp
 tests/SSL/README.txt
+tests/temp/formfunc_luatable_luaparse.lua
 tests/testBoostPath.cpp
 tests/testMethodMemberPointerTemplate.cpp
 tests/testNamedRetVal.cpp
@@ -1335,8 +1342,11 @@ tests/testTimestamp.cpp
 tests/testWolfilter.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp
+tests/wolfilter/scripts/formfunc_luatable_luaparse.lua
 tests/wolfilter/src/employee_assignment_print.cpp
 tests/wolfilter/src/employee_assignment_print.hpp
+tests/wolfilter/template/doc/employee_assignment_print.lua.UTF-8.xml
+tests/wolfilter/template/doc/employee_assignment_print_res.lua.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_print_res.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_print.UTF-8.xml
 tests/wolfilter/template/doc/multilingual.UTF-8.xml
