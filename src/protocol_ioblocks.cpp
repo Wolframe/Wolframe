@@ -31,7 +31,7 @@ Project Wolframe.
 ************************************************************************/
 #include "protocol/ioblocks.hpp"
 #include <cstring>
-#include <new>
+#include <cstdlib>
 
 namespace _Wolframe {
 namespace protocol {
