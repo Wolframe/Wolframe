@@ -209,8 +209,6 @@ TEST_F( TProcHandlerTest, tests)
 		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
 		if (directoryExists( tempdir))
 		{
-			// Aba: sleeping to avoid a race between files disappearing and remove
-			boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
 			boost::filesystem::remove_all( tempdir);
 		}
 		boost::filesystem::create_directory( tempdir);
