@@ -67,8 +67,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, const char** argv)
 	popt.add( "input-filter", 1);
 
 	po::variables_map vmap;
-	// Aba: program options take a char ** not a const char **
-	po::store( po::command_line_parser(argc, const_cast<char **>(argv)).options(fopt).positional(popt).run(), vmap);
+	po::store( po::command_line_parser(argc, argv).options(fopt).positional(popt).run(), vmap);
 	po::notify( vmap);
 
 	m_printversion = vmap.count( "version");
