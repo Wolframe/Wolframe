@@ -48,6 +48,7 @@ void PasswordFile::addUser( const std::string& /*user*/, const std::string& /*pa
 
 bool PasswordFile::delUser( const std::string& /*user*/ )
 {
+	return true;
 }
 
 bool getUser( const std::string& /*user*/, std::string& /*password*/,

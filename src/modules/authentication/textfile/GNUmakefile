@@ -21,6 +21,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_auth_textfile.so
 
 PASSWD_OBJS = \
+	passwdFile.o
 
 CPP_OBJS = \
 	TextFileAuthConfig.o \
