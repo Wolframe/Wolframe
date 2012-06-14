@@ -41,7 +41,7 @@
 using namespace _Wolframe;
 using namespace config;
 
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
+WolfilterCommandLine::WolfilterCommandLine( int argc, const char** argv)
 	:m_printhelp(false)
 	,m_printversion(false)
 	,m_inbufsize(8<<10)

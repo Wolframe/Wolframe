@@ -68,12 +68,12 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 	}
 }
 
-int main( int argc, char **argv )
+int main( int argc, const char **argv )
 {
 	bool doExit = false;
 	try
 	{
-		config::WolfilterCommandLine cmdline( argc, argv);
+		config::WolfilterCommandLine cmdline( argc, (const char **)argv);
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";
