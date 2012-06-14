@@ -44,7 +44,7 @@ namespace config {
 class WolfilterCommandLine
 {
 public:
-	WolfilterCommandLine(int argc, const char **argv);
+	WolfilterCommandLine(int argc, char **argv);
 	WolfilterCommandLine( const WolfilterCommandLine& o)
 		:m_printhelp(o.m_printhelp)
 		,m_printversion(o.m_printversion)

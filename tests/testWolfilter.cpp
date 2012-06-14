@@ -176,12 +176,12 @@ TEST_F( WolfilterTest, tests)
 		std::cerr << "processing test '" << *itr << "'" << std::endl;
 		enum {MaxNofArgs=31};
 		int cmdargc = cmd.size()+1;
-		const char* cmdargv[MaxNofArgs+1];
+		char* cmdargv[MaxNofArgs+1];
 		if (cmdargc > MaxNofArgs) throw std::runtime_error( "too many arguments in test");
-		cmdargv[0] = g_gtest_ARGV[0];
+		cmdargv[0] = strdup( g_gtest_ARGV[0] );
 		for (int ci=1; ci<cmdargc; ++ci)
 		{
-			cmdargv[ci] = cmd[ci-1].c_str();
+			cmdargv[ci] = strdup( cmd[ci-1].c_str() );
 		}
 		config::WolfilterCommandLine cmdline( cmdargc, cmdargv);
 
@@ -231,6 +231,10 @@ TEST_F( WolfilterTest, tests)
 			boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
 		}
 		EXPECT_EQ( td.expected, out.str());
+		for (int ci=0; ci<cmdargc; ++ci)
+		{
+			free( cmdargv[ci] );
+		}
 	}
 }
 
