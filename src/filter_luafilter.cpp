@@ -304,7 +304,7 @@ bool LuaOutputFilter::openTag( const Element& element)
 	}
 	// check for t[k][#t[k]] exists -> it is an array:
 	std::size_t len = lua_rawlen( m_ls, -1);
-	lua_pushnumber( m_ls, len);			///... LUA STK: t k t[k] #t[k]
+	lua_pushnumber( m_ls, (double)len);		///... LUA STK: t k t[k] #t[k]
 	lua_gettable( m_ls, -2);			///... LUA STK: t k t[k] t[k][#t[k]]
 	if (lua_isnil( m_ls, -1))
 	{
@@ -322,7 +322,7 @@ bool LuaOutputFilter::openTag( const Element& element)
 	{
 		///... the table is an array
 		lua_pop( m_ls, 2);			///... LUA STK: t k v
-		lua_pushnumber( m_ls, len + 1);		///... LUA STK: t k v len+1
+		lua_pushnumber( m_ls, (double)(len + 1));	///... LUA STK: t k v len+1
 		lua_newtable( m_ls);			///... LUA STK: t k v len+1 NEWTABLE
 	}
 	return true;
@@ -335,7 +335,7 @@ bool LuaOutputFilter::closeTag()
 		--m_depth;
 		lua_settable( m_ls, -3);
 		std::size_t len = lua_rawlen( m_ls, -1);
-		lua_pushnumber( m_ls, len);
+		lua_pushnumber( m_ls, (double)len);
 		lua_gettable( m_ls, -2);
 		bool isArray = !(bool)lua_isnil( m_ls, -1);
 		lua_pop( m_ls, 1);
