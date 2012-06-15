@@ -68,7 +68,7 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 	}
 }
 
-int main( int argc, const char **argv )
+int main( int argc, char **argv )
 {
 	bool doExit = false;
 	try
