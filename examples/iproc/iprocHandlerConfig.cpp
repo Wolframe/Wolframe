@@ -110,13 +110,14 @@ bool Configuration::test() const
 	std::vector<Command>::const_iterator itr=m_commands.begin();
 	while (itr != m_commands.end())
 	{
+		langbind::TransactionFunction tf;
 #if WITH_LUA
 		langbind::LuaScriptInstanceR li;
-		if (gctx->getLuaScriptInstance( itr->m_procname.c_str(), li))
+		if (gctx->getLuaScriptInstance( itr->m_procname, li))
 		{}
 		else
 #endif
-		if (gctx->hasTransactionFunction( itr->m_procname.c_str()))
+		if (gctx->getTransactionFunction( itr->m_procname, tf))
 		{}
 		else
 		{

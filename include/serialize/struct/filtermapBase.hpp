@@ -66,14 +66,52 @@ public:
 	Parse parse() const		{return m_parse;}
 	Print print() const		{return m_print;}
 
-	FiltermapDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Print pr)
-		:m_constructor(c),m_destructor(d),m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(0),m_type(t),m_parse(pa),m_print(pr){}
-	FiltermapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Print pr)
-		:m_constructor(0),m_destructor(0),m_typename(tn),m_ofs(os),m_size(sz),m_nof_attributes(0),m_type(t),m_parse(pa),m_print(pr){}
+	FiltermapDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Print pr, bool mandatory_)
+		:m_constructor(c)
+		,m_destructor(d)
+		,m_typename(tn)
+		,m_ofs(os)
+		,m_size(sz)
+		,m_nof_attributes(0)
+		,m_type(t)
+		,m_parse(pa)
+		,m_print(pr)
+		,m_mandatory(mandatory_){}
+
+	FiltermapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Print pr, bool mandatory_)
+		:m_constructor(0)
+		,m_destructor(0)
+		,m_typename(tn)
+		,m_ofs(os)
+		,m_size(sz)
+		,m_nof_attributes(0)
+		,m_type(t)
+		,m_parse(pa)
+		,m_print(pr)
+		,m_mandatory(mandatory_){}
+
 	FiltermapDescriptionBase( const FiltermapDescriptionBase& o)
-		:m_constructor(o.m_constructor),m_destructor(o.m_destructor),m_typename(o.m_typename),m_ofs(o.m_ofs),m_size(o.m_size),m_nof_attributes(o.m_nof_attributes),m_elem(o.m_elem),m_type(o.m_type),m_parse(o.m_parse),m_print(o.m_print){}
+		:m_constructor(o.m_constructor)
+		,m_destructor(o.m_destructor)
+		,m_typename(o.m_typename)
+		,m_ofs(o.m_ofs)
+		,m_size(o.m_size)
+		,m_nof_attributes(o.m_nof_attributes)
+		,m_elem(o.m_elem)
+		,m_type(o.m_type)
+		,m_parse(o.m_parse)
+		,m_print(o.m_print)
+		,m_mandatory(o.m_mandatory){}
+
 	FiltermapDescriptionBase()
-		:m_typename(0),m_ofs(0),m_size(0),m_nof_attributes(0),m_type(Atomic),m_parse(0),m_print(0){}
+		:m_typename(0)
+		,m_ofs(0)
+		,m_size(0)
+		,m_nof_attributes(0)
+		,m_type(Atomic)
+		,m_parse(0)
+		,m_print(0)
+		,m_mandatory(false){}
 
 	bool parse( void* obj, langbind::TypedInputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const;
 	bool print( const void* obj, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk) const;
@@ -120,16 +158,24 @@ public:
 		m_elem.push_back( Map::value_type(name,dd));
 	}
 
+	///\brief Get the number of attributes of a struct
+	///\remark returns 0 this is not of type (ContentType) Struct
+	///\return the number of attributes or 0
 	std::size_t nof_attributes() const
 	{
 		return m_nof_attributes;
 	}
 
+	///\brief Define the number of attributes of a struct
+	///\return the number of attributes or 0
+	///\remark returns 0 this is not of type Struct
 	void defineEndOfAttributes()
 	{
 		m_nof_attributes = m_elem.size();
 	}
 
+	///\brief Get the number of elements in the structure or array
+	///\return the number of elements or 0 in case of an atomic value
 	std::size_t nof_elements() const
 	{
 		return m_elem.size();
@@ -139,6 +185,10 @@ public:
 	{
 		return m_typename;
 	}
+
+	///\brief Find out if the element in the structure is mandatory
+	///\return true, if yes
+	bool mandatory() const				{return m_mandatory;}
 
 private:
 	Constructor m_constructor;
@@ -151,6 +201,7 @@ private:
 	ElementType m_type;
 	Parse m_parse;
 	Print m_print;
+	bool m_mandatory;
 };
 
 }}//namespace

@@ -268,7 +268,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				{
 					try
 					{
-						langbind::TransactionFunction tf;
+						langbind::TransactionFunction tfunc;
 						const char* procname = m_cmds[ m_cmdidx - m_nofParentCmds - 2].c_str();
 						langbind::GlobalContext* gctx = langbind::getGlobalContext();
 #if WITH_LUA
@@ -279,9 +279,15 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 						}
 						else
 #endif
-						if (gctx->hasTransactionFunction( procname))
+						if (gctx->getTransactionFunction( procname, tfunc))
 						{
 							m_cmdhandler.reset( new cmdbind::DirectmapCommandHandler());
+						}
+						else
+						{
+							LOG_ERROR << "Command handler not found for '" << procname << "'";
+							m_statusCode = -1;
+							return CLOSED;
 						}
 						m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
 						m_state = Processing;

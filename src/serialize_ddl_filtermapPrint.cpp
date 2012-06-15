@@ -57,7 +57,7 @@ static bool printAtom( const ddl::AtomicType& val, langbind::TypedOutputFilter& 
 
 static bool printStruct( const ddl::StructType& val, langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
-	if (stk.back().state() < val.size()*2)
+	if (stk.back().state() < val.nof_elements()*2)
 	{
 		std::size_t idx = stk.back().state()/2;
 		bool atEnd = stk.back().state()&1;
@@ -117,7 +117,7 @@ static bool printVector( const ddl::StructType& val, langbind::TypedOutputFilter
 	std::size_t idx = stk.back().state()/4;
 	std::size_t substate = stk.back().state()&3;
 
-	if (idx >= val.size())
+	if (idx >= val.nof_elements())
 	{
 		stk.pop_back();
 		return true;
@@ -128,7 +128,7 @@ static bool printVector( const ddl::StructType& val, langbind::TypedOutputFilter
 		{
 			ddl::StructType::Map::const_iterator itr = val.begin() + idx;
 			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));
-			if (idx+1 < val.size())
+			if (idx+1 < val.nof_elements())
 			{
 				stk.back().state( idx*4 +1);
 			}

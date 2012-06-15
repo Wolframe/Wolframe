@@ -138,22 +138,209 @@ FilterMap::FilterMap()
 #endif
 }
 
+bool DDLForm::getValue( const char* name, std::string& val) const
+{
+	serialize::Context::Flags flt;
+	if (serialize::Context::getFlag( name, flt))
+	{
+		if ((int)flt & (int)m_flags)
+		{
+			val = "true";
+		}
+		else
+		{
+			val = "false";
+		}
+		return true;
+	}
+	return false;
+}
+
+bool DDLForm::setValue( const char* name, const std::string& value)
+{
+	serialize::Context::Flags flt;
+	if (serialize::Context::getFlag( name, flt))
+	{
+		if (value == "true")
+		{
+			m_flags = (serialize::Context::Flags)((int)flt | (int)m_flags);
+		}
+		else if (value == "false")
+		{
+			if ((int)flt & (int)m_flags)
+			{
+				m_flags = (serialize::Context::Flags)((int)flt ^ (int)m_flags);
+			}
+		}
+		else
+		{
+			throw std::runtime_error( "illegal value for boolean");
+		}
+		return true;
+	}
+	return false;
+}
+
+
+DDLFormFill::DDLFormFill( const DDLFormR& f)
+	:m_form(f)
+	,m_state(0)
+	,m_ctx(f->flags()){}
+
+DDLFormFill::DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp)
+	:m_form(f)
+	,m_state(0)
+	,m_inputfilter(inp)
+	,m_ctx(f->flags()){}
+
+DDLFormFill::DDLFormFill( const DDLFormFill& o)
+	:m_form(o.m_form)
+	,m_state(o.m_state)
+	,m_inputfilter(o.m_inputfilter)
+	,m_ctx(o.m_ctx)
+	,m_parsestk(o.m_parsestk){}
+
+void DDLFormFill::init( const TypedInputFilterR& i)
+{
+	m_inputfilter = i;
+	m_ctx.clear();
+	m_parsestk.clear();
+	m_state = 0;
+}
+
+DDLFormFill::CallResult DDLFormFill::call()
+{
+	if (m_state > 0) return Ok;
+	switch (m_state)
+	{
+		case 0:
+			if (!m_inputfilter.get())
+			{
+				m_ctx.setError( "no input filter defined for form fill");
+				return Error;
+			}
+			if (!m_form.get())
+			{
+				m_ctx.setError( "no form defined for form fill");
+				return Error;
+			}
+			if (!serialize::parse( m_form->m_structure, *m_inputfilter, m_ctx, m_parsestk))
+			{
+				switch (m_inputfilter->state())
+				{
+					case InputFilter::Open:
+						if (m_ctx.getLastError())
+						{
+							return Error;
+						}
+						break;
+
+					case InputFilter::EndOfMessage:
+						return Yield;
+
+					case InputFilter::Error:
+						m_ctx.setError( m_inputfilter->getError());
+						return Error;
+				}
+			}
+			m_state = 1;
+	}
+	return Ok;
+}
+
+DDLFormPrint::DDLFormPrint( const DDLFormR& f)
+	:m_form(f)
+	,m_state(0)
+	,m_ctx(f->flags()){}
+
+DDLFormPrint::DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp)
+	:m_form(f)
+	,m_state(1)
+	,m_outputfilter(outp)
+	,m_ctx(f->flags()){}
+
+DDLFormPrint::DDLFormPrint( const DDLFormPrint& o)
+	:m_form(o.m_form)
+	,m_state(o.m_state)
+	,m_outputfilter(o.m_outputfilter)
+	,m_ctx(o.m_ctx)
+	,m_printstk(o.m_printstk){}
+
+void DDLFormPrint::init( const TypedOutputFilterR& o)
+{
+	m_outputfilter = o;
+	m_ctx.clear();
+	m_printstk.clear();
+	m_state = 1;
+}
+
+DDLFormPrint::CallResult DDLFormPrint::fetch()
+{
+	if (m_state == 0) return Error;
+	if (m_state == 2) return Ok;
+	if (!m_outputfilter.get())
+	{
+		m_ctx.setError( "no output filter defined for fetching the form iterator");
+		return Error;
+	}
+	if (!m_form.get())
+	{
+		m_ctx.setError( "no form defined for fetching the form iterator");
+		return Error;
+	}
+	if (!serialize::print( m_form->structure(), *m_outputfilter, m_ctx, m_printstk))
+	{
+		switch (m_outputfilter->state())
+		{
+			case OutputFilter::Open:
+				return Error;
+
+			case OutputFilter::EndOfBuffer:
+				return Yield;
+
+			case OutputFilter::Error:
+				m_ctx.setError( m_outputfilter->getError());
+				return Error;
+		}
+	}
+	m_state = 2;
+	return Ok;
+}
+
 void DDLFormMap::defineForm( const std::string& name, const DDLForm& f)
 {
-	defineObject( m_map, name, f);
+	defineObject( m_map, name, DDLFormR( new DDLForm(f)));
 }
 
 bool DDLFormMap::getForm( const std::string& name, DDLFormR& rt) const
 {
-	rt = DDLFormR( new DDLForm());
-	return getObject( m_map, name, *rt.get());
+	DDLFormR obj;
+	if (!getObject( m_map, name, obj) || !obj.get()) return false;
+	rt = DDLFormR( new DDLForm( *obj));
+	return true;
 }
+
+FormFunction::FormFunction()
+	:m_function(0)
+	,m_api_param(0)
+	,m_api_result(0){}
+
+FormFunction::FormFunction( const FormFunction& o)
+	:m_function(o.m_function)
+	,m_api_param(o.m_api_param)
+	,m_api_result(o.m_api_result){}
+
+FormFunction::FormFunction( Function f, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
+	:m_function(f)
+	,m_api_param(p)
+	,m_api_result(r){}
 
 FormFunctionResult::FormFunctionResult( const FormFunction& f)
 	:m_description(f.api_result())
 	,m_state(0)
 	,m_data(std::calloc( f.api_result()->size(), 1), std::free)
 {
+	if (!m_data.get()) throw std::bad_alloc();
 	void* result_struct = m_data.get();
 	if (!result_struct || !m_description->init( result_struct))
 	{
@@ -165,44 +352,58 @@ FormFunctionResult::FormFunctionResult( const FormFunction& f)
 	}
 }
 
+FormFunctionResult::FormFunctionResult( const FormFunctionResult& o)
+	:m_description(o.m_description)
+	,m_state(o.m_state)
+	,m_data(o.m_data)
+	,m_outputfilter(o.m_outputfilter)
+	,m_ctx(o.m_ctx)
+	,m_printstk(o.m_printstk){}
+
 FormFunctionResult::~FormFunctionResult()
 {
 	if (m_state)
 	{
 		m_description->done( m_data.get());
 		std::memset( m_data.get(), 0, m_description->size());
-		if (m_state == 2) m_state = 1;
 	}
 }
 
-FormFunction::CallResult FormFunctionResult::fetch()
+void FormFunctionResult::init( const TypedOutputFilterR& o)
 {
-	if (m_state == 0) return FormFunction::Error;
-	if (m_state == 2) return FormFunction::Ok;
+	m_outputfilter = o;
+	m_ctx.clear();
+	m_printstk.clear();
+	m_state = 1;
+}
+
+FormFunctionResult::CallResult FormFunctionResult::fetch()
+{
+	if (m_state == 0) return Error;
+	if (m_state == 2) return Ok;
 	const void* result_struct = m_data.get();
 	if (!m_outputfilter.get())
 	{
 		m_ctx.setError( "no output filter defined for fetching the form function result");
-		return FormFunction::Error;
+		return Error;
 	}
 	if (!m_description->print( result_struct, *m_outputfilter, m_ctx, m_printstk))
 	{
 		switch (m_outputfilter->state())
 		{
 			case OutputFilter::Open:
-				return FormFunction::Error;
+				return Error;
 
 			case OutputFilter::EndOfBuffer:
-				return FormFunction::Yield;
+				return Yield;
 
 			case OutputFilter::Error:
 				m_ctx.setError( m_outputfilter->getError());
-				return FormFunction::Error;
+				return Error;
 		}
 	}
-	m_ctx.clear();
-	m_printstk.clear();
-	return FormFunction::Ok;
+	m_state = 2;
+	return Ok;
 }
 
 FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
@@ -211,7 +412,8 @@ FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
 	,m_result(f)
 	,m_data(std::calloc( f.api_param()->size(), 1), std::free)
 {
-	if (!m_data.get() || !m_result.m_data.get() || !f.api_param()->init( m_data.get()))
+	if (!m_data.get()) throw std::bad_alloc();
+	if (!f.api_param()->init( m_data.get()))
 	{
 		m_ctx.setError( "could not initialize objects for form function");
 	}
@@ -220,6 +422,16 @@ FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
 		m_state = 1;
 	}
 }
+
+FormFunctionClosure::FormFunctionClosure( const FormFunctionClosure& o)
+	:FormFunction(o)
+	,m_state(o.m_state)
+	,m_result(o.m_result)
+	,m_data(o.m_data)
+	,m_parsestk(o.m_parsestk)
+	,m_ctx(o.m_ctx)
+	,m_inputfilter(o.m_inputfilter)
+	{}
 
 FormFunctionClosure::~FormFunctionClosure()
 {
@@ -230,7 +442,15 @@ FormFunctionClosure::~FormFunctionClosure()
 	}
 }
 
-FormFunction::CallResult FormFunctionClosure::call()
+void FormFunctionClosure::init( const TypedInputFilterR& i)
+{
+	m_inputfilter = i;
+	m_ctx.clear();
+	m_parsestk.clear();
+	m_state = 1;
+}
+
+FormFunctionClosure::CallResult FormFunctionClosure::call()
 {
 	if (m_state < 1) return Error;
 	void* param_struct = m_data.get();
@@ -238,9 +458,6 @@ FormFunction::CallResult FormFunctionClosure::call()
 	switch (m_state)
 	{
 		case 1:
-			m_ctx.clear();
-			m_state = 2;
-		case 2:
 			if (!m_inputfilter.get())
 			{
 				m_ctx.setError( "no input filter defined for form function");
@@ -265,11 +482,11 @@ FormFunction::CallResult FormFunctionClosure::call()
 						return Error;
 				}
 			}
-			m_state = 3;
-		case 3:
+			m_state = 2;
+		case 2:
 			try
 			{
-				int rt = FormFunction::call()( m_result.m_data.get(), param_struct);
+				int rt = FormFunction::function()( m_result.data(), param_struct);
 				if (rt != 0)
 				{
 					m_ctx.setError( "error in call of form function");
@@ -281,7 +498,7 @@ FormFunction::CallResult FormFunctionClosure::call()
 				m_ctx.setError( e.what());
 				return Error;
 			}
-			m_state = 4;
+			m_state = 3;
 	}
 	return Ok;
 }
@@ -296,111 +513,261 @@ bool FormFunctionMap::getFormFunction( const std::string& name, FormFunction& rt
 	return getObject( m_map, name, rt);
 }
 
-bool TransactionFunction::call( const DDLForm& param, DDLForm& result)
+TransactionFunctionResult::TransactionFunctionResult( const TransactionFunction& f)
+	:m_func(f)
+	,m_state(0)
+	{}
+
+TransactionFunctionResult::TransactionFunctionResult( const TransactionFunctionResult& o)
+	:m_func(o.m_func)
+	,m_state(o.m_state)
+	,m_lasterror(o.m_lasterror)
+	,m_elemtype(o.m_elemtype)
+	,m_elem(o.m_elem)
+	,m_resultbuf(o.m_resultbuf)
+	,m_resultreader(o.m_resultreader)
+	,m_outputfilter(o.m_outputfilter){}
+
+
+TransactionFunctionResult::CallResult TransactionFunctionResult::fetch()
 {
-	cmdbind::CommandHandler* cmd = m_cmd.get();
-	if (!cmd || !m_cmdwriter.get() || !m_resultreader.get())
+	if (!m_outputfilter.get())
 	{
-		LOG_ERROR << "incomplete transaction function call definition";
-		return false;
+		m_lasterror = "no output filter specified for transaction function result";
+		m_state = 0;
+		return Error;
 	}
-	enum {inbufsize=4096, outbufsize=4096};
-	char inbuf[ inbufsize];
-	char outbuf[ outbufsize];
-
-	cmd->setInputBuffer( inbuf, inbufsize);
-	cmd->setOutputBuffer( outbuf, outbufsize, 0);
-	m_cmdwriter->setOutputBuffer( inbuf, inbufsize);
-	SerializeOutputFilter tcmdwriter( m_cmdwriter.get());
-	SerializeInputFilter tresultreader( m_resultreader.get());
-
-	std::string resultstr;
-	cmdbind::CommandHandler::Operation op = cmdbind::CommandHandler::READ;
-
-	for(;;)
+	for (;;) switch (m_state)
 	{
-		switch (op)
+		case 0: return Error;
+		case 1:
 		{
-			case cmdbind::CommandHandler::READ:
+			SerializeInputFilter si( m_resultreader.get());
+			if (!si.getNext( m_elemtype, m_elem))
 			{
-				if (!serialize::print( param.m_struct, tcmdwriter, m_ctx, m_printstk))
+				switch (si.state())
 				{
-					const char* err = m_ctx.getLastError();
-					if (err)
-					{
-						LOG_ERROR << "error in transaction function command write (" << err << ")";
-						return false;
-					}
+					case InputFilter::Open:
+						return Ok;
+					case InputFilter::EndOfMessage:
+						m_lasterror = "unexpected end of message in result reader";
+						break;
+					case InputFilter::Error:
+						if (si.getError())
+						{
+							m_lasterror.append( si.getError());
+						}
+						break;
 				}
-				cmd->putInput( inbuf, m_cmdwriter->getPosition());
-				op = cmd->nextOperation();
-				continue;
+				return Error;
 			}
-			case cmdbind::CommandHandler::WRITE:
+			m_state = 2;
+		}
+		case 2:
+		{
+			if (!m_outputfilter->print( m_elemtype, m_elem))
 			{
-				const void* data;
-				std::size_t datasize;
-				cmd->getOutput( data, datasize);
+				switch (m_outputfilter->state())
+				{
+					case OutputFilter::Open:
+						m_lasterror = "unknown error in transaction function output";
+						break;
+					case OutputFilter::EndOfBuffer:
+						return Yield;
+					case OutputFilter::Error:
+						if (m_outputfilter->getError())
+						{
+							m_lasterror.append( m_outputfilter->getError());
+						}
+						break;
+				}
+				return Error;
+			}
+			m_state = 1;
+			break;
+		}
+		default:
+			m_lasterror = "illegal state";
+			return Error;
+	}
+}
 
-				m_resultreader->putInput( data, datasize, false);
-				if (!serialize::parse( result.m_struct, tresultreader, m_ctx, m_parsestk))
-				{
-					const char* err = m_ctx.getLastError();
-					if (err)
-					{
-						LOG_ERROR << "error in transaction function result read (" << err << ")";
-						return false;
-					}
-				}
-				op = cmd->nextOperation();
-				continue;
-			}
-			case cmdbind::CommandHandler::CLOSED:
+void TransactionFunctionResult::init( const TypedOutputFilterR& o)
+{
+	m_state = 1;
+	m_resultreader.reset( m_func.resultreader()->copy());
+	if (m_resultbuf.get())
+	{
+		m_resultreader->putInput( m_resultbuf->c_str(), m_resultbuf->size(), true);
+	}
+	else
+	{
+		m_resultreader->putInput( "", 0, true);
+	}
+	m_lasterror.clear();
+	m_outputfilter = o;
+}
+
+void TransactionFunctionResult::appendCmdOutput( const void* buf, std::size_t size)
+{
+	if (!m_resultbuf.get()) m_resultbuf.reset( new std::string);
+	m_resultbuf->append( (const char*)buf, size);
+}
+
+void TransactionFunctionResult::reset()
+{
+	m_resultbuf.reset();
+	m_lasterror.clear();
+}
+
+
+TransactionFunctionClosure::TransactionFunctionClosure( const std::string& name_, const TransactionFunction& f)
+	:m_func(f)
+	,m_name(name_)
+	,m_cmdop(cmdbind::CommandHandler::READ)
+	,m_state(0)
+	,m_cmdinputbuf(std::malloc( InputBufSize), std::free)
+	,m_cmdoutputbuf(std::malloc( OutputBufSize), std::free)
+	,m_result(f)
+	{}
+
+TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctionClosure& o)
+	:m_func(o.m_func)
+	,m_name(o.m_name)
+	,m_cmd(o.m_cmd)
+	,m_cmdop(cmdbind::CommandHandler::READ)
+	,m_state(o.m_state)
+	,m_lasterror(o.m_lasterror)
+	,m_cmdinputbuf(o.m_cmdinputbuf)
+	,m_cmdoutputbuf(o.m_cmdoutputbuf)
+	,m_cmdwriter(o.m_cmdwriter)
+	,m_result(o.m_result)
+	,m_inputfilter(o.m_inputfilter)
+	{}
+
+TransactionFunctionClosure::CallResult TransactionFunctionClosure::call()
+{
+	if (!m_inputfilter.get())
+	{
+		m_lasterror = "empty input for transaction function command";
+		m_state = 0;
+		return Error;
+	}
+	for (;;) switch (m_cmdop)
+	{
+		case cmdbind::CommandHandler::READ:
+		{
+			switch (m_state)
 			{
-				m_resultreader->putInput( "", 0, true);
-				if (!serialize::parse( result.m_struct, tresultreader, m_ctx, m_parsestk))
-				{
-					const char* err = m_ctx.getLastError();
-					if (err)
+				case 0:
+					return Error;
+				case 1:
+					if (!m_inputfilter->getNext( m_elemtype, m_elem))
 					{
-						LOG_ERROR << "error in transaction function result read (" << err << ")";
-						return false;
+						switch (m_inputfilter->state())
+						{
+							case InputFilter::Open:
+								m_cmd->putInput( m_cmdinputbuf.get(), m_cmdwriter->getPosition());
+								m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
+								m_cmd->nextOperation();
+								m_state = 1;
+
+							case InputFilter::EndOfMessage:
+								m_cmd->putInput( m_cmdinputbuf.get(), m_cmdwriter->getPosition());
+								m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
+								return Yield;
+
+							case InputFilter::Error:
+								if (m_inputfilter->getError())
+								{
+									m_lasterror.append( m_inputfilter->getError());
+								}
+								break;
+						}
+						return Error;
 					}
+					m_state = 2;
+				case 2:
+				{
+					SerializeOutputFilter so( m_cmdwriter.get());
+					if (!so.print( m_elemtype, m_elem))
+					{
+						switch (so.state())
+						{
+							case OutputFilter::Open:
+								m_state = 1;
+								continue;
+
+							case OutputFilter::EndOfBuffer:
+								m_cmd->putInput( m_cmdinputbuf.get(), m_cmdwriter->getPosition());
+								m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
+								continue;
+
+							case InputFilter::Error:
+								if (so.getError())
+								{
+									m_lasterror.append( so.getError());
+								}
+								return Error;
+						}
+						m_lasterror = "illegal state";
+						return Error;
+					}
+					m_state = 1;
+					continue;
 				}
-				return true;
+				default:
+					m_lasterror = "illegal state";
+					return Error;
 			}
+		}
+		case cmdbind::CommandHandler::WRITE:
+		{
+			const void* data;
+			std::size_t datasize;
+			m_cmd->getOutput( data, datasize);
+			m_result.appendCmdOutput( data, datasize);
+			m_cmd->nextOperation();
+			m_state = 1;
+		}
+		case cmdbind::CommandHandler::CLOSED:
+		{
+			return Ok;
 		}
 	}
 }
 
-bool TransactionFunctionMap::hasTransactionFunction( const std::string& name) const
+void TransactionFunctionClosure::init( const TypedInputFilterR& i)
 {
-	const char* ee = std::strchr( name.c_str(), ':');
-	if (ee)
+	m_cmd = m_func.cmdconstructor()( m_name);
+	m_cmdop = cmdbind::CommandHandler::READ;
+	m_state = 1;
+	m_lasterror.clear();
+	m_cmdwriter.reset( m_func.cmdwriter()->copy());
+	m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
+	m_result.reset();
+	m_inputfilter = i;
+	if (!m_cmd.get())
 	{
-		std::string nam( name.c_str(), ee-name.c_str());
-		std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-		return m_map.find( nam) != m_map.end();
+		m_lasterror = "unknown transaction function command";
+		m_state = 0;
 	}
 	else
 	{
-		std::string nam( name);
-		std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-		return m_map.find( nam) != m_map.end();
+		m_cmd->setInputBuffer( m_cmdinputbuf.get(), InputBufSize);
+		m_cmd->setOutputBuffer( m_cmdoutputbuf.get(), OutputBufSize, 0);
+		m_state = 1;
 	}
 }
 
-void TransactionFunctionMap::defineTransactionFunction( const std::string& name, const TransactionFunction::Definition& f)
+void TransactionFunctionMap::defineTransactionFunction( const std::string& name, const TransactionFunction& f)
 {
 	defineObject( m_map, name, f);
 }
 
 bool TransactionFunctionMap::getTransactionFunction( const std::string& name, TransactionFunction& rt) const
 {
-	TransactionFunction::Definition def;
-	if (!getObject( m_map, name, def)) return false;
-	rt = def.create( name);
-	return true;
+	return getObject( m_map, name, rt);
 }
 
 DDLCompilerMap::DDLCompilerMap()

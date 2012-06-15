@@ -47,11 +47,12 @@ public:
 	enum Flags
 	{
 		None=0x00,
-		ValidateAttributes=0x01,
-		CheckComplete=0x02
+		ValidateAttributes=0x01
 	};
+	static bool getFlag( const char* name, Flags& flg);
 
 	Context( Flags f=None);
+	Context( const Context& o);
 	~Context(){}
 
 	const char* getLastError() const				{return m_lasterror[0]?m_lasterror:0;}

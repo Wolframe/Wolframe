@@ -52,7 +52,6 @@
 using namespace _Wolframe;
 using namespace langbind;
 
-
 static langbind::Filter getFilter( langbind::GlobalContext* gc, const std::string& ifl, const std::string& ofl)
 {
 	langbind::Filter rt;
@@ -227,44 +226,44 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 	}
 #endif
 	{
-		FormFunction ffunc;
-		if (gc->getFormFunction( proc.c_str(), ffunc))
+		FormFunction func;
+		if (gc->getFormFunction( proc.c_str(), func))
 		{
 			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
 			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
-			langbind::FormFunctionClosure closure( ffunc);
+			langbind::FormFunctionClosure closure( func);
 			closure.init( inp);
-			langbind::FormFunction::CallResult rt = closure.call();
-			while (rt == langbind::FormFunction::Yield)
+			langbind::FormFunctionClosure::CallResult callrt = closure.call();
+			while (callrt == langbind::FormFunctionClosure::Yield)
 			{
 				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
 				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
 				{
-					rt = closure.call();
+					callrt = closure.call();
 				}
 				else
 				{
 					break;
 				}
 			}
-			if (rt == langbind::FormFunction::Ok)
+			if (callrt == langbind::FormFunctionClosure::Ok)
 			{
 				langbind::FormFunctionResult res = closure.result();
 				res.init( outp);
-				rt = res.fetch();
-				while (rt == langbind::FormFunction::Yield)
+				langbind::FormFunctionResult::CallResult fetchrt = res.fetch();
+				while (fetchrt == langbind::FormFunctionResult::Yield)
 				{
 					if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
 					|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
 					{
-						rt = res.fetch();
+						fetchrt = res.fetch();
 					}
 					else
 					{
 						break;
 					}
 				}
-				if (rt == langbind::FormFunction::Ok)
+				if (fetchrt == langbind::FormFunctionResult::Ok)
 				{
 					writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 					return true;
@@ -286,44 +285,111 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		DDLFormR df;
 		if (gc->getForm( proc.c_str(), df))
 		{
-			serialize::Context ctx;
-			serialize::FiltermapDDLParseStateStack parsestk;
-			serialize::FiltermapDDLPrintStateStack printstk;
-			langbind::SerializeInputFilter tin( flt.inputfilter().get());
-			langbind::SerializeOutputFilter tout( flt.outputfilter().get());
+			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
+			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
+			DDLFormFill closure( df, inp);
 
-			while (!serialize::parse( df->m_struct, tin, ctx, parsestk))
+			langbind::DDLFormFill::CallResult callrt = closure.call();
+			while (callrt == langbind::DDLFormFill::Yield)
 			{
-				const char* err = ctx.getLastError();
-				if (err)
+				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
+				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
 				{
-					LOG_ERROR << "error in DDL form map (" << err << ")";
+					callrt = closure.call();
+				}
+				else
+				{
+					break;
+				}
+			}
+			if (callrt == langbind::DDLFormFill::Ok)
+			{
+				langbind::DDLFormPrint res( df, outp);
+				langbind::DDLFormPrint::CallResult fetchrt = res.fetch();
+				while (fetchrt == langbind::DDLFormPrint::Yield)
+				{
+					if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
+					|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+					{
+						fetchrt = res.fetch();
+					}
+					else
+					{
+						break;
+					}
+				}
+				if (fetchrt == langbind::DDLFormPrint::Ok)
+				{
+					writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+					return true;
+				}
+				else
+				{
+					LOG_ERROR << "error fetching form function result: '" << res.getLastError() << "'";
 					return false;
 				}
-				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) break;
-				continue;
 			}
-			while (!serialize::print( df->m_struct, tout, ctx, printstk))
+			else
 			{
-				const char* err = ctx.getLastError();
-				if (err)
-				{
-					LOG_ERROR << "error in DDL form map (" << err << ")";
-					return false;
-				}
-				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) break;
-				continue;
+				LOG_ERROR << "error in form function: '" << closure.getLastError() << "'";
+				return false;
 			}
-			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-			return	flt.inputfilter()->state() == InputFilter::Open
-				&& flt.outputfilter()->state() == OutputFilter::Open;
 		}
 	}
 	{
-		if (gc->hasTransactionFunction( proc.c_str()))
+		TransactionFunction func;
+		if (gc->getTransactionFunction( proc.c_str(), func))
 		{
-
-			return true;
+			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
+			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
+			langbind::TransactionFunctionClosure closure( proc, func);
+			closure.init( inp);
+			langbind::TransactionFunctionClosure::CallResult callrt = closure.call();
+			while (callrt == langbind::TransactionFunctionClosure::Yield)
+			{
+				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
+				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+				{
+					callrt = closure.call();
+				}
+				else
+				{
+					break;
+				}
+			}
+			if (callrt == langbind::TransactionFunctionClosure::Ok)
+			{
+				langbind::TransactionFunctionResult res = closure.result();
+				res.init( outp);
+				langbind::TransactionFunctionResult::CallResult fetchrt = res.fetch();
+				while (fetchrt == langbind::TransactionFunctionResult::Yield)
+				{
+					if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
+					|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+					{
+						fetchrt = res.fetch();
+					}
+					else
+					{
+						break;
+					}
+				}
+				if (fetchrt == langbind::TransactionFunctionResult::Ok)
+				{
+					writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+					return true;
+				}
+				else
+				{
+					LOG_ERROR << "error fetching transaction function result: '" << res.getLastError() << "'";
+					return false;
+				}
+			}
+			else
+			{
+				LOG_ERROR << "error in transaction function: '" << closure.getLastError() << "'";
+				return false;
+			}
 		}
 	}
 	LOG_ERROR << "mapping command not found: '" << proc.c_str() << "'";

@@ -120,7 +120,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 	langbind::InputFilter::ElementType typ;
 	langbind::TypedFilterBase::Element element;
 
-	stk.back().initStructDef( st.size());
+	stk.back().initStructDef( st.nof_elements());
 
 	if (!inp.getNext( typ, element))
 	{
@@ -187,17 +187,13 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 
 		case langbind::InputFilter::CloseTag:
 		{
-			if (ctx.flag( Context::CheckComplete))
+			ddl::StructType::Map::iterator itr = st.begin(), end = st.end();
+			for (;itr != end; ++itr)
 			{
-				ddl::StructType::Map::iterator itr = st.begin(), end = st.end();
-				for (;itr != end; ++itr)
+				if (itr->second.mandatory() && stk.back().initCount( itr-st.begin()) == 0)
 				{
-					if (itr->second.contentType() != ddl::StructType::Vector
-					&& stk.back().initCount( itr-st.begin()) == 0)
-					{
-						ctx.setError( "undefined structure element");
-						return false;
-					}
+					ctx.setError( "undefined mandatory element");
+					return false;
 				}
 			}
 			stk.pop_back();

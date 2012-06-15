@@ -82,6 +82,13 @@ public:
 		return m_initar[ idx]++;
 	}
 
+	std::size_t initCount( std::size_t idx) const
+	{
+		if (!m_initar) return 0;
+		if (idx > m_size) throw std::logic_error( "ABW in intrusive filter map parser");
+		return m_initar[ idx];
+	}
+
 	void* value() const
 	{
 		return m_value;

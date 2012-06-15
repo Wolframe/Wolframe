@@ -71,16 +71,29 @@ public:
 	}
 
 	///\brief Constructor
-	StructType()
-		:m_contentType( Struct),m_nof_attributes(0){}
+	///\param[in] mandatory_ the element is mandatory in the structure it is part of
+	StructType( bool mandatory_=false)
+		:m_contentType( Struct)
+		,m_nof_attributes(0)
+		,m_mandatory(mandatory_){}
+
 	///\brief Copy constructor
 	///\param[in] o element to copy
 	StructType( const StructType& o)
-		:m_contentType(o.m_contentType),m_value(o.m_value),m_elem(o.m_elem),m_nof_attributes(o.m_nof_attributes){}
+		:m_contentType(o.m_contentType)
+		,m_value(o.m_value)
+		,m_elem(o.m_elem)
+		,m_nof_attributes(o.m_nof_attributes)
+		,m_mandatory(o.m_mandatory){}
+
 	///\brief Copy constructor
-	///\param[in] a element to copy
-	StructType( const AtomicType& a)
-		:m_contentType( Atomic),m_value(a),m_nof_attributes(0){}
+	///\param[in] a atomic element to create as structure element
+	///\param[in] mandatory_ the element is mandatory in the structure it is part of
+	StructType( const AtomicType& a, bool mandatory_=false)
+		:m_contentType( Atomic)
+		,m_value(a)
+		,m_nof_attributes(0)
+		,m_mandatory(mandatory_){}
 
 	///\brief Assignement operator
 	///\param[in] o element to copy
@@ -201,7 +214,14 @@ public:
 	///\brief Reset the value
 	void clear();
 
-	std::size_t size() const			{return m_elem.size();}
+	///\brief Get the number of elements in the structure or array
+	///\return the number of elements or 0 in case of an atomic value
+	std::size_t nof_elements() const		{return m_elem.size();}
+
+	///\brief Find out if the element in the structure is mandatory
+	///\return true, if yes
+	bool mandatory() const				{return m_mandatory;}
+
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
 	///\remark Used for checking the preconditions mentioned as remark [precondition]
@@ -211,6 +231,7 @@ private:
 	AtomicType m_value;
 	Map m_elem;
 	std::size_t m_nof_attributes;
+	bool m_mandatory;
 };
 
 }}//namespace

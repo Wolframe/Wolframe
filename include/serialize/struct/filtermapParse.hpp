@@ -169,17 +169,13 @@ bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Cont
 
 		case langbind::InputFilter::CloseTag:
 		{
-			if (ctx.flag( Context::CheckComplete))
+			FiltermapDescriptionBase::Map::const_iterator itr = descr->begin(),end=descr->end();
+			for (;itr != end; ++itr)
 			{
-				FiltermapDescriptionBase::Map::const_iterator itr = descr->begin(),end=descr->end();
-				for (;itr != end; ++itr)
+				if (itr->second.mandatory() && !stk.back().initCount( itr-descr->begin()))
 				{
-					if (itr->second.type() != FiltermapDescriptionBase::Vector
-					&&  !stk.back().selectElement( itr-descr->begin(), descr->size()))
-					{
-						ctx.setError( "undefined structure element");
-						return false;
-					}
+					ctx.setError( "undefined structure element");
+					return false;
 				}
 			}
 			stk.pop_back();

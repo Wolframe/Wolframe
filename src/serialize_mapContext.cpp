@@ -45,6 +45,22 @@ Context::Context( Flags f)
 	m_lasterror[0] = 0;
 }
 
+Context::Context( const Context& o)
+	:m_flags(o.m_flags)
+{
+	std::memcpy( m_lasterror, o.m_lasterror, sizeof(m_lasterror));
+}
+
+bool Context::getFlag( const char* name, Flags& flg)
+{
+	if (std::strcmp( name, "attributes") == 0)
+	{
+		flg = ValidateAttributes;
+		return true;
+	}
+	return false;
+}
+
 void Context::clear()
 {
 	m_lasterror[0] = 0;
