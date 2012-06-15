@@ -54,18 +54,7 @@ static const unsigned short APP_BUILD = 0;
 static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 {
 	langbind::GlobalContext* gct = langbind::getGlobalContext();
-
-	std::vector<std::string>::const_iterator itr = cmdline.scripts().begin(), end = cmdline.scripts().end();
-	for (; itr != end; ++itr)
-	{
-		boost::filesystem::path scriptpath( boost::filesystem::current_path() / "temp" / *itr);
-		langbind::LuaScript script( scriptpath.string());
-		std::vector<std::string>::const_iterator fi = script.functions().begin(), fe = script.functions().end();
-		for (; fi != fe; ++fi)
-		{
-			gct->defineLuaFunction( *fi, script);
-		}
-	}
+	cmdline.loadGlobalContext( boost::filesystem::current_path().string());
 }
 
 int main( int argc, char **argv )

@@ -67,17 +67,8 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 						test::convertAssignmentListDoc,
 						test::AssignmentListDoc::getFiltermapDescription(),
 						test::AssignmentListDoc::getFiltermapDescription()));
-	std::vector<std::string>::const_iterator itr = cmdline.scripts().begin(), end = cmdline.scripts().end();
-	for (; itr != end; ++itr)
-	{
-		boost::filesystem::path scriptpath( boost::filesystem::current_path() / "temp" / *itr);
-		langbind::LuaScript script( scriptpath.string());
-		std::vector<std::string>::const_iterator fi = script.functions().begin(), fe = script.functions().end();
-		for (; fi != fe; ++fi)
-		{
-			gct->defineLuaFunction( *fi, script);
-		}
-	}
+	boost::filesystem::path refpath( boost::filesystem::current_path() / "temp");
+	cmdline.loadGlobalContext( refpath.string());
 }
 
 class WolfilterTest : public ::testing::Test

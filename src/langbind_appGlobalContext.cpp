@@ -76,7 +76,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 		{
 			LOG_INFO << "Loading DDL form " << itr->name;
 			ddl::CompilerInterfaceR ci;
-			if (!getDDLCompiler( itr->DDL.c_str(), ci))
+			if (!getDDLCompiler( itr->DDL, ci))
 			{
 				LOG_ERROR << "Unknown DDL of form" << itr->DDL;
 				rt = false;
@@ -92,7 +92,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 				}
 				else
 				{
-					defineForm( itr->name.c_str(), form);
+					defineForm( itr->name, form);
 				}
 			}
 		}
