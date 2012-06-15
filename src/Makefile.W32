@@ -100,7 +100,7 @@ LOCAL_STATIC_LIB = \
 
 LOCAL_STATIC_LIB_OBJS = \
 	version.obj \
-	commandLine.obj \
+	wolframedCommandLine.obj \
 	wolfilterCommandLine.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \

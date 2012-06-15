@@ -35,10 +35,9 @@
 
 #include "iprocHandler.hpp"
 #include "connectionHandler.hpp"
+#include "appConfig.hpp"
 #include "handlerConfig.hpp"
 #include "langbind/appGlobalContext.hpp"
-///PF:HACK: Command Line is needed to instantiate the application configuration object:
-#include "../src/commandLine.hpp"
 #include "moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
@@ -60,7 +59,6 @@ class IProcTestConfiguration :public Configuration
 public:
 	IProcTestConfiguration( const IProcTestConfiguration& o)
 		:Configuration(o)
-		,m_cmdLine(o.m_cmdLine)
 		,m_appConfig(o.m_appConfig)
 		,m_langbindConfig(o.m_langbindConfig)
 	{}
@@ -89,8 +87,7 @@ public:
 				throw std::runtime_error( "Error in configuration");
 			}
 		}
-		m_cmdLine.parse( g_gtest_ARGC, g_gtest_ARGV);
-		m_appConfig.finalize( m_cmdLine);
+		m_appConfig.finalize();
 
 		setBuffers( ib, ob);
 		langbind::defineGlobalContext( new langbind::GlobalContext());
@@ -98,7 +95,6 @@ public:
 	}
 
 private:
-	config::CmdLineConfig m_cmdLine;
 	config::ApplicationConfiguration m_appConfig;
 	langbind::ApplicationEnvironmentConfig m_langbindConfig;
 };

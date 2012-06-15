@@ -91,7 +91,10 @@ public:
 	void addModules( const module::ModulesDirectory* modules )
 						{ m_modDir = modules; }
 	bool parse( const char *filename, ConfigFileType type );
+	///\brief Finalize configuration for daemon
 	void finalize( const CmdLineConfig& cmdLine );
+	///\brief Finalize configuration for simple program (tests, wolfilter) running in foreground
+	void finalize();
 
 	bool check() const;
 	bool test() const;

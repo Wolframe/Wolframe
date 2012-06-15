@@ -31,10 +31,10 @@
 
 ************************************************************************/
 //
-// commandLine.cpp
+// wolframedCommandLine.cpp
 //
 
-#include "commandLine.hpp"
+#include "wolframedCommandLine.hpp"
 
 #include <boost/program_options.hpp>
 #include <string>
