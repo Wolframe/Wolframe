@@ -118,6 +118,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_ioFilterCommandHandler.obj \
 	cmdbind_directmapCommandHandler.obj \
 	filter_filterbase.obj \
+	filter_tostringfilter.obj \
 	filter_serializefilter.obj \
 	filter_textwolf_filter.obj \
 	filter_char_filter.obj \

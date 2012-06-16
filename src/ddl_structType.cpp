@@ -205,7 +205,6 @@ StructType& StructType::operator= ( const StructType& o)
 	return *this;
 }
 
-
 void StructType::print( std::ostream& out, size_t level) const
 {
 	std::string indent( level, '\t');
