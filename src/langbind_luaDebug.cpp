@@ -31,6 +31,7 @@
 
 ************************************************************************/
 #include "langbind/luaDebug.hpp"
+#include "langbind/luaException.hpp"
 #include <stdexcept>
 #include <cstddef>
 #include <stdint.h>
@@ -145,10 +146,23 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, std::vec
 	switch (type)
 	{
 		case LUA_TUSERDATA:
-			lua_getmetatable( ls, index);
-			rt.append( "userdata ");
-			getDescription_( ls, -1, rt, stk);
-			lua_pop( ls, 1);
+			lua_pushvalue( ls, index);		///...STK: udata
+			lua_getmetatable( ls, -1);		///...STK: udata mt
+			lua_pushliteral( ls, "__tostring");	///...STK: udata mt __tostring
+			lua_rawget( ls, -2);			///...STK: udata mt mt[__tostring]
+			if (lua_isnil( ls, -1))
+			{
+				rt.append( "userdata ");
+				getDescription_( ls, -2, rt, stk);
+				lua_pop( ls, 3);		///... STK:
+			}
+			else
+			{
+				lua_pushvalue( ls, index);	///... STK: udata mt mt[__tostring] udata
+				lua_call( ls, 1, 1);		///... STK: udata mt str
+				rt.append( lua_tostring( ls, -1));
+				lua_pop( ls, 3);		///... STK:
+			}
 			break;
 
 		case LUA_TNIL:
@@ -214,8 +228,11 @@ bool _Wolframe::langbind::getDescription( lua_State *ls, int index, std::string&
 {
 	try
 	{
-		std::vector<std::size_t> stk;
-		getDescription_( ls, index, ret, stk);
+		LuaExceptionHandlerScope exceptionHandler( ls);
+		{
+			std::vector<std::size_t> stk;
+			getDescription_( ls, index, ret, stk);
+		}
 		return true;
 	}
 	catch (std::bad_alloc) { }
