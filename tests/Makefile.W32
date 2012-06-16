@@ -161,7 +161,7 @@ local_test:
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo testSimpleFormCompiler.exe >> test.bat
-#	@-echo testWolfilter >> test.bat
+	@-echo testWolfilter >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
 
