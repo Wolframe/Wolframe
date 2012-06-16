@@ -52,7 +52,6 @@ public:
 	ToStringFilter( const ToStringFilter& o)
 		:TypedOutputFilter(o)
 		,m_content(o.m_content)
-		,m_indent(o.m_indent)
 		,m_lasttype(o.m_lasttype){}
 	///\brief Destructor
 	virtual ~ToStringFilter(){}
@@ -64,7 +63,6 @@ public:
 
 private:
 	std::string m_content;				//< content string
-	std::string m_indent;				//< current indentiation string
 	FilterBase::ElementType m_lasttype;		//< last parsed element type
 };
 

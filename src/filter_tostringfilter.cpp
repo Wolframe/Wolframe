@@ -42,38 +42,31 @@ bool ToStringFilter::print( ElementType type, const Element& element)
 	switch (type)
 	{
 		case OpenTag:
-			m_content.append( m_indent);
 			m_content.append( element.tostring());
-			m_content.append( "\n");
-			m_content.append( m_indent);
-			m_content.append( "{\n");
-			m_indent.push_back( '\t');
+			m_content.append( " { ");
 			m_lasttype = type;
 		return true;
 		case CloseTag:
-			if (!m_indent.size()) throw std::runtime_error( "tags not balanced");
-			m_indent.resize( m_indent.size()-1);
-			m_content.append( m_indent);
-			m_content.append( "}\n");
+			m_content.append( " } ");
 			m_lasttype = type;
 		return true;
 		case Attribute:
 			m_lasttype = type;
-			m_content.append( m_indent);
 			m_content.append( element.tostring());
 		return true;
 		case Value:
 			if (m_lasttype == Attribute)
 			{
-				m_content.append( " ");
+				m_content.append( "=(");
 				m_content.append( element.tostring());
-				m_content.append( "\n");
+				m_content.append( "(");
 				m_lasttype = OpenTag;
 			}
 			else
 			{
-				m_content.append( m_indent);
+				m_content.append( "(");
 				m_content.append( element.tostring());
+				m_content.append( ")");
 				m_lasttype = type;
 			}
 		return true;
