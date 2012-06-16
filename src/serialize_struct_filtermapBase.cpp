@@ -39,6 +39,36 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
+static std::string getParsePath( const FiltermapParseStateStack& stk)
+{
+	std::string rt;
+	FiltermapParseStateStack::const_iterator itr=stk.begin(), end=stk.end();
+	for (; itr != end; ++itr)
+	{
+		if (itr->name())
+		{
+			rt.append( "/");
+			rt.append( itr->name());
+		}
+	}
+	return rt;
+}
+
+static std::string getPrintPath( const FiltermapPrintStateStack& stk)
+{
+	std::string rt;
+	FiltermapPrintStateStack::const_iterator itr=stk.begin(), end=stk.end();
+	for (; itr != end; ++itr)
+	{
+		if (itr->name())
+		{
+			rt.append( "/");
+			rt.append( itr->name());
+		}
+	}
+	return rt;
+}
+
 bool FiltermapDescriptionBase::parse( void* obj, langbind::TypedInputFilter& tin, Context& ctx, FiltermapParseStateStack& stk) const
 {
 	bool rt = true;
@@ -47,7 +77,7 @@ bool FiltermapDescriptionBase::parse( void* obj, langbind::TypedInputFilter& tin
 		if (stk.size() == 0)
 		{
 			if (!m_parse) throw std::runtime_error( "null parser called");
-			stk.push_back( FiltermapParseState( m_parse, obj));
+			stk.push_back( FiltermapParseState( 0, m_parse, obj));
 		}
 		while (rt && stk.size())
 		{
@@ -57,11 +87,16 @@ bool FiltermapDescriptionBase::parse( void* obj, langbind::TypedInputFilter& tin
 		{
 			return true;
 		}
+		if (!rt && ctx.getLastError())
+		{
+			std::string path = getParsePath( stk);
+			ctx.setTag( path.c_str());
+		}
 	}
 	catch (std::exception& e)
 	{
 		ctx.setError( e.what());
-		return false;
+		rt = false;
 	}
 	return rt;
 }
@@ -74,7 +109,7 @@ bool FiltermapDescriptionBase::print( const void* obj, langbind::TypedOutputFilt
 		if (stk.size() == 0)
 		{
 			if (!m_print) throw std::runtime_error( "null printer called");
-			stk.push_back( FiltermapPrintState( m_print, obj));
+			stk.push_back( FiltermapPrintState( 0, m_print, obj));
 		}
 		while (rt && stk.size())
 		{
@@ -83,6 +118,11 @@ bool FiltermapDescriptionBase::print( const void* obj, langbind::TypedOutputFilt
 		if (tout.state() == langbind::OutputFilter::Open && !ctx.getLastError() && stk.size() == 1)
 		{
 			return true;
+		}
+		if (!rt && ctx.getLastError())
+		{
+			std::string path = getPrintPath( stk);
+			ctx.setTag( path.c_str());
 		}
 	}
 	catch (std::exception& e)

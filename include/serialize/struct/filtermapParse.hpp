@@ -124,9 +124,9 @@ bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Cont
 			void* value = (char*)stk.back().value() + itr->second.ofs();
 			if (itr->second.type() == FiltermapDescriptionBase::Atomic)
 			{
-				stk.push_back( FiltermapParseState( &parseAtomicElementEndTag, value));
+				stk.push_back( FiltermapParseState( 0, &parseAtomicElementEndTag, value));
 			}
-			stk.push_back( FiltermapParseState( itr->second.parse(), value));
+			stk.push_back( FiltermapParseState( itr->first.c_str(), itr->second.parse(), value));
 			return true;
 		}
 
@@ -157,7 +157,7 @@ bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Cont
 				ctx.setError( "duplicate definition");
 				return false;
 			}
-			stk.push_back( FiltermapParseState( itr->second.parse(), (char*)stk.back().value() + itr->second.ofs()));
+			stk.push_back( FiltermapParseState( itr->first.c_str(), itr->second.parse(), (char*)stk.back().value() + itr->second.ofs()));
 			return true;
 		}
 
@@ -201,9 +201,9 @@ bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&
 	Element* ee = &((T*)(char*)stk.back().value())->back();
 	if (FiltermapIntrusiveProperty<Element>::type() == FiltermapDescriptionBase::Atomic)
 	{
-		stk.push_back( FiltermapParseState( &parseAtomicElementEndTag, 0));
+		stk.push_back( FiltermapParseState( 0, &parseAtomicElementEndTag, 0));
 	}
-	stk.push_back( FiltermapParseState( &FiltermapIntrusiveParser<Element>::parse, ee));
+	stk.push_back( FiltermapParseState( 0, &FiltermapIntrusiveParser<Element>::parse, ee));
 	return true;
 }
 

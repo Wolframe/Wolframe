@@ -13,7 +13,7 @@ docin=`echo $example | cut -f2 -d=`".lua"
 docout=`echo $example | cut -f3 -d=`".lua"
 cset=`echo $example | cut -f4 -d=`
 script=`echo $example | cut -f6 -d=`
-cmd="-s $script "`echo $example | cut -f5 -d=`
+cmd="--script $script "`echo $example | cut -f5 -d=`
 
 output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$name.$docin.$cset.tst"
 rm -f $output

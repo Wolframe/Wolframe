@@ -216,7 +216,7 @@ public:
 
 	///\brief Get the number of elements in the structure or array
 	///\return the number of elements or 0 in case of an atomic value
-	std::size_t nof_elements() const		{return m_elem.size();}
+	std::size_t nof_elements() const;
 
 	///\brief Find out if the element in the structure is mandatory
 	///\return true, if yes

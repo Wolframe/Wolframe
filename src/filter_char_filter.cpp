@@ -197,7 +197,7 @@ struct OutputFilterImpl :public OutputFilter
 				setState( EndOfBuffer);
 				return false;
 			}
-			// we finished the printing left
+			//... we've done the emptying of the buffer left
 			return true;
 		}
 		if (type == Value)

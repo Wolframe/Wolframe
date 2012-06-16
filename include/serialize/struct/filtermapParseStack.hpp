@@ -53,6 +53,7 @@ public:
 		,m_initar(0)
 		,m_size(o.m_size)
 		,m_value(o.m_value)
+		,m_name(o.m_name)
 		,m_stateidx(o.m_stateidx)
 		{
 			if (o.m_initar)
@@ -62,11 +63,12 @@ public:
 			}
 		}
 
-	FiltermapParseState( Parse p, void* v)
+	FiltermapParseState( const char* name_, Parse p, void* v)
 		:m_parse(p)
 		,m_initar(0)
 		,m_size(0)
 		,m_value(v)
+		,m_name(name_)
 		,m_stateidx(0)
 		{}
 
@@ -94,6 +96,11 @@ public:
 		return m_value;
 	}
 
+	const char* name() const
+	{
+		return m_name;
+	}
+
 	Parse parse() const
 	{
 		return m_parse;
@@ -114,6 +121,7 @@ private:
 	int* m_initar;
 	std::size_t m_size;
 	void* m_value;
+	const char* m_name;
 	std::size_t m_stateidx;
 };
 

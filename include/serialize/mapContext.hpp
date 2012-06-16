@@ -56,6 +56,7 @@ public:
 	~Context(){}
 
 	const char* getLastError() const				{return m_lasterror[0]?m_lasterror:0;}
+	const char* getLastErrorPos() const				{return m_tag[0]?m_tag:0;}
 	void clear();
 
 	void setTag( const char* tag);
@@ -64,10 +65,9 @@ public:
 
 	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
 private:
+	char m_tag[ 128];
 	char m_lasterror[ 256];
 	Flags m_flags;
-
-	void setMsg( const char* m1, char dd, const char* m2, const char* m3=0);
 };
 
 

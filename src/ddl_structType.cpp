@@ -40,7 +40,7 @@ void StructType::REQUIRE( ContentType t) const
 {
 	if (m_contentType != t)
 	{
-		switch(m_contentType)
+		switch(t)
 		{
 			case Vector: throw std::logic_error( "not defined as vector");
 			case Struct: throw std::logic_error( "not defined as structure");
@@ -89,6 +89,11 @@ StructType::Map::const_iterator StructType::end() const
 {
 	if (m_contentType == Atomic) throw std::logic_error( "defined as atomic");
 	return m_elem.end();
+}
+
+std::size_t StructType::nof_elements() const
+{
+	return (m_contentType==Vector)?(m_elem.size()-1):m_elem.size();
 }
 
 StructType::Map::iterator StructType::begin()
@@ -224,7 +229,7 @@ void StructType::print( std::ostream& out, size_t level) const
 				}
 				else
 				{
-					out << indent << (idx++) << ":" << std::endl << indent << "{";
+					out << indent << (idx++) << ":" << std::endl << indent << "{" << std::endl;
 					ii->second.print( out, level+1);
 					out << indent << "}" << std::endl;
 				}

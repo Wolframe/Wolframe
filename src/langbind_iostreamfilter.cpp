@@ -156,6 +156,21 @@ static bool processIO( BufferStruct& buf, langbind::InputFilter* iflt, langbind:
 	return true;
 }
 
+template <class Obj>
+static void logError( const char* title, const Obj& obj)
+{
+	const char* pp = obj.getLastErrorPos();
+	const char* ee = obj.getLastError();
+	if (pp)
+	{
+		LOG_ERROR << "error at '" << pp << "' " << title << " (" << " (" << (ee?ee:"unknown") << ")";
+	}
+	else
+	{
+		LOG_ERROR << "error " << title << " (" << (ee?ee:"unknown") << ")";
+	}
+}
+
 bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
 	langbind::GlobalContext* gc = langbind::getGlobalContext();
@@ -229,6 +244,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		FormFunction func;
 		if (gc->getFormFunction( proc.c_str(), func))
 		{
+			flt.inputfilter()->setValue( "empty", "false");
 			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
 			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
 			langbind::FormFunctionClosure closure( func);
@@ -270,13 +286,13 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 				}
 				else
 				{
-					LOG_ERROR << "error fetching form function result: '" << res.getLastError() << "'";
+					logError( "fetching form function result", res);
 					return false;
 				}
 			}
 			else
 			{
-				LOG_ERROR << "error in form function: '" << closure.getLastError() << "'";
+				logError( "in form function call", closure);
 				return false;
 			}
 		}
@@ -285,6 +301,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		DDLFormR df;
 		if (gc->getForm( proc.c_str(), df))
 		{
+			flt.inputfilter()->setValue( "empty", "false");
 			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
 			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
 			DDLFormFill closure( df, inp);
@@ -293,7 +310,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			while (callrt == langbind::DDLFormFill::Yield)
 			{
 				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
-				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+				|| (flt.inputfilter()->state() == InputFilter::Open))
 				{
 					callrt = closure.call();
 				}
@@ -309,7 +326,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 				while (fetchrt == langbind::DDLFormPrint::Yield)
 				{
 					if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
-					|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
+					|| (flt.outputfilter()->state() == OutputFilter::Open))
 					{
 						fetchrt = res.fetch();
 					}
@@ -325,13 +342,13 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 				}
 				else
 				{
-					LOG_ERROR << "error fetching form function result: '" << res.getLastError() << "'";
+					logError( "fetching DDL form map result", res);
 					return false;
 				}
 			}
 			else
 			{
-				LOG_ERROR << "error in form function: '" << closure.getLastError() << "'";
+				logError( "in DDL form map", closure);
 				return false;
 			}
 		}
@@ -340,6 +357,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		TransactionFunction func;
 		if (gc->getTransactionFunction( proc.c_str(), func))
 		{
+			flt.inputfilter()->setValue( "empty", "false");
 			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
 			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
 			langbind::TransactionFunctionClosure closure( proc, func);
@@ -381,13 +399,15 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 				}
 				else
 				{
-					LOG_ERROR << "error fetching transaction function result: '" << res.getLastError() << "'";
+					const char* ee = res.getLastError();
+					LOG_ERROR << "error fetching transaction function result (" << (ee?ee:"unknown") << ")";
 					return false;
 				}
 			}
 			else
 			{
-				LOG_ERROR << "error in transaction function: '" << closure.getLastError() << "'";
+				const char* ee = closure.getLastError();
+				LOG_ERROR << "error in transaction function call (" << (ee?ee:"unknown") << ")";
 				return false;
 			}
 		}

@@ -366,6 +366,29 @@ static int function__LuaObject__newindex( lua_State* ls)
 	return 0;
 }
 
+template <class Obj>
+class AppObjectsRuntimeError :public std::runtime_error
+{
+public:
+	AppObjectsRuntimeError( const char* title, const Obj& obj) :std::runtime_error( getMessage( title, obj)){}
+private:
+	static std::string getMessage( const char* title, const Obj& obj)
+	{
+		std::stringstream msg;
+		const char* pp = obj.getLastErrorPos();
+		const char* ee = obj.getLastError();
+		if (pp)
+		{
+			msg << "error at '" << pp << "' " << title << " (" << " (" << (ee?ee:"unknown") << ")";
+		}
+		else
+		{
+			msg << "error " << title << " (" << (ee?ee:"unknown") << ")";
+		}
+		return msg.str();
+	}
+};
+
 static void pushItem( lua_State* ls, const char* item, unsigned int itemsize)
 {
 	if (item)
@@ -457,7 +480,7 @@ static int function_formfunctionresult_table( lua_State* ls)
 				return 1;
 
 			case FormFunctionResult::Error:
-				throw std::runtime_error( result->getLastError());
+				throw AppObjectsRuntimeError<FormFunctionResult>( "fetching form function result", *result);
 		}
 
 	}
@@ -506,7 +529,7 @@ static int function_formfunction_call( lua_State* ls)
 				return 1;
 
 			case FormFunctionClosure::Error:
-				throw std::runtime_error( closure->getLastError());
+				throw AppObjectsRuntimeError<FormFunctionClosure>( "calling form function", *closure);
 		}
 	}
 	catch (const std::bad_alloc&)
@@ -546,7 +569,7 @@ static int function_form_table( lua_State* ls)
 				return 1;
 
 			case DDLFormPrint::Error:
-				throw std::runtime_error( result->getLastError());
+				throw AppObjectsRuntimeError<DDLFormPrint>( "fetching DDL form contents", *result);
 		}
 	}
 	catch (const std::bad_alloc&)
@@ -589,7 +612,7 @@ static int function_form_fill( lua_State* ls)
 				return 0;
 
 			case DDLFormFill::Error:
-				throw std::runtime_error( obj->getLastError());
+				throw AppObjectsRuntimeError<DDLFormFill>( "in call of DDL form fill", *obj);
 		}
 	}
 	catch (const std::bad_alloc&)

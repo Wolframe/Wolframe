@@ -293,7 +293,7 @@ struct OutputFilterImpl :public OutputFilter
 				setState( EndOfBuffer);
 				return false;
 			}
-			// we've done the printing left
+			//... we've done the emptying of the buffer left
 			return true;
 		}
 		switch (type)

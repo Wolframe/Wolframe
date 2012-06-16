@@ -43,12 +43,14 @@ Context::Context( Flags f)
 	:m_flags(f)
 {
 	m_lasterror[0] = 0;
+	m_tag[0] = 0;
 }
 
 Context::Context( const Context& o)
 	:m_flags(o.m_flags)
 {
 	std::memcpy( m_lasterror, o.m_lasterror, sizeof(m_lasterror));
+	std::memcpy( m_tag, o.m_tag, sizeof(m_tag));
 }
 
 bool Context::getFlag( const char* name, Flags& flg)
@@ -64,31 +66,34 @@ bool Context::getFlag( const char* name, Flags& flg)
 void Context::clear()
 {
 	m_lasterror[0] = 0;
-}
-
-void Context::setError( const char* msg, const char* msgparam)
-{
-	setMsg( " ", ' ', msg, msgparam);
+	m_tag[0] = 0;
 }
 
 void Context::setTag( const char* tt)
 {
-	if (!tt) return;
-	setMsg( tt, '/', m_lasterror);
+	if (!tt)
+	{
+		m_tag[0] = 0;
+	}
+	else
+	{
+		std::size_t nn = std::strlen(tt);
+		if (nn >=  sizeof(m_tag)) nn = sizeof(m_tag)-1;
+		std::memcpy( m_tag, tt, nn);
+		m_tag[nn] = 0;
+	}
 }
 
-void Context::setMsg( const char* m1, char dd, const char* m2, const char* m3)
+void Context::setError( const char* m1, const char* m2)
 {
 	try
 	{
 		std::string msg;
 		if (m1) msg.append( m1);
-		if (dd) msg.push_back( dd);
-		if (m2) msg.append( m2);
-		if (m3)
+		if (m2)
 		{
 			msg.append( " (");
-			msg.append( m3);
+			msg.append( m2);
 			msg.push_back(')');
 		}
 		std::size_t nn = msg.size();

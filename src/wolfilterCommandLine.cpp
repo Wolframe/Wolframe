@@ -96,7 +96,9 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 			{
 				formparam.filename = *itr;
 				boost::filesystem::path p(*itr);
-				formparam.ddlname = p.extension().string();
+				std::string ext = p.extension().string();
+				if (!ext.size()) throw std::runtime_error( "no DDL specified (file extension missing) for form file");
+				formparam.ddlname = std::string( ext.c_str()+1);
 			}
 			boost::filesystem::path p(formparam.filename);
 			formparam.formname = p.stem().string();

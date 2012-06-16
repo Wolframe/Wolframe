@@ -213,6 +213,7 @@ public:
 	const ddl::StructType& structure() const	{return m_structure;}
 	serialize::Context::Flags flags() const		{return m_flags;}
 
+	std::string tostring() const;
 private:
 	friend class DDLFormFill;
 	ddl::StructType m_structure;
@@ -240,10 +241,10 @@ public:
 	~DDLFormFill(){}
 
 	///\brief Get the last error of 'call' as string
-	const char* getLastError() const
-	{
-		return m_ctx.getLastError();
-	}
+	const char* getLastError() const			{return m_ctx.getLastError();}
+
+	///\brief Get the last error position of 'call' as string
+	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
 
 	///\brief Initialization before call
 	///\param[in] i input filter
@@ -288,10 +289,11 @@ public:
 	///\brief Destructor
 	~DDLFormPrint(){}
 
-	const char* getLastError() const
-	{
-		return m_ctx.getLastError();
-	}
+	///\brief Get the last error as string
+	const char* getLastError() const			{return m_ctx.getLastError();}
+
+	///\brief Get the last error position as string
+	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
 
 	///\enum CallResult
 	///\brief Enumeration of call states of the fetch processing
@@ -376,10 +378,11 @@ public:
 	///\brief Destructor
 	~FormFunctionResult();
 
-	const char* getLastError() const
-	{
-		return m_ctx.getLastError();
-	}
+	///\brief Get the last error as string
+	const char* getLastError() const			{return m_ctx.getLastError();}
+
+	///\brief Get the last error position as string
+	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
 
 	///\enum CallResult
 	///\brief Enumeration of call states of the fetch processing
@@ -426,10 +429,11 @@ public:
 	///\brief Destructor
 	~FormFunctionClosure();
 
-	const char* getLastError() const
-	{
-		return m_ctx.getLastError();
-	}
+	///\brief Get the last error as string
+	const char* getLastError() const			{return m_ctx.getLastError();}
+
+	///\brief Get the last error position as string
+	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
 
 	///\enum CallResult
 	///\brief Enumeration of call states of the call processing
@@ -516,6 +520,7 @@ public:
 	///\brief Destructor
 	~TransactionFunctionResult(){}
 
+	///\brief Get the last error as string
 	const char* getLastError() const
 	{
 		return m_lasterror.size()?m_lasterror.c_str():0;
@@ -579,6 +584,7 @@ public:
 	///\brief Destructor
 	~TransactionFunctionClosure(){}
 
+	///\brief Get the last error as string
 	const char* getLastError() const
 	{
 		return m_lasterror.size()?m_lasterror.c_str():0;

@@ -181,6 +181,12 @@ bool DDLForm::setValue( const char* name, const std::string& value)
 	return false;
 }
 
+std::string DDLForm::tostring() const
+{
+	std::ostringstream out;
+	m_structure.print( out);
+	return out.str();
+}
 
 DDLFormFill::DDLFormFill( const DDLFormR& f)
 	:m_form(f)
@@ -226,14 +232,12 @@ DDLFormFill::CallResult DDLFormFill::call()
 			}
 			if (!serialize::parse( m_form->m_structure, *m_inputfilter, m_ctx, m_parsestk))
 			{
+				if (m_ctx.getLastError()) return Error;
 				switch (m_inputfilter->state())
 				{
 					case InputFilter::Open:
-						if (m_ctx.getLastError())
-						{
-							return Error;
-						}
-						break;
+						m_ctx.setError( "unknown error in form fill");
+						return Error;
 
 					case InputFilter::EndOfMessage:
 						return Yield;
@@ -290,9 +294,11 @@ DDLFormPrint::CallResult DDLFormPrint::fetch()
 	}
 	if (!serialize::print( m_form->structure(), *m_outputfilter, m_ctx, m_printstk))
 	{
+		if (m_ctx.getLastError()) return Error;
 		switch (m_outputfilter->state())
 		{
 			case OutputFilter::Open:
+				m_ctx.setError( "unknown error in form print");
 				return Error;
 
 			case OutputFilter::EndOfBuffer:
