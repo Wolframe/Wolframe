@@ -75,8 +75,7 @@ OBJS = \
 
 TEST_BINS = \
 	tests/iprocHandlerTest$(EXE) \
-	tests/iprocHandlerXMLTest$(EXE) \
-	tests/simpleFormCompilerTest$(EXE)
+	tests/iprocHandlerXMLTest$(EXE)
 
 CPP_BINS = \
 	iprocd$(EXE)
@@ -87,8 +86,6 @@ iprocd$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPD
 
 tests/iprocHandlerTest$(EXE): tests/iprocHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 tests/iprocHandlerXMLTest$(EXE): tests/iprocHandlerXMLTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
-tests/structFiltermapTest$(EXE): tests/structFiltermapTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
-tests/simpleFormCompilerTest$(EXE): tests/simpleFormCompilerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 
 local_all: $(CPP_BINS)
 
@@ -102,7 +99,6 @@ local_install:
 
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./simpleFormCompilerTest$(EXE)
 ifeq ($(WITH_LUA),1)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./iprocHandlerTest$(EXE)
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./iprocHandlerXMLTest$(EXE)

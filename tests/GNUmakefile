@@ -104,6 +104,7 @@ TEST_CPP_BINS = \
 	configStructParser$(EXE) \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
+	testSimpleFormCompiler$(EXE) \
 	testWolfilter$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
@@ -113,6 +114,7 @@ testSHA2$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 testWolfilter$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 
 local_all:
@@ -160,6 +162,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./configStructParser $(TOPDIR)/src/wolframe.conf
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testProtocolLFdotEscaping
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testSimpleFormCompiler
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testWolfilter
 	@echo
