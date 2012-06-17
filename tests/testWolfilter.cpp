@@ -145,7 +145,12 @@ TEST_F( WolfilterTest, tests)
 		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
 		if (directoryExists( tempdir))
 		{
-			boost::filesystem::remove_all( tempdir);
+			try {
+				boost::filesystem::remove_all( tempdir);
+			} catch( ... ) {
+				boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
+				boost::filesystem::remove_all( tempdir);				
+			}
 		}
 		boost::filesystem::create_directory( tempdir);
 		wtest::TestDescription td( *itr);
