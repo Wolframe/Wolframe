@@ -43,7 +43,7 @@
 #include <boost/bind.hpp>
 #include "appProperties.hpp"
 #include "version.hpp"
-#include "commandLine.hpp"
+#include "wolframedCommandLine.hpp"
 #include "appconfig.hpp"
 #include "standardConfigs.hpp"
 #include "server.hpp"

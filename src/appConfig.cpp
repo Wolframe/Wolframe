@@ -37,7 +37,7 @@
 #include "config/ConfigurationTree.hpp"
 #include "config/valueParser.hpp"
 #include "appConfig.hpp"
-#include "commandLine.hpp"
+#include "wolframedCommandLine.hpp"
 #include "standardConfigs.hpp"		// fuck-up - idiotic interaction with ...
 #include "logger-v1.hpp"
 
@@ -338,6 +338,14 @@ void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
 		m_conf[i]->setCanonicalPathes( configFile );
 }
 
+void ApplicationConfiguration::finalize()
+{
+	foreground = true;
+	for( std::size_t i = 0; i <  m_conf.size(); i++ )
+	{
+		m_conf[i]->setCanonicalPathes( configFile );
+	}
+}
 
 void ApplicationConfiguration::print( std::ostream& os ) const
 {

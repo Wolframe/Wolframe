@@ -31,11 +31,11 @@
 
 ************************************************************************/
 //
-// commandLine.hpp
+// wolframedCommandLine.hpp
 //
 
-#ifndef _COMMANDLINE_HPP_INCLUDED
-#define _COMMANDLINE_HPP_INCLUDED
+#ifndef _WOLFRAMED_COMMANDLINE_HPP_INCLUDED
+#define _WOLFRAMED_COMMANDLINE_HPP_INCLUDED
 
 #include "logger/logLevel.hpp"
 #include "appConfig.hpp"

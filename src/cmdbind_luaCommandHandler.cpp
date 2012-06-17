@@ -54,6 +54,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 {
 	int rt = 0;
 	errorCode = 0;
+	int nargs = 0;
 
 	if (!m_interp.get())
 	{
@@ -85,18 +86,24 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 		{
 			lua_pushlstring( m_interp->thread(), itr->c_str(), itr->size());
 		}
-		rt = lua_resume( m_interp->thread(), NULL, m_argBuffer.size());
+		nargs = (int)m_argBuffer.size();
 	}
-	else
+	do
 	{
 		// call the function (subsequently until termination)
-		rt = lua_resume( m_interp->thread(), NULL, 0);
+		rt = lua_resume( m_interp->thread(), NULL, nargs);
+		if (rt == LUA_YIELD)
+		{
+			if ((m_inputfilter.get() && m_inputfilter->state() != InputFilter::Open)
+			||  (m_outputfilter.get() && m_outputfilter->state() != OutputFilter::Open))
+			{
+				return Yield;
+			}
+		}
+		nargs = 0;
 	}
-	if (rt == LUA_YIELD)
-	{
-		return Yield;
-	}
-	else if (rt != 0)
+	while (rt == LUA_YIELD);
+	if (rt != 0)
 	{
 		const char* msg = lua_tostring( m_interp->thread(), -1);
 		LOG_ERROR << "error calling function '" << m_name.c_str() << "':" << msg;

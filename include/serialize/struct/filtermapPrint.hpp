@@ -89,7 +89,7 @@ static bool printObject_( const traits::struct_&, langbind::TypedOutputFilter& o
 				return false;
 			}
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapPrintState( itr->second.print(), (char*)obj + itr->second.ofs()));
+			stk.push_back( FiltermapPrintState( itr->first.c_str(), itr->second.print(), (char*)obj + itr->second.ofs()));
 		}
 		else
 		{
@@ -100,8 +100,8 @@ static bool printObject_( const traits::struct_&, langbind::TypedOutputFilter& o
 				return false;
 			}
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapPrintState( &printCloseTag, itr->first.c_str()));
-			stk.push_back( FiltermapPrintState( itr->second.print(), (char*)obj + itr->second.ofs()));
+			stk.push_back( FiltermapPrintState( 0, &printCloseTag, itr->first.c_str()));
+			stk.push_back( FiltermapPrintState( itr->first.c_str(), itr->second.print(), (char*)obj + itr->second.ofs()));
 		}
 	}
 	else
@@ -162,7 +162,7 @@ static bool printObject_( const traits::vector_&, langbind::TypedOutputFilter& o
 	}
 	stk.back().state( (idx+1)*2);
 	Element* ve = &(*obj)[ idx];
-	stk.push_back( FiltermapPrintState( &FiltermapIntrusivePrinter<Element>::print, ve));
+	stk.push_back( FiltermapPrintState( stk.back().name(), &FiltermapIntrusivePrinter<Element>::print, ve));
 	return true;
 }
 

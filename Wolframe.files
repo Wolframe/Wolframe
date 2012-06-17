@@ -1071,8 +1071,8 @@ src/cmdbind_execCommandHandler.cpp
 src/cmdbind_ioFilterCommandHandler.cpp
 src/cmdbind_lineCommandHandler.cpp
 src/cmdbind_luaCommandHandler.cpp
-src/commandLine.cpp
-src/commandLine.hpp
+src/wolframedCommandLine.cpp
+src/wolframedCommandLine.hpp
 src/config_descriptionBase.cpp
 src/connectionBase.hpp
 src/connection.cpp

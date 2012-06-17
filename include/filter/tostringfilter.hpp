@@ -29,48 +29,42 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/mapContext.hpp
-///\brief Defines the error handling of serialization/deserialization functions
+///\file filter/tostringfilter.hpp
+///\brief Interface for tostring methods in language bindings
 
-#ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
+#ifndef _Wolframe_FILTER_TOSTRING_FILTER_INTERFACE_HPP_INCLUDED
+#define _Wolframe_FILTER_TOSTRING_FILTER_INTERFACE_HPP_INCLUDED
+#include "filter/typedfilter.hpp"
 #include <string>
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
 
 namespace _Wolframe {
-namespace serialize {
+namespace langbind {
 
-class Context
+///\class ToStringFilter
+///\brief Output filter for tostring methods in language bindings
+class ToStringFilter :public TypedOutputFilter
 {
 public:
-	enum Flags
-	{
-		None=0x00,
-		ValidateAttributes=0x01
-	};
-	static bool getFlag( const char* name, Flags& flg);
+	///\brief Constructor
+	ToStringFilter() {}
+	///\brief Copy constructor
+	///\param[in] o typed output filter to copy
+	ToStringFilter( const ToStringFilter& o)
+		:TypedOutputFilter(o)
+		,m_content(o.m_content)
+		,m_lasttype(o.m_lasttype){}
+	///\brief Destructor
+	virtual ~ToStringFilter(){}
 
-	Context( Flags f=None);
-	Context( const Context& o);
-	~Context(){}
+	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
+	virtual bool print( ElementType type, const Element& element)=0;
 
-	const char* getLastError() const				{return m_lasterror[0]?m_lasterror:0;}
-	const char* getLastErrorPos() const				{return m_tag[0]?m_tag:0;}
-	void clear();
+	const std::string& content() const		{return m_content;}
 
-	void setTag( const char* tag);
-	void setError( const char* msg, const char* msgparam=0);
-	void setError( const char* msg, const std::string& p)		{return setError( msg, p.c_str());}
-
-	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
 private:
-	char m_tag[ 128];
-	char m_lasterror[ 256];
-	Flags m_flags;
+	std::string m_content;				//< content string
+	FilterBase::ElementType m_lasttype;		//< last parsed element type
 };
 
-
-}}
+}}//namespace
 #endif
-

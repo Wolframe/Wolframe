@@ -42,39 +42,53 @@ using namespace serialize;
 // forward declaration
 static bool printObject( langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk);
 
-static bool printAtom( const ddl::AtomicType& val, langbind::TypedOutputFilter& outp, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static std::string getPrintPath( const FiltermapDDLPrintStateStack& stk)
 {
+	std::string rt;
+	FiltermapDDLPrintStateStack::const_iterator itr=stk.begin(), end=stk.end();
+	for (; itr != end; ++itr)
+	{
+		if (itr->value() && itr->value()->contentType() != ddl::StructType::Vector)
+		{
+			std::string tag = itr->tag().tostring();
+			if (tag.size())
+			{
+				rt.append( "/");
+				rt.append( tag);
+			}
+		}
+	}
+	return rt;
+}
+
+static bool printAtom( langbind::TypedOutputFilter& outp, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+{
+	const ddl::AtomicType* val = &stk.back().value()->value();
 	std::string ee;
-	if (!val.get( ee))
+	if (!val->get( ee))
 	{
 		ctx.setError( "value conversion error");
 		return false;
 	}
-	bool rt = outp.print( langbind::OutputFilter::Value, langbind::TypedFilterBase::Element( ee.c_str(), ee.size()));
-	stk.pop_back();
-	return rt;
+	if (outp.print( langbind::OutputFilter::Value, langbind::TypedFilterBase::Element( ee.c_str(), ee.size())))
+	{
+		stk.pop_back();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
-static bool printStruct( const ddl::StructType& val, langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool printStruct( langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
-	if (stk.back().state() < val.size()*2)
+	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
+	std::size_t idx = stk.back().state();
+	if (idx < obj->nof_elements())
 	{
-		std::size_t idx = stk.back().state()/2;
-		bool atEnd = stk.back().state()&1;
-		ddl::StructType::Map::const_iterator itr = val.begin() + idx;
-
-		if (atEnd)
-		{
-			if (!out.print( langbind::TypedOutputFilter::CloseTag, langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size())))
-			{
-				ctx.setError( out.getError());
-				return false;
-			}
-			++idx;
-			++itr;
-			stk.back().state( idx*2);
-		}
-		if (idx < val.nof_attributes())
+		ddl::StructType::Map::const_iterator itr = obj->begin() + idx;
+		if (idx < obj->nof_attributes())
 		{
 			if (itr->second.contentType() != ddl::StructType::Atomic)
 			{
@@ -88,8 +102,7 @@ static bool printStruct( const ddl::StructType& val, langbind::TypedOutputFilter
 				return false;
 			}
 			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));
-			++idx;
-			stk.back().state( 2*idx);
+			stk.back().state( ++idx);
 		}
 		else
 		{
@@ -99,8 +112,10 @@ static bool printStruct( const ddl::StructType& val, langbind::TypedOutputFilter
 				ctx.setError( out.getError());
 				return false;
 			}
-			stk.back().state( 2*idx+1);
-			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));
+
+			stk.back().state( ++idx);
+			stk.push_back( FiltermapDDLPrintState( 0, elem));		//... print close tag
+			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));	//... print element
 		}
 	}
 	else
@@ -110,74 +125,69 @@ static bool printStruct( const ddl::StructType& val, langbind::TypedOutputFilter
 	return true;
 }
 
-static bool printVector( const ddl::StructType& val, langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool printVector( langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
-	langbind::TypedFilterBase::Element elem;
+	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
 
-	std::size_t idx = stk.back().state()/4;
-	std::size_t substate = stk.back().state()&3;
-
-	if (idx >= val.size())
+	std::size_t idx = stk.back().state()/2;
+	std::size_t sdx = stk.back().state() & 1;
+	if (idx >= obj->nof_elements())
 	{
 		stk.pop_back();
 		return true;
 	}
-	switch (substate)
+	ddl::StructType::Map::const_iterator itr = obj->begin()+idx;
+	if (idx >= 1)
 	{
-		case 0:
-		{
-			ddl::StructType::Map::const_iterator itr = val.begin() + idx;
-			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));
-			if (idx+1 < val.size())
-			{
-				stk.back().state( idx*4 +1);
-			}
-			else
-			{
-				stk.back().state( ++idx*4);
-			}
-			return true;
-		}
-		case 1:
+		if (sdx == 0)
 		{
 			if (!out.print( langbind::TypedOutputFilter::CloseTag, stk.back().tag()))
 			{
 				ctx.setError( out.getError());
 				return false;
 			}
-			stk.back().state( idx*4 +2);
 		}
-		default:
+		if (!out.print( langbind::TypedOutputFilter::OpenTag, stk.back().tag()))
 		{
-			if (!out.print( langbind::TypedOutputFilter::OpenTag, stk.back().tag()))
-			{
-				ctx.setError( out.getError());
-				return false;
-			}
-			stk.back().state( ++idx*4);
+			stk.back().state( idx*2+1);
+			ctx.setError( out.getError());
+			return false;
 		}
 	}
+	stk.back().state( (idx+1)*2);
+	stk.push_back( FiltermapDDLPrintState( &itr->second, stk.back().tag()));	//... print element
 	return true;
 }
 
 static bool printObject( langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
+	if (!stk.back().value())
+	{
+		if (!out.print( langbind::TypedOutputFilter::CloseTag, stk.back().tag()))
+		{
+			ctx.setError( out.getError());
+			return false;
+		}
+		stk.pop_back();
+		return true;
+	}
 	switch (stk.back().value()->contentType())
 	{
 		case ddl::StructType::Atomic:
 		{
-			return printAtom( stk.back().value()->value(), out, ctx, stk);
+			return printAtom( out, ctx, stk);
 		}
 		case ddl::StructType::Vector:
 		{
-			return printVector( *stk.back().value(), out, ctx, stk);
+			return printVector( out, ctx, stk);
 		}
 		case ddl::StructType::Struct:
 		{
-			return printStruct( *stk.back().value(), out, ctx, stk);
+			return printStruct( out, ctx, stk);
 		}
 	}
-	return true;
+	ctx.setError( "illegal state in print DDL form");
+	return false;
 }
 
 bool _Wolframe::serialize::print( const ddl::StructType& st, langbind::TypedOutputFilter& tout, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
@@ -193,6 +203,11 @@ bool _Wolframe::serialize::print( const ddl::StructType& st, langbind::TypedOutp
 		while (rt && stk.size())
 		{
 			rt = printObject( tout, ctx, stk);
+		}
+		if (!rt && ctx.getLastError())
+		{
+			std::string path = getPrintPath( stk);
+			ctx.setTag( path.c_str());
 		}
 	}
 	catch (std::exception& e)

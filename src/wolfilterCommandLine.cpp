@@ -33,15 +33,19 @@
 ///\file wolfilterCommandLine.cpp
 ///\brief Implementation of the options of a wolfilter call
 #include "wolfilterCommandLine.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <cstring>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 using namespace _Wolframe;
 using namespace config;
 
-WolfilterCommandLine::WolfilterCommandLine( int argc, const char** argv)
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 	:m_printhelp(false)
 	,m_printversion(false)
 	,m_inbufsize(8<<10)
@@ -55,6 +59,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, const char** argv)
 		( "help,h", "print help message" )
 		( "input,f", po::value<std::string>(), "specify input file to process by path" )
 		( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
+		( "form,r", po::value< std::vector<std::string> >(), "specify form to load by path" )
 		( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
 		( "cmd", po::value<std::string>(), "name of the command to execute")
 		( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
@@ -75,6 +80,40 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, const char** argv)
 
 	if (vmap.count( "input")) m_inputfile = vmap["input"].as<std::string>();
 	if (vmap.count( "module")) m_modules = vmap["module"].as<std::vector<std::string> >();
+	if (vmap.count( "form"))
+	{
+		std::vector<std::string> formparams = vmap["form"].as<std::vector<std::string> >();
+		std::vector<std::string>::const_iterator itr=formparams.begin(), end=formparams.end();
+		for (; itr != end; ++itr)
+		{
+			FormParam formparam;
+			const char* cc = std::strchr( itr->c_str(), '#');
+			if (cc)
+			{
+				formparam.filename = std::string( cc+1);
+				formparam.ddlname = std::string( itr->c_str(), cc-itr->c_str());
+			}
+			else
+			{
+				formparam.filename = *itr;
+				boost::filesystem::path p(*itr);
+#if BOOST_VERSION < 104300
+				std::string ext = p.extension();
+#else
+				std::string ext = p.extension().string();
+#endif
+				if (!ext.size()) throw std::runtime_error( "no DDL specified (file extension missing) for form file");
+				formparam.ddlname = std::string( ext.c_str()+1);
+			}
+			boost::filesystem::path p(formparam.filename);
+#if BOOST_VERSION < 104300
+			formparam.formname = p.stem();
+#else
+			formparam.formname = p.stem().string();
+#endif
+			m_forms.push_back( formparam);
+		}
+	}
 	if (vmap.count( "script")) m_scripts = vmap["script"].as<std::vector<std::string> >();
 	if (vmap.count( "cmd")) m_cmd = vmap["cmd"].as<std::string>();
 	if (vmap.count( "input-filter")) m_inputfilter = vmap["input-filter"].as<std::string>();
@@ -109,6 +148,67 @@ void WolfilterCommandLine::print(std::ostream& out) const
 	out << "\twolfilter [OPTION] <cmd> <inputfilter> <outputfilter>" << std::endl;
 	out << m_helpstring << std::endl;
 }
+
+static std::string canonicalPath( const std::string& path, const std::string& refpath)
+{
+	boost::filesystem::path pt( path);
+	if (pt.is_absolute())
+	{
+		return pt.string();
+	}
+	else
+	{
+		return boost::filesystem::absolute( pt, boost::filesystem::path( refpath)).string();
+	}
+}
+
+void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath) const
+{
+	langbind::GlobalContext* gct = langbind::getGlobalContext();
+	{
+		std::vector<std::string>::const_iterator itr,end;
+		itr = scripts().begin();
+		end = scripts().end();
+		for (; itr != end; ++itr)
+		{
+			std::string scriptpath( canonicalPath( *itr, referencePath));
+			langbind::LuaScript script( scriptpath);
+			std::vector<std::string>::const_iterator fi = script.functions().begin(), fe = script.functions().end();
+			for (; fi != fe; ++fi)
+			{
+				gct->defineLuaFunction( *fi, script);
+			}
+		}
+	}
+	{
+		std::vector<WolfilterCommandLine::FormParam>::const_iterator itr,end;
+		itr = forms().begin();
+		end = forms().end();
+		for (; itr != end; ++itr)
+		{
+			std::string formpath( canonicalPath( itr->filename, referencePath));
+			ddl::CompilerInterfaceR ci;
+			if (!gct->getDDLCompiler( itr->ddlname, ci))
+			{
+				throw std::runtime_error( "Unknown DDL in form parameter");
+			}
+			else
+			{
+				ddl::StructType form;
+				std::string error;
+				if (!ci->compileFile( formpath, form, error))
+				{
+					throw std::runtime_error( error);
+				}
+				else
+				{
+					gct->defineForm( itr->formname, form);
+				}
+			}
+		}
+	}
+}
+
 
 
 

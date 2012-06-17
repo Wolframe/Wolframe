@@ -52,18 +52,25 @@ public:
 	FiltermapPrintState( const FiltermapPrintState& o)
 		:m_print(o.m_print)
 		,m_value(o.m_value)
+		,m_name(o.m_name)
 		,m_stateidx(o.m_stateidx)
 		{}
 
-	FiltermapPrintState( Print p, const void* v)
+	FiltermapPrintState( const char* name_, Print p, const void* v)
 		:m_print(p)
 		,m_value(v)
+		,m_name(name_)
 		,m_stateidx(0)
 		{}
 
 	const void* value() const
 	{
 		return m_value;
+	}
+
+	const char* name() const
+	{
+		return m_name;
 	}
 
 	Print print() const
@@ -84,6 +91,7 @@ public:
 private:
 	Print m_print;
 	const void* m_value;
+	const char* m_name;
 	std::size_t m_stateidx;
 };
 

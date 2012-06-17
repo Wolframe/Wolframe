@@ -39,9 +39,30 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
+static std::string getParsePath( const FiltermapDDLParseStateStack& stk)
+{
+	std::string rt;
+	FiltermapDDLParseStateStack::const_iterator itr=stk.begin(), end=stk.end();
+	for (; itr != end; ++itr)
+	{
+		if (itr->name())
+		{
+			rt.append( "/");
+			rt.append( itr->name());
+		}
+	}
+	return rt;
+}
+
 // forward declarations
 static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapDDLParseState>& stk);
 
+enum AtomicValueState
+{
+	TagValueOpen,
+	TagValueParsed,
+	AttributeValueOpen
+};
 
 static bool parseAtom( ddl::AtomicType& val, langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapDDLParseState>& stk)
 {
@@ -61,6 +82,11 @@ static bool parseAtom( ddl::AtomicType& val, langbind::TypedInputFilter& inp, Co
 				return false;
 
 			case langbind::InputFilter::Value:
+				if (stk.back().state() == TagValueParsed)
+				{
+					ctx.setError( "two subsequent values for single atomic value");
+					return false;
+				}
 				switch (element.type)
 				{
 					case langbind::TypedFilterBase::Element::bool_:
@@ -99,13 +125,29 @@ static bool parseAtom( ddl::AtomicType& val, langbind::TypedInputFilter& inp, Co
 						}
 					break;
 				}
+				if (stk.back().state() == AttributeValueOpen)
+				{
+					stk.pop_back();
+				}
+				else
+				{
+					stk.back().state( TagValueParsed);
+				}
 				break;
 
 			case langbind::InputFilter::CloseTag:
-				if (!val.set( std::string( "")))
+				if (stk.back().state() == AttributeValueOpen)
 				{
-					ctx.setError( "cannot convert empty string to value");
+					ctx.setError( "missing attribute value");
 					return false;
+				}
+				else if (stk.back().state() == TagValueOpen)
+				{
+					if (!val.set( std::string( "")))
+					{
+						ctx.setError( "cannot convert empty string to value");
+						return false;
+					}
 				}
 				stk.pop_back();
 				break;
@@ -120,7 +162,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 	langbind::InputFilter::ElementType typ;
 	langbind::TypedFilterBase::Element element;
 
-	stk.back().initStructDef( st.size());
+	stk.back().initStructDef( st.nof_elements());
 
 	if (!inp.getNext( typ, element))
 	{
@@ -135,7 +177,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			ddl::StructType::Map::iterator itr = st.find( element.tostring());
 			if (itr == st.end())
 			{
-				ctx.setError( "unknown element");
+				ctx.setError( "unknown element ", element.tostring());
 				return false;
 			}
 			std::size_t idx = itr - st.begin();
@@ -143,12 +185,21 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			{
 				if (ctx.flag( Context::ValidateAttributes))
 				{
-					ctx.setError( "attribute element expected");
+					ctx.setError( "attribute element expected for ", element.tostring());
 					return false;
 				}
 			}
+			if (itr->second.contentType() != ddl::StructType::Vector && stk.back().initCount( idx))
+			{
+				ctx.setError( "duplicate structure element definition", element.tostring());
+				return false;
+			}
 			stk.back().selectElement( idx);
-			stk.push_back( FiltermapDDLParseState( &itr->second));
+			stk.push_back( FiltermapDDLParseState( itr->first.c_str(), &itr->second));
+			if (itr->second.contentType() == ddl::StructType::Atomic)
+			{
+				stk.back().state( TagValueOpen);
+			}
 			return true;
 		}
 
@@ -157,7 +208,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			ddl::StructType::Map::iterator itr = st.find( element.tostring());
 			if (itr == st.end())
 			{
-				ctx.setError( "unknown element");
+				ctx.setError( "unknown element ", element.tostring());
 				return false;
 			}
 			std::size_t idx = itr - st.begin();
@@ -165,17 +216,18 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			{
 				if (ctx.flag( Context::ValidateAttributes))
 				{
-					ctx.setError( "content element expected");
+					ctx.setError( "content element expected for ", element.tostring());
 					return false;
 				}
 			}
 			if (itr->second.contentType() != ddl::StructType::Atomic)
 			{
-				ctx.setError( "atomic element expected");
+				ctx.setError( "atomic element expected for ", element.tostring());
 				return false;
 			}
 			stk.back().selectElement( idx);
-			stk.push_back( FiltermapDDLParseState( &itr->second));
+			stk.push_back( FiltermapDDLParseState( itr->first.c_str(), &itr->second));
+			stk.back().state( AttributeValueOpen);
 			return true;
 		}
 
@@ -187,65 +239,52 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 
 		case langbind::InputFilter::CloseTag:
 		{
-			if (ctx.flag( Context::CheckComplete))
+			ddl::StructType::Map::iterator itr = st.begin(), end = st.end();
+			for (;itr != end; ++itr)
 			{
-				ddl::StructType::Map::iterator itr = st.begin(), end = st.end();
-				for (;itr != end; ++itr)
+				if (itr->second.mandatory() && stk.back().initCount( itr-st.begin()) == 0)
 				{
-					if (itr->second.contentType() != ddl::StructType::Vector
-					&& stk.back().initCount( itr-st.begin()) == 0)
-					{
-						ctx.setError( "undefined structure element");
-						return false;
-					}
+					ctx.setError( "undefined mandatory structure element ", itr->first);
+					return false;
 				}
 			}
 			stk.pop_back();
 			return true;
 		}
 	}
-	ctx.setError( "illegal state");
+	ctx.setError( "illegal state in parse DDL form structure");
 	return false;
 }
 
 
 static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapDDLParseState>& stk)
 {
-	bool rt = false;
 	switch (stk.back().value()->contentType())
 	{
 		case ddl::StructType::Atomic:
 		{
-			if (2>=stk.at( stk.size()-1).initCount())
+			if (!parseAtom( stk.back().value()->value(), inp, ctx, stk))
 			{
-				ctx.setError( "duplicate value definition");
 				return false;
 			}
-			rt = parseAtom( stk.back().value()->value(), inp, ctx, stk);
+			return true;
 		}
 		case ddl::StructType::Vector:
 		{
-			if (stk.back().state())
-			{
-				stk.pop_back();
-				return true;
-			}
-			stk.back().state( 1);
 			stk.back().value()->push();
-			stk.push_back( FiltermapDDLParseState( &stk.back().value()->back()));
+			ddl::StructType* velem = &stk.back().value()->back();
+			const char* velemname = stk.back().name();
+			stk.pop_back();
+			stk.push_back( FiltermapDDLParseState( velemname, velem));
 			return true;
 		}
 		case ddl::StructType::Struct:
 		{
-			if (2>=stk.at( stk.size()-1).initCount())
-			{
-				ctx.setError( "duplicate structure definition");
-				return false;
-			}
-			rt = parseStruct( *stk.back().value(), inp, ctx, stk);
+			return parseStruct( *stk.back().value(), inp, ctx, stk);
 		}
 	}
-	return rt;
+	ctx.setError( "illegal state in parse DDL form object");
+	return false;
 }
 
 
@@ -256,17 +295,26 @@ bool _Wolframe::serialize::parse( ddl::StructType& st, langbind::TypedInputFilte
 	{
 		if (stk.size() == 0)
 		{
-			stk.push_back( FiltermapDDLParseState( &st));
+			stk.push_back( FiltermapDDLParseState( 0, &st));
 		}
 		while (rt && stk.size())
 		{
 			rt = parseObject( tin, ctx, stk);
 		}
+		if (tin.state() == langbind::InputFilter::Open && !ctx.getLastError() && stk.size() == 1)
+		{
+			return true;
+		}
 	}
 	catch (std::exception& e)
 	{
 		ctx.setError( e.what());
-		return false;
+		rt = false;
+	}
+	if (!rt && ctx.getLastError())
+	{
+		std::string path = getParsePath( stk);
+		ctx.setTag( path.c_str());
 	}
 	return rt;
 }

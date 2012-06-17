@@ -55,20 +55,22 @@ struct FiltermapDescription :public FiltermapDescriptionBase
 {
 	///\brief Constructor
 	FiltermapDescription()
-		:FiltermapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), FiltermapIntrusiveProperty<Structure>::type(), &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusivePrinter<Structure>::print){}
+		:FiltermapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), FiltermapIntrusiveProperty<Structure>::type(), &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusivePrinter<Structure>::print, false){}
 
 	///\brief Operator to build the structure description element by element
 	///\tparam Element element type
 	///\param[in] name name of the element
 	///\param[in] eptr pointer to member of the element
 	template <typename Element>
-	FiltermapDescription& operator()( const char* name, Element Structure::*eptr)
+	FiltermapDescription& operator()( const char* tag, Element Structure::*eptr)
 	{
 		FiltermapDescriptionBase::Parse parse_ = &FiltermapIntrusiveParser<Element>::parse;
 		FiltermapDescriptionBase::Print print_ = &FiltermapIntrusivePrinter<Element>::print;
 		FiltermapDescriptionBase::ElementType type_ = FiltermapIntrusiveProperty<Element>::type();
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
-		FiltermapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, print_);
+		bool mandatory_ = (tag[0]=='-');
+		const char* name = mandatory_?(tag+1):tag;
+		FiltermapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, print_, mandatory_);
 		if (find( name) != end())
 		{
 			std::ostringstream err;

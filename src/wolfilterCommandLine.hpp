@@ -44,13 +44,14 @@ namespace config {
 class WolfilterCommandLine
 {
 public:
-	WolfilterCommandLine( int argc, const char** argv);
+	WolfilterCommandLine(int argc, char **argv);
 	WolfilterCommandLine( const WolfilterCommandLine& o)
 		:m_printhelp(o.m_printhelp)
 		,m_printversion(o.m_printversion)
 		,m_inputfile(o.m_inputfile)
 		,m_scripts(o.m_scripts)
 		,m_modules(o.m_modules)
+		,m_forms(o.m_forms)
 		,m_cmd(o.m_cmd)
 		,m_inputfilter(o.m_inputfilter)
 		,m_outputfilter(o.m_outputfilter)
@@ -60,11 +61,21 @@ public:
 		{}
 	~WolfilterCommandLine(){}
 
+	///\class FormParam
+	///\brief Definition of a form on command line
+	struct FormParam
+	{
+		std::string ddlname;
+		std::string filename;
+		std::string formname;
+	};
+
 	bool printhelp() const					{return m_printhelp;}
 	bool printversion() const				{return m_printversion;}
 	const std::string& inputfile() const			{return m_inputfile;}
 	const std::vector<std::string>& scripts() const		{return m_scripts;}
 	const std::vector<std::string>& modules() const		{return m_modules;}
+	const std::vector<FormParam>& forms() const		{return m_forms;}
 	const std::string& cmd() const				{return m_cmd;}
 	const std::string& inputfilter() const			{return m_inputfilter;}
 	const std::string& outputfilter() const			{return m_outputfilter;}
@@ -74,12 +85,15 @@ public:
 	std::size_t inbufsize() const				{return m_inbufsize;}
 	std::size_t outbufsize() const				{return m_outbufsize;}
 
+	///\brief loads the command line objects into the global context
+	void loadGlobalContext( const std::string& referencePath) const;
 private:
 	bool m_printhelp;
 	bool m_printversion;
 	std::string m_inputfile;
 	std::vector<std::string> m_scripts;
 	std::vector<std::string> m_modules;
+	std::vector<FormParam> m_forms;
 	std::string m_cmd;
 	std::string m_inputfilter;
 	std::string m_outputfilter;

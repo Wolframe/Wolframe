@@ -100,7 +100,7 @@ public:
 				case short_:	assign<short,T>( val); return true;
 				case ushort_:	assign<unsigned short,T>( val); return true;
 				case char_:	assign<unsigned char,T>( val); return true;
-				case string_:	boost::lexical_cast<std::string>( val); return true;
+				case string_:	m_value = boost::lexical_cast<std::string>( val); return true;
 			}
 
 		}

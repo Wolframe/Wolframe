@@ -57,7 +57,8 @@ public:
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
 	TypedInputFilter( const TypedInputFilter& o)
-		:TypedFilterBase(o),m_state(o.m_state){}
+		:TypedFilterBase(o)
+		,m_state(o.m_state){}
 
 	///\brief Destructor
 	virtual ~TypedInputFilter(){}
@@ -101,7 +102,8 @@ public:
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
 	TypedOutputFilter( const TypedOutputFilter& o)
-		:TypedFilterBase(o),m_state(o.m_state){}
+		:TypedFilterBase(o)
+		,m_state(o.m_state){}
 	///\brief Destructor
 	virtual ~TypedOutputFilter(){}
 

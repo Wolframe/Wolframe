@@ -1,3 +1,4 @@
+
 /************************************************************************
 Copyright (C) 2011 Project Wolframe.
 All rights reserved.
@@ -29,48 +30,48 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/mapContext.hpp
-///\brief Defines the error handling of serialization/deserialization functions
+///\file src/filter_tostringfilter.cpp
+///\brief Implementation of tostring methods in language bindings
+#include "filter/tostringfilter.hpp"
 
-#ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
-#include <string>
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
+using namespace _Wolframe;
+using namespace langbind;
 
-namespace _Wolframe {
-namespace serialize {
-
-class Context
+bool ToStringFilter::print( ElementType type, const Element& element)
 {
-public:
-	enum Flags
+	switch (type)
 	{
-		None=0x00,
-		ValidateAttributes=0x01
-	};
-	static bool getFlag( const char* name, Flags& flg);
+		case OpenTag:
+			m_content.append( element.tostring());
+			m_content.append( " { ");
+			m_lasttype = type;
+		return true;
+		case CloseTag:
+			m_content.append( " } ");
+			m_lasttype = type;
+		return true;
+		case Attribute:
+			m_lasttype = type;
+			m_content.append( element.tostring());
+		return true;
+		case Value:
+			if (m_lasttype == Attribute)
+			{
+				m_content.append( "=(");
+				m_content.append( element.tostring());
+				m_content.append( "(");
+				m_lasttype = OpenTag;
+			}
+			else
+			{
+				m_content.append( "(");
+				m_content.append( element.tostring());
+				m_content.append( ")");
+				m_lasttype = type;
+			}
+		return true;
+	}
+	throw std::runtime_error( "illegal type printed");
+}
 
-	Context( Flags f=None);
-	Context( const Context& o);
-	~Context(){}
-
-	const char* getLastError() const				{return m_lasterror[0]?m_lasterror:0;}
-	const char* getLastErrorPos() const				{return m_tag[0]?m_tag:0;}
-	void clear();
-
-	void setTag( const char* tag);
-	void setError( const char* msg, const char* msgparam=0);
-	void setError( const char* msg, const std::string& p)		{return setError( msg, p.c_str());}
-
-	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
-private:
-	char m_tag[ 128];
-	char m_lasterror[ 256];
-	Flags m_flags;
-};
-
-
-}}
-#endif
 

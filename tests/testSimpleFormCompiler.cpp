@@ -29,8 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file tests/simpleFormCompilerTest.cpp
-#include "tests/testUtils.hpp"
+///\file tests/testSimpleFormCompiler.cpp
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #ifdef _WIN32
 #pragma warning(disable:4996)
@@ -42,6 +41,8 @@ Project Wolframe.
 #include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
 #include <stdexcept>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
 
@@ -52,7 +53,7 @@ struct TestDescription
 
 static const TestDescription testDescription[2] = {
 {
-	"directmap_compiler"
+	"test1"
 },
 {0}
 };
@@ -66,14 +67,29 @@ protected:
 	virtual void TearDown() {}
 };
 
+static bool readFile( const char* fn, std::string& out)
+{
+	char buf;
+	std::fstream ff;
+	ff.open( fn, std::ios::in | std::ios::binary);
+	while (ff.read( &buf, sizeof(buf)))
+	{
+		out.push_back( buf);
+	}
+	bool rt = ((ff.rdstate() & std::ifstream::eofbit) != 0);
+	ff.close();
+	return rt;
+}
+
 TEST_F( SimpleFormCompilerTest, tests)
 {
 	unsigned int ti;
 	for (ti=0; testDescription[ti].srcfile; ti++)
 	{
-		std::string srcfile = wtest::Data::getDataFile( testDescription[ti].srcfile, "data", ".frm");
+		boost::filesystem::path pp = boost::filesystem::current_path() / "simpleFormCompiler" / "data" / testDescription[ti].srcfile;
+		std::string srcfile = pp.string() + ".simpleform";
 		std::string srcstring;
-		if (!wtest::Data::readFile( srcfile.c_str(), srcstring)) throw std::runtime_error("could not read test input file");
+		if (!readFile( srcfile.c_str(), srcstring)) throw std::runtime_error("could not read test input file");
 		ddl::SimpleFormCompiler mm;
 		ddl::StructType sr;
 		std::string error;
@@ -86,7 +102,6 @@ TEST_F( SimpleFormCompilerTest, tests)
 
 int main( int argc, char **argv )
 {
-	wtest::Data::createDataDir( "result");
 	::testing::InitGoogleTest( &argc, argv );
 	return RUN_ALL_TESTS();
 }

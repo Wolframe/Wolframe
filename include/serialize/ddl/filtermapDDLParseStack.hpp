@@ -51,6 +51,7 @@ public:
 		,m_initar(0)
 		,m_elemidx(o.m_elemidx)
 		,m_value(o.m_value)
+		,m_name(o.m_name)
 		,m_stateidx(o.m_stateidx)
 		{
 			if (o.m_initar)
@@ -60,11 +61,12 @@ public:
 			}
 		}
 
-	FiltermapDDLParseState( ddl::StructType* v)
+	FiltermapDDLParseState( const char* name_, ddl::StructType* v)
 		:m_size(0)
 		,m_initar(0)
 		,m_elemidx(0)
 		,m_value(v)
+		,m_name(name_)
 		,m_stateidx(0)
 		{}
 
@@ -97,6 +99,11 @@ public:
 		return m_value;
 	}
 
+	const char* name() const
+	{
+		return m_name;
+	}
+
 	void state( std::size_t idx)
 	{
 		m_stateidx = idx;
@@ -112,10 +119,12 @@ private:
 	int* m_initar;
 	std::size_t m_elemidx;
 	ddl::StructType* m_value;
+	const char* m_name;
 	std::size_t m_stateidx;
 };
 
 typedef std::vector<FiltermapDDLParseState> FiltermapDDLParseStateStack;
+
 
 }}//namespace
 #endif

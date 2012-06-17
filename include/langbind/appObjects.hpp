@@ -50,8 +50,9 @@ namespace langbind {
 
 ///\class Output
 ///\brief Output as seen from scripting language binding
-struct Output
+class Output
 {
+public:
 	///\enum ItemType
 	///\brief Output state
 	enum ItemType
@@ -89,8 +90,9 @@ private:
 
 ///\class Input
 ///\brief input as seen from the application processor program
-struct Input
+class Input
 {
+public:
 	///\brief Constructor
 	Input(){}
 	///\brief Copy constructor
@@ -174,28 +176,148 @@ private:
 
 
 ///\class DDLForm
-struct DDLForm
+class DDLForm
 {
-	ddl::StructType m_struct;
-
+public:
 	///\brief Default constructor
-	DDLForm() {}
+	DDLForm()
+		:m_flags(serialize::Context::None){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
 	DDLForm( const DDLForm& o)
-		:m_struct(o.m_struct){}
+		:m_structure(o.m_structure)
+		,m_flags(o.m_flags){}
 
 	///\brief Constructor
 	///\param[in] st form data
 	DDLForm( const ddl::StructType& st)
-		:m_struct(st){}
+		:m_structure(st)
+		,m_flags(serialize::Context::None){}
 
 	///\brief Destructor
 	~DDLForm(){}
+
+	///\brief Get a member value of the form
+	///\param [in] name case sensitive name of the variable
+	///\param [in] val the value returned
+	///\return true on success, false, if the variable does not exist or the operation failed
+	bool getValue( const char* name, std::string& val) const;
+
+	///\brief Set a member value of the form
+	///\param [in] name case sensitive name of the variable
+	///\param [in] value new value of the variable to set
+	///\return true on success, false, if the variable does not exist or the operation failed
+	bool setValue( const char* name, const std::string& value);
+
+	const ddl::StructType& structure() const	{return m_structure;}
+	serialize::Context::Flags flags() const		{return m_flags;}
+
+	std::string tostring() const;
+private:
+	friend class DDLFormFill;
+	ddl::StructType m_structure;
+	serialize::Context::Flags m_flags;
 };
 
 typedef CountedReference<DDLForm> DDLFormR;
+
+
+///\class DDLFormFill
+///\brief State of filling a form
+class DDLFormFill
+{
+public:
+	///\brief Constructor
+	DDLFormFill( const DDLFormR& f);
+
+	///\brief Constructor
+	DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp);
+
+	///\brief Copy constructor
+	DDLFormFill( const DDLFormFill& o);
+
+	///\brief Destructor
+	~DDLFormFill(){}
+
+	///\brief Get the last error of 'call' as string
+	const char* getLastError() const			{return m_ctx.getLastError();}
+
+	///\brief Get the last error position of 'call' as string
+	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+
+	///\brief Initialization before call
+	///\param[in] i input filter
+	void init( const TypedInputFilterR& i);
+
+	///\enum CallResult
+	///\brief Enumeration of call states
+	enum CallResult
+	{
+		Ok,		//< successful termination
+		Error,		//< termination with error (not completed)
+		Yield		//< call interrupted with request for a system operation
+	};
+
+	///\brief Call of the form fill
+	///\remark finished with 'Error' or 'Ok'
+	CallResult call();
+
+private:
+	DDLFormR m_form;
+	int m_state;
+	TypedInputFilterR m_inputfilter;
+	serialize::Context m_ctx;
+	serialize::FiltermapDDLParseStateStack m_parsestk;
+};
+
+
+///\class DDLFormPrint
+///\brief State of serialization of a DDLForm
+class DDLFormPrint
+{
+public:
+	///\brief Constructor
+	explicit DDLFormPrint( const DDLFormR& f);
+
+	///\brief Constructor
+	DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp);
+
+	///\brief Copy constructor
+	DDLFormPrint( const DDLFormPrint& o);
+
+	///\brief Destructor
+	~DDLFormPrint(){}
+
+	///\brief Get the last error as string
+	const char* getLastError() const			{return m_ctx.getLastError();}
+
+	///\brief Get the last error position as string
+	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+
+	///\enum CallResult
+	///\brief Enumeration of call states of the fetch processing
+	enum CallResult
+	{
+		Ok,		//< successful termination of call
+		Error,		//< termination of call with error (not completed)
+		Yield		//< call interrupted with request for a network operation
+	};
+	///\brief fetches results and writes them to the output filter specified
+	///\return Call state
+	CallResult fetch();
+
+	///\brief Initialization of call context for a new fetch result
+	///\param[in] o fetch output
+	void init( const TypedOutputFilterR& o);
+
+private:
+	DDLFormR m_form;
+	int m_state;
+	TypedOutputFilterR m_outputfilter;
+	serialize::Context m_ctx;
+	serialize::FiltermapDDLPrintStateStack m_printstk;
+};
 
 ///\class DDLFormMap
 ///\brief Map of available forms seen from scripting language binding
@@ -208,125 +330,126 @@ public:
 	void defineForm( const std::string& name, const DDLForm& f);
 	bool getForm( const std::string& name, DDLFormR& rt) const;
 private:
-	std::map<std::string,DDLForm> m_map;
+	std::map<std::string,DDLFormR> m_map;
 };
+
 
 ///\class FormFunction
 class FormFunction
 {
 public:
-	typedef int (Call)( void* res, const void* param);
+	typedef int (Function)( void* res, const void* param);
 
 	///\brief Default constructor
-	FormFunction()
-		:m_call(0)
-		,m_api_param(0)
-		,m_api_result(0){}
+	FormFunction();
 
 	///\brief Copy constructor
 	///\param[in] o copied item
-	FormFunction( const FormFunction& o)
-		:m_call(o.m_call)
-		,m_api_param(o.m_api_param)
-		,m_api_result(o.m_api_result){}
+	FormFunction( const FormFunction& o);
 
 	///\brief Constructor
-	///\param[in] c function to call
+	///\param[in] f function to call
 	///\param[in] p part of the api describing the input
 	///\param[in] r part of the api describing the function result
-	FormFunction( Call c, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
-		:m_call(c)
-		,m_api_param(p)
-		,m_api_result(r){}
-
-	///\enum CallResult
-	///\brief Enumeration of call states of a function call processing
-	enum CallResult
-	{
-		Ok,		//< successful termination of call
-		Error,		//< termination of call with error (not completed)
-		Yield		//< call interrupted with request for a network operation
-	};
+	FormFunction( Function f, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r);
 
 	const serialize::FiltermapDescriptionBase* api_param() const	{return m_api_param;}
 	const serialize::FiltermapDescriptionBase* api_result() const	{return m_api_result;}
-	Call* call() const						{return m_call;}
+	Function* function() const					{return m_function;}
 private:
-	Call* m_call;
+	Function* m_function;
 	const serialize::FiltermapDescriptionBase* m_api_param;
 	const serialize::FiltermapDescriptionBase* m_api_result;
 };
-
 
 ///\class FormFunctionResult
 ///\brief Result of a FormFunction call
 class FormFunctionResult
 {
 public:
+	///\brief Constructor
+	///\param[in] f function called
 	FormFunctionResult( const FormFunction& f);
 
-	FormFunctionResult( const FormFunctionResult& o)
-		:m_description(o.m_description)
-		,m_state(o.m_state)
-		,m_data(o.m_data)
-		,m_ctx(o.m_ctx)
-		,m_printstk(o.m_printstk){}
+	///\brief Copy constructor
+	///\param[in] o copied item
+	FormFunctionResult( const FormFunctionResult& o);
 
+	///\brief Destructor
 	~FormFunctionResult();
 
-	const char* getLastError() const
+	///\brief Get the last error as string
+	const char* getLastError() const			{return m_ctx.getLastError();}
+
+	///\brief Get the last error position as string
+	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+
+	///\enum CallResult
+	///\brief Enumeration of call states of the fetch processing
+	enum CallResult
 	{
-		return m_ctx.getLastError();
-	}
+		Ok,		//< successful termination of call
+		Error,		//< termination of call with error (not completed)
+		Yield		//< call interrupted with request for a network operation
+	};
+	///\brief fetches results and writes them to the output filter specified
+	///\return Call state
+	CallResult fetch();
 
-	FormFunction::CallResult fetch();
+	///\brief Initialization of call context for a new fetch result
+	///\param[in] o fetch output
+	void init( const TypedOutputFilterR& o);
 
-	void init( const TypedOutputFilterR& o)
+	void* data() const
 	{
-		m_outputfilter = o;
+		return m_data.get();
 	}
-
 private:
-	friend class FormFunctionClosure;
 	const serialize::FiltermapDescriptionBase* m_description;
 	int m_state;
 	boost::shared_ptr<void> m_data;
+	TypedOutputFilterR m_outputfilter;
 	serialize::Context m_ctx;
 	serialize::FiltermapPrintStateStack m_printstk;
-	TypedOutputFilterR m_outputfilter;
 };
-
 
 ///\class FormFunctionClosure
 ///\brief Closure with calling state of called FormFunction
 class FormFunctionClosure :public FormFunction
 {
 public:
+	///\brief Constructor
+	///\param[in] f function called
 	FormFunctionClosure( const FormFunction& f);
 
-	FormFunctionClosure( const FormFunctionClosure& o)
-		:FormFunction(o)
-		,m_state(o.m_state)
-		,m_result(o.m_result)
-		,m_data(o.m_data)
-		,m_parsestk(o.m_parsestk)
-		,m_ctx(o.m_ctx)
-		,m_inputfilter(o.m_inputfilter)
-		{}
+	///\brief Copy constructor
+	///\param[in] o copied item
+	FormFunctionClosure( const FormFunctionClosure& o);
 
+	///\brief Destructor
 	~FormFunctionClosure();
 
-	const char* getLastError() const
-	{
-		return m_ctx.getLastError();
-	}
+	///\brief Get the last error as string
+	const char* getLastError() const			{return m_ctx.getLastError();}
 
+	///\brief Get the last error position as string
+	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+
+	///\enum CallResult
+	///\brief Enumeration of call states of the call processing
+	enum CallResult
+	{
+		Ok,		//< successful termination of call
+		Error,		//< termination of call with error (not completed)
+		Yield		//< call interrupted with request for a network operation
+	};
+	///\brief calls the form function with the input from the input filter specified
+	///\return Call state
 	CallResult call();
 
-	void init( const TypedInputFilterR& i)
-	{
-		m_inputfilter = i;
-	}
+	///\brief Initialization of call context for a new call
+	///\param[in] i call input
+	void init( const TypedInputFilterR& i);
 
 	const TypedInputFilterR& inputfilter() const	{return m_inputfilter;}
 	const FormFunctionResult& result() const	{return m_result;}
@@ -339,7 +462,6 @@ private:
 	serialize::Context m_ctx;
 	TypedInputFilterR m_inputfilter;
 };
-
 
 ///\class FormFunctionMap
 ///\brief Map of available transaction functions seen from scripting language binding
@@ -356,71 +478,151 @@ private:
 };
 
 
-///\class TransactionFunction
+
+typedef cmdbind::CommandHandlerR (*CreateCommandHandler)( const std::string& name);
 class TransactionFunction
 {
 public:
-	///\brief Default constructor
-	TransactionFunction() {}
-
-	///\brief Copy constructor
-	///\param[in] o copied item
+	TransactionFunction(){}
 	TransactionFunction( const TransactionFunction& o)
 		:m_cmdwriter(o.m_cmdwriter)
 		,m_resultreader(o.m_resultreader)
-		,m_cmd(o.m_cmd){}
+		,m_cmdconstructor(o.m_cmdconstructor){}
 
+	TransactionFunction( const OutputFilterR& w, const InputFilterR& r, CreateCommandHandler c)
+		:m_cmdwriter(w)
+		,m_resultreader(r)
+		,m_cmdconstructor(c){}
+
+	const OutputFilterR& cmdwriter() const		{return m_cmdwriter;}
+	const InputFilterR& resultreader() const	{return m_resultreader;}
+	CreateCommandHandler cmdconstructor() const	{return m_cmdconstructor;}
+private:
+	OutputFilterR m_cmdwriter;			//< command input writer
+	InputFilterR m_resultreader;			//< command result reader
+	CreateCommandHandler m_cmdconstructor;
+};
+
+
+///\class TransactionFunctionResult
+///\brief Result of a TransactionFunction call
+class TransactionFunctionResult
+{
+public:
 	///\brief Constructor
-	///\param[in] w command input writer
-	///\param[in] r command output reader
-	///\param[in] c command execute handler
-	TransactionFunction( const OutputFilterR& w, const InputFilterR& r, const cmdbind::CommandHandlerR& c)
-		:m_cmdwriter(w),m_resultreader(r),m_cmd(c){}
+	///\param[in] f function called
+	explicit TransactionFunctionResult( const TransactionFunction& f);
+
+	///\brief Copy constructor
+	///\param[in] o copied item
+	TransactionFunctionResult( const TransactionFunctionResult& o);
 
 	///\brief Destructor
-	~TransactionFunction(){}
+	~TransactionFunctionResult(){}
 
-	///\brief Transaction function call
-	///\param[in] param function call arguments
-	///\param[in,out] result function call result
-	///\return true on success, false else
-	bool call( const DDLForm& param, DDLForm& result);
-
-	typedef cmdbind::CommandHandlerR (*CreateCommandHandler)( const std::string& name);
-	struct Definition
+	///\brief Get the last error as string
+	const char* getLastError() const
 	{
-		Definition(){}
-		Definition( const Definition& o)
-			:m_cmdwriter(o.m_cmdwriter)
-			,m_resultreader(o.m_resultreader)
-			,m_cmdconstructor(o.m_cmdconstructor){}
+		return m_lasterror.size()?m_lasterror.c_str():0;
+	}
 
-		Definition( const OutputFilterR& w, const InputFilterR& r, CreateCommandHandler c)
-			:m_cmdwriter(w)
-			,m_resultreader(r)
-			,m_cmdconstructor(c){}
-
-		OutputFilterR m_cmdwriter;			//< command input writer
-		InputFilterR m_resultreader;			//< command result reader
-		CreateCommandHandler m_cmdconstructor;
-
-		TransactionFunction create( const std::string& name) const
-		{
-			TransactionFunction rt;
-			rt.m_cmdwriter.reset( m_cmdwriter->copy());
-			rt.m_resultreader.reset( m_resultreader->copy());
-			rt.m_cmd = m_cmdconstructor( name);
-			return rt;
-		}
+	///\enum CallResult
+	///\brief Enumeration of call states of the fetch processing
+	enum CallResult
+	{
+		Ok,		//< successful termination of call
+		Error,		//< termination of call with error (not completed)
+		Yield		//< call interrupted with request for a network operation
 	};
+
+	///\brief fetches results and writes them to the output filter specified
+	///\return Call state
+	CallResult fetch();
+
+	///\brief Initialization of call context for a new fetch result
+	///\param[in] o fetch output
+	void init( const TypedOutputFilterR& o);
+
+	///\brief Append a chunk to the result buffer
+	///\param[in] buf pointer to chunk
+	///\param[in] size size of chunk in bytes
+	void appendCmdOutput( const void* buf, std::size_t size);
+
+	///\brief Clear the result buffer and error message buffer
+	void reset();
+
 private:
-	friend class Defintion;
-	OutputFilterR m_cmdwriter;				//< command input writer
-	InputFilterR m_resultreader;				//< command result reader
+	TransactionFunction m_func;				//< transaction function executed
+	int m_state;						//< execution state
+	std::string m_lasterror;				//< last error string
+	InputFilter::ElementType m_elemtype;			//< type of last element read from command result
+	TypedInputFilter::Element m_elem;			//< last element read from command result
+	boost::shared_ptr<std::string> m_resultbuf;		//< buffer for result
+	InputFilterR m_resultreader;				//< result reader instance
+	TypedOutputFilterR m_outputfilter;			//< output of the transaction function
+};
+
+///\class TransactionFunctionClosure
+///\brief Closure with calling state of called TransactionFunction
+class TransactionFunctionClosure
+{
+public:
+	enum {
+		InputBufSize=(1<<12),
+		OutputBufSize=(1<<12)
+	};
+
+	///\brief Constructor
+	///\param[in] nam name of the function called
+	///\param[in] f function called
+	TransactionFunctionClosure( const std::string& nam, const TransactionFunction& f);
+
+	///\brief Copy constructor
+	///\param[in] o copied item
+	TransactionFunctionClosure( const TransactionFunctionClosure& o);
+
+	///\brief Destructor
+	~TransactionFunctionClosure(){}
+
+	///\brief Get the last error as string
+	const char* getLastError() const
+	{
+		return m_lasterror.size()?m_lasterror.c_str():0;
+	}
+
+	///\enum CallResult
+	///\brief Enumeration of call states of the call processing
+	enum CallResult
+	{
+		Ok,		//< successful termination of call
+		Error,		//< termination of call with error (not completed)
+		Yield		//< call interrupted with request for a network operation
+	};
+	///\brief Executes the transaction function with the input from the input filter specified as far as possible
+	///\return Call state
+	CallResult call();
+
+	///\brief Initialization of call context for a new call
+	///\param[in] i call input
+	void init( const TypedInputFilterR& i);
+
+	///\brief Get the result of the command
+	const TransactionFunctionResult& result() const		{return m_result;}
+
+private:
+	TransactionFunction m_func;				//< transaction function executed
+	std::string m_name;					//< name of the transaction function executed
 	cmdbind::CommandHandlerR m_cmd;				//< command execute handler
-	serialize::FiltermapDDLParseStateStack m_parsestk;	//< STM for result reader
-	serialize::FiltermapDDLPrintStateStack m_printstk;	//< STM for command writer
-	serialize::Context m_ctx;				//< serialization context
+	cmdbind::CommandHandler::Operation m_cmdop;		//< last operation fetched from command handler
+	int m_state;						//< execution state
+	std::string m_lasterror;				//< last error string
+	InputFilter::ElementType m_elemtype;			//< type of last element read from command result
+	TypedInputFilter::Element m_elem;			//< last element read from command result
+	boost::shared_ptr<void> m_cmdinputbuf;			//< buffer for the command input
+	boost::shared_ptr<void> m_cmdoutputbuf;			//< buffer for the command output
+	OutputFilterR m_cmdwriter;				//< writer of the command
+	TransactionFunctionResult m_result;			//< function result
+	TypedInputFilterR m_inputfilter;			//< transaction command input
 };
 
 ///\class TransactionFunctionMap
@@ -431,11 +633,10 @@ public:
 	TransactionFunctionMap(){}
 	~TransactionFunctionMap(){}
 
-	void defineTransactionFunction( const std::string& name, const TransactionFunction::Definition& f);
-	bool hasTransactionFunction( const std::string& name) const;
+	void defineTransactionFunction( const std::string& name, const TransactionFunction& f);
 	bool getTransactionFunction( const std::string& name, TransactionFunction& rt) const;
 private:
-	std::map<std::string,TransactionFunction::Definition> m_map;
+	std::map<std::string,TransactionFunction> m_map;
 };
 
 
