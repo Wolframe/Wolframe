@@ -40,6 +40,7 @@
 #include <cstring>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
 
 using namespace _Wolframe;
 using namespace config;
@@ -96,12 +97,20 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 			{
 				formparam.filename = *itr;
 				boost::filesystem::path p(*itr);
+#if BOOST_VERSION < 104300
+				std::string ext = p.extension();
+#else
 				std::string ext = p.extension().string();
+#endif
 				if (!ext.size()) throw std::runtime_error( "no DDL specified (file extension missing) for form file");
 				formparam.ddlname = std::string( ext.c_str()+1);
 			}
 			boost::filesystem::path p(formparam.filename);
+#if BOOST_VERSION < 104300
+			formparam.formname = p.stem();
+#else
 			formparam.formname = p.stem().string();
+#endif
 			m_forms.push_back( formparam);
 		}
 	}
