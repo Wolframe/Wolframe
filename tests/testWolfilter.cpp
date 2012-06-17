@@ -33,6 +33,11 @@
 ///\file testWolfilter.cpp
 ///\brief Test program for wolfilter like stdin/stdout mapping
 
+// avoid safe copy warning in boost::is_any_of (no easy workaround here)
+#ifdef _WIN32
+#pragma warning(disable:4996)
+#endif
+
 #include "langbind/iostreamfilter.hpp"
 #include "logger-v1.hpp"
 #include "langbind/appGlobalContext.hpp"

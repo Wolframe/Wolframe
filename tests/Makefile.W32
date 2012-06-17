@@ -146,6 +146,8 @@ local_distclean:
 local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
+	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
+	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
 	@-echo testNamedRetVal >> test.bat
 	@-echo logTest >> test.bat
 	@-echo versionTest >> test.bat
