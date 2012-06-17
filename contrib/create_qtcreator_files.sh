@@ -20,6 +20,7 @@ find . -iname 'INSTALL*' -type f -print >>/tmp/$$
 find . -iname 'TODO*' -type f -print >>/tmp/$$
 find . -iname 'BUGS*' -type f -print >>/tmp/$$
 find . -name 'passwd' -type f -print >>/tmp/$$
-find . -name 'plainPasswd' -type f -print >>/tmp/$$
+find . -name '.gitignore' -type f -print >>/tmp/$$
+find . -name 'create_qtcreator_files.sh' -type f -print >>/tmp/$$
 
 cat /tmp/$$ | sed -e 's|^\./||' | sort -u
