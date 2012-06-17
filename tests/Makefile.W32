@@ -139,7 +139,7 @@ local_all:
 
 local_clean:
 	@-erase test.bat logTest.log 2>NUL
-	@-erase /s temp 2>NULL
+	@-erase /s /q temp 2>NUL
 
 local_distclean:
 
