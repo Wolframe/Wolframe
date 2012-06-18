@@ -78,7 +78,7 @@ public:
 		m_appConfig.addConfig( "env", &m_langbindConfig);
 
 		boost::filesystem::path configFile( boost::filesystem::current_path() / "temp" / "test.cfg");
-		if (utils::fileExists( configFile))
+		if (utils::fileExists( configFile.string()))
 		{
 			if (!m_appConfig.parse( configFile.string().c_str(), config::ApplicationConfiguration::CONFIG_INFO))
 			{

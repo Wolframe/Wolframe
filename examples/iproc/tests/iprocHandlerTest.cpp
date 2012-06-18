@@ -81,7 +81,7 @@ public:
 		config << "}" << std::endl;
 		wtest::Data::writeFile( configFile.string().c_str(), config.str());
 
-		if (ustils::fileExists( configFile))
+		if (utils::fileExists( configFile.string()))
 		{
 			if (!m_appConfig.parse( configFile.string().c_str(), config::ApplicationConfiguration::CONFIG_INFO))
 			{

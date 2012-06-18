@@ -41,6 +41,7 @@
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
+#include "miscUtils.hpp"
 #include <iostream>
 #include <list>
 #include <fstream>
@@ -137,7 +138,7 @@ public:
 		config << "}" << std::endl;
 		wtest::Data::writeFile( configFile.string().c_str(), config.str());
 
-		if (utils::fileExists( configFile))
+		if (utils::fileExists( configFile.string()))
 		{
 			if (!m_appConfig.parse( configFile.string().c_str(), config::ApplicationConfiguration::CONFIG_INFO))
 			{
