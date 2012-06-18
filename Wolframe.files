@@ -189,9 +189,7 @@ examples/iproc/iprocHandlerConfig.hpp
 examples/iproc/iprocHandler.cpp
 examples/iproc/iprocHandler.hpp
 examples/iproc/Makefile.W32
-examples/iproc/tests/data/test_directmap_places_IsoLatin1.xml
 examples/iproc/tests/data/test_IsoLatin1.xml
-examples/iproc/tests/data/test_luamap_places_IsoLatin1.xml
 examples/iproc/tests/data/test_UCS2BE.xml
 examples/iproc/tests/data/test_UCS2LE.xml
 examples/iproc/tests/data/test_UCS4BE.xml
@@ -206,9 +204,6 @@ examples/iproc/tests/scripts/test_echo_xml.lua
 examples/iproc/tests/scripts/test_echo_xml_utf16.lua
 examples/iproc/tests/scripts/test_echo_xml_utf8.lua
 examples/iproc/tests/scripts/test_serialization.lua
-examples/iproc/tests/simpleFormCompilerTest.cpp
-examples/iproc/tests/structFiltermapTest.cpp
-examples/iproc/tests/structLuamapTest.cpp
 examples/iproc/tests/testUtils.hpp
 examples/lua/appConfigDefinition.cpp
 examples/lua/appProperties.cpp
@@ -327,6 +322,7 @@ include/filter/outputfilter.hpp
 include/filter/serializefilter.hpp
 include/filter/textwolf_filter.hpp
 include/filter/token_filter.hpp
+include/filter/tostringfilter.hpp
 include/filter/typedfilterbase.hpp
 include/filter/typedfilter.hpp
 include/filter/xmllite_filter.hpp
@@ -384,7 +380,6 @@ include/SSLcertificateInfo.hpp
 include/standardConfigs.hpp
 include/types/bignum.hpp
 include/version.hpp
-include/wolfilterCommandLine.hpp
 INSTALL.Unix
 INSTALL.Windows
 libgmp/assert.c
@@ -1071,8 +1066,6 @@ src/cmdbind_execCommandHandler.cpp
 src/cmdbind_ioFilterCommandHandler.cpp
 src/cmdbind_lineCommandHandler.cpp
 src/cmdbind_luaCommandHandler.cpp
-src/wolframedCommandLine.cpp
-src/wolframedCommandLine.hpp
 src/config_descriptionBase.cpp
 src/connectionBase.hpp
 src/connection.cpp
@@ -1092,6 +1085,7 @@ src/filter_msxml_filter.cpp
 src/filter_serializefilter.cpp
 src/filter_textwolf_filter.cpp
 src/filter_token_filter.cpp
+src/filter_tostringfilter.cpp
 src/filter_xmllite_filter.cpp
 src/GNUmakefile
 src/handlerConfig.hpp
@@ -1248,8 +1242,11 @@ src/types_bignum.cpp
 src/version.cpp
 src/winMain.cpp
 src/wolfilterCommandLine.cpp
+src/wolfilterCommandLine.hpp
 src/wolfilter.cpp
 src/wolframe.conf
+src/wolframedCommandLine.cpp
+src/wolframedCommandLine.hpp
 src/wolframed.cpp
 src/wolframeHandler.cpp
 src/wolframeHandler.hpp
@@ -1338,6 +1335,7 @@ tests/testNamedRetVal.cpp
 tests/testProtocolLFdotEscaping.cpp
 tests/testRand.cpp
 tests/testSHA2.cpp
+tests/testSimpleFormCompiler.cpp
 tests/testTimestamp.cpp
 tests/testWolfilter.cpp
 tests/threadLeakTest.cpp
@@ -1345,7 +1343,9 @@ tests/versionTest.cpp
 tests/wolfilter/scripts/formfunc_luatable_luaparse.lua
 tests/wolfilter/src/employee_assignment_print.cpp
 tests/wolfilter/src/employee_assignment_print.hpp
+tests/wolfilter/template/doc/employee_assignment_print.form.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_print.lua.UTF-8.xml
+tests/wolfilter/template/doc/employee_assignment_print_res.form.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_print_res.lua.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_print_res.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_print.UTF-8.xml
