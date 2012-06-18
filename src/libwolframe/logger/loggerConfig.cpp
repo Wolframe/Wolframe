@@ -49,6 +49,7 @@
 #include <string>
 #include <ostream>
 
+using namespace _Wolframe::utils;
 
 namespace _Wolframe {
 namespace log {

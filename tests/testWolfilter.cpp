@@ -32,12 +32,6 @@
 ************************************************************************/
 ///\file testWolfilter.cpp
 ///\brief Test program for wolfilter like stdin/stdout mapping
-
-// avoid safe copy warning in boost::is_any_of (no easy workaround here)
-#ifdef _WIN32
-#pragma warning(disable:4996)
-#endif
-
 #include "langbind/iostreamfilter.hpp"
 #include "logger-v1.hpp"
 #include "langbind/appGlobalContext.hpp"
@@ -45,6 +39,7 @@
 #include "wolfilter/src/employee_assignment_print.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
+#include "miscUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -87,17 +82,6 @@ protected:
 
 static std::string selectedTestName;
 
-static bool directoryExists( boost::filesystem::path& pt)
-{
-	try
-	{
-		return boost::filesystem::exists( pt) && boost::filesystem::is_directory( pt);
-	}
-	catch (const std::exception&)
-	{
-		return false;
-	}
-}
 
 TEST_F( WolfilterTest, tests)
 {
@@ -143,16 +127,12 @@ TEST_F( WolfilterTest, tests)
 	{
 		// [2.1] Remove old temporary files:
 		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
-		if (directoryExists( tempdir))
+		if (utils::directoryExists( tempdir.string()))
 		{
-			try {
-				boost::filesystem::remove_all( tempdir);
-			} catch( ... ) {
-				boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
-				boost::filesystem::remove_all( tempdir);				
-			}
+			utils::removeAllFiles( tempdir.string());
 		}
 		boost::filesystem::create_directory( tempdir);
+
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{
@@ -166,14 +146,8 @@ TEST_F( WolfilterTest, tests)
 
 		// [2.4] Parse command line in config section of the test description
 		std::vector<std::string> cmd;
-		std::string cmdstr( td.config);
-		boost::algorithm::trim( cmdstr);
-		{
-			std::vector<std::string> cmd_e;
-			boost::split( cmd_e, cmdstr, boost::is_any_of("\n\t\r "));
-			std::vector<std::string>::const_iterator vi=cmd_e.begin(), ve=cmd_e.end();
-			for (; vi != ve; ++vi) if (!vi->empty()) cmd.push_back( *vi);
-		}
+		utils::splitStringBySpaces( cmd, td.config);
+
 		std::cerr << "processing test '" << *itr << "'" << std::endl;
 		enum {MaxNofArgs=31};
 		int cmdargc = cmd.size()+1;

@@ -55,6 +55,7 @@
 #include <ostream>
 #include <stdexcept>
 
+using namespace _Wolframe::utils;
 using namespace boost::filesystem;
 
 const char* MODULE_SECTION = "LoadModules";

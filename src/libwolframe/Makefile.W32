@@ -52,6 +52,7 @@ CPP_OBJS = \
 	user.obj \
 	moduleDirectory.obj \
 	resolvePath.obj \
+	stringUtils.obj \
 	referenceConfig.obj \
 	CRAM.obj
 

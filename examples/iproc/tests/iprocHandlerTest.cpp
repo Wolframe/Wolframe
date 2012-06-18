@@ -42,6 +42,7 @@
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
+#include "miscUtils.hpp"
 #include "gtest/gtest.h"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -80,7 +81,7 @@ public:
 		config << "}" << std::endl;
 		wtest::Data::writeFile( configFile.string().c_str(), config.str());
 
-		if (boost::filesystem::exists( configFile))
+		if (ustils::fileExists( configFile))
 		{
 			if (!m_appConfig.parse( configFile.string().c_str(), config::ApplicationConfiguration::CONFIG_INFO))
 			{

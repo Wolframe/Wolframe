@@ -52,7 +52,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace config {
 
-namespace utils {
+namespace traits {
 template <typename T> typename boost::enable_if<boost::is_enum<T>, T>::type increment( const T& i) { return (T)((int)i + 1); }
 template <typename T> typename boost::disable_if<boost::is_enum<T>, T>::type increment( const T& i) { T rt = i; return ++rt; }
 }//namespace
@@ -211,7 +211,7 @@ public:
 			unsigned int ii;
 			value = boost::value_initialized<ValueType>();
 
-			for (ii=0; ii<m_size; ii++, value=utils::increment(value))
+			for (ii=0; ii<m_size; ii++, value=traits::increment(value))
 			{
 				if (boost::algorithm::iequals( token, m_ar[ii]))
 				{

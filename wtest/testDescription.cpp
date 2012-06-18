@@ -32,13 +32,8 @@
 ************************************************************************/
 ///\file testDescription.cpp
 ///\brief Implements a test description loaded from a file
-
-// Aba: see below, got trouble on VC10 to compile in debug mode
-#ifdef _WIN32
-#pragma warning(disable:4996)
-#endif
-
 #include "testDescription.hpp"
+#include "miscUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <vector>
@@ -58,9 +53,7 @@ if (boost::starts_with( flag, "DISABLED "))
 {
 	unsigned int nargs=0;
 	std::vector<std::string> platforms;
-	// Aba: the only thing which comes to my mind here is to disable the warning
-	// See http://stackoverflow.com/questions/1301277/c-boost-whats-the-cause-of-this-warning
-	boost::split( platforms, flag, boost::is_any_of("\t "));
+	utils::splitStringBySpaces( platforms, flag);
 	std::vector<std::string>::const_iterator ii = platforms.begin(),ee = platforms.end();
 	for (++ii; ii != ee; ++ii)
 	{

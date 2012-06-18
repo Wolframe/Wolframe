@@ -39,11 +39,11 @@
 #include "handlerConfig.hpp"
 #include "langbind/appConfig.hpp"
 #include "langbind/appGlobalContext.hpp"
-#include "appConfig.hpp"
 #include "testDescription.hpp"
 #include "moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
+#include "miscUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/info_parser.hpp>
@@ -78,7 +78,7 @@ public:
 		m_appConfig.addConfig( "env", &m_langbindConfig);
 
 		boost::filesystem::path configFile( boost::filesystem::current_path() / "temp" / "test.cfg");
-		if (boost::filesystem::exists( configFile))
+		if (utils::fileExists( configFile))
 		{
 			if (!m_appConfig.parse( configFile.string().c_str(), config::ApplicationConfiguration::CONFIG_INFO))
 			{
@@ -150,17 +150,6 @@ public:
 
 static std::string selectedTestName;
 
-static bool directoryExists( boost::filesystem::path& pt)
-{
-	try
-	{
-		return boost::filesystem::exists( pt) && boost::filesystem::is_directory( pt);
-	}
-	catch (const std::exception&)
-	{
-		return false;
-	}
-}
 
 TEST_F( TProcHandlerTest, tests)
 {
@@ -203,16 +192,12 @@ TEST_F( TProcHandlerTest, tests)
 	{
 		// Remove old temporary files:
 		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
-		if (directoryExists( tempdir))
+		if (utils::directoryExists( tempdir.string()))
 		{
-			try {
-				boost::filesystem::remove_all( tempdir);
-			} catch( ... ) {
-				boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
-				boost::filesystem::remove_all( tempdir);				
-			}
+			utils::removeAllFiles( tempdir.string());
 		}
 		boost::filesystem::create_directory( tempdir);
+
 		// Read test description:
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())

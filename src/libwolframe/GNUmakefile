@@ -9,13 +9,15 @@ PACKAGE_NAME = wolframe
 INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
+	-lwolframe \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_filesystem
 
@@ -54,6 +56,7 @@ CPP_OBJS = \
 	user.o \
 	moduleDirectory.o \
 	resolvePath.o \
+	stringUtils.o \
 	referenceConfig.o \
 	CRAM.o
 

@@ -14,6 +14,8 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
+	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	-lboost_filesystem -lboost_system
 
 # openssl

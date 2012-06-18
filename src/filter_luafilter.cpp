@@ -46,14 +46,130 @@ extern "C" {
 using namespace _Wolframe;
 using namespace langbind;
 
-void LuaInputFilter::FetchState::getTagElement( Element& element)
+LuaGeneratorInputFilter::~LuaGeneratorInputFilter()
+{
+	if (m_thread)
+	{
+		lua_pop( m_ls, 2);					///...STK: func
+		luaL_unref( m_ls, LUA_REGISTRYINDEX, m_threadref);	///...allow garbage collecting of the thread
+	}
+}
+
+static bool getElementValue( lua_State* ls, int idx, TypedInputFilter::Element& element, const char*& errelemtype)
+{
+	switch (lua_type( ls, idx))
+	{
+		case LUA_TNIL:
+			return false;
+
+		case LUA_TNUMBER:
+			element.type = TypedFilterBase::Element::double_;
+			element.value.double_ = (double)lua_tonumber(ls, idx);
+			return true;
+
+		case LUA_TBOOLEAN:
+			element.type = TypedFilterBase::Element::bool_;
+			element.value.bool_ = (bool)lua_toboolean(ls, idx);
+			return true;
+
+		case LUA_TSTRING:
+			element.type = TypedFilterBase::Element::string_;
+			element.value.string_.ptr = (const char*)lua_tostring(ls, idx);
+			element.value.string_.size = std::strlen( element.value.string_.ptr);
+			return true;
+		default:
+			errelemtype = lua_typename( ls, lua_type( ls, idx));
+			return false;
+	}
+}
+
+bool LuaGeneratorInputFilter::getValue( int idx, TypedInputFilter::Element& element)
+{
+	const char* errelemtype;
+	if (!getElementValue( m_thread, idx, element, errelemtype))
+	{
+		std::ostringstream msg;
+		msg << "element type '" << (errelemtype?errelemtype:"unknown") << "' not expected for atomic value in filter";
+		setState( InputFilter::Error, msg.str().c_str());
+		return false;
+	}
+	if (element.type == TypedFilterBase::Element::bool_ && element.value.bool_ == false)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool LuaGeneratorInputFilter::getNext( ElementType& type, Element& element)
+{
+	setState( InputFilter::Open);
+	if (!m_thread)
+	{
+		m_thread = lua_newthread( m_ls);			///...STK: func thd
+		lua_pushvalue( m_ls, -1);				///...STK: func thd thd
+		m_threadref = luaL_ref( m_ls, LUA_REGISTRYINDEX);	///...STK: func thd
+		lua_pushvalue( m_ls, -2);				///...STK: func thd func
+	}
+	if (m_lasttype == Attribute)
+	{
+		type = m_lasttype = Value;
+		element = m_attrvalue;
+		return true;
+	}
+	int rt = lua_resume( m_thread, NULL, 0);
+	if (rt == LUA_YIELD)
+	{
+		setState( InputFilter::EndOfMessage);
+		return false;
+	}
+	if (rt != 0)
+	{
+		const char* msg = lua_tostring( m_thread, -1);
+		setState( InputFilter::Error, msg);
+		return false;
+	}
+	if (getValue( -2, element))			//...fetch tag
+	{
+		if (state() == InputFilter::Error) return false;
+		if (getValue( -1, m_attrvalue))		//...fetch attribute value
+		{
+			type = m_lasttype = Attribute;
+			return true;
+		}
+		else
+		{
+			if (state() == InputFilter::Error) return false;
+			type = m_lasttype = OpenTag;
+			return true;
+		}
+	}
+	else
+	{
+		// no tag given:
+		if (state() == InputFilter::Error) return false;
+		if (getValue( -1, element))		//...fetch value
+		{
+			type = m_lasttype = Value;
+			return true;
+		}
+		else
+		{
+			// no tag, no value -> close tag
+			if (state() == InputFilter::Error) return false;
+			type = m_lasttype = CloseTag;
+			return true;
+		}
+	}
+}
+
+void LuaTableInputFilter::FetchState::getTagElement( TypedInputFilter::Element& element)
 {
 	element.type = Element::string_;
 	element.value.string_.ptr = tag;
 	element.value.string_.size = tagsize;
 }
 
-LuaInputFilter::LuaInputFilter( lua_State* ls)
+LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
 	:LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 {
@@ -64,40 +180,20 @@ LuaInputFilter::LuaInputFilter( lua_State* ls)
 	m_stk.push_back( fs);
 }
 
-bool LuaInputFilter::getValue( int idx, TypedFilterBase::Element& element)
+bool LuaTableInputFilter::getValue( int idx, TypedFilterBase::Element& element)
 {
-	switch (lua_type( m_ls, idx))
+	const char* errelemtype;
+	if (!getElementValue( m_ls, idx, element, errelemtype))
 	{
-		case LUA_TNIL:
-			setState( InputFilter::Error, "nil illegal for atomic value in filter"); return false;
-			return false;
-
-		case LUA_TNUMBER:
-			element.type = TypedFilterBase::Element::double_;
-			element.value.double_ = (double)lua_tonumber(m_ls, idx);
-			return true;
-
-		case LUA_TBOOLEAN:
-			element.type = TypedFilterBase::Element::bool_;
-			element.value.bool_ = (bool)lua_toboolean(m_ls, idx);
-			return true;
-
-		case LUA_TSTRING:
-			element.type = TypedFilterBase::Element::string_;
-			element.value.string_.ptr = (const char*)lua_tostring(m_ls, idx);
-			element.value.string_.size = std::strlen( element.value.string_.ptr);
-			return true;
-
-		case LUA_TTABLE: setState( InputFilter::Error, "table not expected for atomic value in filter"); return false;
-		case LUA_TFUNCTION: setState( InputFilter::Error, "function not expected for atomic value in filter"); return false;
-		case LUA_TUSERDATA: setState( InputFilter::Error, "userdata not expected for atomic value in filter"); return false;
-		case LUA_TTHREAD: setState( InputFilter::Error, "thread not expected for atomic value in filter"); return false;
-		case LUA_TLIGHTUSERDATA: setState( InputFilter::Error, "userdata not expected for atomic value in filter"); return false;
+		std::ostringstream msg;
+		msg << "element type '" << (errelemtype?errelemtype:"unknown") << "' not expected for atomic value in filter";
+		setState( InputFilter::Error, msg.str().c_str());
+		return false;
 	}
-	return false;
+	return true;
 }
 
-bool LuaInputFilter::firstTableElem( const char* tag=0)
+bool LuaTableInputFilter::firstTableElem( const char* tag=0)
 {
 	FetchState fs;
 	lua_pushnil( m_ls);
@@ -140,7 +236,7 @@ bool LuaInputFilter::firstTableElem( const char* tag=0)
 	}
 }
 
-bool LuaInputFilter::nextTableElem()
+bool LuaTableInputFilter::nextTableElem()
 {
 	lua_pop( m_ls, 1);
 	if (!lua_next( m_ls, -2))
@@ -150,7 +246,7 @@ bool LuaInputFilter::nextTableElem()
 	return true;
 }
 
-bool LuaInputFilter::getNext( ElementType& type, Element& element)
+bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 {
 	if (!lua_checkstack( m_ls, 10))
 	{
@@ -260,7 +356,7 @@ bool LuaInputFilter::getNext( ElementType& type, Element& element)
 }
 
 
-bool LuaOutputFilter::pushValue( const Element& element)
+bool LuaTableOutputFilter::pushValue( const Element& element)
 {
 	switch (element.type)
 	{
@@ -284,7 +380,7 @@ bool LuaOutputFilter::pushValue( const Element& element)
 	return false;
 }
 
-bool LuaOutputFilter::openTag( const Element& element)
+bool LuaTableOutputFilter::openTag( const Element& element)
 {
 	++m_depth;
 	if (m_depth < 0)
@@ -322,13 +418,13 @@ bool LuaOutputFilter::openTag( const Element& element)
 	{
 		///... the table is an array
 		lua_pop( m_ls, 2);			///... LUA STK: t k v
-		lua_pushnumber( m_ls, (double)(len + 1));	///... LUA STK: t k v len+1
+		lua_pushnumber( m_ls, (double)(len+1));	///... LUA STK: t k v len+1
 		lua_newtable( m_ls);			///... LUA STK: t k v len+1 NEWTABLE
 	}
 	return true;
 }
 
-bool LuaOutputFilter::closeTag()
+bool LuaTableOutputFilter::closeTag()
 {
 	if (m_depth > 0)
 	{
@@ -353,7 +449,7 @@ bool LuaOutputFilter::closeTag()
 	}
 }
 
-bool LuaOutputFilter::closeAttribute( const Element& element)
+bool LuaTableOutputFilter::closeAttribute( const Element& element)
 {
 	lua_pushnil( m_ls);
 	if (lua_next( m_ls, -2))
@@ -370,9 +466,9 @@ bool LuaOutputFilter::closeAttribute( const Element& element)
 	}
 }
 
-bool LuaOutputFilter::print( ElementType type, const Element& element)
+bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 {
-	if (!lua_checkstack( m_ls, 10))
+	if (!lua_checkstack( m_ls, 16))
 	{
 		setState( OutputFilter::Error, "lua stack overflow");
 		return false;

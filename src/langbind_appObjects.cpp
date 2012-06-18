@@ -38,6 +38,7 @@ Project Wolframe.
 #include "logger-v1.hpp"
 #include "filter/filter.hpp"
 #include "filter/serializefilter.hpp"
+#include "filter/tostringfilter.hpp"
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
 #include "filter/token_filter.hpp"
@@ -138,66 +139,35 @@ FilterMap::FilterMap()
 #endif
 }
 
-bool DDLForm::getValue( const char* name, std::string& val) const
-{
-	serialize::Context::Flags flt;
-	if (serialize::Context::getFlag( name, flt))
-	{
-		if ((int)flt & (int)m_flags)
-		{
-			val = "true";
-		}
-		else
-		{
-			val = "false";
-		}
-		return true;
-	}
-	return false;
-}
-
-bool DDLForm::setValue( const char* name, const std::string& value)
-{
-	serialize::Context::Flags flt;
-	if (serialize::Context::getFlag( name, flt))
-	{
-		if (value == "true")
-		{
-			m_flags = (serialize::Context::Flags)((int)flt | (int)m_flags);
-		}
-		else if (value == "false")
-		{
-			if ((int)flt & (int)m_flags)
-			{
-				m_flags = (serialize::Context::Flags)((int)flt ^ (int)m_flags);
-			}
-		}
-		else
-		{
-			throw std::runtime_error( "illegal value for boolean");
-		}
-		return true;
-	}
-	return false;
-}
-
 std::string DDLForm::tostring() const
 {
-	std::ostringstream out;
-	m_structure.print( out);
-	return out.str();
+	ToStringFilter out;
+	serialize::Context ctx;
+	serialize::FiltermapDDLPrintStateStack stk;
+	if (!serialize::print( m_structure, out, ctx, stk))
+	{
+		if (out.state() == OutputFilter::EndOfBuffer)
+		{
+			throw std::logic_error( "internal: tostring serialization with yield");
+		}
+		else
+		{
+			throw std::runtime_error( ctx.getLastError());
+		}
+	}
+	return out.content();
 }
 
-DDLFormFill::DDLFormFill( const DDLFormR& f)
+DDLFormFill::DDLFormFill( const DDLFormR& f, serialize::Context::Flags flags)
 	:m_form(f)
 	,m_state(0)
-	,m_ctx(f->flags()){}
+	,m_ctx(flags){}
 
-DDLFormFill::DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp)
+DDLFormFill::DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp, serialize::Context::Flags flags)
 	:m_form(f)
 	,m_state(0)
 	,m_inputfilter(inp)
-	,m_ctx(f->flags()){}
+	,m_ctx(flags){}
 
 DDLFormFill::DDLFormFill( const DDLFormFill& o)
 	:m_form(o.m_form)
@@ -252,16 +222,16 @@ DDLFormFill::CallResult DDLFormFill::call()
 	return Ok;
 }
 
-DDLFormPrint::DDLFormPrint( const DDLFormR& f)
+DDLFormPrint::DDLFormPrint( const DDLFormR& f, serialize::Context::Flags flags)
 	:m_form(f)
 	,m_state(0)
-	,m_ctx(f->flags()){}
+	,m_ctx(flags){}
 
-DDLFormPrint::DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp)
+DDLFormPrint::DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp, serialize::Context::Flags flags)
 	:m_form(f)
 	,m_state(1)
 	,m_outputfilter(outp)
-	,m_ctx(f->flags()){}
+	,m_ctx(flags){}
 
 DDLFormPrint::DDLFormPrint( const DDLFormPrint& o)
 	:m_form(o.m_form)

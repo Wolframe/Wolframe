@@ -299,7 +299,10 @@ static int function__LuaObject__index( lua_State* ls)
 	try
 	{
 		std::string val;
-		rt = obj->getValue( key, val);
+		if (!obj->getValue( key, val))
+		{
+			return lua_getmetatable( ls, 1)?1:0;
+		}
 		std::size_t nn = (overfl=(val.size() >= sizeof( valbuf)))?(sizeof( valbuf)-1):val.size();
 		std::memcpy( valbuf, val.c_str(), nn);
 		valbuf[ nn] = 0;
@@ -446,7 +449,7 @@ static bool get_operand_TypedInputFilter( lua_State* ls, int idx, TypedInputFilt
 	switch (typ)
 	{
 		case LUA_TTABLE:
-			flt.reset( new LuaInputFilter( ls));
+			flt.reset( new LuaTableInputFilter( ls));
 			return true;
 		case LUA_TUSERDATA:
 		default:
@@ -461,13 +464,13 @@ static bool get_operand_TypedInputFilter( lua_State* ls, int idx, TypedInputFilt
 static int function_formfunctionresult_table( lua_State* ls)
 {
 	LuaErrorMessage luaerr;
-	int ctx;
 	FormFunctionResult* result = LuaObject<FormFunctionResult>::getSelf( ls, "FormFunctionResult", "table");
 	try
 	{
+		int ctx;
 		if (lua_getctx( ls, &ctx) != LUA_YIELD)
 		{
-			result->init( new LuaOutputFilter( ls));
+			result->init( new LuaTableOutputFilter( ls));
 		}
 		FormFunctionResult::CallResult res = result->fetch();
 		switch (res)
@@ -543,7 +546,43 @@ static int function_formfunction_call( lua_State* ls)
 	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by form function call");
 }
 
-static int function_form_table( lua_State* ls)
+static int function_ddlform_tostring( lua_State* ls)
+{
+	LuaErrorMessage luaerr;
+	DDLFormR* form = LuaObject<DDLFormR>::getSelf( ls, "form", "__tostring");
+	try
+	{
+		if (lua_gettop( ls) != 1)
+		{
+			throw std::runtime_error( "called form::__tostring() with arguments");
+		}
+		if (form->get())
+		{
+			std::string content = (*form)->tostring();
+			LuaExceptionHandlerScope escope(ls);
+			{
+				lua_pushlstring( ls, content.c_str(), content.size());
+				return 1;
+			}
+		}
+		else
+		{
+			lua_pushnil( ls);
+			return 1;
+		}
+	}
+	catch (const std::bad_alloc&)
+	{
+		luaerr.init( "out of memory calling method form::__tostring()");
+	}
+	catch (const std::exception& e)
+	{
+		luaerr.init( e.what());
+	}
+	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by method form::__tostring()");
+}
+
+static int function_ddlform_table( lua_State* ls)
 {
 	LuaErrorMessage luaerr;
 	DDLFormR* form = LuaObject<DDLFormR>::getSelf( ls, "form", "table");
@@ -552,8 +591,8 @@ static int function_form_table( lua_State* ls)
 		int ctx;
 		if (lua_getctx( ls, &ctx) != LUA_YIELD)
 		{
-			TypedOutputFilterR outp( new LuaOutputFilter( ls));
-			LuaObject<DDLFormPrint>::push_luastack( ls, DDLFormPrint( *form, outp));
+			TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
+			LuaObject<DDLFormPrint>::push_luastack( ls, DDLFormPrint( *form, outp, serialize::Context::None));
 		}
 		LuaObject<DDLFormPrint>* result = LuaObject<DDLFormPrint>::get( ls, -1);
 		if (!result) throw std::logic_error( "internal. expected form result context object on stack");
@@ -562,7 +601,7 @@ static int function_form_table( lua_State* ls)
 		switch (res)
 		{
 			case DDLFormPrint::Yield:
-				lua_yieldk( ls, 0, 1, function_form_table);
+				lua_yieldk( ls, 0, 1, function_ddlform_table);
 
 			case DDLFormPrint::Ok:
 				/* table is already toplevel element on the stack */
@@ -583,37 +622,66 @@ static int function_form_table( lua_State* ls)
 	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by method form::table()");
 }
 
-static int function_form_fill( lua_State* ls)
+static int function_ddlform_fill__closure( lua_State* ls)
+{
+	DDLFormFill* closure = (DDLFormFill*)lua_touserdata( ls, lua_upvalueindex( 1));
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		if (lua_gettop( ls) != 1)
+		{
+			throw std::logic_error( "internal. expected one argument for the closure of form:fill");
+		}
+		lua_pushvalue( ls, 1);	//...the argument of the filter to iterate on as top element
+	}
+	DDLFormFill::CallResult res = closure->call();
+	switch (res)
+	{
+		case DDLFormFill::Yield:
+			lua_yieldk( ls, 0, 1, function_ddlform_fill__closure);
+
+		case DDLFormFill::Ok:
+			return 0;
+
+		case DDLFormFill::Error:
+			throw AppObjectsRuntimeError<DDLFormFill>( "in call of DDL form fill", *closure);
+	}
+	throw std::logic_error( "illegal state in form fill closure");
+}
+
+static int function_ddlform_fill( lua_State* ls)
 {
 	LuaErrorMessage luaerr;
 	DDLFormR* form = LuaObject<DDLFormR>::getSelf( ls, "form", "fill");
 	try
 	{
-		int ctx;
-		if (lua_getctx( ls, &ctx) != LUA_YIELD)
+		TypedInputFilterR inp;
+		if (!get_operand_TypedInputFilter( ls, 2, inp))
 		{
-			TypedInputFilterR inp;
-			if (!get_operand_TypedInputFilter( ls, 1, inp))
+			throw std::runtime_error( "error in form::fill(..). 1st argument is not a table, form or iterator");
+		}
+		serialize::Context::Flags flags = serialize::Context::None;
+		if (lua_gettop( ls) == 3)
+		{
+			if (!lua_isstring( ls, 3))
 			{
-				throw std::runtime_error( "error in form::fill(..). 1st argument is not a table, form or iterator");
+				throw std::runtime_error( "error in form::fill(..). 2nd argument is not a string");
 			}
-			LuaObject<DDLFormFill>::push_luastack( ls, DDLFormFill( *form, inp));
+			const char* mode = lua_tostring( ls, 3);
+			if (std::strcmp( mode, "strict") == 0)
+			{
+				flags = serialize::Context::ValidateAttributes;
+			}
+			else
+			{
+				throw std::runtime_error( "error in form::fill(..). 2nd argument does not specify a mode of validating input (e.g. \"strict\")");
+			}
 		}
-		LuaObject<DDLFormFill>* obj = LuaObject<DDLFormFill>::get( ls, -1);
-		if (!obj) throw std::logic_error( "expected form::fill(..) context object on stack");
-
-		DDLFormFill::CallResult res = obj->call();
-		switch (res)
-		{
-			case DDLFormFill::Yield:
-				lua_yieldk( ls, 0, 1, function_form_fill);
-
-			case DDLFormFill::Ok:
-				return 0;
-
-			case DDLFormFill::Error:
-				throw AppObjectsRuntimeError<DDLFormFill>( "in call of DDL form fill", *obj);
-		}
+		LuaObject<DDLFormFill>::push_luastack( ls, DDLFormFill( *form, inp, flags));
+		lua_pushcclosure( ls, function_ddlform_fill__closure, 1);
+		lua_pushvalue( ls, -2);		//... generator argument as first parameter
+		lua_call( ls, 1, 0);
+		return 0;
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -1008,10 +1076,11 @@ static const luaL_Reg formfunctionresult_methodtable[ 2] =
 	{0,0}
 };
 
-static const luaL_Reg form_methodtable[ 3] =
+static const luaL_Reg ddlform_methodtable[ 4] =
 {
-	{"table",&function_form_table},
-	{"fill",&function_form_fill},
+	{"table",&function_ddlform_table},
+	{"fill",&function_ddlform_fill},
+	{"__tostring",&function_ddlform_tostring},
 	{0,0}
 };
 
@@ -1219,7 +1288,7 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
 			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
 			LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
-			LuaObject<DDLFormR>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, form_methodtable);
+			LuaObject<DDLFormR>::createMetatable( ls, 0, 0, ddlform_methodtable);
 			LuaObject<DDLFormFill>::createMetatable( ls, 0, 0, 0);
 			LuaObject<DDLFormPrint>::createMetatable( ls, 0, 0, 0);
 			LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);

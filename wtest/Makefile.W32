@@ -16,6 +16,7 @@ INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	advapi32.lib
 
 # openssl

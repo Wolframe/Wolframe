@@ -180,44 +180,27 @@ class DDLForm
 {
 public:
 	///\brief Default constructor
-	DDLForm()
-		:m_flags(serialize::Context::None){}
+	DDLForm(){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
 	DDLForm( const DDLForm& o)
-		:m_structure(o.m_structure)
-		,m_flags(o.m_flags){}
+		:m_structure(o.m_structure){}
 
 	///\brief Constructor
 	///\param[in] st form data
 	DDLForm( const ddl::StructType& st)
-		:m_structure(st)
-		,m_flags(serialize::Context::None){}
+		:m_structure(st){}
 
 	///\brief Destructor
 	~DDLForm(){}
 
-	///\brief Get a member value of the form
-	///\param [in] name case sensitive name of the variable
-	///\param [in] val the value returned
-	///\return true on success, false, if the variable does not exist or the operation failed
-	bool getValue( const char* name, std::string& val) const;
-
-	///\brief Set a member value of the form
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value new value of the variable to set
-	///\return true on success, false, if the variable does not exist or the operation failed
-	bool setValue( const char* name, const std::string& value);
-
 	const ddl::StructType& structure() const	{return m_structure;}
-	serialize::Context::Flags flags() const		{return m_flags;}
 
 	std::string tostring() const;
 private:
 	friend class DDLFormFill;
 	ddl::StructType m_structure;
-	serialize::Context::Flags m_flags;
 };
 
 typedef CountedReference<DDLForm> DDLFormR;
@@ -229,10 +212,10 @@ class DDLFormFill
 {
 public:
 	///\brief Constructor
-	DDLFormFill( const DDLFormR& f);
+	DDLFormFill( const DDLFormR& f, serialize::Context::Flags flags);
 
 	///\brief Constructor
-	DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp);
+	DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp, serialize::Context::Flags flags);
 
 	///\brief Copy constructor
 	DDLFormFill( const DDLFormFill& o);
@@ -278,10 +261,10 @@ class DDLFormPrint
 {
 public:
 	///\brief Constructor
-	explicit DDLFormPrint( const DDLFormR& f);
+	DDLFormPrint( const DDLFormR& f, serialize::Context::Flags flags);
 
 	///\brief Constructor
-	DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp);
+	DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp, serialize::Context::Flags flags);
 
 	///\brief Copy constructor
 	DDLFormPrint( const DDLFormPrint& o);

@@ -29,55 +29,22 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/luamapBase.cpp
-///\brief Implements the non intrusive base class of serialization for the lua map
-#include "serialize/struct/luamapBase.hpp"
-#include <stdexcept>
+///\file stringUtils.cpp
+///\brief Some utility string function implementations. They are mainly boost wrappers that are separated because of some warnings needed to be disabled
 
-using namespace _Wolframe;
-using namespace serialize;
+#include "miscUtils.hpp"
+#ifdef _WIN32
+#pragma warning(disable:4996)
+#endif
+#include <boost/algorithm/string.hpp>
 
-static int luaException( lua_State* ls)
+void _Wolframe::utils::splitStringBySpaces( std::vector<std::string>& res, const std::string& inp)
 {
-	const char* errmsg = lua_tostring( ls, -1);
-	throw std::runtime_error( errmsg?errmsg:"unspecified lua exception");
-	return 0;
+	res.clear();
+	std::vector<std::string> imm;
+	boost::split( imm, inp, boost::is_any_of("\n\t\r "));
+	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
+	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
 }
 
-bool LuamapDescriptionBase::parse( void* obj, lua_State* ls, Context* ctx) const
-{
-	bool gotError = false;
-	lua_pushnil( ls);
-	lua_pushvalue( ls, -2);
-	lua_CFunction old_panicf = lua_atpanic( ls, luaException);
-	try
-	{
-		gotError = !m_parse( obj, ls, ctx);
-	}
-	catch (std::exception& e)
-	{
-		ctx->setError( e.what());
-		gotError = true;
-	}
-	lua_atpanic( ls, old_panicf);
-	lua_pop( ls, 2);
-	return !gotError;
-}
-
-bool LuamapDescriptionBase::print( const void* obj, lua_State* ls, Context* ctx) const
-{
-	bool gotError = false;
-	lua_CFunction old_panicf = lua_atpanic( ls, luaException);
-	try
-	{
-		gotError = !m_print(obj,ls, ctx);
-	}
-	catch (std::exception& e)
-	{
-		ctx->setError( e.what());
-		gotError = true;
-	}
-	lua_atpanic( ls, old_panicf);
-	return !gotError;
-}
 

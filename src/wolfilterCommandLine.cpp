@@ -90,27 +90,18 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 			const char* cc = std::strchr( itr->c_str(), '#');
 			if (cc)
 			{
-				formparam.filename = std::string( cc+1);
 				formparam.ddlname = std::string( itr->c_str(), cc-itr->c_str());
+				formparam.filename = std::string( cc+1);
 			}
 			else
 			{
-				formparam.filename = *itr;
-				boost::filesystem::path p(*itr);
-#if BOOST_VERSION < 104300
-				std::string ext = p.extension();
-#else
-				std::string ext = p.extension().string();
-#endif
+				std::string ext = utils::getFileExtension( *itr);
 				if (!ext.size()) throw std::runtime_error( "no DDL specified (file extension missing) for form file");
+
 				formparam.ddlname = std::string( ext.c_str()+1);
+				formparam.filename = *itr;
 			}
-			boost::filesystem::path p(formparam.filename);
-#if BOOST_VERSION < 104300
-			formparam.formname = p.stem();
-#else
-			formparam.formname = p.stem().string();
-#endif
+			formparam.formname = utils::getFileStem( formparam.filename);
 			m_forms.push_back( formparam);
 		}
 	}

@@ -304,7 +304,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			flt.inputfilter()->setValue( "empty", "false");
 			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
 			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
-			DDLFormFill closure( df, inp);
+			DDLFormFill closure( df, inp, serialize::Context::ValidateAttributes);
 
 			langbind::DDLFormFill::CallResult callrt = closure.call();
 			while (callrt == langbind::DDLFormFill::Yield)
@@ -321,7 +321,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			}
 			if (callrt == langbind::DDLFormFill::Ok)
 			{
-				langbind::DDLFormPrint res( df, outp);
+				langbind::DDLFormPrint res( df, outp, serialize::Context::None);
 				langbind::DDLFormPrint::CallResult fetchrt = res.fetch();
 				while (fetchrt == langbind::DDLFormPrint::Yield)
 				{

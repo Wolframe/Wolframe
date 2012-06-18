@@ -50,9 +50,10 @@
 #include <string>
 #include <ostream>
 
+using namespace _Wolframe::utils;
+
 namespace _Wolframe {
 namespace config {
-
 
 /// Parse the configuration
 bool ServiceConfiguration::parse( const ConfigurationTree& pt, const std::string& node,

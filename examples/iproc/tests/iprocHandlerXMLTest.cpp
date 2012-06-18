@@ -137,7 +137,7 @@ public:
 		config << "}" << std::endl;
 		wtest::Data::writeFile( configFile.string().c_str(), config.str());
 
-		if (boost::filesystem::exists( configFile))
+		if (utils::fileExists( configFile))
 		{
 			if (!m_appConfig.parse( configFile.string().c_str(), config::ApplicationConfiguration::CONFIG_INFO))
 			{
