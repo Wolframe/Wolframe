@@ -33,6 +33,11 @@
 ///\file testWolfilter.cpp
 ///\brief Test program for wolfilter like stdin/stdout mapping
 
+// avoid safe copy warning in boost::is_any_of (no easy workaround here)
+#ifdef _WIN32
+#pragma warning(disable:4996)
+#endif
+
 #include "langbind/iostreamfilter.hpp"
 #include "logger-v1.hpp"
 #include "langbind/appGlobalContext.hpp"
@@ -140,7 +145,12 @@ TEST_F( WolfilterTest, tests)
 		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
 		if (directoryExists( tempdir))
 		{
-			boost::filesystem::remove_all( tempdir);
+			try {
+				boost::filesystem::remove_all( tempdir);
+			} catch( ... ) {
+				boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
+				boost::filesystem::remove_all( tempdir);				
+			}
 		}
 		boost::filesystem::create_directory( tempdir);
 		wtest::TestDescription td( *itr);
