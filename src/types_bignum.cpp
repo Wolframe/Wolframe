@@ -438,7 +438,10 @@ void Bignum::get( std::string& val) const
 	val.clear();
 	std::size_t gg = (m_value.size()>m_dec)?(m_value.size()-m_dec):0;
 	val.append( m_value.c_str(), gg);
-	val.push_back( '.');
+	if (gg < m_value.size())
+	{
+		val.push_back( '.');
+	}
 	for (std::size_t ll=gg; ll < m_dec; ++ll)
 	{
 		val.push_back( '0');

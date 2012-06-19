@@ -29,27 +29,43 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/luamapSerialize.hpp
-///\brief Defines the DDL structure serialization for the lua map
-
-#ifndef _Wolframe_SERIALIZE_DDL_LUAMAP_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_LUAMAP_HPP_INCLUDED
-#include "serialize/mapContext.hpp"
-extern "C"
-{
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-}
-#include "ddl/structType.hpp"
-#include <cstddef>
+///\file types/bcdArithmetic.hpp
+///\brief Defines some operations on arbitrary sized packed bcd numbers
+///\note for the Addition,Subtraction and Verification we refer to http://www.divms.uiowa.edu/~jones/bcd/bcd.html.
+#ifndef _Wolframe_TYPES_BCD_ARITHMETIC_HPP_INCLUDED
+#define _Wolframe_TYPES_BCD_ARITHMETIC_HPP_INCLUDED
+#include <string>
+#include <boost/cstdint.hpp>
 
 namespace _Wolframe {
-namespace serialize {
+namespace types {
 
-void parse( ddl::StructType& st, lua_State* ls);
-void print( const ddl::StructType& st, lua_State* ls);
+class BigBCD
+{
+public:
+	BigBCD( const std::string& numstr);
+	BigBCD( const BigBCD& o);
+	~BigBCD();
+
+	std::string tostring() const;
+
+	BigBCD operator +( const BigBCD& opr);
+	BigBCD operator -( const BigBCD& opr);
+
+	bool isValid() const;
+
+private:
+	void init( std::size_t size_, bool sign_);
+	void expand( std::size_t addsize);
+
+	BigBCD( std::size_t n, bool sgn);
+	static void digits_addition( BigBCD& dest, BigBCD& this_, const BigBCD& opr, boost::uint32_t& carrybit);
+	static void digits_subtraction( BigBCD& dest, BigBCD& this_, const BigBCD& opr);
+
+	std::size_t m_size;
+	boost::uint32_t* m_ar;
+	bool m_sign;
+};
 
 }}//namespace
 #endif
-

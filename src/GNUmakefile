@@ -107,6 +107,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	ddl_compilerInterface.o \
 	ddl_compiler_simpleFormCompiler.o \
 	types_bignum.o \
+	types_bcdArithmetic.o \
 	acceptor.o \
 	serverEndpoint.o \
 	connection.o \
