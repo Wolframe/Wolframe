@@ -183,7 +183,7 @@ static boost::uint32_t tencomp( boost::uint32_t a)
 	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
 	boost::uint32_t t1,t2,t3,t4,t5,t6;
 	t1 = 0xffffFFFF - a;
-	t2 = - a;
+	t2 = (boost::uint32_t) (- (boost::int32_t)a);
 	t3 = t1 ^ 0x00000001;
 	t4 = t2 ^ t3;
 	t5 = ~t4 & 0x11111110;
