@@ -182,7 +182,7 @@ static boost::uint32_t tencomp( boost::uint32_t a)
 {
 	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
 	boost::uint32_t t1,t2,t3,t4,t5,t6;
-	t1 = 0xFFFFFFFF - a;
+	t1 = 0xffffFFFF - a;
 	t2 = - a;
 	t3 = t1 ^ 0x00000001;
 	t4 = t2 ^ t3;
@@ -190,6 +190,31 @@ static boost::uint32_t tencomp( boost::uint32_t a)
 	t6 = (t5 >> 2) | (t5 >> 3);
 	return t2 - t6;
 }
+
+#if USE_OWN_INCREMENT
+static boost::uint32_t increment( boost::uint32_t a)
+{
+	boost::uint32_t t1,t2,t3,t4,t5;
+	t1 = a + 0x06666667;
+	// convert 0 bytes to 0x6 bytes
+	t2 = t1 ^ 0xffffFFFF;
+	t3 = t2 & (t2 >> 1);				//... t3 has now bit 0100 set 's where t1 has bits 0011 set
+	t4 = t3 & 0x44444444;				//... t4 has 0x4 set for nibbles in t1 in range 0x0 to 0x3 (=0 for a valid bcd a)
+	t5 = t1 | (t4 | (t4 >> 1));			//... t5 has 0x6 set for the 0 nibbles in t1
+	return (t5 - 0x06666666);
+}
+
+static boost::uint32_t decrement( boost::uint32_t a)
+{
+	boost::uint32_t t1,t2,t3,t4,t5,t6;
+	t1 = a - 1;
+	// convert 0xF bytes to 0x9 bytes
+	t2 = t1 & 0xeeeeEEEE;				//... delete bit 0001 of each nibble
+	t3 = t2 & (t2 >> 1);				//... t3 has 0010 set for nibbles in t1 having bit 0110 set
+	t3 = t3 & (t3 >> 1);				//... t3 has 0010 set for nibbles in t1 having bits 1110 set
+	return t1 - (t3 | (t3 << 1) | (t3 >> 1));	//... subtract 7 from each elememt in t1 equals 0xF
+}
+#endif
 
 static boost::uint32_t sub( boost::uint32_t a, boost::uint32_t b)
 {
@@ -223,12 +248,25 @@ void BigBCD::digits_addition( BigBCD& rt, BigBCD& this_, const BigBCD& opr, boos
 		boost::uint32_t op1 = (ii>=this_.m_size)?0:this_.m_ar[ii];
 		boost::uint32_t op2 = (ii>=opr.m_size)?0:opr.m_ar[ii];
 		boost::uint32_t res = add( op1, op2);
+#if USE_OWN_INCREMENT
+		if (carry) rt.m_ar[ ii] = increment( res);
+#else
 		rt.m_ar[ ii] = add( res, carry);
+#endif
 		carry = getcarry( carry);
 	}
-	for (; ii>0; --ii)
+	if (carry)
 	{
-		if (rt.m_ar[ii]) break;
+		rt.expand( 1);
+		rt.m_ar[ nn] = carry;
+	}
+	else
+	{
+		for (; ii>0; --ii)
+		{
+			if (rt.m_ar[ii]) break;
+		}
+		rt.m_size = ii+1;
 	}
 }
 
@@ -240,8 +278,12 @@ void BigBCD::digits_subtraction( BigBCD& rt, BigBCD& this_, const BigBCD& opr)
 	{
 		boost::uint32_t op1 = (ii>=this_.m_size)?0:this_.m_ar[ii];
 		boost::uint32_t op2 = (ii>=opr.m_size)?0:opr.m_ar[ii];
-		rt.m_ar[ ii] = sub( op1, op2);
+		boost::uint32_t res = sub( op1, op2);
+#if USE_OWN_INCREMENT
+		if (carry) rt.m_ar[ ii] = decrement( res);
+#else
 		rt.m_ar[ ii] = sub( rt.m_ar[ ii], carry);
+#endif
 	}
 	if (carry)
 	{
@@ -265,11 +307,6 @@ BigBCD BigBCD::operator +( const BigBCD& opr)
 	if (m_sign == opr.m_sign)
 	{
 		digits_addition( rt, *this, opr, carry);
-		if (carry)
-		{
-			rt.expand( 1);
-			rt.m_ar[ nn] = carry;
-		}
 	}
 	else
 	{
@@ -290,11 +327,6 @@ BigBCD BigBCD::operator -( const BigBCD& opr)
 	else
 	{
 		digits_addition( rt, *this, opr, carry);
-		if (carry)
-		{
-			rt.expand( 1);
-			rt.m_ar[ nn] = carry;
-		}
 	}
 	return rt;
 }
