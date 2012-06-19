@@ -38,28 +38,43 @@
 
 #include "passwdFile.hpp"
 
+#include <sstream>
+#include <iostream>
+
 namespace _Wolframe {
 namespace AAAA {
 
-void PasswordFile::addUser( const std::string& /*user*/, const std::string& /*password*/,
-			    const std::string& /*userInfo*/, const std::string& /*comment*/ )
+std::string PasswordFile::passwdString( const std::string& user,
+					const std::string& password )
 {
+	std::stringstream ss;
+	ss << "Display only, user '" << user << "' with password '" << password << "'\n";
+	return ss.str();
 }
 
-bool PasswordFile::delUser( const std::string& /*user*/ )
+void PasswordFile::addUser(const std::string& user, const std::string& password )
 {
+	if ( m_create )
+		std::cout << "Create password file '" << m_filename
+			  << "' if it doesn't exist\n";
+	std::cout << "Change / add user '" << user << "', password file '\n"
+		  << m_filename << "', password '" << password << "'";
+}
+
+bool PasswordFile::delUser( const std::string& user )
+{
+	std::cout << "Delete user '" << user << "' from password file '"
+		  << m_filename << "'\n";
 	return true;
 }
 
-bool getUser( const std::string& /*user*/, std::string& /*password*/,
-	      std::string& /*userInfo*/, std::string& /*comment*/ )
+bool getUser( const std::string& /*user*/, std::string& /*password*/ )
 {
 	return true;
 }
 
 bool getUser( const std::string& /*challenge*/, const std::string& /*response*/,
-	      std::string& /*user*/, std::string& /*password*/,
-	      std::string& /*userInfo*/, std::string& /*comment*/ )
+	      std::string& /*user*/, std::string& /*password*/ )
 {
 	return true;
 }

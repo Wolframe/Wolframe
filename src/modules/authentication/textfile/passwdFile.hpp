@@ -49,16 +49,16 @@ public:
 	PasswordFile( const std::string& filename, bool create = false )
 		: m_filename( filename ), m_create( create )	{}
 
-	void addUser( const std::string& user, const std::string& password,
-		      const std::string& userInfo, const std::string& comment );
+	static std::string passwdString( const std::string& user,
+					 const std::string& password );
+
+	void addUser( const std::string& user, const std::string& password );
 
 	bool delUser( const std::string& user );
 
-	bool getUser( const std::string& user, std::string& password,
-		      std::string& userInfo, std::string& comment );
+	bool getUser( const std::string& user, std::string& password );
 	bool getUser( const std::string& challenge, const std::string& response,
-		      std::string& user, std::string& password,
-		      std::string& userInfo, std::string& comment );
+		      std::string& user, std::string& password );
 private:
 	const std::string	m_filename;
 	const bool		m_create;

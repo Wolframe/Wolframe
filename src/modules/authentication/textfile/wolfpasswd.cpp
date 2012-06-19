@@ -150,9 +150,8 @@ int main( int argc, char* argv[] )
 			passwd = WA::getPassword();
 		else
 			passwd = args[1];
-		std::cout << "Display only user '" << args[0] << "' with password '"
-			  << passwd << "'";
-		// do the job
+		// now do the job
+		std::cout << WA::PasswordFile::passwdString( args[1], passwd );
 	}
 	// delete user
 	else if ( delUser )	{
@@ -175,8 +174,9 @@ int main( int argc, char* argv[] )
 		}
 
 		// All parameters are OK
-		WA::PasswordFile pwdFile( args[0] );
 		try	{
+			WA::PasswordFile pwdFile( args[0] );
+
 			if ( pwdFile.delUser( args[1] ))
 				std::cout << "User '" << args[1] << "' removed from password file '"
 					  << args[0] << "'";
@@ -218,18 +218,25 @@ int main( int argc, char* argv[] )
 			return 2;
 		}
 
-		// Al parameters are OK
+		// Al parameters are OK, do the job
+		bool create = false;
 		if ( createFile )
-			std::cout << "Create password file '" << args[0] << "'\n";
-		std::string passwd;
-		if ( ! batchPwd )
-			passwd = WA::getPassword();
-		else
-			passwd = args[2];
+			create = true;
+		try	{
+			WA::PasswordFile pwdFile( args[0], create );
 
-		std::cout << "Change / add user '" << args[1] << "', password file '"
-			  << args[0] << "', password '" << passwd << "'";
-		// do the job
+			std::string passwd;
+			if ( ! batchPwd )
+				passwd = WA::getPassword();
+			else
+				passwd = args[2];
+			pwdFile.addUser( args[1], passwd );
+		}
+		catch( std::exception& e )	{
+			std::cerr << "Error adding user '" << args[1] << "' to password file '"
+				  << args[0] << ": " << e.what();
+			return 1;
+		}
 	}
 	std::cout << "\nDone.\n\n";
 	return 0;
