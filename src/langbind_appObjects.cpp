@@ -37,7 +37,7 @@ Project Wolframe.
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include "logger-v1.hpp"
 #include "filter/filter.hpp"
-#include "filter/serializefilter.hpp"
+#include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
@@ -518,7 +518,7 @@ TransactionFunctionResult::CallResult TransactionFunctionResult::fetch()
 		case 0: return Error;
 		case 1:
 		{
-			SerializeInputFilter si( m_resultreader.get());
+			TypingInputFilter si( m_resultreader);
 			if (!si.getNext( m_elemtype, m_elem))
 			{
 				switch (si.state())
@@ -665,7 +665,7 @@ TransactionFunctionClosure::CallResult TransactionFunctionClosure::call()
 					m_state = 2;
 				case 2:
 				{
-					SerializeOutputFilter so( m_cmdwriter.get());
+					TypingOutputFilter so( m_cmdwriter);
 					if (!so.print( m_elemtype, m_elem))
 					{
 						switch (so.state())

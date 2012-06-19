@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file serialize_ddl_filtermapPrint.cpp
 
 #include "serialize/ddl/filtermapDDLPrint.hpp"
-#include "filter/serializefilter.hpp"
+#include "filter/typedfilter.hpp"
 #include <cstring>
 #include <sstream>
 

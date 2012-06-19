@@ -87,7 +87,7 @@ public:
 		}
 		m_appConfig.finalize();
 
-		langbind::defineGlobalContext( new langbind::GlobalContext());
+		langbind::defineGlobalContext( langbind::GlobalContextR( new langbind::GlobalContext()));
 		langbind::getGlobalContext()->load( m_langbindConfig);
 	}
 private:

@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file serialize/struct/filtermapBase.cpp
 ///\brief Implements the non intrusive base class of serialization/deserialization of filters
 #include "serialize/struct/filtermapBase.hpp"
-#include "filter/serializefilter.hpp"
+#include "filter/typingfilter.hpp"
 #include <cstring>
 #include <stdexcept>
 

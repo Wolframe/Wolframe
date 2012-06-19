@@ -35,6 +35,7 @@ Project Wolframe.
 #include "langbind/luaDebug.hpp"
 #include "langbind/luaException.hpp"
 #include "filter/luafilter.hpp"
+#include "filter/typingfilter.hpp"
 #include "logger-v1.hpp"
 #include <fstream>
 #include <iostream>
@@ -422,7 +423,7 @@ static int function_inputFilter( lua_State* ls)
 				return 0;
 
 			case InputFilterClosure::Error:
-				luaL_error( ls, "error in iterator");
+				luaL_error( ls, "error in generator function");
 				return 0;
 
 			case InputFilterClosure::Data:
@@ -451,11 +452,22 @@ static bool get_operand_TypedInputFilter( lua_State* ls, int idx, TypedInputFilt
 		case LUA_TTABLE:
 			flt.reset( new LuaTableInputFilter( ls));
 			return true;
-		case LUA_TUSERDATA:
+		case LUA_TFUNCTION:
+			if (lua_getupvalue( ls, idx, 1))
+			{
+				InputFilterClosure* closure = LuaObject<InputFilterClosure>::get( ls, -1);
+				if (closure)
+				{
+					flt.reset( new TypingInputFilter( closure->inputfilter()));
+					return true;
+				}
+			}
+			flt.reset( new LuaGeneratorInputFilter( ls));
+			return true;
 		default:
 		{
 			const char* typnam = typ>0?lua_typename( ls, typ):"NIL";
-			LOG_ERROR << "expected table, form or iterator and got '" << typnam << "' as argument";
+			LOG_ERROR << "expected table, form or generator function and got '" << typnam << "' as argument";
 			return false;
 		}
 	}
@@ -470,7 +482,7 @@ static int function_formfunctionresult_table( lua_State* ls)
 		int ctx;
 		if (lua_getctx( ls, &ctx) != LUA_YIELD)
 		{
-			result->init( new LuaTableOutputFilter( ls));
+			result->init( TypedOutputFilterR( new LuaTableOutputFilter( ls)));
 		}
 		FormFunctionResult::CallResult res = result->fetch();
 		switch (res)
@@ -516,11 +528,12 @@ static int function_formfunction_call( lua_State* ls)
 				TypedInputFilterR inp;
 				if (!get_operand_TypedInputFilter( ls, 1, inp))
 				{
-					throw std::runtime_error( "error in form function call. 1st argument is not a table, form or iterator");
+					throw std::runtime_error( "error in form function call. 1st argument is not a table, form or generator function");
 				}
 				closure->init( inp);
 			}
 		}
+		lua_pushvalue( ls, 1);		//... input filter object as first argument
 		FormFunctionClosure::CallResult res = closure->call();
 		switch (res)
 		{
@@ -658,7 +671,7 @@ static int function_ddlform_fill( lua_State* ls)
 		TypedInputFilterR inp;
 		if (!get_operand_TypedInputFilter( ls, 2, inp))
 		{
-			throw std::runtime_error( "error in form::fill(..). 1st argument is not a table, form or iterator");
+			throw std::runtime_error( "error in form::fill(..). 1st argument is not a table, form or generator function");
 		}
 		serialize::Context::Flags flags = serialize::Context::None;
 		if (lua_gettop( ls) == 3)
@@ -679,7 +692,7 @@ static int function_ddlform_fill( lua_State* ls)
 		}
 		LuaObject<DDLFormFill>::push_luastack( ls, DDLFormFill( *form, inp, flags));
 		lua_pushcclosure( ls, function_ddlform_fill__closure, 1);
-		lua_pushvalue( ls, -2);		//... generator argument as first parameter
+		lua_pushvalue( ls, 2);		//... generator argument as first parameter
 		lua_call( ls, 1, 0);
 		return 0;
 	}
