@@ -175,6 +175,43 @@ private:
 };
 
 
+///\class RedirectFilterClosure
+class RedirectFilterClosure
+{
+public:
+	RedirectFilterClosure();
+	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o);
+	RedirectFilterClosure( const RedirectFilterClosure& o);
+
+	///\enum CallResult
+	///\brief Enumeration of call states of the processing
+	enum CallResult
+	{
+		Ok,		//< successful termination of call
+		Error,		//< termination of call with error (not completed)
+		Yield		//< call interrupted with request for a network operation
+	};
+	///\brief Calls the fetching of input and printing it to output until end or interruption
+	///\return Call state
+	CallResult call();
+
+	///\brief Initialization of call context for a new call
+	///\param[in] i call input
+	void init( const TypedInputFilterR& i, const TypedOutputFilterR& o);
+
+	const TypedInputFilterR& inputfilter() const		{return m_inputfilter;}
+	const TypedOutputFilterR& outputfilter() const		{return m_outputfilter;}
+
+private:
+	int m_state;				//< current state of call
+	int m_taglevel;				//< current balance of open/close tags
+	TypedInputFilterR m_inputfilter;	//< input filter
+	TypedOutputFilterR m_outputfilter;	//< output filter
+	InputFilter::ElementType m_elemtype;	//< type of last element read from command result
+	TypedInputFilter::Element m_elem;	//< last element read from command result
+};
+
+
 ///\class DDLForm
 class DDLForm
 {
@@ -426,7 +463,7 @@ public:
 		Error,		//< termination of call with error (not completed)
 		Yield		//< call interrupted with request for a network operation
 	};
-	///\brief calls the form function with the input from the input filter specified
+	///\brief Calls the form function with the input from the input filter specified
 	///\return Call state
 	CallResult call();
 

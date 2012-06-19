@@ -139,6 +139,97 @@ FilterMap::FilterMap()
 #endif
 }
 
+
+RedirectFilterClosure::RedirectFilterClosure()
+	:m_state(0)
+	,m_taglevel(0)
+	,m_elemtype(InputFilter::Value){}
+
+RedirectFilterClosure::RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o)
+	:m_state(0)
+	,m_taglevel(0)
+	,m_inputfilter(i)
+	,m_outputfilter(o)
+	,m_elemtype(InputFilter::Value)
+	{}
+
+RedirectFilterClosure::RedirectFilterClosure( const RedirectFilterClosure& o)
+	:m_state(o.m_state)
+	,m_taglevel(o.m_taglevel)
+	,m_inputfilter(o.m_inputfilter)
+	,m_outputfilter(o.m_outputfilter)
+	,m_elemtype(o.m_elemtype)
+	,m_elem(o.m_elem)
+	{}
+
+void RedirectFilterClosure::init( const TypedInputFilterR& i, const TypedOutputFilterR& o)
+{
+	m_inputfilter = i;
+	m_outputfilter = o;
+	m_state = 1;
+	m_taglevel = 0;
+	m_elemtype = InputFilter::Value;
+}
+
+
+RedirectFilterClosure::CallResult RedirectFilterClosure::call()
+{
+	if (m_state == 0) return Error;
+	if (!m_inputfilter.get() || !m_outputfilter.get()) return Error;
+
+	for (;;) switch (m_state)
+	{
+		case 1:
+			if (!m_inputfilter->getNext( m_elemtype, m_elem))
+			{
+				switch (m_inputfilter->state())
+				{
+					case InputFilter::Open:
+						return Ok;
+
+					case InputFilter::EndOfMessage:
+						return Yield;
+
+					case InputFilter::Error:
+						return Error;
+				}
+			}
+			m_state = 2;
+		case 2:
+			if (m_elemtype == InputFilter::OpenTag)
+			{
+				++m_taglevel;
+			}
+			else if (m_elemtype == InputFilter::CloseTag)
+			{
+				--m_taglevel;
+				if (m_taglevel < 0)
+				{
+					m_state = 3;
+					return Ok;
+				}
+			}
+			if (!m_outputfilter->print( m_elemtype, m_elem))
+			{
+				switch (m_outputfilter->state())
+				{
+					case OutputFilter::Open:
+						return Error;
+
+					case OutputFilter::EndOfBuffer:
+						return Yield;
+
+					case OutputFilter::Error:
+						return Error;
+				}
+			}
+			m_state = 1;
+		default:
+			return Ok;
+	}
+}
+
+
 std::string DDLForm::tostring() const
 {
 	ToStringFilter out;
@@ -571,6 +662,8 @@ TransactionFunctionResult::CallResult TransactionFunctionResult::fetch()
 void TransactionFunctionResult::init( const TypedOutputFilterR& o)
 {
 	m_state = 1;
+	m_elemtype = InputFilter::Value;
+
 	m_resultreader.reset( m_func.resultreader()->copy());
 	if (m_resultbuf.get())
 	{
@@ -602,6 +695,7 @@ TransactionFunctionClosure::TransactionFunctionClosure( const std::string& name_
 	,m_name(name_)
 	,m_cmdop(cmdbind::CommandHandler::READ)
 	,m_state(0)
+	,m_elemtype(InputFilter::Value)
 	,m_cmdinputbuf(std::malloc( InputBufSize), std::free)
 	,m_cmdoutputbuf(std::malloc( OutputBufSize), std::free)
 	,m_result(f)
@@ -614,12 +708,15 @@ TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctio
 	,m_cmdop(cmdbind::CommandHandler::READ)
 	,m_state(o.m_state)
 	,m_lasterror(o.m_lasterror)
+	,m_elemtype(o.m_elemtype)
+	,m_elem(o.m_elem)
 	,m_cmdinputbuf(o.m_cmdinputbuf)
 	,m_cmdoutputbuf(o.m_cmdoutputbuf)
 	,m_cmdwriter(o.m_cmdwriter)
 	,m_result(o.m_result)
 	,m_inputfilter(o.m_inputfilter)
 	{}
+
 
 TransactionFunctionClosure::CallResult TransactionFunctionClosure::call()
 {
