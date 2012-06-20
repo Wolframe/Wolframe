@@ -47,50 +47,6 @@ extern "C" {
 namespace _Wolframe {
 namespace langbind {
 
-///\class class LuaGeneratorInputFilter
-///\brief Lua generator function (function with closure) as typed input filter
-///\remark The lua function has no arguments and returns a pair (value, tag) like an input filter does
-class LuaGeneratorInputFilter :public TypedInputFilter, public LuaExceptionHandlerScope
-{
-public:
-	///\brief Constructor
-	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaTableInputFilter::getNext(ElementType&,Element&)
-	explicit LuaGeneratorInputFilter( lua_State* ls)
-		:LuaExceptionHandlerScope(ls)
-		,m_ls(ls)
-		,m_thread(m_thread)
-		,m_lasttype(InputFilter::Value){}
-
-	///\brief Copy constructor
-	///\param[in] o lua generator input filter to copy
-	LuaGeneratorInputFilter( const LuaGeneratorInputFilter& o)
-		:TypedInputFilter(o)
-		,LuaExceptionHandlerScope(o)
-		,m_ls(o.m_ls)
-		,m_thread(o.m_thread)
-		,m_threadref(o.m_threadref)
-		,m_lasttype(o.m_lasttype)
-		,m_attrvalue(o.m_attrvalue){}
-
-	///\brief Destructor
-	///\remark Leaves the generator function as top element (-1) on the lua stack
-	virtual ~LuaGeneratorInputFilter();
-
-	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
-	///\remark Expects the generator function to iterate on as top element (-1) on the lua stack when called the first time
-	virtual bool getNext( ElementType& type, Element& element);
-private:
-	bool getValue( int idx, Element& e);	//< fetch the element with index 'idx' as atomic value
-
-private:
-	lua_State* m_ls;			//< lua state
-	lua_State* m_thread;			//< stack of iterator states
-	int m_threadref;			//< reference to thread object to prevent garbage collecting
-	ElementType m_lasttype;			//< last element type
-	Element m_attrvalue;			//< cached attribute value
-};
-
-
 ///\class class LuaTableInputFilter
 ///\brief Lua table as typed input filter
 class LuaTableInputFilter :public TypedInputFilter, public LuaExceptionHandlerScope

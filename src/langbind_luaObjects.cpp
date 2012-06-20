@@ -466,8 +466,7 @@ static bool get_operand_TypedInputFilter( lua_State* ls, int idx, TypedInputFilt
 					return true;
 				}
 			}
-			flt.reset( new LuaGeneratorInputFilter( ls));
-			return true;
+			/*no break here*/
 		default:
 		{
 			const char* typnam = typ>0?lua_typename( ls, typ):"NIL";

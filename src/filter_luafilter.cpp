@@ -46,15 +46,6 @@ extern "C" {
 using namespace _Wolframe;
 using namespace langbind;
 
-LuaGeneratorInputFilter::~LuaGeneratorInputFilter()
-{
-	if (m_thread)
-	{
-		lua_pop( m_ls, 2);					///...STK: func
-		luaL_unref( m_ls, LUA_REGISTRYINDEX, m_threadref);	///...allow garbage collecting of the thread
-	}
-}
-
 static bool getElementValue( lua_State* ls, int idx, TypedInputFilter::Element& element, const char*& errelemtype)
 {
 	switch (lua_type( ls, idx))
@@ -83,92 +74,6 @@ static bool getElementValue( lua_State* ls, int idx, TypedInputFilter::Element& 
 	}
 }
 
-bool LuaGeneratorInputFilter::getValue( int idx, TypedInputFilter::Element& element)
-{
-	const char* errelemtype;
-	if (!getElementValue( m_thread, idx, element, errelemtype))
-	{
-		std::ostringstream msg;
-		msg << "element type '" << (errelemtype?errelemtype:"unknown") << "' not expected for atomic value in filter";
-		setState( InputFilter::Error, msg.str().c_str());
-		return false;
-	}
-	if (element.type == TypedFilterBase::Element::bool_ && element.value.bool_ == false)
-	{
-		return false;
-	}
-	return true;
-}
-
-bool LuaGeneratorInputFilter::getNext( ElementType& type, Element& element)
-{
-	setState( InputFilter::Open);
-	if (!m_thread)
-	{
-		m_thread = lua_newthread( m_ls);			///...STK: func thd
-		lua_pushvalue( m_ls, -1);				///...STK: func thd thd
-		m_threadref = luaL_ref( m_ls, LUA_REGISTRYINDEX);	///...STK: func thd
-		lua_pushvalue( m_ls, -2);				///...STK: func thd func
-	}
-	if (m_lasttype == Attribute)
-	{
-		type = m_lasttype = Value;
-		element = m_attrvalue;
-		return true;
-	}
-	int rt = lua_resume( m_thread, NULL, 0);
-	if (rt == LUA_YIELD)
-	{
-		setState( InputFilter::EndOfMessage);
-		return false;
-	}
-	if (rt != 0)
-	{
-		const char* msg = lua_tostring( m_thread, -1);
-		setState( InputFilter::Error, msg);
-		return false;
-	}
-	if (getValue( -2, element))			//...fetch tag
-	{
-		if (state() == InputFilter::Error) return false;
-		if (getValue( -1, m_attrvalue))		//...fetch attribute value
-		{
-			type = m_lasttype = Attribute;
-			return true;
-		}
-		else
-		{
-			if (state() == InputFilter::Error) return false;
-			type = m_lasttype = OpenTag;
-			return true;
-		}
-	}
-	else
-	{
-		// no tag given:
-		if (state() == InputFilter::Error) return false;
-		if (getValue( -1, element))		//...fetch value
-		{
-			type = m_lasttype = Value;
-			return true;
-		}
-		else
-		{
-			// no tag, no value -> close tag
-			if (state() == InputFilter::Error) return false;
-			type = m_lasttype = CloseTag;
-			return true;
-		}
-	}
-}
-
-void LuaTableInputFilter::FetchState::getTagElement( TypedInputFilter::Element& element)
-{
-	element.type = Element::string_;
-	element.value.string_.ptr = tag;
-	element.value.string_.size = tagsize;
-}
-
 LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
 	:LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
@@ -178,6 +83,13 @@ LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
 	fs.tag = 0;
 	fs.tagsize = 0;
 	m_stk.push_back( fs);
+}
+
+void LuaTableInputFilter::FetchState::getTagElement( TypedInputFilter::Element& element)
+{
+	element.type = Element::string_;
+	element.value.string_.ptr = tag;
+	element.value.string_.size = tagsize;
 }
 
 bool LuaTableInputFilter::getValue( int idx, TypedFilterBase::Element& element)
