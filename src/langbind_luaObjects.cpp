@@ -55,6 +55,7 @@ using namespace langbind;
 
 namespace luaname
 {
+	static const char* Logger = "wolframe.Logger";
 	static const char* Input = "wolframe.Input";
 	static const char* Output = "wolframe.Output";
 	static const char* Filter = "wolframe.Filter";
@@ -72,6 +73,7 @@ namespace
 {
 template <class ObjectType>
 const char* metaTableName()						{return 0;}
+template <> const char* metaTableName<Logger>()				{return luaname::Logger;}
 template <> const char* metaTableName<Input>()				{return luaname::Input;}
 template <> const char* metaTableName<Output>()				{return luaname::Output;}
 template <> const char* metaTableName<Filter>()				{return luaname::Filter;}
@@ -640,22 +642,15 @@ static int function_ddlform_table( lua_State* ls)
 static int function_ddlform_fill__closure( lua_State* ls)
 {
 	LuaErrorMessage luaerr;
-	DDLFormFill* closure = (DDLFormFill*)lua_touserdata( ls, lua_upvalueindex( 1));
-	int ctx;
-	if (lua_getctx( ls, &ctx) != LUA_YIELD)
-	{
-		if (lua_gettop( ls) != 1)
-		{
-			throw std::logic_error( "internal. expected one argument for the closure of form:fill");
-		}
-		lua_pushvalue( ls, 1);	//...the argument of the filter to iterate on as top element
-	}
+	DDLFormFill* closure = (DDLFormFill*)lua_touserdata( ls, -1);
+	lua_pop( ls, 1);
 	try
 	{
 		DDLFormFill::CallResult res = closure->call();
 		switch (res)
 		{
 			case DDLFormFill::Yield:
+				lua_pushlightuserdata( ls, closure);
 				lua_yieldk( ls, 0, 1, function_ddlform_fill__closure);
 
 			case DDLFormFill::Ok:
@@ -705,10 +700,10 @@ static int function_ddlform_fill( lua_State* ls)
 			}
 		}
 		LuaObject<DDLFormFill>::push_luastack( ls, DDLFormFill( *form, inp, flags));
-		lua_pushcclosure( ls, function_ddlform_fill__closure, 1);
-		lua_pushvalue( ls, 2);		//... generator argument as first parameter
-		lua_call( ls, 1, 0);
-		return 0;
+		DDLFormFill* closure = (DDLFormFill*) lua_touserdata( ls, -1);
+		lua_pushvalue( ls, 2);				//... iterator argument
+		lua_pushlightuserdata( ls, closure);		//... pointer to form fill context
+		return function_ddlform_fill__closure( ls);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -753,22 +748,15 @@ static bool get_printop( lua_State* ls, int index, const char*& elem, std::size_
 static int function_output_print_object__closure( lua_State* ls)
 {
 	LuaErrorMessage luaerr;
-	RedirectFilterClosure* closure = (RedirectFilterClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
-	int ctx;
-	if (lua_getctx( ls, &ctx) != LUA_YIELD)
-	{
-		if (lua_gettop( ls) != 1)
-		{
-			luaL_error( ls, "internal. expected one argument for the closure of print");
-		}
-		lua_pushvalue( ls, 1);	//...the argument of the filter to iterate on as top element
-	}
+	RedirectFilterClosure* closure = (RedirectFilterClosure*)lua_touserdata( ls, -1);
+	lua_pop( ls, 1);
 	try
 	{
 		RedirectFilterClosure::CallResult res = closure->call();
 		switch (res)
 		{
 			case RedirectFilterClosure::Yield:
+				lua_pushlightuserdata( ls, closure);
 				lua_yieldk( ls, 0, 1, function_output_print_object__closure);
 
 			case RedirectFilterClosure::Ok:
@@ -830,15 +818,15 @@ static int function_output_print( lua_State* ls)
 					{
 						TypedOutputFilterR outp( new TypingOutputFilter( output->outputfilter()));
 						LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
-						lua_pushcclosure( ls, function_output_print_object__closure, 1);
-						lua_pushvalue( ls, 2);		//... generator argument as first parameter
-						lua_call( ls, 1, 0);
-						return 0;
+						RedirectFilterClosure* closure = (RedirectFilterClosure*) lua_touserdata( ls, -1);
+						lua_pushvalue( ls, 2);			//... iterator argument
+						lua_pushlightuserdata( ls, closure);	//... redirect closure object
+						return function_output_print_object__closure( ls);
 					}
 					else
 					{
 						const char* tn = lua_typename( ls, lua_type( ls, 2));
-						luaL_error( ls, "invalid type (%s) of print argument %d", tn?tn:"unknown", 1);
+						luaL_error( ls, "invalid type (%s) of output:print argument %d", tn?tn:"unknown", 1);
 					}
 				}
 				break;
@@ -1164,44 +1152,7 @@ static int function_input_get( lua_State* ls)
 	return 1;
 }
 
-static int function_yield( lua_State* ls)
-{
-	int ii,nn=lua_gettop( ls);
-	for (ii=0; ii<nn; ii++) lua_pushvalue( ls, ii);
-	return lua_yieldk( ls, ii, 1, function_yield);
-}
-
-static const luaL_Reg input_methodtable[ 3] =
-{
-	{"as",&function_input_as},
-	{"get",&function_input_get},
-	{0,0}
-};
-
-static const luaL_Reg output_methodtable[ 5] =
-{
-	{"as",&function_output_as},
-	{"print",&function_output_print},
-	{"opentag",function_output_opentag},
-	{"closetag",function_output_closetag},
-	{0,0}
-};
-
-static const luaL_Reg formfunctionresult_methodtable[ 2] =
-{
-	{"table",&function_formfunctionresult_table},
-	{0,0}
-};
-
-static const luaL_Reg ddlform_methodtable[ 4] =
-{
-	{"table",&function_ddlform_table},
-	{"fill",&function_ddlform_fill},
-	{"__tostring",&function_ddlform_tostring},
-	{0,0}
-};
-
-static int function_printlog( lua_State *ls)
+static int function_logger_print( lua_State *ls)
 {
 	/* first parameter maps to a log level, rest gets printed depending on
 	 * whether it's a string or a number
@@ -1248,6 +1199,43 @@ static int function_printlog( lua_State *ls)
 	}
 	return luaL_error( ls, luaerr.str());
 }
+
+static const luaL_Reg logger_methodtable[ 2] =
+{
+	{"print",&function_logger_print},
+	{0,0}
+};
+
+static const luaL_Reg input_methodtable[ 3] =
+{
+	{"as",&function_input_as},
+	{"get",&function_input_get},
+	{0,0}
+};
+
+static const luaL_Reg output_methodtable[ 5] =
+{
+	{"as",&function_output_as},
+	{"print",&function_output_print},
+	{"opentag",function_output_opentag},
+	{"closetag",function_output_closetag},
+	{0,0}
+};
+
+static const luaL_Reg formfunctionresult_methodtable[ 2] =
+{
+	{"table",&function_formfunctionresult_table},
+	{0,0}
+};
+
+static const luaL_Reg ddlform_methodtable[ 4] =
+{
+	{"table",&function_ddlform_table},
+	{"fill",&function_ddlform_fill},
+	{"__tostring",&function_ddlform_tostring},
+	{0,0}
+};
+
 
 LuaScript::LuaScript( const std::string& path_)
 	:m_path(path_)
@@ -1306,8 +1294,8 @@ LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
 		luaL_openlibs( m_ls);
 
 		// register logging function already here because then it can be used in the script initilization part
-		lua_pushcfunction( m_ls, &function_printlog);
-		lua_setglobal( m_ls, "printlog");
+		Logger logger_;
+		LuaObject<Logger>::createGlobal( m_ls, "logger", logger_, logger_methodtable);
 
 		// open additional libraries defined for this script
 		std::vector<LuaScript::Module>::const_iterator ii=m_script->modules().begin(), ee=m_script->modules().end();
@@ -1413,8 +1401,6 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			LuaObject<FormFunctionClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<FormFunctionResult>::createMetatable( ls, 0, 0, formfunctionresult_methodtable);
 			setGlobalSingletonPointer<GlobalContext>( ls, gc);
-			lua_pushcfunction( ls, &function_yield);
-			lua_setglobal( ls, "yield");
 			lua_pushcfunction( ls, &function_filter);
 			lua_setglobal( ls, "filter");
 			lua_pushcfunction( ls, &function_form);

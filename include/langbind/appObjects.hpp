@@ -48,6 +48,14 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+///\class Logger
+///\brief Logger as seen from scripting language binding
+///\remark Empty object because it is represented as singleton in the system
+class Logger
+{
+	int _;			//< dummy element because some bindings (Lua) do not like empty structures (objects of size 1)
+};
+
 ///\class Output
 ///\brief Output as seen from scripting language binding
 class Output

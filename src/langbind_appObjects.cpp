@@ -146,7 +146,7 @@ RedirectFilterClosure::RedirectFilterClosure()
 	,m_elemtype(InputFilter::Value){}
 
 RedirectFilterClosure::RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o)
-	:m_state(0)
+	:m_state(1)
 	,m_taglevel(0)
 	,m_inputfilter(i)
 	,m_outputfilter(o)
@@ -195,7 +195,6 @@ RedirectFilterClosure::CallResult RedirectFilterClosure::call()
 				}
 			}
 			m_state = 2;
-		case 2:
 			if (m_elemtype == InputFilter::OpenTag)
 			{
 				++m_taglevel;
@@ -209,6 +208,8 @@ RedirectFilterClosure::CallResult RedirectFilterClosure::call()
 					return Ok;
 				}
 			}
+			/*no break here!*/
+		case 2:
 			if (!m_outputfilter->print( m_elemtype, m_elem))
 			{
 				switch (m_outputfilter->state())
@@ -224,6 +225,7 @@ RedirectFilterClosure::CallResult RedirectFilterClosure::call()
 				}
 			}
 			m_state = 1;
+			continue;
 		default:
 			return Ok;
 	}

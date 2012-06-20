@@ -1,5 +1,12 @@
 #!/bin/sh
 for example in\
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UTF-8=run xml:textwolf=echo_input_generator.lua" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UTF-16LE=run xml:textwolf=echo_input_generator.lua" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UTF-16BE=run xml:textwolf=echo_input_generator.lua" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-2LE=run xml:textwolf=echo_input_generator.lua" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-2BE=run xml:textwolf=echo_input_generator.lua" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-4LE=run xml:textwolf=echo_input_generator.lua" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-4BE=run xml:textwolf=echo_input_generator.lua" \
 	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UTF-8=run xml:textwolf=formfunc_luatable_luaparse.lua" \
 	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UTF-16LE=run xml:textwolf=formfunc_luatable_luaparse.lua" \
 	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UTF-16BE=run xml:textwolf=formfunc_luatable_luaparse.lua" \
