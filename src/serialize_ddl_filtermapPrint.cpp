@@ -70,7 +70,7 @@ static bool printAtom( langbind::TypedOutputFilter& outp, Context& ctx, std::vec
 		ctx.setError( "value conversion error");
 		return false;
 	}
-	if (outp.print( langbind::OutputFilter::Value, langbind::TypedFilterBase::Element( ee.c_str(), ee.size())))
+	if (outp.print( langbind::FilterBase::Value, langbind::TypedFilterBase::Element( ee.c_str(), ee.size())))
 	{
 		stk.pop_back();
 		return true;
@@ -96,7 +96,7 @@ static bool printStruct( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 				return false;
 			}
 			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
-			if (!out.print( langbind::TypedOutputFilter::Attribute, elem))
+			if (!out.print( langbind::FilterBase::Attribute, elem))
 			{
 				ctx.setError( out.getError());
 				return false;
@@ -107,15 +107,15 @@ static bool printStruct( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 		else
 		{
 			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
-			if (!out.print( langbind::TypedOutputFilter::OpenTag, elem))
+			if (!out.print( langbind::FilterBase::OpenTag, elem))
 			{
 				ctx.setError( out.getError());
 				return false;
 			}
 
 			stk.back().state( ++idx);
-			stk.push_back( FiltermapDDLPrintState( 0, elem));		//... print close tag
-			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));	//... print element
+			stk.push_back( FiltermapDDLPrintState( langbind::FilterBase::CloseTag, elem));
+			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));
 		}
 	}
 	else
@@ -128,9 +128,7 @@ static bool printStruct( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 static bool printVector( langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
 	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
-
-	std::size_t idx = stk.back().state()/2;
-	std::size_t sdx = stk.back().state() & 1;
+	std::size_t idx = stk.back().state();
 	if (idx >= obj->nof_elements())
 	{
 		stk.pop_back();
@@ -139,23 +137,18 @@ static bool printVector( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 	ddl::StructType::Map::const_iterator itr = obj->begin()+idx;
 	if (idx >= 1)
 	{
-		if (sdx == 0)
+		if (!out.print( langbind::FilterBase::CloseTag, stk.back().tag()))
 		{
-			if (!out.print( langbind::TypedOutputFilter::CloseTag, stk.back().tag()))
-			{
-				ctx.setError( out.getError());
-				return false;
-			}
-		}
-		if (!out.print( langbind::TypedOutputFilter::OpenTag, stk.back().tag()))
-		{
-			stk.back().state( idx*2+1);
 			ctx.setError( out.getError());
 			return false;
 		}
 	}
-	stk.back().state( (idx+1)*2);
+	stk.back().state( idx+1);
 	stk.push_back( FiltermapDDLPrintState( &itr->second, stk.back().tag()));	//... print element
+	if (idx >= 1)
+	{
+		stk.push_back( FiltermapDDLPrintState( langbind::FilterBase::OpenTag, stk.back().tag()));
+	}
 	return true;
 }
 
@@ -163,7 +156,7 @@ static bool printObject( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 {
 	if (!stk.back().value())
 	{
-		if (!out.print( langbind::TypedOutputFilter::CloseTag, stk.back().tag()))
+		if (!out.print( stk.back().type(), stk.back().tag()))
 		{
 			ctx.setError( out.getError());
 			return false;

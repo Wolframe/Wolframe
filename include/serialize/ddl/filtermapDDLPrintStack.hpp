@@ -50,13 +50,22 @@ public:
 	FiltermapDDLPrintState( const FiltermapDDLPrintState& o)
 		:m_value(o.m_value)
 		,m_stateidx(o.m_stateidx)
+		,m_elemtype(o.m_elemtype)
 		,m_tag(o.m_tag)
 		{}
 
 	FiltermapDDLPrintState( const ddl::StructType* v, const langbind::TypedFilterBase::Element& t)
 		:m_value(v)
 		,m_stateidx(0)
+		,m_elemtype(langbind::FilterBase::Value)
 		,m_tag(t)
+		{}
+
+	FiltermapDDLPrintState( langbind::FilterBase::ElementType typ, const langbind::TypedFilterBase::Element& elem)
+		:m_value(0)
+		,m_stateidx(0)
+		,m_elemtype(typ)
+		,m_tag(elem)
 		{}
 
 	const ddl::StructType* value() const
@@ -74,6 +83,11 @@ public:
 		m_stateidx = idx;
 	}
 
+	langbind::FilterBase::ElementType type() const
+	{
+		return m_elemtype;
+	}
+
 	const langbind::TypedFilterBase::Element& tag() const
 	{
 		return m_tag;
@@ -82,6 +96,7 @@ public:
 private:
 	const ddl::StructType* m_value;
 	std::size_t m_stateidx;
+	langbind::FilterBase::ElementType m_elemtype;
 	langbind::TypedFilterBase::Element m_tag;
 };
 

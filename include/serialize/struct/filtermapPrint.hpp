@@ -64,6 +64,17 @@ static bool printCloseTag( langbind::TypedOutputFilter& out, Context& ctx, Filte
 	return true;
 }
 
+static bool printOpenTag( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+{
+	if (!out.print( langbind::TypedOutputFilter::OpenTag, stk.back().name()))
+	{
+		ctx.setError( out.getError());
+		return false;
+	}
+	stk.pop_back();
+	return true;
+}
+
 template <typename T>
 static bool printObject_( const traits::struct_&, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
 {
@@ -135,34 +146,28 @@ static bool printObject_( const traits::vector_&, langbind::TypedOutputFilter& o
 	typedef typename T::value_type Element;
 	std::vector<Element>* obj = (T*)stk.back().value();
 
-	std::size_t idx = stk.back().state()/2;
-	std::size_t sdx = stk.back().state() & 1;
+	std::size_t idx = stk.back().state();
 	if (idx >= obj->size())
 	{
 		stk.pop_back();
 		return true;
 	}
+	const char* tagname = (const char*)stk.at( stk.size()-2).value();
 	if (idx >= 1)
 	{
-		langbind::TypedInputFilter::Element tag( (const char*)stk.at( stk.size()-2).value());
-		if (sdx == 0)
+		if (!out.print( langbind::TypedOutputFilter::CloseTag, tagname))
 		{
-			if (!out.print( langbind::TypedOutputFilter::CloseTag, tag))
-			{
-				ctx.setError( out.getError());
-				return false;
-			}
-		}
-		if (!out.print( langbind::TypedOutputFilter::OpenTag, tag))
-		{
-			stk.back().state( idx*2+1);
 			ctx.setError( out.getError());
 			return false;
 		}
 	}
-	stk.back().state( (idx+1)*2);
+	stk.back().state( idx+1);
 	Element* ve = &(*obj)[ idx];
 	stk.push_back( FiltermapPrintState( stk.back().name(), &FiltermapIntrusivePrinter<Element>::print, ve));
+	if (idx >= 1)
+	{
+		stk.push_back( FiltermapPrintState( tagname, &printOpenTag, tagname));
+	}
 	return true;
 }
 
