@@ -35,8 +35,7 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
 #include <string>
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
+#include "filter/typedfilter.hpp"
 
 namespace _Wolframe {
 namespace serialize {
@@ -44,6 +43,11 @@ namespace serialize {
 class Context
 {
 public:
+	struct ElementBuffer
+	{
+		langbind::FilterBase::ElementType m_type;
+		langbind::TypedFilterBase::Element m_value;
+	};
 	enum Flags
 	{
 		None=0x00,
@@ -64,10 +68,44 @@ public:
 	void setError( const char* msg, const std::string& p)		{return setError( msg, p.c_str());}
 
 	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
+
+	void setElem( const ElementBuffer& e)
+	{
+		m_elem = e;
+		m_has_elem = true;
+	}
+
+	void setElem( langbind::FilterBase::ElementType t)
+	{
+		m_elem.m_type = t;
+		m_elem.m_value = langbind::TypedFilterBase::Element();
+		m_has_elem = true;
+	}
+
+	void setElem( langbind::FilterBase::ElementType t, langbind::TypedFilterBase::Element v)
+	{
+		m_elem.m_type = t;
+		m_elem.m_value = v;
+		m_has_elem = true;
+	}
+
+	bool getElem( ElementBuffer& e)
+	{
+		if (m_has_elem)
+		{
+			m_has_elem = false;
+			e = m_elem;
+			return true;
+		}
+		return false;
+	}
+
 private:
 	char m_tag[ 128];
 	char m_lasterror[ 256];
 	Flags m_flags;
+	ElementBuffer m_elem;
+	bool m_has_elem;
 };
 
 

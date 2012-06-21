@@ -46,7 +46,7 @@ namespace serialize {
 class FiltermapPrintState
 {
 public:
-	typedef bool (*Print)( langbind::TypedOutputFilter& inp, Context& ctx, std::vector<FiltermapPrintState>& stk);
+	typedef bool (*Print)( Context& ctx, std::vector<FiltermapPrintState>& stk);
 
 public:
 	FiltermapPrintState( const FiltermapPrintState& o)

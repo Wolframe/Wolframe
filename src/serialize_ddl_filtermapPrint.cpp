@@ -40,7 +40,7 @@ using namespace _Wolframe;
 using namespace serialize;
 
 // forward declaration
-static bool printObject( langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk);
+static bool printObject( Context& ctx, std::vector<FiltermapDDLPrintState>& stk);
 
 static std::string getPrintPath( const FiltermapDDLPrintStateStack& stk)
 {
@@ -61,7 +61,7 @@ static std::string getPrintPath( const FiltermapDDLPrintStateStack& stk)
 	return rt;
 }
 
-static bool printAtom( langbind::TypedOutputFilter& outp, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool printAtom( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
 	const ddl::AtomicType* val = &stk.back().value()->value();
 	std::string ee;
@@ -70,19 +70,13 @@ static bool printAtom( langbind::TypedOutputFilter& outp, Context& ctx, std::vec
 		ctx.setError( "value conversion error");
 		return false;
 	}
-	if (outp.print( langbind::FilterBase::Value, langbind::TypedFilterBase::Element( ee.c_str(), ee.size())))
-	{
-		stk.pop_back();
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	ctx.setElem( langbind::FilterBase::Value, langbind::TypedFilterBase::Element( ee.c_str(), ee.size()));
+	return true;
 }
 
-static bool printStruct( langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool printStruct( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
+	bool rt = false;
 	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
 	std::size_t idx = stk.back().state();
 	if (idx < obj->nof_elements())
@@ -96,37 +90,31 @@ static bool printStruct( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 				return false;
 			}
 			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
-			if (!out.print( langbind::FilterBase::Attribute, elem))
-			{
-				ctx.setError( out.getError());
-				return false;
-			}
+			ctx.setElem( langbind::FilterBase::Attribute, elem);
 			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));
 			stk.back().state( ++idx);
+			rt = true;
 		}
 		else
 		{
 			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
-			if (!out.print( langbind::FilterBase::OpenTag, elem))
-			{
-				ctx.setError( out.getError());
-				return false;
-			}
-
+			ctx.setElem( langbind::FilterBase::OpenTag, elem);
 			stk.back().state( ++idx);
 			stk.push_back( FiltermapDDLPrintState( langbind::FilterBase::CloseTag, elem));
 			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));
+			rt = true;
 		}
 	}
 	else
 	{
 		stk.pop_back();
 	}
-	return true;
+	return rt;
 }
 
-static bool printVector( langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool printVector( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
+	bool rt = false;
 	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
 	std::size_t idx = stk.back().state();
 	if (idx >= obj->nof_elements())
@@ -137,11 +125,8 @@ static bool printVector( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 	ddl::StructType::Map::const_iterator itr = obj->begin()+idx;
 	if (idx >= 1)
 	{
-		if (!out.print( langbind::FilterBase::CloseTag, stk.back().tag()))
-		{
-			ctx.setError( out.getError());
-			return false;
-		}
+		ctx.setElem( langbind::FilterBase::CloseTag, stk.back().tag());
+		rt = true;
 	}
 	stk.back().state( idx+1);
 	stk.push_back( FiltermapDDLPrintState( &itr->second, stk.back().tag()));	//... print element
@@ -149,18 +134,14 @@ static bool printVector( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 	{
 		stk.push_back( FiltermapDDLPrintState( langbind::FilterBase::OpenTag, stk.back().tag()));
 	}
-	return true;
+	return rt;
 }
 
-static bool printObject( langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool printObject( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
 	if (!stk.back().value())
 	{
-		if (!out.print( stk.back().type(), stk.back().tag()))
-		{
-			ctx.setError( out.getError());
-			return false;
-		}
+		ctx.setElem( stk.back().type(), stk.back().tag());
 		stk.pop_back();
 		return true;
 	}
@@ -168,15 +149,15 @@ static bool printObject( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 	{
 		case ddl::StructType::Atomic:
 		{
-			return printAtom( out, ctx, stk);
+			return printAtom( ctx, stk);
 		}
 		case ddl::StructType::Vector:
 		{
-			return printVector( out, ctx, stk);
+			return printVector( ctx, stk);
 		}
 		case ddl::StructType::Struct:
 		{
-			return printStruct( out, ctx, stk);
+			return printStruct( ctx, stk);
 		}
 	}
 	ctx.setError( "illegal state in print DDL form");
@@ -185,32 +166,46 @@ static bool printObject( langbind::TypedOutputFilter& out, Context& ctx, std::ve
 
 bool _Wolframe::serialize::print( const ddl::StructType& st, langbind::TypedOutputFilter& tout, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
-	langbind::TypedFilterBase::Element elem;
-	bool rt = true;
 	try
 	{
 		if (stk.size() == 0)
 		{
-			stk.push_back( FiltermapDDLPrintState( &st, elem));
+			stk.push_back( FiltermapDDLPrintState( &st, langbind::TypedFilterBase::Element()));
 		}
-		while (rt && stk.size())
+		while (stk.size())
 		{
-			rt = printObject( tout, ctx, stk);
-		}
-		if (!rt && ctx.getLastError())
-		{
-			std::string path = getPrintPath( stk);
-			ctx.setTag( path.c_str());
+			Context::ElementBuffer elem;
+			if (ctx.getElem( elem))
+			{
+				if (!tout.print( elem.m_type, elem.m_value))
+				{
+					if (tout.getError())
+					{
+						ctx.setError( tout.getError());
+						std::string path = getPrintPath( stk);
+						ctx.setTag( path.c_str());
+					}
+					ctx.setElem( elem);
+					return false;
+				}
+			}
+			if (!printObject( ctx, stk))
+			{
+				if (ctx.getLastError())
+				{
+					std::string path = getPrintPath( stk);
+					ctx.setTag( path.c_str());
+					return false;
+				}
+			}
 		}
 	}
 	catch (std::exception& e)
 	{
 		ctx.setError( e.what());
-		rt = false;
+		return false;
 	}
-	return rt;
+	return true;
 }
-
-
 
 

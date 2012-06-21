@@ -103,7 +103,6 @@ bool FiltermapDescriptionBase::parse( void* obj, langbind::TypedInputFilter& tin
 
 bool FiltermapDescriptionBase::print( const void* obj, langbind::TypedOutputFilter& tout, Context& ctx, FiltermapPrintStateStack& stk) const
 {
-	bool rt = true;
 	try
 	{
 		if (stk.size() == 0)
@@ -111,25 +110,39 @@ bool FiltermapDescriptionBase::print( const void* obj, langbind::TypedOutputFilt
 			if (!m_print) throw std::runtime_error( "null printer called");
 			stk.push_back( FiltermapPrintState( 0, m_print, obj));
 		}
-		while (rt && stk.size())
+		while (stk.size())
 		{
-			rt = stk.back().print()( tout, ctx, stk);
-		}
-		if (tout.state() == langbind::OutputFilter::Open && !ctx.getLastError() && stk.size() == 1)
-		{
-			return true;
-		}
-		if (!rt && ctx.getLastError())
-		{
-			std::string path = getPrintPath( stk);
-			ctx.setTag( path.c_str());
+			Context::ElementBuffer elem;
+			if (ctx.getElem( elem))
+			{
+				if (!tout.print( elem.m_type, elem.m_value))
+				{
+					if (tout.getError())
+					{
+						ctx.setError( tout.getError());
+						std::string path = getPrintPath( stk);
+						ctx.setTag( path.c_str());
+					}
+					ctx.setElem( elem);
+					return false;
+				}
+			}
+			if (!stk.back().print()( ctx, stk))
+			{
+				if (ctx.getLastError())
+				{
+					std::string path = getPrintPath( stk);
+					ctx.setTag( path.c_str());
+					return false;
+				}
+			}
 		}
 	}
 	catch (std::exception& e)
 	{
 		ctx.setError( e.what());
-		rt = false;
+		return false;
 	}
-	return rt;
+	return true;
 }
 

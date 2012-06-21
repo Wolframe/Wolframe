@@ -50,34 +50,29 @@ namespace serialize {
 template <typename T>
 struct FiltermapIntrusivePrinter
 {
-	static bool print( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk);
+	static bool print( Context& ctx, FiltermapPrintStateStack& stk);
 };
 
-static bool printCloseTag( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+static bool printCloseTag( Context& ctx, FiltermapPrintStateStack& stk)
 {
-	if (!out.print( langbind::TypedOutputFilter::CloseTag, langbind::TypedFilterBase::Element()))
-	{
-		ctx.setError( out.getError());
-		return false;
-	}
+	ctx.setElem(langbind::FilterBase::CloseTag);
 	stk.pop_back();
 	return true;
 }
 
-static bool printOpenTag( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+static bool printOpenTag( Context& ctx, FiltermapPrintStateStack& stk)
 {
-	if (!out.print( langbind::TypedOutputFilter::OpenTag, stk.back().name()))
-	{
-		ctx.setError( out.getError());
-		return false;
-	}
+	ctx.setElem(
+		langbind::FilterBase::OpenTag,
+		langbind::TypedFilterBase::Element( stk.back().name()));
 	stk.pop_back();
 	return true;
 }
 
 template <typename T>
-static bool printObject_( const traits::struct_&, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+static bool printObject_( const traits::struct_&, Context& ctx, FiltermapPrintStateStack& stk)
 {
+	bool rt = false;
 	const void* obj = stk.back().value();
 
 	static const FiltermapDescriptionBase* descr = T::getFiltermapDescription();
@@ -93,89 +88,78 @@ static bool printObject_( const traits::struct_&, langbind::TypedOutputFilter& o
 				ctx.setError( "atomic value expected for attribute");
 				return false;
 			}
-			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
-			if (!out.print( langbind::TypedOutputFilter::Attribute, elem))
-			{
-				ctx.setError( out.getError());
-				return false;
-			}
+			ctx.setElem(
+				langbind::FilterBase::Attribute,
+				langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
 			stk.back().state( idx+1);
 			stk.push_back( FiltermapPrintState( itr->first.c_str(), itr->second.print(), (char*)obj + itr->second.ofs()));
+			rt = true;
 		}
 		else
 		{
-			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
-			if (!out.print( langbind::TypedOutputFilter::OpenTag, elem))
-			{
-				ctx.setError( out.getError());
-				return false;
-			}
+			ctx.setElem(
+				langbind::FilterBase::OpenTag,
+				langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
 			stk.back().state( idx+1);
 			stk.push_back( FiltermapPrintState( 0, &printCloseTag, itr->first.c_str()));
 			stk.push_back( FiltermapPrintState( itr->first.c_str(), itr->second.print(), (char*)obj + itr->second.ofs()));
+			rt = true;
 		}
 	}
 	else
 	{
 		stk.pop_back();
 	}
-	return true;
+	return rt;
 }
 
 template <typename T>
-static bool printObject_( const traits::atomic_&, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+static bool printObject_( const traits::atomic_&, Context& ctx, FiltermapPrintStateStack& stk)
 {
-	langbind::TypedInputFilter::Element element;
-	if (!traits::printValue( *(T*)stk.back().value(), element))
+	Context::ElementBuffer elem;
+	elem.m_type = langbind::FilterBase::Value;
+	if (!traits::printValue( *(T*)stk.back().value(), elem.m_value))
 	{
 		ctx.setError( "atomic value conversion error");
 		return false;
 	}
-	if (!out.print( langbind::TypedOutputFilter::Value, element))
-	{
-		ctx.setError( out.getError());
-		return false;
-	}
+	ctx.setElem( elem);
 	stk.pop_back();
 	return true;
 }
 
 template <typename T>
-static bool printObject_( const traits::vector_&, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+static bool printObject_( const traits::vector_&, Context& ctx, FiltermapPrintStateStack& stk)
 {
-	typedef typename T::value_type Element;
-	std::vector<Element>* obj = (T*)stk.back().value();
-
+	bool rt = false;
+	std::vector<typename T::value_type>* obj = (T*)stk.back().value();
 	std::size_t idx = stk.back().state();
 	if (idx >= obj->size())
 	{
 		stk.pop_back();
-		return true;
+		return rt;
 	}
 	const char* tagname = (const char*)stk.at( stk.size()-2).value();
 	if (idx >= 1)
 	{
-		if (!out.print( langbind::TypedOutputFilter::CloseTag, tagname))
-		{
-			ctx.setError( out.getError());
-			return false;
-		}
+		ctx.setElem( langbind::FilterBase::CloseTag);
+		rt = true;
 	}
 	stk.back().state( idx+1);
-	Element* ve = &(*obj)[ idx];
-	stk.push_back( FiltermapPrintState( stk.back().name(), &FiltermapIntrusivePrinter<Element>::print, ve));
+	typename T::value_type* ve = &(*obj)[ idx];
+	stk.push_back( FiltermapPrintState( stk.back().name(), &FiltermapIntrusivePrinter<typename T::value_type>::print, ve));
 	if (idx >= 1)
 	{
 		stk.push_back( FiltermapPrintState( tagname, &printOpenTag, tagname));
 	}
-	return true;
+	return rt;
 }
 
 template <typename T>
-bool FiltermapIntrusivePrinter<T>::print( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk)
+bool FiltermapIntrusivePrinter<T>::print( Context& ctx, FiltermapPrintStateStack& stk)
 {
 	static T* t = 0;
-	return printObject_<T>( traits::getFiltermapCategory(*t), out, ctx, stk);
+	return printObject_<T>( traits::getFiltermapCategory(*t), ctx, stk);
 }
 
 }}//namespace

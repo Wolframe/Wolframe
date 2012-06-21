@@ -44,6 +44,12 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
+struct FiltermapDDLIteratorElement
+{
+	langbind::FilterBase::ElementType m_type;
+	langbind::TypedFilterBase::Element m_value;
+};
+
 class FiltermapDDLPrintState
 {
 public:

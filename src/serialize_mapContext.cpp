@@ -41,6 +41,7 @@ using namespace serialize;
 
 Context::Context( Flags f)
 	:m_flags(f)
+	,m_has_elem(false)
 {
 	m_lasterror[0] = 0;
 	m_tag[0] = 0;
@@ -48,6 +49,7 @@ Context::Context( Flags f)
 
 Context::Context( const Context& o)
 	:m_flags(o.m_flags)
+	,m_has_elem(o.m_has_elem)
 {
 	std::memcpy( m_lasterror, o.m_lasterror, sizeof(m_lasterror));
 	std::memcpy( m_tag, o.m_tag, sizeof(m_tag));
@@ -65,6 +67,7 @@ bool Context::getFlag( const char* name, Flags& flg)
 
 void Context::clear()
 {
+	m_has_elem = false;
 	m_lasterror[0] = 0;
 	m_tag[0] = 0;
 }

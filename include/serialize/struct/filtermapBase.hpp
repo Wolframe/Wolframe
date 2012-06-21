@@ -59,7 +59,7 @@ public:
 
 	typedef std::vector<std::pair<std::string,FiltermapDescriptionBase> > Map;
 	typedef bool (*Parse)( langbind::TypedInputFilter& flt, Context& ctx, FiltermapParseStateStack& stk);
-	typedef bool (*Print)( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk);
+	typedef bool (*Print)( Context& ctx, FiltermapPrintStateStack& stk);
 	typedef bool (*Constructor)( void* obj);
 	typedef void (*Destructor)( void* obj);
 
