@@ -29,14 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapPrint.hpp
-///\brief Defines the intrusive implementation of the printing part of serialization of filters
-#ifndef _Wolframe_SERLIALIZE_STRUCT_FILTERMAP_PRINT_HPP_INCLUDED
-#define _Wolframe_SERLIALIZE_STRUCT_FILTERMAP_PRINT_HPP_INCLUDED
+///\file serialize/struct/filtermapSerialize.hpp
+///\brief Defines the intrusive implementation of the serialization of structures
+#ifndef _Wolframe_SERLIALIZE_STRUCT_FILTERMAP_SERIALIZE_HPP_INCLUDED
+#define _Wolframe_SERLIALIZE_STRUCT_FILTERMAP_SERIALIZE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "serialize/struct/filtermapTraits.hpp"
 #include "serialize/struct/filtermapBase.hpp"
-#include "serialize/struct/filtermapPrintStack.hpp"
+#include "serialize/struct/filtermapSerializeStack.hpp"
 #include "serialize/struct/filtermapPrintValue.hpp"
 #include <stdexcept>
 #include <string>
@@ -48,19 +48,19 @@ namespace serialize {
 
 // forward declaration
 template <typename T>
-struct FiltermapIntrusivePrinter
+struct FiltermapIntrusiveSerializer
 {
-	static bool print( Context& ctx, FiltermapPrintStateStack& stk);
+	static bool fetch( Context& ctx, FiltermapSerializeStateStack& stk);
 };
 
-static bool printCloseTag( Context& ctx, FiltermapPrintStateStack& stk)
+static bool fetchCloseTag( Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	ctx.setElem(langbind::FilterBase::CloseTag);
 	stk.pop_back();
 	return true;
 }
 
-static bool printOpenTag( Context& ctx, FiltermapPrintStateStack& stk)
+static bool fetchOpenTag( Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	ctx.setElem(
 		langbind::FilterBase::OpenTag,
@@ -70,7 +70,7 @@ static bool printOpenTag( Context& ctx, FiltermapPrintStateStack& stk)
 }
 
 template <typename T>
-static bool printObject_( const traits::struct_&, Context& ctx, FiltermapPrintStateStack& stk)
+static bool fetchObject_( const traits::struct_&, Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	bool rt = false;
 	const void* obj = stk.back().value();
@@ -92,7 +92,7 @@ static bool printObject_( const traits::struct_&, Context& ctx, FiltermapPrintSt
 				langbind::FilterBase::Attribute,
 				langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapPrintState( itr->first.c_str(), itr->second.print(), (char*)obj + itr->second.ofs()));
+			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (char*)obj + itr->second.ofs()));
 			rt = true;
 		}
 		else
@@ -101,8 +101,8 @@ static bool printObject_( const traits::struct_&, Context& ctx, FiltermapPrintSt
 				langbind::FilterBase::OpenTag,
 				langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapPrintState( 0, &printCloseTag, itr->first.c_str()));
-			stk.push_back( FiltermapPrintState( itr->first.c_str(), itr->second.print(), (char*)obj + itr->second.ofs()));
+			stk.push_back( FiltermapSerializeState( 0, &fetchCloseTag, itr->first.c_str()));
+			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (char*)obj + itr->second.ofs()));
 			rt = true;
 		}
 	}
@@ -114,7 +114,7 @@ static bool printObject_( const traits::struct_&, Context& ctx, FiltermapPrintSt
 }
 
 template <typename T>
-static bool printObject_( const traits::atomic_&, Context& ctx, FiltermapPrintStateStack& stk)
+static bool fetchObject_( const traits::atomic_&, Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	Context::ElementBuffer elem;
 	elem.m_type = langbind::FilterBase::Value;
@@ -129,7 +129,7 @@ static bool printObject_( const traits::atomic_&, Context& ctx, FiltermapPrintSt
 }
 
 template <typename T>
-static bool printObject_( const traits::vector_&, Context& ctx, FiltermapPrintStateStack& stk)
+static bool fetchObject_( const traits::vector_&, Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	bool rt = false;
 	std::vector<typename T::value_type>* obj = (T*)stk.back().value();
@@ -147,19 +147,19 @@ static bool printObject_( const traits::vector_&, Context& ctx, FiltermapPrintSt
 	}
 	stk.back().state( idx+1);
 	typename T::value_type* ve = &(*obj)[ idx];
-	stk.push_back( FiltermapPrintState( stk.back().name(), &FiltermapIntrusivePrinter<typename T::value_type>::print, ve));
+	stk.push_back( FiltermapSerializeState( stk.back().name(), &FiltermapIntrusiveSerializer<typename T::value_type>::fetch, ve));
 	if (idx >= 1)
 	{
-		stk.push_back( FiltermapPrintState( tagname, &printOpenTag, tagname));
+		stk.push_back( FiltermapSerializeState( tagname, &fetchOpenTag, tagname));
 	}
 	return rt;
 }
 
 template <typename T>
-bool FiltermapIntrusivePrinter<T>::print( Context& ctx, FiltermapPrintStateStack& stk)
+bool FiltermapIntrusiveSerializer<T>::fetch( Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	static T* t = 0;
-	return printObject_<T>( traits::getFiltermapCategory(*t), ctx, stk);
+	return fetchObject_<T>( traits::getFiltermapCategory(*t), ctx, stk);
 }
 
 }}//namespace

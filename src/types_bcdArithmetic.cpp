@@ -282,7 +282,7 @@ void BigBCD::digits_subtraction( BigBCD& rt, BigBCD& this_, const BigBCD& opr)
 #if USE_OWN_INCREMENT
 		if (carry) rt.m_ar[ ii] = decrement( res);
 #else
-		rt.m_ar[ ii] = sub( rt.m_ar[ ii], carry);
+		rt.m_ar[ ii] = sub( res, carry);
 #endif
 	}
 	if (carry)

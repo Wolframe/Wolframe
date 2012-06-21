@@ -44,7 +44,7 @@ StructSerializer::StructSerializer( const void* obj, const FiltermapDescriptionB
 	,m_descr(descr)
 	,m_ctx(flags)
 {
-	m_stk.push_back( FiltermapPrintState( 0, m_descr->print(), m_obj));
+	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_obj));
 }
 
 StructSerializer::StructSerializer( const StructSerializer& o)
@@ -57,7 +57,7 @@ void StructSerializer::init()
 {
 	m_ctx.clear();
 	m_stk.clear();
-	m_stk.push_back( FiltermapPrintState( 0, m_descr->print(), m_obj));
+	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_obj));
 }
 
 static std::string getParsePath( const FiltermapParseStateStack& stk)
@@ -75,10 +75,10 @@ static std::string getParsePath( const FiltermapParseStateStack& stk)
 	return rt;
 }
 
-static std::string getPrintPath( const FiltermapPrintStateStack& stk)
+static std::string getElementPath( const FiltermapSerializeStateStack& stk)
 {
 	std::string rt;
-	FiltermapPrintStateStack::const_iterator itr=stk.begin(), end=stk.end();
+	FiltermapSerializeStateStack::const_iterator itr=stk.begin(), end=stk.end();
 	for (; itr != end; ++itr)
 	{
 		if (itr->name())
@@ -136,7 +136,7 @@ StructSerializer::CallResult StructSerializer::print( langbind::TypedOutputFilte
 					if (out.getError())
 					{
 						m_ctx.setError( out.getError());
-						std::string path = getPrintPath( m_stk);
+						std::string path = getElementPath( m_stk);
 						m_ctx.setTag( path.c_str());
 						m_ctx.setElem( elem);
 						return Error;
@@ -145,11 +145,11 @@ StructSerializer::CallResult StructSerializer::print( langbind::TypedOutputFilte
 					return Yield;
 				}
 			}
-			if (!m_stk.back().print()( m_ctx, m_stk))
+			if (!m_stk.back().fetch()( m_ctx, m_stk))
 			{
 				if (m_ctx.getLastError())
 				{
-					std::string path = getPrintPath( m_stk);
+					std::string path = getElementPath( m_stk);
 					m_ctx.setTag( path.c_str());
 					return Error;
 				}
@@ -173,11 +173,11 @@ bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, langbin
 		Context::ElementBuffer elem;
 		while (!m_ctx.getElem( elem))
 		{
-			if (!m_stk.back().print()( m_ctx, m_stk))
+			if (!m_stk.back().fetch()( m_ctx, m_stk))
 			{
 				if (m_ctx.getLastError())
 				{
-					std::string path = getPrintPath( m_stk);
+					std::string path = getElementPath( m_stk);
 					m_ctx.setTag( path.c_str());
 					return false;
 				}

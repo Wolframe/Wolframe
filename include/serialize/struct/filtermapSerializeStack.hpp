@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapPrintStack.hpp
+///\file serialize/struct/filtermapSerializeStack.hpp
 ///\brief Defines the Parsing STM for serialization for filters
 
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_STACK_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_STACK_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
 #include <vector>
@@ -43,21 +43,21 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-class FiltermapPrintState
+class FiltermapSerializeState
 {
 public:
-	typedef bool (*Print)( Context& ctx, std::vector<FiltermapPrintState>& stk);
+	typedef bool (*Fetch)( Context& ctx, std::vector<FiltermapSerializeState>& stk);
 
 public:
-	FiltermapPrintState( const FiltermapPrintState& o)
-		:m_print(o.m_print)
+	FiltermapSerializeState( const FiltermapSerializeState& o)
+		:m_fetch(o.m_fetch)
 		,m_value(o.m_value)
 		,m_name(o.m_name)
 		,m_stateidx(o.m_stateidx)
 		{}
 
-	FiltermapPrintState( const char* name_, Print p, const void* v)
-		:m_print(p)
+	FiltermapSerializeState( const char* name_, Fetch p, const void* v)
+		:m_fetch(p)
 		,m_value(v)
 		,m_name(name_)
 		,m_stateidx(0)
@@ -73,9 +73,9 @@ public:
 		return m_name;
 	}
 
-	Print print() const
+	Fetch fetch() const
 	{
-		return m_print;
+		return m_fetch;
 	}
 
 	std::size_t state() const
@@ -89,13 +89,13 @@ public:
 	}
 
 private:
-	Print m_print;
+	Fetch m_fetch;
 	const void* m_value;
 	const char* m_name;
 	std::size_t m_stateidx;
 };
 
-typedef std::vector<FiltermapPrintState> FiltermapPrintStateStack;
+typedef std::vector<FiltermapSerializeState> FiltermapSerializeStateStack;
 
 }}//namespace
 #endif

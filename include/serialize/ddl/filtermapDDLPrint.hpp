@@ -43,7 +43,47 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-bool print( const ddl::StructType& st, langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk);
+class DDLStructSerializer
+{
+public:
+	DDLStructSerializer( const ddl::StructType& st, Context::Flags flags=Context::None)
+		:m_st(&st)
+		,m_ctx(flags)
+	{
+		m_stk.push_back( FiltermapDDLPrintState( &st, langbind::TypedFilterBase::Element()));
+	}
+
+	DDLStructSerializer( const DDLStructSerializer& o)
+		:m_ctx(o.m_ctx)
+		,m_stk(o.m_stk){}
+
+	void init()
+	{
+		m_ctx.clear();
+		m_stk.clear();
+		m_stk.push_back( FiltermapDDLPrintState( m_st, langbind::TypedFilterBase::Element()));
+	}
+
+	enum CallResult
+	{
+		Ok,
+		Error,
+		Yield
+	};
+
+	CallResult print( langbind::TypedOutputFilter& out);
+
+	bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
+
+	const char* getLastError() const			{return m_ctx.getLastError();}
+	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+
+private:
+	const ddl::StructType* m_st;
+	Context m_ctx;
+	FiltermapDDLPrintStateStack m_stk;
+	int hugo;
+};
 
 }}//namespace
 #endif
