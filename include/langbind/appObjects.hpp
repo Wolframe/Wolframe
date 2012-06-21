@@ -37,8 +37,8 @@ Project Wolframe.
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
-#include "serialize/ddl/filtermapDDLPrintStack.hpp"
-#include "serialize/ddl/filtermapDDLParseStack.hpp"
+#include "serialize/ddl/filtermapDDLPrint.hpp"
+#include "serialize/ddl/filtermapDDLParse.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include <stack>
 #include <string>
@@ -318,10 +318,10 @@ public:
 	~DDLFormPrint(){}
 
 	///\brief Get the last error as string
-	const char* getLastError() const			{return m_ctx.getLastError();}
+	const char* getLastError() const			{return m_ser.getLastError();}
 
 	///\brief Get the last error position as string
-	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+	const char* getLastErrorPos() const			{return m_ser.getLastErrorPos();}
 
 	///\enum CallResult
 	///\brief Enumeration of call states of the fetch processing
@@ -343,8 +343,7 @@ private:
 	DDLFormR m_form;
 	int m_state;
 	TypedOutputFilterR m_outputfilter;
-	serialize::Context m_ctx;
-	serialize::FiltermapDDLPrintStateStack m_printstk;
+	serialize::DDLStructSerializer m_ser;
 };
 
 ///\class DDLFormMap
@@ -407,10 +406,10 @@ public:
 	~FormFunctionResult();
 
 	///\brief Get the last error as string
-	const char* getLastError() const			{return m_ctx.getLastError();}
+	const char* getLastError() const			{return m_ser.getLastError();}
 
 	///\brief Get the last error position as string
-	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+	const char* getLastErrorPos() const			{return m_ser.getLastErrorPos();}
 
 	///\enum CallResult
 	///\brief Enumeration of call states of the fetch processing
@@ -437,8 +436,7 @@ private:
 	int m_state;
 	boost::shared_ptr<void> m_data;
 	TypedOutputFilterR m_outputfilter;
-	serialize::Context m_ctx;
-	serialize::FiltermapPrintStateStack m_printstk;
+	serialize::StructSerializer m_ser;
 };
 
 ///\class FormFunctionClosure

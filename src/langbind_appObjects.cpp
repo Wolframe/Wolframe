@@ -235,9 +235,8 @@ RedirectFilterClosure::CallResult RedirectFilterClosure::call()
 std::string DDLForm::tostring() const
 {
 	ToStringFilter out;
-	serialize::Context ctx;
-	serialize::FiltermapDDLPrintStateStack stk;
-	if (!serialize::print( m_structure, out, ctx, stk))
+	serialize::DDLStructSerializer ser( m_structure);
+	if (ser.print( out) != serialize::DDLStructSerializer::Ok)
 	{
 		if (out.state() == OutputFilter::EndOfBuffer)
 		{
@@ -245,7 +244,7 @@ std::string DDLForm::tostring() const
 		}
 		else
 		{
-			throw std::runtime_error( ctx.getLastError());
+			throw std::runtime_error( ser.getLastError());
 		}
 	}
 	return out.content();
@@ -318,26 +317,24 @@ DDLFormFill::CallResult DDLFormFill::call()
 DDLFormPrint::DDLFormPrint( const DDLFormR& f, serialize::Context::Flags flags)
 	:m_form(f)
 	,m_state(0)
-	,m_ctx(flags){}
+	,m_ser( m_form->structure(), flags){}
 
 DDLFormPrint::DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp, serialize::Context::Flags flags)
 	:m_form(f)
 	,m_state(1)
 	,m_outputfilter(outp)
-	,m_ctx(flags){}
+	,m_ser(m_form->structure(), flags){}
 
 DDLFormPrint::DDLFormPrint( const DDLFormPrint& o)
 	:m_form(o.m_form)
 	,m_state(o.m_state)
 	,m_outputfilter(o.m_outputfilter)
-	,m_ctx(o.m_ctx)
-	,m_printstk(o.m_printstk){}
+	,m_ser(o.m_ser){}
 
 void DDLFormPrint::init( const TypedOutputFilterR& o)
 {
 	m_outputfilter = o;
-	m_ctx.clear();
-	m_printstk.clear();
+	m_ser.init();
 	m_state = 1;
 }
 
@@ -345,35 +342,25 @@ DDLFormPrint::CallResult DDLFormPrint::fetch()
 {
 	if (m_state == 0) return Error;
 	if (m_state == 2) return Ok;
-	if (!m_outputfilter.get())
-	{
-		m_ctx.setError( "no output filter defined for fetching the form iterator");
-		return Error;
-	}
 	if (!m_form.get())
 	{
-		m_ctx.setError( "no form defined for fetching the form iterator");
-		return Error;
+		throw std::runtime_error( "no form defined to print");
 	}
-	if (!serialize::print( m_form->structure(), *m_outputfilter, m_ctx, m_printstk))
+	if (!m_outputfilter.get()) throw std::runtime_error( "no output specified for serialization");
+
+	switch (m_ser.print(*m_outputfilter))
 	{
-		if (m_ctx.getLastError()) return Error;
-		switch (m_outputfilter->state())
-		{
-			case OutputFilter::Open:
-				m_ctx.setError( "unknown error in form print");
-				return Error;
+		case serialize::DDLStructSerializer::Ok:
+			m_state = 2;
+			return Ok;
 
-			case OutputFilter::EndOfBuffer:
-				return Yield;
+		case serialize::DDLStructSerializer::Yield:
+			return Yield;
 
-			case OutputFilter::Error:
-				m_ctx.setError( m_outputfilter->getError());
-				return Error;
-		}
+		case serialize::DDLStructSerializer::Error:
+			return Error;
 	}
-	m_state = 2;
-	return Ok;
+	throw std::runtime_error( "illegal state in form print");
 }
 
 void DDLFormMap::defineForm( const std::string& name, const DDLForm& f)
@@ -408,14 +395,11 @@ FormFunctionResult::FormFunctionResult( const FormFunction& f)
 	:m_description(f.api_result())
 	,m_state(0)
 	,m_data(std::calloc( f.api_result()->size(), 1), std::free)
+	,m_ser( m_data.get(), m_description)
 {
 	if (!m_data.get()) throw std::bad_alloc();
 	void* result_struct = m_data.get();
-	if (!result_struct || !m_description->init( result_struct))
-	{
-		m_ctx.setError( "could not initialize api result object for form function");
-	}
-	else
+	if (result_struct && m_description->init( result_struct))
 	{
 		m_state = 1;
 	}
@@ -426,8 +410,7 @@ FormFunctionResult::FormFunctionResult( const FormFunctionResult& o)
 	,m_state(o.m_state)
 	,m_data(o.m_data)
 	,m_outputfilter(o.m_outputfilter)
-	,m_ctx(o.m_ctx)
-	,m_printstk(o.m_printstk){}
+	,m_ser(o.m_ser){}
 
 FormFunctionResult::~FormFunctionResult()
 {
@@ -441,8 +424,7 @@ FormFunctionResult::~FormFunctionResult()
 void FormFunctionResult::init( const TypedOutputFilterR& o)
 {
 	m_outputfilter = o;
-	m_ctx.clear();
-	m_printstk.clear();
+	m_ser.init();
 	m_state = 1;
 }
 
@@ -450,29 +432,22 @@ FormFunctionResult::CallResult FormFunctionResult::fetch()
 {
 	if (m_state == 0) return Error;
 	if (m_state == 2) return Ok;
-	const void* result_struct = m_data.get();
-	if (!m_outputfilter.get())
-	{
-		m_ctx.setError( "no output filter defined for fetching the form function result");
-		return Error;
-	}
-	if (!m_description->print( result_struct, *m_outputfilter, m_ctx, m_printstk))
-	{
-		switch (m_outputfilter->state())
-		{
-			case OutputFilter::Open:
-				return Error;
 
-			case OutputFilter::EndOfBuffer:
-				return Yield;
+	if (!m_outputfilter.get()) throw std::runtime_error( "no output specified for serialization");
 
-			case OutputFilter::Error:
-				m_ctx.setError( m_outputfilter->getError());
-				return Error;
-		}
+	switch (m_ser.print(*m_outputfilter))
+	{
+		case serialize::StructSerializer::Ok:
+			m_state = 2;
+			return Ok;
+
+		case serialize::StructSerializer::Yield:
+			return Yield;
+
+		case serialize::StructSerializer::Error:
+			return Error;
 	}
-	m_state = 2;
-	return Ok;
+	throw std::runtime_error( "illegal state in form print");
 }
 
 FormFunctionClosure::FormFunctionClosure( const FormFunction& f)

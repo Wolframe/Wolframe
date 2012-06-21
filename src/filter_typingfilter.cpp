@@ -89,7 +89,7 @@ bool TypingOutputFilter::print( ElementType type, const Element& element)
 				rt = m_outputfilter->print( type, element.value.string_.ptr, element.value.string_.size);
 				break;
 		}
-		if (!rt) setState( m_outputfilter->state(), m_outputfilter->getError());
+		setState( m_outputfilter->state(), m_outputfilter->getError());
 	}
 	catch (boost::bad_lexical_cast& e)
 	{

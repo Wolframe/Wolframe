@@ -47,6 +47,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
+
 class FiltermapDescriptionBase
 {
 public:
@@ -114,7 +115,6 @@ public:
 		,m_mandatory(false){}
 
 	bool parse( void* obj, langbind::TypedInputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const;
-	bool print( const void* obj, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk) const;
 
 	bool init( void* obj) const
 	{
@@ -202,6 +202,37 @@ private:
 	Parse m_parse;
 	Print m_print;
 	bool m_mandatory;
+};
+
+
+class StructSerializer
+{
+public:
+	StructSerializer( const void* obj, const FiltermapDescriptionBase* descr, Context::Flags flags=Context::None);
+
+	StructSerializer( const StructSerializer& o);
+
+	enum CallResult
+	{
+		Ok,
+		Error,
+		Yield
+	};
+
+	void init();
+
+	CallResult print( langbind::TypedOutputFilter& out);
+
+	bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
+
+	const char* getLastError() const			{return m_ctx.getLastError();}
+	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+
+private:
+	const void* m_obj;
+	const FiltermapDescriptionBase* m_descr;
+	Context m_ctx;
+	FiltermapPrintStateStack m_stk;
 };
 
 }}//namespace

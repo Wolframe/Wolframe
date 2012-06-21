@@ -40,7 +40,7 @@ using namespace _Wolframe;
 using namespace serialize;
 
 // forward declaration
-static bool printObject( Context& ctx, std::vector<FiltermapDDLPrintState>& stk);
+static bool fetchObject( Context& ctx, std::vector<FiltermapDDLPrintState>& stk);
 
 static std::string getPrintPath( const FiltermapDDLPrintStateStack& stk)
 {
@@ -61,7 +61,7 @@ static std::string getPrintPath( const FiltermapDDLPrintStateStack& stk)
 	return rt;
 }
 
-static bool printAtom( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
 	const ddl::AtomicType* val = &stk.back().value()->value();
 	std::string ee;
@@ -71,10 +71,11 @@ static bool printAtom( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 		return false;
 	}
 	ctx.setElem( langbind::FilterBase::Value, langbind::TypedFilterBase::Element( ee.c_str(), ee.size()));
+	stk.pop_back();
 	return true;
 }
 
-static bool printStruct( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
 	bool rt = false;
 	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
@@ -112,7 +113,7 @@ static bool printStruct( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 	return rt;
 }
 
-static bool printVector( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool fetchVector( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
 	bool rt = false;
 	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
@@ -137,7 +138,7 @@ static bool printVector( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 	return rt;
 }
 
-static bool printObject( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool fetchObject( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 {
 	if (!stk.back().value())
 	{
@@ -149,63 +150,92 @@ static bool printObject( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 	{
 		case ddl::StructType::Atomic:
 		{
-			return printAtom( ctx, stk);
+			return fetchAtom( ctx, stk);
 		}
 		case ddl::StructType::Vector:
 		{
-			return printVector( ctx, stk);
+			return fetchVector( ctx, stk);
 		}
 		case ddl::StructType::Struct:
 		{
-			return printStruct( ctx, stk);
+			return fetchStruct( ctx, stk);
 		}
 	}
 	ctx.setError( "illegal state in print DDL form");
 	return false;
 }
 
-bool _Wolframe::serialize::print( const ddl::StructType& st, langbind::TypedOutputFilter& tout, Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+
+DDLStructSerializer::CallResult DDLStructSerializer::print( langbind::TypedOutputFilter& out)
 {
 	try
 	{
-		if (stk.size() == 0)
-		{
-			stk.push_back( FiltermapDDLPrintState( &st, langbind::TypedFilterBase::Element()));
-		}
-		while (stk.size())
+		while (m_stk.size())
 		{
 			Context::ElementBuffer elem;
-			if (ctx.getElem( elem))
+			if (m_ctx.getElem( elem))
 			{
-				if (!tout.print( elem.m_type, elem.m_value))
+				if (!out.print( elem.m_type, elem.m_value))
 				{
-					if (tout.getError())
+					if (out.getError())
 					{
-						ctx.setError( tout.getError());
-						std::string path = getPrintPath( stk);
-						ctx.setTag( path.c_str());
+						m_ctx.setError( out.getError());
+						std::string path = getPrintPath( m_stk);
+						m_ctx.setTag( path.c_str());
+						m_ctx.setElem( elem);
+						return Error;
 					}
-					ctx.setElem( elem);
-					return false;
+					m_ctx.setElem( elem);
+					return Yield;
 				}
 			}
-			if (!printObject( ctx, stk))
+			if (!fetchObject( m_ctx, m_stk))
 			{
-				if (ctx.getLastError())
+				if (m_ctx.getLastError())
 				{
-					std::string path = getPrintPath( stk);
-					ctx.setTag( path.c_str());
-					return false;
+					std::string path = getPrintPath( m_stk);
+					m_ctx.setTag( path.c_str());
+					return Error;
 				}
 			}
 		}
 	}
 	catch (std::exception& e)
 	{
-		ctx.setError( e.what());
+		m_ctx.setError( e.what());
+		return Error;
+	}
+	return Ok;
+}
+
+
+bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value)
+{
+	try
+	{
+		if (!m_stk.size()) return false;
+
+		Context::ElementBuffer elem;
+		while (!m_ctx.getElem( elem))
+		{
+			if (!fetchObject( m_ctx, m_stk))
+			{
+				if (m_ctx.getLastError())
+				{
+					std::string path = getPrintPath( m_stk);
+					m_ctx.setTag( path.c_str());
+					return false;
+				}
+			}
+		}
+		type = elem.m_type;
+		value = elem.m_value;
+	}
+	catch (std::exception& e)
+	{
+		m_ctx.setError( e.what());
 		return false;
 	}
 	return true;
 }
-
 
