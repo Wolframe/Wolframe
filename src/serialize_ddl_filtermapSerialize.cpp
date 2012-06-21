@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize_ddl_filtermapPrint.cpp
+///\file serialize_ddl_filtermapSerialize.cpp
 
-#include "serialize/ddl/filtermapDDLPrint.hpp"
+#include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/typedfilter.hpp"
 #include <cstring>
 #include <sstream>
@@ -40,12 +40,12 @@ using namespace _Wolframe;
 using namespace serialize;
 
 // forward declaration
-static bool fetchObject( Context& ctx, std::vector<FiltermapDDLPrintState>& stk);
+static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk);
 
-static std::string getPrintPath( const FiltermapDDLPrintStateStack& stk)
+static std::string getPrintPath( const FiltermapDDLSerializeStateStack& stk)
 {
 	std::string rt;
-	FiltermapDDLPrintStateStack::const_iterator itr=stk.begin(), end=stk.end();
+	FiltermapDDLSerializeStateStack::const_iterator itr=stk.begin(), end=stk.end();
 	for (; itr != end; ++itr)
 	{
 		if (itr->value() && itr->value()->contentType() != ddl::StructType::Vector)
@@ -61,7 +61,7 @@ static std::string getPrintPath( const FiltermapDDLPrintStateStack& stk)
 	return rt;
 }
 
-static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
 {
 	const ddl::AtomicType* val = &stk.back().value()->value();
 	std::string ee;
@@ -75,7 +75,7 @@ static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 	return true;
 }
 
-static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
 {
 	bool rt = false;
 	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
@@ -92,7 +92,7 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 			}
 			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
 			ctx.setElem( langbind::FilterBase::Attribute, elem);
-			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));
+			stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
 			stk.back().state( ++idx);
 			rt = true;
 		}
@@ -101,8 +101,8 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
 			ctx.setElem( langbind::FilterBase::OpenTag, elem);
 			stk.back().state( ++idx);
-			stk.push_back( FiltermapDDLPrintState( langbind::FilterBase::CloseTag, elem));
-			stk.push_back( FiltermapDDLPrintState( &itr->second, elem));
+			stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, elem));
+			stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
 			rt = true;
 		}
 	}
@@ -113,7 +113,7 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 	return rt;
 }
 
-static bool fetchVector( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
 {
 	bool rt = false;
 	const ddl::StructType* obj = (const ddl::StructType*)stk.back().value();
@@ -130,15 +130,15 @@ static bool fetchVector( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
 		rt = true;
 	}
 	stk.back().state( idx+1);
-	stk.push_back( FiltermapDDLPrintState( &itr->second, stk.back().tag()));	//... print element
+	stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));	//... print element
 	if (idx >= 1)
 	{
-		stk.push_back( FiltermapDDLPrintState( langbind::FilterBase::OpenTag, stk.back().tag()));
+		stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::OpenTag, stk.back().tag()));
 	}
 	return rt;
 }
 
-static bool fetchObject( Context& ctx, std::vector<FiltermapDDLPrintState>& stk)
+static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
 {
 	if (!stk.back().value())
 	{

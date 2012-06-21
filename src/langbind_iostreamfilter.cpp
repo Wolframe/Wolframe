@@ -37,7 +37,7 @@
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
-#include "serialize/ddl/filtermapDDLPrint.hpp"
+#include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/token_filter.hpp"
 #include "filter/typingfilter.hpp"
 #if WITH_LUA

@@ -29,14 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/filtermapDDLPrint.hpp
+///\file serialize/ddl/FiltermapDDLSerialize.hpp
 ///\brief Defines the DDL structure serialization for filters
 
-#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_PRINT_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_FILTERMAP_PRINT_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
-#include "serialize/ddl/filtermapDDLPrintStack.hpp"
+#include "serialize/ddl/filtermapDDLSerializeStack.hpp"
 #include "ddl/structType.hpp"
 #include <cstddef>
 
@@ -50,7 +50,7 @@ public:
 		:m_st(&st)
 		,m_ctx(flags)
 	{
-		m_stk.push_back( FiltermapDDLPrintState( &st, langbind::TypedFilterBase::Element()));
+		m_stk.push_back( FiltermapDDLSerializeState( &st, langbind::TypedFilterBase::Element()));
 	}
 
 	DDLStructSerializer( const DDLStructSerializer& o)
@@ -61,7 +61,7 @@ public:
 	{
 		m_ctx.clear();
 		m_stk.clear();
-		m_stk.push_back( FiltermapDDLPrintState( m_st, langbind::TypedFilterBase::Element()));
+		m_stk.push_back( FiltermapDDLSerializeState( m_st, langbind::TypedFilterBase::Element()));
 	}
 
 	enum CallResult
@@ -81,7 +81,7 @@ public:
 private:
 	const ddl::StructType* m_st;
 	Context m_ctx;
-	FiltermapDDLPrintStateStack m_stk;
+	FiltermapDDLSerializeStateStack m_stk;
 	int hugo;
 };
 

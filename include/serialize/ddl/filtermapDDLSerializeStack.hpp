@@ -29,11 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/filtermapDDLPrintStack.hpp
+///\file serialize/ddl/FiltermapDDLSerializeStack.hpp
 ///\brief Defines the Parsing STM for DDL serialization for filters
 
-#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_PRINT_STACK_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_FILTERMAP_PRINT_STACK_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
 #include "ddl/structType.hpp"
@@ -44,30 +44,24 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-struct FiltermapDDLIteratorElement
-{
-	langbind::FilterBase::ElementType m_type;
-	langbind::TypedFilterBase::Element m_value;
-};
-
-class FiltermapDDLPrintState
+class FiltermapDDLSerializeState
 {
 public:
-	FiltermapDDLPrintState( const FiltermapDDLPrintState& o)
+	FiltermapDDLSerializeState( const FiltermapDDLSerializeState& o)
 		:m_value(o.m_value)
 		,m_stateidx(o.m_stateidx)
 		,m_elemtype(o.m_elemtype)
 		,m_tag(o.m_tag)
 		{}
 
-	FiltermapDDLPrintState( const ddl::StructType* v, const langbind::TypedFilterBase::Element& t)
+	FiltermapDDLSerializeState( const ddl::StructType* v, const langbind::TypedFilterBase::Element& t)
 		:m_value(v)
 		,m_stateidx(0)
 		,m_elemtype(langbind::FilterBase::Value)
 		,m_tag(t)
 		{}
 
-	FiltermapDDLPrintState( langbind::FilterBase::ElementType typ, const langbind::TypedFilterBase::Element& elem)
+	FiltermapDDLSerializeState( langbind::FilterBase::ElementType typ, const langbind::TypedFilterBase::Element& elem)
 		:m_value(0)
 		,m_stateidx(0)
 		,m_elemtype(typ)
@@ -106,7 +100,7 @@ private:
 	langbind::TypedFilterBase::Element m_tag;
 };
 
-typedef std::vector<FiltermapDDLPrintState> FiltermapDDLPrintStateStack;
+typedef std::vector<FiltermapDDLSerializeState> FiltermapDDLSerializeStateStack;
 
 }}//namespace
 #endif

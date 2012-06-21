@@ -37,7 +37,7 @@ Project Wolframe.
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
-#include "serialize/ddl/filtermapDDLPrint.hpp"
+#include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include <stack>
