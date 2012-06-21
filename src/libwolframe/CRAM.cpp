@@ -74,12 +74,12 @@ static const int CRAM_CHALLENGE_STRING_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
 static const int CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
 
 
-PasswordHash::PasswordHash( const std::string& password )
+PasswordHash::PasswordHash( const std::string& /*salt*/, const std::string& password )
 {
 	sha224((const unsigned char*)password.c_str(), password.length(), m_hash );
 }
 
-std::string PasswordHash::toString()
+std::string PasswordHash::toBCD()
 {
 	char	buffer[ PASSWORD_HASH_STRING_SIZE ];
 
