@@ -14,19 +14,16 @@ namespace base64	{
 
 struct decoder
 {
-	base64_decodestate _state;
+	static const size_t BUFFERSIZE = 512;
+
+	base64_DecodeState _state;
 	int _buffersize;
 
 	decoder(int buffersize_in = BUFFERSIZE)
 		: _buffersize(buffersize_in)
 	{}
 
-	int decode(char value_in)
-	{
-		return base64_decode_value(value_in);
-	}
-
-	int decode(const char* code_in, const int length_in, char* plaintext_out)
+	int decode(const char* code_in, const int length_in, unsigned char* plaintext_out)
 	{
 		return base64_decode_block(code_in, length_in, plaintext_out, &_state);
 	}
@@ -37,7 +34,7 @@ struct decoder
 		//
 		const int N = _buffersize;
 		char* code = new char[N];
-		char* plaintext = new char[N];
+		unsigned char* plaintext = new unsigned char[N];
 		int codelength;
 		int plainlength;
 
@@ -59,19 +56,16 @@ struct decoder
 
 struct encoder
 {
-	base64_encodestate _state;
+	static const size_t BUFFERSIZE = 512;
+
+	base64_EncodeState _state;
 	int _buffersize;
 
 	encoder(int buffersize_in = BUFFERSIZE)
 		: _buffersize(buffersize_in)
 	{}
 
-	int encode(char value_in)
-	{
-		return base64_encode_value(value_in);
-	}
-
-	int encode(const char* code_in, const int length_in, char* plaintext_out)
+	int encode(const unsigned char* code_in, const int length_in, char* plaintext_out)
 	{
 		return base64_encode_block(code_in, length_in, plaintext_out, &_state);
 	}
@@ -81,7 +75,7 @@ struct encoder
 		return base64_encode_blockend(plaintext_out, &_state);
 	}
 
-	void encode(std::istream& istream_in, std::ostream& ostream_in)
+	void encode( std::istream& in, std::ostream& out )
 	{
 		base64_init_encodestate(&_state);
 		//
@@ -93,18 +87,18 @@ struct encoder
 
 		do
 		{
-			istream_in.read(plaintext, N);
-			plainlength = istream_in.gcount();
+			in.read(plaintext, N);
+			plainlength = in.gcount();
 			//
-			codelength = encode(plaintext, plainlength, code);
-			ostream_in.write(code, codelength);
+			codelength = encode((unsigned char *)plaintext, plainlength, code);
+			out.write(code, codelength);
 		}
-		while (istream_in.good() && plainlength > 0);
+		while (in.good() && plainlength > 0);
 
 		codelength = encode_end(code);
-		ostream_in.write(code, codelength);
+		out.write( code, codelength );
 		//
-		base64_init_encodestate(&_state);
+		base64_init_encodestate( &_state );
 
 		delete [] code;
 		delete [] plaintext;

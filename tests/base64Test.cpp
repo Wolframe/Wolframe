@@ -5,14 +5,15 @@ This is part of the libb64 project, and has been placed in the public domain.
 For details, see http://sourceforge.net/projects/libb64
 */
 
-#include <b64/encode.h>
-#include <b64/decode.h>
+#include <base64.hpp>
 
 #include <iostream>
 #include <fstream>
 #include <string>
 
 #include <stdlib.h>
+
+using namespace _Wolframe;
 
 // Function which prints the usage of this executable
 void usage()
@@ -45,7 +46,7 @@ int main(int argc, char** argv)
 		usage("Wrong number of arguments!");
 		exit(-1);
 	}
-	
+
 	// So far so good; try to open the input file
 	std::string input = argv[2];
 	// Note that we have to open the input in binary mode.
@@ -58,7 +59,7 @@ int main(int argc, char** argv)
 		usage("Could not open input file!");
 		exit(-1);
 	}
-	
+
 	// Now try to open the output file
 	std::string output = argv[3];
 	// Again, note that we have to open the ouput in binary mode.

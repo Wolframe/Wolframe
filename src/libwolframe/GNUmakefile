@@ -58,6 +58,8 @@ CPP_OBJS = \
 	CRAM.o
 
 OBJS = \
+	b64encode.o \
+	b64decode.o \
 	byte2hex.o \
 	sha2.o
 

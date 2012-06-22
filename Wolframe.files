@@ -28,11 +28,6 @@ makefiles/nmake/sub.mk
 makefiles/nmake/top.mk
 .Attic/appException.cpp
 .Attic/appException.hpp
-.Attic/b64decode.c
-.Attic/b64encode.c
-.Attic/b64test.cpp
-.Attic/base64.h
-.Attic/base64.hpp
 .Attic/date.hpp
 .Attic/ErrorCode.hpp
 .Attic/loadModule/cross.cpp
@@ -85,6 +80,11 @@ clients/qt/HistoryLineEdit.hpp
 clients/qt/MainWindow.cpp
 clients/qt/MainWindow.hpp
 clients/qt/Makefile.W32
+clients/qt/moc_AbstractFormLoader.cpp
+clients/qt/moc_DebugTerminal.cpp
+clients/qt/moc_HistoryLineEdit.cpp
+clients/qt/moc_MainWindow.cpp
+clients/qt/moc_WolframeClient.cpp
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -279,6 +279,8 @@ include/appConfig.hpp
 include/appProcessor.hpp
 include/appProperties.hpp
 include/atomicCounter.hpp
+include/base64.h
+include/base64.hpp
 include/byte2hex.h
 include/cmdbind/commandHandler.hpp
 include/cmdbind/directmapCommandHandler.hpp
@@ -1098,6 +1100,8 @@ src/langbind_luaBignum.cpp
 src/langbind_luaDebug.cpp
 src/langbind_luaException.cpp
 src/langbind_luaObjects.cpp
+src/libwolframe/b64decode.c
+src/libwolframe/b64encode.c
 src/libwolframe/byte2hex.c
 src/libwolframe/CRAM.cpp
 src/libwolframe/getPassword.cpp
@@ -1258,6 +1262,7 @@ tests/AAAA/Makefile.W32
 tests/AAAA/passwd
 tests/AAAA/sasl.conf
 tests/AAAA/textFileTest.cpp
+tests/base64Test.cpp
 tests/bignum/GNUmakefile
 tests/bignum/libgmp/GNUmakefile
 tests/bignum/libgmp/Makefile.W32
@@ -1328,6 +1333,7 @@ tests/rlib/testrlib1.cpp
 tests/rlib/testrlib2.cpp
 tests/singletonTest.cpp
 tests/SSL/README.txt
+tests/temp/formfunc_luatable_luaparse.lua
 tests/testBoostPath.cpp
 tests/testMethodMemberPointerTemplate.cpp
 tests/testNamedRetVal.cpp

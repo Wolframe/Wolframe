@@ -93,6 +93,7 @@ TEST_CPP_BINS = \
 	testBoostPath.exe \
 	singletonTest.exe \
 	byte2hexTest.exe \
+	base64Test.exe \
 	CRAMtest.exe \
 	testSHA2.exe \
 	poolTest.exe \
