@@ -72,7 +72,7 @@ struct encoder
 
 	int encode_end(char* plaintext_out)
 	{
-		return base64_encode_blockend(plaintext_out, &_state);
+		return base64_encodeEnd(plaintext_out, &_state);
 	}
 
 	void encode( std::istream& in, std::ostream& out )

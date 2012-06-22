@@ -17,21 +17,21 @@ static inline int base64_decode_value( char value_in )
 	return decoding[(int)value_in];
 }
 
-void base64_init_decodestate(base64_DecodeState* state_in)
+void base64_init_decodestate( base64_DecodeState* state )
 {
-	state_in->step = STEP_A;
-	state_in->plainchar = 0;
+	state->step = STEP_A;
+	state->plainchar = 0;
 }
 
-int base64_decode_block(const char* code_in, const int length_in, unsigned char* plaintext_out, base64_DecodeState* state_in)
+int base64_decode_block( const char* code_in, const int length_in, unsigned char* plaintext_out, base64_DecodeState* state )
 {
 	const char* codechar = code_in;
 	unsigned char* plainchar = plaintext_out;
 	char fragment;
 
-	*plainchar = state_in->plainchar;
+	*plainchar = state->plainchar;
 
-	switch (state_in->step)
+	switch (state->step)
 	{
 		while (1)
 		{
@@ -39,8 +39,8 @@ int base64_decode_block(const char* code_in, const int length_in, unsigned char*
 			do {
 				if (codechar == code_in+length_in)
 				{
-					state_in->step = STEP_A;
-					state_in->plainchar = *plainchar;
+					state->step = STEP_A;
+					state->plainchar = *plainchar;
 					return plainchar - plaintext_out;
 				}
 				fragment = (char)base64_decode_value(*codechar++);
@@ -50,8 +50,8 @@ int base64_decode_block(const char* code_in, const int length_in, unsigned char*
 			do {
 				if (codechar == code_in+length_in)
 				{
-					state_in->step = STEP_B;
-					state_in->plainchar = *plainchar;
+					state->step = STEP_B;
+					state->plainchar = *plainchar;
 					return plainchar - plaintext_out;
 				}
 				fragment = (char)base64_decode_value(*codechar++);
@@ -62,8 +62,8 @@ int base64_decode_block(const char* code_in, const int length_in, unsigned char*
 			do {
 				if (codechar == code_in+length_in)
 				{
-					state_in->step = STEP_C;
-					state_in->plainchar = *plainchar;
+					state->step = STEP_C;
+					state->plainchar = *plainchar;
 					return plainchar - plaintext_out;
 				}
 				fragment = (char)base64_decode_value(*codechar++);
@@ -74,8 +74,8 @@ int base64_decode_block(const char* code_in, const int length_in, unsigned char*
 			do {
 				if (codechar == code_in+length_in)
 				{
-					state_in->step = STEP_D;
-					state_in->plainchar = *plainchar;
+					state->step = STEP_D;
+					state->plainchar = *plainchar;
 					return plainchar - plaintext_out;
 				}
 				fragment = (char)base64_decode_value(*codechar++);

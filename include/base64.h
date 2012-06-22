@@ -26,9 +26,9 @@ typedef struct
 	char plainchar;
 } base64_DecodeState;
 
-void base64_init_decodestate( base64_DecodeState* state_in );
+void base64_init_decodestate( base64_DecodeState* state );
 
-int base64_decode_block(const char* code_in, const int length_in, unsigned char* plaintext_out, base64_DecodeState* state_in);
+int base64_decode_block(const char* code_in, const int length_in, unsigned char* plaintext_out, base64_DecodeState* state );
 
 
 typedef enum	{
@@ -37,18 +37,18 @@ typedef enum	{
 	STEP_2
 } base64_EncodeStep;
 
-typedef struct
-{
-	base64_EncodeStep step;
-	char result;
-	int stepcount;
+typedef struct	{
+	base64_EncodeStep	step;
+	char			result;
+	int			stepCount;
+	unsigned short		lineLength;
 } base64_EncodeState;
 
-void base64_init_encodestate(base64_EncodeState* state_in);
+void base64_init_encodestate( base64_EncodeState* state, unsigned short lineLength );
 
-int base64_encode_block(const unsigned char* plaintext_in, int length_in, char* code_out, base64_EncodeState* state_in);
+int base64_encode_block(const unsigned char* plaintext_in, int length_in, char* code_out, base64_EncodeState* state );
 
-int base64_encode_blockend(char* code_out, base64_EncodeState* state_in);
+int base64_encodeEnd( char* code_out, base64_EncodeState* state );
 
 
 #ifdef __cplusplus

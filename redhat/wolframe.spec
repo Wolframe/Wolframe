@@ -51,16 +51,16 @@
 %define fc14 1
 %define fedora 1
 %endif
-%define fc15 0  
+%define fc15 0
 %if 0%{?fedora_version} == 15
 %define dist fc15
 %define fc15 1
 %define fedora 1
 %endif
-%define fc16 0  
+%define fc16 0
 %if 0%{?fedora_version} == 16
 %define dist fc16
-%define fc16 1   
+%define fc16 1
 %define fedora 1
 %endif
 
