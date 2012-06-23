@@ -17,13 +17,13 @@ static inline int base64_decode_value( char value_in )
 	return decoding[(int)value_in];
 }
 
-void base64_init_decodestate( base64_DecodeState* state )
+void base64_initDecodeState( base64_DecodeState* state )
 {
 	state->step = STEP_A;
 	state->plainchar = 0;
 }
 
-int base64_decode_block( const char* code_in, const int length_in, unsigned char* plaintext_out, base64_DecodeState* state )
+int base64_decodeBlock( base64_DecodeState* state, const char* code_in, const int length_in, unsigned char* plaintext_out )
 {
 	const char* codechar = code_in;
 	unsigned char* plainchar = plaintext_out;

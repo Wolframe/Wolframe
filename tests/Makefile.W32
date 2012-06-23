@@ -94,6 +94,7 @@ TEST_CPP_BINS = \
 	singletonTest.exe \
 	byte2hexTest.exe \
 	base64Test.exe \
+	base64Utility.exe \
 	CRAMtest.exe \
 	testSHA2.exe \
 	poolTest.exe \

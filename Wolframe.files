@@ -1263,6 +1263,7 @@ tests/AAAA/passwd
 tests/AAAA/sasl.conf
 tests/AAAA/textFileTest.cpp
 tests/base64Test.cpp
+tests/base64Utility.cpp
 tests/bignum/GNUmakefile
 tests/bignum/libgmp/GNUmakefile
 tests/bignum/libgmp/Makefile.W32

@@ -7,12 +7,19 @@ For details, see http://sourceforge.net/projects/libb64
 
 #include <base64.h>
 
-void base64_init_encodestate( base64_EncodeState* state, unsigned short lineLength )
+void base64_initEncodeState(base64_EncodeState* state, unsigned short lineLength )
 {
 	state->step = STEP_0;
 	state->result = 0;
 	state->stepCount = 0;
 	state->lineLength = lineLength;
+}
+
+void base64_resetEncodeState(base64_EncodeState* state )
+{
+	state->step = STEP_0;
+	state->result = 0;
+	state->stepCount = 0;
 }
 
 static inline char base64_encodeValue( unsigned char value )
@@ -23,7 +30,7 @@ static inline char base64_encodeValue( unsigned char value )
 	return encoding[ value ];
 }
 
-int base64_encode_block(const unsigned char* plaintext_in, int length_in, char* code_out, base64_EncodeState* state )
+int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plaintext_in, int length_in, char* code_out )
 {
 	const unsigned char* plainchar = plaintext_in;
 	const unsigned char* const plaintextend = plaintext_in + length_in;
@@ -83,26 +90,25 @@ int base64_encode_block(const unsigned char* plaintext_in, int length_in, char* 
 	return codechar - code_out;
 }
 
-int base64_encodeEnd( char* code_out, base64_EncodeState* state )
+int base64_encodeEnd( base64_EncodeState* state, char* output )
 {
-	char* codechar = code_out;
+	char* encoded = output;
 
-	switch (state ->step)
-	{
-	case STEP_1:
-		*codechar++ = base64_encodeValue(state ->result);
-		*codechar++ = '=';
-		*codechar++ = '=';
-		break;
-	case STEP_2:
-		*codechar++ = base64_encodeValue(state ->result);
-		*codechar++ = '=';
-		break;
-	case STEP_0:
-		break;
+	switch ( state->step )	{
+		case STEP_1:
+			*encoded++ = base64_encodeValue( state->result );
+			*encoded++ = '=';
+			*encoded++ = '=';
+			break;
+		case STEP_2:
+			*encoded++ = base64_encodeValue( state->result );
+			*encoded++ = '=';
+			break;
+		case STEP_0:
+			break;
 	}
-	*codechar++ = '\n';
+	*encoded++ = '\n';
 
-	return codechar - code_out;
+	return encoded - output;
 }
 
