@@ -8,28 +8,13 @@
 #ifndef _BASE64_H_INCLUDED
 #define _BASE64_H_INCLUDED
 
+#include <stddef.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
 #define DEFAULT_BASE64_LINE_LENGTH	76
-
-typedef enum	{
-	STEP_A,
-	STEP_B,
-	STEP_C,
-	STEP_D
-} base64_DecodeStep;
-
-typedef struct
-{
-	base64_DecodeStep step;
-	char plainchar;
-} base64_DecodeState;
-
-void base64_initDecodeState( base64_DecodeState* state );
-
-int base64_decodeBlock( base64_DecodeState* state, const char* code_in, const int length_in, unsigned char* plaintext_out );
 
 
 typedef enum	{
@@ -49,9 +34,29 @@ void base64_initEncodeState( base64_EncodeState* state, unsigned short lineLengt
 
 void base64_resetEncodeState( base64_EncodeState* state );
 
-int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plaintext_in, int length_in, char* code_out );
+int base64_encodeBlock( base64_EncodeState* state, const unsigned char* data,
+			size_t dataSize, char* encoded );
 
 int base64_encodeEnd( base64_EncodeState* state, char* out );
+
+
+typedef enum	{
+	STEP_A,
+	STEP_B,
+	STEP_C,
+	STEP_D
+} base64_DecodeStep;
+
+typedef struct
+{
+	base64_DecodeStep step;
+	char plainchar;
+} base64_DecodeState;
+
+void base64_initDecodeState( base64_DecodeState* state );
+
+int base64_decodeBlock( base64_DecodeState* state, const char* encoded,
+			size_t codeLength, unsigned char* data );
 
 
 #ifdef __cplusplus

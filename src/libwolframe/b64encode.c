@@ -9,7 +9,7 @@ For details, see http://sourceforge.net/projects/libb64
 
 static const char* encoding = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-void base64_initEncodeState(base64_EncodeState* state, unsigned short lineLength )
+void base64_initEncodeState( base64_EncodeState* state, unsigned short lineLength )
 {
 	state->step = STEP_0;
 	state->result = 0;
@@ -17,7 +17,7 @@ void base64_initEncodeState(base64_EncodeState* state, unsigned short lineLength
 	state->lineLength = lineLength;
 }
 
-void base64_resetEncodeState(base64_EncodeState* state )
+void base64_resetEncodeState( base64_EncodeState* state )
 {
 	state->step = STEP_0;
 	state->result = 0;
@@ -31,11 +31,12 @@ static inline char base64_encodeValue( unsigned char value )
 	return encoding[ value ];
 }
 
-int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plaintext_in, int length_in, char* code_out )
+int base64_encodeBlock( base64_EncodeState* state, const unsigned char* data,
+			size_t dataSize, char* encoded )
 {
-	const unsigned char* plainchar = plaintext_in;
-	const unsigned char* const plaintextend = plaintext_in + length_in;
-	char* codechar = code_out;
+	const unsigned char* plainchar = data;
+	const unsigned char* const dataEnd = data + dataSize;
+	char* codechar = encoded;
 	char result;
 	char fragment;
 
@@ -44,30 +45,30 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plaintex
 	switch ( state->step )	{
 		while ( 1 )	{
 			case STEP_0:
-				if (plainchar == plaintextend)	{
+				if (plainchar == dataEnd)	{
 					state ->result = result;
 					state ->step = STEP_0;
-					return codechar - code_out;
+					return codechar - encoded;
 				}
 				fragment = *plainchar++;
 				result = (fragment & 0x0fc) >> 2;
 				*codechar++ = base64_encodeValue(result);
 				result = (fragment & 0x003) << 4;
 			case STEP_1:
-				if (plainchar == plaintextend)	{
+				if (plainchar == dataEnd)	{
 					state ->result = result;
 					state ->step = STEP_1;
-					return codechar - code_out;
+					return codechar - encoded;
 				}
 				fragment = *plainchar++;
 				result |= (fragment & 0x0f0) >> 4;
 				*codechar++ = base64_encodeValue(result);
 				result = (fragment & 0x00f) << 2;
 			case STEP_2:
-				if (plainchar == plaintextend)	{
+				if (plainchar == dataEnd)	{
 					state ->result = result;
 					state ->step = STEP_2;
-					return codechar - code_out;
+					return codechar - encoded;
 				}
 				fragment = *plainchar++;
 				result |= (fragment & 0x0c0) >> 6;
@@ -83,7 +84,7 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plaintex
 		}
 	}
 	/* control should not reach here */
-	return codechar - code_out;
+	return codechar - encoded;
 }
 
 int base64_encodeEnd( base64_EncodeState* state, char* output )
