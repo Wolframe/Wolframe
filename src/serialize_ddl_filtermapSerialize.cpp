@@ -63,14 +63,14 @@ static std::string getElementPath( const FiltermapDDLSerializeStateStack& stk)
 
 static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
 {
-	const ddl::AtomicType* val = &stk.back().value()->value();
-	std::string ee;
-	if (!val->get( ee))
+	if (stk.back().state())
 	{
-		throw SerializationErrorException( "value conversion error", getElementPath( stk));
+		stk.pop_back();
+		return false;
 	}
-	ctx.setElem( langbind::FilterBase::Value, langbind::TypedFilterBase::Element( ee.c_str(), ee.size()));
-	stk.pop_back();
+	const ddl::AtomicType* val = &stk.back().value()->value();
+	ctx.setElem( langbind::FilterBase::Value, val->value().c_str(), val->value().size());
+	stk.back().state( 1);
 	return true;
 }
 
