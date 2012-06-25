@@ -137,6 +137,7 @@ public:
 	RedirectFilterClosure();
 	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o);
 	RedirectFilterClosure( const RedirectFilterClosure& o);
+	~RedirectFilterClosure(){}
 
 	///\brief Calls the fetching of input and printing it to output until end or interruption
 	///\return true when completed

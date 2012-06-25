@@ -774,13 +774,14 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 			if (!get_printop( ls, 2, item[0], itemsize[0]))
 			{
 				if (item[1] != 0) throw std::runtime_error( "invalid type of first argument");
-
-				TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
-				TypedOutputFilterR outp( new TypingOutputFilter( output->outputfilter()));
-				LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
-				RedirectFilterClosure* closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
-				lua_pushvalue( ls, 2);			//... iterator argument
-				lua_pushlightuserdata( ls, closure);	//... redirect closure object
+				{
+					TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
+					TypedOutputFilterR outp( new TypingOutputFilter( output->outputfilter()));
+					LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
+					RedirectFilterClosure* closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
+					lua_pushvalue( ls, 2);			//... iterator argument
+					lua_pushlightuserdata( ls, closure);	//... redirect closure object
+				}
 				return function_output_print_object( ls);
 			}
 			break;
