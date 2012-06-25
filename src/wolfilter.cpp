@@ -53,8 +53,9 @@ static const unsigned short APP_BUILD = 0;
 ///\brief Loads the modules, scripts, etc. defined in the command line into the global context
 static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 {
+
+//	Not used...
 //	langbind::GlobalContext* gct = langbind::getGlobalContext();
-//	....
 	cmdline.loadGlobalContext( boost::filesystem::current_path().string());
 }
 

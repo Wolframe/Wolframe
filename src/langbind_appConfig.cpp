@@ -37,9 +37,9 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "miscUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include "miscUtils.hpp"
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -64,7 +64,7 @@ bool ApplicationEnvironmentConfig::check() const
 				rt = false;
 			}
 			compilers[ itr->name] = true;
-			if (!boost::filesystem::exists( itr->modulepath))
+			if (!utils::fileExists( itr->modulepath))
 			{
 				LOG_ERROR << "Path of DDL compiler module does not exist: " << itr->modulepath;
 				rt = false;
@@ -86,7 +86,7 @@ bool ApplicationEnvironmentConfig::check() const
 				LOG_ERROR << "Undefined DDL used for form definition" << itr->name;
 				rt = false;
 			}
-			if (!boost::filesystem::exists( itr->sourcepath))
+			if (!utils::fileExists( itr->sourcepath))
 			{
 				LOG_ERROR << "Path of DDL form source file does not exist: " << itr->sourcepath;
 				rt = false;
@@ -109,7 +109,7 @@ bool ApplicationEnvironmentConfig::check() const
 				rt = false;
 			}
 			filters[ itr->name] = true;
-			if (!boost::filesystem::exists( itr->modulepath))
+			if (!utils::fileExists( itr->modulepath))
 			{
 				LOG_ERROR << "Path of filter module does not exist: " << itr->modulepath;
 				rt = false;
@@ -131,7 +131,7 @@ bool ApplicationEnvironmentConfig::check() const
 				LOG_ERROR << "Undefined filter '" << itr->filter << "'used for transaction function command reader/writer in " << itr->name;
 				rt = false;
 			}
-			if (!boost::filesystem::exists( itr->modulepath))
+			if (!utils::fileExists( itr->modulepath))
 			{
 				LOG_ERROR << "Path of transaction function command handler module does not exist: " << itr->modulepath;
 				rt = false;
@@ -148,7 +148,7 @@ bool ApplicationEnvironmentConfig::check() const
 				rt = false;
 			}
 			scripts[ itr->name] = true;
-			if (!boost::filesystem::exists( itr->sourcepath))
+			if (!utils::fileExists( itr->sourcepath))
 			{
 				LOG_ERROR << "Path of script procedure does not exist: " << itr->sourcepath;
 				rt = false;
@@ -165,7 +165,7 @@ bool ApplicationEnvironmentConfig::check() const
 				rt = false;
 			}
 			formfunctions[ itr->name] = true;
-			if (!boost::filesystem::exists( itr->modulepath))
+			if (!utils::fileExists( itr->modulepath))
 			{
 				LOG_ERROR << "Path of form function module does not exist: " << itr->modulepath;
 				rt = false;
@@ -199,61 +199,48 @@ void ApplicationEnvironmentConfig::print( std::ostream& os, std::size_t indent) 
 	m_config.description()->print( os, (const void*)&m_config, indent);
 }
 
-static void setCanonicalPath( std::string& path, const std::string& refpath)
-{
-	boost::filesystem::path pt( path);
-	if (pt.is_absolute())
-	{
-		path = pt.string();
-	}
-	else
-	{
-		path = boost::filesystem::absolute( pt, boost::filesystem::path( refpath).branch_path()).string();
-	}
-}
-
 void ApplicationEnvironmentConfig::setCanonicalPathes( const std::string& referencePath)
 {
 	{
 		std::vector<DDLCompilerConfigStruct>::iterator itr=m_config.DDL.begin(),end=m_config.DDL.end();
 		for (;itr!=end; ++itr)
 		{
-			setCanonicalPath( itr->modulepath, referencePath);
+			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);
 		}
 	}
 	{
 		std::vector<DDLFormConfigStruct>::iterator itr=m_config.form.begin(),end=m_config.form.end();
 		for (;itr!=end; ++itr)
 		{
-			setCanonicalPath( itr->sourcepath, referencePath);
+			itr->sourcepath = utils::getCanonicalPath( itr->sourcepath, referencePath);
 		}
 	}
 	{
 		std::vector<FilterConfigStruct>::iterator itr=m_config.filter.begin(),end=m_config.filter.end();
 		for (;itr!=end; ++itr)
 		{
-			setCanonicalPath( itr->modulepath, referencePath);
+			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);
 		}
 	}
 	{
 		std::vector<TransactionFunctionConfigStruct>::iterator itr=m_config.transaction.begin(),end=m_config.transaction.end();
 		for (;itr!=end; ++itr)
 		{
-			setCanonicalPath( itr->modulepath, referencePath);
+			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);
 		}
 	}
 	{
 		std::vector<ScriptCommandConfigStruct>::iterator itr=m_config.script.begin(),end=m_config.script.end();
 		for (;itr!=end; ++itr)
 		{
-			setCanonicalPath( itr->sourcepath, referencePath);
+			itr->sourcepath = utils::getCanonicalPath( itr->sourcepath, referencePath);
 		}
 	}
 	{
 		std::vector<FormFunctionConfigStruct>::iterator itr=m_config.formfunction.begin(),end=m_config.formfunction.end();
 		for (;itr!=end; ++itr)
 		{
-			setCanonicalPath( itr->modulepath, referencePath);
+			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);
 		}
 	}
 }

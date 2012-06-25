@@ -145,6 +145,10 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, std::vec
 	int type = lua_type( ls, index);
 	switch (type)
 	{
+		case LUA_TLIGHTUSERDATA:
+			rt.append( "lightuserdata");
+			break;
+
 		case LUA_TUSERDATA:
 			lua_pushvalue( ls, index);		///...STK: udata
 			lua_getmetatable( ls, -1);		///...STK: udata mt

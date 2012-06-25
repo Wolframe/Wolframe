@@ -37,8 +37,8 @@ Project Wolframe.
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
-#include "serialize/ddl/filtermapDDLPrintStack.hpp"
-#include "serialize/ddl/filtermapDDLParseStack.hpp"
+#include "serialize/ddl/filtermapDDLSerialize.hpp"
+#include "serialize/ddl/filtermapDDLParse.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include <stack>
 #include <string>
@@ -47,6 +47,14 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace langbind {
+
+///\class Logger
+///\brief Logger as seen from scripting language binding
+///\remark Empty object because it is represented as singleton in the system
+class Logger
+{
+	int _;			//< dummy element because some bindings (Lua) do not like empty structures (objects of size 1)
+};
 
 ///\class Output
 ///\brief Output as seen from scripting language binding
@@ -175,49 +183,69 @@ private:
 };
 
 
+///\class RedirectFilterClosure
+class RedirectFilterClosure
+{
+public:
+	RedirectFilterClosure();
+	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o);
+	RedirectFilterClosure( const RedirectFilterClosure& o);
+
+	///\enum CallResult
+	///\brief Enumeration of call states of the processing
+	enum CallResult
+	{
+		Ok,		//< successful termination of call
+		Error,		//< termination of call with error (not completed)
+		Yield		//< call interrupted with request for a network operation
+	};
+	///\brief Calls the fetching of input and printing it to output until end or interruption
+	///\return Call state
+	CallResult call();
+
+	///\brief Initialization of call context for a new call
+	///\param[in] i call input
+	void init( const TypedInputFilterR& i, const TypedOutputFilterR& o);
+
+	const TypedInputFilterR& inputfilter() const		{return m_inputfilter;}
+	const TypedOutputFilterR& outputfilter() const		{return m_outputfilter;}
+
+private:
+	int m_state;				//< current state of call
+	int m_taglevel;				//< current balance of open/close tags
+	TypedInputFilterR m_inputfilter;	//< input filter
+	TypedOutputFilterR m_outputfilter;	//< output filter
+	InputFilter::ElementType m_elemtype;	//< type of last element read from command result
+	TypedInputFilter::Element m_elem;	//< last element read from command result
+};
+
+
 ///\class DDLForm
 class DDLForm
 {
 public:
 	///\brief Default constructor
-	DDLForm()
-		:m_flags(serialize::Context::None){}
+	DDLForm(){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
 	DDLForm( const DDLForm& o)
-		:m_structure(o.m_structure)
-		,m_flags(o.m_flags){}
+		:m_structure(o.m_structure){}
 
 	///\brief Constructor
 	///\param[in] st form data
 	DDLForm( const ddl::StructType& st)
-		:m_structure(st)
-		,m_flags(serialize::Context::None){}
+		:m_structure(st){}
 
 	///\brief Destructor
 	~DDLForm(){}
 
-	///\brief Get a member value of the form
-	///\param [in] name case sensitive name of the variable
-	///\param [in] val the value returned
-	///\return true on success, false, if the variable does not exist or the operation failed
-	bool getValue( const char* name, std::string& val) const;
-
-	///\brief Set a member value of the form
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value new value of the variable to set
-	///\return true on success, false, if the variable does not exist or the operation failed
-	bool setValue( const char* name, const std::string& value);
-
 	const ddl::StructType& structure() const	{return m_structure;}
-	serialize::Context::Flags flags() const		{return m_flags;}
 
 	std::string tostring() const;
 private:
 	friend class DDLFormFill;
 	ddl::StructType m_structure;
-	serialize::Context::Flags m_flags;
 };
 
 typedef CountedReference<DDLForm> DDLFormR;
@@ -229,10 +257,10 @@ class DDLFormFill
 {
 public:
 	///\brief Constructor
-	DDLFormFill( const DDLFormR& f);
+	DDLFormFill( const DDLFormR& f, serialize::Context::Flags flags);
 
 	///\brief Constructor
-	DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp);
+	DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp, serialize::Context::Flags flags);
 
 	///\brief Copy constructor
 	DDLFormFill( const DDLFormFill& o);
@@ -278,10 +306,10 @@ class DDLFormPrint
 {
 public:
 	///\brief Constructor
-	explicit DDLFormPrint( const DDLFormR& f);
+	DDLFormPrint( const DDLFormR& f, serialize::Context::Flags flags);
 
 	///\brief Constructor
-	DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp);
+	DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp, serialize::Context::Flags flags);
 
 	///\brief Copy constructor
 	DDLFormPrint( const DDLFormPrint& o);
@@ -290,10 +318,10 @@ public:
 	~DDLFormPrint(){}
 
 	///\brief Get the last error as string
-	const char* getLastError() const			{return m_ctx.getLastError();}
+	const char* getLastError() const			{return m_ser.getLastError();}
 
 	///\brief Get the last error position as string
-	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+	const char* getLastErrorPos() const			{return m_ser.getLastErrorPos();}
 
 	///\enum CallResult
 	///\brief Enumeration of call states of the fetch processing
@@ -315,8 +343,7 @@ private:
 	DDLFormR m_form;
 	int m_state;
 	TypedOutputFilterR m_outputfilter;
-	serialize::Context m_ctx;
-	serialize::FiltermapDDLPrintStateStack m_printstk;
+	serialize::DDLStructSerializer m_ser;
 };
 
 ///\class DDLFormMap
@@ -379,10 +406,10 @@ public:
 	~FormFunctionResult();
 
 	///\brief Get the last error as string
-	const char* getLastError() const			{return m_ctx.getLastError();}
+	const char* getLastError() const			{return m_ser.getLastError();}
 
 	///\brief Get the last error position as string
-	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+	const char* getLastErrorPos() const			{return m_ser.getLastErrorPos();}
 
 	///\enum CallResult
 	///\brief Enumeration of call states of the fetch processing
@@ -409,8 +436,7 @@ private:
 	int m_state;
 	boost::shared_ptr<void> m_data;
 	TypedOutputFilterR m_outputfilter;
-	serialize::Context m_ctx;
-	serialize::FiltermapPrintStateStack m_printstk;
+	serialize::StructSerializer m_ser;
 };
 
 ///\class FormFunctionClosure
@@ -443,7 +469,7 @@ public:
 		Error,		//< termination of call with error (not completed)
 		Yield		//< call interrupted with request for a network operation
 	};
-	///\brief calls the form function with the input from the input filter specified
+	///\brief Calls the form function with the input from the input filter specified
 	///\return Call state
 	CallResult call();
 

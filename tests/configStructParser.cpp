@@ -29,15 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file configStructParser.cpp
-/// \brief test for configuration parser with wolframe example configuration
+///\file configStructParser.cpp
+///\brief test for configuration parser with wolframe example configuration
 
 #include "config/description.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "miscUtils.hpp"
 #ifdef _WIN32
-#pragma warning(disable:4996)
 #pragma warning(disable:4127)
 #endif
 #include <iostream>
@@ -425,7 +424,8 @@ int main( int argc, const char** argv)
 	std::string filename( argv[1]);
 
 	std::string configfile = boost::filesystem::absolute( filename).string();
-	if ( !boost::filesystem::exists( configfile))	{
+	if (!utils::fileExists( configfile))
+	{
 		std::cerr << "Configuration file " << configfile << " does not exist." << std::endl;
 		return false;
 	}

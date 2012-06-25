@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file ddl_atomicType.cpp
 ///\brief implementation of the form DDL atomic type
 #include "ddl/atomicType.hpp"
+#include <limits>
 
 using namespace _Wolframe;
 using namespace ddl;
@@ -61,15 +62,213 @@ void AtomicType::init()
 {
 	switch (m_type)
 	{
-		case double_:
 		case float_:
-		case bigint_:
 		case int_:
 		case uint_:
-		case short_:
-		case ushort_:
-		case char_:	m_value = "0"; ;
 		case string_:	m_value.clear();
 	}
+}
+
+bool AtomicType::assign_double( double val, double epsilon)
+{
+	try
+	{
+		switch (m_type)
+		{
+			case float_:
+			{
+				m_value = boost::lexical_cast<std::string>( val);
+				return true;
+			}
+			case int_:
+			{
+				double vf = std::floor(val);
+				if (val-vf < epsilon)
+				{
+					if (vf < 0.0)
+					{
+						m_value = "-";
+						vf = -vf - 1.0;
+					}
+					IntDomainType conv = boost::numeric_cast<IntDomainType>( vf);
+					m_value.append( boost::lexical_cast<std::string>( conv));
+					return true;
+				}
+				else
+				{
+					throw boost::bad_numeric_cast();
+				}
+			}
+			case uint_:
+			{
+				double vf = std::floor(val);
+				if (val-vf < epsilon)
+				{
+					if (vf < 0.0)
+					{
+						throw boost::bad_numeric_cast();
+					}
+					IntDomainType conv = boost::numeric_cast<IntDomainType>( vf);
+					m_value.append( boost::lexical_cast<std::string>( conv));
+					return true;
+				}
+				else
+				{
+					throw boost::bad_numeric_cast();
+				}
+			}
+			case string_:
+			{
+				m_value = boost::lexical_cast<std::string>( val);
+				return true;
+			}
+		}
+	}
+	catch ( const boost::bad_lexical_cast&)
+	{
+		return false;
+	}
+	catch ( const boost::bad_numeric_cast&)
+	{
+		return false;
+	}
+	return false;
+}
+
+bool AtomicType::assign_int( boost::int64_t val)
+{
+	try
+	{
+		switch (m_type)
+		{
+			case float_:
+			{
+				m_value = boost::lexical_cast<std::string>( val);
+				return true;
+			}
+			case int_:
+			{
+				m_value = boost::lexical_cast<std::string>( val);
+			}
+			case uint_:
+			{
+				if (val < 0)
+				{
+					throw boost::bad_numeric_cast();
+				}
+				m_value = boost::lexical_cast<std::string>( val);
+			}
+			case string_:
+			{
+				m_value = boost::lexical_cast<std::string>( val);
+			}
+		}
+	}
+	catch ( const boost::bad_lexical_cast&)
+	{
+		return false;
+	}
+	catch ( const boost::bad_numeric_cast&)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool AtomicType::assign_uint( boost::uint64_t val)
+{
+	try
+	{
+		switch (m_type)
+		{
+			case float_:
+			{
+				m_value = boost::lexical_cast<std::string>( val);
+				return true;
+			}
+			case int_:
+			case uint_:
+			{
+				m_value = boost::lexical_cast<std::string>( val);
+			}
+			case string_:
+			{
+				m_value = boost::lexical_cast<std::string>( val);
+			}
+		}
+	}
+	catch ( const boost::bad_lexical_cast&)
+	{
+		return false;
+	}
+	catch ( const boost::bad_numeric_cast&)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool AtomicType::assign_string( const std::string& val)
+{
+	try
+	{
+		std::size_t digits;
+		std::string::const_iterator itr = val.begin();
+
+		switch (m_type)
+		{
+			case float_:
+			{
+				if (*itr == '-') ++itr;
+				while (*itr >= '0' && *itr <= '9')
+				{
+					++itr;
+				}
+				if (*itr == '.') ++itr;
+				while (*itr >= '0' && *itr <= '9')
+				{
+					++itr;
+				}
+				if (*itr == 'E')
+				{
+					++itr;
+					if (*itr == '-') ++itr;
+					while (*itr >= '0' && *itr <= '9')
+					{
+						++itr;
+						++digits;
+					}
+					if (digits == 0) throw boost::bad_lexical_cast();
+				}
+				m_value = val;
+				break;
+			}
+			case int_:
+				if (*itr == '-') ++itr;
+				/*no break here!*/
+			case uint_:
+				digits=0;
+				while (*itr >= '0' && *itr <= '9')
+				{
+					++itr;
+					++digits;
+				}
+				if (digits == 0) throw boost::bad_lexical_cast();
+				/*no break here!*/
+			case string_:
+			{
+				m_value = val;
+			}
+		}
+	}
+	catch ( const boost::bad_lexical_cast&)
+	{
+		return false;
+	}
+	catch ( const boost::bad_numeric_cast&)
+	{
+		return false;
+	}
+	return true;
 }
 

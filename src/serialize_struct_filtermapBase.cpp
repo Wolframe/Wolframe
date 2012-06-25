@@ -32,12 +32,33 @@ Project Wolframe.
 ///\file serialize/struct/filtermapBase.cpp
 ///\brief Implements the non intrusive base class of serialization/deserialization of filters
 #include "serialize/struct/filtermapBase.hpp"
-#include "filter/serializefilter.hpp"
+#include "filter/typingfilter.hpp"
 #include <cstring>
 #include <stdexcept>
 
 using namespace _Wolframe;
 using namespace serialize;
+
+StructSerializer::StructSerializer( const void* obj, const FiltermapDescriptionBase* descr, Context::Flags flags)
+	:m_obj(obj)
+	,m_descr(descr)
+	,m_ctx(flags)
+{
+	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_obj));
+}
+
+StructSerializer::StructSerializer( const StructSerializer& o)
+	:m_obj(o.m_obj)
+	,m_descr(o.m_descr)
+	,m_ctx(o.m_ctx)
+	,m_stk(o.m_stk){}
+
+void StructSerializer::init()
+{
+	m_ctx.clear();
+	m_stk.clear();
+	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_obj));
+}
 
 static std::string getParsePath( const FiltermapParseStateStack& stk)
 {
@@ -54,10 +75,10 @@ static std::string getParsePath( const FiltermapParseStateStack& stk)
 	return rt;
 }
 
-static std::string getPrintPath( const FiltermapPrintStateStack& stk)
+static std::string getElementPath( const FiltermapSerializeStateStack& stk)
 {
 	std::string rt;
-	FiltermapPrintStateStack::const_iterator itr=stk.begin(), end=stk.end();
+	FiltermapSerializeStateStack::const_iterator itr=stk.begin(), end=stk.end();
 	for (; itr != end; ++itr)
 	{
 		if (itr->name())
@@ -101,35 +122,74 @@ bool FiltermapDescriptionBase::parse( void* obj, langbind::TypedInputFilter& tin
 	return rt;
 }
 
-bool FiltermapDescriptionBase::print( const void* obj, langbind::TypedOutputFilter& tout, Context& ctx, FiltermapPrintStateStack& stk) const
+StructSerializer::CallResult StructSerializer::print( langbind::TypedOutputFilter& out)
 {
-	bool rt = true;
 	try
 	{
-		if (stk.size() == 0)
+		while (m_stk.size())
 		{
-			if (!m_print) throw std::runtime_error( "null printer called");
-			stk.push_back( FiltermapPrintState( 0, m_print, obj));
-		}
-		while (rt && stk.size())
-		{
-			rt = stk.back().print()( tout, ctx, stk);
-		}
-		if (tout.state() == langbind::OutputFilter::Open && !ctx.getLastError() && stk.size() == 1)
-		{
-			return true;
-		}
-		if (!rt && ctx.getLastError())
-		{
-			std::string path = getPrintPath( stk);
-			ctx.setTag( path.c_str());
+			Context::ElementBuffer elem;
+			if (m_ctx.getElem( elem))
+			{
+				if (!out.print( elem.m_type, elem.m_value))
+				{
+					if (out.getError())
+					{
+						m_ctx.setError( out.getError());
+						std::string path = getElementPath( m_stk);
+						m_ctx.setTag( path.c_str());
+						m_ctx.setElem( elem);
+						return Error;
+					}
+					m_ctx.setElem( elem);
+					return Yield;
+				}
+			}
+			if (!m_stk.back().fetch()( m_ctx, m_stk))
+			{
+				if (m_ctx.getLastError())
+				{
+					std::string path = getElementPath( m_stk);
+					m_ctx.setTag( path.c_str());
+					return Error;
+				}
+			}
 		}
 	}
 	catch (std::exception& e)
 	{
-		ctx.setError( e.what());
-		rt = false;
+		m_ctx.setError( e.what());
+		return Error;
 	}
-	return rt;
+	return Ok;
 }
 
+bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value)
+{
+	try
+	{
+		if (!m_stk.size()) return false;
+
+		Context::ElementBuffer elem;
+		while (!m_ctx.getElem( elem))
+		{
+			if (!m_stk.back().fetch()( m_ctx, m_stk))
+			{
+				if (m_ctx.getLastError())
+				{
+					std::string path = getElementPath( m_stk);
+					m_ctx.setTag( path.c_str());
+					return false;
+				}
+			}
+		}
+		type = elem.m_type;
+		value = elem.m_value;
+	}
+	catch (std::exception& e)
+	{
+		m_ctx.setError( e.what());
+		return false;
+	}
+	return true;
+}

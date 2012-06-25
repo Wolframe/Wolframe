@@ -29,64 +29,63 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/serializefilter.hpp
-///\brief Typed input/output filter wrapper template
-
-#ifndef _Wolframe_SERIALIZE_FILTER_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_FILTER_HPP_INCLUDED
-#include "filter/inputfilter.hpp"
-#include "filter/outputfilter.hpp"
+///\file filter/typingfilter.hpp
+///\brief Interface of filters that wrap untyped to typed input/output filters
+#ifndef _Wolframe_TYPING_FILTER_HPP_INCLUDED
+#define _Wolframe_TYPING_FILTER_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-///\class SerializeInputFilter
+///\class TypingInputFilter
 ///\brief Typed fascade for input filter
-class SerializeInputFilter :public TypedInputFilter
+class TypingInputFilter :public TypedInputFilter
 {
 public:
 	///\brief Constructor
-	explicit SerializeInputFilter( InputFilter* inp=0)
+	explicit TypingInputFilter( const InputFilterR& inp)
 		:m_inputfilter(inp){}
 
 	///\brief Copy constructor
 	///\param[in] o input filter to copy
-	SerializeInputFilter( const SerializeInputFilter& o)
-		:TypedInputFilter(o),m_inputfilter(o.m_inputfilter){}
+	TypingInputFilter( const TypingInputFilter& o)
+		:TypedInputFilter(o)
+		,m_inputfilter(o.m_inputfilter){}
 
 	///\brief Destructor
-	virtual ~SerializeInputFilter(){}
+	virtual ~TypingInputFilter(){}
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
 	virtual bool getNext( ElementType& type, Element& element);
 
 private:
-	InputFilter* m_inputfilter;
+	InputFilterR m_inputfilter;
 };
 
-///\class SerializeOutputFilter
+///\class TypingOutputFilter
 ///\brief Typed fascade for output filter
-class SerializeOutputFilter :public TypedOutputFilter
+class TypingOutputFilter :public TypedOutputFilter
 {
 public:
 	///\brief Constructor
-	SerializeOutputFilter( OutputFilter* out=0)
-		:m_outputfilter(out){}
+	explicit TypingOutputFilter( const OutputFilterR& outp)
+		:m_outputfilter(outp){}
 
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
-	SerializeOutputFilter( const SerializeOutputFilter& o)
-		:TypedOutputFilter(o),m_outputfilter(o.m_outputfilter){}
+	TypingOutputFilter( const TypingOutputFilter& o)
+		:TypedOutputFilter(o)
+		,m_outputfilter(o.m_outputfilter){}
 
 	///\brief Destructor
-	virtual ~SerializeOutputFilter(){}
+	virtual ~TypingOutputFilter(){}
 
 	///\brief Implementation of TypedOutputFilter::print( ElementType,const Element&)
 	virtual bool print( ElementType type, const Element& element);
 
 private:
-	OutputFilter* m_outputfilter;
+	OutputFilterR m_outputfilter;
 };
 
 }}//namespace

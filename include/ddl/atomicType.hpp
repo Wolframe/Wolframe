@@ -38,10 +38,14 @@ Project Wolframe.
 #include <stdexcept>
 #include <cstddef>
 #include <cstring>
+#include <cmath>
+#include <limits>
 #include <boost/utility/enable_if.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include "ddl/bignumType.hpp"
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_float.hpp>
+#include <boost/cstdint.hpp>
 
 namespace _Wolframe {
 namespace ddl {
@@ -55,13 +59,15 @@ public:
 	///\brief What AtomicType can be
 	enum Type
 	{
-		double_,float_,bigint_,int_,uint_,short_,ushort_,char_,string_
+		float_,int_,uint_,string_
 	};
+	typedef boost::int64_t IntDomainType;
+	typedef boost::uint64_t UintDomainType;
 
 	///\brief Get the name of a type as string
 	static const char* typeName( Type tp)
 	{
-		static const char* ar[] = {"double","float","bigint","int","uint","short","ushort","char","string",0};
+		static const char* ar[] = {"float","int","uint","string",0};
 		return ar[ (int)tp];
 	}
 	///\brief Get the id of a type by name, if exists
@@ -84,36 +90,49 @@ public:
 	///\brief Setter method
 	///\tparam T Type of element to assign
 	///\param[in] val element to assign
-	///\return true on success, false if the type check fails or on overflow
+	///\return true on success, false if the type check fails
 	template <typename T>
-	bool set( const T& val)
+	typename boost::enable_if_c<boost::is_float<T>::value,bool>::type
+	set( const T& val)
+	{
+		return assign_double( val, std::numeric_limits<T>::epsilon());
+	}
+
+	template <typename T>
+	typename boost::enable_if_c<boost::is_integral<T>::value && !boost::is_unsigned<T>::value,bool>::type
+	set( const T& val)
+	{
+		return assign_int( val);
+	}
+
+	template <typename T>
+	typename boost::enable_if_c<boost::is_integral<T>::value && boost::is_unsigned<T>::value,bool>::type
+	set( const T& val)
+	{
+		return assign_uint( val);
+	}
+
+	template <typename T>
+	typename boost::enable_if_c<!boost::is_integral<T>::value && !boost::is_float<T>::value && !boost::is_same<std::string,T>::value,bool>::type
+	set( const T& val)
 	{
 		try
 		{
-			switch (m_type)
-			{
-				case double_:	assign<double,T>( val); return true;
-				case float_:	assign<float,T>( val); return true;
-				case bigint_:	assign_bigint<T>( val); return true;
-				case int_:	assign<int,T>( val); return true;
-				case uint_:	assign<unsigned int,T>( val); return true;
-				case short_:	assign<short,T>( val); return true;
-				case ushort_:	assign<unsigned short,T>( val); return true;
-				case char_:	assign<unsigned char,T>( val); return true;
-				case string_:	m_value = boost::lexical_cast<std::string>( val); return true;
-			}
-
+			return assign_string( boost::lexical_cast<std::string>(val));
 		}
 		catch ( const boost::bad_lexical_cast&)
 		{
 			return false;
 		}
-		catch ( const boost::bad_numeric_cast&)
-		{
-			return false;
-		}
-		return false;
 	}
+
+	template <typename T>
+	typename boost::enable_if_c<boost::is_same<std::string,T>::value,bool>::type
+	set( const T& val)
+	{
+		return assign_string( val);
+	}
+
 
 	///\brief Getter method
 	///\tparam T Type of element to get
@@ -159,41 +178,10 @@ private:
 	Type m_type;						//< type of this
 	std::string m_value;					//< value of this
 
-	///\brief Internally used assingement over another type as intermediate.
-	///\tparam M type serving as intermediate of the assignement (used for type checking)
-	///\tparam S type of the element to assign to this. (source type of the assingement)
-	///\param[in] src element to assign to this
-	template <typename M, typename S>
-	typename boost::disable_if_c<
-		boost::is_same<M,S>::value || boost::is_same<std::string,S>::value,void>::type assign( const S& src)
-	{
-		M im = boost::numeric_cast<M>( src);
-		m_value = boost::lexical_cast<std::string>(im);
-	}
-
-	template <typename M, typename S>
-	typename boost::enable_if_c<
-		boost::is_same<M,S>::value && !boost::is_same<std::string,S>::value,void>::type assign( const S& src)
-	{
-		m_value = boost::lexical_cast<std::string>(src);
-	}
-
-	template <typename M, typename S>
-	typename boost::enable_if_c<
-		!boost::is_same<M,S>::value && boost::is_same<std::string,S>::value,void>::type assign( const S& src)
-	{
-		M im = boost::lexical_cast<M>( src);
-		m_value = boost::lexical_cast<std::string>(im);
-	}
-
-	template <typename M, typename S>
-	bool assign_bigint( const S& src)
-	{
-		Bigint val;
-		if (!val.set( src)) return false;
-		if (!val.get( m_value)) return false;
-		return true;
-	}
+	bool assign_double( double val, double epsilon);
+	bool assign_int( IntDomainType val);
+	bool assign_uint( UintDomainType val);
+	bool assign_string( const std::string& val);
 };
 
 }}//namespace

@@ -119,15 +119,16 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_directmapCommandHandler.obj \
 	filter_filterbase.obj \
 	filter_tostringfilter.obj \
-	filter_serializefilter.obj \
+	filter_typingfilter.obj \
 	filter_textwolf_filter.obj \
 	filter_char_filter.obj \
 	filter_line_filter.obj \
 	filter_token_filter.obj \
 	filter_expression_filter.obj \
 	types_bignum.obj \
+	types_bcdArithmetic.obj \
 	serialize_struct_filtermapBase.obj \
-	serialize_ddl_filtermapPrint.obj \
+	serialize_ddl_filtermapSerialize.obj \
 	serialize_ddl_filtermapParse.obj \
 	serialize_mapContext.obj \
 	ddl_atomicType.obj \

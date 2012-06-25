@@ -33,11 +33,12 @@ Project Wolframe.
 ///\brief implementation of scripting language objects
 #include "langbind/appObjects.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
-#include "serialize/ddl/filtermapDDLPrint.hpp"
+#include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include "logger-v1.hpp"
 #include "filter/filter.hpp"
-#include "filter/serializefilter.hpp"
+#include "filter/typingfilter.hpp"
+#include "filter/tostringfilter.hpp"
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
 #include "filter/token_filter.hpp"
@@ -138,66 +139,127 @@ FilterMap::FilterMap()
 #endif
 }
 
-bool DDLForm::getValue( const char* name, std::string& val) const
+
+RedirectFilterClosure::RedirectFilterClosure()
+	:m_state(0)
+	,m_taglevel(0)
+	,m_elemtype(InputFilter::Value){}
+
+RedirectFilterClosure::RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o)
+	:m_state(1)
+	,m_taglevel(0)
+	,m_inputfilter(i)
+	,m_outputfilter(o)
+	,m_elemtype(InputFilter::Value)
+	{}
+
+RedirectFilterClosure::RedirectFilterClosure( const RedirectFilterClosure& o)
+	:m_state(o.m_state)
+	,m_taglevel(o.m_taglevel)
+	,m_inputfilter(o.m_inputfilter)
+	,m_outputfilter(o.m_outputfilter)
+	,m_elemtype(o.m_elemtype)
+	,m_elem(o.m_elem)
+	{}
+
+void RedirectFilterClosure::init( const TypedInputFilterR& i, const TypedOutputFilterR& o)
 {
-	serialize::Context::Flags flt;
-	if (serialize::Context::getFlag( name, flt))
-	{
-		if ((int)flt & (int)m_flags)
-		{
-			val = "true";
-		}
-		else
-		{
-			val = "false";
-		}
-		return true;
-	}
-	return false;
+	m_inputfilter = i;
+	m_outputfilter = o;
+	m_state = 1;
+	m_taglevel = 0;
+	m_elemtype = InputFilter::Value;
 }
 
-bool DDLForm::setValue( const char* name, const std::string& value)
+
+RedirectFilterClosure::CallResult RedirectFilterClosure::call()
 {
-	serialize::Context::Flags flt;
-	if (serialize::Context::getFlag( name, flt))
+	if (m_state == 0) return Error;
+	if (!m_inputfilter.get() || !m_outputfilter.get()) return Error;
+
+	for (;;) switch (m_state)
 	{
-		if (value == "true")
-		{
-			m_flags = (serialize::Context::Flags)((int)flt | (int)m_flags);
-		}
-		else if (value == "false")
-		{
-			if ((int)flt & (int)m_flags)
+		case 1:
+			if (!m_inputfilter->getNext( m_elemtype, m_elem))
 			{
-				m_flags = (serialize::Context::Flags)((int)flt ^ (int)m_flags);
+				switch (m_inputfilter->state())
+				{
+					case InputFilter::Open:
+						return Ok;
+
+					case InputFilter::EndOfMessage:
+						return Yield;
+
+					case InputFilter::Error:
+						return Error;
+				}
 			}
-		}
-		else
-		{
-			throw std::runtime_error( "illegal value for boolean");
-		}
-		return true;
+			m_state = 2;
+			if (m_elemtype == InputFilter::OpenTag)
+			{
+				++m_taglevel;
+			}
+			else if (m_elemtype == InputFilter::CloseTag)
+			{
+				--m_taglevel;
+				if (m_taglevel < 0)
+				{
+					m_state = 3;
+					return Ok;
+				}
+			}
+			/*no break here!*/
+		case 2:
+			if (!m_outputfilter->print( m_elemtype, m_elem))
+			{
+				switch (m_outputfilter->state())
+				{
+					case OutputFilter::Open:
+						return Error;
+
+					case OutputFilter::EndOfBuffer:
+						return Yield;
+
+					case OutputFilter::Error:
+						return Error;
+				}
+			}
+			m_state = 1;
+			continue;
+		default:
+			return Ok;
 	}
-	return false;
 }
+
 
 std::string DDLForm::tostring() const
 {
-	std::ostringstream out;
-	m_structure.print( out);
-	return out.str();
+	ToStringFilter out;
+	serialize::DDLStructSerializer ser( m_structure);
+	if (ser.print( out) != serialize::DDLStructSerializer::Ok)
+	{
+		if (out.state() == OutputFilter::EndOfBuffer)
+		{
+			throw std::logic_error( "internal: tostring serialization with yield");
+		}
+		else
+		{
+			throw std::runtime_error( ser.getLastError());
+		}
+	}
+	return out.content();
 }
 
-DDLFormFill::DDLFormFill( const DDLFormR& f)
+DDLFormFill::DDLFormFill( const DDLFormR& f, serialize::Context::Flags flags)
 	:m_form(f)
 	,m_state(0)
-	,m_ctx(f->flags()){}
+	,m_ctx(flags){}
 
-DDLFormFill::DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp)
+DDLFormFill::DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp, serialize::Context::Flags flags)
 	:m_form(f)
 	,m_state(0)
 	,m_inputfilter(inp)
-	,m_ctx(f->flags()){}
+	,m_ctx(flags){}
 
 DDLFormFill::DDLFormFill( const DDLFormFill& o)
 	:m_form(o.m_form)
@@ -252,29 +314,27 @@ DDLFormFill::CallResult DDLFormFill::call()
 	return Ok;
 }
 
-DDLFormPrint::DDLFormPrint( const DDLFormR& f)
+DDLFormPrint::DDLFormPrint( const DDLFormR& f, serialize::Context::Flags flags)
 	:m_form(f)
 	,m_state(0)
-	,m_ctx(f->flags()){}
+	,m_ser( m_form->structure(), flags){}
 
-DDLFormPrint::DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp)
+DDLFormPrint::DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp, serialize::Context::Flags flags)
 	:m_form(f)
 	,m_state(1)
 	,m_outputfilter(outp)
-	,m_ctx(f->flags()){}
+	,m_ser(m_form->structure(), flags){}
 
 DDLFormPrint::DDLFormPrint( const DDLFormPrint& o)
 	:m_form(o.m_form)
 	,m_state(o.m_state)
 	,m_outputfilter(o.m_outputfilter)
-	,m_ctx(o.m_ctx)
-	,m_printstk(o.m_printstk){}
+	,m_ser(o.m_ser){}
 
 void DDLFormPrint::init( const TypedOutputFilterR& o)
 {
 	m_outputfilter = o;
-	m_ctx.clear();
-	m_printstk.clear();
+	m_ser.init();
 	m_state = 1;
 }
 
@@ -282,35 +342,25 @@ DDLFormPrint::CallResult DDLFormPrint::fetch()
 {
 	if (m_state == 0) return Error;
 	if (m_state == 2) return Ok;
-	if (!m_outputfilter.get())
-	{
-		m_ctx.setError( "no output filter defined for fetching the form iterator");
-		return Error;
-	}
 	if (!m_form.get())
 	{
-		m_ctx.setError( "no form defined for fetching the form iterator");
-		return Error;
+		throw std::runtime_error( "no form defined to print");
 	}
-	if (!serialize::print( m_form->structure(), *m_outputfilter, m_ctx, m_printstk))
+	if (!m_outputfilter.get()) throw std::runtime_error( "no output specified for serialization");
+
+	switch (m_ser.print(*m_outputfilter))
 	{
-		if (m_ctx.getLastError()) return Error;
-		switch (m_outputfilter->state())
-		{
-			case OutputFilter::Open:
-				m_ctx.setError( "unknown error in form print");
-				return Error;
+		case serialize::DDLStructSerializer::Ok:
+			m_state = 2;
+			return Ok;
 
-			case OutputFilter::EndOfBuffer:
-				return Yield;
+		case serialize::DDLStructSerializer::Yield:
+			return Yield;
 
-			case OutputFilter::Error:
-				m_ctx.setError( m_outputfilter->getError());
-				return Error;
-		}
+		case serialize::DDLStructSerializer::Error:
+			return Error;
 	}
-	m_state = 2;
-	return Ok;
+	throw std::runtime_error( "illegal state in form print");
 }
 
 void DDLFormMap::defineForm( const std::string& name, const DDLForm& f)
@@ -345,14 +395,11 @@ FormFunctionResult::FormFunctionResult( const FormFunction& f)
 	:m_description(f.api_result())
 	,m_state(0)
 	,m_data(std::calloc( f.api_result()->size(), 1), std::free)
+	,m_ser( m_data.get(), m_description)
 {
 	if (!m_data.get()) throw std::bad_alloc();
 	void* result_struct = m_data.get();
-	if (!result_struct || !m_description->init( result_struct))
-	{
-		m_ctx.setError( "could not initialize api result object for form function");
-	}
-	else
+	if (result_struct && m_description->init( result_struct))
 	{
 		m_state = 1;
 	}
@@ -363,8 +410,7 @@ FormFunctionResult::FormFunctionResult( const FormFunctionResult& o)
 	,m_state(o.m_state)
 	,m_data(o.m_data)
 	,m_outputfilter(o.m_outputfilter)
-	,m_ctx(o.m_ctx)
-	,m_printstk(o.m_printstk){}
+	,m_ser(o.m_ser){}
 
 FormFunctionResult::~FormFunctionResult()
 {
@@ -378,8 +424,7 @@ FormFunctionResult::~FormFunctionResult()
 void FormFunctionResult::init( const TypedOutputFilterR& o)
 {
 	m_outputfilter = o;
-	m_ctx.clear();
-	m_printstk.clear();
+	m_ser.init();
 	m_state = 1;
 }
 
@@ -387,29 +432,22 @@ FormFunctionResult::CallResult FormFunctionResult::fetch()
 {
 	if (m_state == 0) return Error;
 	if (m_state == 2) return Ok;
-	const void* result_struct = m_data.get();
-	if (!m_outputfilter.get())
-	{
-		m_ctx.setError( "no output filter defined for fetching the form function result");
-		return Error;
-	}
-	if (!m_description->print( result_struct, *m_outputfilter, m_ctx, m_printstk))
-	{
-		switch (m_outputfilter->state())
-		{
-			case OutputFilter::Open:
-				return Error;
 
-			case OutputFilter::EndOfBuffer:
-				return Yield;
+	if (!m_outputfilter.get()) throw std::runtime_error( "no output specified for serialization");
 
-			case OutputFilter::Error:
-				m_ctx.setError( m_outputfilter->getError());
-				return Error;
-		}
+	switch (m_ser.print(*m_outputfilter))
+	{
+		case serialize::StructSerializer::Ok:
+			m_state = 2;
+			return Ok;
+
+		case serialize::StructSerializer::Yield:
+			return Yield;
+
+		case serialize::StructSerializer::Error:
+			return Error;
 	}
-	m_state = 2;
-	return Ok;
+	throw std::runtime_error( "illegal state in form print");
 }
 
 FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
@@ -548,7 +586,7 @@ TransactionFunctionResult::CallResult TransactionFunctionResult::fetch()
 		case 0: return Error;
 		case 1:
 		{
-			SerializeInputFilter si( m_resultreader.get());
+			TypingInputFilter si( m_resultreader);
 			if (!si.getNext( m_elemtype, m_elem))
 			{
 				switch (si.state())
@@ -601,6 +639,8 @@ TransactionFunctionResult::CallResult TransactionFunctionResult::fetch()
 void TransactionFunctionResult::init( const TypedOutputFilterR& o)
 {
 	m_state = 1;
+	m_elemtype = InputFilter::Value;
+
 	m_resultreader.reset( m_func.resultreader()->copy());
 	if (m_resultbuf.get())
 	{
@@ -632,6 +672,7 @@ TransactionFunctionClosure::TransactionFunctionClosure( const std::string& name_
 	,m_name(name_)
 	,m_cmdop(cmdbind::CommandHandler::READ)
 	,m_state(0)
+	,m_elemtype(InputFilter::Value)
 	,m_cmdinputbuf(std::malloc( InputBufSize), std::free)
 	,m_cmdoutputbuf(std::malloc( OutputBufSize), std::free)
 	,m_result(f)
@@ -644,12 +685,15 @@ TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctio
 	,m_cmdop(cmdbind::CommandHandler::READ)
 	,m_state(o.m_state)
 	,m_lasterror(o.m_lasterror)
+	,m_elemtype(o.m_elemtype)
+	,m_elem(o.m_elem)
 	,m_cmdinputbuf(o.m_cmdinputbuf)
 	,m_cmdoutputbuf(o.m_cmdoutputbuf)
 	,m_cmdwriter(o.m_cmdwriter)
 	,m_result(o.m_result)
 	,m_inputfilter(o.m_inputfilter)
 	{}
+
 
 TransactionFunctionClosure::CallResult TransactionFunctionClosure::call()
 {
@@ -695,7 +739,7 @@ TransactionFunctionClosure::CallResult TransactionFunctionClosure::call()
 					m_state = 2;
 				case 2:
 				{
-					SerializeOutputFilter so( m_cmdwriter.get());
+					TypingOutputFilter so( m_cmdwriter);
 					if (!so.print( m_elemtype, m_elem))
 					{
 						switch (so.state())

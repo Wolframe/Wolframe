@@ -37,9 +37,9 @@
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
-#include "serialize/ddl/filtermapDDLPrint.hpp"
+#include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/token_filter.hpp"
-#include "filter/serializefilter.hpp"
+#include "filter/typingfilter.hpp"
 #if WITH_LUA
 #include "cmdbind/luaCommandHandler.hpp"
 #include "langbind/luaObjects.hpp"
@@ -245,8 +245,8 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		if (gc->getFormFunction( proc.c_str(), func))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
-			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
-			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
+			langbind::TypedInputFilterR inp( new langbind::TypingInputFilter( flt.inputfilter()));
+			langbind::TypedOutputFilterR outp( new langbind::TypingOutputFilter( flt.outputfilter()));
 			langbind::FormFunctionClosure closure( func);
 			closure.init( inp);
 			langbind::FormFunctionClosure::CallResult callrt = closure.call();
@@ -302,9 +302,9 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		if (gc->getForm( proc.c_str(), df))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
-			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
-			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
-			DDLFormFill closure( df, inp);
+			langbind::TypedInputFilterR inp( new langbind::TypingInputFilter( flt.inputfilter()));
+			langbind::TypedOutputFilterR outp( new langbind::TypingOutputFilter( flt.outputfilter()));
+			DDLFormFill closure( df, inp, serialize::Context::ValidateAttributes);
 
 			langbind::DDLFormFill::CallResult callrt = closure.call();
 			while (callrt == langbind::DDLFormFill::Yield)
@@ -321,7 +321,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			}
 			if (callrt == langbind::DDLFormFill::Ok)
 			{
-				langbind::DDLFormPrint res( df, outp);
+				langbind::DDLFormPrint res( df, outp, serialize::Context::None);
 				langbind::DDLFormPrint::CallResult fetchrt = res.fetch();
 				while (fetchrt == langbind::DDLFormPrint::Yield)
 				{
@@ -358,8 +358,8 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		if (gc->getTransactionFunction( proc.c_str(), func))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
-			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
-			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
+			langbind::TypedInputFilterR inp( new langbind::TypingInputFilter( flt.inputfilter()));
+			langbind::TypedOutputFilterR outp( new langbind::TypingOutputFilter( flt.outputfilter()));
 			langbind::TransactionFunctionClosure closure( proc, func);
 			closure.init( inp);
 			langbind::TransactionFunctionClosure::CallResult callrt = closure.call();

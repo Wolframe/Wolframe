@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter_serializefilter.cpp
-///\brief implementation of serialization filters
-#include "filter/serializefilter.hpp"
+///\file filter_typingfilter.cpp
+///\brief Implementation of filters that wrap untyped to typed input filters
+#include "filter/typingfilter.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 
@@ -39,20 +39,20 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace langbind;
 
-bool SerializeInputFilter::getNext( ElementType& type, Element& element)
+bool TypingInputFilter::getNext( ElementType& type, Element& element)
 {
-	if (!m_inputfilter) return false;
+	if (!m_inputfilter.get()) return false;
 	element.type = TypedInputFilter::Element::string_;
 	bool rt = m_inputfilter->getNext( type, element.value.blob_.ptr, element.value.blob_.size);
 	if (!rt) setState( m_inputfilter->state(), m_inputfilter->getError());
 	return rt;
 }
 
-bool SerializeOutputFilter::print( ElementType type, const Element& element)
+bool TypingOutputFilter::print( ElementType type, const Element& element)
 {
 	bool rt = true;
 
-	if (!m_outputfilter) return false;
+	if (!m_outputfilter.get()) return false;
 	try
 	{
 		std::string castelement;
@@ -89,7 +89,7 @@ bool SerializeOutputFilter::print( ElementType type, const Element& element)
 				rt = m_outputfilter->print( type, element.value.string_.ptr, element.value.string_.size);
 				break;
 		}
-		if (!rt) setState( m_outputfilter->state(), m_outputfilter->getError());
+		setState( m_outputfilter->state(), m_outputfilter->getError());
 	}
 	catch (boost::bad_lexical_cast& e)
 	{

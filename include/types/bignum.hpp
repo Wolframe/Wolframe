@@ -70,7 +70,7 @@ public:
 	void get( std::string& val) const;
 
 	std::size_t size() const				{return m_value.size();}
-	
+
 
 private:
 	std::string m_value;			//< number digits with sign
