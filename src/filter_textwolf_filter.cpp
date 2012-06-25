@@ -166,8 +166,9 @@ struct InputFilterImpl:public InputFilter
 
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
 	{
-		ptr = m_src + m_parser.getPosition();
-		size = m_srcsize - m_parser.getPosition();
+		std::size_t pp = m_parser.getPosition();
+		ptr = m_src + pp;
+		size = (m_srcsize > pp)?(m_srcsize-pp):0;
 		end = m_srcend;
 	}
 
@@ -191,7 +192,7 @@ struct InputFilterImpl:public InputFilter
 				(textwolf::XMLScannerBase::CloseTag,(int)CloseTag)
 				(textwolf::XMLScannerBase::CloseTagIm,(int)CloseTag)
 				(textwolf::XMLScannerBase::Content,(int)Value)
-				(textwolf::XMLScannerBase::Exit,-1);
+				(textwolf::XMLScannerBase::Exit,(int)CloseTag);
 			}
 		};
 		static const ElementTypeMap tmap;
@@ -204,10 +205,7 @@ struct InputFilterImpl:public InputFilter
 			int st = tmap[ et];
 			if (st == -1)
 			{
-				if (et != textwolf::XMLScannerBase::Exit)
-				{
-					setState( Error, "textwolf: syntax error in XML");
-				}
+				setState( Error, "textwolf: syntax error in XML");
 				return false;
 			}
 			else

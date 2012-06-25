@@ -56,26 +56,24 @@ struct FiltermapIntrusiveParser
 	static bool parse( langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk);
 };
 
-static bool parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
+
+static bool parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
 {
 	langbind::InputFilter::ElementType typ;
 	langbind::TypedFilterBase::Element element;
 
 	if (!inp.getNext( typ, element))
 	{
-		const char* err = inp.getError();
-		if (err) ctx.setError( err);
-		return false;
+		if (inp.state() == langbind::InputFilter::EndOfMessage) return false;
+		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
 	}
 	if (typ == langbind::InputFilter::Value)
 	{
-		ctx.setError( "subsequent atomic values not allowed in filter serialization");
-		return false;
+		throw SerializationErrorException( "subsequent atomic values not allowed in filter serialization", element.tostring(), StructParser::getElementPath( stk));
 	}
 	if (typ != langbind::InputFilter::CloseTag)
 	{
-		ctx.setError( "close tag expected after atomic element");
-		return false;
+		throw SerializationErrorException( "close tag expected after atomic element", element.tostring(), StructParser::getElementPath( stk));
 	}
 	stk.pop_back();
 	return true;
@@ -90,9 +88,8 @@ bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Cont
 
 	if (!inp.getNext( typ, element))
 	{
-		const char* err = inp.getError();
-		if (err) ctx.setError( err);
-		return false;
+		if (inp.state() != langbind::InputFilter::Error) return false;
+		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
 	}
 	switch (typ)
 	{
@@ -101,24 +98,21 @@ bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Cont
 			FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
 			if (itr == descr->end())
 			{
-				ctx.setError( "unknown element ", element.tostring());
-				return false;
+				throw SerializationErrorException( "unknown element", element.tostring(), StructParser::getElementPath( stk));
 			}
 			std::size_t idx = itr - descr->begin();
 			if (idx < descr->nof_attributes())
 			{
 				if (ctx.flag( Context::ValidateAttributes))
 				{
-					ctx.setError( "attribute element expected");
-					return false;
+					throw SerializationErrorException( "attribute element expected", element.tostring(), StructParser::getElementPath( stk));
 				}
 			}
 			if (itr->second.type() != FiltermapDescriptionBase::Vector)
 			{
 				if (stk.back().selectElement( idx, descr->size()))
 				{
-					ctx.setError( "duplicate definition");
-					return false;
+					throw SerializationErrorException( "duplicate definition", element.tostring(), StructParser::getElementPath( stk));
 				}
 			}
 			void* value = (char*)stk.back().value() + itr->second.ofs();
@@ -135,27 +129,23 @@ bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Cont
 			FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
 			if (itr == descr->end())
 			{
-				ctx.setError( "unknown attribute");
-				return false;
+				throw SerializationErrorException( "unknown attribute", element.tostring(), StructParser::getElementPath( stk));
 			}
 			std::size_t idx = itr - descr->begin();
 			if (idx >= descr->nof_attributes())
 			{
 				if (ctx.flag( Context::ValidateAttributes))
 				{
-					ctx.setError( "content element expected");
-					return false;
+					throw SerializationErrorException( "content element expected", element.tostring(), StructParser::getElementPath( stk));
 				}
 			}
 			if (itr->second.type() != FiltermapDescriptionBase::Atomic)
 			{
-				ctx.setError( "atomic value expected for attribute");
-				return false;
+				throw SerializationErrorException( "atomic value expected for attribute", element.tostring(), StructParser::getElementPath( stk));
 			}
 			if (stk.back().selectElement( idx, descr->size()))
 			{
-				ctx.setError( "duplicate definition");
-				return false;
+				throw SerializationErrorException( "duplicate definition", element.tostring(), StructParser::getElementPath( stk));
 			}
 			stk.push_back( FiltermapParseState( itr->first.c_str(), itr->second.parse(), (char*)stk.back().value() + itr->second.ofs()));
 			return true;
@@ -163,8 +153,7 @@ bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Cont
 
 		case langbind::InputFilter::Value:
 		{
-			ctx.setError( "structure instead of value expected");
-			return false;
+			throw SerializationErrorException( "structure instead of value expected", element.tostring(), StructParser::getElementPath( stk));
 		}
 
 		case langbind::InputFilter::CloseTag:
@@ -174,16 +163,14 @@ bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Cont
 			{
 				if (itr->second.mandatory() && !stk.back().initCount( itr-descr->begin()))
 				{
-					ctx.setError( "undefined structure element");
-					return false;
+					throw SerializationErrorException( "undefined structure element", itr->first, StructParser::getElementPath( stk));
 				}
 			}
 			stk.pop_back();
 			return true;
 		}
 	}
-	ctx.setError( "illegal state in parse structure");
-	return false;
+	throw SerializationErrorException( "illegal state in parse structure", StructParser::getElementPath( stk));
 }
 
 template <typename T>
@@ -209,7 +196,7 @@ bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&
 
 
 template <typename T>
-static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
+static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
 {
 	langbind::InputFilter::ElementType typ;
 	langbind::TypedFilterBase::Element element;
@@ -217,22 +204,19 @@ static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& in
 
 	if (!inp.getNext( typ, element))
 	{
-		const char* err = inp.getError();
-		if (err) ctx.setError( err);
-		return false;
+		if (inp.state() != langbind::InputFilter::Error) return false;
+		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
 	}
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:
 		case langbind::InputFilter::Attribute:
-			ctx.setError( "atomic value expected");
-			return false;
+			throw SerializationErrorException( "atomic value expected", StructParser::getElementPath( stk));
 
 		case langbind::InputFilter::Value:
 			if (!parseValue( *obj, element))
 			{
-				ctx.setError( "illegal type of atomic value");
-				return false;
+				throw SerializationErrorException( "illegal type of atomic value", StructParser::getElementPath( stk));
 			}
 			stk.pop_back();
 			return true;
@@ -241,8 +225,7 @@ static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& in
 			element = langbind::TypedFilterBase::Element();
 			if (!parseValue( *obj, element))
 			{
-				ctx.setError( "cannot convert empty value to expected atomic type");
-				return false;
+				throw SerializationErrorException( "cannot convert empty value to expected atomic type", StructParser::getElementPath( stk));
 			}
 			stk.pop_back();
 			if (stk.back().parse() == &parseAtomicElementEndTag)
@@ -251,12 +234,11 @@ static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& in
 			}
 			else
 			{
-				ctx.setError( "value expected after attribute");
+				throw SerializationErrorException( "value expected after attribute", StructParser::getElementPath( stk));
 			}
 			return true;
 	}
-	ctx.setError( "illegal state in parse atomic value");
-	return false;
+	throw SerializationErrorException( "illegal state in parse atomic value", StructParser::getElementPath( stk));
 }
 
 template <typename T>

@@ -44,6 +44,25 @@ extern "C" {
 using namespace _Wolframe;
 using namespace langbind;
 
+void LuaErrorMessage::init( const char* funcname, const char* msg)
+{
+	std::size_t nn = std::strlen( msg);
+	if (nn >= bufsize)
+	{
+		nn = bufsize-1;
+	}
+	std::memcpy( m_buf, msg, nn);
+	m_buf[ nn] = '\0';
+
+	nn = std::strlen( funcname);
+	if (nn >= funcnamesize)
+	{
+		nn = funcnamesize-1;
+	}
+	std::memcpy( m_funcname, funcname, nn);
+	m_funcname[ nn] = '\0';
+}
+
 static int luaException( lua_State* ls)
 {
 	const char* errmsg = lua_tostring( ls, -1);
@@ -60,4 +79,5 @@ LuaExceptionHandlerScope::~LuaExceptionHandlerScope()
 {
 	lua_atpanic( m_ls, m_panicf);
 }
+
 

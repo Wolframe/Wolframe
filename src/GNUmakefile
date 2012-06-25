@@ -120,6 +120,7 @@ ifeq ($(WITH_LUA),1)
 LOCAL_STATIC_LIB_OBJS += \
 	filter_luafilter.o \
 	langbind_luaObjects.o \
+	langbind_luaGetFunctionClosure.o \
 	langbind_luaDebug.o \
 	langbind_luaException.o \
 	langbind_luaBignum.o \

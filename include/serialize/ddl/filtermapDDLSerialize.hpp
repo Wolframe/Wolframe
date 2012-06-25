@@ -43,46 +43,27 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-class DDLStructSerializer
+class DDLStructSerializer :public langbind::TypedInputFilter
 {
 public:
-	DDLStructSerializer( const ddl::StructType& st, Context::Flags flags=Context::None)
-		:m_st(&st)
-		,m_ctx(flags)
-	{
-		m_stk.push_back( FiltermapDDLSerializeState( &st, langbind::TypedFilterBase::Element()));
-	}
+	explicit DDLStructSerializer( const ddl::StructTypeR& st);
 
-	DDLStructSerializer( const DDLStructSerializer& o)
-		:m_ctx(o.m_ctx)
-		,m_stk(o.m_stk){}
+	DDLStructSerializer( const DDLStructSerializer& o);
+	virtual ~DDLStructSerializer(){}
 
-	void init()
-	{
-		m_ctx.clear();
-		m_stk.clear();
-		m_stk.push_back( FiltermapDDLSerializeState( m_st, langbind::TypedFilterBase::Element()));
-	}
+	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
 
-	enum CallResult
-	{
-		Ok,
-		Error,
-		Yield
-	};
-
-	CallResult print( langbind::TypedOutputFilter& out);
+	bool call();
 
 	bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
 
-	const char* getLastError() const			{return m_ctx.getLastError();}
-	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+	const ddl::StructTypeR& structure() const			{return m_st;}
 
 private:
-	const ddl::StructType* m_st;
+	const ddl::StructTypeR m_st;
 	Context m_ctx;
+	langbind::TypedOutputFilterR m_out;
 	FiltermapDDLSerializeStateStack m_stk;
-	int hugo;
 };
 
 }}//namespace

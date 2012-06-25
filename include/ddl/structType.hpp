@@ -234,6 +234,8 @@ private:
 	bool m_mandatory;
 };
 
+typedef CountedReference<StructType> StructTypeR;
+
 }}//namespace
 #endif
 

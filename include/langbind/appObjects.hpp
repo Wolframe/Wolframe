@@ -31,8 +31,8 @@ Project Wolframe.
 ************************************************************************/
 ///\file langbind/appObjects.hpp
 ///\brief interface to system objects for processor language bindings
-#ifndef _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
-#define _Wolframe_langbind_APPOBJECTS_HPP_INCLUDED
+#ifndef _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
+#define _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
@@ -61,14 +61,6 @@ class Logger
 class Output
 {
 public:
-	///\enum ItemType
-	///\brief Output state
-	enum ItemType
-	{
-		Data,		//< normal processing
-		DoYield,	//< yield because rest of buffer not sufficient to complete operation
-		Error		//< logic error in output. Operation is not possible
-	};
 	///\brief Constructor
 	Output() :m_state(0){}
 	///\brief Copy constructor
@@ -85,8 +77,8 @@ public:
 	///\param[in] e1size first element size
 	///\param[in] e2 second element
 	///\param[in] e2size second element size
-	///\return state returned
-	ItemType print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
+	///\return true, on success, false if we have to yield processing
+	bool print( const char* e1, unsigned int e1size, const char* e2, unsigned int e2size);
 
 	const OutputFilterR& outputfilter() const		{return m_outputfilter;}
 	OutputFilterR& outputfilter()				{return m_outputfilter;}
@@ -119,52 +111,7 @@ private:
 	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
 };
 
-///\class InputFilterClosure
-///\brief Closure for the input iterator (in Lua returned by 'input.get()')
-class InputFilterClosure
-{
-public:
-	///\enum ItemType
-	///\brief Input loop state
-	enum ItemType
-	{
-		EndOfData,	//< End of processed content reached
-		Data,		//< normal processing, loop can continue
-		DoYield,	//< have to yield and request more network input
-		Error		//< have to stop processing because of an error
-	};
 
-	///\brief Constructor
-	///\param[in] ig input filter reference from input
-	InputFilterClosure( const InputFilterR& ig)
-		:m_inputfilter(ig)
-		,m_type(InputFilter::Value)
-		,m_gotattr(false)
-		,m_taglevel(0){}
-
-	InputFilterClosure( const InputFilterClosure& o)
-		:m_inputfilter(o.m_inputfilter)
-		,m_type(o.m_type)
-		,m_attrbuf(o.m_attrbuf)
-		,m_gotattr(o.m_gotattr)
-		,m_taglevel(o.m_taglevel){}
-
-	///\brief Get the next pair of elements
-	///\param[out] e1 first element
-	///\param[out] e1size first element size
-	///\param[out] e2 second element
-	///\param[out] e2size second element size
-	///\return state returned
-	ItemType fetch( const char*& e1, unsigned int& e1size, const char*& e2, unsigned int& e2size);
-
-	const InputFilterR& inputfilter() const	{return m_inputfilter;}
-private:
-	InputFilterR m_inputfilter;			//< rerefence to input with filter
-	InputFilter::ElementType m_type;		//< current state (last value type parsed)
-	std::string m_attrbuf;				//< buffer for attribute name
-	bool m_gotattr;					//< true, if the following value belongs to an attribute
-	std::size_t m_taglevel;				//< current level in tag hierarchy
-};
 
 ///\class FilterMap
 ///\brief Map of available filters seen from scripting language binding
@@ -191,17 +138,9 @@ public:
 	RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o);
 	RedirectFilterClosure( const RedirectFilterClosure& o);
 
-	///\enum CallResult
-	///\brief Enumeration of call states of the processing
-	enum CallResult
-	{
-		Ok,		//< successful termination of call
-		Error,		//< termination of call with error (not completed)
-		Yield		//< call interrupted with request for a network operation
-	};
 	///\brief Calls the fetching of input and printing it to output until end or interruption
-	///\return Call state
-	CallResult call();
+	///\return true when completed
+	bool call();
 
 	///\brief Initialization of call context for a new call
 	///\param[in] i call input
@@ -234,116 +173,19 @@ public:
 
 	///\brief Constructor
 	///\param[in] st form data
-	DDLForm( const ddl::StructType& st)
+	DDLForm( const ddl::StructTypeR& st)
 		:m_structure(st){}
 
 	///\brief Destructor
 	~DDLForm(){}
 
-	const ddl::StructType& structure() const	{return m_structure;}
+	const ddl::StructTypeR& structure() const	{return m_structure;}
 
 	std::string tostring() const;
+	void clone();
 private:
 	friend class DDLFormFill;
-	ddl::StructType m_structure;
-};
-
-typedef CountedReference<DDLForm> DDLFormR;
-
-
-///\class DDLFormFill
-///\brief State of filling a form
-class DDLFormFill
-{
-public:
-	///\brief Constructor
-	DDLFormFill( const DDLFormR& f, serialize::Context::Flags flags);
-
-	///\brief Constructor
-	DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp, serialize::Context::Flags flags);
-
-	///\brief Copy constructor
-	DDLFormFill( const DDLFormFill& o);
-
-	///\brief Destructor
-	~DDLFormFill(){}
-
-	///\brief Get the last error of 'call' as string
-	const char* getLastError() const			{return m_ctx.getLastError();}
-
-	///\brief Get the last error position of 'call' as string
-	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
-
-	///\brief Initialization before call
-	///\param[in] i input filter
-	void init( const TypedInputFilterR& i);
-
-	///\enum CallResult
-	///\brief Enumeration of call states
-	enum CallResult
-	{
-		Ok,		//< successful termination
-		Error,		//< termination with error (not completed)
-		Yield		//< call interrupted with request for a system operation
-	};
-
-	///\brief Call of the form fill
-	///\remark finished with 'Error' or 'Ok'
-	CallResult call();
-
-private:
-	DDLFormR m_form;
-	int m_state;
-	TypedInputFilterR m_inputfilter;
-	serialize::Context m_ctx;
-	serialize::FiltermapDDLParseStateStack m_parsestk;
-};
-
-
-///\class DDLFormPrint
-///\brief State of serialization of a DDLForm
-class DDLFormPrint
-{
-public:
-	///\brief Constructor
-	DDLFormPrint( const DDLFormR& f, serialize::Context::Flags flags);
-
-	///\brief Constructor
-	DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp, serialize::Context::Flags flags);
-
-	///\brief Copy constructor
-	DDLFormPrint( const DDLFormPrint& o);
-
-	///\brief Destructor
-	~DDLFormPrint(){}
-
-	///\brief Get the last error as string
-	const char* getLastError() const			{return m_ser.getLastError();}
-
-	///\brief Get the last error position as string
-	const char* getLastErrorPos() const			{return m_ser.getLastErrorPos();}
-
-	///\enum CallResult
-	///\brief Enumeration of call states of the fetch processing
-	enum CallResult
-	{
-		Ok,		//< successful termination of call
-		Error,		//< termination of call with error (not completed)
-		Yield		//< call interrupted with request for a network operation
-	};
-	///\brief fetches results and writes them to the output filter specified
-	///\return Call state
-	CallResult fetch();
-
-	///\brief Initialization of call context for a new fetch result
-	///\param[in] o fetch output
-	void init( const TypedOutputFilterR& o);
-
-private:
-	DDLFormR m_form;
-	int m_state;
-	TypedOutputFilterR m_outputfilter;
-	serialize::DDLStructSerializer m_ser;
+	ddl::StructTypeR m_structure;
 };
 
 ///\class DDLFormMap
@@ -355,9 +197,24 @@ public:
 	~DDLFormMap(){}
 
 	void defineForm( const std::string& name, const DDLForm& f);
-	bool getForm( const std::string& name, DDLFormR& rt) const;
+	bool getForm( const std::string& name, DDLForm& rt) const;
 private:
-	std::map<std::string,DDLFormR> m_map;
+	std::map<std::string,DDLForm> m_map;
+};
+
+
+class ApiFormData
+{
+public:
+	ApiFormData( const serialize::FiltermapDescriptionBase* descr);
+	~ApiFormData();
+
+	void* get() const						{return m_data.get();}
+	const serialize::FiltermapDescriptionBase* descr() const	{return m_descr;}
+	const boost::shared_ptr<void>& data() const			{return m_data;}
+private:
+	const serialize::FiltermapDescriptionBase* m_descr;
+	boost::shared_ptr<void> m_data;
 };
 
 
@@ -382,66 +239,17 @@ public:
 
 	const serialize::FiltermapDescriptionBase* api_param() const	{return m_api_param;}
 	const serialize::FiltermapDescriptionBase* api_result() const	{return m_api_result;}
-	Function* function() const					{return m_function;}
+	int call( void* res, const void* param) const			{return (*m_function)( res, param);}
+
 private:
 	Function* m_function;
 	const serialize::FiltermapDescriptionBase* m_api_param;
 	const serialize::FiltermapDescriptionBase* m_api_result;
 };
 
-///\class FormFunctionResult
-///\brief Result of a FormFunction call
-class FormFunctionResult
-{
-public:
-	///\brief Constructor
-	///\param[in] f function called
-	FormFunctionResult( const FormFunction& f);
-
-	///\brief Copy constructor
-	///\param[in] o copied item
-	FormFunctionResult( const FormFunctionResult& o);
-
-	///\brief Destructor
-	~FormFunctionResult();
-
-	///\brief Get the last error as string
-	const char* getLastError() const			{return m_ser.getLastError();}
-
-	///\brief Get the last error position as string
-	const char* getLastErrorPos() const			{return m_ser.getLastErrorPos();}
-
-	///\enum CallResult
-	///\brief Enumeration of call states of the fetch processing
-	enum CallResult
-	{
-		Ok,		//< successful termination of call
-		Error,		//< termination of call with error (not completed)
-		Yield		//< call interrupted with request for a network operation
-	};
-	///\brief fetches results and writes them to the output filter specified
-	///\return Call state
-	CallResult fetch();
-
-	///\brief Initialization of call context for a new fetch result
-	///\param[in] o fetch output
-	void init( const TypedOutputFilterR& o);
-
-	void* data() const
-	{
-		return m_data.get();
-	}
-private:
-	const serialize::FiltermapDescriptionBase* m_description;
-	int m_state;
-	boost::shared_ptr<void> m_data;
-	TypedOutputFilterR m_outputfilter;
-	serialize::StructSerializer m_ser;
-};
-
 ///\class FormFunctionClosure
 ///\brief Closure with calling state of called FormFunction
-class FormFunctionClosure :public FormFunction
+class FormFunctionClosure
 {
 public:
 	///\brief Constructor
@@ -452,41 +260,23 @@ public:
 	///\param[in] o copied item
 	FormFunctionClosure( const FormFunctionClosure& o);
 
-	///\brief Destructor
-	~FormFunctionClosure();
-
-	///\brief Get the last error as string
-	const char* getLastError() const			{return m_ctx.getLastError();}
-
-	///\brief Get the last error position as string
-	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
-
-	///\enum CallResult
-	///\brief Enumeration of call states of the call processing
-	enum CallResult
-	{
-		Ok,		//< successful termination of call
-		Error,		//< termination of call with error (not completed)
-		Yield		//< call interrupted with request for a network operation
-	};
 	///\brief Calls the form function with the input from the input filter specified
-	///\return Call state
-	CallResult call();
+	///\return true when completed
+	bool call();
 
 	///\brief Initialization of call context for a new call
 	///\param[in] i call input
-	void init( const TypedInputFilterR& i);
+	void init( const TypedInputFilterR& i, serialize::Context::Flags flags);
 
-	const TypedInputFilterR& inputfilter() const	{return m_inputfilter;}
-	const FormFunctionResult& result() const	{return m_result;}
+	const serialize::StructSerializer& result() const		{return m_result;}
 
 private:
+	FormFunction m_func;
 	int m_state;
-	FormFunctionResult m_result;
-	boost::shared_ptr<void> m_data;
-	serialize::FiltermapParseStateStack m_parsestk;
-	serialize::Context m_ctx;
-	TypedInputFilterR m_inputfilter;
+	ApiFormData m_param_data;
+	ApiFormData m_result_data;
+	serialize::StructSerializer m_result;
+	serialize::StructParser m_parser;
 };
 
 ///\class FormFunctionMap
@@ -546,24 +336,9 @@ public:
 	///\brief Destructor
 	~TransactionFunctionResult(){}
 
-	///\brief Get the last error as string
-	const char* getLastError() const
-	{
-		return m_lasterror.size()?m_lasterror.c_str():0;
-	}
-
-	///\enum CallResult
-	///\brief Enumeration of call states of the fetch processing
-	enum CallResult
-	{
-		Ok,		//< successful termination of call
-		Error,		//< termination of call with error (not completed)
-		Yield		//< call interrupted with request for a network operation
-	};
-
 	///\brief fetches results and writes them to the output filter specified
-	///\return Call state
-	CallResult fetch();
+	///\return true when completed
+	bool call();
 
 	///\brief Initialization of call context for a new fetch result
 	///\param[in] o fetch output
@@ -580,7 +355,6 @@ public:
 private:
 	TransactionFunction m_func;				//< transaction function executed
 	int m_state;						//< execution state
-	std::string m_lasterror;				//< last error string
 	InputFilter::ElementType m_elemtype;			//< type of last element read from command result
 	TypedInputFilter::Element m_elem;			//< last element read from command result
 	boost::shared_ptr<std::string> m_resultbuf;		//< buffer for result
@@ -610,23 +384,9 @@ public:
 	///\brief Destructor
 	~TransactionFunctionClosure(){}
 
-	///\brief Get the last error as string
-	const char* getLastError() const
-	{
-		return m_lasterror.size()?m_lasterror.c_str():0;
-	}
-
-	///\enum CallResult
-	///\brief Enumeration of call states of the call processing
-	enum CallResult
-	{
-		Ok,		//< successful termination of call
-		Error,		//< termination of call with error (not completed)
-		Yield		//< call interrupted with request for a network operation
-	};
 	///\brief Executes the transaction function with the input from the input filter specified as far as possible
-	///\return Call state
-	CallResult call();
+	///\return true when completed
+	bool call();
 
 	///\brief Initialization of call context for a new call
 	///\param[in] i call input
@@ -641,7 +401,6 @@ private:
 	cmdbind::CommandHandlerR m_cmd;				//< command execute handler
 	cmdbind::CommandHandler::Operation m_cmdop;		//< last operation fetched from command handler
 	int m_state;						//< execution state
-	std::string m_lasterror;				//< last error string
 	InputFilter::ElementType m_elemtype;			//< type of last element read from command result
 	TypedInputFilter::Element m_elem;			//< last element read from command result
 	boost::shared_ptr<void> m_cmdinputbuf;			//< buffer for the command input

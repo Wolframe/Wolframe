@@ -43,7 +43,25 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-bool parse( ddl::StructType& st, langbind::TypedInputFilter& flt, Context& ctx, std::vector<FiltermapDDLParseState>& stk);
+class DDLStructParser
+{
+public:
+	explicit DDLStructParser( const ddl::StructTypeR& st);
+
+	DDLStructParser( const DDLStructParser& o);
+	virtual ~DDLStructParser(){}
+
+	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
+
+	bool call();
+
+private:
+	ddl::StructTypeR m_st;
+	Context m_ctx;
+	langbind::TypedInputFilterR m_inp;
+	FiltermapDDLParseStateStack m_stk;
+};
+
 
 }}//namespace
 #endif

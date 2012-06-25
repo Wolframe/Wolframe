@@ -65,7 +65,7 @@ public:
 	///\param[out] tf returned transaction function
 	///\param[out] par returned transaction function parameters form
 	///\param[out] res returned transaction function result form
-	bool getTransactionFunctionElements( const std::string& name, TransactionFunction& rt, DDLFormR& param, DDLFormR& result);
+	bool getTransactionFunctionElements( const std::string& name, TransactionFunction& rt, DDLForm& param, DDLForm& result);
 };
 typedef CountedReference<GlobalContext> GlobalContextR;
 

@@ -260,6 +260,12 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 			case FetchState::Done:
 				setState( InputFilter::Open);
 				m_stk.pop_back();
+				if (m_stk.size() == 0)
+				{
+					type = CloseTag;
+					element = Element();
+					return true;
+				}
 				continue;
 		}
 	}
@@ -279,16 +285,17 @@ bool LuaTableOutputFilter::pushValue( const Element& element)
 			lua_pushnumber( m_ls, (lua_Number)element.value.double_);
 			return true;
 		case Element::int_:
-			lua_pushnumber( m_ls, (lua_Number)element.value.int_);
+			lua_pushinteger( m_ls, (lua_Integer)element.value.int_);
 			return true;
 		case Element::uint_:
-			lua_pushnumber( m_ls, (lua_Number)element.value.uint_);
+			lua_pushinteger( m_ls, (lua_Integer)element.value.uint_);
 			return true;
 		case Element::string_:
 			lua_pushlstring( m_ls, element.value.string_.ptr, element.value.string_.size);
+			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			return true;
 	}
-	setState( OutputFilter::Error, "illegal value type printed");
+	setState( OutputFilter::Error, "illegal value type of element");
 	return false;
 }
 
@@ -312,25 +319,25 @@ bool LuaTableOutputFilter::openTag( const Element& element)
 	}
 	// check for t[k][#t[k]] exists -> it is an array:
 	std::size_t len = lua_rawlen( m_ls, -1);
-	lua_pushnumber( m_ls, (double)len);		///... LUA STK: t k t[k] #t[k]
+	lua_pushinteger( m_ls, len);			///... LUA STK: t k t[k] #t[k]
 	lua_gettable( m_ls, -2);			///... LUA STK: t k t[k] t[k][#t[k]]
 	if (lua_isnil( m_ls, -1))
 	{
 		///... the table is a structure. but the element is already defined. we create an array
 		lua_pop( m_ls, 2);			///... LUA STK: t k
 		lua_newtable( m_ls);			///... LUA STK: t k v
-		lua_pushnumber( m_ls, 1);		///... LUA STK: t k v 1
+		lua_pushinteger( m_ls, 1);		///... LUA STK: t k v 1
 		lua_pushvalue( m_ls, -3);		///... LUA STK: t k v 1 k
 		lua_gettable( m_ls, -5);		///... LUA STK: t k v 1 t[k]
 		lua_settable( m_ls, -3);		///... LUA STK: t k v             (v[1]=t[k])
-		lua_pushnumber( m_ls, 2);		///... LUA STK: t k v 2
+		lua_pushinteger( m_ls, 2);		///... LUA STK: t k v 2
 		lua_newtable( m_ls);			///... LUA STK: t k v 2 NEWTABLE
 	}
 	else
 	{
 		///... the table is an array
 		lua_pop( m_ls, 2);			///... LUA STK: t k v
-		lua_pushnumber( m_ls, (double)(len+1));	///... LUA STK: t k v len+1
+		lua_pushinteger( m_ls, len+1);		///... LUA STK: t k v len+1
 		lua_newtable( m_ls);			///... LUA STK: t k v len+1 NEWTABLE
 	}
 	return true;
@@ -343,7 +350,7 @@ bool LuaTableOutputFilter::closeTag()
 		--m_depth;
 		lua_settable( m_ls, -3);
 		std::size_t len = lua_rawlen( m_ls, -1);
-		lua_pushnumber( m_ls, (double)len);
+		lua_pushinteger( m_ls, len);
 		lua_gettable( m_ls, -2);
 		bool isArray = !(bool)lua_isnil( m_ls, -1);
 		lua_pop( m_ls, 1);

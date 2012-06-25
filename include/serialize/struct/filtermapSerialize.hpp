@@ -53,6 +53,7 @@ struct FiltermapIntrusiveSerializer
 	static bool fetch( Context& ctx, FiltermapSerializeStateStack& stk);
 };
 
+
 static bool fetchCloseTag( Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	ctx.setElem(langbind::FilterBase::CloseTag);
@@ -85,30 +86,34 @@ static bool fetchObject_( const traits::struct_&, Context& ctx, FiltermapSeriali
 		{
 			if (itr->second.type() != FiltermapDescriptionBase::Atomic)
 			{
-				ctx.setError( "atomic value expected for attribute");
-				return false;
+				throw SerializationErrorException( "atomic value expected for attribute", StructSerializer::getElementPath( stk));
 			}
 			ctx.setElem(
 				langbind::FilterBase::Attribute,
 				langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
+			rt = true;
 			stk.back().state( idx+1);
 			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (char*)obj + itr->second.ofs()));
-			rt = true;
 		}
 		else
 		{
 			ctx.setElem(
 				langbind::FilterBase::OpenTag,
 				langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
+			rt = true;
 			stk.back().state( idx+1);
 			stk.push_back( FiltermapSerializeState( 0, &fetchCloseTag, itr->first.c_str()));
 			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (char*)obj + itr->second.ofs()));
-			rt = true;
 		}
 	}
 	else
 	{
 		stk.pop_back();
+		if (stk.size() == 0)
+		{
+			ctx.setElem( langbind::FilterBase::CloseTag, langbind::TypedFilterBase::Element());
+			rt = true;
+		}
 	}
 	return rt;
 }
@@ -120,8 +125,7 @@ static bool fetchObject_( const traits::atomic_&, Context& ctx, FiltermapSeriali
 	elem.m_type = langbind::FilterBase::Value;
 	if (!traits::printValue( *(T*)stk.back().value(), elem.m_value))
 	{
-		ctx.setError( "atomic value conversion error");
-		return false;
+		throw SerializationErrorException( "atomic value conversion error", StructSerializer::getElementPath( stk));
 	}
 	ctx.setElem( elem);
 	stk.pop_back();
@@ -137,20 +141,22 @@ static bool fetchObject_( const traits::vector_&, Context& ctx, FiltermapSeriali
 	if (idx >= obj->size())
 	{
 		stk.pop_back();
-		return rt;
 	}
-	const char* tagname = (const char*)stk.at( stk.size()-2).value();
-	if (idx >= 1)
+	else
 	{
-		ctx.setElem( langbind::FilterBase::CloseTag);
-		rt = true;
-	}
-	stk.back().state( idx+1);
-	typename T::value_type* ve = &(*obj)[ idx];
-	stk.push_back( FiltermapSerializeState( stk.back().name(), &FiltermapIntrusiveSerializer<typename T::value_type>::fetch, ve));
-	if (idx >= 1)
-	{
-		stk.push_back( FiltermapSerializeState( tagname, &fetchOpenTag, tagname));
+		const char* tagname = (const char*)stk.at( stk.size()-2).value();
+		if (idx >= 1)
+		{
+			ctx.setElem( langbind::FilterBase::CloseTag);
+			rt = true;
+		}
+		stk.back().state( idx+1);
+		typename T::value_type* ve = &(*obj)[ idx];
+		stk.push_back( FiltermapSerializeState( stk.back().name(), &FiltermapIntrusiveSerializer<typename T::value_type>::fetch, ve));
+		if (idx >= 1)
+		{
+			stk.push_back( FiltermapSerializeState( tagname, &fetchOpenTag, tagname));
+		}
 	}
 	return rt;
 }
