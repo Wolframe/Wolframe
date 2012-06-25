@@ -103,7 +103,7 @@ TEST_F( WolfilterTest, tests)
 		{
 			if (selectedTestName.size())
 			{
-				if (std::search( ditr->path().string().begin(), ditr->path().string().end(), selectedTestName.begin(), selectedTestName.end()) != ditr->path().string().end())
+				if (std::strstr( ditr->path().string().c_str(), selectedTestName.c_str()))
 				{
 					std::cerr << "selected test '" << *ditr << "'" << std::endl;
 					tests.push_back( ditr->path().string());
@@ -125,14 +125,6 @@ TEST_F( WolfilterTest, tests)
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (testno=1; itr != end; ++itr,++testno)
 	{
-		// [2.1] Remove old temporary files:
-		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
-		if (utils::directoryExists( tempdir.string()))
-		{
-			utils::removeAllFiles( tempdir.string());
-		}
-		boost::filesystem::create_directory( tempdir);
-
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{

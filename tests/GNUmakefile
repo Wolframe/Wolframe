@@ -129,6 +129,7 @@ local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
+	@mkdir -p temp
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testMethodMemberPointerTemplate
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testNamedRetVal

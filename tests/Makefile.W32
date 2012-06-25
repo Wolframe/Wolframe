@@ -148,6 +148,7 @@ local_test:
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
+	@-echo mkdir temp
 	@-echo testNamedRetVal >> test.bat
 	@-echo logTest >> test.bat
 	@-echo versionTest >> test.bat
@@ -163,7 +164,7 @@ local_test:
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo testSimpleFormCompiler.exe >> test.bat
-	@-echo testWolfilter >> test.bat
+#temporarily disabled:	@-echo testWolfilter >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
 
