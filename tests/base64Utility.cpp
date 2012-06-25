@@ -61,11 +61,11 @@ int main(int argc, char** argv)
 	// encode or decode
 	std::string choice = argv[1];
 	if ( choice == "-d" )	{
-		base64::Decoder D;
+		base64::Decoder D( 3072 );
 		D.decode( instream, outstream );
 	}
 	else if ( choice == "-e" )	{
-		base64::Encoder E;
+		base64::Encoder E( 3072 );
 		E.encode( instream, outstream );
 	}
 	else	{
