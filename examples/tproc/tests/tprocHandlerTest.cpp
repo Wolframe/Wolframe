@@ -190,14 +190,6 @@ TEST_F( TProcHandlerTest, tests)
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (; itr != end; ++itr)
 	{
-		// Remove old temporary files:
-		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
-		if (utils::directoryExists( tempdir.string()))
-		{
-			utils::removeAllFiles( tempdir.string());
-		}
-		boost::filesystem::create_directory( tempdir);
-
 		// Read test description:
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
