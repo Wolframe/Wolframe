@@ -79,16 +79,7 @@ struct LuaFunctionCppCall
 		}
 		catch (std::exception& e)
 		{
-			try
-			{
-				std::ostringstream msg;
-				msg << "error in function " << name << " (" << e.what() << ")";
-				luaerr.init( name, msg.str().c_str());
-			}
-			catch (...)
-			{
-				luaerr.init( name, "out of memory");
-			}
+			luaerr.init( name, e.what());
 		}
 		return luaerr.luaerror( ls);
 	}

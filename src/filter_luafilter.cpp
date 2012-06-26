@@ -301,12 +301,6 @@ bool LuaTableOutputFilter::pushValue( const Element& element)
 
 bool LuaTableOutputFilter::openTag( const Element& element)
 {
-	++m_depth;
-	if (m_depth < 0)
-	{
-		setState( OutputFilter::Error, "tag stack overflow");
-		return false;
-	}
 	if (!pushValue( element)) return false;		///... LUA STK: t k   (t=Table,k=Key)
 	lua_pushvalue( m_ls, -1);			///... LUA STK: t k k
 	lua_gettable( m_ls, -3);			///... LUA STK: t k t[k]
@@ -315,49 +309,52 @@ bool LuaTableOutputFilter::openTag( const Element& element)
 		///... element with this key not yet defined. so we define it
 		lua_pop( m_ls, 1);			///... LUA STK: t k
 		lua_newtable( m_ls);			///... LUA STK: t k NEWTABLE
+		m_statestk.push_back( Struct);
 		return true;
 	}
 	// check for t[k][#t[k]] exists -> it is an array:
 	std::size_t len = lua_rawlen( m_ls, -1);
 	lua_pushinteger( m_ls, len);			///... LUA STK: t k t[k] #t[k]
 	lua_gettable( m_ls, -2);			///... LUA STK: t k t[k] t[k][#t[k]]
-	if (lua_isnil( m_ls, -1))
+	bool isArray = !lua_isnil( m_ls, -1);
+	if (isArray)
 	{
-		///... the table is a structure. but the element is already defined. we create an array
-		lua_pop( m_ls, 2);			///... LUA STK: t k
-		lua_newtable( m_ls);			///... LUA STK: t k v
-		lua_pushinteger( m_ls, 1);		///... LUA STK: t k v 1
-		lua_pushvalue( m_ls, -3);		///... LUA STK: t k v 1 k
-		lua_gettable( m_ls, -5);		///... LUA STK: t k v 1 t[k]
-		lua_settable( m_ls, -3);		///... LUA STK: t k v             (v[1]=t[k])
-		lua_pushinteger( m_ls, 2);		///... LUA STK: t k v 2
-		lua_newtable( m_ls);			///... LUA STK: t k v 2 NEWTABLE
+		///... the table is an array
+		lua_pop( m_ls, 1);			///... LUA STK: t k ar
+		lua_pushinteger( m_ls, len+1);		///... LUA STK: t k ar len+1
+		lua_newtable( m_ls);			///... LUA STK: t k ar len+1 NEWTABLE
+		m_statestk.push_back( Vector);
 	}
 	else
 	{
-		///... the table is an array
-		lua_pop( m_ls, 2);			///... LUA STK: t k v
-		lua_pushinteger( m_ls, len+1);		///... LUA STK: t k v len+1
-		lua_newtable( m_ls);			///... LUA STK: t k v len+1 NEWTABLE
+		///... the table is a structure. but the element is already defined. we create an array
+		lua_pop( m_ls, 2);			///... LUA STK: t k
+		lua_newtable( m_ls);			///... LUA STK: t k ar
+		lua_pushinteger( m_ls, 1);		///... LUA STK: t k ar 1
+		lua_pushvalue( m_ls, -3);		///... LUA STK: t k ar 1 k
+		lua_gettable( m_ls, -5);		///... LUA STK: t k ar 1 t[k]
+		lua_settable( m_ls, -3);		///... LUA STK: t k ar             (ar[1]=t[k])
+		lua_pushinteger( m_ls, 2);		///... LUA STK: t k ar 2
+		lua_newtable( m_ls);			///... LUA STK: t k ar 2 NEWTABLE
+		m_statestk.push_back( Vector);
 	}
 	return true;
 }
 
 bool LuaTableOutputFilter::closeTag()
 {
-	if (m_depth > 0)
+	if (m_statestk.size() > 0)
 	{
-		--m_depth;
-		lua_settable( m_ls, -3);
-		std::size_t len = lua_rawlen( m_ls, -1);
-		lua_pushinteger( m_ls, len);
-		lua_gettable( m_ls, -2);
-		bool isArray = !(bool)lua_isnil( m_ls, -1);
-		lua_pop( m_ls, 1);
-		if (isArray)
+		if (m_statestk.back() == Vector)
 		{
-			///... a vector is popped twice
-			lua_settable( m_ls, -3);
+			m_statestk.pop_back();				//... LUA STK: t k ar i v
+			lua_settable( m_ls, -3);			//... LUA STK: t k ar		(ar[i] = v)
+			lua_settable( m_ls, -3);			//... LUA STK: t		(t[k] = ar)
+		}
+		else
+		{
+			m_statestk.pop_back();				//... LUA STK: t k v
+			lua_settable( m_ls, -3);			//... LUA STK: t		(t[k] = v)
 		}
 		return true;
 	}
@@ -373,6 +370,7 @@ bool LuaTableOutputFilter::closeAttribute( const Element& element)
 	lua_pushnil( m_ls);
 	if (lua_next( m_ls, -2))
 	{
+		// ... non empty table
 		lua_pop( m_ls, 2);
 		setState( OutputFilter::Error, "value without tag or attribute context");
 		return false;
@@ -381,6 +379,7 @@ bool LuaTableOutputFilter::closeAttribute( const Element& element)
 	{
 		// ... table empty. replace it by value 'element'
 		lua_pop( m_ls, 1);
+		m_statestk.back() = Atomic;
 		return pushValue( element);
 	}
 }
@@ -392,10 +391,10 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 		setState( OutputFilter::Error, "lua stack overflow");
 		return false;
 	}
-	if (!m_isinit)
+	if (m_statestk.size() == 0)
 	{
+		m_statestk.push_back( Struct);
 		lua_newtable( m_ls);
-		m_isinit = true;
 	}
 
 	switch (type)
@@ -439,10 +438,10 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 					m_type = type;
 					return closeAttribute( element);
 				case Value:
-					setState( OutputFilter::Error, "print cannot handle subsequent values");
+					setState( OutputFilter::Error, "output filter cannot handle subsequent values");
 					return false;
 				case CloseTag:
-					setState( OutputFilter::Error, "print cannot handle values outside tag context");
+					setState( OutputFilter::Error, "output filter cannot handle values outside tag context");
 					return false;
 			}
 
@@ -450,7 +449,7 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 			switch (m_type)
 			{
 				case Attribute:
-					setState( OutputFilter::Error, "print of attribute value missed");
+					setState( OutputFilter::Error, "output filter of attribute value missed");
 					return false;
 				case OpenTag:
 					m_type = type;

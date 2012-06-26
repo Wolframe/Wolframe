@@ -141,6 +141,15 @@ static bool fetchObject_( const traits::vector_&, Context& ctx, FiltermapSeriali
 	if (idx >= obj->size())
 	{
 		stk.pop_back();
+		return false;
+	}
+	if (ctx.flag( Context::SerializeWithIndices))
+	{
+		ctx.setElem( langbind::FilterBase::OpenTag, langbind::TypedFilterBase::Element( (unsigned int)idx+1));
+		stk.back().state( idx+1);
+		typename T::value_type* ve = &(*obj)[ idx];
+		stk.push_back( FiltermapSerializeState( 0, &fetchCloseTag, 0));
+		stk.push_back( FiltermapSerializeState( stk.back().name(), &FiltermapIntrusiveSerializer<typename T::value_type>::fetch, ve));
 	}
 	else
 	{
