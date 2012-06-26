@@ -50,14 +50,6 @@ static const unsigned short APP_MINOR_VERSION = 0;
 static const unsigned short APP_REVISION = 5;
 static const unsigned short APP_BUILD = 0;
 
-///\brief Loads the modules, scripts, etc. defined in the command line into the global context
-static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
-{
-//	Not used...
-//	langbind::GlobalContext* gct = langbind::getGlobalContext();
-	cmdline.loadGlobalContext( boost::filesystem::current_path().string());
-}
-
 int main( int argc, char **argv )
 {
 	bool doExit = false;
@@ -77,23 +69,31 @@ int main( int argc, char **argv )
 		}
 		if (doExit) return 0;
 
-		loadGlobalContext( cmdline);
+		// Load the modules, scripts, etc. defined in the command line into the global context:
+		cmdline.loadGlobalContext( boost::filesystem::current_path().string());
 
-		if (!langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), std::cin, std::cout))
+		if (cmdline.inputfile().size())
 		{
-			std::cerr << "conversion error" << std::endl;
-			return -3;
+			std::fstream fh;
+			fh.exceptions( std::ifstream::failbit | std::ifstream::badbit);
+			fh.open( cmdline.inputfile().c_str(), std::ios::in | std::ios::binary);
+
+			langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), fh, std::cout);
+		}
+		else
+		{
+			langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), std::cin, std::cout);
 		}
 	}
 	catch (const std::bad_alloc& e)
 	{
 		std::cerr << "out of memory in wolfilter" << std::endl;
-		return -1;
+		return 1;
 	}
 	catch (const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
-		return -2;
+		return 2;
 	}
 	return 0;
 }

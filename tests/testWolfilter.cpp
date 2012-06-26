@@ -44,6 +44,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
+#include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -162,16 +164,12 @@ TEST_F( WolfilterTest, tests)
 		std::istringstream in( td.input, std::ios::in | std::ios::binary);
 		std::ostringstream out( std::ios::out | std::ios::binary);
 
-		bool trt = langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
-		if (!trt)
-		{
-			boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
-			EXPECT_EQ( true, trt);
-			continue;
-		}
-		EXPECT_EQ( true, trt);
+		langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
 		if (td.expected != out.str())
 		{
+			static boost::mutex mutex;
+			boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
+
 			// [2.6] Dump test contents to files in case of error
 			boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
 			std::fstream oo( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
@@ -195,7 +193,8 @@ TEST_F( WolfilterTest, tests)
 			std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;
 			std::cerr << "OUTPUT written to file '" << OUTPUT.string() << "'" << std::endl;
 			std::cerr << "EXPECT written to file '" << EXPECT.string() << "'" << std::endl;
-			boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
+
+			boost::this_thread::sleep( boost::posix_time::seconds( 3));
 		}
 		EXPECT_EQ( td.expected, out.str());
 		for (int ci=0; ci<cmdargc; ++ci)

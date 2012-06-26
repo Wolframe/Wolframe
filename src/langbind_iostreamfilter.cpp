@@ -191,14 +191,15 @@ static void processIO( BufferStruct& buf, langbind::InputFilter* iflt, langbind:
 }
 
 
-bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
+void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
 	langbind::GlobalContext* gc = langbind::getGlobalContext();
 	langbind::FilterFactoryR tf( new langbind::TokenFilterFactory());
 	gc->defineFilter( "token", tf);
 
 	langbind::Filter flt = getFilter( gc, ifl, ofl);
-	if (!flt.inputfilter().get() || !flt.outputfilter().get()) return false;
+	if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
+	if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
 
 	BufferStruct buf( ib, ob);
 	flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
@@ -236,7 +237,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		checkUnconsumedInput( is, *flt.inputfilter());
 		writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 		if (taglevel != -1) throw std::runtime_error( "tags not balanced");
-		return true;
+		return;
 	}
 #if WITH_LUA
 	{
@@ -257,13 +258,13 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			if (rt == LUA_OK)
 			{
 				writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-				return true;
 			}
 			else
 			{
 				throw std::runtime_error( lua_tostring( sc->thread(), -1));
 			}
 			checkUnconsumedInput( is, *flt.inputfilter());
+			return;
 		}
 	}
 #endif
@@ -286,7 +287,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 			checkUnconsumedInput( is, *flt.inputfilter());
-			return true;
+			return;
 		}
 	}
 	{
@@ -307,7 +308,7 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 			checkUnconsumedInput( is, *flt.inputfilter());
-			return true;
+			return;
 		}
 	}
 	{
@@ -329,11 +330,10 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 			checkUnconsumedInput( is, *flt.inputfilter());
-			return true;
+			return;
 		}
 	}
 	throw std::runtime_error( "command not found");
-	return false;
 }
 
 

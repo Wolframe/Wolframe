@@ -65,7 +65,7 @@ public:
 	///\param[in] ig input filter reference from input
 	InputFilterClosure( const InputFilterR& ig)
 		:m_inputfilter(ig)
-		,m_type(InputFilter::Value)
+		,m_type(InputFilter::OpenTag)
 		,m_taglevel(0){}
 
 	InputFilterClosure( const InputFilterClosure& o)
@@ -77,7 +77,11 @@ public:
 	///\brief Get the next pair of elements on the lua stack if possible
 	ItemType fetch( lua_State* ls);
 
-	const InputFilterR& inputfilter() const	{return m_inputfilter;}
+	const InputFilterR& inputfilter() const		{return m_inputfilter;}
+
+	///\brief Find out if we can use the function in this state as argument of a function
+	///\return true, if yes
+	bool isValidAsOperand() const			{return (m_type==InputFilter::OpenTag);}
 
 private:
 	InputFilterR m_inputfilter;			//< rerefence to input with filter
@@ -105,7 +109,7 @@ public:
 	///\param[in] i input filter reference
 	TypedInputFilterClosure( const TypedInputFilterR& i)
 		:m_inputfilter(i)
-		,m_type(InputFilter::Value)
+		,m_type(InputFilter::OpenTag)
 		,m_taglevel(0){}
 
 	TypedInputFilterClosure( const TypedInputFilterClosure& o)
@@ -120,6 +124,9 @@ public:
 
 	const TypedInputFilterR& inputfilter() const	{return m_inputfilter;}
 
+	///\brief Find out if we can use the function in this state as argument of a function
+	///\return true, if yes
+	bool isValidAsOperand() const			{return (m_type==InputFilter::OpenTag);}
 private:
 	TypedInputFilterR m_inputfilter;		//< rerefence to input with filter
 	InputFilter::ElementType m_type;		//< current state (last value type parsed)

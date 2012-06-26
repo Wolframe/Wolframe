@@ -407,12 +407,20 @@ static TypedInputFilterR get_operand_TypedInputFilter( lua_State* ls, int idx)
 				InputFilterClosure* ic = LuaObject<InputFilterClosure>::get( ls, -1);
 				if (ic)
 				{
+					if (!ic->isValidAsOperand())
+					{
+						throw std::runtime_error( "iterator used as function argument in an intermediate state");
+					}
 					rt.reset( new TypingInputFilter( ic->inputfilter()));
 					break;
 				}
 				TypedInputFilterClosure* tc = LuaObject<TypedInputFilterClosure>::get( ls, -1);
 				if (tc)
 				{
+					if (!tc->isValidAsOperand())
+					{
+						throw std::runtime_error( "iterator used as function argument in an intermediate state");
+					}
 					rt = tc->inputfilter();
 					break;
 				}
@@ -437,6 +445,8 @@ static int DECLNAME( lua_State* ls)\
 	return func.run( fname, ls);\
 }\
 int DECLNAME ## _functor::call( lua_State* ls)\
+
+
 
 
 
@@ -476,6 +486,38 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_typedInputFilter_get)
 			return 2;
 	}
 	throw std::runtime_error( "illegal state when fetching next element");
+}
+
+
+LUA_FUNCTION_THROWS( "scope(..)", function_scope)
+{
+	check_parameters( ls, 0, 1, LUA_TFUNCTION);
+	if (lua_getupvalue( ls, 1, 1))
+	{
+		InputFilterClosure* ic = LuaObject<InputFilterClosure>::get( ls, -1);
+		if (ic)
+		{
+			if (!ic->isValidAsOperand())
+			{
+				throw std::runtime_error( "iterator used as function argument in an intermediate state");
+			}
+			LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( ic->inputfilter()));
+			lua_pushcclosure( ls, function_inputFilter_get, 1);
+			return 1;
+		}
+		TypedInputFilterClosure* tc = LuaObject<TypedInputFilterClosure>::get( ls, -1);
+		if (tc)
+		{
+			if (!tc->isValidAsOperand())
+			{
+				throw std::runtime_error( "iterator used as function argument in an intermediate state");
+			}
+			LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( tc->inputfilter()));
+			lua_pushcclosure( ls, function_typedInputFilter_get, 1);
+			return 1;
+		}
+	}
+	throw std::runtime_error( "iterator on input or on a form expected as argument");
 }
 
 
@@ -572,8 +614,8 @@ LUA_FUNCTION_THROWS( "form:get()", function_form_get)
 	check_parameters( ls, 1, 0);
 
 	TypedInputFilterR itr( new serialize::DDLStructSerializer( result->structure()));
-	LuaObject<TypedInputFilterClosure>::push_luastack( ls, itr);
-	lua_pushcclosure( ls, function_inputFilter_get, 1);
+	LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure(itr));
+	lua_pushcclosure( ls, function_typedInputFilter_get, 1);
 	return 1;
 }
 
@@ -657,7 +699,7 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_struct_get)
 	check_parameters( ls, 1, 0);
 
 	TypedInputFilterR itr( new serialize::StructSerializer( *obj));
-	LuaObject<TypedInputFilterClosure>::push_luastack( ls, itr);
+	LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( itr));
 	lua_pushcclosure( ls, function_typedInputFilter_get, 1);
 	return 1;
 }
@@ -1173,6 +1215,8 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			lua_setglobal( ls, "form");
 			lua_pushcfunction( ls, &function_formfunction);
 			lua_setglobal( ls, "formfunction");
+			lua_pushcfunction( ls, &function_scope);
+			lua_setglobal( ls, "scope");
 		}
 		return true;
 	}
