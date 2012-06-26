@@ -57,6 +57,14 @@ public:
 	{
 		langbind::FilterBase::ElementType m_type;
 		langbind::TypedFilterBase::Element m_value;
+
+		ElementBuffer()
+			:m_type(langbind::FilterBase::Value)
+			{}
+		ElementBuffer( const ElementBuffer& o)
+			:m_type(o.m_type)
+			,m_value(o.m_value)
+			{}
 	};
 	enum Flags
 	{
@@ -85,6 +93,14 @@ public:
 	{
 		m_elem.m_type = t;
 		m_elem.m_value = langbind::TypedFilterBase::Element();
+		m_has_elem = true;
+	}
+
+	void setElem( langbind::FilterBase::ElementType t, const char* str, std::size_t size)
+	{
+		m_elem.m_type = t;
+		m_elem.m_value.value.string_.ptr = str;
+		m_elem.m_value.value.string_.size = size;
 		m_has_elem = true;
 	}
 
