@@ -57,7 +57,7 @@ public:
 	virtual ~ToStringFilter(){}
 
 	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
-	virtual bool print( ElementType type, const Element& element)=0;
+	virtual bool print( ElementType type, const Element& element);
 
 	const std::string& content() const		{return m_content;}
 

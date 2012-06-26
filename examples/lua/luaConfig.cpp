@@ -53,6 +53,8 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
+using namespace _Wolframe::utils;
+
 namespace _Wolframe {
 
 bool LuaConfiguration::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,

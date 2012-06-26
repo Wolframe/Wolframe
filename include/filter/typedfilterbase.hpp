@@ -70,6 +70,30 @@ public:
 			value.string_.size = std::strlen(str);
 		}
 
+		Element( bool e)
+			:type(bool_)
+		{
+			value.bool_ = e;
+		}
+
+		Element( double e)
+			:type(double_)
+		{
+			value.double_ = e;
+		}
+
+		Element( int e)
+			:type(int_)
+		{
+			value.int_ = e;
+		}
+
+		Element( unsigned int e)
+			:type(uint_)
+		{
+			value.uint_ = e;
+		}
+
 		Element( const char* str, std::size_t len)
 			:type(string_)
 		{

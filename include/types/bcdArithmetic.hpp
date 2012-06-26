@@ -29,73 +29,43 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapPrintStack.hpp
-///\brief Defines the Parsing STM for serialization for filters
-
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_STACK_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_STACK_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "serialize/mapContext.hpp"
-#include <vector>
-#include <cstddef>
-#include <stdexcept>
+///\file types/bcdArithmetic.hpp
+///\brief Defines some operations on arbitrary sized packed bcd numbers
+///\note for the Addition,Subtraction and Verification we refer to http://www.divms.uiowa.edu/~jones/bcd/bcd.html.
+#ifndef _Wolframe_TYPES_BCD_ARITHMETIC_HPP_INCLUDED
+#define _Wolframe_TYPES_BCD_ARITHMETIC_HPP_INCLUDED
+#include <string>
+#include <boost/cstdint.hpp>
 
 namespace _Wolframe {
-namespace serialize {
+namespace types {
 
-class FiltermapPrintState
+class BigBCD
 {
 public:
-	typedef bool (*Print)( langbind::TypedOutputFilter& inp, Context& ctx, std::vector<FiltermapPrintState>& stk);
+	BigBCD( const std::string& numstr);
+	BigBCD( const BigBCD& o);
+	~BigBCD();
 
-public:
-	FiltermapPrintState( const FiltermapPrintState& o)
-		:m_print(o.m_print)
-		,m_value(o.m_value)
-		,m_name(o.m_name)
-		,m_stateidx(o.m_stateidx)
-		{}
+	std::string tostring() const;
 
-	FiltermapPrintState( const char* name_, Print p, const void* v)
-		:m_print(p)
-		,m_value(v)
-		,m_name(name_)
-		,m_stateidx(0)
-		{}
+	BigBCD operator +( const BigBCD& opr);
+	BigBCD operator -( const BigBCD& opr);
 
-	const void* value() const
-	{
-		return m_value;
-	}
-
-	const char* name() const
-	{
-		return m_name;
-	}
-
-	Print print() const
-	{
-		return m_print;
-	}
-
-	std::size_t state() const
-	{
-		return m_stateidx;
-	}
-
-	void state( std::size_t idx)
-	{
-		m_stateidx = idx;
-	}
+	bool isValid() const;
 
 private:
-	Print m_print;
-	const void* m_value;
-	const char* m_name;
-	std::size_t m_stateidx;
-};
+	void init( std::size_t size_, bool sign_);
+	void expand( std::size_t addsize);
 
-typedef std::vector<FiltermapPrintState> FiltermapPrintStateStack;
+	BigBCD( std::size_t n, bool sgn);
+	static void digits_addition( BigBCD& dest, BigBCD& this_, const BigBCD& opr, boost::uint32_t& carrybit);
+	static void digits_subtraction( BigBCD& dest, BigBCD& this_, const BigBCD& opr);
+
+	std::size_t m_size;
+	boost::uint32_t* m_ar;
+	bool m_sign;
+};
 
 }}//namespace
 #endif

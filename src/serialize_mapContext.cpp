@@ -41,23 +41,24 @@ using namespace serialize;
 
 Context::Context( Flags f)
 	:m_flags(f)
-{
-	m_lasterror[0] = 0;
-	m_tag[0] = 0;
-}
+	,m_has_elem(false)
+{}
 
 Context::Context( const Context& o)
 	:m_flags(o.m_flags)
-{
-	std::memcpy( m_lasterror, o.m_lasterror, sizeof(m_lasterror));
-	std::memcpy( m_tag, o.m_tag, sizeof(m_tag));
-}
+	,m_has_elem(o.m_has_elem)
+{}
 
 bool Context::getFlag( const char* name, Flags& flg)
 {
-	if (std::strcmp( name, "attributes") == 0)
+	if (std::strcmp( name, "strict") == 0)
 	{
 		flg = ValidateAttributes;
+		return true;
+	}
+	if (std::strcmp( name, "arrayindices") == 0)
+	{
+		flg = SerializeWithIndices;
 		return true;
 	}
 	return false;
@@ -65,49 +66,16 @@ bool Context::getFlag( const char* name, Flags& flg)
 
 void Context::clear()
 {
-	m_lasterror[0] = 0;
-	m_tag[0] = 0;
+	m_has_elem = false;
 }
 
-void Context::setTag( const char* tt)
-{
-	if (!tt)
-	{
-		m_tag[0] = 0;
-	}
-	else
-	{
-		std::size_t nn = std::strlen(tt);
-		if (nn >=  sizeof(m_tag)) nn = sizeof(m_tag)-1;
-		std::memcpy( m_tag, tt, nn);
-		m_tag[nn] = 0;
-	}
-}
+SerializationErrorException::SerializationErrorException( const char* title, const std::string& element, const std::string& tag)
+	:std::runtime_error( std::string() + (title?title:"unknown error") + " (" + element + ")" + (tag.size()?" at ":"") + tag){}
 
-void Context::setError( const char* m1, const char* m2)
-{
-	try
-	{
-		std::string msg;
-		if (m1) msg.append( m1);
-		if (m2)
-		{
-			msg.append( " (");
-			msg.append( m2);
-			msg.push_back(')');
-		}
-		std::size_t nn = msg.size();
-		if (nn >=  sizeof(m_lasterror)) nn = sizeof(m_lasterror)-1;
-		std::memcpy( m_lasterror, msg.c_str(), nn);
-		m_lasterror[ nn] = 0;
-	}
-	catch (const std::bad_alloc& e)
-	{
-		std::size_t nn = std::strlen( e.what());
-		if (nn >=  sizeof(m_lasterror)) nn = sizeof(m_lasterror)-1;
-		std::memcpy( m_lasterror, e.what(), nn);
-		m_lasterror[ nn] = 0;
-	}
-}
+SerializationErrorException::SerializationErrorException( const char* title, const std::string& tag)
+	:std::runtime_error( std::string() + (title?title:"unknown error") + (tag.size()?" at ":"") + tag){}
+
+SerializationErrorException::SerializationErrorException( const char* title)
+	:std::runtime_error( title?title:"unknown error"){}
 
 

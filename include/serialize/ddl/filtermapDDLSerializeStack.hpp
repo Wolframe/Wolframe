@@ -29,22 +29,78 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/filtermapDDLPrint.hpp
-///\brief Defines the DDL structure serialization for filters
+///\file serialize/ddl/FiltermapDDLSerializeStack.hpp
+///\brief Defines the Parsing STM for DDL serialization for filters
 
-#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_PRINT_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_FILTERMAP_PRINT_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
-#include "serialize/ddl/filtermapDDLPrintStack.hpp"
 #include "ddl/structType.hpp"
+#include <vector>
 #include <cstddef>
+#include <stdexcept>
 
 namespace _Wolframe {
 namespace serialize {
 
-bool print( const ddl::StructType& st, langbind::TypedOutputFilter& out, Context& ctx, std::vector<FiltermapDDLPrintState>& stk);
+class FiltermapDDLSerializeState
+{
+public:
+	FiltermapDDLSerializeState( const FiltermapDDLSerializeState& o)
+		:m_value(o.m_value)
+		,m_stateidx(o.m_stateidx)
+		,m_elemtype(o.m_elemtype)
+		,m_tag(o.m_tag)
+		{}
+
+	FiltermapDDLSerializeState( const ddl::StructType* v, const langbind::TypedFilterBase::Element& t)
+		:m_value(v)
+		,m_stateidx(0)
+		,m_elemtype(langbind::FilterBase::Value)
+		,m_tag(t)
+		{}
+
+	FiltermapDDLSerializeState( langbind::FilterBase::ElementType typ, const langbind::TypedFilterBase::Element& elem)
+		:m_value(0)
+		,m_stateidx(0)
+		,m_elemtype(typ)
+		,m_tag(elem)
+		{}
+
+	const ddl::StructType* value() const
+	{
+		return m_value;
+	}
+
+	std::size_t state() const
+	{
+		return m_stateidx;
+	}
+
+	void state( std::size_t idx)
+	{
+		m_stateidx = idx;
+	}
+
+	langbind::FilterBase::ElementType type() const
+	{
+		return m_elemtype;
+	}
+
+	const langbind::TypedFilterBase::Element& tag() const
+	{
+		return m_tag;
+	}
+
+private:
+	const ddl::StructType* m_value;
+	std::size_t m_stateidx;
+	langbind::FilterBase::ElementType m_elemtype;
+	langbind::TypedFilterBase::Element m_tag;
+};
+
+typedef std::vector<FiltermapDDLSerializeState> FiltermapDDLSerializeStateStack;
 
 }}//namespace
 #endif
-

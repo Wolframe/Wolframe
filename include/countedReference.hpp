@@ -60,11 +60,18 @@ public:
 		m_ref->m_cnt++;
 	}
 
-	CountedReference( OBJ* ptr=0)
+	explicit CountedReference( OBJ* ptr)
 		:m_ref( new Pointer())
 	{
 		m_ref->m_cnt = 1;
 		m_ref->m_ptr = ptr;
+	}
+
+	CountedReference()
+		:m_ref( new Pointer())
+	{
+		m_ref->m_cnt = 1;
+		m_ref->m_ptr = 0;
 	}
 
 	~CountedReference()

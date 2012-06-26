@@ -38,7 +38,7 @@ Project Wolframe.
 #include "filter/bufferingfilter.hpp"
 #include "serialize/mapContext.hpp"
 #include "serialize/struct/filtermapParseStack.hpp"
-#include "serialize/struct/filtermapPrintStack.hpp"
+#include "serialize/struct/filtermapSerializeStack.hpp"
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -46,6 +46,7 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace serialize {
+
 
 class FiltermapDescriptionBase
 {
@@ -59,14 +60,14 @@ public:
 
 	typedef std::vector<std::pair<std::string,FiltermapDescriptionBase> > Map;
 	typedef bool (*Parse)( langbind::TypedInputFilter& flt, Context& ctx, FiltermapParseStateStack& stk);
-	typedef bool (*Print)( langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk);
+	typedef bool (*Fetch)( Context& ctx, FiltermapSerializeStateStack& stk);
 	typedef bool (*Constructor)( void* obj);
 	typedef void (*Destructor)( void* obj);
 
 	Parse parse() const		{return m_parse;}
-	Print print() const		{return m_print;}
+	Fetch fetch() const		{return m_fetch;}
 
-	FiltermapDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Print pr, bool mandatory_)
+	FiltermapDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
 		:m_constructor(c)
 		,m_destructor(d)
 		,m_typename(tn)
@@ -75,10 +76,10 @@ public:
 		,m_nof_attributes(0)
 		,m_type(t)
 		,m_parse(pa)
-		,m_print(pr)
+		,m_fetch(pr)
 		,m_mandatory(mandatory_){}
 
-	FiltermapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Print pr, bool mandatory_)
+	FiltermapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
 		:m_constructor(0)
 		,m_destructor(0)
 		,m_typename(tn)
@@ -87,7 +88,7 @@ public:
 		,m_nof_attributes(0)
 		,m_type(t)
 		,m_parse(pa)
-		,m_print(pr)
+		,m_fetch(pr)
 		,m_mandatory(mandatory_){}
 
 	FiltermapDescriptionBase( const FiltermapDescriptionBase& o)
@@ -100,7 +101,7 @@ public:
 		,m_elem(o.m_elem)
 		,m_type(o.m_type)
 		,m_parse(o.m_parse)
-		,m_print(o.m_print)
+		,m_fetch(o.m_fetch)
 		,m_mandatory(o.m_mandatory){}
 
 	FiltermapDescriptionBase()
@@ -110,11 +111,10 @@ public:
 		,m_nof_attributes(0)
 		,m_type(Atomic)
 		,m_parse(0)
-		,m_print(0)
+		,m_fetch(0)
 		,m_mandatory(false){}
 
 	bool parse( void* obj, langbind::TypedInputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const;
-	bool print( const void* obj, langbind::TypedOutputFilter& out, Context& ctx, FiltermapPrintStateStack& stk) const;
 
 	bool init( void* obj) const
 	{
@@ -200,8 +200,63 @@ private:
 	Map m_elem;
 	ElementType m_type;
 	Parse m_parse;
-	Print m_print;
+	Fetch m_fetch;
 	bool m_mandatory;
+};
+
+
+class StructSerializer :public langbind::TypedInputFilter
+{
+public:
+	typedef boost::shared_ptr<void> ObjectReference;
+
+	StructSerializer( const ObjectReference& obj, const FiltermapDescriptionBase* descr);
+
+	StructSerializer( const StructSerializer& o);
+	virtual ~StructSerializer(){}
+
+	static std::string getElementPath( const FiltermapSerializeStateStack& stk);
+
+	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
+
+	bool call();
+
+	///\brief Implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,langbind::TypedFilterBase::Element&)
+	virtual bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
+
+private:
+	const ObjectReference m_obj;
+	const FiltermapDescriptionBase* m_descr;
+	Context m_ctx;
+	langbind::TypedOutputFilterR m_out;
+	FiltermapSerializeStateStack m_stk;
+};
+
+
+class StructParser
+{
+public:
+	typedef boost::shared_ptr<void> ObjectReference;
+
+	StructParser( const ObjectReference& obj, const FiltermapDescriptionBase* descr);
+	StructParser( const StructParser& o);
+	virtual ~StructParser(){}
+
+	static std::string getElementPath( const FiltermapParseStateStack& stk);
+
+	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
+
+	const ObjectReference& object() const					{return m_obj;}
+	const FiltermapDescriptionBase* descr() const				{return m_descr;}
+
+	bool call();
+
+private:
+	ObjectReference m_obj;
+	const FiltermapDescriptionBase* m_descr;
+	Context m_ctx;
+	langbind::TypedInputFilterR m_inp;
+	FiltermapParseStateStack m_stk;
 };
 
 }}//namespace

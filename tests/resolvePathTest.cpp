@@ -5,6 +5,7 @@
 #include "miscUtils.hpp"
 #include "gtest/gtest.h"
 
+using namespace _Wolframe::utils;
 
 // Tests the Version constructors and members
 TEST( ResolvePathFixture, tests )	{

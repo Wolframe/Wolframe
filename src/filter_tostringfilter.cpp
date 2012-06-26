@@ -37,6 +37,17 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace langbind;
 
+static std::string substquot( const std::string& o)
+{
+	std::string rt;
+	for (std::string::const_iterator ii=o.begin(),ee=o.end(); ii!=ee; ++ii)
+	{
+		if (*ii == '\'') rt.push_back( '\'');
+		rt.push_back( *ii);
+	}
+	return rt;
+}
+
 bool ToStringFilter::print( ElementType type, const Element& element)
 {
 	switch (type)
@@ -57,16 +68,16 @@ bool ToStringFilter::print( ElementType type, const Element& element)
 		case Value:
 			if (m_lasttype == Attribute)
 			{
-				m_content.append( "=(");
-				m_content.append( element.tostring());
-				m_content.append( "(");
+				m_content.append( "='");
+				m_content.append( substquot( element.tostring()));
+				m_content.append( "'");
 				m_lasttype = OpenTag;
 			}
 			else
 			{
-				m_content.append( "(");
-				m_content.append( element.tostring());
-				m_content.append( ")");
+				m_content.append( "'");
+				m_content.append( substquot( element.tostring()));
+				m_content.append( "'");
 				m_lasttype = type;
 			}
 		return true;

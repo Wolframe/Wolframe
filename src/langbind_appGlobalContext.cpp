@@ -83,9 +83,9 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 			}
 			else
 			{
-				ddl::StructType form;
+				ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
 				std::string error;
-				if (!ci->compileFile( itr->sourcepath, form, error))
+				if (!ci->compileFile( itr->sourcepath, *form, error))
 				{
 					LOG_ERROR << "Error in DDL form source: " << error;
 					rt = false;
@@ -136,7 +136,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 	return rt;
 }
 
-bool GlobalContext::getTransactionFunctionElements( const std::string& name, TransactionFunction& tf, DDLFormR& par, DDLFormR& res)
+bool GlobalContext::getTransactionFunctionElements( const std::string& name, TransactionFunction& tf, DDLForm& par, DDLForm& res)
 {
 	std::string funcnam;
 	std::string parnam;

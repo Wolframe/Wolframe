@@ -54,21 +54,16 @@ class FRMAttribute
 public:
 	enum Type
 	{
-		double_=AtomicType::double_,
 		float_=AtomicType::float_,
-		bigint_=AtomicType::bigint_,
 		int_=AtomicType::int_,
 		uint_=AtomicType::uint_,
-		short_=AtomicType::short_,
-		ushort_=AtomicType::ushort_,
-		char_=AtomicType::char_,
 		string_=AtomicType::string_,
 		form_
 	};
 
 	static const char* typeName( Type tp)
 	{
-		static const char* ar[] = {"double","float","bigint","int","uint","short","ushort","char","string","form",0};
+		static const char* ar[] = {"float","int","uint","string","form",0};
 		return ar[ (int)tp];
 	}
 

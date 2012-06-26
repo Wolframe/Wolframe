@@ -37,7 +37,7 @@ Project Wolframe.
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/struct/filtermapTraits.hpp"
 #include "serialize/struct/filtermapParse.hpp"
-#include "serialize/struct/filtermapPrint.hpp"
+#include "serialize/struct/filtermapSerialize.hpp"
 #include "serialize/struct/filtermapProperty.hpp"
 #include <typeinfo>
 #include <exception>
@@ -55,7 +55,7 @@ struct FiltermapDescription :public FiltermapDescriptionBase
 {
 	///\brief Constructor
 	FiltermapDescription()
-		:FiltermapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), FiltermapIntrusiveProperty<Structure>::type(), &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusivePrinter<Structure>::print, false){}
+		:FiltermapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), FiltermapIntrusiveProperty<Structure>::type(), &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusiveSerializer<Structure>::fetch, false){}
 
 	///\brief Operator to build the structure description element by element
 	///\tparam Element element type
@@ -65,12 +65,12 @@ struct FiltermapDescription :public FiltermapDescriptionBase
 	FiltermapDescription& operator()( const char* tag, Element Structure::*eptr)
 	{
 		FiltermapDescriptionBase::Parse parse_ = &FiltermapIntrusiveParser<Element>::parse;
-		FiltermapDescriptionBase::Print print_ = &FiltermapIntrusivePrinter<Element>::print;
+		FiltermapDescriptionBase::Fetch fetch_ = &FiltermapIntrusiveSerializer<Element>::fetch;
 		FiltermapDescriptionBase::ElementType type_ = FiltermapIntrusiveProperty<Element>::type();
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
 		bool mandatory_ = (tag[0]=='-');
 		const char* name = mandatory_?(tag+1):tag;
-		FiltermapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, print_, mandatory_);
+		FiltermapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, fetch_, mandatory_);
 		if (find( name) != end())
 		{
 			std::ostringstream err;

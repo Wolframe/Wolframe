@@ -33,13 +33,12 @@
 ///\file langbind/pipe.hpp
 ///\brief Implementation for a pipe (istream|ostream) through wolframe mappings like filters, forms, functions
 
-#include "logger-v1.hpp"
-#include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
-#include "serialize/ddl/filtermapDDLPrint.hpp"
+#include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/token_filter.hpp"
-#include "filter/serializefilter.hpp"
+#include "filter/typingfilter.hpp"
 #if WITH_LUA
 #include "cmdbind/luaCommandHandler.hpp"
 #include "langbind/luaObjects.hpp"
@@ -59,8 +58,9 @@ static langbind::Filter getFilter( langbind::GlobalContext* gc, const std::strin
 	{
 		if (!gc->getFilter( ifl.c_str(), rt))
 		{
-			LOG_ERROR << "unknown filter '" << ifl << "'";
-			return rt;
+			std::ostringstream msg;
+			msg << "unknown filter '" << ifl << "'";
+			throw std::runtime_error( msg.str());
 		}
 	}
 	else
@@ -69,20 +69,22 @@ static langbind::Filter getFilter( langbind::GlobalContext* gc, const std::strin
 		langbind::Filter out;
 		if (!gc->getFilter( ifl.c_str(), in))
 		{
-			LOG_ERROR << "unknown input filter '" << ofl << "'";
-			return rt;
+			std::ostringstream msg;
+			msg << "unknown input filter '" << ifl << "'";
+			throw std::runtime_error( msg.str());
 		}
 		if (!gc->getFilter( ofl.c_str(), out))
 		{
-			LOG_ERROR << "unknown output filter '" << ofl << "'";
-			return rt;
+			std::ostringstream msg;
+			msg << "unknown output filter '" << ofl << "'";
+			throw std::runtime_error( msg.str());
 		}
 		rt = langbind::Filter( in.inputfilter(), out.outputfilter());
 	}
 	return rt;
 }
 
-static bool readInput( char* buf, unsigned int bufsize, std::istream& is, InputFilter& iflt)
+static void readInput( char* buf, unsigned int bufsize, std::istream& is, InputFilter& iflt)
 {
 	std::size_t pp = 0;
 	while (pp < bufsize && !is.eof())
@@ -92,7 +94,36 @@ static bool readInput( char* buf, unsigned int bufsize, std::istream& is, InputF
 	}
 	iflt.putInput( buf, pp, is.eof());
 	iflt.setState( InputFilter::Open);
-	return (!is.eof() || pp);
+}
+
+static void checkUnconsumedInput( std::istream& is, InputFilter& iflt)
+{
+	union
+	{
+		const void* ptr_;
+		const char* ptr;
+	} data;
+	std::size_t ii,size;
+	bool end;
+	iflt.getRest( data.ptr_, size, end);
+	for (ii=0; ii<size; ++ii)
+	{
+		if (data.ptr[ii] < 0 || data.ptr[ii] > 32)
+		{
+			throw std::runtime_error( "unconsumed input left");
+		}
+	}
+	while (!end)
+	{
+		char ch = 0;
+		is.read( &ch, sizeof(char));
+		if (ch < 0 || ch > 32)
+		{
+			throw std::runtime_error( "unconsumed input left");
+		}
+		end = is.eof();
+	}
+
 }
 
 static void writeOutput( char* buf, unsigned int size, std::ostream& os, OutputFilter& oflt)
@@ -118,13 +149,11 @@ struct BufferStruct
 	}
 };
 
-static bool processIO( BufferStruct& buf, langbind::InputFilter* iflt, langbind::OutputFilter* oflt, std::istream& is, std::ostream& os)
+static void processIO( BufferStruct& buf, langbind::InputFilter* iflt, langbind::OutputFilter* oflt, std::istream& is, std::ostream& os)
 {
-	const char* errmsg;
 	if (!iflt || !oflt)
 	{
-		LOG_ERROR << "Error lost filter";
-		return false;
+		throw std::runtime_error( "lost filter");
 	}
 	switch (iflt->state())
 	{
@@ -132,53 +161,45 @@ static bool processIO( BufferStruct& buf, langbind::InputFilter* iflt, langbind:
 			break;
 
 		case InputFilter::EndOfMessage:
-			return readInput( buf.inbuf, buf.insize, is, *iflt);
+			if (is.eof()) throw std::runtime_error( "unexpected end of input");
+			readInput( buf.inbuf, buf.insize, is, *iflt);
+			return;
 
 		case InputFilter::Error:
-			errmsg = iflt->getError();
-			LOG_ERROR << "Error in input filter: " << (errmsg?errmsg:"unknown");
-			return false;
+		{
+			std::ostringstream msg;
+			msg << "error in input filter " << iflt->getError() << "'";
+			throw std::runtime_error( msg.str());
+		}
 	}
 	switch (oflt->state())
 	{
 		case OutputFilter::Open:
-			return false;
+			throw std::runtime_error( "unknown error");
 
 		case OutputFilter::EndOfBuffer:
 			writeOutput( buf.outbuf, buf.outsize, os, *oflt);
-			return true;
+			return;
 
 		case OutputFilter::Error:
-			errmsg = oflt->getError();
-			LOG_ERROR << "Error in output filter: " << (errmsg?errmsg:"unknown");
-			return false;
-	}
-	return true;
-}
-
-template <class Obj>
-static void logError( const char* title, const Obj& obj)
-{
-	const char* pp = obj.getLastErrorPos();
-	const char* ee = obj.getLastError();
-	if (pp)
-	{
-		LOG_ERROR << "error at '" << pp << "' " << title << " (" << " (" << (ee?ee:"unknown") << ")";
-	}
-	else
-	{
-		LOG_ERROR << "error " << title << " (" << (ee?ee:"unknown") << ")";
+		{
+			std::ostringstream msg;
+			msg << "error in output filter " << oflt->getError() << "'";
+			throw std::runtime_error( msg.str());
+		}
 	}
 }
 
-bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
+
+void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
 	langbind::GlobalContext* gc = langbind::getGlobalContext();
 	langbind::FilterFactoryR tf( new langbind::TokenFilterFactory());
 	gc->defineFilter( "token", tf);
 
 	langbind::Filter flt = getFilter( gc, ifl, ofl);
-	if (!flt.inputfilter().get() || !flt.outputfilter().get()) return false;
+	if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
+	if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
 
 	BufferStruct buf( ib, ob);
 	flt.outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
@@ -186,25 +207,37 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 	if (proc.size() == 0 || proc == "-")
 	{
 		const void* elem;
+		int taglevel = 0;
 		std::size_t elemsize;
 		InputFilter::ElementType etype;
 
-		for (;;)
+		while (taglevel >= 0)
 		{
 			if (!flt.inputfilter().get()->getNext( etype, elem, elemsize))
 			{
-				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) goto _END_FILTER_LOOP;
+				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 				continue;
 			}
-			while (!flt.outputfilter().get()->print( etype, elem, elemsize))
+			if (etype == FilterBase::OpenTag)
 			{
-				if (!processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)) goto _END_FILTER_LOOP;
+				taglevel++;
+			}
+			else if (etype == FilterBase::CloseTag)
+			{
+				taglevel--;
+			}
+			if (taglevel >= 0)
+			{
+				while (!flt.outputfilter().get()->print( etype, elem, elemsize))
+				{
+					processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+				}
 			}
 		}
-		_END_FILTER_LOOP:
+		checkUnconsumedInput( is, *flt.inputfilter());
 		writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-		return	flt.inputfilter()->state() == InputFilter::Open
-			&& flt.outputfilter()->state() == OutputFilter::Open;
+		if (taglevel != -1) throw std::runtime_error( "tags not balanced");
+		return;
 	}
 #if WITH_LUA
 	{
@@ -213,30 +246,25 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		{
 			if (!gc->initLuaScriptInstance( sc.get(), flt.inputfilter(), flt.outputfilter()))
 			{
-				LOG_ERROR << "error initializing lua script";
-				return false;
+				throw std::runtime_error( "error initializing lua script");
 			}
 			lua_getglobal( sc->thread(), proc.c_str());
 			int rt = lua_resume( sc->thread(), NULL, 0);
 			while (rt == LUA_YIELD)
 			{
-				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
-				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
-				{
-					rt = lua_resume( sc->thread(), NULL, 0);
-				}
+				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+				rt = lua_resume( sc->thread(), NULL, 0);
 			}
 			if (rt == LUA_OK)
 			{
 				writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-				return true;
 			}
 			else
 			{
-				const char* msg = lua_tostring( sc->thread(), -1);
-				LOG_ERROR << "error in lua script: '" << msg << "'";
-				return false;
+				throw std::runtime_error( lua_tostring( sc->thread(), -1));
 			}
+			checkUnconsumedInput( is, *flt.inputfilter());
+			return;
 		}
 	}
 #endif
@@ -245,112 +273,42 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		if (gc->getFormFunction( proc.c_str(), func))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
-			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
-			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
+			langbind::TypedInputFilterR inp( new langbind::TypingInputFilter( flt.inputfilter()));
+			langbind::TypedOutputFilterR outp( new langbind::TypingOutputFilter( flt.outputfilter()));
 			langbind::FormFunctionClosure closure( func);
-			closure.init( inp);
-			langbind::FormFunctionClosure::CallResult callrt = closure.call();
-			while (callrt == langbind::FormFunctionClosure::Yield)
-			{
-				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
-				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
-				{
-					callrt = closure.call();
-				}
-				else
-				{
-					break;
-				}
-			}
-			if (callrt == langbind::FormFunctionClosure::Ok)
-			{
-				langbind::FormFunctionResult res = closure.result();
-				res.init( outp);
-				langbind::FormFunctionResult::CallResult fetchrt = res.fetch();
-				while (fetchrt == langbind::FormFunctionResult::Yield)
-				{
-					if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
-					|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
-					{
-						fetchrt = res.fetch();
-					}
-					else
-					{
-						break;
-					}
-				}
-				if (fetchrt == langbind::FormFunctionResult::Ok)
-				{
-					writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-					return true;
-				}
-				else
-				{
-					logError( "fetching form function result", res);
-					return false;
-				}
-			}
-			else
-			{
-				logError( "in form function call", closure);
-				return false;
-			}
+			closure.init( inp, serialize::Context::ValidateAttributes);
+
+			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+
+			serialize::StructSerializer res = closure.result();
+			res.init( outp);
+
+			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+
+			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+			checkUnconsumedInput( is, *flt.inputfilter());
+			return;
 		}
 	}
 	{
-		DDLFormR df;
+		DDLForm df;
 		if (gc->getForm( proc.c_str(), df))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
-			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
-			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
-			DDLFormFill closure( df, inp);
+			langbind::TypedInputFilterR inp( new langbind::TypingInputFilter( flt.inputfilter()));
+			langbind::TypedOutputFilterR outp( new langbind::TypingOutputFilter( flt.outputfilter()));
+			serialize::DDLStructParser closure( df.structure());
+			closure.init( inp, serialize::Context::ValidateAttributes);
 
-			langbind::DDLFormFill::CallResult callrt = closure.call();
-			while (callrt == langbind::DDLFormFill::Yield)
-			{
-				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
-				|| (flt.inputfilter()->state() == InputFilter::Open))
-				{
-					callrt = closure.call();
-				}
-				else
-				{
-					break;
-				}
-			}
-			if (callrt == langbind::DDLFormFill::Ok)
-			{
-				langbind::DDLFormPrint res( df, outp);
-				langbind::DDLFormPrint::CallResult fetchrt = res.fetch();
-				while (fetchrt == langbind::DDLFormPrint::Yield)
-				{
-					if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
-					|| (flt.outputfilter()->state() == OutputFilter::Open))
-					{
-						fetchrt = res.fetch();
-					}
-					else
-					{
-						break;
-					}
-				}
-				if (fetchrt == langbind::DDLFormPrint::Ok)
-				{
-					writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-					return true;
-				}
-				else
-				{
-					logError( "fetching DDL form map result", res);
-					return false;
-				}
-			}
-			else
-			{
-				logError( "in DDL form map", closure);
-				return false;
-			}
+			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+
+			serialize::DDLStructSerializer res( df.structure());
+			res.init( outp, serialize::Context::None);
+
+			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+			checkUnconsumedInput( is, *flt.inputfilter());
+			return;
 		}
 	}
 	{
@@ -358,62 +316,24 @@ bool _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		if (gc->getTransactionFunction( proc.c_str(), func))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
-			langbind::TypedInputFilterR inp( new langbind::SerializeInputFilter( flt.inputfilter().get()));
-			langbind::TypedOutputFilterR outp( new langbind::SerializeOutputFilter( flt.outputfilter().get()));
+			langbind::TypedInputFilterR inp( new langbind::TypingInputFilter( flt.inputfilter()));
+			langbind::TypedOutputFilterR outp( new langbind::TypingOutputFilter( flt.outputfilter()));
 			langbind::TransactionFunctionClosure closure( proc, func);
 			closure.init( inp);
-			langbind::TransactionFunctionClosure::CallResult callrt = closure.call();
-			while (callrt == langbind::TransactionFunctionClosure::Yield)
-			{
-				if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
-				|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
-				{
-					callrt = closure.call();
-				}
-				else
-				{
-					break;
-				}
-			}
-			if (callrt == langbind::TransactionFunctionClosure::Ok)
-			{
-				langbind::TransactionFunctionResult res = closure.result();
-				res.init( outp);
-				langbind::TransactionFunctionResult::CallResult fetchrt = res.fetch();
-				while (fetchrt == langbind::TransactionFunctionResult::Yield)
-				{
-					if (processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os)
-					|| (flt.inputfilter()->state() == InputFilter::Open && flt.outputfilter()->state() == OutputFilter::Open))
-					{
-						fetchrt = res.fetch();
-					}
-					else
-					{
-						break;
-					}
-				}
-				if (fetchrt == langbind::TransactionFunctionResult::Ok)
-				{
-					writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-					return true;
-				}
-				else
-				{
-					const char* ee = res.getLastError();
-					LOG_ERROR << "error fetching transaction function result (" << (ee?ee:"unknown") << ")";
-					return false;
-				}
-			}
-			else
-			{
-				const char* ee = closure.getLastError();
-				LOG_ERROR << "error in transaction function call (" << (ee?ee:"unknown") << ")";
-				return false;
-			}
+
+			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+
+			langbind::TransactionFunctionResult res = closure.result();
+			res.init( outp);
+
+			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+
+			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+			checkUnconsumedInput( is, *flt.inputfilter());
+			return;
 		}
 	}
-	LOG_ERROR << "mapping command not found: '" << proc.c_str() << "'";
-	return false;
+	throw std::runtime_error( "command not found");
 }
 
 

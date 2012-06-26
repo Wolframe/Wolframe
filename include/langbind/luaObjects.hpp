@@ -31,8 +31,8 @@ Project Wolframe.
 ************************************************************************/
 ///\file langbind/luaObjects.hpp
 ///\brief interface to system objects for processor language bindings
-#ifndef _Wolframe_langbind_LUAOBJECTS_HPP_INCLUDED
-#define _Wolframe_langbind_LUAOBJECTS_HPP_INCLUDED
+#ifndef _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
+#define _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
 #include "langbind/appObjects.hpp"
 #include <boost/shared_ptr.hpp>

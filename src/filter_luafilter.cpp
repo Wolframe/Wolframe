@@ -46,14 +46,35 @@ extern "C" {
 using namespace _Wolframe;
 using namespace langbind;
 
-void LuaInputFilter::FetchState::getTagElement( Element& element)
+static bool getElementValue( lua_State* ls, int idx, TypedInputFilter::Element& element, const char*& errelemtype)
 {
-	element.type = Element::string_;
-	element.value.string_.ptr = tag;
-	element.value.string_.size = tagsize;
+	switch (lua_type( ls, idx))
+	{
+		case LUA_TNIL:
+			return false;
+
+		case LUA_TNUMBER:
+			element.type = TypedFilterBase::Element::double_;
+			element.value.double_ = (double)lua_tonumber(ls, idx);
+			return true;
+
+		case LUA_TBOOLEAN:
+			element.type = TypedFilterBase::Element::bool_;
+			element.value.bool_ = (bool)lua_toboolean(ls, idx);
+			return true;
+
+		case LUA_TSTRING:
+			element.type = TypedFilterBase::Element::string_;
+			element.value.string_.ptr = (const char*)lua_tostring(ls, idx);
+			element.value.string_.size = std::strlen( element.value.string_.ptr);
+			return true;
+		default:
+			errelemtype = lua_typename( ls, lua_type( ls, idx));
+			return false;
+	}
 }
 
-LuaInputFilter::LuaInputFilter( lua_State* ls)
+LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
 	:LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 {
@@ -64,40 +85,27 @@ LuaInputFilter::LuaInputFilter( lua_State* ls)
 	m_stk.push_back( fs);
 }
 
-bool LuaInputFilter::getValue( int idx, TypedFilterBase::Element& element)
+void LuaTableInputFilter::FetchState::getTagElement( TypedInputFilter::Element& element)
 {
-	switch (lua_type( m_ls, idx))
-	{
-		case LUA_TNIL:
-			setState( InputFilter::Error, "nil illegal for atomic value in filter"); return false;
-			return false;
-
-		case LUA_TNUMBER:
-			element.type = TypedFilterBase::Element::double_;
-			element.value.double_ = (double)lua_tonumber(m_ls, idx);
-			return true;
-
-		case LUA_TBOOLEAN:
-			element.type = TypedFilterBase::Element::bool_;
-			element.value.bool_ = (bool)lua_toboolean(m_ls, idx);
-			return true;
-
-		case LUA_TSTRING:
-			element.type = TypedFilterBase::Element::string_;
-			element.value.string_.ptr = (const char*)lua_tostring(m_ls, idx);
-			element.value.string_.size = std::strlen( element.value.string_.ptr);
-			return true;
-
-		case LUA_TTABLE: setState( InputFilter::Error, "table not expected for atomic value in filter"); return false;
-		case LUA_TFUNCTION: setState( InputFilter::Error, "function not expected for atomic value in filter"); return false;
-		case LUA_TUSERDATA: setState( InputFilter::Error, "userdata not expected for atomic value in filter"); return false;
-		case LUA_TTHREAD: setState( InputFilter::Error, "thread not expected for atomic value in filter"); return false;
-		case LUA_TLIGHTUSERDATA: setState( InputFilter::Error, "userdata not expected for atomic value in filter"); return false;
-	}
-	return false;
+	element.type = Element::string_;
+	element.value.string_.ptr = tag;
+	element.value.string_.size = tagsize;
 }
 
-bool LuaInputFilter::firstTableElem( const char* tag=0)
+bool LuaTableInputFilter::getValue( int idx, TypedFilterBase::Element& element)
+{
+	const char* errelemtype;
+	if (!getElementValue( m_ls, idx, element, errelemtype))
+	{
+		std::ostringstream msg;
+		msg << "element type '" << (errelemtype?errelemtype:"unknown") << "' not expected for atomic value in filter";
+		setState( InputFilter::Error, msg.str().c_str());
+		return false;
+	}
+	return true;
+}
+
+bool LuaTableInputFilter::firstTableElem( const char* tag=0)
 {
 	FetchState fs;
 	lua_pushnil( m_ls);
@@ -140,7 +148,7 @@ bool LuaInputFilter::firstTableElem( const char* tag=0)
 	}
 }
 
-bool LuaInputFilter::nextTableElem()
+bool LuaTableInputFilter::nextTableElem()
 {
 	lua_pop( m_ls, 1);
 	if (!lua_next( m_ls, -2))
@@ -150,7 +158,7 @@ bool LuaInputFilter::nextTableElem()
 	return true;
 }
 
-bool LuaInputFilter::getNext( ElementType& type, Element& element)
+bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 {
 	if (!lua_checkstack( m_ls, 10))
 	{
@@ -252,6 +260,12 @@ bool LuaInputFilter::getNext( ElementType& type, Element& element)
 			case FetchState::Done:
 				setState( InputFilter::Open);
 				m_stk.pop_back();
+				if (m_stk.size() == 0)
+				{
+					type = CloseTag;
+					element = Element();
+					return true;
+				}
 				continue;
 		}
 	}
@@ -260,7 +274,7 @@ bool LuaInputFilter::getNext( ElementType& type, Element& element)
 }
 
 
-bool LuaOutputFilter::pushValue( const Element& element)
+bool LuaTableOutputFilter::pushValue( const Element& element)
 {
 	switch (element.type)
 	{
@@ -271,20 +285,21 @@ bool LuaOutputFilter::pushValue( const Element& element)
 			lua_pushnumber( m_ls, (lua_Number)element.value.double_);
 			return true;
 		case Element::int_:
-			lua_pushnumber( m_ls, (lua_Number)element.value.int_);
+			lua_pushinteger( m_ls, (lua_Integer)element.value.int_);
 			return true;
 		case Element::uint_:
-			lua_pushnumber( m_ls, (lua_Number)element.value.uint_);
+			lua_pushinteger( m_ls, (lua_Integer)element.value.uint_);
 			return true;
 		case Element::string_:
 			lua_pushlstring( m_ls, element.value.string_.ptr, element.value.string_.size);
+			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			return true;
 	}
-	setState( OutputFilter::Error, "illegal value type printed");
+	setState( OutputFilter::Error, "illegal value type of element");
 	return false;
 }
 
-bool LuaOutputFilter::openTag( const Element& element)
+bool LuaTableOutputFilter::openTag( const Element& element)
 {
 	++m_depth;
 	if (m_depth < 0)
@@ -304,38 +319,38 @@ bool LuaOutputFilter::openTag( const Element& element)
 	}
 	// check for t[k][#t[k]] exists -> it is an array:
 	std::size_t len = lua_rawlen( m_ls, -1);
-	lua_pushnumber( m_ls, (double)len);		///... LUA STK: t k t[k] #t[k]
+	lua_pushinteger( m_ls, len);			///... LUA STK: t k t[k] #t[k]
 	lua_gettable( m_ls, -2);			///... LUA STK: t k t[k] t[k][#t[k]]
 	if (lua_isnil( m_ls, -1))
 	{
 		///... the table is a structure. but the element is already defined. we create an array
 		lua_pop( m_ls, 2);			///... LUA STK: t k
 		lua_newtable( m_ls);			///... LUA STK: t k v
-		lua_pushnumber( m_ls, 1);		///... LUA STK: t k v 1
+		lua_pushinteger( m_ls, 1);		///... LUA STK: t k v 1
 		lua_pushvalue( m_ls, -3);		///... LUA STK: t k v 1 k
 		lua_gettable( m_ls, -5);		///... LUA STK: t k v 1 t[k]
 		lua_settable( m_ls, -3);		///... LUA STK: t k v             (v[1]=t[k])
-		lua_pushnumber( m_ls, 2);		///... LUA STK: t k v 2
+		lua_pushinteger( m_ls, 2);		///... LUA STK: t k v 2
 		lua_newtable( m_ls);			///... LUA STK: t k v 2 NEWTABLE
 	}
 	else
 	{
 		///... the table is an array
 		lua_pop( m_ls, 2);			///... LUA STK: t k v
-		lua_pushnumber( m_ls, (double)(len + 1));	///... LUA STK: t k v len+1
+		lua_pushinteger( m_ls, len+1);		///... LUA STK: t k v len+1
 		lua_newtable( m_ls);			///... LUA STK: t k v len+1 NEWTABLE
 	}
 	return true;
 }
 
-bool LuaOutputFilter::closeTag()
+bool LuaTableOutputFilter::closeTag()
 {
 	if (m_depth > 0)
 	{
 		--m_depth;
 		lua_settable( m_ls, -3);
 		std::size_t len = lua_rawlen( m_ls, -1);
-		lua_pushnumber( m_ls, (double)len);
+		lua_pushinteger( m_ls, len);
 		lua_gettable( m_ls, -2);
 		bool isArray = !(bool)lua_isnil( m_ls, -1);
 		lua_pop( m_ls, 1);
@@ -353,7 +368,7 @@ bool LuaOutputFilter::closeTag()
 	}
 }
 
-bool LuaOutputFilter::closeAttribute( const Element& element)
+bool LuaTableOutputFilter::closeAttribute( const Element& element)
 {
 	lua_pushnil( m_ls);
 	if (lua_next( m_ls, -2))
@@ -370,9 +385,9 @@ bool LuaOutputFilter::closeAttribute( const Element& element)
 	}
 }
 
-bool LuaOutputFilter::print( ElementType type, const Element& element)
+bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 {
-	if (!lua_checkstack( m_ls, 10))
+	if (!lua_checkstack( m_ls, 16))
 	{
 		setState( OutputFilter::Error, "lua stack overflow");
 		return false;

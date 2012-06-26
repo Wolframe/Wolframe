@@ -47,18 +47,18 @@ extern "C" {
 namespace _Wolframe {
 namespace langbind {
 
-///\class class LuaInputFilter
+///\class class LuaTableInputFilter
 ///\brief Lua table as typed input filter
-class LuaInputFilter :public TypedInputFilter, public LuaExceptionHandlerScope
+class LuaTableInputFilter :public TypedInputFilter, public LuaExceptionHandlerScope
 {
 public:
 	///\brief Constructor
-	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaInputFilter::getNext(ElementType&,Element&)
-	LuaInputFilter( lua_State* ls);
+	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaTableInputFilter::getNext(ElementType&,Element&)
+	explicit LuaTableInputFilter( lua_State* ls);
 
 	///\brief Copy constructor
-	///\param[in] o lua input filter to copy
-	LuaInputFilter( const LuaInputFilter& o)
+	///\param[in] o lua table input filter to copy
+	LuaTableInputFilter( const LuaTableInputFilter& o)
 		:TypedInputFilter(o)
 		,LuaExceptionHandlerScope(o)
 		,m_ls(o.m_ls)
@@ -66,10 +66,10 @@ public:
 
 	///\brief Destructor
 	///\remark Leaves the iterated table as top element (-1) on the lua stack
-	virtual ~LuaInputFilter(){}
+	virtual ~LuaTableInputFilter(){}
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
-	///\remark Expects the table to iterate as top element (-1) on the lua stack
+	///\remark Expects the table to iterate as top element (-1) on the lua stack when called the first time
 	virtual bool getNext( ElementType& type, Element& element);
 
 private:
@@ -112,14 +112,14 @@ private:
 };
 
 
-///\class class LuaOutputFilter
+///\class class LuaTableOutputFilter
 ///\brief Lua table as typed output filter
-class LuaOutputFilter :public TypedOutputFilter, public LuaExceptionHandlerScope
+class LuaTableOutputFilter :public TypedOutputFilter, public LuaExceptionHandlerScope
 {
 public:
 	///\brief Constructor
-	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaOutputFilter::print(ElementType,const Element&)
-	LuaOutputFilter( lua_State* ls)
+	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaTableOutputFilter::print(ElementType,const Element&)
+	explicit LuaTableOutputFilter( lua_State* ls)
 		:LuaExceptionHandlerScope(ls)
 		,m_ls(ls)
 		,m_depth(0)
@@ -128,7 +128,7 @@ public:
 
 	///\brief Copy constructor
 	///\param[in] o lua output filter to copy
-	LuaOutputFilter( const LuaOutputFilter& o)
+	LuaTableOutputFilter( const LuaTableOutputFilter& o)
 		:TypedOutputFilter(o)
 		,LuaExceptionHandlerScope(o)
 		,m_ls(o.m_ls)
@@ -140,7 +140,7 @@ public:
 	}
 
 	///\brief Destructor
-	virtual ~LuaOutputFilter(){}
+	virtual ~LuaTableOutputFilter(){}
 
 	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
 	virtual bool print( ElementType type, const Element& element);

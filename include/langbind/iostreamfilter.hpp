@@ -41,6 +41,7 @@ namespace _Wolframe {
 namespace langbind {
 
 ///\brief Maps input to output through a filter and a conversion procedure.
+///\remark throws exception on error
 ///\param[in] proc conversion procedure name. emty for no conversion
 ///\param[in] ifl input filter name
 ///\param[in] ib input buffer size
@@ -48,8 +49,7 @@ namespace langbind {
 ///\param[in] ob output buffer size
 ///\param[in,out] is input stream
 ///\param[in,out] os output stream
-///\return true on success, false else
-bool iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os);
+void iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os);
 
 }}//namespace
 #endif

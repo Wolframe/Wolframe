@@ -91,7 +91,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_ioFilterCommandHandler.o \
 	cmdbind_directmapCommandHandler.o \
 	filter_filterbase.o \
-	filter_serializefilter.o \
+	filter_typingfilter.o \
 	filter_textwolf_filter.o \
 	filter_char_filter.o \
 	filter_line_filter.o \
@@ -99,7 +99,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_expression_filter.o \
 	filter_tostringfilter.o \
 	serialize_struct_filtermapBase.o \
-	serialize_ddl_filtermapPrint.o \
+	serialize_ddl_filtermapSerialize.o \
 	serialize_ddl_filtermapParse.o \
 	serialize_mapContext.o \
 	ddl_atomicType.o \
@@ -107,6 +107,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	ddl_compilerInterface.o \
 	ddl_compiler_simpleFormCompiler.o \
 	types_bignum.o \
+	types_bcdArithmetic.o \
 	acceptor.o \
 	serverEndpoint.o \
 	connection.o \
@@ -119,6 +120,7 @@ ifeq ($(WITH_LUA),1)
 LOCAL_STATIC_LIB_OBJS += \
 	filter_luafilter.o \
 	langbind_luaObjects.o \
+	langbind_luaGetFunctionClosure.o \
 	langbind_luaDebug.o \
 	langbind_luaException.o \
 	langbind_luaBignum.o \

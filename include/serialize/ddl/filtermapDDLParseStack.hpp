@@ -70,6 +70,11 @@ public:
 		,m_stateidx(0)
 		{}
 
+	~FiltermapDDLParseState()
+	{
+		if (m_initar) std::free( m_initar);
+	}
+
 	void initStructDef( std::size_t n)
 	{
 		if (!m_initar)

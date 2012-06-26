@@ -51,7 +51,6 @@ public:
 	Filter( const Filter& o)
 		:m_inputfilter(o.m_inputfilter),m_outputfilter(o.m_outputfilter){}
 	Filter(){}
-	~Filter(){}
 
 	const InputFilterR& inputfilter() const		{return m_inputfilter;}
 	const OutputFilterR& outputfilter() const	{return m_outputfilter;}

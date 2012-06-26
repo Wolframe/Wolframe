@@ -32,12 +32,6 @@
 ************************************************************************/
 ///\file testWolfilter.cpp
 ///\brief Test program for wolfilter like stdin/stdout mapping
-
-// avoid safe copy warning in boost::is_any_of (no easy workaround here)
-#ifdef _WIN32
-#pragma warning(disable:4996)
-#endif
-
 #include "langbind/iostreamfilter.hpp"
 #include "logger-v1.hpp"
 #include "langbind/appGlobalContext.hpp"
@@ -45,10 +39,13 @@
 #include "wolfilter/src/employee_assignment_print.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
+#include "miscUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
+#include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -87,17 +84,6 @@ protected:
 
 static std::string selectedTestName;
 
-static bool directoryExists( boost::filesystem::path& pt)
-{
-	try
-	{
-		return boost::filesystem::exists( pt) && boost::filesystem::is_directory( pt);
-	}
-	catch (const std::exception&)
-	{
-		return false;
-	}
-}
 
 TEST_F( WolfilterTest, tests)
 {
@@ -119,7 +105,7 @@ TEST_F( WolfilterTest, tests)
 		{
 			if (selectedTestName.size())
 			{
-				if (std::search( ditr->path().string().begin(), ditr->path().string().end(), selectedTestName.begin(), selectedTestName.end()) != ditr->path().string().end())
+				if (std::strstr( ditr->path().string().c_str(), selectedTestName.c_str()))
 				{
 					std::cerr << "selected test '" << *ditr << "'" << std::endl;
 					tests.push_back( ditr->path().string());
@@ -141,18 +127,6 @@ TEST_F( WolfilterTest, tests)
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (testno=1; itr != end; ++itr,++testno)
 	{
-		// [2.1] Remove old temporary files:
-		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
-		if (directoryExists( tempdir))
-		{
-			try {
-				boost::filesystem::remove_all( tempdir);
-			} catch( ... ) {
-				boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
-				boost::filesystem::remove_all( tempdir);				
-			}
-		}
-		boost::filesystem::create_directory( tempdir);
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{
@@ -166,14 +140,8 @@ TEST_F( WolfilterTest, tests)
 
 		// [2.4] Parse command line in config section of the test description
 		std::vector<std::string> cmd;
-		std::string cmdstr( td.config);
-		boost::algorithm::trim( cmdstr);
-		{
-			std::vector<std::string> cmd_e;
-			boost::split( cmd_e, cmdstr, boost::is_any_of("\n\t\r "));
-			std::vector<std::string>::const_iterator vi=cmd_e.begin(), ve=cmd_e.end();
-			for (; vi != ve; ++vi) if (!vi->empty()) cmd.push_back( *vi);
-		}
+		utils::splitStringBySpaces( cmd, td.config);
+
 		std::cerr << "processing test '" << *itr << "'" << std::endl;
 		enum {MaxNofArgs=31};
 		int cmdargc = cmd.size()+1;
@@ -196,16 +164,12 @@ TEST_F( WolfilterTest, tests)
 		std::istringstream in( td.input, std::ios::in | std::ios::binary);
 		std::ostringstream out( std::ios::out | std::ios::binary);
 
-		bool trt = langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
-		if (!trt)
-		{
-			boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
-			EXPECT_EQ( true, trt);
-			continue;
-		}
-		EXPECT_EQ( true, trt);
+		langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
 		if (td.expected != out.str())
 		{
+			static boost::mutex mutex;
+			boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
+
 			// [2.6] Dump test contents to files in case of error
 			boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
 			std::fstream oo( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
@@ -229,7 +193,8 @@ TEST_F( WolfilterTest, tests)
 			std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;
 			std::cerr << "OUTPUT written to file '" << OUTPUT.string() << "'" << std::endl;
 			std::cerr << "EXPECT written to file '" << EXPECT.string() << "'" << std::endl;
-			boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
+
+			boost::this_thread::sleep( boost::posix_time::seconds( 3));
 		}
 		EXPECT_EQ( td.expected, out.str());
 		for (int ci=0; ci<cmdargc; ++ci)

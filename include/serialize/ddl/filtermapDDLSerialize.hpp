@@ -29,26 +29,42 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/luamapSerialize.hpp
-///\brief Defines the DDL structure serialization for the lua map
+///\file serialize/ddl/FiltermapDDLSerialize.hpp
+///\brief Defines the DDL structure serialization for filters
 
-#ifndef _Wolframe_SERIALIZE_DDL_LUAMAP_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_LUAMAP_HPP_INCLUDED
+#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_HPP_INCLUDED
+#include "filter/typedfilter.hpp"
 #include "serialize/mapContext.hpp"
-extern "C"
-{
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-}
+#include "serialize/ddl/filtermapDDLSerializeStack.hpp"
 #include "ddl/structType.hpp"
 #include <cstddef>
 
 namespace _Wolframe {
 namespace serialize {
 
-void parse( ddl::StructType& st, lua_State* ls);
-void print( const ddl::StructType& st, lua_State* ls);
+class DDLStructSerializer :public langbind::TypedInputFilter
+{
+public:
+	explicit DDLStructSerializer( const ddl::StructTypeR& st);
+
+	DDLStructSerializer( const DDLStructSerializer& o);
+	virtual ~DDLStructSerializer(){}
+
+	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
+
+	bool call();
+
+	bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
+
+	const ddl::StructTypeR& structure() const			{return m_st;}
+
+private:
+	const ddl::StructTypeR m_st;
+	Context m_ctx;
+	langbind::TypedOutputFilterR m_out;
+	FiltermapDDLSerializeStateStack m_stk;
+};
 
 }}//namespace
 #endif

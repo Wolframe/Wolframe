@@ -43,6 +43,8 @@
 #include <boost/filesystem.hpp>
 #include "miscUtils.hpp"
 
+using namespace _Wolframe::utils;
+
 namespace _Wolframe {
 namespace AAAA {
 

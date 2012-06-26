@@ -20,9 +20,9 @@ INCLUDE_LIBS = \
 	-lboost_program_options \
 	-lboost_filesystem \
 	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/wtest/wolftest.a \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	$(TOPDIR)/wtest/wolftest.a \
 	$(LIBS_DL)
 
 # lua
@@ -94,6 +94,7 @@ local_install:
 
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
+	mkdir -p tests/temp
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./tprocHandlerTest$(EXE)
 endif
 
