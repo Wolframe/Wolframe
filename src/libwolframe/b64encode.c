@@ -31,11 +31,12 @@ static inline char base64_encodeValue( unsigned char value )
 	return encoding[ value ];
 }
 
-int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plaintext_in, int length_in, char* code_out )
+int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
+			size_t plainLength, char* encoded )
 {
-	const unsigned char* plainchar = plaintext_in;
-	const unsigned char* const plaintextend = plaintext_in + length_in;
-	char* codechar = code_out;
+	const unsigned char* plainchar = plain;
+	const unsigned char* const plaintextend = plain + plainLength;
+	char* codechar = encoded;
 	char result;
 	char fragment;
 
@@ -47,7 +48,7 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plaintex
 				if (plainchar == plaintextend)	{
 					state ->result = result;
 					state ->step = STEP_0;
-					return codechar - code_out;
+					return codechar - encoded;
 				}
 				fragment = *plainchar++;
 				result = (fragment & 0x0fc) >> 2;
@@ -57,7 +58,7 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plaintex
 				if (plainchar == plaintextend)	{
 					state ->result = result;
 					state ->step = STEP_1;
-					return codechar - code_out;
+					return codechar - encoded;
 				}
 				fragment = *plainchar++;
 				result |= (fragment & 0x0f0) >> 4;
@@ -67,7 +68,7 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plaintex
 				if (plainchar == plaintextend)	{
 					state ->result = result;
 					state ->step = STEP_2;
-					return codechar - code_out;
+					return codechar - encoded;
 				}
 				fragment = *plainchar++;
 				result |= (fragment & 0x0c0) >> 6;
@@ -83,12 +84,12 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plaintex
 		}
 	}
 	/* control should not reach here */
-	return codechar - code_out;
+	return codechar - encoded;
 }
 
-int base64_encodeEnd( base64_EncodeState* state, char* output )
+int base64_encodeEnd(base64_EncodeState* state, char* encodedEnd )
 {
-	char* encoded = output;
+	char* encoded = encodedEnd;
 
 	switch ( state->step )	{
 		case STEP_1:
@@ -105,6 +106,6 @@ int base64_encodeEnd( base64_EncodeState* state, char* output )
 	}
 	*encoded++ = '\n';
 
-	return encoded - output;
+	return encoded - encodedEnd;
 }
 

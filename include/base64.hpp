@@ -23,29 +23,29 @@ struct decoder
 		: _buffersize(buffersize_in)
 	{}
 
-	int decode(const char* code_in, const int length_in, unsigned char* plaintext_out)
+	int decode( const char* encoded, size_t encodedLength, unsigned char* plain )
 	{
-		return base64_decodeBlock( &m_state, code_in, length_in, plaintext_out );
+		return base64_decodeBlock( &m_state, encoded, encodedLength, plain );
 	}
 
-	void decode( std::istream& in, std::ostream& out )
+	void decode( std::istream& encoded, std::ostream& plain )
 	{
 		base64_initDecodeState( &m_state );
 		//
 		const int N = _buffersize;
 		char* code = new char[N];
 		unsigned char* plaintext = new unsigned char[N];
-		int codelength;
-		int plainlength;
+		int encodedLength;
+		int plainLength;
 
 		do
 		{
-			in.read((char*)code, N);
-			codelength = in.gcount();
-			plainlength = decode( code, codelength, plaintext );
-			out.write((const char*)plaintext, plainlength );
+			encoded.read((char*)code, N);
+			encodedLength = encoded.gcount();
+			plainLength = decode( code, encodedLength, plaintext );
+			plain.write((const char*)plaintext, plainLength );
 		}
-		while (in.good() && codelength > 0);
+		while (encoded.good() && encodedLength > 0);
 		//
 		base64_initDecodeState(&m_state);
 
@@ -67,9 +67,9 @@ struct encoder
 		base64_initEncodeState( &m_state, lineLength );
 	}
 
-	int encode(const unsigned char* code_in, const int length_in, char* plaintext_out)
+	int encode( const unsigned char* plain, const int plainLength, char* encoded )
 	{
-		return base64_encodeBlock( &m_state, code_in, length_in, plaintext_out );
+		return base64_encodeBlock( &m_state, plain, plainLength, encoded );
 	}
 
 	int encodeEnd( char* output )
@@ -77,7 +77,7 @@ struct encoder
 		return base64_encodeEnd( &m_state, output );
 	}
 
-	void encode( std::istream& in, std::ostream& out )
+	void encode( std::istream& plain, std::ostream& encoded )
 	{
 		const int N = m_buffersize;
 		char* plaintext = new char[N];
@@ -86,15 +86,15 @@ struct encoder
 		int codelength;
 
 		do	{
-			in.read( plaintext, N );
-			plainlength = in.gcount();
+			plain.read( plaintext, N );
+			plainlength = plain.gcount();
 			//
 			codelength = encode((unsigned char *)plaintext, plainlength, code );
-			out.write( code, codelength );
-		} while ( in.good() && plainlength > 0 );
+			encoded.write( code, codelength );
+		} while ( plain.good() && plainlength > 0 );
 
 		codelength = encodeEnd( code );
-		out.write( code, codelength );
+		encoded.write( code, codelength );
 		//
 		base64_resetEncodeState( &m_state );
 
