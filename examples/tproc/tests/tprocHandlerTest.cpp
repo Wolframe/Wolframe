@@ -50,6 +50,8 @@
 #include <boost/algorithm/string.hpp>
 #include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
+#include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <map>
 #include <string>
 #include <vector>
@@ -190,14 +192,6 @@ TEST_F( TProcHandlerTest, tests)
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (; itr != end; ++itr)
 	{
-		// Remove old temporary files:
-		boost::filesystem::path tempdir( boost::filesystem::current_path() / "temp");
-		if (utils::directoryExists( tempdir.string()))
-		{
-			utils::removeAllFiles( tempdir.string());
-		}
-		boost::filesystem::create_directory( tempdir);
-
 		// Read test description:
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
@@ -220,6 +214,9 @@ TEST_F( TProcHandlerTest, tests)
 
 				if (test.expected() != test.output())
 				{
+					static boost::mutex mutex;
+					boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
+
 					boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
 					std::fstream outputf( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
 					outputf.write( test.output().c_str(), test.output().size());

@@ -25,60 +25,60 @@ void base64_initDecodeState( base64_DecodeState* state )
 }
 
 int base64_decodeBlock( base64_DecodeState* state, const char* encoded,
-			size_t codeLength, unsigned char* data )
+			size_t codeLength, unsigned char* plain )
 {
-	const char* codechar = encoded;
-	unsigned char* plainchar = data;
+	const char* codeChar = encoded;
+	unsigned char* plainByte = plain;
 	char fragment;
 
-	*plainchar = state->plainchar;
+	*plainByte = state->plainchar;
 
 	switch ( state->step )	{
 		while ( 1 )	{
-		case STEP_A:
+			case STEP_A:
 				do {
-					if (codechar == encoded+codeLength)	{
+					if (codeChar == encoded+codeLength)	{
 						state->step = STEP_A;
-						state->plainchar = *plainchar;
-						return plainchar - data;
+						state->plainchar = *plainByte;
+						return plainByte - plain;
 					}
-					fragment = (char)base64_decodeValue(*codechar++);
+					fragment = (char)base64_decodeValue(*codeChar++);
 				} while (fragment < 0);
-				*plainchar    = (fragment & 0x03f) << 2;
+				*plainByte    = (fragment & 0x03f) << 2;
 			case STEP_B:
 				do {
-					if (codechar == encoded+codeLength)	{
+					if (codeChar == encoded+codeLength)	{
 						state->step = STEP_B;
-						state->plainchar = *plainchar;
-						return plainchar - data;
+						state->plainchar = *plainByte;
+						return plainByte - plain;
 					}
-					fragment = (char)base64_decodeValue(*codechar++);
+					fragment = (char)base64_decodeValue(*codeChar++);
 				} while ( fragment < 0 );
-				*plainchar++ |= (fragment & 0x030) >> 4;
-				*plainchar    = (fragment & 0x00f) << 4;
+				*plainByte++ |= (fragment & 0x030) >> 4;
+				*plainByte    = (fragment & 0x00f) << 4;
 			case STEP_C:
 				do {
-					if (codechar == encoded+codeLength)	{
+					if (codeChar == encoded+codeLength)	{
 						state->step = STEP_C;
-						state->plainchar = *plainchar;
-						return plainchar - data;
+						state->plainchar = *plainByte;
+						return plainByte - plain;
 					}
-					fragment = (char)base64_decodeValue(*codechar++);
+					fragment = (char)base64_decodeValue(*codeChar++);
 				} while (fragment < 0);
-				*plainchar++ |= (fragment & 0x03c) >> 2;
-				*plainchar    = (fragment & 0x003) << 6;
+				*plainByte++ |= (fragment & 0x03c) >> 2;
+				*plainByte    = (fragment & 0x003) << 6;
 			case STEP_D:
 				do {
-					if (codechar == encoded+codeLength)	{
+					if (codeChar == encoded+codeLength)	{
 						state->step = STEP_D;
-						state->plainchar = *plainchar;
-						return plainchar - data;
+						state->plainchar = *plainByte;
+						return plainByte - plain;
 					}
-					fragment = (char)base64_decodeValue(*codechar++);
+					fragment = (char)base64_decodeValue(*codeChar++);
 				} while (fragment < 0);
-				*plainchar++   |= (fragment & 0x03f);
+				*plainByte++   |= (fragment & 0x03f);
 		}
 	}
 	/* control should not reach here */
-	return plainchar - data;
+	return plainByte - plain;
 }

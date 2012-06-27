@@ -16,7 +16,6 @@ extern "C" {
 
 #define DEFAULT_BASE64_LINE_LENGTH	76
 
-
 typedef enum	{
 	STEP_0,
 	STEP_1,
@@ -34,10 +33,10 @@ void base64_initEncodeState( base64_EncodeState* state, unsigned short lineLengt
 
 void base64_resetEncodeState( base64_EncodeState* state );
 
-int base64_encodeBlock( base64_EncodeState* state, const unsigned char* data,
-			size_t dataSize, char* encoded );
+int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
+			size_t plainLength, char* encoded );
 
-int base64_encodeEnd( base64_EncodeState* state, char* out );
+int base64_encodeEnd( base64_EncodeState* state, char* encoded );
 
 
 typedef enum	{
@@ -57,7 +56,6 @@ void base64_initDecodeState( base64_DecodeState* state );
 
 int base64_decodeBlock( base64_DecodeState* state, const char* encoded,
 			size_t codeLength, unsigned char* data );
-
 
 #ifdef __cplusplus
 }

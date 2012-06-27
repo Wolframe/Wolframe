@@ -42,7 +42,7 @@ using namespace serialize;
 // forward declaration
 static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk);
 
-static std::string getPrintPath( const FiltermapDDLSerializeStateStack& stk)
+static std::string getElementPath( const FiltermapDDLSerializeStateStack& stk)
 {
 	std::string rt;
 	FiltermapDDLSerializeStateStack::const_iterator itr=stk.begin(), end=stk.end();
@@ -63,15 +63,14 @@ static std::string getPrintPath( const FiltermapDDLSerializeStateStack& stk)
 
 static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
 {
-	const ddl::AtomicType* val = &stk.back().value()->value();
-	std::string ee;
-	if (!val->get( ee))
+	if (stk.back().state())
 	{
-		ctx.setError( "value conversion error");
+		stk.pop_back();
 		return false;
 	}
-	ctx.setElem( langbind::FilterBase::Value, langbind::TypedFilterBase::Element( ee.c_str(), ee.size()));
-	stk.pop_back();
+	const ddl::AtomicType* val = &stk.back().value()->value();
+	ctx.setElem( langbind::FilterBase::Value, val->value().c_str(), val->value().size());
+	stk.back().state( 1);
 	return true;
 }
 
@@ -87,28 +86,32 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 		{
 			if (itr->second.contentType() != ddl::StructType::Atomic)
 			{
-				ctx.setError( "atomic value expected for attribute");
-				return false;
+				throw SerializationErrorException( "atomic value expected for attribute", getElementPath( stk));
 			}
 			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
 			ctx.setElem( langbind::FilterBase::Attribute, elem);
+			rt = true;
 			stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
 			stk.back().state( ++idx);
-			rt = true;
 		}
 		else
 		{
 			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
 			ctx.setElem( langbind::FilterBase::OpenTag, elem);
+			rt = true;
 			stk.back().state( ++idx);
 			stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, elem));
 			stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
-			rt = true;
 		}
 	}
 	else
 	{
 		stk.pop_back();
+		if (stk.size() == 0)
+		{
+			ctx.setElem( langbind::FilterBase::CloseTag, langbind::TypedFilterBase::Element());
+			rt = true;
+		}
 	}
 	return rt;
 }
@@ -121,19 +124,21 @@ static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	if (idx >= obj->nof_elements())
 	{
 		stk.pop_back();
-		return true;
 	}
-	ddl::StructType::Map::const_iterator itr = obj->begin()+idx;
-	if (idx >= 1)
+	else
 	{
-		ctx.setElem( langbind::FilterBase::CloseTag, stk.back().tag());
-		rt = true;
-	}
-	stk.back().state( idx+1);
-	stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));	//... print element
-	if (idx >= 1)
-	{
-		stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::OpenTag, stk.back().tag()));
+		ddl::StructType::Map::const_iterator itr = obj->begin()+idx;
+		if (idx >= 1)
+		{
+			ctx.setElem( langbind::FilterBase::CloseTag, stk.back().tag());
+			rt = true;
+		}
+		stk.back().state( idx+1);
+		stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));	//... print element
+		if (idx >= 1)
+		{
+			stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::OpenTag, stk.back().tag()));
+		}
 	}
 	return rt;
 }
@@ -146,96 +151,86 @@ static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 		stk.pop_back();
 		return true;
 	}
-	switch (stk.back().value()->contentType())
+	else
 	{
-		case ddl::StructType::Atomic:
+		switch (stk.back().value()->contentType())
 		{
-			return fetchAtom( ctx, stk);
-		}
-		case ddl::StructType::Vector:
-		{
-			return fetchVector( ctx, stk);
-		}
-		case ddl::StructType::Struct:
-		{
-			return fetchStruct( ctx, stk);
+			case ddl::StructType::Atomic:
+			{
+				return fetchAtom( ctx, stk);
+			}
+			case ddl::StructType::Vector:
+			{
+				return fetchVector( ctx, stk);
+			}
+			case ddl::StructType::Struct:
+			{
+				return fetchStruct( ctx, stk);
+			}
 		}
 	}
-	ctx.setError( "illegal state in print DDL form");
 	return false;
 }
 
-
-DDLStructSerializer::CallResult DDLStructSerializer::print( langbind::TypedOutputFilter& out)
+bool DDLStructSerializer::call()
 {
-	try
+	if (!m_out.get()) throw std::runtime_error( "no output for serialize");
+	while (m_stk.size())
 	{
-		while (m_stk.size())
+		Context::ElementBuffer elem;
+		if (m_ctx.getElem( elem))
 		{
-			Context::ElementBuffer elem;
-			if (m_ctx.getElem( elem))
+			if (!m_out->print( elem.m_type, elem.m_value))
 			{
-				if (!out.print( elem.m_type, elem.m_value))
+				if (m_out->getError())
 				{
-					if (out.getError())
-					{
-						m_ctx.setError( out.getError());
-						std::string path = getPrintPath( m_stk);
-						m_ctx.setTag( path.c_str());
-						m_ctx.setElem( elem);
-						return Error;
-					}
-					m_ctx.setElem( elem);
-					return Yield;
+					throw SerializationErrorException( m_out->getError(), getElementPath( m_stk));
 				}
-			}
-			if (!fetchObject( m_ctx, m_stk))
-			{
-				if (m_ctx.getLastError())
-				{
-					std::string path = getPrintPath( m_stk);
-					m_ctx.setTag( path.c_str());
-					return Error;
-				}
+				m_ctx.setElem( elem);
+				return false;
 			}
 		}
+		fetchObject( m_ctx, m_stk);
 	}
-	catch (std::exception& e)
-	{
-		m_ctx.setError( e.what());
-		return Error;
-	}
-	return Ok;
+	return true;
 }
 
 
 bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value)
 {
-	try
+	Context::ElementBuffer elem;
+	while (m_stk.size() && !m_ctx.getElem( elem))
 	{
-		if (!m_stk.size()) return false;
+		fetchObject( m_ctx, m_stk);
+	}
+	if (!m_stk.size()) return false;
 
-		Context::ElementBuffer elem;
-		while (!m_ctx.getElem( elem))
-		{
-			if (!fetchObject( m_ctx, m_stk))
-			{
-				if (m_ctx.getLastError())
-				{
-					std::string path = getPrintPath( m_stk);
-					m_ctx.setTag( path.c_str());
-					return false;
-				}
-			}
-		}
-		type = elem.m_type;
-		value = elem.m_value;
-	}
-	catch (std::exception& e)
-	{
-		m_ctx.setError( e.what());
-		return false;
-	}
+	type = elem.m_type;
+	value = elem.m_value;
+	setState( langbind::InputFilter::Open);
 	return true;
+}
+
+DDLStructSerializer::DDLStructSerializer( const ddl::StructTypeR& st)
+	:m_st(st)
+{
+	if (!m_st.get()) throw std::runtime_error( "empty form passed to serializer");
+	m_stk.push_back( FiltermapDDLSerializeState( st.get(), langbind::TypedFilterBase::Element()));
+}
+
+DDLStructSerializer::DDLStructSerializer( const DDLStructSerializer& o)
+	:TypedInputFilter(o)
+	,m_st(o.m_st)
+	,m_ctx(o.m_ctx)
+	,m_out(o.m_out)
+	,m_stk(o.m_stk){}
+
+void DDLStructSerializer::init( const langbind::TypedOutputFilterR& out, Context::Flags flags)
+{
+	m_ctx.clear();
+	m_ctx.setFlags(flags);
+	m_stk.clear();
+	m_stk.push_back( FiltermapDDLSerializeState( m_st.get(), langbind::TypedFilterBase::Element()));
+	m_out = out;
 }
 

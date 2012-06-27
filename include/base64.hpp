@@ -22,9 +22,9 @@ public:
 		base64_initEncodeState( &m_state, lineLength );
 	}
 
-	int encode( const unsigned char* code_in, const int length_in, char* plaintext_out )
+	int encode( const unsigned char* plain, const int plainLength, char* encoded )
 	{
-		return base64_encodeBlock( &m_state, code_in, length_in, plaintext_out );
+		return base64_encodeBlock( &m_state, plain, plainLength, encoded );
 	}
 
 	int encodeEnd( char* output )
@@ -32,7 +32,7 @@ public:
 		return base64_encodeEnd( &m_state, output );
 	}
 
-	void encode( std::istream& in, std::ostream& out )
+	void encode( std::istream& plain, std::ostream& encoded )
 	{
 		const int N = m_buffersize;
 		char* plaintext = new char[N];
@@ -41,15 +41,15 @@ public:
 		int codelength;
 
 		do	{
-			in.read( plaintext, N );
-			plainlength = in.gcount();
+			plain.read( plaintext, N );
+			plainlength = plain.gcount();
 			//
 			codelength = encode((unsigned char *)plaintext, plainlength, code );
-			out.write( code, codelength );
-		} while ( in.good() && plainlength > 0 );
+			encoded.write( code, codelength );
+		} while ( plain.good() && plainlength > 0 );
 
 		codelength = encodeEnd( code );
-		out.write( code, codelength );
+		encoded.write( code, codelength );
 		//
 		base64_resetEncodeState( &m_state );
 
@@ -62,6 +62,7 @@ private:
 	base64_EncodeState	m_state;
 	int			m_buffersize;
 };
+
 
 class Decoder
 {

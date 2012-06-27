@@ -31,11 +31,11 @@ static inline char base64_encodeValue( unsigned char value )
 	return encoding[ value ];
 }
 
-int base64_encodeBlock( base64_EncodeState* state, const unsigned char* data,
-			size_t dataSize, char* encoded )
+int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
+			size_t plainLength, char* encoded )
 {
-	const unsigned char* plainchar = data;
-	const unsigned char* const dataEnd = data + dataSize;
+	const unsigned char* plainchar = plain;
+	const unsigned char* const plaintextend = plain + plainLength;
 	char* codechar = encoded;
 	char result;
 	char fragment;
@@ -87,9 +87,9 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* data,
 	return codechar - encoded;
 }
 
-int base64_encodeEnd( base64_EncodeState* state, char* output )
+int base64_encodeEnd(base64_EncodeState* state, char* encodedEnd )
 {
-	char* encoded = output;
+	char* encoded = encodedEnd;
 
 	switch ( state->step )	{
 		case STEP_1:
@@ -106,6 +106,6 @@ int base64_encodeEnd( base64_EncodeState* state, char* output )
 	}
 	*encoded++ = '\n';
 
-	return encoded - output;
+	return encoded - encodedEnd;
 }
 

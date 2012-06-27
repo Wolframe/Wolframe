@@ -205,34 +205,58 @@ private:
 };
 
 
-class StructSerializer
+class StructSerializer :public langbind::TypedInputFilter
 {
 public:
-	StructSerializer( const void* obj, const FiltermapDescriptionBase* descr, Context::Flags flags=Context::None);
+	typedef boost::shared_ptr<void> ObjectReference;
+
+	StructSerializer( const ObjectReference& obj, const FiltermapDescriptionBase* descr);
 
 	StructSerializer( const StructSerializer& o);
+	virtual ~StructSerializer(){}
 
-	enum CallResult
-	{
-		Ok,
-		Error,
-		Yield
-	};
+	static std::string getElementPath( const FiltermapSerializeStateStack& stk);
 
-	void init();
+	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
 
-	CallResult print( langbind::TypedOutputFilter& out);
+	bool call();
 
-	bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
-
-	const char* getLastError() const			{return m_ctx.getLastError();}
-	const char* getLastErrorPos() const			{return m_ctx.getLastErrorPos();}
+	///\brief Implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,langbind::TypedFilterBase::Element&)
+	virtual bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
 
 private:
-	const void* m_obj;
+	const ObjectReference m_obj;
 	const FiltermapDescriptionBase* m_descr;
 	Context m_ctx;
+	langbind::TypedOutputFilterR m_out;
 	FiltermapSerializeStateStack m_stk;
+};
+
+
+class StructParser
+{
+public:
+	typedef boost::shared_ptr<void> ObjectReference;
+
+	StructParser( const ObjectReference& obj, const FiltermapDescriptionBase* descr);
+	StructParser( const StructParser& o);
+	virtual ~StructParser(){}
+
+	static std::string getElementPath( const FiltermapParseStateStack& stk);
+
+	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
+
+	const ObjectReference& object() const					{return m_obj;}
+	const FiltermapDescriptionBase* descr() const				{return m_descr;}
+
+	bool call();
+
+private:
+	ObjectReference m_obj;
+	const FiltermapDescriptionBase* m_descr;
+	Context m_ctx;
+	langbind::TypedInputFilterR m_inp;
+	FiltermapParseStateStack m_stk;
 };
 
 }}//namespace

@@ -35,7 +35,6 @@ Project Wolframe.
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "ddl/compiler/simpleFormCompiler.hpp"
-#include "logger-v1.hpp"
 #include "filter/filter.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
@@ -146,7 +145,7 @@ RedirectFilterClosure::RedirectFilterClosure()
 	,m_elemtype(InputFilter::Value){}
 
 RedirectFilterClosure::RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o)
-	:m_state(1)
+	:m_state(0)
 	,m_taglevel(0)
 	,m_inputfilter(i)
 	,m_outputfilter(o)
@@ -166,35 +165,36 @@ void RedirectFilterClosure::init( const TypedInputFilterR& i, const TypedOutputF
 {
 	m_inputfilter = i;
 	m_outputfilter = o;
-	m_state = 1;
+	m_state = 0;
 	m_taglevel = 0;
 	m_elemtype = InputFilter::Value;
 }
 
 
-RedirectFilterClosure::CallResult RedirectFilterClosure::call()
+bool RedirectFilterClosure::call()
 {
-	if (m_state == 0) return Error;
-	if (!m_inputfilter.get() || !m_outputfilter.get()) return Error;
+	if (!m_inputfilter.get()) throw std::runtime_error( "no input defined for redirecting filter");
+	if (!m_outputfilter.get()) throw std::runtime_error( "no output defined for redirecting filter");
 
 	for (;;) switch (m_state)
 	{
-		case 1:
+		case 0:
 			if (!m_inputfilter->getNext( m_elemtype, m_elem))
 			{
 				switch (m_inputfilter->state())
 				{
 					case InputFilter::Open:
-						return Ok;
+						m_state = 2;
+						return true;
 
 					case InputFilter::EndOfMessage:
-						return Yield;
+						return false;
 
 					case InputFilter::Error:
-						return Error;
+						throw std::runtime_error( m_inputfilter->getError());
 				}
 			}
-			m_state = 2;
+			m_state = 1;
 			if (m_elemtype == InputFilter::OpenTag)
 			{
 				++m_taglevel;
@@ -204,177 +204,96 @@ RedirectFilterClosure::CallResult RedirectFilterClosure::call()
 				--m_taglevel;
 				if (m_taglevel < 0)
 				{
-					m_state = 3;
-					return Ok;
+					m_state = 2;
+					return true;
 				}
 			}
 			/*no break here!*/
-		case 2:
+		case 1:
 			if (!m_outputfilter->print( m_elemtype, m_elem))
 			{
 				switch (m_outputfilter->state())
 				{
 					case OutputFilter::Open:
-						return Error;
+						throw std::runtime_error( "unknown error in output filter");
 
 					case OutputFilter::EndOfBuffer:
-						return Yield;
+						return false;
 
 					case OutputFilter::Error:
-						return Error;
+						throw std::runtime_error( m_outputfilter->getError());
 				}
 			}
-			m_state = 1;
+			m_state = 0;
 			continue;
 		default:
-			return Ok;
+			return true;
 	}
 }
 
+void DDLForm::clone()
+{
+	if (m_structure.get())
+	{
+		m_structure = ddl::StructTypeR( new ddl::StructType( *m_structure));
+	}
+}
 
 std::string DDLForm::tostring() const
 {
-	ToStringFilter out;
+	ToStringFilter* flt = new ToStringFilter;
+	TypedOutputFilterR out( flt);
 	serialize::DDLStructSerializer ser( m_structure);
-	if (ser.print( out) != serialize::DDLStructSerializer::Ok)
+	ser.init( out, serialize::Context::SerializeWithIndices);
+	if (!ser.call())
 	{
-		if (out.state() == OutputFilter::EndOfBuffer)
+		if (out->state() == OutputFilter::EndOfBuffer)
 		{
 			throw std::logic_error( "internal: tostring serialization with yield");
 		}
 		else
 		{
-			throw std::runtime_error( ser.getLastError());
+			throw std::runtime_error( ser.getError());
 		}
 	}
-	return out.content();
-}
-
-DDLFormFill::DDLFormFill( const DDLFormR& f, serialize::Context::Flags flags)
-	:m_form(f)
-	,m_state(0)
-	,m_ctx(flags){}
-
-DDLFormFill::DDLFormFill( const DDLFormR& f, const TypedInputFilterR& inp, serialize::Context::Flags flags)
-	:m_form(f)
-	,m_state(0)
-	,m_inputfilter(inp)
-	,m_ctx(flags){}
-
-DDLFormFill::DDLFormFill( const DDLFormFill& o)
-	:m_form(o.m_form)
-	,m_state(o.m_state)
-	,m_inputfilter(o.m_inputfilter)
-	,m_ctx(o.m_ctx)
-	,m_parsestk(o.m_parsestk){}
-
-void DDLFormFill::init( const TypedInputFilterR& i)
-{
-	m_inputfilter = i;
-	m_ctx.clear();
-	m_parsestk.clear();
-	m_state = 0;
-}
-
-DDLFormFill::CallResult DDLFormFill::call()
-{
-	if (m_state > 0) return Ok;
-	switch (m_state)
-	{
-		case 0:
-			if (!m_inputfilter.get())
-			{
-				m_ctx.setError( "no input filter defined for form fill");
-				return Error;
-			}
-			if (!m_form.get())
-			{
-				m_ctx.setError( "no form defined for form fill");
-				return Error;
-			}
-			if (!serialize::parse( m_form->m_structure, *m_inputfilter, m_ctx, m_parsestk))
-			{
-				if (m_ctx.getLastError()) return Error;
-				switch (m_inputfilter->state())
-				{
-					case InputFilter::Open:
-						m_ctx.setError( "unknown error in form fill");
-						return Error;
-
-					case InputFilter::EndOfMessage:
-						return Yield;
-
-					case InputFilter::Error:
-						m_ctx.setError( m_inputfilter->getError());
-						return Error;
-				}
-			}
-			m_state = 1;
-	}
-	return Ok;
-}
-
-DDLFormPrint::DDLFormPrint( const DDLFormR& f, serialize::Context::Flags flags)
-	:m_form(f)
-	,m_state(0)
-	,m_ser( m_form->structure(), flags){}
-
-DDLFormPrint::DDLFormPrint( const DDLFormR& f, const TypedOutputFilterR& outp, serialize::Context::Flags flags)
-	:m_form(f)
-	,m_state(1)
-	,m_outputfilter(outp)
-	,m_ser(m_form->structure(), flags){}
-
-DDLFormPrint::DDLFormPrint( const DDLFormPrint& o)
-	:m_form(o.m_form)
-	,m_state(o.m_state)
-	,m_outputfilter(o.m_outputfilter)
-	,m_ser(o.m_ser){}
-
-void DDLFormPrint::init( const TypedOutputFilterR& o)
-{
-	m_outputfilter = o;
-	m_ser.init();
-	m_state = 1;
-}
-
-DDLFormPrint::CallResult DDLFormPrint::fetch()
-{
-	if (m_state == 0) return Error;
-	if (m_state == 2) return Ok;
-	if (!m_form.get())
-	{
-		throw std::runtime_error( "no form defined to print");
-	}
-	if (!m_outputfilter.get()) throw std::runtime_error( "no output specified for serialization");
-
-	switch (m_ser.print(*m_outputfilter))
-	{
-		case serialize::DDLStructSerializer::Ok:
-			m_state = 2;
-			return Ok;
-
-		case serialize::DDLStructSerializer::Yield:
-			return Yield;
-
-		case serialize::DDLStructSerializer::Error:
-			return Error;
-	}
-	throw std::runtime_error( "illegal state in form print");
+	return flt->content();
 }
 
 void DDLFormMap::defineForm( const std::string& name, const DDLForm& f)
 {
-	defineObject( m_map, name, DDLFormR( new DDLForm(f)));
+	DDLForm f_(f);
+	f_.clone();
+	defineObject( m_map, name, f_);
 }
 
-bool DDLFormMap::getForm( const std::string& name, DDLFormR& rt) const
+bool DDLFormMap::getForm( const std::string& name, DDLForm& rt) const
 {
-	DDLFormR obj;
-	if (!getObject( m_map, name, obj) || !obj.get()) return false;
-	rt = DDLFormR( new DDLForm( *obj));
+	if (!getObject( m_map, name, rt)) return false;
+	rt.clone();
 	return true;
 }
+
+
+ApiFormData::ApiFormData( const serialize::FiltermapDescriptionBase* descr_)
+	:m_descr(descr_)
+	,m_data(std::calloc( descr_->size(), 1), std::free)
+{
+	void* ptr = m_data.get();
+	if (!ptr) throw std::bad_alloc();
+	if (!m_descr->init( ptr))
+	{
+		m_descr->done( ptr);
+		m_data.reset();
+		throw std::bad_alloc();
+	}
+}
+
+ApiFormData::~ApiFormData()
+{
+	void* ptr = m_data.get();
+	if (ptr) m_descr->done( ptr);
+}
+
 
 FormFunction::FormFunction()
 	:m_function(0)
@@ -391,160 +310,49 @@ FormFunction::FormFunction( Function f, const serialize::FiltermapDescriptionBas
 	,m_api_param(p)
 	,m_api_result(r){}
 
-FormFunctionResult::FormFunctionResult( const FormFunction& f)
-	:m_description(f.api_result())
-	,m_state(0)
-	,m_data(std::calloc( f.api_result()->size(), 1), std::free)
-	,m_ser( m_data.get(), m_description)
-{
-	if (!m_data.get()) throw std::bad_alloc();
-	void* result_struct = m_data.get();
-	if (result_struct && m_description->init( result_struct))
-	{
-		m_state = 1;
-	}
-}
-
-FormFunctionResult::FormFunctionResult( const FormFunctionResult& o)
-	:m_description(o.m_description)
-	,m_state(o.m_state)
-	,m_data(o.m_data)
-	,m_outputfilter(o.m_outputfilter)
-	,m_ser(o.m_ser){}
-
-FormFunctionResult::~FormFunctionResult()
-{
-	if (m_state)
-	{
-		m_description->done( m_data.get());
-		std::memset( m_data.get(), 0, m_description->size());
-	}
-}
-
-void FormFunctionResult::init( const TypedOutputFilterR& o)
-{
-	m_outputfilter = o;
-	m_ser.init();
-	m_state = 1;
-}
-
-FormFunctionResult::CallResult FormFunctionResult::fetch()
-{
-	if (m_state == 0) return Error;
-	if (m_state == 2) return Ok;
-
-	if (!m_outputfilter.get()) throw std::runtime_error( "no output specified for serialization");
-
-	switch (m_ser.print(*m_outputfilter))
-	{
-		case serialize::StructSerializer::Ok:
-			m_state = 2;
-			return Ok;
-
-		case serialize::StructSerializer::Yield:
-			return Yield;
-
-		case serialize::StructSerializer::Error:
-			return Error;
-	}
-	throw std::runtime_error( "illegal state in form print");
-}
 
 FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
-	:FormFunction(f)
+	:m_func(f)
 	,m_state(0)
-	,m_result(f)
-	,m_data(std::calloc( f.api_param()->size(), 1), std::free)
-{
-	if (!m_data.get()) throw std::bad_alloc();
-	if (!f.api_param()->init( m_data.get()))
-	{
-		m_ctx.setError( "could not initialize objects for form function");
-	}
-	else
-	{
-		m_state = 1;
-	}
-}
+	,m_param_data(f.api_param())
+	,m_result_data(f.api_result())
+	,m_result(m_result_data.data(),m_result_data.descr())
+	,m_parser(m_param_data.data(),m_param_data.descr()){}
 
 FormFunctionClosure::FormFunctionClosure( const FormFunctionClosure& o)
-	:FormFunction(o)
-	,m_state(o.m_state)
+	:m_func(o.m_func)
+	,m_state(0)
+	,m_param_data(o.m_param_data)
+	,m_result_data(o.m_result_data)
 	,m_result(o.m_result)
-	,m_data(o.m_data)
-	,m_parsestk(o.m_parsestk)
-	,m_ctx(o.m_ctx)
-	,m_inputfilter(o.m_inputfilter)
+	,m_parser(o.m_parser)
 	{}
 
-FormFunctionClosure::~FormFunctionClosure()
+void FormFunctionClosure::init( const TypedInputFilterR& i, serialize::Context::Flags flags)
 {
-	if (m_state)
-	{
-		api_param()->done( m_data.get());
-		std::memset( m_data.get(), 0, api_param()->size());
-	}
+	m_parser.init(i,flags);
 }
 
-void FormFunctionClosure::init( const TypedInputFilterR& i)
+bool FormFunctionClosure::call()
 {
-	m_inputfilter = i;
-	m_ctx.clear();
-	m_parsestk.clear();
-	m_state = 1;
-}
-
-FormFunctionClosure::CallResult FormFunctionClosure::call()
-{
-	if (m_state < 1) return Error;
-	void* param_struct = m_data.get();
-
+	void* param_struct = m_param_data.get();
+	void* result_struct = m_result_data.get();
 	switch (m_state)
 	{
+		case 0:
+			if (!m_parser.call()) return false;
+			m_state = 1;
 		case 1:
-			if (!m_inputfilter.get())
+			int rt = m_func.call( result_struct, param_struct);
+			if (rt != 0)
 			{
-				m_ctx.setError( "no input filter defined for form function");
-				return Error;
-			}
-			if (!api_param()->parse( param_struct, *m_inputfilter, m_ctx, m_parsestk))
-			{
-				switch (m_inputfilter->state())
-				{
-					case InputFilter::Open:
-						if (m_ctx.getLastError())
-						{
-							return Error;
-						}
-						break;
-
-					case InputFilter::EndOfMessage:
-						return Yield;
-
-					case InputFilter::Error:
-						m_ctx.setError( m_inputfilter->getError());
-						return Error;
-				}
+				std::ostringstream msg;
+				msg << "error in call of form function (return code " << rt << ")";
+				throw std::runtime_error( msg.str());
 			}
 			m_state = 2;
-		case 2:
-			try
-			{
-				int rt = FormFunction::function()( m_result.data(), param_struct);
-				if (rt != 0)
-				{
-					m_ctx.setError( "error in call of form function");
-					return Error;
-				}
-			}
-			catch (const std::exception& e)
-			{
-				m_ctx.setError( e.what());
-				return Error;
-			}
-			m_state = 3;
 	}
-	return Ok;
+	return true;
 }
 
 void FormFunctionMap::defineFormFunction( const std::string& name, const FormFunction& f)
@@ -565,7 +373,6 @@ TransactionFunctionResult::TransactionFunctionResult( const TransactionFunction&
 TransactionFunctionResult::TransactionFunctionResult( const TransactionFunctionResult& o)
 	:m_func(o.m_func)
 	,m_state(o.m_state)
-	,m_lasterror(o.m_lasterror)
 	,m_elemtype(o.m_elemtype)
 	,m_elem(o.m_elem)
 	,m_resultbuf(o.m_resultbuf)
@@ -573,17 +380,15 @@ TransactionFunctionResult::TransactionFunctionResult( const TransactionFunctionR
 	,m_outputfilter(o.m_outputfilter){}
 
 
-TransactionFunctionResult::CallResult TransactionFunctionResult::fetch()
+bool TransactionFunctionResult::call()
 {
 	if (!m_outputfilter.get())
 	{
-		m_lasterror = "no output filter specified for transaction function result";
-		m_state = 0;
-		return Error;
+		throw std::runtime_error( "no output filter specified for transaction function result");
 	}
 	for (;;) switch (m_state)
 	{
-		case 0: return Error;
+		case 0: throw std::runtime_error( "transaction function result not initialized");
 		case 1:
 		{
 			TypingInputFilter si( m_resultreader);
@@ -592,18 +397,15 @@ TransactionFunctionResult::CallResult TransactionFunctionResult::fetch()
 				switch (si.state())
 				{
 					case InputFilter::Open:
-						return Ok;
+						return true;
+
 					case InputFilter::EndOfMessage:
-						m_lasterror = "unexpected end of message in result reader";
-						break;
+						throw std::runtime_error( "unexpected end of message in result reader");
+
 					case InputFilter::Error:
-						if (si.getError())
-						{
-							m_lasterror.append( si.getError());
-						}
-						break;
+						throw std::runtime_error( si.getError());
 				}
-				return Error;
+				throw std::runtime_error( "in transaction function illegal input filter state");
 			}
 			m_state = 2;
 		}
@@ -614,25 +416,21 @@ TransactionFunctionResult::CallResult TransactionFunctionResult::fetch()
 				switch (m_outputfilter->state())
 				{
 					case OutputFilter::Open:
-						m_lasterror = "unknown error in transaction function output";
-						break;
+						throw std::runtime_error( "unknown error in transaction function output");
+
 					case OutputFilter::EndOfBuffer:
-						return Yield;
+						return false;
+
 					case OutputFilter::Error:
-						if (m_outputfilter->getError())
-						{
-							m_lasterror.append( m_outputfilter->getError());
-						}
-						break;
+						throw std::runtime_error( m_outputfilter->getError());
 				}
-				return Error;
+				throw std::runtime_error( "in transaction function illegal output filter state");
 			}
 			m_state = 1;
 			break;
 		}
 		default:
-			m_lasterror = "illegal state";
-			return Error;
+			throw std::runtime_error( "in transaction function illegal state");
 	}
 }
 
@@ -650,7 +448,6 @@ void TransactionFunctionResult::init( const TypedOutputFilterR& o)
 	{
 		m_resultreader->putInput( "", 0, true);
 	}
-	m_lasterror.clear();
 	m_outputfilter = o;
 }
 
@@ -663,7 +460,6 @@ void TransactionFunctionResult::appendCmdOutput( const void* buf, std::size_t si
 void TransactionFunctionResult::reset()
 {
 	m_resultbuf.reset();
-	m_lasterror.clear();
 }
 
 
@@ -684,7 +480,6 @@ TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctio
 	,m_cmd(o.m_cmd)
 	,m_cmdop(cmdbind::CommandHandler::READ)
 	,m_state(o.m_state)
-	,m_lasterror(o.m_lasterror)
 	,m_elemtype(o.m_elemtype)
 	,m_elem(o.m_elem)
 	,m_cmdinputbuf(o.m_cmdinputbuf)
@@ -695,13 +490,11 @@ TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctio
 	{}
 
 
-TransactionFunctionClosure::CallResult TransactionFunctionClosure::call()
+bool TransactionFunctionClosure::call()
 {
 	if (!m_inputfilter.get())
 	{
-		m_lasterror = "empty input for transaction function command";
-		m_state = 0;
-		return Error;
+		throw std::runtime_error( "empty input for transaction function command");
 	}
 	for (;;) switch (m_cmdop)
 	{
@@ -710,7 +503,7 @@ TransactionFunctionClosure::CallResult TransactionFunctionClosure::call()
 			switch (m_state)
 			{
 				case 0:
-					return Error;
+					throw std::runtime_error( "invalid transaction object called");
 				case 1:
 					if (!m_inputfilter->getNext( m_elemtype, m_elem))
 					{
@@ -721,20 +514,17 @@ TransactionFunctionClosure::CallResult TransactionFunctionClosure::call()
 								m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
 								m_cmd->nextOperation();
 								m_state = 1;
+								continue;
 
 							case InputFilter::EndOfMessage:
 								m_cmd->putInput( m_cmdinputbuf.get(), m_cmdwriter->getPosition());
 								m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
-								return Yield;
+								return false;
 
 							case InputFilter::Error:
-								if (m_inputfilter->getError())
-								{
-									m_lasterror.append( m_inputfilter->getError());
-								}
-								break;
+								throw std::runtime_error( m_inputfilter->getError());
 						}
-						return Error;
+						throw std::runtime_error( "in transaction function illegal input filter state");
 					}
 					m_state = 2;
 				case 2:
@@ -754,21 +544,15 @@ TransactionFunctionClosure::CallResult TransactionFunctionClosure::call()
 								continue;
 
 							case InputFilter::Error:
-								if (so.getError())
-								{
-									m_lasterror.append( so.getError());
-								}
-								return Error;
+								throw std::runtime_error( so.getError());
 						}
-						m_lasterror = "illegal state";
-						return Error;
+						throw std::runtime_error( "in transaction function illegal output filter state");
 					}
 					m_state = 1;
 					continue;
 				}
 				default:
-					m_lasterror = "illegal state";
-					return Error;
+					throw std::runtime_error( "illegal state");
 			}
 		}
 		case cmdbind::CommandHandler::WRITE:
@@ -779,10 +563,11 @@ TransactionFunctionClosure::CallResult TransactionFunctionClosure::call()
 			m_result.appendCmdOutput( data, datasize);
 			m_cmd->nextOperation();
 			m_state = 1;
+			continue;
 		}
 		case cmdbind::CommandHandler::CLOSED:
 		{
-			return Ok;
+			return true;
 		}
 	}
 }
@@ -792,15 +577,14 @@ void TransactionFunctionClosure::init( const TypedInputFilterR& i)
 	m_cmd = m_func.cmdconstructor()( m_name);
 	m_cmdop = cmdbind::CommandHandler::READ;
 	m_state = 1;
-	m_lasterror.clear();
 	m_cmdwriter.reset( m_func.cmdwriter()->copy());
 	m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
 	m_result.reset();
 	m_inputfilter = i;
 	if (!m_cmd.get())
 	{
-		m_lasterror = "unknown transaction function command";
 		m_state = 0;
+		throw std::runtime_error( "unknown transaction function command");
 	}
 	else
 	{
@@ -836,178 +620,63 @@ bool DDLCompilerMap::getDDLCompiler( const std::string& name, ddl::CompilerInter
 	return getObject( m_map, name, rt);
 }
 
-static InputFilterClosure::ItemType fetchFailureResult( const InputFilter& ff)
-{
-	const char* msg;
-	switch (ff.state())
-	{
-		case InputFilter::EndOfMessage:
-			return InputFilterClosure::DoYield;
 
-		case InputFilter::Error:
-			msg = ff.getError();
-			LOG_ERROR << "error in input filter (" << (msg?msg:"unknown") << ")";
-			return InputFilterClosure::Error;
-
-		case InputFilter::Open:
-			LOG_DATA << "end of input";
-			return InputFilterClosure::EndOfData;
-	}
-	LOG_ERROR << "illegal state in iterator";
-	return InputFilterClosure::Error;
-}
-
-InputFilterClosure::ItemType InputFilterClosure::fetch( const char*& tag, unsigned int& tagsize, const char*& val, unsigned int& valsize)
-{
-	const void* element;
-	std::size_t elementsize;
-
-AGAIN:
-	if (!m_inputfilter.get())
-	{
-		return EndOfData;
-	}
-	if (!m_inputfilter->getNext( m_type, element, elementsize))
-	{
-		return fetchFailureResult( *m_inputfilter);
-	}
-	else
-	{
-		switch (m_type)
-		{
-			case InputFilter::OpenTag:
-				m_taglevel += 1;
-				tag = (const char*)element;
-				tagsize = elementsize;
-				val = 0;
-				valsize = 0;
-				m_gotattr = false;
-				return Data;
-
-			case InputFilter::Value:
-				if (m_gotattr)
-				{
-					tag = m_attrbuf.c_str();
-					tagsize = m_attrbuf.size();
-					m_gotattr = false;
-				}
-				else
-				{
-					tag = 0;
-					tagsize = 0;
-				}
-				val = (const char*)element;
-				valsize = elementsize;
-				return Data;
-
-			 case InputFilter::Attribute:
-				m_attrbuf.clear();
-				m_attrbuf.append( (const char*)element, elementsize);
-				m_gotattr = true;
-				goto AGAIN;
-
-			 case InputFilter::CloseTag:
-				tag = 0;
-				tagsize = 0;
-				val = 0;
-				valsize = 0;
-				m_gotattr = false;
-				if (m_taglevel == 0)
-				{
-					return EndOfData;
-				}
-				else
-				{
-					m_taglevel -= 1;
-					return Data;
-				}
-		}
-	}
-	LOG_ERROR << "illegal state in iterator";
-	return Error;
-}
-
-Output::ItemType Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize)
+bool Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize)
 {
 	if (!m_outputfilter.get())
 	{
-		LOG_ERROR << "no output sink defined (output ignored)";
-		return Error;
+		throw std::runtime_error( "no output sink defined (output ignored)");
 	}
-	try
+	if (tag)
 	{
-		if (tag)
+		if (val)
 		{
-			if (val)
+			switch (m_state)
 			{
-				switch (m_state)
-				{
-					case 0:
-						if (!m_outputfilter->print( OutputFilter::Attribute, tag, tagsize)) break;
-						m_state ++;
-					case 1:
-						if (!m_outputfilter->print( OutputFilter::Value, val, valsize)) break;
-						m_state ++;
-					case 2:
-						m_state = 0;
-						return Data;
-				}
-				const char* err = m_outputfilter->getError();
-				if (err)
-				{
-					LOG_ERROR << "error in output filter (" << err << ")";
-					return Error;
-				}
-				return DoYield;
+				case 0:
+					if (!m_outputfilter->print( OutputFilter::Attribute, tag, tagsize)) break;
+					m_state ++;
+				case 1:
+					if (!m_outputfilter->print( OutputFilter::Value, val, valsize)) break;
+					m_state ++;
+				case 2:
+					m_state = 0;
+					return true;
 			}
-			else
-			{
-				if (!m_outputfilter->print( OutputFilter::OpenTag, tag, tagsize))
-				{
-					const char* err = m_outputfilter->getError();
-					if (err)
-					{
-						LOG_ERROR << "error in output filter open tag (" << err << ")";
-						return Error;
-					}
-					return DoYield;
-				}
-				return Data;
-			}
-		}
-		else if (val)
-		{
-			if (!m_outputfilter->print( OutputFilter::Value, val, valsize))
-			{
-				const char* err = m_outputfilter->getError();
-				if (err)
-				{
-					LOG_ERROR << "error in output filter value (" << err << ")";
-					return Error;
-				}
-				return DoYield;
-			}
-			return Data;
+			const char* err = m_outputfilter->getError();
+			if (err) throw std::runtime_error( err);
+			return false;
 		}
 		else
 		{
-			if (!m_outputfilter->print( OutputFilter::CloseTag, 0, 0))
+			if (!m_outputfilter->print( OutputFilter::OpenTag, tag, tagsize))
 			{
 				const char* err = m_outputfilter->getError();
-				if (err)
-				{
-					LOG_ERROR << "error in output filter close tag (" << err << ")";
-					return Error;
-				}
-				return DoYield;
+				if (err) throw std::runtime_error( err);
+				return false;
 			}
-			return Data;
+			return true;
 		}
 	}
-	catch (std::bad_alloc)
+	else if (val)
 	{
-		LOG_ERROR << "out of memory in output filter";
-		return Error;
+		if (!m_outputfilter->print( OutputFilter::Value, val, valsize))
+		{
+			const char* err = m_outputfilter->getError();
+			if (err) throw std::runtime_error( err);
+			return false;
+		}
+		return true;
+	}
+	else
+	{
+		if (!m_outputfilter->print( OutputFilter::CloseTag, 0, 0))
+		{
+			const char* err = m_outputfilter->getError();
+			if (err) throw std::runtime_error( err);
+			return false;
+		}
+		return true;
 	}
 }
 

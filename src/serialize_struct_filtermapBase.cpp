@@ -39,28 +39,21 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
-StructSerializer::StructSerializer( const void* obj, const FiltermapDescriptionBase* descr, Context::Flags flags)
+StructParser::StructParser( const ObjectReference& obj, const FiltermapDescriptionBase* descr_)
 	:m_obj(obj)
-	,m_descr(descr)
-	,m_ctx(flags)
+	,m_descr(descr_)
 {
-	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_obj));
+	m_stk.push_back( FiltermapParseState( 0, m_descr->parse(), m_obj.get()));
 }
 
-StructSerializer::StructSerializer( const StructSerializer& o)
+StructParser::StructParser( const StructParser& o)
 	:m_obj(o.m_obj)
 	,m_descr(o.m_descr)
 	,m_ctx(o.m_ctx)
+	,m_inp(o.m_inp)
 	,m_stk(o.m_stk){}
 
-void StructSerializer::init()
-{
-	m_ctx.clear();
-	m_stk.clear();
-	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_obj));
-}
-
-static std::string getParsePath( const FiltermapParseStateStack& stk)
+std::string StructParser::getElementPath( const FiltermapParseStateStack& stk)
 {
 	std::string rt;
 	FiltermapParseStateStack::const_iterator itr=stk.begin(), end=stk.end();
@@ -75,7 +68,56 @@ static std::string getParsePath( const FiltermapParseStateStack& stk)
 	return rt;
 }
 
-static std::string getElementPath( const FiltermapSerializeStateStack& stk)
+void StructParser::init( const langbind::TypedInputFilterR& i, Context::Flags flags)
+{
+	m_inp = i;
+	m_ctx.clear();
+	m_ctx.setFlags(flags);
+	m_stk.clear();
+	m_stk.push_back( FiltermapParseState( 0, m_descr->parse(), m_obj.get()));
+}
+
+bool StructParser::call()
+{
+	bool rt = true;
+	if (!m_obj.get()) throw std::runtime_error( "try to fill null object");
+	if (!m_inp.get()) throw std::runtime_error( "no input for parse");
+
+	while (rt && m_stk.size())
+	{
+		rt = m_stk.back().parse()( *m_inp, m_ctx, m_stk);
+	}
+	return rt;
+}
+
+
+
+StructSerializer::StructSerializer( const ObjectReference& obj, const FiltermapDescriptionBase* descr_)
+	:m_obj(obj)
+	,m_descr(descr_)
+	,m_ctx()
+{
+	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_obj.get()));
+}
+
+StructSerializer::StructSerializer( const StructSerializer& o)
+	:TypedInputFilter(o)
+	,m_obj(o.m_obj)
+	,m_descr(o.m_descr)
+	,m_ctx(o.m_ctx)
+	,m_out(o.m_out)
+	,m_stk(o.m_stk){}
+
+void StructSerializer::init( const langbind::TypedOutputFilterR& out, Context::Flags flags)
+{
+	m_ctx.clear();
+	m_ctx.setFlags(flags);
+	m_stk.clear();
+	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_obj.get()));
+	m_out = out;
+}
+
+std::string StructSerializer::getElementPath( const FiltermapSerializeStateStack& stk)
 {
 	std::string rt;
 	FiltermapSerializeStateStack::const_iterator itr=stk.begin(), end=stk.end();
@@ -90,106 +132,41 @@ static std::string getElementPath( const FiltermapSerializeStateStack& stk)
 	return rt;
 }
 
-bool FiltermapDescriptionBase::parse( void* obj, langbind::TypedInputFilter& tin, Context& ctx, FiltermapParseStateStack& stk) const
+bool StructSerializer::call()
 {
-	bool rt = true;
-	try
+	if (!m_out.get()) throw std::runtime_error( "no output for serialize");
+	while (m_stk.size())
 	{
-		if (stk.size() == 0)
+		Context::ElementBuffer elem;
+		if (m_ctx.getElem( elem))
 		{
-			if (!m_parse) throw std::runtime_error( "null parser called");
-			stk.push_back( FiltermapParseState( 0, m_parse, obj));
-		}
-		while (rt && stk.size())
-		{
-			rt = stk.back().parse()( tin, ctx, stk);
-		}
-		if (tin.state() == langbind::InputFilter::Open && !ctx.getLastError() && stk.size() == 1)
-		{
-			return true;
-		}
-		if (!rt && ctx.getLastError())
-		{
-			std::string path = getParsePath( stk);
-			ctx.setTag( path.c_str());
-		}
-	}
-	catch (std::exception& e)
-	{
-		ctx.setError( e.what());
-		rt = false;
-	}
-	return rt;
-}
-
-StructSerializer::CallResult StructSerializer::print( langbind::TypedOutputFilter& out)
-{
-	try
-	{
-		while (m_stk.size())
-		{
-			Context::ElementBuffer elem;
-			if (m_ctx.getElem( elem))
+			if (!m_out->print( elem.m_type, elem.m_value))
 			{
-				if (!out.print( elem.m_type, elem.m_value))
+				if (m_out->getError())
 				{
-					if (out.getError())
-					{
-						m_ctx.setError( out.getError());
-						std::string path = getElementPath( m_stk);
-						m_ctx.setTag( path.c_str());
-						m_ctx.setElem( elem);
-						return Error;
-					}
-					m_ctx.setElem( elem);
-					return Yield;
+					throw SerializationErrorException( m_out->getError(), getElementPath( m_stk));
 				}
-			}
-			if (!m_stk.back().fetch()( m_ctx, m_stk))
-			{
-				if (m_ctx.getLastError())
-				{
-					std::string path = getElementPath( m_stk);
-					m_ctx.setTag( path.c_str());
-					return Error;
-				}
+				m_ctx.setElem( elem);
+				return false;
 			}
 		}
+		m_stk.back().fetch()( m_ctx, m_stk);
 	}
-	catch (std::exception& e)
-	{
-		m_ctx.setError( e.what());
-		return Error;
-	}
-	return Ok;
+	return true;
 }
 
 bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value)
 {
-	try
+	Context::ElementBuffer elem;
+	while (m_stk.size() && !m_ctx.getElem( elem))
 	{
-		if (!m_stk.size()) return false;
+		m_stk.back().fetch()( m_ctx, m_stk);
+	}
+	if (!m_stk.size()) return false;
 
-		Context::ElementBuffer elem;
-		while (!m_ctx.getElem( elem))
-		{
-			if (!m_stk.back().fetch()( m_ctx, m_stk))
-			{
-				if (m_ctx.getLastError())
-				{
-					std::string path = getElementPath( m_stk);
-					m_ctx.setTag( path.c_str());
-					return false;
-				}
-			}
-		}
-		type = elem.m_type;
-		value = elem.m_value;
-	}
-	catch (std::exception& e)
-	{
-		m_ctx.setError( e.what());
-		return false;
-	}
+	type = elem.m_type;
+	value = elem.m_value;
+	setState( langbind::InputFilter::Open);
 	return true;
 }
+

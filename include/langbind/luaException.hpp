@@ -33,16 +33,69 @@ Project Wolframe.
 ///\brief interface for throwing C++ exceptions for lua functions called in a C++ context (outside the interpreter)
 #ifndef _Wolframe_langbind_LUA_EXCEPTION_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_EXCEPTION_HPP_INCLUDED
+#include <sstream>
+#include <iostream>
+
 extern "C" {
 	#include <lua.h>
+	#include <lauxlib.h>
 }
 
 namespace _Wolframe {
 namespace langbind {
 
+///\class LuaErrorMessage
+///\brief Buffer for error message in Lua scope (not leaking when a lua error exception longjump happens)
+class LuaErrorMessage
+{
+public:
+	LuaErrorMessage()
+	{
+		m_buf[0] = '\0';
+	}
+
+	void init( const char* funcname, const char* msg);
+
+	int luaerror( lua_State* ls) const
+	{
+		return luaL_error( ls, "error in function '%s' (%s)", m_funcname, m_buf);
+	}
+private:
+	enum {bufsize=224,funcnamesize=32};
+	char m_buf[ bufsize];
+	char m_funcname[ funcnamesize];
+};
+
+///\brief Class for calling C++ in a potentially exception throwing context remapping throws to lua errors with complete clean up
+template <class Functor>
+struct LuaFunctionCppCall
+{
+	static int run( const char* name, lua_State* ls)
+	{
+		LuaErrorMessage luaerr;
+		try
+		{
+			return Functor::call( ls);
+		}
+		catch (std::exception& e)
+		{
+			try
+			{
+				std::ostringstream msg;
+				msg << "error in function " << name << " (" << e.what() << ")";
+				luaerr.init( name, msg.str().c_str());
+			}
+			catch (...)
+			{
+				luaerr.init( name, "out of memory");
+			}
+		}
+		return luaerr.luaerror( ls);
+	}
+};
+
 ///\class LuaExceptionHandlerScope
-///\brief Marking a scope during lifetime (RAII) where lua exceptions are translated into C++ exceptions
-///\remark This class should be used when calling lua functions and both C++ exceptions and Lua exceptions may be thrown
+///\brief Class for calling lua function in a C++ scope. Lua longjumps are catched and translated to C++ exceptions
 class LuaExceptionHandlerScope
 {
 public:

@@ -94,6 +94,7 @@ local_install:
 
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
+	mkdir -p tests/temp
 	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./tprocHandlerTest$(EXE)
 endif
 

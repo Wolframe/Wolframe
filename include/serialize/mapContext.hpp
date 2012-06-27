@@ -35,10 +35,20 @@ Project Wolframe.
 #ifndef _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_MAPCONTEXT_HPP_INCLUDED
 #include <string>
+#include <stdexcept>
 #include "filter/typedfilter.hpp"
 
 namespace _Wolframe {
 namespace serialize {
+
+class SerializationErrorException :public std::runtime_error
+{
+public:
+	SerializationErrorException( const char* title, const std::string& element, const std::string& tag);
+	SerializationErrorException( const char* title, const std::string& tag);
+	SerializationErrorException( const char* title);
+};
+
 
 class Context
 {
@@ -47,11 +57,20 @@ public:
 	{
 		langbind::FilterBase::ElementType m_type;
 		langbind::TypedFilterBase::Element m_value;
+
+		ElementBuffer()
+			:m_type(langbind::FilterBase::Value)
+			{}
+		ElementBuffer( const ElementBuffer& o)
+			:m_type(o.m_type)
+			,m_value(o.m_value)
+			{}
 	};
 	enum Flags
 	{
 		None=0x00,
-		ValidateAttributes=0x01
+		ValidateAttributes=0x01,
+		SerializeWithIndices=0x02
 	};
 	static bool getFlag( const char* name, Flags& flg);
 
@@ -59,15 +78,10 @@ public:
 	Context( const Context& o);
 	~Context(){}
 
-	const char* getLastError() const				{return m_lasterror[0]?m_lasterror:0;}
-	const char* getLastErrorPos() const				{return m_tag[0]?m_tag:0;}
 	void clear();
 
-	void setTag( const char* tag);
-	void setError( const char* msg, const char* msgparam=0);
-	void setError( const char* msg, const std::string& p)		{return setError( msg, p.c_str());}
-
 	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
+	void setFlags( Flags f)						{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff;}
 
 	void setElem( const ElementBuffer& e)
 	{
@@ -79,6 +93,14 @@ public:
 	{
 		m_elem.m_type = t;
 		m_elem.m_value = langbind::TypedFilterBase::Element();
+		m_has_elem = true;
+	}
+
+	void setElem( langbind::FilterBase::ElementType t, const char* str, std::size_t size)
+	{
+		m_elem.m_type = t;
+		m_elem.m_value.value.string_.ptr = str;
+		m_elem.m_value.value.string_.size = size;
 		m_has_elem = true;
 	}
 
@@ -101,8 +123,6 @@ public:
 	}
 
 private:
-	char m_tag[ 128];
-	char m_lasterror[ 256];
 	Flags m_flags;
 	ElementBuffer m_elem;
 	bool m_has_elem;

@@ -43,16 +43,14 @@ int main(int argc, char** argv)
 	}
 
 	// open the input file in binary mode.
-	std::string input = argv[2];
-	std::ifstream instream( input.c_str(), std::ios_base::in | std::ios_base::binary );
+	std::ifstream instream( argv[2], std::ios_base::in | std::ios_base::binary );
 	if ( !instream.is_open() )	{
 		usage( "Could not open input file!" );
 		return -1;
 	}
 
 	// open the output file in binary mode.
-	std::string output = argv[3];
-	std::ofstream outstream( output.c_str(), std::ios_base::out | std::ios_base::binary );
+	std::ofstream outstream( argv[3], std::ios_base::out | std::ios_base::binary );
 	if ( !outstream.is_open() )	{
 		usage( "Could not open output file!" );
 		return -1;

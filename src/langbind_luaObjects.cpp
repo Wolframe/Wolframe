@@ -34,13 +34,16 @@ Project Wolframe.
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/luaDebug.hpp"
 #include "langbind/luaException.hpp"
+#include "langbind/luaGetFunctionClosure.hpp"
 #include "filter/luafilter.hpp"
 #include "filter/typingfilter.hpp"
+#include "filter/tostringfilter.hpp"
 #include "logger-v1.hpp"
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <cstddef>
+#include <cstdarg>
 #include <boost/lexical_cast.hpp>
 extern "C"
 {
@@ -59,14 +62,15 @@ namespace luaname
 	static const char* Input = "wolframe.Input";
 	static const char* Output = "wolframe.Output";
 	static const char* Filter = "wolframe.Filter";
-	static const char* DDLFormR = "wolframe.DDLFormR";
 	static const char* RedirectFilterClosure = "wolframe.RedirectFilterClosure";
-	static const char* DDLFormFill = "wolframe.DDLFormFill";
-	static const char* DDLFormPrint = "wolframe.DDLFormPrint";
+	static const char* DDLForm = "wolframe.DDLForm";
+	static const char* DDLStructParser = "wolframe.DDLStructParser";
+	static const char* DDLStructSerializer = "wolframe.DDLStructSerializer";
 	static const char* GlobalContext = "wolframe.ctx";
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
+	static const char* TypedInputFilterClosure = "wolframe.TypedInputFilterClosure";
 	static const char* FormFunctionClosure = "wolframe.FormFunctionClosure";
-	static const char* FormFunctionResult = "wolframe.FormFunctionResult";
+	static const char* StructSerializer = "wolframe.StructSerializer";
 }
 
 namespace
@@ -78,13 +82,14 @@ template <> const char* metaTableName<Input>()				{return luaname::Input;}
 template <> const char* metaTableName<Output>()				{return luaname::Output;}
 template <> const char* metaTableName<Filter>()				{return luaname::Filter;}
 template <> const char* metaTableName<RedirectFilterClosure>()		{return luaname::RedirectFilterClosure;}
-template <> const char* metaTableName<DDLFormR>()			{return luaname::DDLFormR;}
-template <> const char* metaTableName<DDLFormFill>()			{return luaname::DDLFormFill;}
-template <> const char* metaTableName<DDLFormPrint>()			{return luaname::DDLFormPrint;}
+template <> const char* metaTableName<DDLForm>()			{return luaname::DDLForm;}
+template <> const char* metaTableName<serialize::DDLStructParser>()	{return luaname::DDLStructParser;}
+template <> const char* metaTableName<serialize::DDLStructSerializer>()	{return luaname::DDLStructSerializer;}
 template <> const char* metaTableName<GlobalContext>()			{return luaname::GlobalContext;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
+template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
 template <> const char* metaTableName<FormFunctionClosure>()		{return luaname::FormFunctionClosure;}
-template <> const char* metaTableName<FormFunctionResult>()		{return luaname::FormFunctionResult;}
+template <> const char* metaTableName<serialize::StructSerializer>()	{return luaname::StructSerializer;}
 }//anonymous namespace
 
 static const luaL_Reg empty_methodtable[ 1] =
@@ -93,11 +98,11 @@ static const luaL_Reg empty_methodtable[ 1] =
 };
 
 template <class ObjectType>
-struct LuaObject :public ObjectType
+struct LuaObject
 {
-	const char* m_name;
 	LuaObject( const ObjectType& o)
-		:ObjectType(o),m_name(metaTableName<ObjectType>()) {}
+		:m_name(metaTableName<ObjectType>())
+		,m_obj(o) {}
 	LuaObject()
 		:m_name(metaTableName<ObjectType>()) {}
 
@@ -197,7 +202,7 @@ struct LuaObject :public ObjectType
 	static bool setGlobal( lua_State* ls, const char* name, const ObjectType& instance)
 	{
 		lua_getglobal( ls, name);
-		LuaObject* obj = (LuaObject*) luaL_checkudata( ls, -1, metaTableName<ObjectType>());
+		LuaObject* obj = (LuaObject*) luaL_testudata( ls, -1, metaTableName<ObjectType>());
 		if (!obj) return false;
 		*obj = instance;
 		return true;
@@ -206,31 +211,38 @@ struct LuaObject :public ObjectType
 	static ObjectType* getGlobal( lua_State* ls, const char* name)
 	{
 		lua_getglobal( ls, name);
-		LuaObject* obj = (LuaObject*) luaL_checkudata( ls, -1, metaTableName<ObjectType>());
+		LuaObject* obj = (LuaObject*) luaL_testudata( ls, -1, metaTableName<ObjectType>());
 		if (!obj)
 		{
 			luaL_error( ls, "reserved global variable '%s' has been changed", name);
 			return 0;
 		}
-		return obj;
+		return obj->ref();
 	}
 
-	static LuaObject* getSelf( lua_State* ls, const char* name, const char* method)
+	static ObjectType* getSelf( lua_State* ls, const char* name, const char* method)
 	{
 		LuaObject* self;
-		if (lua_gettop( ls) == 0 || (self=(LuaObject*)luaL_checkudata( ls, 1, metaTableName<ObjectType>())) == 0)
+		if (lua_gettop( ls) == 0 || (self=(LuaObject*)luaL_testudata( ls, 1, metaTableName<ObjectType>())) == 0)
 		{
 			luaL_error( ls, "'%s' (metatable '%s') needs self parameter (%s:%s() instead of %s.%s())", name, metaTableName<ObjectType>(), name, method, name, method);
 			return 0;
 		}
-		return self;
+		return self->ref();
 	}
 
-	static LuaObject* get( lua_State* ls, int index)
+	static ObjectType* get( lua_State* ls, int index)
 	{
-		LuaObject* rt = (LuaObject*) luaL_checkudata( ls, index, metaTableName<ObjectType>());
-		return rt;
+		LuaObject* rt = (LuaObject*) luaL_testudata( ls, index, metaTableName<ObjectType>());
+		return rt?rt->ref():0;
 	}
+
+	const ObjectType* ref() const		{return &m_obj;}
+	ObjectType* ref()			{return &m_obj;}
+	const char* name() const		{return m_name;}
+private:
+	const char* m_name;
+	ObjectType m_obj;
 };
 
 template <class ObjectType>
@@ -254,7 +266,7 @@ template <class ObjectType>
 static ObjectType* getGlobalSingletonPointer( lua_State* ls)
 {
 	lua_getglobal( ls, metaTableName<ObjectType>());
-	ObjectType** objref = (ObjectType**) luaL_checkudata( ls, -1, metaTableName<ObjectType>());
+	ObjectType** objref = (ObjectType**) luaL_testudata( ls, -1, metaTableName<ObjectType>());
 	if (!objref)
 	{
 		luaL_error( ls, "reserved global variable '%s' has been changed", metaTableName<ObjectType>());
@@ -264,429 +276,280 @@ static ObjectType* getGlobalSingletonPointer( lua_State* ls)
 	return *objref;
 }
 
-class LuaErrorMessage
+static void check_parameters( lua_State* ls, int si, int nn, ...)
 {
-public:
-	LuaErrorMessage()
+	va_list aa;
+	va_start( aa, nn);
+	int anum = lua_gettop( ls);
+	if (anum != nn+si)
 	{
-		m_buf[0] = '\0';
+		if (nn == 0) throw std::runtime_error( "no arguments expected");
+		if (anum > nn+si) throw std::runtime_error( "too many arguments");
+		if (anum < nn+si) throw std::runtime_error( "too few arguments");
 	}
-
-	void init( const char* msg)
+	for (int ii = si; ii < nn; ++ii)
 	{
-		std::size_t nn = std::strlen( msg);
-		if (nn >= bufsize)
+		int expect = va_arg( aa, int);
+		int typ = lua_type( ls, -ii-1);
+		if (typ != expect)
 		{
-			nn = bufsize-1;
+			const char* expectname = lua_typename( ls, expect);
+			const char* typname = lua_typename( ls, typ);
+			std::ostringstream msg;
+			msg << "expected " << (expectname?expectname:"?") << "instead of " << (typname?typname:"?") << "as argument " << (ii-si+1);
+			throw std::runtime_error( msg.str());
 		}
-		std::memcpy( m_buf, msg, nn);
-		m_buf[ nn] = '\0';
 	}
-	const char* str() const
-	{
-		return m_buf[0]?m_buf:0;
-	}
-private:
-	enum {bufsize=256};
-	char m_buf[ bufsize];
-};
+	va_end( aa);
+}
+
 
 template <class Object>
 static int function__LuaObject__index( lua_State* ls)
 {
+	LuaErrorMessage luaerr;
 	Object* obj = LuaObject<Object>::getSelf( ls, metaTableName<Object>(), "__index");
 	const char* key = lua_tostring( ls, 2);
-	if (!key) luaL_error( ls, "%s __index called with an invalid argument 2 (key)", metaTableName<Object>());
-
-	bool rt = false;
-	bool overfl = false;
-	char valbuf[ 256];
 	try
 	{
+		if (!key)
+		{
+			throw std::runtime_error( "invalid element name");
+		}
+		bool rt = false;
 		std::string val;
 		if (!obj->getValue( key, val))
 		{
 			return lua_getmetatable( ls, 1)?1:0;
 		}
-		std::size_t nn = (overfl=(val.size() >= sizeof( valbuf)))?(sizeof( valbuf)-1):val.size();
-		std::memcpy( valbuf, val.c_str(), nn);
-		valbuf[ nn] = 0;
+		if (rt)
+		{
+			LuaExceptionHandlerScope escope(ls);
+			{
+				lua_pushlstring( ls, val.c_str(), val.size());
+				return 1;
+			}
+		}
+		else
+		{
+			throw std::runtime_error( "unknown element name");
+		}
+		return 0;
 	}
 	catch (const std::bad_alloc&)
 	{
-		return luaL_error( ls, "out of memory calling %s __index", metaTableName<Object>());
+		luaerr.init( "__index", "out of memory");
 	}
 	catch (const std::exception& e)
 	{
-		return luaL_error( ls, "%s __index called with illegal value (%s)", metaTableName<Object>(), e.what());
+		luaerr.init( "__index", e.what());
 	}
-	if (rt)
-	{
-		if (overfl)
-		{
-			return luaL_error( ls, "%s __index variable size exceeds maximum size (%u)", metaTableName<Object>(), sizeof(valbuf));
-		}
-
-		lua_pushstring( ls, valbuf);
-		return 1;
-	}
-	else
-	{
-		return luaL_error( ls, "%s __index called with unknown variable name", metaTableName<Object>());
-	}
-	return 0;
+	return luaerr.luaerror( ls);
 }
 
 template <class Object>
 static int function__LuaObject__newindex( lua_State* ls)
 {
+	LuaErrorMessage luaerr;
 	Object* obj = LuaObject<Object>::getSelf( ls, metaTableName<Object>(), "__newindex");
 	const char* key = lua_tostring( ls, 2);
-	if (!key) luaL_error( ls, "%s __newindex called with invalid argument 2 (key)", metaTableName<Object>());
-	const char* val = 0;
-	int tp = lua_type( ls, 3);
-
-	if (tp == LUA_TBOOLEAN)
-	{
-		val = lua_toboolean( ls, 3)?"true":"false";
-	}
-	else
-	{
-		val = lua_tostring( ls, 3);
-	}
-	if (!val) luaL_error( ls, "%s __newindex called with invalid argument 3 (value)", metaTableName<Object>());
-
 	try
 	{
-		if (!obj->setValue( key, val))
+		if (!key)
 		{
-			luaL_error( ls, "%s __newindex called with unknown variable name '%s'", metaTableName<Object>(), key);
+			throw std::runtime_error( "invalid element name");
 		}
-	}
-	catch (const std::bad_alloc&)
-	{
-		return luaL_error( ls, "out of memory calling %s __newindex", metaTableName<Object>());
-	}
-	catch (const std::exception& e)
-	{
-		return luaL_error( ls, "%s __newindex called with illegal value (%s)", metaTableName<Object>(), e.what());
-	}
-	return 0;
-}
+		const char* val = 0;
+		int tp = lua_type( ls, 3);
 
-template <class Obj>
-class AppObjectsRuntimeError :public std::runtime_error
-{
-public:
-	AppObjectsRuntimeError( const char* title, const Obj& obj) :std::runtime_error( getMessage( title, obj)){}
-private:
-	static std::string getMessage( const char* title, const Obj& obj)
-	{
-		std::stringstream msg;
-		const char* pp = obj.getLastErrorPos();
-		const char* ee = obj.getLastError();
-		if (pp)
+		if (tp == LUA_TBOOLEAN)
 		{
-			msg << "error at '" << pp << "' " << title << " (" << " (" << (ee?ee:"unknown") << ")";
+			val = lua_toboolean( ls, 3)?"true":"false";
 		}
 		else
 		{
-			msg << "error " << title << " (" << (ee?ee:"unknown") << ")";
+			val = lua_tostring( ls, 3);
 		}
-		return msg.str();
-	}
-};
-
-static void pushItem( lua_State* ls, const char* item, unsigned int itemsize)
-{
-	if (item)
-	{
-		lua_pushlstring( ls, item, (std::size_t)itemsize);
-		lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
-	}
-	else
-	{
-		lua_pushboolean( ls, 0);
-	}
-}
-
-static int function_inputFilter( lua_State* ls)
-{
-	const char* item[2];
-	unsigned int itemsize[2];
-	InputFilterClosure* closure = (InputFilterClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
-
-	try
-	{
-		switch (closure->fetch( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
+		if (!val)
 		{
-			case InputFilterClosure::DoYield:
-				lua_yieldk( ls, 0, 1, function_inputFilter);
-
-			case InputFilterClosure::EndOfData:
-				return 0;
-
-			case InputFilterClosure::Error:
-				luaL_error( ls, "error in generator function");
-				return 0;
-
-			case InputFilterClosure::Data:
-				pushItem( ls, item[0], itemsize[0]);
-				pushItem( ls, item[1], itemsize[1]);
-				return 2;
+			throw std::runtime_error( "value is not convertible to a string");
 		}
+		if (!obj->setValue( key, val))
+		{
+			throw std::runtime_error( "unknown element name");
+		}
+		return 0;
 	}
 	catch (const std::bad_alloc&)
 	{
-		return luaL_error( ls, "out of memory calling input filter fetch");
+		luaerr.init( "__newindex", "out of memory");
 	}
 	catch (const std::exception& e)
 	{
-		return luaL_error( ls, "got exception in input filter fetch: (%s)", e.what());
+		luaerr.init( "__newindex", e.what());
 	}
-	return luaL_error( ls, "illegal state produced by input filter fetch");
+	return luaerr.luaerror( ls);
 }
 
-
-static bool get_operand_TypedInputFilter( lua_State* ls, int idx, TypedInputFilterR& flt)
+static TypedInputFilterR get_operand_TypedInputFilter( lua_State* ls, int idx)
 {
+	TypedInputFilterR rt;
 	int typ = lua_type( ls, idx);
 	switch (typ)
 	{
 		case LUA_TTABLE:
-			flt.reset( new LuaTableInputFilter( ls));
-			return true;
+			rt.reset( new LuaTableInputFilter( ls));
+			break;
+
 		case LUA_TFUNCTION:
 			if (lua_getupvalue( ls, idx, 1))
 			{
-				InputFilterClosure* closure = LuaObject<InputFilterClosure>::get( ls, -1);
-				if (closure)
+				InputFilterClosure* ic = LuaObject<InputFilterClosure>::get( ls, -1);
+				if (ic)
 				{
-					flt.reset( new TypingInputFilter( closure->inputfilter()));
-					return true;
+					if (!ic->isValidAsOperand())
+					{
+						throw std::runtime_error( "iterator used as function argument in an intermediate state");
+					}
+					rt.reset( new TypingInputFilter( ic->inputfilter()));
+					break;
+				}
+				TypedInputFilterClosure* tc = LuaObject<TypedInputFilterClosure>::get( ls, -1);
+				if (tc)
+				{
+					if (!tc->isValidAsOperand())
+					{
+						throw std::runtime_error( "iterator used as function argument in an intermediate state");
+					}
+					rt = tc->inputfilter();
+					break;
 				}
 			}
 			/*no break here*/
 		default:
 		{
 			const char* typnam = typ>0?lua_typename( ls, typ):"NIL";
-			LOG_ERROR << "expected table, form or generator function and got '" << typnam << "' as argument";
-			return false;
+			std::ostringstream msg;
+			msg << "expected table, form or generator function and got '" << typnam << "' as argument";
+			throw std::runtime_error( msg.str());
 		}
 	}
+	return rt;
 }
 
-static int function_formfunctionresult_table( lua_State* ls)
+#define LUA_FUNCTION_THROWS(fname,DECLNAME)\
+struct DECLNAME ## _functor {static int call( lua_State* ls);};\
+static int DECLNAME( lua_State* ls)\
+{\
+	LuaFunctionCppCall<DECLNAME ## _functor> func;\
+	return func.run( fname, ls);\
+}\
+int DECLNAME ## _functor::call( lua_State* ls)\
+
+
+
+
+
+LUA_FUNCTION_THROWS( "<structure>:get()", function_inputFilter_get)
 {
-	LuaErrorMessage luaerr;
-	FormFunctionResult* result = LuaObject<FormFunctionResult>::getSelf( ls, "FormFunctionResult", "table");
-	try
+	InputFilterClosure* closure = LuaObject<InputFilterClosure>::get( ls, lua_upvalueindex( 1));
+	LuaExceptionHandlerScope escope(ls);
+	switch (closure->fetch( ls))
 	{
-		int ctx;
-		if (lua_getctx( ls, &ctx) != LUA_YIELD)
-		{
-			result->init( TypedOutputFilterR( new LuaTableOutputFilter( ls)));
-		}
-		FormFunctionResult::CallResult res = result->fetch();
-		switch (res)
-		{
-			case FormFunctionResult::Yield:
-				lua_yieldk( ls, 0, 1, function_formfunctionresult_table);
+		case InputFilterClosure::DoYield:
+			lua_yieldk( ls, 0, 1, function_inputFilter_get);
 
-			case FormFunctionResult::Ok:
-				/* table is already toplevel element on the stack */
-				return 1;
+		case InputFilterClosure::EndOfData:
+			return 0;
 
-			case FormFunctionResult::Error:
-				throw AppObjectsRuntimeError<FormFunctionResult>( "fetching form function result", *result);
-		}
-
+		case InputFilterClosure::Data:
+			return 2;
 	}
-	catch (const std::bad_alloc&)
-	{
-		luaerr.init( "out of memory calling form function fetch result as table");
-	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by form function fetch result as table");
+	throw std::runtime_error( "illegal state when fetching next element");
 }
 
-static int function_formfunction_call( lua_State* ls)
+
+
+LUA_FUNCTION_THROWS( "<structure>:get()", function_typedInputFilter_get)
 {
-	LuaErrorMessage luaerr;
-	FormFunctionClosure* closure = (FormFunctionClosure*)lua_touserdata( ls, lua_upvalueindex( 1));
-	try
+	TypedInputFilterClosure* closure = LuaObject<TypedInputFilterClosure>::get( ls, lua_upvalueindex( 1));
+	LuaExceptionHandlerScope escope(ls);
+	switch (closure->fetch( ls))
 	{
-		int ctx;
-		if (lua_getctx( ls, &ctx) != LUA_YIELD)
-		{
-			if (lua_gettop( ls) != 1)
-			{
-				throw std::runtime_error( "two arguments expected for call of formfunction");
-			}
-			else
-			{
-				TypedInputFilterR inp;
-				if (!get_operand_TypedInputFilter( ls, 1, inp))
-				{
-					throw std::runtime_error( "error in form function call. 1st argument is not a table, form or generator function");
-				}
-				closure->init( inp);
-			}
-		}
-		lua_pushvalue( ls, 1);		//... input filter object as first argument
-		FormFunctionClosure::CallResult res = closure->call();
-		switch (res)
-		{
-			case FormFunctionClosure::Yield:
-				lua_yieldk( ls, 0, 1, function_formfunction_call);
+		case TypedInputFilterClosure::DoYield:
+			lua_yieldk( ls, 0, 1, function_typedInputFilter_get);
 
-			case FormFunctionClosure::Ok:
-				LuaObject<FormFunctionResult>::push_luastack( ls, closure->result());
-				return 1;
+		case TypedInputFilterClosure::EndOfData:
+			return 0;
 
-			case FormFunctionClosure::Error:
-				throw AppObjectsRuntimeError<FormFunctionClosure>( "calling form function", *closure);
-		}
+		case TypedInputFilterClosure::Data:
+			return 2;
 	}
-	catch (const std::bad_alloc&)
-	{
-		luaerr.init( "out of memory calling form function call");
-	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by form function call");
+	throw std::runtime_error( "illegal state when fetching next element");
 }
 
-static int function_ddlform_tostring( lua_State* ls)
+
+LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 {
-	LuaErrorMessage luaerr;
-	DDLFormR* form = LuaObject<DDLFormR>::getSelf( ls, "form", "__tostring");
-	try
+	check_parameters( ls, 0, 1, LUA_TFUNCTION);
+	if (lua_getupvalue( ls, 1, 1))
 	{
-		if (lua_gettop( ls) != 1)
+		InputFilterClosure* ic = LuaObject<InputFilterClosure>::get( ls, -1);
+		if (ic)
 		{
-			throw std::runtime_error( "called form::__tostring() with arguments");
-		}
-		if (form->get())
-		{
-			std::string content = (*form)->tostring();
-			LuaExceptionHandlerScope escope(ls);
+			if (!ic->isValidAsOperand())
 			{
-				lua_pushlstring( ls, content.c_str(), content.size());
-				return 1;
+				throw std::runtime_error( "iterator used as function argument in an intermediate state");
 			}
+			LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( ic->inputfilter()));
+			lua_pushcclosure( ls, function_inputFilter_get, 1);
+			return 1;
 		}
-		else
+		TypedInputFilterClosure* tc = LuaObject<TypedInputFilterClosure>::get( ls, -1);
+		if (tc)
 		{
-			lua_pushnil( ls);
+			if (!tc->isValidAsOperand())
+			{
+				throw std::runtime_error( "iterator used as function argument in an intermediate state");
+			}
+			LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( tc->inputfilter()));
+			lua_pushcclosure( ls, function_typedInputFilter_get, 1);
 			return 1;
 		}
 	}
-	catch (const std::bad_alloc&)
-	{
-		luaerr.init( "out of memory calling method form::__tostring()");
-	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by method form::__tostring()");
+	throw std::runtime_error( "iterator on input or on a form expected as argument");
 }
 
-static int function_ddlform_table( lua_State* ls)
+
+LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 {
-	LuaErrorMessage luaerr;
-	DDLFormR* form = LuaObject<DDLFormR>::getSelf( ls, "form", "table");
-	try
-	{
-		int ctx;
-		if (lua_getctx( ls, &ctx) != LUA_YIELD)
-		{
-			TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
-			LuaObject<DDLFormPrint>::push_luastack( ls, DDLFormPrint( *form, outp, serialize::Context::None));
-		}
-		LuaObject<DDLFormPrint>* result = LuaObject<DDLFormPrint>::get( ls, -1);
-		if (!result) throw std::logic_error( "internal. expected form result context object on stack");
+	DDLForm* form = LuaObject<DDLForm>::getSelf( ls, "form", "__tostring");
+	check_parameters( ls, 1, 0);
 
-		DDLFormPrint::CallResult res = result->fetch();
-		switch (res)
-		{
-			case DDLFormPrint::Yield:
-				lua_yieldk( ls, 0, 1, function_ddlform_table);
-
-			case DDLFormPrint::Ok:
-				/* table is already toplevel element on the stack */
-				return 1;
-
-			case DDLFormPrint::Error:
-				throw AppObjectsRuntimeError<DDLFormPrint>( "fetching DDL form contents", *result);
-		}
-	}
-	catch (const std::bad_alloc&)
+	std::string content = form->tostring();
+	LuaExceptionHandlerScope escope(ls);
 	{
-		luaerr.init( "out of memory calling method form::table()");
+		lua_pushlstring( ls, content.c_str(), content.size());
+		return 1;
 	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by method form::table()");
 }
 
-static int function_ddlform_fill__closure( lua_State* ls)
+
+LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 {
-	LuaErrorMessage luaerr;
-	DDLFormFill* closure = (DDLFormFill*)lua_touserdata( ls, -1);
-	lua_pop( ls, 1);
-	try
+	DDLForm* form = LuaObject<DDLForm>::getSelf( ls, "form", "fill");
+	serialize::DDLStructParser* closure;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
-		DDLFormFill::CallResult res = closure->call();
-		switch (res)
-		{
-			case DDLFormFill::Yield:
-				lua_pushlightuserdata( ls, closure);
-				lua_yieldk( ls, 0, 1, function_ddlform_fill__closure);
+		TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
 
-			case DDLFormFill::Ok:
-				return 0;
-
-			case DDLFormFill::Error:
-				throw AppObjectsRuntimeError<DDLFormFill>( "in call of DDL form fill", *closure);
-		}
-	}
-	catch (const std::bad_alloc&)
-	{
-		luaerr.init( "out of memory calling output:print");
-	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by output:print");
-}
-
-static int function_ddlform_fill( lua_State* ls)
-{
-	LuaErrorMessage luaerr;
-	DDLFormR* form = LuaObject<DDLFormR>::getSelf( ls, "form", "fill");
-	try
-	{
-		TypedInputFilterR inp;
-		if (!get_operand_TypedInputFilter( ls, 2, inp))
-		{
-			throw std::runtime_error( "error in form::fill(..). 1st argument is not a table, form or generator function");
-		}
 		serialize::Context::Flags flags = serialize::Context::None;
 		if (lua_gettop( ls) == 3)
 		{
 			if (!lua_isstring( ls, 3))
 			{
-				throw std::runtime_error( "error in form::fill(..). 2nd argument is not a string");
+				throw std::runtime_error( "2nd argument is not a string");
 			}
 			const char* mode = lua_tostring( ls, 3);
 			if (std::strcmp( mode, "strict") == 0)
@@ -695,29 +558,204 @@ static int function_ddlform_fill( lua_State* ls)
 			}
 			else
 			{
-				throw std::runtime_error( "error in form::fill(..). 2nd argument does not specify a mode of validating input (e.g. \"strict\")");
+				throw std::runtime_error( "2nd argument does not specify a mode of validating input (e.g. \"strict\")");
 			}
 		}
-		LuaObject<DDLFormFill>::push_luastack( ls, DDLFormFill( *form, inp, flags));
-		DDLFormFill* closure = (DDLFormFill*) lua_touserdata( ls, -1);
-		lua_pushvalue( ls, 2);				//... iterator argument
-		lua_pushlightuserdata( ls, closure);		//... pointer to form fill context
-		return function_ddlform_fill__closure( ls);
+		LuaObject<serialize::DDLStructParser>::push_luastack( ls, serialize::DDLStructParser( form->structure()));
+		closure = LuaObject<serialize::DDLStructParser>::get( ls, -1);
+		closure->init( inp, flags);
+		lua_pushvalue( ls, 2);		//... iterator argument (table, generator function, etc.)
 	}
-	catch (const std::bad_alloc&)
+	else
 	{
-		luaerr.init( "out of memory calling form:fill(..)");
+		closure = (serialize::DDLStructParser*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
 	}
-	catch (const std::exception& e)
+	if (!closure->call())
 	{
-		luaerr.init( e.what());
+		lua_pushlightuserdata( ls, closure);
+		lua_yieldk( ls, 0, 1, function_form_fill);
 	}
-	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by form:fill(..)");
+	return 0;
 }
+
+
+LUA_FUNCTION_THROWS( "form:table()", function_form_table)
+{
+	DDLForm* form = LuaObject<DDLForm>::getSelf( ls, "form", "table");
+
+	serialize::DDLStructSerializer* result;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		check_parameters( ls, 1, 0);
+		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
+		LuaObject<serialize::DDLStructSerializer>::push_luastack( ls, serialize::DDLStructSerializer( form->structure()));
+		result = LuaObject<serialize::DDLStructSerializer>::get( ls, -1);
+		result->init( outp, serialize::Context::SerializeWithIndices);
+	}
+	else
+	{
+		result = (serialize::DDLStructSerializer*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
+	if (!result->call())
+	{
+		lua_pushlightuserdata( ls, result);
+		lua_yieldk( ls, 0, 1, function_form_table);
+	}
+	return 1;
+}
+
+
+LUA_FUNCTION_THROWS( "form:get()", function_form_get)
+{
+	DDLForm* result = LuaObject<DDLForm>::getSelf( ls, "form", "get");
+	check_parameters( ls, 1, 0);
+
+	TypedInputFilterR itr( new serialize::DDLStructSerializer( result->structure()));
+	LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure(itr));
+	lua_pushcclosure( ls, function_typedInputFilter_get, 1);
+	return 1;
+}
+
+
+
+LUA_FUNCTION_THROWS( "form()", function_form)
+{
+	check_parameters( ls, 0, 1, LUA_TSTRING);
+
+	const char* name = lua_tostring( ls, 1);
+	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
+	if (!ctx)
+	{
+		throw std::runtime_error( "lost global context");
+	}
+	DDLForm frm;
+	if (!ctx->getForm( name, frm))
+	{
+		throw std::runtime_error( "form not defined");
+	}
+	LuaObject<DDLForm>::push_luastack( ls, frm);
+	return 1;
+}
+
+
+LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_struct_tostring)
+{
+	serialize::StructSerializer* obj = LuaObject<serialize::StructSerializer>::getSelf( ls, "<structure>", "__tostring");
+	check_parameters( ls, 1, 0);
+
+	ToStringFilter* flt = new ToStringFilter;
+	TypedOutputFilterR out( flt);
+	obj->init( out, serialize::Context::SerializeWithIndices);
+	if (!obj->call())
+	{
+		if (out->state() == OutputFilter::EndOfBuffer)
+		{
+			throw std::logic_error( "internal: tostring serialization with yield");
+		}
+		else
+		{
+			throw std::runtime_error( out->getError());
+		}
+	}
+	std::string content = flt->content();
+	LuaExceptionHandlerScope escope(ls);
+	{
+		lua_pushlstring( ls, content.c_str(), content.size());
+		return 1;
+	}
+}
+
+
+LUA_FUNCTION_THROWS( "<structure>:table()", function_struct_table)
+{
+	serialize::StructSerializer* obj = LuaObject<serialize::StructSerializer>::getSelf( ls, "<structure>", "table");
+
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		check_parameters( ls, 1, 0);
+		obj->init( TypedOutputFilterR( new LuaTableOutputFilter( ls)), serialize::Context::SerializeWithIndices);
+	}
+	else
+	{
+		obj = (serialize::StructSerializer*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
+	if (!obj->call())
+	{
+		lua_pushlightuserdata( ls, obj);
+		lua_yieldk( ls, 0, 1, function_struct_table);
+	}
+	return 1;
+}
+
+
+LUA_FUNCTION_THROWS( "<structure>:get()", function_struct_get)
+{
+	serialize::StructSerializer* obj = LuaObject<serialize::StructSerializer>::getSelf( ls, "<form function result>", "get");
+	check_parameters( ls, 1, 0);
+
+	TypedInputFilterR itr( new serialize::StructSerializer( *obj));
+	LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( itr));
+	lua_pushcclosure( ls, function_typedInputFilter_get, 1);
+	return 1;
+}
+
+
+LUA_FUNCTION_THROWS( "<formfunction>(..)", function_formfunction_call)
+{
+	FormFunctionClosure* closure = LuaObject<FormFunctionClosure>::get( ls, lua_upvalueindex( 1));
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		if (lua_gettop( ls) != 1)
+		{
+			throw std::runtime_error( "one argument expected");
+		}
+		else
+		{
+			TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
+			closure->init( inp, serialize::Context::None);
+		}
+		lua_pushvalue( ls, 1);		//... iterator argument (table, generator function, etc.)
+	}
+	if (!closure->call())
+	{
+		lua_yieldk( ls, 0, 1, function_formfunction_call);
+	}
+	LuaObject<serialize::StructSerializer>::push_luastack( ls, closure->result());
+	return 1;
+}
+
+
+LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
+{
+	check_parameters( ls, 0, 1, LUA_TSTRING);
+
+	const char* name = lua_tostring( ls, 1);
+	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
+	if (!ctx)
+	{
+		throw std::runtime_error( "lost global context");
+	}
+	FormFunction func;
+	if (!ctx->getFormFunction( name, func))
+	{
+		throw std::runtime_error( "function not found");
+	}
+	LuaObject<FormFunctionClosure>::push_luastack( ls, FormFunctionClosure( func));
+	lua_pushcclosure( ls, function_formfunction_call, 1);
+	return 1;
+}
+
 
 static bool get_printop( lua_State* ls, int index, const char*& elem, std::size_t& elemsize)
 {
 	int tp;
+	LuaExceptionHandlerScope escope(ls);
 	switch (tp=lua_type( ls, index))
 	{
 		case LUA_TNIL:
@@ -744,459 +782,224 @@ static bool get_printop( lua_State* ls, int index, const char*& elem, std::size_
 	return false;
 }
 
-static int function_output_print_object__closure( lua_State* ls)
+
+LUA_FUNCTION_THROWS( "output:print(..)", function_output_print_object)
 {
-	LuaErrorMessage luaerr;
 	RedirectFilterClosure* closure = (RedirectFilterClosure*)lua_touserdata( ls, -1);
 	lua_pop( ls, 1);
-	try
+	if (!closure->call())
 	{
-		RedirectFilterClosure::CallResult res = closure->call();
-		switch (res)
-		{
-			case RedirectFilterClosure::Yield:
-				lua_pushlightuserdata( ls, closure);
-				lua_yieldk( ls, 0, 1, function_output_print_object__closure);
-
-			case RedirectFilterClosure::Ok:
-				return 0;
-
-			case RedirectFilterClosure::Error:
-			{
-				TypedInputFilter* inp = closure->inputfilter().get();
-				if (inp && inp->getError())
-				{
-					luaL_error( ls, inp->getError());
-				}
-				TypedOutputFilter* outp = closure->outputfilter().get();
-				if (outp && outp->getError())
-				{
-					luaL_error( ls, outp->getError());
-				}
-				luaL_error( ls, "unknown error in print");
-			}
-		}
+		lua_pushlightuserdata( ls, closure);
+		lua_yieldk( ls, 0, 1, function_output_print_object);
 	}
-	catch (const std::bad_alloc&)
-	{
-		luaerr.init( "out of memory calling output:print");
-	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by output:print");
+	return 0;
 }
 
-static int function_output_print( lua_State* ls)
+
+LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 {
-	LuaErrorMessage luaerr;
-	const char* msg;
 	const char* item[2] = {0,0};
 	std::size_t itemsize[2] = {0,0};
 
 	Output* output = LuaObject<Output>::getSelf( ls, "output", "print");
-	try
+	switch (lua_gettop( ls))
 	{
-		switch (lua_gettop( ls))
-		{
-			case 1:
-				break;
-			case 3:
-				if (!get_printop( ls, 3, item[1], itemsize[1]))
+		case 1:
+			break;
+		case 3:
+			if (!get_printop( ls, 3, item[1], itemsize[1]))
+			{
+				throw std::runtime_error( "invalid type of 2nd argument");
+			}
+			/*no break here !*/
+		case 2:
+			if (!get_printop( ls, 2, item[0], itemsize[0]))
+			{
+				if (item[1] != 0) throw std::runtime_error( "invalid type of first argument");
 				{
-					const char* tn = lua_typename( ls, lua_type( ls, 3));
-					luaL_error( ls, "invalid type (%s) of print argument %d", tn?tn:"unknown", 2);
+					TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
+					TypedOutputFilterR outp( new TypingOutputFilter( output->outputfilter()));
+					LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
+					RedirectFilterClosure* closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
+					lua_pushvalue( ls, 2);			//... iterator argument
+					lua_pushlightuserdata( ls, closure);	//... redirect closure object
 				}
-				/*no break here !*/
-			case 2:
-				if (!get_printop( ls, 2, item[0], itemsize[0]))
-				{
-					TypedInputFilterR inp;
-					if (item[1] == 0 && get_operand_TypedInputFilter( ls, 2, inp))
-					{
-						TypedOutputFilterR outp( new TypingOutputFilter( output->outputfilter()));
-						LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
-						RedirectFilterClosure* closure = (RedirectFilterClosure*) lua_touserdata( ls, -1);
-						lua_pushvalue( ls, 2);			//... iterator argument
-						lua_pushlightuserdata( ls, closure);	//... redirect closure object
-						return function_output_print_object__closure( ls);
-					}
-					else
-					{
-						const char* tn = lua_typename( ls, lua_type( ls, 2));
-						luaL_error( ls, "invalid type (%s) of output:print argument %d", tn?tn:"unknown", 1);
-					}
-				}
-				break;
-			default:
-				return luaL_error( ls, "too many arguments in call of output:print");
-		}
-		switch (output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
-		{
-			case Output::DoYield:
-				lua_yieldk( ls, 0, 1, function_output_print);
-
-			case Output::Error:
-				msg = output->outputfilter()->getError();
-				return luaL_error( ls, "error in output:print (%s)", msg?msg:"unknown");
-
-			case Output::Data:
-				return 0;
-		}
+				return function_output_print_object( ls);
+			}
+			break;
+		default:
+			throw std::runtime_error( "too many arguments");
 	}
-	catch (const std::bad_alloc&)
+	if (!output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 	{
-		luaerr.init( "out of memory calling output:print");
+		lua_yieldk( ls, 0, 1, function_output_print);
 	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by output:print");
+	return 0;
 }
 
-static int function_output_opentag( lua_State* ls)
-{
-	LuaErrorMessage luaerr;
-	const char* msg;
-	const char* tag = 0;
-	std::size_t tagsize = 0;
 
+LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
+{
 	Output* output = LuaObject<Output>::getSelf( ls, "output", "opentag");
-	if (lua_gettop( ls) == 1)
-	{
-		return luaL_error( ls, "output:opentag called without tag name as argument");
-	}
-	else if (lua_gettop( ls) == 2)
-	{
-		if (!get_printop( ls, 2, tag, tagsize))
-		{
-			const char* tn = lua_typename( ls, lua_type( ls, 2));
-			luaL_error( ls, "invalid type (%s) of tag name - print argument %d", tn?tn:"unknown", 2);
-		}
-	}
-	else if (lua_gettop( ls) > 2)
-	{
-		return luaL_error( ls, "output:opentag called with too many arguments");
-	}
-	try
-	{
-		switch (output->print( tag, tagsize, 0/*val*/, 0))
-		{
-			case Output::DoYield:
-				lua_yieldk( ls, 0, 1, function_output_opentag);
+	check_parameters( ls, 1, 1, LUA_TSTRING);
+	const char* tag = lua_tostring( ls, 2);
+	std::size_t tagsize = std::strlen( tag);
 
-			case Output::Error:
-				msg = output->outputfilter()->getError();
-				return luaL_error( ls, "error in output:opentag (%s)", msg?msg:"unknown");
-
-			case Output::Data:
-				return 0;
-		}
-	}
-	catch (const std::bad_alloc&)
+	if (!output->print( tag, tagsize, 0/*val*/, 0))
 	{
-		luaerr.init( "out of memory calling output:opentag");
+		lua_yieldk( ls, 0, 1, function_output_opentag);
 	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by output:opentag");
+	return 0;
 }
 
-static int function_output_closetag( lua_State* ls)
-{
-	LuaErrorMessage luaerr;
-	const char* msg;
 
+LUA_FUNCTION_THROWS( "output:closetag(..)", function_output_closetag)
+{
 	Output* output = LuaObject<Output>::getSelf( ls, "output", "closetag");
-	if (lua_gettop( ls) > 1)
-	{
-		return luaL_error( ls, "output:closetag called with too many arguments. no arguments expected");
-	}
-	try
-	{
-		switch (output->print( 0/*tag*/, 0, 0/*val*/, 0))
-		{
-			case Output::DoYield:
-				lua_yieldk( ls, 0, 1, function_output_closetag);
+	check_parameters( ls, 1, 0);
 
-			case Output::Error:
-				msg = output->outputfilter()->getError();
-				return luaL_error( ls, "error in output:closetag (%s)", msg?msg:"unknown");
-
-			case Output::Data:
-				return 0;
-		}
-	}
-	catch (const std::bad_alloc&)
+	if (!output->print( 0/*tag*/, 0, 0/*val*/, 0))
 	{
-		luaerr.init( "out of memory calling output:closetag");
+		lua_yieldk( ls, 0, 1, function_output_closetag);
 	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str()?luaerr.str():"illegal state produced by output:closetag");
+	return 0;
 }
 
-static int function_filter( lua_State* ls)
+
+LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 {
-	LuaErrorMessage luaerr;
-	unsigned int nn = lua_gettop( ls);
-	if (nn == 0) return luaL_error( ls, "too few arguments for function 'filter'");
-	if (nn > 1) return luaL_error( ls, "too many arguments for function 'filter'");
-	if (!lua_isstring( ls, 1))
-	{
-		return luaL_error( ls, "invalid type of argument (string expected)");
-	}
+	check_parameters( ls, 0, 1, LUA_TSTRING);
+
 	const char* name = lua_tostring( ls, 1);
 	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
 	if (!ctx)
 	{
-		return luaL_error( ls, "internal error. function 'filter' got no global context");
+		throw std::runtime_error( "lost global context");
 	}
 	Filter flt;
-	try
+	if (!ctx->getFilter( name, flt))
 	{
-		if (!ctx->getFilter( name, flt))
-		{
-			return luaL_error( ls, "could not get filter '%s'", name);
-		}
-		LuaObject<Filter>::push_luastack( ls, flt);
-		return 1;
+		throw std::runtime_error( "filter not defined");
 	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str());
+	LuaObject<Filter>::push_luastack( ls, flt);
+	return 1;
 }
 
-static int function_form( lua_State* ls)
-{
-	LuaErrorMessage luaerr;
-	unsigned int nn = lua_gettop( ls);
-	if (nn == 0) return luaL_error( ls, "too few arguments for function 'form'");
-	if (nn > 1) return luaL_error( ls, "too many arguments for function 'form'");
-	if (!lua_isstring( ls, 1))
-	{
-		return luaL_error( ls, "invalid type of argument (string expected)");
-	}
-	const char* name = lua_tostring( ls, 1);
-	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
-	if (!ctx)
-	{
-		return luaL_error( ls, "internal error. function 'form' got no global context");
-	}
-	DDLFormR frm;
-	try
-	{
-		if (!ctx->getForm( name, frm))
-		{
-			return luaL_error( ls, "could not get form '%s'", name);
-		}
-		LuaObject<DDLFormR>::push_luastack( ls, frm);
-		return 1;
-	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str());
-}
 
-static int function_formfunction( lua_State* ls)
+LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 {
-	LuaErrorMessage luaerr;
-	unsigned int nn = lua_gettop( ls);
-	if (nn == 0) return luaL_error( ls, "too few arguments for function 'formfunction'");
-	if (nn > 1) return luaL_error( ls, "too many arguments for function 'formfunction'");
-	if (!lua_isstring( ls, 1))
-	{
-		return luaL_error( ls, "invalid type of argument (string expected)");
-	}
-	const char* name = lua_tostring( ls, 1);
-	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
-	if (!ctx)
-	{
-		return luaL_error( ls, "internal error. function 'formfunction' got no global context");
-	}
-	try
-	{
-		FormFunction func;
-		if (!ctx->getFormFunction( name, func))
-		{
-			LOG_ERROR << "could not get form function '" << name << "'";
-			throw std::runtime_error( "could not get form function");
-		}
-		LuaObject<FormFunctionClosure>::push_luastack( ls, FormFunctionClosure( func));
-		lua_pushcclosure( ls, function_formfunction_call, 1);
-		return 1;
-	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str());
-}
-
-static int function_input_as( lua_State* ls)
-{
-	LuaErrorMessage luaerr;
 	Input* input = LuaObject<Input>::getSelf( ls, "input", "as");
-	if (lua_gettop( ls) != 2)
-	{
-		luaL_error( ls, "filter type value as parameter of method 'input:as' expected");
-	}
-	LuaObject<Filter>* filter = LuaObject<Filter>::get( ls, 2);
+	check_parameters( ls, 1, 1, LUA_TUSERDATA);
 
-	if (!filter)
-	{
-		const char* tn = lua_typename( ls, lua_type( ls, 2));
-		luaL_error( ls, "filter type value expected as first argument of input:as instead of %s", tn?tn:"UNKNOWN");
-	}
-	try
-	{
-		InputFilter* ff = 0;
-		if (filter->inputfilter().get())
-		{
-			ff = filter->inputfilter()->copy();
-			if (input->inputfilter().get())
-			{
-				// assign the rest of the input to the new filter attached
-				const void* chunk;
-				std::size_t chunksize;
-				bool chunkend;
-				input->inputfilter()->getRest( chunk, chunksize, chunkend);
-				ff->putInput( chunk, chunksize, chunkend);
-			}
-			input->inputfilter().reset( ff);
-		}
-		else
-		{
-			luaL_error( ls, "input:as called with a filter with undefined input");
-		}
-		return 0;
-	}
-	catch (const std::bad_alloc&)
-	{
-		luaerr.init( "out of memory calling input:as");
-	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str());
-}
-
-static int function_output_as( lua_State* ls)
-{
-	LuaErrorMessage luaerr;
-	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");
-	if (lua_gettop( ls) != 2)
-	{
-		luaL_error( ls, "filter type value as parameter of method 'output:as' expected");
-	}
 	Filter* filter = LuaObject<Filter>::get( ls, 2);
 	if (!filter)
 	{
-		const char* tn = lua_typename( ls, lua_type( ls, 2));
-		luaL_error( ls, "filter type value expected as first argument of output:as instead of %s", tn?tn:"UNKNOWN");
+		throw std::runtime_error( "filter object expected as first argument");
 	}
-	try
+	InputFilter* ff = 0;
+	if (filter->inputfilter().get())
 	{
-		OutputFilter* ff = 0;
-		if (filter->outputfilter().get())
+		ff = filter->inputfilter()->copy();
+		if (input->inputfilter().get())
 		{
-			ff = filter->outputfilter()->copy();
-			if (output->outputfilter().get())
-			{
-				ff->assignState( *output->outputfilter());
-			}
+			// assign the rest of the input to the new filter attached
+			const void* chunk;
+			std::size_t chunksize;
+			bool chunkend;
+			input->inputfilter()->getRest( chunk, chunksize, chunkend);
+			ff->putInput( chunk, chunksize, chunkend);
 		}
-		else
-		{
-			luaL_error( ls, "output:as called with a filter with undefined output");
-		}
-		output->outputfilter().reset( ff);
-		return 0;
+		input->inputfilter().reset( ff);
 	}
-	catch (const std::bad_alloc&)
+	else
 	{
-		luaerr.init( "out of memory calling output:as");
+		throw std::runtime_error( "called with undefined input for the argument filter object");
 	}
-	catch (const std::exception& e)
-	{
-		luaerr.init( e.what());
-	}
-	return luaL_error( ls, luaerr.str());
+	return 0;
 }
 
-static int function_input_get( lua_State* ls)
+
+
+LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
+{
+	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");
+	check_parameters( ls, 1, 1, LUA_TUSERDATA);
+
+	Filter* filter = LuaObject<Filter>::get( ls, 2);
+	if (!filter)
+	{
+		throw std::runtime_error( "filter object expected as first argument");
+	}
+	OutputFilter* ff = 0;
+	if (filter->outputfilter().get())
+	{
+		ff = filter->outputfilter()->copy();
+		if (output->outputfilter().get())
+		{
+			ff->assignState( *output->outputfilter());
+		}
+	}
+	else
+	{
+		throw std::runtime_error( "called with undefined output for the argument filter object");
+	}
+	output->outputfilter().reset( ff);
+	return 0;
+}
+
+
+
+LUA_FUNCTION_THROWS( "input:get()", function_input_get)
 {
 	Input* input = LuaObject<Input>::getSelf( ls, "input", "get");
-	if (lua_gettop( ls) != 1)
-	{
-		luaL_error( ls, "no arguments expected for input:get");
-	}
+	check_parameters( ls, 1, 0);
+
 	if (!input->inputfilter().get())
 	{
 		return luaL_error( ls, "no filter defined for input with input:as");
 	}
 	LuaObject<InputFilterClosure>::push_luastack( ls, input->inputfilter());
-	lua_pushcclosure( ls, function_inputFilter, 1);
+	lua_pushcclosure( ls, function_inputFilter_get, 1);
 	return 1;
 }
 
-static int function_logger_print( lua_State *ls)
+
+LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
 {
 	/* first parameter maps to a log level, rest gets printed depending on
 	 * whether it's a string or a number
 	 */
-	LuaErrorMessage luaerr;
 	int ii,nn = lua_gettop(ls);
 	if (nn <= 0)
 	{
-		luaL_error( ls, "no arguments passed to 'printlog'");
-		return 0;
+		throw std::runtime_error( "missing arguments");
 	}
-	try
+	const char *logLevel = lua_tostring( ls, 1);
+	if (!logLevel)
 	{
-		const char *logLevel = luaL_checkstring( ls, 1);
-		std::string logmsg;
+		throw std::runtime_error( "first argument log level is not a string");
+	}
+	std::string logmsg;
 
-		for (ii=2; ii<=nn; ii++)
-		{
-			if (!getDescription( ls, ii, logmsg))
-			{
-				throw std::runtime_error( "failed to map 'printLog' arguments to a string");
-			}
-		}
-		_Wolframe::log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
-		if (lv == _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED)
-		{
-			throw std::runtime_error( "'printLog' called with undefined loglevel as argument");
-		}
-		else
-		{
-			_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( lv )
-				<< _Wolframe::log::LogComponent::LogLua
-				<< logmsg;
-		}
-		return 0;
-	}
-	catch (const std::bad_alloc&)
+	for (ii=2; ii<=nn; ii++)
 	{
-		luaerr.init( "out of memory calling output:as");
+		if (!getDescription( ls, ii, logmsg))
+		{
+			throw std::runtime_error( "failed to map arguments to strings");
+		}
 	}
-	catch (const std::exception& e)
+	_Wolframe::log::LogLevel::Level lv = _Wolframe::log::LogLevel::strToLogLevel( logLevel);
+	if (lv == _Wolframe::log::LogLevel::LOGLEVEL_UNDEFINED)
 	{
-		luaerr.init( e.what());
+		throw std::runtime_error( "first argument is an undefined loglevel");
 	}
-	return luaL_error( ls, luaerr.str());
+	else
+	{
+		_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( lv )
+			<< _Wolframe::log::LogComponent::LogLua
+			<< logmsg;
+	}
+	return 0;
 }
 
 static const luaL_Reg logger_methodtable[ 2] =
@@ -1221,17 +1024,20 @@ static const luaL_Reg output_methodtable[ 5] =
 	{0,0}
 };
 
-static const luaL_Reg formfunctionresult_methodtable[ 2] =
+static const luaL_Reg struct_methodtable[ 4] =
 {
-	{"table",&function_formfunctionresult_table},
+	{"table",&function_struct_table},
+	{"get", &function_struct_get},
+	{"__tostring",&function_struct_tostring},
 	{0,0}
 };
 
-static const luaL_Reg ddlform_methodtable[ 4] =
+static const luaL_Reg ddlform_methodtable[ 5] =
 {
-	{"table",&function_ddlform_table},
-	{"fill",&function_ddlform_fill},
-	{"__tostring",&function_ddlform_tostring},
+	{"table",&function_form_table},
+	{"get",&function_form_get},
+	{"fill",&function_form_fill},
+	{"__tostring",&function_form_tostring},
 	{0,0}
 };
 
@@ -1249,8 +1055,9 @@ LuaScript::LuaScript( const std::string& path_)
 	}
 	if ((ff.rdstate() & std::ifstream::eofbit) == 0)
 	{
-		LOG_ERROR << "failed to read lua script from file: '" << path_ << "'";
-		throw std::runtime_error( "read lua script from file");
+		std::ostringstream msg;
+		msg << "failed to read lua script from file: '" << path_ << "'";
+		throw std::runtime_error( msg.str());
 	}
 	ff.close();
 
@@ -1381,24 +1188,26 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 	GlobalContext* gc = dynamic_cast<GlobalContext*>( this);
 	if (!gc)
 	{
-		LOG_ERROR << "cannot get global context via RTTI from Lua function map";
-		return false;
+		std::ostringstream msg;
+		msg << "cannot get global context via RTTI from Lua function map";
+		throw std::runtime_error( msg.str());
 	}
 	lua_State* ls = lsi->ls();
 	try
 	{
 		LuaExceptionHandlerScope luaThrows(ls);
 		{
+			LuaObject<RedirectFilterClosure>::createMetatable( ls, 0, 0, 0);
+			LuaObject<DDLForm>::createMetatable( ls, 0, 0, ddlform_methodtable);
+			LuaObject<serialize::DDLStructParser>::createMetatable( ls, 0, 0, 0);
+			LuaObject<serialize::DDLStructSerializer>::createMetatable( ls, 0, 0, 0);
+			LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
+			LuaObject<TypedInputFilterClosure>::createMetatable( ls, 0, 0, 0);
+			LuaObject<FormFunctionClosure>::createMetatable( ls, 0, 0, 0);
+			LuaObject<serialize::StructSerializer>::createMetatable( ls, 0, 0, struct_methodtable);
 			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
 			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
 			LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
-			LuaObject<RedirectFilterClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<DDLFormR>::createMetatable( ls, 0, 0, ddlform_methodtable);
-			LuaObject<DDLFormFill>::createMetatable( ls, 0, 0, 0);
-			LuaObject<DDLFormPrint>::createMetatable( ls, 0, 0, 0);
-			LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<FormFunctionClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<FormFunctionResult>::createMetatable( ls, 0, 0, formfunctionresult_methodtable);
 			setGlobalSingletonPointer<GlobalContext>( ls, gc);
 			lua_pushcfunction( ls, &function_filter);
 			lua_setglobal( ls, "filter");
@@ -1406,12 +1215,16 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			lua_setglobal( ls, "form");
 			lua_pushcfunction( ls, &function_formfunction);
 			lua_setglobal( ls, "formfunction");
+			lua_pushcfunction( ls, &function_scope);
+			lua_setglobal( ls, "scope");
 		}
 		return true;
 	}
 	catch (const std::exception& e)
 	{
-		LOG_ERROR << "exception intializing lua script instance. " << e.what();
+		std::ostringstream msg;
+		msg << "error intializing lua script instance. " << e.what();
+		throw std::runtime_error( msg.str());
 	}
 	return false;
 }
