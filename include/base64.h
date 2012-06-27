@@ -34,9 +34,9 @@ void base64_initEncodeState( base64_EncodeState* state, unsigned short lineLengt
 void base64_resetEncodeState( base64_EncodeState* state );
 
 int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
-			size_t plainLength, char* encoded );
+			size_t plainLength, char* encoded, size_t /*encodedMaxSize*/ );
 
-int base64_encodeEnd( base64_EncodeState* state, char* encoded );
+int base64_encodeEnd( base64_EncodeState* state, char* encoded, size_t /*encodedMaxSize*/ );
 
 
 typedef enum	{
@@ -55,7 +55,7 @@ typedef struct
 void base64_initDecodeState( base64_DecodeState* state );
 
 int base64_decodeBlock( base64_DecodeState* state, const char* encoded,
-			size_t codeLength, unsigned char* data );
+			size_t codeLength, unsigned char* plain, size_t /*plainMaxSize*/ );
 
 #ifdef __cplusplus
 }

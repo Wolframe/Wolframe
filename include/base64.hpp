@@ -16,51 +16,52 @@ class Encoder
 {
 	static const size_t BUFFERSIZE = 512;
 public:
-	Encoder( int buffersize_in = BUFFERSIZE, unsigned short lineLength = DEFAULT_BASE64_LINE_LENGTH )
-		: m_buffersize( buffersize_in )
+	Encoder( size_t bufferSize = BUFFERSIZE,
+		 unsigned short lineLength = DEFAULT_BASE64_LINE_LENGTH )
+		: m_bufferSize( bufferSize )
 	{
 		base64_initEncodeState( &m_state, lineLength );
 	}
 
-	int encode( const unsigned char* plain, const int plainLength, char* encoded )
+	int encode( const unsigned char* plain, const int plainLength,
+		    char* encoded, size_t encodedMaxSize )
 	{
-		return base64_encodeBlock( &m_state, plain, plainLength, encoded );
+		return base64_encodeBlock( &m_state, plain, plainLength, encoded, encodedMaxSize );
 	}
 
-	int encodeEnd( char* output )
+	int encodeEnd( char* encoded, size_t encodedMaxSize )
 	{
-		return base64_encodeEnd( &m_state, output );
+		return base64_encodeEnd( &m_state, encoded, encodedMaxSize );
 	}
 
-	void encode( std::istream& plain, std::ostream& encoded )
+	void encode( std::istream& input, std::ostream& output )
 	{
-		const int N = m_buffersize;
-		char* plaintext = new char[N];
-		char* code = new char[2*N];
-		int plainlength;
-		int codelength;
+		unsigned char* plain = new unsigned char[ m_bufferSize ];
+		char* encoded = new char[ 2 * m_bufferSize ];
+		int plainLength;
+		int encodedLength;
 
 		do	{
-			plain.read( plaintext, N );
-			plainlength = plain.gcount();
+			input.read( (char *)plain, m_bufferSize );
+			plainLength = input.gcount();
 			//
-			codelength = encode((unsigned char *)plaintext, plainlength, code );
-			encoded.write( code, codelength );
-		} while ( plain.good() && plainlength > 0 );
+			encodedLength = encode( plain, plainLength, encoded, 2 * m_bufferSize );
+			output.write( encoded, encodedLength );
+		} while ( input.good() && plainLength > 0 );
 
-		codelength = encodeEnd( code );
-		encoded.write( code, codelength );
+		encodedLength = encodeEnd( encoded, 2 * m_bufferSize );
+		output.write( encoded, encodedLength );
 		//
 		base64_resetEncodeState( &m_state );
 
-		delete [] code;
-		delete [] plaintext;
+		delete [] encoded;
+		delete [] plain;
 	}
 
 private:
 
 	base64_EncodeState	m_state;
-	int			m_buffersize;
+	const size_t		m_bufferSize;
 };
 
 
@@ -68,41 +69,45 @@ class Decoder
 {
 	static const size_t BUFFERSIZE = 512;
 public:
-	Decoder() : m_buffersize( BUFFERSIZE )				{}
-	Decoder( size_t buffersize ) : m_buffersize( buffersize )	{}
-
-	int decode( const char* code_in, const int length_in, unsigned char* plaintext_out )
-	{
-		return base64_decodeBlock( &m_state, code_in, length_in, plaintext_out );
-	}
-
-	void decode( std::istream& in, std::ostream& out )
+	Decoder() : m_bufferSize( BUFFERSIZE )
 	{
 		base64_initDecodeState( &m_state );
-		//
-		const int N = m_buffersize;
-		char* code = new char[N];
-		unsigned char* plaintext = new unsigned char[N];
-		int codelength;
-		int plainlength;
+	}
+
+	Decoder( size_t bufferSize ) : m_bufferSize( bufferSize )
+	{
+		base64_initDecodeState( &m_state );
+	}
+
+	int decode( const char* encoded, size_t encodedLength,
+		    unsigned char* plain, size_t plainMaxSize )
+	{
+		return base64_decodeBlock( &m_state, encoded, encodedLength, plain, plainMaxSize );
+	}
+
+	void decode( std::istream& input, std::ostream& output )
+	{
+		char* encoded = new char[ m_bufferSize ];
+		unsigned char* plain = new unsigned char[ m_bufferSize ];
+		int encodedLength;
+		int plainLength;
 
 		do
 		{
-			in.read((char*)code, N);
-			codelength = in.gcount();
-			plainlength = decode( code, codelength, plaintext );
-			out.write((const char*)plaintext, plainlength );
-		}
-		while (in.good() && codelength > 0);
-		//
-		base64_initDecodeState(&m_state);
+			input.read( encoded, m_bufferSize );
+			encodedLength = input.gcount();
+			plainLength = decode( encoded, encodedLength, plain, m_bufferSize );
+			output.write( (const char*)plain, plainLength );
+		} while ( input.good() && encodedLength > 0 );
 
-		delete [] code;
-		delete [] plaintext;
+		base64_initDecodeState( &m_state );
+
+		delete [] encoded;
+		delete [] plain;
 	}
 private:
 	base64_DecodeState	m_state;
-	size_t			m_buffersize;
+	const size_t		m_bufferSize;
 };
 
 }} // namespace _Wolframe::base64
