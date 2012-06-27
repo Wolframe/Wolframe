@@ -66,8 +66,13 @@ static int strEncode( const char* data, char* encoded, size_t codeSize )
 {
 	base64::Encoder E;
 	int ret = E.encode((const unsigned char *)data, strlen((const char *)data ), encoded, codeSize - 1 );
-	if ( ret >= 0 )
-		ret += E.encodeEnd( encoded + ret, codeSize - ret - 1 );
+	if ( ret >= 0 )	{
+		int	retEnd;
+		if (( retEnd = E.encodeEnd( encoded + ret, codeSize - ret - 1 )) >= 0 )
+			ret += retEnd;
+		else
+			return retEnd;
+	}
 	if ( ret >= 0 )
 		encoded[ ret ] = 0;
 	return ret;
@@ -188,6 +193,37 @@ TEST( Base64, PaddingTolerance )
 	plainLength = strDecode( result6_bad, 10, decoded, bufSize );
 	EXPECT_EQ( 6, plainLength );
 	EXPECT_STREQ( vector6, decoded );
+}
+
+TEST( Base64, InsufficientBuffer )
+{
+	char	buffer[ bufSize ];
+
+	EXPECT_EQ( -1, strEncode( vector1, buffer, 1 ));
+	EXPECT_EQ( -1, strEncode( vector1, buffer, 2 ));
+	EXPECT_EQ( -1, strEncode( vector1, buffer, 3 ));
+	EXPECT_EQ( -1, strEncode( vector1, buffer, 4 ));
+
+	EXPECT_EQ( -1, strEncode( vector2, buffer, 1 ));
+	EXPECT_EQ( -1, strEncode( vector2, buffer, 2 ));
+	EXPECT_EQ( -1, strEncode( vector2, buffer, 3 ));
+	EXPECT_EQ( -1, strEncode( vector2, buffer, 4 ));
+
+	EXPECT_EQ( -1, strEncode( vector3, buffer, 1 ));
+	EXPECT_EQ( -1, strEncode( vector3, buffer, 2 ));
+	EXPECT_EQ( -1, strEncode( vector3, buffer, 3 ));
+	EXPECT_EQ( -1, strEncode( vector3, buffer, 4 ));
+
+	EXPECT_EQ( -1, strDecode( result1, buffer, 0 ));
+	EXPECT_EQ( -1, strDecode( result2, buffer, 0 ));
+	EXPECT_EQ( -1, strDecode( result2, buffer, 1 ));
+	EXPECT_EQ( -1, strDecode( result3, buffer, 0 ));
+	EXPECT_EQ( -1, strDecode( result3, buffer, 1 ));
+	EXPECT_EQ( -1, strDecode( result3, buffer, 2 ));
+	EXPECT_EQ( -1, strDecode( result4, buffer, 0 ));
+	EXPECT_EQ( -1, strDecode( result4, buffer, 1 ));
+	EXPECT_EQ( -1, strDecode( result4, buffer, 2 ));
+	EXPECT_EQ( -1, strDecode( result4, buffer, 3 ));
 }
 
 int main( int argc, char **argv )
