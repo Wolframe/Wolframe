@@ -96,14 +96,6 @@ public:
 		m_has_elem = true;
 	}
 
-	void setElem( langbind::FilterBase::ElementType t, const char* str, std::size_t size)
-	{
-		m_elem.m_type = t;
-		m_elem.m_value.value.string_.ptr = str;
-		m_elem.m_value.value.string_.size = size;
-		m_has_elem = true;
-	}
-
 	void setElem( langbind::FilterBase::ElementType t, langbind::TypedFilterBase::Element v)
 	{
 		m_elem.m_type = t;

@@ -69,7 +69,7 @@ static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLSerializeState>& st
 		return false;
 	}
 	const ddl::AtomicType* val = &stk.back().value()->value();
-	ctx.setElem( langbind::FilterBase::Value, val->value().c_str(), val->value().size());
+	ctx.setElem( langbind::FilterBase::Value, langbind::TypedFilterBase::Element( val->value().c_str(), val->value().size()));
 	stk.back().state( 1);
 	return true;
 }
@@ -109,7 +109,7 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 		stk.pop_back();
 		if (stk.size() == 0)
 		{
-			ctx.setElem( langbind::FilterBase::CloseTag, langbind::TypedFilterBase::Element());
+			ctx.setElem( langbind::FilterBase::CloseTag);
 			rt = true;
 		}
 	}
@@ -124,17 +124,26 @@ static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	if (idx >= obj->nof_elements())
 	{
 		stk.pop_back();
+		return false;
+	}
+	ddl::StructType::Map::const_iterator itr = obj->begin()+idx;
+	if (ctx.flag( Context::SerializeWithIndices))
+	{
+		ctx.setElem( langbind::FilterBase::OpenTag, langbind::TypedFilterBase::Element( (unsigned int)idx+1U));
+		stk.back().state( idx+1);
+		stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, langbind::TypedFilterBase::Element( (unsigned int)idx+1U)));
+		stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));
+		rt = true;
 	}
 	else
 	{
-		ddl::StructType::Map::const_iterator itr = obj->begin()+idx;
 		if (idx >= 1)
 		{
 			ctx.setElem( langbind::FilterBase::CloseTag, stk.back().tag());
 			rt = true;
 		}
 		stk.back().state( idx+1);
-		stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));	//... print element
+		stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));
 		if (idx >= 1)
 		{
 			stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::OpenTag, stk.back().tag()));
@@ -171,6 +180,7 @@ static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	}
 	return false;
 }
+
 
 bool DDLStructSerializer::call()
 {

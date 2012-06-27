@@ -43,6 +43,9 @@ Project Wolframe.
 extern "C" {
 	#include "lua.h"
 }
+#else
+#error Lua support not enabled
+#endif
 
 namespace _Wolframe {
 namespace langbind {
@@ -122,9 +125,7 @@ public:
 	explicit LuaTableOutputFilter( lua_State* ls)
 		:LuaExceptionHandlerScope(ls)
 		,m_ls(ls)
-		,m_depth(0)
-		,m_type(OpenTag)
-		,m_isinit(false){}
+		,m_type(OpenTag){}
 
 	///\brief Copy constructor
 	///\param[in] o lua output filter to copy
@@ -132,11 +133,10 @@ public:
 		:TypedOutputFilter(o)
 		,LuaExceptionHandlerScope(o)
 		,m_ls(o.m_ls)
-		,m_depth(o.m_depth)
 		,m_type(o.m_type)
-		,m_isinit(o.m_isinit)
+		,m_statestk(o.m_statestk)
 	{
-		if (m_isinit) throw std::runtime_error( "copy of lua output filter not allowed in this state");
+		if (m_statestk.size() > 0) throw std::runtime_error( "copy of lua output filter not allowed in this state");
 	}
 
 	///\brief Destructor
@@ -153,13 +153,17 @@ private:
 
 private:
 	lua_State* m_ls;
-	int m_depth;
 	ElementType m_type;
-	bool m_isinit;
+
+	enum ContentType
+	{
+		Atomic,
+		Struct,
+		Vector
+	};
+	std::vector<ContentType> m_statestk;
 };
 
 }}//namespace
 #endif
-#endif
-
 
