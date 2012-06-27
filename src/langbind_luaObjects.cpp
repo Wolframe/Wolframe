@@ -969,12 +969,42 @@ LUA_FUNCTION_THROWS( "input:get()", function_input_get)
 
 	if (!input->inputfilter().get())
 	{
-		return luaL_error( ls, "no filter defined for input with input:as");
+		return luaL_error( ls, "no filter defined for input with input:as(..)");
 	}
 	LuaObject<InputFilterClosure>::push_luastack( ls, input->inputfilter());
 	lua_pushcclosure( ls, function_inputFilter_get, 1);
 	return 1;
 }
+
+
+
+LUA_FUNCTION_THROWS( "input:table()", function_input_table)
+{
+	RedirectFilterClosure* obj;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		Input* input = LuaObject<Input>::getSelf( ls, "input", "table");
+		check_parameters( ls, 1, 0);
+		TypedInputFilterR inp( new TypingInputFilter( input->inputfilter()));
+		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
+		LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
+		obj = LuaObject<RedirectFilterClosure>::get( ls, -1);
+	}
+	else
+	{
+		obj = (RedirectFilterClosure*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
+	if (!obj->call())
+	{
+		lua_pushlightuserdata( ls, obj);
+		lua_yieldk( ls, 0, 1, function_input_table);
+	}
+	return 1;
+}
+
+
 
 
 LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
@@ -1015,15 +1045,18 @@ LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
 	return 0;
 }
 
+
+
 static const luaL_Reg logger_methodtable[ 2] =
 {
 	{"print",&function_logger_print},
 	{0,0}
 };
 
-static const luaL_Reg input_methodtable[ 3] =
+static const luaL_Reg input_methodtable[ 4] =
 {
 	{"as",&function_input_as},
+	{"table",&function_input_table},
 	{"get",&function_input_get},
 	{0,0}
 };

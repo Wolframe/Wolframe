@@ -1,23 +1,38 @@
 #!/bin/sh
 for example in\
-	"echoinpgen=employee_assignment_print=employee_assignment_print=UTF-8=run xml:textwolf=echo_input_generator.lua" \
-	"echoinpgen=employee_assignment_print=employee_assignment_print=UTF-16LE=run xml:textwolf=echo_input_generator.lua" \
-	"echoinpgen=employee_assignment_print=employee_assignment_print=UTF-16BE=run xml:textwolf=echo_input_generator.lua" \
-	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-2LE=run xml:textwolf=echo_input_generator.lua" \
-	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-2BE=run xml:textwolf=echo_input_generator.lua" \
-	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-4LE=run xml:textwolf=echo_input_generator.lua" \
-	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-4BE=run xml:textwolf=echo_input_generator.lua" \
-	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UTF-8=run xml:textwolf=formfunc_luatable_luaparse.lua" \
-	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UTF-16LE=run xml:textwolf=formfunc_luatable_luaparse.lua" \
-	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UTF-16BE=run xml:textwolf=formfunc_luatable_luaparse.lua" \
-	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UCS-2LE=run xml:textwolf=formfunc_luatable_luaparse.lua" \
-	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UCS-2BE=run xml:textwolf=formfunc_luatable_luaparse.lua" \
-	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UCS-4LE=run xml:textwolf=formfunc_luatable_luaparse.lua" \
-	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UCS-4BE=run xml:textwolf=formfunc_luatable_luaparse.lua"
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UTF-8=run xml:textwolf=echo_input_generator.lua=" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UTF-16LE=run xml:textwolf=echo_input_generator.lua=" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UTF-16BE=run xml:textwolf=echo_input_generator.lua=" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-2LE=run xml:textwolf=echo_input_generator.lua=" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-2BE=run xml:textwolf=echo_input_generator.lua=" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-4LE=run xml:textwolf=echo_input_generator.lua=" \
+	"echoinpgen=employee_assignment_print=employee_assignment_print=UCS-4BE=run xml:textwolf=echo_input_generator.lua=" \
+	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UTF-8=run xml:textwolf=formfunc_luatable_luaparse.lua=" \
+	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UTF-16LE=run xml:textwolf=formfunc_luatable_luaparse.lua=" \
+	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UTF-16BE=run xml:textwolf=formfunc_luatable_luaparse.lua=" \
+	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UCS-2LE=run xml:textwolf=formfunc_luatable_luaparse.lua=" \
+	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UCS-2BE=run xml:textwolf=formfunc_luatable_luaparse.lua=" \
+	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UCS-4LE=run xml:textwolf=formfunc_luatable_luaparse.lua=" \
+	"luaformfunc=employee_assignment_print=employee_assignment_print_res=UCS-4BE=run xml:textwolf=formfunc_luatable_luaparse.lua=" \
+	"luaformfuncinpgen=employee_assignment_print=employee_assignment_print_res=UTF-8=run xml:textwolf=formfunc_input_generator.lua=.formfunc" \
+	"luaformfuncinpgen=employee_assignment_print=employee_assignment_print_res=UTF-16LE=run xml:textwolf=formfunc_input_generator.lua=.formfunc" \
+	"luaformfuncinpgen=employee_assignment_print=employee_assignment_print_res=UTF-16BE=run xml:textwolf=formfunc_input_generator.lua=.formfunc" \
+	"luaformfuncinpgen=employee_assignment_print=employee_assignment_print_res=UCS-2LE=run xml:textwolf=formfunc_input_generator.lua=.formfunc" \
+	"luaformfuncinpgen=employee_assignment_print=employee_assignment_print_res=UCS-2BE=run xml:textwolf=formfunc_input_generator.lua=.formfunc" \
+	"luaformfuncinpgen=employee_assignment_print=employee_assignment_print_res=UCS-4LE=run xml:textwolf=formfunc_input_generator.lua=.formfunc" \
+	"luaformfuncinpgen=employee_assignment_print=employee_assignment_print_res=UCS-4BE=run xml:textwolf=formfunc_input_generator.lua=.formfunc" \
+	"luaformfunciter=employee_assignment_print=employee_assignment_print_res=UTF-8=run xml:textwolf=echo_formfunc_generator.lua=.formfunc" \
+	"luaformfunciter=employee_assignment_print=employee_assignment_print_res=UTF-16LE=run xml:textwolf=echo_formfunc_generator.lua=.formfunc" \
+	"luaformfunciter=employee_assignment_print=employee_assignment_print_res=UTF-16BE=run xml:textwolf=echo_formfunc_generator.lua=.formfunc" \
+	"luaformfunciter=employee_assignment_print=employee_assignment_print_res=UCS-2LE=run xml:textwolf=echo_formfunc_generator.lua=.formfunc" \
+	"luaformfunciter=employee_assignment_print=employee_assignment_print_res=UCS-2BE=run xml:textwolf=echo_formfunc_generator.lua=.formfunc" \
+	"luaformfunciter=employee_assignment_print=employee_assignment_print_res=UCS-4LE=run xml:textwolf=echo_formfunc_generator.lua=.formfunc" \
+	"luaformfunciter=employee_assignment_print=employee_assignment_print_res=UCS-4BE=run xml:textwolf=echo_formfunc_generator.lua=.formfunc"
 do
+resf=`echo $example | cut -f7 -d=`
 name=`echo $example | cut -f1 -d=`
 docin=`echo $example | cut -f2 -d=`".lua"
-docout=`echo $example | cut -f3 -d=`".lua"
+docout=`echo $example | cut -f3 -d=`"$resf.lua"
 cset=`echo $example | cut -f4 -d=`
 cmdnam=`echo $example | cut -f5 -d=`
 script=`echo $example | cut -f6 -d=`

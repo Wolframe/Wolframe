@@ -9,8 +9,6 @@ function run()
 	input:as(f)
 	output:as(f)
 
-	t = input:table()
-	r = formfunction("employee_assignment_convert")( t)
-	output:print( r:table())
+	r = formfunction("employee_assignment_convert")( input:get())
+	output:print( r:get())
 end
-

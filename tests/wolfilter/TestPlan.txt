@@ -1,16 +1,18 @@
 LUA
 output:print(input:get())		luacommand.echoinpgen.employee_assignment_print.lua
 output:print(form:get())		luaddlformget.employee_assignment_print.ddlformfill
-output:print(formfunction()():get())	?
+output:print(formfunction()():get())	luacommand.luaformfuncinpgen.employee_assignment_print.lua
 output:print(TTABLE)			luacommand.luaformfunc.employee_assignment_print.lua
 for v,t in input:get()			luaddlformfill.employee_assignment_print.luaddlformfill
 
 form:fill( TTABLE)			luaddlformfill.employee_assignment_print.luaddlformfill
 form:fill( input:get())			luaddlformget.employee_assignment_print.ddlformfill
+form:fill( input:table())		luaddlformiter.employee_assignment_print.ddlformfill
 form:table()				luaddlformfill.employee_assignment_print.luaddlformfill
-for v,t in form:get()			?
+for v,t in form:get()			luaddlformiter.employee_assignment_print.ddlformfill
 
 formfunction()( TTABLE)			luacommand.luaformfunc.employee_assignment_print.lua
-formfunction()( input:get())		?
+formfunction()( input:get())		luacommand.luaformfuncinpgen.employee_assignment_print.lua
 formfunction()():table()		luacommand.luaformfunc.employee_assignment_print.lua
-for v,t in formfunction()():get()	?
+for v,t in formfunction()():get()	luacommand.luaformfunciter.employee_assignment_print.lua
+

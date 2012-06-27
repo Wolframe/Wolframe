@@ -1,22 +1,30 @@
 #!/bin/sh
 for example in\
-	"employee_assignment_print=employee_assignment_print_res=UTF-8=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
-	"employee_assignment_print=employee_assignment_print_res=UTF-16LE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
-	"employee_assignment_print=employee_assignment_print_res=UTF-16BE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
-	"employee_assignment_print=employee_assignment_print_res=UCS-2LE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
-	"employee_assignment_print=employee_assignment_print_res=UCS-2BE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
-	"employee_assignment_print=employee_assignment_print_res=UCS-4LE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
-	"employee_assignment_print=employee_assignment_print_res=UCS-4BE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform"
+	"luaddlformget=employee_assignment_print=employee_assignment_print_res=UTF-8=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
+	"luaddlformget=employee_assignment_print=employee_assignment_print_res=UTF-16LE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
+	"luaddlformget=employee_assignment_print=employee_assignment_print_res=UTF-16BE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
+	"luaddlformget=employee_assignment_print=employee_assignment_print_res=UCS-2LE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
+	"luaddlformget=employee_assignment_print=employee_assignment_print_res=UCS-2BE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
+	"luaddlformget=employee_assignment_print=employee_assignment_print_res=UCS-4LE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
+	"luaddlformget=employee_assignment_print=employee_assignment_print_res=UCS-4BE=run xml:textwolf=ddlform_fill_input_generator.lua=employee_assignment_print.simpleform" \
+	"luaddlformiter=employee_assignment_print=employee_assignment_print_res=UTF-8=run xml:textwolf=echo_ddlform_iterator.lua=employee_assignment_print.simpleform" \
+	"luaddlformiter=employee_assignment_print=employee_assignment_print_res=UTF-16LE=run xml:textwolf=echo_ddlform_iterator.lua=employee_assignment_print.simpleform" \
+	"luaddlformiter=employee_assignment_print=employee_assignment_print_res=UTF-16BE=run xml:textwolf=echo_ddlform_iterator.lua=employee_assignment_print.simpleform" \
+	"luaddlformiter=employee_assignment_print=employee_assignment_print_res=UCS-2LE=run xml:textwolf=echo_ddlform_iterator.lua=employee_assignment_print.simpleform" \
+	"luaddlformiter=employee_assignment_print=employee_assignment_print_res=UCS-2BE=run xml:textwolf=echo_ddlform_iterator.lua=employee_assignment_print.simpleform" \
+	"luaddlformiter=employee_assignment_print=employee_assignment_print_res=UCS-4LE=run xml:textwolf=echo_ddlform_iterator.lua=employee_assignment_print.simpleform" \
+	"luaddlformiter=employee_assignment_print=employee_assignment_print_res=UCS-4BE=run xml:textwolf=echo_ddlform_iterator.lua=employee_assignment_print.simpleform"
 do
-docin=`echo $example | cut -f1 -d=`".ddlformfill"
-docout=`echo $example | cut -f2 -d=`".ddlformfill"
-cset=`echo $example | cut -f3 -d=`
-cmdnam=`echo $example | cut -f4 -d=`
-script=`echo $example | cut -f5 -d=`
-form=`echo $example | cut -f6 -d=`
+name=`echo $example | cut -f1 -d=`
+docin=`echo $example | cut -f2 -d=`".ddlformfill"
+docout=`echo $example | cut -f3 -d=`".ddlformfill"
+cset=`echo $example | cut -f4 -d=`
+cmdnam=`echo $example | cut -f5 -d=`
+script=`echo $example | cut -f6 -d=`
+form=`echo $example | cut -f7 -d=`
 cmd="--form $form --script $script $cmdnam"
 
-output="../`echo $0 | sed 's/template//' | sed 's/.tst$//'`.$docin.$cset.tst"
+output="../"`dirname $0 | sed 's/template//'`"/$name.$docin.$cset.tst"
 rm -f $output
 echo "Writing test file $output"
 
