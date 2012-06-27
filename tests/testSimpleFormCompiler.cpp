@@ -67,20 +67,6 @@ protected:
 	virtual void TearDown() {}
 };
 
-static bool readFile( const char* fn, std::string& out)
-{
-	char buf;
-	std::fstream ff;
-	ff.open( fn, std::ios::in | std::ios::binary);
-	while (ff.read( &buf, sizeof(buf)))
-	{
-		out.push_back( buf);
-	}
-	bool rt = ((ff.rdstate() & std::ifstream::eofbit) != 0);
-	ff.close();
-	return rt;
-}
-
 TEST_F( SimpleFormCompilerTest, tests)
 {
 	unsigned int ti;
@@ -88,13 +74,8 @@ TEST_F( SimpleFormCompilerTest, tests)
 	{
 		boost::filesystem::path pp = boost::filesystem::current_path() / "simpleFormCompiler" / "data" / testDescription[ti].srcfile;
 		std::string srcfile = pp.string() + ".simpleform";
-		std::string srcstring;
-		if (!readFile( srcfile.c_str(), srcstring)) throw std::runtime_error("could not read test input file");
 		ddl::SimpleFormCompiler mm;
-		ddl::StructType sr;
-		std::string error;
-		EXPECT_EQ( true, mm.compile( srcstring, sr, error));
-		ASSERT_EQ( "", error);
+		ddl::StructType sr = mm.compileFile( srcfile);
 		sr.print( std::cerr);
 
 	}

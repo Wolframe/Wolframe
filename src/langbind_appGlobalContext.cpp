@@ -85,15 +85,8 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 			{
 				ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
 				std::string error;
-				if (!ci->compileFile( itr->sourcepath, *form, error))
-				{
-					LOG_ERROR << "Error in DDL form source: " << error;
-					rt = false;
-				}
-				else
-				{
-					defineForm( itr->name, form);
-				}
+				*form = ci->compileFile( itr->sourcepath);
+				defineForm( itr->name, form);
 			}
 		}
 	}

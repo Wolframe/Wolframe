@@ -104,6 +104,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	serialize_mapContext.o \
 	ddl_atomicType.o \
 	ddl_structType.o \
+	ddl_structTypeBuild.o \
 	ddl_compilerInterface.o \
 	ddl_compiler_simpleFormCompiler.o \
 	types_bignum.o \

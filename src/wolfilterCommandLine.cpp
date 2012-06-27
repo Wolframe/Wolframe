@@ -187,14 +187,8 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath) 
 			{
 				ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
 				std::string error;
-				if (!ci->compileFile( formpath, *form, error))
-				{
-					throw std::runtime_error( error);
-				}
-				else
-				{
-					gct->defineForm( itr->formname, form);
-				}
+				*form = ci->compileFile( formpath);
+				gct->defineForm( itr->formname, form);
 			}
 		}
 	}

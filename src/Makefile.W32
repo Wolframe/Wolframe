@@ -133,6 +133,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	serialize_mapContext.obj \
 	ddl_atomicType.obj \
 	ddl_structType.obj \
+	ddl_structTypeBuild.obj \
 	ddl_compilerInterface.obj \
 	ddl_compiler_simpleFormCompiler.obj \
 	acceptor.obj \

@@ -38,6 +38,7 @@ Project Wolframe.
 #include "filter/luafilter.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
+#include "ddl/structTypeBuild.hpp"
 #include "logger-v1.hpp"
 #include <fstream>
 #include <iostream>
@@ -542,8 +543,6 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
-		TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
-
 		serialize::Context::Flags flags = serialize::Context::None;
 		if (lua_gettop( ls) == 3)
 		{
@@ -561,6 +560,7 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 				throw std::runtime_error( "2nd argument does not specify a mode of validating input (e.g. \"strict\")");
 			}
 		}
+		TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
 		LuaObject<serialize::DDLStructParser>::push_luastack( ls, serialize::DDLStructParser( form->structure()));
 		closure = LuaObject<serialize::DDLStructParser>::get( ls, -1);
 		closure->init( inp, flags);
@@ -623,21 +623,34 @@ LUA_FUNCTION_THROWS( "form:get()", function_form_get)
 
 LUA_FUNCTION_THROWS( "form()", function_form)
 {
-	check_parameters( ls, 0, 1, LUA_TSTRING);
+	if (lua_isstring( ls, 1))
+	{
+		check_parameters( ls, 0, 1, LUA_TSTRING);
 
-	const char* name = lua_tostring( ls, 1);
-	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
-	if (!ctx)
-	{
-		throw std::runtime_error( "lost global context");
+		const char* name = lua_tostring( ls, 1);
+		GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
+		if (!ctx)
+		{
+			throw std::runtime_error( "lost global context");
+		}
+		DDLForm frm;
+		if (!ctx->getForm( name, frm))
+		{
+			throw std::runtime_error( "form not defined");
+		}
+		LuaObject<DDLForm>::push_luastack( ls, frm);
+		return 1;
 	}
-	DDLForm frm;
-	if (!ctx->getForm( name, frm))
+	else if (lua_istable( ls, 1))
 	{
-		throw std::runtime_error( "form not defined");
+		check_parameters( ls, 0, 1, LUA_TTABLE);
+		TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
+		if (!inp.get()) throw std::runtime_error( "unexpected null object intead of table argument");
+		DDLForm frm( ddl::StructTypeR( new ddl::StructTypeBuild( *inp)));
+		LuaObject<DDLForm>::push_luastack( ls, frm);
+		return 1;
 	}
-	LuaObject<DDLForm>::push_luastack( ls, frm);
-	return 1;
+	throw std::runtime_error( "expected string or table as argument of form");
 }
 
 

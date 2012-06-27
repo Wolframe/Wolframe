@@ -181,6 +181,11 @@ public:
 	///\param[in] prototype prototype of an empty vector element (new elements are created as copies of prototype)
 	void defineAsVector( const StructType& prototype);
 
+	///\brief Define this to an atomic type 'tp'
+	///\remark [precondition] this must not be initialized by other means yet
+	///\param[in] tp Atomic value equivalent to define
+	void defineAsAtomic( const AtomicType& tp);
+
 	///\brief Add a new element (copy of prototype) to this as a vector of elements (ContentType Vector)
 	///\remark [precondition] this must be of type (ContentType) Vector
 	void push();

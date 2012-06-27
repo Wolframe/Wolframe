@@ -29,44 +29,23 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl_compilerInterface.cpp
-///\brief implementation of common methods of DDL compilers
-#include "ddl/compilerInterface.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
-#include <sstream>
-#include <string>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/filesystem/exception.hpp>
+///\file ddl/structTypeBuild.hpp
+///\brief Interface to build a structure description from a structure (filter)
 
-using namespace _Wolframe;
-using namespace ddl;
+#ifndef _Wolframe_DDL_STRUCTTYPE_BUILD_HPP_INCLUDED
+#define _Wolframe_DDL_STRUCTTYPE_BUILD_HPP_INCLUDED
+#include "ddl/structType.hpp"
+#include "filter/typedfilter.hpp"
 
-StructType CompilerInterface::compileFile( const std::string& filename) const
+namespace _Wolframe {
+namespace ddl {
+
+class StructTypeBuild :public StructType
 {
-	std::ifstream inFile( filename.c_str());
-	inFile.exceptions( std::ifstream::failbit | std::ifstream::badbit);
-	std::ostringstream src;
-	try
-	{
-		while (inFile)
-		{
-			std::string ln;
-			if (inFile.eof()) break;
-			std::getline( inFile, ln);
-			src << ln << "\n";
-		}
-	}
-	catch (std::ifstream::failure& e)
-	{
-		if (!(inFile.rdstate() & std::ifstream::eofbit))
-		{
-			// ... puzzle: I try to mask the EOF exception, but it is still thrown. Maybe because of 'getline' ?
-			std::ostringstream msg;
-			msg << "error '" << e.what() << "' reading file '" << filename << "'" << std::endl;
-			throw std::runtime_error( msg.str());
-		}
-	}
-	return compile( src.str());
-}
+public:
+	StructTypeBuild( langbind::TypedInputFilter& inp);
+};
+
+}}//namespace
+#endif
 

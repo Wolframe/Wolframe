@@ -33,46 +33,6 @@ function readTable( itr)
 	return result( tab)
 end
 
-function printArray( t, a)
-	for i,v in ipairs(a) do
-		if type(v) == "table" then
-			output:print( false, t)
-			printTable(v)
-			output:print()
-		else
-			output:print( v, t)
-		end
-	end
-end
-
-function printTable( tab)
-	local iscontent = true
-	--... we do not print attributes here
-	--... iscontent=false -> print atomic values as attributes until the first non atomic value
-	--... iscontent=false -> print all values as tag content
-	for t,v in pairs(tab) do
-		local tagname = t
-		if type(v) == "table" then
-			iscontent = true
-			if v[#v] then
-				printArray( t, v)
-			else
-				output:print( false, t)
-				printTable( v)
-				output:print()
-			end
-		elseif type(t) == "number" then
-			output:print( v)
-		elseif iscontent then
-			output:print( false, t)
-			output:print( v)
-			output:print()
-		else
-			output:print( v, t)
-		end
-	end
-end
-
 function run()
 	f = filter( "xml:textwolf")
 
@@ -85,6 +45,6 @@ function run()
 
 	t = readTable( input:get())
 	r = formfunction("employee_assignment_convert")( t)
-	printTable( r:table())
+	output:print( r:table())
 end
 
