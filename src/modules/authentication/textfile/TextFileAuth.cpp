@@ -172,7 +172,7 @@ User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
 					   const CRAMresponse& response,
 					   bool caseSensitveUser ) const
 {
-	return authenticate( challenge, response.toString(), caseSensitveUser );
+	return authenticate( challenge, response.toBCD(), caseSensitveUser );
 }
 
 User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,

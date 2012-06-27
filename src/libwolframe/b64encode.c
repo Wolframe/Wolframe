@@ -7,8 +7,6 @@ For details, see http://sourceforge.net/projects/libb64
 
 #include <base64.h>
 
-#define CRLF_SIZE	1
-
 static const char* encoding = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 void base64_initEncodeState( base64_EncodeState* state, unsigned short lineLength )
@@ -54,7 +52,7 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
 				}
 				fragment = *plainByte++;
 				result = ( fragment & 0x0fc ) >> 2;
-				if ( encodedMaxSize-- <= 0 )
+				if ( encodedMaxSize-- < 1 )
 					return -1;
 				*codeChar++ = base64_encodeValue( result );
 				result = ( fragment & 0x003 ) << 4;
@@ -66,7 +64,7 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
 				}
 				fragment = *plainByte++;
 				result |= ( fragment & 0x0f0 ) >> 4;
-				if ( encodedMaxSize-- <= 0 )
+				if ( encodedMaxSize-- < 1 )
 					return -1;
 				*codeChar++ = base64_encodeValue( result );
 				result = ( fragment & 0x00f ) << 2;
@@ -78,17 +76,15 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
 				}
 				fragment = *plainByte++;
 				result |= ( fragment & 0x0c0 ) >> 6;
-				if ( encodedMaxSize-- <= 0 )
+				if ( encodedMaxSize-- < 2 )
 					return -1;
 				*codeChar++ = base64_encodeValue( result );
 				result  = ( fragment & 0x03f ) >> 0;
-				if ( encodedMaxSize-- <= 0 )
-					return -1;
 				*codeChar++ = base64_encodeValue( result );
 
 				++( state->stepCount );
 				if ( state->stepCount == state->lineLength / 4 )	{
-					if ( encodedMaxSize-- <= 0 )
+					if ( encodedMaxSize-- < 1 )
 						return -1;
 					*codeChar++ = '\n';
 					state->stepCount = 0;
@@ -105,24 +101,21 @@ int base64_encodeEnd( base64_EncodeState* state, char* encoded, size_t encodedMa
 
 	switch ( state->step )	{
 		case STEP_1:
-			if ( encodedMaxSize < 3 + CRLF_SIZE )
+			if ( encodedMaxSize < 3 )
 				return -1;
 			*codeByte++ = base64_encodeValue( state->result );
 			*codeByte++ = '=';
 			*codeByte++ = '=';
 			break;
 		case STEP_2:
-			if ( encodedMaxSize < 2 + CRLF_SIZE)
+			if ( encodedMaxSize < 2 )
 				return -1;
 			*codeByte++ = base64_encodeValue( state->result );
 			*codeByte++ = '=';
 			break;
 		case STEP_0:
-			if ( encodedMaxSize < CRLF_SIZE )
-				return -1;
 			break;
 	}
-	*codeByte++ = '\n';
 
 	return codeByte - encoded;
 }

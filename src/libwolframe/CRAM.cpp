@@ -73,13 +73,13 @@ static const int PASSWORD_HASH_STRING_SIZE = 2 * PASSWORD_DIGEST_SIZE + 1;
 static const int CRAM_CHALLENGE_STRING_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
 static const int CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
 
-
-PasswordHash::PasswordHash( const std::string& /*salt*/, const std::string& password )
+PasswordHash::PasswordHash( const PasswordSalt& pwdSalt, const std::string& password )
+	: m_salt( pwdSalt )
 {
 	sha224((const unsigned char*)password.c_str(), password.length(), m_hash );
 }
 
-std::string PasswordHash::toBCD()
+std::string PasswordHash::toBCD() const
 {
 	char	buffer[ PASSWORD_HASH_STRING_SIZE ];
 
@@ -87,12 +87,12 @@ std::string PasswordHash::toBCD()
 
 	if ( byte2hex( m_hash, PASSWORD_DIGEST_SIZE,
 		       buffer, PASSWORD_HASH_STRING_SIZE ) == NULL )
-		throw std::logic_error( "PasswordHash::toString() cannot convert hash ?!?" );
+		throw std::logic_error( "PasswordHash::toBCD() cannot convert hash ?!?" );
 
 	return std::string( buffer );
 }
 
-std::string PasswordHash::toBase64()
+std::string PasswordHash::toBase64() const
 {
 	char	buffer[ PASSWORD_HASH_STRING_SIZE ];
 
@@ -161,7 +161,7 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 #endif
 }
 
-std::string CRAMchallenge::toString()
+std::string CRAMchallenge::toBCD() const
 {
 	char	buffer[ CRAM_CHALLENGE_STRING_SIZE ];
 
@@ -208,7 +208,7 @@ CRAMresponse::CRAMresponse( const std::string& challenge,
 	sha512( buffer, CRAM_CHALLENGE_SIZE, m_response );
 }
 
-std::string CRAMresponse::toString() const
+std::string CRAMresponse::toBCD() const
 {
 	char	buffer[ CRAM_RESPONSE_STRING_SIZE ];
 

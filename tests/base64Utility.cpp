@@ -65,6 +65,7 @@ int main(int argc, char** argv)
 	else if ( choice == "-e" )	{
 		base64::Encoder E( 3072 );
 		E.encode( instream, outstream );
+		outstream << std::endl;
 	}
 	else	{
 		std::cout << "[" << choice << "]" << std::endl;

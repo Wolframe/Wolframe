@@ -49,7 +49,7 @@ TEST( CRAM, Challenge )
 #else
 	_Wolframe::AAAA::CRAMchallenge	challenge( "/dev/urandom" );
 #endif
-	std::cout << challenge.toString();
+	std::cout << challenge.toBCD();
 	ASSERT_TRUE( true );
 }
 

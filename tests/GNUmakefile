@@ -152,6 +152,8 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./byte2hexTest
 	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./base64Test
+	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testRand
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testTimestamp

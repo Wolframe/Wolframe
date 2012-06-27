@@ -49,17 +49,31 @@ static const int PASSWORD_SALT_SIZE = 128 / 8;
 static const int CRAM_CHALLENGE_SIZE = CRAM_BLOCK_SIZE;
 static const int CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
 
+
+class PasswordSalt
+{
+	friend class PasswordHash;
+public:
+	PasswordSalt();
+	explicit PasswordSalt( const unsigned char* salt );
+	explicit PasswordSalt( const char* base64Salt );
+	std::string toBCD() const;
+	std::string toBase64() const;
+private:
+	unsigned char	m_salt[ PASSWORD_SALT_SIZE ];
+};
+
+
 class PasswordHash
 {
 public:
-	PasswordHash( const std::string& salt, const std::string& password );
-	PasswordHash( const unsigned char* salt, const std::string& password );
-	std::string toBCD();
-	std::string toBase64();
-	std::string salt();
+	PasswordHash( const PasswordSalt& pwdSalt, const std::string& password );
+	std::string toBCD() const;
+	std::string toBase64() const;
+	PasswordSalt& salt() const;
 private:
-	unsigned char	m_hash[ PASSWORD_DIGEST_SIZE ];
-	unsigned char	m_salt[ PASSWORD_SALT_SIZE ];
+	unsigned char		m_hash[ PASSWORD_DIGEST_SIZE ];
+	const PasswordSalt	m_salt;
 };
 
 
@@ -68,9 +82,10 @@ class CRAMchallenge
 	friend class CRAMresponse;
 public:
 	CRAMchallenge( const std::string& randomDevice );
-	std::string toString();
+	std::string toBCD() const;
+	std::string toBase64() const;
 private:
-	unsigned char	m_challenge[ CRAM_CHALLENGE_SIZE ];
+	unsigned char		m_challenge[ CRAM_CHALLENGE_SIZE ];
 };
 
 
@@ -82,13 +97,14 @@ public:
 	CRAMresponse( const std::string& challenge,
 		      const std::string& username, const std::string& pwdHash );
 
-	std::string toString() const;
+	std::string toBCD() const;
+	std::string toBase64() const;
 	bool operator == ( const CRAMresponse& rhs );
 	bool operator != ( const CRAMresponse& rhs )	{ return !( *this == rhs ); }
 	bool operator == ( const std::string& rhs );
 	bool operator != ( const std::string& rhs )	{ return !( *this == rhs ); }
 private:
-	unsigned char	m_response[ CRAM_RESPONSE_SIZE ];
+	unsigned char		m_response[ CRAM_RESPONSE_SIZE ];
 };
 
 }} // namespace _Wolframe::AAAA
