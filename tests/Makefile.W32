@@ -164,7 +164,7 @@ local_test:
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo testSimpleFormCompiler.exe >> test.bat
-#PF: temp disabled because of EOL problem in test data:	@-echo testWolfilter >> test.bat
+	@-echo testWolfilter >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
 
