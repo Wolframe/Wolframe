@@ -53,7 +53,7 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
 				fragment = *plainByte++;
 				result = ( fragment & 0x0fc ) >> 2;
 				if ( encodedMaxSize-- < 1 )
-					return -1;
+					return BUFFER_OVERFLOW;
 				*codeChar++ = base64_encodeValue( result );
 				result = ( fragment & 0x003 ) << 4;
 			case STEP_1:
@@ -65,7 +65,7 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
 				fragment = *plainByte++;
 				result |= ( fragment & 0x0f0 ) >> 4;
 				if ( encodedMaxSize-- < 1 )
-					return -1;
+					return BUFFER_OVERFLOW;
 				*codeChar++ = base64_encodeValue( result );
 				result = ( fragment & 0x00f ) << 2;
 			case STEP_2:
@@ -76,16 +76,17 @@ int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
 				}
 				fragment = *plainByte++;
 				result |= ( fragment & 0x0c0 ) >> 6;
-				if ( encodedMaxSize-- < 2 )
-					return -1;
+				if ( encodedMaxSize < 2 )
+					return BUFFER_OVERFLOW;
+				encodedMaxSize -= 2;
 				*codeChar++ = base64_encodeValue( result );
 				result  = ( fragment & 0x03f ) >> 0;
 				*codeChar++ = base64_encodeValue( result );
 
 				++( state->stepCount );
-				if ( state->stepCount == state->lineLength / 4 )	{
+				if ( state->lineLength && state->stepCount == state->lineLength / 4 )	{
 					if ( encodedMaxSize-- < 1 )
-						return -1;
+						return BUFFER_OVERFLOW;
 					*codeChar++ = '\n';
 					state->stepCount = 0;
 				}
@@ -102,14 +103,14 @@ int base64_encodeEnd( base64_EncodeState* state, char* encoded, size_t encodedMa
 	switch ( state->step )	{
 		case STEP_1:
 			if ( encodedMaxSize < 3 )
-				return -1;
+				return BUFFER_OVERFLOW;
 			*codeByte++ = base64_encodeValue( state->result );
 			*codeByte++ = '=';
 			*codeByte++ = '=';
 			break;
 		case STEP_2:
 			if ( encodedMaxSize < 2 )
-				return -1;
+				return BUFFER_OVERFLOW;
 			*codeByte++ = base64_encodeValue( state->result );
 			*codeByte++ = '=';
 			break;

@@ -16,6 +16,9 @@ extern "C" {
 
 #define DEFAULT_BASE64_LINE_LENGTH	76
 
+#define BUFFER_OVERFLOW		-1
+#define INVALID_CODE		-2
+
 typedef enum	{
 	STEP_0,
 	STEP_1,

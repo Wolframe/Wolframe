@@ -81,7 +81,7 @@ static int strEncode( const char* data, char* encoded, size_t codeSize )
 static int strDecode( const char* encoded, size_t codeSize, char* plain, size_t plainSize )
 {
 	base64::Decoder D;
-	int ret = D.decode( encoded, codeSize, (unsigned char *)plain, plainSize );
+	int ret = D.decode( encoded, codeSize, (unsigned char *)plain, plainSize - 1 );
 	if ( ret >= 0 )
 		plain[ ret ] = 0;
 	return ret;
@@ -203,27 +203,101 @@ TEST( Base64, InsufficientBuffer )
 	EXPECT_EQ( -1, strEncode( vector1, buffer, 2 ));
 	EXPECT_EQ( -1, strEncode( vector1, buffer, 3 ));
 	EXPECT_EQ( -1, strEncode( vector1, buffer, 4 ));
+	EXPECT_EQ( 4, strEncode( vector1, buffer, 5 ));
 
 	EXPECT_EQ( -1, strEncode( vector2, buffer, 1 ));
 	EXPECT_EQ( -1, strEncode( vector2, buffer, 2 ));
 	EXPECT_EQ( -1, strEncode( vector2, buffer, 3 ));
 	EXPECT_EQ( -1, strEncode( vector2, buffer, 4 ));
+	EXPECT_EQ( 4, strEncode( vector2, buffer, 5 ));
 
 	EXPECT_EQ( -1, strEncode( vector3, buffer, 1 ));
 	EXPECT_EQ( -1, strEncode( vector3, buffer, 2 ));
 	EXPECT_EQ( -1, strEncode( vector3, buffer, 3 ));
 	EXPECT_EQ( -1, strEncode( vector3, buffer, 4 ));
+	EXPECT_EQ( 4, strEncode( vector3, buffer, 5 ));
 
-	EXPECT_EQ( -1, strDecode( result1, buffer, 0 ));
-	EXPECT_EQ( -1, strDecode( result2, buffer, 0 ));
+	EXPECT_EQ( -1, strDecode( result1, buffer, 1 ));
+	EXPECT_EQ( 1, strDecode( result1, buffer, 2 ));
+
 	EXPECT_EQ( -1, strDecode( result2, buffer, 1 ));
-	EXPECT_EQ( -1, strDecode( result3, buffer, 0 ));
+	EXPECT_EQ( -1, strDecode( result2, buffer, 2 ));
+	EXPECT_EQ( 2, strDecode( result2, buffer, 3 ));
+
 	EXPECT_EQ( -1, strDecode( result3, buffer, 1 ));
 	EXPECT_EQ( -1, strDecode( result3, buffer, 2 ));
-	EXPECT_EQ( -1, strDecode( result4, buffer, 0 ));
+	EXPECT_EQ( -1, strDecode( result3, buffer, 3 ));
+	EXPECT_EQ( 3, strDecode( result3, buffer, 4 ));
+
 	EXPECT_EQ( -1, strDecode( result4, buffer, 1 ));
 	EXPECT_EQ( -1, strDecode( result4, buffer, 2 ));
 	EXPECT_EQ( -1, strDecode( result4, buffer, 3 ));
+	EXPECT_EQ( -1, strDecode( result4, buffer, 4 ));
+	EXPECT_EQ( 4, strDecode( result4, buffer, 5 ));
+}
+
+// The decoder doesn't detect invalid codes for now
+//TEST( Base64, InvalidCode )
+//{
+//	static const char* invalid = "Zm9?YmFy==";
+//	char	buffer[ bufSize ];
+//
+//	EXPECT_EQ( -2, strDecode( invalid, buffer, bufSize ));
+//	EXPECT_STREQ( vector6, buffer );
+//}
+
+//#include <iostream>
+//#include <fstream>
+
+TEST( Base64, RandomData )
+{
+	size_t		dataSize, encodedSize;
+	unsigned short	lineLength;
+	unsigned char*	data;
+	char*		encoded;
+	unsigned char*	decoded;
+
+	dataSize = random() % 32768;
+	lineLength = random() % 512;
+	encodedSize = (( dataSize + 2 ) / 3 ) * 4;
+	encodedSize += encodedSize / lineLength;
+
+	data = new unsigned char[ dataSize ];
+	encoded = new char[ encodedSize + 2 ];
+	decoded = new unsigned char[ dataSize ];
+
+	std::cout << "Data size: " << dataSize << ", line length: " << lineLength
+		  << ", encoded estimated size: " << encodedSize << std::endl;
+	for ( size_t i = 0; i < dataSize; i++ )
+		data[ i ] = random() % 256;
+
+//	std::ofstream fdata( "data", std::ios_base::out | std::ios_base::binary );
+//	fdata.write(( char *)data, dataSize );
+//	fdata.close();
+
+	base64::Encoder E( 0, lineLength );
+	int encodeResult = E.encode( data, dataSize, encoded, encodedSize );
+	int encodeEndResult = E.encodeEnd( encoded + encodeResult, encodedSize - encodeResult + 2 );
+		std::cout << "Encode result: " << encodeResult << ", end result: " << encodeEndResult << std::endl;
+	encodeResult += encodeEndResult;
+	EXPECT_EQ( encodeResult, encodedSize );
+
+//	std::ofstream fencoded( "encoded", std::ios_base::out | std::ios_base::binary );
+//	fencoded.write( encoded, encodeResult );
+//	fencoded.close();
+
+	base64::Decoder D;
+	int decodeResult = D.decode( encoded, encodeResult, decoded, dataSize );
+	EXPECT_EQ( dataSize, decodeResult );
+	EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
+
+//	std::ofstream fdecoded( "decoded", std::ios_base::out | std::ios_base::binary );
+//	fdecoded.write(( char *)decoded, decodeResult );
+//	fdecoded.close();
+
+	delete[] data;
+	delete[] encoded;
+	delete[] decoded;
 }
 
 int main( int argc, char **argv )

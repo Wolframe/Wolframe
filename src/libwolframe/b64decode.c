@@ -54,10 +54,8 @@ int base64_decodeBlock( base64_DecodeState* state, const char* encoded,
 						state->plainchar = *plainByte;
 						return plainByte - plain;
 					}
-					fragment = (char)base64_decodeValue( *codeChar++);
+					fragment = (char)base64_decodeValue( *codeChar++ );
 				} while ( fragment < 0 );
-				if ( plainMaxSize-- < 1 )
-					return -1;
 				*plainByte = ( fragment & 0x03f ) << 2;
 			case STEP_B:
 				do {
@@ -69,10 +67,8 @@ int base64_decodeBlock( base64_DecodeState* state, const char* encoded,
 					fragment = (char)base64_decodeValue( *codeChar++ );
 				} while ( fragment < 0 );
 				if ( plainMaxSize-- < 1 )
-					return -1;
+					return BUFFER_OVERFLOW;
 				*plainByte++ |= ( fragment & 0x030 ) >> 4;
-				if ( plainMaxSize-- < 1 )
-					return -1;
 				*plainByte = ( fragment & 0x00f ) << 4;
 			case STEP_C:
 				do {
@@ -84,10 +80,8 @@ int base64_decodeBlock( base64_DecodeState* state, const char* encoded,
 					fragment = (char)base64_decodeValue( *codeChar++ );
 				} while ( fragment < 0 );
 				if ( plainMaxSize-- < 1 )
-					return -1;
+					return BUFFER_OVERFLOW;
 				*plainByte++ |= ( fragment & 0x03c ) >> 2;
-				if ( plainMaxSize-- < 1 )
-					return -1;
 				*plainByte = ( fragment & 0x003 ) << 6;
 			case STEP_D:
 				do {
@@ -99,7 +93,7 @@ int base64_decodeBlock( base64_DecodeState* state, const char* encoded,
 					fragment = (char)base64_decodeValue( *codeChar++ );
 				} while ( fragment < 0 );
 				if ( plainMaxSize-- < 1 )
-					return -1;
+					return BUFFER_OVERFLOW;
 				*plainByte++ |= ( fragment & 0x03f );
 		}
 	}
