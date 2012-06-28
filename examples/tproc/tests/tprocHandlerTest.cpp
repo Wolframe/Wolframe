@@ -169,11 +169,12 @@ TEST_F( TProcHandlerTest, tests)
 	{
 		if (boost::iequals( boost::filesystem::extension( *ditr), ".tst"))
 		{
+			std::string testname = boost::filesystem::basename(*ditr);
 			if (selectedTestName.size())
 			{
 				if (std::search( ditr->path().string().begin(), ditr->path().string().end(), selectedTestName.begin(), selectedTestName.end()) != ditr->path().string().end())
 				{
-					std::cerr << "selected test '" << *ditr << "'" << std::endl;
+					std::cerr << "selected test '" << testname << "'" << std::endl;
 					tests.push_back( ditr->path().string());
 				}
 			}
@@ -192,16 +193,17 @@ TEST_F( TProcHandlerTest, tests)
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (; itr != end; ++itr)
 	{
+		std::string testname = boost::filesystem::basename(*itr);
 		// Read test description:
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{
 			// Skip tests when disabled:
-			std::cerr << "skipping test '" << *itr << "' ( is " << td.requires << ")" << std::endl;
+			std::cerr << "skipping test '" << testname << "' ( is " << td.requires << ")" << std::endl;
 			continue;
 		}
 		// Run test:
-		std::cerr << "processing test '" << *itr << "'" << std::endl;
+		std::cerr << "processing test '" << testname << "'" << std::endl;
 		TestConfiguration testConfiguration;
 		for (int ii=0; ii<NOF_IB; ii++)
 		{

@@ -103,11 +103,12 @@ TEST_F( WolfilterTest, tests)
 	{
 		if (boost::iequals( boost::filesystem::extension( *ditr), ".tst"))
 		{
+			std::string testname = boost::filesystem::basename(*ditr);
 			if (selectedTestName.size())
 			{
 				if (std::strstr( ditr->path().string().c_str(), selectedTestName.c_str()))
 				{
-					std::cerr << "selected test '" << *ditr << "'" << std::endl;
+					std::cerr << "selected test '" << testname << "'" << std::endl;
 					tests.push_back( ditr->path().string());
 				}
 			}
@@ -127,11 +128,12 @@ TEST_F( WolfilterTest, tests)
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (testno=1; itr != end; ++itr,++testno)
 	{
+		std::string testname = boost::filesystem::basename(*itr);
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{
 			// [2.2] Skip tests when disabled
-			std::cerr << "skipping test '" << *itr << "' ( is " << td.requires << ")" << std::endl;
+			std::cerr << "skipping test '" << testname << "' ( is " << td.requires << ")" << std::endl;
 			continue;
 		}
 		// [2.3] Define I/O buffer sizes
@@ -142,7 +144,7 @@ TEST_F( WolfilterTest, tests)
 		std::vector<std::string> cmd;
 		utils::splitStringBySpaces( cmd, td.config);
 
-		std::cerr << "processing test '" << *itr << "'" << std::endl;
+		std::cerr << "processing test '" << testname << "'" << std::endl;
 		enum {MaxNofArgs=31};
 		int cmdargc = cmd.size()+1;
 		char* cmdargv[MaxNofArgs+1];

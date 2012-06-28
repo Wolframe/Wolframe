@@ -1,18 +1,24 @@
-LUA
-output:print(input:get())		luacommand.echoinpgen.employee_assignment_print.lua
-output:print(form:get())		luaddlformget.employee_assignment_print.ddlformfill
-output:print(formfunction()():get())	luacommand.luaformfuncinpgen.employee_assignment_print.lua
-output:print(TTABLE)			luacommand.luaformfunc.employee_assignment_print.lua
-for v,t in input:get()			luaddlformfill.employee_assignment_print.luaddlformfill
+(1) FILTER INPUT/OUTPUT MAPPING
+simple unicode				filter_employee_assignment_print, map_input_generator
+multilingual unicode			filter_multilingual
+map by form				map_ddlform
+map by form function			map_formfunc
 
-form:fill( TTABLE)			luaddlformfill.employee_assignment_print.luaddlformfill
-form:fill( input:get())			luaddlformget.employee_assignment_print.ddlformfill
-form:fill( input:table())		luaddlformiter.employee_assignment_print.ddlformfill
-form:table()				luaddlformfill.employee_assignment_print.luaddlformfill
-for v,t in form:get()			luaddlformiter.employee_assignment_print.ddlformfill
+(2) LUA SCRIPT MAPPING
+output:print(input:get())		lua_echo_input_generator
+output:print(form:get())		lua_dllform_input_generator
+output:print(formfunction()():get())	lua_formfunc_input_generator
+output:print(TTABLE)			lua_luaformfunc_table
+for v,t in input:get()			lua_ddlform_table
 
-formfunction()( TTABLE)			luacommand.luaformfunc.employee_assignment_print.lua
-formfunction()( input:get())		luacommand.luaformfuncinpgen.employee_assignment_print.lua
-formfunction()():table()		luacommand.luaformfunc.employee_assignment_print.lua
-for v,t in formfunction()():get()	luacommand.luaformfunciter.employee_assignment_print.lua
+form:fill( TTABLE)			lua_ddlform_table
+form:fill( input:get())			lua_ddlform_input_generator
+form:fill( input:table())		lua_ddlform_iterator
+form:table()				lua_ddlform_table
+for v,t in form:get()			lua_ddlform_iterator
+
+formfunction()( TTABLE)			lua_luaformfunc_table
+formfunction()( input:get())		lua_luaformfunc_input_generator
+formfunction()():table()		lua_luaformfunc_table
+for v,t in formfunction()():get()	lua_luaformfunc_iterator
 
