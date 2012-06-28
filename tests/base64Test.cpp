@@ -246,8 +246,6 @@ TEST( Base64, InsufficientBuffer )
 //	EXPECT_STREQ( vector6, buffer );
 //}
 
-//#include <iostream>
-//#include <fstream>
 
 TEST( Base64, RandomData )
 {
@@ -257,43 +255,38 @@ TEST( Base64, RandomData )
 	char*		encoded;
 	unsigned char*	decoded;
 
-	dataSize = random() % 32768;
-	lineLength = random() % 512;
+// Data size: 16815, line length: 7, encoded estimated size: 28024
+// Data size: 12879, line length: 212, encoded estimated size: 17252
+
+	srand( time( NULL ) );
+	dataSize = 1 + rand() % 32768;
+	lineLength = rand() % 512;
 	encodedSize = (( dataSize + 2 ) / 3 ) * 4;
-	encodedSize += encodedSize / lineLength;
+	if ( lineLength / 4 )	{
+		unsigned short effLineLength = ( lineLength / 4 ) * 4;
+		encodedSize += encodedSize / effLineLength - (( encodedSize % effLineLength ) ? 0 : 1 );
+	}
 
 	data = new unsigned char[ dataSize ];
-	encoded = new char[ encodedSize + 2 ];
+	encoded = new char[ encodedSize ];
 	decoded = new unsigned char[ dataSize ];
 
 	std::cout << "Data size: " << dataSize << ", line length: " << lineLength
 		  << ", encoded estimated size: " << encodedSize << std::endl;
 	for ( size_t i = 0; i < dataSize; i++ )
-		data[ i ] = random() % 256;
-
-//	std::ofstream fdata( "data", std::ios_base::out | std::ios_base::binary );
-//	fdata.write(( char *)data, dataSize );
-//	fdata.close();
+		data[ i ] = rand() % 256;
 
 	base64::Encoder E( 0, lineLength );
 	int encodeResult = E.encode( data, dataSize, encoded, encodedSize );
-	int encodeEndResult = E.encodeEnd( encoded + encodeResult, encodedSize - encodeResult + 2 );
+	int encodeEndResult = E.encodeEnd( encoded + encodeResult, encodedSize - encodeResult );
 		std::cout << "Encode result: " << encodeResult << ", end result: " << encodeEndResult << std::endl;
 	encodeResult += encodeEndResult;
 	EXPECT_EQ( encodeResult, encodedSize );
-
-//	std::ofstream fencoded( "encoded", std::ios_base::out | std::ios_base::binary );
-//	fencoded.write( encoded, encodeResult );
-//	fencoded.close();
 
 	base64::Decoder D;
 	int decodeResult = D.decode( encoded, encodeResult, decoded, dataSize );
 	EXPECT_EQ( dataSize, decodeResult );
 	EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
-
-//	std::ofstream fdecoded( "decoded", std::ios_base::out | std::ios_base::binary );
-//	fdecoded.write(( char *)decoded, decodeResult );
-//	fdecoded.close();
 
 	delete[] data;
 	delete[] encoded;

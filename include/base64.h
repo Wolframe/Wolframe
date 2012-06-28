@@ -27,19 +27,25 @@ typedef enum	{
 
 typedef struct	{
 	base64_EncodeStep	step;
-	char			result;
+	unsigned char		result;
 	int			stepCount;
 	unsigned short		lineLength;
 } base64_EncodeState;
 
+/**
+ *
+ */
 void base64_initEncodeState( base64_EncodeState* state, unsigned short lineLength );
 
 void base64_resetEncodeState( base64_EncodeState* state );
 
-int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
-			size_t plainLength, char* encoded, size_t /*encodedMaxSize*/ );
+/**
+ * Encodes a block of binary data into Base-64
+ */
+int base64_encodeBlock( base64_EncodeState* state, const void* data, size_t dataSize,
+			char* encoded, size_t encodedMaxSize );
 
-int base64_encodeEnd( base64_EncodeState* state, char* encoded, size_t /*encodedMaxSize*/ );
+int base64_encodeEnd( base64_EncodeState* state, char* encoded, size_t encodedMaxSize );
 
 
 typedef enum	{
@@ -51,14 +57,14 @@ typedef enum	{
 
 typedef struct
 {
-	base64_DecodeStep step;
-	char plainchar;
+	base64_DecodeStep	step;
+	unsigned char		dataByte;
 } base64_DecodeState;
 
 void base64_initDecodeState( base64_DecodeState* state );
 
-int base64_decodeBlock( base64_DecodeState* state, const char* encoded,
-			size_t codeLength, unsigned char* plain, size_t /*plainMaxSize*/ );
+int base64_decodeBlock( base64_DecodeState* state, const char* encoded, size_t encodedSize,
+			void* data, size_t dataMaxSize );
 
 #ifdef __cplusplus
 }

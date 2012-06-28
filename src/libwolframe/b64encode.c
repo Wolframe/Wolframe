@@ -5,6 +5,7 @@ This is part of the libb64 project, and has been placed in the public domain.
 For details, see http://sourceforge.net/projects/libb64
 */
 
+#include <assert.h>
 #include <base64.h>
 
 static const char* encoding = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -31,68 +32,71 @@ static inline char base64_encodeValue( unsigned char value )
 	return encoding[ value ];
 }
 
-int base64_encodeBlock( base64_EncodeState* state, const unsigned char* plain,
-			size_t plainLength, char* encoded, size_t encodedMaxSize )
+int base64_encodeBlock( base64_EncodeState* state, const void* data, size_t dataSize,
+			char* encoded, size_t encodedMaxSize )
 {
-	const unsigned char* plainByte = plain;
-	const unsigned char* const plainEnd = plain + plainLength;
+	if ( dataSize == 0 )
+		return 0;
+
+	// check if the output buffer is big enough
+	size_t encodedSize = ( dataSize * 4 ) / 3;
+	if ( state->lineLength / 4 )	{
+		unsigned short effLineLength = ( state->lineLength / 4 ) * 4;
+		encodedSize += encodedSize / effLineLength - (( encodedSize % effLineLength ) ? 0 : 1 );
+	}
+	if ( encodedMaxSize < encodedSize )
+		return BUFFER_OVERFLOW;
+
+	const unsigned char* dataByte = data;
+	const unsigned char* const dataEnd = data + dataSize;
 	char* codeChar = encoded;
-	char result;
-	char fragment;
+	unsigned char result;
+	unsigned char fragment;
 
 	result = state->result;
 
 	switch ( state->step )	{
 		while ( 1 )	{
 			case STEP_0:
-				if ( plainByte == plainEnd )	{
+				if ( dataByte == dataEnd )	{
 					state->result = result;
 					state->step = STEP_0;
-					return codeChar - encoded;
+					break;
 				}
-				fragment = *plainByte++;
+				fragment = *dataByte++;
 				result = ( fragment & 0x0fc ) >> 2;
-				if ( encodedMaxSize-- < 1 )
-					return BUFFER_OVERFLOW;
 				*codeChar++ = base64_encodeValue( result );
 				result = ( fragment & 0x003 ) << 4;
 			case STEP_1:
-				if ( plainByte == plainEnd )	{
+				if ( dataByte == dataEnd )	{
 					state->result = result;
 					state->step = STEP_1;
-					return codeChar - encoded;
+					break;
 				}
-				fragment = *plainByte++;
+				fragment = *dataByte++;
 				result |= ( fragment & 0x0f0 ) >> 4;
-				if ( encodedMaxSize-- < 1 )
-					return BUFFER_OVERFLOW;
 				*codeChar++ = base64_encodeValue( result );
 				result = ( fragment & 0x00f ) << 2;
 			case STEP_2:
-				if ( plainByte == plainEnd )	{
+				if ( dataByte == dataEnd )	{
 					state->result = result;
 					state->step = STEP_2;
-					return codeChar - encoded;
+					break;
 				}
-				fragment = *plainByte++;
+				fragment = *dataByte++;
 				result |= ( fragment & 0x0c0 ) >> 6;
-				if ( encodedMaxSize < 2 )
-					return BUFFER_OVERFLOW;
-				encodedMaxSize -= 2;
 				*codeChar++ = base64_encodeValue( result );
 				result  = ( fragment & 0x03f ) >> 0;
 				*codeChar++ = base64_encodeValue( result );
 
 				++( state->stepCount );
 				if ( state->lineLength && state->stepCount == state->lineLength / 4 )	{
-					if ( encodedMaxSize-- < 1 )
-						return BUFFER_OVERFLOW;
 					*codeChar++ = '\n';
 					state->stepCount = 0;
 				}
 		}
 	}
-	/* control should not reach here */
+	assert( encodedSize == codeChar - encoded );
 	return codeChar - encoded;
 }
 

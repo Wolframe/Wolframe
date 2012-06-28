@@ -1338,7 +1338,6 @@ tests/rlib/testrlib1.cpp
 tests/rlib/testrlib2.cpp
 tests/singletonTest.cpp
 tests/SSL/README.txt
-tests/temp/formfunc_luatable_luaparse.lua
 tests/testBoostPath.cpp
 tests/testMethodMemberPointerTemplate.cpp
 tests/testNamedRetVal.cpp

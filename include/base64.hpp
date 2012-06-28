@@ -23,10 +23,10 @@ public:
 		base64_initEncodeState( &m_state, lineLength );
 	}
 
-	int encode( const unsigned char* plain, const int plainLength,
+	int encode( const void* data, size_t dataSize,
 		    char* encoded, size_t encodedMaxSize )
 	{
-		return base64_encodeBlock( &m_state, plain, plainLength, encoded, encodedMaxSize );
+		return base64_encodeBlock( &m_state, data, dataSize, encoded, encodedMaxSize );
 	}
 
 	int encodeEnd( char* encoded, size_t encodedMaxSize )
@@ -38,19 +38,19 @@ public:
 	{
 		unsigned char* plain = new unsigned char[ m_bufferSize ];
 		char* encoded = new char[ 2 * m_bufferSize ];
-		int plainLength;
-		int encodedLength;
+		int dataSize;
+		int encodedSize;
 
 		do	{
 			input.read( (char *)plain, m_bufferSize );
-			plainLength = input.gcount();
+			dataSize = input.gcount();
 			//
-			encodedLength = encode( plain, plainLength, encoded, 2 * m_bufferSize );
-			output.write( encoded, encodedLength );
-		} while ( input.good() && plainLength > 0 );
+			encodedSize = encode( plain, dataSize, encoded, 2 * m_bufferSize );
+			output.write( encoded, encodedSize );
+		} while ( input.good() && dataSize > 0 );
 
-		encodedLength = encodeEnd( encoded, 2 * m_bufferSize );
-		output.write( encoded, encodedLength );
+		encodedSize = encodeEnd( encoded, 2 * m_bufferSize );
+		output.write( encoded, encodedSize );
 		//
 		base64_resetEncodeState( &m_state );
 
@@ -79,31 +79,31 @@ public:
 		base64_initDecodeState( &m_state );
 	}
 
-	int decode( const char* encoded, size_t encodedLength,
-		    unsigned char* plain, size_t plainMaxSize )
+	int decode( const char* encoded, size_t encodedSize,
+		    void* data, size_t dataMaxSize )
 	{
-		return base64_decodeBlock( &m_state, encoded, encodedLength, plain, plainMaxSize );
+		return base64_decodeBlock( &m_state, encoded, encodedSize, data, dataMaxSize );
 	}
 
 	void decode( std::istream& input, std::ostream& output )
 	{
 		char* encoded = new char[ m_bufferSize ];
-		unsigned char* plain = new unsigned char[ m_bufferSize ];
-		int encodedLength;
-		int plainLength;
+		unsigned char* data = new unsigned char[ m_bufferSize ];
+		int encodedSize;
+		int dataSize;
 
 		do
 		{
 			input.read( encoded, m_bufferSize );
-			encodedLength = input.gcount();
-			plainLength = decode( encoded, encodedLength, plain, m_bufferSize );
-			output.write( (const char*)plain, plainLength );
-		} while ( input.good() && encodedLength > 0 );
+			encodedSize = input.gcount();
+			dataSize = decode( encoded, encodedSize, data, m_bufferSize );
+			output.write( (const char*)data, dataSize );
+		} while ( input.good() && encodedSize > 0 );
 
 		base64_initDecodeState( &m_state );
 
 		delete [] encoded;
-		delete [] plain;
+		delete [] data;
 	}
 private:
 	base64_DecodeState	m_state;
