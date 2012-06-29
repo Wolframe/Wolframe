@@ -47,6 +47,8 @@ int base64_encodeBlock( base64_EncodeState* state, const void* data, size_t data
 
 int base64_encodeEnd( base64_EncodeState* state, char* encoded, size_t encodedMaxSize );
 
+size_t base64_encodedSize( size_t dataSize, unsigned short lineLength );
+
 
 typedef enum	{
 	STEP_A,

@@ -25,6 +25,23 @@ void base64_resetEncodeState( base64_EncodeState* state )
 	state->stepCount = 0;
 }
 
+size_t base64_encodedSize( size_t dataSize, unsigned short lineLength )
+{
+	size_t encodedSize = (( dataSize + 2 ) / 3 ) * 4;
+	if ( lineLength / 4 )	{
+		lineLength = ( lineLength / 4 ) * 4;
+		if ( encodedSize && ( encodedSize % lineLength ))
+			encodedSize += encodedSize / lineLength;
+		else	{
+			if ( dataSize % 3 )
+				encodedSize += encodedSize / lineLength - 1;
+			else
+				encodedSize += encodedSize / lineLength;
+		}
+	}
+	return encodedSize;
+}
+
 static inline char base64_encodeValue( unsigned char value )
 {
 	if ( value > 63 )
@@ -35,23 +52,23 @@ static inline char base64_encodeValue( unsigned char value )
 int base64_encodeBlock( base64_EncodeState* state, const void* data, size_t dataSize,
 			char* encoded, size_t encodedMaxSize )
 {
-	if ( dataSize == 0 )
-		return 0;
+	const unsigned char* dataByte;
+	const unsigned char* dataEnd;
+	char* codeChar;
+	unsigned char result;
+	unsigned char fragment;
 
 	// check if the output buffer is big enough
 	size_t encodedSize = ( dataSize * 4 ) / 3;
-	if ( state->lineLength / 4 )	{
-		unsigned short effLineLength = ( state->lineLength / 4 ) * 4;
-		encodedSize += encodedSize / effLineLength - (( encodedSize % effLineLength ) ? 0 : 1 );
-	}
+	if ( state->lineLength / 4 )
+		encodedSize += encodedSize / (( state->lineLength / 4 ) * 4 );
+
 	if ( encodedMaxSize < encodedSize )
 		return BUFFER_OVERFLOW;
 
-	const unsigned char* dataByte = data;
-	const unsigned char* const dataEnd = data + dataSize;
-	char* codeChar = encoded;
-	unsigned char result;
-	unsigned char fragment;
+	dataByte = ( const unsigned char* )data;
+	dataEnd = ( const unsigned char* )data + dataSize;
+	codeChar = encoded;
 
 	result = state->result;
 
@@ -96,7 +113,7 @@ int base64_encodeBlock( base64_EncodeState* state, const void* data, size_t data
 				}
 		}
 	}
-	assert( encodedSize == codeChar - encoded );
+	assert( encodedSize == (size_t)( codeChar - encoded ));
 	return codeChar - encoded;
 }
 

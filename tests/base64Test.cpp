@@ -246,6 +246,15 @@ TEST( Base64, InsufficientBuffer )
 //	EXPECT_STREQ( vector6, buffer );
 //}
 
+TEST( Base64, WhiteSpaces )
+{
+	static const char* whiteSpaces = "  \t\n\rZm9v  YmFy=\r= =\t=\n";
+	char	decoded[ bufSize ];
+
+	int plainLength = strDecode( whiteSpaces, decoded, bufSize );
+	EXPECT_EQ( 6, plainLength );
+	EXPECT_STREQ( vector6, decoded );
+}
 
 TEST( Base64, RandomData )
 {
@@ -255,21 +264,22 @@ TEST( Base64, RandomData )
 	char*		encoded;
 	unsigned char*	decoded;
 
-// Data size: 16815, line length: 7, encoded estimated size: 28024
-// Data size: 12879, line length: 212, encoded estimated size: 17252
-
 	srand( time( NULL ) );
 	dataSize = 1 + rand() % 32768;
-	lineLength = rand() % 512;
-	encodedSize = (( dataSize + 2 ) / 3 ) * 4;
-	if ( lineLength / 4 )	{
-		unsigned short effLineLength = ( lineLength / 4 ) * 4;
-		encodedSize += encodedSize / effLineLength - (( encodedSize % effLineLength ) ? 0 : 1 );
-	}
+	lineLength = rand() % 1024;
 
-	data = new unsigned char[ dataSize ];
-	encoded = new char[ encodedSize ];
-	decoded = new unsigned char[ dataSize ];
+// Data size: 5512, line length: 2, encoded estimated size: 7352
+// Data size: 26504, line length: 126, encoded estimated size: 35624
+// Data size: 18008, line length: 107, encoded estimated size: 24242
+// Data size: 22840, line length: 328, encoded estimated size: 30548
+//	dataSize = 104;
+//	lineLength = 39;
+
+	encodedSize = base64::Encoder::encodedSize( dataSize, lineLength );
+
+	data = new unsigned char[ dataSize + 1 ];
+	encoded = new char[ encodedSize + 1 ];
+	decoded = new unsigned char[ dataSize + 1 ];
 
 	std::cout << "Data size: " << dataSize << ", line length: " << lineLength
 		  << ", encoded estimated size: " << encodedSize << std::endl;

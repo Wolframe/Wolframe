@@ -23,6 +23,16 @@ public:
 		base64_initEncodeState( &m_state, lineLength );
 	}
 
+	static size_t encodedSize( size_t dataSize, unsigned short lineLength )
+	{
+		return base64_encodedSize( dataSize, lineLength );
+	}
+
+	size_t encodedSize( size_t dataSize )
+	{
+		return base64_encodedSize( dataSize, m_state.lineLength );
+	}
+
 	int encode( const void* data, size_t dataSize,
 		    char* encoded, size_t encodedMaxSize )
 	{
