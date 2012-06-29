@@ -54,6 +54,7 @@ public:
 		EndOfMessage,	//< have to yield processing because end of message reached
 		Error		//< have to stop processing with an error
 	};
+
 	///\brief Default constructor
 	InputFilter()
 		:m_state(Open){}

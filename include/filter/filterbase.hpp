@@ -69,16 +69,16 @@ public:
 	///\param [in] msg (optional) error to set
 	void setError( const char* msg=0);
 
-	///\brief Get a member value of the filter
+	///\brief Get a member value of the filter. Throws on conversion error
 	///\param [in] name case sensitive name of the variable
 	///\param [in] val buffer for the value returned
-	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* /*name*/, std::string& /*val*/) const	{return false;}
+	///\return true on success, false, if the variable does not exist or we have to yield (check state)
+	virtual bool getValue( const char* /*name*/, std::string& /*val*/)		{return false;}
 
-	///\brief Set a member value of the filter
+	///\brief Set a member value of the filter. Throws on conversion error
 	///\param [in] name case sensitive name of the variable
 	///\param [in] val new value of the variable to set
-	///\return true on success, false, if the variable does not exist or the operation failed
+	///\return true on success, false, if the variable does not exist or we have to yield (check state)
 	virtual bool setValue( const char* /*name*/, const std::string& /*val*/)	{return false;}
 
 private:

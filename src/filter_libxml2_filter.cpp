@@ -3,6 +3,7 @@
 #endif
 #include "filter/libxml2_filter.hpp"
 #include "filter/bufferingfilter.hpp"
+#include "filter/doctype.hpp"
 #include <cstddef>
 #include <cstring>
 #include <vector>
@@ -69,23 +70,40 @@ public:
 		:m_writerbuf(o.m_writerbuf)
 		,m_writer(o.m_writer){}
 
-	DocumentWriter( const char* encoding)
+	bool init( const char* encoding, bool standalone)
 	{
 		xmlBufferPtr bb = xmlBufferCreate();
-		if (bb)
+		if (!bb) return false;
+
+		m_writerbuf = boost::shared_ptr<xmlBuffer>( bb, xmlBufferFree);
+		xmlTextWriterPtr ww = xmlNewTextWriterMemory( bb, 0);
+		if (!ww) return false;
+
+		m_writer = boost::shared_ptr<xmlTextWriter>( ww, xmlFreeTextWriter);
+		if (0>xmlTextWriterStartDocument( ww, "1.0", encoding, (standalone?"yes":"no")))
 		{
-			m_writerbuf = boost::shared_ptr<xmlBuffer>( bb, xmlBufferFree);
-			xmlTextWriterPtr ww = xmlNewTextWriterMemory( bb, 0);
-			if (ww)
+			m_writer.reset();
+			m_writerbuf.reset();
+			return false;
+		}
+		return true;
+	}
+
+	DocumentWriter( const char* encoding, const char* doctype, const char* publicid, const char* systemid)
+	{
+		if (init( encoding, false))
+		{
+			xmlTextWriterPtr ww = m_writer.get();
+			if (0>xmlTextWriterStartDTD( ww, (const xmlChar*)doctype, (const xmlChar*)publicid, (const xmlChar*)systemid))
 			{
-				m_writer = boost::shared_ptr<xmlTextWriter>( ww, xmlFreeTextWriter);
-				if (0>xmlTextWriterStartDocument( ww, "1.0", encoding, "yes"))
-				{
-					m_writer.reset();
-					m_writerbuf.reset();
-				}
+				xmlTextWriterEndDTD(ww);
 			}
 		}
+	}
+
+	DocumentWriter( const char* encoding)
+	{
+		init( encoding, true);
 	}
 
 	xmlTextWriterPtr get() const
@@ -126,7 +144,11 @@ struct InputFilterImpl :public InputFilter
 		,m_propvalues(o.m_propvalues)
 		,m_withEmpty(o.m_withEmpty)
 		,m_elembuf(o.m_elembuf)
-		,m_encoding(o.m_encoding){}
+		,m_encoding(o.m_encoding)
+		,m_doctype_root(o.m_doctype_root)
+		,m_doctype_public(o.m_doctype_public)
+		,m_doctype_system(o.m_doctype_system)
+		{}
 
 	///\brief Implements InputFilter::copy()
 	virtual InputFilter* copy() const
@@ -135,12 +157,25 @@ struct InputFilterImpl :public InputFilter
 	}
 
 	///\brief Implements FilterBase::getValue(const char*,std::string&)
-	virtual bool getValue( const char* name, std::string& val) const
+	virtual bool getValue( const char* name, std::string& val)
 	{
 		if (std::strcmp( name, "empty") == 0)
 		{
 			val = m_withEmpty?"true":"false";
 			return true;
+		}
+		if (std::strcmp( name, "doctype") == 0)
+		{
+			DocType doctype;
+			if (getDocType( doctype))
+			{
+				val = doctype.tostring();
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		return InputFilter::getValue( name, val);
 	}
@@ -180,12 +215,29 @@ struct InputFilterImpl :public InputFilter
 			setState( Error, err->message);
 		}
 		m_node = xmlDocGetRootElement( m_doc.get());
+		xmlDtdPtr dtd = (xmlDtdPtr)m_node->parent;
+		if (dtd && dtd->type)
+		{
+			m_doctype_root = getElementString( dtd->name);
+			m_doctype_public = getElementString( dtd->ExternalID);
+			m_doctype_system = getElementString( dtd->SystemID);
+		}
+
 		const xmlChar* ec = m_doc.get()->encoding;
 		m_encoding.reset( new std::string);
 		for (int ii=0; ec[ii]!=0; ii++)
 		{
 			m_encoding->push_back((unsigned char)ec[ii]);
 		}
+	}
+
+	bool getDocType( DocType& doctype)
+	{
+		if (!m_doc.get()) return false;
+		doctype.rootid = m_doctype_root.size()?m_doctype_root.c_str():0;
+		doctype.publicid = m_doctype_public.size()?m_doctype_public.c_str():0;
+		doctype.systemid = m_doctype_system.size()?m_doctype_system.c_str():0;
+		return true;
 	}
 
 	///\brief implement interface member InputFilter::getNext( typename FilterBase::ElementType&,const void*&,std::size_t&)
@@ -291,6 +343,11 @@ struct InputFilterImpl :public InputFilter
 	}
 
 private:
+	std::string getElementString( const xmlChar* str)
+	{
+		return str?std::string( (const char*)str, xmlStrlen(str) * sizeof(*str)):std::string();
+	}
+
 	void getElement( const void*& element, std::size_t& elementsize, const xmlChar* str)
 	{
 		if (!str)
@@ -314,6 +371,9 @@ private:
 	bool m_withEmpty;
 	std::string m_elembuf;
 	CountedReference<std::string> m_encoding;
+	std::string m_doctype_root;
+	std::string m_doctype_public;
+	std::string m_doctype_system;
 };
 
 
@@ -345,6 +405,23 @@ public:
 		return new OutputFilterImpl( *this);
 	}
 
+	///\brief Implements FilterBase::setValue(const char*,const std::string&)
+	virtual bool setValue( const char* name, const std::string& value)
+	{
+		if (std::strcmp( name, "doctype") == 0)
+		{
+			DocType doctype( value);
+			if (doctype.rootid)
+			{
+				m_doctype_root = doctype.rootid;
+				if (doctype.publicid) m_doctype_public = doctype.publicid;
+				if (doctype.systemid) m_doctype_system = doctype.systemid;
+			}
+			return true;
+		}
+		return OutputFilter::setValue( name, value);
+	}
+
 	///\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize)
 	{
@@ -354,7 +431,14 @@ public:
 		if (!xmlout)
 		{
 			const char* ec = m_encoding.get()?m_encoding.get()->c_str():"UTF-8";
-			m_doc = DocumentWriter( ec);
+			if (m_doctype_root.size())
+			{
+				m_doc = DocumentWriter( ec, m_doctype_root.c_str(), m_doctype_public.c_str(), m_doctype_system.c_str());
+			}
+			else
+			{
+				m_doc = DocumentWriter( ec);
+			}
 			xmlout = m_doc.get();
 			if (!xmlout)
 			{
@@ -498,6 +582,9 @@ private:
 	std::string m_valuestrbuf;
 	std::string m_elembuf;
 	std::size_t m_elemitr;
+	std::string m_doctype_root;
+	std::string m_doctype_public;
+	std::string m_doctype_system;
 };
 
 }//end anonymous namespace
