@@ -52,6 +52,8 @@ namespace textwolf {
 template <class BufferType>
 struct XMLPrinterBase
 {
+	typedef void (*PrintDoctype)( void* obj, const char* rootid, const char* publicid, const char* systemid, BufferType& buf);
+	typedef void (*PrintHeader)( void* obj, bool standalone, BufferType& buf);
 	typedef bool (*PrintProc)( void* obj, const char* elemptr, std::size_t elemsize, BufferType& buf);
 	typedef bool (*PrintProcEmpty)( void* obj, BufferType& buf);
 	typedef void* (*CopyObj)( void* obj);
@@ -59,6 +61,8 @@ struct XMLPrinterBase
 
 	struct MethodTable
 	{
+		PrintDoctype m_printDoctype;
+		PrintHeader m_printHeader;
 		PrintProc m_printOpenTag;
 		PrintProcEmpty m_printCloseTag;
 		PrintProc m_printAttribute;
@@ -66,8 +70,8 @@ struct XMLPrinterBase
 		DeleteObj m_del;
 		CopyObj m_copy;
 
-		MethodTable()				:m_printOpenTag(0),m_printCloseTag(0),m_printAttribute(0),m_printValue(0),m_del(0),m_copy(0){}
-		MethodTable( const MethodTable& o)	:m_printOpenTag(o.m_printOpenTag),m_printCloseTag(o.m_printCloseTag),m_printAttribute(o.m_printAttribute),m_printValue(o.m_printValue),m_del(o.m_del),m_copy(o.m_copy){}
+		MethodTable()				:m_printDoctype(0),m_printHeader(0),m_printOpenTag(0),m_printCloseTag(0),m_printAttribute(0),m_printValue(0),m_del(0),m_copy(0){}
+		MethodTable( const MethodTable& o)	:m_printDoctype(o.m_printDoctype),m_printHeader(o.m_printHeader),m_printOpenTag(o.m_printOpenTag),m_printCloseTag(o.m_printCloseTag),m_printAttribute(o.m_printAttribute),m_printValue(o.m_printValue),m_del(o.m_del),m_copy(o.m_copy){}
 	};
 
 	static void parseEncoding( std::string& dest, const std::string& src)
@@ -201,27 +205,61 @@ private:
 			IOCharset::print( (textwolf::UChar)(unsigned char)ch, buf);
 		}
 
-		void printHeader( BufferType& buf)
+		void printHeader( bool standalone, BufferType& buf)
 		{
+			if (m_state != Init) throw std::logic_error( "printing document not starting with xml header");
 			std::string enc = m_attributes.getEncoding();
 			printToBuffer( "<?xml version=\"1.0\" encoding=\"", 30, buf);
 			printToBuffer( enc.c_str(), enc.size(), buf);
-			printToBuffer( "\" standalone=\"yes\"?>\n", 21, buf);
+			if (standalone)
+			{
+				printToBuffer( "\" standalone=\"yes\"?>\n", 21, buf);
+			}
+			else
+			{
+				printToBuffer( "\"?>\n", 4, buf);
+			}
 			m_state = Content;
+		}
+
+		void printDoctype( const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
+		{
+			if (rootid)
+			{
+				if (publicid)
+				{
+					if (!systemid) throw std::logic_error("defined DOCTYPE with PUBLIC id but no SYSTEM id");
+					printToBuffer( "<!DOCTYPE \"", 11, buf);
+					printToBuffer( rootid, std::strlen( rootid), buf);
+					printToBuffer( "\" PUBLIC \"", 10, buf);
+					printToBuffer( publicid, std::strlen( publicid), buf);
+					printToBuffer( "\" SYSTEM \"", 10, buf);
+					printToBuffer( systemid, std::strlen( systemid), buf);
+					printToBuffer( "\"!>\n", 4, buf);
+				}
+				else if (systemid)
+				{
+					printToBuffer( "<!DOCTYPE \"", 11, buf);
+					printToBuffer( rootid, std::strlen( rootid), buf);
+					printToBuffer( "\" SYSTEM \"", 10, buf);
+					printToBuffer( systemid, std::strlen( systemid), buf);
+					printToBuffer( "\"!>\n", 4, buf);
+				}
+				else
+				{
+					printToBuffer( "<!DOCTYPE \"", 11, buf);
+					printToBuffer( rootid, std::strlen( rootid), buf);
+					printToBuffer( "\"!>\n", 4, buf);
+				}
+			}
 		}
 
 		void exitTagContext( BufferType& buf)
 		{
 			if (m_state != Content)
 			{
-				if (m_state == Init)
-				{
-					printHeader( buf);
-				}
-				else
-				{
-					printToBuffer( '>', buf);
-				}
+				if (m_state == Init) throw std::runtime_error( "printed xml without root element");
+				printToBuffer( '>', buf);
 				m_state = Content;
 			}
 		}
@@ -299,7 +337,6 @@ private:
 			return true;
 		}
 
-	private:
 		enum State
 		{
 			Init,
@@ -307,6 +344,12 @@ private:
 			TagAttribute,
 			TagElement
 		};
+
+		State state() const
+		{
+			return m_state;
+		}
+	private:
 		State m_state;					//< output state
 		BufferType m_buf;				//< element output  buffer
 		TagStack m_tagstack;				//< tag name stack of open tags
@@ -324,6 +367,18 @@ public:
 		This* obj = (This*)obj_;
 		This* rt = new This( *obj);
 		return rt;
+	}
+
+	static void printHeader( void* obj_, bool standalone, BufferType& buf)
+	{
+		This* obj = (This*)obj_;
+		obj->printHeader( standalone, buf);
+	}
+
+	static void printDoctype( void* obj_, const char* rootid, const char* publicid, const char* systemid, BufferType& buf)
+	{
+		This* obj = (This*)obj_;
+		obj->printDoctype( rootid, publicid, systemid, buf);
 	}
 
 	static bool printOpenTag( void* obj_, const char* src, std::size_t srcsize, BufferType& buf)
@@ -357,6 +412,8 @@ public:
 
 	static void* create( MethodTable& mt, const XMLAttributes& a)
 	{
+		mt.m_printDoctype = printDoctype;
+		mt.m_printHeader = printHeader;
 		mt.m_printOpenTag = printOpenTag;
 		mt.m_printCloseTag = printCloseTag;
 		mt.m_printAttribute = printAttribute;
@@ -368,10 +425,13 @@ public:
 
 	static void* copy( MethodTable& mt, void* obj)
 	{
+		mt.m_printDoctype = printDoctype;
+		mt.m_printHeader = printHeader;
 		mt.m_printOpenTag = printOpenTag;
 		mt.m_printCloseTag = printCloseTag;
 		mt.m_printAttribute = printAttribute;
 		mt.m_printValue = printValue;
+		mt.m_copy = copyObj;
 		mt.m_del = deleteObj;
 		return copyObj( obj);
 	}
@@ -401,9 +461,32 @@ public:
 		if (m_obj) m_mt.m_del( m_obj);
 	}
 
+	void setDocumentType( const char* rootid, const char* publicid, const char* systemid)
+	{
+		m_doctype_root = rootid?rootid:"";
+		m_doctype_public = publicid?publicid:"";
+		m_doctype_system = systemid?systemid:"";
+	}
+
 	bool printOpenTag( const char* src, std::size_t srcsize, BufferType& buf)
 	{
-		if (!m_obj) if (!createPrinter()) return false;
+		if (!m_obj)
+		{
+			if (!createPrinter()) return false;
+			if (m_doctype_root.size())
+			{
+				if (srcsize != m_doctype_root.size() || std::memcmp( m_doctype_root.c_str(), src, srcsize) != 0)
+				{
+					throw std::runtime_error( "printed document root does not match to DOCTYPE");
+				}
+				m_mt.m_printHeader( m_obj, false, buf);
+				m_mt.m_printDoctype( m_obj, m_doctype_root.c_str(), m_doctype_public.size()?m_doctype_public.c_str():0, m_doctype_system.size()?m_doctype_system.c_str():0, buf);
+			}
+			else
+			{
+				m_mt.m_printHeader( m_obj, true, buf);
+			}
+		}
 		return m_mt.m_printOpenTag( m_obj, src, srcsize, buf);
 	}
 
@@ -425,6 +508,7 @@ public:
 		return m_mt.m_printValue( m_obj, src, srcsize, buf);
 	}
 
+private:
 	bool createPrinter()
 	{
 		std::string enc;
@@ -475,9 +559,12 @@ public:
 private:
 	typedef typename XMLPrinterBase<BufferType>::MethodTable MethodTable;
 
-	MethodTable m_mt;				//< method table of m_obj
-	void* m_obj;					//< pointer to parser objecct
-	XMLAttributes m_attributes;			//< xml encoding
+	MethodTable m_mt;			//< method table of m_obj
+	void* m_obj;				//< pointer to parser objecct
+	XMLAttributes m_attributes;		//< xml encoding
+	std::string m_doctype_root;		//< document type definition root element
+	std::string m_doctype_public;		//< document type public identifier
+	std::string m_doctype_system;		//< document type system URI of validation schema
 };
 
 } //namespace

@@ -202,6 +202,9 @@ public:
 		HeaderAttribName,			//< tag attribute name in the XML header
 		HeaderAttribValue,			//< tag attribute value in the XML header
 		HeaderEnd,				//< end of XML header event (after parsing '?&gt;')
+		DocAttribStart,				//< Start of a document attribute definition
+		DocAttribValue,				//< document attribute value in a DOCTYPE or ENTITY definition
+		DocAttribEnd,				//< end of a document attribute definition <! .. !>
 		TagAttribName,				//< tag attribute name (e.g. "id" in &lt;person id='5'&gt;
 		TagAttribValue,				//< tag attribute value (e.g. "5" in &lt;person id='5'&gt;
 		OpenTag,				//< open tag (e.g. "bla" for "&lt;bla...")
@@ -220,7 +223,7 @@ public:
 	///\return XML element type as string
 	static const char* getElementTypeName( ElementType ee)
 	{
-		static const char* names[ NofElementTypes] = {0,"ErrorOccurred","HeaderStart","HeaderAttribName","HeaderAttribValue","HeaderEnd","TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
+		static const char* names[ NofElementTypes] = {0,"ErrorOccurred","HeaderStart","HeaderAttribName","HeaderAttribValue","HeaderEnd", "DocAttribStart", "DocAttribValue", "DocAttribEnd", "TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
 		return names[ (unsigned int)ee];
 	}
 
@@ -229,6 +232,7 @@ public:
 	enum Error
 	{
 		Ok,					//< no error, everything is OK
+		ErrIllegalDocumentAttributeDef,		//< error in document attribute or entity definition
 		ErrExpectedOpenTag,			//< expected an open tag in this state
 		ErrExpectedXMLTag,			//< expected an <?xml tag in this state
 		ErrUnexpectedEndOfText,			//< unexpected end of text in the middle of the XML definition
@@ -249,9 +253,9 @@ public:
 	///\return the error code as string
 	static const char* getErrorString( Error ee)
 	{
-		enum {NofErrors=15};
+		enum {NofErrors=16};
 		static const char* sError[NofErrors]
-			= {0,"ExpectedOpenTag", "ExpectedXMLTag","UnexpectedEndOfText",
+			= {0,"IllegalDocumentAttributeDef", "ExpectedOpenTag", "ExpectedXMLTag","UnexpectedEndOfText",
 				"OutputBufferTooSmall","SyntaxToken","StringNotTerminated",
 				"UndefinedCharacterEntity","ExpectedTagEnd",
 				"ExpectedEqual", "ExpectedTagAttribute","ExpectedCDATATag","Internal",
@@ -266,7 +270,7 @@ public:
 	{
 		START, STARTTAG, XTAG, PITAG, PITAGEND, XTAGEND, XTAGEOLN, XTAGDONE, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE,
 		CONTENT, TOKEN, XMLTAG, OPENTAG, CLOSETAG, TAGCLSK, TAGAISK, TAGANAM, TAGAESK, TAGAVSK, TAGAVID, TAGAVSQ, TAGAVDQ, TAGAVQE,
-		TAGCLIM, ENTITYSL, ENTITY, ENTITYLC, CDATA, CDATA1, CDATA2, CDATA3, EXIT
+		TAGCLIM, ENTITYSL, ENTITY, ENTITYE, ENTITYID, ENTITYSQ, ENTITYDQ, ENTITYLC, CDATA, CDATA1, CDATA2, CDATA3, EXIT
 	};
 
 	///\brief Get the scanner state machine state as string
@@ -274,7 +278,7 @@ public:
 	///\return the state as string
 	static const char* getStateString( STMState s)
 	{
-		enum Constant {NofStates=39};
+		enum Constant {NofStates=43};
 		static const char* sState[NofStates]
 		= {
 			"START", "STARTTAG", "XTAG", "PITAG", "PITAGEND",
@@ -283,8 +287,9 @@ public:
 			"XTAGAVQE", "CONTENT", "TOKEN", "XMLTAG", "OPENTAG",
 			"CLOSETAG", "TAGCLSK", "TAGAISK", "TAGANAM", "TAGAESK",
 			"TAGAVSK", "TAGAVID", "TAGAVSQ", "TAGAVDQ", "TAGAVQE",
-			"TAGCLIM", "ENTITYSL", "ENTITY", "ENTITYLC", "CDATA",
-			"CDATA1", "CDATA2", "CDATA3", "EXIT"
+			"TAGCLIM", "ENTITYSL", "ENTITY", "ENTITYE", "ENTITYID",
+			"ENTITYSQ", "ENTITYDQ",  "ENTITYLC", "CDATA", "CDATA1",
+			"CDATA2", "CDATA3", "EXIT"
 		};
 		return sState[(unsigned int)s];
 	}
@@ -357,7 +362,11 @@ public:
 			[ TAGAVQE  ](EndOfLine,Cntrl,Space,TAGAISK)(Slash,TAGCLIM)(Gt,CONTENT).miss(ErrExpectedTagAttribute)
 			[ TAGCLIM  ].action(Return,CloseTagIm)(EndOfLine)(Cntrl)(Space)(Gt,CONTENT).miss(ErrExpectedTagEnd)
 			[ ENTITYSL ](Osb,CDATA).fallback(ENTITY)
-			[ ENTITY   ](Gt,CONTENT)(Osb,ENTITYLC).other( ENTITY)
+			[ ENTITY   ].action(Return,DocAttribStart)(Exclam,ENTITYE)(EndOfLine)(Cntrl)(Space)(Sq,ENTITYSQ)(Osb,ENTITYLC).miss(ErrIllegalDocumentAttributeDef)
+			[ ENTITYE  ].action(Return,DocAttribEnd)(Gt,CONTENT).miss(ErrIllegalDocumentAttributeDef)
+			[ ENTITYID ].action(ReturnIdentifier,DocAttribValue)(EndOfLine,Cntrl,Space,ENTITY)(Exclam,ENTITYE).miss(ErrIllegalDocumentAttributeDef)
+			[ ENTITYSQ ].action(ReturnSQString,DocAttribValue)(Sq,ENTITY).miss(ErrStringNotTerminated)
+			[ ENTITYDQ ].action(ReturnDQString,DocAttribValue)(Dq,ENTITY).miss(ErrStringNotTerminated)
 			[ ENTITYLC ](Csb,ENTITY).other( ENTITYLC)
 			[ CDATA    ].action(ExpectIdentifierCDATA)(Osb,CDATA1).miss(ErrExpectedCDATATag)
 			[ CDATA1   ](Csb,CDATA2).other(CDATA1)

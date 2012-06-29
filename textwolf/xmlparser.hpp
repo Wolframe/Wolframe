@@ -163,10 +163,12 @@ public:
 		,m_srcsize(0)
 		,m_srceof(false)
 		,m_obj(0)
-		,m_attrEncoding(false)
+		,m_headerAttrType(None)
 		,m_withEmpty(true)
 		,m_doTokenize(false)
+		,m_standalone(false)
 		,m_attributes(a)
+		,m_doctype_state(0)
 	{
 		m_obj = XMLParserObject<XmlHdrSrcIterator,BufferType,charset::UTF8,charset::UTF8>::create( m_mt);
 	}
@@ -178,10 +180,15 @@ public:
 		,m_srceof(o.m_srceof)
 		,m_mt(o.m_mt)
 		,m_obj(0)
-		,m_attrEncoding(o.m_attrEncoding)
+		,m_headerAttrType(o.m_headerAttrType)
 		,m_withEmpty(o.m_withEmpty)
 		,m_doTokenize(o.m_doTokenize)
+		,m_standalone(o.m_standalone)
 		,m_attributes(o.m_attributes)
+		,m_doctype_state(o.m_doctype_state)
+		,m_doctype_root(o.m_doctype_root)
+		,m_doctype_public(o.m_doctype_public)
+		,m_doctype_system(o.m_doctype_system)
 	{
 		if (o.m_obj)
 		{
@@ -206,6 +213,33 @@ public:
 		return rt;
 	}
 
+	const std::string& getDoctypeRoot() const
+	{
+		return m_doctype_root;
+	}
+
+	const std::string& getDoctypePublic() const
+	{
+		return m_doctype_public;
+	}
+
+	const std::string& getDoctypeSystem() const
+	{
+		return m_doctype_system;
+	}
+
+	enum State
+	{
+		ParseHeader,			//< parsing the XML header section
+		ParseDoctype,			//< parsing DOCTYPE definition if available
+		ParseSource			//< parsing the XML content section
+	};
+
+	State state() const
+	{
+		return m_state;
+	}
+
 	bool doTokenize() const
 	{
 		return m_doTokenize;
@@ -216,6 +250,11 @@ public:
 		bool rt = m_doTokenize;
 		if (m_obj) m_mt.m_setFlag( m_obj, DoTokenize, m_doTokenize = val);
 		return rt;
+	}
+
+	bool isStandalone() const
+	{
+		return m_standalone;
 	}
 
 	void putInput( const char* ptr, std::size_t size, bool end)
@@ -246,15 +285,45 @@ public:
 					}
 					else if (elemtype == XMLScannerBase::HeaderAttribName)
 					{
-						m_attrEncoding = (elemsize == 8 && std::memcmp( elemptr, "encoding", 8) == 0);
+						if (elemsize == 8 && std::memcmp( elemptr, "encoding", 8) == 0)
+						{
+							m_headerAttrType = Encoding;
+						}
+						else if (elemsize == 7 && std::memcmp( elemptr, "version", 7) == 0)
+						{
+							m_headerAttrType = Version;
+						}
+						else if (elemsize == 10 && std::memcmp( elemptr, "standalone", 8) == 0)
+						{
+							m_headerAttrType = Standalone;
+						}
+						else
+						{
+							m_headerAttrType = None;
+						}
 						continue;
 					}
 					else if (elemtype == XMLScannerBase::HeaderAttribValue)
 					{
-						if (m_attrEncoding)
+						switch (m_headerAttrType)
 						{
-							std::string enc( elemptr, elemsize);
-							m_attributes.setEncoding( enc);
+							case None: throw std::runtime_error( "unknown attribute name in xml header");
+							case Standalone:
+								if (elemsize == 3 && std::memcmp( elemptr, "yes", 3) == 0)
+								{
+									m_standalone = true;
+									break;
+								}
+								else
+								{
+									m_standalone = false;
+									break;
+								}
+							case Version:
+								break;
+							case Encoding:
+								m_attributes.setEncoding( std::string( elemptr, elemsize));
+								break;
 						}
 						continue;
 					}
@@ -269,8 +338,8 @@ public:
 						}
 						else
 						{
-							m_state = ParseSource;
-							continue;
+							m_state = m_standalone?ParseSource:ParseDoctype;
+							break;
 						}
 					}
 					else
@@ -281,6 +350,90 @@ public:
 						break;
 					}
 
+				case ParseDoctype:
+					if (elemtype == XMLScannerBase::DocAttribStart)
+					{
+						m_doctype_state = 1;
+					}
+					else if (elemtype == XMLScannerBase::DocAttribValue)
+					{
+						if (m_doctype_state == 1)
+						{
+							if (elemsize == 7 && std::memcmp( elemptr, "DOCTYPE", elemsize))
+							{
+								m_doctype_state = 2;
+								continue;
+							}
+							else
+							{
+								// ... other than DOCTYPE definitions are not of interest
+								m_doctype_state = 0;
+								continue;
+							}
+						}
+						else if (m_doctype_state == 2)
+						{
+							m_doctype_root.clear();
+							m_doctype_root.append( (const char*)elemptr, elemsize);
+							m_doctype_state = 3;
+							continue;
+						}
+						else if (m_doctype_state == 3)
+						{
+							if (elemsize == 6 && std::memcmp( elemptr, "PUBLIC", elemsize))
+							{
+								m_doctype_state = 4;
+								continue;
+							}
+							else if (elemsize == 6 && std::memcmp( elemptr, "SYSTEM", elemsize))
+							{
+								m_doctype_state = 5;
+								continue;
+							}
+							else
+							{
+								elemptr = "error in xml <!DOCTYPE definition";
+								elemsize = std::strlen( elemptr);
+								elemtype = XMLScannerBase::ErrorOccurred;
+								break;
+							}
+						}
+						else if (m_doctype_state == 4)
+						{
+							m_doctype_public.clear();
+							m_doctype_public.append( (const char*)elemptr, elemsize);
+							m_doctype_state = 5;
+							continue;
+						}
+						else if (m_doctype_state == 5)
+						{
+							m_doctype_system.clear();
+							m_doctype_system.append( (const char*)elemptr, elemsize);
+							m_doctype_state = 6;
+							continue;
+						}
+					}
+					else if (elemtype == XMLScannerBase::DocAttribEnd)
+					{
+						if (m_doctype_state < 4 && m_doctype_state != 0)
+						{
+							elemptr = "error in xml <!DOCTYPE definition";
+							elemsize = std::strlen( elemptr);
+							elemtype = XMLScannerBase::ErrorOccurred;
+							break;
+						}
+						m_state = ParseSource;
+						m_doctype_state = 0;
+						elemtype = XMLScannerBase::DocAttribEnd;
+						elemptr = "";
+						elemsize = 0;
+						break;
+					}
+					else
+					{
+						throw std::runtime_error( "missing DOCTYPE declaration in a non standalone xml document");
+					}
+					/* no break here */
 				case ParseSource:
 					if (elemtype == XMLScannerBase::Content && !m_withEmpty)
 					{
@@ -345,21 +498,28 @@ private:
 		return m_obj;
 	}
 private:
-	enum State
-	{
-		ParseHeader,			//< parsing the XML header section
-		ParseSource			//< parsing the XML content section
-	};
 	State m_state;				//< parser section parsing state
 	const char* m_src;			//< pointer to source chunk
 	std::size_t m_srcsize;			//< size of source chunk
 	bool m_srceof;				//< end of input reached
 	MethodTable m_mt;			//< method table of m_obj
 	void* m_obj;				//< pointer to parser objecct
-	bool m_attrEncoding;			//< flag used in state 'ParseHeader': true, if last atrribute parsed was 'encoding'
+	enum HeaderAttribType
+	{
+		None,
+		Version,
+		Encoding,
+		Standalone
+	};
+	HeaderAttribType m_headerAttrType;	//< flag used in state 'ParseHeader', marks the last attribute name parsed
 	bool m_withEmpty;			//< do produce empty tokens (containing only spaces)
 	bool m_doTokenize;			//< do tokenize (whitespace sequences as delimiters)
+	bool m_standalone;			//< true if there is no document scema defintion
 	XMLAttributes m_attributes;		//< defines a method to call when the XML encoding has been detected
+	int m_doctype_state;			//< parser doctype section parsing state
+	std::string m_doctype_root;		//< document type definition root element
+	std::string m_doctype_public;		//< document type public identifier
+	std::string m_doctype_system;		//< document type system URI of validation schema
 };
 
 } //namespace
