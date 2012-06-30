@@ -18,8 +18,14 @@
 # - docin		input document name
 # - docout		output document name
 #
+filterlist="xml:textwolf"
 csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4LE UCS-4BE"
-for cset in $csetlist		# character set encoding name
+for filter in $filterlist
 do
-	. ./output_tst.sh
+	for cset in $csetlist		# character set encoding name
+	do
+		inputfilter="$filter"
+		outputfilter="$filter"
+		. ./output_tst.sh
+	done
 done

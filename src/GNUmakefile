@@ -162,6 +162,8 @@ wolframed$(EXE): libwolframe
 wolframed$(EXE): wolframed.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
+wolfilter$(EXE): libwolframe
+
 wolfilter$(EXE): wolfilter.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 

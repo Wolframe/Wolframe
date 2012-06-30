@@ -18,6 +18,8 @@
 # - testscripts		list of scripts of the test
 # - docin		input document name
 # - docout		output document name
+# - inputfilter		input filter name
+# - outputfilter	output filter name
 #
 output="../data/$testname.$cset.tst"
 rm -f $output
@@ -27,7 +29,7 @@ echo '**' >> $output
 echo '**input' >> $output
 cat doc/$docin.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
 echo '**config' >> $output
-echo $testcmd >> $output
+echo "--input-filter $inputfilter --output-filter $outputfilter $testcmd" >> $output
 for script in $testscripts
 do
 	echo "**file: $script" >> $output
