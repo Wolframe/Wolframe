@@ -28,6 +28,8 @@ do
 	inputfilter="$filter"
 	outputfilter="$filter"
 	. ./output_tst.sh
+	echo "echo executing test $testname $cset" >> ../../testWolfilter.sh
+	echo "cat wolfilter/template/doc/$docin.UTF-8.xml | sed 's/UTF-8/$cset/' | recode UTF-8..$cset | ../wtest/cleanInput BOM EOLN | ../src/wolfilter `echo --input-filter $inputfilter --output-filter $outputfilter $testcmd | sed 's@--form @--form wolfilter/scripts/@' | sed 's@--script @--script wolfilter/scripts/@'` > temp/$docout.$cset.xml" >> ../../testWolfilter.sh
 done
 
 filter="xml:libxml2"
@@ -37,4 +39,6 @@ do
 	inputfilter="$filter"
 	outputfilter="$filter"
 	. ./output_tst.sh
+	echo "echo executing test $testname $cset" >> ../../testWolfilter.sh
+	echo "cat wolfilter/template/doc/$docin.UTF-8.xml | sed 's/UTF-8/$cset/' | recode UTF-8..$cset | ../wtest/cleanInput BOM EOLN | ../src/wolfilter `echo --input-filter $inputfilter --output-filter $outputfilter $testcmd | sed 's@--form @--form wolfilter/scripts/@' | sed 's@--script @--script wolfilter/scripts/@'` > temp/$docout.$cset.xml" >> ../../testWolfilter.sh
 done
