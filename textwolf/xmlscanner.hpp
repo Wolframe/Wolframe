@@ -202,7 +202,6 @@ public:
 		HeaderAttribName,			//< tag attribute name in the XML header
 		HeaderAttribValue,			//< tag attribute value in the XML header
 		HeaderEnd,				//< end of XML header event (after parsing '?&gt;')
-		DocAttribStart,				//< Start of a document attribute definition
 		DocAttribValue,				//< document attribute value in a DOCTYPE or ENTITY definition
 		DocAttribEnd,				//< end of a document attribute definition <! .. !>
 		TagAttribName,				//< tag attribute name (e.g. "id" in &lt;person id='5'&gt;
@@ -223,7 +222,7 @@ public:
 	///\return XML element type as string
 	static const char* getElementTypeName( ElementType ee)
 	{
-		static const char* names[ NofElementTypes] = {0,"ErrorOccurred","HeaderStart","HeaderAttribName","HeaderAttribValue","HeaderEnd", "DocAttribStart", "DocAttribValue", "DocAttribEnd", "TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
+		static const char* names[ NofElementTypes] = {0,"ErrorOccurred","HeaderStart","HeaderAttribName","HeaderAttribValue","HeaderEnd", "DocAttribValue", "DocAttribEnd", "TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
 		return names[ (unsigned int)ee];
 	}
 
@@ -269,7 +268,7 @@ public:
 	enum STMState
 	{
 		START, STARTTAG, XTAG, PITAG, PITAGEND, XTAGEND, XTAGEOLN, XTAGDONE, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE,
-		CONTENT, TOKEN, XMLTAG, OPENTAG, CLOSETAG, TAGCLSK, TAGAISK, TAGANAM, TAGAESK, TAGAVSK, TAGAVID, TAGAVSQ, TAGAVDQ, TAGAVQE,
+		CONTENT, TOKEN, SEEKTOK, XMLTAG, OPENTAG, CLOSETAG, TAGCLSK, TAGAISK, TAGANAM, TAGAESK, TAGAVSK, TAGAVID, TAGAVSQ, TAGAVDQ, TAGAVQE,
 		TAGCLIM, ENTITYSL, ENTITY, ENTITYE, ENTITYID, ENTITYSQ, ENTITYDQ, ENTITYLC, CDATA, CDATA1, CDATA2, CDATA3, EXIT
 	};
 
@@ -278,18 +277,18 @@ public:
 	///\return the state as string
 	static const char* getStateString( STMState s)
 	{
-		enum Constant {NofStates=43};
+		enum Constant {NofStates=44};
 		static const char* sState[NofStates]
 		= {
 			"START", "STARTTAG", "XTAG", "PITAG", "PITAGEND",
 			"XTAGEND", "XTAGEOLN", "XTAGDONE", "XTAGAISK", "XTAGANAM",
 			"XTAGAESK", "XTAGAVSK", "XTAGAVID", "XTAGAVSQ", "XTAGAVDQ",
-			"XTAGAVQE", "CONTENT", "TOKEN", "XMLTAG", "OPENTAG",
-			"CLOSETAG", "TAGCLSK", "TAGAISK", "TAGANAM", "TAGAESK",
-			"TAGAVSK", "TAGAVID", "TAGAVSQ", "TAGAVDQ", "TAGAVQE",
-			"TAGCLIM", "ENTITYSL", "ENTITY", "ENTITYE", "ENTITYID",
-			"ENTITYSQ", "ENTITYDQ",  "ENTITYLC", "CDATA", "CDATA1",
-			"CDATA2", "CDATA3", "EXIT"
+			"XTAGAVQE", "CONTENT", "TOKEN", "SEEKTOK", "XMLTAG",
+			"OPENTAG", "CLOSETAG", "TAGCLSK", "TAGAISK", "TAGANAM",
+			"TAGAESK", "TAGAVSK", "TAGAVID", "TAGAVSQ", "TAGAVDQ",
+			"TAGAVQE", "TAGCLIM", "ENTITYSL", "ENTITY", "ENTITYE",
+			"ENTITYID", "ENTITYSQ", "ENTITYDQ",  "ENTITYLC", "CDATA",
+			"CDATA1", "CDATA2", "CDATA3", "EXIT"
 		};
 		return sState[(unsigned int)s];
 	}
@@ -348,6 +347,7 @@ public:
 				[ TOKEN    ].action(ReturnContent,Content)(EndOfText,EXIT)(EndOfLine,Cntrl,Space,CONTENT)(Lt,XMLTAG).fallback(CONTENT);
 			}
 			(*this)
+			[ SEEKTOK  ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,XMLTAG).fallback(TOKEN)
 			[ XMLTAG   ](EndOfLine)(Cntrl)(Space)(Questm,PITAG)(Slash,CLOSETAG).fallback(OPENTAG)
 			[ OPENTAG  ].action(ReturnIdentifier,OpenTag)(EndOfLine,Cntrl,Space,TAGAISK)(Slash,TAGCLIM)(Gt,CONTENT).miss(ErrExpectedTagAttribute)
 			[ CLOSETAG ].action(ReturnIdentifier,CloseTag)(EndOfLine,Cntrl,Space,TAGCLSK)(Gt,CONTENT).miss(ErrExpectedTagEnd)
@@ -362,9 +362,9 @@ public:
 			[ TAGAVQE  ](EndOfLine,Cntrl,Space,TAGAISK)(Slash,TAGCLIM)(Gt,CONTENT).miss(ErrExpectedTagAttribute)
 			[ TAGCLIM  ].action(Return,CloseTagIm)(EndOfLine)(Cntrl)(Space)(Gt,CONTENT).miss(ErrExpectedTagEnd)
 			[ ENTITYSL ](Osb,CDATA).fallback(ENTITY)
-			[ ENTITY   ].action(Return,DocAttribStart)(Exclam,ENTITYE)(EndOfLine)(Cntrl)(Space)(Sq,ENTITYSQ)(Osb,ENTITYLC).miss(ErrIllegalDocumentAttributeDef)
-			[ ENTITYE  ].action(Return,DocAttribEnd)(Gt,CONTENT).miss(ErrIllegalDocumentAttributeDef)
-			[ ENTITYID ].action(ReturnIdentifier,DocAttribValue)(EndOfLine,Cntrl,Space,ENTITY)(Exclam,ENTITYE).miss(ErrIllegalDocumentAttributeDef)
+			[ ENTITY   ](Gt,ENTITYE)(EndOfLine)(Cntrl)(Space)(Dq,ENTITYDQ)(Sq,ENTITYSQ)(Osb,ENTITYLC).fallback(ENTITYID)
+			[ ENTITYE  ].action(Return,DocAttribEnd).fallback(SEEKTOK)
+			[ ENTITYID ].action(ReturnIdentifier,DocAttribValue)(EndOfLine,Cntrl,Space,ENTITY)(Gt,ENTITYE).miss(ErrIllegalDocumentAttributeDef)
 			[ ENTITYSQ ].action(ReturnSQString,DocAttribValue)(Sq,ENTITY).miss(ErrStringNotTerminated)
 			[ ENTITYDQ ].action(ReturnDQString,DocAttribValue)(Dq,ENTITY).miss(ErrStringNotTerminated)
 			[ ENTITYLC ](Csb,ENTITY).other( ENTITYLC)

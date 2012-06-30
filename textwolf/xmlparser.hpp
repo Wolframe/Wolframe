@@ -312,18 +312,18 @@ public:
 								if (elemsize == 3 && std::memcmp( elemptr, "yes", 3) == 0)
 								{
 									m_standalone = true;
-									break;
+									continue;
 								}
 								else
 								{
 									m_standalone = false;
-									break;
+									continue;
 								}
 							case Version:
-								break;
+								continue;
 							case Encoding:
 								m_attributes.setEncoding( std::string( elemptr, elemsize));
-								break;
+								continue;
 						}
 						continue;
 					}
@@ -351,43 +351,41 @@ public:
 					}
 
 				case ParseDoctype:
-					if (elemtype == XMLScannerBase::DocAttribStart)
+					if (elemtype == XMLScannerBase::DocAttribValue)
 					{
-						m_doctype_state = 1;
-					}
-					else if (elemtype == XMLScannerBase::DocAttribValue)
-					{
-						if (m_doctype_state == 1)
+						if (m_doctype_state == 0)
 						{
-							if (elemsize == 7 && std::memcmp( elemptr, "DOCTYPE", elemsize))
+							if (elemsize == 7 && std::memcmp( elemptr, "DOCTYPE", elemsize) == 0)
 							{
-								m_doctype_state = 2;
+								m_doctype_root.clear();
+								m_doctype_public.clear();
+								m_doctype_system.clear();
+								m_doctype_state = 1;
 								continue;
 							}
 							else
 							{
 								// ... other than DOCTYPE definitions are not of interest
-								m_doctype_state = 0;
+								m_doctype_state = 5;
 								continue;
 							}
+						}
+						else if (m_doctype_state == 1)
+						{
+							m_doctype_root.append( (const char*)elemptr, elemsize);
+							m_doctype_state = 2;
+							continue;
 						}
 						else if (m_doctype_state == 2)
 						{
-							m_doctype_root.clear();
-							m_doctype_root.append( (const char*)elemptr, elemsize);
-							m_doctype_state = 3;
-							continue;
-						}
-						else if (m_doctype_state == 3)
-						{
-							if (elemsize == 6 && std::memcmp( elemptr, "PUBLIC", elemsize))
+							if (elemsize == 6 && std::memcmp( elemptr, "PUBLIC", elemsize) == 0)
 							{
-								m_doctype_state = 4;
+								m_doctype_state = 3;
 								continue;
 							}
-							else if (elemsize == 6 && std::memcmp( elemptr, "SYSTEM", elemsize))
+							else if (elemsize == 6 && std::memcmp( elemptr, "SYSTEM", elemsize) == 0)
 							{
-								m_doctype_state = 5;
+								m_doctype_state = 4;
 								continue;
 							}
 							else
@@ -398,24 +396,22 @@ public:
 								break;
 							}
 						}
-						else if (m_doctype_state == 4)
+						else if (m_doctype_state == 3)
 						{
-							m_doctype_public.clear();
 							m_doctype_public.append( (const char*)elemptr, elemsize);
-							m_doctype_state = 5;
+							m_doctype_state = 4;
 							continue;
 						}
-						else if (m_doctype_state == 5)
+						else if (m_doctype_state == 4)
 						{
-							m_doctype_system.clear();
 							m_doctype_system.append( (const char*)elemptr, elemsize);
-							m_doctype_state = 6;
+							m_doctype_state = 5;
 							continue;
 						}
 					}
 					else if (elemtype == XMLScannerBase::DocAttribEnd)
 					{
-						if (m_doctype_state < 4 && m_doctype_state != 0)
+						if (m_doctype_state < 5)
 						{
 							elemptr = "error in xml <!DOCTYPE definition";
 							elemsize = std::strlen( elemptr);
