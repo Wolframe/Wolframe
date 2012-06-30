@@ -321,7 +321,7 @@ static int function__LuaObject__index( lua_State* ls)
 		std::string val;
 		if (!obj->getValue( key, val))
 		{
-			return lua_getmetatable( ls, 1)?1:0;
+			if (lua_getmetatable( ls, 1)) return 1;
 		}
 		if (rt)
 		{
@@ -377,6 +377,7 @@ static int function__LuaObject__newindex( lua_State* ls)
 		}
 		if (!obj->setValue( key, val))
 		{
+			if (lua_getmetatable( ls, 1)) return 1;
 			throw std::runtime_error( "unknown element name");
 		}
 		return 0;
@@ -933,15 +934,53 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 
 
 
+LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
+{
+	Input* input = LuaObject<Input>::getSelf( ls, "input", "doctype");
+	check_parameters( ls, 1, 0, LUA_TUSERDATA);
+
+	if (!input->inputfilter().get())
+	{
+		lua_pushnil( ls);
+		return 1;
+	}
+	{
+		std::string doctype;
+		if (input->inputfilter()->getDocType( doctype))
+		{
+			LuaExceptionHandlerScope escope(ls);
+			{
+				lua_pushlstring( ls, doctype.c_str(), doctype.size());
+				return 1;
+			}
+
+		}
+	}
+	lua_yieldk( ls, 0, 1, function_input_doctype);
+	return 0;
+}
+
+
+
 LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 {
-	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");
-	check_parameters( ls, 1, 1, LUA_TUSERDATA);
-
-	Filter* filter = LuaObject<Filter>::get( ls, 2);
-	if (!filter)
+	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");	//< self argument (mandatory)
+	Filter* filter;								//< 1st argument (mandatory)
+	const char* doctype = 0;						//< 2nd argument (optional)
+	switch (lua_gettop( ls))
 	{
-		throw std::runtime_error( "filter object expected as first argument");
+		case 3:
+			doctype = lua_tostring( ls, 3);
+			if (!doctype) throw std::runtime_error( "string expected as second argument");
+			/*no break here!*/
+		case 2:
+			filter = LuaObject<Filter>::get( ls, 2);
+			if (!filter) throw std::runtime_error( "filter object expected as first argument");
+			break;
+		case 1:
+			throw std::runtime_error( "too few arguments");
+		default:
+			throw std::runtime_error( "too many arguments");
 	}
 	OutputFilter* ff = 0;
 	if (filter->outputfilter().get())
@@ -950,6 +989,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 		if (output->outputfilter().get())
 		{
 			ff->assignState( *output->outputfilter());
+			if (doctype) ff->setDocType( doctype);
 		}
 	}
 	else
@@ -1053,10 +1093,11 @@ static const luaL_Reg logger_methodtable[ 2] =
 	{0,0}
 };
 
-static const luaL_Reg input_methodtable[ 4] =
+static const luaL_Reg input_methodtable[ 5] =
 {
 	{"as",&function_input_as},
 	{"table",&function_input_table},
+	{"doctype",function_input_doctype},
 	{"get",&function_input_get},
 	{0,0}
 };

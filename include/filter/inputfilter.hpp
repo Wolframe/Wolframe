@@ -37,6 +37,7 @@ Project Wolframe.
 #include "countedReference.hpp"
 #include "filter/filterbase.hpp"
 #include <string>
+#include <stdexcept>
 
 namespace _Wolframe {
 namespace langbind {
@@ -94,8 +95,17 @@ public:
 	///\param [out] element pointer to element returned
 	///\param [out] elementsize size of the element returned
 	///\return true, if success, false, if not.
-	///\remark Check the state when false is returned
+	///\remark Check the filter state when false is returned
 	virtual bool getNext( ElementType& type, const void*& element, std::size_t& elementsize)=0;
+
+	///\brief Get type of the document
+	///\param [out] doctype the document type string returned
+	///\return true, if success, false, if not.
+	///\remark Check the filter state when false is returned
+	virtual bool getDocType( std::string& /*doctype*/)
+	{
+		throw std::runtime_error("document type not defined for this type of filter");
+	}
 
 	///\brief Get the current state
 	///\return the current state

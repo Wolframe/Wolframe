@@ -164,20 +164,22 @@ struct InputFilterImpl :public InputFilter
 			val = m_withEmpty?"true":"false";
 			return true;
 		}
-		if (std::strcmp( name, "doctype") == 0)
-		{
-			DocType doctype;
-			if (getDocType( doctype))
-			{
-				val = doctype.tostring();
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
 		return InputFilter::getValue( name, val);
+	}
+
+	///\brief Implements FilterBase::getDocType(std::string&)
+	virtual bool getDocType( std::string& val)
+	{
+		DocType doctype;
+		if (getDocType( doctype))
+		{
+			val = doctype.tostring();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	///\brief Implements FilterBase::setValue(const char*,const std::string&)
@@ -405,21 +407,16 @@ public:
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Implements FilterBase::setValue(const char*,const std::string&)
-	virtual bool setValue( const char* name, const std::string& value)
+	///\brief Implementation of OutputFilter::setDocType( const std::string&)
+	virtual void setDocType( const std::string& value)
 	{
-		if (std::strcmp( name, "doctype") == 0)
+		DocType doctype( value);
+		if (doctype.rootid)
 		{
-			DocType doctype( value);
-			if (doctype.rootid)
-			{
-				m_doctype_root = doctype.rootid;
-				if (doctype.publicid) m_doctype_public = doctype.publicid;
-				if (doctype.systemid) m_doctype_system = doctype.systemid;
-			}
-			return true;
+			m_doctype_root = doctype.rootid;
+			if (doctype.publicid) m_doctype_public = doctype.publicid;
+			if (doctype.systemid) m_doctype_system = doctype.systemid;
 		}
-		return OutputFilter::setValue( name, value);
 	}
 
 	///\brief Implementation of OutputFilter::print( ElementType, const void*,std::size_t)

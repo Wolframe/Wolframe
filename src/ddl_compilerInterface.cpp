@@ -44,11 +44,12 @@ using namespace ddl;
 
 StructType CompilerInterface::compileFile( const std::string& filename) const
 {
-	std::ifstream inFile( filename.c_str());
-	inFile.exceptions( std::ifstream::failbit | std::ifstream::badbit);
 	std::ostringstream src;
+	std::ifstream inFile( filename.c_str());
 	try
 	{
+		inFile.exceptions( std::ifstream::failbit | std::ifstream::badbit);
+
 		while (inFile)
 		{
 			std::string ln;
@@ -56,8 +57,9 @@ StructType CompilerInterface::compileFile( const std::string& filename) const
 			std::getline( inFile, ln);
 			src << ln << "\n";
 		}
+		return compile( src.str());
 	}
-	catch (std::ifstream::failure& e)
+	catch (const std::ifstream::failure& e)
 	{
 		if (!(inFile.rdstate() & std::ifstream::eofbit))
 		{
@@ -66,7 +68,16 @@ StructType CompilerInterface::compileFile( const std::string& filename) const
 			msg << "error '" << e.what() << "' reading file '" << filename << "'" << std::endl;
 			throw std::runtime_error( msg.str());
 		}
+		else
+		{
+			return compile( src.str());
+		}
 	}
-	return compile( src.str());
+	catch (const std::exception& e)
+	{
+		std::ostringstream msg;
+		msg << "error '" << e.what() << "' loading file '" << filename << "'" << std::endl;
+		throw std::runtime_error( msg.str());
+	}
 }
 

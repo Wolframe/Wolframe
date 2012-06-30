@@ -162,6 +162,7 @@ public:
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srceof(false)
+		,m_srcofs(0)
 		,m_obj(0)
 		,m_headerAttrType(None)
 		,m_withEmpty(true)
@@ -178,6 +179,7 @@ public:
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srceof(o.m_srceof)
+		,m_srcofs(o.m_srcofs)
 		,m_mt(o.m_mt)
 		,m_obj(0)
 		,m_headerAttrType(o.m_headerAttrType)
@@ -267,7 +269,7 @@ public:
 
 	std::size_t getPosition() const
 	{
-		return m_obj?m_mt.m_getPosition( m_obj):0;
+		return m_obj?(m_mt.m_getPosition( m_obj)+m_srcofs):0;
 	}
 
 	XMLScannerBase::ElementType getNext( const char*& elemptr, std::size_t& elemsize)
@@ -449,11 +451,10 @@ private:
 	{
 		std::string enc;
 		parseEncoding( enc, m_attributes.getEncoding());
-		std::size_t pos = 0;
 
 		if (m_obj)
 		{
-			pos = getPosition();
+			m_srcofs = getPosition();
 			m_mt.m_del( m_obj);
 			m_obj = 0;
 		}
@@ -490,7 +491,7 @@ private:
 		{
 			m_obj = XMLParserObject<SrcIterator,BufferType,charset::UCS4LE,charset::UTF8>::create( m_mt);
 		}
-		if (m_obj) putInput( m_src+pos, m_srcsize-pos, m_srceof);
+		if (m_obj) putInput( m_src+m_srcofs, m_srcsize-m_srcofs, m_srceof);
 		return m_obj;
 	}
 private:
@@ -498,6 +499,7 @@ private:
 	const char* m_src;			//< pointer to source chunk
 	std::size_t m_srcsize;			//< size of source chunk
 	bool m_srceof;				//< end of input reached
+	std::size_t m_srcofs;			//< offset for current position calculation
 	MethodTable m_mt;			//< method table of m_obj
 	void* m_obj;				//< pointer to parser objecct
 	enum HeaderAttribType

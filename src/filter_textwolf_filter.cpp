@@ -103,20 +103,22 @@ struct InputFilterImpl:public InputFilter
 			val = m_parser.doTokenize();
 			return true;
 		}
-		if (std::strcmp( name, "doctype") == 0)
-		{
-			DocType doctype;
-			if (getDocType( doctype))
-			{
-				val = doctype.tostring();
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
 		return Parent::getValue( name, val);
+	}
+
+	///\brief Implementation of InputFilter::getDocType(std::string&)
+	virtual bool getDocType( std::string& val)
+	{
+		DocType doctype;
+		if (getDocType( doctype))
+		{
+			val = doctype.tostring();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
@@ -236,27 +238,35 @@ private:
 	///\remark Check the state when false is returned
 	bool getDocType( DocType& doctype)
 	{
-		const char* ee;
-		std::size_t eesize;
-		for (;;) switch (m_parser.state())
+		try
 		{
-			case XMLParser::ParseHeader:
-				if (!m_parser.getNext( ee, eesize)) return false;
-				if (m_parser.isStandalone()) return true;
-				continue;
-
-			case XMLParser::ParseDoctype:
-				if (!m_parser.getNext( ee, eesize)) return false;
-				continue;
-
-			case XMLParser::ParseSource:
+			const char* ee;
+			std::size_t eesize;
+			for (;;) switch (m_parser.state())
 			{
-				doctype.rootid = m_parser.getDoctypeRoot().size()?m_parser.getDoctypeRoot().c_str():0;
-				doctype.publicid = m_parser.getDoctypePublic().size()?m_parser.getDoctypePublic().c_str():0;
-				doctype.systemid = m_parser.getDoctypeSystem().size()?m_parser.getDoctypeSystem().c_str():0;
-				return true;
+				case XMLParser::ParseHeader:
+					if (!m_parser.getNext( ee, eesize)) return false;
+					if (m_parser.isStandalone()) return true;
+					continue;
+
+				case XMLParser::ParseDoctype:
+					if (!m_parser.getNext( ee, eesize)) return false;
+					continue;
+
+				case XMLParser::ParseSource:
+				{
+					doctype.rootid = m_parser.getDoctypeRoot().size()?m_parser.getDoctypeRoot().c_str():0;
+					doctype.publicid = m_parser.getDoctypePublic().size()?m_parser.getDoctypePublic().c_str():0;
+					doctype.systemid = m_parser.getDoctypeSystem().size()?m_parser.getDoctypeSystem().c_str():0;
+					return true;
+				}
 			}
 		}
+		catch (textwolf::SrcIterator::EoM)
+		{
+			setState( EndOfMessage);
+			return false;
+		};
 	}
 
 private:
@@ -313,21 +323,11 @@ struct OutputFilterImpl :public OutputFilter
 		return false;
 	}
 
-	void setDocType( const DocType& doctype)
+	///\brief Implementation of OutputFilter::setDocType( const std::string&)
+	virtual void setDocType( const std::string& value)
 	{
+		DocType doctype( value);
 		m_printer.setDocumentType( doctype.rootid, doctype.publicid, doctype.systemid);
-	}
-
-	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
-	virtual bool setValue( const char* name, const std::string& value)
-	{
-		if (std::strcmp( name, "doctype") == 0)
-		{
-			DocType doctype( value);
-			setDocType( doctype);
-			return true;
-		}
-		return Parent::setValue( name, value);
 	}
 
 	///\brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
