@@ -70,7 +70,6 @@ static char* nextid( char*& pp, std::string::const_iterator& cc, const std::stri
 		{
 			if (ee != cc) ++cc;
 			*pp++ = '\0';
-/*[-]*/std::cout << "PARSE DOCTYPE '" << std::string( baseptr) << "'" << std::endl;
 			return baseptr;
 		}
 		else

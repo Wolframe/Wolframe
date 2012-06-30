@@ -132,6 +132,7 @@ struct InputFilterImpl :public InputFilter
 		,m_value(0)
 		,m_prop(0)
 		,m_propvalues(0)
+		,m_taglevel(0)
 		,m_withEmpty(false)
 		,m_encoding(e){}
 
@@ -142,6 +143,7 @@ struct InputFilterImpl :public InputFilter
 		,m_value(o.m_value)
 		,m_prop(o.m_prop)
 		,m_propvalues(o.m_propvalues)
+		,m_taglevel(o.m_taglevel)
 		,m_withEmpty(o.m_withEmpty)
 		,m_elembuf(o.m_elembuf)
 		,m_encoding(o.m_encoding)
@@ -275,13 +277,26 @@ struct InputFilterImpl :public InputFilter
 		{
 			if (m_nodestk.empty())
 			{
-				m_doc = DocumentReader();
-				rt = false;
+				if (m_taglevel >= 0)
+				{
+					m_taglevel -= 1;
+					m_doc = DocumentReader();
+					elementsize = 0;
+					type = InputFilter::CloseTag;
+					rt = true;
+				}
+				else
+				{
+					setState( Error, "illegal state - get next called after end of document");
+					rt = false;
+				}
 			}
 			else
 			{
 				m_node = m_nodestk.back();
 				m_nodestk.pop_back();
+				m_taglevel -= 1;
+				elementsize = 0;
 				type = InputFilter::CloseTag;
 				rt = true;
 			}
@@ -298,6 +313,7 @@ struct InputFilterImpl :public InputFilter
 				m_nodestk.push_back( m_node->next);
 				getElement( element, elementsize, m_node->name);
 				m_node = m_node->children;
+				m_taglevel += 1;
 				break;
 
 			case XML_ATTRIBUTE_NODE:
@@ -369,6 +385,7 @@ private:
 	xmlChar* m_value;
 	xmlAttr* m_prop;
 	xmlNode* m_propvalues;
+	int m_taglevel;
 	std::vector<xmlNode*> m_nodestk;
 	bool m_withEmpty;
 	std::string m_elembuf;
