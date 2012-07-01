@@ -1,7 +1,38 @@
+/************************************************************************
+
+ Copyright (C) 2011 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
+//
 // base64.hpp - c++ wrapper for base64 functions
 //
-// Adapted from the libb64 project (http://sourceforge.net/projects/libb64)
-// for the Wolframe project
 
 #ifndef _BASE64_HPP_INCLUDED
 #define _BASE64_HPP_INCLUDED
@@ -36,12 +67,12 @@ public:
 	int encode( const void* data, size_t dataSize,
 		    char* encoded, size_t encodedMaxSize )
 	{
-		return base64_encodeBlock( &m_state, data, dataSize, encoded, encodedMaxSize );
+		return base64_encodeChunk( &m_state, data, dataSize, encoded, encodedMaxSize );
 	}
 
 	int encodeEnd( char* encoded, size_t encodedMaxSize )
 	{
-		return base64_encodeEnd( &m_state, encoded, encodedMaxSize );
+		return base64_encodeEndChunk( &m_state, encoded, encodedMaxSize );
 	}
 
 	void encode( std::istream& input, std::ostream& output )
@@ -49,18 +80,18 @@ public:
 		unsigned char* plain = new unsigned char[ m_bufferSize ];
 		char* encoded = new char[ 2 * m_bufferSize ];
 		int dataSize;
-		int encodedSize;
+		int codedSize;
 
 		do	{
 			input.read( (char *)plain, m_bufferSize );
 			dataSize = input.gcount();
 			//
-			encodedSize = encode( plain, dataSize, encoded, 2 * m_bufferSize );
-			output.write( encoded, encodedSize );
+			codedSize = encode( plain, dataSize, encoded, 2 * m_bufferSize );
+			output.write( encoded, codedSize );
 		} while ( input.good() && dataSize > 0 );
 
-		encodedSize = encodeEnd( encoded, 2 * m_bufferSize );
-		output.write( encoded, encodedSize );
+		codedSize = encodeEnd( encoded, 2 * m_bufferSize );
+		output.write( encoded, codedSize );
 		//
 		base64_resetEncodeState( &m_state );
 
@@ -92,7 +123,7 @@ public:
 	int decode( const char* encoded, size_t encodedSize,
 		    void* data, size_t dataMaxSize )
 	{
-		return base64_decodeBlock( &m_state, encoded, encodedSize, data, dataMaxSize );
+		return base64_decodeChunk( &m_state, encoded, encodedSize, data, dataMaxSize );
 	}
 
 	void decode( std::istream& input, std::ostream& output )
