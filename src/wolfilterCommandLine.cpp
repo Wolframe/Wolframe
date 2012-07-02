@@ -60,6 +60,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 		( "input,f", po::value<std::string>(), "specify input file to process by path" )
 		( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 		( "form,r", po::value< std::vector<std::string> >(), "specify form to load by path" )
+		( "function,t", po::value< std::vector<std::string> >(), "specify form to form function (transaction)" )
 		( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
 		( "cmd", po::value<std::string>(), "name of the command to execute")
 		( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
@@ -103,6 +104,23 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 			}
 			formparam.formname = utils::getFileStem( formparam.filename);
 			m_forms.push_back( formparam);
+		}
+	}
+	if (vmap.count( "function"))
+	{
+		std::vector<std::string> functions = vmap["function"].as<std::vector<std::string> >();
+		std::vector<std::string>::const_iterator itr=functions.begin(), end=functions.end();
+		for (; itr != end; ++itr)
+		{
+			PeerFormFunctionParam pfp;
+			std::vector<std::string> pp;
+			utils::splitString( pp, *itr, ":");
+			if (pp.size() != 4) throw std::runtime_error( "function definition expected as <name>:<function>:<in-form>:<out-form>");
+			pfp.name = pp[0];
+			pfp.functionname = pp[1];
+			pfp.inputformname = pp[2];
+			pfp.outputformname = pp[3];
+			m_peerformfunctions.push_back( pfp);
 		}
 	}
 	if (vmap.count( "script")) m_scripts = vmap["script"].as<std::vector<std::string> >();
@@ -172,7 +190,7 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath) 
 		}
 	}
 	{
-		std::vector<WolfilterCommandLine::FormParam>::const_iterator itr,end;
+		std::vector<FormParam>::const_iterator itr,end;
 		itr = forms().begin();
 		end = forms().end();
 		for (; itr != end; ++itr)
@@ -187,20 +205,28 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath) 
 			{
 				ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
 				std::string error;
-				if (!ci->compileFile( formpath, *form, error))
-				{
-					throw std::runtime_error( error);
-				}
-				else
-				{
-					gct->defineForm( itr->formname, form);
-				}
+				*form = ci->compileFile( formpath);
+				gct->defineForm( itr->formname, form);
 			}
 		}
 	}
+	{
+		std::vector<PeerFormFunctionParam>::const_iterator itr,end;
+		itr = peerformfunctions().begin();
+		end = peerformfunctions().end();
+		for (; itr != end; ++itr)
+		{
+			langbind::PeerFunction pf;
+			langbind::DDLForm inform;
+			langbind::DDLForm outform;
+
+			if (!gct->getPeerFunction( itr->functionname, pf)) throw std::runtime_error( "transaction function not found");
+			if (!gct->getForm( itr->inputformname, inform)) throw std::runtime_error( "parameter description of transaction function not found");
+			if (!gct->getForm( itr->outputformname, outform)) throw std::runtime_error( "return value description of transaction function not found");
+
+			gct->definePeerFormFunction( itr->name, langbind::PeerFormFunction( pf, inform, outform));
+		}
+	}
 }
-
-
-
 
 

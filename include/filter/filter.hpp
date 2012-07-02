@@ -74,9 +74,10 @@ public:
 	///\return true on success, false, if the variable does not exist or the operation failed
 	bool setValue( const char* name, const std::string& value)
 	{
-		if (m_inputfilter.get() && m_inputfilter->setValue( name, value)) return true;
-		if (m_outputfilter.get() && m_outputfilter->setValue( name, value)) return true;
-		return false;
+		bool rt = false;
+		if (m_inputfilter.get() && m_inputfilter->setValue( name, value)) rt = true;
+		if (m_outputfilter.get() && m_outputfilter->setValue( name, value)) rt = true;
+		return rt;
 	}
 protected:
 	InputFilterR m_inputfilter;

@@ -42,6 +42,9 @@ std::string getCanonicalPath( const std::string& path, const std::string& refpat
 ///\brief Split the string by spaces, treating subsequent spaces as one space
 void splitStringBySpaces( std::vector<std::string>& res, const std::string& inp);
 
+///\brief Split the string, ingoring empty parts
+void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchr);
+
 }}//namespace
 
 /// Temporary, till libboost 1.42 support goes away

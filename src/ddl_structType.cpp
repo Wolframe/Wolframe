@@ -153,6 +153,14 @@ void StructType::defineAsVector( const StructType& prototype_)
 	m_elem.push_back( Element( std::string(), prototype_));
 }
 
+void StructType::defineAsAtomic( const AtomicType& tp)
+{
+	if (m_contentType == Vector) throw std::logic_error( "element already defined as vector");
+	if (m_elem.size()) throw std::logic_error( "element already initialized as non empty structure. cannot redefine type anymore");
+	m_value = tp;
+	m_contentType = Atomic;
+}
+
 void StructType::push()
 {
 	REQUIRE(Vector);
@@ -161,13 +169,15 @@ void StructType::push()
 
 StructType& StructType::back()
 {
-	REQUIRE(Vector);
+	if (m_contentType == Atomic) throw std::logic_error( "not defined as vector or structure");
+	if (m_contentType == Vector && m_elem.size() <= 1) throw std::runtime_error( "no last element defined");
 	return m_elem.back().second;
 }
 
 const StructType& StructType::back() const
 {
-	REQUIRE(Vector);
+	if (m_contentType == Atomic) throw std::logic_error( "not defined as vector or structure");
+	if (m_contentType == Vector && m_elem.size() <= 1) throw std::runtime_error( "no last element defined");
 	return m_elem.back().second;
 }
 

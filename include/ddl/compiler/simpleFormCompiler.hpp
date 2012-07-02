@@ -35,10 +35,6 @@ Project Wolframe.
 #ifndef _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
 #define _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
 #include <string>
-#include <vector>
-#include <map>
-#include <cstddef>
-#include <cstring>
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 
@@ -50,8 +46,8 @@ class SimpleFormCompiler :public CompilerInterface
 public:
 	SimpleFormCompiler() :CompilerInterface( "simpleform") {}
 
-	///\brief Compile a source from a string. See CompilerInterface::compile( const std::string&,StructType&,std::string&)
-	virtual bool compile( const std::string& srcstring, StructType& result, std::string& error) const;
+	///\brief Compile a source from a string. See CompilerInterface::compile( const std::string&) const
+	virtual StructType compile( const std::string& srcstring) const;
 };
 
 }}

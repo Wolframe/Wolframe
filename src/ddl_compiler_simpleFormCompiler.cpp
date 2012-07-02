@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file ddl_compiler_SimpleFormCompiler.cpp
-///\brief implementation of a compiler for a self defined form DDL called 'simple form DDL'
+///\brief Implementation of a compiler for a self defined form DDL called 'simple form DDL'
 
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include <string>
@@ -252,7 +252,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 			FRMAttribute fa( itr->first, itr->second.data());
 			if (fa.type() == FRMAttribute::form_)
 			{
-				throw std::runtime_error( "Semantic error: Form declared as empty and with default value");
+				throw std::runtime_error( "Semantic error: illegal type specifier");
 			}
 			AtomicType at( (AtomicType::Type)fa.type());
 			at.set( fa.value());
@@ -306,21 +306,13 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 	}
 }
 
-
-bool SimpleFormCompiler::compile( const std::string& srcstring, StructType& result_, std::string& error_) const
+StructType SimpleFormCompiler::compile( const std::string& srcstring) const
 {
-	try
-	{
-		std::istringstream src( srcstring);
-		boost::property_tree::ptree pt;
-		boost::property_tree::info_parser::read_info( src, pt);
-		compile_ptree( pt, result_);
-		return true;
-	}
-	catch (const std::runtime_error& e)
-	{
-		error_ = e.what();
-	}
-	return false;
+	StructType rt;
+	std::istringstream src( srcstring);
+	boost::property_tree::ptree pt;
+	boost::property_tree::info_parser::read_info( src, pt);
+	compile_ptree( pt, rt);
+	return rt;
 }
 

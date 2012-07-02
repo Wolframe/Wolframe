@@ -90,9 +90,14 @@ int main( int argc, char **argv )
 		std::cerr << "out of memory in wolfilter" << std::endl;
 		return 1;
 	}
-	catch (const std::exception& e)
+	catch (const std::runtime_error& e)
 	{
 		std::cerr << e.what() << std::endl;
+		return 2;
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "exception " << e.what() << std::endl;
 		return 2;
 	}
 	return 0;

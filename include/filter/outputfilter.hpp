@@ -104,6 +104,14 @@ public:
 	///\return true, on success, false, if failed
 	virtual bool print( ElementType type, const void* element, std::size_t elementsize)=0;
 
+	///\brief Set type of the document.
+	///\remark For some types of filters (non buffering) the type has to be set before the first print
+	///\param [in] doctype the document type string
+	virtual void setDocType( const std::string& /*doctype*/)
+	{
+		throw std::runtime_error("document type can not be set for this type of filter");
+	}
+
 	///\brief Print the follow element to the buffer
 	///\param [in] type type of element to print
 	///\param [in] element content of element to print

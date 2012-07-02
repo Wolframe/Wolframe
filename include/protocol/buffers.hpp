@@ -51,35 +51,54 @@ namespace protocol {
 
 ///
 ///\class Buffer
-///\brief Constant size single byte (ASCII) character buffer that implements a subset of the std::string interface
+///\brief Constant size byte (ASCII) character buffer that implements a subset of the std::string interface
 ///\remark The buffer implements the STL back insertion sequence interface required by the protocol parser.
 ///
 class Buffer
 {
 private:
-	std::size_t m_pos;			///< current cursor position of the buffer (number of added characters)
-	std::size_t m_size;			///< current cursor position of the buffer (number of added characters)
-	char* m_buf;				///< buffer content
+	std::size_t m_pos;				//< current fill size the buffer in bytes
+	std::size_t m_size;				//< size of the buffer in bytes
+	char* m_buf;					//< buffer content
 	bool m_allocated;
 
 public:
-	///\brief Constructor
-	Buffer( std::size_t n)			:m_pos(0),m_size(n),m_buf(new char[n]),m_allocated(true) {}
-	///\brief Constructor
-	Buffer( char* b, std::size_t n)		:m_pos(0),m_size(n),m_buf(b),m_allocated(false) {}
-	~Buffer()				{if (m_allocated) delete [] m_buf;}
+	///\brief Default constructor
+	Buffer()					:m_pos(0),m_size(0),m_buf(0),m_allocated(false){}
 
-	Buffer& operator=( const Buffer& o)	{if (m_size < o.m_pos) throw std::logic_error("assignement not possible"); std::memmove( m_buf, o.m_buf, m_pos=o.m_pos); return *this;}
+	///\brief Constructor allocating the buffer
+	///\param[in] n size of buffer memory area in bytes
+	explicit Buffer( std::size_t n)			:m_pos(0),m_size(n),m_buf(new char[n]),m_allocated(true) {}
+
+	///\brief Constructor getting the buffer memory passed
+	///\param[in] b pointer to buffer memory area
+	///\param[in] n size of buffer memory area in bytes
+	Buffer( char* b, std::size_t n)			:m_pos(0),m_size(n),m_buf(b),m_allocated(false) {}
+
+	///\brief Destructor
+	~Buffer()					{if (m_allocated) delete [] m_buf;}
+
+	///\brief Recreate buffer getting the buffer memory passed
+	///\param[in] b pointer to buffer memory area
+	///\param[in] n size of buffer memory area in bytes
+	void init( char* b, std::size_t n)		{if (m_allocated) delete [] m_buf; m_pos=0; m_size=n; m_buf=b; m_allocated=false;}
+
+	///\brief Recreate buffer allocating the buffer
+	///\param[in] n size of buffer memory area in bytes
+	void init( std::size_t n)			{if (m_allocated) delete [] m_buf; m_pos=0; m_size=n; m_buf=new char[n]; m_allocated=true;}
+
+	Buffer& operator=( const Buffer& o)		{if (m_size < o.m_pos) throw std::logic_error("assignement not possible"); std::memmove( m_buf, o.m_buf, m_pos=o.m_pos); return *this;}
+
 	///\brief Clear the buffer content
-	void clear()				{m_pos=0;}
+	void clear()					{m_pos=0;}
 
 	///\brief Append one character
 	///\param[in] ch the character to append
-	void push_back( char ch)		{if (m_pos<m_size) m_buf[m_pos++]=ch;}
+	void push_back( char ch)			{if (m_pos<m_size) m_buf[m_pos++]=ch;}
 
 	///\brief Append a 0-terminated string
 	///\param[in] cc the string to append
-	void append( const char* cc)		{unsigned int ii=0; while(m_pos<m_size && cc[ii]) m_buf[m_pos++]=cc[ii++];}
+	void append( const char* cc)			{unsigned int ii=0; while(m_pos<m_size && cc[ii]) m_buf[m_pos++]=cc[ii++];}
 
 	///\brief Append a string
 	///\param[in] cc the string to append
@@ -88,44 +107,47 @@ public:
 
 	///\brief Return the number of characters in the buffer
 	///\return the number of characters (bytes)
-	std::size_t size() const		{return m_pos;}
-	std::size_t size()			{return m_pos;}
+	std::size_t size() const			{return m_pos;}
+
+	///\brief Return the maximum number of characters that can be put into the buffer
+	///\return the maximum number of characters (bytes)
+	std::size_t allocsize() const			{return m_size;}
 
 	///\brief Change the fill size of the buffer to a smaller size
-	void resize( std::size_t n)		{if (n > m_pos) throw std::logic_error("resize to bigger size not possible"); m_pos=n;}
+	void resize( std::size_t n)			{if (n > m_pos) throw std::logic_error("resize to bigger size not possible"); m_pos=n;}
 
 	///\brief Return the buffer content as pointer to string without 0 termination
 	///\return the pointer to buffer start
-	const char* ptr() const			{return m_buf;}
+	const char* ptr() const				{return m_buf;}
 
 	///\brief Return the buffer content as pointer to string without 0 termination
 	///\return the pointer to buffer start
-	char* ptr()				{return m_buf;}
+	char* ptr()					{return m_buf;}
 
 	///\brief Return the buffer content as 0-terminated string
 	///\return the C-string
-	const char* c_str()			{m_buf[m_pos]=0; return m_buf;}
+	const char* c_str()				{m_buf[m_pos]=0; return m_buf;}
 
 	///\brief cast operator for direct access
 	///\return the C-string
-	operator const char*()			{return c_str();}
+	operator const char*()				{return c_str();}
 
 	///\brief check, if the buffer had an overflow, no space left
 	///\return true, if yes
-	bool overflow() const			{return m_pos==m_size;}
+	bool overflow() const				{return m_pos==m_size;}
 };
 
 
 ///\class CArgBuffer
 ///\brief Buffer for multi argument parsing (fixed array of null terminated byte character strings)
-///  The buffer implements the STL back insertion sequence interface required by the protocol parser.
-///
-/// This buffer splits the input, A sequence of characters by blanks and it parses escaping and quoted strings in the following way:
-/// Escaping is done with backslash, strings can be single or double quoted.
-/// The maximum number of arguments parsed is fix (16). More arguments are appended to the 16th argument.
-/// A string is starting with a quote and terminating with the same non escaped quote or with the end of line.
-/// Only blanks are splitting elements.
-///
+//  The buffer implements the STL back insertion sequence interface required by the protocol parser.
+//
+// This buffer splits the input, A sequence of characters by blanks and it parses escaping and quoted strings in the following way:
+// Escaping is done with backslash, strings can be single or double quoted.
+// The maximum number of arguments parsed is fix (16). More arguments are appended to the 16th argument.
+// A string is starting with a quote and terminating with the same non escaped quote or with the end of line.
+// Only blanks are splitting elements.
+//
 ///\tparam Buffer buffer type with an interface as _Wolframe::protocol::Buffer, a subset of the std::string interface used for buffering the elements of the argument vector.
 template <class Buffer>
 class CArgBuffer

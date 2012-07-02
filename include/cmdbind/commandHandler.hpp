@@ -53,7 +53,7 @@ public:
 		CLOSED
 	};
 
-	///\brief Constructor
+	///\brief Defaul constructor
 	CommandHandler()
 		:m_statusCode(0){}
 
@@ -83,7 +83,7 @@ public:
 	///\brief Passes the network input to the command handler (READ operation)
 	///\param [in] begin start of the network input block.
 	///\param [in] bytesTransferred number of bytes passed in the input block
-	virtual void putInput( const void *begin, std::size_t bytesTransferred)=0;
+	virtual void putInput( const void* begin, std::size_t bytesTransferred)=0;
 
 	///\brief Get the input block request (READ operation)
 	///\param [out] begin start of the network input buffer

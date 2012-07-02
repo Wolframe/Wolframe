@@ -91,12 +91,12 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_ioFilterCommandHandler.o \
 	cmdbind_directmapCommandHandler.o \
 	filter_filterbase.o \
+	filter_doctype.o \
 	filter_typingfilter.o \
 	filter_textwolf_filter.o \
 	filter_char_filter.o \
 	filter_line_filter.o \
 	filter_token_filter.o \
-	filter_expression_filter.o \
 	filter_tostringfilter.o \
 	serialize_struct_filtermapBase.o \
 	serialize_ddl_filtermapSerialize.o \
@@ -104,6 +104,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	serialize_mapContext.o \
 	ddl_atomicType.o \
 	ddl_structType.o \
+	ddl_structTypeBuild.o \
 	ddl_compilerInterface.o \
 	ddl_compiler_simpleFormCompiler.o \
 	types_bignum.o \
@@ -159,6 +160,8 @@ wolframed$(EXE): libwolframe
 
 wolframed$(EXE): wolframed.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
+
+wolfilter$(EXE): libwolframe
 
 wolfilter$(EXE): wolfilter.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)

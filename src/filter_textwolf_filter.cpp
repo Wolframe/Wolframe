@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file filter_textwolf_filter.cpp
 ///\brief Filter implementation reading/writing xml with the textwolf xml library
 #include "filter/textwolf_filter.hpp"
+#include "filter/doctype.hpp"
 #include "textwolf/sourceiterator.hpp"
 #include "textwolf/xmlparser.hpp"
 #include "textwolf/xmlprinter.hpp"
@@ -76,8 +77,8 @@ struct InputFilterImpl:public InputFilter
 		,m_parser( attr)
 		,m_src(0)
 		,m_srcsize(0)
-		,m_srcend(false){}
-
+		,m_srcend(false)
+		{}
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
@@ -86,13 +87,11 @@ struct InputFilterImpl:public InputFilter
 		,m_parser( o.m_parser)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
-		,m_srcend(o.m_srcend){}
+		,m_srcend(o.m_srcend)
+		{}
 
-	///\brief Get a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] val the value returned
-	///\return true on success, false, if the variable does not exist or the operation failed
-	virtual bool getValue( const char* name, std::string& val) const
+	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
+	virtual bool getValue( const char* name, std::string& val)
 	{
 		if (std::strcmp( name, "empty") == 0)
 		{
@@ -107,10 +106,22 @@ struct InputFilterImpl:public InputFilter
 		return Parent::getValue( name, val);
 	}
 
-	///\brief Set a member value of the filter
-	///\param [in] name case sensitive name of the variable
-	///\param [in] value new value of the variable to set
-	///\return true on success, false, if the variable does not exist or the operation failed
+	///\brief Implementation of InputFilter::getDocType(std::string&)
+	virtual bool getDocType( std::string& val)
+	{
+		DocType doctype;
+		if (getDocType( doctype))
+		{
+			val = doctype.tostring();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
 	virtual bool setValue( const char* name, const std::string& value)
 	{
 		if (std::strcmp( name, "empty") == 0)
@@ -180,12 +191,7 @@ struct InputFilterImpl:public InputFilter
 			ElementTypeMap()
 			{
 				(*this)
-				(textwolf::XMLScannerBase::None,-1)
-				(textwolf::XMLScannerBase::ErrorOccurred,-1)
-				(textwolf::XMLScannerBase::HeaderStart,(int)OpenTag)
-				(textwolf::XMLScannerBase::HeaderAttribName,(int)Attribute)
-				(textwolf::XMLScannerBase::HeaderAttribValue,(int)Value)
-				(textwolf::XMLScannerBase::HeaderEnd,(int)CloseTag)
+				(textwolf::XMLScannerBase::ErrorOccurred,-2)
 				(textwolf::XMLScannerBase::TagAttribName,(int)Attribute)
 				(textwolf::XMLScannerBase::TagAttribValue,(int)Value)
 				(textwolf::XMLScannerBase::OpenTag,(int)OpenTag)
@@ -198,20 +204,24 @@ struct InputFilterImpl:public InputFilter
 		static const ElementTypeMap tmap;
 		try
 		{
-			const char* ee;
-			textwolf::XMLScannerBase::ElementType et = m_parser.getNext( ee, elementsize);
-			element = (const void*)ee;
+			for (;;)
+			{
+				const char* ee;
+				textwolf::XMLScannerBase::ElementType et = m_parser.getNext( ee, elementsize);
+				element = (const void*)ee;
 
-			int st = tmap[ et];
-			if (st == -1)
-			{
-				setState( Error, "textwolf: syntax error in XML");
-				return false;
-			}
-			else
-			{
-				type = (InputFilterImpl::ElementType)st;
-				return true;
+				int st = tmap[ et];
+				if (st < 0)
+				{
+					if (st == -1) continue;
+					setState( Error, "textwolf: syntax error in XML");
+					return false;
+				}
+				else
+				{
+					type = (InputFilterImpl::ElementType)st;
+					return true;
+				}
 			}
 		}
 		catch (textwolf::SrcIterator::EoM)
@@ -221,6 +231,44 @@ struct InputFilterImpl:public InputFilter
 		};
 		return false;
 	}
+private:
+	///\brief Get the document type definition, if available
+	///\param [out] doctype definition parsed
+	///\return true, if success, false, if not.
+	///\remark Check the state when false is returned
+	bool getDocType( DocType& doctype)
+	{
+		try
+		{
+			const char* ee;
+			std::size_t eesize;
+			for (;;) switch (m_parser.state())
+			{
+				case XMLParser::ParseHeader:
+					if (!m_parser.getNext( ee, eesize)) return false;
+					if (m_parser.isStandalone()) return true;
+					continue;
+
+				case XMLParser::ParseDoctype:
+					if (!m_parser.getNext( ee, eesize)) return false;
+					continue;
+
+				case XMLParser::ParseSource:
+				{
+					doctype.rootid = m_parser.getDoctypeRoot().size()?m_parser.getDoctypeRoot().c_str():0;
+					doctype.publicid = m_parser.getDoctypePublic().size()?m_parser.getDoctypePublic().c_str():0;
+					doctype.systemid = m_parser.getDoctypeSystem().size()?m_parser.getDoctypeSystem().c_str():0;
+					return true;
+				}
+			}
+		}
+		catch (textwolf::SrcIterator::EoM)
+		{
+			setState( EndOfMessage);
+			return false;
+		};
+	}
+
 private:
 	typedef textwolf::XMLParser<std::string,XMLFilterAttributes> XMLParser;
 
@@ -273,6 +321,13 @@ struct OutputFilterImpl :public OutputFilter
 			return true;
 		}
 		return false;
+	}
+
+	///\brief Implementation of OutputFilter::setDocType( const std::string&)
+	virtual void setDocType( const std::string& value)
+	{
+		DocType doctype( value);
+		m_printer.setDocumentType( doctype.rootid, doctype.publicid, doctype.systemid);
 	}
 
 	///\brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)

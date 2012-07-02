@@ -42,29 +42,42 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace ddl;
 
-bool CompilerInterface::compileFile( const std::string& filename, StructType& result, std::string& error) const
+StructType CompilerInterface::compileFile( const std::string& filename) const
 {
+	std::ostringstream src;
+	std::ifstream inFile( filename.c_str());
 	try
 	{
-		std::ifstream inFile( filename.c_str());
-		std::ostringstream src;
+		inFile.exceptions( std::ifstream::failbit | std::ifstream::badbit);
+
 		while (inFile)
 		{
 			std::string ln;
+			if (inFile.eof()) break;
 			std::getline( inFile, ln);
-			if (!inFile.eof()) src << ln << "\n";
+			src << ln << "\n";
 		}
-		return compile( src.str(), result, error);
+		return compile( src.str());
 	}
-	catch (const std::ios_base::failure& e)
+	catch (const std::ifstream::failure& e)
 	{
-		error.append( "Error reading DDL source file '");
-		error.append( filename);
-		error.append( "' (");
-		error.append( e.what());
-		error.append( ")");
-		return false;
+		if (!(inFile.rdstate() & std::ifstream::eofbit))
+		{
+			// ... puzzle: I try to mask the EOF exception, but it is still thrown. Maybe because of 'getline' ?
+			std::ostringstream msg;
+			msg << "error '" << e.what() << "' reading file '" << filename << "'" << std::endl;
+			throw std::runtime_error( msg.str());
+		}
+		else
+		{
+			return compile( src.str());
+		}
 	}
-	return true;
+	catch (const std::exception& e)
+	{
+		std::ostringstream msg;
+		msg << "error '" << e.what() << "' loading file '" << filename << "'" << std::endl;
+		throw std::runtime_error( msg.str());
+	}
 }
 

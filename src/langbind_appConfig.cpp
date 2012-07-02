@@ -117,7 +117,7 @@ bool ApplicationEnvironmentConfig::check() const
 		}
 	}
 	{
-		std::vector<TransactionFunctionConfigStruct>::const_iterator itr=m_config.transaction.begin(),end=m_config.transaction.end();
+		std::vector<PeerFormFunctionConfigStruct>::const_iterator itr=m_config.transaction.begin(),end=m_config.transaction.end();
 		for (;itr!=end; ++itr)
 		{
 			if (functions[ itr->name])
@@ -223,7 +223,7 @@ void ApplicationEnvironmentConfig::setCanonicalPathes( const std::string& refere
 		}
 	}
 	{
-		std::vector<TransactionFunctionConfigStruct>::iterator itr=m_config.transaction.begin(),end=m_config.transaction.end();
+		std::vector<PeerFormFunctionConfigStruct>::iterator itr=m_config.transaction.begin(),end=m_config.transaction.end();
 		for (;itr!=end; ++itr)
 		{
 			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);
