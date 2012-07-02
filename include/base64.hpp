@@ -43,6 +43,18 @@
 namespace _Wolframe	{
 namespace base64	{
 
+size_t encodedSize( size_t dataSize, unsigned short lineLength )
+{
+	return base64_encodedSize( dataSize, lineLength );
+}
+
+int encode( const void* data, size_t dataSize,
+	    char* encoded, size_t encodedMaxSize, unsigned short lineLength )
+{
+	return base64_encode(  data, dataSize, encoded, encodedMaxSize, lineLength );
+}
+
+
 class Encoder
 {
 	static const size_t BUFFERSIZE = 512;
@@ -54,20 +66,9 @@ public:
 		base64_initEncodeState( &m_state, lineLength );
 	}
 
-	static size_t encodedSize( size_t dataSize, unsigned short lineLength )
-	{
-		return base64_encodedSize( dataSize, lineLength );
-	}
-
 	size_t encodedSize( size_t dataSize )
 	{
 		return base64_encodedSize( dataSize, m_state.lineLength );
-	}
-
-	static int encode( const void* data, size_t dataSize,
-			   char* encoded, size_t encodedMaxSize, unsigned short lineLength )
-	{
-		return base64_encode(  data, dataSize, encoded, encodedMaxSize, lineLength );
 	}
 
 	int encodeChunk( const void* data, size_t dataSize,
@@ -81,7 +82,7 @@ public:
 		return base64_encodeEndChunk( &m_state, encoded, encodedMaxSize );
 	}
 
-	void encodeChunk( std::istream& input, std::ostream& output )
+	void encode( std::istream& input, std::ostream& output )
 	{
 		unsigned char* plain = new unsigned char[ m_bufferSize ];
 		char* encoded = new char[ 2 * m_bufferSize ];

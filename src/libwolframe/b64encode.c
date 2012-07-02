@@ -110,6 +110,7 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 		*output++ = '\n';
 		encodedMaxSize--;
 		state->newLinePending = 0;
+		state->lineSize = 0;
 	}
 
 	switch ( state->bytesLeft )	{
@@ -147,7 +148,7 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 			if ( dataSize >= 1 )	{
 				if ( encodedMaxSize < 4 )
 					return BUFFER_OVERFLOW;
-				state->carryBytes[ 1 ] = *bytes++;
+				state->carryBytes[ 2 ] = *bytes++;
 				dataSize--;
 				encodeBytes( state->carryBytes, output );
 				state->bytesLeft = 0;

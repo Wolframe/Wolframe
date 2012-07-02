@@ -39,7 +39,10 @@
 
 
 #undef _BASE64_WRITE_OUTPUT
+#undef _BASE64_LOOP_TEST
+
 //#define _BASE64_WRITE_OUTPUT
+#define _BASE64_LOOP_TEST
 
 using namespace _Wolframe;
 
@@ -273,19 +276,24 @@ TEST( Base64, RandomData )
 	char*		encoded1;
 	char*		encoded2;
 	unsigned char*	decoded;
+	int		chunkSize;
 
 	srand( time( NULL ) );
-
+#ifdef _BASE64_LOOP_TEST
 	for ( int i = 0; i < 1024; i++ )	{
+#endif
 		dataSize = 1 + rand() % 32768;
 		lineLength = rand() % 1024;
-		//	dataSize = 80;
-		//	lineLength = 3;
+		chunkSize = 1 + rand() % dataSize;
+// fixed data
+//		dataSize = 5892;
+//		lineLength = 130;
+//		chunkSize = 3366;
 
-		encodedSize = base64::Encoder::encodedSize( dataSize, lineLength );
+		encodedSize = base64::encodedSize( dataSize, lineLength );
 
 		data = new unsigned char[ dataSize ];
-		encoded1 = new char[ encodedSize ];
+		encoded1 = new char[ encodedSize + 1 ];
 		encoded2 = new char[ encodedSize ];
 		decoded = new unsigned char[ dataSize + 1 ];
 
@@ -301,7 +309,6 @@ TEST( Base64, RandomData )
 		fdata.close();
 #endif
 		base64::Encoder E( 0, lineLength );
-		int chunkSize = ( 1 + rand()) % dataSize;
 		int encodeResult = 0;
 		int partialResult = 0;
 		size_t dataUsed = 0;
@@ -314,7 +321,7 @@ TEST( Base64, RandomData )
 			dataUsed += chunkSize;
 		}
 		partialResult = E.encodeChunk( data + dataUsed, dataSize - dataUsed,
-					       encoded1 + encodeResult, encodedSize - encodeResult );
+					       encoded1 + encodeResult, encodedSize - encodeResult + 1 );
 		EXPECT_GE( partialResult, 0 );
 		encodeResult += partialResult;
 		EXPECT_LE( encodeResult, encodedSize );
@@ -330,7 +337,7 @@ TEST( Base64, RandomData )
 #endif
 		EXPECT_EQ( encodeResult, encodedSize );
 
-		encodeResult = base64::Encoder::encode( data, dataSize, encoded2, encodedSize, lineLength );
+		encodeResult = base64::encode( data, dataSize, encoded2, encodedSize, lineLength );
 #ifdef _BASE64_WRITE_OUTPUT
 		// encoded file
 		std::ofstream edata2( "b64encoded2", std::ios_base::out | std::ios_base::binary );
@@ -355,7 +362,9 @@ TEST( Base64, RandomData )
 		delete[] encoded1;
 		delete[] encoded2;
 		delete[] decoded;
+#ifdef _BASE64_LOOP_TEST
 	}
+#endif
 }
 
 int main( int argc, char **argv )
