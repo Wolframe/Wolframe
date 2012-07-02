@@ -104,16 +104,16 @@ const config::DescriptionBase* FormFunctionConfigStruct::description()
 	return &rt;
 }
 
-const config::DescriptionBase* TransactionFunctionConfigStruct::description()
+const config::DescriptionBase* PeerFormFunctionConfigStruct::description()
 {
-	struct ThisDescription :public config::Description<TransactionFunctionConfigStruct>
+	struct ThisDescription :public config::Description<PeerFormFunctionConfigStruct>
 	{
 		ThisDescription()
 		{
 			(*this)
-			( "name",		&TransactionFunctionConfigStruct::name)
-			( "filter",		&TransactionFunctionConfigStruct::filter)
-			( "modulepath",		&TransactionFunctionConfigStruct::modulepath)
+			( "name",		&PeerFormFunctionConfigStruct::name)
+			( "filter",		&PeerFormFunctionConfigStruct::filter)
+			( "modulepath",		&PeerFormFunctionConfigStruct::modulepath)
 			;
 		}
 	};

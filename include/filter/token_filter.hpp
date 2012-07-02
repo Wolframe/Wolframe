@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/line_filter.hpp
-///\brief Filter reading/writing line by line
+///\file filter/token_filter.hpp
+///\brief Filter reading/writing the tokens of a filter input/output for debugging purposes
 
 #ifndef _Wolframe_FILTER_TOKEN_HPP_INCLUDED
 #define _Wolframe_FILTER_TOKEN_HPP_INCLUDED

@@ -100,12 +100,12 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 		}
 	}
 	{
-		std::vector<TransactionFunctionConfigStruct>::const_iterator itr=config.data().transaction.begin(),end=config.data().transaction.end();
+		std::vector<PeerFormFunctionConfigStruct>::const_iterator itr=config.data().transaction.begin(),end=config.data().transaction.end();
 		for (;itr!=end; ++itr)
 		{
 			LOG_INFO << "Loading transaction function " << itr->name;
-			///TODO: load transaction function from itr->modulepath
-			///Call defineTransactionFunction( const std::string& name, const TransactionFunction& f);
+			///TODO: load peer form function from itr->modulepath
+			///Call definePeerFormFunction( const std::string& name, const PeerFormFunction& f);
 		}
 	}
 #if WITH_LUA
@@ -127,37 +127,6 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 		}
 	}
 	return rt;
-}
-
-bool GlobalContext::getTransactionFunctionElements( const std::string& name, TransactionFunction& tf, DDLForm& par, DDLForm& res)
-{
-	std::string funcnam;
-	std::string parnam;
-	std::string resnam;
-	const char* parnam_;
-	const char* resnam_;
-	if ((parnam_ = std::strchr( name.c_str(), ':')) == 0) return false;
-	funcnam = std::string( name, parnam_ - name.c_str());
-	if ((resnam_ = std::strchr( ++parnam_, ':')) == 0) return false;
-	parnam = std::string( parnam_, resnam_ - parnam_);
-	resnam = std::string( ++resnam_);
-
-	if (!getForm( parnam, par))
-	{
-		LOG_ERROR << "unknown form name '" << parnam << "'";
-		return false;
-	}
-	if (!getForm( resnam, res))
-	{
-		LOG_ERROR << "unknown form name '" << resnam << "'";
-		return false;
-	}
-	if (!getTransactionFunction( funcnam, tf))
-	{
-		LOG_ERROR << "unknown transaction function name '" << funcnam << "'";
-		return false;
-	}
-	return true;
 }
 
 

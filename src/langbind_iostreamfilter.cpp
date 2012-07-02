@@ -51,9 +51,9 @@
 using namespace _Wolframe;
 using namespace langbind;
 
-static langbind::Filter getFilter( langbind::GlobalContext* gc, const std::string& ifl, const std::string& ofl)
+static Filter getFilter( GlobalContext* gc, const std::string& ifl, const std::string& ofl)
 {
-	langbind::Filter rt;
+	Filter rt;
 	if (boost::iequals( ofl, ifl))
 	{
 		if (!gc->getFilter( ifl.c_str(), rt))
@@ -65,8 +65,8 @@ static langbind::Filter getFilter( langbind::GlobalContext* gc, const std::strin
 	}
 	else
 	{
-		langbind::Filter in;
-		langbind::Filter out;
+		Filter in;
+		Filter out;
 		if (!gc->getFilter( ifl.c_str(), in))
 		{
 			std::ostringstream msg;
@@ -79,7 +79,7 @@ static langbind::Filter getFilter( langbind::GlobalContext* gc, const std::strin
 			msg << "unknown output filter '" << ofl << "'";
 			throw std::runtime_error( msg.str());
 		}
-		rt = langbind::Filter( in.inputfilter(), out.outputfilter());
+		rt = Filter( in.inputfilter(), out.outputfilter());
 	}
 	return rt;
 }
@@ -149,7 +149,7 @@ struct BufferStruct
 	}
 };
 
-static void processIO( BufferStruct& buf, langbind::InputFilter* iflt, langbind::OutputFilter* oflt, std::istream& is, std::ostream& os)
+static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt, std::istream& is, std::ostream& os)
 {
 	if (!iflt || !oflt)
 	{
@@ -193,11 +193,11 @@ static void processIO( BufferStruct& buf, langbind::InputFilter* iflt, langbind:
 
 void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
-	langbind::GlobalContext* gc = langbind::getGlobalContext();
-	langbind::FilterFactoryR tf( new langbind::TokenFilterFactory());
+	GlobalContext* gc = getGlobalContext();
+	FilterFactoryR tf( new TokenFilterFactory());
 	gc->defineFilter( "token", tf);
 
-	langbind::Filter flt = getFilter( gc, ifl, ofl);
+	Filter flt = getFilter( gc, ifl, ofl);
 	if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
 	if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
 
@@ -273,9 +273,9 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		if (gc->getFormFunction( proc.c_str(), func))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
-			langbind::TypedInputFilterR inp( new langbind::TypingInputFilter( flt.inputfilter()));
-			langbind::TypedOutputFilterR outp( new langbind::TypingOutputFilter( flt.outputfilter()));
-			langbind::FormFunctionClosure closure( func);
+			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
+			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
+			FormFunctionClosure closure( func);
 			closure.init( inp, serialize::Context::ValidateAttributes);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
@@ -295,8 +295,8 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		if (gc->getForm( proc.c_str(), df))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
-			langbind::TypedInputFilterR inp( new langbind::TypingInputFilter( flt.inputfilter()));
-			langbind::TypedOutputFilterR outp( new langbind::TypingOutputFilter( flt.outputfilter()));
+			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
+			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
 			serialize::DDLStructParser closure( df.structure());
 			closure.init( inp, serialize::Context::ValidateAttributes);
 
@@ -306,25 +306,25 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			res.init( outp, serialize::Context::None);
 
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 			checkUnconsumedInput( is, *flt.inputfilter());
 			return;
 		}
 	}
 	{
-		TransactionFunction func;
-		if (gc->getTransactionFunction( proc.c_str(), func))
+		PeerFormFunction func;
+		if (gc->getPeerFormFunction( proc.c_str(), func))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
-			langbind::TypedInputFilterR inp( new langbind::TypingInputFilter( flt.inputfilter()));
-			langbind::TypedOutputFilterR outp( new langbind::TypingOutputFilter( flt.outputfilter()));
-			langbind::TransactionFunctionClosure closure( proc, func);
-			closure.init( inp);
+			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
+			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
+			PeerFormFunctionClosure closure( func, inp);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			langbind::TransactionFunctionResult res = closure.result();
-			res.init( outp);
+			serialize::DDLStructSerializer res( closure.result().structure());
+			res.init( outp, serialize::Context::None);
 
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 

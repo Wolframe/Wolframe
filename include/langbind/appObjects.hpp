@@ -183,7 +183,7 @@ public:
 	const ddl::StructTypeR& structure() const	{return m_structure;}
 
 	std::string tostring() const;
-	void clone();
+	DDLForm copy() const;
 private:
 	friend class DDLFormFill;
 	ddl::StructTypeR m_structure;
@@ -295,77 +295,45 @@ private:
 };
 
 
-
-typedef cmdbind::CommandHandlerR (*CreateCommandHandler)( const std::string& name);
-class TransactionFunction
+class PeerFunction
 {
 public:
-	TransactionFunction(){}
-	TransactionFunction( const TransactionFunction& o)
-		:m_cmdwriter(o.m_cmdwriter)
-		,m_resultreader(o.m_resultreader)
-		,m_cmdconstructor(o.m_cmdconstructor){}
+	typedef cmdbind::CommandHandlerR (*CreateCommandHandler)();
 
-	TransactionFunction( const OutputFilterR& w, const InputFilterR& r, CreateCommandHandler c)
-		:m_cmdwriter(w)
-		,m_resultreader(r)
-		,m_cmdconstructor(c){}
+	PeerFunction(){}
+	PeerFunction( const PeerFunction& o);
+	PeerFunction( const OutputFilterR& w, const InputFilterR& r, CreateCommandHandler c);
 
 	const OutputFilterR& cmdwriter() const		{return m_cmdwriter;}
 	const InputFilterR& resultreader() const	{return m_resultreader;}
 	CreateCommandHandler cmdconstructor() const	{return m_cmdconstructor;}
+
 private:
 	OutputFilterR m_cmdwriter;			//< command input writer
 	InputFilterR m_resultreader;			//< command result reader
-	CreateCommandHandler m_cmdconstructor;
+	CreateCommandHandler m_cmdconstructor;		//< constructor of a command handler instance for that command
 };
 
 
-///\class TransactionFunctionResult
-///\brief Result of a TransactionFunction call
-class TransactionFunctionResult
+class PeerFormFunction :public PeerFunction
 {
 public:
-	///\brief Constructor
-	///\param[in] f function called
-	explicit TransactionFunctionResult( const TransactionFunction& f);
+	PeerFormFunction(){}
+	PeerFormFunction( const PeerFormFunction& o);
+	PeerFormFunction( const PeerFunction& f, const DDLForm& i, const DDLForm& o);
 
-	///\brief Copy constructor
-	///\param[in] o copied item
-	TransactionFunctionResult( const TransactionFunctionResult& o);
-
-	///\brief Destructor
-	~TransactionFunctionResult(){}
-
-	///\brief fetches results and writes them to the output filter specified
-	///\return true when completed
-	bool call();
-
-	///\brief Initialization of call context for a new fetch result
-	///\param[in] o fetch output
-	void init( const TypedOutputFilterR& o);
-
-	///\brief Append a chunk to the result buffer
-	///\param[in] buf pointer to chunk
-	///\param[in] size size of chunk in bytes
-	void appendCmdOutput( const void* buf, std::size_t size);
-
-	///\brief Clear the result buffer and error message buffer
-	void reset();
+	const DDLForm& inputform() const		{return m_inputform;}
+	const DDLForm& outputform() const		{return m_outputform;}
 
 private:
-	TransactionFunction m_func;				//< transaction function executed
-	int m_state;						//< execution state
-	InputFilter::ElementType m_elemtype;			//< type of last element read from command result
-	TypedInputFilter::Element m_elem;			//< last element read from command result
-	boost::shared_ptr<std::string> m_resultbuf;		//< buffer for result
-	InputFilterR m_resultreader;				//< result reader instance
-	TypedOutputFilterR m_outputfilter;			//< output of the transaction function
+	DDLForm m_inputform;				//< transaction function parameter description
+	DDLForm m_outputform;				//< transaction function result description
 };
 
-///\class TransactionFunctionClosure
-///\brief Closure with calling state of called TransactionFunction
-class TransactionFunctionClosure
+
+///\class PeerFormFunctionClosure
+///\brief Closure with calling state of called PeerFormFunction
+class PeerFormFunctionClosure
 {
 public:
 	enum {
@@ -376,53 +344,65 @@ public:
 	///\brief Constructor
 	///\param[in] nam name of the function called
 	///\param[in] f function called
-	TransactionFunctionClosure( const std::string& nam, const TransactionFunction& f);
+	PeerFormFunctionClosure( const PeerFormFunction& f, const TypedInputFilterR& i);
 
 	///\brief Copy constructor
 	///\param[in] o copied item
-	TransactionFunctionClosure( const TransactionFunctionClosure& o);
+	PeerFormFunctionClosure( const PeerFormFunctionClosure& o);
 
 	///\brief Destructor
-	~TransactionFunctionClosure(){}
+	~PeerFormFunctionClosure(){}
 
 	///\brief Executes the transaction function with the input from the input filter specified as far as possible
-	///\return true when completed
+	///\return true when completed, false if it needs more input (yield execution)
 	bool call();
 
-	///\brief Initialization of call context for a new call
-	///\param[in] i call input
-	void init( const TypedInputFilterR& i);
-
 	///\brief Get the result of the command
-	const TransactionFunctionResult& result() const		{return m_result;}
+	DDLForm result() const;
 
 private:
-	TransactionFunction m_func;				//< transaction function executed
-	std::string m_name;					//< name of the transaction function executed
+	PeerFormFunction m_func;				//< transaction function executed
 	cmdbind::CommandHandlerR m_cmd;				//< command execute handler
 	cmdbind::CommandHandler::Operation m_cmdop;		//< last operation fetched from command handler
 	int m_state;						//< execution state
-	InputFilter::ElementType m_elemtype;			//< type of last element read from command result
-	TypedInputFilter::Element m_elem;			//< last element read from command result
 	boost::shared_ptr<void> m_cmdinputbuf;			//< buffer for the command input
 	boost::shared_ptr<void> m_cmdoutputbuf;			//< buffer for the command output
 	OutputFilterR m_cmdwriter;				//< writer of the command
-	TransactionFunctionResult m_result;			//< function result
+	InputFilterR m_resultreader;				//< reader (parser) of the result
+	serialize::DDLStructParser m_param;			//< function parameter form
+	serialize::DDLStructParser m_result;			//< function result form
+	serialize::DDLStructSerializer m_cmdserialize;		//< serializer of the command
 	TypedInputFilterR m_inputfilter;			//< transaction command input
 };
 
-///\class TransactionFunctionMap
+
+///\class PeerFunctionMap
 ///\brief Map of available transaction functions seen from scripting language binding
-class TransactionFunctionMap
+class PeerFunctionMap
 {
 public:
-	TransactionFunctionMap(){}
-	~TransactionFunctionMap(){}
+	PeerFunctionMap(){}
+	~PeerFunctionMap(){}
 
-	void defineTransactionFunction( const std::string& name, const TransactionFunction& f);
-	bool getTransactionFunction( const std::string& name, TransactionFunction& rt) const;
+	void definePeerFunction( const std::string& name, const PeerFunction& f);
+	bool getPeerFunction( const std::string& name, PeerFunction& rt) const;
 private:
-	std::map<std::string,TransactionFunction> m_map;
+	std::map<std::string,PeerFunction> m_map;
+};
+
+
+///\class PeerFormFunctionMap
+///\brief Map of available transaction functions seen from scripting language binding
+class PeerFormFunctionMap
+{
+public:
+	PeerFormFunctionMap(){}
+	~PeerFormFunctionMap(){}
+
+	void definePeerFormFunction( const std::string& name, const PeerFormFunction& f);
+	bool getPeerFormFunction( const std::string& name, PeerFormFunction& rt) const;
+private:
+	std::map<std::string,PeerFormFunction> m_map;
 };
 
 

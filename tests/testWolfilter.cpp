@@ -50,13 +50,19 @@
 #include <sstream>
 #include <iostream>
 
-///\remark Hack for linking this stuff to the test program. Cannot do it in the makefile unfortunately
+///\remark Hack for linking this stuff to the test program. Can't do it in the makefile unfortunately
 #include "wolfilter/src/employee_assignment_print.cpp"
+#include "wolfilter/src/echo_cmdhandler.cpp"
 
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 
 using namespace _Wolframe;
+
+static cmdbind::CommandHandlerR createEchoCommandHandler()
+{
+	return cmdbind::CommandHandlerR( new test::EchoCommandHandler());
+}
 
 ///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
 static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
@@ -69,6 +75,12 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 						test::convertAssignmentListDoc,
 						test::AssignmentListDoc::getFiltermapDescription(),
 						test::AssignmentListDoc::getFiltermapDescription()));
+
+	langbind::Filter flt;
+	if (!gct->getFilter( "token", flt)) throw std::runtime_error( "filter 'token' not found");
+	langbind::PeerFunction func( flt.outputfilter(), flt.inputfilter(), createEchoCommandHandler);
+	gct->definePeerFunction( "echo_peer", func);
+
 	boost::filesystem::path refpath( boost::filesystem::current_path() / "temp");
 	cmdline.loadGlobalContext( refpath.string());
 }
@@ -142,7 +154,7 @@ TEST_F( WolfilterTest, tests)
 
 		// [2.4] Parse command line in config section of the test description
 		std::vector<std::string> cmd;
-		utils::splitStringBySpaces( cmd, td.config);
+		utils::splitString( cmd, td.config, "\n\t\r ");
 
 		std::cerr << "processing test '" << testname << "'" << std::endl;
 		enum {MaxNofArgs=31};

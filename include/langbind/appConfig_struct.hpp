@@ -69,7 +69,7 @@ struct FilterConfigStruct
 	static const config::DescriptionBase* description();
 };
 
-struct TransactionFunctionConfigStruct
+struct PeerFormFunctionConfigStruct
 {
 	std::string name;						//< name of the transaction function
 	std::string filter;						//< name of the filter defining the transaction command reader/writer
@@ -102,7 +102,7 @@ struct EnvironmentConfigStruct
 	std::vector<DDLCompilerConfigStruct> DDL;			//< definitions of DDLs
 	std::vector<DDLFormConfigStruct> form;				//< definitions of forms
 	std::vector<FilterConfigStruct> filter;				//< definitions of filters
-	std::vector<TransactionFunctionConfigStruct> transaction;	//< definitions of transaction functions
+	std::vector<PeerFormFunctionConfigStruct> transaction;		//< definitions of transaction functions
 	std::vector<ScriptCommandConfigStruct> script;			//< definitions of script functions
 	std::vector<FormFunctionConfigStruct> formfunction;		//< definitions of the form functions
 

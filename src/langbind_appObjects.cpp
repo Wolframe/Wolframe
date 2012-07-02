@@ -41,7 +41,6 @@ Project Wolframe.
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
 #include "filter/token_filter.hpp"
-#include "filter/expression_filter.hpp"
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <cctype>
@@ -126,6 +125,7 @@ FilterMap::FilterMap()
 {
 	defineFilter( "char", FilterFactoryR( new CharFilterFactory()));
 	defineFilter( "line", FilterFactoryR( new LineFilterFactory()));
+	defineFilter( "token", FilterFactoryR( new TokenFilterFactory()));
 	defineFilter( "xml:textwolf", FilterFactoryR( new TextwolfXmlFilterFactory()));
 #ifdef WITH_LIBXML2
 	defineFilter( "xml:libxml2", FilterFactoryR( new Libxml2FilterFactory()));
@@ -231,12 +231,14 @@ bool RedirectFilterClosure::call()
 	}
 }
 
-void DDLForm::clone()
+DDLForm DDLForm::copy() const
 {
+	DDLForm rt;
 	if (m_structure.get())
 	{
-		m_structure = ddl::StructTypeR( new ddl::StructType( *m_structure));
+		rt.m_structure = ddl::StructTypeR( new ddl::StructType( *m_structure));
 	}
+	return rt;
 }
 
 std::string DDLForm::tostring() const
@@ -261,15 +263,13 @@ std::string DDLForm::tostring() const
 
 void DDLFormMap::defineForm( const std::string& name, const DDLForm& f)
 {
-	DDLForm f_(f);
-	f_.clone();
-	defineObject( m_map, name, f_);
+	defineObject( m_map, name, f.copy());
 }
 
 bool DDLFormMap::getForm( const std::string& name, DDLForm& rt) const
 {
 	if (!getObject( m_map, name, rt)) return false;
-	rt.clone();
+	rt = rt.copy();
 	return true;
 }
 
@@ -365,241 +365,145 @@ bool FormFunctionMap::getFormFunction( const std::string& name, FormFunction& rt
 	return getObject( m_map, name, rt);
 }
 
-TransactionFunctionResult::TransactionFunctionResult( const TransactionFunction& f)
-	:m_func(f)
-	,m_state(0)
-	{}
-
-TransactionFunctionResult::TransactionFunctionResult( const TransactionFunctionResult& o)
-	:m_func(o.m_func)
-	,m_state(o.m_state)
-	,m_elemtype(o.m_elemtype)
-	,m_elem(o.m_elem)
-	,m_resultbuf(o.m_resultbuf)
+PeerFunction::PeerFunction( const PeerFunction& o)
+	:m_cmdwriter(o.m_cmdwriter)
 	,m_resultreader(o.m_resultreader)
-	,m_outputfilter(o.m_outputfilter){}
+	,m_cmdconstructor(o.m_cmdconstructor)
+{}
+
+PeerFunction::PeerFunction( const OutputFilterR& w, const InputFilterR& r, CreateCommandHandler c)
+	:m_cmdwriter(w)
+	,m_resultreader(r)
+	,m_cmdconstructor(c)
+{}
+
+PeerFormFunction::PeerFormFunction( const PeerFormFunction& o)
+	:PeerFunction(o)
+	,m_inputform(o.m_inputform)
+	,m_outputform(o.m_outputform)
+{}
+
+PeerFormFunction::PeerFormFunction( const PeerFunction& f, const DDLForm& i, const DDLForm& o)
+	:PeerFunction(f)
+	,m_inputform(i)
+	,m_outputform(o)
+{}
 
 
-bool TransactionFunctionResult::call()
-{
-	if (!m_outputfilter.get())
-	{
-		throw std::runtime_error( "no output filter specified for transaction function result");
-	}
-	for (;;) switch (m_state)
-	{
-		case 0: throw std::runtime_error( "transaction function result not initialized");
-		case 1:
-		{
-			TypingInputFilter si( m_resultreader);
-			if (!si.getNext( m_elemtype, m_elem))
-			{
-				switch (si.state())
-				{
-					case InputFilter::Open:
-						return true;
-
-					case InputFilter::EndOfMessage:
-						throw std::runtime_error( "unexpected end of message in result reader");
-
-					case InputFilter::Error:
-						throw std::runtime_error( si.getError());
-				}
-				throw std::runtime_error( "in transaction function illegal input filter state");
-			}
-			m_state = 2;
-		}
-		case 2:
-		{
-			if (!m_outputfilter->print( m_elemtype, m_elem))
-			{
-				switch (m_outputfilter->state())
-				{
-					case OutputFilter::Open:
-						throw std::runtime_error( "unknown error in transaction function output");
-
-					case OutputFilter::EndOfBuffer:
-						return false;
-
-					case OutputFilter::Error:
-						throw std::runtime_error( m_outputfilter->getError());
-				}
-				throw std::runtime_error( "in transaction function illegal output filter state");
-			}
-			m_state = 1;
-			break;
-		}
-		default:
-			throw std::runtime_error( "in transaction function illegal state");
-	}
-}
-
-void TransactionFunctionResult::init( const TypedOutputFilterR& o)
-{
-	m_state = 1;
-	m_elemtype = InputFilter::Value;
-
-	m_resultreader.reset( m_func.resultreader()->copy());
-	if (m_resultbuf.get())
-	{
-		m_resultreader->putInput( m_resultbuf->c_str(), m_resultbuf->size(), true);
-	}
-	else
-	{
-		m_resultreader->putInput( "", 0, true);
-	}
-	m_outputfilter = o;
-}
-
-void TransactionFunctionResult::appendCmdOutput( const void* buf, std::size_t size)
-{
-	if (!m_resultbuf.get()) m_resultbuf.reset( new std::string);
-	m_resultbuf->append( (const char*)buf, size);
-}
-
-void TransactionFunctionResult::reset()
-{
-	m_resultbuf.reset();
-}
-
-
-TransactionFunctionClosure::TransactionFunctionClosure( const std::string& name_, const TransactionFunction& f)
+PeerFormFunctionClosure::PeerFormFunctionClosure( const PeerFormFunction& f, const TypedInputFilterR& i)
 	:m_func(f)
-	,m_name(name_)
+	,m_cmd(f.cmdconstructor()())
 	,m_cmdop(cmdbind::CommandHandler::READ)
 	,m_state(0)
-	,m_elemtype(InputFilter::Value)
 	,m_cmdinputbuf(std::malloc( InputBufSize), std::free)
 	,m_cmdoutputbuf(std::malloc( OutputBufSize), std::free)
-	,m_result(f)
-	{}
+	,m_param(f.inputform().copy().structure())
+	,m_result(f.outputform().copy().structure())
+	,m_cmdserialize(m_param.structure())
+	,m_inputfilter(i)
+{
+	if (!f.cmdwriter().get()) throw std::runtime_error( "called peer function without command writer filter");
+	if (!f.resultreader().get()) throw std::runtime_error( "called peer function without result reader filter");
+	if (!m_inputfilter.get()) throw std::runtime_error( "null input for peer function");
+	if (!m_cmdinputbuf.get()) throw std::bad_alloc();
+	if (!m_cmdoutputbuf.get()) throw std::bad_alloc();
 
-TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctionClosure& o)
+	m_cmdwriter.reset( f.cmdwriter()->copy());
+	m_resultreader.reset( f.resultreader()->copy());
+	m_param.init( m_inputfilter);
+	m_result.init( TypedInputFilterR( new TypingInputFilter( m_resultreader)));
+	m_cmdserialize.init( TypedOutputFilterR( new TypingOutputFilter( m_cmdwriter)));
+	m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
+	m_cmd->setInputBuffer( m_cmdinputbuf.get(), InputBufSize);
+	m_cmd->setOutputBuffer( m_cmdoutputbuf.get(), OutputBufSize, 0);
+}
+
+PeerFormFunctionClosure::PeerFormFunctionClosure( const PeerFormFunctionClosure& o)
 	:m_func(o.m_func)
-	,m_name(o.m_name)
 	,m_cmd(o.m_cmd)
-	,m_cmdop(cmdbind::CommandHandler::READ)
+	,m_cmdop(o.m_cmdop)
 	,m_state(o.m_state)
-	,m_elemtype(o.m_elemtype)
-	,m_elem(o.m_elem)
 	,m_cmdinputbuf(o.m_cmdinputbuf)
 	,m_cmdoutputbuf(o.m_cmdoutputbuf)
 	,m_cmdwriter(o.m_cmdwriter)
+	,m_resultreader(o.m_resultreader)
+	,m_param(o.m_param)
 	,m_result(o.m_result)
+	,m_cmdserialize(o.m_cmdserialize)
 	,m_inputfilter(o.m_inputfilter)
 	{}
 
-
-bool TransactionFunctionClosure::call()
+DDLForm PeerFormFunctionClosure::result() const
 {
+	return DDLForm( m_result.structure());
+}
+
+bool PeerFormFunctionClosure::call()
+{
+	bool res;
+	const void* data;
+	std::size_t datasize;
+
 	if (!m_inputfilter.get())
 	{
-		throw std::runtime_error( "empty input for transaction function command");
+		throw std::runtime_error( "null input for peer function command");
 	}
+	// read input into parameter form 'm_param'
+	if (m_state == 0 && !m_param.call()) return false;
+	m_state = 1;
+
 	for (;;) switch (m_cmdop)
 	{
 		case cmdbind::CommandHandler::READ:
-		{
-			switch (m_state)
+			res = m_cmdserialize.call();
+			m_cmd->putInput( m_cmdinputbuf.get(), m_cmdwriter->getPosition());
+			m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
+			m_cmdop = m_cmd->nextOperation();
+			if (res && m_cmdop == cmdbind::CommandHandler::READ)
 			{
-				case 0:
-					throw std::runtime_error( "invalid transaction object called");
-				case 1:
-					if (!m_inputfilter->getNext( m_elemtype, m_elem))
-					{
-						switch (m_inputfilter->state())
-						{
-							case InputFilter::Open:
-								m_cmd->putInput( m_cmdinputbuf.get(), m_cmdwriter->getPosition());
-								m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
-								m_cmd->nextOperation();
-								m_state = 1;
-								continue;
-
-							case InputFilter::EndOfMessage:
-								m_cmd->putInput( m_cmdinputbuf.get(), m_cmdwriter->getPosition());
-								m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
-								return false;
-
-							case InputFilter::Error:
-								throw std::runtime_error( m_inputfilter->getError());
-						}
-						throw std::runtime_error( "in transaction function illegal input filter state");
-					}
-					m_state = 2;
-				case 2:
-				{
-					TypingOutputFilter so( m_cmdwriter);
-					if (!so.print( m_elemtype, m_elem))
-					{
-						switch (so.state())
-						{
-							case OutputFilter::Open:
-								m_state = 1;
-								continue;
-
-							case OutputFilter::EndOfBuffer:
-								m_cmd->putInput( m_cmdinputbuf.get(), m_cmdwriter->getPosition());
-								m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
-								continue;
-
-							case InputFilter::Error:
-								throw std::runtime_error( so.getError());
-						}
-						throw std::runtime_error( "in transaction function illegal output filter state");
-					}
-					m_state = 1;
-					continue;
-				}
-				default:
-					throw std::runtime_error( "illegal state");
+				throw std::runtime_error( "peer function not terminated");
 			}
-		}
-		case cmdbind::CommandHandler::WRITE:
-		{
-			const void* data;
-			std::size_t datasize;
-			m_cmd->getOutput( data, datasize);
-			m_result.appendCmdOutput( data, datasize);
-			m_cmd->nextOperation();
-			m_state = 1;
 			continue;
-		}
+
+		case cmdbind::CommandHandler::WRITE:
+			m_cmd->getOutput( data, datasize);
+			m_resultreader->putInput( data, datasize, false);
+			if (m_result.call())
+			{
+				throw std::runtime_error( "illegal state in result reader. end reading without getting end of data marker");
+			}
+			m_cmdop = m_cmd->nextOperation();
+			continue;
+
 		case cmdbind::CommandHandler::CLOSED:
-		{
+			m_resultreader->putInput( "", 0, true);
+			if (!m_result.call())
+			{
+				throw std::runtime_error( "peer function result not terminated");
+			}
 			return true;
-		}
+		default:
+			throw std::runtime_error( "illegal state in peer function in command handler");
 	}
 }
 
-void TransactionFunctionClosure::init( const TypedInputFilterR& i)
-{
-	m_cmd = m_func.cmdconstructor()( m_name);
-	m_cmdop = cmdbind::CommandHandler::READ;
-	m_state = 1;
-	m_cmdwriter.reset( m_func.cmdwriter()->copy());
-	m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
-	m_result.reset();
-	m_inputfilter = i;
-	if (!m_cmd.get())
-	{
-		m_state = 0;
-		throw std::runtime_error( "unknown transaction function command");
-	}
-	else
-	{
-		m_cmd->setInputBuffer( m_cmdinputbuf.get(), InputBufSize);
-		m_cmd->setOutputBuffer( m_cmdoutputbuf.get(), OutputBufSize, 0);
-		m_state = 1;
-	}
-}
 
-void TransactionFunctionMap::defineTransactionFunction( const std::string& name, const TransactionFunction& f)
+void PeerFunctionMap::definePeerFunction( const std::string& name, const PeerFunction& f)
 {
 	defineObject( m_map, name, f);
 }
 
-bool TransactionFunctionMap::getTransactionFunction( const std::string& name, TransactionFunction& rt) const
+bool PeerFunctionMap::getPeerFunction( const std::string& name, PeerFunction& rt) const
+{
+	return getObject( m_map, name, rt);
+}
+
+void PeerFormFunctionMap::definePeerFormFunction( const std::string& name, const PeerFormFunction& f)
+{
+	defineObject( m_map, name, f);
+}
+
+bool PeerFormFunctionMap::getPeerFormFunction( const std::string& name, PeerFormFunction& rt) const
 {
 	return getObject( m_map, name, rt);
 }

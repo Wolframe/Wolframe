@@ -38,11 +38,11 @@ Project Wolframe.
 #endif
 #include <boost/algorithm/string.hpp>
 
-void _Wolframe::utils::splitStringBySpaces( std::vector<std::string>& res, const std::string& inp)
+void _Wolframe::utils::splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
 {
 	res.clear();
 	std::vector<std::string> imm;
-	boost::split( imm, inp, boost::is_any_of("\n\t\r "));
+	boost::split( imm, inp, boost::is_any_of(splitchrs));
 	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
 	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
 }

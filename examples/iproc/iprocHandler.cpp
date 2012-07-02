@@ -250,7 +250,7 @@ const net::NetworkOperation Connection::nextOperation()
 					default:
 						try
 						{
-							langbind::TransactionFunction tf;
+							langbind::PeerFormFunction tf;
 							const char* procname = m_config->commands()[ m_cmdidx - NofCommands].m_procname.c_str();
 							langbind::GlobalContext* gctx = langbind::getGlobalContext();
 #if WITH_LUA
@@ -261,7 +261,7 @@ const net::NetworkOperation Connection::nextOperation()
 							}
 							else
 #endif
-							if (gctx->getTransactionFunction( procname, tf))
+							if (gctx->getPeerFormFunction( procname, tf))
 							{
 								m_cmdhandler.reset( new cmdbind::DirectmapCommandHandler());
 							}

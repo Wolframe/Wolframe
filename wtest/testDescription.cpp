@@ -53,7 +53,7 @@ if (boost::starts_with( flag, "DISABLED "))
 {
 	unsigned int nargs=0;
 	std::vector<std::string> platforms;
-	utils::splitStringBySpaces( platforms, flag);
+	utils::splitString( platforms, flag, "\n\t\r ");
 	std::vector<std::string>::const_iterator ii = platforms.begin(),ee = platforms.end();
 	for (++ii; ii != ee; ++ii)
 	{

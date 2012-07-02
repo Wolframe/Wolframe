@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file filter_token_filter.cpp
-///\brief Filter implementation a filter for debug input/output
+///\brief Filter implementation of a filter for debug input/output
 
 #include "filter/token_filter.hpp"
 #include "textwolf/charset.hpp"
@@ -51,6 +51,7 @@ static bool getElementType( InputFilter::ElementType& et, char ch)
 	{
 		case '>': et = InputFilter::OpenTag; return true;
 		case '<': et = InputFilter::CloseTag; return true;
+		case '.': et = InputFilter::CloseTag; return true;
 		case '@': et = InputFilter::Attribute; return true;
 		case '=': et = InputFilter::Value; return true;
 	}
@@ -171,6 +172,8 @@ struct InputFilterImpl :public InputFilter
 	///\brief Constructor
 	InputFilterImpl()
 		:m_tag(0)
+		,m_taglevel(0)
+		,m_elemtype(OpenTag)
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false){}
@@ -181,6 +184,8 @@ struct InputFilterImpl :public InputFilter
 		:InputFilter(o)
 		,m_itr(o.m_itr)
 		,m_tag(o.m_tag)
+		,m_taglevel(o.m_taglevel)
+		,m_elemtype(o.m_elemtype)
 		,m_elembuf(o.m_elembuf)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
@@ -216,24 +221,19 @@ struct InputFilterImpl :public InputFilter
 		{
 			m_elembuf.clear();
 			m_linecomplete = false;
+			if (m_taglevel == -1) return false;
 		}
 		setState( Open);
 		type = Value;
 		try
 		{
-			if (m_tag)
-			{
-				if (!getElementType( type, m_tag))
-				{
-					setState( InputFilter::Error, "textwolf: Unknown token tag");
-				}
-			}
-			else
+			if (!m_tag)
 			{
 				char tg = m_itr.ascii();
-				if (!getElementType( type, tg))
+				if (!getElementType( m_elemtype, tg))
 				{
-					setState( InputFilter::Error, "textwolf: Unknown token tag");
+					setState( InputFilter::Error, "token filter - unknown token tag");
+					return false;
 				}
 				m_tag = tg;
 				++m_itr;
@@ -251,6 +251,27 @@ struct InputFilterImpl :public InputFilter
 					element = m_elembuf.c_str();
 					elementsize = m_elembuf.size();
 					++m_itr;
+					if (m_elemtype == OpenTag)
+					{
+						++m_taglevel;
+					}
+					else if (m_elemtype == CloseTag)
+					{
+						--m_taglevel;
+						if (m_tag == '.')
+						{
+							if (elementsize)
+							{
+								setState( InputFilter::Error, "token filter - end of data with argument");
+								return false;
+							}
+							if (m_taglevel != -1)
+							{
+								setState( InputFilter::Error, "token filter - tags not balanced");
+								return false;
+							}
+						}
+					}
 					m_tag = '\0';
 					m_linecomplete = true;
 					return true;
@@ -278,6 +299,8 @@ struct InputFilterImpl :public InputFilter
 private:
 	TextScanner m_itr;		//< src iterator
 	char m_tag;			//< tag defining the currently parsed element type
+	int m_taglevel;			//< tag level
+	ElementType m_elemtype;		//< current element type
 	std::string m_elembuf;		//< buffer for current line => current token
 	const char* m_src;		//< pointer to current chunk parsed
 	std::size_t m_srcsize;		//< size of the current chunk parsed in bytes

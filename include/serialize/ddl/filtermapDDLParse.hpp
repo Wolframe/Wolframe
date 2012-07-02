@@ -55,6 +55,8 @@ public:
 
 	bool call();
 
+	const ddl::StructTypeR& structure() const			{return m_st;}
+
 private:
 	ddl::StructTypeR m_st;
 	Context m_ctx;
