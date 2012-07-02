@@ -43,7 +43,8 @@ EchoCommandHandler::EchoCommandHandler()
 	:m_state(Init)
 	,m_outputitr(0)
 	,m_inpos(0)
-	,m_cmd(0){}
+	,m_cmd(0)
+	,m_taglevel(0){}
 
 void EchoCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
 {
@@ -61,63 +62,74 @@ cmdbind::CommandHandler::Operation EchoCommandHandler::nextOperation()
 	char* cc;
 	char* ee;
 
-	for (;;) switch (m_state)
+	for (;;)
 	{
-		case Init:
-			m_state = ParseCommand;
-			/*no break here!*/
+		switch (m_state)
+		{
+			case Init:
+				m_state = ParseCommand;
+				/*no break here!*/
 
-		case ParseCommand:
-			if (m_inpos >= m_in.size()) return cmdbind::CommandHandler::READ;
-			m_cmd = m_in.charptr()[ m_inpos++];
-			if (m_cmd == '\n') continue;
-			if (m_cmd < ' ' && m_cmd >= 0) throw std::runtime_error("error in command handler illegal control character or null byte in command");
-			m_state = Process;
-			/*no break here!*/
+			case ParseCommand:
+				if (m_inpos >= m_in.pos()) return cmdbind::CommandHandler::READ;
+				m_cmd = m_in.charptr()[ m_inpos++];
+				if (m_cmd == '\n') continue;
+				if (m_cmd < ' ' && m_cmd >= 0) throw std::runtime_error("illegal control character or null byte in command");
+				m_state = Process;
+				/*no break here!*/
 
-		case Process:
-			cc = m_in.charptr() + m_inpos;
-			ee = m_in.charptr() + m_in.size();
-			while (cc < ee)
-			{
-				if (*cc < ' ' && *cc > '\0')
+			case Process:
+				cc = m_in.charptr() + m_inpos;
+				ee = m_in.charptr() + m_in.pos();
+				if (cc == ee) return cmdbind::CommandHandler::READ;
+
+				while (cc < ee)
 				{
-					if (*cc == '\n')
+					if (*cc < ' ' && *cc > '\0')
 					{
-						++cc;
-						bool res = executeCommand( m_cmd, m_inputline);
-						m_state = ParseCommand;
-						m_inputline.clear();
-						if (res) m_state = OnTerminate;
-						flushOutput();
-						if (m_outputline.size() > 0) m_state = FlushOutput;
-						break;
+						if (*cc == '\n')
+						{
+							++cc;
+							m_inpos = cc - m_in.charptr();
+							bool res = executeCommand( m_cmd, m_inputline);
+							m_state = ParseCommand;
+							m_inputline.clear();
+							if (res)
+							{
+								m_state = OnTerminate;
+							}
+							else
+							{
+								flushOutput();
+								if (m_outputline.size() > 0) m_state = FlushOutput;
+							}
+							break;
+						}
+						else
+						{
+							throw std::runtime_error( "illegal control character passed to command handler");
+						}
 					}
 					else
 					{
-						throw std::runtime_error( "illegal control character passed to command handler");
+						m_inputline.push_back( *cc);
 					}
+					++cc;
 				}
-				else
-				{
-					m_inputline.push_back( *cc);
-				}
-				++cc;
-			}
-			continue;
+				m_inpos = cc - m_in.charptr();
+				continue;
 
-		case FlushOutput:
-			flushOutput();
-			if (m_outputline.size() == 0) m_state = Process;
-			return cmdbind::CommandHandler::WRITE;
+			case FlushOutput:
+				flushOutput();
+				if (m_outputline.size() == 0) m_state = Process;
+				return cmdbind::CommandHandler::WRITE;
 
-		case OnTerminate:
-			flushOutput();
-			if (m_outputline.size() == 0 && m_out.size() == 0) return cmdbind::CommandHandler::CLOSED;
-			return cmdbind::CommandHandler::WRITE;
+			case OnTerminate:
+				flushOutput();
+				if (m_outputline.size() == 0 && m_out.pos() == 0) return cmdbind::CommandHandler::CLOSED;
+				return cmdbind::CommandHandler::WRITE;
+		}
 	}
-
-
 }
 
 void EchoCommandHandler::putInput( const void* begin, std::size_t bytesTransferred)
@@ -133,7 +145,7 @@ void EchoCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 	m_inpos = 0;
 	m_in.setPos(0);
 	begin = m_in.ptr();
-	maxBlockSize = m_in.restsize();
+	maxBlockSize = m_in.size();
 }
 
 void EchoCommandHandler::flushOutput()
@@ -141,12 +153,12 @@ void EchoCommandHandler::flushOutput()
 	std::size_t restoutput = m_outputline.size() - m_outputitr;
 	if (restoutput)
 	{
-		std::size_t restbuf = m_out.size() - m_out.restsize();
+		std::size_t restbuf = m_out.restsize();
 		if (restbuf < restoutput)
 		{
 			restoutput = restbuf;
 		}
-		std::memcpy( m_out.charptr(), m_outputline.c_str() + m_outputitr, restoutput);
+		std::memcpy( m_out.charptr() + m_out.pos(), m_outputline.c_str() + m_outputitr, restoutput);
 		m_out.incr( restoutput);
 
 		m_outputitr += restoutput;
@@ -161,13 +173,13 @@ void EchoCommandHandler::flushOutput()
 void EchoCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
 	begin = m_out.ptr();
-	bytesToTransfer = m_out.size();
+	bytesToTransfer = m_out.pos();
 	m_out.setPos(0);
 }
 
 void EchoCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	nofBytes = m_in.size() - m_inpos;
+	nofBytes = m_in.pos() - m_inpos;
 	begin = (const void*)(m_in.charptr() + m_inpos);
 }
 
@@ -183,11 +195,14 @@ bool EchoCommandHandler::executeCommand( char cmd, const std::string& arg)
 {
 	switch (cmd)
 	{
-		case '.':
-			if (m_inputline.size()) throw std::runtime_error("error in command handler terminate command with argument");
-			return true;
 		case '<':
+			--m_taglevel;
+			pushResult( cmd, arg);
+			return (m_taglevel == 0);
 		case '>':
+			++m_taglevel;
+			pushResult( cmd, arg);
+			return false;
 		case '@':
 		case '=':
 			pushResult( cmd, arg);

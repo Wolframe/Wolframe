@@ -87,6 +87,12 @@ private:
 		FlushOutput,
 		OnTerminate
 	};
+
+	static const char* stateName( State i)
+	{
+		const char* ar[] = {"Init","ParseCommand","Process","FlushOutput","OnTerminate"};
+		return ar[(int)i];
+	}
 private:
 	State m_state;
 	protocol::InputBlock m_in;
@@ -96,6 +102,7 @@ private:
 	std::size_t m_outputitr;
 	std::size_t m_inpos;
 	char m_cmd;
+	int m_taglevel;
 };
 
 }}//namespace

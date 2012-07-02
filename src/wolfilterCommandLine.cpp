@@ -220,9 +220,9 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath) 
 			langbind::DDLForm inform;
 			langbind::DDLForm outform;
 
-			if (!gct->getPeerFunction( itr->functionname, pf)) throw std::runtime_error( "peer function not found");
-			if (!gct->getForm( itr->inputformname, inform)) throw std::runtime_error( "input form of peer form function not found");
-			if (!gct->getForm( itr->outputformname, outform)) throw std::runtime_error( "output form of peer form function not found");
+			if (!gct->getPeerFunction( itr->functionname, pf)) throw std::runtime_error( "transaction function not found");
+			if (!gct->getForm( itr->inputformname, inform)) throw std::runtime_error( "parameter description of transaction function not found");
+			if (!gct->getForm( itr->outputformname, outform)) throw std::runtime_error( "return value description of transaction function not found");
 
 			gct->definePeerFormFunction( itr->name, langbind::PeerFormFunction( pf, inform, outform));
 		}

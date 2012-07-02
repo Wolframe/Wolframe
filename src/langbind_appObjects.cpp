@@ -402,9 +402,9 @@ PeerFormFunctionClosure::PeerFormFunctionClosure( const PeerFormFunction& f, con
 	,m_cmdserialize(m_param.structure())
 	,m_inputfilter(i)
 {
-	if (!f.cmdwriter().get()) throw std::runtime_error( "called peer function without command writer filter");
-	if (!f.resultreader().get()) throw std::runtime_error( "called peer function without result reader filter");
-	if (!m_inputfilter.get()) throw std::runtime_error( "null input for peer function");
+	if (!f.cmdwriter().get()) throw std::runtime_error( "called transaction function without command writer filter");
+	if (!f.resultreader().get()) throw std::runtime_error( "called transaction function without result reader filter");
+	if (!m_inputfilter.get()) throw std::runtime_error( "null input for transaction function");
 	if (!m_cmdinputbuf.get()) throw std::bad_alloc();
 	if (!m_cmdoutputbuf.get()) throw std::bad_alloc();
 
@@ -446,7 +446,7 @@ bool PeerFormFunctionClosure::call()
 
 	if (!m_inputfilter.get())
 	{
-		throw std::runtime_error( "null input for peer function command");
+		throw std::runtime_error( "null input for transaction function command");
 	}
 	// read input into parameter form 'm_param'
 	if (m_state == 0 && !m_param.call()) return false;
@@ -461,7 +461,7 @@ bool PeerFormFunctionClosure::call()
 			m_cmdop = m_cmd->nextOperation();
 			if (res && m_cmdop == cmdbind::CommandHandler::READ)
 			{
-				throw std::runtime_error( "peer function not terminated");
+				throw std::runtime_error( "transaction function not terminated");
 			}
 			continue;
 
@@ -479,11 +479,11 @@ bool PeerFormFunctionClosure::call()
 			m_resultreader->putInput( "", 0, true);
 			if (!m_result.call())
 			{
-				throw std::runtime_error( "peer function result not terminated");
+				throw std::runtime_error( "transaction function result corrupt");
 			}
 			return true;
 		default:
-			throw std::runtime_error( "illegal state in peer function in command handler");
+			throw std::runtime_error( "illegal state in transaction function in command handler");
 	}
 }
 

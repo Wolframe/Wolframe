@@ -51,7 +51,6 @@ static bool getElementType( InputFilter::ElementType& et, char ch)
 	{
 		case '>': et = InputFilter::OpenTag; return true;
 		case '<': et = InputFilter::CloseTag; return true;
-		case '.': et = InputFilter::CloseTag; return true;
 		case '@': et = InputFilter::Attribute; return true;
 		case '=': et = InputFilter::Value; return true;
 	}
@@ -151,6 +150,7 @@ struct OutputFilterImpl :public OutputFilter
 		}
 		IOCharset::print( getElementTag( type), m_elembuf);
 		printToBufferEscEOL( (const char*)element, elementsize, m_elembuf);
+		IOCharset::print( '\n', m_elembuf);
 		if (!emptybuf())
 		{
 			setState( EndOfBuffer);
@@ -229,14 +229,32 @@ struct InputFilterImpl :public InputFilter
 		{
 			if (!m_tag)
 			{
-				char tg = m_itr.ascii();
+				char tg;
+				do
+				{
+					tg = m_itr.ascii();
+					++m_itr;
+				}
+				while (tg == '\n' || tg == '\r');
+				if (!tg)
+				{
+					if (m_taglevel != 0)
+					{
+						setState( InputFilter::Error, "token filter - tags not balanced");
+						return false;
+					}
+					m_taglevel = -1;
+					type = CloseTag;
+					element = "";
+					elementsize = 0;
+					return true;
+				}
 				if (!getElementType( m_elemtype, tg))
 				{
 					setState( InputFilter::Error, "token filter - unknown token tag");
 					return false;
 				}
 				m_tag = tg;
-				++m_itr;
 			}
 			textwolf::UChar ch;
 			while ((ch = *m_itr) != 0)
@@ -248,6 +266,7 @@ struct InputFilterImpl :public InputFilter
 				}
 				if (ch == '\n')
 				{
+					type = m_elemtype;
 					element = m_elembuf.c_str();
 					elementsize = m_elembuf.size();
 					++m_itr;
@@ -258,19 +277,6 @@ struct InputFilterImpl :public InputFilter
 					else if (m_elemtype == CloseTag)
 					{
 						--m_taglevel;
-						if (m_tag == '.')
-						{
-							if (elementsize)
-							{
-								setState( InputFilter::Error, "token filter - end of data with argument");
-								return false;
-							}
-							if (m_taglevel != -1)
-							{
-								setState( InputFilter::Error, "token filter - tags not balanced");
-								return false;
-							}
-						}
 					}
 					m_tag = '\0';
 					m_linecomplete = true;
@@ -284,6 +290,7 @@ struct InputFilterImpl :public InputFilter
 			}
 			if (m_elembuf.size() != 0)
 			{
+				type = m_elemtype;
 				element = m_elembuf.c_str();
 				elementsize = m_elembuf.size();
 				m_linecomplete = true;
