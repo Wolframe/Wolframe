@@ -1,4 +1,5 @@
 **
+**requires:LUA
 **input
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE assignmentlist PUBLIC "-//ABC//DTD XML 1.0 plus Software 2.0 plus ABC 1.1//EN" "http://www.wolframe.org/example-doc/employee_assignement_print.dtd">

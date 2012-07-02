@@ -26,6 +26,15 @@ rm -f $output
 echo "Writing test file $output"
 
 echo '**' >> $output
+if [ `echo $cset | grep -c '4'` != "0" ]; then
+	echo '**requires:DISABLED NETBSD' >> $output
+fi
+if [ `echo $testname | grep -c 'lua_'` != "0" ]; then
+	echo '**requires:LUA' >> $output
+fi
+if [ `echo $testname | grep -c '_libxml2'` != "0" ]; then
+	echo '**requires:LIBXML2' >> $output
+fi
 echo '**input' >> $output
 cat doc/$docin.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
 echo '**config' >> $output
