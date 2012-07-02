@@ -64,18 +64,24 @@ public:
 		return base64_encodedSize( dataSize, m_state.lineLength );
 	}
 
-	int encode( const void* data, size_t dataSize,
-		    char* encoded, size_t encodedMaxSize )
+	static int encode( const void* data, size_t dataSize,
+			   char* encoded, size_t encodedMaxSize, unsigned short lineLength )
+	{
+		return base64_encode(  data, dataSize, encoded, encodedMaxSize, lineLength );
+	}
+
+	int encodeChunk( const void* data, size_t dataSize,
+			 char* encoded, size_t encodedMaxSize )
 	{
 		return base64_encodeChunk( &m_state, data, dataSize, encoded, encodedMaxSize );
 	}
 
-	int encodeEnd( char* encoded, size_t encodedMaxSize )
+	int encodeEndChunk( char* encoded, size_t encodedMaxSize )
 	{
 		return base64_encodeEndChunk( &m_state, encoded, encodedMaxSize );
 	}
 
-	void encode( std::istream& input, std::ostream& output )
+	void encodeChunk( std::istream& input, std::ostream& output )
 	{
 		unsigned char* plain = new unsigned char[ m_bufferSize ];
 		char* encoded = new char[ 2 * m_bufferSize ];
@@ -86,11 +92,11 @@ public:
 			input.read( (char *)plain, m_bufferSize );
 			dataSize = input.gcount();
 			//
-			codedSize = encode( plain, dataSize, encoded, 2 * m_bufferSize );
+			codedSize = encodeChunk( plain, dataSize, encoded, 2 * m_bufferSize );
 			output.write( encoded, codedSize );
 		} while ( input.good() && dataSize > 0 );
 
-		codedSize = encodeEnd( encoded, 2 * m_bufferSize );
+		codedSize = encodeEndChunk( encoded, 2 * m_bufferSize );
 		output.write( encoded, codedSize );
 		//
 		base64_resetEncodeState( &m_state );

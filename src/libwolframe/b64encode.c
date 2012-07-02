@@ -192,6 +192,7 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 
 	switch( dataSize )	{
 		case 0:
+			state->bytesLeft = 0;
 			break;
 		case 1:
 			state->carryBytes[ 0 ] = *bytes;
@@ -253,7 +254,7 @@ int base64_encode( const void* data, size_t dataSize,
 		case 2:
 			if ( encodedMaxSize < 4 )
 				return BUFFER_OVERFLOW;
-			encodeBytes( bytes, output );
+			encodeEndBytes( bytes, dataSize, output );
 			output += 4;
 	}
 	return output - encoded;

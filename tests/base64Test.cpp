@@ -69,10 +69,10 @@ static const size_t bufSize = 512 + 1;
 static int strEncode( const char* data, char* encoded, size_t codeSize )
 {
 	base64::Encoder E;
-	int ret = E.encode((const unsigned char *)data, strlen((const char *)data ), encoded, codeSize - 1 );
+	int ret = E.encodeChunk((const unsigned char *)data, strlen((const char *)data ), encoded, codeSize - 1 );
 	if ( ret >= 0 )	{
 		int	retEnd;
-		if (( retEnd = E.encodeEnd( encoded + ret, codeSize - ret - 1 )) >= 0 )
+		if (( retEnd = E.encodeEndChunk( encoded + ret, codeSize - ret - 1 )) >= 0 )
 			ret += retEnd;
 		else
 			return retEnd;
@@ -270,59 +270,92 @@ TEST( Base64, RandomData )
 	size_t		dataSize, encodedSize;
 	unsigned short	lineLength;
 	unsigned char*	data;
-	char*		encoded;
+	char*		encoded1;
+	char*		encoded2;
 	unsigned char*	decoded;
 
 	srand( time( NULL ) );
-	dataSize = 1 + rand() % 32768;
-	lineLength = rand() % 1024;
-//	dataSize = 80;
-//	lineLength = 3;
 
-	encodedSize = base64::Encoder::encodedSize( dataSize, lineLength );
+	for ( int i = 0; i < 1024; i++ )	{
+		dataSize = 1 + rand() % 32768;
+		lineLength = rand() % 1024;
+		//	dataSize = 80;
+		//	lineLength = 3;
 
-	data = new unsigned char[ dataSize ];
-	encoded = new char[ encodedSize + 10 ];
-	decoded = new unsigned char[ dataSize + 1 ];
+		encodedSize = base64::Encoder::encodedSize( dataSize, lineLength );
 
-	std::cout << "Data size: " << dataSize << ", line length: " << lineLength
-		  << ", encoded estimated size: " << encodedSize << std::endl;
-	for ( size_t i = 0; i < dataSize; i++ )
-		data[ i ] = rand() % 256;
+		data = new unsigned char[ dataSize ];
+		encoded1 = new char[ encodedSize ];
+		encoded2 = new char[ encodedSize ];
+		decoded = new unsigned char[ dataSize + 1 ];
+
+		std::cout << "Data size: " << dataSize << ", line length: " << lineLength
+			  << ", encoded estimated size: " << encodedSize;
+		for ( size_t j = 0; j < dataSize; j++ )
+			data[ j ] = rand() % 256;
 
 #ifdef _BASE64_WRITE_OUTPUT
-	// data file
-	std::ofstream fdata( "b64data", std::ios_base::out | std::ios_base::binary );
-	fdata.write(( const char *)data, dataSize );
-	fdata.close();
+		// data file
+		std::ofstream fdata( "b64data", std::ios_base::out | std::ios_base::binary );
+		fdata.write(( const char *)data, dataSize );
+		fdata.close();
 #endif
-	base64::Encoder E( 0, lineLength );
-	int encodeResult = E.encode( data, dataSize, encoded, encodedSize + 10 );
-	int encodeEndResult = E.encodeEnd( encoded + encodeResult, encodedSize - encodeResult + 10 );
-		std::cout << "Encode result: " << encodeResult << ", end result: " << encodeEndResult << std::endl;
-	encodeResult += encodeEndResult;
+		base64::Encoder E( 0, lineLength );
+		int chunkSize = ( 1 + rand()) % dataSize;
+		int encodeResult = 0;
+		int partialResult = 0;
+		size_t dataUsed = 0;
+		while ( dataUsed <= dataSize - chunkSize )	{
+			partialResult = E.encodeChunk( data + dataUsed, chunkSize,
+						       encoded1 + encodeResult, encodedSize - encodeResult );
+			EXPECT_GE( partialResult, 0 );
+			encodeResult += partialResult;
+			EXPECT_LE( encodeResult, encodedSize );
+			dataUsed += chunkSize;
+		}
+		partialResult = E.encodeChunk( data + dataUsed, dataSize - dataUsed,
+					       encoded1 + encodeResult, encodedSize - encodeResult );
+		EXPECT_GE( partialResult, 0 );
+		encodeResult += partialResult;
+		EXPECT_LE( encodeResult, encodedSize );
+		int encodeEndResult = E.encodeEndChunk( encoded1 + encodeResult, encodedSize - encodeResult );
+		std::cout << ", chunk size: " << chunkSize;
+		std::cout << ", encode result: " << encodeResult << ", end result: " << encodeEndResult << std::endl;
+		encodeResult += encodeEndResult;
 #ifdef _BASE64_WRITE_OUTPUT
-	// encoded file
-	std::ofstream edata( "b64encoded", std::ios_base::out | std::ios_base::binary );
-	edata.write(( const char *)encoded, encodeResult );
-	edata.close();
+		// encoded file
+		std::ofstream edata1( "b64encoded1", std::ios_base::out | std::ios_base::binary );
+		edata1.write(( const char *)encoded1, encodeResult );
+		edata1.close();
 #endif
-	EXPECT_EQ( encodeResult, encodedSize );
+		EXPECT_EQ( encodeResult, encodedSize );
 
-	base64::Decoder D;
-	int decodeResult = D.decode( encoded, encodeResult, decoded, dataSize + 1 );
+		encodeResult = base64::Encoder::encode( data, dataSize, encoded2, encodedSize, lineLength );
 #ifdef _BASE64_WRITE_OUTPUT
-	// encoded file
-	std::ofstream ddata( "b64decoded", std::ios_base::out | std::ios_base::binary );
-	ddata.write(( const char *)decoded, decodeResult );
-	ddata.close();
+		// encoded file
+		std::ofstream edata2( "b64encoded2", std::ios_base::out | std::ios_base::binary );
+		edata2.write(( const char *)encoded2, encodeResult );
+		edata2.close();
 #endif
-	EXPECT_EQ( dataSize, decodeResult );
-	EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
+		EXPECT_EQ( encodeResult, encodedSize );
+		EXPECT_EQ( 0, memcmp( encoded1, encoded2, encodedSize ));
 
-	delete[] data;
-	delete[] encoded;
-	delete[] decoded;
+		base64::Decoder D;
+		int decodeResult = D.decode( encoded1, encodeResult, decoded, dataSize + 1 );
+#ifdef _BASE64_WRITE_OUTPUT
+		// encoded file
+		std::ofstream ddata( "b64decoded", std::ios_base::out | std::ios_base::binary );
+		ddata.write(( const char *)decoded, decodeResult );
+		ddata.close();
+#endif
+		EXPECT_EQ( dataSize, decodeResult );
+		EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
+
+		delete[] data;
+		delete[] encoded1;
+		delete[] encoded2;
+		delete[] decoded;
+	}
 }
 
 int main( int argc, char **argv )
