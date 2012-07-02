@@ -48,6 +48,8 @@ extern "C" {
 #define BUFFER_OVERFLOW		-1
 #define INVALID_CODE		-2
 
+/* enconding */
+
 typedef struct	{
 	unsigned char	carryBytes[ 3 ];
 	unsigned short	bytesLeft;
@@ -63,19 +65,21 @@ void base64_initEncodeState( base64_EncodeState* state, unsigned short lineLengt
 
 void base64_resetEncodeState( base64_EncodeState* state );
 
+int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t dataSize,
+			char* encoded, size_t encodedMaxSize );
+
+int base64_encodeEndChunk( base64_EncodeState* state, char* encoded, size_t encodedMaxSize );
+
+
+size_t base64_encodedSize( size_t dataSize, unsigned short lineLength );
+
 /**
  * Encodes a block of binary data into Base-64
  */
 int base64_encode( const void* data, size_t dataSize,
 		   char* encoded, size_t encodedMaxSize, unsigned short lineLength );
 
-int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t dataSize,
-			char* encoded, size_t encodedMaxSize );
-
-int base64_encodeEndChunk( base64_EncodeState* state, char* encoded, size_t encodedMaxSize );
-
-size_t base64_encodedSize( size_t dataSize, unsigned short lineLength );
-
+/* decoding */
 
 typedef enum	{
 	STEP_A,
@@ -94,6 +98,8 @@ void base64_initDecodeState( base64_DecodeState* state );
 
 int base64_decodeChunk( base64_DecodeState* state, const char* encoded, size_t encodedSize,
 			void* data, size_t dataMaxSize );
+
+int base64_decode( const char* encoded, size_t encodedSize, void* data, size_t dataMaxSize );
 
 #ifdef __cplusplus
 }

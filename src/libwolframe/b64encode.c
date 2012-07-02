@@ -193,7 +193,6 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 
 	switch( dataSize )	{
 		case 0:
-			state->bytesLeft = 0;
 			break;
 		case 1:
 			state->carryBytes[ 0 ] = *bytes;

@@ -286,9 +286,9 @@ TEST( Base64, RandomData )
 		lineLength = rand() % 1024;
 		chunkSize = 1 + rand() % dataSize;
 // fixed data
-//		dataSize = 5892;
+//		dataSize = 4;
 //		lineLength = 130;
-//		chunkSize = 3366;
+//		chunkSize = 4;
 
 		encodedSize = base64::encodedSize( dataSize, lineLength );
 
