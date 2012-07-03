@@ -40,9 +40,13 @@
 
 #undef _BASE64_WRITE_OUTPUT
 #undef _BASE64_LOOP_TEST
+#undef _BASE64_PRINT_TEST_PARAMETRS
 
 //#define _BASE64_WRITE_OUTPUT
 #define _BASE64_LOOP_TEST
+//#define _BASE64_NOF_LOOPS	64
+#define _BASE64_NOF_LOOPS	10240
+//#define _BASE64_PRINT_TEST_PARAMETRS
 
 using namespace _Wolframe;
 
@@ -280,15 +284,15 @@ TEST( Base64, RandomData )
 
 	srand( time( NULL ) );
 #ifdef _BASE64_LOOP_TEST
-	for ( int i = 0; i < 1024; i++ )	{
+	for ( int i = 0; i < _BASE64_NOF_LOOPS; i++ )	{
 #endif
 		dataSize = 1 + rand() % 32768;
-		lineLength = rand() % 1024;
+		lineLength = rand() % 2048;
 		chunkSize = 1 + rand() % dataSize;
 // fixed data
-//		dataSize = 4;
-//		lineLength = 130;
-//		chunkSize = 4;
+//		dataSize = 19;
+//		lineLength = 9;
+//		chunkSize = 14;
 
 		encodedSize = base64::encodedSize( dataSize, lineLength );
 
@@ -297,8 +301,6 @@ TEST( Base64, RandomData )
 		encoded2 = new char[ encodedSize ];
 		decoded = new unsigned char[ dataSize + 1 ];
 
-		std::cout << "Data size: " << dataSize << ", line length: " << lineLength
-			  << ", encoded estimated size: " << encodedSize;
 		for ( size_t j = 0; j < dataSize; j++ )
 			data[ j ] = rand() % 256;
 
@@ -312,6 +314,11 @@ TEST( Base64, RandomData )
 		int encodeResult = 0;
 		int partialResult = 0;
 		size_t dataUsed = 0;
+#ifdef _BASE64_PRINT_TEST_PARAMETRS
+		std::cout << "Data: " << dataSize << " bytes, line length: " << lineLength
+			  << ", encoded computed size: " << encodedSize;
+		std::cout << ", chunk size: " << chunkSize;
+#endif
 		while ( dataUsed <= dataSize - chunkSize )	{
 			partialResult = E.encodeChunk( data + dataUsed, chunkSize,
 						       encoded1 + encodeResult, encodedSize - encodeResult );
@@ -326,8 +333,9 @@ TEST( Base64, RandomData )
 		encodeResult += partialResult;
 		EXPECT_LE( encodeResult, encodedSize );
 		int encodeEndResult = E.encodeEndChunk( encoded1 + encodeResult, encodedSize - encodeResult );
-		std::cout << ", chunk size: " << chunkSize;
-		std::cout << ", encode result: " << encodeResult << ", end result: " << encodeEndResult << std::endl;
+#ifdef _BASE64_PRINT_TEST_PARAMETRS
+		std::cout << ", encoded size: " << encodeResult << " + " << encodeEndResult << std::endl;
+#endif
 		encodeResult += encodeEndResult;
 #ifdef _BASE64_WRITE_OUTPUT
 		// encoded file
