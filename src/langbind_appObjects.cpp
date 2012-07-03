@@ -390,26 +390,32 @@ PeerFormFunction::PeerFormFunction( const PeerFunction& f, const DDLForm& i, con
 {}
 
 
-PeerFormFunctionClosure::PeerFormFunctionClosure( const PeerFormFunction& f, const TypedInputFilterR& i)
+PeerFormFunctionClosure::PeerFormFunctionClosure( const PeerFormFunction& f)
 	:m_func(f)
 	,m_cmd(f.cmdconstructor()())
 	,m_cmdop(cmdbind::CommandHandler::READ)
 	,m_state(0)
 	,m_cmdinputbuf(std::malloc( InputBufSize), std::free)
 	,m_cmdoutputbuf(std::malloc( OutputBufSize), std::free)
-	,m_param(f.inputform().copy().structure())
-	,m_result(f.outputform().copy().structure())
-	,m_cmdserialize(m_param.structure())
-	,m_inputfilter(i)
+{}
+
+void PeerFormFunctionClosure::init( const TypedInputFilterR& i)
 {
-	if (!f.cmdwriter().get()) throw std::runtime_error( "called transaction function without command writer filter");
-	if (!f.resultreader().get()) throw std::runtime_error( "called transaction function without result reader filter");
+	m_inputfilter = i;
+	m_param = serialize::DDLStructParser( m_func.inputform().copy().structure());
+	m_result = serialize::DDLStructParser( m_func.outputform().copy().structure());
+	m_cmdserialize = serialize::DDLStructSerializer( m_param.structure());
+
+	if (!m_func.cmdwriter().get()) throw std::runtime_error( "called transaction function without command writer filter");
+	if (!m_func.resultreader().get()) throw std::runtime_error( "called transaction function without result reader filter");
 	if (!m_inputfilter.get()) throw std::runtime_error( "null input for transaction function");
 	if (!m_cmdinputbuf.get()) throw std::bad_alloc();
 	if (!m_cmdoutputbuf.get()) throw std::bad_alloc();
 
-	m_cmdwriter.reset( f.cmdwriter()->copy());
-	m_resultreader.reset( f.resultreader()->copy());
+	m_cmdop = cmdbind::CommandHandler::READ;
+	m_state = 0;
+	m_cmdwriter.reset( m_func.cmdwriter()->copy());
+	m_resultreader.reset( m_func.resultreader()->copy());
 	m_param.init( m_inputfilter);
 	m_result.init( TypedInputFilterR( new TypingInputFilter( m_resultreader)));
 	m_cmdserialize.init( TypedOutputFilterR( new TypingOutputFilter( m_cmdwriter)));
@@ -417,6 +423,7 @@ PeerFormFunctionClosure::PeerFormFunctionClosure( const PeerFormFunction& f, con
 	m_cmd->setInputBuffer( m_cmdinputbuf.get(), InputBufSize);
 	m_cmd->setOutputBuffer( m_cmdoutputbuf.get(), OutputBufSize, 0);
 }
+
 
 PeerFormFunctionClosure::PeerFormFunctionClosure( const PeerFormFunctionClosure& o)
 	:m_func(o.m_func)

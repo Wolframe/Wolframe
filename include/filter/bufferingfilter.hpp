@@ -91,6 +91,21 @@ public:
 		}
 	}
 
+	virtual bool getDocType( std::string& val)
+	{
+		if (m_end)
+		{
+			bool rt = m_ref->getDocType( val);
+			setState( m_ref->state(), m_ref->getError());
+			return rt;
+		}
+		else
+		{
+			setState( EndOfMessage);
+			return false;
+		}
+	}
+
 	///\brief Implements FilterBase::getValue(const char*,std::string&)
 	virtual bool getValue( const char* name, std::string& val) const
 	{

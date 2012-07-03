@@ -46,10 +46,13 @@ namespace serialize {
 class DDLStructParser
 {
 public:
+	DDLStructParser(){}
 	explicit DDLStructParser( const ddl::StructTypeR& st);
 
 	DDLStructParser( const DDLStructParser& o);
 	virtual ~DDLStructParser(){}
+
+	DDLStructParser& operator=( const DDLStructParser& o);
 
 	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
 

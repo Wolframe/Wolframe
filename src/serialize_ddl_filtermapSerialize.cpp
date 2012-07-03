@@ -235,6 +235,16 @@ DDLStructSerializer::DDLStructSerializer( const DDLStructSerializer& o)
 	,m_out(o.m_out)
 	,m_stk(o.m_stk){}
 
+DDLStructSerializer& DDLStructSerializer::operator =( const DDLStructSerializer& o)
+{
+	TypedInputFilter::operator=(o);
+	m_st = o.m_st;
+	m_ctx = o.m_ctx;
+	m_out = o.m_out;
+	m_stk = o.m_stk;
+	return *this;
+}
+
 void DDLStructSerializer::init( const langbind::TypedOutputFilterR& out, Context::Flags flags)
 {
 	m_ctx.clear();

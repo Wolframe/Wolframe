@@ -52,7 +52,6 @@ bool ApplicationEnvironmentConfig::check() const
 	std::map<std::string,bool> forms;
 	std::map<std::string,bool> functions;
 	std::map<std::string,bool> scripts;
-	std::map<std::string,bool> formfunctions;
 	{
 		compilers[ "simpleform"] = true;
 		std::vector<DDLCompilerConfigStruct>::const_iterator itr=m_config.DDL.begin(),end=m_config.DDL.end();
@@ -117,23 +116,23 @@ bool ApplicationEnvironmentConfig::check() const
 		}
 	}
 	{
-		std::vector<PeerFormFunctionConfigStruct>::const_iterator itr=m_config.transaction.begin(),end=m_config.transaction.end();
+		std::vector<PeerFunctionConfigStruct>::const_iterator itr=m_config.peerfunction.begin(),end=m_config.peerfunction.end();
 		for (;itr!=end; ++itr)
 		{
 			if (functions[ itr->name])
 			{
-				LOG_ERROR << "Duplicate definition or using reserved name for transaction function " << itr->name;
+				LOG_ERROR << "Duplicate definition or using reserved name for peer function " << itr->name;
 				rt = false;
 			}
 			functions[ itr->name] = true;
 			if (!filters[ itr->filter])
 			{
-				LOG_ERROR << "Undefined filter '" << itr->filter << "'used for transaction function command reader/writer in " << itr->name;
+				LOG_ERROR << "Undefined filter '" << itr->filter << "' used for peer function command reader/writer in " << itr->name;
 				rt = false;
 			}
 			if (!utils::fileExists( itr->modulepath))
 			{
-				LOG_ERROR << "Path of transaction function command handler module does not exist: " << itr->modulepath;
+				LOG_ERROR << "Path of peer function command handler module does not exist: " << itr->modulepath;
 				rt = false;
 			}
 		}
@@ -159,15 +158,42 @@ bool ApplicationEnvironmentConfig::check() const
 		std::vector<FormFunctionConfigStruct>::const_iterator itr=m_config.formfunction.begin(),end=m_config.formfunction.end();
 		for (;itr!=end; ++itr)
 		{
-			if (formfunctions[ itr->name])
+			if (functions[ itr->name])
 			{
 				LOG_ERROR << "Duplicate definition or using reserved name for form function " << itr->name;
 				rt = false;
 			}
-			formfunctions[ itr->name] = true;
+			functions[ itr->name] = true;
 			if (!utils::fileExists( itr->modulepath))
 			{
 				LOG_ERROR << "Path of form function module does not exist: " << itr->modulepath;
+				rt = false;
+			}
+		}
+	}
+	{
+		std::vector<PeerFormFunctionConfigStruct>::const_iterator itr=m_config.peerformfunction.begin(),end=m_config.peerformfunction.end();
+		for (;itr!=end; ++itr)
+		{
+			if (functions[ itr->name])
+			{
+				LOG_ERROR << "Duplicate definition or using reserved name for peer form function " << itr->name;
+				rt = false;
+			}
+			functions[ itr->name] = true;
+			if (!functions[ itr->peerfunc])
+			{
+				LOG_ERROR << "Undefined peer function '" << itr->name << "'";
+				rt = false;
+			}
+			if (!forms[ itr->inputform])
+			{
+				LOG_ERROR << "Undefined form '" << itr->inputform << "' used for peer form function command parameter description" << itr->name;
+				rt = false;
+			}
+			if (!forms[ itr->outputform])
+			{
+				LOG_ERROR << "Undefined form '" << itr->outputform << "' used for peer form function command result description" << itr->name;
 				rt = false;
 			}
 		}
@@ -223,7 +249,7 @@ void ApplicationEnvironmentConfig::setCanonicalPathes( const std::string& refere
 		}
 	}
 	{
-		std::vector<PeerFormFunctionConfigStruct>::iterator itr=m_config.transaction.begin(),end=m_config.transaction.end();
+		std::vector<PeerFunctionConfigStruct>::iterator itr=m_config.peerfunction.begin(),end=m_config.peerfunction.end();
 		for (;itr!=end; ++itr)
 		{
 			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);

@@ -344,11 +344,15 @@ public:
 	///\brief Constructor
 	///\param[in] nam name of the function called
 	///\param[in] f function called
-	PeerFormFunctionClosure( const PeerFormFunction& f, const TypedInputFilterR& i);
+	PeerFormFunctionClosure( const PeerFormFunction& f);
 
 	///\brief Copy constructor
 	///\param[in] o copied item
 	PeerFormFunctionClosure( const PeerFormFunctionClosure& o);
+
+	///\brief Initialization of call context for a new call
+	///\param[in] i call input
+	void init( const TypedInputFilterR& i);
 
 	///\brief Destructor
 	~PeerFormFunctionClosure(){}

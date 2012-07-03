@@ -276,6 +276,15 @@ DDLStructParser::DDLStructParser( const DDLStructParser& o)
 	,m_stk(o.m_stk)
 	{}
 
+DDLStructParser& DDLStructParser::operator=( const DDLStructParser& o)
+{
+	m_st = o.m_st;
+	m_ctx = o.m_ctx;
+	m_inp = o.m_inp;
+	m_stk = o.m_stk;
+	return *this;
+}
+
 void DDLStructParser::init( const langbind::TypedInputFilterR& i, Context::Flags flags)
 {
 	m_inp = i;

@@ -319,7 +319,8 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
-			PeerFormFunctionClosure closure( func, inp);
+			PeerFormFunctionClosure closure( func);
+			closure.init( inp);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 

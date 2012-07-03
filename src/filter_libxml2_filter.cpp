@@ -94,9 +94,11 @@ public:
 		if (init( encoding, false))
 		{
 			xmlTextWriterPtr ww = m_writer.get();
-			if (0>xmlTextWriterStartDTD( ww, (const xmlChar*)doctype, (const xmlChar*)publicid, (const xmlChar*)systemid))
+			if (0>xmlTextWriterStartDTD( ww, (const xmlChar*)doctype, (const xmlChar*)publicid, (const xmlChar*)systemid)
+			||  0>xmlTextWriterEndDTD(ww))
 			{
-				xmlTextWriterEndDTD(ww);
+				m_writer.reset();
+				m_writerbuf.reset();
 			}
 		}
 	}
@@ -147,9 +149,6 @@ struct InputFilterImpl :public InputFilter
 		,m_withEmpty(o.m_withEmpty)
 		,m_elembuf(o.m_elembuf)
 		,m_encoding(o.m_encoding)
-		,m_doctype_root(o.m_doctype_root)
-		,m_doctype_public(o.m_doctype_public)
-		,m_doctype_system(o.m_doctype_system)
 		{}
 
 	///\brief Implements InputFilter::copy()
@@ -169,7 +168,7 @@ struct InputFilterImpl :public InputFilter
 		return InputFilter::getValue( name, val);
 	}
 
-	///\brief Implements FilterBase::getDocType(std::string&)
+	///\brief Implements InputFilter::getDocType(std::string&)
 	virtual bool getDocType( std::string& val)
 	{
 		DocType doctype;
@@ -219,13 +218,6 @@ struct InputFilterImpl :public InputFilter
 			setState( Error, err->message);
 		}
 		m_node = xmlDocGetRootElement( m_doc.get());
-		xmlDtdPtr dtd = (xmlDtdPtr)m_node->parent;
-		if (dtd && dtd->type)
-		{
-			m_doctype_root = getElementString( dtd->name);
-			m_doctype_public = getElementString( dtd->ExternalID);
-			m_doctype_system = getElementString( dtd->SystemID);
-		}
 
 		const xmlChar* ec = m_doc.get()->encoding;
 		m_encoding.reset( new std::string);
@@ -237,10 +229,28 @@ struct InputFilterImpl :public InputFilter
 
 	bool getDocType( DocType& doctype)
 	{
-		if (!m_doc.get()) return false;
-		doctype.rootid = m_doctype_root.size()?m_doctype_root.c_str():0;
-		doctype.publicid = m_doctype_public.size()?m_doctype_public.c_str():0;
-		doctype.systemid = m_doctype_system.size()?m_doctype_system.c_str():0;
+		if (!m_doc.get())
+		{
+			return false;
+		}
+		xmlNode* nd = m_doc.get()->children;
+		while (nd && nd->type != XML_DTD_NODE)
+		{
+			nd = nd->next;
+		}
+		if (nd)
+		{
+			xmlDtdPtr dtd = (xmlDtdPtr)nd;
+			doctype.rootid = (char*)dtd->name;
+			doctype.publicid = (char*)dtd->ExternalID;
+			doctype.systemid = (char*)dtd->SystemID;
+		}
+		else
+		{
+			doctype.rootid = 0;
+			doctype.publicid = 0;
+			doctype.systemid = 0;
+		}
 		return true;
 	}
 
@@ -390,9 +400,6 @@ private:
 	bool m_withEmpty;
 	std::string m_elembuf;
 	CountedReference<std::string> m_encoding;
-	std::string m_doctype_root;
-	std::string m_doctype_public;
-	std::string m_doctype_system;
 };
 
 

@@ -95,12 +95,12 @@ struct InputFilterImpl:public InputFilter
 	{
 		if (std::strcmp( name, "empty") == 0)
 		{
-			val = m_parser.withEmpty();
+			val = m_parser.withEmpty()?"true":"false";
 			return true;
 		}
 		if (std::strcmp( name, "tokenize") == 0)
 		{
-			val = m_parser.doTokenize();
+			val = m_parser.doTokenize()?"true":"false";
 			return true;
 		}
 		return Parent::getValue( name, val);

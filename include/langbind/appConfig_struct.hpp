@@ -1,4 +1,4 @@
- /************************************************************************
+/************************************************************************
 
  Copyright (C) 2011 Project Wolframe.
  All rights reserved.
@@ -69,11 +69,22 @@ struct FilterConfigStruct
 	static const config::DescriptionBase* description();
 };
 
+struct PeerFunctionConfigStruct
+{
+	std::string name;						//< name of the peer function
+	std::string filter;						//< name of the filter defining the command protocol reader/writer
+	std::string modulepath;						//< path of the command handler module (cmdbind::CommandHandler)
+
+	///\brief Get the configuration structure description
+	static const config::DescriptionBase* description();
+};
+
 struct PeerFormFunctionConfigStruct
 {
-	std::string name;						//< name of the transaction function
-	std::string filter;						//< name of the filter defining the transaction command reader/writer
-	std::string modulepath;						//< path of the transaction function handler module (cmdbind::CommandHandler)
+	std::string name;						//< name of the peer form function
+	std::string peerfunc;						//< name of the peer function
+	std::string inputform;						//< name of the input form (parameter)
+	std::string outputform;						//< name of the output form (return value)
 
 	///\brief Get the configuration structure description
 	static const config::DescriptionBase* description();
@@ -90,7 +101,7 @@ struct ScriptCommandConfigStruct
 
 struct FormFunctionConfigStruct
 {
-	std::string name;						//< name of the form function
+	std::string name;						//< name of the form function (globally unique)
 	std::string modulepath;						//< path of module with the function definition and implementation
 
 	///\brief Get the configuration structure description
@@ -102,7 +113,8 @@ struct EnvironmentConfigStruct
 	std::vector<DDLCompilerConfigStruct> DDL;			//< definitions of DDLs
 	std::vector<DDLFormConfigStruct> form;				//< definitions of forms
 	std::vector<FilterConfigStruct> filter;				//< definitions of filters
-	std::vector<PeerFormFunctionConfigStruct> transaction;		//< definitions of transaction functions
+	std::vector<PeerFunctionConfigStruct> peerfunction;		//< definitions of peer functions
+	std::vector<PeerFormFunctionConfigStruct> peerformfunction;	//< definitions of peer form functions
 	std::vector<ScriptCommandConfigStruct> script;			//< definitions of script functions
 	std::vector<FormFunctionConfigStruct> formfunction;		//< definitions of the form functions
 

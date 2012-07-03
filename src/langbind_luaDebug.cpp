@@ -173,7 +173,11 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, std::vec
 			rt.append( "nil");
 			break;
 
-		case LUA_TSTRING: {
+		case LUA_TBOOLEAN:
+			rt.append( lua_toboolean( ls, index) ? "true":"false");
+			break;
+
+		case LUA_TSTRING:
 			rt.append( lua_tostring( ls, index));
 			break;
 
@@ -216,7 +220,6 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, std::vec
 
 		default:
 			rt.append( "(none)");
-		}
 	}
 }
 

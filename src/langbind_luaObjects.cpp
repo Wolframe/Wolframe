@@ -69,8 +69,10 @@ namespace luaname
 	static const char* DDLStructSerializer = "wolframe.DDLStructSerializer";
 	static const char* GlobalContext = "wolframe.ctx";
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
+	static const char* TypedInputFilterR = "wolframe.TypedInputFilterR";
 	static const char* TypedInputFilterClosure = "wolframe.TypedInputFilterClosure";
 	static const char* FormFunctionClosure = "wolframe.FormFunctionClosure";
+	static const char* PeerFormFunctionClosure = "wolframe.PeerFormFunctionClosure";
 	static const char* StructSerializer = "wolframe.StructSerializer";
 }
 
@@ -88,8 +90,10 @@ template <> const char* metaTableName<serialize::DDLStructParser>()	{return luan
 template <> const char* metaTableName<serialize::DDLStructSerializer>()	{return luaname::DDLStructSerializer;}
 template <> const char* metaTableName<GlobalContext>()			{return luaname::GlobalContext;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
+template <> const char* metaTableName<TypedInputFilterR>()		{return luaname::TypedInputFilterR;}
 template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
 template <> const char* metaTableName<FormFunctionClosure>()		{return luaname::FormFunctionClosure;}
+template <> const char* metaTableName<PeerFormFunctionClosure>()	{return luaname::PeerFormFunctionClosure;}
 template <> const char* metaTableName<serialize::StructSerializer>()	{return luaname::StructSerializer;}
 }//anonymous namespace
 
@@ -317,23 +321,19 @@ static int function__LuaObject__index( lua_State* ls)
 		{
 			throw std::runtime_error( "invalid element name");
 		}
-		bool rt = false;
 		std::string val;
 		if (!obj->getValue( key, val))
 		{
 			if (lua_getmetatable( ls, 1)) return 1;
+			throw std::runtime_error( "unknown element name");
 		}
-		if (rt)
+		else
 		{
 			LuaExceptionHandlerScope escope(ls);
 			{
 				lua_pushlstring( ls, val.c_str(), val.size());
 				return 1;
 			}
-		}
-		else
-		{
-			throw std::runtime_error( "unknown element name");
 		}
 		return 0;
 	}
@@ -365,18 +365,23 @@ static int function__LuaObject__newindex( lua_State* ls)
 
 		if (tp == LUA_TBOOLEAN)
 		{
-			val = lua_toboolean( ls, 3)?"true":"false";
+			lua_pushvalue( ls, 3);
+			val = lua_toboolean( ls, -1)?"true":"false";
 		}
 		else
 		{
-			val = lua_tostring( ls, 3);
+			lua_pushvalue( ls, 3);
+			val = lua_tostring( ls, -1);
 		}
 		if (!val)
 		{
+			lua_pop( ls, 1);
+			if (lua_getmetatable( ls, 1)) return 1;
 			throw std::runtime_error( "value is not convertible to a string");
 		}
 		if (!obj->setValue( key, val))
 		{
+			lua_pop( ls, 1);
 			if (lua_getmetatable( ls, 1)) return 1;
 			throw std::runtime_error( "unknown element name");
 		}
@@ -472,14 +477,14 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_inputFilter_get)
 
 
 
-LUA_FUNCTION_THROWS( "<structure>:get()", function_typedInputFilter_get)
+LUA_FUNCTION_THROWS( "<structure>:get()", function_typedinputfilterClosure_get)
 {
 	TypedInputFilterClosure* closure = LuaObject<TypedInputFilterClosure>::get( ls, lua_upvalueindex( 1));
 	LuaExceptionHandlerScope escope(ls);
 	switch (closure->fetch( ls))
 	{
 		case TypedInputFilterClosure::DoYield:
-			lua_yieldk( ls, 0, 1, function_typedInputFilter_get);
+			lua_yieldk( ls, 0, 1, function_typedinputfilterClosure_get);
 
 		case TypedInputFilterClosure::EndOfData:
 			return 0;
@@ -515,7 +520,7 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 				throw std::runtime_error( "iterator used as function argument in an intermediate state");
 			}
 			LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( tc->inputfilter()));
-			lua_pushcclosure( ls, function_typedInputFilter_get, 1);
+			lua_pushcclosure( ls, function_typedinputfilterClosure_get, 1);
 			return 1;
 		}
 	}
@@ -616,7 +621,7 @@ LUA_FUNCTION_THROWS( "form:get()", function_form_get)
 
 	TypedInputFilterR itr( new serialize::DDLStructSerializer( result->structure()));
 	LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure(itr));
-	lua_pushcclosure( ls, function_typedInputFilter_get, 1);
+	lua_pushcclosure( ls, function_typedinputfilterClosure_get, 1);
 	return 1;
 }
 
@@ -709,12 +714,68 @@ LUA_FUNCTION_THROWS( "<structure>:table()", function_struct_table)
 
 LUA_FUNCTION_THROWS( "<structure>:get()", function_struct_get)
 {
-	serialize::StructSerializer* obj = LuaObject<serialize::StructSerializer>::getSelf( ls, "<form function result>", "get");
+	serialize::StructSerializer* obj = LuaObject<serialize::StructSerializer>::getSelf( ls, "<structure>", "get");
 	check_parameters( ls, 1, 0);
 
 	TypedInputFilterR itr( new serialize::StructSerializer( *obj));
 	LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( itr));
-	lua_pushcclosure( ls, function_typedInputFilter_get, 1);
+	lua_pushcclosure( ls, function_typedinputfilterClosure_get, 1);
+	return 1;
+}
+
+
+LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_typedinputfilter_tostring)
+{
+	TypedInputFilterR* obj = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "__tostring");
+	check_parameters( ls, 1, 0);
+
+	ToStringFilter* flt = new ToStringFilter();
+	TypedOutputFilterR out( flt);
+	RedirectFilterClosure exc( *obj, out);
+	if (!exc.call())
+	{
+		throw std::logic_error( "internal: tostring serialization with yield");
+	}
+	std::string content = flt->content();
+	LuaExceptionHandlerScope escope(ls);
+	{
+		lua_pushlstring( ls, content.c_str(), content.size());
+		return 1;
+	}
+}
+
+
+LUA_FUNCTION_THROWS( "<structure>:table()", function_typedinputfilter_table)
+{
+	TypedInputFilterR* obj = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "table");
+
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
+		LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( *obj, outp));
+		RedirectFilterClosure* closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
+		lua_pushvalue( ls, 2);			//... iterator argument
+		lua_pushlightuserdata( ls, closure);	//... redirect closure object
+	}
+	RedirectFilterClosure* closure = (RedirectFilterClosure*)lua_touserdata( ls, -1);
+	lua_pop( ls, 1);
+	if (!closure->call())
+	{
+		lua_pushlightuserdata( ls, closure);
+		lua_yieldk( ls, 0, 1, function_typedinputfilter_table);
+	}
+	return 1;
+}
+
+
+LUA_FUNCTION_THROWS( "<structure>:get()", function_typedinputfilter_get)
+{
+	TypedInputFilterR* obj = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "get");
+	check_parameters( ls, 1, 0);
+
+	LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( *obj));
+	lua_pushcclosure( ls, function_typedinputfilterClosure_get, 1);
 	return 1;
 }
 
@@ -744,6 +805,31 @@ LUA_FUNCTION_THROWS( "<formfunction>(..)", function_formfunction_call)
 	return 1;
 }
 
+LUA_FUNCTION_THROWS( "<formfunction>(..)", function_peerformfunction_call)
+{
+	PeerFormFunctionClosure* closure = LuaObject<PeerFormFunctionClosure>::get( ls, lua_upvalueindex( 1));
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		if (lua_gettop( ls) != 1)
+		{
+			throw std::runtime_error( "one argument expected");
+		}
+		else
+		{
+			TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
+			closure->init( inp);
+		}
+		lua_pushvalue( ls, 1);		//... iterator argument (table, generator function, etc.)
+	}
+	if (!closure->call())
+	{
+		lua_yieldk( ls, 0, 1, function_peerformfunction_call);
+	}
+	LuaObject<DDLForm>::push_luastack( ls, closure->result());
+	return 1;
+}
+
 
 LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 {
@@ -755,14 +841,30 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 	{
 		throw std::runtime_error( "lost global context");
 	}
-	FormFunction func;
-	if (!ctx->getFormFunction( name, func))
+	FormFunction ff;
+	PeerFunction pf;
+	PeerFormFunction pff;
+
+	if (ctx->getFormFunction( name, ff))
 	{
-		throw std::runtime_error( "function not found");
+		LuaObject<FormFunctionClosure>::push_luastack( ls, FormFunctionClosure( ff));
+		lua_pushcclosure( ls, function_formfunction_call, 1);
+		return 1;
 	}
-	LuaObject<FormFunctionClosure>::push_luastack( ls, FormFunctionClosure( func));
-	lua_pushcclosure( ls, function_formfunction_call, 1);
-	return 1;
+	else if (ctx->getPeerFormFunction( name, pff))
+	{
+		LuaObject<PeerFormFunctionClosure>::push_luastack( ls, PeerFormFunctionClosure( pff));
+		lua_pushcclosure( ls, function_peerformfunction_call, 1);
+		return 1;
+	}
+	else if (ctx->getPeerFunction( name, pf))
+	{
+		throw std::runtime_error( "calling peer function without parameter/result form directly. Only functions configured as formfunction or peerformfunction are supported");
+	}
+	else
+	{
+		throw std::runtime_error( "form function not found");
+	}
 }
 
 
@@ -882,21 +984,39 @@ LUA_FUNCTION_THROWS( "output:closetag(..)", function_output_closetag)
 
 LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 {
-	check_parameters( ls, 0, 1, LUA_TSTRING);
+	switch (lua_gettop( ls))
+	{
+		case 0:
+		{
+			LuaExceptionHandlerScope escope(ls);
+			{
+				Input* input = LuaObject<Input>::getGlobal( ls, "input");
+				Output* output = LuaObject<Output>::getGlobal( ls, "output");
+				Filter flt( input->inputfilter(), output->outputfilter());
+				LuaObject<Filter>::push_luastack( ls, flt);
+				return 1;
+			}
+		}
+		case 1:
+		{
+			const char* name = lua_tostring( ls, 1);
+			if (!name) throw std::runtime_error( "filter name is not a string");
 
-	const char* name = lua_tostring( ls, 1);
-	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
-	if (!ctx)
-	{
-		throw std::runtime_error( "lost global context");
+			GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
+			if (!ctx)
+			{
+				throw std::runtime_error( "lost global context");
+			}
+			Filter flt;
+			if (!ctx->getFilter( name, flt))
+			{
+				throw std::runtime_error( "filter not defined");
+			}
+			LuaObject<Filter>::push_luastack( ls, flt);
+			return 1;
+		}
+		default: throw std::runtime_error( "too many arguments");
 	}
-	Filter flt;
-	if (!ctx->getFilter( name, flt))
-	{
-		throw std::runtime_error( "filter not defined");
-	}
-	LuaObject<Filter>::push_luastack( ls, flt);
-	return 1;
 }
 
 
@@ -1111,6 +1231,14 @@ static const luaL_Reg output_methodtable[ 5] =
 	{0,0}
 };
 
+static const luaL_Reg typedinputfilter_methodtable[ 4] =
+{
+	{"table",&function_typedinputfilter_table},
+	{"get", &function_typedinputfilter_get},
+	{"__tostring",&function_typedinputfilter_tostring},
+	{0,0}
+};
+
 static const luaL_Reg struct_methodtable[ 4] =
 {
 	{"table",&function_struct_table},
@@ -1288,10 +1416,13 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			LuaObject<DDLForm>::createMetatable( ls, 0, 0, ddlform_methodtable);
 			LuaObject<serialize::DDLStructParser>::createMetatable( ls, 0, 0, 0);
 			LuaObject<serialize::DDLStructSerializer>::createMetatable( ls, 0, 0, 0);
+			LuaObject<serialize::StructSerializer>::createMetatable( ls, 0, 0, struct_methodtable);
 			LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
+			LuaObject<TypedInputFilterR>::createMetatable( ls, 0, 0, typedinputfilter_methodtable);
 			LuaObject<TypedInputFilterClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<FormFunctionClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<serialize::StructSerializer>::createMetatable( ls, 0, 0, struct_methodtable);
+			LuaObject<PeerFormFunctionClosure>::createMetatable( ls, 0, 0, 0);
+
 			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
 			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
 			LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);

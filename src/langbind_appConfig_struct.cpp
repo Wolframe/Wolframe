@@ -104,6 +104,23 @@ const config::DescriptionBase* FormFunctionConfigStruct::description()
 	return &rt;
 }
 
+const config::DescriptionBase* PeerFunctionConfigStruct::description()
+{
+	struct ThisDescription :public config::Description<PeerFunctionConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "name",		&PeerFunctionConfigStruct::name)
+			( "filter",		&PeerFunctionConfigStruct::filter)
+			( "modulepath",		&PeerFunctionConfigStruct::modulepath)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
 const config::DescriptionBase* PeerFormFunctionConfigStruct::description()
 {
 	struct ThisDescription :public config::Description<PeerFormFunctionConfigStruct>
@@ -112,8 +129,9 @@ const config::DescriptionBase* PeerFormFunctionConfigStruct::description()
 		{
 			(*this)
 			( "name",		&PeerFormFunctionConfigStruct::name)
-			( "filter",		&PeerFormFunctionConfigStruct::filter)
-			( "modulepath",		&PeerFormFunctionConfigStruct::modulepath)
+			(" peerfunc",		&PeerFormFunctionConfigStruct::peerfunc)
+			( "inputform",		&PeerFormFunctionConfigStruct::inputform)
+			( "outputform",		&PeerFormFunctionConfigStruct::outputform)
 			;
 		}
 	};
@@ -147,7 +165,8 @@ const config::DescriptionBase* EnvironmentConfigStruct::description()
 			( "DDL",		&EnvironmentConfigStruct::DDL)
 			( "form",		&EnvironmentConfigStruct::form)
 			( "filter",		&EnvironmentConfigStruct::filter)
-			( "transaction",	&EnvironmentConfigStruct::transaction)
+			( "peerfunction",	&EnvironmentConfigStruct::peerfunction)
+			( "peerformfunction",	&EnvironmentConfigStruct::peerformfunction)
 #if WITH_LUA
 			( "script",		&EnvironmentConfigStruct::script)
 #endif
