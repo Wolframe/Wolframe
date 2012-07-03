@@ -104,7 +104,7 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 	bytes = ( const unsigned char *)data;
 	output = encoded;
 
-	if ( state->newLinePending )	{
+	if ( state->newLinePending && dataSize )	{
 		if ( encodedMaxSize < 1 )
 			return BUFFER_OVERFLOW;
 		*output++ = '\n';

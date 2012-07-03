@@ -280,15 +280,15 @@ TEST( Base64, RandomData )
 
 	srand( time( NULL ) );
 #ifdef _BASE64_LOOP_TEST
-	for ( int i = 0; i < 1024; i++ )	{
+	for ( int i = 0; i < 64; i++ )	{
 #endif
 		dataSize = 1 + rand() % 32768;
 		lineLength = rand() % 1024;
 		chunkSize = 1 + rand() % dataSize;
 // fixed data
-//		dataSize = 4;
-//		lineLength = 130;
-//		chunkSize = 4;
+//		dataSize = 18;
+//		lineLength = 13;
+//		chunkSize = 16;
 
 		encodedSize = base64::encodedSize( dataSize, lineLength );
 
