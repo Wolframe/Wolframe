@@ -39,7 +39,7 @@
 
 static const char* base64Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static inline void encodeBytes( const unsigned char *data, char *str )
+static void encodeBytes( const unsigned char *data, char *str )
 {
 	*str++ = base64Table[ data[ 0 ] >> 2 ];
 	*str++ = base64Table[(( data[ 0 ] << 4 ) | ( data[ 1 ] >> 4 )) & 0x3f ];
@@ -47,7 +47,7 @@ static inline void encodeBytes( const unsigned char *data, char *str )
 	*str = base64Table[ data[ 2 ] & 0x3f ];
 }
 
-static inline int encodeEndBytes( const unsigned char *data, size_t dataSize,
+static int encodeEndBytes( const unsigned char *data, size_t dataSize,
 				  char *str )
 {
 	assert( dataSize < 3 );
@@ -68,9 +68,10 @@ static inline int encodeEndBytes( const unsigned char *data, size_t dataSize,
 			*str = '=';
 			return 4;
 	}
+	return 0; //PF: should never happen
 }
 
-static inline unsigned short correctedLineLength( unsigned short length )
+static unsigned short correctedLineLength( unsigned short length )
 {
 	unsigned short corrected;
 
@@ -115,12 +116,12 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 {
 	const unsigned char *bytes;
 	char *output;
+	int	encodedSize;
+	size_t	bytesToEncode;
 
 	bytes = ( const unsigned char *)data;
 	output = encoded;
 
-	int	encodedSize;
-	size_t	bytesToEncode;
 	if ( state->newLinePending && dataSize )
 		encodedSize = 1;
 	else

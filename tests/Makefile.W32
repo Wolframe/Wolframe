@@ -127,6 +127,7 @@ poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
 testSHA2.exe: testSHA2.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 byte2hexTest.exe: byte2hexTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Test.exe: base64Test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+base64Utility.exe: base64Utility.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 CRAMtest.exe: CRAMtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib

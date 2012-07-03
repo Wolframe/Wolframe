@@ -81,7 +81,7 @@ static const char decodeTable[] = {
 
 static const unsigned short decodeTableSize = sizeof( decodeTable );
 
-static inline int base64_decodeValue( char value )
+static int base64_decodeValue( char value )
 {
 	return decodeTable[ (int)value ];
 }
