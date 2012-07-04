@@ -116,16 +116,13 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 {
 	const unsigned char *bytes;
 	char *output;
-	int	encodedSize;
+	size_t	encodedSize;
 	size_t	bytesToEncode;
 
 	bytes = ( const unsigned char *)data;
 	output = encoded;
 
-	if ( state->newLinePending && dataSize )
-		encodedSize = 1;
-	else
-		encodedSize = 0;
+	encodedSize = 0;
 	bytesToEncode = dataSize;
 	if ( state->bytesLeft )	{
 		if ( bytesToEncode + state->bytesLeft >= 3 )	{
@@ -136,10 +133,15 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 			bytesToEncode = 0;
 	}
 	encodedSize += ( bytesToEncode / 3 ) * 4;
-	if ( state->lineLength && encodedSize )
-		encodedSize += (  state->lineSize + encodedSize ) / state->lineLength;
-//	encodedSize += (  state->lineSize + encodedSize + state->lineLength - 1 ) / state->lineLength - 1;
+	if ( state->lineLength && encodedSize )	{
+		if ( !(( state->lineSize + encodedSize ) % state->lineLength ) && !( bytesToEncode % 3 ))
+			encodedSize += ( state->lineSize + encodedSize ) / state->lineLength - 1;
+		else
+			encodedSize += ( state->lineSize + encodedSize ) / state->lineLength;
+	}
 
+	if ( state->newLinePending && !encodedSize )
+		encodedSize++;
 
 	if ( state->newLinePending && dataSize )	{
 		if ( encodedMaxSize < 1 )
@@ -248,7 +250,7 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 			state->carryBytes[ 1 ] = *bytes;
 			state->bytesLeft = 2;
 	}
-//	assert( encodedSize == output - encoded );
+	assert( encodedSize == (size_t)( output - encoded ));
 	return output - encoded;
 }
 
@@ -267,7 +269,7 @@ int base64_encode( const void* data, size_t dataSize,
 	char *output;
 	unsigned short lineSize;
 
-	int encodedSize;
+	size_t encodedSize;
 	encodedSize = base64_encodedSize( dataSize, lineLength );
 	if ( encodedMaxSize < encodedSize )
 		return BUFFER_OVERFLOW;
@@ -300,7 +302,7 @@ int base64_encode( const void* data, size_t dataSize,
 			encodeEndBytes( bytes, dataSize, output );
 			output += 4;
 	}
-	assert( encodedSize == output - encoded );
+	assert( encodedSize == ( size_t)( output - encoded ));
 	return output - encoded;
 }
 

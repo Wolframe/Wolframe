@@ -34,7 +34,6 @@
 // base64 tests
 //
 #include "gtest/gtest.h"
-#include <stdexcept>
 #include "base64.hpp"
 
 
@@ -288,11 +287,13 @@ TEST( Base64, RandomData )
 #endif
 		dataSize = 1 + rand() % 32768;
 		lineLength = rand() % 2048;
+//		dataSize = 1 + rand() % 64;
+//		lineLength = rand() % 32;
 		chunkSize = 1 + rand() % dataSize;
 // fixed data
-//		dataSize = 19;
-//		lineLength = 9;
-//		chunkSize = 14;
+//		dataSize = 39;
+//		lineLength = 17;
+//		chunkSize = 3;
 
 		encodedSize = base64::encodedSize( dataSize, lineLength );
 
