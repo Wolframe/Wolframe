@@ -1,0 +1,7 @@
+<customer>
+    <name>The good test client</name>
+    <address>good street 10</address>
+    <phoneNumber>+41 11 222 3456 </phoneNumber>
+    <phoneNumber>+41 11 222 3457 </phoneNumber>
+    <phoneNumber>+41 11 222 3458 </phoneNumber>
+</customer>
