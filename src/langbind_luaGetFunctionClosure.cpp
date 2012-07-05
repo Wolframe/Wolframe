@@ -224,5 +224,19 @@ AGAIN:
 }
 
 
+InputFilterClosure InputFilterClosure::branch()
+{
+	if (m_taglevel == 0 || !isValidAsOperand()) throw std::runtime_error( "illegal state for branching");
+	m_taglevel -= 1;
+	return InputFilterClosure( m_inputfilter);
+}
+
+TypedInputFilterClosure TypedInputFilterClosure::branch()
+{
+	if (m_taglevel == 0 || !isValidAsOperand()) throw std::runtime_error( "illegal state for branching");
+	m_taglevel -= 1;
+	return TypedInputFilterClosure( m_inputfilter);
+}
+
 
 

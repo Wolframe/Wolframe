@@ -83,6 +83,7 @@ public:
 	///\return true, if yes
 	bool isValidAsOperand() const			{return (m_type==InputFilter::OpenTag);}
 
+	InputFilterClosure branch();
 private:
 	InputFilterR m_inputfilter;			//< rerefence to input with filter
 	InputFilter::ElementType m_type;		//< current state (last value type parsed)
@@ -127,6 +128,8 @@ public:
 	///\brief Find out if we can use the function in this state as argument of a function
 	///\return true, if yes
 	bool isValidAsOperand() const			{return (m_type==InputFilter::OpenTag);}
+
+	TypedInputFilterClosure branch();
 private:
 	TypedInputFilterR m_inputfilter;		//< rerefence to input with filter
 	InputFilter::ElementType m_type;		//< current state (last value type parsed)

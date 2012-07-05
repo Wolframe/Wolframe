@@ -509,7 +509,7 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 			{
 				throw std::runtime_error( "iterator used as function argument in an intermediate state");
 			}
-			LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( ic->inputfilter()));
+			LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( ic->branch()));
 			lua_pushcclosure( ls, function_inputFilter_get, 1);
 			return 1;
 		}
@@ -520,7 +520,7 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 			{
 				throw std::runtime_error( "iterator used as function argument in an intermediate state");
 			}
-			LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( tc->inputfilter()));
+			LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( tc->branch()));
 			lua_pushcclosure( ls, function_typedinputfilterClosure_get, 1);
 			return 1;
 		}
