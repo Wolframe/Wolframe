@@ -102,7 +102,9 @@ void base64_resetEncodeState( base64_EncodeState* state )
 
 size_t base64_encodedSize( size_t dataSize, unsigned short lineLength )
 {
-	size_t encodedSize = (( dataSize + 2 ) / 3 ) * 4;
+	size_t encodedSize;
+
+	encodedSize = (( dataSize + 2 ) / 3 ) * 4;
 	lineLength = correctedLineLength( lineLength );
 	if ( lineLength && encodedSize )
 		encodedSize += ( encodedSize + lineLength - 1 ) / lineLength - 1;
@@ -111,19 +113,16 @@ size_t base64_encodedSize( size_t dataSize, unsigned short lineLength )
 }
 
 
-int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t dataSize,
-			char* encoded, size_t encodedMaxSize )
+size_t base64_encodedChunkSize( base64_EncodeState* state, size_t dataSize )
 {
-	const unsigned char *bytes;
-	char *output;
-	size_t	encodedSize;
+	size_t encodedSize;
 	size_t	bytesToEncode;
-
-	bytes = ( const unsigned char *)data;
-	output = encoded;
 
 	encodedSize = 0;
 	bytesToEncode = dataSize;
+
+	/* Start with data remaining from the previous chunk ignoring the pending new line
+	 */
 	if ( state->bytesLeft )	{
 		if ( bytesToEncode + state->bytesLeft >= 3 )	{
 			bytesToEncode -= 3 - state->bytesLeft;
@@ -132,22 +131,50 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 		else
 			bytesToEncode = 0;
 	}
+
+
+	/* Count the triplets in this chunk
+	 */
 	encodedSize += ( bytesToEncode / 3 ) * 4;
-	if ( state->lineLength && encodedSize )	{
-		if ( !(( state->lineSize + encodedSize ) % state->lineLength ) && !( bytesToEncode % 3 ))
-			encodedSize += ( state->lineSize + encodedSize ) / state->lineLength - 1;
-		else
-			encodedSize += ( state->lineSize + encodedSize ) / state->lineLength;
+
+	/* Count the new lines and take into account the pending new line
+	 * For a row which ends on the border of the line, the '\n' is not
+	 * counted unless there is data left for the next chunk
+	 */
+	if ( state->lineLength )	{
+		if ( encodedSize )	{
+			if ( state->newLinePending )
+				encodedSize += ( encodedSize - ( bytesToEncode % 3 ? 0 : 1 ))
+						/ state->lineLength + 1;
+			else
+				encodedSize += ( state->lineSize + encodedSize - ( bytesToEncode % 3 ? 0 : 1 ))
+						/ state->lineLength;
+		}
+		else	{
+			if ( state->newLinePending && bytesToEncode )
+				encodedSize++;
+		}
 	}
 
-	if ( state->newLinePending && !encodedSize )
-		encodedSize++;
+	return encodedSize;
+}
+
+int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t dataSize,
+			char* encoded, size_t encodedMaxSize )
+{
+	const unsigned char *bytes;
+	char *output;
+	size_t	encodedSize;
+
+	encodedSize = base64_encodedChunkSize( state, dataSize );
+	if ( encodedMaxSize < encodedSize )
+		return BUFFER_OVERFLOW;
+
+	bytes = ( const unsigned char *)data;
+	output = encoded;
 
 	if ( state->newLinePending && dataSize )	{
-		if ( encodedMaxSize < 1 )
-			return BUFFER_OVERFLOW;
 		*output++ = '\n';
-		encodedMaxSize--;
 		state->newLinePending = 0;
 		state->lineSize = 0;
 	}
@@ -157,23 +184,17 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 			break;
 		case 1:
 			if ( dataSize >= 2 )	{
-				if ( encodedMaxSize < 4 )
-					return BUFFER_OVERFLOW;
 				state->carryBytes[ 1 ] = *bytes++;
 				state->carryBytes[ 2 ] = *bytes++;
 				dataSize -= 2;
 				encodeBytes( state->carryBytes, output );
 				state->bytesLeft = 0;
 				output += 4;
-				encodedMaxSize -= 4;
 				if ( state->lineLength )	{
 					state->lineSize += 4;
 					if ( state->lineSize >= state->lineLength )	{
 						if ( dataSize )	{
-							if ( encodedMaxSize < 1 )
-								return BUFFER_OVERFLOW;
 							*output++ = '\n';
-							encodedMaxSize--;
 							state->lineSize = 0;
 						}
 						else
@@ -189,22 +210,16 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 			break;
 		case 2:
 			if ( dataSize >= 1 )	{
-				if ( encodedMaxSize < 4 )
-					return BUFFER_OVERFLOW;
 				state->carryBytes[ 2 ] = *bytes++;
 				dataSize--;
 				encodeBytes( state->carryBytes, output );
 				state->bytesLeft = 0;
 				output += 4;
-				encodedMaxSize -= 4;
 				if ( state->lineLength )	{
 					state->lineSize += 4;
 					if ( state->lineSize >= state->lineLength )	{
 						if ( dataSize )	{
-							if ( encodedMaxSize < 1 )
-								return BUFFER_OVERFLOW;
 							*output++ = '\n';
-							encodedMaxSize--;
 							state->lineSize = 0;
 						}
 						else
@@ -215,21 +230,15 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 	}
 
 	while ( dataSize >= 3 )	{
-		if ( encodedMaxSize < 4 )
-			return BUFFER_OVERFLOW;
 		encodeBytes( bytes, output );
 		bytes += 3;
 		output += 4;
 		dataSize -= 3;
-		encodedMaxSize -= 4;
 		if ( state->lineLength )	{
 			state->lineSize += 4;
 			if ( state->lineSize >= state->lineLength )	{
 				if ( dataSize )	{
-					if ( encodedMaxSize < 1 )
-						return BUFFER_OVERFLOW;
 					*output++ = '\n';
-					encodedMaxSize--;
 					state->lineSize = 0;
 				}
 				else
@@ -250,15 +259,29 @@ int base64_encodeChunk( base64_EncodeState* state, const void* data, size_t data
 			state->carryBytes[ 1 ] = *bytes;
 			state->bytesLeft = 2;
 	}
-	assert( encodedSize == (size_t)( output - encoded ));
+	assert( encodedSize == ( size_t )( output - encoded ));
 	return output - encoded;
 }
 
 int base64_encodeEndChunk( base64_EncodeState* state, char* encoded, size_t encodedMaxSize )
 {
-	if ( state->bytesLeft && encodedMaxSize < 4 )
-		return BUFFER_OVERFLOW;
-	return encodeEndBytes( state->carryBytes, state->bytesLeft, encoded );
+	if ( state->bytesLeft )	{
+		if ( state->newLinePending )	{
+			if ( encodedMaxSize < 5 )
+				return BUFFER_OVERFLOW;
+			*encoded++ = '\n';
+			encodeEndBytes( state->carryBytes, state->bytesLeft, encoded );
+			return 5;
+		}
+		else	{
+			if ( encodedMaxSize < 4 )
+				return BUFFER_OVERFLOW;
+			encodeEndBytes( state->carryBytes, state->bytesLeft, encoded );
+			return 4;
+		}
+	}
+	else
+		return 0;
 }
 
 
@@ -302,7 +325,7 @@ int base64_encode( const void* data, size_t dataSize,
 			encodeEndBytes( bytes, dataSize, output );
 			output += 4;
 	}
-	assert( encodedSize == ( size_t)( output - encoded ));
+	assert( encodedSize == ( size_t )( output - encoded ));
 	return output - encoded;
 }
 

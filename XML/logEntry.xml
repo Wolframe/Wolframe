@@ -1,0 +1,8 @@
+<activity>
+    <userID>x</userID>
+    <customerName>The good test client</customerName>
+    <startTime>2006-08-07 12:34:56+02:00</startTime>
+    <endTime>2006-08-07 12:35:57+02:00</endTime>
+    <description>We did someting good</description>
+    <note>We will do someting good again</note>
+</activity>

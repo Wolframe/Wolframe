@@ -46,7 +46,8 @@ extern "C" {
 #define DEFAULT_BASE64_LINE_LENGTH	76
 
 #define BUFFER_OVERFLOW		-1
-#define INVALID_CODE		-2
+#define INVALID_BUFFER		-2
+#define INVALID_DATA		-3
 
 /* enconding */
 
@@ -72,6 +73,8 @@ int base64_encodeEndChunk( base64_EncodeState* state, char* encoded, size_t enco
 
 
 size_t base64_encodedSize( size_t dataSize, unsigned short lineLength );
+
+size_t base64_encodedChunkSize( base64_EncodeState* state, size_t dataSize );
 
 /**
  * Encodes a block of binary data into Base-64
