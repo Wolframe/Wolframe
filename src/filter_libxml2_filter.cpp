@@ -454,7 +454,7 @@ public:
 			const char* ec = m_encoding.get()?m_encoding.get()->c_str():"UTF-8";
 			if (m_doctype_root.size())
 			{
-				m_doc = DocumentWriter( ec, m_doctype_root.c_str(), m_doctype_public.c_str(), m_doctype_system.c_str());
+				m_doc = DocumentWriter( ec, m_doctype_root.c_str(), m_doctype_public.size()?m_doctype_public.c_str():0, m_doctype_system.size()?m_doctype_system.c_str():0);
 			}
 			else
 			{

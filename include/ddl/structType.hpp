@@ -227,17 +227,26 @@ public:
 	///\return true, if yes
 	bool mandatory() const				{return m_mandatory;}
 
+	///\brief Get the document type definition string for this form
+	///\return the document type definition string or 0 if not defined
+	const char* doctype() const;
+
+	///\brief Define the document type definition string for this form
+	///\param[in] doctype_ Document type definition string
+	void defineDoctype( const char* doctype_);
+
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
 	///\remark Used for checking the preconditions mentioned as remark [precondition]
 	void REQUIRE( ContentType t) const;
 
-	ContentType m_contentType;
-	AtomicType m_value;
-	Map m_elem;
-	std::size_t m_nof_attributes;
-	bool m_mandatory;
+	ContentType m_contentType;	//< type of the element
+	AtomicType m_value;		//< value, if the value is atomic
+	Map m_elem;			//< map represented as array
+	std::size_t m_nof_attributes;	//< number of attributes (first N elements of the structure)
+	bool m_mandatory;		//< true, if the field is mandatory
 };
+
 
 typedef CountedReference<StructType> StructTypeR;
 

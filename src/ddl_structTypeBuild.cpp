@@ -97,6 +97,7 @@ StructTypeBuild::StructTypeBuild( langbind::TypedInputFilter& src)
 				break;
 			}
 			case langbind::FilterBase::CloseTag:
+				lasttype = type;
 				return;
 
 			case langbind::FilterBase::Attribute:
@@ -141,7 +142,7 @@ StructTypeBuild::StructTypeBuild( langbind::TypedInputFilter& src)
 				else
 				{
 					if (nof_elements() > 0) throw std::runtime_error( "values without tag in structure definition");
-					lasttype = langbind::FilterBase::OpenTag;
+					lasttype = langbind::FilterBase::Value;
 					defineAsAtomic( at);
 				}
 			}

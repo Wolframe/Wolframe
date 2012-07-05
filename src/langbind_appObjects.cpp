@@ -36,6 +36,7 @@ Project Wolframe.
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include "filter/filter.hpp"
+#include "miscUtils.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "filter/char_filter.hpp"
@@ -258,7 +259,63 @@ std::string DDLForm::tostring() const
 			throw std::runtime_error( ser.getError());
 		}
 	}
+	if (m_structure->doctype())
+	{
+		std::string rt = "!DOCTYPE \"";
+		rt.append( m_structure->doctype());
+		rt.append( "\" ");
+		rt.append( flt->content());
+		return rt;
+	}
 	return flt->content();
+}
+
+std::string DDLForm::getIdFromDoctype( const std::string& doctype)
+{
+	std::string rootid;
+	std::string publicid;
+	std::string systemid;
+	std::string::const_iterator itr=doctype.begin(), end=doctype.end();
+
+	if (utils::parseNextToken( rootid, itr, end))
+	{
+		if (utils::parseNextToken( publicid, itr, end))
+		{
+			if (publicid == "PUBLIC")
+			{
+				if (!utils::parseNextToken( publicid, itr, end)
+				||  !utils::parseNextToken( systemid, itr, end))
+				{
+					throw std::runtime_error( "illegal doctype definition");
+				}
+				return utils::getFileStem( systemid);
+			}
+			else if (publicid == "SYSTEM")
+			{
+				if (!utils::parseNextToken( systemid, itr, end))
+				{
+					throw std::runtime_error( "illegal doctype definition");
+				}
+				return utils::getFileStem( systemid);
+			}
+			else if (utils::parseNextToken( systemid, itr, end))
+			{
+				return utils::getFileStem( systemid);
+			}
+			else
+			{
+				return utils::getFileStem( publicid);
+			}
+		}
+		else
+		{
+			return rootid;
+		}
+	}
+	else
+	{
+		return "";
+	}
 }
 
 void DDLFormMap::defineForm( const std::string& name, const DDLForm& f)
