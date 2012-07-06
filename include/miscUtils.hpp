@@ -23,27 +23,33 @@ std::string getFileExtension( const std::string& path);
 ///\return The file stem without the extension marking dot '.'
 std::string getFileStem( const std::string& path);
 
-///\brief Returns true, if the file with path 'path' exists
-bool fileExists( const std::string& path);
-
-///\brief Returns true, if the file with path 'path' exists and is a directory
-bool directoryExists( const std::string& path);
-
-///\brief Returns true, if the directory with path 'path' exists
-bool isDirectory( const std::string& path);
-
-///\brief Removes the the directory with path 'path'
-void removeAllFiles( const std::string& path);
-
 ///\brief Get the path 'path' relative to 'refpath' if it is not absolute
+///\param[in] path relative part of the path or a bsolute path
+///\param[in] refpath absolute part of the path if 'path' is relative
 ///\return the canonical path
 std::string getCanonicalPath( const std::string& path, const std::string& refpath);
 
-///\brief Split the string by spaces, treating subsequent spaces as one space
-void splitStringBySpaces( std::vector<std::string>& res, const std::string& inp);
+///\brief Returns true, if the file with path 'path' exists
+bool fileExists( const std::string& path);
 
-///\brief Split the string, ingoring empty parts
+
+///\brief Split the string, ingoring empty parts of the result (susequent split characters treated as one)
+///\param[in] inp string to split
+///\param[in] splitchr set of characters to split with (each of them is one separating character)
 void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchr);
+
+///\brief Parsing the next token in a UTF-8 or Isolatin-1 string that is either
+// - a single quoted (') string backslash escaping returned without the delimiting quotes and escaping resolved
+// - a double quoted (") string backslash escaping returned without the delimiting quotes and escaping resolved
+// - an identifier consisting of alphanumeric ASCII characters and characters beyond the ASCII code page (>127)
+// - an operator   '+' '-' '*' '/' '|' '&' '@' '!' '?' ':' '.' ';' ',' '#' '(' ')' '[' ']' '<' '>'
+///
+///\remark throws exception on error
+///\return true if a token was found and parsed, false when no token was found (EOF)
+///\param[out] tok token parsed
+///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the token parsed)
+///\param[in] end iterator marking the end of the source
+bool parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end);
 
 }}//namespace
 

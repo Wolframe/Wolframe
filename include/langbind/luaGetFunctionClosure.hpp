@@ -35,6 +35,7 @@ Project Wolframe.
 #define _Wolframe_langbind_LUA_GET_FUNCTION_CLOSURE_HPP_INCLUDED
 #include "langbind/appObjects.hpp"
 #include <boost/shared_ptr.hpp>
+#include "countedReference.hpp"
 
 #if WITH_LUA
 extern "C" {
@@ -63,16 +64,28 @@ public:
 
 	///\brief Constructor
 	///\param[in] ig input filter reference from input
-	InputFilterClosure( const InputFilterR& ig)
+	explicit InputFilterClosure( const InputFilterR& ig)
 		:m_inputfilter(ig)
 		,m_type(InputFilter::OpenTag)
-		,m_taglevel(0){}
+		,m_taglevel(0)
+		,m_id(0)
+		{}
+
+	InputFilterClosure( const InputFilterR& ig, const CountedReference<std::size_t>& a)
+		:m_inputfilter(ig)
+		,m_type(InputFilter::OpenTag)
+		,m_taglevel(0)
+		,m_id(a.get()?(*a):0)
+		,m_activeid(a)
+		{}
 
 	InputFilterClosure( const InputFilterClosure& o)
 		:m_inputfilter(o.m_inputfilter)
 		,m_type(o.m_type)
 		,m_attrbuf(o.m_attrbuf)
-		,m_taglevel(o.m_taglevel){}
+		,m_taglevel(o.m_taglevel)
+		,m_id(o.m_id)
+		,m_activeid(o.m_activeid){}
 
 	///\brief Get the next pair of elements on the lua stack if possible
 	ItemType fetch( lua_State* ls);
@@ -81,13 +94,17 @@ public:
 
 	///\brief Find out if we can use the function in this state as argument of a function
 	///\return true, if yes
-	bool isValidAsOperand() const			{return (m_type==InputFilter::OpenTag);}
+	bool isValidAsOperand() const			{return (m_type==InputFilter::OpenTag && (!m_activeid.get() || *m_activeid == m_id));}
+
+	InputFilterClosure scope();
 
 private:
 	InputFilterR m_inputfilter;			//< rerefence to input with filter
 	InputFilter::ElementType m_type;		//< current state (last value type parsed)
 	std::string m_attrbuf;				//< buffer for attribute name
 	std::size_t m_taglevel;				//< current level in tag hierarchy
+	std::size_t m_id;				//< id for checking valid access
+	CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
 };
 
 
@@ -107,16 +124,30 @@ public:
 
 	///\brief Constructor
 	///\param[in] i input filter reference
-	TypedInputFilterClosure( const TypedInputFilterR& i)
+	explicit TypedInputFilterClosure( const TypedInputFilterR& i)
 		:m_inputfilter(i)
 		,m_type(InputFilter::OpenTag)
-		,m_taglevel(0){}
+		,m_taglevel(0)
+		,m_id(0)
+		{}
+
+	///\brief Constructor
+	///\param[in] i input filter reference
+	explicit TypedInputFilterClosure( const TypedInputFilterR& i, const CountedReference<std::size_t>& a)
+		:m_inputfilter(i)
+		,m_type(InputFilter::OpenTag)
+		,m_taglevel(0)
+		,m_id(a.get()?(*a):0)
+		,m_activeid(a)
+		{}
 
 	TypedInputFilterClosure( const TypedInputFilterClosure& o)
 		:m_inputfilter(o.m_inputfilter)
 		,m_type(o.m_type)
 		,m_attrbuf(o.m_attrbuf)
-		,m_taglevel(o.m_taglevel){}
+		,m_taglevel(o.m_taglevel)
+		,m_id(o.m_id)
+		,m_activeid(o.m_activeid){}
 
 	///\brief Get the next pair of elements on the lua stack if possible
 	///\return state returned
@@ -126,12 +157,17 @@ public:
 
 	///\brief Find out if we can use the function in this state as argument of a function
 	///\return true, if yes
-	bool isValidAsOperand() const			{return (m_type==InputFilter::OpenTag);}
+	bool isValidAsOperand() const			{return (m_type==InputFilter::OpenTag && (!m_activeid.get() || *m_activeid == m_id));}
+
+	TypedInputFilterClosure scope();
+
 private:
 	TypedInputFilterR m_inputfilter;		//< rerefence to input with filter
 	InputFilter::ElementType m_type;		//< current state (last value type parsed)
 	std::string m_attrbuf;				//< buffer for attribute name
 	std::size_t m_taglevel;				//< current level in tag hierarchy
+	std::size_t m_id;				//< id for checking valid access
+	CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
 };
 
 }}//namespace

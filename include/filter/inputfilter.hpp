@@ -102,9 +102,10 @@ public:
 	///\param [out] doctype the document type string returned
 	///\return true, if success, false, if not.
 	///\remark Check the filter state when false is returned
-	virtual bool getDocType( std::string& /*doctype*/)
+	virtual bool getDocType( std::string& doctype)
 	{
-		throw std::runtime_error("document type not defined for this type of filter");
+		doctype = "";
+		return true;
 	}
 
 	///\brief Get the current state

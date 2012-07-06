@@ -67,7 +67,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 				LOG_ERROR << "unknown lua script '" << m_name << "'";
 				return Error;
 			}
-			if (!gc->initLuaScriptInstance( m_interp.get(), m_inputfilter, m_outputfilter))
+			if (!gc->initLuaScriptInstance( m_interp.get(), Input(m_inputfilter), Output(m_outputfilter)))
 			{
 				LOG_ERROR << "error initializing lua script '" << m_name << "'";
 				return Error;

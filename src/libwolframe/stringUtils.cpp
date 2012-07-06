@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Some utility string function implementations. They are mainly boost wrappers that are separated because of some warnings needed to be disabled
 
 #include "miscUtils.hpp"
+#include <cstring>
 #ifdef _WIN32
 #pragma warning(disable:4996)
 #endif
@@ -47,4 +48,77 @@ void _Wolframe::utils::splitString( std::vector<std::string>& res, const std::st
 	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
 }
 
+struct CharTable
+{
+	bool ar[256];
+	CharTable()
+	{
+		for (unsigned int ii=0; ii<sizeof(ar); ++ii) ar[ii]=false;
+	}
+	CharTable& operator()( char start, char end)		{while (start <= end) ar[(unsigned char)start++] = true; return *this;}
+	CharTable& operator()( char start)			{ar[(unsigned char)start] = true; return *this;}
+
+	char operator[]( char idx) const			{return ar[(unsigned char)idx];}
+};
+
+struct OperatorTable :public CharTable
+{
+	OperatorTable()
+	{
+		(*this)('+')('-')('*')('/')('|')('&')('@')('!')('?')(':')('.')(';')(',')('#')('(')(')')('[')(']')('<')('>');
+	}
+};
+
+struct AlphanumTable :public CharTable
+{
+	AlphanumTable()
+	{
+		(*this)('a','z')('A','Z')('0','9')('_')(-127,-1);
+	}
+};
+
+static OperatorTable operatorTable;
+static AlphanumTable alphanumTable;
+
+bool _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end)
+{
+	tok.clear();
+	while (*itr <= 32 && *itr >= 0 && itr != end) ++itr;
+	if (itr == end) return false;
+	if (*itr == '\'' || *itr == '\"')
+	{
+		char eb = *itr;
+		for (++itr; itr != end; ++itr)
+		{
+			if (*itr == eb)
+			{
+				++itr;
+				return true;
+			}
+			else if (*itr == '\\')
+			{
+				++itr;
+				if (itr == end) throw std::runtime_error( "string not terminated");
+			}
+			if (*itr == 0) throw std::runtime_error( "string has multibyte encoding or is binary");
+			tok.push_back( *itr);
+		}
+		throw std::runtime_error( "string not terminated");
+	}
+	else if (operatorTable[ *itr])
+	{
+		tok.push_back( *itr);
+		++itr;
+		return true;
+	}
+	else if (alphanumTable[ *itr])
+	{
+		while (alphanumTable[ *itr]) tok.push_back( *itr++);
+		return true;
+	}
+	else
+	{
+		throw std::runtime_error( std::string( "illegal token character '") + *itr + "'");
+	}
+}
 

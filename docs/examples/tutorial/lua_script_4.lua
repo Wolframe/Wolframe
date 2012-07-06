@@ -9,10 +9,11 @@ function run( )
         f = filter( "XML:libxml2")
         input:as(f)
         output:as(f)
-        for c,t in input:get() do
+        i = input:get()
+        for c,t in i do
                 output:print( c, t)
                 if t == "content" then
-                        process_content( input:get())
+                        process_content( scope( i))
                         output:print( false, false)
                 end
         end

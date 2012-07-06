@@ -39,6 +39,7 @@ Project Wolframe.
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "ddl/structTypeBuild.hpp"
+#include "miscUtils.hpp"
 #include "logger-v1.hpp"
 #include <fstream>
 #include <iostream>
@@ -457,14 +458,14 @@ int DECLNAME ## _functor::call( lua_State* ls)\
 
 
 
-LUA_FUNCTION_THROWS( "<structure>:get()", function_inputFilter_get)
+LUA_FUNCTION_THROWS( "<structure>:get()", function_inputfilterClosure_get)
 {
 	InputFilterClosure* closure = LuaObject<InputFilterClosure>::get( ls, lua_upvalueindex( 1));
 	LuaExceptionHandlerScope escope(ls);
 	switch (closure->fetch( ls))
 	{
 		case InputFilterClosure::DoYield:
-			lua_yieldk( ls, 0, 1, function_inputFilter_get);
+			lua_yieldk( ls, 0, 1, function_inputfilterClosure_get);
 
 		case InputFilterClosure::EndOfData:
 			return 0;
@@ -508,8 +509,8 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 			{
 				throw std::runtime_error( "iterator used as function argument in an intermediate state");
 			}
-			LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( ic->inputfilter()));
-			lua_pushcclosure( ls, function_inputFilter_get, 1);
+			LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( ic->scope()));
+			lua_pushcclosure( ls, function_inputfilterClosure_get, 1);
 			return 1;
 		}
 		TypedInputFilterClosure* tc = LuaObject<TypedInputFilterClosure>::get( ls, -1);
@@ -519,7 +520,7 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 			{
 				throw std::runtime_error( "iterator used as function argument in an intermediate state");
 			}
-			LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( tc->inputfilter()));
+			LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( tc->scope()));
 			lua_pushcclosure( ls, function_typedinputfilterClosure_get, 1);
 			return 1;
 		}
@@ -537,6 +538,27 @@ LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 	LuaExceptionHandlerScope escope(ls);
 	{
 		lua_pushlstring( ls, content.c_str(), content.size());
+		return 1;
+	}
+}
+
+
+LUA_FUNCTION_THROWS( "form:doctype()", function_form_doctype)
+{
+	DDLForm* form = LuaObject<DDLForm>::getSelf( ls, "form", "doctype");
+	check_parameters( ls, 1, 0);
+
+	const char* doctype = form->structure()->doctype();
+	LuaExceptionHandlerScope escope(ls);
+	{
+		if (doctype)
+		{
+			lua_pushstring( ls, doctype);
+		}
+		else
+		{
+			lua_pushnil( ls);
+		}
 		return 1;
 	}
 }
@@ -1053,6 +1075,39 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 }
 
 
+LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
+{
+	Input* input = LuaObject<Input>::getSelf( ls, "input", "doctypeid");
+	check_parameters( ls, 1, 0, LUA_TUSERDATA);
+
+	if (!input->inputfilter().get())
+	{
+		lua_pushnil( ls);
+		return 1;
+	}
+	{
+		std::string doctype;
+		if (input->inputfilter()->getDocType( doctype))
+		{
+			LuaExceptionHandlerScope escope(ls);
+			{
+				std::string doctypeid( DDLForm::getIdFromDoctype( doctype));
+				if (doctypeid.size())
+				{
+					lua_pushlstring( ls, doctypeid.c_str(), doctypeid.size());
+				}
+				else
+				{
+					lua_pushnil( ls);
+				}
+				return 1;
+			}
+		}
+	}
+	lua_yieldk( ls, 0, 1, function_input_doctypeid);
+	return 0;
+}
+
 
 LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 {
@@ -1070,16 +1125,21 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 		{
 			LuaExceptionHandlerScope escope(ls);
 			{
-				lua_pushlstring( ls, doctype.c_str(), doctype.size());
+				if (doctype.size())
+				{
+					lua_pushlstring( ls, doctype.c_str(), doctype.size());
+				}
+				else
+				{
+					lua_pushnil( ls);
+				}
 				return 1;
 			}
-
 		}
 	}
 	lua_yieldk( ls, 0, 1, function_input_doctype);
 	return 0;
 }
-
 
 
 LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
@@ -1131,40 +1191,166 @@ LUA_FUNCTION_THROWS( "input:get()", function_input_get)
 	{
 		return luaL_error( ls, "no filter defined for input with input:as(..)");
 	}
-	LuaObject<InputFilterClosure>::push_luastack( ls, input->inputfilter());
-	lua_pushcclosure( ls, function_inputFilter_get, 1);
+	LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure(input->getIterator()));
+	lua_pushcclosure( ls, function_inputfilterClosure_get, 1);
 	return 1;
 }
 
 
-
-LUA_FUNCTION_THROWS( "input:table()", function_input_table)
+LUA_FUNCTION_THROWS( "input:table()", function_input_table_DDLStructSerializer)
 {
-	RedirectFilterClosure* obj;
-	int ctx;
-	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	serialize::DDLStructSerializer* result = (serialize::DDLStructSerializer*)lua_touserdata( ls, -1);
+	lua_pop( ls, 1);
+
+	if (!result->call())
 	{
-		Input* input = LuaObject<Input>::getSelf( ls, "input", "table");
-		check_parameters( ls, 1, 0);
-		TypedInputFilterR inp( new TypingInputFilter( input->inputfilter()));
+		lua_pushlightuserdata( ls, result);
+		lua_yieldk( ls, 0, 1, function_input_table_DDLStructSerializer);
+	}
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "input:table()", function_input_table_DDLStructParser)
+{
+	serialize::DDLStructParser* closure = (serialize::DDLStructParser*)lua_touserdata( ls, -1);
+	lua_pop( ls, 1);
+
+	if (!closure->call())
+	{
+		lua_pushlightuserdata( ls, closure);
+		lua_yieldk( ls, 0, 1, function_input_table_DDLStructParser);
+	}
+	{
 		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
-		LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
-		obj = LuaObject<RedirectFilterClosure>::get( ls, -1);
+		LuaObject<serialize::DDLStructSerializer>::push_luastack( ls, serialize::DDLStructSerializer( closure->structure()));
+		serialize::DDLStructSerializer* result = LuaObject<serialize::DDLStructSerializer>::get( ls, -1);
+		result->init( outp, serialize::Context::SerializeWithIndices);
+		lua_pushlightuserdata( ls, result);
 	}
-	else
+	return function_input_table_DDLStructSerializer(ls);
+}
+
+LUA_FUNCTION_THROWS( "input:form()", function_input_form_DDLStructParser)
+{
+	serialize::DDLStructParser* closure = (serialize::DDLStructParser*)lua_touserdata( ls, -1);
+	lua_pop( ls, 1);
+
+	if (!closure->call())
 	{
-		obj = (RedirectFilterClosure*)lua_touserdata( ls, -1);
-		lua_pop( ls, 1);
+		lua_pushlightuserdata( ls, closure);
+		lua_yieldk( ls, 0, 1, function_input_form_DDLStructParser);
 	}
+	LuaObject<DDLForm>::push_luastack( ls, DDLForm( closure->structure()));
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "input:table()", function_input_table_RedirectFilterClosure)
+{
+	RedirectFilterClosure* obj = (RedirectFilterClosure*)lua_touserdata( ls, -1);
+	lua_pop( ls, 1);
+
 	if (!obj->call())
 	{
 		lua_pushlightuserdata( ls, obj);
-		lua_yieldk( ls, 0, 1, function_input_table);
+		lua_yieldk( ls, 0, 1, function_input_table_RedirectFilterClosure);
 	}
 	return 1;
 }
 
+static int function_input_table_nil( lua_State* ls)
+{
+	lua_pushnil( ls);
+	return 1;
+}
 
+static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool outputIsTable)
+{
+	if (input->inputfilter().get())
+	{
+		std::string doctype;
+		// try to get 'form' for validation if the document is not standalone:
+		if (input->inputfilter()->getDocType( doctype))
+		{
+			if (doctype.size())
+			{
+				std::string doctypeid( DDLForm::getIdFromDoctype( doctype));
+				GlobalContext* gtc = getGlobalSingletonPointer<GlobalContext>( ls);
+				if (!gtc)
+				{
+					throw std::runtime_error( "lost global context");
+				}
+				DDLForm form;
+				if (!gtc->getForm( doctypeid, form))
+				{
+					throw std::runtime_error( std::string("form not defined for document type '") + doctypeid + "'");
+				}
+				{
+					serialize::DDLStructParser* closure;
+					serialize::Context::Flags flags = serialize::Context::ValidateAttributes;
+					TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
+					LuaObject<serialize::DDLStructParser>::push_luastack( ls, serialize::DDLStructParser( form.structure()));
+					closure = LuaObject<serialize::DDLStructParser>::get( ls, -1);
+					closure->init( inp, flags);
+					lua_pushlightuserdata( ls, closure);
+					if (outputIsTable)
+					{
+						return &function_input_table_DDLStructParser;
+					}
+					else
+					{
+						return &function_input_form_DDLStructParser;
+					}
+				}
+			}
+			else if (outputIsTable)
+			{
+				// document is standalone
+				TypedInputFilterR inp( new TypingInputFilter( input->inputfilter()));
+				TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
+				LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
+				RedirectFilterClosure* obj = LuaObject<RedirectFilterClosure>::get( ls, -1);
+				lua_pushlightuserdata( ls, obj);
+				return &function_input_table_RedirectFilterClosure;
+			}
+			else
+			{
+				return &function_input_table_nil;
+			}
+		}
+	}
+	else
+	{
+		throw std::runtime_error( "undefined input filter");
+	}
+	return 0;
+}
+
+LUA_FUNCTION_THROWS( "input:table()", function_input_table)
+{
+	Input* input = LuaObject<Input>::getSelf( ls, "input", "table");
+	check_parameters( ls, 1, 0);
+
+	lua_CFunction func = get_input_struct_closure( ls, input, true);
+	if (!func)
+	{
+		return lua_yieldk( ls, 0, 1, function_input_table);
+	}
+	return func( ls);
+}
+
+
+LUA_FUNCTION_THROWS( "input:form()", function_input_form)
+{
+	Input* input = LuaObject<Input>::getSelf( ls, "input", "form");
+	check_parameters( ls, 1, 0);
+
+	lua_CFunction func = get_input_struct_closure( ls, input, false);
+	if (!func)
+	{
+		return lua_yieldk( ls, 0, 1, function_input_form);
+	}
+	return func( ls);
+}
 
 
 LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
@@ -1213,11 +1399,13 @@ static const luaL_Reg logger_methodtable[ 2] =
 	{0,0}
 };
 
-static const luaL_Reg input_methodtable[ 5] =
+static const luaL_Reg input_methodtable[ 7] =
 {
 	{"as",&function_input_as},
+	{"form",&function_input_form},
 	{"table",&function_input_table},
 	{"doctype",function_input_doctype},
+	{"doctypeid",function_input_doctypeid},
 	{"get",&function_input_get},
 	{0,0}
 };
@@ -1247,8 +1435,9 @@ static const luaL_Reg struct_methodtable[ 4] =
 	{0,0}
 };
 
-static const luaL_Reg ddlform_methodtable[ 5] =
+static const luaL_Reg ddlform_methodtable[ 6] =
 {
+	{"doctype",&function_form_doctype},
 	{"table",&function_form_table},
 	{"get",&function_form_get},
 	{"fill",&function_form_fill},

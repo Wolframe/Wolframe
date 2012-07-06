@@ -244,7 +244,7 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		LuaScriptInstanceR sc;
 		if (gc->getLuaScriptInstance( proc, sc))
 		{
-			if (!gc->initLuaScriptInstance( sc.get(), flt.inputfilter(), flt.outputfilter()))
+			if (!gc->initLuaScriptInstance( sc.get(), Input(flt.inputfilter()), Output(flt.outputfilter())))
 			{
 				throw std::runtime_error( "error initializing lua script");
 			}

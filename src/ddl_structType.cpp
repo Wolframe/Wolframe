@@ -215,6 +215,18 @@ StructType& StructType::operator= ( const StructType& o)
 	return *this;
 }
 
+const char* StructType::doctype() const
+{
+	REQUIRE(Struct);
+	return m_value.value().size()?m_value.value().c_str():0;
+}
+
+void StructType::defineDoctype( const char* doctype_)
+{
+	REQUIRE(Struct);
+	m_value.set( std::string(doctype_?doctype_:""));
+}
+
 void StructType::print( std::ostream& out, size_t level) const
 {
 	std::string indent( level, '\t');
@@ -247,6 +259,10 @@ void StructType::print( std::ostream& out, size_t level) const
 		}
 		case Struct:
 		{
+			if (doctype())
+			{
+				out << indent << "!DOCTYPE \"" << doctype() << "\"" << std::endl;
+			}
 			StructType::Map::const_iterator ii = begin(),ee=end();
 			for (; ii != ee; ++ii)
 			{
@@ -275,4 +291,5 @@ void StructType::print( std::ostream& out, size_t level) const
 		}
 	}
 }
+
 

@@ -94,20 +94,30 @@ class Input
 {
 public:
 	///\brief Constructor
-	Input(){}
+	Input()
+		:m_used(false){}
+
 	///\brief Copy constructor
 	///\param[in] o copied item
-	Input( const Input& o) :m_inputfilter(o.m_inputfilter){}
+	Input( const Input& o)
+		:m_used(o.m_used)
+		,m_inputfilter(o.m_inputfilter){}
+
 	///\brief Constructor by input filter
 	///\param[in] flt input filter reference
-	Input( const InputFilterR& flt) :m_inputfilter(flt){}
+	explicit Input( const InputFilterR& flt)
+		:m_used(false)
+		,m_inputfilter(flt){}
+
 	///\brief Destructor
 	~Input(){}
 
 	const InputFilterR& inputfilter() const		{return m_inputfilter;}
 	InputFilterR& inputfilter()			{return m_inputfilter;}
 
+	InputFilterR& getIterator();
 private:
+	bool m_used;					//< only one iterator can be created from input. This is the guard for checking this.
 	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
 };
 
@@ -184,6 +194,8 @@ public:
 
 	std::string tostring() const;
 	DDLForm copy() const;
+
+	static std::string getIdFromDoctype( const std::string& doctype);
 private:
 	friend class DDLFormFill;
 	ddl::StructTypeR m_structure;

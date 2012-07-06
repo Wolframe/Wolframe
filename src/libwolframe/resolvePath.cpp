@@ -95,58 +95,6 @@ std::string _Wolframe::utils::getFileStem( const std::string& path)
 	return rt;
 }
 
-bool _Wolframe::utils::fileExists( const std::string& path)
-{
-	try
-	{
-		boost::filesystem::path pt( path);
-		return boost::filesystem::exists( pt);
-	}
-	catch (const std::exception&)
-	{
-		return false;
-	}
-}
-
-bool _Wolframe::utils::directoryExists( const std::string& path)
-{
-	try
-	{
-		boost::filesystem::path pt( path);
-		return boost::filesystem::exists( pt) && boost::filesystem::is_directory( pt);
-	}
-	catch (const std::exception&)
-	{
-		return false;
-	}
-}
-
-bool _Wolframe::utils::isDirectory( const std::string& path)
-{
-	try
-	{
-		boost::filesystem::path pt( path);
-		return boost::filesystem::exists( pt) && boost::filesystem::is_directory( pt);
-	}
-	catch (const std::exception&)
-	{
-		return false;
-	}
-}
-
-void _Wolframe::utils::removeAllFiles( const std::string& path)
-{
-	boost::filesystem::path pt( path);
-	try {
-		boost::filesystem::remove_all( pt);
-	}
-	catch( ... )
-	{
-		boost::this_thread::sleep( boost::posix_time::seconds( 1 ) );
-		boost::filesystem::remove_all( pt);
-	}
-}
-
 std::string _Wolframe::utils::getCanonicalPath( const std::string& path, const std::string& refpath)
 {
 	boost::filesystem::path pt( path);
@@ -160,3 +108,15 @@ std::string _Wolframe::utils::getCanonicalPath( const std::string& path, const s
 	}
 }
 
+bool _Wolframe::utils::fileExists( const std::string& path)
+{
+	try
+	{
+		boost::filesystem::path pt( path);
+		return boost::filesystem::exists( pt);
+	}
+	catch (const std::exception&)
+	{
+		return false;
+	}
+}

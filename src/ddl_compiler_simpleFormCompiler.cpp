@@ -89,7 +89,7 @@ public:
 		,m_type(o.m_type)
 		,m_value(o.m_value){}
 
-	FRMAttribute( const std::string& name, const std::string& item)
+	explicit FRMAttribute( const std::string& item)
 		:m_isVector(false),m_isAttribute(false),m_type(string_)
 	{
 		enum State
@@ -138,10 +138,6 @@ public:
 					}
 					if (*ii == '(')
 					{
-						if (m_type == form_)
-						{
-							throw std::runtime_error( (std::string("Form ") += name) += "declared with default value");
-						}
 						st = ParseDfOpen;
 						break;
 					}
@@ -224,13 +220,6 @@ private:
 		{
 			throw std::runtime_error( (std::string( "Unknown type: '") += typestr) += "'");
 		}
-		if (m_type == form_)
-		{
-			if (m_isAttribute)
-			{
-				throw std::runtime_error( "Syntax error: Form declared as atrribute");
-			}
-		}
 	}
 private:
 	bool m_isVector;
@@ -249,7 +238,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 	{
 		if (itr->second.begin() == itr->second.end() && itr->second.data().size())
 		{
-			FRMAttribute fa( itr->first, itr->second.data());
+			FRMAttribute fa( itr->second.data());
 			if (fa.type() == FRMAttribute::form_)
 			{
 				throw std::runtime_error( "Semantic error: illegal type specifier");
@@ -278,10 +267,14 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 		{
 			if (itr->second.data().size())
 			{
-				FRMAttribute fa( itr->first, itr->second.data());
+				FRMAttribute fa( itr->second.data());
 				if (fa.type() != FRMAttribute::form_)
 				{
 					throw std::runtime_error( "Semantic error: Atomic type declared as structure");
+				}
+				if (fa.isAttribute())
+				{
+					throw std::runtime_error( "Syntax error: Form declared as attribute");
 				}
 				StructType st;
 				if (fa.isVector())
@@ -292,6 +285,10 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				}
 				else
 				{
+					if (fa.type() == FRMAttribute::form_)
+					{
+						throw std::runtime_error( "Semantic error: Form declared with default value");
+					}
 					compile_ptree( itr->second, st);
 				}
 				result.defineContent( itr->first, st);
@@ -306,13 +303,42 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 	}
 }
 
+static std::string getDoctype( boost::property_tree::ptree& pt)
+{
+	std::string rt;
+	boost::property_tree::ptree::iterator itr=pt.begin(),end=pt.end();
+	while (itr != end)
+	{
+		if (itr->second.begin() == itr->second.end() && itr->second.data().size())
+		{
+			if (itr->first[0] == '!')
+			{
+				if (boost::algorithm::iequals( itr->first, "!DOCTYPE"))
+				{
+					if (rt.size()) throw std::runtime_error( "attribute !DOCTYPE defined twice");
+					rt = itr->second.data();
+				}
+				boost::property_tree::ptree::iterator dd = itr;
+				itr++;
+				pt.erase( dd);
+				continue;
+			}
+		}
+		++itr;
+	}
+	return rt;
+}
+
 StructType SimpleFormCompiler::compile( const std::string& srcstring) const
 {
 	StructType rt;
 	std::istringstream src( srcstring);
 	boost::property_tree::ptree pt;
 	boost::property_tree::info_parser::read_info( src, pt);
+	rt.defineDoctype( getDoctype( pt).c_str());
 	compile_ptree( pt, rt);
 	return rt;
 }
+
+
 
