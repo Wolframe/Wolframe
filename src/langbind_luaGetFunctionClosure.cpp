@@ -54,6 +54,10 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( lua_State* ls)
 	{
 		return EndOfData;
 	}
+	if (m_activeid.get() && *m_activeid != m_id)
+	{
+		throw std::runtime_error( "branched scope iterator has not consumed all its input");
+	}
 AGAIN:
 	if (!m_inputfilter->getNext( elemtype, element, elementsize))
 	{
@@ -107,6 +111,10 @@ AGAIN:
 				m_type = elemtype;
 				if (m_taglevel == 0)
 				{
+					if (m_activeid.get())
+					{
+						*m_activeid = m_id-1;
+					}
 					return EndOfData;
 				}
 				else
@@ -156,6 +164,10 @@ TypedInputFilterClosure::ItemType TypedInputFilterClosure::fetch( lua_State* ls)
 	if (!m_inputfilter.get())
 	{
 		return EndOfData;
+	}
+	if (m_activeid.get() && *m_activeid != m_id)
+	{
+		throw std::runtime_error( "branched scope iterator has not consumed all its input");
 	}
 AGAIN:
 	if (!m_inputfilter->getNext( elemtype, element))
@@ -209,6 +221,10 @@ AGAIN:
 				m_type = elemtype;
 				if (m_taglevel == 0)
 				{
+					if (m_activeid.get())
+					{
+						*m_activeid = m_id-1;
+					}
 					return EndOfData;
 				}
 				else
@@ -224,19 +240,34 @@ AGAIN:
 }
 
 
-InputFilterClosure InputFilterClosure::branch()
+InputFilterClosure InputFilterClosure::scope()
 {
-	if (m_taglevel == 0 || !isValidAsOperand()) throw std::runtime_error( "illegal state for branching");
+	if (m_taglevel == 0 || !isValidAsOperand()) throw std::runtime_error( "illegal state for branching a scope");
 	m_taglevel -= 1;
-	return InputFilterClosure( m_inputfilter);
+	if (!m_activeid.get())
+	{
+		m_activeid.reset( new std::size_t(m_id+1));
+	}
+	else
+	{
+		*m_activeid = m_id + 1;
+	}
+	return InputFilterClosure( m_inputfilter, m_activeid);
 }
 
-TypedInputFilterClosure TypedInputFilterClosure::branch()
+TypedInputFilterClosure TypedInputFilterClosure::scope()
 {
-	if (m_taglevel == 0 || !isValidAsOperand()) throw std::runtime_error( "illegal state for branching");
+	if (m_taglevel == 0 || !isValidAsOperand()) throw std::runtime_error( "illegal state for branching a scope");
 	m_taglevel -= 1;
-	return TypedInputFilterClosure( m_inputfilter);
+	if (!m_activeid.get())
+	{
+		m_activeid.reset( new std::size_t(m_id+1));
+	}
+	else
+	{
+		*m_activeid = m_id + 1;
+	}
+	return TypedInputFilterClosure( m_inputfilter, m_activeid);
 }
-
 
 

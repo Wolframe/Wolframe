@@ -29,14 +29,13 @@ function run_employee( itr)
 				output:print( v,t)
 			end
 		else
-			logger.print( "ERROR", "unknown tag ", t, " ", v)
+			error( "unknown element " .. t .. " " .. v)
 		end
 	end
 end
 
 function run_task( itr)
 	for v,t in itr do
-		logger.print( "INFO", "task element ", t, " ", v)
 		if t == "title" then
 			if not v then
 				output:opentag( t)
@@ -59,7 +58,7 @@ function run_task( itr)
 				output:print( v,t)
 			end
 		else
-			logger.print( "ERROR", "unknown tag ", t, " ", v)
+			error( "unknown element " .. t .. " " .. v)
 		end
 	end
 end
@@ -82,7 +81,7 @@ function run_assignment( itr)
 			run_employee( scope( itr))
 			output:closetag()
 		else
-			logger.print( "ERROR", "unknown element ", t, " ", v)
+			error( "unknown element " .. t .. " " .. v)
 		end
 	end
 end
@@ -94,7 +93,7 @@ function run_assignmentlist( itr)
 			run_assignment( scope( itr))
 			output:closetag()
 		else
-			logger.print( "ERROR", "unknown tag ", t, " ", v)
+			error( "unknown element " .. t .. " " .. v)
 		end
 	end
 end
@@ -109,7 +108,7 @@ function run()
 			run_assignmentlist( scope( itr))
 			output:closetag()
 		else
-			logger.print( "ERROR", "unknown tag ", t, " ", v)
+			error( "unknown element " .. t .. " " .. v)
 		end
 	end
 end

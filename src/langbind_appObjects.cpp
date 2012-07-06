@@ -93,6 +93,14 @@ bool getObject( const std::map<std::string,Object>& m_map, const std::string& na
 }
 }//anonymous namespace
 
+InputFilterR& Input::getIterator()
+{
+	if (m_used) throw std::runtime_error( "try to read input twice");
+	m_used = true;
+	return m_inputfilter;
+}
+
+
 void FilterMap::defineFilter( const std::string& name, const FilterFactoryR& f)
 {
 	defineObject( m_map, name, f);

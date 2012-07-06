@@ -458,14 +458,14 @@ int DECLNAME ## _functor::call( lua_State* ls)\
 
 
 
-LUA_FUNCTION_THROWS( "<structure>:get()", function_inputFilter_get)
+LUA_FUNCTION_THROWS( "<structure>:get()", function_inputfilterClosure_get)
 {
 	InputFilterClosure* closure = LuaObject<InputFilterClosure>::get( ls, lua_upvalueindex( 1));
 	LuaExceptionHandlerScope escope(ls);
 	switch (closure->fetch( ls))
 	{
 		case InputFilterClosure::DoYield:
-			lua_yieldk( ls, 0, 1, function_inputFilter_get);
+			lua_yieldk( ls, 0, 1, function_inputfilterClosure_get);
 
 		case InputFilterClosure::EndOfData:
 			return 0;
@@ -509,8 +509,8 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 			{
 				throw std::runtime_error( "iterator used as function argument in an intermediate state");
 			}
-			LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( ic->branch()));
-			lua_pushcclosure( ls, function_inputFilter_get, 1);
+			LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( ic->scope()));
+			lua_pushcclosure( ls, function_inputfilterClosure_get, 1);
 			return 1;
 		}
 		TypedInputFilterClosure* tc = LuaObject<TypedInputFilterClosure>::get( ls, -1);
@@ -520,7 +520,7 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 			{
 				throw std::runtime_error( "iterator used as function argument in an intermediate state");
 			}
-			LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( tc->branch()));
+			LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( tc->scope()));
 			lua_pushcclosure( ls, function_typedinputfilterClosure_get, 1);
 			return 1;
 		}
@@ -1191,8 +1191,8 @@ LUA_FUNCTION_THROWS( "input:get()", function_input_get)
 	{
 		return luaL_error( ls, "no filter defined for input with input:as(..)");
 	}
-	LuaObject<InputFilterClosure>::push_luastack( ls, input->inputfilter());
-	lua_pushcclosure( ls, function_inputFilter_get, 1);
+	LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure(input->getIterator()));
+	lua_pushcclosure( ls, function_inputfilterClosure_get, 1);
 	return 1;
 }
 
@@ -1287,7 +1287,7 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 				{
 					serialize::DDLStructParser* closure;
 					serialize::Context::Flags flags = serialize::Context::ValidateAttributes;
-					TypedInputFilterR inp( new TypingInputFilter( input->inputfilter()));
+					TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
 					LuaObject<serialize::DDLStructParser>::push_luastack( ls, serialize::DDLStructParser( form.structure()));
 					closure = LuaObject<serialize::DDLStructParser>::get( ls, -1);
 					closure->init( inp, flags);
