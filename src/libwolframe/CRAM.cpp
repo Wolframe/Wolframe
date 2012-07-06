@@ -63,15 +63,62 @@
 
 #include "AAAA/CRAM.hpp"
 #include "byte2hex.h"
+#include "base64.hpp"
 #include "sha2.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace _Wolframe::AAAA;
+using namespace _Wolframe;
 
-static const int PASSWORD_HASH_STRING_SIZE = 2 * PASSWORD_DIGEST_SIZE + 1;
+static const int PASSWORD_HASH_BCD_SIZE = 2 * PASSWORD_DIGEST_SIZE + 1;
+static const int PASSWORD_HASH_BASE64_SIZE = (( PASSWORD_DIGEST_SIZE + 2 ) / 3 ) * 4 + 1;
 static const int CRAM_CHALLENGE_STRING_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
 static const int CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
+
+
+PasswordSalt::PasswordSalt()
+{
+	memset( m_salt, 0, PASSWORD_SALT_SIZE );
+}
+
+PasswordSalt::PasswordSalt( const unsigned char* salt )
+{
+	memcpy( m_salt, salt, PASSWORD_SALT_SIZE );
+}
+
+PasswordSalt::PasswordSalt( const char* base64Salt )
+{
+	memset( m_salt, 0, PASSWORD_SALT_SIZE );
+	base64::decode( base64Salt, strlen( base64Salt ), m_salt, PASSWORD_SALT_SIZE );
+}
+
+std::string PasswordSalt::toBCD() const
+{
+	char	buffer[ PASSWORD_HASH_BCD_SIZE ];
+
+	memset( buffer, 0, PASSWORD_HASH_BCD_SIZE );
+
+	if ( byte2hex( m_salt, PASSWORD_DIGEST_SIZE,
+		       buffer, PASSWORD_HASH_BCD_SIZE ) == NULL )
+		throw std::logic_error( "PasswordHash::toBCD() cannot convert hash ?!?" );
+
+	return std::string( buffer );
+}
+
+std::string PasswordSalt::toBase64() const
+{
+	char	buffer[ PASSWORD_HASH_BASE64_SIZE ];
+
+	memset( buffer, 0, PASSWORD_HASH_BASE64_SIZE );
+
+	if ( base64::encode( m_salt, PASSWORD_DIGEST_SIZE,
+			     buffer, PASSWORD_HASH_BCD_SIZE, 0 ) < 0 )
+		throw std::logic_error( "PasswordHash::toBase64() cannot convert hash ?!?" );
+
+	return std::string( buffer );
+}
+
 
 PasswordHash::PasswordHash( const PasswordSalt& pwdSalt, const std::string& password )
 	: m_salt( pwdSalt )
@@ -81,12 +128,12 @@ PasswordHash::PasswordHash( const PasswordSalt& pwdSalt, const std::string& pass
 
 std::string PasswordHash::toBCD() const
 {
-	char	buffer[ PASSWORD_HASH_STRING_SIZE ];
+	char	buffer[ PASSWORD_HASH_BCD_SIZE ];
 
-	memset( buffer, 0, PASSWORD_HASH_STRING_SIZE );
+	memset( buffer, 0, PASSWORD_HASH_BCD_SIZE );
 
 	if ( byte2hex( m_hash, PASSWORD_DIGEST_SIZE,
-		       buffer, PASSWORD_HASH_STRING_SIZE ) == NULL )
+		       buffer, PASSWORD_HASH_BCD_SIZE ) == NULL )
 		throw std::logic_error( "PasswordHash::toBCD() cannot convert hash ?!?" );
 
 	return std::string( buffer );
@@ -94,12 +141,12 @@ std::string PasswordHash::toBCD() const
 
 std::string PasswordHash::toBase64() const
 {
-	char	buffer[ PASSWORD_HASH_STRING_SIZE ];
+	char	buffer[ PASSWORD_HASH_BCD_SIZE ];
 
-	memset( buffer, 0, PASSWORD_HASH_STRING_SIZE );
+	memset( buffer, 0, PASSWORD_HASH_BCD_SIZE );
 
 	if ( byte2hex( m_hash, PASSWORD_DIGEST_SIZE,
-		       buffer, PASSWORD_HASH_STRING_SIZE ) == NULL )
+		       buffer, PASSWORD_HASH_BCD_SIZE ) == NULL )
 		throw std::logic_error( "PasswordHash::toString() cannot convert hash ?!?" );
 
 	return std::string( buffer );

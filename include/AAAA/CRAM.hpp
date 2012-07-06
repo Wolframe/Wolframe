@@ -57,6 +57,9 @@ public:
 	PasswordSalt();
 	explicit PasswordSalt( const unsigned char* salt );
 	explicit PasswordSalt( const char* base64Salt );
+
+	static size_t size()	{ return PASSWORD_SALT_SIZE; }
+
 	std::string toBCD() const;
 	std::string toBase64() const;
 private:
