@@ -289,9 +289,7 @@ TEST( Base64, RandomData )
 //		dataSize = 1 + rand() % 64; lineLength = rand() % 32;
 		chunkSize = 1 + rand() % dataSize;
 // fixed data
-//		dataSize = 21; lineLength = 29;	chunkSize = 7;
-//		dataSize = 20; lineLength = 4;	chunkSize = 15;
-//		dataSize = 48; lineLength = 9;	chunkSize = 1;
+//		dataSize = 8; lineLength = 16;	chunkSize = 8;
 
 		encodedSize = base64::encodedSize( dataSize, lineLength );
 
@@ -354,16 +352,30 @@ TEST( Base64, RandomData )
 		EXPECT_EQ( encodeResult, encodedSize );
 		EXPECT_EQ( 0, memcmp( encoded1, encoded2, encodedSize ));
 
+		decoded[ dataSize ] = 0x5a;
 		base64::Decoder D;
-		int decodeResult = D.decode( encoded1, encodeResult, decoded, dataSize + 1 );
+		int decodeResult1 = D.decode( encoded1, encodeResult, decoded, dataSize + 1 );
 #ifdef _BASE64_WRITE_OUTPUT
-		// encoded file
-		std::ofstream ddata( "b64decoded", std::ios_base::out | std::ios_base::binary );
-		ddata.write(( const char *)decoded, decodeResult );
-		ddata.close();
+		// decoded file
+		std::ofstream ddata1( "b64decoded1", std::ios_base::out | std::ios_base::binary );
+		ddata1.write(( const char *)decoded, decodeResult1 );
+		ddata1.close();
 #endif
-		EXPECT_EQ( dataSize, decodeResult );
+		EXPECT_EQ( dataSize, decodeResult1 );
 		EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
+		EXPECT_EQ( decoded[ dataSize ], 0x5a );
+
+		decoded[ dataSize ] = 0xa5;
+		int decodeResult2 = base64::decode( encoded1, encodeResult, decoded, dataSize + 1 );
+#ifdef _BASE64_WRITE_OUTPUT
+		// decoded file
+		std::ofstream ddata2( "b64decoded2", std::ios_base::out | std::ios_base::binary );
+		ddata2.write(( const char *)decoded, decodeResult2 );
+		ddata2.close();
+#endif
+		EXPECT_EQ( dataSize, decodeResult2 );
+		EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
+		EXPECT_EQ( decoded[ dataSize ], 0xa5 );
 
 		delete[] data;
 		delete[] encoded1;

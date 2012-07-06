@@ -113,10 +113,10 @@ private:
 };
 
 
-//int decode( const char* encoded, size_t encodedSize, void* data, size_t dataMaxSize )
-//{
-//	return base64_decode( encoded, encodedSize, data, dataMaxSize );
-//}
+int decode( const char* encoded, size_t encodedSize, void* data, size_t dataMaxSize )
+{
+	return base64_decode( encoded, encodedSize, data, dataMaxSize );
+}
 
 class Decoder
 {

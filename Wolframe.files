@@ -1356,6 +1356,9 @@ tests/temp/echo_input_generator.lua
 tests/temp/formfunc_input_generator.lua
 tests/temp/formfunc_iterator.lua
 tests/temp/formfunc_table.lua
+tests/temp/peerformfunc_input_generator.lua
+tests/temp/peerformfunc_iterator.lua
+tests/temp/peerformfunc_table.lua
 tests/testBoostPath.cpp
 tests/testMethodMemberPointerTemplate.cpp
 tests/testNamedRetVal.cpp
@@ -1375,6 +1378,8 @@ tests/wolfilter/scripts/echo_input_generator.lua
 tests/wolfilter/scripts/formfunc_input_generator.lua
 tests/wolfilter/scripts/formfunc_iterator.lua
 tests/wolfilter/scripts/formfunc_table.lua
+tests/wolfilter/scripts/peerformfunc_input_generator.lua
+tests/wolfilter/scripts/peerformfunc_iterator.lua
 tests/wolfilter/scripts/peerformfunc_table.lua
 tests/wolfilter/src/echo_cmdhandler.cpp
 tests/wolfilter/src/echo_cmdhandler.hpp
@@ -1426,9 +1431,13 @@ wtest/testDescription.hpp
 wtest/testHandlerTemplates.hpp
 wtest/wtestcheck.cpp
 XML/configuration.rng
+XML/customer.xml
 XML/database.rng
+XML/logEntry.xml
 XML/logging.rng
+XML/operation.xml
 XML/README
+XML/user.xml
 zlib/adler32.c
 zlib/compress.c
 zlib/crc32.c
