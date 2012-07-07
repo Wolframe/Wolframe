@@ -20,13 +20,13 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_filter_textwolf.dll
+	mod_filter_line.dll
 
 CPP_OBJS = \
 	$(TOPDIR)\src\filter_filterbase.obj \
 	$(TOPDIR)\src\filter_doctype.obj \
-	$(TOPDIR)\src\filter_textwolf_filter.obj \
-	mod_filter_textwolf.obj
+	$(TOPDIR)\src\filter_line_filter.obj \
+	mod_filter_line.obj
 
 all: $(DYNAMIC_MODULE)
 

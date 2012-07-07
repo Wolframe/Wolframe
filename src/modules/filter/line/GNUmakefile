@@ -14,13 +14,13 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lwolframe
 
-DYNAMIC_MODULE = mod_filter_textwolf.so
+DYNAMIC_MODULE = mod_filter_line.so
 
 CPP_OBJS = \
 	$(TOPDIR)/src/filter_filterbase.o \
 	$(TOPDIR)/src/filter_doctype.o \
-	$(TOPDIR)/src/filter_textwolf_filter.o \
-	mod_filter_textwolf.o
+	$(TOPDIR)/src/filter_line_filter.o \
+	mod_filter_line.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
