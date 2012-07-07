@@ -194,9 +194,6 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
 	GlobalContext* gc = getGlobalContext();
-	FilterFactoryR tf( new TokenFilterFactory());
-	gc->defineFilter( "token", tf);
-
 	Filter flt = getFilter( gc, ifl, ofl);
 	if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
 	if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");

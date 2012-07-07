@@ -1,0 +1,25 @@
+TOPDIR = ..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+SUBDIRS = \
+	$(SUBDIRS)
+# textwolf token char line
+
+# libxml2
+#!IFDEF WITH_LIBXML2
+#SUBDIRS = \
+#	$(SUBDIRS) libxml2
+#!ENDIF
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:

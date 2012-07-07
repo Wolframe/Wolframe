@@ -30,8 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file serialize/struct/filtermapBase.hpp
-///\brief Defines the non intrusive base class of serialization for filters
-
+///\brief Defines the non intrusive base class of serialization/deserialization of objects interfaced as TypedInputFilter/TypedOutputFilter.
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_BASE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"

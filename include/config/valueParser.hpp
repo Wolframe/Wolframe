@@ -143,8 +143,8 @@ public:
 			return true;
 		}
 	private:
-		DomainValueType m_min;		///< minimal allowed value of the range
-		DomainValueType m_max;		///< maximal allowed value of the range
+		DomainValueType m_min;		//< minimal allowed value of the range
+		DomainValueType m_max;		//< maximal allowed value of the range
 	};
 
 	///\class RangeDomain
@@ -223,8 +223,8 @@ public:
 			return false;
 		}
 	private:
-		unsigned int m_size;	///< number of elements in the enumeration
-		const char** m_ar;	///< string representation of the elements in the enumeration
+		unsigned int m_size;	//< number of elements in the enumeration
+		const char** m_ar;	//< string representation of the elements in the enumeration
 	};
 
 	///\class BoolDomain

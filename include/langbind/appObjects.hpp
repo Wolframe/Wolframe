@@ -133,10 +133,10 @@ public:
 	FilterMap( const FilterMap& o)
 		:m_map(o.m_map){}
 
-	void defineFilter( const std::string& name, const FilterFactoryR& f);
+	void defineFilter( const std::string& name, CreateFilterFunc f);
 	bool getFilter( const std::string& arg, Filter& rt);
 private:
-	std::map<std::string,FilterFactoryR> m_map;
+	std::map<std::string,CreateFilterFunc> m_map;
 };
 
 

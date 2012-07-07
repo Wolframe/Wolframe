@@ -39,6 +39,7 @@ Project Wolframe.
 #include "textwolf/cstringiterator.hpp"
 #include <string>
 #include <cstddef>
+#include <algorithm>
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -388,6 +389,28 @@ struct OutputFilterImpl :public OutputFilter
 		return true;
 	}
 
+	///\brief Implementation of FilterBase::getValue( const char*, std::string&)
+	virtual bool getValue( const char* name, std::string& val)
+	{
+		if (std::strcmp( name, "encoding") == 0)
+		{
+			val = m_attributes.getEncoding();
+			return true;
+		}
+		return Parent::getValue( name, val);
+	}
+
+	///\brief Implementation of FilterBase::setValue( const char*, const std::string&)
+	virtual bool setValue( const char* name, const std::string& value)
+	{
+		if (std::strcmp( name, "encoding") == 0)
+		{
+			m_attributes.setEncoding( value);
+			return true;
+		}
+		return Parent::setValue( name, value);
+	}
+
 private:
 	typedef textwolf::XMLPrinter<std::string,XMLFilterAttributes> XMLPrinter;
 
@@ -414,8 +437,16 @@ public:
 	}
 };
 
-Filter TextwolfXmlFilterFactory::create( const char* encoding) const
+Filter _Wolframe::langbind::createTextwolfXmlFilter( const std::string& name)
 {
+	const char* filterbasename = "xml:textwolf";
+	std::size_t nn = std::strlen( filterbasename);
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	if (name.size() < nn || std::memcmp( nam.c_str(), filterbasename, nn) != 0) throw std::runtime_error( "filter name does not match");
+	if (name.size() == nn) return TextwolfXmlFilter();
+	if (name[nn] != ':') throw std::runtime_error( "textwolf xml filter name does not match");
+	const char* encoding = name.c_str() + nn + 1;
 	return TextwolfXmlFilter( encoding);
 }
 

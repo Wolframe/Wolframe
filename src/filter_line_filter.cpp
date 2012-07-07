@@ -39,6 +39,7 @@ Project Wolframe.
 #include "textwolf/cstringiterator.hpp"
 #include <cstring>
 #include <cstddef>
+#include <algorithm>
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -316,8 +317,17 @@ public:
 	}
 };
 
-Filter LineFilterFactory::create( const char* encoding) const
+
+Filter _Wolframe::langbind::createLineFilter( const std::string& name)
 {
+	const char* filterbasename = "line";
+	std::size_t nn = std::strlen( filterbasename);
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	if (name.size() < nn || std::memcmp( nam.c_str(), filterbasename, nn) != 0) throw std::runtime_error( "filter name does not match");
+	if (name.size() == nn) return LineFilter();
+	if (name[nn] != ':') throw std::runtime_error( "line filter name does not match");
+	const char* encoding = name.c_str() + nn + 1;
 	return LineFilter( encoding);
 }
 

@@ -47,8 +47,7 @@ IOFilterCommandHandler::IOFilterCommandHandler()
 	,m_writedatasize(0)
 	,m_itrpos(0)
 {
-	static langbind::CharFilterFactory defaultff;
-	langbind::Filter flt = defaultff.create( "UTF-8");
+	langbind::Filter flt = createCharFilter( "char");
 	m_inputfilter = flt.inputfilter();
 	m_outputfilter = flt.outputfilter();
 }

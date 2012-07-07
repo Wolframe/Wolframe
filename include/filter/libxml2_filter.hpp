@@ -39,13 +39,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-class Libxml2FilterFactory :public FilterFactory
-{
-public:
-	Libxml2FilterFactory(){}
-	virtual ~Libxml2FilterFactory(){}
-	virtual Filter create( const char* encoding) const;
-};
+Filter createLibxml2Filter( const std::string& name);
 
 }}//namespace
 #endif

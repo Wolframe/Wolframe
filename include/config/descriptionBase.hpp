@@ -51,11 +51,11 @@ struct DescriptionBase
 	///\brief A description of one item of the configuration POD structure
 	struct Item
 	{
-		std::size_t m_ofs;		///< member position offset in bytes from the start of the structure
-		std::string m_name;		///< member name
-		const char* m_type;		///< member type name
-		Parse m_parse;			///< parse member function
-		Print m_print;			///< print member function
+		std::size_t m_ofs;		//< member position offset in bytes from the start of the structure
+		std::string m_name;		//< member name
+		const char* m_type;		//< member type name
+		Parse m_parse;			//< parse member function
+		Print m_print;			//< print member function
 
 		///\brief Constructor
 		Item( std::size_t ofs, const std::string& name, const char* type, Parse parse, Print print)

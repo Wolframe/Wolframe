@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file serialize/struct/filtermapParse.hpp
-///\brief Defines the intrusive implementation of the parsing part of serialization/deserialization of filters
+///\brief Defines the intrusive implementation of the deserialization of objects interfaced as TypedInputFilter
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"

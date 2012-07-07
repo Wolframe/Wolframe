@@ -39,6 +39,7 @@ Project Wolframe.
 #include "filter/outputfilter.hpp"
 #include <map>
 #include <string>
+#include <cstring>
 
 namespace _Wolframe {
 namespace langbind {
@@ -84,14 +85,7 @@ protected:
 	OutputFilterR m_outputfilter;
 };
 
-struct FilterFactory
-{
-	FilterFactory(){}
-	virtual ~FilterFactory(){}
-	virtual Filter create( const char* arg) const=0;
-};
-
-typedef CountedReference<FilterFactory> FilterFactoryR;
+typedef Filter (*CreateFilterFunc)( const std::string& name);
 
 }}//namespace
 #endif

@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file serialize/struct/filtermapSerializeStack.hpp
-///\brief Defines the Parsing STM for serialization for filters
+///\brief Defines the parsing stack for serialization of objects
 
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_SERIALIZE_STACK_HPP_INCLUDED

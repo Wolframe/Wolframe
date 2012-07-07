@@ -415,9 +415,9 @@ static TypedInputFilterR get_operand_TypedInputFilter( lua_State* ls, int idx)
 				InputFilterClosure* ic = LuaObject<InputFilterClosure>::get( ls, -1);
 				if (ic)
 				{
-					if (!ic->isValidAsOperand())
+					if (!ic->isValidAsScope())
 					{
-						throw std::runtime_error( "iterator used as function argument in an intermediate state");
+						throw std::runtime_error( "Illegal use of iterator as function argument. Only allowed at the beginning or after an open tag");
 					}
 					rt.reset( new TypingInputFilter( ic->inputfilter()));
 					break;
@@ -425,9 +425,9 @@ static TypedInputFilterR get_operand_TypedInputFilter( lua_State* ls, int idx)
 				TypedInputFilterClosure* tc = LuaObject<TypedInputFilterClosure>::get( ls, -1);
 				if (tc)
 				{
-					if (!tc->isValidAsOperand())
+					if (!tc->isValidAsScope())
 					{
-						throw std::runtime_error( "iterator used as function argument in an intermediate state");
+						throw std::runtime_error( "Illegal use of iterator as function argument. Only allowed at the beginning or after an open tag");
 					}
 					rt = tc->inputfilter();
 					break;
@@ -505,10 +505,6 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 		InputFilterClosure* ic = LuaObject<InputFilterClosure>::get( ls, -1);
 		if (ic)
 		{
-			if (!ic->isValidAsOperand())
-			{
-				throw std::runtime_error( "iterator used as function argument in an intermediate state");
-			}
 			LuaObject<InputFilterClosure>::push_luastack( ls, InputFilterClosure( ic->scope()));
 			lua_pushcclosure( ls, function_inputfilterClosure_get, 1);
 			return 1;
@@ -516,10 +512,6 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 		TypedInputFilterClosure* tc = LuaObject<TypedInputFilterClosure>::get( ls, -1);
 		if (tc)
 		{
-			if (!tc->isValidAsOperand())
-			{
-				throw std::runtime_error( "iterator used as function argument in an intermediate state");
-			}
 			LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( tc->scope()));
 			lua_pushcclosure( ls, function_typedinputfilterClosure_get, 1);
 			return 1;

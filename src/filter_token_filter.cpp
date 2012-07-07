@@ -39,6 +39,7 @@ Project Wolframe.
 #include "textwolf/cstringiterator.hpp"
 #include <cstring>
 #include <cstddef>
+#include <algorithm>
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -176,7 +177,8 @@ struct InputFilterImpl :public InputFilter
 		,m_elemtype(OpenTag)
 		,m_src(0)
 		,m_srcsize(0)
-		,m_srcend(false){}
+		,m_srcend(false)
+		,m_linecomplete(false){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
@@ -189,7 +191,8 @@ struct InputFilterImpl :public InputFilter
 		,m_elembuf(o.m_elembuf)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
-		,m_srcend(o.m_srcend){}
+		,m_srcend(o.m_srcend)
+		,m_linecomplete(o.m_linecomplete){}
 
 	///\brief self copy
 	///\return copy of this
@@ -323,7 +326,7 @@ class TokenFilter :public Filter
 public:
 	TokenFilter( const char* encoding=0)
 	{
-		if (!encoding)
+		if (!encoding || !encoding[0])
 		{
 			m_inputfilter.reset( new InputFilterImpl<textwolf::charset::UTF8>());
 			m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::UTF8>());
@@ -395,8 +398,17 @@ public:
 	}
 };
 
-Filter TokenFilterFactory::create( const char* encoding) const
+Filter _Wolframe::langbind::createTokenFilter( const std::string& name)
 {
+	const char* filterbasename = "token";
+	std::size_t nn = std::strlen( filterbasename);
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	if (name.size() < nn || std::memcmp( nam.c_str(), filterbasename, nn) != 0) throw std::runtime_error( "filter name does not match");
+	if (name.size() == nn) return TokenFilter();
+	if (name[nn] != ':') throw std::runtime_error( "token filter name does not match");
+	const char* encoding = name.c_str() + nn + 1;
 	return TokenFilter( encoding);
 }
+
 

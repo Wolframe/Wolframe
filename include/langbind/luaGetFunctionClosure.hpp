@@ -94,7 +94,7 @@ public:
 
 	///\brief Find out if we can use the function in this state as argument of a function
 	///\return true, if yes
-	bool isValidAsOperand() const			{return (m_type==InputFilter::OpenTag && (!m_activeid.get() || *m_activeid == m_id));}
+	bool isValidAsScope() const			{return (m_type==InputFilter::OpenTag && (!m_activeid.get() || *m_activeid == m_id));}
 
 	InputFilterClosure scope();
 
@@ -157,7 +157,7 @@ public:
 
 	///\brief Find out if we can use the function in this state as argument of a function
 	///\return true, if yes
-	bool isValidAsOperand() const			{return (m_type==InputFilter::OpenTag && (!m_activeid.get() || *m_activeid == m_id));}
+	bool isValidAsScope() const			{return (m_type==InputFilter::OpenTag && (!m_activeid.get() || *m_activeid == m_id));}
 
 	TypedInputFilterClosure scope();
 

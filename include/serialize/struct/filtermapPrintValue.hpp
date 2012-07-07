@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file serialize/struct/filtermapPrintValue.hpp
-///\brief Defines the intrucsive printing of a typed filter element for serialization
+///\brief Defines the intrucsive printing of a value for serialization
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_VALUE_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PRINT_VALUE_HPP_INCLUDED
 #include <boost/lexical_cast.hpp>

@@ -58,6 +58,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <ctime>
 
 using namespace _Wolframe;
 using namespace _Wolframe::tproc;
@@ -152,12 +153,19 @@ public:
 
 static std::string selectedTestName;
 
+static unsigned int testSeed()
+{
+
+	std::time_t now = std::time(0);
+	std::tm *ltm = localtime(&now);
+	return (int)(ltm->tm_mday + 100 * ltm->tm_mon);
+}
 
 TEST_F( TProcHandlerTest, tests)
 {
-	enum {NOF_IB=6,NOF_OB=4};
-	std::size_t ib[] = {127,1,2,3,5,7};
-	std::size_t ob[] = {127,1,2,5};
+	enum {NOF_IB=10,NOF_OB=6,TEST_MOD=7,NOF_TESTS=5};
+	std::size_t ib[] = {16000,127,1,2,3,5,7,8,11,13};
+	std::size_t ob[] = {16000,127,1,2,5,7};
 	std::vector<std::string> tests;
 
 	boost::filesystem::recursive_directory_iterator ditr( boost::filesystem::current_path() / "data"), dend;
@@ -205,46 +213,48 @@ TEST_F( TProcHandlerTest, tests)
 		// Run test:
 		std::cerr << "processing test '" << testname << "'" << std::endl;
 		TestConfiguration testConfiguration;
-		for (int ii=0; ii<NOF_IB; ii++)
+
+		unsigned int rr = testSeed();
+		for (int tt=0; tt<NOF_TESTS; tt++,rr+=TEST_MOD)
 		{
-			for (int oo=0; oo<NOF_OB; oo++)
+			unsigned int ii = rr % NOF_IB;
+			unsigned int oo = rr % NOF_OB;
+
+			TProcHandlerTestInstance test( td, &testConfiguration, ib[ii], ob[oo]);
+			int trt = test.run();
+			if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
+			EXPECT_EQ( 0, trt);
+
+			if (test.expected() != test.output())
 			{
-				TProcHandlerTestInstance test( td, &testConfiguration, ib[ii], ob[oo]);
-				int trt = test.run();
-				if (trt != 0) boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
-				EXPECT_EQ( 0, trt);
+				static boost::mutex mutex;
+				boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
 
-				if (test.expected() != test.output())
-				{
-					static boost::mutex mutex;
-					boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
+				boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
+				std::fstream outputf( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
+				outputf.write( test.output().c_str(), test.output().size());
+				if (outputf.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
+				outputf.close();
 
-					boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
-					std::fstream outputf( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
-					outputf.write( test.output().c_str(), test.output().size());
-					if (outputf.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
-					outputf.close();
+				boost::filesystem::path EXPECT( boost::filesystem::current_path() / "temp" / "EXPECT");
+				std::fstream expectedf( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
+				expectedf.write( test.expected().c_str(), test.expected().size());
+				if (expectedf.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
+				expectedf.close();
 
-					boost::filesystem::path EXPECT( boost::filesystem::current_path() / "temp" / "EXPECT");
-					std::fstream expectedf( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
-					expectedf.write( test.expected().c_str(), test.expected().size());
-					if (expectedf.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
-					expectedf.close();
+				boost::filesystem::path INPUT( boost::filesystem::current_path() / "temp" / "INPUT");
+				std::fstream inputf( INPUT.string().c_str(), std::ios::out | std::ios::binary);
+				inputf.write( test.input().c_str(), test.input().size());
+				if (inputf.bad()) std::cerr << "error writing file '" << INPUT.string() << "'" << std::endl;
+				inputf.close();
 
-					boost::filesystem::path INPUT( boost::filesystem::current_path() / "temp" / "INPUT");
-					std::fstream inputf( INPUT.string().c_str(), std::ios::out | std::ios::binary);
-					inputf.write( test.input().c_str(), test.input().size());
-					if (inputf.bad()) std::cerr << "error writing file '" << INPUT.string() << "'" << std::endl;
-					inputf.close();
-
-					std::cerr << "test output [" << ib[ii] << "/" << ob[oo] << "] does not match for '" << *itr << "'" << std::endl;
-					std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;
-					std::cerr << "OUTPUT written to file '" << OUTPUT.string() << "'" << std::endl;
-					std::cerr << "EXPECT written to file '" << EXPECT.string() << "'" << std::endl;
-					boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
-				}
-				EXPECT_EQ( test.expected(), test.output());
+				std::cerr << "test output [" << ib[ii] << "/" << ob[oo] << "] does not match for '" << *itr << "'" << std::endl;
+				std::cerr << "INPUT  written to file '"  << INPUT.string() << "'" << std::endl;
+				std::cerr << "OUTPUT written to file '" << OUTPUT.string() << "'" << std::endl;
+				std::cerr << "EXPECT written to file '" << EXPECT.string() << "'" << std::endl;
+				boost::this_thread::sleep( boost::posix_time::seconds( 3 ) );
 			}
+			EXPECT_EQ( test.expected(), test.output());
 		}
 	}
 }

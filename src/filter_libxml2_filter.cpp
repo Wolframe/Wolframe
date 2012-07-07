@@ -8,6 +8,7 @@
 #include <cstring>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include <stdexcept>
 #include "libxml/parser.h"
 #include "libxml/tree.h"
@@ -612,19 +613,32 @@ private:
 
 struct Libxml2Filter :public Filter
 {
-	Libxml2Filter()
+	Libxml2Filter( const char* encoding=0)
 	{
 		CountedReference<std::string> enc;
+		if (encoding)
+		{
+			enc.reset( new std::string( encoding));
+		}
 		InputFilterImpl impl( enc);
-
 		m_inputfilter.reset( new BufferingInputFilter( &impl));
 		m_outputfilter.reset( new OutputFilterImpl( enc));
 	}
 };
 
-Filter Libxml2FilterFactory::create( const char*) const
+Filter _Wolframe::langbind::createLibxml2Filter( const std::string& name)
 {
-	return Libxml2Filter();
+	const char* filterbasename = "xml:libxml2";
+	std::size_t nn = std::strlen( filterbasename);
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	if (name.size() < nn || std::memcmp( nam.c_str(), filterbasename, nn) != 0) throw std::runtime_error( "filter name does not match");
+	if (name.size() == nn) return Libxml2Filter();
+	if (name[nn] != ':') throw std::runtime_error( "libxml2 filter name does not match");
+	const char* encoding = name.c_str() + nn + 1;
+	return Libxml2Filter( encoding);
 }
+
+
 
 

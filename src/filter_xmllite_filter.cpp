@@ -75,15 +75,8 @@ private:
 
 }//end anonymous namespace
 
-class XmlLiteFilter :public Filter
-{
-public:
-	XmlLiteFilter( ){}
-};
-
-Filter XmlLiteFilterFactory::create( const char*) const
+Filter _Wolframe::langbind::createXmlLiteFilter( const std::string& )
 {
 	return XmlLiteFilter();
 }
-
 

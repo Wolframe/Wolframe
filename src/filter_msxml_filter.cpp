@@ -72,9 +72,10 @@ public:
 	MSXMLFilter( ){}
 };
 
-Filter MSXMLFilterFactory::create( const char*) const
+Filter _Wolframe::langbind::createMSXMLFilter( const std::string&)
 {
 	return MSXMLFilter();
 }
+
 
 

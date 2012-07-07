@@ -39,13 +39,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-class TokenFilterFactory :public FilterFactory
-{
-public:
-	TokenFilterFactory(){}
-	virtual ~TokenFilterFactory(){}
-	virtual Filter create( const char* encoding) const;
-};
+Filter createTokenFilter( const std::string& name);
 
 }}//namespace
 #endif

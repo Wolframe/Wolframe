@@ -56,7 +56,7 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( lua_State* ls)
 	}
 	if (m_activeid.get() && *m_activeid != m_id)
 	{
-		throw std::runtime_error( "branched scope iterator has not consumed all its input");
+		throw std::runtime_error( "branched scope of iterator has not consumed all its input");
 	}
 AGAIN:
 	if (!m_inputfilter->getNext( elemtype, element, elementsize))
@@ -167,7 +167,7 @@ TypedInputFilterClosure::ItemType TypedInputFilterClosure::fetch( lua_State* ls)
 	}
 	if (m_activeid.get() && *m_activeid != m_id)
 	{
-		throw std::runtime_error( "branched scope iterator has not consumed all its input");
+		throw std::runtime_error( "branched scope of iterator has not consumed all its input");
 	}
 AGAIN:
 	if (!m_inputfilter->getNext( elemtype, element))
@@ -242,7 +242,7 @@ AGAIN:
 
 InputFilterClosure InputFilterClosure::scope()
 {
-	if (m_taglevel == 0 || !isValidAsOperand()) throw std::runtime_error( "illegal state for branching a scope");
+	if (m_taglevel == 0 || !isValidAsScope()) throw std::runtime_error( "illegal iterator state for branching a scope of it");
 	m_taglevel -= 1;
 	if (!m_activeid.get())
 	{
@@ -257,7 +257,7 @@ InputFilterClosure InputFilterClosure::scope()
 
 TypedInputFilterClosure TypedInputFilterClosure::scope()
 {
-	if (m_taglevel == 0 || !isValidAsOperand()) throw std::runtime_error( "illegal state for branching a scope");
+	if (m_taglevel == 0 || !isValidAsScope()) throw std::runtime_error( "illegal iterator state for branching a scope of it");
 	m_taglevel -= 1;
 	if (!m_activeid.get())
 	{

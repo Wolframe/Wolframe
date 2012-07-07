@@ -30,8 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file serialize/struct/filtermapDescription.hpp
-///\brief Defines the bricks for the SDK to describe structures for mapping filters to forms in a readable way.
-///\remark This module uses intrusive building blocks to build the serialization/deserialization of the direct map objects.
+///\brief Defines the bricks for the SDK to describe serialization/deserialization of objects in Wolframe.
+///\remark This module uses intrusive building blocks to build the serialization/deserialization of the objects interfaced as TypedInputFilter/TypedOutputFilter.
 #ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_DESCRIPTION_HPP_INCLUDED
 #define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_DESCRIPTION_HPP_INCLUDED
 #include "serialize/struct/filtermapBase.hpp"
