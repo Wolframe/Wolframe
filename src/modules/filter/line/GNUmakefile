@@ -6,13 +6,13 @@ SUBDIRS =
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
+	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
-INCLUDE_LIBS = \
-	-lwolframe
+INCLUDE_LIBS =
 
 DYNAMIC_MODULE = mod_filter_line.so
 
