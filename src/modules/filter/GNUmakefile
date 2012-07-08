@@ -7,9 +7,9 @@ SUBDIRS =
 SUBDIRS += textwolf token char line
 
 # libxml2
-#ifeq ($(WITH_LIBXML2),1)
-#SUBDIRS += libxml2
-#endif
+ifeq ($(WITH_LIBXML2),1)
+SUBDIRS += libxml2
+endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

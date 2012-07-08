@@ -49,44 +49,15 @@ public:
 	typedef bool (*Fetch)( Context& ctx, std::vector<FiltermapSerializeState>& stk);
 
 public:
-	FiltermapSerializeState( const FiltermapSerializeState& o)
-		:m_fetch(o.m_fetch)
-		,m_value(o.m_value)
-		,m_name(o.m_name)
-		,m_stateidx(o.m_stateidx)
-		{}
+	FiltermapSerializeState( const FiltermapSerializeState& o);
 
-	FiltermapSerializeState( const char* name_, Fetch p, const void* v)
-		:m_fetch(p)
-		,m_value(v)
-		,m_name(name_)
-		,m_stateidx(0)
-		{}
+	FiltermapSerializeState( const char* name_, Fetch p, const void* v);
 
-	const void* value() const
-	{
-		return m_value;
-	}
-
-	const char* name() const
-	{
-		return m_name;
-	}
-
-	Fetch fetch() const
-	{
-		return m_fetch;
-	}
-
-	std::size_t state() const
-	{
-		return m_stateidx;
-	}
-
-	void state( std::size_t idx)
-	{
-		m_stateidx = idx;
-	}
+	const void* value() const			{return m_value;}
+	const char* name() const			{return m_name;}
+	Fetch fetch() const				{return m_fetch;}
+	std::size_t state() const			{return m_stateidx;}
+	void state( std::size_t idx)			{m_stateidx = idx;}
 
 private:
 	Fetch m_fetch;

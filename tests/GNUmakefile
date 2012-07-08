@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = modules AAAA
+SUBDIRS = modules AAAA wolfilter
 # SUBDIRS = modules AAAA bignum
 
 

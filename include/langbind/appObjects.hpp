@@ -30,10 +30,11 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file langbind/appObjects.hpp
-///\brief interface to system objects for processor language bindings
+///\brief Interface to system objects for processor language bindings
 #ifndef _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
+#include "langbind/appFormFunction.hpp"
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
@@ -230,35 +231,6 @@ private:
 	boost::shared_ptr<void> m_data;
 };
 
-
-///\class FormFunction
-class FormFunction
-{
-public:
-	typedef int (Function)( void* res, const void* param);
-
-	///\brief Default constructor
-	FormFunction();
-
-	///\brief Copy constructor
-	///\param[in] o copied item
-	FormFunction( const FormFunction& o);
-
-	///\brief Constructor
-	///\param[in] f function to call
-	///\param[in] p part of the api describing the input
-	///\param[in] r part of the api describing the function result
-	FormFunction( Function f, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r);
-
-	const serialize::FiltermapDescriptionBase* api_param() const	{return m_api_param;}
-	const serialize::FiltermapDescriptionBase* api_result() const	{return m_api_result;}
-	int call( void* res, const void* param) const			{return (*m_function)( res, param);}
-
-private:
-	Function* m_function;
-	const serialize::FiltermapDescriptionBase* m_api_param;
-	const serialize::FiltermapDescriptionBase* m_api_result;
-};
 
 ///\class FormFunctionClosure
 ///\brief Closure with calling state of called FormFunction

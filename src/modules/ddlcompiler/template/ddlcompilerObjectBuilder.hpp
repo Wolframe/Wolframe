@@ -29,49 +29,64 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapParseStack.hpp
-///\brief Defines the parsing stack for deserialization
-
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_STACK_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_STACK_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "serialize/mapContext.hpp"
-#include <vector>
-#include <stdexcept>
+///\file modules/ddlcompiler/template/ddlcompilerObjectBuilder.hpp
+///\brief Interface template for object builder of form DDL compilers
+#ifndef _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#include "ddl/compilerInterface.hpp"
+#include "moduleInterface.hpp"
+#include "object.hpp"
 
 namespace _Wolframe {
-namespace serialize {
+namespace module {
 
-class FiltermapParseState
+template <class CompilerInterface>
+class DDLCompilerObject :public Object, public CompilerInterface
 {
 public:
-	typedef bool (*Parse)( langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapParseState>& stk);
+	DDLCompilerObject( const char* name_)
+		:CompilerInterface(name_){}
 
-public:
-	FiltermapParseState( const FiltermapParseState& o);
-	FiltermapParseState( const char* name_, Parse p, void* v);
-	~FiltermapParseState();
+	virtual ~DDLCompilerObject(){}
 
-	std::size_t selectElement( std::size_t idx, std::size_t size);
-	std::size_t initCount( std::size_t idx) const;
-
-	void* value() const			{return m_value;}
-	const char* name() const		{return m_name;}
-	Parse parse() const			{return m_parse;}
-	std::size_t state() const		{return m_stateidx;}
-	void state( std::size_t idx)		{m_stateidx = idx;}
-
-private:
-	Parse m_parse;
-	int* m_initar;
-	std::size_t m_size;
-	void* m_value;
-	const char* m_name;
-	std::size_t m_stateidx;
+	virtual const char* objectName() const
+	{
+		return ddlname().c_str();
+	}
 };
 
-typedef std::vector<FiltermapParseState> FiltermapParseStateStack;
+template <class CompilerInterface>
+class DDLCompilerObjectBuilder :public ObjectBuilder
+{
+public:
+	DDLCompilerObjectBuilder( const char* name_)
+		:ObjectBuilder(name_)
+		,m_ddlname(name_){}
+
+	virtual ~DDLCompilerObjectBuilder(){}
+
+	virtual Object* object()
+	{
+		return new DDLCompilerObject<CompilerInterface>(m_ddlname);
+	}
+
+private:
+	std::string m_ddlname;
+};
 
 }}//namespace
+
+#define DECLARE_DDLCOMPILER(NAME,CPPID,CCOBJ) \
+namespace {\
+struct CPPID\
+{\
+	static ObjectBuilder* constructor()\
+	{\
+		return new DDLCompilerObjectBuilder<CCOBJ>(NAME);\
+	}\
+};\
+}//anonymous namespace
+//end DECLARE_FUNCTION
+
 #endif
 

@@ -37,143 +37,76 @@ Project Wolframe.
 #include "serialize/struct/filtermapTraits.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/struct/filtermapParseStack.hpp"
-#include "serialize/struct/filtermapParseValue.hpp"
 #include "serialize/struct/filtermapProperty.hpp"
-#include <sstream>
-#include <stdexcept>
 #include <string>
 #include <cstddef>
-#include <boost/lexical_cast.hpp>
 #include <boost/utility/value_init.hpp>
 
 namespace _Wolframe {
 namespace serialize {
 
 // forward declaration
-template <typename T>
+template <typename TYPE>
 struct FiltermapIntrusiveParser
 {
 	static bool parse( langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk);
 };
 
+bool parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk);
 
-static bool parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
-{
-	langbind::InputFilter::ElementType typ;
-	langbind::TypedFilterBase::Element element;
+bool parseObjectStruct( const FiltermapDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk);
 
-	if (!inp.getNext( typ, element))
-	{
-		if (inp.state() == langbind::InputFilter::EndOfMessage) return false;
-		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
-	}
-	if (typ == langbind::InputFilter::Value)
-	{
-		throw SerializationErrorException( "subsequent atomic values not allowed in filter serialization", element.tostring(), StructParser::getElementPath( stk));
-	}
-	if (typ != langbind::InputFilter::CloseTag)
-	{
-		throw SerializationErrorException( "close tag expected after atomic element", element.tostring(), StructParser::getElementPath( stk));
-	}
-	stk.pop_back();
-	return true;
-}
+typedef bool (*ParseValue)( void* value, const langbind::TypedFilterBase::Element& element);
 
-template <typename T>
+bool parseValue_int( signed int*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_uint( unsigned int*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_ulong( unsigned long*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_long( signed long*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_short( signed short*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_ushort( unsigned short*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_char( signed char*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_uchar( unsigned char*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_float( float*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_double( double*, const langbind::TypedFilterBase::Element& element);
+bool parseValue_string( std::string*, const langbind::TypedFilterBase::Element& element);
+
+namespace {
+template <typename TYPE>
+static bool parseValue_( void*, const langbind::TypedFilterBase::Element&)
+{throw std::runtime_error( "unable to parse atomic value of this type");}
+template <> bool parseValue_<signed int>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_int( (signed int*)value, element);}
+template <> bool parseValue_<unsigned int>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_uint( (unsigned int*)value, element);}
+template <> bool parseValue_<signed long>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_long( (signed long*)value, element);}
+template <> bool parseValue_<unsigned long>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_ulong( (unsigned long*)value, element);}
+template <> bool parseValue_<signed short>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_short( (signed short*)value, element);}
+template <> bool parseValue_<unsigned short>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_ushort( (unsigned short*)value, element);}
+template <> bool parseValue_<signed char>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_char( (signed char*)value, element);}
+template <> bool parseValue_<unsigned char>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_uchar( (unsigned char*)value, element);}
+template <> bool parseValue_<float>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_float( (float*)value, element);}
+template <> bool parseValue_<double>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_double( (double*)value, element);}
+template <> bool parseValue_<std::string>( void* value, const langbind::TypedFilterBase::Element& element)
+{return parseValue_string( (std::string*)value, element);}
+}//anonymous namespace
+
+bool parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk);
+
+template <typename TYPE>
 bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
 {
-	langbind::InputFilter::ElementType typ;
-	langbind::TypedFilterBase::Element element;
-	static const FiltermapDescriptionBase* descr = T::getFiltermapDescription();
-
-	if (!inp.getNext( typ, element))
-	{
-		if (inp.state() != langbind::InputFilter::Error) return false;
-		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
-	}
-	switch (typ)
-	{
-		case langbind::InputFilter::OpenTag:
-		{
-			FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
-			if (itr == descr->end())
-			{
-				throw SerializationErrorException( "unknown element", element.tostring(), StructParser::getElementPath( stk));
-			}
-			std::size_t idx = itr - descr->begin();
-			if (idx < descr->nof_attributes())
-			{
-				if (ctx.flag( Context::ValidateAttributes))
-				{
-					throw SerializationErrorException( "attribute element expected", element.tostring(), StructParser::getElementPath( stk));
-				}
-			}
-			if (itr->second.type() != FiltermapDescriptionBase::Vector)
-			{
-				if (stk.back().selectElement( idx, descr->size()))
-				{
-					throw SerializationErrorException( "duplicate definition", element.tostring(), StructParser::getElementPath( stk));
-				}
-			}
-			void* value = (char*)stk.back().value() + itr->second.ofs();
-			if (itr->second.type() == FiltermapDescriptionBase::Atomic)
-			{
-				stk.push_back( FiltermapParseState( 0, &parseAtomicElementEndTag, value));
-			}
-			stk.push_back( FiltermapParseState( itr->first.c_str(), itr->second.parse(), value));
-			return true;
-		}
-
-		case langbind::InputFilter::Attribute:
-		{
-			FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
-			if (itr == descr->end())
-			{
-				throw SerializationErrorException( "unknown attribute", element.tostring(), StructParser::getElementPath( stk));
-			}
-			std::size_t idx = itr - descr->begin();
-			if (idx >= descr->nof_attributes())
-			{
-				if (ctx.flag( Context::ValidateAttributes))
-				{
-					throw SerializationErrorException( "content element expected", element.tostring(), StructParser::getElementPath( stk));
-				}
-			}
-			if (itr->second.type() != FiltermapDescriptionBase::Atomic)
-			{
-				throw SerializationErrorException( "atomic value expected for attribute", element.tostring(), StructParser::getElementPath( stk));
-			}
-			if (stk.back().selectElement( idx, descr->size()))
-			{
-				throw SerializationErrorException( "duplicate definition", element.tostring(), StructParser::getElementPath( stk));
-			}
-			stk.push_back( FiltermapParseState( itr->first.c_str(), itr->second.parse(), (char*)stk.back().value() + itr->second.ofs()));
-			return true;
-		}
-
-		case langbind::InputFilter::Value:
-		{
-			throw SerializationErrorException( "structure instead of value expected", element.tostring(), StructParser::getElementPath( stk));
-		}
-
-		case langbind::InputFilter::CloseTag:
-		{
-			FiltermapDescriptionBase::Map::const_iterator itr = descr->begin(),end=descr->end();
-			for (;itr != end; ++itr)
-			{
-				if (itr->second.mandatory() && !stk.back().initCount( itr-descr->begin()))
-				{
-					throw SerializationErrorException( "undefined structure element", itr->first, StructParser::getElementPath( stk));
-				}
-			}
-			stk.pop_back();
-			return true;
-		}
-	}
-	throw SerializationErrorException( "illegal state in parse structure", StructParser::getElementPath( stk));
+	return parseObjectStruct( TYPE::getFiltermapDescription(), inp, ctx, stk);
 }
 
-template <typename T>
+template <typename TYPE>
 bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&, FiltermapParseStateStack& stk)
 {
 	if (stk.back().state())
@@ -181,11 +114,11 @@ bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&
 		stk.pop_back();
 		return true;
 	}
-	typedef typename T::value_type Element;
+	typedef typename TYPE::value_type Element;
 	boost::value_initialized<Element> val;
-	((T*)stk.back().value())->push_back( val);
+	((TYPE*)stk.back().value())->push_back( val);
 	stk.back().state( 1);
-	Element* ee = &((T*)(char*)stk.back().value())->back();
+	Element* ee = &((TYPE*)(char*)stk.back().value())->back();
 	if (FiltermapIntrusiveProperty<Element>::type() == FiltermapDescriptionBase::Atomic)
 	{
 		stk.push_back( FiltermapParseState( 0, &parseAtomicElementEndTag, 0));
@@ -194,58 +127,17 @@ bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&
 	return true;
 }
 
-
-template <typename T>
-static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk)
+template <typename TYPE>
+static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
 {
-	langbind::InputFilter::ElementType typ;
-	langbind::TypedFilterBase::Element element;
-	T* obj = (T*)(stk.back().value());
-
-	if (!inp.getNext( typ, element))
-	{
-		if (inp.state() != langbind::InputFilter::Error) return false;
-		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
-	}
-	switch (typ)
-	{
-		case langbind::InputFilter::OpenTag:
-		case langbind::InputFilter::Attribute:
-			throw SerializationErrorException( "atomic value expected", StructParser::getElementPath( stk));
-
-		case langbind::InputFilter::Value:
-			if (!parseValue( *obj, element))
-			{
-				throw SerializationErrorException( "illegal type of atomic value", StructParser::getElementPath( stk));
-			}
-			stk.pop_back();
-			return true;
-
-		case langbind::InputFilter::CloseTag:
-			element = langbind::TypedFilterBase::Element();
-			if (!parseValue( *obj, element))
-			{
-				throw SerializationErrorException( "cannot convert empty value to expected atomic type", StructParser::getElementPath( stk));
-			}
-			stk.pop_back();
-			if (stk.back().parse() == &parseAtomicElementEndTag)
-			{
-				stk.pop_back();
-			}
-			else
-			{
-				throw SerializationErrorException( "value expected after attribute", StructParser::getElementPath( stk));
-			}
-			return true;
-	}
-	throw SerializationErrorException( "illegal state in parse atomic value", StructParser::getElementPath( stk));
+	return parseObjectAtomic( parseValue_<TYPE>, inp, ctx, stk);
 }
 
-template <typename T>
-bool FiltermapIntrusiveParser<T>::parse( langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
+template <typename TYPE>
+bool FiltermapIntrusiveParser<TYPE>::parse( langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
 {
-	static T* t = 0;
-	return parseObject_<T>( traits::getFiltermapCategory(*t), inp, ctx, stk);
+	static TYPE* t = 0;
+	return parseObject_<TYPE>( traits::getFiltermapCategory(*t), inp, ctx, stk);
 }
 
 }}//namespace

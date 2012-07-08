@@ -39,7 +39,6 @@ Project Wolframe.
 #include "serialize/struct/filtermapParse.hpp"
 #include "serialize/struct/filtermapSerialize.hpp"
 #include "serialize/struct/filtermapProperty.hpp"
-#include <typeinfo>
 #include <exception>
 #include <stdexcept>
 #include <sstream>

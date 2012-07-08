@@ -163,9 +163,9 @@ static unsigned int testSeed()
 
 TEST_F( TProcHandlerTest, tests)
 {
-	enum {NOF_IB=10,NOF_OB=6,TEST_MOD=7,NOF_TESTS=5};
-	std::size_t ib[] = {16000,127,1,2,3,5,7,8,11,13};
-	std::size_t ob[] = {16000,127,1,2,5,7};
+	enum {NOF_IB=11,NOF_OB=7,TEST_MOD=13,NOF_TESTS=5};
+	std::size_t ib[] = {16000,127,1,2,3,5,7,8,11,13,17};
+	std::size_t ob[] = {16000,127,1,2,5,7,8};
 	std::vector<std::string> tests;
 
 	boost::filesystem::recursive_directory_iterator ditr( boost::filesystem::current_path() / "data"), dend;

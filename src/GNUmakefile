@@ -99,6 +99,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_token_filter.o \
 	filter_tostringfilter.o \
 	serialize_struct_filtermapBase.o \
+	serialize_struct_filtermapParseStack.o \
+	serialize_struct_filtermapParse.o \
+	serialize_struct_filtermapSerializeStack.o \
+	serialize_struct_filtermapSerialize.o \
 	serialize_ddl_filtermapSerialize.o \
 	serialize_ddl_filtermapParse.o \
 	serialize_mapContext.o \

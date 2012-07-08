@@ -47,7 +47,7 @@
 #include <fstream>
 #include <algorithm>
 #include <stdexcept>
-#include <stdio.h>
+#include <ctime>
 #include <boost/lexical_cast.hpp>
 #include "gtest/gtest.h"
 
@@ -166,34 +166,42 @@ protected:
 	virtual void TearDown() {}
 };
 
+static unsigned int testSeed()
+{
+
+	std::time_t now = std::time(0);
+	std::tm *ltm = localtime(&now);
+	return (int)(ltm->tm_mday + 100 * ltm->tm_mon);
+}
+
 TEST_F( IProcHandlerXMLTest, tests)
 {
 	unsigned int ti;
 	for (ti=0; testDescriptions[ti].scriptfile; ti++)
 	{
-		enum {NofBufferSizes=5};
-		static int BufferSize[ NofBufferSizes] = {2,3,5,7,127};
+		enum {NOF_IB=11,NOF_OB=7,TEST_MOD=13,NOF_TESTS=5};
+		std::size_t ib[] = {16000,127,1,2,3,5,7,8,11,13,17};
+		std::size_t ob[] = {16000,127,1,2,5,7,8};
 
 		net::LocalTCPendpoint  ep( "127.0.0.1", 12345);
 		wtest::Data data( testDescriptions[ti].name, testDescriptions[ti].datafile);
 
-		for (unsigned int ib=0; ib<NofBufferSizes; ib++)
+		unsigned int rr = testSeed();
+		for (int tt=0; tt<NOF_TESTS; tt++,rr+=TEST_MOD)
 		{
-			for (unsigned int ob=0; ob<NofBufferSizes; ob++)
-			{
-				std::string testoutput;
-				std::string scriptpath( "../scripts/");
-				scriptpath.append( testDescriptions[ti].scriptfile);
+			std::size_t ii = (rr % NOF_IB);
+			std::size_t oo = (rr % NOF_OB);
 
-				IProcTestConfiguration config(
-						scriptpath, BufferSize[ib]+EoDBufferSize,
-						BufferSize[ob]);
-				iproc::Connection connection( ep, &config);
+			std::string testoutput;
+			std::string scriptpath( "../scripts/");
+			scriptpath.append( testDescriptions[ti].scriptfile);
 
-				EXPECT_EQ( 0, test::runTestIO( data.input, testoutput, connection));
-				data.check( testoutput);
-				ASSERT_EQ( data.expected, testoutput);
-			}
+			IProcTestConfiguration config( scriptpath, ib[ii]+EoDBufferSize, ob[oo]);
+			iproc::Connection connection( ep, &config);
+
+			EXPECT_EQ( 0, test::runTestIO( data.input, testoutput, connection));
+			data.check( testoutput);
+			ASSERT_EQ( data.expected, testoutput);
 		}
 	}
 }

@@ -29,49 +29,26 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapParseStack.hpp
-///\brief Defines the parsing stack for deserialization
+///\file serialize_struct_filtermapSerializeStack.cpp
+///\brief Implements the parsing stack for deserialization
 
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_STACK_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PARSE_STACK_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "serialize/mapContext.hpp"
-#include <vector>
-#include <stdexcept>
+#include "serialize/struct/filtermapSerializeStack.hpp"
 
-namespace _Wolframe {
-namespace serialize {
+using namespace _Wolframe;
+using namespace _Wolframe::serialize;
 
-class FiltermapParseState
-{
-public:
-	typedef bool (*Parse)( langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapParseState>& stk);
+FiltermapSerializeState::FiltermapSerializeState( const FiltermapSerializeState& o)
+	:m_fetch(o.m_fetch)
+	,m_value(o.m_value)
+	,m_name(o.m_name)
+	,m_stateidx(o.m_stateidx)
+	{}
 
-public:
-	FiltermapParseState( const FiltermapParseState& o);
-	FiltermapParseState( const char* name_, Parse p, void* v);
-	~FiltermapParseState();
+FiltermapSerializeState::FiltermapSerializeState( const char* name_, Fetch p, const void* v)
+	:m_fetch(p)
+	,m_value(v)
+	,m_name(name_)
+	,m_stateidx(0)
+	{}
 
-	std::size_t selectElement( std::size_t idx, std::size_t size);
-	std::size_t initCount( std::size_t idx) const;
-
-	void* value() const			{return m_value;}
-	const char* name() const		{return m_name;}
-	Parse parse() const			{return m_parse;}
-	std::size_t state() const		{return m_stateidx;}
-	void state( std::size_t idx)		{m_stateidx = idx;}
-
-private:
-	Parse m_parse;
-	int* m_initar;
-	std::size_t m_size;
-	void* m_value;
-	const char* m_name;
-	std::size_t m_stateidx;
-};
-
-typedef std::vector<FiltermapParseState> FiltermapParseStateStack;
-
-}}//namespace
-#endif
 

@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file langbind_appObjects.cpp
-///\brief implementation of scripting language objects
+///\brief Implementation of scripting language objects
 #include "langbind/appObjects.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
@@ -380,22 +380,6 @@ ApiFormData::~ApiFormData()
 	void* ptr = m_data.get();
 	if (ptr) m_descr->done( ptr);
 }
-
-
-FormFunction::FormFunction()
-	:m_function(0)
-	,m_api_param(0)
-	,m_api_result(0){}
-
-FormFunction::FormFunction( const FormFunction& o)
-	:m_function(o.m_function)
-	,m_api_param(o.m_api_param)
-	,m_api_result(o.m_api_result){}
-
-FormFunction::FormFunction( Function f, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
-	:m_function(f)
-	,m_api_param(p)
-	,m_api_result(r){}
 
 
 FormFunctionClosure::FormFunctionClosure( const FormFunction& f)

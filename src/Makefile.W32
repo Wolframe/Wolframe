@@ -128,6 +128,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	types_bignum.obj \
 	types_bcdArithmetic.obj \
 	serialize_struct_filtermapBase.obj \
+	serialize_struct_filtermapParseStack.obj \
+	serialize_struct_filtermapParse.obj \
+	serialize_struct_filtermapSerializeStack.obj \
+	serialize_struct_filtermapSerialize.obj \
 	serialize_ddl_filtermapSerialize.obj \
 	serialize_ddl_filtermapParse.obj \
 	serialize_mapContext.obj \
