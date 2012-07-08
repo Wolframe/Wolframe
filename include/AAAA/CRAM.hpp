@@ -55,15 +55,16 @@ class PasswordSalt
 	friend class PasswordHash;
 public:
 	PasswordSalt();
-	explicit PasswordSalt( const unsigned char* salt );
-	explicit PasswordSalt( const char* base64Salt );
+	explicit PasswordSalt( const std::string& salt );
 
 	static size_t size()	{ return PASSWORD_SALT_SIZE; }
+
+	void generate( const std::string& randomDevice );
 
 	std::string toBCD() const;
 	std::string toBase64() const;
 private:
-	unsigned char	m_salt[ PASSWORD_SALT_SIZE ];
+	unsigned char		m_salt[ PASSWORD_SALT_SIZE ];
 };
 
 
@@ -71,6 +72,7 @@ class PasswordHash
 {
 public:
 	PasswordHash( const PasswordSalt& pwdSalt, const std::string& password );
+	PasswordHash( const std::string& hash );
 	std::string toBCD() const;
 	std::string toBase64() const;
 	PasswordSalt& salt() const;

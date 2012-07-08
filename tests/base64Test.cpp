@@ -353,26 +353,40 @@ TEST( Base64, RandomData )
 
 		decoded[ dataSize ] = 0x5a;
 		base64::Decoder D;
-		int decodeResult1 = D.decode( encoded1, encodeResult, decoded, dataSize + 1 );
+		int decodeResult = 0;
+		dataUsed = 0;
+		partialResult = 0;
+		while ( dataUsed <= encodeResult - chunkSize )	{
+			partialResult = D.decode( encoded1 + dataUsed, chunkSize,
+						  decoded + decodeResult, dataSize - decodeResult + 1 );
+			EXPECT_GE( partialResult, 0 );
+			decodeResult += partialResult;
+			EXPECT_LE( decodeResult, dataSize );
+			dataUsed += chunkSize;
+		}
+		partialResult = D.decode( encoded1 + dataUsed, encodeResult - dataUsed,
+					  decoded + decodeResult, dataSize - decodeResult + 1 );
+		EXPECT_GE( partialResult, 0 );
+		decodeResult += partialResult;
 #ifdef _BASE64_WRITE_OUTPUT
 		// decoded file
 		std::ofstream ddata1( "b64decoded1", std::ios_base::out | std::ios_base::binary );
-		ddata1.write(( const char *)decoded, decodeResult1 );
+		ddata1.write(( const char *)decoded, decodeResult );
 		ddata1.close();
 #endif
-		EXPECT_EQ( dataSize, decodeResult1 );
+		EXPECT_EQ( dataSize, decodeResult );
 		EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
 		EXPECT_EQ( decoded[ dataSize ], 0x5a );
 
 		decoded[ dataSize ] = 0xa5;
-		int decodeResult2 = base64::decode( encoded1, encodeResult, decoded, dataSize + 1 );
+		decodeResult = base64::decode( encoded1, encodeResult, decoded, dataSize + 1 );
 #ifdef _BASE64_WRITE_OUTPUT
 		// decoded file
 		std::ofstream ddata2( "b64decoded2", std::ios_base::out | std::ios_base::binary );
-		ddata2.write(( const char *)decoded, decodeResult2 );
+		ddata2.write(( const char *)decoded, decodeResult );
 		ddata2.close();
 #endif
-		EXPECT_EQ( dataSize, decodeResult2 );
+		EXPECT_EQ( dataSize, decodeResult );
 		EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
 		EXPECT_EQ( decoded[ dataSize ], 0xa5 );
 

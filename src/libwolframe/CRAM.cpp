@@ -82,15 +82,49 @@ PasswordSalt::PasswordSalt()
 	memset( m_salt, 0, PASSWORD_SALT_SIZE );
 }
 
-PasswordSalt::PasswordSalt( const unsigned char* salt )
-{
-	memcpy( m_salt, salt, PASSWORD_SALT_SIZE );
-}
-
-PasswordSalt::PasswordSalt( const char* base64Salt )
+PasswordSalt::PasswordSalt( const std::string &salt )
 {
 	memset( m_salt, 0, PASSWORD_SALT_SIZE );
-	base64::decode( base64Salt, strlen( base64Salt ), m_salt, PASSWORD_SALT_SIZE );
+	base64::decode( salt.c_str(), salt.length(), m_salt, PASSWORD_SALT_SIZE );
+}
+
+void PasswordSalt::generate( const std::string& randomDevice )
+{
+#ifndef _WIN32
+	int hndl = open( randomDevice.c_str(), O_RDONLY );
+	if ( hndl < 0 )	{
+		std::string errMsg = "Error opening '" + randomDevice + "': ";
+		throw std::runtime_error( errMsg );
+	}
+
+	int rndPart = read( hndl, m_salt, PASSWORD_SALT_SIZE );
+	if ( rndPart < 0 )	{
+		std::string errMsg = "Error reading '" + randomDevice + "'";
+		throw std::runtime_error( errMsg );
+	}
+	else if ( rndPart < PASSWORD_SALT_SIZE )	{
+		std::string errMsg = "Not enough entropy in '" + randomDevice + "' ?!?";
+		throw std::logic_error( errMsg );
+	}
+
+	close( hndl );
+#else
+	HCRYPTPROV provider = 0;
+
+	if( !CryptAcquireContext( &provider, 0, randomDevice.c_str( ), PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
+		throw std::runtime_error( "Error opening cyrpto context" );
+	}
+
+	if( !CryptGenRandom( provider, PASSWORD_SALT_SIZE, static_cast<BYTE *>( m_salt ))) {
+		CryptReleaseContext( provider, 0 );
+		throw std::runtime_error( "Error generating random data " );
+	}
+
+	if( !CryptReleaseContext( provider, 0 ) ) {
+		throw std::runtime_error( "Error closing cyrpto context" );
+	}
+#endif
+
 }
 
 std::string PasswordSalt::toBCD() const
