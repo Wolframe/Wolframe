@@ -45,14 +45,18 @@ class DDLCompilerObject :public Object, public CompilerInterface
 {
 public:
 	DDLCompilerObject( const char* name_)
-		:CompilerInterface(name_){}
+		:CompilerInterface()
+		,m_name(name_){}
 
 	virtual ~DDLCompilerObject(){}
 
 	virtual const char* objectName() const
 	{
-		return ddlname().c_str();
+		return m_name.c_str();
 	}
+
+private:
+	std::string m_name;
 };
 
 template <class CompilerInterface>
@@ -61,17 +65,17 @@ class DDLCompilerObjectBuilder :public ObjectBuilder
 public:
 	DDLCompilerObjectBuilder( const char* name_)
 		:ObjectBuilder(name_)
-		,m_ddlname(name_){}
+		,m_name(name_){}
 
 	virtual ~DDLCompilerObjectBuilder(){}
 
 	virtual Object* object()
 	{
-		return new DDLCompilerObject<CompilerInterface>(m_ddlname);
+		return new DDLCompilerObject<CompilerInterface>(m_name.c_str());
 	}
 
 private:
-	std::string m_ddlname;
+	std::string m_name;
 };
 
 }}//namespace
