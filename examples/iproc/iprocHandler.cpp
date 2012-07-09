@@ -298,7 +298,7 @@ const net::NetworkOperation Connection::nextOperation()
 							m_cmdhandler->getOutput( content, contentsize);
 							return net::SendData( content, contentsize);
 						break;
-						case cmdbind::CommandHandler::CLOSED:
+						case cmdbind::CommandHandler::CLOSE:
 							m_cmdhandler->getDataLeft( content, contentsize);
 							pos = (const char*)content - m_input.charptr();
 							m_input.setPos( pos + contentsize);

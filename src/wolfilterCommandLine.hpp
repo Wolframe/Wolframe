@@ -37,6 +37,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -98,7 +99,8 @@ public:
 	std::size_t outbufsize() const							{return m_outbufsize;}
 
 	///\brief loads the command line objects into the global context
-	void loadGlobalContext( const std::string& referencePath) const;
+	void loadGlobalContext( const std::string& referencePath, module::ModulesDirectory& modDir) const;
+
 private:
 	bool m_printhelp;
 	bool m_printversion;

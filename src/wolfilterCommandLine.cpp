@@ -34,6 +34,7 @@
 ///\brief Implementation of the options of a wolfilter call
 #include "wolfilterCommandLine.hpp"
 #include "langbind/appGlobalContext.hpp"
+#include "moduleInterface.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
@@ -171,9 +172,24 @@ static std::string canonicalPath( const std::string& path, const std::string& re
 	}
 }
 
-void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath) const
+void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath, module::ModulesDirectory& modDir) const
 {
 	langbind::GlobalContext* gct = langbind::getGlobalContext();
+	{
+		std::list<std::string> modfiles;
+		std::vector<std::string>::const_iterator itr,end;
+		itr = m_modules.begin();
+		end = m_modules.end();
+
+		for (; itr != end; ++itr)
+		{
+			modfiles.push_back( canonicalPath( *itr, referencePath));
+		}
+		if (!LoadModules( modDir, modfiles))
+		{
+			throw std::runtime_error( "Modules could not be loaded");
+		}
+	}
 	{
 		std::vector<std::string>::const_iterator itr,end;
 		itr = scripts().begin();
@@ -220,9 +236,9 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath) 
 			langbind::DDLForm inform;
 			langbind::DDLForm outform;
 
-			if (!gct->getPeerFunction( itr->functionname, pf)) throw std::runtime_error( "transaction function not found");
-			if (!gct->getForm( itr->inputformname, inform)) throw std::runtime_error( "parameter description of transaction function not found");
-			if (!gct->getForm( itr->outputformname, outform)) throw std::runtime_error( "return value description of transaction function not found");
+			if (!gct->getPeerFunction( itr->functionname, pf)) throw std::runtime_error( "Transaction function not found");
+			if (!gct->getForm( itr->inputformname, inform)) throw std::runtime_error( "Parameter description of transaction function not found");
+			if (!gct->getForm( itr->outputformname, outform)) throw std::runtime_error( "Return value description of transaction function not found");
 
 			gct->definePeerFormFunction( itr->name, langbind::PeerFormFunction( pf, inform, outform));
 		}

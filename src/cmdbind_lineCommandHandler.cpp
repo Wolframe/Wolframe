@@ -161,7 +161,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				if (m_delegateHandler)
 				{
 					CommandHandler::Operation delegateRes = m_delegateHandler->nextOperation();
-					if (delegateRes == CLOSED)
+					if (delegateRes == CLOSE)
 					{
 						try
 						{
@@ -192,7 +192,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 						{
 							LOG_ERROR << "command delegation termination method thrown exception: " << e.what();
 							m_cmdstateidx = Terminate;
-							return CLOSED;
+							return CLOSE;
 						}
 					}
 					else
@@ -204,7 +204,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				{
 					LOG_ERROR << "protocol error";
 					m_cmdstateidx = Terminate;
-					return CLOSED;
+					return CLOSE;
 				}
 
 			case EnterCommand:
@@ -300,7 +300,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 				{
 					LOG_ERROR << "command execution thrown exception: " << e.what();
 					m_cmdstateidx = Terminate;
-					return CLOSED;
+					return CLOSE;
 				}
 			}
 
@@ -312,7 +312,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					if (m_resultstate < 0)
 					{
 						m_cmdstateidx = Terminate;
-						return CLOSED;
+						return CLOSE;
 					}
 					else
 					{
@@ -347,7 +347,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 
 			case Terminate:
 			{
-				return CLOSED;
+				return CLOSE;
 			}
 		}//switch(..)
 	}//for(;;)

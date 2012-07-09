@@ -75,6 +75,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	version.o \
 	wolframedCommandLine.o \
 	wolfilterCommandLine.o \
+	loadModules.o \
 	serviceConfig.o \
 	serviceBanner.o \
 	appConfig.o \
@@ -85,7 +86,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_appConfig_struct.o \
 	langbind_appConfig.o \
 	langbind_iostreamfilter.o \
-	cmdbind_commandHandler.o \
+	cmdbind_protocolCommandHandler.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
 	cmdbind_ioFilterCommandHandler.o \
@@ -148,7 +149,6 @@ CPP_OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	$(LOCAL_STATIC_LIB_OBJS) \
-	loadModules.o \
 	wolframeHandler.o \
 	posixMain.o
 
@@ -170,7 +170,7 @@ wolfilter$(EXE): libwolframe
 wolfilter$(EXE): wolfilter.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
-local_all: $(LOCAL_STATIC_LIB) loadModules-dummy.o
+local_all: $(LOCAL_STATIC_LIB)
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
@@ -178,7 +178,6 @@ $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 local_clean:
 	@rm -f $(LOCAL_STATIC_LIB)
 	@rm -f primary.db
-	@rm -f loadModules-dummy.o
 
 local_distclean:
 

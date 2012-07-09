@@ -30,45 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/filter/token/mod_filter_token.cpp
-///\brief Module for token XML filters
-#include "modules/filter/template/filterObjectBuilder.hpp"
-#include "filter/token_filter.hpp"
+///\file tests/wolfilter/modules/echo_cmdhandler/mod_echo_cmdhandler.cpp
+///\brief Module for testing peer functions
+#include "modules/cmdbind/template/commandHandlerObjectBuilder.hpp"
+#include "wolfilter/modules/echo_cmdhandler/echo_cmdhandler.hpp"
 #include "logger-v1.hpp"
-#include <cstring>
 
 _Wolframe::log::LogBackend* logBackendPtr;
 
 using namespace _Wolframe;
-using namespace module;
+using namespace _Wolframe::module;
+using namespace _Wolframe::test;
 
 static void setModuleLogger( void* logger )
 {
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-DECLARE_FILTER_OBJECT("token",		TokenFilterObject,		langbind::createTokenFilter)
-DECLARE_FILTER_OBJECT("token:UTF-8",	TokenFilterObject_UTF8,		langbind::createTokenFilter)
-DECLARE_FILTER_OBJECT("token:UTF-16BE",	TokenFilterObject_UTF16BE,	langbind::createTokenFilter)
-DECLARE_FILTER_OBJECT("token:UTF-16LE",	TokenFilterObject_UTF16LE,	langbind::createTokenFilter)
-DECLARE_FILTER_OBJECT("token:UCS-2BE",	TokenFilterObject_UCS2BE,	langbind::createTokenFilter)
-DECLARE_FILTER_OBJECT("token:UCS-2LE",	TokenFilterObject_UCS2LE,	langbind::createTokenFilter)
-DECLARE_FILTER_OBJECT("token:UCS-4BE",	TokenFilterObject_UCS4BE,	langbind::createTokenFilter)
-DECLARE_FILTER_OBJECT("token:UCS-4LE",	TokenFilterObject_UCS4LE,	langbind::createTokenFilter)
+DECLARE_COMMAND_HANDLER("echo_cmdhandler",EchoCommandHandlerObject,EchoCommandHandler)
 
-enum {NofObjects=8};
+
+enum {NofObjects=1};
 static createObjectFunc objdef[ NofObjects] =
 {
-	TokenFilterObject::constructor,
-	TokenFilterObject_UTF8::constructor,
-	TokenFilterObject_UTF16BE::constructor,
-	TokenFilterObject_UTF16LE::constructor,
-	TokenFilterObject_UCS2BE::constructor,
-	TokenFilterObject_UCS2LE::constructor,
-	TokenFilterObject_UCS4BE::constructor,
-	TokenFilterObject_UCS4LE::constructor
+	EchoCommandHandlerObject::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "token filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "test command handler", setModuleLogger, 0, 0, NofObjects, objdef);
 
 

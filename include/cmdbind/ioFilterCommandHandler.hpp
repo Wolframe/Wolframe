@@ -35,7 +35,7 @@
 #define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"
 #include "filter/filter.hpp"
-#include "cmdbind/commandHandler.hpp"
+#include "cmdbind/protocolCommandHandler.hpp"
 #include "connectionHandler.hpp"
 
 namespace _Wolframe {
@@ -43,7 +43,7 @@ namespace cmdbind {
 
 ///\class IOFilterCommandHandler
 ///\brief Command handler processing filter input/output
-class IOFilterCommandHandler :public CommandHandler
+class IOFilterCommandHandler :public ProtocolCommandHandler
 {
 public:
 	typedef CommandHandler Parent;

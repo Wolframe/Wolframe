@@ -282,7 +282,7 @@ const net::NetworkOperation Connection::nextOperation()
 			m_cmdhandler.getOutput( outpp, outppsize);
 			return net::SendData( outpp, outppsize);
 
-		case cmdbind::CommandHandler::CLOSED:
+		case cmdbind::CommandHandler::CLOSE:
 			return net::CloseConnection();
 	}
 	return net::CloseConnection();
