@@ -57,7 +57,7 @@ public:
 	PasswordSalt();
 	explicit PasswordSalt( const std::string& salt );
 
-	static size_t size()	{ return PASSWORD_SALT_SIZE; }
+	static size_t size()		{ return PASSWORD_SALT_SIZE; }
 
 	void generate( const std::string& randomDevice );
 
@@ -73,9 +73,11 @@ class PasswordHash
 public:
 	PasswordHash( const PasswordSalt& pwdSalt, const std::string& password );
 	PasswordHash( const std::string& hash );
+
 	std::string toBCD() const;
 	std::string toBase64() const;
-	PasswordSalt& salt() const;
+
+	const PasswordSalt& salt() const	{ return m_salt; }
 private:
 	unsigned char		m_hash[ PASSWORD_DIGEST_SIZE ];
 	const PasswordSalt	m_salt;
@@ -87,6 +89,7 @@ class CRAMchallenge
 	friend class CRAMresponse;
 public:
 	CRAMchallenge( const std::string& randomDevice );
+
 	std::string toBCD() const;
 	std::string toBase64() const;
 private:
@@ -98,7 +101,7 @@ class CRAMresponse
 {
 public:
 	CRAMresponse( const CRAMchallenge& challenge,
-		      const std::string& username, const std::string &pwdHash);
+		      const std::string& username, const std::string &pwdHash );
 	CRAMresponse( const std::string& challenge,
 		      const std::string& username, const std::string& pwdHash );
 
