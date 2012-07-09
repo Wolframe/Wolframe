@@ -39,6 +39,7 @@
 #include "wolfilter/src/employee_assignment_print.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
+#include "moduleInterface.hpp"
 #include "miscUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -64,6 +65,8 @@ static cmdbind::CommandHandlerR createEchoCommandHandler()
 	return cmdbind::CommandHandlerR( new test::EchoCommandHandler());
 }
 
+static module::ModulesDirectory m_modulesDirectory;
+
 ///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
 static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 {
@@ -82,7 +85,7 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 	gct->definePeerFunction( "echo_peer", func);
 
 	boost::filesystem::path refpath( boost::filesystem::current_path() / "temp");
-	cmdline.loadGlobalContext( refpath.string());
+	cmdline.loadGlobalContext( refpath.string(), m_modulesDirectory);
 }
 
 class WolfilterTest : public ::testing::Test

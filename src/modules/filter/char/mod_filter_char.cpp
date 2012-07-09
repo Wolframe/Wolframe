@@ -47,8 +47,8 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-DECLARE_FILTER_OBJECT("char",			CharFilterObject,			langbind::createCharFilter)
-DECLARE_FILTER_OBJECT("char:UTF-8",		CharFilterObject_UTF8,		langbind::createCharFilter)
+DECLARE_FILTER_OBJECT("char",		CharFilterObject,		langbind::createCharFilter)
+DECLARE_FILTER_OBJECT("char:UTF-8",	CharFilterObject_UTF8,		langbind::createCharFilter)
 DECLARE_FILTER_OBJECT("char:UTF-16BE",	CharFilterObject_UTF16BE,	langbind::createCharFilter)
 DECLARE_FILTER_OBJECT("char:UTF-16LE",	CharFilterObject_UTF16LE,	langbind::createCharFilter)
 DECLARE_FILTER_OBJECT("char:UCS-2BE",	CharFilterObject_UCS2BE,	langbind::createCharFilter)

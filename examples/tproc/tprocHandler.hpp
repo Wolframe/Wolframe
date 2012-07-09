@@ -36,6 +36,7 @@
 #ifndef _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #define _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
+#include "cmdbind/protocolCommandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "protocol/ioblocks.hpp"
@@ -61,7 +62,7 @@ public:
 	int doRun( int argc, const char** argv, std::ostream& out);
 	int doCmdQUIT( int argc, const char** argv, std::ostream& out);
 private:
-	const Configuration* m_config;		///< configuration reference
+	const Configuration* m_config;		//< configuration reference
 };
 
 
@@ -92,11 +93,11 @@ public:
 	virtual void signalOccured( NetworkSignal);
 
 private:
-	const Configuration* m_config;			///< configuration reference
-	CommandHandler m_cmdhandler;			///< top level instance executing commands
-	protocol::InputBlock m_input;			///< buffer for network read messages
-	protocol::OutputBlock m_output;			///< buffer for network write messages
-	bool m_terminated;				///< true, if a termination signal came from the network
+	const Configuration* m_config;			//< configuration reference
+	CommandHandler m_cmdhandler;			//< top level instance executing commands
+	protocol::InputBlock m_input;			//< buffer for network read messages
+	protocol::OutputBlock m_output;			//< buffer for network write messages
+	bool m_terminated;				//< true, if a termination signal came from the network
 };
 } // namespace tproc
 

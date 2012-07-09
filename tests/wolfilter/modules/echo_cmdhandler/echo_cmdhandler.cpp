@@ -30,14 +30,17 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilter/src/echo_cmdhandler.cpp
+///\file wolfilter/modules/echo_cmdhandler/echo_cmdhandler.cpp
 ///\brief Implementation wolfilter test command handler
 
-#include "wolfilter/src/echo_cmdhandler.hpp"
+#include "echo_cmdhandler.hpp"
 #include <string>
 #include <cstring>
 #include <stdexcept>
 #include "cmdbind/commandHandler.hpp"
+
+using namespace _Wolframe;
+using namespace _Wolframe::test;
 
 EchoCommandHandler::EchoCommandHandler()
 	:m_state(Init)

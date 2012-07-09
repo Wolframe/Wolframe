@@ -31,13 +31,11 @@
 
 ************************************************************************/
 ///\file cmdbind/commandHandler.hpp
-///\brief interface to a generic command handler for a networkHandler command with delegation of network I/O until the command context is left
+///\brief Interface to a generic command handler
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #include "countedReference.hpp"
-#include <vector>
-#include <string>
-#include <stdexcept>
+#include "FSMinterface.hpp"
 
 namespace _Wolframe {
 namespace cmdbind {
@@ -45,12 +43,11 @@ namespace cmdbind {
 class CommandHandler
 {
 public:
-	///\brief typedef for private net::NetworkOperation::Operation
-	enum Operation
-	{
+	///\brief This is a temporary declared instance for FSMoperation::Operation
+	enum Operation	{
 		READ,
 		WRITE,
-		CLOSED
+		CLOSE
 	};
 
 	///\brief Defaul constructor
@@ -59,11 +56,6 @@ public:
 
 	///\brief Destructor
 	virtual ~CommandHandler(){}
-
-	///\brief Pass the parameters for processing
-	///\param [in] argc number of arguments of the protocol command
-	///\param [in] argv arguments of the protocol command
-	void passParameters( const std::string& nam, int argc, const char** argv);
 
 	///\brief Define the input buffer for processing the command
 	///\param [in] buf buffer for the data to process
@@ -104,8 +96,6 @@ public:
 	int statusCode() const				{return m_statusCode;}
 
 protected:
-	std::string m_name;				//< name of the command to execute
-	std::vector< std::string > m_argBuffer;		//< the command arguments
 	int m_statusCode;				//< error code of operation for the client
 };
 

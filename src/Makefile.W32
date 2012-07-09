@@ -112,7 +112,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_appConfig_struct.obj \
 	langbind_appConfig.obj \
 	langbind_iostreamfilter.obj \
-	cmdbind_commandHandler.obj \
+	cmdbind_protocolCommandHandler.obj \
 	cmdbind_lineCommandHandler.obj \
 	cmdbind_execCommandHandler.obj \
 	cmdbind_ioFilterCommandHandler.obj \

@@ -39,6 +39,7 @@
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
 #include "wolfilterCommandLine.hpp"
+#include "moduleInterface.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
@@ -55,6 +56,7 @@ int main( int argc, char **argv )
 	bool doExit = false;
 	try
 	{
+		module::ModulesDirectory modDir;
 		config::WolfilterCommandLine cmdline( argc, argv);
 		if (cmdline.printversion())
 		{
@@ -70,7 +72,7 @@ int main( int argc, char **argv )
 		if (doExit) return 0;
 
 		// Load the modules, scripts, etc. defined in the command line into the global context:
-		cmdline.loadGlobalContext( boost::filesystem::current_path().string());
+		cmdline.loadGlobalContext( boost::filesystem::current_path().string(), modDir);
 
 		if (cmdline.inputfile().size())
 		{
