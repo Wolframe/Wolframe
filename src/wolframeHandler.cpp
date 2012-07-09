@@ -181,83 +181,79 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 const net::NetworkOperation wolframeConnection::nextOperation()
 {
 	switch( m_state )	{
-	case NEW_CONNECTION:	{
-		m_state = SEND_HELLO;
-		if ( ! m_globalCtx.banner().empty() )
-			m_outMsg = m_globalCtx.banner() + "\nOK\n";
-		else
-			m_outMsg = "OK\n";
-		return net::NetworkOperation( net::SendString( m_outMsg ));
-	}
-
-	case SEND_HELLO:	{
-		m_state = READ_INPUT;
-		return net::NetworkOperation( net::ReadData( m_readBuf.ptr(), m_readBuf.size(), 30 ));
-	}
-
-	case READ_INPUT:
-		m_dataStart = m_readBuf.charptr();
-		// Yes, it continues with OUTPUT_MSG, sneaky, sneaky, sneaky :P
-
-	case OUTPUT_MSG:
-		if ( !strncmp( "quit", m_dataStart, 4 ))	{
-			m_state = TERMINATING;
-			return net::NetworkOperation( net::SendString( "Bye\n" ));
+		case NEW_CONNECTION:	{
+			m_state = SEND_HELLO;
+			if ( ! m_globalCtx.banner().empty() )
+				m_outMsg = m_globalCtx.banner() + "\nOK\n";
+			else
+				m_outMsg = "OK\n";
+			return net::NetworkOperation( net::SendString( m_outMsg ));
 		}
-		else	{
-			char *s = m_dataStart;
-			for ( std::size_t i = 0; i < m_dataSize; i++ )	{
-				if ( *s == '\n' )	{
-					s++;
-					m_outMsg = std::string( m_dataStart, s - m_dataStart );
-					m_dataSize -= s - m_dataStart;
-					m_dataStart = s;
-					m_state = OUTPUT_MSG;
-					return net::NetworkOperation( net::SendString( m_outMsg ));
-				}
-				s++;
-			}
-			// If we got here, no \n was found, we need to read more
-			// or close the connection if the buffer is full
-			if ( m_dataSize >= m_readBuf.size() )	{
+
+		case SEND_HELLO:	{
+			m_state = READ_INPUT;
+			return net::NetworkOperation( net::ReadData( m_readBuf.ptr(), m_readBuf.size(), 30 ));
+		}
+
+		case READ_INPUT:
+			m_dataStart = m_readBuf.charptr();
+			if ( !strncmp( "quit", m_dataStart, 4 ))	{
 				m_state = TERMINATING;
-				return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
+				return net::NetworkOperation( net::SendString( "Bye\n" ));
 			}
-			else {
-				memmove( m_readBuf.ptr(), m_dataStart, m_dataSize );
-				m_state = READ_INPUT;
-				// Aba: Windows: wolframeHandler.cpp(194) : error C2036: 'void *' : unknown size,
-				// fixed temporarily with an ugly cast. Please check.
-				return net::NetworkOperation( net::ReadData( (char *)m_readBuf.ptr() + m_dataSize,
-									     m_readBuf.size() - m_dataSize,
-									     30 ));
+			else	{
+				char *s = m_dataStart;
+				for ( std::size_t i = 0; i < m_dataSize; i++ )	{
+					if ( *s == '\n' )	{
+						s++;
+						m_outMsg = std::string( m_dataStart, s - m_dataStart );
+						m_dataSize -= s - m_dataStart;
+						m_dataStart = s;
+						m_state = OUTPUT_MSG;
+						return net::NetworkOperation( net::SendString( m_outMsg ));
+					}
+					s++;
+				}
+				// If we got here, no \n was found, we need to read more
+				// or close the connection if the buffer is full
+				if ( m_dataSize >= m_readBuf.size() )	{
+					m_state = TERMINATING;
+					return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
+				}
 			}
+			break;		// should be unreachable
+
+		case OUTPUT_MSG:
+			memmove( m_readBuf.ptr(), m_dataStart, m_dataSize );
+			m_state = READ_INPUT;
+			// Aba: Windows: wolframeHandler.cpp(194) : error C2036: 'void *' : unknown size,
+			// fixed temporarily with an ugly cast. Please check.
+			return net::NetworkOperation( net::ReadData( (char *)m_readBuf.ptr() + m_dataSize,
+								     m_readBuf.size() - m_dataSize,
+								     30 ));
+		case TIMEOUT_OCCURED:	{
+			m_state = TERMINATING;
+			return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
 		}
 
-	case TIMEOUT_OCCURED:	{
-		m_state = TERMINATING;
-		return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
-	}
+		case SIGNALLED:	{
+			m_state = TERMINATING;
+			return net::NetworkOperation( net::SendString( "Server is shutting down. :P\n" ));
+		}
 
-	case SIGNALLED:	{
-		m_state = TERMINATING;
-		return net::NetworkOperation( net::SendString( "Server is shutting down. :P\n" ));
-	}
+		case FORBIDDEN:	{
+			m_state = TERMINATING;
+			return net::NetworkOperation( net::SendString( "Access denied.\n" ));
+		}
 
-	case FORBIDDEN:	{
-		m_state = TERMINATING;
-		return net::NetworkOperation( net::SendString( "Access denied.\n" ));
-	}
+		case TERMINATING:	{
+			m_state = FINISHED;
+			return net::NetworkOperation( net::CloseConnection() );
+		}
 
-	case TERMINATING:	{
-		m_state = FINISHED;
-		return net::NetworkOperation( net::CloseConnection() );
-	}
-
-	case FINISHED:
-		LOG_DEBUG << "Processor in FINISHED state";
-		break;
-
+		case FINISHED:
+			LOG_DEBUG << "Processor in FINISHED state";
+			break;
 	} /* switch( m_state ) */
 
 	LOG_ALERT << "Connection FSM out of states";

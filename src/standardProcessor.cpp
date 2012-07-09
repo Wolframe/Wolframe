@@ -31,38 +31,42 @@
 
 ************************************************************************/
 //
-// Wolframe processor provider (group)
+// Wolframe standard processor
 //
 
-#ifndef _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
-#define _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
-
-#include "processor/procProvider.hpp"
-#include "container.hpp"
-#include "database/database.hpp"
-#include "database/DBprovider.hpp"
-
-#include <list>
+#include "standardProcessor.hpp"
 
 namespace _Wolframe {
 namespace proc {
 
-class ProcessorProvider::ProcessorProvider_Impl
+// Standard channel processor
+StandardProcessor::StandardProcessor()
 {
-public:
-	ProcessorProvider_Impl( const ProcProviderConfig* conf,
-				const module::ModulesDirectory* modules);
-	~ProcessorProvider_Impl();
+}
 
-	bool resolveDB( const db::DatabaseProvider& db );
+StandardProcessor::~StandardProcessor()
+{
+}
 
-	Processor* processor();
-private:
-	std::string			m_dbLabel;
-	const db::Database*		m_db;
-	std::list< ProcessorUnit* >	m_proc;
-};
+void StandardProcessor::close()
+{
+}
+
+// The FSM interface
+void StandardProcessor::receiveData( const void* /*data*/, std::size_t /*size*/ )
+{
+}
+
+const FSMoperation StandardProcessor::nextOperation()
+{
+}
+
+void StandardProcessor::signal( FSMsignal /*event*/ )
+{
+}
+
+std::size_t StandardProcessor::dataLeft( const void*& /*begin*/ )
+{
+}
 
 }} // namespace _Wolframe::proc
-
-#endif // _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
