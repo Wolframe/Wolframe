@@ -170,21 +170,21 @@ std::string& EchoProcessorUnit::process( std::string& input )
 }
 
 //***  Processor ********************************************************
-void EchoProcessor::receiveData( const void* /*data*/, std::size_t /*size*/ )
+void EchoProcessorSlice::receiveData( const void* /*data*/, std::size_t /*size*/ )
 {
 }
 
-const FSMoperation EchoProcessor::nextOperation()
+const FSMoperation EchoProcessorSlice::nextOperation()
 {
 	FSMoperation	op;
 	return op;
 }
 
-void EchoProcessor::signal( FSMsignal /*event*/ )
+void EchoProcessorSlice::signal( proc::Processor::FSMsignal /*event*/ )
 {
 }
 
-std::size_t EchoProcessor::dataLeft( const void*& /*begin*/ )
+std::size_t EchoProcessorSlice::dataLeft( const void*& /*begin*/ )
 {
 	return 0;
 }

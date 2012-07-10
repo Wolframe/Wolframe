@@ -159,9 +159,9 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
-Processor* ProcessorProvider::processor()
+ProcessorSlice* ProcessorProvider::slice()
 {
-	return m_impl->processor();
+	return m_impl->slice();
 }
 
 
@@ -214,11 +214,11 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 	return true;
 }
 
-Processor* ProcessorProvider::ProcessorProvider_Impl::processor()
+ProcessorSlice* ProcessorProvider::ProcessorProvider_Impl::slice()
 {
 	std::list< ProcessorUnit* >::const_iterator it = m_proc.begin();
 	if ( it != m_proc.end() )
-		return (*it)->processor();
+		return (*it)->slice();
 	else
 		return NULL;
 }

@@ -56,7 +56,7 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Processor* processor();
+	ProcessorSlice* slice();
 private:
 	std::string			m_dbLabel;
 	const db::Database*		m_db;

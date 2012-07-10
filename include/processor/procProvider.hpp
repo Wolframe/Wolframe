@@ -74,7 +74,7 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	Processor* processor();
+	ProcessorSlice* slice();
 
 private:
 	class ProcessorProvider_Impl;

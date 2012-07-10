@@ -43,16 +43,16 @@
 
 namespace _Wolframe {
 
-class EchoProcessorSlice : public proc::Processor
+class EchoProcessorSlice : public proc::ProcessorSlice
 {
 public:
-	~EchoProcessor()				{}
+	~EchoProcessorSlice()				{}
 	const char* typeName() const			{ return "EchoProcessor"; }
 	void close()					{}
 
 	void receiveData( const void* data, std::size_t size );
 	const FSMoperation nextOperation();
-	void signal( FSMsignal event );
+	void signal( proc::Processor::FSMsignal event );
 	std::size_t dataLeft( const void*& begin );
 };
 
@@ -69,8 +69,8 @@ public:
 
 	EchoProcessorUnit( Operation operation );
 	~EchoProcessorUnit()				{}
-	const char* typeName() const			{ return "EchoProcessor"; }
-	proc::Processor* processor() const		{ return new EchoProcessor; }
+	const char* name() const			{ return "EchoProcessor"; }
+	proc::ProcessorSlice* slice() const		{ return new EchoProcessorSlice; }
 
 	std::string& process( std::string& input );
 private:
@@ -105,7 +105,7 @@ public:
 	EchoProcContainer( const EchoProcConfig& conf );
 	~EchoProcContainer()				{}
 
-	virtual const char* objectName() const		{ return m_proc->typeName(); }
+	virtual const char* objectName() const		{ return m_proc->name(); }
 	virtual proc::ProcessorUnit* object() const	{ return m_proc; }
 	void dispose()					{ m_proc = NULL; delete this; }
 private:
