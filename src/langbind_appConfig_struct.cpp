@@ -33,14 +33,15 @@
 ///\file langbind_appConfig_struct.cpp
 ///\brief Implementation of the data structures of the processor environment configuration
 #include "langbind/appConfig_struct.hpp"
-#include "config/description.hpp"
+#include "config/structSerialize.hpp"
+#include "serialize/struct/filtermapDescription.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-const config::DescriptionBase* DDLCompilerConfigStruct::description()
+const serialize::StructDescriptionBase* DDLCompilerConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public config::Description<DDLCompilerConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<DDLCompilerConfigStruct>
 	{
 		ThisDescription()
 		{
@@ -54,9 +55,9 @@ const config::DescriptionBase* DDLCompilerConfigStruct::description()
 	return &rt;
 }
 
-const config::DescriptionBase* DDLFormConfigStruct::description()
+const serialize::StructDescriptionBase* DDLFormConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public config::Description<DDLFormConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<DDLFormConfigStruct>
 	{
 		ThisDescription()
 		{
@@ -71,9 +72,9 @@ const config::DescriptionBase* DDLFormConfigStruct::description()
 	return &rt;
 }
 
-const config::DescriptionBase* FilterConfigStruct::description()
+const serialize::StructDescriptionBase* FilterConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public config::Description<FilterConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<FilterConfigStruct>
 	{
 		ThisDescription()
 		{
@@ -88,9 +89,9 @@ const config::DescriptionBase* FilterConfigStruct::description()
 }
 
 
-const config::DescriptionBase* FormFunctionConfigStruct::description()
+const serialize::StructDescriptionBase* FormFunctionConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public config::Description<FormFunctionConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<FormFunctionConfigStruct>
 	{
 		ThisDescription()
 		{
@@ -104,9 +105,9 @@ const config::DescriptionBase* FormFunctionConfigStruct::description()
 	return &rt;
 }
 
-const config::DescriptionBase* PeerFunctionConfigStruct::description()
+const serialize::StructDescriptionBase* PeerFunctionConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public config::Description<PeerFunctionConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<PeerFunctionConfigStruct>
 	{
 		ThisDescription()
 		{
@@ -121,9 +122,9 @@ const config::DescriptionBase* PeerFunctionConfigStruct::description()
 	return &rt;
 }
 
-const config::DescriptionBase* PeerFormFunctionConfigStruct::description()
+const serialize::StructDescriptionBase* PeerFormFunctionConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public config::Description<PeerFormFunctionConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<PeerFormFunctionConfigStruct>
 	{
 		ThisDescription()
 		{
@@ -139,9 +140,9 @@ const config::DescriptionBase* PeerFormFunctionConfigStruct::description()
 	return &rt;
 }
 
-const config::DescriptionBase* ScriptCommandConfigStruct::description()
+const serialize::StructDescriptionBase* ScriptCommandConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public config::Description<ScriptCommandConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<ScriptCommandConfigStruct>
 	{
 		ThisDescription()
 		{
@@ -155,9 +156,9 @@ const config::DescriptionBase* ScriptCommandConfigStruct::description()
 	return &rt;
 }
 
-const config::DescriptionBase* EnvironmentConfigStruct::description()
+const serialize::StructDescriptionBase* EnvironmentConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public config::Description<EnvironmentConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<EnvironmentConfigStruct>
 	{
 		ThisDescription()
 		{

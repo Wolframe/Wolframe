@@ -33,6 +33,7 @@
 ///\file langbind_appConfig.cpp
 ///\brief Implementation of the language binding objects configuration
 #include "langbind/appConfig.hpp"
+#include "config/structSerialize.hpp"
 #include "logger-v1.hpp"
 #include <string>
 #include <vector>
@@ -205,12 +206,7 @@ bool ApplicationEnvironmentConfig::parse( const config::ConfigurationTree& pt, c
 {
 	try
 	{
-		std::string errmsg;
-		if (!m_config.description()->parse( (void*)&m_config, (const boost::property_tree::ptree&)pt, errmsg))
-		{
-			LOG_ERROR << "Error in configuration: " << errmsg;
-			return false;
-		}
+		config::parseConfigStructure( m_config, (const boost::property_tree::ptree&)pt);
 		return true;
 	}
 	catch (std::exception& e)
@@ -222,7 +218,8 @@ bool ApplicationEnvironmentConfig::parse( const config::ConfigurationTree& pt, c
 
 void ApplicationEnvironmentConfig::print( std::ostream& os, std::size_t indent) const
 {
-	m_config.description()->print( os, (const void*)&m_config, indent);
+	while (indent--) os << "\t";
+	os << config::structureToString( m_config);
 }
 
 void ApplicationEnvironmentConfig::setCanonicalPathes( const std::string& referencePath)

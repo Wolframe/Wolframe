@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_CONFIG_DESCRIPTION_HPP_INCLUDED
 #define _Wolframe_CONFIG_DESCRIPTION_HPP_INCLUDED
+#error DEPRECATED
 #include "config/structParser.hpp"
 #include "config/structPrinter.hpp"
 #include "config/descriptionBase.hpp"

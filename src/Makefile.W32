@@ -105,7 +105,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceConfig.obj \
 	serviceBanner.obj \
 	appConfig.obj \
-	config_descriptionBase.obj \
 	protocol_ioblocks.obj \
 	langbind_appObjects.obj \
 	langbind_appGlobalContext.obj \

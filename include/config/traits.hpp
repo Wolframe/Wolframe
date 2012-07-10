@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_CONFIG_TRAITS_HPP_INCLUDED
 #define _Wolframe_CONFIG_TRAITS_HPP_INCLUDED
+#error DEPRECATED
 #include <boost/lexical_cast.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
