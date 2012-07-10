@@ -120,6 +120,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_filterbase.obj \
 	filter_doctype.obj \
 	filter_tostringfilter.obj \
+	filter_ptreefilter.obj \
 	filter_typingfilter.obj \
 	filter_textwolf_filter.obj \
 	filter_char_filter.obj \

@@ -99,6 +99,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_line_filter.o \
 	filter_token_filter.o \
 	filter_tostringfilter.o \
+	filter_ptreefilter.o \
 	serialize_struct_filtermapBase.o \
 	serialize_struct_filtermapParseStack.o \
 	serialize_struct_filtermapParse.o \

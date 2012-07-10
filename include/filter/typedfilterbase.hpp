@@ -63,6 +63,20 @@ public:
 			value.string_.size = 0;
 		}
 
+		Element( const std::string& str)
+			:type(string_)
+		{
+			value.string_.ptr = str.c_str();
+			value.string_.size = str.size();
+		}
+
+		Element( const char* str, std::size_t len)
+			:type(string_)
+		{
+			value.string_.ptr = str;
+			value.string_.size = len;
+		}
+
 		Element( const char* str)
 			:type(string_)
 		{
@@ -92,13 +106,6 @@ public:
 			:type(uint_)
 		{
 			value.uint_ = e;
-		}
-
-		Element( const char* str, std::size_t len)
-			:type(string_)
-		{
-			value.string_.ptr = str;
-			value.string_.size = len;
 		}
 
 		Element( const Element& o)

@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-/// \file config/description.hpp
-/// \brief Defines the description of a struct for the configuration parser to assign the values to the mebers by name
+///\file config/description.hpp
+///\brief Defines the description of a struct for the configuration parser to assign the values to the mebers by name
 
 #ifndef _Wolframe_CONFIG_DESCRIPTION_HPP_INCLUDED
 #define _Wolframe_CONFIG_DESCRIPTION_HPP_INCLUDED
