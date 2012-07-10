@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_CONFIG_STRUCTURE_PRINTER_HPP_INCLUDED
 #define _Wolframe_CONFIG_STRUCTURE_PRINTER_HPP_INCLUDED
+#error DEPRECATED
 #include <string>
 #include <vector>
 #include <cstring>

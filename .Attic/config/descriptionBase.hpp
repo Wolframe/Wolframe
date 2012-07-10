@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_CONFIG_DESCRIPTION_BASE_HPP_INCLUDED
 #define _Wolframe_CONFIG_DESCRIPTION_BASE_HPP_INCLUDED
+#error DEPRECATED
 #include <boost/property_tree/ptree.hpp>
 #include <vector>
 #include <string>

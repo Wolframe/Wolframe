@@ -437,7 +437,7 @@ int main( int argc, const char** argv)
 	{
 		boost::property_tree::read_info( configfile, pt);
 		config::parseConfigStructure( cfg, pt);
-		std::cout << config::configStructureToString( cfg) << std::endl;
+		std::cout << config::structureToString( cfg) << std::endl;
 	}
 	catch (std::exception& e)
 	{

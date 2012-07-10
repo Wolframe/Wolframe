@@ -36,7 +36,7 @@
 #define _Wolframe_IPROC_HANDLER_CONFIGURATION_HPP_INCLUDED
 #include <vector>
 #include <string>
-#include "config/descriptionBase.hpp"
+#include "config/configurationBase.hpp"
 #include "standardConfigs.hpp"
 
 namespace _Wolframe {
@@ -58,7 +58,7 @@ public:
 	};
 public:
 	Configuration()
-		:ConfigurationBase( "iproc", 0, "iproc") {}
+		:config::ConfigurationBase( "iproc", 0, "iproc") {}
 
 	Configuration( const std::vector<Command>& cc, std::size_t ib, std::size_t ob)
 		:config::ConfigurationBase("iproc", 0, "iproc")

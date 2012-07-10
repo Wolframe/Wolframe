@@ -38,7 +38,6 @@
 #include <string>
 #include "cmdbind/commandHandler.hpp"
 #include "langbind/appConfig_struct.hpp"
-#include "config/descriptionBase.hpp"
 #include "config/configurationBase.hpp"
 #include "ddl/compilerInterface.hpp"
 

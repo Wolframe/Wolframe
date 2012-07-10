@@ -1,4 +1,4 @@
- /************************************************************************
+/************************************************************************
 
  Copyright (C) 2011 Project Wolframe.
  All rights reserved.
@@ -37,7 +37,7 @@
 #include <vector>
 #include <string>
 #include "cmdbind/execCommandHandler.hpp"
-#include "config/descriptionBase.hpp"
+#include "config/configurationBase.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "standardConfigs.hpp"
 

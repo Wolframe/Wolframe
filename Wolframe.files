@@ -28,6 +28,11 @@ makefiles/nmake/sub.mk
 makefiles/nmake/top.mk
 .Attic/appException.cpp
 .Attic/appException.hpp
+.Attic/config/descriptionBase.hpp
+.Attic/config/description.hpp
+.Attic/config/structParser.hpp
+.Attic/config/structPrinter.hpp
+.Attic/config/traits.hpp
 .Attic/date.hpp
 .Attic/ErrorCode.hpp
 .Attic/expression_filter.hpp
@@ -290,13 +295,8 @@ include/cmdbind/luaCommandHandler.hpp
 include/cmdbind/protocolCommandHandler.hpp
 include/config/configurationBase.hpp
 include/config/ConfigurationTree.hpp
-include/config/descriptionBase.hpp
-include/config/description.hpp
 include/config/reference.hpp
-include/config/structParser.hpp
-include/config/structPrinter.hpp
 include/config/structSerialize.hpp
-include/config/traits.hpp
 include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp

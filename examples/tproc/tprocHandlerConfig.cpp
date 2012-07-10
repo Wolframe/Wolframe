@@ -38,7 +38,8 @@
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "cmdbind/directmapCommandHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
-#include "config/description.hpp"
+#include "config/structSerialize.hpp"
+#include "serialize/struct/filtermapDescription.hpp"
 #include <string>
 #include <vector>
 #include <boost/algorithm/string.hpp>
@@ -54,12 +55,12 @@ struct ConfigurationStruct
 	std::vector<std::string> cmd;			//< command definitions
 
 	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
-const config::DescriptionBase* ConfigurationStruct::description()
+const serialize::StructDescriptionBase* ConfigurationStruct::getStructDescription()
 {
-	struct ThisDescription :public config::Description<ConfigurationStruct>
+	struct ThisDescription :public serialize::StructDescription<ConfigurationStruct>
 	{
 		ThisDescription()
 		{
@@ -77,12 +78,8 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 	try
 	{
 		ConfigurationStruct data;
-		std::string errmsg;
-		if (!data.description()->parse( (void*)&data, (const boost::property_tree::ptree&)pt, errmsg))
-		{
-			LOG_ERROR << "Error in configuration: " << errmsg;
-			return false;
-		}
+		config::parseConfigStructure( data, (const boost::property_tree::ptree&)pt);
+
 		std::vector<std::string>::const_iterator itr=data.cmd.begin();
 		while (itr != data.cmd.end())
 		{

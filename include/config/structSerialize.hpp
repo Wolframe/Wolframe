@@ -50,7 +50,7 @@ void parseConfigStructure( Structure& st, const boost::property_tree::ptree& pt)
 }
 
 template <class Structure>
-std::string configStructureToString( const Structure& st)
+std::string structureToString( const Structure& st)
 {
 	langbind::ToStringFilter* res;
 	langbind::TypedOutputFilterR out( res = new langbind::ToStringFilter( "\t"));

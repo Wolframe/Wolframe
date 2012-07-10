@@ -79,7 +79,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceConfig.o \
 	serviceBanner.o \
 	appConfig.o \
-	config_descriptionBase.o \
 	protocol_ioblocks.o \
 	langbind_appObjects.o \
 	langbind_appGlobalContext.o \

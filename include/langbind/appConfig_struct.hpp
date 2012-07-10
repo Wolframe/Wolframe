@@ -36,7 +36,7 @@
 #define _Wolframe_APPLICATION_ENVIRONMENT_CONFIGURATION_STRUCT_HPP_INCLUDED
 #include <vector>
 #include <string>
-#include "config/descriptionBase.hpp"
+#include "config/structSerialize.hpp"
 
 namespace _Wolframe {
 namespace langbind {
@@ -47,7 +47,7 @@ struct DDLCompilerConfigStruct
 	std::string modulepath;						//< path of the DDL compiler module
 
 	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct DDLFormConfigStruct
@@ -57,7 +57,7 @@ struct DDLFormConfigStruct
 	std::string sourcepath;						//< path of the DDL source of this form
 
 	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct FilterConfigStruct
@@ -66,7 +66,7 @@ struct FilterConfigStruct
 	std::string modulepath;						//< path of filter module
 
 	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct PeerFunctionConfigStruct
@@ -76,7 +76,7 @@ struct PeerFunctionConfigStruct
 	std::string modulepath;						//< path of the command handler module (cmdbind::CommandHandler)
 
 	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct PeerFormFunctionConfigStruct
@@ -87,7 +87,7 @@ struct PeerFormFunctionConfigStruct
 	std::string outputform;						//< name of the output form (return value)
 
 	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct ScriptCommandConfigStruct
@@ -96,7 +96,7 @@ struct ScriptCommandConfigStruct
 	std::string sourcepath;						//< path of the script source
 
 	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct FormFunctionConfigStruct
@@ -105,7 +105,7 @@ struct FormFunctionConfigStruct
 	std::string modulepath;						//< path of module with the function definition and implementation
 
 	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct EnvironmentConfigStruct
@@ -119,7 +119,7 @@ struct EnvironmentConfigStruct
 	std::vector<FormFunctionConfigStruct> formfunction;		//< definitions of the form functions
 
 	///\brief Get the configuration structure description
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 }}//namespace

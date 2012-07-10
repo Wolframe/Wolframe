@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_CONFIG_STRUCTURE_PARSER_HPP_INCLUDED
 #define _Wolframe_CONFIG_STRUCTURE_PARSER_HPP_INCLUDED
+#error DEPRECATED
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <string>
