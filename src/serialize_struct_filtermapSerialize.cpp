@@ -108,18 +108,18 @@ bool _Wolframe::serialize::fetchOpenTag( Context& ctx, FiltermapSerializeStateSt
 	return true;
 }
 
-bool _Wolframe::serialize::fetchObjectStruct( const FiltermapDescriptionBase* descr, Context& ctx, FiltermapSerializeStateStack& stk)
+bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr, Context& ctx, FiltermapSerializeStateStack& stk)
 {
 	bool rt = false;
 	const void* obj = stk.back().value();
 	std::size_t idx = stk.back().state();
 	if (idx < descr->nof_elements())
 	{
-		FiltermapDescriptionBase::Map::const_iterator itr = descr->begin() + idx;
+		StructDescriptionBase::Map::const_iterator itr = descr->begin() + idx;
 
 		if (idx < descr->nof_attributes())
 		{
-			if (itr->second.type() != FiltermapDescriptionBase::Atomic)
+			if (itr->second.type() != StructDescriptionBase::Atomic)
 			{
 				throw SerializationErrorException( "atomic value expected for attribute", StructSerializer::getElementPath( stk));
 			}

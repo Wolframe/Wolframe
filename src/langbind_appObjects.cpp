@@ -361,7 +361,7 @@ bool DDLFormMap::getForm( const std::string& name, DDLForm& rt) const
 }
 
 
-ApiFormData::ApiFormData( const serialize::FiltermapDescriptionBase* descr_)
+ApiFormData::ApiFormData( const serialize::StructDescriptionBase* descr_)
 	:m_descr(descr_)
 	,m_data(std::calloc( descr_->size(), 1), std::free)
 {

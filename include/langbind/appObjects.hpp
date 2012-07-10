@@ -220,14 +220,14 @@ private:
 class ApiFormData
 {
 public:
-	ApiFormData( const serialize::FiltermapDescriptionBase* descr);
+	ApiFormData( const serialize::StructDescriptionBase* descr);
 	~ApiFormData();
 
 	void* get() const						{return m_data.get();}
-	const serialize::FiltermapDescriptionBase* descr() const	{return m_descr;}
+	const serialize::StructDescriptionBase* descr() const	{return m_descr;}
 	const boost::shared_ptr<void>& data() const			{return m_data;}
 private:
-	const serialize::FiltermapDescriptionBase* m_descr;
+	const serialize::StructDescriptionBase* m_descr;
 	boost::shared_ptr<void> m_data;
 };
 

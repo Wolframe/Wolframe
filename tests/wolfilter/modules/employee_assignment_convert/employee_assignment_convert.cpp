@@ -41,9 +41,9 @@
 using namespace _Wolframe;
 using namespace test;
 
-const serialize::FiltermapDescriptionBase* Task::getFiltermapDescription()
+const serialize::StructDescriptionBase* Task::getStructDescription()
 {
-	struct ThisDescription :public serialize::FiltermapDescription<Task>
+	struct ThisDescription :public serialize::StructDescription<Task>
 	{
 		ThisDescription()
 		{
@@ -57,9 +57,9 @@ const serialize::FiltermapDescriptionBase* Task::getFiltermapDescription()
 	return &rt;
 }
 
-const serialize::FiltermapDescriptionBase* Employee::getFiltermapDescription()
+const serialize::StructDescriptionBase* Employee::getStructDescription()
 {
-	struct ThisDescription :public serialize::FiltermapDescription<Employee>
+	struct ThisDescription :public serialize::StructDescription<Employee>
 	{
 		ThisDescription()
 		{
@@ -73,9 +73,9 @@ const serialize::FiltermapDescriptionBase* Employee::getFiltermapDescription()
 	return &rt;
 }
 
-const serialize::FiltermapDescriptionBase* Assignment::getFiltermapDescription()
+const serialize::StructDescriptionBase* Assignment::getStructDescription()
 {
-	struct ThisDescription :public serialize::FiltermapDescription<Assignment>
+	struct ThisDescription :public serialize::StructDescription<Assignment>
 	{
 		ThisDescription()
 		{
@@ -89,9 +89,9 @@ const serialize::FiltermapDescriptionBase* Assignment::getFiltermapDescription()
 	return &rt;
 }
 
-const serialize::FiltermapDescriptionBase* AssignmentList::getFiltermapDescription()
+const serialize::StructDescriptionBase* AssignmentList::getStructDescription()
 {
-	struct ThisDescription :public serialize::FiltermapDescription<AssignmentList>
+	struct ThisDescription :public serialize::StructDescription<AssignmentList>
 	{
 		ThisDescription()
 		{
@@ -103,9 +103,9 @@ const serialize::FiltermapDescriptionBase* AssignmentList::getFiltermapDescripti
 	return &rt;
 }
 
-const serialize::FiltermapDescriptionBase* AssignmentListDoc::getFiltermapDescription()
+const serialize::StructDescriptionBase* AssignmentListDoc::getStructDescription()
 {
-	struct ThisDescription :public serialize::FiltermapDescription<AssignmentListDoc>
+	struct ThisDescription :public serialize::StructDescription<AssignmentListDoc>
 	{
 		ThisDescription()
 		{

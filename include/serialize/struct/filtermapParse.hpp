@@ -54,7 +54,7 @@ struct FiltermapIntrusiveParser
 
 bool parseAtomicElementEndTag( langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk);
 
-bool parseObjectStruct( const FiltermapDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk);
+bool parseObjectStruct( const StructDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk);
 
 typedef bool (*ParseValue)( void* value, const langbind::TypedFilterBase::Element& element);
 
@@ -103,7 +103,7 @@ bool parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Co
 template <typename TYPE>
 bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
 {
-	return parseObjectStruct( TYPE::getFiltermapDescription(), inp, ctx, stk);
+	return parseObjectStruct( TYPE::getStructDescription(), inp, ctx, stk);
 }
 
 template <typename TYPE>
@@ -119,7 +119,7 @@ bool parseObject_( const traits::vector_&, langbind::TypedInputFilter&, Context&
 	((TYPE*)stk.back().value())->push_back( val);
 	stk.back().state( 1);
 	Element* ee = &((TYPE*)(char*)stk.back().value())->back();
-	if (FiltermapIntrusiveProperty<Element>::type() == FiltermapDescriptionBase::Atomic)
+	if (FiltermapIntrusiveProperty<Element>::type() == StructDescriptionBase::Atomic)
 	{
 		stk.push_back( FiltermapParseState( 0, &parseAtomicElementEndTag, 0));
 	}

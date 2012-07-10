@@ -76,8 +76,8 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 	gct->defineFormFunction( "employee_assignment_convert",
 					langbind::FormFunction(
 						test::convertAssignmentListDoc,
-						test::AssignmentListDoc::getFiltermapDescription(),
-						test::AssignmentListDoc::getFiltermapDescription()));
+						test::AssignmentListDoc::getStructDescription(),
+						test::AssignmentListDoc::getStructDescription()));
 
 	langbind::Filter flt;
 	if (!gct->getFilter( "token", flt)) throw std::runtime_error( "filter 'token' not found");

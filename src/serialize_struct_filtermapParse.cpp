@@ -115,7 +115,7 @@ bool _Wolframe::serialize::parseAtomicElementEndTag( langbind::TypedInputFilter&
 	return true;
 }
 
-bool _Wolframe::serialize::parseObjectStruct( const FiltermapDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
+bool _Wolframe::serialize::parseObjectStruct( const StructDescriptionBase* descr, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
 {
 	langbind::InputFilter::ElementType typ;
 	langbind::TypedFilterBase::Element element;
@@ -129,7 +129,7 @@ bool _Wolframe::serialize::parseObjectStruct( const FiltermapDescriptionBase* de
 	{
 		case langbind::InputFilter::OpenTag:
 		{
-			FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
+			StructDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
 			if (itr == descr->end())
 			{
 				throw SerializationErrorException( "unknown element", element.tostring(), StructParser::getElementPath( stk));
@@ -142,7 +142,7 @@ bool _Wolframe::serialize::parseObjectStruct( const FiltermapDescriptionBase* de
 					throw SerializationErrorException( "attribute element expected", element.tostring(), StructParser::getElementPath( stk));
 				}
 			}
-			if (itr->second.type() != FiltermapDescriptionBase::Vector)
+			if (itr->second.type() != StructDescriptionBase::Vector)
 			{
 				if (stk.back().selectElement( idx, descr->size()))
 				{
@@ -150,7 +150,7 @@ bool _Wolframe::serialize::parseObjectStruct( const FiltermapDescriptionBase* de
 				}
 			}
 			void* value = (char*)stk.back().value() + itr->second.ofs();
-			if (itr->second.type() == FiltermapDescriptionBase::Atomic)
+			if (itr->second.type() == StructDescriptionBase::Atomic)
 			{
 				stk.push_back( FiltermapParseState( 0, &parseAtomicElementEndTag, value));
 			}
@@ -160,7 +160,7 @@ bool _Wolframe::serialize::parseObjectStruct( const FiltermapDescriptionBase* de
 
 		case langbind::InputFilter::Attribute:
 		{
-			FiltermapDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
+			StructDescriptionBase::Map::const_iterator itr = descr->find( element.tostring());
 			if (itr == descr->end())
 			{
 				throw SerializationErrorException( "unknown attribute", element.tostring(), StructParser::getElementPath( stk));
@@ -173,7 +173,7 @@ bool _Wolframe::serialize::parseObjectStruct( const FiltermapDescriptionBase* de
 					throw SerializationErrorException( "content element expected", element.tostring(), StructParser::getElementPath( stk));
 				}
 			}
-			if (itr->second.type() != FiltermapDescriptionBase::Atomic)
+			if (itr->second.type() != StructDescriptionBase::Atomic)
 			{
 				throw SerializationErrorException( "atomic value expected for attribute", element.tostring(), StructParser::getElementPath( stk));
 			}
@@ -192,7 +192,7 @@ bool _Wolframe::serialize::parseObjectStruct( const FiltermapDescriptionBase* de
 
 		case langbind::InputFilter::CloseTag:
 		{
-			FiltermapDescriptionBase::Map::const_iterator itr = descr->begin(),end=descr->end();
+			StructDescriptionBase::Map::const_iterator itr = descr->begin(),end=descr->end();
 			for (;itr != end; ++itr)
 			{
 				if (itr->second.mandatory() && !stk.back().initCount( itr-descr->begin()))

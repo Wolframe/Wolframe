@@ -39,19 +39,27 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
-StructParser::StructParser( const ObjectReference& obj, const FiltermapDescriptionBase* descr_)
-	:m_obj(obj)
+StructParser::StructParser( const ObjectReference& obj, const StructDescriptionBase* descr_)
+	:m_ptr(obj.get())
+	,m_obj(obj)
 	,m_descr(descr_)
 {
-	m_stk.push_back( FiltermapParseState( 0, m_descr->parse(), m_obj.get()));
+	m_stk.push_back( FiltermapParseState( 0, m_descr->parse(), m_ptr));
 }
 
+StructParser::StructParser( void* obj, const StructDescriptionBase* descr_)
+	:m_ptr(obj)
+	,m_descr(descr_)
+{}
+
 StructParser::StructParser( const StructParser& o)
-	:m_obj(o.m_obj)
+	:m_ptr(o.m_ptr)
+	,m_obj(o.m_obj)
 	,m_descr(o.m_descr)
 	,m_ctx(o.m_ctx)
 	,m_inp(o.m_inp)
-	,m_stk(o.m_stk){}
+	,m_stk(o.m_stk)
+{}
 
 std::string StructParser::getElementPath( const FiltermapParseStateStack& stk)
 {
@@ -74,13 +82,13 @@ void StructParser::init( const langbind::TypedInputFilterR& i, Context::Flags fl
 	m_ctx.clear();
 	m_ctx.setFlags(flags);
 	m_stk.clear();
-	m_stk.push_back( FiltermapParseState( 0, m_descr->parse(), m_obj.get()));
+	m_stk.push_back( FiltermapParseState( 0, m_descr->parse(), m_ptr));
 }
 
 bool StructParser::call()
 {
 	bool rt = true;
-	if (!m_obj.get()) throw std::runtime_error( "try to fill null object");
+	if (!m_ptr) throw std::runtime_error( "try to fill null object");
 	if (!m_inp.get()) throw std::runtime_error( "no input for parse");
 
 	while (rt && m_stk.size())
@@ -92,16 +100,26 @@ bool StructParser::call()
 
 
 
-StructSerializer::StructSerializer( const ObjectReference& obj, const FiltermapDescriptionBase* descr_)
-	:m_obj(obj)
+StructSerializer::StructSerializer( const ObjectReference& obj, const StructDescriptionBase* descr_)
+	:m_ptr(obj.get())
+	,m_obj(obj)
 	,m_descr(descr_)
 	,m_ctx()
 {
-	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_obj.get()));
+	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_ptr));
+}
+
+StructSerializer::StructSerializer( const void* obj, const StructDescriptionBase* descr_)
+	:m_ptr(obj)
+	,m_descr(descr_)
+	,m_ctx()
+{
+	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_ptr));
 }
 
 StructSerializer::StructSerializer( const StructSerializer& o)
 	:TypedInputFilter(o)
+	,m_ptr(o.m_ptr)
 	,m_obj(o.m_obj)
 	,m_descr(o.m_descr)
 	,m_ctx(o.m_ctx)
@@ -113,7 +131,7 @@ void StructSerializer::init( const langbind::TypedOutputFilterR& out, Context::F
 	m_ctx.clear();
 	m_ctx.setFlags(flags);
 	m_stk.clear();
-	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_obj.get()));
+	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_ptr));
 	m_out = out;
 }
 

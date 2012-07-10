@@ -29,33 +29,38 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/struct/filtermapProperty.hpp
-///\brief Defines the intrusive implementation of some parsing element properties
-#ifndef _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PROPERTY_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_STRUCT_FILTERMAP_PROPERTY_HPP_INCLUDED
-#include "serialize/struct/filtermapTraits.hpp"
+///\file config/structSerialize.hpp
+///\brief Defines a configuration structure parser
+#ifndef _Wolframe_CONFIG_STRUCT_SERIALIZE_HPP_INCLUDED
+#define _Wolframe_CONFIG_STRUCT_SERIALIZE_HPP_INCLUDED
+#include "filter/ptreefilter.hpp"
+#include "filter/tostringfilter.hpp"
+#include "serialize/struct/filtermapBase.hpp"
 
 namespace _Wolframe {
-namespace serialize {
+namespace config {
 
-template <typename T>
-struct FiltermapIntrusiveProperty
+template <class Structure>
+void parseConfigStructure( Structure& st, const boost::property_tree::ptree& pt)
 {
-private:
-	static StructDescriptionBase::ElementType type_( const traits::struct_&)
-		{return StructDescriptionBase::Struct;}
-	static StructDescriptionBase::ElementType type_( const traits::vector_&)
-		{return StructDescriptionBase::Vector;}
-	static StructDescriptionBase::ElementType type_( const traits::atomic_&)
-		{return StructDescriptionBase::Atomic;}
-public:
-	static StructDescriptionBase::ElementType type()
-	{
-		const T* obj = 0;
-		return type_( traits::getFiltermapCategory(*obj));
-	}
-};
+	langbind::TypedInputFilterR inp( new langbind::PropertyTreeInputFilter( pt));
+	serialize::StructParser parser( (void*)&st, st.getStructDescription());
+	parser.init( inp);
+	if (!parser.call()) throw std::runtime_error( "illegal state in configuration parser");
+}
+
+template <class Structure>
+std::string configStructureToString( const Structure& st)
+{
+	langbind::ToStringFilter* res;
+	langbind::TypedOutputFilterR out( res = new langbind::ToStringFilter( "\t"));
+	serialize::StructSerializer serializer( (const void*)&st, st.getStructDescription());
+	serializer.init( out);
+	if (!serializer.call()) throw std::runtime_error( "illegal state in configuration parser");
+	return res->content();
+}
 
 }}//namespace
 #endif
+
 

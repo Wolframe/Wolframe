@@ -32,7 +32,8 @@ Project Wolframe.
 ///\file configStructParser.cpp
 ///\brief test for configuration parser with wolframe example configuration
 
-#include "config/description.hpp"
+#include "config/structSerialize.hpp"
+#include "serialize/struct/filtermapDescription.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "miscUtils.hpp"
@@ -56,7 +57,7 @@ struct LoggerConfig
 		ToStderr()
 			:loglevel("INFO"){}
 
-		static const config::DescriptionBase* description();
+		static const serialize::StructDescriptionBase* getStructDescription();
 	};
 
 	struct ToFile
@@ -67,7 +68,7 @@ struct LoggerConfig
 		ToFile()
 			:loglevel("INFO"){}
 
-		static const config::DescriptionBase* description();
+		static const serialize::StructDescriptionBase* getStructDescription();
 	};
 
 	struct ToSyslog
@@ -80,7 +81,7 @@ struct LoggerConfig
 			:loglevel("INFO")
 			,facility("LOCAL2"){}
 
-		static const config::DescriptionBase* description();
+		static const serialize::StructDescriptionBase* getStructDescription();
 	};
 
 	struct ToEventlog
@@ -92,7 +93,7 @@ struct LoggerConfig
 		ToEventlog()
 			:loglevel("INFO"){}
 
-		static const config::DescriptionBase* description();
+		static const serialize::StructDescriptionBase* getStructDescription();
 	};
 
 	ToEventlog eventlog;
@@ -100,7 +101,7 @@ struct LoggerConfig
 	ToFile filelog;
 	ToStderr _stderr;
 
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct NetConfig
@@ -118,7 +119,7 @@ struct NetConfig
 		Endpoint()
 			:port(0),maxConnections(0){}
 
-		static const config::DescriptionBase* description();
+		static const serialize::StructDescriptionBase* getStructDescription();
 	};
 	std::vector<Endpoint> endpoints;
 
@@ -137,12 +138,12 @@ struct NetConfig
 		SSLEndpoint()
 			:port(0),maxConnections(0),verify(true){}
 
-		static const config::DescriptionBase* description();
+		static const serialize::StructDescriptionBase* getStructDescription();
 	};
 	std::vector<SSLEndpoint> SSLendpoints;
 
 	NetConfig() :threads(0),maxConnections(0) {}
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct DatabaseConfig
@@ -157,7 +158,7 @@ struct DatabaseConfig
 	unsigned short acquireTimeout;
 
 	DatabaseConfig() :port(0),connections(0),acquireTimeout(0) {}
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct ServiceConfig
@@ -166,7 +167,7 @@ struct ServiceConfig
 	std::string displayName;
 	std::string descr;
 
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct DaemonConfig
@@ -175,7 +176,7 @@ struct DaemonConfig
 	std::string group;
 	std::string pidFile;
 
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct AAAAConfig
@@ -185,13 +186,13 @@ struct AAAAConfig
 		std::string file;
 		std::string database;
 
-		static const config::DescriptionBase* description();
+		static const serialize::StructDescriptionBase* getStructDescription();
 	};
 	struct AuditConfig
 	{
 		std::string file;
 
-		static const config::DescriptionBase* description();
+		static const serialize::StructDescriptionBase* getStructDescription();
 	};
 };
 
@@ -204,13 +205,13 @@ struct Configuration
 	LoggerConfig logger;
 	std::vector<DatabaseConfig> database;
 
-	static const config::DescriptionBase* description();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 
-const config::DescriptionBase* LoggerConfig::ToStderr::description()
+const serialize::StructDescriptionBase* LoggerConfig::ToStderr::getStructDescription()
 {
-	struct ThisDescription :public config::Description<LoggerConfig::ToStderr>
+	struct ThisDescription :public serialize::StructDescription<LoggerConfig::ToStderr>
 	{
 		ThisDescription()
 		{
@@ -222,9 +223,9 @@ const config::DescriptionBase* LoggerConfig::ToStderr::description()
 	return &rt;
 }
 
-const config::DescriptionBase* LoggerConfig::ToFile::description()
+const serialize::StructDescriptionBase* LoggerConfig::ToFile::getStructDescription()
 {
-	struct ThisDescription :public config::Description<LoggerConfig::ToFile>
+	struct ThisDescription :public serialize::StructDescription<LoggerConfig::ToFile>
 	{
 		ThisDescription()
 		{
@@ -237,9 +238,9 @@ const config::DescriptionBase* LoggerConfig::ToFile::description()
 	return &rt;
 }
 
-const config::DescriptionBase* LoggerConfig::ToSyslog::description()
+const serialize::StructDescriptionBase* LoggerConfig::ToSyslog::getStructDescription()
 {
-	struct ThisDescription :public config::Description<LoggerConfig::ToSyslog>
+	struct ThisDescription :public serialize::StructDescription<LoggerConfig::ToSyslog>
 	{
 		ThisDescription()
 		{
@@ -253,9 +254,9 @@ const config::DescriptionBase* LoggerConfig::ToSyslog::description()
 	return &rt;
 }
 
-const config::DescriptionBase* LoggerConfig::ToEventlog::description()
+const serialize::StructDescriptionBase* LoggerConfig::ToEventlog::getStructDescription()
 {
-	struct ThisDescription :public config::Description<LoggerConfig::ToEventlog>
+	struct ThisDescription :public serialize::StructDescription<LoggerConfig::ToEventlog>
 	{
 		ThisDescription()
 		{
@@ -269,9 +270,9 @@ const config::DescriptionBase* LoggerConfig::ToEventlog::description()
 	return &rt;
 }
 
-const config::DescriptionBase* LoggerConfig::description()
+const serialize::StructDescriptionBase* LoggerConfig::getStructDescription()
 {
-	struct ThisDescription :public config::Description<LoggerConfig>
+	struct ThisDescription :public serialize::StructDescription<LoggerConfig>
 	{
 		ThisDescription()
 		{
@@ -286,9 +287,9 @@ const config::DescriptionBase* LoggerConfig::description()
 	return &rt;
 }
 
-const config::DescriptionBase* NetConfig::description()
+const serialize::StructDescriptionBase* NetConfig::getStructDescription()
 {
-	struct ThisDescription :public config::Description<NetConfig>
+	struct ThisDescription :public serialize::StructDescription<NetConfig>
 	{
 		ThisDescription()
 		{
@@ -303,9 +304,9 @@ const config::DescriptionBase* NetConfig::description()
 	return &rt;
 }
 
-const config::DescriptionBase* NetConfig::Endpoint::description()
+const serialize::StructDescriptionBase* NetConfig::Endpoint::getStructDescription()
 {
-	struct ThisDescription :public config::Description<NetConfig::Endpoint>
+	struct ThisDescription :public serialize::StructDescription<NetConfig::Endpoint>
 	{
 		ThisDescription()
 		{
@@ -320,9 +321,9 @@ const config::DescriptionBase* NetConfig::Endpoint::description()
 	return &rt;
 }
 
-const config::DescriptionBase* NetConfig::SSLEndpoint::description()
+const serialize::StructDescriptionBase* NetConfig::SSLEndpoint::getStructDescription()
 {
-	struct ThisDescription :public config::Description<NetConfig::SSLEndpoint>
+	struct ThisDescription :public serialize::StructDescription<NetConfig::SSLEndpoint>
 	{
 		ThisDescription()
 		{
@@ -342,9 +343,9 @@ const config::DescriptionBase* NetConfig::SSLEndpoint::description()
 	return &rt;
 }
 
-const config::DescriptionBase* DatabaseConfig::description()
+const serialize::StructDescriptionBase* DatabaseConfig::getStructDescription()
 {
-	struct ThisDescription :public config::Description<DatabaseConfig>
+	struct ThisDescription :public serialize::StructDescription<DatabaseConfig>
 	{
 		ThisDescription()
 		{
@@ -363,9 +364,9 @@ const config::DescriptionBase* DatabaseConfig::description()
 	return &rt;
 }
 
-const config::DescriptionBase* ServiceConfig::description()
+const serialize::StructDescriptionBase* ServiceConfig::getStructDescription()
 {
-	struct ThisDescription :public config::Description<ServiceConfig>
+	struct ThisDescription :public serialize::StructDescription<ServiceConfig>
 	{
 		ThisDescription()
 		{
@@ -379,9 +380,9 @@ const config::DescriptionBase* ServiceConfig::description()
 	return &rt;
 }
 
-const config::DescriptionBase* DaemonConfig::description()
+const serialize::StructDescriptionBase* DaemonConfig::getStructDescription()
 {
-	struct ThisDescription :public config::Description<DaemonConfig>
+	struct ThisDescription :public serialize::StructDescription<DaemonConfig>
 	{
 		ThisDescription()
 		{
@@ -395,9 +396,9 @@ const config::DescriptionBase* DaemonConfig::description()
 	return &rt;
 }
 
-const config::DescriptionBase* Configuration::description()
+const serialize::StructDescriptionBase* Configuration::getStructDescription()
 {
-	struct ThisDescription :public config::Description<Configuration>
+	struct ThisDescription :public serialize::StructDescription<Configuration>
 	{
 		ThisDescription()
 		{
@@ -435,10 +436,8 @@ int main( int argc, const char** argv)
 	try
 	{
 		boost::property_tree::read_info( configfile, pt);
-		if (cfg.description()->parse( &cfg, pt, errmsg))
-		{
-			cfg.description()->print( std::cout, &cfg);
-		}
+		config::parseConfigStructure( cfg, pt);
+		std::cout << config::configStructureToString( cfg) << std::endl;
 	}
 	catch (std::exception& e)
 	{

@@ -48,7 +48,7 @@ struct Task
 	std::string key;
 	int customernumber;
 
-	static const serialize::FiltermapDescriptionBase* getFiltermapDescription();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct Employee
@@ -57,7 +57,7 @@ struct Employee
 	std::string surname;
 	std::string phone;
 
-	static const serialize::FiltermapDescriptionBase* getFiltermapDescription();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct Assignment
@@ -66,21 +66,21 @@ struct Assignment
 	Employee employee;
 	std::string issuedate;
 
-	static const serialize::FiltermapDescriptionBase* getFiltermapDescription();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct AssignmentList
 {
 	std::vector<Assignment> assignment;
 
-	static const serialize::FiltermapDescriptionBase* getFiltermapDescription();
+	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
 struct AssignmentListDoc
 {
 	AssignmentList assignmentlist;
 
-	static const serialize::FiltermapDescriptionBase* getFiltermapDescription();
+	static const serialize::StructDescriptionBase* getStructDescription();
 	static int convert( AssignmentListDoc& res, const AssignmentListDoc& param);
 };
 

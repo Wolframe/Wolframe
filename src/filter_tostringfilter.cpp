@@ -53,15 +53,38 @@ bool ToStringFilter::print( ElementType type, const Element& element)
 	switch (type)
 	{
 		case OpenTag:
+			m_content.append( m_indent);
 			m_content.append( element.tostring());
-			m_content.append( " { ");
+			if (m_indentstr.size())
+			{
+				m_content.append( " {\n");
+				m_indent.append( m_indentstr);
+			}
+			else
+			{
+				m_content.append( " { ");
+			}
 			m_lasttype = type;
 		return true;
 		case CloseTag:
-			m_content.append( " } ");
+			if (m_indentstr.size())
+			{
+				if (m_indent.size() >= m_indentstr.size())
+				{
+					m_indent.resize( m_indent.size() - m_indentstr.size());
+				}
+				m_content.push_back( '\n');
+				m_content.append( m_indent);
+				m_content.append( "}\n");
+			}
+			else
+			{
+				m_content.append( " } ");
+			}
 			m_lasttype = type;
 		return true;
 		case Attribute:
+			m_content.append( m_indent);
 			m_lasttype = type;
 			m_content.append( element.tostring());
 		return true;
@@ -75,6 +98,7 @@ bool ToStringFilter::print( ElementType type, const Element& element)
 			}
 			else
 			{
+				m_content.append( m_indent);
 				m_content.append( "'");
 				m_content.append( substquot( element.tostring()));
 				m_content.append( "'");

@@ -62,18 +62,18 @@ public:
 	///\param[in] f function to call
 	///\param[in] p part of the api describing the input
 	///\param[in] r part of the api describing the function result
-	FormFunction( Function f, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
+	FormFunction( Function f, const serialize::StructDescriptionBase* p, const serialize::StructDescriptionBase* r)
 		:m_function(f)
 		,m_api_param(p)
 		,m_api_result(r){}
 
 	///\brief Get the form function parameter description
 	///\return The description
-	const serialize::FiltermapDescriptionBase* api_param() const	{return m_api_param;}
+	const serialize::StructDescriptionBase* api_param() const	{return m_api_param;}
 
 	///\brief Get the form function result description
 	///\return The description
-	const serialize::FiltermapDescriptionBase* api_result() const	{return m_api_result;}
+	const serialize::StructDescriptionBase* api_result() const	{return m_api_result;}
 
 	///\brief Call the form function
 	///\param[in] res pointer to structure as defined with 'api_result()' to hold the form function result
@@ -83,8 +83,8 @@ public:
 
 private:
 	Function* m_function;						//< form function implementation
-	const serialize::FiltermapDescriptionBase* m_api_param;		//< api parameter description
-	const serialize::FiltermapDescriptionBase* m_api_result;	//< api result description
+	const serialize::StructDescriptionBase* m_api_param;		//< api parameter description
+	const serialize::StructDescriptionBase* m_api_result;	//< api result description
 };
 
 }}//namespace

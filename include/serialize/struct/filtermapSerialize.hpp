@@ -55,7 +55,7 @@ bool fetchCloseTag( Context& ctx, FiltermapSerializeStateStack& stk);
 
 bool fetchOpenTag( Context& ctx, FiltermapSerializeStateStack& stk);
 
-bool fetchObjectStruct( const FiltermapDescriptionBase* descr, Context& ctx, FiltermapSerializeStateStack& stk);
+bool fetchObjectStruct( const StructDescriptionBase* descr, Context& ctx, FiltermapSerializeStateStack& stk);
 
 typedef bool (*PrintValue)( const void* ptr, langbind::TypedFilterBase::Element& value);
 
@@ -106,7 +106,7 @@ template <> bool printValue_<std::string>( const void* value, langbind::TypedFil
 template <typename TYPE>
 static bool fetchObject_( const traits::struct_&, Context& ctx, FiltermapSerializeStateStack& stk)
 {
-	static const FiltermapDescriptionBase* descr = TYPE::getFiltermapDescription();
+	static const StructDescriptionBase* descr = TYPE::getStructDescription();
 	return fetchObjectStruct( descr, ctx, stk);
 }
 

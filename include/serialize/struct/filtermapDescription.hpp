@@ -46,30 +46,30 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-///\class FiltermapDescription
+///\class StructDescription
 ///\brief Intrusive description of a filter/form map
 ///\tparam Structure structure that is represented by this description
 template <class Structure>
-struct FiltermapDescription :public FiltermapDescriptionBase
+struct StructDescription :public StructDescriptionBase
 {
 	///\brief Constructor
-	FiltermapDescription()
-		:FiltermapDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), FiltermapIntrusiveProperty<Structure>::type(), &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusiveSerializer<Structure>::fetch, false){}
+	StructDescription()
+		:StructDescriptionBase( &constructor, &destructor, getTypename<Structure>(), 0, sizeof(Structure), FiltermapIntrusiveProperty<Structure>::type(), &FiltermapIntrusiveParser<Structure>::parse, &FiltermapIntrusiveSerializer<Structure>::fetch, false){}
 
 	///\brief Operator to build the structure description element by element
 	///\tparam Element element type
 	///\param[in] name name of the element
 	///\param[in] eptr pointer to member of the element
 	template <typename Element>
-	FiltermapDescription& operator()( const char* tag, Element Structure::*eptr)
+	StructDescription& operator()( const char* tag, Element Structure::*eptr)
 	{
-		FiltermapDescriptionBase::Parse parse_ = &FiltermapIntrusiveParser<Element>::parse;
-		FiltermapDescriptionBase::Fetch fetch_ = &FiltermapIntrusiveSerializer<Element>::fetch;
-		FiltermapDescriptionBase::ElementType type_ = FiltermapIntrusiveProperty<Element>::type();
+		StructDescriptionBase::Parse parse_ = &FiltermapIntrusiveParser<Element>::parse;
+		StructDescriptionBase::Fetch fetch_ = &FiltermapIntrusiveSerializer<Element>::fetch;
+		StructDescriptionBase::ElementType type_ = FiltermapIntrusiveProperty<Element>::type();
 		std::size_t pp = (std::size_t)&(((Structure*)0)->*eptr);
 		bool mandatory_ = (tag[0]=='-');
 		const char* name = mandatory_?(tag+1):tag;
-		FiltermapDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, fetch_, mandatory_);
+		StructDescriptionBase e( getTypename<Element>(), pp, sizeof(Element), type_, parse_, fetch_, mandatory_);
 		if (find( name) != end())
 		{
 			std::ostringstream err;
@@ -80,7 +80,7 @@ struct FiltermapDescription :public FiltermapDescriptionBase
 		return *this;
 	}
 
-	FiltermapDescription& operator--(int)
+	StructDescription& operator--(int)
 	{
 		defineEndOfAttributes();
 		return *this;

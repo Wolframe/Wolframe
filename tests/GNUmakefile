@@ -164,7 +164,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./configValueParser
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./configStructParser $(TOPDIR)/src/wolframe.conf
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./configStructParser config/structparser.conf
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testProtocolLFdotEscaping
 	@echo

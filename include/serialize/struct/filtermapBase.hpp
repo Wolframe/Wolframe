@@ -47,7 +47,7 @@ namespace _Wolframe {
 namespace serialize {
 
 
-class FiltermapDescriptionBase
+class StructDescriptionBase
 {
 public:
 	enum ElementType
@@ -57,7 +57,7 @@ public:
 		Vector
 	};
 
-	typedef std::vector<std::pair<std::string,FiltermapDescriptionBase> > Map;
+	typedef std::vector<std::pair<std::string,StructDescriptionBase> > Map;
 	typedef bool (*Parse)( langbind::TypedInputFilter& flt, Context& ctx, FiltermapParseStateStack& stk);
 	typedef bool (*Fetch)( Context& ctx, FiltermapSerializeStateStack& stk);
 	typedef bool (*Constructor)( void* obj);
@@ -66,7 +66,7 @@ public:
 	Parse parse() const		{return m_parse;}
 	Fetch fetch() const		{return m_fetch;}
 
-	FiltermapDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
+	StructDescriptionBase( Constructor c, Destructor d, const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
 		:m_constructor(c)
 		,m_destructor(d)
 		,m_typename(tn)
@@ -78,7 +78,7 @@ public:
 		,m_fetch(pr)
 		,m_mandatory(mandatory_){}
 
-	FiltermapDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
+	StructDescriptionBase( const char* tn, std::size_t os, std::size_t sz, ElementType t, Parse pa, Fetch pr, bool mandatory_)
 		:m_constructor(0)
 		,m_destructor(0)
 		,m_typename(tn)
@@ -90,7 +90,7 @@ public:
 		,m_fetch(pr)
 		,m_mandatory(mandatory_){}
 
-	FiltermapDescriptionBase( const FiltermapDescriptionBase& o)
+	StructDescriptionBase( const StructDescriptionBase& o)
 		:m_constructor(o.m_constructor)
 		,m_destructor(o.m_destructor)
 		,m_typename(o.m_typename)
@@ -103,7 +103,7 @@ public:
 		,m_fetch(o.m_fetch)
 		,m_mandatory(o.m_mandatory){}
 
-	FiltermapDescriptionBase()
+	StructDescriptionBase()
 		:m_typename(0)
 		,m_ofs(0)
 		,m_size(0)
@@ -152,7 +152,7 @@ public:
 	Map::const_iterator begin() const {return m_elem.begin();}
 	Map::const_iterator end() const {return m_elem.end();}
 
-	void define( const std::string& name, const FiltermapDescriptionBase& dd)
+	void define( const std::string& name, const StructDescriptionBase& dd)
 	{
 		m_elem.push_back( Map::value_type(name,dd));
 	}
@@ -209,7 +209,8 @@ class StructSerializer :public langbind::TypedInputFilter
 public:
 	typedef boost::shared_ptr<void> ObjectReference;
 
-	StructSerializer( const ObjectReference& obj, const FiltermapDescriptionBase* descr);
+	StructSerializer( const ObjectReference& obj, const StructDescriptionBase* descr);
+	StructSerializer( const void* obj, const StructDescriptionBase* descr);
 
 	StructSerializer( const StructSerializer& o);
 	virtual ~StructSerializer(){}
@@ -224,8 +225,9 @@ public:
 	virtual bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
 
 private:
+	const void* m_ptr;
 	const ObjectReference m_obj;
-	const FiltermapDescriptionBase* m_descr;
+	const StructDescriptionBase* m_descr;
 	Context m_ctx;
 	langbind::TypedOutputFilterR m_out;
 	FiltermapSerializeStateStack m_stk;
@@ -237,7 +239,8 @@ class StructParser
 public:
 	typedef boost::shared_ptr<void> ObjectReference;
 
-	StructParser( const ObjectReference& obj, const FiltermapDescriptionBase* descr);
+	StructParser( void* obj, const StructDescriptionBase* descr);
+	StructParser( const ObjectReference& obj, const StructDescriptionBase* descr);
 	StructParser( const StructParser& o);
 	virtual ~StructParser(){}
 
@@ -246,13 +249,14 @@ public:
 	void init( const langbind::TypedInputFilterR& i, Context::Flags flags=Context::None);
 
 	const ObjectReference& object() const					{return m_obj;}
-	const FiltermapDescriptionBase* descr() const				{return m_descr;}
+	const StructDescriptionBase* descr() const				{return m_descr;}
 
 	bool call();
 
 private:
+	void* m_ptr;
 	ObjectReference m_obj;
-	const FiltermapDescriptionBase* m_descr;
+	const StructDescriptionBase* m_descr;
 	Context m_ctx;
 	langbind::TypedInputFilterR m_inp;
 	FiltermapParseStateStack m_stk;

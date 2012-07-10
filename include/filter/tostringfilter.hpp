@@ -46,13 +46,18 @@ class ToStringFilter :public TypedOutputFilter
 {
 public:
 	///\brief Constructor
-	ToStringFilter() {}
+	explicit ToStringFilter( const std::string indentstr_="")
+		:m_lasttype(FilterBase::OpenTag)
+		,m_indentstr(indentstr_) {}
+
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
 	ToStringFilter( const ToStringFilter& o)
 		:TypedOutputFilter(o)
 		,m_content(o.m_content)
-		,m_lasttype(o.m_lasttype){}
+		,m_lasttype(o.m_lasttype)
+		,m_indent(o.m_indent)
+		,m_indentstr(o.m_indentstr){}
 	///\brief Destructor
 	virtual ~ToStringFilter(){}
 
@@ -64,6 +69,8 @@ public:
 private:
 	std::string m_content;				//< content string
 	FilterBase::ElementType m_lasttype;		//< last parsed element type
+	std::string m_indent;				//< indent array
+	std::string m_indentstr;			//< indentiation string
 };
 
 }}//namespace
