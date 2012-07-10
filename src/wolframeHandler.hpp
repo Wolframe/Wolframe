@@ -90,7 +90,7 @@ private:
 		SEND_HELLO,			///<
 		READ_INPUT,			///<
 		OUTPUT_MSG,			///<
-		TIMEOUT_OCCURED,			///<
+		TIMEOUT_OCCURED,		///<
 		SIGNALLED,			///<
 		FORBIDDEN,			///<
 		TERMINATING,			///<

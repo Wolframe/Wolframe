@@ -73,9 +73,9 @@ class ProcessorUnit
 public:
 	virtual ~ProcessorUnit()		{}
 
-	// temporary
-	virtual Processor* processor() const = 0;
-//	virtual ProcessorSlice* slice() const = 0;
+	virtual const char* name() const = 0;
+
+	virtual ProcessorSlice* slice() const = 0;
 };
 
 }} // namespace _Wolframe::proc

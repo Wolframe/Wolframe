@@ -30,39 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// Wolframe processor provider (group)
-//
+///\file tests/wolfilter/modules/echo_cmdhandler/mod_echo_cmdhandler.cpp
+///\brief Module for testing peer functions
+#include "modules/cmdbind/template/commandHandlerObjectBuilder.hpp"
+#include "wolfilter/modules/echo_cmdhandler/echo_cmdhandler.hpp"
+#include "logger-v1.hpp"
 
-#ifndef _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
-#define _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
+_Wolframe::log::LogBackend* logBackendPtr;
 
-#include "processor/procProvider.hpp"
-#include "container.hpp"
-#include "database/database.hpp"
-#include "database/DBprovider.hpp"
+using namespace _Wolframe;
+using namespace _Wolframe::module;
+using namespace _Wolframe::test;
 
-#include <list>
-
-namespace _Wolframe {
-namespace proc {
-
-class ProcessorProvider::ProcessorProvider_Impl
+static void setModuleLogger( void* logger )
 {
-public:
-	ProcessorProvider_Impl( const ProcProviderConfig* conf,
-				const module::ModulesDirectory* modules);
-	~ProcessorProvider_Impl();
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
+}
 
-	bool resolveDB( const db::DatabaseProvider& db );
+DECLARE_COMMAND_HANDLER("echo_cmdhandler",EchoCommandHandlerObject,EchoCommandHandler)
 
-	Processor* processor();
-private:
-	std::string			m_dbLabel;
-	const db::Database*		m_db;
-	std::list< ProcessorUnit* >	m_proc;
+
+enum {NofObjects=1};
+static createObjectFunc objdef[ NofObjects] =
+{
+	EchoCommandHandlerObject::constructor
 };
 
-}} // namespace _Wolframe::proc
+ModuleEntryPoint entryPoint( 0, "test command handler", setModuleLogger, 0, 0, NofObjects, objdef);
 
-#endif // _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
+

@@ -29,26 +29,26 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/ddlcompiler/template/ddlcompilerObjectBuilder.hpp
-///\brief Interface template for object builder of form DDL compilers
-#ifndef _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "ddl/compilerInterface.hpp"
+///\file modules/cmdbind/template/commandHandlerObjectBuilder.hpp
+///\brief Interface template for object builder of peer command handlers
+#ifndef _Wolframe_MODULE_COMMAND_HANDLER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_MODULE_COMMAND_HANDLER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#include "cmdbind/commandHandler.hpp"
 #include "moduleInterface.hpp"
 #include "object.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-template <class CompilerInterface>
-class DDLCompilerObject :public Object, public CompilerInterface
+template <class CommandHandler>
+class CommandHandlerObject :public Object, public CommandHandler
 {
 public:
-	DDLCompilerObject( const char* name_)
-		:CompilerInterface()
+	CommandHandlerObject( const char* name_)
+		:CommandHandler()
 		,m_name(name_){}
 
-	virtual ~DDLCompilerObject(){}
+	virtual ~CommandHandlerObject(){}
 
 	virtual const char* objectName() const
 	{
@@ -59,19 +59,19 @@ private:
 	std::string m_name;
 };
 
-template <class CompilerInterface>
-class DDLCompilerObjectBuilder :public ObjectBuilder
+template <class CommandHandler>
+class CommandHandlerObjectBuilder :public ObjectBuilder
 {
 public:
-	DDLCompilerObjectBuilder( const char* name_)
+	CommandHandlerObjectBuilder( const char* name_)
 		:ObjectBuilder(name_)
 		,m_name(name_){}
 
-	virtual ~DDLCompilerObjectBuilder(){}
+	virtual ~CommandHandlerObjectBuilder(){}
 
 	virtual Object* object()
 	{
-		return new DDLCompilerObject<CompilerInterface>(m_name.c_str());
+		return new CommandHandlerObject<CommandHandler>(m_name.c_str());
 	}
 
 private:
@@ -80,17 +80,17 @@ private:
 
 }}//namespace
 
-#define DECLARE_DDLCOMPILER(NAME,CPPID,CCOBJ) \
+#define DECLARE_COMMAND_HANDLER(NAME,CPPID,OBJ) \
 namespace {\
 struct CPPID\
 {\
 	static ObjectBuilder* constructor()\
 	{\
-		return new DDLCompilerObjectBuilder<CCOBJ>(NAME);\
+		return new CommandHandlerObjectBuilder<OBJ>(NAME);\
 	}\
 };\
 }//anonymous namespace
-//end DECLARE_DDLCOMPILER
+//end DECLARE_COMMAND_HANDLER
 
 #endif
 

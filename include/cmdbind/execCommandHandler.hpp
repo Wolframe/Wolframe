@@ -36,7 +36,7 @@
 //        Includes also a 'Capa' command for showing the list of available commands
 #ifndef _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_EXEC_COMMAND_HANDLER_HPP_INCLUDED
-#include "cmdbind/commandHandler.hpp"
+#include "cmdbind/protocolCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
 #include "connectionHandler.hpp"
@@ -48,7 +48,7 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-class ExecCommandHandler :public CommandHandler
+class ExecCommandHandler :public ProtocolCommandHandler
 {
 public:
 	struct Command
@@ -64,7 +64,7 @@ public:
 	///\brief Constructor
 	///\param[in] rcmds_ array of commands that should return control to the caller
 	///\param[in] cmds_ array of command handlers with commands executed by this command handler
-	explicit ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_);
+	ExecCommandHandler( const std::vector<std::string>& rcmds_, const std::vector<Command>& cmds_);
 
 	///\brief Destructor
 	virtual ~ExecCommandHandler();
@@ -138,7 +138,7 @@ private:
 	int m_cmdidx;						//< command parsed
 	int m_nofParentCmds;					//< number of commands passed by the owner to get control back
 	std::vector<std::string> m_cmds;			//< list of commands available
-	CountedReference<CommandHandler> m_cmdhandler;		//< currently executed command
+	CountedReference<ProtocolCommandHandler> m_cmdhandler;	//< currently executed command
 	std::string m_capastr;					//< capability string to print
 	std::size_t m_capaitr;					//< index in capabilities
 };

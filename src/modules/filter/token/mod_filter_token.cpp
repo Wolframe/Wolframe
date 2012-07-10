@@ -47,7 +47,7 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-DECLARE_FILTER_OBJECT("token",			TokenFilterObject,			langbind::createTokenFilter)
+DECLARE_FILTER_OBJECT("token",		TokenFilterObject,		langbind::createTokenFilter)
 DECLARE_FILTER_OBJECT("token:UTF-8",	TokenFilterObject_UTF8,		langbind::createTokenFilter)
 DECLARE_FILTER_OBJECT("token:UTF-16BE",	TokenFilterObject_UTF16BE,	langbind::createTokenFilter)
 DECLARE_FILTER_OBJECT("token:UTF-16LE",	TokenFilterObject_UTF16LE,	langbind::createTokenFilter)

@@ -91,7 +91,7 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 	for (;;) switch (m_state)
 	{
 		case Terminated:
-			return CLOSED;
+			return CLOSE;
 
 		case FlushingOutput:
 			if (!(flt = m_outputfilter.get()))
@@ -187,7 +187,7 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 			}
 	}
 	LOG_ERROR << "illegal state";
-	return CLOSED;
+	return CLOSE;
 }
 
 

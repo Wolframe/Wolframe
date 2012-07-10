@@ -30,39 +30,39 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// Wolframe processor provider (group)
-//
-
-#ifndef _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
-#define _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
-
-#include "processor/procProvider.hpp"
-#include "container.hpp"
-#include "database/database.hpp"
-#include "database/DBprovider.hpp"
-
-#include <list>
+///\file cmdbind/protocolCommandHandler.hpp
+///\brief Interface to a command handler in the protocol context
+#ifndef _Wolframe_CMDBIND_PROTOCOL_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_CMDBIND_PROTOCOL_COMMAND_HANDLER_HPP_INCLUDED
+#include "countedReference.hpp"
+#include "commandHandler.hpp"
+#include <vector>
+#include <string>
 
 namespace _Wolframe {
-namespace proc {
+namespace cmdbind {
 
-class ProcessorProvider::ProcessorProvider_Impl
+class ProtocolCommandHandler :public CommandHandler
 {
 public:
-	ProcessorProvider_Impl( const ProcProviderConfig* conf,
-				const module::ModulesDirectory* modules);
-	~ProcessorProvider_Impl();
+	///\brief Defaul constructor
+	ProtocolCommandHandler(){}
 
-	bool resolveDB( const db::DatabaseProvider& db );
+	///\brief Destructor
+	virtual ~ProtocolCommandHandler(){}
 
-	Processor* processor();
-private:
-	std::string			m_dbLabel;
-	const db::Database*		m_db;
-	std::list< ProcessorUnit* >	m_proc;
+	///\brief Pass the parameters for processing
+	///\param [in] argc number of arguments of the protocol command
+	///\param [in] argv arguments of the protocol command
+	void passParameters( const std::string& nam, int argc, const char** argv);
+
+protected:
+	std::string m_name;				//< name of the command to execute
+	std::vector< std::string > m_argBuffer;		//< the command arguments
 };
 
-}} // namespace _Wolframe::proc
+typedef CountedReference<ProtocolCommandHandler> ProtocolCommandHandlerR;
 
-#endif // _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
+}}
+#endif
+

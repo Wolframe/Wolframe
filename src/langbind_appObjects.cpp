@@ -553,7 +553,7 @@ bool PeerFormFunctionClosure::call()
 			m_cmdop = m_cmd->nextOperation();
 			continue;
 
-		case cmdbind::CommandHandler::CLOSED:
+		case cmdbind::CommandHandler::CLOSE:
 			m_resultreader->putInput( "", 0, true);
 			if (!m_result.call())
 			{

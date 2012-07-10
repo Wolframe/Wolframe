@@ -43,7 +43,7 @@
 
 namespace _Wolframe {
 
-class EchoProcessor : public proc::Processor
+class EchoProcessorSlice : public proc::Processor
 {
 public:
 	~EchoProcessor()				{}

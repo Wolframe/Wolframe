@@ -185,7 +185,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					}
 					else
 					{
-						return CLOSED;
+						return CLOSE;
 					}
 				}
 				else
@@ -233,7 +233,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				if (m_cmdidx < m_nofParentCmds)
 				{
 					m_state = Terminate;
-					return CLOSED;
+					return CLOSE;
 				}
 				else if (m_cmdidx == m_nofParentCmds)
 				{
@@ -287,7 +287,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 						{
 							LOG_ERROR << "Command handler not found for '" << procname << "'";
 							m_statusCode = -1;
-							return CLOSED;
+							return CLOSE;
 						}
 						m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
 						m_state = Processing;
@@ -299,7 +299,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					{
 						LOG_ERROR << "Command handler creation thrown exception: " << e.what();
 						m_statusCode = -1;
-						return CLOSED;
+						return CLOSE;
 					}
 					continue;
 				}
@@ -322,7 +322,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 						case WRITE:
 							return WRITE;
 						break;
-						case CLOSED:
+						case CLOSE:
 							m_cmdhandler->getDataLeft( content, contentsize);
 							pos = (const char*)content - m_input.charptr();
 							m_input.setPos( pos + contentsize);
@@ -350,7 +350,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				{
 					LOG_ERROR << "Command execution thrown exception: " << e.what();
 					m_statusCode = -2;
-					return CLOSED;
+					return CLOSE;
 				}
 			}
 
@@ -387,12 +387,12 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 
 			case Terminate:
 			{
-				return CLOSED;
+				return CLOSE;
 			}
 		}//switch(..)
 	}//for(;;)
 
-	return CLOSED;
+	return CLOSE;
 }
 
 
