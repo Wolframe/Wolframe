@@ -60,7 +60,7 @@ private:
 class FormFunctionObjectBuilder :public ObjectBuilder
 {
 public:
-	FormFunctionObjectBuilder( const char* name_, langbind::FormFunction::Function f, const serialize::FiltermapDescriptionBase* p, const serialize::FiltermapDescriptionBase* r)
+	FormFunctionObjectBuilder( const char* name_, langbind::FormFunction::Function f, const serialize::StructDescriptionBase* p, const serialize::StructDescriptionBase* r)
 		:ObjectBuilder( name_)
 		,m_func(name_,langbind::FormFunction( f,p,r)){}
 

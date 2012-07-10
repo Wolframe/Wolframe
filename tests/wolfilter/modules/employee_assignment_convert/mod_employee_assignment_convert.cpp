@@ -48,8 +48,8 @@ static void setModuleLogger( void* logger )
 }
 
 
-static const serialize::FiltermapDescriptionBase* convertAssignmentListDoc_param = AssignmentListDoc::getFiltermapDescription();
-static const serialize::FiltermapDescriptionBase* convertAssignmentListDoc_result = AssignmentListDoc::getFiltermapDescription();
+static const serialize::StructDescriptionBase* convertAssignmentListDoc_param = AssignmentListDoc::getFiltermapDescription();
+static const serialize::StructDescriptionBase* convertAssignmentListDoc_result = AssignmentListDoc::getFiltermapDescription();
 
 DECLARE_FUNCTION("employee_assingment_convert",employee_assingment_convert_func,convertAssignmentListDoc,convertAssignmentListDoc_param,convertAssignmentListDoc_result)
 

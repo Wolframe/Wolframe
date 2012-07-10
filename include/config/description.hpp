@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file config/description.hpp
-///\brief Defines the description of a struct for the configuration parser to assign the values to the mebers by name
+///\brief Defines the description of a struct for the configuration parser to assign the values to the members by name
 
 #ifndef _Wolframe_CONFIG_DESCRIPTION_HPP_INCLUDED
 #define _Wolframe_CONFIG_DESCRIPTION_HPP_INCLUDED
