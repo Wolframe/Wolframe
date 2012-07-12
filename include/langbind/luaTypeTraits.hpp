@@ -33,12 +33,13 @@ Project Wolframe.
 ///\brief Type Traits for embedding types in lua binding
 #ifndef _Wolframe_LANGBIND_LUA_TYPE_TRAITS_HPP_INCLUDED
 #define _Wolframe_LANGBIND_LUA_TYPE_TRAITS_HPP_INCLUDED
+#include "langbind/luaException.hpp"
 #include <string>
 #include <stdexcept>
 #include <cstring>
-
 #include <boost/integer_traits.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/remove_const.hpp>
 
 extern "C"
 {
@@ -49,7 +50,6 @@ extern "C"
 
 namespace _Wolframe {
 namespace langbind {
-namespace traits {
 
 ///\brief Operators and Methods checked in this module
 template<typename TYPE>
@@ -75,75 +75,6 @@ struct Interface
 	bool operator ==( const TYPE&) const;
 };
 
-template<typename T>
-struct has_method_get_key
-{
-	typedef char small_type;
-	struct large_type {small_type dummy[2];};
-
-	template<bool (T::*)( const char* key, std::string& val) const> struct tester_member_signature;
-
-	template<typename U>
-	static small_type has_matching_member(tester_member_signature<&U::get >*);
-	template<typename U>
-	static large_type has_matching_member(...);
-
-	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
-};
-
-template<typename T>
-struct has_method_set_key
-{
-	typedef char small_type;
-	struct large_type {small_type dummy[2];};
-
-	template<bool (T::*)( const char* key, const std::string& val) const> struct tester_member_signature;
-	template<bool (T::*)( const char* key, const char* val) const> struct tester_charp_member_signature;
-
-	template<typename U>
-	static small_type has_matching_member(tester_member_signature<&U::set >*);
-	template<typename U>
-	static small_type has_matching_member(tester_charp_member_signature<&U::set >*);
-	template<typename U>
-	static large_type has_matching_member(...);
-
-	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
-};
-
-template<typename T>
-struct has_method_get
-{
-	typedef char small_type;
-	struct large_type {small_type dummy[2];};
-
-	template<bool (T::*)( std::string& val) const> struct tester_member_signature;
-
-	template<typename U>
-	static small_type has_matching_member(tester_member_signature<&U::get >*);
-	template<typename U>
-	static large_type has_matching_member(...);
-
-	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
-};
-
-template<typename T>
-struct has_method_set
-{
-	typedef char small_type;
-	struct large_type {small_type dummy[2];};
-
-	template<bool (T::*)( const std::string& val) const> struct tester_member_signature;
-	template<bool (T::*)( const char* val) const> struct tester_charp_member_signature;
-
-	template<typename U>
-	static small_type has_matching_member(tester_member_signature<&U::set >*);
-	template<typename U>
-	static small_type has_matching_member(tester_charp_member_signature<&U::set >*);
-	template<typename U>
-	static large_type has_matching_member(...);
-
-	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
-};
 
 template<typename T>
 struct has_operator_tostring
@@ -152,7 +83,7 @@ struct has_operator_tostring
 	struct large_type {small_type dummy[2];};
 
 	template<const std::string& (T::*)() const> struct tester_const_member_signature;
-	template<std::string (T::*)()> struct tester_member_signature;
+	template<std::string (T::*)() const> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::tostring >*);
@@ -181,28 +112,12 @@ struct has_operator_len
 };
 
 template<typename T>
-struct has_operator_pow
-{
-	typedef char small_type;
-	struct large_type {small_type dummy[2];};
-
-	template<T& (T::*)(unsigned int)> struct tester_member_signature;
-
-	template<typename U>
-	static small_type has_matching_member(tester_member_signature<&U::pow >*);
-	template<typename U>
-	static large_type has_matching_member(...);
-
-	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
-};
-
-template<typename T>
 struct has_operator_neg
 {
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<T& (T::*)()> struct tester_member_signature;
+	template<T (T::*)()> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::operator- >*);
@@ -218,7 +133,7 @@ struct has_operator_add
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<T& (T::*)( const T&)> struct tester_member_signature;
+	template<T (T::*)( const T&) const> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::operator+ >*);
@@ -234,7 +149,7 @@ struct has_operator_sub
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<T& (T::*)( const T&)> struct tester_member_signature;
+	template<T (T::*)( const T&) const> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::operator- >*);
@@ -250,7 +165,7 @@ struct has_operator_mul
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<T& (T::*)( const T&)> struct tester_member_signature;
+	template<T (T::*)( const T&) const> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::operator* >*);
@@ -266,7 +181,7 @@ struct has_operator_div
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<T& (T::*)( const T&)> struct tester_member_signature;
+	template<T (T::*)( const T&) const> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::operator/ >*);
@@ -324,522 +239,426 @@ struct has_operator_eq
 	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
 };
 
-template <class ObjectType>
-struct LuaGetValue
+template <class ArithmeticType, class MetaTypeInfo>
+struct LuaArithmeticType :public ArithmeticType
 {
-	static int exec( lua_State* ls)
-	{
-		ObjectType* self = ObjectType::get( ls, 1);
-		const char* key = lua_tostring( ls, 2);
-		if (!key) luaL_error( ls, "__index called with an invalid argument 2 (key)");
+	LuaArithmeticType( const std::string& str)
+		:ArithmeticType(str){}
+	LuaArithmeticType( const ArithmeticType& o)
+		:ArithmeticType(o){}
+	LuaArithmeticType(){}
 
-		bool rt = false;
-		bool overfl = false;
-		char valbuf[ 256];
-		std::size_t nn = 0;
-		try
-		{
-			std::string val;
-			rt = self->getValue( key, val);
-			nn = (overfl=(val.size() >= sizeof( valbuf)))?(sizeof(valbuf)-1):val.size();
-			std::memcpy( valbuf, val.c_str(), nn);
-			valbuf[ nn] = 0;
-		}
-		catch (const std::bad_alloc&)
-		{
-			return luaL_error( ls, "out of memory calling __index");
-		}
-		catch (const std::exception& e)
-		{
-			return luaL_error( ls, "__index called with illegal value (%s)", e.what());
-		}
-		if (rt)
-		{
-			if (overfl)
-			{
-				return luaL_error( ls, "__index variable size exceeds maximum size (%u)", sizeof(valbuf));
-			}
-			lua_pushlstring( ls, valbuf, nn);
-			return 1;
-		}
-		else
-		{
-			return luaL_error( ls, "__index called with unknown member name");
-		}
+	static void createMetatable( lua_State* ls)
+	{
+		luaL_newmetatable( ls, MetaTypeInfo::metatableName());
+
+		lua_pushliteral( ls, "__gc");
+		lua_pushcfunction( ls, &destroy);
+		lua_rawset( ls, -3);
+		lua_pop( ls, 1);
+	}
+
+	void* operator new (std::size_t num_bytes, lua_State* ls) throw (std::bad_alloc)
+	{
+		void* rt = lua_newuserdata( ls, num_bytes);
+		if (rt == 0) throw std::bad_alloc();
+		luaL_getmetatable( ls, MetaTypeInfo::metatableName());
+		lua_setmetatable( ls, -2);
+		return rt;
+	}
+
+	//\brief does nothing because the LUA garbage collector does the job.
+	//\warning CAUTION: DO NOT CALL THIS FUNCTION ! DOES NOT WORK ON MSVC 9.0. (The compiler links with the std delete) (just avoids C4291 warning)
+	void operator delete (void *, lua_State*) {}
+
+	static int destroy( lua_State* ls)
+	{
+		LuaArithmeticType *THIS = (LuaArithmeticType*)lua_touserdata( ls, 1);
+		if (THIS) THIS->~LuaArithmeticType();
 		return 0;
 	}
-};
 
-template <class ObjectType>
-struct LuaSetValue
-{
-	static int exec( lua_State* ls)
+	static void push_luastack( lua_State* ls, const ArithmeticType& o)
 	{
-		ObjectType* self = ObjectType::get( ls, 1);
-		const char* key = lua_tostring( ls, 2);
-		if (!key) luaL_error( ls, "__newindex called with an invalid argument 2 (key)");
-		const char* val = 0;
-		int tp = lua_type( ls, 3);
-
-		if (tp == LUA_TBOOLEAN)
-		{
-			val = lua_toboolean( ls, 3)?"true":"false";
-		}
-		else
-		{
-			val = lua_tostring( ls, 3);
-		}
-		if (!val) luaL_error( ls, "__newindex called with invalid argument 3 (value)");
-
 		try
 		{
-			if (!self->setValue( key, val))
-			{
-				luaL_error( ls, "__newindex called with unknown variable name");
-			}
-		}
-		catch (const std::bad_alloc&)
-		{
-			return luaL_error( ls, "out of memory calling __newindex");
-		}
-		catch (const std::exception& e)
-		{
-			return luaL_error( ls, "__newindex called with illegal value (%s)", e.what());
-		}
-		return 0;
-	}
-};
-
-template <class ObjectType>
-struct LuaAssignValue
-{
-	static int exec( lua_State* ls)
-	{
-		ObjectType* self = ObjectType::get( ls, 1);
-		char* operand = lua_tostring( ls, 2);
-		if (operand)
-		{
-			luaL_error( ls, "assigned value is not convertable to string");
-		}
-		try
-		{
-			if (!self->set( operand))
-			{
-				luaL_error( ls, "value cannot be assigned (conversion error): '%s'", operand);
-			}
-		}
-		catch (const std::bad_alloc&)
-		{
-			luaL_error( ls, "memory allocation error in lua context");
+			(void*)new (ls) LuaArithmeticType( o);
 		}
 		catch (const std::exception&)
 		{
-			luaL_error( ls, "calculation exception in lua context");
+			luaL_error( ls, "memory allocation error in lua context");
 		}
-		return 0;
+	}
+
+	static ArithmeticType* get( lua_State* ls, int index)
+	{
+		ArithmeticType* rt = (ArithmeticType*) luaL_testudata( ls, index, MetaTypeInfo::metatableName());
+		if (!rt)
+		{
+			const char* arg = lua_tostring( ls, index);
+			if (arg == 0) throw std::runtime_error( "cannot convert argument to arithmetic type");
+			LuaExceptionHandlerScope escope(ls);
+			{
+				(void)new (ls) LuaArithmeticType( std::string(arg));
+			}
+			rt = (ArithmeticType*) luaL_checkudata( ls, -1, MetaTypeInfo::metatableName());
+		}
+		return rt;
 	}
 };
 
-template <class ObjectType, ObjectType ObjectType::*method( const ObjectType& operand)>
-struct LuaBinOperator
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorAdd
 {
-	static int exec( lua_State* ls)
+	typedef LuaBinOperatorAdd This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
 	{
-		ObjectType* self = ObjectType::get( ls, 1);
-		ObjectType* operand = ObjectType::get( ls, 2);
-		try
+		LuaExceptionHandlerScope escope( ls);
 		{
-			ObjectType result = (self->*method)( *operand);
-			ObjectType::push_luastack( ls, result);
-		}
-		catch (const std::bad_alloc&)
-		{
-			luaL_error( ls, "memory allocation error in lua context");
-		}
-		catch (const std::exception&)
-		{
-			luaL_error( ls, "calculation exception in lua context");
+			ObjectType* self = ThisOperand::get( ls, 1);
+			ObjectType* operand = ThisOperand::get( ls, 2);
+			ThisOperand::push_luastack( ls, self->operator+( *operand));
 		}
 		return 1;
 	}
-};
-
-template <class ObjectType, typename OperandType, ObjectType ObjectType::*method( OperandType operand)>
-struct LuaBinOperatorOp
-{
-	static void getOperand( lua_State* ls, int index, unsigned int& x)
-	{
-		double value = lua_tonumber( ls, index);
-		lua_Integer vv = lua_tointeger( ls, index);
-		if (vv == 0)
-		{
-			lua_Number bb = lua_tonumber( ls, index);
-			if (bb < 0) bb = -bb;
-			if (bb < std::numeric_limits<double>::epsilon())
-			{
-				x = 0;
-			}
-			else
-			{
-				luaL_error( ls, "illegal operand (float) in operation");
-			}
-		}
-		else
-		{
-			if (vv < 0)
-			{
-				luaL_error( ls, "illegal operand (negative) in operation");
-			}
-			x = vv;
-		}
-	}
-
 	static int exec( lua_State* ls)
 	{
-		ObjectType* self = ObjectType::get( ls, 1);
-		OperandType operand;
-		getOperand( ls, 2, operand);
-		try
+		LuaFunctionCppCall<This> func;
+		return func.run( "__add", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorSub
+{
+	typedef LuaBinOperatorSub This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
 		{
-			ObjectType result = (self->*method)( operand);
-			ObjectType::push_luastack( ls, result);
-		}
-		catch (const std::bad_alloc&)
-		{
-			luaL_error( ls, "memory allocation error in lua context");
-		}
-		catch (const std::exception&)
-		{
-			luaL_error( ls, "calculation exception in lua context");
+			ObjectType* self = ThisOperand::get( ls, 1);
+			ObjectType* operand = ThisOperand::get( ls, 2);
+			ThisOperand::push_luastack( ls, self->operator-( *operand));
 		}
 		return 1;
 	}
-};
-
-template <class ObjectType, typename ResultType, ResultType ObjectType::*method()>
-struct LuaPrefixOperator
-{
-	static void push_luastack( lua_State* ls, const std::string& p)
-	{
-		lua_pushlstring( ls, p.c_str(), p.size());
-	}
-
-	static void push_luastack( lua_State* ls, std::size_t p)
-	{
-		lua_pushnumber( ls, p);
-	}
-
-	static void push_luastack( lua_State* ls, const ObjectType& p)
-	{
-		push_luastack( ls, p);
-	}
-
 	static int exec( lua_State* ls)
 	{
-		ObjectType* self = ObjectType::get( ls, 1);
-		try
+		LuaFunctionCppCall<This> func;
+		return func.run( "__sub", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorMul
+{
+	typedef LuaBinOperatorMul This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
 		{
-			ResultType result = (self->*method)();
-			push_luastack( ls, result);
-		}
-		catch (const std::bad_alloc&)
-		{
-			luaL_error( ls, "memory allocation error in lua context");
-		}
-		catch (const std::exception&)
-		{
-			luaL_error( ls, "calculation exception in lua context");
+			ObjectType* self = ThisOperand::get( ls, 1);
+			ObjectType* operand = ThisOperand::get( ls, 2);
+			ThisOperand::push_luastack( ls, self->operator*( *operand));
 		}
 		return 1;
 	}
-};
-
-template <class ObjectType, bool ObjectType::*method( const ObjectType& operand)>
-struct LuaCmpOperator
-{
 	static int exec( lua_State* ls)
 	{
-		ObjectType* self = ObjectType::get( ls, 1);
-		ObjectType* operand = ObjectType::get( ls, 2);
-		try
+		LuaFunctionCppCall<This> func;
+		return func.run( "__mul", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorDiv
+{
+	typedef LuaBinOperatorDiv This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
 		{
-			bool result = (self->*method)( *operand);
-			lua_pushboolean( ls, result);
-		}
-		catch (const std::bad_alloc&)
-		{
-			luaL_error( ls, "memory allocation error in lua context");
-		}
-		catch (const std::exception&)
-		{
-			luaL_error( ls, "calculation exception in lua context");
+			ObjectType* self = ThisOperand::get( ls, 1);
+			ObjectType* operand = ThisOperand::get( ls, 2);
+			ThisOperand::push_luastack( ls, self->operator/( *operand));
 		}
 		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__div", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaOperatorNeg
+{
+	typedef LuaOperatorNeg This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			ThisOperand::push_luastack( ls, self->operator-());
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__neg", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaOperatorToString
+{
+	typedef LuaOperatorToString This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			std::string content = self->tostring();
+			lua_pushlstring( ls, content.c_str(), content.size());
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__tostring", ls);
 	}
 };
 
 
-template <typename T>
+template <class ObjectType, class MetaTypeInfo>
+struct LuaCmpOperatorEqual
+{
+	typedef LuaCmpOperatorEqual This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			ObjectType* operand = ThisOperand::get( ls, 2);
+			lua_pushboolean( ls, self->operator==( *operand));
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__eq", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaCmpOperatorLessEqual
+{
+	typedef LuaCmpOperatorLessEqual This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			ObjectType* operand = ThisOperand::get( ls, 2);
+			lua_pushboolean( ls, self->operator<=( *operand));
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__le", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaCmpOperatorLessThan
+{
+	typedef LuaCmpOperatorLessThan This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			ObjectType* operand = ThisOperand::get( ls, 2);
+			lua_pushboolean( ls, self->operator<( *operand));
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__lt", ls);
+	}
+};
+
+
+template <typename T, typename M>
 typename boost::enable_if_c<
 	has_operator_eq<T>::value
 	,void>::type defineOperator_eq( lua_State* ls)
 {
 	lua_pushliteral( ls, "__eq");
-	bool (T::*cmp)( const T&) = &T::operator==;
-	int (*fun)( lua_State*) = &LuaCmpOperator< T, cmp>::exec;
-	lua_pushcfunction( ls, fun);
+	lua_CFunction f = &LuaCmpOperatorEqual<T,M>::exec;
+	lua_pushcfunction( ls, f);
 	lua_rawset( ls, -3);
 }
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	! has_operator_eq<T>::value
 	,void>::type defineOperator_eq( lua_State*)
 {}
 
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	has_operator_le<T>::value
 	,void>::type defineOperator_le( lua_State* ls)
 {
 	lua_pushliteral( ls, "__le");
-	bool (T::*cmp)( const T&) = &T::operator<=;
-	int (*fun)( lua_State*) = &LuaCmpOperator< T, cmp >::exec;
-	lua_pushcfunction( ls, fun);
+	lua_CFunction f = &LuaCmpOperatorLessEqual<T,M>::exec;
+	lua_pushcfunction( ls, f);
 	lua_rawset( ls, -3);
 }
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	! has_operator_le<T>::value
 	,void>::type defineOperator_le( lua_State*)
 {}
 
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	has_operator_lt<T>::value
 	,void>::type defineOperator_lt( lua_State* ls)
 {
 	lua_pushliteral( ls, "__lt");
-	bool (T::*cmp)( const T&) = &T::operator<;
-	int (*fun)( lua_State*) = &LuaCmpOperator< T, cmp >::exec;
-	lua_pushcfunction( ls, fun);
+	lua_CFunction f = &LuaCmpOperatorLessThan<T,M>::exec;
+	lua_pushcfunction( ls, f);
 	lua_rawset( ls, -3);
 }
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	! has_operator_lt<T>::value
 	,void>::type defineOperator_lt( lua_State*)
 {}
 
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	has_operator_tostring<T>::value
 	,void>::type defineOperator_tostring( lua_State* ls)
 {
 	lua_pushliteral( ls, "__tostring");
-	std::string (T::*call)() = &T::tostring;
-	int (*fun)( lua_State*) = LuaPrefixOperator< T, std::string, call >::exec;
-	lua_pushcfunction( ls, fun );
+	lua_CFunction f = &LuaOperatorToString<T,M>::exec;
+	lua_pushcfunction( ls, f);
 	lua_rawset( ls, -3);
 }
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	! has_operator_tostring<T>::value
 	,void>::type defineOperator_tostring( lua_State*)
 {}
 
-template <typename T>
-typename boost::enable_if_c<
-	has_operator_len<T>::value
-	,void>::type defineOperator_len( lua_State* ls)
-{
-	lua_pushliteral( ls, "__len");
-	std::size_t (T::*call)() = &T::len;
-	int (*fun)( lua_State*) = LuaPrefixOperator< T, std::size_t, call >::exec;
-	lua_pushcfunction( ls, fun);
-	lua_rawset( ls, -3);
-}
-template <typename T>
-typename boost::enable_if_c<
-	! has_operator_len<T>::value
-	,void>::type defineOperator_len( lua_State*)
-{}
-
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	has_operator_neg<T>::value
 	,void>::type defineOperator_neg( lua_State* ls)
 {
 	lua_pushliteral( ls, "__unm");
-	T (T::*call)() = &T::operator-;
-	int (*fun)( lua_State*) = &LuaPrefixOperator<T, T, call >::exec;
-	lua_pushcfunction( ls, fun);
+	lua_CFunction f = &LuaOperatorNeg<T,M>::exec;
+	lua_pushcfunction( ls, f);
 	lua_rawset( ls, -3);
 }
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	! has_operator_neg<T>::value
 	,void>::type defineOperator_neg( lua_State*)
 {}
 
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	has_operator_add<T>::value
 	,void>::type defineOperator_add( lua_State* ls)
 {
 	lua_pushliteral( ls, "__add");
-	T (T::*call)( const T&) = &T::operator+;
-	int (*fun)( lua_State*) = &LuaBinOperator<T, call>::exec;
-	lua_pushcfunction( ls, fun);
+	lua_CFunction f = &LuaBinOperatorAdd<T,M>::exec;
+	lua_pushcfunction( ls, f);
 	lua_rawset( ls, -3);
 }
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	! has_operator_add<T>::value
 	,void>::type defineOperator_add( lua_State*)
 {}
 
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	has_operator_sub<T>::value
 	,void>::type defineOperator_sub( lua_State* ls)
 {
 	lua_pushliteral( ls, "__sub");
-	T (T::*call)( const T&) = &T::operator-;
-	int (*fun)( lua_State*) = &LuaBinOperator<T, call>::exec;
-	lua_pushcfunction( ls, fun);
+	lua_CFunction f = &LuaBinOperatorSub<T,M>::exec;
+	lua_pushcfunction( ls, f);
 	lua_rawset( ls, -3);
 }
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	! has_operator_sub<T>::value
 	,void>::type defineOperator_sub( lua_State*)
 {}
 
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	has_operator_div<T>::value
 	,void>::type defineOperator_div( lua_State* ls)
 {
 	lua_pushliteral( ls, "__div");
-	T (T::*call)( const T&) = &T::operator/;
-	int (*fun)( lua_State*) = &LuaBinOperator<T, call>::exec;
-	lua_pushcfunction( ls, fun);
+	lua_CFunction f = &LuaBinOperatorDiv<T,M>::exec;
+	lua_pushcfunction( ls, f);
 	lua_rawset( ls, -3);
 }
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	! has_operator_div<T>::value
 	,void>::type defineOperator_div( lua_State*)
 {}
 
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	has_operator_mul<T>::value
 	,void>::type defineOperator_mul( lua_State* ls)
 {
 	lua_pushliteral( ls, "__mul");
-	T (T::*call)( const T&) = &T::operator*;
-	int (*fun)( lua_State*) = &LuaBinOperator<T, call>::exec;
-	lua_pushcfunction( ls, fun);
+	lua_CFunction f = &LuaBinOperatorMul<T,M>::exec;
+	lua_pushcfunction( ls, f);
 	lua_rawset( ls, -3);
 }
-template <typename T>
+template <typename T, typename M>
 typename boost::enable_if_c<
 	! has_operator_mul<T>::value
 	,void>::type defineOperator_mul( lua_State*)
 {}
 
-template <typename T>
-typename boost::enable_if_c<
-	has_operator_pow<T>::value
-	,void>::type defineOperator_pow( lua_State* ls)
-{
-	lua_pushliteral( ls, "__pow");
-	T (T::*call)( unsigned int) = &T::pow;
-	int (*fun)( lua_State*) = &LuaBinOperatorOp<T, unsigned int, call>::exec;
-	lua_pushcfunction( ls, fun);
-	lua_rawset( ls, -3);
-}
-template <typename T>
-typename boost::enable_if_c<
-	! has_operator_pow<T>::value
-	,void>::type defineOperator_pow( lua_State*)
-{}
-
-
-template <typename T>
-typename boost::enable_if_c<
-	has_method_get_key<T>::value
-	,void>::type defineMethod_index( lua_State* ls)
-{
-	lua_pushliteral( ls, "__index");
-	int (*fun)( lua_State*) = &LuaGetValue<T>::exec;
-	lua_pushcfunction( ls, fun);
-	lua_rawset( ls, -3);
-}
-template <typename T>
-typename boost::enable_if_c<
-	! has_method_get_key<T>::value
-	,void>::type defineMethod_index( lua_State* ls)
-{
-	lua_pushliteral( ls, "__index");
-	lua_pushvalue( ls, -2);
-	lua_rawset( ls, -3);
-}
-
-template <typename T>
-typename boost::enable_if_c<
-	has_method_set_key<T>::value
-	,void>::type defineMethod_newindex( lua_State* ls)
-{
-	lua_pushliteral( ls, "__newindex");
-	int (*fun)( lua_State*) = &LuaSetValue<T>::exec;
-	lua_pushcfunction( ls, fun);
-	lua_rawset( ls, -3);
-}
-template <typename T>
-typename boost::enable_if_c<
-	! has_method_set_key<T>::value
-	,void>::type defineMethod_newindex( lua_State* ls)
-{
-	lua_pushliteral( ls, "__newindex");
-	lua_pushvalue( ls, -2);
-	lua_rawset( ls, -3);
-}
-
-template <typename T>
-typename boost::enable_if_c<
-	has_method_get<T>::value
-	,void>::type defineMethod_get( lua_State* ls)
-{
-	lua_pushliteral( ls, "get");
-	std::string (T::*call)() = &T::tostring;
-	int (*fun)( lua_State*) = LuaPrefixOperator< T, std::string, call >::exec;
-	lua_pushcfunction( ls, fun );
-	lua_rawset( ls, -3);
-}
-template <typename T>
-typename boost::enable_if_c<
-	! has_method_get<T>::value
-	,void>::type defineMethod_get( lua_State*)
-{}
-
-template <typename T>
-typename boost::enable_if_c<
-	has_method_set<T>::value
-	,void>::type defineMethod_set( lua_State* ls)
-{
-	lua_pushliteral( ls, "set");
-	int (*fun)( lua_State*) = &LuaAssignValue<T>::exec;
-	lua_pushcfunction( ls, fun);
-	lua_rawset( ls, -3);
-}
-template <typename T>
-typename boost::enable_if_c<
-	! has_method_set<T>::value
-	,void>::type defineMethod_set( lua_State*)
-{}
-
-}}} //namespace
+}} //namespace
 #endif
 

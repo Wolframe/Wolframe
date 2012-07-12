@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file types_bignum.cpp
+///\file langbind_luaBignum.cpp
 ///\brief Implements a bignum type for Lua
-#include "types/bignum.hpp"
 #include "langbind/luaBignum.hpp"
+#include "types/bcdArithmetic.hpp"
 #include "langbind/luaTypeTraits.hpp"
 #include "langbind/luaTypeArithmetic.hpp"
 #include <limits>
@@ -46,27 +46,25 @@ extern "C"
 using namespace _Wolframe;
 using namespace langbind;
 
-namespace luaname
-{
-	static const char* Bignum = "wolframe.bignum";
-}
-
-struct LuaBignumMetaInfo :public types::Bignum
+struct LuaBignumMetaInfo :public types::BigBCD
 {
 	static const char* metatableName()
 	{
-		return luaname::Bignum;
+		return "wolframe.bcdnumber";
 	}
-
-
+	static const char* typeName()
+	{
+		return "bcdnumber";
+	}
 };
 
-typedef LuaArithmenticTypeTemplate<types::Bignum, LuaBignumMetaInfo> LuaBignum;
+typedef LuaArithmeticType<types::BigBCD, LuaBignumMetaInfo> LuaBigBCD;
+typedef LuaArithmeticTypeConstructor<types::BigBCD, LuaBignumMetaInfo> ConstructorLuaBigBCD;
 
 int _Wolframe::langbind::initBignumModule( lua_State* ls)
 {
-	LuaBignum::createMetatable( ls);
-	lua_register( ls, "bignum", &LuaBignum::create);
+	createLuaArithmeticTypeMetatable<types::BigBCD, LuaBignumMetaInfo>( ls);
+	lua_register( ls, "bcdnumber", &ConstructorLuaBigBCD::create);
 	return 0;
 }
 

@@ -53,6 +53,7 @@ class GlobalContext
 	,public DDLCompilerMap
 	,public FormFunctionMap
 #if WITH_LUA
+	,public LuaModuleMap
 	,public LuaFunctionMap
 #endif
 {

@@ -43,14 +43,16 @@ namespace types {
 class BigBCD
 {
 public:
+	BigBCD();
 	BigBCD( const std::string& numstr);
 	BigBCD( const BigBCD& o);
 	~BigBCD();
 
 	std::string tostring() const;
 
-	BigBCD operator +( const BigBCD& opr);
-	BigBCD operator -( const BigBCD& opr);
+	BigBCD operator +( const BigBCD& opr) const	{return add( opr);}
+	BigBCD operator -( const BigBCD& opr) const	{return sub( opr);}
+	BigBCD operator -() const			{return neg();}
 
 	bool isValid() const;
 
@@ -58,9 +60,13 @@ private:
 	void init( std::size_t size_, bool sign_);
 	void expand( std::size_t addsize);
 
-	BigBCD( std::size_t n, bool sgn);
-	static void digits_addition( BigBCD& dest, BigBCD& this_, const BigBCD& opr, boost::uint32_t& carrybit);
-	static void digits_subtraction( BigBCD& dest, BigBCD& this_, const BigBCD& opr);
+	explicit BigBCD( std::size_t n, bool sgn=true);
+
+	static void digits_addition( BigBCD& dest, const BigBCD& this_, const BigBCD& opr, boost::uint32_t& carrybit);
+	static void digits_subtraction( BigBCD& dest, const BigBCD& this_, const BigBCD& opr);
+	BigBCD add( const BigBCD& opr) const;
+	BigBCD sub( const BigBCD& opr) const;
+	BigBCD neg() const				{BigBCD rt(*this); rt.m_sign = !rt.m_sign; return rt;}
 
 	std::size_t m_size;
 	boost::uint32_t* m_ar;

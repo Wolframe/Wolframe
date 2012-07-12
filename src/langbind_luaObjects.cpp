@@ -35,6 +35,7 @@ Project Wolframe.
 #include "langbind/luaDebug.hpp"
 #include "langbind/luaException.hpp"
 #include "langbind/luaGetFunctionClosure.hpp"
+#include "langbind/luaBignum.hpp"
 #include "filter/luafilter.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
@@ -1479,6 +1480,9 @@ LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
 	m_ls = luaL_newstate();
 	if (!m_ls) throw std::runtime_error( "failed to create lua state");
 
+	GlobalContext* gc = getGlobalContext();
+	if (!gc) throw std::runtime_error( "lost global context");
+
 	LuaExceptionHandlerScope luaThrows(m_ls);
 	{
 		// create thread and prevent garbage collecting of it (http://permalink.gmane.org/gmane.comp.lang.lua.general/22680)
@@ -1499,16 +1503,13 @@ LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
 		Logger logger_;
 		LuaObject<Logger>::createGlobal( m_ls, "logger", logger_, logger_methodtable);
 
-		// open additional libraries defined for this script
-		std::vector<LuaScript::Module>::const_iterator ii=m_script->modules().begin(), ee=m_script->modules().end();
-		for (;ii!=ee; ++ii)
+		// open additional Lua libraries defined for this script
+		std::vector<std::string>::const_iterator ii=m_script->modules().begin(), ee=m_script->modules().end();
+		for ( ; ii != ee; ++ii)
 		{
-			if (ii->m_initializer( m_ls))
-			{
-				std::ostringstream buf;
-				buf << "module '" << ii->m_name << "' initialization failed: " << lua_tostring( m_ls, -1);
-				throw std::runtime_error( buf.str());
-			}
+			LuaModule mod;
+			if (!gc->getLuaModule( *ii, mod)) throw std::runtime_error( std::string( "module '") + *ii + "' not found");
+			mod.load( m_ls);
 		}
 
 		// call main, we may have to initialize LUA modules there
@@ -1528,6 +1529,46 @@ LuaScriptInstance::~LuaScriptInstance()
 		luaL_unref( m_ls, LUA_REGISTRYINDEX, m_threadref);
 		lua_close( m_ls);
 	}
+}
+
+void LuaModule::load( lua_State* ls)
+{
+	LuaExceptionHandlerScope luaThrows(ls);
+	{
+		if (!m_initializer) throw std::runtime_error( "Module entry point not defined (null)");
+		if (m_initializer( ls) != 0)
+		{
+			std::ostringstream buf;
+			buf << "Unable to call main entry of lua module '" << m_name << "' (" << lua_tostring( ls, -1 ) << ")";
+			throw std::runtime_error( buf.str());
+		}
+	}
+}
+
+LuaModuleMap::LuaModuleMap()
+{
+	// Load Lua standard modules
+	langbind::LuaModule modbcd( "bcdnumber", langbind::initBignumModule);
+	defineLuaModule( "bcdnumber", modbcd);
+}
+
+void LuaModuleMap::defineLuaModule( const std::string& name, const LuaModule& mod)
+{
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	std::map<std::string,LuaModule>::const_iterator ii=m_map.find( nam),ee=m_map.end();
+	if (ii != ee) throw std::runtime_error( (std::string("duplicate definition of lua module '") + nam + "'").c_str());
+	m_map[ nam] = mod;
+}
+
+bool LuaModuleMap::getLuaModule( const std::string& name, LuaModule& rt) const
+{
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	std::map<std::string,LuaModule>::const_iterator ii=m_map.find( nam),ee=m_map.end();
+	if (ii == ee) return false;
+	rt = ii->second;
+	return true;
 }
 
 LuaFunctionMap::~LuaFunctionMap()

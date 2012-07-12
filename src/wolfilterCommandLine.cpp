@@ -62,6 +62,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 		( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 		( "form,r", po::value< std::vector<std::string> >(), "specify form to load by path" )
 		( "function,t", po::value< std::vector<std::string> >(), "specify form to form function (transaction)" )
+		( "lua-import", po::value< std::vector<std::string> >(), "specify additional lua modules to use by name" )
 		( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
 		( "cmd", po::value<std::string>(), "name of the command to execute")
 		( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
@@ -124,6 +125,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 			m_peerformfunctions.push_back( pfp);
 		}
 	}
+	if (vmap.count( "lua-import")) m_luaimports = vmap["lua-import"].as<std::vector<std::string> >();
 	if (vmap.count( "script")) m_scripts = vmap["script"].as<std::vector<std::string> >();
 	if (vmap.count( "cmd")) m_cmd = vmap["cmd"].as<std::string>();
 	if (vmap.count( "input-filter")) m_inputfilter = vmap["input-filter"].as<std::string>();
@@ -198,6 +200,11 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath, 
 		{
 			std::string scriptpath( canonicalPath( *itr, referencePath));
 			langbind::LuaScript script( scriptpath);
+			std::vector<std::string>::const_iterator mi,me;
+			for (mi=m_luaimports.begin(),me=m_luaimports.end(); mi != me; ++mi)
+			{
+				script.addModule( *mi);
+			}
 			std::vector<std::string>::const_iterator fi = script.functions().begin(), fe = script.functions().end();
 			for (; fi != fe; ++fi)
 			{

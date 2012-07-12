@@ -86,7 +86,7 @@ struct LuaFunctionCppCall
 };
 
 ///\class LuaExceptionHandlerScope
-///\brief Class for calling lua function in a C++ scope. Lua longjumps are catched and translated to C++ exceptions
+///\brief Class for calling a Lua function in a C++ scope. Lua longjumps are catched and translated to C++ exceptions
 class LuaExceptionHandlerScope
 {
 public:

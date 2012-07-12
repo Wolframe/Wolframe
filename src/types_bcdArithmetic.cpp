@@ -60,12 +60,23 @@ void BigBCD::expand( std::size_t addsize)
 	m_size = newsize;
 }
 
+BigBCD::BigBCD()
+{
+	init( 0, true);
+}
+
 BigBCD::BigBCD( std::size_t n, bool sgn)
+	:m_size(0)
+	,m_ar(0)
+	,m_sign(false)
 {
 	init( n, sgn);
 }
 
 BigBCD::BigBCD( const std::string& numstr)
+	:m_size(0)
+	,m_ar(0)
+	,m_sign(false)
 {
 	unsigned int ii = numstr.size();
 	unsigned int gg;
@@ -96,6 +107,9 @@ BigBCD::BigBCD( const std::string& numstr)
 }
 
 BigBCD::BigBCD( const BigBCD& o)
+	:m_size(0)
+	,m_ar(0)
+	,m_sign(false)
 {
 	init( m_size, m_sign);
 	std::memcpy( m_ar, o.m_ar, m_size * sizeof(*m_ar));
@@ -165,7 +179,7 @@ static boost::uint32_t checkvalue( boost::uint32_t a)
 	return (t2 & 0x11111110);
 }
 
-static boost::uint32_t add( boost::uint32_t a, boost::uint32_t b)
+static boost::uint32_t add_bcd( boost::uint32_t a, boost::uint32_t b)
 {
 	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
 	boost::uint32_t t1,t2,t3,t4,t5,t6;
@@ -216,9 +230,9 @@ static boost::uint32_t decrement( boost::uint32_t a)
 }
 #endif
 
-static boost::uint32_t sub( boost::uint32_t a, boost::uint32_t b)
+static boost::uint32_t sub_bcd( boost::uint32_t a, boost::uint32_t b)
 {
-	return add( a, tencomp(b));
+	return add_bcd( a, tencomp(b));
 }
 
 static boost::uint32_t getcarry( boost::uint32_t& a)
@@ -239,7 +253,7 @@ bool BigBCD::isValid() const
 	return (chkval == 0);
 }
 
-void BigBCD::digits_addition( BigBCD& rt, BigBCD& this_, const BigBCD& opr, boost::uint32_t& carry)
+void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr, boost::uint32_t& carry)
 {
 	std::size_t ii = 0, nn = rt.m_size;
 	carry = 0;
@@ -247,11 +261,11 @@ void BigBCD::digits_addition( BigBCD& rt, BigBCD& this_, const BigBCD& opr, boos
 	{
 		boost::uint32_t op1 = (ii>=this_.m_size)?0:this_.m_ar[ii];
 		boost::uint32_t op2 = (ii>=opr.m_size)?0:opr.m_ar[ii];
-		boost::uint32_t res = add( op1, op2);
+		boost::uint32_t res = add_bcd( op1, op2);
 #if USE_OWN_INCREMENT
 		if (carry) rt.m_ar[ ii] = increment( res);
 #else
-		rt.m_ar[ ii] = add( res, carry);
+		rt.m_ar[ ii] = add_bcd( res, carry);
 #endif
 		carry = getcarry( carry);
 	}
@@ -270,7 +284,7 @@ void BigBCD::digits_addition( BigBCD& rt, BigBCD& this_, const BigBCD& opr, boos
 	}
 }
 
-void BigBCD::digits_subtraction( BigBCD& rt, BigBCD& this_, const BigBCD& opr)
+void BigBCD::digits_subtraction( BigBCD& rt, const BigBCD& this_, const BigBCD& opr)
 {
 	std::size_t ii = 0, nn = rt.m_size;
 	boost::uint32_t carry = 0;
@@ -278,11 +292,11 @@ void BigBCD::digits_subtraction( BigBCD& rt, BigBCD& this_, const BigBCD& opr)
 	{
 		boost::uint32_t op1 = (ii>=this_.m_size)?0:this_.m_ar[ii];
 		boost::uint32_t op2 = (ii>=opr.m_size)?0:opr.m_ar[ii];
-		boost::uint32_t res = sub( op1, op2);
+		boost::uint32_t res = sub_bcd( op1, op2);
 #if USE_OWN_INCREMENT
 		if (carry) rt.m_ar[ ii] = decrement( res);
 #else
-		rt.m_ar[ ii] = sub( res, carry);
+		rt.m_ar[ ii] = sub_bcd( res, carry);
 #endif
 	}
 	if (carry)
@@ -299,7 +313,7 @@ void BigBCD::digits_subtraction( BigBCD& rt, BigBCD& this_, const BigBCD& opr)
 	}
 }
 
-BigBCD BigBCD::operator +( const BigBCD& opr)
+BigBCD BigBCD::add( const BigBCD& opr) const
 {
 	boost::uint32_t carry;
 	std::size_t nn = (opr.m_size > m_size)?opr.m_size:m_size;
@@ -315,7 +329,7 @@ BigBCD BigBCD::operator +( const BigBCD& opr)
 	return rt;
 }
 
-BigBCD BigBCD::operator -( const BigBCD& opr)
+BigBCD BigBCD::sub( const BigBCD& opr) const
 {
 	boost::uint32_t carry;
 	std::size_t nn = (opr.m_size > m_size)?opr.m_size:m_size;

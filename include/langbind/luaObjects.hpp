@@ -48,18 +48,20 @@ extern "C" {
 namespace _Wolframe {
 namespace langbind {
 
-class LuaScript
+class LuaModule
 {
 public:
-	struct Module
-	{
-		std::string m_name;
-		lua_CFunction m_initializer;
+	LuaModule()						:m_initializer(0){}
+	LuaModule( const LuaModule& o)				:m_name(o.m_name),m_initializer(o.m_initializer){}
+	LuaModule( const std::string& n, const lua_CFunction f)	:m_name(n),m_initializer(f){}
+	void load( lua_State* ls);
+private:
+	std::string m_name;
+	lua_CFunction m_initializer;
+};
 
-		Module( const Module& o)				:m_name(o.m_name),m_initializer(o.m_initializer){}
-		Module( const std::string& n, const lua_CFunction f)	:m_name(n),m_initializer(f){}
-	};
-
+class LuaScript
+{
 public:
 	LuaScript( const std::string& path_);
 	LuaScript( const LuaScript& o)
@@ -69,15 +71,15 @@ public:
 		,m_content(o.m_content){}
 	~LuaScript(){}
 
-	void addModule( const std::string& n, lua_CFunction f)		{m_modules.push_back( Module( n, f));}
+	void addModule( const std::string& name)			{m_modules.push_back( name);}
 
-	const std::vector<Module>& modules() const			{return m_modules;}
+	const std::vector<std::string>& modules() const			{return m_modules;}
 	const std::vector<std::string>& functions() const		{return m_functions;}
 	const std::string& path() const					{return m_path;}
 	const std::string& content() const				{return m_content;}
 
 private:
-	std::vector<Module> m_modules;
+	std::vector<std::string> m_modules;
 	std::vector<std::string> m_functions;
 	std::string m_path;
 	std::string m_content;
@@ -91,6 +93,7 @@ public:
 
 	lua_State* ls()				{return m_ls;}
 	lua_State* thread()			{return m_thread;}
+	const LuaScript* script() const		{return m_script;}
 private:
 	lua_State* m_ls;
 	lua_State* m_thread;
@@ -102,6 +105,21 @@ private:
 };
 
 typedef CountedReference<LuaScriptInstance> LuaScriptInstanceR;
+
+
+///\class LuaModuleMap
+///\brief Map of available Lua functions
+class LuaModuleMap
+{
+public:
+	LuaModuleMap();
+
+	void defineLuaModule( const std::string& name, const LuaModule& script);
+	bool getLuaModule( const std::string& name, LuaModule& rt) const;
+
+private:
+	std::map<std::string,LuaModule> m_map;
+};
 
 
 ///\class LuaFunctionMap

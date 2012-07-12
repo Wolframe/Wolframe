@@ -85,6 +85,7 @@ public:
 	bool printhelp() const								{return m_printhelp;}
 	bool printversion() const							{return m_printversion;}
 	const std::string& inputfile() const						{return m_inputfile;}
+	const std::vector<std::string>& luaimports() const				{return m_luaimports;}
 	const std::vector<std::string>& scripts() const					{return m_scripts;}
 	const std::vector<std::string>& modules() const					{return m_modules;}
 	const std::vector<FormParam>& forms() const					{return m_forms;}
@@ -105,6 +106,7 @@ private:
 	bool m_printhelp;
 	bool m_printversion;
 	std::string m_inputfile;
+	std::vector<std::string> m_luaimports;
 	std::vector<std::string> m_scripts;
 	std::vector<std::string> m_modules;
 	std::vector<FormParam> m_forms;
