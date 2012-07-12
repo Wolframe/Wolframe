@@ -603,12 +603,12 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 
 LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 {
-	DDLForm* form = LuaObject<DDLForm>::getSelf( ls, "form", "table");
-
+	DDLForm* form;
 	serialize::DDLStructSerializer* result;
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
+		form = LuaObject<DDLForm>::getSelf( ls, "form", "table");
 		check_parameters( ls, 1, 0);
 		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
 		LuaObject<serialize::DDLStructSerializer>::push_luastack( ls, serialize::DDLStructSerializer( form->structure()));
@@ -617,11 +617,13 @@ LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 	}
 	else
 	{
+		form = (DDLForm*)lua_touserdata( ls, -2);
 		result = (serialize::DDLStructSerializer*)lua_touserdata( ls, -1);
-		lua_pop( ls, 1);
+		lua_pop( ls, 2);
 	}
 	if (!result->call())
 	{
+		lua_pushlightuserdata( ls, form);
 		lua_pushlightuserdata( ls, result);
 		lua_yieldk( ls, 0, 1, function_form_table);
 	}
@@ -705,11 +707,11 @@ LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_struct_tostring)
 
 LUA_FUNCTION_THROWS( "<structure>:table()", function_struct_table)
 {
-	serialize::StructSerializer* obj = LuaObject<serialize::StructSerializer>::getSelf( ls, "<structure>", "table");
-
+	serialize::StructSerializer* obj;
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
+		obj = LuaObject<serialize::StructSerializer>::getSelf( ls, "<structure>", "table");
 		check_parameters( ls, 1, 0);
 		obj->init( TypedOutputFilterR( new LuaTableOutputFilter( ls)), serialize::Context::SerializeWithIndices);
 	}
@@ -762,21 +764,23 @@ LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_typedinputfilter_tostr
 
 LUA_FUNCTION_THROWS( "<structure>:table()", function_typedinputfilter_table)
 {
-	TypedInputFilterR* obj = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "table");
-
+	TypedInputFilterR* obj;
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
+		obj = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "table");
 		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
 		LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( *obj, outp));
 		RedirectFilterClosure* closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
 		lua_pushvalue( ls, 2);			//... iterator argument
 		lua_pushlightuserdata( ls, closure);	//... redirect closure object
 	}
+	obj = (TypedInputFilterR*)lua_touserdata( ls, -2);
 	RedirectFilterClosure* closure = (RedirectFilterClosure*)lua_touserdata( ls, -1);
-	lua_pop( ls, 1);
+	lua_pop( ls, 2);
 	if (!closure->call())
 	{
+		lua_pushlightuserdata( ls, obj);
 		lua_pushlightuserdata( ls, closure);
 		lua_yieldk( ls, 0, 1, function_typedinputfilter_table);
 	}
@@ -957,11 +961,11 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 {
 	const char* item[2] = {0,0};
 	std::size_t itemsize[2] = {0,0};
-
-	Output* output = LuaObject<Output>::getSelf( ls, "output", "print");
+	Output* output;
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
+		output = LuaObject<Output>::getSelf( ls, "output", "print");
 		switch (lua_gettop( ls))
 		{
 			case 1:
@@ -993,13 +997,20 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 	}
 	else
 	{
-		item[0] = lua_tolstring( ls, -2, &itemsize[0]);
-		item[1] = lua_tolstring( ls, -1, &itemsize[1]);
+		item[0] = (const char*)lua_touserdata( ls, -5);
+		itemsize[0] = (std::size_t)lua_tointeger( ls, -4);
+		item[1] = (const char*)lua_touserdata( ls, -3);
+		itemsize[1] = (std::size_t)lua_tointeger( ls, -2);
+		output = (Output*)lua_touserdata( ls, -1);
+		lua_pop( ls, 5);
 	}
 	if (!output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 	{
-		lua_pushlstring( ls, item[0], itemsize[0]);
-		lua_pushlstring( ls, item[1], itemsize[1]);
+		lua_pushlightuserdata( ls, const_cast<void*>( (const void*)item[0]));
+		lua_pushinteger( ls, itemsize[0]);
+		lua_pushlightuserdata( ls, const_cast<void*>( (const void*)item[1]));
+		lua_pushinteger( ls, itemsize[1]);
+		lua_pushlightuserdata( ls, output);
 		lua_yieldk( ls, 0, 1, function_output_print);
 	}
 	return 0;
@@ -1008,13 +1019,29 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 
 LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 {
-	Output* output = LuaObject<Output>::getSelf( ls, "output", "opentag");
-	check_parameters( ls, 1, 1, LUA_TSTRING);
-	const char* tag = lua_tostring( ls, 2);
-	std::size_t tagsize = std::strlen( tag);
-
+	Output* output;
+	const char* tag;
+	std::size_t tagsize;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		output = LuaObject<Output>::getSelf( ls, "output", "opentag");
+		check_parameters( ls, 1, 1, LUA_TSTRING);
+		tag = lua_tostring( ls, 2);
+		tagsize = std::strlen( tag);
+	}
+	else
+	{
+		tag = (const char*)lua_touserdata( ls, -3);
+		tagsize = (std::size_t)lua_tointeger( ls, -2);
+		output = (Output*)lua_touserdata( ls, -1);
+		lua_pop( ls, 3);
+	}
 	if (!output->print( tag, tagsize, 0/*val*/, 0))
 	{
+		lua_pushlightuserdata( ls, const_cast<void*>( (const void*)tag));
+		lua_pushinteger( ls, tagsize);
+		lua_pushlightuserdata( ls, output);
 		lua_yieldk( ls, 0, 1, function_output_opentag);
 	}
 	return 0;
@@ -1023,11 +1050,21 @@ LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 
 LUA_FUNCTION_THROWS( "output:closetag(..)", function_output_closetag)
 {
-	Output* output = LuaObject<Output>::getSelf( ls, "output", "closetag");
-	check_parameters( ls, 1, 0);
-
+	Output* output;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		output = LuaObject<Output>::getSelf( ls, "output", "closetag");
+		check_parameters( ls, 1, 0);
+	}
+	else
+	{
+		output = (Output*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
 	if (!output->print( 0/*tag*/, 0, 0/*val*/, 0))
 	{
+		lua_pushlightuserdata( ls, output);
 		lua_yieldk( ls, 0, 1, function_output_closetag);
 	}
 	return 0;
@@ -1107,9 +1144,18 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 
 LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 {
-	Input* input = LuaObject<Input>::getSelf( ls, "input", "doctypeid");
-	check_parameters( ls, 1, 0, LUA_TUSERDATA);
-
+	Input* input;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		input = LuaObject<Input>::getSelf( ls, "input", "doctypeid");
+		check_parameters( ls, 1, 0);
+	}
+	else
+	{
+		input = (Input*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
 	if (!input->inputfilter().get())
 	{
 		lua_pushnil( ls);
@@ -1134,6 +1180,7 @@ LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 			}
 		}
 	}
+	lua_pushlightuserdata( ls, input);
 	lua_yieldk( ls, 0, 1, function_input_doctypeid);
 	return 0;
 }
@@ -1141,9 +1188,18 @@ LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 
 LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 {
-	Input* input = LuaObject<Input>::getSelf( ls, "input", "doctype");
-	check_parameters( ls, 1, 0, LUA_TUSERDATA);
-
+	Input* input;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		input = LuaObject<Input>::getSelf( ls, "input", "doctype");
+		check_parameters( ls, 1, 0);
+	}
+	else
+	{
+		input = (Input*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
 	if (!input->inputfilter().get())
 	{
 		lua_pushnil( ls);
@@ -1167,6 +1223,7 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 			}
 		}
 	}
+	lua_pushlightuserdata( ls, input);
 	lua_yieldk( ls, 0, 1, function_input_doctype);
 	return 0;
 }
@@ -1357,12 +1414,22 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 
 LUA_FUNCTION_THROWS( "input:table()", function_input_table)
 {
-	Input* input = LuaObject<Input>::getSelf( ls, "input", "table");
-	check_parameters( ls, 1, 0);
-
+	Input* input;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		input = LuaObject<Input>::getSelf( ls, "input", "table");
+		check_parameters( ls, 1, 0);
+	}
+	else
+	{
+		input = (Input*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
 	lua_CFunction func = get_input_struct_closure( ls, input, true);
 	if (!func)
 	{
+		lua_pushlightuserdata( ls, input);
 		return lua_yieldk( ls, 0, 1, function_input_table);
 	}
 	return func( ls);
@@ -1371,12 +1438,22 @@ LUA_FUNCTION_THROWS( "input:table()", function_input_table)
 
 LUA_FUNCTION_THROWS( "input:form()", function_input_form)
 {
-	Input* input = LuaObject<Input>::getSelf( ls, "input", "form");
-	check_parameters( ls, 1, 0);
-
+	Input* input;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		input = LuaObject<Input>::getSelf( ls, "input", "form");
+		check_parameters( ls, 1, 0);
+	}
+	else
+	{
+		input = (Input*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
 	lua_CFunction func = get_input_struct_closure( ls, input, false);
 	if (!func)
 	{
+		lua_pushlightuserdata( ls, input);
 		return lua_yieldk( ls, 0, 1, function_input_form);
 	}
 	return func( ls);
