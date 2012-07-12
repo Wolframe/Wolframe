@@ -159,9 +159,14 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
-ProcessorSlice* ProcessorProvider::slice()
+//const langbind::Filter& ProcessorProvider::getFilter( const std::string& name ) const
+//{
+//	return m_impl->getFilter( name );
+//}
+
+cmdbind::CommandHandler* ProcessorProvider::getHandler( const std::string& name )
 {
-	return m_impl->slice();
+	return m_impl->getHandler( name );
 }
 
 
@@ -181,7 +186,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					dynamic_cast< ObjectContainer< ProcessorUnit >* >( builder->container( **it ));
 			if ( proc == NULL )	{
 				LOG_ALERT << "Wolframe Porcessor Group: '" << builder->container( **it )->objectName()
-					  << "'' is not a ProcessorUnit";
+					  << "'' is not a Processor Unit";
 				throw std::logic_error( "object is not a ProcessorUnit" );
 			}
 			m_proc.push_back( proc->object() );
@@ -219,13 +224,16 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 	return true;
 }
 
-ProcessorSlice* ProcessorProvider::ProcessorProvider_Impl::slice()
+
+//const langbind::Filter& ProcessorProvider::ProcessorProvider_Impl::getFilter( const std::string& name ) const
+//{
+//	return m_impl->getFilter( name );
+//}
+
+cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::getHandler( const std::string& /*name*/ )
 {
-	std::list< ProcessorUnit* >::const_iterator it = m_proc.begin();
-	if ( it != m_proc.end() )
-		return (*it)->slice();
-	else
-		return NULL;
+	return NULL;
 }
+
 
 }} // namespace _Wolframe::proc

@@ -53,6 +53,11 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::ObjectCon
 		if ( builder )	{
 			ObjectContainer< AuthorizationUnit >* authz =
 					dynamic_cast< ObjectContainer< AuthorizationUnit >* >( builder->container( **it ));
+			if ( authz == NULL )	{
+				LOG_ALERT << "AuthorizationProvider: '" << builder->container( **it )->objectName()
+					  << "' is not an Authorization Unit";
+				throw std::logic_error( "object is not an AuthorizationUnit" );
+			}
 			m_authorizeUnits.push_back( authz->object() );
 			LOG_TRACE << "'" << authz->objectName() << "' authorization unit registered";
 			authz->dispose();

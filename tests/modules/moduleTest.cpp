@@ -21,8 +21,8 @@ using namespace std;
 class ModuleFixture : public ::testing::Test
 {
 	protected:
-                LogBackend& logBack;
-		
+		LogBackend& logBack;
+
 	protected:
 		ModuleFixture( ) :
 			logBack( LogBackend::instance( ) )
@@ -43,19 +43,20 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 #endif
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );
-	
+
 	ContainerBuilder* container = modDir.getContainer( "TestObject" );
 	ASSERT_TRUE( container != NULL );
-	
+
 	config::ObjectConfiguration* configuration = container->configuration( "TestObject" );
 	ASSERT_TRUE( configuration != NULL );
 
 	test::TestModuleContainer* obj = dynamic_cast<test::TestModuleContainer *>( container->container( *configuration ) );
+	ASSERT_TRUE( obj != NULL );
 	test::TestUnit* unit = obj->object( );
 
 	string s = unit->hello( );
 	ASSERT_EQ( s, "hello" );
-	
+
 	delete unit;
 }
 
@@ -85,9 +86,11 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 	ASSERT_TRUE( configuration2 != NULL );
 
 	test_containers::TestModuleContainer1* obj1 = dynamic_cast<test_containers::TestModuleContainer1 *>( container1->container( *configuration1 ) );
+	ASSERT_TRUE( obj1 != NULL );
 	test_containers::TestUnit1* unit1 = obj1->object( );
 
 	test_containers::TestModuleContainer2* obj2 = dynamic_cast<test_containers::TestModuleContainer2 *>( container2->container( *configuration2 ) );
+	ASSERT_TRUE( obj2 != NULL );
 	test_containers::TestUnit2* unit2 = obj2->object( );
 
 	string s1 = unit1->hello( );
@@ -96,7 +99,7 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 	string s2 = unit2->hullo( );
 	ASSERT_EQ( s2, "hullo" );
 
-	delete unit1;	
+	delete unit1;
 	delete unit2;
 }
 
