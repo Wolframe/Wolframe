@@ -882,6 +882,18 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 	}
 }
 
+static const char* userdata_tolstring( lua_State* ls, int index, std::size_t* len)
+{
+	lua_pushvalue( ls, index);		///...STK: udata
+	lua_getmetatable( ls, -1);		///...STK: udata mt
+	lua_pushliteral( ls, "__tostring");	///...STK: udata mt __tostring
+	lua_rawget( ls, -2);			///...STK: udata mt mt[__tostring]
+	if (lua_isnil( ls, -1)) return 0;
+	lua_pushvalue( ls, index);		///... STK: udata mt mt[__tostring] udata
+	lua_call( ls, 1, 1);			///... STK: udata mt str
+	const char* rt = lua_tolstring( ls, -1, len);
+	return rt;
+}
 
 static bool get_printop( lua_State* ls, int index, const char*& elem, std::size_t& elemsize)
 {
@@ -893,6 +905,7 @@ static bool get_printop( lua_State* ls, int index, const char*& elem, std::size_
 			elem = 0;
 			elemsize = 0;
 			return true;
+
 		case LUA_TBOOLEAN:
 			if (!lua_toboolean( ls, index))
 			{
@@ -903,11 +916,24 @@ static bool get_printop( lua_State* ls, int index, const char*& elem, std::size_
 			else
 			{
 				const char* tn = lua_typename( ls, tp);
-				luaL_error( ls, "invalid type (%s) of print argument %d", tn?tn:"unknown", index-1);
+				std::stringstream msg;
+				msg << "Invalid type (" << (tn?tn:"unknown") << " of print argument " << (index-1);
+				throw std::runtime_error( msg.str());
 			}
+
 		case LUA_TNUMBER:
 		case LUA_TSTRING:
 			elem = lua_tolstring( ls, index, &elemsize);
+			return true;
+
+		case LUA_TUSERDATA:
+			elem = userdata_tolstring( ls, index, &elemsize);
+			if (!elem)
+			{
+				std::stringstream msg;
+				msg << "Value of print argument " << (index-1) << " is userdata and is not representable as string (has no '__tostring' method)";
+				throw std::runtime_error( msg.str());
+			}
 			return true;
 	}
 	return false;
@@ -933,36 +959,47 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 	std::size_t itemsize[2] = {0,0};
 
 	Output* output = LuaObject<Output>::getSelf( ls, "output", "print");
-	switch (lua_gettop( ls))
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
-		case 1:
-			break;
-		case 3:
-			if (!get_printop( ls, 3, item[1], itemsize[1]))
-			{
-				throw std::runtime_error( "invalid type of 2nd argument");
-			}
-			/*no break here !*/
-		case 2:
-			if (!get_printop( ls, 2, item[0], itemsize[0]))
-			{
-				if (item[1] != 0) throw std::runtime_error( "invalid type of first argument");
+		switch (lua_gettop( ls))
+		{
+			case 1:
+				break;
+			case 3:
+				if (!get_printop( ls, 3, item[1], itemsize[1]))
 				{
-					TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
-					TypedOutputFilterR outp( new TypingOutputFilter( output->outputfilter()));
-					LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
-					RedirectFilterClosure* closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
-					lua_pushvalue( ls, 2);			//... iterator argument
-					lua_pushlightuserdata( ls, closure);	//... redirect closure object
+					throw std::runtime_error( "invalid type of 2nd argument");
 				}
-				return function_output_print_object( ls);
-			}
-			break;
-		default:
-			throw std::runtime_error( "too many arguments");
+				/*no break here !*/
+			case 2:
+				if (!get_printop( ls, 2, item[0], itemsize[0]))
+				{
+					if (item[1] != 0) throw std::runtime_error( "invalid type of first argument");
+					{
+						TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
+						TypedOutputFilterR outp( new TypingOutputFilter( output->outputfilter()));
+						LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
+						RedirectFilterClosure* closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
+						lua_pushvalue( ls, 2);			//... iterator argument
+						lua_pushlightuserdata( ls, closure);	//... redirect closure object
+					}
+					return function_output_print_object( ls);
+				}
+				break;
+			default:
+				throw std::runtime_error( "too many arguments");
+		}
+	}
+	else
+	{
+		item[0] = lua_tolstring( ls, -2, &itemsize[0]);
+		item[1] = lua_tolstring( ls, -1, &itemsize[1]);
 	}
 	if (!output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 	{
+		lua_pushlstring( ls, item[0], itemsize[0]);
+		lua_pushlstring( ls, item[1], itemsize[1]);
 		lua_yieldk( ls, 0, 1, function_output_print);
 	}
 	return 0;

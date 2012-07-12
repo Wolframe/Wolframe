@@ -36,6 +36,7 @@ Project Wolframe.
 #include <cstring>
 #include <cstdlib>
 #include <stdexcept>
+/*[-]*/#include <iostream>
 
 using namespace _Wolframe::types;
 
@@ -78,30 +79,32 @@ BigBCD::BigBCD( const std::string& numstr)
 	,m_ar(0)
 	,m_sign(false)
 {
-	unsigned int ii = numstr.size();
-	unsigned int gg;
-	if (numstr[0] == '-')
+	unsigned int ii = 0, nn = numstr.size();
+	if (numstr[ ii] == '-')
 	{
-		init( (numstr.size()+6)/7, true);
-		gg = 1;
+		++ii;
 		m_sign = true;
 	}
-	else
+	unsigned int bb = (((nn-ii)+6) / 7);
+	unsigned int tt = (((nn-ii)+6) % 7) * 4;
+	if (!bb) throw std::runtime_error( "illegal bcd number string");
+
+	init( bb, m_sign);
+	for (; ii<nn; ++ii)
 	{
-		init( (numstr.size()+6)/7, false);
-		gg = 0;
-	}
-	unsigned int bb;
-	unsigned int tt;
-	for (bb=0,tt=0; ii>gg; --ii)
-	{
-		unsigned char digit = (unsigned char)(numstr[ ii-1] - '0');
-		if (digit > '9') throw std::runtime_error( "illegal bcd number");
-		m_ar[ bb] = (m_ar[ bb] << 4) + digit;
-		if (++tt == 7)
+		unsigned int digit = (unsigned char)(numstr[ ii] - '0');
+		if (digit > 9) throw std::runtime_error( "illegal bcd number");
+		m_ar[ bb-1] += (digit << tt);
+
+		if (tt == 0)
 		{
-			++bb;
-			tt = 0;
+			--bb;
+			if (!bb && (ii+1) != nn) throw std::runtime_error( "illegal state in bcd number constructor");
+			tt = 24;
+		}
+		else
+		{
+			tt -= 4;
 		}
 	}
 }
@@ -154,7 +157,7 @@ std::string BigBCD::tostring() const
 	}
 	else while (bb>0)
 	{
-		unsigned char digit = (unsigned char)(m_ar[ bb-1] >> tt);
+		unsigned char digit = (unsigned char)(m_ar[ bb-1] >> tt) & 0xf;
 		if (digit > 9) throw std::runtime_error( "illegal bcd number");
 		rt.push_back('0'+digit);
 		if (tt == 0)

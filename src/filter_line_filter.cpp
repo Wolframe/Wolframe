@@ -144,6 +144,7 @@ struct InputFilterImpl :public InputFilter
 		:m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
+		,m_srcclosed(false)
 		,m_linecomplete(false){}
 
 	///\brief Copy constructor
@@ -155,6 +156,7 @@ struct InputFilterImpl :public InputFilter
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend)
+		,m_srcclosed(o.m_srcclosed)
 		,m_linecomplete(o.m_linecomplete){}
 
 	///\brief self copy
@@ -175,8 +177,9 @@ struct InputFilterImpl :public InputFilter
 
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
 	{
-		ptr = m_src + m_itr.getPosition();
-		size = m_srcsize - m_itr.getPosition();
+		std::size_t pos = m_itr.getPosition();
+		ptr = m_src + pos;
+		size = (m_srcsize > pos)?(m_srcsize - pos):0;
 		end = m_srcend;
 	}
 
@@ -221,6 +224,14 @@ struct InputFilterImpl :public InputFilter
 				m_linecomplete = true;
 				return true;
 			}
+			else if (!m_srcclosed)
+			{
+				type = InputFilter::CloseTag;
+				element = 0;
+				elementsize = 0;
+				m_srcclosed = true;
+				return true;
+			}
 		}
 		catch (textwolf::SrcIterator::EoM)
 		{
@@ -234,6 +245,7 @@ private:
 	const char* m_src;		//< pointer to current chunk parsed
 	std::size_t m_srcsize;		//< size of the current chunk parsed in bytes
 	bool m_srcend;			//< true if end of message is in current chunk parsed
+	bool m_srcclosed;		//< true if the finishing close tag has been returned
 	bool m_linecomplete;		//< true if the last getNext could complete a line
 };
 

@@ -9,14 +9,16 @@ function run()
 			if w == '+' then
 				op1=bcdnumber( stack[ #stack -1])
 				op2=bcdnumber( stack[ #stack])
-				logger.print( "INFO", "PLUS ", op1, op2)
+				logger.print( "INFO", "calculate ", op1, " plus ", op2)
 				res = op1 + op2
+				logger.print( "INFO", "result ", res)
 				output:print( res)
 			elseif w == '-' then
 				op1=bcdnumber( stack[ #stack -1])
 				op2=bcdnumber( stack[ #stack])
-				logger.print( "INFO", "MINUS ", op1, op2)
-				res = op1 + op2
+				logger.print( "INFO", "calculate ", op1, " minus ", op2)
+				res = op1 - op2
+				logger.print( "INFO", "result ", res)
 				output:print( res)
 			else
 				table.insert( stack, w)

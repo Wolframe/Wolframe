@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file luaDebug.hpp
-/// \brief Logger interface for the lua application processor
+///\file luaDebug.hpp
+///\brief Logger interface for the lua application processor
 #ifndef _langbind_LUA_DEBUG_HPP_INCLUDED
 #define _langbind_LUA_DEBUG_HPP_INCLUDED
 #include <string>

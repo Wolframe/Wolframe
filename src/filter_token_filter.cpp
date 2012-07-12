@@ -212,8 +212,9 @@ struct InputFilterImpl :public InputFilter
 
 	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
 	{
-		ptr = m_src + m_itr.getPosition();
-		size = m_srcsize - m_itr.getPosition();
+		std::size_t pos = m_itr.getPosition();
+		ptr = m_src + pos;
+		size = (m_srcsize > pos)?(m_srcsize - pos):0;
 		end = m_srcend;
 	}
 

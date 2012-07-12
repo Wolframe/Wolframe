@@ -99,22 +99,6 @@ struct has_operator_tostring
 };
 
 template<typename T>
-struct has_operator_len
-{
-	typedef char small_type;
-	struct large_type {small_type dummy[2];};
-
-	template<std::size_t (T::*)()> struct tester_member_signature;
-
-	template<typename U>
-	static small_type has_matching_member(tester_member_signature<&U::len >*);
-	template<typename U>
-	static large_type has_matching_member(...);
-
-	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
-};
-
-template<typename T>
 struct has_operator_neg
 {
 	typedef char small_type;
