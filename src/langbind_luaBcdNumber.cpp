@@ -29,12 +29,11 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind_luaBignum.cpp
-///\brief Implements a bignum type for Lua
-#include "langbind/luaBignum.hpp"
+///\file langbind_luaBcdNumber.cpp
+///\brief Implements a BCD number type of arbitrary length ("bcdnumber") for Lua
+#include "langbind/luaBcdNumber.hpp"
 #include "types/bcdArithmetic.hpp"
-#include "langbind/luaTypeTraits.hpp"
-#include "langbind/luaTypeArithmetic.hpp"
+#include "langbind/luaArithmeticType.hpp"
 #include <limits>
 extern "C"
 {

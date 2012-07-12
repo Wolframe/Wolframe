@@ -160,7 +160,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_luaGetFunctionClosure.obj \
 	langbind_luaDebug.obj \
 	langbind_luaException.obj \
-	langbind_luaBignum.obj \
+	langbind_luaBcdNumber.obj \
 	cmdbind_luaCommandHandler.obj
 !ENDIF
 

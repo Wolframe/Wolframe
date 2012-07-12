@@ -1,3 +1,4 @@
+ 
 /************************************************************************
 Copyright (C) 2011 Project Wolframe.
 All rights reserved.
@@ -29,10 +30,19 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/luaTypeTraits.hpp
-///\brief Type Traits for embedding types in lua binding
-#ifndef _Wolframe_LANGBIND_LUA_TYPE_TRAITS_HPP_INCLUDED
-#define _Wolframe_LANGBIND_LUA_TYPE_TRAITS_HPP_INCLUDED
+///\file langbind/luaTypeArtithmetic.hpp
+///\brief Type Template for arithmetic type bindings in lua
+/*
+	The arithmetic type should have a constructor from string, direct construction
+	from other types or more than one argument
+	are not supported yet. If need it will be supported in the future.
+
+	Besides the mandatory constructor, the arithmetic type binding checks for
+	some methods and operators ans binds them to the lua state.
+*/
+
+#ifndef _Wolframe_LANGBIND_LUA_ARTITHMETIC_TYPE_HPP_INCLUDED
+#define _Wolframe_LANGBIND_LUA_ARTITHMETIC_TYPE_HPP_INCLUDED
 #include "langbind/luaException.hpp"
 #include <string>
 #include <stdexcept>
@@ -46,6 +56,7 @@ extern "C"
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#include "luaconf.h"
 }
 
 namespace _Wolframe {
@@ -59,16 +70,8 @@ struct Interface
 	TYPE operator - ( const TYPE&) const;
 	TYPE operator / ( const TYPE&) const;
 	TYPE operator * ( const TYPE&) const;
-	TYPE pow( unsigned int) const;
 	TYPE operator - () const;
-	unsigned int len() const;
 	std::string tostring() const;
-
-	bool set( const char* key, const std::string&);
-	bool set( const char* key, const char*);
-	bool set( const std::string&);
-	bool set( const char*);
-	bool get( const char* key, std::string&) const;
 
 	bool operator <( const TYPE&) const;
 	bool operator <=( const TYPE&) const;
@@ -659,6 +662,60 @@ typename boost::enable_if_c<
 	,void>::type defineOperator_mul( lua_State*)
 {}
 
-}} //namespace
+template <class ArithmeticType, class MetaTypeInfo>
+static void createLuaArithmeticTypeMetatable( lua_State* ls)
+{
+	LuaArithmeticType<ArithmeticType,MetaTypeInfo>::createMetatable( ls);
+	luaL_getmetatable( ls, MetaTypeInfo::metatableName());
+	defineOperator_add<ArithmeticType, MetaTypeInfo>( ls);
+	defineOperator_sub<ArithmeticType, MetaTypeInfo>( ls);
+	defineOperator_mul<ArithmeticType, MetaTypeInfo>( ls);
+	defineOperator_div<ArithmeticType, MetaTypeInfo>( ls);
+	defineOperator_lt<ArithmeticType, MetaTypeInfo>( ls);
+	defineOperator_le<ArithmeticType, MetaTypeInfo>( ls);
+	defineOperator_eq<ArithmeticType, MetaTypeInfo>( ls);
+	defineOperator_neg<ArithmeticType, MetaTypeInfo>( ls);
+	defineOperator_tostring<ArithmeticType, MetaTypeInfo>( ls);
+	lua_pop( ls, 1);
+}
+
+template <class ArithmeticType, class MetaTypeInfo>
+struct LuaArithmeticTypeConstructor
+{
+	typedef LuaArithmeticTypeConstructor This;
+	typedef LuaArithmeticType<ArithmeticType,MetaTypeInfo> ThisType;
+
+	static int call( lua_State* ls)
+	{
+		if (lua_gettop( ls) == 0)
+		{
+			(void)new (ls) LuaArithmeticType<ArithmeticType,MetaTypeInfo>();
+		}
+		else if (lua_gettop( ls) == 1)
+		{
+			const char* arg = lua_tostring( ls , 1);
+			if (!arg)
+			{
+				throw std::runtime_error( "argument not convertible to a string");
+			}
+			(void)new (ls) ThisType( std::string(arg));
+		}
+		else
+		{
+			throw std::runtime_error( "too many arguments");
+		}
+		return 1;
+	}
+
+	static int create( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( MetaTypeInfo::typeName(), ls);
+	}
+};
+
+}}//namespace
 #endif
+
+
 

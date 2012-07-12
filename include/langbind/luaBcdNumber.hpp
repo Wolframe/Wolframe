@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/luaBignum.hpp
-///\brief Defines a bignum type for Lua
+///\file langbind/luaBcdNumber.hpp
+///\brief Defines the "bcdnumber" type for Lua
 #ifndef _Wolframe_LANGBIND_LUA_BIGNUM_HPP_INCLUDED
 #define _Wolframe_LANGBIND_LUA_BIGNUM_HPP_INCLUDED
 

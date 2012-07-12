@@ -35,7 +35,7 @@ Project Wolframe.
 #include "langbind/luaDebug.hpp"
 #include "langbind/luaException.hpp"
 #include "langbind/luaGetFunctionClosure.hpp"
-#include "langbind/luaBignum.hpp"
+#include "langbind/luaBcdNumber.hpp"
 #include "filter/luafilter.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
