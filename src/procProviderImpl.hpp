@@ -56,7 +56,8 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	ProcessorSlice* slice();
+//	const langbind::Filter& getFilter( const std::string& name ) const;
+	cmdbind::CommandHandler* getHandler( const std::string& name );
 private:
 	std::string			m_dbLabel;
 	const db::Database*		m_db;

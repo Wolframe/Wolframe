@@ -40,6 +40,8 @@
 #include "processor.hpp"
 #include <boost/noncopyable.hpp>
 #include "database/DBprovider.hpp"
+#include "filter/filter.hpp"
+#include "cmdbind/commandHandler.hpp"
 
 namespace _Wolframe {
 namespace proc {
@@ -74,7 +76,8 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	ProcessorSlice* slice();
+//	const langbind::Filter& getFilter( const std::string& name ) const;
+	cmdbind::CommandHandler* getHandler( const std::string& name );
 
 private:
 	class ProcessorProvider_Impl;
