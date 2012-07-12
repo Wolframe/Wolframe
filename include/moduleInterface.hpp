@@ -110,7 +110,11 @@ public:
 
 	ContainerBuilder* getContainer( const std::string& section, const std::string& keyword ) const;
 	ContainerBuilder* getContainer( const std::string& name ) const;
-
+	ObjectBuilder* getObject( const std::string& name ) const;
+	std::list< ObjectBuilder* >::const_iterator objectBegin() const
+						{ return m_object.begin(); }
+	std::list< ObjectBuilder* >::const_iterator objectEnd() const
+						{ return m_object.end(); }
 private:
 	std::list< ContainerBuilder* >	m_container;
 	std::list< ObjectBuilder* >	m_object;

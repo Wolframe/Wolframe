@@ -1,6 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS = echo
+#SUBDIRS = echo
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

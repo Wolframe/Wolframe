@@ -55,29 +55,6 @@ public:
 	virtual void close() = 0;
 };
 
-
-/// base class for Wolframe channel processor slices
-class ProcessorSlice
-{
-public:
-	virtual ~ProcessorSlice()		{}
-
-	virtual void close() = 0;
-};
-
-
-/// Processor Unit
-/// This is the base class for processor unit implementations
-class ProcessorUnit
-{
-public:
-	virtual ~ProcessorUnit()		{}
-
-	virtual const char* name() const = 0;
-
-	virtual ProcessorSlice* slice() const = 0;
-};
-
 }} // namespace _Wolframe::proc
 
 #endif // _WOLFRAME_PROCESSOR_HPP_INCLUDED

@@ -1,6 +1,6 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = echo
+#SUBDIRS = echo
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
