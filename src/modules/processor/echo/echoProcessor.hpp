@@ -43,7 +43,7 @@
 
 namespace _Wolframe {
 
-class EchoProcessorSlice : public proc::ProcessorSlice
+class EchoProcessorSlice
 {
 public:
 	~EchoProcessorSlice()				{}
@@ -57,7 +57,7 @@ public:
 };
 
 
-class EchoProcessorUnit : public proc::ProcessorUnit
+class EchoProcessorUnit
 {
 public:
 	enum Operation	{
@@ -70,7 +70,7 @@ public:
 	EchoProcessorUnit( Operation operation );
 	~EchoProcessorUnit()				{}
 	const char* name() const			{ return "EchoProcessor"; }
-	proc::ProcessorSlice* slice() const		{ return new EchoProcessorSlice; }
+//	proc::ProcessorSlice* slice() const		{ return new EchoProcessorSlice; }
 
 	std::string& process( std::string& input );
 private:

@@ -43,6 +43,7 @@
 #include "database/DBprovider.hpp"
 
 #include <list>
+#include <map>
 
 namespace _Wolframe {
 namespace proc {
@@ -59,9 +60,10 @@ public:
 //	const langbind::Filter& getFilter( const std::string& name ) const;
 	cmdbind::CommandHandler* getHandler( const std::string& name );
 private:
-	std::string			m_dbLabel;
-	const db::Database*		m_db;
-	std::list< ProcessorUnit* >	m_proc;
+	std::string					m_dbLabel;
+	const db::Database*				m_db;
+	std::list< cmdbind::CommandHandler* >		m_handler;
+	std::list< langbind::Filter* >			m_filter;
 };
 
 }} // namespace _Wolframe::proc

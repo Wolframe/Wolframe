@@ -178,34 +178,54 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	if ( !conf->m_dbLabel.empty())
 		m_dbLabel = conf->m_dbLabel;
 
+	// Build the list of command handlers
 	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_procConfig.begin();
 									it != conf->m_procConfig.end(); it++ )	{
 		module::ContainerBuilder* builder = modules->getContainer((*it)->objectName());
 		if ( builder )	{
-			ObjectContainer< ProcessorUnit >* proc =
-					dynamic_cast< ObjectContainer< ProcessorUnit >* >( builder->container( **it ));
-			if ( proc == NULL )	{
-				LOG_ALERT << "Wolframe Porcessor Group: '" << builder->container( **it )->objectName()
-					  << "'' is not a Processor Unit";
-				throw std::logic_error( "object is not a ProcessorUnit" );
+			ObjectContainer< cmdbind::CommandHandler >* handler =
+					dynamic_cast< ObjectContainer< cmdbind::CommandHandler >* >( builder->container( **it ));
+			if ( handler == NULL )	{
+				LOG_ALERT << "Wolframe Processor Provider: '" << builder->container( **it )->objectName()
+					  << "'' is not a command handler";
+				throw std::logic_error( "Object is not a commandHandler. See log." );
 			}
-			m_proc.push_back( proc->object() );
-			LOG_TRACE << "'" << proc->objectName() << "' processor unit registered";
-			proc->dispose();
+			m_handler.push_back( handler->object() );
+			std::string handlerName = handler->objectName();
+			LOG_TRACE << "'" << handlerName << "' command handler registered";
+			handler->dispose();
 		}
 		else	{
-			LOG_ALERT << "Wolframe Processor Group: unknown processor type '" << (*it)->objectName() << "'";
-			throw std::domain_error( "Unknown processor type in Processor Group constructor. See log" );
+			LOG_ALERT << "Wolframe Processor Provider: unknown processor type '" << (*it)->objectName() << "'";
+			throw std::domain_error( "Unknown command handler type constructor. See log." );
 		}
+	}
+
+	// Build the list of filters
+	for ( std::list< module::ObjectBuilder *>::const_iterator it = modules->objectBegin();
+								it != modules->objectEnd(); it++ )	{
+//		if ( // the object is a filter )
+		langbind::Filter* filter = dynamic_cast< langbind::Filter* >((*it)->object());
+		if ( filter == NULL )	{
+			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->object()->objectName()
+				  << "'' is not a filter";
+			throw std::logic_error( "Object is not a filter. See log." );
+		}
+		std::string filterName = (*it)->object()->objectName();
+		m_filter.push_back( filter );
+		LOG_TRACE << "'" << filterName << "' filter registered";
 	}
 }
 
 
 ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 {
-	for ( std::list< ProcessorUnit* >::iterator it = m_proc.begin();
-							it != m_proc.end(); it++ )
+	for ( std::list< cmdbind::CommandHandler* >::iterator it = m_handler.begin();
+							it != m_handler.end(); it++ )
 		delete *it;
+//	for ( std::list< langbind::Filter* >::iterator it = m_filter.begin();
+//							it != m_filter.end(); it++ )
+//		delete *it;
 }
 
 bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabaseProvider& db )

@@ -100,4 +100,14 @@ ContainerBuilder* ModulesDirectory::getContainer( const std::string& name ) cons
 	return NULL;
 }
 
+ObjectBuilder* ModulesDirectory::getObject( const std::string& name ) const
+{
+	for ( std::list< ObjectBuilder* >::const_iterator it = m_object.begin();
+							it != m_object.end(); it++ )	{
+		if ( boost::algorithm::iequals( (*it)->m_name, name ))
+			return *it;
+	}
+	return NULL;
+}
+
 }} // namespace _Wolframe::module
