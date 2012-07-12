@@ -52,6 +52,11 @@ AuditProvider::AuditProvider( const std::list< config::ObjectConfiguration* >& c
 		if ( builder )	{
 			ObjectContainer< AuditUnit >* audit =
 					dynamic_cast< ObjectContainer< AuditUnit >* >( builder->container( **it ));
+			if ( audit == NULL )	{
+				LOG_ALERT << "AuditProvider: '" << builder->container( **it )->objectName()
+					  << "' is not an Audit Unit";
+				throw std::logic_error( "object is not an AuditUnit" );
+			}
 			m_auditors.push_back( audit->object() );
 			LOG_TRACE << "'" << audit->objectName() << "' audit unit registered";
 			audit->dispose();

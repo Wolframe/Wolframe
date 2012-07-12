@@ -52,6 +52,11 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::ObjectCon
 		if ( builder )	{
 			ObjectContainer< AuthenticationUnit >* auth =
 					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( builder->container( **it ));
+			if ( auth == NULL )	{
+				LOG_ALERT << "AuthenticationFactory: '" << builder->container( **it )->objectName()
+					  << "' is not an Authentication Unit";
+				throw std::logic_error( "object is not an AuthenticationUnit" );
+			}
 			m_authenticators.push_back( auth->object() );
 			LOG_TRACE << "'" << auth->objectName() << "' authentication unit registered";
 			auth->dispose();

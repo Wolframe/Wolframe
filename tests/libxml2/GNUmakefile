@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = 
+SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -30,8 +30,8 @@ TEST_CPP_BINS = \
 local_all:
 
 local_clean:
-	@-rm *.RES
-	@-rm *.DIFF
+	@-rm -f *.RES
+	@-rm -f *.DIFF
 
 local_distclean:
 
@@ -51,4 +51,4 @@ testdata:
 		sed "s/encoding=\"UTF-8\"/encoding=\"$$e\"/" test-orig.xml > x; \
 		iconv -f UTF-8 -t $$e -o test-$$e.xml x; \
 	done
-	
+

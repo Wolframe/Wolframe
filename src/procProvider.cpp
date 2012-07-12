@@ -181,7 +181,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					dynamic_cast< ObjectContainer< ProcessorUnit >* >( builder->container( **it ));
 			if ( proc == NULL )	{
 				LOG_ALERT << "Wolframe Porcessor Group: '" << builder->container( **it )->objectName()
-					  << "'' is not a ProcessorUnit";
+					  << "'' is not a Processor Unit";
 				throw std::logic_error( "object is not a ProcessorUnit" );
 			}
 			m_proc.push_back( proc->object() );
