@@ -1092,6 +1092,8 @@ src/ddl_compilerInterface.cpp
 src/ddl_compiler_simpleFormCompiler.cpp
 src/ddl_structTypeBuild.cpp
 src/ddl_structType.cpp
+src/echoProcessor.cpp
+src/echoProcessor.hpp
 src/exceptionBase.hpp
 src/filter_char_filter.cpp
 src/filter_doctype.cpp
@@ -1262,14 +1264,6 @@ src/modules/filter/token/mod_filter_token.cpp
 src/modules/formfunction/template/formfunctionObjectBuilder.hpp
 src/modules/GNUmakefile
 src/modules/Makefile.W32
-src/modules/processor/echo/echoProcessor.cpp
-src/modules/processor/echo/echoProcessor.hpp
-src/modules/processor/echo/echoProcessorModule.cpp
-src/modules/processor/echo/echoProcessorModule.def
-src/modules/processor/echo/GNUmakefile
-src/modules/processor/echo/Makefile.W32
-src/modules/processor/GNUmakefile
-src/modules/processor/Makefile.W32
 src/posixMain.cpp
 src/procProvider.cpp
 src/procProviderImpl.hpp
