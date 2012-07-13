@@ -76,8 +76,8 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-//	const langbind::Filter& getFilter( const std::string& name ) const;
-	cmdbind::CommandHandler* getHandler( const std::string& name );
+	const langbind::Filter* getFilter( const std::string& name ) const;
+	cmdbind::CommandHandler* getHandler( const std::string& command ) const;
 
 private:
 	class ProcessorProvider_Impl;

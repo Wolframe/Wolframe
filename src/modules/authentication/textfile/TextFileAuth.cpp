@@ -77,7 +77,7 @@ TextFileAuthenticator::~TextFileAuthenticator()
 {
 }
 
-AuthenticatorSlice* TextFileAuthenticator::authSlice()
+AuthenticatorInstance* TextFileAuthenticator::instance()
 {
 	return new TextFileAuthSlice( *this );
 }

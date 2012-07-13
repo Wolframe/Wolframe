@@ -77,7 +77,7 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	AuthenticatorSlice* authSlice()			{ return NULL; }
+	AuthenticatorInstance* instance()			{ return NULL; }
 private:
 	const std::string	m_dbLabel;
 	const db::Database*	m_db;
