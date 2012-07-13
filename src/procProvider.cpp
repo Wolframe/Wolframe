@@ -190,11 +190,13 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					  << "'' is not a command handler";
 				throw std::logic_error( "Object is not a commandHandler. See log." );
 			}
-			m_handler.push_back( handler->object() );
-			std::string handlerName = handler->objectName();
-			LOG_TRACE << "'" << handlerName << "' command handler registered";
-			// register handler commands here
-			handler->dispose();
+			else	{
+				m_handler.push_back( handler->object() );
+				std::string handlerName = handler->objectName();
+				LOG_TRACE << "'" << handlerName << "' command handler registered";
+				// register handler commands here
+				handler->dispose();
+			}
 		}
 		else	{
 			LOG_ALERT << "Wolframe Processor Provider: unknown processor type '" << (*it)->objectName() << "'";
@@ -205,18 +207,20 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	// Build the list of filters
 	for ( std::list< module::ObjectBuilder *>::const_iterator it = modules->objectBegin();
 								it != modules->objectEnd(); it++ )	{
-//		if the object is a filter
-		langbind::Filter* filter = dynamic_cast< langbind::Filter* >((*it)->object());
+		//		if the object is a filter
+		module::FilterObject* filter = dynamic_cast< module::FilterObject* >((*it)->object());
 		if ( filter == NULL )	{
 			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->object()->objectName()
 				  << "'' is not a filter";
 			throw std::logic_error( "Object is not a filter. See log." );
 		}
-		std::string filterName = (*it)->object()->objectName();
-		m_filter.push_back( filter );
-		boost::algorithm::to_upper( filterName );
-		m_filterMap[ filterName ] = filter;
-		LOG_TRACE << "'" << filterName << "' filter registered";
+		else	{
+			std::string filterName = filter->objectName();
+			m_filter.push_back( filter );
+			boost::algorithm::to_upper( filterName );
+			m_filterMap[ filterName ] = filter;
+			LOG_TRACE << "'" << filterName << "' filter registered";
+		}
 	}
 }
 
@@ -226,9 +230,9 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 	for ( std::list< cmdbind::CommandHandlerUnit* >::iterator it = m_handler.begin();
 							it != m_handler.end(); it++ )
 		delete *it;
-//	for ( std::list< langbind::Filter* >::iterator it = m_filter.begin();
-//							it != m_filter.end(); it++ )
-//		delete *it;
+	for ( std::list< const module::FilterObject* >::iterator it = m_filter.begin();
+							it != m_filter.end(); it++ )
+		delete *it;
 }
 
 bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabaseProvider& db )
