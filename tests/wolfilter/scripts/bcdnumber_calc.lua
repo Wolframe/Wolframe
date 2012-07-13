@@ -5,20 +5,15 @@ function run()
 	stack = {}
 	for line in input:get() do
 		for w in string.gmatch( line, "%S+") do
-			logger.print( "INFO", "GET ", w)
 			if w == '+' then
-				op1=bcdnumber( stack[ #stack -1])
-				op2=bcdnumber( stack[ #stack])
-				logger.print( "INFO", "calculate ", op1, " plus ", op2)
+				op1 = bcdnumber( stack[ #stack -1])
+				op2 = bcdnumber( stack[ #stack])
 				res = op1 + op2
-				logger.print( "INFO", "result ", res)
 				output:print( res)
 			elseif w == '-' then
-				op1=bcdnumber( stack[ #stack -1])
-				op2=bcdnumber( stack[ #stack])
-				logger.print( "INFO", "calculate ", op1, " minus ", op2)
+				op1 = bcdnumber( stack[ #stack -1])
+				op2 = bcdnumber( stack[ #stack])
 				res = op1 - op2
-				logger.print( "INFO", "result ", res)
 				output:print( res)
 			else
 				table.insert( stack, w)

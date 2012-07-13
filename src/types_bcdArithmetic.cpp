@@ -36,7 +36,6 @@ Project Wolframe.
 #include <cstring>
 #include <cstdlib>
 #include <stdexcept>
-/*[-]*/#include <iostream>
 
 using namespace _Wolframe::types;
 
@@ -110,9 +109,9 @@ BigBCD::BigBCD( const std::string& numstr)
 }
 
 BigBCD::BigBCD( const BigBCD& o)
-	:m_size(0)
+	:m_size(o.m_size)
 	,m_ar(0)
-	,m_sign(false)
+	,m_sign(o.m_sign)
 {
 	init( m_size, m_sign);
 	std::memcpy( m_ar, o.m_ar, m_size * sizeof(*m_ar));
@@ -208,34 +207,10 @@ static boost::uint32_t tencomp( boost::uint32_t a)
 	return t2 - t6;
 }
 
-#if USE_OWN_INCREMENT
-static boost::uint32_t increment( boost::uint32_t a)
-{
-	boost::uint32_t t1,t2,t3,t4,t5;
-	t1 = a + 0x06666667;
-	// convert 0 bytes to 0x6 bytes
-	t2 = t1 ^ 0xffffFFFF;
-	t3 = t2 & (t2 >> 1);				//... t3 has now bit 0100 set 's where t1 has bits 0011 set
-	t4 = t3 & 0x44444444;				//... t4 has 0x4 set for nibbles in t1 in range 0x0 to 0x3 (=0 for a valid bcd a)
-	t5 = t1 | (t4 | (t4 >> 1));			//... t5 has 0x6 set for the 0 nibbles in t1
-	return (t5 - 0x06666666);
-}
-
-static boost::uint32_t decrement( boost::uint32_t a)
-{
-	boost::uint32_t t1,t2,t3,t4,t5,t6;
-	t1 = a - 1;
-	// convert 0xF bytes to 0x9 bytes
-	t2 = t1 & 0xeeeeEEEE;				//... delete bit 0001 of each nibble
-	t3 = t2 & (t2 >> 1);				//... t3 has 0010 set for nibbles in t1 having bit 0110 set
-	t3 = t3 & (t3 >> 1);				//... t3 has 0010 set for nibbles in t1 having bits 1110 set
-	return t1 - (t3 | (t3 << 1) | (t3 >> 1));	//... subtract 7 from each elememt in t1 equals 0xF
-}
-#endif
-
 static boost::uint32_t sub_bcd( boost::uint32_t a, boost::uint32_t b)
 {
-	return add_bcd( a, tencomp(b));
+	boost::uint32_t rt = add_bcd( a, tencomp(b));
+	return rt;
 }
 
 static boost::uint32_t getcarry( boost::uint32_t& a)
@@ -243,6 +218,15 @@ static boost::uint32_t getcarry( boost::uint32_t& a)
 	boost::uint32_t carry = (a >> 28);
 	a &= 0x0fffFFFF;
 	return carry;
+}
+
+static boost::uint32_t increment( boost::uint32_t a)
+{
+	return add_bcd( a, 1);
+}
+static boost::uint32_t decrement( boost::uint32_t a)
+{
+	return sub_bcd( a, 1);
 }
 
 bool BigBCD::isValid() const
@@ -265,55 +249,66 @@ void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr
 		boost::uint32_t op1 = (ii>=this_.m_size)?0:this_.m_ar[ii];
 		boost::uint32_t op2 = (ii>=opr.m_size)?0:opr.m_ar[ii];
 		boost::uint32_t res = add_bcd( op1, op2);
-#if USE_OWN_INCREMENT
-		if (carry) rt.m_ar[ ii] = increment( res);
-#else
-		rt.m_ar[ ii] = add_bcd( res, carry);
-#endif
-		carry = getcarry( carry);
+		if (carry) res = increment( res);
+		carry = getcarry( res);
+		rt.m_ar[ ii] = res;
 	}
 	if (carry)
 	{
 		rt.expand( 1);
-		rt.m_ar[ nn] = carry;
+		rt.m_ar[ nn++] = carry;
 	}
 	else
 	{
-		for (; ii>0; --ii)
+		for (ii=nn; ii>0; --ii)
 		{
-			if (rt.m_ar[ii]) break;
+			if (rt.m_ar[ii-1]) break;
 		}
-		rt.m_size = ii+1;
+		rt.m_size = (ii>0)?ii:1;
 	}
 }
 
 void BigBCD::digits_subtraction( BigBCD& rt, const BigBCD& this_, const BigBCD& opr)
 {
-	std::size_t ii = 0, nn = rt.m_size;
+	std::size_t mm = 0, ii = 0, nn = rt.m_size;
+	if (nn == 0) throw std::logic_error( "illegal bcd number");
 	boost::uint32_t carry = 0;
 	for (;ii<nn; ++ii)
 	{
 		boost::uint32_t op1 = (ii>=this_.m_size)?0:this_.m_ar[ii];
 		boost::uint32_t op2 = (ii>=opr.m_size)?0:opr.m_ar[ii];
-		boost::uint32_t res = sub_bcd( op1, op2);
-#if USE_OWN_INCREMENT
-		if (carry) rt.m_ar[ ii] = decrement( res);
-#else
-		rt.m_ar[ ii] = sub_bcd( res, carry);
-#endif
+		boost::uint32_t res = add_bcd( op1, tencomp(op2));
+		if (carry)
+		{
+			res = decrement( res);
+			carry = (op1 <= op2);
+		}
+		else
+		{
+			carry = (op1 < op2);
+		}
+		rt.m_ar[ ii] = res;
 	}
 	if (carry)
 	{
+		for (mm=nn; mm>0; mm--)
+		{
+			boost::uint32_t res = rt.m_ar[ mm-1];
+			if (mm>1) res = increment( res);
+			res = tencomp(res) & 0x0fffFFFF;
+			rt.m_ar[ mm-1] = res;
+		}
 		rt.m_sign = !rt.m_sign;
 	}
 	else
 	{
-		for (; ii>0; --ii)
-		{
-			if (rt.m_ar[ii]) break;
-		}
-		rt.m_size = ii+1;
+		for (mm=nn; mm>0; mm--) rt.m_ar[ mm-1] &= 0x0fffFFFF;
 	}
+	for (ii=nn; ii>0; --ii)
+	{
+		if (rt.m_ar[ii-1]) break;
+	}
+	rt.m_size = (ii>0)?ii:1;
 }
 
 BigBCD BigBCD::add( const BigBCD& opr) const
