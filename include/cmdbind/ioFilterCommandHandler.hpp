@@ -62,6 +62,7 @@ public:
 	{
 		m_outputfilter = out;
 	}
+
 	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
 
