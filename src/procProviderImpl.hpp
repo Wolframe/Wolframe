@@ -42,6 +42,7 @@
 #include "database/database.hpp"
 #include "database/DBprovider.hpp"
 #include "modules/filter/template/filterObjectBuilder.hpp"
+#include "cmdbind/commandHandlerUnit.hpp"
 
 #include <list>
 #include <map>
