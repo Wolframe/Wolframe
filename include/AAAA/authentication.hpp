@@ -61,7 +61,7 @@ public:
 /// AuthenticatorSlice
 /// This is the base class for authenticator slices implementations
 /// An authenticator has (usually) several authenticator sliced
-class AuthenticatorSlice : public _Wolframe::FSMinterface
+class AuthenticatorInstance : public _Wolframe::FSMinterface
 {
 public:
 	enum AuthProtocol	{
@@ -70,7 +70,7 @@ public:
 		SASL			/// SASL dialog
 	};
 
-	virtual ~AuthenticatorSlice()		{}
+	virtual ~AuthenticatorInstance()		{}
 	virtual void close()			{}
 
 	virtual AuthProtocol protocolType() const = 0;
@@ -93,7 +93,7 @@ public:
 						{ return true; }
 	virtual const char* typeName() const = 0;
 
-	virtual AuthenticatorSlice* authSlice() = 0;
+	virtual AuthenticatorInstance* instance() = 0;
 private:
 	const std::string	m_identifier;
 };

@@ -77,7 +77,7 @@ public:
 	~SaslAuthenticator();
 	virtual const char* typeName() const		{ return "SaslAuth"; }
 
-	AuthenticatorSlice* authSlice()		{ return NULL; }
+	AuthenticatorInstance* instance()		{ return NULL; }
 
 private:
 	// registered name of the service, should maybe be fixed (or default to) 'wolframe'

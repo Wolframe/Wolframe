@@ -83,7 +83,7 @@ public:
 	~PAMAuthenticator();
 	virtual const char* typeName() const		{ return "PAMAuth"; }
 
-	AuthenticatorSlice* authSlice()			{ return NULL; }
+	AuthenticatorInstance* instance()			{ return NULL; }
 
 private:
 	// name of the PAM service

@@ -164,7 +164,7 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 //	return m_impl->getFilter( name );
 //}
 
-cmdbind::CommandHandler* ProcessorProvider::getHandler( const std::string& name )
+cmdbind::CommandHandler* ProcessorProvider::getHandler( const std::string& name ) const
 {
 	return m_impl->getHandler( name );
 }
@@ -183,8 +183,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 									it != conf->m_procConfig.end(); it++ )	{
 		module::ContainerBuilder* builder = modules->getContainer((*it)->objectName());
 		if ( builder )	{
-			ObjectContainer< cmdbind::CommandHandler >* handler =
-					dynamic_cast< ObjectContainer< cmdbind::CommandHandler >* >( builder->container( **it ));
+			ObjectContainer< cmdbind::CommandHandlerUnit >* handler =
+					dynamic_cast< ObjectContainer< cmdbind::CommandHandlerUnit >* >( builder->container( **it ));
 			if ( handler == NULL )	{
 				LOG_ALERT << "Wolframe Processor Provider: '" << builder->container( **it )->objectName()
 					  << "'' is not a command handler";
@@ -193,6 +193,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			m_handler.push_back( handler->object() );
 			std::string handlerName = handler->objectName();
 			LOG_TRACE << "'" << handlerName << "' command handler registered";
+			// register handler commands here
 			handler->dispose();
 		}
 		else	{
@@ -204,7 +205,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	// Build the list of filters
 	for ( std::list< module::ObjectBuilder *>::const_iterator it = modules->objectBegin();
 								it != modules->objectEnd(); it++ )	{
-//		if ( // the object is a filter )
+//		if the object is a filter
 		langbind::Filter* filter = dynamic_cast< langbind::Filter* >((*it)->object());
 		if ( filter == NULL )	{
 			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->object()->objectName()
@@ -213,6 +214,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		}
 		std::string filterName = (*it)->object()->objectName();
 		m_filter.push_back( filter );
+		boost::algorithm::to_upper( filterName );
+		m_filterMap[ filterName ] = filter;
 		LOG_TRACE << "'" << filterName << "' filter registered";
 	}
 }
@@ -220,7 +223,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 {
-	for ( std::list< cmdbind::CommandHandler* >::iterator it = m_handler.begin();
+	for ( std::list< cmdbind::CommandHandlerUnit* >::iterator it = m_handler.begin();
 							it != m_handler.end(); it++ )
 		delete *it;
 //	for ( std::list< langbind::Filter* >::iterator it = m_filter.begin();
@@ -245,14 +248,24 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 }
 
 
-//const langbind::Filter& ProcessorProvider::ProcessorProvider_Impl::getFilter( const std::string& name ) const
-//{
-//	return m_impl->getFilter( name );
-//}
-
-cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::getHandler( const std::string& /*name*/ )
+const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::getFilter( const std::string& name ) const
 {
-	return NULL;
+	std::string filterName = boost::algorithm::to_upper_copy( name );
+	std::map<const std::string, const langbind::Filter*>::const_iterator filter = m_filterMap.find( filterName );
+	if ( filter == m_filterMap.end() )
+		return NULL;
+	else
+		return filter->second;
+}
+
+cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::getHandler( const std::string& command ) const
+{
+	std::string cmdName = boost::algorithm::to_upper_copy( command );
+	std::map<const std::string, cmdbind::CommandHandlerUnit*>::const_iterator cmd = m_cmdMap.find( cmdName );
+	if ( cmd == m_cmdMap.end() )
+		return NULL;
+	else
+		return cmd->second->handler( command );
 }
 
 

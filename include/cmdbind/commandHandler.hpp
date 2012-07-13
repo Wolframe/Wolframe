@@ -36,6 +36,7 @@
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #include "countedReference.hpp"
 #include "FSMinterface.hpp"
+#include <string>
 
 namespace _Wolframe {
 namespace cmdbind {
@@ -100,6 +101,23 @@ protected:
 };
 
 typedef CountedReference<CommandHandler> CommandHandlerR;
+
+
+class CommandHandlerUnit
+{
+public:
+	/// \brief virtual destructor
+	virtual ~CommandHandlerUnit()		{}
+
+	/// \brief Return an instance of the command handler for operation
+	/// \param [in] command the name of the command to be executed by the handler
+	/// \returns pointer to a CommandHandler object or NULL if none is available
+	///		for command
+	virtual CommandHandler* handler( const std::string& command );
+
+	// There should be a method to enumerate the commands for the unit
+	// an iterator most likely
+};
 
 }}
 #endif

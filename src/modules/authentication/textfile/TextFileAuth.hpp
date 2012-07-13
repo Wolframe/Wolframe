@@ -75,7 +75,7 @@ public:
 	~TextFileAuthenticator();
 	virtual const char* typeName() const		{ return "TextFileAuth"; }
 
-	AuthenticatorSlice* authSlice();
+	AuthenticatorInstance* instance();
 
 	User* authenticatePlain( const std::string& username, const std::string& password,
 				 bool caseSensitveUser ) const;
@@ -89,7 +89,7 @@ private:
 };
 
 
-class TextFileAuthSlice : public AuthenticatorSlice
+class TextFileAuthSlice : public AuthenticatorInstance
 {
 	enum	FSMstate	{
 		INIT,
@@ -103,7 +103,7 @@ public:
 	void close()					{ delete this; }
 
 	const char* typeName() const			{ return m_backend.typeName(); }
-	AuthProtocol protocolType() const		{ return AuthenticatorSlice::PLAIN; }
+	AuthProtocol protocolType() const		{ return AuthenticatorInstance::PLAIN; }
 
 	void receiveData( const void* data, std::size_t size );
 	const FSMoperation nextOperation();
