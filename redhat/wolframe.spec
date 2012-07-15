@@ -628,6 +628,11 @@ fi
 
 %{_libdir}/wolframe/modules/mod_authz_database.so
 
+%{_libdir}/wolframe/modules/mod_filter_char.so
+%{_libdir}/wolframe/modules/mod_filter_libxml2.so
+%{_libdir}/wolframe/modules/mod_filter_line.so
+%{_libdir}/wolframe/modules/mod_filter_textwolf.so
+%{_libdir}/wolframe/modules/mod_filter_token.so
 
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
