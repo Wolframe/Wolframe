@@ -628,8 +628,6 @@ fi
 
 %{_libdir}/wolframe/modules/mod_authz_database.so
 
-%{_libdir}/wolframe/modules/mod_proc_echo.so
-
 
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
