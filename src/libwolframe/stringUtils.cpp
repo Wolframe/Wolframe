@@ -32,11 +32,11 @@ Project Wolframe.
 ///\file stringUtils.cpp
 ///\brief Some utility string function implementations. They are mainly boost wrappers that are separated because of some warnings needed to be disabled
 
-#include "miscUtils.hpp"
-#include <cstring>
 #ifdef _WIN32
 #pragma warning(disable:4996)
 #endif
+#include "miscUtils.hpp"
+#include <cstring>
 #include <boost/algorithm/string.hpp>
 
 void _Wolframe::utils::splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)

@@ -22,8 +22,8 @@ DYNAMIC_MODULE = \
 	mod_ddlcompiler_simpleform.dll
 
 CPP_OBJS = \
-	$(TOPDIR)\src\ddl_compiler_simpleFormCompiler.o \
-	mod_ddlcompiler_simpleform.o
+	$(TOPDIR)\src\ddl_compiler_simpleFormCompiler.obj \
+	mod_ddlcompiler_simpleform.obj
 
 all: $(DYNAMIC_MODULE)
 
