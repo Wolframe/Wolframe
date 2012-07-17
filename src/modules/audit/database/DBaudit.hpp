@@ -35,7 +35,6 @@
 //
 
 #include "AAAA/audit.hpp"
-#include "config/reference.hpp"
 #include "moduleInterface.hpp"
 
 #ifndef _DB_AUDIT_HPP_INCLUDED

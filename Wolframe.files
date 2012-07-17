@@ -308,7 +308,6 @@ include/cmdbind/luaCommandHandler.hpp
 include/cmdbind/protocolCommandHandler.hpp
 include/config/configurationBase.hpp
 include/config/ConfigurationTree.hpp
-include/config/reference.hpp
 include/config/structSerialize.hpp
 include/config/valueParser.hpp
 include/connectionEndpoint.hpp
@@ -1158,7 +1157,6 @@ src/libwolframe/provider/Authorization.cpp
 src/libwolframe/provider/DBproviderConfig.cpp
 src/libwolframe/provider/DBproviderImpl.cpp
 src/libwolframe/provider/DBproviderImpl.hpp
-src/libwolframe/referenceConfig.cpp
 src/libwolframe/resolvePath.cpp
 src/libwolframe/sha2.c
 src/libwolframe/stringUtils.cpp
