@@ -80,8 +80,9 @@ TEST_BINS = \
 CPP_BINS = \
 	tprocd$(EXE)
 
--include $(TOPDIR)/makefiles/gmake/sub.mk
+tprocd$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
+-include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all: $(CPP_BINS)
 
