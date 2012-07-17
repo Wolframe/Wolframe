@@ -50,7 +50,7 @@ public:
 	///\brief virtual destructor
 	virtual ~CommandHandlerUnit()		{}
 
-	///\brief Get an instance of the command handler for operation
+	///\brief Get an instance of the command handler for the command
 	///\param [in] command the name of the command to be executed by the handler
 	///\returns pointer to a CommandHandler object or NULL if none is available for command
 	virtual CommandHandler* handler( const std::string& command)

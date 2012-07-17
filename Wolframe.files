@@ -28,6 +28,7 @@ makefiles/nmake/sub.mk
 makefiles/nmake/top.mk
 .Attic/appException.cpp
 .Attic/appException.hpp
+.Attic/BCDarithmeticOwnIncrement.c
 .Attic/config/config_descriptionBase.cpp
 .Attic/config/descriptionBase.hpp
 .Attic/config/description.hpp
@@ -292,13 +293,13 @@ include/AAAA/authorization.hpp
 include/AAAA/CRAM.hpp
 include/AAAA/user.hpp
 include/appConfig.hpp
-include/appProcessor.hpp
 include/appProperties.hpp
 include/atomicCounter.hpp
 include/base64.h
 include/base64.hpp
 include/byte2hex.h
 include/cmdbind/commandHandler.hpp
+include/cmdbind/commandHandlerUnit.hpp
 include/cmdbind/directmapCommandHandler.hpp
 include/cmdbind/execCommandHandler.hpp
 include/cmdbind/ioFilterCommandHandler.hpp
@@ -1379,6 +1380,7 @@ tests/rlib/testrlib1.cpp
 tests/rlib/testrlib2.cpp
 tests/singletonTest.cpp
 tests/SSL/README.txt
+tests/temp/bcdnumber_calc.lua
 tests/temp/ddlform_input_generator.lua
 tests/temp/ddlform_iterator.lua
 tests/temp/ddlform_iterator_scope.lua

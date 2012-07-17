@@ -205,8 +205,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	}
 
 	// Build the list of filters
-	for ( std::list< module::ObjectBuilder *>::const_iterator it = modules->objectBegin();
-								it != modules->objectEnd(); it++ )	{
+	for ( module::ModulesDirectory::object_iterator it = modules->objectsBegin();
+								it != modules->objectsEnd(); it++ )	{
 		//		if the object is a filter
 		module::FilterObject* filter = dynamic_cast< module::FilterObject* >((*it)->object());
 		if ( filter == NULL )	{

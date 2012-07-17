@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-///\file moduleInterface.hpp
-//
+///
+/// \file moduleInterface.hpp
+///
 
 #ifndef _MODULE_INTERFACE_HPP_INCLUDED
 #define _MODULE_INTERFACE_HPP_INCLUDED
@@ -73,7 +73,7 @@ public:
 	ContainerBuilder( const char* title, const char* section, const char* keyword,
 			 const char* name )
 		: m_title( title ), m_section( section), m_keyword( keyword ),
-		  m_name( name ){}
+		  m_name( name )		{}
 
 	virtual ~ContainerBuilder()		{}
 
@@ -102,8 +102,8 @@ public:
 class ModulesDirectory
 {
 public:
-	ModulesDirectory()	{}
-	~ModulesDirectory()	{}
+	ModulesDirectory()			{}
+	~ModulesDirectory()			{}
 
 	bool addContainer( ContainerBuilder* container );
 	bool addObject( ObjectBuilder* object );
@@ -111,10 +111,32 @@ public:
 	ContainerBuilder* getContainer( const std::string& section, const std::string& keyword ) const;
 	ContainerBuilder* getContainer( const std::string& name ) const;
 	ObjectBuilder* getObject( const std::string& name ) const;
-	std::list< ObjectBuilder* >::const_iterator objectBegin() const
-						{ return m_object.begin(); }
-	std::list< ObjectBuilder* >::const_iterator objectEnd() const
-						{ return m_object.end(); }
+
+	class object_iterator
+	{
+		friend class ModulesDirectory;
+	public:
+		object_iterator()		{}
+		object_iterator( const object_iterator& it )
+			: m_it( it.m_it)	{}
+
+		ObjectBuilder* operator->() const		{ return *m_it; }
+		ObjectBuilder* operator*() const		{ return *m_it; }
+		object_iterator& operator++()			{ ++m_it; return *this; }
+		object_iterator operator++( int )		{ object_iterator rtrn( *this ); ++m_it; return rtrn; }
+		bool operator == ( const object_iterator& rhs )	{ return m_it == rhs.m_it; }
+		bool operator != ( const object_iterator& rhs )	{ return m_it != rhs.m_it; }
+
+	private:
+		std::list< ObjectBuilder* >::const_iterator	m_it;
+
+		object_iterator( const std::list< ObjectBuilder* >::const_iterator& it )
+			: m_it( it )		{}
+	};
+
+	object_iterator objectsBegin() const				{ return object_iterator( m_object.begin() ); }
+	object_iterator objectsEnd() const				{ return object_iterator( m_object.end() ); }
+
 private:
 	std::list< ContainerBuilder* >	m_container;
 	std::list< ObjectBuilder* >	m_object;
