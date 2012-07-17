@@ -1,13 +1,13 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe-git
-pkgver=20110918
+pkgver=20120717
 pkgrel=1
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
 arch=('i686' 'x86_64')
 url="http://wolframe.net/"
 depends=('boost>=1.43' 'boost-libs>=1.43' 'openssl' 'pam' 'libsasl' 
-         'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'qt')
+         'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'qt' 'gmp')
 makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz')
 md5sums=('8f74d2dcf94db2470ed096127941893d')
 _gitroot=git://github.com/mbarbos/Wolframe.git
@@ -18,7 +18,8 @@ package() {
 
   make \
     WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
-    WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 \
+    WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
+    WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_LIBGMP=1 \
     DESTDIR=${pkgdir} prefix=/usr \
     install
 }
@@ -39,7 +40,10 @@ build() {
   msg "Building..."
   make \
     WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
-    WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 WITH_LIBXSLT=1
+    WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
+    WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_LIBGMP=1 \
+    CFLAGS='-O2' CXXFLAGS='-O2' \
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe
 
   cd docs
   make doc
