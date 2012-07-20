@@ -41,6 +41,16 @@
 namespace _Wolframe {
 namespace module {
 
+ModulesDirectory::~ModulesDirectory()
+{
+	while ( ! m_object.empty() )	{
+		assert( m_object.front() != NULL );
+		delete m_object.front();
+		m_object.pop_front();
+	}
+}
+
+
 bool ModulesDirectory::addContainer( ContainerBuilder* container )
 {
 	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();

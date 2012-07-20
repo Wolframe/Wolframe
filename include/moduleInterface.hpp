@@ -58,6 +58,8 @@ public:
 
 	virtual ~ObjectBuilder()		{}
 
+	const char* builderName() const		{ return m_name; }
+
 	virtual Object* object() = 0;
 };
 
@@ -76,6 +78,8 @@ public:
 		  m_name( name )		{}
 
 	virtual ~ContainerBuilder()		{}
+
+	const char* builderName() const		{ return m_name; }
 
 	virtual config::ObjectConfiguration* configuration( const char* logPrefix ) = 0;
 	virtual Container* container( const config::ObjectConfiguration& conf ) = 0;
@@ -103,7 +107,7 @@ class ModulesDirectory
 {
 public:
 	ModulesDirectory()			{}
-	~ModulesDirectory()			{}
+	~ModulesDirectory();
 
 	bool addContainer( ContainerBuilder* container );
 	bool addObject( ObjectBuilder* object );

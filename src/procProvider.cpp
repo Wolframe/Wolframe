@@ -210,7 +210,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		//		if the object is a filter
 		module::FilterObject* filter = dynamic_cast< module::FilterObject* >((*it)->object());
 		if ( filter == NULL )	{
-			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->object()->objectName()
+			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 				  << "'' is not a filter";
 			throw std::logic_error( "Object is not a filter. See log." );
 		}
