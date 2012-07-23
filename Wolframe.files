@@ -108,6 +108,13 @@ contrib/osc/boost/debian/README.source
 contrib/osc/README
 contrib/README
 Credits
+database/AAAA/audit.sql
+database/AAAA/authentication.sql
+database/AAAA/authorization.sql
+database/Tutorial-1/address.sql
+database/Tutorial-2/customers.sql
+database/Tutorial-2/notes.sql
+database/Tutorial-2/users.sql
 debian/README.source
 docs/AppServer/Appendix.xml
 docs/AppServer/AppServer.ent
@@ -136,6 +143,7 @@ docs/examples/cpp/configuration_parse_prototype.hpp
 docs/examples/cpp/configuration_print_prototype.hpp
 docs/examples/timetrack/customer_query_1.xml
 docs/examples/timetrack/customer_query_2.xml
+docs/examples/timetrack/scheme.sql
 docs/examples/tutorial/ddl_simpleform_1.input.xml
 docs/examples/tutorial/ddl_simpleform_1.output.xml
 docs/examples/tutorial/lua_script_1.input.xml
