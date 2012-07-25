@@ -32,7 +32,7 @@ CPP_OBJS = \
 PASSWD_LIBS = \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	-lboost_program_options \
-	-lboost_system
+	-lboost_system -lboost_filesystem
 
 CPP_BINS = \
 	wolfpasswd$(EXE)

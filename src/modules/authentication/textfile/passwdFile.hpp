@@ -52,6 +52,8 @@ public:
 	static std::string passwdString( const std::string& user,
 					 const std::string& password );
 
+	std::string salt();
+
 	void addUser( const std::string& user, const std::string& password );
 
 	bool delUser( const std::string& user );

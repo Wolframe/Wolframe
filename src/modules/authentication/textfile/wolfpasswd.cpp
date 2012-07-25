@@ -35,6 +35,10 @@
 //
 
 #include <boost/program_options.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
+
 #include <string>
 #include <iostream>
 
@@ -43,6 +47,8 @@
 
 namespace PO = boost::program_options;
 namespace WA = _Wolframe::AAAA;
+namespace WU = _Wolframe::utils;
+
 
 int main( int argc, char* argv[] )
 {
@@ -175,18 +181,18 @@ int main( int argc, char* argv[] )
 
 		// All parameters are OK
 		try	{
-			WA::PasswordFile pwdFile( args[0] );
+			std::string filename = WU::resolvePath( boost::filesystem::absolute( args[0] ).string());
+			WA::PasswordFile pwdFile( filename );
 
 			if ( pwdFile.delUser( args[1] ))
 				std::cout << "User '" << args[1] << "' removed from password file '"
-					  << args[0] << "'";
+					  << filename << "'";
 			else
 				std::cout << "User '" << args[1] << "' not found in password file '"
-					  << args[0] << "'";
+					  << filename << "'";
 		}
 		catch( std::exception& e )	{
-			std::cerr << "Error removing user '" << args[1] << "' from password file '"
-				  << args[0] << ": " << e.what();
+			std::cerr << "Error removing user '" << args[1] << "': " << e.what() << "\n\n";
 			return 1;
 		}
 	}
@@ -223,7 +229,8 @@ int main( int argc, char* argv[] )
 		if ( createFile )
 			create = true;
 		try	{
-			WA::PasswordFile pwdFile( args[0], create );
+			std::string filename = WU::resolvePath( boost::filesystem::absolute( args[0] ).string());
+			WA::PasswordFile pwdFile( filename, create );
 
 			std::string passwd;
 			if ( ! batchPwd )
@@ -231,10 +238,11 @@ int main( int argc, char* argv[] )
 			else
 				passwd = args[2];
 			pwdFile.addUser( args[1], passwd );
+			std::cout << "User '" << args[1] << "' added to password file '"
+				  << filename << "'";
 		}
 		catch( std::exception& e )	{
-			std::cerr << "Error adding user '" << args[1] << "' to password file '"
-				  << args[0] << ": " << e.what();
+			std::cerr << "Error adding user '" << args[1] << "': " << e.what() << "\n\n";
 			return 1;
 		}
 	}

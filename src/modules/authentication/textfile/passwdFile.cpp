@@ -41,6 +41,10 @@
 #include <sstream>
 #include <iostream>
 
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+#include "miscUtils.hpp"
+
 namespace _Wolframe {
 namespace AAAA {
 
@@ -52,13 +56,40 @@ std::string PasswordFile::passwdString( const std::string& user,
 	return ss.str();
 }
 
-void PasswordFile::addUser(const std::string& user, const std::string& password )
+std::string PasswordFile::salt()
 {
-	if ( m_create )
-		std::cout << "Create password file '" << m_filename
-			  << "' if it doesn't exist\n";
-	std::cout << "Change / add user '" << user << "', password file '\n"
-		  << m_filename << "', password '" << password << "'";
+	if ( !boost::filesystem::exists( m_filename ))	{
+		std::string msg = "password file '";
+		msg += m_filename + "' does not exist";
+		throw std::runtime_error( msg );
+	}
+
+	FILE*	file;
+	if ( ! ( file = fopen( m_filename.c_str(), "r" )))	{
+		std::string msg = "error opening password file '";
+		msg += m_filename + "': " + strerror( errno );
+		throw std::runtime_error( msg );
+	}
+
+	return std::string( "" );
+}
+
+void PasswordFile::addUser(const std::string& /*user*/, const std::string& /*password*/ )
+{
+//	FILE*	file;
+
+	if ( !boost::filesystem::exists( m_filename ))	{
+		if ( m_create )	{
+		}
+		else	{
+			std::string msg = "password file '";
+			msg += m_filename + "' does not exist";
+			throw std::runtime_error( msg );
+		}
+	}
+	else	{
+
+	}
 }
 
 bool PasswordFile::delUser( const std::string& user )
