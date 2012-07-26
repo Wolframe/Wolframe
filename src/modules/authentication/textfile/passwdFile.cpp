@@ -41,12 +41,15 @@
 #include <sstream>
 #include <iostream>
 
+#include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "miscUtils.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
+
+static const std::size_t PWD_LINE_SIZE = 1024;
 
 std::string PasswordFile::passwdString( const std::string& user,
 					const std::string& password )
@@ -67,8 +70,45 @@ std::string PasswordFile::salt()
 	FILE*	file;
 	if ( ! ( file = fopen( m_filename.c_str(), "r" )))	{
 		std::string msg = "error opening password file '";
-		msg += m_filename + "': " + strerror( errno );
+		msg += m_filename + "'";
 		throw std::runtime_error( msg );
+	}
+
+	char lineBuf[ PWD_LINE_SIZE + 2];
+	while( ! feof( file ))	{
+		if ( ! fgets( lineBuf,  PWD_LINE_SIZE, file ))	{
+			if ( feof( file ))	{		// EOF reached with nothing to read
+				fclose( file );
+				return std::string();
+			}
+			else	{
+				std::string msg = "error reading password file '";
+				msg += m_filename + "'";
+				fclose( file );
+				throw std::runtime_error( msg );
+			}
+		}
+
+		std::string line( lineBuf );
+		boost::algorithm::trim( line );
+		if ( line[0] == '#' || line.empty() )
+			continue;
+
+		std::size_t  start = 0, end = 0;
+		std::string pwd;
+		// skip username
+		if ( end != std::string::npos )	{
+			end = line.find( ":", start );
+			line.substr( start, (end == std::string::npos) ? std::string::npos : end - start );
+			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+		}
+		// get password
+		if ( end != std::string::npos )	{
+			end = line.find( ":", start );
+			pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+		}
+		return pwd;
 	}
 
 	return std::string( "" );
