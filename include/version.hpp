@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// version.hpp
-//
+/**
+ * Header file for the Version class
+ */
 
 #ifndef _VERSION_HPP_INCLUDED
 #define _VERSION_HPP_INCLUDED
@@ -41,44 +41,49 @@
 
 namespace _Wolframe {
 
-	class Version {
-	private:
-		unsigned short	major_;
-		unsigned short	minor_;
-		unsigned short	revision_;
-		bool		hasRevision_;
-		unsigned	build_;
-		bool		hasBuild_;
-	public:
-		Version();
-		Version( unsigned short M, unsigned short m );
-		Version( unsigned short M, unsigned short m, unsigned short r );
-		Version( unsigned short M, unsigned short m, unsigned short r, unsigned b );
+class Version {
+private:
+	unsigned short	m_major;
+	unsigned short	m_minor;
+	unsigned short	m_revision;
+	bool		m_hasRevision;
+	unsigned	m_build;
+	bool		m_hasBuild;
+public:
+	/// Empty Version constructor.
+	///
+	/// This will contruct a Version object having major and minor versions set to 0,
+	/// no revision number and no build number.
+	Version();
+	Version( unsigned short M, unsigned short m );
+	Version( unsigned short M, unsigned short m, unsigned short r );
+	Version( unsigned short M, unsigned short m, unsigned short r, unsigned b );
 
-		// Aba: clashes on FreeBSD with sys/types.h major and minor
-		unsigned short Major()		{ return major_; }
-		unsigned short Minor()		{ return minor_; }
-		unsigned short Revision()	{ return revision_; }
-		unsigned Build()		{ return build_; }
+	// Aba: clashes on FreeBSD with sys/types.h major and minor
+	unsigned short Major() const		{ return m_major; }
+	unsigned short Minor() const		{ return m_minor; }
+	unsigned short Revision() const		{ return m_revision; }
+	unsigned Build() const			{ return m_build; }
 
-		bool operator== ( const Version &other ) const;
-		bool operator!= ( const Version &other ) const	{ return !( *this == other ); }
+	bool operator == ( const Version &other ) const;
+	bool operator != ( const Version &other ) const	{ return !( *this == other ); }
 
-		bool operator> ( const Version &other ) const;
-		bool operator>= ( const Version &other ) const	{ return !( *this < other ); }
-		bool operator< ( const Version &other ) const	{ return ( other > *this ); }
-		bool operator<= ( const Version &other ) const	{ return !( *this > other ); }
+	bool operator >  ( const Version &other ) const;
+	bool operator >= ( const Version &other ) const	{ return !( *this < other ); }
+	bool operator <  ( const Version &other ) const	{ return  ( other > *this ); }
+	bool operator <= ( const Version &other ) const	{ return !( *this > other ); }
 
-		std::string toString() const;
-		/// format string: (% is the escape character)
-		/// %% - %
-		/// %M - major version
-		/// %m - minor version
-		/// %r - revision
-		/// %b - build
-		/// all other characters are send directly to the output
-		std::string toString( const char* format ) const;
-	};
+	std::string toString() const;
+
+	/// format string: (% is the escape character)
+	/// %% - %
+	/// %M - major version
+	/// %m - minor version
+	/// %r - revision
+	/// %b - build
+	/// all other characters are send directly to the output
+	std::string toString( const char* format ) const;
+};
 
 } // namespace _Wolframe
 

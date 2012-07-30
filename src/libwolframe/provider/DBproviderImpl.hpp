@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-// DBproviderImplementation.hpp
+// DBproviderImpl.hpp
 //
 
 #ifndef _DB_PROVIDER_IMPLEMENTATION_HPP_INCLUDED

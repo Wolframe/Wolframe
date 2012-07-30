@@ -45,10 +45,10 @@ namespace _Wolframe	{
 class ApplicationSingleton : public Singleton< ApplicationSingleton >
 {
 public:
-	const Version& version() const		{ return version_; }
-	void version( const Version& ver )	{ version_ = ver; }
+	const Version& version() const		{ return m_version; }
+	void version( const Version& ver )	{ m_version = ver; }
 private:
-	Version	version_;
+	Version	m_version;
 };
 
 } // namespace _Wolframe

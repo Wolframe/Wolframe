@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// version.cpp
-//
+/// \file version.cpp
+/// Version class implementation
 
 #include <string>
 #include <sstream>
@@ -41,51 +40,48 @@
 namespace _Wolframe {
 
 Version::Version()
-{
-	major_ = minor_ = revision_ = build_ = 0;
-	hasRevision_ = hasBuild_ = false;
-}
+	: m_major( 0 ), m_minor( 0 ),
+	  m_revision( 0 ), m_hasRevision( false ),
+	  m_build( 0 ), m_hasBuild( false )
+{}
 
 Version::Version( unsigned short M, unsigned short m )
-{
-	major_ = M, minor_ = m;
-	revision_ = build_ = 0;
-	hasRevision_ = hasBuild_ = false;
-}
+	: m_major( M ), m_minor( m ),
+	  m_revision( 0 ), m_hasRevision( false ),
+	  m_build( 0 ), m_hasBuild( false )
+{}
 
 Version::Version( unsigned short M, unsigned short m, unsigned short r )
-{
-	major_ = M, minor_ = m, revision_ = r;
-	build_ = 0;
-	hasRevision_ = true;
-	hasBuild_ = false;
-}
+	: m_major( M ), m_minor( m ),
+	  m_revision( r ), m_hasRevision( true ),
+	  m_build( 0 ), m_hasBuild( false )
+{}
 
 Version::Version( unsigned short M, unsigned short m, unsigned short r, unsigned b )
-{
-	major_ = M, minor_ = m, revision_ = r, build_ = b;
-	hasRevision_ = hasBuild_ = true;
-}
+	: m_major( M ), m_minor( m ),
+	  m_revision( r ), m_hasRevision( true ),
+	  m_build( b ), m_hasBuild( true )
+{}
 
 
-bool Version::operator== ( const Version &other ) const
+bool Version::operator == ( const Version &other ) const
 {
-	if ( major_ != other.major_ )		return false;
-	if ( minor_ != other.minor_ )		return false;
-	if ( revision_ != other.revision_ )	return false;
-	if ( build_ != other.build_ )		return false;
+	if ( m_major != other.m_major )		return false;
+	if ( m_minor != other.m_minor )		return false;
+	if ( m_revision != other.m_revision )	return false;
+	if ( m_build != other.m_build )		return false;
 	return true;
 }
 
-bool Version::operator> ( const Version &other ) const
+bool Version::operator > ( const Version &other ) const
 {
-	if ( major_ > other.major_ )		return true;
-	if ( major_ < other.major_ )		return false;
-	if ( minor_ > other.minor_ )		return true;
-	if ( minor_ < other.minor_ )		return false;
-	if ( revision_ > other.revision_ )	return true;
-	if ( revision_ < other.revision_ )	return false;
-	if ( build_ > other.build_ )		return true;
+	if ( m_major > other.m_major )		return true;
+	if ( m_major < other.m_major )		return false;
+	if ( m_minor > other.m_minor )		return true;
+	if ( m_minor < other.m_minor )		return false;
+	if ( m_revision > other.m_revision )	return true;
+	if ( m_revision < other.m_revision )	return false;
+	if ( m_build > other.m_build )		return true;
 
 	return false;
 }
@@ -95,15 +91,16 @@ std::string Version::toString() const
 {
 	std::ostringstream	o;
 
-	o << major_ << "." << minor_;
-	if ( hasRevision_ )	{
-		o << "." << revision_;
-		if ( hasBuild_ )	{
-			o << "." << build_;
+	o << m_major << "." << m_minor;
+	if ( m_hasRevision )	{
+		o << "." << m_revision;
+		if ( m_hasBuild )	{
+			o << "." << m_build;
 		}
 	}
 	return o.str();
 }
+
 
 std::string Version::toString( const char* format ) const
 {
@@ -113,12 +110,12 @@ std::string Version::toString( const char* format ) const
 	for ( const char *it = format; *it != '\0'; it++ )	{
 		if ( escaped )	{
 			switch( *it )	{
-			case '%': o << *it; break;
-			case 'M': o << major_; break;
-			case 'm': o << minor_;	break;
-			case 'r': if ( hasRevision_ ) o << revision_; break;
-			case 'b': if ( hasBuild_ ) o << build_; break;
-			default: o << *it;
+				case '%': o << *it; break;
+				case 'M': o << m_major; break;
+				case 'm': o << m_minor;	break;
+				case 'r': if ( m_hasRevision ) o << m_revision; break;
+				case 'b': if ( m_hasBuild ) o << m_build; break;
+				default: o << *it;
 			}
 			escaped = false;
 		}
