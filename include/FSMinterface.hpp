@@ -37,25 +37,31 @@
 #ifndef _FSM_INTERFACE_HPP_INCLUDED
 #define _FSM_INTERFACE_HPP_INCLUDED
 
-#include <cstddef>
+#include <cstddef>		// for std::size_t
 
 namespace _Wolframe {
 
 /// Finite State Machine operation
-class FSMoperation
-{
-public:
-	enum Operation	{
-		READ,
-		WRITE,
-		CLOSE
-	};
-};
-
 class FSMinterface
 {
 public:
-	enum FSMsignal	{
+	/// Finite State Machine operation
+	class Operation
+	{
+	public:
+		enum FSMoperation	{
+			READ,
+			WRITE,
+			CLOSE
+		};
+	private:
+		FSMoperation	m_op;
+		const void*	m_data;
+		std::size_t	m_dataSize;
+	};
+
+	/// Finite State Machine signal
+	enum Signal	{
 		TIMEOUT,
 		TERMINATE,
 		END_OF_FILE,
@@ -67,13 +73,13 @@ public:
 	/// The input data.
 	virtual void receiveData( const void* data, std::size_t size ) = 0;
 
-	/// What should be done next.
-	virtual const FSMoperation nextOperation() = 0;
+	/// What oeration the FSM expects next from the outside.
+	virtual const Operation nextOperation() = 0;
 
-	/// signal the FSM
-	virtual void signal( FSMsignal /*event*/ )	{}
+	/// Signal the FSM.
+	virtual void signal( Signal /*event*/ )	{}
 
-	/// Data not consumed.
+	/// Data that has not been consumed by the FSM.
 	virtual std::size_t dataLeft( const void*& begin ) = 0;
 };
 

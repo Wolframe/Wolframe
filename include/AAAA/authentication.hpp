@@ -58,9 +58,9 @@ public:
 };
 
 
-/// AuthenticatorSlice
+/// AuthenticatorInstance
 /// This is the base class for authenticator slices implementations
-/// An authenticator has (usually) several authenticator sliced
+/// An authenticator has (usually) several authenticator instances
 class AuthenticatorInstance : public _Wolframe::FSMinterface
 {
 public:

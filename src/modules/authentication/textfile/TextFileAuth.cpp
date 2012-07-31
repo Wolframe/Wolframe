@@ -271,13 +271,13 @@ void TextFileAuthSlice::receiveData( const void* /*data*/, std::size_t /*size*/ 
 {
 }
 
-const FSMoperation TextFileAuthSlice::nextOperation()
+const FSMinterface::Operation TextFileAuthSlice::nextOperation()
 {
-	FSMoperation	op;
+	FSMinterface::Operation	op;
 	return op;
 }
 
-void TextFileAuthSlice::signal( FSMsignal /*event*/ )
+void TextFileAuthSlice::signal( FSMinterface::Signal /*event*/ )
 {
 }
 

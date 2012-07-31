@@ -63,8 +63,8 @@ public:
 
 	// From the FSM interface
 	void receiveData( const void* data, std::size_t size );
-	const FSMoperation nextOperation();
-	void signal( FSMsignal event );
+	const Operation nextOperation();
+	void signal( Signal event );
 	std::size_t dataLeft( const void*& begin );
 private:
 };

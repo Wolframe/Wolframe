@@ -41,28 +41,30 @@
 
 namespace _Wolframe {
 
+/// version class
 class Version {
 private:
-	unsigned short	m_major;
-	unsigned short	m_minor;
-	unsigned short	m_revision;
-	bool		m_hasRevision;
-	unsigned	m_build;
-	bool		m_hasBuild;
+	unsigned short	m_major;		///< Major version.
+	unsigned short	m_minor;		///< Minor version.
+	unsigned short	m_revision;		///< Revision.
+	bool		m_hasRevision;		///< Is revision present ?
+	unsigned	m_build;		///< Build number.
+	bool		m_hasBuild;		///< Is build number present ?
 public:
 	/// Empty Version constructor.
-	///
-	/// This will contruct a Version object having major and minor versions set to 0,
-	/// no revision number and no build number.
 	Version();
 	Version( unsigned short M, unsigned short m );
 	Version( unsigned short M, unsigned short m, unsigned short r );
 	Version( unsigned short M, unsigned short m, unsigned short r, unsigned b );
 
 	// Aba: clashes on FreeBSD with sys/types.h major and minor
+	/// Returns the major number of the version.
 	unsigned short Major() const		{ return m_major; }
+	/// Returns the minor number of the version.
 	unsigned short Minor() const		{ return m_minor; }
+	/// Returns the revision number of the version.
 	unsigned short Revision() const		{ return m_revision; }
+	/// Returns the build number of the version.
 	unsigned Build() const			{ return m_build; }
 
 	bool operator == ( const Version &other ) const;
@@ -73,15 +75,10 @@ public:
 	bool operator <  ( const Version &other ) const	{ return  ( other > *this ); }
 	bool operator <= ( const Version &other ) const	{ return !( *this > other ); }
 
+	/// \brief Print the version in 'major.minor.revision.build' format.
 	std::string toString() const;
 
-	/// format string: (% is the escape character)
-	/// %% - %
-	/// %M - major version
-	/// %m - minor version
-	/// %r - revision
-	/// %b - build
-	/// all other characters are send directly to the output
+	/// \brief Print the version using custom format.
 	std::string toString( const char* format ) const;
 };
 

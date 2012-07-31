@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-/// \file version.cpp
-/// Version class implementation
+/// \file  version.cpp
+/// \brief Version class implementation
 
 #include <string>
 #include <sstream>
@@ -39,6 +39,8 @@
 
 namespace _Wolframe {
 
+/// This will contruct a Version object having major and minor versions set to 0,
+/// no revision number and no build number.
 Version::Version()
 	: m_major( 0 ), m_minor( 0 ),
 	  m_revision( 0 ), m_hasRevision( false ),
@@ -101,7 +103,13 @@ std::string Version::toString() const
 	return o.str();
 }
 
-
+/// The format string elements: (% is the escape character)
+/// \li %% - %
+/// \li %M - major version
+/// \li %m - minor version
+/// \li %r - revision
+/// \li %b - build
+/// \li all other characters are send directly to the output
 std::string Version::toString( const char* format ) const
 {
 	std::ostringstream	o;

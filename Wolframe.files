@@ -35,7 +35,6 @@ makefiles/nmake/top.mk
 .Attic/config/structParser.hpp
 .Attic/config/structPrinter.hpp
 .Attic/config/traits.hpp
-.Attic/date.hpp
 .Attic/ErrorCode.hpp
 .Attic/expression_filter.hpp
 .Attic/filter_expression_filter.cpp
