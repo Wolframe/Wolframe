@@ -106,8 +106,8 @@ public:
 	AuthProtocol protocolType() const		{ return AuthenticatorInstance::PLAIN; }
 
 	void receiveData( const void* data, std::size_t size );
-	const FSMinterface::Operation nextOperation();
-	void signal( FSMinterface::Signal event );
+	const FSM::Operation nextOperation();
+	void signal( FSM::Signal event );
 	std::size_t dataLeft( const void*& begin );
 
 	User* user();

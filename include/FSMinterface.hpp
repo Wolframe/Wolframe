@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///
+/// \file FSMinterface.hpp
 /// Finite State Machine interface
 ///
 
@@ -41,8 +41,8 @@
 
 namespace _Wolframe {
 
-/// Finite State Machine operation
-class FSMinterface
+/// Finite State Machine interface
+class FSM
 {
 public:
 	/// Finite State Machine operation
@@ -60,7 +60,7 @@ public:
 		std::size_t	m_dataSize;
 	};
 
-	/// Finite State Machine signal
+	/// Finite State Machine signals
 	enum Signal	{
 		TIMEOUT,
 		TERMINATE,

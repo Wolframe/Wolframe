@@ -43,7 +43,7 @@ namespace _Wolframe {
 namespace proc {
 
 /// base class for Wolframe channel processors
-class Processor : public FSMinterface
+class Processor : public FSM
 {
 public:
 	enum FSMsignal	{

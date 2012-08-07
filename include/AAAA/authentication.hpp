@@ -48,7 +48,7 @@ namespace _Wolframe {
 namespace AAAA {
 
 // interface for the authentication global mechanism
-class Authenticator : public _Wolframe::FSMinterface
+class Authenticator : public _Wolframe::FSM
 {
 public:
 	virtual ~Authenticator()		{}
@@ -61,7 +61,7 @@ public:
 /// AuthenticatorInstance
 /// This is the base class for authenticator slices implementations
 /// An authenticator has (usually) several authenticator instances
-class AuthenticatorInstance : public _Wolframe::FSMinterface
+class AuthenticatorInstance : public _Wolframe::FSM
 {
 public:
 	enum AuthProtocol	{
