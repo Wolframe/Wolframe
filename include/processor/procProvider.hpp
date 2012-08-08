@@ -46,6 +46,7 @@
 namespace _Wolframe {
 namespace proc {
 
+/// Base class for processor configuration
 class ProcProviderConfig : public config::ConfigurationBase
 {
 	friend class ProcessorProvider;

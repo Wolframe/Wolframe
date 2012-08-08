@@ -37,10 +37,9 @@
 #ifndef _OBJECT_HPP_INCLUDED
 #define _OBJECT_HPP_INCLUDED
 
-#include <string>
-
 namespace _Wolframe	{
 
+/// A generic object
 class Object
 {
 public:

@@ -37,10 +37,9 @@
 #ifndef _CONTAINER_HPP_INCLUDED
 #define _CONTAINER_HPP_INCLUDED
 
-#include <string>
-
 namespace _Wolframe	{
 
+/// Container base class
 class Container
 {
 public:
@@ -49,6 +48,7 @@ public:
 	virtual const char* objectName() const = 0;
 };
 
+/// Template used to specilize a container
 template < class T >
 class ObjectContainer : public Container
 {

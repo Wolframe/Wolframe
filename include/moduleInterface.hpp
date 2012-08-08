@@ -94,10 +94,10 @@ public:
 		: ContainerBuilder( title, section, keyword, name )	{}
 	virtual ~ContainerDescription()		{}
 
-	virtual config::ObjectConfiguration* configuration( const char* logPrefix ){
+	virtual config::ObjectConfiguration* configuration( const char* logPrefix )	{
 		return new Tconf( m_title, logPrefix, m_keyword );
 	}
-	virtual Container* container( const config::ObjectConfiguration& conf ){
+	virtual Container* container( const config::ObjectConfiguration& conf )	{
 		return new T( dynamic_cast< const Tconf& >( conf ));
 	}
 };
