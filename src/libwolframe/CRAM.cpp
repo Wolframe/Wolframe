@@ -31,20 +31,9 @@
 
 ************************************************************************/
 //
-// Challenge Response Authentication Mechanism Implementation
+/// \file CRAM.cpp
+/// Challenge Response Authentication Mechanism Implementation
 //
-
-/**
- * @defgroup CRAM Challenge Response Authentication Mechanism functions
- * @ingroup miscFunctions
- * @{
- */
-
-/**
- * @file CRAM.cpp
- * @brief Implementation of the Challenge Response Authentication Mechanism
- * @author Mihai Barbos <mihai.barbos@gmail.com>
- */
 
 #include <stdexcept>
 #include <cstring>
@@ -82,13 +71,14 @@ PasswordSalt::PasswordSalt()
 	memset( m_salt, 0, PASSWORD_SALT_SIZE );
 }
 
-PasswordSalt::PasswordSalt( const std::string &salt )
+/// \note The byte array is considered to be of size PASSWORD_SALT_SIZE
+/// and it can not be changed.
+PasswordSalt::PasswordSalt( const unsigned char* salt )
 {
-	memset( m_salt, 0, PASSWORD_SALT_SIZE );
-	base64::decode( salt.c_str(), salt.length(), m_salt, PASSWORD_SALT_SIZE );
+	memcpy( m_salt, salt, PASSWORD_SALT_SIZE );
 }
 
-void PasswordSalt::generate( const std::string& randomDevice )
+PasswordSalt::PasswordSalt( const std::string& randomDevice )
 {
 #ifndef _WIN32
 	int hndl = open( randomDevice.c_str(), O_RDONLY );
@@ -315,6 +305,4 @@ bool CRAMresponse::operator == ( const std::string& rhs )
 		return false;
 	return !memcmp( this->m_response, buffer, CRAM_RESPONSE_SIZE );
 }
-
-/** @} *//* CRAM */
 

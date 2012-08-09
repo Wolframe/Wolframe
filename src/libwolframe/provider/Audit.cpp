@@ -100,7 +100,7 @@ void StandardAudit::close()
 }
 
 // audit request
-bool StandardAudit::audit( const AAAAObject& auditObject )
+bool StandardAudit::audit( const Information& auditObject )
 {
 	bool hasSucceded = false;
 

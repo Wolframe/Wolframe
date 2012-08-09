@@ -160,7 +160,7 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 
 	// Check if the connection is allowed
 	if (( m_authorization = m_globalCtx.aaaa().authorizer()))	{
-		if ( m_authorization->allowed( AAAA::AAAAObj_Connect( *m_localEP, *m_remoteEP )))	{
+		if ( m_authorization->allowed( AAAA::ConnectInfo( *m_localEP, *m_remoteEP )))	{
 			LOG_DEBUG << "Connection from " << m_remoteEP->toString()
 				  << " to " << m_localEP->toString() << " authorized";
 		}

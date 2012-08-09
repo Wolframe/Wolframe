@@ -75,16 +75,16 @@ bool DBauthorizer::resolveDB( const db::DatabaseProvider& db )
 }
 
 
-AuthorizationUnit::Result DBauthorizer::allowed( const AAAAObject& authzObject )
+AuthorizationUnit::Result DBauthorizer::allowed( const Information& authzObject )
 {
 	switch ( authzObject.type() )	{
-		case AAAAObject::CONNECTION:	{
-			const AAAAObj_Connect& obj = dynamic_cast<const AAAAObj_Connect&>( authzObject );
+		case Information::CONNECTION:	{
+			const ConnectInfo& obj = dynamic_cast<const ConnectInfo&>( authzObject );
 			return connectionAllowed( obj.local, obj.remote);
 		}
-		case AAAAObject::LOGIN:
-		case AAAAObject::LOGOUT:
-		case AAAAObject::TRANSACTION:
+		case Information::LOGIN:
+		case Information::LOGOUT:
+		case Information::TRANSACTION:
 			return IGNORED;
 	}
 	return ERROR;

@@ -40,7 +40,7 @@
 
 #include <string>
 
-#include "AAAAobjects.hpp"
+#include "AAAAinformation.hpp"
 #include "connectionEndpoint.hpp"
 #include "database/DBprovider.hpp"
 
@@ -56,7 +56,7 @@ public:
 	virtual void close()		{}
 
 	// authorization requests
-	virtual bool allowed( const AAAAObject& ) = 0;
+	virtual bool allowed( const Information& ) = 0;
 };
 
 
@@ -83,7 +83,7 @@ public:
 						{ return true; }
 	virtual const char* typeName() const = 0;
 
-	virtual Result allowed( const AAAAObject& ) = 0;
+	virtual Result allowed( const Information& ) = 0;
 private:
 	const std::string	m_identifier;
 };

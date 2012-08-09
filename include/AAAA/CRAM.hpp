@@ -31,7 +31,12 @@
 
 ************************************************************************/
 //
-// Challenge Response Authentication Mechanism classes
+/// \file CRAM.hpp
+/// Challenge Response Authentication Mechanism classes
+///
+/// \note This implementation of a CRAM mechanism is specific to the Wolframe Project.
+/// It is not supposed to be compatible to any other implementation.
+/// But we hope that is at least as secure as any other authentication implementation.
 //
 
 #ifndef _CRAM_HPP_INCLUDED
@@ -54,14 +59,24 @@ class PasswordSalt
 {
 	friend class PasswordHash;
 public:
+	/// Construct an empty salt (all bits 0).
 	PasswordSalt();
-	explicit PasswordSalt( const std::string& salt );
+	/// Construct a salt from the given byte array.
+	explicit PasswordSalt( const unsigned char* salt );
+	/// Construct a random salt using randomDevice to generate random bytes.
+	explicit PasswordSalt( const std::string& randomDevice );
 
+	/// The size of the salt in bytes
 	static size_t size()		{ return PASSWORD_SALT_SIZE; }
 
-	void generate( const std::string& randomDevice );
+	/// Set the salt value from the BCD encoded string.
+	void fromBCD( const std::string& salt );
+	/// Set the salt value from the base64 encoded string.
+	void fromBase64( const std::string& salt );
 
+	/// Return the salt as a BCD encoded string.
 	std::string toBCD() const;
+	/// Return the salt as a base64 encoded string.
 	std::string toBase64() const;
 private:
 	unsigned char		m_salt[ PASSWORD_SALT_SIZE ];
@@ -107,8 +122,12 @@ public:
 
 	std::string toBCD() const;
 	std::string toBase64() const;
+
+	/// True if the 2 CRAM responses are identical, false otherwise
 	bool operator == ( const CRAMresponse& rhs );
 	bool operator != ( const CRAMresponse& rhs )	{ return !( *this == rhs ); }
+	/// True if the CRAM response base64 encoding is equivalent to the given argument,
+	/// false otherwise
 	bool operator == ( const std::string& rhs );
 	bool operator != ( const std::string& rhs )	{ return !( *this == rhs ); }
 private:

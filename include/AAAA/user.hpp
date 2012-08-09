@@ -31,7 +31,8 @@
 
 ************************************************************************/
 //
-//
+/// \file user.hpp
+/// Basic user information
 //
 
 #ifndef _USER_HPP_INCLUDED
@@ -52,7 +53,7 @@ public:
 
 	~User();
 
-	const std::string& authorizer() const		{ return m_authenticator; }
+	const std::string& authenticator() const	{ return m_authenticator; }
 	time_t loginTime() const			{ return m_loginTime; }
 	const std::string& uname() const		{ return m_uname; }
 	const std::string& name() const			{ return m_name; }

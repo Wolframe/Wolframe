@@ -64,13 +64,13 @@ TextFileAuditor::~TextFileAuditor()
 {
 }
 
-bool TextFileAuditor::audit( const AAAAObject& auditObject )
+bool TextFileAuditor::audit( const Information& auditObject )
 {
 	switch( auditObject.type())	{
-		case AAAAObject::CONNECTION:
-		case AAAAObject::LOGIN:
-		case AAAAObject::LOGOUT:
-		case AAAAObject::TRANSACTION:
+		case Information::CONNECTION:
+		case Information::LOGIN:
+		case Information::LOGOUT:
+		case Information::TRANSACTION:
 			return true;
 	}
 	return false;

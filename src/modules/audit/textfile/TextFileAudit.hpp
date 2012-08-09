@@ -74,7 +74,7 @@ public:
 	const char* typeName() const		{ return "FileAudit"; }
 
 	bool required()				{ return m_required; }
-	bool audit( const AAAAObject& auditObject );
+	bool audit( const Information& auditObject );
 private:
 	bool		m_required;
 	std::string	m_file;

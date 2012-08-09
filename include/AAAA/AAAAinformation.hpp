@@ -31,8 +31,8 @@
 
 ************************************************************************/
 ///
-/// \file AAAAobjects.hpp
-/// \brief header file for the objects used for AAAA operations
+/// \file AAAAinformation.hpp
+/// Header file for the objects used for AAAA information.
 ///
 
 #include "connectionEndpoint.hpp"
@@ -43,29 +43,30 @@
 namespace _Wolframe {
 namespace AAAA {
 
-struct AAAAObject
+/// Base class for AAAA information objects.
+class Information
 {
-	enum ObjectType	{
-		CONNECTION,
-		LOGIN,
-		LOGOUT,
-		TRANSACTION
+public:
+	enum Type	{
+		CONNECTION,			///< object is connection infromation
+		LOGIN,				///< object is login information
+		LOGOUT,				///< object is logout information
+		TRANSACTION			///< object is a transaction information
 	};
 
-	virtual ObjectType type() const = 0;
+	virtual Type type() const = 0;
 };
 
-
-struct AAAAObj_Connect : public AAAAObject
+/// Connection intiation info for AAAA purposes
+struct ConnectInfo : public Information
 {
-	const net::LocalEndpoint&	local;
-	const net::RemoteEndpoint&	remote;
+	const net::LocalEndpoint&	local;	///< local endpoint info
+	const net::RemoteEndpoint&	remote;	///< remote endpoint info
 
-	AAAAObj_Connect( const net::LocalEndpoint& lcl,
-			 const net::RemoteEndpoint& rmt)
+	ConnectInfo( const net::LocalEndpoint& lcl, const net::RemoteEndpoint& rmt )
 		: local( lcl ), remote( rmt )	{}
 
-	AAAAObject::ObjectType type() const	{ return CONNECTION; }
+	Information::Type type() const	{ return CONNECTION; }
 };
 
 }} // namespace _Wolframe::AAAA

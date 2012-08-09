@@ -91,7 +91,7 @@ public:
 	~StandardAuthorizer();
 	void close();
 
-	bool allowed( const AAAAObject& authzObject );
+	bool allowed( const Information& authzObject );
 private:
 	const std::list< AuthorizationUnit* >&	m_authorizeUnits;
 	bool m_default;
@@ -121,7 +121,7 @@ public:
 	~StandardAudit();
 	void close();
 
-	bool audit( const AAAAObject& );
+	bool audit( const Information& );
 private:
 	const std::list< AuditUnit* >&	m_auditUnits;
 	bool				m_mandatory;

@@ -75,7 +75,7 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	AuthorizationUnit::Result allowed( const AAAAObject& );
+	AuthorizationUnit::Result allowed( const Information& );
 private:
 	const std::string	m_dbLabel;
 	const db::Database*	m_db;

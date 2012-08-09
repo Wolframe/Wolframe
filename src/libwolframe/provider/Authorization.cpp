@@ -105,7 +105,7 @@ void StandardAuthorizer::close()
 }
 
 // authorization requests
-bool StandardAuthorizer::allowed( const AAAAObject& authzObject )
+bool StandardAuthorizer::allowed( const Information& authzObject )
 {
 	bool retVal = true;
 	bool ignored = true;

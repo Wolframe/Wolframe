@@ -38,7 +38,7 @@
 #ifndef _AUDIT_HPP_INCLUDED
 #define _AUDIT_HPP_INCLUDED
 
-#include "AAAA/AAAAobjects.hpp"
+#include "AAAA/AAAAinformation.hpp"
 #include "database/DBprovider.hpp"
 
 namespace _Wolframe {
@@ -52,7 +52,7 @@ public:
 	// close the auditor
 	virtual void close()				{}
 
-	virtual bool audit( const AAAAObject& auditObject ) = 0;
+	virtual bool audit( const Information& auditObject ) = 0;
 };
 
 
@@ -67,7 +67,7 @@ public:
 							{ return true; }
 	virtual bool required() = 0;
 
-	virtual bool audit( const AAAAObject& auditObject ) = 0;
+	virtual bool audit( const Information& auditObject ) = 0;
 
 //	virtual bool log( AuditMsg_Connect & msg ) = 0;
 //	virtual bool log( AuditMsg_Login& msg ) = 0;
