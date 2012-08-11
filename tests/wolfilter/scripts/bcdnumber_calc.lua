@@ -15,6 +15,16 @@ function run()
 				op2 = bcdnumber( stack[ #stack])
 				res = op1 - op2
 				output:print( res)
+			elseif w == '*' then
+				op1 = bcdnumber( stack[ #stack -1])
+				op2 = bcdnumber( stack[ #stack])
+				res = op1 * op2
+				output:print( res)
+			elseif w == '/' then
+				op1 = bcdnumber( stack[ #stack -1])
+				op2 = bcdnumber( stack[ #stack])
+				res = op1 / op2
+				output:print( res)
 			else
 				table.insert( stack, w)
 			end
