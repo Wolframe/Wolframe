@@ -100,7 +100,6 @@
 %define with_libxml2	1
 %define with_libxslt	1
 %define with_libhpdf	1
-%define with_libgmp	1
 %define with_examples	1
 
 # Qt is far too old on some platforms, we also don't want to build a local
@@ -243,10 +242,6 @@ Requires: libxslt >= 1.0
 %if %{with_libhpdf}
 BuildRequires: libpng-devel
 BuildRequires: zlib-devel
-%endif
-%if %{with_libgmp}
-BuildRequires: gmp-devel
-Requires: gmp
 %endif
 BuildRequires: gcc-c++
 BuildRequires: doxygen
@@ -453,7 +448,6 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_LIBGMP=%{with_libgmp} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -476,7 +470,6 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_LIBGMP=%{with_libgmp} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -500,7 +493,6 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_LIBGMP=%{with_libgmp} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
@@ -531,7 +523,6 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_LIBGMP=%{with_libgmp} \
 	WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 

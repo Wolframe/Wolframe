@@ -83,9 +83,6 @@ if (boost::starts_with( flag, "DISABLED "))
 #if !(WITH_LUA)
 	if (boost::iequals( flag, "LUA")) return "WITH_LUA=1 ";
 #endif
-#if !(WITH_LIBGMP)
-	if (boost::iequals( flag, "LIBGMP")) return "WITH_LIBGMP=1 ";
-#endif
 #if !(WITH_SSL)
 	if (boost::iequals( flag, "SSL")) return "WITH_SSL=1 ";
 #endif

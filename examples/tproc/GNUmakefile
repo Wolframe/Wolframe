@@ -38,12 +38,6 @@ INCLUDE_LIBS += \
 	$(LIBS_DL)
 endif
 
-# gmp
-ifeq ($(WITH_LIBGMP),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_LIBGMP
-endif
-
 # libxml2
 ifeq ($(WITH_LIBXML2),1)
 INCLUDE_CXXFLAGS += \

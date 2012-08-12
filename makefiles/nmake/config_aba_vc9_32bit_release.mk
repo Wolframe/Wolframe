@@ -124,9 +124,6 @@ WIX_LIBS = dutil_2008.lib wcautil_2008.lib
 WIX_ARCH = x86
 #WIX_ARCH = x64
 
-# libgmp
-########
-
 # define for 64 bit, undefine for 32 bit
 #WIN64=1
 
