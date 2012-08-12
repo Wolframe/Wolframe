@@ -48,6 +48,7 @@ public:
 	BigBCD( const BigBCD& o);
 	~BigBCD();
 
+	void init( const BigBCD& o)			{copy( o, 0);}
 	void init( const std::string& str);
 	std::string tostring() const;
 
@@ -115,12 +116,12 @@ private:
 
 	static void digits_addition( BigBCD& dest, const BigBCD& this_, const BigBCD& opr, Allocator* allocator);
 	static void digits_subtraction( BigBCD& dest, const BigBCD& this_, const BigBCD& opr, Allocator* allocator);
-	static void digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allocator* allocator);
-	static void digits_nibble_multiplication( BigBCD& rt, const BigBCD& this_, unsigned char factor, Allocator* allocator);
-	static void digits_16_multiplication( BigBCD& rt, const BigBCD& this_, Allocator* allocator);
-	static void digits_multiplication( BigBCD& rt, const BigBCD& this_, unsigned int factor, Allocator* allocator);
-	static void digits_multiplication( BigBCD& rt, const BigBCD& this_, const BigBCD& factor, Allocator* allocator);
-	static void digits_division( BigBCD& rt, const BigBCD& this_, const BigBCD& factor, Allocator* allocator);
+	static void digits_shift( BigBCD& dest, const BigBCD& this_, int nof_digits, Allocator* allocator);
+	static void digits_nibble_multiplication( BigBCD& dest, const BigBCD& this_, unsigned char factor, Allocator* allocator);
+	static void digits_16_multiplication( BigBCD& dest, const BigBCD& this_, Allocator* allocator);
+	static void digits_multiplication( BigBCD& dest, const BigBCD& this_, unsigned int factor, Allocator* allocator);
+	static void digits_multiplication( BigBCD& dest, const BigBCD& this_, const BigBCD& factor, Allocator* allocator);
+	static void digits_division( BigBCD& dest, const BigBCD& this_, const BigBCD& factor, Allocator* allocator);
 	static void xchg( BigBCD& a, BigBCD& b);
 	static unsigned int division_estimate( const BigBCD& this_, const BigBCD& opr);
 	static BigBCD estimate_as_bcd( unsigned int estimate, int estshift, Allocator* allocator);
@@ -163,6 +164,8 @@ public:
 		,m_calc_precision(cp){}
 
 	BigNumber( const std::string& numstr, unsigned int sp=0, unsigned int cp=0);
+
+	void format( unsigned int show_prec, unsigned int calc_prec);
 
 	std::string tostring() const;
 

@@ -1138,5 +1138,14 @@ BigNumber BigNumber::operator -() const
 	return rt;
 }
 
+void BigNumber::format( unsigned int show_prec, unsigned int calc_prec)
+{
+	if (calc_prec != m_calc_precision)
+	{
+		init( shift( (int)calc_prec - (int)m_calc_precision));
+	}
+	m_calc_precision = calc_prec;
+	m_show_precision = show_prec;
+}
 
 

@@ -72,6 +72,7 @@ struct Interface
 	TYPE operator * ( const TYPE&) const;
 	TYPE operator - () const;
 	std::string tostring() const;
+	void format( unsigned int show_prec, unsigned int calc_prec);
 
 	bool operator <( const TYPE&) const;
 	bool operator <=( const TYPE&) const;
@@ -92,6 +93,22 @@ struct has_operator_tostring
 	static small_type has_matching_member(tester_member_signature<&U::tostring >*);
 	template<typename U>
 	static small_type has_matching_member(tester_const_member_signature<&U::tostring >*);
+	template<typename U>
+	static large_type has_matching_member(...);
+
+	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
+};
+
+template<typename T>
+struct has_function_format
+{
+	typedef char small_type;
+	struct large_type {small_type dummy[2];};
+
+	template<void (T::*)( unsigned int, unsigned int)> struct tester_member_signature;
+
+	template<typename U>
+	static small_type has_matching_member(tester_member_signature<&U::tostring >*);
 	template<typename U>
 	static large_type has_matching_member(...);
 
@@ -431,6 +448,44 @@ struct LuaOperatorToString
 	}
 };
 
+template <class ObjectType, class MetaTypeInfo>
+struct LuaFunctionFormat
+{
+	typedef LuaFunctionFormat This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			if (lua_gettop( ls) < 2) throw std::runtime_error( "too few arguments");
+			if (lua_gettop( ls) > 3) throw std::runtime_error( "too many arguments");
+			unsigned int show_prec = 0;
+			unsigned int calc_prec = 0;
+
+			if (lua_gettop( ls) == 3)
+			{
+				if (lua_type( ls, 2) != LUA_TNUMBER) throw std::runtime_error( "number expected as 2nd argument");
+				show_prec = lua_tointeger( ls, 2);
+				if (lua_type( ls, 3) != LUA_TNUMBER) throw std::runtime_error( "number expected as 3rd argument");
+				calc_prec = lua_tointeger( ls, 3);
+			}
+			else
+			{
+				if (lua_type( ls, 2) != LUA_TNUMBER) throw std::runtime_error( "number expected as 2nd argument");
+				calc_prec = show_prec = lua_tointeger( ls, 2);
+			}
+			self->format( show_prec, calc_prec);
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "format", ls);
+	}
+};
 
 template <class ObjectType, class MetaTypeInfo>
 struct LuaCmpOperatorEqual
@@ -565,6 +620,23 @@ typename boost::enable_if_c<
 	! has_operator_tostring<T>::value
 	,void>::type defineOperator_tostring( lua_State*)
 {}
+
+template <typename T, typename M>
+typename boost::enable_if_c<
+	has_function_format<T>::value
+	,void>::type defineFunction_format( lua_State* ls)
+{
+	lua_pushliteral( ls, "format");
+	lua_CFunction f = &LuaFunctionFormat<T,M>::exec;
+	lua_pushcfunction( ls, f);
+	lua_rawset( ls, -3);
+}
+template <typename T, typename M>
+typename boost::enable_if_c<
+	! has_function_format<T>::value
+	,void>::type defineFunction_format( lua_State*)
+{}
+
 
 template <typename T, typename M>
 typename boost::enable_if_c<
