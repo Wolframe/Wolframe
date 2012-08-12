@@ -45,7 +45,7 @@ class DDLCompilerObject :public Object, public CompilerInterface
 {
 public:
 	DDLCompilerObject( const char* name_)
-		:CompilerInterface()
+		:CompilerInterface(name_)
 		,m_name(name_){}
 
 	virtual ~DDLCompilerObject(){}
