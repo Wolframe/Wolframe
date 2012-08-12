@@ -152,7 +152,7 @@ private:
 	MemChunk* m_chunk;
 };
 
-void BigBCD::init( std::size_t nn, bool ng, Allocator* allocator)
+void BigBCD::init( std::size_t nn, Allocator* allocator)
 {
 	if (m_ar && m_allocated) free( m_ar);
 	m_size = nn;
@@ -178,7 +178,7 @@ void BigBCD::init( std::size_t nn, bool ng, Allocator* allocator)
 		m_ar = 0;
 		m_allocated = false;
 	}
-	m_neg = ng;
+	m_neg = false;
 }
 
 BigBCD::BigBCD()
@@ -187,26 +187,13 @@ BigBCD::BigBCD()
 	,m_neg(false)
 	,m_allocated(false)
 {
-	init( 0, false);
+	init( 0);
 }
 
-BigBCD::BigBCD( std::size_t n, bool ng)
-	:m_size(0)
-	,m_ar(0)
-	,m_neg(ng)
-	,m_allocated(false)
+void BigBCD::init( const std::string& str)
 {
-	init( n, ng);
-}
-
-BigBCD::BigBCD( const std::string& numstr)
-	:m_size(0)
-	,m_ar(0)
-	,m_neg(false)
-	,m_allocated(false)
-{
-	unsigned int ii = 0, nn = numstr.size();
-	if (numstr[ ii] == '-')
+	unsigned int ii = 0, nn = str.size();
+	if (str[ ii] == '-')
 	{
 		++ii;
 		m_neg = true;
@@ -215,10 +202,10 @@ BigBCD::BigBCD( const std::string& numstr)
 	unsigned int tt = (((nn-ii)+6) % 7) * 4;
 	if (!bb) throw std::runtime_error( "illegal bcd number string");
 
-	init( bb, m_neg);
+	init( bb);
 	for (; ii<nn; ++ii)
 	{
-		unsigned int digit = (unsigned char)(numstr[ ii] - '0');
+		unsigned int digit = (unsigned char)(str[ ii] - '0');
 		if (digit > 9) throw std::runtime_error( "illegal bcd number");
 		m_ar[ bb-1] += (digit << tt);
 
@@ -233,6 +220,16 @@ BigBCD::BigBCD( const std::string& numstr)
 			tt -= 4;
 		}
 	}
+	normalize();
+}
+
+BigBCD::BigBCD( const std::string& numstr)
+	:m_size(0)
+	,m_ar(0)
+	,m_neg(false)
+	,m_allocated(false)
+{
+	init( numstr);
 }
 
 BigBCD::BigBCD( const BigBCD& o)
@@ -241,13 +238,15 @@ BigBCD::BigBCD( const BigBCD& o)
 	,m_neg(o.m_neg)
 	,m_allocated(false)
 {
-	init( m_size, m_neg);
+	init( m_size);
+	m_neg = o.m_neg;
 	std::memcpy( m_ar, o.m_ar, m_size * sizeof(*m_ar));
 }
 
 void BigBCD::copy( const BigBCD& o, Allocator* allocator)
 {
-	init( o.m_size, o.m_neg, allocator);
+	init( o.m_size, allocator);
+	m_neg = o.m_neg;
 	std::memcpy( m_ar, o.m_ar, m_size * sizeof(*m_ar));
 }
 
@@ -402,12 +401,33 @@ bool BigBCD::isNull() const
 	return (ii==ee);
 }
 
+void BigBCD::normalize()
+{
+	if (!isValid()) throw std::logic_error( "bad bcd calculation");
+	std::size_t ii = 0, nn = m_size;
+
+	for (ii=nn; ii>0; --ii)
+	{
+		if (m_ar[ii-1]) break;
+	}
+	if (ii > 0)
+	{
+		m_size = ii;
+	}
+	else
+	{
+		m_neg = false;
+		m_size = 0;
+	}
+}
+
 void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr, Allocator* allocator)
 {
 	boost::uint32_t carry;
 	std::size_t ii=0, nn = (opr.m_size > this_.m_size)?opr.m_size:this_.m_size;
 	if (nn == 0) return;
-	rt.init( nn+1, this_.m_neg, allocator);
+	rt.init( nn+1, allocator);
+	rt.m_neg = this_.m_neg;
 	carry = 0;
 	for (;ii<nn; ++ii)
 	{
@@ -421,14 +441,11 @@ void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr
 	if (carry)
 	{
 		rt.m_ar[ nn++] = carry;
+		if (!rt.isValid()) throw std::logic_error( "bad bcd calculation");
 	}
 	else
 	{
-		for (ii=nn; ii>0; --ii)
-		{
-			if (rt.m_ar[ii-1]) break;
-		}
-		rt.m_size = (ii>0)?ii:1;
+		rt.normalize();
 	}
 }
 
@@ -436,7 +453,8 @@ void BigBCD::digits_subtraction( BigBCD& rt, const BigBCD& this_, const BigBCD& 
 {
 	std::size_t ii = 0, mm = 0, nn = (opr.m_size > this_.m_size)?opr.m_size:this_.m_size;
 	if (nn == 0) return;
-	rt.init( nn, this_.m_neg, allocator);
+	rt.init( nn, allocator);
+	rt.m_neg = this_.m_neg;
 	boost::uint32_t carry = 0;
 	for (;ii<nn; ++ii)
 	{
@@ -469,11 +487,7 @@ void BigBCD::digits_subtraction( BigBCD& rt, const BigBCD& this_, const BigBCD& 
 	{
 		for (mm=nn; mm>0; mm--) rt.m_ar[ mm-1] &= 0x0fffFFFF;
 	}
-	for (ii=nn; ii>0; --ii)
-	{
-		if (rt.m_ar[ii-1]) break;
-	}
-	rt.m_size = (ii>0)?ii:1;
+	rt.normalize();
 }
 
 void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allocator* allocator)
@@ -485,7 +499,8 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allo
 		std::size_t ii,nn;
 		const boost::uint32_t MASK = (1<<28)-1;
 
-		rt.init( this_.m_size + ofs + 1, this_.m_neg, allocator);
+		rt.init( this_.m_size + ofs + 1, allocator);
+		rt.m_neg = this_.m_neg;
 		for (ii=0,nn=ofs; ii<nn; ++ii)
 		{
 			rt.m_ar[ ii] = 0;
@@ -518,7 +533,8 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allo
 		std::size_t ii,nn;
 		const boost::uint32_t MASK = (1<<28)-1;
 
-		rt.init( this_.m_size - ofs + 1, this_.m_neg, allocator);
+		rt.init( this_.m_size - ofs + 1, allocator);
+		rt.m_neg = this_.m_neg;
 		if (sfh == 0)
 		{
 			for (ii=ofs,nn=this_.m_size; ii<nn; ++ii)
@@ -542,12 +558,7 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allo
 	{
 		rt.copy( this_, allocator);
 	}
-	std::size_t ii;
-	for (ii=rt.m_size; ii>0; --ii)
-	{
-		if (rt.m_ar[ii-1]) break;
-	}
-	rt.m_size = ii;
+	rt.normalize();
 }
 
 BigBCD BigBCD::shift( int digits) const
@@ -660,7 +671,7 @@ void BigBCD::digits_multiplication( BigBCD& rt, const BigBCD& this_, unsigned in
 {
 	if (factor == 0)
 	{
-		rt.init( 0, false);
+		rt.init( 0);
 		return;
 	}
 	BigBCD part,fac;
@@ -760,6 +771,7 @@ void BigBCD::digits_division( BigBCD& rt, const BigBCD& this_, const BigBCD& opr
 	if (opr.sign() != this_.sign())
 	{
 		rt.m_neg = true;
+		rt.normalize();
 	}
 }
 
@@ -809,8 +821,8 @@ BigBCD BigBCD::mul( const BigBCD& opr) const
 
 bool BigBCD::isequal( const BigBCD& o) const
 {
-	if (sign() != o.sign()) return false;
 	BigBCD::const_iterator ii = begin(), ee = end(), oo = o.begin();
+	if (sign() != o.sign() && (ii != ee || oo != o.end())) return false;
 	if (ii.size() != oo.size()) return false;
 	for (; ii != ee; ++ii,++oo) if (*ii != *oo) return false;
 	return true;
@@ -896,7 +908,7 @@ BigBCD BigBCD::estimate_as_bcd( unsigned int estimate, int estshift, Allocator* 
 {
 	unsigned int mm = (estshift>0)?(3+estshift/4):(3-estshift/4);
 	BigBCD rt;
-	rt.init( mm, false, allocator);
+	rt.init( mm, allocator);
 
 	if (estimate >= std::numeric_limits<unsigned int>::max())
 	{
@@ -927,12 +939,7 @@ BigBCD BigBCD::estimate_as_bcd( unsigned int estimate, int estshift, Allocator* 
 			tt += 4;
 		}
 	}
-	std::size_t ii;
-	for (ii=rt.m_size; ii>0; --ii)
-	{
-		if (rt.m_ar[ii-1]) break;
-	}
-	rt.m_size = ii;
+	rt.normalize();
 	return rt;
 }
 
@@ -941,6 +948,195 @@ BigBCD BigBCD::div( const BigBCD& opr) const
 	BigBCD val;
 	Allocator allocator;
 	digits_division( val, *this, opr, &allocator);
+	val.normalize();
 	return BigBCD( val);
 }
+
+BigBCD BigBCD::neg() const
+{
+	BigBCD rt(*this);
+	rt.m_neg = !rt.m_neg;
+	rt.normalize();
+	return rt;
+}
+
+BigNumber::BigNumber( const std::string& numstr, unsigned int sp, unsigned int cp)
+	:m_show_precision(sp)
+	,m_calc_precision(cp)
+{
+	std::string val;
+	std::string::const_iterator ii=numstr.begin(), ee=numstr.end();
+	unsigned int cpn = 0;
+	int state = 0;
+	for (; ii != ee; ++ii)
+	{
+		if (*ii == '.')
+		{
+			if (state != 0) throw std::runtime_error( "illegal big number syntax");
+			state = 1;
+		}
+		else
+		{
+			if (state == 1)
+			{
+				if (cpn < cp)
+				{
+					val.push_back( *ii);
+					cpn++;
+				}
+			}
+			else
+			{
+				val.push_back( *ii);
+			}
+		}
+	}
+	for (; cpn < cp; ++cpn)
+	{
+		val.push_back( '0');
+	}
+	init( val);
+}
+
+std::string BigNumber::tostring() const
+{
+	BigBCD::const_iterator ii=begin(), ee=end();
+	unsigned int kk = ii.size();
+	std::string rt;
+	if (sign() == '-')
+	{
+		rt.push_back('-');
+	}
+	for (; kk > m_calc_precision && ii != ee; --kk,++ii)
+	{
+		rt.push_back( ii.ascii());
+	}
+	if (m_show_precision > 0)
+	{
+		rt.push_back('.');
+	}
+	for (kk=0; ii != ee && kk < m_show_precision; ++kk,++ii)
+	{
+		rt.push_back( ii.ascii());
+	}
+	for (; kk < m_show_precision; ++kk)
+	{
+		rt.push_back( '0');
+	}
+	return rt;
+}
+
+bool BigNumber::isequal( const BigNumber& o) const
+{
+	if (o.m_calc_precision == m_calc_precision)
+	{
+		return BigBCD::operator == ( o);
+	}
+	if (o.m_calc_precision < m_calc_precision)
+	{
+		return BigBCD::operator == ( o.shift( m_calc_precision-o.m_calc_precision));
+	}
+	else
+	{
+		BigBCD val( shift( o.m_calc_precision-m_calc_precision));
+		return val == o;
+	}
+}
+
+bool BigNumber::islt( const BigNumber& o) const
+{
+	if (o.m_calc_precision == m_calc_precision)
+	{
+		return BigBCD::operator < ( o);
+	}
+	if (o.m_calc_precision < m_calc_precision)
+	{
+		return BigBCD::operator < ( o.shift( m_calc_precision-o.m_calc_precision));
+	}
+	else
+	{
+		BigBCD val( shift( o.m_calc_precision-m_calc_precision));
+		return val < o;
+	}
+}
+
+bool BigNumber::isle( const BigNumber& o) const
+{
+	if (o.m_calc_precision == m_calc_precision)
+	{
+		return BigBCD::operator <= ( o);
+	}
+	if (o.m_calc_precision < m_calc_precision)
+	{
+		return BigBCD::operator <= ( o.shift( m_calc_precision-o.m_calc_precision));
+	}
+	else
+	{
+		BigBCD val( shift( o.m_calc_precision-m_calc_precision));
+		return val <= o;
+	}
+}
+
+BigNumber BigNumber::operator /( const BigNumber& o) const
+{
+	BigBCD val( shift( (int)o.m_calc_precision));
+	BigNumber rt( val / ( o.shift( m_calc_precision-o.m_calc_precision)), m_show_precision, m_calc_precision);
+	return rt;
+}
+
+BigNumber BigNumber::operator *( const BigNumber& o) const
+{
+	BigBCD val( static_cast<BigBCD>(o) * ( o.shift( m_calc_precision-o.m_calc_precision)));
+	BigNumber rt( val.shift( -(int)o.m_calc_precision), m_show_precision, m_calc_precision);
+	return rt;
+}
+
+BigNumber BigNumber::operator +( const BigNumber& o) const
+{
+	if (o.m_calc_precision == m_calc_precision)
+	{
+		BigNumber rt( BigBCD::operator + ( o), m_show_precision, m_calc_precision);
+		return rt;
+	}
+	if (o.m_calc_precision < m_calc_precision)
+	{
+		BigNumber rt( BigBCD::operator + ( o.shift( m_calc_precision-o.m_calc_precision)), m_show_precision, m_calc_precision);;
+		return rt;
+	}
+	else
+	{
+		BigBCD val( shift( o.m_calc_precision-m_calc_precision) + o);
+		BigNumber rt( val.shift( -(int)(o.m_calc_precision-m_calc_precision)), m_show_precision, m_calc_precision);
+		return rt;
+	}
+}
+
+BigNumber BigNumber::operator -( const BigNumber& o) const
+{
+	if (o.m_calc_precision == m_calc_precision)
+	{
+		BigNumber rt( BigBCD::operator - ( o), m_show_precision, m_calc_precision);
+		return rt;
+	}
+	if (o.m_calc_precision < m_calc_precision)
+	{
+		BigNumber rt( BigBCD::operator - ( o.shift( m_calc_precision-o.m_calc_precision)), m_show_precision, m_calc_precision);;
+		return rt;
+	}
+	else
+	{
+		BigBCD val( shift( o.m_calc_precision-m_calc_precision) - o);
+		BigNumber rt( val.shift( -(int)(o.m_calc_precision-m_calc_precision)), m_show_precision, m_calc_precision);
+		return rt;
+	}
+}
+
+BigNumber BigNumber::operator -() const
+{
+	BigNumber rt( rt);
+	rt.invert_sign();
+	return rt;
+}
+
+
 

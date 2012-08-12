@@ -45,25 +45,43 @@ extern "C"
 using namespace _Wolframe;
 using namespace langbind;
 
-struct LuaBignumMetaInfo :public types::BigBCD
+struct LuaBigintMetaInfo
 {
 	static const char* metatableName()
 	{
-		return "wolframe.bcdnumber";
+		return "wolframe.bigint";
 	}
 	static const char* typeName()
 	{
-		return "bcdnumber";
+		return "bigint";
 	}
 };
 
-typedef LuaArithmeticType<types::BigBCD, LuaBignumMetaInfo> LuaBigBCD;
-typedef LuaArithmeticTypeConstructor<types::BigBCD, LuaBignumMetaInfo> ConstructorLuaBigBCD;
+typedef LuaArithmeticType<types::BigBCD, LuaBigintMetaInfo> LuaBigint;
+typedef LuaArithmeticTypeConstructor<types::BigBCD, LuaBigintMetaInfo> ConstructorLuaBigint;
+
+struct LuaBignumMetaInfo
+{
+	static const char* metatableName()
+	{
+		return "wolframe.bignum";
+	}
+	static const char* typeName()
+	{
+		return "bignum";
+	}
+};
+
+typedef LuaArithmeticType<types::BigNumber, LuaBignumMetaInfo> LuaBignum;
+typedef LuaArithmeticTypeConstructor<types::BigNumber, LuaBignumMetaInfo> ConstructorLuaBignum;
 
 int _Wolframe::langbind::initBignumModule( lua_State* ls)
 {
-	createLuaArithmeticTypeMetatable<types::BigBCD, LuaBignumMetaInfo>( ls);
-	lua_register( ls, "bcdnumber", &ConstructorLuaBigBCD::create);
+	createLuaArithmeticTypeMetatable<types::BigBCD, LuaBigintMetaInfo>( ls);
+	lua_register( ls, "bigint", &ConstructorLuaBigint::create);
+
+	createLuaArithmeticTypeMetatable<types::BigNumber, LuaBignumMetaInfo>( ls);
+	lua_register( ls, "bignum", &ConstructorLuaBignum::create);
 	return 0;
 }
 

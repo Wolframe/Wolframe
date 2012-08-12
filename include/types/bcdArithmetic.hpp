@@ -48,9 +48,8 @@ public:
 	BigBCD( const BigBCD& o);
 	~BigBCD();
 
+	void init( const std::string& str);
 	std::string tostring() const;
-
-	BigBCD& operator=( const BigBCD& o);
 
 	BigBCD operator /( const BigBCD& opr) const	{return div( opr);}
 	BigBCD operator *( const BigBCD& opr) const	{return mul( opr);}
@@ -58,6 +57,10 @@ public:
 	BigBCD operator +( const BigBCD& opr) const	{return add( opr);}
 	BigBCD operator -( const BigBCD& opr) const	{return sub( opr);}
 	BigBCD operator -() const			{return neg();}
+
+	BigBCD shift( int digits) const;
+	void invert_sign()				{m_neg = !m_neg; normalize();}
+	char sign() const				{return m_neg?'-':'+';}
 
 	bool operator==( const BigBCD& o) const		{return isequal(o);}
 	bool operator!=( const BigBCD& o) const		{return !isequal(o);}
@@ -80,8 +83,10 @@ public:
 		const_iterator operator++(int)			{const_iterator rt(*this); increment(); return rt;}
 		unsigned char operator*() const;
 		const const_iterator* operator->() const	{return this;}
+
 		char ascii() const				{return operator*() + '0';}
 		std::size_t size() const;
+
 		bool operator==( const const_iterator& o) const	{return isequal(o);}
 		bool operator!=( const const_iterator& o) const	{return !isequal(o);}
 		bool operator<=( const const_iterator& o) const	{return isle(o);}
@@ -104,10 +109,9 @@ public:
 
 private:
 	struct Allocator;
-	void init( std::size_t size_, bool neg_, Allocator* allocator=0);
+	void init( std::size_t size_, Allocator* allocator=0);
 	void copy( const BigBCD& o, Allocator* allocator);
-
-	explicit BigBCD( std::size_t n, bool sgn=true);
+	void normalize();
 
 	static void digits_addition( BigBCD& dest, const BigBCD& this_, const BigBCD& opr, Allocator* allocator);
 	static void digits_subtraction( BigBCD& dest, const BigBCD& this_, const BigBCD& opr, Allocator* allocator);
@@ -121,15 +125,13 @@ private:
 	static unsigned int division_estimate( const BigBCD& this_, const BigBCD& opr);
 	static BigBCD estimate_as_bcd( unsigned int estimate, int estshift, Allocator* allocator);
 
-	BigBCD shift( int digits) const;
 	BigBCD add( const BigBCD& opr) const;
 	BigBCD sub( const BigBCD& opr) const;
 	BigBCD mul( unsigned int opr) const;
 	BigBCD mul( const BigBCD& opr) const;
 	BigBCD div( const BigBCD& opr) const;
-	BigBCD neg() const				{BigBCD rt(*this); rt.m_neg = !rt.m_neg; return rt;}
+	BigBCD neg() const;
 
-	char sign() const				{return m_neg?'-':'+';}
 	bool isequal( const BigBCD& other) const;
 	bool islt( const BigBCD& other) const;
 	bool isle( const BigBCD& other) const;
@@ -141,6 +143,51 @@ private:
 	boost::uint32_t* m_ar;
 	bool m_neg;
 	bool m_allocated;
+};
+
+class BigNumber :public BigBCD
+{
+public:
+	BigNumber()
+		:m_show_precision(0)
+		,m_calc_precision(0){}
+
+	BigNumber( const BigNumber& o)
+		:BigBCD(o)
+		,m_show_precision(o.m_show_precision)
+		,m_calc_precision(o.m_calc_precision){}
+
+	BigNumber( const BigBCD& o, unsigned int sp, unsigned int cp)
+		:BigBCD(o)
+		,m_show_precision(sp)
+		,m_calc_precision(cp){}
+
+	BigNumber( const std::string& numstr, unsigned int sp=0, unsigned int cp=0);
+
+	std::string tostring() const;
+
+	BigNumber& operator=( const BigNumber& o);
+
+	BigNumber operator /( const BigNumber& opr) const;
+	BigNumber operator *( const BigNumber& opr) const;
+	BigNumber operator *( unsigned int opr) const;
+	BigNumber operator +( const BigNumber& opr) const;
+	BigNumber operator -( const BigNumber& opr) const;
+	BigNumber operator -() const;
+
+	bool operator==( const BigNumber& o) const		{return isequal(o);}
+	bool operator!=( const BigNumber& o) const		{return !isequal(o);}
+	bool operator<=( const BigNumber& o) const		{return isle(o);}
+	bool operator<( const BigNumber& o) const		{return islt(o);}
+	bool operator>=( const BigNumber& o) const		{return !islt(o);}
+	bool operator>( const BigNumber& o) const		{return !isle(o);}
+private:
+	bool isequal( const BigNumber& other) const;
+	bool islt( const BigNumber& other) const;
+	bool isle( const BigNumber& other) const;
+
+	unsigned int m_show_precision;
+	unsigned int m_calc_precision;
 };
 
 }}//namespace
