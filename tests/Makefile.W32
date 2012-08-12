@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = modules AAAA bignum
+SUBDIRS = modules AAAA
 
 # all broken on windows due to working telnet
 #!IFDEF WITH_EXPECT

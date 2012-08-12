@@ -1,8 +1,8 @@
 
 Available targets:
 
-nmake [all]	       create all artifacts
-nmake test	       create test binaries and execute tests and execute
+nmake [all]            create all artifacts
+nmake test             create test binaries and execute tests and execute
                        fast tests
 nmake longtest         execute all tests, including long lasting ones
 nmake doc              build the documentation
@@ -23,7 +23,6 @@ WITH_MSXML=1           build with Microsoft XML Core Services support
 WITH_XMLLITE=1         build with Microsoft XmlLite library support
 WITH_EXAMPLES=1        build and test the examples
 WITH_LIBHPDF=1         build code for creating PDFs with LibHpdf
-WITH_LIBGMP=1          build support for big integers and reals (using GMP)
 
 Avaliable optional features during testing only:
 
@@ -33,5 +32,5 @@ WITH_EXPECT=1          use Expect/Tcl for system testing
 Example:
 nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1
                               WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LIBXML2=1
-			      WITH_LIBXSLT=1 WITH_LIBHPDF=1 WITH_EXAMPLES=1
-                              WITH_MSXML=1 WITH_XMLLITE=1 WITH_LIBGMP=1
+                              WITH_LIBXSLT=1 WITH_LIBHPDF=1 WITH_EXAMPLES=1
+                              WITH_MSXML=1 WITH_XMLLITE=1

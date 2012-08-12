@@ -123,9 +123,6 @@ WIX_ARCH = x64
 
 #PGDLL_WITHOUT_MAJOR_VERSION=1
 
-# libgmp
-########
-
 # define for 64 bit, undefine for 32 bit
 #WIN64=1
 

@@ -36,12 +36,6 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_LIBXML2
 endif
 
-# libgmp
-ifeq ($(WITH_LIBGMP),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_LIBGMP
-endif
-
 LOCAL_STATIC_LIB = \
 	wolftest.a
 

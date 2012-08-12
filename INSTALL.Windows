@@ -45,8 +45,6 @@ Prerequisites
   - optionally (WITH_MSXML): MSXML 6.0 or later
 - optionally (WITH_LIBHPDF): for PDF creation,
   using the provided version in 'libhpdf'
-- optionally (WITH_LIBGMP): for bigint support,
-  using the provided library in 'libgmp'
 - optionally for testing (WITH_EXPECT) Expect and Tcl 8.4 or later
 - optionally for packaging:
   - Wix 3.5 or later (which needs .NET 2.0 during packaging)

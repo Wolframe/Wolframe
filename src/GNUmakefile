@@ -60,14 +60,6 @@ INCLUDE_LIBS += \
 	$(LIBXML2_LIBS)
 endif
 
-# libgmp
-ifeq ($(WITH_LIBGMP),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_LIBGMP
-INCLUDE_LIBS += \
-	$(LIBGMP_LIBS)
-endif
-
 LOCAL_STATIC_LIB = \
 	libwolframe.a
 

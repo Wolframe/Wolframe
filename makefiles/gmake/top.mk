@@ -172,13 +172,6 @@ endif
 	@echo "LIBZ_LIB_DIRS: $(LIBZ_LIB_DIRS)"
 	@echo "LIBZ_LIBS: $(LIBZ_LIBS)"
 endif
-ifeq ($(WITH_LIBGMP),1)
-	@echo
-	@echo "LIBGMP_DIR: $(LIBGMP_DIR)"
-	@echo "LIBGMP_INCLUDE_DIRS: $(LIBGMP_INCLUDE_DIRS)"
-	@echo "LIBGMP_LIB_DIRS: $(LIBGMP_LIB_DIRS)"
-	@echo "LIBGMP_LIBS: $(LIBGMP_LIBS)"
-endif
 ifeq ($(WITH_LIBHPDF),1)
 ifeq ($(WITH_SYSTEM_LIBHPDF),1)
 	@echo
@@ -190,13 +183,6 @@ endif
 ifeq ($(WITH_LOCAL_LIBHPDF),1)
 	@echo
 	@echo "using local libhpdf.."
-endif
-ifeq ($(WITH_GMP),1)
-	@echo
-	@echo "LIBGMP_DIR: $(LIBGMP_DIR)"
-	@echo "LIBGMP_INCLUDE_DIRS: $(LIBGMP_INCLUDE_DIRS)"
-	@echo "LIBGMP_LIB_DIRS: $(LIBGMP_LIB_DIRS)"
-	@echo "LIBGMP_LIBS: $(LIBGMP_LIBS)"
 endif
 endif
 	@echo

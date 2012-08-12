@@ -1,8 +1,6 @@
 TOPDIR = ..
 
 SUBDIRS = modules AAAA wolfilter
-# SUBDIRS = modules AAAA bignum
-
 
 ifeq ($(WITH_EXPECT),1)
 SUBDIRS += expect config
