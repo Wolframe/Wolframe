@@ -47,56 +47,145 @@ void BigBCD::xchg( BigBCD& a, BigBCD& b)
 	tmp.m_ar = a.m_ar;
 	tmp.m_size = a.m_size;
 	tmp.m_neg = a.m_neg;
+	tmp.m_allocated = a.m_allocated;
+
 	a.m_ar = b.m_ar;
 	a.m_size = b.m_size;
 	a.m_neg = b.m_neg;
+	a.m_allocated = b.m_allocated;
+
 	b.m_ar = tmp.m_ar;
 	b.m_size = tmp.m_size;
 	b.m_neg = tmp.m_neg;
+	b.m_allocated = tmp.m_allocated;
+
 	tmp.m_ar = 0;
 	tmp.m_size = 0;
+	tmp.m_allocated = false;
 }
 
-void BigBCD::init( std::size_t nn, bool ng)
+namespace {
+class MemChunk
 {
-	if (m_ar) free( m_ar);
+public:
+	enum {bufsize=(1<<15)};
+
+	explicit MemChunk( std::size_t nn=bufsize) :m_next(0),m_pos(0),m_bufsize(nn<(std::size_t)bufsize?(std::size_t)bufsize:nn)
+	{
+		m_buf = (char*)std::calloc( m_bufsize, sizeof(char));
+		if (!m_buf) throw std::bad_alloc();
+	}
+
+	~MemChunk()
+	{
+		free( m_buf);
+	}
+
+	void* alloc( std::size_t nn)
+	{
+		if (m_pos + nn < m_bufsize)
+		{
+			char* rt;
+			rt = m_buf + m_pos;
+			m_pos += nn;
+			return (void*)rt;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	MemChunk* next() const
+	{
+		return m_next;
+	}
+
+	void link( MemChunk* nxt)
+	{
+		if (m_next) throw std::logic_error( "lost memory chunk");
+		m_next = nxt;
+	}
+
+private:
+	MemChunk* m_next;
+	std::size_t m_pos;
+	std::size_t m_bufsize;
+	char* m_buf;
+};
+}//anonymous namespace
+
+class BigBCD::Allocator
+{
+public:
+	Allocator() :m_chunk(0){}
+
+	~Allocator()
+	{
+		if (m_chunk)
+		{
+			MemChunk* curr = m_chunk;
+			MemChunk* next;
+			do
+			{
+				next = curr->next();
+				delete curr;
+				curr = next;
+			}
+			while (next);
+		}
+	}
+
+	void* alloc( std::size_t nn)
+	{
+		void* rt;
+		if (!m_chunk || !(rt = m_chunk->alloc( nn)))
+		{
+			MemChunk* chk = new MemChunk( nn);
+			rt = chk->alloc( nn);
+			chk->link( m_chunk);
+			m_chunk = chk;
+		}
+		return rt;
+	}
+private:
+	MemChunk* m_chunk;
+};
+
+void BigBCD::init( std::size_t nn, bool ng, Allocator* allocator)
+{
+	if (m_ar && m_allocated) free( m_ar);
 	m_size = nn;
 	if (m_size)
 	{
-		m_ar = (boost::uint32_t*)std::calloc( nn, sizeof(*m_ar));
-		if (!m_ar) throw std::bad_alloc();
+		std::size_t mm = nn * sizeof(*m_ar);
+		if (mm < nn) throw std::bad_alloc();
+		if (allocator)
+		{
+			m_ar = (boost::uint32_t*)allocator->alloc( mm);
+			m_allocated = false;
+		}
+		else
+		{
+			m_ar = (boost::uint32_t*)std::malloc( mm);
+			if (!m_ar) throw std::bad_alloc();
+			std::memset( m_ar, 0, mm);
+			m_allocated = true;
+		}
 	}
 	else
 	{
 		m_ar = 0;
+		m_allocated = false;
 	}
 	m_neg = ng;
 }
 
-BigBCD& BigBCD::operator=( const BigBCD& o)
-{
-	m_ar = 0;
-	init( o.m_size, o.m_neg);
-	std::memcpy( m_ar, o.m_ar, m_size*sizeof(*m_ar));
-	return *this;
-}
-
-void BigBCD::expand( std::size_t addsize)
-{
-	std::size_t newsize = m_size + addsize;
-	if (newsize < m_size) throw std::bad_alloc();
-	if (newsize != m_size)
-	{
-		boost::uint32_t* newar = (boost::uint32_t*)std::realloc( m_ar, newsize * sizeof(*m_ar));
-		if (newar == 0) throw std::bad_alloc();
-		for (; m_size < newsize; m_size++) newar[m_size] = 0;
-		m_ar = newar;
-		m_size = newsize;
-	}
-}
-
 BigBCD::BigBCD()
-	:m_ar(0)
+	:m_size(0)
+	,m_ar(0)
+	,m_neg(false)
+	,m_allocated(false)
 {
 	init( 0, false);
 }
@@ -105,6 +194,7 @@ BigBCD::BigBCD( std::size_t n, bool ng)
 	:m_size(0)
 	,m_ar(0)
 	,m_neg(ng)
+	,m_allocated(false)
 {
 	init( n, ng);
 }
@@ -113,6 +203,7 @@ BigBCD::BigBCD( const std::string& numstr)
 	:m_size(0)
 	,m_ar(0)
 	,m_neg(false)
+	,m_allocated(false)
 {
 	unsigned int ii = 0, nn = numstr.size();
 	if (numstr[ ii] == '-')
@@ -148,14 +239,21 @@ BigBCD::BigBCD( const BigBCD& o)
 	:m_size(o.m_size)
 	,m_ar(0)
 	,m_neg(o.m_neg)
+	,m_allocated(false)
 {
 	init( m_size, m_neg);
 	std::memcpy( m_ar, o.m_ar, m_size * sizeof(*m_ar));
 }
 
+void BigBCD::copy( const BigBCD& o, Allocator* allocator)
+{
+	init( o.m_size, o.m_neg, allocator);
+	std::memcpy( m_ar, o.m_ar, m_size * sizeof(*m_ar));
+}
+
 BigBCD::~BigBCD()
 {
-	if (m_ar) free( m_ar);
+	if (m_ar && m_allocated) free( m_ar);
 }
 
 std::string BigBCD::tostring() const
@@ -298,12 +396,18 @@ bool BigBCD::isValid() const
 	return (chkval == 0);
 }
 
-void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr)
+bool BigBCD::isNull() const
+{
+	const_iterator ii=begin(),ee=end();
+	return (ii==ee);
+}
+
+void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr, Allocator* allocator)
 {
 	boost::uint32_t carry;
 	std::size_t ii=0, nn = (opr.m_size > this_.m_size)?opr.m_size:this_.m_size;
 	if (nn == 0) return;
-	rt.init( nn, this_.m_neg);
+	rt.init( nn+1, this_.m_neg, allocator);
 	carry = 0;
 	for (;ii<nn; ++ii)
 	{
@@ -316,7 +420,6 @@ void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr
 	}
 	if (carry)
 	{
-		rt.expand( 1);
 		rt.m_ar[ nn++] = carry;
 	}
 	else
@@ -329,11 +432,11 @@ void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr
 	}
 }
 
-void BigBCD::digits_subtraction( BigBCD& rt, const BigBCD& this_, const BigBCD& opr)
+void BigBCD::digits_subtraction( BigBCD& rt, const BigBCD& this_, const BigBCD& opr, Allocator* allocator)
 {
 	std::size_t ii = 0, mm = 0, nn = (opr.m_size > this_.m_size)?opr.m_size:this_.m_size;
 	if (nn == 0) return;
-	rt.init( nn, this_.m_neg);
+	rt.init( nn, this_.m_neg, allocator);
 	boost::uint32_t carry = 0;
 	for (;ii<nn; ++ii)
 	{
@@ -373,7 +476,7 @@ void BigBCD::digits_subtraction( BigBCD& rt, const BigBCD& this_, const BigBCD& 
 	rt.m_size = (ii>0)?ii:1;
 }
 
-void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits)
+void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allocator* allocator)
 {
 	if (nof_digits > 0)
 	{
@@ -382,7 +485,7 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits)
 		std::size_t ii,nn;
 		const boost::uint32_t MASK = (1<<28)-1;
 
-		rt.init( this_.m_size + ofs + 1, this_.m_neg);
+		rt.init( this_.m_size + ofs + 1, this_.m_neg, allocator);
 		for (ii=0,nn=ofs; ii<nn; ++ii)
 		{
 			rt.m_ar[ ii] = 0;
@@ -415,7 +518,7 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits)
 		std::size_t ii,nn;
 		const boost::uint32_t MASK = (1<<28)-1;
 
-		rt.init( this_.m_size - ofs + 1, this_.m_neg);
+		rt.init( this_.m_size - ofs + 1, this_.m_neg, allocator);
 		if (sfh == 0)
 		{
 			for (ii=ofs,nn=this_.m_size; ii<nn; ++ii)
@@ -437,7 +540,7 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits)
 	}
 	else
 	{
-		rt = this_;
+		rt.copy( this_, allocator);
 	}
 	std::size_t ii;
 	for (ii=rt.m_size; ii>0; --ii)
@@ -450,31 +553,31 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits)
 BigBCD BigBCD::shift( int digits) const
 {
 	BigBCD rt;
-	digits_shift( rt, *this, digits);
+	digits_shift( rt, *this, digits, 0);
 	return rt;
 }
 
-void BigBCD::digits_16_multiplication( BigBCD& rt, const BigBCD& this_)
+void BigBCD::digits_16_multiplication( BigBCD& rt, const BigBCD& this_, Allocator* allocator)
 {
 	BigBCD x2,x4,x8;
-	digits_addition( x2, this_, this_);
-	digits_addition( x4, x2, x2);
-	digits_addition( x8, x4, x4);
-	digits_addition( rt, x8, x8);
+	digits_addition( x2, this_, this_, allocator);
+	digits_addition( x4, x2, x2, allocator);
+	digits_addition( x8, x4, x4, allocator);
+	digits_addition( rt, x8, x8, allocator);
 }
 
-void BigBCD::digits_nibble_multiplication( BigBCD& rt, const BigBCD& this_, unsigned char factor)
+void BigBCD::digits_nibble_multiplication( BigBCD& rt, const BigBCD& this_, unsigned char factor, Allocator* allocator)
 {
 	BigBCD x2,x4,x8;
 	if ((factor & 0xE) != 0)
 	{
-		digits_addition( x2, this_, this_);
+		digits_addition( x2, this_, this_, allocator);
 		if ((factor & 0xC) != 0)
 		{
-			digits_addition( x4, x2, x2);
+			digits_addition( x4, x2, x2, allocator);
 			if ((factor & 0x8) != 0)
 			{
-				digits_addition( x8, x4, x4);
+				digits_addition( x8, x4, x4, allocator);
 			}
 		}
 	}
@@ -483,69 +586,69 @@ void BigBCD::digits_nibble_multiplication( BigBCD& rt, const BigBCD& this_, unsi
 		case 0:
 		break;
 		case 1:
-			rt = this_;
+			rt.copy( this_, allocator);
 		break;
 		case 2:
-			rt = x2;
+			rt.copy( x2, allocator);
 		break;
 		case 3:
-			digits_addition( rt, x2, this_);
+			digits_addition( rt, x2, this_, allocator);
 		break;
 		case 4:
-			rt = x4;
+			rt.copy( x4, allocator);
 		break;
 		case 5:
-			digits_addition( rt, x4, this_);
+			digits_addition( rt, x4, this_, allocator);
 		break;
 		case 6:
-			digits_addition( rt, x4, x2);
+			digits_addition( rt, x4, x2, allocator);
 		break;
 		case 7:
 		{
 			BigBCD x6;
-			digits_addition( x6, x4, x2);
-			digits_addition( rt, x6, this_);
+			digits_addition( x6, x4, x2, allocator);
+			digits_addition( rt, x6, this_, allocator);
 		}
 		break;
 		case 8:
-			rt = x8;
+			rt.copy( x8, allocator);
 		break;
 		case 9:
-			digits_addition( rt, x8, this_);
+			digits_addition( rt, x8, this_, allocator);
 		break;
 		case 10:
-			digits_addition( rt, x8, x2);
+			digits_addition( rt, x8, x2, allocator);
 		break;
 		case 11:
 		{
 			BigBCD x10;
-			digits_addition( x10, x8, x2);
-			digits_addition( rt, x10, this_);
+			digits_addition( x10, x8, x2, allocator);
+			digits_addition( rt, x10, this_, allocator);
 		}
 		break;
 		case 12:
-			digits_addition( rt, x8, x4);
+			digits_addition( rt, x8, x4, allocator);
 		break;
 		case 13:
 		{
-			BigBCD x12( this_.m_size+1, this_.m_neg);
-			digits_addition( x12, x8, x4);
-			digits_addition( rt, x12, this_);
+			BigBCD x12;
+			digits_addition( x12, x8, x4, allocator);
+			digits_addition( rt, x12, this_, allocator);
 		}
 		break;
 		case 14:
 		{
 			BigBCD x12;
-			digits_addition( x12, x8, x4);
-			digits_addition( rt, x12, x2);
+			digits_addition( x12, x8, x4, allocator);
+			digits_addition( rt, x12, x2, allocator);
 		}
 		break;
 		case 15:
 		{
 			BigBCD x12,x14;
-			digits_addition( x12, x8, x4);
-			digits_addition( x14, x12, x2);
-			digits_addition( rt, x14, this_);
+			digits_addition( x12, x8, x4, allocator);
+			digits_addition( x14, x12, x2, allocator);
+			digits_addition( rt, x14, this_, allocator);
 		}
 		break;
 		default:
@@ -553,91 +656,155 @@ void BigBCD::digits_nibble_multiplication( BigBCD& rt, const BigBCD& this_, unsi
 	}
 }
 
-void BigBCD::digits_multiplication( BigBCD& rt, const BigBCD& this_, unsigned int factor)
+void BigBCD::digits_multiplication( BigBCD& rt, const BigBCD& this_, unsigned int factor, Allocator* allocator)
 {
 	if (factor == 0)
 	{
-		rt.init( 0);
+		rt.init( 0, false);
 		return;
 	}
 	BigBCD part,fac;
-	digits_nibble_multiplication( rt, this_, factor & 0x0f);
-	fac = this_;
+	digits_nibble_multiplication( rt, this_, factor & 0x0f, allocator);
+	fac.copy( this_, allocator);
 	factor >>= 4;
 	while (factor > 0)
 	{
-		BigBCD newfac = fac.mul16();
+		BigBCD newfac;
+		digits_16_multiplication( newfac, fac, allocator);
 		xchg( fac, newfac);
-		digits_nibble_multiplication( part, fac, factor & 0x0f);
+		digits_nibble_multiplication( part, fac, factor & 0x0f, allocator);
 		BigBCD sum;
-		digits_addition( sum, part, rt);
+		digits_addition( sum, part, rt, allocator);
 		xchg( sum, rt);
 		factor >>= 4;
 	}
 }
 
-BigBCD BigBCD::add( const BigBCD& opr) const
+void BigBCD::digits_multiplication( BigBCD& rt, const BigBCD& this_, const BigBCD& opr, Allocator* allocator)
 {
-	std::size_t nn = (opr.m_size > m_size)?opr.m_size:m_size;
-	BigBCD rt( nn, m_neg);
-	if (m_neg == opr.m_neg)
+	const_iterator ii = opr.begin(), ee = opr.end();
+	if (ii == ee) return;
+
+	digits_nibble_multiplication( rt, this_, *ii, allocator);
+	++ii;
+	while (ii != ee)
 	{
-		digits_addition( rt, *this, opr);
+		BigBCD sum;
+		digits_shift( sum, rt, 1, allocator);
+		BigBCD part;
+		digits_nibble_multiplication( part, this_, *ii, allocator);
+		digits_addition( rt, sum, part, allocator);
+		++ii;
+	}
+}
+
+static int estimate_shifts( const BigBCD& this_, const BigBCD& match)
+{
+	int rt = (int)(this_.begin().size() - match.begin().size());
+	if (*this_.begin() == *match.begin())
+	{
+		return rt;
 	}
 	else
 	{
-		digits_subtraction( rt, *this, opr);
+		return rt - 1;
+	}
+}
+
+void BigBCD::digits_division( BigBCD& rt, const BigBCD& this_, const BigBCD& opr, Allocator* allocator)
+{
+	BigBCD reminder;
+	reminder.copy( this_, allocator);
+	reminder.m_neg = false;
+
+	if (opr.isNull()) throw std::runtime_error( "division by zero");
+
+	while (!reminder.isNull() && !reminder.isabslt( opr))
+	{
+		unsigned int estimate = division_estimate( reminder, opr);
+		if (estimate == 0) throw std::runtime_error( "illegal state calculating division estimate");
+		BigBCD part;
+		digits_multiplication( part, opr, estimate, allocator);
+		part.m_neg = false;
+		int estshift = estimate_shifts( reminder, part);
+		BigBCD corr;
+		digits_shift( corr, part, estshift, allocator);
+
+		while (reminder < corr)
+		{
+			if (estimate < 16)
+			{
+				estimate--;
+				if (estimate == 0) throw std::logic_error( "division estimate got zero");
+			}
+			else
+			{
+				estimate -= estimate >> 4;
+			}
+			digits_multiplication( part, opr, estimate, allocator);
+			part.m_neg = false;
+			digits_shift( corr, part, estshift, allocator);
+		}
+		BigBCD bcdest;
+		bcdest.copy( estimate_as_bcd( estimate, estshift, allocator), allocator);
+
+		digits_multiplication( part, opr, bcdest, allocator);
+
+		BigBCD newrt;
+		digits_addition( newrt, rt, bcdest, allocator);
+		xchg( rt, newrt);
+		BigBCD newreminder;
+		digits_subtraction( newreminder, reminder, part, allocator);
+		xchg( reminder, newreminder);
+	}
+	if (opr.sign() != this_.sign())
+	{
+		rt.m_neg = true;
+	}
+}
+
+BigBCD BigBCD::add( const BigBCD& opr) const
+{
+	BigBCD rt;
+	if (m_neg == opr.m_neg)
+	{
+		digits_addition( rt, *this, opr, 0);
+	}
+	else
+	{
+		digits_subtraction( rt, *this, opr, 0);
 	}
 	return rt;
 }
 
 BigBCD BigBCD::sub( const BigBCD& opr) const
 {
-	std::size_t nn = (opr.m_size > m_size)?opr.m_size:m_size;
-	BigBCD rt( nn, m_neg);
+	BigBCD rt;
 	if (m_neg == opr.m_neg)
 	{
-		digits_subtraction( rt, *this, opr);
+		digits_subtraction( rt, *this, opr, 0);
 	}
 	else
 	{
-		digits_addition( rt, *this, opr);
+		digits_addition( rt, *this, opr, 0);
 	}
 	return rt;
 }
 
 BigBCD BigBCD::mul( unsigned int opr) const
 {
-	BigBCD rt;
-	digits_multiplication( rt, *this, opr);
-	return rt;
+	BigBCD val;
+	Allocator allocator;
+	digits_multiplication( val, *this, opr, &allocator);
+	return BigBCD( val);
 }
 
 BigBCD BigBCD::mul( const BigBCD& opr) const
 {
-	const_iterator ii = opr.begin(), ee = opr.end();
-	BigBCD rt;
-	if (ii == ee) return rt;
-
-	digits_nibble_multiplication( rt, *this, *ii);
-	++ii;
-	while (ii != ee)
-	{
-		BigBCD sum;
-		digits_shift( sum, rt, 1);
-		BigBCD part;
-		digits_nibble_multiplication( part, *this, *ii);
-		digits_addition( rt, sum, part);
-		++ii;
-	}
-	return rt;
-}
-
-BigBCD BigBCD::mul16() const
-{
-	BigBCD rt;
-	digits_16_multiplication( rt, *this);
-	return rt;
+	BigBCD val;
+	Allocator allocator;
+	digits_multiplication( val, *this, opr, &allocator);
+	return BigBCD( val);
 }
 
 bool BigBCD::isequal( const BigBCD& o) const
@@ -725,48 +892,20 @@ unsigned int BigBCD::division_estimate( const BigBCD& this_, const BigBCD& opr)
 	return estimate_to_uint( est / (div+1));
 }
 
-static int estimate_shifts( const BigBCD& this_, const BigBCD& match)
-{
-	int rt = (int)(this_.begin().size() - match.begin().size());
-	if (*this_.begin() == *match.begin())
-	{
-		return rt;
-	}
-	else
-	{
-		return rt - 1;
-	}
-}
-
-BigBCD BigBCD::estimate_as_bcd( unsigned int estimate, int estshift)
+BigBCD BigBCD::estimate_as_bcd( unsigned int estimate, int estshift, Allocator* allocator)
 {
 	unsigned int mm = (estshift>0)?(3+estshift/4):(3-estshift/4);
-	BigBCD rt( mm, false);
+	BigBCD rt;
+	rt.init( mm, false, allocator);
+
 	if (estimate >= std::numeric_limits<unsigned int>::max())
 	{
 		throw std::logic_error( "division estimate out of range");
 	}
-	switch (estshift)
-	{
-		case -1: estimate /= 10; estshift = 0; break;
-		case -2: estimate /= 100; estshift = 0; break;
-		case -3: estimate /= 1000; estshift = 0; break;
-		case -4: estimate /= 10000; estshift = 0; break;
-		case -5: estimate /= 100000; estshift = 0; break;
-		case -6: estimate /= 1000000; estshift = 0; break;
-		case -7: estimate /= 10000000; estshift = 0; break;
-		case -8: estimate /= 100000000; estshift = 0; break;
-		case -9: estimate /= 1000000000; estshift = 0; break;
-		case -10:estimate /= 10000000000; estshift = 0; break;
-		case -11:estimate /= 100000000000; estshift = 0; break;
-		case -12:estimate /= 1000000000000; estshift = 0; break;
-		case -13:estimate /= 10000000000000; estshift = 0; break;
-	}
-	while (estshift < 0)
-	{
-		estimate /= 10;
-		estshift ++;
-	}
+	while (estshift < -6) { estimate /= 1000000; estshift += 6;}
+	while (estshift < -3) { estimate /= 1000; estshift += 3;}
+	while (estshift < -1) { estimate /= 100; estshift += 2;}
+	while (estshift <  0) { estimate /= 10; estshift += 1;}
 	if (estimate == 0)
 	{
 		estimate = 1;
@@ -799,45 +938,9 @@ BigBCD BigBCD::estimate_as_bcd( unsigned int estimate, int estshift)
 
 BigBCD BigBCD::div( const BigBCD& opr) const
 {
-	BigBCD rt, reminder = *this;
-	reminder.m_neg = false;
-
-	while (!reminder.isabsle( opr))
-	{
-		unsigned int estimate = division_estimate( reminder, opr);
-		if (estimate == 0) throw std::runtime_error( "division by zero");
-		BigBCD part = opr.mul( estimate);
-		part.m_neg = false;
-
-		int estshift = estimate_shifts( reminder, part);
-		BigBCD corr = part.shift( estshift);
-
-		while (reminder < corr)
-		{
-			if (estimate < 16)
-			{
-				estimate--;
-			}
-			else
-			{
-				estimate -= estimate >> 4;
-			}
-			part = opr.mul( estimate);
-			part.m_neg = false;
-			corr = part.shift( estshift);
-		}
-		BigBCD bcdest( estimate_as_bcd( estimate, estshift));
-		part = bcdest * opr;
-
-		rt = rt.add( bcdest);
-		reminder = reminder.sub( part);
-	}
-	if (opr.sign() != sign())
-	{
-		rt.m_neg = true;
-	}
-	return rt;
+	BigBCD val;
+	Allocator allocator;
+	digits_division( val, *this, opr, &allocator);
+	return BigBCD( val);
 }
-
-
 

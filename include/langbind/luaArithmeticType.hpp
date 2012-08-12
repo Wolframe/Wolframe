@@ -184,7 +184,7 @@ struct has_operator_le
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<bool (T::*)( const T&)> struct tester_member_signature;
+	template<bool (T::*)( const T&) const> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::operator<= >*);
@@ -200,7 +200,7 @@ struct has_operator_lt
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<bool (T::*)( const T&)> struct tester_member_signature;
+	template<bool (T::*)( const T&) const> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::operator< >*);
@@ -216,7 +216,7 @@ struct has_operator_eq
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
-	template<bool (T::*)( const T&)> struct tester_member_signature;
+	template<bool (T::*)( const T&) const> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::operator== >*);

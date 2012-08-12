@@ -67,6 +67,7 @@ public:
 	bool operator>( const BigBCD& o) const		{return !isle(o);}
 
 	bool isValid() const;
+	bool isNull() const;
 
 	friend class const_iterator;
 	class const_iterator
@@ -102,20 +103,23 @@ public:
 	const_iterator end() const				{return const_iterator();}
 
 private:
-	void init( std::size_t size_, bool neg_=false);
-	void expand( std::size_t addsize);
+	struct Allocator;
+	void init( std::size_t size_, bool neg_, Allocator* allocator=0);
+	void copy( const BigBCD& o, Allocator* allocator);
 
 	explicit BigBCD( std::size_t n, bool sgn=true);
 
-	static void digits_addition( BigBCD& dest, const BigBCD& this_, const BigBCD& opr);
-	static void digits_subtraction( BigBCD& dest, const BigBCD& this_, const BigBCD& opr);
-	static void digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits);
-	static void digits_nibble_multiplication( BigBCD& rt, const BigBCD& this_, unsigned char factor);
-	static void digits_16_multiplication( BigBCD& rt, const BigBCD& this_);
-	static void digits_multiplication( BigBCD& rt, const BigBCD& this_, unsigned int factor);
+	static void digits_addition( BigBCD& dest, const BigBCD& this_, const BigBCD& opr, Allocator* allocator);
+	static void digits_subtraction( BigBCD& dest, const BigBCD& this_, const BigBCD& opr, Allocator* allocator);
+	static void digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allocator* allocator);
+	static void digits_nibble_multiplication( BigBCD& rt, const BigBCD& this_, unsigned char factor, Allocator* allocator);
+	static void digits_16_multiplication( BigBCD& rt, const BigBCD& this_, Allocator* allocator);
+	static void digits_multiplication( BigBCD& rt, const BigBCD& this_, unsigned int factor, Allocator* allocator);
+	static void digits_multiplication( BigBCD& rt, const BigBCD& this_, const BigBCD& factor, Allocator* allocator);
+	static void digits_division( BigBCD& rt, const BigBCD& this_, const BigBCD& factor, Allocator* allocator);
 	static void xchg( BigBCD& a, BigBCD& b);
 	static unsigned int division_estimate( const BigBCD& this_, const BigBCD& opr);
-	static BigBCD estimate_as_bcd( unsigned int estimate, int estshift);
+	static BigBCD estimate_as_bcd( unsigned int estimate, int estshift, Allocator* allocator);
 
 	BigBCD shift( int digits) const;
 	BigBCD add( const BigBCD& opr) const;
@@ -123,7 +127,6 @@ private:
 	BigBCD mul( unsigned int opr) const;
 	BigBCD mul( const BigBCD& opr) const;
 	BigBCD div( const BigBCD& opr) const;
-	BigBCD mul16() const;
 	BigBCD neg() const				{BigBCD rt(*this); rt.m_neg = !rt.m_neg; return rt;}
 
 	char sign() const				{return m_neg?'-':'+';}
@@ -137,6 +140,7 @@ private:
 	std::size_t m_size;
 	boost::uint32_t* m_ar;
 	bool m_neg;
+	bool m_allocated;
 };
 
 }}//namespace
