@@ -1133,7 +1133,7 @@ BigNumber BigNumber::operator -( const BigNumber& o) const
 
 BigNumber BigNumber::operator -() const
 {
-	BigNumber rt( rt);
+	BigNumber rt( *this);
 	rt.invert_sign();
 	return rt;
 }
