@@ -111,12 +111,12 @@ private:
 static LocalGarbageCollector	handleList;
 
 
-bool module::LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles )
+bool _Wolframe::module::LoadModules( ModulesDirectory& modDir, const std::list< std::string >& modFiles )
 {
 	bool retVal = true;
 
 	for ( std::list< std::string >::const_iterator it = modFiles.begin();
-	      it != modFiles.end(); it++ )	{
+		it != modFiles.end(); it++ )	{
 		LOG_TRACE << "Loading module '" << *it << "'";
 #if !defined(_WIN32)	// POSIX module loader
 		void* hndl = dlopen( it->c_str(), RTLD_LAZY );

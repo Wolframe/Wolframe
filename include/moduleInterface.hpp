@@ -147,7 +147,7 @@ private:
 };
 
 
-bool LoadModules( ModulesDirectory& modDir, std::list< std::string >& modFiles );
+bool LoadModules( ModulesDirectory& modDir, const std::list< std::string >& modFiles );
 
 
 //*********** Module interface *********

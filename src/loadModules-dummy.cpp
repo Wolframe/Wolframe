@@ -37,7 +37,7 @@
 #include "moduleInterface.hpp"
 
 bool _Wolframe::module::LoadModules( ModulesDirectory& /*modules*/,
-				     std::list< std::string >& /*modFiles*/)
+				     const std::list< std::string >& /*modFiles*/)
 {
 	return true;
 }
