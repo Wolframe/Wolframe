@@ -102,6 +102,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	version.obj \
 	wolframedCommandLine.obj \
 	wolfilterCommandLine.obj \
+	loadModules.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
 	appConfig.obj \
@@ -194,7 +195,6 @@ CPP_OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
 	$(LOCAL_STATIC_LIB_OBJS) \
-	loadModules.obj \
 	wolframeHandler.obj \
 	winMain.obj
 
