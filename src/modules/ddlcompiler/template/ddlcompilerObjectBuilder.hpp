@@ -40,12 +40,12 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-template <class CompilerInterface>
-class DDLCompilerObject :public Object, public CompilerInterface
+template <class CompilerInterfaceC>
+class DDLCompilerObject :public Object, public CompilerInterfaceC
 {
 public:
 	DDLCompilerObject( const char* name_)
-		:CompilerInterface(name_)
+		:CompilerInterfaceC()
 		,m_name(name_){}
 
 	virtual ~DDLCompilerObject(){}
@@ -59,7 +59,7 @@ private:
 	std::string m_name;
 };
 
-template <class CompilerInterface>
+template <class CompilerInterfaceC>
 class DDLCompilerObjectBuilder :public ObjectBuilder
 {
 public:
@@ -71,7 +71,7 @@ public:
 
 	virtual Object* object()
 	{
-		return new DDLCompilerObject<CompilerInterface>(m_name.c_str());
+		return new DDLCompilerObject<CompilerInterfaceC>(m_name.c_str());
 	}
 
 private:
