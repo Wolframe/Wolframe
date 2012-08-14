@@ -14,7 +14,9 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\tests \
 	/I"$(BOOST_INCLUDE_DIR)"
 
-INCLUDE_LDFLAGS =
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
 INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
@@ -22,6 +24,8 @@ DYNAMIC_MODULE = \
 	mod_employee_assignment_convert.dll
 
 CPP_OBJS = \
+	$(TOPDIR)\src\serialize_mapContext.obj \
+	$(TOPDIR)\src\filter_filterbase.obj \
 	$(TOPDIR)\src\serialize_struct_filtermapBase.obj \
 	$(TOPDIR)\src\serialize_struct_filtermapParseStack.obj \
 	$(TOPDIR)\src\serialize_struct_filtermapParse.obj \
