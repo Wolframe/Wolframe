@@ -407,27 +407,6 @@ Project Wolframe.
 		
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
 		
-		<?ifdef var.with_xmllite?>
-			<Property Id="XMLLITE_VERSION">
-				<DirectorySearch Id="SystemFolderDriverVersion" Path="[SystemFolder]">
-					<FileSearch Name="xmllite.dll" MinVersion="1.0"/>
-				</DirectorySearch>
-			</Property>
-			<Condition Message="The installed version of xmllite.dll is not high enough to support this installer (minimal required version is 1.0.1018.0).">
-				<![CDATA[Installed OR XMLLITE_VERSION]]>
-			</Condition>
-		<?endif?>
-
-		<!-- no more merge modules for MSXML6, let the user download one -->
-		<?ifdef var.with_msxml?>
-			<Property Id="MSXML6_INSTALLED">
-				<RegistrySearch Id="MSXML6Search" Root="HKCR" Key="Msxml2.DOMDocument.6.0" Type="raw"/>
-			</Property>
-			<Condition Message="No MSXML6 has been installed. Install package first.">
-				<![CDATA[Installed OR MSXML6_INSTALLED]]>
-			</Condition>
-		<?endif?>
-				
 		<Property Id="WOLFRAME_DATABASE_TYPE" Secure="yes">
 			<RegistrySearch Id="WolframeDatabaseType" Root="HKCU"
 			                Key="SOFTWARE\WolframeGroup\Wolframe\Configuration"

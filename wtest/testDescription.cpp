@@ -107,12 +107,6 @@ if (boost::starts_with( flag, "DISABLED "))
 #if !(WITH_LIBXML2)
 	if (boost::iequals( flag, "LIBXML2")) return "WITH_LIBXML2=1 ";
 #endif
-#if !(WITH_XMLLITE)
-	if (boost::iequals( flag, "XMLLITE")) return "WITH_XMLLITE=1 ";
-#endif
-#if !(WITH_MSXML)
-	if (boost::iequals( flag, "MSXML")) return "WITH_MSXML=1 ";
-#endif
 #if !(WITH_LIBXSLT)
 	if (boost::iequals( flag, "LIBXSLT")) return "WITH_LIBXSLT=1 ";
 #endif

@@ -19,8 +19,6 @@ WITH_SQLITE3=1         build AAAA and DB connectors for Sqlite3
 WITH_PGSQL=1           build AAAA and DB connectors for PostgreSql
 WITH_LIBXML2=1         build code using libxml2
 WITH_LIBXSLT=1         build code using libxslt
-WITH_MSXML=1           build with Microsoft XML Core Services support
-WITH_XMLLITE=1         build with Microsoft XmlLite library support
 WITH_EXAMPLES=1        build and test the examples
 WITH_LIBHPDF=1         build code for creating PDFs with LibHpdf
 
@@ -33,4 +31,3 @@ Example:
 nmake /nologo /f Makefile.W32 WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1
                               WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LIBXML2=1
                               WITH_LIBXSLT=1 WITH_LIBHPDF=1 WITH_EXAMPLES=1
-                              WITH_MSXML=1 WITH_XMLLITE=1

@@ -25,18 +25,6 @@ SUBDIRS = \
 	$(SUBDIRS) libhpdf
 !ENDIF
 
-# MSXML
-!IFDEF WITH_MSXML
-SUBDIRS = \
-	$(SUBDIRS) msxml msxslt
-!ENDIF
-
-# XMLLite
-!IFDEF WITH_XMLLITE
-SUBDIRS = \
-	$(SUBDIRS) xmllite
-!ENDIF
-
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
