@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_OUTPUTFILTER_INTERFACE_HPP_INCLUDED
-#include "countedReference.hpp"
+#include "types/countedReference.hpp"
 #include "filter/filterbase.hpp"
 #include <string>
 #include <cstring>
@@ -159,7 +159,7 @@ private:
 
 ///\typedef OutputFilterR
 ///\brief Shared output filter reference
-typedef CountedReference<OutputFilter> OutputFilterR;
+typedef types::CountedReference<OutputFilter> OutputFilterR;
 
 }}//namespace
 #endif

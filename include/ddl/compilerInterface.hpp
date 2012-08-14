@@ -36,7 +36,7 @@ Project Wolframe.
 #define _Wolframe_DDL_COMPILER_INTERFACE_HPP_INCLUDED
 #include "ddl/atomicType.hpp"
 #include "ddl/structType.hpp"
-#include "countedReference.hpp"
+#include "types/countedReference.hpp"
 #include <string>
 
 namespace _Wolframe {
@@ -67,7 +67,7 @@ private:
 };
 
 ///\brief Reference to a DDL compiler
-typedef CountedReference<CompilerInterface> CompilerInterfaceR;
+typedef types::CountedReference<CompilerInterface> CompilerInterfaceR;
 
 }}//namespace
 #endif

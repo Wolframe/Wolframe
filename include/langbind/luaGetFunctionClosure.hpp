@@ -34,8 +34,8 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_LUA_GET_FUNCTION_CLOSURE_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_GET_FUNCTION_CLOSURE_HPP_INCLUDED
 #include "langbind/appObjects.hpp"
+#include "types/countedReference.hpp"
 #include <boost/shared_ptr.hpp>
-#include "countedReference.hpp"
 
 #if WITH_LUA
 extern "C" {
@@ -71,7 +71,7 @@ public:
 		,m_id(0)
 		{}
 
-	InputFilterClosure( const InputFilterR& ig, const CountedReference<std::size_t>& a)
+	InputFilterClosure( const InputFilterR& ig, const types::CountedReference<std::size_t>& a)
 		:m_inputfilter(ig)
 		,m_type(InputFilter::OpenTag)
 		,m_taglevel(0)
@@ -99,12 +99,12 @@ public:
 	InputFilterClosure scope();
 
 private:
-	InputFilterR m_inputfilter;			//< rerefence to input with filter
-	InputFilter::ElementType m_type;		//< current state (last value type parsed)
-	std::string m_attrbuf;				//< buffer for attribute name
-	std::size_t m_taglevel;				//< current level in tag hierarchy
-	std::size_t m_id;				//< id for checking valid access
-	CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
+	InputFilterR m_inputfilter;				//< rerefence to input with filter
+	InputFilter::ElementType m_type;			//< current state (last value type parsed)
+	std::string m_attrbuf;					//< buffer for attribute name
+	std::size_t m_taglevel;					//< current level in tag hierarchy
+	std::size_t m_id;					//< id for checking valid access
+	types::CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
 };
 
 
@@ -133,7 +133,7 @@ public:
 
 	///\brief Constructor
 	///\param[in] i input filter reference
-	explicit TypedInputFilterClosure( const TypedInputFilterR& i, const CountedReference<std::size_t>& a)
+	explicit TypedInputFilterClosure( const TypedInputFilterR& i, const types::CountedReference<std::size_t>& a)
 		:m_inputfilter(i)
 		,m_type(InputFilter::OpenTag)
 		,m_taglevel(0)
@@ -162,12 +162,12 @@ public:
 	TypedInputFilterClosure scope();
 
 private:
-	TypedInputFilterR m_inputfilter;		//< rerefence to input with filter
-	InputFilter::ElementType m_type;		//< current state (last value type parsed)
-	std::string m_attrbuf;				//< buffer for attribute name
-	std::size_t m_taglevel;				//< current level in tag hierarchy
-	std::size_t m_id;				//< id for checking valid access
-	CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
+	TypedInputFilterR m_inputfilter;			//< rerefence to input with filter
+	InputFilter::ElementType m_type;			//< current state (last value type parsed)
+	std::string m_attrbuf;					//< buffer for attribute name
+	std::size_t m_taglevel;					//< current level in tag hierarchy
+	std::size_t m_id;					//< id for checking valid access
+	types::CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
 };
 
 }}//namespace

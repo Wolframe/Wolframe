@@ -63,7 +63,6 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
-	$(TOPDIR)/src/loadModules-dummy.o \
 	tprocHandler.o \
 	tprocHandlerConfig.o \
 	$(TOPDIR)/src/posixMain.o

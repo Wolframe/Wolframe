@@ -41,7 +41,7 @@ Project Wolframe.
 #include <cstddef>
 #include <boost/lexical_cast.hpp>
 #include "ddl/atomicType.hpp"
-#include "countedReference.hpp"
+#include "types/countedReference.hpp"
 
 namespace _Wolframe {
 namespace ddl {
@@ -250,7 +250,7 @@ private:
 };
 
 
-typedef CountedReference<StructType> StructTypeR;
+typedef types::CountedReference<StructType> StructTypeR;
 
 }}//namespace
 #endif
