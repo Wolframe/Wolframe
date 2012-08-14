@@ -37,7 +37,7 @@ Project Wolframe.
 #include "textwolf/xmlparser.hpp"
 #include "textwolf/xmlprinter.hpp"
 #include "textwolf/cstringiterator.hpp"
-#include "utils/countedReference.hpp"
+#include "types/countedReference.hpp"
 #include <string>
 #include <cstddef>
 #include <algorithm>
@@ -51,7 +51,7 @@ typedef textwolf::XMLParser<textwolf::CStringIterator,std::string>  XMLParser;
 
 struct XMLFilterAttributes
 {
-	utils::CountedReference<std::string> m_encoding;
+	types::CountedReference<std::string> m_encoding;
 
 	void setEncoding( const std::string& encoding)
 	{

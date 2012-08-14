@@ -38,7 +38,7 @@
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
 #include "connectionHandler.hpp"
-#include "utils/countedReference.hpp"
+#include "types/countedReference.hpp"
 #include "logger-v1.hpp"
 #include <vector>
 #include <string>

@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file iprocHandlerConfig.cpp
 ///\brief Implementation of the commands of the iproc connection handler
-#include "utils/countedReference.hpp"
+#include "types/countedReference.hpp"
 #include "iprocHandlerConfig.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "logger-v1.hpp"

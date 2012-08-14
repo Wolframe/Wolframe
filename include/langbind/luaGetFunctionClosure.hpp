@@ -34,7 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_LUA_GET_FUNCTION_CLOSURE_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_GET_FUNCTION_CLOSURE_HPP_INCLUDED
 #include "langbind/appObjects.hpp"
-#include "utils/countedReference.hpp"
+#include "types/countedReference.hpp"
 #include <boost/shared_ptr.hpp>
 
 #if WITH_LUA
@@ -71,7 +71,7 @@ public:
 		,m_id(0)
 		{}
 
-	InputFilterClosure( const InputFilterR& ig, const utils::CountedReference<std::size_t>& a)
+	InputFilterClosure( const InputFilterR& ig, const types::CountedReference<std::size_t>& a)
 		:m_inputfilter(ig)
 		,m_type(InputFilter::OpenTag)
 		,m_taglevel(0)
@@ -104,7 +104,7 @@ private:
 	std::string m_attrbuf;					//< buffer for attribute name
 	std::size_t m_taglevel;					//< current level in tag hierarchy
 	std::size_t m_id;					//< id for checking valid access
-	utils::CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
+	types::CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
 };
 
 
@@ -133,7 +133,7 @@ public:
 
 	///\brief Constructor
 	///\param[in] i input filter reference
-	explicit TypedInputFilterClosure( const TypedInputFilterR& i, const utils::CountedReference<std::size_t>& a)
+	explicit TypedInputFilterClosure( const TypedInputFilterR& i, const types::CountedReference<std::size_t>& a)
 		:m_inputfilter(i)
 		,m_type(InputFilter::OpenTag)
 		,m_taglevel(0)
@@ -167,7 +167,7 @@ private:
 	std::string m_attrbuf;					//< buffer for attribute name
 	std::size_t m_taglevel;					//< current level in tag hierarchy
 	std::size_t m_id;					//< id for checking valid access
-	utils::CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
+	types::CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
 };
 
 }}//namespace

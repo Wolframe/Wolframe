@@ -40,7 +40,7 @@
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
 #include "connectionHandler.hpp"
-#include "utils/countedReference.hpp"
+#include "types/countedReference.hpp"
 #include "logger-v1.hpp"
 #include <vector>
 #include <string>
@@ -138,7 +138,7 @@ private:
 	int m_cmdidx;							//< command parsed
 	int m_nofParentCmds;						//< number of commands passed by the owner to get control back
 	std::vector<std::string> m_cmds;				//< list of commands available
-	utils::CountedReference<ProtocolCommandHandler> m_cmdhandler;	//< currently executed command
+	types::CountedReference<ProtocolCommandHandler> m_cmdhandler;	//< currently executed command
 	std::string m_capastr;						//< capability string to print
 	std::size_t m_capaitr;						//< index in capabilities
 };

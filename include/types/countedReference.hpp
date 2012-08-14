@@ -31,14 +31,14 @@ Project Wolframe.
 ************************************************************************/
 #ifndef _Wolframe_COUNTED_REFERENCE_HPP_INCLUDED
 #define _Wolframe_COUNTED_REFERENCE_HPP_INCLUDED
-///\file countedReference.hpp
+///\file types/countedReference.hpp
 ///\brief Multiple references to an object that is freed with its last reference.
 ///\remark The reference template introduced here should be replaced by an appropriate boost smart pointer. The existence of this module is due easier injection of tracing and debugging aspects
 
 #include <cstddef>
 
 namespace _Wolframe {
-
+namespace types {
 
 ///\class Reference
 ///\brief Reference to an object that is freed when not referenced anymore.
@@ -125,7 +125,7 @@ private:
 	Pointer* m_ref;
 };
 
-}//namespace
+}}//namespace
 #endif
 
 

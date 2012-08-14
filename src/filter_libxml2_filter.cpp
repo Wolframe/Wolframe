@@ -4,7 +4,7 @@
 #include "filter/libxml2_filter.hpp"
 #include "filter/bufferingfilter.hpp"
 #include "filter/doctype.hpp"
-#include "utils/countedReference.hpp"
+#include "types/countedReference.hpp"
 #include <cstddef>
 #include <cstring>
 #include <vector>
@@ -131,7 +131,7 @@ private:
 
 struct InputFilterImpl :public InputFilter
 {
-	InputFilterImpl( const utils::CountedReference<std::string>& e)
+	InputFilterImpl( const types::CountedReference<std::string>& e)
 		:m_node(0)
 		,m_value(0)
 		,m_prop(0)
@@ -401,14 +401,14 @@ private:
 	std::vector<xmlNode*> m_nodestk;			//< stack of nodes
 	bool m_withEmpty;					//< return empty tokens as W3C requires too
 	std::string m_elembuf;					//< buffer for current element
-	utils::CountedReference<std::string> m_encoding;	//< character set encoding
+	types::CountedReference<std::string> m_encoding;	//< character set encoding
 };
 
 
 class OutputFilterImpl :public OutputFilter
 {
 public:
-	OutputFilterImpl( const utils::CountedReference<std::string>& enc)
+	OutputFilterImpl( const types::CountedReference<std::string>& enc)
 		:m_encoding(enc)
 		,m_nofroot(0)
 		,m_taglevel(0)
@@ -597,7 +597,7 @@ private:
 		return rt;
 	}
 private:
-	utils::CountedReference<std::string> m_encoding;	//< character set encoding
+	types::CountedReference<std::string> m_encoding;	//< character set encoding
 	DocumentWriter m_doc;					//< document writer structure
 	int m_nofroot;						//< number of root elements parsed
 	int m_taglevel;						//< tag hierarchy level
@@ -616,7 +616,7 @@ struct Libxml2Filter :public Filter
 {
 	Libxml2Filter( const char* encoding=0)
 	{
-		utils::CountedReference<std::string> enc;
+		types::CountedReference<std::string> enc;
 		if (encoding)
 		{
 			enc.reset( new std::string( encoding));
