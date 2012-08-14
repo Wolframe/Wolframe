@@ -4,6 +4,7 @@
 #include "filter/libxml2_filter.hpp"
 #include "filter/bufferingfilter.hpp"
 #include "filter/doctype.hpp"
+#include "utils/countedReference.hpp"
 #include <cstddef>
 #include <cstring>
 #include <vector>
@@ -130,7 +131,7 @@ private:
 
 struct InputFilterImpl :public InputFilter
 {
-	InputFilterImpl( const CountedReference<std::string>& e)
+	InputFilterImpl( const utils::CountedReference<std::string>& e)
 		:m_node(0)
 		,m_value(0)
 		,m_prop(0)
@@ -391,23 +392,23 @@ private:
 		}
 	}
 private:
-	DocumentReader m_doc;
-	xmlNode* m_node;
-	xmlChar* m_value;
+	DocumentReader m_doc;					//< document reader structure
+	xmlNode* m_node;					//< current node value
+	xmlChar* m_value;					//< current node value
 	xmlAttr* m_prop;
 	xmlNode* m_propvalues;
-	int m_taglevel;
-	std::vector<xmlNode*> m_nodestk;
-	bool m_withEmpty;
-	std::string m_elembuf;
-	CountedReference<std::string> m_encoding;
+	int m_taglevel;						//< tag hierarchy level
+	std::vector<xmlNode*> m_nodestk;			//< stack of nodes
+	bool m_withEmpty;					//< return empty tokens as W3C requires too
+	std::string m_elembuf;					//< buffer for current element
+	utils::CountedReference<std::string> m_encoding;	//< character set encoding
 };
 
 
 class OutputFilterImpl :public OutputFilter
 {
 public:
-	OutputFilterImpl( const CountedReference<std::string>& enc)
+	OutputFilterImpl( const utils::CountedReference<std::string>& enc)
 		:m_encoding(enc)
 		,m_nofroot(0)
 		,m_taglevel(0)
@@ -596,17 +597,17 @@ private:
 		return rt;
 	}
 private:
-	CountedReference<std::string> m_encoding;
-	DocumentWriter m_doc;
-	int m_nofroot;
-	int m_taglevel;
-	std::string m_attribname;
-	std::string m_valuestrbuf;
-	std::string m_elembuf;
-	std::size_t m_elemitr;
-	std::string m_doctype_root;
-	std::string m_doctype_public;
-	std::string m_doctype_system;
+	utils::CountedReference<std::string> m_encoding;	//< character set encoding
+	DocumentWriter m_doc;					//< document writer structure
+	int m_nofroot;						//< number of root elements parsed
+	int m_taglevel;						//< tag hierarchy level
+	std::string m_attribname;				//< attribute name buffer
+	std::string m_valuestrbuf;				//< value buffer
+	std::string m_elembuf;					//< buffer for current element
+	std::size_t m_elemitr;					//< iterator on current element
+	std::string m_doctype_root;				//< !DOCTYPE root element (1)
+	std::string m_doctype_public;				//< !DOCTYPE public element (2)
+	std::string m_doctype_system;				//< !DOCTYPE system element (3)
 };
 
 }//end anonymous namespace
@@ -615,7 +616,7 @@ struct Libxml2Filter :public Filter
 {
 	Libxml2Filter( const char* encoding=0)
 	{
-		CountedReference<std::string> enc;
+		utils::CountedReference<std::string> enc;
 		if (encoding)
 		{
 			enc.reset( new std::string( encoding));

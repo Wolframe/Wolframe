@@ -110,21 +110,21 @@ private:
 		return ar[c];
 	}
 
-	State m_state;							//< state of the processor (protocol main statemachine)
+	State m_state;								//< state of the processor (protocol main statemachine)
 
-	protocol::Buffer m_buffer;					//< context (sub state) for partly parsed input lines
-	protocol::CArgBuffer<protocol::Buffer> m_argBuffer;		//< buffer for the arguments
+	protocol::Buffer m_buffer;						//< context (sub state) for partly parsed input lines
+	protocol::CArgBuffer<protocol::Buffer> m_argBuffer;			//< buffer for the arguments
 
-	protocol::InputBlock m_input;					//< buffer for network read messages
-	protocol::OutputBlock m_output;					//< buffer for network write messages
+	protocol::InputBlock m_input;						//< buffer for network read messages
+	protocol::OutputBlock m_output;						//< buffer for network write messages
 
-	protocol::InputBlock::iterator m_itr;				//< iterator to scan protocol input
-	protocol::InputBlock::iterator m_end;				//< iterator pointing to end of message buffer
+	protocol::InputBlock::iterator m_itr;					//< iterator to scan protocol input
+	protocol::InputBlock::iterator m_end;					//< iterator pointing to end of message buffer
 
-	const Configuration* m_config;					//< configuration
-	protocol::CmdParser<protocol::Buffer> m_parser;			//< context dependent command parser definition
-	int m_cmdidx;							//< command parsed
-	CountedReference<cmdbind::ProtocolCommandHandler> m_cmdhandler;	//< currently executed command
+	const Configuration* m_config;						//< configuration
+	protocol::CmdParser<protocol::Buffer> m_parser;				//< context dependent command parser definition
+	int m_cmdidx;								//< command parsed
+	utils::CountedReference<cmdbind::ProtocolCommandHandler> m_cmdhandler;	//< currently executed command
 
 	///\brief Helper function to send a line message with CRLF termination as C string
 	///\param [in] str head of the line to write

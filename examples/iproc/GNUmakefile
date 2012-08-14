@@ -68,7 +68,6 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
-	$(TOPDIR)/src/loadModules-dummy.o \
 	iprocHandler.o \
 	iprocHandlerConfig.o \
 	$(TOPDIR)/src/posixMain.o

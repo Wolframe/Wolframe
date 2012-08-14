@@ -156,6 +156,7 @@ std::size_t ArrayDoublingAllocator::alloc( std::size_t nof)
 		std::memset( m_ar + m_size, 0, m_size * sizeof(char));
 	}
 	m_pos += nof;
+	return rt;
 }
 
 const void* ArrayDoublingAllocator::base() const

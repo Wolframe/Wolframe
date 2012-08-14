@@ -34,7 +34,7 @@
 ///\brief Interface to a generic command handler
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
-#include "countedReference.hpp"
+#include "utils/countedReference.hpp"
 #include "FSMinterface.hpp"
 #include <string>
 
@@ -102,7 +102,7 @@ protected:
 	int m_statusCode;				//< error code of operation for the client
 };
 
-typedef CountedReference<CommandHandler> CommandHandlerR;
+typedef utils::CountedReference<CommandHandler> CommandHandlerR;
 
 }}
 

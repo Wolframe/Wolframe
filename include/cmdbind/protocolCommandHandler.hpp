@@ -34,8 +34,8 @@
 ///\brief Interface to a command handler in the protocol context
 #ifndef _Wolframe_CMDBIND_PROTOCOL_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_CMDBIND_PROTOCOL_COMMAND_HANDLER_HPP_INCLUDED
-#include "countedReference.hpp"
-#include "commandHandler.hpp"
+#include "utils/countedReference.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include <vector>
 #include <string>
 
@@ -61,7 +61,7 @@ protected:
 	std::vector< std::string > m_argBuffer;		//< the command arguments
 };
 
-typedef CountedReference<ProtocolCommandHandler> ProtocolCommandHandlerR;
+typedef utils::CountedReference<ProtocolCommandHandler> ProtocolCommandHandlerR;
 
 }}
 #endif

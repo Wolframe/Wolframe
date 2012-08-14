@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_INPUTFILTER_INTERFACE_HPP_INCLUDED
-#include "countedReference.hpp"
+#include "utils/countedReference.hpp"
 #include "filter/filterbase.hpp"
 #include <string>
 #include <stdexcept>
@@ -123,7 +123,7 @@ private:
 
 ///\typedef InputFilterR
 ///\brief Shared input filter reference
-typedef CountedReference<InputFilter> InputFilterR;
+typedef utils::CountedReference<InputFilter> InputFilterR;
 
 
 }}//namespace

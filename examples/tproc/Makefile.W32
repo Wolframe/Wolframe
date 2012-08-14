@@ -104,7 +104,6 @@ INCLUDE_LIBS = \
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
-	$(TOPDIR)\src\loadModules-dummy.obj \
 	tprocHandler.obj \
 	tprocHandlerConfig.obj \
 	$(TOPDIR)\src\winMain.obj

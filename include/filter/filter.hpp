@@ -34,7 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_FILTER_FILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_FILTER_INTERFACE_HPP_INCLUDED
-#include "countedReference.hpp"
+#include "utils/countedReference.hpp"
 #include "filter/inputfilter.hpp"
 #include "filter/outputfilter.hpp"
 #include <map>

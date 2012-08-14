@@ -103,7 +103,6 @@ INCLUDE_LIBS = \
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
-	$(TOPDIR)\src\loadModules-dummy.obj \
 	iprocHandler.obj \
 	iprocHandlerConfig.obj \
 	$(TOPDIR)\src\winMain.obj
