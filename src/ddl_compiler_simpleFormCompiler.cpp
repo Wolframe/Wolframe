@@ -335,7 +335,8 @@ StructType SimpleFormCompiler::compile( const std::string& srcstring) const
 	std::istringstream src( srcstring);
 	boost::property_tree::ptree pt;
 	boost::property_tree::info_parser::read_info( src, pt);
-	rt.defineDoctype( getDoctype( pt).c_str());
+	std::string doctype = getDoctype( pt);
+	if (doctype.size()) rt.defineDoctype( doctype.c_str());
 	compile_ptree( pt, rt);
 	return rt;
 }

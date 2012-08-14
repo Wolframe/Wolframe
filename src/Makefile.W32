@@ -126,6 +126,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_line_filter.obj \
 	filter_token_filter.obj \
 	types_bcdArithmetic.obj \
+	types_allocators.obj \
 	serialize_struct_filtermapBase.obj \
 	serialize_struct_filtermapParseStack.obj \
 	serialize_struct_filtermapParse.obj \

@@ -69,7 +69,6 @@ public:
 	{
 		std::string ddlname;
 		std::string filename;
-		std::string formname;
 	};
 
 	///\class PeerFormFunctionParam

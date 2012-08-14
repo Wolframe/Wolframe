@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file langbind_appObjects.cpp
 ///\brief implementation of scripting global context
 #include "langbind/appGlobalContext.hpp"
+#include "miscUtils.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;
@@ -74,7 +75,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 		std::vector<DDLFormConfigStruct>::const_iterator itr=config.data().form.begin(),end=config.data().form.end();
 		for (;itr!=end; ++itr)
 		{
-			LOG_INFO << "Loading DDL form " << itr->name;
+			LOG_INFO << "Loading DDL form " << itr->sourcepath;
 			ddl::CompilerInterfaceR ci;
 			if (!getDDLCompiler( itr->DDL, ci))
 			{
@@ -86,7 +87,16 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 				ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
 				std::string error;
 				*form = ci->compileFile( itr->sourcepath);
-				defineForm( itr->name, form);
+				if (form->doctype())
+				{
+					std::string name = ddl::StructType::getIdFromDoctype( form->doctype());
+					defineForm( name, form);
+				}
+				else
+				{
+					std::string name = utils::getFileStem( itr->sourcepath);
+					defineForm( name, form);
+				}
 			}
 		}
 	}

@@ -104,7 +104,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 				formparam.ddlname = std::string( ext.c_str()+1);
 				formparam.filename = *itr;
 			}
-			formparam.formname = utils::getFileStem( formparam.filename);
 			m_forms.push_back( formparam);
 		}
 	}
@@ -229,7 +228,17 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath, 
 				ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
 				std::string error;
 				*form = ci->compileFile( formpath);
-				gct->defineForm( itr->formname, form);
+				if (form->doctype())
+				{
+					std::string name = ddl::StructType::getIdFromDoctype( form->doctype());
+					gct->defineForm( name, form);
+				}
+				else
+				{
+					std::string name = utils::getFileStem( formpath);
+					gct->defineForm( name, form);
+				}
+
 			}
 		}
 	}

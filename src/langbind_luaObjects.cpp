@@ -1167,7 +1167,7 @@ LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 		{
 			LuaExceptionHandlerScope escope(ls);
 			{
-				std::string doctypeid( DDLForm::getIdFromDoctype( doctype));
+				std::string doctypeid( ddl::StructType::getIdFromDoctype( doctype));
 				if (doctypeid.size())
 				{
 					lua_pushlstring( ls, doctypeid.c_str(), doctypeid.size());
@@ -1360,7 +1360,7 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 		{
 			if (doctype.size())
 			{
-				std::string doctypeid( DDLForm::getIdFromDoctype( doctype));
+				std::string doctypeid( ddl::StructType::getIdFromDoctype( doctype));
 				GlobalContext* gtc = getGlobalSingletonPointer<GlobalContext>( ls);
 				if (!gtc)
 				{

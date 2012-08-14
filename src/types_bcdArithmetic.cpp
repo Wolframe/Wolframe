@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implements some operations on arbitrary sized packed bcd numbers
 
 #include "types/bcdArithmetic.hpp"
+#include "types/allocators.hpp"
 #include <cstring>
 #include <cstdlib>
 #include <stdexcept>
@@ -63,94 +64,6 @@ void BigBCD::xchg( BigBCD& a, BigBCD& b)
 	tmp.m_size = 0;
 	tmp.m_allocated = false;
 }
-
-namespace {
-class MemChunk
-{
-public:
-	enum {bufsize=(1<<15)};
-
-	explicit MemChunk( std::size_t nn=bufsize) :m_next(0),m_pos(0),m_bufsize(nn<(std::size_t)bufsize?(std::size_t)bufsize:nn)
-	{
-		m_buf = (char*)std::calloc( m_bufsize, sizeof(char));
-		if (!m_buf) throw std::bad_alloc();
-	}
-
-	~MemChunk()
-	{
-		free( m_buf);
-	}
-
-	void* alloc( std::size_t nn)
-	{
-		if (m_pos + nn < m_bufsize)
-		{
-			char* rt;
-			rt = m_buf + m_pos;
-			m_pos += nn;
-			return (void*)rt;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
-	MemChunk* next() const
-	{
-		return m_next;
-	}
-
-	void link( MemChunk* nxt)
-	{
-		if (m_next) throw std::logic_error( "lost memory chunk");
-		m_next = nxt;
-	}
-
-private:
-	MemChunk* m_next;
-	std::size_t m_pos;
-	std::size_t m_bufsize;
-	char* m_buf;
-};
-}//anonymous namespace
-
-class BigBCD::Allocator
-{
-public:
-	Allocator() :m_chunk(0){}
-
-	~Allocator()
-	{
-		if (m_chunk)
-		{
-			MemChunk* curr = m_chunk;
-			MemChunk* next;
-			do
-			{
-				next = curr->next();
-				delete curr;
-				curr = next;
-			}
-			while (next);
-		}
-	}
-
-	void* alloc( std::size_t nn)
-	{
-		void* rt;
-		if (!m_chunk || !(rt = m_chunk->alloc( nn)))
-		{
-			MemChunk* chk = new MemChunk( nn);
-			rt = chk->alloc( nn);
-			chk->link( m_chunk);
-			m_chunk = chk;
-		}
-		return rt;
-	}
-private:
-	MemChunk* m_chunk;
-};
 
 void BigBCD::init( std::size_t nn, Allocator* allocator)
 {
@@ -1147,5 +1060,4 @@ void BigNumber::format( unsigned int show_prec, unsigned int calc_prec)
 	m_calc_precision = calc_prec;
 	m_show_precision = show_prec;
 }
-
 

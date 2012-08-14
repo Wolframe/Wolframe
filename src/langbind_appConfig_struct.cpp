@@ -62,7 +62,6 @@ const serialize::StructDescriptionBase* DDLFormConfigStruct::getStructDescriptio
 		ThisDescription()
 		{
 			(*this)
-			( "name",		&DDLFormConfigStruct::name)
 			( "DDL",		&DDLFormConfigStruct::DDL)
 			( "sourcepath",		&DDLFormConfigStruct::sourcepath)
 			;

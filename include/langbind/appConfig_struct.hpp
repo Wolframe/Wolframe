@@ -52,7 +52,6 @@ struct DDLCompilerConfigStruct
 
 struct DDLFormConfigStruct
 {
-	std::string name;						//< name of the form
 	std::string DDL;						//< name of DDL referencing the DDL compiler (langbind::DDLCompilerConfigStruct)
 	std::string sourcepath;						//< path of the DDL source of this form
 

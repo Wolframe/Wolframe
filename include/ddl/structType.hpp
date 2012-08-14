@@ -235,6 +235,8 @@ public:
 	///\param[in] doctype_ Document type definition string
 	void defineDoctype( const char* doctype_);
 
+	static std::string getIdFromDoctype( const std::string& doctype);
+
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
 	///\remark Used for checking the preconditions mentioned as remark [precondition]

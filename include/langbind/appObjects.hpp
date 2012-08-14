@@ -196,7 +196,6 @@ public:
 	std::string tostring() const;
 	DDLForm copy() const;
 
-	static std::string getIdFromDoctype( const std::string& doctype);
 private:
 	friend class DDLFormFill;
 	ddl::StructTypeR m_structure;

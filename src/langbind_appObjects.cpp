@@ -300,53 +300,6 @@ std::string DDLForm::tostring() const
 	return flt->content();
 }
 
-std::string DDLForm::getIdFromDoctype( const std::string& doctype)
-{
-	std::string rootid;
-	std::string publicid;
-	std::string systemid;
-	std::string::const_iterator itr=doctype.begin(), end=doctype.end();
-
-	if (utils::parseNextToken( rootid, itr, end))
-	{
-		if (utils::parseNextToken( publicid, itr, end))
-		{
-			if (publicid == "PUBLIC")
-			{
-				if (!utils::parseNextToken( publicid, itr, end)
-				||  !utils::parseNextToken( systemid, itr, end))
-				{
-					throw std::runtime_error( "illegal doctype definition");
-				}
-				return utils::getFileStem( systemid);
-			}
-			else if (publicid == "SYSTEM")
-			{
-				if (!utils::parseNextToken( systemid, itr, end))
-				{
-					throw std::runtime_error( "illegal doctype definition");
-				}
-				return utils::getFileStem( systemid);
-			}
-			else if (utils::parseNextToken( systemid, itr, end))
-			{
-				return utils::getFileStem( systemid);
-			}
-			else
-			{
-				return utils::getFileStem( publicid);
-			}
-		}
-		else
-		{
-			return rootid;
-		}
-	}
-	else
-	{
-		return "";
-	}
-}
 
 void DDLFormMap::defineForm( const std::string& name, const DDLForm& f)
 {

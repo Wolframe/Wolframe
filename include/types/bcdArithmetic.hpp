@@ -36,6 +36,7 @@ Project Wolframe.
 #define _Wolframe_TYPES_BCD_ARITHMETIC_HPP_INCLUDED
 #include <string>
 #include <boost/cstdint.hpp>
+#include "types/allocators.hpp"
 
 namespace _Wolframe {
 namespace types {
@@ -109,7 +110,7 @@ public:
 	const_iterator end() const				{return const_iterator();}
 
 private:
-	class Allocator;
+	typedef GreedySmallChunkAllocator Allocator;
 	void init( std::size_t size_, Allocator* allocator=0);
 	void copy( const BigBCD& o, Allocator* allocator);
 	void normalize();

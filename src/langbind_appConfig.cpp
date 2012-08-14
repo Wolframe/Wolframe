@@ -50,7 +50,6 @@ bool ApplicationEnvironmentConfig::check() const
 	bool rt = true;
 	std::map<std::string,bool> filters;
 	std::map<std::string,bool> compilers;
-	std::map<std::string,bool> forms;
 	std::map<std::string,bool> functions;
 	std::map<std::string,bool> scripts;
 	{
@@ -75,15 +74,9 @@ bool ApplicationEnvironmentConfig::check() const
 		std::vector<DDLFormConfigStruct>::const_iterator itr=m_config.form.begin(),end=m_config.form.end();
 		for (;itr!=end; ++itr)
 		{
-			if (forms[ itr->name])
-			{
-				LOG_ERROR << "Duplicate definition or using reserved name for form " << itr->name;
-				rt = false;
-			}
-			forms[ itr->name] = true;
 			if (!compilers[ itr->DDL])
 			{
-				LOG_ERROR << "Undefined DDL used for form definition" << itr->name;
+				LOG_ERROR << "Undefined DDL used for form definition" << itr->sourcepath;
 				rt = false;
 			}
 			if (!utils::fileExists( itr->sourcepath))
@@ -185,16 +178,6 @@ bool ApplicationEnvironmentConfig::check() const
 			if (!functions[ itr->peerfunc])
 			{
 				LOG_ERROR << "Undefined peer function '" << itr->name << "'";
-				rt = false;
-			}
-			if (!forms[ itr->inputform])
-			{
-				LOG_ERROR << "Undefined form '" << itr->inputform << "' used for peer form function command parameter description" << itr->name;
-				rt = false;
-			}
-			if (!forms[ itr->outputform])
-			{
-				LOG_ERROR << "Undefined form '" << itr->outputform << "' used for peer form function command result description" << itr->name;
 				rt = false;
 			}
 		}
