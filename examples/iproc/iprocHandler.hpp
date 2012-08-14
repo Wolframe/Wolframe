@@ -40,6 +40,7 @@
 #include "cmdbind/protocolCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
+#include "types/countedReference.hpp"
 
 namespace _Wolframe {
 namespace iproc {
@@ -124,7 +125,7 @@ private:
 	const Configuration* m_config;						//< configuration
 	protocol::CmdParser<protocol::Buffer> m_parser;				//< context dependent command parser definition
 	int m_cmdidx;								//< command parsed
-	utils::CountedReference<cmdbind::ProtocolCommandHandler> m_cmdhandler;	//< currently executed command
+	types::CountedReference<cmdbind::ProtocolCommandHandler> m_cmdhandler;	//< currently executed command
 
 	///\brief Helper function to send a line message with CRLF termination as C string
 	///\param [in] str head of the line to write
