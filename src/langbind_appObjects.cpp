@@ -55,12 +55,6 @@ Project Wolframe.
 #include "filter/libxml2_filter.hpp"
 #endif
 #include "filter/textwolf_filter.hpp"
-#ifdef WITH_XMLLITE
-#include "filter/xmllite_filter.hpp"
-#endif
-#if WITH_MSXML
-#include "filter/msxml_filter.hpp"
-#endif
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -160,12 +154,6 @@ FilterMap::FilterMap()
 	defineFilter( "xml:libxml2:UCS-4BE", createLibxml2Filter);
 #else
 	defineFilter( "xml", createTextwolfXmlFilter);
-#endif
-#ifdef WITH_XMLLITE
-	defineFilter( "xml:xmllite", createXmlLiteFilter);
-#endif
-#ifdef WITH_MSXML
-	defineFilter( "xml:msxml", createMSXMLFilter);
 #endif
 }
 

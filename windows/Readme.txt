@@ -33,8 +33,7 @@ Prepare the build
   cd src
   nmake /nologo /f Makefile.W32 ^
      WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1 ^
-     WITH_SQLITE3=1 WITH_PGSQL=1 WITH_MSXML=1 ^
-     WITH_XMLLITE=1 WITH_EXAMPLES=1 ^
+     WITH_SQLITE3=1 WITH_PGSQL=1 WITH_EXAMPLES=1 ^
      copy_prereq
 
 * Build documentation in 'docs' subdir:
@@ -46,15 +45,13 @@ Prepare the build
 
   nmake /nologo /f Makefile.W32 ^
      WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1 ^
-     WITH_SQLITE3=1 WITH_PGSQL=1 WITH_MSXML=1 ^
-     WITH_XMLLITE=1 WITH_EXAMPLES=1
+     WITH_SQLITE3=1 WITH_PGSQL=1 WITH_EXAMPLES=1
 
 * a standalone setup.exe can be build with
 
   nmake /nologo /f Makefile.W32 ^
      WITH_SSL=1 WITH_EXPECT=1 WITH_LUA=1 WITH_QT=1 ^
-     WITH_SQLITE3=1 WITH_PGSQL=1 WITH_MSXML=1 ^
-     WITH_XMLLITE=1 WITH_EXAMPLES=1 ^
+     WITH_SQLITE3=1 WITH_PGSQL=1 WITH_EXAMPLES=1 ^
      setup.exe
 
 Some useful links for the packager

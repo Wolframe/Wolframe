@@ -40,6 +40,7 @@
 #include "cmdbind/protocolCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
+#include "types/countedReference.hpp"
 
 namespace _Wolframe {
 namespace iproc {
