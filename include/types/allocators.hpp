@@ -74,7 +74,7 @@ private:
 template <typename Type>
 struct TypedArrayDoublingAllocator :public types::ArrayDoublingAllocator
 {
-	const Type* base() const
+	Type* base() const
 	{
 		return (Type*)types::ArrayDoublingAllocator::base();
 	}

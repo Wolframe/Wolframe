@@ -127,7 +127,7 @@ ArrayDoublingAllocator::ArrayDoublingAllocator()
 	,m_size(InitBlockSize)
 	,m_pos(0)
 {
-	m_ar = (char*)std::malloc( m_size);
+	m_ar = (char*)std::calloc( m_size, sizeof(char));
 	if (!m_ar) throw std::bad_alloc();
 }
 
