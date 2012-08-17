@@ -48,12 +48,12 @@ namespace {
 
 static bool getElementType( InputFilter::ElementType& et, char ch)
 {
-	switch (ch)
+	switch ((TokenType)ch)
 	{
-		case '>': et = InputFilter::OpenTag; return true;
-		case '<': et = InputFilter::CloseTag; return true;
-		case '@': et = InputFilter::Attribute; return true;
-		case '=': et = InputFilter::Value; return true;
+		case TokenOpenTag: et = InputFilter::OpenTag; return true;
+		case TokenCloseTag: et = InputFilter::CloseTag; return true;
+		case TokenAttribute: et = InputFilter::Attribute; return true;
+		case TokenValue: et = InputFilter::Value; return true;
 	}
 	return false;
 }
@@ -62,10 +62,10 @@ static char getElementTag( OutputFilter::ElementType tp)
 {
 	switch (tp)
 	{
-		case InputFilter::OpenTag: return '>';
-		case InputFilter::CloseTag: return '<';
-		case InputFilter::Attribute: return '@';
-		case InputFilter::Value: return '=';
+		case InputFilter::OpenTag: return (char)TokenOpenTag;
+		case InputFilter::CloseTag: return (char)TokenCloseTag;
+		case InputFilter::Attribute: return (char)TokenAttribute;
+		case InputFilter::Value: return (char)TokenValue;
 	}
 	return '\0';
 }

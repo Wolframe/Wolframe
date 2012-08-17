@@ -39,6 +39,14 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
+enum TokenType
+{
+	TokenOpenTag='>',
+	TokenCloseTag='<',
+	TokenAttribute='@',
+	TokenValue='='
+};
+
 Filter createTokenFilter( const std::string& name);
 
 }}//namespace

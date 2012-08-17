@@ -61,7 +61,8 @@ public:
 	~ArrayDoublingAllocator();
 
 	std::size_t alloc( std::size_t nofBytes);
-	const void* base() const;
+	const void* base() const			{return m_ar;}
+	std::size_t size() const			{return m_pos;}
 
 private:
 	enum {InitBlockSize=(1<<14)};
@@ -77,6 +78,12 @@ struct TypedArrayDoublingAllocator :public types::ArrayDoublingAllocator
 	Type* base() const
 	{
 		return (Type*)types::ArrayDoublingAllocator::base();
+	}
+
+	Type& operator[]( std::size_t idx) const
+	{
+		if (idx > size()/sizeof(Type)) throw std::logic_error( "Array bounds access");
+		return ((Type*)types::ArrayDoublingAllocator::base())[ idx];
 	}
 
 	std::size_t alloc( unsigned int nof)

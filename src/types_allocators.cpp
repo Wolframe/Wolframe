@@ -159,9 +159,5 @@ std::size_t ArrayDoublingAllocator::alloc( std::size_t nof)
 	return rt;
 }
 
-const void* ArrayDoublingAllocator::base() const
-{
-	return m_ar;
-}
 
 

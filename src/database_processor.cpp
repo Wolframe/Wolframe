@@ -33,11 +33,11 @@
 ///\brief Implementation of the processor of database commands
 ///\file src/database_processor.cpp
 #include "database/processor.hpp"
+#include "filter/token_filter.hpp"
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/charset.hpp"
 #include <cstring>
-#include <limits>
 #include <sstream>
 #include <iostream>
 #include <locale>
@@ -98,6 +98,7 @@ int TagTable::unused() const
 
 Structure::Structure( const TagTable* tagmap)
 	:m_tagmap(tagmap)
+	,m_rootidx(0)
 {
 	m_nodemem.alloc( 1);
 	m_strmem.alloc( 1);
@@ -108,31 +109,56 @@ Structure::Structure( const Structure& o)
 	:m_nodemem(o.m_nodemem)
 	,m_strmem(o.m_strmem)
 	,m_data(o.m_data)
-	,m_tagmap(o.m_tagmap){}
+	,m_tagmap(o.m_tagmap)
+	,m_rootidx(o.m_rootidx)
+	{}
 
 void Structure::openTag( const char* tag, std::size_t tagsize)
 {
 	const std::string tagstr( tag, tagsize);
+	openTag( tagstr);
+}
+
+void Structure::openTag( const std::string& tagstr)
+{
 	int mi = -(int)m_tagmap->find( tagstr);
 	if (mi == 0) mi = -(int)m_tagmap->unused();
 
-	m_data.back().push_back( Node( mi, 0));
+	m_data.back().push_back( Node( 0, mi, 0, 0));
 	m_data.push_back( std::vector<Node>());
+}
+
+void Structure::setParentLinks( std::size_t mi)
+{
+	Node* nd = &m_nodemem[mi];
+	std::size_t ii = 0, nn = nd->nofchild(), ci = nd->childidx();
+	for (; ii<nn; ++ii)
+	{
+		Node* cd = &m_nodemem[ ci + ii];
+		cd->m_parent = mi;
+		setParentLinks( ci);
+	}
 }
 
 void Structure::closeTag()
 {
 	if (m_data.back().size())
 	{
-		std::size_t mi = m_nodemem.alloc( m_data.back().size());
-		Node* nd = m_nodemem.base() + mi;
+		std::size_t ni = m_data.back().size();
+		std::size_t mi = m_nodemem.alloc( ni);
+		Node* nd = &m_nodemem[mi];
 		std::vector<Node>::const_iterator itr = m_data.back().begin(), end = m_data.back().end();
 		for (; itr != end; ++itr, ++nd)
 		{
 			*nd = *itr;
 		}
 		m_data.pop_back();
-		m_data.back().back().second = -(int)mi;
+		m_data.back().back().m_elementsize = ni;
+		m_data.back().back().m_element = Node::ref_element( mi);
+		if (m_data.size() == 1)
+		{
+			m_rootidx = mi;
+		}
 	}
 	else
 	{
@@ -146,11 +172,64 @@ void Structure::pushValue( const char* val, std::size_t valsize)
 	if (mi > (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc();
 	char* nd = m_strmem.base() + mi;
 	std::memcpy( nd, val, (valsize+1)*sizeof(char));
-	if (m_data.size() < 2 || m_data.back().size() > 0 || m_data[ m_data.size()-2].back().second != 0)
+	if (m_data.size() < 2)
 	{
-		throw std::logic_error( "tag stack inconsintent");
+		throw std::logic_error( "pushed value as root element");
 	}
-	m_data[ m_data.size()-2].back().second = (int)mi;
+	if (m_data.back().size() > 0)
+	{
+		throw std::logic_error( "pushed value without tag context");
+	}
+	if (m_data[ m_data.size()-2].back().m_element != 0)
+	{
+		throw std::logic_error( "pushed more thatn one value in same tag context");
+	}
+	m_data[ m_data.size()-2].back().m_elementsize = valsize;
+	m_data[ m_data.size()-2].back().m_element = Node::val_element( mi);
+}
+
+void Structure::pushValue( const std::string& val)
+{
+	pushValue( val.c_str(), val.size());
+}
+
+bool Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
+{
+	bool rt = false;
+	std::size_t ii = 0, nn = nd.nofchild();
+	Node* cd = &m_nodemem[ nd.childidx()];
+	for (; ii<nn; ++ii)
+	{
+		if (tag == 0 || tag == cd[ ii].m_tag)
+		{
+			nextnd.push_back( cd[ ii]);
+			rt = true;
+		}
+	}
+	return rt;
+}
+
+bool Structure::find( const Node& nd, int tag, std::vector<Node>& findnd) const
+{
+	bool rt = false;
+	std::size_t ii = 0, nn = nd.nofchild();
+	Node* cd = &m_nodemem[ nd.childidx()];
+	for (; ii<nn; ++ii)
+	{
+		if (tag == 0 || tag == cd[ ii].m_tag) findnd.push_back( cd[ ii]);
+		if (cd[ ii].nofchild() > 0) rt |= find( cd[ ii], tag, findnd);
+	}
+	return rt;
+}
+
+bool Structure::up( const Node& nd, std::vector<Node>& rt) const
+{
+	if (nd.m_parent != 0)
+	{
+		rt.push_back( m_nodemem[ nd.m_parent]);
+		return true;
+	}
+	return false;
 }
 
 Path::Path( const std::string& pt, TagTable* tagmap)
@@ -160,7 +239,17 @@ Path::Path( const std::string& pt, TagTable* tagmap)
 	std::string::const_iterator ii = pt.begin(), ee = pt.end();
 	while (ii != ee)
 	{
-		if (*ii == '/')
+		if (*ii == '$')
+		{
+			elem.m_type = Result;
+			elem.m_tag = m_resultvar.size();
+			++ii;
+			while (ii < ee && std::isalnum( *ii))
+			{
+				m_resultvar.push_back( *ii);
+			}
+		}
+		else if (*ii == '/')
 		{
 			++ii;
 			if (*ii == '/')
@@ -193,7 +282,7 @@ Path::Path( const std::string& pt, TagTable* tagmap)
 					throw std::runtime_error( std::string("selection '//..' is illegal in path '") + pt + "'" );
 				}
 				elem.m_type = Up;
-				elem.m_id = 0;
+				elem.m_tag = 0;
 			}
 			else if (tagnam == ".")
 			{
@@ -202,18 +291,26 @@ Path::Path( const std::string& pt, TagTable* tagmap)
 					throw std::runtime_error( std::string("selection '//.' is illegal in path '") + pt + "'" );
 				}
 				elem.m_type = Current;
-				elem.m_id = 0;
+				elem.m_tag = 0;
 			}
 			else if (tagnam == "*")
 			{
-				elem.m_id = 0;
+				elem.m_tag = 0;
 			}
 			else
 			{
 				tagnam = normalizeTagName( tagnam);
-				elem.m_id = tagmap->get( tagnam);
+				elem.m_tag = tagmap->get( tagnam);
 			}
 			m_path.push_back( elem);
+		}
+	}
+	std::vector<Element>::const_iterator pi = m_path.begin(), pe = m_path.end();
+	for (; pi != pe; ++pi)
+	{
+		if (pi->m_type == Result && m_path.size() > 1)
+		{
+			throw std::runtime_error( "referencing result variable in path");
 		}
 	}
 }
@@ -227,26 +324,19 @@ std::string Path::tostring() const
 	std::ostringstream rt;
 	for (; ii != ee; ++ii)
 	{
-		rt << elementTypeName( ii->m_type) << " " << ii->m_id << std::endl;
+		rt << elementTypeName( ii->m_type) << " " << ii->m_tag << std::endl;
 	}
 	return rt.str();
 }
 
 
-FunctionCall::FunctionCall( const std::string& name, const std::string& selector, const std::vector<std::string>& arg)
-	:m_name(name),m_selector(selector,&m_tagmap)
-{
-	std::vector<std::string>::const_iterator ii = arg.begin(), ee = arg.end();
-	for (; ii != ee; ++ii)
-	{
-		Path pp( *ii, &m_tagmap);
-		m_arg.push_back( pp);
-	}
-}
+FunctionCall::FunctionCall( const std::string& n, const Path& s, const std::vector<Path>& a)
+	:m_name(n)
+	,m_selector(s)
+	,m_arg(a) {}
 
 FunctionCall::FunctionCall( const FunctionCall& o)
-	:m_tagmap(o.m_tagmap)
-	,m_name(o.m_name)
+	:m_name(o.m_name)
 	,m_selector(o.m_selector)
 	,m_arg(o.m_arg) {}
 
@@ -271,18 +361,18 @@ TransactionProgram::TransactionProgram( const std::string& src)
 		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
 		if (*ii != '(') throw std::runtime_error( "syntax error in expression '(' expected");
 		++ii;
-		std::string selector;
+		std::string selectorstr;
 		while (ii < ee && *ii > 0 && *ii < 32) ++ii;
 		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
 		while (ii < ee && *ii != ':')
 		{
-			selector.push_back( *ii);
+			selectorstr.push_back( *ii);
 			++ii;
 		}
 		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
 		while (ii < ee && *ii > 0 && *ii < 32) ++ii;
 		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
-		std::vector<std::string> param;
+		std::vector<std::string> paramstr;
 
 		for (;;)
 		{
@@ -296,7 +386,7 @@ TransactionProgram::TransactionProgram( const std::string& src)
 			}
 			boost::trim( pp);
 			if (ii == ee) throw std::runtime_error( "unexpected end of expression");
-			param.push_back( pp);
+			paramstr.push_back( pp);
 			if (*ii == ')')
 			{
 				++ii;
@@ -309,12 +399,107 @@ TransactionProgram::TransactionProgram( const std::string& src)
 				continue;
 			}
 		}
+		Path selector( selectorstr, &m_tagmap);
+		std::vector<Path> param;
+		std::vector<std::string>::const_iterator ai = paramstr.begin(), ae = paramstr.end();
+		for (; ai != ae; ++ai)
+		{
+			Path pp( *ai, &m_tagmap);
+			param.push_back( pp);
+		}
 		FunctionCall cc( functionname, selector, param);
 		m_call.push_back( cc);
+
 		while (ii < ee && *ii > 0 && *ii < 32) ++ii;
 		if (ii == ee) break;
 		if (*ii != ';') throw std::runtime_error( "missing semicolon as expression separator");
 	}
 }
+
+bool TransactionProgram::execute( DatabaseInterface* , const std::string& content) const
+{
+	// [A] Parse content structure:
+	Structure st( &m_tagmap);
+	std::string::const_iterator ii = content.begin(), ee = content.end();
+
+	while (ii != ee)
+	{
+		if (*ii == '\n')
+		{
+			++ii;
+			continue;
+		}
+		langbind::TokenType toktype = (langbind::TokenType)(*ii++);
+		std::string::const_iterator tt = ii;
+		while (ii != ee && *ii != '\n') ++ii;
+		const char* tok = content.c_str()+(tt-content.begin());
+		std::size_t toksize = ii-tt;
+
+		switch (toktype)
+		{
+			case langbind::TokenOpenTag:
+				st.openTag( tok, toksize);
+			break;
+			case langbind::TokenCloseTag:
+				st.closeTag();
+			break;
+			case langbind::TokenAttribute:
+				st.openTag( tok, toksize);
+			break;
+			case langbind::TokenValue:
+				st.pushValue( tok, toksize);
+			break;
+			default:
+				throw std::runtime_error( std::string("illegal token in input '") + *ii + "'");
+		}
+	}
+	// [B] Execute commands:
+	std::vector<FunctionCall>::const_iterator ci = m_call.begin(), ce = m_call.end();
+	for (; ci != ce; ++ci)
+	{
+		std::vector<Structure::Node> nodearray;
+		std::vector<Structure::Node> nodearray2;
+		nodearray.push_back( nodearray[ st.root()]);
+
+		// [B.1] Find selected nodes:
+		std::vector<Path::Element>::const_iterator si = ci->selector().begin(), se = ci->selector().end();
+		for (; si != se; ++si)
+		{
+			nodearray2.clear();
+			std::vector<Structure::Node>::const_iterator ni = nodearray.begin(), ne = nodearray.end();
+			for (; ni != ne; ++ni)
+			{
+				switch (si->m_type)
+				{
+					case Path::Result:
+						throw std::runtime_error( "referencing result in selector");
+
+					case Path::Find:
+						st.find( *ni, si->m_tag, nodearray2);
+						break;
+
+					case Path::Next:
+						st.next( *ni, si->m_tag, nodearray2);
+						break;
+
+					case Path::Up:
+						st.up( *ni, nodearray2);
+						break;
+
+					case Path::Current:
+						break;
+				}
+			}
+			nodearray = nodearray2;
+		}
+		// [B.2] For each selected node do expand the function call arguments and call the function:
+		std::vector<Structure::Node>::const_iterator vi=nodearray.begin(),ve=nodearray.end();
+		for (; vi!=ve; ++vi)
+		{
+		}
+	}
+	return true;
+}
+
 
 

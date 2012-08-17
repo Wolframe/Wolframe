@@ -37,6 +37,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <limits>
+#include <stdexcept>
 #include "types/allocators.hpp"
 
 namespace _Wolframe {
@@ -82,16 +84,61 @@ public:
 	Structure( const Structure& o);
 
 	void openTag( const char* tag, std::size_t tagsize);
+	void openTag( const std::string& tag);
 	void closeTag();
 	void pushValue( const char* val, std::size_t valsize);
+	void pushValue( const std::string& val);
+
+	struct Node
+	{
+		int m_parent;
+		int m_tag;
+		int m_elementsize;
+		int m_element;
+
+		Node()
+			:m_parent(0)
+			,m_tag(0)
+			,m_elementsize(0)
+			,m_element(0){}
+
+		Node( const Node& o)
+			:m_parent(o.m_parent)
+			,m_tag(o.m_tag)
+			,m_elementsize(o.m_elementsize)
+			,m_element(o.m_element){}
+
+		Node( int p, int t, int size, int e)
+			:m_parent(p)
+			,m_tag(t)
+			,m_elementsize(size)
+			,m_element(e){}
+
+		static int ref_element( std::size_t idx)			{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return -(int)idx;}
+		static int val_element( std::size_t idx)			{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return (int)idx;}
+
+		std::size_t childidx() const					{return (m_element < 0)?(std::size_t)-m_element:0;}
+		std::size_t nofchild() const					{return (m_element < 0)?(std::size_t)m_elementsize:0;}
+		std::size_t valueidx() const					{return (m_element > 0)?(std::size_t)m_element:0;}
+		std::size_t valuesize() const					{return (m_element > 0)?(std::size_t)m_elementsize:0;}
+	};
+
+	std::size_t root() const						{if (m_data.size() != 1) throw std::runtime_error( "accessing root of incomplete structure"); return m_rootidx;}
+	bool next( const Node& nd, int tag, std::vector<Node>& rt) const;
+	bool find( const Node& nd, int tag, std::vector<Node>& rt) const;
+	bool up( const Node& nd, std::vector<Node>& rt) const;
 
 private:
-	typedef std::pair<int,int> Node;
+	void setParentLinks( std::size_t mi);
+
+private:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;
 	types::TypedArrayDoublingAllocator<char> m_strmem;
 	std::vector< std::vector<Node> > m_data;
 	const TagTable* m_tagmap;
+	std::size_t m_rootidx;
 };
+
 
 class Path
 {
@@ -101,19 +148,20 @@ public:
 		Next,
 		Find,
 		Current,
-		Up
+		Up,
+		Result
 	};
 
 	static const char* elementTypeName( ElementType i)
 	{
-		static const char* ar[] ={"Next","Find","Current","Up"};
+		static const char* ar[] ={"Next","Find","Current","Up","Result"};
 		return ar[(int)i];
 	}
 
 	struct Element
 	{
 		ElementType m_type;
-		int m_id;
+		int m_tag;
 	};
 
 	Path(){}
@@ -121,8 +169,12 @@ public:
 	Path( const Path& o);
 	std::string tostring() const;
 
+	std::vector<Element>::const_iterator begin() const	{return m_path.begin();}
+	std::vector<Element>::const_iterator end() const	{return m_path.end();}
+	std::size_t size() const				{return m_path.size();}
 private:
 	std::vector<Element> m_path;
+	std::string m_resultvar;
 };
 
 
@@ -131,9 +183,12 @@ class FunctionCall
 public:
 	FunctionCall(){}
 	FunctionCall( const FunctionCall& o);
-	FunctionCall( const std::string& name, const std::string& selector, const std::vector<std::string>& arg);
+	FunctionCall( const std::string& name, const Path& selector, const std::vector<Path>& arg);
+
+	const Path& selector() const			{return m_selector;}
+	const std::vector<Path>& arg() const		{return m_arg;}
+
 private:
-	TagTable m_tagmap;
 	std::string m_name;
 	Path m_selector;
 	std::vector<Path> m_arg;
@@ -146,8 +201,11 @@ public:
 	TransactionProgram(){}
 	TransactionProgram( const TransactionProgram& o);
 	TransactionProgram( const std::string& src);
+
+	bool execute( DatabaseInterface* dbinterf, const std::string& content) const;
 private:
 	std::vector<FunctionCall> m_call;
+	TagTable m_tagmap;
 };
 
 }}//namespace
