@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011 Project Wolframe.
+ Copyright (C) 2011, 2012 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
