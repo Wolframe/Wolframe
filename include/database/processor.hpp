@@ -50,13 +50,15 @@ struct DatabaseInterface
 	virtual bool commit()=0;
 	virtual bool rollback()=0;
 	virtual bool start( const std::string& stmname)=0;
-	virtual bool bind( unsigned int idx, const std::string& value)=0;
-	virtual bool exec()=0;
+	virtual bool bind( std::size_t idx, const char* value)=0;
+	virtual bool execute()=0;
 	virtual unsigned int nofColumns()=0;
-	virtual char* getLastError()=0;
-	virtual bool get( unsigned int idx, const char*& tagname, std::string& value)=0;
+	virtual const char* columnName( std::size_t idx)=0;
+	virtual const char* getLastError()=0;
+	virtual const char* get( std::size_t idx)=0;
 	virtual bool next()=0;
 };
+
 
 class TagTable
 {
@@ -77,17 +79,12 @@ private:
 	std::map< std::string, int> m_map;
 };
 
+
 class Structure
 {
 public:
-	Structure( const TagTable* tagmap);
+	Structure( const TagTable* tagmap, const std::string& content);
 	Structure( const Structure& o);
-
-	void openTag( const char* tag, std::size_t tagsize);
-	void openTag( const std::string& tag);
-	void closeTag();
-	void pushValue( const char* val, std::size_t valsize);
-	void pushValue( const std::string& val);
 
 	struct Node
 	{
@@ -123,18 +120,25 @@ public:
 		std::size_t valuesize() const					{return (m_element > 0)?(std::size_t)m_elementsize:0;}
 	};
 
-	std::size_t root() const						{if (m_data.size() != 1) throw std::runtime_error( "accessing root of incomplete structure"); return m_rootidx;}
+	const Node& root() const						{if (m_rootidx == 0) throw std::runtime_error( "accessing root of incomplete structure"); return m_nodemem[ m_rootidx];}
+
 	bool next( const Node& nd, int tag, std::vector<Node>& rt) const;
 	bool find( const Node& nd, int tag, std::vector<Node>& rt) const;
 	bool up( const Node& nd, std::vector<Node>& rt) const;
+	const char* nodevalue( std::size_t idx) const				{return &m_strmem[idx];}
 
 private:
+	typedef std::vector< std::vector<Node> > BuildNodeStruct;
 	void setParentLinks( std::size_t mi);
+	void openTag( const char* tag, std::size_t tagsize, BuildNodeStruct& data);
+	void openTag( const std::string& tag, BuildNodeStruct& data);
+	void closeTag( BuildNodeStruct& data);
+	void pushValue( const char* val, std::size_t valsize, BuildNodeStruct& data);
+	void pushValue( const std::string& val, BuildNodeStruct& data);
 
 private:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;
 	types::TypedArrayDoublingAllocator<char> m_strmem;
-	std::vector< std::vector<Node> > m_data;
 	const TagTable* m_tagmap;
 	std::size_t m_rootidx;
 };
@@ -147,7 +151,6 @@ public:
 	{
 		Next,
 		Find,
-		Current,
 		Up,
 		Result
 	};
@@ -165,16 +168,19 @@ public:
 	};
 
 	Path(){}
-	Path( const std::string& pt, TagTable* tagmap);
+	Path( const std::string& src, TagTable* tagmap);
 	Path( const Path& o);
 	std::string tostring() const;
 
-	std::vector<Element>::const_iterator begin() const	{return m_path.begin();}
-	std::vector<Element>::const_iterator end() const	{return m_path.end();}
-	std::size_t size() const				{return m_path.size();}
+	std::size_t resultReference() const;
+	bool selectNodes( const Structure& st, const Structure::Node& nd, std::vector<Structure::Node>& ar) const;
+
+	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
+	std::vector<Element>::const_iterator end() const		{return m_path.end();}
+	std::size_t size() const					{return m_path.size();}
+
 private:
 	std::vector<Element> m_path;
-	std::string m_resultvar;
 };
 
 
@@ -183,12 +189,18 @@ class FunctionCall
 public:
 	FunctionCall(){}
 	FunctionCall( const FunctionCall& o);
-	FunctionCall( const std::string& name, const Path& selector, const std::vector<Path>& arg);
+	FunctionCall( const std::string& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg);
 
 	const Path& selector() const			{return m_selector;}
 	const std::vector<Path>& arg() const		{return m_arg;}
+	const std::string& name() const			{return m_name;}
+	const std::string& resultname() const		{return m_resultname;}
+
+	void resultname( const char* r)			{m_resultname = r;}
+	bool hasResultReference() const;
 
 private:
+	std::string m_resultname;
 	std::string m_name;
 	Path m_selector;
 	std::vector<Path> m_arg;
@@ -202,8 +214,30 @@ public:
 	TransactionProgram( const TransactionProgram& o);
 	TransactionProgram( const std::string& src);
 
-	bool execute( DatabaseInterface* dbinterf, const std::string& content) const;
+	std::string execute( DatabaseInterface* dbinterf, const std::string& content) const;
+
 private:
+	struct Output
+	{
+		Output(){}
+
+		void openTag( const std::string& tag);
+		void openTag( const char* tag, std::size_t tagsize);
+		void closeTag();
+		void pushValue( const std::string& val);
+		void pushValue( const char* val, std::size_t valsize);
+
+		std::string tostring() const			{return m_string;}
+
+	private:
+		std::string m_string;
+	};
+
+private:
+	const std::string& resultname() const			{return m_resultname;}
+
+private:
+	std::string m_resultname;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
 };

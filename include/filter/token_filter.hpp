@@ -44,7 +44,8 @@ enum TokenType
 	TokenOpenTag='>',
 	TokenCloseTag='<',
 	TokenAttribute='@',
-	TokenValue='='
+	TokenValue='=',
+	TokenNextLine='.'
 };
 
 Filter createTokenFilter( const std::string& name);

@@ -54,6 +54,7 @@ static bool getElementType( InputFilter::ElementType& et, char ch)
 		case TokenCloseTag: et = InputFilter::CloseTag; return true;
 		case TokenAttribute: et = InputFilter::Attribute; return true;
 		case TokenValue: et = InputFilter::Value; return true;
+		case TokenNextLine: return false;
 	}
 	return false;
 }
@@ -107,7 +108,8 @@ struct OutputFilterImpl :public OutputFilter
 		{
 			if (ch == '\n')
 			{
-				IOCharset::print( ' ', buf);
+				IOCharset::print( '\n', buf);
+				IOCharset::print( (char)TokenNextLine, buf);
 			}
 			else
 			{
@@ -178,7 +180,8 @@ struct InputFilterImpl :public InputFilter
 		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
-		,m_linecomplete(false){}
+		,m_linecomplete(false)
+		,m_eolnread(false){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
@@ -192,7 +195,8 @@ struct InputFilterImpl :public InputFilter
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
 		,m_srcend(o.m_srcend)
-		,m_linecomplete(o.m_linecomplete){}
+		,m_linecomplete(o.m_linecomplete)
+		,m_eolnread(o.m_eolnread){}
 
 	///\brief self copy
 	///\return copy of this
@@ -263,28 +267,43 @@ struct InputFilterImpl :public InputFilter
 			textwolf::UChar ch;
 			while ((ch = *m_itr) != 0)
 			{
-				if (ch == '\r')
+				if (m_eolnread)
+				{
+					if (ch == (char)TokenNextLine)
+					{
+						AppCharset::print( '\n', m_elembuf);
+						++m_itr;
+						continue;
+					}
+					else
+					{
+						type = m_elemtype;
+						element = m_elembuf.c_str();
+						elementsize = m_elembuf.size();
+						if (m_elemtype == OpenTag)
+						{
+							++m_taglevel;
+						}
+						else if (m_elemtype == CloseTag)
+						{
+							--m_taglevel;
+						}
+						m_tag = '\0';
+						m_linecomplete = true;
+						m_eolnread = false;
+						return true;
+					}
+				}
+				else if (ch == '\r')
 				{
 					++m_itr;
 					continue;
 				}
-				if (ch == '\n')
+				else if (ch == '\n')
 				{
-					type = m_elemtype;
-					element = m_elembuf.c_str();
-					elementsize = m_elembuf.size();
 					++m_itr;
-					if (m_elemtype == OpenTag)
-					{
-						++m_taglevel;
-					}
-					else if (m_elemtype == CloseTag)
-					{
-						--m_taglevel;
-					}
-					m_tag = '\0';
-					m_linecomplete = true;
-					return true;
+					m_eolnread = true;
+					continue;
 				}
 				else
 				{
@@ -297,6 +316,7 @@ struct InputFilterImpl :public InputFilter
 				type = m_elemtype;
 				element = m_elembuf.c_str();
 				elementsize = m_elembuf.size();
+				m_tag = '\0';
 				m_linecomplete = true;
 				return true;
 			}
@@ -317,6 +337,7 @@ private:
 	std::size_t m_srcsize;		//< size of the current chunk parsed in bytes
 	bool m_srcend;			//< true if end of message is in current chunk parsed
 	bool m_linecomplete;		//< true if the last getNext could complete a line
+	bool m_eolnread;		//< true if the end of line has been read
 };
 
 }//end anonymous namespace
