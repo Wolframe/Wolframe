@@ -40,6 +40,7 @@ Project Wolframe.
 #include <cstring>
 #include <cstddef>
 #include <algorithm>
+/*[-]*/#include <iostream>
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -273,6 +274,7 @@ struct InputFilterImpl :public InputFilter
 					{
 						AppCharset::print( '\n', m_elembuf);
 						++m_itr;
+						m_eolnread = false;
 						continue;
 					}
 					else
@@ -316,8 +318,17 @@ struct InputFilterImpl :public InputFilter
 				type = m_elemtype;
 				element = m_elembuf.c_str();
 				elementsize = m_elembuf.size();
+				if (m_elemtype == OpenTag)
+				{
+					++m_taglevel;
+				}
+				else if (m_elemtype == CloseTag)
+				{
+					--m_taglevel;
+				}
 				m_tag = '\0';
 				m_linecomplete = true;
+				m_eolnread = false;
 				return true;
 			}
 		}
