@@ -129,8 +129,11 @@ void Structure::setParentLinks( std::size_t mi)
 	for (; ii<nn; ++ii)
 	{
 		Node* cd = &m_nodemem[ ci + ii];
-		cd->m_parent = mi;
-		setParentLinks( ci + ii);
+		if (cd->m_parent != (int)mi)
+		{
+			cd->m_parent = (int)mi;
+			setParentLinks( ci + ii);
+		}
 	}
 }
 
@@ -150,12 +153,16 @@ const std::string Structure::tostring() const
 			if (cd->valueidx())
 			{
 				std::size_t indent = stk.size() -1;
-				const char* val = nodevalue( cd->valueidx());
+				const char* val = &m_strmem[ cd->m_element];
 				while (indent--) rt << '\t';
-				rt << cd->m_tag << ": '" << val << "'" << std::endl;
+				if (cd->m_tag) rt << cd->m_tag << ": ";
+				rt << "'" << val << "'" << std::endl;
 			}
 			else
 			{
+				std::size_t indent = stk.size() -1;
+				while (indent--) rt << '\t';
+				rt << cd->m_tag << ":" << std::endl;
 				stk.push_back( std::pair< std::size_t, std::size_t>( cd->nofchild(), cd->childidx()));
 			}
 		}
@@ -175,72 +182,60 @@ void Structure::openTag( const char* tag, std::size_t tagsize)
 
 void Structure::openTag( const std::string& tagstr)
 {
-	int mi = -(int)m_tagmap->find( tagstr);
-	if (mi == 0) mi = -(int)m_tagmap->unused();
+	int mi = (int)m_tagmap->find( tagstr);
+	if (mi == 0) mi = (int)m_tagmap->unused();
 
 	m_data.back().push_back( Node( 0, mi, 0, 0));
 	m_data.push_back( std::vector<Node>());
 }
 
+std::size_t Structure::createRootNode()
+{
+	std::size_t ni = m_data.back().size();
+	m_rootidx = m_nodemem.alloc( ni);
+	Node* nd = &m_nodemem[ m_rootidx];
+	std::vector<Node>::const_iterator itr = m_data.back().begin(), end = m_data.back().end();
+	for (; itr != end; ++itr, ++nd)
+	{
+		*nd = *itr;
+	}
+	m_data.pop_back();
+	return ni;
+}
+
 void Structure::closeTag()
 {
-	if (m_data.back().size())
+	if (m_data.empty())
 	{
-		std::size_t ni = m_data.back().size();
-		std::size_t mi = m_nodemem.alloc( ni);
-		Node* nd = &m_nodemem[mi];
-		std::vector<Node>::const_iterator itr = m_data.back().begin(), end = m_data.back().end();
-		for (; itr != end; ++itr, ++nd)
-		{
-			*nd = *itr;
-		}
-		m_data.pop_back();
+		throw std::runtime_error( "no unique toplevel tag in input");
+	}
+	else if (m_data.back().size())
+	{
+		std::size_t ni = createRootNode();
 		m_data.back().back().m_elementsize = ni;
-		m_data.back().back().m_element = Node::ref_element( mi);
+		m_data.back().back().m_element = Node::ref_element( m_rootidx);
+
 		if (m_data.size() == 1)
 		{
-			m_rootidx = mi;
+			// top level tag closed, assuming end of structure,
+			// creating root node and set all parent links:
+			createRootNode();
 			setParentLinks( m_rootidx);
 		}
 	}
 	else
 	{
 		m_data.pop_back();
-		if (m_data.back().size() && m_data.back().back().m_element)
-		{
-			std::size_t mi = m_nodemem.alloc( 1);
-			Node* nd = &m_nodemem[mi];
-			std::vector<Node>::const_iterator itr = m_data.back().begin();
-			*nd = *itr;
-			if (m_data.size() == 1)
-			{
-				m_rootidx = mi;
-				setParentLinks( m_rootidx);
-			}
-		}
 	}
 }
 
 void Structure::pushValue( const char* val, std::size_t valsize)
 {
 	std::size_t mi = m_strmem.alloc( valsize+1);
-	if (mi > (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc();
-	char* nd = m_strmem.base() + mi;
-	std::memcpy( nd, val, (valsize+1)*sizeof(char));
-	if (m_data.size() < 2)
-	{
-		throw std::logic_error( "pushed value as root element");
-	}
-	if (m_data.back().size() > 0)
-	{
-		throw std::logic_error( "pushed value without tag context");
-	}
-	if (m_data[ m_data.size()-2].back().m_element != 0)
-	{
-		throw std::logic_error( "pushed more thatn one value in same tag context");
-	}
-	m_data[ m_data.size()-2].back().m_elementsize = valsize;
-	m_data[ m_data.size()-2].back().m_element = Node::val_element( mi);
+	char* mem = m_strmem.base() + mi;
+	std::memcpy( mem, val, (valsize+1)*sizeof(char));
+
+	m_data.back().push_back( Node( 0, 0, valsize, Node::val_element( mi)));
 }
 
 void Structure::pushValue( const std::string& val)
@@ -250,29 +245,28 @@ void Structure::pushValue( const std::string& val)
 
 bool Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
 {
-	bool rt = false;
-	std::size_t ii = 0, nn = nd.nofchild();
-	Node* cd = &m_nodemem[ nd.childidx()];
-	for (; ii<nn; ++ii)
+	if (nd.m_tag && (int)nd.m_element < 0)
 	{
-		if (tag == 0 || tag == cd[ ii].m_tag)
+		if (tag == 0 || tag == nd.m_tag)
 		{
-			nextnd.push_back( cd[ ii]);
-			rt = true;
+			nextnd.push_back( m_nodemem[ -(int)nd.m_element]);
+			return true;
 		}
 	}
-	return rt;
+	return false;
 }
 
 bool Structure::find( const Node& nd, int tag, std::vector<Node>& findnd) const
 {
-	bool rt = false;
+	bool rt = next( nd, tag, findnd);
 	std::size_t ii = 0, nn = nd.nofchild();
-	Node* cd = &m_nodemem[ nd.childidx()];
-	for (; ii<nn; ++ii)
+	if (nn)
 	{
-		if (tag == 0 || tag == cd[ ii].m_tag) findnd.push_back( cd[ ii]);
-		if (cd[ ii].nofchild() > 0) rt |= find( cd[ ii], tag, findnd);
+		Node* cd = &m_nodemem[ nd.childidx()];
+		for (; ii<nn; ++ii)
+		{
+			rt |= find( cd[ii], tag, findnd);
+		}
 	}
 	return rt;
 }
@@ -285,6 +279,17 @@ bool Structure::up( const Node& nd, std::vector<Node>& rt) const
 		return true;
 	}
 	return false;
+}
+
+const char* Structure::nodevalue( const Node& nd) const
+{
+	const char* rt = 0;
+	if (nd.m_tag != 0)
+	{
+		throw std::runtime_error( "node selected is not a leaf");
+	}
+	rt = &m_strmem[ nd.valueidx()];
+	return rt;
 }
 
 Path::Path( const std::string& pt, TagTable* tagmap)
@@ -490,6 +495,7 @@ TransactionFunction::TransactionFunction( const std::string& src)
 			++ii;
 		}
 		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
+		++ii;
 		while (ii < ee && *ii > 0 && *ii < 32) ++ii;
 		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
 		std::vector<std::string> paramstr;
@@ -579,15 +585,6 @@ TransactionFunction::TransactionFunction( const std::string& src)
 	}
 }
 
-struct DatabaseError :public std::runtime_error
-{
-	DatabaseError( DatabaseInterface* dbi)
-		:std::runtime_error( std::string("error in database transaction (") + dbi->getLastError())
-	{
-		dbi->rollback();
-	}
-};
-
 TransactionInput::TransactionInput( const TagTable* tagmap)
 	:Structure(tagmap)
 	,m_lasttype(langbind::TypedInputFilter::Value){}
@@ -672,95 +669,121 @@ langbind::TransactionInputR TransactionFunction::getInput() const
 
 langbind::TransactionResultR TransactionFunction::execute( DatabaseInterface* dbi, const langbind::TransactionInput* inputi) const
 {
-	const TransactionInput* inputst = dynamic_cast<const TransactionInput*>( inputi);
-	if (!inputst) throw std::logic_error( "function called with unknown input type");
-
-	std::string ststr = inputst->tostring();
-/*[-]*/std::cout << "INPUT" << std::endl << ststr << std::endl << std::endl;
-
-	TransactionResult* result = new TransactionResult();
-	langbind::TransactionResultR rt( result);
-
-	typedef std::vector<std::size_t> ResultRow;
-	std::string resultstr,resultstr2;
-	std::vector<ResultRow> resultar,resultar2;
-
-	if (!dbi->begin()) throw DatabaseError( dbi);
-	if (!m_resultname.empty())
+	try
 	{
-		result->openTag( m_resultname);
-	}
-	std::vector<FunctionCall>::const_iterator ci = m_call.begin(), ce = m_call.end();
-	for (; ci != ce; ++ci)
-	{
-		resultar = resultar2;
-		resultstr = resultstr2;
-		resultar2.clear();
-		resultstr2.clear();
-		resultstr2.push_back( '\0');
+		const TransactionInput* inputst = dynamic_cast<const TransactionInput*>( inputi);
+		if (!inputst) throw std::logic_error( "function called with unknown input type");
 
-		// Start transaction:
-		if (!dbi->start( ci->name())) throw DatabaseError( dbi);
+		std::string ststr = inputst->tostring();
 
-		// Select the nodes to execute the command with:
-		std::vector<Structure::Node> nodearray;
-		if (!ci->selector().selectNodes( *inputst, inputst->root(), nodearray)) continue;
+		TransactionResult* result = new TransactionResult();
+		langbind::TransactionResultR rt( result);
 
-		// For each selected node do expand the function call arguments:
-		std::vector<Structure::Node>::const_iterator vi=nodearray.begin(),ve=nodearray.end();
-		for (; vi != ve; ++vi)
+		typedef std::vector<std::size_t> ResultRow;
+		std::string resultstr,resultstr2;
+		std::vector<ResultRow> resultar,resultar2;
+
+		if (!dbi->begin()) throw std::logic_error( "transaction begin failed");
+		if (!m_resultname.empty())
 		{
-			// Expand the arguments that are input node references:
-			std::vector<Path>::const_iterator pi=ci->arg().begin(), pe=ci->arg().end();
-			for (std::size_t argidx=0; pi != pe; ++pi,++argidx)
-			{
-				if (!pi->resultReference())
-				{
-					std::vector<Structure::Node> param;
-					if (!pi->selectNodes( *inputst, *vi, param))
-					{
-						if (param.size() > 1)
-						{
-							throw std::runtime_error( "more than one node selected in db call argument");
-						}
-						else if (param.size() == 0)
-						{
-							if (!dbi->bind( argidx, 0)) throw DatabaseError( dbi);
-						}
-						else
-						{
-							std::size_t idx = param[0].valueidx();
-							if (idx == 0) throw std::runtime_error( "non atomic value selected in db call argument");
+			result->openTag( m_resultname);
+		}
+		std::vector<FunctionCall>::const_iterator ci = m_call.begin(), ce = m_call.end();
+		for (; ci != ce; ++ci)
+		{
+			resultar = resultar2;
+			resultstr = resultstr2;
+			resultar2.clear();
+			resultstr2.clear();
+			resultstr2.push_back( '\0');
 
-							if (!dbi->bind( argidx, inputst->nodevalue( idx))) throw DatabaseError( dbi);
-						}
-					}
-				}
-			}
+			// Start transaction:
+			if (!dbi->start( ci->name())) throw std::logic_error( "start transaction failed");
 
-			// Expand the arguments that are result references:
-			if (ci->hasResultReference())
+			// Select the nodes to execute the command with:
+			std::vector<Structure::Node> nodearray;
+			if (!ci->selector().selectNodes( *inputst, inputst->root(), nodearray)) continue;
+
+			// For each selected node do expand the function call arguments:
+			std::vector<Structure::Node>::const_iterator vi=nodearray.begin(),ve=nodearray.end();
+			for (; vi != ve; ++vi)
 			{
-				std::vector<ResultRow>::const_iterator ri = resultar.begin(), re = resultar.end();
-				for (; ri != re; ++ri)
+				// Expand the arguments that are input node references:
+				std::vector<Path>::const_iterator pi=ci->arg().begin(), pe=ci->arg().end();
+				for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
 				{
-					for (std::size_t argidx=0; pi != pe; ++pi,++argidx)
+					if (!pi->resultReference())
 					{
-						std::size_t residx = pi->resultReference();
-						if (residx)
+						std::vector<Structure::Node> param;
+						if (pi->selectNodes( *inputst, *vi, param))
 						{
-							std::size_t resstridx =  (*ri)[ residx -1];
-							if (resstridx)
+							if (param.size() > 1)
 							{
-								if (!dbi->bind( argidx, resultstr.c_str() + resstridx)) throw DatabaseError( dbi);
+								throw std::runtime_error( "more than one node selected in db call argument");
+							}
+							else if (param.size() == 0)
+							{
+								if (!dbi->bind( argidx, 0)) throw std::logic_error( "bind NULL parameter in transaction failed");
 							}
 							else
 							{
-								if (!dbi->bind( argidx, 0)) throw DatabaseError( dbi);
+								const char* value = inputst->nodevalue( param[0]);
+								if (!dbi->bind( argidx, value)) throw std::logic_error( "bind paramater in transaction failed");
 							}
 						}
 					}
-					if (!dbi->execute()) throw DatabaseError( dbi);
+				}
+
+				// Expand the arguments that are result references:
+				if (ci->hasResultReference())
+				{
+					std::vector<ResultRow>::const_iterator ri = resultar.begin(), re = resultar.end();
+					for (; ri != re; ++ri)
+					{
+						for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
+						{
+							std::size_t residx = pi->resultReference();
+							if (residx)
+							{
+								std::size_t resstridx =  (*ri)[ residx -1];
+								if (resstridx)
+								{
+									if (!dbi->bind( argidx, resultstr.c_str() + resstridx)) throw std::logic_error( "bind paramater in transaction failed");
+								}
+								else
+								{
+									if (!dbi->bind( argidx, 0)) throw std::logic_error( "bind paramater in transaction failed");
+								}
+							}
+						}
+						if (!dbi->execute()) throw std::logic_error( "execute database function in transaction failed");
+						ResultRow res;
+						std::size_t ii, nn=dbi->nofColumns();
+						while (dbi->next())
+						{
+							for (ii=0; ii<nn; ++ii)
+							{
+								const char* resstr = dbi->get( ii);
+								if (resstr)
+								{
+									res.push_back( resultstr2.size());
+									resultstr2.append( resstr);
+									resultstr2.push_back( '\0');
+								}
+								else
+								{
+									res.push_back( 0);
+								}
+							}
+							resultar.push_back( res);
+							res.clear();
+						}
+						if (dbi->getLastError()) throw std::logic_error( "fetch next result in transaction failed");
+					}
+				}
+				else
+				{
+					if (!dbi->execute()) throw std::logic_error( "execute database call in transaction failed");
 					ResultRow res;
 					std::size_t ii, nn=dbi->nofColumns();
 					while (dbi->next())
@@ -782,72 +805,60 @@ langbind::TransactionResultR TransactionFunction::execute( DatabaseInterface* db
 						resultar.push_back( res);
 						res.clear();
 					}
-					if (dbi->getLastError()) throw DatabaseError( dbi);
-				}
-			}
-			else
-			{
-				if (!dbi->execute()) throw DatabaseError( dbi);
-				ResultRow res;
-				std::size_t ii, nn=dbi->nofColumns();
-				while (dbi->next())
-				{
-					for (ii=0; ii<nn; ++ii)
-					{
-						const char* resstr = dbi->get( ii);
-						if (resstr)
-						{
-							res.push_back( resultstr2.size());
-							resultstr2.append( resstr);
-							resultstr2.push_back( '\0');
-						}
-						else
-						{
-							res.push_back( 0);
-						}
-					}
-					resultar.push_back( res);
-					res.clear();
-				}
-				if (dbi->getLastError()) throw DatabaseError( dbi);
-			}
-
-			// print the result if it is named:
-			if (!ci->resultname().empty())
-			{
-				std::vector<std::string> columnar;
-				result->openTag( ci->resultname());
-				columnar.clear();
-				std::size_t ii, nn=dbi->nofColumns();
-				for (ii=0; ii<nn; ++ii)
-				{
-					const char* colname = dbi->columnName( ii);
-					columnar.push_back( colname);
+					if (dbi->getLastError()) throw std::logic_error( "fetch next result in transaction failed");
 				}
 
-				std::vector<ResultRow>::const_iterator ri = resultar.begin(), re = resultar.end();
-				for (; ri != re; ++ri)
+				// print the result if it is named:
+				if (!ci->resultname().empty())
 				{
+					std::vector<std::string> columnar;
+					result->openTag( ci->resultname());
+					columnar.clear();
+					std::size_t ii, nn=dbi->nofColumns();
 					for (ii=0; ii<nn; ++ii)
 					{
-						if ((*ri)[ii])
+						const char* colname = dbi->columnName( ii);
+						columnar.push_back( colname);
+					}
+
+					std::vector<ResultRow>::const_iterator ri = resultar.begin(), re = resultar.end();
+					for (; ri != re; ++ri)
+					{
+						for (ii=0; ii<nn; ++ii)
 						{
-							result->openTag( columnar[ ii]);
-							result->pushValue( resultstr2.c_str() + (*ri)[ii]);
-							result->closeTag();
+							if ((*ri)[ii])
+							{
+								result->openTag( columnar[ ii]);
+								result->pushValue( resultstr2.c_str() + (*ri)[ii]);
+								result->closeTag();
+							}
 						}
 					}
+					result->closeTag();
 				}
-				result->closeTag();
 			}
 		}
+		if (!dbi->commit()) throw std::logic_error( "commit transaction failed");
+		if (!m_resultname.empty())
+		{
+			result->closeTag();
+		}
+		return rt;
 	}
-	if (!dbi->commit()) throw DatabaseError( dbi);
-	if (!m_resultname.empty())
+	catch (const std::exception& e)
 	{
-		result->closeTag();
+		const char* dberr = dbi->getLastError();
+		if (dberr)
+		{
+			dbi->rollback();
+			throw std::runtime_error( std::string("error in database transaction: ") + e.what() + "(" + dbi->getLastError() + ")");
+		}
+		else
+		{
+			dbi->rollback();
+			throw std::runtime_error( std::string("error in database transaction: ") + e.what());
+		}
 	}
-	return rt;
 }
 
 

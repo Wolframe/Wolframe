@@ -138,7 +138,7 @@ public:
 	bool next( const Node& nd, int tag, std::vector<Node>& rt) const;
 	bool find( const Node& nd, int tag, std::vector<Node>& rt) const;
 	bool up( const Node& nd, std::vector<Node>& rt) const;
-	const char* nodevalue( std::size_t idx) const				{return &m_strmem[idx];}
+	const char* nodevalue( const Node& nd) const;
 
 	const std::string tostring() const;
 
@@ -147,6 +147,7 @@ protected:
 	void openTag( const char* tag, std::size_t tagsize);
 	void openTag( const std::string& tag);
 	void closeTag();
+	std::size_t createRootNode();
 	void pushValue( const char* val, std::size_t valsize);
 	void pushValue( const std::string& val);
 	void check() const;
