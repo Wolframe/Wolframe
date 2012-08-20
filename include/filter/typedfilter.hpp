@@ -54,6 +54,7 @@ public:
 	///\brief Constructor
 	TypedInputFilter()
 		:m_state(InputFilter::Open) {}
+
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
 	TypedInputFilter( const TypedInputFilter& o)

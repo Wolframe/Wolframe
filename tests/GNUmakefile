@@ -105,7 +105,8 @@ TEST_CPP_BINS = \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
 	testSimpleFormCompiler$(EXE) \
-	testWolfilter$(EXE)
+	testWolfilter$(EXE) \
+	testDatabaseProcessorVM$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -116,6 +117,7 @@ CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 testWolfilter$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+testDatabaseProcessorVM$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 
 local_all:
 
@@ -169,6 +171,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testSimpleFormCompiler
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testWolfilter
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testDatabaseProcessorVM
 	@echo
 	@echo
 endif

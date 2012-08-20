@@ -1,0 +1,1 @@
+absolute_select.tst:		One command, one absolute path, no selector

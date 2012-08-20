@@ -123,7 +123,6 @@ static void checkUnconsumedInput( std::istream& is, InputFilter& iflt)
 		}
 		end = is.eof();
 	}
-
 }
 
 static void writeOutput( char* buf, unsigned int size, std::ostream& os, OutputFilter& oflt)

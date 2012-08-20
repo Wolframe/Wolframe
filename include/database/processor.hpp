@@ -34,28 +34,41 @@
 ///\file database/processor.hpp
 #ifndef _DATABASE_PROCESSOR_HPP_INCLUDED
 #define _DATABASE_PROCESSOR_HPP_INCLUDED
+#include "types/allocators.hpp"
+#include "langbind/transactionFunction.hpp"
 #include <string>
 #include <vector>
 #include <map>
 #include <limits>
 #include <stdexcept>
-#include "types/allocators.hpp"
 
 namespace _Wolframe {
 namespace db {
 
 struct DatabaseInterface
 {
+	virtual ~DatabaseInterface(){}
+	///\brief Begin transaction
 	virtual bool begin()=0;
+	///\brief Commit current transaction
 	virtual bool commit()=0;
+	///\brief Rollback current transaction
 	virtual bool rollback()=0;
+	///\brief Start new command statement
 	virtual bool start( const std::string& stmname)=0;
+	///\brief Bind parameter value on current command statement
 	virtual bool bind( std::size_t idx, const char* value)=0;
+	///\brief Execute instance of current statement
 	virtual bool execute()=0;
+	///\brief Get the number of columns of the last result
 	virtual unsigned int nofColumns()=0;
+	///\brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx)=0;
+	///\brief Get the last database error as string
 	virtual const char* getLastError()=0;
+	///\brief Get a column of the last result
 	virtual const char* get( std::size_t idx)=0;
+	///\brief Skip to the next row of the last result
 	virtual bool next()=0;
 };
 
@@ -83,7 +96,7 @@ private:
 class Structure
 {
 public:
-	Structure( const TagTable* tagmap, const std::string& content);
+	Structure( const TagTable* tagmap);
 	Structure( const Structure& o);
 
 	struct Node
@@ -127,20 +140,24 @@ public:
 	bool up( const Node& nd, std::vector<Node>& rt) const;
 	const char* nodevalue( std::size_t idx) const				{return &m_strmem[idx];}
 
-private:
-	typedef std::vector< std::vector<Node> > BuildNodeStruct;
+	const std::string tostring() const;
+
+protected:
 	void setParentLinks( std::size_t mi);
-	void openTag( const char* tag, std::size_t tagsize, BuildNodeStruct& data);
-	void openTag( const std::string& tag, BuildNodeStruct& data);
-	void closeTag( BuildNodeStruct& data);
-	void pushValue( const char* val, std::size_t valsize, BuildNodeStruct& data);
-	void pushValue( const std::string& val, BuildNodeStruct& data);
+	void openTag( const char* tag, std::size_t tagsize);
+	void openTag( const std::string& tag);
+	void closeTag();
+	void pushValue( const char* val, std::size_t valsize);
+	void pushValue( const std::string& val);
+	void check() const;
 
 private:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;
 	types::TypedArrayDoublingAllocator<char> m_strmem;
 	const TagTable* m_tagmap;
 	std::size_t m_rootidx;
+	typedef std::vector< std::vector<Node> > BuildNodeStruct;
+	BuildNodeStruct m_data;
 };
 
 
@@ -207,34 +224,57 @@ private:
 };
 
 
-class TransactionProgram
+class TransactionResult
+	:public langbind::TransactionResult
 {
 public:
-	TransactionProgram(){}
-	TransactionProgram( const TransactionProgram& o);
-	TransactionProgram( const std::string& src);
+	TransactionResult(){}
+	TransactionResult( const TransactionResult& o);
+	virtual ~TransactionResult(){}
 
-	std::string execute( DatabaseInterface* dbinterf, const std::string& content) const;
-
-private:
-	struct Output
-	{
-		Output(){}
-
-		void openTag( const std::string& tag);
-		void openTag( const char* tag, std::size_t tagsize);
-		void closeTag();
-		void pushValue( const std::string& val);
-		void pushValue( const char* val, std::size_t valsize);
-
-		std::string tostring() const			{return m_string;}
-
-	private:
-		std::string m_string;
-	};
+	virtual bool getNext( ElementType& type, langbind::TypedFilterBase::Element& element);
 
 private:
-	const std::string& resultname() const			{return m_resultname;}
+	friend class TransactionFunction;
+	void openTag( const std::string& tag);
+	void openTag( const char* tag, std::size_t tagsize);
+	void closeTag();
+	void pushValue( const std::string& val);
+	void pushValue( const char* val, std::size_t valsize);
+	void finalize();
+
+private:
+	typedef std::pair< langbind::InputFilter::ElementType, langbind::TypedFilterBase::Element> Item;
+	typedef std::vector<Item> ItemArray;
+	ItemArray m_itemar;
+	ItemArray::const_iterator m_itemitr;
+};
+
+
+class TransactionInput
+	:public langbind::TransactionInput
+	,public Structure
+{
+public:
+	explicit TransactionInput( const TagTable* tagmap);
+	TransactionInput( const TransactionInput& o);
+	virtual ~TransactionInput(){}
+
+	virtual bool print( ElementType type, const Element& element);
+private:
+	langbind::TypedInputFilter::ElementType m_lasttype;
+};
+
+
+class TransactionFunction :public langbind::TransactionFunction
+{
+public:
+	TransactionFunction( const TransactionFunction& o);
+	TransactionFunction( const std::string& src);
+	virtual ~TransactionFunction(){}
+
+	virtual langbind::TransactionInputR getInput() const;
+	virtual langbind::TransactionResultR execute( DatabaseInterface* dbi, const langbind::TransactionInput* input) const;
 
 private:
 	std::string m_resultname;

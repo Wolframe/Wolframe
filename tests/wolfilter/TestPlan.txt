@@ -13,7 +13,7 @@ for v,t in input:get()			lua_ddlform_table
 
 form:fill( TTABLE)			lua_ddlform_table
 form:fill( input:get())			lua_ddlform_input_generator
-form:fill( input:table())		lua_ddlform_iterator
+form:fill( input:table())		lua_ddlform_iterator, lua_ddlform_iterator_scope_libxml2
 form:table()				lua_ddlform_table
 for v,t in form:get()			lua_ddlform_iterator
 
@@ -22,3 +22,18 @@ formfunction()( input:get())		lua_luaformfunc_input_generator
 formfunction()():table()		lua_luaformfunc_table
 for v,t in formfunction()():get()	lua_luaformfunc_iterator
 
+bignum basic operators			lua_bcdnumber_calc
+scope( FORM::get())			lua_ddlform_iterator_scope_libxml2
+output:as( filter(), FORM:doctype())	lua_echo_input_doctype_form
+input::form()				lua_echo_input_doctype_form
+output:as( filter(), input:doctype())	lua_echo_input_doctype_table
+output:print( input:table())		lua_echo_input_doctype_table (doctype),lua_echo_input_table (nodoctype)
+output:print( input:get())		lua_echo_input_doctype
+
+TODO:
+lua_peerformfunc_input_generator
+lua_peerformfunc_iterator
+lua_peerformfunc_table
+map_peerformfunc
+map_echo_input_generator
+map_formfunc

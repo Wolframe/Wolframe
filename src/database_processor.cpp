@@ -43,6 +43,7 @@
 #include <locale>
 #include <boost/algorithm/string.hpp>
 
+using namespace _Wolframe;
 using namespace _Wolframe::db;
 
 static std::string normalizeTagName( const std::string& tagname)
@@ -103,65 +104,22 @@ Structure::Structure( const Structure& o)
 	,m_rootidx(o.m_rootidx)
 	{}
 
-Structure::Structure( const TagTable* tagmap, const std::string& content)
+
+Structure::Structure( const TagTable* tagmap)
 	:m_tagmap(tagmap)
 	,m_rootidx(0)
 {
-	BuildNodeStruct data;
 	m_nodemem.alloc( 1);
 	m_strmem.alloc( 1);
-	data.push_back( std::vector<Node>());
-	std::string tokstr;
+	m_data.push_back( std::vector<Node>());
+}
 
-	std::string::const_iterator ii = content.begin(), ee = content.end();
-	while (ii != ee && *ii != '\n') ++ii;
-	langbind::TokenType toktype = (langbind::TokenType)(*ii++);
-
-	while (ii != ee)
-	{
-		if (*ii == '\n')
-		{
-			++ii;
-			if (ii != ee && *ii == (char)langbind::TokenNextLine)
-			{
-				++ii;
-				tokstr.push_back( '\n');
-			}
-			else
-			{
-				switch (toktype)
-				{
-					case langbind::TokenOpenTag:
-						openTag( tokstr, data);
-					break;
-					case langbind::TokenCloseTag:
-						closeTag( data);
-					break;
-					case langbind::TokenAttribute:
-						openTag( tokstr, data);
-					break;
-					case langbind::TokenValue:
-						pushValue( tokstr, data);
-					break;
-					case langbind::TokenNextLine:
-						throw std::runtime_error( "illegal state");
-					break;
-					default:
-						throw std::runtime_error( std::string("illegal token in input '") + *ii + "'");
-				}
-				toktype = (langbind::TokenType)(*ii++);
-			}
-		}
-		else
-		{
-			tokstr.push_back( *ii++);
-		}
-	}
-	if (data.size() != 1)
+void Structure::check() const
+{
+	if (m_data.size() != 1)
 	{
 		throw std::runtime_error( "tags not balanced in structure");
 	}
-	setParentLinks( m_rootidx);
 }
 
 void Structure::setParentLinks( std::size_t mi)
@@ -176,72 +134,118 @@ void Structure::setParentLinks( std::size_t mi)
 	}
 }
 
-void Structure::openTag( const char* tag, std::size_t tagsize, BuildNodeStruct& data)
+const std::string Structure::tostring() const
 {
-	const std::string tagstr( tag, tagsize);
-	openTag( tagstr, data);
+	std::vector <std::pair< std::size_t, std::size_t> > stk;
+	std::ostringstream rt;
+	stk.push_back( std::pair< std::size_t, std::size_t>( 1, m_rootidx));
+	while (stk.size())
+	{
+		std::size_t ii = stk.back().first;
+		std::size_t mi = stk.back().second;
+		--stk.back().first;
+		if (ii>0)
+		{
+			Node* cd = &m_nodemem[ mi + ii - 1];
+			if (cd->valueidx())
+			{
+				std::size_t indent = stk.size() -1;
+				const char* val = nodevalue( cd->valueidx());
+				while (indent--) rt << '\t';
+				rt << cd->m_tag << ": '" << val << "'" << std::endl;
+			}
+			else
+			{
+				stk.push_back( std::pair< std::size_t, std::size_t>( cd->nofchild(), cd->childidx()));
+			}
+		}
+		else
+		{
+			stk.pop_back();
+		}
+	}
+	return rt.str();
 }
 
-void Structure::openTag( const std::string& tagstr, BuildNodeStruct& data)
+void Structure::openTag( const char* tag, std::size_t tagsize)
+{
+	const std::string tagstr( tag, tagsize);
+	openTag( tagstr);
+}
+
+void Structure::openTag( const std::string& tagstr)
 {
 	int mi = -(int)m_tagmap->find( tagstr);
 	if (mi == 0) mi = -(int)m_tagmap->unused();
 
-	data.back().push_back( Node( 0, mi, 0, 0));
-	data.push_back( std::vector<Node>());
+	m_data.back().push_back( Node( 0, mi, 0, 0));
+	m_data.push_back( std::vector<Node>());
 }
 
-void Structure::closeTag( BuildNodeStruct& data)
+void Structure::closeTag()
 {
-	if (data.back().size())
+	if (m_data.back().size())
 	{
-		std::size_t ni = data.back().size();
+		std::size_t ni = m_data.back().size();
 		std::size_t mi = m_nodemem.alloc( ni);
 		Node* nd = &m_nodemem[mi];
-		std::vector<Node>::const_iterator itr = data.back().begin(), end = data.back().end();
+		std::vector<Node>::const_iterator itr = m_data.back().begin(), end = m_data.back().end();
 		for (; itr != end; ++itr, ++nd)
 		{
 			*nd = *itr;
 		}
-		data.pop_back();
-		data.back().back().m_elementsize = ni;
-		data.back().back().m_element = Node::ref_element( mi);
-		if (data.size() == 1)
+		m_data.pop_back();
+		m_data.back().back().m_elementsize = ni;
+		m_data.back().back().m_element = Node::ref_element( mi);
+		if (m_data.size() == 1)
 		{
 			m_rootidx = mi;
+			setParentLinks( m_rootidx);
 		}
 	}
 	else
 	{
-		data.pop_back();
+		m_data.pop_back();
+		if (m_data.back().size() && m_data.back().back().m_element)
+		{
+			std::size_t mi = m_nodemem.alloc( 1);
+			Node* nd = &m_nodemem[mi];
+			std::vector<Node>::const_iterator itr = m_data.back().begin();
+			*nd = *itr;
+			if (m_data.size() == 1)
+			{
+				m_rootidx = mi;
+				setParentLinks( m_rootidx);
+			}
+		}
 	}
 }
 
-void Structure::pushValue( const char* val, std::size_t valsize, BuildNodeStruct& data)
+void Structure::pushValue( const char* val, std::size_t valsize)
 {
 	std::size_t mi = m_strmem.alloc( valsize+1);
 	if (mi > (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc();
 	char* nd = m_strmem.base() + mi;
 	std::memcpy( nd, val, (valsize+1)*sizeof(char));
-	if (data.size() < 2)
+	if (m_data.size() < 2)
 	{
 		throw std::logic_error( "pushed value as root element");
 	}
-	if (data.back().size() > 0)
+	if (m_data.back().size() > 0)
 	{
 		throw std::logic_error( "pushed value without tag context");
 	}
-	if (data[ data.size()-2].back().m_element != 0)
+	if (m_data[ m_data.size()-2].back().m_element != 0)
 	{
 		throw std::logic_error( "pushed more thatn one value in same tag context");
 	}
-	data[ data.size()-2].back().m_elementsize = valsize;
-	data[ data.size()-2].back().m_element = Node::val_element( mi);
+	m_data[ m_data.size()-2].back().m_elementsize = valsize;
+	m_data[ m_data.size()-2].back().m_element = Node::val_element( mi);
 }
 
-void Structure::pushValue( const std::string& val, BuildNodeStruct& data)
+void Structure::pushValue( const std::string& val)
 {
-	pushValue( val.c_str(), val.size(), data);
+	pushValue( val.c_str(), val.size());
 }
 
 bool Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
@@ -445,12 +449,12 @@ bool FunctionCall::hasResultReference() const
 	return false;
 }
 
-TransactionProgram::TransactionProgram( const TransactionProgram& o)
+TransactionFunction::TransactionFunction( const TransactionFunction& o)
 	:m_resultname(o.m_resultname)
 	,m_call(o.m_call)
 	,m_tagmap(o.m_tagmap){}
 
-TransactionProgram::TransactionProgram( const std::string& src)
+TransactionFunction::TransactionFunction( const std::string& src)
 {
 	std::string::const_iterator ii = src.begin(), ee = src.end();
 	for (; ii != ee; ++ii)
@@ -584,61 +588,107 @@ struct DatabaseError :public std::runtime_error
 	}
 };
 
-void TransactionProgram::Output::openTag( const std::string& tag)
-{
-	openTag( tag.c_str(), tag.size());
-}
+TransactionInput::TransactionInput( const TagTable* tagmap)
+	:Structure(tagmap)
+	,m_lasttype(langbind::TypedInputFilter::Value){}
 
-void TransactionProgram::Output::openTag( const char* tag, std::size_t tagsize)
-{
-	m_string.push_back( (char)langbind::TokenOpenTag);
-	m_string.append( tag, tagsize);
-	m_string.push_back( '\n');
-}
+TransactionInput::TransactionInput( const TransactionInput& o)
+	:Structure(o)
+	,m_lasttype(o.m_lasttype){}
 
-void TransactionProgram::Output::closeTag()
+bool TransactionInput::print( ElementType type, const Element& element)
 {
-	m_string.push_back( (char)langbind::TokenCloseTag);
-	m_string.push_back( '\n');
-}
-
-void TransactionProgram::Output::pushValue( const std::string& val)
-{
-	pushValue( val.c_str(), val.size());
-}
-
-void TransactionProgram::Output::pushValue( const char* val, std::size_t valsize)
-{
-	m_string.push_back( (char)langbind::TokenValue);
-	std::size_t ii;
-	for (ii=0; ii<valsize; ++ii)
+	switch (type)
 	{
-		if (val[ii] == '\n')
-		{
-			m_string.push_back( '\n');
-			m_string.push_back( (char)langbind::TokenNextLine);
-		}
-		else
-		{
-			m_string.push_back( val[ ii]);
-		}
+		case langbind::TypedInputFilter::OpenTag:
+			openTag( element.tostring());
+		break;
+		case langbind::TypedInputFilter::CloseTag:
+			closeTag();
+		break;
+		case langbind::TypedInputFilter::Attribute:
+			openTag( element.tostring());
+		break;
+		case langbind::TypedInputFilter::Value:
+			pushValue( element.tostring());
+			if (m_lasttype == langbind::TypedInputFilter::Attribute)
+			{
+				closeTag();
+			}
+		break;
 	}
-	m_string.push_back( '\n');
+	m_lasttype = type;
+	return true;
 }
 
-std::string TransactionProgram::execute( DatabaseInterface* dbi, const std::string& content) const
-{
-	Structure st( &m_tagmap, content);
-	Output output;
+TransactionResult::TransactionResult( const TransactionResult& o)
+	:m_itemar(o.m_itemar)
+	,m_itemitr(o.m_itemar.begin()+(o.m_itemitr-o.m_itemar.begin())){}
 
-	typedef std::vector<std::size_t> Result;
+void TransactionResult::openTag( const std::string& tag)
+{
+	m_itemar.push_back( Item( langbind::InputFilter::OpenTag, tag));
+}
+
+void TransactionResult::openTag( const char* tag, std::size_t tagsize)
+{
+	m_itemar.push_back( Item( langbind::InputFilter::OpenTag, std::string( tag, tagsize)));
+}
+
+void TransactionResult::closeTag()
+{
+	m_itemar.push_back( Item( langbind::InputFilter::CloseTag, std::string()));
+}
+
+void TransactionResult::pushValue( const std::string& val)
+{
+	m_itemar.push_back( Item( langbind::InputFilter::Value, val));
+}
+
+void TransactionResult::pushValue( const char* val, std::size_t valsize)
+{
+	m_itemar.push_back( Item( langbind::InputFilter::Value, std::string( val, valsize)));
+}
+
+bool TransactionResult::getNext( ElementType& type, Element& element)
+{
+	if (m_itemitr == m_itemar.end()) return false;
+	type = m_itemitr->first;
+	element = m_itemitr->second;
+	++m_itemitr;
+	return true;
+}
+
+void TransactionResult::finalize()
+{
+	m_itemitr = m_itemar.begin();
+}
+
+langbind::TransactionInputR TransactionFunction::getInput() const
+{
+	langbind::TransactionInputR rt( new TransactionInput( &m_tagmap));
+	return rt;
+}
+
+langbind::TransactionResultR TransactionFunction::execute( DatabaseInterface* dbi, const langbind::TransactionInput* inputi) const
+{
+	const TransactionInput* inputst = dynamic_cast<const TransactionInput*>( inputi);
+	if (!inputst) throw std::logic_error( "function called with unknown input type");
+
+	std::string ststr = inputst->tostring();
+/*[-]*/std::cout << "INPUT" << std::endl << ststr << std::endl << std::endl;
+
+	TransactionResult* result = new TransactionResult();
+	langbind::TransactionResultR rt( result);
+
+	typedef std::vector<std::size_t> ResultRow;
 	std::string resultstr,resultstr2;
-	std::vector<Result> resultar,resultar2;
+	std::vector<ResultRow> resultar,resultar2;
 
 	if (!dbi->begin()) throw DatabaseError( dbi);
-	if (!resultname().empty())
+	if (!m_resultname.empty())
 	{
-		output.openTag( resultname());
+		result->openTag( m_resultname);
 	}
 	std::vector<FunctionCall>::const_iterator ci = m_call.begin(), ce = m_call.end();
 	for (; ci != ce; ++ci)
@@ -654,7 +704,7 @@ std::string TransactionProgram::execute( DatabaseInterface* dbi, const std::stri
 
 		// Select the nodes to execute the command with:
 		std::vector<Structure::Node> nodearray;
-		if (!ci->selector().selectNodes( st, st.root(), nodearray)) continue;
+		if (!ci->selector().selectNodes( *inputst, inputst->root(), nodearray)) continue;
 
 		// For each selected node do expand the function call arguments:
 		std::vector<Structure::Node>::const_iterator vi=nodearray.begin(),ve=nodearray.end();
@@ -667,7 +717,7 @@ std::string TransactionProgram::execute( DatabaseInterface* dbi, const std::stri
 				if (!pi->resultReference())
 				{
 					std::vector<Structure::Node> param;
-					if (!pi->selectNodes( st, *vi, param))
+					if (!pi->selectNodes( *inputst, *vi, param))
 					{
 						if (param.size() > 1)
 						{
@@ -682,7 +732,7 @@ std::string TransactionProgram::execute( DatabaseInterface* dbi, const std::stri
 							std::size_t idx = param[0].valueidx();
 							if (idx == 0) throw std::runtime_error( "non atomic value selected in db call argument");
 
-							if (!dbi->bind( argidx, st.nodevalue( idx))) throw DatabaseError( dbi);
+							if (!dbi->bind( argidx, inputst->nodevalue( idx))) throw DatabaseError( dbi);
 						}
 					}
 				}
@@ -691,7 +741,7 @@ std::string TransactionProgram::execute( DatabaseInterface* dbi, const std::stri
 			// Expand the arguments that are result references:
 			if (ci->hasResultReference())
 			{
-				std::vector<Result>::const_iterator ri = resultar.begin(), re = resultar.end();
+				std::vector<ResultRow>::const_iterator ri = resultar.begin(), re = resultar.end();
 				for (; ri != re; ++ri)
 				{
 					for (std::size_t argidx=0; pi != pe; ++pi,++argidx)
@@ -711,7 +761,7 @@ std::string TransactionProgram::execute( DatabaseInterface* dbi, const std::stri
 						}
 					}
 					if (!dbi->execute()) throw DatabaseError( dbi);
-					Result res;
+					ResultRow res;
 					std::size_t ii, nn=dbi->nofColumns();
 					while (dbi->next())
 					{
@@ -738,7 +788,7 @@ std::string TransactionProgram::execute( DatabaseInterface* dbi, const std::stri
 			else
 			{
 				if (!dbi->execute()) throw DatabaseError( dbi);
-				Result res;
+				ResultRow res;
 				std::size_t ii, nn=dbi->nofColumns();
 				while (dbi->next())
 				{
@@ -766,7 +816,7 @@ std::string TransactionProgram::execute( DatabaseInterface* dbi, const std::stri
 			if (!ci->resultname().empty())
 			{
 				std::vector<std::string> columnar;
-				output.openTag( ci->resultname());
+				result->openTag( ci->resultname());
 				columnar.clear();
 				std::size_t ii, nn=dbi->nofColumns();
 				for (ii=0; ii<nn; ++ii)
@@ -775,29 +825,29 @@ std::string TransactionProgram::execute( DatabaseInterface* dbi, const std::stri
 					columnar.push_back( colname);
 				}
 
-				std::vector<Result>::const_iterator ri = resultar.begin(), re = resultar.end();
+				std::vector<ResultRow>::const_iterator ri = resultar.begin(), re = resultar.end();
 				for (; ri != re; ++ri)
 				{
 					for (ii=0; ii<nn; ++ii)
 					{
 						if ((*ri)[ii])
 						{
-							output.openTag( columnar[ ii]);
-							output.pushValue( resultstr2.c_str() + (*ri)[ii]);
-							output.closeTag();
+							result->openTag( columnar[ ii]);
+							result->pushValue( resultstr2.c_str() + (*ri)[ii]);
+							result->closeTag();
 						}
 					}
 				}
-				output.closeTag();
+				result->closeTag();
 			}
 		}
 	}
 	if (!dbi->commit()) throw DatabaseError( dbi);
-	if (!resultname().empty())
+	if (!m_resultname.empty())
 	{
-		output.closeTag();
+		result->closeTag();
 	}
-	return output.tostring();
+	return rt;
 }
 
 
