@@ -36,6 +36,7 @@
 #include "types/dateArithmetic.hpp"
 #include <stdexcept>
 #include <cstring>
+#include <ctime>
 
 using namespace _Wolframe::types;
 
@@ -110,24 +111,40 @@ Date::Date( unsigned short y, unsigned short m, unsigned short d)
 	check();
 }
 
+Date::Date( const std::string& dt, const char* format)
+{
+	struct tm tt;
+	std::memset( &tt, 0, sizeof(tt));
+	if (!std::strptime( dt.str(), format,  &tt))
+	{
+		throw std::runtime_error( "date conversion error");
+	}
+	sdate dt;
+	dt.y = tt.tm_year;
+	dt.m = tt.tm_mon;
+	dt.d = tt.tm_mday;
+
+	m_daynum = daynum( dt);
+}
+
 std::string Date::tostring( const char* format) const
 {
 	char buf[ 1024];
 	if (strlen( format) > 50) throw std::bad_alloc();
-	struct tm tm_info;
-	std::memset( &tm_info, 0, sizeof(tm_info));
+	struct tm tt;
+	std::memset( &tt, 0, sizeof(tt));
 	sdate dt = dtf( m_daynum);
 	sdate dt_first_jan;
 	dt_first_jan.y = dt.y;
 	dt_first_jan.m = 1;
 	dt_first_jan.d = 1;
-	tm_info.tm_mday = dt.d;
-	tm_info.tm_mon = dt.m;
-	tm_info.tm_year = dt.y;
-	tm_info.tm_wday = weekday( m_daynum);
-	tm_info.tm_yday = m_daynum - daynum( dt_first_jan);
+	tt.tm_mday = dt.d;
+	tt.tm_mon = dt.m;
+	tt.tm_year = dt.y;
+	tt.tm_wday = weekday( m_daynum);
+	tt.tm_yday = m_daynum - daynum( dt_first_jan);
 
-	strftime( buf, sizeof(buf), format, &tm_info);
+	strftime( buf, sizeof(buf), format, &tt);
 	return std::string( buf);
 }
 

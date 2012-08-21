@@ -51,9 +51,13 @@ public:
 	///\param[in] d number of days counted from 1 (first day of month)
 	Date( unsigned short y, unsigned short m, unsigned short d);
 
+	///\brief Constructor
+	///\param[in] dt date in strptime parseable format
+	///\param[in] format strptime format definition of 'dt'
+	Date( const std::string& dt, const char* format="%Y/%m/%d");
+
 	///\brief Copy constructor
-	Date( const Date& o)
-		:m_daynum(o.m_daynum){}
+	Date( const Date& o)				:m_daynum(o.m_daynum){}
 
 	///\brief Get the difference in days
 	int operator - (const Date& o)			{return (int)(m_daynum - o.m_daynum);}
