@@ -36,7 +36,7 @@ Project Wolframe.
 #include "serialize/struct/filtermapDescription.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #ifdef _WIN32
 #pragma warning(disable:4127)
 #endif

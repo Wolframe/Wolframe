@@ -40,7 +40,7 @@
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
 #include "moduleInterface.hpp"
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>

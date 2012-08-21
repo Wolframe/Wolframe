@@ -30,9 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// getPassword.hpp
-//
+///\file utils/getPassword.hpp
 
 #ifndef _GET_PASSWORD_HPP_INCLUDED
 #define _GET_PASSWORD_HPP_INCLUDED

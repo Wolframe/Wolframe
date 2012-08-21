@@ -43,7 +43,7 @@
 #include "moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/info_parser.hpp>

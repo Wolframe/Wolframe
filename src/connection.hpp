@@ -45,7 +45,7 @@
 #include <list>
 #include "connectionBase.hpp"
 #include "connectionHandler.hpp"
-#include "atomicCounter.hpp"
+#include "types/atomicCounter.hpp"
 
 namespace _Wolframe {
 namespace net {

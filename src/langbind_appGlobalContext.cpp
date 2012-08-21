@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file langbind_appObjects.cpp
 ///\brief implementation of scripting global context
 #include "langbind/appGlobalContext.hpp"
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;

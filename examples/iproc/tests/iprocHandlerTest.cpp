@@ -42,7 +42,7 @@
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #include "gtest/gtest.h"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>

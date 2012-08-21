@@ -34,7 +34,7 @@
 // resolvePath.cpp
 //
 
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 
 #include <string>
 #include <boost/thread/thread.hpp>

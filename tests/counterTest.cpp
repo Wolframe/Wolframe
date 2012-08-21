@@ -7,7 +7,7 @@
 
 #include <boost/thread/thread.hpp>
 
-#include "atomicCounter.hpp"
+#include "types/atomicCounter.hpp"
 #include "gtest/gtest.h"
 
 

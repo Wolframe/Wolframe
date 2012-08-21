@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file ddl_compilerInterface.cpp
 ///\brief implementation of common methods of DDL compilers
 #include "ddl/compilerInterface.hpp"
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <sstream>
 #include <string>

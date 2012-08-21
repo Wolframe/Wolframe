@@ -34,7 +34,7 @@
 // base64 tests
 //
 #include "gtest/gtest.h"
-#include "base64.hpp"
+#include "types/base64.hpp"
 
 
 #undef _BASE64_WRITE_OUTPUT

@@ -33,7 +33,7 @@
 ///\file testDescription.cpp
 ///\brief Implements a test description loaded from a file
 #include "testDescription.hpp"
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <vector>

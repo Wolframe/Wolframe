@@ -34,7 +34,7 @@
  * b64decode.c - base64 decoding implementation
  */
 
-#include "base64.h"
+#include "types/base64.h"
 
 static const char decodeTable[] = {
 	/* 0 - 31 / 0x00 - 0x1f */

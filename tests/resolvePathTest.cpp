@@ -2,7 +2,7 @@
 // resolvePath unit tests
 //
 
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #include "gtest/gtest.h"
 
 using namespace _Wolframe::utils;

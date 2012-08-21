@@ -38,8 +38,8 @@
 #include "gtest/gtest.h"
 
 #include "TextFileAuth.hpp"
-#include "sha2.h"
-#include "byte2hex.h"
+#include "types/sha2.h"
+#include "types/byte2hex.h"
 #include <boost/algorithm/string.hpp>
 
 #ifdef _WIN32

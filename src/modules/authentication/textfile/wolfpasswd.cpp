@@ -37,12 +37,12 @@
 #include <boost/program_options.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 
 #include <string>
 #include <iostream>
 
-#include "getPassword.hpp"
+#include "utils/getPassword.hpp"
 #include "passwdFile.hpp"
 
 namespace PO = boost::program_options;

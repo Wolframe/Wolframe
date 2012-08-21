@@ -41,7 +41,7 @@
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #include <iostream>
 #include <list>
 #include <fstream>

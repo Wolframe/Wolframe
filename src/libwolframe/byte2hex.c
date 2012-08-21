@@ -42,7 +42,7 @@
  * @author Mihai Barbos <mihai.barbos@gmail.com>
  */
 
-#include "byte2hex.h"
+#include "types/byte2hex.h"
 
 #include <stdlib.h>
 #include <string.h>

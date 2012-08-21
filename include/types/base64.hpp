@@ -38,7 +38,7 @@
 #define _BASE64_HPP_INCLUDED
 
 #include <iostream>
-#include "base64.h"
+#include "types/base64.h"
 
 namespace _Wolframe	{
 namespace base64	{

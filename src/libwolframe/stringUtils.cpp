@@ -35,7 +35,7 @@ Project Wolframe.
 #ifdef _WIN32
 #pragma warning(disable:4996)
 #endif
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #include <cstring>
 #include <boost/algorithm/string.hpp>
 

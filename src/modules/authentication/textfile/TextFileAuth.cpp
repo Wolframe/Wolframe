@@ -41,14 +41,14 @@
 
 #include "logger-v1.hpp"
 #include "TextFileAuth.hpp"
-#include "sha2.h"
-#include "byte2hex.h"
+#include "types/sha2.h"
+#include "types/byte2hex.h"
 #include "AAAA/CRAM.hpp"
 
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 
 namespace _Wolframe {
 namespace AAAA {

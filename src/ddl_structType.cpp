@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file ddl_structType.cpp
 ///\brief implementation of the form DDL generic type
 #include "ddl/structType.hpp"
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 
 using namespace _Wolframe;
 using namespace ddl;

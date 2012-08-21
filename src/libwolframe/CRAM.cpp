@@ -51,9 +51,9 @@
 #endif
 
 #include "AAAA/CRAM.hpp"
-#include "byte2hex.h"
-#include "base64.hpp"
-#include "sha2.h"
+#include "types/byte2hex.h"
+#include "types/base64.hpp"
+#include "types/sha2.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 

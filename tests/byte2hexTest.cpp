@@ -35,7 +35,7 @@
 // byte <-> ASCII hex conversion tests
 
 #include "gtest/gtest.h"
-#include "byte2hex.h"
+#include "types/byte2hex.h"
 
 
 TEST( byte2hex, Bytes_to_HEX )

@@ -35,7 +35,7 @@
  */
 
 #include <assert.h>
-#include "base64.h"
+#include "types/base64.h"
 
 static const char* base64Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 

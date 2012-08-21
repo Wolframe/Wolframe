@@ -40,7 +40,7 @@ Project Wolframe.
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "ddl/structTypeBuild.hpp"
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #include "logger-v1.hpp"
 #include <fstream>
 #include <iostream>

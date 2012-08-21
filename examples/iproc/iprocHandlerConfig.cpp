@@ -41,7 +41,7 @@
 #include "serialize/struct/filtermapDescription.hpp"
 #include <sstream>
 #include <boost/algorithm/string.hpp>
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;

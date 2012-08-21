@@ -36,7 +36,7 @@ Project Wolframe.
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include "filter/filter.hpp"
-#include "miscUtils.hpp"
+#include "utils/miscUtils.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "filter/char_filter.hpp"
