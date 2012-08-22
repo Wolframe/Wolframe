@@ -40,6 +40,18 @@ Project Wolframe.
 #include <limits>
 #include <cmath>
 
+#ifdef _Wolframe_TYPES_BCD_USE_64BIT
+#define NumMask 0x0fffFFFFffffFFFFULL
+#define NumHighShift 60
+#define NumDigits 15
+#define MaxEstimate 100000000000000
+#else
+#define NumMask 0x0fffFFFF
+#define NumHighShift 28
+#define NumDigits 7
+#define MaxEstimate 1000000000
+#endif
+
 using namespace _Wolframe::types;
 
 void BigBCD::xchg( BigBCD& a, BigBCD& b)
@@ -75,12 +87,12 @@ void BigBCD::init( std::size_t nn, Allocator* allocator)
 		if (mm < nn) throw std::bad_alloc();
 		if (allocator)
 		{
-			m_ar = (boost::uint32_t*)allocator->alloc( mm);
+			m_ar = (BCDElement*)allocator->alloc( mm);
 			m_allocated = false;
 		}
 		else
 		{
-			m_ar = (boost::uint32_t*)std::malloc( mm);
+			m_ar = (BCDElement*)std::malloc( mm);
 			if (!m_ar) throw std::bad_alloc();
 			std::memset( m_ar, 0, mm);
 			m_allocated = true;
@@ -111,14 +123,14 @@ void BigBCD::init( const std::string& str)
 		++ii;
 		m_neg = true;
 	}
-	unsigned int bb = (((nn-ii)+6) / 7);
-	unsigned int tt = (((nn-ii)+6) % 7) * 4;
+	unsigned int bb = (((nn-ii)+(NumDigits-1)) / NumDigits);
+	unsigned int tt = (((nn-ii)+(NumDigits-1)) % NumDigits) * 4;
 	if (!bb) throw std::runtime_error( "illegal bcd number string");
 
 	init( bb);
 	for (; ii<nn; ++ii)
 	{
-		unsigned int digit = (unsigned char)(str[ ii] - '0');
+		BCDElement digit = (unsigned char)(str[ ii] - '0');
 		if (digit > 9) throw std::runtime_error( "illegal bcd number");
 		m_ar[ bb-1] += (digit << tt);
 
@@ -126,7 +138,7 @@ void BigBCD::init( const std::string& str)
 		{
 			--bb;
 			if (!bb && (ii+1) != nn) throw std::runtime_error( "illegal state in bcd number constructor");
-			tt = 24;
+			tt = (NumHighShift-4);
 		}
 		else
 		{
@@ -184,11 +196,11 @@ std::string BigBCD::tostring() const
 }
 
 BigBCD::const_iterator::const_iterator()
-	:m_idx(0),m_shf(24),m_ar(0)
+	:m_idx(0),m_shf(NumHighShift-4),m_ar(0)
 {}
 
 BigBCD::const_iterator::const_iterator( const BigBCD& bcd)
-	:m_idx(bcd.m_size),m_shf(24),m_ar(bcd.m_ar)
+	:m_idx(bcd.m_size),m_shf(NumHighShift-4),m_ar(bcd.m_ar)
 {
 	while (m_idx>0)
 	{
@@ -200,14 +212,14 @@ BigBCD::const_iterator::const_iterator( const BigBCD& bcd)
 
 std::size_t BigBCD::const_iterator::size() const
 {
-	return (m_idx == 0)?0:((m_idx-1)*7 + m_shf/4);
+	return (m_idx == 0)?0:((m_idx-1)*NumDigits + m_shf/4);
 }
 
 void BigBCD::const_iterator::increment()
 {
 	if (m_shf == 0)
 	{
-		m_shf = 24;
+		m_shf = NumHighShift-4;
 		m_idx -= 1;
 	}
 	else
@@ -238,8 +250,50 @@ bool BigBCD::const_iterator::isle( const const_iterator& other) const
 	return m_idx>=other.m_idx || m_shf>=other.m_shf;
 }
 
+#ifdef _Wolframe_TYPES_BCD_USE_64BIT
+static BCDElement checkvalue( boost::uint64_t a)
+{
+	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
+	boost::uint64_t t1,t2;
+	t1 = a + 0x0666666666666666ULL;
+	t2 = t1 ^ a;
+	return (t2 & 0x1111111111111110ULL);
+}
 
-static boost::uint32_t checkvalue( boost::uint32_t a)
+static boost::uint64_t add_bcd( boost::uint64_t a, boost::uint64_t b)
+{
+	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
+	boost::uint64_t t1,t2,t3,t4,t5,t6;
+	t1 = a + 0x0666666666666666ULL;
+	t2 = t1 + b;
+	t3 = t1 ^ b;
+	t4 = t2 ^ t3;
+	t5 = ~t4 & 0x1111111111111110ULL;
+	t6 = (t5 >> 2) | (t5 >> 3);
+	return t2 - t6;
+}
+
+static boost::uint64_t tencomp( boost::uint64_t a)
+{
+	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
+	boost::uint64_t t1,t2,t3,t4,t5,t6;
+	t1 = 0xffffFFFFffffFFFFULL - a;
+	t2 = (boost::uint64_t) (- (boost::int64_t)a);
+	t3 = t1 ^  0x0000000000000001ULL;
+	t4 = t2 ^ t3;
+	t5 = ~t4 & 0x1111111111111110ULL;
+	t6 = (t5 >> 2) | (t5 >> 3);
+	return t2 - t6;
+}
+
+static boost::uint64_t getcarry( boost::uint64_t& a)
+{
+	boost::uint64_t carry = (a >> 60);
+	a &= 0x0fffFFFFffffFFFFULL;
+	return carry;
+}
+#else
+static BCDElement checkvalue( boost::uint32_t a)
 {
 	// thanks to http://www.divms.uiowa.edu/~jones/bcd/bcd.html:
 	boost::uint32_t t1,t2;
@@ -274,25 +328,27 @@ static boost::uint32_t tencomp( boost::uint32_t a)
 	return t2 - t6;
 }
 
-static boost::uint32_t sub_bcd( boost::uint32_t a, boost::uint32_t b)
-{
-	boost::uint32_t rt = add_bcd( a, tencomp(b));
-	return rt;
-}
-
 static boost::uint32_t getcarry( boost::uint32_t& a)
 {
 	boost::uint32_t carry = (a >> 28);
 	a &= 0x0fffFFFF;
 	return carry;
 }
+#endif
 
-static boost::uint32_t increment( boost::uint32_t a)
+static BCDElement sub_bcd( BCDElement a, BCDElement b)
+{
+	BCDElement rt = add_bcd( a, tencomp(b));
+	return rt;
+}
+
+
+static BCDElement increment( BCDElement a)
 {
 	return add_bcd( a, 1);
 }
 
-static boost::uint32_t decrement( boost::uint32_t a)
+static BCDElement decrement( BCDElement a)
 {
 	return sub_bcd( a, 1);
 }
@@ -300,7 +356,7 @@ static boost::uint32_t decrement( boost::uint32_t a)
 bool BigBCD::isValid() const
 {
 	std::size_t ii;
-	boost::uint32_t chkval = 0;
+	BCDElement chkval = 0;
 	for (ii=0; ii<m_size; ++ii)
 	{
 		chkval |= checkvalue( m_ar[ii]);
@@ -336,7 +392,7 @@ void BigBCD::normalize()
 
 void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr, Allocator* allocator)
 {
-	boost::uint32_t carry;
+	BCDElement carry;
 	std::size_t ii=0, nn = (opr.m_size > this_.m_size)?opr.m_size:this_.m_size;
 	if (nn == 0) return;
 	rt.init( nn+1, allocator);
@@ -344,9 +400,9 @@ void BigBCD::digits_addition( BigBCD& rt, const BigBCD& this_, const BigBCD& opr
 	carry = 0;
 	for (;ii<nn; ++ii)
 	{
-		boost::uint32_t op1 = (ii>=this_.m_size)?0:this_.m_ar[ii];
-		boost::uint32_t op2 = (ii>=opr.m_size)?0:opr.m_ar[ii];
-		boost::uint32_t res = add_bcd( op1, op2);
+		BCDElement op1 = (ii>=this_.m_size)?0:this_.m_ar[ii];
+		BCDElement op2 = (ii>=opr.m_size)?0:opr.m_ar[ii];
+		BCDElement res = add_bcd( op1, op2);
 		if (carry) res = increment( res);
 		carry = getcarry( res);
 		rt.m_ar[ ii] = res;
@@ -368,12 +424,12 @@ void BigBCD::digits_subtraction( BigBCD& rt, const BigBCD& this_, const BigBCD& 
 	if (nn == 0) return;
 	rt.init( nn, allocator);
 	rt.m_neg = this_.m_neg;
-	boost::uint32_t carry = 0;
+	BCDElement carry = 0;
 	for (;ii<nn; ++ii)
 	{
-		boost::uint32_t op1 = (ii>=this_.m_size)?0:this_.m_ar[ii];
-		boost::uint32_t op2 = (ii>=opr.m_size)?0:opr.m_ar[ii];
-		boost::uint32_t res = add_bcd( op1, tencomp(op2));
+		BCDElement op1 = (ii>=this_.m_size)?0:this_.m_ar[ii];
+		BCDElement op2 = (ii>=opr.m_size)?0:opr.m_ar[ii];
+		BCDElement res = add_bcd( op1, tencomp(op2));
 		if (carry)
 		{
 			res = decrement( res);
@@ -389,16 +445,16 @@ void BigBCD::digits_subtraction( BigBCD& rt, const BigBCD& this_, const BigBCD& 
 	{
 		for (mm=nn; mm>0; mm--)
 		{
-			boost::uint32_t res = rt.m_ar[ mm-1];
+			BCDElement res = rt.m_ar[ mm-1];
 			if (mm>1) res = increment( res);
-			res = tencomp(res) & 0x0fffFFFF;
+			res = tencomp(res) & NumMask;
 			rt.m_ar[ mm-1] = res;
 		}
 		rt.m_neg = !rt.m_neg;
 	}
 	else
 	{
-		for (mm=nn; mm>0; mm--) rt.m_ar[ mm-1] &= 0x0fffFFFF;
+		for (mm=nn; mm>0; mm--) rt.m_ar[ mm-1] &= NumMask;
 	}
 	rt.normalize();
 }
@@ -407,10 +463,9 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allo
 {
 	if (nof_digits > 0)
 	{
-		unsigned int ofs = (unsigned int)nof_digits / 7;
-		unsigned int sfh = (unsigned int)nof_digits % 7;
+		unsigned int ofs = (unsigned int)nof_digits / NumDigits;
+		unsigned int sfh = (unsigned int)nof_digits % NumDigits;
 		std::size_t ii,nn;
-		const boost::uint32_t MASK = (1<<28)-1;
 
 		rt.init( this_.m_size + ofs + 1, allocator);
 		rt.m_neg = this_.m_neg;
@@ -427,12 +482,12 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allo
 		}
 		else if (this_.m_size)
 		{
-			unsigned char upshift=28-(sfh*4),doshift=sfh*4;
-			rt.m_ar[ ofs++] = (this_.m_ar[ 0] << doshift) & MASK;
+			unsigned char upshift=NumHighShift-(sfh*4),doshift=sfh*4;
+			rt.m_ar[ ofs++] = (this_.m_ar[ 0] << doshift) & NumMask;
 			for (ii=0,nn=this_.m_size-1; ii<nn; ++ii)
 			{
-				boost::uint32_t aa = this_.m_ar[ ii] >> upshift;
-				boost::uint32_t bb = (this_.m_ar[ ii+1] << doshift) & MASK;
+				BCDElement aa = this_.m_ar[ ii] >> upshift;
+				BCDElement bb = (this_.m_ar[ ii+1] << doshift) & NumMask;
 				rt.m_ar[ ii + ofs] = aa | bb;
 			}
 			rt.m_ar[ ii + ofs] = this_.m_ar[ ii] >> upshift;
@@ -441,10 +496,9 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allo
 	else if (nof_digits < 0)
 	{
 		nof_digits = -nof_digits;
-		unsigned int ofs = (unsigned int)nof_digits / 7;
-		unsigned int sfh = (unsigned int)nof_digits % 7;
+		unsigned int ofs = (unsigned int)nof_digits / NumDigits;
+		unsigned int sfh = (unsigned int)nof_digits % NumDigits;
 		std::size_t ii,nn;
-		const boost::uint32_t MASK = (1<<28)-1;
 
 		rt.init( this_.m_size - ofs + 1, allocator);
 		rt.m_neg = this_.m_neg;
@@ -457,11 +511,11 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allo
 		}
 		else if (this_.m_size)
 		{
-			unsigned char upshift=28-(sfh*4),doshift=sfh*4;
+			unsigned char upshift=NumHighShift-(sfh*4),doshift=sfh*4;
 			for (ii=ofs,nn=this_.m_size-1; ii<nn; ++ii)
 			{
-				boost::uint32_t aa = this_.m_ar[ ii] >> doshift;
-				boost::uint32_t bb = (this_.m_ar[ ii+1] << upshift) & MASK;
+				BCDElement aa = this_.m_ar[ ii] >> doshift;
+				BCDElement bb = (this_.m_ar[ ii+1] << upshift) & NumMask;
 				rt.m_ar[ ii - ofs] = aa | bb;
 			}
 			rt.m_ar[ ii - ofs] = this_.m_ar[ ii] >> doshift;
@@ -580,7 +634,7 @@ void BigBCD::digits_nibble_multiplication( BigBCD& rt, const BigBCD& this_, unsi
 	}
 }
 
-void BigBCD::digits_multiplication( BigBCD& rt, const BigBCD& this_, unsigned int factor, Allocator* allocator)
+void BigBCD::digits_multiplication( BigBCD& rt, const BigBCD& this_, FactorType factor, Allocator* allocator)
 {
 	if (factor == 0)
 	{
@@ -645,7 +699,7 @@ void BigBCD::digits_division( BigBCD& rt, const BigBCD& this_, const BigBCD& opr
 
 	while (!reminder.isNull() && !reminder.isabslt( opr))
 	{
-		unsigned int estimate = division_estimate( reminder, opr);
+		FactorType estimate = division_estimate( reminder, opr);
 		if (estimate == 0) throw std::runtime_error( "illegal state calculating division estimate");
 		BigBCD part;
 		digits_multiplication( part, opr, estimate, allocator);
@@ -785,15 +839,15 @@ bool BigBCD::isle( const BigBCD& o) const
 	return isabsle( o);
 }
 
-static unsigned int estimate_to_uint( double val)
+static FactorType estimate_to_uint( double val)
 {
-	boost::uint64_t rt = static_cast<boost::uint64_t>( std::floor( val * 1000000000));
-	while (rt > 1000000000000ULL) rt /= 1000;
-	while (rt >= std::numeric_limits<unsigned int>::max()) rt /= 10;
-	return (unsigned int)rt;
+	boost::uint64_t rt = static_cast<boost::uint64_t>( std::floor( val * MaxEstimate));
+	while (rt >= (std::numeric_limits<FactorType>::max() * 1000)) rt /= 1000;
+	while (rt >= std::numeric_limits<FactorType>::max()) rt /= 10;
+	return (FactorType)rt;
 }
 
-unsigned int BigBCD::division_estimate( const BigBCD& this_, const BigBCD& opr)
+FactorType BigBCD::division_estimate( const BigBCD& this_, const BigBCD& opr)
 {
 	double est = 0;
 	double div = 0;
@@ -817,13 +871,13 @@ unsigned int BigBCD::division_estimate( const BigBCD& this_, const BigBCD& opr)
 	return estimate_to_uint( est / (div+1));
 }
 
-BigBCD BigBCD::estimate_as_bcd( unsigned int estimate, int estshift, Allocator* allocator)
+BigBCD BigBCD::estimate_as_bcd( FactorType estimate, int estshift, Allocator* allocator)
 {
 	unsigned int mm = (estshift>0)?(3+estshift/4):(3-estshift/4);
 	BigBCD rt;
 	rt.init( mm, allocator);
 
-	if (estimate >= std::numeric_limits<unsigned int>::max())
+	if (estimate >= std::numeric_limits<FactorType>::max())
 	{
 		throw std::logic_error( "division estimate out of range");
 	}
@@ -835,14 +889,14 @@ BigBCD BigBCD::estimate_as_bcd( unsigned int estimate, int estshift, Allocator* 
 	{
 		estimate = 1;
 	}
-	unsigned int bb = estshift/7, tt = 4*(estshift%7);
+	unsigned int bb = estshift/NumDigits, tt = 4*(estshift%NumDigits);
 	while (estimate > 0)
 	{
-		unsigned int dd = estimate % 10;
+		BCDElement dd = estimate % 10;
 		estimate /= 10;
 		rt.m_ar[ bb] |= dd << tt;
 
-		if (tt == 24)
+		if (tt == (NumHighShift-4))
 		{
 			tt = 0;
 			bb += 1;

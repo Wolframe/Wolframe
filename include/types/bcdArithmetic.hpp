@@ -41,6 +41,15 @@ Project Wolframe.
 namespace _Wolframe {
 namespace types {
 
+#define _Wolframe_TYPES_BCD_USE_64BIT
+#ifdef _Wolframe_TYPES_BCD_USE_64BIT
+typedef boost::uint64_t BCDElement;
+typedef boost::uint64_t FactorType;
+#else
+typedef boost::uint32_t BCDElement;
+typedef boost::uint32_t FactorType;
+#endif
+
 class BigBCD
 {
 public:
@@ -103,7 +112,7 @@ public:
 
 		std::size_t m_idx;
 		unsigned char m_shf;
-		const boost::uint32_t* m_ar;
+		const BCDElement* m_ar;
 	};
 
 	const_iterator begin() const				{return const_iterator(*this);}
@@ -120,12 +129,12 @@ private:
 	static void digits_shift( BigBCD& dest, const BigBCD& this_, int nof_digits, Allocator* allocator);
 	static void digits_nibble_multiplication( BigBCD& dest, const BigBCD& this_, unsigned char factor, Allocator* allocator);
 	static void digits_16_multiplication( BigBCD& dest, const BigBCD& this_, Allocator* allocator);
-	static void digits_multiplication( BigBCD& dest, const BigBCD& this_, unsigned int factor, Allocator* allocator);
+	static void digits_multiplication( BigBCD& dest, const BigBCD& this_, FactorType factor, Allocator* allocator);
 	static void digits_multiplication( BigBCD& dest, const BigBCD& this_, const BigBCD& factor, Allocator* allocator);
 	static void digits_division( BigBCD& dest, const BigBCD& this_, const BigBCD& factor, Allocator* allocator);
 	static void xchg( BigBCD& a, BigBCD& b);
-	static unsigned int division_estimate( const BigBCD& this_, const BigBCD& opr);
-	static BigBCD estimate_as_bcd( unsigned int estimate, int estshift, Allocator* allocator);
+	static FactorType division_estimate( const BigBCD& this_, const BigBCD& opr);
+	static BigBCD estimate_as_bcd( FactorType estimate, int estshift, Allocator* allocator);
 
 	BigBCD add( const BigBCD& opr) const;
 	BigBCD sub( const BigBCD& opr) const;
@@ -142,7 +151,7 @@ private:
 
 private:
 	std::size_t m_size;
-	boost::uint32_t* m_ar;
+	BCDElement* m_ar;
 	bool m_neg;
 	bool m_allocated;
 };
