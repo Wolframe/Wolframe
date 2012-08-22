@@ -499,6 +499,15 @@ TransactionFunction::TransactionFunction( const TransactionFunction& o)
 	,m_call(o.m_call)
 	,m_tagmap(o.m_tagmap){}
 
+static bool isAlphaNumeric( char ch)
+{
+	if (ch >= '0' && ch <= '9') return true;
+	if (ch >= 'A' && ch <= 'Z') return true;
+	if (ch >= 'a' && ch <= 'z') return true;
+	if (ch == '_') return true;
+	return false;
+}
+
 TransactionFunction::TransactionFunction( const std::string& src)
 {
 	std::string::const_iterator ii = src.begin(), ee = src.end();
@@ -507,7 +516,7 @@ TransactionFunction::TransactionFunction( const std::string& src)
 		while (ii < ee && *ii > 0 && *ii < 32) ++ii;
 		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
 		std::string resname,functionname;
-		while (ii < ee && (std::isalnum( *ii) || *ii == '/'))
+		while (ii < ee && (isAlphaNumeric( *ii) || *ii == '/'))
 		{
 			functionname.push_back( *ii);
 			++ii;
@@ -516,7 +525,7 @@ TransactionFunction::TransactionFunction( const std::string& src)
 		{
 			resname = functionname;
 			functionname.clear();
-			for (++ii; ii < ee && std::isalnum( *ii); ++ii)
+			for (++ii; ii < ee && isAlphaNumeric( *ii); ++ii)
 			{
 				functionname.push_back( *ii);
 			}
