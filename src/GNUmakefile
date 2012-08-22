@@ -13,6 +13,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(TOPDIR) \
+	-I$(TOPDIR)/plibc/include \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
@@ -20,6 +21,7 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
+	$(TOPDIR)/plibc/src/plibc.a \
 	$(LIBS_DL)
 
 # openssl

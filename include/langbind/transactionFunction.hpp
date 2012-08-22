@@ -40,30 +40,20 @@
 namespace _Wolframe {
 namespace langbind {
 
-struct TransactionResult :public langbind::TypedInputFilter
-{
-	TransactionResult(){}
-	virtual ~TransactionResult(){}
-};
-typedef types::CountedReference<TransactionResult> TransactionResultR;
-
-
-struct TransactionInput :public langbind::TypedOutputFilter
-{
-	TransactionInput(){}
-	virtual ~TransactionInput(){}
-};
-typedef types::CountedReference<TransactionInput> TransactionInputR;
-
-
 struct TransactionFunction
 {
+	typedef TypedInputFilter Result;
+	typedef types::CountedReference<Result> ResultR;
+	typedef TypedOutputFilter Input;
+	typedef types::CountedReference<Input> InputR;
+
 	TransactionFunction(){}
 	virtual ~TransactionFunction(){}
 
-	virtual TransactionInputR getInput() const=0;
-	virtual TransactionResultR execute( const TransactionInput* i) const=0;
+	virtual InputR getInput() const=0;
+	virtual ResultR execute( const Input* i) const=0;
 };
+typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
 
 }}
 #endif

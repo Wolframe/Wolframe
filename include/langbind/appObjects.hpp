@@ -35,6 +35,7 @@ Project Wolframe.
 #define _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
 #include "langbind/appFormFunction.hpp"
+#include "langbind/transactionFunction.hpp"
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
@@ -390,6 +391,54 @@ public:
 	bool getPeerFormFunction( const std::string& name, PeerFormFunction& rt) const;
 private:
 	std::map<std::string,PeerFormFunction> m_map;
+};
+
+
+///\class TransactionFunctionClosure
+///\brief Closure with calling state of called TransactionFunction
+class TransactionFunctionClosure
+{
+public:
+	///\brief Constructor
+	///\param[in] f function called
+	TransactionFunctionClosure( const TransactionFunctionR& f);
+
+	///\brief Copy constructor
+	///\param[in] o copied item
+	TransactionFunctionClosure( const TransactionFunctionClosure& o);
+
+	///\brief Calls the transaction function with the input from the input filter specified
+	///\return true when completed
+	bool call();
+
+	///\brief Initialization of call context for a new call
+	///\param[in] i call input
+	void init( const TypedInputFilterR& i);
+
+	const TransactionFunction::ResultR& result() const	{return m_result;}
+
+private:
+	TransactionFunctionR m_func;			//< function to execute
+	int m_state;					//< current state of call
+	RedirectFilterClosure m_input;			//< builder of structure from input
+	TransactionFunction::InputR m_inputstruct;	//< input structure
+	TransactionFunction::ResultR m_result;		//< function call result
+};
+
+
+///\class TransactionFunctionMap
+///\brief Map of available transaction functions
+class TransactionFunctionMap
+{
+public:
+	TransactionFunctionMap(){}
+	~TransactionFunctionMap(){}
+
+	void defineTransactionFunction( const std::string& name, const TransactionFunctionR& f);
+	bool getTransactionFunction( const std::string& name, TransactionFunctionR& rt) const;
+
+private:
+	std::map<std::string,TransactionFunctionR> m_map;
 };
 
 

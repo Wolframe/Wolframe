@@ -97,17 +97,28 @@ int TagTable::unused() const
 	return m_size +1;
 }
 
+bool Structure::Node::operator == (const Node& o) const
+{
+	if (m_parent != o.m_parent) return false;
+	if (m_tag != o.m_tag) return false;
+	if (m_element != o.m_element) return false;
+	if (m_elementsize != o.m_elementsize) return false;
+	return true;
+}
+
 Structure::Structure( const Structure& o)
 	:m_nodemem(o.m_nodemem)
 	,m_strmem(o.m_strmem)
 	,m_tagmap(o.m_tagmap)
 	,m_rootidx(o.m_rootidx)
+	,m_rootsize(o.m_rootsize)
 	{}
 
 
 Structure::Structure( const TagTable* tagmap)
 	:m_tagmap(tagmap)
 	,m_rootidx(0)
+	,m_rootsize(0)
 {
 	m_nodemem.alloc( 1);
 	m_strmem.alloc( 1);
@@ -141,7 +152,7 @@ const std::string Structure::tostring() const
 {
 	std::vector <std::pair< std::size_t, std::size_t> > stk;
 	std::ostringstream rt;
-	stk.push_back( std::pair< std::size_t, std::size_t>( 1, m_rootidx));
+	stk.push_back( std::pair< std::size_t, std::size_t>( m_rootsize, m_rootidx));
 	while (stk.size())
 	{
 		std::size_t ii = stk.back().first;
@@ -189,43 +200,42 @@ void Structure::openTag( const std::string& tagstr)
 	m_data.push_back( std::vector<Node>());
 }
 
-std::size_t Structure::createRootNode()
+void Structure::createRootNode()
 {
-	std::size_t ni = m_data.back().size();
-	m_rootidx = m_nodemem.alloc( ni);
+	m_rootsize = m_data.back().size();
+	m_rootidx = m_nodemem.alloc( m_rootsize);
 	Node* nd = &m_nodemem[ m_rootidx];
 	std::vector<Node>::const_iterator itr = m_data.back().begin(), end = m_data.back().end();
 	for (; itr != end; ++itr, ++nd)
 	{
 		*nd = *itr;
 	}
-	m_data.pop_back();
-	return ni;
 }
 
 void Structure::closeTag()
 {
-	if (m_data.empty())
+	if (m_data.size() == 1)
 	{
-		throw std::runtime_error( "no unique toplevel tag in input");
+		throw std::runtime_error( "tags in input not balanced");
 	}
-	else if (m_data.back().size())
+	if (m_data.back().size() == 0)
 	{
-		std::size_t ni = createRootNode();
-		m_data.back().back().m_elementsize = ni;
-		m_data.back().back().m_element = Node::ref_element( m_rootidx);
+		pushValue( "", 0);
+	}
+	createRootNode();
+	m_data.pop_back();
+	m_data.back().back().m_elementsize = m_rootsize;
+	m_data.back().back().m_element = Node::ref_element( m_rootidx);
 
-		if (m_data.size() == 1)
-		{
-			// top level tag closed, assuming end of structure,
-			// creating root node and set all parent links:
-			createRootNode();
-			setParentLinks( m_rootidx);
-		}
-	}
-	else
+	if (m_data.size() == 1)
 	{
-		m_data.pop_back();
+		// top level tag closed, assuming end of structure,
+		// creating root node and set all parent links:
+		createRootNode();
+		for (std::size_t ri=0; ri<m_rootsize; ++ri)
+		{
+			setParentLinks( m_rootidx+ri);
+		}
 	}
 }
 
@@ -243,52 +253,83 @@ void Structure::pushValue( const std::string& val)
 	pushValue( val.c_str(), val.size());
 }
 
-bool Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
+void Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
 {
-	if (nd.m_tag && (int)nd.m_element < 0)
-	{
-		if (tag == 0 || tag == nd.m_tag)
-		{
-			nextnd.push_back( m_nodemem[ -(int)nd.m_element]);
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Structure::find( const Node& nd, int tag, std::vector<Node>& findnd) const
-{
-	bool rt = next( nd, tag, findnd);
-	std::size_t ii = 0, nn = nd.nofchild();
+	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
 	if (nn)
 	{
-		Node* cd = &m_nodemem[ nd.childidx()];
+		Node* cd = &m_nodemem[ idx];
 		for (; ii<nn; ++ii)
 		{
-			rt |= find( cd[ii], tag, findnd);
+			if (cd[ii].m_tag)
+			{
+				if (!tag || cd[ii].m_tag == tag)
+				{
+					nextnd.push_back( cd[ii]);
+				}
+			}
 		}
 	}
-	return rt;
 }
 
-bool Structure::up( const Node& nd, std::vector<Node>& rt) const
+void Structure::find( const Node& nd, int tag, std::vector<Node>& findnd) const
+{
+	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
+	if (nn)
+	{
+		Node* cd = &m_nodemem[ idx];
+		for (; ii<nn; ++ii)
+		{
+			if (cd[ii].m_tag)
+			{
+				if (!tag || cd[ii].m_tag == tag)
+				{
+					findnd.push_back( cd[ii]);
+				}
+			}
+			if (nd.childidx())
+			{
+				find( cd[ii], tag, findnd);
+			}
+		}
+	}
+}
+
+void Structure::up( const Node& nd, std::vector<Node>& rt) const
 {
 	if (nd.m_parent != 0)
 	{
 		rt.push_back( m_nodemem[ nd.m_parent]);
-		return true;
 	}
-	return false;
+	else
+	{
+		throw std::runtime_error( "selecting /.. from root");
+	}
+}
+
+Structure::Node Structure::root() const
+{
+	Node rt( 0, 0, m_rootsize, Node::ref_element(m_rootidx));
+	return rt;
 }
 
 const char* Structure::nodevalue( const Node& nd) const
 {
 	const char* rt = 0;
-	if (nd.m_tag != 0)
+	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
+	if (nn)
 	{
-		throw std::runtime_error( "node selected is not a leaf");
+		Node* cd = &m_nodemem[ idx];
+		for (; ii<nn; ++ii)
+		{
+			if (!cd[ii].m_tag)
+			{
+				if (rt) throw std::runtime_error( "node selected has more than one value");
+				std::size_t validx = cd[ii].valueidx();
+				if (validx) rt = &m_strmem[ validx];
+			}
+		}
 	}
-	rt = &m_strmem[ nd.valueidx()];
 	return rt;
 }
 
@@ -395,7 +436,7 @@ std::string Path::tostring() const
 	return rt.str();
 }
 
-bool Path::selectNodes( const Structure& st, const Structure::Node& nd, std::vector<Structure::Node>& ar) const
+void Path::selectNodes( const Structure& st, const Structure::Node& nd, std::vector<Structure::Node>& ar) const
 {
 	std::vector<Structure::Node> ar1,ar2;
 	ar1.push_back( nd);
@@ -428,8 +469,7 @@ bool Path::selectNodes( const Structure& st, const Structure::Node& nd, std::vec
 		}
 		ar1 = ar2;
 	}
-	ar = ar1;
-	return (ar.size() > 0);
+	ar.insert( ar.end(), ar1.begin(), ar1.end());
 }
 
 FunctionCall::FunctionCall( const std::string& r, const std::string& n, const Path& s, const std::vector<Path>& a)
@@ -590,7 +630,8 @@ TransactionInput::TransactionInput( const TagTable* tagmap)
 	,m_lasttype(langbind::TypedInputFilter::Value){}
 
 TransactionInput::TransactionInput( const TransactionInput& o)
-	:Structure(o)
+	:langbind::TransactionFunction::Input(o)
+	,Structure(o)
 	,m_lasttype(o.m_lasttype){}
 
 bool TransactionInput::print( ElementType type, const Element& element)
@@ -619,7 +660,8 @@ bool TransactionInput::print( ElementType type, const Element& element)
 }
 
 TransactionResult::TransactionResult( const TransactionResult& o)
-	:m_itemar(o.m_itemar)
+	:langbind::TransactionFunction::Result(o)
+	,m_itemar(o.m_itemar)
 	,m_itemitr(o.m_itemar.begin()+(o.m_itemitr-o.m_itemar.begin())){}
 
 void TransactionResult::openTag( const std::string& tag)
@@ -661,23 +703,21 @@ void TransactionResult::finalize()
 	m_itemitr = m_itemar.begin();
 }
 
-langbind::TransactionInputR TransactionFunction::getInput() const
+langbind::TransactionFunction::InputR TransactionFunction::getInput() const
 {
-	langbind::TransactionInputR rt( new TransactionInput( &m_tagmap));
+	langbind::TransactionFunction::InputR rt( new TransactionInput( &m_tagmap));
 	return rt;
 }
 
-langbind::TransactionResultR TransactionFunction::execute( DatabaseInterface* dbi, const langbind::TransactionInput* inputi) const
+langbind::TransactionFunction::ResultR TransactionFunction::execute( DatabaseInterface* dbi, const langbind::TransactionFunction::Input* inputi) const
 {
 	try
 	{
 		const TransactionInput* inputst = dynamic_cast<const TransactionInput*>( inputi);
 		if (!inputst) throw std::logic_error( "function called with unknown input type");
 
-		std::string ststr = inputst->tostring();
-
 		TransactionResult* result = new TransactionResult();
-		langbind::TransactionResultR rt( result);
+		langbind::TransactionFunction::ResultR rt( result);
 
 		typedef std::vector<std::size_t> ResultRow;
 		std::string resultstr,resultstr2;
@@ -702,10 +742,11 @@ langbind::TransactionResultR TransactionFunction::execute( DatabaseInterface* db
 
 			// Select the nodes to execute the command with:
 			std::vector<Structure::Node> nodearray;
-			if (!ci->selector().selectNodes( *inputst, inputst->root(), nodearray)) continue;
+			Structure::Node root = inputst->root();
+			ci->selector().selectNodes( *inputst, root, nodearray);
 
 			// For each selected node do expand the function call arguments:
-			std::vector<Structure::Node>::const_iterator vi=nodearray.begin(),ve=nodearray.end();
+			std::vector<Structure::Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (; vi != ve; ++vi)
 			{
 				// Expand the arguments that are input node references:
@@ -715,21 +756,25 @@ langbind::TransactionResultR TransactionFunction::execute( DatabaseInterface* db
 					if (!pi->resultReference())
 					{
 						std::vector<Structure::Node> param;
-						if (pi->selectNodes( *inputst, *vi, param))
+						pi->selectNodes( *inputst, *vi, param);
+						if (param.size() > 1)
 						{
-							if (param.size() > 1)
+							std::vector<Structure::Node>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
+							for (; gi != ge; ++gi)
 							{
-								throw std::runtime_error( "more than one node selected in db call argument");
+								if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
 							}
-							else if (param.size() == 0)
-							{
-								if (!dbi->bind( argidx, 0)) throw std::logic_error( "bind NULL parameter in transaction failed");
-							}
-							else
-							{
-								const char* value = inputst->nodevalue( param[0]);
-								if (!dbi->bind( argidx, value)) throw std::logic_error( "bind paramater in transaction failed");
-							}
+							const char* value = inputst->nodevalue( *gs);
+							if (!dbi->bind( argidx, value)) throw std::logic_error( "bind paramater in transaction failed");
+						}
+						else if (param.size() == 0)
+						{
+							if (!dbi->bind( argidx, 0)) throw std::logic_error( "bind NULL parameter in transaction failed");
+						}
+						else
+						{
+							const char* value = inputst->nodevalue( param[0]);
+							if (!dbi->bind( argidx, value)) throw std::logic_error( "bind paramater in transaction failed");
 						}
 					}
 				}

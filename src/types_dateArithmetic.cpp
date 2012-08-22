@@ -37,6 +37,7 @@
 #include <stdexcept>
 #include <cstring>
 #include <ctime>
+#include "strptime.h"
 
 using namespace _Wolframe::types;
 
@@ -115,16 +116,16 @@ Date::Date( const std::string& dt, const char* format)
 {
 	struct tm tt;
 	std::memset( &tt, 0, sizeof(tt));
-	if (!std::strptime( dt.str(), format,  &tt))
+	if (!plibc_strptime( dt.c_str(), format,  &tt))
 	{
 		throw std::runtime_error( "date conversion error");
 	}
-	sdate dt;
-	dt.y = tt.tm_year;
-	dt.m = tt.tm_mon;
-	dt.d = tt.tm_mday;
+	sdate dd;
+	dd.y = tt.tm_year;
+	dd.m = tt.tm_mon;
+	dd.d = tt.tm_mday;
 
-	m_daynum = daynum( dt);
+	m_daynum = daynum( dd);
 }
 
 std::string Date::tostring( const char* format) const

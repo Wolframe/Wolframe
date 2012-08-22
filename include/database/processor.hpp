@@ -124,20 +124,22 @@ public:
 			,m_elementsize(size)
 			,m_element(e){}
 
-		static int ref_element( std::size_t idx)			{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return -(int)idx;}
-		static int val_element( std::size_t idx)			{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return (int)idx;}
+		bool operator == (const Node& o) const;
+		bool operator != (const Node& o) const		{return !operator==(o);}
 
-		std::size_t childidx() const					{return (m_element < 0)?(std::size_t)-m_element:0;}
-		std::size_t nofchild() const					{return (m_element < 0)?(std::size_t)m_elementsize:0;}
-		std::size_t valueidx() const					{return (m_element > 0)?(std::size_t)m_element:0;}
-		std::size_t valuesize() const					{return (m_element > 0)?(std::size_t)m_elementsize:0;}
+		static int ref_element( std::size_t idx)	{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return -(int)idx;}
+		static int val_element( std::size_t idx)	{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return (int)idx;}
+
+		std::size_t childidx() const			{return (m_element < 0)?(std::size_t)-m_element:0;}
+		std::size_t nofchild() const			{return (m_element < 0)?(std::size_t)m_elementsize:0;}
+		std::size_t valueidx() const			{return (m_element > 0)?(std::size_t)m_element:0;}
+		std::size_t valuesize() const			{return (m_element > 0)?(std::size_t)m_elementsize:0;}
 	};
 
-	const Node& root() const						{if (m_rootidx == 0) throw std::runtime_error( "accessing root of incomplete structure"); return m_nodemem[ m_rootidx];}
-
-	bool next( const Node& nd, int tag, std::vector<Node>& rt) const;
-	bool find( const Node& nd, int tag, std::vector<Node>& rt) const;
-	bool up( const Node& nd, std::vector<Node>& rt) const;
+	Node root() const;
+	void next( const Node& nd, int tag, std::vector<Node>& rt) const;
+	void find( const Node& nd, int tag, std::vector<Node>& rt) const;
+	void up( const Node& nd, std::vector<Node>& rt) const;
 	const char* nodevalue( const Node& nd) const;
 
 	const std::string tostring() const;
@@ -147,7 +149,7 @@ protected:
 	void openTag( const char* tag, std::size_t tagsize);
 	void openTag( const std::string& tag);
 	void closeTag();
-	std::size_t createRootNode();
+	void createRootNode();
 	void pushValue( const char* val, std::size_t valsize);
 	void pushValue( const std::string& val);
 	void check() const;
@@ -157,6 +159,7 @@ private:
 	types::TypedArrayDoublingAllocator<char> m_strmem;
 	const TagTable* m_tagmap;
 	std::size_t m_rootidx;
+	std::size_t m_rootsize;
 	typedef std::vector< std::vector<Node> > BuildNodeStruct;
 	BuildNodeStruct m_data;
 };
@@ -191,7 +194,7 @@ public:
 	std::string tostring() const;
 
 	std::size_t resultReference() const;
-	bool selectNodes( const Structure& st, const Structure::Node& nd, std::vector<Structure::Node>& ar) const;
+	void selectNodes( const Structure& st, const Structure::Node& nd, std::vector<Structure::Node>& ar) const;
 
 	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
 	std::vector<Element>::const_iterator end() const		{return m_path.end();}
@@ -226,7 +229,7 @@ private:
 
 
 class TransactionResult
-	:public langbind::TransactionResult
+	:public langbind::TransactionFunction::Result
 {
 public:
 	TransactionResult(){}
@@ -253,7 +256,7 @@ private:
 
 
 class TransactionInput
-	:public langbind::TransactionInput
+	:public langbind::TransactionFunction::Input
 	,public Structure
 {
 public:
@@ -267,15 +270,16 @@ private:
 };
 
 
-class TransactionFunction :public langbind::TransactionFunction
+class TransactionFunction
+	:public langbind::TransactionFunction
 {
 public:
 	TransactionFunction( const TransactionFunction& o);
 	TransactionFunction( const std::string& src);
 	virtual ~TransactionFunction(){}
 
-	virtual langbind::TransactionInputR getInput() const;
-	virtual langbind::TransactionResultR execute( DatabaseInterface* dbi, const langbind::TransactionInput* input) const;
+	virtual langbind::TransactionFunction::InputR getInput() const;
+	virtual langbind::TransactionFunction::ResultR execute( DatabaseInterface* dbi, const langbind::TransactionFunction::Input* input) const;
 
 private:
 	std::string m_resultname;

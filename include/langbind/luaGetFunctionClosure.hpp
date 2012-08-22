@@ -103,7 +103,7 @@ private:
 	InputFilter::ElementType m_type;			//< current state (last value type parsed)
 	std::string m_attrbuf;					//< buffer for attribute name
 	std::size_t m_taglevel;					//< current level in tag hierarchy
-	std::size_t m_id;					//< id for checking valid access
+	std::size_t m_id;					//< id for checking valid access (scope)
 	types::CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
 };
 

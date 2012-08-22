@@ -137,6 +137,10 @@ struct DatabaseCommandLog :public DatabaseInterface
 		return m_out.str();
 	}
 
+	void reset()
+	{
+		m_out.str("");
+	}
 private:
 	std::ostringstream m_out;
 };
@@ -148,7 +152,7 @@ struct TestTransactionFunction :public TransactionFunction
 	TestTransactionFunction( const std::string& src)
 		:TransactionFunction(src){}
 
-	virtual langbind::TransactionResultR execute( const langbind::TransactionInput* inp) const
+	virtual langbind::TransactionFunction::ResultR execute( const langbind::TransactionFunction::Input* inp) const
 	{
 		DatabaseInterface* dbi = &g_databaseCommandLog;
 		return TransactionFunction::execute( dbi, inp);
@@ -166,7 +170,7 @@ protected:
 
 static std::string selectedTestName;
 
-void pushTestInput( const langbind::TransactionInputR& input, std::string tdinput)
+void pushTestInput( const langbind::TransactionFunction::InputR& input, std::string tdinput)
 {
 	langbind::Filter tokenfilter = langbind::createTokenFilter( "token:UTF-8");
 	langbind::Filter xmlfilter = langbind::createTextwolfXmlFilter( "xml:textwolf");
@@ -263,8 +267,9 @@ TEST_F( DatabaseProcessorVMTest, tests)
 
 		std::cerr << "processing test '" << testname << "'" << std::endl;
 
+		g_databaseCommandLog.reset();
 		TestTransactionFunction program( td.config);
-		langbind::TransactionInputR input = program.getInput();
+		langbind::TransactionFunction::InputR input = program.getInput();
 		pushTestInput( input, td.input);
 		program.execute( input.get());
 

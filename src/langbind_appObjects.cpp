@@ -527,6 +527,54 @@ bool PeerFormFunctionMap::getPeerFormFunction( const std::string& name, PeerForm
 	return getObject( m_map, name, rt);
 }
 
+TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctionR& f)
+	:m_func(f)
+	,m_state(0)
+	,m_inputstruct(f->getInput()){}
+
+TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctionClosure& o)
+	:m_func(o.m_func)
+	,m_state(o.m_state)
+	,m_input(o.m_input)
+	,m_inputstruct(o.m_inputstruct)
+	,m_result(o.m_result){}
+
+bool TransactionFunctionClosure::call()
+{
+	switch (m_state)
+	{
+		case 0:
+			throw std::runtime_error( "input not initialized");
+		case 1:
+			if (!m_input.call()) return false;
+			m_state = 2;
+		case 2:
+			m_result = m_func->execute( m_inputstruct.get());
+			m_state = 3;
+			return true;
+		default:
+			return true;
+	}
+}
+
+void TransactionFunctionClosure::init( const TypedInputFilterR& i)
+{
+	m_input.init( i, m_inputstruct);
+	m_state = 0;
+	m_inputstruct = m_func->getInput();
+}
+
+
+void TransactionFunctionMap::defineTransactionFunction( const std::string& name, const TransactionFunctionR& f)
+{
+	defineObject( m_map, name, f);
+}
+
+bool TransactionFunctionMap::getTransactionFunction( const std::string& name, TransactionFunctionR& rt) const
+{
+	return getObject( m_map, name, rt);
+}
+
 DDLCompilerMap::DDLCompilerMap()
 {
 	ddl::CompilerInterfaceR simpleformCompiler( new ddl::SimpleFormCompiler());
