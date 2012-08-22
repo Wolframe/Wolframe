@@ -115,16 +115,16 @@ Date::Date( const std::string& dt, const char* format)
 {
 	struct tm tt;
 	std::memset( &tt, 0, sizeof(tt));
-	if (!std::strptime( dt.str(), format,  &tt))
+	if (!strptime( dt.c_str(), format,  &tt))
 	{
 		throw std::runtime_error( "date conversion error");
 	}
-	sdate dt;
-	dt.y = tt.tm_year;
-	dt.m = tt.tm_mon;
-	dt.d = tt.tm_mday;
+	sdate sdt;
+	sdt.y = tt.tm_year;
+	sdt.m = tt.tm_mon;
+	sdt.d = tt.tm_mday;
 
-	m_daynum = daynum( dt);
+	m_daynum = daynum( sdt);
 }
 
 std::string Date::tostring( const char* format) const
