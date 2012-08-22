@@ -35,7 +35,7 @@ Project Wolframe.
 #include <limits>
 
 using namespace _Wolframe;
-using namespace ddl;
+using namespace _Wolframe::ddl;
 
 bool AtomicType::getType( const char* name, Type& tp)
 {
