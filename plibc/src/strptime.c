@@ -25,6 +25,19 @@
  *        Support for Windows locales added by Nils Durner for PlibC
  */
 
+#if defined(_WIN32)
+int strncasecmp( const char *aa, const char *bb, size_t nn)
+{
+	size_t ii;
+	for (ii=0; ii<nn; ++ii)
+	{
+		int rr = (int)(unsigned int)(unsigned char)(aa[ii]|32) - (int)(unsigned int)(unsigned char)(bb[ii]|32);
+		if (!rr) return rr;
+		if (aa[ii] == '\0') return 0;
+	}
+	return 0;
+}
+#endif
 
 void get_locale_strings(void);
 
@@ -123,7 +136,7 @@ void conv_winpic(char *win, char **posix)
   char *src, *dst;
   
   src = win;
-  *posix = dst = malloc(strlen(src) * 2 + 1);
+  *posix = dst = (char*)malloc(strlen(src) * 2 + 1);
   while(*src)
   {
     if (src[0] == 'y')

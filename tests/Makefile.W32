@@ -125,7 +125,7 @@ configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
 testProtocolLFdotEscaping.exe: testProtocolLFdotEscaping.obj $(TOPDIR)\src\wolframe.lib
 testSimpleFormCompiler.exe: testSimpleFormCompiler.obj $(TOPDIR)\src\wolframe.lib
 testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
-testDatabaseProcessorVM.exe testDatabaseProcessorVM.obj $(TOPDIR)\src\wolframe.lib
+testDatabaseProcessorVM.exe: testDatabaseProcessorVM.obj $(TOPDIR)\src\wolframe.lib
 testRand.exe: testRand.obj
 testTimestamp.exe: testTimestamp.obj
 

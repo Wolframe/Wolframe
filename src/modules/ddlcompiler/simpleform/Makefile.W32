@@ -25,6 +25,10 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	$(TOPDIR)\src\ddl_compiler_simpleFormCompiler.obj \
+	$(TOPDIR)\src\ddl_atomicType.obj \
+	$(TOPDIR)\src\ddl_structType.obj \
+	$(TOPDIR)\src\libwolframe\resolvePath.obj \
+	$(TOPDIR)\src\libwolframe\stringUtils.obj \
 	mod_ddlcompiler_simpleform.obj
 
 all: $(DYNAMIC_MODULE)

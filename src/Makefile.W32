@@ -112,11 +112,11 @@ LOCAL_STATIC_LIB_OBJS = \
 	serialize_ddl_filtermapSerialize.obj \
 	serialize_ddl_filtermapParse.obj \
 	serialize_mapContext.obj \
+	ddl_compilerInterface.obj \
+	ddl_compiler_simpleFormCompiler.obj \
 	ddl_atomicType.obj \
 	ddl_structType.obj \
 	ddl_structTypeBuild.obj \
-	ddl_compilerInterface.obj \
-	ddl_compiler_simpleFormCompiler.obj \
 	acceptor.obj \
 	connection.obj \
 	serverConfig.obj \

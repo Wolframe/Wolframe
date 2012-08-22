@@ -16,6 +16,10 @@ DYNAMIC_MODULE = mod_ddlcompiler_simpleform.so
 
 CPP_OBJS = \
 	$(TOPDIR)/src/ddl_compiler_simpleFormCompiler.o \
+	$(TOPDIR)/src/ddl_atomicType.o \
+	$(TOPDIR)/src/ddl_structType.o \
+	$(TOPDIR)/src/libwolframe/resolvePath.o \
+	$(TOPDIR)/src/libwolframe/stringUtils.o \
 	mod_ddlcompiler_simpleform.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
