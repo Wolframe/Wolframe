@@ -36,9 +36,9 @@
 #include "types/dateArithmetic.hpp"
 #include <stdexcept>
 #include <cstring>
-#include <ctime>
-#include "strptime.h"
+#include "boost/date_time/gregorian/gregorian.hpp"
 
+using namespace _Wolframe;
 using namespace _Wolframe::types;
 
 namespace
@@ -63,18 +63,11 @@ static long daynum( sdate d)
 }
 
 static sdate g_mindate = {1600, 1, 1};
-static sdate g_sundaydate = {1600, 1, 2};
 static long g_mindaynum = daynum( g_mindate);
-static long g_sundaydaynum = daynum( g_sundaydate);
-
-static short weekday( long d)
-{
-	return (d - g_sundaydaynum + 7) % 7;
-}
 
 ///\brief Convert day number to y,m,d format
 ///\remark Original source from http://alcor.concordia.ca/~gpkatch/gdate-c.html
-struct sdate dtf( long d)
+struct sdate get_sdate( long d)
 {
 	struct sdate pd;
 	long y, ddd, mi;
@@ -114,39 +107,28 @@ Date::Date( unsigned short y, unsigned short m, unsigned short d)
 
 Date::Date( const std::string& dt, const char* format)
 {
-	struct tm tt;
-	std::memset( &tt, 0, sizeof(tt));
-	if (!plibc_strptime( dt.c_str(), format,  &tt))
-	{
-		throw std::runtime_error( "date conversion error");
-	}
+	std::istringstream dti(dt);
+	boost::gregorian::date_facet dtf( format);
+	dti.imbue( std::locale( std::locale::classic(), &dtf));
+	boost::gregorian::date gdate;
+	dti >> gdate;
+
 	sdate dd;
-	dd.y = tt.tm_year;
-	dd.m = tt.tm_mon;
-	dd.d = tt.tm_mday;
+	dd.y = gdate.year();
+	dd.m = gdate.month();
+	dd.d = gdate.day();
 
 	m_daynum = daynum( dd);
 }
 
 std::string Date::tostring( const char* format) const
 {
-	char buf[ 1024];
-	if (strlen( format) > 50) throw std::bad_alloc();
-	struct tm tt;
-	std::memset( &tt, 0, sizeof(tt));
-	sdate dt = dtf( m_daynum);
-	sdate dt_first_jan;
-	dt_first_jan.y = dt.y;
-	dt_first_jan.m = 1;
-	dt_first_jan.d = 1;
-	tt.tm_mday = dt.d;
-	tt.tm_mon = dt.m;
-	tt.tm_year = dt.y;
-	tt.tm_wday = weekday( m_daynum);
-	tt.tm_yday = m_daynum - daynum( dt_first_jan);
-
-	strftime( buf, sizeof(buf), format, &tt);
-	return std::string( buf);
+	std::ostringstream dto;
+	boost::gregorian::date_facet dtf( format);
+	dto.imbue( std::locale( std::locale::classic(), &dtf));
+	sdate thisdate = get_sdate( m_daynum);
+	boost::gregorian::date gdate( thisdate.y, thisdate.m, thisdate.d);
+	dto << gdate;
+	return dto.str();
 }
-
 

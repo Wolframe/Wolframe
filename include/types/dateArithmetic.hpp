@@ -52,8 +52,9 @@ public:
 	Date( unsigned short y, unsigned short m, unsigned short d);
 
 	///\brief Constructor
-	///\param[in] dt date in strptime parseable format
-	///\param[in] format strptime format definition of 'dt'
+	///\param[in] dt date as string
+	///\param[in] format format definition of 'dt' in a format similar to printf
+	///\remark For the format defintion see http://www.boost.org/doc/libs/1_43_0/doc/html/date_time/date_time_io.html
 	Date( const std::string& dt, const char* format="%Y/%m/%d");
 
 	///\brief Copy constructor
@@ -71,9 +72,10 @@ public:
 	Date& operator -= (int days)			{m_daynum -= days; check(); return *this;}
 
 	///\brief Get the date as a formated string
-	///\param[in] format strftime - format string
+	///\param[in] format format definition of 'dt' in a format similar to printf
 	///\return the date as string
-	std::string tostring( const char* format) const;
+	///\remark For the format defintion see http://www.boost.org/doc/libs/1_43_0/doc/html/date_time/date_time_io.html
+	std::string tostring( const char* format="%Y/%m/%d") const;
 
 private:
 	///\brief Check the date and throw an exception if the date is not in the boundaries allowed by this library (bigger than 1599/12/31)
