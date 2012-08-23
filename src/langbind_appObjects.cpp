@@ -377,156 +377,6 @@ bool FormFunctionMap::getFormFunction( const std::string& name, FormFunction& rt
 	return getObject( m_map, name, rt);
 }
 
-PeerFunction::PeerFunction( const PeerFunction& o)
-	:m_cmdwriter(o.m_cmdwriter)
-	,m_resultreader(o.m_resultreader)
-	,m_cmdconstructor(o.m_cmdconstructor)
-{}
-
-PeerFunction::PeerFunction( const OutputFilterR& w, const InputFilterR& r, CreateCommandHandler c)
-	:m_cmdwriter(w)
-	,m_resultreader(r)
-	,m_cmdconstructor(c)
-{}
-
-PeerFormFunction::PeerFormFunction( const PeerFormFunction& o)
-	:PeerFunction(o)
-	,m_inputform(o.m_inputform)
-	,m_outputform(o.m_outputform)
-{}
-
-PeerFormFunction::PeerFormFunction( const PeerFunction& f, const DDLForm& i, const DDLForm& o)
-	:PeerFunction(f)
-	,m_inputform(i)
-	,m_outputform(o)
-{}
-
-
-PeerFormFunctionClosure::PeerFormFunctionClosure( const PeerFormFunction& f)
-	:m_func(f)
-	,m_cmd(f.cmdconstructor()())
-	,m_cmdop(cmdbind::CommandHandler::READ)
-	,m_state(0)
-	,m_cmdinputbuf(std::malloc( InputBufSize), std::free)
-	,m_cmdoutputbuf(std::malloc( OutputBufSize), std::free)
-{}
-
-void PeerFormFunctionClosure::init( const TypedInputFilterR& i)
-{
-	m_inputfilter = i;
-	m_param = serialize::DDLStructParser( m_func.inputform().copy().structure());
-	m_result = serialize::DDLStructParser( m_func.outputform().copy().structure());
-	m_cmdserialize = serialize::DDLStructSerializer( m_param.structure());
-
-	if (!m_func.cmdwriter().get()) throw std::runtime_error( "called transaction function without command writer filter");
-	if (!m_func.resultreader().get()) throw std::runtime_error( "called transaction function without result reader filter");
-	if (!m_inputfilter.get()) throw std::runtime_error( "null input for transaction function");
-	if (!m_cmdinputbuf.get()) throw std::bad_alloc();
-	if (!m_cmdoutputbuf.get()) throw std::bad_alloc();
-
-	m_cmdop = cmdbind::CommandHandler::READ;
-	m_state = 0;
-	m_cmdwriter.reset( m_func.cmdwriter()->copy());
-	m_resultreader.reset( m_func.resultreader()->copy());
-	m_param.init( m_inputfilter);
-	m_result.init( TypedInputFilterR( new TypingInputFilter( m_resultreader)));
-	m_cmdserialize.init( TypedOutputFilterR( new TypingOutputFilter( m_cmdwriter)));
-	m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
-	m_cmd->setInputBuffer( m_cmdinputbuf.get(), InputBufSize);
-	m_cmd->setOutputBuffer( m_cmdoutputbuf.get(), OutputBufSize, 0);
-}
-
-
-PeerFormFunctionClosure::PeerFormFunctionClosure( const PeerFormFunctionClosure& o)
-	:m_func(o.m_func)
-	,m_cmd(o.m_cmd)
-	,m_cmdop(o.m_cmdop)
-	,m_state(o.m_state)
-	,m_cmdinputbuf(o.m_cmdinputbuf)
-	,m_cmdoutputbuf(o.m_cmdoutputbuf)
-	,m_cmdwriter(o.m_cmdwriter)
-	,m_resultreader(o.m_resultreader)
-	,m_param(o.m_param)
-	,m_result(o.m_result)
-	,m_cmdserialize(o.m_cmdserialize)
-	,m_inputfilter(o.m_inputfilter)
-	{}
-
-DDLForm PeerFormFunctionClosure::result() const
-{
-	return DDLForm( m_result.structure());
-}
-
-bool PeerFormFunctionClosure::call()
-{
-	bool res;
-	const void* data;
-	std::size_t datasize;
-
-	if (!m_inputfilter.get())
-	{
-		throw std::runtime_error( "null input for transaction function command");
-	}
-	// read input into parameter form 'm_param'
-	if (m_state == 0 && !m_param.call()) return false;
-	m_state = 1;
-
-	for (;;) switch (m_cmdop)
-	{
-		case cmdbind::CommandHandler::READ:
-			res = m_cmdserialize.call();
-			m_cmd->putInput( m_cmdinputbuf.get(), m_cmdwriter->getPosition());
-			m_cmdwriter->setOutputBuffer( m_cmdinputbuf.get(), InputBufSize);
-			m_cmdop = m_cmd->nextOperation();
-			if (res && m_cmdop == cmdbind::CommandHandler::READ)
-			{
-				throw std::runtime_error( "transaction function not terminated");
-			}
-			continue;
-
-		case cmdbind::CommandHandler::WRITE:
-			m_cmd->getOutput( data, datasize);
-			m_resultreader->putInput( data, datasize, false);
-			if (m_result.call())
-			{
-				throw std::runtime_error( "illegal state in result reader. end reading without getting end of data marker");
-			}
-			m_cmdop = m_cmd->nextOperation();
-			continue;
-
-		case cmdbind::CommandHandler::CLOSE:
-			m_resultreader->putInput( "", 0, true);
-			if (!m_result.call())
-			{
-				throw std::runtime_error( "transaction function result corrupt");
-			}
-			return true;
-		default:
-			throw std::runtime_error( "illegal state in transaction function in command handler");
-	}
-}
-
-
-void PeerFunctionMap::definePeerFunction( const std::string& name, const PeerFunction& f)
-{
-	defineObject( m_map, name, f);
-}
-
-bool PeerFunctionMap::getPeerFunction( const std::string& name, PeerFunction& rt) const
-{
-	return getObject( m_map, name, rt);
-}
-
-void PeerFormFunctionMap::definePeerFormFunction( const std::string& name, const PeerFormFunction& f)
-{
-	defineObject( m_map, name, f);
-}
-
-bool PeerFormFunctionMap::getPeerFormFunction( const std::string& name, PeerFormFunction& rt) const
-{
-	return getObject( m_map, name, rt);
-}
-
 TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctionR& f)
 	:m_func(f)
 	,m_state(0)
@@ -559,9 +409,9 @@ bool TransactionFunctionClosure::call()
 
 void TransactionFunctionClosure::init( const TypedInputFilterR& i)
 {
-	m_input.init( i, m_inputstruct);
-	m_state = 0;
 	m_inputstruct = m_func->getInput();
+	m_input.init( i, m_inputstruct);
+	m_state = 1;
 }
 
 

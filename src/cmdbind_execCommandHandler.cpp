@@ -268,7 +268,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				{
 					try
 					{
-						langbind::PeerFormFunction tfunc;
+						langbind::TransactionFunctionR tfunc;
 						const char* procname = m_cmds[ m_cmdidx - m_nofParentCmds - 2].c_str();
 						langbind::GlobalContext* gctx = langbind::getGlobalContext();
 #if WITH_LUA
@@ -279,7 +279,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 						}
 						else
 #endif
-						if (gctx->getPeerFormFunction( procname, tfunc))
+						if (gctx->getTransactionFunction( procname, tfunc))
 						{
 							m_cmdhandler.reset( new cmdbind::DirectmapCommandHandler());
 						}

@@ -74,7 +74,7 @@ namespace luaname
 	static const char* TypedInputFilterR = "wolframe.TypedInputFilterR";
 	static const char* TypedInputFilterClosure = "wolframe.TypedInputFilterClosure";
 	static const char* FormFunctionClosure = "wolframe.FormFunctionClosure";
-	static const char* PeerFormFunctionClosure = "wolframe.PeerFormFunctionClosure";
+	static const char* TransactionFunctionClosure = "wolframe.TransactionFunctionClosure";
 	static const char* StructSerializer = "wolframe.StructSerializer";
 }
 
@@ -95,7 +95,7 @@ template <> const char* metaTableName<InputFilterClosure>()		{return luaname::In
 template <> const char* metaTableName<TypedInputFilterR>()		{return luaname::TypedInputFilterR;}
 template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
 template <> const char* metaTableName<FormFunctionClosure>()		{return luaname::FormFunctionClosure;}
-template <> const char* metaTableName<PeerFormFunctionClosure>()	{return luaname::PeerFormFunctionClosure;}
+template <> const char* metaTableName<TransactionFunctionClosure>()	{return luaname::TransactionFunctionClosure;}
 template <> const char* metaTableName<serialize::StructSerializer>()	{return luaname::StructSerializer;}
 }//anonymous namespace
 
@@ -824,9 +824,9 @@ LUA_FUNCTION_THROWS( "<formfunction>(..)", function_formfunction_call)
 	return 1;
 }
 
-LUA_FUNCTION_THROWS( "<formfunction>(..)", function_peerformfunction_call)
+LUA_FUNCTION_THROWS( "<transaction>(..)", function_transactionfunction_call)
 {
-	PeerFormFunctionClosure* closure = LuaObject<PeerFormFunctionClosure>::get( ls, lua_upvalueindex( 1));
+	TransactionFunctionClosure* closure = LuaObject<TransactionFunctionClosure>::get( ls, lua_upvalueindex( 1));
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
@@ -843,9 +843,9 @@ LUA_FUNCTION_THROWS( "<formfunction>(..)", function_peerformfunction_call)
 	}
 	if (!closure->call())
 	{
-		lua_yieldk( ls, 0, 1, function_peerformfunction_call);
+		lua_yieldk( ls, 0, 1, function_transactionfunction_call);
 	}
-	LuaObject<DDLForm>::push_luastack( ls, closure->result());
+	LuaObject<TypedInputFilterR>::push_luastack( ls, closure->result());
 	return 1;
 }
 
@@ -861,8 +861,6 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 		throw std::runtime_error( "lost global context");
 	}
 	FormFunction ff;
-	PeerFunction pf;
-	PeerFormFunction pff;
 
 	if (ctx->getFormFunction( name, ff))
 	{
@@ -870,19 +868,33 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 		lua_pushcclosure( ls, function_formfunction_call, 1);
 		return 1;
 	}
-	else if (ctx->getPeerFormFunction( name, pff))
-	{
-		LuaObject<PeerFormFunctionClosure>::push_luastack( ls, PeerFormFunctionClosure( pff));
-		lua_pushcclosure( ls, function_peerformfunction_call, 1);
-		return 1;
-	}
-	else if (ctx->getPeerFunction( name, pf))
-	{
-		throw std::runtime_error( "calling peer function without parameter/result form directly. Only functions configured as formfunction or peerformfunction are supported");
-	}
 	else
 	{
 		throw std::runtime_error( "form function not found");
+	}
+}
+
+LUA_FUNCTION_THROWS( "transaction(..)", function_transaction)
+{
+	check_parameters( ls, 0, 1, LUA_TSTRING);
+
+	const char* name = lua_tostring( ls, 1);
+	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
+	if (!ctx)
+	{
+		throw std::runtime_error( "lost global context");
+	}
+	TransactionFunctionR tf;
+
+	if (ctx->getTransactionFunction( name, tf))
+	{
+		LuaObject<TransactionFunctionClosure>::push_luastack( ls, TransactionFunctionClosure( tf));
+		lua_pushcclosure( ls, function_transactionfunction_call, 1);
+		return 1;
+	}
+	else
+	{
+		throw std::runtime_error( "transaction function not found");
 	}
 }
 
@@ -1757,7 +1769,7 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			LuaObject<TypedInputFilterR>::createMetatable( ls, 0, 0, typedinputfilter_methodtable);
 			LuaObject<TypedInputFilterClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<FormFunctionClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<PeerFormFunctionClosure>::createMetatable( ls, 0, 0, 0);
+			LuaObject<TransactionFunctionClosure>::createMetatable( ls, 0, 0, 0);
 
 			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
 			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
@@ -1769,6 +1781,8 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			lua_setglobal( ls, "form");
 			lua_pushcfunction( ls, &function_formfunction);
 			lua_setglobal( ls, "formfunction");
+			lua_pushcfunction( ls, &function_transaction);
+			lua_setglobal( ls, "transaction");
 			lua_pushcfunction( ls, &function_scope);
 			lua_setglobal( ls, "scope");
 		}

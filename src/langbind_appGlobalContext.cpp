@@ -110,7 +110,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 		}
 	}
 	{
-		std::vector<PeerFunctionConfigStruct>::const_iterator itr=config.data().peerfunction.begin(),end=config.data().peerfunction.end();
+		std::vector<TransactionTypeConfigStruct>::const_iterator itr=config.data().transactiontype.begin(),end=config.data().transactiontype.end();
 		for (;itr!=end; ++itr)
 		{
 			LOG_INFO << "Loading peer function " << itr->name;
@@ -119,7 +119,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 		}
 	}
 	{
-		std::vector<PeerFormFunctionConfigStruct>::const_iterator itr=config.data().peerformfunction.begin(),end=config.data().peerformfunction.end();
+		std::vector<TransactionFunctionConfigStruct>::const_iterator itr=config.data().transaction.begin(),end=config.data().transaction.end();
 		for (;itr!=end; ++itr)
 		{
 			LOG_INFO << "Loading peer form function function " << itr->name;

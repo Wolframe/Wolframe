@@ -1,6 +1,6 @@
 
 function run()
-	r = formfunction("transaction")( input:get())
+	r = transaction("echo_transaction")( input:get())
 	output:print( r:get())
 end
 

@@ -49,8 +49,7 @@ namespace langbind {
 class GlobalContext
 	:public FilterMap
 	,public DDLFormMap
-	,public PeerFunctionMap
-	,public PeerFormFunctionMap
+	,public TransactionFunctionMap
 	,public DDLCompilerMap
 	,public FormFunctionMap
 #if WITH_LUA

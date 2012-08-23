@@ -110,25 +110,15 @@ bool ApplicationEnvironmentConfig::check() const
 		}
 	}
 	{
-		std::vector<PeerFunctionConfigStruct>::const_iterator itr=m_config.peerfunction.begin(),end=m_config.peerfunction.end();
+		std::vector<TransactionFunctionConfigStruct>::const_iterator itr=m_config.transaction.begin(),end=m_config.transaction.end();
 		for (;itr!=end; ++itr)
 		{
 			if (functions[ itr->name])
 			{
-				LOG_ERROR << "Duplicate definition or using reserved name for peer function " << itr->name;
+				LOG_ERROR << "Duplicate definition or using reserved name for transaction function " << itr->name;
 				rt = false;
 			}
 			functions[ itr->name] = true;
-			if (!filters[ itr->filter])
-			{
-				LOG_ERROR << "Undefined filter '" << itr->filter << "' used for peer function command reader/writer in " << itr->name;
-				rt = false;
-			}
-			if (!utils::fileExists( itr->modulepath))
-			{
-				LOG_ERROR << "Path of peer function command handler module does not exist: " << itr->modulepath;
-				rt = false;
-			}
 		}
 	}
 	{
@@ -161,23 +151,6 @@ bool ApplicationEnvironmentConfig::check() const
 			if (!utils::fileExists( itr->modulepath))
 			{
 				LOG_ERROR << "Path of form function module does not exist: " << itr->modulepath;
-				rt = false;
-			}
-		}
-	}
-	{
-		std::vector<PeerFormFunctionConfigStruct>::const_iterator itr=m_config.peerformfunction.begin(),end=m_config.peerformfunction.end();
-		for (;itr!=end; ++itr)
-		{
-			if (functions[ itr->name])
-			{
-				LOG_ERROR << "Duplicate definition or using reserved name for peer form function " << itr->name;
-				rt = false;
-			}
-			functions[ itr->name] = true;
-			if (!functions[ itr->peerfunc])
-			{
-				LOG_ERROR << "Undefined peer function '" << itr->name << "'";
 				rt = false;
 			}
 		}
@@ -229,7 +202,7 @@ void ApplicationEnvironmentConfig::setCanonicalPathes( const std::string& refere
 		}
 	}
 	{
-		std::vector<PeerFunctionConfigStruct>::iterator itr=m_config.peerfunction.begin(),end=m_config.peerfunction.end();
+		std::vector<TransactionTypeConfigStruct>::iterator itr=m_config.transactiontype.begin(),end=m_config.transactiontype.end();
 		for (;itr!=end; ++itr)
 		{
 			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);

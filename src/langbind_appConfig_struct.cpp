@@ -104,16 +104,15 @@ const serialize::StructDescriptionBase* FormFunctionConfigStruct::getStructDescr
 	return &rt;
 }
 
-const serialize::StructDescriptionBase* PeerFunctionConfigStruct::getStructDescription()
+const serialize::StructDescriptionBase* TransactionTypeConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<PeerFunctionConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<TransactionTypeConfigStruct>
 	{
 		ThisDescription()
 		{
 			(*this)
-			( "name",		&PeerFunctionConfigStruct::name)
-			( "filter",		&PeerFunctionConfigStruct::filter)
-			( "modulepath",		&PeerFunctionConfigStruct::modulepath)
+			( "name",		&TransactionTypeConfigStruct::name)
+			( "modulepath",		&TransactionTypeConfigStruct::modulepath)
 			;
 		}
 	};
@@ -121,17 +120,16 @@ const serialize::StructDescriptionBase* PeerFunctionConfigStruct::getStructDescr
 	return &rt;
 }
 
-const serialize::StructDescriptionBase* PeerFormFunctionConfigStruct::getStructDescription()
+const serialize::StructDescriptionBase* TransactionFunctionConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<PeerFormFunctionConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<TransactionFunctionConfigStruct>
 	{
 		ThisDescription()
 		{
 			(*this)
-			( "name",		&PeerFormFunctionConfigStruct::name)
-			(" peerfunc",		&PeerFormFunctionConfigStruct::peerfunc)
-			( "inputform",		&PeerFormFunctionConfigStruct::inputform)
-			( "outputform",		&PeerFormFunctionConfigStruct::outputform)
+			( "name",		&TransactionFunctionConfigStruct::name)
+			( "interpreter",	&TransactionFunctionConfigStruct::interpreter)
+			( "call",		&TransactionFunctionConfigStruct::call)
 			;
 		}
 	};
@@ -165,8 +163,8 @@ const serialize::StructDescriptionBase* EnvironmentConfigStruct::getStructDescri
 			( "DDL",		&EnvironmentConfigStruct::DDL)
 			( "form",		&EnvironmentConfigStruct::form)
 			( "filter",		&EnvironmentConfigStruct::filter)
-			( "peerfunction",	&EnvironmentConfigStruct::peerfunction)
-			( "peerformfunction",	&EnvironmentConfigStruct::peerformfunction)
+			( "transactiontype",	&EnvironmentConfigStruct::transactiontype)
+			( "transaction",	&EnvironmentConfigStruct::transaction)
 #if WITH_LUA
 			( "script",		&EnvironmentConfigStruct::script)
 #endif

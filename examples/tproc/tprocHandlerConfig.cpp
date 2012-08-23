@@ -112,14 +112,14 @@ bool Configuration::test() const
 	std::vector<cmdbind::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin();
 	while (itr != m_commands.end())
 	{
-		langbind::PeerFormFunction tf;
+		langbind::TransactionFunctionR tf;
 #if WITH_LUA
 		langbind::LuaScriptInstanceR li;
 		if (gctx->getLuaScriptInstance( itr->m_procname, li))
 		{}
 		else
 #endif
-		if (gctx->getPeerFormFunction( itr->m_procname, tf))
+		if (gctx->getTransactionFunction( itr->m_procname, tf))
 		{}
 		else
 		{

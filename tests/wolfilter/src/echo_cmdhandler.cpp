@@ -39,176 +39,43 @@
 #include <stdexcept>
 #include "cmdbind/commandHandler.hpp"
 
-EchoCommandHandler::EchoCommandHandler()
-	:m_state(Init)
-	,m_outputitr(0)
-	,m_inpos(0)
-	,m_cmd(0)
-	,m_taglevel(0){}
+using namespace _Wolframe;
+using namespace _Wolframe::test;
 
-void EchoCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
+EchoTransactionResult::EchoTransactionResult( const EchoTransactionResult& o)
+	:langbind::TransactionFunction::Result(o)
+	,m_itemar(o.m_itemar)
+	,m_itemitr(m_itemar.begin()){}
+
+bool EchoTransactionResult::getNext( ElementType& type, langbind::TypedFilterBase::Element& element)
 {
-	m_in.set( buf, allocsize);
+	if (m_itemitr == m_itemar.end()) return false;
+	type = m_itemitr->first;
+	element = langbind::TypedFilterBase::Element( m_itemitr->second);
+	++m_itemitr;
+	return true;
 }
 
-void EchoCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
+EchoTransactionInput::EchoTransactionInput( const EchoTransactionInput& o)
+	:langbind::TransactionFunction::Input(o)
+	,m_result(o.m_result){}
+
+bool EchoTransactionInput::print( ElementType type, const Element& element)
 {
-	m_out.set( buf, size);
-	m_out.setPos( pos);
+	EchoTransactionResult::Item item( type, element.tostring());
+	m_result.m_itemar.push_back( item);
+	m_result.m_itemitr = m_result.m_itemar.begin();
+	return true;
 }
 
-cmdbind::CommandHandler::Operation EchoCommandHandler::nextOperation()
+langbind::TransactionFunction::InputR EchoTransactionFunction::getInput() const
 {
-	char* cc;
-	char* ee;
-
-	for (;;)
-	{
-		switch (m_state)
-		{
-			case Init:
-				m_state = ParseCommand;
-				/*no break here!*/
-
-			case ParseCommand:
-				if (m_inpos >= m_in.pos()) return cmdbind::CommandHandler::READ;
-				m_cmd = m_in.charptr()[ m_inpos++];
-				if (m_cmd == '\n') continue;
-				if (m_cmd < ' ' && m_cmd >= 0) throw std::runtime_error("illegal control character or null byte in command");
-				m_state = Process;
-				/*no break here!*/
-
-			case Process:
-				cc = m_in.charptr() + m_inpos;
-				ee = m_in.charptr() + m_in.pos();
-				if (cc == ee) return cmdbind::CommandHandler::READ;
-
-				while (cc < ee)
-				{
-					if (*cc < ' ' && *cc > '\0')
-					{
-						if (*cc == '\n')
-						{
-							++cc;
-							m_inpos = cc - m_in.charptr();
-							bool res = executeCommand( m_cmd, m_inputline);
-							m_state = ParseCommand;
-							m_inputline.clear();
-							if (res)
-							{
-								m_state = OnTerminate;
-							}
-							else
-							{
-								flushOutput();
-								if (m_outputline.size() > 0) m_state = FlushOutput;
-							}
-							break;
-						}
-						else
-						{
-							throw std::runtime_error( "illegal control character passed to command handler");
-						}
-					}
-					else
-					{
-						m_inputline.push_back( *cc);
-					}
-					++cc;
-				}
-				m_inpos = cc - m_in.charptr();
-				continue;
-
-			case FlushOutput:
-				flushOutput();
-				if (m_outputline.size() == 0) m_state = Process;
-				return cmdbind::CommandHandler::WRITE;
-
-			case OnTerminate:
-				flushOutput();
-				if (m_outputline.size() == 0 && m_out.pos() == 0) return cmdbind::CommandHandler::CLOSE;
-				return cmdbind::CommandHandler::WRITE;
-		}
-	}
+	return langbind::TransactionFunction::InputR( new EchoTransactionInput());
 }
 
-void EchoCommandHandler::putInput( const void* begin, std::size_t bytesTransferred)
+langbind::TransactionFunction::ResultR EchoTransactionFunction::execute( const langbind::TransactionFunction::Input* inputi) const
 {
-	std::size_t startidx = (const char*)begin - m_in.charptr();
-	if (startidx != 0) throw std::logic_error( "unexpected start of input in command handler");
-	m_in.setPos( bytesTransferred + startidx);
-	m_inpos = 0;
-}
-
-void EchoCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
-{
-	m_inpos = 0;
-	m_in.setPos(0);
-	begin = m_in.ptr();
-	maxBlockSize = m_in.size();
-}
-
-void EchoCommandHandler::flushOutput()
-{
-	std::size_t restoutput = m_outputline.size() - m_outputitr;
-	if (restoutput)
-	{
-		std::size_t restbuf = m_out.restsize();
-		if (restbuf < restoutput)
-		{
-			restoutput = restbuf;
-		}
-		std::memcpy( m_out.charptr() + m_out.pos(), m_outputline.c_str() + m_outputitr, restoutput);
-		m_out.incr( restoutput);
-
-		m_outputitr += restoutput;
-		if (m_outputitr == m_outputline.size())
-		{
-			m_outputitr = 0;
-			m_outputline.clear();
-		}
-	}
-}
-
-void EchoCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
-{
-	begin = m_out.ptr();
-	bytesToTransfer = m_out.pos();
-	m_out.setPos(0);
-}
-
-void EchoCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
-{
-	nofBytes = m_in.pos() - m_inpos;
-	begin = (const void*)(m_in.charptr() + m_inpos);
-}
-
-void EchoCommandHandler::pushResult( char cmd, const std::string& arg)
-{
-	m_outputline.clear();
-	m_outputline.push_back(cmd);
-	m_outputline.append(arg);
-	m_outputline.push_back('\n');
-}
-
-bool EchoCommandHandler::executeCommand( char cmd, const std::string& arg)
-{
-	switch (cmd)
-	{
-		case '<':
-			--m_taglevel;
-			pushResult( cmd, arg);
-			return (m_taglevel == 0);
-		case '>':
-			++m_taglevel;
-			pushResult( cmd, arg);
-			return false;
-		case '@':
-		case '=':
-			pushResult( cmd, arg);
-			return false;
-		default:
-			throw std::runtime_error( "unknown command for echo command handler");
-	}
+	const EchoTransactionInput* input = dynamic_cast<const EchoTransactionInput*>( inputi);
+	return langbind::TransactionFunction::ResultR( new EchoTransactionResult( input->m_result));
 }
 

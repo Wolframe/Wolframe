@@ -1,7 +1,7 @@
 
 function run()
 	t = input:table()
-	r = formfunction("transaction")( t)
+	r = transaction("echo_transaction")( t)
 	output:print( r:table())
 end
 

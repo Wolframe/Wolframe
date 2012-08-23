@@ -60,11 +60,6 @@ static char* g_gtest_ARGV[2] = {0, 0};
 
 using namespace _Wolframe;
 
-static cmdbind::CommandHandlerR createEchoCommandHandler()
-{
-	return cmdbind::CommandHandlerR( new test::EchoCommandHandler());
-}
-
 static module::ModulesDirectory m_modulesDirectory;
 
 ///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
@@ -81,8 +76,8 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 
 	langbind::Filter flt;
 	if (!gct->getFilter( "token", flt)) throw std::runtime_error( "filter 'token' not found");
-	langbind::PeerFunction func( flt.outputfilter(), flt.inputfilter(), createEchoCommandHandler);
-	gct->definePeerFunction( "echo_peer", func);
+	langbind::TransactionFunctionR func( new EchoTransactionFunction());
+	gct->defineTransactionFunction( "echo_transaction", func);
 
 	boost::filesystem::path refpath( boost::filesystem::current_path() / "temp");
 	cmdline.loadGlobalContext( refpath.string(), m_modulesDirectory);

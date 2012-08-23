@@ -34,6 +34,7 @@
 ///\brief Implementation of the options of a wolfilter call
 #include "wolfilterCommandLine.hpp"
 #include "langbind/appGlobalContext.hpp"
+#include "langbind/appConfig_struct.hpp"
 #include "moduleInterface.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -44,7 +45,47 @@
 #include "utils/miscUtils.hpp"
 
 using namespace _Wolframe;
-using namespace config;
+using namespace _Wolframe::config;
+
+
+struct DDLFormOption :public langbind::DDLFormConfigStruct
+{
+	DDLFormOption( const std::string& src)
+	{
+		const char* cc = std::strchr( src.c_str(), '#');
+		if (cc)
+		{
+			DDL = std::string( src.c_str(), cc-src.c_str());
+			sourcepath = std::string( cc+1);
+		}
+		else
+		{
+			std::string ext = utils::getFileExtension( src);
+			if (!ext.size()) throw std::runtime_error( "no DDL specified (file extension missing) for form file");
+
+			DDL = std::string( ext.c_str()+1);
+			sourcepath = src;
+		}
+	}
+};
+
+struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStruct
+{
+	TransactionFunctionOption( const std::string& src)
+	{
+		std::string::const_iterator si = src.begin(), se = src.end();
+		if (!utils::parseNextToken( name, si, se))
+		{
+			throw std::runtime_error( "illegal transaction function option");
+		}
+		if (!utils::parseNextToken( interpreter, si, se))
+		{
+			throw std::runtime_error( "illegal transaction function option");
+		}
+		call.insert( call.end(), si, se);
+	}
+};
+
 
 WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 	:m_printhelp(false)
@@ -89,21 +130,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 		std::vector<std::string>::const_iterator itr=formparams.begin(), end=formparams.end();
 		for (; itr != end; ++itr)
 		{
-			FormParam formparam;
-			const char* cc = std::strchr( itr->c_str(), '#');
-			if (cc)
-			{
-				formparam.ddlname = std::string( itr->c_str(), cc-itr->c_str());
-				formparam.filename = std::string( cc+1);
-			}
-			else
-			{
-				std::string ext = utils::getFileExtension( *itr);
-				if (!ext.size()) throw std::runtime_error( "no DDL specified (file extension missing) for form file");
-
-				formparam.ddlname = std::string( ext.c_str()+1);
-				formparam.filename = *itr;
-			}
+			DDLFormOption formparam( *itr);
 			m_forms.push_back( formparam);
 		}
 	}
@@ -113,15 +140,8 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 		std::vector<std::string>::const_iterator itr=functions.begin(), end=functions.end();
 		for (; itr != end; ++itr)
 		{
-			PeerFormFunctionParam pfp;
-			std::vector<std::string> pp;
-			utils::splitString( pp, *itr, ":");
-			if (pp.size() != 4) throw std::runtime_error( "function definition expected as <name>:<function>:<in-form>:<out-form>");
-			pfp.name = pp[0];
-			pfp.functionname = pp[1];
-			pfp.inputformname = pp[2];
-			pfp.outputformname = pp[3];
-			m_peerformfunctions.push_back( pfp);
+			TransactionFunctionOption tf(*itr);
+			m_transactions.push_back( tf);
 		}
 	}
 	if (vmap.count( "lua-import")) m_luaimports = vmap["lua-import"].as<std::vector<std::string> >();
@@ -212,14 +232,14 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath, 
 		}
 	}
 	{
-		std::vector<FormParam>::const_iterator itr,end;
+		std::vector<langbind::DDLFormConfigStruct>::const_iterator itr,end;
 		itr = forms().begin();
 		end = forms().end();
 		for (; itr != end; ++itr)
 		{
-			std::string formpath( canonicalPath( itr->filename, referencePath));
+			std::string formpath( canonicalPath( itr->sourcepath, referencePath));
 			ddl::CompilerInterfaceR ci;
-			if (!gct->getDDLCompiler( itr->ddlname, ci))
+			if (!gct->getDDLCompiler( itr->DDL, ci))
 			{
 				throw std::runtime_error( "Unknown DDL in form parameter");
 			}
@@ -240,23 +260,6 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath, 
 				}
 
 			}
-		}
-	}
-	{
-		std::vector<PeerFormFunctionParam>::const_iterator itr,end;
-		itr = peerformfunctions().begin();
-		end = peerformfunctions().end();
-		for (; itr != end; ++itr)
-		{
-			langbind::PeerFunction pf;
-			langbind::DDLForm inform;
-			langbind::DDLForm outform;
-
-			if (!gct->getPeerFunction( itr->functionname, pf)) throw std::runtime_error( "Transaction function not found");
-			if (!gct->getForm( itr->inputformname, inform)) throw std::runtime_error( "Parameter description of transaction function not found");
-			if (!gct->getForm( itr->outputformname, outform)) throw std::runtime_error( "Return value description of transaction function not found");
-
-			gct->definePeerFormFunction( itr->name, langbind::PeerFormFunction( pf, inform, outform));
 		}
 	}
 }

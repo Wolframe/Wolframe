@@ -68,22 +68,20 @@ struct FilterConfigStruct
 	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
-struct PeerFunctionConfigStruct
+struct TransactionTypeConfigStruct
 {
 	std::string name;						//< name of the peer function
-	std::string filter;						//< name of the filter defining the command protocol reader/writer
 	std::string modulepath;						//< path of the command handler module (cmdbind::CommandHandler)
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
-struct PeerFormFunctionConfigStruct
+struct TransactionFunctionConfigStruct
 {
-	std::string name;						//< name of the peer form function
-	std::string peerfunc;						//< name of the peer function
-	std::string inputform;						//< name of the input form (parameter)
-	std::string outputform;						//< name of the output form (return value)
+	std::string name;						//< name of the function
+	std::string interpreter;					//< name of the transaction function interpreter
+	std::string call;						//< the source of the transaction function
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();
@@ -112,8 +110,8 @@ struct EnvironmentConfigStruct
 	std::vector<DDLCompilerConfigStruct> DDL;			//< definitions of DDLs
 	std::vector<DDLFormConfigStruct> form;				//< definitions of forms
 	std::vector<FilterConfigStruct> filter;				//< definitions of filters
-	std::vector<PeerFunctionConfigStruct> peerfunction;		//< definitions of peer functions
-	std::vector<PeerFormFunctionConfigStruct> peerformfunction;	//< definitions of peer form functions
+	std::vector<TransactionTypeConfigStruct> transactiontype;	//< definitions of transaction types
+	std::vector<TransactionFunctionConfigStruct> transaction;	//< definitions of transaction function
 	std::vector<ScriptCommandConfigStruct> script;			//< definitions of script functions
 	std::vector<FormFunctionConfigStruct> formfunction;		//< definitions of the form functions
 

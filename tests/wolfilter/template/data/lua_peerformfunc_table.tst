@@ -9,5 +9,5 @@ scriptopt="--script $luascript"
 testcmd="$formopt $funcopt $scriptopt run"		# command to execute by the test
 testscripts="$luascript $formname"			# list of scripts of the test
 docin=employee_assignment_print				# input document name
-docout=lua_ddlform_table				# output document name
+docout=$testname					# output document name
 . ./output_tst_all.sh

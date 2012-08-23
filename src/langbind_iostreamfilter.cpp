@@ -266,7 +266,7 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 #endif
 	{
 		FormFunction func;
-		if (gc->getFormFunction( proc.c_str(), func))
+		if (gc->getFormFunction( proc, func))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
@@ -288,7 +288,7 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 	}
 	{
 		DDLForm df;
-		if (gc->getForm( proc.c_str(), df))
+		if (gc->getForm( proc, df))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
@@ -309,20 +309,18 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		}
 	}
 	{
-		PeerFormFunction func;
-		if (gc->getPeerFormFunction( proc.c_str(), func))
+		TransactionFunctionR func;
+		if (gc->getTransactionFunction( proc, func))
 		{
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
-			PeerFormFunctionClosure closure( func);
+			TransactionFunctionClosure closure( func);
 			closure.init( inp);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			serialize::DDLStructSerializer res( closure.result().structure());
-			res.init( outp, serialize::Context::None);
-
+			RedirectFilterClosure res( closure.result(), outp);
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());

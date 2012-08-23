@@ -41,68 +41,53 @@
 namespace _Wolframe {
 namespace test {
 
-class EchoCommandHandler :public cmdbind::CommandHandler
+class EchoTransactionResult
+	:public langbind::TransactionFunction::Result
 {
 public:
-	///\brief Default constructor
-	EchoCommandHandler();
+	EchoTransactionResult(){}
+	EchoTransactionResult( const EchoTransactionResult& o);
 
-	///\brief Destructor
-	virtual ~EchoCommandHandler(){}
+	virtual ~EchoTransactionResult(){}
 
-	///\brief Implement CommandHandler::setInputBuffer(void*,std::size_t)
-	virtual void setInputBuffer( void* buf, std::size_t allocsize);
-
-	///\brief Implement CommandHandler::setOutputBuffer(void*,std::size_t,std::size_t)
-	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
-
-	///\brief Implement CommandHandler::nextOperation()
-	virtual Operation nextOperation();
-
-	///\brief Implement CommandHandler::putInput(const void*,std::size_t)
-	virtual void putInput( const void* begin, std::size_t bytesTransferred);
-
-	///\brief Implement CommandHandler::getInputBlock( void*&,std::size_t&)
-	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
-
-	///\brief Implement CommandHandler::getOutput(const void*&,std::size_t&)
-	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
-
-	///\brief Implement CommandHandler::getDataLeft(const void*&,std::size_t&)
-	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
-
-protected:
-	virtual bool executeCommand( char cmd, const std::string& arg);
-
-	virtual void pushResult( char cmd, const std::string& arg);
+	virtual bool getNext( ElementType& type, langbind::TypedFilterBase::Element& element);
 
 private:
-	void flushOutput();
+	friend class EchoTransactionInput;
+	typedef std::pair< langbind::InputFilter::ElementType, std::string> Item;
+	typedef std::vector<Item> ItemArray;
+	ItemArray m_itemar;
+	ItemArray::const_iterator m_itemitr;
+};
 
-	enum State
-	{
-		Init,
-		ParseCommand,
-		Process,
-		FlushOutput,
-		OnTerminate
-	};
 
-	static const char* stateName( State i)
-	{
-		const char* ar[] = {"Init","ParseCommand","Process","FlushOutput","OnTerminate"};
-		return ar[(int)i];
-	}
+class EchoTransactionInput
+	:public langbind::TransactionFunction::Input
+{
+public:
+	EchoTransactionInput(){}
+	EchoTransactionInput( const EchoTransactionInput& o);
+	virtual ~EchoTransactionInput(){}
+
+	virtual bool print( ElementType type, const Element& element);
+
 private:
-	State m_state;
-	protocol::InputBlock m_in;
-	protocol::OutputBlock m_out;
-	std::string m_inputline;
-	std::string m_outputline;
-	std::size_t m_outputitr;
-	std::size_t m_inpos;
-	char m_cmd;
-	int m_taglevel;
+	friend class EchoTransactionFunction;
+	EchoTransactionResult m_result;
+};
+
+
+class EchoTransactionFunction
+	:public langbind::TransactionFunction
+{
+public:
+	EchoTransactionFunction( const TransactionFunction& o);
+	EchoTransactionFunction(){}
+	virtual ~EchoTransactionFunction(){}
+
+	virtual langbind::TransactionFunction::InputR getInput() const;
+
+	virtual langbind::TransactionFunction::ResultR execute( const langbind::TransactionFunction::Input* inputi) const;
 };
 
 }}//namespace
