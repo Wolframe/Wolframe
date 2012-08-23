@@ -42,6 +42,7 @@ Project Wolframe.
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "cmdbind/commandHandler.hpp"
+#include "database/preparedStatement.hpp"
 #include <stack>
 #include <string>
 #include <algorithm>
@@ -324,6 +325,21 @@ public:
 
 private:
 	std::map<std::string,TransactionFunctionR> m_map;
+};
+
+///\class PreparedStatementHandlerMap
+///\brief Map of available prepared statement handler for a database
+class PreparedStatementHandlerMap
+{
+public:
+	PreparedStatementHandlerMap(){}
+	~PreparedStatementHandlerMap(){}
+
+	void definePreparedStatementHandler( const std::string& name, const std::string& dbname, db::CreatePreparedStatementHandlerFunc f);
+	bool getPreparedStatementHandler( const std::string& name, db::PreparedStatementHandlerR& rt) const;
+
+private:
+	std::map<std::string,std::pair<db::CreatePreparedStatementHandlerFunc, std::string> > m_map;
 };
 
 

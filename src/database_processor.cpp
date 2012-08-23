@@ -32,7 +32,9 @@
 ************************************************************************/
 ///\brief Implementation of the processor of database commands
 ///\file src/database_processor.cpp
+#include "database/preparedStatement.hpp"
 #include "database/processor.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "filter/token_filter.hpp"
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/cstringiterator.hpp"
@@ -495,7 +497,8 @@ bool FunctionCall::hasResultReference() const
 }
 
 TransactionFunction::TransactionFunction( const TransactionFunction& o)
-	:m_resultname(o.m_resultname)
+	:m_handlername(o.m_handlername)
+	,m_resultname(o.m_resultname)
 	,m_call(o.m_call)
 	,m_tagmap(o.m_tagmap){}
 
@@ -508,7 +511,8 @@ static bool isAlphaNumeric( char ch)
 	return false;
 }
 
-TransactionFunction::TransactionFunction( const std::string& src)
+TransactionFunction::TransactionFunction( const std::string& handler, const std::string& src)
+	:m_handlername(handler)
 {
 	std::string::const_iterator ii = src.begin(), ee = src.end();
 	for (; ii != ee; ++ii)
@@ -702,7 +706,7 @@ bool TransactionResult::getNext( ElementType& type, Element& element)
 {
 	if (m_itemitr == m_itemar.end()) return false;
 	type = m_itemitr->first;
-	element = m_itemitr->second;
+	element = langbind::TypedFilterBase::Element( m_itemitr->second);
 	++m_itemitr;
 	return true;
 }
@@ -718,17 +722,145 @@ langbind::TransactionFunction::InputR TransactionFunction::getInput() const
 	return rt;
 }
 
-langbind::TransactionFunction::ResultR TransactionFunction::execute( DatabaseInterface* dbi, const langbind::TransactionFunction::Input* inputi) const
+typedef std::vector<std::size_t> ResultRow;
+
+///\brief Execute one single command of the transaction
+static void getCommandResults( PreparedStatementHandler* dbi, std::vector<ResultRow>& resultar, std::string& resultstr)
 {
+	ResultRow res;
+	std::size_t ii, nn=dbi->nofColumns();
+	do
+	{
+		for (ii=0; ii<nn; ++ii)
+		{
+			const char* resstr = dbi->get( ii);
+			if (resstr)
+			{
+				res.push_back( resultstr.size());
+				resultstr.append( resstr);
+				resultstr.push_back( '\0');
+			}
+			else
+			{
+				res.push_back( 0);
+			}
+		}
+		resultar.push_back( res);
+		res.clear();
+	}
+	while (dbi->next());
+	if (dbi->getLastError()) throw std::logic_error( "fetch next result in transaction failed");
+}
+
+///\brief Print the result of a command if it is named
+static void printCommandResult( PreparedStatementHandler* dbi, const FunctionCall& call, TransactionResult* result, const std::vector<ResultRow>& resultar, const std::string& resultstr)
+{
+	if (!call.resultname().empty())
+	{
+		// Get the result column names. They are printed as tag names
+		std::vector<std::string> columnar;
+		columnar.clear();
+		std::size_t ii, nn=dbi->nofColumns();
+		for (ii=0; ii<nn; ++ii)
+		{
+			const char* colname = dbi->columnName( ii);
+			columnar.push_back( colname);
+		}
+
+		// Print the result rows
+		std::vector<ResultRow>::const_iterator ri = resultar.begin(), re = resultar.end();
+		for (; ri != re; ++ri)
+		{
+			result->openTag( call.resultname());
+			for (ii=0; ii<nn; ++ii)
+			{
+				if ((*ri)[ii])
+				{
+					result->openTag( columnar[ ii]);
+					result->pushValue( resultstr.c_str() + (*ri)[ii]);
+					result->closeTag();
+				}
+			}
+			result->closeTag();
+		}
+	}
+}
+
+// Bind the arguments that are input node references:
+static void bindNodeReferenceArguments( PreparedStatementHandler* dbi, const FunctionCall& call, const TransactionInput* inputst, const Structure::Node& selectornode)
+{
+	std::vector<Path>::const_iterator pi=call.arg().begin(), pe=call.arg().end();
+	for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
+	{
+		if (!pi->resultReference())
+		{
+			std::vector<Structure::Node> param;
+			pi->selectNodes( *inputst, selectornode, param);
+			if (param.size() > 1)
+			{
+				std::vector<Structure::Node>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
+				for (; gi != ge; ++gi)
+				{
+					if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
+				}
+				const char* value = inputst->nodevalue( *gs);
+				if (!dbi->bind( argidx, value)) throw std::logic_error( "bind paramater in transaction failed");
+			}
+			else if (param.size() == 0)
+			{
+				if (!dbi->bind( argidx, 0)) throw std::logic_error( "bind NULL parameter in transaction failed");
+			}
+			else
+			{
+				const char* value = inputst->nodevalue( param[0]);
+				if (!dbi->bind( argidx, value)) throw std::logic_error( "bind paramater in transaction failed");
+			}
+		}
+	}
+}
+
+// Bind the arguments that are result references (one row):
+static void bindResultRowReferenceArguments( PreparedStatementHandler* dbi, const FunctionCall& call, const ResultRow& row, const std::string& resultstr)
+{
+	std::vector<Path>::const_iterator pi=call.arg().begin(), pe=call.arg().end();
+	for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
+	{
+		std::size_t residx = pi->resultReference();
+		if (residx)
+		{
+			std::size_t resstridx = row[ residx -1];
+			if (resstridx)
+			{
+				if (!dbi->bind( argidx, resultstr.c_str() + resstridx)) throw std::logic_error( "bind paramater in transaction failed");
+			}
+			else
+			{
+				if (!dbi->bind( argidx, 0)) throw std::logic_error( "bind paramater in transaction failed");
+			}
+		}
+	}
+}
+
+
+langbind::TransactionFunction::ResultR TransactionFunction::execute( const langbind::TransactionFunction::Input* inputi) const
+{
+	PreparedStatementHandler* dbi = 0;
 	try
 	{
+		PreparedStatementHandlerR dbiref;
+		langbind::GlobalContext* gct = langbind::getGlobalContext();
+		if (!gct->getPreparedStatementHandler( m_handlername, dbiref))
+		{
+			throw std::runtime_error( std::string("database prepared statement handler '") + m_handlername + "' not defined");
+		}
+		dbi = dbiref.get();
+
 		const TransactionInput* inputst = dynamic_cast<const TransactionInput*>( inputi);
 		if (!inputst) throw std::logic_error( "function called with unknown input type");
 
 		TransactionResult* result = new TransactionResult();
 		langbind::TransactionFunction::ResultR rt( result);
 
-		typedef std::vector<std::size_t> ResultRow;
 		std::string resultstr,resultstr2;
 		std::vector<ResultRow> resultar,resultar2;
 
@@ -758,35 +890,7 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( DatabaseInt
 			std::vector<Structure::Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 			for (; vi != ve; ++vi)
 			{
-				// Expand the arguments that are input node references:
-				std::vector<Path>::const_iterator pi=ci->arg().begin(), pe=ci->arg().end();
-				for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
-				{
-					if (!pi->resultReference())
-					{
-						std::vector<Structure::Node> param;
-						pi->selectNodes( *inputst, *vi, param);
-						if (param.size() > 1)
-						{
-							std::vector<Structure::Node>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
-							for (; gi != ge; ++gi)
-							{
-								if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
-							}
-							const char* value = inputst->nodevalue( *gs);
-							if (!dbi->bind( argidx, value)) throw std::logic_error( "bind paramater in transaction failed");
-						}
-						else if (param.size() == 0)
-						{
-							if (!dbi->bind( argidx, 0)) throw std::logic_error( "bind NULL parameter in transaction failed");
-						}
-						else
-						{
-							const char* value = inputst->nodevalue( param[0]);
-							if (!dbi->bind( argidx, value)) throw std::logic_error( "bind paramater in transaction failed");
-						}
-					}
-				}
+				bindNodeReferenceArguments( dbi, *ci, inputst, *vi);
 
 				// Expand the arguments that are result references:
 				if (ci->hasResultReference())
@@ -794,102 +898,32 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( DatabaseInt
 					std::vector<ResultRow>::const_iterator ri = resultar.begin(), re = resultar.end();
 					for (; ri != re; ++ri)
 					{
-						for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
+						bindResultRowReferenceArguments( dbi, *ci, *ri, resultstr);
+						if (!dbi->execute())
 						{
-							std::size_t residx = pi->resultReference();
-							if (residx)
-							{
-								std::size_t resstridx =  (*ri)[ residx -1];
-								if (resstridx)
-								{
-									if (!dbi->bind( argidx, resultstr.c_str() + resstridx)) throw std::logic_error( "bind paramater in transaction failed");
-								}
-								else
-								{
-									if (!dbi->bind( argidx, 0)) throw std::logic_error( "bind paramater in transaction failed");
-								}
-							}
+							throw std::logic_error( "execute database function in transaction failed");
 						}
-						if (!dbi->execute()) throw std::logic_error( "execute database function in transaction failed");
-						ResultRow res;
-						std::size_t ii, nn=dbi->nofColumns();
-						while (dbi->next())
+						std::vector<FunctionCall>::const_iterator nextcall = ci + 1;
+						if (!ci->resultname().empty() || (nextcall != ce && nextcall->hasResultReference()))
 						{
-							for (ii=0; ii<nn; ++ii)
-							{
-								const char* resstr = dbi->get( ii);
-								if (resstr)
-								{
-									res.push_back( resultstr2.size());
-									resultstr2.append( resstr);
-									resultstr2.push_back( '\0');
-								}
-								else
-								{
-									res.push_back( 0);
-								}
-							}
-							resultar.push_back( res);
-							res.clear();
+							getCommandResults( dbi, resultar2, resultstr2);
 						}
-						if (dbi->getLastError()) throw std::logic_error( "fetch next result in transaction failed");
 					}
 				}
 				else
 				{
-					if (!dbi->execute()) throw std::logic_error( "execute database call in transaction failed");
-					ResultRow res;
-					std::size_t ii, nn=dbi->nofColumns();
-					while (dbi->next())
+					// If we do not have result references then the command is complete and executed once
+					if (!dbi->execute())
 					{
-						for (ii=0; ii<nn; ++ii)
-						{
-							const char* resstr = dbi->get( ii);
-							if (resstr)
-							{
-								res.push_back( resultstr2.size());
-								resultstr2.append( resstr);
-								resultstr2.push_back( '\0');
-							}
-							else
-							{
-								res.push_back( 0);
-							}
-						}
-						resultar.push_back( res);
-						res.clear();
+						throw std::logic_error( "execute database function in transaction failed");
 					}
-					if (dbi->getLastError()) throw std::logic_error( "fetch next result in transaction failed");
+					std::vector<FunctionCall>::const_iterator nextcall = ci + 1;
+					if (!ci->resultname().empty() || (nextcall != ce && nextcall->hasResultReference()))
+					{
+						getCommandResults( dbi, resultar2, resultstr2);
+					}
 				}
-
-				// print the result if it is named:
-				if (!ci->resultname().empty())
-				{
-					std::vector<std::string> columnar;
-					result->openTag( ci->resultname());
-					columnar.clear();
-					std::size_t ii, nn=dbi->nofColumns();
-					for (ii=0; ii<nn; ++ii)
-					{
-						const char* colname = dbi->columnName( ii);
-						columnar.push_back( colname);
-					}
-
-					std::vector<ResultRow>::const_iterator ri = resultar.begin(), re = resultar.end();
-					for (; ri != re; ++ri)
-					{
-						for (ii=0; ii<nn; ++ii)
-						{
-							if ((*ri)[ii])
-							{
-								result->openTag( columnar[ ii]);
-								result->pushValue( resultstr2.c_str() + (*ri)[ii]);
-								result->closeTag();
-							}
-						}
-					}
-					result->closeTag();
-				}
+				printCommandResult( dbi, *ci, result, resultar2, resultstr2);
 			}
 		}
 		if (!dbi->commit()) throw std::logic_error( "commit transaction failed");
@@ -897,15 +931,16 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( DatabaseInt
 		{
 			result->closeTag();
 		}
+		result->finalize();
 		return rt;
 	}
 	catch (const std::exception& e)
 	{
-		const char* dberr = dbi->getLastError();
+		const char* dberr = (dbi)?dbi->getLastError():"could not get database interface";
 		if (dberr)
 		{
 			dbi->rollback();
-			throw std::runtime_error( std::string("error in database transaction: ") + e.what() + "(" + dbi->getLastError() + ")");
+			throw std::runtime_error( std::string("error in database transaction: ") + e.what() + "(" + dberr + ")");
 		}
 		else
 		{

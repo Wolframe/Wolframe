@@ -12,16 +12,10 @@ bind( 2, '2' );
 bind( 3, '3' );
 bind( 4, '' );
 execute();
-nofColumns();
-next();
-getLastError();
 bind( 1, '11' );
 bind( 2, '' );
 bind( 3, '33' );
 bind( 4, '44' );
 execute();
-nofColumns();
-next();
-getLastError();
 commit();
 **end

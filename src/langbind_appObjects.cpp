@@ -425,6 +425,20 @@ bool TransactionFunctionMap::getTransactionFunction( const std::string& name, Tr
 	return getObject( m_map, name, rt);
 }
 
+void PreparedStatementHandlerMap::definePreparedStatementHandler( const std::string& name, const std::string& dbname, db::CreatePreparedStatementHandlerFunc f)
+{
+	std::pair<db::CreatePreparedStatementHandlerFunc,std::string> func(f,dbname);
+	defineObject( m_map, name, func);
+}
+
+bool PreparedStatementHandlerMap::getPreparedStatementHandler( const std::string& name, db::PreparedStatementHandlerR& rt) const
+{
+	std::pair<db::CreatePreparedStatementHandlerFunc,std::string> func;
+	if (!getObject( m_map, name, func)) return false;
+	rt = func.first( func.second);
+	return true;
+}
+
 DDLCompilerMap::DDLCompilerMap()
 {
 	ddl::CompilerInterfaceR simpleformCompiler( new ddl::SimpleFormCompiler());

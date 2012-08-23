@@ -73,7 +73,10 @@ bool ToStringFilter::print( ElementType type, const Element& element)
 				{
 					m_indent.resize( m_indent.size() - m_indentstr.size());
 				}
-				m_content.push_back( '\n');
+				if (m_lasttype != CloseTag)
+				{
+					m_content.push_back( '\n');
+				}
 				m_content.append( m_indent);
 				m_content.append( "}\n");
 			}

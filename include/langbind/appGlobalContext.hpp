@@ -50,6 +50,7 @@ class GlobalContext
 	:public FilterMap
 	,public DDLFormMap
 	,public TransactionFunctionMap
+	,public PreparedStatementHandlerMap
 	,public DDLCompilerMap
 	,public FormFunctionMap
 #if WITH_LUA

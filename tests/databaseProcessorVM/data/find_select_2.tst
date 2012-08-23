@@ -10,8 +10,5 @@ start( 'run' );
 bind( 1, '1' );
 bind( 2, '2' );
 execute();
-nofColumns();
-next();
-getLastError();
 commit();
 **end

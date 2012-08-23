@@ -9,8 +9,5 @@ begin();
 start( 'run' );
 bind( 1, '1' );
 execute();
-nofColumns();
-next();
-getLastError();
 commit();
 **end

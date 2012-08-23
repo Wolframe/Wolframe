@@ -33,12 +33,16 @@
 ///\file testWolfilter.cpp
 ///\brief Test program for wolfilter like stdin/stdout mapping
 #include "database/processor.hpp"
+#include "database/preparedStatement.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
 #include "filter/token_filter.hpp"
 #include "filter/textwolf_filter.hpp"
 #include "filter/typingfilter.hpp"
+#include "filter/tostringfilter.hpp"
+#include "utils/miscUtils.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -55,9 +59,116 @@ static char* g_gtest_ARGV[2] = {0, 0};
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-struct DatabaseCommandLog :public DatabaseInterface
+static std::size_t getResultIndex( const std::string& testname)
 {
-	DatabaseCommandLog(){}
+	static std::map<std::string, std::size_t> g_resultitrmap;
+	static boost::mutex g_resultitrmap_mutex;
+
+	boost::interprocess::scoped_lock<boost::mutex> lock(g_resultitrmap_mutex);
+	return ++g_resultitrmap[ testname];
+}
+
+static std::vector<std::vector<std::string> > readResultFile( boost::filesystem::path& path)
+{
+	char buf;
+	std::fstream ff;
+	std::string line;
+	std::vector< std::vector<std::string> > rt;
+	ff.open( path.string().c_str(), std::ios::in);
+	while (ff.read( &buf, sizeof(buf)))
+	{
+		if (buf == '\n')
+		{
+			std::string tok;
+			std::string::const_iterator il = line.begin(), el = line.end();
+			std::vector<std::string> row;
+
+			while (utils::parseNextToken( tok, il, el))
+			{
+				row.push_back( tok);
+			}
+			rt.push_back( row);
+			line.clear();
+		}
+		else
+		{
+			line.push_back( buf);
+		}
+	}
+	if ((ff.rdstate() & std::ifstream::eofbit) == 0)
+	{
+		std::ostringstream msg;
+		msg << "failed to result from file: '" << path << "'";
+		throw std::runtime_error( msg.str());
+	}
+	ff.close();
+	return rt;
+}
+
+
+struct Result
+{
+public:
+	Result(){}
+	void load( std::size_t idx)
+	{
+		boost::filesystem::path path( boost::filesystem::current_path() / "temp" / (boost::lexical_cast<std::string>(idx) + ".result"));
+		if (utils::fileExists( path.string()))
+		{
+			m_data = readResultFile( path);
+			m_itr = m_data.begin();
+			if (m_itr == m_data.end())
+			{
+				throw std::runtime_error( "empty result");
+			}
+			m_cols = *m_itr++;
+		}
+		else
+		{
+			m_cols.clear();
+			m_data.clear();
+			m_itr = m_data.begin();
+		}
+	}
+
+	static void removeAll()
+	{
+		static boost::mutex this_mutex;
+		boost::interprocess::scoped_lock<boost::mutex> lock(this_mutex);
+
+		for (std::size_t idx=1; ;idx++)
+		{
+			boost::filesystem::path path( boost::filesystem::current_path() / "temp" / (boost::lexical_cast<std::string>(idx) + ".result"));
+			if (utils::fileExists( path.string()))
+			{
+				boost::filesystem::remove( path);
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+
+	bool next()					{if (m_itr != m_data.end()) ++m_itr; return (m_itr != m_data.end());}
+	unsigned int nofColumns()			{return m_cols.size();}
+	const char* columnName( std::size_t idx)	{return (idx >= m_cols.size())?0:m_cols[idx].c_str();}
+	const char* get( std::size_t idx)		{return (m_itr == m_data.end() || idx >= m_itr->size())?0:(*m_itr)[idx].c_str();}
+
+private:
+	typedef std::vector<std::string> Row;
+	std::vector<Row> m_data;
+	std::vector<Row>::const_iterator m_itr;
+	std::vector<std::string> m_cols;
+};
+
+
+class DatabaseCommandLog
+	:public PreparedStatementHandler
+{
+public:
+	DatabaseCommandLog( const std::string& name)
+		:m_testname(name){}
 
 	virtual bool begin()
 	{
@@ -98,38 +209,40 @@ struct DatabaseCommandLog :public DatabaseInterface
 
 	virtual bool execute()
 	{
+		m_res.load( getResultIndex( m_testname));
 		m_out << "execute();" << std::endl;
 		return true;
 	}
 
-	virtual unsigned int nofColumns()
+	virtual std::size_t nofColumns()
 	{
-		m_out << "nofColumns();" << std::endl;
-		return 0;
+		m_out << "nofColumns(); returns " << m_res.nofColumns() << std::endl;
+		return m_res.nofColumns();
 	}
 
 	virtual const char* columnName( std::size_t idx)
 	{
-		m_out << "columnName( " << idx << " );" << std::endl;
-		return 0;
+		m_out << "columnName( " << idx << " ); returns " << m_res.columnName( idx) << std::endl;
+		return m_res.columnName( idx);
 	}
 
 	virtual const char* getLastError()
 	{
-		m_out << "getLastError();" << std::endl;
+		m_out << "getLastError(); returns 0" << std::endl;
 		return 0;
 	}
 
 	virtual const char* get( std::size_t idx)
 	{
-		m_out << "get( " << idx << " );" << std::endl;
-		return 0;
+		m_out << "get( " << idx << " ); returns " << m_res.get( idx) << std::endl;
+		return m_res.get( idx);
 	}
 
 	virtual bool next()
 	{
-		m_out << "next();" << std::endl;
-		return 0;
+		bool rt = m_res.next();
+		m_out << "next(); returns " << rt << std::endl;
+		return rt;
 	}
 
 	std::string str()
@@ -142,22 +255,38 @@ struct DatabaseCommandLog :public DatabaseInterface
 		m_out.str("");
 	}
 private:
+	std::string m_testname;
 	std::ostringstream m_out;
+	Result m_res;
 };
 
-static DatabaseCommandLog g_databaseCommandLog;
+static std::map<std::string, PreparedStatementHandlerR> g_testoutput;
+static boost::mutex g_testoutput_mutex;
 
-struct TestTransactionFunction :public TransactionFunction
+static std::string getTestOutput( const std::string& testname)
 {
-	TestTransactionFunction( const std::string& src)
-		:TransactionFunction(src){}
+	boost::interprocess::scoped_lock<boost::mutex> lock(g_testoutput_mutex);
+	PreparedStatementHandlerR stm = g_testoutput[ testname];
+	DatabaseCommandLog* log = dynamic_cast<DatabaseCommandLog*>( stm.get());
+	return log->str();
+}
 
-	virtual langbind::TransactionFunction::ResultR execute( const langbind::TransactionFunction::Input* inp) const
-	{
-		DatabaseInterface* dbi = &g_databaseCommandLog;
-		return TransactionFunction::execute( dbi, inp);
-	}
-};
+static PreparedStatementHandlerR createPreparedStatementHandlerFunc( const std::string& testname)
+{
+	boost::interprocess::scoped_lock<boost::mutex> lock(g_testoutput_mutex);
+	PreparedStatementHandlerR rt( new DatabaseCommandLog( testname));
+	g_testoutput[ testname] = rt;
+	return rt;
+}
+
+///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
+static void loadGlobalContext( const std::string& testname)
+{
+	langbind::GlobalContext* gct = new langbind::GlobalContext();
+	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
+	std::string cmdname( "printcmd");
+	gct->definePreparedStatementHandler( cmdname, testname, &createPreparedStatementHandlerFunc);
+}
 
 class DatabaseProcessorVMTest : public ::testing::Test
 {
@@ -183,7 +312,7 @@ void pushTestInput( const langbind::TransactionFunction::InputR& input, std::str
 	langbind::TypedFilterBase::Element element;
 	int taglevel = 0;
 	while (inp.getNext( type, element))
-	{		
+	{
 		if (type == langbind::FilterBase::OpenTag)
 		{
 			taglevel++;
@@ -256,7 +385,9 @@ TEST_F( DatabaseProcessorVMTest, tests)
 	std::vector<std::string>::const_iterator itr=tests.begin(),end=tests.end();
 	for (testno=1; itr != end; ++itr,++testno)
 	{
+		Result::removeAll();
 		std::string testname = boost::filesystem::basename(*itr);
+
 		wtest::TestDescription td( *itr);
 		if (td.requires.size())
 		{
@@ -266,14 +397,25 @@ TEST_F( DatabaseProcessorVMTest, tests)
 		}
 
 		std::cerr << "processing test '" << testname << "'" << std::endl;
+		loadGlobalContext( testname);
 
-		g_databaseCommandLog.reset();
-		TestTransactionFunction program( td.config);
+		TransactionFunction program( "printcmd", td.config);
 		langbind::TransactionFunction::InputR input = program.getInput();
 		pushTestInput( input, td.input);
-		program.execute( input.get());
+		langbind::TransactionFunction::ResultR result = program.execute( input.get());
+		langbind::ToStringFilter* resultbuf = new langbind::ToStringFilter( "  ");
+		langbind::TypedOutputFilterR resultbufref( resultbuf);
+		langbind::RedirectFilterClosure redirect( result, resultbufref);
+		if (!redirect.call()) throw std::runtime_error( "to string conversion of database output failed");
 
-		if (td.expected != g_databaseCommandLog.str())
+		std::string output = getTestOutput( testname);
+		std::string resultstr = resultbuf->content();
+		if (resultstr.size())
+		{
+			output.append( "\n");
+			output.append( resultstr);
+		}
+		if (td.expected != output)
 		{
 			static boost::mutex mutex;
 			boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
@@ -281,7 +423,7 @@ TEST_F( DatabaseProcessorVMTest, tests)
 			// [2.6] Dump test contents to files in case of error
 			boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
 			std::fstream oo( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
-			oo.write( g_databaseCommandLog.str().c_str(), g_databaseCommandLog.str().size());
+			oo.write( output.c_str(), output.size());
 			if (oo.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
 			oo.close();
 
@@ -304,7 +446,7 @@ TEST_F( DatabaseProcessorVMTest, tests)
 
 			boost::this_thread::sleep( boost::posix_time::seconds( 3));
 		}
-		EXPECT_EQ( td.expected, g_databaseCommandLog.str());
+		EXPECT_EQ( td.expected, output);
 	}
 }
 

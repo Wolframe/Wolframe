@@ -45,34 +45,6 @@
 namespace _Wolframe {
 namespace db {
 
-struct DatabaseInterface
-{
-	virtual ~DatabaseInterface(){}
-	///\brief Begin transaction
-	virtual bool begin()=0;
-	///\brief Commit current transaction
-	virtual bool commit()=0;
-	///\brief Rollback current transaction
-	virtual bool rollback()=0;
-	///\brief Start new command statement
-	virtual bool start( const std::string& stmname)=0;
-	///\brief Bind parameter value on current command statement
-	virtual bool bind( std::size_t idx, const char* value)=0;
-	///\brief Execute instance of current statement
-	virtual bool execute()=0;
-	///\brief Get the number of columns of the last result
-	virtual unsigned int nofColumns()=0;
-	///\brief Get a column title of the last result
-	virtual const char* columnName( std::size_t idx)=0;
-	///\brief Get the last database error as string
-	virtual const char* getLastError()=0;
-	///\brief Get a column of the last result
-	virtual const char* get( std::size_t idx)=0;
-	///\brief Skip to the next row of the last result
-	virtual bool next()=0;
-};
-
-
 class TagTable
 {
 public:
@@ -238,8 +210,7 @@ public:
 
 	virtual bool getNext( ElementType& type, langbind::TypedFilterBase::Element& element);
 
-private:
-	friend class TransactionFunction;
+public:
 	void openTag( const std::string& tag);
 	void openTag( const char* tag, std::size_t tagsize);
 	void closeTag();
@@ -248,7 +219,7 @@ private:
 	void finalize();
 
 private:
-	typedef std::pair< langbind::InputFilter::ElementType, langbind::TypedFilterBase::Element> Item;
+	typedef std::pair< langbind::InputFilter::ElementType, std::string> Item;
 	typedef std::vector<Item> ItemArray;
 	ItemArray m_itemar;
 	ItemArray::const_iterator m_itemitr;
@@ -275,13 +246,14 @@ class TransactionFunction
 {
 public:
 	TransactionFunction( const TransactionFunction& o);
-	TransactionFunction( const std::string& src);
+	TransactionFunction( const std::string& handler, const std::string& src);
 	virtual ~TransactionFunction(){}
 
 	virtual langbind::TransactionFunction::InputR getInput() const;
-	virtual langbind::TransactionFunction::ResultR execute( DatabaseInterface* dbi, const langbind::TransactionFunction::Input* input) const;
+	virtual langbind::TransactionFunction::ResultR execute( const langbind::TransactionFunction::Input* input) const;
 
 private:
+	std::string m_handlername;
 	std::string m_resultname;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;

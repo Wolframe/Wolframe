@@ -12,8 +12,5 @@ bind( 2, '2' );
 bind( 3, '3' );
 bind( 4, '' );
 execute();
-nofColumns();
-next();
-getLastError();
 commit();
 **end
