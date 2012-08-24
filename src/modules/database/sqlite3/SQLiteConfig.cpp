@@ -87,7 +87,7 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 }
 
 SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
-	: config::ObjectConfiguration( name, logParent, logName )
+	: config::NamedConfiguration( name, logParent, logName )
 {
 	flag = false;
 }

@@ -43,9 +43,9 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-static ContainerBuilder* createModule( void )
+static ConfiguredContainerBuilder* createModule( void )
 {
-	static module::ContainerDescription< AAAA::DBauditContainer,
+	static module::ConfiguredContainerDescription< AAAA::DBauditContainer,
 			AAAA::DBauditConfig > mod( "Audit - database", "audit",
 						   "database", "DatabaseAudit" );
 	return &mod;
@@ -58,7 +58,7 @@ static void setModuleLogger( void* logger )
 
 
 static const unsigned short nrContainers = 1;
-static ContainerBuilder* (*containers[ nrContainers ])() = {
+static ConfiguredContainerBuilder* (*containers[ nrContainers ])() = {
 	createModule
 };
 

@@ -29,61 +29,69 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/filter/template/filterObjectBuilder.hpp
-///\brief Interface template for object builder of filters
-#ifndef _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "filter/filter.hpp"
+///\file modules/ddlcompiler/template/ddlcompilerContainerBuilder.hpp
+///\brief Interface template for object builder of form DDL compilers
+#ifndef _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#include "ddl/compilerInterface.hpp"
 #include "moduleInterface.hpp"
-#include "object.hpp"
+#include "container.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-class FilterObject :public Object, public langbind::Filter
+template <class CompilerInterfaceC>
+class DDLCompilerContainer :public Container, public CompilerInterfaceC
 {
 public:
-	FilterObject( const char* name_, const langbind::Filter& filter_)
-		:langbind::Filter(filter_)
+	DDLCompilerContainer( const char* name_)
+		:CompilerInterfaceC()
 		,m_name(name_){}
 
-	virtual ~FilterObject(){}
+	virtual ~DDLCompilerContainer(){}
 
 	virtual const char* objectName() const
 	{
 		return m_name.c_str();
 	}
+
+	virtual void dispose()	{ delete this; }
 private:
 	std::string m_name;
 };
 
-template <langbind::CreateFilterFunc createFilterFunc>
-class FilterObjectBuilder :public ObjectBuilder
+template <class CompilerInterfaceC>
+class DDLCompilerContainerBuilder :public ContainerBuilder
 {
 public:
-	FilterObjectBuilder( const char* name_)
-		:ObjectBuilder( name_){}
+	DDLCompilerContainerBuilder( const char* name_)
+		:ContainerBuilder(name_)
+		,m_name(name_){}
 
-	virtual ~FilterObjectBuilder(){}
+	virtual ~DDLCompilerContainerBuilder(){}
 
-	virtual Object* object()
+	virtual Container* object()
 	{
-		return new FilterObject( m_name, createFilterFunc( m_name));
+		return new DDLCompilerContainer<CompilerInterfaceC>(m_name.c_str());
 	}
+
+private:
+	std::string m_name;
 };
 
 }}//namespace
 
-#define DECLARE_FILTER_OBJECT(NAME,CPPID,createFilterFunc) \
+#define DECLARE_DDLCOMPILER(NAME,CPPID,CCOBJ) \
 namespace {\
 struct CPPID\
 {\
-	static ObjectBuilder* constructor()\
+	static ContainerBuilder* constructor()\
 	{\
-		return new FilterObjectBuilder<createFilterFunc>(NAME);\
+		return new DDLCompilerContainerBuilder<CCOBJ>(NAME);\
 	}\
 };\
 }//anonymous namespace
-//end DECLARE_FILTER_OBJECT
+//end DECLARE_DDLCOMPILER
 
 #endif
+

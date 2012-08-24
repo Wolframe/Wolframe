@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file modules/filter/char/mod_filter_char.cpp
 ///\brief Module for char XML filters
-#include "modules/filter/template/filterObjectBuilder.hpp"
+#include "modules/filter/template/filterContainerBuilder.hpp"
 #include "filter/char_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>

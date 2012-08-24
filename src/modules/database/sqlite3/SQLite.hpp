@@ -49,7 +49,7 @@ namespace _Wolframe {
 namespace db {
 
 /// SQLite database configuration
-class SQLiteConfig : public config::ObjectConfiguration
+class SQLiteConfig : public config::NamedConfiguration
 {
 	friend class SQLiteContainer;
 public:

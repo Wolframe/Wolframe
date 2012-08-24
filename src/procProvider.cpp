@@ -69,9 +69,9 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 		}
 		else	{
 			if ( modules )	{
-				module::ContainerBuilder* builder = modules->getContainer( "processor", L1it->first );
+				module::ConfiguredContainerBuilder* builder = modules->getContainer( "processor", L1it->first );
 				if ( builder )	{
-					config::ObjectConfiguration* conf = builder->configuration( logPrefix().c_str());
+					config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
 					if ( conf->parse( L1it->second, L1it->first, modules ))
 						m_procConfig.push_back( conf );
 					else	{
@@ -99,7 +99,7 @@ namespace proc {
 
 ProcProviderConfig::~ProcProviderConfig()
 {
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_procConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )
 		delete *it;
 }
@@ -109,7 +109,7 @@ void ProcProviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 	os << sectionName() << std::endl;
 	os << "   Database: " << (m_dbLabel.empty() ? "(none)" : m_dbLabel) << std::endl;
 	if ( m_procConfig.size() > 0 )	{
-		for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_procConfig.begin();
+		for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 			(*it)->print( os, 3 );
 		}
@@ -127,7 +127,7 @@ bool ProcProviderConfig::check() const
 		LOG_ERROR << logPrefix() << "referenced database ID cannot be empty";
 		correct = false;
 	}
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_procConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -137,7 +137,7 @@ bool ProcProviderConfig::check() const
 
 void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_procConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}
@@ -179,9 +179,9 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		m_dbLabel = conf->m_dbLabel;
 
 	// Build the list of command handlers
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = conf->m_procConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
 									it != conf->m_procConfig.end(); it++ )	{
-		module::ContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
 		if ( builder )	{
 			ObjectContainer< cmdbind::CommandHandlerUnit >* handler =
 					dynamic_cast< ObjectContainer< cmdbind::CommandHandlerUnit >* >( builder->container( **it ));
@@ -205,10 +205,10 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	}
 
 	// Build the list of filters
-	for ( module::ModulesDirectory::object_iterator it = modules->objectsBegin();
+	for ( module::ModulesDirectory::container_iterator it = modules->objectsBegin();
 								it != modules->objectsEnd(); it++ )	{
 		//		if the object is a filter
-		module::FilterObject* filter = dynamic_cast< module::FilterObject* >((*it)->object());
+		module::FilterContainer* filter = dynamic_cast< module::FilterContainer* >((*it)->object());
 		if ( filter == NULL )	{
 			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 				  << "'' is not a filter";
@@ -230,7 +230,7 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 	for ( std::list< cmdbind::CommandHandlerUnit* >::iterator it = m_handler.begin();
 							it != m_handler.end(); it++ )
 		delete *it;
-	for ( std::list< const module::FilterObject* >::iterator it = m_filter.begin();
+	for ( std::list< const module::FilterContainer* >::iterator it = m_filter.begin();
 							it != m_filter.end(); it++ )
 		delete *it;
 }

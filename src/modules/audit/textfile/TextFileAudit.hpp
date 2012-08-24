@@ -45,12 +45,12 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class TextFileAuditConfig : public config::ObjectConfiguration
+class TextFileAuditConfig : public config::NamedConfiguration
 {
 	friend class TextFileAuditContainer;
 public:
 	TextFileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
+		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
 	const char* objectName() const			{ return "FileAudit"; }
 

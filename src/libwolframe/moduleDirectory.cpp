@@ -43,18 +43,18 @@ namespace module {
 
 ModulesDirectory::~ModulesDirectory()
 {
-	while ( ! m_object.empty() )	{
-		assert( m_object.front() != NULL );
-		delete m_object.front();
-		m_object.pop_front();
+	while ( ! m_container.empty() )	{
+		assert( m_container.front() != NULL );
+		delete m_container.front();
+		m_container.pop_front();
 	}
 }
 
 
-bool ModulesDirectory::addContainer( ContainerBuilder* container )
+bool ModulesDirectory::addContainer( ConfiguredContainerBuilder* container )
 {
-	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
-							it != m_container.end(); it++ )	{
+	for ( std::list< ConfiguredContainerBuilder* >::const_iterator it = m_cfgdContainer.begin();
+							it != m_cfgdContainer.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_section, container->m_section ) &&
 				boost::algorithm::iequals( (*it)->m_keyword, container->m_keyword ))	{
 			LOG_ALERT << "A configuration module for section '" << container->m_section
@@ -67,32 +67,32 @@ bool ModulesDirectory::addContainer( ContainerBuilder* container )
 			return false;
 		}
 	}
-	m_container.push_back( container );
+	m_cfgdContainer.push_back( container );
 	LOG_DEBUG << "Module '" << container->m_name << "' registered for section '"
 		  << container->m_section << "' keyword '" << container->m_keyword << "'";
 	return true;
 }
 
-bool ModulesDirectory::addObject( ObjectBuilder* object )
+bool ModulesDirectory::addContainer( ContainerBuilder* container )
 {
-	for ( std::list< ObjectBuilder* >::const_iterator it = m_object.begin();
-							it != m_object.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->m_name, object->m_name ))	{
-			LOG_ALERT << "A module object named '" << object->m_name
+	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
+							it != m_container.end(); it++ )	{
+		if ( boost::algorithm::iequals( (*it)->m_name, container->m_name ))	{
+			LOG_ALERT << "A module object named '" << container->m_name
 				  << "' already exists";
 			return false;
 		}
 	}
-	m_object.push_back( object );
-	LOG_DEBUG << "Module object '" << object->m_name << "' registered";
+	m_container.push_back( container );
+	LOG_DEBUG << "Module object '" << container->m_name << "' registered";
 	return true;
 }
 
-ContainerBuilder* ModulesDirectory::getContainer( const std::string& section,
+ConfiguredContainerBuilder* ModulesDirectory::getContainer( const std::string& section,
 						 const std::string& keyword ) const
 {
-	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
-							it != m_container.end(); it++ )	{
+	for ( std::list< ConfiguredContainerBuilder* >::const_iterator it = m_cfgdContainer.begin();
+							it != m_cfgdContainer.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_keyword, keyword ) &&
 				boost::algorithm::iequals( (*it)->m_section, section ))
 			return *it;
@@ -100,20 +100,20 @@ ContainerBuilder* ModulesDirectory::getContainer( const std::string& section,
 	return NULL;
 }
 
-ContainerBuilder* ModulesDirectory::getContainer( const std::string& name ) const
+ConfiguredContainerBuilder* ModulesDirectory::getContainer( const std::string& name ) const
 {
-	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
-							it != m_container.end(); it++ )	{
+	for ( std::list< ConfiguredContainerBuilder* >::const_iterator it = m_cfgdContainer.begin();
+							it != m_cfgdContainer.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_name, name ))
 			return *it;
 	}
 	return NULL;
 }
 
-ObjectBuilder* ModulesDirectory::getObject( const std::string& name ) const
+ContainerBuilder* ModulesDirectory::getObject( const std::string& name ) const
 {
-	for ( std::list< ObjectBuilder* >::const_iterator it = m_object.begin();
-							it != m_object.end(); it++ )	{
+	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
+							it != m_container.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_name, name ))
 			return *it;
 	}

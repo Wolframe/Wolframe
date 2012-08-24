@@ -46,12 +46,12 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class PAMAuthConfig :  public config::ObjectConfiguration
+class PAMAuthConfig :  public config::NamedConfiguration
 {
 	friend class PAMAuthContainer;
 public:
 	PAMAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
+		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
 	virtual const char* objectName() const		{ return "PAMAuth"; }
 

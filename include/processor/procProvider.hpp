@@ -64,7 +64,7 @@ public:
 	virtual void setCanonicalPathes( const std::string& referencePath );
 private:
 	std::string					m_dbLabel;
-	std::list< config::ObjectConfiguration* >	m_procConfig;
+	std::list< config::NamedConfiguration* >	m_procConfig;
 };
 
 /// Processor provider

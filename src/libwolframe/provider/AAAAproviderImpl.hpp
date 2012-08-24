@@ -72,7 +72,7 @@ private:
 class AuthenticationFactory
 {
 public:
-	AuthenticationFactory( const std::list< config::ObjectConfiguration* >& confs,
+	AuthenticationFactory( const std::list< config::NamedConfiguration* >& confs,
 			       const module::ModulesDirectory* modules );
 	~AuthenticationFactory();
 	bool resolveDB( const db::DatabaseProvider& db );
@@ -100,7 +100,7 @@ private:
 class AuthorizationProvider
 {
 public:
-	AuthorizationProvider( const std::list< config::ObjectConfiguration* >& confs,
+	AuthorizationProvider( const std::list< config::NamedConfiguration* >& confs,
 			       bool authzDefault,
 			       const module::ModulesDirectory* modules );
 	~AuthorizationProvider();
@@ -130,7 +130,7 @@ private:
 class AuditProvider
 {
 public:
-	AuditProvider( const std::list< config::ObjectConfiguration* >& confs,
+	AuditProvider( const std::list< config::NamedConfiguration* >& confs,
 		       const module::ModulesDirectory* modules );
 	~AuditProvider();
 	bool resolveDB( const db::DatabaseProvider& db );

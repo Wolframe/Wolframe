@@ -41,7 +41,7 @@ namespace _Wolframe {
 namespace module {
 namespace test {
 
-class TestModuleConfig :  public config::ObjectConfiguration
+class TestModuleConfig :  public config::NamedConfiguration
 {
 	friend class TestModuleContainer;
 

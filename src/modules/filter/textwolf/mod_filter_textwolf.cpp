@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file modules/filter/textwolf/mod_filter_textwolf.cpp
 ///\brief Module for textwolf XML filters
-#include "modules/filter/template/filterObjectBuilder.hpp"
+#include "modules/filter/template/filterContainerBuilder.hpp"
 #include "filter/textwolf_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>

@@ -46,7 +46,7 @@ namespace db {
 
 //***  PostgreSQL configuration functions  **********************************
 PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
-	: config::ObjectConfiguration( cfgName, logParent, logName )
+	: config::NamedConfiguration( cfgName, logParent, logName )
 {
 	port = 0;
 	connections = 0;

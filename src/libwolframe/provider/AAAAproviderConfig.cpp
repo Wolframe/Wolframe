@@ -54,15 +54,15 @@ AAAAconfiguration::AAAAconfiguration()
 /// destructor
 AAAAconfiguration::~AAAAconfiguration()
 {
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
 		delete *it;
 
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_authzConfig.begin();
 								it != m_authzConfig.end(); it++ )
 		delete *it;
 
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it =m_auditConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it =m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )
 		delete *it;
 }
@@ -94,9 +94,9 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 						retVal = false;
 				}
 				else if ( modules )	{
-					module::ContainerBuilder* builder = modules->getContainer( "Authentication", L2it->first );
+					module::ConfiguredContainerBuilder* builder = modules->getContainer( "Authentication", L2it->first );
 					if ( builder )	{
-						config::ObjectConfiguration* conf = builder->configuration( logStr.c_str());
+						config::NamedConfiguration* conf = builder->configuration( logStr.c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_authConfig.push_back( conf );
 						else	{
@@ -123,9 +123,9 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 						retVal = false;
 				}
 				else if ( modules )	{
-					module::ContainerBuilder* builder = modules->getContainer( "Authorization", L2it->first );
+					module::ConfiguredContainerBuilder* builder = modules->getContainer( "Authorization", L2it->first );
 					if ( builder )	{
-						config::ObjectConfiguration* conf = builder->configuration( logStr.c_str());
+						config::NamedConfiguration* conf = builder->configuration( logStr.c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_authzConfig.push_back( conf );
 						else	{
@@ -152,9 +152,9 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 						retVal = false;
 				}
 				else if ( modules )	{
-					module::ContainerBuilder* builder = modules->getContainer( "Audit", L2it->first );
+					module::ConfiguredContainerBuilder* builder = modules->getContainer( "Audit", L2it->first );
 					if ( builder )	{
-						config::ObjectConfiguration* conf = builder->configuration( logStr.c_str());
+						config::NamedConfiguration* conf = builder->configuration( logStr.c_str());
 						if ( conf->parse( L2it->second, L2it->first, modules ))
 							m_auditConfig.push_back( conf );
 						else	{
@@ -185,19 +185,19 @@ void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
 	os << "   Authentication" << std::endl;
 	os << "      Allow anonymous login: " << (m_allowAnonymous ? "yes" : "no") << std::endl;
 	os << "      Random numbers device: " << m_randomDevice << std::endl;
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
 		(*it)->print( os, 6 );
 
 	os << "   Authorization" << std::endl;
 	os << "      Default: " << (m_authzDefault ? "allow" : "deny") << std::endl;
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_authzConfig.begin();
 								it != m_authzConfig.end(); it++ )
 		(*it)->print( os, 6 );
 
 	os << "   Audit" << std::endl;
 	os << "      Audit is mandatory: " << (m_mandatoryAudit ? "yes" : "no") << std::endl;
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )
 		(*it)->print( os, 6 );
 
@@ -208,19 +208,19 @@ bool AAAAconfiguration::check() const
 {
 	bool correct = true;
 
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
 	}
 
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_authzConfig.begin();
 								it != m_authzConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
 	}
 
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -231,16 +231,16 @@ bool AAAAconfiguration::check() const
 
 void AAAAconfiguration::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
 		(*it)->setCanonicalPathes( refPath );
 
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_authzConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_authzConfig.begin();
 								it != m_authzConfig.end(); it++ )
 		(*it)->setCanonicalPathes( refPath );
 
 
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_auditConfig.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_auditConfig.begin();
 								it != m_auditConfig.end(); it++ )
 		(*it)->setCanonicalPathes( refPath );
 }

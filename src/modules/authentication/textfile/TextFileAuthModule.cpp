@@ -43,9 +43,9 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace module {
 
-static ContainerBuilder* createModule( void )
+static ConfiguredContainerBuilder* createModule( void )
 {
-	static module::ContainerDescription< AAAA::TextFileAuthContainer,
+	static module::ConfiguredContainerDescription< AAAA::TextFileAuthContainer,
 			AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
 							"TextFile", "TextFileAuth" );
 	return &mod;
@@ -58,7 +58,7 @@ static void setModuleLogger( void* logger )
 
 
 static const unsigned short nrContainers = 1;
-static ContainerBuilder* (*containers[ nrContainers ])() = {
+static ConfiguredContainerBuilder* (*containers[ nrContainers ])() = {
 	createModule
 };
 

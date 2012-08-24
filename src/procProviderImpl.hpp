@@ -41,7 +41,7 @@
 #include "container.hpp"
 #include "database/database.hpp"
 #include "database/DBprovider.hpp"
-#include "modules/filter/template/filterObjectBuilder.hpp"
+#include "modules/filter/template/filterContainerBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 
 #include <list>
@@ -66,7 +66,7 @@ private:
 	const db::Database*				m_db;
 	std::list< cmdbind::CommandHandlerUnit* >	m_handler;
 	std::map< const std::string, cmdbind::CommandHandlerUnit*>	m_cmdMap;
-	std::list< const module::FilterObject* >	m_filter;
+	std::list< const module::FilterContainer* >	m_filter;
 	std::map< const std::string, const langbind::Filter* >		m_filterMap;
 };
 

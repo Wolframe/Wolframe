@@ -41,8 +41,8 @@
 
 namespace _Wolframe	{
 
-	const char*		applicationName();
-	const Version		applicationVersion();
+	const char*	applicationName();
+	const Version	applicationVersion();
 
 namespace config	{
 

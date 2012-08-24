@@ -48,7 +48,7 @@ public:
 	virtual const char* objectName() const = 0;
 };
 
-/// Template used to specilize a container
+/// Template used to specialize a container
 template < class T >
 class ObjectContainer : public Container
 {

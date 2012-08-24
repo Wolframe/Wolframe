@@ -43,13 +43,13 @@
 namespace _Wolframe {
 namespace AAAA {
 
-AuthorizationProvider::AuthorizationProvider( const std::list< config::ObjectConfiguration* >& confs,
+AuthorizationProvider::AuthorizationProvider( const std::list< config::NamedConfiguration* >& confs,
 					      bool authzDefault,
 					      const module::ModulesDirectory* modules )
 {
-	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
+	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 								it != confs.end(); it++ )	{
-		module::ContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
 		if ( builder )	{
 			ObjectContainer< AuthorizationUnit >* authz =
 					dynamic_cast< ObjectContainer< AuthorizationUnit >* >( builder->container( **it ));

@@ -45,7 +45,7 @@ namespace module {
 namespace test_containers {
 
 TestModuleConfig::TestModuleConfig( const char* cfgName, const char* logParent, const char* logName )
-	: config::ObjectConfiguration( cfgName, logParent, logName )
+	: config::NamedConfiguration( cfgName, logParent, logName )
 {
 	MOD_LOG_DEBUG << "Test module config created";
 }
@@ -123,16 +123,16 @@ bool TestUnitImpl2::resolveDB( const db::DatabaseProvider& /* db */ )
 	return true;
 }
 
-static ContainerBuilder* createModule1( void )
+static ConfiguredContainerBuilder* createModule1( void )
 {
-	static module::ContainerDescription< test_containers::TestModuleContainer1,
+	static module::ConfiguredContainerDescription< test_containers::TestModuleContainer1,
 		test_containers::TestModuleConfig > mod( "Test Module 1", "Test 1", "test1", "TestObject1" );
 	return &mod;
 }
 
-static ContainerBuilder* createModule2( void )
+static ConfiguredContainerBuilder* createModule2( void )
 {
-	static module::ContainerDescription< test_containers::TestModuleContainer2,
+	static module::ConfiguredContainerDescription< test_containers::TestModuleContainer2,
 		test_containers::TestModuleConfig > mod( "Test Module 2", "Test 2", "test 2", "TestObject2" );
 	return &mod;
 }
@@ -144,7 +144,7 @@ static void setModuleLogger( void* logger )
 
 
 static const unsigned short nrContainers = 2;
-static ContainerBuilder* (*containers[ nrContainers ])() = {
+static ConfiguredContainerBuilder* (*containers[ nrContainers ])() = {
 	createModule1,
 	createModule2
 };

@@ -162,11 +162,11 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir, const std::list< 
 		}
 
 		entry->setLogger( &_Wolframe::log::LogBackend::instance() );
-		for ( unsigned short i = 0; i < entry->containers; i++ )	{
-			modDir.addContainer( entry->createContainer[ i ]() );
+		for ( unsigned short i = 0; i < entry->cfgdContainers; i++ )	{
+			modDir.addContainer( entry->createCfgdContainer[ i ]() );
 		}
 		for ( unsigned short i = 0; i < entry->objects; i++ )	{
-			modDir.addObject( entry->createObject[ i ]() );
+			modDir.addContainer( entry->createObject[ i ]() );
 		}
 		handleList.addHandle( hndl );
 		LOG_DEBUG << "Module '" << entry->name << "' loaded";

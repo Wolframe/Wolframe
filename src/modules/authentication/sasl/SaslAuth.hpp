@@ -47,12 +47,12 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class SaslAuthConfig :  public config::ObjectConfiguration
+class SaslAuthConfig :  public config::NamedConfiguration
 {
 	friend class SaslAuthContainer;
 public:
 	SaslAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
+		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
 	virtual const char* objectName() const		{ return "SaslAuth"; }
 

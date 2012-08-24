@@ -119,16 +119,16 @@ private:
 };
 
 
-/// An object configuration is a normal configuration that provides
+/// A named configuration is a normal configuration that provides
 /// also an objectName function.
-class ObjectConfiguration : public ConfigurationBase
+class NamedConfiguration : public ConfigurationBase
 {
 public:
 	/// Class constructor.
-	ObjectConfiguration( const char* name, const char* logParent, const char* logName )
+	NamedConfiguration( const char* name, const char* logParent, const char* logName )
 		: ConfigurationBase( name, logParent, logName )	{}
 
-	virtual ~ObjectConfiguration()				{}
+	virtual ~NamedConfiguration()				{}
 
 	virtual const char* objectName() const = 0;
 };

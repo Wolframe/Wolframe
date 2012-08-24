@@ -43,12 +43,12 @@
 namespace _Wolframe {
 namespace AAAA {
 
-AuthenticationFactory::AuthenticationFactory( const std::list< config::ObjectConfiguration* >& confs,
+AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConfiguration* >& confs,
 					  const module::ModulesDirectory* modules )
 {
-	for ( std::list<config::ObjectConfiguration*>::const_iterator it = confs.begin();
+	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
-		module::ContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
 		if ( builder )	{
 			ObjectContainer< AuthenticationUnit >* auth =
 					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( builder->container( **it ));

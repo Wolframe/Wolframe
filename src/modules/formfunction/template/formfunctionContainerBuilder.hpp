@@ -29,68 +29,66 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/cmdbind/template/commandHandlerObjectBuilder.hpp
-///\brief Interface template for object builder of peer command handlers
-#ifndef _Wolframe_MODULE_COMMAND_HANDLER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_COMMAND_HANDLER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "cmdbind/commandHandler.hpp"
+///\file modules/formfunction/template/formfunctionContainerBuilder.hpp
+///\brief Interface template for object builder of form functions
+#ifndef _Wolframe_MODULE_FORMFUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_MODULE_FORMFUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#include "langbind/appFormFunction.hpp"
 #include "moduleInterface.hpp"
-#include "object.hpp"
+#include "container.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-template <class CommandHandler>
-class CommandHandlerObject :public Object, public CommandHandler
+class FormFunctionContainer :public Container, public langbind::FormFunction
 {
 public:
-	CommandHandlerObject( const char* name_)
-		:CommandHandler()
+	FormFunctionContainer( const char* name_, const langbind::FormFunction& func)
+		:langbind::FormFunction(func)
 		,m_name(name_){}
 
-	virtual ~CommandHandlerObject(){}
+	virtual ~FormFunctionContainer(){}
 
 	virtual const char* objectName() const
 	{
 		return m_name.c_str();
 	}
 
+	virtual void dispose()	{ delete this; }
 private:
 	std::string m_name;
 };
 
-template <class CommandHandler>
-class CommandHandlerObjectBuilder :public ObjectBuilder
+class FormFunctionContainerBuilder :public ContainerBuilder
 {
 public:
-	CommandHandlerObjectBuilder( const char* name_)
-		:ObjectBuilder(name_)
-		,m_name(name_){}
+	FormFunctionContainerBuilder( const char* name_, langbind::FormFunction::Function f, const serialize::StructDescriptionBase* p, const serialize::StructDescriptionBase* r)
+		:ContainerBuilder( name_)
+		,m_func(name_,langbind::FormFunction( f,p,r)){}
 
-	virtual ~CommandHandlerObjectBuilder(){}
+	virtual ~FormFunctionContainerBuilder(){}
 
-	virtual Object* object()
+	virtual Container* object()
 	{
-		return new CommandHandlerObject<CommandHandler>(m_name.c_str());
+		return &m_func;
 	}
-
 private:
-	std::string m_name;
+	FormFunctionContainer m_func;
 };
 
 }}//namespace
 
-#define DECLARE_COMMAND_HANDLER(NAME,CPPID,OBJ) \
+#define DECLARE_FUNCTION(NAME,CPPID,FUNC,PARAM,RESULT) \
 namespace {\
 struct CPPID\
 {\
-	static ObjectBuilder* constructor()\
+	static ContainerBuilder* constructor()\
 	{\
-		return new CommandHandlerObjectBuilder<OBJ>(NAME);\
+		return new FormFunctionContainerBuilder(NAME,FUNC,PARAM,RESULT);\
 	}\
 };\
 }//anonymous namespace
-//end DECLARE_COMMAND_HANDLER
+//end DECLARE_FUNCTION
 
 #endif
 

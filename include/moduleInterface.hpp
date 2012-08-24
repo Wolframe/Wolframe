@@ -42,28 +42,28 @@
 #include <boost/property_tree/ptree.hpp>
 #include "config/configurationBase.hpp"
 #include "container.hpp"
-#include "object.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-class ObjectBuilder
+class ContainerBuilder
 {
 	friend class ModulesDirectory;
 protected:
 	const char* m_name;
 public:
-	ObjectBuilder( const char* name )
+	ContainerBuilder( const char* name )
 		: m_name( name )		{}
 
-	virtual ~ObjectBuilder()		{}
+	virtual ~ContainerBuilder()		{}
 
 	const char* builderName() const		{ return m_name; }
 
-	virtual Object* object() = 0;
+	virtual Container* object() = 0;
 };
 
-class ContainerBuilder
+///
+class ConfiguredContainerBuilder
 {
 	friend class ModulesDirectory;
 protected:
@@ -72,32 +72,35 @@ protected:
 	const char* m_keyword;
 	const char* m_name;
 public:
-	ContainerBuilder( const char* title, const char* section, const char* keyword,
-			 const char* name )
+	ConfiguredContainerBuilder( const char* title, const char* section, const char* keyword,
+				    const char* name )
 		: m_title( title ), m_section( section), m_keyword( keyword ),
 		  m_name( name )		{}
 
-	virtual ~ContainerBuilder()		{}
+	virtual ~ConfiguredContainerBuilder()	{}
 
 	const char* builderName() const		{ return m_name; }
 
-	virtual config::ObjectConfiguration* configuration( const char* logPrefix ) = 0;
-	virtual Container* container( const config::ObjectConfiguration& conf ) = 0;
+	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
+	virtual Container* container( const config::NamedConfiguration& conf ) = 0;
 };
 
+///
 template < class T, class Tconf >
-class ContainerDescription : public ContainerBuilder
+class ConfiguredContainerDescription : public ConfiguredContainerBuilder
 {
 public:
-	ContainerDescription( const char* title, const char* section, const char* keyword,
-			      const char* name )
-		: ContainerBuilder( title, section, keyword, name )	{}
-	virtual ~ContainerDescription()		{}
+	ConfiguredContainerDescription( const char* title, const char* section,
+					const char* keyword, const char* name )
+		: ConfiguredContainerBuilder( title, section, keyword, name )
+	{}
 
-	virtual config::ObjectConfiguration* configuration( const char* logPrefix )	{
+	virtual ~ConfiguredContainerDescription(){}
+
+	virtual config::NamedConfiguration* configuration( const char* logPrefix )	{
 		return new Tconf( m_title, logPrefix, m_keyword );
 	}
-	virtual Container* container( const config::ObjectConfiguration& conf )	{
+	virtual Container* container( const config::NamedConfiguration& conf )	{
 		return new T( dynamic_cast< const Tconf& >( conf ));
 	}
 };
@@ -106,44 +109,46 @@ public:
 class ModulesDirectory
 {
 public:
-	ModulesDirectory()			{}
+	ModulesDirectory()				{}
 	~ModulesDirectory();
 
+	bool addContainer( ConfiguredContainerBuilder* container );
 	bool addContainer( ContainerBuilder* container );
-	bool addObject( ObjectBuilder* object );
 
-	ContainerBuilder* getContainer( const std::string& section, const std::string& keyword ) const;
-	ContainerBuilder* getContainer( const std::string& name ) const;
-	ObjectBuilder* getObject( const std::string& name ) const;
+	ConfiguredContainerBuilder* getContainer( const std::string& section, const std::string& keyword ) const;
+	ConfiguredContainerBuilder* getContainer( const std::string& name ) const;
+	ContainerBuilder* getObject( const std::string& name ) const;
 
-	class object_iterator
+	class container_iterator
 	{
 		friend class ModulesDirectory;
 	public:
-		object_iterator()		{}
-		object_iterator( const object_iterator& it )
-			: m_it( it.m_it)	{}
+		container_iterator()			{}
+		container_iterator( const container_iterator& it )
+			: m_it( it.m_it )		{}
 
-		ObjectBuilder* operator->() const		{ return *m_it; }
-		ObjectBuilder* operator*() const		{ return *m_it; }
-		object_iterator& operator++()			{ ++m_it; return *this; }
-		object_iterator operator++( int )		{ object_iterator rtrn( *this ); ++m_it; return rtrn; }
-		bool operator == ( const object_iterator& rhs )	{ return m_it == rhs.m_it; }
-		bool operator != ( const object_iterator& rhs )	{ return m_it != rhs.m_it; }
+		ContainerBuilder* operator->() const	{ return *m_it; }
+		ContainerBuilder* operator*() const	{ return *m_it; }
+		container_iterator& operator++()	{ ++m_it; return *this; }
+		container_iterator operator++( int )	{ container_iterator rtrn( *this ); ++m_it; return rtrn; }
+		bool operator == ( const container_iterator& rhs )
+							{ return m_it == rhs.m_it; }
+		bool operator != ( const container_iterator& rhs )
+							{ return m_it != rhs.m_it; }
 
 	private:
-		std::list< ObjectBuilder* >::const_iterator	m_it;
+		std::list< ContainerBuilder* >::const_iterator	m_it;
 
-		object_iterator( const std::list< ObjectBuilder* >::const_iterator& it )
-			: m_it( it )		{}
+		container_iterator( const std::list< ContainerBuilder* >::const_iterator& it )
+			: m_it( it )			{}
 	};
 
-	object_iterator objectsBegin() const				{ return object_iterator( m_object.begin() ); }
-	object_iterator objectsEnd() const				{ return object_iterator( m_object.end() ); }
+	container_iterator objectsBegin() const		{ return container_iterator( m_container.begin() ); }
+	container_iterator objectsEnd() const		{ return container_iterator( m_container.end() ); }
 
 private:
-	std::list< ContainerBuilder* >	m_container;
-	std::list< ObjectBuilder* >	m_object;
+	std::list< ConfiguredContainerBuilder* >	m_cfgdContainer; ///< list of configurable containers
+	std::list< ContainerBuilder* >			m_container;	 ///< list of simple containers
 };
 
 
@@ -157,8 +162,8 @@ enum ModuleObjectType	{
 	MODULE_OBJECT = 2
 };
 
-typedef ContainerBuilder* (*createContainerFunc)();
-typedef ObjectBuilder* (*createObjectFunc)();
+typedef ConfiguredContainerBuilder* (*createCfgContainerFunc)();
+typedef ContainerBuilder* (*createObjectFunc)();
 
 struct ModuleEntryPoint
 {
@@ -170,32 +175,32 @@ struct ModuleEntryPoint
 	unsigned short ifaceVersion;
 	const char* name;
 	void (*setLogger)(void*);
-	unsigned short		containers;
-	createContainerFunc	*createContainer;
+	unsigned short		cfgdContainers;		///< number of configured containers
+	createCfgContainerFunc	*createCfgdContainer;
 	unsigned short		objects;
 	createObjectFunc	*createObject;
 public:
 	ModuleEntryPoint( unsigned short iVer, const char* modName,
 			  void (*setLoggerFunc)(void*),
-			  unsigned short nrContainers, createContainerFunc* containerFunc,
+			  unsigned short nrContainers, createCfgContainerFunc* containerFunc,
 			  unsigned short nrObjects, createObjectFunc* objectFunc
 			  )
 		: ifaceVersion( iVer ), name( modName ),
 		  setLogger( setLoggerFunc ),
-		  containers( nrContainers ), createContainer( containerFunc ),
+		  cfgdContainers( nrContainers ), createCfgdContainer( containerFunc ),
 		  objects( nrObjects ), createObject( objectFunc )
 	{
 		std::memcpy ( signature, "Wolframe Module", MODULE_SIGN_SIZE );
-		if ( createContainer == NULL ) containers = 0;
+		if ( createCfgdContainer == NULL ) cfgdContainers = 0;
 		if ( createObject == NULL ) objects = 0;
 	}
 
 };
 
 #if !defined(_WIN32)	// POSIX module loader
-	extern "C" ModuleEntryPoint	entryPoint;
+extern "C" ModuleEntryPoint	entryPoint;
 #else
-	extern "C" __declspec( dllexport ) ModuleEntryPoint entryPoint;
+extern "C" __declspec( dllexport ) ModuleEntryPoint entryPoint;
 #endif
 
 }} // namespace _Wolframe::module

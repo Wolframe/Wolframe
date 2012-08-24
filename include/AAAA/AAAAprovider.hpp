@@ -63,11 +63,11 @@ public:
 private:
 	bool						m_allowAnonymous;
 	std::string					m_randomDevice;
-	std::list< config::ObjectConfiguration* >	m_authConfig;
+	std::list< config::NamedConfiguration* >	m_authConfig;
 	bool						m_authzDefault;
-	std::list< config::ObjectConfiguration* >	m_authzConfig;
+	std::list< config::NamedConfiguration* >	m_authzConfig;
 	bool						m_mandatoryAudit;
-	std::list< config::ObjectConfiguration* >	m_auditConfig;
+	std::list< config::NamedConfiguration* >	m_auditConfig;
 };
 
 class AAAAprovider : public boost::noncopyable

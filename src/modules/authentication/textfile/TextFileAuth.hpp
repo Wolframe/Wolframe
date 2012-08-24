@@ -47,12 +47,12 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class TextFileAuthConfig :  public config::ObjectConfiguration
+class TextFileAuthConfig :  public config::NamedConfiguration
 {
 	friend class TextFileAuthContainer;
 public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
+		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
 	virtual const char* objectName() const		{ return "TextFileAuth"; }
 

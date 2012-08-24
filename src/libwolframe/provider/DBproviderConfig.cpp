@@ -65,9 +65,9 @@ bool DBproviderConfig::parse( const config::ConfigurationTree& pt,
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
 		if ( modules )	{
-			module::ContainerBuilder* builder = modules->getContainer( "database", L1it->first );
+			module::ConfiguredContainerBuilder* builder = modules->getContainer( "database", L1it->first );
 			if ( builder )	{
-				config::ObjectConfiguration* conf = builder->configuration( logPrefix().c_str());
+				config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
 				if ( conf->parse( L1it->second, L1it->first, modules ))
 					m_config.push_back( conf );
 				else	{
@@ -88,7 +88,7 @@ bool DBproviderConfig::parse( const config::ConfigurationTree& pt,
 
 DBproviderConfig::~DBproviderConfig()
 {
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_config.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )
 		delete *it;
 }
@@ -97,7 +97,7 @@ void DBproviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
 	if ( m_config.size() > 0 )	{
-		for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_config.begin();
+		for ( std::list< config::NamedConfiguration* >::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 			(*it)->print( os, 3 );
 		}
@@ -111,7 +111,7 @@ void DBproviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 bool DBproviderConfig::check() const
 {
 	bool correct = true;
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_config.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
@@ -121,7 +121,7 @@ bool DBproviderConfig::check() const
 
 void DBproviderConfig::setCanonicalPathes( const std::string& refPath )
 {
-	for ( std::list< config::ObjectConfiguration* >::const_iterator it = m_config.begin();
+	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_config.begin();
 								it != m_config.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}

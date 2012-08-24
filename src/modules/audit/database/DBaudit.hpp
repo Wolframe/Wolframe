@@ -43,12 +43,12 @@
 namespace _Wolframe {
 namespace AAAA {
 
-class DBauditConfig : public config::ObjectConfiguration
+class DBauditConfig : public config::NamedConfiguration
 {
 	friend class DBauditContainer;
 public:
 	DBauditConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName )
+		: config::NamedConfiguration( cfgName, logParent, logName )
 	{ m_required = true; }
 
 	const char* objectName() const		{ return "DatabaseAudit"; }

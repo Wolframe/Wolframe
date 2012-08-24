@@ -78,12 +78,12 @@ private:
 };
 
 
-class EchoProcConfig : public config::ObjectConfiguration
+class EchoProcConfig : public config::NamedConfiguration
 {
 	friend class EchoProcContainer;
 public:
 	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName ) {}
+		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
 	const char* objectName() const			{ return "EchoProcessor"; }
 

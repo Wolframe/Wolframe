@@ -44,12 +44,12 @@ namespace _Wolframe {
 namespace AAAA {
 
 //***  Database authorizer configuration  *******************************
-class DatabaseAuthzConfig : public config::ObjectConfiguration
+class DatabaseAuthzConfig : public config::NamedConfiguration
 {
 	friend class DBauthzContainer;
 public:
 	DatabaseAuthzConfig( const char* cfgName, const char* logParent, const char* logName )
-		: config::ObjectConfiguration( cfgName, logParent, logName )	{}
+		: config::NamedConfiguration( cfgName, logParent, logName )	{}
 
 	virtual const char* objectName() const		{ return "DatabaseAuthorization"; }
 

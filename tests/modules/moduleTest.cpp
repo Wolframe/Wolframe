@@ -44,10 +44,10 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );
 
-	ContainerBuilder* container = modDir.getContainer( "TestObject" );
+	ConfiguredContainerBuilder* container = modDir.getContainer( "TestObject" );
 	ASSERT_TRUE( container != NULL );
 
-	config::ObjectConfiguration* configuration = container->configuration( "TestObject" );
+	config::NamedConfiguration* configuration = container->configuration( "TestObject" );
 	ASSERT_TRUE( configuration != NULL );
 
 	test::TestModuleContainer* obj = dynamic_cast<test::TestModuleContainer *>( container->container( *configuration ) );
@@ -73,16 +73,16 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );
 
-	ContainerBuilder* container1 = modDir.getContainer( "TestObject1" );
+	ConfiguredContainerBuilder* container1 = modDir.getContainer( "TestObject1" );
 	ASSERT_TRUE( container1 != NULL );
 
-	ContainerBuilder* container2 = modDir.getContainer( "TestObject2" );
+	ConfiguredContainerBuilder* container2 = modDir.getContainer( "TestObject2" );
 	ASSERT_TRUE( container2 != NULL );
 
-	config::ObjectConfiguration* configuration1 = container1->configuration( "TestObject1" );
+	config::NamedConfiguration* configuration1 = container1->configuration( "TestObject1" );
 	ASSERT_TRUE( configuration1 != NULL );
 
-	config::ObjectConfiguration* configuration2 = container2->configuration( "TestObject2" );
+	config::NamedConfiguration* configuration2 = container2->configuration( "TestObject2" );
 	ASSERT_TRUE( configuration2 != NULL );
 
 	test_containers::TestModuleContainer1* obj1 = dynamic_cast<test_containers::TestModuleContainer1 *>( container1->container( *configuration1 ) );

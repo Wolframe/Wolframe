@@ -29,49 +29,50 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/ddlcompiler/template/ddlcompilerObjectBuilder.hpp
-///\brief Interface template for object builder of form DDL compilers
-#ifndef _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "ddl/compilerInterface.hpp"
+///\file modules/cmdbind/template/commandHandlerContainerBuilder.hpp
+///\brief Interface template for object builder of peer command handlers
+#ifndef _Wolframe_MODULE_COMMAND_HANDLER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_MODULE_COMMAND_HANDLER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#include "cmdbind/commandHandler.hpp"
 #include "moduleInterface.hpp"
-#include "object.hpp"
+#include "container.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-template <class CompilerInterfaceC>
-class DDLCompilerObject :public Object, public CompilerInterfaceC
+template <class CommandHandler>
+class CommandHandlerContainer :public Container, public CommandHandler
 {
 public:
-	DDLCompilerObject( const char* name_)
-		:CompilerInterfaceC()
+	CommandHandlerContainer( const char* name_)
+		:CommandHandler()
 		,m_name(name_){}
 
-	virtual ~DDLCompilerObject(){}
+	virtual ~CommandHandlerContainer(){}
 
 	virtual const char* objectName() const
 	{
 		return m_name.c_str();
 	}
 
+	virtual void dispose()	{ delete this; }
 private:
 	std::string m_name;
 };
 
-template <class CompilerInterfaceC>
-class DDLCompilerObjectBuilder :public ObjectBuilder
+template <class CommandHandler>
+class CommandHandlerContainerBuilder :public ContainerBuilder
 {
 public:
-	DDLCompilerObjectBuilder( const char* name_)
-		:ObjectBuilder(name_)
+	CommandHandlerContainerBuilder( const char* name_)
+		:ContainerBuilder(name_)
 		,m_name(name_){}
 
-	virtual ~DDLCompilerObjectBuilder(){}
+	virtual ~CommandHandlerContainerBuilder(){}
 
-	virtual Object* object()
+	virtual Container* object()
 	{
-		return new DDLCompilerObject<CompilerInterfaceC>(m_name.c_str());
+		return new CommandHandlerContainer<CommandHandler>(m_name.c_str());
 	}
 
 private:
@@ -80,17 +81,17 @@ private:
 
 }}//namespace
 
-#define DECLARE_DDLCOMPILER(NAME,CPPID,CCOBJ) \
+#define DECLARE_COMMAND_HANDLER(NAME,CPPID,OBJ) \
 namespace {\
 struct CPPID\
 {\
-	static ObjectBuilder* constructor()\
+	static ContainerBuilder* constructor()\
 	{\
-		return new DDLCompilerObjectBuilder<CCOBJ>(NAME);\
+		return new CommandHandlerContainerBuilder<OBJ>(NAME);\
 	}\
 };\
 }//anonymous namespace
-//end DECLARE_DDLCOMPILER
+//end DECLARE_COMMAND_HANDLER
 
 #endif
 
