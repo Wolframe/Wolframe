@@ -349,8 +349,11 @@ Path::Path( const std::string& pt, TagTable* tagmap)
 			{
 				resno.push_back( *ii);
 			}
+			if (resno.size() == 0 || resno.size() > 999) throw std::runtime_error( "illegal result reference (only numbers between 1 and 999 allowed)");
 			elem.m_tag = std::atoi( resno.c_str());
 			if (elem.m_tag == 0) throw std::runtime_error( "referencing result with index 0");
+			m_path.push_back( elem);
+			continue;
 		}
 		else if (*ii == '/')
 		{
@@ -511,73 +514,79 @@ static bool isAlphaNumeric( char ch)
 	return false;
 }
 
+static void nextToken( std::string::const_iterator& ii, std::string::const_iterator& ee)
+{
+	while (ii < ee && *ii > 0 && *ii <= 32) ++ii;
+	if (ii == ee) throw std::runtime_error( "unexpected end of expression");
+}
+
 TransactionFunction::TransactionFunction( const std::string& handler, const std::string& src)
 	:m_handlername(handler)
 {
 	std::string::const_iterator ii = src.begin(), ee = src.end();
-	for (; ii != ee; ++ii)
+	while (ii != ee)
 	{
-		while (ii < ee && *ii > 0 && *ii < 32) ++ii;
-		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
+		// Parse result name and function name "bla/bla=func(" or "bla=func(" of "func(":
+		nextToken(ii,ee);
 		std::string resname,functionname;
 		while (ii < ee && (isAlphaNumeric( *ii) || *ii == '/'))
 		{
 			functionname.push_back( *ii);
 			++ii;
 		}
-		if (ii < ee && *ii == '=')
+		nextToken(ii,ee);
+		if (*ii == '=')
 		{
+			++ii; nextToken(ii,ee);
 			resname = functionname;
 			functionname.clear();
-			for (++ii; ii < ee && isAlphaNumeric( *ii); ++ii)
+			for (; ii < ee && isAlphaNumeric( *ii); ++ii)
 			{
 				functionname.push_back( *ii);
 			}
+			if (functionname.empty()) throw std::runtime_error("expected identifier for function name after '='");
 		}
-		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
-		while (ii < ee && *ii > 0 && *ii < 32) ++ii;
-		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
+		nextToken(ii,ee);
 		if (*ii != '(') throw std::runtime_error( "syntax error in expression '(' expected");
-		++ii;
+		++ii; nextToken(ii,ee);
+
+		// Parse selector "/doc/aa:":
 		std::string selectorstr;
-		while (ii < ee && *ii > 0 && *ii < 32) ++ii;
-		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
-		while (ii < ee && *ii != ':')
+		while (ii < ee && *ii != ':' && *ii != ',' && *ii != ')' && *ii != '(' && *ii != ';')
 		{
 			selectorstr.push_back( *ii);
 			++ii;
 		}
-		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
-		++ii;
-		while (ii < ee && *ii > 0 && *ii < 32) ++ii;
-		if (ii == ee) throw std::runtime_error( "unexpected end of expression");
-		std::vector<std::string> paramstr;
+		nextToken(ii,ee);
+		if (*ii != ':') throw std::runtime_error( "expected ':' after selection");
+		++ii; nextToken(ii,ee);
 
+		// Parse parameter list:
+		std::vector<std::string> paramstr;
 		for (;;)
 		{
 			std::string pp;
-			while (ii < ee && *ii > 0 && *ii < 32) ++ii;
-			if (ii == ee) throw std::runtime_error( "unexpected end of expression");
 			while (ii < ee && *ii != ',' && *ii != ')')
 			{
 				pp.push_back( *ii);
 				++ii;
 			}
 			boost::trim( pp);
-			if (ii == ee) throw std::runtime_error( "unexpected end of expression");
+			if (pp.empty()) throw std::runtime_error( "empty element in parameter list");
 			paramstr.push_back( pp);
+			nextToken(ii,ee);
 			if (*ii == ')')
 			{
 				++ii;
-				while (ii < ee && *ii > 0 && *ii < 32) ++ii;
 				break;
 			}
 			else if (*ii == ',')
 			{
-				++ii;
+				++ii; nextToken(ii,ee);
 				continue;
 			}
 		}
+		// Build Function call object for parsed function:
 		Path selector( selectorstr, &m_tagmap);
 		std::vector<Path> param;
 		std::vector<std::string>::const_iterator ai = paramstr.begin(), ae = paramstr.end();
@@ -589,12 +598,16 @@ TransactionFunction::TransactionFunction( const std::string& handler, const std:
 		FunctionCall cc( resname, functionname, selector, param);
 		m_call.push_back( cc);
 
-		while (ii < ee && *ii > 0 && *ii < 32) ++ii;
+		// Skip to end of next semicolon that starts a new function call definition:
+		while (ii < ee && *ii > 0 && *ii <= 32) ++ii;
 		if (ii == ee) break;
 		if (*ii != ';') throw std::runtime_error( "missing semicolon as expression separator");
+		++ii;
+		while (ii < ee && *ii > 0 && *ii <= 32) ++ii;
+		if (ii == ee) throw std::runtime_error( "superfluous semicolon at end of expression. ';' is a separator and not the terminator of a function call definition");
 	}
 
-	// calculating common result name prefix
+	// calculating common result name prefix:
 	std::vector<FunctionCall>::iterator ci = m_call.begin(), ce = m_call.end();
 	m_resultname.clear();
 	ci = m_call.begin(), ce = m_call.end();
@@ -605,14 +618,18 @@ TransactionFunction::TransactionFunction( const std::string& handler, const std:
 		if (pp)
 		{
 			prefix.append( ci->resultname().c_str(), pp-ci->resultname().c_str());
-			if (std::strchr( pp+1, '/')) throw std::runtime_error( "illegal result prefix");
+			if (std::strchr( pp+1, '/')) throw std::runtime_error( "Illegal result prefix. Only one '/' allowed");
 
 			if (m_resultname.empty())
 			{
 				m_resultname = prefix;
 				ci->resultname( pp+1);
 			}
-			else if (m_resultname != prefix)
+			else if (m_resultname == prefix)
+			{
+				ci->resultname( pp+1);
+			}
+			else
 			{
 				throw std::runtime_error( "no common result prefix");
 			}
@@ -729,9 +746,9 @@ static void getCommandResults( PreparedStatementHandler* dbi, std::vector<Result
 {
 	ResultRow res;
 	std::size_t ii, nn=dbi->nofColumns();
-	do
+	if (nn) do
 	{
-		for (ii=0; ii<nn; ++ii)
+		for (ii=1; ii<=nn; ++ii)
 		{
 			const char* resstr = dbi->get( ii);
 			if (resstr)
@@ -761,9 +778,10 @@ static void printCommandResult( PreparedStatementHandler* dbi, const FunctionCal
 		std::vector<std::string> columnar;
 		columnar.clear();
 		std::size_t ii, nn=dbi->nofColumns();
-		for (ii=0; ii<nn; ++ii)
+		for (ii=1; ii<=nn; ++ii)
 		{
 			const char* colname = dbi->columnName( ii);
+			if (!colname) throw std::runtime_error( "cannot retrieve a result column name");
 			columnar.push_back( colname);
 		}
 
@@ -828,14 +846,18 @@ static void bindResultRowReferenceArguments( PreparedStatementHandler* dbi, cons
 		std::size_t residx = pi->resultReference();
 		if (residx)
 		{
+			if (residx > row.size())
+			{
+				throw std::runtime_error( "accessing non existing index in result row when binding parameters");
+			}
 			std::size_t resstridx = row[ residx -1];
 			if (resstridx)
 			{
-				if (!dbi->bind( argidx, resultstr.c_str() + resstridx)) throw std::logic_error( "bind paramater in transaction failed");
+				if (!dbi->bind( argidx, resultstr.c_str() + resstridx)) throw std::runtime_error( "bind paramater in transaction failed");
 			}
 			else
 			{
-				if (!dbi->bind( argidx, 0)) throw std::logic_error( "bind paramater in transaction failed");
+				if (!dbi->bind( argidx, 0)) throw std::runtime_error( "bind paramater in transaction failed");
 			}
 		}
 	}
@@ -892,7 +914,7 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 			{
 				bindNodeReferenceArguments( dbi, *ci, inputst, *vi);
 
-				// Expand the arguments that are result references:
+				// Expand the arguments that are result references, and execute the command for each result row:
 				if (ci->hasResultReference())
 				{
 					std::vector<ResultRow>::const_iterator ri = resultar.begin(), re = resultar.end();
@@ -904,10 +926,13 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 							throw std::logic_error( "execute database function in transaction failed");
 						}
 						std::vector<FunctionCall>::const_iterator nextcall = ci + 1;
+						std::vector<ResultRow> resultar2_singlecmd;
 						if (!ci->resultname().empty() || (nextcall != ce && nextcall->hasResultReference()))
 						{
-							getCommandResults( dbi, resultar2, resultstr2);
+							getCommandResults( dbi, resultar2_singlecmd, resultstr2);
+							resultar2.insert( resultar2.end(), resultar2_singlecmd.begin(), resultar2_singlecmd.end());
 						}
+						printCommandResult( dbi, *ci, result, resultar2_singlecmd, resultstr2);
 					}
 				}
 				else
@@ -918,12 +943,14 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 						throw std::logic_error( "execute database function in transaction failed");
 					}
 					std::vector<FunctionCall>::const_iterator nextcall = ci + 1;
+					std::vector<ResultRow> resultar2_singlecmd;
 					if (!ci->resultname().empty() || (nextcall != ce && nextcall->hasResultReference()))
 					{
-						getCommandResults( dbi, resultar2, resultstr2);
+						getCommandResults( dbi, resultar2_singlecmd, resultstr2);
+						resultar2.insert( resultar2.end(), resultar2_singlecmd.begin(), resultar2_singlecmd.end());
 					}
+					printCommandResult( dbi, *ci, result, resultar2_singlecmd, resultstr2);
 				}
-				printCommandResult( dbi, *ci, result, resultar2, resultstr2);
 			}
 		}
 		if (!dbi->commit()) throw std::logic_error( "commit transaction failed");

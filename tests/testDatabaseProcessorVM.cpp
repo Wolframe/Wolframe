@@ -152,8 +152,8 @@ public:
 
 	bool next()					{if (m_itr != m_data.end()) ++m_itr; return (m_itr != m_data.end());}
 	unsigned int nofColumns()			{return m_cols.size();}
-	const char* columnName( std::size_t idx)	{return (idx >= m_cols.size())?0:m_cols[idx].c_str();}
-	const char* get( std::size_t idx)		{return (m_itr == m_data.end() || idx >= m_itr->size())?0:(*m_itr)[idx].c_str();}
+	const char* columnName( std::size_t idx)	{return (idx == 0 || idx > m_cols.size())?0:m_cols[idx-1].c_str();}
+	const char* get( std::size_t idx)		{return (m_itr == m_data.end() || idx == 0 || idx > m_itr->size())?0:(*m_itr)[idx-1].c_str();}
 
 private:
 	typedef std::vector<std::string> Row;

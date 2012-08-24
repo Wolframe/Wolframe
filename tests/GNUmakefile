@@ -114,10 +114,13 @@ logTest$(EXE): $(TOPDIR)/src/libwolframe.a
 testSHA2$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-testWolfilter$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
-testDatabaseProcessorVM$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+protocolArgumentParsing$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+configValueParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+configStructParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testDatabaseProcessorVM$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 local_all:
 

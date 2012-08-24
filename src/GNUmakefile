@@ -82,7 +82,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_execCommandHandler.o \
 	cmdbind_ioFilterCommandHandler.o \
 	cmdbind_directmapCommandHandler.o \
-	database_processor.o \
 	filter_filterbase.o \
 	filter_doctype.o \
 	filter_typingfilter.o \
@@ -105,6 +104,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	ddl_structTypeBuild.o \
 	ddl_compilerInterface.o \
 	ddl_compiler_simpleFormCompiler.o \
+	database_processor.o \
 	types_allocators.o \
 	types_bcdArithmetic.o \
 	types_dateArithmetic.o \

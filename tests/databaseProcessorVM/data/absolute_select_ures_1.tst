@@ -3,26 +3,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <aa>1</aa>
 **config
-result=run(: /aa)
+run(: /aa); exec(: $1)
 **file: 1.result
 id
-1
+2
 **output
 begin();
 start( 'run' );
 bind( 1, '1' );
 execute();
 nofColumns(); returns 1
-get( 1 ); returns 1
+get( 1 ); returns 2
 next(); returns 0
 getLastError(); returns 0
-nofColumns(); returns 1
-columnName( 1 ); returns id
+start( 'exec' );
+bind( 1, '2' );
+execute();
 commit();
-
-result {
-  id {
-    '1'
-  }
-}
 **end

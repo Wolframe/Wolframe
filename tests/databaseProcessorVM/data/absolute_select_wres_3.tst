@@ -17,23 +17,23 @@ bind( 2, '2' );
 bind( 3, '3' );
 execute();
 nofColumns(); returns 3
-get( 0 ); returns 1
-get( 1 ); returns hugo
-get( 2 ); returns bahnhofstrasse 15
+get( 1 ); returns 1
+get( 2 ); returns hugo
+get( 3 ); returns bahnhofstrasse 15
 next(); returns 1
-get( 0 ); returns 2
-get( 1 ); returns miriam
-get( 2 ); returns zum gemsweg 3
+get( 1 ); returns 2
+get( 2 ); returns miriam
+get( 3 ); returns zum gemsweg 3
 next(); returns 1
-get( 0 ); returns 3
-get( 1 ); returns sara
-get( 2 ); returns tannensteig 12
+get( 1 ); returns 3
+get( 2 ); returns sara
+get( 3 ); returns tannensteig 12
 next(); returns 0
 getLastError(); returns 0
 nofColumns(); returns 3
-columnName( 0 ); returns id
-columnName( 1 ); returns name
-columnName( 2 ); returns street
+columnName( 1 ); returns id
+columnName( 2 ); returns name
+columnName( 3 ); returns street
 commit();
 
 doc {
