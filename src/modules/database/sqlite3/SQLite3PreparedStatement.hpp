@@ -30,65 +30,81 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to process prepared statements by a transaction function execute
-///\file database/preparedStatement.hpp
-#ifndef _DATABASE_PREPARED_STATEMENT_HPP_INCLUDED
-#define _DATABASE_PREPARED_STATEMENT_HPP_INCLUDED
-#include "types/countedReference.hpp"
+///\brief Interface to process prepared statements with sqlite3
+///\file modules/database/sqlite3/SQLite3PreparedStatement.hpp
+#ifndef _DATABASE_PREPARED_STATEMENT_SQLITE3_HPP_INCLUDED
+#define _DATABASE_PREPARED_STATEMENT_SQLITE3_HPP_INCLUDED
+#include "database/preparedStatement.hpp"
 #include <string>
+#include <map>
 #include <cstdlib>
+#include "sqlite3.h"
 
 namespace _Wolframe {
 namespace db {
 
-///\class PreparedStatementHandler
-///\brief Interface to process prepared statements in a database
-struct PreparedStatementHandler
+///\class PreparedStatementHandler_sqlite3
+///\brief Handler to process prepared statements with sqlite3
+///\remark The sqlite3 connection is opened, closed, created and disposed by the caller
+struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 {
-	PreparedStatementHandler()
-		:m_timeout(0)
-		,m_retries(0){}
+	///\brief Constructor
+	PreparedStatementHandler_sqlite3( sqlite3* conn, const std::map<std::string,std::string>* stmmap);
 
-	virtual ~PreparedStatementHandler(){}
+	///\brief Destructor
+	virtual ~PreparedStatementHandler_sqlite3();
+
 	///\brief Begin transaction
-	virtual bool begin()=0;
+	virtual bool begin();
 	///\brief Commit current transaction
-	virtual bool commit()=0;
+	virtual bool commit();
 	///\brief Rollback current transaction
-	virtual bool rollback()=0;
+	virtual bool rollback();
 	///\brief Start new command statement
-	///\param[in] stmname name of prepared statement
-	virtual bool start( const std::string& stmname)=0;
+	virtual bool start( const std::string& stmname);
 	///\brief Bind parameter value on current command statement
-	virtual bool bind( std::size_t idx, const char* value)=0;
+	virtual bool bind( std::size_t idx, const char* value);
 	///\brief Execute instance of current statement
-	virtual bool execute()=0;
+	virtual bool execute();
 	///\brief Get the number of columns of the last result
-	virtual std::size_t nofColumns()=0;
+	virtual std::size_t nofColumns();
 	///\brief Get a column title of the last result
-	virtual const char* columnName( std::size_t idx)=0;
+	virtual const char* columnName( std::size_t idx);
 	///\brief Get the last database error as string
-	virtual const char* getLastError()=0;
+	virtual const char* getLastError();
 	///\brief Get a column of the last result
-	virtual const char* get( std::size_t idx)=0;
+	virtual const char* get( std::size_t idx);
 	///\brief Skip to the next row of the last result
-	virtual bool next()=0;
-
-public:
-	void timeout( unsigned short v)		{m_timeout=v;}
-	void retries( unsigned short v)		{m_retries=v;}
-	unsigned short timeout() const		{return m_timeout;}
-	unsigned short retries() const		{return m_retries;}
+	virtual bool next();
 
 private:
-	unsigned short m_timeout;
-	unsigned short m_retries;
+	enum State
+	{
+		Init,
+		Transaction,
+		Prepared,
+		Executed,
+		Error
+	};
+	static const char* stateName( State i)
+	{
+		const char* ar[] = {"Init","Transaction","Prepared","Error"};
+		return ar[ (int)i];
+	}
+
+	void clear();
+	void setDatabaseErrorMessage();
+	bool status( int rc, State newstate);
+	bool errorStatus( const std::string& message);
+	bool executeInstruction( const char* stmstr, State newstate);
+
+private:
+	State m_state;
+	sqlite3* m_conn;
+	const std::map<std::string,std::string>* m_stmmap;
+	std::string m_lasterror;
+	sqlite3_stmt* m_stm;
 };
-
-typedef types::CountedReference<PreparedStatementHandler> PreparedStatementHandlerR;
-
-typedef PreparedStatementHandlerR (*CreatePreparedStatementHandlerFunc)( const std::string& dbname);
-
 
 }}//namespace
 #endif

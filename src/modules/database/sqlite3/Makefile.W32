@@ -27,6 +27,7 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	SQLite.obj \
 	SQLiteConfig.obj \
+	SQLite3PreparedStatement.obj \
 	SQLiteModule.obj
 
 all: $(DYNAMIC_MODULE)
