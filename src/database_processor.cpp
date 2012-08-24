@@ -514,10 +514,28 @@ static bool isAlphaNumeric( char ch)
 	return false;
 }
 
-static void nextToken( std::string::const_iterator& ii, std::string::const_iterator& ee)
+static void skipSpaces( std::string::const_iterator& ii, std::string::const_iterator& ee)
 {
 	while (ii < ee && *ii > 0 && *ii <= 32) ++ii;
+}
+
+static void nextToken( std::string::const_iterator& ii, std::string::const_iterator& ee)
+{
+	skipSpaces(ii,ee);
 	if (ii == ee) throw std::runtime_error( "unexpected end of expression");
+}
+
+static std::string parseParameter( std::string::const_iterator& ii, std::string::const_iterator& ee)
+{
+	std::string rt;
+	while (ii < ee && *ii != ',' && *ii != ')')
+	{
+		rt.push_back( *ii);
+		++ii;
+	}
+	boost::trim( rt);
+	if (rt.empty()) throw std::runtime_error( "empty element in parameter list");
+	return rt;
 }
 
 TransactionFunction::TransactionFunction( const std::string& handler, const std::string& src)
@@ -563,29 +581,30 @@ TransactionFunction::TransactionFunction( const std::string& handler, const std:
 
 		// Parse parameter list:
 		std::vector<std::string> paramstr;
-		for (;;)
+		if (*ii == ')')
 		{
-			std::string pp;
-			while (ii < ee && *ii != ',' && *ii != ')')
+			// ... empty parameter list
+			++ii;
+		}
+		else
+		{
+			for (;;)
 			{
-				pp.push_back( *ii);
-				++ii;
-			}
-			boost::trim( pp);
-			if (pp.empty()) throw std::runtime_error( "empty element in parameter list");
-			paramstr.push_back( pp);
-			nextToken(ii,ee);
-			if (*ii == ')')
-			{
-				++ii;
-				break;
-			}
-			else if (*ii == ',')
-			{
-				++ii; nextToken(ii,ee);
-				continue;
+				paramstr.push_back( parseParameter( ii, ee));
+				nextToken(ii,ee);
+				if (*ii == ')')
+				{
+					++ii;
+					break;
+				}
+				else if (*ii == ',')
+				{
+					++ii; nextToken(ii,ee);
+					continue;
+				}
 			}
 		}
+
 		// Build Function call object for parsed function:
 		Path selector( selectorstr, &m_tagmap);
 		std::vector<Path> param;
@@ -599,11 +618,10 @@ TransactionFunction::TransactionFunction( const std::string& handler, const std:
 		m_call.push_back( cc);
 
 		// Skip to end of next semicolon that starts a new function call definition:
-		while (ii < ee && *ii > 0 && *ii <= 32) ++ii;
+		skipSpaces(ii,ee);
 		if (ii == ee) break;
 		if (*ii != ';') throw std::runtime_error( "missing semicolon as expression separator");
-		++ii;
-		while (ii < ee && *ii > 0 && *ii <= 32) ++ii;
+		++ii; skipSpaces(ii,ee);
 		if (ii == ee) throw std::runtime_error( "superfluous semicolon at end of expression. ';' is a separator and not the terminator of a function call definition");
 	}
 
@@ -766,7 +784,7 @@ static void getCommandResults( PreparedStatementHandler* dbi, std::vector<Result
 		res.clear();
 	}
 	while (dbi->next());
-	if (dbi->getLastError()) throw std::logic_error( "fetch next result in transaction failed");
+	if (dbi->getLastError()) throw std::runtime_error( "fetch next result in transaction failed");
 }
 
 ///\brief Print the result of a command if it is named
@@ -822,16 +840,16 @@ static void bindNodeReferenceArguments( PreparedStatementHandler* dbi, const Fun
 					if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
 				}
 				const char* value = inputst->nodevalue( *gs);
-				if (!dbi->bind( argidx, value)) throw std::logic_error( "bind paramater in transaction failed");
+				if (!dbi->bind( argidx, value)) throw std::runtime_error( "bind paramater in transaction failed");
 			}
 			else if (param.size() == 0)
 			{
-				if (!dbi->bind( argidx, 0)) throw std::logic_error( "bind NULL parameter in transaction failed");
+				if (!dbi->bind( argidx, 0)) throw std::runtime_error( "bind NULL parameter in transaction failed");
 			}
 			else
 			{
 				const char* value = inputst->nodevalue( param[0]);
-				if (!dbi->bind( argidx, value)) throw std::logic_error( "bind paramater in transaction failed");
+				if (!dbi->bind( argidx, value)) throw std::runtime_error( "bind paramater in transaction failed");
 			}
 		}
 	}
@@ -886,7 +904,7 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 		std::string resultstr,resultstr2;
 		std::vector<ResultRow> resultar,resultar2;
 
-		if (!dbi->begin()) throw std::logic_error( "transaction begin failed");
+		if (!dbi->begin()) throw std::runtime_error( "transaction begin failed");
 		if (!m_resultname.empty())
 		{
 			result->openTag( m_resultname);
@@ -901,7 +919,7 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 			resultstr2.push_back( '\0');
 
 			// Start transaction:
-			if (!dbi->start( ci->name())) throw std::logic_error( "start transaction failed");
+			if (!dbi->start( ci->name())) throw std::runtime_error( "start transaction failed");
 
 			// Select the nodes to execute the command with:
 			std::vector<Structure::Node> nodearray;
@@ -923,7 +941,7 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 						bindResultRowReferenceArguments( dbi, *ci, *ri, resultstr);
 						if (!dbi->execute())
 						{
-							throw std::logic_error( "execute database function in transaction failed");
+							throw std::runtime_error( "execute database function in transaction failed");
 						}
 						std::vector<FunctionCall>::const_iterator nextcall = ci + 1;
 						std::vector<ResultRow> resultar2_singlecmd;
@@ -940,7 +958,7 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 					// If we do not have result references then the command is complete and executed once
 					if (!dbi->execute())
 					{
-						throw std::logic_error( "execute database function in transaction failed");
+						throw std::runtime_error( "execute database function in transaction failed");
 					}
 					std::vector<FunctionCall>::const_iterator nextcall = ci + 1;
 					std::vector<ResultRow> resultar2_singlecmd;
@@ -953,7 +971,7 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 				}
 			}
 		}
-		if (!dbi->commit()) throw std::logic_error( "commit transaction failed");
+		if (!dbi->commit()) throw std::runtime_error( "commit transaction failed");
 		if (!m_resultname.empty())
 		{
 			result->closeTag();
