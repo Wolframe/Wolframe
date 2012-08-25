@@ -267,6 +267,11 @@ BuildRequires: postgresql-devel >= 7.0
 %define build_sqlite 1
 %endif
 %endif
+%if %{centos}
+%if %{centos5}
+%define build_sqlite 1
+%endif
+%endif
 %endif
 
 # sqlite database module
