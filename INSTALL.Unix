@@ -32,11 +32,10 @@ Table of Contents
     FreeBSD 8.2
     FreeBSD 9.0
     NetBSD 5.1
-    OpenBSD 5.0
+    OpenBSD 5.1
     Solaris 10
       Solaris 10 (CSW toolchain)
   Broken and non-working instructions for other Unixes
-    OpenBSD 5.0
     Solaris 10 (SFW gcc toolchain)
     Solaris 10 (Sun Forte toolchain)
     Solaris 10 (Sunfreeware GCC toolchain)
@@ -515,15 +514,16 @@ For testing you need 'tcl-expect' (5.43.0nb1).
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
-OpenBSD 5.0
+OpenBSD 5.1
 -----------
 
-Required packages: boost (1.42.0p7)
-Optional packages: cyrus-sasl2 (from ports tree, 2.1.23p7),
-                   qt4 (qt4-4.7.3p0),
-                   sqlite3 (3.7.5), postgresql-client (9.0.4),
-                   libxml (2.7.8p2), libxslt (1.1.26p2),
-                   png (1.5.4)
+Required packages: boost (1.42.0p12)
+Optional packages: cyrus-sasl2 (from ports tree, 2.1.25p2, install
+                   dependencies like groff before building it!),
+                   qt4 (qt4-4.7.4p3),
+                   sqlite3 (3.7.9p0), postgresql-client (9.1.2),
+                   libxml (2.7.8p4), libxslt (1.1.26p3),
+                   png (1.5.6p0) 
 
 You need 'gmake' (3.82).
 

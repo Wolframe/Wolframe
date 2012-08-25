@@ -2992,7 +2992,7 @@ endif
 
 ifeq "$(PLATFORM)" "OPENBSD"
 ifeq "$(OS_MAJOR_VERSION)" "5"
-LIBZ_DIR ?= /usr/local
+LIBZ_DIR ?= /usr
 LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
 LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
 LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
