@@ -157,6 +157,23 @@ BigBCD::BigBCD( const std::string& numstr)
 	init( numstr);
 }
 
+BigBCD::BigBCD( long num)
+	:m_size(0)
+	,m_ar(0)
+	,m_neg(false)
+	,m_allocated(false)
+{
+	bool ng = false;
+	if (num < 0)
+	{
+		ng = true;
+		num = -num;
+	}
+	BigBCD th = estimate_as_bcd( (FactorType)num, 0, 0);
+	th.m_neg ^= ng;
+	copy( th, 0);
+}
+
 BigBCD::BigBCD( const BigBCD& o)
 	:m_size(o.m_size)
 	,m_ar(0)
@@ -770,12 +787,27 @@ BigBCD BigBCD::sub( const BigBCD& opr) const
 	return rt;
 }
 
-BigBCD BigBCD::mul( unsigned int opr) const
+BigBCD BigBCD::mul( FactorType opr) const
 {
 	BigBCD val;
 	Allocator allocator;
 	digits_multiplication( val, *this, opr, &allocator);
 	return BigBCD( val);
+}
+
+BigBCD BigBCD::mul( long opr) const
+{
+	bool ng = false;
+	if (opr < 0)
+	{
+		opr = -opr;
+		ng = true;
+	}
+	BigBCD val;
+	Allocator allocator;
+	digits_multiplication( val, *this, opr, &allocator);
+	val.m_neg ^= ng;
+	return val;
 }
 
 BigBCD BigBCD::mul( const BigBCD& opr) const

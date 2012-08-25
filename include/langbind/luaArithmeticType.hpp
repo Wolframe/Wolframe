@@ -50,6 +50,7 @@ Project Wolframe.
 #include <boost/integer_traits.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/remove_const.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 extern "C"
 {
@@ -67,9 +68,13 @@ template<typename TYPE>
 struct Interface
 {
 	TYPE operator + ( const TYPE&) const;
+	TYPE operator + ( long) const;
 	TYPE operator - ( const TYPE&) const;
+	TYPE operator - ( long) const;
 	TYPE operator / ( const TYPE&) const;
+	TYPE operator / ( long) const;
 	TYPE operator * ( const TYPE&) const;
+	TYPE operator * ( long) const;
 	TYPE operator - () const;
 	std::string tostring() const;
 	void format( unsigned int show_prec, unsigned int calc_prec);
@@ -148,12 +153,66 @@ struct has_operator_add
 };
 
 template<typename T>
+struct has_operator_add_long
+{
+	typedef char small_type;
+	struct large_type {small_type dummy[2];};
+
+	template<T (T::*)( long) const> struct tester_member_signature;
+
+	template<typename U>
+	static small_type has_matching_member(tester_member_signature<&U::operator+ >*);
+	template<typename U>
+	static large_type has_matching_member(...);
+
+	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
+};
+
+template<typename T>
 struct has_operator_sub
 {
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
 	template<T (T::*)( const T&) const> struct tester_member_signature;
+
+	template<typename U>
+	static small_type has_matching_member(tester_member_signature<&U::operator- >*);
+	template<typename U>
+	static large_type has_matching_member(...);
+
+	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
+};
+
+template<typename T>
+struct has_operator_diff
+{
+	typedef char small_type;
+	struct large_type {small_type dummy[2];};
+
+	template<long (T::*)( const T&) const> struct tester_member_signature1;
+	template<T (T::*)( long) const> struct tester_member_signature2;
+
+	template<typename U>
+	static small_type has_matching_member1(tester_member_signature1<&U::operator- >*);
+	template<typename U>
+	static large_type has_matching_member1(...);
+	template<typename U>
+	static small_type has_matching_member2(tester_member_signature2<&U::operator- >*);
+	template<typename U>
+	static large_type has_matching_member2(...);
+
+	static const bool value=sizeof(has_matching_member1<T>(0))==sizeof(small_type)
+				&& sizeof(has_matching_member2<T>(0))==sizeof(small_type);
+};
+
+template<typename T>
+struct has_operator_sub_long
+{
+	typedef char small_type;
+	struct large_type {small_type dummy[2];};
+
+	template<T (T::*)( long) const> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::operator- >*);
@@ -180,12 +239,44 @@ struct has_operator_mul
 };
 
 template<typename T>
+struct has_operator_mul_long
+{
+	typedef char small_type;
+	struct large_type {small_type dummy[2];};
+
+	template<T (T::*)( long) const> struct tester_member_signature;
+
+	template<typename U>
+	static small_type has_matching_member(tester_member_signature<&U::operator* >*);
+	template<typename U>
+	static large_type has_matching_member(...);
+
+	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
+};
+
+template<typename T>
 struct has_operator_div
 {
 	typedef char small_type;
 	struct large_type {small_type dummy[2];};
 
 	template<T (T::*)( const T&) const> struct tester_member_signature;
+
+	template<typename U>
+	static small_type has_matching_member(tester_member_signature<&U::operator/ >*);
+	template<typename U>
+	static large_type has_matching_member(...);
+
+	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
+};
+
+template<typename T>
+struct has_operator_div_long
+{
+	typedef char small_type;
+	struct large_type {small_type dummy[2];};
+
+	template<T (T::*)( long) const> struct tester_member_signature;
 
 	template<typename U>
 	static small_type has_matching_member(tester_member_signature<&U::operator/ >*);
@@ -335,6 +426,55 @@ struct LuaBinOperatorAdd
 };
 
 template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorAddLong
+{
+	typedef LuaBinOperatorAddLong This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			if (!lua_isnumber( ls, 2)) throw std::runtime_error( "number expected as 2nd argument");
+			long operand = boost::numeric_cast<long>( lua_tonumber( ls, 2));
+			ThisOperand::push_luastack( ls, self->operator+( operand));
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__add", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorAddAny
+{
+	typedef LuaBinOperatorAddAny This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		if (lua_isnumber( ls, 2))
+		{
+			return LuaBinOperatorAddLong<ObjectType,MetaTypeInfo>::call(ls);
+		}
+		else
+		{
+			return LuaBinOperatorAdd<ObjectType,MetaTypeInfo>::call(ls);
+		}
+	}
+
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__add", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
 struct LuaBinOperatorSub
 {
 	typedef LuaBinOperatorSub This;
@@ -347,6 +487,86 @@ struct LuaBinOperatorSub
 			ObjectType* self = ThisOperand::get( ls, 1);
 			ObjectType* operand = ThisOperand::get( ls, 2);
 			ThisOperand::push_luastack( ls, self->operator-( *operand));
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__sub", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorSubLong
+{
+	typedef LuaBinOperatorSubLong This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			if (!lua_isnumber( ls, 2)) throw std::runtime_error( "number expected as 2nd argument");
+			long operand = boost::numeric_cast<long>( lua_tonumber( ls, 2));
+			ThisOperand::push_luastack( ls, self->operator-( operand));
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__sub", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorSubAny
+{
+	typedef LuaBinOperatorSubAny This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		if (lua_isnumber( ls, 2))
+		{
+			return LuaBinOperatorSubLong<ObjectType,MetaTypeInfo>::call(ls);
+		}
+		else
+		{
+			return LuaBinOperatorSub<ObjectType,MetaTypeInfo>::call(ls);
+		}
+	}
+
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__sub", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorDiff
+{
+	typedef LuaBinOperatorDiff This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			if (lua_isnumber( ls, 2))
+			{
+				long operand = boost::numeric_cast<long>( lua_tonumber( ls, 2));
+				ThisOperand::push_luastack( ls, self->operator-( operand));
+			}
+			else
+			{
+				ObjectType* operand = ThisOperand::get( ls, 2);
+				lua_pushinteger( ls, self->operator-( *operand));
+			}
 		}
 		return 1;
 	}
@@ -381,6 +601,55 @@ struct LuaBinOperatorMul
 };
 
 template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorMulLong
+{
+	typedef LuaBinOperatorMulLong This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			if (!lua_isnumber( ls, 2)) throw std::runtime_error( "number expected as 2nd argument");
+			long operand = boost::numeric_cast<long>( lua_tonumber( ls, 2));
+			ThisOperand::push_luastack( ls, self->operator*( operand));
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__mul", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorMulAny
+{
+	typedef LuaBinOperatorMulAny This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		if (lua_isnumber( ls, 2))
+		{
+			return LuaBinOperatorMulLong<ObjectType,MetaTypeInfo>::call(ls);
+		}
+		else
+		{
+			return LuaBinOperatorMul<ObjectType,MetaTypeInfo>::call(ls);
+		}
+	}
+
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__mul", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
 struct LuaBinOperatorDiv
 {
 	typedef LuaBinOperatorDiv This;
@@ -396,6 +665,55 @@ struct LuaBinOperatorDiv
 		}
 		return 1;
 	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__div", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorDivLong
+{
+	typedef LuaBinOperatorDivLong This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		LuaExceptionHandlerScope escope( ls);
+		{
+			ObjectType* self = ThisOperand::get( ls, 1);
+			if (!lua_isnumber( ls, 2)) throw std::runtime_error( "number expected as 2nd argument");
+			long operand = boost::numeric_cast<long>( lua_tonumber( ls, 2));
+			ThisOperand::push_luastack( ls, self->operator/( operand));
+		}
+		return 1;
+	}
+	static int exec( lua_State* ls)
+	{
+		LuaFunctionCppCall<This> func;
+		return func.run( "__div", ls);
+	}
+};
+
+template <class ObjectType, class MetaTypeInfo>
+struct LuaBinOperatorDivAny
+{
+	typedef LuaBinOperatorDivAny This;
+	typedef LuaArithmeticType<ObjectType,MetaTypeInfo> ThisOperand;
+
+	static int call( lua_State* ls)
+	{
+		if (lua_isnumber( ls, 2))
+		{
+			return LuaBinOperatorDivLong<ObjectType,MetaTypeInfo>::call(ls);
+		}
+		else
+		{
+			return LuaBinOperatorDiv<ObjectType,MetaTypeInfo>::call(ls);
+		}
+	}
+
 	static int exec( lua_State* ls)
 	{
 		LuaFunctionCppCall<This> func;
@@ -656,7 +974,7 @@ typename boost::enable_if_c<
 
 template <typename T, typename M>
 typename boost::enable_if_c<
-	has_operator_add<T>::value
+	has_operator_add<T>::value && ! has_operator_add_long<T>::value
 	,void>::type defineOperator_add( lua_State* ls)
 {
 	lua_pushliteral( ls, "__add");
@@ -666,13 +984,33 @@ typename boost::enable_if_c<
 }
 template <typename T, typename M>
 typename boost::enable_if_c<
-	! has_operator_add<T>::value
+	! has_operator_add<T>::value && has_operator_add_long<T>::value
+	,void>::type defineOperator_add( lua_State* ls)
+{
+	lua_pushliteral( ls, "__add");
+	lua_CFunction f = &LuaBinOperatorAddLong<T,M>::exec;
+	lua_pushcfunction( ls, f);
+	lua_rawset( ls, -3);
+}
+template <typename T, typename M>
+typename boost::enable_if_c<
+	has_operator_add<T>::value && has_operator_add_long<T>::value
+	,void>::type defineOperator_add( lua_State* ls)
+{
+	lua_pushliteral( ls, "__add");
+	lua_CFunction f = &LuaBinOperatorAddAny<T,M>::exec;
+	lua_pushcfunction( ls, f);
+	lua_rawset( ls, -3);
+}
+template <typename T, typename M>
+typename boost::enable_if_c<
+	! has_operator_add<T>::value && ! has_operator_add_long<T>::value
 	,void>::type defineOperator_add( lua_State*)
 {}
 
 template <typename T, typename M>
 typename boost::enable_if_c<
-	has_operator_sub<T>::value
+	has_operator_sub<T>::value && ! has_operator_sub_long<T>::value && ! has_operator_diff<T>::value
 	,void>::type defineOperator_sub( lua_State* ls)
 {
 	lua_pushliteral( ls, "__sub");
@@ -682,13 +1020,43 @@ typename boost::enable_if_c<
 }
 template <typename T, typename M>
 typename boost::enable_if_c<
-	! has_operator_sub<T>::value
+	! has_operator_sub<T>::value && has_operator_sub_long<T>::value && ! has_operator_diff<T>::value
+	,void>::type defineOperator_sub( lua_State* ls)
+{
+	lua_pushliteral( ls, "__sub");
+	lua_CFunction f = &LuaBinOperatorSubLong<T,M>::exec;
+	lua_pushcfunction( ls, f);
+	lua_rawset( ls, -3);
+}
+template <typename T, typename M>
+typename boost::enable_if_c<
+	has_operator_sub<T>::value && has_operator_sub_long<T>::value && ! has_operator_diff<T>::value
+	,void>::type defineOperator_sub( lua_State* ls)
+{
+	lua_pushliteral( ls, "__sub");
+	lua_CFunction f = &LuaBinOperatorSubAny<T,M>::exec;
+	lua_pushcfunction( ls, f);
+	lua_rawset( ls, -3);
+}
+template <typename T, typename M>
+typename boost::enable_if_c<
+	has_operator_diff<T>::value
+	,void>::type defineOperator_sub( lua_State* ls)
+{
+	lua_pushliteral( ls, "__sub");
+	lua_CFunction f = &LuaBinOperatorDiff<T,M>::exec;
+	lua_pushcfunction( ls, f);
+	lua_rawset( ls, -3);
+}
+template <typename T, typename M>
+typename boost::enable_if_c<
+	! has_operator_sub<T>::value && ! has_operator_sub_long<T>::value && ! has_operator_diff<T>::value
 	,void>::type defineOperator_sub( lua_State*)
 {}
 
 template <typename T, typename M>
 typename boost::enable_if_c<
-	has_operator_div<T>::value
+	has_operator_div<T>::value && ! has_operator_div_long<T>::value
 	,void>::type defineOperator_div( lua_State* ls)
 {
 	lua_pushliteral( ls, "__div");
@@ -698,13 +1066,33 @@ typename boost::enable_if_c<
 }
 template <typename T, typename M>
 typename boost::enable_if_c<
-	! has_operator_div<T>::value
+	! has_operator_div<T>::value && has_operator_div_long<T>::value
+	,void>::type defineOperator_div( lua_State* ls)
+{
+	lua_pushliteral( ls, "__div");
+	lua_CFunction f = &LuaBinOperatorDivLong<T,M>::exec;
+	lua_pushcfunction( ls, f);
+	lua_rawset( ls, -3);
+}
+template <typename T, typename M>
+typename boost::enable_if_c<
+	has_operator_div<T>::value && has_operator_div_long<T>::value
+	,void>::type defineOperator_div( lua_State* ls)
+{
+	lua_pushliteral( ls, "__div");
+	lua_CFunction f = &LuaBinOperatorDivAny<T,M>::exec;
+	lua_pushcfunction( ls, f);
+	lua_rawset( ls, -3);
+}
+template <typename T, typename M>
+typename boost::enable_if_c<
+	! has_operator_div<T>::value && ! has_operator_div_long<T>::value
 	,void>::type defineOperator_div( lua_State*)
 {}
 
 template <typename T, typename M>
 typename boost::enable_if_c<
-	has_operator_mul<T>::value
+	has_operator_mul<T>::value && ! has_operator_mul_long<T>::value
 	,void>::type defineOperator_mul( lua_State* ls)
 {
 	lua_pushliteral( ls, "__mul");
@@ -714,7 +1102,27 @@ typename boost::enable_if_c<
 }
 template <typename T, typename M>
 typename boost::enable_if_c<
-	! has_operator_mul<T>::value
+	! has_operator_mul<T>::value && has_operator_mul_long<T>::value
+	,void>::type defineOperator_mul( lua_State* ls)
+{
+	lua_pushliteral( ls, "__mul");
+	lua_CFunction f = &LuaBinOperatorMulLong<T,M>::exec;
+	lua_pushcfunction( ls, f);
+	lua_rawset( ls, -3);
+}
+template <typename T, typename M>
+typename boost::enable_if_c<
+	has_operator_mul<T>::value && has_operator_mul_long<T>::value
+	,void>::type defineOperator_mul( lua_State* ls)
+{
+	lua_pushliteral( ls, "__mul");
+	lua_CFunction f = &LuaBinOperatorMulAny<T,M>::exec;
+	lua_pushcfunction( ls, f);
+	lua_rawset( ls, -3);
+}
+template <typename T, typename M>
+typename boost::enable_if_c<
+	! has_operator_mul<T>::value && ! has_operator_mul_long<T>::value
 	,void>::type defineOperator_mul( lua_State*)
 {}
 

@@ -124,6 +124,7 @@ LOCAL_STATIC_LIB_OBJS += \
 	langbind_luaDebug.o \
 	langbind_luaException.o \
 	langbind_luaBcdNumber.o \
+	langbind_luaDateTime.o \
 	cmdbind_luaCommandHandler.o
 endif
 

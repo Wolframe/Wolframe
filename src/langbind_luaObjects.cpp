@@ -36,6 +36,7 @@ Project Wolframe.
 #include "langbind/luaException.hpp"
 #include "langbind/luaGetFunctionClosure.hpp"
 #include "langbind/luaBcdNumber.hpp"
+#include "langbind/luaDateTime.hpp"
 #include "filter/luafilter.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
@@ -1676,6 +1677,8 @@ LuaModuleMap::LuaModuleMap()
 	// Load Lua standard modules
 	langbind::LuaModule modbcd( "bcdnumber", langbind::initBignumModule);
 	defineLuaModule( "bcdnumber", modbcd);
+	langbind::LuaModule moddatetime( "datetime", langbind::initDateTimeModule);
+	defineLuaModule( "datetime", moddatetime);
 }
 
 void LuaModuleMap::defineLuaModule( const std::string& name, const LuaModule& mod)

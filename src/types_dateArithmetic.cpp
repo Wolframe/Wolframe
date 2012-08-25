@@ -44,17 +44,18 @@ Date::Date( unsigned short y, unsigned short m, unsigned short d)
 
 Date::Date( const std::string& dt, const char* format)
 {
-	std::istringstream dti(dt);
-	boost::gregorian::date_facet dtf( format);
-	dti.imbue( std::locale( std::locale::classic(), &dtf));
+	std::istringstream dti;
+	dti.str( dt);
+	boost::gregorian::date_facet* dtf = new boost::gregorian::date_facet( format);
+	dti.imbue( std::locale( std::locale::classic(), dtf));
 	dti >> m_date;
 }
 
 std::string Date::tostring( const char* format) const
 {
 	std::ostringstream dto;
-	boost::gregorian::date_facet dtf( format);
-	dto.imbue( std::locale( std::locale::classic(), &dtf));
+	boost::gregorian::date_facet* dtf = new boost::gregorian::date_facet( format);
+	dto.imbue( std::locale( std::locale::classic(), dtf));
 	dto << m_date;
 	return dto.str();
 }

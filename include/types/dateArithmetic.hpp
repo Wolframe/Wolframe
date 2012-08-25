@@ -61,6 +61,10 @@ public:
 	Date( const Date& o)
 		:m_date(o.m_date){}
 
+	///\brief Default constructor
+	Date()
+		:m_date(boost::gregorian::day_clock::local_day()){}
+
 	///\brief Get the difference in days
 	long operator - (const Date& o) const;
 	///\brief Add number of days
@@ -83,7 +87,8 @@ public:
 	///\param[in] format format definition of 'dt' in a format similar to printf
 	///\return the date as string
 	///\remark For the format defintion see http://www.boost.org/doc/libs/1_43_0/doc/html/date_time/date_time_io.html
-	std::string tostring( const char* format="%Y/%m/%d") const;
+	std::string tostring( const char* format) const;
+	std::string tostring() const			{return tostring("%Y/%m/%d");}
 
 private:
 	///\brief Constructor

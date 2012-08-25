@@ -40,7 +40,7 @@
 #include <limits>
 #include <stdexcept>
 #if SQLITE_VERSION_NUMBER < 3005000
-#error This SQLite version is not supported by this module. It relies on the "
+#error This SQLite version is not supported by this module. It relies on the 'V2' interface
 #endif
 
 using namespace _Wolframe;

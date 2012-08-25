@@ -55,6 +55,7 @@ class BigBCD
 public:
 	BigBCD();
 	BigBCD( const std::string& numstr);
+	BigBCD( long num);
 	BigBCD( const BigBCD& o);
 	~BigBCD();
 
@@ -64,7 +65,6 @@ public:
 
 	BigBCD operator /( const BigBCD& opr) const	{return div( opr);}
 	BigBCD operator *( const BigBCD& opr) const	{return mul( opr);}
-	BigBCD operator *( unsigned int opr) const	{return mul( opr);}
 	BigBCD operator +( const BigBCD& opr) const	{return add( opr);}
 	BigBCD operator -( const BigBCD& opr) const	{return sub( opr);}
 	BigBCD operator -() const			{return neg();}
@@ -138,7 +138,8 @@ private:
 
 	BigBCD add( const BigBCD& opr) const;
 	BigBCD sub( const BigBCD& opr) const;
-	BigBCD mul( unsigned int opr) const;
+	BigBCD mul( FactorType opr) const;
+	BigBCD mul( long opr) const;
 	BigBCD mul( const BigBCD& opr) const;
 	BigBCD div( const BigBCD& opr) const;
 	BigBCD neg() const;

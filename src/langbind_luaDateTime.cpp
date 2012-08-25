@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind_luaBcdNumber.cpp
-///\brief Implements a BCD number type of arbitrary length ("bigint") and a BCD fixed point number of any defined precision and arbitrary length ("bignum") for Lua
-#include "langbind/luaBcdNumber.hpp"
-#include "types/bcdArithmetic.hpp"
+///\file langbind_luaDateTime.cpp
+///\brief Implements types for date/time arithmetic and formated parsing/printing for Lua
+#include "langbind/luaDateTime.hpp"
+#include "types/dateArithmetic.hpp"
 #include "langbind/luaArithmeticType.hpp"
 #include <limits>
 extern "C"
@@ -45,43 +45,26 @@ extern "C"
 using namespace _Wolframe;
 using namespace langbind;
 
-struct LuaBigintMetaInfo
+struct LuaDateMetaInfo
 {
 	static const char* metatableName()
 	{
-		return "wolframe.bigint";
+		return "wolframe.date";
 	}
 	static const char* typeName()
 	{
-		return "bigint";
+		return "date";
 	}
 };
 
-typedef LuaArithmeticType<types::BigBCD, LuaBigintMetaInfo> LuaBigint;
-typedef LuaArithmeticTypeConstructor<types::BigBCD, LuaBigintMetaInfo> ConstructorLuaBigint;
+typedef LuaArithmeticType<types::Date, LuaDateMetaInfo> LuaDate;
+typedef LuaArithmeticTypeConstructor<types::Date, LuaDateMetaInfo> ConstructorLuaDate;
 
-struct LuaBignumMetaInfo
+int _Wolframe::langbind::initDateTimeModule( lua_State* ls)
 {
-	static const char* metatableName()
-	{
-		return "wolframe.bignum";
-	}
-	static const char* typeName()
-	{
-		return "bignum";
-	}
-};
+	createLuaArithmeticTypeMetatable<types::Date, LuaDateMetaInfo>( ls);
+	lua_register( ls, "date", &ConstructorLuaDate::create);
 
-typedef LuaArithmeticType<types::BigNumber, LuaBignumMetaInfo> LuaBignum;
-typedef LuaArithmeticTypeConstructor<types::BigNumber, LuaBignumMetaInfo> ConstructorLuaBignum;
-
-int _Wolframe::langbind::initBignumModule( lua_State* ls)
-{
-	createLuaArithmeticTypeMetatable<types::BigBCD, LuaBigintMetaInfo>( ls);
-	lua_register( ls, "bigint", &ConstructorLuaBigint::create);
-
-	createLuaArithmeticTypeMetatable<types::BigNumber, LuaBignumMetaInfo>( ls);
-	lua_register( ls, "bignum", &ConstructorLuaBignum::create);
 	return 0;
 }
 
