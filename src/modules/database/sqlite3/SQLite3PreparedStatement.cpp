@@ -72,7 +72,11 @@ void PreparedStatementHandler_sqlite3::setDatabaseErrorMessage()
 {
 	const char* str = sqlite3_errmsg( m_conn);
 	int errcode = sqlite3_errcode( m_conn);
+#if SQLITE_VERSION_NUMBER >= 3006005
 	int extcode = sqlite3_extended_errcode( m_conn);
+#else
+	int extcode = 0;
+#endif
 
 	std::ostringstream msg;
 	msg << "SQLite error " << errcode;
