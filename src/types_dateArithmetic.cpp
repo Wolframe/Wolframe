@@ -32,93 +32,22 @@
 ************************************************************************/
 ///\file types_dateArithmetic.cpp
 ///\brief Date arithmetic functions
-///\remark based on http://alcor.concordia.ca/~gpkatch/gdate-algorithm.html: Date arithmetics algorithm's described and implemented by Gary Katch
 #include "types/dateArithmetic.hpp"
 #include <stdexcept>
 #include <cstring>
-#include "boost/date_time/gregorian/gregorian.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
-namespace
-{
-struct sdate
-{
-	long y;
-	long m;
-	long d;
-};
-}
-
-///\brief Convert date to day number
-///\remark Original source from http://alcor.concordia.ca/~gpkatch/gdate-c.html
-static long daynum( sdate d)
-{
-	long y, m;
-
-	m = (d.m + 9)%12;	/* mar=0, feb=11 */
-	y = d.y - m/10;		/* if Jan/Feb, year-- */
-	return y*365 + y/4 - y/100 + y/400 + (m*306 + 5)/10 + (d.d - 1);
-}
-
-static sdate g_mindate = {1600, 1, 1};
-static long g_mindaynum = daynum( g_mindate);
-
-///\brief Convert day number to y,m,d format
-///\remark Original source from http://alcor.concordia.ca/~gpkatch/gdate-c.html
-struct sdate get_sdate( long d)
-{
-	struct sdate pd;
-	long y, ddd, mi;
-
-	y = (10000*d + 14780)/3652425;
-	ddd = d - (y*365 + y/4 - y/100 + y/400);
-	if (ddd < 0)
-	{
-		y--;
-		ddd = d - (y*365 + y/4 - y/100 + y/400);
-	}
-	mi = (52 + 100*ddd)/3060;
-	pd.y = y + (mi + 2)/12;
-	pd.m = (mi + 2)%12 + 1;
-	pd.d = ddd - (mi*306 + 5)/10 + 1;
-	return pd;
-}
-
-
-void Date::check()
-{
-	if (m_daynum < g_mindaynum)
-	{
-		throw std::runtime_error( "bad date in calculation");
-	}
-}
-
 Date::Date( unsigned short y, unsigned short m, unsigned short d)
-{
-	sdate dt;
-	dt.y = y;
-	dt.m = m;
-	dt.d = d;
-	m_daynum = daynum( dt);
-	check();
-}
+	:m_date( y, m, d){}
 
 Date::Date( const std::string& dt, const char* format)
 {
 	std::istringstream dti(dt);
 	boost::gregorian::date_facet dtf( format);
 	dti.imbue( std::locale( std::locale::classic(), &dtf));
-	boost::gregorian::date gdate;
-	dti >> gdate;
-
-	sdate dd;
-	dd.y = gdate.year();
-	dd.m = gdate.month();
-	dd.d = gdate.day();
-
-	m_daynum = daynum( dd);
+	dti >> m_date;
 }
 
 std::string Date::tostring( const char* format) const
@@ -126,9 +55,39 @@ std::string Date::tostring( const char* format) const
 	std::ostringstream dto;
 	boost::gregorian::date_facet dtf( format);
 	dto.imbue( std::locale( std::locale::classic(), &dtf));
-	sdate thisdate = get_sdate( m_daynum);
-	boost::gregorian::date gdate( thisdate.y, thisdate.m, thisdate.d);
-	dto << gdate;
+	dto << m_date;
 	return dto.str();
 }
+
+long Date::operator - (const Date& o) const
+{
+	return (m_date - o.m_date).days();
+}
+
+Date Date::operator + (long days) const
+{
+	boost::gregorian::date_duration d( days);
+	return Date( m_date + d);
+}
+
+Date Date::operator - (long days) const
+{
+	boost::gregorian::date_duration d( days);
+	return Date( m_date - d);
+}
+
+Date& Date::operator += (long days)
+{
+	boost::gregorian::date_duration d( days);
+	m_date += d;
+	return *this;
+}
+
+Date& Date::operator -= (long days)
+{
+	boost::gregorian::date_duration d( days);
+	m_date -= d;
+	return *this;
+}
+
 

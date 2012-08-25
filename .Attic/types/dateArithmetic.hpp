@@ -32,10 +32,10 @@
 ************************************************************************/
 ///\file types/dateArithmetic.hpp
 ///\brief Interface to date arithmetic functions
+///\remark based on http://alcor.concordia.ca/~gpkatch/gdate-algorithm.html: Date arithmetics algorithm's described and implemented by Gary Katch (Implementation http://alcor.concordia.ca/~gpkatch/gdate-c.html)
 #ifndef _TYPES_DATE_ARITHMETIC_HPP_INCLUDED
 #define _TYPES_DATE_ARITHMETIC_HPP_INCLUDED
 #include <string>
-#include "boost/date_time/gregorian/gregorian.hpp"
 
 namespace _Wolframe {
 namespace types {
@@ -58,26 +58,18 @@ public:
 	Date( const std::string& dt, const char* format="%Y/%m/%d");
 
 	///\brief Copy constructor
-	Date( const Date& o)
-		:m_date(o.m_date){}
+	Date( const Date& o)				:m_daynum(o.m_daynum){}
 
 	///\brief Get the difference in days
-	long operator - (const Date& o) const;
+	int operator - (const Date& o)			{return (int)(m_daynum - o.m_daynum);}
 	///\brief Add number of days
-	Date operator + (long days) const;
+	Date operator + (int days)			{Date rt( m_daynum + days); rt.check(); return rt;}
 	///\brief Subtract number of days
-	Date operator - (long days) const;
+	Date operator - (int days)			{Date rt( m_daynum - days); rt.check(); return rt;}
 	///\brief Add number of days
-	Date& operator += (long days);
+	Date& operator += (int days)			{m_daynum += days; check(); return *this;}
 	///\brief Subtract number of days
-	Date& operator -= (long days);
-
-	bool operator == (const Date& o) const		{return m_date == o.m_date;}
-	bool operator != (const Date& o) const		{return m_date != o.m_date;}
-	bool operator >= (const Date& o) const		{return m_date >= o.m_date;}
-	bool operator <= (const Date& o) const		{return m_date <= o.m_date;}
-	bool operator < (const Date& o) const		{return m_date < o.m_date;}
-	bool operator > (const Date& o) const		{return m_date > o.m_date;}
+	Date& operator -= (int days)			{m_daynum -= days; check(); return *this;}
 
 	///\brief Get the date as a formated string
 	///\param[in] format format definition of 'dt' in a format similar to printf
@@ -86,12 +78,14 @@ public:
 	std::string tostring( const char* format="%Y/%m/%d") const;
 
 private:
+	///\brief Check the date and throw an exception if the date is not in the boundaries allowed by this library (bigger than 1599/12/31)
+	void check();
 	///\brief Constructor
-	Date( const boost::gregorian::date& o)
-		:m_date(o){}
+	Date( long daynum)
+		:m_daynum(daynum){}
 
-	///\brief Internal representation of the date
-	boost::gregorian::date m_date;
+	///\brief Representation as number of days
+	long m_daynum;
 };
 
 
