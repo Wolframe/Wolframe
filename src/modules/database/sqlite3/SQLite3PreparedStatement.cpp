@@ -39,9 +39,6 @@
 #include <cstdlib>
 #include <limits>
 #include <stdexcept>
-#if SQLITE_VERSION_NUMBER < 3005000
-#error This SQLite version is not supported by this module. It relies on the "V2" interface of sqlite3
-#endif
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
