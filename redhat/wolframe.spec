@@ -259,10 +259,11 @@ BuildRequires: postgresql-devel >= 7.0
 %endif
 
 # build local sqlite3 for distibutions with no or too old version
+# or which do not support V2 of the API correctly
 %define build_sqlite 0   
 %if %{with_sqlite}
 %if %{rhel}
-%if %{rhel4}
+%if %{rhel4} || %{rhel5}
 %define build_sqlite 1
 %endif
 %endif
