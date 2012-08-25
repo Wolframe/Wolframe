@@ -44,7 +44,7 @@ Project Wolframe.
 #define NumMask 0x0fffFFFFffffFFFFULL
 #define NumHighShift 60
 #define NumDigits 15
-#define MaxEstimate 100000000000000
+#define MaxEstimate 100000000000000ULL
 #else
 #define NumMask 0x0fffFFFF
 #define NumHighShift 28
