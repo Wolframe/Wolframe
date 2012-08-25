@@ -89,7 +89,12 @@ bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, S
 {
 	sqlite3_stmt* inst = 0;
 	const char *stmtail;
+#if SQLITE_VERSION_NUMBER >= 3005000
 	int rc = sqlite3_prepare_v2( m_conn, stmstr, -1, &inst, &stmtail);
+#else
+	int rc = sqlite3_prepare( m_conn, stmstrm -1, &inst, &stmtail);
+#endif
+
 	if (rc != SQLITE_OK) return status( rc, newstate);
 
 	if (stmtail != 0)
