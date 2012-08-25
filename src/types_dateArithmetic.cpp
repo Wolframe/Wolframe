@@ -36,6 +36,8 @@
 #include <stdexcept>
 #include <cstring>
 
+static const char* ISO_extended_format = "%Y-%m-%d";		//< default format for dates
+
 using namespace _Wolframe;
 using namespace _Wolframe::types;
 
@@ -46,7 +48,7 @@ Date::Date( const std::string& dt, const char* format)
 {
 	std::istringstream dti;
 	dti.str( dt);
-	boost::gregorian::date_facet* dtf = new boost::gregorian::date_facet( format);
+	boost::gregorian::date_input_facet *dtf = new boost::gregorian::date_input_facet( format?format:ISO_extended_format);
 	dti.imbue( std::locale( std::locale::classic(), dtf));
 	dti >> m_date;
 }
@@ -54,7 +56,7 @@ Date::Date( const std::string& dt, const char* format)
 std::string Date::tostring( const char* format) const
 {
 	std::ostringstream dto;
-	boost::gregorian::date_facet* dtf = new boost::gregorian::date_facet( format);
+	boost::gregorian::date_facet* dtf = new boost::gregorian::date_facet( format?format:ISO_extended_format);
 	dto.imbue( std::locale( std::locale::classic(), dtf));
 	dto << m_date;
 	return dto.str();

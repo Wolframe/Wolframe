@@ -55,7 +55,7 @@ public:
 	///\param[in] dt date as string
 	///\param[in] format format definition of 'dt' in a format similar to printf
 	///\remark For the format defintion see http://www.boost.org/doc/libs/1_43_0/doc/html/date_time/date_time_io.html
-	Date( const std::string& dt, const char* format="%Y/%m/%d");
+	Date( const std::string& dt, const char* format=0);
 
 	///\brief Copy constructor
 	Date( const Date& o)
@@ -88,7 +88,7 @@ public:
 	///\return the date as string
 	///\remark For the format defintion see http://www.boost.org/doc/libs/1_43_0/doc/html/date_time/date_time_io.html
 	std::string tostring( const char* format) const;
-	std::string tostring() const			{return tostring("%Y/%m/%d");}
+	std::string tostring() const			{return tostring(0);}
 
 private:
 	///\brief Constructor
