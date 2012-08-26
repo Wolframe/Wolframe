@@ -23,6 +23,7 @@ DYNAMIC_MODULE = mod_db_postgresql.so
 CPP_OBJS = \
 	PostgreSQLconfig.o \
 	PostgreSQL.o \
+	PostgreSQLpreparedStatement.o \
 	PostgreSQLmodule.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

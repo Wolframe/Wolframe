@@ -119,9 +119,7 @@ bool PreparedStatementHandler_sqlite3::commit()
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}
-	bool rt = executeInstruction( "COMMIT TRANSACTION;", Init);
-	clear();
-	return rt;
+	return executeInstruction( "COMMIT TRANSACTION;", Init);
 }
 
 bool PreparedStatementHandler_sqlite3::rollback()
@@ -192,7 +190,7 @@ bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
 
 bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const char* value)
 {
-	if (m_state != Prepared || m_state != Executed)
+	if (m_state != Prepared && m_state != Executed)
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
 	}

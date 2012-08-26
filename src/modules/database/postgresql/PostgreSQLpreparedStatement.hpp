@@ -30,29 +30,29 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to process prepared statements with sqlite3
-///\file modules/database/sqlite3/SQLite3PreparedStatement.hpp
-#ifndef _DATABASE_PREPARED_STATEMENT_SQLITE3_HPP_INCLUDED
-#define _DATABASE_PREPARED_STATEMENT_SQLITE3_HPP_INCLUDED
+///\brief Interface to process prepared statements with postgres client using libpq
+///\file modules/database/postgres/PostgreSQLpreparedStatement.hpp
+#ifndef _DATABASE_PREPARED_STATEMENT_POSTGRESQL_LIBPQ_HPP_INCLUDED
+#define _DATABASE_PREPARED_STATEMENT_POSTGRESQL_LIBPQ_HPP_INCLUDED
 #include "database/preparedStatement.hpp"
 #include <string>
-#include <map>
+#include <vector>
 #include <cstdlib>
-#include "sqlite3.h"
+#include <libpq-fe.h>
 
 namespace _Wolframe {
 namespace db {
 
-///\class PreparedStatementHandler_sqlite3
-///\brief Handler to process prepared statements with sqlite3
-///\remark The sqlite3 connection is opened, closed, created and disposed by the caller
-struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
+///\class PreparedStatementHandler_postgres
+///\brief Handler to process prepared statements with postgresql (libpq)
+///\remark The postgres connection is opened, closed, created and disposed by the caller
+struct PreparedStatementHandler_postgres :public PreparedStatementHandler
 {
 	///\brief Constructor
-	PreparedStatementHandler_sqlite3( sqlite3* conn, const std::map<std::string,std::string>* stmmap);
+	PreparedStatementHandler_postgres( PGconn* conn);
 
 	///\brief Destructor
-	virtual ~PreparedStatementHandler_sqlite3();
+	virtual ~PreparedStatementHandler_postgres();
 
 	///\brief Begin transaction
 	virtual bool begin();
@@ -95,16 +95,22 @@ private:
 	}
 
 	void setDatabaseErrorMessage();
-	bool status( int rc, State newstate);
+	bool status( PGresult* res, State newstate);
 	bool errorStatus( const std::string& message);
 	bool executeInstruction( const char* stmstr, State newstate);
 
 private:
+	enum {MaxBindParameters=64};
+
 	State m_state;
-	sqlite3* m_conn;
-	const std::map<std::string,std::string>* m_stmmap;
+	PGconn* m_conn;
+	PGresult* m_lastresult;
 	std::string m_lasterror;
-	sqlite3_stmt* m_stm;
+	std::string m_stmname;
+	std::string m_stmparamstr;
+	std::vector<std::size_t> m_bind;
+	std::size_t m_nof_rows;
+	std::size_t m_idx_row;
 };
 
 }}//namespace

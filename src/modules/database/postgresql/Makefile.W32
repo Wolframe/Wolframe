@@ -27,6 +27,7 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	PostgreSQLconfig.obj \
 	PostgreSQL.obj \
+	PostgreSQLpreparedStatement.obj \
 	PostgreSQLmodule.obj
 
 all: $(DYNAMIC_MODULE)

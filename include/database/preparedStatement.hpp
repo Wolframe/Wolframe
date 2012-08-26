@@ -56,6 +56,8 @@ struct PreparedStatementHandler
 	virtual bool commit()=0;
 	///\brief Rollback current transaction
 	virtual bool rollback()=0;
+	///\brief Clear object and set initial state
+	virtual void clear(){}
 	///\brief Start new command statement
 	///\param[in] stmname name of prepared statement
 	virtual bool start( const std::string& stmname)=0;
