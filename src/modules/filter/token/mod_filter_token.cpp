@@ -69,6 +69,12 @@ static createObjectFunc objdef[ NofObjects] =
 	TokenFilterObject_UCS4LE::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "token filter", setModuleLogger, 0, 0, NofObjects, objdef);
+#ifndef _WIN32
+#define DLLEXPORT 
+#else
+#define DLLEXPORT __declspec( dllexport )
+#endif
+
+extern "C" DLLEXPORT ModuleEntryPoint entryPoint( 0, "token filter", setModuleLogger, 0, 0, NofObjects, objdef);
 
 

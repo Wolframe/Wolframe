@@ -69,6 +69,12 @@ static createObjectFunc objdef[ NofObjects] =
 	LineFilterObject_UCS4LE::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "line filter", setModuleLogger, 0, 0, NofObjects, objdef);
+#ifndef _WIN32
+#define DLLEXPORT 
+#else
+#define DLLEXPORT __declspec( dllexport )
+#endif
+
+extern "C" DLLEXPORT ModuleEntryPoint entryPoint( 0, "line filter", setModuleLogger, 0, 0, NofObjects, objdef);
 
 
