@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/ioFilterCommandHandler.hpp
-#ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
+///\file cmdbind/doctypeFilterCommandHandler.hpp
+#ifndef _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"
 #include "filter/filter.hpp"
 #include "cmdbind/protocolCommandHandler.hpp"
@@ -41,27 +41,18 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class IOFilterCommandHandler
-///\brief Command handler processing filter input/output
-class IOFilterCommandHandler :public ProtocolCommandHandler
+///\class DoctypeFilterCommandHandler
+///\brief Command handler for exctracting the document type identifier from a content
+///\remark This is a pre-processing command handler. It is returning the consumed input as data left for following processing
+class DoctypeFilterCommandHandler :public ProtocolCommandHandler
 {
 public:
 	typedef CommandHandler Parent;
 
 	///\brief Constructor
-	IOFilterCommandHandler();
+	DoctypeFilterCommandHandler();
 	///\brief Destructor
-	virtual ~IOFilterCommandHandler();
-
-	void setFilter( const langbind::InputFilterR& in)
-	{
-		m_inputfilter = in;
-	}
-
-	void setFilter( const langbind::OutputFilterR& out)
-	{
-		m_outputfilter = out;
-	}
+	virtual ~DoctypeFilterCommandHandler();
 
 	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
@@ -83,6 +74,8 @@ public:
 
 	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
+
+	std::string doctypeid() const;
 
 	///\enum CallResult
 	///\brief Enumeration of call states of this application processor instance
@@ -106,32 +99,27 @@ private:
 	enum State
 	{
 		Processing,
-		FlushingOutput,
-		DiscardInput,
-		Terminated
+		Terminated,
+		Done
 	};
 	static const char* stateName( State st)
 	{
-		static const char* ar[] = {"Processing","FlushingOutput","DiscardInput","Terminated"};
+		static const char* ar[] = {"Processing","Terminated"};
 		return ar[ (int)st];
 	}
 
 	protocol::EscapeBuffer m_escapeBuffer;
 
 	State m_state;					//< processing state machine state
-	const void* m_writedata;			//< bytes to write next (WRITE)
-	std::size_t m_writedatasize;			//< number of bytes to write next (WRITE)
 
 	protocol::InputBlock m_input;			//< input buffer
-	protocol::OutputBlock m_output;			//< output buffer
 	protocol::InputBlock::iterator m_eoD;		//< input end of data marker
 	std::size_t m_itrpos;				//< read start position in buffer for the command handler
+	std::string m_inputbuffer;			//< buffer for consumed input (is returned to caller because this is a preprocessing command handler)
+	std::string m_doctypeid;			//< document type identifier extracted
 
-private:
-	void getFilterOutputWriteData();
 protected:
-	langbind::InputFilterR m_inputfilter;		//< input interface for this command handler
-	langbind::OutputFilterR m_outputfilter;		//< output interface for this command handler
+	langbind::InputFilterR m_inputfilter;		//< network input interface for this command handler
 };
 }}
 #endif

@@ -81,6 +81,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
 	cmdbind_ioFilterCommandHandler.o \
+	cmdbind_doctypeFilterCommandHandler.o \
 	cmdbind_directmapCommandHandler.o \
 	filter_filterbase.o \
 	filter_doctype.o \
