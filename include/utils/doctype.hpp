@@ -38,7 +38,7 @@ Project Wolframe.
 namespace _Wolframe {
 namespace utils {
 
-///\brief Defines how XML document type definitions are mapped to document type identifiers
+///\brief Gets the Wolframe document type id extracted from an XML document type definition
 std::string getIdFromDoctype( const std::string& doctype);
 
 }}
