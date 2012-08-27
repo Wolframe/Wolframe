@@ -43,6 +43,7 @@
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "utils/miscUtils.hpp"
+#include "utils/doctype.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::config;
@@ -250,7 +251,7 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath, 
 				*form = ci->compileFile( formpath);
 				if (form->doctype())
 				{
-					std::string name = ddl::StructType::getIdFromDoctype( form->doctype());
+					std::string name = utils::getIdFromDoctype( form->doctype());
 					gct->defineForm( name, form);
 				}
 				else

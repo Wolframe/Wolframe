@@ -246,12 +246,12 @@ private:
 			for (;;) switch (m_parser.state())
 			{
 				case XMLParser::ParseHeader:
-					if (!m_parser.getNext( ee, eesize)) return false;
+					m_parser.getNext( ee, eesize);
 					if (m_parser.isStandalone()) return true;
 					continue;
 
 				case XMLParser::ParseDoctype:
-					if (!m_parser.getNext( ee, eesize)) return false;
+					m_parser.getNext( ee, eesize);
 					continue;
 
 				case XMLParser::ParseSource:

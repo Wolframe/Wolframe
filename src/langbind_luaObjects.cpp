@@ -42,6 +42,7 @@ Project Wolframe.
 #include "filter/tostringfilter.hpp"
 #include "ddl/structTypeBuild.hpp"
 #include "utils/miscUtils.hpp"
+#include "utils/doctype.hpp"
 #include "logger-v1.hpp"
 #include <fstream>
 #include <iostream>
@@ -1180,7 +1181,7 @@ LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 		{
 			LuaExceptionHandlerScope escope(ls);
 			{
-				std::string doctypeid( ddl::StructType::getIdFromDoctype( doctype));
+				std::string doctypeid( utils::getIdFromDoctype( doctype));
 				if (doctypeid.size())
 				{
 					lua_pushlstring( ls, doctypeid.c_str(), doctypeid.size());
@@ -1373,7 +1374,7 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 		{
 			if (doctype.size())
 			{
-				std::string doctypeid( ddl::StructType::getIdFromDoctype( doctype));
+				std::string doctypeid( utils::getIdFromDoctype( doctype));
 				GlobalContext* gtc = getGlobalSingletonPointer<GlobalContext>( ls);
 				if (!gtc)
 				{

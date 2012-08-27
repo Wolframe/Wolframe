@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief implementation of scripting global context
 #include "langbind/appGlobalContext.hpp"
 #include "utils/miscUtils.hpp"
+#include "utils/doctype.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;
@@ -89,7 +90,7 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 				*form = ci->compileFile( itr->sourcepath);
 				if (form->doctype())
 				{
-					std::string name = ddl::StructType::getIdFromDoctype( form->doctype());
+					std::string name = utils::getIdFromDoctype( form->doctype());
 					defineForm( name, form);
 				}
 				else
