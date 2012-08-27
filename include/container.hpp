@@ -45,7 +45,7 @@ class Container
 public:
 	virtual ~Container()		{}
 	virtual void dispose() = 0;
-	virtual const char* objectName() const = 0;
+	virtual const char* identifier() const = 0;
 };
 
 /// Template used to specialize a container

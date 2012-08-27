@@ -57,7 +57,7 @@ DECLARE_FILTER_OBJECT("xml:libxml2:UCS-4BE",	Libxml2FilterObject_UCS4BE,	langbin
 DECLARE_FILTER_OBJECT("xml:libxml2:UCS-4LE",	Libxml2FilterObject_UCS4LE,	langbind::createLibxml2Filter)
 
 enum {NofObjects=8};
-static createObjectFunc objdef[ NofObjects] =
+static createContainerFunc objdef[ NofObjects] =
 {
 	Libxml2FilterObject::constructor,
 	Libxml2FilterObject_UTF8::constructor,

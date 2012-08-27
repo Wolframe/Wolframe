@@ -57,7 +57,7 @@ DECLARE_FILTER_OBJECT("xml:textwolf:UCS-4BE",	TextwolfXMLFilterObject_UCS4BE,	la
 DECLARE_FILTER_OBJECT("xml:textwolf:UCS-4LE",	TextwolfXMLFilterObject_UCS4LE,	langbind::createTextwolfXmlFilter)
 
 enum {NofObjects=8};
-static createObjectFunc objdef[ NofObjects] =
+static createContainerFunc objdef[ NofObjects] =
 {
 	TextwolfXMLFilterObject::constructor,
 	TextwolfXMLFilterObject_UTF8::constructor,

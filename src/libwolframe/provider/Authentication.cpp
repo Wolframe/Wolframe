@@ -39,6 +39,7 @@
 #include "AAAAproviderImpl.hpp"
 #include "logger-v1.hpp"
 #include "boost/algorithm/string.hpp"
+#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -53,12 +54,12 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 			ObjectContainer< AuthenticationUnit >* auth =
 					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( builder->container( **it ));
 			if ( auth == NULL )	{
-				LOG_ALERT << "AuthenticationFactory: '" << builder->container( **it )->objectName()
+				LOG_ALERT << "AuthenticationFactory: '" << builder->container( **it )->identifier()
 					  << "' is not an Authentication Unit";
 				throw std::logic_error( "object is not an AuthenticationUnit" );
 			}
 			m_authenticators.push_back( auth->object() );
-			LOG_TRACE << "'" << auth->objectName() << "' authentication unit registered";
+			LOG_TRACE << "'" << auth->identifier() << "' authentication unit registered";
 			auth->dispose();
 		}
 		else	{

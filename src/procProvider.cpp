@@ -186,13 +186,13 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			ObjectContainer< cmdbind::CommandHandlerUnit >* handler =
 					dynamic_cast< ObjectContainer< cmdbind::CommandHandlerUnit >* >( builder->container( **it ));
 			if ( handler == NULL )	{
-				LOG_ALERT << "Wolframe Processor Provider: '" << builder->container( **it )->objectName()
+				LOG_ALERT << "Wolframe Processor Provider: '" << builder->container( **it )->identifier()
 					  << "'' is not a command handler";
 				throw std::logic_error( "Object is not a commandHandler. See log." );
 			}
 			else	{
 				m_handler.push_back( handler->object() );
-				std::string handlerName = handler->objectName();
+				std::string handlerName = handler->identifier();
 				LOG_TRACE << "'" << handlerName << "' command handler registered";
 				// register handler commands here
 				handler->dispose();
@@ -210,12 +210,12 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		//		if the object is a filter
 		module::FilterContainer* filter = dynamic_cast< module::FilterContainer* >((*it)->object());
 		if ( filter == NULL )	{
-			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
+			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
 				  << "'' is not a filter";
 			throw std::logic_error( "Object is not a filter. See log." );
 		}
 		else	{
-			std::string filterName = filter->objectName();
+			std::string filterName = filter->identifier();
 			m_filter.push_back( filter );
 			boost::algorithm::to_upper( filterName );
 			m_filterMap[ filterName ] = filter;

@@ -87,7 +87,7 @@ public:
 	TextFileAuditContainer( const TextFileAuditConfig& conf );
 	~TextFileAuditContainer()		{}
 
-	const char* objectName() const		{ return m_audit->typeName(); }
+	const char* identifier() const		{ return m_audit->typeName(); }
 	AuditUnit* object() const		{ return m_audit; }
 	void dispose()				{ m_audit = NULL; delete this; }
 private:

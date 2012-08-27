@@ -72,12 +72,12 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 			ObjectContainer< db::DatabaseUnit >* db =
 					dynamic_cast< ObjectContainer< db::DatabaseUnit >* >( builder->container( **it ));
 			if ( db == NULL )	{
-				LOG_ALERT << "DatabaseProvider: '" << builder->container( **it )->objectName()
+				LOG_ALERT << "DatabaseProvider: '" << builder->container( **it )->identifier()
 					  << "' is not an Database Unit";
 				throw std::logic_error( "object is not an DatabaseUnit" );
 			}
 			m_db.push_back( db->object() );
-			LOG_TRACE << "'" << db->objectName() << "' database unit registered";
+			LOG_TRACE << "'" << db->identifier() << "' database unit registered";
 			db->dispose();
 		}
 		else	{

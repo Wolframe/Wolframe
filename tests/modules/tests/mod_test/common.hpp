@@ -86,7 +86,7 @@ public:
 
 	~TestModuleContainer()			{}
 
-	virtual const char* objectName() const	{ return "TestUnit"; }
+	virtual const char* identifier() const	{ return "TestUnit"; }
 	virtual TestUnit* object() const	{ return m_test; }
 	void dispose()				{ m_test = NULL; delete this; }
 private:

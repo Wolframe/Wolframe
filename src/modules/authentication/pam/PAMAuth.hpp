@@ -112,7 +112,7 @@ public:
 	PAMAuthContainer( const PAMAuthConfig& conf );
 	~PAMAuthContainer()				{}
 
-	virtual const char* objectName() const		{ return m_auth->typeName(); }
+	virtual const char* identifier() const		{ return m_auth->typeName(); }
 	virtual AuthenticationUnit* object() const	{ return m_auth; }
 	void dispose()					{ m_auth = NULL; delete this; }
 private:

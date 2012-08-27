@@ -91,7 +91,7 @@ public:
 	DBauthzContainer( const DatabaseAuthzConfig& conf );
 	~DBauthzContainer()				{}
 
-	virtual const char* objectName() const		{ return m_authz->typeName(); }
+	virtual const char* identifier() const		{ return m_authz->typeName(); }
 	virtual AuthorizationUnit* object() const	{ return m_authz; }
 	void dispose()					{ m_authz = NULL; delete this; }
 private:

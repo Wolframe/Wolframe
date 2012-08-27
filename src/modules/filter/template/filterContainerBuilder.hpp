@@ -49,7 +49,7 @@ public:
 
 	virtual ~FilterContainer(){}
 
-	virtual const char* objectName() const
+	virtual const char* identifier() const
 	{
 		return m_name.c_str();
 	}
@@ -70,7 +70,7 @@ public:
 
 	virtual Container* object()
 	{
-		return new FilterContainer( m_name, createFilterFunc( m_name));
+		return new FilterContainer( m_identifier, createFilterFunc( m_identifier));
 	}
 };
 

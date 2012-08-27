@@ -39,54 +39,54 @@
 
 #if !defined(_WIN32)	// POSIX module loader
 
-	#include <dlfcn.h>
+#include <dlfcn.h>
 
-	typedef	void*	_Wolframe_MODULE_HANDLE;
-	#define	_Wolframe_DLL_CLOSE(x)	dlclose( x )
+typedef	void*	_Wolframe_MODULE_HANDLE;
+#define	_Wolframe_DLL_CLOSE(x)	dlclose( x )
 #else		// Win32 module loader
 
-	#define WIN32_MEAN_AND_LEAN
-	#include <windows.h>
-	#include <string.h>
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#include <string.h>
 
-	typedef	HMODULE	_Wolframe_MODULE_HANDLE;
-	#define	_Wolframe_DLL_CLOSE(x)	(void)FreeLibrary( x )
+typedef	HMODULE	_Wolframe_MODULE_HANDLE;
+#define	_Wolframe_DLL_CLOSE(x)	(void)FreeLibrary( x )
 
-	#ifdef LOCAL_ERROR_BUFFER_SIZE
-		#error "LOCAL_ERROR_BUFFER_SIZE previously defined"
-	#else
-		#define	LOCAL_ERROR_BUFFER_SIZE	512
-	#endif
-	char *getLastError( char *buf, size_t buflen )
-	{
-		LPTSTR errbuf;
-		DWORD errbuf_len;
-		DWORD res;
-		DWORD last_error;
+#ifdef LOCAL_ERROR_BUFFER_SIZE
+#error "LOCAL_ERROR_BUFFER_SIZE previously defined"
+#else
+#define	LOCAL_ERROR_BUFFER_SIZE	512
+#endif
+char *getLastError( char *buf, size_t buflen )
+{
+	LPTSTR errbuf;
+	DWORD errbuf_len;
+	DWORD res;
+	DWORD last_error;
 
-		last_error = GetLastError( );
+	last_error = GetLastError( );
 
-		res = FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS |
-			FORMAT_MESSAGE_MAX_WIDTH_MASK,
-			NULL,			/* message is from system */
-			last_error,		/* there is a message with that id */
-			0,			/* default language preference */
-			(LPTSTR)&errbuf,	/* buffer allocated internally with LocalAlloc */
-			0,			/* minimum allocation size */
-			NULL );			/* no arguments */
+	res = FormatMessage(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER |
+				FORMAT_MESSAGE_FROM_SYSTEM |
+				FORMAT_MESSAGE_IGNORE_INSERTS |
+				FORMAT_MESSAGE_MAX_WIDTH_MASK,
+				NULL,			/* message is from system */
+				last_error,		/* there is a message with that id */
+				0,			/* default language preference */
+				(LPTSTR)&errbuf,	/* buffer allocated internally with LocalAlloc */
+				0,			/* minimum allocation size */
+				NULL );			/* no arguments */
 
-		if( res == 0 ) {
-			strncpy( buf, "No message available", buflen );
-		} else {
-			strncpy( buf, errbuf, buflen );
-			LocalFree( errbuf );
-		}
-
-		return buf;
+	if( res == 0 ) {
+		strncpy( buf, "No message available", buflen );
+	} else {
+		strncpy( buf, errbuf, buflen );
+		LocalFree( errbuf );
 	}
+
+	return buf;
+}
 
 #endif		// defined(_WIN32)
 
@@ -116,7 +116,7 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir, const std::list< 
 	bool retVal = true;
 
 	for ( std::list< std::string >::const_iterator it = modFiles.begin();
-		it != modFiles.end(); it++ )	{
+							it != modFiles.end(); it++ )	{
 		LOG_TRACE << "Loading module '" << *it << "'";
 #if !defined(_WIN32)	// POSIX module loader
 		void* hndl = dlopen( it->c_str(), RTLD_LAZY );
@@ -163,10 +163,10 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir, const std::list< 
 
 		entry->setLogger( &_Wolframe::log::LogBackend::instance() );
 		for ( unsigned short i = 0; i < entry->cfgdContainers; i++ )	{
-			modDir.addContainer( entry->createCfgdContainer[ i ]() );
+			modDir.addBuilder( entry->createCfgdContainer[ i ]() );
 		}
-		for ( unsigned short i = 0; i < entry->objects; i++ )	{
-			modDir.addContainer( entry->createObject[ i ]() );
+		for ( unsigned short i = 0; i < entry->containers; i++ )	{
+			modDir.addBuilder( entry->createContainer[ i ]() );
 		}
 		handleList.addHandle( hndl );
 		LOG_DEBUG << "Module '" << entry->name << "' loaded";

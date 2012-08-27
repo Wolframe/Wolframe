@@ -46,18 +46,19 @@
 namespace _Wolframe {
 namespace module {
 
+///
 class ContainerBuilder
 {
 	friend class ModulesDirectory;
 protected:
-	const char* m_name;
+	const char* m_identifier;
 public:
 	ContainerBuilder( const char* name )
-		: m_name( name )		{}
+		: m_identifier( name )			{}
 
-	virtual ~ContainerBuilder()		{}
+	virtual ~ContainerBuilder()			{}
 
-	const char* builderName() const		{ return m_name; }
+	const char* identifier() const			{ return m_identifier; }
 
 	virtual Container* object() = 0;
 };
@@ -68,18 +69,18 @@ class ConfiguredContainerBuilder
 	friend class ModulesDirectory;
 protected:
 	const char* m_title;
-	const char* m_section;
-	const char* m_keyword;
-	const char* m_name;
+	const char* m_section;		///< configuration section to which it reacts
+	const char* m_keyword;		///< configuration keyword (element)
+	const char* m_identifier;	///< identifier of the builder
 public:
 	ConfiguredContainerBuilder( const char* title, const char* section, const char* keyword,
 				    const char* name )
 		: m_title( title ), m_section( section), m_keyword( keyword ),
-		  m_name( name )		{}
+		  m_identifier( name )			{}
 
-	virtual ~ConfiguredContainerBuilder()	{}
+	virtual ~ConfiguredContainerBuilder()		{}
 
-	const char* builderName() const		{ return m_name; }
+	const char* identifier() const			{ return m_identifier; }
 
 	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
 	virtual Container* container( const config::NamedConfiguration& conf ) = 0;
@@ -95,7 +96,7 @@ public:
 		: ConfiguredContainerBuilder( title, section, keyword, name )
 	{}
 
-	virtual ~ConfiguredContainerDescription(){}
+	virtual ~ConfiguredContainerDescription()	{}
 
 	virtual config::NamedConfiguration* configuration( const char* logPrefix )	{
 		return new Tconf( m_title, logPrefix, m_keyword );
@@ -112,12 +113,12 @@ public:
 	ModulesDirectory()				{}
 	~ModulesDirectory();
 
-	bool addContainer( ConfiguredContainerBuilder* container );
-	bool addContainer( ContainerBuilder* container );
+	bool addBuilder( ConfiguredContainerBuilder* container );
+	bool addBuilder( ContainerBuilder* container );
 
 	ConfiguredContainerBuilder* getContainer( const std::string& section, const std::string& keyword ) const;
-	ConfiguredContainerBuilder* getContainer( const std::string& name ) const;
-	ContainerBuilder* getObject( const std::string& name ) const;
+	ConfiguredContainerBuilder* getContainer( const std::string& identifier ) const;
+	ContainerBuilder* getObject( const std::string& identifier ) const;
 
 	class container_iterator
 	{
@@ -163,7 +164,7 @@ enum ModuleObjectType	{
 };
 
 typedef ConfiguredContainerBuilder* (*createCfgContainerFunc)();
-typedef ContainerBuilder* (*createObjectFunc)();
+typedef ContainerBuilder* (*createContainerFunc)();
 
 struct ModuleEntryPoint
 {
@@ -176,23 +177,23 @@ struct ModuleEntryPoint
 	const char* name;
 	void (*setLogger)(void*);
 	unsigned short		cfgdContainers;		///< number of configured containers
-	createCfgContainerFunc	*createCfgdContainer;
-	unsigned short		objects;
-	createObjectFunc	*createObject;
+	createCfgContainerFunc	*createCfgdContainer;	///< vector of creation functions for configured containers
+	unsigned short		containers;		///< number of simple (unconfigured) containers
+	createContainerFunc	*createContainer;	///< vector of creation functions for simple containers
 public:
 	ModuleEntryPoint( unsigned short iVer, const char* modName,
 			  void (*setLoggerFunc)(void*),
 			  unsigned short nrContainers, createCfgContainerFunc* containerFunc,
-			  unsigned short nrObjects, createObjectFunc* objectFunc
+			  unsigned short nrObjects, createContainerFunc* objectFunc
 			  )
 		: ifaceVersion( iVer ), name( modName ),
 		  setLogger( setLoggerFunc ),
 		  cfgdContainers( nrContainers ), createCfgdContainer( containerFunc ),
-		  objects( nrObjects ), createObject( objectFunc )
+		  containers( nrObjects ), createContainer( objectFunc )
 	{
 		std::memcpy ( signature, "Wolframe Module", MODULE_SIGN_SIZE );
 		if ( createCfgdContainer == NULL ) cfgdContainers = 0;
-		if ( createObject == NULL ) objects = 0;
+		if ( createContainer == NULL ) containers = 0;
 	}
 
 };

@@ -37,6 +37,7 @@
 #include <stdexcept>
 
 #include "AAAAproviderImpl.hpp"
+#include "moduleInterface.hpp"
 #include "logger-v1.hpp"
 #include "boost/algorithm/string.hpp"
 
@@ -54,12 +55,12 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::NamedConf
 			ObjectContainer< AuthorizationUnit >* authz =
 					dynamic_cast< ObjectContainer< AuthorizationUnit >* >( builder->container( **it ));
 			if ( authz == NULL )	{
-				LOG_ALERT << "AuthorizationProvider: '" << builder->container( **it )->objectName()
+				LOG_ALERT << "AuthorizationProvider: '" << builder->container( **it )->identifier()
 					  << "' is not an Authorization Unit";
 				throw std::logic_error( "object is not an AuthorizationUnit" );
 			}
 			m_authorizeUnits.push_back( authz->object() );
-			LOG_TRACE << "'" << authz->objectName() << "' authorization unit registered";
+			LOG_TRACE << "'" << authz->identifier() << "' authorization unit registered";
 			authz->dispose();
 		}
 		else	{

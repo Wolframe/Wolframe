@@ -87,9 +87,9 @@ class DBauditContainer : public ObjectContainer< AuditUnit >
 {
 public:
 	DBauditContainer( const DBauditConfig& conf );
-	~DBauditContainer()				{}
+	~DBauditContainer()			{}
 
-	const char* objectName() const		{ return m_audit->typeName(); }
+	const char* identifier() const		{ return m_audit->typeName(); }
 	AuditUnit* object() const		{ return m_audit; }
 	void dispose()				{ m_audit = NULL; delete this; }
 private:

@@ -109,7 +109,7 @@ public:
 	~PostgreSQLcontainer()				{ if ( m_db ) delete m_db; }
 
 	virtual const std::string& ID() const		{ return m_db->ID(); }
-	virtual const char* objectName() const		{ return m_db->typeName(); }
+	virtual const char* identifier() const		{ return m_db->typeName(); }
 	virtual DatabaseUnit* object() const		{ return m_db; }
 	void dispose()					{ m_db = NULL; delete this; }
 private:

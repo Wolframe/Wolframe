@@ -49,7 +49,7 @@ public:
 
 	virtual ~FormFunctionContainer(){}
 
-	virtual const char* objectName() const
+	virtual const char* identifier() const
 	{
 		return m_name.c_str();
 	}

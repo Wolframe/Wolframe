@@ -100,7 +100,7 @@ public:
 
 	~TestModuleContainer1()			{}
 
-	virtual const char* objectName() const	{ return "TestUnit1"; }
+	virtual const char* identifier() const	{ return "TestUnit1"; }
 	virtual TestUnit1* object() const	{ return m_test; }
 	void dispose()				{ m_test = NULL; delete this; }
 private:
@@ -114,7 +114,7 @@ public:
 
 	~TestModuleContainer2()			{}
 
-	virtual const char* objectName() const	{ return "TestUnit2"; }
+	virtual const char* identifier() const	{ return "TestUnit2"; }
 	virtual TestUnit2* object() const	{ return m_test; }
 	void dispose()				{ m_test = NULL; delete this; }
 private:

@@ -51,7 +51,7 @@ ModulesDirectory::~ModulesDirectory()
 }
 
 
-bool ModulesDirectory::addContainer( ConfiguredContainerBuilder* container )
+bool ModulesDirectory::addBuilder( ConfiguredContainerBuilder* container )
 {
 	for ( std::list< ConfiguredContainerBuilder* >::const_iterator it = m_cfgdContainer.begin();
 							it != m_cfgdContainer.end(); it++ )	{
@@ -61,30 +61,30 @@ bool ModulesDirectory::addContainer( ConfiguredContainerBuilder* container )
 				  << "' keyword '" << container->m_keyword << "' already exists";
 			return false;
 		}
-		if ( boost::algorithm::iequals( (*it)->m_name, container->m_name ))	{
-			LOG_ALERT << "A module container named '" << container->m_name
+		if ( boost::algorithm::iequals( (*it)->m_identifier, container->m_identifier ))	{
+			LOG_ALERT << "A module container named '" << container->m_identifier
 				  << "' already exists";
 			return false;
 		}
 	}
 	m_cfgdContainer.push_back( container );
-	LOG_DEBUG << "Module '" << container->m_name << "' registered for section '"
+	LOG_DEBUG << "Module '" << container->m_identifier << "' registered for section '"
 		  << container->m_section << "' keyword '" << container->m_keyword << "'";
 	return true;
 }
 
-bool ModulesDirectory::addContainer( ContainerBuilder* container )
+bool ModulesDirectory::addBuilder( ContainerBuilder* container )
 {
 	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
 							it != m_container.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->m_name, container->m_name ))	{
-			LOG_ALERT << "A module object named '" << container->m_name
+		if ( boost::algorithm::iequals( (*it)->m_identifier, container->m_identifier ))	{
+			LOG_ALERT << "A module object named '" << container->m_identifier
 				  << "' already exists";
 			return false;
 		}
 	}
 	m_container.push_back( container );
-	LOG_DEBUG << "Module object '" << container->m_name << "' registered";
+	LOG_DEBUG << "Module object '" << container->m_identifier << "' registered";
 	return true;
 }
 
@@ -100,21 +100,21 @@ ConfiguredContainerBuilder* ModulesDirectory::getContainer( const std::string& s
 	return NULL;
 }
 
-ConfiguredContainerBuilder* ModulesDirectory::getContainer( const std::string& name ) const
+ConfiguredContainerBuilder* ModulesDirectory::getContainer( const std::string& identifier ) const
 {
 	for ( std::list< ConfiguredContainerBuilder* >::const_iterator it = m_cfgdContainer.begin();
 							it != m_cfgdContainer.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->m_name, name ))
+		if ( boost::algorithm::iequals( (*it)->m_identifier, identifier ))
 			return *it;
 	}
 	return NULL;
 }
 
-ContainerBuilder* ModulesDirectory::getObject( const std::string& name ) const
+ContainerBuilder* ModulesDirectory::getObject( const std::string& identifier ) const
 {
 	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
 							it != m_container.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->m_name, name ))
+		if ( boost::algorithm::iequals( (*it)->m_identifier, identifier ))
 			return *it;
 	}
 	return NULL;

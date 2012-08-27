@@ -50,7 +50,7 @@ public:
 
 	virtual ~DDLCompilerContainer(){}
 
-	virtual const char* objectName() const
+	virtual const char* identifier() const
 	{
 		return m_name.c_str();
 	}
@@ -66,17 +66,17 @@ class DDLCompilerContainerBuilder :public ContainerBuilder
 public:
 	DDLCompilerContainerBuilder( const char* name_)
 		:ContainerBuilder(name_)
-		,m_name(name_){}
+		,m_identifier(name_){}
 
 	virtual ~DDLCompilerContainerBuilder(){}
 
 	virtual Container* object()
 	{
-		return new DDLCompilerContainer<CompilerInterfaceC>(m_name.c_str());
+		return new DDLCompilerContainer<CompilerInterfaceC>(m_identifier.c_str());
 	}
 
 private:
-	std::string m_name;
+	std::string m_identifier;
 };
 
 }}//namespace

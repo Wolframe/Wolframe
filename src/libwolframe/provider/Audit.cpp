@@ -37,6 +37,7 @@
 #include <stdexcept>
 
 #include "AAAAproviderImpl.hpp"
+#include "moduleInterface.hpp"
 #include "logger-v1.hpp"
 #include "boost/algorithm/string.hpp"
 
@@ -53,12 +54,12 @@ AuditProvider::AuditProvider( const std::list< config::NamedConfiguration* >& co
 			ObjectContainer< AuditUnit >* audit =
 					dynamic_cast< ObjectContainer< AuditUnit >* >( builder->container( **it ));
 			if ( audit == NULL )	{
-				LOG_ALERT << "AuditProvider: '" << builder->container( **it )->objectName()
+				LOG_ALERT << "AuditProvider: '" << builder->container( **it )->identifier()
 					  << "' is not an Audit Unit";
 				throw std::logic_error( "object is not an AuditUnit" );
 			}
 			m_auditors.push_back( audit->object() );
-			LOG_TRACE << "'" << audit->objectName() << "' audit unit registered";
+			LOG_TRACE << "'" << audit->identifier() << "' audit unit registered";
 			audit->dispose();
 		}
 		else	{

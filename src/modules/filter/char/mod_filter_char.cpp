@@ -57,7 +57,7 @@ DECLARE_FILTER_OBJECT("char:UCS-4BE",	CharFilterObject_UCS4BE,	langbind::createC
 DECLARE_FILTER_OBJECT("char:UCS-4LE",	CharFilterObject_UCS4LE,	langbind::createCharFilter)
 
 enum {NofObjects=8};
-static createObjectFunc objdef[ NofObjects] =
+static createContainerFunc objdef[ NofObjects] =
 {
 	CharFilterObject::constructor,
 	CharFilterObject_UTF8::constructor,
