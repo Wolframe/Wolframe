@@ -40,12 +40,20 @@ Project Wolframe.
 	<LoadModules>
 		<module>modules\database\postgresql\mod_db_postgresql.dll</module>
 		<module>modules\database\sqlite3\mod_db_sqlite3.dll</module>
+
 		<module>modules\audit\database\mod_audit_database.dll</module>
 		<module>modules\audit\textfile\mod_audit_textfile.dll</module>
 		<module>modules\authentication\database\mod_auth_database.dll</module>
 		<module>modules\authentication\textfile\mod_auth_textfile.dll</module>
+		<module>modules\authorization\database\mod_authz_database.dll</module>
 
-		<module>modules\processor\echo\mod_proc_echo.dll</module>
+<!--		<module>modules\processor\echo\mod_proc_echo.dll</module>-->
+
+        <module>modules\filter\char\mod_filter_char.dll</module>
+        <module>modules\filter\libxml2\mod_filter_libxml2.dll</module>
+        <module>modules\filter\line\mod_filter_line.dll</module>
+		<module>modules\filter\textwolf\mod_filter_textwolf.dll</module>
+		<module>modules\filter\token\mod_filter_token.dll</module>
 	</LoadModules>
 
 	<ServerTokens>OS</ServerTokens>		<!--    Print the application name and version
