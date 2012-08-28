@@ -53,8 +53,6 @@ public:
 	{
 		return m_name.c_str();
 	}
-
-	virtual void dispose()	{ delete this; }
 private:
 	std::string m_name;
 };
