@@ -100,7 +100,7 @@ void FilterMap::defineFilter( const std::string& name, CreateFilterFunc f)
 	defineObject( m_map, name, f);
 }
 
-bool FilterMap::getFilter( const std::string& name, Filter& rt)
+bool FilterMap::getFilter( const std::string& name, Filter& rt) const
 {
 	CreateFilterFunc f;
 	if (!getObject( m_map, name, f)) return false;

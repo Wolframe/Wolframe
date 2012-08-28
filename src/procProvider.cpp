@@ -159,10 +159,10 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
-//const langbind::Filter& ProcessorProvider::getFilter( const std::string& name ) const
-//{
-//	return m_impl->getFilter( name );
-//}
+const langbind::Filter* ProcessorProvider::getFilter( const std::string& name ) const
+{
+	return m_impl->getFilter( name );
+}
 
 cmdbind::CommandHandler* ProcessorProvider::getHandler( const std::string& name ) const
 {

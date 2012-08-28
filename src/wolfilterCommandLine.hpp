@@ -38,6 +38,7 @@
 #include <vector>
 #include <iostream>
 #include "moduleInterface.hpp"
+#include "processor/procProvider.hpp"
 #include "langbind/appConfig_struct.hpp"
 
 namespace _Wolframe {
@@ -46,7 +47,7 @@ namespace config {
 class WolfilterCommandLine
 {
 public:
-	WolfilterCommandLine(int argc, char **argv);
+	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath);
 	WolfilterCommandLine( const WolfilterCommandLine& o)
 		:m_printhelp(o.m_printhelp)
 		,m_printversion(o.m_printversion)
@@ -75,6 +76,8 @@ public:
 	const std::string& cmd() const								{return m_cmd;}
 	const std::string& inputfilter() const							{return m_inputfilter;}
 	const std::string& outputfilter() const							{return m_outputfilter;}
+	const proc::ProcProviderConfig& providerConfig() const					{return m_providerConfig;}
+	const module::ModulesDirectory& modulesDirectory() const				{return m_modulesDirectory;}
 
 	void print(std::ostream &) const;
 
@@ -82,7 +85,7 @@ public:
 	std::size_t outbufsize() const								{return m_outbufsize;}
 
 	///\brief loads the command line objects into the global context
-	void loadGlobalContext( const std::string& referencePath, module::ModulesDirectory& modDir) const;
+	void loadGlobalContext() const;
 
 private:
 	bool m_printhelp;
@@ -99,6 +102,9 @@ private:
 	std::string m_helpstring;
 	std::size_t m_inbufsize;
 	std::size_t m_outbufsize;
+	proc::ProcProviderConfig m_providerConfig;
+	module::ModulesDirectory m_modulesDirectory;
+	std::string m_referencePath;
 };
 
 }}//namespace

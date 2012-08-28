@@ -41,6 +41,7 @@
 #include "testDescription.hpp"
 #include "moduleInterface.hpp"
 #include "utils/miscUtils.hpp"
+#include "processor/procProvider.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -60,12 +61,14 @@ static char* g_gtest_ARGV[2] = {0, 0};
 
 using namespace _Wolframe;
 
-static module::ModulesDirectory m_modulesDirectory;
+static proc::ProcessorProvider* g_processorProvider = 0;
 
 ///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
 static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 {
-	langbind::GlobalContext* gct = new langbind::GlobalContext();
+	if (g_processorProvider) delete g_processorProvider;
+	g_processorProvider = new proc::ProcessorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory());
+	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
 	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
 
 	gct->defineFormFunction( "employee_assignment_convert",
@@ -79,8 +82,7 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 	langbind::TransactionFunctionR func( new EchoTransactionFunction());
 	gct->defineTransactionFunction( "echo_transaction", func);
 
-	boost::filesystem::path refpath( boost::filesystem::current_path() / "temp");
-	cmdline.loadGlobalContext( refpath.string(), m_modulesDirectory);
+	cmdline.loadGlobalContext();
 }
 
 class WolfilterTest : public ::testing::Test
@@ -164,7 +166,8 @@ TEST_F( WolfilterTest, tests)
 		{
 			cmdargv[ci] = strdup( cmd[ci-1].c_str() );
 		}
-		config::WolfilterCommandLine cmdline( cmdargc, cmdargv);
+		boost::filesystem::path refpath( boost::filesystem::current_path() / "temp");
+		config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string());
 
 		// [2.5] Call iostreamfilter
 		if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;

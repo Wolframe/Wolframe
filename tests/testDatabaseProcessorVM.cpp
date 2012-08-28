@@ -43,6 +43,8 @@
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "utils/miscUtils.hpp"
+#include "processor/procProvider.hpp"
+#include "moduleInterface.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -279,11 +281,18 @@ static PreparedStatementHandlerR createPreparedStatementHandlerFunc( const std::
 	return rt;
 }
 
+static proc::ProcProviderConfig g_processorProviderConfig;
+static proc::ProcessorProvider* g_processorProvider = 0;
+static module::ModulesDirectory g_modulesDirectory;
+
 ///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
 static void loadGlobalContext( const std::string& testname)
 {
-	langbind::GlobalContext* gct = new langbind::GlobalContext();
+	if (g_processorProvider) delete g_processorProvider;
+	g_processorProvider = new proc::ProcessorProvider( &g_processorProviderConfig, &g_modulesDirectory);
+	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
 	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
+
 	std::string cmdname( "printcmd");
 	gct->definePreparedStatementHandler( cmdname, testname, &createPreparedStatementHandlerFunc);
 }
