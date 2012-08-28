@@ -89,12 +89,15 @@ bool PostgreSQLconfig::check() const
 
 
 //***  PostgreSQL database container  ***************************************
-PostgreSQLcontainer::PostgreSQLcontainer( const PostgreSQLconfig& conf )
+PostgreSQLdatabase* PostgreSQLcontainer::object( const config::NamedConfiguration& conf )
 {
-	m_db = new PostgreSQLdatabase( conf.m_ID, conf.host, conf.port, conf.dbName,
-				       conf.user, conf.password, conf.connectTimeout,
-				       conf.connections, conf.acquireTimeout );
-	MOD_LOG_TRACE << "PostgreSQL database unit for '" << conf.m_ID << "' created";
+	const PostgreSQLconfig& cfg = dynamic_cast< const PostgreSQLconfig& >( conf );
+
+	PostgreSQLdatabase* m_db = new PostgreSQLdatabase( cfg.m_ID, cfg.host, cfg.port, cfg.dbName,
+							   cfg.user, cfg.password, cfg.connectTimeout,
+							   cfg.connections, cfg.acquireTimeout );
+	MOD_LOG_TRACE << "PostgreSQL database unit for '" << cfg.m_ID << "' created";
+	return m_db;
 }
 
 

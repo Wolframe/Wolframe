@@ -41,11 +41,34 @@
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
+namespace AAAA {
+
+class DBauditConstructor : public ObjectConstructor< AuditUnit >
+{
+public:
+	DBauditConstructor()		{}
+	~DBauditConstructor()		{}
+
+	const char* identifier() const	{ return "DatabaseAudit"; }
+	DBauditor* object( const config::NamedConfiguration& conf );
+};
+
+DBauditor* DBauditConstructor::object( const config::NamedConfiguration& conf )
+{
+	const DBauditConfig& cfg = dynamic_cast< const DBauditConfig& >( conf );
+
+	DBauditor* m_audit = new DBauditor( cfg.m_dbConfig );
+	MOD_LOG_TRACE << "Database auditor container created";
+	return m_audit;
+}
+
+} // namespace AAAA
+
 namespace module {
 
 static ConfiguredBuilder* createModule( void )
 {
-	static module::ConfiguredContainerDescription< AAAA::DBauditContainer,
+	static module::ConfiguredBuilderDescription< AAAA::DBauditConstructor,
 			AAAA::DBauditConfig > mod( "Audit - database", "audit",
 						   "database", "DatabaseAudit" );
 	return &mod;
@@ -66,4 +89,5 @@ ModuleEntryPoint entryPoint( 0, "Database audit", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-}} // namespace _Wolframe::module
+} // namespace module
+} // namespace _Wolframe

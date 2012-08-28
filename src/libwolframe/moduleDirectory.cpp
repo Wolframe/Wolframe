@@ -88,7 +88,7 @@ bool ModulesDirectory::addBuilder( SimpleBuilder* container )
 	return true;
 }
 
-ConfiguredBuilder* ModulesDirectory::getContainer( const std::string& section,
+ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& section,
 						 const std::string& keyword ) const
 {
 	for ( std::list< ConfiguredBuilder* >::const_iterator it = m_cfgdContainer.begin();
@@ -100,7 +100,7 @@ ConfiguredBuilder* ModulesDirectory::getContainer( const std::string& section,
 	return NULL;
 }
 
-ConfiguredBuilder* ModulesDirectory::getContainer( const std::string& identifier ) const
+ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& identifier ) const
 {
 	for ( std::list< ConfiguredBuilder* >::const_iterator it = m_cfgdContainer.begin();
 							it != m_cfgdContainer.end(); it++ )	{

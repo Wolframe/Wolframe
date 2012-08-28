@@ -40,7 +40,6 @@
 #include <list>
 #include "config/configurationBase.hpp"
 #include "database/DBprovider.hpp"
-#include "container.hpp"
 
 namespace _Wolframe {
 namespace db {

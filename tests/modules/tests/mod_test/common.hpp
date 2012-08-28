@@ -79,18 +79,14 @@ public:
 	virtual const std::string hello( ) = 0;
 };
 
-class TestModuleContainer : public ObjectContainer< TestUnit >
+class TestModuleContainer : public ObjectConstructor< TestUnit >
 {
 public:
-	TestModuleContainer( const TestModuleConfig& conf );
-
+	TestModuleContainer()			{}
 	~TestModuleContainer()			{}
 
 	virtual const char* identifier() const	{ return "TestUnit"; }
-	virtual TestUnit* object() const	{ return m_test; }
-	void dispose()				{ m_test = NULL; delete this; }
-private:
-	TestUnit *m_test;
+	virtual TestUnit* object( const config::NamedConfiguration& conf );
 };
 
 }}} // namespace _Wolframe::module::test

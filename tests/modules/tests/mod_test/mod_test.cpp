@@ -71,10 +71,11 @@ void TestModuleConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 {
 }
 
-TestModuleContainer::TestModuleContainer( const TestModuleConfig& /* conf */ )
+TestUnit* TestModuleContainer::object( const config::NamedConfiguration& /* conf */ )
 {
-	m_test = new TestUnitImpl( /* conf */ );
+	TestUnit* m_test = new TestUnitImpl( /* conf */ );
 	MOD_LOG_DEBUG << "Test module container created";
+	return m_test;
 }
 
 TestUnitImpl::TestUnitImpl( )
@@ -99,7 +100,7 @@ bool TestUnitImpl::resolveDB( const db::DatabaseProvider& /* db */ )
 
 static ConfiguredBuilder* createModule( void )
 {
-	static module::ConfiguredContainerDescription< test::TestModuleContainer,
+	static module::ConfiguredBuilderDescription< test::TestModuleContainer,
 		test::TestModuleConfig > mod( "Test Module", "Test", "test", "TestObject" );
 	return &mod;
 }

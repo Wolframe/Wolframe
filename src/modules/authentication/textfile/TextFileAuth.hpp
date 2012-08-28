@@ -42,14 +42,13 @@
 #include "AAAA/authentication.hpp"
 #include "AAAA/user.hpp"
 #include "AAAA/CRAM.hpp"
-#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
 class TextFileAuthConfig :  public config::NamedConfiguration
 {
-	friend class TextFileAuthContainer;
+	friend class TextFileAuthConstructor;
 public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
@@ -116,20 +115,6 @@ private:
 	User*				m_user;
 	std::string			m_username;
 	std::string			m_password;
-};
-
-
-class TextFileAuthContainer : public ObjectContainer< AuthenticationUnit >
-{
-public:
-	TextFileAuthContainer( const TextFileAuthConfig& conf );
-	~TextFileAuthContainer()			{}
-
-	virtual const char* identifier() const		{ return m_auth->typeName(); }
-	virtual AuthenticationUnit* object() const	{ return m_auth; }
-	void dispose()					{ m_auth = NULL; delete this; }
-private:
-	TextFileAuthenticator*		m_auth;
 };
 
 }} // namespace _Wolframe::AAAA

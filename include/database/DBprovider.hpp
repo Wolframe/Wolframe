@@ -46,7 +46,7 @@ namespace module { class ModulesDirectory; }
 namespace db {
 
 /// database configuration
-class DBproviderConfig : public config::ConfigurationBase
+class DBproviderConfig : public config::ConfigurationBase, private boost::noncopyable
 {
 	friend class DatabaseProvider;
 public:

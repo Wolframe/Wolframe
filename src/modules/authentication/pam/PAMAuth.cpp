@@ -35,6 +35,7 @@
 //
 
 #include <string>
+#include <cstring>
 #include <ostream>
 
 #include "logger-v1.hpp"
@@ -237,12 +238,6 @@ PAMAuthenticator::PAMAuthenticator( const std::string& Identifier,
 
 PAMAuthenticator::~PAMAuthenticator()
 {
-}
-
-PAMAuthContainer::PAMAuthContainer( const PAMAuthConfig& conf )
-{
-	m_auth = new PAMAuthenticator( conf.m_identifier, conf.m_service );
-	MOD_LOG_NOTICE << "PAM authenticator container created";
 }
 
 }} // namespace _Wolframe::AAAA

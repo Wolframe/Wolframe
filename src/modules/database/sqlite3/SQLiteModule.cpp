@@ -45,7 +45,7 @@ namespace module {
 
 static ConfiguredBuilder* createSQLiteModule( void )
 {
-	static module::ConfiguredContainerDescription< db::SQLiteContainer,
+	static module::ConfiguredBuilderDescription< db::SQLiteContainer,
 			db::SQLiteConfig > mod( "SQLite database", "database",
 						"SQLite", "SQLite" );
 	return &mod;
@@ -66,4 +66,5 @@ ModuleEntryPoint entryPoint( 0, "SQLite database", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-}} // namespace _Wolframe::module
+} // namespace module
+} // namespace _Wolframe

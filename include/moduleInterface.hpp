@@ -69,41 +69,44 @@ class ConfiguredBuilder
 	friend class ModulesDirectory;
 protected:
 	const char* m_title;		///< used for printing (logging etc.)
-	const char* m_section;		///< configuration section to which it reacts
+	const char* m_section;		///< configuration section to which the
+					/// configuration parser reacts
 	const char* m_keyword;		///< configuration keyword (element)
 	const char* m_identifier;	///< identifier of the builder
 public:
 	ConfiguredBuilder( const char* title, const char* section, const char* keyword,
-				    const char* id )
+			   const char* id )
 		: m_title( title ), m_section( section), m_keyword( keyword ),
-		  m_identifier( id )			{}
+		  m_identifier( id )		{}
 
 	virtual ~ConfiguredBuilder()		{}
 
-	const char* identifier() const			{ return m_identifier; }
+	const char* identifier() const		{ return m_identifier; }
 
 	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
-	virtual Container* container( const config::NamedConfiguration& conf ) = 0;
+	virtual Container* builder() = 0;
 };
 
+
 ///
-template < class T, class Tconf >
-class ConfiguredContainerDescription : public ConfiguredBuilder
+template < class Tbuilder, class Tconf >
+class ConfiguredBuilderDescription : public ConfiguredBuilder
 {
 public:
-	ConfiguredContainerDescription( const char* title, const char* section,
-					const char* keyword, const char* id )
-		: ConfiguredBuilder( title, section, keyword, id )
-	{}
+	ConfiguredBuilderDescription( const char* title, const char* section,
+				      const char* keyword, const char* id )
+		: ConfiguredBuilder( title, section, keyword, id )	{}
 
-	virtual ~ConfiguredContainerDescription()	{}
+	virtual ~ConfiguredBuilderDescription()	{}
 
 	virtual config::NamedConfiguration* configuration( const char* logPrefix )	{
 		return new Tconf( m_title, logPrefix, m_keyword );
 	}
-	virtual Container* container( const config::NamedConfiguration& conf )	{
-		return new T( dynamic_cast< const Tconf& >( conf ));
+	virtual Container* builder()	{
+		return &m_builder;
 	}
+private:
+	Tbuilder	m_builder;
 };
 
 ///
@@ -116,8 +119,8 @@ public:
 	bool addBuilder( ConfiguredBuilder* container );
 	bool addBuilder( SimpleBuilder* container );
 
-	ConfiguredBuilder* getContainer( const std::string& section, const std::string& keyword ) const;
-	ConfiguredBuilder* getContainer( const std::string& identifier ) const;
+	ConfiguredBuilder* getBuilder( const std::string& section, const std::string& keyword ) const;
+	ConfiguredBuilder* getBuilder( const std::string& identifier ) const;
 	SimpleBuilder* getObject( const std::string& identifier ) const;
 
 	class container_iterator
@@ -149,7 +152,7 @@ public:
 
 private:
 	std::list< ConfiguredBuilder* >	m_cfgdContainer; ///< list of configurable containers
-	std::list< SimpleBuilder* >			m_container;	 ///< list of simple containers
+	std::list< SimpleBuilder* >	m_container;	 ///< list of simple containers
 };
 
 
@@ -177,9 +180,9 @@ struct ModuleEntryPoint
 	const char* name;
 	void (*setLogger)(void*);
 	unsigned short		cfgdContainers;		///< number of configured builders
-	createCfgdBuilderFunc	*createCfgdBuilder;	///< array of creation functions for configured builders
+	createCfgdBuilderFunc	*createCfgdBuilder;	///< the array of functions that create the configured builders
 	unsigned short		containers;		///< number of simple (unconfigured) builders
-	createBuilderFunc	*createBuilder;		///< array of creation functions for simple builders
+	createBuilderFunc	*createBuilder;		///< the array of functions that create the simple builders
 public:
 	ModuleEntryPoint( unsigned short iVer, const char* modName,
 			  void (*setLoggerFunc)(void*),

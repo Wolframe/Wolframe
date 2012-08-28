@@ -99,13 +99,5 @@ AuthorizationUnit::Result DBauthorizer::connectionAllowed( const net::LocalEndpo
 	return DENIED;
 }
 
-
-//***  Database authorizer container  ***********************************
-DBauthzContainer::DBauthzContainer( const DatabaseAuthzConfig& conf )
-{
-	m_authz = new DBauthorizer( conf.m_identifier, conf.m_dbConfig );
-	MOD_LOG_TRACE << "Database authorizer container created";
-}
-
 }} // namespace _Wolframe::AAAA
 

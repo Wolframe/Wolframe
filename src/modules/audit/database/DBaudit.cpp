@@ -43,14 +43,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-//****  DBauditor Container  ************************************************
-DBauditContainer::DBauditContainer( const DBauditConfig& conf )
-{
-	m_audit = new DBauditor( conf.m_dbConfig );
-	MOD_LOG_TRACE << "Database auditor container created";
-}
-
-
 //****  DBauditor  **********************************************************
 DBauditor::DBauditor( const std::string& dbLabel )
 	: m_dbLabel( dbLabel )

@@ -93,32 +93,24 @@ public:
 	virtual const std::string hullo( ) = 0;
 };
 
-class TestModuleContainer1 : public ObjectContainer< TestUnit1 >
+class TestModuleContainer1 : public ObjectConstructor< TestUnit1 >
 {
 public:
-	TestModuleContainer1( const TestModuleConfig& conf );
-
+	TestModuleContainer1()			{}
 	~TestModuleContainer1()			{}
 
 	virtual const char* identifier() const	{ return "TestUnit1"; }
-	virtual TestUnit1* object() const	{ return m_test; }
-	void dispose()				{ m_test = NULL; delete this; }
-private:
-	TestUnit1 *m_test;
+	virtual TestUnit1* object( const config::NamedConfiguration& conf );
 };
 
-class TestModuleContainer2 : public ObjectContainer< TestUnit2 >
+class TestModuleContainer2 : public ObjectConstructor< TestUnit2 >
 {
 public:
-	TestModuleContainer2( const TestModuleConfig& conf );
-
+	TestModuleContainer2()			{}
 	~TestModuleContainer2()			{}
 
 	virtual const char* identifier() const	{ return "TestUnit2"; }
-	virtual TestUnit2* object() const	{ return m_test; }
-	void dispose()				{ m_test = NULL; delete this; }
-private:
-	TestUnit2 *m_test;
+	virtual TestUnit2* object( const config::NamedConfiguration& conf );
 };
 
 }}} // namespace _Wolframe::module::test_containers

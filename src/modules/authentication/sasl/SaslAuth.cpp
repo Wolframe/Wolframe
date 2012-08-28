@@ -98,13 +98,5 @@ SaslAuthenticator::~SaslAuthenticator()
 {
 }
 
-
-SaslAuthContainer::SaslAuthContainer( const SaslAuthConfig& conf )
-{
-	m_auth = new SaslAuthenticator( conf.m_identifier,
-					conf.m_service, conf.m_confPath );
-	MOD_LOG_NOTICE << "SASL authenticator container created";
-}
-
 }} // namespace _Wolframe::AAAA
 

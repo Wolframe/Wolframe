@@ -44,15 +44,16 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );
 
-	ConfiguredBuilder* container = modDir.getContainer( "TestObject" );
+	ConfiguredBuilder* container = modDir.getBuilder( "TestObject" );
 	ASSERT_TRUE( container != NULL );
 
 	config::NamedConfiguration* configuration = container->configuration( "TestObject" );
 	ASSERT_TRUE( configuration != NULL );
 
-	test::TestModuleContainer* obj = dynamic_cast<test::TestModuleContainer *>( container->container( *configuration ) );
+	ObjectConstructor< test::TestUnit >* obj = dynamic_cast< ObjectConstructor< test::TestUnit >* >( container->builder( ) );
+//	test::TestModuleContainer* obj = dynamic_cast<test::TestModuleContainer *>( container->builder( ) );
 	ASSERT_TRUE( obj != NULL );
-	test::TestUnit* unit = obj->object( );
+	test::TestUnit* unit = obj->object( *configuration );
 
 	string s = unit->hello( );
 	ASSERT_EQ( s, "hello" );
@@ -73,10 +74,10 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );
 
-	ConfiguredBuilder* container1 = modDir.getContainer( "TestObject1" );
+	ConfiguredBuilder* container1 = modDir.getBuilder( "TestObject1" );
 	ASSERT_TRUE( container1 != NULL );
 
-	ConfiguredBuilder* container2 = modDir.getContainer( "TestObject2" );
+	ConfiguredBuilder* container2 = modDir.getBuilder( "TestObject2" );
 	ASSERT_TRUE( container2 != NULL );
 
 	config::NamedConfiguration* configuration1 = container1->configuration( "TestObject1" );
@@ -85,13 +86,15 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 	config::NamedConfiguration* configuration2 = container2->configuration( "TestObject2" );
 	ASSERT_TRUE( configuration2 != NULL );
 
-	test_containers::TestModuleContainer1* obj1 = dynamic_cast<test_containers::TestModuleContainer1 *>( container1->container( *configuration1 ) );
+	ObjectConstructor< test_containers::TestUnit1 >* obj1 = dynamic_cast< ObjectConstructor< test_containers::TestUnit1 >* >( container1->builder( ) );
+//	test_containers::TestModuleContainer1* obj1 = dynamic_cast<test_containers::TestModuleContainer1 *>( container1->builder( ) );
 	ASSERT_TRUE( obj1 != NULL );
-	test_containers::TestUnit1* unit1 = obj1->object( );
+	test_containers::TestUnit1* unit1 = obj1->object( *configuration1 );
 
-	test_containers::TestModuleContainer2* obj2 = dynamic_cast<test_containers::TestModuleContainer2 *>( container2->container( *configuration2 ) );
+	ObjectConstructor< test_containers::TestUnit2 >* obj2 = dynamic_cast< ObjectConstructor< test_containers::TestUnit2 >* >( container2->builder( ) );
+//	test_containers::TestModuleContainer2* obj2 = dynamic_cast<test_containers::TestModuleContainer2 *>( container2->builder( ) );
 	ASSERT_TRUE( obj2 != NULL );
-	test_containers::TestUnit2* unit2 = obj2->object( );
+	test_containers::TestUnit2* unit2 = obj2->object( *configuration2 );
 
 	string s1 = unit1->hello( );
 	ASSERT_EQ( s1, "hello" );
