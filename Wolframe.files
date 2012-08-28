@@ -317,6 +317,7 @@ include/appProperties.hpp
 include/cmdbind/commandHandler.hpp
 include/cmdbind/commandHandlerUnit.hpp
 include/cmdbind/directmapCommandHandler.hpp
+include/cmdbind/doctypeFilterCommandHandler.hpp
 include/cmdbind/execCommandHandler.hpp
 include/cmdbind/ioFilterCommandHandler.hpp
 include/cmdbind/lineCommandHandler.hpp
@@ -417,6 +418,7 @@ include/types/countedReference.hpp
 include/types/dateArithmetic.hpp
 include/types/sha2.h
 include/types/singleton.hpp
+include/utils/doctype.hpp
 include/utils/getPassword.hpp
 include/utils/miscUtils.hpp
 include/version.hpp
@@ -627,6 +629,7 @@ src/appConfigDefinition.cpp
 src/appProperties.cpp
 src/appSingleton.hpp
 src/cmdbind_directmapCommandHandler.cpp
+src/cmdbind_doctypeFilterCommandHandler.cpp
 src/cmdbind_execCommandHandler.cpp
 src/cmdbind_ioFilterCommandHandler.cpp
 src/cmdbind_lineCommandHandler.cpp
@@ -709,6 +712,7 @@ src/libwolframe/resolvePath.cpp
 src/libwolframe/sha2.c
 src/libwolframe/stringUtils.cpp
 src/libwolframe/user.cpp
+src/libwolframe/utils_doctype.cpp
 src/loadModules.cpp
 src/loadModules-dummy.cpp
 src/Makefile.W32

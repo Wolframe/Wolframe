@@ -97,7 +97,7 @@ bool TestUnitImpl::resolveDB( const db::DatabaseProvider& /* db */ )
 	return true;
 }
 
-static ConfiguredContainerBuilder* createModule( void )
+static ConfiguredBuilder* createModule( void )
 {
 	static module::ConfiguredContainerDescription< test::TestModuleContainer,
 		test::TestModuleConfig > mod( "Test Module", "Test", "test", "TestObject" );
@@ -111,7 +111,7 @@ static void setModuleLogger( void* logger )
 
 
 static const unsigned short nrContainers = 1;
-static ConfiguredContainerBuilder* (*containers[ nrContainers ])() = {
+static ConfiguredBuilder* (*containers[ nrContainers ])() = {
 	createModule
 };
 

@@ -56,7 +56,7 @@ DECLARE_FUNCTION("employee_assingment_convert",employee_assingment_convert_func,
 
 
 enum {NofObjects=1};
-static createContainerFunc objdef[ NofObjects] =
+static createBuilderFunc objdef[ NofObjects] =
 {
 	employee_assingment_convert_func::constructor
 };

@@ -50,7 +50,7 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::NamedConf
 {
 	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 								it != confs.end(); it++ )	{
-		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getContainer((*it)->objectName());
 		if ( builder )	{
 			ObjectContainer< AuthorizationUnit >* authz =
 					dynamic_cast< ObjectContainer< AuthorizationUnit >* >( builder->container( **it ));

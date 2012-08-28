@@ -69,7 +69,7 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 		}
 		else	{
 			if ( modules )	{
-				module::ConfiguredContainerBuilder* builder = modules->getContainer( "processor", L1it->first );
+				module::ConfiguredBuilder* builder = modules->getContainer( "processor", L1it->first );
 				if ( builder )	{
 					config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
 					if ( conf->parse( L1it->second, L1it->first, modules ))
@@ -181,7 +181,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	// Build the list of command handlers
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
 									it != conf->m_procConfig.end(); it++ )	{
-		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getContainer((*it)->objectName());
 		if ( builder )	{
 			ObjectContainer< cmdbind::CommandHandlerUnit >* handler =
 					dynamic_cast< ObjectContainer< cmdbind::CommandHandlerUnit >* >( builder->container( **it ));

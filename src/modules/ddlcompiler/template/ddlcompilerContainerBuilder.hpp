@@ -61,14 +61,14 @@ private:
 };
 
 template <class CompilerInterfaceC>
-class DDLCompilerContainerBuilder :public ContainerBuilder
+class DDLCompilerBuilder :public SimpleBuilder
 {
 public:
-	DDLCompilerContainerBuilder( const char* name_)
-		:ContainerBuilder(name_)
+	DDLCompilerBuilder( const char* name_)
+		:SimpleBuilder(name_)
 		,m_identifier(name_){}
 
-	virtual ~DDLCompilerContainerBuilder(){}
+	virtual ~DDLCompilerBuilder(){}
 
 	virtual Container* object()
 	{
@@ -85,9 +85,9 @@ private:
 namespace {\
 struct CPPID\
 {\
-	static ContainerBuilder* constructor()\
+	static SimpleBuilder* constructor()\
 	{\
-		return new DDLCompilerContainerBuilder<CCOBJ>(NAME);\
+		return new DDLCompilerBuilder<CCOBJ>(NAME);\
 	}\
 };\
 }//anonymous namespace

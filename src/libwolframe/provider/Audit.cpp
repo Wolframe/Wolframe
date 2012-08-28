@@ -49,7 +49,7 @@ AuditProvider::AuditProvider( const std::list< config::NamedConfiguration* >& co
 {
 	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 								it != confs.end(); it++ )	{
-		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getContainer((*it)->objectName());
 		if ( builder )	{
 			ObjectContainer< AuditUnit >* audit =
 					dynamic_cast< ObjectContainer< AuditUnit >* >( builder->container( **it ));

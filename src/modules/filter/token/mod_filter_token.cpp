@@ -57,7 +57,7 @@ DECLARE_FILTER_OBJECT("token:UCS-4BE",	TokenFilterObject_UCS4BE,	langbind::creat
 DECLARE_FILTER_OBJECT("token:UCS-4LE",	TokenFilterObject_UCS4LE,	langbind::createTokenFilter)
 
 enum {NofObjects=8};
-static createContainerFunc objdef[ NofObjects] =
+static createBuilderFunc objdef[ NofObjects] =
 {
 	TokenFilterObject::constructor,
 	TokenFilterObject_UTF8::constructor,

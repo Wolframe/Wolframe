@@ -51,7 +51,7 @@ DECLARE_COMMAND_HANDLER("echo_cmdhandler",EchoCommandHandlerObject,EchoCommandHa
 
 
 enum {NofObjects=1};
-static createContainerFunc objdef[ NofObjects] =
+static createBuilderFunc objdef[ NofObjects] =
 {
 	EchoCommandHandlerObject::constructor
 };

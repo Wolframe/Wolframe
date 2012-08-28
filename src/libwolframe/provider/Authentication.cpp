@@ -49,7 +49,7 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 {
 	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
-		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getContainer((*it)->objectName());
 		if ( builder )	{
 			ObjectContainer< AuthenticationUnit >* auth =
 					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( builder->container( **it ));

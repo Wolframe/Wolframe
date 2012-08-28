@@ -57,7 +57,7 @@ DECLARE_FILTER_OBJECT("line:UCS-4BE",	LineFilterObject_UCS4BE,	langbind::createL
 DECLARE_FILTER_OBJECT("line:UCS-4LE",	LineFilterObject_UCS4LE,	langbind::createLineFilter)
 
 enum {NofObjects=8};
-static createContainerFunc objdef[ NofObjects] =
+static createBuilderFunc objdef[ NofObjects] =
 {
 	LineFilterObject::constructor,
 	LineFilterObject_UTF8::constructor,

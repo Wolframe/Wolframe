@@ -65,7 +65,7 @@ private:
 	std::string					m_dbLabel;
 	const db::Database*				m_db;
 	std::list< cmdbind::CommandHandlerUnit* >	m_handler;
-	std::map< const std::string, cmdbind::CommandHandlerUnit*>	m_cmdMap;
+	std::map< const std::string, cmdbind::CommandHandlerUnit* >	m_cmdMap;
 	std::list< const module::FilterContainer* >	m_filter;
 	std::map< const std::string, const langbind::Filter* >		m_filterMap;
 };

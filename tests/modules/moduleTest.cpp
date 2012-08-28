@@ -44,7 +44,7 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );
 
-	ConfiguredContainerBuilder* container = modDir.getContainer( "TestObject" );
+	ConfiguredBuilder* container = modDir.getContainer( "TestObject" );
 	ASSERT_TRUE( container != NULL );
 
 	config::NamedConfiguration* configuration = container->configuration( "TestObject" );
@@ -73,10 +73,10 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );
 
-	ConfiguredContainerBuilder* container1 = modDir.getContainer( "TestObject1" );
+	ConfiguredBuilder* container1 = modDir.getContainer( "TestObject1" );
 	ASSERT_TRUE( container1 != NULL );
 
-	ConfiguredContainerBuilder* container2 = modDir.getContainer( "TestObject2" );
+	ConfiguredBuilder* container2 = modDir.getContainer( "TestObject2" );
 	ASSERT_TRUE( container2 != NULL );
 
 	config::NamedConfiguration* configuration1 = container1->configuration( "TestObject1" );
