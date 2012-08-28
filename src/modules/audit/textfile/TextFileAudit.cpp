@@ -45,14 +45,6 @@
 namespace _Wolframe {
 namespace AAAA {
 
-//****  Text File Audit Container   *****************************************
-TextFileAuditContainer::TextFileAuditContainer( const TextFileAuditConfig& conf )
-{
-	m_audit = new TextFileAuditor( conf.m_file );
-	MOD_LOG_TRACE << "Text file auditor container created";
-}
-
-
 //****  Text File Audit   ***************************************************
 TextFileAuditor::TextFileAuditor( const std::string& filename )
 	: m_file( filename )

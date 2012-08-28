@@ -38,14 +38,13 @@
 #define _DB_AUTHENTICATION_HPP_INCLUDED
 
 #include "AAAA/authentication.hpp"
-#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
 class DBAuthConfig : public config::NamedConfiguration
 {
-	friend class DBauthContainer;
+	friend class DBauthConstructor;
 public:
 	DBAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName )	{}
@@ -80,20 +79,6 @@ public:
 private:
 	const std::string	m_dbLabel;
 	const db::Database*	m_db;
-};
-
-
-class DBauthContainer : public ObjectContainer< AuthenticationUnit >
-{
-public:
-	DBauthContainer( const DBAuthConfig& conf );
-	~DBauthContainer()				{}
-
-	virtual const char* identifier() const		{ return m_auth->typeName(); }
-	virtual AuthenticationUnit* object() const	{ return m_auth; }
-	void dispose()					{ m_auth = NULL; delete this; }
-private:
-	DBauthenticator*	m_auth;
 };
 
 }} // namespace _Wolframe::AAAA

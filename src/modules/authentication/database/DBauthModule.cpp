@@ -41,13 +41,37 @@
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
+namespace AAAA {
+
+class DBauthConstructor : public ObjectConstructor< AuthenticationUnit >
+{
+public:
+	DBauthConstructor()			{}
+	~DBauthConstructor()			{}
+
+	const char* identifier() const		{ return "DBAuth"; }
+	DBauthenticator* object( const config::NamedConfiguration& conf );
+};
+
+DBauthenticator* DBauthConstructor::object( const config::NamedConfiguration& conf )
+{
+	const DBAuthConfig& cfg = dynamic_cast< const DBAuthConfig& >( conf );
+
+	DBauthenticator* m_auth = new DBauthenticator( cfg.m_identifier, cfg.m_dbLabel );
+	MOD_LOG_DEBUG << "Database authenticator container created for '"
+		      << cfg.m_identifier << "'";
+	return m_auth;
+}
+
+} // namespace AAAA
+
 namespace module {
 
-static ConfiguredContainerBuilder* createModule( void )
+static ConfiguredBuilder* createModule( void )
 {
-	static module::ConfiguredContainerDescription< AAAA::DBauthContainer,
+	static module::ConfiguredBuilderDescription< AAAA::DBauthConstructor,
 			AAAA::DBAuthConfig > mod( "Authentication database", "Authentication",
-							"database", "DBAuth" );
+						  "database", "DBAuth" );
 	return &mod;
 }
 
@@ -58,7 +82,7 @@ static void setModuleLogger( void* logger )
 
 
 static const unsigned short nrContainers = 1;
-static ConfiguredContainerBuilder* (*containers[ nrContainers ])() = {
+static ConfiguredBuilder* (*containers[ nrContainers ])() = {
 	createModule
 };
 
@@ -66,4 +90,6 @@ ModuleEntryPoint entryPoint( 0, "Database authentification", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-}} // namespace _Wolframe::module
+} // namespace module
+} // namespace _Wolframe
+

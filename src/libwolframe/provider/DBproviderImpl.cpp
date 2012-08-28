@@ -67,18 +67,17 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 {
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_config.begin();
 									it != conf->m_config.end(); it++ )	{
-		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
 		if ( builder )	{
-			ObjectContainer< db::DatabaseUnit >* db =
-					dynamic_cast< ObjectContainer< db::DatabaseUnit >* >( builder->container( **it ));
+			ObjectConstructor< db::DatabaseUnit >* db =
+					dynamic_cast< ObjectConstructor< db::DatabaseUnit >* >( builder->builder());
 			if ( db == NULL )	{
-				LOG_ALERT << "DatabaseProvider: '" << builder->container( **it )->identifier()
-					  << "' is not an Database Unit";
-				throw std::logic_error( "object is not an DatabaseUnit" );
+				LOG_ALERT << "DatabaseProvider: '" << builder->identifier()
+					  << "' is not an Database Unit builder";
+				throw std::logic_error( "object is not an DatabaseUnit builder" );
 			}
-			m_db.push_back( db->object() );
+			m_db.push_back( db->object(**it ) );
 			LOG_TRACE << "'" << db->identifier() << "' database unit registered";
-			db->dispose();
 		}
 		else	{
 			LOG_ALERT << "DatabaseProvider: unknown database module '" << (*it)->objectName() << "'";

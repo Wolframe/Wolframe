@@ -53,20 +53,18 @@ public:
 	{
 		return m_name.c_str();
 	}
-
-	virtual void dispose()	{ delete this; }
 private:
 	std::string m_name;
 };
 
 template <langbind::CreateFilterFunc createFilterFunc>
-class FilterContainerBuilder :public ContainerBuilder
+class FilterBuilder :public SimpleBuilder
 {
 public:
-	FilterContainerBuilder( const char* name_)
-		:ContainerBuilder( name_){}
+	FilterBuilder( const char* name_)
+		:SimpleBuilder( name_){}
 
-	virtual ~FilterContainerBuilder(){}
+	virtual ~FilterBuilder(){}
 
 	virtual Container* object()
 	{
@@ -80,9 +78,9 @@ public:
 namespace {\
 struct CPPID\
 {\
-	static ContainerBuilder* constructor()\
+	static SimpleBuilder* constructor()\
 	{\
-		return new FilterContainerBuilder<createFilterFunc>(NAME);\
+		return new FilterBuilder<createFilterFunc>(NAME);\
 	}\
 };\
 }//anonymous namespace

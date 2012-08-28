@@ -86,34 +86,31 @@ public:
 			    const std::string& user, const std::string& password,
 			    unsigned short connectTimeout,
 			    size_t connections, unsigned short acquireTimeout );
-	virtual ~PostgreSQLdatabase();
+	~PostgreSQLdatabase();
 
-	virtual const std::string& ID() const		{ return m_ID; }
-	virtual const char* typeName() const		{ return "PostgreSQL"; }
-	virtual const Database& database() const	{ return *this; }
+	const std::string& ID() const		{ return m_ID; }
+	const char* typeName() const		{ return "PostgreSQL"; }
+	const Database& database() const	{ return *this; }
 
-	virtual bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
-			    unsigned short, unsigned short ){ return true; }
+	bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
+			    unsigned short, unsigned short )
+						{ return true; }
 private:
-	const std::string	m_ID;			//< database ID
-	std::string		m_connStr;		//< connection string
-	size_t			m_noConnections;	//< number of connections
-	ObjectPool< PGconn* >	m_connPool;		//< pool of connections
+	const std::string	m_ID;			///< database ID
+	std::string		m_connStr;		///< connection string
+	size_t			m_noConnections;	///< number of connections
+	ObjectPool< PGconn* >	m_connPool;		///< pool of connections
 };
 
 
-class PostgreSQLcontainer : public ObjectContainer< db::DatabaseUnit >
+class PostgreSQLcontainer : public ObjectConstructor< db::DatabaseUnit >
 {
 public:
-	PostgreSQLcontainer( const PostgreSQLconfig& conf );
-	~PostgreSQLcontainer()				{ if ( m_db ) delete m_db; }
+	PostgreSQLcontainer()			{}
+	~PostgreSQLcontainer()			{}
 
-	virtual const std::string& ID() const		{ return m_db->ID(); }
-	virtual const char* identifier() const		{ return m_db->typeName(); }
-	virtual DatabaseUnit* object() const		{ return m_db; }
-	void dispose()					{ m_db = NULL; delete this; }
-private:
-	PostgreSQLdatabase*	m_db;
+	const char* identifier() const	{ return "PostgreSQL"; }
+	PostgreSQLdatabase* object( const config::NamedConfiguration& conf );
 };
 
 }} // _Wolframe::db

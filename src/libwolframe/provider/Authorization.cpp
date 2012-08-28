@@ -50,18 +50,17 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::NamedConf
 {
 	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 								it != confs.end(); it++ )	{
-		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
 		if ( builder )	{
-			ObjectContainer< AuthorizationUnit >* authz =
-					dynamic_cast< ObjectContainer< AuthorizationUnit >* >( builder->container( **it ));
+			ObjectConstructor< AuthorizationUnit >* authz =
+					dynamic_cast< ObjectConstructor< AuthorizationUnit >* >( builder->builder());
 			if ( authz == NULL )	{
-				LOG_ALERT << "AuthorizationProvider: '" << builder->container( **it )->identifier()
-					  << "' is not an Authorization Unit";
-				throw std::logic_error( "object is not an AuthorizationUnit" );
+				LOG_ALERT << "AuthorizationProvider: '" << builder->identifier()
+					  << "' is not an Authorization Unit builder";
+				throw std::logic_error( "object is not an AuthorizationUnit builder" );
 			}
-			m_authorizeUnits.push_back( authz->object() );
+			m_authorizeUnits.push_back( authz->object( **it ) );
 			LOG_TRACE << "'" << authz->identifier() << "' authorization unit registered";
-			authz->dispose();
 		}
 		else	{
 			LOG_ALERT << "AuthorizationProvider: unknown authorization type '" << (*it)->objectName() << "'";

@@ -38,7 +38,6 @@
 #define _SASL_AUTHENTICATION_HPP_INCLUDED
 
 #include "AAAA/authentication.hpp"
-#include "moduleInterface.hpp"
 
 #include <string>
 
@@ -49,12 +48,12 @@ namespace AAAA {
 
 class SaslAuthConfig :  public config::NamedConfiguration
 {
-	friend class SaslAuthContainer;
+	friend class SaslAuthConstructor;
 public:
 	SaslAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* objectName() const		{ return "SaslAuth"; }
+	virtual const char* objectName() const	{ return "SaslAuth"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -75,9 +74,9 @@ public:
 	SaslAuthenticator( const std::string& Identifier,
 			   const std::string& service, const std::string& confpath );
 	~SaslAuthenticator();
-	virtual const char* typeName() const		{ return "SaslAuth"; }
+	virtual const char* typeName() const	{ return "SaslAuth"; }
 
-	AuthenticatorInstance* instance()		{ return NULL; }
+	AuthenticatorInstance* instance()	{ return NULL; }
 
 private:
 	// registered name of the service, should maybe be fixed (or default to) 'wolframe'
@@ -85,20 +84,6 @@ private:
 
 	// a SASL configuration path for optional config (overridding system-wide one)
 	const std::string	m_confPath;
-};
-
-
-class SaslAuthContainer : public ObjectContainer< AuthenticationUnit >
-{
-public:
-	SaslAuthContainer( const SaslAuthConfig& conf );
-	~SaslAuthContainer()			{}
-
-	virtual const char* identifier() const		{ return m_auth->typeName(); }
-	virtual AuthenticationUnit* object() const	{ return m_auth; }
-	void dispose()					{ m_auth = NULL; delete this; }
-private:
-	SaslAuthenticator*	m_auth;
 };
 
 }} // namespace _Wolframe::AAAA

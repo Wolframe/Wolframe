@@ -49,7 +49,7 @@ static void setModuleLogger( void* logger )
 DECLARE_DDLCOMPILER("simpleform",SimpleformDDLCompiler,ddl::SimpleFormCompiler)
 
 enum {NofObjects=1};
-static createContainerFunc objdef[ NofObjects] =
+static createBuilderFunc objdef[ NofObjects] =
 {
 	SimpleformDDLCompiler::constructor
 };

@@ -51,9 +51,9 @@ ModulesDirectory::~ModulesDirectory()
 }
 
 
-bool ModulesDirectory::addBuilder( ConfiguredContainerBuilder* container )
+bool ModulesDirectory::addBuilder( ConfiguredBuilder* container )
 {
-	for ( std::list< ConfiguredContainerBuilder* >::const_iterator it = m_cfgdContainer.begin();
+	for ( std::list< ConfiguredBuilder* >::const_iterator it = m_cfgdContainer.begin();
 							it != m_cfgdContainer.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_section, container->m_section ) &&
 				boost::algorithm::iequals( (*it)->m_keyword, container->m_keyword ))	{
@@ -73,9 +73,9 @@ bool ModulesDirectory::addBuilder( ConfiguredContainerBuilder* container )
 	return true;
 }
 
-bool ModulesDirectory::addBuilder( ContainerBuilder* container )
+bool ModulesDirectory::addBuilder( SimpleBuilder* container )
 {
-	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
+	for ( std::list< SimpleBuilder* >::const_iterator it = m_container.begin();
 							it != m_container.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_identifier, container->m_identifier ))	{
 			LOG_ALERT << "A module object named '" << container->m_identifier
@@ -88,10 +88,10 @@ bool ModulesDirectory::addBuilder( ContainerBuilder* container )
 	return true;
 }
 
-ConfiguredContainerBuilder* ModulesDirectory::getContainer( const std::string& section,
+ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& section,
 						 const std::string& keyword ) const
 {
-	for ( std::list< ConfiguredContainerBuilder* >::const_iterator it = m_cfgdContainer.begin();
+	for ( std::list< ConfiguredBuilder* >::const_iterator it = m_cfgdContainer.begin();
 							it != m_cfgdContainer.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_keyword, keyword ) &&
 				boost::algorithm::iequals( (*it)->m_section, section ))
@@ -100,9 +100,9 @@ ConfiguredContainerBuilder* ModulesDirectory::getContainer( const std::string& s
 	return NULL;
 }
 
-ConfiguredContainerBuilder* ModulesDirectory::getContainer( const std::string& identifier ) const
+ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& identifier ) const
 {
-	for ( std::list< ConfiguredContainerBuilder* >::const_iterator it = m_cfgdContainer.begin();
+	for ( std::list< ConfiguredBuilder* >::const_iterator it = m_cfgdContainer.begin();
 							it != m_cfgdContainer.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_identifier, identifier ))
 			return *it;
@@ -110,9 +110,9 @@ ConfiguredContainerBuilder* ModulesDirectory::getContainer( const std::string& i
 	return NULL;
 }
 
-ContainerBuilder* ModulesDirectory::getObject( const std::string& identifier ) const
+SimpleBuilder* ModulesDirectory::getObject( const std::string& identifier ) const
 {
-	for ( std::list< ContainerBuilder* >::const_iterator it = m_container.begin();
+	for ( std::list< SimpleBuilder* >::const_iterator it = m_container.begin();
 							it != m_container.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_identifier, identifier ))
 			return *it;

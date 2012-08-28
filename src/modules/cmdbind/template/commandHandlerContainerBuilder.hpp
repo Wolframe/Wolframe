@@ -54,21 +54,19 @@ public:
 	{
 		return m_name.c_str();
 	}
-
-	virtual void dispose()	{ delete this; }
 private:
 	std::string m_name;
 };
 
 template <class CommandHandler>
-class CommandHandlerContainerBuilder :public ContainerBuilder
+class CommandHandlerBuilder :public SimpleBuilder
 {
 public:
-	CommandHandlerContainerBuilder( const char* name_)
-		:ContainerBuilder(name_)
+	CommandHandlerBuilder( const char* name_)
+		:SimpleBuilder(name_)
 		,m_identifier(name_){}
 
-	virtual ~CommandHandlerContainerBuilder(){}
+	virtual ~CommandHandlerBuilder(){}
 
 	virtual Container* object()
 	{
@@ -85,9 +83,9 @@ private:
 namespace {\
 struct CPPID\
 {\
-	static ContainerBuilder* constructor()\
+	static SimpleBuilder* constructor()\
 	{\
-		return new CommandHandlerContainerBuilder<OBJ>(NAME);\
+		return new CommandHandlerBuilder<OBJ>(NAME);\
 	}\
 };\
 }//anonymous namespace

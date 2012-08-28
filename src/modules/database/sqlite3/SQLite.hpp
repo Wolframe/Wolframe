@@ -92,18 +92,14 @@ private:
 };
 
 
-class SQLiteContainer : public ObjectContainer< db::DatabaseUnit >
+class SQLiteContainer : public ObjectConstructor< db::DatabaseUnit >
 {
 public:
-	SQLiteContainer( const SQLiteConfig& conf );
-	~SQLiteContainer()				{}
+	SQLiteContainer()			{}
+	~SQLiteContainer()			{}
 
-	const std::string& ID() const			{ return m_db->ID(); }
-	virtual const char* identifier() const		{ return m_db->typeName(); }
-	virtual DatabaseUnit* object() const		{ return m_db; }
-	void dispose()					{ m_db = NULL; delete this; }
-private:
-	SQLiteDatabase*		m_db;
+	virtual const char* identifier() const	{ return "SQLite"; }
+	virtual SQLiteDatabase* object( const config::NamedConfiguration& conf );
 };
 
 }} // _Wolframe::db

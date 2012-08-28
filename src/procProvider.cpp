@@ -69,7 +69,7 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 		}
 		else	{
 			if ( modules )	{
-				module::ConfiguredContainerBuilder* builder = modules->getContainer( "processor", L1it->first );
+				module::ConfiguredBuilder* builder = modules->getBuilder( "processor", L1it->first );
 				if ( builder )	{
 					config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
 					if ( conf->parse( L1it->second, L1it->first, modules ))
@@ -181,21 +181,20 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	// Build the list of command handlers
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
 									it != conf->m_procConfig.end(); it++ )	{
-		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
 		if ( builder )	{
-			ObjectContainer< cmdbind::CommandHandlerUnit >* handler =
-					dynamic_cast< ObjectContainer< cmdbind::CommandHandlerUnit >* >( builder->container( **it ));
+			ObjectConstructor< cmdbind::CommandHandlerUnit >* handler =
+					dynamic_cast< ObjectConstructor< cmdbind::CommandHandlerUnit >* >( builder->builder());
 			if ( handler == NULL )	{
-				LOG_ALERT << "Wolframe Processor Provider: '" << builder->container( **it )->identifier()
+				LOG_ALERT << "Wolframe Processor Provider: '" << builder->identifier()
 					  << "'' is not a command handler";
 				throw std::logic_error( "Object is not a commandHandler. See log." );
 			}
 			else	{
-				m_handler.push_back( handler->object() );
+				m_handler.push_back( handler->object( **it ) );
 				std::string handlerName = handler->identifier();
 				LOG_TRACE << "'" << handlerName << "' command handler registered";
 				// register handler commands here
-				handler->dispose();
 			}
 		}
 		else	{

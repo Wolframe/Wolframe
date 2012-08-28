@@ -47,16 +47,16 @@ namespace _Wolframe {
 namespace module {
 
 ///
-class ContainerBuilder
+class SimpleBuilder
 {
 	friend class ModulesDirectory;
 protected:
 	const char* m_identifier;
 public:
-	ContainerBuilder( const char* name )
-		: m_identifier( name )			{}
+	SimpleBuilder( const char* id )
+		: m_identifier( id )			{}
 
-	virtual ~ContainerBuilder()			{}
+	virtual ~SimpleBuilder()			{}
 
 	const char* identifier() const			{ return m_identifier; }
 
@@ -64,46 +64,49 @@ public:
 };
 
 ///
-class ConfiguredContainerBuilder
+class ConfiguredBuilder
 {
 	friend class ModulesDirectory;
 protected:
-	const char* m_title;
-	const char* m_section;		///< configuration section to which it reacts
+	const char* m_title;		///< used for printing (logging etc.)
+	const char* m_section;		///< configuration section to which the
+					/// configuration parser reacts
 	const char* m_keyword;		///< configuration keyword (element)
 	const char* m_identifier;	///< identifier of the builder
 public:
-	ConfiguredContainerBuilder( const char* title, const char* section, const char* keyword,
-				    const char* name )
+	ConfiguredBuilder( const char* title, const char* section, const char* keyword,
+			   const char* id )
 		: m_title( title ), m_section( section), m_keyword( keyword ),
-		  m_identifier( name )			{}
+		  m_identifier( id )		{}
 
-	virtual ~ConfiguredContainerBuilder()		{}
+	virtual ~ConfiguredBuilder()		{}
 
-	const char* identifier() const			{ return m_identifier; }
+	const char* identifier() const		{ return m_identifier; }
 
 	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
-	virtual Container* container( const config::NamedConfiguration& conf ) = 0;
+	virtual Container* builder() = 0;
 };
 
+
 ///
-template < class T, class Tconf >
-class ConfiguredContainerDescription : public ConfiguredContainerBuilder
+template < class Tbuilder, class Tconf >
+class ConfiguredBuilderDescription : public ConfiguredBuilder
 {
 public:
-	ConfiguredContainerDescription( const char* title, const char* section,
-					const char* keyword, const char* name )
-		: ConfiguredContainerBuilder( title, section, keyword, name )
-	{}
+	ConfiguredBuilderDescription( const char* title, const char* section,
+				      const char* keyword, const char* id )
+		: ConfiguredBuilder( title, section, keyword, id )	{}
 
-	virtual ~ConfiguredContainerDescription()	{}
+	virtual ~ConfiguredBuilderDescription()	{}
 
 	virtual config::NamedConfiguration* configuration( const char* logPrefix )	{
 		return new Tconf( m_title, logPrefix, m_keyword );
 	}
-	virtual Container* container( const config::NamedConfiguration& conf )	{
-		return new T( dynamic_cast< const Tconf& >( conf ));
+	virtual Container* builder()	{
+		return &m_builder;
 	}
+private:
+	Tbuilder	m_builder;
 };
 
 ///
@@ -113,12 +116,12 @@ public:
 	ModulesDirectory()				{}
 	~ModulesDirectory();
 
-	bool addBuilder( ConfiguredContainerBuilder* container );
-	bool addBuilder( ContainerBuilder* container );
+	bool addBuilder( ConfiguredBuilder* container );
+	bool addBuilder( SimpleBuilder* container );
 
-	ConfiguredContainerBuilder* getContainer( const std::string& section, const std::string& keyword ) const;
-	ConfiguredContainerBuilder* getContainer( const std::string& identifier ) const;
-	ContainerBuilder* getObject( const std::string& identifier ) const;
+	ConfiguredBuilder* getBuilder( const std::string& section, const std::string& keyword ) const;
+	ConfiguredBuilder* getBuilder( const std::string& identifier ) const;
+	SimpleBuilder* getObject( const std::string& identifier ) const;
 
 	class container_iterator
 	{
@@ -128,8 +131,8 @@ public:
 		container_iterator( const container_iterator& it )
 			: m_it( it.m_it )		{}
 
-		ContainerBuilder* operator->() const	{ return *m_it; }
-		ContainerBuilder* operator*() const	{ return *m_it; }
+		SimpleBuilder* operator->() const	{ return *m_it; }
+		SimpleBuilder* operator*() const	{ return *m_it; }
 		container_iterator& operator++()	{ ++m_it; return *this; }
 		container_iterator operator++( int )	{ container_iterator rtrn( *this ); ++m_it; return rtrn; }
 		bool operator == ( const container_iterator& rhs )
@@ -138,9 +141,9 @@ public:
 							{ return m_it != rhs.m_it; }
 
 	private:
-		std::list< ContainerBuilder* >::const_iterator	m_it;
+		std::list< SimpleBuilder* >::const_iterator	m_it;
 
-		container_iterator( const std::list< ContainerBuilder* >::const_iterator& it )
+		container_iterator( const std::list< SimpleBuilder* >::const_iterator& it )
 			: m_it( it )			{}
 	};
 
@@ -148,8 +151,8 @@ public:
 	container_iterator objectsEnd() const		{ return container_iterator( m_container.end() ); }
 
 private:
-	std::list< ConfiguredContainerBuilder* >	m_cfgdContainer; ///< list of configurable containers
-	std::list< ContainerBuilder* >			m_container;	 ///< list of simple containers
+	std::list< ConfiguredBuilder* >	m_cfgdContainer; ///< list of configurable containers
+	std::list< SimpleBuilder* >	m_container;	 ///< list of simple containers
 };
 
 
@@ -163,8 +166,8 @@ enum ModuleObjectType	{
 	MODULE_OBJECT = 2
 };
 
-typedef ConfiguredContainerBuilder* (*createCfgContainerFunc)();
-typedef ContainerBuilder* (*createContainerFunc)();
+typedef ConfiguredBuilder* (*createCfgdBuilderFunc)();
+typedef SimpleBuilder* (*createBuilderFunc)();
 
 struct ModuleEntryPoint
 {
@@ -176,24 +179,24 @@ struct ModuleEntryPoint
 	unsigned short ifaceVersion;
 	const char* name;
 	void (*setLogger)(void*);
-	unsigned short		cfgdContainers;		///< number of configured containers
-	createCfgContainerFunc	*createCfgdContainer;	///< vector of creation functions for configured containers
-	unsigned short		containers;		///< number of simple (unconfigured) containers
-	createContainerFunc	*createContainer;	///< vector of creation functions for simple containers
+	unsigned short		cfgdContainers;		///< number of configured builders
+	createCfgdBuilderFunc	*createCfgdBuilder;	///< the array of functions that create the configured builders
+	unsigned short		containers;		///< number of simple (unconfigured) builders
+	createBuilderFunc	*createBuilder;		///< the array of functions that create the simple builders
 public:
 	ModuleEntryPoint( unsigned short iVer, const char* modName,
 			  void (*setLoggerFunc)(void*),
-			  unsigned short nrContainers, createCfgContainerFunc* containerFunc,
-			  unsigned short nrObjects, createContainerFunc* objectFunc
+			  unsigned short nrContainers, createCfgdBuilderFunc* containerFunc,
+			  unsigned short nrObjects, createBuilderFunc* objectFunc
 			  )
 		: ifaceVersion( iVer ), name( modName ),
 		  setLogger( setLoggerFunc ),
-		  cfgdContainers( nrContainers ), createCfgdContainer( containerFunc ),
-		  containers( nrObjects ), createContainer( objectFunc )
+		  cfgdContainers( nrContainers ), createCfgdBuilder( containerFunc ),
+		  containers( nrObjects ), createBuilder( objectFunc )
 	{
 		std::memcpy ( signature, "Wolframe Module", MODULE_SIGN_SIZE );
-		if ( createCfgdContainer == NULL ) cfgdContainers = 0;
-		if ( createContainer == NULL ) containers = 0;
+		if ( createCfgdBuilder == NULL ) cfgdContainers = 0;
+		if ( createBuilder == NULL ) containers = 0;
 	}
 
 };

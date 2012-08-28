@@ -49,18 +49,17 @@ AuditProvider::AuditProvider( const std::list< config::NamedConfiguration* >& co
 {
 	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 								it != confs.end(); it++ )	{
-		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
 		if ( builder )	{
-			ObjectContainer< AuditUnit >* audit =
-					dynamic_cast< ObjectContainer< AuditUnit >* >( builder->container( **it ));
+			ObjectConstructor< AuditUnit >* audit =
+					dynamic_cast< ObjectConstructor< AuditUnit >* >( builder->builder());
 			if ( audit == NULL )	{
-				LOG_ALERT << "AuditProvider: '" << builder->container( **it )->identifier()
-					  << "' is not an Audit Unit";
-				throw std::logic_error( "object is not an AuditUnit" );
+				LOG_ALERT << "AuditProvider: '" << builder->identifier()
+					  << "' is not an Audit Unit builder";
+				throw std::logic_error( "object is not an AuditUnit builder" );
 			}
-			m_auditors.push_back( audit->object() );
+			m_auditors.push_back( audit->object( **it ) );
 			LOG_TRACE << "'" << audit->identifier() << "' audit unit registered";
-			audit->dispose();
 		}
 		else	{
 			LOG_ALERT << "AuditProvider: unknown audit type '" << (*it)->objectName() << "'";

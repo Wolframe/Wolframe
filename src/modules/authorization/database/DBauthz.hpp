@@ -38,7 +38,6 @@
 #define _DB_AUTHORIZATION_HPP_INCLUDED
 
 #include "AAAA/authorization.hpp"
-#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -46,7 +45,7 @@ namespace AAAA {
 //***  Database authorizer configuration  *******************************
 class DatabaseAuthzConfig : public config::NamedConfiguration
 {
-	friend class DBauthzContainer;
+	friend class DBauthzConstructor;
 public:
 	DatabaseAuthzConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName )	{}
@@ -82,20 +81,6 @@ private:
 
 	AuthorizationUnit::Result connectionAllowed( const net::LocalEndpoint& /*local*/,
 						     const net::RemoteEndpoint& remote );
-};
-
-//***  Database authorizer container  ***********************************
-class DBauthzContainer : public ObjectContainer< AuthorizationUnit >
-{
-public:
-	DBauthzContainer( const DatabaseAuthzConfig& conf );
-	~DBauthzContainer()				{}
-
-	virtual const char* identifier() const		{ return m_authz->typeName(); }
-	virtual AuthorizationUnit* object() const	{ return m_authz; }
-	void dispose()					{ m_authz = NULL; delete this; }
-private:
-	 DBauthorizer*		m_authz;
 };
 
 }} // namespace _Wolframe::AAAA

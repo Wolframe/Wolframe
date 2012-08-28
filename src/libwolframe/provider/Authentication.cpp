@@ -49,18 +49,17 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 {
 	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
-		module::ConfiguredContainerBuilder* builder = modules->getContainer((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
 		if ( builder )	{
-			ObjectContainer< AuthenticationUnit >* auth =
-					dynamic_cast< ObjectContainer< AuthenticationUnit >* >( builder->container( **it ));
+			ObjectConstructor< AuthenticationUnit >* auth =
+					dynamic_cast< ObjectConstructor< AuthenticationUnit >* >( builder->builder());
 			if ( auth == NULL )	{
-				LOG_ALERT << "AuthenticationFactory: '" << builder->container( **it )->identifier()
-					  << "' is not an Authentication Unit";
-				throw std::logic_error( "object is not an AuthenticationUnit" );
+				LOG_ALERT << "AuthenticationFactory: '" << builder->identifier()
+					  << "' is not an Authentication Unit builder";
+				throw std::logic_error( "object is not an AuthenticationUnit builder" );
 			}
-			m_authenticators.push_back( auth->object() );
+			m_authenticators.push_back( auth->object( **it ));
 			LOG_TRACE << "'" << auth->identifier() << "' authentication unit registered";
-			auth->dispose();
 		}
 		else	{
 			LOG_ALERT << "AuthenticationFactory: unknown authentication type '" << (*it)->objectName() << "'";

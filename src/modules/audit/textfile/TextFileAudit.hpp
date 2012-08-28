@@ -40,14 +40,13 @@
 #include <string>
 
 #include "AAAA/audit.hpp"
-#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
 
 class TextFileAuditConfig : public config::NamedConfiguration
 {
-	friend class TextFileAuditContainer;
+	friend class TextFileAuditConstructor;
 public:
 	TextFileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
@@ -78,20 +77,6 @@ public:
 private:
 	bool		m_required;
 	std::string	m_file;
-};
-
-
-class TextFileAuditContainer : public ObjectContainer< AuditUnit >
-{
-public:
-	TextFileAuditContainer( const TextFileAuditConfig& conf );
-	~TextFileAuditContainer()		{}
-
-	const char* identifier() const		{ return m_audit->typeName(); }
-	AuditUnit* object() const		{ return m_audit; }
-	void dispose()				{ m_audit = NULL; delete this; }
-private:
-	TextFileAuditor*	m_audit;
 };
 
 }} // namespace _Wolframe::AAAA

@@ -34,6 +34,8 @@
 // container template
 //
 
+#include "config/configurationBase.hpp"
+
 #ifndef _CONTAINER_HPP_INCLUDED
 #define _CONTAINER_HPP_INCLUDED
 
@@ -44,18 +46,16 @@ class Container
 {
 public:
 	virtual ~Container()		{}
-	virtual void dispose() = 0;
 	virtual const char* identifier() const = 0;
 };
 
 /// Template used to specialize a container
 template < class T >
-class ObjectContainer : public Container
+class ObjectConstructor : public Container
 {
 public:
-	virtual ~ObjectContainer()	{}
-	virtual void dispose() = 0;
-	virtual T* object() const = 0;
+	virtual ~ObjectConstructor()	{}
+	virtual T* object( const config::NamedConfiguration& conf ) = 0;
 };
 
 } // namespace _Wolframe

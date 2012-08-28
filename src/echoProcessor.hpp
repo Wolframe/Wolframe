@@ -99,7 +99,7 @@ private:
 };
 
 
-class EchoProcContainer : public ObjectContainer< proc::ProcessorUnit >
+class EchoProcContainer : public ObjectConstructor< proc::ProcessorUnit >
 {
 public:
 	EchoProcContainer( const EchoProcConfig& conf );
@@ -107,7 +107,6 @@ public:
 
 	virtual const char* identifier() const		{ return m_proc->name(); }
 	virtual proc::ProcessorUnit* object() const	{ return m_proc; }
-	void dispose()					{ m_proc = NULL; delete this; }
 private:
 	EchoProcessorUnit*	m_proc;
 };

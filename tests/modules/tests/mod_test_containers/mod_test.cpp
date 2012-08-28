@@ -71,16 +71,18 @@ void TestModuleConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 {
 }
 
-TestModuleContainer1::TestModuleContainer1( const TestModuleConfig& /* conf */ )
+TestUnit1* TestModuleContainer1::object( const config::NamedConfiguration& /* conf */ )
 {
-	m_test = new TestUnitImpl1( /* conf */ );
+	TestUnit1* m_test = new TestUnitImpl1( /* conf */ );
 	MOD_LOG_DEBUG << "Test module 1 container created";
+	return m_test;
 }
 
-TestModuleContainer2::TestModuleContainer2( const TestModuleConfig& /* conf */ )
+TestUnit2* TestModuleContainer2::object( const config::NamedConfiguration& /*conf */ )
 {
-	m_test = new TestUnitImpl2( /* conf */ );
+	TestUnit2* m_test = new TestUnitImpl2( /* conf */ );
 	MOD_LOG_DEBUG << "Test module 2 container created";
+	return m_test;
 }
 
 TestUnitImpl1::TestUnitImpl1( )
@@ -123,16 +125,16 @@ bool TestUnitImpl2::resolveDB( const db::DatabaseProvider& /* db */ )
 	return true;
 }
 
-static ConfiguredContainerBuilder* createModule1( void )
+static ConfiguredBuilder* createModule1( void )
 {
-	static module::ConfiguredContainerDescription< test_containers::TestModuleContainer1,
+	static module::ConfiguredBuilderDescription< test_containers::TestModuleContainer1,
 		test_containers::TestModuleConfig > mod( "Test Module 1", "Test 1", "test1", "TestObject1" );
 	return &mod;
 }
 
-static ConfiguredContainerBuilder* createModule2( void )
+static ConfiguredBuilder* createModule2( void )
 {
-	static module::ConfiguredContainerDescription< test_containers::TestModuleContainer2,
+	static module::ConfiguredBuilderDescription< test_containers::TestModuleContainer2,
 		test_containers::TestModuleConfig > mod( "Test Module 2", "Test 2", "test 2", "TestObject2" );
 	return &mod;
 }
@@ -144,7 +146,7 @@ static void setModuleLogger( void* logger )
 
 
 static const unsigned short nrContainers = 2;
-static ConfiguredContainerBuilder* (*containers[ nrContainers ])() = {
+static ConfiguredBuilder* (*containers[ nrContainers ])() = {
 	createModule1,
 	createModule2
 };

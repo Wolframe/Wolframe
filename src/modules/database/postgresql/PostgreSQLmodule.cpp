@@ -38,15 +38,14 @@
 #include "moduleInterface.hpp"
 #include "logger-v1.hpp"
 
-
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace module {
 
-static ConfiguredContainerBuilder* createPGSQLmodule( void )
+static ConfiguredBuilder* createPGSQLmodule( void )
 {
-	static ConfiguredContainerDescription< db::PostgreSQLcontainer,
+	static ConfiguredBuilderDescription< db::PostgreSQLcontainer,
 			db::PostgreSQLconfig > mod( "PostgreSQL database", "database",
 						    "PostgreSQL", "PostgreSQL" );
 	return &mod;
@@ -59,7 +58,7 @@ static void setModuleLogger( void* logger )
 
 
 static const unsigned short nrContainers = 1;
-static ConfiguredContainerBuilder* (*containers[ nrContainers ])() = {
+static ConfiguredBuilder* (*containers[ nrContainers ])() = {
 	createPGSQLmodule
 };
 
@@ -67,4 +66,5 @@ ModuleEntryPoint entryPoint( 0, "PostgreSQL database", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-}} // namespace _Wolframe::module
+} // namespace module
+} // namespace _Wolframe

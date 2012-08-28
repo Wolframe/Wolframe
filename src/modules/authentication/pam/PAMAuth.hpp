@@ -39,7 +39,6 @@
 
 #include <string>
 #include "AAAA/authentication.hpp"
-#include "moduleInterface.hpp"
 
 #include <security/pam_appl.h>
 
@@ -48,12 +47,12 @@ namespace AAAA {
 
 class PAMAuthConfig :  public config::NamedConfiguration
 {
-	friend class PAMAuthContainer;
+	friend class PAMAuthConstructor;
 public:
 	PAMAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* objectName() const		{ return "PAMAuth"; }
+	virtual const char* objectName() const	{ return "PAMAuth"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -81,9 +80,9 @@ public:
 	PAMAuthenticator( const std::string& Identifier,
 			  const std::string& service );
 	~PAMAuthenticator();
-	virtual const char* typeName() const		{ return "PAMAuth"; }
+	virtual const char* typeName() const	{ return "PAMAuth"; }
 
-	AuthenticatorInstance* instance()			{ return NULL; }
+	AuthenticatorInstance* instance()	{ return NULL; }
 
 private:
 	// name of the PAM service
@@ -103,20 +102,6 @@ private:
 		_Wolframe_PAM_STATE_HAS_PASS,
 		_Wolframe_PAM_STATE_ERROR
 	} m_state;
-};
-
-
-class PAMAuthContainer : public ObjectContainer< AuthenticationUnit >
-{
-public:
-	PAMAuthContainer( const PAMAuthConfig& conf );
-	~PAMAuthContainer()				{}
-
-	virtual const char* identifier() const		{ return m_auth->typeName(); }
-	virtual AuthenticationUnit* object() const	{ return m_auth; }
-	void dispose()					{ m_auth = NULL; delete this; }
-private:
-	PAMAuthenticator*	m_auth;
 };
 
 }} // namespace _Wolframe::AAAA

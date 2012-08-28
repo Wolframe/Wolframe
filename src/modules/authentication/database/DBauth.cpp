@@ -74,13 +74,5 @@ bool DBauthenticator::resolveDB( const db::DatabaseProvider& db )
 	return true;
 }
 
-
-DBauthContainer::DBauthContainer( const DBAuthConfig& conf )
-{
-	m_auth = new DBauthenticator( conf.m_identifier, conf.m_dbLabel );
-	MOD_LOG_DEBUG << "Database authenticator container created for '"
-		      << conf.m_identifier << "'";
-}
-
 }} // namespace _Wolframe::AAAA
 

@@ -53,20 +53,18 @@ public:
 	{
 		return m_name.c_str();
 	}
-
-	virtual void dispose()	{ delete this; }
 private:
 	std::string m_name;
 };
 
-class FormFunctionContainerBuilder :public ContainerBuilder
+class FormFunctionBuilder :public SimpleBuilder
 {
 public:
-	FormFunctionContainerBuilder( const char* name_, langbind::FormFunction::Function f, const serialize::StructDescriptionBase* p, const serialize::StructDescriptionBase* r)
-		:ContainerBuilder( name_)
+	FormFunctionBuilder( const char* name_, langbind::FormFunction::Function f, const serialize::StructDescriptionBase* p, const serialize::StructDescriptionBase* r)
+		:SimpleBuilder( name_)
 		,m_func(name_,langbind::FormFunction( f,p,r)){}
 
-	virtual ~FormFunctionContainerBuilder(){}
+	virtual ~FormFunctionBuilder(){}
 
 	virtual Container* object()
 	{
@@ -82,9 +80,9 @@ private:
 namespace {\
 struct CPPID\
 {\
-	static ContainerBuilder* constructor()\
+	static SimpleBuilder* constructor()\
 	{\
-		return new FormFunctionContainerBuilder(NAME,FUNC,PARAM,RESULT);\
+		return new FormFunctionBuilder(NAME,FUNC,PARAM,RESULT);\
 	}\
 };\
 }//anonymous namespace

@@ -35,7 +35,6 @@
 //
 
 #include "AAAA/audit.hpp"
-#include "moduleInterface.hpp"
 
 #ifndef _DB_AUDIT_HPP_INCLUDED
 #define _DB_AUDIT_HPP_INCLUDED
@@ -45,7 +44,7 @@ namespace AAAA {
 
 class DBauditConfig : public config::NamedConfiguration
 {
-	friend class DBauditContainer;
+	friend class DBauditConstructor;
 public:
 	DBauditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName )
@@ -80,20 +79,6 @@ private:
 	bool			m_required;
 	std::string		m_dbLabel;
 	const db::Database*	m_db;
-};
-
-
-class DBauditContainer : public ObjectContainer< AuditUnit >
-{
-public:
-	DBauditContainer( const DBauditConfig& conf );
-	~DBauditContainer()			{}
-
-	const char* identifier() const		{ return m_audit->typeName(); }
-	AuditUnit* object() const		{ return m_audit; }
-	void dispose()				{ m_audit = NULL; delete this; }
-private:
-	DBauditor*		m_audit;
 };
 
 }} // namespace _Wolframe::AAAA

@@ -41,11 +41,34 @@
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
+namespace AAAA {
+
+class TextFileAuditConstructor : public ObjectConstructor< AuditUnit >
+{
+public:
+	TextFileAuditConstructor()	{}
+	~TextFileAuditConstructor()	{}
+
+	const char* identifier() const	{ return "FileAudit"; }
+	TextFileAuditor* object( const config::NamedConfiguration& conf );
+};
+
+TextFileAuditor* TextFileAuditConstructor::object( const config::NamedConfiguration& conf )
+{
+	const TextFileAuditConfig& cfg = dynamic_cast< const TextFileAuditConfig& >( conf );
+
+	TextFileAuditor* m_audit = new TextFileAuditor( cfg.m_file );
+	MOD_LOG_TRACE << "Text file auditor container created";
+	return m_audit;
+}
+
+} // namespace AAAA
+
 namespace module {
 
-static ConfiguredContainerBuilder* createModule( void )
+static ConfiguredBuilder* createModule( void )
 {
-	static module::ConfiguredContainerDescription< AAAA::TextFileAuditContainer,
+	static module::ConfiguredBuilderDescription< AAAA::TextFileAuditConstructor,
 			AAAA::TextFileAuditConfig > mod( "Audit - text file", "audit",
 						     "TextFile", "FileAudit" );
 	return &mod;
@@ -58,7 +81,7 @@ static void setModuleLogger( void* logger )
 
 
 static const unsigned short nrContainers = 1;
-static ConfiguredContainerBuilder* (*containers[ nrContainers ])() = {
+static ConfiguredBuilder* (*containers[ nrContainers ])() = {
 	createModule
 };
 
@@ -66,4 +89,5 @@ ModuleEntryPoint entryPoint( 0, "Text file audit", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-}} // namespace _Wolframe::module
+} // namespace module
+} // namespace _Wolframe
