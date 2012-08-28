@@ -31,6 +31,8 @@ makefiles/nmake/top.mk
 .Attic/config/config_descriptionBase.cpp
 .Attic/config/descriptionBase.hpp
 .Attic/config/description.hpp
+.Attic/config/PostgreSQLconfig.hpp
+.Attic/config/SQLite3Config.hpp
 .Attic/config/structParser.hpp
 .Attic/config/structPrinter.hpp
 .Attic/config/traits.hpp
