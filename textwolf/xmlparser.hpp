@@ -9,7 +9,7 @@
     document without buffering anything but the current result token
     processed with its tag hierarchy information.
 
-    Copyright (C) 2010 Patrick Frey
+    Copyright (C) 2010,2011,2012 Patrick Frey
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -153,7 +153,7 @@ struct XMLParserObject
 ///\brief Class for XML parsing independent of the character set
 ///\tparam BufferType type to use as buffer (STL back insertion interface)
 ///\tparam XMLAttributes setter/getter class for document attributes
-template <class BufferType, class XMLAttributes=DefaultXMLAttributes>
+template <class BufferType=std::string, class XMLAttributes=DefaultXMLAttributes>
 class XMLParser :public XMLParserBase
 {
 public:
