@@ -200,6 +200,8 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 		throw std::runtime_error( "Modules could not be loaded");
 	}
+
+	// Define processor provider objects
 }
 
 void WolfilterCommandLine::print(std::ostream& out) const
