@@ -54,6 +54,20 @@
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
 
+static proc::ProcProviderConfig g_processorProviderConfig;
+static proc::ProcessorProvider* g_processorProvider = 0;
+static module::ModulesDirectory g_modulesDirectory;
+
+///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
+static void loadGlobalContext()
+{
+	if (g_processorProvider) delete g_processorProvider;
+	g_processorProvider = new proc::ProcessorProvider( &g_processorProviderConfig, &g_modulesDirectory);
+	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
+	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
+}
+
+
 struct TestDescription
 {
 	const char* name;			///< determines the name of the result and of the expected result file
@@ -148,7 +162,7 @@ public:
 		m_appConfig.finalize();
 
 		setBuffers( ib, ob);
-		langbind::defineGlobalContext( langbind::GlobalContextR( new langbind::GlobalContext()));
+		loadGlobalContext();
 		langbind::getGlobalContext()->load( m_langbindConfig);
 	}
 

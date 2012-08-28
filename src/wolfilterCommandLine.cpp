@@ -87,12 +87,25 @@ struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStru
 	}
 };
 
+static std::string canonicalPath( const std::string& path, const std::string& refpath)
+{
+	boost::filesystem::path pt( path);
+	if (pt.is_absolute())
+	{
+		return pt.string();
+	}
+	else
+	{
+		return boost::filesystem::absolute( pt, boost::filesystem::path( refpath)).string();
+	}
+}
 
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath)
 	:m_printhelp(false)
 	,m_printversion(false)
 	,m_inbufsize(8<<10)
 	,m_outbufsize(8<<10)
+	,m_referencePath(referencePath)
 {
 	namespace po = boost::program_options;
 
@@ -172,6 +185,23 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv)
 	std::ostringstream dd;
 	dd << fopt;
 	m_helpstring = dd.str();
+
+	// Load modules
+	std::list<std::string> modfiles;
+	std::vector<std::string>::const_iterator itr,end;
+	itr = m_modules.begin();
+	end = m_modules.end();
+
+	for (; itr != end; ++itr)
+	{
+		modfiles.push_back( canonicalPath( *itr, referencePath));
+	}
+	if (!LoadModules( m_modulesDirectory, modfiles))
+	{
+		throw std::runtime_error( "Modules could not be loaded");
+	}
+
+	// Define processor provider objects
 }
 
 void WolfilterCommandLine::print(std::ostream& out) const
@@ -181,44 +211,16 @@ void WolfilterCommandLine::print(std::ostream& out) const
 	out << m_helpstring << std::endl;
 }
 
-static std::string canonicalPath( const std::string& path, const std::string& refpath)
-{
-	boost::filesystem::path pt( path);
-	if (pt.is_absolute())
-	{
-		return pt.string();
-	}
-	else
-	{
-		return boost::filesystem::absolute( pt, boost::filesystem::path( refpath)).string();
-	}
-}
-
-void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath, module::ModulesDirectory& modDir) const
+void WolfilterCommandLine::loadGlobalContext() const
 {
 	langbind::GlobalContext* gct = langbind::getGlobalContext();
-	{
-		std::list<std::string> modfiles;
-		std::vector<std::string>::const_iterator itr,end;
-		itr = m_modules.begin();
-		end = m_modules.end();
-
-		for (; itr != end; ++itr)
-		{
-			modfiles.push_back( canonicalPath( *itr, referencePath));
-		}
-		if (!LoadModules( modDir, modfiles))
-		{
-			throw std::runtime_error( "Modules could not be loaded");
-		}
-	}
 	{
 		std::vector<std::string>::const_iterator itr,end;
 		itr = scripts().begin();
 		end = scripts().end();
 		for (; itr != end; ++itr)
 		{
-			std::string scriptpath( canonicalPath( *itr, referencePath));
+			std::string scriptpath( canonicalPath( *itr, m_referencePath));
 			langbind::LuaScript script( scriptpath);
 			std::vector<std::string>::const_iterator mi,me;
 			for (mi=m_luaimports.begin(),me=m_luaimports.end(); mi != me; ++mi)
@@ -238,7 +240,7 @@ void WolfilterCommandLine::loadGlobalContext( const std::string& referencePath, 
 		end = forms().end();
 		for (; itr != end; ++itr)
 		{
-			std::string formpath( canonicalPath( itr->sourcepath, referencePath));
+			std::string formpath( canonicalPath( itr->sourcepath, m_referencePath));
 			ddl::CompilerInterfaceR ci;
 			if (!gct->getDDLCompiler( itr->DDL, ci))
 			{

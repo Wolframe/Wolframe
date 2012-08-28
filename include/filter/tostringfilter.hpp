@@ -64,6 +64,7 @@ public:
 	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
 	virtual bool print( ElementType type, const Element& element);
 
+	///\brief Get the content
 	const std::string& content() const		{return m_content;}
 
 private:

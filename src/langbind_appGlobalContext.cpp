@@ -37,7 +37,7 @@ Project Wolframe.
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;
-using namespace langbind;
+using namespace _Wolframe::langbind;
 
 static GlobalContextR g_context;
 
@@ -48,17 +48,10 @@ void _Wolframe::langbind::defineGlobalContext( const GlobalContextR& context)
 
 GlobalContext* _Wolframe::langbind::getGlobalContext()
 {
-	return g_context.get();
+	GlobalContext* gct = g_context.get();
+	if (!gct) throw std::runtime_error( "global context not defined");
+	return gct;
 }
-
-struct AutoCreateGlobalContext
-{
-	AutoCreateGlobalContext()
-	{
-		g_context.reset( new GlobalContext());
-	}
-};
-AutoCreateGlobalContext g_autoCreateGlobalContext;
 
 bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 {
@@ -149,5 +142,16 @@ bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
 	return rt;
 }
 
+bool GlobalContext::getFilter( const std::string& arg, Filter& fl) const
+{
+	bool rt = FilterMap::getFilter( arg, fl);
+	if (!rt)
+	{
+		const Filter* fp = m_provider->getFilter( arg);
+		if (!fp) return false;
+		fl = *fp;
+	}
+	return rt;
+}
 
 

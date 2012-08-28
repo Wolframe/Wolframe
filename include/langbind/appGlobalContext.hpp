@@ -40,6 +40,7 @@ Project Wolframe.
 #include "langbind/luaObjects.hpp"
 #endif
 #include "langbind/appConfig.hpp"
+#include "processor/procProvider.hpp"
 
 namespace _Wolframe {
 namespace langbind {
@@ -59,8 +60,14 @@ class GlobalContext
 #endif
 {
 public:
-	GlobalContext(){}
+	explicit GlobalContext( const proc::ProcessorProvider* provider)
+		:m_provider(provider){}
+
 	bool load( const ApplicationEnvironmentConfig& config);
+	bool getFilter( const std::string& arg, Filter& rt) const;
+
+private:
+	const proc::ProcessorProvider* m_provider;
 };
 typedef types::CountedReference<GlobalContext> GlobalContextR;
 

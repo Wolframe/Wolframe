@@ -40,6 +40,7 @@
 #include "langbind/iostreamfilter.hpp"
 #include "wolfilterCommandLine.hpp"
 #include "moduleInterface.hpp"
+#include "processor/procProvider.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
@@ -51,13 +52,26 @@ static const unsigned short APP_MINOR_VERSION = 0;
 static const unsigned short APP_REVISION = 5;
 static const unsigned short APP_BUILD = 0;
 
+static proc::ProcessorProvider* g_processorProvider = 0;
+
+///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
+static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
+{
+	if (g_processorProvider) delete g_processorProvider;
+	g_processorProvider = new proc::ProcessorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory());
+	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
+	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
+
+	cmdline.loadGlobalContext();
+}
+
 int main( int argc, char **argv )
 {
 	bool doExit = false;
 	try
 	{
 		module::ModulesDirectory modDir;
-		config::WolfilterCommandLine cmdline( argc, argv);
+		config::WolfilterCommandLine cmdline( argc, argv, boost::filesystem::current_path().string());
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";
@@ -72,8 +86,9 @@ int main( int argc, char **argv )
 		if (doExit) return 0;
 
 		// Load the modules, scripts, etc. defined in the command line into the global context:
-		cmdline.loadGlobalContext( boost::filesystem::current_path().string(), modDir);
+		loadGlobalContext( cmdline);
 
+		// Call the function to execute
 		if (cmdline.inputfile().size())
 		{
 			std::fstream fh;

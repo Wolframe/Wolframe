@@ -80,6 +80,30 @@ private:
 	int m_state;			//< fetching state of current element
 };
 
+///\class ToStringFilter
+///\brief Output filter for tostring methods in language bindings
+class PropertyTreeOutputFilter :public TypedOutputFilter
+{
+public:
+	///\brief Constructor
+	PropertyTreeOutputFilter();
+
+	///\brief Destructor
+	virtual ~PropertyTreeOutputFilter(){}
+
+	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
+	virtual bool print( ElementType type, const Element& element);
+
+	///\brief Get the content
+	const boost::property_tree::ptree& content() const	{return m_content;}
+
+private:
+	typedef boost::property_tree::ptree Tree;
+	Tree m_content;				//< content string
+	std::vector<Tree*> m_stk;		//< build property tree stack
+	std::string m_attribute;		//< parsed attribute name
+};
+
 }}//namespace
 #endif
 
