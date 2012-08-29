@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file modules/filter/libxml2/mod_filter_libxml2.cpp
 ///\brief Module for libxml2 XML filters
-#include "modules/filter/template/filterContainerBuilder.hpp"
+#include "modules/filter/template/filterBuilder.hpp"
 #include "filter/libxml2_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
@@ -70,7 +70,7 @@ static createBuilderFunc objdef[ NofObjects] =
 };
 
 #ifndef _WIN32
-#define DLLEXPORT 
+#define DLLEXPORT
 #else
 #define DLLEXPORT __declspec( dllexport )
 #endif

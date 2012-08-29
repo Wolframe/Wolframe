@@ -762,7 +762,7 @@ src/modules/authorization/database/GNUmakefile
 src/modules/authorization/database/Makefile.W32
 src/modules/authorization/GNUmakefile
 src/modules/authorization/Makefile.W32
-src/modules/cmdbind/template/commandHandlerContainerBuilder.hpp
+src/modules/cmdbind/template/commandHandlerBuilder.hpp
 src/modules/database/GNUmakefile
 src/modules/database/Makefile.W32
 src/modules/database/postgresql/GNUmakefile
@@ -788,7 +788,7 @@ src/modules/ddlcompiler/Makefile.W32
 src/modules/ddlcompiler/simpleform/GNUmakefile
 src/modules/ddlcompiler/simpleform/Makefile.W32
 src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform.cpp
-src/modules/ddlcompiler/template/ddlcompilerContainerBuilder.hpp
+src/modules/ddlcompiler/template/ddlcompilerBuilder.hpp
 src/modules/filter/char/GNUmakefile
 src/modules/filter/char/Makefile.W32
 src/modules/filter/char/mod_filter_char.cpp
@@ -800,14 +800,14 @@ src/modules/filter/line/GNUmakefile
 src/modules/filter/line/Makefile.W32
 src/modules/filter/line/mod_filter_line.cpp
 src/modules/filter/Makefile.W32
-src/modules/filter/template/filterContainerBuilder.hpp
+src/modules/filter/template/filterBuilder.hpp
 src/modules/filter/textwolf/GNUmakefile
 src/modules/filter/textwolf/Makefile.W32
 src/modules/filter/textwolf/mod_filter_textwolf.cpp
 src/modules/filter/token/GNUmakefile
 src/modules/filter/token/Makefile.W32
 src/modules/filter/token/mod_filter_token.cpp
-src/modules/formfunction/template/formfunctionContainerBuilder.hpp
+src/modules/formfunction/template/formfunctionBuilder.hpp
 src/modules/GNUmakefile
 src/modules/Makefile.W32
 src/posixMain.cpp

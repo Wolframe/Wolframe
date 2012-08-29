@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file modules/filter/token/mod_filter_token.cpp
 ///\brief Module for token XML filters
-#include "modules/filter/template/filterContainerBuilder.hpp"
+#include "modules/filter/template/filterBuilder.hpp"
 #include "filter/token_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
@@ -70,7 +70,7 @@ static createBuilderFunc objdef[ NofObjects] =
 };
 
 #ifndef _WIN32
-#define DLLEXPORT 
+#define DLLEXPORT
 #else
 #define DLLEXPORT __declspec( dllexport )
 #endif

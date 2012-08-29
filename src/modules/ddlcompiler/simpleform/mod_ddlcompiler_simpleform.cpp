@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file tests/wolfilter/modules/ddlcompiler/mod_ddlcompiler_simpleform.cpp
 ///\brief Module for testing form functions
-#include "modules/ddlcompiler/template/ddlcompilerContainerBuilder.hpp"
+#include "modules/ddlcompiler/template/ddlcompilerBuilder.hpp"
 #include "logger-v1.hpp"
 #include "ddl/compiler/simpleFormCompiler.hpp"
 

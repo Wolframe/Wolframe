@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file tests/wolfilter/modules/echo_cmdhandler/mod_echo_cmdhandler.cpp
 ///\brief Module for testing peer functions
-#include "modules/cmdbind/template/commandHandlerContainerBuilder.hpp"
+#include "modules/cmdbind/template/commandHandlerBuilder.hpp"
 #include "wolfilter/modules/echo_cmdhandler/echo_cmdhandler.hpp"
 #include "logger-v1.hpp"
 
