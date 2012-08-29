@@ -36,6 +36,13 @@
 #include "gtest/gtest.h"
 #include "types/base64.hpp"
 
+#ifdef _WIN32
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#else
+#include <stdlib.h>
+#include <time.h>
+#endif
 
 #undef _BASE64_WRITE_OUTPUT
 #undef _BASE64_LOOP_TEST
@@ -280,7 +287,11 @@ TEST( Base64, RandomData )
 	unsigned char*	decoded;
 	int		chunkSize;
 
+#ifndef _WIN32
 	srand( time( NULL ) );
+#else
+	srand( GetTickCount( ) );
+#endif
 #ifdef _BASE64_LOOP_TEST
 	for ( int i = 0; i < _BASE64_NOF_LOOPS; i++ )	{
 #endif
