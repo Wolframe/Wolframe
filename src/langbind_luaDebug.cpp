@@ -34,7 +34,6 @@
 #include "langbind/luaException.hpp"
 #include <stdexcept>
 #include <cstddef>
-#include <stdint.h>
 #include <string>
 #include <vector>
 #include "logger-v1.hpp"
