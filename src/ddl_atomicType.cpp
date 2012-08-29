@@ -214,18 +214,19 @@ bool AtomicType::assign_string( const std::string& val)
 	{
 		std::size_t digits;
 		std::string::const_iterator itr = val.begin();
+		std::string::const_iterator end = val.end();
 
 		switch (m_type)
 		{
 			case float_:
 			{
 				if (*itr == '-') ++itr;
-				while (*itr >= '0' && *itr <= '9')
+				while (itr != end && *itr >= '0' && *itr <= '9')
 				{
 					++itr;
 				}
 				if (*itr == '.') ++itr;
-				while (*itr >= '0' && *itr <= '9')
+				while (itr != end && *itr >= '0' && *itr <= '9')
 				{
 					++itr;
 				}
@@ -233,7 +234,7 @@ bool AtomicType::assign_string( const std::string& val)
 				{
 					++itr;
 					if (*itr == '-') ++itr;
-					while (*itr >= '0' && *itr <= '9')
+					while (itr != end && *itr >= '0' && *itr <= '9')
 					{
 						++itr;
 						++digits;
@@ -248,7 +249,7 @@ bool AtomicType::assign_string( const std::string& val)
 				/*no break here!*/
 			case uint_:
 				digits=0;
-				while (*itr >= '0' && *itr <= '9')
+				while (itr != end && *itr >= '0' && *itr <= '9')
 				{
 					++itr;
 					++digits;
