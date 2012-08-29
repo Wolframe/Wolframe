@@ -43,7 +43,7 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace AAAA {
 
-class SaslAuthConstructor : public ObjectConstructor< AuthenticationUnit >
+class SaslAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
 {
 public:
 	virtual const char* identifier() const	{ return "SaslAuth"; }

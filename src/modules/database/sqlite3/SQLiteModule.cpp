@@ -44,7 +44,7 @@ namespace _Wolframe {
 namespace db {
 
 //***  SQLite database constructor  *******************************************
-class SQLiteConstructor : public ObjectConstructor< db::DatabaseUnit >
+class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 {
 public:
 	virtual const char* identifier() const	{ return "SQLite"; }

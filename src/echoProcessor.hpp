@@ -99,7 +99,7 @@ private:
 };
 
 
-class EchoProcContainer : public ObjectConstructor< proc::ProcessorUnit >
+class EchoProcContainer : public ConfiguredObjectConstructor< proc::ProcessorUnit >
 {
 public:
 	EchoProcContainer( const EchoProcConfig& conf );

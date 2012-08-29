@@ -51,8 +51,8 @@ AuditProvider::AuditProvider( const std::list< config::NamedConfiguration* >& co
 								it != confs.end(); it++ )	{
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
 		if ( builder )	{
-			ObjectConstructor< AuditUnit >* audit =
-					dynamic_cast< ObjectConstructor< AuditUnit >* >( builder->builder());
+			ConfiguredObjectConstructor< AuditUnit >* audit =
+					dynamic_cast< ConfiguredObjectConstructor< AuditUnit >* >( builder->builder());
 			if ( audit == NULL )	{
 				LOG_ALERT << "AuditProvider: '" << builder->identifier()
 					  << "' is not an Audit Unit builder";

@@ -43,7 +43,7 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace AAAA {
 
-class TextFileAuditConstructor : public ObjectConstructor< AuditUnit >
+class TextFileAuditConstructor : public ConfiguredObjectConstructor< AuditUnit >
 {
 public:
 	const char* identifier() const	{ return "FileAudit"; }

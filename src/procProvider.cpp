@@ -183,8 +183,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 									it != conf->m_procConfig.end(); it++ )	{
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
 		if ( builder )	{
-			ObjectConstructor< cmdbind::CommandHandlerUnit >* handler =
-					dynamic_cast< ObjectConstructor< cmdbind::CommandHandlerUnit >* >( builder->builder());
+			ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* handler =
+					dynamic_cast< ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* >( builder->builder());
 			if ( handler == NULL )	{
 				LOG_ALERT << "Wolframe Processor Provider: '" << builder->identifier()
 					  << "'' is not a command handler";

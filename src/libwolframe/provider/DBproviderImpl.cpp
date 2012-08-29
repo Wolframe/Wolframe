@@ -69,8 +69,8 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 									it != conf->m_config.end(); it++ )	{
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
 		if ( builder )	{
-			ObjectConstructor< db::DatabaseUnit >* db =
-					dynamic_cast< ObjectConstructor< db::DatabaseUnit >* >( builder->builder());
+			ConfiguredObjectConstructor< db::DatabaseUnit >* db =
+					dynamic_cast< ConfiguredObjectConstructor< db::DatabaseUnit >* >( builder->builder());
 			if ( db == NULL )	{
 				LOG_ALERT << "DatabaseProvider: '" << builder->identifier()
 					  << "' is not an Database Unit builder";

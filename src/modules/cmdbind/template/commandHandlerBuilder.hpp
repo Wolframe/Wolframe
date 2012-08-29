@@ -35,13 +35,13 @@ Project Wolframe.
 #define _Wolframe_MODULE_COMMAND_HANDLER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
 #include "moduleInterface.hpp"
-#include "container.hpp"
+#include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
 
 template <class CommandHandler>
-class CommandHandlerContainer :public Container, public CommandHandler
+class CommandHandlerContainer :public ObjectConstructorBase, public CommandHandler
 {
 public:
 	CommandHandlerContainer( const char* name_)
@@ -68,7 +68,7 @@ public:
 
 	virtual ~CommandHandlerBuilder(){}
 
-	virtual Container* object()
+	virtual ObjectConstructorBase* object()
 	{
 		return new CommandHandlerContainer<CommandHandler>(m_identifier.c_str());
 	}

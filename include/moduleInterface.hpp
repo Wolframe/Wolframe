@@ -41,7 +41,7 @@
 #include <list>
 #include <boost/property_tree/ptree.hpp>
 #include "config/configurationBase.hpp"
-#include "container.hpp"
+#include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
@@ -60,7 +60,7 @@ public:
 
 	const char* identifier() const			{ return m_identifier; }
 
-	virtual Container* object() = 0;
+	virtual ObjectConstructorBase* object() = 0;
 };
 
 ///
@@ -84,7 +84,7 @@ public:
 	const char* identifier() const		{ return m_identifier; }
 
 	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
-	virtual Container* builder() = 0;
+	virtual ObjectConstructorBase* builder() = 0;
 };
 
 
@@ -102,7 +102,7 @@ public:
 	virtual config::NamedConfiguration* configuration( const char* logPrefix )	{
 		return new Tconf( m_title, logPrefix, m_keyword );
 	}
-	virtual Container* builder()	{
+	virtual ObjectConstructorBase* builder()	{
 		return &m_builder;
 	}
 private:

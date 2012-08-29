@@ -35,12 +35,12 @@ Project Wolframe.
 #define _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "filter/filter.hpp"
 #include "moduleInterface.hpp"
-#include "container.hpp"
+#include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-class FilterContainer :public Container, public langbind::Filter
+class FilterContainer :public ObjectConstructorBase, public langbind::Filter
 {
 public:
 	FilterContainer( const char* name_, const langbind::Filter& filter_)
@@ -66,7 +66,7 @@ public:
 
 	virtual ~FilterBuilder(){}
 
-	virtual Container* object()
+	virtual ObjectConstructorBase* object()
 	{
 		return new FilterContainer( m_identifier, createFilterFunc( m_identifier));
 	}

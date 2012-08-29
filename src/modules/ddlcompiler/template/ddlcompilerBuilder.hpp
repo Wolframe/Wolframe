@@ -35,13 +35,13 @@ Project Wolframe.
 #define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "ddl/compilerInterface.hpp"
 #include "moduleInterface.hpp"
-#include "container.hpp"
+#include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
 
 template <class CompilerInterfaceC>
-class DDLCompilerContainer :public Container, public CompilerInterfaceC
+class DDLCompilerContainer :public ObjectConstructorBase, public CompilerInterfaceC
 {
 public:
 	DDLCompilerContainer( const char* name_)
@@ -68,7 +68,7 @@ public:
 
 	virtual ~DDLCompilerBuilder(){}
 
-	virtual Container* object()
+	virtual ObjectConstructorBase* object()
 	{
 		return new DDLCompilerContainer<CompilerInterfaceC>(m_identifier.c_str());
 	}

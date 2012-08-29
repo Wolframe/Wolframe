@@ -44,7 +44,7 @@ namespace _Wolframe {
 namespace db {
 
 //***  PostgreSQL database constructor  ***************************************
-class PostgreSQLconstructor : public ObjectConstructor< db::DatabaseUnit >
+class PostgreSQLconstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 {
 public:
 	const char* identifier() const	{ return "PostgreSQL"; }

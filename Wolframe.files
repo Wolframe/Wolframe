@@ -61,6 +61,7 @@ makefiles/nmake/top.mk
 .Attic/loadModule/Makefile.W32
 .Attic/loadModule/moduleBase.hpp
 .Attic/manpage-template.xml
+.Attic/msstdint.h
 .Attic/mtproc/implementation_c.c
 .Attic/mtproc/implementation_c.h
 .Attic/mtproc/methodtable_c.h
@@ -331,7 +332,7 @@ include/config/structSerialize.hpp
 include/config/valueParser.hpp
 include/connectionEndpoint.hpp
 include/connectionHandler.hpp
-include/container.hpp
+include/constructor.hpp
 include/database/database.hpp
 include/database/databaseOperation.hpp
 include/database/DBprovider.hpp

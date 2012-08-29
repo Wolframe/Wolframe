@@ -93,7 +93,7 @@ public:
 	virtual const std::string hullo( ) = 0;
 };
 
-class TestModuleContainer1 : public ObjectConstructor< TestUnit1 >
+class TestModuleContainer1 : public ConfiguredObjectConstructor< TestUnit1 >
 {
 public:
 	TestModuleContainer1()			{}
@@ -103,7 +103,7 @@ public:
 	virtual TestUnit1* object( const config::NamedConfiguration& conf );
 };
 
-class TestModuleContainer2 : public ObjectConstructor< TestUnit2 >
+class TestModuleContainer2 : public ConfiguredObjectConstructor< TestUnit2 >
 {
 public:
 	TestModuleContainer2()			{}
