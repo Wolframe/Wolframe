@@ -46,9 +46,6 @@ namespace AAAA {
 class DBauthConstructor : public ObjectConstructor< AuthenticationUnit >
 {
 public:
-	DBauthConstructor()			{}
-	~DBauthConstructor()			{}
-
 	const char* identifier() const		{ return "DBAuth"; }
 	DBauthenticator* object( const config::NamedConfiguration& conf );
 };

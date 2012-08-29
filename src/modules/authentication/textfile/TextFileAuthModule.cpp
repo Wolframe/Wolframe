@@ -48,9 +48,6 @@ namespace AAAA {
 class TextFileAuthConstructor : public ObjectConstructor< AuthenticationUnit >
 {
 public:
-	TextFileAuthConstructor()		{}
-	~TextFileAuthConstructor()		{}
-
 	const char* identifier() const		{ return "TextFileAuth"; }
 	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
 };

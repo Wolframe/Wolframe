@@ -46,9 +46,6 @@ namespace AAAA {
 class SaslAuthConstructor : public ObjectConstructor< AuthenticationUnit >
 {
 public:
-	SaslAuthConstructor()			{}
-	~SaslAuthConstructor()			{}
-
 	virtual const char* identifier() const	{ return "SaslAuth"; }
 	virtual SaslAuthenticator* object( const config::NamedConfiguration& conf );
 };

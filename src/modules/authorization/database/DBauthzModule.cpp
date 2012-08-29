@@ -47,9 +47,6 @@ namespace AAAA {
 class DBauthzConstructor : public ObjectConstructor< AuthorizationUnit >
 {
 public:
-	DBauthzConstructor()			{}
-	~DBauthzConstructor()			{}
-
 	const char* identifier() const	{ return "DatabaseAuthorization"; }
 	DBauthorizer* object( const config::NamedConfiguration& conf );
 };

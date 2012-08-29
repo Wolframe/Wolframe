@@ -117,16 +117,6 @@ bool SQLiteDatabase::doTransaction( DatabaseRequest& /*request*/, DatabaseAnswer
 	return true;
 }
 
-//***  SQLite database container  *******************************************
-SQLiteDatabase* SQLiteContainer::object( const config::NamedConfiguration& conf )
-{
-	const SQLiteConfig& cfg = dynamic_cast< const SQLiteConfig& >( conf );
-
-	SQLiteDatabase* m_db = new SQLiteDatabase( cfg.m_ID, cfg.filename, /* Aba: temporary */ 10, cfg.flag );
-	MOD_LOG_TRACE << "SQLite database container for '" << cfg.m_ID << "' created";
-	return m_db;
-}
-
 }} // _Wolframe::db
 
 

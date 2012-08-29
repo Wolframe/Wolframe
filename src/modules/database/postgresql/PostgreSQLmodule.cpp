@@ -41,11 +41,34 @@
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
+namespace db {
+
+//***  PostgreSQL database constructor  ***************************************
+class PostgreSQLconstructor : public ObjectConstructor< db::DatabaseUnit >
+{
+public:
+	const char* identifier() const	{ return "PostgreSQL"; }
+	PostgreSQLdatabase* object( const config::NamedConfiguration& conf );
+};
+
+PostgreSQLdatabase* PostgreSQLconstructor::object( const config::NamedConfiguration& conf )
+{
+	const PostgreSQLconfig& cfg = dynamic_cast< const PostgreSQLconfig& >( conf );
+
+	PostgreSQLdatabase* m_db = new PostgreSQLdatabase( cfg.m_ID, cfg.host, cfg.port, cfg.dbName,
+							   cfg.user, cfg.password, cfg.connectTimeout,
+							   cfg.connections, cfg.acquireTimeout );
+	MOD_LOG_TRACE << "PostgreSQL database unit for '" << cfg.m_ID << "' created";
+	return m_db;
+}
+
+} // namespace db
+
 namespace module {
 
 static ConfiguredBuilder* createPGSQLmodule( void )
 {
-	static ConfiguredBuilderDescription< db::PostgreSQLcontainer,
+	static ConfiguredBuilderDescription< db::PostgreSQLconstructor,
 			db::PostgreSQLconfig > mod( "PostgreSQL database", "database",
 						    "PostgreSQL", "PostgreSQL" );
 	return &mod;

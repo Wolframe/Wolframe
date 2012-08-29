@@ -46,9 +46,6 @@ namespace AAAA {
 class DBauditConstructor : public ObjectConstructor< AuditUnit >
 {
 public:
-	DBauditConstructor()		{}
-	~DBauditConstructor()		{}
-
 	const char* identifier() const	{ return "DatabaseAudit"; }
 	DBauditor* object( const config::NamedConfiguration& conf );
 };

@@ -41,12 +41,9 @@
 #include <list>
 
 #include "database/database.hpp"
-#include "container.hpp"
 #include "config/configurationBase.hpp"
 
 #include "objectPool.hpp"
-
-#include "moduleInterface.hpp"
 
 namespace _Wolframe {
 namespace db {
@@ -54,7 +51,7 @@ namespace db {
 /// PostgreSQL server connection configuration
 class PostgreSQLconfig : public config::NamedConfiguration
 {
-	friend class PostgreSQLcontainer;
+	friend class PostgreSQLconstructor;
 public:
 	const char* objectName() const			{ return "PostgreSQL"; }
 
@@ -100,17 +97,6 @@ private:
 	std::string		m_connStr;		///< connection string
 	size_t			m_noConnections;	///< number of connections
 	ObjectPool< PGconn* >	m_connPool;		///< pool of connections
-};
-
-
-class PostgreSQLcontainer : public ObjectConstructor< db::DatabaseUnit >
-{
-public:
-	PostgreSQLcontainer()			{}
-	~PostgreSQLcontainer()			{}
-
-	const char* identifier() const	{ return "PostgreSQL"; }
-	PostgreSQLdatabase* object( const config::NamedConfiguration& conf );
 };
 
 }} // _Wolframe::db

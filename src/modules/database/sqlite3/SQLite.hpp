@@ -38,8 +38,7 @@
 #define _SQLITE_HPP_INCLUDED
 
 #include "database/database.hpp"
-#include "container.hpp"
-#include "moduleInterface.hpp"
+#include "config/configurationBase.hpp"
 
 #include <list>
 #include "objectPool.hpp"
@@ -51,7 +50,7 @@ namespace db {
 /// SQLite database configuration
 class SQLiteConfig : public config::NamedConfiguration
 {
-	friend class SQLiteContainer;
+	friend class SQLiteConstructor;
 public:
 	const char* objectName() const			{ return "SQLite"; }
 
@@ -89,17 +88,6 @@ private:
 	bool			m_flag;
 	std::list< sqlite3* >	m_connections;		//< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		//< pool of connections
-};
-
-
-class SQLiteContainer : public ObjectConstructor< db::DatabaseUnit >
-{
-public:
-	SQLiteContainer()			{}
-	~SQLiteContainer()			{}
-
-	virtual const char* identifier() const	{ return "SQLite"; }
-	virtual SQLiteDatabase* object( const config::NamedConfiguration& conf );
 };
 
 }} // _Wolframe::db
