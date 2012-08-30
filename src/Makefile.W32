@@ -90,7 +90,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_ioFilterCommandHandler.obj \
 	cmdbind_doctypeFilterCommandHandler.obj \
 	cmdbind_directmapCommandHandler.obj \
-	database_processor.obj \
 	filter_filterbase.obj \
 	filter_doctype.obj \
 	filter_tostringfilter.obj \
@@ -116,6 +115,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	ddl_atomicType.obj \
 	ddl_structType.obj \
 	ddl_structTypeBuild.obj \
+	database_processor.obj \
+	prnt_pdfPrinter.obj \
 	acceptor.obj \
 	connection.obj \
 	serverConfig.obj \

@@ -87,6 +87,12 @@ public:
 	///\brief Return current char position
 	unsigned int pos() const {return m_pos;}
 
+	int operator - (const CStringIterator& o) const
+	{
+		if (m_src != o.m_src) return 0;
+		return (int)(m_pos - o.m_pos);
+	}
+
 private:
 	const char* m_src;
 	unsigned int m_size;

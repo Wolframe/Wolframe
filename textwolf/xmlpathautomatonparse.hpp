@@ -34,7 +34,9 @@
 */
 #ifndef __TEXTWOLF_XML_PATH_AUTOMATON_PARSE_HPP__
 #define __TEXTWOLF_XML_PATH_AUTOMATON_PARSE_HPP__
-#include "textwolf/xmlpathautomatonparse.hpp"
+#include "textwolf/xmlpathautomaton.hpp"
+#include "textwolf/charset.hpp"
+#include "textwolf/cstringiterator.hpp"
 #include <limits>
 #include <string>
 #include <vector>
@@ -45,24 +47,25 @@
 namespace textwolf {
 
 ///\class XMLPathSelectAutomatonParser
-///\tparam SrcCharSet_ character set of the automaton definition source
-///\tparam AtmCharSet_ character set of the token defintions of the automaton
+///\tparam SrcCharSet character set of the automaton definition source
+///\tparam AtmCharSet character set of the token defintions of the automaton
 ///\brief Automaton to define XML path expressions and assign types (int values) to them
-template <class SrcCharSet_=charset::UTF8, class AtmCharSet_=charset::UTF8>
-class XMLPathSelectAutomatonParser :public XMLPathSelectAutomaton
+template <class SrcCharSet=charset::UTF8, class AtmCharSet=charset::UTF8>
+class XMLPathSelectAutomatonParser :public XMLPathSelectAutomaton<AtmCharSet>
 {
 public:
-	typedef XMLPathSelectAutomaton<CharSet_> ThisAutomaton;
+	typedef XMLPathSelectAutomaton<AtmCharSet> ThisAutomaton;
+	typedef typename ThisAutomaton::PathElement PathElement;
 	typedef XMLPathSelectAutomatonParser This;
-	typedef TextScanner<CStringIterator,SrcCharSet_> SrcScanner;
+	typedef TextScanner<CStringIterator,SrcCharSet> SrcScanner;
 
 public:
 	///\brief Constructor
 	XMLPathSelectAutomatonParser(){}
 
-	int addExpression( int typeidx, const char* expr, std::size_t exprsize)
+	int addExpression( int typeidx, const char* esrc, std::size_t esrcsize)
 	{
-		CStringIterator itr( expr, exprsize);
+		CStringIterator itr( esrc, esrcsize);
 		SrcScanner src( itr);
 
 		PathElement expr( this);
@@ -111,28 +114,28 @@ public:
 					// Range
 					int range_start = -1;
 					int range_end = -1;
-					++ii; skipSpaces( expr, ii);
-					range_start = parseNum( expr, ii);
-					if (range_start < 0) return ii+1;
-					skipSpaces( expr, ii);
+					++src; skipSpaces( src);
+					range_start = parseNum( src);
+					if (range_start < 0) return src.getPosition()+1;
+					skipSpaces( src);
 
-					if (expr[ii] == ',')
+					if (*src == ',')
 					{
-						++ii; skipSpaces( expr, ii);
-						if (expr[ii] == ']')
+						++src; skipSpaces( src);
+						if (*src == ']')
 						{
 							expr.FROM( range_start);
 						}
 						else
 						{
-							range_end = parseNum( expr, ii);
-							if (range_end < 0) return ii+1;
-							++ii; skipSpaces( expr, ii);
-							if (expr[ii] != ']') return ii+1;
+							range_end = parseNum( src);
+							if (range_end < 0) return src.getPosition()+1;
+							++src; skipSpaces( src);
+							if (*src != ']') return src.getPosition()+1;
 							expr.RANGE( range_start, range_end);
 						}
 					}
-					else if (expr[ii] == ']')
+					else if (*src == ']')
 					{
 						range_start = range_end;
 						expr.INDEX( range_start);
@@ -142,17 +145,18 @@ public:
 			}
 		}
 		expr.assignType( typeidx);
+		return 0;
 	}
 
 private:
 	static void skipSpaces( SrcScanner& src)
 	{
-		for (; src->control() == Space; ++src);
+		for (; src.control() == Space; ++src);
 	}
 
 	static int parseNum( SrcScanner& src)
 	{
-		std::size_t kk=ii,std::string num;
+		std::string num;
 		for (; *src>='0' && *src<='9';++src) num.push_back( *src);
 		if (num.size() == 0 || num.size() > 8) return -1;
 		return std::atoi( num.c_str());
@@ -161,11 +165,11 @@ private:
 	static std::string parseIdentifier( SrcScanner& src)
 	{
 		std::string rt;
-		for (; src->control() == Undef || src->control() == Any; ++src)
+		for (; src.control() == Undef || src.control() == Any; ++src)
 		{
-			AtmCharSet_::print( *src, rt);
+			AtmCharSet::print( *src, rt);
 		}
-		AtmCharSet_::print( 0, rt);
+		AtmCharSet::print( 0, rt);
 		return rt;
 	}
 };

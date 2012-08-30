@@ -35,7 +35,7 @@
 #ifndef __TEXTWOLF_XML_PATH_AUTOMATON_HPP__
 #define __TEXTWOLF_XML_PATH_AUTOMATON_HPP__
 #include "textwolf/char.hpp"
-#include "textwolf/charset_interface.hpp"
+#include "textwolf/charset.hpp"
 #include "textwolf/exception.hpp"
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/staticbuffer.hpp"
@@ -650,7 +650,7 @@ public:
 		///\brief Define index of the element index to push
 		///\param [in] idx element index
 		///\return *this
-		PathElement& INDEX(int idx) throw(exception)					{return doRange(idx1,idx2+1); return *this;}
+		PathElement& INDEX(int idx) throw(exception)					{return doRange(idx,idx+1); return *this;}
 
 		///\brief Define element type to push
 		///\param [in] type element type
