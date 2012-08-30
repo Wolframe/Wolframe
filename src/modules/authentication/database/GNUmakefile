@@ -20,6 +20,7 @@ DYNAMIC_MODULE = mod_auth_database.so
 
 CPP_OBJS = \
 	DBauthConfig.o \
+	DBauthConstructor.o \
 	DBauth.o \
 	DBauthModule.o
 

@@ -67,7 +67,7 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 {
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_config.begin();
 									it != conf->m_config.end(); it++ )	{
-		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
 			ConfiguredObjectConstructor< db::DatabaseUnit >* db =
 					dynamic_cast< ConfiguredObjectConstructor< db::DatabaseUnit >* >( builder->builder());
@@ -80,7 +80,7 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 			LOG_TRACE << "'" << db->identifier() << "' database unit registered";
 		}
 		else	{
-			LOG_ALERT << "DatabaseProvider: unknown database module '" << (*it)->objectName() << "'";
+			LOG_ALERT << "DatabaseProvider: unknown database module '" << (*it)->className() << "'";
 			throw std::domain_error( "Unknown database type in DBprovider constructor. See log" );
 		}
 	}

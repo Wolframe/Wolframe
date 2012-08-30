@@ -82,8 +82,8 @@ public:
 class AuthenticationUnit
 {
 public:
-	AuthenticationUnit( const std::string& Identifier )
-		: m_identifier( Identifier )	{}
+	AuthenticationUnit( const std::string& id )
+		: m_identifier( id )		{}
 
 	virtual ~AuthenticationUnit()		{}
 
@@ -91,7 +91,7 @@ public:
 
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
 						{ return true; }
-	virtual const char* typeName() const = 0;
+	virtual const char* className() const = 0;
 
 	virtual AuthenticatorInstance* instance() = 0;
 private:

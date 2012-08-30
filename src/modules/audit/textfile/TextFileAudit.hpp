@@ -40,6 +40,7 @@
 #include <string>
 
 #include "AAAA/audit.hpp"
+#include "constructor.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -51,7 +52,7 @@ public:
 	TextFileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	const char* objectName() const			{ return "FileAudit"; }
+	const char* className() const		{ return "FileAudit"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -70,13 +71,21 @@ class TextFileAuditor : public AuditUnit
 public:
 	TextFileAuditor( const std::string& filename );
 	~TextFileAuditor();
-	const char* typeName() const		{ return "FileAudit"; }
+	const char* className() const		{ return "FileAudit"; }
 
 	bool required()				{ return m_required; }
 	bool audit( const Information& auditObject );
 private:
 	bool		m_required;
 	std::string	m_file;
+};
+
+
+class TextFileAuditConstructor : public ConfiguredObjectConstructor< AuditUnit >
+{
+public:
+	const char* identifier() const	{ return "FileAudit"; }
+	TextFileAuditor* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

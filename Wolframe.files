@@ -720,6 +720,7 @@ src/loadModules.cpp
 src/loadModules-dummy.cpp
 src/Makefile.W32
 src/modules/audit/database/DBauditConfig.cpp
+src/modules/audit/database/DBauditConstructor.cpp
 src/modules/audit/database/DBaudit.cpp
 src/modules/audit/database/DBaudit.hpp
 src/modules/audit/database/DBauditModule.cpp
@@ -731,11 +732,13 @@ src/modules/audit/Makefile.W32
 src/modules/audit/textfile/GNUmakefile
 src/modules/audit/textfile/Makefile.W32
 src/modules/audit/textfile/TextFileAuditConfig.cpp
+src/modules/audit/textfile/TextFileAuditConstructor.cpp
 src/modules/audit/textfile/TextFileAudit.cpp
 src/modules/audit/textfile/TextFileAudit.hpp
 src/modules/audit/textfile/TextFileAuditModule.cpp
 src/modules/audit/textfile/TextFileAuditModule.def
 src/modules/authentication/database/DBauthConfig.cpp
+src/modules/authentication/database/DBauthConstructor.cpp
 src/modules/authentication/database/DBauth.cpp
 src/modules/authentication/database/DBauth.hpp
 src/modules/authentication/database/DBauthModule.cpp
@@ -929,6 +932,7 @@ tests/temp/echo_input_doctype_form.lua
 tests/temp/echo_input_doctype.lua
 tests/temp/echo_input_doctype_table.lua
 tests/temp/echo_input_generator.lua
+tests/temp/echo_input_iterator.lua
 tests/temp/echo_input_table.lua
 tests/temp/formfunc_input_generator.lua
 tests/temp/formfunc_iterator.lua
@@ -971,6 +975,7 @@ tests/wolfilter/scripts/echo_input_doctype_form.lua
 tests/wolfilter/scripts/echo_input_doctype.lua
 tests/wolfilter/scripts/echo_input_doctype_table.lua
 tests/wolfilter/scripts/echo_input_generator.lua
+tests/wolfilter/scripts/echo_input_iterator.lua
 tests/wolfilter/scripts/echo_input_table.lua
 tests/wolfilter/scripts/formfunc_input_generator.lua
 tests/wolfilter/scripts/formfunc_iterator.lua
@@ -1019,6 +1024,8 @@ textwolf/textwolf.hpp
 textwolf/xmlattributes.hpp
 textwolf/xmlhdriterator.hpp
 textwolf/xmlparser.hpp
+textwolf/xmlpathautomaton.hpp
+textwolf/xmlpathautomatonparse.hpp
 textwolf/xmlpathselect.hpp
 textwolf/xmlprinter.hpp
 textwolf/xmlscanner.hpp

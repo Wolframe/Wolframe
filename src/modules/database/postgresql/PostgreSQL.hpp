@@ -53,7 +53,7 @@ class PostgreSQLconfig : public config::NamedConfiguration
 {
 	friend class PostgreSQLconstructor;
 public:
-	const char* objectName() const			{ return "PostgreSQL"; }
+	const char* className() const			{ return "PostgreSQL"; }
 
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLconfig()				{}
@@ -86,7 +86,7 @@ public:
 	~PostgreSQLdatabase();
 
 	const std::string& ID() const		{ return m_ID; }
-	const char* typeName() const		{ return "PostgreSQL"; }
+	const char* className() const		{ return "PostgreSQL"; }
 	const Database& database() const	{ return *this; }
 
 	bool doTransaction( DatabaseRequest&, DatabaseAnswer&,

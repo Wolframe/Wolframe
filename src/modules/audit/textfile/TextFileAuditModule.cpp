@@ -41,26 +41,6 @@
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
-namespace AAAA {
-
-class TextFileAuditConstructor : public ConfiguredObjectConstructor< AuditUnit >
-{
-public:
-	const char* identifier() const	{ return "FileAudit"; }
-	TextFileAuditor* object( const config::NamedConfiguration& conf );
-};
-
-TextFileAuditor* TextFileAuditConstructor::object( const config::NamedConfiguration& conf )
-{
-	const TextFileAuditConfig& cfg = dynamic_cast< const TextFileAuditConfig& >( conf );
-
-	TextFileAuditor* m_audit = new TextFileAuditor( cfg.m_file );
-	MOD_LOG_TRACE << "Text file auditor container created";
-	return m_audit;
-}
-
-} // namespace AAAA
-
 namespace module {
 
 static ConfiguredBuilder* createModule( void )

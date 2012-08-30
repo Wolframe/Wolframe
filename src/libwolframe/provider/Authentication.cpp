@@ -49,7 +49,7 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 {
 	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 							it != confs.end(); it++ )	{
-		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
 			ConfiguredObjectConstructor< AuthenticationUnit >* auth =
 					dynamic_cast< ConfiguredObjectConstructor< AuthenticationUnit >* >( builder->builder());
@@ -62,7 +62,7 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 			LOG_TRACE << "'" << auth->identifier() << "' authentication unit registered";
 		}
 		else	{
-			LOG_ALERT << "AuthenticationFactory: unknown authentication type '" << (*it)->objectName() << "'";
+			LOG_ALERT << "AuthenticationFactory: unknown authentication type '" << (*it)->className() << "'";
 			throw std::domain_error( "Unknown authentication mechanism type in AAAAprovider constructor. See log" );
 		}
 	}

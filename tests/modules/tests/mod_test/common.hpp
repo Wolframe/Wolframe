@@ -50,7 +50,7 @@ public:
 
 	virtual ~TestModuleConfig( ) {}
 
-	virtual const char* objectName() const		{ return "TestUnit"; }
+	virtual const char* className() const		{ return "TestUnit"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,

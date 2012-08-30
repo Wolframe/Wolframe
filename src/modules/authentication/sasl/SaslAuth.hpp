@@ -53,7 +53,7 @@ public:
 	SaslAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* objectName() const	{ return "SaslAuth"; }
+	virtual const char* className() const	{ return "SaslAuth"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -74,7 +74,7 @@ public:
 	SaslAuthenticator( const std::string& Identifier,
 			   const std::string& service, const std::string& confpath );
 	~SaslAuthenticator();
-	virtual const char* typeName() const	{ return "SaslAuth"; }
+	virtual const char* className() const	{ return "SaslAuth"; }
 
 	AuthenticatorInstance* instance()	{ return NULL; }
 

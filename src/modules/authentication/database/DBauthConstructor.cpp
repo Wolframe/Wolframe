@@ -31,39 +31,24 @@
 
 ************************************************************************/
 //
-// Database Audit module
+//
 //
 
-#include "DBaudit.hpp"
-#include "moduleInterface.hpp"
 #include "logger-v1.hpp"
-
-_Wolframe::log::LogBackend*	logBackendPtr;
+#include "DBauth.hpp"
 
 namespace _Wolframe {
-namespace module {
+namespace AAAA {
 
-static ConfiguredBuilder* createModule( void )
+DBauthenticator* DBauthConstructor::object( const config::NamedConfiguration& conf )
 {
-	static module::ConfiguredBuilderDescription< AAAA::DBauditConstructor,
-			AAAA::DBauditConfig > mod( "Audit - database", "audit",
-						   "database", "DatabaseAudit" );
-	return &mod;
+	const DBAuthConfig& cfg = dynamic_cast< const DBAuthConfig& >( conf );
+
+	DBauthenticator* m_auth = new DBauthenticator( cfg.m_identifier, cfg.m_dbLabel );
+	MOD_LOG_DEBUG << "Database authenticator container created for '"
+		      << cfg.m_identifier << "'";
+	return m_auth;
 }
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
+}} // namespace _Wolframe::AAAA
 
-
-static const unsigned short nrContainers = 1;
-static ConfiguredBuilder* (*containers[ nrContainers ])() = {
-	createModule
-};
-
-ModuleEntryPoint entryPoint( 0, "Database audit", setModuleLogger,
-			     nrContainers, containers,
-			     0, NULL );
-
-}} // namespace _Wolframe::module

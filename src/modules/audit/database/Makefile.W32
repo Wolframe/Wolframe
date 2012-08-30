@@ -24,6 +24,7 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	DBaudit.obj \
+	DBauditConstructor.obj \
 	DBauditConfig.obj \
 	DBauditModule.obj
 

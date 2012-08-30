@@ -50,7 +50,7 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::NamedConf
 {
 	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 								it != confs.end(); it++ )	{
-		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
 			ConfiguredObjectConstructor< AuthorizationUnit >* authz =
 					dynamic_cast< ConfiguredObjectConstructor< AuthorizationUnit >* >( builder->builder());
@@ -63,7 +63,7 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::NamedConf
 			LOG_TRACE << "'" << authz->identifier() << "' authorization unit registered";
 		}
 		else	{
-			LOG_ALERT << "AuthorizationProvider: unknown authorization type '" << (*it)->objectName() << "'";
+			LOG_ALERT << "AuthorizationProvider: unknown authorization type '" << (*it)->className() << "'";
 			throw std::domain_error( "Unknown authorization mechanism type in AAAAprovider constructor. See log" );
 		}
 	}

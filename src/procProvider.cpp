@@ -181,7 +181,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	// Build the list of command handlers
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
 									it != conf->m_procConfig.end(); it++ )	{
-		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
 			ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* handler =
 					dynamic_cast< ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* >( builder->builder());
@@ -198,7 +198,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			}
 		}
 		else	{
-			LOG_ALERT << "Wolframe Processor Provider: unknown processor type '" << (*it)->objectName() << "'";
+			LOG_ALERT << "Wolframe Processor Provider: unknown processor type '" << (*it)->className() << "'";
 			throw std::domain_error( "Unknown command handler type constructor. See log." );
 		}
 	}

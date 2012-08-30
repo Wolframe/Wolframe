@@ -52,7 +52,7 @@ public:
 	PAMAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* objectName() const	{ return "PAMAuth"; }
+	virtual const char* className() const	{ return "PAMAuth"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -80,7 +80,7 @@ public:
 	PAMAuthenticator( const std::string& Identifier,
 			  const std::string& service );
 	~PAMAuthenticator();
-	virtual const char* typeName() const	{ return "PAMAuth"; }
+	virtual const char* className() const	{ return "PAMAuth"; }
 
 	AuthenticatorInstance* instance()	{ return NULL; }
 

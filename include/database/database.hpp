@@ -101,10 +101,10 @@ class DatabaseUnit
 public:
 	virtual ~DatabaseUnit()			{}
 
-	/// Database type (module type).
-	/// All database implementations need a type (name).
-	/// Type names must be unique.
-	virtual const char* typeName() const = 0;
+	/// Database class (module type).
+	/// All database implementations need a class name.
+	/// Class names must be unique.
+	virtual const char* className() const = 0;
 
 	virtual const Database& database() const = 0;
 };

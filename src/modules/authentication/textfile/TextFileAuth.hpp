@@ -53,7 +53,7 @@ public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* objectName() const		{ return "TextFileAuth"; }
+	virtual const char* className() const		{ return "TextFileAuth"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -72,7 +72,7 @@ class TextFileAuthenticator : public AuthenticationUnit
 public:
 	TextFileAuthenticator( const std::string& Identifier, const std::string& filename );
 	~TextFileAuthenticator();
-	virtual const char* typeName() const		{ return "TextFileAuth"; }
+	virtual const char* className() const		{ return "TextFileAuth"; }
 
 	AuthenticatorInstance* instance();
 
@@ -101,7 +101,7 @@ public:
 	~TextFileAuthSlice();
 	void close()					{ delete this; }
 
-	const char* typeName() const			{ return m_backend.typeName(); }
+	const char* typeName() const			{ return m_backend.className(); }
 	AuthProtocol protocolType() const		{ return AuthenticatorInstance::PLAIN; }
 
 	void receiveData( const void* data, std::size_t size );

@@ -120,7 +120,7 @@ private:
 
 
 /// A named configuration is a normal configuration that provides
-/// also an objectName function.
+/// also an className function.
 class NamedConfiguration : public ConfigurationBase
 {
 public:
@@ -130,7 +130,7 @@ public:
 
 	virtual ~NamedConfiguration()				{}
 
-	virtual const char* objectName() const = 0;
+	virtual const char* className() const = 0;
 };
 
 }} // namespace _Wolframe::config

@@ -49,7 +49,7 @@ AuditProvider::AuditProvider( const std::list< config::NamedConfiguration* >& co
 {
 	for ( std::list<config::NamedConfiguration*>::const_iterator it = confs.begin();
 								it != confs.end(); it++ )	{
-		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->objectName());
+		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
 			ConfiguredObjectConstructor< AuditUnit >* audit =
 					dynamic_cast< ConfiguredObjectConstructor< AuditUnit >* >( builder->builder());
@@ -62,7 +62,7 @@ AuditProvider::AuditProvider( const std::list< config::NamedConfiguration* >& co
 			LOG_TRACE << "'" << audit->identifier() << "' audit unit registered";
 		}
 		else	{
-			LOG_ALERT << "AuditProvider: unknown audit type '" << (*it)->objectName() << "'";
+			LOG_ALERT << "AuditProvider: unknown audit type '" << (*it)->className() << "'";
 			throw std::domain_error( "Unknown auditing mechanism type in AAAAprovider constructor. See log" );
 		}
 	}

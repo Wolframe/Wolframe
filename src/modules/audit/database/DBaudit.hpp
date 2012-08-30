@@ -35,6 +35,7 @@
 //
 
 #include "AAAA/audit.hpp"
+#include "constructor.hpp"
 
 #ifndef _DB_AUDIT_HPP_INCLUDED
 #define _DB_AUDIT_HPP_INCLUDED
@@ -50,7 +51,7 @@ public:
 		: config::NamedConfiguration( cfgName, logParent, logName )
 	{ m_required = true; }
 
-	const char* objectName() const		{ return "DatabaseAudit"; }
+	const char* className() const		{ return "DatabaseAudit"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -68,7 +69,7 @@ class DBauditor : public AuditUnit
 public:
 	DBauditor( const std::string& dbLabel );
 	~DBauditor();
-	const char* typeName() const		{ return "DatabaseAudit"; }
+	const char* className() const		{ return "DatabaseAudit"; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
@@ -79,6 +80,13 @@ private:
 	bool			m_required;
 	std::string		m_dbLabel;
 	const db::Database*	m_db;
+};
+
+class DBauditConstructor : public ConfiguredObjectConstructor< AuditUnit >
+{
+public:
+	const char* identifier() const	{ return "DatabaseAudit"; }
+	DBauditor* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

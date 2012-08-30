@@ -52,7 +52,7 @@ class SQLiteConfig : public config::NamedConfiguration
 {
 	friend class SQLiteConstructor;
 public:
-	const char* objectName() const			{ return "SQLite"; }
+	const char* className() const			{ return "SQLite"; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	~SQLiteConfig()					{}
@@ -77,7 +77,7 @@ public:
 	virtual ~SQLiteDatabase();
 
 	virtual const std::string& ID() const		{ return m_ID; }
-	virtual const char* typeName() const		{ return "SQLite"; }
+	virtual const char* className() const		{ return "SQLite"; }
 	virtual const Database& database() const	{ return *this; }
 
 	virtual bool doTransaction( DatabaseRequest&, DatabaseAnswer&,

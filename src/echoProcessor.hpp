@@ -85,7 +85,7 @@ public:
 	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	const char* objectName() const			{ return "EchoProcessor"; }
+	const char* className() const			{ return "EchoProcessor"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,

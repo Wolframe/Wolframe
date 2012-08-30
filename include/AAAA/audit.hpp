@@ -63,6 +63,8 @@ class AuditUnit
 public:
 	virtual ~AuditUnit()				{}
 
+	virtual const char* className() const = 0;
+
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
 							{ return true; }
 	virtual bool required() = 0;

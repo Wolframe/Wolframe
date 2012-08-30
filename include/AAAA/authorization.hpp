@@ -81,7 +81,7 @@ public:
 
 	virtual bool resolveDB( const db::DatabaseProvider& /*db*/ )
 						{ return true; }
-	virtual const char* typeName() const = 0;
+	virtual const char* className() const = 0;
 
 	virtual Result allowed( const Information& ) = 0;
 private:

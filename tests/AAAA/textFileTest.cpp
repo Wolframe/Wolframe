@@ -101,7 +101,7 @@ static User* CRAMauth( TextFileAuthenticator& auth, const std::string& user, con
 TEST_F( AuthenticationFixture, typeName )
 {
 	TextFileAuthenticator authenticator( "", "passwd" );
-	ASSERT_STREQ( authenticator.typeName( ), "TextFileAuth" );
+	ASSERT_STREQ( authenticator.className( ), "TextFileAuth" );
 }
 
 TEST_F( AuthenticationFixture, fileWithoutNewLine )

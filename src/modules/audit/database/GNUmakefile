@@ -20,6 +20,7 @@ DYNAMIC_MODULE = mod_audit_database.so
 
 CPP_OBJS = \
 	DBaudit.o \
+	DBauditConstructor.o \
 	DBauditConfig.o \
 	DBauditModule.o
 

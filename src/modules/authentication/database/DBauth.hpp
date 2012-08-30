@@ -38,6 +38,7 @@
 #define _DB_AUTHENTICATION_HPP_INCLUDED
 
 #include "AAAA/authentication.hpp"
+#include "constructor.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -49,7 +50,7 @@ public:
 	DBAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName )	{}
 
-	virtual const char* objectName() const		{ return "DBAuth"; }
+	virtual const char* className() const		{ return "DBAuth"; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -71,14 +72,21 @@ public:
 	DBauthenticator( const std::string& Identifier, const std::string& dbLabel );
 	~DBauthenticator();
 
-	const char* typeName() const			{ return "DBAuth"; }
+	const char* className() const			{ return "DBAuth"; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	AuthenticatorInstance* instance()			{ return NULL; }
+	AuthenticatorInstance* instance()		{ return NULL; }
 private:
 	const std::string	m_dbLabel;
 	const db::Database*	m_db;
+};
+
+class DBauthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
+{
+public:
+	const char* identifier() const			{ return "DBAuth"; }
+	DBauthenticator* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

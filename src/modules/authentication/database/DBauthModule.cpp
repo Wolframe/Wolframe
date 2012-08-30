@@ -42,24 +42,6 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace AAAA {
-
-class DBauthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
-{
-public:
-	const char* identifier() const		{ return "DBAuth"; }
-	DBauthenticator* object( const config::NamedConfiguration& conf );
-};
-
-DBauthenticator* DBauthConstructor::object( const config::NamedConfiguration& conf )
-{
-	const DBAuthConfig& cfg = dynamic_cast< const DBAuthConfig& >( conf );
-
-	DBauthenticator* m_auth = new DBauthenticator( cfg.m_identifier, cfg.m_dbLabel );
-	MOD_LOG_DEBUG << "Database authenticator container created for '"
-		      << cfg.m_identifier << "'";
-	return m_auth;
-}
-
 } // namespace AAAA
 
 namespace module {
