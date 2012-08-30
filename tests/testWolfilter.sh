@@ -130,6 +130,14 @@ echo executing test filter_multilingual_libxml2 UCS-2BE
 cat wolfilter/template/doc/multilingual.UTF-8.xml | sed 's/UTF-8/UCS-2BE/' | recode UTF-8..UCS-2BE | ../wtest/cleanInput BOM EOLN | ../src/wolfilter --input-filter xml:libxml2 --output-filter xml:libxml2 - > temp/multilingual.UCS-2BE.xml
 echo executing test filter_multilingual_libxml2 UCS-4BE
 cat wolfilter/template/doc/multilingual.UTF-8.xml | sed 's/UTF-8/UCS-4BE/' | recode UTF-8..UCS-4BE | ../wtest/cleanInput BOM EOLN | ../src/wolfilter --input-filter xml:libxml2 --output-filter xml:libxml2 - > temp/multilingual.UCS-4BE.xml
+echo executing test lua_echo_input_iterator UCS-2LE
+cat wolfilter/template/doc/employee_assignment_print.UTF-8.xml | sed 's/UTF-8/UCS-2LE/' | recode UTF-8..UCS-2LE | ../wtest/cleanInput BOM EOLN | ../src/wolfilter --input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter//textwolf/mod_filter_textwolf.so --script wolfilter/scripts/echo_input_iterator.lua run > temp/employee_assignment_print.UCS-2LE.xml
+echo executing test lua_echo_input_iterator UCS-2BE
+cat wolfilter/template/doc/employee_assignment_print.UTF-8.xml | sed 's/UTF-8/UCS-2BE/' | recode UTF-8..UCS-2BE | ../wtest/cleanInput BOM EOLN | ../src/wolfilter --input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter//textwolf/mod_filter_textwolf.so --script wolfilter/scripts/echo_input_iterator.lua run > temp/employee_assignment_print.UCS-2BE.xml
+echo executing test lua_echo_input_iterator UCS-4BE
+cat wolfilter/template/doc/employee_assignment_print.UTF-8.xml | sed 's/UTF-8/UCS-4BE/' | recode UTF-8..UCS-4BE | ../wtest/cleanInput BOM EOLN | ../src/wolfilter --input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter//textwolf/mod_filter_textwolf.so --script wolfilter/scripts/echo_input_iterator.lua run > temp/employee_assignment_print.UCS-4BE.xml
+echo executing test lua_echo_input_iterator UCS-4LE
+cat wolfilter/template/doc/employee_assignment_print.UTF-8.xml | sed 's/UTF-8/UCS-4LE/' | recode UTF-8..UCS-4LE | ../wtest/cleanInput BOM EOLN | ../src/wolfilter --input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter//textwolf/mod_filter_textwolf.so --script wolfilter/scripts/echo_input_iterator.lua run > temp/employee_assignment_print.UCS-4LE.xml
 echo executing test lua_echo_input_iterator_libxml2 UTF-8
 cat wolfilter/template/doc/employee_assignment_print.UTF-8.xml | sed 's/UTF-8/UTF-8/' | recode UTF-8..UTF-8 | ../wtest/cleanInput BOM EOLN | ../src/wolfilter --input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter//libxml2/mod_filter_libxml2.so --module ../../src/modules/filter//textwolf/mod_filter_textwolf.so --script wolfilter/scripts/echo_input_iterator.lua run > temp/employee_assignment_print.UTF-8.xml
 echo executing test lua_echo_input_iterator_libxml2 UTF-16LE
