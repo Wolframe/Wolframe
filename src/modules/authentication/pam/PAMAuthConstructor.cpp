@@ -31,43 +31,22 @@
 
 ************************************************************************/
 //
-// Database Authentification module
+// PAM Authentication constructor
 //
 
-#include "DBauth.hpp"
-#include "moduleInterface.hpp"
+#include "PAMAuth.hpp"
 #include "logger-v1.hpp"
-
-_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace AAAA {
-} // namespace AAAA
 
-namespace module {
-
-static ConfiguredBuilder* createModule( void )
+PAMAuthenticator* PAMAuthConstructor::object( const config::NamedConfiguration& conf )
 {
-	static module::ConfiguredBuilderDescription< AAAA::DBauthConstructor,
-			AAAA::DBAuthConfig > mod( "Authentication database", "Authentication",
-						  "database", "DBAuth" );
-	return &mod;
+	const PAMAuthConfig& cfg = dynamic_cast< const PAMAuthConfig& >( conf );
+
+	PAMAuthenticator* m_auth = new PAMAuthenticator( cfg.m_identifier, cfg.m_service );
+	MOD_LOG_NOTICE << "PAM authenticator container created";
+	return m_auth;
 }
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
-
-
-static const unsigned short nrContainers = 1;
-static ConfiguredBuilder* (*containers[ nrContainers ])() = {
-	createModule
-};
-
-ModuleEntryPoint entryPoint( 0, "Database authentification", setModuleLogger,
-			     nrContainers, containers,
-			     0, NULL );
-
-}} // namespace _Wolframe::module
-
+}} // namespace _Wolframe::AAAA

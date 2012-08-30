@@ -41,27 +41,6 @@
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
-namespace db {
-
-//***  SQLite database constructor  *******************************************
-class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
-{
-public:
-	virtual const char* identifier() const	{ return "SQLite"; }
-	virtual SQLiteDatabase* object( const config::NamedConfiguration& conf );
-};
-
-SQLiteDatabase* SQLiteConstructor::object( const config::NamedConfiguration& conf )
-{
-	const SQLiteConfig& cfg = dynamic_cast< const SQLiteConfig& >( conf );
-
-	SQLiteDatabase* m_db = new SQLiteDatabase( cfg.m_ID, cfg.filename, /* Aba: temporary */ 10, cfg.flag );
-	MOD_LOG_TRACE << "SQLite database container for '" << cfg.m_ID << "' created";
-	return m_db;
-}
-
-} // namespace db
-
 namespace module {
 
 static ConfiguredBuilder* createSQLiteModule( void )
@@ -87,5 +66,4 @@ ModuleEntryPoint entryPoint( 0, "SQLite database", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-} // namespace module
-} // namespace _Wolframe
+}} // namespace _Wolframe::module

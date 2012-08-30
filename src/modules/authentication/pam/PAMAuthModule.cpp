@@ -41,26 +41,6 @@
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
-namespace AAAA {
-
-class PAMAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
-{
-public:
-	const char* identifier() const		{ return "PAMAuth"; }
-	PAMAuthenticator* object( const config::NamedConfiguration& conf );
-};
-
-PAMAuthenticator* PAMAuthConstructor::object( const config::NamedConfiguration& conf )
-{
-	const PAMAuthConfig& cfg = dynamic_cast< const PAMAuthConfig& >( conf );
-
-	PAMAuthenticator* m_auth = new PAMAuthenticator( cfg.m_identifier, cfg.m_service );
-	MOD_LOG_NOTICE << "PAM authenticator container created";
-	return m_auth;
-}
-
-} // namespace AAAA
-
 namespace module {
 
 static ConfiguredBuilder* createModule( void )
@@ -86,5 +66,4 @@ ModuleEntryPoint entryPoint( 0, "PAM authentication", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-} // namespace module
-} // namespace _Wolframe
+}} // namespace _Wolframe::module

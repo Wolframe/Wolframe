@@ -24,6 +24,7 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	DBauthzConfig.obj \
+	DBauthzConstructor.obj \
 	DBauthz.obj \
 	DBauthzModule.obj
 

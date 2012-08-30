@@ -39,6 +39,7 @@
 
 #include <string>
 #include "AAAA/authentication.hpp"
+#include "constructor.hpp"
 
 #include <security/pam_appl.h>
 
@@ -102,6 +103,14 @@ private:
 		_Wolframe_PAM_STATE_HAS_PASS,
 		_Wolframe_PAM_STATE_ERROR
 	} m_state;
+};
+
+
+class PAMAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
+{
+public:
+	const char* identifier() const		{ return "PAMAuth"; }
+	PAMAuthenticator* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

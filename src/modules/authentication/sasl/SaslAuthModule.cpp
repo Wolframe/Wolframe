@@ -41,28 +41,6 @@
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
-namespace AAAA {
-
-class SaslAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
-{
-public:
-	virtual const char* identifier() const	{ return "SaslAuth"; }
-	virtual SaslAuthenticator* object( const config::NamedConfiguration& conf );
-};
-
-
-SaslAuthenticator* SaslAuthConstructor::object( const config::NamedConfiguration& conf )
-{
-	const SaslAuthConfig& cfg = dynamic_cast< const SaslAuthConfig& >( conf );
-
-	SaslAuthenticator* m_auth = new SaslAuthenticator( cfg.m_identifier,
-							   cfg.m_service, cfg.m_confPath );
-	MOD_LOG_NOTICE << "SASL authenticator container created";
-	return m_auth;
-}
-
-} // namespace AAAA
-
 namespace module {
 
 static ConfiguredBuilder* createModule( void )
@@ -88,5 +66,4 @@ ModuleEntryPoint entryPoint( 0, "SASL authentication", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-} // namespace module
-} // namespace _Wolframe
+}} // namespace _Wolframe::module

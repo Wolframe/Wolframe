@@ -41,27 +41,6 @@
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
-namespace AAAA {
-
-//***  Database authorizer constructor  ***********************************
-class DBauthzConstructor : public ConfiguredObjectConstructor< AuthorizationUnit >
-{
-public:
-	const char* identifier() const	{ return "DatabaseAuthorization"; }
-	DBauthorizer* object( const config::NamedConfiguration& conf );
-};
-
-DBauthorizer* DBauthzConstructor::object( const config::NamedConfiguration& conf )
-{
-	const DatabaseAuthzConfig& cfg = dynamic_cast< const DatabaseAuthzConfig& >( conf );
-
-	DBauthorizer* m_authz = new DBauthorizer( cfg.m_identifier, cfg.m_dbConfig );
-	MOD_LOG_TRACE << "Database authorizer container created";
-	return m_authz;
-}
-
-} // namespace AAAA
-
 namespace module {
 
 static ConfiguredBuilder* createModule( void )
@@ -87,5 +66,4 @@ ModuleEntryPoint entryPoint( 0, "Database authorization", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-} // namespace module
-} // namespace _Wolframe
+}} // namespace _Wolframe::module

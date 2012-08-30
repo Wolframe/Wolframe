@@ -31,10 +31,10 @@
 
 ************************************************************************/
 //
-// Database Authentification module
+// Text File Authentication module
 //
 
-#include "DBauth.hpp"
+#include "TextFileAuth.hpp"
 #include "moduleInterface.hpp"
 #include "logger-v1.hpp"
 
@@ -42,15 +42,36 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace AAAA {
+
+// Text file authentication - constructor
+//***********************************************************************
+class TextFileAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
+{
+public:
+	const char* identifier() const		{ return "TextFileAuth"; }
+	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
+};
+
+
+TextFileAuthenticator* TextFileAuthConstructor::object( const config::NamedConfiguration& conf )
+{
+	const TextFileAuthConfig& cfg = dynamic_cast< const TextFileAuthConfig& >( conf );
+
+	TextFileAuthenticator* m_auth = new TextFileAuthenticator( cfg.m_identifier, cfg.m_file );
+	MOD_LOG_DEBUG << "Text file authenticator container created for '"
+		      << cfg.m_identifier << "'";
+	return m_auth;
+}
+
 } // namespace AAAA
 
 namespace module {
 
 static ConfiguredBuilder* createModule( void )
 {
-	static module::ConfiguredBuilderDescription< AAAA::DBauthConstructor,
-			AAAA::DBAuthConfig > mod( "Authentication database", "Authentication",
-						  "database", "DBAuth" );
+	static module::ConfiguredBuilderDescription< AAAA::TextFileAuthConstructor,
+			AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
+							"TextFile", "TextFileAuth" );
 	return &mod;
 }
 
@@ -65,9 +86,9 @@ static ConfiguredBuilder* (*containers[ nrContainers ])() = {
 	createModule
 };
 
-ModuleEntryPoint entryPoint( 0, "Database authentification", setModuleLogger,
+ModuleEntryPoint entryPoint( 0, "Text File authentication", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-}} // namespace _Wolframe::module
-
+} // namespace module
+} // namespace _Wolframe

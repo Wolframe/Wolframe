@@ -38,6 +38,7 @@
 #define _DB_AUTHORIZATION_HPP_INCLUDED
 
 #include "AAAA/authorization.hpp"
+#include "constructor.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -81,6 +82,15 @@ private:
 
 	AuthorizationUnit::Result connectionAllowed( const net::LocalEndpoint& /*local*/,
 						     const net::RemoteEndpoint& remote );
+};
+
+
+//***  Database authorizer constructor  ***********************************
+class DBauthzConstructor : public ConfiguredObjectConstructor< AuthorizationUnit >
+{
+public:
+	const char* identifier() const	{ return "DatabaseAuthorization"; }
+	DBauthorizer* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

@@ -42,6 +42,7 @@
 
 #include "database/database.hpp"
 #include "config/configurationBase.hpp"
+#include "constructor.hpp"
 
 #include "objectPool.hpp"
 
@@ -97,6 +98,15 @@ private:
 	std::string		m_connStr;		///< connection string
 	size_t			m_noConnections;	///< number of connections
 	ObjectPool< PGconn* >	m_connPool;		///< pool of connections
+};
+
+
+//***  PostgreSQL database constructor  ***************************************
+class PostgreSQLconstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
+{
+public:
+	const char* identifier() const	{ return "PostgreSQL"; }
+	PostgreSQLdatabase* object( const config::NamedConfiguration& conf );
 };
 
 }} // _Wolframe::db

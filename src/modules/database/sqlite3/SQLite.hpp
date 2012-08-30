@@ -39,6 +39,7 @@
 
 #include "database/database.hpp"
 #include "config/configurationBase.hpp"
+#include "constructor.hpp"
 
 #include <list>
 #include "objectPool.hpp"
@@ -88,6 +89,15 @@ private:
 	bool			m_flag;
 	std::list< sqlite3* >	m_connections;		//< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		//< pool of connections
+};
+
+
+//***  SQLite database constructor  *******************************************
+class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
+{
+public:
+	virtual const char* identifier() const	{ return "SQLite"; }
+	virtual SQLiteDatabase* object( const config::NamedConfiguration& conf );
 };
 
 }} // _Wolframe::db

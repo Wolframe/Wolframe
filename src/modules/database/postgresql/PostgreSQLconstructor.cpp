@@ -31,43 +31,24 @@
 
 ************************************************************************/
 //
-// Database Authentification module
+// PostgreSQL constructor
 //
 
-#include "DBauth.hpp"
-#include "moduleInterface.hpp"
+#include "PostgreSQL.hpp"
 #include "logger-v1.hpp"
 
-_Wolframe::log::LogBackend*	logBackendPtr;
-
 namespace _Wolframe {
-namespace AAAA {
-} // namespace AAAA
+namespace db {
 
-namespace module {
-
-static ConfiguredBuilder* createModule( void )
+PostgreSQLdatabase* PostgreSQLconstructor::object( const config::NamedConfiguration& conf )
 {
-	static module::ConfiguredBuilderDescription< AAAA::DBauthConstructor,
-			AAAA::DBAuthConfig > mod( "Authentication database", "Authentication",
-						  "database", "DBAuth" );
-	return &mod;
+	const PostgreSQLconfig& cfg = dynamic_cast< const PostgreSQLconfig& >( conf );
+
+	PostgreSQLdatabase* m_db = new PostgreSQLdatabase( cfg.m_ID, cfg.host, cfg.port, cfg.dbName,
+							   cfg.user, cfg.password, cfg.connectTimeout,
+							   cfg.connections, cfg.acquireTimeout );
+	MOD_LOG_TRACE << "PostgreSQL database unit for '" << cfg.m_ID << "' created";
+	return m_db;
 }
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
-
-
-static const unsigned short nrContainers = 1;
-static ConfiguredBuilder* (*containers[ nrContainers ])() = {
-	createModule
-};
-
-ModuleEntryPoint entryPoint( 0, "Database authentification", setModuleLogger,
-			     nrContainers, containers,
-			     0, NULL );
-
-}} // namespace _Wolframe::module
-
+}} // namespace _Wolframe::db

@@ -22,6 +22,7 @@ DYNAMIC_MODULE = mod_db_postgresql.so
 
 CPP_OBJS = \
 	PostgreSQLconfig.o \
+	PostgreSQLconstructor.o \
 	PostgreSQL.o \
 	PostgreSQLpreparedStatement.o \
 	PostgreSQLmodule.o

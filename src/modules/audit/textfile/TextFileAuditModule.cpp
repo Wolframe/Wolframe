@@ -66,5 +66,4 @@ ModuleEntryPoint entryPoint( 0, "Text file audit", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-} // namespace module
-} // namespace _Wolframe
+}} // namespace _Wolframe::module

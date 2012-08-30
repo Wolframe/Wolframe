@@ -31,43 +31,22 @@
 
 ************************************************************************/
 //
-// Database Authentification module
+// SQLite constructor
 //
 
-#include "DBauth.hpp"
-#include "moduleInterface.hpp"
+#include "SQLite.hpp"
 #include "logger-v1.hpp"
 
-_Wolframe::log::LogBackend*	logBackendPtr;
-
 namespace _Wolframe {
-namespace AAAA {
-} // namespace AAAA
+namespace db {
 
-namespace module {
-
-static ConfiguredBuilder* createModule( void )
+SQLiteDatabase* SQLiteConstructor::object( const config::NamedConfiguration& conf )
 {
-	static module::ConfiguredBuilderDescription< AAAA::DBauthConstructor,
-			AAAA::DBAuthConfig > mod( "Authentication database", "Authentication",
-						  "database", "DBAuth" );
-	return &mod;
+	const SQLiteConfig& cfg = dynamic_cast< const SQLiteConfig& >( conf );
+
+	SQLiteDatabase* m_db = new SQLiteDatabase( cfg.m_ID, cfg.filename, /* Aba: temporary */ 10, cfg.flag );
+	MOD_LOG_TRACE << "SQLite database container for '" << cfg.m_ID << "' created";
+	return m_db;
 }
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
-
-
-static const unsigned short nrContainers = 1;
-static ConfiguredBuilder* (*containers[ nrContainers ])() = {
-	createModule
-};
-
-ModuleEntryPoint entryPoint( 0, "Database authentification", setModuleLogger,
-			     nrContainers, containers,
-			     0, NULL );
-
-}} // namespace _Wolframe::module
-
+}} // namespace _Wolframe::db

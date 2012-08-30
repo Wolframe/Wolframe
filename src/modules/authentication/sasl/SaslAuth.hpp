@@ -38,9 +38,9 @@
 #define _SASL_AUTHENTICATION_HPP_INCLUDED
 
 #include "AAAA/authentication.hpp"
+#include "constructor.hpp"
 
 #include <string>
-
 #include "sasl/sasl.h"
 
 namespace _Wolframe {
@@ -84,6 +84,14 @@ private:
 
 	// a SASL configuration path for optional config (overridding system-wide one)
 	const std::string	m_confPath;
+};
+
+
+class SaslAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
+{
+public:
+	virtual const char* identifier() const	{ return "SaslAuth"; }
+	virtual SaslAuthenticator* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

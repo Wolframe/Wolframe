@@ -31,43 +31,22 @@
 
 ************************************************************************/
 //
-// Database Authentification module
+// Database authorization constructor
 //
 
-#include "DBauth.hpp"
-#include "moduleInterface.hpp"
+#include "DBauthz.hpp"
 #include "logger-v1.hpp"
-
-_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace AAAA {
-} // namespace AAAA
 
-namespace module {
-
-static ConfiguredBuilder* createModule( void )
+DBauthorizer* DBauthzConstructor::object( const config::NamedConfiguration& conf )
 {
-	static module::ConfiguredBuilderDescription< AAAA::DBauthConstructor,
-			AAAA::DBAuthConfig > mod( "Authentication database", "Authentication",
-						  "database", "DBAuth" );
-	return &mod;
+	const DatabaseAuthzConfig& cfg = dynamic_cast< const DatabaseAuthzConfig& >( conf );
+
+	DBauthorizer* m_authz = new DBauthorizer( cfg.m_identifier, cfg.m_dbConfig );
+	MOD_LOG_TRACE << "Database authorizer container created";
+	return m_authz;
 }
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
-
-
-static const unsigned short nrContainers = 1;
-static ConfiguredBuilder* (*containers[ nrContainers ])() = {
-	createModule
-};
-
-ModuleEntryPoint entryPoint( 0, "Database authentification", setModuleLogger,
-			     nrContainers, containers,
-			     0, NULL );
-
-}} // namespace _Wolframe::module
-
+}} // namespace _Wolframe::AAAA

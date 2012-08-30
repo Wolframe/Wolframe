@@ -749,11 +749,13 @@ src/modules/authentication/GNUmakefile
 src/modules/authentication/Makefile.W32
 src/modules/authentication/pam/GNUmakefile
 src/modules/authentication/pam/PAMAuthConfig.cpp
+src/modules/authentication/pam/PAMAuthConstructor.cpp
 src/modules/authentication/pam/PAMAuth.cpp
 src/modules/authentication/pam/PAMAuth.hpp
 src/modules/authentication/pam/PAMAuthModule.cpp
 src/modules/authentication/sasl/GNUmakefile
 src/modules/authentication/sasl/SaslAuthConfig.cpp
+src/modules/authentication/sasl/SaslAuthConstructor.cpp
 src/modules/authentication/sasl/SaslAuth.cpp
 src/modules/authentication/sasl/SaslAuth.hpp
 src/modules/authentication/sasl/SaslAuthModule.cpp
@@ -763,12 +765,14 @@ src/modules/authentication/textfile/passwdFile.cpp
 src/modules/authentication/textfile/passwdFile.hpp
 src/modules/authentication/textfile/README.txt
 src/modules/authentication/textfile/TextFileAuthConfig.cpp
+src/modules/authentication/textfile/TextFileAuthConstructor.cpp
 src/modules/authentication/textfile/TextFileAuth.cpp
 src/modules/authentication/textfile/TextFileAuth.hpp
 src/modules/authentication/textfile/TextFileAuthModule.cpp
 src/modules/authentication/textfile/TextFileAuthModule.def
 src/modules/authentication/textfile/wolfpasswd.cpp
 src/modules/authorization/database/DBauthzConfig.cpp
+src/modules/authorization/database/DBauthzConstructor.cpp
 src/modules/authorization/database/DBauthz.cpp
 src/modules/authorization/database/DBauthz.hpp
 src/modules/authorization/database/DBauthzModule.cpp
@@ -783,6 +787,7 @@ src/modules/database/Makefile.W32
 src/modules/database/postgresql/GNUmakefile
 src/modules/database/postgresql/Makefile.W32
 src/modules/database/postgresql/PostgreSQLconfig.cpp
+src/modules/database/postgresql/PostgreSQLconstructor.cpp
 src/modules/database/postgresql/PostgreSQL.cpp
 src/modules/database/postgresql/PostgreSQL.hpp
 src/modules/database/postgresql/PostgreSQLmodule.cpp
@@ -794,6 +799,7 @@ src/modules/database/sqlite3/Makefile.W32
 src/modules/database/sqlite3/SQLite3PreparedStatement.cpp
 src/modules/database/sqlite3/SQLite3PreparedStatement.hpp
 src/modules/database/sqlite3/SQLiteConfig.cpp
+src/modules/database/sqlite3/SQLiteConstructor.cpp
 src/modules/database/sqlite3/SQLite.cpp
 src/modules/database/sqlite3/SQLite.hpp
 src/modules/database/sqlite3/SQLiteModule.cpp

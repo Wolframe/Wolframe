@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-//
+// Database Authentification constructor
 //
 
 #include "logger-v1.hpp"

@@ -31,43 +31,23 @@
 
 ************************************************************************/
 //
-// Database Authentification module
+// Text File Authentication constructor
 //
 
-#include "DBauth.hpp"
-#include "moduleInterface.hpp"
+#include "SaslAuth.hpp"
 #include "logger-v1.hpp"
-
-_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace AAAA {
-} // namespace AAAA
 
-namespace module {
-
-static ConfiguredBuilder* createModule( void )
+SaslAuthenticator* SaslAuthConstructor::object( const config::NamedConfiguration& conf )
 {
-	static module::ConfiguredBuilderDescription< AAAA::DBauthConstructor,
-			AAAA::DBAuthConfig > mod( "Authentication database", "Authentication",
-						  "database", "DBAuth" );
-	return &mod;
+	const SaslAuthConfig& cfg = dynamic_cast< const SaslAuthConfig& >( conf );
+
+	SaslAuthenticator* m_auth = new SaslAuthenticator( cfg.m_identifier,
+							   cfg.m_service, cfg.m_confPath );
+	MOD_LOG_NOTICE << "SASL authenticator container created";
+	return m_auth;
 }
 
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
-
-
-static const unsigned short nrContainers = 1;
-static ConfiguredBuilder* (*containers[ nrContainers ])() = {
-	createModule
-};
-
-ModuleEntryPoint entryPoint( 0, "Database authentification", setModuleLogger,
-			     nrContainers, containers,
-			     0, NULL );
-
-}} // namespace _Wolframe::module
-
+}} // namespace _Wolframe::AAAA

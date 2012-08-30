@@ -26,6 +26,7 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	SQLite.obj \
+	SQLiteConstructor.obj \
 	SQLiteConfig.obj \
 	SQLite3PreparedStatement.obj \
 	SQLiteModule.obj
