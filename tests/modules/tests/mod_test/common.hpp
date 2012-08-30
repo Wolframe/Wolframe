@@ -82,9 +82,8 @@ public:
 class TestModuleContainer : public ConfiguredObjectConstructor< TestUnit >
 {
 public:
-	TestModuleContainer()			{}
-	~TestModuleContainer()			{}
-
+	virtual ObjectConstructorBase::ObjectType objectType() const
+						{ return TEST_OBJECT; }
 	virtual const char* identifier() const	{ return "TestUnit"; }
 	virtual TestUnit* object( const config::NamedConfiguration& conf );
 };

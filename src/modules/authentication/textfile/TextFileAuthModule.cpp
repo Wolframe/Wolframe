@@ -41,30 +41,6 @@
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
-namespace AAAA {
-
-// Text file authentication - constructor
-//***********************************************************************
-class TextFileAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
-{
-public:
-	const char* identifier() const		{ return "TextFileAuth"; }
-	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
-};
-
-
-TextFileAuthenticator* TextFileAuthConstructor::object( const config::NamedConfiguration& conf )
-{
-	const TextFileAuthConfig& cfg = dynamic_cast< const TextFileAuthConfig& >( conf );
-
-	TextFileAuthenticator* m_auth = new TextFileAuthenticator( cfg.m_identifier, cfg.m_file );
-	MOD_LOG_DEBUG << "Text file authenticator container created for '"
-		      << cfg.m_identifier << "'";
-	return m_auth;
-}
-
-} // namespace AAAA
-
 namespace module {
 
 static ConfiguredBuilder* createModule( void )
@@ -90,5 +66,4 @@ ModuleEntryPoint entryPoint( 0, "Text File authentication", setModuleLogger,
 			     nrContainers, containers,
 			     0, NULL );
 
-} // namespace module
-} // namespace _Wolframe
+}} // namespace _Wolframe::module

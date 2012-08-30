@@ -49,6 +49,8 @@ public:
 
 	virtual ~FilterContainer(){}
 
+	virtual ObjectConstructorBase::ObjectType objectType() const
+						{ return FILTER_OBJECT; }
 	virtual const char* identifier() const
 	{
 		return m_name.c_str();

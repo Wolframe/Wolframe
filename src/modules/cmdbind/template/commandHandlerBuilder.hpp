@@ -50,6 +50,8 @@ public:
 
 	virtual ~CommandHandlerContainer(){}
 
+	virtual ObjectConstructorBase::ObjectType objectType() const
+						{ return CMD_HANDLER_OBJECT; }
 	virtual const char* identifier() const
 	{
 		return m_name.c_str();

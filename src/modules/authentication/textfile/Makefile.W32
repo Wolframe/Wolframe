@@ -27,6 +27,7 @@ PASSWD_OBJS = \
 
 CPP_OBJS = \
 	TextFileAuthConfig.obj \
+	TextFileAuthConstructor.obj \
 	TextFileAuth.obj \
 	TextFileAuthModule.obj
 

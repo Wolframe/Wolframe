@@ -85,6 +85,8 @@ private:
 class DBauthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
 {
 public:
+	virtual ObjectConstructorBase::ObjectType objectType() const
+						{ return AUTHENTICATION_OBJECT; }
 	const char* identifier() const			{ return "DBAuth"; }
 	DBauthenticator* object( const config::NamedConfiguration& conf );
 };

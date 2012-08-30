@@ -31,27 +31,14 @@
 
 ************************************************************************/
 //
-// Text File Authentication module
+// Text File Authentication constructor
 //
 
 #include "TextFileAuth.hpp"
-#include "moduleInterface.hpp"
 #include "logger-v1.hpp"
-
-_Wolframe::log::LogBackend*	logBackendPtr;
 
 namespace _Wolframe {
 namespace AAAA {
-
-// Text file authentication - constructor
-//***********************************************************************
-class TextFileAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
-{
-public:
-	const char* identifier() const		{ return "TextFileAuth"; }
-	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
-};
-
 
 TextFileAuthenticator* TextFileAuthConstructor::object( const config::NamedConfiguration& conf )
 {
@@ -63,32 +50,4 @@ TextFileAuthenticator* TextFileAuthConstructor::object( const config::NamedConfi
 	return m_auth;
 }
 
-} // namespace AAAA
-
-namespace module {
-
-static ConfiguredBuilder* createModule( void )
-{
-	static module::ConfiguredBuilderDescription< AAAA::TextFileAuthConstructor,
-			AAAA::TextFileAuthConfig > mod( "Authentication file", "Authentication",
-							"TextFile", "TextFileAuth" );
-	return &mod;
-}
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend* >( logger );
-}
-
-
-static const unsigned short nrContainers = 1;
-static ConfiguredBuilder* (*containers[ nrContainers ])() = {
-	createModule
-};
-
-ModuleEntryPoint entryPoint( 0, "Text File authentication", setModuleLogger,
-			     nrContainers, containers,
-			     0, NULL );
-
-} // namespace module
-} // namespace _Wolframe
+}} // namespace _Wolframe::AAAA

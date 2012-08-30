@@ -50,6 +50,8 @@ public:
 
 	virtual ~DDLCompilerContainer(){}
 
+	virtual ObjectConstructorBase::ObjectType objectType() const
+						{ return DDL_COMPILER_OBJECT; }
 	virtual const char* identifier() const
 	{
 		return m_name.c_str();

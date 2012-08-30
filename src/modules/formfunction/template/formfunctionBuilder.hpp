@@ -49,6 +49,8 @@ public:
 
 	virtual ~FormFunctionContainer(){}
 
+	virtual ObjectConstructorBase::ObjectType objectType() const
+						{ return FORM_FUNCTION_OBJECT; }
 	virtual const char* identifier() const
 	{
 		return m_name.c_str();

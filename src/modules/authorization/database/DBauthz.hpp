@@ -89,6 +89,8 @@ private:
 class DBauthzConstructor : public ConfiguredObjectConstructor< AuthorizationUnit >
 {
 public:
+	virtual ObjectConstructorBase::ObjectType objectType() const
+						{ return AUTHORIZATION_OBJECT; }
 	const char* identifier() const	{ return "DatabaseAuthorization"; }
 	DBauthorizer* object( const config::NamedConfiguration& conf );
 };

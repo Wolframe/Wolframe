@@ -45,8 +45,21 @@ namespace _Wolframe	{
 class ObjectConstructorBase
 {
 public:
+	enum ObjectType	{
+		AUTHENTICATION_OBJECT,
+		AUDIT_OBJECT,
+		AUTHORIZATION_OBJECT,
+		DATABASE_OBJECT,
+		FILTER_OBJECT,
+		DDL_COMPILER_OBJECT,
+		FORM_FUNCTION_OBJECT,
+		CMD_HANDLER_OBJECT,
+		TEST_OBJECT
+	};
+
 	virtual ~ObjectConstructorBase()	{}
 	virtual const char* identifier() const = 0;
+	virtual ObjectType objectType() const = 0;
 };
 
 // Templates of specialized constructors

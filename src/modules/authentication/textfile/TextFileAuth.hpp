@@ -40,6 +40,7 @@
 #include <string>
 #include <vector>
 #include "AAAA/authentication.hpp"
+#include "constructor.hpp"
 #include "AAAA/user.hpp"
 #include "AAAA/CRAM.hpp"
 
@@ -115,6 +116,18 @@ private:
 	User*				m_user;
 	std::string			m_username;
 	std::string			m_password;
+};
+
+
+// Text file authentication - constructor
+//***********************************************************************
+class TextFileAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
+{
+public:
+	virtual ObjectConstructorBase::ObjectType objectType() const
+						{ return AUTHENTICATION_OBJECT; }
+	const char* identifier() const		{ return "TextFileAuth"; }
+	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
 };
 
 }} // namespace _Wolframe::AAAA

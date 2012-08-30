@@ -54,10 +54,10 @@ class PostgreSQLconfig : public config::NamedConfiguration
 {
 	friend class PostgreSQLconstructor;
 public:
-	const char* className() const			{ return "PostgreSQL"; }
+	const char* className() const		{ return "PostgreSQL"; }
 
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
-	~PostgreSQLconfig()				{}
+	~PostgreSQLconfig()			{}
 
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
@@ -105,7 +105,9 @@ private:
 class PostgreSQLconstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 {
 public:
-	const char* identifier() const	{ return "PostgreSQL"; }
+	virtual ObjectConstructorBase::ObjectType objectType() const
+						{ return DATABASE_OBJECT; }
+	const char* identifier() const		{ return "PostgreSQL"; }
 	PostgreSQLdatabase* object( const config::NamedConfiguration& conf );
 };
 

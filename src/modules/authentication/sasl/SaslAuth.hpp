@@ -90,6 +90,8 @@ private:
 class SaslAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
 {
 public:
+	virtual ObjectConstructorBase::ObjectType objectType() const
+						{ return AUTHENTICATION_OBJECT; }
 	virtual const char* identifier() const	{ return "SaslAuth"; }
 	virtual SaslAuthenticator* object( const config::NamedConfiguration& conf );
 };
