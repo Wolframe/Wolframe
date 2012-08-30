@@ -17,12 +17,16 @@
 # - testscripts		list of scripts of the test
 # - docin		input document name
 # - docout		output document name
-# - modules		modules to load
+# - csetlist		list of character set encodings
 #
 TESTNAME="$testname"
 
-csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4LE UCS-4BE"
-. ./output_tst_textwolf.sh
-csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4BE"
-. ./output_tst_libxml2.sh
-
+filter="xml:textwolf"
+for cset in $csetlist
+do
+	inputfilter="$filter"
+	outputfilter="$filter"
+	. ./output_tst.sh
+	echo "echo executing test $testname $cset" >> ../../testWolfilter.sh
+	echo "cat wolfilter/template/doc/$docin.UTF-8.xml | sed 's/UTF-8/$cset/' | recode UTF-8..$cset | ../wtest/cleanInput BOM EOLN | ../src/wolfilter `echo --input-filter $inputfilter --output-filter $outputfilter $testcmd | sed 's@--form @--form wolfilter/scripts/@' | sed 's@--script @--script wolfilter/scripts/@'` > temp/$docout.$cset.xml" >> ../../testWolfilter.sh
+done

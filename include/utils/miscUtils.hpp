@@ -38,18 +38,31 @@ bool fileExists( const std::string& path);
 ///\param[in] splitchr set of characters to split with (each of them is one separating character)
 void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchr);
 
+///\class OperatorTable
+///\brief Operator table structure for parseNextToken( std::string&,std::string::const_iterator&, std::string::const_iterator, );
+class OperatorTable
+{
+public:
+	OperatorTable( const char* op="");
+	bool operator[]( char ch) const		{return m_ar[ (unsigned char)ch];}
+private:
+	bool m_ar[256];
+};
+
 ///\brief Parsing the next token in a UTF-8 or Isolatin-1 string that is either
 // - a single quoted (') string backslash escaping returned without the delimiting quotes and escaping resolved
 // - a double quoted (") string backslash escaping returned without the delimiting quotes and escaping resolved
 // - an identifier consisting of alphanumeric ASCII characters and characters beyond the ASCII code page (>127)
-// - an operator   '+' '-' '*' '/' '|' '&' '@' '!' '?' ':' '.' ';' ',' '#' '(' ')' '[' ']' '<' '>'
+// - a single character operator from an operator table
 ///
 ///\remark throws exception on error
-///\return true if a token was found and parsed, false when no token was found (EOF)
+///\return the first character of the token parsed in the source if a token was found and parsed, '\0' when no token was found (EOF)
 ///\param[out] tok token parsed
 ///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the token parsed)
 ///\param[in] end iterator marking the end of the source
-bool parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end);
+///\param[in] operatorTable (optional) operator table
+char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const OperatorTable& operatorTable);
+char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end);
 
 }}//namespace
 

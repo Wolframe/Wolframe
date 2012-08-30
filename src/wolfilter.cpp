@@ -70,8 +70,9 @@ int main( int argc, char **argv )
 	bool doExit = false;
 	try
 	{
+		static boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
 		module::ModulesDirectory modDir;
-		config::WolfilterCommandLine cmdline( argc, argv, boost::filesystem::current_path().string());
+		config::WolfilterCommandLine cmdline( argc, argv, execdir.string());
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";

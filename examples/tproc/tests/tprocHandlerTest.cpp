@@ -65,6 +65,7 @@ using namespace _Wolframe::tproc;
 
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
+static boost::filesystem::path g_testdir;
 
 static proc::ProcProviderConfig g_processorProviderConfig;
 static proc::ProcessorProvider* g_processorProvider = 0;
@@ -93,7 +94,7 @@ public:
 		m_appConfig.addConfig( "proc", this);
 		m_appConfig.addConfig( "env", &m_langbindConfig);
 
-		boost::filesystem::path configFile( boost::filesystem::current_path() / "temp" / "test.cfg");
+		boost::filesystem::path configFile( g_testdir / "temp" / "test.cfg");
 		if (utils::fileExists( configFile.string()))
 		{
 			if (!m_appConfig.parse( configFile.string().c_str(), config::ApplicationConfiguration::CONFIG_INFO))
@@ -181,7 +182,7 @@ TEST_F( TProcHandlerTest, tests)
 	std::size_t ob[] = {16000,127,1,2,5,7,8};
 	std::vector<std::string> tests;
 
-	boost::filesystem::recursive_directory_iterator ditr( boost::filesystem::current_path() / "data"), dend;
+	boost::filesystem::recursive_directory_iterator ditr( g_testdir / "data"), dend;
 	if (selectedTestName.size())
 	{
 		std::cerr << "executing tests matching '" << selectedTestName << "'" << std::endl;
@@ -216,7 +217,7 @@ TEST_F( TProcHandlerTest, tests)
 	{
 		std::string testname = boost::filesystem::basename(*itr);
 		// Read test description:
-		wtest::TestDescription td( *itr);
+		wtest::TestDescription td( *itr, g_gtest_ARGV[0]);
 		if (td.requires.size())
 		{
 			// Skip tests when disabled:
@@ -243,19 +244,19 @@ TEST_F( TProcHandlerTest, tests)
 				static boost::mutex mutex;
 				boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
 
-				boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
+				boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
 				std::fstream outputf( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
 				outputf.write( test.output().c_str(), test.output().size());
 				if (outputf.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
 				outputf.close();
 
-				boost::filesystem::path EXPECT( boost::filesystem::current_path() / "temp" / "EXPECT");
+				boost::filesystem::path EXPECT( g_testdir / "temp" / "EXPECT");
 				std::fstream expectedf( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
 				expectedf.write( test.expected().c_str(), test.expected().size());
 				if (expectedf.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
 				expectedf.close();
 
-				boost::filesystem::path INPUT( boost::filesystem::current_path() / "temp" / "INPUT");
+				boost::filesystem::path INPUT( g_testdir / "temp" / "INPUT");
 				std::fstream inputf( INPUT.string().c_str(), std::ios::out | std::ios::binary);
 				inputf.write( test.input().c_str(), test.input().size());
 				if (inputf.bad()) std::cerr << "error writing file '" << INPUT.string() << "'" << std::endl;
@@ -276,6 +277,8 @@ int main( int argc, char **argv )
 {
 	g_gtest_ARGC = 1;
 	g_gtest_ARGV[0] = argv[0];
+	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+
 	if (argc > 2)
 	{
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;

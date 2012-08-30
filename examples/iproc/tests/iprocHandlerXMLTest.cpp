@@ -125,6 +125,7 @@ static const TestDescription testDescriptions[] =
 
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
+static boost::filesystem::path g_testdir;
 
 class IProcTestConfiguration :public Configuration
 {
@@ -139,7 +140,7 @@ public:
 		m_appConfig.addConfig( "proc", this);
 		m_appConfig.addConfig( "env", &m_langbindConfig);
 
-		boost::filesystem::path configFile( boost::filesystem::current_path() / "temp" / "test.cfg");
+		boost::filesystem::path configFile( g_testdir / "temp" / "test.cfg");
 		std::ostringstream config;
 		config << "env {" << std::endl;
 		config << "   script {" << std::endl;
@@ -198,7 +199,7 @@ TEST_F( IProcHandlerXMLTest, tests)
 		std::size_t ob[] = {16000,127,1,2,5,7,8};
 
 		net::LocalTCPendpoint  ep( "127.0.0.1", 12345);
-		wtest::Data data( testDescriptions[ti].name, testDescriptions[ti].datafile);
+		wtest::Data data( testDescriptions[ti].name, testDescriptions[ti].datafile, g_gtest_ARGV[0]);
 
 		unsigned int rr = testSeed();
 		for (int tt=0; tt<NOF_TESTS; tt++,rr+=TEST_MOD)
@@ -224,13 +225,15 @@ int main( int argc, char **argv )
 {
 	g_gtest_ARGC = 1;
 	g_gtest_ARGV[0] = argv[0];
+	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+
 	if (argc > 1)
 	{
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
 		return 1;
 	}
-	wtest::Data::createDataDir( "temp");
-	wtest::Data::createDataDir( "result");
+	wtest::Data::createDataDir( "temp", g_gtest_ARGV[0]);
+	wtest::Data::createDataDir( "result", g_gtest_ARGV[0]);
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	return RUN_ALL_TESTS();
 }

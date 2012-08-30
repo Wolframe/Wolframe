@@ -244,8 +244,10 @@ static void writeFile( const std::string& pt, const std::string& content)
 }
 
 
-TestDescription::TestDescription( const std::string& pt)
+TestDescription::TestDescription( const std::string& pt, const char* argv0)
 {
+	static boost::filesystem::path testdir = boost::filesystem::system_complete( argv0).parent_path();
+
 	std::vector<std::string> header;
 	std::vector<std::string> content;
 	readFile( pt, header, content, requires);
@@ -266,14 +268,14 @@ TestDescription::TestDescription( const std::string& pt)
 		else if (boost::iequals( *hi, "config"))
 		{
 			config.append( *itr);
-			boost::filesystem::path fn( boost::filesystem::current_path() / "temp" / "test.cfg");
+			boost::filesystem::path fn( testdir / "temp" / "test.cfg");
 			writeFile( fn.string(), config);
 		}
 		else if (boost::starts_with( *hi, "file:"))
 		{
 			std::string filename( hi->c_str()+std::strlen("file:"));
 			boost::trim( filename);
-			boost::filesystem::path fn( boost::filesystem::current_path() / "temp" / filename);
+			boost::filesystem::path fn( testdir / "temp" / filename);
 			writeFile( fn.string(), *itr);
 		}
 	}

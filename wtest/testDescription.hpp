@@ -46,7 +46,7 @@ struct TestDescription
 	std::string config;
 	std::string requires;
 
-	TestDescription( const std::string& filename);
+	TestDescription( const std::string& filename, const char* argv0);
 	TestDescription( const TestDescription& o)
 		:input(o.input),expected(o.expected),config(o.config),requires(o.requires)
 	{}

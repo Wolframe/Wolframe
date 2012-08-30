@@ -58,6 +58,7 @@
 
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
+static boost::filesystem::path g_testdir;
 
 using namespace _Wolframe;
 
@@ -106,7 +107,7 @@ TEST_F( WolfilterTest, tests)
 	std::size_t testno;
 
 	// [1] Selecting tests to execute:
-	boost::filesystem::recursive_directory_iterator ditr( boost::filesystem::current_path() / "wolfilter" / "data"), dend;
+	boost::filesystem::recursive_directory_iterator ditr( g_testdir / "wolfilter" / "data"), dend;
 	if (selectedTestName.size())
 	{
 		std::cerr << "executing tests matching '" << selectedTestName << "'" << std::endl;
@@ -141,7 +142,7 @@ TEST_F( WolfilterTest, tests)
 	for (testno=1; itr != end; ++itr,++testno)
 	{
 		std::string testname = boost::filesystem::basename(*itr);
-		wtest::TestDescription td( *itr);
+		wtest::TestDescription td( *itr, g_gtest_ARGV[0]);
 		if (td.requires.size())
 		{
 			// [2.2] Skip tests when disabled
@@ -166,7 +167,7 @@ TEST_F( WolfilterTest, tests)
 		{
 			cmdargv[ci] = strdup( cmd[ci-1].c_str() );
 		}
-		boost::filesystem::path refpath( boost::filesystem::current_path() / "temp");
+		boost::filesystem::path refpath( g_testdir / "temp");
 		config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string());
 
 		// [2.5] Call iostreamfilter
@@ -186,19 +187,19 @@ TEST_F( WolfilterTest, tests)
 			boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
 
 			// [2.6] Dump test contents to files in case of error
-			boost::filesystem::path OUTPUT( boost::filesystem::current_path() / "temp" / "OUTPUT");
+			boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
 			std::fstream oo( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
 			oo.write( out.str().c_str(), out.str().size());
 			if (oo.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
 			oo.close();
 
-			boost::filesystem::path EXPECT( boost::filesystem::current_path() / "temp" / "EXPECT");
+			boost::filesystem::path EXPECT( g_testdir / "temp" / "EXPECT");
 			std::fstream ee( EXPECT.string().c_str(), std::ios::out | std::ios::binary);
 			ee.write( td.expected.c_str(), td.expected.size());
 			if (ee.bad()) std::cerr << "error writing file '" << EXPECT.string() << "'" << std::endl;
 			ee.close();
 
-			boost::filesystem::path INPUT( boost::filesystem::current_path() / "temp" / "INPUT");
+			boost::filesystem::path INPUT( g_testdir / "temp" / "INPUT");
 			std::fstream ss( INPUT.string().c_str(), std::ios::out | std::ios::binary);
 			ss.write( td.input.c_str(), td.input.size());
 			if (ss.bad()) std::cerr << "error writing file '" << INPUT.string() << "'" << std::endl;
@@ -223,6 +224,8 @@ int main( int argc, char **argv )
 {
 	g_gtest_ARGC = 1;
 	g_gtest_ARGV[0] = argv[0];
+	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+
 	if (argc > 2)
 	{
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;

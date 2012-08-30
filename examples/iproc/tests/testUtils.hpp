@@ -47,16 +47,16 @@ namespace wtest {
 
 struct Data
 {
-	Data( const char* testname, const char* inputfilename)
+	Data( const char* testname, const char* inputfilename, const char* argv0)
 	{
 		name = testname;
-		inputf = getDataFile( inputfilename, "data");
+		inputf = getDataFile( inputfilename, "data", 0, argv0);
 		if (!readFile( inputf.c_str(), input)) throw std::runtime_error("could not read test input file");
 
-		expectedf = getDataFile( testname, "must", ".txt");
+		expectedf = getDataFile( testname, "must", ".txt", argv0);
 		readFile( expectedf.c_str(), expected);
 
-		resultf = getDataFile( testname, "result", ".txt");
+		resultf = getDataFile( testname, "result", ".txt", argv0);
 		std::cerr << "in case of error the output is written to '" << resultf << "'" << std::endl;
 	}
 
@@ -99,13 +99,13 @@ struct Data
 		return true;
 	}
 
-	static std::string getDataFile( const char* name, const char* type, const char* ext=0)
+	static std::string getDataFile( const char* name, const char* type, const char* ext, const char* argv0)
 	{
-		boost::filesystem::path rt = boost::filesystem::current_path();
+		static boost::filesystem::path testdir = boost::filesystem::system_complete( argv0).parent_path();
+		boost::filesystem::path rt = testdir;
 		std::string datafile( name);
 		datafile.append( ext?ext:"");
-		rt /= type;
-		rt /= datafile;
+		rt = testdir / type / datafile;
 		return rt.string();
 	}
 
@@ -129,10 +129,10 @@ struct Data
 		ff.write( content.c_str(), content.size());
 	}
 
-	static void createDataDir( const char* type)
+	static void createDataDir( const char* type, const char* argv0)
 	{
-		boost::filesystem::path pt = boost::filesystem::current_path();
-		pt /= type;
+		static boost::filesystem::path testdir = boost::filesystem::system_complete( argv0).parent_path();
+		boost::filesystem::path pt = testdir / type;
 		boost::filesystem::create_directory( pt);
 	}
 };

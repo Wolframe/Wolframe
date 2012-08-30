@@ -60,7 +60,7 @@ int main( int argc, const char **argv )
 	}
 	try
 	{
-		TestDescription test( argv[1]);
+		TestDescription test( argv[1], argv[0]);
 	}
 	catch (const std::exception& e)
 	{

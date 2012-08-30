@@ -39,6 +39,8 @@ Project Wolframe.
 #include <cstring>
 #include <boost/algorithm/string.hpp>
 
+using namespace _Wolframe::utils;
+
 void _Wolframe::utils::splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
 {
 	res.clear();
@@ -48,43 +50,25 @@ void _Wolframe::utils::splitString( std::vector<std::string>& res, const std::st
 	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
 }
 
-struct CharTable
+OperatorTable::OperatorTable( const char* op)
 {
-	bool ar[256];
-	CharTable()
-	{
-		for (unsigned int ii=0; ii<sizeof(ar); ++ii) ar[ii]=false;
-	}
-	CharTable& operator()( char start, char end)		{while (start <= end) ar[(unsigned char)start++] = true; return *this;}
-	CharTable& operator()( char start)			{ar[(unsigned char)start] = true; return *this;}
+	std::size_t ii;
+	for (ii=0; ii<sizeof(m_ar); ++ii) m_ar[ii]=false;
+	for (ii=0; op[ii]; ++ii) m_ar[(unsigned char)(op[ii])]=true;
+}
 
-	char operator[]( char idx) const			{return ar[(unsigned char)idx];}
-};
-
-struct OperatorTable :public CharTable
+static bool isLetter( char ch)
 {
-	OperatorTable()
-	{
-		(*this)('+')('-')('*')('/')('|')('&')('@')('!')('?')(':')('.')(';')(',')('#')('(')(')')('[')(']')('<')('>');
-	}
-};
+	return (ch < 0 || ((ch|32) >= 'a' && (ch|32) <= 'z') || (ch >= '0' && ch <= '9') || ch == '_');
+}
 
-struct AlphanumTable :public CharTable
+char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const OperatorTable& operatorTable)
 {
-	AlphanumTable()
-	{
-		(*this)('a','z')('A','Z')('0','9')('_')(-127,-1);
-	}
-};
-
-static OperatorTable operatorTable;
-static AlphanumTable alphanumTable;
-
-bool _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end)
-{
+	char rt = '\0';
 	tok.clear();
 	while (*itr <= 32 && *itr >= 0 && itr != end) ++itr;
-	if (itr == end) return false;
+	if (itr == end) return '\0';
+	rt = *itr;
 	if (*itr == '\'' || *itr == '\"')
 	{
 		char eb = *itr;
@@ -93,7 +77,7 @@ bool _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 			if (*itr == eb)
 			{
 				++itr;
-				return true;
+				return rt;
 			}
 			else if (*itr == '\\')
 			{
@@ -109,12 +93,12 @@ bool _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 	{
 		tok.push_back( *itr);
 		++itr;
-		return true;
+		return rt;
 	}
-	else if (alphanumTable[ *itr])
+	else if (isLetter( *itr))
 	{
-		while (alphanumTable[ *itr]) tok.push_back( *itr++);
-		return true;
+		while (isLetter( *itr)) tok.push_back( *itr++);
+		return rt;
 	}
 	else
 	{
@@ -122,3 +106,8 @@ bool _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 	}
 }
 
+char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end)
+{
+	static OperatorTable noOperator;
+	return parseNextToken( tok,itr,end,noOperator);
+}
