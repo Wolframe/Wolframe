@@ -43,12 +43,9 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace AAAA {
 
-class PAMAuthConstructor : public ObjectConstructor< AuthenticationUnit >
+class PAMAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit >
 {
 public:
-	PAMAuthConstructor()			{}
-	~PAMAuthConstructor()			{}
-
 	const char* identifier() const		{ return "PAMAuth"; }
 	PAMAuthenticator* object( const config::NamedConfiguration& conf );
 };

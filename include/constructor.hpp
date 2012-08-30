@@ -31,33 +31,43 @@
 
 ************************************************************************/
 //
-// container template
+// Constructor classes
 //
 
 #include "config/configurationBase.hpp"
 
-#ifndef _CONTAINER_HPP_INCLUDED
-#define _CONTAINER_HPP_INCLUDED
+#ifndef _CONSTRUCTOR_HPP_INCLUDED
+#define _CONSTRUCTOR_HPP_INCLUDED
 
 namespace _Wolframe	{
 
 /// Container base class
-class Container
+class ObjectConstructorBase
 {
 public:
-	virtual ~Container()		{}
+	virtual ~ObjectConstructorBase()	{}
 	virtual const char* identifier() const = 0;
 };
 
-/// Template used to specialize a container
+// Templates of specialized constructors
+/// Constructor of a configured object
 template < class T >
-class ObjectConstructor : public Container
+class ConfiguredObjectConstructor : public ObjectConstructorBase
 {
 public:
-	virtual ~ObjectConstructor()	{}
+	virtual ~ConfiguredObjectConstructor()	{}
 	virtual T* object( const config::NamedConfiguration& conf ) = 0;
+};
+
+/// Constructor of a simple (without configuration) object
+template < class T >
+class SimpleObjectConstructor : public ObjectConstructorBase
+{
+public:
+	virtual ~SimpleObjectConstructor()	{}
+	virtual T* object() = 0;
 };
 
 } // namespace _Wolframe
 
-#endif // _CONTAINER_HPP_INCLUDED
+#endif // _CONSTRUCTOR_HPP_INCLUDED

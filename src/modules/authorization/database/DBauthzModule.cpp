@@ -44,12 +44,9 @@ namespace _Wolframe {
 namespace AAAA {
 
 //***  Database authorizer constructor  ***********************************
-class DBauthzConstructor : public ObjectConstructor< AuthorizationUnit >
+class DBauthzConstructor : public ConfiguredObjectConstructor< AuthorizationUnit >
 {
 public:
-	DBauthzConstructor()			{}
-	~DBauthzConstructor()			{}
-
 	const char* identifier() const	{ return "DatabaseAuthorization"; }
 	DBauthorizer* object( const config::NamedConfiguration& conf );
 };

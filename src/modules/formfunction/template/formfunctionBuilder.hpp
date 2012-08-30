@@ -35,12 +35,12 @@ Project Wolframe.
 #define _Wolframe_MODULE_FORMFUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "langbind/appFormFunction.hpp"
 #include "moduleInterface.hpp"
-#include "container.hpp"
+#include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-class FormFunctionContainer :public Container, public langbind::FormFunction
+class FormFunctionContainer :public ObjectConstructorBase, public langbind::FormFunction
 {
 public:
 	FormFunctionContainer( const char* name_, const langbind::FormFunction& func)
@@ -66,7 +66,7 @@ public:
 
 	virtual ~FormFunctionBuilder(){}
 
-	virtual Container* object()
+	virtual ObjectConstructorBase* object()
 	{
 		return &m_func;
 	}

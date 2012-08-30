@@ -38,10 +38,9 @@
 #define _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
 
 #include "processor/procProvider.hpp"
-#include "container.hpp"
 #include "database/database.hpp"
 #include "database/DBprovider.hpp"
-#include "modules/filter/template/filterContainerBuilder.hpp"
+#include "modules/filter/template/filterBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 
 #include <list>

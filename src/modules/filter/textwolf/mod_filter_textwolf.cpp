@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file modules/filter/textwolf/mod_filter_textwolf.cpp
 ///\brief Module for textwolf XML filters
-#include "modules/filter/template/filterContainerBuilder.hpp"
+#include "modules/filter/template/filterBuilder.hpp"
 #include "filter/textwolf_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
@@ -70,7 +70,7 @@ static createBuilderFunc objdef[ NofObjects] =
 };
 
 #ifndef _WIN32
-#define DLLEXPORT 
+#define DLLEXPORT
 #else
 #define DLLEXPORT __declspec( dllexport )
 #endif

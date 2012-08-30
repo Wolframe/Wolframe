@@ -88,19 +88,6 @@ bool PostgreSQLconfig::check() const
 }
 
 
-//***  PostgreSQL database container  ***************************************
-PostgreSQLdatabase* PostgreSQLcontainer::object( const config::NamedConfiguration& conf )
-{
-	const PostgreSQLconfig& cfg = dynamic_cast< const PostgreSQLconfig& >( conf );
-
-	PostgreSQLdatabase* m_db = new PostgreSQLdatabase( cfg.m_ID, cfg.host, cfg.port, cfg.dbName,
-							   cfg.user, cfg.password, cfg.connectTimeout,
-							   cfg.connections, cfg.acquireTimeout );
-	MOD_LOG_TRACE << "PostgreSQL database unit for '" << cfg.m_ID << "' created";
-	return m_db;
-}
-
-
 //***  PostgreSQL database functions  ***************************************
 static std::string escConnElement( std::string element )
 {

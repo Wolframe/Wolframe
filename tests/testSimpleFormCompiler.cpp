@@ -78,7 +78,6 @@ TEST_F( SimpleFormCompilerTest, tests)
 		ddl::SimpleFormCompiler mm;
 		ddl::StructType sr = mm.compileFile( srcfile);
 		sr.print( std::cerr);
-
 	}
 }
 

@@ -106,7 +106,7 @@ User* TextFileAuthenticator::authenticatePlain( const std::string& username,
 
 		std::string line( lineBuf );
 		boost::algorithm::trim( line );
-		if ( line[0] == '#' || line.empty() )
+		if ( line.empty() || line[0] == '#' )
 			continue;
 
 		std::size_t  start = 0, end = 0;
@@ -196,7 +196,7 @@ User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
 
 		std::string line( lineBuf );
 		boost::algorithm::trim( line );
-		if ( line[0] == '#' || line.empty() )
+		if ( line.empty() || line[0] == '#' )
 			continue;
 
 		std::size_t  start = 0, end = 0;

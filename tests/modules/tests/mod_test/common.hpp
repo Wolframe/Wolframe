@@ -79,7 +79,7 @@ public:
 	virtual const std::string hello( ) = 0;
 };
 
-class TestModuleContainer : public ObjectConstructor< TestUnit >
+class TestModuleContainer : public ConfiguredObjectConstructor< TestUnit >
 {
 public:
 	TestModuleContainer()			{}

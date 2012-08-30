@@ -29,26 +29,26 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/cmdbind/template/commandHandlerContainerBuilder.hpp
-///\brief Interface template for object builder of peer command handlers
-#ifndef _Wolframe_MODULE_COMMAND_HANDLER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_COMMAND_HANDLER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "cmdbind/commandHandler.hpp"
+///\file modules/ddlcompiler/template/ddlcompilerContainerBuilder.hpp
+///\brief Interface template for object builder of form DDL compilers
+#ifndef _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#include "ddl/compilerInterface.hpp"
 #include "moduleInterface.hpp"
-#include "container.hpp"
+#include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-template <class CommandHandler>
-class CommandHandlerContainer :public Container, public CommandHandler
+template <class CompilerInterfaceC>
+class DDLCompilerContainer :public ObjectConstructorBase, public CompilerInterfaceC
 {
 public:
-	CommandHandlerContainer( const char* name_)
-		:CommandHandler()
+	DDLCompilerContainer( const char* name_)
+		:CompilerInterfaceC()
 		,m_name(name_){}
 
-	virtual ~CommandHandlerContainer(){}
+	virtual ~DDLCompilerContainer(){}
 
 	virtual const char* identifier() const
 	{
@@ -58,19 +58,19 @@ private:
 	std::string m_name;
 };
 
-template <class CommandHandler>
-class CommandHandlerBuilder :public SimpleBuilder
+template <class CompilerInterfaceC>
+class DDLCompilerBuilder :public SimpleBuilder
 {
 public:
-	CommandHandlerBuilder( const char* name_)
+	DDLCompilerBuilder( const char* name_)
 		:SimpleBuilder(name_)
 		,m_identifier(name_){}
 
-	virtual ~CommandHandlerBuilder(){}
+	virtual ~DDLCompilerBuilder(){}
 
-	virtual Container* object()
+	virtual ObjectConstructorBase* object()
 	{
-		return new CommandHandlerContainer<CommandHandler>(m_identifier.c_str());
+		return new DDLCompilerContainer<CompilerInterfaceC>(m_identifier.c_str());
 	}
 
 private:
@@ -79,17 +79,17 @@ private:
 
 }}//namespace
 
-#define DECLARE_COMMAND_HANDLER(NAME,CPPID,OBJ) \
+#define DECLARE_DDLCOMPILER(NAME,CPPID,CCOBJ) \
 namespace {\
 struct CPPID\
 {\
 	static SimpleBuilder* constructor()\
 	{\
-		return new CommandHandlerBuilder<OBJ>(NAME);\
+		return new DDLCompilerBuilder<CCOBJ>(NAME);\
 	}\
 };\
 }//anonymous namespace
-//end DECLARE_COMMAND_HANDLER
+//end DECLARE_DDLCOMPILER
 
 #endif
 

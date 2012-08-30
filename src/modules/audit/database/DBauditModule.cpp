@@ -43,12 +43,9 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 namespace _Wolframe {
 namespace AAAA {
 
-class DBauditConstructor : public ObjectConstructor< AuditUnit >
+class DBauditConstructor : public ConfiguredObjectConstructor< AuditUnit >
 {
 public:
-	DBauditConstructor()		{}
-	~DBauditConstructor()		{}
-
 	const char* identifier() const	{ return "DatabaseAudit"; }
 	DBauditor* object( const config::NamedConfiguration& conf );
 };
