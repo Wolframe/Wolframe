@@ -70,7 +70,7 @@ public:
 
 	virtual ~DDLCompilerBuilder(){}
 
-	virtual ObjectConstructorBase* object()
+	virtual ObjectConstructorBase* constructor()
 	{
 		return new DDLCompilerContainer<CompilerInterfaceC>(m_identifier.c_str());
 	}

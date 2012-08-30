@@ -53,7 +53,7 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::NamedConf
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
 			ConfiguredObjectConstructor< AuthorizationUnit >* authz =
-					dynamic_cast< ConfiguredObjectConstructor< AuthorizationUnit >* >( builder->builder());
+					dynamic_cast< ConfiguredObjectConstructor< AuthorizationUnit >* >( builder->constructor());
 			if ( authz == NULL )	{
 				LOG_ALERT << "AuthorizationProvider: '" << builder->identifier()
 					  << "' is not an Authorization Unit builder";

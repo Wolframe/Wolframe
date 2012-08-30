@@ -68,7 +68,7 @@ public:
 
 	virtual ~FilterBuilder(){}
 
-	virtual ObjectConstructorBase* object()
+	virtual ObjectConstructorBase* constructor()
 	{
 		return new FilterContainer( m_identifier, createFilterFunc( m_identifier));
 	}

@@ -50,8 +50,6 @@ namespace module {
 class SimpleBuilder
 {
 	friend class ModulesDirectory;
-protected:
-	const char* m_identifier;
 public:
 	SimpleBuilder( const char* id )
 		: m_identifier( id )			{}
@@ -60,31 +58,33 @@ public:
 
 	const char* identifier() const			{ return m_identifier; }
 
-	virtual ObjectConstructorBase* object() = 0;
+	virtual ObjectConstructorBase* constructor() = 0;
+protected:
+	const char* m_identifier;
 };
 
 ///
 class ConfiguredBuilder
 {
 	friend class ModulesDirectory;
+public:
+	ConfiguredBuilder( const char* title, const char* section, const char* keyword,
+			   const char* id )
+		: m_title( title ), m_section( section), m_keyword( keyword ),
+		  m_identifier( id )			{}
+
+	virtual ~ConfiguredBuilder()			{}
+
+	const char* identifier() const			{ return m_identifier; }
+
+	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
+	virtual ObjectConstructorBase* constructor() = 0;
 protected:
 	const char* m_title;		///< used for printing (logging etc.)
 	const char* m_section;		///< configuration section to which the
 					/// configuration parser reacts
 	const char* m_keyword;		///< configuration keyword (element)
 	const char* m_identifier;	///< identifier of the builder
-public:
-	ConfiguredBuilder( const char* title, const char* section, const char* keyword,
-			   const char* id )
-		: m_title( title ), m_section( section), m_keyword( keyword ),
-		  m_identifier( id )		{}
-
-	virtual ~ConfiguredBuilder()		{}
-
-	const char* identifier() const		{ return m_identifier; }
-
-	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
-	virtual ObjectConstructorBase* builder() = 0;
 };
 
 
@@ -97,12 +97,12 @@ public:
 				      const char* keyword, const char* id )
 		: ConfiguredBuilder( title, section, keyword, id )	{}
 
-	virtual ~ConfiguredBuilderDescription()	{}
+	virtual ~ConfiguredBuilderDescription()		{}
 
 	virtual config::NamedConfiguration* configuration( const char* logPrefix )	{
 		return new Tconf( m_title, logPrefix, m_keyword );
 	}
-	virtual ObjectConstructorBase* builder()	{
+	virtual ObjectConstructorBase* constructor()	{
 		return &m_builder;
 	}
 private:
@@ -147,12 +147,12 @@ public:
 			: m_it( it )			{}
 	};
 
-	container_iterator objectsBegin() const		{ return container_iterator( m_container.begin() ); }
-	container_iterator objectsEnd() const		{ return container_iterator( m_container.end() ); }
+	container_iterator objectsBegin() const		{ return container_iterator( m_builder.begin() ); }
+	container_iterator objectsEnd() const		{ return container_iterator( m_builder.end() ); }
 
 private:
-	std::list< ConfiguredBuilder* >	m_cfgdContainer; ///< list of configurable containers
-	std::list< SimpleBuilder* >	m_container;	 ///< list of simple containers
+	std::list< ConfiguredBuilder* >	m_cfgdBuilder;	///< list of configurable builders
+	std::list< SimpleBuilder* >	m_builder;	///< list of simple builders
 };
 
 

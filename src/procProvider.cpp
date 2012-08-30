@@ -184,7 +184,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
 			ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* handler =
-					dynamic_cast< ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* >( builder->builder());
+					dynamic_cast< ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* >( builder->constructor());
 			if ( handler == NULL )	{
 				LOG_ALERT << "Wolframe Processor Provider: '" << builder->identifier()
 					  << "'' is not a command handler";
@@ -207,7 +207,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	for ( module::ModulesDirectory::container_iterator it = modules->objectsBegin();
 								it != modules->objectsEnd(); it++ )	{
 		//		if the object is a filter
-		module::FilterContainer* filter = dynamic_cast< module::FilterContainer* >((*it)->object());
+		module::FilterContainer* filter = dynamic_cast< module::FilterContainer* >((*it)->constructor());
 		if ( filter == NULL )	{
 			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
 				  << "'' is not a filter";

@@ -70,7 +70,7 @@ public:
 
 	virtual ~CommandHandlerBuilder(){}
 
-	virtual ObjectConstructorBase* object()
+	virtual ObjectConstructorBase* constructor()
 	{
 		return new CommandHandlerContainer<CommandHandler>(m_identifier.c_str());
 	}

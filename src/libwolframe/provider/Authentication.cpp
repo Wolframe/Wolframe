@@ -52,7 +52,7 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
 			ConfiguredObjectConstructor< AuthenticationUnit >* auth =
-					dynamic_cast< ConfiguredObjectConstructor< AuthenticationUnit >* >( builder->builder());
+					dynamic_cast< ConfiguredObjectConstructor< AuthenticationUnit >* >( builder->constructor());
 			if ( auth == NULL )	{
 				LOG_ALERT << "AuthenticationFactory: '" << builder->identifier()
 					  << "' is not an Authentication Unit builder";

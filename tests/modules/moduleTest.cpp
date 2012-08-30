@@ -50,7 +50,7 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 	config::NamedConfiguration* configuration = container->configuration( "TestObject" );
 	ASSERT_TRUE( configuration != NULL );
 
-	ConfiguredObjectConstructor< test::TestUnit >* obj = dynamic_cast< ConfiguredObjectConstructor< test::TestUnit >* >( container->builder( ) );
+	ConfiguredObjectConstructor< test::TestUnit >* obj = dynamic_cast< ConfiguredObjectConstructor< test::TestUnit >* >( container->constructor( ) );
 //	test::TestModuleContainer* obj = dynamic_cast<test::TestModuleContainer *>( container->builder( ) );
 	ASSERT_TRUE( obj != NULL );
 	test::TestUnit* unit = obj->object( *configuration );
@@ -86,12 +86,12 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 	config::NamedConfiguration* configuration2 = container2->configuration( "TestObject2" );
 	ASSERT_TRUE( configuration2 != NULL );
 
-	ConfiguredObjectConstructor< test_containers::TestUnit1 >* obj1 = dynamic_cast< ConfiguredObjectConstructor< test_containers::TestUnit1 >* >( container1->builder( ) );
+	ConfiguredObjectConstructor< test_containers::TestUnit1 >* obj1 = dynamic_cast< ConfiguredObjectConstructor< test_containers::TestUnit1 >* >( container1->constructor( ) );
 //	test_containers::TestModuleContainer1* obj1 = dynamic_cast<test_containers::TestModuleContainer1 *>( container1->builder( ) );
 	ASSERT_TRUE( obj1 != NULL );
 	test_containers::TestUnit1* unit1 = obj1->object( *configuration1 );
 
-	ConfiguredObjectConstructor< test_containers::TestUnit2 >* obj2 = dynamic_cast< ConfiguredObjectConstructor< test_containers::TestUnit2 >* >( container2->builder( ) );
+	ConfiguredObjectConstructor< test_containers::TestUnit2 >* obj2 = dynamic_cast< ConfiguredObjectConstructor< test_containers::TestUnit2 >* >( container2->constructor( ) );
 //	test_containers::TestModuleContainer2* obj2 = dynamic_cast<test_containers::TestModuleContainer2 *>( container2->builder( ) );
 	ASSERT_TRUE( obj2 != NULL );
 	test_containers::TestUnit2* unit2 = obj2->object( *configuration2 );

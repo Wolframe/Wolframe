@@ -68,7 +68,7 @@ public:
 
 	virtual ~FormFunctionBuilder(){}
 
-	virtual ObjectConstructorBase* object()
+	virtual ObjectConstructorBase* constructor()
 	{
 		return &m_func;
 	}
