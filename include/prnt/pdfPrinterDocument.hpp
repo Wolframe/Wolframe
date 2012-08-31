@@ -45,6 +45,8 @@ struct Document
 	~Document();
 	void execute_enter( Method method, const VariableScope& vars);
 	void execute_leave( Method method);
+
+	std::string tostring() const;
 };
 
 

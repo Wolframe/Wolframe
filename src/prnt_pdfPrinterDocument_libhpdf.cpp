@@ -41,3 +41,10 @@ Document::~Document(){}
 void Document::execute_enter( Method , const VariableScope&){}
 void Document::execute_leave( Method){}
 
+std::string Document::tostring() const
+{
+	return std::string();
+}
+
+
+
