@@ -56,7 +56,7 @@ LOCAL_BINS = \
 # we get too many spurios errors and problems (for instance in abuild
 # checks on openSuSE). This doesn't mean they should not be fixed
 # though upstream!
-ALL_CFLAGS = -O2 -Wall $(LUA_PLATFORM_CFLAGS) -I. $(SO_COMPILE_FLAGS)
+ALL_CFLAGS = $(OPTFLAGS) -Wall $(LUA_PLATFORM_CFLAGS) -I. $(SO_COMPILE_FLAGS)
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
