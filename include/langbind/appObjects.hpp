@@ -54,9 +54,10 @@ namespace langbind {
 ///\class Logger
 ///\brief Logger as seen from scripting language binding
 ///\remark Empty object because it is represented as singleton in the system
-class Logger
+struct Logger
 {
 	int _;			//< dummy element because some bindings (Lua) do not like empty structures (objects of size 1)
+	Logger() :_(0){}
 };
 
 ///\class Output

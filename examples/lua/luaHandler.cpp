@@ -344,7 +344,7 @@ void luaConnection::networkInput( const void *begin, std::size_t bytesTransferre
 
 void luaConnection::signalOccured( NetworkSignal signal )
 {
-	const char *signal_s;
+	const char *signal_s = 0;
 
 	if ( signal == TIMEOUT )	{
 		LOG_TRACE << "Processor received timeout";
