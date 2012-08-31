@@ -115,7 +115,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.o \
 	serverConfig.o \
 	server.o \
-	procProvider.o
+	procProviderImpl.o
 
 #LUA
 ifeq ($(WITH_LUA),1)

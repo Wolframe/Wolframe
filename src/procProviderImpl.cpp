@@ -159,14 +159,14 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
-const langbind::Filter* ProcessorProvider::getFilter( const std::string& name ) const
+const langbind::Filter* ProcessorProvider::filter( const std::string& name ) const
 {
-	return m_impl->getFilter( name );
+	return m_impl->filter( name );
 }
 
-cmdbind::CommandHandler* ProcessorProvider::getHandler( const std::string& name ) const
+cmdbind::CommandHandler* ProcessorProvider::handler( const std::string& name ) const
 {
-	return m_impl->getHandler( name );
+	return m_impl->handler( name );
 }
 
 
@@ -183,16 +183,16 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 									it != conf->m_procConfig.end(); it++ )	{
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
-			ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* handler =
+			ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* hndlr =
 					dynamic_cast< ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* >( builder->constructor());
-			if ( handler == NULL )	{
+			if ( hndlr == NULL )	{
 				LOG_ALERT << "Wolframe Processor Provider: '" << builder->identifier()
 					  << "'' is not a command handler";
 				throw std::logic_error( "Object is not a commandHandler. See log." );
 			}
 			else	{
-				m_handler.push_back( handler->object( **it ) );
-				std::string handlerName = handler->identifier();
+				m_handler.push_back( hndlr->object( **it ) );
+				std::string handlerName = hndlr->identifier();
 				LOG_TRACE << "'" << handlerName << "' command handler registered";
 				// register handler commands here
 			}
@@ -207,17 +207,17 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	for ( module::ModulesDirectory::container_iterator it = modules->objectsBegin();
 								it != modules->objectsEnd(); it++ )	{
 		//		if the object is a filter
-		module::FilterContainer* filter = dynamic_cast< module::FilterContainer* >((*it)->constructor());
-		if ( filter == NULL )	{
+		module::FilterContainer* fltr = dynamic_cast< module::FilterContainer* >((*it)->constructor());
+		if ( fltr == NULL )	{
 			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
 				  << "'' is not a filter";
 			throw std::logic_error( "Object is not a filter. See log." );
 		}
 		else	{
-			std::string filterName = filter->identifier();
-			m_filter.push_back( filter );
+			std::string filterName = fltr->identifier();
+			m_filter.push_back( fltr );
 			boost::algorithm::to_upper( filterName );
-			m_filterMap[ filterName ] = filter;
+			m_filterMap[ filterName ] = fltr;
 			LOG_TRACE << "'" << filterName << "' filter registered";
 		}
 	}
@@ -251,17 +251,17 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 }
 
 
-const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::getFilter( const std::string& name ) const
+const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name ) const
 {
 	std::string filterName = boost::algorithm::to_upper_copy( name );
-	std::map<const std::string, const langbind::Filter*>::const_iterator filter = m_filterMap.find( filterName );
-	if ( filter == m_filterMap.end() )
+	std::map<const std::string, const langbind::Filter*>::const_iterator fltr = m_filterMap.find( filterName );
+	if ( fltr == m_filterMap.end() )
 		return NULL;
 	else
-		return filter->second;
+		return fltr->second;
 }
 
-cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::getHandler( const std::string& command ) const
+cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::handler( const std::string& command ) const
 {
 	std::string cmdName = boost::algorithm::to_upper_copy( command );
 	std::map<const std::string, cmdbind::CommandHandlerUnit*>::const_iterator cmd = m_cmdMap.find( cmdName );
@@ -270,6 +270,5 @@ cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::getHandler( 
 	else
 		return cmd->second->handler( command );
 }
-
 
 }} // namespace _Wolframe::proc
