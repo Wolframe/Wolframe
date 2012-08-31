@@ -62,6 +62,7 @@ public:
 
 	std::size_t alloc( std::size_t nofBytes);
 	const void* base() const			{return m_ar;}
+	void* base()					{return m_ar;}
 	std::size_t size() const			{return m_pos;}
 
 private:
@@ -75,7 +76,12 @@ private:
 template <typename Type>
 struct TypedArrayDoublingAllocator :public types::ArrayDoublingAllocator
 {
-	Type* base() const
+	const Type* base() const
+	{
+		return (const Type*)types::ArrayDoublingAllocator::base();
+	}
+
+	Type* base()
 	{
 		return (Type*)types::ArrayDoublingAllocator::base();
 	}
@@ -83,7 +89,7 @@ struct TypedArrayDoublingAllocator :public types::ArrayDoublingAllocator
 	const Type& operator[]( std::size_t idx) const
 	{
 		if (idx > size()/sizeof(Type)) throw std::logic_error( "Array bounds access");
-		return ((Type*)types::ArrayDoublingAllocator::base())[ idx];
+		return ((const Type*)types::ArrayDoublingAllocator::base())[ idx];
 	}
 
 	Type& operator[]( std::size_t idx)
