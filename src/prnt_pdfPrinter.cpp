@@ -234,12 +234,11 @@ PrintFunction::InputR SimplePdfPrintFunction::getInput() const
 	return rt;
 }
 
-PrintFunction::ResultR SimplePdfPrintFunction::execute( const Input* input_) const
+std::string SimplePdfPrintFunction::execute( const Input* input_) const
 {
 	const PrintInput* input = dynamic_cast<const PrintInput*>( input_);
 	if (!input) throw std::runtime_error( "calling print pdf with incompatible input");
-	PrintFunction::ResultR rt( new std::string( input->document().tostring()));
-	return rt;
+	return input->document().tostring();
 }
 
 PrintFunctionR _Wolframe::prnt::createSimplePdfPrintFunction( const std::string& description)

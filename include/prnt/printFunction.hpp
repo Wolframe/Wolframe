@@ -44,7 +44,6 @@ namespace prnt {
 ///\brief Interface for printing forms to a string of printable format (e.g. PDF)
 struct PrintFunction
 {
-	typedef types::CountedReference<std::string> ResultR;
 	typedef langbind::TypedOutputFilter Input;
 	typedef types::CountedReference<Input> InputR;
 
@@ -55,7 +54,7 @@ struct PrintFunction
 	virtual ~PrintFunction(){}
 
 	virtual InputR getInput() const=0;
-	virtual ResultR execute( const Input* i) const=0;
+	virtual std::string execute( const Input* i) const=0;
 };
 
 ///\brief Reference to a printing interface

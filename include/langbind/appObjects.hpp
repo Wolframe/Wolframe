@@ -36,12 +36,12 @@ Project Wolframe.
 #include "filter/filter.hpp"
 #include "langbind/appFormFunction.hpp"
 #include "langbind/transactionFunction.hpp"
+#include "prnt/printFunction.hpp"
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
-#include "cmdbind/commandHandler.hpp"
 #include "database/preparedStatement.hpp"
 #include <stack>
 #include <string>
@@ -312,7 +312,6 @@ private:
 	TransactionFunction::ResultR m_result;		//< function call result
 };
 
-
 ///\class TransactionFunctionMap
 ///\brief Map of available transaction functions
 class TransactionFunctionMap
@@ -327,6 +326,54 @@ public:
 private:
 	std::map<std::string,TransactionFunctionR> m_map;
 };
+
+
+///\class PrintFunctionClosure
+///\brief Closure with calling state of called PrintFunction
+class PrintFunctionClosure
+{
+public:
+	///\brief Constructor
+	///\param[in] f function called
+	PrintFunctionClosure( const prnt::PrintFunctionR& f);
+
+	///\brief Copy constructor
+	///\param[in] o copied item
+	PrintFunctionClosure( const PrintFunctionClosure& o);
+
+	///\brief Calls the transaction function with the input from the input filter specified
+	///\return true when completed
+	bool call();
+
+	///\brief Initialization of call context for a new call
+	///\param[in] i call input
+	void init( const TypedInputFilterR& i);
+
+	std::string result() const			{return m_result;}
+
+private:
+	prnt::PrintFunctionR m_func;			//< function to execute
+	int m_state;					//< current state of call
+	RedirectFilterClosure m_input;			//< builder of structure from input
+	prnt::PrintFunction::InputR m_inputstruct;	//< input structure
+	std::string m_result;				//< function call result
+};
+
+///\class PrintFunctionMap
+///\brief Map of available printing functions (e.g. document structure to PDF,PS, etc.)
+class PrintFunctionMap
+{
+public:
+	PrintFunctionMap(){}
+	~PrintFunctionMap(){}
+
+	void definePrintFunction( const std::string& name, const prnt::PrintFunctionR& f);
+	bool getPrintFunction( const std::string& name, prnt::PrintFunctionR& rt) const;
+
+private:
+	std::map<std::string,prnt::PrintFunctionR> m_map;
+};
+
 
 ///\class PreparedStatementHandlerMap
 ///\brief Map of available prepared statement handler for a database
