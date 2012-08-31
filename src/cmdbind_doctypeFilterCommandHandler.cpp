@@ -138,7 +138,7 @@ void DoctypeFilterCommandHandler::getDataLeft( const void*& begin, std::size_t& 
 		m_inputbuffer.append( m_input.charptr() + pos, m_input.pos() - pos);
 		m_state = Done;
 	}
-	begin = (void*)m_inputbuffer.c_str();
+	begin = (const void*)m_inputbuffer.c_str();
 	nofBytes = m_inputbuffer.size();
 }
 

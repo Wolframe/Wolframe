@@ -40,11 +40,13 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 # -Wundef: gcc warning is violating the standard, not using it
 # -Wvariadic-macros: set -Wno-variadic-macros; troubles gtest, which is happilly
 #  mixing C99 and C++98 features, let's hope c++0 sorts this out
+# -Wmissing-return: functions returning and throwing exceptions are no longer
+#  possible, this is an annoying feature!
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
-	-g -O0 \
-	-fstrict-aliasing \
+	-g -O3 -Werror \
+	-fstrict-aliasing -Wstrict-aliasing=2 \
 	-pedantic -Wall \
 	-Wno-long-long \
 	-Wunused -Wno-import \
@@ -53,7 +55,6 @@ COMMON_COMPILE_FLAGS = \
 	-Wshadow -Wpointer-arith \
 	-Wcast-qual -Wcast-align \
 	-Wwrite-strings \
-	-Wmissing-noreturn \
 	-Wno-multichar -Wparentheses -Wredundant-decls \
 	-Wdisabled-optimization
 ifeq "$(GCC_MAJOR_VERSION)" "4"
