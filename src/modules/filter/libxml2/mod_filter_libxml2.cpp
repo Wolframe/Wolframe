@@ -70,6 +70,6 @@ static createBuilderFunc objdef[ NofObjects] =
 };
 
 
-ModuleEntryPoint entryPoint( 0, "libxml2 XML filter", setModuleLogger, 0, 0, NofObjects, objdef);
+WOLFRAME_DLLEXPORT ModuleEntryPoint entryPoint( 0, "libxml2 XML filter", setModuleLogger, 0, 0, NofObjects, objdef);
 
 
