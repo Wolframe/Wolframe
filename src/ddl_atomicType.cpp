@@ -212,7 +212,7 @@ bool AtomicType::assign_string( const std::string& val)
 {
 	try
 	{
-		std::size_t digits;
+		std::size_t digits = 0;
 		std::string::const_iterator itr = val.begin();
 		std::string::const_iterator end = val.end();
 
