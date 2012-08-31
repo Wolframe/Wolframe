@@ -29,40 +29,70 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/pdfPrinter.hpp
-///\brief Defines the prnt::PrintingInterface for an implementation based on libhpdf and some form definition
-#ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#define _Wolframe_PRNT_SIMPLE_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#include "prnt/printingInterface.hpp"
-#include "types/countedReference.hpp"
+///\file prnt/pdfPrinterExpression.hpp
+///\brief Defines expressions to express variable assignements in simple PDF printing document descriptions
+#ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_EXPRESSION_HPP_INCLUDED
+#define _Wolframe_PRNT_SIMPLE_PDF_PRINT_EXPRESSION_HPP_INCLUDED
+#include "prnt/pdfPrinterMethod.hpp"
+#include "prnt/pdfPrinterVariable.hpp"
 #include <string>
+#include <map>
+#include <vector>
+#include <cstdlib>
 
 namespace _Wolframe {
 namespace prnt {
 
-///\class SimplePdfPrintFunction
-///\brief Implementaion of a PrintFunction for printing PDFs with libhpdf and a simple document description
-class SimplePdfPrintFunction :public PrintFunction
+class Expression
 {
 public:
-	///\brief Constructor
-	///\param[in] description Source of the document print description
-	SimplePdfPrintFunction( const std::string& description);
-	///\brief Destructor
-	virtual ~SimplePdfPrintFunction(){}
+	void push_operator( char chr);
+	void push_value( std::size_t idx);
+	void push_variable( std::size_t idx);
+	void push_expression( const Expression& expr);
 
-	virtual InputR getInput() const;
-	virtual ResultR execute( const Input* i) const;
+	std::size_t size() const		{return m_ar.size();}
 
-public:
-	struct SimplePdfPrintFunctionImpl;
+#if 0
+	void evaluate_expression( VariableScope& vs, const std::string& exprstrings) const;
+#endif
+
 private:
-	SimplePdfPrintFunctionImpl* m_impl;
+	struct Item
+	{
+		enum Type {Variable,Value,Operator};
+		Type m_type;
+		union
+		{
+			std::size_t m_idx;
+			char m_opchr;
+		} value;
+	};
+
+private:
+	std::vector<Item> m_ar;
 };
 
-///\param[in] src form description source
-PrintFunctionR createSimplePdfPrintFunction( const std::string& description);
 
-}}//namespace
+struct StateDef
+{
+	StateDef(){}
+
+	StateDef( const StateDef& o)
+		:m_expr(o.m_expr)
+		,m_call(o.m_call){}
+
+	void parse( std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
+
+	struct MethodCall
+	{
+		Method m_method;
+		Expression m_param;
+	};
+	Expression m_expr;
+	std::vector<MethodCall> m_call;
+};
+
+}}
 #endif
 

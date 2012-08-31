@@ -106,6 +106,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	ddl_compilerInterface.o \
 	ddl_compiler_simpleFormCompiler.o \
 	database_processor.o \
+	prnt_pdfPrinterVariable.o \
+	prnt_pdfPrinterMethod.o \
+	prnt_pdfPrinterExpression.o \
+	prnt_pdfPrinterDocument_libhpdf.o \
 	prnt_pdfPrinter.o \
 	types_allocators.o \
 	types_bcdArithmetic.o \

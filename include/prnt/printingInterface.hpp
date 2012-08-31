@@ -31,8 +31,8 @@ Project Wolframe.
 ************************************************************************/
 ///\file prnt/PrintingInterface.hpp
 ///\brief Defines the interface for printing structures to a string of printable format (e.g. PDF)
-#ifndef _Wolframe_PRNT_PRINTER_INTERFACE_HPP_INCLUDED
-#define _Wolframe_PRNT_PRINTER_INTERFACE_HPP_INCLUDED
+#ifndef _Wolframe_PRNT_PRINT_FUNCTION_HPP_INCLUDED
+#define _Wolframe_PRNT_PRINT_FUNCTION_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "types/countedReference.hpp"
 #include <string>
@@ -40,33 +40,29 @@ Project Wolframe.
 namespace _Wolframe {
 namespace prnt {
 
-///\class PrintingInterface
+///\class PrintFunction
 ///\brief Interface for printing forms to a string of printable format (e.g. PDF)
-struct PrintingInterface
+struct PrintFunction
 {
+	typedef types::CountedReference<std::string> ResultR;
+	typedef langbind::TypedOutputFilter Input;
+	typedef types::CountedReference<Input> InputR;
+
 	///\brief Constructor
 	///\param[in] name name of the printing interface
-	explicit PrintingInterface( const std::string& name_) :m_name(name_) {}
+	explicit PrintFunction(){}
 	///\brief Destructor
-	virtual ~PrintingInterface(){}
+	virtual ~PrintFunction(){}
 
-	///\brief Prints a structure to a string
-	///\param[in] input input structure
-	///\return the printing output as string
-	virtual std::string print( const langbind::TypedInputFilterR& input) const=0;
-
-	///\brief Get the name of this printing interface
-	const std::string& name() const			{return m_name;}
-
-private:
-	std::string m_name;
+	virtual InputR getInput() const=0;
+	virtual ResultR execute( const Input* i) const=0;
 };
 
 ///\brief Reference to a printing interface
-typedef types::CountedReference<PrintingInterface> PrintingInterfaceR;
+typedef types::CountedReference<PrintFunction> PrintFunctionR;
 
 ///\param[in] src form description source
-typedef PrintingInterfaceR (*CreatePrintingInterfaceFunc)( const std::string& src);
+typedef PrintFunctionR (*CreatePrintFunction)( const std::string& src);
 
 }}//namespace
 #endif

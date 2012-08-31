@@ -49,28 +49,16 @@
 namespace textwolf {
 
 ///\brief XML path select template
-///\tparam InputIterator input iterator with ++ and read only * returning 0 als last character of the input
-///\tparam InputCharSet_ character set encoding of the input, read as stream of bytes
-///\tparam OutputCharSet_ character set encoding of the output, printed as string of the item type of the character set,
-///\tparam OutputBuffer_ buffer for output with STL back insertion sequence interface (e.g. std::string,std::vector<char>,textwolf::StaticBuffer)
-template <
-		class InputIterator,
-		class InputCharSet_,
-		class OutputCharSet_,
-		class OutputBuffer_
->
+///\tparam CharSet_ character set encoding of the automaton elements
+template <class CharSet_>
 class XMLPathSelect :public throws_exception
 {
 public:
-	typedef OutputBuffer_ OutputBuffer;
-	typedef XMLPathSelectAutomaton<OutputCharSet_> ThisXMLPathSelectAutomaton;
-	typedef XMLScanner<InputIterator,InputCharSet_,OutputCharSet_,OutputBuffer> ThisXMLScanner;
-	typedef XMLPathSelect<InputIterator,InputCharSet_,OutputCharSet_,OutputBuffer> ThisXMLPathSelect;
-	typedef std::map<const char*,UChar> EntityMap;
+	typedef XMLPathSelectAutomaton<CharSet_> ThisXMLPathSelectAutomaton;
+	typedef XMLPathSelect<CharSet_> ThisXMLPathSelect;
 
 private:
-	ThisXMLScanner scan;				//< XML Scanner for fetching elements for the automaton input
-	const ThisXMLPathSelectAutomaton* atm;		//< XML select automaton used
+	const ThisXMLPathSelectAutomaton* atm;		//< XML select automaton
 	typedef typename ThisXMLPathSelectAutomaton::Mask Mask;
 	typedef typename ThisXMLPathSelectAutomaton::Token Token;
 	typedef typename ThisXMLPathSelectAutomaton::Hash Hash;
@@ -378,118 +366,30 @@ private:
 public:
 	///\brief Constructor
 	///\param[in] p_atm read only ML path select automaton reference
-	///\param[in] p_src source input iterator to process
-	///\param[in] obuf reference to buffer to use for the output elements (STL back insertion sequence interface)
-	///\param[in] entityMap read only map of named entities to expand
-	XMLPathSelect( const ThisXMLPathSelectAutomaton* p_atm, InputIterator& p_src, const EntityMap& entityMap)
-		:scan(p_src,entityMap),atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),triggers(p_atm->maxTriggers),tokens(p_atm->maxTokens)
-	{
-		if (atm->states.size() > 0) expand(0);
-	}
-	///\brief Constructor
-	///\param[in] p_atm read only ML path select automaton reference
-	///\param[in] obuf reference to buffer to use for the output elements (STL back insertion sequence interface)
-	///\param[in] entityMap read only map of named entities to expand
-	XMLPathSelect( const ThisXMLPathSelectAutomaton* p_atm, const EntityMap& entityMap)
-		:scan(entityMap),atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),triggers(p_atm->maxTriggers),tokens(p_atm->maxTokens)
-	{
-		if (atm->states.size() > 0) expand(0);
-	}
-	///\brief Constructor
-	///\param[in] p_atm read only ML path select automaton reference
-	///\param[in] p_src source input iterator to process
-	XMLPathSelect( const ThisXMLPathSelectAutomaton* p_atm, InputIterator& p_src)
-		:scan(p_src),atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),triggers(p_atm->maxTriggers),tokens(p_atm->maxTokens)
-	{
-		if (atm->states.size() > 0) expand(0);
-	}
-	///\brief Constructor
-	///\param[in] p_atm read only ML path select automaton reference
 	XMLPathSelect( const ThisXMLPathSelectAutomaton* p_atm)
 		:atm(p_atm),scopestk(p_atm->maxScopeStackSize),follows(p_atm->maxFollows),triggers(p_atm->maxTriggers),tokens(p_atm->maxTokens)
 	{
 		if (atm->states.size() > 0) expand(0);
 	}
+
 	///\brief Copy constructor
 	///\param [in] o element to copy
 	XMLPathSelect( const XMLPathSelect& o)
-		:scan(o.scan),atm(o.atm),scopestk(o.maxScopeStackSize),follows(o.maxFollows),follows(o.maxTriggers),tokens(o.maxTokens){}
-
-	///\brief Assign something to the source iterator while keeping the state
-	///\param [in] a source iterator assignment
-	template <class IteratorAssignment>
-	void setSource( const IteratorAssignment& a)
-	{
-		scan.setSource( a);
-	}
-
-	///\brief Get the current source iterator position
-	///\return source iterator position in character words (usually bytes)
-	std::size_t getPosition() const
-	{
-		return scan.getPosition();
-	}
-
-	///\brief Set the tokenization behaviour
-	///\param [out] v the tokenization behaviour flag
-	void doTokenize( bool v)
-	{
-		scan.doTokenize(v);
-	}
-
-	///\class End
-	///\brief end of input iterator for the output of this XMLScanner
-	struct End {};
+		:atm(o.atm),scopestk(o.scopestk),follows(o.follows),triggers(o.triggers),tokens(o.tokens){}
 
 	///\class iterator
 	///\brief input iterator for the output of this XMLScanner
 	class iterator
 	{
 	public:
-		///\class Element
-		///\brief visited current element data of the iterator
-		class Element
-		{
-		public:
-			///\class State
-			///\brief state of the iterator
-			enum State
-			{
-				Ok,			//< normal
-				EndOfInput,		//< end of input triggered
-				ErrorState		//< error occurred (identifier as string is in the output token buffer)
-			};
-
-			///\brief Constructor
-			Element()				:m_state(Ok),m_type(0),m_content(0),m_size(0) {}
-			///\brief Constructor for content end iterator
-			Element( const End&)			:m_state(EndOfInput),m_type(0),m_content(0),m_size(0) {}
-			///\brief Copy constructor
-			///\param [in] orig element to copy
-			Element( const Element& orig)		:m_state(orig.m_state),m_type(orig.m_type),m_content(orig.m_content),m_size(orig.m_size) {}
-			///\brief Get the iterator state
-			State state() const			{return m_state;}
-			///\brief Get the currently visited element type
-			int type() const			{return m_type;}
-			///\brief Get the currently visited element content
-			const char* content() const		{return m_content;}
-			///\brief Get the size of the content of the currently visited element in bytes
-			unsigned int size() const		{return m_size;}
-		private:
-			friend class iterator;			//< friend to intialize the elements
-			State m_state;				//< current state
-			int m_type;				//< currently visited element type
-			const char* m_content;			//< currently visited element content
-			unsigned int m_size;			//< size of the content of the currently visited element in bytes
-		};
-		typedef Element value_type;
+		typedef int value_type;
 		typedef std::size_t difference_type;
-		typedef Element* pointer;
-		typedef Element& reference;
+		typedef int* pointer;
+		typedef int& reference;
 		typedef std::input_iterator_tag iterator_category;
 
 	private:
-		Element element;				//< currently visited element
+		int element;					//< currently visited element (type)
 		ThisXMLPathSelect* input;			//< producing XML path selection stream
 
 		///\brief Skip to next element
@@ -498,48 +398,23 @@ public:
 		{
 			if (input != 0)
 			{
-				do
-				{
-					if (!input->context.key)
-					{
-						XMLScannerBase::ElementType et = input->scan.nextItem( input->context.scope.mask.pos);
-						if (et == XMLScannerBase::Exit)
-						{
-							if (input->scopestk.size() == 0)
-							{
-								element.m_state = Element::EndOfInput;
-							}
-							else
-							{
-								element.m_state = Element::ErrorState;
-								element.m_content = XMLScannerBase::getErrorString( XMLScannerBase::ErrUnexpectedEndOfInput);
-							}
-							return *this;
-						}
-						if (et == XMLScannerBase::ErrorOccurred)
-						{
-							input->scan.getError( &element.m_content);
-							element.m_state = Element::ErrorState;
-							return *this;
-						}
-						input->initProcessElement( et, input->scan.getItem(), input->scan.getItemSize());
-					}
-					element.m_type = input->fetch();
-
-				} while (element.m_type == 0);
-
-				element.m_content = input->context.key;
-				element.m_size = input->context.keysize;
+				element = input->fetch();
+			}
+			else
+			{
+				element = 0;
 			}
 			return *this;
 		}
+
 		///\brief Iterator compare
 		///\param [in] iter iterator to compare with
 		///\return true, if the elements are equal
 		bool compare( const iterator& iter) const
 		{
-			return (element.state() != Element::Ok && iter.element.state() != Element::Ok);
+			return (element == iter.element);
 		}
+
 	public:
 		///\brief Assign iterator
 		///\param [in] orig iterator to copy
@@ -558,19 +433,17 @@ public:
 
 		///\brief Constructor by values
 		///\param [in] p_input XML path selection stream to iterate through
-		///\param [in] skipToFirst true, if the iterator should skip to the first character of the input (default behaviour of STL conform iterators but maybe not exception save)
-		iterator( ThisXMLPathSelect& p_input, bool skipToFirst=true)
+		iterator( ThisXMLPathSelect& p_input, XMLScannerBase::ElementType type, const char* key, int keysize)
 				:input( &p_input)
 		{
-			if (skipToFirst) skip();
+			input->initProcessElement( type, key, keysize);
+			skip();
 		}
 
 		///\brief Constructor
 		///\param [in] et end of input tag
-		iterator( const End& et)	:element(et),input(0) {}
-
-		///\brief Constructor
-		iterator()			:input(0) {}
+		iterator()
+			:element(0),input(0) {}
 
 		///\brief Assignement
 		///\param [in] orig iterator to copy
@@ -583,14 +456,14 @@ public:
 
 		///\brief Element acceess
 		///\return read only element reference
-		const Element& operator*()
+		int operator*() const
 		{
 			return element;
 		}
 
 		///\brief Element acceess
 		///\return read only element reference
-		const Element* operator->()
+		const int* operator->() const
 		{
 			return &element;
 		}
@@ -614,16 +487,16 @@ public:
 
 	///\brief Get the start iterator
 	///\return iterator pointing to the first of the selected XML path elements
-	iterator begin( bool skipToFirst=true)
+	iterator find( XMLScannerBase::ElementType type, const char* key, int keysize)
 	{
-		return iterator( *this, skipToFirst);
+		return iterator( *this, type, key, keysize);
 	}
 
 	///\brief Get the end of content marker
 	///\return iterator as end of content marker
 	iterator end()
 	{
-		return iterator( End());
+		return iterator();
 	}
 };
 

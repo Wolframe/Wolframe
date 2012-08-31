@@ -116,6 +116,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	ddl_structType.obj \
 	ddl_structTypeBuild.obj \
 	database_processor.obj \
+	prnt_pdfPrinterVariable.obj \
+	prnt_pdfPrinterMethod.obj \
+	prnt_pdfPrinterExpression.obj \
+	prnt_pdfPrinterDocument_libhpdf.obj \
 	prnt_pdfPrinter.obj \
 	acceptor.obj \
 	connection.obj \

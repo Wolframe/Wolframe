@@ -29,40 +29,40 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/pdfPrinter.hpp
-///\brief Defines the prnt::PrintingInterface for an implementation based on libhpdf and some form definition
-#ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#define _Wolframe_PRNT_SIMPLE_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#include "prnt/printingInterface.hpp"
-#include "types/countedReference.hpp"
-#include <string>
+///\file prnt_pdfPrinterMethod.cpp
+#include "prnt/pdfPrinterMethod.hpp"
+#include <stdexcept>
 
-namespace _Wolframe {
-namespace prnt {
+using namespace _Wolframe;
+using namespace _Wolframe::prnt;
 
-///\class SimplePdfPrintFunction
-///\brief Implementaion of a PrintFunction for printing PDFs with libhpdf and a simple document description
-class SimplePdfPrintFunction :public PrintFunction
+const char* _Wolframe::prnt::methodName( Method m)
 {
-public:
-	///\brief Constructor
-	///\param[in] description Source of the document print description
-	SimplePdfPrintFunction( const std::string& description);
-	///\brief Destructor
-	virtual ~SimplePdfPrintFunction(){}
+	static const char* ar[] = {
+		"Move",
+		"PrintText",
+		0};
+	return ar[ (int)m];
+}
 
-	virtual InputR getInput() const;
-	virtual ResultR execute( const Input* i) const;
-
-public:
-	struct SimplePdfPrintFunctionImpl;
-private:
-	SimplePdfPrintFunctionImpl* m_impl;
+namespace {
+struct MethodnameMap :public std::map <std::string, std::size_t>
+{
+	MethodnameMap()
+	{
+		for (std::size_t ii=0; methodName( (Method)ii); ++ii)
+		{
+			(*this)[ methodName( (Method)ii)] = ii;
+		}
+	}
 };
+}//anonymous namespace
 
-///\param[in] src form description source
-PrintFunctionR createSimplePdfPrintFunction( const std::string& description);
+std::map <std::string, std::size_t>* _Wolframe::prnt::getMethodnameMap()
+{
+	static MethodnameMap rt;
+	return &rt;
+}
 
-}}//namespace
-#endif
+
 

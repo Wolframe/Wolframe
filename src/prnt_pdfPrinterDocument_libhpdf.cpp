@@ -29,40 +29,13 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/pdfPrinter.hpp
-///\brief Defines the prnt::PrintingInterface for an implementation based on libhpdf and some form definition
-#ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#define _Wolframe_PRNT_SIMPLE_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#include "prnt/printingInterface.hpp"
-#include "types/countedReference.hpp"
-#include <string>
+///\file prnt_pdfPrinterDocument_libhpdf.cpp
+#include "prnt/pdfPrinterDocument.hpp"
 
-namespace _Wolframe {
-namespace prnt {
+using namespace _Wolframe;
+using namespace _Wolframe::prnt;
 
-///\class SimplePdfPrintFunction
-///\brief Implementaion of a PrintFunction for printing PDFs with libhpdf and a simple document description
-class SimplePdfPrintFunction :public PrintFunction
-{
-public:
-	///\brief Constructor
-	///\param[in] description Source of the document print description
-	SimplePdfPrintFunction( const std::string& description);
-	///\brief Destructor
-	virtual ~SimplePdfPrintFunction(){}
-
-	virtual InputR getInput() const;
-	virtual ResultR execute( const Input* i) const;
-
-public:
-	struct SimplePdfPrintFunctionImpl;
-private:
-	SimplePdfPrintFunctionImpl* m_impl;
-};
-
-///\param[in] src form description source
-PrintFunctionR createSimplePdfPrintFunction( const std::string& description);
-
-}}//namespace
-#endif
+Document::Document(){}
+Document::~Document(){}
+void Document::execute( Method , const VariableScope& ){}
 

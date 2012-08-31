@@ -123,7 +123,7 @@ bool fetchObjectVectorElement( FetchElement fetchElement, const void* ve, Contex
 template <typename TYPE>
 static bool fetchObject_( const traits::vector_&, Context& ctx, FiltermapSerializeStateStack& stk)
 {
-	std::vector<typename TYPE::value_type>* obj = (TYPE*)stk.back().value();
+	const std::vector<typename TYPE::value_type>* obj = (const TYPE*)stk.back().value();
 	std::size_t idx = stk.back().state();
 	if (idx >= obj->size())
 	{
