@@ -162,7 +162,7 @@ const std::string Structure::tostring() const
 		--stk.back().first;
 		if (ii>0)
 		{
-			Node* cd = &m_nodemem[ mi + ii - 1];
+			const Node* cd = &m_nodemem[ mi + ii - 1];
 			if (cd->valueidx())
 			{
 				std::size_t indent = stk.size() -1;
@@ -260,7 +260,7 @@ void Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
 	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
 	if (nn)
 	{
-		Node* cd = &m_nodemem[ idx];
+		const Node* cd = &m_nodemem[ idx];
 		for (; ii<nn; ++ii)
 		{
 			if (cd[ii].m_tag)
@@ -279,7 +279,7 @@ void Structure::find( const Node& nd, int tag, std::vector<Node>& findnd) const
 	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
 	if (nn)
 	{
-		Node* cd = &m_nodemem[ idx];
+		const Node* cd = &m_nodemem[ idx];
 		for (; ii<nn; ++ii)
 		{
 			if (cd[ii].m_tag)
@@ -321,7 +321,7 @@ const char* Structure::nodevalue( const Node& nd) const
 	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
 	if (nn)
 	{
-		Node* cd = &m_nodemem[ idx];
+		const Node* cd = &m_nodemem[ idx];
 		for (; ii<nn; ++ii)
 		{
 			if (!cd[ii].m_tag)
