@@ -18,6 +18,9 @@ ifeq "$(COMPILER)" "gcc"
 GCC_MAJOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-major-version $(CC) "$(CURDIR)" $(TOPDIR))
 GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-version $(CC) "$(CURDIR)" $(TOPDIR))
 
+# optimization flags
+OPTFLAGS ?= -g -O2
+
 # -Werror: troubles Qt in qvector2d.h
 # -Wswitch-default: not good for switches with enums
 # -Wsystem-headers: bad idea, as header files are usually happily broken :-)
@@ -45,7 +48,7 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
-	-g -O0 \
+	$(OPTFLAGS) \
 	-fstrict-aliasing -Wstrict-aliasing=2 \
 	-pedantic -Wall \
 	-Wno-long-long \
