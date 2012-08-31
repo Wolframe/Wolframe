@@ -328,6 +328,25 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 			return;
 		}
 	}
+	{
+		prnt::PrintFunctionR func;
+		if (gc->getPrintFunction( proc, func))
+		{
+			flt.inputfilter()->setValue( "empty", "false");
+			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
+			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
+			PrintFunctionClosure closure( func);
+			closure.init( inp);
+
+			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+
+			std::string result = closure.result();
+			os.write( result.c_str(), result.size());
+
+			checkUnconsumedInput( is, *flt.inputfilter());
+			return;
+		}
+	}
 	throw std::runtime_error( "command not found");
 }
 

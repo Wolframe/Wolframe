@@ -414,7 +414,6 @@ void TransactionFunctionClosure::init( const TypedInputFilterR& i)
 	m_state = 1;
 }
 
-
 void TransactionFunctionMap::defineTransactionFunction( const std::string& name, const TransactionFunctionR& f)
 {
 	defineObject( m_map, name, f);
@@ -424,6 +423,55 @@ bool TransactionFunctionMap::getTransactionFunction( const std::string& name, Tr
 {
 	return getObject( m_map, name, rt);
 }
+
+
+PrintFunctionClosure::PrintFunctionClosure( const prnt::PrintFunctionR& f)
+	:m_func(f)
+	,m_state(0)
+	,m_inputstruct(f->getInput()){}
+
+PrintFunctionClosure::PrintFunctionClosure( const PrintFunctionClosure& o)
+	:m_func(o.m_func)
+	,m_state(o.m_state)
+	,m_input(o.m_input)
+	,m_inputstruct(o.m_inputstruct)
+	,m_result(o.m_result){}
+
+bool PrintFunctionClosure::call()
+{
+	switch (m_state)
+	{
+		case 0:
+			throw std::runtime_error( "input not initialized");
+		case 1:
+			if (!m_input.call()) return false;
+			m_state = 2;
+		case 2:
+			m_result = m_func->execute( m_inputstruct.get());
+			m_state = 3;
+			return true;
+		default:
+			return true;
+	}
+}
+
+void PrintFunctionClosure::init( const TypedInputFilterR& i)
+{
+	m_inputstruct = m_func->getInput();
+	m_input.init( i, m_inputstruct);
+	m_state = 1;
+}
+
+void PrintFunctionMap::definePrintFunction( const std::string& name, const prnt::PrintFunctionR& f)
+{
+	defineObject( m_map, name, f);
+}
+
+bool PrintFunctionMap::getPrintFunction( const std::string& name, prnt::PrintFunctionR& rt) const
+{
+	return getObject( m_map, name, rt);
+}
+
 
 void PreparedStatementHandlerMap::definePreparedStatementHandler( const std::string& name, const std::string& dbname, db::CreatePreparedStatementHandlerFunc f)
 {

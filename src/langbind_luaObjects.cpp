@@ -77,6 +77,7 @@ namespace luaname
 	static const char* TypedInputFilterClosure = "wolframe.TypedInputFilterClosure";
 	static const char* FormFunctionClosure = "wolframe.FormFunctionClosure";
 	static const char* TransactionFunctionClosure = "wolframe.TransactionFunctionClosure";
+	static const char* PrintFunctionClosure = "wolframe.PrintFunctionClosure";
 	static const char* StructSerializer = "wolframe.StructSerializer";
 }
 
@@ -98,6 +99,7 @@ template <> const char* metaTableName<TypedInputFilterR>()		{return luaname::Typ
 template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
 template <> const char* metaTableName<FormFunctionClosure>()		{return luaname::FormFunctionClosure;}
 template <> const char* metaTableName<TransactionFunctionClosure>()	{return luaname::TransactionFunctionClosure;}
+template <> const char* metaTableName<PrintFunctionClosure>()		{return luaname::PrintFunctionClosure;}
 template <> const char* metaTableName<serialize::StructSerializer>()	{return luaname::StructSerializer;}
 }//anonymous namespace
 
@@ -826,7 +828,7 @@ LUA_FUNCTION_THROWS( "<formfunction>(..)", function_formfunction_call)
 	return 1;
 }
 
-LUA_FUNCTION_THROWS( "<transaction>(..)", function_transactionfunction_call)
+LUA_FUNCTION_THROWS( "<formfunction>(..)", function_transactionfunction_call)
 {
 	TransactionFunctionClosure* closure = LuaObject<TransactionFunctionClosure>::get( ls, lua_upvalueindex( 1));
 	int ctx;
@@ -851,6 +853,34 @@ LUA_FUNCTION_THROWS( "<transaction>(..)", function_transactionfunction_call)
 	return 1;
 }
 
+LUA_FUNCTION_THROWS( "<formfunction>(..)", function_printfunction_call)
+{
+	PrintFunctionClosure* closure = LuaObject<PrintFunctionClosure>::get( ls, lua_upvalueindex( 1));
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		if (lua_gettop( ls) != 1)
+		{
+			throw std::runtime_error( "one argument expected");
+		}
+		else
+		{
+			TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
+			closure->init( inp);
+		}
+		lua_pushvalue( ls, 1);		//... iterator argument (table, generator function, etc.)
+	}
+	if (!closure->call())
+	{
+		lua_yieldk( ls, 0, 1, function_printfunction_call);
+	}
+	std::string result = closure->result();
+	{
+		LuaExceptionHandlerScope escope(ls);
+		lua_pushlstring( ls, result.c_str(), result.size());
+	}
+	return 1;
+}
 
 LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 {
@@ -863,6 +893,8 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 		throw std::runtime_error( "lost global context");
 	}
 	FormFunction ff;
+	TransactionFunctionR tf;
+	prnt::PrintFunctionR pf;
 
 	if (ctx->getFormFunction( name, ff))
 	{
@@ -870,33 +902,21 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 		lua_pushcclosure( ls, function_formfunction_call, 1);
 		return 1;
 	}
-	else
-	{
-		throw std::runtime_error( "form function not found");
-	}
-}
-
-LUA_FUNCTION_THROWS( "transaction(..)", function_transaction)
-{
-	check_parameters( ls, 0, 1, LUA_TSTRING);
-
-	const char* name = lua_tostring( ls, 1);
-	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
-	if (!ctx)
-	{
-		throw std::runtime_error( "lost global context");
-	}
-	TransactionFunctionR tf;
-
-	if (ctx->getTransactionFunction( name, tf))
+	else if (ctx->getTransactionFunction( name, tf))
 	{
 		LuaObject<TransactionFunctionClosure>::push_luastack( ls, TransactionFunctionClosure( tf));
 		lua_pushcclosure( ls, function_transactionfunction_call, 1);
 		return 1;
 	}
+	else if (ctx->getPrintFunction( name, pf))
+	{
+		LuaObject<PrintFunctionClosure>::push_luastack( ls, PrintFunctionClosure( pf));
+		lua_pushcclosure( ls, function_printfunction_call, 1);
+		return 1;
+	}
 	else
 	{
-		throw std::runtime_error( "transaction function not found");
+		throw std::runtime_error( "form function not found");
 	}
 }
 
@@ -1774,6 +1794,7 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			LuaObject<TypedInputFilterClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<FormFunctionClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<TransactionFunctionClosure>::createMetatable( ls, 0, 0, 0);
+			LuaObject<PrintFunctionClosure>::createMetatable( ls, 0, 0, 0);
 
 			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
 			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
@@ -1785,8 +1806,6 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			lua_setglobal( ls, "form");
 			lua_pushcfunction( ls, &function_formfunction);
 			lua_setglobal( ls, "formfunction");
-			lua_pushcfunction( ls, &function_transaction);
-			lua_setglobal( ls, "transaction");
 			lua_pushcfunction( ls, &function_scope);
 			lua_setglobal( ls, "scope");
 		}

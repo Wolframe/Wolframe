@@ -51,6 +51,7 @@ class GlobalContext
 	:public FilterMap
 	,public DDLFormMap
 	,public TransactionFunctionMap
+	,public PrintFunctionMap
 	,public PreparedStatementHandlerMap
 	,public DDLCompilerMap
 	,public FormFunctionMap

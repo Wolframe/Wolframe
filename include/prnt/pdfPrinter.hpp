@@ -52,7 +52,7 @@ public:
 	virtual ~SimplePdfPrintFunction(){}
 
 	virtual InputR getInput() const;
-	virtual ResultR execute( const Input* i) const;
+	virtual std::string execute( const Input* i) const;
 
 public:
 	struct SimplePdfPrintFunctionImpl;
