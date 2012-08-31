@@ -94,7 +94,7 @@ void LuaTableInputFilter::FetchState::getTagElement( TypedInputFilter::Element& 
 
 bool LuaTableInputFilter::getValue( int idx, TypedFilterBase::Element& element)
 {
-	const char* errelemtype;
+	const char* errelemtype = 0;
 	if (!getElementValue( m_ls, idx, element, errelemtype))
 	{
 		std::ostringstream msg;
