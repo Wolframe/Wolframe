@@ -146,7 +146,7 @@ SimplePdfPrintFunction::SimplePdfPrintFunction( const std::string& description)
 
 
 
-class PrintInput :public PrintFunction::Input
+class PrintInput :public langbind::TypedOutputFilter
 {
 public:
 	PrintInput( const SimplePdfPrintFunction::SimplePdfPrintFunctionImpl* func)
@@ -214,6 +214,12 @@ public:
 		m_lasttype = type;
 		return true;
 	}
+
+	const Document& document() const
+	{
+		return m_document;
+	}
+
 private:
 	Document m_document;
 	VariableScope m_variableScope;
@@ -228,9 +234,11 @@ PrintFunction::InputR SimplePdfPrintFunction::getInput() const
 	return rt;
 }
 
-PrintFunction::ResultR SimplePdfPrintFunction::execute( const Input*) const
+PrintFunction::ResultR SimplePdfPrintFunction::execute( const Input* input_) const
 {
-	PrintFunction::ResultR rt;
+	const PrintInput* input = dynamic_cast<const PrintInput*>( input_);
+	if (!input) throw std::runtime_error( "calling print pdf with incompatible input");
+	PrintFunction::ResultR rt( new std::string( input->document().tostring()));
 	return rt;
 }
 
