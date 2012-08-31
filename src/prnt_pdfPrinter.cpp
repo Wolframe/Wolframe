@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file prnt_pdfPrinter.hpp
-///\brief Implements the prnt::PrintingInterface base on libhpdf and some form definition
+///\brief Implements the prnt::PrintFunction base on libhpdf
 #include "prnt/pdfPrinter.hpp"
 #include "prnt/pdfPrinterVariable.hpp"
 #include "prnt/pdfPrinterMethod.hpp"

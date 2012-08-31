@@ -30,10 +30,10 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file prnt/pdfPrinter.hpp
-///\brief Defines the prnt::PrintingInterface for an implementation based on libhpdf and some form definition
+///\brief Defines a prnt::PrintFunction implementation based on libhpdf with a simple document description
 #ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_FUNCTION_HPP_INCLUDED
 #define _Wolframe_PRNT_SIMPLE_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#include "prnt/printingInterface.hpp"
+#include "prnt/printFunction.hpp"
 #include "types/countedReference.hpp"
 #include <string>
 
@@ -41,7 +41,7 @@ namespace _Wolframe {
 namespace prnt {
 
 ///\class SimplePdfPrintFunction
-///\brief Implementaion of a PrintFunction for printing PDFs with libhpdf and a simple document description
+///\brief Implementaion of a PrintFunction for printing PDFs with libhpdf with a simple document description
 class SimplePdfPrintFunction :public PrintFunction
 {
 public:

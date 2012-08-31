@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt/PrintingInterface.hpp
+///\file prnt/printFunction.hpp
 ///\brief Defines the interface for printing structures to a string of printable format (e.g. PDF)
 #ifndef _Wolframe_PRNT_PRINT_FUNCTION_HPP_INCLUDED
 #define _Wolframe_PRNT_PRINT_FUNCTION_HPP_INCLUDED
