@@ -54,6 +54,7 @@ public:
 	virtual InputR getInput() const;
 	virtual std::string execute( const Input* i) const;
 
+	virtual std::string tostring() const;
 public:
 	struct SimplePdfPrintFunctionImpl;
 private:

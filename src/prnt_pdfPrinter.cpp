@@ -135,6 +135,10 @@ public:
 	const std::string& exprstrings() const			{return m_exprstrings;}
 	const XMLPathSelectAutomatonParser& parser() const	{return m_parser;}
 
+	std::string tostring() const
+	{
+		return std::string();
+	}
 private:
 	XMLPathSelectAutomatonParser m_parser;
 	std::vector<StateDef> m_statedef;
@@ -239,6 +243,11 @@ std::string SimplePdfPrintFunction::execute( const Input* input_) const
 	const PrintInput* input = dynamic_cast<const PrintInput*>( input_);
 	if (!input) throw std::runtime_error( "calling print pdf with incompatible input");
 	return input->document().tostring();
+}
+
+std::string SimplePdfPrintFunction::tostring() const
+{
+	return m_impl->tostring();
 }
 
 PrintFunctionR _Wolframe::prnt::createSimplePdfPrintFunction( const std::string& description)

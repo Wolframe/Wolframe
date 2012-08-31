@@ -49,8 +49,6 @@ struct Document
 	std::string tostring() const;
 };
 
-
-
 }}
 #endif
 

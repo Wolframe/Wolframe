@@ -55,6 +55,8 @@ struct PrintFunction
 
 	virtual InputR getInput() const=0;
 	virtual std::string execute( const Input* i) const=0;
+
+	virtual std::string tostring() const=0;
 };
 
 ///\brief Reference to a printing interface

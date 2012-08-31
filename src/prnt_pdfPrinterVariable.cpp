@@ -40,7 +40,10 @@ using namespace _Wolframe::prnt;
 const char* _Wolframe::prnt::variableName( Variable v)
 {
 	static const char* ar[] = {
-		"Position",
+		"Index",
+		"Value",
+		"PositionX",
+		"PositionY",
 		"SizeX",
 		"SizeY",
 		0};

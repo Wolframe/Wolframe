@@ -42,7 +42,10 @@ namespace prnt {
 
 enum Variable
 {
-	Position,
+	Index,
+	Value,
+	PositionX,
+	PositionY,
 	SizeX,
 	SizeY
 };
