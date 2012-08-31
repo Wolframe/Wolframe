@@ -47,8 +47,13 @@ typedef  unsigned int        HPDF_UINT;
 
 /*  32bit integer types
  */
+#ifdef __GNUC__
+#define MAY_ALIAS __attribute__((__may_alias__))
+#else
+#define MAY_ALIAS
+#endif
 typedef  signed int          HPDF_INT32;
-typedef  unsigned int        HPDF_UINT32;
+typedef  unsigned int        MAY_ALIAS HPDF_UINT32;
 
 
 /*  16bit integer types
