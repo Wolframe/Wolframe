@@ -128,7 +128,7 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 				langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
 			rt = true;
 			stk.back().state( idx+1);
-			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (char*)obj + itr->second.ofs()));
+			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
 		}
 		else
 		{
@@ -138,7 +138,7 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 			rt = true;
 			stk.back().state( idx+1);
 			stk.push_back( FiltermapSerializeState( 0, &fetchCloseTag, itr->first.c_str()));
-			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (char*)obj + itr->second.ofs()));
+			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
 		}
 	}
 	else

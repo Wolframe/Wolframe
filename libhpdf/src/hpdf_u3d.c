@@ -41,6 +41,7 @@ static HPDF_STATUS Get3DStreamType (HPDF_Stream  stream, const char **type)
 	HPDF_PTRACE ((" HPDF_U3D_Get3DStreamType\n"));
 
 	len = 4;
+	*type = NULL;
 	if (HPDF_Stream_Read (stream, tag, &len) != HPDF_OK) {
 		return HPDF_Error_GetCode (stream->error);
 	}

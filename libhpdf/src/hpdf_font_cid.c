@@ -18,6 +18,9 @@
 #include "hpdf_conf.h"
 #include "hpdf_utils.h"
 #include "hpdf_font.h"
+#ifndef HPDF_UNUSED
+#define HPDF_UNUSED(a) ((void)(a))
+#endif
 
 static HPDF_Font
 CIDFontType0_New (HPDF_Font parent,
@@ -645,6 +648,8 @@ MeasureText  (HPDF_Font          font,
     HPDF_Encoder encoder = attr->encoder;
     HPDF_ParseText_Rec  parse_state;
     HPDF_INT dw2;
+
+    HPDF_UNUSED( last_btype );
 
     HPDF_PTRACE ((" HPDF_Type0Font_MeasureText\n"));
 
