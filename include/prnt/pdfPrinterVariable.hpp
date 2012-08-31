@@ -77,6 +77,10 @@ public:
 	void push();
 	void pop();
 
+	void push_marker( std::size_t mi)				{m_mrkar.back().push_back(mi);}
+	std::vector<std::size_t>::const_iterator begin_marker()	const	{return m_mrkar.back().begin();}
+	std::vector<std::size_t>::const_iterator end_marker() const	{return m_mrkar.back().end();}
+
 	void define( Variable var, const std::string& value);
 	void define( Variable var, double value);
 	void define( Variable var, Variable src);
@@ -91,6 +95,7 @@ private:
 	typedef std::map<std::size_t,std::size_t> Map;
 	std::vector<Map> m_ar;
 	std::vector<VariableValue> m_valuear;
+	std::vector<std::vector<std::size_t> > m_mrkar;
 	std::string m_strings;
 };
 
@@ -102,7 +107,7 @@ public:
 
 	void push( const std::string& value);
 	void push( double value);
-	void pop();
+	void pop( std::size_t nof=1);
 
 	VariableValue::Type type( std::size_t idx) const;
 	double asNumber( std::size_t idx) const;

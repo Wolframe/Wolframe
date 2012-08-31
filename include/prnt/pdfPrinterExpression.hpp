@@ -53,9 +53,7 @@ public:
 
 	std::size_t size() const		{return m_ar.size();}
 
-#if 0
-	void evaluate_expression( VariableScope& vs, const std::string& exprstrings) const;
-#endif
+	void evaluate( VariableScope& vs, const std::string& exprstrings) const;
 
 private:
 	struct Item

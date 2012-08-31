@@ -166,9 +166,17 @@ public:
 				m_variableScope.push();
 				break;
 			case langbind::TypedFilterBase::CloseTag:
+			{
 				xtype = textwolf::XMLScannerBase::CloseTag;
+				std::vector<std::size_t>::const_iterator mi = m_variableScope.begin_marker();
+				std::vector<std::size_t>::const_iterator me = m_variableScope.end_marker();
+				for (; mi != me; ++mi)
+				{
+					m_document.execute_leave( (Method)*mi);
+				}
 				m_variableScope.pop();
 				break;
+			}
 			case langbind::TypedFilterBase::Attribute:
 				xtype = textwolf::XMLScannerBase::TagAttribName;
 				break;
@@ -190,9 +198,17 @@ public:
 		{
 			if (*itr)
 			{
-				//[+]const StateDef* st =
-				m_func->statedef( *itr -1);
-
+				const StateDef* st = m_func->statedef( *itr -1);
+				st->m_expr.evaluate( m_variableScope, m_func->exprstrings());
+				std::vector<StateDef::MethodCall>::const_iterator ci = st->m_call.begin(), ce = st->m_call.end();
+				for (; ci != ce; ++ci)
+				{
+					m_variableScope.push();
+					ci->m_param.evaluate( m_variableScope, m_func->exprstrings());
+					m_document.execute_enter( ci->m_method, m_variableScope);
+					m_variableScope.pop();
+					m_variableScope.push_marker( (std::size_t)ci->m_method);
+				}
 			}
 		}
 		m_lasttype = type;

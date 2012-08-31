@@ -37,5 +37,7 @@ using namespace _Wolframe::prnt;
 
 Document::Document(){}
 Document::~Document(){}
-void Document::execute( Method , const VariableScope& ){}
+
+void Document::execute_enter( Method , const VariableScope&){}
+void Document::execute_leave( Method){}
 

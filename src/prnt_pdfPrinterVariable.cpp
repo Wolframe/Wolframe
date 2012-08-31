@@ -199,26 +199,26 @@ ValueStack::ValueStack()
 	m_strings.push_back( '\0');
 }
 
-void ValueStack::pop()
+void ValueStack::pop( std::size_t nof)
 {
-	m_valuear.pop_back();
+	while (nof--) m_valuear.pop_back();
 }
 
 VariableValue::Type ValueStack::type( std::size_t idx) const
 {
-	if (idx >= m_valuear.size()) throw std::logic_error("internal: too few operands for evaluating expression");
+	if (idx >= m_valuear.size()) throw std::logic_error("internal: too few elements on stack for required operation");
 	return m_valuear.at( m_valuear.size()-1-idx).type();
 }
 
 double ValueStack::asNumber( std::size_t idx) const
 {
-	if (idx >= m_valuear.size()) throw std::logic_error("internal: too few operands for evaluating expression");
+	if (idx >= m_valuear.size()) throw std::logic_error("internal: too few elements on stack for required operation");
 	return m_valuear.at( m_valuear.size()-1-idx).asNumber( m_strings);
 }
 
 std::string ValueStack::asString( std::size_t idx) const
 {
-	if (idx >= m_valuear.size()) throw std::logic_error("internal: too few operands for evaluating expression");
+	if (idx >= m_valuear.size()) throw std::logic_error("internal: too few elements on stack for required operation");
 	return m_valuear.at( m_valuear.size()-1-idx).asString( m_strings);
 }
 

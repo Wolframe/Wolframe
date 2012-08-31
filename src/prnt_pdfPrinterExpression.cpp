@@ -34,6 +34,9 @@ Project Wolframe.
 #include "prnt/pdfPrinterVariable.hpp"
 #include "utils/miscUtils.hpp"
 #include <stdexcept>
+#include <limits>
+
+using namespace std;
 
 using namespace _Wolframe;
 using namespace _Wolframe::prnt;
@@ -67,58 +70,106 @@ void Expression::push_expression( const Expression& expr)
 	m_ar.insert( m_ar.end(), expr.m_ar.begin(), expr.m_ar.end());
 }
 
-#if 0
-void Expression::evaluate_expression( VariableScope& vscope, const std::string& exprstrings) const
+void Expression::evaluate( VariableScope& vscope, const std::string& exprstrings) const
 {
 	ValueStack stk;
-	Variable assignvar;
+	double resultNumber;
+	double divisorNumber;
+	std::string resultString;
 
-	std::vector<Item>::const_iterator itr=m_ar.begin(), end=m_ar.end();
+	std::vector<Item>::const_iterator next,itr=m_ar.begin(), end=m_ar.end();
 	for (; itr != end; ++itr)
 	{
 		switch (itr->m_type)
 		{
-			case Variable:
-			case Value:
-				stkelem.item = *itr;
-				stk.push_back( stkelem);
-			break;
-			case Operator:
-				stkelem.item = *itr;
-				switch (itr->m_opchr)
+			case Item::Variable:
+				next = itr+1;
+				if (next != end && next->m_type == Item::Operator && next->value.m_opchr == '=')
+				{
+					// handle special case of variable on left side of assignment:
+					Variable var = (Variable)itr->value.m_idx;
+					switch (stk.type( 1))
+					{
+						case VariableValue::Number:
+							vscope.define( var, stk.asNumber( 1));
+							break;
+						case VariableValue::String:
+							vscope.define( var, stk.asString( 1));
+							break;
+					}
+					++itr;
+				}
+				else
+				{
+					// other variables are expanded:
+					Variable var = (Variable)itr->value.m_idx;
+					std::size_t idx = vscope.getValueIdx( var);
+					if (idx == 0) throw std::runtime_error( std::string( "variable not defined '") + variableName(var) + "'");
+					switch (vscope.getType( idx))
+					{
+						case VariableValue::Number:
+							stk.push( vscope.getNumber( idx));
+							break;
+						case VariableValue::String:
+							stk.push( vscope.getString( idx));
+							break;
+					}
+				}
+				break;
+
+			case Item::Value:
+				stk.push( std::string( exprstrings.c_str() + itr->value.m_idx));
+				break;
+
+			case Item::Operator:
+				switch (itr->value.m_opchr)
 				{
 					case  '=':
-						if (stk.size() < 2) throw std::logic_error("internal: binary operator '=' with too few operands");
-						StackElem* dest = &stk[ stk.size()-2];
-						StackElem* src = &stk[ stk.size()-1];
-						if (dest->m_type != Variable) throw std::logic_error("internal: assignment to non variable");
-						if (src->m_type == Variable)
-						{
-						}
+						throw std::logic_error("internal: assignement '=' with illegal operands");
 					break;
 					case  '~':
-						if (stk.size() < 1) throw std::logic_error("internal: unary operator '-' without operand");
+						resultNumber = - stk.asNumber( 1);
 					break;
 					case  '*':
-						if (stk.size() < 2) throw std::logic_error("internal: binary operator '=' with too few operands");
+						resultNumber = stk.asNumber( 0) * stk.asNumber( 1);
+						stk.pop( 2);
+						stk.push( resultNumber);
 					break;
 					case  '/':
-						if (stk.size() < 2) throw std::logic_error("internal: binary operator '=' with too few operands");
+						divisorNumber = stk.asNumber( 0);
+						if (divisorNumber < std::numeric_limits<double>::epsilon() && divisorNumber > -std::numeric_limits<double>::epsilon())
+						{
+							throw std::runtime_error( "division by zero");
+						}
+						else
+						{
+							resultNumber = stk.asNumber( 1) / divisorNumber;
+						}
+						stk.pop( 2);
+						stk.push( resultNumber);
 					break;
 					case  '+':
-						if (stk.size() < 2) throw std::logic_error("internal: binary operator '=' with too few operands");
+						resultNumber = stk.asNumber( 0) + stk.asNumber( 1);
+						stk.pop( 2);
+						stk.push( resultNumber);
 					break;
 					case  '-':
-						if (stk.size() < 2) throw std::logic_error("internal: binary operator '=' with too few operands");
+						resultNumber = stk.asNumber( 0) - stk.asNumber( 1);
+						stk.pop( 2);
+						stk.push( resultNumber);
 					break;
-					default: throw std::logic_error("internal: unknown operator in expression");
+					case  '#':
+						resultString = stk.asString( 0) + stk.asString( 1);
+						stk.pop( 2);
+						stk.push( resultString);
+					break;
+					default:
+						throw std::logic_error("internal: unknown operator in expression");
 				}
-				stk.push_back( stkelem);
 			break;
 		}
 	}
 }
-#endif
 
 static bool checkNumber( const std::string& tok)
 {
@@ -172,7 +223,7 @@ static Expression parseFactorExpression( const Expression& op1, std::string::con
 static Expression parseAssignExpression( const Expression& op1, std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
 static Expression parseAssignExpressionList( char separator, std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
 static StateDef::MethodCall parseMethodCall( std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
-static utils::OperatorTable g_operatorTable( "(){}=+-*/,;");
+static utils::OperatorTable g_operatorTable( "#(){}=+-*/,;");
 
 static Expression parseOperand( std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings)
 {
@@ -214,6 +265,7 @@ static Expression parseOperand( std::string::const_iterator itr, const std::stri
 			rt.push_expression( subexpr);
 			break;
 		}
+		case '#':
 		case '=':
 		case '/':
 		case '*':
@@ -265,6 +317,7 @@ static Expression parseFactorExpression( const Expression& op1, std::string::con
 		case ')':
 		case '}':
 		case '+':
+		case '#':
 		case '-':
 			itr = prev;
 			rt.push_expression( op1);
@@ -308,6 +361,7 @@ static Expression parseSumExpression( const Expression& op1, std::string::const_
 			break;
 		case '-':
 		case '+':
+		case '#':
 		{
 			Expression op2 = parseOperand( itr, end, exprstrings);
 			if (!op2.size()) throw std::runtime_error( "second operand expected for binary minus '-'");
