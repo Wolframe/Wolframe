@@ -243,9 +243,9 @@ struct InputFilterImpl :public InputFilter
 		if (nd)
 		{
 			xmlDtdPtr dtd = (xmlDtdPtr)nd;
-			doctype.rootid = (char*)dtd->name;
-			doctype.publicid = (char*)dtd->ExternalID;
-			doctype.systemid = (char*)dtd->SystemID;
+			doctype.rootid = (const char*)dtd->name;
+			doctype.publicid = (const char*)dtd->ExternalID;
+			doctype.systemid = (const char*)dtd->SystemID;
 		}
 		else
 		{
@@ -565,11 +565,11 @@ private:
 		return (const xmlChar*)aa.c_str();
 	}
 
-	xmlChar* getElement( const void* element, std::size_t elementsize)
+	const xmlChar* getElement( const void* element, std::size_t elementsize)
 	{
 		m_valuestrbuf.clear();
 		m_valuestrbuf.append( (const char*)element, elementsize);
-		return (xmlChar*)m_valuestrbuf.c_str();
+		return (const xmlChar*)m_valuestrbuf.c_str();
 	}
 
 	bool flushBuffer()

@@ -69,12 +69,7 @@ static createBuilderFunc objdef[ NofObjects] =
 	Libxml2FilterObject_UCS4LE::constructor
 };
 
-#ifndef _WIN32
-#define DLLEXPORT
-#else
-#define DLLEXPORT __declspec( dllexport )
-#endif
 
-extern "C" DLLEXPORT ModuleEntryPoint entryPoint( 0, "libxml2 XML filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "libxml2 XML filter", setModuleLogger, 0, 0, NofObjects, objdef);
 
 

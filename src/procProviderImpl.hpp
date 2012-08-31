@@ -58,8 +58,8 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	const langbind::Filter* getFilter( const std::string& name ) const;
-	cmdbind::CommandHandler* getHandler( const std::string& command ) const;
+	const langbind::Filter* filter( const std::string& name ) const;
+	cmdbind::CommandHandler* handler( const std::string& command ) const;
 private:
 	std::string					m_dbLabel;
 	const db::Database*				m_db;
