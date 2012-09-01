@@ -1,0 +1,4 @@
+LIBRARY mod_filter_char
+
+EXPORTS
+entryPoint	@1

@@ -70,4 +70,4 @@ static createBuilderFunc objdef[ NofObjects] =
 };
 
 
-WOLFRAME_DLLEXPORT ModuleEntryPoint entryPoint( 0, "textwolf XML filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "textwolf XML filter", setModuleLogger, 0, 0, NofObjects, objdef);

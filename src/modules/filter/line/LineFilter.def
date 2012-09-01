@@ -1,0 +1,4 @@
+LIBRARY mod_filter_line
+
+EXPORTS
+entryPoint	@1

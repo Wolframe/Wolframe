@@ -69,7 +69,6 @@ static createBuilderFunc objdef[ NofObjects] =
 	CharFilterObject_UCS4LE::constructor
 };
 
-
-WOLFRAME_DLLEXPORT ModuleEntryPoint entryPoint( 0, "char filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "char filter", setModuleLogger, 0, 0, NofObjects, objdef);
 
 

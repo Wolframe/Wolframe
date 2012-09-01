@@ -1,0 +1,4 @@
+LIBRARY mod_filter_token
+
+EXPORTS
+entryPoint	@1
