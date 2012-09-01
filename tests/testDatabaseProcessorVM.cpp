@@ -343,7 +343,7 @@ void pushTestInput( const langbind::TransactionFunction::InputR& input, std::str
 			xmlfilter.inputfilter()->getRest( ptr, size, end);
 			for (ii=0; ii<size; ++ii)
 			{
-				if (((char*)ptr)[ii] < 0 || ((char*)ptr)[ii] > 32)
+				if (((const char*)ptr)[ii] < 0 || ((const char*)ptr)[ii] > 32)
 				{
 					throw std::runtime_error( "unconsumed input left");
 				}
