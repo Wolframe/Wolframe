@@ -1,0 +1,4 @@
+LIBRARY mod_filter_textwolf
+
+EXPORTS
+entryPoint	@1

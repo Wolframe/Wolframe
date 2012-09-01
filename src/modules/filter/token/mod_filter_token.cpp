@@ -69,5 +69,4 @@ static createBuilderFunc objdef[ NofObjects] =
 	TokenFilterObject_UCS4LE::constructor
 };
 
-
-WOLFRAME_DLLEXPORT ModuleEntryPoint entryPoint( 0, "token filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "token filter", setModuleLogger, 0, 0, NofObjects, objdef);

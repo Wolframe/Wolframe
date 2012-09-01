@@ -1,5 +1,4 @@
 LIBRARY mod_authz_database
-DESCRIPTION "Wolframe authorization module"
 
 EXPORTS
 entryPoint	@1

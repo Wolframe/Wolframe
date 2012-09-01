@@ -33,7 +33,7 @@ all: $(DYNAMIC_MODULE)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:CharFilterModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

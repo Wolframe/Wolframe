@@ -201,21 +201,7 @@ public:
 
 };
 
-/** old version - delete after tests **
-#if !defined(_WIN32)	// POSIX module loader
-extern "C" ModuleEntryPoint	entryPoint;
-#else
-extern "C" __declspec( dllexport ) ModuleEntryPoint entryPoint;
-#endif
-**/
-
-#if !defined(_WIN32)	// POSIX module loader
-#define WOLFRAME_DLLEXPORT
-#else
-#define WOLFRAME_DLLEXPORT __declspec( dllexport )
-#endif
-
-extern "C" WOLFRAME_DLLEXPORT ModuleEntryPoint	entryPoint;
+extern "C" ModuleEntryPoint entryPoint;
 
 }} // namespace _Wolframe::module
 

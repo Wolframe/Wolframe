@@ -33,7 +33,7 @@ all: $(DYNAMIC_MODULE)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:TextwolfFilter.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 
@@ -42,3 +42,4 @@ local_clean:
 local_distclean:
 
 local_test:
+

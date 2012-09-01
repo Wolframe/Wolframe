@@ -1,5 +1,4 @@
 LIBRARY mod_db_postgresql
-DESCRIPTION "Wolframe PostgreSQL database module"
 
 EXPORTS
 entryPoint	@1

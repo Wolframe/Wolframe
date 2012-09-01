@@ -1,5 +1,4 @@
 LIBRARY mod_db_sqlite3
-DESCRIPTION "Wolframe SQLite database module"
 
 EXPORTS
 entryPoint	@1
