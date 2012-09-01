@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file prnt_pdfPrinterDocument_libhpdf.cpp
+///\file prnt_pdfPrinterDocument_testtrace.cpp
 #include "prnt/pdfPrinterDocument.hpp"
 
 using namespace _Wolframe;
@@ -49,17 +49,24 @@ struct DocumentImpl :public Document
 };
 }// anonymous namespace
 
-void DocumentImpl::execute_enter( Method , const VariableScope&){}
-void DocumentImpl::execute_leave( Method){}
+void DocumentImpl::execute_enter( Method , const VariableScope&)
+{
+}
+
+void DocumentImpl::execute_leave( Method)
+{
+}
 
 std::string DocumentImpl::tostring() const
 {
 	return std::string();
 }
 
-Document* _Wolframe::prnt::createLibHpdfDocument()
+Document* _Wolframe::prnt::createTestTraceDocument()
 {
 	return new DocumentImpl();
 }
+
+
 
 

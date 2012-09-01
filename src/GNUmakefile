@@ -110,6 +110,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	prnt_pdfPrinterMethod.o \
 	prnt_pdfPrinterExpression.o \
 	prnt_pdfPrinterDocument_libhpdf.o \
+	prnt_pdfPrinterDocument_testtrace.o \
 	prnt_pdfPrinter.o \
 	types_allocators.o \
 	types_bcdArithmetic.o \

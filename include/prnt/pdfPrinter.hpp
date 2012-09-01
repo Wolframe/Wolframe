@@ -47,7 +47,7 @@ class SimplePdfPrintFunction :public PrintFunction
 public:
 	///\brief Constructor
 	///\param[in] description Source of the document print description
-	SimplePdfPrintFunction( const std::string& description);
+	SimplePdfPrintFunction( const std::string& description, bool test=false);
 	///\brief Destructor
 	virtual ~SimplePdfPrintFunction(){}
 
@@ -58,11 +58,14 @@ public:
 public:
 	struct SimplePdfPrintFunctionImpl;
 private:
-	SimplePdfPrintFunctionImpl* m_impl;
+	SimplePdfPrintFunctionImpl* m_impl;		//< hidden implementation (PIMPL)
 };
 
-///\param[in] src form description source
+///\param[in] description print description source
 PrintFunctionR createSimplePdfPrintFunction( const std::string& description);
+
+///\param[in] description print description source
+PrintFunctionR createTestTracePdfPrintFunction( const std::string& description);
 
 }}//namespace
 #endif

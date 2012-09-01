@@ -52,26 +52,6 @@ enum Variable
 
 const char* variableName( Variable v);
 
-class VariableValue
-{
-public:
-	enum Type {Number, String};
-
-	static VariableValue string( std::size_t idx);
-	static VariableValue number( double value);
-
-	std::string asString( const std::string strvalar) const;
-	double asNumber( const std::string strvalar) const;
-	Type type() const	{return m_type;}
-
-private:
-	Type m_type;
-	union
-	{
-		double m_number;
-		std::size_t m_string;
-	} value;
-};
 
 class VariableScope
 {
@@ -85,19 +65,14 @@ public:
 	std::vector<std::size_t>::const_iterator end_marker() const	{return m_mrkar.back().end();}
 
 	void define( Variable var, const std::string& value);
-	void define( Variable var, double value);
 	void define( Variable var, Variable src);
 
 	std::size_t getValueIdx( Variable var);
-	VariableValue::Type getType( std::size_t idx) const;
-
-	std::string getString( std::size_t idx);
-	double getNumber( std::size_t idx);
+	std::string getValue( std::size_t idx);
 
 private:
 	typedef std::map<std::size_t,std::size_t> Map;
 	std::vector<Map> m_ar;
-	std::vector<VariableValue> m_valuear;
 	std::vector<std::vector<std::size_t> > m_mrkar;
 	std::string m_strings;
 };
@@ -109,15 +84,12 @@ public:
 	ValueStack();
 
 	void push( const std::string& value);
-	void push( double value);
 	void pop( std::size_t nof=1);
 
-	VariableValue::Type type( std::size_t idx) const;
-	double asNumber( std::size_t idx) const;
-	std::string asString( std::size_t idx) const;
+	std::string top( std::size_t idx=0) const;
 
 private:
-	std::vector<VariableValue> m_valuear;
+	std::vector<std::size_t> m_valuear;
 	std::string m_strings;
 };
 

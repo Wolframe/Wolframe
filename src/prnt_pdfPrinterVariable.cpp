@@ -31,6 +31,7 @@ Project Wolframe.
 ************************************************************************/
 ///\file prnt_pdfPrinterVariable.cpp
 #include "prnt/pdfPrinterVariable.hpp"
+#include "types/bcdArithmetic.hpp"
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
 
@@ -69,53 +70,9 @@ std::map <std::string, std::size_t>* _Wolframe::prnt::getVariablenameMap()
 	return &rt;
 }
 
-VariableValue VariableValue::string( std::size_t idx)
-{
-	VariableValue rt;
-	rt.m_type = String;
-	rt.value.m_string = idx;
-	return rt;
-}
-
-VariableValue VariableValue::number( double value)
-{
-	VariableValue rt;
-	rt.m_type = Number;
-	rt.value.m_number = value;
-	return rt;
-}
-
-std::string VariableValue::asString( const std::string strvalar) const
-{
-	switch (m_type)
-	{
-		case VariableValue::Number:
-			return boost::lexical_cast<std::string>( value.m_number);
-
-		case VariableValue::String:
-			return std::string( strvalar.c_str() + value.m_string);
-	}
-	throw std::logic_error("illegal state");
-}
-
-double VariableValue::asNumber( const std::string strvalar) const
-{
-	switch (m_type)
-	{
-		case VariableValue::Number:
-			return value.m_number;
-
-		case VariableValue::String:
-			std::string strval = strvalar.c_str() + value.m_string;
-			return boost::lexical_cast<double>( strval);
-	}
-	throw std::logic_error("illegal state");
-}
-
 VariableScope::VariableScope()
 {
 	m_strings.push_back('\0');
-	m_valuear.push_back( VariableValue::string(0));
 	m_ar.push_back( Map());
 }
 
@@ -133,17 +90,10 @@ void VariableScope::pop()
 void VariableScope::define( Variable var, const std::string& value)
 {
 	if (m_ar.back().find( var) != m_ar.back().end()) throw std::runtime_error( std::string( "duplicate definition of variable '") + variableName(var) + "'");
-	m_valuear.push_back( VariableValue::string( m_strings.size()));
+
+	m_ar.back()[var] = m_strings.size();
 	m_strings.append( value);
 	m_strings.push_back('\0');
-	m_ar.back()[var] = m_valuear.size()-1;
-}
-
-void VariableScope::define( Variable var, double value)
-{
-	if (m_ar.back().find( var) != m_ar.back().end()) throw std::runtime_error( std::string( "duplicate definition of variable '") + variableName(var) + "'");
-	m_valuear.push_back( VariableValue::number( value));
-	m_ar.back()[var] = m_valuear.size()-1;
 }
 
 void VariableScope::define( Variable var, Variable src)
@@ -169,36 +119,20 @@ std::size_t VariableScope::getValueIdx( Variable var)
 	return 0;
 }
 
-VariableValue::Type VariableScope::getType( std::size_t idx) const
+std::string VariableScope::getValue( std::size_t idx)
 {
-	return m_valuear[idx].type();
-}
-
-std::string VariableScope::getString( std::size_t idx)
-{
-	const VariableValue& val = m_valuear[ idx];
-	return val.asString( m_strings);
-}
-
-double VariableScope::getNumber( std::size_t idx)
-{
-	const VariableValue& val = m_valuear[ idx];
-	return val.asNumber( m_strings);
-}
-
-void ValueStack::push( const std::string& value)
-{
-	m_valuear.push_back( VariableValue::string( m_strings.size()));
-	m_strings.append( value);
-}
-
-void ValueStack::push( double value)
-{
-	m_valuear.push_back( VariableValue::number( value));
+	return std::string( m_strings.c_str() + idx);
 }
 
 ValueStack::ValueStack()
 {
+	m_strings.push_back( '\0');
+}
+
+void ValueStack::push( const std::string& value)
+{
+	m_valuear.push_back( m_strings.size());
+	m_strings.append( value);
 	m_strings.push_back( '\0');
 }
 
@@ -207,22 +141,10 @@ void ValueStack::pop( std::size_t nof)
 	while (nof--) m_valuear.pop_back();
 }
 
-VariableValue::Type ValueStack::type( std::size_t idx) const
+std::string ValueStack::top( std::size_t idx) const
 {
 	if (idx >= m_valuear.size()) throw std::logic_error("internal: too few elements on stack for required operation");
-	return m_valuear.at( m_valuear.size()-1-idx).type();
-}
-
-double ValueStack::asNumber( std::size_t idx) const
-{
-	if (idx >= m_valuear.size()) throw std::logic_error("internal: too few elements on stack for required operation");
-	return m_valuear.at( m_valuear.size()-1-idx).asNumber( m_strings);
-}
-
-std::string ValueStack::asString( std::size_t idx) const
-{
-	if (idx >= m_valuear.size()) throw std::logic_error("internal: too few elements on stack for required operation");
-	return m_valuear.at( m_valuear.size()-1-idx).asString( m_strings);
+	return std::string( m_strings.c_str() + m_valuear[ m_valuear.size()-1-idx]);
 }
 
 

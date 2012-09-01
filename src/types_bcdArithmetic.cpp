@@ -959,14 +959,41 @@ BigBCD BigBCD::neg() const
 	return rt;
 }
 
+BigNumber::BigNumber( const std::string& numstr)
+{
+	initFromString( numstr);
+}
+
 BigNumber::BigNumber( const std::string& numstr, unsigned int sp, unsigned int cp)
-	:m_show_precision(sp)
-	,m_calc_precision(cp)
+{
+	initFromString( numstr);
+	format( sp, cp);
+}
+
+BigNumber::BigNumber( const BigBCD& o, unsigned int sp, unsigned int cp)
+	:BigBCD(o)
+{
+	format(sp, cp);
+}
+
+BigNumber::BigNumber( const std::string& numstr, unsigned int p)
+{
+	initFromString( numstr);
+	format( p, p);
+}
+
+void BigNumber::initFromString( const std::string& numstr)
+{
+	initFromString( numstr, numstr.size());
+}
+
+void BigNumber::initFromString( const std::string& numstr, unsigned int maxPrecision)
 {
 	std::string val;
-	std::string::const_iterator ii=numstr.begin(), ee=numstr.end();
 	unsigned int cpn = 0;
 	int state = 0;
+
+	std::string::const_iterator ii=numstr.begin(), ee=numstr.end();
 	for (; ii != ee; ++ii)
 	{
 		if (*ii == '.')
@@ -978,7 +1005,7 @@ BigNumber::BigNumber( const std::string& numstr, unsigned int sp, unsigned int c
 		{
 			if (state == 1)
 			{
-				if (cpn < cp)
+				if (cpn < maxPrecision)
 				{
 					val.push_back( *ii);
 					cpn++;
@@ -990,10 +1017,7 @@ BigNumber::BigNumber( const std::string& numstr, unsigned int sp, unsigned int c
 			}
 		}
 	}
-	for (; cpn < cp; ++cpn)
-	{
-		val.push_back( '0');
-	}
+	m_calc_precision = m_show_precision = cpn;
 	init( val);
 }
 

@@ -157,6 +157,7 @@ private:
 	bool m_allocated;
 };
 
+
 class BigNumber :public BigBCD
 {
 public:
@@ -169,14 +170,14 @@ public:
 		,m_show_precision(o.m_show_precision)
 		,m_calc_precision(o.m_calc_precision){}
 
-	BigNumber( const BigBCD& o, unsigned int sp, unsigned int cp)
-		:BigBCD(o)
-		,m_show_precision(sp)
-		,m_calc_precision(cp){}
-
-	BigNumber( const std::string& numstr, unsigned int sp=0, unsigned int cp=0);
+	BigNumber( const BigBCD& o, unsigned int sp, unsigned int cp);
+	BigNumber( const std::string& numstr, unsigned int sp, unsigned int cp);
+	BigNumber( const std::string& numstr, unsigned int sp);
+	BigNumber( const std::string& numstr);
 
 	void format( unsigned int show_prec, unsigned int calc_prec);
+	void setCalcPrecision( unsigned int p)		{format( p, m_calc_precision);}
+	void setShowPrecision( unsigned int p)		{format( m_show_precision, p);}
 
 	std::string tostring() const;
 
@@ -195,7 +196,11 @@ public:
 	bool operator<( const BigNumber& o) const		{return islt(o);}
 	bool operator>=( const BigNumber& o) const		{return !islt(o);}
 	bool operator>( const BigNumber& o) const		{return !isle(o);}
+
 private:
+	void initFromString( const std::string& numstr, unsigned int maxPrecision);
+	void initFromString( const std::string& numstr);
+
 	bool isequal( const BigNumber& other) const;
 	bool islt( const BigNumber& other) const;
 	bool isle( const BigNumber& other) const;

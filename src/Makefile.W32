@@ -120,6 +120,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	prnt_pdfPrinterMethod.obj \
 	prnt_pdfPrinterExpression.obj \
 	prnt_pdfPrinterDocument_libhpdf.obj \
+	prnt_pdfPrinterDocument_testtrace.obj \
 	prnt_pdfPrinter.obj \
 	acceptor.obj \
 	connection.obj \

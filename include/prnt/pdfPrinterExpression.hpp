@@ -46,12 +46,19 @@ namespace prnt {
 class Expression
 {
 public:
+	Expression()
+		:m_calc_precision(5){}
+	Expression( const Expression& o)
+		:m_ar(o.m_ar)
+		,m_calc_precision(o.m_calc_precision){}
+
 	void push_operator( char chr);
 	void push_value( std::size_t idx);
 	void push_variable( std::size_t idx);
 	void push_expression( const Expression& expr);
 
 	std::size_t size() const		{return m_ar.size();}
+	void setPrecision( unsigned int p)	{m_calc_precision=p;}
 
 	void evaluate( VariableScope& vs, const std::string& exprstrings) const;
 
@@ -69,6 +76,7 @@ private:
 
 private:
 	std::vector<Item> m_ar;
+	unsigned int m_calc_precision;
 };
 
 

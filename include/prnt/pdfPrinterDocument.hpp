@@ -41,13 +41,16 @@ namespace prnt {
 
 struct Document
 {
-	Document();
-	~Document();
-	void execute_enter( Method method, const VariableScope& vars);
-	void execute_leave( Method method);
+	Document(){}
+	virtual ~Document(){}
+	virtual void execute_enter( Method method, const VariableScope& vars)=0;
+	virtual void execute_leave( Method method)=0;
 
-	std::string tostring() const;
+	virtual std::string tostring() const=0;
 };
+
+Document* createLibHpdfDocument();
+Document* createTestTraceDocument();
 
 }}
 #endif

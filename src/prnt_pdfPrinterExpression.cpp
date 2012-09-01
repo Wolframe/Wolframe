@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file prnt_pdfPrinterExpression.cpp
 #include "prnt/pdfPrinterExpression.hpp"
 #include "prnt/pdfPrinterVariable.hpp"
+#include "types/bcdArithmetic.hpp"
 #include "utils/miscUtils.hpp"
 #include <stdexcept>
 #include <limits>
@@ -70,12 +71,11 @@ void Expression::push_expression( const Expression& expr)
 	m_ar.insert( m_ar.end(), expr.m_ar.begin(), expr.m_ar.end());
 }
 
+typedef types::BigNumber Number;
+
 void Expression::evaluate( VariableScope& vscope, const std::string& exprstrings) const
 {
 	ValueStack stk;
-	double resultNumber;
-	double divisorNumber;
-	std::string resultString;
 
 	std::vector<Item>::const_iterator next,itr=m_ar.begin(), end=m_ar.end();
 	for (; itr != end; ++itr)
@@ -88,32 +88,17 @@ void Expression::evaluate( VariableScope& vscope, const std::string& exprstrings
 				{
 					// handle special case of variable on left side of assignment:
 					Variable var = (Variable)itr->value.m_idx;
-					switch (stk.type( 1))
-					{
-						case VariableValue::Number:
-							vscope.define( var, stk.asNumber( 1));
-							break;
-						case VariableValue::String:
-							vscope.define( var, stk.asString( 1));
-							break;
-					}
+					vscope.define( var, stk.top());
 					++itr;
 				}
 				else
 				{
-					// other variables are expanded:
+					// for other variables are the referenced values expanded:
 					Variable var = (Variable)itr->value.m_idx;
 					std::size_t idx = vscope.getValueIdx( var);
+
 					if (idx == 0) throw std::runtime_error( std::string( "variable not defined '") + variableName(var) + "'");
-					switch (vscope.getType( idx))
-					{
-						case VariableValue::Number:
-							stk.push( vscope.getNumber( idx));
-							break;
-						case VariableValue::String:
-							stk.push( vscope.getString( idx));
-							break;
-					}
+					stk.push( vscope.getValue( idx));
 				}
 				break;
 
@@ -124,45 +109,56 @@ void Expression::evaluate( VariableScope& vscope, const std::string& exprstrings
 			case Item::Operator:
 				switch (itr->value.m_opchr)
 				{
-					case  '=':
+					case '=':
 						throw std::logic_error("internal: assignement '=' with illegal operands");
 					break;
-					case  '~':
-						resultNumber = - stk.asNumber( 1);
-					break;
-					case  '*':
-						resultNumber = stk.asNumber( 0) * stk.asNumber( 1);
+					case '~':
+					{
+						Number op( stk.top());
+						stk.pop();
+						stk.push( (-op).tostring());
+						break;
+					}
+					case '*':
+					{
+						Number op1( stk.top(0), m_calc_precision);
+						Number op2( stk.top(1), m_calc_precision);
 						stk.pop( 2);
-						stk.push( resultNumber);
-					break;
-					case  '/':
-						divisorNumber = stk.asNumber( 0);
-						if (divisorNumber < std::numeric_limits<double>::epsilon() && divisorNumber > -std::numeric_limits<double>::epsilon())
-						{
-							throw std::runtime_error( "division by zero");
-						}
-						else
-						{
-							resultNumber = stk.asNumber( 1) / divisorNumber;
-						}
+						stk.push( Number( op1 * op2).tostring());
+						break;
+					}
+					case '/':
+					{
+						Number op1( stk.top(0), m_calc_precision);
+						Number op2( stk.top(1), m_calc_precision);
 						stk.pop( 2);
-						stk.push( resultNumber);
-					break;
-					case  '+':
-						resultNumber = stk.asNumber( 0) + stk.asNumber( 1);
+						stk.push( Number( op1 / op2).tostring());
+						break;
+					}
+					case '+':
+					{
+						Number op1( stk.top(0), m_calc_precision);
+						Number op2( stk.top(1), m_calc_precision);
 						stk.pop( 2);
-						stk.push( resultNumber);
-					break;
-					case  '-':
-						resultNumber = stk.asNumber( 0) - stk.asNumber( 1);
+						stk.push( Number( op1 + op2).tostring());
+						break;
+					}
+					case '-':
+					{
+						Number op1( stk.top(0), m_calc_precision);
+						Number op2( stk.top(1), m_calc_precision);
 						stk.pop( 2);
-						stk.push( resultNumber);
-					break;
-					case  '#':
-						resultString = stk.asString( 0) + stk.asString( 1);
+						stk.push( Number( op1 - op2).tostring());
+						break;
+					}
+					case '#':
+					{
+						std::string op1( stk.top(0));
+						std::string op2( stk.top(1));
 						stk.pop( 2);
-						stk.push( resultString);
-					break;
+						stk.push( op1 + op2);
+						break;
+					}
 					default:
 						throw std::logic_error("internal: unknown operator in expression");
 				}

@@ -106,7 +106,8 @@ typedef textwolf::XMLPathSelect<textwolf::charset::UTF8> XMLPathSelect;
 struct SimplePdfPrintFunction::SimplePdfPrintFunctionImpl
 {
 public:
-	SimplePdfPrintFunctionImpl( const std::string& src)
+	SimplePdfPrintFunctionImpl( const std::string& src, bool testTraceVersion)
+		:m_testTraceVersion(testTraceVersion)
 	{
 		m_exprstrings.push_back( '\0');
 		std::size_t linecnt = 0;
@@ -134,6 +135,7 @@ public:
 	const StateDef* statedef( std::size_t idx) const	{return &m_statedef[idx];}
 	const std::string& exprstrings() const			{return m_exprstrings;}
 	const XMLPathSelectAutomatonParser& parser() const	{return m_parser;}
+	bool isTestTraceVersion() const				{return m_testTraceVersion;}
 
 	std::string tostring() const
 	{
@@ -143,18 +145,18 @@ private:
 	XMLPathSelectAutomatonParser m_parser;
 	std::vector<StateDef> m_statedef;
 	std::string m_exprstrings;
+	bool m_testTraceVersion;
 };
 
-SimplePdfPrintFunction::SimplePdfPrintFunction( const std::string& description)
-	:m_impl(new SimplePdfPrintFunctionImpl(description)){}
-
-
+SimplePdfPrintFunction::SimplePdfPrintFunction( const std::string& description, bool testTraceVersion)
+	:m_impl(new SimplePdfPrintFunctionImpl(description, testTraceVersion)){}
 
 class PrintInput :public langbind::TypedOutputFilter
 {
 public:
 	PrintInput( const SimplePdfPrintFunction::SimplePdfPrintFunctionImpl* func)
-		:m_func(func)
+		:m_document( func->isTestTraceVersion()?(createTestTraceDocument()):(createLibHpdfDocument()))
+		,m_func(func)
 		,m_selectState(&func->parser())
 		,m_lasttype( langbind::TypedFilterBase::OpenTag){}
 
@@ -176,7 +178,7 @@ public:
 				std::vector<std::size_t>::const_iterator me = m_variableScope.end_marker();
 				for (; mi != me; ++mi)
 				{
-					m_document.execute_leave( (Method)*mi);
+					m_document->execute_leave( (Method)*mi);
 				}
 				m_variableScope.pop();
 				break;
@@ -209,7 +211,7 @@ public:
 				{
 					m_variableScope.push();
 					ci->m_param.evaluate( m_variableScope, m_func->exprstrings());
-					m_document.execute_enter( ci->m_method, m_variableScope);
+					m_document->execute_enter( ci->m_method, m_variableScope);
 					m_variableScope.pop();
 					m_variableScope.push_marker( (std::size_t)ci->m_method);
 				}
@@ -221,11 +223,11 @@ public:
 
 	const Document& document() const
 	{
-		return m_document;
+		return *m_document;
 	}
 
 private:
-	Document m_document;
+	boost::shared_ptr<Document> m_document;
 	VariableScope m_variableScope;
 	const SimplePdfPrintFunction::SimplePdfPrintFunctionImpl* m_func;
 	XMLPathSelect m_selectState;
@@ -252,7 +254,14 @@ std::string SimplePdfPrintFunction::tostring() const
 
 PrintFunctionR _Wolframe::prnt::createSimplePdfPrintFunction( const std::string& description)
 {
-	SimplePdfPrintFunction* ref = new SimplePdfPrintFunction( description);
+	SimplePdfPrintFunction* ref = new SimplePdfPrintFunction( description, false);
+	PrintFunctionR rt( ref);
+	return rt;
+}
+
+PrintFunctionR _Wolframe::prnt::createTestTracePdfPrintFunction( const std::string& description)
+{
+	SimplePdfPrintFunction* ref = new SimplePdfPrintFunction( description, true);
 	PrintFunctionR rt( ref);
 	return rt;
 }
