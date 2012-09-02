@@ -29,10 +29,10 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
-	$(TOPDIR)/src/ddl_atomicType.obj \
-	$(TOPDIR)/src/ddl_structType.obj \
-	$(TOPDIR)/src/ddl_structTypeBuild.obj \
-	$(TOPDIR)/src/ddl_compilerInterface.obj \
+	$(TOPDIR)/src/ddl_atomicType.o \
+	$(TOPDIR)/src/ddl_structType.o \
+	$(TOPDIR)/src/ddl_structTypeBuild.o \
+	$(TOPDIR)/src/ddl_compilerInterface.o \
 	$(TOPDIR)/src/serialize_ddl_filtermapParse.o \
 	$(TOPDIR)/src/serialize_ddl_filtermapSerialize.o \
 	$(TOPDIR)/src/serialize_mapContext.o \
