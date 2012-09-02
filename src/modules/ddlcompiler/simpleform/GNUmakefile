@@ -9,17 +9,18 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR) -I$(TOPDIR)/tests \
 	-I$(BOOST_INCLUDE_DIR)
 
-INCLUDE_LDFLAGS =
-INCLUDE_LIBS =
+INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe
+	-L$(TOPDIR)/src/libwolframe_serialize
+
+INCLUDE_LIBS = \
+	-lwolframe \
+	-lwolframe_serialize
 
 DYNAMIC_MODULE = mod_ddlcompiler_simpleform.so
 
 CPP_OBJS = \
 	$(TOPDIR)/src/ddl_compiler_simpleFormCompiler.o \
-	$(TOPDIR)/src/ddl_atomicType.o \
-	$(TOPDIR)/src/ddl_structType.o \
-	$(TOPDIR)/src/libwolframe/resolvePath.o \
-	$(TOPDIR)/src/libwolframe/stringUtils.o \
 	mod_ddlcompiler_simpleform.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
