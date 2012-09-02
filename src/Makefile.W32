@@ -106,11 +106,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	types_allocators.obj \
 	types_bcdArithmetic.obj \
 	types_dateArithmetic.obj \
-	ddl_compilerInterface.obj \
 	ddl_compiler_simpleFormCompiler.obj \
-	ddl_atomicType.obj \
-	ddl_structType.obj \
-	ddl_structTypeBuild.obj \
 	database_processor.obj \
 	prnt_pdfPrinterVariable.obj \
 	prnt_pdfPrinterMethod.obj \
