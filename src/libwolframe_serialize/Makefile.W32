@@ -23,7 +23,12 @@ LIBRARIES = \
 CPP_OBJS = \
 	$(TOPDIR)\src\serialize_ddl_filtermapParse.obj \
 	$(TOPDIR)\src\serialize_ddl_filtermapSerialize.obj \
-	$(TOPDIR)\src\serialize_mapContext.obj
+	$(TOPDIR)\src\serialize_mapContext.obj \
+	$(TOPDIR)\src\serialize_struct_filtermapBase.obj \
+	$(TOPDIR)\src\serialize_struct_filtermapParse.obj \
+	$(TOPDIR)\src\serialize_struct_filtermapParseStack.obj \
+	$(TOPDIR)\src\serialize_struct_filtermapSerialize.obj \
+	$(TOPDIR)\src\serialize_struct_filtermapSerializeStack.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

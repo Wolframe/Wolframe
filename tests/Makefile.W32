@@ -47,7 +47,8 @@ INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
-	$(TOPDIR)\src\libwolframe\wolframe.lib
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib
 
 # Lua
 !IFDEF WITH_LUA
