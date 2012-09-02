@@ -462,6 +462,21 @@ int DECLNAME ## _functor::call( lua_State* ls)\
 
 
 
+LUA_FUNCTION_THROWS( "module()", function_module)
+{
+	check_parameters( ls, 0, 1, LUA_TSTRING);
+	const char* modulename = lua_tostring( ls, 1);
+
+	GlobalContext* ctx = getGlobalContext();
+	if (!ctx) throw std::runtime_error( "lost global context");
+
+	LuaModule mod;
+	if (!ctx->getLuaModule( modulename, mod)) throw std::runtime_error( std::string( "module '") + modulename + "' not defined");
+	mod.load( ls);
+	return 0;
+}
+
+
 
 LUA_FUNCTION_THROWS( "<structure>:get()", function_inputfilterClosure_get)
 {
@@ -1616,7 +1631,15 @@ LuaScript::LuaScript( const std::string& path_)
 	{
 		if (lua_isfunction( ls, -1) && lua_isstring( ls, -2))
 		{
-			m_functions.push_back( lua_tostring( ls, -2));
+			const char* uname = lua_getupvalue( ls, -1, 1);
+			if (uname)
+			{
+				if (std::strcmp( uname, "ENV_"))
+				{
+					m_functions.push_back( lua_tostring( ls, -3));
+				}
+				lua_pop( ls, 1);
+			}
 		}
 		lua_pop( ls, 1);
 	}
@@ -1651,14 +1674,9 @@ LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
 		Logger logger_;
 		LuaObject<Logger>::createGlobal( m_ls, "logger", logger_, logger_methodtable);
 
-		// open additional Lua libraries defined for this script
-		std::vector<std::string>::const_iterator ii=m_script->modules().begin(), ee=m_script->modules().end();
-		for ( ; ii != ee; ++ii)
-		{
-			LuaModule mod;
-			if (!gc->getLuaModule( *ii, mod)) throw std::runtime_error( std::string( "module '") + *ii + "' not found");
-			mod.load( m_ls);
-		}
+		// register module load function already here because then it can be used in the script initilization part
+		lua_pushcfunction( m_ls, &function_module);
+		lua_setglobal( m_ls, "module");
 
 		// call main, we may have to initialize LUA modules there
 		if (lua_pcall( m_ls, 0, LUA_MULTRET, 0) != 0)

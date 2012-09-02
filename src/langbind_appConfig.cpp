@@ -33,6 +33,7 @@
 ///\file langbind_appConfig.cpp
 ///\brief Implementation of the language binding objects configuration
 #include "langbind/appConfig.hpp"
+#include "langbind/appGlobalContext.hpp"
 #include "config/structSerialize.hpp"
 #include "logger-v1.hpp"
 #include <string>
@@ -47,115 +48,8 @@ using namespace langbind;
 
 bool ApplicationEnvironmentConfig::check() const
 {
-	bool rt = true;
-	std::map<std::string,bool> filters;
-	std::map<std::string,bool> compilers;
-	std::map<std::string,bool> functions;
-	std::map<std::string,bool> scripts;
-	{
-		compilers[ "simpleform"] = true;
-		std::vector<DDLCompilerConfigStruct>::const_iterator itr=m_config.DDL.begin(),end=m_config.DDL.end();
-		for (;itr!=end; ++itr)
-		{
-			if (compilers[ itr->name])
-			{
-				LOG_ERROR << "Duplicate definition or using reserved name for compiler " << itr->name;
-				rt = false;
-			}
-			compilers[ itr->name] = true;
-			if (!utils::fileExists( itr->modulepath))
-			{
-				LOG_ERROR << "Path of DDL compiler module does not exist: " << itr->modulepath;
-				rt = false;
-			}
-		}
-	}
-	{
-		std::vector<DDLFormConfigStruct>::const_iterator itr=m_config.form.begin(),end=m_config.form.end();
-		for (;itr!=end; ++itr)
-		{
-			if (!compilers[ itr->DDL])
-			{
-				LOG_ERROR << "Undefined DDL used for form definition" << itr->sourcepath;
-				rt = false;
-			}
-			if (!utils::fileExists( itr->sourcepath))
-			{
-				LOG_ERROR << "Path of DDL form source file does not exist: " << itr->sourcepath;
-				rt = false;
-			}
-		}
-	}
-	{
-		filters[ "char"] = true;
-		filters[ "line"] = true;
-		filters[ "xml:textwolf"] = true;
-		filters[ "xml:libxml2"] = true;
-		filters[ "xml:xmllite"] = true;
-		filters[ "xml:msxml"] = true;
-		std::vector<FilterConfigStruct>::const_iterator itr=m_config.filter.begin(),end=m_config.filter.end();
-		for (;itr!=end; ++itr)
-		{
-			if (filters[ itr->name])
-			{
-				LOG_ERROR << "Duplicate definition or using reserved name for filter " << itr->name;
-				rt = false;
-			}
-			filters[ itr->name] = true;
-			if (!utils::fileExists( itr->modulepath))
-			{
-				LOG_ERROR << "Path of filter module does not exist: " << itr->modulepath;
-				rt = false;
-			}
-		}
-	}
-	{
-		std::vector<TransactionFunctionConfigStruct>::const_iterator itr=m_config.transaction.begin(),end=m_config.transaction.end();
-		for (;itr!=end; ++itr)
-		{
-			if (functions[ itr->name])
-			{
-				LOG_ERROR << "Duplicate definition or using reserved name for transaction function " << itr->name;
-				rt = false;
-			}
-			functions[ itr->name] = true;
-		}
-	}
-	{
-		std::vector<ScriptCommandConfigStruct>::const_iterator itr=m_config.script.begin(),end=m_config.script.end();
-		for (;itr!=end; ++itr)
-		{
-			if (scripts[ itr->name])
-			{
-				LOG_ERROR << "Duplicate definition of script procedure: " << itr->name;
-				rt = false;
-			}
-			scripts[ itr->name] = true;
-			if (!utils::fileExists( itr->sourcepath))
-			{
-				LOG_ERROR << "Path of script procedure does not exist: " << itr->sourcepath;
-				rt = false;
-			}
-		}
-	}
-	{
-		std::vector<FormFunctionConfigStruct>::const_iterator itr=m_config.formfunction.begin(),end=m_config.formfunction.end();
-		for (;itr!=end; ++itr)
-		{
-			if (functions[ itr->name])
-			{
-				LOG_ERROR << "Duplicate definition or using reserved name for form function " << itr->name;
-				rt = false;
-			}
-			functions[ itr->name] = true;
-			if (!utils::fileExists( itr->modulepath))
-			{
-				LOG_ERROR << "Path of form function module does not exist: " << itr->modulepath;
-				rt = false;
-			}
-		}
-	}
-	return rt;
+	GlobalContext lgct(0);
+	return lgct.load( m_config);
 }
 
 bool ApplicationEnvironmentConfig::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)
@@ -180,47 +74,7 @@ void ApplicationEnvironmentConfig::print( std::ostream& os, std::size_t indent) 
 
 void ApplicationEnvironmentConfig::setCanonicalPathes( const std::string& referencePath)
 {
-	{
-		std::vector<DDLCompilerConfigStruct>::iterator itr=m_config.DDL.begin(),end=m_config.DDL.end();
-		for (;itr!=end; ++itr)
-		{
-			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);
-		}
-	}
-	{
-		std::vector<DDLFormConfigStruct>::iterator itr=m_config.form.begin(),end=m_config.form.end();
-		for (;itr!=end; ++itr)
-		{
-			itr->sourcepath = utils::getCanonicalPath( itr->sourcepath, referencePath);
-		}
-	}
-	{
-		std::vector<FilterConfigStruct>::iterator itr=m_config.filter.begin(),end=m_config.filter.end();
-		for (;itr!=end; ++itr)
-		{
-			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);
-		}
-	}
-	{
-		std::vector<TransactionTypeConfigStruct>::iterator itr=m_config.transactiontype.begin(),end=m_config.transactiontype.end();
-		for (;itr!=end; ++itr)
-		{
-			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);
-		}
-	}
-	{
-		std::vector<ScriptCommandConfigStruct>::iterator itr=m_config.script.begin(),end=m_config.script.end();
-		for (;itr!=end; ++itr)
-		{
-			itr->sourcepath = utils::getCanonicalPath( itr->sourcepath, referencePath);
-		}
-	}
-	{
-		std::vector<FormFunctionConfigStruct>::iterator itr=m_config.formfunction.begin(),end=m_config.formfunction.end();
-		for (;itr!=end; ++itr)
-		{
-			itr->modulepath = utils::getCanonicalPath( itr->modulepath, referencePath);
-		}
-	}
+
+	m_config.setCanonicalPathes( referencePath);
 }
 

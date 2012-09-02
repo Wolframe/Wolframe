@@ -1,8 +1,10 @@
+module "bcdnumber"
 
 function run()
 	f = filter( "line:UTF-8")
 	input:as( f)
 	output:as( f)
+
 	stack = {}
 	for line in input:get() do
 		for w in string.gmatch( line, "%S+") do

@@ -500,7 +500,7 @@ bool FunctionCall::hasResultReference() const
 }
 
 TransactionFunction::TransactionFunction( const TransactionFunction& o)
-	:m_handlername(o.m_handlername)
+	:m_database(o.m_database)
 	,m_resultname(o.m_resultname)
 	,m_call(o.m_call)
 	,m_tagmap(o.m_tagmap){}
@@ -538,8 +538,8 @@ static std::string parseParameter( std::string::const_iterator& ii, std::string:
 	return rt;
 }
 
-TransactionFunction::TransactionFunction( const std::string& handler, const std::string& src)
-	:m_handlername(handler)
+TransactionFunction::TransactionFunction( const std::string& database, const std::string& src)
+	:m_database(database)
 {
 	std::string::const_iterator ii = src.begin(), ee = src.end();
 	while (ii != ee)
@@ -889,9 +889,9 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 	{
 		PreparedStatementHandlerR dbiref;
 		langbind::GlobalContext* gct = langbind::getGlobalContext();
-		if (!gct->getPreparedStatementHandler( m_handlername, dbiref))
+		if (!gct->getPreparedStatementHandler( m_database, dbiref))
 		{
-			throw std::runtime_error( std::string("database prepared statement handler '") + m_handlername + "' not defined");
+			throw std::runtime_error( std::string("database prepared statement handler '") + m_database + "' not defined");
 		}
 		dbi = dbiref.get();
 
@@ -995,5 +995,10 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 	}
 }
 
+langbind::TransactionFunctionR createPreparedStatementTransactionFunction( const std::string& database, const std::string& description)
+{
+	langbind::TransactionFunctionR rt( new TransactionFunction( database, description));
+	return rt;
+}
 
 

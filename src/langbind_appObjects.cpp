@@ -424,6 +424,16 @@ bool TransactionFunctionMap::getTransactionFunction( const std::string& name, Tr
 	return getObject( m_map, name, rt);
 }
 
+void TransactionFunctionMap::defineTransactionFunctionType( const std::string& name, CreateTransactionFunction f)
+{
+	defineObject( m_typemap, name, f);
+}
+
+bool TransactionFunctionMap::getTransactionFunctionType( const std::string& name, CreateTransactionFunction& rt) const
+{
+	return getObject( m_typemap, name, rt);
+}
+
 
 PrintFunctionClosure::PrintFunctionClosure( const prnt::PrintFunctionR& f)
 	:m_func(f)
@@ -472,6 +482,15 @@ bool PrintFunctionMap::getPrintFunction( const std::string& name, prnt::PrintFun
 	return getObject( m_map, name, rt);
 }
 
+void PrintFunctionMap::definePrintFunctionType( const std::string& name, prnt::CreatePrintFunction f)
+{
+	defineObject( m_typemap, name, f);
+}
+
+bool PrintFunctionMap::getPrintFunctionType( const std::string& name, prnt::CreatePrintFunction& rt) const
+{
+	return getObject( m_typemap, name, rt);
+}
 
 void PreparedStatementHandlerMap::definePreparedStatementHandler( const std::string& name, const std::string& dbname, db::CreatePreparedStatementHandlerFunc f)
 {

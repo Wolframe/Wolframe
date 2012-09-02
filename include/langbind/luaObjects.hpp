@@ -66,21 +66,16 @@ class LuaScript
 public:
 	LuaScript( const std::string& path_);
 	LuaScript( const LuaScript& o)
-		:m_modules(o.m_modules)
-		,m_functions(o.m_functions)
+		:m_functions(o.m_functions)
 		,m_path(o.m_path)
 		,m_content(o.m_content){}
 	~LuaScript(){}
 
-	void addModule( const std::string& name)			{m_modules.push_back( name);}
-
-	const std::vector<std::string>& modules() const			{return m_modules;}
 	const std::vector<std::string>& functions() const		{return m_functions;}
 	const std::string& path() const					{return m_path;}
 	const std::string& content() const				{return m_content;}
 
 private:
-	std::vector<std::string> m_modules;
 	std::vector<std::string> m_functions;
 	std::string m_path;
 	std::string m_content;

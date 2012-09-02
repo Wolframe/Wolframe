@@ -105,7 +105,7 @@ public:
 		m_appConfig.finalize();
 
 		loadGlobalContext();
-		langbind::getGlobalContext()->load( m_langbindConfig);
+		langbind::getGlobalContext()->load( m_langbindConfig.data());
 	}
 private:
 	config::ApplicationConfiguration m_appConfig;

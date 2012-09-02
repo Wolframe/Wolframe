@@ -323,8 +323,11 @@ public:
 	void defineTransactionFunction( const std::string& name, const TransactionFunctionR& f);
 	bool getTransactionFunction( const std::string& name, TransactionFunctionR& rt) const;
 
+	void defineTransactionFunctionType( const std::string& name, CreateTransactionFunction f);
+	bool getTransactionFunctionType( const std::string& name, CreateTransactionFunction& rt) const;
 private:
 	std::map<std::string,TransactionFunctionR> m_map;
+	std::map<std::string,CreateTransactionFunction> m_typemap;
 };
 
 
@@ -370,10 +373,13 @@ public:
 	void definePrintFunction( const std::string& name, const prnt::PrintFunctionR& f);
 	bool getPrintFunction( const std::string& name, prnt::PrintFunctionR& rt) const;
 
+	void definePrintFunctionType( const std::string& name, prnt::CreatePrintFunction f);
+	bool getPrintFunctionType( const std::string& name, prnt::CreatePrintFunction& rt) const;
+
 private:
 	std::map<std::string,prnt::PrintFunctionR> m_map;
+	std::map<std::string,prnt::CreatePrintFunction> m_typemap;
 };
-
 
 ///\class PreparedStatementHandlerMap
 ///\brief Map of available prepared statement handler for a database

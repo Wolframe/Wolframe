@@ -64,8 +64,15 @@ public:
 	explicit GlobalContext( const proc::ProcessorProvider* provider)
 		:m_provider(provider){}
 
-	bool load( const ApplicationEnvironmentConfig& config);
+	bool load( const EnvironmentConfigStruct& config);
+
 	bool getFilter( const std::string& arg, Filter& rt) const;
+
+private:
+	bool loadScript( const ScriptCommandConfigStruct& config, std::string& itemname, std::string& error);
+	bool loadPrintLayout( const PrintLayoutConfigStruct& config, std::string& itemname, std::string& error);
+	bool loadDDLForm( const DDLFormConfigStruct& config, std::string& itemname, std::string& error);
+	bool loadTransactionFunction( const TransactionFunctionConfigStruct& config, std::string& itemname, std::string& error);
 
 private:
 	const proc::ProcessorProvider* m_provider;

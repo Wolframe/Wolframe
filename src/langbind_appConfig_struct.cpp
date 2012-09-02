@@ -35,25 +35,10 @@
 #include "langbind/appConfig_struct.hpp"
 #include "config/structSerialize.hpp"
 #include "serialize/struct/filtermapDescription.hpp"
+#include "utils/miscUtils.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
-
-const serialize::StructDescriptionBase* DDLCompilerConfigStruct::getStructDescription()
-{
-	struct ThisDescription :public serialize::StructDescription<DDLCompilerConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "name",		&DDLCompilerConfigStruct::name)
-			( "modulepath",		&DDLCompilerConfigStruct::modulepath)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
 
 const serialize::StructDescriptionBase* DDLFormConfigStruct::getStructDescription()
 {
@@ -71,48 +56,16 @@ const serialize::StructDescriptionBase* DDLFormConfigStruct::getStructDescriptio
 	return &rt;
 }
 
-const serialize::StructDescriptionBase* FilterConfigStruct::getStructDescription()
+const serialize::StructDescriptionBase* PrintLayoutConfigStruct::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<FilterConfigStruct>
+	struct ThisDescription :public serialize::StructDescription<PrintLayoutConfigStruct>
 	{
 		ThisDescription()
 		{
 			(*this)
-			( "name",		&FilterConfigStruct::name)
-			( "modulepath",		&FilterConfigStruct::modulepath)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
-
-const serialize::StructDescriptionBase* FormFunctionConfigStruct::getStructDescription()
-{
-	struct ThisDescription :public serialize::StructDescription<FormFunctionConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "name",		&FormFunctionConfigStruct::name)
-			( "modulepath",		&FormFunctionConfigStruct::modulepath)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
-const serialize::StructDescriptionBase* TransactionTypeConfigStruct::getStructDescription()
-{
-	struct ThisDescription :public serialize::StructDescription<TransactionTypeConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "name",		&TransactionTypeConfigStruct::name)
-			( "modulepath",		&TransactionTypeConfigStruct::modulepath)
+			( "name",		&PrintLayoutConfigStruct::name)
+			( "type",		&PrintLayoutConfigStruct::type)
+			( "sourcepath",		&PrintLayoutConfigStruct::sourcepath)
 			;
 		}
 	};
@@ -128,7 +81,8 @@ const serialize::StructDescriptionBase* TransactionFunctionConfigStruct::getStru
 		{
 			(*this)
 			( "name",		&TransactionFunctionConfigStruct::name)
-			( "interpreter",	&TransactionFunctionConfigStruct::interpreter)
+			( "type",		&TransactionFunctionConfigStruct::type)
+			( "database",		&TransactionFunctionConfigStruct::database)
 			( "call",		&TransactionFunctionConfigStruct::call)
 			;
 		}
@@ -145,6 +99,7 @@ const serialize::StructDescriptionBase* ScriptCommandConfigStruct::getStructDesc
 		{
 			(*this)
 			( "name",		&ScriptCommandConfigStruct::name)
+			( "type",		&ScriptCommandConfigStruct::type)
 			( "sourcepath",		&ScriptCommandConfigStruct::sourcepath)
 			;
 		}
@@ -160,19 +115,39 @@ const serialize::StructDescriptionBase* EnvironmentConfigStruct::getStructDescri
 		ThisDescription()
 		{
 			(*this)
-			( "DDL",		&EnvironmentConfigStruct::DDL)
 			( "form",		&EnvironmentConfigStruct::form)
-			( "filter",		&EnvironmentConfigStruct::filter)
-			( "transactiontype",	&EnvironmentConfigStruct::transactiontype)
+			( "printlayout",	&EnvironmentConfigStruct::printlayout)
 			( "transaction",	&EnvironmentConfigStruct::transaction)
-#if WITH_LUA
 			( "script",		&EnvironmentConfigStruct::script)
-#endif
-			( "formfunction",	&EnvironmentConfigStruct::formfunction)
 			;
 		}
 	};
 	static const ThisDescription rt;
 	return &rt;
+}
+
+void EnvironmentConfigStruct::setCanonicalPathes( const std::string& referencePath)
+{
+	{
+		std::vector<DDLFormConfigStruct>::iterator itr=form.begin(),end=form.end();
+		for (;itr!=end; ++itr)
+		{
+			itr->sourcepath = utils::getCanonicalPath( itr->sourcepath, referencePath);
+		}
+	}
+	{
+		std::vector<PrintLayoutConfigStruct>::iterator itr=printlayout.begin(),end=printlayout.end();
+		for (;itr!=end; ++itr)
+		{
+			itr->sourcepath = utils::getCanonicalPath( itr->sourcepath, referencePath);
+		}
+	}
+	{
+		std::vector<ScriptCommandConfigStruct>::iterator itr=script.begin(),end=script.end();
+		for (;itr!=end; ++itr)
+		{
+			itr->sourcepath = utils::getCanonicalPath( itr->sourcepath, referencePath);
+		}
+	}
 }
 

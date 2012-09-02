@@ -35,6 +35,7 @@ Project Wolframe.
 #include "utils/miscUtils.hpp"
 #include "utils/doctype.hpp"
 #include "logger-v1.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -53,90 +54,264 @@ GlobalContext* _Wolframe::langbind::getGlobalContext()
 	return gct;
 }
 
-bool GlobalContext::load( const ApplicationEnvironmentConfig& config)
+bool GlobalContext::loadScript( const ScriptCommandConfigStruct& config, std::string& itemname, std::string& error)
+{
+	try
+	{
+		itemname.clear();
+		std::string type( config.type);
+		if (type.empty())
+		{
+			std::string ext = utils::getFileExtension( config.sourcepath);
+			if (!ext.size())
+			{
+				error = "no type of script specified (file extension missing)";
+				return false;
+			}
+			type = std::string( ext.c_str()+1);
+		}
+
+		std::string name( config.name);
+		if (boost::algorithm::iequals( type, "lua"))
+		{
+#if WITH_LUA
+			langbind::LuaScript script( config.sourcepath);
+			if (name.empty())
+			{
+				if (script.functions().empty())
+				{
+					error = "no functions defined in script";
+					return false;
+				}
+				else
+				{
+					// no function name specified, then the last function in the script is the name of the exported function
+					name = script.functions().back();
+				}
+			}
+			defineLuaFunction( itemname = name, script);
+			return true;
+#else
+			error = "cannot load script (lua script support not built in)";
+			return false;
+#endif
+		}
+		else
+		{
+			error = "cannot load script (unknown type of script)";
+			return false;
+		}
+		return true;
+	}
+	catch (std::runtime_error& e)
+	{
+		error = e.what();
+		return false;
+	}
+}
+
+bool GlobalContext::loadPrintLayout( const PrintLayoutConfigStruct& config, std::string& itemname, std::string& error)
+{
+	try
+	{
+		itemname.clear();
+		std::string type( config.type);
+		if (type.empty())
+		{
+			std::string ext = utils::getFileExtension( config.sourcepath);
+			if (!ext.size())
+			{
+				error = "no type of print layout specified (file extension missing) for print layout file";
+				return false;
+			}
+			type = std::string( ext.c_str()+1);
+		}
+		prnt::CreatePrintFunction pf;
+		if (!getPrintFunctionType( type, pf))
+		{
+			error = std::string( "Unknown print layout description type '") + type + "'";
+			return false;
+		}
+		else
+		{
+			prnt::PrintFunctionR func = pf( config.sourcepath);
+			std::string name( config.name);
+			if (name.empty())
+			{
+				name = utils::getFileStem( config.sourcepath);
+				if (name.empty())
+				{
+					error = "no name defined for print layout";
+					return false;
+				}
+			}
+			definePrintFunction( itemname = name, func);
+		}
+		return true;
+	}
+	catch (std::runtime_error& e)
+	{
+		error = e.what();
+		return false;
+	}
+}
+
+bool GlobalContext::loadDDLForm( const DDLFormConfigStruct& config, std::string& itemname, std::string& error)
+{
+	try
+	{
+		itemname.clear();
+		std::string DDL( config.DDL);
+		if (DDL.empty())
+		{
+			std::string ext = utils::getFileExtension( config.sourcepath);
+			if (!ext.size())
+			{
+				error = "no DDL specified (file extension missing) for form file";
+				return false;
+			}
+			DDL = std::string( ext.c_str()+1);
+		}
+		ddl::CompilerInterfaceR ci;
+		if (!getDDLCompiler( DDL, ci))
+		{
+			error = std::string( "Unknown DDL of form '") + DDL + "'";
+			return false;
+		}
+		else
+		{
+			ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
+			*form = ci->compileFile( config.sourcepath);
+			std::string name;
+			if (form->doctype())
+			{
+				name = utils::getIdFromDoctype( form->doctype());
+			}
+			else
+			{
+				name = utils::getFileStem( config.sourcepath);
+			}
+			defineForm( itemname = name, form);
+		}
+		return true;
+	}
+	catch (std::runtime_error& e)
+	{
+		error = e.what();
+		return false;
+	}
+}
+
+bool GlobalContext::loadTransactionFunction( const TransactionFunctionConfigStruct& config, std::string& itemname, std::string& error)
+{
+	try
+	{
+		itemname.clear();
+		CreateTransactionFunction creatf;
+		if (!getTransactionFunctionType( config.type, creatf))
+		{
+			error = std::string("unknown transaction function type '") + config.type + "'";
+			return false;
+		}
+
+		defineTransactionFunction( itemname = config.name, creatf( config.database, config.call));
+		return true;
+	}
+	catch (std::runtime_error& e)
+	{
+		error = e.what();
+		return false;
+	}
+}
+
+bool GlobalContext::load( const EnvironmentConfigStruct& config)
 {
 	bool rt = true;
+	std::map<std::string,std::string> functions;
+	std::string itemname;
+	std::string error;
 	{
-		std::vector<DDLCompilerConfigStruct>::const_iterator itr=config.data().DDL.begin(),end=config.data().DDL.end();
+		std::vector<DDLFormConfigStruct>::const_iterator itr=config.form.begin(),end=config.form.end();
 		for (;itr!=end; ++itr)
 		{
-			LOG_INFO << "Loading DDL compiler " << itr->name;
-			///TODO: load compiler from module itr->modulepath
-			///Call defineDDLCompiler( const std::string& name, const ddl::CompilerInterfaceR& ci);
-		}
-	}
-	{
-		std::vector<DDLFormConfigStruct>::const_iterator itr=config.data().form.begin(),end=config.data().form.end();
-		for (;itr!=end; ++itr)
-		{
-			LOG_INFO << "Loading DDL form " << itr->sourcepath;
-			ddl::CompilerInterfaceR ci;
-			if (!getDDLCompiler( itr->DDL, ci))
+			if (!loadDDLForm( *itr, itemname, error))
 			{
-				LOG_ERROR << "Unknown DDL of form" << itr->DDL;
+				LOG_ERROR << "Cannot load DDL form '" << itemname << " from '" << itr->sourcepath << "' (" << error << ")";
+				rt = false;
+			}
+			else if (functions.find( itemname) != functions.end())
+			{
+				LOG_ERROR << "Name clash with " << functions[ itemname] << " loading DDL form '" << itemname << " from '" << itr->sourcepath << "' (" << error << ")";
 				rt = false;
 			}
 			else
 			{
-				ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
-				std::string error;
-				*form = ci->compileFile( itr->sourcepath);
-				if (form->doctype())
-				{
-					std::string name = utils::getIdFromDoctype( form->doctype());
-					defineForm( name, form);
-				}
-				else
-				{
-					std::string name = utils::getFileStem( itr->sourcepath);
-					defineForm( name, form);
-				}
+				functions[ itemname] = std::string( "form definition '") + itemname + "' in '" + itr->sourcepath + "'";
+				LOG_DEBUG << "Loaded DDL form '" << itemname << "'";
 			}
 		}
 	}
 	{
-		std::vector<FilterConfigStruct>::const_iterator itr=config.data().filter.begin(),end=config.data().filter.end();
+		std::vector<PrintLayoutConfigStruct>::const_iterator itr=config.printlayout.begin(),end=config.printlayout.end();
 		for (;itr!=end; ++itr)
 		{
-			LOG_INFO << "Loading filter " << itr->name;
-			///TODO: load filter from itr->modulepath
-			///Call defineFilter( const std::string& name, const FilterFactoryR& f);
+			if (!loadPrintLayout( *itr, itemname, error))
+			{
+				LOG_ERROR << "Cannot load print layout '" << itemname << " from '" << itr->sourcepath << "' (" << error << ")";
+				rt = false;
+			}
+			else if (functions.find( itemname) != functions.end())
+			{
+				LOG_ERROR << "Name clash with " << functions[ itemname] << " loading print layout '" << itemname << " from '" << itr->sourcepath << "' (" << error << ")";
+				rt = false;
+			}
+			else
+			{
+				functions[ itemname] = std::string( "print layout '") + itemname + "' in '" + itr->sourcepath + "'";
+				LOG_DEBUG << "Loaded print layout '" << itemname << "'";
+			}
 		}
 	}
 	{
-		std::vector<TransactionTypeConfigStruct>::const_iterator itr=config.data().transactiontype.begin(),end=config.data().transactiontype.end();
+		std::vector<TransactionFunctionConfigStruct>::const_iterator itr=config.transaction.begin(),end=config.transaction.end();
 		for (;itr!=end; ++itr)
 		{
-			LOG_INFO << "Loading peer function " << itr->name;
-			///TODO: load peer function from itr->modulepath
-			///Call definePeerFunction( const std::string& name, const PeerFunction& f);
+			if (!loadTransactionFunction( *itr, itemname, error))
+			{
+				LOG_ERROR << "Cannot load transaction function '" << itemname << "' (" << error << ")";;
+				rt = false;
+			}
+			else if (functions.find( itemname) != functions.end())
+			{
+				LOG_ERROR << "Name clash with " << functions[ itemname] << " loading transaction function '" << itemname << "' (" << error << ")";;
+				rt = false;
+			}
+			else
+			{
+				functions[ itemname] = std::string( "transaction function '") + itemname + "'";
+				LOG_DEBUG << "Loaded transaction function '" << itemname << "'";
+			}
 		}
 	}
 	{
-		std::vector<TransactionFunctionConfigStruct>::const_iterator itr=config.data().transaction.begin(),end=config.data().transaction.end();
+		std::vector<ScriptCommandConfigStruct>::const_iterator itr=config.script.begin(),end=config.script.end();
 		for (;itr!=end; ++itr)
 		{
-			LOG_INFO << "Loading peer form function function " << itr->name;
-			///TODO: load peer form function from itr->modulepath
-			///Call definePeerFormFunction( const std::string& name, const PeerFormFunction& f);
-		}
-	}
-#if WITH_LUA
-	{
-		std::vector<ScriptCommandConfigStruct>::const_iterator itr=config.data().script.begin(),end=config.data().script.end();
-		for (;itr!=end; ++itr)
-		{
-			defineLuaFunction( itr->name, itr->sourcepath);
-		}
-	}
-#endif
-	{
-		std::vector<FormFunctionConfigStruct>::const_iterator itr=config.data().formfunction.begin(),end=config.data().formfunction.end();
-		for (;itr!=end; ++itr)
-		{
-			LOG_INFO << "Loading form function" << itr->name;
-			///TODO: load form function from itr->modulepath
-			///API for defining the function is not yet available !
+			if (!loadScript( *itr, itemname, error))
+			{
+				LOG_ERROR << "Cannot load script function '" << itemname << "' from '"<< itr->sourcepath << "' (" << error << ")";
+				rt = false;
+			}
+			else if (functions.find( itemname) != functions.end())
+			{
+				LOG_ERROR << "Name clash with " << functions[ itemname] << " loading script function '" << itemname << "' from '"<< itr->sourcepath << "' (" << error << ")";
+				rt = false;
+			}
+			else
+			{
+				functions[ itemname] = std::string( "script function '") + itemname + "' in '" + itr->sourcepath + "'";
+				LOG_DEBUG << "Loaded script function '" << itemname << "'";
+			}
 		}
 	}
 	return rt;

@@ -53,7 +53,12 @@ struct TransactionFunction
 	virtual InputR getInput() const=0;
 	virtual ResultR execute( const Input* i) const=0;
 };
+
 typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
+
+///\param[in] database name of the database
+///\param[in] description transaction description source
+typedef TransactionFunctionR (*CreateTransactionFunction)( const std::string& database, const std::string& description);
 
 }}
 #endif

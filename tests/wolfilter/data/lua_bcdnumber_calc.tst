@@ -34402,11 +34402,13 @@
 523113432845870143891774895725038
 1416033216724766420909673978
 **file:bcdnumber_calc.lua
+module "bcdnumber"
 
 function run()
 	f = filter( "line:UTF-8")
 	input:as( f)
 	output:as( f)
+
 	stack = {}
 	for line in input:get() do
 		for w in string.gmatch( line, "%S+") do
@@ -34493,5 +34495,5 @@ end
 
 
 **config
---lua-import bcdnumber --script bcdnumber_calc.lua run
+--script bcdnumber_calc.lua run
 **end

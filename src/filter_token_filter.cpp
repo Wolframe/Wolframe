@@ -40,7 +40,6 @@ Project Wolframe.
 #include <cstring>
 #include <cstddef>
 #include <algorithm>
-/*[-]*/#include <iostream>
 
 using namespace _Wolframe;
 using namespace langbind;

@@ -246,18 +246,22 @@ class TransactionFunction
 {
 public:
 	TransactionFunction( const TransactionFunction& o);
-	TransactionFunction( const std::string& handler, const std::string& src);
+	TransactionFunction( const std::string& database, const std::string& src);
 	virtual ~TransactionFunction(){}
 
 	virtual langbind::TransactionFunction::InputR getInput() const;
 	virtual langbind::TransactionFunction::ResultR execute( const langbind::TransactionFunction::Input* input) const;
 
 private:
-	std::string m_handlername;
+	std::string m_database;
 	std::string m_resultname;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
 };
+
+///\param[in] handler name of interface to underlaying database
+///\param[in] description transaction description source
+langbind::TransactionFunctionR createPreparedStatementTransactionFunction( const std::string& database, const std::string& description);
 
 }}//namespace
 #endif

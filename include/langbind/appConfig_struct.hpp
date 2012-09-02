@@ -41,37 +41,20 @@
 namespace _Wolframe {
 namespace langbind {
 
-struct DDLCompilerConfigStruct
-{
-	std::string name;						//< name of DDL referenced by form definitions
-	std::string modulepath;						//< path of the DDL compiler module
-
-	///\brief Get the configuration structure description
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
-
 struct DDLFormConfigStruct
 {
-	std::string DDL;						//< name of DDL referencing the DDL compiler (langbind::DDLCompilerConfigStruct)
-	std::string sourcepath;						//< path of the DDL source of this form
+	std::string DDL;						//< (optional) name of DDL referencing the DDL compiler (langbind::DDLCompilerConfigStruct)
+	std::string sourcepath;						//< path of the DDL source of this form. The name of the function is defined in the source or given by the stem of the file name in 'sourcepath'
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
-struct FilterConfigStruct
+struct PrintLayoutConfigStruct
 {
-	std::string name;						//< name of the form
-	std::string modulepath;						//< path of filter module
-
-	///\brief Get the configuration structure description
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
-
-struct TransactionTypeConfigStruct
-{
-	std::string name;						//< name of the peer function
-	std::string modulepath;						//< path of the command handler module (cmdbind::CommandHandler)
+	std::string name;						//< (optional) name of the print function. If not defined then the the name of the print function is the stem of the file name in 'sourcepath'
+	std::string type;						//< (optional) type of the print function. Defines the interpreter of the print layout description in the source file, creating a print function out of it. If not specified, then the file extension determines the type
+	std::string sourcepath;						//< path of the source of this print function containing the print layout description.
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();
@@ -80,7 +63,8 @@ struct TransactionTypeConfigStruct
 struct TransactionFunctionConfigStruct
 {
 	std::string name;						//< name of the function
-	std::string interpreter;					//< name of the transaction function interpreter
+	std::string type;						//< name of the transaction function type (interpreter)
+	std::string database;						//< database interface
 	std::string call;						//< the source of the transaction function
 
 	///\brief Get the configuration structure description
@@ -90,33 +74,25 @@ struct TransactionFunctionConfigStruct
 struct ScriptCommandConfigStruct
 {
 	std::string name;						//< name of the function in the script (globally unique)
+	std::string type;						//< (optional) name of the transaction function type (interpreter). If not specified, then the file extension determines the type
 	std::string sourcepath;						//< path of the script source
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
-struct FormFunctionConfigStruct
-{
-	std::string name;						//< name of the form function (globally unique)
-	std::string modulepath;						//< path of module with the function definition and implementation
-
-	///\brief Get the configuration structure description
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
 
 struct EnvironmentConfigStruct
 {
-	std::vector<DDLCompilerConfigStruct> DDL;			//< definitions of DDLs
 	std::vector<DDLFormConfigStruct> form;				//< definitions of forms
-	std::vector<FilterConfigStruct> filter;				//< definitions of filters
-	std::vector<TransactionTypeConfigStruct> transactiontype;	//< definitions of transaction types
+	std::vector<PrintLayoutConfigStruct> printlayout;		//< definitions of print layouts for forms
 	std::vector<TransactionFunctionConfigStruct> transaction;	//< definitions of transaction function
 	std::vector<ScriptCommandConfigStruct> script;			//< definitions of script functions
-	std::vector<FormFunctionConfigStruct> formfunction;		//< definitions of the form functions
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();
+
+	void setCanonicalPathes( const std::string& referencePath);
 };
 
 }}//namespace

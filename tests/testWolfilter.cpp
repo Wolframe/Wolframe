@@ -167,7 +167,7 @@ TEST_F( WolfilterTest, tests)
 		{
 			cmdargv[ci] = strdup( cmd[ci-1].c_str() );
 		}
-		boost::filesystem::path refpath( g_testdir / "temp");
+		boost::filesystem::path refpath( g_testdir / "temp" / "test.cfg");
 		config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string());
 
 		// [2.5] Call iostreamfilter

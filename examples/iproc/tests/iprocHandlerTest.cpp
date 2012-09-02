@@ -107,7 +107,7 @@ public:
 
 		setBuffers( ib, ob);
 		loadGlobalContext();
-		langbind::getGlobalContext()->load( m_langbindConfig);
+		langbind::getGlobalContext()->load( m_langbindConfig.data());
 	}
 
 private:

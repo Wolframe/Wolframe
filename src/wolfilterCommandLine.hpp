@@ -52,10 +52,8 @@ public:
 		:m_printhelp(o.m_printhelp)
 		,m_printversion(o.m_printversion)
 		,m_inputfile(o.m_inputfile)
-		,m_scripts(o.m_scripts)
 		,m_modules(o.m_modules)
-		,m_forms(o.m_forms)
-		,m_transactions(o.m_transactions)
+		,m_envconfig(o.m_envconfig)
 		,m_cmd(o.m_cmd)
 		,m_inputfilter(o.m_inputfilter)
 		,m_outputfilter(o.m_outputfilter)
@@ -68,11 +66,8 @@ public:
 	bool printhelp() const									{return m_printhelp;}
 	bool printversion() const								{return m_printversion;}
 	const std::string& inputfile() const							{return m_inputfile;}
-	const std::vector<std::string>& luaimports() const					{return m_luaimports;}
-	const std::vector<std::string>& scripts() const						{return m_scripts;}
+	const langbind::EnvironmentConfigStruct& envconfig() const				{return m_envconfig;}
 	const std::vector<std::string>& modules() const						{return m_modules;}
-	const std::vector<langbind::DDLFormConfigStruct>& forms() const				{return m_forms;}
-	const std::vector<langbind::TransactionFunctionConfigStruct>& transactions() const	{return m_transactions;}
 	const std::string& cmd() const								{return m_cmd;}
 	const std::string& inputfilter() const							{return m_inputfilter;}
 	const std::string& outputfilter() const							{return m_outputfilter;}
@@ -91,11 +86,8 @@ private:
 	bool m_printhelp;
 	bool m_printversion;
 	std::string m_inputfile;
-	std::vector<std::string> m_luaimports;
-	std::vector<std::string> m_scripts;
 	std::vector<std::string> m_modules;
-	std::vector<langbind::DDLFormConfigStruct> m_forms;
-	std::vector<langbind::TransactionFunctionConfigStruct> m_transactions;
+	langbind::EnvironmentConfigStruct m_envconfig;
 	std::string m_cmd;
 	std::string m_inputfilter;
 	std::string m_outputfilter;

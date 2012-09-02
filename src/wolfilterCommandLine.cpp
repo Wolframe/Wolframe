@@ -48,13 +48,60 @@
 using namespace _Wolframe;
 using namespace _Wolframe::config;
 
+static void parseNameTypeSource( const std::string& opt, bool getFilenameStemAsName, std::string& name, std::string& type, std::string& sourcepath)
+{
+	const char* cc = std::strchr( opt.c_str(), ':');
+	const char* xx = std::strchr( opt.c_str(), '.');
+	if (cc && cc-opt.c_str() > 1)
+	{
+		if (xx && xx < cc)
+		{
+			std::string type_name( opt.c_str(), cc-opt.c_str());
+			std::string ext = utils::getFileExtension( type_name);
+			std::string stem = utils::getFileStem( type_name);
+
+			if (!ext.empty()) type = std::string( ext.c_str() + 1);
+			if (!stem.empty()) name = std::string( stem.c_str());
+		}
+		else
+		{
+			type = std::string( opt.c_str(), cc-opt.c_str());
+			name = "";
+		}
+		sourcepath = std::string( cc+1);
+		if (type.empty())
+		{
+			std::string ext = utils::getFileExtension( sourcepath);
+			if (!ext.empty()) type = std::string( ext.c_str() + 1);
+		}
+		if (name.empty() && getFilenameStemAsName)
+		{
+			std::string stem = utils::getFileStem( sourcepath);
+			if (!stem.empty()) name = std::string( stem.c_str());
+		}
+	}
+	else
+	{
+		sourcepath = opt;
+		std::string ext = utils::getFileExtension( opt);
+		if (ext.empty()) throw std::runtime_error( "no type of print layout specified (file extension missing)");
+		type = std::string( ext.c_str() + 1);
+
+		if (getFilenameStemAsName)
+		{
+			std::string stem = utils::getFileStem( opt);
+			if (stem.empty()) throw std::runtime_error( "no name of print layout specified (file stem missing)");
+			name = std::string( stem.c_str());
+		}
+	}
+}
 
 struct DDLFormOption :public langbind::DDLFormConfigStruct
 {
 	DDLFormOption( const std::string& src)
 	{
-		const char* cc = std::strchr( src.c_str(), '#');
-		if (cc)
+		const char* cc = std::strchr( src.c_str(), ':');
+		if (cc && cc-src.c_str() > 1)
 		{
 			DDL = std::string( src.c_str(), cc-src.c_str());
 			sourcepath = std::string( cc+1);
@@ -70,6 +117,14 @@ struct DDLFormOption :public langbind::DDLFormConfigStruct
 	}
 };
 
+struct PrintLayoutOption :public langbind::PrintLayoutConfigStruct
+{
+	PrintLayoutOption( const std::string& opt)
+	{
+		parseNameTypeSource( opt, true, name, type, sourcepath);
+	}
+};
+
 struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStruct
 {
 	TransactionFunctionOption( const std::string& src)
@@ -77,28 +132,28 @@ struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStru
 		std::string::const_iterator si = src.begin(), se = src.end();
 		if (!utils::parseNextToken( name, si, se))
 		{
-			throw std::runtime_error( "illegal transaction function option");
+			throw std::runtime_error( "illegal transaction function option (name)");
 		}
-		if (!utils::parseNextToken( interpreter, si, se))
+		if (!utils::parseNextToken( type, si, se))
 		{
-			throw std::runtime_error( "illegal transaction function option");
+			throw std::runtime_error( "illegal transaction function option (type)");
+		}
+		if (!utils::parseNextToken( database, si, se))
+		{
+			throw std::runtime_error( "illegal transaction function option (database)");
 		}
 		call.insert( call.end(), si, se);
 	}
 };
 
-static std::string canonicalPath( const std::string& path, const std::string& refpath)
+struct ScriptCommandOption :public langbind::ScriptCommandConfigStruct
 {
-	boost::filesystem::path pt( path);
-	if (pt.is_absolute())
+	ScriptCommandOption( const std::string& opt)
 	{
-		return pt.string();
+		parseNameTypeSource( opt, false, name, type, sourcepath);
 	}
-	else
-	{
-		return boost::filesystem::absolute( pt, boost::filesystem::path( refpath)).string();
-	}
-}
+};
+
 
 WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath)
 	:m_printhelp(false)
@@ -116,8 +171,8 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		( "input,f", po::value<std::string>(), "specify input file to process by path" )
 		( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 		( "form,r", po::value< std::vector<std::string> >(), "specify form to load by path" )
-		( "function,t", po::value< std::vector<std::string> >(), "specify form to form function (transaction)" )
-		( "lua-import", po::value< std::vector<std::string> >(), "specify additional lua modules to use by name" )
+		( "printlayout,p", po::value< std::vector<std::string> >(), "specify print layout for a form" )
+		( "transaction,t", po::value< std::vector<std::string> >(), "specify transaction function" )
 		( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
 		( "cmd", po::value<std::string>(), "name of the command to execute")
 		( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
@@ -144,22 +199,37 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		std::vector<std::string>::const_iterator itr=formparams.begin(), end=formparams.end();
 		for (; itr != end; ++itr)
 		{
-			DDLFormOption formparam( *itr);
-			m_forms.push_back( formparam);
+			m_envconfig.form.push_back( DDLFormOption( *itr));
 		}
 	}
-	if (vmap.count( "function"))
+	if (vmap.count( "printlayout"))
 	{
-		std::vector<std::string> functions = vmap["function"].as<std::vector<std::string> >();
-		std::vector<std::string>::const_iterator itr=functions.begin(), end=functions.end();
+		std::vector<std::string> printlayouts = vmap["printlayout"].as<std::vector<std::string> >();
+		std::vector<std::string>::const_iterator itr=printlayouts.begin(), end=printlayouts.end();
 		for (; itr != end; ++itr)
 		{
-			TransactionFunctionOption tf(*itr);
-			m_transactions.push_back( tf);
+			m_envconfig.printlayout.push_back( PrintLayoutOption( *itr));
 		}
 	}
-	if (vmap.count( "lua-import")) m_luaimports = vmap["lua-import"].as<std::vector<std::string> >();
-	if (vmap.count( "script")) m_scripts = vmap["script"].as<std::vector<std::string> >();
+	if (vmap.count( "transaction"))
+	{
+		std::vector<std::string> transactions = vmap["transaction"].as<std::vector<std::string> >();
+		std::vector<std::string>::const_iterator itr=transactions.begin(), end=transactions.end();
+		for (; itr != end; ++itr)
+		{
+			m_envconfig.transaction.push_back( TransactionFunctionOption( *itr));
+		}
+	}
+	if (vmap.count( "script"))
+	{
+		std::vector<std::string> scripts = vmap["script"].as<std::vector<std::string> >();
+		std::vector<std::string>::const_iterator itr=scripts.begin(), end=scripts.end();
+		for (; itr != end; ++itr)
+		{
+			m_envconfig.script.push_back( ScriptCommandOption( *itr));
+		}
+	}
+
 	if (vmap.count( "cmd")) m_cmd = vmap["cmd"].as<std::string>();
 	if (vmap.count( "input-filter")) m_inputfilter = vmap["input-filter"].as<std::string>();
 	if (vmap.count( "output-filter")) m_outputfilter = vmap["output-filter"].as<std::string>();
@@ -194,12 +264,15 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 
 	for (; itr != end; ++itr)
 	{
-		modfiles.push_back( canonicalPath( *itr, referencePath));
+		modfiles.push_back( utils::getCanonicalPath( *itr, referencePath));
 	}
 	if (!LoadModules( m_modulesDirectory, modfiles))
 	{
 		throw std::runtime_error( "Modules could not be loaded");
 	}
+
+	// Set canonical pathes
+	m_envconfig.setCanonicalPathes( referencePath);
 
 	// Define processor provider objects
 }
@@ -215,55 +288,8 @@ void WolfilterCommandLine::loadGlobalContext() const
 {
 	langbind::GlobalContext* gct = langbind::getGlobalContext();
 	{
-		std::vector<std::string>::const_iterator itr,end;
-		itr = scripts().begin();
-		end = scripts().end();
-		for (; itr != end; ++itr)
-		{
-			std::string scriptpath( canonicalPath( *itr, m_referencePath));
-			langbind::LuaScript script( scriptpath);
-			std::vector<std::string>::const_iterator mi,me;
-			for (mi=m_luaimports.begin(),me=m_luaimports.end(); mi != me; ++mi)
-			{
-				script.addModule( *mi);
-			}
-			std::vector<std::string>::const_iterator fi = script.functions().begin(), fe = script.functions().end();
-			for (; fi != fe; ++fi)
-			{
-				gct->defineLuaFunction( *fi, script);
-			}
-		}
-	}
-	{
-		std::vector<langbind::DDLFormConfigStruct>::const_iterator itr,end;
-		itr = forms().begin();
-		end = forms().end();
-		for (; itr != end; ++itr)
-		{
-			std::string formpath( canonicalPath( itr->sourcepath, m_referencePath));
-			ddl::CompilerInterfaceR ci;
-			if (!gct->getDDLCompiler( itr->DDL, ci))
-			{
-				throw std::runtime_error( "Unknown DDL in form parameter");
-			}
-			else
-			{
-				ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
-				std::string error;
-				*form = ci->compileFile( formpath);
-				if (form->doctype())
-				{
-					std::string name = utils::getIdFromDoctype( form->doctype());
-					gct->defineForm( name, form);
-				}
-				else
-				{
-					std::string name = utils::getFileStem( formpath);
-					gct->defineForm( name, form);
-				}
-
-			}
-		}
+		if (!gct) throw std::runtime_error( "No global context defined");
+		gct->load( m_envconfig);
 	}
 }
 

@@ -1,8 +1,7 @@
 testname=`basename $0 ".tst"`				# name of the test
 luascript=`echo $testname | sed 's/lua_//'`.lua
 testscripts=$luascript					# list of scripts of the test
-testimports="--lua-import bcdnumber"
-testcmd="$testimports --script $luascript run"		# command to execute by the test
+testcmd="--script $luascript run"			# command to execute by the test
 docin=doc/rand_bcdnumbder_calc_input.txt		# input document name
 docout=doc/rand_bcdnumbder_calc_output.txt		# output document name
 output="../data/$testname.tst"

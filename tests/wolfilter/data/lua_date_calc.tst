@@ -52,6 +52,7 @@
 0
 1
 **file:date_calc.lua
+module "datetime"
 
 function run()
 	f = filter( "line:UTF-8")
@@ -138,5 +139,5 @@ end
 
 
 **config
---lua-import datetime --script date_calc.lua run
+--script date_calc.lua run
 **end
