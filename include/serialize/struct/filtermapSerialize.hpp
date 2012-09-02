@@ -75,6 +75,10 @@ bool printValue_float( const float*, langbind::TypedFilterBase::Element& element
 bool printValue_double( const double*, langbind::TypedFilterBase::Element& element);
 bool printValue_string( const std::string*, langbind::TypedFilterBase::Element& element);
 
+typedef bool (*FetchElement)( Context& ctx, FiltermapSerializeStateStack& stk);
+
+bool fetchObjectVectorElement( FetchElement fetchElement, const void* ve, Context& ctx, FiltermapSerializeStateStack& stk);
+
 namespace {
 template <typename TYPE>
 static bool printValue_( const void*, langbind::TypedFilterBase::Element&)
@@ -101,7 +105,6 @@ template <> bool printValue_<double>( const void* value, langbind::TypedFilterBa
 {return printValue_double( (const double*)value, element);}
 template <> bool printValue_<std::string>( const void* value, langbind::TypedFilterBase::Element& element)
 {return printValue_string( (const std::string*)value, element);}
-}//anonymous namespace
 
 template <typename TYPE>
 static bool fetchObject_( const traits::struct_&, Context& ctx, FiltermapSerializeStateStack& stk)
@@ -116,10 +119,6 @@ static bool fetchObject_( const traits::atomic_&, Context& ctx, FiltermapSeriali
 	return fetchObjectAtomic( printValue_<TYPE>, ctx, stk);
 }
 
-typedef bool (*FetchElement)( Context& ctx, FiltermapSerializeStateStack& stk);
-
-bool fetchObjectVectorElement( FetchElement fetchElement, const void* ve, Context& ctx, FiltermapSerializeStateStack& stk);
-
 template <typename TYPE>
 static bool fetchObject_( const traits::vector_&, Context& ctx, FiltermapSerializeStateStack& stk)
 {
@@ -133,6 +132,7 @@ static bool fetchObject_( const traits::vector_&, Context& ctx, FiltermapSeriali
 	const void* ve = &(*obj)[ idx];
 	return fetchObjectVectorElement( &FiltermapIntrusiveSerializer<typename TYPE::value_type>::fetch, ve, ctx, stk);
 }
+}//anonymous namespace
 
 template <typename TYPE>
 bool FiltermapIntrusiveSerializer<TYPE>::fetch( Context& ctx, FiltermapSerializeStateStack& stk)

@@ -70,6 +70,9 @@ bool parseValue_float( float*, const langbind::TypedFilterBase::Element& element
 bool parseValue_double( double*, const langbind::TypedFilterBase::Element& element);
 bool parseValue_string( std::string*, const langbind::TypedFilterBase::Element& element);
 
+bool parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk);
+
+
 namespace {
 template <typename TYPE>
 static bool parseValue_( void*, const langbind::TypedFilterBase::Element&)
@@ -96,9 +99,6 @@ template <> bool parseValue_<double>( void* value, const langbind::TypedFilterBa
 {return parseValue_double( (double*)value, element);}
 template <> bool parseValue_<std::string>( void* value, const langbind::TypedFilterBase::Element& element)
 {return parseValue_string( (std::string*)value, element);}
-}//anonymous namespace
-
-bool parseObjectAtomic( ParseValue parseVal, langbind::TypedInputFilter& inp, Context&, FiltermapParseStateStack& stk);
 
 template <typename TYPE>
 bool parseObject_( const traits::struct_&, langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)
@@ -132,6 +132,9 @@ static bool parseObject_( const traits::atomic_&, langbind::TypedInputFilter& in
 {
 	return parseObjectAtomic( parseValue_<TYPE>, inp, ctx, stk);
 }
+
+}//anonymous namespace
+
 
 template <typename TYPE>
 bool FiltermapIntrusiveParser<TYPE>::parse( langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk)

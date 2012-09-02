@@ -156,6 +156,7 @@ int AssignmentListDoc::convert( AssignmentListDoc& res, const AssignmentListDoc&
 	return 0;
 }
 
+
 int _Wolframe::test::convertAssignmentListDoc( void* res, const void* param)
 {
 	return AssignmentListDoc::convert( *(AssignmentListDoc*)res, *(const AssignmentListDoc*) param);

@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = libwolframe modules
+SUBDIRS = libwolframe libwolframe_serialize modules
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -8,7 +8,8 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
-	-L$(TOPDIR)/src/libwolframe
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
@@ -17,6 +18,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
+	-lwolframe_serialize \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
@@ -92,14 +94,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_token_filter.o \
 	filter_tostringfilter.o \
 	filter_ptreefilter.o \
-	serialize_struct_filtermapBase.o \
-	serialize_struct_filtermapParseStack.o \
-	serialize_struct_filtermapParse.o \
-	serialize_struct_filtermapSerializeStack.o \
-	serialize_struct_filtermapSerialize.o \
-	serialize_ddl_filtermapSerialize.o \
-	serialize_ddl_filtermapParse.o \
-	serialize_mapContext.o \
 	ddl_atomicType.o \
 	ddl_structType.o \
 	ddl_structTypeBuild.o \
@@ -160,14 +154,14 @@ CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-modules: libwolframe
+modules: libwolframe libwolframe_serialize
 
-wolframed$(EXE): libwolframe
+wolframed$(EXE): libwolframe libwolframe_serialize
 
 wolframed$(EXE): wolframed.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
-wolfilter$(EXE): libwolframe
+wolfilter$(EXE): libwolframe libwolframe_serialize
 
 wolfilter$(EXE): wolfilter.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)

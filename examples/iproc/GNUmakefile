@@ -22,6 +22,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
+	$(TOPDIR)/src/libwolframe_serialize/libwolframe_serialize.a \
 	$(LIBS_DL)
 
 # lua

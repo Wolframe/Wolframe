@@ -39,6 +39,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/wtest/wolftest.a \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
+	$(TOPDIR)/src/libwolframe_serialize/libwolframe_serialize.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_program_options
 

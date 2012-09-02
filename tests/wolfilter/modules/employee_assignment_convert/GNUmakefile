@@ -9,17 +9,16 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR) -I$(TOPDIR)/tests \
 	-I$(BOOST_INCLUDE_DIR)
 
-INCLUDE_LDFLAGS =
-INCLUDE_LIBS =
+INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe_serialize
+
+INCLUDE_LIBS = \
+	-lwolframe_serialize \
+	$(LIBS_DL)
 
 DYNAMIC_MODULE = mod_employee_assignment_convert.so
 
 CPP_OBJS = \
-	$(TOPDIR)/src/serialize_struct_filtermapBase.o \
-	$(TOPDIR)/src/serialize_struct_filtermapParseStack.o \
-	$(TOPDIR)/src/serialize_struct_filtermapParse.o \
-	$(TOPDIR)/src/serialize_struct_filtermapSerializeStack.o \
-	$(TOPDIR)/src/serialize_struct_filtermapSerialize.o \
 	employee_assignment_convert.o \
 	mod_employee_assignment_convert.o
 

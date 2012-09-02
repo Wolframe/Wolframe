@@ -125,7 +125,6 @@ struct StructDescription :public StructDescriptionBase
 		{}
 		return typ;
 	}
-
 };
 
 }}// end namespace
