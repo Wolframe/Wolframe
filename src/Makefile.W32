@@ -1,6 +1,9 @@
 TOPDIR = ..
 
-SUBDIRS = libwolframe libwolframe_serialize modules
+SUBDIRS = \
+	libwolframe \
+	libwolframe_serialize \
+	modules
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -103,11 +106,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	types_allocators.obj \
 	types_bcdArithmetic.obj \
 	types_dateArithmetic.obj \
-	ddl_compilerInterface.obj \
 	ddl_compiler_simpleFormCompiler.obj \
-	ddl_atomicType.obj \
-	ddl_structType.obj \
-	ddl_structTypeBuild.obj \
 	database_processor.obj \
 	prnt_pdfPrinterVariable.obj \
 	prnt_pdfPrinterMethod.obj \
@@ -168,6 +167,7 @@ all: dependencies $(CPP_OBJS) $(CPP_BINS)
 
 dependencies:
 	cd libwolframe & $(MAKE) /nologo /f Makefile.w32 all
+	cd libwolframe_serialize & $(MAKE) /nologo /f Makefile.w32 all
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

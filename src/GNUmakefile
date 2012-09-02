@@ -94,10 +94,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_token_filter.o \
 	filter_tostringfilter.o \
 	filter_ptreefilter.o \
-	ddl_atomicType.o \
-	ddl_structType.o \
-	ddl_structTypeBuild.o \
-	ddl_compilerInterface.o \
 	ddl_compiler_simpleFormCompiler.o \
 	database_processor.o \
 	prnt_pdfPrinterVariable.o \
