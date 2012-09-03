@@ -19,7 +19,12 @@ GCC_MAJOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-major-ver
 GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-version $(CC) "$(CURDIR)" $(TOPDIR))
 
 # optimization flags
+ifdef RELEASE
+OPTFLAGS ?= -O2
+# no -frepo -fno-implicit-templates currently, create tons of errors!!
+else
 OPTFLAGS ?= -g -O0
+endif
 
 # -Werror: troubles Qt in qvector2d.h
 # -Wswitch-default: not good for switches with enums

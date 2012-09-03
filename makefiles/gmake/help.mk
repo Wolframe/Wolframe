@@ -38,6 +38,7 @@ ENABLE_NLS=0           Don't build gettext NLS support (default is on)
 
 Avaliable optional features during testing only:
 
+RELEASE=1              build using release compiler and linker flags
 RUN_TESTS=0            don't automatially run tests (default is run them)
 WITH_EXPECT=1          use Expect/Tcl for system testing
 
