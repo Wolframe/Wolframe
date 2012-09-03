@@ -687,6 +687,7 @@ fi
 %{_includedir}/wolframe/filter/*.hpp
 %dir %{_includedir}/wolframe/types/
 %{_includedir}/wolframe/types/*.hpp
+%{_includedir}/wolframe/types/*.h
 %dir %{_includedir}/wolframe/AAAA/
 %{_includedir}/wolframe/AAAA/*.hpp
 

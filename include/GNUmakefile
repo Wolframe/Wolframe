@@ -15,7 +15,7 @@ INCLUDE_SUBDIRS = \
 local_install:
 	for d in $(INCLUDE_SUBDIRS); do \
 		$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)/wolframe/$$d && \
-		$(INSTALL) -m 644 $$d/*.hpp $(DESTDIR)$(includedir)/wolframe/$$d; \
+		$(INSTALL) -m 644 $$d/*.h* $(DESTDIR)$(includedir)/wolframe/$$d; \
 	done
 
 local_uninstall:
