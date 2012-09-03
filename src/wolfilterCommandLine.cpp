@@ -48,113 +48,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::config;
 
-static void parseNameTypeSource( const std::string& opt, bool getFilenameStemAsName, std::string& name, std::string& type, std::string& sourcepath)
-{
-	const char* cc = std::strchr( opt.c_str(), ':');
-	const char* xx = std::strchr( opt.c_str(), '.');
-	if (cc && cc-opt.c_str() > 1)
-	{
-		if (xx && xx < cc)
-		{
-			std::string type_name( opt.c_str(), cc-opt.c_str());
-			std::string ext = utils::getFileExtension( type_name);
-			std::string stem = utils::getFileStem( type_name);
-
-			if (!ext.empty()) type = std::string( ext.c_str() + 1);
-			if (!stem.empty()) name = std::string( stem.c_str());
-		}
-		else
-		{
-			type = std::string( opt.c_str(), cc-opt.c_str());
-			name = "";
-		}
-		sourcepath = std::string( cc+1);
-		if (type.empty())
-		{
-			std::string ext = utils::getFileExtension( sourcepath);
-			if (!ext.empty()) type = std::string( ext.c_str() + 1);
-		}
-		if (name.empty() && getFilenameStemAsName)
-		{
-			std::string stem = utils::getFileStem( sourcepath);
-			if (!stem.empty()) name = std::string( stem.c_str());
-		}
-	}
-	else
-	{
-		sourcepath = opt;
-		std::string ext = utils::getFileExtension( opt);
-		if (ext.empty()) throw std::runtime_error( "no type of print layout specified (file extension missing)");
-		type = std::string( ext.c_str() + 1);
-
-		if (getFilenameStemAsName)
-		{
-			std::string stem = utils::getFileStem( opt);
-			if (stem.empty()) throw std::runtime_error( "no name of print layout specified (file stem missing)");
-			name = std::string( stem.c_str());
-		}
-	}
-}
-
-struct DDLFormOption :public langbind::DDLFormConfigStruct
-{
-	DDLFormOption( const std::string& src)
-	{
-		const char* cc = std::strchr( src.c_str(), ':');
-		if (cc && cc-src.c_str() > 1)
-		{
-			DDL = std::string( src.c_str(), cc-src.c_str());
-			sourcepath = std::string( cc+1);
-		}
-		else
-		{
-			std::string ext = utils::getFileExtension( src);
-			if (!ext.size()) throw std::runtime_error( "no DDL specified (file extension missing) for form file");
-
-			DDL = std::string( ext.c_str()+1);
-			sourcepath = src;
-		}
-	}
-};
-
-struct PrintLayoutOption :public langbind::PrintLayoutConfigStruct
-{
-	PrintLayoutOption( const std::string& opt)
-	{
-		parseNameTypeSource( opt, true, name, type, sourcepath);
-	}
-};
-
-struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStruct
-{
-	TransactionFunctionOption( const std::string& src)
-	{
-		std::string::const_iterator si = src.begin(), se = src.end();
-		if (!utils::parseNextToken( name, si, se))
-		{
-			throw std::runtime_error( "illegal transaction function option (name)");
-		}
-		if (!utils::parseNextToken( type, si, se))
-		{
-			throw std::runtime_error( "illegal transaction function option (type)");
-		}
-		if (!utils::parseNextToken( database, si, se))
-		{
-			throw std::runtime_error( "illegal transaction function option (database)");
-		}
-		call.insert( call.end(), si, se);
-	}
-};
-
-struct ScriptCommandOption :public langbind::ScriptCommandConfigStruct
-{
-	ScriptCommandOption( const std::string& opt)
-	{
-		parseNameTypeSource( opt, false, name, type, sourcepath);
-	}
-};
-
-
 WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath)
 	:m_printhelp(false)
 	,m_printversion(false)
@@ -199,7 +92,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		std::vector<std::string>::const_iterator itr=formparams.begin(), end=formparams.end();
 		for (; itr != end; ++itr)
 		{
-			m_envconfig.form.push_back( DDLFormOption( *itr));
+			m_envconfig.form.push_back( langbind::DDLFormOption( *itr));
 		}
 	}
 	if (vmap.count( "printlayout"))
@@ -208,7 +101,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		std::vector<std::string>::const_iterator itr=printlayouts.begin(), end=printlayouts.end();
 		for (; itr != end; ++itr)
 		{
-			m_envconfig.printlayout.push_back( PrintLayoutOption( *itr));
+			m_envconfig.printlayout.push_back( langbind::PrintLayoutOption( *itr));
 		}
 	}
 	if (vmap.count( "transaction"))
@@ -217,7 +110,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		std::vector<std::string>::const_iterator itr=transactions.begin(), end=transactions.end();
 		for (; itr != end; ++itr)
 		{
-			m_envconfig.transaction.push_back( TransactionFunctionOption( *itr));
+			m_envconfig.transaction.push_back( langbind::TransactionFunctionOption( *itr));
 		}
 	}
 	if (vmap.count( "script"))
@@ -226,7 +119,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		std::vector<std::string>::const_iterator itr=scripts.begin(), end=scripts.end();
 		for (; itr != end; ++itr)
 		{
-			m_envconfig.script.push_back( ScriptCommandOption( *itr));
+			m_envconfig.script.push_back( langbind::ScriptCommandOption( *itr));
 		}
 	}
 

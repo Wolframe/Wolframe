@@ -1,0 +1,49 @@
+!DOCTYPE "invoice 'http://www.wolframe.org/example-doc/invoice.dtd'"
+invoice
+{
+	order
+	{
+		number string
+		reference string
+		representative string
+		terms uint
+		issuedate string
+		duedate string
+		description string
+	}
+	item []
+	{
+		name string
+		description string
+		quantity uint
+		discount float
+		price
+		{
+			unit float
+			total float
+			tax float
+			gross float
+		}
+	}
+	bill
+	{
+		price
+		{
+			total float
+			tax float
+			gross float
+		}
+		payed float
+		open float
+	}
+	address
+	{
+		@id string
+		name string
+		street string
+		postalcode uint
+		city string
+		country string
+	}
+}
+

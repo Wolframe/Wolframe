@@ -42,6 +42,8 @@
 #include "moduleInterface.hpp"
 #include "utils/miscUtils.hpp"
 #include "processor/procProvider.hpp"
+#include "prnt/pdfPrinter.hpp"
+
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -78,10 +80,11 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 						test::AssignmentListDoc::getStructDescription(),
 						test::AssignmentListDoc::getStructDescription()));
 
-	langbind::Filter flt;
-	if (!gct->getFilter( "token", flt)) throw std::runtime_error( "filter 'token' not found");
 	langbind::TransactionFunctionR func( new EchoTransactionFunction());
 	gct->defineTransactionFunction( "echo_transaction", func);
+
+	gct->definePrintFunctionType( "simplepdf", &prnt::createSimplePdfPrintFunction);
+	gct->definePrintFunctionType( "tracepdf", &prnt::createTestTracePdfPrintFunction);
 
 	cmdline.loadGlobalContext();
 }

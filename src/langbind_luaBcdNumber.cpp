@@ -45,6 +45,9 @@ extern "C"
 using namespace _Wolframe;
 using namespace langbind;
 
+namespace
+{
+
 struct LuaBigintMetaInfo
 {
 	static const char* metatableName()
@@ -74,6 +77,8 @@ struct LuaBignumMetaInfo
 
 typedef LuaArithmeticType<types::BigNumber, LuaBignumMetaInfo> LuaBignum;
 typedef LuaArithmeticTypeConstructor<types::BigNumber, LuaBignumMetaInfo> ConstructorLuaBignum;
+
+}//anonymous namespace
 
 int _Wolframe::langbind::initBignumModule( lua_State* ls)
 {

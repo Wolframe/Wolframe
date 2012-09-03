@@ -49,6 +49,7 @@ enum Variable
 	SizeX,
 	SizeY
 };
+enum {NofVariables=(int)SizeY+1};
 
 const char* variableName( Variable v);
 
@@ -67,8 +68,38 @@ public:
 	void define( Variable var, const std::string& value);
 	void define( Variable var, Variable src);
 
-	std::size_t getValueIdx( Variable var);
-	std::string getValue( std::size_t idx);
+	std::size_t getValueIdx( Variable var) const;
+	std::string getValue( std::size_t idx) const;
+
+	class const_iterator
+	{
+	public:
+		const_iterator( const const_iterator& o)		:m_visited(o.m_visited),m_itr(o.m_itr){}
+		const_iterator( const VariableScope* visited)		:m_visited(visited),m_itr(0){skip();}
+		const_iterator()					:m_visited(0),m_itr(NofVariables){}
+		void skip()						{while (m_itr < (int)NofVariables && !m_visited->getValueIdx( (Variable)m_itr)) ++m_itr;}
+		const_iterator& operator++()				{skip(); return *this;}
+		const_iterator operator++(int)				{const_iterator rt(*this); skip(); return rt;}
+		bool operator ==( const const_iterator& o) const	{return !compare(o);}
+		bool operator !=( const const_iterator& o) const	{return compare(o);}
+		bool operator <=( const const_iterator& o) const	{return compare(o)<=0;}
+		bool operator >=( const const_iterator& o) const	{return compare(o)>=0;}
+		bool operator <( const const_iterator& o) const		{return compare(o)<0;}
+		bool operator >( const const_iterator& o) const		{return compare(o)>0;}
+
+		const char* name() const				{return (m_itr < NofVariables)?variableName((Variable)m_itr):"";}
+		std::string value() const				{return (m_itr < NofVariables)?m_visited->getValue( m_visited->getValueIdx( (Variable)m_itr)):std::string();}
+
+	private:
+		int compare( const const_iterator& o) const		{return m_itr - o.m_itr;}
+
+	private:
+		const VariableScope* m_visited;
+		unsigned int m_itr;
+	};
+
+	const_iterator begin() const					{return const_iterator(this);}
+	const_iterator end() const					{return const_iterator();}
 
 private:
 	typedef std::map<std::size_t,std::size_t> Map;

@@ -45,6 +45,9 @@ extern "C"
 using namespace _Wolframe;
 using namespace langbind;
 
+namespace
+{
+
 struct LuaDateMetaInfo
 {
 	static const char* metatableName()
@@ -59,6 +62,8 @@ struct LuaDateMetaInfo
 
 typedef LuaArithmeticType<types::Date, LuaDateMetaInfo> LuaDate;
 typedef LuaArithmeticTypeConstructor<types::Date, LuaDateMetaInfo> ConstructorLuaDate;
+
+}//anonymous namespace
 
 int _Wolframe::langbind::initDateTimeModule( lua_State* ls)
 {

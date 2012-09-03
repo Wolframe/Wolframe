@@ -104,7 +104,7 @@ void VariableScope::define( Variable var, Variable src)
 	m_ar.back()[var] = val;
 }
 
-std::size_t VariableScope::getValueIdx( Variable var)
+std::size_t VariableScope::getValueIdx( Variable var) const
 {
 	std::vector<Map>::const_iterator itr = m_ar.begin()+m_ar.size();
 	while (itr != m_ar.begin())
@@ -119,7 +119,7 @@ std::size_t VariableScope::getValueIdx( Variable var)
 	return 0;
 }
 
-std::string VariableScope::getValue( std::size_t idx)
+std::string VariableScope::getValue( std::size_t idx) const
 {
 	return std::string( m_strings.c_str() + idx);
 }

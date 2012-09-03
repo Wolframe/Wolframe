@@ -41,79 +41,87 @@
 using namespace _Wolframe;
 using namespace test;
 
+namespace {
+struct TaskDescription :public serialize::StructDescription<Task>
+{
+	TaskDescription()
+	{
+		(*this)
+		("key", &Task::key)
+		("title", &Task::title)
+		("customernumber", &Task::customernumber);
+	}
+};
+
+struct EmployeeDescription :public serialize::StructDescription<Employee>
+{
+	EmployeeDescription()
+	{
+		(*this)
+		("firstname", &Employee::firstname)
+		("surname", &Employee::surname)
+		("phone", &Employee::phone);
+	}
+};
+
+struct AssignmentDescription :public serialize::StructDescription<Assignment>
+{
+	AssignmentDescription()
+	{
+		(*this)
+		("issuedate", &Assignment::issuedate)
+		("employee", &Assignment::employee)
+		("task", &Assignment::task);
+	}
+};
+
+struct AssignmentListDescription :public serialize::StructDescription<AssignmentList>
+{
+	AssignmentListDescription()
+	{
+		(*this)
+		("assignment", &AssignmentList::assignment);
+	}
+};
+
+struct AssignmentListDocDescription :public serialize::StructDescription<AssignmentListDoc>
+{
+	AssignmentListDocDescription()
+	{
+		(*this)
+		("assignmentlist", &AssignmentListDoc::assignmentlist);
+	}
+};
+}
+
+
 const serialize::StructDescriptionBase* Task::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<Task>
-	{
-		ThisDescription()
-		{
-			(*this)
-			("key", &Task::key)
-			("title", &Task::title)
-			("customernumber", &Task::customernumber);
-		}
-	};
-	static ThisDescription rt;
+	static TaskDescription rt;
 	return &rt;
 }
 
 const serialize::StructDescriptionBase* Employee::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<Employee>
-	{
-		ThisDescription()
-		{
-			(*this)
-			("firstname", &Employee::firstname)
-			("surname", &Employee::surname)
-			("phone", &Employee::phone);
-		}
-	};
-	static ThisDescription rt;
+	static EmployeeDescription rt;
 	return &rt;
 }
 
 const serialize::StructDescriptionBase* Assignment::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<Assignment>
-	{
-		ThisDescription()
-		{
-			(*this)
-			("issuedate", &Assignment::issuedate)
-			("employee", &Assignment::employee)
-			("task", &Assignment::task);
-		}
-	};
-	static ThisDescription rt;
+	static AssignmentDescription rt;
 	return &rt;
 }
 
 const serialize::StructDescriptionBase* AssignmentList::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<AssignmentList>
-	{
-		ThisDescription()
-		{
-			(*this)
-			("assignment", &AssignmentList::assignment);
-		}
-	};
-	static ThisDescription rt;
+	static AssignmentListDescription rt;
 	return &rt;
 }
 
 const serialize::StructDescriptionBase* AssignmentListDoc::getStructDescription()
 {
-	struct ThisDescription :public serialize::StructDescription<AssignmentListDoc>
-	{
-		ThisDescription()
-		{
-			(*this)
-			("assignmentlist", &AssignmentListDoc::assignmentlist);
-		}
-	};
-	static ThisDescription rt;
+	static AssignmentListDocDescription rt;
 	return &rt;
 }
 
