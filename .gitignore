@@ -16,6 +16,7 @@ wolframemsg.h
 *.a
 *.sho
 *.sho++
+*.rpo
 *.exe
 *.exe.manifest
 *.dll
