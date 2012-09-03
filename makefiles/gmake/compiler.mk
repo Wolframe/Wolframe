@@ -50,6 +50,7 @@ OPTFLAGS ?= -g -O0
 COMMON_COMPILE_FLAGS = \
 	$(OPTFLAGS) \
 	-fstrict-aliasing -Wstrict-aliasing=2 \
+	-frepo -fno-implicit-templates \
 	-pedantic -Wall \
 	-Wno-long-long \
 	-Wunused -Wno-import \
