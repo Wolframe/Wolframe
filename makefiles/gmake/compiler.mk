@@ -50,7 +50,6 @@ OPTFLAGS ?= -g -O0
 COMMON_COMPILE_FLAGS = \
 	$(OPTFLAGS) \
 	-fstrict-aliasing -Wstrict-aliasing=2 \
-	-frepo -fno-implicit-templates \
 	-pedantic -Wall \
 	-Wno-long-long \
 	-Wunused -Wno-import \
@@ -136,7 +135,8 @@ CXX_COMPILE_FLAGS = \
 # gcc 4.x
 ifeq "$(GCC_MAJOR_VERSION)" "4"
 CXX_COMPILE_FLAGS += \
-	-Wno-invalid-offsetof -funit-at-a-time
+	-Wno-invalid-offsetof -funit-at-a-time \
+	-frepo -fno-implicit-templates
 endif
 
 ifeq "$(GCC_MAJOR_VERSION)" "3"
