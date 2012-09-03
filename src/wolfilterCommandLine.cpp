@@ -36,6 +36,7 @@
 #include "langbind/appGlobalContext.hpp"
 #include "langbind/appConfig_struct.hpp"
 #include "moduleInterface.hpp"
+#include "logger-v1.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
@@ -61,6 +62,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	fopt.add_options()
 		( "version,v", "print version" )
 		( "help,h", "print help message" )
+		( "loglevel,l", po::value<std::string>(), "specify the log level on console" )
 		( "input,f", po::value<std::string>(), "specify input file to process by path" )
 		( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 		( "form,r", po::value< std::vector<std::string> >(), "specify form to load by path" )
@@ -83,7 +85,11 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 
 	m_printversion = vmap.count( "version");
 	m_printhelp = vmap.count( "help");
-
+	if (vmap.count( "loglevel"))
+	{
+		m_loglevel = vmap["loglevel"].as<std::string>();
+		_Wolframe::log::LogBackend::instance().setConsoleLevel( log::LogLevel::strToLogLevel( m_loglevel));
+	}
 	if (vmap.count( "input")) m_inputfile = vmap["input"].as<std::string>();
 	if (vmap.count( "module")) m_modules = vmap["module"].as<std::vector<std::string> >();
 	if (vmap.count( "form"))

@@ -39,6 +39,8 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
+static const char untaggedValueTag = '>';
+
 // forward declaration
 static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk);
 
@@ -96,12 +98,29 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 		}
 		else
 		{
-			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
-			ctx.setElem( langbind::FilterBase::OpenTag, elem);
-			rt = true;
-			stk.back().state( ++idx);
-			stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, elem));
-			stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
+			if (itr->first.size() == 1 && itr->first.c_str()[0] == untaggedValueTag)
+			{
+				if (itr->second.contentType() != ddl::StructType::Atomic)
+				{
+					throw SerializationErrorException( "atomic element expected for untagged value in structure", getElementPath( stk));
+				}
+				else
+				{
+					langbind::TypedFilterBase::Element elem( itr->second.value().value());
+					ctx.setElem( langbind::FilterBase::Value, elem);
+					rt = true;
+				}
+				stk.back().state( ++idx);
+			}
+			else
+			{
+				langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
+				ctx.setElem( langbind::FilterBase::OpenTag, elem);
+				rt = true;
+				stk.back().state( ++idx);
+				stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, elem));
+				stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
+			}
 		}
 	}
 	else

@@ -39,6 +39,8 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
+static const std::string untaggedValueTag = ">";
+
 static std::string getElementPath( const FiltermapDDLParseStateStack& stk)
 {
 	std::string rt;
@@ -64,6 +66,43 @@ enum AtomicValueState
 	AttributeValueOpen
 };
 
+static void setAtomValue( ddl::AtomicType& val, const langbind::TypedFilterBase::Element element, const std::vector<FiltermapDDLParseState>& stk)
+{
+	switch (element.type)
+	{
+		case langbind::TypedFilterBase::Element::bool_:
+			if (!val.set( element.value.bool_))
+			{
+				throw SerializationErrorException( "illegal value for boolean", element.tostring(), getElementPath( stk));
+			}
+		break;
+		case langbind::TypedFilterBase::Element::double_:
+			if (!val.set( element.value.double_))
+			{
+				throw SerializationErrorException( "illegal value for double precision floating point number", element.tostring(), getElementPath( stk));
+			}
+		break;
+		case langbind::TypedFilterBase::Element::int_:
+			if (!val.set( element.value.int_))
+			{
+				throw SerializationErrorException( "illegal value for integer number", element.tostring(), getElementPath( stk));
+			}
+		break;
+		case langbind::TypedFilterBase::Element::uint_:
+			if (!val.set( element.value.uint_))
+			{
+				throw SerializationErrorException( "illegal value for non negative integer number", element.tostring(), getElementPath( stk));
+			}
+		break;
+		case langbind::TypedFilterBase::Element::string_:
+			if (!val.set( std::string( element.value.string_.ptr, element.value.string_.size)))
+			{
+				throw SerializationErrorException( "illegal value for string", element.tostring(), getElementPath( stk));
+			}
+		break;
+	}
+}
+
 static bool parseAtom( ddl::AtomicType& val, langbind::TypedInputFilter& inp, Context&, std::vector<FiltermapDDLParseState>& stk)
 {
 	langbind::InputFilter::ElementType typ;
@@ -87,39 +126,8 @@ static bool parseAtom( ddl::AtomicType& val, langbind::TypedInputFilter& inp, Co
 			{
 				throw SerializationErrorException( "two subsequent values for atomic value", element.tostring(), getElementPath( stk));
 			}
-			switch (element.type)
-			{
-				case langbind::TypedFilterBase::Element::bool_:
-					if (!val.set( element.value.bool_))
-					{
-						throw SerializationErrorException( "illegal value for boolean", element.tostring(), getElementPath( stk));
-					}
-				break;
-				case langbind::TypedFilterBase::Element::double_:
-					if (!val.set( element.value.double_))
-					{
-						throw SerializationErrorException( "illegal value for double precision floating point number", element.tostring(), getElementPath( stk));
-					}
-				break;
-				case langbind::TypedFilterBase::Element::int_:
-					if (!val.set( element.value.int_))
-					{
-						throw SerializationErrorException( "illegal value for integer number", element.tostring(), getElementPath( stk));
-					}
-				break;
-				case langbind::TypedFilterBase::Element::uint_:
-					if (!val.set( element.value.uint_))
-					{
-						throw SerializationErrorException( "illegal value for non negative integer number", element.tostring(), getElementPath( stk));
-					}
-				break;
-				case langbind::TypedFilterBase::Element::string_:
-					if (!val.set( std::string( element.value.string_.ptr, element.value.string_.size)))
-					{
-						throw SerializationErrorException( "illegal value for string", element.tostring(), getElementPath( stk));
-					}
-				break;
-			}
+			setAtomValue( val, element, stk);
+
 			if (stk.back().state() == AttributeValueOpen)
 			{
 				stk.pop_back();
@@ -217,7 +225,19 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 
 		case langbind::InputFilter::Value:
 		{
-			throw SerializationErrorException( "structure instead of value expected", element.tostring(), getElementPath( stk));
+			ddl::StructType::Map::iterator itr = st.find( untaggedValueTag);
+			if (itr == st.end())
+			{
+				throw SerializationErrorException( "found untagged value that is not defined for this structure", element.tostring(), getElementPath( stk));
+			}
+			if (itr->second.contentType() != ddl::StructType::Atomic)
+			{
+				throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
+			}
+			else
+			{
+				setAtomValue( itr->second.value(), element, stk);
+			}
 		}
 
 		case langbind::InputFilter::CloseTag:

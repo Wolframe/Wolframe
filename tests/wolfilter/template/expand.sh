@@ -7,7 +7,9 @@
 # Executing this script in the wrong context might invalidate your test collection.
 
 echo "#!/bin/sh" > ../../testWolfilter.sh
-echo "export LD_LIBRARY_PATH=../src/libwolframe" >> ../../testWolfilter.sh
+PWD=`pwd`
+topdir=`dirname $PWD/$0`"/../../../../"
+echo "export LD_LIBRARY_PATH=$topdir/src/libwolframe;$topdir/tests/wolfilter/modules" >> ../../testWolfilter.sh
 
 for ff in `find data -type f -name "*.tst"`; do
 	echo Expanding template $ff

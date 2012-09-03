@@ -72,6 +72,7 @@ public:
 private:
 	bool m_printhelp;
 	bool m_printversion;
+	std::string m_loglevel;
 	std::string m_inputfile;
 	std::vector<std::string> m_modules;
 	langbind::EnvironmentConfigStruct m_envconfig;

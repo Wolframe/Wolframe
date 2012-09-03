@@ -20,6 +20,8 @@
 # - csetlist		list of character set encodings
 #
 TESTNAME="$testname"
+PWD=`pwd`
+topdir=`dirname $PWD/$0`"/../../../../"
 
 filter="xml:textwolf"
 for cset in $csetlist
@@ -28,5 +30,5 @@ do
 	outputfilter="$filter"
 	. ./output_tst.sh
 	echo "echo executing test $testname $cset" >> ../../testWolfilter.sh
-	echo "cat wolfilter/template/doc/$docin.UTF-8.xml | sed 's/UTF-8/$cset/' | recode UTF-8..$cset | ../wtest/cleanInput BOM EOLN | ../src/wolfilter `echo --input-filter $inputfilter --output-filter $outputfilter $testcmd | sed 's@--form @--form wolfilter/scripts/@' | sed 's@--script @--script wolfilter/scripts/@'` > temp/$docout.$cset.xml" >> ../../testWolfilter.sh
+	echo "cat $topdir/tests/wolfilter/template/doc/$docin.UTF-8.xml | sed 's/UTF-8/$cset/' | recode UTF-8..$cset | $topdir/wtest/cleanInput BOM EOLN | $topdir/src/wolfilter `echo --input-filter $inputfilter --output-filter $outputfilter $testcmd | sed 's@--form @--form $topdir/tests/wolfilter/scripts/@' | sed 's@--script @--script $topdir/tests/wolfilter/scripts/@'` > $topdir/tests/temp/$docout.$cset.xml" >> ../../testWolfilter.sh
 done

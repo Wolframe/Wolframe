@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE "invoice SYSTEM 'http://www.wolframe.org/example-doc/invoice.dtd'"><invoive><order>
+<!DOCTYPE invoice SYSTEM 'http://www.wolframe.org/example-doc/invoice.dtd'>
+<invoice>
+<order>
 <number>INS03-62</number>
 <reference>PO#6123</reference>
 <representative>happyHamster1</representative>
-<terms unit='day'>45</terms>
+<terms>45</terms>
 <issuedate>2013/03/21</issuedate>
 <duedate>2013/05/05</duedate>
 <description>swimming pool supplies and accessoires</description>

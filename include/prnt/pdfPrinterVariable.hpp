@@ -42,6 +42,7 @@ namespace prnt {
 
 enum Variable
 {
+	Text,
 	Index,
 	Value,
 	PositionX,

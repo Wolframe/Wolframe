@@ -41,6 +41,7 @@ using namespace _Wolframe::prnt;
 const char* _Wolframe::prnt::variableName( Variable v)
 {
 	static const char* ar[] = {
+		"Text",
 		"Index",
 		"Value",
 		"PositionX",
