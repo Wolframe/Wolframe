@@ -20,7 +20,8 @@ GCC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --gcc-minor-ver
 
 # optimization flags
 ifdef RELEASE
-OPTFLAGS ?= -O2 -frepo -fno-implicit-templates
+OPTFLAGS ?= -O2
+# no -frepo -fno-implicit-templates currently, create tons of errors!!
 else
 OPTFLAGS ?= -g -O0
 endif
