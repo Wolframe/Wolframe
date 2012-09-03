@@ -436,6 +436,7 @@ make install
 
 cd %{_builddir}/%{name}-%{version}
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
+	RELEASE=1 \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
@@ -458,6 +459,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	sysconfdir=/etc libdir=%{_libdir}
 
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
+	RELEASE=1 \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
@@ -481,6 +483,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	%{?_smp_mflags} \
+	RELEASE=1 \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
@@ -511,6 +514,7 @@ echo ===================== END OF TESTING =========================
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT install \
+	RELEASE=1 \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
@@ -614,6 +618,8 @@ fi
 %dir %{_libdir}/wolframe
 %{_libdir}/wolframe/libwolframe.so.0.0.0
 %{_libdir}/wolframe/libwolframe.so.0
+%{_libdir}/wolframe/libwolframe_serialize.so.0.0.0
+%{_libdir}/wolframe/libwolframe_serialize.so.0
 
 %dir %{_libdir}/wolframe/modules
 
@@ -645,6 +651,8 @@ fi
 %dir %{_libdir}/wolframe
 %{_libdir}/wolframe/libwolframe.so
 %{_libdir}/wolframe/libwolframe.a
+%{_libdir}/wolframe/libwolframe_serialize.so
+%{_libdir}/wolframe/libwolframe_serialize.a
 %dir %{_includedir}/wolframe
 %{_includedir}/wolframe/*.hpp
 %dir %{_includedir}/wolframe/config/

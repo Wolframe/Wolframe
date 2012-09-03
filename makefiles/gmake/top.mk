@@ -18,6 +18,7 @@
 # - target 'config'
 
 -include makefiles/gmake/platform.mk
+-include makefiles/gmake/compiler.mk
 
 .PHONY: all
 all:
@@ -74,6 +75,7 @@ ifeq "$(PLATFORM)" "LINUX"
 	@echo "Linux distribution: $(LINUX_DIST) $(LINUX_REV)"
 endif
 	@echo "C++ Compiler: $(COMPILER)"
+	@echo "Optimization flags: $(OPTFLAGS)"
 	@echo
 	@echo "Required Dependencies:"
 	@echo
