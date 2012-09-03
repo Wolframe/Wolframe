@@ -31,6 +31,7 @@ Project Wolframe.
 ************************************************************************/
 ///\file serialize/struct/filtermapBase.cpp
 ///\brief Implements the non intrusive base class of serialization/deserialization
+#include "serialize/struct/filtermapParseStack.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "filter/typingfilter.hpp"
 #include <cstring>
@@ -44,7 +45,8 @@ StructParser::StructParser( const ObjectReference& obj, const StructDescriptionB
 	,m_obj(obj)
 	,m_descr(descr_)
 {
-	m_stk.push_back( FiltermapParseState( 0, m_descr->parse(), m_ptr));
+	FiltermapParseState st( 0, m_descr->parse(), m_ptr);
+	m_stk.push_back( st);
 }
 
 StructParser::StructParser( void* obj, const StructDescriptionBase* descr_)

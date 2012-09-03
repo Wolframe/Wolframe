@@ -156,6 +156,18 @@ public:
 			}
 			throw std::runtime_error("illegal state");
 		}
+
+		bool empty() const
+		{
+			return (type == string_ && value.string_.size == 0);
+		}
+
+		void clear()
+		{
+			type = string_;
+			value.string_.size = 0;
+			value.string_.ptr = "";
+		}
 	};
 };
 

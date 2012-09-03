@@ -42,10 +42,13 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
+///\brief Forward declaration
+class FiltermapParseStateStack;
+
 class FiltermapParseState
 {
 public:
-	typedef bool (*Parse)( langbind::TypedInputFilter& inp, Context& ctx, std::vector<FiltermapParseState>& stk);
+	typedef bool (*Parse)( langbind::TypedInputFilter& inp, Context& ctx, FiltermapParseStateStack& stk);
 
 public:
 	FiltermapParseState( const FiltermapParseState& o);
@@ -55,12 +58,11 @@ public:
 	std::size_t selectElement( std::size_t idx, std::size_t size);
 	std::size_t initCount( std::size_t idx) const;
 
-	void* value() const			{return m_value;}
-	const char* name() const		{return m_name;}
-	Parse parse() const			{return m_parse;}
-	std::size_t state() const		{return m_stateidx;}
-	void state( std::size_t idx)		{m_stateidx = idx;}
-
+	void* value() const		{return m_value;}
+	const char* name() const	{return m_name;}
+	Parse parse() const		{return m_parse;}
+	std::size_t state() const	{return m_stateidx;}
+	void state( std::size_t idx)	{m_stateidx = idx;}
 private:
 	Parse m_parse;
 	int* m_initar;
@@ -70,7 +72,22 @@ private:
 	std::size_t m_stateidx;
 };
 
-typedef std::vector<FiltermapParseState> FiltermapParseStateStack;
+class FiltermapParseStateStack :public std::vector<FiltermapParseState>
+{
+public:
+	FiltermapParseStateStack(){}
+	FiltermapParseStateStack( const FiltermapParseStateStack& o)
+		:std::vector<FiltermapParseState>(o)
+		,m_valuebuf(o.m_valuebuf){}
+
+	bool hasbufvalue() const					{return !m_valuebuf.empty();}
+	void bufvalue( const langbind::TypedFilterBase::Element& e)	{m_valuebuf = e;}
+	void clearbuf()							{m_valuebuf.clear();}
+	const langbind::TypedFilterBase::Element& valuebuf() const	{return m_valuebuf;}
+
+private:
+	langbind::TypedFilterBase::Element m_valuebuf;
+};
 
 }}//namespace
 #endif

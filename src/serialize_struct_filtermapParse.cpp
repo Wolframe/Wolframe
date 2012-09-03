@@ -120,6 +120,10 @@ bool _Wolframe::serialize::parseObjectStruct( const StructDescriptionBase* descr
 	langbind::InputFilter::ElementType typ;
 	langbind::TypedFilterBase::Element element;
 
+	if (stk.hasbufvalue())
+	{
+		throw SerializationErrorException( "error in structure definition: structure without name");
+	}
 	if (!inp.getNext( typ, element))
 	{
 		if (inp.state() != langbind::InputFilter::Error) return false;
@@ -187,7 +191,27 @@ bool _Wolframe::serialize::parseObjectStruct( const StructDescriptionBase* descr
 
 		case langbind::InputFilter::Value:
 		{
-			throw SerializationErrorException( "structure instead of value expected", element.tostring(), StructParser::getElementPath( stk));
+			StructDescriptionBase::Map::const_iterator itr = descr->find( "");
+			if (itr == descr->end())
+			{
+				throw SerializationErrorException( "structure instead of value expected or definition of untagged value in structure must be available", element.tostring(), StructParser::getElementPath( stk));
+			}
+			std::size_t idx = itr - descr->begin();
+			if (idx < descr->nof_attributes())
+			{
+				throw SerializationErrorException( "error in structure definition: defined untagged value as attribute in structure", StructParser::getElementPath( stk));
+			}
+			if (itr->second.type() != StructDescriptionBase::Vector)
+			{
+				if (stk.back().selectElement( idx, descr->size()))
+				{
+					throw SerializationErrorException( "duplicate definition", element.tostring(), StructParser::getElementPath( stk));
+				}
+			}
+			void* value = (char*)stk.back().value() + itr->second.ofs();
+			stk.push_back( FiltermapParseState( "", itr->second.parse(), value));
+			stk.bufvalue( element);
+			return true;
 		}
 
 		case langbind::InputFilter::CloseTag:
@@ -213,7 +237,13 @@ bool _Wolframe::serialize::parseObjectAtomic( ParseValue parseVal, langbind::Typ
 	langbind::InputFilter::ElementType typ;
 	langbind::TypedFilterBase::Element element;
 
-	if (!inp.getNext( typ, element))
+	if (stk.hasbufvalue())
+	{
+		typ = langbind::InputFilter::Value;
+		element = stk.valuebuf();
+		stk.clearbuf();
+	}
+	else if (!inp.getNext( typ, element))
 	{
 		if (inp.state() != langbind::InputFilter::Error) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));

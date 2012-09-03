@@ -256,11 +256,19 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 			}
 			if (fa.isAttribute())
 			{
+				if (itr->first == "_") throw std::runtime_error( "empty attribute name is illegal");
 				result.defineAttribute( itr->first, val);
 			}
 			else
 			{
-				result.defineContent( itr->first, val);
+				if (itr->first == "_")
+				{
+					result.defineContent( "", val);
+				}
+				else
+				{
+					result.defineContent( itr->first, val);
+				}
 			}
 		}
 		else

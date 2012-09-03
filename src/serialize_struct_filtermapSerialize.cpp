@@ -130,6 +130,10 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 			stk.back().state( idx+1);
 			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
 		}
+		else if (itr->first.empty())
+		{
+			stk.push_back( FiltermapSerializeState( "", itr->second.fetch(), (const char*)obj + itr->second.ofs()));
+		}
 		else
 		{
 			ctx.setElem(
@@ -180,15 +184,15 @@ bool _Wolframe::serialize::fetchObjectVectorElement( FetchElement fetchElement, 
 	}
 	else
 	{
-		const char* tagname = (const char*)stk.at( stk.size()-2).value();
-		if (idx >= 1)
+		const char* tagname = stk.back().name();
+		if (idx >= 1 && tagname)
 		{
 			ctx.setElem( langbind::FilterBase::CloseTag);
 			rt = true;
 		}
 		stk.back().state( idx+1);
-		stk.push_back( FiltermapSerializeState( stk.back().name(), fetchElement, ve));
-		if (idx >= 1)
+		stk.push_back( FiltermapSerializeState( "", fetchElement, ve));
+		if (idx >= 1 && tagname)
 		{
 			stk.push_back( FiltermapSerializeState( tagname, &fetchOpenTag, tagname));
 		}

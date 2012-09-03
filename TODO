@@ -8,8 +8,6 @@ ABa:
 
 
 PF:
-- atomic untagged values allowed for structure elements in serialization (both)
-- extend simple form description to have atomic untagged values in structures
 - bignum tests (only bigint tested until now)
 - wolfilter loading modules
 - Serialization Special tag name ">" for content element in structure to handle <elem id='7'>bla</elem>

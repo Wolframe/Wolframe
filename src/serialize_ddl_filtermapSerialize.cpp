@@ -39,8 +39,6 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
-static const char untaggedValueTag = '>';
-
 // forward declaration
 static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk);
 
@@ -86,31 +84,27 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 		ddl::StructType::Map::const_iterator itr = obj->begin() + idx;
 		if (idx < obj->nof_attributes())
 		{
-			if (itr->second.contentType() != ddl::StructType::Atomic)
+			if (itr->first.empty())
 			{
-				throw SerializationErrorException( "atomic value expected for attribute", getElementPath( stk));
+				throw SerializationErrorException( "error in structure definition: defined untagged value as attribute in structure", getElementPath( stk));
+			}
+			if (itr->second.contentType() != ddl::StructType::Atomic || itr->first.empty())
+			{
+				throw SerializationErrorException( "named atomic value expected for attribute", getElementPath( stk));
 			}
 			langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
 			ctx.setElem( langbind::FilterBase::Attribute, elem);
 			rt = true;
-			stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
 			stk.back().state( ++idx);
+			stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
 		}
 		else
 		{
-			if (itr->first.size() == 1 && itr->first.c_str()[0] == untaggedValueTag)
+			if (itr->first.empty())
 			{
-				if (itr->second.contentType() != ddl::StructType::Atomic)
-				{
-					throw SerializationErrorException( "atomic element expected for untagged value in structure", getElementPath( stk));
-				}
-				else
-				{
-					langbind::TypedFilterBase::Element elem( itr->second.value().value());
-					ctx.setElem( langbind::FilterBase::Value, elem);
-					rt = true;
-				}
 				stk.back().state( ++idx);
+				langbind::TypedFilterBase::Element tag;
+				stk.push_back( FiltermapDDLSerializeState( &itr->second, tag));
 			}
 			else
 			{
@@ -156,14 +150,15 @@ static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	}
 	else
 	{
-		if (idx >= 1)
+		bool hasTag = !stk.back().tag().empty();
+		if (idx >= 1 && hasTag)
 		{
 			ctx.setElem( langbind::FilterBase::CloseTag, stk.back().tag());
 			rt = true;
 		}
 		stk.back().state( idx+1);
 		stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));
-		if (idx >= 1)
+		if (idx >= 1 && hasTag)
 		{
 			stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::OpenTag, stk.back().tag()));
 		}

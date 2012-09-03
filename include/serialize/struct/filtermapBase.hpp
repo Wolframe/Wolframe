@@ -46,7 +46,6 @@ Project Wolframe.
 namespace _Wolframe {
 namespace serialize {
 
-
 class StructDescriptionBase
 {
 public:

@@ -39,8 +39,6 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace serialize;
 
-static const std::string untaggedValueTag = ">";
-
 static std::string getElementPath( const FiltermapDDLParseStateStack& stk)
 {
 	std::string rt;
@@ -225,18 +223,36 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 
 		case langbind::InputFilter::Value:
 		{
-			ddl::StructType::Map::iterator itr = st.find( untaggedValueTag);
+			ddl::StructType::Map::iterator itr = st.find( "");
 			if (itr == st.end())
 			{
-				throw SerializationErrorException( "found untagged value that is not defined for this structure", element.tostring(), getElementPath( stk));
+				throw SerializationErrorException( "parsed untagged value, but no untagged value is defined for this structure", element.tostring(), getElementPath( stk));
 			}
-			if (itr->second.contentType() != ddl::StructType::Atomic)
+			std::size_t idx = itr - st.begin();
+			if (idx < st.nof_attributes())
 			{
-				throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
+				throw SerializationErrorException( "error in structure definition: defined untagged value as attribute in structure", element.tostring(), getElementPath( stk));
 			}
-			else
+			switch (itr->second.contentType())
 			{
-				setAtomValue( itr->second.value(), element, stk);
+				case ddl::StructType::Atomic:
+					setAtomValue( itr->second.value(), element, stk);
+					return true;
+
+				case ddl::StructType::Struct:
+					throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
+
+				case ddl::StructType::Vector:
+					if (itr->second.prototype().contentType() == ddl::StructType::Atomic)
+					{
+						itr->second.push();
+						setAtomValue( itr->second.back().value(), element, stk);
+						return true;
+					}
+					else
+					{
+						throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
+					}
 			}
 		}
 
