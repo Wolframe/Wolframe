@@ -135,8 +135,7 @@ CXX_COMPILE_FLAGS = \
 # gcc 4.x
 ifeq "$(GCC_MAJOR_VERSION)" "4"
 CXX_COMPILE_FLAGS += \
-	-Wno-invalid-offsetof -funit-at-a-time \
-	-frepo -fno-implicit-templates
+	-Wno-invalid-offsetof -funit-at-a-time
 endif
 
 ifeq "$(GCC_MAJOR_VERSION)" "3"
