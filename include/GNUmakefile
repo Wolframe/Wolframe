@@ -6,7 +6,11 @@ local_all:
 
 local_clean:
 
-INCLUDE_SUBDIRS = . config AAAA processor logger database protocol
+INCLUDE_SUBDIRS = \
+	. \
+	langbind protocol cmdbind database prnt config \
+	ddl ddl/compiler logger utils serialize serialize/struct \
+	serialize/ddl processor filter types AAAA
 
 local_install:
 	for d in $(INCLUDE_SUBDIRS); do \
@@ -16,4 +20,4 @@ local_install:
 
 local_uninstall:
 	-rm -rf $(DESTDIR)$(includedir)/wolframe
-	-rmdir $(DESTDIR)$(includedir)
+	-rmdir $(DESTDIR)$(includedir).

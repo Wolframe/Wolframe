@@ -655,18 +655,40 @@ fi
 %{_libdir}/wolframe/libwolframe_serialize.a
 %dir %{_includedir}/wolframe
 %{_includedir}/wolframe/*.hpp
-%dir %{_includedir}/wolframe/config/
-%{_includedir}/wolframe/config/*.hpp
-%dir %{_includedir}/wolframe/AAAA/
-%{_includedir}/wolframe/AAAA/*.hpp
-%dir %{_includedir}/wolframe/processor/
-%{_includedir}/wolframe/processor/*.hpp
-%dir %{_includedir}/wolframe/logger/
-%{_includedir}/wolframe/logger/*.hpp
-%dir %{_includedir}/wolframe/database/
-%{_includedir}/wolframe/database/*.hpp
+%dir %{_includedir}/wolframe/langbind/
+%{_includedir}/wolframe/langbind/*.hpp
 %dir %{_includedir}/wolframe/protocol/
 %{_includedir}/wolframe/protocol/*.hpp
+%dir %{_includedir}/wolframe/cmdbind/
+%{_includedir}/wolframe/cmdbind/*.hpp
+%dir %{_includedir}/wolframe/database/
+%{_includedir}/wolframe/database/*.hpp
+%dir %{_includedir}/wolframe/prnt/
+%{_includedir}/wolframe/prnt/*.hpp
+%dir %{_includedir}/wolframe/config/
+%{_includedir}/wolframe/config/*.hpp
+%dir %{_includedir}/wolframe/ddl/
+%{_includedir}/wolframe/ddl/*.hpp
+%dir %{_includedir}/wolframe/ddl/compiler/
+%{_includedir}/wolframe/ddl/compiler/*.hpp
+%dir %{_includedir}/wolframe/logger/
+%{_includedir}/wolframe/logger/*.hpp
+%dir %{_includedir}/wolframe/utils/
+%{_includedir}/wolframe/utils/*.hpp
+%dir %{_includedir}/wolframe/serialize/
+%{_includedir}/wolframe/serialize/*.hpp
+%dir %{_includedir}/wolframe/serialize/struct/
+%{_includedir}/wolframe/serialize/struct/*.hpp
+%dir %{_includedir}/wolframe/serialize/ddl/
+%{_includedir}/wolframe/serialize/ddl/*.hpp
+%dir %{_includedir}/wolframe/processor/
+%{_includedir}/wolframe/processor/*.hpp
+%dir %{_includedir}/wolframe/filter/
+%{_includedir}/wolframe/filter/*.hpp
+%dir %{_includedir}/wolframe/types/
+%{_includedir}/wolframe/types/*.hpp
+%dir %{_includedir}/wolframe/AAAA/
+%{_includedir}/wolframe/AAAA/*.hpp
 
 %if %{with_pgsql}
 %files postgresql
