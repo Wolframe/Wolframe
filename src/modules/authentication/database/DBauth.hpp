@@ -43,6 +43,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
+static const char* DB_AUTHENTICATION_CLASS_NAME = "DBAuth";
+
 class DBAuthConfig : public config::NamedConfiguration
 {
 	friend class DBauthConstructor;
@@ -50,7 +52,7 @@ public:
 	DBAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName )	{}
 
-	virtual const char* className() const		{ return "DBAuth"; }
+	virtual const char* className() const		{ return DB_AUTHENTICATION_CLASS_NAME; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -72,7 +74,7 @@ public:
 	DBauthenticator( const std::string& Identifier, const std::string& dbLabel );
 	~DBauthenticator();
 
-	const char* className() const			{ return "DBAuth"; }
+	const char* className() const			{ return DB_AUTHENTICATION_CLASS_NAME; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
@@ -87,7 +89,7 @@ class DBauthConstructor : public ConfiguredObjectConstructor< AuthenticationUnit
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHENTICATION_OBJECT; }
-	const char* identifier() const			{ return "DBAuth"; }
+	const char* identifier() const			{ return DB_AUTHENTICATION_CLASS_NAME; }
 	DBauthenticator* object( const config::NamedConfiguration& conf );
 };
 

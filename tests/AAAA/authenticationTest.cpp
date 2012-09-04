@@ -69,7 +69,7 @@ TEST_F( AuthenticationFixture, PamAuthenticator )
 TEST_F( AuthenticationFixture, SaslAuthenticator )
 {
 	SaslAuthenticator authenticator( "", "wolframe", "sasl.conf" );
-	ASSERT_STREQ( authenticator.className( ), "SaslAuth" );
+	ASSERT_STREQ( authenticator.className( ), "SASLAuth" );
 }
 #endif // WITH_SASL
 

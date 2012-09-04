@@ -46,6 +46,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
+static const char* SASL_AUTHENTICATION_CLASS_NAME = "SASLAuth";
+
 class SaslAuthConfig :  public config::NamedConfiguration
 {
 	friend class SaslAuthConstructor;
@@ -53,7 +55,7 @@ public:
 	SaslAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* className() const	{ return "SaslAuth"; }
+	virtual const char* className() const	{ return SASL_AUTHENTICATION_CLASS_NAME; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -74,7 +76,7 @@ public:
 	SaslAuthenticator( const std::string& Identifier,
 			   const std::string& service, const std::string& confpath );
 	~SaslAuthenticator();
-	virtual const char* className() const	{ return "SaslAuth"; }
+	virtual const char* className() const	{ return SASL_AUTHENTICATION_CLASS_NAME; }
 
 	AuthenticatorInstance* instance()	{ return NULL; }
 
@@ -92,7 +94,7 @@ class SaslAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUn
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHENTICATION_OBJECT; }
-	virtual const char* identifier() const	{ return "SaslAuth"; }
+	virtual const char* identifier() const	{ return SASL_AUTHENTICATION_CLASS_NAME; }
 	virtual SaslAuthenticator* object( const config::NamedConfiguration& conf );
 };
 

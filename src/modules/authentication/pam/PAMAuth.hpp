@@ -46,6 +46,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
+static const char* PAM_AUTHENTICATION_CLASS_NAME = "PAMAuth";
+
 class PAMAuthConfig :  public config::NamedConfiguration
 {
 	friend class PAMAuthConstructor;
@@ -53,7 +55,7 @@ public:
 	PAMAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* className() const	{ return "PAMAuth"; }
+	virtual const char* className() const	{ return PAM_AUTHENTICATION_CLASS_NAME; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -81,7 +83,7 @@ public:
 	PAMAuthenticator( const std::string& Identifier,
 			  const std::string& service );
 	~PAMAuthenticator();
-	virtual const char* className() const	{ return "PAMAuth"; }
+	virtual const char* className() const	{ return PAM_AUTHENTICATION_CLASS_NAME; }
 
 	AuthenticatorInstance* instance()	{ return NULL; }
 
@@ -111,7 +113,7 @@ class PAMAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUni
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHENTICATION_OBJECT; }
-	const char* identifier() const		{ return "PAMAuth"; }
+	const char* identifier() const		{ return PAM_AUTHENTICATION_CLASS_NAME; }
 	PAMAuthenticator* object( const config::NamedConfiguration& conf );
 };
 

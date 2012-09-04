@@ -43,6 +43,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
+static const char* DB_AUDIT_CLASS_NAME = "DatabaseAudit";
+
 class DBauditConfig : public config::NamedConfiguration
 {
 	friend class DBauditConstructor;
@@ -51,7 +53,7 @@ public:
 		: config::NamedConfiguration( cfgName, logParent, logName )
 	{ m_required = true; }
 
-	const char* className() const		{ return "DatabaseAudit"; }
+	const char* className() const		{ return DB_AUDIT_CLASS_NAME; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -69,7 +71,7 @@ class DBauditor : public AuditUnit
 public:
 	DBauditor( const std::string& dbLabel );
 	~DBauditor();
-	const char* className() const		{ return "DatabaseAudit"; }
+	const char* className() const		{ return DB_AUDIT_CLASS_NAME; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
@@ -87,7 +89,7 @@ class DBauditConstructor : public ConfiguredObjectConstructor< AuditUnit >
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUDIT_OBJECT; }
-	const char* identifier() const	{ return "DatabaseAudit"; }
+	const char* identifier() const	{ return DB_AUDIT_CLASS_NAME; }
 	DBauditor* object( const config::NamedConfiguration& conf );
 };
 

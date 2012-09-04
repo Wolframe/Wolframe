@@ -45,6 +45,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
+static const char* FILE_AUDIT_CLASS_NAME = "FileAudit";
+
 class TextFileAuditConfig : public config::NamedConfiguration
 {
 	friend class TextFileAuditConstructor;
@@ -52,7 +54,7 @@ public:
 	TextFileAuditConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	const char* className() const		{ return "FileAudit"; }
+	const char* className() const		{ return FILE_AUDIT_CLASS_NAME; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -71,7 +73,7 @@ class TextFileAuditor : public AuditUnit
 public:
 	TextFileAuditor( const std::string& filename );
 	~TextFileAuditor();
-	const char* className() const		{ return "FileAudit"; }
+	const char* className() const		{ return FILE_AUDIT_CLASS_NAME; }
 
 	bool required()				{ return m_required; }
 	bool audit( const Information& auditObject );
@@ -86,7 +88,7 @@ class TextFileAuditConstructor : public ConfiguredObjectConstructor< AuditUnit >
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUDIT_OBJECT; }
-	const char* identifier() const	{ return "FileAudit"; }
+	const char* identifier() const	{ return FILE_AUDIT_CLASS_NAME; }
 	TextFileAuditor* object( const config::NamedConfiguration& conf );
 };
 

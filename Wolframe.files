@@ -364,6 +364,7 @@ include/filter/typingfilter.hpp
 include/FSMinterface.hpp
 include/GNUmakefile
 include/langbind/appConfig.hpp
+include/langbind/appConfig_option.hpp
 include/langbind/appConfig_struct.hpp
 include/langbind/appFormFunction.hpp
 include/langbind/appGlobalContext.hpp
@@ -669,6 +670,7 @@ src/filter_typingfilter.cpp
 src/GNUmakefile
 src/handlerConfig.hpp
 src/langbind_appConfig.cpp
+src/langbind_appConfig_option.cpp
 src/langbind_appConfig_struct.cpp
 src/langbind_appGlobalContext.cpp
 src/langbind_appObjects.cpp
@@ -1007,6 +1009,7 @@ tests/wolfilter/scripts/formfunc_table.lua
 tests/wolfilter/scripts/peerformfunc_input_generator.lua
 tests/wolfilter/scripts/peerformfunc_iterator.lua
 tests/wolfilter/scripts/peerformfunc_table.lua
+tests/wolfilter/scripts/print_table.lua
 tests/wolfilter/src/echo_cmdhandler.cpp
 tests/wolfilter/src/echo_cmdhandler.hpp
 tests/wolfilter/src/employee_assignment_print.cpp
@@ -1015,6 +1018,7 @@ tests/wolfilter/template/doc/employee_assignment_doctype_2.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_doctype.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_print_2.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_print.UTF-8.xml
+tests/wolfilter/template/doc/invoice_example.UTF-8.xml
 tests/wolfilter/template/doc/lua_ddlform_input_generator.UTF-8.xml
 tests/wolfilter/template/doc/lua_ddlform_iterator_scope.UTF-8.xml
 tests/wolfilter/template/doc/lua_ddlform_iterator.UTF-8.xml
@@ -1026,6 +1030,7 @@ tests/wolfilter/template/doc/lua_formfunc_input_generator.UTF-8.xml
 tests/wolfilter/template/doc/lua_formfunc_iterator.UTF-8.xml
 tests/wolfilter/template/doc/lua_formfunc_table.UTF-8.xml
 tests/wolfilter/template/doc/lua_peerformfunc_table.UTF-8.xml
+tests/wolfilter/template/doc/lua_print_table_testtrace.UTF-8.xml
 tests/wolfilter/template/doc/map_ddlform.UTF-8.xml
 tests/wolfilter/template/doc/map_formfunc.UTF-8.xml
 tests/wolfilter/template/doc/multilingual.UTF-8.xml

@@ -43,6 +43,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
+static const char* DB_AUTHORIZATION_CLASS_NAME = "DatabaseAuthorization";
+
 //***  Database authorizer configuration  *******************************
 class DatabaseAuthzConfig : public config::NamedConfiguration
 {
@@ -51,7 +53,7 @@ public:
 	DatabaseAuthzConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName )	{}
 
-	virtual const char* className() const		{ return "DatabaseAuthorization"; }
+	virtual const char* className() const		{ return DB_AUTHORIZATION_CLASS_NAME; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -71,7 +73,7 @@ class DBauthorizer : public AuthorizationUnit
 public:
 	DBauthorizer( const std::string& Identifier, const std::string& DbLabel );
 	~DBauthorizer();
-	const char* className() const		{ return "DatabaseAuthorization"; }
+	const char* className() const		{ return DB_AUTHORIZATION_CLASS_NAME; }
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
@@ -91,7 +93,7 @@ class DBauthzConstructor : public ConfiguredObjectConstructor< AuthorizationUnit
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHORIZATION_OBJECT; }
-	const char* identifier() const	{ return "DatabaseAuthorization"; }
+	const char* identifier() const	{ return DB_AUTHORIZATION_CLASS_NAME; }
 	DBauthorizer* object( const config::NamedConfiguration& conf );
 };
 

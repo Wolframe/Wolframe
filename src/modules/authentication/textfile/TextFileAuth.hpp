@@ -47,6 +47,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
+static const char* TEXT_FILE_AUTHENTICATION_CLASS_NAME = "TextFileAuth";
+
 class TextFileAuthConfig :  public config::NamedConfiguration
 {
 	friend class TextFileAuthConstructor;
@@ -54,7 +56,7 @@ public:
 	TextFileAuthConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	virtual const char* className() const		{ return "TextFileAuth"; }
+	virtual const char* className() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -73,7 +75,7 @@ class TextFileAuthenticator : public AuthenticationUnit
 public:
 	TextFileAuthenticator( const std::string& Identifier, const std::string& filename );
 	~TextFileAuthenticator();
-	virtual const char* className() const		{ return "TextFileAuth"; }
+	virtual const char* className() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
 
 	AuthenticatorInstance* instance();
 
@@ -126,7 +128,7 @@ class TextFileAuthConstructor : public ConfiguredObjectConstructor< Authenticati
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHENTICATION_OBJECT; }
-	const char* identifier() const		{ return "TextFileAuth"; }
+	const char* identifier() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
 	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
 };
 
