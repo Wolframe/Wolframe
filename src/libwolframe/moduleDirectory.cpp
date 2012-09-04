@@ -43,10 +43,15 @@ namespace module {
 
 ModulesDirectory::~ModulesDirectory()
 {
-	while ( ! m_builder.empty() )	{
-		assert( m_builder.front() != NULL );
-		delete m_builder.front();
-		m_builder.pop_front();
+	while ( ! m_simpleBuilder.empty() )	{
+		assert( m_simpleBuilder.front() != NULL );
+		delete m_simpleBuilder.front();
+		m_simpleBuilder.pop_front();
+	}
+	while ( ! m_cfgdBuilder.empty() )	{
+		assert( m_cfgdBuilder.front() != NULL );
+		delete m_cfgdBuilder.front();
+		m_cfgdBuilder.pop_front();
 	}
 }
 
@@ -75,15 +80,15 @@ bool ModulesDirectory::addBuilder( ConfiguredBuilder* container )
 
 bool ModulesDirectory::addBuilder( SimpleBuilder* container )
 {
-	for ( std::list< SimpleBuilder* >::const_iterator it = m_builder.begin();
-							it != m_builder.end(); it++ )	{
+	for ( std::list< SimpleBuilder* >::const_iterator it = m_simpleBuilder.begin();
+							it != m_simpleBuilder.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_identifier, container->m_identifier ))	{
 			LOG_ALERT << "A module object named '" << container->m_identifier
 				  << "' already exists";
 			return false;
 		}
 	}
-	m_builder.push_back( container );
+	m_simpleBuilder.push_back( container );
 	LOG_DEBUG << "Module object '" << container->m_identifier << "' registered";
 	return true;
 }
@@ -104,16 +109,6 @@ ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& identifier )
 {
 	for ( std::list< ConfiguredBuilder* >::const_iterator it = m_cfgdBuilder.begin();
 							it != m_cfgdBuilder.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->m_identifier, identifier ))
-			return *it;
-	}
-	return NULL;
-}
-
-SimpleBuilder* ModulesDirectory::getObject( const std::string& identifier ) const
-{
-	for ( std::list< SimpleBuilder* >::const_iterator it = m_builder.begin();
-							it != m_builder.end(); it++ )	{
 		if ( boost::algorithm::iequals( (*it)->m_identifier, identifier ))
 			return *it;
 	}

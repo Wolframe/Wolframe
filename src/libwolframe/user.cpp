@@ -30,16 +30,18 @@
  Project Wolframe.
 
 ************************************************************************/
-//
+/// \file user.cpp
 //
 //
 
 #include <string>
-#include <climits>
 #include <AAAA/user.hpp>
 
 using namespace _Wolframe::AAAA;
 
+
+/// User object destructor.
+/// This function will overwrite the data in the User structure.
 User::~User()
 {
 	std::size_t i;

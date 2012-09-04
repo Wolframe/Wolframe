@@ -48,12 +48,14 @@
 namespace _Wolframe {
 namespace db {
 
+static const char* SQLite_DB_CLASS_NAME = "SQLite";
+
 /// SQLite database configuration
 class SQLiteConfig : public config::NamedConfiguration
 {
 	friend class SQLiteConstructor;
 public:
-	const char* className() const			{ return "SQLite"; }
+	const char* className() const			{ return SQLite_DB_CLASS_NAME; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	~SQLiteConfig()					{}
@@ -78,7 +80,7 @@ public:
 	virtual ~SQLiteDatabase();
 
 	virtual const std::string& ID() const		{ return m_ID; }
-	virtual const char* className() const		{ return "SQLite"; }
+	virtual const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 	virtual const Database& database() const	{ return *this; }
 
 	virtual bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
@@ -98,7 +100,7 @@ class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 							{ return DATABASE_OBJECT; }
-	virtual const char* identifier() const		{ return "SQLite"; }
+	virtual const char* identifier() const		{ return SQLite_DB_CLASS_NAME; }
 	virtual SQLiteDatabase* object( const config::NamedConfiguration& conf );
 };
 

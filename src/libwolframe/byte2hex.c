@@ -31,7 +31,7 @@
 
 ************************************************************************/
 /**
- * @defgroup hex2byte Convertion between ASCII hex string and data block
+ * @defgroup hex2byte Conversion between ASCII hex string and data block
  * @ingroup miscFunctions
  * @{
  */

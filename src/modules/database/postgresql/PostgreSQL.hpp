@@ -49,12 +49,14 @@
 namespace _Wolframe {
 namespace db {
 
+static const char* POSTGRESQL_DB_CLASS_NAME = "PostgreSQL";
+
 /// PostgreSQL server connection configuration
 class PostgreSQLconfig : public config::NamedConfiguration
 {
 	friend class PostgreSQLconstructor;
 public:
-	const char* className() const		{ return "PostgreSQL"; }
+	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 
 	PostgreSQLconfig( const char* name, const char* logParent, const char* logName );
 	~PostgreSQLconfig()			{}
@@ -87,7 +89,7 @@ public:
 	~PostgreSQLdatabase();
 
 	const std::string& ID() const		{ return m_ID; }
-	const char* className() const		{ return "PostgreSQL"; }
+	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 	const Database& database() const	{ return *this; }
 
 	bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
@@ -107,7 +109,7 @@ class PostgreSQLconstructor : public ConfiguredObjectConstructor< db::DatabaseUn
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return DATABASE_OBJECT; }
-	const char* identifier() const		{ return "PostgreSQL"; }
+	const char* identifier() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 	PostgreSQLdatabase* object( const config::NamedConfiguration& conf );
 };
 

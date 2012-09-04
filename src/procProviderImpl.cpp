@@ -204,7 +204,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	}
 
 	// Build the list of filters
-	for ( module::ModulesDirectory::container_iterator it = modules->objectsBegin();
+	for ( module::ModulesDirectory::simpleBuilder_iterator it = modules->objectsBegin();
 								it != modules->objectsEnd(); it++ )	{
 		//		if the object is a filter
 		module::FilterContainer* fltr = dynamic_cast< module::FilterContainer* >((*it)->constructor());

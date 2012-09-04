@@ -41,7 +41,7 @@
 
 namespace _Wolframe	{
 
-/// Container base class
+/// Constructor base class
 class ObjectConstructorBase
 {
 public:

@@ -38,8 +38,8 @@
 #define _MODULE_INTERFACE_HPP_INCLUDED
 
 #include <string>
+#include <cstring>
 #include <list>
-#include <boost/property_tree/ptree.hpp>
 #include "config/configurationBase.hpp"
 #include "constructor.hpp"
 
@@ -121,38 +121,37 @@ public:
 
 	ConfiguredBuilder* getBuilder( const std::string& section, const std::string& keyword ) const;
 	ConfiguredBuilder* getBuilder( const std::string& identifier ) const;
-	SimpleBuilder* getObject( const std::string& identifier ) const;
 
-	class container_iterator
+	class simpleBuilder_iterator
 	{
 		friend class ModulesDirectory;
 	public:
-		container_iterator()			{}
-		container_iterator( const container_iterator& it )
+		simpleBuilder_iterator()			{}
+		simpleBuilder_iterator( const simpleBuilder_iterator& it )
 			: m_it( it.m_it )		{}
 
 		SimpleBuilder* operator->() const	{ return *m_it; }
 		SimpleBuilder* operator*() const	{ return *m_it; }
-		container_iterator& operator++()	{ ++m_it; return *this; }
-		container_iterator operator++( int )	{ container_iterator rtrn( *this ); ++m_it; return rtrn; }
-		bool operator == ( const container_iterator& rhs )
+		simpleBuilder_iterator& operator++()	{ ++m_it; return *this; }
+		simpleBuilder_iterator operator++( int ){ simpleBuilder_iterator rtrn( *this ); ++m_it; return rtrn; }
+		bool operator == ( const simpleBuilder_iterator& rhs )
 							{ return m_it == rhs.m_it; }
-		bool operator != ( const container_iterator& rhs )
+		bool operator != ( const simpleBuilder_iterator& rhs )
 							{ return m_it != rhs.m_it; }
 
 	private:
 		std::list< SimpleBuilder* >::const_iterator	m_it;
 
-		container_iterator( const std::list< SimpleBuilder* >::const_iterator& it )
+		simpleBuilder_iterator( const std::list< SimpleBuilder* >::const_iterator& it )
 			: m_it( it )			{}
 	};
 
-	container_iterator objectsBegin() const		{ return container_iterator( m_builder.begin() ); }
-	container_iterator objectsEnd() const		{ return container_iterator( m_builder.end() ); }
+	simpleBuilder_iterator objectsBegin() const	{ return simpleBuilder_iterator( m_simpleBuilder.begin() ); }
+	simpleBuilder_iterator objectsEnd() const	{ return simpleBuilder_iterator( m_simpleBuilder.end() ); }
 
 private:
 	std::list< ConfiguredBuilder* >	m_cfgdBuilder;	///< list of configurable builders
-	std::list< SimpleBuilder* >	m_builder;	///< list of simple builders
+	std::list< SimpleBuilder* >	m_simpleBuilder;///< list of simple builders
 };
 
 
@@ -161,12 +160,12 @@ bool LoadModules( ModulesDirectory& modDir, const std::list< std::string >& modF
 
 //*********** Module interface *********
 
-enum ModuleObjectType	{
-	MODULE_CONTAINER = 1,
-	MODULE_OBJECT = 2
-};
-
+/// Function that constructs a configured builder.
+/// This function is specific for each of the configured builders in the module.
 typedef ConfiguredBuilder* (*createCfgdBuilderFunc)();
+
+/// Function that constructs a simple (non-configured) builder.
+/// This function is specific for each of the simple builders in the module.
 typedef SimpleBuilder* (*createBuilderFunc)();
 
 struct ModuleEntryPoint
