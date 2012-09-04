@@ -198,8 +198,10 @@ copy_prereq:
 !ENDIF
 !IFDEF WITH_PGSQL
 	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
+!IFDEF PGDLL_WITH_I18N
 	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" .
 	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" .
+!ENDIF
 !ENDIF
 !IFDEF WITH_LIBXML2
 	@-copy "$(WIN_ICONV_DIR)\iconv.dll" .

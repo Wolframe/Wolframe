@@ -162,13 +162,5 @@ Project Wolframe.
 	<!-- There is no configuration for accounting as it
 	     should be derived from audit information -->
 	</AAAA>
-
-	<!-- The thing that does the real job ;) -->
-	<Processor>
-		<database>#inserted by installer#</database>
-		<EchoProcessor>
-			<timeout>10</timeout>
-		</EchoProcessor>
-	</Processor>
 	
 </configuration>

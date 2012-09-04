@@ -81,6 +81,10 @@ QT_DIR = C:\Qt\4.8.1
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
 PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-debug
 
+# enable if Postgresql has been compiled with internationalization support
+# (libintl and libiconv)
+#PGDLL_WITH_I18N = 1
+
 # enable depending on libintl.dll and libiconv.dll (deployment only)
 PGDLL_WITHOUT_MAJOR_VERSION = 1
 
@@ -116,8 +120,8 @@ WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 
 # architecture of resulting msi
-#WIX_ARCH = x86
-WIX_ARCH = x64
+WIX_ARCH = x86
+#WIX_ARCH = x64
 
 #PGDLL_LIBRARIES=1
 
