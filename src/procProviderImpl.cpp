@@ -183,18 +183,26 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 									it != conf->m_procConfig.end(); it++ )	{
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
-			ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* hndlr =
+			ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* cnstrctr =
 					dynamic_cast< ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* >( builder->constructor());
-			if ( hndlr == NULL )	{
+			if ( cnstrctr == NULL )	{
 				LOG_ALERT << "Wolframe Processor Provider: '" << builder->identifier()
 					  << "'' is not a command handler";
 				throw std::logic_error( "Object is not a commandHandler. See log." );
 			}
 			else	{
-				m_handler.push_back( hndlr->object( **it ) );
-				std::string handlerName = hndlr->identifier();
+				cmdbind::CommandHandlerUnit* handlerUnit = cnstrctr->object( **it );
+				m_handler.push_back( handlerUnit );
+				std::string handlerName = cnstrctr->identifier();
 				LOG_TRACE << "'" << handlerName << "' command handler registered";
-				// register handler commands here
+
+				// register handler commands
+				for ( std::list< std::string >::const_iterator cmdIt = handlerUnit->commands()->begin();
+										cmdIt != handlerUnit->commands()->end(); cmdIt++ )	{
+					std::string opName = boost::algorithm::to_upper_copy( *cmdIt );
+					m_cmdMap[ opName ] = handlerUnit;
+					LOG_TRACE << "'" << opName << "' registered for '" << handlerName << "' command handler";
+				}
 			}
 		}
 		else	{

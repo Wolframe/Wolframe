@@ -32,12 +32,13 @@
 ************************************************************************/
 ///\file cmdbind/commandHandlerUnit.hpp
 ///\brief Interface to command handler units
+
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_UNIT_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_UNIT_HPP_INCLUDED
+
 #include "cmdbind/commandHandler.hpp"
 #include <string>
-#include <map>
-#include <stdexcept>
+#include <list>
 
 namespace _Wolframe {
 namespace cmdbind {
@@ -53,56 +54,14 @@ public:
 	///\brief Get an instance of the command handler for the command
 	///\param [in] command the name of the command to be executed by the handler
 	///\returns pointer to a CommandHandler object or NULL if none is available for command
-	virtual CommandHandler* handler( const std::string& command)
-	{
-		std::map<std::string,Constructor>::const_iterator itr = m_constructormap.find( command);
-		if (itr == m_constructormap.end()) return 0;
-		return (*itr->second)();
-	}
-
-	///\brief Define command handler constructor of a certain type for a certain name
-	///\tparam CommandHandlerType the command handler class
-	///\param[in] command the name of the command
-	template <class CommandHandlerType>
-	void defineHandler( const std::string& command)
-	{
-		struct _ { static CommandHandler* constructor() {return new CommandHandlerType();}};
-		std::map<std::string,Constructor>::const_iterator itr = m_constructormap.find( command);
-		if (itr != m_constructormap.end()) throw std::runtime_error( "Duplicate definition of command handler");
-		m_constructormap[ command] = &_::constructor;
-	}
-
-public:
-	///\brief Command handler constructor
-	typedef CommandHandler* (*Constructor)();
+	virtual CommandHandler* handler( const std::string& command );
 
 	///\class const_iterator
-	///\brief Iterator to enumerate the commands for the unit
-	class const_iterator
-	{
-	public:
-		const_iterator()				{}
-		const_iterator( const const_iterator& o)	:m_itr(o.m_itr){}
-
-		const std::string& operator->() const		{return m_itr->first;}
-		const std::string& operator*() const		{return m_itr->first;}
-		const_iterator& operator++()			{++m_itr; return *this;}
-		const_iterator operator++(int)			{const_iterator rt(*this); ++m_itr; return rt;}
-
-	private:
-		typedef std::map<std::string,Constructor>::const_iterator Itr;
-		Itr m_itr;
-		friend class CommandHandlerUnit;
-			const_iterator( const Itr& i)		:m_itr(i){}
-	};
-
-	const_iterator begin() const				{return const_iterator(m_constructormap.begin());}
-	const_iterator end() const				{return const_iterator(m_constructormap.end());}
-
-private:
-	std::map<std::string,Constructor> m_constructormap;
+	///\brief Get the list of commands for the unit
+	///\returns pointer to a list of command names (strings). A NULL pointer is an error.
+	virtual const std::list< std::string >* commands() const;
 };
 
-}}//namespace
+}} //namespace _Wolframe::cmdbind
 
-#endif
+#endif // _Wolframe_CMDBIND_COMMAND_HANDLER_UNIT_HPP_INCLUDED

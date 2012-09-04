@@ -197,7 +197,6 @@ public:
 		if ( createCfgdBuilder == NULL ) cfgdContainers = 0;
 		if ( createBuilder == NULL ) containers = 0;
 	}
-
 };
 
 extern "C" ModuleEntryPoint entryPoint;
