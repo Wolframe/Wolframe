@@ -1,0 +1,4 @@
+LIBRARY mod_ddlcompiler_simpleform
+
+EXPORTS
+entryPoint	@1
