@@ -81,7 +81,7 @@ struct InputFilterImpl :public InputFilter
 	}
 
 	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
-	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
+	virtual bool getNext( InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
 	{
 		if (m_done)
 		{
@@ -146,7 +146,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\param [in] element pointer to the element to print
 	///\param [in] elementsize size of the element to print in bytes
 	///\return true, if success, false else
-	virtual bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
+	virtual bool print( OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
 		if (m_elemitr < m_elembuf.size())

@@ -268,17 +268,16 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModAuthzDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_authz_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateModAuthzDatabaseDefaultDeny" Action="setValue" ElementPath="/configuration/AAAA/Authorization/default"
-								              Value="deny"
-									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
+<!--
 							<Component Id="ModDdlCompilerSimpleForm" Guid="{2a5e72e8-cc29-4264-8026-c222901ea401}">
 								<File Id="mod_ddlcompiler_simpleform.dll" Name="mod_ddlcompiler_simpleform.dll" DiskId="1" Source="..\src\modules\ddlcompiler\simpleform\mod_ddlcompiler_simpleform.dll"/>
 								<util:XmlFile Id="AppendConfigModDdlCompilerSimpleForm" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_ddlcompiler_simpleform.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
+-->
 
 							<Component Id="ModFilterChar" Guid="{2dc36fbb-e779-43cf-b6cf-c6dbb280fc85}">
 								<File Id="mod_filter_char.dll" Name="mod_filter_char.dll" DiskId="1" Source="..\src\modules\filter\char\mod_filter_char.dll"/>
@@ -431,11 +430,13 @@ Project Wolframe.
 				</Feature>
 			</Feature>
 
+<!--
 			<Feature Id="ProcessingModules" Title="Data Processing Modules" Description="Data Processing modules" Level="3">
 				<Feature Id="DdlCompilerSimpleForm" Title="Simple form" Description="Wolframe data definition language compiler." Level="3" InstallDefault="local" TypicalDefault="install">
 					<ComponentRef Id="ModDdlCompilerSimpleForm"/>
 				</Feature>
 			</Feature>
+-->
 			
 			<Feature Id="FilterModules" Title="Filter Modules" Description="Filter modules" Level="3">
 				<Feature Id="StandardFilterModules" Title="Standard filter modules" Description="Standard filter modules." Level="3" InstallDefault="local" TypicalDefault="install">
