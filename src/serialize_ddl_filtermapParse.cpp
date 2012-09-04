@@ -166,6 +166,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 		if (inp.state() != langbind::InputFilter::Error) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), getElementPath( stk));
 	}
+
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:
@@ -173,7 +174,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			ddl::StructType::Map::iterator itr = st.find( element.tostring());
 			if (itr == st.end())
 			{
-				throw SerializationErrorException( "unknown element", element.tostring(), getElementPath( stk));
+				throw SerializationErrorException( "unknown tag ", element.tostring(), getElementPath( stk));
 			}
 			std::size_t idx = itr - st.begin();
 			if (idx < st.nof_attributes())
@@ -201,7 +202,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			ddl::StructType::Map::iterator itr = st.find( element.tostring());
 			if (itr == st.end())
 			{
-				throw SerializationErrorException( "unknown element", element.tostring(), getElementPath( stk));
+				throw SerializationErrorException( "unknown attribute ", element.tostring(), getElementPath( stk));
 			}
 			std::size_t idx = itr - st.begin();
 			if (idx >= st.nof_attributes())

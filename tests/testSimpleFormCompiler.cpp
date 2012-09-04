@@ -31,13 +31,10 @@ Project Wolframe.
 ************************************************************************/
 ///\file tests/testSimpleFormCompiler.cpp
 #include "ddl/compiler/simpleFormCompiler.hpp"
-#ifdef _WIN32
-#pragma warning(disable:4996)
-#pragma warning(disable:4127)
-#endif
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <iostream>
+#include "utils/miscUtils.hpp"
 #include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
 #include <stdexcept>
@@ -76,7 +73,7 @@ TEST_F( SimpleFormCompilerTest, tests)
 		boost::filesystem::path pp = g_testdir / "simpleFormCompiler" / "data" / testDescription[ti].srcfile;
 		std::string srcfile = pp.string() + ".simpleform";
 		ddl::SimpleFormCompiler mm;
-		ddl::StructType sr = mm.compileFile( srcfile);
+		ddl::StructType sr = mm.compile( utils::readSourceFileContent( srcfile));
 		sr.print( std::cerr);
 	}
 }

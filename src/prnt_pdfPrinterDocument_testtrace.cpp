@@ -60,16 +60,21 @@ private:
 
 void DocumentImpl::execute_enter( Method method, const VariableScope& vscope)
 {
+/*[-]*/std::cout << "ENTER " << methodName(method) << ":" << std::endl;
 	m_out << "ENTER " << methodName(method) << ":" << std::endl;
 	VariableScope::const_iterator vi = vscope.begin(), ve = vscope.end();
 	m_stk.push_back( ++m_cnt);
+/*[-]*/std::cout << m_cnt << "$ ";
 	m_out << m_cnt << "$ ";
 	while (vi != ve)
 	{
+/*[-]*/std::cout << vi.name() << " = '" << vi.value() << "', ";
 		m_out << vi.name() << " = '" << vi.value() << "'";
 		++vi;
 		if (vi != ve) m_out << ", ";
 	}
+/*[-]*/std::cout << std::endl;
+	m_out << std::endl;
 }
 
 void DocumentImpl::execute_leave( Method method)

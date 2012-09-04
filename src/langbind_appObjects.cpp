@@ -39,6 +39,7 @@ Project Wolframe.
 #include "utils/miscUtils.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
+#include "filter/blob_filter.hpp"
 #include "filter/char_filter.hpp"
 #include "filter/line_filter.hpp"
 #include "filter/token_filter.hpp"
@@ -110,6 +111,7 @@ bool FilterMap::getFilter( const std::string& name, Filter& rt) const
 
 FilterMap::FilterMap()
 {
+	defineFilter( "blob", createBlobFilter);
 	defineFilter( "char", createCharFilter);
 	defineFilter( "char:UTF-8", createCharFilter);
 	defineFilter( "char:UTF-16BE", createCharFilter);

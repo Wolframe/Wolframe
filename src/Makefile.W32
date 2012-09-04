@@ -101,6 +101,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_ptreefilter.obj \
 	filter_typingfilter.obj \
 	filter_textwolf_filter.obj \
+	filter_blob_filter.obj \
 	filter_char_filter.obj \
 	filter_line_filter.obj \
 	filter_token_filter.obj \
@@ -197,8 +198,10 @@ copy_prereq:
 !ENDIF
 !IFDEF WITH_PGSQL
 	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
+!IFDEF PGDLL_WITH_I18N
 	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" .
 	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" .
+!ENDIF
 !ENDIF
 !IFDEF WITH_LIBXML2
 	@-copy "$(WIN_ICONV_DIR)\iconv.dll" .

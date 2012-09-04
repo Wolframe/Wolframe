@@ -29,11 +29,20 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl_compilerInterface.cpp
-///\brief implementation of common methods of DDL compilers
-#include "ddl/compilerInterface.hpp"
+///\file char_filter.hpp
+///\brief Filter reading/writing character by character
 
-using namespace _Wolframe;
-using namespace ddl;
+#ifndef _Wolframe_FILTER_BLOB_HPP_INCLUDED
+#define _Wolframe_FILTER_BLOB_HPP_INCLUDED
+#include "filter/filter.hpp"
+#include <string>
+
+namespace _Wolframe {
+namespace langbind {
+
+Filter createBlobFilter( const std::string& name);
+
+}}//namespace
+#endif
 
 

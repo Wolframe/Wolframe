@@ -56,6 +56,7 @@ CPP_OBJS = \
 	moduleDirectory.o \
 	resolvePath.o \
 	stringUtils.o \
+	parseUtils.o \
 	utils_doctype.o \
 	CRAM.o
 

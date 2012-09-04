@@ -37,6 +37,8 @@ Project Wolframe.
 #endif
 #include "utils/miscUtils.hpp"
 #include <cstring>
+#include <sstream>
+#include <string>
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe::utils;
@@ -50,64 +52,3 @@ void _Wolframe::utils::splitString( std::vector<std::string>& res, const std::st
 	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
 }
 
-OperatorTable::OperatorTable( const char* op)
-{
-	std::size_t ii;
-	for (ii=0; ii<sizeof(m_ar); ++ii) m_ar[ii]=false;
-	for (ii=0; op[ii]; ++ii) m_ar[(unsigned char)(op[ii])]=true;
-}
-
-static bool isLetter( char ch)
-{
-	return (ch < 0 || ((ch|32) >= 'a' && (ch|32) <= 'z') || (ch >= '0' && ch <= '9') || ch == '_');
-}
-
-char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const OperatorTable& operatorTable)
-{
-	char rt = '\0';
-	tok.clear();
-	while (*itr <= 32 && *itr >= 0 && itr != end) ++itr;
-	if (itr == end) return '\0';
-	rt = *itr;
-	if (*itr == '\'' || *itr == '\"')
-	{
-		char eb = *itr;
-		for (++itr; itr != end; ++itr)
-		{
-			if (*itr == eb)
-			{
-				++itr;
-				return rt;
-			}
-			else if (*itr == '\\')
-			{
-				++itr;
-				if (itr == end) throw std::runtime_error( "string not terminated");
-			}
-			if (*itr == 0) throw std::runtime_error( "string has multibyte encoding or is binary");
-			tok.push_back( *itr);
-		}
-		throw std::runtime_error( "string not terminated");
-	}
-	else if (operatorTable[ *itr])
-	{
-		tok.push_back( *itr);
-		++itr;
-		return rt;
-	}
-	else if (isLetter( *itr))
-	{
-		while (isLetter( *itr)) tok.push_back( *itr++);
-		return rt;
-	}
-	else
-	{
-		throw std::runtime_error( std::string( "illegal token character '") + *itr + "'");
-	}
-}
-
-char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end)
-{
-	static OperatorTable noOperator;
-	return parseNextToken( tok,itr,end,noOperator);
-}

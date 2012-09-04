@@ -133,12 +133,14 @@ Project Wolframe.
 							<?ifdef with_pgsql?>
 							<Component Id="PostgresqlDlls" Guid="{3BD6483F-70B2-44D3-9C65-26787635A44B}">
 								<File Id="libpq.dll" Name="libpq.dll" DiskId="1" Source="..\src\libpq.dll"/>
-								<?ifdef pgdll_without_major_versions?>
-									<File Id="libiconv.dll" Name="libiconv.dll" DiskId="1" Source="..\src\libiconv.dll"/>
-									<File Id="libintl.dll" Name="libintl.dll" DiskId="1" Source="..\src\libintl.dll"/>
-								<?else?>
-									<File Id="libiconv.dll" Name="libiconv-2.dll" DiskId="1" Source="..\src\libiconv-2.dll"/>
-									<File Id="libintl.dll" Name="libintl-8.dll" DiskId="1" Source="..\src\libintl-8.dll"/>								
+								<?ifdef pgdll_with_18n?>
+									<?ifdef pgdll_without_major_versions?>
+										<File Id="libiconv.dll" Name="libiconv.dll" DiskId="1" Source="..\src\libiconv.dll"/>
+										<File Id="libintl.dll" Name="libintl.dll" DiskId="1" Source="..\src\libintl.dll"/>
+									<?else?>
+										<File Id="libiconv.dll" Name="libiconv-2.dll" DiskId="1" Source="..\src\libiconv-2.dll"/>
+										<File Id="libintl.dll" Name="libintl-8.dll" DiskId="1" Source="..\src\libintl-8.dll"/>								
+									<?endif?>
 								<?endif?>
 							</Component>
 							<?endif?>
@@ -261,15 +263,60 @@ Project Wolframe.
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 							</Component>
 
-							<Component Id="ModProcEcho" Guid="{A2B8DBB1-1059-4596-A6E1-7DC31214F305}">
-								<File Id="mod_proc_echo.dll" Name="mod_proc_echo.dll" DiskId="1" Source="..\src\modules\processor\echo\mod_proc_echo.dll"/>
-								<util:XmlFile Id="AppendConfigModProcEcho" Action="createElement" ElementPath="/configuration/LoadModules"
-								              Name="module" Value="[INSTALLDIR]modules\mod_proc_echo.dll"
+							<Component Id="ModAuthzDatabase" Guid="{e9da7e48-2bee-43bf-a388-ce2bb02da1bd}">
+								<File Id="mod_authz_database.dll" Name="mod_authz_database.dll" DiskId="1" Source="..\src\modules\authorization\database\mod_authz_database.dll"/>
+								<util:XmlFile Id="AppendConfigModAuthzDatabase" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_authz_database.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-								<util:XmlFile Id="UpdateEchoDatabase" Action="setValue" ElementPath="/configuration/Processor/database"
-								              Value="[WOLFRAME_DATABASE_TYPE]"
+								<util:XmlFile Id="UpdateModAuthzDatabaseDefaultDeny" Action="setValue" ElementPath="/configuration/AAAA/Authorization/default"
+								              Value="deny"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
-							      </Component>							
+							</Component>
+
+							<Component Id="ModDdlCompilerSimpleForm" Guid="{2a5e72e8-cc29-4264-8026-c222901ea401}">
+								<File Id="mod_ddlcompiler_simpleform.dll" Name="mod_ddlcompiler_simpleform.dll" DiskId="1" Source="..\src\modules\ddlcompiler\simpleform\mod_ddlcompiler_simpleform.dll"/>
+								<util:XmlFile Id="AppendConfigModDdlCompilerSimpleForm" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_ddlcompiler_simpleform.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<Component Id="ModFilterChar" Guid="{2dc36fbb-e779-43cf-b6cf-c6dbb280fc85}">
+								<File Id="mod_filter_char.dll" Name="mod_filter_char.dll" DiskId="1" Source="..\src\modules\filter\char\mod_filter_char.dll"/>
+								<util:XmlFile Id="AppendConfigModFilterChar" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_filter_char.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<?ifdef var.with_libxml2?>
+								<Component Id="ModFilterLibXml2" Guid="{ccbe6394-ce8e-4faf-acbf-79b8173c8c12}">
+									<File Id="mod_filter_libxml2.dll" Name="mod_filter_libxml2.dll" DiskId="1" Source="..\src\modules\filter\libxml2\mod_filter_libxml2.dll"/>
+									<util:XmlFile Id="AppendConfigModFilterLibXml2" Action="createElement" ElementPath="/configuration/LoadModules"
+												  Name="module" Value="[INSTALLDIR]modules\mod_filter_libxml2.dll"
+											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+								</Component>
+							<?endif?>
+
+							<Component Id="ModFilterLine" Guid="{60e8af7a-488b-4b50-81ba-e1f0685e5987}">
+								<File Id="mod_filter_line.dll" Name="mod_filter_line.dll" DiskId="1" Source="..\src\modules\filter\line\mod_filter_line.dll"/>
+								<util:XmlFile Id="AppendConfigModFilterLine" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_filter_line.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<Component Id="ModFilterTextwolf" Guid="{2c0379f7-bec4-41f1-bf2b-7cf2e23d22cb}">
+								<File Id="mod_filter_textwolf.dll" Name="mod_filter_textwolf.dll" DiskId="1" Source="..\src\modules\filter\textwolf\mod_filter_textwolf.dll"/>
+								<util:XmlFile Id="AppendConfigModFilterTextwolf" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_filter_textwolf.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<Component Id="ModFilterToken" Guid="{2424b75e-85cc-4bbe-b5ce-73c21680e622}">
+								<File Id="mod_filter_token.dll" Name="mod_filter_token.dll" DiskId="1" Source="..\src\modules\filter\token\mod_filter_token.dll"/>
+								<util:XmlFile Id="AppendConfigModFilterToken" Action="createElement" ElementPath="/configuration/LoadModules"
+								              Name="module" Value="[INSTALLDIR]modules\mod_filter_token.dll"
+									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
 						</Directory>
 						
 						<Directory Id="LogDir" Name="logs">
@@ -377,13 +424,35 @@ Project Wolframe.
 					<ComponentRef Id="ModAuthTextfile"/>
 				</Feature>
 			</Feature>
-			
-			<Feature Id="ProcModules" Title="Processor Modules" Description="Modules with processors doing the actual work." Level="3">
-				<Feature Id="ProcEcho" Title="Echo processor" Description="A demo processor echoing all input." Level="3" InstallDefault="local" TypicalDefault="install">
-					<ComponentRef Id="ModProcEcho"/>
+
+			<Feature Id="AuthzModules" Title="Authorization Modules" Description="Authorization modules" Level="3">
+				<Feature Id="AuthzDatabase" Title="Authenticate via database" Description="Use a database module for authorizaion." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModAuthzDatabase"/>
 				</Feature>
 			</Feature>
 
+			<Feature Id="ProcessingModules" Title="Data Processing Modules" Description="Data Processing modules" Level="3">
+				<Feature Id="DdlCompilerSimpleForm" Title="Simple form" Description="Wolframe data definition language compiler." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModDdlCompilerSimpleForm"/>
+				</Feature>
+			</Feature>
+			
+			<Feature Id="FilterModules" Title="Filter Modules" Description="Filter modules" Level="3">
+				<Feature Id="StandardFilterModules" Title="Standard filter modules" Description="Standard filter modules." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModFilterChar"/>
+					<ComponentRef Id="ModFilterLine"/>
+					<ComponentRef Id="ModFilterTextwolf"/>
+					<ComponentRef Id="ModFilterToken"/>
+				</Feature>
+
+				<?ifdef var.with_libxml2?>
+					<Feature Id="FilterModuleLibXml2" Title="Libxml2 filter module" Description="Libxml filter module." Level="3" InstallDefault="local" TypicalDefault="install">
+						<ComponentRef Id="ModFilterLibXml2"/>
+					</Feature>
+				<?endif?>
+				
+			</Feature>			
+			
 			<Feature Id="Clients" Title="Clients" Description="Client programmes talking to Wolframe." Level="3"  InstallDefault="local">
 				<Feature Id="QtClient" Title="Qt Client" Description="A Qt client to access the Wolframe server." Level="1000">
 				</Feature>

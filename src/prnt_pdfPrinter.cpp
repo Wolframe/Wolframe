@@ -39,6 +39,8 @@ Project Wolframe.
 #include "textwolf/xmlpathautomatonparse.hpp"
 #include "textwolf/xmlpathselect.hpp"
 #include <cstdlib>
+#include <sstream>
+#include <iostream>
 #include <vector>
 #include <map>
 
@@ -83,6 +85,7 @@ static std::string getLine( std::size_t& linecnt, std::string::const_iterator& i
 
 static std::string getSelectionExpression( std::string::const_iterator& itr, const std::string::const_iterator& end)
 {
+/*[-]*/std::cout << "SCAN getSelectionExpression '" << std::string( itr, end) << "'" << std::endl;
 	std::string::const_iterator eb = itr;
 	for (; itr != end; ++itr)
 	{
@@ -117,6 +120,7 @@ public:
 			std::string line = getLine( linecnt, itr, end);
 			std::string::const_iterator li=line.begin(), le=line.end();
 			std::string xpathstr = getSelectionExpression( li, le);
+/*[-]*/std::cout << "XPATH '" << xpathstr << "'" << std::endl;
 			int xerr = m_parser.addExpression( (int)m_statedef.size()+1, xpathstr.c_str(), xpathstr.size());
 			if (xerr != 0)
 			{
@@ -139,7 +143,13 @@ public:
 
 	std::string tostring() const
 	{
-		return std::string();
+		std::ostringstream out;
+		std::vector<StateDef>::const_iterator is = m_statedef.begin(), es = m_statedef.end();
+		for (; is != es; ++is)
+		{
+			out << "STATE " << (int)(is-m_statedef.begin()) << ": " << is->tostring( m_exprstrings) << std::endl;
+		}
+		return out.str();
 	}
 private:
 	XMLPathSelectAutomatonParser m_parser;
@@ -262,6 +272,7 @@ PrintFunctionR _Wolframe::prnt::createSimplePdfPrintFunction( const std::string&
 PrintFunctionR _Wolframe::prnt::createTestTracePdfPrintFunction( const std::string& description)
 {
 	SimplePdfPrintFunction* ref = new SimplePdfPrintFunction( description, true);
+/*[-]*/std::cout << "PRINT FUNCTION " << ref->tostring() << std::endl;
 	PrintFunctionR rt( ref);
 	return rt;
 }
