@@ -206,19 +206,76 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	// Build the list of filters
 	for ( module::ModulesDirectory::simpleBuilder_iterator it = modules->objectsBegin();
 								it != modules->objectsEnd(); it++ )	{
-		//		if the object is a filter
-		module::FilterContainer* fltr = dynamic_cast< module::FilterContainer* >((*it)->constructor());
-		if ( fltr == NULL )	{
-			LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
-				  << "'' is not a filter";
-			throw std::logic_error( "Object is not a filter. See log." );
-		}
-		else	{
-			std::string filterName = fltr->identifier();
-			m_filter.push_back( fltr );
-			boost::algorithm::to_upper( filterName );
-			m_filterMap[ filterName ] = fltr;
-			LOG_TRACE << "'" << filterName << "' filter registered";
+		switch( it->constructor()->objectType() )	{
+			case ObjectConstructorBase::FILTER_OBJECT:	{	// object is a filter
+				module::FilterContainer* fltr = dynamic_cast< module::FilterContainer* >((*it)->constructor());
+				if ( fltr == NULL )	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+						  << "'' is not a filter";
+					throw std::logic_error( "Object is not a filter. See log." );
+				}
+				else	{
+					std::string name = fltr->identifier();
+					m_filter.push_back( fltr );
+					boost::algorithm::to_upper( name );
+					m_filterMap[ name ] = fltr;
+					LOG_TRACE << "'" << name << "' filter registered";
+				}
+				break;
+			}
+			case ObjectConstructorBase::DDL_COMPILER_OBJECT:	// object is a DDL compiler
+				LOG_WARNING << "DDL compiler interface is not yet available";
+				break;
+
+			case ObjectConstructorBase::FORM_FUNCTION_OBJECT:	{	// object is a DDL compiler
+				module::FormFunctionContainer* ffo = dynamic_cast< module::FormFunctionContainer* >((*it)->constructor());
+				if ( ffo == NULL )	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+						  << "'' is not a form function";
+					throw std::logic_error( "Object is not a form function. See log." );
+				}
+				else	{
+					std::string name = ffo->identifier();
+					boost::algorithm::to_upper( name );
+					LOG_TRACE << "'" << name << "' form function registered";
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::AUDIT_OBJECT:
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					  << "'' is marked as an AUDIT_OBJECT but has a simple object constructor";
+				throw std::logic_error( "Object is not a valid simple object. See log." );
+				break;
+			case ObjectConstructorBase::AUTHENTICATION_OBJECT:
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					  << "'' is marked as an AUTHENTICATION_OBJECT but has a simple object constructor";
+				throw std::logic_error( "Object is not a valid simple object. See log." );
+				break;
+			case ObjectConstructorBase::AUTHORIZATION_OBJECT:
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					  << "'' is marked as an AUTHORIZATION_OBJECT but has a simple object constructor";
+				throw std::logic_error( "Object is not a valid simple object. See log." );
+				break;
+			case ObjectConstructorBase::DATABASE_OBJECT:
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					  << "'' is marked as an DATABASE_OBJECT but has a simple object constructor";
+				throw std::logic_error( "Object is not a valid simple object. See log." );
+				break;
+			case ObjectConstructorBase::CMD_HANDLER_OBJECT:
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					  << "'' is marked as an CMD_HANDLER_OBJECT but has a simple object constructor";
+				throw std::logic_error( "Object is not a valid simple object. See log." );
+				break;
+			case ObjectConstructorBase::TEST_OBJECT:
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					  << "'' is marked as an TEST_OBJECT but has a simple object constructor";
+				throw std::logic_error( "Object is not a valid simple object. See log." );
+				break;
+			default:
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					  << "'' is of an unknown object type";
+				throw std::logic_error( "Object is not a valid simple object. See log." );
 		}
 	}
 }

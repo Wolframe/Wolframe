@@ -41,6 +41,8 @@
 #include "database/database.hpp"
 #include "database/DBprovider.hpp"
 #include "modules/filter/template/filterBuilder.hpp"
+#include "modules/ddlcompiler/template/ddlcompilerBuilder.hpp"
+#include "modules/formfunction/template/formfunctionBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 
 #include <list>
