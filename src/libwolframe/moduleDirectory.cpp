@@ -48,11 +48,11 @@ ModulesDirectory::~ModulesDirectory()
 		delete m_simpleBuilder.front();
 		m_simpleBuilder.pop_front();
 	}
-	while ( ! m_cfgdBuilder.empty() )	{
-		assert( m_cfgdBuilder.front() != NULL );
-		delete m_cfgdBuilder.front();
-		m_cfgdBuilder.pop_front();
-	}
+//	while ( ! m_cfgdBuilder.empty() )	{
+//		assert( m_cfgdBuilder.front() != NULL );
+//		delete m_cfgdBuilder.front();
+//		m_cfgdBuilder.pop_front();
+//	}
 }
 
 

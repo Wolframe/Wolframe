@@ -265,12 +265,6 @@ examples/tproc/appProperties.cpp
 examples/tproc/GNUmakefile
 examples/tproc/handlerConfig.hpp
 examples/tproc/Makefile.W32
-examples/tproc/tests/temp/echo.lua
-examples/tproc/tests/temp/example_1.lua
-examples/tproc/tests/temp/example_2.lua
-examples/tproc/tests/temp/example_3.lua
-examples/tproc/tests/temp/example_4.lua
-examples/tproc/tests/temp/example_5.lua
 examples/tproc/tests/template/data/multilingual.UTF-8.xml
 examples/tproc/tests/tprocHandlerTest.cpp
 examples/tproc/tproc.conf
@@ -344,6 +338,7 @@ include/ddl/compiler/simpleFormCompiler.hpp
 include/ddl/structTypeBuild.hpp
 include/ddl/structType.hpp
 include/ErrorCode.hpp
+include/filter/blob_filter.hpp
 include/filter/bufferingfilter.hpp
 include/filter/char_filter.hpp
 include/filter/doctype.hpp
@@ -656,6 +651,7 @@ src/ddl_structType.cpp
 src/echoProcessor.cpp
 src/echoProcessor.hpp
 src/exceptionBase.hpp
+src/filter_blob_filter.cpp
 src/filter_char_filter.cpp
 src/filter_doctype.cpp
 src/filter_filterbase.cpp
@@ -709,6 +705,7 @@ src/libwolframe/logger/syslog_win32.c
 src/libwolframe/logger/syslog_win32.h
 src/libwolframe/Makefile.W32
 src/libwolframe/moduleDirectory.cpp
+src/libwolframe/parseUtils.cpp
 src/libwolframe/provider/AAAAproviderConfig.cpp
 src/libwolframe/provider/AAAAproviderImpl.cpp
 src/libwolframe/provider/AAAAproviderImpl.hpp
@@ -818,6 +815,7 @@ src/modules/ddlcompiler/Makefile.W32
 src/modules/ddlcompiler/simpleform/GNUmakefile
 src/modules/ddlcompiler/simpleform/Makefile.W32
 src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform.cpp
+src/modules/ddlcompiler/simpleform/ModDdlCompilerSimpleForm.def
 src/modules/ddlcompiler/template/ddlcompilerBuilder.hpp
 src/modules/filter/char/CharFilterModule.def
 src/modules/filter/char/GNUmakefile
