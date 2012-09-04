@@ -102,8 +102,10 @@ public:
 			ParseDfValue,
 			ParseEnd
 		};
-		State st = ParseName;
-		std::string::const_iterator ii=item.begin(), ee=item.end(), valbegin, valend;
+		State st = ParseStart;
+		std::string vv;
+
+		std::string::const_iterator ii=item.begin(), ee=item.end();
 		for (; ii != ee; ++ii)
 		{
 			switch (st)
@@ -111,22 +113,22 @@ public:
 				case ParseStart:
 					if (*ii == '@')
 					{
+						++ii;
 						m_isAttribute = true;
-						st = ParseName;
-						break;
 					}
 					st = ParseName;
 					/* no break here !*/
 				case ParseName:
 					if (((*ii|32) >= 'a' && (*ii|32) <= 'z') || (*ii >= '0' && *ii <= '9') || *ii == '_')
 					{
-						break;
+						vv.push_back( *ii);
+						continue;
 					}
-					parseType( item.substr( 0, ii-item.begin()));
+					parseType( vv);
 					st = ParseEndName;
 					/* no break here !*/
 				case ParseEndName:
-					if (*ii < ' ' && *ii >= 0)
+					if (*ii <= ' ' && *ii >= 0)
 					{
 						break;
 					}
@@ -144,7 +146,7 @@ public:
 					throw std::runtime_error( "Syntax error in Simple Form Attribute: '[' or '(' expected");
 
 				case ParseArOpen:
-					if (*ii < ' ' && *ii >= 0)
+					if (*ii <= ' ' && *ii > 0)
 					{
 						break;
 					}
@@ -156,7 +158,7 @@ public:
 					throw std::runtime_error( "Syntax error in Simple Form Attribute: ']' expected");
 
 				case ParseDfOpen:
-					if (*ii < ' ' && *ii >= 0)
+					if (*ii <= ' ' && *ii > 0)
 					{
 						break;
 					}
@@ -166,28 +168,23 @@ public:
 						break;
 					}
 					st = ParseDfValue;
-					valbegin = ii;
-					valend = ii;
+					vv.clear();
 					/* no break here !*/
 
 				case ParseDfValue:
-					if (*ii < ' ' && *ii >= 0)
-					{
-						break;
-					}
 					if (*ii == ')')
 					{
-						m_value = item.substr( valbegin-item.begin(), valend-valbegin);
+						m_value = vv;
 						st = ParseEnd;
 						break;
 					}
 					else
 					{
-						valend = ii+1;
+						vv.push_back( *ii);
 					}
 				break;
 				case ParseEnd:
-					if (*ii < ' ' && *ii >= 0)
+					if (*ii <= ' ' && *ii > 0)
 					{
 						break;
 					}
@@ -196,7 +193,7 @@ public:
 		}
 		if (st == ParseName)
 		{
-			parseType( item.substr( 0, ii-item.begin()));
+			parseType( vv);
 		}
 		else if (st != ParseEnd)
 		{
@@ -230,12 +227,28 @@ private:
 
 }///anonymous namespace
 
+static bool isIdentifier( const std::string& name)
+{
+	std::string::const_iterator ii=name.begin(), ee=name.end();
+	for (;ii!=ee; ++ii)
+	{
+		if (!(((*ii|32) >= 'a' && (*ii|32) <= 'z') || (*ii >= '0' && *ii <= '9') || *ii == '_'))
+		{
+			break;
+		}
+	}
+	return (ii==ee);
+}
 
 static void compile_ptree( const boost::property_tree::ptree& pt, StructType& result)
 {
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
 	{
+		if (!isIdentifier( itr->first))
+		{
+			throw std::runtime_error( "Semantic error: Identifier expected as variable name");
+		}
 		if (itr->second.begin() == itr->second.end() && itr->second.data().size())
 		{
 			FRMAttribute fa( itr->second.data());

@@ -35,6 +35,8 @@ Project Wolframe.
 #include "types/bcdArithmetic.hpp"
 #include "utils/miscUtils.hpp"
 #include <stdexcept>
+/*[-]*/#include <iostream>
+#include <sstream>
 #include <limits>
 
 using namespace std;
@@ -77,6 +79,7 @@ void Expression::evaluate( VariableScope& vscope, const std::string& exprstrings
 {
 	ValueStack stk;
 
+/*[-]*/std::cout << "EVALUATE " << exprstrings << std::endl;
 	std::vector<Item>::const_iterator next,itr=m_ar.begin(), end=m_ar.end();
 	for (; itr != end; ++itr)
 	{
@@ -213,22 +216,25 @@ static bool isSpace( char ch)
 	return ((unsigned char)ch <= (unsigned char)' ');
 }
 
-static Expression parseOperand( std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
-static Expression parseSumExpression( const Expression& op1, std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
-static Expression parseFactorExpression( const Expression& op1, std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
-static Expression parseAssignExpression( const Expression& op1, std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
-static Expression parseAssignExpressionList( char separator, std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
-static StateDef::MethodCall parseMethodCall( std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
+static Expression parseOperand( std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings);
+static Expression parseSumExpression( const Expression& op1, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings);
+static Expression parseFactorExpression( const Expression& op1, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings);
+static Expression parseAssignExpression( const Expression& op1, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings);
+static Expression parseAssignExpressionList( char separator, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings);
+static StateDef::MethodCall parseMethodCall( std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings);
 static utils::OperatorTable g_operatorTable( "#(){}=+-*/,;");
 
-static Expression parseOperand( std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings)
+
+static Expression parseOperand( std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings)
 {
+/*[-]*/std::cout << "SCAN parseOperand '" << std::string( itr, end) << "'" << std::endl;
 	Expression rt;
 	std::string tok;
 	std::string::const_iterator prev;
 	char ch;
 
 	prev = itr; ch = parseNextToken( tok, itr, end, g_operatorTable);
+/*[-]*/std::cout << "SCAN parseOperand CHR '" << ch << "'" << std::endl;
 	switch (ch)
 	{
 		case '\0': break;
@@ -273,6 +279,7 @@ static Expression parseOperand( std::string::const_iterator itr, const std::stri
 			exprstrings.push_back( '\0');
 			break;
 		default:
+/*[-]*/std::cout << "SCAN parseOperand default '" << ch << "'" << std::endl;
 			if (isIdentifierToken(ch))
 			{
 				if (!checkIdentifier( tok)) throw std::runtime_error( std::string( "illegal identifier '") + tok + "'");
@@ -280,6 +287,7 @@ static Expression parseOperand( std::string::const_iterator itr, const std::stri
 				std::map <std::string,std::size_t>::const_iterator vi = varnamemap->find( tok);
 				if (vi == varnamemap->end()) throw std::runtime_error( std::string( "unknown variable name '") + tok + "'");
 				rt.push_variable( vi->second);
+/*[-]*/std::cout << "SCAN parseOperand variable '" << vi->second << "'" << std::endl;
 			}
 			else if (isNumberToken(ch))
 			{
@@ -296,8 +304,9 @@ static Expression parseOperand( std::string::const_iterator itr, const std::stri
 	return rt;
 }
 
-static Expression parseFactorExpression( const Expression& op1, std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings)
+static Expression parseFactorExpression( const Expression& op1, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings)
 {
+/*[-]*/std::cout << "SCAN parseFactorExpression '" << std::string( itr, end) << "'" << std::endl;
 	Expression rt;
 	std::string tok;
 	std::string::const_iterator prev;
@@ -336,14 +345,16 @@ static Expression parseFactorExpression( const Expression& op1, std::string::con
 	return rt;
 }
 
-static Expression parseSumExpression( const Expression& op1, std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings)
+static Expression parseSumExpression( const Expression& op1, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings)
 {
+/*[-]*/std::cout << "SCAN parseSumExpression '" << std::string( itr, end) << "'" << std::endl;
 	Expression rt;
 	std::string tok;
 	std::string::const_iterator prev;
 	char ch;
 
 	prev = itr; ch = parseNextToken( tok, itr, end, g_operatorTable);
+/*[-]*/std::cout << "SCAN parseSumExpression CHR '" << ch << "'" << std::endl;
 	switch (ch)
 	{
 		case '\0':
@@ -384,8 +395,9 @@ static Expression parseSumExpression( const Expression& op1, std::string::const_
 	return rt;
 }
 
-static Expression parseAssignExpression( const Expression& op1, std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings)
+static Expression parseAssignExpression( const Expression& op1, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings)
 {
+/*[-]*/std::cout << "SCAN parseAssignExpression '" << std::string( itr, end) << "'" << std::endl;
 	Expression rt;
 	std::string tok;
 	std::string::const_iterator prev;
@@ -396,10 +408,14 @@ static Expression parseAssignExpression( const Expression& op1, std::string::con
 	{
 		case '=':
 		{
+/*[-]*/while (itr != end && isSpace( *itr)) itr++;
+/*[-]*/if (itr != end) std::cout << "SCAN parseAssignExpression CHR1 '" << *itr << "'" << std::endl;
 			Expression op2 = parseOperand( itr, end, exprstrings);
 			if (!op2.size()) throw std::runtime_error( "something expected right of an assignment '='");
+/*[-]*/while (itr != end && isSpace( *itr)) itr++;
+/*[-]*/if (itr != end) std::cout << "SCAN parseAssignExpression CHR2 '" << ch << "'" << std::endl;
 			op2 = parseSumExpression( op2, itr, end, exprstrings);
-			if (!op2.size()) throw std::runtime_error( "second operand expected for binary minus '-'");
+			if (!op2.size()) throw std::runtime_error( "expression expected right of an assignment '='");
 			rt.push_expression( op2);
 			rt.push_expression( op1);
 			rt.push_operator( ch);
@@ -413,8 +429,9 @@ static Expression parseAssignExpression( const Expression& op1, std::string::con
 	return rt;
 }
 
-static Expression parseAssignExpressionList( char separator, std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings)
+static Expression parseAssignExpressionList( char separator, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings)
 {
+/*[-]*/std::cout << "SCAN parseAssignExpressionList '" << std::string( itr, end) << "'" << std::endl;
 	Expression rt;
 	std::string tok;
 	std::string::const_iterator prev;
@@ -423,16 +440,14 @@ static Expression parseAssignExpressionList( char separator, std::string::const_
 	prev = itr; ch = parseNextToken( tok, itr, end, g_operatorTable);
 	switch (ch)
 	{
-		case '\0':
-			break;
 		case ')':
 		case '}':
 			itr = prev;
-			break;
+		case '\0':
+			return rt;
 	}
 	for (;;)
 	{
-		if (ch == '\0' || ch == ')' || ch ) return rt;
 		if (isIdentifierToken(ch))
 		{
 			Expression op1;
@@ -446,11 +461,10 @@ static Expression parseAssignExpressionList( char separator, std::string::const_
 			if (ch == separator) continue;
 			switch (ch)
 			{
-				case '\0':
-					return rt;
 				case ')':
 				case '}':
 					itr = prev;
+				case '\0':
 					return rt;
 			}
 			throw std::runtime_error( std::string( "separator or end of assignment list expected; unexpected token '") + tok + "'");
@@ -462,8 +476,9 @@ static Expression parseAssignExpressionList( char separator, std::string::const_
 	}
 }
 
-static StateDef::MethodCall parseMethodCall( std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings)
+static StateDef::MethodCall parseMethodCall( std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings)
 {
+/*[-]*/std::cout << "SCAN parseMethodCall '" << std::string( itr, end) << "'" << std::endl;
 	StateDef::MethodCall rt;
 	std::string tok;
 	std::string::const_iterator prev;
@@ -503,6 +518,7 @@ static StateDef::MethodCall parseMethodCall( std::string::const_iterator itr, co
 
 void StateDef::parse( std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings)
 {
+/*[-]*/std::cout << "SCAN parse '" << std::string( itr, end) << "'" << std::endl;
 	std::string tok;
 	std::string::const_iterator prev;
 	Expression expr;
@@ -513,6 +529,7 @@ void StateDef::parse( std::string::const_iterator itr, const std::string::const_
 	{
 		if (*itr == '{')
 		{
+			++itr;
 			m_expr.push_expression( parseAssignExpressionList( ';', itr, end, exprstrings));
 			ch = parseNextToken( tok, itr, end, g_operatorTable);
 			if (ch != '}') throw std::runtime_error( "expected '}' at end of assignment list");
@@ -526,5 +543,49 @@ void StateDef::parse( std::string::const_iterator itr, const std::string::const_
 	}
 }
 
+std::string Expression::tostring( const std::string& exprstrings) const
+{
+	std::ostringstream out;
+	Variable var;
+	std::vector<Item>::const_iterator itr=m_ar.begin(), end=m_ar.end();
+	for (; itr != end; ++itr)
+	{
+		switch (itr->m_type)
+		{
+			case Item::Variable:
+				var = (Variable)itr->value.m_idx;
+				out << " " << variableName( var);
+				break;
 
+			case Item::Value:
+				out << " '" << std::string( exprstrings.c_str() + itr->value.m_idx) << "'";
+				break;
+
+			case Item::Operator:
+				out << itr->value.m_opchr;
+				break;
+			break;
+		}
+	}
+	return out.str();
+}
+
+std::string StateDef::MethodCall::tostring( const std::string& exprstrings) const
+{
+	std::ostringstream out;
+	out << methodName( m_method) << "(" << m_param.tostring( exprstrings) << ")";
+	return out.str();
+}
+
+std::string StateDef::tostring( const std::string& exprstrings) const
+{
+	std::ostringstream out;
+	std::vector<MethodCall>::const_iterator ii = m_call.begin(), ee = m_call.end();
+	out << "{" << m_expr.tostring( exprstrings) << "}";
+	for (; ii != ee; ++ii)
+	{
+		out << " " << ii->tostring( exprstrings) << std::endl;
+	}
+	return out.str();
+}
 

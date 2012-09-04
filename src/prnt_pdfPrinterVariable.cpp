@@ -74,12 +74,12 @@ std::map <std::string, std::size_t>* _Wolframe::prnt::getVariablenameMap()
 VariableScope::VariableScope()
 {
 	m_strings.push_back('\0');
-	m_ar.push_back( Map());
+	m_ar.push_back( Area());
 }
 
 void VariableScope::push()
 {
-	m_ar.push_back( Map());
+	m_ar.push_back( Area());
 }
 
 void VariableScope::pop()
@@ -90,9 +90,9 @@ void VariableScope::pop()
 
 void VariableScope::define( Variable var, const std::string& value)
 {
-	if (m_ar.back().find( var) != m_ar.back().end()) throw std::runtime_error( std::string( "duplicate definition of variable '") + variableName(var) + "'");
+	if (m_ar.back().m_map.find( var) != m_ar.back().m_map.end()) throw std::runtime_error( std::string( "duplicate definition of variable '") + variableName(var) + "'");
 
-	m_ar.back()[var] = m_strings.size();
+	m_ar.back().m_map[var] = m_strings.size();
 	m_strings.append( value);
 	m_strings.push_back('\0');
 }
@@ -100,19 +100,19 @@ void VariableScope::define( Variable var, const std::string& value)
 void VariableScope::define( Variable var, Variable src)
 {
 	std::size_t val = getValueIdx( src);
-	if (m_ar.back().find( var) != m_ar.back().end()) throw std::runtime_error( std::string( "duplicate definition of variable '") + variableName(var) + "'");
+	if (m_ar.back().m_map.find( var) != m_ar.back().m_map.end()) throw std::runtime_error( std::string( "duplicate definition of variable '") + variableName(var) + "'");
 	if (!val) throw std::runtime_error( std::string( "undefined variable in scope '") + variableName(src) + "'");
-	m_ar.back()[var] = val;
+	m_ar.back().m_map[var] = val;
 }
 
 std::size_t VariableScope::getValueIdx( Variable var) const
 {
-	std::vector<Map>::const_iterator itr = m_ar.begin()+m_ar.size();
+	std::vector<Area>::const_iterator itr = m_ar.begin()+m_ar.size();
 	while (itr != m_ar.begin())
 	{
 		--itr;
-		Map::const_iterator vi = m_ar.back().find( var);
-		if (vi != m_ar.back().end())
+		std::map<std::size_t,std::size_t>::const_iterator vi = m_ar.back().m_map.find( var);
+		if (vi != m_ar.back().m_map.end())
 		{
 			return vi->second;
 		}

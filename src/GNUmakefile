@@ -90,6 +90,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_doctype.o \
 	filter_typingfilter.o \
 	filter_textwolf_filter.o \
+	filter_blob_filter.o \
 	filter_char_filter.o \
 	filter_line_filter.o \
 	filter_token_filter.o \

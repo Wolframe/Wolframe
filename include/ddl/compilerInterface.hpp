@@ -54,11 +54,6 @@ struct CompilerInterface
 	///\return compilation result (a map represented as StructType::Struct of exported structures representing the forms)
 	virtual StructType compile( const std::string& srcstring) const=0;
 
-	///\brief Compile a source from a file. Throws in case of error.
-	///\param[in] filename path of the file as string
-	///\return compilation result (a map represented as StructType::Struct of exported structures representing the forms)
-	StructType compileFile( const std::string& filename) const;
-
 	///\brief Get the name of the ddl this compiler is for
 	const std::string& ddlname() const		{return m_ddlname;}
 

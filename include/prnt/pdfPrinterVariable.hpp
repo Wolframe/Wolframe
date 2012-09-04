@@ -62,9 +62,9 @@ public:
 	void push();
 	void pop();
 
-	void push_marker( std::size_t mi)				{m_mrkar.back().push_back(mi);}
-	std::vector<std::size_t>::const_iterator begin_marker()	const	{return m_mrkar.back().begin();}
-	std::vector<std::size_t>::const_iterator end_marker() const	{return m_mrkar.back().end();}
+	void push_marker( std::size_t mi)				{return m_ar.back().m_mrk.push_back( mi);}
+	std::vector<std::size_t>::const_iterator begin_marker()	const	{return m_ar.back().m_mrk.begin();}
+	std::vector<std::size_t>::const_iterator end_marker() const	{return m_ar.back().m_mrk.end();}
 
 	void define( Variable var, const std::string& value);
 	void define( Variable var, Variable src);
@@ -103,9 +103,12 @@ public:
 	const_iterator end() const					{return const_iterator();}
 
 private:
-	typedef std::map<std::size_t,std::size_t> Map;
-	std::vector<Map> m_ar;
-	std::vector<std::vector<std::size_t> > m_mrkar;
+	struct Area
+	{
+		std::map<std::size_t,std::size_t> m_map;
+		std::vector<std::size_t> m_mrk;
+	};
+	std::vector<Area> m_ar;
 	std::string m_strings;
 };
 

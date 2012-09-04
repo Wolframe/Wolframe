@@ -62,6 +62,8 @@ public:
 
 	void evaluate( VariableScope& vs, const std::string& exprstrings) const;
 
+	std::string tostring( const std::string& exprstrings) const;
+
 private:
 	struct Item
 	{
@@ -90,10 +92,14 @@ struct StateDef
 
 	void parse( std::string::const_iterator itr, const std::string::const_iterator& end, std::string& exprstrings);
 
+	std::string tostring( const std::string& exprstrings) const;
+
 	struct MethodCall
 	{
 		Method m_method;
 		Expression m_param;
+
+		std::string tostring( const std::string& exprstrings) const;
 	};
 	Expression m_expr;
 	std::vector<MethodCall> m_call;

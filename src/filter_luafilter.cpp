@@ -204,7 +204,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 				{
 					m_stk.back().id = FetchState::VectorIterReopen;
 					m_stk.back().getTagElement( element);
-					type = FilterBase::CloseTag;
+					type = CloseTag;
 					return true;
 				}
 				else
@@ -216,7 +216,7 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 			case FetchState::VectorIterReopen:
 				m_stk.back().id = FetchState::VectorIterValue;
 				m_stk.back().getTagElement( element);
-				type = FilterBase::OpenTag;
+				type = OpenTag;
 				return true;
 
 			case FetchState::TableIterOpen:
@@ -370,10 +370,12 @@ bool LuaTableOutputFilter::closeAttribute( const Element& element)
 	lua_pushnil( m_ls);
 	if (lua_next( m_ls, -2))
 	{
-		// ... non empty table
+		// ... non empty table, we create an element with an empty key
 		lua_pop( m_ls, 2);
-		setState( OutputFilter::Error, "value without tag or attribute context");
-		return false;
+		lua_pushstring( m_ls, "");
+		if (!pushValue( element)) return false;
+		lua_settable( m_ls, -3);
+		return true;
 	}
 	else
 	{

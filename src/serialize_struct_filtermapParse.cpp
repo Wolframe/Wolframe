@@ -129,6 +129,7 @@ bool _Wolframe::serialize::parseObjectStruct( const StructDescriptionBase* descr
 		if (inp.state() != langbind::InputFilter::Error) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
 	}
+
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:

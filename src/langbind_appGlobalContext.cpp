@@ -35,6 +35,7 @@ Project Wolframe.
 #include "utils/miscUtils.hpp"
 #include "utils/doctype.hpp"
 #include "logger-v1.hpp"
+#include <sstream>
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
@@ -134,7 +135,17 @@ bool GlobalContext::loadPrintLayout( const PrintLayoutConfigStruct& config, std:
 		}
 		else
 		{
-			prnt::PrintFunctionR func = pf( config.sourcepath);
+			prnt::PrintFunctionR func;
+			try
+			{
+				func = pf( utils::readSourceFileContent( config.sourcepath));
+			}
+			catch (const std::exception& e)
+			{
+				std::ostringstream msg;
+				msg << "could not compile file '" << config.sourcepath << "': " << e.what() << std::endl;
+				throw std::runtime_error( msg.str());
+			}
 			std::string name( config.name);
 			if (name.empty())
 			{
@@ -149,9 +160,9 @@ bool GlobalContext::loadPrintLayout( const PrintLayoutConfigStruct& config, std:
 		}
 		return true;
 	}
-	catch (std::runtime_error& e)
+	catch (const std::runtime_error& e)
 	{
-		error = e.what();
+		error = std::string( "error in print layout definition: ") + e.what();
 		return false;
 	}
 }
@@ -181,7 +192,17 @@ bool GlobalContext::loadDDLForm( const DDLFormConfigStruct& config, std::string&
 		else
 		{
 			ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
-			*form = ci->compileFile( config.sourcepath);
+			try
+			{
+				*form = ci->compile( utils::readSourceFileContent( config.sourcepath));
+			}
+			catch (const std::exception& e)
+			{
+				std::ostringstream msg;
+				msg << "could not compile file '" << config.sourcepath << "': " << e.what() << std::endl;
+				throw std::runtime_error( msg.str());
+			}
+
 			std::string name;
 			if (form->doctype())
 			{
@@ -197,7 +218,7 @@ bool GlobalContext::loadDDLForm( const DDLFormConfigStruct& config, std::string&
 	}
 	catch (std::runtime_error& e)
 	{
-		error = e.what();
+		error = std::string( "error in form data definition source: ") + e.what();
 		return false;
 	}
 }

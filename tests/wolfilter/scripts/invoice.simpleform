@@ -21,7 +21,11 @@ invoice
 		{
 			unit float
 			total float
-			tax float
+			tax
+			{
+				description @string
+				_ float
+			}
 			gross float
 		}
 	}
@@ -36,9 +40,9 @@ invoice
 		payed float
 		open float
 	}
-	address
+	address []
 	{
-		@id string
+		id @string
 		name string
 		street string
 		postalcode uint

@@ -64,6 +64,12 @@ private:
 char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const OperatorTable& operatorTable);
 char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end);
 
+
+///\brief Reading the content of a source file
+///\remark Throws on error
+///\TODO BETTER AND SAVER IMPLEMENTATION
+std::string readSourceFileContent( const std::string& filename);
+
 }}//namespace
 
 /// Temporary, till libboost 1.42 support goes away
