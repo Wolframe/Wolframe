@@ -62,17 +62,56 @@ public:
 public:
 	///\brief Constructor
 	XMLPathSelectAutomatonParser(){}
+	virtual ~XMLPathSelectAutomatonParser(){}
 
 	int addExpression( int typeidx, const char* esrc, std::size_t esrcsize)
 	{
+		std::string idstrings;
+		CStringIterator pitr( esrc, esrcsize);
+		SrcScanner pp( pitr);
+		std::vector<std::size_t> idref;
+
+		for (; *pp; skipSpaces( pp))
+		{
+			switch (*pp)
+			{
+				case '/':
+				case '@':
+					++pp;
+					continue;
+				case '[':
+					while (*pp != 0 && *pp != ']') pp++;
+					if (*pp == 0) return pp.getPosition()+1;
+					++pp;
+					continue;
+				default:
+					if (pp.control() == Undef || pp.control() == Any)
+					{
+						idref.push_back( parseIdentifier( pp, idstrings));
+					}
+					else
+					{
+						return pp.getPosition()+1;
+					}
+			}
+		}
+		typename std::vector<std::size_t>::const_iterator di = idref.begin(), de = idref.end();
+
 		CStringIterator itr( esrc, esrcsize);
 		SrcScanner src( itr);
-
 		PathElement expr( this);
-		for (; *src; ++src, skipSpaces( src))
+
+		for (; *src; skipSpaces( src))
 		{
 			switch (*src)
 			{
+				case '@':
+				{
+					if (di == de) return src.getPosition()+1;
+					++src;
+					skipIdentifier( src);
+					expr( getIdentifier( *di, idstrings) );
+				}
 				case '/':
 				{
 					++src;
@@ -81,30 +120,32 @@ public:
 						++src;
 						if (*src == '@')
 						{
-							std::string id = parseIdentifier( ++src);
-							if (id.empty()) return src.getPosition()+1;
-							expr --( id.c_str());
+							if (di == de) return src.getPosition()+1;
+							++src;
+							skipIdentifier( src);
+							expr -- ( getIdentifier( *di, idstrings) );
 						}
 						else
 						{
-							std::string id = parseIdentifier( src);
-							if (id.empty()) return src.getPosition()+1;
-							expr --[ id.c_str()];
+							if (di == de) return src.getPosition()+1;
+							skipIdentifier( src);
+							expr -- [ getIdentifier( *di, idstrings) ];
 						}
 					}
 					else
 					{
 						if (*src == '@')
 						{
-							std::string id = parseIdentifier( ++src);
-							if (id.empty()) return src.getPosition()+1;
-							expr( id.c_str());
+							if (di == de) return src.getPosition()+1;
+							++src;
+							skipIdentifier( src);
+							expr ( getIdentifier( *di, idstrings) );
 						}
 						else
 						{
-							std::string id = parseIdentifier( src);
-							if (id.empty()) return src.getPosition()+1;
-							expr[ id.c_str()];
+							if (di == de) return src.getPosition()+1;
+							skipIdentifier( src);
+							expr [ getIdentifier( *di, idstrings) ];
 						}
 					}
 					continue;
@@ -125,6 +166,7 @@ public:
 						if (*src == ']')
 						{
 							expr.FROM( range_start);
+							++src;
 						}
 						else
 						{
@@ -133,15 +175,23 @@ public:
 							++src; skipSpaces( src);
 							if (*src != ']') return src.getPosition()+1;
 							expr.RANGE( range_start, range_end);
+							++src;
 						}
 					}
 					else if (*src == ']')
 					{
 						range_start = range_end;
 						expr.INDEX( range_start);
+						++src;
+					}
+					else
+					{
+						return src.getPosition()+1;
 					}
 					continue;
 				}
+				default:
+					return src.getPosition()+1;
 			}
 		}
 		expr.assignType( typeidx);
@@ -162,15 +212,25 @@ private:
 		return std::atoi( num.c_str());
 	}
 
-	static std::string parseIdentifier( SrcScanner& src)
+	std::size_t parseIdentifier( SrcScanner& src, std::string& idstrings)
 	{
-		std::string rt;
+		std::size_t rt = idstrings.size();
 		for (; src.control() == Undef || src.control() == Any; ++src)
 		{
-			AtmCharSet::print( *src, rt);
+			AtmCharSet::print( *src, idstrings);
 		}
-		AtmCharSet::print( 0, rt);
+		AtmCharSet::print( 0, idstrings);
 		return rt;
+	}
+
+	static void skipIdentifier( SrcScanner& src)
+	{
+		for (; src.control() == Undef || src.control() == Any; ++src);
+	}
+
+	const char* getIdentifier( std::size_t idx, const std::string& idstrings) const
+	{
+		return idstrings.c_str() + idx;
 	}
 };
 

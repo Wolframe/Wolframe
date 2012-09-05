@@ -222,7 +222,7 @@ public:
 	///\return XML element type as string
 	static const char* getElementTypeName( ElementType ee)
 	{
-		static const char* names[ NofElementTypes] = {0,"ErrorOccurred","HeaderStart","HeaderAttribName","HeaderAttribValue","HeaderEnd", "DocAttribValue", "DocAttribEnd", "TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
+		static const char* names[ NofElementTypes] = {"None","ErrorOccurred","HeaderStart","HeaderAttribName","HeaderAttribValue","HeaderEnd", "DocAttribValue", "DocAttribEnd", "TagAttribName","TagAttribValue","OpenTag","CloseTag","CloseTagIm","Content","Exit"};
 		return names[ (unsigned int)ee];
 	}
 

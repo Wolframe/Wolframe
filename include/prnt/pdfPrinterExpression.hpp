@@ -55,6 +55,7 @@ public:
 	void push_operator( char chr);
 	void push_value( std::size_t idx);
 	void push_variable( std::size_t idx);
+	void push_tagvariable( std::size_t idx);
 	void push_expression( const Expression& expr);
 
 	std::size_t size() const		{return m_ar.size();}
@@ -67,7 +68,7 @@ public:
 private:
 	struct Item
 	{
-		enum Type {Variable,Value,Operator};
+		enum Type {Variable,TagVariable,Value,Operator};
 		Type m_type;
 		union
 		{

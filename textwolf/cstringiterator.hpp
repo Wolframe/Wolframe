@@ -85,7 +85,10 @@ public:
 	}
 
 	///\brief Return current char position
-	unsigned int pos() const {return m_pos;}
+	unsigned int pos() const	{return m_pos;}
+
+	///\brief Set current char position
+	void pos( unsigned int i)	{m_pos=(i<m_size)?i:m_size;}
 
 	int operator - (const CStringIterator& o) const
 	{

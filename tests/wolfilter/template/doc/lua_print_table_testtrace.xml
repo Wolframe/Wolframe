@@ -1,0 +1,27 @@
+ENTER PrintText:
+1$ Text = 'invoice'
+ENTER PrintText:
+2$ Text = 'invoice', Index = '2.00000'
+LEAVE PrintText 2
+ENTER PrintText:
+3$ Text = 'invoice', Index = '3.00000'
+LEAVE PrintText 3
+ENTER PrintText:
+4$ Text = 'invoice', Index = '4.00000'
+LEAVE PrintText 4
+ENTER PrintText:
+5$ Text = 'invoice', Index = '2.00000'
+LEAVE PrintText 5
+ENTER PrintText:
+6$ Text = 'invoice', Index = '3.00000'
+LEAVE PrintText 6
+ENTER PrintText:
+7$ Text = 'invoice', Index = '4.00000'
+LEAVE PrintText 7
+ENTER PrintText:
+8$ Text = 'invoice', Index = '5.00000'
+LEAVE PrintText 8
+ENTER PrintText:
+9$ Text = 'invoice', Index = '6.00000'
+LEAVE PrintText 9
+LEAVE PrintText 1

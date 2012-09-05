@@ -64,14 +64,13 @@ static boost::filesystem::path g_testdir;
 
 using namespace _Wolframe;
 
-static proc::ProcessorProvider* g_processorProvider = 0;
+boost::shared_ptr<proc::ProcessorProvider> g_processorProvider;
 
 ///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
 static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 {
-	if (g_processorProvider) delete g_processorProvider;
-	g_processorProvider = new proc::ProcessorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory());
-	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
+	g_processorProvider.reset( new proc::ProcessorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory()));
+	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider.get());
 	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
 
 	gct->defineFormFunction( "employee_assignment_convert",

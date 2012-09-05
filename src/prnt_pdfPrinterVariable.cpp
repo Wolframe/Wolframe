@@ -41,9 +41,9 @@ using namespace _Wolframe::prnt;
 const char* _Wolframe::prnt::variableName( Variable v)
 {
 	static const char* ar[] = {
+		"R0","R1","R2","R3","R4","R5","R6","R7","R8","R9",
 		"Text",
 		"Index",
-		"Value",
 		"PositionX",
 		"PositionY",
 		"SizeX",
@@ -79,45 +79,63 @@ VariableScope::VariableScope()
 
 void VariableScope::push()
 {
-	m_ar.push_back( Area());
+	m_ar.push_back( Area( m_ar.back(), m_tag.size()));
+	m_ar.back().m_mrk.clear();
+}
+
+void VariableScope::push( const std::string& tag)
+{
+
+	m_ar.push_back( Area( m_ar.back(), m_tag.size()));
+	m_ar.back().m_mrk.clear();
+	m_tag.push_back( '/');
+	m_tag.append( tag);
+
+	std::map< std::string,std::map<Variable,std::size_t> >::const_iterator ti = m_tagvarmap.find( m_tag), te = m_tagvarmap.end();
+	if (ti != te)
+	{
+		std::map<Variable,std::size_t>::const_iterator di = ti->second.begin(), de = ti->second.end();
+		for (; di != de; ++di)
+		{
+			m_ar.back().m_map[ di->first] = di->second;
+		}
+	}
 }
 
 void VariableScope::pop()
 {
+	m_tag.resize( m_ar.back().m_tagidx);
 	m_ar.pop_back();
 	if (m_ar.empty()) throw std::logic_error( "non existing variable scope closed");
 }
 
-void VariableScope::define( Variable var, const std::string& value)
+void VariableScope::define( Variable var, const std::string& value, bool passToSibling)
 {
-	if (m_ar.back().m_map.find( var) != m_ar.back().m_map.end()) throw std::runtime_error( std::string( "duplicate definition of variable '") + variableName(var) + "'");
-
-	m_ar.back().m_map[var] = m_strings.size();
+	std::size_t val = m_strings.size();
+	m_ar.back().m_map[ var] = val;
 	m_strings.append( value);
 	m_strings.push_back('\0');
+	if (passToSibling)
+	{
+		m_tagvarmap[ m_tag][ var] = val;
+	}
 }
 
-void VariableScope::define( Variable var, Variable src)
+void VariableScope::define( Variable var, Variable src, bool passToSibling)
 {
 	std::size_t val = getValueIdx( src);
-	if (m_ar.back().m_map.find( var) != m_ar.back().m_map.end()) throw std::runtime_error( std::string( "duplicate definition of variable '") + variableName(var) + "'");
 	if (!val) throw std::runtime_error( std::string( "undefined variable in scope '") + variableName(src) + "'");
 	m_ar.back().m_map[var] = val;
+	if (passToSibling)
+	{
+		m_tagvarmap[ m_tag][ var] = val;
+	}
 }
 
 std::size_t VariableScope::getValueIdx( Variable var) const
 {
-	std::vector<Area>::const_iterator itr = m_ar.begin()+m_ar.size();
-	while (itr != m_ar.begin())
-	{
-		--itr;
-		std::map<std::size_t,std::size_t>::const_iterator vi = m_ar.back().m_map.find( var);
-		if (vi != m_ar.back().m_map.end())
-		{
-			return vi->second;
-		}
-	}
-	return 0;
+	std::map<Variable,std::size_t>::const_iterator vi = m_ar.back().m_map.find( var);
+	return (vi == m_ar.back().m_map.end())?0:vi->second;
 }
 
 std::string VariableScope::getValue( std::size_t idx) const
@@ -146,6 +164,20 @@ std::string ValueStack::top( std::size_t idx) const
 {
 	if (idx >= m_valuear.size()) throw std::logic_error("internal: too few elements on stack for required operation");
 	return std::string( m_strings.c_str() + m_valuear[ m_valuear.size()-1-idx]);
+}
+
+std::string ValueStack::dump() const
+{
+	std::ostringstream rt;
+	int ii = 1;
+	std::vector<std::size_t>::const_iterator vi = m_valuear.begin() + m_valuear.size(), vb = m_valuear.begin();
+	while (vi > vb)
+	{
+		--vi;
+		--ii;
+		rt << (int)ii << ": '" << std::string( m_strings.c_str() + *vi) << "'" << std::endl;
+	}
+	return rt.str();
 }
 
 

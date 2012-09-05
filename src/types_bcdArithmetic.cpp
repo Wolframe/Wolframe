@@ -125,7 +125,7 @@ void BigBCD::init( const std::string& str)
 	}
 	unsigned int bb = (((nn-ii)+(NumDigits-1)) / NumDigits);
 	unsigned int tt = (((nn-ii)+(NumDigits-1)) % NumDigits) * 4;
-	if (!bb) throw std::runtime_error( "illegal bcd number string");
+	if (!bb) throw std::runtime_error( std::string( "illegal bcd number string '") + str + "'");
 
 	init( bb);
 	for (; ii<nn; ++ii)
@@ -229,7 +229,7 @@ BigBCD::const_iterator::const_iterator( const BigBCD& bcd)
 
 std::size_t BigBCD::const_iterator::size() const
 {
-	return (m_idx == 0)?0:((m_idx-1)*NumDigits + m_shf/4);
+	return (m_idx == 0)?0:((m_idx-1)*NumDigits + m_shf/4 + 1);
 }
 
 void BigBCD::const_iterator::increment()
@@ -972,6 +972,8 @@ BigNumber::BigNumber( const std::string& numstr, unsigned int sp, unsigned int c
 
 BigNumber::BigNumber( const BigBCD& o, unsigned int sp, unsigned int cp)
 	:BigBCD(o)
+	,m_show_precision(0)
+	,m_calc_precision(0)
 {
 	format(sp, cp);
 }
@@ -994,6 +996,11 @@ void BigNumber::initFromString( const std::string& numstr, unsigned int maxPreci
 	int state = 0;
 
 	std::string::const_iterator ii=numstr.begin(), ee=numstr.end();
+	if (*ii == '-')
+	{
+		val.push_back('-');
+		++ii;
+	}
 	for (; ii != ee; ++ii)
 	{
 		if (*ii == '.')
@@ -1001,7 +1008,7 @@ void BigNumber::initFromString( const std::string& numstr, unsigned int maxPreci
 			if (state != 0) throw std::runtime_error( "illegal big number syntax");
 			state = 1;
 		}
-		else
+		else if (*ii >= '0' && *ii <= '9')
 		{
 			if (state == 1)
 			{
@@ -1015,6 +1022,10 @@ void BigNumber::initFromString( const std::string& numstr, unsigned int maxPreci
 			{
 				val.push_back( *ii);
 			}
+		}
+		else
+		{
+			throw std::runtime_error( std::string("illegal big number value '") + numstr + "'");
 		}
 	}
 	m_calc_precision = m_show_precision = cpn;
@@ -1030,9 +1041,16 @@ std::string BigNumber::tostring() const
 	{
 		rt.push_back('-');
 	}
-	for (; kk > m_calc_precision && ii != ee; --kk,++ii)
+	if (kk == m_calc_precision)
 	{
-		rt.push_back( ii.ascii());
+		rt.push_back('0');
+	}
+	else
+	{
+		for (; kk > m_calc_precision && ii != ee; --kk,++ii)
+		{
+			rt.push_back( ii.ascii());
+		}
 	}
 	if (m_show_precision > 0)
 	{
@@ -1055,7 +1073,7 @@ bool BigNumber::isequal( const BigNumber& o) const
 	{
 		return BigBCD::operator == ( o);
 	}
-	if (o.m_calc_precision < m_calc_precision)
+	else if (o.m_calc_precision < m_calc_precision)
 	{
 		return BigBCD::operator == ( o.shift( m_calc_precision-o.m_calc_precision));
 	}
@@ -1072,7 +1090,7 @@ bool BigNumber::islt( const BigNumber& o) const
 	{
 		return BigBCD::operator < ( o);
 	}
-	if (o.m_calc_precision < m_calc_precision)
+	else if (o.m_calc_precision < m_calc_precision)
 	{
 		return BigBCD::operator < ( o.shift( m_calc_precision-o.m_calc_precision));
 	}
@@ -1089,7 +1107,7 @@ bool BigNumber::isle( const BigNumber& o) const
 	{
 		return BigBCD::operator <= ( o);
 	}
-	if (o.m_calc_precision < m_calc_precision)
+	else if (o.m_calc_precision < m_calc_precision)
 	{
 		return BigBCD::operator <= ( o.shift( m_calc_precision-o.m_calc_precision));
 	}
@@ -1103,14 +1121,19 @@ bool BigNumber::isle( const BigNumber& o) const
 BigNumber BigNumber::operator /( const BigNumber& o) const
 {
 	BigBCD val( shift( (int)o.m_calc_precision));
-	BigNumber rt( val / ( o.shift( m_calc_precision-o.m_calc_precision)), m_show_precision, m_calc_precision);
+	BigBCD res( val / o);
+	BigNumber rt( res, 0, 0);
+	rt.m_calc_precision = m_calc_precision;
+	rt.m_show_precision = m_show_precision;
 	return rt;
 }
 
 BigNumber BigNumber::operator *( const BigNumber& o) const
 {
-	BigBCD val( static_cast<BigBCD>(o) * ( o.shift( m_calc_precision-o.m_calc_precision)));
-	BigNumber rt( val.shift( -(int)o.m_calc_precision), m_show_precision, m_calc_precision);
+	BigBCD val( BigBCD(*this) * BigBCD(o));
+	BigNumber rt( val.shift( -(int)o.m_calc_precision), 0, 0);
+	rt.m_calc_precision = m_calc_precision;
+	rt.m_show_precision = m_show_precision;
 	return rt;
 }
 
@@ -1118,18 +1141,24 @@ BigNumber BigNumber::operator +( const BigNumber& o) const
 {
 	if (o.m_calc_precision == m_calc_precision)
 	{
-		BigNumber rt( BigBCD::operator + ( o), m_show_precision, m_calc_precision);
+		BigNumber rt( BigBCD::operator + ( o), 0, 0);
+		rt.m_calc_precision = m_calc_precision;
+		rt.m_show_precision = m_show_precision;
 		return rt;
 	}
-	if (o.m_calc_precision < m_calc_precision)
+	else if (o.m_calc_precision < m_calc_precision)
 	{
-		BigNumber rt( BigBCD::operator + ( o.shift( m_calc_precision-o.m_calc_precision)), m_show_precision, m_calc_precision);;
+		BigNumber rt( BigBCD::operator + ( o.shift( m_calc_precision-o.m_calc_precision)), 0, 0);
+		rt.m_calc_precision = m_calc_precision;
+		rt.m_show_precision = m_show_precision;
 		return rt;
 	}
 	else
 	{
 		BigBCD val( shift( o.m_calc_precision-m_calc_precision) + o);
-		BigNumber rt( val.shift( -(int)(o.m_calc_precision-m_calc_precision)), m_show_precision, m_calc_precision);
+		BigNumber rt( val.shift( -(int)(o.m_calc_precision-m_calc_precision)), 0, 0);
+		rt.m_calc_precision = m_calc_precision;
+		rt.m_show_precision = m_show_precision;
 		return rt;
 	}
 }
@@ -1138,18 +1167,24 @@ BigNumber BigNumber::operator -( const BigNumber& o) const
 {
 	if (o.m_calc_precision == m_calc_precision)
 	{
-		BigNumber rt( BigBCD::operator - ( o), m_show_precision, m_calc_precision);
+		BigNumber rt( BigBCD::operator - ( o), 0, 0);
+		rt.m_calc_precision = m_calc_precision;
+		rt.m_show_precision = m_show_precision;
 		return rt;
 	}
-	if (o.m_calc_precision < m_calc_precision)
+	else if (o.m_calc_precision < m_calc_precision)
 	{
-		BigNumber rt( BigBCD::operator - ( o.shift( m_calc_precision-o.m_calc_precision)), m_show_precision, m_calc_precision);;
+		BigNumber rt( BigBCD::operator - ( o.shift( m_calc_precision-o.m_calc_precision)), 0, 0);
+		rt.m_calc_precision = m_calc_precision;
+		rt.m_show_precision = m_show_precision;
 		return rt;
 	}
 	else
 	{
 		BigBCD val( shift( o.m_calc_precision-m_calc_precision) - o);
-		BigNumber rt( val.shift( -(int)(o.m_calc_precision-m_calc_precision)), m_show_precision, m_calc_precision);
+		BigNumber rt( val.shift( -(int)(o.m_calc_precision-m_calc_precision)), 0, 0);
+		rt.m_calc_precision = m_calc_precision;
+		rt.m_show_precision = m_show_precision;
 		return rt;
 	}
 }

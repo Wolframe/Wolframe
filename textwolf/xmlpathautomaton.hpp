@@ -40,10 +40,12 @@
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/staticbuffer.hpp"
 #include <limits>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <map>
 #include <cstddef>
+#include <stdexcept>
 
 namespace textwolf {
 
@@ -69,13 +71,20 @@ public:
 public:
 	///\brief Constructor
 	XMLPathSelectAutomaton()
-			:memUsage(defaultMemUsage),maxDepth(defaultMaxDepth),maxScopeStackSize(0),maxFollows(0),maxTriggers(0),maxTokens(0)
+		:memUsage(defaultMemUsage)
+		,maxDepth(defaultMaxDepth)
+		,maxScopeStackSize(0)
+		,maxFollows(0)
+		,maxTriggers(0)
+		,maxTokens(0)
 	{
 		if (!setMemUsage( memUsage, maxDepth)) throw exception( DimOutOfRange);
 	}
 	typedef CharSet_ CharSet;
 	typedef int Hash;
 	typedef XMLPathSelectAutomaton<CharSet> ThisXMLPathSelectAutomaton;
+
+	virtual ~XMLPathSelectAutomaton(){}
 
 public:
 	///\enum Operation
@@ -126,9 +135,11 @@ public:
 
 		///\brief Deactivate operation for a certain element type
 		void reject( XMLScannerBase::ElementType e)					{neg |= (1<<(unsigned short)e);}
+		bool hasReject( XMLScannerBase::ElementType e) const				{return (neg & (1<<(unsigned short)e)) != 0;}
 
 		///\brief Declare an operation to match on an element type
 		void match( XMLScannerBase::ElementType e)					{pos |= (1<<(unsigned short)e);}
+		bool hasMatch( XMLScannerBase::ElementType e) const				{return (pos & (1<<(unsigned short)e)) != 0;}
 
 		///\brief Declare an operation as seek operation
 		void seekop( Operation op)
@@ -165,6 +176,43 @@ public:
 					break;
 			}
 		}
+
+		const char* seekopName() const
+		{
+			if (this->hasMatch( XMLScannerBase::OpenTag)
+			&&  this->hasMatch( XMLScannerBase::HeaderStart))
+				return "Tag";
+
+			if (this->hasMatch( XMLScannerBase::TagAttribName)
+			&&  this->hasMatch( XMLScannerBase::HeaderAttribName)
+			&&  this->hasReject( XMLScannerBase::Content))
+				return "Attribute";
+
+			if (this->hasMatch( XMLScannerBase::TagAttribValue)
+			&&  this->hasMatch( XMLScannerBase::HeaderAttribValue)
+			&&  this->hasReject( XMLScannerBase::Content))
+				return "AttributeValue";
+
+			if (this->hasMatch( XMLScannerBase::TagAttribValue)
+			&&  this->hasMatch( XMLScannerBase::HeaderAttribValue)
+			&&  this->hasReject( XMLScannerBase::TagAttribName)
+			&&  this->hasReject( XMLScannerBase::HeaderAttribName)
+			&&  this->hasReject( XMLScannerBase::Content)
+			&&  this->hasReject( XMLScannerBase::OpenTag))
+				return "ThisAttributeValue";
+
+			if (this->hasMatch( XMLScannerBase::Content))
+				return "Content";
+
+			if (this->hasMatch( XMLScannerBase::HeaderEnd))
+				return "ContentStart";
+
+			if (pos == 0 && neg == 0)
+				return "None";
+
+			return "";
+		}
+
 		///\brief Join two mask definitions
 		///\param[in] mask definition of mask to join this with
 		void join( const Mask& mask)				{pos |= mask.pos; neg |= mask.neg;}
@@ -208,11 +256,12 @@ public:
 
 		///\brief Constructor
 		State()
-				:keysize(0),key(0),srckey(0),next(-1),link(-1) {}
+			:keysize(0),key(0),srckey(0),next(-1),link(-1) {}
 
 		///\brief Copy constructor
 		///\param [in] orig element to copy
-		State( const State& orig)		:core(orig.core),keysize(orig.keysize),key(0),srckey(0),next(orig.next),link(orig.link)
+		State( const State& orig)
+			:core(orig.core),keysize(orig.keysize),key(0),srckey(0),next(orig.next),link(orig.link)
 		{
 			defineKey( orig.keysize, orig.key, orig.srckey);
 		}
@@ -295,15 +344,58 @@ public:
 		{
 			link = p_link;
 		}
+
+		std::string tostring() const
+		{
+			std::ostringstream rt;
+			if (next >= 0) rt << " ->" << next;
+			if (link >= 0) rt << " ~" << link;
+			rt << ' ';
+			if (core.follow)
+			{
+				rt << '/';
+			}
+			rt << '/';
+			rt << core.mask.seekopName();
+			if (srckey)
+			{
+				rt << " '" << srckey << "'";
+			}
+			else
+			{
+				rt << " (null)";
+			}
+			if (core.cnt_end > 0)
+			{
+				rt << '[' << core.cnt_start << ',' << rt << core.cnt_end << ']';
+			}
+			if (core.typeidx)
+			{
+				rt << " =>" << core.typeidx;
+			}
+			return rt.str();
+		}
 	};
-	std::vector<State> states;							//< the states of the statemachine
+	std::vector<State> states;				//< the states of the statemachine
+
+	///\brief Returns the content of the automaton as pretty printed string for debug output
+	std::string tostring() const
+	{
+		std::ostringstream rt;
+		typename std::vector<State>::const_iterator ii=states.begin(), ee=states.end();
+		for (; ii != ee; ++ii)
+		{
+			rt << (int)(ii-states.begin()) << ": " << ii->tostring() << std::endl;
+		}
+		return rt.str();
+	}
 
 	///\class Token
 	///\brief Active or passive but still valid token of the XML processing (this is a trigger waiting to match)
 	struct Token
 	{
-		Core core;											//< core of the state
-		int stateidx;										//< index into the automaton, poiting to the state
+		Core core;					//< core of the state
+		int stateidx;					//< index into the automaton, poiting to the state
 
 		///\brief Constructor
 		Token()						:stateidx(-1) {}

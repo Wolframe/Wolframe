@@ -119,6 +119,7 @@ public:
 	const_iterator end() const				{return const_iterator();}
 
 private:
+	friend class BigNumber;
 	typedef GreedySmallChunkAllocator Allocator;
 	void init( std::size_t size_, Allocator* allocator=0);
 	void copy( const BigBCD& o, Allocator* allocator);

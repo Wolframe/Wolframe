@@ -40,15 +40,17 @@ Project Wolframe.
 namespace _Wolframe {
 namespace prnt {
 
+///\enum Variable
+///\brief Fixed list of usable Variables (Registers)
 enum Variable
 {
-	Text,
-	Index,
-	Value,
-	PositionX,
-	PositionY,
-	SizeX,
-	SizeY
+	R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,		//< general purpose registers
+	Text,					//< text to be printed
+	Index,					//< element counting register for elements printed with index
+	PositionX,				//< X coordinate position
+	PositionY,				//< Y coordinate position
+	SizeX,					//< Size on the X axis of the coordinate system
+	SizeY					//< Size on the Y axis of the coordinate system
 };
 enum {NofVariables=(int)SizeY+1};
 
@@ -59,57 +61,57 @@ class VariableScope
 {
 public:
 	VariableScope();
+
 	void push();
+	void push( const std::string& tag);
 	void pop();
 
 	void push_marker( std::size_t mi)				{return m_ar.back().m_mrk.push_back( mi);}
-	std::vector<std::size_t>::const_iterator begin_marker()	const	{return m_ar.back().m_mrk.begin();}
-	std::vector<std::size_t>::const_iterator end_marker() const	{return m_ar.back().m_mrk.end();}
 
-	void define( Variable var, const std::string& value);
-	void define( Variable var, Variable src);
+	typedef std::vector<std::size_t>::const_iterator const_marker_iterator;
+	typedef std::vector<std::size_t>::iterator marker_iterator;
+
+	const_marker_iterator begin_marker() const			{return m_ar.back().m_mrk.begin();}
+	const_marker_iterator end_marker() const			{return m_ar.back().m_mrk.end();}
+
+	typedef std::map<Variable,std::size_t>::const_iterator const_iterator;
+	typedef std::map<Variable,std::size_t>::iterator iterator;
+
+	const_iterator begin() const					{return m_ar.back().m_map.begin();}
+	const_iterator end() const					{return m_ar.back().m_map.end();}
+
+	void define( Variable var, const std::string& value, bool passToSibling=false);
+	void define( Variable var, Variable src, bool passToSibling=false);
 
 	std::size_t getValueIdx( Variable var) const;
+	bool isDefined( Variable var) const				{return getValueIdx( var) != 0;}
+
 	std::string getValue( std::size_t idx) const;
-
-	class const_iterator
-	{
-	public:
-		const_iterator( const const_iterator& o)		:m_visited(o.m_visited),m_itr(o.m_itr){}
-		const_iterator( const VariableScope* visited)		:m_visited(visited),m_itr(0){skip();}
-		const_iterator()					:m_visited(0),m_itr(NofVariables){}
-		void skip()						{while (m_itr < (int)NofVariables && !m_visited->getValueIdx( (Variable)m_itr)) ++m_itr;}
-		const_iterator& operator++()				{skip(); return *this;}
-		const_iterator operator++(int)				{const_iterator rt(*this); skip(); return rt;}
-		bool operator ==( const const_iterator& o) const	{return !compare(o);}
-		bool operator !=( const const_iterator& o) const	{return compare(o);}
-		bool operator <=( const const_iterator& o) const	{return compare(o)<=0;}
-		bool operator >=( const const_iterator& o) const	{return compare(o)>=0;}
-		bool operator <( const const_iterator& o) const		{return compare(o)<0;}
-		bool operator >( const const_iterator& o) const		{return compare(o)>0;}
-
-		const char* name() const				{return (m_itr < NofVariables)?variableName((Variable)m_itr):"";}
-		std::string value() const				{return (m_itr < NofVariables)?m_visited->getValue( m_visited->getValueIdx( (Variable)m_itr)):std::string();}
-
-	private:
-		int compare( const const_iterator& o) const		{return m_itr - o.m_itr;}
-
-	private:
-		const VariableScope* m_visited;
-		unsigned int m_itr;
-	};
-
-	const_iterator begin() const					{return const_iterator(this);}
-	const_iterator end() const					{return const_iterator();}
 
 private:
 	struct Area
 	{
-		std::map<std::size_t,std::size_t> m_map;
+		std::map<Variable,std::size_t> m_map;
 		std::vector<std::size_t> m_mrk;
+		std::size_t m_tagidx;
+
+		explicit Area( std::size_t tagidx_=0)
+			:m_tagidx(tagidx_){}
+
+		Area( const Area& o, std::size_t tagidx_)
+			:m_map(o.m_map)
+			,m_mrk(o.m_mrk)
+			,m_tagidx(tagidx_){}
+
+		Area( const Area& o)
+			:m_map(o.m_map)
+			,m_mrk(o.m_mrk)
+			,m_tagidx(o.m_tagidx){}
 	};
 	std::vector<Area> m_ar;
 	std::string m_strings;
+	std::string m_tag;
+	std::map< std::string, std::map<Variable,std::size_t> > m_tagvarmap;
 };
 
 
@@ -122,6 +124,7 @@ public:
 	void pop( std::size_t nof=1);
 
 	std::string top( std::size_t idx=0) const;
+	std::string dump() const;
 
 private:
 	std::vector<std::size_t> m_valuear;

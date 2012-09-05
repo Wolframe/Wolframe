@@ -43,7 +43,8 @@ namespace
 class DocumentImpl :public Document
 {
 public:
-	DocumentImpl(){}
+	DocumentImpl()
+		:m_cnt(0){}
 	virtual ~DocumentImpl(){}
 
 	virtual void execute_enter( Method method, const VariableScope& vars);
@@ -60,25 +61,25 @@ private:
 
 void DocumentImpl::execute_enter( Method method, const VariableScope& vscope)
 {
-/*[-]*/std::cout << "ENTER " << methodName(method) << ":" << std::endl;
 	m_out << "ENTER " << methodName(method) << ":" << std::endl;
 	VariableScope::const_iterator vi = vscope.begin(), ve = vscope.end();
 	m_stk.push_back( ++m_cnt);
-/*[-]*/std::cout << m_cnt << "$ ";
 	m_out << m_cnt << "$ ";
 	while (vi != ve)
 	{
-/*[-]*/std::cout << vi.name() << " = '" << vi.value() << "', ";
-		m_out << vi.name() << " = '" << vi.value() << "'";
+		if (vi != vscope.begin())
+		{
+			m_out << ", ";
+		}
+		m_out << variableName( vi->first) << " = '" << vscope.getValue( vi->second) << "'";
 		++vi;
-		if (vi != ve) m_out << ", ";
 	}
-/*[-]*/std::cout << std::endl;
 	m_out << std::endl;
 }
 
 void DocumentImpl::execute_leave( Method method)
 {
+	if (m_stk.empty()) throw std::runtime_error( "internal: call of enter/leave not balanced");
 	std::size_t idx = m_stk.back();
 	m_stk.pop_back();
 	m_out << "LEAVE " << methodName(method) << " " << idx << std::endl;

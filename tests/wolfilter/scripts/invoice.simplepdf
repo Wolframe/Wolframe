@@ -1,1 +1,2 @@
-//name: {Text=Value} PrintText()
+/invoice: {Text="invoice"} PrintText()
+//name: {Text ?= "text"; [Index] ?= -1; [Index] = Index + 1} PrintText()

@@ -52,6 +52,14 @@ static bool isSpace( char ch)
 	return ((unsigned char)ch <= (unsigned char)' ');
 }
 
+static bool isEmpty( const std::string& line)
+{
+	std::string::const_iterator itr = line.begin();
+	const std::string::const_iterator end = line.end();
+	for (; itr != end; ++itr) if (*itr < 0 || *itr > 32) return false;
+	return true;
+}
+
 static std::string getLine( std::size_t& linecnt, std::string::const_iterator& itr, const std::string::const_iterator& end)
 {
 	std::string rt;
@@ -80,12 +88,12 @@ static std::string getLine( std::size_t& linecnt, std::string::const_iterator& i
 			rt.push_back( *itr);
 		}
 	}
+	if (itr != end) ++itr;
 	return rt;
 }
 
 static std::string getSelectionExpression( std::string::const_iterator& itr, const std::string::const_iterator& end)
 {
-/*[-]*/std::cout << "SCAN getSelectionExpression '" << std::string( itr, end) << "'" << std::endl;
 	std::string::const_iterator eb = itr;
 	for (; itr != end; ++itr)
 	{
@@ -117,18 +125,25 @@ public:
 		std::string::const_iterator itr = src.begin(), end=src.end();
 		try
 		{
-			std::string line = getLine( linecnt, itr, end);
-			std::string::const_iterator li=line.begin(), le=line.end();
-			std::string xpathstr = getSelectionExpression( li, le);
-/*[-]*/std::cout << "XPATH '" << xpathstr << "'" << std::endl;
-			int xerr = m_parser.addExpression( (int)m_statedef.size()+1, xpathstr.c_str(), xpathstr.size());
-			if (xerr != 0)
+			while (itr != end)
 			{
-				std::runtime_error( std::string( "in xml selection path at position ") + boost::lexical_cast<std::string>(xerr));
+				std::string line = getLine( linecnt, itr, end);
+				if (isEmpty( line))
+				{
+					++linecnt;
+					continue;
+				}
+				std::string::const_iterator li=line.begin(), le=line.end();
+				std::string xpathstr = getSelectionExpression( li, le);
+				int xerr = m_parser.addExpression( (int)m_statedef.size()+1, xpathstr.c_str(), xpathstr.size());
+				if (xerr != 0)
+				{
+					std::runtime_error( std::string( "in xml selection path at position ") + boost::lexical_cast<std::string>(xerr));
+				}
+				StateDef stateDef;
+				stateDef.parse( li, le, m_exprstrings);
+				m_statedef.push_back( stateDef);
 			}
-			StateDef stateDef;
-			stateDef.parse( li, le, m_exprstrings);
-			m_statedef.push_back( stateDef);
 		}
 		catch (const std::runtime_error& e)
 		{
@@ -149,6 +164,9 @@ public:
 		{
 			out << "STATE " << (int)(is-m_statedef.begin()) << ": " << is->tostring( m_exprstrings) << std::endl;
 		}
+		out << "AUTOMATON:" << std::endl;
+		out << m_parser.tostring() << std::endl;
+
 		return out.str();
 	}
 private:
@@ -160,6 +178,12 @@ private:
 
 SimplePdfPrintFunction::SimplePdfPrintFunction( const std::string& description, bool testTraceVersion)
 	:m_impl(new SimplePdfPrintFunctionImpl(description, testTraceVersion)){}
+
+SimplePdfPrintFunction::~SimplePdfPrintFunction()
+{
+	delete m_impl;
+}
+
 
 class PrintInput :public langbind::TypedOutputFilter
 {
@@ -174,13 +198,15 @@ public:
 
 	virtual bool print( langbind::TypedFilterBase::ElementType type, const langbind::TypedFilterBase::Element& element)
 	{
+		std::string elemstr = element.tostring();
 		textwolf::XMLScannerBase::ElementType xtype = textwolf::XMLScannerBase::None;
 		switch (type)
 		{
 			case langbind::TypedFilterBase::OpenTag:
-				xtype = textwolf::XMLScannerBase::None;
-				m_variableScope.push();
+				xtype = textwolf::XMLScannerBase::OpenTag;
+				m_variableScope.push( elemstr);
 				break;
+
 			case langbind::TypedFilterBase::CloseTag:
 			{
 				xtype = textwolf::XMLScannerBase::CloseTag;
@@ -193,9 +219,11 @@ public:
 				m_variableScope.pop();
 				break;
 			}
+
 			case langbind::TypedFilterBase::Attribute:
 				xtype = textwolf::XMLScannerBase::TagAttribName;
 				break;
+
 			case langbind::TypedFilterBase::Value:
 				if (m_lasttype == langbind::TypedFilterBase::Attribute)
 				{
@@ -207,7 +235,9 @@ public:
 				}
 				break;
 		}
-		std::string elemstr = element.tostring();
+		m_lasttype = type;
+
+		// Execute methods triggered:
 		XMLPathSelect::iterator itr = m_selectState.find( xtype, elemstr.c_str(), elemstr.size());
 		XMLPathSelect::iterator end = m_selectState.end();
 		for (; itr!=end; itr++)
@@ -227,7 +257,6 @@ public:
 				}
 			}
 		}
-		m_lasttype = type;
 		return true;
 	}
 
@@ -272,7 +301,6 @@ PrintFunctionR _Wolframe::prnt::createSimplePdfPrintFunction( const std::string&
 PrintFunctionR _Wolframe::prnt::createTestTracePdfPrintFunction( const std::string& description)
 {
 	SimplePdfPrintFunction* ref = new SimplePdfPrintFunction( description, true);
-/*[-]*/std::cout << "PRINT FUNCTION " << ref->tostring() << std::endl;
 	PrintFunctionR rt( ref);
 	return rt;
 }

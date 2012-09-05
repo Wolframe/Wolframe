@@ -49,7 +49,7 @@ public:
 	///\param[in] description Source of the document print description
 	SimplePdfPrintFunction( const std::string& description, bool test=false);
 	///\brief Destructor
-	virtual ~SimplePdfPrintFunction(){}
+	virtual ~SimplePdfPrintFunction();
 
 	virtual InputR getInput() const;
 	virtual std::string execute( const Input* i) const;

@@ -45,6 +45,12 @@ do
 	cat ../scripts/$script >> $output
 done
 echo '**output' >> $output
-cat doc/$docout.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
-echo "" | recode UTF-8..$cset >> $output
+if [ -f doc/$docout.UTF-8.xml ]; then
+	cat doc/$docout.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
+	echo "" | recode UTF-8..$cset >> $output
+elif [ -f doc/$docout.xml ]; then
+	cat doc/$docout.xml >> $output
+else
+	echo "OUTPUT FILE doc/$docout.UTF-8.xml OR doc/$docout.xml NOT FOUND !"
+fi
 echo '**end' >> $output
