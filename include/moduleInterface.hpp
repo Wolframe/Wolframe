@@ -89,7 +89,7 @@ protected:
 
 
 ///
-template < class Tbuilder, class Tconf >
+template < class Tconstructor, class Tconf >
 class ConfiguredBuilderDescription : public ConfiguredBuilder
 {
 public:
@@ -103,10 +103,10 @@ public:
 		return new Tconf( m_title, logPrefix, m_keyword );
 	}
 	virtual ObjectConstructorBase* constructor()	{
-		return &m_builder;
+		return &m_constructor;
 	}
 private:
-	Tbuilder	m_builder;
+	Tconstructor	m_constructor;
 };
 
 ///

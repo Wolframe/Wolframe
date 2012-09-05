@@ -116,7 +116,7 @@ void EchoProcConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 
 
 //***  Processor unit container  ****************************************
-EchoProcContainer::EchoProcContainer( const EchoProcConfig& conf )
+EchoProcConstructor::EchoProcConstructor( const EchoProcConfig& conf )
 {
 	m_proc = new EchoProcessorUnit( conf.m_operation );
 	MOD_LOG_TRACE << "Echo processor container created";
@@ -174,13 +174,13 @@ void EchoProcessorSlice::receiveData( const void* /*data*/, std::size_t /*size*/
 {
 }
 
-const FSMoperation EchoProcessorSlice::nextOperation()
+const FSM::Operation EchoProcessorSlice::nextOperation()
 {
-	FSMoperation	op;
+	FSM::Operation	op;
 	return op;
 }
 
-void EchoProcessorSlice::signal( proc::Processor::FSMsignal /*event*/ )
+void EchoProcessorSlice::signal(FSM::Signal /*event*/ )
 {
 }
 

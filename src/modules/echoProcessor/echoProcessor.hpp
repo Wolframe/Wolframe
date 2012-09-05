@@ -37,22 +37,27 @@
 #ifndef _ECHO_PROCESSOR_HPP_INCLUDED
 #define _ECHO_PROCESSOR_HPP_INCLUDED
 
-#include "processor/processor.hpp"
-#include "container.hpp"
+#include "cmdbind/commandHandler.hpp"
+#include "cmdbind/commandHandlerUnit.hpp"
+#include "FSMinterface.hpp"
+#include "constructor.hpp"
 #include "moduleInterface.hpp"
 
+
 namespace _Wolframe {
+
+static const char* ECHO_PROCESSOR_CLASS_NAME = "EchoProcessor";
 
 class EchoProcessorSlice
 {
 public:
 	~EchoProcessorSlice()				{}
-	const char* typeName() const			{ return "EchoProcessor"; }
+	const char* typeName() const			{ return ECHO_PROCESSOR_CLASS_NAME; }
 	void close()					{}
 
 	void receiveData( const void* data, std::size_t size );
-	const FSMoperation nextOperation();
-	void signal( proc::Processor::FSMsignal event );
+	const FSM::Operation nextOperation();
+	void signal( FSM::Signal event );
 	std::size_t dataLeft( const void*& begin );
 };
 
@@ -69,7 +74,7 @@ public:
 
 	EchoProcessorUnit( Operation operation );
 	~EchoProcessorUnit()				{}
-	const char* name() const			{ return "EchoProcessor"; }
+	const char* name() const			{ return ECHO_PROCESSOR_CLASS_NAME; }
 //	proc::ProcessorSlice* slice() const		{ return new EchoProcessorSlice; }
 
 	std::string& process( std::string& input );
@@ -80,12 +85,12 @@ private:
 
 class EchoProcConfig : public config::NamedConfiguration
 {
-	friend class EchoProcContainer;
+	friend class EchoProcConstructor;
 public:
 	EchoProcConfig( const char* cfgName, const char* logParent, const char* logName )
 		: config::NamedConfiguration( cfgName, logParent, logName ) {}
 
-	const char* className() const			{ return "EchoProcessor"; }
+	const char* className() const			{ return ECHO_PROCESSOR_CLASS_NAME; }
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
@@ -99,14 +104,14 @@ private:
 };
 
 
-class EchoProcContainer : public ConfiguredObjectConstructor< proc::ProcessorUnit >
+class EchoProcConstructor : public ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >
 {
 public:
-	EchoProcContainer( const EchoProcConfig& conf );
-	~EchoProcContainer()				{}
+	EchoProcConstructor( const EchoProcConfig& conf );
+	~EchoProcConstructor()				{}
 
-	virtual const char* identifier() const		{ return m_proc->name(); }
-	virtual proc::ProcessorUnit* object() const	{ return m_proc; }
+	virtual const char* identifier() const		{ return ECHO_PROCESSOR_CLASS_NAME; }
+	virtual cmdbind::CommandHandlerUnit* object() const;
 private:
 	EchoProcessorUnit*	m_proc;
 };

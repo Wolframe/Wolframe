@@ -50,6 +50,11 @@ TestModuleConfig::TestModuleConfig( const char* cfgName, const char* logParent, 
 	MOD_LOG_DEBUG << "Test module config created";
 }
 
+TestModuleConfig::~TestModuleConfig()
+{
+	MOD_LOG_DEBUG << "Test module config destroyed";
+}
+
 bool TestModuleConfig::parse( const config::ConfigurationTree& /*pt*/, const std::string& /*node*/,
     const module::ModulesDirectory* /*modules*/ )
 {
@@ -71,10 +76,10 @@ void TestModuleConfig::setCanonicalPathes( const std::string& /*refPath*/ )
 {
 }
 
-TestUnit* TestModuleContainer::object( const config::NamedConfiguration& /* conf */ )
+TestUnit* TestModuleConstructor::object( const config::NamedConfiguration& /* conf */ )
 {
 	TestUnit* m_test = new TestUnitImpl( /* conf */ );
-	MOD_LOG_DEBUG << "Test module container created";
+	MOD_LOG_DEBUG << "Test module object created";
 	return m_test;
 }
 
@@ -100,7 +105,7 @@ bool TestUnitImpl::resolveDB( const db::DatabaseProvider& /* db */ )
 
 static ConfiguredBuilder* createModule( void )
 {
-	static module::ConfiguredBuilderDescription< test::TestModuleContainer,
+	static module::ConfiguredBuilderDescription< test::TestModuleConstructor,
 		test::TestModuleConfig > mod( "Test Module", "Test", "test", "TestObject" );
 	return &mod;
 }

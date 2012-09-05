@@ -93,7 +93,7 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 	m_authentication = NULL;
 	m_authorization = NULL;
 	m_audit = NULL;
-	m_proc = NULL;
+//	m_proc = NULL;
 }
 
 

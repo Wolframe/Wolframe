@@ -1,0 +1,4 @@
+LIBRARY mod_db_postgresql
+
+EXPORTS
+entryPoint	@1
