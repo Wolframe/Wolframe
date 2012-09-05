@@ -44,20 +44,20 @@ TEST_F( ModuleFixture, LoadingModuleFromDir )
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );
 
-	ConfiguredBuilder* container = modDir.getBuilder( "TestObject" );
-	ASSERT_TRUE( container != NULL );
+	ConfiguredBuilder* builder = modDir.getBuilder( "TestObject" );
+	ASSERT_TRUE( builder != NULL );
 
-	config::NamedConfiguration* configuration = container->configuration( "TestObject" );
+	config::NamedConfiguration* configuration = builder->configuration( "TestObject" );
 	ASSERT_TRUE( configuration != NULL );
 
-	ConfiguredObjectConstructor< test::TestUnit >* obj = dynamic_cast< ConfiguredObjectConstructor< test::TestUnit >* >( container->constructor( ) );
-//	test::TestModuleContainer* obj = dynamic_cast<test::TestModuleContainer *>( container->builder( ) );
-	ASSERT_TRUE( obj != NULL );
-	test::TestUnit* unit = obj->object( *configuration );
+	ConfiguredObjectConstructor< test::TestUnit >* cnstrctr = dynamic_cast< ConfiguredObjectConstructor< test::TestUnit >* >( builder->constructor( ) );
+	ASSERT_TRUE( cnstrctr != NULL );
+	test::TestUnit* unit = cnstrctr->object( *configuration );
 
 	string s = unit->hello( );
 	ASSERT_EQ( s, "hello" );
 
+	delete configuration;
 	delete unit;
 }
 
@@ -74,25 +74,25 @@ TEST_F( ModuleFixture, LoadingModuleWithMultipleContainers )
 	bool res = LoadModules( modDir, modFiles );
 	ASSERT_TRUE( res );
 
-	ConfiguredBuilder* container1 = modDir.getBuilder( "TestObject1" );
-	ASSERT_TRUE( container1 != NULL );
+	ConfiguredBuilder* builder1 = modDir.getBuilder( "TestObject1" );
+	ASSERT_TRUE( builder1 != NULL );
 
-	ConfiguredBuilder* container2 = modDir.getBuilder( "TestObject2" );
-	ASSERT_TRUE( container2 != NULL );
+	ConfiguredBuilder* builder2 = modDir.getBuilder( "TestObject2" );
+	ASSERT_TRUE( builder2 != NULL );
 
-	config::NamedConfiguration* configuration1 = container1->configuration( "TestObject1" );
+	config::NamedConfiguration* configuration1 = builder1->configuration( "TestObject1" );
 	ASSERT_TRUE( configuration1 != NULL );
 
-	config::NamedConfiguration* configuration2 = container2->configuration( "TestObject2" );
+	config::NamedConfiguration* configuration2 = builder2->configuration( "TestObject2" );
 	ASSERT_TRUE( configuration2 != NULL );
 
-	ConfiguredObjectConstructor< test_containers::TestUnit1 >* obj1 = dynamic_cast< ConfiguredObjectConstructor< test_containers::TestUnit1 >* >( container1->constructor( ) );
-	ASSERT_TRUE( obj1 != NULL );
-	test_containers::TestUnit1* unit1 = obj1->object( *configuration1 );
+	ConfiguredObjectConstructor< test_containers::TestUnit1 >* cnstrctr1 = dynamic_cast< ConfiguredObjectConstructor< test_containers::TestUnit1 >* >( builder1->constructor( ) );
+	ASSERT_TRUE( cnstrctr1 != NULL );
+	test_containers::TestUnit1* unit1 = cnstrctr1->object( *configuration1 );
 
-	ConfiguredObjectConstructor< test_containers::TestUnit2 >* obj2 = dynamic_cast< ConfiguredObjectConstructor< test_containers::TestUnit2 >* >( container2->constructor( ) );
-	ASSERT_TRUE( obj2 != NULL );
-	test_containers::TestUnit2* unit2 = obj2->object( *configuration2 );
+	ConfiguredObjectConstructor< test_containers::TestUnit2 >* cnstrctr2 = dynamic_cast< ConfiguredObjectConstructor< test_containers::TestUnit2 >* >( builder2->constructor( ) );
+	ASSERT_TRUE( cnstrctr2 != NULL );
+	test_containers::TestUnit2* unit2 = cnstrctr2->object( *configuration2 );
 
 	string s1 = unit1->hello( );
 	ASSERT_EQ( s1, "hello" );

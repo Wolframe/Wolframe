@@ -48,9 +48,14 @@ ModulesDirectory::~ModulesDirectory()
 		delete m_simpleBuilder.front();
 		m_simpleBuilder.pop_front();
 	}
+// Most of the builder creation functions do not allocate an object.
+// The objects are static variables in those functions so we don't delete them.
+//
 //	while ( ! m_cfgdBuilder.empty() )	{
 //		assert( m_cfgdBuilder.front() != NULL );
+//		LOG_ALERT << "Destroying builder " << m_cfgdBuilder.front()->identifier();
 //		delete m_cfgdBuilder.front();
+//		LOG_ALERT << "Builder for '" << m_cfgdBuilder.front()->identifier() << "' destroyed";
 //		m_cfgdBuilder.pop_front();
 //	}
 }

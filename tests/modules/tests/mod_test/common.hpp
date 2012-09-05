@@ -43,12 +43,12 @@ namespace test {
 
 class TestModuleConfig :  public config::NamedConfiguration
 {
-	friend class TestModuleContainer;
+	friend class TestModuleConstructor;
 
 public:
 	TestModuleConfig( const char* cfgName, const char* logParent, const char* logName );
 
-	virtual ~TestModuleConfig( ) {}
+	virtual ~TestModuleConfig();
 
 	virtual const char* className() const		{ return "TestUnit"; }
 
@@ -79,7 +79,7 @@ public:
 	virtual const std::string hello( ) = 0;
 };
 
-class TestModuleContainer : public ConfiguredObjectConstructor< TestUnit >
+class TestModuleConstructor : public ConfiguredObjectConstructor< TestUnit >
 {
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
