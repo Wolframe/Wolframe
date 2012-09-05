@@ -37,7 +37,6 @@
 #ifndef _PROCESSOR_PROVIDER_HPP_INCLUDED
 #define _PROCESSOR_PROVIDER_HPP_INCLUDED
 
-#include "processor.hpp"
 #include <boost/noncopyable.hpp>
 #include "database/DBprovider.hpp"
 #include "filter/filter.hpp"

@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = database audit authentication authorization filter ddlcompiler
+SUBDIRS = database audit authentication authorization filter ddlcompiler echoProcessor
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

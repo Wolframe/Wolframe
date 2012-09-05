@@ -393,7 +393,6 @@ include/prnt/pdfPrinter.hpp
 include/prnt/pdfPrinterMethod.hpp
 include/prnt/pdfPrinterVariable.hpp
 include/prnt/printFunction.hpp
-include/processor/processor.hpp
 include/processor/procProvider.hpp
 include/protocol/buffers.hpp
 include/protocol/ioblocks.hpp
@@ -654,8 +653,6 @@ src/ddl_compilerInterface.cpp
 src/ddl_compiler_simpleFormCompiler.cpp
 src/ddl_structTypeBuild.cpp
 src/ddl_structType.cpp
-src/echoProcessor.cpp
-src/echoProcessor.hpp
 src/exceptionBase.hpp
 src/filter_blob_filter.cpp
 src/filter_char_filter.cpp
@@ -823,6 +820,11 @@ src/modules/ddlcompiler/simpleform/Makefile.W32
 src/modules/ddlcompiler/simpleform/mod_ddlcompiler_simpleform.cpp
 src/modules/ddlcompiler/simpleform/ModDdlCompilerSimpleForm.def
 src/modules/ddlcompiler/template/ddlcompilerBuilder.hpp
+src/modules/echoProcessor/echoProcessor.cpp
+src/modules/echoProcessor/echoProcessor.hpp
+src/modules/echoProcessor/echoProcessorModule.def
+src/modules/echoProcessor/GNUmakefile
+src/modules/echoProcessor/Makefile.W32
 src/modules/filter/char/CharFilterModule.def
 src/modules/filter/char/GNUmakefile
 src/modules/filter/char/Makefile.W32

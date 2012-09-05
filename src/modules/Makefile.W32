@@ -1,6 +1,6 @@
 TOPDIR = ..\..
 
-SUBDIRS = database audit authentication authorization filter ddlcompiler
+SUBDIRS = database audit authentication authorization filter ddlcompiler echoProcessor
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
