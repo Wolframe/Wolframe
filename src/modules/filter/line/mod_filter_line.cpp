@@ -59,14 +59,14 @@ DECLARE_FILTER_OBJECT("line:UCS-4LE",	LineFilterObject_UCS4LE,	langbind::createL
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	LineFilterObject::constructor,
-	LineFilterObject_UTF8::constructor,
-	LineFilterObject_UTF16BE::constructor,
-	LineFilterObject_UTF16LE::constructor,
-	LineFilterObject_UCS2BE::constructor,
-	LineFilterObject_UCS2LE::constructor,
-	LineFilterObject_UCS4BE::constructor,
-	LineFilterObject_UCS4LE::constructor
+	LineFilterObject::builder,
+	LineFilterObject_UTF8::builder,
+	LineFilterObject_UTF16BE::builder,
+	LineFilterObject_UTF16LE::builder,
+	LineFilterObject_UCS2BE::builder,
+	LineFilterObject_UCS2LE::builder,
+	LineFilterObject_UCS4BE::builder,
+	LineFilterObject_UCS4LE::builder
 };
 
 ModuleEntryPoint entryPoint( 0, "line filter", setModuleLogger, 0, 0, NofObjects, objdef);

@@ -159,7 +159,7 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
-const langbind::Filter* ProcessorProvider::filter( const std::string& name ) const
+const langbind::Filter ProcessorProvider::filter( const std::string& name ) const
 {
 	return m_impl->filter( name );
 }
@@ -216,7 +216,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 								it != modules->objectsEnd(); it++ )	{
 		switch( it->constructor()->objectType() )	{
 			case ObjectConstructorBase::FILTER_OBJECT:	{	// object is a filter
-				module::FilterContainer* fltr = dynamic_cast< module::FilterContainer* >((*it)->constructor());
+				module::FilterCreator* fltr = dynamic_cast< module::FilterCreator* >((*it)->constructor());
 				if ( fltr == NULL )	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
 						  << "'' is not a filter";
@@ -294,7 +294,7 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 	for ( std::list< cmdbind::CommandHandlerUnit* >::iterator it = m_handler.begin();
 							it != m_handler.end(); it++ )
 		delete *it;
-	for ( std::list< const module::FilterContainer* >::iterator it = m_filter.begin();
+	for ( std::list< const module::FilterCreator* >::iterator it = m_filter.begin();
 							it != m_filter.end(); it++ )
 		delete *it;
 }
@@ -316,20 +316,20 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 }
 
 
-const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name ) const
+const langbind::Filter ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name ) const
 {
 	std::string filterName = boost::algorithm::to_upper_copy( name );
-	std::map<const std::string, const langbind::Filter*>::const_iterator fltr = m_filterMap.find( filterName );
+	std::map <const std::string, const module::FilterCreator* >::const_iterator fltr = m_filterMap.find( filterName );
 	if ( fltr == m_filterMap.end() )
-		return NULL;
+		throw std::runtime_error( "no filter found" );
 	else
-		return fltr->second;
+		return fltr->second->object();
 }
 
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::handler( const std::string& command ) const
 {
 	std::string cmdName = boost::algorithm::to_upper_copy( command );
-	std::map<const std::string, cmdbind::CommandHandlerUnit*>::const_iterator cmd = m_cmdMap.find( cmdName );
+	std::map< const std::string, cmdbind::CommandHandlerUnit* >::const_iterator cmd = m_cmdMap.find( cmdName );
 	if ( cmd == m_cmdMap.end() )
 		return NULL;
 	else

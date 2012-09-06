@@ -59,14 +59,14 @@ DECLARE_FILTER_OBJECT("xml:libxml2:UCS-4LE",	Libxml2FilterObject_UCS4LE,	langbin
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	Libxml2FilterObject::constructor,
-	Libxml2FilterObject_UTF8::constructor,
-	Libxml2FilterObject_UTF16BE::constructor,
-	Libxml2FilterObject_UTF16LE::constructor,
-	Libxml2FilterObject_UCS2BE::constructor,
-	Libxml2FilterObject_UCS2LE::constructor,
-	Libxml2FilterObject_UCS4BE::constructor,
-	Libxml2FilterObject_UCS4LE::constructor
+	Libxml2FilterObject::builder,
+	Libxml2FilterObject_UTF8::builder,
+	Libxml2FilterObject_UTF16BE::builder,
+	Libxml2FilterObject_UTF16LE::builder,
+	Libxml2FilterObject_UCS2BE::builder,
+	Libxml2FilterObject_UCS2LE::builder,
+	Libxml2FilterObject_UCS4BE::builder,
+	Libxml2FilterObject_UCS4LE::builder
 };
 
 

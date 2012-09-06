@@ -61,15 +61,15 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	cmdbind::CommandHandler* handler( const std::string& command ) const;
-	const langbind::Filter* filter( const std::string& name ) const;
+	const langbind::Filter filter( const std::string& name ) const;
 
 private:
 	std::string					m_dbLabel;
 	const db::Database*				m_db;
 	std::list< cmdbind::CommandHandlerUnit* >	m_handler;
 	std::map< const std::string, cmdbind::CommandHandlerUnit* >	m_cmdMap;
-	std::list< const module::FilterContainer* >	m_filter;
-	std::map< const std::string, const langbind::Filter* >		m_filterMap;
+	std::list< const module::FilterCreator* >	m_filter;
+	std::map< const std::string, const module::FilterCreator* >	m_filterMap;
 };
 
 }} // namespace _Wolframe::proc

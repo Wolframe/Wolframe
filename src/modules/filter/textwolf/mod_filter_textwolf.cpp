@@ -59,14 +59,14 @@ DECLARE_FILTER_OBJECT("xml:textwolf:UCS-4LE",	TextwolfXMLFilterObject_UCS4LE,	la
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	TextwolfXMLFilterObject::constructor,
-	TextwolfXMLFilterObject_UTF8::constructor,
-	TextwolfXMLFilterObject_UTF16BE::constructor,
-	TextwolfXMLFilterObject_UTF16LE::constructor,
-	TextwolfXMLFilterObject_UCS2BE::constructor,
-	TextwolfXMLFilterObject_UCS2LE::constructor,
-	TextwolfXMLFilterObject_UCS4BE::constructor,
-	TextwolfXMLFilterObject_UCS4LE::constructor
+	TextwolfXMLFilterObject::builder,
+	TextwolfXMLFilterObject_UTF8::builder,
+	TextwolfXMLFilterObject_UTF16BE::builder,
+	TextwolfXMLFilterObject_UTF16LE::builder,
+	TextwolfXMLFilterObject_UCS2BE::builder,
+	TextwolfXMLFilterObject_UCS2LE::builder,
+	TextwolfXMLFilterObject_UCS4BE::builder,
+	TextwolfXMLFilterObject_UCS4LE::builder
 };
 
 

@@ -59,14 +59,14 @@ DECLARE_FILTER_OBJECT("token:UCS-4LE",	TokenFilterObject_UCS4LE,	langbind::creat
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	TokenFilterObject::constructor,
-	TokenFilterObject_UTF8::constructor,
-	TokenFilterObject_UTF16BE::constructor,
-	TokenFilterObject_UTF16LE::constructor,
-	TokenFilterObject_UCS2BE::constructor,
-	TokenFilterObject_UCS2LE::constructor,
-	TokenFilterObject_UCS4BE::constructor,
-	TokenFilterObject_UCS4LE::constructor
+	TokenFilterObject::builder,
+	TokenFilterObject_UTF8::builder,
+	TokenFilterObject_UTF16BE::builder,
+	TokenFilterObject_UTF16LE::builder,
+	TokenFilterObject_UCS2BE::builder,
+	TokenFilterObject_UCS2LE::builder,
+	TokenFilterObject_UCS4BE::builder,
+	TokenFilterObject_UCS4LE::builder
 };
 
 ModuleEntryPoint entryPoint( 0, "token filter", setModuleLogger, 0, 0, NofObjects, objdef);

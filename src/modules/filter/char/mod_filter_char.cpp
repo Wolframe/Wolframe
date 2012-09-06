@@ -32,6 +32,7 @@
 ************************************************************************/
 ///\file modules/filter/char/mod_filter_char.cpp
 ///\brief Module for char XML filters
+
 #include "modules/filter/template/filterBuilder.hpp"
 #include "filter/char_filter.hpp"
 #include "logger-v1.hpp"
@@ -59,14 +60,14 @@ DECLARE_FILTER_OBJECT("char:UCS-4LE",	CharFilterObject_UCS4LE,	langbind::createC
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	CharFilterObject::constructor,
-	CharFilterObject_UTF8::constructor,
-	CharFilterObject_UTF16BE::constructor,
-	CharFilterObject_UTF16LE::constructor,
-	CharFilterObject_UCS2BE::constructor,
-	CharFilterObject_UCS2LE::constructor,
-	CharFilterObject_UCS4BE::constructor,
-	CharFilterObject_UCS4LE::constructor
+	CharFilterObject::builder,
+	CharFilterObject_UTF8::builder,
+	CharFilterObject_UTF16BE::builder,
+	CharFilterObject_UTF16LE::builder,
+	CharFilterObject_UCS2BE::builder,
+	CharFilterObject_UCS2LE::builder,
+	CharFilterObject_UCS4BE::builder,
+	CharFilterObject_UCS4LE::builder
 };
 
 ModuleEntryPoint entryPoint( 0, "char filter", setModuleLogger, 0, 0, NofObjects, objdef);

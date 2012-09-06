@@ -116,8 +116,8 @@ public:
 	ModulesDirectory()				{}
 	~ModulesDirectory();
 
-	bool addBuilder( ConfiguredBuilder* container );
-	bool addBuilder( SimpleBuilder* container );
+	bool addBuilder( ConfiguredBuilder* builder );
+	bool addBuilder( SimpleBuilder* builder );
 
 	ConfiguredBuilder* getBuilder( const std::string& section, const std::string& keyword ) const;
 	ConfiguredBuilder* getBuilder( const std::string& identifier ) const;
