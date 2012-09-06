@@ -224,8 +224,13 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				}
 				else	{
 					std::string name = fltr->identifier();
-					m_filter.push_back( fltr );
 					boost::algorithm::to_upper( name );
+					std::map <const std::string, const module::FilterCreator* >::const_iterator fltrItr = m_filterMap.find( name );
+					if ( fltrItr != m_filterMap.end() )	{
+						LOG_FATAL << "Duplicate filter name '" << name << "'";
+						throw std::runtime_error( "Duplicate filter name" );
+					}
+					m_filter.push_back( fltr );
 					m_filterMap[ name ] = fltr;
 					LOG_TRACE << "'" << name << "' filter registered";
 				}
@@ -320,14 +325,10 @@ const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const
 {
 	std::string filterName = boost::algorithm::to_upper_copy( name );
 	std::map <const std::string, const module::FilterCreator* >::const_iterator fltr = m_filterMap.find( filterName );
-	if ( fltr == m_filterMap.end() )	{
-		LOG_ALERT << "Filter not found: " << name;
+	if ( fltr == m_filterMap.end() )
 		return NULL;
-	}
-	else	{
-		LOG_ALERT << "Filter found: " << fltr->second->identifier();
+	else
 		return fltr->second->object();
-	}
 }
 
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::handler( const std::string& command ) const
