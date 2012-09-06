@@ -117,11 +117,12 @@ BigBCD::BigBCD()
 
 void BigBCD::init( const std::string& str)
 {
+	bool ng = false;
 	unsigned int ii = 0, nn = str.size();
 	if (str[ ii] == '-')
 	{
 		++ii;
-		m_neg = true;
+		ng = true;
 	}
 	unsigned int bb = (((nn-ii)+(NumDigits-1)) / NumDigits);
 	unsigned int tt = (((nn-ii)+(NumDigits-1)) % NumDigits) * 4;
@@ -145,6 +146,7 @@ void BigBCD::init( const std::string& str)
 			tt -= 4;
 		}
 	}
+	m_neg = ng;
 	normalize();
 }
 
@@ -200,11 +202,13 @@ BigBCD::~BigBCD()
 std::string BigBCD::tostring() const
 {
 	std::string rt;
-	if (m_neg) rt.push_back('-');
-
 	const_iterator ii = begin(), ee = end();
 	if (ii == ee) return "0";
 
+	if (m_neg)
+	{
+		rt.push_back('-');
+	}
 	for (; ii != ee; ++ii)
 	{
 		rt.push_back( ii->ascii());
@@ -1036,6 +1040,8 @@ std::string BigNumber::tostring() const
 {
 	BigBCD::const_iterator ii=begin(), ee=end();
 	unsigned int kk = ii.size();
+	if (!kk) return "0";
+
 	std::string rt;
 	if (sign() == '-')
 	{

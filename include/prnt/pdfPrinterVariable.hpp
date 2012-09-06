@@ -89,6 +89,8 @@ public:
 	std::string getValue( std::size_t idx) const;
 
 private:
+	void pushDefinitionToTagContext( Variable var, std::size_t val);
+
 	struct Area
 	{
 		std::map<Variable,std::size_t> m_map;
@@ -108,10 +110,24 @@ private:
 			,m_mrk(o.m_mrk)
 			,m_tagidx(o.m_tagidx){}
 	};
-	std::vector<Area> m_ar;
-	std::string m_strings;
-	std::string m_tag;
-	std::map< std::string, std::map<Variable,std::size_t> > m_tagvarmap;
+	struct TagContext
+	{
+		TagContext(){}
+		TagContext( const std::vector<int>& scopeid)
+			:m_scopeid(scopeid){}
+		TagContext( const TagContext& o)
+			:m_var(o.m_var)
+			,m_scopeid(o.m_scopeid){}
+
+		std::map<Variable,std::size_t> m_var;
+		std::vector<int> m_scopeid;
+	};
+
+	std::vector<Area> m_ar;					//< stack of variable scopes
+	std::string m_strings;					//< all strings used for values
+	std::string m_tag;					//< current tag path including scope information (m_tagscopeidx) of the parent
+	std::vector<int> m_scopeid;				//< scope id of the tag to distinguish context of /a[i]/b from /a[k]/b (non siblings) but not /a/b[i] from /a/b[k] (siblings)
+	std::map< std::string, TagContext> m_tagvarmap;		//< map of tag paths to their related definitions
 };
 
 

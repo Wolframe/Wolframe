@@ -74,30 +74,55 @@ std::map <std::string, std::size_t>* _Wolframe::prnt::getVariablenameMap()
 VariableScope::VariableScope()
 {
 	m_strings.push_back('\0');
+	m_scopeid.push_back( 0);
 	m_ar.push_back( Area());
+}
+
+// Find out if to tag scopes are adressing the same context.
+// For example /a[0]/b and /a[1]/b are not sibling and though not adressing the same context
+// But /a/b[0] and /a/b[1] on the other hand are siblings and therefore adressing the same context
+static bool isSameTagScope( const std::vector<int>& scopeid1, const std::vector<int>& scopeid2)
+{
+	if (scopeid1.size() < 2 || scopeid2.size() < 2 || scopeid1.size() != scopeid2.size())
+	{
+		throw std::runtime_error( "internal: unexpected state in tag scope comparison");
+	}
+	std::vector<int>::const_iterator itr1 = scopeid1.begin(), end1 = scopeid1.begin() + scopeid1.size() - 2;
+	std::vector<int>::const_iterator itr2 = scopeid2.begin(), end2 = scopeid2.begin() + scopeid2.size() - 2;
+
+	for (; itr1 != end1 && itr2 != end2 && *itr1 == *itr2; ++itr1,++itr2);
+	return (itr1 == end1 && itr2 == end2);
 }
 
 void VariableScope::push()
 {
 	m_ar.push_back( Area( m_ar.back(), m_tag.size()));
+	++m_scopeid.back();
+	m_scopeid.push_back( 0);
 	m_ar.back().m_mrk.clear();
+	if (m_ar.size() != m_scopeid.size()) throw std::logic_error( "internal: unexpected tag stack state");
 }
 
 void VariableScope::push( const std::string& tag)
 {
 
-	m_ar.push_back( Area( m_ar.back(), m_tag.size()));
-	m_ar.back().m_mrk.clear();
+	push();
+
 	m_tag.push_back( '/');
 	m_tag.append( tag);
 
-	std::map< std::string,std::map<Variable,std::size_t> >::const_iterator ti = m_tagvarmap.find( m_tag), te = m_tagvarmap.end();
+	std::map< std::string, TagContext >::const_iterator ti = m_tagvarmap.find( m_tag), te = m_tagvarmap.end();
 	if (ti != te)
 	{
-		std::map<Variable,std::size_t>::const_iterator di = ti->second.begin(), de = ti->second.end();
-		for (; di != de; ++di)
+		// Check if the found match is in the same tag scope
+		if (isSameTagScope( ti->second.m_scopeid, m_scopeid))
 		{
-			m_ar.back().m_map[ di->first] = di->second;
+			// If yes, then take all its variable definitions into the local definition scope
+			std::map<Variable,std::size_t>::const_iterator di = ti->second.m_var.begin(), de = ti->second.m_var.end();
+			for (; di != de; ++di)
+			{
+				m_ar.back().m_map[ di->first] = di->second;
+			}
 		}
 	}
 }
@@ -106,7 +131,32 @@ void VariableScope::pop()
 {
 	m_tag.resize( m_ar.back().m_tagidx);
 	m_ar.pop_back();
-	if (m_ar.empty()) throw std::logic_error( "non existing variable scope closed");
+	m_scopeid.pop_back();
+	if (m_ar.empty() || m_scopeid.empty()) throw std::logic_error( "non existing variable scope closed");
+}
+
+void VariableScope::pushDefinitionToTagContext( Variable var, std::size_t val)
+{
+	std::map< std::string, TagContext >::iterator ti = m_tagvarmap.find( m_tag), te = m_tagvarmap.end();
+	if (ti != te)
+	{
+		// Check if the new definition is in the same tag scope than the definitions before
+		if (!isSameTagScope( ti->second.m_scopeid, m_scopeid))
+		{
+			// If not, then clear the old context, because it will not be
+			// used anymore and create a new one for the current tag scope:
+			ti->second.m_var.clear();
+			ti->second.m_scopeid = m_scopeid;
+		}
+		// Take all variables pushed to this tag context to the local context:
+		ti->second.m_var[ var] = val;
+	}
+	else
+	{
+		// Take all variables pushed to this tag context to the local context:
+		m_tagvarmap[ m_tag].m_var[ var] = val;
+		m_tagvarmap[ m_tag].m_scopeid = m_scopeid;
+	}
 }
 
 void VariableScope::define( Variable var, const std::string& value, bool passToSibling)
@@ -117,7 +167,7 @@ void VariableScope::define( Variable var, const std::string& value, bool passToS
 	m_strings.push_back('\0');
 	if (passToSibling)
 	{
-		m_tagvarmap[ m_tag][ var] = val;
+		pushDefinitionToTagContext( var, val);
 	}
 }
 
@@ -128,7 +178,7 @@ void VariableScope::define( Variable var, Variable src, bool passToSibling)
 	m_ar.back().m_map[var] = val;
 	if (passToSibling)
 	{
-		m_tagvarmap[ m_tag][ var] = val;
+		pushDefinitionToTagContext( var, val);
 	}
 }
 
