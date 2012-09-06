@@ -41,6 +41,8 @@ namespace _Wolframe {
 namespace langbind {
 
 Filter createTextwolfXmlFilter( const std::string& name);
+Filter* createTextwolfXmlFilterPtr( const std::string& name);
+
 
 }}//namespace
 #endif

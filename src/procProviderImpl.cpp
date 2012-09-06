@@ -159,7 +159,7 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
-const langbind::Filter ProcessorProvider::filter( const std::string& name ) const
+const langbind::Filter* ProcessorProvider::filter( const std::string& name ) const
 {
 	return m_impl->filter( name );
 }
@@ -316,14 +316,18 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 }
 
 
-const langbind::Filter ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name ) const
+const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name ) const
 {
 	std::string filterName = boost::algorithm::to_upper_copy( name );
 	std::map <const std::string, const module::FilterCreator* >::const_iterator fltr = m_filterMap.find( filterName );
-	if ( fltr == m_filterMap.end() )
-		throw std::runtime_error( "no filter found" );
-	else
+	if ( fltr == m_filterMap.end() )	{
+		LOG_ALERT << "Filter not found: " << name;
+		return NULL;
+	}
+	else	{
+		LOG_ALERT << "Filter found: " << fltr->second->identifier();
 		return fltr->second->object();
+	}
 }
 
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::handler( const std::string& command ) const

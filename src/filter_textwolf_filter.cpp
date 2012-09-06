@@ -450,3 +450,15 @@ Filter _Wolframe::langbind::createTextwolfXmlFilter( const std::string& name)
 	return TextwolfXmlFilter( encoding);
 }
 
+Filter* _Wolframe::langbind::createTextwolfXmlFilterPtr( const std::string& name)
+{
+	const char* filterbasename = "xml:textwolf";
+	std::size_t nn = std::strlen( filterbasename);
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	if (name.size() < nn || std::memcmp( nam.c_str(), filterbasename, nn) != 0) throw std::runtime_error( "filter name does not match");
+	if (name.size() == nn) return new TextwolfXmlFilter();
+	if (name[nn] != ':') throw std::runtime_error( "textwolf xml filter name does not match");
+	const char* encoding = name.c_str() + nn + 1;
+	return new TextwolfXmlFilter( encoding);
+}

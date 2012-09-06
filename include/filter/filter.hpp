@@ -86,6 +86,8 @@ protected:
 };
 
 typedef Filter (*CreateFilterFunc)( const std::string& name);
+typedef Filter* (*CreateFilterPtrFunc)( const std::string& name);
+
 
 }}//namespace
 #endif

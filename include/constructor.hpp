@@ -78,7 +78,7 @@ class SimpleObjectConstructor : public ObjectConstructorBase
 {
 public:
 	virtual ~SimpleObjectConstructor()	{}
-	virtual T object() const = 0;
+	virtual T* object() const = 0;
 };
 
 } // namespace _Wolframe

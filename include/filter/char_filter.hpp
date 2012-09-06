@@ -40,6 +40,8 @@ namespace _Wolframe {
 namespace langbind {
 
 Filter createCharFilter( const std::string& name);
+Filter* createCharFilterPtr( const std::string& name);
+
 
 }}//namespace
 #endif
