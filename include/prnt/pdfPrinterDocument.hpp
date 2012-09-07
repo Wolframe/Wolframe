@@ -43,8 +43,8 @@ struct Document
 {
 	Document(){}
 	virtual ~Document(){}
-	virtual void execute_enter( Method method, const VariableScope& vars)=0;
-	virtual void execute_leave( Method method)=0;
+	virtual void execute_enter( Method::Id method, const VariableScope& vars)=0;
+	virtual void execute_leave( Method::Id method)=0;
 
 	virtual std::string tostring() const=0;
 };

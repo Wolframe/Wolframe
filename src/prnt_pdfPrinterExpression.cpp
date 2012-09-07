@@ -60,19 +60,19 @@ void Expression::push_value( std::size_t idx)
 	m_ar.push_back( ee);
 }
 
-void Expression::push_variable( std::size_t idx)
+void Expression::push_variable( Variable::Id var)
 {
 	Item ee;
 	ee.m_type = Item::Variable;
-	ee.value.m_idx = idx;
+	ee.value.m_idx = (std::size_t)var;
 	m_ar.push_back( ee);
 }
 
-void Expression::push_tagvariable( std::size_t idx)
+void Expression::push_tagvariable( Variable::Id var)
 {
 	Item ee;
 	ee.m_type = Item::TagVariable;
-	ee.value.m_idx = idx;
+	ee.value.m_idx = (std::size_t)var;
 	m_ar.push_back( ee);
 }
 
@@ -100,7 +100,7 @@ void Expression::evaluate( VariableScope& vscope, const std::string& exprstrings
 				if (next != end && next->m_type == Item::Operator && (next->value.m_opchr == '=' || next->value.m_opchr == '?'))
 				{
 					// handle special case of variable on left side of assignment:
-					Variable var = (Variable)itr->value.m_idx;
+					Variable::Id var = (Variable::Id)itr->value.m_idx;
 					if (next->value.m_opchr == '?')
 					{
 						// conditional assigment (define if not yet defined)
@@ -125,7 +125,7 @@ void Expression::evaluate( VariableScope& vscope, const std::string& exprstrings
 				else
 				{
 					// for other variables are the referenced values expanded:
-					Variable var = (Variable)itr->value.m_idx;
+					Variable::Id var = (Variable::Id)itr->value.m_idx;
 					std::size_t idx = vscope.getValueIdx( var);
 
 					if (idx == 0) throw std::runtime_error( std::string( "variable not defined '") + variableName(var) + "'");
@@ -317,10 +317,7 @@ static Expression parseOperand( std::string::const_iterator& itr, const std::str
 			if (isIdentifierToken(ch))
 			{
 				if (!checkIdentifier( tok)) throw std::runtime_error( std::string( "illegal identifier '") + tok + "'");
-				std::map <std::string, std::size_t>* varnamemap = getVariablenameMap();
-				std::map <std::string,std::size_t>::const_iterator vi = varnamemap->find( tok);
-				if (vi == varnamemap->end()) throw std::runtime_error( std::string( "unknown variable name '") + tok + "'");
-				rt.push_variable( vi->second);
+				rt.push_variable( variableId( tok));
 			}
 			else if (isNumberToken(ch))
 			{
@@ -506,16 +503,13 @@ static Expression parseAssignExpressionList( char separator, std::string::const_
 		{
 			Expression op1;
 			if (!checkIdentifier( tok)) throw std::runtime_error( std::string( "illegal identifier '") + tok + "'");
-			std::map <std::string, std::size_t>* varnamemap = getVariablenameMap();
-			std::map <std::string,std::size_t>::const_iterator vi = varnamemap->find( tok);
-			if (vi == varnamemap->end()) throw std::runtime_error( std::string( "value assigned to unknown variable '") + tok + "'");
 			if (passToSibling)
 			{
-				op1.push_tagvariable( vi->second);
+				op1.push_tagvariable( variableId( tok));
 			}
 			else
 			{
-				op1.push_variable( vi->second);
+				op1.push_variable( variableId( tok));
 			}
 			rt.push_expression( parseAssignExpression( op1, itr, end, exprstrings));
 			prev = itr; ch = parseNextToken( tok, itr, end, g_operatorTable);
@@ -551,10 +545,7 @@ static StateDef::MethodCall parseMethodCall( std::string::const_iterator& itr, c
 	ch = parseNextToken( tok, itr, end, g_operatorTable);
 	if (!isIdentifierToken(ch)) throw std::runtime_error( std::string( "expected method identifier instead of ' ") + tok + "'");
 
-	std::map <std::string, std::size_t>* methodnamemap = _Wolframe::prnt::getMethodnameMap();
-	std::map <std::string, std::size_t>::const_iterator vi = methodnamemap->find( tok);
-	if (vi == methodnamemap->end()) throw std::runtime_error( std::string( "unknown method called '") + tok + "'");
-	rt.m_method = (Method)vi->second;
+	rt.m_method = methodId( tok);
 	ch = parseNextToken( tok, itr, end, g_operatorTable);
 	if (ch == '(')
 	{
@@ -609,19 +600,19 @@ void StateDef::parse( std::string::const_iterator itr, const std::string::const_
 std::string Expression::tostring( const std::string& exprstrings) const
 {
 	std::ostringstream out;
-	Variable var;
+	Variable::Id var;
 	std::vector<Item>::const_iterator itr=m_ar.begin(), end=m_ar.end();
 	for (; itr != end; ++itr)
 	{
 		switch (itr->m_type)
 		{
 			case Item::TagVariable:
-				var = (Variable)itr->value.m_idx;
+				var = (Variable::Id)itr->value.m_idx;
 				out << " [" << variableName( var) << "]";
 				break;
 
 			case Item::Variable:
-				var = (Variable)itr->value.m_idx;
+				var = (Variable::Id)itr->value.m_idx;
 				out << " " << variableName( var);
 				break;
 

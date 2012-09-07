@@ -47,6 +47,27 @@ INCLUDE_LIBS += \
 	$(LIBS_DL)
 endif
 
+# libhpdf
+ifeq ($(WITH_LIBHPDF),1)
+ifneq ($(WITH_LOCAL_LIBHPDF),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_LIBHPDF
+
+INCLUDE_LIBS += \
+	-lhpdf
+endif
+endif
+ifeq ($(WITH_LOCAL_LIBHPDF),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_LIBHPDF
+
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/libhpdf/include
+
+INCLUDE_LIBS += \
+	$(TOPDIR)/libhpdf/src/libhpdf.a
+endif
+
 # libxml2
 ifeq ($(WITH_LIBXML2),1)
 INCLUDE_CXXFLAGS += \
@@ -101,7 +122,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	prnt_pdfPrinterVariable.o \
 	prnt_pdfPrinterMethod.o \
 	prnt_pdfPrinterExpression.o \
-	prnt_pdfPrinterDocument_libhpdf.o \
 	prnt_pdfPrinterDocument_testtrace.o \
 	prnt_pdfPrinter.o \
 	types_allocators.o \
@@ -125,6 +145,12 @@ LOCAL_STATIC_LIB_OBJS += \
 	langbind_luaBcdNumber.o \
 	langbind_luaDateTime.o \
 	cmdbind_luaCommandHandler.o
+endif
+
+#LIBHPDF
+ifeq ($(WITH_LIBHPDF),1)
+LOCAL_STATIC_LIB_OBJS += \
+	prnt_pdfPrinterDocument_libhpdf.o
 endif
 
 #LIBXML2

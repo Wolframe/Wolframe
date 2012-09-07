@@ -42,19 +42,27 @@ namespace prnt {
 
 ///\enum Variable
 ///\brief Fixed list of usable Variables (Registers)
-enum Variable
+struct Variable
 {
-	R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,		//< general purpose registers
-	Text,					//< text to be printed
-	Index,					//< element counting register for elements printed with index
-	PositionX,				//< X coordinate position
-	PositionY,				//< Y coordinate position
-	SizeX,					//< Size on the X axis of the coordinate system
-	SizeY					//< Size on the Y axis of the coordinate system
+	enum Id
+	{
+		R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,		//< general purpose registers
+		Text,					//< text to be printed
+		Align,					//< text alignment (left,right,center)
+		Index,					//< element counting register for elements printed with index
+		PositionX,				//< X coordinate position
+		PositionY,				//< Y coordinate position
+		SizeX,					//< Size on the X axis of the coordinate system
+		SizeY,					//< Size on the Y axis of the coordinate system
+		LineStyle,				//< Line width and optionally the dash pattern for lines in the page
+		Font,					//< Font type and encoding separated by a ';'
+		FontSize				//< Size of the font
+	};
 };
-enum {NofVariables=(int)SizeY+1};
+enum {NofVariables=(int)Variable::SizeY+1};
 
-const char* variableName( Variable v);
+const char* variableName( Variable::Id v);
+Variable::Id variableId( const std::string& name);
 
 
 class VariableScope
@@ -74,26 +82,26 @@ public:
 	const_marker_iterator begin_marker() const			{return m_ar.back().m_mrk.begin();}
 	const_marker_iterator end_marker() const			{return m_ar.back().m_mrk.end();}
 
-	typedef std::map<Variable,std::size_t>::const_iterator const_iterator;
-	typedef std::map<Variable,std::size_t>::iterator iterator;
+	typedef std::map<Variable::Id,std::size_t>::const_iterator const_iterator;
+	typedef std::map<Variable::Id,std::size_t>::iterator iterator;
 
 	const_iterator begin() const					{return m_ar.back().m_map.begin();}
 	const_iterator end() const					{return m_ar.back().m_map.end();}
 
-	void define( Variable var, const std::string& value, bool passToSibling=false);
-	void define( Variable var, Variable src, bool passToSibling=false);
+	void define( Variable::Id var, const std::string& value, bool passToSibling=false);
+	void define( Variable::Id var, Variable::Id src, bool passToSibling=false);
 
-	std::size_t getValueIdx( Variable var) const;
-	bool isDefined( Variable var) const				{return getValueIdx( var) != 0;}
+	std::size_t getValueIdx( Variable::Id var) const;
+	bool isDefined( Variable::Id var) const				{return getValueIdx( var) != 0;}
 
 	std::string getValue( std::size_t idx) const;
 
 private:
-	void pushDefinitionToTagContext( Variable var, std::size_t val);
+	void pushDefinitionToTagContext( Variable::Id var, std::size_t val);
 
 	struct Area
 	{
-		std::map<Variable,std::size_t> m_map;
+		std::map<Variable::Id,std::size_t> m_map;
 		std::vector<std::size_t> m_mrk;
 		std::size_t m_tagidx;
 
@@ -119,7 +127,7 @@ private:
 			:m_var(o.m_var)
 			,m_scopeid(o.m_scopeid){}
 
-		std::map<Variable,std::size_t> m_var;
+		std::map<Variable::Id,std::size_t> m_var;
 		std::vector<int> m_scopeid;
 	};
 
@@ -146,8 +154,6 @@ private:
 	std::vector<std::size_t> m_valuear;
 	std::string m_strings;
 };
-
-std::map <std::string, std::size_t>* getVariablenameMap();
 
 }}
 #endif

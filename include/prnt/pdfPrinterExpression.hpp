@@ -54,8 +54,8 @@ public:
 
 	void push_operator( char chr);
 	void push_value( std::size_t idx);
-	void push_variable( std::size_t idx);
-	void push_tagvariable( std::size_t idx);
+	void push_variable( Variable::Id var);
+	void push_tagvariable( Variable::Id var);
 	void push_expression( const Expression& expr);
 
 	std::size_t size() const		{return m_ar.size();}
@@ -97,7 +97,7 @@ struct StateDef
 
 	struct MethodCall
 	{
-		Method m_method;
+		Method::Id m_method;
 		Expression m_param;
 
 		std::string tostring( const std::string& exprstrings) const;

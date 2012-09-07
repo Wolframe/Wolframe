@@ -214,7 +214,7 @@ public:
 				std::vector<std::size_t>::const_iterator me = m_variableScope.end_marker();
 				for (; mi != me; ++mi)
 				{
-					m_document->execute_leave( (Method)*mi);
+					m_document->execute_leave( (Method::Id)*mi);
 				}
 				m_variableScope.pop();
 				break;
@@ -290,6 +290,13 @@ std::string SimplePdfPrintFunction::tostring() const
 {
 	return m_impl->tostring();
 }
+
+#if !WITH_LIBHPDF
+Document* _Wolframe::prnt::createLibHpdfDocument()
+{
+	throw std::runtime_error( "libhpdf support not built in. function requires the software to be built with WITH_LIBHPDF=1");
+}
+#endif
 
 PrintFunctionR _Wolframe::prnt::createSimplePdfPrintFunction( const std::string& description)
 {

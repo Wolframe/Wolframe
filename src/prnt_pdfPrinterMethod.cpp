@@ -32,15 +32,18 @@ Project Wolframe.
 ///\file prnt_pdfPrinterMethod.cpp
 #include "prnt/pdfPrinterMethod.hpp"
 #include <stdexcept>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::prnt;
 
-const char* _Wolframe::prnt::methodName( Method m)
+const char* _Wolframe::prnt::methodName( Method::Id m)
 {
 	static const char* ar[] = {
-		"Move",
+		"AddPage",
 		"PrintText",
+		"DrawRectangle",
+		"DrawLine",
 		0};
 	return ar[ (int)m];
 }
@@ -48,21 +51,28 @@ const char* _Wolframe::prnt::methodName( Method m)
 namespace {
 struct MethodnameMap :public std::map <std::string, std::size_t>
 {
+	static std::string unifyKey( const std::string& key)
+	{
+		return boost::algorithm::to_lower_copy(key);
+	}
+
 	MethodnameMap()
 	{
-		for (std::size_t ii=0; methodName( (Method)ii); ++ii)
+		for (std::size_t ii=0; methodName( (Method::Id)ii); ++ii)
 		{
-			(*this)[ methodName( (Method)ii)] = ii;
+			(*this)[ unifyKey( methodName( (Method::Id)ii))] = ii;
 		}
 	}
 };
 }//anonymous namespace
 
-std::map <std::string, std::size_t>* _Wolframe::prnt::getMethodnameMap()
+Method::Id _Wolframe::prnt::methodId( const std::string& name)
 {
-	static MethodnameMap rt;
-	return &rt;
+	static MethodnameMap map;
+	std::string key( map.unifyKey( name));
+	std::map <std::string, std::size_t>::const_iterator itr = map.find( key);
+	if (itr == map.end()) throw std::runtime_error( std::string( "unknown method '") + name + "'");
+	return (Method::Id)itr->second;
 }
-
 
 

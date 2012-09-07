@@ -40,15 +40,19 @@ Project Wolframe.
 namespace _Wolframe {
 namespace prnt {
 
-enum Method
+struct Method
 {
-	Move,
-	PrintText
+	enum Id
+	{
+		AddPage,
+		PrintText,
+		DrawRectangle,
+		DrawLine
+	};
 };
 
-const char* methodName( Method m);
-
-std::map <std::string, std::size_t>* getMethodnameMap();
+const char* methodName( Method::Id m);
+Method::Id methodId( const std::string& name);
 
 }}
 #endif

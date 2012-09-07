@@ -34,20 +34,25 @@ Project Wolframe.
 #include "types/bcdArithmetic.hpp"
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::prnt;
 
-const char* _Wolframe::prnt::variableName( Variable v)
+const char* _Wolframe::prnt::variableName( Variable::Id v)
 {
 	static const char* ar[] = {
 		"R0","R1","R2","R3","R4","R5","R6","R7","R8","R9",
 		"Text",
+		"Align",
 		"Index",
 		"PositionX",
 		"PositionY",
 		"SizeX",
 		"SizeY",
+		"LineStyle",
+		"Font",
+		"FontSize",
 		0};
 	return ar[ (int)v];
 }
@@ -55,20 +60,29 @@ const char* _Wolframe::prnt::variableName( Variable v)
 namespace {
 struct VarnameMap :public std::map <std::string, std::size_t>
 {
+	static std::string unifyKey( const std::string& key)
+	{
+		return boost::algorithm::to_lower_copy(key);
+	}
+
 	VarnameMap()
 	{
-		for (std::size_t ii=0; variableName( (Variable)ii); ++ii)
+		for (std::size_t ii=0; variableName( (Variable::Id)ii); ++ii)
 		{
-			(*this)[ variableName( (Variable)ii)] = ii;
+			std::string key( unifyKey( variableName( (Variable::Id)ii)));
+			(*this)[ key] = ii;
 		}
 	}
 };
 }//anonymous namespace
 
-std::map <std::string, std::size_t>* _Wolframe::prnt::getVariablenameMap()
+Variable::Id _Wolframe::prnt::variableId( const std::string& name)
 {
-	static VarnameMap rt;
-	return &rt;
+	static VarnameMap map;
+	std::string key( map.unifyKey( name));
+	std::map <std::string, std::size_t>::const_iterator itr = map.find( key);
+	if (itr == map.end()) throw std::runtime_error( std::string( "unknown variable '") + name + "'");
+	return (Variable::Id)itr->second;
 }
 
 VariableScope::VariableScope()
@@ -118,7 +132,7 @@ void VariableScope::push( const std::string& tag)
 		if (isSameTagScope( ti->second.m_scopeid, m_scopeid))
 		{
 			// If yes, then take all its variable definitions into the local definition scope
-			std::map<Variable,std::size_t>::const_iterator di = ti->second.m_var.begin(), de = ti->second.m_var.end();
+			std::map<Variable::Id,std::size_t>::const_iterator di = ti->second.m_var.begin(), de = ti->second.m_var.end();
 			for (; di != de; ++di)
 			{
 				m_ar.back().m_map[ di->first] = di->second;
@@ -135,7 +149,7 @@ void VariableScope::pop()
 	if (m_ar.empty() || m_scopeid.empty()) throw std::logic_error( "non existing variable scope closed");
 }
 
-void VariableScope::pushDefinitionToTagContext( Variable var, std::size_t val)
+void VariableScope::pushDefinitionToTagContext( Variable::Id var, std::size_t val)
 {
 	std::map< std::string, TagContext >::iterator ti = m_tagvarmap.find( m_tag), te = m_tagvarmap.end();
 	if (ti != te)
@@ -159,7 +173,7 @@ void VariableScope::pushDefinitionToTagContext( Variable var, std::size_t val)
 	}
 }
 
-void VariableScope::define( Variable var, const std::string& value, bool passToSibling)
+void VariableScope::define( Variable::Id var, const std::string& value, bool passToSibling)
 {
 	std::size_t val = m_strings.size();
 	m_ar.back().m_map[ var] = val;
@@ -171,7 +185,7 @@ void VariableScope::define( Variable var, const std::string& value, bool passToS
 	}
 }
 
-void VariableScope::define( Variable var, Variable src, bool passToSibling)
+void VariableScope::define( Variable::Id var, Variable::Id src, bool passToSibling)
 {
 	std::size_t val = getValueIdx( src);
 	if (!val) throw std::runtime_error( std::string( "undefined variable in scope '") + variableName(src) + "'");
@@ -182,9 +196,9 @@ void VariableScope::define( Variable var, Variable src, bool passToSibling)
 	}
 }
 
-std::size_t VariableScope::getValueIdx( Variable var) const
+std::size_t VariableScope::getValueIdx( Variable::Id var) const
 {
-	std::map<Variable,std::size_t>::const_iterator vi = m_ar.back().m_map.find( var);
+	std::map<Variable::Id,std::size_t>::const_iterator vi = m_ar.back().m_map.find( var);
 	return (vi == m_ar.back().m_map.end())?0:vi->second;
 }
 
