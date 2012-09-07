@@ -637,8 +637,6 @@ fi
 %{_libdir}/wolframe/modules/mod_filter_textwolf.so
 %{_libdir}/wolframe/modules/mod_filter_token.so
 
-%{_libdir}/wolframe/modules/mod_echo.so
-
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
 
