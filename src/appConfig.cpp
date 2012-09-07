@@ -230,8 +230,8 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 							for ( std::list< std::string >::const_iterator Vit = m_modFiles.begin();
 													Vit != m_modFiles.end(); Vit++ )	{
 								if ( boost::algorithm::iequals( *Vit, modFile ))	{
-									LOG_ERROR << "duplicate module file: '" << modFile << "'";
-									retVal = false;
+									LOG_WARNING << "duplicate module file: '" << modFile << "'. Ignoring the second file.";
+//									retVal = false;
 									isDuplicate = true;
 								}
 							}

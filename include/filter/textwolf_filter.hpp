@@ -34,12 +34,15 @@ Project Wolframe.
 
 #ifndef _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
 #define _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
+
 #include "filter/filter.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
 Filter createTextwolfXmlFilter( const std::string& name);
+Filter* createTextwolfXmlFilterPtr( const std::string& name);
+
 
 }}//namespace
 #endif

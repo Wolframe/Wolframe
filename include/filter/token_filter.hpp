@@ -49,6 +49,7 @@ enum TokenType
 };
 
 Filter createTokenFilter( const std::string& name);
+Filter* createTokenFilterPtr( const std::string& name);
 
 }}//namespace
 #endif

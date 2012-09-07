@@ -31,8 +31,10 @@ Project Wolframe.
 ************************************************************************/
 ///\file modules/filter/template/filterObjectBuilder.hpp
 ///\brief Interface template for object builder of filters
+
 #ifndef _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+
 #include "filter/filter.hpp"
 #include "moduleInterface.hpp"
 #include "constructor.hpp"
@@ -40,26 +42,24 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-class FilterContainer :public ObjectConstructorBase, public langbind::Filter
+class FilterCreator :public SimpleObjectConstructor< langbind::Filter >
 {
 public:
-	FilterContainer( const char* name_, const langbind::Filter& filter_)
-		:langbind::Filter(filter_)
-		,m_name(name_){}
+	FilterCreator( const char* name_, const langbind::CreateFilterPtrFunc filterFunc_ )
+		: m_name(name_), m_function(filterFunc_) {}
 
-	virtual ~FilterContainer(){}
+	virtual ~FilterCreator(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return FILTER_OBJECT; }
-	virtual const char* identifier() const
-	{
-		return m_name.c_str();
-	}
+	virtual const char* identifier() const	{ return m_name.c_str(); }
+	virtual langbind::Filter* object() const{ return m_function( m_name ); }
 private:
-	std::string m_name;
+	const std::string			m_name;
+	const langbind::CreateFilterPtrFunc	m_function;
 };
 
-template <langbind::CreateFilterFunc createFilterFunc>
+template <langbind::CreateFilterPtrFunc createFilterPtrFunc>
 class FilterBuilder :public SimpleBuilder
 {
 public:
@@ -70,7 +70,7 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new FilterContainer( m_identifier, createFilterFunc( m_identifier));
+		return new FilterCreator( m_identifier, createFilterPtrFunc );
 	}
 };
 
@@ -80,7 +80,7 @@ public:
 namespace {\
 struct CPPID\
 {\
-	static SimpleBuilder* constructor()\
+	static SimpleBuilder* builder()\
 	{\
 		return new FilterBuilder<createFilterFunc>(NAME);\
 	}\

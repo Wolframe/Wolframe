@@ -47,26 +47,26 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-DECLARE_FILTER_OBJECT("xml:textwolf",		TextwolfXMLFilterObject,	langbind::createTextwolfXmlFilter)
-DECLARE_FILTER_OBJECT("xml:textwolf:UTF-8",	TextwolfXMLFilterObject_UTF8,	langbind::createTextwolfXmlFilter)
-DECLARE_FILTER_OBJECT("xml:textwolf:UTF-16BE",	TextwolfXMLFilterObject_UTF16BE,langbind::createTextwolfXmlFilter)
-DECLARE_FILTER_OBJECT("xml:textwolf:UTF-16LE",	TextwolfXMLFilterObject_UTF16LE,langbind::createTextwolfXmlFilter)
-DECLARE_FILTER_OBJECT("xml:textwolf:UCS-2BE",	TextwolfXMLFilterObject_UCS2BE,	langbind::createTextwolfXmlFilter)
-DECLARE_FILTER_OBJECT("xml:textwolf:UCS-2LE",	TextwolfXMLFilterObject_UCS2LE,	langbind::createTextwolfXmlFilter)
-DECLARE_FILTER_OBJECT("xml:textwolf:UCS-4BE",	TextwolfXMLFilterObject_UCS4BE,	langbind::createTextwolfXmlFilter)
-DECLARE_FILTER_OBJECT("xml:textwolf:UCS-4LE",	TextwolfXMLFilterObject_UCS4LE,	langbind::createTextwolfXmlFilter)
+DECLARE_FILTER_OBJECT("xml:textwolf",		TextwolfXMLFilterObject,	langbind::createTextwolfXmlFilterPtr)
+DECLARE_FILTER_OBJECT("xml:textwolf:UTF-8",	TextwolfXMLFilterObject_UTF8,	langbind::createTextwolfXmlFilterPtr)
+DECLARE_FILTER_OBJECT("xml:textwolf:UTF-16BE",	TextwolfXMLFilterObject_UTF16BE,langbind::createTextwolfXmlFilterPtr)
+DECLARE_FILTER_OBJECT("xml:textwolf:UTF-16LE",	TextwolfXMLFilterObject_UTF16LE,langbind::createTextwolfXmlFilterPtr)
+DECLARE_FILTER_OBJECT("xml:textwolf:UCS-2BE",	TextwolfXMLFilterObject_UCS2BE,	langbind::createTextwolfXmlFilterPtr)
+DECLARE_FILTER_OBJECT("xml:textwolf:UCS-2LE",	TextwolfXMLFilterObject_UCS2LE,	langbind::createTextwolfXmlFilterPtr)
+DECLARE_FILTER_OBJECT("xml:textwolf:UCS-4BE",	TextwolfXMLFilterObject_UCS4BE,	langbind::createTextwolfXmlFilterPtr)
+DECLARE_FILTER_OBJECT("xml:textwolf:UCS-4LE",	TextwolfXMLFilterObject_UCS4LE,	langbind::createTextwolfXmlFilterPtr)
 
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	TextwolfXMLFilterObject::constructor,
-	TextwolfXMLFilterObject_UTF8::constructor,
-	TextwolfXMLFilterObject_UTF16BE::constructor,
-	TextwolfXMLFilterObject_UTF16LE::constructor,
-	TextwolfXMLFilterObject_UCS2BE::constructor,
-	TextwolfXMLFilterObject_UCS2LE::constructor,
-	TextwolfXMLFilterObject_UCS4BE::constructor,
-	TextwolfXMLFilterObject_UCS4LE::constructor
+	TextwolfXMLFilterObject::builder,
+	TextwolfXMLFilterObject_UTF8::builder,
+	TextwolfXMLFilterObject_UTF16BE::builder,
+	TextwolfXMLFilterObject_UTF16LE::builder,
+	TextwolfXMLFilterObject_UCS2BE::builder,
+	TextwolfXMLFilterObject_UCS2LE::builder,
+	TextwolfXMLFilterObject_UCS4BE::builder,
+	TextwolfXMLFilterObject_UCS4LE::builder
 };
 
 

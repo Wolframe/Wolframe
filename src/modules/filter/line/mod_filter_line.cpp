@@ -47,26 +47,26 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-DECLARE_FILTER_OBJECT("line",		LineFilterObject,		langbind::createLineFilter)
-DECLARE_FILTER_OBJECT("line:UTF-8",	LineFilterObject_UTF8,		langbind::createLineFilter)
-DECLARE_FILTER_OBJECT("line:UTF-16BE",	LineFilterObject_UTF16BE,	langbind::createLineFilter)
-DECLARE_FILTER_OBJECT("line:UTF-16LE",	LineFilterObject_UTF16LE,	langbind::createLineFilter)
-DECLARE_FILTER_OBJECT("line:UCS-2BE",	LineFilterObject_UCS2BE,	langbind::createLineFilter)
-DECLARE_FILTER_OBJECT("line:UCS-2LE",	LineFilterObject_UCS2LE,	langbind::createLineFilter)
-DECLARE_FILTER_OBJECT("line:UCS-4BE",	LineFilterObject_UCS4BE,	langbind::createLineFilter)
-DECLARE_FILTER_OBJECT("line:UCS-4LE",	LineFilterObject_UCS4LE,	langbind::createLineFilter)
+DECLARE_FILTER_OBJECT("line",		LineFilterObject,		langbind::createLineFilterPtr)
+DECLARE_FILTER_OBJECT("line:UTF-8",	LineFilterObject_UTF8,		langbind::createLineFilterPtr)
+DECLARE_FILTER_OBJECT("line:UTF-16BE",	LineFilterObject_UTF16BE,	langbind::createLineFilterPtr)
+DECLARE_FILTER_OBJECT("line:UTF-16LE",	LineFilterObject_UTF16LE,	langbind::createLineFilterPtr)
+DECLARE_FILTER_OBJECT("line:UCS-2BE",	LineFilterObject_UCS2BE,	langbind::createLineFilterPtr)
+DECLARE_FILTER_OBJECT("line:UCS-2LE",	LineFilterObject_UCS2LE,	langbind::createLineFilterPtr)
+DECLARE_FILTER_OBJECT("line:UCS-4BE",	LineFilterObject_UCS4BE,	langbind::createLineFilterPtr)
+DECLARE_FILTER_OBJECT("line:UCS-4LE",	LineFilterObject_UCS4LE,	langbind::createLineFilterPtr)
 
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	LineFilterObject::constructor,
-	LineFilterObject_UTF8::constructor,
-	LineFilterObject_UTF16BE::constructor,
-	LineFilterObject_UTF16LE::constructor,
-	LineFilterObject_UCS2BE::constructor,
-	LineFilterObject_UCS2LE::constructor,
-	LineFilterObject_UCS4BE::constructor,
-	LineFilterObject_UCS4LE::constructor
+	LineFilterObject::builder,
+	LineFilterObject_UTF8::builder,
+	LineFilterObject_UTF16BE::builder,
+	LineFilterObject_UTF16LE::builder,
+	LineFilterObject_UCS2BE::builder,
+	LineFilterObject_UCS2LE::builder,
+	LineFilterObject_UCS4BE::builder,
+	LineFilterObject_UCS4LE::builder
 };
 
 ModuleEntryPoint entryPoint( 0, "line filter", setModuleLogger, 0, 0, NofObjects, objdef);

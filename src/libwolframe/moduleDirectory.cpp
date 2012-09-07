@@ -61,40 +61,40 @@ ModulesDirectory::~ModulesDirectory()
 }
 
 
-bool ModulesDirectory::addBuilder( ConfiguredBuilder* container )
+bool ModulesDirectory::addBuilder( ConfiguredBuilder* builder )
 {
 	for ( std::list< ConfiguredBuilder* >::const_iterator it = m_cfgdBuilder.begin();
 							it != m_cfgdBuilder.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->m_section, container->m_section ) &&
-				boost::algorithm::iequals( (*it)->m_keyword, container->m_keyword ))	{
-			LOG_ALERT << "A configuration module for section '" << container->m_section
-				  << "' keyword '" << container->m_keyword << "' already exists";
+		if ( boost::algorithm::iequals( (*it)->m_section, builder->m_section ) &&
+				boost::algorithm::iequals( (*it)->m_keyword, builder->m_keyword ))	{
+			LOG_ALERT << "A configuration module for section '" << builder->m_section
+				  << "' keyword '" << builder->m_keyword << "' already exists";
 			return false;
 		}
-		if ( boost::algorithm::iequals( (*it)->m_identifier, container->m_identifier ))	{
-			LOG_ALERT << "A module container named '" << container->m_identifier
+		if ( boost::algorithm::iequals( (*it)->m_identifier, builder->m_identifier ))	{
+			LOG_ALERT << "A module container named '" << builder->m_identifier
 				  << "' already exists";
 			return false;
 		}
 	}
-	m_cfgdBuilder.push_back( container );
-	LOG_DEBUG << "Module '" << container->m_identifier << "' registered for section '"
-		  << container->m_section << "' keyword '" << container->m_keyword << "'";
+	m_cfgdBuilder.push_back( builder );
+	LOG_DEBUG << "Module '" << builder->m_identifier << "' registered for section '"
+		  << builder->m_section << "' keyword '" << builder->m_keyword << "'";
 	return true;
 }
 
-bool ModulesDirectory::addBuilder( SimpleBuilder* container )
+bool ModulesDirectory::addBuilder( SimpleBuilder* builder )
 {
 	for ( std::list< SimpleBuilder* >::const_iterator it = m_simpleBuilder.begin();
 							it != m_simpleBuilder.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->m_identifier, container->m_identifier ))	{
-			LOG_ALERT << "A module object named '" << container->m_identifier
+		if ( boost::algorithm::iequals( (*it)->m_identifier, builder->m_identifier ))	{
+			LOG_ALERT << "A module object named '" << builder->m_identifier
 				  << "' already exists";
 			return false;
 		}
 	}
-	m_simpleBuilder.push_back( container );
-	LOG_DEBUG << "Module object '" << container->m_identifier << "' registered";
+	m_simpleBuilder.push_back( builder );
+	LOG_DEBUG << "Module object '" << builder->m_identifier << "' registered";
 	return true;
 }
 

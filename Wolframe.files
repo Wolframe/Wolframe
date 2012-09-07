@@ -972,6 +972,7 @@ tests/temp/formfunc_table.lua
 tests/temp/peerformfunc_input_generator.lua
 tests/temp/peerformfunc_iterator.lua
 tests/temp/peerformfunc_table.lua
+tests/temp/print_table.lua
 tests/testBoostPath.cpp
 tests/testDatabaseProcessorVM.cpp
 tests/testMethodMemberPointerTemplate.cpp
@@ -1036,7 +1037,7 @@ tests/wolfilter/template/doc/lua_formfunc_input_generator.UTF-8.xml
 tests/wolfilter/template/doc/lua_formfunc_iterator.UTF-8.xml
 tests/wolfilter/template/doc/lua_formfunc_table.UTF-8.xml
 tests/wolfilter/template/doc/lua_peerformfunc_table.UTF-8.xml
-tests/wolfilter/template/doc/lua_print_table_testtrace.UTF-8.xml
+tests/wolfilter/template/doc/lua_print_table_testtrace.xml
 tests/wolfilter/template/doc/map_ddlform.UTF-8.xml
 tests/wolfilter/template/doc/map_formfunc.UTF-8.xml
 tests/wolfilter/template/doc/multilingual.UTF-8.xml
