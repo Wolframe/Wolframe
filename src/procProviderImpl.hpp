@@ -66,8 +66,8 @@ public:
 private:
 	std::string					m_dbLabel;
 	const db::Database*				m_db;
-	std::list< cmdbind::CommandHandlerUnit* >	m_handler;
-	std::map< const std::string, cmdbind::CommandHandlerUnit* >	m_cmdMap;
+	std::list< cmdbind::CommandHandlerCreator* >	m_handler;
+	std::map< const std::string, cmdbind::CommandHandlerCreator* >	m_cmdMap;
 	std::list< const module::FilterCreator* >	m_filter;
 	std::map< const std::string, const module::FilterCreator* >	m_filterMap;
 };

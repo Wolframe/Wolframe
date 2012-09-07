@@ -104,14 +104,14 @@ private:
 };
 
 
-class EchoProcConstructor : public ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >
+class EchoProcConstructor : public ConfiguredObjectConstructor< cmdbind::CommandHandlerCreator >
 {
 public:
 	EchoProcConstructor( const EchoProcConfig& conf );
 	~EchoProcConstructor()				{}
 
 	virtual const char* identifier() const		{ return ECHO_PROCESSOR_CLASS_NAME; }
-	virtual cmdbind::CommandHandlerUnit* object() const;
+	virtual cmdbind::CommandHandlerCreator* object() const;
 private:
 	EchoProcessorUnit*	m_proc;
 };
