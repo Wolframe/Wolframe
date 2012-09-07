@@ -10,5 +10,5 @@ Build-Depends: debhelper (>= 4.1.16),
  libssl-dev, libqt4-dev, libpam-dev, libsasl2-dev,
  libsqlite3-dev, libpq-dev, libxml2-dev, libxslt1-dev,
  xsltproc, docbook-xsl, doxygen, graphviz, lsb-release,
- zlib1g-dev, libpng-dev, libhpdf-dev
+ zlib1g-dev, libpng-dev
 Files:
