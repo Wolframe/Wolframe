@@ -40,21 +40,59 @@
 _Wolframe::log::LogBackend* logBackendPtr;
 
 using namespace _Wolframe;
-using namespace module;
+using namespace _Wolframe::module;
+namespace lb = _Wolframe::langbind;
 
 static void setModuleLogger( void* logger )
 {
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-DECLARE_FILTER_OBJECT("xml:libxml2",		Libxml2FilterObject,		langbind::createLibxml2FilterPtr)
-DECLARE_FILTER_OBJECT("xml:libxml2:UTF-8",	Libxml2FilterObject_UTF8,	langbind::createLibxml2FilterPtr)
-DECLARE_FILTER_OBJECT("xml:libxml2:UTF-16BE",	Libxml2FilterObject_UTF16BE,	langbind::createLibxml2FilterPtr)
-DECLARE_FILTER_OBJECT("xml:libxml2:UTF-16LE",	Libxml2FilterObject_UTF16LE,	langbind::createLibxml2FilterPtr)
-DECLARE_FILTER_OBJECT("xml:libxml2:UCS-2BE",	Libxml2FilterObject_UCS2BE,	langbind::createLibxml2FilterPtr)
-DECLARE_FILTER_OBJECT("xml:libxml2:UCS-2LE",	Libxml2FilterObject_UCS2LE,	langbind::createLibxml2FilterPtr)
-DECLARE_FILTER_OBJECT("xml:libxml2:UCS-4BE",	Libxml2FilterObject_UCS4BE,	langbind::createLibxml2FilterPtr)
-DECLARE_FILTER_OBJECT("xml:libxml2:UCS-4LE",	Libxml2FilterObject_UCS4LE,	langbind::createLibxml2FilterPtr)
+namespace {
+
+struct Libxml2FilterObject
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2");}
+};
+struct Libxml2FilterObject_UTF8
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UTF-8");}
+};
+struct Libxml2FilterObject_UTF16BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UTF-16BE");}
+};
+struct Libxml2FilterObject_UTF16LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UTF-16LE");}
+};
+struct Libxml2FilterObject_UCS2BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UCS-2BE");}
+};
+struct Libxml2FilterObject_UCS2LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UCS-2LE");}
+};
+struct Libxml2FilterObject_UCS4BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UCS-4BE");}
+};
+struct Libxml2FilterObject_UCS4LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UCS-4LE");}
+};
+
+}//anonymous namespace
+
 
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =

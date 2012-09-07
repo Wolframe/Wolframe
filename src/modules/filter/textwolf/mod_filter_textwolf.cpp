@@ -40,21 +40,58 @@
 _Wolframe::log::LogBackend* logBackendPtr;
 
 using namespace _Wolframe;
-using namespace module;
+using namespace _Wolframe::module;
+namespace lb = _Wolframe::langbind;
 
 static void setModuleLogger( void* logger )
 {
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-DECLARE_FILTER_OBJECT("xml:textwolf",		TextwolfXMLFilterObject,	langbind::createTextwolfXmlFilterPtr)
-DECLARE_FILTER_OBJECT("xml:textwolf:UTF-8",	TextwolfXMLFilterObject_UTF8,	langbind::createTextwolfXmlFilterPtr)
-DECLARE_FILTER_OBJECT("xml:textwolf:UTF-16BE",	TextwolfXMLFilterObject_UTF16BE,langbind::createTextwolfXmlFilterPtr)
-DECLARE_FILTER_OBJECT("xml:textwolf:UTF-16LE",	TextwolfXMLFilterObject_UTF16LE,langbind::createTextwolfXmlFilterPtr)
-DECLARE_FILTER_OBJECT("xml:textwolf:UCS-2BE",	TextwolfXMLFilterObject_UCS2BE,	langbind::createTextwolfXmlFilterPtr)
-DECLARE_FILTER_OBJECT("xml:textwolf:UCS-2LE",	TextwolfXMLFilterObject_UCS2LE,	langbind::createTextwolfXmlFilterPtr)
-DECLARE_FILTER_OBJECT("xml:textwolf:UCS-4BE",	TextwolfXMLFilterObject_UCS4BE,	langbind::createTextwolfXmlFilterPtr)
-DECLARE_FILTER_OBJECT("xml:textwolf:UCS-4LE",	TextwolfXMLFilterObject_UCS4LE,	langbind::createTextwolfXmlFilterPtr)
+namespace {
+
+struct TextwolfXMLFilterObject
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf");}
+};
+struct TextwolfXMLFilterObject_UTF8
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UTF-8");}
+};
+struct TextwolfXMLFilterObject_UTF16BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UTF-16BE");}
+};
+struct TextwolfXMLFilterObject_UTF16LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UTF-16LE");}
+};
+struct TextwolfXMLFilterObject_UCS2BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UCS-2BE");}
+};
+struct TextwolfXMLFilterObject_UCS2LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UCS-2LE");}
+};
+struct TextwolfXMLFilterObject_UCS4BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UCS-4BE");}
+};
+struct TextwolfXMLFilterObject_UCS4LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UCS-4LE");}
+};
+
+}//anonymous namespace
 
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =

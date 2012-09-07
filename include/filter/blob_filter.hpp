@@ -29,8 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file char_filter.hpp
-///\brief Filter reading/writing character by character
+///\file blob_filter.hpp
+///\brief Filter reading/writing of data witout touching it - as binary blob
 
 #ifndef _Wolframe_FILTER_BLOB_HPP_INCLUDED
 #define _Wolframe_FILTER_BLOB_HPP_INCLUDED
@@ -41,6 +41,7 @@ namespace _Wolframe {
 namespace langbind {
 
 Filter createBlobFilter( const std::string& name);
+Filter* createBlobFilterPtr( const std::string& name);
 
 }}//namespace
 #endif

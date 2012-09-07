@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\file modules/filter/line/mod_filter_line.cpp
-///\brief Module for line XML filters
+///\brief Module for line filters
 #include "modules/filter/template/filterBuilder.hpp"
 #include "filter/line_filter.hpp"
 #include "logger-v1.hpp"
@@ -40,21 +40,59 @@
 _Wolframe::log::LogBackend* logBackendPtr;
 
 using namespace _Wolframe;
-using namespace module;
+using namespace _Wolframe::module;
+namespace lb = _Wolframe::langbind;
 
 static void setModuleLogger( void* logger )
 {
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-DECLARE_FILTER_OBJECT("line",		LineFilterObject,		langbind::createLineFilterPtr)
-DECLARE_FILTER_OBJECT("line:UTF-8",	LineFilterObject_UTF8,		langbind::createLineFilterPtr)
-DECLARE_FILTER_OBJECT("line:UTF-16BE",	LineFilterObject_UTF16BE,	langbind::createLineFilterPtr)
-DECLARE_FILTER_OBJECT("line:UTF-16LE",	LineFilterObject_UTF16LE,	langbind::createLineFilterPtr)
-DECLARE_FILTER_OBJECT("line:UCS-2BE",	LineFilterObject_UCS2BE,	langbind::createLineFilterPtr)
-DECLARE_FILTER_OBJECT("line:UCS-2LE",	LineFilterObject_UCS2LE,	langbind::createLineFilterPtr)
-DECLARE_FILTER_OBJECT("line:UCS-4BE",	LineFilterObject_UCS4BE,	langbind::createLineFilterPtr)
-DECLARE_FILTER_OBJECT("line:UCS-4LE",	LineFilterObject_UCS4LE,	langbind::createLineFilterPtr)
+namespace {
+
+struct LineFilterObject
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLineFilterPtr>("line");}
+};
+struct LineFilterObject_UTF8
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLineFilterPtr>("line:UTF-8");}
+};
+struct LineFilterObject_UTF16BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLineFilterPtr>("line:UTF-16BE");}
+};
+struct LineFilterObject_UTF16LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLineFilterPtr>("line:UTF-16LE");}
+};
+struct LineFilterObject_UCS2BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLineFilterPtr>("line:UCS-2BE");}
+};
+struct LineFilterObject_UCS2LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLineFilterPtr>("line:UCS-2LE");}
+};
+struct LineFilterObject_UCS4BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLineFilterPtr>("line:UCS-4BE");}
+};
+struct LineFilterObject_UCS4LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createLineFilterPtr>("line:UCS-4LE");}
+};
+
+}//anonymous namespace
+
 
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =
@@ -70,3 +108,4 @@ static createBuilderFunc objdef[ NofObjects] =
 };
 
 ModuleEntryPoint entryPoint( 0, "line filter", setModuleLogger, 0, 0, NofObjects, objdef);
+

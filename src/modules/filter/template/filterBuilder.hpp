@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/filter/template/filterObjectBuilder.hpp
+///\file modules/filter/template/filterBuilder.hpp
 ///\brief Interface template for object builder of filters
 
 #ifndef _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
@@ -75,17 +75,5 @@ public:
 };
 
 }}//namespace
-
-#define DECLARE_FILTER_OBJECT(NAME,CPPID,createFilterFunc) \
-namespace {\
-struct CPPID\
-{\
-	static SimpleBuilder* builder()\
-	{\
-		return new FilterBuilder<createFilterFunc>(NAME);\
-	}\
-};\
-}//anonymous namespace
-//end DECLARE_FILTER_OBJECT
 
 #endif

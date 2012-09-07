@@ -187,8 +187,17 @@ struct BlobFilter :public Filter
 	}
 };
 
-Filter _Wolframe::langbind::createBlobFilter( const std::string&)
+Filter _Wolframe::langbind::createBlobFilter( const std::string& name)
 {
+	enum {namelen=4};
+	std::string nam( name);
+	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
+	if (nam != "blob") throw std::runtime_error( "filter name does not match");
 	return BlobFilter();
+}
+
+Filter* _Wolframe::langbind::createBlobFilterPtr( const std::string& name)
+{
+	return new Filter( createBlobFilter( name));
 }
 
