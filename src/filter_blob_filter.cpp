@@ -55,7 +55,7 @@ struct InputFilterImpl :public InputFilter
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
 		:InputFilter( o)
-		,m_elembuf( m_elembuf)
+		,m_elembuf( o.m_elembuf)
 		,m_end(o.m_end)
 		,m_done(o.m_done){}
 
