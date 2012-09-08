@@ -1,4 +1,4 @@
-LIBRARY mod_db_postgresql
+LIBRARY mod_echo
 
 EXPORTS
 entryPoint	@1
