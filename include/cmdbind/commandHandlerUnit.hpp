@@ -43,13 +43,13 @@
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class CommandHandlerUnit
+///\class CommandHandlerCreator
 ///\brief Set of command handlers adressable by identifiers
-class CommandHandlerUnit
+class CommandHandlerCreator
 {
 public:
 	///\brief virtual destructor
-	virtual ~CommandHandlerUnit()		{}
+	virtual ~CommandHandlerCreator()		{}
 
 	///\brief Get an instance of the command handler for the command
 	///\param [in] command the name of the command to be executed by the handler
