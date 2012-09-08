@@ -34406,7 +34406,7 @@
 module "bcdnumber"
 
 function run()
-	f = filter( "line;UTF-8")
+	f = filter( "line", "UTF-8")
 	input:as( f)
 	output:as( f)
 

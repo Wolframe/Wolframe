@@ -1122,6 +1122,8 @@ LUA_FUNCTION_THROWS( "output:closetag(..)", function_output_closetag)
 
 LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 {
+	const char* name = "";
+	const char* encoding = "";
 	switch (lua_gettop( ls))
 	{
 		case 0:
@@ -1135,9 +1137,12 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 				return 1;
 			}
 		}
+		case 2:
+			encoding = lua_tostring( ls, 2);
+			if (!encoding) throw std::runtime_error( "encoding name is not a string");
 		case 1:
 		{
-			const char* name = lua_tostring( ls, 1);
+			name = lua_tostring( ls, 1);
 			if (!name) throw std::runtime_error( "filter name is not a string");
 
 			GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
@@ -1145,11 +1150,17 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 			{
 				throw std::runtime_error( "lost global context");
 			}
-			std::pair<std::string,std::string> filterid = Filter::identifier( name);
 			Filter flt;
-			if (!ctx->getFilter( filterid.first, filterid.second, flt))
+			if (!ctx->getFilter( name, encoding, flt))
 			{
-				throw std::runtime_error( "filter not defined");
+				if (encoding[0])
+				{
+					throw std::runtime_error( std::string( "filter '") + name + "'" + " with encoding '" + encoding + "' is not defined");
+				}
+				else
+				{
+					throw std::runtime_error( std::string( "filter '") + name + "' is not defined");
+				}
 			}
 			LuaObject<Filter>::push_luastack( ls, flt);
 			return 1;

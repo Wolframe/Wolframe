@@ -62,11 +62,6 @@ public:
 	///\return true on success, false, if the variable does not exist or the operation failed
 	bool getValue( const char* name, std::string& val) const;
 
-	///\brief Splits a name of the filter into its identifying parts (name + argument)
-	///\param [in] id identifier of the filter (name + ":" + arguments)
-	///\return pair describing the filter (name -> first, arguments -> second)
-	static std::pair<std::string,std::string> identifier( const std::string& id);
-
 	///\brief Set a member value of the filter
 	///\param [in] name case sensitive name of the variable
 	///\param [in] value new value of the variable to set

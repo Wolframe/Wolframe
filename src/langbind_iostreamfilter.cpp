@@ -51,11 +51,27 @@
 using namespace _Wolframe;
 using namespace langbind;
 
+std::pair<std::string,std::string> filterIdentifier( const std::string& id)
+{
+	const char* cc = id.c_str();
+	const char* ee = cc;
+
+	while (*ee && *ee != ',') ++ee;
+	if (*ee)
+	{
+		return std::pair<std::string,std::string>( std::string( cc, ee-cc), ee + 1);
+	}
+	else
+	{
+		return std::pair<std::string,std::string>( cc, "");
+	}
+}
+
 static Filter getFilter( GlobalContext* gc, const std::string& ifl_, const std::string& ofl_)
 {
 	Filter rt;
-	std::pair<std::string,std::string> ifl = Filter::identifier( ifl_);
-	std::pair<std::string,std::string> ofl = Filter::identifier( ofl_);
+	std::pair<std::string,std::string> ifl = filterIdentifier( ifl_);
+	std::pair<std::string,std::string> ofl = filterIdentifier( ofl_);
 	if (boost::iequals( ofl_, ifl_))
 	{
 		if (!gc->getFilter( ifl.first, ifl.second, rt))
