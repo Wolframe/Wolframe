@@ -70,7 +70,7 @@ INCLUDE_LIBS = \
 !ENDIF
 
 # libhpdf
-!IFDEF WITH_LOCAL_LIBHPDF
+!IFDEF WITH_LIBHPDF
 INCLUDE_CXXFLAGS = \
 	$(INCLUDE_CXXFLAGS) /DWITH_LIBHPDF
 
@@ -78,7 +78,7 @@ INCLUDE_DIRS = \
 	$(INCLUDE_DIRS) /I"$(TOPDIR)\libhpdf\include"
 
 INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(TOPDIR)\src\libhpdf.lib"
+	$(INCLUDE_LIBS) "$(TOPDIR)\libhpdf\src\hpdf.lib"
 !ENDIF
 
 

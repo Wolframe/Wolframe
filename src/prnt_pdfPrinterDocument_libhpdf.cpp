@@ -168,7 +168,7 @@ private:
 	///\remark Syntax: "width;ptn1,ptn2,...,ptnN;phase" no spaces
 	struct LineStyle
 	{
-		HPDF_UINT width;
+		HPDF_REAL width;
 		enum {MaxPtn=32};
 		HPDF_UINT16 ptn[ MaxPtn];
 		HPDF_UINT nofptn;
@@ -301,6 +301,8 @@ private:
 				fi = doc.m_linestylemap.find( idx);
 			}
 			HPDF_Page_SetDash( m_hnd, fi->second.ptn, fi->second.nofptn, fi->second.phase);
+			// Aba, got C4244 here ('const HPDF_UINT' to 'HPDF_REAL', possible loss of data)
+			// changed width in LineStyle to real, no sure if this is correct
 			HPDF_Page_SetLineWidth( m_hnd, fi->second.width);
 			doc.m_vcache.m_linestyle_varidx = idx;
 		}
