@@ -47,8 +47,10 @@ bool Filter::getValue( const char* name, std::string& val) const
 std::pair<std::string,std::string> Filter::identifier( const std::string& id)
 {
 	const char* cc = id.c_str();
-	const char* ee = std::strchr( cc, ';');
-	if (ee)
+	const char* ee = cc;
+
+	while (*ee && *ee != ',' && *ee != ';') ++ee;
+	if (*ee)
 	{
 		return std::pair<std::string,std::string>( std::string( cc, ee-cc), ee + 1);
 	}
