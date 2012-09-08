@@ -183,15 +183,15 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 									it != conf->m_procConfig.end(); it++ )	{
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
 		if ( builder )	{
-			ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* cnstrctr =
-					dynamic_cast< ConfiguredObjectConstructor< cmdbind::CommandHandlerUnit >* >( builder->constructor());
+			ConfiguredObjectConstructor< cmdbind::CommandHandlerCreator >* cnstrctr =
+					dynamic_cast< ConfiguredObjectConstructor< cmdbind::CommandHandlerCreator >* >( builder->constructor());
 			if ( cnstrctr == NULL )	{
 				LOG_ALERT << "Wolframe Processor Provider: '" << builder->identifier()
 					  << "'' is not a command handler";
 				throw std::logic_error( "Object is not a commandHandler. See log." );
 			}
 			else	{
-				cmdbind::CommandHandlerUnit* handlerUnit = cnstrctr->object( **it );
+				cmdbind::CommandHandlerCreator* handlerUnit = cnstrctr->object( **it );
 				m_handler.push_back( handlerUnit );
 				std::string handlerName = cnstrctr->identifier();
 				LOG_TRACE << "'" << handlerName << "' command handler registered";
@@ -296,7 +296,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 {
-	for ( std::list< cmdbind::CommandHandlerUnit* >::iterator it = m_handler.begin();
+	for ( std::list< cmdbind::CommandHandlerCreator* >::iterator it = m_handler.begin();
 							it != m_handler.end(); it++ )
 		delete *it;
 	for ( std::list< const module::FilterCreator* >::iterator it = m_filter.begin();
@@ -334,7 +334,7 @@ const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::handler( const std::string& command ) const
 {
 	std::string cmdName = boost::algorithm::to_upper_copy( command );
-	std::map< const std::string, cmdbind::CommandHandlerUnit* >::const_iterator cmd = m_cmdMap.find( cmdName );
+	std::map< const std::string, cmdbind::CommandHandlerCreator* >::const_iterator cmd = m_cmdMap.find( cmdName );
 	if ( cmd == m_cmdMap.end() )
 		return NULL;
 	else

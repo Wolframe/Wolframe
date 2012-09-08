@@ -1,6 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS = employee_assignment_convert echo_cmdhandler
+SUBDIRS = employee_assignment_convert
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

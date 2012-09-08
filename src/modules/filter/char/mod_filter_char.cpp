@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\file modules/filter/char/mod_filter_char.cpp
-///\brief Module for char XML filters
+///\brief Module for char filters
 
 #include "modules/filter/template/filterBuilder.hpp"
 #include "filter/char_filter.hpp"
@@ -41,21 +41,59 @@
 _Wolframe::log::LogBackend* logBackendPtr;
 
 using namespace _Wolframe;
-using namespace module;
+using namespace _Wolframe::module;
+namespace lb = _Wolframe::langbind;
+
+namespace {
+
+struct CharFilterObject
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createCharFilterPtr>("char");}
+};
+struct CharFilterObject_UTF8
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createCharFilterPtr>("char:UTF-8");}
+};
+struct CharFilterObject_UTF16BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createCharFilterPtr>("char:UTF-16BE");}
+};
+struct CharFilterObject_UTF16LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createCharFilterPtr>("char:UTF-16LE");}
+};
+struct CharFilterObject_UCS2BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createCharFilterPtr>("char:UCS-2BE");}
+};
+struct CharFilterObject_UCS2LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createCharFilterPtr>("char:UCS-2LE");}
+};
+struct CharFilterObject_UCS4BE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createCharFilterPtr>("char:UCS-4BE");}
+};
+struct CharFilterObject_UCS4LE
+{
+	static SimpleBuilder* builder()
+		{return new FilterBuilder<lb::createCharFilterPtr>("char:UCS-4LE");}
+};
+
+}//anonymous namespace
+
 
 static void setModuleLogger( void* logger )
 {
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
-
-DECLARE_FILTER_OBJECT("char",		CharFilterObject,		langbind::createCharFilterPtr)
-DECLARE_FILTER_OBJECT("char:UTF-8",	CharFilterObject_UTF8,		langbind::createCharFilterPtr)
-DECLARE_FILTER_OBJECT("char:UTF-16BE",	CharFilterObject_UTF16BE,	langbind::createCharFilterPtr)
-DECLARE_FILTER_OBJECT("char:UTF-16LE",	CharFilterObject_UTF16LE,	langbind::createCharFilterPtr)
-DECLARE_FILTER_OBJECT("char:UCS-2BE",	CharFilterObject_UCS2BE,	langbind::createCharFilterPtr)
-DECLARE_FILTER_OBJECT("char:UCS-2LE",	CharFilterObject_UCS2LE,	langbind::createCharFilterPtr)
-DECLARE_FILTER_OBJECT("char:UCS-4BE",	CharFilterObject_UCS4BE,	langbind::createCharFilterPtr)
-DECLARE_FILTER_OBJECT("char:UCS-4LE",	CharFilterObject_UCS4LE,	langbind::createCharFilterPtr)
 
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =

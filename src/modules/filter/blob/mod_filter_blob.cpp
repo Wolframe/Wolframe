@@ -30,10 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/filter/token/mod_filter_token.cpp
-///\brief Module for token filters
+///\file modules/filter/char/mod_filter_char.cpp
+///\brief Module for blob filters that forward the data as binary blob as it is
+
 #include "modules/filter/template/filterBuilder.hpp"
-#include "filter/token_filter.hpp"
+#include "filter/blob_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 
@@ -50,60 +51,63 @@ static void setModuleLogger( void* logger )
 
 namespace {
 
-struct TokenFilterObject
+struct BlobFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob");}
 };
-struct TokenFilterObject_UTF8
+struct BlobFilterObject_UTF8
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token:UTF-8");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UTF-8");}
 };
-struct TokenFilterObject_UTF16BE
+struct BlobFilterObject_UTF16BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token:UTF-16BE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UTF-16BE");}
 };
-struct TokenFilterObject_UTF16LE
+struct BlobFilterObject_UTF16LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token:UTF-16LE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UTF-16LE");}
 };
-struct TokenFilterObject_UCS2BE
+struct BlobFilterObject_UCS2BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token:UCS-2BE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UCS-2BE");}
 };
-struct TokenFilterObject_UCS2LE
+struct BlobFilterObject_UCS2LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token:UCS-2LE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UCS-2LE");}
 };
-struct TokenFilterObject_UCS4BE
+struct BlobFilterObject_UCS4BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token:UCS-4BE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UCS-4BE");}
 };
-struct TokenFilterObject_UCS4LE
+struct BlobFilterObject_UCS4LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token:UCS-4LE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UCS-4LE");}
 };
 
 }//anonymous namespace
 
+
 enum {NofObjects=8};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	TokenFilterObject::builder,
-	TokenFilterObject_UTF8::builder,
-	TokenFilterObject_UTF16BE::builder,
-	TokenFilterObject_UTF16LE::builder,
-	TokenFilterObject_UCS2BE::builder,
-	TokenFilterObject_UCS2LE::builder,
-	TokenFilterObject_UCS4BE::builder,
-	TokenFilterObject_UCS4LE::builder
+	BlobFilterObject::builder,
+	BlobFilterObject_UTF8::builder,
+	BlobFilterObject_UTF16BE::builder,
+	BlobFilterObject_UTF16LE::builder,
+	BlobFilterObject_UCS2BE::builder,
+	BlobFilterObject_UCS2LE::builder,
+	BlobFilterObject_UCS4BE::builder,
+	BlobFilterObject_UCS4LE::builder
 };
 
-ModuleEntryPoint entryPoint( 0, "token filter", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "blob filter", setModuleLogger, 0, 0, NofObjects, objdef);
+
+

@@ -825,6 +825,10 @@ src/modules/echoProcessor/echoProcessor.hpp
 src/modules/echoProcessor/echoProcessorModule.def
 src/modules/echoProcessor/GNUmakefile
 src/modules/echoProcessor/Makefile.W32
+src/modules/filter/blob/BlobFilterModule.def
+src/modules/filter/blob/GNUmakefile
+src/modules/filter/blob/Makefile.W32
+src/modules/filter/blob/mod_filter_blob.cpp
 src/modules/filter/char/CharFilterModule.def
 src/modules/filter/char/GNUmakefile
 src/modules/filter/char/Makefile.W32
@@ -987,11 +991,6 @@ tests/threadLeakTest.cpp
 tests/versionTest.cpp
 tests/wolfilter/GNUmakefile
 tests/wolfilter/Makefile.W32
-tests/wolfilter/modules/echo_cmdhandler/echo_cmdhandler.cpp
-tests/wolfilter/modules/echo_cmdhandler/echo_cmdhandler.hpp
-tests/wolfilter/modules/echo_cmdhandler/GNUmakefile
-tests/wolfilter/modules/echo_cmdhandler/Makefile.W32
-tests/wolfilter/modules/echo_cmdhandler/mod_echo_cmdhandler.cpp
 tests/wolfilter/modules/employee_assignment_convert/employee_assignment_convert.cpp
 tests/wolfilter/modules/employee_assignment_convert/employee_assignment_convert.hpp
 tests/wolfilter/modules/employee_assignment_convert/GNUmakefile

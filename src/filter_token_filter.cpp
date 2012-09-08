@@ -445,13 +445,5 @@ Filter _Wolframe::langbind::createTokenFilter( const std::string& name)
 
 Filter* _Wolframe::langbind::createTokenFilterPtr( const std::string& name)
 {
-	const char* filterbasename = "token";
-	std::size_t nn = std::strlen( filterbasename);
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-	if (name.size() < nn || std::memcmp( nam.c_str(), filterbasename, nn) != 0) throw std::runtime_error( "filter name does not match");
-	if (name.size() == nn) return new TokenFilter();
-	if (name[nn] != ':') throw std::runtime_error( "token filter name does not match");
-	const char* encoding = name.c_str() + nn + 1;
-	return new TokenFilter( encoding);
+	return new Filter( createTokenFilter( name));
 }

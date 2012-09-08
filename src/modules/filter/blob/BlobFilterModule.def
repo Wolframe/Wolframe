@@ -1,0 +1,4 @@
+LIBRARY mod_filter_blob
+
+EXPORTS
+entryPoint	@1
