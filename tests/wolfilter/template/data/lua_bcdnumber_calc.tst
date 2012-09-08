@@ -7,6 +7,7 @@ docout=doc/rand_bcdnumbder_calc_output.txt		# output document name
 output="../data/$testname.tst"
 
 echo '**' > $output
+echo '**requires:LUA' >> $output
 echo '**input' >> $output
 cat $docin >> $output
 echo '**output' >> $output
