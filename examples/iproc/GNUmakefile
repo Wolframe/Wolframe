@@ -26,7 +26,6 @@ INCLUDE_LIBS = \
 	$(LIBS_DL)
 
 # lua
-
 ifeq ($(WITH_LUA),1)
 INCLUDE_CXXFLAGS += \
 	-DWITH_LUA
@@ -37,6 +36,27 @@ INCLUDE_DIRS += \
 INCLUDE_LIBS += \
 	$(TOPDIR)/lua/src/liblua.a \
 	$(LIBS_DL)
+endif
+
+# libhpdf
+ifeq ($(WITH_LIBHPDF),1)
+ifneq ($(WITH_LOCAL_LIBHPDF),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_LIBHPDF
+
+INCLUDE_LIBS += \
+	-lhpdf
+endif
+endif
+ifeq ($(WITH_LOCAL_LIBHPDF),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_LIBHPDF
+
+INCLUDE_DIRS += \
+	-I$(TOPDIR)/libhpdf/include
+
+INCLUDE_LIBS += \
+	$(TOPDIR)/libhpdf/src/libhpdf.a
 endif
 
 # libxml2

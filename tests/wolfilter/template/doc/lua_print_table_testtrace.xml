@@ -1,36 +1,24 @@
-ENTER PrintText:
-1$ Text = 'invoice'
-ENTER PrintText:
-2$ R1 = '0', Text = 'invoice'
-ENTER PrintText:
-3$ R1 = '0', Text = 'invoice', Index = '0'
-LEAVE PrintText 3
-LEAVE PrintText 2
-ENTER PrintText:
-4$ R1 = '1.00000', Text = 'invoice'
-ENTER PrintText:
-5$ R1 = '1.00000', Text = 'invoice', Index = '0'
-LEAVE PrintText 5
-LEAVE PrintText 4
-ENTER PrintText:
-6$ R1 = '2.00000', Text = 'invoice'
-ENTER PrintText:
-7$ R1 = '2.00000', Text = 'invoice', Index = '0'
-LEAVE PrintText 7
-LEAVE PrintText 6
-ENTER PrintText:
-8$ Text = 'invoice', Index = '0'
-LEAVE PrintText 8
-ENTER PrintText:
-9$ Text = 'invoice', Index = '0'
-LEAVE PrintText 9
-ENTER PrintText:
-10$ Text = 'invoice', Index = '0'
-LEAVE PrintText 10
-ENTER PrintText:
-11$ Text = 'invoice', Index = '0'
-LEAVE PrintText 11
-ENTER PrintText:
-12$ Text = 'invoice', Index = '0'
-LEAVE PrintText 12
-LEAVE PrintText 1
+ENTER PrintText: 1$ Text = 'invoice'
+ENTER PrintText: 2$ R1 = '0', Text = 'invoice'
+ENTER PrintText: 3$ R1 = '0', Text = 'invoice', Index = '0'
+LEAVE PrintText: 3$ R1 = '0', Text = 'invoice', Index = '0'
+LEAVE PrintText: 2$ R1 = '0', Text = 'invoice'
+ENTER PrintText: 4$ R1 = '1.00000', Text = 'invoice'
+ENTER PrintText: 5$ R1 = '1.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 5$ R1 = '1.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 4$ R1 = '1.00000', Text = 'invoice'
+ENTER PrintText: 6$ R1 = '2.00000', Text = 'invoice'
+ENTER PrintText: 7$ R1 = '2.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 7$ R1 = '2.00000', Text = 'invoice', Index = '0'
+LEAVE PrintText: 6$ R1 = '2.00000', Text = 'invoice'
+ENTER PrintText: 8$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 8$ Text = 'invoice', Index = '0'
+ENTER PrintText: 9$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 9$ Text = 'invoice', Index = '0'
+ENTER PrintText: 10$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 10$ Text = 'invoice', Index = '0'
+ENTER PrintText: 11$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 11$ Text = 'invoice', Index = '0'
+ENTER PrintText: 12$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 12$ Text = 'invoice', Index = '0'
+LEAVE PrintText: 1$ Text = 'invoice'

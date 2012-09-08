@@ -214,7 +214,7 @@ public:
 				std::vector<std::size_t>::const_iterator me = m_variableScope.end_marker();
 				for (; mi != me; ++mi)
 				{
-					m_document->execute_leave( (Method::Id)*mi);
+					m_document->execute_leave( (Method::Id)*mi, m_variableScope);
 				}
 				m_variableScope.pop();
 				break;

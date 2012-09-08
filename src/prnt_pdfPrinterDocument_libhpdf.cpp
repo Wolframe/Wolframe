@@ -33,6 +33,7 @@ Project Wolframe.
 #include "prnt/pdfPrinterDocument.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include "logger-v1.hpp"
 #include "hpdf.h"
 
 using namespace _Wolframe;
@@ -47,6 +48,8 @@ public:
 		:m_hnd(0)
 		,m_pageidx(0)
 		,m_method(Method::PrintText)
+		,m_methodcall(false)
+		,m_cnt(0)
 	{
 		m_hnd = HPDF_New( error_handler, (void*)this);
 		if (!m_hnd)
@@ -58,6 +61,7 @@ public:
 	void execute( Method::Id m, VariableScope& vscope)
 	{
 		m_method = m;
+		m_methodcall = true;
 		switch (m_method)
 		{
 			case Method::DrawLine:
@@ -88,28 +92,84 @@ public:
 				m_pageidx = m_pagear.size();
 				break;
 		}
+		m_methodcall = false;
+	}
+
+	void execute_enter( Method::Id method, VariableScope& vscope)
+	{
+		m_stk.push_back( ++m_cnt);
+		LOG_TRACE << "enter " << methodName(method) << ": " << (int)m_cnt << "$ " << vardump(vscope);
+		execute( method, vscope);
+	}
+
+	void execute_leave( Method::Id method, VariableScope& vscope)
+	{
+		if (m_stk.empty()) throw std::runtime_error( "internal: call of enter/leave not balanced");
+		std::size_t idx = m_stk.back();
+		m_stk.pop_back();
+		LOG_TRACE << "leave " << methodName(method) << ": " << (int)idx << "$ " << vardump(vscope);
+	}
+
+	std::string tostring() const
+	{
+		std::string rt;
+		enum {bufallocsize=1<<14};
+		HPDF_BYTE buf[ bufallocsize];
+		HPDF_UINT32 bufsize = 0;
+		HPDF_SaveToStream( m_hnd);
+		HPDF_STATUS status = HPDF_OK;
+		while (status == HPDF_OK)
+		{
+			bufsize = bufallocsize;
+			status = HPDF_ReadFromStream( m_hnd, buf, &bufsize);
+			rt.append( (const char*)buf, bufsize * sizeof( HPDF_BYTE));
+		}
+		HPDF_ResetStream( m_hnd);
+		if (status != HPDF_STREAM_EOF) throw_error( "could not serialize printed PDF document into string");
+		return rt;
 	}
 
 private:
 	static void error_handler( HPDF_STATUS error_no, HPDF_STATUS detail_no, void* void_this_)
 	{
 		HpdfDocument* this_ = (HpdfDocument*)void_this_;
-		std::ostringstream msg;
-		msg << "error in method " << methodName(this_->m_method) << " calling hpdf (error code " << (int)error_no << ", detailed error code " << detail_no << ")";
-		throw std::runtime_error( msg.str());
+		std::ostringstream msgbuf;
+		if (this_->m_methodcall)
+		{
+			msgbuf << "error in method " << methodName(this_->m_method) << " calling hpdf (error code " << (int)error_no << ", detailed error code " << detail_no << ")";
+		}
+		else
+		{
+			msgbuf << "error printing PDF (calling hpdf error code " << (int)error_no << ", detailed error code " << detail_no << ")";
+		}
+		throw std::runtime_error( msgbuf.str());
 	}
 
 	void throw_error( const char* msg, const char* arg) const
 	{
 		std::ostringstream msgbuf;
-		msgbuf << "error in method " << methodName(m_method) << ": " << msg << " (" << arg << ")";
+		if (m_methodcall)
+		{
+			msgbuf << "error in method " << methodName(m_method) << ": " << msg << " (" << arg << ")";
+		}
+		else
+		{
+			msgbuf << "error printing PDF: " << msg << " (" << arg << ")";
+		}
 		throw std::runtime_error( msgbuf.str());
 	}
 
 	void throw_error( const char* msg) const
 	{
 		std::ostringstream msgbuf;
-		msgbuf << "error in method " << methodName(m_method) << ": " << msg;
+		if (m_methodcall)
+		{
+			msgbuf << "error in method " << methodName(m_method) << ": " << msg;
+		}
+		else
+		{
+			msgbuf << "error printing PDF: " << msg;
+		}
 		throw std::runtime_error( msgbuf.str());
 	}
 
@@ -235,7 +295,6 @@ private:
 			if (ii != ee) doc.throw_error( "illegal value for line style definition", src.c_str());
 		}
 	};
-
 
 	class Page
 	{
@@ -531,14 +590,34 @@ private:
 		}
 	};
 
+	std::string vardump( VariableScope& vscope)
+	{
+		std::ostringstream rt;
+
+		VariableScope::const_iterator vi = vscope.begin(), ve = vscope.end();
+		while (vi != ve)
+		{
+			if (vi != vscope.begin())
+			{
+				rt << ", ";
+			}
+			rt << variableName( vi->first) << " = '" << vscope.getValue( vi->second) << "'";
+			++vi;
+		}
+		return rt.str();
+	}
+
 private:
 	HPDF_Doc m_hnd;						//< libhpdf document handle
 	std::vector<Page> m_pagear;				//< array of pages defined
 	std::size_t m_pageidx;					//< page number starting from 1
 	Method::Id m_method;					//< current method executed
-	std::map<std::size_t,Font> m_fontmap;
-	std::map<std::size_t,LineStyle> m_linestylemap;
-	VariableCache m_vcache;
+	bool m_methodcall;					//< true, if we are currently executing a method
+	std::map<std::size_t,Font> m_fontmap;			//< map of variable content references to font descriptions (constructed only once)
+	std::map<std::size_t,LineStyle> m_linestylemap;		//< map of variable content references to line style (width,dash) descriptions (constructed only once)
+	VariableCache m_vcache;					//< currently active object references set by variables of the caller
+	std::vector< std::size_t> m_stk;			//< call counter stack
+	std::size_t m_cnt;					//< call counter
 };
 
 
@@ -547,20 +626,25 @@ struct DocumentImpl :public Document
 	DocumentImpl(){}
 	virtual ~DocumentImpl(){}
 
-	virtual void execute_enter( Method::Id method, const VariableScope& vars);
-	virtual void execute_leave( Method::Id method);
+	virtual void execute_enter( Method::Id method, VariableScope& vscope)
+	{
+		m_impl.execute_enter( method, vscope);
+	}
+	virtual void execute_leave( Method::Id method, VariableScope& vscope)
+	{
+		m_impl.execute_leave( method, vscope);
+	}
 
-	virtual std::string tostring() const;
+	virtual std::string tostring() const
+	{
+		return m_impl.tostring();
+	}
+
+private:
+	HpdfDocument m_impl;
 };
 }// anonymous namespace
 
-void DocumentImpl::execute_enter( Method::Id , const VariableScope&){}
-void DocumentImpl::execute_leave( Method::Id){}
-
-std::string DocumentImpl::tostring() const
-{
-	return std::string();
-}
 
 Document* _Wolframe::prnt::createLibHpdfDocument()
 {

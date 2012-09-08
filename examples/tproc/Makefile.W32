@@ -27,7 +27,6 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib
 
 # openssl
-
 !IFDEF WITH_SSL
 
 INCLUDE_DIRS = \
@@ -45,7 +44,6 @@ INCLUDE_LIBS = \
 !ENDIF
 
 # Lua
-
 !IFDEF WITH_LUA
 
 INCLUDE_CXXFLAGS = \
@@ -72,6 +70,18 @@ INCLUDE_DIRS = \
 INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
 	
+!ENDIF
+
+# libhpdf
+!IFDEF WITH_LIBHPDF
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_LIBHPDF
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS) /I"$(TOPDIR)\libhpdf\include"
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(TOPDIR)\libhpdf\src\hpdf.lib"
 !ENDIF
 
 OBJS = \

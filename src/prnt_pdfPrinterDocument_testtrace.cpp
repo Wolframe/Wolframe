@@ -47,42 +47,50 @@ public:
 		:m_cnt(0){}
 	virtual ~DocumentImpl(){}
 
-	virtual void execute_enter( Method::Id method, const VariableScope& vars);
-	virtual void execute_leave( Method::Id method);
+	virtual void execute_enter( Method::Id method, VariableScope& vars);
+	virtual void execute_leave( Method::Id method, VariableScope& vars);
 
 	virtual std::string tostring() const;
 
 private:
+	static std::string vardump( VariableScope& vars);
+
 	std::ostringstream m_out;
 	std::vector< std::size_t> m_stk;
 	std::size_t m_cnt;
 };
 }// anonymous namespace
 
-void DocumentImpl::execute_enter( Method::Id method, const VariableScope& vscope)
+
+std::string DocumentImpl::vardump( VariableScope& vscope)
 {
-	m_out << "ENTER " << methodName(method) << ":" << std::endl;
+	std::ostringstream rt;
+
 	VariableScope::const_iterator vi = vscope.begin(), ve = vscope.end();
-	m_stk.push_back( ++m_cnt);
-	m_out << m_cnt << "$ ";
 	while (vi != ve)
 	{
 		if (vi != vscope.begin())
 		{
-			m_out << ", ";
+			rt << ", ";
 		}
-		m_out << variableName( vi->first) << " = '" << vscope.getValue( vi->second) << "'";
+		rt << variableName( vi->first) << " = '" << vscope.getValue( vi->second) << "'";
 		++vi;
 	}
-	m_out << std::endl;
+	return rt.str();
 }
 
-void DocumentImpl::execute_leave( Method::Id method)
+void DocumentImpl::execute_enter( Method::Id method, VariableScope& vars)
+{
+	m_stk.push_back( ++m_cnt);
+	m_out << "ENTER " << methodName(method) << ": " << m_cnt << "$ " << vardump(vars) << std::endl;
+}
+
+void DocumentImpl::execute_leave( Method::Id method, VariableScope& vars)
 {
 	if (m_stk.empty()) throw std::runtime_error( "internal: call of enter/leave not balanced");
 	std::size_t idx = m_stk.back();
 	m_stk.pop_back();
-	m_out << "LEAVE " << methodName(method) << " " << idx << std::endl;
+	m_out << "LEAVE " << methodName(method) << ": " << idx << "$ " << vardump(vars) << std::endl;
 }
 
 std::string DocumentImpl::tostring() const
