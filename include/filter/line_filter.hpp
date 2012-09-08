@@ -39,8 +39,8 @@ Project Wolframe.
 namespace _Wolframe {
 namespace langbind {
 
-Filter createLineFilter( const std::string& name);
-Filter* createLineFilterPtr( const std::string& name);
+Filter createLineFilter( const std::string& name, const std::string& arg);
+Filter* createLineFilterPtr( const std::string& name, const std::string& arg);
 
 }}//namespace
 #endif

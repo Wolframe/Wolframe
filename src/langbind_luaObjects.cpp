@@ -1145,8 +1145,9 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 			{
 				throw std::runtime_error( "lost global context");
 			}
+			std::pair<std::string,std::string> filterid = Filter::identifier( name);
 			Filter flt;
-			if (!ctx->getFilter( name, flt))
+			if (!ctx->getFilter( filterid.first, filterid.second, flt))
 			{
 				throw std::runtime_error( "filter not defined");
 			}

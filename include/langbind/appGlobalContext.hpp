@@ -66,7 +66,7 @@ public:
 
 	bool load( const EnvironmentConfigStruct& config);
 
-	bool getFilter( const std::string& arg, Filter& rt) const;
+	bool getFilter( const std::string& name, const std::string& arg, Filter& rt) const;
 
 private:
 	bool loadScript( const ScriptCommandConfigStruct& config, std::string& itemname, std::string& error);

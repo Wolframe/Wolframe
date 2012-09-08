@@ -338,12 +338,12 @@ bool GlobalContext::load( const EnvironmentConfigStruct& config)
 	return rt;
 }
 
-bool GlobalContext::getFilter( const std::string& arg, Filter& fl) const
+bool GlobalContext::getFilter( const std::string& name, const std::string& arg, Filter& fl) const
 {
-	const Filter* fp = m_provider->filter( arg);
+	const Filter* fp = m_provider->filter( name, arg);
 	if (!fp)
 	{
-		bool rt = FilterMap::getFilter( arg, fl);
+		bool rt = FilterMap::getFilter( name, arg, fl);
 		return rt;
 	}
 	else

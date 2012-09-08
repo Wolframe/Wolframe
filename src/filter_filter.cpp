@@ -29,28 +29,40 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/token_filter.hpp
-///\brief Filter reading/writing the tokens of a filter input/output for debugging purposes
-
-#ifndef _Wolframe_FILTER_TOKEN_HPP_INCLUDED
-#define _Wolframe_FILTER_TOKEN_HPP_INCLUDED
+///\file filter_filter.cpp
+///\brief Implementation of filter class
 #include "filter/filter.hpp"
+#include <cstring>
 
-namespace _Wolframe {
-namespace langbind {
+using namespace _Wolframe;
+using namespace _Wolframe::langbind;
 
-enum TokenType
+bool Filter::getValue( const char* name, std::string& val) const
 {
-	TokenOpenTag='>',
-	TokenCloseTag='<',
-	TokenAttribute='@',
-	TokenValue='=',
-	TokenNextLine='.'
-};
+	if (m_inputfilter.get() && m_inputfilter->getValue( name, val)) return true;
+	if (m_outputfilter.get() && m_outputfilter->getValue( name, val)) return true;
+	return false;
+}
 
-Filter createTokenFilter( const std::string& name, const std::string& arg);
-Filter* createTokenFilterPtr( const std::string& name, const std::string& arg);
+std::pair<std::string,std::string> Filter::identifier( const std::string& id)
+{
+	const char* cc = id.c_str();
+	const char* ee = std::strchr( cc, ';');
+	if (ee)
+	{
+		return std::pair<std::string,std::string>( std::string( cc, ee-cc), ee + 1);
+	}
+	else
+	{
+		return std::pair<std::string,std::string>( cc, "");
+	}
+}
 
-}}//namespace
-#endif
+bool Filter::setValue( const char* name, const std::string& value)
+{
+	bool rt = false;
+	if (m_inputfilter.get() && m_inputfilter->setValue( name, value)) rt = true;
+	if (m_outputfilter.get() && m_outputfilter->setValue( name, value)) rt = true;
+	return rt;
+}
 

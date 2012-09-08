@@ -30,16 +30,14 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file filter/filter.hpp
-///\brief Interface for filter modules
+///\brief Interface for filter class
 
 #ifndef _Wolframe_FILTER_FILTER_INTERFACE_HPP_INCLUDED
 #define _Wolframe_FILTER_FILTER_INTERFACE_HPP_INCLUDED
 #include "types/countedReference.hpp"
 #include "filter/inputfilter.hpp"
 #include "filter/outputfilter.hpp"
-#include <map>
 #include <string>
-#include <cstring>
 
 namespace _Wolframe {
 namespace langbind {
@@ -62,31 +60,26 @@ public:
 	///\param [in] name case sensitive name of the variable
 	///\param [in] val the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	bool getValue( const char* name, std::string& val) const
-	{
-		if (m_inputfilter.get() && m_inputfilter->getValue( name, val)) return true;
-		if (m_outputfilter.get() && m_outputfilter->getValue( name, val)) return true;
-		return false;
-	}
+	bool getValue( const char* name, std::string& val) const;
+
+	///\brief Splits a name of the filter into its identifying parts (name + argument)
+	///\param [in] id identifier of the filter (name + ":" + arguments)
+	///\return pair describing the filter (name -> first, arguments -> second)
+	static std::pair<std::string,std::string> identifier( const std::string& id);
 
 	///\brief Set a member value of the filter
 	///\param [in] name case sensitive name of the variable
 	///\param [in] value new value of the variable to set
 	///\return true on success, false, if the variable does not exist or the operation failed
-	bool setValue( const char* name, const std::string& value)
-	{
-		bool rt = false;
-		if (m_inputfilter.get() && m_inputfilter->setValue( name, value)) rt = true;
-		if (m_outputfilter.get() && m_outputfilter->setValue( name, value)) rt = true;
-		return rt;
-	}
+	bool setValue( const char* name, const std::string& value);
+
 protected:
 	InputFilterR m_inputfilter;
 	OutputFilterR m_outputfilter;
 };
 
-typedef Filter (*CreateFilterFunc)( const std::string& name);
-typedef Filter* (*CreateFilterPtrFunc)( const std::string& name);
+typedef Filter (*CreateFilterFunc)( const std::string& name, const std::string& arg);
+typedef Filter* (*CreateFilterPtrFunc)( const std::string& name, const std::string& arg);
 
 
 }}//namespace

@@ -46,7 +46,7 @@ DoctypeFilterCommandHandler::DoctypeFilterCommandHandler()
 	:m_state(Processing)
 	,m_itrpos(0)
 {
-	langbind::Filter flt = createTextwolfXmlFilter( "xml:textwolf");
+	langbind::Filter flt = createTextwolfXmlFilter( "xml:textwolf", "");
 	m_inputfilter = flt.inputfilter();
 }
 

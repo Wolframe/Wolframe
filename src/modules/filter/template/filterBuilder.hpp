@@ -45,8 +45,10 @@ namespace module {
 class FilterConstructor :public SimpleObjectConstructor< langbind::Filter >
 {
 public:
-	FilterConstructor( const char* name_, const langbind::CreateFilterPtrFunc filterFunc_ )
-		: m_name(name_), m_function(filterFunc_) {}
+	FilterConstructor( const char* name_, const std::string& arg_, const langbind::CreateFilterPtrFunc filterFunc_ )
+		: m_name(name_)
+		, m_arg(arg_)
+		, m_function(filterFunc_) {}
 
 	virtual ~FilterConstructor(){}
 
@@ -55,9 +57,10 @@ public:
 		return FILTER_OBJECT;
 	}
 	virtual const char* identifier() const		{ return m_name.c_str(); }
-	virtual langbind::Filter* object() const	{ return m_function( m_name ); }
+	virtual langbind::Filter* object() const	{ return m_function( m_name, m_arg ); }
 private:
 	const std::string m_name;
+	const std::string m_arg;
 	const langbind::CreateFilterPtrFunc m_function;
 };
 
@@ -65,15 +68,18 @@ template <langbind::CreateFilterPtrFunc createFilterPtrFunc>
 class FilterBuilder :public SimpleBuilder
 {
 public:
-	FilterBuilder( const char* name_)
-		:SimpleBuilder( name_){}
+	FilterBuilder( const char* name_, const char* arg_)
+		:SimpleBuilder( name_)
+		,m_arg(arg_){}
 
 	virtual ~FilterBuilder(){}
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new FilterConstructor( m_identifier, createFilterPtrFunc );
+		return new FilterConstructor( m_identifier, m_arg, createFilterPtrFunc );
 	}
+private:
+	std::string m_arg;
 };
 
 }}//namespace

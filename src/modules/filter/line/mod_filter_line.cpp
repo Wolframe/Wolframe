@@ -53,42 +53,42 @@ namespace {
 struct LineFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line");}
+		{return new FilterBuilder<lb::createLineFilterPtr>("line", "");}
 };
 struct LineFilterObject_UTF8
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line:UTF-8");}
+		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UTF-8");}
 };
 struct LineFilterObject_UTF16BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line:UTF-16BE");}
+		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UTF-16BE");}
 };
 struct LineFilterObject_UTF16LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line:UTF-16LE");}
+		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UTF-16LE");}
 };
 struct LineFilterObject_UCS2BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line:UCS-2BE");}
+		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UCS-2BE");}
 };
 struct LineFilterObject_UCS2LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line:UCS-2LE");}
+		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UCS-2LE");}
 };
 struct LineFilterObject_UCS4BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line:UCS-4BE");}
+		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UCS-4BE");}
 };
 struct LineFilterObject_UCS4LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line:UCS-4LE");}
+		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UCS-4LE");}
 };
 
 }//anonymous namespace

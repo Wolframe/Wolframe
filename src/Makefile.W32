@@ -107,6 +107,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_doctypeFilterCommandHandler.obj \
 	cmdbind_directmapCommandHandler.obj \
 	filter_filterbase.obj \
+	filter_filter.obj \
 	filter_doctype.obj \
 	filter_tostringfilter.obj \
 	filter_ptreefilter.obj \

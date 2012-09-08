@@ -47,7 +47,7 @@ IOFilterCommandHandler::IOFilterCommandHandler()
 	,m_writedatasize(0)
 	,m_itrpos(0)
 {
-	langbind::Filter flt = createCharFilter( "char");
+	langbind::Filter flt = createCharFilter( "char", "");
 	m_inputfilter = flt.inputfilter();
 	m_outputfilter = flt.outputfilter();
 }

@@ -53,42 +53,42 @@ namespace {
 struct Libxml2FilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2");}
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "");}
 };
 struct Libxml2FilterObject_UTF8
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UTF-8");}
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UTF-8");}
 };
 struct Libxml2FilterObject_UTF16BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UTF-16BE");}
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UTF-16BE");}
 };
 struct Libxml2FilterObject_UTF16LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UTF-16LE");}
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UTF-16LE");}
 };
 struct Libxml2FilterObject_UCS2BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UCS-2BE");}
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UCS-2BE");}
 };
 struct Libxml2FilterObject_UCS2LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UCS-2LE");}
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UCS-2LE");}
 };
 struct Libxml2FilterObject_UCS4BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UCS-4BE");}
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UCS-4BE");}
 };
 struct Libxml2FilterObject_UCS4LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2:UCS-4LE");}
+		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UCS-4LE");}
 };
 
 }//anonymous namespace

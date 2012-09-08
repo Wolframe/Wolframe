@@ -51,15 +51,17 @@
 using namespace _Wolframe;
 using namespace langbind;
 
-static Filter getFilter( GlobalContext* gc, const std::string& ifl, const std::string& ofl)
+static Filter getFilter( GlobalContext* gc, const std::string& ifl_, const std::string& ofl_)
 {
 	Filter rt;
-	if (boost::iequals( ofl, ifl))
+	std::pair<std::string,std::string> ifl = Filter::identifier( ifl_);
+	std::pair<std::string,std::string> ofl = Filter::identifier( ofl_);
+	if (boost::iequals( ofl_, ifl_))
 	{
-		if (!gc->getFilter( ifl.c_str(), rt))
+		if (!gc->getFilter( ifl.first, ifl.second, rt))
 		{
 			std::ostringstream msg;
-			msg << "unknown filter '" << ifl << "'";
+			msg << "unknown filter: name = '" << ifl.first << " arguments = " << ofl.second << "'";
 			throw std::runtime_error( msg.str());
 		}
 	}
@@ -67,16 +69,16 @@ static Filter getFilter( GlobalContext* gc, const std::string& ifl, const std::s
 	{
 		Filter in;
 		Filter out;
-		if (!gc->getFilter( ifl.c_str(), in))
+		if (!gc->getFilter( ifl.first, ifl.second, in))
 		{
 			std::ostringstream msg;
-			msg << "unknown input filter '" << ifl << "'";
+			msg << "unknown input filter: name = '" << ifl.first << " arguments = " << ifl.second << "'";
 			throw std::runtime_error( msg.str());
 		}
-		if (!gc->getFilter( ofl.c_str(), out))
+		if (!gc->getFilter( ofl.first, ofl.second, out))
 		{
 			std::ostringstream msg;
-			msg << "unknown output filter '" << ofl << "'";
+			msg << "unknown output filter: name = '" << ofl.first << " arguments = " << ofl.second << "'";
 			throw std::runtime_error( msg.str());
 		}
 		rt = Filter( in.inputfilter(), out.outputfilter());

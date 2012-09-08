@@ -311,8 +311,8 @@ static std::string selectedTestName;
 
 void pushTestInput( const langbind::TransactionFunction::InputR& input, std::string tdinput)
 {
-	langbind::Filter tokenfilter = langbind::createTokenFilter( "token:UTF-8");
-	langbind::Filter xmlfilter = langbind::createTextwolfXmlFilter( "xml:textwolf");
+	langbind::Filter tokenfilter = langbind::createTokenFilter( "token", "UTF-8");
+	langbind::Filter xmlfilter = langbind::createTextwolfXmlFilter( "xml:textwolf", "");
 	langbind::TypingInputFilter inp( xmlfilter.inputfilter());
 
 	xmlfilter.inputfilter()->setValue( "empty", "false");

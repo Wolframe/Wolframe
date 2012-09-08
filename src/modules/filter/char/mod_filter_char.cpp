@@ -49,42 +49,42 @@ namespace {
 struct CharFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char");}
+		{return new FilterBuilder<lb::createCharFilterPtr>("char", "");}
 };
 struct CharFilterObject_UTF8
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char:UTF-8");}
+		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UTF-8");}
 };
 struct CharFilterObject_UTF16BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char:UTF-16BE");}
+		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UTF-16BE");}
 };
 struct CharFilterObject_UTF16LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char:UTF-16LE");}
+		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UTF-16LE");}
 };
 struct CharFilterObject_UCS2BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char:UCS-2BE");}
+		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UCS-2BE");}
 };
 struct CharFilterObject_UCS2LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char:UCS-2LE");}
+		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UCS-2LE");}
 };
 struct CharFilterObject_UCS4BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char:UCS-4BE");}
+		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UCS-4BE");}
 };
 struct CharFilterObject_UCS4LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char:UCS-4LE");}
+		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UCS-4LE");}
 };
 
 }//anonymous namespace

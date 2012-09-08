@@ -54,42 +54,42 @@ namespace {
 struct BlobFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "");}
 };
 struct BlobFilterObject_UTF8
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UTF-8");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UTF-8");}
 };
 struct BlobFilterObject_UTF16BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UTF-16BE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UTF-16BE");}
 };
 struct BlobFilterObject_UTF16LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UTF-16LE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UTF-16LE");}
 };
 struct BlobFilterObject_UCS2BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UCS-2BE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UCS-2BE");}
 };
 struct BlobFilterObject_UCS2LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UCS-2LE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UCS-2LE");}
 };
 struct BlobFilterObject_UCS4BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UCS-4BE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UCS-4BE");}
 };
 struct BlobFilterObject_UCS4LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob:UCS-4LE");}
+		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UCS-4LE");}
 };
 
 }//anonymous namespace

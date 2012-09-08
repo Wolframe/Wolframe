@@ -53,42 +53,42 @@ namespace {
 struct TextwolfXMLFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf");}
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf", "");}
 };
 struct TextwolfXMLFilterObject_UTF8
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UTF-8");}
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf", "UTF-8");}
 };
 struct TextwolfXMLFilterObject_UTF16BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UTF-16BE");}
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf", "UTF-16BE");}
 };
 struct TextwolfXMLFilterObject_UTF16LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UTF-16LE");}
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf", "UTF-16LE");}
 };
 struct TextwolfXMLFilterObject_UCS2BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UCS-2BE");}
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf", "UCS-2BE");}
 };
 struct TextwolfXMLFilterObject_UCS2LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UCS-2LE");}
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf", "UCS-2LE");}
 };
 struct TextwolfXMLFilterObject_UCS4BE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UCS-4BE");}
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf", "UCS-4BE");}
 };
 struct TextwolfXMLFilterObject_UCS4LE
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf:UCS-4LE");}
+		{return new FilterBuilder<lb::createTextwolfXmlFilterPtr>("xml:textwolf", "UCS-4LE");}
 };
 
 }//anonymous namespace

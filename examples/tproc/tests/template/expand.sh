@@ -6,6 +6,6 @@
 
 for ff in `find data -type f -name "*.tst"`; do
 	echo Expanding template $ff
-	./$ff 
+	./$ff
 done
 
