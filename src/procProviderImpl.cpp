@@ -216,7 +216,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 								it != modules->objectsEnd(); it++ )	{
 		switch( it->constructor()->objectType() )	{
 			case ObjectConstructorBase::FILTER_OBJECT:	{	// object is a filter
-				module::FilterCreator* fltr = dynamic_cast< module::FilterCreator* >((*it)->constructor());
+				module::FilterConstructor* fltr = dynamic_cast< module::FilterConstructor* >((*it)->constructor());
 				if ( fltr == NULL )	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
 						  << "'' is not a filter";
@@ -225,7 +225,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					std::string name = fltr->identifier();
 					boost::algorithm::to_upper( name );
-					std::map <const std::string, const module::FilterCreator* >::const_iterator fltrItr = m_filterMap.find( name );
+					std::map <const std::string, const module::FilterConstructor* >::const_iterator fltrItr = m_filterMap.find( name );
 					if ( fltrItr != m_filterMap.end() )	{
 						LOG_FATAL << "Duplicate filter name '" << name << "'";
 						throw std::runtime_error( "Duplicate filter name" );
@@ -299,7 +299,7 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 	for ( std::list< cmdbind::CommandHandlerUnit* >::iterator it = m_handler.begin();
 							it != m_handler.end(); it++ )
 		delete *it;
-	for ( std::list< const module::FilterCreator* >::iterator it = m_filter.begin();
+	for ( std::list< const module::FilterConstructor* >::iterator it = m_filter.begin();
 							it != m_filter.end(); it++ )
 		delete *it;
 }
@@ -324,7 +324,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name ) const
 {
 	std::string filterName = boost::algorithm::to_upper_copy( name );
-	std::map <const std::string, const module::FilterCreator* >::const_iterator fltr = m_filterMap.find( filterName );
+	std::map <const std::string, const module::FilterConstructor* >::const_iterator fltr = m_filterMap.find( filterName );
 	if ( fltr == m_filterMap.end() )
 		return NULL;
 	else

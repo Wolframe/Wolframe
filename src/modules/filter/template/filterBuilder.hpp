@@ -42,21 +42,23 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-class FilterCreator :public SimpleObjectConstructor< langbind::Filter >
+class FilterConstructor :public SimpleObjectConstructor< langbind::Filter >
 {
 public:
-	FilterCreator( const char* name_, const langbind::CreateFilterPtrFunc filterFunc_ )
+	FilterConstructor( const char* name_, const langbind::CreateFilterPtrFunc filterFunc_ )
 		: m_name(name_), m_function(filterFunc_) {}
 
-	virtual ~FilterCreator(){}
+	virtual ~FilterConstructor(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
-						{ return FILTER_OBJECT; }
-	virtual const char* identifier() const	{ return m_name.c_str(); }
-	virtual langbind::Filter* object() const{ return m_function( m_name ); }
+	{
+		return FILTER_OBJECT;
+	}
+	virtual const char* identifier() const		{ return m_name.c_str(); }
+	virtual langbind::Filter* object() const	{ return m_function( m_name ); }
 private:
-	const std::string			m_name;
-	const langbind::CreateFilterPtrFunc	m_function;
+	const std::string m_name;
+	const langbind::CreateFilterPtrFunc m_function;
 };
 
 template <langbind::CreateFilterPtrFunc createFilterPtrFunc>
@@ -70,7 +72,7 @@ public:
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new FilterCreator( m_identifier, createFilterPtrFunc );
+		return new FilterConstructor( m_identifier, createFilterPtrFunc );
 	}
 };
 
