@@ -291,7 +291,7 @@ std::string SimplePdfPrintFunction::tostring() const
 	return m_impl->tostring();
 }
 
-#if !WITH_LIBHPDF
+#ifndef WITH_LIBHPDF
 Document* _Wolframe::prnt::createLibHpdfDocument()
 {
 	throw std::runtime_error( "libhpdf support not built in. function requires the software to be built with WITH_LIBHPDF=1");
