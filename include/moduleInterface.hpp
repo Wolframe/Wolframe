@@ -58,6 +58,7 @@ public:
 
 	const char* identifier() const			{ return m_identifier; }
 
+	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
 	virtual ObjectConstructorBase* constructor() = 0;
 protected:
 	const char* m_identifier;
@@ -77,6 +78,7 @@ public:
 
 	const char* identifier() const			{ return m_identifier; }
 
+	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
 	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
 	virtual ObjectConstructorBase* constructor() = 0;
 protected:
@@ -101,6 +103,9 @@ public:
 
 	virtual config::NamedConfiguration* configuration( const char* logPrefix )	{
 		return new Tconf( m_title, logPrefix, m_keyword );
+	}
+	virtual ObjectConstructorBase::ObjectType objectType() const	{
+		return m_constructor.objectType();
 	}
 	virtual ObjectConstructorBase* constructor()	{
 		return &m_constructor;

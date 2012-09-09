@@ -219,7 +219,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	// Build the lists of objects
 	for ( module::ModulesDirectory::simpleBuilder_iterator it = modules->objectsBegin();
 								it != modules->objectsEnd(); it++ )	{
-		switch( it->constructor()->objectType() )	{
+		switch( it->objectType() )	{
 			case ObjectConstructorBase::FILTER_OBJECT:	{	// object is a filter
 				module::FilterConstructor* fltr = dynamic_cast< module::FilterConstructor* >((*it)->constructor());
 				if ( fltr == NULL )	{

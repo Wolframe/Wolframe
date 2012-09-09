@@ -79,6 +79,10 @@ public:
 
 	virtual ~FilterBuilder(){}
 
+	virtual ObjectConstructorBase::ObjectType objectType() const
+	{
+		return ObjectConstructorBase::FILTER_OBJECT;
+	}
 	virtual ObjectConstructorBase* constructor()
 	{
 		return new FilterConstructor( m_identifier, m_createFunc);

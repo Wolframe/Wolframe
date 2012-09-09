@@ -70,6 +70,10 @@ public:
 
 	virtual ~DDLCompilerBuilder(){}
 
+	virtual ObjectConstructorBase::ObjectType objectType() const
+	{
+		return ObjectConstructorBase::DDL_COMPILER_OBJECT;
+	}
 	virtual ObjectConstructorBase* constructor()
 	{
 		return new DDLCompilerContainer<CompilerInterfaceC>(m_identifier.c_str());

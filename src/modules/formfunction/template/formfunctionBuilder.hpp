@@ -76,6 +76,10 @@ public:
 
 	virtual ~FormFunctionBuilder(){}
 
+	virtual ObjectConstructorBase::ObjectType objectType() const
+	{
+		return ObjectConstructorBase::FORM_FUNCTION_OBJECT;
+	}
 	virtual ObjectConstructorBase* constructor()
 	{
 		return new FormFunctionConstructor( m_identifier, m_func);
