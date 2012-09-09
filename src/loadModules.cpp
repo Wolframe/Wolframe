@@ -36,6 +36,7 @@
 
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"
+#include "utils/miscUtils.hpp"
 
 #if !defined(_WIN32)	// POSIX module loader
 
@@ -119,7 +120,14 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir, const std::list< 
 							it != modFiles.end(); it++ )	{
 		LOG_TRACE << "Loading module '" << *it << "'";
 #if !defined(_WIN32)	// POSIX module loader
-		void* hndl = dlopen( it->c_str(), RTLD_LAZY );
+		void* hndl;
+		if (utils::getFileExtension( *it).empty())	{
+			std::string path = *it + ".so";
+			hndl = dlopen( path.c_str(), RTLD_LAZY );
+		}
+		else	{
+			hndl = dlopen( it->c_str(), RTLD_LAZY );
+		}
 		if ( !hndl )	{
 			LOG_ERROR << "Module loader: " << dlerror()
 				  << ", (while loading module '" << *it << "')";
