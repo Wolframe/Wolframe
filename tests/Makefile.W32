@@ -147,12 +147,14 @@ local_all:
 
 local_clean:
 	@-erase test.bat logTest.log 2>NUL
-	@-erase /s /q temp 2>NUL
+	@-erase /s /q temp >NUL 2>NUL
+	@-rmdir temp 2>NUL
 
 local_distclean:
 
 local_test:
 	@-echo @echo off > test.bat
+	@-echo mkdir temp >> test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" . >> test.bat
 	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
