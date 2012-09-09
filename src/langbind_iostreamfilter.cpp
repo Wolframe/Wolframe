@@ -88,13 +88,13 @@ static Filter getFilter( GlobalContext* gc, const std::string& ifl_, const std::
 		if (!gc->getFilter( ifl.first, ifl.second, in))
 		{
 			std::ostringstream msg;
-			msg << "unknown input filter: name = '" << ifl.first << " arguments = " << ifl.second << "'";
+			msg << "unknown input filter: name = '" << ifl.first << "' arguments = '" << ifl.second << "'";
 			throw std::runtime_error( msg.str());
 		}
 		if (!gc->getFilter( ofl.first, ofl.second, out))
 		{
 			std::ostringstream msg;
-			msg << "unknown output filter: name = '" << ofl.first << " arguments = " << ofl.second << "'";
+			msg << "unknown output filter: name = '" << ofl.first << "' arguments = '" << ofl.second << "'";
 			throw std::runtime_error( msg.str());
 		}
 		rt = Filter( in.inputfilter(), out.outputfilter());
