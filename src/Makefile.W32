@@ -77,7 +77,8 @@ INCLUDE_DIRS = \
 	$(INCLUDE_DIRS) /I"$(TOPDIR)\libhpdf\include"
 
 INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(TOPDIR)\libhpdf\src\hpdf.lib"
+	$(INCLUDE_LIBS) "$(TOPDIR)\libhpdf\src\hpdf.lib" \
+	"$(TOPDIR)\zlib\zlib.lib" "$(TOPDIR)\libpng\libpng.lib"
 !ENDIF
 
 
