@@ -62,6 +62,7 @@ public:
 
 	cmdbind::CommandHandler* handler( const std::string& command ) const;
 	const langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
+	const langbind::FormFunction* formfunction( const std::string& name ) const;
 
 private:
 	std::string					m_dbLabel;
@@ -70,6 +71,8 @@ private:
 	std::map< const std::string, cmdbind::CommandHandlerCreator* >	m_cmdMap;
 	std::list< const module::FilterConstructor* >	m_filter;
 	std::map< const std::string, const module::FilterConstructor* >	m_filterMap;
+	std::list< const module::FormFunctionConstructor* >	m_formfunction;
+	std::map< const std::string, const module::FormFunctionConstructor* >	m_formfunctionMap;
 };
 
 }} // namespace _Wolframe::proc

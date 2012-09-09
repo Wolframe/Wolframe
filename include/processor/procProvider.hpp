@@ -40,6 +40,7 @@
 #include <boost/noncopyable.hpp>
 #include "database/DBprovider.hpp"
 #include "filter/filter.hpp"
+#include "langbind/appFormFunction.hpp"
 #include "cmdbind/commandHandler.hpp"
 
 namespace _Wolframe {
@@ -78,6 +79,7 @@ public:
 
 	cmdbind::CommandHandler* handler( const std::string& command ) const;
 	const langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
+	const langbind::FormFunction* formfunction( const std::string& name) const;
 
 private:
 	class ProcessorProvider_Impl;

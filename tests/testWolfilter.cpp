@@ -36,7 +36,6 @@
 #include "logger-v1.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "wolfilterCommandLine.hpp"
-#include "wolfilter/src/employee_assignment_print.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
 #include "moduleInterface.hpp"
@@ -72,12 +71,6 @@ static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
 	g_processorProvider.reset( new proc::ProcessorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory()));
 	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider.get());
 	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
-
-	gct->defineFormFunction( "employee_assignment_convert",
-					langbind::FormFunction(
-						test::convertAssignmentListDoc,
-						test::AssignmentListDoc::getStructDescription(),
-						test::AssignmentListDoc::getStructDescription()));
 
 	langbind::TransactionFunctionR func( new EchoTransactionFunction());
 	gct->defineTransactionFunction( "echo_transaction", func);

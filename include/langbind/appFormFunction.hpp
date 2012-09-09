@@ -84,7 +84,7 @@ public:
 private:
 	Function* m_function;						//< form function implementation
 	const serialize::StructDescriptionBase* m_api_param;		//< api parameter description
-	const serialize::StructDescriptionBase* m_api_result;	//< api result description
+	const serialize::StructDescriptionBase* m_api_result;		//< api result description
 };
 
 }}//namespace

@@ -56,7 +56,7 @@ struct employee_assingment_convert_func
 		static const serialize::StructDescriptionBase* result = AssignmentListDoc::getStructDescription();
 		langbind::FormFunction func( convertAssignmentListDoc, param, result);
 
-		return new FormFunctionBuilder( "employee_assingment_convert", func);
+		return new FormFunctionBuilder( "employee_assignment_convert", func);
 	}
 };
 }

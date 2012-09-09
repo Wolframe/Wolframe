@@ -349,8 +349,24 @@ bool GlobalContext::getFilter( const std::string& name, const std::string& arg, 
 	else
 	{
 		fl = *fp;
+		delete fp;
 		return true;
 	}
 }
 
+bool GlobalContext::getFormFunction( const std::string& name, FormFunction& func) const
+{
+	const FormFunction* fp = m_provider->formfunction( name);
+	if (!fp)
+	{
+		bool rt = FormFunctionMap::getFormFunction( name, func);
+		return rt;
+	}
+	else
+	{
+		func = *fp;
+		delete fp;
+		return true;
+	}
+}
 
