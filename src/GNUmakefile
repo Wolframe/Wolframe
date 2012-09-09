@@ -103,7 +103,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_ioFilterCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \
 	cmdbind_directmapCommandHandler.o \
-	filter_filterbase.o \
 	filter_filter.o \
 	filter_doctype.o \
 	filter_typingfilter.o \
@@ -114,7 +113,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_token_filter.o \
 	filter_tostringfilter.o \
 	filter_ptreefilter.o \
-	ddl_compiler_simpleFormCompiler.o \
 	database_processor.o \
 	prnt_pdfPrinterVariable.o \
 	prnt_pdfPrinterMethod.o \

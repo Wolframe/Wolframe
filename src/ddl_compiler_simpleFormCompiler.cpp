@@ -362,5 +362,9 @@ StructType SimpleFormCompiler::compile( const std::string& srcstring) const
 	return rt;
 }
 
+DDLCompiler* _Wolframe::ddl::createSimpleFormCompilerFunc()
+{
+	return new SimpleFormCompiler();
+}
 
 

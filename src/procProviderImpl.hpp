@@ -43,6 +43,7 @@
 #include "modules/filter/template/filterBuilder.hpp"
 #include "modules/ddlcompiler/template/ddlcompilerBuilder.hpp"
 #include "modules/formfunction/template/formfunctionBuilder.hpp"
+#include "modules/ddlcompiler/template/ddlcompilerBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 
 #include <list>
@@ -61,8 +62,9 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	cmdbind::CommandHandler* handler( const std::string& command ) const;
-	const langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
-	const langbind::FormFunction* formfunction( const std::string& name ) const;
+	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
+	langbind::FormFunction* formfunction( const std::string& name ) const;
+	ddl::DDLCompiler* ddlcompiler( const std::string& name ) const;
 
 private:
 	std::string					m_dbLabel;
@@ -73,6 +75,8 @@ private:
 	std::map< const std::string, const module::FilterConstructor* >	m_filterMap;
 	std::list< const module::FormFunctionConstructor* >	m_formfunction;
 	std::map< const std::string, const module::FormFunctionConstructor* >	m_formfunctionMap;
+	std::list< const module::DDLCompilerConstructor* >	m_ddlcompiler;
+	std::map< const std::string, const module::DDLCompilerConstructor* >	m_ddlcompilerMap;
 };
 
 }} // namespace _Wolframe::proc

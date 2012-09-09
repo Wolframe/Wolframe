@@ -42,6 +42,7 @@
 #include "filter/filter.hpp"
 #include "langbind/appFormFunction.hpp"
 #include "cmdbind/commandHandler.hpp"
+#include "ddl/compilerInterface.hpp"
 
 namespace _Wolframe {
 namespace proc {
@@ -78,8 +79,9 @@ public:
 	bool resolveDB( const db::DatabaseProvider& db );
 
 	cmdbind::CommandHandler* handler( const std::string& command ) const;
-	const langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
-	const langbind::FormFunction* formfunction( const std::string& name) const;
+	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
+	langbind::FormFunction* formfunction( const std::string& name) const;
+	ddl::DDLCompiler* ddlcompiler( const std::string& name) const;
 
 private:
 	class ProcessorProvider_Impl;

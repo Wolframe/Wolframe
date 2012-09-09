@@ -54,7 +54,6 @@
 #include <iostream>
 
 ///\remark Hack for linking this stuff to the test program. Can't do it in the makefile unfortunately
-#include "wolfilter/src/employee_assignment_print.cpp"
 #include "wolfilter/src/echo_cmdhandler.cpp"
 
 static int g_gtest_ARGC = 0;

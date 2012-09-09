@@ -106,7 +106,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_ioFilterCommandHandler.obj \
 	cmdbind_doctypeFilterCommandHandler.obj \
 	cmdbind_directmapCommandHandler.obj \
-	filter_filterbase.obj \
 	filter_filter.obj \
 	filter_doctype.obj \
 	filter_tostringfilter.obj \
@@ -120,7 +119,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	types_allocators.obj \
 	types_bcdArithmetic.obj \
 	types_dateArithmetic.obj \
-	ddl_compiler_simpleFormCompiler.obj \
 	database_processor.obj \
 	prnt_pdfPrinterVariable.obj \
 	prnt_pdfPrinterMethod.obj \

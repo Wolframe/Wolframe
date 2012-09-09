@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = modules AAAA wolfilter
+SUBDIRS = modules AAAA simpleFormCompiler wolfilter
 
 ifeq ($(WITH_EXPECT),1)
 SUBDIRS += expect config
@@ -121,7 +121,6 @@ TEST_CPP_BINS = \
 	configStructParser$(EXE) \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
-	testSimpleFormCompiler$(EXE) \
 	testWolfilter$(EXE) \
 	testDatabaseProcessorVM$(EXE)
 
@@ -135,7 +134,6 @@ protocolArgumentParsing$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolf
 testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 configValueParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 configStructParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
-testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testDatabaseProcessorVM$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
@@ -187,8 +185,6 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./configStructParser config/structparser.conf
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testProtocolLFdotEscaping
-	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testSimpleFormCompiler
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize ./testWolfilter
 	@echo

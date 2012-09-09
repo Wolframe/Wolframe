@@ -70,7 +70,7 @@ TEST_F( SimpleFormCompilerTest, tests)
 	unsigned int ti;
 	for (ti=0; testDescription[ti].srcfile; ti++)
 	{
-		boost::filesystem::path pp = g_testdir / "simpleFormCompiler" / "data" / testDescription[ti].srcfile;
+		boost::filesystem::path pp = g_testdir / "data" / testDescription[ti].srcfile;
 		std::string srcfile = pp.string() + ".simpleform";
 		ddl::SimpleFormCompiler mm;
 		ddl::StructType sr = mm.compile( utils::readSourceFileContent( srcfile));
@@ -81,7 +81,7 @@ TEST_F( SimpleFormCompilerTest, tests)
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
-	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path().parent_path().parent_path();
 
 	return RUN_ALL_TESTS();
 }

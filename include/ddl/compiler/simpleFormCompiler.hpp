@@ -41,14 +41,16 @@ Project Wolframe.
 namespace _Wolframe {
 namespace ddl {
 
-class SimpleFormCompiler :public CompilerInterface
+class SimpleFormCompiler :public DDLCompiler
 {
 public:
-	SimpleFormCompiler() :CompilerInterface( "simpleform") {}
+	SimpleFormCompiler() :DDLCompiler( "simpleform") {}
 
-	///\brief Compile a source from a string. See CompilerInterface::compile( const std::string&) const
+	///\brief Compile a source from a string. See DDLCompiler::compile( const std::string&) const
 	virtual StructType compile( const std::string& srcstring) const;
 };
+
+DDLCompiler* createSimpleFormCompilerFunc();
 
 }}
 #endif

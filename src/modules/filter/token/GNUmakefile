@@ -17,8 +17,6 @@ INCLUDE_LIBS =
 DYNAMIC_MODULE = mod_filter_token.so
 
 CPP_OBJS = \
-	$(TOPDIR)/src/filter_filterbase.o \
-	$(TOPDIR)/src/filter_doctype.o \
 	$(TOPDIR)/src/filter_token_filter.o \
 	mod_filter_token.o
 

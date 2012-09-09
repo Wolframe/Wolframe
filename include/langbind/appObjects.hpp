@@ -406,10 +406,10 @@ public:
 	DDLCompilerMap();
 	~DDLCompilerMap(){}
 
-	void defineDDLCompiler( const std::string& name, const ddl::CompilerInterfaceR& ci);
-	bool getDDLCompiler( const std::string& name, ddl::CompilerInterfaceR& rt) const;
+	void defineDDLCompiler( const std::string& name, const ddl::DDLCompilerR& ci);
+	bool getDDLCompiler( const std::string& name, ddl::DDLCompilerR& rt) const;
 private:
-	std::map<std::string,ddl::CompilerInterfaceR> m_map;
+	std::map<std::string,ddl::DDLCompilerR> m_map;
 };
 
 }} //namespace

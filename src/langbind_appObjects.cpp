@@ -474,17 +474,14 @@ bool PreparedStatementHandlerMap::getPreparedStatementHandler( const std::string
 }
 
 DDLCompilerMap::DDLCompilerMap()
-{
-	ddl::CompilerInterfaceR simpleformCompiler( new ddl::SimpleFormCompiler());
-	m_map[ simpleformCompiler->ddlname()] = simpleformCompiler;
-}
+{}
 
-void DDLCompilerMap::defineDDLCompiler( const std::string& name, const ddl::CompilerInterfaceR& f)
+void DDLCompilerMap::defineDDLCompiler( const std::string& name, const ddl::DDLCompilerR& f)
 {
 	defineObject( m_map, name, f);
 }
 
-bool DDLCompilerMap::getDDLCompiler( const std::string& name, ddl::CompilerInterfaceR& rt) const
+bool DDLCompilerMap::getDDLCompiler( const std::string& name, ddl::DDLCompilerR& rt) const
 {
 	return getObject( m_map, name, rt);
 }

@@ -40,33 +40,39 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-template <class CompilerInterfaceC>
-class DDLCompilerContainer :public ObjectConstructorBase, public CompilerInterfaceC
+class DDLCompilerConstructor :public SimpleObjectConstructor< ddl::DDLCompiler >
 {
 public:
-	DDLCompilerContainer( const char* name_)
-		:CompilerInterfaceC()
-		,m_name(name_){}
+	DDLCompilerConstructor( const char* name_, const ddl::CreateDDLCompilerFunc createFunc_ )
+		: m_name(name_)
+		, m_createFunc(createFunc_) {}
 
-	virtual ~DDLCompilerContainer(){}
+	virtual ~DDLCompilerConstructor(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
-						{ return DDL_COMPILER_OBJECT; }
+	{
+		return DDL_COMPILER_OBJECT;
+	}
 	virtual const char* identifier() const
 	{
 		return m_name.c_str();
 	}
+	virtual ddl::DDLCompiler* object() const
+	{
+		return m_createFunc();
+	}
+
 private:
-	std::string m_name;
+	const std::string m_name;
+	const ddl::CreateDDLCompilerFunc m_createFunc;
 };
 
-template <class CompilerInterfaceC>
 class DDLCompilerBuilder :public SimpleBuilder
 {
 public:
-	DDLCompilerBuilder( const char* name_)
-		:SimpleBuilder(name_)
-		,m_identifier(name_){}
+	DDLCompilerBuilder( const char* name_, ddl::CreateDDLCompilerFunc createFunc_)
+		:SimpleBuilder( name_)
+		,m_createFunc(createFunc_){}
 
 	virtual ~DDLCompilerBuilder(){}
 
@@ -76,26 +82,13 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new DDLCompilerContainer<CompilerInterfaceC>(m_identifier.c_str());
+		return new DDLCompilerConstructor( m_identifier, m_createFunc);
 	}
-
 private:
-	std::string m_identifier;
+	const ddl::CreateDDLCompilerFunc m_createFunc;
 };
 
 }}//namespace
-
-#define DECLARE_DDLCOMPILER(NAME,CPPID,CCOBJ) \
-namespace {\
-struct CPPID\
-{\
-	static SimpleBuilder* constructor()\
-	{\
-		return new DDLCompilerBuilder<CCOBJ>(NAME);\
-	}\
-};\
-}//anonymous namespace
-//end DECLARE_DDLCOMPILER
 
 #endif
 

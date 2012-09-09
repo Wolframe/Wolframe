@@ -42,12 +42,12 @@ Project Wolframe.
 namespace _Wolframe {
 namespace ddl {
 
-///\class CompilerInterface
+///\class DDLCompiler
 ///\brief Interface for DDL compilers
-struct CompilerInterface
+struct DDLCompiler
 {
-	explicit CompilerInterface( const std::string& n) :m_ddlname(n) {}
-	virtual ~CompilerInterface(){}
+	explicit DDLCompiler( const std::string& n) :m_ddlname(n) {}
+	virtual ~DDLCompiler(){}
 
 	///\brief Compile a source from a string. Throws in case of error.
 	///\param[in] srcstring source as string
@@ -62,7 +62,9 @@ private:
 };
 
 ///\brief Reference to a DDL compiler
-typedef types::CountedReference<CompilerInterface> CompilerInterfaceR;
+typedef types::CountedReference<DDLCompiler> DDLCompilerR;
+
+typedef DDLCompiler* (*CreateDDLCompilerFunc)();
 
 }}//namespace
 #endif

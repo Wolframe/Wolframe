@@ -105,7 +105,7 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:libxml2 --output-filter xml:libxml2 --printlayout print_invoice.tracepdf:invoice.simplepdf --form invoice.simpleform --script print_table.lua run
+--input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --printlayout print_invoice.tracepdf:invoice.simplepdf --form invoice.simpleform --script print_table.lua run
 **file: print_table.lua
 
 function run()

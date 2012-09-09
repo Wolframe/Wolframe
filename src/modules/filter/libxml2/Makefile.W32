@@ -27,7 +27,6 @@ DYNAMIC_MODULE = \
 	mod_filter_libxml2.dll
 
 CPP_OBJS = \
-	$(TOPDIR)\src\filter_filterbase.obj \
 	$(TOPDIR)\src\filter_doctype.obj \
 	$(TOPDIR)\src\filter_libxml2_filter.obj \
 	mod_filter_libxml2.obj

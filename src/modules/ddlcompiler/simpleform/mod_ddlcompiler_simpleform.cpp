@@ -46,7 +46,15 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-DECLARE_DDLCOMPILER("simpleform",SimpleformDDLCompiler,ddl::SimpleFormCompiler)
+namespace {
+struct SimpleformDDLCompiler
+{
+	static SimpleBuilder* constructor()
+	{
+		return new DDLCompilerBuilder( "simpleform", ddl::createSimpleFormCompilerFunc);
+	}
+};
+}//anonymous namespace
 
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =

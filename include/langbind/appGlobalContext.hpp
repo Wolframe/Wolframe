@@ -68,6 +68,7 @@ public:
 
 	bool getFilter( const std::string& name, const std::string& arg, Filter& rt) const;
 	bool getFormFunction( const std::string& name, FormFunction& rt) const;
+	bool getDDLCompiler( const std::string& name, ddl::DDLCompilerR& rt) const;
 
 private:
 	bool loadScript( const ScriptCommandConfigStruct& config, std::string& itemname, std::string& error);

@@ -159,12 +159,12 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
-const langbind::Filter* ProcessorProvider::filter( const std::string& name, const std::string& arg ) const
+langbind::Filter* ProcessorProvider::filter( const std::string& name, const std::string& arg ) const
 {
 	return m_impl->filter( name, arg );
 }
 
-const langbind::FormFunction* ProcessorProvider::formfunction( const std::string& name) const
+langbind::FormFunction* ProcessorProvider::formfunction( const std::string& name) const
 {
 	return m_impl->formfunction( name );
 }
@@ -174,6 +174,10 @@ cmdbind::CommandHandler* ProcessorProvider::handler( const std::string& name ) c
 	return m_impl->handler( name );
 }
 
+ddl::DDLCompiler* ProcessorProvider::ddlcompiler( const std::string& name) const
+{
+	return m_impl->ddlcompiler( name );
+}
 
 //**** Processor Provider PIMPL Implementation ******************************
 ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf,
@@ -241,11 +245,31 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				}
 				break;
 			}
-			case ObjectConstructorBase::DDL_COMPILER_OBJECT:	// object is a DDL compiler
-				LOG_WARNING << "DDL compiler interface is not yet available";
-				break;
 
-			case ObjectConstructorBase::FORM_FUNCTION_OBJECT:	{	// object is a DDL compiler
+			case ObjectConstructorBase::DDL_COMPILER_OBJECT:	{	// object is a DDL compiler
+				module::DDLCompilerConstructor* ffo = dynamic_cast< module::DDLCompilerConstructor* >((*it)->constructor());
+				if ( ffo == NULL )	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+						  << "'' is not a DDL compiler";
+					throw std::logic_error( "Object is not a form function. See log." );
+				}
+				else	{
+					std::string name = ffo->identifier();
+					boost::algorithm::to_upper( name);
+					std::map <const std::string, const module::DDLCompilerConstructor* >::const_iterator itr = m_ddlcompilerMap.find( name );
+					if ( itr != m_ddlcompilerMap.end() )	{
+						LOG_FATAL << "Duplicate DDL compiler name '" << name << "'";
+						throw std::runtime_error( "Duplicate DDL compiler name" );
+					}
+					m_ddlcompiler.push_back( ffo );
+					m_ddlcompilerMap[ name ] = ffo;
+
+					LOG_TRACE << "'" << name << "' DDL compiler registered";
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::FORM_FUNCTION_OBJECT:	{	// object is a form function
 				module::FormFunctionConstructor* ffo = dynamic_cast< module::FormFunctionConstructor* >((*it)->constructor());
 				if ( ffo == NULL )	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
@@ -338,7 +362,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 }
 
 
-const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg ) const
+langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg ) const
 {
 	std::string filterName = boost::algorithm::to_upper_copy( name);
 	std::map <const std::string, const module::FilterConstructor* >::const_iterator fltr = m_filterMap.find( filterName );
@@ -348,11 +372,21 @@ const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const
 		return fltr->second->object( arg);
 }
 
-const langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formfunction( const std::string& name ) const
+langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formfunction( const std::string& name ) const
 {
 	std::string formfunctionName = boost::algorithm::to_upper_copy( name);
 	std::map <const std::string, const module::FormFunctionConstructor* >::const_iterator ffo = m_formfunctionMap.find( formfunctionName );
 	if ( ffo == m_formfunctionMap.end() )
+		return NULL;
+	else
+		return ffo->second->object();
+}
+
+ddl::DDLCompiler* ProcessorProvider::ProcessorProvider_Impl::ddlcompiler( const std::string& name ) const
+{
+	std::string ddlcompilerName = boost::algorithm::to_upper_copy( name);
+	std::map <const std::string, const module::DDLCompilerConstructor* >::const_iterator ffo = m_ddlcompilerMap.find( ddlcompilerName );
+	if ( ffo == m_ddlcompilerMap.end() )
 		return NULL;
 	else
 		return ffo->second->object();

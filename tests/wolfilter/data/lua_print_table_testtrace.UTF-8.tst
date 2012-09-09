@@ -104,7 +104,7 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:textwolf --output-filter xml:textwolf --printlayout print_invoice.tracepdf:invoice.simplepdf --form invoice.simpleform --script print_table.lua run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --printlayout print_invoice.tracepdf:invoice.simplepdf --form invoice.simpleform --script print_table.lua run
 **file: print_table.lua
 
 function run()

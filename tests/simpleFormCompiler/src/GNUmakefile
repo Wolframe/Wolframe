@@ -1,0 +1,50 @@
+TOPDIR = ../../..
+
+SUBDIRS =
+
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
+INCLUDE_DIRS = \
+	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
+	-I$(TOPDIR) \
+	-I$(TOPDIR)/gtest/include \
+	-I$(BOOST_INCLUDE_DIR)
+
+INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize
+
+INCLUDE_LIBS = \
+	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/src/libwolframe.a \
+	$(TOPDIR)/src/libwolframe/libwolframe.a \
+	$(TOPDIR)/src/libwolframe_serialize/libwolframe_serialize.a \
+	-lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lboost_filesystem -lboost_system -lboost_program_options
+
+OBJS = \
+	$(TOPDIR)/src/ddl_compiler_simpleFormCompiler.o
+
+TEST_CPP_BINS = \
+	testSimpleFormCompiler$(EXE)
+
+-include $(TOPDIR)/makefiles/gmake/sub.mk
+
+testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a $(TEST_OBJS)
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_install:
+
+local_uninstall:
+
+local_test:$(TEST_CPP_BINS)
+ifeq ($(RUN_TESTS),1)
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testSimpleFormCompiler
+	@echo
+endif
+

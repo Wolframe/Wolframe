@@ -183,7 +183,7 @@ bool GlobalContext::loadDDLForm( const DDLFormConfigStruct& config, std::string&
 			}
 			DDL = std::string( ext.c_str()+1);
 		}
-		ddl::CompilerInterfaceR ci;
+		ddl::DDLCompilerR ci;
 		if (!getDDLCompiler( DDL, ci))
 		{
 			error = std::string( "Unknown DDL of form '") + DDL + "'";
@@ -340,7 +340,7 @@ bool GlobalContext::load( const EnvironmentConfigStruct& config)
 
 bool GlobalContext::getFilter( const std::string& name, const std::string& arg, Filter& fl) const
 {
-	const Filter* fp = m_provider->filter( name, arg);
+	Filter* fp = m_provider->filter( name, arg);
 	if (!fp)
 	{
 		bool rt = FilterMap::getFilter( name, arg, fl);
@@ -356,7 +356,7 @@ bool GlobalContext::getFilter( const std::string& name, const std::string& arg, 
 
 bool GlobalContext::getFormFunction( const std::string& name, FormFunction& func) const
 {
-	const FormFunction* fp = m_provider->formfunction( name);
+	FormFunction* fp = m_provider->formfunction( name);
 	if (!fp)
 	{
 		bool rt = FormFunctionMap::getFormFunction( name, func);
@@ -366,6 +366,21 @@ bool GlobalContext::getFormFunction( const std::string& name, FormFunction& func
 	{
 		func = *fp;
 		delete fp;
+		return true;
+	}
+}
+
+bool GlobalContext::getDDLCompiler( const std::string& name, ddl::DDLCompilerR& dc) const
+{
+	ddl::DDLCompiler* fp = m_provider->ddlcompiler( name);
+	if (!fp)
+	{
+		bool rt = DDLCompilerMap::getDDLCompiler( name, dc);
+		return rt;
+	}
+	else
+	{
+		dc.reset( fp);
 		return true;
 	}
 }

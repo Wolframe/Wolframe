@@ -31,10 +31,8 @@ Project Wolframe.
 ************************************************************************/
 ///\file modules/filter/template/filterBuilder.hpp
 ///\brief Interface template for object builder of filters
-
 #ifndef _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-
+#define _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDEDd
 #include "filter/filter.hpp"
 #include "moduleInterface.hpp"
 #include "constructor.hpp"
