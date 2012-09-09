@@ -63,10 +63,6 @@ public:
 	{
 		return m_function( m_name, arg );
 	}
-	virtual langbind::Filter* object() const
-	{
-		return m_function( m_name, "");
-	}
 
 private:
 	const std::string m_name;

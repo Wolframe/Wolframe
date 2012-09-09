@@ -658,6 +658,7 @@ src/filter_blob_filter.cpp
 src/filter_char_filter.cpp
 src/filter_doctype.cpp
 src/filter_filterbase.cpp
+src/filter_filter.cpp
 src/filter_libxml2_filter.cpp
 src/filter_line_filter.cpp
 src/filter_luafilter.cpp
@@ -973,10 +974,10 @@ tests/temp/echo_input_table.lua
 tests/temp/formfunc_input_generator.lua
 tests/temp/formfunc_iterator.lua
 tests/temp/formfunc_table.lua
-tests/temp/peerformfunc_input_generator.lua
-tests/temp/peerformfunc_iterator.lua
-tests/temp/peerformfunc_table.lua
 tests/temp/print_table.lua
+tests/temp/transaction_input_generator.lua
+tests/temp/transaction_iterator.lua
+tests/temp/transaction_table.lua
 tests/testBoostPath.cpp
 tests/testDatabaseProcessorVM.cpp
 tests/testMethodMemberPointerTemplate.cpp
@@ -1012,10 +1013,10 @@ tests/wolfilter/scripts/echo_input_table.lua
 tests/wolfilter/scripts/formfunc_input_generator.lua
 tests/wolfilter/scripts/formfunc_iterator.lua
 tests/wolfilter/scripts/formfunc_table.lua
-tests/wolfilter/scripts/peerformfunc_input_generator.lua
-tests/wolfilter/scripts/peerformfunc_iterator.lua
-tests/wolfilter/scripts/peerformfunc_table.lua
 tests/wolfilter/scripts/print_table.lua
+tests/wolfilter/scripts/transaction_input_generator.lua
+tests/wolfilter/scripts/transaction_iterator.lua
+tests/wolfilter/scripts/transaction_table.lua
 tests/wolfilter/src/echo_cmdhandler.cpp
 tests/wolfilter/src/echo_cmdhandler.hpp
 tests/wolfilter/src/employee_assignment_print.cpp
@@ -1035,8 +1036,8 @@ tests/wolfilter/template/doc/lua_echo_input_table.UTF-8.xml
 tests/wolfilter/template/doc/lua_formfunc_input_generator.UTF-8.xml
 tests/wolfilter/template/doc/lua_formfunc_iterator.UTF-8.xml
 tests/wolfilter/template/doc/lua_formfunc_table.UTF-8.xml
-tests/wolfilter/template/doc/lua_peerformfunc_table.UTF-8.xml
 tests/wolfilter/template/doc/lua_print_table_testtrace.xml
+tests/wolfilter/template/doc/lua_transaction_table.UTF-8.xml
 tests/wolfilter/template/doc/map_ddlform.UTF-8.xml
 tests/wolfilter/template/doc/map_formfunc.UTF-8.xml
 tests/wolfilter/template/doc/multilingual.UTF-8.xml

@@ -78,7 +78,10 @@ class SimpleObjectConstructor : public ObjectConstructorBase
 {
 public:
 	virtual ~SimpleObjectConstructor()	{}
-	virtual T* object() const = 0;
+
+// One of these functions should be here in order to have a real contract
+//	virtual T* object() const = 0;
+//	virtual T* object( std::string& arg ) const = 0;
 };
 
 } // namespace _Wolframe
