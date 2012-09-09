@@ -81,7 +81,7 @@ TEST_F( SimpleFormCompilerTest, tests)
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
-	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path().parent_path().parent_path();
+	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path().parent_path();
 
 	return RUN_ALL_TESTS();
 }
