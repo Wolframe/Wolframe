@@ -53,58 +53,16 @@ namespace {
 struct Libxml2FilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "");}
-};
-struct Libxml2FilterObject_UTF8
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UTF-8");}
-};
-struct Libxml2FilterObject_UTF16BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UTF-16BE");}
-};
-struct Libxml2FilterObject_UTF16LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UTF-16LE");}
-};
-struct Libxml2FilterObject_UCS2BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UCS-2BE");}
-};
-struct Libxml2FilterObject_UCS2LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UCS-2LE");}
-};
-struct Libxml2FilterObject_UCS4BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UCS-4BE");}
-};
-struct Libxml2FilterObject_UCS4LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLibxml2FilterPtr>("xml:libxml2", "UCS-4LE");}
+		{return new FilterBuilder("xml:libxml2", lb::createLibxml2FilterPtr);}
 };
 
 }//anonymous namespace
 
 
-enum {NofObjects=8};
+enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	Libxml2FilterObject::builder,
-	Libxml2FilterObject_UTF8::builder,
-	Libxml2FilterObject_UTF16BE::builder,
-	Libxml2FilterObject_UTF16LE::builder,
-	Libxml2FilterObject_UCS2BE::builder,
-	Libxml2FilterObject_UCS2LE::builder,
-	Libxml2FilterObject_UCS4BE::builder,
-	Libxml2FilterObject_UCS4LE::builder
+	Libxml2FilterObject::builder
 };
 
 

@@ -53,58 +53,16 @@ namespace {
 struct LineFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line", "");}
-};
-struct LineFilterObject_UTF8
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UTF-8");}
-};
-struct LineFilterObject_UTF16BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UTF-16BE");}
-};
-struct LineFilterObject_UTF16LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UTF-16LE");}
-};
-struct LineFilterObject_UCS2BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UCS-2BE");}
-};
-struct LineFilterObject_UCS2LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UCS-2LE");}
-};
-struct LineFilterObject_UCS4BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UCS-4BE");}
-};
-struct LineFilterObject_UCS4LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createLineFilterPtr>("line", "UCS-4LE");}
+		{return new FilterBuilder("line", lb::createLineFilterPtr);}
 };
 
 }//anonymous namespace
 
 
-enum {NofObjects=8};
+enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	LineFilterObject::builder,
-	LineFilterObject_UTF8::builder,
-	LineFilterObject_UTF16BE::builder,
-	LineFilterObject_UTF16LE::builder,
-	LineFilterObject_UCS2BE::builder,
-	LineFilterObject_UCS2LE::builder,
-	LineFilterObject_UCS4BE::builder,
-	LineFilterObject_UCS4LE::builder
+	LineFilterObject::builder
 };
 
 ModuleEntryPoint entryPoint( 0, "line filter", setModuleLogger, 0, 0, NofObjects, objdef);

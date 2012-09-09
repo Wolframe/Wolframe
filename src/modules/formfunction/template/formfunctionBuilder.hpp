@@ -40,14 +40,14 @@ Project Wolframe.
 namespace _Wolframe {
 namespace module {
 
-class FormFunctionContainer :public ObjectConstructorBase, public langbind::FormFunction
+class FormFunctionConstructor :public SimpleObjectConstructor< langbind::FormFunction >
 {
 public:
-	FormFunctionContainer( const char* name_, const langbind::FormFunction& func)
-		:langbind::FormFunction(func)
-		,m_name(name_){}
+	FormFunctionConstructor( const char* name_, const langbind::FormFunction& func_)
+		: m_name(name_)
+		, m_func(func_) {}
 
-	virtual ~FormFunctionContainer(){}
+	virtual ~FormFunctionConstructor(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
@@ -57,40 +57,34 @@ public:
 	{
 		return m_name.c_str();
 	}
+	virtual langbind::FormFunction* object() const
+	{
+		return new langbind::FormFunction( m_func);
+	}
+
 private:
-	std::string m_name;
+	const std::string m_name;
+	const langbind::FormFunction m_func;
 };
 
 class FormFunctionBuilder :public SimpleBuilder
 {
 public:
-	FormFunctionBuilder( const char* name_, langbind::FormFunction::Function f, const serialize::StructDescriptionBase* p, const serialize::StructDescriptionBase* r)
+	FormFunctionBuilder( const char* name_, const langbind::FormFunction& func_)
 		:SimpleBuilder( name_)
-		,m_func(name_,langbind::FormFunction( f,p,r)){}
+		,m_func(func_){}
 
 	virtual ~FormFunctionBuilder(){}
 
 	virtual ObjectConstructorBase* constructor()
 	{
-		return &m_func;
+		return new FormFunctionConstructor( m_identifier, m_func);
 	}
 private:
-	FormFunctionContainer m_func;
+	const langbind::FormFunction m_func;
 };
 
 }}//namespace
-
-#define DECLARE_FUNCTION(NAME,CPPID,FUNC,PARAM,RESULT) \
-namespace {\
-struct CPPID\
-{\
-	static SimpleBuilder* constructor()\
-	{\
-		return new FormFunctionBuilder(NAME,FUNC,PARAM,RESULT);\
-	}\
-};\
-}//anonymous namespace
-//end DECLARE_FUNCTION
 
 #endif
 

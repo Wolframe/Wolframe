@@ -49,42 +49,7 @@ namespace {
 struct CharFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char", "");}
-};
-struct CharFilterObject_UTF8
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UTF-8");}
-};
-struct CharFilterObject_UTF16BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UTF-16BE");}
-};
-struct CharFilterObject_UTF16LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UTF-16LE");}
-};
-struct CharFilterObject_UCS2BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UCS-2BE");}
-};
-struct CharFilterObject_UCS2LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UCS-2LE");}
-};
-struct CharFilterObject_UCS4BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UCS-4BE");}
-};
-struct CharFilterObject_UCS4LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createCharFilterPtr>("char", "UCS-4LE");}
+		{return new FilterBuilder("char", lb::createCharFilterPtr);}
 };
 
 }//anonymous namespace
@@ -95,17 +60,10 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-enum {NofObjects=8};
+enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	CharFilterObject::builder,
-	CharFilterObject_UTF8::builder,
-	CharFilterObject_UTF16BE::builder,
-	CharFilterObject_UTF16LE::builder,
-	CharFilterObject_UCS2BE::builder,
-	CharFilterObject_UCS2LE::builder,
-	CharFilterObject_UCS4BE::builder,
-	CharFilterObject_UCS4LE::builder
+	CharFilterObject::builder
 };
 
 ModuleEntryPoint entryPoint( 0, "char filter", setModuleLogger, 0, 0, NofObjects, objdef);

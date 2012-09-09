@@ -241,7 +241,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				break;
 
 			case ObjectConstructorBase::FORM_FUNCTION_OBJECT:	{	// object is a DDL compiler
-				module::FormFunctionContainer* ffo = dynamic_cast< module::FormFunctionContainer* >((*it)->constructor());
+				module::FormFunctionConstructor* ffo = dynamic_cast< module::FormFunctionConstructor* >((*it)->constructor());
 				if ( ffo == NULL )	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
 						  << "'' is not a form function";
@@ -323,12 +323,12 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 
 const langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg ) const
 {
-	std::string filterName = boost::algorithm::to_upper_copy( name + ";" + arg);
+	std::string filterName = boost::algorithm::to_upper_copy( name);
 	std::map <const std::string, const module::FilterConstructor* >::const_iterator fltr = m_filterMap.find( filterName );
 	if ( fltr == m_filterMap.end() )
 		return NULL;
 	else
-		return fltr->second->object();
+		return fltr->second->object( arg);
 }
 
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::handler( const std::string& command ) const

@@ -53,57 +53,15 @@ namespace {
 struct TokenFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token", "");}
-};
-struct TokenFilterObject_UTF8
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token", "UTF-8");}
-};
-struct TokenFilterObject_UTF16BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token", "UTF-16BE");}
-};
-struct TokenFilterObject_UTF16LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token", "UTF-16LE");}
-};
-struct TokenFilterObject_UCS2BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token", "UCS-2BE");}
-};
-struct TokenFilterObject_UCS2LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token", "UCS-2LE");}
-};
-struct TokenFilterObject_UCS4BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token", "UCS-4BE");}
-};
-struct TokenFilterObject_UCS4LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createTokenFilterPtr>("token", "UCS-4LE");}
+		{return new FilterBuilder( "token", lb::createTokenFilterPtr);}
 };
 
 }//anonymous namespace
 
-enum {NofObjects=8};
+enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	TokenFilterObject::builder,
-	TokenFilterObject_UTF8::builder,
-	TokenFilterObject_UTF16BE::builder,
-	TokenFilterObject_UTF16LE::builder,
-	TokenFilterObject_UCS2BE::builder,
-	TokenFilterObject_UCS2LE::builder,
-	TokenFilterObject_UCS4BE::builder,
-	TokenFilterObject_UCS4LE::builder
+	TokenFilterObject::builder
 };
 
 ModuleEntryPoint entryPoint( 0, "token filter", setModuleLogger, 0, 0, NofObjects, objdef);

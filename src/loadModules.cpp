@@ -122,7 +122,7 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir, const std::list< 
 		void* hndl = dlopen( it->c_str(), RTLD_LAZY );
 		if ( !hndl )	{
 			LOG_ERROR << "Module loader: " << dlerror()
-				  << ", (module '" << *it << "')";
+				  << ", (while loading module '" << *it << "')";
 			retVal = false;
 			break;
 		}

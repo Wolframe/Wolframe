@@ -96,66 +96,31 @@ InputFilterR& Input::getIterator()
 }
 
 
-void FilterMap::defineFilter( const std::string& name, const std::string& arg, CreateFilterFunc f)
+void FilterMap::defineFilter( const std::string& name, CreateFilterFunc f)
 {
-	defineObject( m_map, name + ";" + arg, f);
+	defineObject( m_map, name, f);
 }
 
 bool FilterMap::getFilter( const std::string& name, const std::string& arg, Filter& rt) const
 {
 	CreateFilterFunc f;
-	if (!getObject( m_map, name + ";" + arg, f)) return false;
+	if (!getObject( m_map, name, f)) return false;
 	rt = f( name, arg);
 	return true;
 }
 
 FilterMap::FilterMap()
 {
-	defineFilter( "blob", "", createBlobFilter);
-	defineFilter( "char", "", createCharFilter);
-	defineFilter( "char", "UTF-8", createCharFilter);
-	defineFilter( "char", "UTF-16BE", createCharFilter);
-	defineFilter( "char", "UTF-16LE", createCharFilter);
-	defineFilter( "char", "UCS-2LE", createCharFilter);
-	defineFilter( "char", "UCS-2BE", createCharFilter);
-	defineFilter( "char", "UCS-4LE", createCharFilter);
-	defineFilter( "char", "UCS-4BE", createCharFilter);
-	defineFilter( "line" ,"", createLineFilter);
-	defineFilter( "line", "UTF-8", createLineFilter);
-	defineFilter( "line", "UTF-16BE", createLineFilter);
-	defineFilter( "line", "UTF-16LE", createLineFilter);
-	defineFilter( "line", "UCS-2LE", createLineFilter);
-	defineFilter( "line", "UCS-2BE", createLineFilter);
-	defineFilter( "line", "UCS-4LE", createLineFilter);
-	defineFilter( "line", "UCS-4BE", createLineFilter);
-	defineFilter( "token", "", createTokenFilter);
-	defineFilter( "token", "UTF-8", createTokenFilter);
-	defineFilter( "token", "UTF-16BE", createTokenFilter);
-	defineFilter( "token", "UTF-16LE", createTokenFilter);
-	defineFilter( "token", "UCS-2LE", createTokenFilter);
-	defineFilter( "token", "UCS-2BE", createTokenFilter);
-	defineFilter( "token", "UCS-4LE", createTokenFilter);
-	defineFilter( "token", "UCS-4BE", createTokenFilter);
-	defineFilter( "xml:textwolf", "", createTextwolfXmlFilter);
-	defineFilter( "xml:textwolf", "UTF-8", createTextwolfXmlFilter);
-	defineFilter( "xml:textwolf", "UTF-16BE", createTextwolfXmlFilter);
-	defineFilter( "xml:textwolf", "UTF-16LE", createTextwolfXmlFilter);
-	defineFilter( "xml:textwolf", "UCS-2LE", createTextwolfXmlFilter);
-	defineFilter( "xml:textwolf", "UCS-2BE", createTextwolfXmlFilter);
-	defineFilter( "xml:textwolf", "UCS-4LE", createTextwolfXmlFilter);
-	defineFilter( "xml:textwolf", "UCS-4BE", createTextwolfXmlFilter);
+	defineFilter( "blob", createBlobFilter);
+	defineFilter( "char", createCharFilter);
+	defineFilter( "line" ,createLineFilter);
+	defineFilter( "token", createTokenFilter);
+	defineFilter( "xml:textwolf", createTextwolfXmlFilter);
 #ifdef WITH_LIBXML2
-	defineFilter( "xml", "", createLibxml2Filter);
-	defineFilter( "xml:libxml2", "", createLibxml2Filter);
-	defineFilter( "xml:libxml2", "UTF-8", createLibxml2Filter);
-	defineFilter( "xml:libxml2", "UTF-16BE", createLibxml2Filter);
-	defineFilter( "xml:libxml2", "UTF-16LE", createLibxml2Filter);
-	defineFilter( "xml:libxml2", "UCS-2LE", createLibxml2Filter);
-	defineFilter( "xml:libxml2", "UCS-2BE", createLibxml2Filter);
-	defineFilter( "xml:libxml2", "UCS-4LE", createLibxml2Filter);
-	defineFilter( "xml:libxml2", "UCS-4BE", createLibxml2Filter);
+	defineFilter( "xml", createLibxml2Filter);
+	defineFilter( "xml:libxml2", createLibxml2Filter);
 #else
-	defineFilter( "xml", "", createTextwolfXmlFilter);
+	defineFilter( "xml", createTextwolfXmlFilter);
 #endif
 }
 

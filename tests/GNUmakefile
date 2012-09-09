@@ -196,7 +196,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testSimpleFormCompiler
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testWolfilter
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize ./testWolfilter
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testDatabaseProcessorVM
 	@echo

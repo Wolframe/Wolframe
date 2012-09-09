@@ -47,13 +47,19 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
+namespace {
+struct employee_assingment_convert_func
+{
+	static SimpleBuilder* constructor()
+	{
+		static const serialize::StructDescriptionBase* param = AssignmentListDoc::getStructDescription();
+		static const serialize::StructDescriptionBase* result = AssignmentListDoc::getStructDescription();
+		langbind::FormFunction func( convertAssignmentListDoc, param, result);
 
-static const serialize::StructDescriptionBase* convertAssignmentListDoc_param = AssignmentListDoc::getStructDescription();
-static const serialize::StructDescriptionBase* convertAssignmentListDoc_result = AssignmentListDoc::getStructDescription();
-
-
-DECLARE_FUNCTION("employee_assingment_convert",employee_assingment_convert_func,convertAssignmentListDoc,convertAssignmentListDoc_param,convertAssignmentListDoc_result)
-
+		return new FormFunctionBuilder( "employee_assingment_convert", func);
+	}
+};
+}
 
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =

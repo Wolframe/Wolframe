@@ -77,7 +77,7 @@ static Filter getFilter( GlobalContext* gc, const std::string& ifl_, const std::
 		if (!gc->getFilter( ifl.first, ifl.second, rt))
 		{
 			std::ostringstream msg;
-			msg << "unknown filter: name = '" << ifl.first << " arguments = " << ofl.second << "'";
+			msg << "unknown filter: name = '" << ifl.first << "' ,arguments = '" << ofl.second << "'";
 			throw std::runtime_error( msg.str());
 		}
 	}

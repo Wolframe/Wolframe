@@ -54,58 +54,16 @@ namespace {
 struct BlobFilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "");}
-};
-struct BlobFilterObject_UTF8
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UTF-8");}
-};
-struct BlobFilterObject_UTF16BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UTF-16BE");}
-};
-struct BlobFilterObject_UTF16LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UTF-16LE");}
-};
-struct BlobFilterObject_UCS2BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UCS-2BE");}
-};
-struct BlobFilterObject_UCS2LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UCS-2LE");}
-};
-struct BlobFilterObject_UCS4BE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UCS-4BE");}
-};
-struct BlobFilterObject_UCS4LE
-{
-	static SimpleBuilder* builder()
-		{return new FilterBuilder<lb::createBlobFilterPtr>("blob", "UCS-4LE");}
+		{return new FilterBuilder("blob", lb::createBlobFilterPtr);}
 };
 
 }//anonymous namespace
 
 
-enum {NofObjects=8};
+enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	BlobFilterObject::builder,
-	BlobFilterObject_UTF8::builder,
-	BlobFilterObject_UTF16BE::builder,
-	BlobFilterObject_UTF16LE::builder,
-	BlobFilterObject_UCS2BE::builder,
-	BlobFilterObject_UCS2LE::builder,
-	BlobFilterObject_UCS4BE::builder,
-	BlobFilterObject_UCS4LE::builder
+	BlobFilterObject::builder
 };
 
 ModuleEntryPoint entryPoint( 0, "blob filter", setModuleLogger, 0, 0, NofObjects, objdef);
