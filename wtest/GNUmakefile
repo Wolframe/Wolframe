@@ -35,10 +35,6 @@ ifeq ($(WITH_LIBHPDF),1)
 INCLUDE_CXXFLAGS += \
 	-DWITH_LIBHPDF
 endif
-ifeq ($(WITH_LOCAL_LIBHPDF),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_LIBHPDF
-endif
 
 # libxml2
 ifeq ($(WITH_LIBXML2),1)
