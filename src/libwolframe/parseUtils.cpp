@@ -60,7 +60,7 @@ char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 {
 	char rt = '\0';
 	tok.clear();
-	while (*itr <= 32 && *itr >= 0 && itr != end) ++itr;
+	while (itr != end && *itr <= 32 && *itr >= 0 && itr != end) ++itr;
 	if (itr == end) return '\0';
 	rt = *itr;
 	if (*itr == '\'' || *itr == '\"')
@@ -91,7 +91,7 @@ char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 	}
 	else if (isLetter( *itr))
 	{
-		while (isLetter( *itr)) tok.push_back( *itr++);
+		while ( itr != end && isLetter( *itr)) tok.push_back( *itr++);
 		return rt;
 	}
 	else

@@ -245,7 +245,7 @@ bool AtomicType::assign_string( const std::string& val)
 				break;
 			}
 			case int_:
-				if (*itr == '-') ++itr;
+				if ( itr != end && *itr == '-') ++itr;
 				/*no break here!*/
 			case uint_:
 				digits=0;
