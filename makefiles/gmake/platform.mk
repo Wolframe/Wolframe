@@ -639,9 +639,99 @@ ifeq ($(WITH_SSL),1)
 
 ifeq "$(PLATFORM)" "LINUX"
 
+ifeq "$(LINUX_DIST)" "arch"
+OPENSSL_LIBS ?= -lssl -lcrypto -lz
+endif
+
+ifeq "$(LINUX_DIST)" "slackware"
 OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+# Ubuntu
+
+ifeq "$(LINUX_DIST)" "ubuntu"
+
+ifeq "$(LINUX_REV)" "12.04"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+ifeq "$(LINUX_REV)" "11.10"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+ifeq "$(LINUX_REV)" "11.04"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+ifeq "$(LINUX_REV)" "10.10"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+ifeq "$(LINUX_REV)" "10.04"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
 
 endif
+
+# Debian
+
+ifeq "$(LINUX_DIST)" "debian"
+
+ifeq "$(LINUX_REV)" "5"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+ifeq "$(LINUX_REV)" "6"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+endif
+
+ifeq "$(LINUX_DIST)" "redhat"
+
+# RHEL5
+ifeq "$(LINUX_REV)" "5"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+# RHEL6
+ifeq "$(LINUX_REV)" "6"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+# Fedora 14
+ifeq "$(LINUX_REV)" "14"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+# Fedora 15
+ifeq "$(LINUX_REV)" "15"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+# Fedora 16
+ifeq "$(LINUX_REV)" "16"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+# Fedora 17
+ifeq "$(LINUX_REV)" "17"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+endif
+
+ifeq "$(LINUX_DIST)" "sles"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+ifeq "$(LINUX_DIST)" "suse"
+OPENSSL_LIBS ?= -lssl -lcrypto
+endif
+
+endif
+
+
 
 ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(OS_MAJOR_VERSION)" "5"

@@ -82,26 +82,20 @@ endif
 
 # libhpdf
 ifeq ($(WITH_LIBHPDF),1)
-ifneq ($(WITH_LOCAL_LIBHPDF),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_LIBHPDF
 
-INCLUDE_LIBS += \
-	-lhpdf
-endif
-endif
-ifeq ($(WITH_LOCAL_LIBHPDF),1)
 INCLUDE_CXXFLAGS += \
 	-DWITH_LIBHPDF
 
 INCLUDE_DIRS += \
-	-I$(TOPDIR)/libhpdf/include
+	$(LIBHPDF_INCLUDE_DIRS)
+
+INCLUDE_LDFLAGS += \
+	$(LBHPDF_LIB_DIRS)
 
 INCLUDE_LIBS += \
-	$(TOPDIR)/libhpdf/src/libhpdf.a
+	$(LIBHPDF_LIBS)
+
 endif
-
-
 
 TEST_OBJS =
 
