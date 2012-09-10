@@ -43,6 +43,9 @@ doc-html-chunked: html/index.html
 
 doc-pdf: WolfBook.pdf
 
+.PHONY: depend
+depend:
+
 epub: WolfBook.epub
 	mkdir OEBPS/images
 	cp images/draft.png images/*.svg OEBPS/images
