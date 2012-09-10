@@ -150,3 +150,14 @@ void EnvironmentConfigStruct::setCanonicalPathes( const std::string& referencePa
 	}
 }
 
+boost::property_tree::ptree EnvironmentConfigStruct::toPropertyTree() const
+{
+	return config::structureToPropertyTree( *this);
+}
+
+void EnvironmentConfigStruct::initFromPropertyTree( const boost::property_tree::ptree& pt)
+{
+	config::parseConfigStructure( *this, pt);
+}
+
+

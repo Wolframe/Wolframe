@@ -80,8 +80,8 @@ private:
 	int m_state;			//< fetching state of current element
 };
 
-///\class ToStringFilter
-///\brief Output filter for tostring methods in language bindings
+///\class PropertyTreeOutputFilter
+///\brief Output filter for serializing a structure as property tree
 class PropertyTreeOutputFilter :public TypedOutputFilter
 {
 public:

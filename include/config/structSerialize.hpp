@@ -46,7 +46,18 @@ void parseConfigStructure( Structure& st, const boost::property_tree::ptree& pt)
 	langbind::TypedInputFilterR inp( new langbind::PropertyTreeInputFilter( pt));
 	serialize::StructParser parser( (void*)&st, st.getStructDescription());
 	parser.init( inp);
-	if (!parser.call()) throw std::runtime_error( "illegal state in configuration parser");
+	if (!parser.call()) throw std::runtime_error( "illegal state in structure parser");
+}
+
+template <class Structure>
+boost::property_tree::ptree structureToPropertyTree( const Structure& st)
+{
+	langbind::PropertyTreeOutputFilter* res;
+	langbind::TypedOutputFilterR out( res = new langbind::PropertyTreeOutputFilter());
+	serialize::StructSerializer serializer( (const void*)&st, st.getStructDescription());
+	serializer.init( out);
+	if (!serializer.call()) throw std::runtime_error( "illegal state in structure serializer");
+	return res->content();
 }
 
 template <class Structure>
@@ -56,7 +67,7 @@ std::string structureToString( const Structure& st)
 	langbind::TypedOutputFilterR out( res = new langbind::ToStringFilter( "\t"));
 	serialize::StructSerializer serializer( (const void*)&st, st.getStructDescription());
 	serializer.init( out);
-	if (!serializer.call()) throw std::runtime_error( "illegal state in configuration parser");
+	if (!serializer.call()) throw std::runtime_error( "illegal state in structure serializer");
 	return res->content();
 }
 

@@ -34,9 +34,10 @@
 ///\brief Data structures of the configuration of the processor environment
 #ifndef _Wolframe_APPLICATION_ENVIRONMENT_CONFIGURATION_STRUCT_HPP_INCLUDED
 #define _Wolframe_APPLICATION_ENVIRONMENT_CONFIGURATION_STRUCT_HPP_INCLUDED
+#include "serialize/struct/filtermapBase.hpp"
 #include <vector>
 #include <string>
-#include "config/structSerialize.hpp"
+#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
 namespace langbind {
@@ -92,6 +93,9 @@ struct EnvironmentConfigStruct
 	static const serialize::StructDescriptionBase* getStructDescription();
 
 	void setCanonicalPathes( const std::string& referencePath);
+
+	boost::property_tree::ptree toPropertyTree() const;
+	void initFromPropertyTree( const boost::property_tree::ptree& pt);
 };
 
 }}//namespace
