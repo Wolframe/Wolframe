@@ -39,7 +39,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-static void parseNameTypeSource( const std::string& opt, bool getFilenameStemAsName, std::string& name, std::string& type, std::string& sourcepath)
+static void parseNameTypeSource( const std::string& opt, bool getFilenameStemAsName, std::string& name, std::string& type, std::string& file)
 {
 	const char* cc = std::strchr( opt.c_str(), ':');
 	const char* xx = std::strchr( opt.c_str(), '.');
@@ -59,21 +59,21 @@ static void parseNameTypeSource( const std::string& opt, bool getFilenameStemAsN
 			type = std::string( opt.c_str(), cc-opt.c_str());
 			name = "";
 		}
-		sourcepath = std::string( cc+1);
+		file = std::string( cc+1);
 		if (type.empty())
 		{
-			std::string ext = utils::getFileExtension( sourcepath);
+			std::string ext = utils::getFileExtension( file);
 			if (!ext.empty()) type = std::string( ext.c_str() + 1);
 		}
 		if (name.empty() && getFilenameStemAsName)
 		{
-			std::string stem = utils::getFileStem( sourcepath);
+			std::string stem = utils::getFileStem( file);
 			if (!stem.empty()) name = std::string( stem.c_str());
 		}
 	}
 	else
 	{
-		sourcepath = opt;
+		file = opt;
 		std::string ext = utils::getFileExtension( opt);
 		if (ext.empty()) throw std::runtime_error( "no type of print layout specified (file extension missing)");
 		type = std::string( ext.c_str() + 1);
@@ -93,7 +93,7 @@ DDLFormOption::DDLFormOption( const std::string& src)
 	if (cc && cc-src.c_str() > 1)
 	{
 		DDL = std::string( src.c_str(), cc-src.c_str());
-		sourcepath = std::string( cc+1);
+		file = std::string( cc+1);
 	}
 	else
 	{
@@ -101,13 +101,13 @@ DDLFormOption::DDLFormOption( const std::string& src)
 		if (!ext.size()) throw std::runtime_error( "no DDL specified (file extension missing) for form file");
 
 		DDL = std::string( ext.c_str()+1);
-		sourcepath = src;
+		file = src;
 	}
 }
 
 PrintLayoutOption::PrintLayoutOption( const std::string& opt)
 {
-	parseNameTypeSource( opt, true, name, type, sourcepath);
+	parseNameTypeSource( opt, true, name, type, file);
 }
 
 TransactionFunctionOption::TransactionFunctionOption( const std::string& src)
@@ -126,7 +126,7 @@ TransactionFunctionOption::TransactionFunctionOption( const std::string& src)
 
 ScriptCommandOption::ScriptCommandOption( const std::string& opt)
 {
-	parseNameTypeSource( opt, false, name, type, sourcepath);
+	parseNameTypeSource( opt, false, name, type, file);
 }
 
 

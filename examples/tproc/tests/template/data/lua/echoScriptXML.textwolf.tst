@@ -49,7 +49,7 @@ end
 env {
 	script {
 		name run
-		sourcepath echo.lua
+		file echo.lua
 	}
 }
 proc {

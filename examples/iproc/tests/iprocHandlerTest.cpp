@@ -88,7 +88,7 @@ public:
 		config << "env {" << std::endl;
 		config << "   script {" << std::endl;
 		config << "      name run" << std::endl;
-		config << "      sourcepath \"" << scriptpath << "\"" << std::endl;
+		config << "      file \"" << scriptpath << "\"" << std::endl;
 		config << "   }" << std::endl;
 		config << "}" << std::endl;
 		config << "proc {" << std::endl;

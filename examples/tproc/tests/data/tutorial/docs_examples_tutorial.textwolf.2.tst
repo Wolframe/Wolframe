@@ -21,7 +21,7 @@ end
 env {
 	script {
 		name run
-		sourcepath example_2.lua
+		file example_2.lua
 	}
 }
 proc {

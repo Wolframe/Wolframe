@@ -27,7 +27,7 @@ recode lat1..ibmpc >> $output <<!TEST
 env {
 	script {
 		name run
-		sourcepath example_$example.lua
+		file example_$example.lua
 	}
 }
 proc {

@@ -48,7 +48,7 @@ const serialize::StructDescriptionBase* DDLFormConfigStruct::getStructDescriptio
 		{
 			(*this)
 			( "DDL",		&DDLFormConfigStruct::DDL)
-			( "sourcepath",		&DDLFormConfigStruct::sourcepath)
+			( "file",		&DDLFormConfigStruct::file)
 			;
 		}
 	};
@@ -65,7 +65,7 @@ const serialize::StructDescriptionBase* PrintLayoutConfigStruct::getStructDescri
 			(*this)
 			( "name",		&PrintLayoutConfigStruct::name)
 			( "type",		&PrintLayoutConfigStruct::type)
-			( "sourcepath",		&PrintLayoutConfigStruct::sourcepath)
+			( "file",		&PrintLayoutConfigStruct::file)
 			;
 		}
 	};
@@ -99,7 +99,7 @@ const serialize::StructDescriptionBase* ScriptCommandConfigStruct::getStructDesc
 			(*this)
 			( "name",		&ScriptCommandConfigStruct::name)
 			( "type",		&ScriptCommandConfigStruct::type)
-			( "sourcepath",		&ScriptCommandConfigStruct::sourcepath)
+			( "file",		&ScriptCommandConfigStruct::file)
 			;
 		}
 	};
@@ -131,21 +131,21 @@ void EnvironmentConfigStruct::setCanonicalPathes( const std::string& referencePa
 		std::vector<DDLFormConfigStruct>::iterator itr=form.begin(),end=form.end();
 		for (;itr!=end; ++itr)
 		{
-			itr->sourcepath = utils::getCanonicalPath( itr->sourcepath, referencePath);
+			itr->file = utils::getCanonicalPath( itr->file, referencePath);
 		}
 	}
 	{
 		std::vector<PrintLayoutConfigStruct>::iterator itr=printlayout.begin(),end=printlayout.end();
 		for (;itr!=end; ++itr)
 		{
-			itr->sourcepath = utils::getCanonicalPath( itr->sourcepath, referencePath);
+			itr->file = utils::getCanonicalPath( itr->file, referencePath);
 		}
 	}
 	{
 		std::vector<ScriptCommandConfigStruct>::iterator itr=script.begin(),end=script.end();
 		for (;itr!=end; ++itr)
 		{
-			itr->sourcepath = utils::getCanonicalPath( itr->sourcepath, referencePath);
+			itr->file = utils::getCanonicalPath( itr->file, referencePath);
 		}
 	}
 }

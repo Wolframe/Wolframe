@@ -63,7 +63,7 @@ bool GlobalContext::loadScript( const ScriptCommandConfigStruct& config, std::st
 		std::string type( config.type);
 		if (type.empty())
 		{
-			std::string ext = utils::getFileExtension( config.sourcepath);
+			std::string ext = utils::getFileExtension( config.file);
 			if (!ext.size())
 			{
 				error = "no type of script specified (file extension missing)";
@@ -76,7 +76,7 @@ bool GlobalContext::loadScript( const ScriptCommandConfigStruct& config, std::st
 		if (boost::algorithm::iequals( type, "lua"))
 		{
 #if WITH_LUA
-			langbind::LuaScript script( config.sourcepath);
+			langbind::LuaScript script( config.file);
 			if (name.empty())
 			{
 				if (script.functions().empty())
@@ -119,7 +119,7 @@ bool GlobalContext::loadPrintLayout( const PrintLayoutConfigStruct& config, std:
 		std::string type( config.type);
 		if (type.empty())
 		{
-			std::string ext = utils::getFileExtension( config.sourcepath);
+			std::string ext = utils::getFileExtension( config.file);
 			if (!ext.size())
 			{
 				error = "no type of print layout specified (file extension missing) for print layout file";
@@ -138,18 +138,18 @@ bool GlobalContext::loadPrintLayout( const PrintLayoutConfigStruct& config, std:
 			prnt::PrintFunctionR func;
 			try
 			{
-				func.reset( pf( utils::readSourceFileContent( config.sourcepath)));
+				func.reset( pf( utils::readSourceFileContent( config.file)));
 			}
 			catch (const std::exception& e)
 			{
 				std::ostringstream msg;
-				msg << "could not compile file '" << config.sourcepath << "': " << e.what() << std::endl;
+				msg << "could not compile file '" << config.file << "': " << e.what() << std::endl;
 				throw std::runtime_error( msg.str());
 			}
 			std::string name( config.name);
 			if (name.empty())
 			{
-				name = utils::getFileStem( config.sourcepath);
+				name = utils::getFileStem( config.file);
 				if (name.empty())
 				{
 					error = "no name defined for print layout";
@@ -175,7 +175,7 @@ bool GlobalContext::loadDDLForm( const DDLFormConfigStruct& config, std::string&
 		std::string DDL( config.DDL);
 		if (DDL.empty())
 		{
-			std::string ext = utils::getFileExtension( config.sourcepath);
+			std::string ext = utils::getFileExtension( config.file);
 			if (!ext.size())
 			{
 				error = "no DDL specified (file extension missing) for form file";
@@ -194,12 +194,12 @@ bool GlobalContext::loadDDLForm( const DDLFormConfigStruct& config, std::string&
 			ddl::StructTypeR form = ddl::StructTypeR( new ddl::StructType());
 			try
 			{
-				*form = ci->compile( utils::readSourceFileContent( config.sourcepath));
+				*form = ci->compile( utils::readSourceFileContent( config.file));
 			}
 			catch (const std::exception& e)
 			{
 				std::ostringstream msg;
-				msg << "could not compile file '" << config.sourcepath << "': " << e.what() << std::endl;
+				msg << "could not compile file '" << config.file << "': " << e.what() << std::endl;
 				throw std::runtime_error( msg.str());
 			}
 
@@ -210,7 +210,7 @@ bool GlobalContext::loadDDLForm( const DDLFormConfigStruct& config, std::string&
 			}
 			else
 			{
-				name = utils::getFileStem( config.sourcepath);
+				name = utils::getFileStem( config.file);
 			}
 			defineForm( itemname = name, form);
 		}
@@ -257,17 +257,17 @@ bool GlobalContext::load( const EnvironmentConfigStruct& config)
 		{
 			if (!loadDDLForm( *itr, itemname, error))
 			{
-				LOG_ERROR << "Cannot load DDL form '" << itemname << " from '" << itr->sourcepath << "' (" << error << ")";
+				LOG_ERROR << "Cannot load DDL form '" << itemname << " from '" << itr->file << "' (" << error << ")";
 				rt = false;
 			}
 			else if (functions.find( itemname) != functions.end())
 			{
-				LOG_ERROR << "Name clash with " << functions[ itemname] << " loading DDL form '" << itemname << " from '" << itr->sourcepath << "' (" << error << ")";
+				LOG_ERROR << "Name clash with " << functions[ itemname] << " loading DDL form '" << itemname << " from '" << itr->file << "' (" << error << ")";
 				rt = false;
 			}
 			else
 			{
-				functions[ itemname] = std::string( "form definition '") + itemname + "' in '" + itr->sourcepath + "'";
+				functions[ itemname] = std::string( "form definition '") + itemname + "' in '" + itr->file + "'";
 				LOG_DEBUG << "Loaded DDL form '" << itemname << "'";
 			}
 		}
@@ -278,17 +278,17 @@ bool GlobalContext::load( const EnvironmentConfigStruct& config)
 		{
 			if (!loadPrintLayout( *itr, itemname, error))
 			{
-				LOG_ERROR << "Cannot load print layout '" << itemname << " from '" << itr->sourcepath << "' (" << error << ")";
+				LOG_ERROR << "Cannot load print layout '" << itemname << " from '" << itr->file << "' (" << error << ")";
 				rt = false;
 			}
 			else if (functions.find( itemname) != functions.end())
 			{
-				LOG_ERROR << "Name clash with " << functions[ itemname] << " loading print layout '" << itemname << " from '" << itr->sourcepath << "' (" << error << ")";
+				LOG_ERROR << "Name clash with " << functions[ itemname] << " loading print layout '" << itemname << " from '" << itr->file << "' (" << error << ")";
 				rt = false;
 			}
 			else
 			{
-				functions[ itemname] = std::string( "print layout '") + itemname + "' in '" + itr->sourcepath + "'";
+				functions[ itemname] = std::string( "print layout '") + itemname + "' in '" + itr->file + "'";
 				LOG_DEBUG << "Loaded print layout '" << itemname << "'";
 			}
 		}
@@ -320,17 +320,17 @@ bool GlobalContext::load( const EnvironmentConfigStruct& config)
 		{
 			if (!loadScript( *itr, itemname, error))
 			{
-				LOG_ERROR << "Cannot load script function '" << itemname << "' from '"<< itr->sourcepath << "' (" << error << ")";
+				LOG_ERROR << "Cannot load script function '" << itemname << "' from '"<< itr->file << "' (" << error << ")";
 				rt = false;
 			}
 			else if (functions.find( itemname) != functions.end())
 			{
-				LOG_ERROR << "Name clash with " << functions[ itemname] << " loading script function '" << itemname << "' from '"<< itr->sourcepath << "' (" << error << ")";
+				LOG_ERROR << "Name clash with " << functions[ itemname] << " loading script function '" << itemname << "' from '"<< itr->file << "' (" << error << ")";
 				rt = false;
 			}
 			else
 			{
-				functions[ itemname] = std::string( "script function '") + itemname + "' in '" + itr->sourcepath + "'";
+				functions[ itemname] = std::string( "script function '") + itemname + "' in '" + itr->file + "'";
 				LOG_DEBUG << "Loaded script function '" << itemname << "'";
 			}
 		}
