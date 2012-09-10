@@ -82,7 +82,6 @@ const serialize::StructDescriptionBase* TransactionFunctionConfigStruct::getStru
 			(*this)
 			( "name",		&TransactionFunctionConfigStruct::name)
 			( "type",		&TransactionFunctionConfigStruct::type)
-			( "database",		&TransactionFunctionConfigStruct::database)
 			( "call",		&TransactionFunctionConfigStruct::call)
 			;
 		}

@@ -43,7 +43,7 @@ namespace module {
 class FilterConstructor :public SimpleObjectConstructor< langbind::Filter >
 {
 public:
-	FilterConstructor( const char* name_, const langbind::CreateFilterPtrFunc filterFunc_ )
+	FilterConstructor( const char* name_, langbind::CreateFilterPtrFunc filterFunc_ )
 		: m_name(name_)
 		, m_function(filterFunc_) {}
 
@@ -65,7 +65,7 @@ public:
 private:
 	const std::string m_name;
 	const std::string m_arg;
-	const langbind::CreateFilterPtrFunc m_function;
+	langbind::CreateFilterPtrFunc m_function;
 };
 
 class FilterBuilder :public SimpleBuilder
@@ -86,7 +86,7 @@ public:
 		return new FilterConstructor( m_identifier, m_createFunc);
 	}
 private:
-	const langbind::CreateFilterPtrFunc m_createFunc;
+	langbind::CreateFilterPtrFunc m_createFunc;
 };
 
 }}//namespace

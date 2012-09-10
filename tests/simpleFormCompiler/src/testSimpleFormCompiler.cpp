@@ -30,16 +30,18 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file tests/testSimpleFormCompiler.cpp
-#include "ddl/compiler/simpleFormCompiler.hpp"
+#include "utils/miscUtils.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <iostream>
-#include "utils/miscUtils.hpp"
 #include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
 #include <stdexcept>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+
+//PF:HACK: Include instead of static linking because the module is already used as shared library module and the makefile system cannot handle this yet
+#include "ddl_compiler_simpleFormCompiler.cpp"
 
 using namespace _Wolframe;
 static boost::filesystem::path g_testdir;
@@ -81,8 +83,7 @@ TEST_F( SimpleFormCompilerTest, tests)
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );
-	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path().parent_path();
-
+	g_testdir = boost::filesystem::path( utils::getParentPath( argv[0], 2));
 	return RUN_ALL_TESTS();
 }
 

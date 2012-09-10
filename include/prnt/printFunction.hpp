@@ -63,7 +63,7 @@ struct PrintFunction
 typedef types::CountedReference<PrintFunction> PrintFunctionR;
 
 ///\param[in] description print description source
-typedef PrintFunctionR (*CreatePrintFunction)( const std::string& description);
+typedef PrintFunction* (*CreatePrintFunction)( const std::string& description);
 
 }}//namespace
 #endif

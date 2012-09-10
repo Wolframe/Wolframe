@@ -138,7 +138,7 @@ bool GlobalContext::loadPrintLayout( const PrintLayoutConfigStruct& config, std:
 			prnt::PrintFunctionR func;
 			try
 			{
-				func = pf( utils::readSourceFileContent( config.sourcepath));
+				func.reset( pf( utils::readSourceFileContent( config.sourcepath)));
 			}
 			catch (const std::exception& e)
 			{
@@ -235,7 +235,7 @@ bool GlobalContext::loadTransactionFunction( const TransactionFunctionConfigStru
 			return false;
 		}
 
-		defineTransactionFunction( itemname = config.name, creatf( config.database, config.call));
+		defineTransactionFunction( itemname = config.name, TransactionFunctionR( creatf( config.call)));
 		return true;
 	}
 	catch (std::runtime_error& e)

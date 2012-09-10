@@ -44,6 +44,8 @@
 #include "modules/ddlcompiler/template/ddlcompilerBuilder.hpp"
 #include "modules/formfunction/template/formfunctionBuilder.hpp"
 #include "modules/ddlcompiler/template/ddlcompilerBuilder.hpp"
+#include "modules/prnt/template/printFunctionBuilder.hpp"
+#include "modules/transaction/template/transactionFunctionBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 
 #include <list>
@@ -77,6 +79,10 @@ private:
 	std::map< const std::string, const module::FormFunctionConstructor* >	m_formfunctionMap;
 	std::list< const module::DDLCompilerConstructor* >	m_ddlcompiler;
 	std::map< const std::string, const module::DDLCompilerConstructor* >	m_ddlcompilerMap;
+	std::list< const module::TransactionFunctionConstructor* >	m_transactionFunctionCompiler;
+	std::map< const std::string, const module::TransactionFunctionConstructor* >	m_transactionFunctionCompilerMap;
+	std::list< const module::PrintFunctionConstructor* >	m_printFunctionCompiler;
+	std::map< const std::string, const module::PrintFunctionConstructor* >	m_printFunctionCompilerMap;
 };
 
 }} // namespace _Wolframe::proc

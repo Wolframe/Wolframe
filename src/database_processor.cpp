@@ -538,8 +538,7 @@ static std::string parseParameter( std::string::const_iterator& ii, std::string:
 	return rt;
 }
 
-TransactionFunction::TransactionFunction( const std::string& database, const std::string& src)
-	:m_database(database)
+TransactionFunction::TransactionFunction( const std::string& src)
 {
 	std::string::const_iterator ii = src.begin(), ee = src.end();
 	while (ii != ee)
@@ -891,7 +890,14 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 		langbind::GlobalContext* gct = langbind::getGlobalContext();
 		if (!gct->getPreparedStatementHandler( m_database, dbiref))
 		{
-			throw std::runtime_error( std::string("database prepared statement handler '") + m_database + "' not defined");
+			if (m_database.empty())
+			{
+				throw std::runtime_error( "default database prepared statement handler is not defined");
+			}
+			else
+			{
+				throw std::runtime_error( std::string("prepared statement handler for database '") + m_database + "' is not defined");
+			}
 		}
 		dbi = dbiref.get();
 
@@ -981,24 +987,18 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 	}
 	catch (const std::exception& e)
 	{
-		const char* dberr = (dbi)?dbi->getLastError():"could not get database interface";
-		if (dberr)
-		{
-			dbi->rollback();
-			throw std::runtime_error( std::string("error in database transaction: ") + e.what() + "(" + dberr + ")");
-		}
-		else
-		{
-			dbi->rollback();
-			throw std::runtime_error( std::string("error in database transaction: ") + e.what());
-		}
+		if (!dbi) throw std::runtime_error( e.what());
+
+		const char* dberr = dbi->getLastError();
+		std::string dberrstr( dberr?dberr:"unspecified database error");
+		dbi->rollback();
+		throw std::runtime_error( std::string("error in database transaction: ") + e.what() + " (" + dberrstr + ")");
 	}
 }
 
-langbind::TransactionFunctionR createPreparedStatementTransactionFunction( const std::string& database, const std::string& description)
+langbind::TransactionFunction* createPreparedStatementTransactionFunction( const std::string& description)
 {
-	langbind::TransactionFunctionR rt( new TransactionFunction( database, description));
-	return rt;
+	return new TransactionFunction( description);
 }
 
 

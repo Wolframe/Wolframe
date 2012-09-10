@@ -220,7 +220,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		}
 	}
 
-	// Build the lists of objects
+	// Build the lists of objects without configuration
 	for ( module::ModulesDirectory::simpleBuilder_iterator it = modules->objectsBegin();
 								it != modules->objectsEnd(); it++ )	{
 		switch( it->objectType() )	{
@@ -246,7 +246,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				break;
 			}
 
-			case ObjectConstructorBase::DDL_COMPILER_OBJECT:	{	// object is a DDL compiler
+			case ObjectConstructorBase::DDL_COMPILER_OBJECT:
+			{	// object is a DDL compiler
 				module::DDLCompilerConstructor* ffo = dynamic_cast< module::DDLCompilerConstructor* >((*it)->constructor());
 				if ( ffo == NULL )	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
@@ -269,7 +270,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				break;
 			}
 
-			case ObjectConstructorBase::FORM_FUNCTION_OBJECT:	{	// object is a form function
+			case ObjectConstructorBase::FORM_FUNCTION_OBJECT:
+			{	// object is a form function
 				module::FormFunctionConstructor* ffo = dynamic_cast< module::FormFunctionConstructor* >((*it)->constructor());
 				if ( ffo == NULL )	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
@@ -288,6 +290,57 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					m_formfunctionMap[ name ] = ffo;
 
 					LOG_TRACE << "'" << name << "' form function registered";
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::TRANSACTION_FUNCTION_OBJECT:
+			{	// object is a transaction function compiler
+				module::TransactionFunctionConstructor* ffo = dynamic_cast< module::TransactionFunctionConstructor* >((*it)->constructor());
+				if ( ffo == NULL )
+				{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+						  << "'' is not a transaction function compiler";
+					throw std::logic_error( "Object is not a transaction function compiler. See log." );
+				}
+				else	{
+					std::string name = ffo->identifier();
+					boost::algorithm::to_upper( name);
+					std::map <const std::string, const module::TransactionFunctionConstructor* >::const_iterator itr = m_transactionFunctionCompilerMap.find( name );
+					if ( itr != m_transactionFunctionCompilerMap.end() )	{
+						LOG_FATAL << "Duplicate transaction function compiler name '" << name << "'";
+						throw std::runtime_error( "Duplicate transaction function compiler name" );
+					}
+					m_transactionFunctionCompiler.push_back( ffo );
+					m_transactionFunctionCompilerMap[ name ] = ffo;
+
+					LOG_TRACE << "'" << name << "' transaction function compiler registered";
+				}
+				break;
+			}
+
+			case ObjectConstructorBase::PRINT_FUNCTION_OBJECT:
+			{	// object is a print function compiler
+				module::PrintFunctionConstructor* ffo = dynamic_cast< module::PrintFunctionConstructor* >((*it)->constructor());
+				if ( ffo == NULL )
+				{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+						  << "'' is not a print function compiler";
+					throw std::logic_error( "Object is not a print function compiler. See log." );
+				}
+				else
+				{
+					std::string name = ffo->identifier();
+					boost::algorithm::to_upper( name);
+					std::map <const std::string, const module::PrintFunctionConstructor* >::const_iterator itr = m_printFunctionCompilerMap.find( name );
+					if ( itr != m_printFunctionCompilerMap.end() )	{
+						LOG_FATAL << "Duplicate print function compiler name '" << name << "'";
+						throw std::runtime_error( "Duplicate print function compiler name" );
+					}
+					m_printFunctionCompiler.push_back( ffo );
+					m_printFunctionCompilerMap[ name ] = ffo;
+
+					LOG_TRACE << "'" << name << "' print function compiler registered";
 				}
 				break;
 			}

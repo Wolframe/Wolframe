@@ -29,63 +29,64 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/ddlcompiler/template/ddlcompilerContainerBuilder.hpp
-///\brief Interface template for object builder of form DDL compilers
-#ifndef _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "ddl/compilerInterface.hpp"
+///\file modules/prnt/template/PrintFunctionBuilder.hpp
+///\brief Interface template for object builder of print functions from a layout description
+#ifndef _Wolframe_MODULE_PRINT_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_MODULE_PRINT_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#include "prnt/printFunction.hpp"
 #include "moduleInterface.hpp"
 #include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-class DDLCompilerConstructor :public SimpleObjectConstructor< ddl::DDLCompiler >
+class PrintFunctionConstructor :public SimpleObjectConstructor< prnt::PrintFunction >
 {
 public:
-	DDLCompilerConstructor( const char* name_, ddl::CreateDDLCompilerFunc createFunc_ )
+	PrintFunctionConstructor( const char* name_, prnt::CreatePrintFunction createFunc_ )
 		: m_name(name_)
 		, m_createFunc(createFunc_) {}
 
-	virtual ~DDLCompilerConstructor(){}
+	virtual ~PrintFunctionConstructor(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
-		return DDL_COMPILER_OBJECT;
+		return PRINT_FUNCTION_OBJECT;
 	}
 	virtual const char* identifier() const
 	{
 		return m_name.c_str();
 	}
-	virtual ddl::DDLCompiler* object() const
+	virtual prnt::PrintFunction* object( const std::string& layout_source) const
 	{
-		return m_createFunc();
+		return m_createFunc( layout_source);
 	}
 
 private:
 	const std::string m_name;
-	ddl::CreateDDLCompilerFunc m_createFunc;
+	prnt::CreatePrintFunction m_createFunc;
 };
 
-class DDLCompilerBuilder :public SimpleBuilder
+class PrintFunctionBuilder :public SimpleBuilder
 {
 public:
-	DDLCompilerBuilder( const char* name_, ddl::CreateDDLCompilerFunc createFunc_)
+	PrintFunctionBuilder( const char* name_, prnt::CreatePrintFunction createFunc_)
 		:SimpleBuilder( name_)
 		,m_createFunc(createFunc_){}
 
-	virtual ~DDLCompilerBuilder(){}
+	virtual ~PrintFunctionBuilder(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
-		return ObjectConstructorBase::DDL_COMPILER_OBJECT;
+		return ObjectConstructorBase::PRINT_FUNCTION_OBJECT;
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new DDLCompilerConstructor( m_identifier, m_createFunc);
+		return new PrintFunctionConstructor( m_identifier, m_createFunc);
 	}
+
 private:
-	ddl::CreateDDLCompilerFunc m_createFunc;
+	prnt::CreatePrintFunction m_createFunc;
 };
 
 }}//namespace

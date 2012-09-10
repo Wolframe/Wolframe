@@ -62,10 +62,10 @@ private:
 };
 
 ///\param[in] description print description source
-PrintFunctionR createSimplePdfPrintFunction( const std::string& description);
+PrintFunction* createSimplePdfPrintFunction( const std::string& description);
 
 ///\param[in] description print description source
-PrintFunctionR createTestTracePdfPrintFunction( const std::string& description);
+PrintFunction* createTestTracePdfPrintFunction( const std::string& description);
 
 }}//namespace
 #endif

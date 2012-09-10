@@ -246,7 +246,7 @@ class TransactionFunction
 {
 public:
 	TransactionFunction( const TransactionFunction& o);
-	TransactionFunction( const std::string& database, const std::string& src);
+	TransactionFunction( const std::string& description);
 	virtual ~TransactionFunction(){}
 
 	virtual langbind::TransactionFunction::InputR getInput() const;
@@ -261,7 +261,7 @@ private:
 
 ///\param[in] handler name of interface to underlaying database
 ///\param[in] description transaction description source
-langbind::TransactionFunctionR createPreparedStatementTransactionFunction( const std::string& database, const std::string& description);
+langbind::TransactionFunction* createPreparedStatementTransactionFunction( const std::string& description);
 
 }}//namespace
 #endif

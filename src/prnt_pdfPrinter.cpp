@@ -298,19 +298,14 @@ Document* _Wolframe::prnt::createLibHpdfDocument()
 }
 #endif
 
-PrintFunctionR _Wolframe::prnt::createSimplePdfPrintFunction( const std::string& description)
+PrintFunction* _Wolframe::prnt::createSimplePdfPrintFunction( const std::string& description)
 {
-	SimplePdfPrintFunction* ref = new SimplePdfPrintFunction( description, false);
-	PrintFunctionR rt( ref);
-	return rt;
+	return new SimplePdfPrintFunction( description, false);
 }
 
-PrintFunctionR _Wolframe::prnt::createTestTracePdfPrintFunction( const std::string& description)
+PrintFunction* _Wolframe::prnt::createTestTracePdfPrintFunction( const std::string& description)
 {
-	SimplePdfPrintFunction* ref = new SimplePdfPrintFunction( description, true);
-	PrintFunctionR rt( ref);
-	return rt;
+	return new SimplePdfPrintFunction( description, true);
 }
-
 
 

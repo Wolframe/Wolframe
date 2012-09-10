@@ -58,7 +58,7 @@ typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
 
 ///\param[in] database name of the database
 ///\param[in] description transaction description source
-typedef TransactionFunctionR (*CreateTransactionFunction)( const std::string& database, const std::string& description);
+typedef TransactionFunction* (*CreateTransactionFunction)( const std::string& description);
 
 }}
 #endif

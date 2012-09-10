@@ -120,3 +120,22 @@ bool _Wolframe::utils::fileExists( const std::string& path)
 		return false;
 	}
 }
+
+std::string _Wolframe::utils::getParentPath( const std::string& path, unsigned int levels)
+{
+	boost::filesystem::path pt( path);
+	if (!pt.is_absolute())
+	{
+		pt = boost::filesystem::absolute( pt, boost::filesystem::current_path()).string();
+	}
+	pt = boost::filesystem::path( resolvePath( pt.string()));
+
+	while (levels > 0)
+	{
+		pt = pt.parent_path();
+		--levels;
+	}
+	return pt.string();
+}
+
+

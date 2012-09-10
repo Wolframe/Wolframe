@@ -29,6 +29,12 @@ std::string getFileStem( const std::string& path);
 ///\return the canonical path
 std::string getCanonicalPath( const std::string& path, const std::string& refpath);
 
+///\brief Get the parent path of 'path' (skipping /./ as parent path unlike boost::filesystem does)
+///\param[in] path the path to get the parent path from
+///\param[in] level how many level (1 = parent, 2 = granparent, etc.)
+///\return the parent path
+std::string getParentPath( const std::string& path, unsigned int levels=1);
+
 ///\brief Returns true, if the file with path 'path' exists
 bool fileExists( const std::string& path);
 

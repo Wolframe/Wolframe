@@ -22,15 +22,12 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_program_options
 
-OBJS = \
-	$(TOPDIR)/src/ddl_compiler_simpleFormCompiler.o
-
 TEST_CPP_BINS = \
 	testSimpleFormCompiler$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a $(TEST_OBJS)
+testSimpleFormCompiler$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 local_all:
 

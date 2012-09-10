@@ -293,9 +293,7 @@ static void loadGlobalContext( const std::string& testname)
 	g_processorProvider = new proc::ProcessorProvider( &g_processorProviderConfig, &g_modulesDirectory);
 	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
 	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
-
-	std::string cmdname( "printcmd");
-	gct->definePreparedStatementHandler( cmdname, testname, &createPreparedStatementHandlerFunc);
+	gct->definePreparedStatementHandler( ""/*default*/, testname, &createPreparedStatementHandlerFunc);
 }
 
 class DatabaseProcessorVMTest : public ::testing::Test
@@ -409,7 +407,7 @@ TEST_F( DatabaseProcessorVMTest, tests)
 		std::cerr << "processing test '" << testname << "'" << std::endl;
 		loadGlobalContext( testname);
 
-		TransactionFunction program( "printcmd", td.config);
+		TransactionFunction program( td.config);
 		langbind::TransactionFunction::InputR input = program.getInput();
 		pushTestInput( input, td.input);
 		langbind::TransactionFunction::ResultR result = program.execute( input.get());

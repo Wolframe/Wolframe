@@ -29,63 +29,63 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/ddlcompiler/template/ddlcompilerContainerBuilder.hpp
-///\brief Interface template for object builder of form DDL compilers
-#ifndef _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_DDL_COMPILER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "ddl/compilerInterface.hpp"
+///\file modules/transaction/template/transactionFunctionBuilder.hpp
+///\brief Interface template for object builder of transaction functions from a description
+#ifndef _Wolframe_MODULE_TRANSACTION_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_MODULE_TRANSACTION_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#include "langbind/transactionFunction.hpp"
 #include "moduleInterface.hpp"
 #include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-class DDLCompilerConstructor :public SimpleObjectConstructor< ddl::DDLCompiler >
+class TransactionFunctionConstructor :public SimpleObjectConstructor< langbind::TransactionFunction >
 {
 public:
-	DDLCompilerConstructor( const char* name_, ddl::CreateDDLCompilerFunc createFunc_ )
+	TransactionFunctionConstructor( const char* name_, langbind::CreateTransactionFunction createFunc_ )
 		: m_name(name_)
 		, m_createFunc(createFunc_) {}
 
-	virtual ~DDLCompilerConstructor(){}
+	virtual ~TransactionFunctionConstructor(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
-		return DDL_COMPILER_OBJECT;
+		return TRANSACTION_FUNCTION_OBJECT;
 	}
 	virtual const char* identifier() const
 	{
 		return m_name.c_str();
 	}
-	virtual ddl::DDLCompiler* object() const
+	virtual langbind::TransactionFunction* object( const std::string& description) const
 	{
-		return m_createFunc();
+		return m_createFunc( description);
 	}
 
 private:
 	const std::string m_name;
-	ddl::CreateDDLCompilerFunc m_createFunc;
+	const langbind::CreateTransactionFunction m_createFunc;
 };
 
-class DDLCompilerBuilder :public SimpleBuilder
+class TransactionFunctionBuilder :public SimpleBuilder
 {
 public:
-	DDLCompilerBuilder( const char* name_, ddl::CreateDDLCompilerFunc createFunc_)
+	TransactionFunctionBuilder( const char* name_, langbind::CreateTransactionFunction createFunc_)
 		:SimpleBuilder( name_)
 		,m_createFunc(createFunc_){}
 
-	virtual ~DDLCompilerBuilder(){}
+	virtual ~TransactionFunctionBuilder(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
-		return ObjectConstructorBase::DDL_COMPILER_OBJECT;
+		return ObjectConstructorBase::TRANSACTION_FUNCTION_OBJECT;
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new DDLCompilerConstructor( m_identifier, m_createFunc);
+		return new TransactionFunctionConstructor( m_identifier, m_createFunc);
 	}
 private:
-	ddl::CreateDDLCompilerFunc m_createFunc;
+	const langbind::CreateTransactionFunction m_createFunc;
 };
 
 }}//namespace

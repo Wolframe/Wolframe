@@ -121,10 +121,6 @@ TransactionFunctionOption::TransactionFunctionOption( const std::string& src)
 	{
 		throw std::runtime_error( "illegal transaction function option (type)");
 	}
-	if (!utils::parseNextToken( database, si, se))
-	{
-		throw std::runtime_error( "illegal transaction function option (database)");
-	}
 	call.insert( call.end(), si, se);
 }
 

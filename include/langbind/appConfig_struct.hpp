@@ -64,7 +64,6 @@ struct TransactionFunctionConfigStruct
 {
 	std::string name;						//< name of the function
 	std::string type;						//< name of the transaction function type (interpreter)
-	std::string database;						//< database interface
 	std::string call;						//< the source of the transaction function
 
 	///\brief Get the configuration structure description
