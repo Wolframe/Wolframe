@@ -46,8 +46,13 @@ ifneq ($(MAKECMDGOALS),distclean)
 -include $(TEST_BIN_OBJS:.o=.d)
 -include $(TEST_CPP_BIN_OBJS:.o=.d)
 
+.PHONY: depend_recursive
+depend_recursive:
+	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
+	  (set -e; $(MAKE) -C $$d depend || exit 1); done)
+
 .PHONY: depend
-depend: $(OBJS:.o=.d) $(CPP_OBJS:.o=.d) $(BIN_OBJS:.o=.d) $(CPP_BIN_OBJS:.o=.d) $(TEST_BIN_OBJS:.o=.d) $(TEST_CPP_BIN_OBJS:.o=.d)
+depend: depend_recursive $(OBJS:.o=.d) $(CPP_OBJS:.o=.d) $(BIN_OBJS:.o=.d) $(CPP_BIN_OBJS:.o=.d) $(TEST_BIN_OBJS:.o=.d) $(TEST_CPP_BIN_OBJS:.o=.d)
 
 endif
 endif
