@@ -16,6 +16,7 @@
 # - target 'install'
 # - target 'uninstall'
 # - target 'config'
+# - target 'depend'
 
 -include makefiles/gmake/platform.mk
 -include makefiles/gmake/compiler.mk
@@ -48,6 +49,11 @@ install:
 uninstall:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d uninstall || exit 1); done)
+
+.PHONY: depend
+depend:
+	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
+	  (set -e; $(MAKE) -C $$d depend || exit 1); done)
 
 .PHONY: test
 test: all

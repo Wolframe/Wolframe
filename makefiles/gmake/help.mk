@@ -12,6 +12,7 @@ make uninstall         uninstall (set 'DESTDIR' and 'prefix' at will)
 make dist[-Z|-gz|-bz2] create tarball containing all sources
 make help              show this very help page
 make config            show the configuration used during build
+make depend            build dependency files (extension .d)
 make init-po           create initial version of the gettext files
 make merge-po          merge the gettext files after changes
 make check-po          check sanity of gettext files
