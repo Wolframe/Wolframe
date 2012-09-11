@@ -122,3 +122,4 @@ tests/testWolfilter
 tests/testDatabaseProcessorVM
 wtest/wtestcheck
 src/modules/authentication/textfile/wolfpasswd
+tests/simpleFormCompiler/src/testSimpleFormCompiler
