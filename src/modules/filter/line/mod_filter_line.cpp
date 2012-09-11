@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file modules/filter/line/mod_filter_line.cpp
 ///\brief Module for line filters
-#include "modules/filter/template/filterBuilder.hpp"
+#include "module/filterBuilder.hpp"
 #include "filter/line_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>

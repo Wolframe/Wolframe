@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file modules/filter/libxml2/mod_filter_libxml2.cpp
 ///\brief Module for libxml2 XML filters
-#include "modules/filter/template/filterBuilder.hpp"
+#include "module/filterBuilder.hpp"
 #include "filter/libxml2_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>

@@ -40,12 +40,12 @@
 #include "processor/procProvider.hpp"
 #include "database/database.hpp"
 #include "database/DBprovider.hpp"
-#include "modules/filter/template/filterBuilder.hpp"
-#include "modules/ddlcompiler/template/ddlcompilerBuilder.hpp"
-#include "modules/formfunction/template/formfunctionBuilder.hpp"
-#include "modules/ddlcompiler/template/ddlcompilerBuilder.hpp"
-#include "modules/prnt/template/printFunctionBuilder.hpp"
-#include "modules/transaction/template/transactionFunctionBuilder.hpp"
+#include "module/filterBuilder.hpp"
+#include "module/ddlcompilerBuilder.hpp"
+#include "module/formfunctionBuilder.hpp"
+#include "module/ddlcompilerBuilder.hpp"
+#include "module/printFunctionBuilder.hpp"
+#include "module/transactionFunctionBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 
 #include <list>

@@ -32,8 +32,7 @@
 ************************************************************************/
 ///\file modules/filter/char/mod_filter_char.cpp
 ///\brief Module for char filters
-
-#include "modules/filter/template/filterBuilder.hpp"
+#include "module/filterBuilder.hpp"
 #include "filter/char_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>

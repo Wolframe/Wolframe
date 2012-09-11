@@ -32,8 +32,8 @@
 ************************************************************************/
 ///\file tests/wolfilter/modules/employee_assignment_convert/mod_employee_assignment_convert.cpp
 ///\brief Module for testing form functions
-#include "modules/formfunction/template/formfunctionBuilder.hpp"
-#include "wolfilter/modules/employee_assignment_convert/employee_assignment_convert.hpp"
+#include "module/formfunctionBuilder.hpp"
+#include "employee_assignment_convert.hpp"
 #include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
