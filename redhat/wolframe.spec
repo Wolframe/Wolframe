@@ -691,6 +691,8 @@ fi
 %{_includedir}/wolframe/types/*.h
 %dir %{_includedir}/wolframe/AAAA/
 %{_includedir}/wolframe/AAAA/*.hpp
+%dir %{_includedir}/wolframe/module/
+%{_includedir}/wolframe/module/*.hpp
 
 %if %{with_pgsql}
 %files postgresql
