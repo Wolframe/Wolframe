@@ -636,6 +636,7 @@ fi
 %{_libdir}/wolframe/modules/mod_filter_line.so
 %{_libdir}/wolframe/modules/mod_filter_textwolf.so
 %{_libdir}/wolframe/modules/mod_filter_token.so
+%{_libdir}/wolframe/modules/mod_filter_blob.so
 
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
@@ -690,6 +691,8 @@ fi
 %{_includedir}/wolframe/types/*.h
 %dir %{_includedir}/wolframe/AAAA/
 %{_includedir}/wolframe/AAAA/*.hpp
+%dir %{_includedir}/wolframe/module/
+%{_includedir}/wolframe/module/*.hpp
 
 %if %{with_pgsql}
 %files postgresql

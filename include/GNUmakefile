@@ -10,7 +10,7 @@ INCLUDE_SUBDIRS = \
 	. \
 	langbind protocol cmdbind database prnt config \
 	ddl ddl/compiler logger utils serialize serialize/struct \
-	serialize/ddl processor filter types AAAA
+	serialize/ddl processor filter types AAAA module
 
 local_install:
 	for d in $(INCLUDE_SUBDIRS); do \
