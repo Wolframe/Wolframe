@@ -60,7 +60,7 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 ##############################################################
 
 #OPENSSL_DIR = C:\Programme\OpenSSL-1.0.0a
-OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-release
+OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
 #OPENSSL_DIR = D:\Programme\OpenSSL
 #OPENSSL_DIR = D:\OpenSSL\Win32
 #OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
@@ -79,7 +79,7 @@ QT_DIR = C:\Qt\4.8.1
 
 #PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
-PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-release
+PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-debug
 
 # enable if Postgresql has been compiled with internationalization support
 # (libintl and libiconv)
