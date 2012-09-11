@@ -241,13 +241,13 @@ private:
 };
 
 
-class TransactionFunction
+class PreparedStatementTransactionFunction
 	:public langbind::TransactionFunction
 {
 public:
-	TransactionFunction( const TransactionFunction& o);
-	TransactionFunction( const std::string& description);
-	virtual ~TransactionFunction(){}
+	PreparedStatementTransactionFunction( const PreparedStatementTransactionFunction& o);
+	PreparedStatementTransactionFunction( const std::string& description);
+	virtual ~PreparedStatementTransactionFunction(){}
 
 	virtual langbind::TransactionFunction::InputR getInput() const;
 	virtual langbind::TransactionFunction::ResultR execute( const langbind::TransactionFunction::Input* input) const;

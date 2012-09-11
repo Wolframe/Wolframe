@@ -499,7 +499,7 @@ bool FunctionCall::hasResultReference() const
 	return false;
 }
 
-TransactionFunction::TransactionFunction( const TransactionFunction& o)
+PreparedStatementTransactionFunction::PreparedStatementTransactionFunction( const PreparedStatementTransactionFunction& o)
 	:m_database(o.m_database)
 	,m_resultname(o.m_resultname)
 	,m_call(o.m_call)
@@ -538,7 +538,7 @@ static std::string parseParameter( std::string::const_iterator& ii, std::string:
 	return rt;
 }
 
-TransactionFunction::TransactionFunction( const std::string& src)
+PreparedStatementTransactionFunction::PreparedStatementTransactionFunction( const std::string& src)
 {
 	std::string::const_iterator ii = src.begin(), ee = src.end();
 	while (ii != ee)
@@ -750,7 +750,7 @@ void TransactionResult::finalize()
 	m_itemitr = m_itemar.begin();
 }
 
-langbind::TransactionFunction::InputR TransactionFunction::getInput() const
+langbind::TransactionFunction::InputR PreparedStatementTransactionFunction::getInput() const
 {
 	langbind::TransactionFunction::InputR rt( new TransactionInput( &m_tagmap));
 	return rt;
@@ -881,7 +881,7 @@ static void bindResultRowReferenceArguments( PreparedStatementHandler* dbi, cons
 }
 
 
-langbind::TransactionFunction::ResultR TransactionFunction::execute( const langbind::TransactionFunction::Input* inputi) const
+langbind::TransactionFunction::ResultR PreparedStatementTransactionFunction::execute( const langbind::TransactionFunction::Input* inputi) const
 {
 	PreparedStatementHandler* dbi = 0;
 	try
@@ -998,7 +998,7 @@ langbind::TransactionFunction::ResultR TransactionFunction::execute( const langb
 
 langbind::TransactionFunction* createPreparedStatementTransactionFunction( const std::string& description)
 {
-	return new TransactionFunction( description);
+	return new PreparedStatementTransactionFunction( description);
 }
 
 

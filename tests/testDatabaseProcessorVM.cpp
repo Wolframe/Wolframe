@@ -407,7 +407,7 @@ TEST_F( DatabaseProcessorVMTest, tests)
 		std::cerr << "processing test '" << testname << "'" << std::endl;
 		loadGlobalContext( testname);
 
-		TransactionFunction program( td.config);
+		PreparedStatementTransactionFunction program( td.config);
 		langbind::TransactionFunction::InputR input = program.getInput();
 		pushTestInput( input, td.input);
 		langbind::TransactionFunction::ResultR result = program.execute( input.get());
