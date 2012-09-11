@@ -4,7 +4,7 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-SUBDIRS +=
+SUBDIRS += preparedStatement
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

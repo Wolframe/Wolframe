@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implementation of the processor of database commands
-///\file src/database_processor.cpp
+///\brief Implementation of the processor of prepared statements in the database
+///\file src/database_preparedStatementProcessor.cpp
 #include "database/preparedStatement.hpp"
-#include "database/processor.hpp"
+#include "database/preparedStatementProcessor.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "filter/token_filter.hpp"
 #include "textwolf/xmlscanner.hpp"

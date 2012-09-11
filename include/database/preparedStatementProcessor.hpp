@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\brief Interface of the processor of database commands
-///\file database/processor.hpp
+///\file database/preparedStatementProcessor.hpp
 #ifndef _DATABASE_PROCESSOR_HPP_INCLUDED
 #define _DATABASE_PROCESSOR_HPP_INCLUDED
 #include "types/allocators.hpp"

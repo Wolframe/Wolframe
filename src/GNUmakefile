@@ -113,7 +113,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_token_filter.o \
 	filter_tostringfilter.o \
 	filter_ptreefilter.o \
-	database_processor.o \
+	database_preparedStatementProcessor.o \
 	prnt_pdfPrinterVariable.o \
 	prnt_pdfPrinterMethod.o \
 	prnt_pdfPrinterExpression.o \

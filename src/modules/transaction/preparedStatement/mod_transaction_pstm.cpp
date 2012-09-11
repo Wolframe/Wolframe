@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/ddlcompiler/mod_ddlcompiler_simpleform.cpp
+///\file modules/transaction/mod_transaction_pstm.cpp
 ///\brief Module for testing form functions
-#include "module/ddlcompilerBuilder.hpp"
+#include "module/transactionFunctionBuilder.hpp"
 #include "logger-v1.hpp"
-#include "ddl/compiler/simpleFormCompiler.hpp"
+#include "database/preparedStatementProcessor.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 
@@ -47,11 +47,11 @@ static void setModuleLogger( void* logger )
 }
 
 namespace {
-struct SimpleformDDLCompiler
+struct PreparedStatementProcessor
 {
 	static SimpleBuilder* constructor()
 	{
-		return new DDLCompilerBuilder( "simpleform", ddl::createSimpleFormCompilerFunc);
+		return new TransactionFunctionBuilder( "dbpstm", db::createPreparedStatementTransactionFunction);
 	}
 };
 }//anonymous namespace
@@ -59,8 +59,8 @@ struct SimpleformDDLCompiler
 enum {NofObjects=1};
 static createBuilderFunc objdef[ NofObjects] =
 {
-	SimpleformDDLCompiler::constructor
+	PreparedStatementProcessor::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "simple form DDL compiler", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "transaction function as database prepared statements", setModuleLogger, 0, 0, NofObjects, objdef);
 

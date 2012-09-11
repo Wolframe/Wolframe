@@ -119,7 +119,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	types_allocators.obj \
 	types_bcdArithmetic.obj \
 	types_dateArithmetic.obj \
-	database_processor.obj \
+	database_preparedStatementProcessor.obj \
 	prnt_pdfPrinterVariable.obj \
 	prnt_pdfPrinterMethod.obj \
 	prnt_pdfPrinterExpression.obj \

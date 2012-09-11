@@ -27,6 +27,7 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	-I$(TOPDIR)/include -I. \
 	-I$(TOPDIR)/src \
+	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/gtest/include \
 	-I$(TOPDIR)/wtest

@@ -30,9 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file testWolfilter.cpp
-///\brief Test program for wolfilter like stdin/stdout mapping
-#include "database/processor.hpp"
+///\file testDatabaseProcessorVM.cpp
+///\brief Test program for the prepared statement interpreter
 #include "database/preparedStatement.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "logger-v1.hpp"
@@ -58,6 +57,9 @@
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
+
+//PF:HACK: Include instead of static linking because the module is already used as shared library module and the makefile system cannot handle this yet
+#include "database_preparedStatementProcessor.cpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
