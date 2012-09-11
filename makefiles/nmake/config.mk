@@ -91,17 +91,17 @@ PGDLL_WITHOUT_MAJOR_VERSION = 1
 # win_iconv
 ###########
 
-WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-debug
+WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-release
 
 # libxml2
 #########
 
-LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32-debug
+LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32-release
 
 # libxslt
 #########
 
-LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32-debug
+LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32-release
 
 # Tcl 8.5 and Expect
 ####################
@@ -116,8 +116,8 @@ EXPECT = $(TCL_DIR)\bin\tclsh.exe
 
 WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 
-#WIX_LIBS = dutil_2008.lib wcautil_2008.lib
-WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
+WIX_LIBS = dutil_2008.lib wcautil_2008.lib
+#WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 
 # architecture of resulting msi
 WIX_ARCH = x86

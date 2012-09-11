@@ -117,8 +117,7 @@ ms\do_nasm
 nmake /f ms\ntdll.mak
 nmake /f ms\ntdll.mak install
 
-Never versions of OpenSSL have a dieffent installation layout. For
-now do the following (so that other build systems don't break):
+For later usage in Postgresql add the following link libraries:
 
 mkdir C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC
 copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
@@ -305,6 +304,8 @@ before building the library:
 
 PREFIX="C:\Program Files\libxml2-2.7.8-win32"
 
+For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
+
 nmake /nologo /f Makefile.msvc all
 nmake /nologo /f Makefile.msvc install
 
@@ -328,11 +329,14 @@ For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
 When there are spaces in the installation prefix, fix it manually in 'config.msvc'
 before building the library:
 
-PREFIX="C:\Program Files\libxml2-2.7.8-win32"
+PREFIX="C:\Program Files\libxslt-1.1.26-win32"
 
 nmake /nologo /f Makefile.msvc all
 
-The xsltproc.exe binary is missing a manifest treatment, so manually execute
+For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
+
+In the debug version: the xsltproc.exe binary is missing a manifest treatment,
+so manually execute:
 
 cd win32\bin.msvc
 mt -nologo -manifest xsltproc.exe.manifest -outputresource:xsltproc.exe;1
