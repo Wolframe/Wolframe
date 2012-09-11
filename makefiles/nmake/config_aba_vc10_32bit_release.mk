@@ -60,7 +60,7 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 ##############################################################
 
 #OPENSSL_DIR = C:\Programme\OpenSSL-1.0.0a
-OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-debug
+OPENSSL_DIR = c:\OpenSSL\openssl-1.0.1-win32-release
 #OPENSSL_DIR = D:\Programme\OpenSSL
 #OPENSSL_DIR = D:\OpenSSL\Win32
 #OPENSSL_DIR = D:\Program Files\OpenSSL-1.0.0d
@@ -79,7 +79,7 @@ QT_DIR = C:\Qt\4.8.1
 
 #PGSQL_DIR = C:\Program Files\PostgreSQL\9.0
 #PGSQL_DIR = D:\Program Files\PostgreSQL\9.0
-PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-debug
+PGSQL_DIR = C:\cygwin\home\Andreas Baumann\postgresql-9.1.3-win32-release
 
 # enable if Postgresql has been compiled with internationalization support
 # (libintl and libiconv)
@@ -91,17 +91,17 @@ PGDLL_WITHOUT_MAJOR_VERSION = 1
 # win_iconv
 ###########
 
-WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-debug
+WIN_ICONV_DIR = C:\cygwin\home\Andreas Baumann\win-iconv-0.0.3-win32-release
 
 # libxml2
 #########
 
-LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32-debug
+LIBXML2_DIR = C:\cygwin\home\Andreas Baumann\libxml2-2.7.8-win32-release
 
 # libxslt
 #########
 
-LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32-debug
+LIBXSLT_DIR = C:\cygwin\home\Andreas Baumann\libxslt-1.1.26-win32-release
 
 # Tcl 8.5 and Expect
 ####################
@@ -116,8 +116,8 @@ EXPECT = $(TCL_DIR)\bin\tclsh.exe
 
 WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 
-#WIX_LIBS = dutil_2008.lib wcautil_2008.lib
-WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
+WIX_LIBS = dutil_2008.lib wcautil_2008.lib
+#WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 
 # architecture of resulting msi
 WIX_ARCH = x86
