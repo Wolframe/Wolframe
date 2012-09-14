@@ -33,7 +33,7 @@
       <enum>QFormLayout::ExpandingFieldsGrow</enum>
      </property>
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_first">
        <property name="text">
         <string>First Name:</string>
        </property>
@@ -47,7 +47,7 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="label_last">
        <property name="text">
         <string>Last Name:</string>
        </property>
@@ -61,7 +61,7 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="label_birthDate">
        <property name="text">
         <string>Date Of Birth:</string>
        </property>
@@ -82,7 +82,7 @@
       </widget>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="label_gender">
        <property name="text">
         <string>Gender:</string>
        </property>

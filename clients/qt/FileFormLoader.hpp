@@ -8,14 +8,14 @@
 #include <QObject>
 #include <QString>
 
-#include "AbstractFormLoader.hpp"
+#include "FormLoader.hpp"
 
 namespace _Wolframe {
 	namespace QtClient {
 
-	class FileFormLoader : public AbstractFormLoader
+	class FileFormLoader : public FormLoader
 	{
-		// intentionally omitting Q_OBJECT here, is done in AbstractFormLoader!
+		// intentionally omitting Q_OBJECT here, is done in FormLoader!
 		
 		public:
 			FileFormLoader( QString dir );
