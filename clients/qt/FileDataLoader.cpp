@@ -1,8 +1,8 @@
 //
-// FileDataHandler.cpp
+// FileDataLoader.cpp
 //
 
-#include "FileDataHandler.hpp"
+#include "FileDataLoader.hpp"
 
 #include <QDir>
 #include <QFile>
@@ -10,11 +10,11 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-FileDataHandler::FileDataHandler( QString dir ) : m_dir( dir ) 
+FileDataLoader::FileDataLoader( QString dir ) : m_dir( dir ) 
 {
 }
 
-void FileDataHandler::initiateDataLoad( QString name )
+void FileDataLoader::initiateDataLoad( QString name )
 {
 // read directly here and stuff data into the signal
 	QFile file( m_dir + "/" + name + ".xml" );
@@ -24,7 +24,7 @@ void FileDataHandler::initiateDataLoad( QString name )
 	emit dataLoaded( name, data );
 }
 
-void FileDataHandler::initiateDataSave( QString name, QByteArray data )
+void FileDataLoader::initiateDataSave( QString name, QByteArray data )
 {
 	QFile file( m_dir + "/" + name + ".xml.sav" );
 	file.open( QFile::WriteOnly );

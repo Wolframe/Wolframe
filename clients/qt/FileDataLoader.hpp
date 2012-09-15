@@ -1,22 +1,22 @@
 //
-// FileDataHandler.hpp
+// FileDataLoader.hpp
 //
 
 #ifndef _FILE_DATA_HANLDER_INCLUDED
 #define _FILE_DATA_HANLDER_INCLUDED
 
-#include "DataHandler.hpp"
+#include "DataLoader.hpp"
 
 namespace _Wolframe {
 	namespace QtClient {
 
-	class FileDataHandler : public DataHandler
+	class FileDataLoader : public DataLoader
 	{	
-		// intentionally omitting Q_OBJECT here, is done in DataHandler!
+		// intentionally omitting Q_OBJECT here, is done in DataLoader!
 		
 		public:
-			FileDataHandler( QString dir );
-			virtual ~FileDataHandler( ) {};
+			FileDataLoader( QString dir );
+			virtual ~FileDataLoader( ) {};
 
 			virtual void initiateDataLoad( QString form_name );
 			virtual void initiateDataSave( QString form_name, QByteArray data );
@@ -29,5 +29,5 @@ namespace _Wolframe {
 
 #endif // _FILE_DATA_HANLDER_INCLUDED
 //
-// FileDataHandler.hpp
+// FileDataLoader.hpp
 //

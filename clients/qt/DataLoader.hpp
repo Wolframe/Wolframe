@@ -1,5 +1,5 @@
 //
-// DataHandler.hpp
+// DataLoader.hpp
 //
 
 #ifndef _DATA_HANLDER_INCLUDED
@@ -13,12 +13,12 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-	class DataHandler : public QObject
+	class DataLoader : public QObject
 	{	
 		Q_OBJECT
 		
 		public:
-			virtual ~DataHandler( ) {};
+			virtual ~DataLoader( ) {};
 			virtual void initiateDataLoad( QString form_name ) = 0;
 			virtual void initiateDataSave( QString form_name, QByteArray data ) = 0;
 

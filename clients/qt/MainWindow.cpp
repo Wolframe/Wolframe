@@ -4,7 +4,7 @@
 
 #include "MainWindow.hpp"
 #include "FileFormLoader.hpp"
-#include "FileDataHandler.hpp"
+#include "FileDataLoader.hpp"
 
 #include <QtUiTools>
 #include <QtGui>
@@ -20,7 +20,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 ), m_fo
 	// for testing, load form descriptions and data
 	// from the local filesystem
 	m_formLoader = new FileFormLoader( "forms" );
-	m_dataHandler = new FileDataHandler( "data" );
+	m_dataHandler = new FileDataLoader( "data" );
 	initialize( );
 }
 
@@ -39,19 +39,19 @@ void MainWindow::initialize( )
 		this, SLOT( formListLoaded( ) ) );
 	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
 		this, SLOT( formLoaded( QString, QByteArray ) ) );	
-		
-// load default theme
-	loadTheme( QString( QLatin1String( "windows" ) ) );
+
+// link the data handler to our window
+	QObject::connect( m_dataHandler, SIGNAL( dataLoaded( QString, QByteArray ) ),
+		this, SLOT( dataLoaded( QString, QByteArray ) ) );
 
 // create a Wolframe protocol client
 	m_wolframeClient = new WolframeClient( );
 
 // create debuging terminal
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
-
-// link the data handler to our window
-	QObject::connect( m_dataHandler, SIGNAL( dataLoaded( QString, QByteArray ) ),
-		this, SLOT( dataLoaded( QString, QByteArray ) ) );
+		
+// load default theme
+	loadTheme( QString( QLatin1String( "windows" ) ) );
 }
 
 void MainWindow::populateThemesMenu( )

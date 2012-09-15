@@ -54,9 +54,9 @@ OBJS = \
 	FormLoader.obj \
 	moc_FormLoader.obj \
 	FileFormLoader.obj \
-	DataHandler.obj \
-	moc_DataHandler.obj \
-	FileDataHandler.obj \
+	DataLoader.obj \
+	moc_DataLoader.obj \
+	FileDataLoader.obj \
 	DebugTerminal.obj \
 	moc_DebugTerminal.obj \
 	HistoryLineEdit.obj \
@@ -89,8 +89,8 @@ moc_DebugTerminal.cpp: DebugTerminal.hpp
 moc_FormLoader.cpp: FormLoader.hpp
 	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. FormLoader.hpp -o moc_FormLoader.cpp
 
-moc_DataHandler.cpp: DataHandler.hpp
-	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. DataHandler.hpp -o moc_DataHandler.cpp
+moc_DataLoader.cpp: DataLoader.hpp
+	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. DataLoader.hpp -o moc_DataLoader.cpp
 
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. WolframeClient.hpp -o moc_WolframeClient.cpp

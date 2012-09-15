@@ -2,7 +2,7 @@
 <ui version="4.0">
  <author>generated</author>
  <class>Test2Form</class>
- <widget class="QWidget" name="Test2Form">
+ <widget class="QWidget" name="form1">
   <property name="geometry">
    <rect>
     <x>0</x>

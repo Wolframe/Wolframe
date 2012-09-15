@@ -1,8 +1,8 @@
 //
-// DataHandler.cpp
+// DataLoader.cpp
 //
 
-#include "DataHandler.hpp"
+#include "DataLoader.hpp"
 
 namespace _Wolframe {
 	namespace QtClient {
