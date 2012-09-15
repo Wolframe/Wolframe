@@ -26,7 +26,7 @@ void FileDataLoader::initiateDataLoad( QString name )
 
 void FileDataLoader::initiateDataSave( QString name, QByteArray data )
 {
-	QFile file( m_dir + "/" + name + ".xml.sav" );
+	QFile file( m_dir + "/" + name + ".xml" );
 	file.open( QFile::WriteOnly );
 	file.write( data );
 	file.close( );

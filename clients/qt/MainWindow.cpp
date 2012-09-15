@@ -45,6 +45,8 @@ void MainWindow::initialize( )
 // link the data loader to our window
 	QObject::connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
 		this, SLOT( dataLoaded( QString, QByteArray ) ) );
+	QObject::connect( m_dataLoader, SIGNAL( dataSaved( QString ) ),
+		this, SLOT( dataSaved( QString ) ) );
 
 // create a Wolframe protocol client
 	m_wolframeClient = new WolframeClient( );
@@ -222,8 +224,32 @@ void MainWindow::formLoaded( QString name, QByteArray xml )
 	
 	m_dataLoader->initiateDataLoad( name );
 
+// connect standard form actions
+	QMetaObject::connectSlotsByName( this );
+	
 // not busy anymore
 	qApp->restoreOverrideCursor();
+}
+
+void MainWindow::on_buttons_accepted( )
+{
+	qDebug( ) << "Form accepted";
+	
+	QByteArray xml;
+	m_dataHandler->writeFormData( m_currentForm, m_form, &xml );
+	
+	m_dataLoader->initiateDataSave( m_currentForm, xml );
+}
+
+void MainWindow::on_buttons_rejected( )
+{
+	qDebug( ) << "Form rejected";
+	m_dataLoader->initiateDataLoad( m_currentForm );
+}
+
+void MainWindow::dataSaved( QString name )
+{	
+	qDebug( ) << "Saved data for form " << name;
 }
 
 void MainWindow::dataLoaded( QString name, QByteArray xml )

@@ -18,6 +18,7 @@ namespace _Wolframe {
 			DataHandler( ) {};
 			virtual ~DataHandler( ) {};
 			void readFormData( QString name, QWidget *form, QByteArray &data );
+			void writeFormData( QString name, QWidget *form, QByteArray *data );
 	};
 } // namespace QtClient
 } // namespace _Wolframe

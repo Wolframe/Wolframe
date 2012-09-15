@@ -47,11 +47,15 @@ namespace _Wolframe {
 		void formListLoaded( );
 		void formLoaded( QString name, QByteArray xml );
 		void dataLoaded( QString name, QByteArray xml );
+		void dataSaved( QString name );
 
 		void on_actionExit_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
 		void on_actionDebugTerminal_triggered( bool checked );
+		
+		void on_buttons_accepted( );
+		void on_buttons_rejected( );
 	};
 } // namespace QtClient
 } // namespace _Wolframe
