@@ -8,6 +8,8 @@
     - naming convention to glue the values to string properties
     - where to put things like validators? (mandatory field,
       isnumber, regex, etc.)
+    - how to handle domain enums with internal and presentation
+      (e.g. combobox, selection)
   - save data back to this directory
   - first step is to edit a singleton object like one user in
     one form

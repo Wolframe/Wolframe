@@ -20,7 +20,8 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 ), m_fo
 	// for testing, load form descriptions and data
 	// from the local filesystem
 	m_formLoader = new FileFormLoader( "forms" );
-	m_dataHandler = new FileDataLoader( "data" );
+	m_dataLoader = new FileDataLoader( "data" );
+	m_dataHandler = new DataHandler( );
 	initialize( );
 }
 
@@ -28,8 +29,9 @@ MainWindow::~MainWindow( )
 {
 	delete m_debugTerminal;
 	delete m_wolframeClient;
-	delete m_formLoader;
 	delete m_dataHandler;
+	delete m_formLoader;
+	delete m_dataLoader;
 }
 
 void MainWindow::initialize( )
@@ -40,8 +42,8 @@ void MainWindow::initialize( )
 	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
 		this, SLOT( formLoaded( QString, QByteArray ) ) );	
 
-// link the data handler to our window
-	QObject::connect( m_dataHandler, SIGNAL( dataLoaded( QString, QByteArray ) ),
+// link the data loader to our window
+	QObject::connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
 		this, SLOT( dataLoaded( QString, QByteArray ) ) );
 
 // create a Wolframe protocol client
@@ -218,7 +220,7 @@ void MainWindow::formLoaded( QString name, QByteArray xml )
 // initiate load of form data
 	qDebug( ) << "Initiating loading of form data for form " << name;
 	
-	m_dataHandler->initiateDataLoad( name );
+	m_dataLoader->initiateDataLoad( name );
 
 // not busy anymore
 	qApp->restoreOverrideCursor();
@@ -229,6 +231,8 @@ void MainWindow::dataLoaded( QString name, QByteArray xml )
 	qDebug( ) << "Loaded data for form " << name
 		<< "(" << m_form << "):\n"
 		<< xml;
+	
+	m_dataHandler->readFormData( name, m_form, xml );
 }
 
 void MainWindow::themeSelected( QAction *action )

@@ -1,7 +1,8 @@
-<form>
+<?xml version="1.0" encoding="UTF-8"?>
+<form1>
   <first>Jon</first>
   <last>Doe</last>
-  <birthDate>12/22/1967</birthDate>
-  <gender>Male</gender>
-</form>
+  <birthDate>1967-12-22</birthDate>
+  <gender>Female</gender>
+</form1>
 

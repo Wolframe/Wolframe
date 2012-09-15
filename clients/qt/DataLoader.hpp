@@ -2,12 +2,11 @@
 // DataLoader.hpp
 //
 
-#ifndef _DATA_HANLDER_INCLUDED
-#define _DATA_HANLDER_INCLUDED
+#ifndef _DATA_LOADER_INCLUDED
+#define _DATA_LOADER_INCLUDED
 
 #include <QObject>
 #include <QString>
-#include <QStringList>
 #include <QByteArray>
 
 namespace _Wolframe {
@@ -29,4 +28,4 @@ namespace _Wolframe {
 } // namespace QtClient
 } // namespace _Wolframe
 
-#endif // _DATA_HANLDER_INCLUDED
+#endif // _DATA_LOADER_INCLUDED

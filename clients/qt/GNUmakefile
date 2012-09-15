@@ -48,6 +48,7 @@ OBJS = \
 	DataLoader.o \
 	moc_DataLoader.o \
 	FileDataLoader.o \
+	DataHandler.o \
 	DebugTerminal.o \
 	moc_DebugTerminal.o \
 	HistoryLineEdit.o \

@@ -9,6 +9,7 @@
 
 #include "FormLoader.hpp"
 #include "DataLoader.hpp"
+#include "DataHandler.hpp"
 #include "DebugTerminal.hpp"
 #include "WolframeClient.hpp"
 
@@ -29,7 +30,8 @@ namespace _Wolframe {
 		QString m_currentTheme;		// the name of the currently selected theme
 		QString m_currentForm;		// the name of the form currently visible
 		FormLoader *m_formLoader;	// form loader (visible form)
-		DataLoader *m_dataHandler;	// load and saves data (data form)
+		DataLoader *m_dataLoader;	// load and saves data (data form)
+		DataHandler *m_dataHandler;	// form/data handler
 		DebugTerminal *m_debugTerminal;	// protocol debug terminal (interactive)
 		WolframeClient *m_wolframeClient; // the client protocol class
 

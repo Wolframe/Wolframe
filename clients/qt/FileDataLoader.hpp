@@ -2,8 +2,8 @@
 // FileDataLoader.hpp
 //
 
-#ifndef _FILE_DATA_HANLDER_INCLUDED
-#define _FILE_DATA_HANLDER_INCLUDED
+#ifndef _FILE_DATA_LOADER_INCLUDED
+#define _FILE_DATA_LOADER_INCLUDED
 
 #include "DataLoader.hpp"
 
@@ -27,7 +27,7 @@ namespace _Wolframe {
 } // namespace QtClient
 } // namespace _Wolframe
 
-#endif // _FILE_DATA_HANLDER_INCLUDED
+#endif // _FILE_DATA_LOADER_INCLUDED
 //
 // FileDataLoader.hpp
 //

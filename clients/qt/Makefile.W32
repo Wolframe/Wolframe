@@ -57,6 +57,7 @@ OBJS = \
 	DataLoader.obj \
 	moc_DataLoader.obj \
 	FileDataLoader.obj \
+	DataHandler.obj \
 	DebugTerminal.obj \
 	moc_DebugTerminal.obj \
 	HistoryLineEdit.obj \
