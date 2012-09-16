@@ -12,6 +12,7 @@
 #include <QLineEdit>
 #include <QDateEdit>
 #include <QComboBox>
+#include <QSpinBox>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -48,6 +49,10 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
 			QString text = comboBox->itemText( comboBox->currentIndex( ) );
 			xml.writeTextElement( "", name, text );
+		} else if( clazz == "QSpinBox" ) {
+			QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
+			QString text = QString::number( spinBox->value( ) );
+			xml.writeTextElement( "", name, text );
 		}
 		qDebug( ) << clazz << name;
 	}
@@ -82,6 +87,9 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 						} else if( clazz == "QDateEdit" ) {
 							QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
 							dateEdit->setDate( QDate::fromString( text, Qt::ISODate ) );
+						} else if( clazz == "QSpinBox" ) {
+							QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
+							spinBox->setValue( text.toInt( ) );
 						} else if( clazz == "QComboBox" ) {
 							QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
 							for( int idx = 0; idx < comboBox->count( ); idx++ ) {

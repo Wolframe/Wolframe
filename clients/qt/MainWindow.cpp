@@ -254,8 +254,7 @@ void MainWindow::dataSaved( QString name )
 
 void MainWindow::dataLoaded( QString name, QByteArray xml )
 {
-	qDebug( ) << "Loaded data for form " << name
-		<< "(" << m_form << "):\n"
+	qDebug( ) << "Loaded data for form " << name << ":\n"
 		<< xml;
 	
 	m_dataHandler->readFormData( name, m_form, xml );
