@@ -55,14 +55,11 @@ LOCAL_STATIC_LIB_OBJS = \
 	appConfig.obj \
 	protocol_ioblocks.obj \
 	langbind_appObjects.obj \
-	langbind_appGlobalContext.obj \
 	langbind_appConfig_struct.obj \
 	langbind_appConfig_option.obj \
-	langbind_appConfig.obj \
 	langbind_scriptConfig_struct.obj \
 	langbind_scriptConfig_option.obj \
 	langbind_iostreamfilter.obj \
-	cmdbind_protocolCommandHandler.obj \
 	cmdbind_lineCommandHandler.obj \
 	cmdbind_execCommandHandler.obj \
 	cmdbind_ioFilterCommandHandler.obj \
@@ -74,10 +71,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_ptreefilter.obj \
 	filter_typingfilter.obj \
 	filter_textwolf_filter.obj \
-	filter_blob_filter.obj \
 	filter_char_filter.obj \
-	filter_line_filter.obj \
-	filter_token_filter.obj \
 	types_allocators.obj \
 	database_preparedStatementProcessor.obj \
 	acceptor.obj \
@@ -88,14 +82,7 @@ LOCAL_STATIC_LIB_OBJS = \
 
 !IFDEF WITH_SSL
 LOCAL_STATIC_LIB_OBJS = \
-	$(LOCAL_STATIC_LIB_OBJS) serverEndpoint.obj
-!ENDIF
-
-
-#SSL
-!IFDEF WITH_SSL
-LOCAL_STATIC_LIB_OBJS = $(LOCAL_STATIC_LIB_OBJS) \
-	SSLcertificateInfo.obj
+	$(LOCAL_STATIC_LIB_OBJS) serverEndpoint.obj SSLcertificateInfo.obj
 !ENDIF
 
 CPP_OBJS = \

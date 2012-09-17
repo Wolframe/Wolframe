@@ -35,21 +35,6 @@ INCLUDE_LIBS += \
 endif
 
 
-# libxml2
-ifeq ($(WITH_LIBXML2),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_LIBXML2
-
-INCLUDE_DIRS += \
-	$(LIBXML2_INCLUDE_DIRS)
-
-INCLUDE_LDFLAGS += \
-	$(LIBXML2_LIB_DIRS)
-
-INCLUDE_LIBS += \
-	$(LIBXML2_LIBS)
-endif
-
 LOCAL_STATIC_LIB = \
 	libwolframe.a
 
@@ -63,27 +48,21 @@ LOCAL_STATIC_LIB_OBJS = \
 	appConfig.o \
 	protocol_ioblocks.o \
 	langbind_appObjects.o \
-	langbind_appGlobalContext.o \
 	langbind_appConfig_struct.o \
 	langbind_appConfig_option.o \
-	langbind_appConfig.o \
 	langbind_scriptConfig_struct.o \
 	langbind_scriptConfig_option.o \
 	langbind_iostreamfilter.o \
-	cmdbind_protocolCommandHandler.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
 	cmdbind_ioFilterCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \
 	cmdbind_directmapCommandHandler.o \
 	filter_filter.o \
+	filter_textwolf_filter.o \
+	filter_char_filter.o \
 	filter_doctype.o \
 	filter_typingfilter.o \
-	filter_textwolf_filter.o \
-	filter_blob_filter.o \
-	filter_char_filter.o \
-	filter_line_filter.o \
-	filter_token_filter.o \
 	filter_tostringfilter.o \
 	filter_ptreefilter.o \
 	database_preparedStatementProcessor.o \
@@ -95,12 +74,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	server.o \
 	procProviderImpl.o
 
-
-#LIBXML2
-ifeq ($(WITH_LIBXML2),1)
-LOCAL_STATIC_LIB_OBJS += \
-	filter_libxml2_filter.o
-endif
 
 #SSL
 ifeq ($(WITH_SSL),1)
