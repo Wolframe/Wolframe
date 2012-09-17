@@ -31,13 +31,50 @@
 
 ************************************************************************/
 //
-// This is a dummy module loader in order to satisfy all dependencies
+// paswword file manipulation tests
 //
 
-#include "moduleDirectory.hpp"
+#include "logger-v1.hpp"
+#include "gtest/gtest.h"
+#include "passwdFile.hpp"
 
-bool _Wolframe::module::LoadModules( ModulesDirectory& /*modules*/,
-				     const std::list< std::string >& /*modFiles*/)
+#ifdef _WIN32
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif
+
+using namespace _Wolframe::AAAA;
+using namespace std;
+
+// make the logger in the modules work although it does not make sense
+_Wolframe::log::LogBackend*	logBackendPtr;
+
+// The fixture for testing class _Wolframe::module
+class PasswdFileFixture : public ::testing::Test
 {
-	return true;
+protected:
+	PasswdFileFixture( )	{}
+};
+
+
+TEST_F( PasswdFileFixture, parsingLine )
+{
+	std::string user, password, info;
+	bool result;
+
+	result = PasswordFile::parsePwdLine( "user:password:info",
+					     user, password, info );
+
+	ASSERT_TRUE( result );
+	ASSERT_STREQ( "user", user.c_str() );
+	ASSERT_STREQ( "password", password.c_str() );
+	ASSERT_STREQ( "info", info.c_str() );
+}
+
+//****************************************************************************
+
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS( );
 }

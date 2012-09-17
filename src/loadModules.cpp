@@ -35,6 +35,7 @@
 //
 
 #include "logger-v1.hpp"
+#include "moduleDirectory.hpp"
 #include "moduleInterface.hpp"
 #include "utils/miscUtils.hpp"
 

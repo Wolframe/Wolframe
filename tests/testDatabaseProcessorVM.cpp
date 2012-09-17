@@ -44,7 +44,7 @@
 #include "filter/tostringfilter.hpp"
 #include "utils/miscUtils.hpp"
 #include "processor/procProvider.hpp"
-#include "moduleInterface.hpp"
+#include "moduleDirectory.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>

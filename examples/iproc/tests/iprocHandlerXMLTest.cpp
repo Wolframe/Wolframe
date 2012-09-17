@@ -37,7 +37,7 @@
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
 #include "langbind/appGlobalContext.hpp"
-#include "moduleInterface.hpp"
+#include "moduleDirectory.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"

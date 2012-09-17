@@ -1,1 +1,35 @@
 - use QNetworkSession (for mobiles and roaming profiles)
+- localize forms:
+  - there should be no need to copy them just for localization
+- investigate why auto-wiring failed in the past
+- add a data handler
+  - simplest form is read data as XML from a directory (as for
+    the forms)
+    - classes to map from/to:
+      - grouped QRadioButtons: exclusive, select one item from
+        a small list of possible items in a domain
+      - grouped QCheckBoxes: multiple select in a small list of
+        items
+      - QListView: list of things to select (multiple select)
+      - QPlainTextEdit: tags in rich text?
+      - QTreeWidget
+      - file upload
+      - file download
+    - where to put things like validators? (mandatory field,
+      isnumber, regex, etc.)
+    - tooltips?
+    - how to handle domain enums with internal and presentation
+      (e.g. combobox, selection)
+    - representation of lists of variable size, e.g. list of
+      phone numbers
+  - 1:n relations (pick a foreign reference to another
+    object), domains (e.g. pick a city in a list of possibilities)
+  - grid views
+- QIODevice for data loader and handler instead of a fixed byte
+  array in the signal (otherwise the debug window gets complicated)
+- attach the DebugWindow also to the simple file based form
+  and data loader, to test the debugging window. Needs line peeking
+  and rewinding QIODevice
+- workflow
+  - save, cancel of form (first step)
+

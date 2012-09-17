@@ -51,9 +51,13 @@ MOC_FLAGS = \
 OBJS = \
 	moc_MainWindow.obj \
 	MainWindow.obj \
-	AbstractFormLoader.obj \
-	moc_AbstractFormLoader.obj \
+	FormLoader.obj \
+	moc_FormLoader.obj \
 	FileFormLoader.obj \
+	DataLoader.obj \
+	moc_DataLoader.obj \
+	FileDataLoader.obj \
+	DataHandler.obj \
 	DebugTerminal.obj \
 	moc_DebugTerminal.obj \
 	HistoryLineEdit.obj \
@@ -83,8 +87,11 @@ moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
 moc_DebugTerminal.cpp: DebugTerminal.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
 
-moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
-	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
+moc_FormLoader.cpp: FormLoader.hpp
+	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. FormLoader.hpp -o moc_FormLoader.cpp
+
+moc_DataLoader.cpp: DataLoader.hpp
+	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. DataLoader.hpp -o moc_DataLoader.cpp
 
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. WolframeClient.hpp -o moc_WolframeClient.cpp

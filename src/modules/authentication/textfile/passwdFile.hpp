@@ -49,9 +49,16 @@ public:
 	PasswordFile( const std::string& filename, bool create = false )
 		: m_filename( filename ), m_create( create )	{}
 
-	static std::string passwdString( const std::string& user,
-					 const std::string& password );
+	/// Return the string as it is in the password file
+	static std::string passwdLine( const std::string& user, const std::string& password,
+				       const std::string& info = "" );
 
+	/// Parse the password string and split it into fields
+	/// \param
+	static bool parsePwdLine( const std::string& pwdLine,
+				  std::string& user, std::string& password, std::string& info );
+
+	/// Return the salt used for the password file
 	std::string salt();
 
 	void addUser( const std::string& user, const std::string& password );

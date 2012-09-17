@@ -23,7 +23,7 @@ void FileFormLoader::initiateListLoad( )
 void FileFormLoader::initiateFormLoad( QString &name )
 {
 // read directly here and stuff data into the signal
-	QFile file( m_dir + "/" + name );
+	QFile file( m_dir + "/" + name + ".ui" );
 	file.open( QFile::ReadOnly );
 	QByteArray data = file.readAll( );
 	file.close( );	
@@ -34,7 +34,8 @@ QStringList FileFormLoader::getFormNames( )
 {
 // read list of forms diretcory on demand
 	QDir forms_dir( QLatin1String( "forms" ) );
-	QStringList forms = forms_dir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name );
+	QStringList forms = forms_dir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
+		.replaceInStrings( ".ui", "" );
 	return forms;
 }
 

@@ -102,9 +102,13 @@ If you want to compile your own version, use
 - a perl (ActivePerl)
 - optionally NASM
 
+perl Configure debug-VC-WIN32 \
+	--prefix="C:\OpenSSL\openssl-1.0.1-win32-debug"
+
+respectively
+
 perl Configure VC-WIN32 \
-	--prefix="C:\OpenSSL\openssl-1.0.1-win32-debug" \
-	asm threads no-shared
+	--prefix="C:\OpenSSL\openssl-1.0.1-win32-release"
 	
 Make sure there prefix has no spaces in it!
 
@@ -113,6 +117,22 @@ ms\do_nasm
 nmake /f ms\ntdll.mak
 nmake /f ms\ntdll.mak install
 
+For later usage in Postgresql add the following link libraries:
+
+mkdir C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC
+copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC\libeay32MDd.lib
+copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\ssleay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC\ssleay32MDd.lib
+
+respectively
+
+mkdir C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC
+copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\libeay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\libeay32MD.lib
+copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
+	
 Have a closer look to INSTALL.W32 and INSTALL.W64 of the package itself.
 
 Qt
@@ -173,7 +193,7 @@ You need at least ActivePerl installed.
 cd src\tools\msvc
 copy config_default.pl config.pl
 
-Adapt config.pl to your needsm for instance for SSL support:
+Adapt config.pl to your needs for instance for SSL support:
 
 openssl=>"C:\OpenSSL\openssl-1.0.1-win32-debug"
 
@@ -182,10 +202,21 @@ to start bison and you don't have bison installed.
 
 build DEBUG libpq
 
+respectively
+
+build RELEASE libpq
+
 install C:\<somewhere>
 
-(install fails happily with spaces in pathes, source and destination,
-copy by hand in this case)
+or if thata fails, and usually it does (install fails happily with spaces in pathes
+source and destination, copy by hand in this case), do:
+
+mkdir C:\<somewhere>\include
+mkdir C:\<somewhere>\lib
+copy Release\libpq.dll C:\<somewhere>\lib
+copy Release\libpq.lib C:\<somewhere>\lib
+copy src\interfaces\libpq\libpq-fe.h C:\<somewhere>\include
+copy src\include\postgres_ext.h C:\<somewhere>\include
 
 Notes for Postgreslql 9.0.4
 ---------------------------
@@ -202,6 +233,8 @@ with VS2010:
 
 http://archives.postgresql.org/pgsql-hackers/2011-01/msg00118.php
 
+(in Wolframe, see contrib\Windows\Postgresql\VS2010v2.patch)
+
 The patch has some hard coded library names:
 
 cd <openssl-dir>\lib
@@ -209,6 +242,14 @@ mkdir VC
 cd VC
 copy ..\libeay32.dll libeay32MDd.lib (for the 32-bit debug version for example)
 copy ..\ssleay32.dll ssleay32MDd.lib
+
+respectively for the release version:
+
+cd <openssl-dir>\lib
+mkdir VC
+cd VC
+copy ..\libeay32.dll libeay32MD.lib (for the 32-bit debug version for example)
+copy ..\ssleay32.dll ssleay32MD.lib
 
 Maybe newer versions will have the patch integrated.
 
@@ -263,6 +304,8 @@ before building the library:
 
 PREFIX="C:\Program Files\libxml2-2.7.8-win32"
 
+For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
+
 nmake /nologo /f Makefile.msvc all
 nmake /nologo /f Makefile.msvc install
 
@@ -286,11 +329,14 @@ For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
 When there are spaces in the installation prefix, fix it manually in 'config.msvc'
 before building the library:
 
-PREFIX="C:\Program Files\libxml2-2.7.8-win32"
+PREFIX="C:\Program Files\libxslt-1.1.26-win32"
 
 nmake /nologo /f Makefile.msvc all
 
-The xsltproc.exe binary is missing a manifest treatment, so manually execute
+For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
+
+In the debug version: the xsltproc.exe binary is missing a manifest treatment,
+so manually execute:
 
 cd win32\bin.msvc
 mt -nologo -manifest xsltproc.exe.manifest -outputresource:xsltproc.exe;1

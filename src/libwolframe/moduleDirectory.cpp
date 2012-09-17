@@ -36,7 +36,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include "logger-v1.hpp"
-#include "moduleInterface.hpp"
+#include "moduleDirectory.hpp"
 
 namespace _Wolframe {
 namespace module {
@@ -123,11 +123,11 @@ ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& section,
 	return NULL;
 }
 
-ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& identifier ) const
+ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& objectName ) const
 {
 	for ( std::list< ConfiguredBuilder* >::const_iterator it = m_cfgdBuilder.begin();
 							it != m_cfgdBuilder.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->m_identifier, identifier ))
+		if ( boost::algorithm::iequals( (*it)->m_identifier, objectName ))
 			return *it;
 	}
 	return NULL;

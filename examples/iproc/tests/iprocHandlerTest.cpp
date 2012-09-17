@@ -39,7 +39,7 @@
 #include "handlerConfig.hpp"
 #include "langbind/appObjects.hpp"
 #include "processor/procProvider.hpp"
-#include "moduleInterface.hpp"
+#include "moduleDirectory.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"

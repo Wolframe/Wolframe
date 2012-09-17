@@ -70,17 +70,31 @@ class ConfiguredBuilder
 {
 	friend class ModulesDirectory;
 public:
+	/// ConfiguredBuilder (builder for objects with configuration) constructor
+	///\param title		string used for printing purposes, usually logging.
+	///\param section	configuration section (parent node)
+	///\param keyword	keyword in the configuration section. The object configuration
+	///			is bind to the section, keyword pair
+	///\param objectName	the name of the object the builder builds
 	ConfiguredBuilder( const char* title, const char* section, const char* keyword,
 			   const char* id )
-		: m_title( title ), m_section( section), m_keyword( keyword ),
+		: m_title( title ), m_section( section ), m_keyword( keyword ),
 		  m_identifier( id )			{}
 
 	virtual ~ConfiguredBuilder()			{}
 
 	const char* identifier() const			{ return m_identifier; }
 
+	/// The type of the object: filter, audit, command handler etc.
+	/// This is not the same as the objectName
 	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
+
+	/// the configuration for the object
+	///\param logPrefix	string to print before the log messages generated inside this object.
+	///			Same as for any confiuration object.
 	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
+
+	/// the virtual constructor for the object
 	virtual ObjectConstructorBase* constructor() = 0;
 protected:
 	const char* m_title;		///< used for printing (logging etc.)
@@ -91,7 +105,7 @@ protected:
 };
 
 
-///
+/// Template for constructing a configured builder.
 template < class Tconstructor, class Tconf >
 class ConfiguredBuilderDescription : public ConfiguredBuilder
 {
@@ -115,60 +129,6 @@ private:
 	Tconstructor	m_constructor;
 };
 
-///
-class ModulesDirectory
-{
-public:
-	ModulesDirectory()				{}
-	~ModulesDirectory();
-
-	bool addBuilder( ConfiguredBuilder* builder );
-	bool addBuilder( SimpleBuilder* builder );
-
-	ConfiguredBuilder* getBuilder( const std::string& section, const std::string& keyword ) const;
-	ConfiguredBuilder* getBuilder( const std::string& identifier ) const;
-
-	class simpleBuilder_iterator
-	{
-		friend class ModulesDirectory;
-	public:
-		simpleBuilder_iterator()			{}
-		simpleBuilder_iterator( const simpleBuilder_iterator& it )
-			: m_it( it.m_it )		{}
-
-		SimpleBuilder* operator->() const	{ return *m_it; }
-		SimpleBuilder* operator*() const	{ return *m_it; }
-		simpleBuilder_iterator& operator++()	{ ++m_it; return *this; }
-		simpleBuilder_iterator operator++( int ){ simpleBuilder_iterator rtrn( *this ); ++m_it; return rtrn; }
-		bool operator == ( const simpleBuilder_iterator& rhs )
-							{ return m_it == rhs.m_it; }
-		bool operator != ( const simpleBuilder_iterator& rhs )
-							{ return m_it != rhs.m_it; }
-
-	private:
-		std::list< SimpleBuilder* >::const_iterator	m_it;
-
-		simpleBuilder_iterator( const std::list< SimpleBuilder* >::const_iterator& it )
-			: m_it( it )			{}
-	};
-
-	simpleBuilder_iterator objectsBegin() const	{ return simpleBuilder_iterator( m_simpleBuilder.begin() ); }
-	simpleBuilder_iterator objectsEnd() const	{ return simpleBuilder_iterator( m_simpleBuilder.end() ); }
-
-	///\brief Get a selected list of configurable objects loaded as tuple (section,keyword)
-	///\remark This function solves a henn and egg problem for the wolfilter program.
-	///\param[in] objtype type of the configurable objects to select
-	///\return The list of section,keyword tuples of configurable objects with the selected type
-	std::vector<std::pair<std::string,std::string> > getConfigurableSectionKeywords( ObjectConstructorBase::ObjectType objtype) const;
-
-private:
-	std::list< ConfiguredBuilder* >	m_cfgdBuilder;	///< list of configurable builders
-	std::list< SimpleBuilder* >	m_simpleBuilder;///< list of simple builders
-};
-
-
-bool LoadModules( ModulesDirectory& modDir, const std::list< std::string >& modFiles );
-
 
 //*********** Module interface *********
 
@@ -180,16 +140,19 @@ typedef ConfiguredBuilder* (*createCfgdBuilderFunc)();
 /// This function is specific for each of the simple builders in the module.
 typedef SimpleBuilder* (*createBuilderFunc)();
 
+
+/// The module entry point structure. Only one entry point per module.
 struct ModuleEntryPoint
 {
 	enum	SignSize	{
 		MODULE_SIGN_SIZE = 16
 	};
 
-	char signature[MODULE_SIGN_SIZE];
-	unsigned short ifaceVersion;
-	const char* name;
-	void (*setLogger)(void*);
+	char signature[MODULE_SIGN_SIZE];		///< module entry point signature
+	unsigned short ifaceVersion;			///< version of the module loader interface
+	const char* name;				///< name of the module
+	void (*setLogger)(void*);			///< pointer to function that sets the
+							/// the logger for the module objects
 	unsigned short		cfgdContainers;		///< number of configured builders
 	createCfgdBuilderFunc	*createCfgdBuilder;	///< the array of functions that create the configured builders
 	unsigned short		containers;		///< number of simple (unconfigured) builders

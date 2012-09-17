@@ -42,9 +42,13 @@ endif
 OBJS = \
 	moc_MainWindow.o \
 	MainWindow.o \
-	AbstractFormLoader.o \
-	moc_AbstractFormLoader.o \
+	FormLoader.o \
+	moc_FormLoader.o \
 	FileFormLoader.o \
+	DataLoader.o \
+	moc_DataLoader.o \
+	FileDataLoader.o \
+	DataHandler.o \
 	DebugTerminal.o \
 	moc_DebugTerminal.o \
 	HistoryLineEdit.o \
@@ -68,8 +72,11 @@ moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
 moc_DebugTerminal.cpp: DebugTerminal.hpp
 	$(QT_MOC) $(MOC_FLAGS) DebugTerminal.hpp -o moc_DebugTerminal.cpp
 
-moc_AbstractFormLoader.cpp: AbstractFormLoader.hpp
-	$(QT_MOC) $(MOC_FLAGS) AbstractFormLoader.hpp -o moc_AbstractFormLoader.cpp
+moc_FormLoader.cpp: FormLoader.hpp
+	$(QT_MOC) $(MOC_FLAGS) FormLoader.hpp -o moc_FormLoader.cpp
+
+moc_DataLoader.cpp: DataLoader.hpp
+	$(QT_MOC) $(MOC_FLAGS) DataLoader.hpp -o moc_DataLoader.cpp
 
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_MOC) $(MOC_FLAGS) WolframeClient.hpp -o moc_WolframeClient.cpp
@@ -91,6 +98,9 @@ FORMS = \
 	forms/form1.ui \
 	forms/form2.ui
 
+DATA = \
+	data/form1.xml
+
 THEMES = \
 	themes/phone/MainWindow.ui \
 	themes/windows/MainWindow.ui
@@ -100,6 +110,8 @@ local_test:
 	@for i in $(THEMES); do xmllint --noout --schema qt-ui-4.7.xsd $$i; done
 	@echo "Testing validity of forms.."
 	@for i in $(FORMS); do xmllint --noout --schema qt-ui-4.7.xsd $$i; done
+	@echo "Testing validity of XML data.."
+	@for i in $(DATA); do xmllint --noout $$i; done
 
 run: $(CPP_BINS)
 	@echo "Testing Qt client.."

@@ -95,7 +95,6 @@ tests/libxslt/testlibxslt1
 tests/testMethodMemberPointerTemplate
 examples/iproc/tests/iprocHandlerTest
 examples/iproc/tests/iprocHandlerXMLTest
-tests/simpleFormCompiler/src/testSimpleFormCompiler
 examples/iproc/tests/structFiltermapTest
 examples/iproc/tests/structLuamapTest
 examples/tproc/tests/tprocHandlerTest
@@ -130,3 +129,5 @@ makeNOLUA.sh
 setenv.sh
 valgrind.sh
 wtest/cleanInput
+tests/simpleFormCompiler/src/testSimpleFormCompiler
+tests/AAAA/passwdFileTest

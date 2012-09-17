@@ -4,17 +4,24 @@
 
 #include "MainWindow.hpp"
 #include "FileFormLoader.hpp"
+#include "FileDataLoader.hpp"
 
 #include <QtUiTools>
 #include <QtGui>
 #include <QBuffer>
+
+#include <QDebug>
 
 namespace _Wolframe {
 	namespace QtClient {
 
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 ), m_form( 0 )
 {
+	// for testing, load form descriptions and data
+	// from the local filesystem
 	m_formLoader = new FileFormLoader( "forms" );
+	m_dataLoader = new FileDataLoader( "data" );
+	m_dataHandler = new DataHandler( );
 	initialize( );
 }
 
@@ -22,19 +29,33 @@ MainWindow::~MainWindow( )
 {
 	delete m_debugTerminal;
 	delete m_wolframeClient;
+	delete m_dataHandler;
 	delete m_formLoader;
+	delete m_dataLoader;
 }
 
 void MainWindow::initialize( )
 {
-// load default theme
-	loadTheme( QString( QLatin1String( "windows" ) ) );
+// link the form loader for form loader notifications
+	QObject::connect( m_formLoader, SIGNAL( formListLoaded( ) ),
+		this, SLOT( formListLoaded( ) ) );
+	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
+		this, SLOT( formLoaded( QString, QByteArray ) ) );	
+
+// link the data loader to our window
+	QObject::connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
+		this, SLOT( dataLoaded( QString, QByteArray ) ) );
+	QObject::connect( m_dataLoader, SIGNAL( dataSaved( QString ) ),
+		this, SLOT( dataSaved( QString ) ) );
 
 // create a Wolframe protocol client
 	m_wolframeClient = new WolframeClient( );
 
 // create debuging terminal
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
+		
+// load default theme
+	loadTheme( QString( QLatin1String( "windows" ) ) );
 }
 
 void MainWindow::populateThemesMenu( )
@@ -97,7 +118,10 @@ void MainWindow::loadTheme( QString theme )
 
 	QAction *actionDebugTerminal = qFindChild<QAction *>( m_ui, "actionDebugTerminal" );
 	QObject::connect( actionDebugTerminal, SIGNAL( triggered( bool ) ), this, SLOT( on_actionDebugTerminal_triggered( bool ) ) ); 
-
+	// TODO: for this to work the SAME object must implement
+	// the slots!
+	// QMetaObject::connectSlotsByName( this );
+	
 // copy over the location of the old window to the new one
 // also copy over the current form, don't destroy the old ui,
 // events could be outstanding (deleteLater marks the widget 
@@ -119,7 +143,6 @@ void MainWindow::loadTheme( QString theme )
 	populateThemesMenu( );
 
 // now that we have a menu where we can add things, we start the form list loading
-	QObject::connect( m_formLoader, SIGNAL( formListLoaded( ) ), this, SLOT( formListLoaded( ) ) );
 	m_formLoader->initiateListLoad( );
 	
 // not busy anymore
@@ -153,8 +176,9 @@ void MainWindow::formListLoaded( )
 }
 
 void MainWindow::formSelected( QAction *action )
-{
+{		
 	QString form = action->text( );
+	qDebug( ) << "Form " << form << " selected";
 	if( form != m_currentForm )
 		loadForm( form );
 }
@@ -164,14 +188,14 @@ void MainWindow::loadForm( QString form )
 // indicate busy state
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
-	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
-		this, SLOT( formLoaded( QString, QByteArray ) ) );
-	
+	qDebug( ) << "Initiating form load for " << form;
 	m_formLoader->initiateFormLoad( form );
 }
 
 void MainWindow::formLoaded( QString name, QByteArray xml )
 {
+	qDebug( ) << "Form " << name << " loaded";
+	
 // read the form and construct it
 	QWidget *oldForm = m_form;
 	QUiLoader loader;
@@ -186,16 +210,54 @@ void MainWindow::formLoaded( QString name, QByteArray xml )
 	if( oldForm ) {
 		m_form->move( oldForm->pos( ) );
 		oldForm->hide( );
+		l->removeWidget( oldForm );
 		oldForm->deleteLater( );
-		oldForm = NULL;
+		oldForm = 0;
 	}
 	m_form->show( );
 
 // remember the name of the current form
 	m_currentForm = name;
+
+// initiate load of form data
+	qDebug( ) << "Initiating loading of form data for form " << name;
+	
+	m_dataLoader->initiateDataLoad( name );
+
+// connect standard form actions
+	QMetaObject::connectSlotsByName( this );
 	
 // not busy anymore
 	qApp->restoreOverrideCursor();
+}
+
+void MainWindow::on_buttons_accepted( )
+{
+	qDebug( ) << "Form accepted";
+	
+	QByteArray xml;
+	m_dataHandler->writeFormData( m_currentForm, m_form, &xml );
+	
+	m_dataLoader->initiateDataSave( m_currentForm, xml );
+}
+
+void MainWindow::on_buttons_rejected( )
+{
+	qDebug( ) << "Form rejected";
+	m_dataLoader->initiateDataLoad( m_currentForm );
+}
+
+void MainWindow::dataSaved( QString name )
+{	
+	qDebug( ) << "Saved data for form " << name;
+}
+
+void MainWindow::dataLoaded( QString name, QByteArray xml )
+{
+	qDebug( ) << "Loaded data for form " << name << ":\n"
+		<< xml;
+	
+	m_dataHandler->readFormData( name, m_form, xml );
 }
 
 void MainWindow::themeSelected( QAction *action )

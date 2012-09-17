@@ -40,7 +40,7 @@
 #include "langbind/appConfig.hpp"
 #include "langbind/appGlobalContext.hpp"
 #include "testDescription.hpp"
-#include "moduleInterface.hpp"
+#include "moduleDirectory.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "testHandlerTemplates.hpp"
 #include "utils/miscUtils.hpp"

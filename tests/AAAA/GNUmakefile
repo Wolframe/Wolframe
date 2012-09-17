@@ -27,7 +27,8 @@ INCLUDE_LIBS = \
 
 CPP_OBJS = \
 	$(TOPDIR)/src/modules/authentication/textfile/TextFileAuth.o \
-	$(TOPDIR)/src/modules/authentication/database/DBauth.o
+	$(TOPDIR)/src/modules/authentication/database/DBauth.o \
+	$(TOPDIR)/src/modules/authentication/textfile/passwdFile.o
 
 # openssl
 
@@ -84,14 +85,19 @@ endif
 
 TEST_CPP_BINS = \
 	authenticationTest$(EXE) \
-	textFileTest$(EXE)
+	textFileTest$(EXE) \
+	passwdFileTest$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
+
 authenticationTest$(EXE): $(CPP_OBJS)
 textFileTest$(EXE): $(CPP_OBJS)
+passwdFileTest$(EXE): $(CPP_OBJS)
+
 
 local_all:
+
 
 local_clean:
 	-rm -f sasl.db
@@ -115,6 +121,8 @@ endif
 local_test: sasl.db $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./authenticationTest
+	@echo
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./passwdFileTest
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe ./textFileTest
 	@echo

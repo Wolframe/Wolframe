@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <author>generated</author>
- <class>Test2Form</class>
- <widget class="QWidget" name="Test2Form">
+ <class>form1</class>
+ <widget class="QWidget" name="form1">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -18,7 +18,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Calculator Builder</string>
+   <string>Wolframe client form 1</string>
   </property>
   <layout class="QGridLayout">
    <property name="margin">
@@ -33,42 +33,42 @@
       <enum>QFormLayout::ExpandingFieldsGrow</enum>
      </property>
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_first">
        <property name="text">
         <string>First Name:</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="first">
        <property name="text">
         <string/>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="label_last">
        <property name="text">
         <string>Last Name:</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="lineEdit_2">
+      <widget class="QLineEdit" name="last">
        <property name="text">
         <string/>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_birthDate">
        <property name="text">
         <string>Date Of Birth:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QDateEdit" name="dateEdit">
+     <item row="3" column="1">
+      <widget class="QDateEdit" name="birthDate">
        <property name="date">
         <date>
          <year>2000</year>
@@ -81,15 +81,61 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_4">
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_temperature">
+       <property name="text">
+        <string>Temperature:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QDoubleSpinBox" name="temperature">
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-50.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>60.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_age">
+       <property name="text">
+        <string>Age:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QSpinBox" name="age">
+       <property name="minimumSize">
+        <size>
+         <width>54</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>54</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_gender">
        <property name="text">
         <string>Gender:</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="QComboBox" name="comboBox">
+     <item row="6" column="1">
+      <widget class="QComboBox" name="gender">
        <item>
         <property name="text">
          <string>Male</string>
@@ -102,7 +148,97 @@
        </item>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_working">
+       <property name="text">
+        <string>Working:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QCheckBox" name="working"/>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_wakeupTime">
+       <property name="text">
+        <string>Wakeup Time:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QDateTimeEdit" name="wakeupTime"/>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="label_anotherTime">
+       <property name="text">
+        <string>Another time:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QTimeEdit" name="anotherTime"/>
+     </item>
+     <item row="11" column="0">
+      <widget class="QLabel" name="label_nofChildren">
+       <property name="text">
+        <string>Number of children:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="1">
+      <layout class="QGridLayout" name="childrenLayout">
+       <item row="0" column="0">
+        <widget class="QSlider" name="nofChildren">
+         <property name="maximum">
+          <number>8</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksAbove</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="13" column="0">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -115,10 +251,16 @@
        </property>
       </spacer>
      </item>
-     <item row="5" column="1">
-      <widget class="QDialogButtonBox" name="buttonBox">
+     <item row="13" column="1">
+      <widget class="QDialogButtonBox" name="buttons">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
        </property>
       </widget>
      </item>

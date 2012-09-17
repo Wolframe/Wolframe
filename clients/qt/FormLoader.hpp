@@ -1,9 +1,9 @@
 //
-// AbstractFormLoader.hpp
+// FormLoader.hpp
 //
 
-#ifndef _ABSTRACT_FORM_LOADER_HPP_INCLUDED
-#define _ABSTRACT_FORM_LOADER_HPP_INCLUDED
+#ifndef _FORM_LOADER_HPP_INCLUDED
+#define _FORM_LOADER_HPP_INCLUDED
 
 #include <QObject>
 #include <QString>
@@ -13,12 +13,12 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-	class AbstractFormLoader : public QObject
+	class FormLoader : public QObject
 	{	
 		Q_OBJECT
 		
 		public:
-			virtual ~AbstractFormLoader( ) {};
+			virtual ~FormLoader( ) {};
 			virtual void initiateListLoad( ) = 0;
 			virtual void initiateFormLoad( QString &name ) = 0;
 			virtual QStringList getFormNames( ) = 0;
@@ -30,4 +30,4 @@ namespace _Wolframe {
 } // namespace QtClient
 } // namespace _Wolframe
 
-#endif // _ABSTRACT_FORM_LOADER_HPP_INCLUDED
+#endif // _FORM_LOADER_HPP_INCLUDED

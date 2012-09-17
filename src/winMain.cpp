@@ -50,7 +50,7 @@
 #include "ErrorCode.hpp"
 #include "logger-v1.hpp"
 #include "appSingleton.hpp"
-#include "moduleInterface.hpp"
+#include "moduleDirectory.hpp"
 
 #include "connectionHandler.hpp"
 
@@ -289,7 +289,7 @@ static void WINAPI service_main( DWORD argc, LPTSTR *argv ) {
 	try {
 // set an emergency logger (debug view), is set in 'ImagePath' in the registry of the service description
 		_Wolframe::log::LogBackend::instance().setWinDebugLevel( winDbgLevel );
-		
+
 // read configuration (from the location passed in the command line arguments of the main, not the service_main)
 		_Wolframe::config::CmdLineConfig cmdLineCfg; // empty for a service with --service
 		cmdLineCfg.command = _Wolframe::config::CmdLineConfig::RUN_SERVICE;

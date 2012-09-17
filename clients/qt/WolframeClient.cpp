@@ -261,7 +261,7 @@ void WolframeClient::dataAvailable( )
 
 		case AboutToDisconnect:
 		case Connected:
-			if( m_socket->canReadLine( ) ) {
+			while( m_socket->canReadLine( ) ) {
 				char buf[1024];
 				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
 				if( buf[len-1] == '\n' ) buf[len-1] = '\0';
