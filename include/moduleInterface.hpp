@@ -69,17 +69,31 @@ class ConfiguredBuilder
 {
 	friend class ModulesDirectory;
 public:
+	/// ConfiguredBuilder (builder for objects with configuration) constructor
+	///\param title		string used for printing purposes, usually logging.
+	///\param section	configuration section (parent node)
+	///\param keyword	keyword in the configuration section. The object configuration
+	///			is bind to the section, keyword pair
+	///\param objectName	the name of the object the builder builds
 	ConfiguredBuilder( const char* title, const char* section, const char* keyword,
 			   const char* id )
-		: m_title( title ), m_section( section), m_keyword( keyword ),
+		: m_title( title ), m_section( section ), m_keyword( keyword ),
 		  m_identifier( id )			{}
 
 	virtual ~ConfiguredBuilder()			{}
 
 	const char* identifier() const			{ return m_identifier; }
 
+	/// The type of the object: filter, audit, command handler etc.
+	/// This is not the same as the objectName
 	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
+
+	/// the configuration for the object
+	///\param logPrefix	string to print before the log messages generated inside this object.
+	///			Same as for any confiuration object.
 	virtual config::NamedConfiguration* configuration( const char* logPrefix ) = 0;
+
+	/// the virtual constructor for the object
 	virtual ObjectConstructorBase* constructor() = 0;
 protected:
 	const char* m_title;		///< used for printing (logging etc.)

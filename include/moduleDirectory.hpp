@@ -52,11 +52,19 @@ public:
 	ModulesDirectory()				{}
 	~ModulesDirectory();
 
+	/// Add a configured builder to the directory.
 	bool addBuilder( ConfiguredBuilder* builder );
+
+	/// Add a simple builder (builder for objects without configuration) to the directory.
 	bool addBuilder( SimpleBuilder* builder );
 
+	/// Get the builder for the configuration section, keyword pair.
+	///\param section	the section (parent) of the configuration
+	///\param keyword	the keyword in the section
 	ConfiguredBuilder* getBuilder( const std::string& section, const std::string& keyword ) const;
-	ConfiguredBuilder* getBuilder( const std::string& identifier ) const;
+
+	/// Get the builder for the specified objectName
+	ConfiguredBuilder* getBuilder( const std::string& objectName ) const;
 
 	/// Const iterator for the simple builders in the directory
 	class simpleBuilder_iterator
