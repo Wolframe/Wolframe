@@ -63,8 +63,8 @@ public:
 	///\param keyword	the keyword in the section
 	ConfiguredBuilder* getBuilder( const std::string& section, const std::string& keyword ) const;
 
-	/// Get the builder for the specified objectName
-	ConfiguredBuilder* getBuilder( const std::string& builderName ) const;
+	/// Get the builder for the specified object class name
+	ConfiguredBuilder* getBuilder( const std::string& objectClassName ) const;
 
 	/// Const iterator for the simple builders in the directory
 	class simpleBuilder_iterator

@@ -54,12 +54,12 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 			ConfiguredObjectConstructor< AuthenticationUnit >* auth =
 					dynamic_cast< ConfiguredObjectConstructor< AuthenticationUnit >* >( builder->constructor());
 			if ( auth == NULL )	{
-				LOG_ALERT << "AuthenticationFactory: '" << builder->builderName()
+				LOG_ALERT << "AuthenticationFactory: '" << builder->objectClassName()
 					  << "' is not an Authentication Unit builder";
 				throw std::logic_error( "object is not an AuthenticationUnit builder" );
 			}
 			m_authenticators.push_back( auth->object( **it ));
-			LOG_TRACE << "'" << auth->identifier() << "' authentication unit registered";
+			LOG_TRACE << "'" << auth->objectClassName() << "' authentication unit registered";
 		}
 		else	{
 			LOG_ALERT << "AuthenticationFactory: unknown authentication type '" << (*it)->className() << "'";

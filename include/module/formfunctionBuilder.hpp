@@ -53,7 +53,7 @@ public:
 	{
 		return FORM_FUNCTION_OBJECT;
 	}
-	virtual const char* identifier() const
+	virtual const char* objectClassName() const
 	{
 		return m_name.c_str();
 	}
@@ -82,7 +82,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new FormFunctionConstructor( m_builderName, m_func);
+		return new FormFunctionConstructor( m_className, m_func);
 	}
 private:
 	const langbind::FormFunction m_func;

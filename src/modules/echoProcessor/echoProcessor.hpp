@@ -110,7 +110,7 @@ public:
 	EchoProcConstructor( const EchoProcConfig& conf );
 	~EchoProcConstructor()				{}
 
-	virtual const char* identifier() const		{ return ECHO_PROCESSOR_CLASS_NAME; }
+	virtual const char* objectClassName() const		{ return ECHO_PROCESSOR_CLASS_NAME; }
 	virtual cmdbind::CommandHandlerConstructor* object() const;
 private:
 	EchoProcessorUnit*	m_proc;

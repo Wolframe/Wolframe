@@ -55,7 +55,7 @@ public:
 		return TRANSACTION_FUNCTION_OBJECT;
 	}
 
-	virtual const char* identifier() const
+	virtual const char* objectClassName() const
 	{
 		return m_name.c_str();
 	}
@@ -91,7 +91,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new TransactionFunctionConstructor( m_builderName, m_createFunc);
+		return new TransactionFunctionConstructor( m_className, m_createFunc);
 	}
 private:
 	const langbind::CreateTransactionFunction m_createFunc;

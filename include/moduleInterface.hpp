@@ -53,16 +53,16 @@ class SimpleBuilder
 	friend class ModulesDirectory;
 public:
 	SimpleBuilder( const char* builderID )
-		: m_builderName( builderID )			{}
+		: m_className( builderID )		{}
 
 	virtual ~SimpleBuilder()			{}
 
-	const char* builderName() const			{ return m_builderName; }
+	const char* objectClassName() const		{ return m_className; }
 
 	virtual ObjectConstructorBase::ObjectType objectType() const = 0;
 	virtual ObjectConstructorBase* constructor() = 0;
 protected:
-	const char* m_builderName;
+	const char* m_className;
 };
 
 ///
@@ -75,16 +75,15 @@ public:
 	///\param section	configuration section (parent node)
 	///\param keyword	keyword in the configuration section. The object configuration
 	///			is bind to the section, keyword pair
-	///\param builderName	the name of the builder, usually the name of the object
-	///			built by this builder
+	///\param className	the name of the class that the built constructor will build
 	ConfiguredBuilder( const char* title, const char* section, const char* keyword,
-			   const char* builderID )
+			   const char* className )
 		: m_title( title ), m_section( section ), m_keyword( keyword ),
-		  m_builderName( builderID )			{}
+		  m_className( className )		{}
 
 	virtual ~ConfiguredBuilder()			{}
 
-	const char* builderName() const			{ return m_builderName; }
+	const char* objectClassName() const		{ return m_className; }
 
 	/// The type of the object: filter, audit, command handler etc.
 	/// This is not the same as the objectName
@@ -102,7 +101,7 @@ protected:
 	const char* m_section;		///< configuration section to which the
 					/// configuration parser reacts
 	const char* m_keyword;		///< configuration keyword (element)
-	const char* m_builderName;	///< identifier of the builder
+	const char* m_className;	///< class name of the object
 };
 
 
@@ -112,8 +111,8 @@ class ConfiguredBuilderDescription : public ConfiguredBuilder
 {
 public:
 	ConfiguredBuilderDescription( const char* title, const char* section,
-				      const char* keyword, const char* id )
-		: ConfiguredBuilder( title, section, keyword, id )	{}
+				      const char* keyword, const char* className )
+		: ConfiguredBuilder( title, section, keyword, className )	{}
 
 	virtual ~ConfiguredBuilderDescription()		{}
 

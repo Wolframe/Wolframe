@@ -109,7 +109,7 @@ class PostgreSQLconstructor : public ConfiguredObjectConstructor< db::DatabaseUn
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return DATABASE_OBJECT; }
-	const char* identifier() const		{ return POSTGRESQL_DB_CLASS_NAME; }
+	const char* objectClassName() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 	PostgreSQLdatabase* object( const config::NamedConfiguration& conf );
 };
 

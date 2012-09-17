@@ -55,12 +55,12 @@ AuthorizationProvider::AuthorizationProvider( const std::list< config::NamedConf
 			ConfiguredObjectConstructor< AuthorizationUnit >* authz =
 					dynamic_cast< ConfiguredObjectConstructor< AuthorizationUnit >* >( builder->constructor());
 			if ( authz == NULL )	{
-				LOG_ALERT << "AuthorizationProvider: '" << builder->builderName()
+				LOG_ALERT << "AuthorizationProvider: '" << builder->objectClassName()
 					  << "' is not an Authorization Unit builder";
 				throw std::logic_error( "object is not an AuthorizationUnit builder" );
 			}
 			m_authorizeUnits.push_back( authz->object( **it ) );
-			LOG_TRACE << "'" << authz->identifier() << "' authorization unit registered";
+			LOG_TRACE << "'" << authz->objectClassName() << "' authorization unit registered";
 		}
 		else	{
 			LOG_ALERT << "AuthorizationProvider: unknown authorization type '" << (*it)->className() << "'";

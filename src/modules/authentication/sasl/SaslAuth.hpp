@@ -94,7 +94,7 @@ class SaslAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUn
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHENTICATION_OBJECT; }
-	virtual const char* identifier() const	{ return SASL_AUTHENTICATION_CLASS_NAME; }
+	virtual const char* objectClassName() const	{ return SASL_AUTHENTICATION_CLASS_NAME; }
 	virtual SaslAuthenticator* object( const config::NamedConfiguration& conf );
 };
 
