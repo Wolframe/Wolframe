@@ -54,11 +54,6 @@ struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStru
 	TransactionFunctionOption( const std::string& src);
 };
 
-struct ScriptCommandOption :public langbind::ScriptCommandConfigStruct
-{
-	ScriptCommandOption( const std::string& opt);
-};
-
 }}//namespace
 #endif
 

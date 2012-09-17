@@ -35,6 +35,7 @@ Project Wolframe.
 #define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "langbind/luaObjects.hpp"
+#include "langbind/luaScriptContext.hpp"
 
 namespace _Wolframe {
 namespace cmdbind {
@@ -44,12 +45,14 @@ namespace cmdbind {
 class LuaCommandHandler :public IOFilterCommandHandler
 {
 public:
-	///\class Context
-	///\brief Execution context of the command handler
-	struct InterpreterContext;
+	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
+	typedef langbind::LuaScriptContext ContextStruct;
 
+public:
 	///\brief Constructor
-	LuaCommandHandler(){}
+	explicit LuaCommandHandler( const ContextStruct* ctx_)
+		:m_ctx(ctx_){}
+
 	///\brief Destructor
 	virtual ~LuaCommandHandler(){}
 
@@ -58,7 +61,14 @@ public:
 	///\return CallResult status (See IOFilterCommandHandler::CallResult)
 	virtual CallResult call( const char*& err);
 
+	///\brief Get the identifier of this command handler type
+	static const char* identifier()
+	{
+		return "LuaCommandHandler";
+	}
+
 private:
+	const langbind::LuaScriptContext* m_ctx;
 	langbind::LuaScriptInstanceR m_interp;
 };
 

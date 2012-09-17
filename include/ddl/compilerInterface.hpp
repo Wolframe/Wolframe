@@ -64,7 +64,15 @@ private:
 ///\brief Reference to a DDL compiler
 typedef types::CountedReference<DDLCompiler> DDLCompilerR;
 
+///\brief Describes the creation of a DDL compiler object
 typedef DDLCompiler* (*CreateDDLCompilerFunc)();
+
+
+///\brief Get a form an its document type identifying the form
+///\param[in] ddlc compiler of the DDL the form is described in
+///\param[in] ddfilename data definition source file name as absolute path
+///\return pair (identifier, structure) where the identifier identifies the form and structure describes the form
+std::pair< std::string, ddl::StructTypeR> loadForm( const ddl::DDLCompiler& ddlc, const std::string& ddfilename);
 
 }}//namespace
 #endif

@@ -114,11 +114,11 @@ static std::string getSelectionExpression( std::string::const_iterator& itr, con
 typedef textwolf::XMLPathSelectAutomatonParser<textwolf::charset::UTF8,textwolf::charset::UTF8> XMLPathSelectAutomatonParser;
 typedef textwolf::XMLPathSelect<textwolf::charset::UTF8> XMLPathSelect;
 
-struct SimplePdfPrintFunction::SimplePdfPrintFunctionImpl
+struct HaruPdfPrintFunction::Impl
 {
 public:
-	SimplePdfPrintFunctionImpl( const std::string& src, bool testTraceVersion)
-		:m_testTraceVersion(testTraceVersion)
+	Impl( const std::string& src, CreateDocumentFunc createDocument_)
+		:m_createDocument(createDocument_)
 	{
 		m_exprstrings.push_back( '\0');
 		std::size_t linecnt = 0;
@@ -147,14 +147,14 @@ public:
 		}
 		catch (const std::runtime_error& e)
 		{
-			throw std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(linecnt) + " of simple PDF printer description source (" + e.what() + ")");
+			throw std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(linecnt) + " of PDF printer layout description source (" + e.what() + ")");
 		}
 	}
 
 	const StateDef* statedef( std::size_t idx) const	{return &m_statedef[idx];}
 	const std::string& exprstrings() const			{return m_exprstrings;}
 	const XMLPathSelectAutomatonParser& parser() const	{return m_parser;}
-	bool isTestTraceVersion() const				{return m_testTraceVersion;}
+	Document* createDocument() const			{return m_createDocument();}
 
 	std::string tostring() const
 	{
@@ -173,13 +173,13 @@ private:
 	XMLPathSelectAutomatonParser m_parser;
 	std::vector<StateDef> m_statedef;
 	std::string m_exprstrings;
-	bool m_testTraceVersion;
+	CreateDocumentFunc m_createDocument;
 };
 
-SimplePdfPrintFunction::SimplePdfPrintFunction( const std::string& description, bool testTraceVersion)
-	:m_impl(new SimplePdfPrintFunctionImpl(description, testTraceVersion)){}
+HaruPdfPrintFunction::HaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument)
+	:m_impl( new Impl( description, createDocument)){}
 
-SimplePdfPrintFunction::~SimplePdfPrintFunction()
+HaruPdfPrintFunction::~HaruPdfPrintFunction()
 {
 	delete m_impl;
 }
@@ -188,8 +188,8 @@ SimplePdfPrintFunction::~SimplePdfPrintFunction()
 class PrintInput :public langbind::TypedOutputFilter
 {
 public:
-	PrintInput( const SimplePdfPrintFunction::SimplePdfPrintFunctionImpl* func)
-		:m_document( func->isTestTraceVersion()?(createTestTraceDocument()):(createLibHpdfDocument()))
+	PrintInput( const HaruPdfPrintFunction::Impl* func)
+		:m_document( func->createDocument())
 		,m_func(func)
 		,m_selectState(&func->parser())
 		,m_lasttype( langbind::TypedFilterBase::OpenTag){}
@@ -268,44 +268,32 @@ public:
 private:
 	boost::shared_ptr<Document> m_document;
 	VariableScope m_variableScope;
-	const SimplePdfPrintFunction::SimplePdfPrintFunctionImpl* m_func;
+	const HaruPdfPrintFunction::Impl* m_func;
 	XMLPathSelect m_selectState;
 	langbind::TypedFilterBase::ElementType m_lasttype;
 };
 
-PrintFunction::InputR SimplePdfPrintFunction::getInput() const
+PrintFunction::InputR HaruPdfPrintFunction::getInput() const
 {
 	PrintFunction::InputR rt( new PrintInput( m_impl));
 	return rt;
 }
 
-std::string SimplePdfPrintFunction::execute( const Input* input_) const
+std::string HaruPdfPrintFunction::execute( const Input* input_) const
 {
 	const PrintInput* input = dynamic_cast<const PrintInput*>( input_);
 	if (!input) throw std::runtime_error( "calling print pdf with incompatible input");
 	return input->document().tostring();
 }
 
-std::string SimplePdfPrintFunction::tostring() const
+std::string HaruPdfPrintFunction::tostring() const
 {
 	return m_impl->tostring();
 }
 
-#ifndef WITH_LIBHPDF
-Document* _Wolframe::prnt::createLibHpdfDocument()
+PrintFunction* _Wolframe::prnt::createHaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument)
 {
-	throw std::runtime_error( "libhpdf support not built in. function requires the software to be built with WITH_LIBHPDF=1");
-}
-#endif
-
-PrintFunction* _Wolframe::prnt::createSimplePdfPrintFunction( const std::string& description)
-{
-	return new SimplePdfPrintFunction( description, false);
-}
-
-PrintFunction* _Wolframe::prnt::createTestTracePdfPrintFunction( const std::string& description)
-{
-	return new SimplePdfPrintFunction( description, true);
+	return new HaruPdfPrintFunction( description, createDocument);
 }
 
 

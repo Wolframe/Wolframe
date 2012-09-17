@@ -42,6 +42,9 @@
 namespace _Wolframe {
 namespace db {
 
+// Forward declaration
+class PreparedStatementHandler;
+
 enum TransactionType	{
 	AUTHENTICATION,
 	AUTHORIZATION,
@@ -87,6 +90,11 @@ public:
 
 	/* we should also decide how we handle db encoding
 	virtual const char* encoding() const = 0; */
+
+	virtual PreparedStatementHandler* getPreparedStatementHandler() const
+	{
+		return 0; //undefined by default
+	}
 
 	/// Close the database connetion
 	/// This exists for no good reason (mostly to make code look uniform)

@@ -54,7 +54,6 @@ CPP_OBJS = \
 	resolvePath.obj \
 	stringUtils.obj \
 	parseUtils.obj \
-	utils_doctype.obj \
 	CRAM.obj
 
 OBJS = \

@@ -30,7 +30,7 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file prnt_pdfPrinterDocument_testtrace.cpp
-#include "prnt/pdfPrinterDocument.hpp"
+#include "prnt/pdfPrinterDocument_testtrace.hpp"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>

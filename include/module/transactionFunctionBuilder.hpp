@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/transaction/template/transactionFunctionBuilder.hpp
+///\file module/transactionFunctionBuilder.hpp
 ///\brief Interface template for object builder of transaction functions from a description
 #ifndef _Wolframe_MODULE_TRANSACTION_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_TRANSACTION_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
@@ -44,8 +44,9 @@ class TransactionFunctionConstructor :public SimpleObjectConstructor< langbind::
 {
 public:
 	TransactionFunctionConstructor( const char* name_, langbind::CreateTransactionFunction createFunc_ )
-		: m_name(name_)
-		, m_createFunc(createFunc_) {}
+		:m_name(name_)
+		,m_provider(0)
+		,m_createFunc(createFunc_) {}
 
 	virtual ~TransactionFunctionConstructor(){}
 
@@ -53,17 +54,25 @@ public:
 	{
 		return TRANSACTION_FUNCTION_OBJECT;
 	}
+
 	virtual const char* identifier() const
 	{
 		return m_name.c_str();
 	}
+
 	virtual langbind::TransactionFunction* object( const std::string& description) const
 	{
-		return m_createFunc( description);
+		return m_createFunc( m_provider, description);
+	}
+
+	void setDatabaseProvider( db::DatabaseProvider* provider_)
+	{
+		m_provider = provider_;
 	}
 
 private:
 	const std::string m_name;
+	db::DatabaseProvider* m_provider;
 	const langbind::CreateTransactionFunction m_createFunc;
 };
 

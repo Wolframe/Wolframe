@@ -1,6 +1,6 @@
 
 function run()
-	f = filter( "xml:textwolf")
+	f = filter( "xml")
 	f.empty = false
 	input:as( f)
 	output:as( filter( "blob"))

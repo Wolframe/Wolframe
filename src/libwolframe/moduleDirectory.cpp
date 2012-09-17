@@ -60,6 +60,19 @@ ModulesDirectory::~ModulesDirectory()
 //	}
 }
 
+std::vector<std::pair<std::string,std::string> > ModulesDirectory::getConfigurableSectionKeywords( ObjectConstructorBase::ObjectType objtype) const
+{
+	std::vector< std::pair<std::string,std::string> > rt;
+	std::list< ConfiguredBuilder* >::const_iterator ii = m_cfgdBuilder.begin(), ee = m_cfgdBuilder.end();
+	for (; ii != ee; ++ii)
+	{
+		if ((*ii)->objectType() == objtype)
+		{
+			rt.push_back( std::pair<std::string,std::string>( (*ii)->m_section, (*ii)->m_keyword));
+		}
+	}
+	return rt;
+}
 
 bool ModulesDirectory::addBuilder( ConfiguredBuilder* builder )
 {

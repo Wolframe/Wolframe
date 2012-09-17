@@ -63,26 +63,46 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	cmdbind::CommandHandler* handler( const std::string& command ) const;
+	cmdbind::CommandHandler* cmdhandler( const std::string& command );
+	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command );
+
 	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
 	langbind::FormFunction* formfunction( const std::string& name ) const;
-	ddl::DDLCompiler* ddlcompiler( const std::string& name ) const;
+	const ddl::StructType* form( const std::string& name ) const;
+	const prnt::PrintFunction* printFunction( const std::string& name) const;
+	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
+
+private:
+	bool loadForm( const std::string& ddlname, const std::string& dataDefinitionFilename);
+	bool loadPrintFunction( const std::string& name, const std::string& type, const std::string& layoutFilename);
+	bool declareTransactionFunction( const std::string& name, const std::string& type, const std::string& command);
+	bool declareFunctionName( const std::string& name, const char* typestr);
 
 private:
 	std::string					m_dbLabel;
 	const db::Database*				m_db;
-	std::list< cmdbind::CommandHandlerCreator* >	m_handler;
-	std::map< const std::string, cmdbind::CommandHandlerCreator* >	m_cmdMap;
-	std::list< const module::FilterConstructor* >	m_filter;
-	std::map< const std::string, const module::FilterConstructor* >	m_filterMap;
-	std::list< const module::FormFunctionConstructor* >	m_formfunction;
-	std::map< const std::string, const module::FormFunctionConstructor* >	m_formfunctionMap;
-	std::list< const module::DDLCompilerConstructor* >	m_ddlcompiler;
-	std::map< const std::string, const module::DDLCompilerConstructor* >	m_ddlcompilerMap;
-	std::list< const module::TransactionFunctionConstructor* >	m_transactionFunctionCompiler;
-	std::map< const std::string, const module::TransactionFunctionConstructor* >	m_transactionFunctionCompilerMap;
-	std::list< const module::PrintFunctionConstructor* >	m_printFunctionCompiler;
-	std::map< const std::string, const module::PrintFunctionConstructor* >	m_printFunctionCompilerMap;
+	std::list< cmdbind::CommandHandlerConstructor* >	m_cmd;
+	std::map< std::string, std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*> >	m_cmdMap;
+
+	std::list< module::FilterConstructor* >	m_filter;
+	std::map< std::string, const module::FilterConstructor* >	m_filterMap;
+
+	std::list< module::FormFunctionConstructor* >	m_formfunction;
+	std::map< std::string, const module::FormFunctionConstructor* >	m_formfunctionMap;
+
+	std::list< module::DDLCompilerConstructor* >	m_ddlcompiler;
+	std::map< std::string, ddl::DDLCompilerR >	m_ddlcompilerMap;
+	std::map< std::string, ddl::StructTypeR>	m_formMap;
+
+	std::list< module::TransactionFunctionConstructor* >	m_transactionFunctionCompiler;
+	std::map< std::string, const module::TransactionFunctionConstructor* >	m_transactionFunctionCompilerMap;
+	std::map< std::string, langbind::TransactionFunctionR>	m_transactionFunctionMap;
+
+	std::list< module::PrintFunctionConstructor* >	m_printFunctionCompiler;
+	std::map< std::string, const module::PrintFunctionConstructor* >	m_printFunctionCompilerMap;
+	std::map< std::string, prnt::PrintFunctionR>	m_printFunctionMap;
+
+	std::map< std::string, const char*>	m_langfunctionIdentifierMap;
 };
 
 }} // namespace _Wolframe::proc

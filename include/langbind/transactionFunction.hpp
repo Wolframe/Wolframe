@@ -37,6 +37,12 @@
 #include "filter/typedfilter.hpp"
 #include "types/countedReference.hpp"
 
+///\brief Forward declaration
+namespace _Wolframe {
+namespace db {
+class DatabaseProvider;
+}}
+
 namespace _Wolframe {
 namespace langbind {
 
@@ -58,7 +64,7 @@ typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
 
 ///\param[in] database name of the database
 ///\param[in] description transaction description source
-typedef TransactionFunction* (*CreateTransactionFunction)( const std::string& description);
+typedef TransactionFunction* (*CreateTransactionFunction)( db::DatabaseProvider* provider_, const std::string& description);
 
 }}
 #endif

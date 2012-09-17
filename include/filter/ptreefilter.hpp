@@ -95,12 +95,21 @@ public:
 	virtual bool print( ElementType type, const Element& element);
 
 	///\brief Get the content
-	const boost::property_tree::ptree& content() const	{return m_content;}
+	const boost::property_tree::ptree& content() const	{return m_stk.back().m_node;}
 
 private:
-	typedef boost::property_tree::ptree Tree;
-	Tree m_content;				//< content string
-	std::vector<Tree*> m_stk;		//< build property tree stack
+	struct State
+	{
+		State(){}
+		State( const std::string& name_)
+			:m_name(name_){}
+		State( const State& o)
+			:m_name(o.m_name), m_node(o.m_node){}
+
+		std::string m_name;
+		boost::property_tree::ptree m_node;
+	};
+	std::vector<State> m_stk;		//< build property tree stack
 	std::string m_attribute;		//< parsed attribute name
 };
 

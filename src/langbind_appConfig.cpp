@@ -33,48 +33,6 @@
 ///\file langbind_appConfig.cpp
 ///\brief Implementation of the language binding objects configuration
 #include "langbind/appConfig.hpp"
-#include "langbind/appGlobalContext.hpp"
-#include "config/structSerialize.hpp"
-#include "logger-v1.hpp"
-#include <string>
-#include <vector>
-#include <map>
-#include "utils/miscUtils.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
 
-using namespace _Wolframe;
-using namespace langbind;
 
-bool ApplicationEnvironmentConfig::check() const
-{
-	GlobalContext lgct(0);
-	return lgct.load( m_config);
-}
-
-bool ApplicationEnvironmentConfig::parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory*)
-{
-	try
-	{
-		config::parseConfigStructure( m_config, (const boost::property_tree::ptree&)pt);
-		return true;
-	}
-	catch (std::exception& e)
-	{
-		LOG_ERROR << "Error parsing configuration: " << e.what();
-		return false;
-	}
-}
-
-void ApplicationEnvironmentConfig::print( std::ostream& os, std::size_t indent) const
-{
-	while (indent--) os << "\t";
-	os << config::structureToString( m_config);
-}
-
-void ApplicationEnvironmentConfig::setCanonicalPathes( const std::string& referencePath)
-{
-
-	m_config.setCanonicalPathes( referencePath);
-}
 

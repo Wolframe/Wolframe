@@ -1,0 +1,4 @@
+LIBRARY mod_haru_pdf_printer
+
+EXPORTS
+entryPoint	@1

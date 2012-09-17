@@ -107,29 +107,7 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 
 bool Configuration::test() const
 {
-	bool rt = true;
-	langbind::GlobalContext* gctx = langbind::getGlobalContext();
-	std::vector<cmdbind::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin();
-	while (itr != m_commands.end())
-	{
-		langbind::TransactionFunctionR tf;
-#if WITH_LUA
-		langbind::LuaScriptInstanceR li;
-		if (gctx->getLuaScriptInstance( itr->m_procname, li))
-		{}
-		else
-#endif
-		if (gctx->getTransactionFunction( itr->m_procname, tf))
-		{}
-		else
-		{
-			LOG_ERROR << "Error in configuration. Function not found: '" << itr->m_procname << "'";
-			rt = false;
-		}
-
-		++itr;
-	}
-	return rt;
+	return true;
 }
 
 bool Configuration::check() const

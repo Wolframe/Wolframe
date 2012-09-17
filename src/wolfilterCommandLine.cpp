@@ -33,14 +33,18 @@
 ///\file wolfilterCommandLine.cpp
 ///\brief Implementation of the options of a wolfilter call
 #include "wolfilterCommandLine.hpp"
-#include "langbind/appGlobalContext.hpp"
+#include "langbind/appObjects.hpp"
 #include "langbind/appConfig_struct.hpp"
+#include "filter/ptreefilter.hpp"
+#include "filter/tostringfilter.hpp"
 #include "moduleInterface.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "logger-v1.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <cstring>
+#include <algorithm>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "utils/miscUtils.hpp"
@@ -48,6 +52,44 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::config;
+
+config::ConfigurationTree WolfilterCommandLine::getConfig() const
+{
+	boost::property_tree::ptree proccfg;
+	boost::property_tree::ptree envcfg = m_envconfig.toPropertyTree();
+	if (!envcfg.empty())
+	{
+		proccfg.add_child( "environment", envcfg);
+	}
+	std::vector<std::pair<std::string,std::string> >
+		cmdhl = m_modulesDirectory.getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
+
+	if (!cmdhl.empty() && !m_scriptenvconfig.script.empty())
+	{
+		// if the list of configurable command handlers has one unique element and we have
+		// a configuration of scripts on the command line, then we pass the
+		// configuration to this command handler:
+		if (cmdhl.size() > 1)
+		{
+			// only one command handler allowed:
+			throw std::runtime_error( "more than one command handler module loaded");
+		}
+		boost::property_tree::ptree cmdhlcfg;
+		cmdhlcfg.add_child( cmdhl.begin()->second, m_scriptenvconfig.toPropertyTree());
+		proccfg.add_child( cmdhl.begin()->first, cmdhlcfg);
+	}
+	return proccfg;
+}
+
+static std::string configurationTree_tostring( const boost::property_tree::ptree& pt)
+{
+	langbind::TypedInputFilterR inp( new langbind::PropertyTreeInputFilter( pt));
+	langbind::ToStringFilter* res;
+	langbind::TypedOutputFilterR out( res = new langbind::ToStringFilter( "\t"));
+	langbind::RedirectFilterClosure redirect( inp, out);
+	if (!redirect.call()) throw std::runtime_error( "can't map configuration tree to string");
+	return res->content();
+}
 
 WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath)
 	:m_printhelp(false)
@@ -91,7 +133,15 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( log::LogLevel::strToLogLevel( m_loglevel));
 	}
 	if (vmap.count( "input")) m_inputfile = vmap["input"].as<std::string>();
-	if (vmap.count( "module")) m_modules = vmap["module"].as<std::vector<std::string> >();
+	if (vmap.count( "module"))
+	{
+		m_modules = vmap["module"].as<std::vector<std::string> >();
+		std::vector<std::string>::iterator itr=m_modules.begin(), end=m_modules.end();
+		for (; itr != end; ++itr)
+		{
+			*itr = utils::getCanonicalPath( *itr, referencePath);
+		}
+	}
 	if (vmap.count( "form"))
 	{
 		std::vector<std::string> formparams = vmap["form"].as<std::vector<std::string> >();
@@ -125,7 +175,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		std::vector<std::string>::const_iterator itr=scripts.begin(), end=scripts.end();
 		for (; itr != end; ++itr)
 		{
-			m_envconfig.script.push_back( langbind::ScriptCommandOption( *itr));
+			m_scriptenvconfig.script.push_back( langbind::ScriptCommandOption( *itr));
 		}
 	}
 
@@ -133,9 +183,8 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	if (vmap.count( "input-filter")) m_inputfilter = vmap["input-filter"].as<std::string>();
 	if (vmap.count( "output-filter")) m_outputfilter = vmap["output-filter"].as<std::string>();
 
-	if (m_outputfilter.empty()) m_outputfilter = m_inputfilter;		//... default same filter for input and output
-	if (m_inputfilter.empty()) m_inputfilter = "xml:textwolf";		//... xml:textwolf as default input filter
-	if (m_outputfilter.empty()) m_outputfilter = m_inputfilter;		//... default same filter for input and output
+	if (m_outputfilter.empty() && !m_inputfilter.empty()) m_outputfilter = m_inputfilter; //... default same filter for input and output
+	if (m_inputfilter.empty() && !m_outputfilter.empty()) m_inputfilter = m_outputfilter; //... default same filter for input and output
 
 	const char* bp;
 	bp = std::strchr( m_inputfilter.c_str(), '/');
@@ -157,23 +206,28 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 
 	// Load modules
 	std::list<std::string> modfiles;
-	std::vector<std::string>::const_iterator itr,end;
-	itr = m_modules.begin();
-	end = m_modules.end();
-
-	for (; itr != end; ++itr)
-	{
-		modfiles.push_back( utils::getCanonicalPath( *itr, referencePath));
-	}
+	std::copy( m_modules.begin(), m_modules.end(), std::back_inserter(modfiles));
 	if (!LoadModules( m_modulesDirectory, modfiles))
 	{
 		throw std::runtime_error( "Modules could not be loaded");
 	}
 
-	// Set canonical pathes
-	m_envconfig.setCanonicalPathes( referencePath);
+	// Load, instantiate and check the configuration:
+	m_providerConfig.reset( new proc::ProcProviderConfig());
+	config::ConfigurationTree cfg = getConfig();
 
-	// Define processor provider objects
+	LOG_DEBUG << "Created configuration from command line:";
+	LOG_DEBUG << configurationTree_tostring( cfg);
+
+	if (!m_providerConfig->parse( cfg, "", &m_modulesDirectory))
+	{
+		throw std::runtime_error( "Configuration could not be created from command line");
+	}
+	m_providerConfig->setCanonicalPathes( referencePath);
+	if (!m_providerConfig->check())
+	{
+		throw std::runtime_error( "Configuration created from command line is not valid");
+	}
 }
 
 void WolfilterCommandLine::print(std::ostream& out) const
@@ -183,13 +237,5 @@ void WolfilterCommandLine::print(std::ostream& out) const
 	out << m_helpstring << std::endl;
 }
 
-void WolfilterCommandLine::loadGlobalContext() const
-{
-	langbind::GlobalContext* gct = langbind::getGlobalContext();
-	{
-		if (!gct) throw std::runtime_error( "No global context defined");
-		gct->load( m_envconfig);
-	}
-}
 
 

@@ -136,13 +136,21 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 		}
 		else
 		{
-			ctx.setElem(
-				langbind::FilterBase::OpenTag,
-				langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
-			rt = true;
-			stk.back().state( idx+1);
-			stk.push_back( FiltermapSerializeState( 0, &fetchCloseTag, itr->first.c_str()));
-			stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
+			if (itr->second.type() == StructDescriptionBase::Vector && !ctx.flag( Context::SerializeWithIndices))
+			{
+				stk.back().state( idx+1);
+				stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
+			}
+			else
+			{
+				ctx.setElem(
+					langbind::FilterBase::OpenTag,
+					langbind::TypedFilterBase::Element( itr->first.c_str(), itr->first.size()));
+				rt = true;
+				stk.back().state( idx+1);
+				stk.push_back( FiltermapSerializeState( 0, &fetchCloseTag, itr->first.c_str()));
+				stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
+			}
 		}
 	}
 	else
@@ -185,16 +193,18 @@ bool _Wolframe::serialize::fetchObjectVectorElement( FetchElement fetchElement, 
 	else
 	{
 		const char* tagname = stk.back().name();
-		if (idx >= 1 && tagname)
+		if (tagname)
 		{
-			ctx.setElem( langbind::FilterBase::CloseTag);
+			ctx.setElem( langbind::FilterBase::OpenTag, langbind::TypedFilterBase::Element( tagname));
 			rt = true;
+			stk.back().state( idx+1);
+			stk.push_back( FiltermapSerializeState( tagname, &fetchCloseTag, tagname));
+			stk.push_back( FiltermapSerializeState( "", fetchElement, ve));
 		}
-		stk.back().state( idx+1);
-		stk.push_back( FiltermapSerializeState( "", fetchElement, ve));
-		if (idx >= 1 && tagname)
+		else
 		{
-			stk.push_back( FiltermapSerializeState( tagname, &fetchOpenTag, tagname));
+			stk.back().state( idx+1);
+			stk.push_back( FiltermapSerializeState( "", fetchElement, ve));
 		}
 	}
 	return rt;

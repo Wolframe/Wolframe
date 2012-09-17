@@ -36,6 +36,7 @@
 #include "config/structSerialize.hpp"
 #include "serialize/struct/filtermapDescription.hpp"
 #include "utils/miscUtils.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -90,23 +91,6 @@ const serialize::StructDescriptionBase* TransactionFunctionConfigStruct::getStru
 	return &rt;
 }
 
-const serialize::StructDescriptionBase* ScriptCommandConfigStruct::getStructDescription()
-{
-	struct ThisDescription :public serialize::StructDescription<ScriptCommandConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "name",		&ScriptCommandConfigStruct::name)
-			( "type",		&ScriptCommandConfigStruct::type)
-			( "file",		&ScriptCommandConfigStruct::file)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
 const serialize::StructDescriptionBase* EnvironmentConfigStruct::getStructDescription()
 {
 	struct ThisDescription :public serialize::StructDescription<EnvironmentConfigStruct>
@@ -117,7 +101,6 @@ const serialize::StructDescriptionBase* EnvironmentConfigStruct::getStructDescri
 			( "form",		&EnvironmentConfigStruct::form)
 			( "printlayout",	&EnvironmentConfigStruct::printlayout)
 			( "transaction",	&EnvironmentConfigStruct::transaction)
-			( "script",		&EnvironmentConfigStruct::script)
 			;
 		}
 	};
@@ -141,13 +124,6 @@ void EnvironmentConfigStruct::setCanonicalPathes( const std::string& referencePa
 			itr->file = utils::getCanonicalPath( itr->file, referencePath);
 		}
 	}
-	{
-		std::vector<ScriptCommandConfigStruct>::iterator itr=script.begin(),end=script.end();
-		for (;itr!=end; ++itr)
-		{
-			itr->file = utils::getCanonicalPath( itr->file, referencePath);
-		}
-	}
 }
 
 boost::property_tree::ptree EnvironmentConfigStruct::toPropertyTree() const
@@ -158,6 +134,28 @@ boost::property_tree::ptree EnvironmentConfigStruct::toPropertyTree() const
 void EnvironmentConfigStruct::initFromPropertyTree( const boost::property_tree::ptree& pt)
 {
 	config::parseConfigStructure( *this, pt);
+}
+
+bool EnvironmentConfigStruct::check() const
+{
+	for (std::vector<DDLFormConfigStruct>::const_iterator ii=form.begin(), ee=form.end(); ii != ee; ++ii)
+	{
+		if (!utils::fileExists( ii->file)) return false;
+	}
+	for (std::vector<PrintLayoutConfigStruct>::const_iterator ii=printlayout.begin(), ee=printlayout.end(); ii != ee; ++ii)
+	{
+		if (!utils::fileExists( ii->file)) return false;
+	}
+	return true;
+}
+
+void EnvironmentConfigStruct::print( std::ostream& os, size_t indent) const
+{
+	std::string indentstr( indent+1, '\t');
+	indentstr[0] = '\n';
+	std::string rt( config::structureToString( *this));
+	boost::replace_all( rt, "\n", indentstr);
+	os << rt;
 }
 
 

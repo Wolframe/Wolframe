@@ -36,7 +36,6 @@
 #include <cstring>
 #include <cstdlib>
 #include <stdexcept>
-#include "langbind/appGlobalContext.hpp"
 #include "langbind/iostreamfilter.hpp"
 #include "wolfilterCommandLine.hpp"
 #include "moduleInterface.hpp"
@@ -51,19 +50,6 @@ static const unsigned short APP_MAJOR_VERSION = 0;
 static const unsigned short APP_MINOR_VERSION = 0;
 static const unsigned short APP_REVISION = 5;
 static const unsigned short APP_BUILD = 0;
-
-static proc::ProcessorProvider* g_processorProvider = 0;
-
-///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
-static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
-{
-	if (g_processorProvider) delete g_processorProvider;
-	g_processorProvider = new proc::ProcessorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory());
-	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
-	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
-
-	cmdline.loadGlobalContext();
-}
 
 int main( int argc, char **argv )
 {
@@ -87,7 +73,7 @@ int main( int argc, char **argv )
 		if (doExit) return 0;
 
 		// Load the modules, scripts, etc. defined in the command line into the global context:
-		loadGlobalContext( cmdline);
+		proc::ProcessorProvider processorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory());
 
 		// Call the function to execute
 		if (cmdline.inputfile().size())
@@ -96,11 +82,11 @@ int main( int argc, char **argv )
 			fh.exceptions( std::ifstream::failbit | std::ifstream::badbit);
 			fh.open( cmdline.inputfile().c_str(), std::ios::in | std::ios::binary);
 
-			langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), fh, std::cout);
+			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), fh, std::cout);
 		}
 		else
 		{
-			langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), std::cin, std::cout);
+			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), cmdline.inbufsize(), cmdline.outputfilter(), cmdline.outbufsize(), std::cin, std::cout);
 		}
 	}
 	catch (const std::bad_alloc& e)

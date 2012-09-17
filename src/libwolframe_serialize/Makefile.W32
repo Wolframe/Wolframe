@@ -21,6 +21,7 @@ LIBRARIES = \
 	wolframe_serialize.lib
 
 CPP_OBJS = \
+	$(TOPDIR)\src\libwolframe\utils_doctype.obj \
 	$(TOPDIR)\src\ddl_atomicType.obj \
 	$(TOPDIR)\src\ddl_structType.obj \
 	$(TOPDIR)\src\ddl_structTypeBuild.obj \

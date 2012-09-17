@@ -30,9 +30,9 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file prnt/pdfPrinterDocument.hpp
-///\brief Defines Methods of the simple PDF print function
-#ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_DOCUMENT_HPP_INCLUDED
-#define _Wolframe_PRNT_SIMPLE_PDF_PRINT_DOCUMENT_HPP_INCLUDED
+///\brief Defines the document interface of a pdfPrinter (haru)
+#ifndef _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_HPP_INCLUDED
+#define _Wolframe_PRNT_HARU_PDF_PRINT_DOCUMENT_HPP_INCLUDED
 #include "prnt/pdfPrinterMethod.hpp"
 #include "prnt/pdfPrinterVariable.hpp"
 
@@ -49,8 +49,7 @@ struct Document
 	virtual std::string tostring() const=0;
 };
 
-Document* createLibHpdfDocument();
-Document* createTestTraceDocument();
+typedef Document* (*CreateDocumentFunc)();
 
 }}
 #endif

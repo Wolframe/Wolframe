@@ -39,10 +39,15 @@
 
 #include <boost/noncopyable.hpp>
 #include "database/DBprovider.hpp"
+#include "database/preparedStatement.hpp"
 #include "filter/filter.hpp"
 #include "langbind/appFormFunction.hpp"
 #include "cmdbind/commandHandler.hpp"
+#include "cmdbind/ioFilterCommandHandler.hpp"
 #include "ddl/compilerInterface.hpp"
+#include "prnt/printFunction.hpp"
+#include "langbind/transactionFunction.hpp"
+#include "langbind/appConfig_struct.hpp"
 
 namespace _Wolframe {
 namespace proc {
@@ -63,9 +68,11 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	virtual void setCanonicalPathes( const std::string& referencePath );
+
 private:
 	std::string					m_dbLabel;
 	std::list< config::NamedConfiguration* >	m_procConfig;
+	langbind::EnvironmentConfigStruct		m_environment;
 };
 
 /// Processor provider
@@ -78,10 +85,18 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	cmdbind::CommandHandler* handler( const std::string& command ) const;
+	cmdbind::CommandHandler* cmdhandler( const std::string& command );
+	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command);
+
 	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
 	langbind::FormFunction* formfunction( const std::string& name) const;
-	ddl::DDLCompiler* ddlcompiler( const std::string& name) const;
+
+	const ddl::StructType* form( const std::string& name ) const;
+	const prnt::PrintFunction* printFunction( const std::string& name) const;
+	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
+
+	///\brief PF:HACK: Reminder Dummy implementation. Problem solved later
+	db::PreparedStatementHandler* getPreparedStatementHandler() {return 0;}
 
 private:
 	class ProcessorProvider_Impl;

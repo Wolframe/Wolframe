@@ -34,35 +34,6 @@
 ///\brief Interface to a command handler in the protocol context
 #ifndef _Wolframe_CMDBIND_PROTOCOL_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_CMDBIND_PROTOCOL_COMMAND_HANDLER_HPP_INCLUDED
-#include "types/countedReference.hpp"
-#include "cmdbind/commandHandler.hpp"
-#include <vector>
-#include <string>
 
-namespace _Wolframe {
-namespace cmdbind {
-
-class ProtocolCommandHandler :public CommandHandler
-{
-public:
-	///\brief Defaul constructor
-	ProtocolCommandHandler(){}
-
-	///\brief Destructor
-	virtual ~ProtocolCommandHandler(){}
-
-	///\brief Pass the parameters for processing
-	///\param [in] argc number of arguments of the protocol command
-	///\param [in] argv arguments of the protocol command
-	void passParameters( const std::string& nam, int argc, const char** argv);
-
-protected:
-	std::string m_name;				//< name of the command to execute
-	std::vector< std::string > m_argBuffer;		//< the command arguments
-};
-
-typedef types::CountedReference<ProtocolCommandHandler> ProtocolCommandHandlerR;
-
-}}
 #endif
 

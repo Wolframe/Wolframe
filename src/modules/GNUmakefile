@@ -1,6 +1,9 @@
 TOPDIR = ../..
 
-SUBDIRS = database audit authentication authorization filter ddlcompiler echoProcessor
+SUBDIRS = database audit authentication authorization filter ddlcompiler prnt cmdbind echoProcessor
+ifeq ($(WITH_LUA),1)
+SUBDIRS += lua
+endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

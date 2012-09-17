@@ -60,70 +60,12 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace langbind;
 
-namespace //anonymous
-{
-template <class Object>
-void defineObject( std::map<std::string,Object>& m_map, const std::string& name, const Object& obj)
-{
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-	m_map[ nam] = obj;
-}
-
-template <class Object>
-bool getObject( const std::map<std::string,Object>& m_map, const std::string& name, Object& obj)
-{
-	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-	typename std::map<std::string,Object>::const_iterator ii=m_map.find( nam),ee=m_map.end();
-	if (ii == ee)
-	{
-		return false;
-	}
-	else
-	{
-		obj = ii->second;
-		return true;
-	}
-}
-}//anonymous namespace
-
 InputFilterR& Input::getIterator()
 {
 	if (m_used) throw std::runtime_error( "try to read input twice");
 	m_used = true;
 	return m_inputfilter;
 }
-
-
-void FilterMap::defineFilter( const std::string& name, CreateFilterFunc f)
-{
-	defineObject( m_map, name, f);
-}
-
-bool FilterMap::getFilter( const std::string& name, const std::string& arg, Filter& rt) const
-{
-	CreateFilterFunc f;
-	if (!getObject( m_map, name, f)) return false;
-	rt = f( name, arg);
-	return true;
-}
-
-FilterMap::FilterMap()
-{
-	defineFilter( "blob", createBlobFilter);
-	defineFilter( "char", createCharFilter);
-	defineFilter( "line" ,createLineFilter);
-	defineFilter( "token", createTokenFilter);
-	defineFilter( "xml:textwolf", createTextwolfXmlFilter);
-#ifdef WITH_LIBXML2
-	defineFilter( "xml", createLibxml2Filter);
-	defineFilter( "xml:libxml2", createLibxml2Filter);
-#else
-	defineFilter( "xml", createTextwolfXmlFilter);
-#endif
-}
-
 
 RedirectFilterClosure::RedirectFilterClosure()
 	:m_state(0)
@@ -256,18 +198,6 @@ std::string DDLForm::tostring() const
 }
 
 
-void DDLFormMap::defineForm( const std::string& name, const DDLForm& f)
-{
-	defineObject( m_map, name, f.copy());
-}
-
-bool DDLFormMap::getForm( const std::string& name, DDLForm& rt) const
-{
-	if (!getObject( m_map, name, rt)) return false;
-	rt = rt.copy();
-	return true;
-}
-
 
 ApiFormData::ApiFormData( const serialize::StructDescriptionBase* descr_)
 	:m_descr(descr_)
@@ -334,17 +264,8 @@ bool FormFunctionClosure::call()
 	return true;
 }
 
-void FormFunctionMap::defineFormFunction( const std::string& name, const FormFunction& f)
-{
-	defineObject( m_map, name, f);
-}
 
-bool FormFunctionMap::getFormFunction( const std::string& name, FormFunction& rt) const
-{
-	return getObject( m_map, name, rt);
-}
-
-TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctionR& f)
+TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunction* f)
 	:m_func(f)
 	,m_state(0)
 	,m_inputstruct(f->getInput()){}
@@ -381,28 +302,8 @@ void TransactionFunctionClosure::init( const TypedInputFilterR& i)
 	m_state = 1;
 }
 
-void TransactionFunctionMap::defineTransactionFunction( const std::string& name, const TransactionFunctionR& f)
-{
-	defineObject( m_map, name, f);
-}
 
-bool TransactionFunctionMap::getTransactionFunction( const std::string& name, TransactionFunctionR& rt) const
-{
-	return getObject( m_map, name, rt);
-}
-
-void TransactionFunctionMap::defineTransactionFunctionType( const std::string& name, CreateTransactionFunction f)
-{
-	defineObject( m_typemap, name, f);
-}
-
-bool TransactionFunctionMap::getTransactionFunctionType( const std::string& name, CreateTransactionFunction& rt) const
-{
-	return getObject( m_typemap, name, rt);
-}
-
-
-PrintFunctionClosure::PrintFunctionClosure( const prnt::PrintFunctionR& f)
+PrintFunctionClosure::PrintFunctionClosure( const prnt::PrintFunction* f)
 	:m_func(f)
 	,m_state(0)
 	,m_inputstruct(f->getInput()){}
@@ -438,54 +339,6 @@ void PrintFunctionClosure::init( const TypedInputFilterR& i)
 	m_input.init( i, m_inputstruct);
 	m_state = 1;
 }
-
-void PrintFunctionMap::definePrintFunction( const std::string& name, const prnt::PrintFunctionR& f)
-{
-	defineObject( m_map, name, f);
-}
-
-bool PrintFunctionMap::getPrintFunction( const std::string& name, prnt::PrintFunctionR& rt) const
-{
-	return getObject( m_map, name, rt);
-}
-
-void PrintFunctionMap::definePrintFunctionType( const std::string& name, prnt::CreatePrintFunction f)
-{
-	defineObject( m_typemap, name, f);
-}
-
-bool PrintFunctionMap::getPrintFunctionType( const std::string& name, prnt::CreatePrintFunction& rt) const
-{
-	return getObject( m_typemap, name, rt);
-}
-
-void PreparedStatementHandlerMap::definePreparedStatementHandler( const std::string& name, const std::string& dbname, db::CreatePreparedStatementHandlerFunc f)
-{
-	std::pair<db::CreatePreparedStatementHandlerFunc,std::string> func(f,dbname);
-	defineObject( m_map, name, func);
-}
-
-bool PreparedStatementHandlerMap::getPreparedStatementHandler( const std::string& name, db::PreparedStatementHandlerR& rt) const
-{
-	std::pair<db::CreatePreparedStatementHandlerFunc,std::string> func;
-	if (!getObject( m_map, name, func)) return false;
-	rt = func.first( func.second);
-	return true;
-}
-
-DDLCompilerMap::DDLCompilerMap()
-{}
-
-void DDLCompilerMap::defineDDLCompiler( const std::string& name, const ddl::DDLCompilerR& f)
-{
-	defineObject( m_map, name, f);
-}
-
-bool DDLCompilerMap::getDDLCompiler( const std::string& name, ddl::DDLCompilerR& rt) const
-{
-	return getObject( m_map, name, rt);
-}
-
 
 bool Output::print( const char* tag, unsigned int tagsize, const char* val, unsigned int valsize)
 {

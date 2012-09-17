@@ -35,8 +35,14 @@
 #ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_CMDBIND_COMMAND_HANDLER_HPP_INCLUDED
 #include "types/countedReference.hpp"
-#include "FSMinterface.hpp"
 #include <string>
+#include <vector>
+
+///\brief Forward declaration
+namespace _Wolframe {
+namespace proc {
+class ProcessorProvider;
+}}
 
 namespace _Wolframe {
 namespace cmdbind {
@@ -55,7 +61,8 @@ public:
 
 	///\brief Defaul constructor
 	CommandHandler()
-		:m_statusCode(0){}
+		:m_statusCode(0)
+		,m_provider(0){}
 
 	///\brief Destructor
 	virtual ~CommandHandler(){}
@@ -98,8 +105,35 @@ public:
 	///\brief Get the error code of command execution to be returned to the client
 	int statusCode() const				{return m_statusCode;}
 
+	///\brief Pass the reference to the processor provider to the command handler
+	///\param[in] the reference to the processor provider
+	void setProcProvider( proc::ProcessorProvider* p)
+	{
+		m_provider = p;
+	}
+
+	///\brief Get the reference to the processor provider
+	///\return the reference to the processor provider
+	proc::ProcessorProvider* procProvider()
+	{
+		return m_provider;
+	}
+
+	///\brief Pass the parameters for the next command handler call
+	void passParameters( const std::string& nam, int argc, const char** argv)
+	{
+		m_name = nam;
+		for (int ii=0; ii<argc; ii++)
+		{
+			m_argBuffer.push_back( argv[ ii]);
+		}
+	}
+
 protected:
 	int m_statusCode;				//< error code of operation for the client
+	std::string m_name;				//< name of the command to execute
+	std::vector< std::string > m_argBuffer;		//< the command arguments
+	proc::ProcessorProvider* m_provider;		//< the reference to the global processor provider
 };
 
 typedef types::CountedReference<CommandHandler> CommandHandlerR;

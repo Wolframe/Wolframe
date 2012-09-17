@@ -67,21 +67,58 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 			if ( ! Parser::getValue( logPrefix().c_str(), *L1it, m_dbLabel, &isDefined ))
 				retVal = false;
 		}
+		if ( boost::algorithm::iequals( "environment", L1it->first ))
+		{
+			try
+			{
+				m_environment.initFromPropertyTree( L1it->second);
+			}
+			catch (const std::exception& e)
+			{
+				LOG_ERROR << e.what();
+				retVal = false;
+			}
+		}
 		else	{
 			if ( modules )	{
-				module::ConfiguredBuilder* builder = modules->getBuilder( "processor", L1it->first );
-				if ( builder )	{
-					config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
-					if ( conf->parse( L1it->second, L1it->first, modules ))
-						m_procConfig.push_back( conf );
-					else	{
-						delete conf;
-						retVal = false;
+				module::ConfiguredBuilder* builder;
+				boost::property_tree::ptree::const_iterator kwi=L1it->second.begin(),kwe=L1it->second.end();
+				for (; kwi != kwe; ++kwi)
+				{
+					const char* section = L1it->first.c_str();
+					const char* keyword = kwi->first.c_str();
+					builder = modules->getBuilder( section, keyword);
+					if (builder)
+					{
+						config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
+						if (conf->parse( kwi->second, kwi->first, modules))
+						{
+							m_procConfig.push_back( conf);
+						}
+						else
+						{
+							delete conf;
+							retVal = false;
+						}
+						break;
 					}
 				}
-				else
-					LOG_WARNING << logPrefix() << "unknown configuration option: '"
-						    << L1it->first << "'";
+				if (!builder)
+				{
+					builder = modules->getBuilder( "processor", L1it->first );
+					if ( builder )	{
+						config::NamedConfiguration* conf = builder->configuration( logPrefix().c_str());
+						if ( conf->parse( L1it->second, L1it->first, modules ))
+							m_procConfig.push_back( conf );
+						else	{
+							delete conf;
+							retVal = false;
+						}
+					}
+					else
+						LOG_WARNING << logPrefix() << "unknown configuration option: '"
+							    << L1it->first << "'";
+				}
 			}
 			else
 				LOG_WARNING << logPrefix() << "unknown configuration option: '"
@@ -104,7 +141,7 @@ ProcProviderConfig::~ProcProviderConfig()
 		delete *it;
 }
 
-void ProcProviderConfig::print( std::ostream& os, size_t /* indent */ ) const
+void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
 {
 	os << sectionName() << std::endl;
 	os << "   Database: " << (m_dbLabel.empty() ? "(none)" : m_dbLabel) << std::endl;
@@ -116,21 +153,30 @@ void ProcProviderConfig::print( std::ostream& os, size_t /* indent */ ) const
 	}
 	else
 		os << "   None configured" << std::endl;
+
+	m_environment.print( os, indent);
 }
 
 
-/// Check if the database configuration makes sense
+/// Check if the configuration makes sense
 bool ProcProviderConfig::check() const
 {
 	bool correct = true;
+#if PF_DISABLED
+//...Configuration without database can be possible in wolfilter
 	if ( m_dbLabel.empty() )	{
-		LOG_ERROR << logPrefix() << "referenced database ID cannot be empty";
+		LOG_ERROR << logPrefix() << "referenced database ID can not be empty";
 		correct = false;
 	}
+#endif
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		if ( !(*it)->check() )
 			correct = false;
+	}
+	if (!m_environment.check())
+	{
+		correct = false;
 	}
 	return correct;
 }
@@ -141,13 +187,17 @@ void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 								it != m_procConfig.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}
+	m_environment.setCanonicalPathes( refPath );
 }
 
 
 //**** Processor Provider PIMPL *********************************************
 ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 				      const module::ModulesDirectory* modules )
-	: m_impl( new ProcessorProvider_Impl( conf, modules ))	{}
+	: m_impl(0)
+{
+	m_impl = new ProcessorProvider_Impl( conf, modules );
+}
 
 ProcessorProvider::~ProcessorProvider()
 {
@@ -169,14 +219,33 @@ langbind::FormFunction* ProcessorProvider::formfunction( const std::string& name
 	return m_impl->formfunction( name );
 }
 
-cmdbind::CommandHandler* ProcessorProvider::handler( const std::string& name ) const
+cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& name )
 {
-	return m_impl->handler( name );
+	cmdbind::CommandHandler* rt = m_impl->cmdhandler( name );
+	if (rt) rt->setProcProvider( this);
+	return rt;
 }
 
-ddl::DDLCompiler* ProcessorProvider::ddlcompiler( const std::string& name) const
+cmdbind::IOFilterCommandHandler* ProcessorProvider::iofilterhandler( const std::string& name )
 {
-	return m_impl->ddlcompiler( name );
+	cmdbind::IOFilterCommandHandler* rt = m_impl->iofilterhandler( name );
+	if (rt) rt->setProcProvider( this);
+	return rt;
+}
+
+const ddl::StructType* ProcessorProvider::form( const std::string& name) const
+{
+	return m_impl->form( name);
+}
+
+const prnt::PrintFunction* ProcessorProvider::printFunction( const std::string& name) const
+{
+	return m_impl->printFunction( name);
+}
+
+const langbind::TransactionFunction* ProcessorProvider::transactionFunction( const std::string& name) const
+{
+	return m_impl->transactionFunction( name);
 }
 
 //**** Processor Provider PIMPL Implementation ******************************
@@ -191,32 +260,40 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
 									it != conf->m_procConfig.end(); it++ )	{
 		module::ConfiguredBuilder* builder = modules->getBuilder((*it)->className());
-		if ( builder )	{
-			ConfiguredObjectConstructor< cmdbind::CommandHandlerCreator >* cnstrctr =
-					dynamic_cast< ConfiguredObjectConstructor< cmdbind::CommandHandlerCreator >* >( builder->constructor());
-			if ( cnstrctr == NULL )	{
-				LOG_ALERT << "Wolframe Processor Provider: '" << builder->identifier()
-					  << "'' is not a command handler";
-				throw std::logic_error( "Object is not a commandHandler. See log." );
+		if ( builder )
+		{
+			if (builder->objectType() == ObjectConstructorBase::CMD_HANDLER_OBJECT)
+			{
+				cmdbind::CommandHandlerConstructor* cnstrctr =
+					dynamic_cast<cmdbind::CommandHandlerConstructor*>( builder->constructor());
+
+				if ( cnstrctr == NULL )	{
+					LOG_ALERT << "Wolframe Processor Provider: '" << builder->identifier()
+						  << "' is not a command handler";
+					throw std::logic_error( "Object is not a commandHandler. See log." );
+				}
+				else	{
+					m_cmd.push_back( cnstrctr );
+
+					// register handler commands
+					std::list<std::string> cmds = cnstrctr->commands( **it);
+					for (std::list<std::string>::const_iterator cmdIt = cmds.begin(); cmdIt != cmds.end(); cmdIt++)
+					{
+						std::string opName = boost::algorithm::to_upper_copy( *cmdIt );
+						m_cmdMap[ opName ] = std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*>( cnstrctr, *it);
+
+						LOG_TRACE << "Command '" << opName << "' registered for '" << cnstrctr->identifier() << "' command handler";
+					}
+				}
 			}
 			else	{
-				cmdbind::CommandHandlerCreator* handlerUnit = cnstrctr->object( **it );
-				m_handler.push_back( handlerUnit );
-				std::string handlerName = cnstrctr->identifier();
-				LOG_TRACE << "'" << handlerName << "' command handler registered";
-
-				// register handler commands
-				for ( std::list< std::string >::const_iterator cmdIt = handlerUnit->commands()->begin();
-										cmdIt != handlerUnit->commands()->end(); cmdIt++ )	{
-					std::string opName = boost::algorithm::to_upper_copy( *cmdIt );
-					m_cmdMap[ opName ] = handlerUnit;
-					LOG_TRACE << "'" << opName << "' registered for '" << handlerName << "' command handler";
-				}
+				LOG_ALERT << "Wolframe Processor Provider: unknown processor type '" << (*it)->className() << "'";
+				throw std::domain_error( "Unknown command handler type constructor. See log." );
 			}
 		}
 		else	{
-			LOG_ALERT << "Wolframe Processor Provider: unknown processor type '" << (*it)->className() << "'";
-			throw std::domain_error( "Unknown command handler type constructor. See log." );
+			LOG_ALERT << "Wolframe Processor Provider: processor provider configuration can not handle objects of this type '" << (*it)->className() << "'";
+			throw std::domain_error( "Unknown configurable object for processor provider. See log." );
 		}
 	}
 
@@ -241,6 +318,21 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					}
 					m_filter.push_back( fltr );
 					m_filterMap[ name ] = fltr;
+					const char* cc = strchr( name.c_str(), ':');
+					if (cc)
+					{
+						//filter names with ':' separated segments
+						//in the name have the first segment as name
+						//(default filter for a category like 'xml')
+						//for the first loaded filter:
+						std::string category( name.c_str(), cc - name.c_str());
+						fltrItr = m_filterMap.find( category);
+						if (fltrItr == m_filterMap.end())
+						{
+							m_filterMap[ category ] = fltr;
+							LOG_TRACE << "'" << name << "' as default '" << category << "'filter registered";
+						}
+					}
 					LOG_TRACE << "'" << name << "' filter registered";
 				}
 				break;
@@ -257,13 +349,14 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					std::string name = ffo->identifier();
 					boost::algorithm::to_upper( name);
-					std::map <const std::string, const module::DDLCompilerConstructor* >::const_iterator itr = m_ddlcompilerMap.find( name );
+					std::map <const std::string, ddl::DDLCompilerR >::const_iterator itr = m_ddlcompilerMap.find( name );
 					if ( itr != m_ddlcompilerMap.end() )	{
 						LOG_FATAL << "Duplicate DDL compiler name '" << name << "'";
 						throw std::runtime_error( "Duplicate DDL compiler name" );
 					}
 					m_ddlcompiler.push_back( ffo );
-					m_ddlcompilerMap[ name ] = ffo;
+					const ddl::DDLCompilerR cc( ffo->object());
+					m_ddlcompilerMap[ name ] = cc;
 
 					LOG_TRACE << "'" << name << "' DDL compiler registered";
 				}
@@ -285,6 +378,10 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					if ( itr != m_formfunctionMap.end() )	{
 						LOG_FATAL << "Duplicate form function name '" << name << "'";
 						throw std::runtime_error( "Duplicate form function name" );
+					}
+					if (!declareFunctionName( name, "form function"))
+					{
+						throw std::runtime_error( "Duplicate function identifier used for form function");
 					}
 					m_formfunction.push_back( ffo );
 					m_formfunctionMap[ name ] = ffo;
@@ -331,14 +428,14 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					std::string name = ffo->identifier();
-					boost::algorithm::to_upper( name);
-					std::map <const std::string, const module::PrintFunctionConstructor* >::const_iterator itr = m_printFunctionCompilerMap.find( name );
+					std::string key = boost::algorithm::to_upper_copy( name);
+					std::map <const std::string, const module::PrintFunctionConstructor* >::const_iterator itr = m_printFunctionCompilerMap.find( key );
 					if ( itr != m_printFunctionCompilerMap.end() )	{
 						LOG_FATAL << "Duplicate print function compiler name '" << name << "'";
 						throw std::runtime_error( "Duplicate print function compiler name" );
 					}
 					m_printFunctionCompiler.push_back( ffo );
-					m_printFunctionCompilerMap[ name ] = ffo;
+					m_printFunctionCompilerMap[ key ] = ffo;
 
 					LOG_TRACE << "'" << name << "' print function compiler registered";
 				}
@@ -362,17 +459,20 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				break;
 			case ObjectConstructorBase::DATABASE_OBJECT:
 				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
-					  << "'' is marked as an DATABASE_OBJECT but has a simple object constructor";
+					  << "'' is marked as a DATABASE_OBJECT but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
 			case ObjectConstructorBase::CMD_HANDLER_OBJECT:
 				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
-					  << "'' is marked as an CMD_HANDLER_OBJECT but has a simple object constructor";
+					  << "'' is marked as a CMD_HANDLER_OBJECT but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
+				break;
+			case ObjectConstructorBase::LANGUAGE_EXTENSION_OBJECT:
+				// ... language extension modules are not handled here
 				break;
 			case ObjectConstructorBase::TEST_OBJECT:
 				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
-					  << "'' is marked as an TEST_OBJECT but has a simple object constructor";
+					  << "'' is marked as a TEST_OBJECT but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
 			default:
@@ -381,20 +481,52 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 		}
 	}
+
+	// Build the list of configured objects in the processor environment:
+	bool success = true;
+	for (std::vector<langbind::DDLFormConfigStruct>::const_iterator ii=conf->m_environment.form.begin(), ee=conf->m_environment.form.end(); ii != ee; ++ii)
+	{
+		success &= loadForm( ii->DDL, ii->file);
+	}
+	for (std::vector<langbind::PrintLayoutConfigStruct>::const_iterator ii=conf->m_environment.printlayout.begin(), ee=conf->m_environment.printlayout.end(); ii != ee; ++ii)
+	{
+		success &= loadPrintFunction( ii->name, ii->type, ii->file);
+	}
+	for (std::vector<langbind::TransactionFunctionConfigStruct>::const_iterator ii=conf->m_environment.transaction.begin(), ee=conf->m_environment.transaction.end(); ii != ee; ++ii)
+	{
+		success &= declareTransactionFunction( ii->name, ii->type, ii->call);
+	}
+	if (!success)
+	{
+		throw std::logic_error( "Not all configured objects in the processor environment could be loaded. See log." );
+	}
 }
 
 
 ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 {
-	for ( std::list< cmdbind::CommandHandlerCreator* >::iterator it = m_handler.begin();
-							it != m_handler.end(); it++ )
+	for ( std::list< cmdbind::CommandHandlerConstructor* >::iterator it = m_cmd.begin();
+							it != m_cmd.end(); it++ )
 		delete *it;
-	for ( std::list< const module::FilterConstructor* >::iterator it = m_filter.begin();
+
+	for ( std::list< module::FilterConstructor* >::iterator it = m_filter.begin();
 							it != m_filter.end(); it++ )
 		delete *it;
 
-	for ( std::list< const module::FormFunctionConstructor* >::iterator it = m_formfunction.begin();
+	for ( std::list< module::FormFunctionConstructor* >::iterator it = m_formfunction.begin();
 							it != m_formfunction.end(); it++ )
+		delete *it;
+
+	for ( std::list< module::DDLCompilerConstructor* >::iterator it = m_ddlcompiler.begin();
+							it != m_ddlcompiler.end(); ++it )
+		delete *it;
+
+	for ( std::list< module::TransactionFunctionConstructor* >::iterator it = m_transactionFunctionCompiler.begin();
+							it != m_transactionFunctionCompiler.end(); ++it )
+		delete *it;
+
+	for ( std::list< module::PrintFunctionConstructor* >::iterator it = m_printFunctionCompiler.begin();
+							it != m_printFunctionCompiler.end(); ++it )
 		delete *it;
 }
 
@@ -435,24 +567,167 @@ langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formfunction(
 		return ffo->second->object();
 }
 
-ddl::DDLCompiler* ProcessorProvider::ProcessorProvider_Impl::ddlcompiler( const std::string& name ) const
+bool ProcessorProvider::ProcessorProvider_Impl::declareFunctionName( const std::string& name, const char* typestr)
 {
-	std::string ddlcompilerName = boost::algorithm::to_upper_copy( name);
-	std::map <const std::string, const module::DDLCompilerConstructor* >::const_iterator ffo = m_ddlcompilerMap.find( ddlcompilerName );
-	if ( ffo == m_ddlcompilerMap.end() )
-		return NULL;
-	else
-		return ffo->second->object();
+	std::string key = boost::algorithm::to_upper_copy( name);
+	std::map <const std::string, const char*>::const_iterator idt = m_langfunctionIdentifierMap.find( key);
+	if (idt != m_langfunctionIdentifierMap.end())
+	{
+		LOG_ERROR << "Duplicate function identifier for "<< typestr << " with name '" << name << "' already used for a " << idt->second << "";
+		return false;
+	}
+	m_langfunctionIdentifierMap[ key] = typestr;
+	return true;
 }
 
-cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::handler( const std::string& command ) const
+bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const std::string& ddlname, const std::string& dataDefinitionFilename)
 {
-	std::string cmdName = boost::algorithm::to_upper_copy( command );
-	std::map< const std::string, cmdbind::CommandHandlerCreator* >::const_iterator cmd = m_cmdMap.find( cmdName );
-	if ( cmd == m_cmdMap.end() )
+	try
+	{
+		std::string key = boost::algorithm::to_upper_copy( ddlname);
+		std::map <const std::string, ddl::DDLCompilerR>::const_iterator itr = m_ddlcompilerMap.find( key);
+		if (itr == m_ddlcompilerMap.end())
+		{
+			LOG_ERROR << "Failed to load form '" << utils::getFileStem( dataDefinitionFilename) << "'. Compiler for DDL '" << ddlname << "' is not defined";
+			return false;
+		}
+		std::pair< std::string, ddl::StructTypeR> def = ddl::loadForm( *itr->second, dataDefinitionFilename);
+		std::string formkey = boost::algorithm::to_upper_copy( def.first);
+		m_formMap[ formkey] = def.second;
+
+		LOG_TRACE << "Form '" << def.first << "' in '" << utils::getFileStem( dataDefinitionFilename) << "' for DDL '" << ddlname << "' loaded";
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		LOG_ERROR << e.what();
+		return false;
+	}
+}
+
+const ddl::StructType* ProcessorProvider::ProcessorProvider_Impl::form( const std::string& name ) const
+{
+	std::string key = boost::algorithm::to_upper_copy( name);
+	std::map <std::string, ddl::StructTypeR>::const_iterator itr = m_formMap.find( key);
+	if ( itr == m_formMap.end() )
 		return NULL;
 	else
-		return cmd->second->handler( command );
+		return itr->second.get();
+}
+
+bool ProcessorProvider::ProcessorProvider_Impl::loadPrintFunction( const std::string& name, const std::string& type, const std::string& layoutFilename)
+{
+	try
+	{
+		std::string typekey = boost::algorithm::to_upper_copy( type);
+		std::map <std::string, const module::PrintFunctionConstructor*>::const_iterator itr = m_printFunctionCompilerMap.find( typekey);
+		if (itr == m_printFunctionCompilerMap.end())
+		{
+			LOG_ERROR << "Failed to load print layout '" << utils::getFileStem( layoutFilename) << "'. Printer type '" << type << "' is not defined";
+			return false;
+		}
+		prnt::PrintFunctionR funcp( itr->second->object( utils::readSourceFileContent( layoutFilename)));
+		std::string funcname( name);
+		if (funcname.empty())
+		{
+			funcname = utils::getFileStem( layoutFilename);
+		}
+		std::string funckey( boost::algorithm::to_upper_copy( funcname));
+
+		std::map <std::string, prnt::PrintFunctionR>::const_iterator ip = m_printFunctionMap.find( funckey);
+		if (ip != m_printFunctionMap.end())
+		{
+			LOG_ERROR << "Duplicate definition of print layout with name '" << funcname << "'";
+			return false;
+		}
+		if (!declareFunctionName( funcname, "print function name"))
+		{
+			return false;
+		}
+		m_printFunctionMap[ funckey] = funcp;
+		LOG_TRACE << "Print layout '" << funcname << "' for printer '" << name << "' loaded";
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		LOG_ERROR << "Cannot load print layout from file '" << utils::getFileStem( layoutFilename) << "': " <<  e.what();
+		return false;
+	}
+}
+
+const prnt::PrintFunction* ProcessorProvider::ProcessorProvider_Impl::printFunction( const std::string& name ) const
+{
+	std::string key = boost::algorithm::to_upper_copy( name);
+	std::map <std::string, prnt::PrintFunctionR>::const_iterator itr = m_printFunctionMap.find( key);
+	if ( itr == m_printFunctionMap.end() )
+		return NULL;
+	else
+		return itr->second.get();
+}
+
+bool ProcessorProvider::ProcessorProvider_Impl::declareTransactionFunction( const std::string& name, const std::string& type, const std::string& command)
+{
+	try
+	{
+		std::string key = boost::algorithm::to_upper_copy( type);
+		std::map <std::string, const module::TransactionFunctionConstructor*>::const_iterator itr = m_transactionFunctionCompilerMap.find( key);
+		if (itr == m_transactionFunctionCompilerMap.end())
+		{
+			LOG_ERROR << "Cannot declare transaction function '" << name << "'. Transaction function type '" << type << "' is not defined";
+			return false;
+		}
+		langbind::TransactionFunctionR funcp( itr->second->object( command));
+		std::string funckey( boost::algorithm::to_upper_copy( name));
+
+		std::map <std::string, langbind::TransactionFunctionR>::const_iterator ip = m_transactionFunctionMap.find( funckey);
+		if (ip != m_transactionFunctionMap.end())
+		{
+			LOG_ERROR << "Duplicate definition of transaction function with name '" << name << "'";
+			return false;
+		}
+		if (!declareFunctionName( name, "transaction function name"))
+		{
+			return false;
+		}
+		m_transactionFunctionMap[ funckey] = funcp;
+		LOG_TRACE << "Transaction function '" << name << "' (" << type << ") declared";
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		LOG_ERROR << "Cannot declare '" << type << "' transaction function '" << name << "': " <<  e.what();
+		return false;
+	}
+}
+
+const langbind::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transactionFunction( const std::string& name ) const
+{
+	std::string key = boost::algorithm::to_upper_copy( name);
+	std::map <std::string, langbind::TransactionFunctionR>::const_iterator itr = m_transactionFunctionMap.find( key);
+	if ( itr == m_transactionFunctionMap.end() )
+		return NULL;
+	else
+		return itr->second.get();
+}
+
+cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command )
+{
+	std::string cmdName = boost::algorithm::to_upper_copy( command );
+	std::map< std::string, std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*> >::const_iterator cmd = m_cmdMap.find( cmdName );
+	if ( cmd == m_cmdMap.end() )
+	{
+		return NULL;
+	}
+	cmdbind::CommandHandlerConstructor* constructor = cmd->second.first;
+	config::NamedConfiguration* cfg = cmd->second.second;
+	return constructor->object( *cfg);
+}
+
+cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofilterhandler( const std::string& command )
+{
+	cmdbind::CommandHandler* hnd = cmdhandler( command);
+	if (!hnd) return NULL;
+	return dynamic_cast<cmdbind::IOFilterCommandHandler*>( hnd);
 }
 
 }} // namespace _Wolframe::proc

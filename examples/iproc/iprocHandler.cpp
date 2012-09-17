@@ -32,13 +32,8 @@
 ************************************************************************/
 ///\file iprocHandler.cpp
 ///\brief Implementation of a simple protocol based command handler calling a lus script
-
 #include "iprocHandler.hpp"
-#if WITH_LUA
-#include "cmdbind/luaCommandHandler.hpp"
-#endif
-#include "cmdbind/directmapCommandHandler.hpp"
-#include "langbind/appGlobalContext.hpp"
+#include "processor/procProvider.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 
@@ -250,20 +245,17 @@ const net::NetworkOperation Connection::nextOperation()
 					default:
 						try
 						{
-							langbind::TransactionFunctionR tf;
 							const char* procname = m_config->commands()[ m_cmdidx - NofCommands].m_procname.c_str();
-							langbind::GlobalContext* gctx = langbind::getGlobalContext();
-#if WITH_LUA
-							langbind::LuaScriptInstanceR li;
-							if (gctx->getLuaScriptInstance( procname, li))
+							if (!m_provider)
 							{
-								m_cmdhandler.reset( new cmdbind::LuaCommandHandler());
+								LOG_ERROR << "No processor provider set";
+								return net::CloseConnection();
 							}
-							else
-#endif
-							if (gctx->getTransactionFunction( procname, tf))
+							m_cmdhandler.reset( m_provider->cmdhandler( procname));
+							if (!m_cmdhandler.get())
 							{
-								m_cmdhandler.reset( new cmdbind::DirectmapCommandHandler());
+								LOG_ERROR << "Command handler not found for '" << procname << "'";
+								return net::CloseConnection();
 							}
 							m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
 							m_state = Processing;
@@ -355,6 +347,7 @@ Connection::Connection( const net::LocalEndpoint& local, const Configuration* co
 	,m_output(config->output_bufsize())
 	,m_config(config)
 	,m_cmdidx( -1)
+	,m_provider(0)
 {
 	m_itr = m_input.begin();
 	m_end = m_input.end();

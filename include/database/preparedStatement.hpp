@@ -89,7 +89,7 @@ private:
 
 typedef types::CountedReference<PreparedStatementHandler> PreparedStatementHandlerR;
 
-typedef PreparedStatementHandlerR (*CreatePreparedStatementHandlerFunc)( const std::string& dbname);
+typedef PreparedStatementHandlerR (*CreatePreparedStatementHandlerFunc)();
 
 
 }}//namespace

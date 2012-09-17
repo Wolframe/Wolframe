@@ -34,7 +34,7 @@
 ///\brief interface to a generic command handler for a networkHandler command with delegation of network I/O until the command context is left
 #ifndef _Wolframe_cmdbind_LINE_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_LINE_COMMAND_HANDLER_HPP_INCLUDED
-#include "cmdbind/protocolCommandHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
 #include "connectionHandler.hpp"
@@ -98,7 +98,7 @@ private:
 };
 
 
-class LineCommandHandler :public ProtocolCommandHandler
+class LineCommandHandler :public CommandHandler
 {
 public:
 	///\brief Constructor

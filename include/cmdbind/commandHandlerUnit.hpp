@@ -32,34 +32,32 @@
 ************************************************************************/
 ///\file cmdbind/commandHandlerUnit.hpp
 ///\brief Interface to command handler units
-
-#ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_UNIT_HPP_INCLUDED
-#define _Wolframe_CMDBIND_COMMAND_HANDLER_UNIT_HPP_INCLUDED
-
+#ifndef _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
+#define _Wolframe_CMDBIND_COMMAND_HANDLER_CONSTRUCTOR_HPP_INCLUDED
 #include "cmdbind/commandHandler.hpp"
+#include "constructor.hpp"
+#include "moduleInterface.hpp"
 #include <string>
 #include <list>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class CommandHandlerCreator
+///\class CommandHandlerConstructor
 ///\brief Set of command handlers adressable by identifiers
-class CommandHandlerCreator
+class CommandHandlerConstructor
+	:public ConfiguredObjectConstructor<cmdbind::CommandHandler>
 {
 public:
 	///\brief virtual destructor
-	virtual ~CommandHandlerCreator()		{}
+	virtual ~CommandHandlerConstructor(){}
 
-	///\brief Get an instance of the command handler for the command
-	///\param [in] command the name of the command to be executed by the handler
-	///\returns pointer to a CommandHandler object or NULL if none is available for command
-	virtual CommandHandler* handler( const std::string& command );
+	virtual ObjectConstructorBase::ObjectType objectType() const
+	{
+		return ObjectConstructorBase::CMD_HANDLER_OBJECT;
+	}
 
-	///\class const_iterator
-	///\brief Get the list of commands for the unit
-	///\returns pointer to a list of command names (strings). A NULL pointer is an error.
-	virtual const std::list< std::string >* commands() const;
+	virtual std::list<std::string> commands( const config::NamedConfiguration& cfgi) const=0;
 };
 
 }} //namespace _Wolframe::cmdbind

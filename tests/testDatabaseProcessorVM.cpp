@@ -33,7 +33,8 @@
 ///\file testDatabaseProcessorVM.cpp
 ///\brief Test program for the prepared statement interpreter
 #include "database/preparedStatement.hpp"
-#include "langbind/appGlobalContext.hpp"
+#include "langbind/appObjects.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
@@ -276,28 +277,6 @@ static std::string getTestOutput( const std::string& testname)
 	return log->str();
 }
 
-static PreparedStatementHandlerR createPreparedStatementHandlerFunc( const std::string& testname)
-{
-	boost::interprocess::scoped_lock<boost::mutex> lock(g_testoutput_mutex);
-	PreparedStatementHandlerR rt( new DatabaseCommandLog( testname));
-	g_testoutput[ testname] = rt;
-	return rt;
-}
-
-static proc::ProcProviderConfig g_processorProviderConfig;
-static proc::ProcessorProvider* g_processorProvider = 0;
-static module::ModulesDirectory g_modulesDirectory;
-
-///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
-static void loadGlobalContext( const std::string& testname)
-{
-	if (g_processorProvider) delete g_processorProvider;
-	g_processorProvider = new proc::ProcessorProvider( &g_processorProviderConfig, &g_modulesDirectory);
-	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
-	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
-	gct->definePreparedStatementHandler( ""/*default*/, testname, &createPreparedStatementHandlerFunc);
-}
-
 class DatabaseProcessorVMTest : public ::testing::Test
 {
 protected:
@@ -407,9 +386,11 @@ TEST_F( DatabaseProcessorVMTest, tests)
 		}
 
 		std::cerr << "processing test '" << testname << "'" << std::endl;
-		loadGlobalContext( testname);
+		module::ModulesDirectory modulesDirectory;
+		proc::ProcProviderConfig cfg;
+		proc::ProcessorProvider processorProvider( &cfg, &modulesDirectory);
 
-		PreparedStatementTransactionFunction program( td.config);
+		PreparedStatementTransactionFunction program( &processorProvider, td.config);
 		langbind::TransactionFunction::InputR input = program.getInput();
 		pushTestInput( input, td.input);
 		langbind::TransactionFunction::ResultR result = program.execute( input.get());

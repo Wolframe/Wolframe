@@ -32,36 +32,3 @@
 ************************************************************************/
 ///\file langbind/appConfig.hpp
 ///\brief Configuration of the processor environment
-#ifndef _Wolframe_APPLICATION_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
-#define _Wolframe_APPLICATION_ENVIRONMENT_CONFIGURATION_HPP_INCLUDED
-#include <vector>
-#include <string>
-#include "cmdbind/commandHandler.hpp"
-#include "langbind/appConfig_struct.hpp"
-#include "config/configurationBase.hpp"
-#include "ddl/compilerInterface.hpp"
-
-namespace _Wolframe {
-namespace langbind {
-
-///\brief application environment configuration
-class ApplicationEnvironmentConfig : public config::ConfigurationBase
-{
-public:
-	ApplicationEnvironmentConfig() : ConfigurationBase( "Application Environment", NULL, "Application environment configuration" )	{}
-	~ApplicationEnvironmentConfig() {}
-
-	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules );
-	bool check() const;
-	void print( std::ostream& os, std::size_t indent) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
-
-	const EnvironmentConfigStruct& data() const				{return m_config;}
-private:
-	EnvironmentConfigStruct m_config;
-};
-
-}}//namespace
-#endif
-
-

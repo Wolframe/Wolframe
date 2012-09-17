@@ -37,7 +37,7 @@
 #include "connectionHandler.hpp"
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
-#include "langbind/appGlobalContext.hpp"
+#include "langbind/appObjects.hpp"
 #include "processor/procProvider.hpp"
 #include "moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"

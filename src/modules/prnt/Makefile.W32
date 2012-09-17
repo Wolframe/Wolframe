@@ -5,7 +5,13 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 SUBDIRS = \
+	$(SUBDIRS) testPdfPrinter
+
+!IFDEF WITH_LIBHPDF
+SUBDIRS = \
 	$(SUBDIRS)
+#PF:DISABLED: haruPdfPrinter
+!ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

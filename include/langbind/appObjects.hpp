@@ -45,7 +45,6 @@ Project Wolframe.
 #include "database/preparedStatement.hpp"
 #include <stack>
 #include <string>
-#include <map>
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
 
@@ -126,25 +125,6 @@ private:
 	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
 };
 
-
-
-///\class FilterMap
-///\brief Map of available filters seen from scripting language binding
-class FilterMap
-{
-public:
-	FilterMap();
-	~FilterMap(){}
-	FilterMap( const FilterMap& o)
-		:m_map(o.m_map){}
-
-	void defineFilter( const std::string& name, CreateFilterFunc f);
-	bool getFilter( const std::string& name, const std::string& arg, Filter& rt) const;
-private:
-	std::map<std::string,CreateFilterFunc> m_map;
-};
-
-
 ///\class RedirectFilterClosure
 class RedirectFilterClosure
 {
@@ -205,21 +185,6 @@ private:
 	ddl::StructTypeR m_structure;
 };
 
-///\class DDLFormMap
-///\brief Map of available forms seen from scripting language binding
-class DDLFormMap
-{
-public:
-	DDLFormMap(){}
-	~DDLFormMap(){}
-
-	void defineForm( const std::string& name, const DDLForm& f);
-	bool getForm( const std::string& name, DDLForm& rt) const;
-private:
-	std::map<std::string,DDLForm> m_map;
-};
-
-
 class ApiFormData
 {
 public:
@@ -233,7 +198,6 @@ private:
 	const serialize::StructDescriptionBase* m_descr;
 	boost::shared_ptr<void> m_data;
 };
-
 
 ///\class FormFunctionClosure
 ///\brief Closure with calling state of called FormFunction
@@ -267,21 +231,6 @@ private:
 	serialize::StructParser m_parser;
 };
 
-///\class FormFunctionMap
-///\brief Map of available transaction functions seen from scripting language binding
-class FormFunctionMap
-{
-public:
-	FormFunctionMap(){}
-	~FormFunctionMap(){}
-
-	void defineFormFunction( const std::string& name, const FormFunction& f);
-	bool getFormFunction( const std::string& name, FormFunction& rt) const;
-private:
-	std::map<std::string,FormFunction> m_map;
-};
-
-
 ///\class TransactionFunctionClosure
 ///\brief Closure with calling state of called TransactionFunction
 class TransactionFunctionClosure
@@ -289,7 +238,7 @@ class TransactionFunctionClosure
 public:
 	///\brief Constructor
 	///\param[in] f function called
-	TransactionFunctionClosure( const TransactionFunctionR& f);
+	TransactionFunctionClosure( const TransactionFunction* f);
 
 	///\brief Copy constructor
 	///\param[in] o copied item
@@ -306,31 +255,12 @@ public:
 	const TransactionFunction::ResultR& result() const	{return m_result;}
 
 private:
-	TransactionFunctionR m_func;			//< function to execute
+	const TransactionFunction* m_func;		//< function to execute
 	int m_state;					//< current state of call
 	RedirectFilterClosure m_input;			//< builder of structure from input
 	TransactionFunction::InputR m_inputstruct;	//< input structure
 	TransactionFunction::ResultR m_result;		//< function call result
 };
-
-///\class TransactionFunctionMap
-///\brief Map of available transaction functions
-class TransactionFunctionMap
-{
-public:
-	TransactionFunctionMap(){}
-	~TransactionFunctionMap(){}
-
-	void defineTransactionFunction( const std::string& name, const TransactionFunctionR& f);
-	bool getTransactionFunction( const std::string& name, TransactionFunctionR& rt) const;
-
-	void defineTransactionFunctionType( const std::string& name, CreateTransactionFunction f);
-	bool getTransactionFunctionType( const std::string& name, CreateTransactionFunction& rt) const;
-private:
-	std::map<std::string,TransactionFunctionR> m_map;
-	std::map<std::string,CreateTransactionFunction> m_typemap;
-};
-
 
 ///\class PrintFunctionClosure
 ///\brief Closure with calling state of called PrintFunction
@@ -339,7 +269,7 @@ class PrintFunctionClosure
 public:
 	///\brief Constructor
 	///\param[in] f function called
-	PrintFunctionClosure( const prnt::PrintFunctionR& f);
+	PrintFunctionClosure( const prnt::PrintFunction* f);
 
 	///\brief Copy constructor
 	///\param[in] o copied item
@@ -356,60 +286,11 @@ public:
 	std::string result() const			{return m_result;}
 
 private:
-	prnt::PrintFunctionR m_func;			//< function to execute
+	const prnt::PrintFunction* m_func;		//< function to execute
 	int m_state;					//< current state of call
 	RedirectFilterClosure m_input;			//< builder of structure from input
 	prnt::PrintFunction::InputR m_inputstruct;	//< input structure
 	std::string m_result;				//< function call result
-};
-
-///\class PrintFunctionMap
-///\brief Map of available printing functions (e.g. document structure to PDF,PS, etc.)
-class PrintFunctionMap
-{
-public:
-	PrintFunctionMap(){}
-	~PrintFunctionMap(){}
-
-	void definePrintFunction( const std::string& name, const prnt::PrintFunctionR& f);
-	bool getPrintFunction( const std::string& name, prnt::PrintFunctionR& rt) const;
-
-	void definePrintFunctionType( const std::string& name, prnt::CreatePrintFunction f);
-	bool getPrintFunctionType( const std::string& name, prnt::CreatePrintFunction& rt) const;
-
-private:
-	std::map<std::string,prnt::PrintFunctionR> m_map;
-	std::map<std::string,prnt::CreatePrintFunction> m_typemap;
-};
-
-///\class PreparedStatementHandlerMap
-///\brief Map of available prepared statement handler for a database
-class PreparedStatementHandlerMap
-{
-public:
-	PreparedStatementHandlerMap(){}
-	~PreparedStatementHandlerMap(){}
-
-	void definePreparedStatementHandler( const std::string& name, const std::string& dbname, db::CreatePreparedStatementHandlerFunc f);
-	bool getPreparedStatementHandler( const std::string& name, db::PreparedStatementHandlerR& rt) const;
-
-private:
-	std::map<std::string,std::pair<db::CreatePreparedStatementHandlerFunc, std::string> > m_map;
-};
-
-
-///\class DDLCompilerMap
-///\brief Map of available DDL compilers seen from scripting language binding
-class DDLCompilerMap
-{
-public:
-	DDLCompilerMap();
-	~DDLCompilerMap(){}
-
-	void defineDDLCompiler( const std::string& name, const ddl::DDLCompilerR& ci);
-	bool getDDLCompiler( const std::string& name, ddl::DDLCompilerR& rt) const;
-private:
-	std::map<std::string,ddl::DDLCompilerR> m_map;
 };
 
 }} //namespace

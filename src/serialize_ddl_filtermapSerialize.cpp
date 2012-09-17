@@ -108,12 +108,21 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 			}
 			else
 			{
-				langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
-				ctx.setElem( langbind::FilterBase::OpenTag, elem);
-				rt = true;
-				stk.back().state( ++idx);
-				stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, elem));
-				stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
+				if (itr->second.contentType() == ddl::StructType::Vector && !ctx.flag( Context::SerializeWithIndices))
+				{
+					langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
+					stk.back().state( ++idx);
+					stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
+				}
+				else
+				{
+					langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());
+					ctx.setElem( langbind::FilterBase::OpenTag, elem);
+					rt = true;
+					stk.back().state( ++idx);
+					stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, elem));
+					stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
+				}
 			}
 		}
 	}
@@ -151,16 +160,18 @@ static bool fetchVector( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	else
 	{
 		bool hasTag = !stk.back().tag().empty();
-		if (idx >= 1 && hasTag)
+		if (hasTag)
 		{
-			ctx.setElem( langbind::FilterBase::CloseTag, stk.back().tag());
+			ctx.setElem( langbind::FilterBase::OpenTag, stk.back().tag());
 			rt = true;
+			stk.back().state( idx+1);
+			stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::CloseTag, stk.back().tag()));
+			stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));
 		}
-		stk.back().state( idx+1);
-		stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));
-		if (idx >= 1 && hasTag)
+		else
 		{
-			stk.push_back( FiltermapDDLSerializeState( langbind::FilterBase::OpenTag, stk.back().tag()));
+			stk.back().state( idx+1);
+			stk.push_back( FiltermapDDLSerializeState( &itr->second, stk.back().tag()));
 		}
 	}
 	return rt;

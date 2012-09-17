@@ -124,9 +124,5 @@ TransactionFunctionOption::TransactionFunctionOption( const std::string& src)
 	call.insert( call.end(), si, se);
 }
 
-ScriptCommandOption::ScriptCommandOption( const std::string& opt)
-{
-	parseNameTypeSource( opt, false, name, type, file);
-}
 
 

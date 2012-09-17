@@ -71,23 +71,12 @@ struct TransactionFunctionConfigStruct
 	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
-struct ScriptCommandConfigStruct
-{
-	std::string name;						//< name of the function in the script (globally unique)
-	std::string type;						//< (optional) name of the transaction function type (interpreter). If not specified, then the file extension determines the type
-	std::string file;						//< path of the script source
-
-	///\brief Get the configuration structure description
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
-
 
 struct EnvironmentConfigStruct
 {
 	std::vector<DDLFormConfigStruct> form;				//< definitions of forms
 	std::vector<PrintLayoutConfigStruct> printlayout;		//< definitions of print layouts for forms
 	std::vector<TransactionFunctionConfigStruct> transaction;	//< definitions of transaction function
-	std::vector<ScriptCommandConfigStruct> script;			//< definitions of script functions
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();
@@ -96,6 +85,10 @@ struct EnvironmentConfigStruct
 
 	boost::property_tree::ptree toPropertyTree() const;
 	void initFromPropertyTree( const boost::property_tree::ptree& pt);
+
+	void print( std::ostream& os, size_t indent) const;
+
+	bool check() const;
 };
 
 }}//namespace

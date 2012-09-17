@@ -31,7 +31,6 @@ Project Wolframe.
 ************************************************************************/
 #include "langbind/luaObjects.hpp"
 #include "langbind/appObjects.hpp"
-#include "langbind/appGlobalContext.hpp"
 #include "langbind/luaDebug.hpp"
 #include "langbind/luaException.hpp"
 #include "langbind/luaGetFunctionClosure.hpp"
@@ -50,6 +49,7 @@ Project Wolframe.
 #include <cstddef>
 #include <cstdarg>
 #include <boost/lexical_cast.hpp>
+#include <boost/type_traits/remove_cv.hpp>
 extern "C"
 {
 #include "lua.h"
@@ -71,7 +71,6 @@ namespace luaname
 	static const char* DDLForm = "wolframe.DDLForm";
 	static const char* DDLStructParser = "wolframe.DDLStructParser";
 	static const char* DDLStructSerializer = "wolframe.DDLStructSerializer";
-	static const char* GlobalContext = "wolframe.ctx";
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
 	static const char* TypedInputFilterR = "wolframe.TypedInputFilterR";
 	static const char* TypedInputFilterClosure = "wolframe.TypedInputFilterClosure";
@@ -79,6 +78,8 @@ namespace luaname
 	static const char* TransactionFunctionClosure = "wolframe.TransactionFunctionClosure";
 	static const char* PrintFunctionClosure = "wolframe.PrintFunctionClosure";
 	static const char* StructSerializer = "wolframe.StructSerializer";
+	static const char* ProcessorProvider = ":wolframe.ProcessorProvider";
+	static const char* LuaModuleMap = ":wolframe.LuaModuleMap";
 }
 
 namespace
@@ -93,7 +94,6 @@ template <> const char* metaTableName<RedirectFilterClosure>()		{return luaname:
 template <> const char* metaTableName<DDLForm>()			{return luaname::DDLForm;}
 template <> const char* metaTableName<serialize::DDLStructParser>()	{return luaname::DDLStructParser;}
 template <> const char* metaTableName<serialize::DDLStructSerializer>()	{return luaname::DDLStructSerializer;}
-template <> const char* metaTableName<GlobalContext>()			{return luaname::GlobalContext;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
 template <> const char* metaTableName<TypedInputFilterR>()		{return luaname::TypedInputFilterR;}
 template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
@@ -101,6 +101,8 @@ template <> const char* metaTableName<FormFunctionClosure>()		{return luaname::F
 template <> const char* metaTableName<TransactionFunctionClosure>()	{return luaname::TransactionFunctionClosure;}
 template <> const char* metaTableName<PrintFunctionClosure>()		{return luaname::PrintFunctionClosure;}
 template <> const char* metaTableName<serialize::StructSerializer>()	{return luaname::StructSerializer;}
+template <> const char* metaTableName<proc::ProcessorProvider>()	{return luaname::ProcessorProvider;}
+template <> const char* metaTableName<langbind::LuaModuleMap>()		{return luaname::LuaModuleMap;}
 }//anonymous namespace
 
 static const luaL_Reg empty_methodtable[ 1] =
@@ -259,32 +261,30 @@ private:
 template <class ObjectType>
 static void setGlobalSingletonPointer( lua_State* ls, ObjectType* obj)
 {
-	luaL_newmetatable( ls, metaTableName<ObjectType>());
-	lua_pushliteral( ls, "__index");
-	lua_pushvalue( ls, -2);
-	lua_rawset( ls, -3);
-	lua_pushliteral( ls, "__newindex");
-	lua_pushvalue( ls, -2);
-	lua_rawset( ls, -3);
-	ObjectType** objref = (ObjectType**)lua_newuserdata( ls, sizeof(ObjectType*));
-	*objref = obj;
-	luaL_getmetatable( ls, metaTableName<ObjectType>());
-	lua_setmetatable( ls, -2);
-	lua_setglobal( ls, metaTableName<ObjectType>());
+	typedef typename boost::remove_cv<ObjectType>::type ObjectType_ncv;
+	ObjectType_ncv* obj_ncv = const_cast<ObjectType_ncv*>( obj);
+	lua_pushlightuserdata( ls, obj_ncv);
+	lua_setglobal( ls, metaTableName<ObjectType_ncv>());
 }
 
 template <class ObjectType>
 static ObjectType* getGlobalSingletonPointer( lua_State* ls)
 {
-	lua_getglobal( ls, metaTableName<ObjectType>());
-	ObjectType** objref = (ObjectType**) luaL_testudata( ls, -1, metaTableName<ObjectType>());
-	if (!objref)
-	{
-		luaL_error( ls, "reserved global variable '%s' has been changed", metaTableName<ObjectType>());
-		return 0;
-	}
+	typedef typename boost::remove_cv<ObjectType>::type ObjectType_ncv;
+	lua_getglobal( ls, metaTableName<ObjectType_ncv>());
+	ObjectType* rt = (ObjectType*)lua_touserdata( ls, -1);
 	lua_pop( ls, 1);
-	return *objref;
+	return rt;
+}
+
+static proc::ProcessorProvider* getProcessorProvider( lua_State* ls)
+{
+	return getGlobalSingletonPointer<proc::ProcessorProvider>( ls);
+}
+
+static const LuaModuleMap* getLuaModuleMap( lua_State* ls)
+{
+	return getGlobalSingletonPointer<const LuaModuleMap>( ls);
 }
 
 static void check_parameters( lua_State* ls, int si, int nn, ...)
@@ -466,16 +466,21 @@ LUA_FUNCTION_THROWS( "module()", function_module)
 {
 	check_parameters( ls, 0, 1, LUA_TSTRING);
 	const char* modulename = lua_tostring( ls, 1);
-
-	GlobalContext* ctx = getGlobalContext();
-	if (!ctx) throw std::runtime_error( "lost global context");
-
+	if (!modulename) throw std::runtime_error( "module name is not a string");
+	const LuaModuleMap* modmap = getLuaModuleMap( ls);
 	LuaModule mod;
-	if (!ctx->getLuaModule( modulename, mod)) throw std::runtime_error( std::string( "module '") + modulename + "' not defined");
+	if (!modmap->getLuaModule( modulename, mod)) throw std::runtime_error( std::string( "module '") + modulename + "' not defined");
 	mod.load( ls);
 	return 0;
 }
 
+LUA_FUNCTION_THROWS( "module()", function_module_dummy)
+{
+	check_parameters( ls, 0, 1, LUA_TSTRING);
+	const char* modulename = lua_tostring( ls, 1);
+	if (!modulename) throw std::runtime_error( "module name is not a string");
+	return 0;
+}
 
 
 LUA_FUNCTION_THROWS( "<structure>:get()", function_inputfilterClosure_get)
@@ -670,16 +675,10 @@ LUA_FUNCTION_THROWS( "form()", function_form)
 		check_parameters( ls, 0, 1, LUA_TSTRING);
 
 		const char* name = lua_tostring( ls, 1);
-		GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
-		if (!ctx)
-		{
-			throw std::runtime_error( "lost global context");
-		}
-		DDLForm frm;
-		if (!ctx->getForm( name, frm))
-		{
-			throw std::runtime_error( "form not defined");
-		}
+		proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+		const ddl::StructType* st = ctx->form( name);
+		if (!st) throw std::runtime_error( std::string("form '") + name + "' not defined");
+		DDLForm frm( ddl::StructTypeR( new ddl::StructType( *st)));
 		LuaObject<DDLForm>::push_luastack( ls, frm);
 		return 1;
 	}
@@ -902,37 +901,29 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 	check_parameters( ls, 0, 1, LUA_TSTRING);
 
 	const char* name = lua_tostring( ls, 1);
-	GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
-	if (!ctx)
+	proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+	FormFunctionR ff( ctx->formfunction( name));
+	if (ff.get())
 	{
-		throw std::runtime_error( "lost global context");
-	}
-	FormFunction ff;
-	TransactionFunctionR tf;
-	prnt::PrintFunctionR pf;
-
-	if (ctx->getFormFunction( name, ff))
-	{
-		LuaObject<FormFunctionClosure>::push_luastack( ls, FormFunctionClosure( ff));
+		LuaObject<FormFunctionClosure>::push_luastack( ls, FormFunctionClosure( *ff));
 		lua_pushcclosure( ls, function_formfunction_call, 1);
 		return 1;
 	}
-	else if (ctx->getTransactionFunction( name, tf))
+	const TransactionFunction* tf = ctx->transactionFunction( name);
+	if (tf)
 	{
 		LuaObject<TransactionFunctionClosure>::push_luastack( ls, TransactionFunctionClosure( tf));
 		lua_pushcclosure( ls, function_transactionfunction_call, 1);
 		return 1;
 	}
-	else if (ctx->getPrintFunction( name, pf))
+	const prnt::PrintFunction* pf = ctx->printFunction( name);
+	if (pf)
 	{
 		LuaObject<PrintFunctionClosure>::push_luastack( ls, PrintFunctionClosure( pf));
 		lua_pushcclosure( ls, function_printfunction_call, 1);
 		return 1;
 	}
-	else
-	{
-		throw std::runtime_error( "form function not found");
-	}
+	throw std::runtime_error( "form function not found (is neither a module form function, nor a transaction function, nor a print function)");
 }
 
 static const char* userdata_tolstring( lua_State* ls, int index, std::size_t* len)
@@ -1145,13 +1136,9 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 			name = lua_tostring( ls, 1);
 			if (!name) throw std::runtime_error( "filter name is not a string");
 
-			GlobalContext* ctx = getGlobalSingletonPointer<GlobalContext>( ls);
-			if (!ctx)
-			{
-				throw std::runtime_error( "lost global context");
-			}
-			Filter flt;
-			if (!ctx->getFilter( name, encoding, flt))
+			proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+			types::CountedReference<Filter> flt( ctx->filter( name, encoding));
+			if (!flt.get())
 			{
 				if (encoding[0])
 				{
@@ -1162,7 +1149,7 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 					throw std::runtime_error( std::string( "filter '") + name + "' is not defined");
 				}
 			}
-			LuaObject<Filter>::push_luastack( ls, flt);
+			LuaObject<Filter>::push_luastack( ls, *flt);
 			return 1;
 		}
 		default: throw std::runtime_error( "too many arguments");
@@ -1422,32 +1409,25 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 			if (doctype.size())
 			{
 				std::string doctypeid( utils::getIdFromDoctype( doctype));
-				GlobalContext* gtc = getGlobalSingletonPointer<GlobalContext>( ls);
-				if (!gtc)
+				proc::ProcessorProvider* gtc = getProcessorProvider( ls);
+				const ddl::StructType* st = gtc->form( doctypeid);
+				if (!st) throw std::runtime_error( std::string("form not defined for document type '") + doctypeid + "'");
+				DDLForm form( ddl::StructTypeR( new ddl::StructType( *st)));
+
+				serialize::DDLStructParser* closure;
+				serialize::Context::Flags flags = serialize::Context::ValidateAttributes;
+				TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
+				LuaObject<serialize::DDLStructParser>::push_luastack( ls, serialize::DDLStructParser( form.structure()));
+				closure = LuaObject<serialize::DDLStructParser>::get( ls, -1);
+				closure->init( inp, flags);
+				lua_pushlightuserdata( ls, closure);
+				if (outputIsTable)
 				{
-					throw std::runtime_error( "lost global context");
+					return &function_input_table_DDLStructParser;
 				}
-				DDLForm form;
-				if (!gtc->getForm( doctypeid, form))
+				else
 				{
-					throw std::runtime_error( std::string("form not defined for document type '") + doctypeid + "'");
-				}
-				{
-					serialize::DDLStructParser* closure;
-					serialize::Context::Flags flags = serialize::Context::ValidateAttributes;
-					TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
-					LuaObject<serialize::DDLStructParser>::push_luastack( ls, serialize::DDLStructParser( form.structure()));
-					closure = LuaObject<serialize::DDLStructParser>::get( ls, -1);
-					closure->init( inp, flags);
-					lua_pushlightuserdata( ls, closure);
-					if (outputIsTable)
-					{
-						return &function_input_table_DDLStructParser;
-					}
-					else
-					{
-						return &function_input_form_DDLStructParser;
-					}
+					return &function_input_form_DDLStructParser;
 				}
 			}
 			else if (outputIsTable)
@@ -1657,14 +1637,22 @@ LuaScript::LuaScript( const std::string& path_)
 	}
 }
 
+LuaScriptInstance::LuaScriptInstance( const LuaScript* script_, const LuaModuleMap* modulemap_)
+	:m_ls(0),m_thread(0),m_threadref(0),m_script(script_)
+{
+	init( modulemap_);
+}
+
 LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
 	:m_ls(0),m_thread(0),m_threadref(0),m_script(script_)
 {
+	init( 0);
+}
+
+void LuaScriptInstance::init( const LuaModuleMap* modulemap_)
+{
 	m_ls = luaL_newstate();
 	if (!m_ls) throw std::runtime_error( "failed to create lua state");
-
-	GlobalContext* gc = getGlobalContext();
-	if (!gc) throw std::runtime_error( "lost global context");
 
 	LuaExceptionHandlerScope luaThrows(m_ls);
 	{
@@ -1679,18 +1667,24 @@ LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
 			buf << "Failed to load script '" << m_script->path() << "':" << lua_tostring( m_ls, -1);
 			throw std::runtime_error( buf.str());
 		}
-		// open standard lua libraries
+		// open standard lua libraries (we load all of them):
 		luaL_openlibs( m_ls);
 
-		// register logging function already here because then it can be used in the script initilization part
+		// register objects already here that may be used in the initilization part:
 		Logger logger_;
 		LuaObject<Logger>::createGlobal( m_ls, "logger", logger_, logger_methodtable);
-
-		// register module load function already here because then it can be used in the script initilization part
-		lua_pushcfunction( m_ls, &function_module);
-		lua_setglobal( m_ls, "module");
-
-		// call main, we may have to initialize LUA modules there
+		if (modulemap_)
+		{
+			setGlobalSingletonPointer<const langbind::LuaModuleMap>( m_ls, modulemap_);
+			lua_pushcfunction( m_ls, &function_module);
+			lua_setglobal( m_ls, "module");
+		}
+		else
+		{
+			lua_pushcfunction( m_ls, &function_module_dummy);
+			lua_setglobal( m_ls, "module");
+		}
+		// call main (initialization part):
 		if (lua_pcall( m_ls, 0, LUA_MULTRET, 0) != 0)
 		{
 			std::ostringstream buf;
@@ -1723,19 +1717,9 @@ void LuaModule::load( lua_State* ls)
 	}
 }
 
-LuaModuleMap::LuaModuleMap()
-{
-	// Load Lua standard modules
-	langbind::LuaModule modbcd( "bcdnumber", langbind::initBignumModule);
-	defineLuaModule( "bcdnumber", modbcd);
-	langbind::LuaModule moddatetime( "datetime", langbind::initDateTimeModule);
-	defineLuaModule( "datetime", moddatetime);
-}
-
 void LuaModuleMap::defineLuaModule( const std::string& name, const LuaModule& mod)
 {
 	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
 	std::map<std::string,LuaModule>::const_iterator ii=m_map.find( nam),ee=m_map.end();
 	if (ii != ee) throw std::runtime_error( (std::string("duplicate definition of lua module '") + nam + "'").c_str());
 	m_map[ nam] = mod;
@@ -1744,7 +1728,6 @@ void LuaModuleMap::defineLuaModule( const std::string& name, const LuaModule& mo
 bool LuaModuleMap::getLuaModule( const std::string& name, LuaModule& rt) const
 {
 	std::string nam( name);
-	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
 	std::map<std::string,LuaModule>::const_iterator ii=m_map.find( nam),ee=m_map.end();
 	if (ii == ee) return false;
 	rt = ii->second;
@@ -1796,19 +1779,12 @@ bool LuaFunctionMap::getLuaScriptInstance( const std::string& procname, LuaScrip
 
 	std::map<std::string,std::size_t>::const_iterator ii=m_procmap.find( nam),ee=m_procmap.end();
 	if (ii == ee) return false;
-	rt = LuaScriptInstanceR( new LuaScriptInstance( m_ar[ ii->second]));
+	rt = LuaScriptInstanceR( new LuaScriptInstance( m_ar[ ii->second], m_modulemap));
 	return true;
 }
 
-bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input& input_, const Output& output_)
+bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input& input_, const Output& output_, proc::ProcessorProvider* provider_) const
 {
-	GlobalContext* gc = dynamic_cast<GlobalContext*>( this);
-	if (!gc)
-	{
-		std::ostringstream msg;
-		msg << "cannot get global context via RTTI from Lua function map";
-		throw std::runtime_error( msg.str());
-	}
 	lua_State* ls = lsi->ls();
 	try
 	{
@@ -1825,11 +1801,10 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			LuaObject<FormFunctionClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<TransactionFunctionClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<PrintFunctionClosure>::createMetatable( ls, 0, 0, 0);
-
+			setGlobalSingletonPointer<proc::ProcessorProvider>( ls, provider_);
 			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
 			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
 			LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
-			setGlobalSingletonPointer<GlobalContext>( ls, gc);
 			lua_pushcfunction( ls, &function_filter);
 			lua_setglobal( ls, "filter");
 			lua_pushcfunction( ls, &function_form);
@@ -1848,5 +1823,13 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 		throw std::runtime_error( msg.str());
 	}
 	return false;
+}
+
+std::list<std::string> LuaFunctionMap::commands() const
+{
+	std::list<std::string> rt;
+	std::map<std::string,std::size_t>::const_iterator ii = m_procmap.begin(), ee = m_procmap.end();
+	for (; ii != ee; ++ii) rt.push_back( ii->first);
+	return rt;
 }
 

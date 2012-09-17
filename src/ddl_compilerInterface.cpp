@@ -32,8 +32,35 @@ Project Wolframe.
 ///\file ddl_compilerInterface.cpp
 ///\brief implementation of common methods of DDL compilers
 #include "ddl/compilerInterface.hpp"
+#include "utils/miscUtils.hpp"
+#include "utils/doctype.hpp"
 
 using namespace _Wolframe;
 using namespace ddl;
+
+std::pair< std::string, ddl::StructTypeR> _Wolframe::ddl::loadForm( const ddl::DDLCompiler& ddlc, const std::string& ddfilename)
+{
+	std::pair< std::string, ddl::StructTypeR> rt;
+	rt.second.reset( new ddl::StructType());
+	try
+	{
+		*rt.second = ddlc.compile( utils::readSourceFileContent( ddfilename));
+	}
+	catch (const std::exception& e)
+	{
+		std::ostringstream msg;
+		msg << "could not compile data description file '" << ddfilename << "': " << e.what() << std::endl;
+		throw std::runtime_error( msg.str());
+	}
+	if (rt.second->doctype())
+	{
+		rt.first = utils::getIdFromDoctype( rt.second->doctype());
+	}
+	else
+	{
+		rt.first = utils::getFileStem( ddfilename);
+	}
+	return rt;
+}
 
 

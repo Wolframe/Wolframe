@@ -1,0 +1,4 @@
+LIBRARY mod_lua_datetime
+
+EXPORTS
+entryPoint	@1

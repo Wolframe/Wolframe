@@ -19,11 +19,18 @@
 # - docout		output document name
 # - csetlist		list of character set encodings
 #
+TESTCMD="$testcmd"
 TESTNAME="$testname"
 PWD=`pwd`
 topdir=`dirname $PWD/$0`"/../../../../"
 
 filter="xml:textwolf"
+modpath="../../src/modules"
+testcmd="--module $modpath/filter/textwolf/mod_filter_textwolf $testcmd"
+if [ `echo $testcmd | grep '.lua ' | grep -c -- '--script'` != 0 ]; then
+	testcmd="--module $modpath/cmdbind/luaCommandHandler/mod_lua_command_handler $testcmd"
+fi
+
 for cset in $csetlist
 do
 	inputfilter="$filter"
@@ -32,3 +39,5 @@ do
 	echo "echo executing test $testname $cset" >> ../../testWolfilter.sh
 	echo "cat $topdir/tests/wolfilter/template/doc/$docin.UTF-8.xml | sed 's/UTF-8/$cset/' | recode UTF-8..$cset | $topdir/wtest/cleanInput BOM EOLN | $topdir/src/wolfilter `echo --input-filter $inputfilter --output-filter $outputfilter $testcmd | sed "s@--form @--form $topdir/tests/wolfilter/scripts/@" | sed "s@--script @--script $topdir/tests/wolfilter/scripts/@" | sed "s@--module @--module $topdir/tests/wolfilter/modules/../@"` > $topdir/tests/temp/$docout.$cset.xml" >> ../../testWolfilter.sh
 done
+testcmd="$TESTCMD"
+testname="$TESTNAME"

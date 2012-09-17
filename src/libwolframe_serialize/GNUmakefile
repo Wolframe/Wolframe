@@ -29,6 +29,7 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
+	$(TOPDIR)/src/libwolframe/utils_doctype.o \
 	$(TOPDIR)/src/ddl_atomicType.o \
 	$(TOPDIR)/src/ddl_structType.o \
 	$(TOPDIR)/src/ddl_structTypeBuild.o \

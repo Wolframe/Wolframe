@@ -32,8 +32,8 @@
 ************************************************************************/
 ///\brief Interface of the processor of database commands
 ///\file database/preparedStatementProcessor.hpp
-#ifndef _DATABASE_PROCESSOR_HPP_INCLUDED
-#define _DATABASE_PROCESSOR_HPP_INCLUDED
+#ifndef _DATABASE_PREPARED_STM_PROCESSOR_HPP_INCLUDED
+#define _DATABASE_PREPARED_STM_PROCESSOR_HPP_INCLUDED
 #include "types/allocators.hpp"
 #include "langbind/transactionFunction.hpp"
 #include <string>
@@ -41,6 +41,12 @@
 #include <map>
 #include <limits>
 #include <stdexcept>
+
+///\brief Forward declaration
+namespace _Wolframe {
+namespace db {
+class DatabaseProvider;
+}}
 
 namespace _Wolframe {
 namespace db {
@@ -246,7 +252,7 @@ class PreparedStatementTransactionFunction
 {
 public:
 	PreparedStatementTransactionFunction( const PreparedStatementTransactionFunction& o);
-	PreparedStatementTransactionFunction( const std::string& description);
+	PreparedStatementTransactionFunction( db::DatabaseProvider* provider_, const std::string& description);
 	virtual ~PreparedStatementTransactionFunction(){}
 
 	virtual langbind::TransactionFunction::InputR getInput() const;
@@ -257,11 +263,12 @@ private:
 	std::string m_resultname;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
+	db::DatabaseProvider* m_provider;
 };
 
 ///\param[in] handler name of interface to underlaying database
 ///\param[in] description transaction description source
-langbind::TransactionFunction* createPreparedStatementTransactionFunction( const std::string& description);
+langbind::TransactionFunction* createPreparedStatementTransactionFunction( db::DatabaseProvider* provider_, const std::string& description);
 
 }}//namespace
 #endif

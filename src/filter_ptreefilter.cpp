@@ -34,6 +34,7 @@
 ///\brief Implements a filter for serialization/deserialization of a property tree
 #include "filter/ptreefilter.hpp"
 #include <stdexcept>
+#include <sstream>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
@@ -83,8 +84,22 @@ bool PropertyTreeInputFilter::getNext( ElementType& type, Element& element)
 
 PropertyTreeOutputFilter::PropertyTreeOutputFilter()
 {
-	m_stk.push_back( &m_content);
+	m_stk.push_back( State());
 }
+
+static std::string ptree_tostring( const boost::property_tree::ptree& pt)
+{
+	std::ostringstream rt;
+	rt << "[" << pt.get_value<std::string>() << "]";
+	boost::property_tree::ptree::const_iterator ii = pt.begin(), ee = pt.end();
+	for (; ii != ee; ++ii)
+	{
+		if (ii != pt.begin()) rt << ", ";
+		rt << std::string(ii->first) << " {" << ptree_tostring( ii->second) << "}";
+	}
+	return rt.str();
+}
+
 
 bool PropertyTreeOutputFilter::print( ElementType type, const Element& element)
 {
@@ -97,19 +112,11 @@ bool PropertyTreeOutputFilter::print( ElementType type, const Element& element)
 	{
 		case TypedFilterBase::OpenTag:
 		{
-			m_stk.back()->add_child( elem, Tree());
-			Tree* cur = m_stk.back();
-			Tree::assoc_iterator nodei = cur->find( elem), nexti = nodei;
-			if (nodei == cur->not_found())
-			{
-				std::runtime_error( "illegal state in property tree output filter");
-			}
+			m_stk.push_back( State( elem));
 			if (!m_attribute.empty())
 			{
 				std::runtime_error( "unspecified attribute value in property tree output filter");
 			}
-			for (++nexti; nexti != cur->not_found(); nodei=nexti,++nexti);
-			m_stk.push_back( &nodei->second);
 		}
 		break;
 		case TypedFilterBase::CloseTag:
@@ -117,11 +124,16 @@ bool PropertyTreeOutputFilter::print( ElementType type, const Element& element)
 			{
 				std::runtime_error( "unspecified attribute value in property tree output filter");
 			}
-			m_stk.pop_back();
-			if (m_stk.empty())
+			if (m_stk.size() <= 1)
 			{
 				std::runtime_error( "tags not balanced in property tree output filter");
 			}
+			if (!m_stk.back().m_node.empty() || !m_stk.back().m_node.get_value<std::string>().empty())
+			{
+				boost::property_tree::ptree* parent = &m_stk[ m_stk.size()-2].m_node;
+				parent->add_child( m_stk.back().m_name, m_stk.back().m_node);
+			}
+			m_stk.pop_back();
 		break;
 		case TypedFilterBase::Attribute:
 			m_attribute = elem;
@@ -134,14 +146,14 @@ bool PropertyTreeOutputFilter::print( ElementType type, const Element& element)
 		{
 			if (!m_attribute.empty())
 			{
-				Tree node;
+				boost::property_tree::ptree node;
 				node.put_value( elem);
-				m_stk.back()->add_child( m_attribute, node);
+				m_stk.back().m_node.add_child( m_attribute, node);
 				m_attribute.clear();
 			}
 			else
 			{
-				Tree* cur = m_stk.back();
+				boost::property_tree::ptree* cur = &m_stk.back().m_node;
 				if (!cur->get_value<std::string>().empty())
 				{
 					std::runtime_error( "duplicate value for a tag in property tree output filter");

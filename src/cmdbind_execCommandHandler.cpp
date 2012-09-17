@@ -32,11 +32,7 @@
 ************************************************************************/
 #include "cmdbind/execCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
-#if WITH_LUA
-#include "cmdbind/luaCommandHandler.hpp"
-#endif
-#include "cmdbind/directmapCommandHandler.hpp"
-#include "langbind/appGlobalContext.hpp"
+#include "processor/procProvider.hpp"
 #include "logger-v1.hpp"
 
 using namespace _Wolframe;
@@ -269,21 +265,15 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					try
 					{
 						langbind::TransactionFunctionR tfunc;
-						const char* procname = m_cmds[ m_cmdidx - m_nofParentCmds - 2].c_str();
-						langbind::GlobalContext* gctx = langbind::getGlobalContext();
-#if WITH_LUA
-						langbind::LuaScriptInstanceR li;
-						if (gctx->getLuaScriptInstance( procname, li))
+						const std::string& procname = m_cmds[ m_cmdidx - m_nofParentCmds - 2];
+						if (!m_provider)
 						{
-							m_cmdhandler.reset( new cmdbind::LuaCommandHandler());
+							LOG_ERROR << "Processor provider undefined";
+							m_statusCode = -1;
+							return CLOSE;
 						}
-						else
-#endif
-						if (gctx->getTransactionFunction( procname, tfunc))
-						{
-							m_cmdhandler.reset( new cmdbind::DirectmapCommandHandler());
-						}
-						else
+						m_cmdhandler.reset( m_provider->cmdhandler( procname));
+						if (!m_cmdhandler.get())
 						{
 							LOG_ERROR << "Command handler not found for '" << procname << "'";
 							m_statusCode = -1;

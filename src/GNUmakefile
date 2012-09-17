@@ -34,35 +34,6 @@ INCLUDE_LIBS += \
 	$(OPENSSL_LIBS)
 endif
 
-# lua
-ifeq ($(WITH_LUA),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_LUA
-
-INCLUDE_DIRS += \
-	-I$(TOPDIR)/lua/src
-
-INCLUDE_LIBS += \
-	$(TOPDIR)/lua/src/liblua.a \
-	$(LIBS_DL)
-endif
-
-# libhpdf
-ifeq ($(WITH_LIBHPDF),1)
-
-INCLUDE_CXXFLAGS += \
-	-DWITH_LIBHPDF
-
-INCLUDE_DIRS += \
-	$(LIBHPDF_INCLUDE_DIRS)
-
-INCLUDE_LDFLAGS += \
-	$(LBHPDF_LIB_DIRS)
-
-INCLUDE_LIBS += \
-	$(LIBHPDF_LIBS)
-
-endif
 
 # libxml2
 ifeq ($(WITH_LIBXML2),1)
@@ -96,6 +67,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_appConfig_struct.o \
 	langbind_appConfig_option.o \
 	langbind_appConfig.o \
+	langbind_scriptConfig_struct.o \
+	langbind_scriptConfig_option.o \
 	langbind_iostreamfilter.o \
 	cmdbind_protocolCommandHandler.o \
 	cmdbind_lineCommandHandler.o \
@@ -114,14 +87,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_tostringfilter.o \
 	filter_ptreefilter.o \
 	database_preparedStatementProcessor.o \
-	prnt_pdfPrinterVariable.o \
-	prnt_pdfPrinterMethod.o \
-	prnt_pdfPrinterExpression.o \
-	prnt_pdfPrinterDocument_testtrace.o \
-	prnt_pdfPrinter.o \
 	types_allocators.o \
-	types_bcdArithmetic.o \
-	types_dateArithmetic.o \
 	acceptor.o \
 	serverEndpoint.o \
 	connection.o \
@@ -129,24 +95,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	server.o \
 	procProviderImpl.o
 
-#LUA
-ifeq ($(WITH_LUA),1)
-LOCAL_STATIC_LIB_OBJS += \
-	filter_luafilter.o \
-	langbind_luaObjects.o \
-	langbind_luaGetFunctionClosure.o \
-	langbind_luaDebug.o \
-	langbind_luaException.o \
-	langbind_luaBcdNumber.o \
-	langbind_luaDateTime.o \
-	cmdbind_luaCommandHandler.o
-endif
-
-#LIBHPDF
-ifeq ($(WITH_LIBHPDF),1)
-LOCAL_STATIC_LIB_OBJS += \
-	prnt_pdfPrinterDocument_libhpdf.o
-endif
 
 #LIBXML2
 ifeq ($(WITH_LIBXML2),1)

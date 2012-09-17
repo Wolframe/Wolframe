@@ -35,7 +35,7 @@
 #define _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"
 #include "filter/filter.hpp"
-#include "cmdbind/protocolCommandHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "connectionHandler.hpp"
 
 namespace _Wolframe {
@@ -44,7 +44,7 @@ namespace cmdbind {
 ///\class DoctypeFilterCommandHandler
 ///\brief Command handler for exctracting the document type identifier from a content
 ///\remark This is a pre-processing command handler. It is returning the consumed input as data left for following processing
-class DoctypeFilterCommandHandler :public ProtocolCommandHandler
+class DoctypeFilterCommandHandler :public CommandHandler
 {
 public:
 	typedef CommandHandler Parent;

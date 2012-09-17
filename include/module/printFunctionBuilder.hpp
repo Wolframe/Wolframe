@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/prnt/template/PrintFunctionBuilder.hpp
+///\file module/printFunctionBuilder.hpp
 ///\brief Interface template for object builder of print functions from a layout description
 #ifndef _Wolframe_MODULE_PRINT_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_PRINT_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED

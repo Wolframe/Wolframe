@@ -87,6 +87,8 @@ private:
 	const serialize::StructDescriptionBase* m_api_result;		//< api result description
 };
 
+typedef types::CountedReference<FormFunction> FormFunctionR;
+
 }}//namespace
 #endif
 

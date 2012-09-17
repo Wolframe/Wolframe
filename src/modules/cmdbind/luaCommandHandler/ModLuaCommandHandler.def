@@ -1,0 +1,4 @@
+LIBRARY mod_lua_command_handler
+
+EXPORTS
+entryPoint	@1

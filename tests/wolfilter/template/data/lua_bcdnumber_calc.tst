@@ -1,7 +1,14 @@
 testname=`basename $0 ".tst"`				# name of the test
 luascript=`echo $testname | sed 's/lua_//'`.lua
 testscripts=$luascript					# list of scripts of the test
-testcmd="--script $luascript run"			# command to execute by the test
+modpath="../../src/modules"				# module directory relative from tests/temp
+mod="$modpath/filter/line/mod_filter_line"		# filter module to load
+opt="--module $mod"
+mod="$modpath/lua/bcdnumber/mod_lua_bcdnumber"
+opt="$opt --module $mod"
+opt="$opt --module $modpath/cmdbind/luaCommandHandler/mod_lua_command_handler"
+opt="$opt --script $luascript"
+testcmd="$opt run"					# command to execute by the test
 docin=doc/rand_bcdnumbder_calc_input.txt		# input document name
 docout=doc/rand_bcdnumbder_calc_output.txt		# output document name
 output="../data/$testname.tst"

@@ -29,26 +29,4 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter_filter.cpp
-///\brief Implementation of filter class
-#include "filter/filter.hpp"
-#include <cstring>
-
-using namespace _Wolframe;
-using namespace _Wolframe::langbind;
-
-bool Filter::getValue( const char* name, std::string& val) const
-{
-	if (m_inputfilter.get() && m_inputfilter->getValue( name, val)) return true;
-	if (m_outputfilter.get() && m_outputfilter->getValue( name, val)) return true;
-	return false;
-}
-
-bool Filter::setValue( const char* name, const std::string& value)
-{
-	bool rt = false;
-	if (m_inputfilter.get() && m_inputfilter->setValue( name, value)) rt = true;
-	if (m_outputfilter.get() && m_outputfilter->setValue( name, value)) rt = true;
-	return rt;
-}
 

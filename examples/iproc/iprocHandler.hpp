@@ -37,7 +37,7 @@
 #define _Wolframe_iproc_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
-#include "cmdbind/protocolCommandHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
 #include "types/countedReference.hpp"
@@ -71,6 +71,12 @@ public:
 
 	///\brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
 	virtual void signalOccured( NetworkSignal);
+
+	///\brief Set the reference to the prcessor provider
+	void setProcessorProvider( proc::ProcessorProvider* provider_)
+	{
+		m_provider = provider_;
+	}
 
 private:
 	///\enum State
@@ -125,7 +131,8 @@ private:
 	const Configuration* m_config;						//< configuration
 	protocol::CmdParser<protocol::Buffer> m_parser;				//< context dependent command parser definition
 	int m_cmdidx;								//< command parsed
-	types::CountedReference<cmdbind::ProtocolCommandHandler> m_cmdhandler;	//< currently executed command
+	types::CountedReference<cmdbind::CommandHandler> m_cmdhandler;		//< currently executed command
+	proc::ProcessorProvider* m_provider;					//< processor provider
 
 	///\brief Helper function to send a line message with CRLF termination as C string
 	///\param [in] str head of the line to write
@@ -146,7 +153,7 @@ private:
 } // namespace iproc
 
 
-/// The server handler container
+///\brief The server handler container
 class ServerHandler::ServerHandlerImpl
 {
 public:

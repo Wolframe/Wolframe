@@ -30,42 +30,40 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file prnt/pdfPrinter.hpp
-///\brief Defines a prnt::PrintFunction implementation based on libhpdf with a simple document description
-#ifndef _Wolframe_PRNT_SIMPLE_PDF_PRINT_FUNCTION_HPP_INCLUDED
-#define _Wolframe_PRNT_SIMPLE_PDF_PRINT_FUNCTION_HPP_INCLUDED
+///\brief Defines a prnt::PrintFunction implementation based on libhpdf with a simple document layout description
+#ifndef _Wolframe_PRNT_HARU_PDF_PRINT_FUNCTION_HPP_INCLUDED
+#define _Wolframe_PRNT_HARU_PDF_PRINT_FUNCTION_HPP_INCLUDED
 #include "prnt/printFunction.hpp"
+#include "prnt/pdfPrinterDocument.hpp"
 #include "types/countedReference.hpp"
 #include <string>
 
 namespace _Wolframe {
 namespace prnt {
 
-///\class SimplePdfPrintFunction
-///\brief Implementaion of a PrintFunction for printing PDFs with libhpdf with a simple document description
-class SimplePdfPrintFunction :public PrintFunction
+///\class HaruPdfPrintFunction
+///\brief Implementation of a PrintFunction for printing PDFs with libhpdf with a simple document layout description
+class HaruPdfPrintFunction :public PrintFunction
 {
 public:
 	///\brief Constructor
 	///\param[in] description Source of the document print description
-	SimplePdfPrintFunction( const std::string& description, bool test=false);
+	HaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument);
 	///\brief Destructor
-	virtual ~SimplePdfPrintFunction();
+	virtual ~HaruPdfPrintFunction();
 
 	virtual InputR getInput() const;
 	virtual std::string execute( const Input* i) const;
 
 	virtual std::string tostring() const;
 public:
-	struct SimplePdfPrintFunctionImpl;
+	struct Impl;
 private:
-	SimplePdfPrintFunctionImpl* m_impl;		//< hidden implementation (PIMPL)
+	Impl* m_impl;		//< hidden implementation (PIMPL)
 };
 
 ///\param[in] description print description source
-PrintFunction* createSimplePdfPrintFunction( const std::string& description);
-
-///\param[in] description print description source
-PrintFunction* createTestTracePdfPrintFunction( const std::string& description);
+PrintFunction* createHaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument);
 
 }}//namespace
 #endif

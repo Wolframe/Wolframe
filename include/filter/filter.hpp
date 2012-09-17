@@ -60,13 +60,24 @@ public:
 	///\param [in] name case sensitive name of the variable
 	///\param [in] val the value returned
 	///\return true on success, false, if the variable does not exist or the operation failed
-	bool getValue( const char* name, std::string& val) const;
+	bool getValue( const char* name, std::string& val) const
+	{
+		if (m_inputfilter.get() && m_inputfilter->getValue( name, val)) return true;
+		if (m_outputfilter.get() && m_outputfilter->getValue( name, val)) return true;
+		return false;
+	}
 
 	///\brief Set a member value of the filter
 	///\param [in] name case sensitive name of the variable
 	///\param [in] value new value of the variable to set
 	///\return true on success, false, if the variable does not exist or the operation failed
-	bool setValue( const char* name, const std::string& value);
+	bool setValue( const char* name, const std::string& value)
+	{
+		bool rt = false;
+		if (m_inputfilter.get() && m_inputfilter->setValue( name, value)) rt = true;
+		if (m_outputfilter.get() && m_outputfilter->setValue( name, value)) rt = true;
+		return rt;
+	}
 
 protected:
 	InputFilterR m_inputfilter;

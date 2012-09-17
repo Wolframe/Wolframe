@@ -34,7 +34,9 @@
 ///\file src/database_preparedStatementProcessor.cpp
 #include "database/preparedStatement.hpp"
 #include "database/preparedStatementProcessor.hpp"
+#include "processor/procProvider.hpp"
 #include "langbind/appGlobalContext.hpp"
+#include "types/countedReference.hpp"
 #include "filter/token_filter.hpp"
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/cstringiterator.hpp"
@@ -503,7 +505,8 @@ PreparedStatementTransactionFunction::PreparedStatementTransactionFunction( cons
 	:m_database(o.m_database)
 	,m_resultname(o.m_resultname)
 	,m_call(o.m_call)
-	,m_tagmap(o.m_tagmap){}
+	,m_tagmap(o.m_tagmap)
+	,m_provider(o.m_provider){}
 
 static bool isAlphaNumeric( char ch)
 {
@@ -538,7 +541,8 @@ static std::string parseParameter( std::string::const_iterator& ii, std::string:
 	return rt;
 }
 
-PreparedStatementTransactionFunction::PreparedStatementTransactionFunction( const std::string& src)
+PreparedStatementTransactionFunction::PreparedStatementTransactionFunction( db::DatabaseProvider* provider_, const std::string& src)
+	:m_provider(provider_)
 {
 	std::string::const_iterator ii = src.begin(), ee = src.end();
 	while (ii != ee)
@@ -886,9 +890,13 @@ langbind::TransactionFunction::ResultR PreparedStatementTransactionFunction::exe
 	PreparedStatementHandler* dbi = 0;
 	try
 	{
-		PreparedStatementHandlerR dbiref;
-		langbind::GlobalContext* gct = langbind::getGlobalContext();
-		if (!gct->getPreparedStatementHandler( m_database, dbiref))
+		types::CountedReference<Database> dbref;
+		if (!dbref.get())
+		{
+			throw std::runtime_error( "default database for transaction functions not defined");
+		}
+		dbi = dbref->getPreparedStatementHandler();
+		if (!dbi)
 		{
 			if (m_database.empty())
 			{
@@ -899,7 +907,7 @@ langbind::TransactionFunction::ResultR PreparedStatementTransactionFunction::exe
 				throw std::runtime_error( std::string("prepared statement handler for database '") + m_database + "' is not defined");
 			}
 		}
-		dbi = dbiref.get();
+		PreparedStatementHandlerR dbiref( dbi);
 
 		const TransactionInput* inputst = dynamic_cast<const TransactionInput*>( inputi);
 		if (!inputst) throw std::logic_error( "function called with unknown input type");
@@ -996,9 +1004,9 @@ langbind::TransactionFunction::ResultR PreparedStatementTransactionFunction::exe
 	}
 }
 
-langbind::TransactionFunction* createPreparedStatementTransactionFunction( const std::string& description)
+langbind::TransactionFunction* _Wolframe::db::createPreparedStatementTransactionFunction( db::DatabaseProvider* provider_, const std::string& description)
 {
-	return new PreparedStatementTransactionFunction( description);
+	return new PreparedStatementTransactionFunction( provider_, description);
 }
 
 

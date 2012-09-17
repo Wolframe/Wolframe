@@ -140,5 +140,8 @@ end
 
 
 **config
+--module ../../src/modules/filter/line/mod_filter_line
+--module ../../src/modules/lua/datetime/mod_lua_datetime
+--module ../../src/modules/cmdbind/luaCommandHandler/mod_lua_command_handler
 --script date_calc.lua run
 **end

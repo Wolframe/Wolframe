@@ -30,14 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/pipe.hpp
-///\brief Implementation for a pipe (istream|ostream) through wolframe mappings like filters, forms, functions
-
+///\file langbind_iostreamfilter.hpp
+///\brief Implementation of a kind of pipe (istream|ostream) through wolframe mappings like filters, forms, functions
 #include "langbind/iostreamfilter.hpp"
-#include "langbind/appGlobalContext.hpp"
+#include "langbind/appObjects.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
-#include "filter/token_filter.hpp"
+#include "filter/char_filter.hpp"
 #include "filter/typingfilter.hpp"
 #if WITH_LUA
 #include "cmdbind/luaCommandHandler.hpp"
@@ -67,37 +66,50 @@ std::pair<std::string,std::string> filterIdentifier( const std::string& id)
 	}
 }
 
-static Filter getFilter( GlobalContext* gc, const std::string& ifl_, const std::string& ofl_)
+static Filter getFilter( proc::ProcessorProvider* provider, const std::string& ifl_, const std::string& ofl_)
 {
 	Filter rt;
+	if (ifl_.empty() && ofl_.empty())
+	{
+		return langbind::createCharFilter( "char", "");
+	}
 	std::pair<std::string,std::string> ifl = filterIdentifier( ifl_);
 	std::pair<std::string,std::string> ofl = filterIdentifier( ofl_);
 	if (boost::iequals( ofl_, ifl_))
 	{
-		if (!gc->getFilter( ifl.first, ifl.second, rt))
+		Filter* fp = provider->filter( ifl.first, ifl.second);
+		if (!fp)
 		{
 			std::ostringstream msg;
 			msg << "unknown filter: name = '" << ifl.first << "' ,arguments = '" << ofl.second << "'";
 			throw std::runtime_error( msg.str());
 		}
+		else
+		{
+			rt = *fp;
+			delete fp;
+		}
 	}
 	else
 	{
-		Filter in;
-		Filter out;
-		if (!gc->getFilter( ifl.first, ifl.second, in))
+		Filter* in = provider->filter( ifl.first, ifl.second);
+		Filter* out = provider->filter( ofl.first, ofl.second);
+		if (!in)
 		{
 			std::ostringstream msg;
 			msg << "unknown input filter: name = '" << ifl.first << "' arguments = '" << ifl.second << "'";
 			throw std::runtime_error( msg.str());
 		}
-		if (!gc->getFilter( ofl.first, ofl.second, out))
+		if (!out)
 		{
+			delete in;
 			std::ostringstream msg;
 			msg << "unknown output filter: name = '" << ofl.first << "' arguments = '" << ofl.second << "'";
 			throw std::runtime_error( msg.str());
 		}
-		rt = Filter( in.inputfilter(), out.outputfilter());
+		rt = Filter( in->inputfilter(), out->outputfilter());
+		delete in;
+		delete out;
 	}
 	return rt;
 }
@@ -208,10 +220,9 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 }
 
 
-void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
+void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, const std::string& proc, const std::string& ifl, std::size_t ib, const std::string& ofl, std::size_t ob, std::istream& is, std::ostream& os)
 {
-	GlobalContext* gc = getGlobalContext();
-	Filter flt = getFilter( gc, ifl, ofl);
+	Filter flt = getFilter( provider, ifl, ofl);
 	if (!flt.inputfilter().get()) throw std::runtime_error( "input filter not found");
 	if (!flt.outputfilter().get()) throw std::runtime_error( "output filter not found");
 
@@ -253,43 +264,41 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		if (taglevel != -1) throw std::runtime_error( "tags not balanced");
 		return;
 	}
-#if WITH_LUA
 	{
-		LuaScriptInstanceR sc;
-		if (gc->getLuaScriptInstance( proc, sc))
+		cmdbind::IOFilterCommandHandler* hnd = provider->iofilterhandler( proc);
+		if (hnd)
 		{
-			if (!gc->initLuaScriptInstance( sc.get(), Input(flt.inputfilter()), Output(flt.outputfilter())))
-			{
-				throw std::runtime_error( "error initializing lua script");
-			}
-			lua_getglobal( sc->thread(), proc.c_str());
-			int rt = lua_resume( sc->thread(), NULL, 0);
-			while (rt == LUA_YIELD)
+			cmdbind::CommandHandlerR cmdhnd( hnd);
+			hnd->passParameters( proc, 0, 0);
+			hnd->setFilter( flt.inputfilter());
+			hnd->setFilter( flt.outputfilter());
+			const char* errmsg;
+			cmdbind::IOFilterCommandHandler::CallResult res;
+
+			while ((res = hnd->call( errmsg)) == cmdbind::IOFilterCommandHandler::Yield)
 			{
 				processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
-				rt = lua_resume( sc->thread(), NULL, 0);
 			}
-			if (rt == LUA_OK)
+			if (res == cmdbind::IOFilterCommandHandler::Error)
 			{
-				writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
+				throw std::runtime_error( std::string( "error in iofilter command handler: ") + (errmsg?errmsg:"unknown"));
 			}
 			else
 			{
-				throw std::runtime_error( lua_tostring( sc->thread(), -1));
+				writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
 			}
 			checkUnconsumedInput( is, *flt.inputfilter());
 			return;
 		}
 	}
-#endif
 	{
-		FormFunction func;
-		if (gc->getFormFunction( proc, func))
+		FormFunctionR func( provider->formfunction( proc));
+		if (func.get())
 		{
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
-			FormFunctionClosure closure( func);
+			FormFunctionClosure closure( *func);
 			closure.init( inp, serialize::Context::ValidateAttributes);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
@@ -305,9 +314,10 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		}
 	}
 	{
-		DDLForm df;
-		if (gc->getForm( proc, df))
+		const ddl::StructType* st = provider->form( proc);
+		if (st)
 		{
+			DDLForm df( ddl::StructTypeR( new ddl::StructType( *st)));
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
@@ -327,8 +337,8 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		}
 	}
 	{
-		TransactionFunctionR func;
-		if (gc->getTransactionFunction( proc, func))
+		const TransactionFunction* func = provider->transactionFunction( proc);
+		if (func)
 		{
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
@@ -347,8 +357,8 @@ void _Wolframe::langbind::iostreamfilter( const std::string& proc, const std::st
 		}
 	}
 	{
-		prnt::PrintFunctionR func;
-		if (gc->getPrintFunction( proc, func))
+		const prnt::PrintFunction* func = provider->printFunction( proc);
+		if (func)
 		{
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));

@@ -53,32 +53,11 @@
 #include <sstream>
 #include <iostream>
 
-///\remark Hack for linking this stuff to the test program. Can't do it in the makefile unfortunately
-#include "wolfilter/src/echo_cmdhandler.cpp"
-
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
 
 using namespace _Wolframe;
-
-boost::shared_ptr<proc::ProcessorProvider> g_processorProvider;
-
-///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
-static void loadGlobalContext( const config::WolfilterCommandLine& cmdline)
-{
-	g_processorProvider.reset( new proc::ProcessorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory()));
-	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider.get());
-	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
-
-	langbind::TransactionFunctionR func( new EchoTransactionFunction());
-	gct->defineTransactionFunction( "echo_transaction", func);
-
-	gct->definePrintFunctionType( "simplepdf", &prnt::createSimplePdfPrintFunction);
-	gct->definePrintFunctionType( "tracepdf", &prnt::createTestTracePdfPrintFunction);
-
-	cmdline.loadGlobalContext();
-}
 
 class WolfilterTest : public ::testing::Test
 {
@@ -169,12 +148,13 @@ TEST_F( WolfilterTest, tests)
 		if (cmdline.printversion()) std::cerr << "ignored option --version" << std::endl;
 		if (cmdline.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
 
-		loadGlobalContext( cmdline);
+		proc::ProcessorProvider processorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory());
 
 		std::istringstream in( td.input, std::ios::in | std::ios::binary);
 		std::ostringstream out( std::ios::out | std::ios::binary);
 
-		langbind::iostreamfilter( cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
+		langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
+
 		if (td.expected != out.str())
 		{
 			static boost::mutex mutex;

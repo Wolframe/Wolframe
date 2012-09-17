@@ -34,6 +34,7 @@ Project Wolframe.
 #include "langbind/appObjects.hpp"
 #include "langbind/luaObjects.hpp"
 #include "langbind/appGlobalContext.hpp"
+#include "utils/miscUtils.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
 #include <cstddef>
@@ -60,14 +61,12 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	{
 		try
 		{
-			GlobalContext* gc = getGlobalContext();
-			LuaScriptInstanceR sc;
-			if (!gc->getLuaScriptInstance( m_name, m_interp))
+			if (!m_ctx->funcmap.getLuaScriptInstance( m_name, m_interp))
 			{
 				LOG_ERROR << "unknown lua script '" << m_name << "'";
 				return Error;
 			}
-			if (!gc->initLuaScriptInstance( m_interp.get(), Input(m_inputfilter), Output(m_outputfilter)))
+			if (!m_ctx->funcmap.initLuaScriptInstance( m_interp.get(), Input(m_inputfilter), Output(m_outputfilter), m_provider))
 			{
 				LOG_ERROR << "error initializing lua script '" << m_name << "'";
 				return Error;
@@ -106,11 +105,28 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	if (rt != 0)
 	{
 		const char* msg = lua_tostring( m_interp->thread(), -1);
-		LOG_ERROR << "error calling function '" << m_name.c_str() << "':" << msg;
+		std::string scriptfilename( utils::getFileStem( m_interp->script()->path()));
+		const char* fp = std::strstr( msg, "[string \"");
+		const char* ep = 0;
+		if (fp) ep = std::strchr( fp, ']');
+
+		if (fp && ep)
+		{
+			std::string emsg( msg, fp - msg);
+			emsg.push_back( '[');
+			emsg.append( scriptfilename);
+			emsg.append( ep);
+			LOG_ERROR << "error calling function '" << m_name.c_str() << "':" << emsg;
+		}
+		else
+		{
+			LOG_ERROR << "error calling function '" << m_name.c_str() << "':" << msg;
+		}
 		errorCode = "lua call failed";
 		return Error;
 	}
 	return Ok;
 }
+
 
 

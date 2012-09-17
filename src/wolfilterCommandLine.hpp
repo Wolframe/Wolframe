@@ -41,6 +41,8 @@
 #include "processor/procProvider.hpp"
 #include "langbind/appConfig_struct.hpp"
 #include "langbind/appConfig_option.hpp"
+#include "langbind/scriptConfig_struct.hpp"
+#include "langbind/scriptConfig_option.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -61,13 +63,13 @@ public:
 	const std::string& outputfilter() const				{return m_outputfilter;}
 	std::size_t inbufsize() const					{return m_inbufsize;}
 	std::size_t outbufsize() const					{return m_outbufsize;}
-	const proc::ProcProviderConfig& providerConfig() const		{return m_providerConfig;}
+	const proc::ProcProviderConfig& providerConfig() const		{return *m_providerConfig;}
 	const module::ModulesDirectory& modulesDirectory() const	{return m_modulesDirectory;}
 
 	void print(std::ostream &) const;
 
-	///\brief loads the command line objects into the global context
-	void loadGlobalContext() const;
+private:
+	config::ConfigurationTree getConfig() const;
 
 private:
 	bool m_printhelp;
@@ -76,13 +78,14 @@ private:
 	std::string m_inputfile;
 	std::vector<std::string> m_modules;
 	langbind::EnvironmentConfigStruct m_envconfig;
+	langbind::ScriptEnvironmentConfigStruct m_scriptenvconfig;
 	std::string m_cmd;
 	std::string m_inputfilter;
 	std::string m_outputfilter;
 	std::string m_helpstring;
 	std::size_t m_inbufsize;
 	std::size_t m_outbufsize;
-	proc::ProcProviderConfig m_providerConfig;
+	types::CountedReference<proc::ProcProviderConfig> m_providerConfig;
 	module::ModulesDirectory m_modulesDirectory;
 	std::string m_referencePath;
 };

@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file modules/formfunction/template/formfunctionContainerBuilder.hpp
+///\file module/formfunctionBuilder.hpp
 ///\brief Interface template for object builder of form functions
 #ifndef _Wolframe_MODULE_FORMFUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_FORMFUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED

@@ -1,7 +1,10 @@
 TOPDIR = ..\..
 
-SUBDIRS = database audit authentication authorization filter ddlcompiler
+SUBDIRS = database audit authentication authorization filter ddlcompiler prnt cmdbind
 # Aba: echoProcessor, temporarily disabled, doesn't build on windows
+!IFDEF WITH_LUA
+SUBDIRS = $(SUBDIRS) lua
+!ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

@@ -33,6 +33,8 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/wtest
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
@@ -122,8 +124,9 @@ TEST_CPP_BINS = \
 	configStructParser$(EXE) \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
-	testWolfilter$(EXE) \
-	testDatabaseProcessorVM$(EXE)
+	testWolfilter$(EXE)
+
+#PF:DISABLED TEMPORARILY: testDatabaseProcessorVM$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -136,7 +139,7 @@ testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwo
 configValueParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 configStructParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
-testDatabaseProcessorVM$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+#PF:DISABLED TEMPORARILY: testDatabaseProcessorVM$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 local_all:
 
@@ -189,7 +192,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize ./testWolfilter
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testDatabaseProcessorVM
+#PF:DISABLED TEMPORARILY: 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testDatabaseProcessorVM
 	@echo
 	@echo
 endif

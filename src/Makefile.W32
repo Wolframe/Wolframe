@@ -41,46 +41,6 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
-# Lua
-!IFDEF WITH_LUA
-
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LUA
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I$(TOPDIR)\lua\src
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) $(TOPDIR)\lua\src\lua.lib
-
-!ENDIF
-
-# libxml2
-!IFDEF WITH_LIBXML2
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LIBXML2
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml" \
-	/I"$(WIN_ICONV_DIR)"
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
-!ENDIF
-
-# libhpdf
-!IFDEF WITH_LIBHPDF
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LIBHPDF
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I"$(TOPDIR)\libhpdf\include"
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(TOPDIR)\libhpdf\src\hpdf.lib" \
-	"$(TOPDIR)\zlib\zlib.lib" "$(TOPDIR)\libpng\libpng.lib"
-!ENDIF
-
 
 LOCAL_STATIC_LIB = \
 	wolframe.lib
@@ -99,6 +59,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_appConfig_struct.obj \
 	langbind_appConfig_option.obj \
 	langbind_appConfig.obj \
+	langbind_scriptConfig_struct.obj \
+	langbind_scriptConfig_option.obj \
 	langbind_iostreamfilter.obj \
 	cmdbind_protocolCommandHandler.obj \
 	cmdbind_lineCommandHandler.obj \
@@ -117,14 +79,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_line_filter.obj \
 	filter_token_filter.obj \
 	types_allocators.obj \
-	types_bcdArithmetic.obj \
-	types_dateArithmetic.obj \
 	database_preparedStatementProcessor.obj \
-	prnt_pdfPrinterVariable.obj \
-	prnt_pdfPrinterMethod.obj \
-	prnt_pdfPrinterExpression.obj \
-	prnt_pdfPrinterDocument_testtrace.obj \
-	prnt_pdfPrinter.obj \
 	acceptor.obj \
 	connection.obj \
 	serverConfig.obj \
@@ -136,33 +91,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	$(LOCAL_STATIC_LIB_OBJS) serverEndpoint.obj
 !ENDIF
 
-# Lua
-!IFDEF WITH_LUA
-LOCAL_STATIC_LIB_OBJS = \
-	$(LOCAL_STATIC_LIB_OBJS) \
-	filter_luafilter.obj \
-	langbind_luaObjects.obj \
-	langbind_luaGetFunctionClosure.obj \
-	langbind_luaDebug.obj \
-	langbind_luaException.obj \
-	langbind_luaBcdNumber.obj \
-	langbind_luaDateTime.obj \
-	cmdbind_luaCommandHandler.obj
-!ENDIF
-
-# libhpdf
-!IFDEF WITH_LIBHPDF
-LOCAL_STATIC_LIB_OBJS = \
-	$(LOCAL_STATIC_LIB_OBJS) \
-	prnt_pdfPrinterDocument_libhpdf.obj
-!ENDIF
-
-# libxml2
-!IFDEF WITH_LIBXML2
-LOCAL_STATIC_LIB_OBJS = \
-	$(LOCAL_STATIC_LIB_OBJS) \
-	filter_libxml2_filter.obj
-!ENDIF
 
 #SSL
 !IFDEF WITH_SSL
