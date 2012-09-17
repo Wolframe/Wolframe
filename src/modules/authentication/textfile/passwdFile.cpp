@@ -51,12 +51,52 @@ namespace AAAA {
 
 static const std::size_t PWD_LINE_SIZE = 1024;
 
-std::string PasswordFile::passwdString( const std::string& user,
-					const std::string& password )
+std::string PasswordFile::passwdLine( const std::string& user,
+				      const std::string& password , const std::string &info )
 {
 	std::stringstream ss;
-	ss << "Display only, user '" << user << "' with password '" << password << "'\n";
+	ss << "Display only, user '" << user << "' with password '" << password << "', info: '"
+	   << info << "'\n";
 	return ss.str();
+}
+
+bool PasswordFile::parsePwdLine( const std::string& pwdLine,
+				 std::string& user, std::string& password, std::string& info )
+{
+	std::string line = boost::algorithm::trim_copy( pwdLine );
+	if ( line.empty() || line[0] == '#' )	{
+		user.clear();
+		password.clear();
+		info.clear();
+		return true;
+	}
+
+	std::size_t  start = 0, end = 0;
+	if ( end != std::string::npos )	{
+		end = line.find( ":", start );
+		user = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+		start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+		boost::algorithm::trim( user );
+	}
+
+	if ( end != std::string::npos )	{
+		end = line.find( ":", start );
+		password = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+		start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+		boost::algorithm::trim( password );
+	}
+	else	{
+		password.clear();
+		info.clear();
+		return false;
+	}
+
+	if ( end != std::string::npos )	{
+		end = line.find( ":", start );
+		info = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+		boost::algorithm::trim( info );
+	}
+	return true;
 }
 
 std::string PasswordFile::salt()

@@ -31,48 +31,50 @@
 
 ************************************************************************/
 //
+// paswword file manipulation tests
 //
-//
 
-#ifndef _PASSWDFILE_HPP_INCLUDED
-#define _PASSWDFILE_HPP_INCLUDED
+#include "logger-v1.hpp"
+#include "gtest/gtest.h"
+#include "passwdFile.hpp"
 
-#include <string>
-#include <cstdio>
+#ifdef _WIN32
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif
 
-namespace _Wolframe {
-namespace AAAA {
+using namespace _Wolframe::AAAA;
+using namespace std;
 
-class PasswordFile
+// make the logger in the modules work although it does not make sense
+_Wolframe::log::LogBackend*	logBackendPtr;
+
+// The fixture for testing class _Wolframe::module
+class PasswdFileFixture : public ::testing::Test
 {
-public:
-	PasswordFile( const std::string& filename, bool create = false )
-		: m_filename( filename ), m_create( create )	{}
-
-	/// Return the string as it is in the password file
-	static std::string passwdLine( const std::string& user, const std::string& password,
-				       const std::string& info = "" );
-
-	/// Parse the password string and split it into fields
-	/// \param
-	static bool parsePwdLine( const std::string& pwdLine,
-				  std::string& user, std::string& password, std::string& info );
-
-	/// Return the salt used for the password file
-	std::string salt();
-
-	void addUser( const std::string& user, const std::string& password );
-
-	bool delUser( const std::string& user );
-
-	bool getUser( const std::string& user, std::string& password );
-	bool getUser( const std::string& challenge, const std::string& response,
-		      std::string& user, std::string& password );
-private:
-	const std::string	m_filename;
-	const bool		m_create;
+protected:
+	PasswdFileFixture( )	{}
 };
 
-}} // namepspace _Wolframe::AAAA
 
-#endif // _PASSWDFILE_HPP_INCLUDED
+TEST_F( PasswdFileFixture, parsingLine )
+{
+	std::string user, password, info;
+	bool result;
+
+	result = PasswordFile::parsePwdLine( "user:password:info",
+					     user, password, info );
+
+	ASSERT_TRUE( result );
+	ASSERT_STREQ( "user", user.c_str() );
+	ASSERT_STREQ( "password", password.c_str() );
+	ASSERT_STREQ( "info", info.c_str() );
+}
+
+//****************************************************************************
+
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS( );
+}

@@ -27,16 +27,20 @@ INCLUDE_LIBS = \
 
 CPP_OBJS = \
 	$(TOPDIR)\src\modules\authentication\textfile\TextFileAuth.obj \
-	$(TOPDIR)\src\modules\authentication\database\DBauth.obj
+	$(TOPDIR)\src\modules\authentication\database\DBauth.obj \
+	$(TOPDIR)\src\modules\authentication\textfile\passwdFile.obj
 
 TEST_CPP_BINS = \
 	authenticationTest.exe \
-	textFileTest.exe
+	textFileTest.exe \
+	passwdFileTest.exe
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 authenticationTest.exe: authenticationTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
 textFileTest.exe: textFileTest.obj $(CPP_OBJS) $(TOPDIR)\src\wolframe.lib
+passwdFileTest.exe: passwdFileTest.obj $(CPP_OBJS)
+
 
 local_all:
 
@@ -49,6 +53,7 @@ local_test:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo authenticationTest >> test.bat
+	@-echo passwdFileTest >> test.bat
 	@-echo textFileTest >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat

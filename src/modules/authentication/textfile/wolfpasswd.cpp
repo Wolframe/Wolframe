@@ -55,13 +55,14 @@ int main( int argc, char* argv[] )
 	PO::options_description desc( "Usage:\n"
 				      "  wolfpasswd [-cD] passwordfile username\n"
 				      "  wolfpasswd -b[c] passwordfile username password\n"
-				      "  wolfpasswd -n username\n"
-				      "  wolfpasswd -nb username password\n"
+				      "  wolfpasswd -n [-s salt] username\n"
+				      "  wolfpasswd -nb [-s salt] username password\n"
 				      "  wolfpasswd -h\n"
 				      "Options" );
 	desc.add_options()
 			( "help,h", "Display this help message." )
 			( "create,c", "Create the file if it doesn't exist." )
+			( "salt,s", "Use the specified salt (only valid with --display-only)." )
 			( "display-only,n", "Don't update the password file; display results on stdout." )
 			( "batch,b", "Use the password from the command line instead of prompting for it.")
 			( "delete,D", "Delete the specified user." )
@@ -157,7 +158,7 @@ int main( int argc, char* argv[] )
 		else
 			passwd = args[1];
 		// now do the job
-		std::cout << WA::PasswordFile::passwdString( args[1], passwd );
+		std::cout << WA::PasswordFile::passwdLine( args[1], passwd );
 	}
 	// delete user
 	else if ( delUser )	{
