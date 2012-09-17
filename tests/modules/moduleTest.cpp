@@ -3,7 +3,7 @@
 //
 
 #include "logger-v1.hpp"
-#include "moduleInterface.hpp"
+#include "moduleDirectory.hpp"
 #include "gtest/gtest.h"
 
 #include "tests/mod_test/common.hpp"

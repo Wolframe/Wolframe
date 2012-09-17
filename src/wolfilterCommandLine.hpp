@@ -37,7 +37,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "moduleInterface.hpp"
+#include "moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
 #include "langbind/appConfig_struct.hpp"
 #include "langbind/appConfig_option.hpp"

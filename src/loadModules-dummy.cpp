@@ -34,7 +34,7 @@
 // This is a dummy module loader in order to satisfy all dependencies
 //
 
-#include "moduleInterface.hpp"
+#include "moduleDirectory.hpp"
 
 bool _Wolframe::module::LoadModules( ModulesDirectory& /*modules*/,
 				     const std::list< std::string >& /*modFiles*/)
