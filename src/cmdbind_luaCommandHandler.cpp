@@ -33,7 +33,6 @@ Project Wolframe.
 #include "langbind/luaDebug.hpp"
 #include "langbind/appObjects.hpp"
 #include "langbind/luaObjects.hpp"
-#include "langbind/appGlobalContext.hpp"
 #include "utils/miscUtils.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
