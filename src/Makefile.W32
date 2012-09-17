@@ -70,6 +70,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	filter_tostringfilter.obj \
 	filter_ptreefilter.obj \
 	filter_typingfilter.obj \
+	filter_textwolf.obj \
 	types_allocators.obj \
 	database_preparedStatementProcessor.obj \
 	acceptor.obj \

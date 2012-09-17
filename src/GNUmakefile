@@ -59,6 +59,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_doctypeFilterCommandHandler.o \
 	cmdbind_directmapCommandHandler.o \
 	filter_filter.o \
+	filter_textwolf.o \
 	filter_doctype.o \
 	filter_typingfilter.o \
 	filter_tostringfilter.o \
