@@ -5,7 +5,16 @@
 - add a data handler
   - simplest form is read data as XML from a directory (as for
     the forms)
-    - naming convention to glue the values to string properties
+    - classes to map from/to:
+      - grouped QRadioButtons: exclusive, select one item from
+        a small list of possible items in a domain
+      - grouped QCheckBoxes: multiple select in a small list of
+        items
+      - QListView: list of things to select (multiple select)
+      - QPlainTextEdit: tags in rich text?
+      - QTreeWidget
+      - file upload
+      - file download
     - where to put things like validators? (mandatory field,
       isnumber, regex, etc.)
     - tooltips?
@@ -13,12 +22,14 @@
       (e.g. combobox, selection)
     - representation of lists of variable size, e.g. list of
       phone numbers
-  - save data back to this directory
-  - first step is to edit a singleton object like one user in
-    one form
-  - then 1:n relations (pick a foreign reference to another
+  - 1:n relations (pick a foreign reference to another
     object), domains (e.g. pick a city in a list of possibilities)
-  - then comes grid views
-- attach the WolframeClient also to the simple file based form
-  and data loader, to test the debugging window
+  - grid views
+- QIODevice for data loader and handler instead of a fixed byte
+  array in the signal (otherwise the debug window gets complicated)
+- attach the DebugWindow also to the simple file based form
+  and data loader, to test the debugging window. Needs line peeking
+  and rewinding QIODevice
+- workflow
+  - save, cancel of form (first step)
 

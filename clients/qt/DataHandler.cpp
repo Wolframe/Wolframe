@@ -11,8 +11,13 @@
 
 #include <QLineEdit>
 #include <QDateEdit>
+#include <QTimeEdit>
+#include <QDateTimeEdit>
 #include <QComboBox>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QCheckBox>
+#include <QSlider>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -33,7 +38,8 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		
 // ignore internal elements
 		if( name == "" || name.startsWith( "qt_" ) ||
-			clazz == "QLabel" ) {
+			clazz == "QLabel" ||
+			!widget->isEnabled( ) ) {
 			continue;
 		}
 		
@@ -45,6 +51,14 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
 			QString text = dateEdit->date( ).toString( Qt::ISODate );
 			xml.writeTextElement( "", name, text );
+		} else if( clazz == "QTimeEdit" ) {
+			QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>( widget );
+			QString text = timeEdit->time( ).toString( Qt::ISODate );
+			xml.writeTextElement( "", name, text );
+		} else if( clazz == "QDateTimeEdit" ) {
+			QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
+			QString text = dateTimeEdit->dateTime( ).toString( Qt::ISODate );
+			xml.writeTextElement( "", name, text );
 		} else if( clazz == "QComboBox" ) {
 			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
 			QString text = comboBox->itemText( comboBox->currentIndex( ) );
@@ -52,6 +66,17 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		} else if( clazz == "QSpinBox" ) {
 			QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
 			QString text = QString::number( spinBox->value( ) );
+			xml.writeTextElement( "", name, text );
+		} else if( clazz == "QDoubleSpinBox" ) {
+			QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( widget );
+			QString text = QString::number( spinBox->value( ) );
+			xml.writeTextElement( "", name, text );
+		} else if( clazz == "QCheckBox" ) {
+			QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
+			xml.writeTextElement( "", name, checkBox->isChecked( ) ? "true" : "false" );
+		} else if( clazz == "QSlider" ) {
+			QSlider *slider = qobject_cast<QSlider *>( widget );
+			QString text = QString::number( slider->value( ) );
 			xml.writeTextElement( "", name, text );
 		}
 		qDebug( ) << clazz << name;
@@ -87,9 +112,18 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 						} else if( clazz == "QDateEdit" ) {
 							QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
 							dateEdit->setDate( QDate::fromString( text, Qt::ISODate ) );
+						} else if( clazz == "QTimeEdit" ) {
+							QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>( widget );
+							timeEdit->setTime( QTime::fromString( text, Qt::ISODate ) );
+						} else if( clazz == "QDateTimeEdit" ) {
+							QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
+							dateTimeEdit->setDateTime( QDateTime::fromString( text, Qt::ISODate ) );
 						} else if( clazz == "QSpinBox" ) {
 							QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
 							spinBox->setValue( text.toInt( ) );
+						} else if( clazz == "QDoubleSpinBox" ) {
+							QDoubleSpinBox *doubleSpinBox = qobject_cast<QDoubleSpinBox *>( widget );
+							doubleSpinBox->setValue( text.toDouble( ) );
 						} else if( clazz == "QComboBox" ) {
 							QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
 							for( int idx = 0; idx < comboBox->count( ); idx++ ) {
@@ -98,6 +132,16 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 									break;
 								}
 							}
+						} else if( clazz == "QCheckBox" ) {
+							QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
+							if( text == "true"  ) {
+								checkBox->setChecked( true );
+							} else {
+								checkBox->setChecked( false );
+							}
+						} else if( clazz == "QSlider" ) {
+							QSlider *slider = qobject_cast<QSlider *>( widget );
+							slider->setValue( text.toInt( ) );
 						}
 					}
 				}

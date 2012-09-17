@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <author>generated</author>
- <class>Test1Form</class>
+ <class>form2</class>
  <widget class="QWidget" name="form2">
   <property name="geometry">
    <rect>
@@ -42,7 +42,7 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="lineEdit">
        <property name="text">
-        <string></string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -56,7 +56,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string></string>
+        <string/>
        </property>
       </widget>
      </item>
@@ -64,6 +64,13 @@
       <widget class="QDialogButtonBox" name="buttonBox">
        <property name="standardButtons">
         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QPlainTextEdit" name="plainTextEdit">
+       <property name="centerOnScroll">
+        <bool>false</bool>
        </property>
       </widget>
      </item>

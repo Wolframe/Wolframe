@@ -3,6 +3,11 @@
   <first>Jon</first>
   <last>Doe</last>
   <birthDate>1967-12-22</birthDate>
-  <gender>Male</gender>
+  <temperature>15.8</temperature>
   <age>45</age>
+  <gender>Male</gender>
+  <working>false</working>
+  <wakeupTime>2067-12-22T13:33:00</wakeupTime>
+  <anotherTime>04:33:00</anotherTime>
+  <nofChildren>2</nofChildren>
 </form1>
