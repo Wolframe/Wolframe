@@ -94,6 +94,12 @@ public:
 	simpleBuilder_iterator objectsBegin() const	{ return simpleBuilder_iterator( m_simpleBuilder.begin() ); }
 	simpleBuilder_iterator objectsEnd() const	{ return simpleBuilder_iterator( m_simpleBuilder.end() ); }
 
+	///\brief Get a selected list of configurable objects loaded as tuple (section,keyword)
+	///\remark This function solves a henn and egg problem for the wolfilter program.
+	///\param[in] objtype type of the configurable objects to select
+	///\return The list of section,keyword tuples of configurable objects with the selected type
+	std::vector<std::pair<std::string,std::string> > getConfigurableSectionKeywords( ObjectConstructorBase::ObjectType objtype) const;
+
 private:
 	std::list< ConfiguredBuilder* >	m_cfgdBuilder;	///< list of configurable builders
 	std::list< SimpleBuilder* >	m_simpleBuilder;///< list of simple builders
