@@ -34,7 +34,6 @@
 ///\brief Test program for wolfilter like stdin/stdout mapping
 #include "langbind/iostreamfilter.hpp"
 #include "logger-v1.hpp"
-#include "langbind/appGlobalContext.hpp"
 #include "wolfilterCommandLine.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
