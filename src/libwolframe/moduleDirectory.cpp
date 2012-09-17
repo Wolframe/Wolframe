@@ -84,14 +84,14 @@ bool ModulesDirectory::addBuilder( ConfiguredBuilder* builder )
 				  << "' keyword '" << builder->m_keyword << "' already exists";
 			return false;
 		}
-		if ( boost::algorithm::iequals( (*it)->m_identifier, builder->m_identifier ))	{
-			LOG_ALERT << "A module container named '" << builder->m_identifier
+		if ( boost::algorithm::iequals( (*it)->m_builderName, builder->m_builderName ))	{
+			LOG_ALERT << "A module container named '" << builder->m_builderName
 				  << "' already exists";
 			return false;
 		}
 	}
 	m_cfgdBuilder.push_back( builder );
-	LOG_DEBUG << "Module '" << builder->m_identifier << "' registered for section '"
+	LOG_DEBUG << "Module '" << builder->m_builderName << "' registered for section '"
 		  << builder->m_section << "' keyword '" << builder->m_keyword << "'";
 	return true;
 }
@@ -100,14 +100,14 @@ bool ModulesDirectory::addBuilder( SimpleBuilder* builder )
 {
 	for ( std::list< SimpleBuilder* >::const_iterator it = m_simpleBuilder.begin();
 							it != m_simpleBuilder.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->m_identifier, builder->m_identifier ))	{
-			LOG_ALERT << "A module object named '" << builder->m_identifier
+		if ( boost::algorithm::iequals( (*it)->m_builderName, builder->m_builderName ))	{
+			LOG_ALERT << "A module object named '" << builder->m_builderName
 				  << "' already exists";
 			return false;
 		}
 	}
 	m_simpleBuilder.push_back( builder );
-	LOG_DEBUG << "Module object '" << builder->m_identifier << "' registered";
+	LOG_DEBUG << "Module object '" << builder->m_builderName << "' registered";
 	return true;
 }
 
@@ -123,11 +123,11 @@ ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& section,
 	return NULL;
 }
 
-ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& objectName ) const
+ConfiguredBuilder* ModulesDirectory::getBuilder( const std::string& builderName ) const
 {
 	for ( std::list< ConfiguredBuilder* >::const_iterator it = m_cfgdBuilder.begin();
 							it != m_cfgdBuilder.end(); it++ )	{
-		if ( boost::algorithm::iequals( (*it)->m_identifier, objectName ))
+		if ( boost::algorithm::iequals( (*it)->m_builderName, builderName ))
 			return *it;
 	}
 	return NULL;

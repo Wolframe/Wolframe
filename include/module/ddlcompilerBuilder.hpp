@@ -82,7 +82,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new DDLCompilerConstructor( m_identifier, m_createFunc);
+		return new DDLCompilerConstructor( m_builderName, m_createFunc);
 	}
 private:
 	ddl::CreateDDLCompilerFunc m_createFunc;

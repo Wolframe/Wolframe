@@ -82,7 +82,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new FormFunctionConstructor( m_identifier, m_func);
+		return new FormFunctionConstructor( m_builderName, m_func);
 	}
 private:
 	const langbind::FormFunction m_func;

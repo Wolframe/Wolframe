@@ -54,7 +54,7 @@ AuthenticationFactory::AuthenticationFactory( const std::list< config::NamedConf
 			ConfiguredObjectConstructor< AuthenticationUnit >* auth =
 					dynamic_cast< ConfiguredObjectConstructor< AuthenticationUnit >* >( builder->constructor());
 			if ( auth == NULL )	{
-				LOG_ALERT << "AuthenticationFactory: '" << builder->identifier()
+				LOG_ALERT << "AuthenticationFactory: '" << builder->builderName()
 					  << "' is not an Authentication Unit builder";
 				throw std::logic_error( "object is not an AuthenticationUnit builder" );
 			}

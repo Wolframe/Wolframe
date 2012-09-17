@@ -91,7 +91,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new TransactionFunctionConstructor( m_identifier, m_createFunc);
+		return new TransactionFunctionConstructor( m_builderName, m_createFunc);
 	}
 private:
 	const langbind::CreateTransactionFunction m_createFunc;

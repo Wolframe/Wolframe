@@ -82,7 +82,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new PrintFunctionConstructor( m_identifier, m_createFunc);
+		return new PrintFunctionConstructor( m_builderName, m_createFunc);
 	}
 
 private:

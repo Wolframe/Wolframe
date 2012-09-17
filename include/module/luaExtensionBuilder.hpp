@@ -88,7 +88,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new LuaExtensionConstructor( m_identifier, m_func);
+		return new LuaExtensionConstructor( m_builderName, m_func);
 	}
 private:
 	const lua_CFunction m_func;

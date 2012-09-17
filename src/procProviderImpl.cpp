@@ -268,7 +268,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					dynamic_cast<cmdbind::CommandHandlerConstructor*>( builder->constructor());
 
 				if ( cnstrctr == NULL )	{
-					LOG_ALERT << "Wolframe Processor Provider: '" << builder->identifier()
+					LOG_ALERT << "Wolframe Processor Provider: '" << builder->builderName()
 						  << "' is not a command handler";
 					throw std::logic_error( "Object is not a commandHandler. See log." );
 				}
@@ -304,7 +304,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			case ObjectConstructorBase::FILTER_OBJECT:	{	// object is a filter
 				module::FilterConstructor* fltr = dynamic_cast< module::FilterConstructor* >((*it)->constructor());
 				if ( fltr == NULL )	{
-					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 						  << "'' is not a filter";
 					throw std::logic_error( "Object is not a filter. See log." );
 				}
@@ -342,7 +342,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			{	// object is a DDL compiler
 				module::DDLCompilerConstructor* ffo = dynamic_cast< module::DDLCompilerConstructor* >((*it)->constructor());
 				if ( ffo == NULL )	{
-					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 						  << "'' is not a DDL compiler";
 					throw std::logic_error( "Object is not a form function. See log." );
 				}
@@ -367,7 +367,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			{	// object is a form function
 				module::FormFunctionConstructor* ffo = dynamic_cast< module::FormFunctionConstructor* >((*it)->constructor());
 				if ( ffo == NULL )	{
-					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 						  << "'' is not a form function";
 					throw std::logic_error( "Object is not a form function. See log." );
 				}
@@ -396,7 +396,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				module::TransactionFunctionConstructor* ffo = dynamic_cast< module::TransactionFunctionConstructor* >((*it)->constructor());
 				if ( ffo == NULL )
 				{
-					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 						  << "'' is not a transaction function compiler";
 					throw std::logic_error( "Object is not a transaction function compiler. See log." );
 				}
@@ -421,7 +421,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				module::PrintFunctionConstructor* ffo = dynamic_cast< module::PrintFunctionConstructor* >((*it)->constructor());
 				if ( ffo == NULL )
 				{
-					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 						  << "'' is not a print function compiler";
 					throw std::logic_error( "Object is not a print function compiler. See log." );
 				}
@@ -443,27 +443,27 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			}
 
 			case ObjectConstructorBase::AUDIT_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 					  << "'' is marked as an AUDIT_OBJECT but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
 			case ObjectConstructorBase::AUTHENTICATION_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 					  << "'' is marked as an AUTHENTICATION_OBJECT but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
 			case ObjectConstructorBase::AUTHORIZATION_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 					  << "'' is marked as an AUTHORIZATION_OBJECT but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
 			case ObjectConstructorBase::DATABASE_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 					  << "'' is marked as a DATABASE_OBJECT but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
 			case ObjectConstructorBase::CMD_HANDLER_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 					  << "'' is marked as a CMD_HANDLER_OBJECT but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
@@ -471,12 +471,12 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				// ... language extension modules are not handled here
 				break;
 			case ObjectConstructorBase::TEST_OBJECT:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 					  << "'' is marked as a TEST_OBJECT but has a simple object constructor";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 				break;
 			default:
-				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->identifier()
+				LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->builderName()
 					  << "'' is of an unknown object type";
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 		}

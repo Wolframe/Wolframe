@@ -71,7 +71,7 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 			ConfiguredObjectConstructor< db::DatabaseUnit >* db =
 					dynamic_cast< ConfiguredObjectConstructor< db::DatabaseUnit >* >( builder->constructor());
 			if ( db == NULL )	{
-				LOG_ALERT << "DatabaseProvider: '" << builder->identifier()
+				LOG_ALERT << "DatabaseProvider: '" << builder->builderName()
 					  << "' is not an Database Unit builder";
 				throw std::logic_error( "object is not an DatabaseUnit builder" );
 			}

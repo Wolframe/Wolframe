@@ -83,7 +83,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new FilterConstructor( m_identifier, m_createFunc);
+		return new FilterConstructor( m_builderName, m_createFunc);
 	}
 private:
 	langbind::CreateFilterPtrFunc m_createFunc;
