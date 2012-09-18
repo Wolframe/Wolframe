@@ -110,7 +110,9 @@ TEST_CPP_BINS = \
 	testRand.exe \
 	testProtocolLFdotEscaping.exe \
 	testTimestamp.exe \
-	testWolfilter.exe
+	testWolfilter.exe \
+	stringNormalizationTest.exe
+
 
 #PF:DISABLED TEMPORARILY: testDatabaseProcessorVM.exe
 
@@ -140,6 +142,7 @@ configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
 testProtocolLFdotEscaping.exe: testProtocolLFdotEscaping.obj $(TOPDIR)\src\wolframe.lib
 testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
+stringNormalizationTest.exe: stringNormalizationTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 #PF:DISABLED TEMPORARILY: testDatabaseProcessorVM.exe: testDatabaseProcessorVM.obj $(TOPDIR)\src\wolframe.lib
 testRand.exe: testRand.obj
 testTimestamp.exe: testTimestamp.obj
@@ -176,6 +179,7 @@ local_test:
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo testWolfilter >> test.bat
+	@-echo stringNormalizationTest >> test.bat
 #PF:DISABLED TEMPORARILY: 	@-echo testDatabaseProcessorVM >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
