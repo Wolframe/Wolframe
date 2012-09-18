@@ -30,7 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 ///\file stringUtils.cpp
-///\brief Some utility string function implementations. They are mainly boost wrappers that are separated because of some warnings needed to be disabled
+///\brief Some utility string function implementations.
+/// They are mainly boost wrappers that are separated because of some warnings needed to be disabled
 
 #ifdef _WIN32
 #pragma warning(disable:4996)
@@ -52,3 +53,26 @@ void _Wolframe::utils::splitString( std::vector<std::string>& res, const std::st
 	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
 }
 
+
+/// Rules: trim the string left and right, replace all whitespaces with one space
+/// and set the string to uppercase.
+void _Wolframe::utils::normalizeString( std::string& str )
+{
+	boost::algorithm::trim( str );
+	for ( std::string::iterator it = str.begin(); it != str.end(); it++ )	{
+		if ( isspace( *it ))	{
+			*it++ = ' ';
+			while ( isspace( *it ) && it != str.end() )
+				str.erase( it );
+		}
+	}
+	boost::algorithm::to_upper( str );
+}
+
+/// Rules are the same as for normalizeString(...)
+std::string _Wolframe::utils::normalizeString_copy( const std::string& str )
+{
+	std::string ret = str;
+	normalizeString( ret );
+	return ret;
+}
