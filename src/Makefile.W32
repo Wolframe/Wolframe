@@ -3,6 +3,7 @@ TOPDIR = ..
 SUBDIRS = \
 	libwolframe \
 	libwolframe_serialize \
+	libwolframe_langbind \
 	modules
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
@@ -22,6 +23,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	advapi32.lib
 
 # openssl
@@ -53,25 +55,12 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceConfig.obj \
 	serviceBanner.obj \
 	appConfig.obj \
-	protocol_ioblocks.obj \
-	langbind_appObjects.obj \
-	langbind_appConfig_struct.obj \
-	langbind_appConfig_option.obj \
-	langbind_scriptConfig_struct.obj \
-	langbind_scriptConfig_option.obj \
 	langbind_iostreamfilter.obj \
 	cmdbind_lineCommandHandler.obj \
 	cmdbind_execCommandHandler.obj \
 	cmdbind_ioFilterCommandHandler.obj \
 	cmdbind_doctypeFilterCommandHandler.obj \
 	cmdbind_directmapCommandHandler.obj \
-	filter_filter.obj \
-	filter_doctype.obj \
-	filter_tostringfilter.obj \
-	filter_ptreefilter.obj \
-	filter_typingfilter.obj \
-	filter_textwolf_filter.obj \
-	filter_char_filter.obj \
 	types_allocators.obj \
 	database_preparedStatementProcessor.obj \
 	acceptor.obj \
@@ -101,6 +90,7 @@ all: dependencies $(CPP_OBJS) $(CPP_BINS)
 dependencies:
 	cd libwolframe & $(MAKE) /nologo /f Makefile.w32 all
 	cd libwolframe_serialize & $(MAKE) /nologo /f Makefile.w32 all
+	cd libwolframe_langbind & $(MAKE) /nologo /f Makefile.w32 all
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

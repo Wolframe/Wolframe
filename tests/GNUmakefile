@@ -35,14 +35,16 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/wtest/wolftest.a \
 	$(TOPDIR)/src/libwolframe.a \
-	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	$(TOPDIR)/src/libwolframe_serialize/libwolframe_serialize.a \
+	-lwolframe \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_program_options
 
@@ -153,12 +155,12 @@ local_clean:
 
 local_distclean:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR)"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR)"
 
 ifeq ($(WITH_LIBHPDF),1)
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBHPDF_LIB_DIR)"
-endif                        
-                        
+endif
+
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
 	@mkdir -p temp
@@ -200,7 +202,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize ./testWolfilter
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testWolfilter
 	@echo
 #PF:DISABLED TEMPORARILY: 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testDatabaseProcessorVM
 	@echo

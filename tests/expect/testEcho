@@ -26,15 +26,14 @@ if { [catch {
 
 	set message "1 short line"
 	send "$message\r"
-	expect "$message"
+	expect "$message\r"
 
 	set message "2nd short line with üèöéäà°§"
 	send "$message\r"
-	expect "$message"
+	expect "$message\r"
 
-	set timeout 1
 	send "quit\r"
-	expect "Bye"
+	expect "Bye\r"
 	expect 	{
 		timeout	{ send_user " --> oops. timeout occured\n"; return 1 }
 		eof	{ send_user " --> Connection closed. OK\n" }

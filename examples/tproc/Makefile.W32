@@ -24,7 +24,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib
+	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib
 
 # openssl
 !IFDEF WITH_SSL
@@ -43,46 +44,6 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
-# Lua
-!IFDEF WITH_LUA
-
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LUA
- 
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I$(TOPDIR)\lua\src
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) $(TOPDIR)\lua\src\lua.lib
-
-!ENDIF
-
-# libxml2
-!IFDEF WITH_LIBXML2
-
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LIBXML2
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I. /I"$(LIBXML2_DIR)\include" /I"$(LIBXML2_DIR)\include\libxml" \
-	/I"$(WIN_ICONV_DIR)"
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
-	
-!ENDIF
-
-# libhpdf
-!IFDEF WITH_LIBHPDF
-INCLUDE_CXXFLAGS = \
-	$(INCLUDE_CXXFLAGS) /DWITH_LIBHPDF
-
-INCLUDE_DIRS = \
-	$(INCLUDE_DIRS) /I"$(TOPDIR)\libhpdf\include"
-
-INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) "$(TOPDIR)\libhpdf\src\hpdf.lib"
-!ENDIF
 
 OBJS = \
 	appProperties.obj \

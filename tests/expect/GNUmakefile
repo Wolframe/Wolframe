@@ -19,8 +19,8 @@ ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_EXPECT),1)
 ifneq "$(PLATFORM)" "OPENBSD"
 ifneq "$(PLATFORM)" "NETBSD"
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize $(EXPECT) ./testEcho
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize $(EXPECT) ./testPecho
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind $(EXPECT) ./testEcho
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind $(EXPECT) ./testPecho
 endif
 endif
 endif
