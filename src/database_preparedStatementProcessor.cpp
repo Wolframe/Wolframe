@@ -35,7 +35,6 @@
 #include "database/preparedStatement.hpp"
 #include "database/preparedStatementProcessor.hpp"
 #include "processor/procProvider.hpp"
-#include "langbind/appGlobalContext.hpp"
 #include "types/countedReference.hpp"
 #include "filter/token_filter.hpp"
 #include "textwolf/xmlscanner.hpp"
