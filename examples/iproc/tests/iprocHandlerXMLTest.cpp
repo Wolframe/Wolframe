@@ -58,15 +58,6 @@ static proc::ProcProviderConfig g_processorProviderConfig;
 static proc::ProcessorProvider* g_processorProvider = 0;
 static module::ModulesDirectory g_modulesDirectory;
 
-///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
-static void loadGlobalContext()
-{
-	if (g_processorProvider) delete g_processorProvider;
-	g_processorProvider = new proc::ProcessorProvider( &g_processorProviderConfig, &g_modulesDirectory);
-	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
-	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
-}
-
 
 struct TestDescription
 {
