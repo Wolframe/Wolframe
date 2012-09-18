@@ -10,7 +10,14 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(LUA_PLATFORM_LIBS)
 
-LOCAL_STATIC_LIB_OBJS = \
+STATIC_LIB = liblua.a
+
+DYNAMIC_LIB = liblua.so
+DYNAMIC_LIB_MAJOR = 5
+DYNAMIC_LIB_MINOR = 2
+DYNAMIC_LIB_PATCH = 0
+
+OBJS = \
 	lapi.o \
 	lauxlib.o \
 	lbaselib.o \
@@ -44,10 +51,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	lvm.o \
 	lzio.o
 
-LOCAL_STATIC_LIB = \
-	liblua.a
-
-LOCAL_BINS = \
+BINS = \
 	lua$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
@@ -58,18 +62,9 @@ LOCAL_BINS = \
 # though upstream!
 ALL_CFLAGS = $(OPTFLAGS) -Wall $(LUA_PLATFORM_CFLAGS) -I. $(SO_COMPILE_FLAGS)
 
-$(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
-	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
-
-lua$(EXE): lua.o liblua.a
-	$(LINK) -o $@ $(ALL_LDFLAGS) lua.o liblua.a $(LIBS)
-
-local_all: $(LOCAL_STATIC_LIB) $(LOCAL_BINS)
+local_all:
 
 local_clean:
-	@rm -f $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
-	@rm -f *.sho++
-	@rm -f lua.o
 
 local_distclean:
 
