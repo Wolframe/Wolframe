@@ -89,7 +89,7 @@ class DBauditConstructor : public ConfiguredObjectConstructor< AuditUnit >
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUDIT_OBJECT; }
-	const char* identifier() const	{ return DB_AUDIT_CLASS_NAME; }
+	const char* objectClassName() const	{ return DB_AUDIT_CLASS_NAME; }
 	DBauditor* object( const config::NamedConfiguration& conf );
 };
 

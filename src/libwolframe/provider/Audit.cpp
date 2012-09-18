@@ -54,12 +54,12 @@ AuditProvider::AuditProvider( const std::list< config::NamedConfiguration* >& co
 			ConfiguredObjectConstructor< AuditUnit >* audit =
 					dynamic_cast< ConfiguredObjectConstructor< AuditUnit >* >( builder->constructor());
 			if ( audit == NULL )	{
-				LOG_ALERT << "AuditProvider: '" << builder->identifier()
+				LOG_ALERT << "AuditProvider: '" << builder->objectClassName()
 					  << "' is not an Audit Unit builder";
 				throw std::logic_error( "object is not an AuditUnit builder" );
 			}
 			m_auditors.push_back( audit->object( **it ) );
-			LOG_TRACE << "'" << audit->identifier() << "' audit unit registered";
+			LOG_TRACE << "'" << audit->objectClassName() << "' audit unit registered";
 		}
 		else	{
 			LOG_ALERT << "AuditProvider: unknown audit type '" << (*it)->className() << "'";

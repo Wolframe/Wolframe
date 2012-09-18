@@ -128,7 +128,7 @@ class TextFileAuthConstructor : public ConfiguredObjectConstructor< Authenticati
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHENTICATION_OBJECT; }
-	const char* identifier() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
+	const char* objectClassName() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
 	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
 };
 

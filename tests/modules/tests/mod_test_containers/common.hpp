@@ -98,7 +98,7 @@ class TestModuleContainer1 : public ConfiguredObjectConstructor< TestUnit1 >
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return TEST_OBJECT; }
-	virtual const char* identifier() const	{ return "TestUnit1"; }
+	virtual const char* objectClassName() const	{ return "TestUnit1"; }
 	virtual TestUnit1* object( const config::NamedConfiguration& conf );
 };
 
@@ -107,7 +107,7 @@ class TestModuleContainer2 : public ConfiguredObjectConstructor< TestUnit2 >
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return TEST_OBJECT; }
-	virtual const char* identifier() const	{ return "TestUnit2"; }
+	virtual const char* objectClassName() const	{ return "TestUnit2"; }
 	virtual TestUnit2* object( const config::NamedConfiguration& conf );
 };
 

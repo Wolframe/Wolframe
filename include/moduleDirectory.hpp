@@ -63,8 +63,8 @@ public:
 	///\param keyword	the keyword in the section
 	ConfiguredBuilder* getBuilder( const std::string& section, const std::string& keyword ) const;
 
-	/// Get the builder for the specified objectName
-	ConfiguredBuilder* getBuilder( const std::string& objectName ) const;
+	/// Get the builder for the specified object class name
+	ConfiguredBuilder* getBuilder( const std::string& objectClassName ) const;
 
 	/// Const iterator for the simple builders in the directory
 	class simpleBuilder_iterator
@@ -98,7 +98,7 @@ public:
 	///\remark This function solves a henn and egg problem for the wolfilter program.
 	///\param[in] objtype type of the configurable objects to select
 	///\return The list of section,keyword tuples of configurable objects with the selected type
-	std::vector<std::pair<std::string,std::string> > getConfigurableSectionKeywords( ObjectConstructorBase::ObjectType objtype) const;
+	std::vector<std::pair<std::string,std::string> > getConfigurableSectionKeywords( ObjectConstructorBase::ObjectType objtype ) const;
 
 private:
 	std::list< ConfiguredBuilder* >	m_cfgdBuilder;	///< list of configurable builders

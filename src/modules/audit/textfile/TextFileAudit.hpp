@@ -88,7 +88,7 @@ class TextFileAuditConstructor : public ConfiguredObjectConstructor< AuditUnit >
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUDIT_OBJECT; }
-	const char* identifier() const	{ return FILE_AUDIT_CLASS_NAME; }
+	const char* objectClassName() const	{ return FILE_AUDIT_CLASS_NAME; }
 	TextFileAuditor* object( const config::NamedConfiguration& conf );
 };
 

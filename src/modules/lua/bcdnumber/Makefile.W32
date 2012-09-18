@@ -23,13 +23,13 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\lua\src\lua.lib
 
 DYNAMIC_MODULE = \
+	mod_lua_bcdnumber.dll
+
+CPP_OBJS = \
 	$(TOPDIR)\src\types_allocators.obj \
 	$(TOPDIR)\src\types_bcdArithmetic.obj \
 	$(TOPDIR)\src\langbind_luaException.obj \
 	$(TOPDIR)\src\langbind_luaBcdNumber.obj \
-	mod_lua_bcdnumber.dll
-
-CPP_OBJS = \
 	mod_lua_bcdnumber.obj
 
 all: $(DYNAMIC_MODULE)

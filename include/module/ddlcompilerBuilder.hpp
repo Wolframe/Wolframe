@@ -53,7 +53,7 @@ public:
 	{
 		return DDL_COMPILER_OBJECT;
 	}
-	virtual const char* identifier() const
+	virtual const char* objectClassName() const
 	{
 		return m_name.c_str();
 	}
@@ -82,7 +82,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new DDLCompilerConstructor( m_identifier, m_createFunc);
+		return new DDLCompilerConstructor( m_className, m_createFunc);
 	}
 private:
 	ddl::CreateDDLCompilerFunc m_createFunc;

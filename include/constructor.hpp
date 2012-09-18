@@ -63,7 +63,7 @@ public:
 	virtual ~ObjectConstructorBase()	{}
 
 	///
-	virtual const char* identifier() const = 0;
+	virtual const char* objectClassName() const = 0;
 
 	/// The type of the object. Filter, DDL compiler, authentication etc.
 	virtual ObjectType objectType() const = 0;

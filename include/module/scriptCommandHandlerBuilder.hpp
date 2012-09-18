@@ -168,7 +168,7 @@ public:
 		return rt;
 	}
 
-	virtual const char* identifier() const
+	virtual const char* objectClassName() const
 	{
 		return CommandHandlerType::identifier();
 	}

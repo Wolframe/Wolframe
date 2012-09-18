@@ -59,7 +59,7 @@ public:
 	{
 		return LANGUAGE_EXTENSION_OBJECT;
 	}
-	virtual const char* identifier() const
+	virtual const char* objectClassName() const
 	{
 		return m_name.c_str();
 	}
@@ -88,7 +88,7 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new LuaExtensionConstructor( m_identifier, m_func);
+		return new LuaExtensionConstructor( m_className, m_func);
 	}
 private:
 	const lua_CFunction m_func;

@@ -100,7 +100,7 @@ class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 							{ return DATABASE_OBJECT; }
-	virtual const char* identifier() const		{ return SQLite_DB_CLASS_NAME; }
+	virtual const char* objectClassName() const		{ return SQLite_DB_CLASS_NAME; }
 	virtual SQLiteDatabase* object( const config::NamedConfiguration& conf );
 };
 

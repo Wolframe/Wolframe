@@ -57,7 +57,7 @@ void LuaScriptContext::load( const ScriptEnvironmentConfigStruct& cfg, const mod
 		{
 			module::LuaExtensionConstructor* co = dynamic_cast< module::LuaExtensionConstructor* >((*mi)->constructor());
 			if (!co) continue;
-			std::string name = co->identifier();
+			std::string name = co->objectClassName();
 			modulemap.defineLuaModule( name, LuaModule( name, co->object()));
 			m_objects.push_back( co);
 		}

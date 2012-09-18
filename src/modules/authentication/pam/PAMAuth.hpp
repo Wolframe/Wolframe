@@ -113,7 +113,7 @@ class PAMAuthConstructor : public ConfiguredObjectConstructor< AuthenticationUni
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return AUTHENTICATION_OBJECT; }
-	const char* identifier() const		{ return PAM_AUTHENTICATION_CLASS_NAME; }
+	const char* objectClassName() const		{ return PAM_AUTHENTICATION_CLASS_NAME; }
 	PAMAuthenticator* object( const config::NamedConfiguration& conf );
 };
 
