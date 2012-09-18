@@ -39,6 +39,8 @@
 #include "filter/tostringfilter.hpp"
 #include "moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"
+#include "utils/miscUtils.hpp"
+#include "utils/doctype.hpp"
 #include "logger-v1.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -47,8 +49,6 @@
 #include <algorithm>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
-#include "utils/doctype.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::config;

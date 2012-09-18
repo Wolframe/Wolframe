@@ -1,6 +1,3 @@
-#ifndef WITH_LIBXML2
-#error Compiling a libxml2 module without libxml2 support enabled
-#endif
 #include "filter/libxml2_filter.hpp"
 #include "filter/bufferingfilter.hpp"
 #include "filter/doctype.hpp"

@@ -36,7 +36,7 @@
 #ifndef _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #define _Wolframe_tproc_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
-#include "cmdbind/protocolCommandHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "protocol/ioblocks.hpp"

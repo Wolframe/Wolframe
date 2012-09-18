@@ -38,6 +38,7 @@
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
 #include "langbind/appObjects.hpp"
+#include "langbind/appConfig_struct.hpp"
 #include "processor/procProvider.hpp"
 #include "moduleDirectory.hpp"
 #include "config/ConfigurationTree.hpp"
@@ -45,6 +46,7 @@
 #include "testUtils.hpp"
 #include "utils/miscUtils.hpp"
 #include "gtest/gtest.h"
+#include "wtest/testModules.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
@@ -67,24 +69,27 @@ public:
 	IProcTestConfiguration( const IProcTestConfiguration& o)
 		:Configuration(o)
 		,m_appConfig(o.m_appConfig)
-		,m_langbindConfig(o.m_langbindConfig)
 	{}
 	IProcTestConfiguration( const std::string& scriptpath, std::size_t ib, std::size_t ob)
 	{
+		m_appConfig.addModules( &g_modulesDirectory);
 		m_appConfig.addConfig( "proc", this);
-		m_appConfig.addConfig( "env", &m_langbindConfig);
+
 
 		boost::filesystem::path configFile( g_testdir / "temp" / "test.cfg");
 		std::ostringstream config;
-		config << "env {" << std::endl;
-		config << "   script {" << std::endl;
-		config << "      name run" << std::endl;
-		config << "      file \"" << scriptpath << "\"" << std::endl;
+		config << "cmdhandler {" << std::endl;
+		config << "   " << utils::getFileExtension( scriptpath) << " {" << std::endl;
+		config << "      script {" << std::endl;
+		config << "         name run" << std::endl;
+		config << "         file \"" << scriptpath << "\"" << std::endl;
+		config << "      }" << std::endl;
 		config << "   }" << std::endl;
 		config << "}" << std::endl;
 		config << "proc {" << std::endl;
 		config << "   cmd run" << std::endl;
 		config << "}" << std::endl;
+
 		wtest::Data::writeFile( configFile.string().c_str(), config.str());
 
 		if (utils::fileExists( configFile.string()))
@@ -95,15 +100,11 @@ public:
 			}
 		}
 		m_appConfig.finalize();
-
 		setBuffers( ib, ob);
-		loadGlobalContext();
-		langbind::getGlobalContext()->load( m_langbindConfig.data());
 	}
 
 private:
 	config::ApplicationConfiguration m_appConfig;
-	langbind::ApplicationEnvironmentConfig m_langbindConfig;
 };
 
 static const char* getRandomAsciiString( unsigned int maxStringSize=4096)
@@ -206,6 +207,7 @@ public:
 	std::string m_input;
 	std::string m_expected;
 	net::LocalTCPendpoint ep;
+	proc::ProcessorProvider* m_provider;
 	iproc::Connection* m_connection;
 	IProcTestConfiguration m_config;
 	enum
@@ -216,6 +218,7 @@ public:
 protected:
 	IProcHandlerTest()
 		:ep( "127.0.0.1", 12345)
+		,m_provider(0)
 		,m_connection(0)
 		,m_config(
 			"../scripts/test_echo_char.lua",
@@ -226,6 +229,8 @@ protected:
 	virtual void SetUp()
 	{
 		TestDescription test;
+		m_provider = new proc::ProcessorProvider( , &g_modulesDirectory);
+
 		m_connection = new iproc::Connection( ep, &m_config);
 
 		m_input.clear();
@@ -245,6 +250,7 @@ protected:
 	virtual void TearDown()
 	{
 		delete m_connection;
+		delete m_processorProvider;
 	}
 };
 
@@ -334,6 +340,11 @@ int main( int argc, char **argv )
 	g_gtest_ARGV[0] = argv[0];
 	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
 
+	if (!LoadModules( g_modulesDirectory, wtest::getTestModuleList( "../../..")))
+	{
+		std::cerr << "failed to load modules" << std::endl;
+		return 2;
+	}
 	if (argc > 1)
 	{
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;

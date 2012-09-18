@@ -30,27 +30,17 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file testDescription.hpp
-///\brief Interface to a test description loaded from a file
-#ifndef _Wolframe_wtest_TESTDESCRIPTION_HPP_INCLUDED
-#define _Wolframe_wtest_TESTDESCRIPTION_HPP_INCLUDED
+///\file wtest/testModules.hpp
+///\brief Function to get list of modules available for a test program
+#ifndef _Wolframe_wtest_TESTMODULES_HPP_INCLUDED
+#define _Wolframe_wtest_TESTMODULES_HPP_INCLUDED
 #include <string>
+#include <list>
+
 namespace _Wolframe {
 namespace wtest {
 
-struct TestDescription
-{
-	std::string input;
-	std::string expected;
-	std::string config;
-	std::string requires;
+std::list<std::string> getTestModuleList( const char* topdir);
 
-	TestDescription( const std::string& filename, const char* argv0);
-	TestDescription( const TestDescription& o)
-		:input(o.input),expected(o.expected),config(o.config),requires(o.requires)
-	{}
-};
-
-}} //namespace
+}}
 #endif
-

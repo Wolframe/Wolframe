@@ -19,14 +19,13 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_employee_assignment_convert.dll
 
 CPP_OBJS = \
-	$(TOPDIR)\src\serialize_mapContext.obj \
-	$(TOPDIR)\src\filter_filterbase.obj \
 	employee_assignment_convert.obj \
 	mod_employee_assignment_convert.obj
 
@@ -35,7 +34,7 @@ all: $(DYNAMIC_MODULE)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /nologo /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:EmployeeAssignmentConvert.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

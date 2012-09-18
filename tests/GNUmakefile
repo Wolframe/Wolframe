@@ -126,7 +126,8 @@ TEST_CPP_BINS = \
 	configStructParser$(EXE) \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
-	testWolfilter$(EXE)
+	testWolfilter$(EXE) \
+	stringNormalizationTest$(EXE)
 
 #PF:DISABLED TEMPORARILY: testDatabaseProcessorVM$(EXE)
 
@@ -141,6 +142,7 @@ testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwo
 configValueParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 configStructParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+stringNormalizationTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 #PF:DISABLED TEMPORARILY: testDatabaseProcessorVM$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 local_all:
@@ -197,6 +199,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./configStructParser config/structparser.conf
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testProtocolLFdotEscaping
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testWolfilter
 	@echo

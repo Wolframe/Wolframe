@@ -42,6 +42,7 @@
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
 #include "utils/miscUtils.hpp"
+#include "wtest/testModules.hpp"
 #include <iostream>
 #include <list>
 #include <fstream>

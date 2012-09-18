@@ -34,7 +34,7 @@
 ///\brief Implementation of the tproc connection handler configuration
 #include "types/countedReference.hpp"
 #include "tprocHandlerConfig.hpp"
-#include "langbind/appGlobalContext.hpp"
+#include "langbind/appObjects.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "cmdbind/directmapCommandHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
