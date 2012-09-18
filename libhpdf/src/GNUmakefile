@@ -11,7 +11,14 @@ INCLUDE_LDFLAGS =
 
 INCLUDE_LIBS =
 
-LOCAL_STATIC_LIB_OBJS = \
+STATIC_LIB = libhpdf.a
+
+DYNAMIC_LIB = libhpdf.so
+DYNAMIC_LIB_MAJOR = 2
+DYNAMIC_LIB_MINOR = 2
+DYNAMIC_LIB_PATCH = 1
+
+OBJS = \
 	hpdf_annotation.o \
 	hpdf_array.o \
 	hpdf_binary.o \
@@ -68,11 +75,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	hpdf_3dmeasure.o \
 	hpdf_encoder_utf.o \
 	hpdf_exdata.o \
-	hpdf_image_ccitt.o \
-	hpdf_pdfa.o
-
-LOCAL_STATIC_LIB = \
-	libhpdf.a
+	hpdf_image_ccitt.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -82,14 +85,9 @@ LOCAL_STATIC_LIB = \
 # though upstream!
 ALL_CFLAGS = $(OPTFLAGS) -Wall -I. -I../include $(INCLUDE_DIRS) $(INCLUDE_CFLAGS)
 
-$(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
-	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
-
-local_all: $(LOCAL_STATIC_LIB)
+local_all:
 
 local_clean:
-	@rm -f $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
-	@rm -f *.sho++
 
 local_distclean:
 
