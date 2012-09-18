@@ -42,6 +42,7 @@
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
 #include "utils/miscUtils.hpp"
+#include "wtest/testModules.hpp"
 #include <iostream>
 #include <list>
 #include <fstream>
@@ -57,6 +58,14 @@ using namespace _Wolframe::iproc;
 static proc::ProcProviderConfig g_processorProviderConfig;
 static proc::ProcessorProvider* g_processorProvider = 0;
 static module::ModulesDirectory g_modulesDirectory;
+
+static void loadGlobalContext()
+{
+	if (!LoadModules( g_modulesDirectory, wtest::getTestModuleList( "../../..")))
+	{
+		throw std::runtime_error( "Modules could not be loaded");
+	}
+}
 
 ///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
 static void loadGlobalContext()

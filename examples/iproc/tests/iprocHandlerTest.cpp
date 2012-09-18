@@ -38,6 +38,7 @@
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
 #include "langbind/appObjects.hpp"
+#include "langbind/appConfig_struct.hpp"
 #include "processor/procProvider.hpp"
 #include "moduleDirectory.hpp"
 #include "config/ConfigurationTree.hpp"
@@ -56,19 +57,6 @@ using namespace _Wolframe::iproc;
 static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
-
-static proc::ProcProviderConfig g_processorProviderConfig;
-static proc::ProcessorProvider* g_processorProvider = 0;
-static module::ModulesDirectory g_modulesDirectory;
-
-///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
-static void loadGlobalContext()
-{
-	if (g_processorProvider) delete g_processorProvider;
-	g_processorProvider = new proc::ProcessorProvider( &g_processorProviderConfig, &g_modulesDirectory);
-	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
-	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
-}
 
 class IProcTestConfiguration :public Configuration
 {
@@ -112,7 +100,7 @@ public:
 
 private:
 	config::ApplicationConfiguration m_appConfig;
-	langbind::ApplicationEnvironmentConfig m_langbindConfig;
+	langbind::EnvironmentConfig m_langbindConfig;
 };
 
 static const char* getRandomAsciiString( unsigned int maxStringSize=4096)

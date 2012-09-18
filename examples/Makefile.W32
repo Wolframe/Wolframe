@@ -1,8 +1,7 @@
 TOPDIR = ..
 
 SUBDIRS = echo pecho
-
-#PF:DISABLED TEMPORARILY: iproc tproc
+# iproc tproc
 
 !IFDEF WITH_LUA
 SUBDIRS = \

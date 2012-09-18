@@ -48,7 +48,8 @@ LOCAL_STATIC_LIB = \
 	wtest.lib
 
 LOCAL_STATIC_LIB_OBJS = \
-	testDescription.obj
+	testDescription.obj \
+	testModules.obj
 
 CPP_OBJS =
 

@@ -52,11 +52,6 @@ Project Wolframe.
 #include <iostream>
 #include <stdexcept>
 
-#ifdef WITH_LIBXML2
-#include "filter/libxml2_filter.hpp"
-#endif
-#include "filter/textwolf_filter.hpp"
-
 using namespace _Wolframe;
 using namespace langbind;
 

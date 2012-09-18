@@ -30,27 +30,33 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file testDescription.hpp
-///\brief Interface to a test description loaded from a file
-#ifndef _Wolframe_wtest_TESTDESCRIPTION_HPP_INCLUDED
-#define _Wolframe_wtest_TESTDESCRIPTION_HPP_INCLUDED
-#include <string>
-namespace _Wolframe {
-namespace wtest {
+///\file wtest/testModules.cpp
+///\brief Implements a function to get list of modules available for a test program
+#include "wtest/testModules.hpp"
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
 
-struct TestDescription
+using namespace _Wolframe;
+using namespace _Wolframe::wtest;
+ 
+std::list<std::string> _Wolframe::wtest::getTestModuleList( const char* topdir)
 {
-	std::string input;
-	std::string expected;
-	std::string config;
-	std::string requires;
-
-	TestDescription( const std::string& filename, const char* argv0);
-	TestDescription( const TestDescription& o)
-		:input(o.input),expected(o.expected),config(o.config),requires(o.requires)
-	{}
-};
-
-}} //namespace
+	std::list<std::string> rt;
+	static const char* ar[] = {
+		"filter/textwolf/mod_filter_textwolf",
+#if WITH_LIBXML2
+		"filter/libxml2/mod_filter_libxml2",
 #endif
+		"filter/cmdbind/luaCommandHandler/mod_lua_command_handler",
+		0}
+	std::size_t ii = 0;
+	while (ar[ii])
+	{
+		boost::filesystem::path pt( topdir);
+		pt /= ar[ii++];
+		rt.push_back( pt.string());
+	}
+	return rt;
+}
+
 
