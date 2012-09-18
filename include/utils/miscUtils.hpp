@@ -77,11 +77,22 @@ bool fileExists( const std::string& path);
 void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchr);
 
 
-///\brief Normalize a string in place
+/// \brief Normalize a string in place
+/// \param[in][out] str	string to be normalized
 void normalizeString( std::string& str );
 
-///\brief Copy the string and normalize it
+/// \brief Copy the string and normalize it
+/// \param[in]	str	string to be normalized
+/// \returns		normalized string
 std::string normalizeString_copy( const std::string& str );
+
+/// \brief Compute a degree of similarity between strings
+/// \note This is work in progress and not used yet. Most likely it will also
+/// go to a different place.
+/// \param[in]	str1	string to be compared
+/// \param[in]	str2	reference string
+/// \returns		s distance between the normalized strings (0 => strings are equal)
+int stringSimilarity( const std::string& str1, const std::string& str2 );
 
 
 ///\class OperatorTable
