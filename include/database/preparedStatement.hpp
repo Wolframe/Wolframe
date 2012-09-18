@@ -43,8 +43,9 @@ namespace db {
 
 ///\class PreparedStatementHandler
 ///\brief Interface to process prepared statements in a database
-struct PreparedStatementHandler
+class PreparedStatementHandler
 {
+public:
 	PreparedStatementHandler()
 		:m_timeout(0)
 		,m_retries(0){}

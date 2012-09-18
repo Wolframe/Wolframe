@@ -311,7 +311,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					std::string name = fltr->objectClassName();
 					boost::algorithm::to_upper( name );
-					std::map <const std::string, const module::FilterConstructor* >::const_iterator fltrItr = m_filterMap.find( name );
+					std::map < std::string, const module::FilterConstructor* >::const_iterator fltrItr = m_filterMap.find( name );
 					if ( fltrItr != m_filterMap.end() )	{
 						LOG_FATAL << "Duplicate filter name '" << name << "'";
 						throw std::runtime_error( "Duplicate filter name" );
@@ -349,7 +349,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					std::string name = ffo->objectClassName();
 					boost::algorithm::to_upper( name);
-					std::map <const std::string, ddl::DDLCompilerR >::const_iterator itr = m_ddlcompilerMap.find( name );
+					std::map< std::string, ddl::DDLCompilerR >::const_iterator itr = m_ddlcompilerMap.find( name );
 					if ( itr != m_ddlcompilerMap.end() )	{
 						LOG_FATAL << "Duplicate DDL compiler name '" << name << "'";
 						throw std::runtime_error( "Duplicate DDL compiler name" );
@@ -374,7 +374,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					std::string name = ffo->objectClassName();
 					boost::algorithm::to_upper( name);
-					std::map <const std::string, const module::FormFunctionConstructor* >::const_iterator itr = m_formfunctionMap.find( name );
+					std::map< std::string, const module::FormFunctionConstructor* >::const_iterator itr = m_formfunctionMap.find( name );
 					if ( itr != m_formfunctionMap.end() )	{
 						LOG_FATAL << "Duplicate form function name '" << name << "'";
 						throw std::runtime_error( "Duplicate form function name" );
@@ -403,7 +403,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					std::string name = ffo->objectClassName();
 					boost::algorithm::to_upper( name);
-					std::map <const std::string, const module::TransactionFunctionConstructor* >::const_iterator itr = m_transactionFunctionCompilerMap.find( name );
+					std::map< std::string, const module::TransactionFunctionConstructor* >::const_iterator itr = m_transactionFunctionCompilerMap.find( name );
 					if ( itr != m_transactionFunctionCompilerMap.end() )	{
 						LOG_FATAL << "Duplicate transaction function compiler name '" << name << "'";
 						throw std::runtime_error( "Duplicate transaction function compiler name" );
@@ -429,7 +429,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				{
 					std::string name = ffo->objectClassName();
 					std::string key = boost::algorithm::to_upper_copy( name);
-					std::map <const std::string, const module::PrintFunctionConstructor* >::const_iterator itr = m_printFunctionCompilerMap.find( key );
+					std::map< std::string, const module::PrintFunctionConstructor* >::const_iterator itr = m_printFunctionCompilerMap.find( key );
 					if ( itr != m_printFunctionCompilerMap.end() )	{
 						LOG_FATAL << "Duplicate print function compiler name '" << name << "'";
 						throw std::runtime_error( "Duplicate print function compiler name" );
@@ -550,7 +550,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg ) const
 {
 	std::string filterName = boost::algorithm::to_upper_copy( name);
-	std::map <const std::string, const module::FilterConstructor* >::const_iterator fltr = m_filterMap.find( filterName );
+	std::map< std::string, const module::FilterConstructor* >::const_iterator fltr = m_filterMap.find( filterName );
 	if ( fltr == m_filterMap.end() )
 		return NULL;
 	else
@@ -560,7 +560,7 @@ langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::
 langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formfunction( const std::string& name ) const
 {
 	std::string formfunctionName = boost::algorithm::to_upper_copy( name);
-	std::map <const std::string, const module::FormFunctionConstructor* >::const_iterator ffo = m_formfunctionMap.find( formfunctionName );
+	std::map< std::string, const module::FormFunctionConstructor* >::const_iterator ffo = m_formfunctionMap.find( formfunctionName );
 	if ( ffo == m_formfunctionMap.end() )
 		return NULL;
 	else
@@ -570,7 +570,7 @@ langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formfunction(
 bool ProcessorProvider::ProcessorProvider_Impl::declareFunctionName( const std::string& name, const char* typestr)
 {
 	std::string key = boost::algorithm::to_upper_copy( name);
-	std::map <const std::string, const char*>::const_iterator idt = m_langfunctionIdentifierMap.find( key);
+	std::map< std::string, const char*>::const_iterator idt = m_langfunctionIdentifierMap.find( key);
 	if (idt != m_langfunctionIdentifierMap.end())
 	{
 		LOG_ERROR << "Duplicate function identifier for "<< typestr << " with name '" << name << "' already used for a " << idt->second << "";
@@ -585,7 +585,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const std::string& ddl
 	try
 	{
 		std::string key = boost::algorithm::to_upper_copy( ddlname);
-		std::map <const std::string, ddl::DDLCompilerR>::const_iterator itr = m_ddlcompilerMap.find( key);
+		std::map< std::string, ddl::DDLCompilerR>::const_iterator itr = m_ddlcompilerMap.find( key);
 		if (itr == m_ddlcompilerMap.end())
 		{
 			LOG_ERROR << "Failed to load form '" << utils::getFileStem( dataDefinitionFilename) << "'. Compiler for DDL '" << ddlname << "' is not defined";
@@ -620,7 +620,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrintFunction( const std::st
 	try
 	{
 		std::string typekey = boost::algorithm::to_upper_copy( type);
-		std::map <std::string, const module::PrintFunctionConstructor*>::const_iterator itr = m_printFunctionCompilerMap.find( typekey);
+		std::map< std::string, const module::PrintFunctionConstructor*>::const_iterator itr = m_printFunctionCompilerMap.find( typekey);
 		if (itr == m_printFunctionCompilerMap.end())
 		{
 			LOG_ERROR << "Failed to load print layout '" << utils::getFileStem( layoutFilename) << "'. Printer type '" << type << "' is not defined";
@@ -658,7 +658,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrintFunction( const std::st
 const prnt::PrintFunction* ProcessorProvider::ProcessorProvider_Impl::printFunction( const std::string& name ) const
 {
 	std::string key = boost::algorithm::to_upper_copy( name);
-	std::map <std::string, prnt::PrintFunctionR>::const_iterator itr = m_printFunctionMap.find( key);
+	std::map< std::string, prnt::PrintFunctionR>::const_iterator itr = m_printFunctionMap.find( key);
 	if ( itr == m_printFunctionMap.end() )
 		return NULL;
 	else
@@ -670,7 +670,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::declareTransactionFunction( cons
 	try
 	{
 		std::string key = boost::algorithm::to_upper_copy( type);
-		std::map <std::string, const module::TransactionFunctionConstructor*>::const_iterator itr = m_transactionFunctionCompilerMap.find( key);
+		std::map< std::string, const module::TransactionFunctionConstructor*>::const_iterator itr = m_transactionFunctionCompilerMap.find( key);
 		if (itr == m_transactionFunctionCompilerMap.end())
 		{
 			LOG_ERROR << "Cannot declare transaction function '" << name << "'. Transaction function type '" << type << "' is not defined";
@@ -679,7 +679,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::declareTransactionFunction( cons
 		langbind::TransactionFunctionR funcp( itr->second->object( command));
 		std::string funckey( boost::algorithm::to_upper_copy( name));
 
-		std::map <std::string, langbind::TransactionFunctionR>::const_iterator ip = m_transactionFunctionMap.find( funckey);
+		std::map< std::string, langbind::TransactionFunctionR>::const_iterator ip = m_transactionFunctionMap.find( funckey);
 		if (ip != m_transactionFunctionMap.end())
 		{
 			LOG_ERROR << "Duplicate definition of transaction function with name '" << name << "'";
@@ -703,7 +703,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::declareTransactionFunction( cons
 const langbind::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transactionFunction( const std::string& name ) const
 {
 	std::string key = boost::algorithm::to_upper_copy( name);
-	std::map <std::string, langbind::TransactionFunctionR>::const_iterator itr = m_transactionFunctionMap.find( key);
+	std::map< std::string, langbind::TransactionFunctionR>::const_iterator itr = m_transactionFunctionMap.find( key);
 	if ( itr == m_transactionFunctionMap.end() )
 		return NULL;
 	else
