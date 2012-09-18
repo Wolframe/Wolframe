@@ -53,7 +53,9 @@ TEST_BINS = \
 CPP_BINS = \
 	tprocd$(EXE)
 
-tprocd$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR)"
+
+tprocd$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -69,10 +71,10 @@ local_install:
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
 	mkdir -p tests/temp
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./tprocHandlerTest$(EXE)
+	LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) tests/tprocHandlerTest$(EXE)
 endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe tproc example..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./tprocd -c tproc.conf -f
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./tprocd -c tproc.conf -f
 

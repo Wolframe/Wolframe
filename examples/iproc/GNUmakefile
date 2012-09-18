@@ -29,6 +29,9 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/wtest/wolftest.a \
 	$(LIBS_DL)
 
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR)"
+
+
 # openssl
 
 ifeq ($(WITH_SSL),1)
@@ -75,12 +78,12 @@ local_install:
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
 ifeq ($(WITH_LUA),1)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./iprocHandlerTest$(EXE)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./iprocHandlerXMLTest$(EXE)
+	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) tests/iprocHandlerTest$(EXE)
+	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) tests/iprocHandlerXMLTest$(EXE)
 endif
 endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe iproc example..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(LIBXML2_LIB_DIR) ./iprocd -c iproc.conf -f
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./iprocd -c iproc.conf -f
 

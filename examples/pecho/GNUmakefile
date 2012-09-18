@@ -56,7 +56,9 @@ CPP_BINS = \
 TEST_BINS += \
 	tests/pechoHandlerTest$(EXE)
 
-pechod$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR)"
+
+pechod$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 tests/pechoHandlerTest$(EXE): tests/pechoHandlerTest.o $(OBJS) $(TOPDIR)/src/libwolframe.a
 
@@ -72,11 +74,11 @@ local_install:
 
 local_test:$(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
-	cd tests && LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./pechoHandlerTest$(EXE)
+	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) tests/pechoHandlerTest$(EXE)
 ifeq ($(WITH_EXPECT),1)
 ifneq "$(PLATFORM)" "OPENBSD"
 ifneq "$(PLATFORM)" "NETBSD"
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) $(EXPECT) tests/testPEcho
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) tests/testPEcho
 endif
 endif
 endif
@@ -84,4 +86,4 @@ endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./pechod -c pecho.conf -f
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./pechod -c pecho.conf -f
