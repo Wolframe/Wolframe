@@ -20,28 +20,25 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\lua\src\lua.lib
 
 DYNAMIC_MODULE = \
 	mod_lua_command_handler.dll
 
-CPP_OBJS = \
-	$(TOPDIR)\src\filter_typingfilter.obj \
-	$(TOPDIR)\src\filter_char_filter.obj \
+LUA_CPP_OBJS = \
 	$(TOPDIR)\src\filter_luafilter.obj \
-	$(TOPDIR)\src\filter_tostringfilter.obj \
-	$(TOPDIR)\src\filter_typingfilter.obj \
-	$(TOPDIR)\src\filter_ptreefilter.obj \
-	$(TOPDIR)\src\langbind_appObjects.obj \
 	$(TOPDIR)\src\langbind_luaObjects.obj \
 	$(TOPDIR)\src\langbind_luaGetFunctionClosure.obj \
 	$(TOPDIR)\src\langbind_luaDebug.obj \
 	$(TOPDIR)\src\langbind_luaException.obj \
-	$(TOPDIR)\src\langbind_luaScriptContext.obj \
+	$(TOPDIR)\src\langbind_luaScriptContext.obj
+
+CPP_OBJS = \
+	$(LUA_CPP_OBJS) \
 	$(TOPDIR)\src\langbind_appConfig_struct.obj \
 	$(TOPDIR)\src\langbind_scriptConfig_struct.obj \
-	$(TOPDIR)\src\protocol_ioblocks.obj \
 	$(TOPDIR)\src\cmdbind_ioFilterCommandHandler.obj \
 	$(TOPDIR)\src\cmdbind_luaCommandHandler.obj \
 	$(TOPDIR)\src\procProviderImpl.obj \

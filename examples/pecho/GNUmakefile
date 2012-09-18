@@ -13,16 +13,22 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/wtest
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
+	$(TOPDIR)/src/libwolframe.a \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
-	$(LIBS_DL) \
-	$(TOPDIR)/src/libwolframe.a \
-	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	$(TOPDIR)/gtest/gtest-all.o
+	-lwolframe \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
+	$(TOPDIR)/gtest/gtest-all.o \
+	$(TOPDIR)/wtest/wolftest.a \
+	$(LIBS_DL)
 
 # openssl
 

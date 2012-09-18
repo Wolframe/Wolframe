@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = libwolframe libwolframe_serialize modules
+SUBDIRS = libwolframe libwolframe_serialize libwolframe_langbind modules
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -9,7 +9,8 @@ INCLUDE_CXXFLAGS =
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_serialize
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_langbind
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
@@ -19,6 +20,7 @@ INCLUDE_DIRS = \
 INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_serialize \
+	-lwolframe_langbind \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
@@ -46,25 +48,12 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceConfig.o \
 	serviceBanner.o \
 	appConfig.o \
-	protocol_ioblocks.o \
-	langbind_appObjects.o \
-	langbind_appConfig_struct.o \
-	langbind_appConfig_option.o \
-	langbind_scriptConfig_struct.o \
-	langbind_scriptConfig_option.o \
 	langbind_iostreamfilter.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
 	cmdbind_ioFilterCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \
 	cmdbind_directmapCommandHandler.o \
-	filter_filter.o \
-	filter_textwolf_filter.o \
-	filter_char_filter.o \
-	filter_doctype.o \
-	filter_typingfilter.o \
-	filter_tostringfilter.o \
-	filter_ptreefilter.o \
 	database_preparedStatementProcessor.o \
 	types_allocators.o \
 	acceptor.o \

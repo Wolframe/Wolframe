@@ -13,62 +13,21 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/wtest
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
+	-lwolframe \
+	-lwolframe_serialize \
+	-lwolframe_langbind \
 	$(TOPDIR)/gtest/gtest-all.o \
-	$(TOPDIR)/src/libwolframe.a \
-	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	$(TOPDIR)/src/libwolframe_serialize/libwolframe_serialize.a \
+	$(TOPDIR)/wtest/wolftest.a \
 	$(LIBS_DL)
-
-# lua
-ifeq ($(WITH_LUA),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_LUA
-
-INCLUDE_DIRS += \
-	-I$(TOPDIR)/lua/src
-
-INCLUDE_LIBS += \
-	$(TOPDIR)/lua/src/liblua.a \
-	$(LIBS_DL)
-endif
-
-# libhpdf
-ifeq ($(WITH_LIBHPDF),1)
-
-INCLUDE_CXXFLAGS += \
-	-DWITH_LIBHPDF
-
-INCLUDE_DIRS += \
-	$(LIBHPDF_INCLUDE_DIRS)
-
-INCLUDE_LDFLAGS += \
-	$(LIBHPDF_LIB_DIRS)
-
-INCLUDE_LIBS += \
-	$(LIBHPDF_LIBS)
-
-endif
-
-# libxml2
-ifeq ($(WITH_LIBXML2),1)
-INCLUDE_CXXFLAGS += \
-	-DWITH_LIBXML2
-
-INCLUDE_DIRS += \
-	$(LIBXML2_INCLUDE_DIRS)
-
-INCLUDE_LDFLAGS += \
-	$(LIBXML2_LIB_DIRS)
-
-INCLUDE_LIBS += \
-	$(LIBXML2_LIBS)
-endif
 
 # openssl
 
