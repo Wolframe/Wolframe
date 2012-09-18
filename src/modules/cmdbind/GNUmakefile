@@ -4,7 +4,9 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
+ifeq ($(WITH_LUA),1)
 SUBDIRS += luaCommandHandler
+endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
