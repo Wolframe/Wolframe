@@ -16,6 +16,7 @@ Table of Contents
     Fedora 14
     Fedora 15
     Fedora 16
+    Fedora 17
     Ubuntu 10.04.1 LTS
     Ubuntu 10.10 Server
     Ubuntu 11.04
@@ -209,6 +210,8 @@ For building the PDF wolfbook install 'fop'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
+For running non-gtest tests you need 'expect'.
+
 Fedora 16
 ---------
 
@@ -227,6 +230,31 @@ For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxy
 For building the PDF wolfbook install 'fop'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
+
+For running non-gtest tests you need 'expect'.
+
+Fedora 17
+---------
+
+No problems with the supplied packages at all, everything builds out of the box:
+
+Required pacakges: boost-devel (1.48.0)
+Optional packages: openssl-devel (1.0.0j), qt4-devel (4.8.2),
+                   pam-devel (1.1.5), cyrus-sasl-devel (2.1.23),
+                   sqlite-devel (3.7.11), postgresql-devel (9.1.5),
+                   libxml2-devel (2.7.8), libxslt-devel (1.1.26),
+                   libpng-devel (1.2.48), zlib-devel (1.2.5)
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
+For building the PDF wolfbook install 'fop'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+For running non-gtest tests you need 'expect' (5.45).
+
+For running some tests you need 'telnet' (0.17).
 
 Ubuntu 10.04.1 LTS
 ------------------

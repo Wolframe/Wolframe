@@ -153,57 +153,63 @@ local_clean:
 
 local_distclean:
 
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR)"
+
+ifeq ($(WITH_LIBHPDF),1)
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBHPDF_LIB_DIR)"
+endif                        
+                        
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
 	@mkdir -p temp
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testMethodMemberPointerTemplate
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testMethodMemberPointerTemplate
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testNamedRetVal
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testNamedRetVal
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./logTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./logTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./versionTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./versionTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./counterTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./counterTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./resolvePathTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./resolvePathTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testBoostPath
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testBoostPath
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./singletonTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./singletonTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testSHA2
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testSHA2
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./byte2hexTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./byte2hexTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./base64Test
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./base64Test
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testRand
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testRand
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testTimestamp
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testTimestamp
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./CRAMtest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./CRAMtest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./protocolArgumentParsing
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./protocolArgumentParsing
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./configValueParser
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./configValueParser
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./configStructParser config/structparser.conf
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./configStructParser config/structparser.conf
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testProtocolLFdotEscaping
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testProtocolLFdotEscaping
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./stringNormalizationTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
 	@echo
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize ./testWolfilter
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize ./testWolfilter
 	@echo
-#PF:DISABLED TEMPORARILY: 	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./testDatabaseProcessorVM
+#PF:DISABLED TEMPORARILY: 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testDatabaseProcessorVM
 	@echo
 	@echo
 endif
 
 local_longtest: poolTest
 ifeq ($(RUN_TESTS),0)
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./poolTest
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./poolTest
 	@echo
 	@echo
 endif

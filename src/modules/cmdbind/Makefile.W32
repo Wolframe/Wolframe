@@ -4,8 +4,10 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
+!IFDEF WITH_LUA
 SUBDIRS = \
 	$(SUBDIRS) luaCommandHandler
+!ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
