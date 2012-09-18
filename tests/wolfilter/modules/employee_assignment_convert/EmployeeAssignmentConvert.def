@@ -1,0 +1,4 @@
+LIBRARY mod_employee_assignment_convert
+
+EXPORTS
+entryPoint	@1
