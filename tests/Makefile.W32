@@ -49,7 +49,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\gtest\gtest-all.obj \
 	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib
+	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib
 
 # Lua
 !IFDEF WITH_LUA
