@@ -51,7 +51,7 @@ struct LuaBcdNumberBuilder
 {
 	static SimpleBuilder* constructor()
 	{
-		return new LuaExtensionBuilder( "bcdnumber", langbind::initBignumModule);
+		return new LuaExtensionBuilder( "LuaExtension:bcdnumber", langbind::initBignumModule);
 	}
 };
 }//anonymous namespace

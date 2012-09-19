@@ -1649,6 +1649,30 @@ LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
 	init( 0);
 }
 
+std::string LuaScriptInstance::luaErrorMessage( lua_State* ls_, int index)
+{
+	std::string rt;
+	const char* msg = lua_tostring( ls_, index);
+	if (!msg) msg = "";
+	std::string scriptfilename( utils::getFileStem( script()->path()));
+	const char* fp = std::strstr( msg, "[string \"");
+	const char* ep = 0;
+	if (fp) ep = std::strchr( fp, ']');
+
+	if (fp && ep)
+	{
+		rt.append( msg, fp - msg);
+		rt.push_back( '[');
+		rt.append( scriptfilename);
+		rt.append( ep);
+	}
+	else
+	{
+		rt.append( msg);
+	}
+	return rt;
+}
+
 void LuaScriptInstance::init( const LuaModuleMap* modulemap_)
 {
 	m_ls = luaL_newstate();
@@ -1688,7 +1712,7 @@ void LuaScriptInstance::init( const LuaModuleMap* modulemap_)
 		if (lua_pcall( m_ls, 0, LUA_MULTRET, 0) != 0)
 		{
 			std::ostringstream buf;
-			buf << "Unable to call main entry of script: " << lua_tostring( m_ls, -1 );
+			buf << "Unable to call main entry of script: " << luaErrorMessage( m_ls);
 			throw std::runtime_error( buf.str());
 		}
 	}

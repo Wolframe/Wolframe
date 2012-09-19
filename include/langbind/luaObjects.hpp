@@ -41,13 +41,9 @@ Project Wolframe.
 #include <list>
 #include <boost/shared_ptr.hpp>
 
-#if WITH_LUA
 extern "C" {
 	#include "lua.h"
 }
-#else
-#error Lua support not enabled
-#endif
 
 namespace _Wolframe {
 namespace langbind {
@@ -111,6 +107,8 @@ public:
 	lua_State* ls()				{return m_ls;}
 	lua_State* thread()			{return m_thread;}
 	const LuaScript* script() const		{return m_script;}
+
+	std::string luaErrorMessage( lua_State* ls_, int index=-1);
 
 private:
 	void init( const LuaModuleMap* modulemap_);

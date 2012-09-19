@@ -51,7 +51,7 @@ struct LuaDateTimeBuilder
 {
 	static SimpleBuilder* constructor()
 	{
-		return new LuaExtensionBuilder( "datetime", langbind::initDateTimeModule);
+		return new LuaExtensionBuilder( "LuaExtension:datetime", langbind::initDateTimeModule);
 	}
 };
 }//anonymous namespace

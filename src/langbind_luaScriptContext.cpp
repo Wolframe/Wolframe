@@ -55,11 +55,14 @@ void LuaScriptContext::load( const ScriptEnvironmentConfigStruct& cfg, const mod
 	{
 		if (mi->objectType() == ObjectConstructorBase::LANGUAGE_EXTENSION_OBJECT)
 		{
-			module::LuaExtensionConstructor* co = dynamic_cast< module::LuaExtensionConstructor* >((*mi)->constructor());
-			if (!co) continue;
-			std::string name = co->objectClassName();
-			modulemap.defineLuaModule( name, LuaModule( name, co->object()));
-			m_objects.push_back( co);
+			const char* className = mi->objectClassName();
+			if (module::LuaExtensionBuilder::classNameMatches( className))
+			{
+				module::LuaExtensionConstructor* co = dynamic_cast< module::LuaExtensionConstructor* >((*mi)->constructor());
+				if (!co) throw std::runtime_error( "Language extension module has Lua extension module identifier but is not of this class");
+				modulemap.defineLuaModule( co->moduleName(), LuaModule( co->moduleName(), co->object()));
+				m_objects.push_back( co);
+			}
 		}
 	}
 

@@ -35,6 +35,9 @@ Project Wolframe.
 #define _Wolframe_MODULE_LUA_LANGUAGE_EXTENSION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "moduleInterface.hpp"
 #include "constructor.hpp"
+#include <string>
+#include <cstring>
+#include <stdexcept>
 #if WITH_LUA
 extern "C" {
 	#include "lua.h"
@@ -49,9 +52,10 @@ namespace module {
 class LuaExtensionConstructor :public SimpleObjectConstructor< lua_CFunction >
 {
 public:
-	LuaExtensionConstructor( const char* name_, lua_CFunction func_)
-		: m_name(name_)
-		, m_func(func_) {}
+	LuaExtensionConstructor( const char* className_, const char* moduleName_, lua_CFunction func_)
+		:m_className(className_)
+		,m_moduleName(moduleName_)
+		,m_func(func_) {}
 
 	virtual ~LuaExtensionConstructor(){}
 
@@ -61,24 +65,35 @@ public:
 	}
 	virtual const char* objectClassName() const
 	{
-		return m_name.c_str();
+		return m_className.c_str();
 	}
 	virtual lua_CFunction object() const
 	{
 		return m_func;
 	}
+	const std::string& moduleName()
+	{
+		return m_moduleName;
+	}
 
 private:
-	const std::string m_name;
+	const std::string m_className;
+	const std::string m_moduleName;
 	const lua_CFunction m_func;
 };
 
 class LuaExtensionBuilder :public SimpleBuilder
 {
 public:
-	LuaExtensionBuilder( const char* name_, lua_CFunction func_)
-		:SimpleBuilder( name_)
-		,m_func(func_){}
+	LuaExtensionBuilder( const char* className_, lua_CFunction func_)
+		:SimpleBuilder( className_)
+		,m_func(func_)
+	{
+		if (!classNameMatches( className_))
+		{
+			throw std::logic_error( "lua language extension module does not have prefix 'LuaExtension:'");
+		}
+	}
 
 	virtual ~LuaExtensionBuilder(){}
 
@@ -88,10 +103,17 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new LuaExtensionConstructor( m_className, m_func);
+		return new LuaExtensionConstructor( m_className, strchr(m_className, ':')+1, m_func);
+	}
+
+	static bool classNameMatches( const char* className_)
+	{
+		static const char* prefix = "LuaExtension:";
+		const char* cc = std::strchr( className_, ':');
+		return (cc && memcmp( className_, prefix, cc-className_+1) == 0);
 	}
 private:
-	const lua_CFunction m_func;
+	lua_CFunction m_func;
 };
 
 }}//namespace

@@ -103,24 +103,8 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	while (rt == LUA_YIELD);
 	if (rt != 0)
 	{
-		const char* msg = lua_tostring( m_interp->thread(), -1);
-		std::string scriptfilename( utils::getFileStem( m_interp->script()->path()));
-		const char* fp = std::strstr( msg, "[string \"");
-		const char* ep = 0;
-		if (fp) ep = std::strchr( fp, ']');
-
-		if (fp && ep)
-		{
-			std::string emsg( msg, fp - msg);
-			emsg.push_back( '[');
-			emsg.append( scriptfilename);
-			emsg.append( ep);
-			LOG_ERROR << "error calling function '" << m_name.c_str() << "':" << emsg;
-		}
-		else
-		{
-			LOG_ERROR << "error calling function '" << m_name.c_str() << "':" << msg;
-		}
+		std::string msg = m_interp->luaErrorMessage( m_interp->thread());
+		LOG_ERROR << "error calling function '" << m_name.c_str() << "':" << msg;
 		errorCode = "lua call failed";
 		return Error;
 	}
