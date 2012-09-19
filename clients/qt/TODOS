@@ -1,6 +1,8 @@
 - use QNetworkSession (for mobiles and roaming profiles)
 - localize forms:
-  - there should be no need to copy them just for localization
+  - Domain names like 'male', 'female', separate view localized form
+    and use something different internally, also, should the domains
+    come from the ui or as a separate request?
 - investigate why auto-wiring failed in the past
 - add a data handler
   - simplest form is read data as XML from a directory (as for

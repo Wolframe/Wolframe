@@ -6,6 +6,7 @@
 #define _MAIN_WINDOW_HPP_INCLUDED
 
 #include <QWidget>
+#include <QApplication>
 
 #include "FormLoader.hpp"
 #include "DataLoader.hpp"
@@ -21,10 +22,11 @@ namespace _Wolframe {
 	Q_OBJECT
 
 	public:
-		MainWindow( QWidget *_parent = 0 );
+		MainWindow( QApplication &app, QWidget *_parent = 0 );
 		virtual ~MainWindow( );
 	
 	private:
+		QApplication &m_app;		// reference to the application (better solution!?)
 		QWidget *m_ui;			// main window from theme
 		QWidget *m_form;		// current active form
 		QString m_currentTheme;		// the name of the currently selected theme
@@ -45,7 +47,7 @@ namespace _Wolframe {
 		void themeSelected( QAction *action );
 		void formSelected( QAction *action );
 		void formListLoaded( );
-		void formLoaded( QString name, QByteArray xml );
+		void formLoaded( QString name, QByteArray form, QByteArray localization );
 		void dataLoaded( QString name, QByteArray xml );
 		void dataSaved( QString name );
 

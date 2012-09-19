@@ -10,7 +10,8 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-FileFormLoader::FileFormLoader( QString dir ) : m_dir( dir ) 
+FileFormLoader::FileFormLoader( QString formDir, QString localeDir )
+	: m_formDir( formDir ), m_localeDir( localeDir ) 
 {
 }
 
@@ -20,14 +21,22 @@ void FileFormLoader::initiateListLoad( )
 	emit formListLoaded( );
 }
 
-void FileFormLoader::initiateFormLoad( QString &name )
+QByteArray FileFormLoader::readFile( QString name )
 {
-// read directly here and stuff data into the signal
-	QFile file( m_dir + "/" + name + ".ui" );
+	QFile file( name );
 	file.open( QFile::ReadOnly );
 	QByteArray data = file.readAll( );
-	file.close( );	
-	emit formLoaded( name, data );
+	file.close( );
+	return data;
+}
+
+void FileFormLoader::initiateFormLoad( QString &name, QLocale locale )
+{
+// read directly here and stuff data into the signal
+	QByteArray form = readFile( m_formDir + "/" + name + ".ui" );
+	QByteArray localization = readFile( m_localeDir + "/" + name + "." + locale.name( ) + ".qm" );
+
+	emit formLoaded( name, form, localization );
 }
 
 QStringList FileFormLoader::getFormNames( )
