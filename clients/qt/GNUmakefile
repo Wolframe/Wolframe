@@ -81,19 +81,6 @@ moc_DataLoader.cpp: DataLoader.hpp
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_MOC) $(MOC_FLAGS) WolframeClient.hpp -o moc_WolframeClient.cpp
 
-local_clean:
-	@-rm -f moc_*.cpp
-	@-rm -f i18n/*.qm
-
-local_distclean:
-
-local_install:
-	$(INSTALL) -d -m 0755 $(DESTDIR)$(bindir)
-	$(INSTALL) -m 0755 $(CPP_BINS) $(DESTDIR)$(bindir)
-
-local_uninstall:
-	-rm -f $(DESTDIR)$(bindir)/qtclient$(EXE)
-	-rmdir $(DESTDIR)$(bindir)
 	
 FORMS = \
 	forms/form1.ui \
@@ -110,9 +97,25 @@ THEMES = \
 	$(QT_LRELEASE) $< -qm $@
 
 I18NS = \
-	i18n/form1.de_CH.qm
+	i18n/form1.de_CH.qm \
+	themes/windows/MainWindow.de_CH.qm \
+	themes/phone/MainWindow.de_CH.qm
 
 local_all: $(I18NS)
+
+local_clean:
+	@-rm -f moc_*.cpp
+	@-rm -f $(I18NS)
+
+local_distclean:
+
+local_install:
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(bindir)
+	$(INSTALL) -m 0755 $(CPP_BINS) $(DESTDIR)$(bindir)
+
+local_uninstall:
+	-rm -f $(DESTDIR)$(bindir)/qtclient$(EXE)
+	-rmdir $(DESTDIR)$(bindir)
 
 local_test:
 	@echo "Testing validity of themes.."
@@ -128,4 +131,5 @@ run: local_all $(CPP_BINS)
 
 .PHONY: i18n
 i18n:
+	lupdate themes/windows/MainWindow.ui -ts themes/windows/de_CH.ts
 	lupdate forms/form1.ui -ts i18n/form1.de_CH.ts

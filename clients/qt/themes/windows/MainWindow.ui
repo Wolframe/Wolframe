@@ -66,7 +66,7 @@
      <string>Th&amp;emes</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menu_Language">
+   <widget class="QMenu" name="menuLanguages">
     <property name="title">
      <string>&amp;Language</string>
     </property>
@@ -74,7 +74,7 @@
    <addaction name="menuFile"/>
    <addaction name="menuForms"/>
    <addaction name="menuThemes"/>
-   <addaction name="menu_Language"/>
+   <addaction name="menuLanguages"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">

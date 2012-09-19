@@ -68,7 +68,6 @@ QStringList FileFormLoader::getLanguageCodes( )
 		it.next( );
 		QStringList parts = it.value( ).split( "." );
 		languageCodes.push_back( parts[1] );		
-		qDebug( ) << parts[1];
 	}
 
 	return languageCodes;

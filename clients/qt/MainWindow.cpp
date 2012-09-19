@@ -6,25 +6,27 @@
 #include "FileFormLoader.hpp"
 #include "FileDataLoader.hpp"
 
-#include <QtUiTools>
 #include <QtGui>
 #include <QBuffer>
 #include <QApplication>
 #include <QTranslator>
 #include <QLocale>
+#include <QtAlgorithms>
 
 #include <QDebug>
 
 namespace _Wolframe {
 	namespace QtClient {
 
-MainWindow::MainWindow( QApplication &app, QWidget *_parent ) : QWidget( _parent ), m_app( app ), m_ui( 0 ), m_form( 0 )
+MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 ), m_form( 0 )
 {
 	// for testing, load form descriptions and data
 	// from the local filesystem
 	m_formLoader = new FileFormLoader( "forms", "i18n" );
 	m_dataLoader = new FileDataLoader( "data" );
 	m_dataHandler = new DataHandler( );
+	m_uiLoader = new QUiLoader( );
+	m_uiLoader->setLanguageChangeEnabled ( true );
 	initialize( );
 }
 
@@ -35,6 +37,7 @@ MainWindow::~MainWindow( )
 	delete m_dataHandler;
 	delete m_formLoader;
 	delete m_dataLoader;
+	delete m_uiLoader;
 }
 
 void MainWindow::initialize( )
@@ -56,12 +59,12 @@ void MainWindow::initialize( )
 
 // create debuging terminal
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
+
+// set default language to the system language
+	m_currentLanguage = QLocale::system( ).name( );
 		
 // load default theme
 	loadTheme( QString( QLatin1String( "windows" ) ) );
-
-// load language codes for language picker
-	QStringList languages = m_formLoader->getLanguageCodes( );
 }
 
 void MainWindow::populateThemesMenu( )
@@ -93,8 +96,7 @@ void MainWindow::loadTheme( QString theme )
 	QString themesFolder( QLatin1String( "themes/" ) + theme + QLatin1Char( '/' ) );
 
 // tell the loader that this is the working directory
-	QUiLoader loader;
-	loader.setWorkingDirectory( themesFolder );
+	m_uiLoader->setWorkingDirectory( themesFolder );
 
 // remember current user interface
 	QWidget *oldUi = m_ui;
@@ -103,7 +105,7 @@ void MainWindow::loadTheme( QString theme )
 // theme switching, login, exit, about, etc. (to start unauthenticated)
 	QFile file( themesFolder + QLatin1String( "MainWindow.ui" ) );
 	file.open( QFile::ReadOnly );
-	m_ui = loader.load( &file, this );
+	m_ui = m_uiLoader->load( &file, this );
 	file.close( );
 
 // set stylesheet of the application (has impact on the whole application)
@@ -150,12 +152,37 @@ void MainWindow::loadTheme( QString theme )
 
 // now that we have a menu where we can add things, we start the form list loading
 	m_formLoader->initiateListLoad( );
+
+// load language codes for language picker
+	loadLanguages( );
 	
 // not busy anymore
 	qApp->restoreOverrideCursor( );
 
 // load the current form again
 	if( m_form ) loadForm( m_currentForm );
+}
+
+void MainWindow::loadLanguages( )
+{
+// get the list of available languages
+	QStringList languages = m_formLoader->getLanguageCodes( );
+
+// construct a menu showing all languages
+	QMenu *languageMenu = qFindChild<QMenu *>( m_ui, "menuLanguages" );
+	languageMenu->clear( );
+	QActionGroup *languageGroup = new QActionGroup( languageMenu );
+	languageGroup->setExclusive( true );
+	foreach( QString language, languages ) {
+		QLocale locale( language );
+		QAction *action = new QAction( locale.languageToString( locale.language( ) ) + " (" + language + ")", languageGroup );
+		action->setCheckable( true );
+		action->setData( QVariant( language ) );
+		languageGroup->addAction( action );
+		if( language == m_currentLanguage ) action->setChecked( true );		
+	}
+	languageMenu->addActions( languageGroup->actions( ) );
+	QObject::connect( languageGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( languageSelected( QAction * ) ) );
 }
 
 void MainWindow::formListLoaded( )
@@ -181,6 +208,55 @@ void MainWindow::formListLoaded( )
 	qApp->restoreOverrideCursor();
 }
 
+void MainWindow::languageSelected( QAction *action )
+{
+	QString language = action->data( ).toString( );
+	qDebug( ) << "Switching interface language to " << language;
+	if( language == m_currentLanguage ) {
+		return;
+	}
+
+// get list of all translators currently floating around and delete them
+	const QList<QTranslator *> oldTranslators( findChildren<QTranslator *>( ) );
+	foreach( QTranslator *translator, oldTranslators ) {
+		QCoreApplication::instance( )->removeTranslator( translator );
+	}
+	qDeleteAll( oldTranslators );
+
+// this it the default language, bail out as no translations are necessary
+	if( language == "en_US" ) {
+		m_currentLanguage = language;
+		return;
+	}
+
+// install new ones, first the ones of the theme, then the ones of the current form
+// all other forms will reinstall the correct language when called again
+	QTranslator *translator = new QTranslator( this );
+	if( !translator->load( "MainWindow." + language, "themes/" + m_currentTheme ) ) {
+		qDebug( ) << "Error while loading translations for theme " <<
+			m_currentTheme << " for locale " << m_currentLanguage;
+	}
+	QCoreApplication::instance( )->installTranslator( translator );
+
+	m_currentLanguage = language;
+}
+
+void MainWindow::changeEvent( QEvent *e )
+{
+	QWidget::changeEvent( e );
+	qDebug( ) << "changeEvent";
+	
+	switch( e->type( ) ) {
+		case QEvent::LanguageChange:
+// QLoader ui retranslate automatically
+			qDebug( ) << "retranslate!";
+			break;
+			
+		default:
+			break;
+	}
+}
+
 void MainWindow::formSelected( QAction *action )
 {		
 	QString form = action->text( );
@@ -195,27 +271,33 @@ void MainWindow::loadForm( QString form )
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
 	qDebug( ) << "Initiating form load for " << form;
-	m_formLoader->initiateFormLoad( form, QLocale::system( ) );
+	m_formLoader->initiateFormLoad( form, QLocale( m_currentLanguage ) );
 }
 
 void MainWindow::formLoaded( QString name, QByteArray form, QByteArray localization )
 {
 	qDebug( ) << "Form " << name << " loaded";
 
-// install translation files for this form
-	QTranslator translator;
-	if( !translator.load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
-		qDebug( ) << "Error while loading translations for form " <<
-			name << " for locale " << QLocale::system( ).name( );
+// get list of all translators for this form and delete them
+	const QList<QTranslator *> oldTranslators( m_form->findChildren<QTranslator *>( ) );
+	foreach( QTranslator *translator, oldTranslators ) {
+		QCoreApplication::instance( )->removeTranslator( translator );
 	}
-	m_app.installTranslator( &translator );
+	qDeleteAll( oldTranslators );
 	
 // read the form and construct it
 	QWidget *oldForm = m_form;
-	QUiLoader loader;
 	QBuffer buf( &form );
-	m_form = loader.load( &buf, m_ui );
+	m_form = m_uiLoader->load( &buf, m_ui );
 	buf.close( );
+
+// install translation files for this form
+	QTranslator *translator = new QTranslator( m_form );
+	if( !translator->load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
+		qDebug( ) << "Error while loading translations for form " <<
+			name << " for locale " << m_currentLanguage;
+	}
+	QCoreApplication::instance( )->installTranslator( translator );
 
 // add it to the main window, disable old form
 	QVBoxLayout *l = qFindChild<QVBoxLayout *>( m_ui, "mainAreaLayout" );
