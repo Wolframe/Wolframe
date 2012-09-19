@@ -1051,7 +1051,7 @@ QT_INCLUDE_DIR ?= /usr/local/include/qt4
 QT_LIB_DIR ?= /usr/local/lib/qt4
 QT_BIN_DIR ?= /usr/local/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc-qt4
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease-qt4
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 endif
@@ -1067,7 +1067,7 @@ QT_INCLUDE_DIR ?= /usr/local/include/qt4
 QT_LIB_DIR ?= /usr/local/lib/qt4
 QT_BIN_DIR ?= /usr/local/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc-qt4
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease-qt4
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 endif
