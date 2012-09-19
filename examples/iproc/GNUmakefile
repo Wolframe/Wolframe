@@ -7,7 +7,7 @@ SUBDIRS =
 INCLUDE_CXXFLAGS =
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include \
+	-I. -I$(TOPDIR)/include -I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR) \
 	-I$(TOPDIR)/gtest/include \
 	-I$(TOPDIR)/wtest
@@ -22,6 +22,7 @@ INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \
 	-lboost_filesystem \
+	$(TOPDIR)/src/libwolframe.a \
 	-lwolframe \
 	-lwolframe_serialize \
 	-lwolframe_langbind \

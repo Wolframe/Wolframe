@@ -40,7 +40,7 @@
 namespace _Wolframe {
 namespace wtest {
 
-std::list<std::string> getTestModuleList( const char* topdir);
+std::list<std::string> getTestModuleList( const std::string& topdir);
 
 }}
 #endif

@@ -29,9 +29,16 @@ recode lat1..ibmpc >> $output <<!TEST
 cat $MAIN/$example.frm >> $output
 recode lat1..ibmpc >> $output <<!TEST
 **config
-env {
-	directmap {
-		name run
+provider {
+	cmdhandler {
+		form
+		{
+			cmd {
+				inputform input.simpleform
+				inputform output.simpleform
+				name run
+			}
+		}
 	}
 }
 proc {

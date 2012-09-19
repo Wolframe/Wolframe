@@ -39,15 +39,9 @@ function run( )
 	end
 end
 --config
-env {
-	script {
-		name run
-		file echo.lua
-	}
-}
-proc {
-	cmd run
-}
+!TEST
+./output_provider_cfg.sh echo.lua >> $output
+recode lat1..ibmpc >> $output <<!TEST
 --output
 OK enter cmd
 !TEST

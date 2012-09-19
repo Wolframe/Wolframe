@@ -10,7 +10,7 @@ INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_DIRS = \
-	-I. -I$(TOPDIR)/include \
+	-I. -I$(TOPDIR) -I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
@@ -46,10 +46,12 @@ LOCAL_STATIC_LIB = \
 	wolftest.a
 
 LOCAL_STATIC_LIB_OBJS = \
-	testDescription.o
+	testDescription.o \
+	testModules.o
 
 CPP_OBJS = \
-	testDescription.o
+	testDescription.o \
+	testModules.o
 
 CPP_BINS = \
 	wtestcheck$(EXE)

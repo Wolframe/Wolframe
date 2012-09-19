@@ -16,16 +16,6 @@ function run( )
 		output:print( 'X')
 	end
 end
---config
-env {
-	script {
-		name run
-		file echo.lua
-	}
-}
-proc {
-	cmd run
-}
 --output
 OK CMD1A '1'
 OK CMD2A '2'
@@ -37,4 +27,23 @@ OK
 OK CMD3A '4'
 OK enter cmd
 BYE
+--config
+provider
+{
+	cmdhandler
+	{
+		lua
+		{
+			script
+			{
+				name run
+				file echo.lua
+			}
+		}
+	}
+}
+proc
+{
+	cmd run
+}
 --end

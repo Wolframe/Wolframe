@@ -39,20 +39,24 @@
 using namespace _Wolframe;
 using namespace _Wolframe::wtest;
  
-std::list<std::string> _Wolframe::wtest::getTestModuleList( const char* topdir)
+std::list<std::string> _Wolframe::wtest::getTestModuleList( const std::string& topdir)
 {
 	std::list<std::string> rt;
 	static const char* ar[] = {
 		"filter/textwolf/mod_filter_textwolf",
+		"filter/char/mod_filter_char",
+		"filter/line/mod_filter_line",
 #if WITH_LIBXML2
 		"filter/libxml2/mod_filter_libxml2",
 #endif
-		"filter/cmdbind/luaCommandHandler/mod_lua_command_handler",
-		0}
+		"cmdbind/luaCommandHandler/mod_lua_command_handler",
+		0};
 	std::size_t ii = 0;
 	while (ar[ii])
 	{
 		boost::filesystem::path pt( topdir);
+		pt /= "src";
+		pt /= "modules";
 		pt /= ar[ii++];
 		rt.push_back( pt.string());
 	}

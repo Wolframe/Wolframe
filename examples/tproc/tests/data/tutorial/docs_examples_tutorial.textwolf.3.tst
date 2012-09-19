@@ -19,13 +19,22 @@ function run( )
         end
 end
 **config
-env {
-	script {
-		name run
-		file example_3.lua
+provider
+{
+	cmdhandler
+	{
+		lua
+		{
+			script
+			{
+				name run
+				file example_3.lua
+			}
+		}
 	}
 }
-proc {
+proc
+{
 	cmd run
 }
 **output

@@ -92,6 +92,12 @@ public:
 	///\brief Indicate that an unrecoverable error, a timeout or a terminate signal has occurred and the connection will be terminated
 	virtual void signalOccured( NetworkSignal);
 
+	///\brief Set the reference to the prcessor provider
+	void setProcessorProvider( proc::ProcessorProvider* provider_)
+	{
+		m_cmdhandler.setProcProvider( provider_);
+	}
+
 private:
 	const Configuration* m_config;			//< configuration reference
 	CommandHandler m_cmdhandler;			//< top level instance executing commands

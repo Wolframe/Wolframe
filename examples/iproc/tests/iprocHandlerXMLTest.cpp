@@ -36,9 +36,11 @@
 #include "connectionHandler.hpp"
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
-#include "langbind/appGlobalContext.hpp"
 #include "moduleDirectory.hpp"
 #include "config/ConfigurationTree.hpp"
+#include "langbind/appConfig_struct.hpp"
+#include "langbind/scriptConfig_struct.hpp"
+#include "processor/procProvider.hpp"
 #include "testHandlerTemplates.hpp"
 #include "testUtils.hpp"
 #include "utils/miscUtils.hpp"
@@ -55,9 +57,46 @@
 using namespace _Wolframe;
 using namespace _Wolframe::iproc;
 
-static proc::ProcProviderConfig g_processorProviderConfig;
-static proc::ProcessorProvider* g_processorProvider = 0;
-static module::ModulesDirectory g_modulesDirectory;
+static module::ModulesDirectory* g_modulesDirectory;
+static boost::filesystem::path g_referencePath;
+
+static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const boost::filesystem::path& script)
+{
+	boost::shared_ptr<proc::ProcProviderConfig> rt( new proc::ProcProviderConfig());
+	langbind::ScriptEnvironmentConfigStruct script_env;
+	langbind::ScriptCommandConfigStruct scriptcfg;
+	scriptcfg.name = "run";
+	scriptcfg.file = script.string();
+	script_env.script.push_back( scriptcfg);
+
+	boost::property_tree::ptree proccfg;
+	std::vector<std::pair<std::string,std::string> >
+		cmdhl = g_modulesDirectory->getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
+
+	if (!cmdhl.empty() && !script_env.script.empty())
+	{
+		if (cmdhl.size() > 1)
+		{
+			// only one command handler allowed:
+			throw std::runtime_error( "more than one command handler module loaded");
+		}
+		boost::property_tree::ptree cmdhlcfg;
+		cmdhlcfg.add_child( cmdhl.begin()->second, script_env.toPropertyTree());
+		proccfg.add_child( cmdhl.begin()->first, cmdhlcfg);
+	}
+	if (!rt->parse( (const config::ConfigurationTree&)proccfg, std::string(""), g_modulesDirectory))
+	{
+		throw std::runtime_error( "error in test configuration");
+	}
+	rt->setCanonicalPathes( g_referencePath.string());
+	return rt;
+}
+
+static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const boost::shared_ptr<proc::ProcProviderConfig>& cfg)
+{
+	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg.get(), g_modulesDirectory));
+	return rt;
+}
 
 
 struct TestDescription
@@ -125,24 +164,19 @@ public:
 	IProcTestConfiguration( const IProcTestConfiguration& o)
 		:Configuration(o)
 		,m_appConfig(o.m_appConfig)
-		,m_langbindConfig(o.m_langbindConfig)
 	{}
-	IProcTestConfiguration( const std::string& scriptpath, std::size_t ib, std::size_t ob)
+	IProcTestConfiguration( const boost::filesystem::path& scriptpath, std::size_t ib, std::size_t ob)
 	{
+		m_providerConfig = getProcProviderConfig( scriptpath);
+		m_appConfig.addModules( g_modulesDirectory);
 		m_appConfig.addConfig( "proc", this);
-		m_appConfig.addConfig( "env", &m_langbindConfig);
 
 		boost::filesystem::path configFile( g_testdir / "temp" / "test.cfg");
 		std::ostringstream config;
-		config << "env {" << std::endl;
-		config << "   script {" << std::endl;
-		config << "      name run" << std::endl;
-		config << "      file \"" << scriptpath << "\"" << std::endl;
-		config << "   }" << std::endl;
-		config << "}" << std::endl;
 		config << "proc {" << std::endl;
 		config << "   cmd run" << std::endl;
 		config << "}" << std::endl;
+
 		wtest::Data::writeFile( configFile.string().c_str(), config.str());
 
 		if (utils::fileExists( configFile.string()))
@@ -153,15 +187,17 @@ public:
 			}
 		}
 		m_appConfig.finalize();
-
 		setBuffers( ib, ob);
-		loadGlobalContext();
-		langbind::getGlobalContext()->load( m_langbindConfig.data());
+	}
+
+	const boost::shared_ptr<proc::ProcProviderConfig>& providerConfig() const
+	{
+		return m_providerConfig;
 	}
 
 private:
 	config::ApplicationConfiguration m_appConfig;
-	langbind::ApplicationEnvironmentConfig m_langbindConfig;
+	boost::shared_ptr<proc::ProcProviderConfig> m_providerConfig;
 };
 
 class IProcHandlerXMLTest : public ::testing::Test
@@ -200,11 +236,15 @@ TEST_F( IProcHandlerXMLTest, tests)
 			std::size_t oo = (rr % NOF_OB);
 
 			std::string testoutput;
-			std::string scriptpath( "../scripts/");
-			scriptpath.append( testDescriptions[ti].scriptfile);
+			boost::filesystem::path scriptpath = g_testdir / "scripts" / testDescriptions[ti].scriptfile;
 
 			IProcTestConfiguration config( scriptpath, ib[ii]+EoDBufferSize, ob[oo]);
+
+			boost::shared_ptr<proc::ProcessorProvider>
+				provider = getProcProvider( config.providerConfig());
+
 			iproc::Connection connection( ep, &config);
+			connection.setProcessorProvider( provider.get());
 
 			EXPECT_EQ( 0, test::runTestIO( data.input, testoutput, connection));
 			data.check( testoutput);
@@ -217,8 +257,16 @@ int main( int argc, char **argv )
 {
 	g_gtest_ARGC = 1;
 	g_gtest_ARGV[0] = argv[0];
-	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+	g_testdir = boost::filesystem::system_complete( utils::resolvePath( argv[0])).parent_path();
+	g_referencePath = g_testdir / "temp";
+	std::string topdir = g_testdir.parent_path().parent_path().parent_path().string();
+	g_modulesDirectory = new module::ModulesDirectory();
 
+	if (!LoadModules( *g_modulesDirectory, wtest::getTestModuleList( topdir)))
+	{
+		std::cerr << "failed to load modules" << std::endl;
+		return 2;
+	}
 	if (argc > 1)
 	{
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
@@ -228,6 +276,7 @@ int main( int argc, char **argv )
 	wtest::Data::createDataDir( "result", g_gtest_ARGV[0]);
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	return RUN_ALL_TESTS();
+	delete g_modulesDirectory;
 }
 
 

@@ -179,13 +179,22 @@ function run( )
 	end
 end
 --config
-env {
-	script {
-		name run
-		file echo.lua
+provider
+{
+	cmdhandler
+	{
+		lua
+		{
+			script
+			{
+				name run
+				file echo.lua
+			}
+		}
 	}
 }
-proc {
+proc
+{
 	cmd run
 }
 --output

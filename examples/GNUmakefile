@@ -1,8 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = echo pecho
-
-#PF:DISABLED TEMPORARILY: iproc tproc
+SUBDIRS = echo pecho iproc tproc
 
 ifeq ($(WITH_LUA),1)
 SUBDIRS += lua

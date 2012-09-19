@@ -36,8 +36,8 @@
 
 #ifndef _HANDLERCONFIG_HPP_INCLUDED
 #define _HANDLERCONFIG_HPP_INCLUDED
-
 #include "standardConfigs.hpp"
+#include "processor/procProvider.hpp"
 #include "tprocHandlerConfig.hpp"
 
 namespace _Wolframe {
@@ -45,15 +45,21 @@ namespace _Wolframe {
 struct HandlerConfiguration
 {
 public:
-	tproc::Configuration *m_appConfig;
+	tproc::Configuration* m_appConfig;
+	proc::ProcProviderConfig* m_procCfg;
 
 	HandlerConfiguration()
+		:m_appConfig(0)
+		,m_procCfg(0)
 	{
 		m_appConfig = new tproc::Configuration();
+		m_procCfg = new proc::ProcProviderConfig();
 	}
 
-	virtual ~HandlerConfiguration( ) {
+	virtual ~HandlerConfiguration( )
+	{
 		if (m_appConfig) delete m_appConfig;
+		if (m_procCfg) delete m_procCfg;
 	}
 };
 

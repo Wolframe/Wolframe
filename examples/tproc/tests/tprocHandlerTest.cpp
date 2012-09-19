@@ -34,16 +34,20 @@
 ///\brief Class unit tests using google test framework (gTest)
 
 #include "tprocHandler.hpp"
+#include "handlerConfig.hpp"
 #include "connectionHandler.hpp"
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
-#include "langbind/appConfig.hpp"
-#include "langbind/appGlobalContext.hpp"
 #include "testDescription.hpp"
 #include "moduleDirectory.hpp"
 #include "config/ConfigurationTree.hpp"
+#include "langbind/appObjects.hpp"
+#include "langbind/appConfig_struct.hpp"
+#include "langbind/scriptConfig_struct.hpp"
+#include "processor/procProvider.hpp"
 #include "testHandlerTemplates.hpp"
 #include "utils/miscUtils.hpp"
+#include "wtest/testModules.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/info_parser.hpp>
@@ -67,17 +71,13 @@ static int g_gtest_ARGC = 0;
 static char* g_gtest_ARGV[2] = {0, 0};
 static boost::filesystem::path g_testdir;
 
-static proc::ProcProviderConfig g_processorProviderConfig;
-static proc::ProcessorProvider* g_processorProvider = 0;
-static module::ModulesDirectory g_modulesDirectory;
+static module::ModulesDirectory* g_modulesDirectory = 0;
+static boost::filesystem::path g_referencePath;
 
-///\brief Loads the modules, scripts, etc. defined hardcoded and in the command line into the global context
-static void loadGlobalContext()
+static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const proc::ProcProviderConfig* cfg)
 {
-	if (g_processorProvider) delete g_processorProvider;
-	g_processorProvider = new proc::ProcessorProvider( &g_processorProviderConfig, &g_modulesDirectory);
-	langbind::GlobalContext* gct = new langbind::GlobalContext( g_processorProvider);
-	langbind::defineGlobalContext( langbind::GlobalContextR( gct));
+	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg, g_modulesDirectory));
+	return rt;
 }
 
 class TestConfiguration :public tproc::Configuration
@@ -86,13 +86,13 @@ public:
 	TestConfiguration( const TestConfiguration& o)
 		:Configuration(o)
 		,m_appConfig(o.m_appConfig)
-		,m_langbindConfig(o.m_langbindConfig)
 	{}
 
 	TestConfiguration()
 	{
+		m_appConfig.addModules( g_modulesDirectory);
 		m_appConfig.addConfig( "proc", this);
-		m_appConfig.addConfig( "env", &m_langbindConfig);
+		m_appConfig.addConfig( "provider", &m_procConfig);
 
 		boost::filesystem::path configFile( g_testdir / "temp" / "test.cfg");
 		if (utils::fileExists( configFile.string()))
@@ -103,13 +103,16 @@ public:
 			}
 		}
 		m_appConfig.finalize();
-
-		loadGlobalContext();
-		langbind::getGlobalContext()->load( m_langbindConfig.data());
 	}
+
+	const proc::ProcProviderConfig* providerConfig() const
+	{
+		return &m_procConfig;
+	}
+
 private:
 	config::ApplicationConfiguration m_appConfig;
-	langbind::ApplicationEnvironmentConfig m_langbindConfig;
+	proc::ProcProviderConfig m_procConfig;
 };
 
 class TProcHandlerTest : public ::testing::Test
@@ -123,20 +126,6 @@ protected:
 
 class TProcHandlerTestInstance
 {
-private:
-	net::LocalTCPendpoint ep;
-	tproc::Connection* m_connection;
-	TestConfiguration* m_config;
-	std::string m_input;
-	std::string m_output;
-	std::string m_expected;
-
-	enum
-	{
-		EoDBufferSize=4,
-		MinOutBufferSize=16
-	};
-
 public:
 	TProcHandlerTestInstance( const wtest::TestDescription& descr, TestConfiguration* config, std::size_t ib, std::size_t ob)
 		:ep( "127.0.0.1", 12345)
@@ -147,6 +136,8 @@ public:
 	{
 		m_config->setBuffers( ib + EoDBufferSize, ob + MinOutBufferSize);
 		m_connection = new tproc::Connection( ep, m_config);
+		m_provider = getProcProvider( m_config->providerConfig());
+		m_connection->setProcessorProvider( m_provider.get());
 	}
 
 	~TProcHandlerTestInstance()
@@ -163,6 +154,21 @@ public:
 		m_output.clear();
 		return test::runTestIO( m_input, m_output, *m_connection);
 	}
+
+private:
+	net::LocalTCPendpoint ep;
+	tproc::Connection* m_connection;
+	boost::shared_ptr<proc::ProcessorProvider> m_provider;
+	TestConfiguration* m_config;
+	std::string m_input;
+	std::string m_output;
+	std::string m_expected;
+
+	enum
+	{
+		EoDBufferSize=4,
+		MinOutBufferSize=16
+	};
 };
 
 static std::string selectedTestName;
@@ -278,7 +284,14 @@ int main( int argc, char **argv )
 	g_gtest_ARGC = 1;
 	g_gtest_ARGV[0] = argv[0];
 	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+	std::string topdir = g_testdir.parent_path().parent_path().parent_path().string();
+	g_modulesDirectory = new module::ModulesDirectory();
 
+	if (!LoadModules( *g_modulesDirectory, wtest::getTestModuleList( topdir)))
+	{
+		std::cerr << "failed to load modules" << std::endl;
+		return 2;
+	}
 	if (argc > 2)
 	{
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
@@ -291,5 +304,6 @@ int main( int argc, char **argv )
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
 	return RUN_ALL_TESTS();
+	delete g_modulesDirectory;
 }
 
