@@ -122,7 +122,7 @@ local_test:
 	@echo "Testing validity of XML data.."
 	@for i in $(DATA); do xmllint --noout $$i; done
 
-run: local_all
+run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
 	@LD_LIBRARY_PATH=$(QT_LIB_DIR) ./qtclient
 
