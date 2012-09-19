@@ -7,6 +7,8 @@
 #include <QDir>
 #include <QFile>
 
+#include <QDebug>
+
 namespace _Wolframe {
 	namespace QtClient {
 
@@ -41,11 +43,35 @@ void FileFormLoader::initiateFormLoad( QString &name, QLocale locale )
 
 QStringList FileFormLoader::getFormNames( )
 {
-// read list of forms diretcory on demand
-	QDir forms_dir( QLatin1String( "forms" ) );
-	QStringList forms = forms_dir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
+// read list of forms directory on demand
+	QDir formsDir( QLatin1String( "forms" ) );
+	QStringList forms = formsDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
 		.replaceInStrings( ".ui", "" );
 	return forms;
+}
+
+QStringList FileFormLoader::getLanguageCodes( )
+{
+	QStringList languageCodes;
+	languageCodes.push_back( "en_US" ); // default locale, always around
+	
+// read list of supperted languages for all forms based on their qm files available
+	QDir translationDir( QLatin1String( "i18n" ) );
+	translationDir.setFilter( QDir::Files | QDir::NoDotAndDotDot );
+	translationDir.setSorting( QDir::Name );
+	QStringList filters;
+	filters << "*.qm";
+	translationDir.setNameFilters( filters );
+	QStringList localeFiles = translationDir.entryList( );
+	QMutableStringListIterator it( localeFiles );
+	while( it.hasNext( ) ) {
+		it.next( );
+		QStringList parts = it.value( ).split( "." );
+		languageCodes.push_back( parts[1] );		
+		qDebug( ) << parts[1];
+	}
+
+	return languageCodes;
 }
 
 } // namespace QtClient

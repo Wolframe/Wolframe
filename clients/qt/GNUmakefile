@@ -107,7 +107,7 @@ THEMES = \
 	themes/windows/MainWindow.ui
 
 %.qm : %.ts
-	lrelease $< -qm $@
+	$(QT_LRELEASE) $< -qm $@
 
 I18NS = \
 	i18n/form1.de_CH.qm

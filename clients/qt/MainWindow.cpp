@@ -59,6 +59,9 @@ void MainWindow::initialize( )
 		
 // load default theme
 	loadTheme( QString( QLatin1String( "windows" ) ) );
+
+// load language codes for language picker
+	QStringList languages = m_formLoader->getLanguageCodes( );
 }
 
 void MainWindow::populateThemesMenu( )
@@ -223,7 +226,6 @@ void MainWindow::formLoaded( QString name, QByteArray form, QByteArray localizat
 		oldForm->hide( );
 		l->removeWidget( oldForm );
 		oldForm->deleteLater( );
-		oldForm = 0;
 	}
 	m_form->show( );
 
