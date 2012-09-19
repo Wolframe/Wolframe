@@ -107,7 +107,9 @@ ifeq ($(WITH_QT),1)
 	@echo "QT_DIR: $(QT_DIR)"
 	@echo "QT_INCLUDE_DIR: $(QT_INCLUDE_DIR)"
 	@echo "QT_LIB_DIR: $(QT_LIB_DIR)"
+	@echo "QT_BIN_DIR: $(QT_BIN_DIR)"
 	@echo "QT_MOC: $(QT_MOC)"
+	@echo "QT_LRELEASE: $(QT_LRELEASE)"
 endif
 ifeq ($(WITH_PAM),1)
 	@echo

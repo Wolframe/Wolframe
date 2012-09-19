@@ -83,7 +83,7 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 
 local_clean:
 	@-rm -f moc_*.cpp
-	@-rm i18n/*.qm
+	@-rm -f i18n/*.qm
 
 local_distclean:
 
