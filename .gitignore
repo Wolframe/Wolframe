@@ -133,3 +133,4 @@ tests/simpleFormCompiler/src/testSimpleFormCompiler
 tests/AAAA/passwdFileTest
 tests/testSimpleFormCompiler
 tests/stringNormalizationTest
+*.qm

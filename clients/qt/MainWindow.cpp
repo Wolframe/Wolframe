@@ -9,17 +9,20 @@
 #include <QtUiTools>
 #include <QtGui>
 #include <QBuffer>
+#include <QApplication>
+#include <QTranslator>
+#include <QLocale>
 
 #include <QDebug>
 
 namespace _Wolframe {
 	namespace QtClient {
 
-MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 ), m_form( 0 )
+MainWindow::MainWindow( QApplication &app, QWidget *_parent ) : QWidget( _parent ), m_app( app ), m_ui( 0 ), m_form( 0 )
 {
 	// for testing, load form descriptions and data
 	// from the local filesystem
-	m_formLoader = new FileFormLoader( "forms" );
+	m_formLoader = new FileFormLoader( "forms", "i18n" );
 	m_dataLoader = new FileDataLoader( "data" );
 	m_dataHandler = new DataHandler( );
 	initialize( );
@@ -39,8 +42,8 @@ void MainWindow::initialize( )
 // link the form loader for form loader notifications
 	QObject::connect( m_formLoader, SIGNAL( formListLoaded( ) ),
 		this, SLOT( formListLoaded( ) ) );
-	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
-		this, SLOT( formLoaded( QString, QByteArray ) ) );	
+	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray, QByteArray ) ),
+		this, SLOT( formLoaded( QString, QByteArray, QByteArray ) ) );	
 
 // link the data loader to our window
 	QObject::connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
@@ -189,17 +192,25 @@ void MainWindow::loadForm( QString form )
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
 	qDebug( ) << "Initiating form load for " << form;
-	m_formLoader->initiateFormLoad( form );
+	m_formLoader->initiateFormLoad( form, QLocale::system( ) );
 }
 
-void MainWindow::formLoaded( QString name, QByteArray xml )
+void MainWindow::formLoaded( QString name, QByteArray form, QByteArray localization )
 {
 	qDebug( ) << "Form " << name << " loaded";
+
+// install translation files for this form
+	QTranslator translator;
+	if( !translator.load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
+		qDebug( ) << "Error while loading translations for form " <<
+			name << " for locale " << QLocale::system( ).name( );
+	}
+	m_app.installTranslator( &translator );
 	
 // read the form and construct it
 	QWidget *oldForm = m_form;
 	QUiLoader loader;
-	QBuffer buf( &xml );
+	QBuffer buf( &form );
 	m_form = loader.load( &buf, m_ui );
 	buf.close( );
 

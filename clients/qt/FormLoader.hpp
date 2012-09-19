@@ -9,6 +9,7 @@
 #include <QString>
 #include <QStringList>
 #include <QByteArray>
+#include <QLocale>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -20,12 +21,12 @@ namespace _Wolframe {
 		public:
 			virtual ~FormLoader( ) {};
 			virtual void initiateListLoad( ) = 0;
-			virtual void initiateFormLoad( QString &name ) = 0;
+			virtual void initiateFormLoad( QString &name, QLocale locale ) = 0;
 			virtual QStringList getFormNames( ) = 0;
 
 		Q_SIGNALS:
 			void formListLoaded( );
-			void formLoaded( QString form_name, QByteArray form );
+			void formLoaded( QString form_name, QByteArray form, QByteArray locale );
 	};
 } // namespace QtClient
 } // namespace _Wolframe

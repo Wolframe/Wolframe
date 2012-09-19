@@ -83,6 +83,7 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 
 local_clean:
 	@-rm -f moc_*.cpp
+	@-rm i18n/*.qm
 
 local_distclean:
 
@@ -105,6 +106,14 @@ THEMES = \
 	themes/phone/MainWindow.ui \
 	themes/windows/MainWindow.ui
 
+%.qm : %.ts
+	lrelease $< -qm $@
+
+I18NS = \
+	i18n/form1.de_CH.qm
+
+local_all: $(I18NS)
+
 local_test:
 	@echo "Testing validity of themes.."
 	@for i in $(THEMES); do xmllint --noout --schema qt-ui-4.7.xsd $$i; done
@@ -113,6 +122,10 @@ local_test:
 	@echo "Testing validity of XML data.."
 	@for i in $(DATA); do xmllint --noout $$i; done
 
-run: $(CPP_BINS)
+run: local_all
 	@echo "Testing Qt client.."
 	@LD_LIBRARY_PATH=$(QT_LIB_DIR) ./qtclient
+
+.PHONY: i18n
+i18n:
+	lupdate forms/form1.ui -ts i18n/form1.de_CH.ts
