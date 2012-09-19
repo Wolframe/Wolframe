@@ -83,7 +83,7 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 
 local_clean:
 	@-rm -f moc_*.cpp
-	@-rm i18n/*.qm
+	@-rm -f i18n/*.qm
 
 local_distclean:
 
@@ -107,7 +107,7 @@ THEMES = \
 	themes/windows/MainWindow.ui
 
 %.qm : %.ts
-	lrelease $< -qm $@
+	$(QT_LRELEASE) $< -qm $@
 
 I18NS = \
 	i18n/form1.de_CH.qm

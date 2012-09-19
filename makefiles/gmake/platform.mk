@@ -812,7 +812,9 @@ ifeq "$(LINUX_DIST)" "arch"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -820,7 +822,9 @@ ifeq "$(LINUX_DIST)" "slackware"
 QT_DIR ?= /usr/lib/qt
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -831,7 +835,9 @@ ifeq "$(LINUX_REV)" "14"
 QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -840,7 +846,9 @@ ifeq "$(LINUX_REV)" "15"
 QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc   
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -849,7 +857,9 @@ ifeq "$(LINUX_REV)" "16"
 QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc   
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -858,7 +868,9 @@ ifeq "$(LINUX_REV)" "17"
 QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
 QT_INCLUDE_DIR ?= /usr/include
 QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -867,7 +879,9 @@ ifeq "$(LINUX_REV)" "5"
 QT_DIR ?= /usr/lib/qt4
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -876,7 +890,9 @@ ifeq "$(LINUX_REV)" "6"
 QT_DIR ?= /usr/lib/qt4
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -890,7 +906,9 @@ ifeq "$(LINUX_REV)" "12.04"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -898,7 +916,9 @@ ifeq "$(LINUX_REV)" "11.10"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -906,7 +926,9 @@ ifeq "$(LINUX_REV)" "11.04"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -914,7 +936,9 @@ ifeq "$(LINUX_REV)" "10.10"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -922,7 +946,9 @@ ifeq "$(LINUX_REV)" "10.04"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -936,7 +962,9 @@ ifeq "$(LINUX_REV)" "5"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -944,7 +972,9 @@ ifeq "$(LINUX_REV)" "6"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -955,7 +985,9 @@ ifeq "$(LINUX_REV)" "11"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 endif
@@ -966,7 +998,9 @@ ifeq "$(LINUX_REV)" "11.4"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -974,7 +1008,9 @@ ifeq "$(LINUX_REV)" "12.1"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -982,7 +1018,9 @@ ifeq "$(LINUX_REV)" "12.2"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -990,7 +1028,9 @@ ifeq "$(LINUX_REV)" "12.3"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_MOC ?= $(QT_DIR)/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 
@@ -1009,7 +1049,9 @@ ifndef QT_DIR
 QT_DIR ?= /usr/local/lib/qt4
 QT_INCLUDE_DIR ?= /usr/local/include/qt4
 QT_LIB_DIR ?= /usr/local/lib/qt4
-QT_MOC ?= /usr/local/bin/moc-qt4
+QT_BIN_DIR ?= /usr/local/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc-qt4
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 endif
@@ -1023,7 +1065,9 @@ ifndef QT_DIR
 QT_DIR ?= /usr/local/lib/qt4
 QT_INCLUDE_DIR ?= /usr/local/include/qt4
 QT_LIB_DIR ?= /usr/local/lib/qt4
-QT_MOC ?= /usr/local/bin/moc-qt4
+QT_BIN_DIR ?= /usr/local/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc-qt4
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 endif
@@ -1040,7 +1084,9 @@ ifndef QT_DIR
 QT_DIR ?= /usr/local/lib/qt4
 QT_INCLUDE_DIR ?= /usr/local/include/X11/qt4
 QT_LIB_DIR ?= /usr/local/lib/qt4
-QT_MOC ?= /usr/local/bin/moc4
+QT_BIN_DIR ?= /usr/local/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc4
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease4
 QT_LDFLAGS = -L/usr/X11R6/lib
 endif
 endif
@@ -1057,7 +1103,9 @@ ifndef QT_DIR
 QT_DIR ?= /usr/pkg/qt4
 QT_INCLUDE_DIR ?= /usr/pkg/qt4/include
 QT_LIB_DIR ?= /usr/pkg/qt4/lib
-QT_MOC ?= /usr/pkg/qt4/bin/moc
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LDFLAGS =
 endif
 endif

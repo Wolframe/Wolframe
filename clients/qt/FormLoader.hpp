@@ -23,6 +23,7 @@ namespace _Wolframe {
 			virtual void initiateListLoad( ) = 0;
 			virtual void initiateFormLoad( QString &name, QLocale locale ) = 0;
 			virtual QStringList getFormNames( ) = 0;
+			virtual QStringList getLanguageCodes( ) = 0;
 
 		Q_SIGNALS:
 			void formListLoaded( );
