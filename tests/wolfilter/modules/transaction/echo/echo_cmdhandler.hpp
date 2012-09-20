@@ -30,12 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilter/src/echo_cmdhandler.hpp
-///\brief Interface wolfilter test command handler
-#ifndef _Wolframe_TESTS_WOLFILTER_echo_cmdhandler_HPP_INCLUDED
-#define _Wolframe_TESTS_WOLFILTER_echo_cmdhandler_HPP_INCLUDED
+///\file tests/wolfilter/modules/transaction/echo/echo_transaction.cpp
+///\brief Interface for a fake transaction handler for tests
+#ifndef _Wolframe_TESTS_WOLFILTER_TRANSACTION_ECHO_HPP_INCLUDED
+#define _Wolframe_TESTS_WOLFILTER_TRANSACTION_ECHO_HPP_INCLUDED
 #include <string>
-#include "cmdbind/commandHandler.hpp"
+#include <vector>
+#include "langbind/transactionFunction.hpp"
 #include "protocol/ioblocks.hpp"
 
 namespace _Wolframe {

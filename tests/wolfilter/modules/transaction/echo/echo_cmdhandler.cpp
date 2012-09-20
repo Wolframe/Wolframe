@@ -30,14 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file wolfilter/src/echo_cmdhandler.cpp
-///\brief Implementation wolfilter test command handler
-
-#include "wolfilter/src/echo_cmdhandler.hpp"
+///\file tests/wolfilter/modules/transaction/echo/echo_transaction.cpp
+///\brief Implementation of a fake transaction handler for tests
+#include "echo_cmdhandler.hpp"
 #include <string>
 #include <cstring>
 #include <stdexcept>
-#include "cmdbind/commandHandler.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::test;
