@@ -650,7 +650,8 @@ fi
 %{_libdir}/wolframe/modules/mod_filter_token.so
 %{_libdir}/wolframe/modules/mod_filter_blob.so
 
-%{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
+# disabled
+#%{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
 
 %{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
 %{_libdir}/wolframe/modules/mod_lua_datetime.so

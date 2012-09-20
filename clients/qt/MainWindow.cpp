@@ -18,25 +18,27 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 ), m_form( 0 )
+MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 )
 {
-	// for testing, load form descriptions and data
-	// from the local filesystem
-	m_formLoader = new FileFormLoader( "forms", "i18n" );
-	m_dataLoader = new FileDataLoader( "data" );
-	m_dataHandler = new DataHandler( );
+// a Qt UI loader for the main theme window
 	m_uiLoader = new QUiLoader( );
 	m_uiLoader->setLanguageChangeEnabled ( true );
+
+// for testing, load lists of available forms from the files system,
+// pass the form loader to the FormWidget
+	m_formLoader = new FileFormLoader( "forms", "i18n" );	
+
+	m_formWidget = new FormWidget( m_formLoader, this );
+	
 	initialize( );
 }
 
 MainWindow::~MainWindow( )
 {
+	delete m_formWidget;
 	delete m_debugTerminal;
 	delete m_wolframeClient;
-	delete m_dataHandler;
 	delete m_formLoader;
-	delete m_dataLoader;
 	delete m_uiLoader;
 }
 
@@ -45,14 +47,6 @@ void MainWindow::initialize( )
 // link the form loader for form loader notifications
 	QObject::connect( m_formLoader, SIGNAL( formListLoaded( ) ),
 		this, SLOT( formListLoaded( ) ) );
-	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray, QByteArray ) ),
-		this, SLOT( formLoaded( QString, QByteArray, QByteArray ) ) );	
-
-// link the data loader to our window
-	QObject::connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
-		this, SLOT( dataLoaded( QString, QByteArray ) ) );
-	QObject::connect( m_dataLoader, SIGNAL( dataSaved( QString ) ),
-		this, SLOT( dataSaved( QString ) ) );
 
 // create a Wolframe protocol client
 	m_wolframeClient = new WolframeClient( );
@@ -141,6 +135,10 @@ void MainWindow::loadTheme( QString theme )
 		oldUi->deleteLater( );
 	}
 
+// attach form widget in the right place of the theme main window
+	QVBoxLayout *l = qFindChild<QVBoxLayout *>( m_ui, "mainAreaLayout" );
+	l->addWidget( m_formWidget );
+
 // show the new gui
 	m_ui->show( );
 	
@@ -160,7 +158,7 @@ void MainWindow::loadTheme( QString theme )
 	qApp->restoreOverrideCursor( );
 
 // load the current form again
-	if( m_form ) loadForm( m_currentForm );
+	if( m_currentForm  != "" ) loadForm( m_currentForm );
 }
 
 void MainWindow::loadLanguages( )
@@ -241,20 +239,11 @@ void MainWindow::languageSelected( QAction *action )
 	m_currentLanguage = language;
 }
 
-void MainWindow::changeEvent( QEvent *e )
+void MainWindow::themeSelected( QAction *action )
 {
-	QWidget::changeEvent( e );
-	qDebug( ) << "changeEvent";
-	
-	switch( e->type( ) ) {
-		case QEvent::LanguageChange:
-// QLoader ui retranslate automatically
-			qDebug( ) << "retranslate!";
-			break;
-			
-		default:
-			break;
-	}
+	QString theme = action->text( );
+	if( theme != m_currentTheme )
+		loadTheme( theme );
 }
 
 void MainWindow::formSelected( QAction *action )
@@ -265,101 +254,13 @@ void MainWindow::formSelected( QAction *action )
 		loadForm( form );
 }
 
-void MainWindow::loadForm( QString form )
+void MainWindow::loadForm( QString name )
 {
-// indicate busy state
-	qApp->setOverrideCursor( Qt::BusyCursor );
-
-	qDebug( ) << "Initiating form load for " << form;
-	m_formLoader->initiateFormLoad( form, QLocale( m_currentLanguage ) );
-}
-
-void MainWindow::formLoaded( QString name, QByteArray form, QByteArray localization )
-{
-	qDebug( ) << "Form " << name << " loaded";
-
-// get list of all translators for this form and delete them
-	const QList<QTranslator *> oldTranslators( m_form->findChildren<QTranslator *>( ) );
-	foreach( QTranslator *translator, oldTranslators ) {
-		QCoreApplication::instance( )->removeTranslator( translator );
-	}
-	qDeleteAll( oldTranslators );
-	
-// read the form and construct it
-	QWidget *oldForm = m_form;
-	QBuffer buf( &form );
-	m_form = m_uiLoader->load( &buf, m_ui );
-	buf.close( );
-
-// install translation files for this form
-	QTranslator *translator = new QTranslator( m_form );
-	if( !translator->load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
-		qDebug( ) << "Error while loading translations for form " <<
-			name << " for locale " << m_currentLanguage;
-	}
-	QCoreApplication::instance( )->installTranslator( translator );
-
-// add it to the main window, disable old form
-	QVBoxLayout *l = qFindChild<QVBoxLayout *>( m_ui, "mainAreaLayout" );
-	l->addWidget( m_form );
-
-	if( oldForm ) {
-		m_form->move( oldForm->pos( ) );
-		oldForm->hide( );
-		l->removeWidget( oldForm );
-		oldForm->deleteLater( );
-	}
-	m_form->show( );
+// delegate form loading to form widget
+	m_formWidget->loadForm( name, QLocale( m_currentLanguage ) );
 
 // remember the name of the current form
 	m_currentForm = name;
-
-// initiate load of form data
-	qDebug( ) << "Initiating loading of form data for form " << name;
-	
-	m_dataLoader->initiateDataLoad( name );
-
-// connect standard form actions
-	QMetaObject::connectSlotsByName( this );
-	
-// not busy anymore
-	qApp->restoreOverrideCursor();
-}
-
-void MainWindow::on_buttons_accepted( )
-{
-	qDebug( ) << "Form accepted";
-	
-	QByteArray xml;
-	m_dataHandler->writeFormData( m_currentForm, m_form, &xml );
-	
-	m_dataLoader->initiateDataSave( m_currentForm, xml );
-}
-
-void MainWindow::on_buttons_rejected( )
-{
-	qDebug( ) << "Form rejected";
-	m_dataLoader->initiateDataLoad( m_currentForm );
-}
-
-void MainWindow::dataSaved( QString name )
-{	
-	qDebug( ) << "Saved data for form " << name;
-}
-
-void MainWindow::dataLoaded( QString name, QByteArray xml )
-{
-	qDebug( ) << "Loaded data for form " << name << ":\n"
-		<< xml;
-	
-	m_dataHandler->readFormData( name, m_form, xml );
-}
-
-void MainWindow::themeSelected( QAction *action )
-{
-	QString theme = action->text( );
-	if( theme != m_currentTheme )
-		loadTheme( theme );
 }
 
 void MainWindow::on_actionExit_triggered( )

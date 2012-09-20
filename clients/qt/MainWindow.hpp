@@ -9,10 +9,9 @@
 #include <QtUiTools>
 
 #include "FormLoader.hpp"
-#include "DataLoader.hpp"
-#include "DataHandler.hpp"
 #include "DebugTerminal.hpp"
 #include "WolframeClient.hpp"
+#include "FormWidget.hpp"
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -27,12 +26,10 @@ namespace _Wolframe {
 	
 	private:
 		QWidget *m_ui;			// main window from theme
-		QWidget *m_form;		// current active form
+		FormWidget *m_formWidget;	// current active form
 		QString m_currentTheme;		// the name of the currently selected theme
 		QString m_currentForm;		// the name of the form currently visible
 		FormLoader *m_formLoader;	// form loader (visible form)
-		DataLoader *m_dataLoader;	// load and saves data (data form)
-		DataHandler *m_dataHandler;	// form/data handler
 		DebugTerminal *m_debugTerminal;	// protocol debug terminal (interactive)
 		WolframeClient *m_wolframeClient; // the client protocol class
 		QString m_currentLanguage;	// code of the current interface language
@@ -45,25 +42,17 @@ namespace _Wolframe {
 		void loadForm( QString formName );
 		void loadData( QString formName );
 
-	protected:
-		virtual void changeEvent( QEvent * event );
-
 	private Q_SLOTS:
 		void themeSelected( QAction *action );
 		void formSelected( QAction *action );
 		void languageSelected( QAction *action );
+
 		void formListLoaded( );
-		void formLoaded( QString name, QByteArray form, QByteArray localization );
-		void dataLoaded( QString name, QByteArray xml );
-		void dataSaved( QString name );
 
 		void on_actionExit_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
 		void on_actionDebugTerminal_triggered( bool checked );
-		
-		void on_buttons_accepted( );
-		void on_buttons_rejected( );
 	};
 } // namespace QtClient
 } // namespace _Wolframe
