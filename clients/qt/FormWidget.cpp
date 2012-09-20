@@ -57,10 +57,11 @@ void FormWidget::loadForm( QString name, QLocale locale )
 // indicate busy state
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
-	qDebug( ) << "Initiating form load for " << name;
-	m_formLoader->initiateFormLoad( name, locale );
-	
+	m_name = name;
 	m_locale = locale;
+
+	qDebug( ) << "Initiating form load for " << name;
+	m_formLoader->initiateFormLoad( name, locale );	
 }	
 
 void FormWidget::formLoaded( QString name, QByteArray form, QByteArray localization )
@@ -103,7 +104,7 @@ void FormWidget::formLoaded( QString name, QByteArray form, QByteArray localizat
 	m_dataLoader->initiateDataLoad( name );
 
 // connect standard form actions
-	QMetaObject::connectSlotsByName( m_ui );
+	QMetaObject::connectSlotsByName( this );
 	
 // not busy anymore
 	qApp->restoreOverrideCursor( );	
