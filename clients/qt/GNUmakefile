@@ -54,7 +54,9 @@ OBJS = \
 	HistoryLineEdit.o \
 	moc_HistoryLineEdit.o \
 	WolframeClient.o \
-	moc_WolframeClient.o
+	moc_WolframeClient.o \
+	FormWidget.o \
+	moc_FormWidget.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -80,6 +82,9 @@ moc_DataLoader.cpp: DataLoader.hpp
 
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_MOC) $(MOC_FLAGS) WolframeClient.hpp -o moc_WolframeClient.cpp
+
+moc_FormWidget.cpp: FormWidget.hpp
+	$(QT_MOC) $(MOC_FLAGS) FormWidget.hpp -o moc_FormWidget.cpp
 
 	
 FORMS = \
