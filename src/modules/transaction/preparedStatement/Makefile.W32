@@ -26,6 +26,7 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	$(TOPDIR)\src\database_preparedStatementProcessor.obj \
+	$(TOPDIR)\src\types_allocators.obj \
 	mod_transaction_pstm.obj
 
 all: $(DYNAMIC_MODULE)
