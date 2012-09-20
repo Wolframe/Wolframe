@@ -9,8 +9,7 @@ SUBDIRS = \
 
 !IFDEF WITH_LIBHPDF
 SUBDIRS = \
-	$(SUBDIRS)
-#PF:DISABLED: haruPdfPrinter
+	$(SUBDIRS) haruPdfPrinter
 !ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk

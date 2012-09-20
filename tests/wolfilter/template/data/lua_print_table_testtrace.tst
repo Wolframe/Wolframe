@@ -3,7 +3,7 @@ testname=`basename $0 ".tst"`				# name of the test
 luascript=`echo $testname | sed 's/lua_//' | sed 's/_testtrace//'`.lua
 formname="invoice.simpleform"
 opt=""
-layout="print_invoice.tracepdf:invoice.simplepdf"
+layout="f=invoice.simplepdf,n=print_invoice,t=tracepdf"
 modpath="../../src/modules/ddlcompiler/"		# DDL compiler module directory relative from tests/temp
 mod="$modpath/simpleform/mod_ddlcompiler_simpleform"	# DDL compiler module to load
 opt="$opt --module $mod"

@@ -76,6 +76,12 @@ bool fileExists( const std::string& path);
 ///\param[in] splitchr set of characters to split with (each of them is one separating character)
 void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchr);
 
+///\brief Split the string, ingoring empty parts of the result (susequent split characters treated as one)
+///\param[in] begin begin input iterator
+///\param[in] end end input iterator
+///\param[in] splitchr set of characters to split with (each of them is one separating character)
+void splitString( std::vector<std::string>& res, std::string::const_iterator begin, std::string::const_iterator end, const char* splitchr);
+
 
 /// \brief Normalize a string in place
 /// \param[in][out] str	string to be normalized
@@ -95,12 +101,12 @@ std::string normalizeString_copy( const std::string& str );
 int stringSimilarity( const std::string& str1, const std::string& str2 );
 
 
-///\class OperatorTable
-///\brief Operator table structure for parseNextToken( std::string&,std::string::const_iterator&, std::string::const_iterator, );
-class OperatorTable
+///\class CharTable
+///\brief Character table structure for parseNextToken( std::string&,std::string::const_iterator&, std::string::const_iterator, ...);
+class CharTable
 {
 public:
-	OperatorTable( const char* op="");
+	CharTable( const char* op="", bool isInverse=false);
 	bool operator[]( char ch) const		{return m_ar[ (unsigned char)ch];}
 private:
 	bool m_ar[256];
@@ -118,14 +124,18 @@ private:
 ///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the token parsed)
 ///\param[in] end iterator marking the end of the source
 ///\param[in] operatorTable (optional) operator table
-char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const OperatorTable& operatorTable);
+///\param[in] alphaTable (optional) token alphabet as character table
+char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& operatorTable, const CharTable& alphaTable);
+///\brief See utils::parseNextToken(std::string&,std::string::const_iterator&,std::string::const_iterator,const CharTable&,const CharTable&)
+char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& operatorTable);
+///\brief See utils::parseNextToken(std::string&,std::string::const_iterator&,std::string::const_iterator,const CharTable&,const CharTable&)
 char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end);
 
 
 ///\brief Reading the content of a source file
 ///\remark Throws on error
-///\TODO BETTER AND SAVER IMPLEMENTATION
 std::string readSourceFileContent( const std::string& filename);
+std::vector<std::string> readSourceFileLines( const std::string& filename);
 
 }} //namespace _Wolframe::utils
 

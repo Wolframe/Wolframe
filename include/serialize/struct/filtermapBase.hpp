@@ -114,6 +114,10 @@ public:
 
 	bool parse( void* obj, langbind::TypedInputFilter& in, Context& ctx, FiltermapParseStateStack& stk) const;
 
+	///\brief Initializes an atomic element in a structure
+	///\remark Not very efficient implementation
+	bool setAtomicValue( void* obj, std::size_t idx, const std::string& value) const;
+
 	bool init( void* obj) const
 	{
 		return (m_constructor)?m_constructor( obj):true;

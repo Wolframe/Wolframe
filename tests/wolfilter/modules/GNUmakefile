@@ -1,6 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS = employee_assignment_convert
+SUBDIRS = employee_assignment_convert database transaction
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

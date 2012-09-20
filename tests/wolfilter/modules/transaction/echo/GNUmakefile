@@ -18,7 +18,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_transaction_echo.so
 
 CPP_OBJS = \
-	echo_cmdhandler.o \
+	echo_transaction.o \
 	mod_transaction_echo.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

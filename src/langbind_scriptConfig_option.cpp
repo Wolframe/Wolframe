@@ -34,6 +34,7 @@
 ///\brief Implementation of the data structures on command line for the script execution configuration of a processor
 #include "langbind/scriptConfig_option.hpp"
 #include "langbind/scriptConfig_struct.hpp"
+#include "serialize/structOptionParser.hpp"
 #include "utils/miscUtils.hpp"
 
 using namespace _Wolframe;

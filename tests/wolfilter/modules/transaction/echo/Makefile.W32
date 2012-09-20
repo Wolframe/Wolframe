@@ -25,7 +25,7 @@ DYNAMIC_MODULE = \
 	mod_transaction_echo.dll
 
 CPP_OBJS = \
-	echo_cmdhandler.obj \
+	echo_transaction.obj \
 	mod_transaction_echo.obj
 
 all: $(DYNAMIC_MODULE)

@@ -35,6 +35,7 @@
 #ifndef _Wolframe_APPLICATION_ENVIRONMENT_CMDLINE_OPTION_STRUCT_HPP_INCLUDED
 #define _Wolframe_APPLICATION_ENVIRONMENT_CMDLINE_OPTION_STRUCT_HPP_INCLUDED
 #include "langbind/appConfig_struct.hpp"
+#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
 namespace langbind {
@@ -52,6 +53,21 @@ struct PrintLayoutOption :public langbind::PrintLayoutConfigStruct
 struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStruct
 {
 	TransactionFunctionOption( const std::string& src);
+};
+
+
+class DatabaseConfigOption
+{
+public:
+	DatabaseConfigOption( const std::string& opt);
+
+	boost::property_tree::ptree tree() const
+	{
+		return m_tree;
+	}
+
+private:
+	boost::property_tree::ptree m_tree;
 };
 
 }}//namespace

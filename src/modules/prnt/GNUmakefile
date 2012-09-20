@@ -7,7 +7,7 @@ SUBDIRS =
 SUBDIRS += testPdfPrinter
 
 ifeq ($(WITH_LIBHPDF),1)
-#PF:DISABLED: SUBDIRS += haruPdfPrinter
+SUBDIRS += haruPdfPrinter
 endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

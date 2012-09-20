@@ -44,8 +44,8 @@ namespace langbind {
 
 struct DDLFormConfigStruct
 {
-	std::string DDL;						//< (optional) name of DDL referencing the DDL compiler (langbind::DDLCompilerConfigStruct)
 	std::string file;						//< path of the DDL source of this form. The name of the function is defined in the source or given by the stem of the file name in 'sourcepath'
+	std::string DDL;						//< (optional) name of DDL referencing the DDL compiler (langbind::DDLCompilerConfigStruct)
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();
@@ -53,9 +53,9 @@ struct DDLFormConfigStruct
 
 struct PrintLayoutConfigStruct
 {
+	std::string file;						//< path of the source of this print function containing the print layout description.
 	std::string name;						//< (optional) name of the print function. If not defined then the the name of the print function is the stem of the file name in 'sourcepath'
 	std::string type;						//< (optional) type of the print function. Defines the interpreter of the print layout description in the source file, creating a print function out of it. If not specified, then the file extension determines the type
-	std::string file;						//< path of the source of this print function containing the print layout description.
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();

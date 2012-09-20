@@ -91,6 +91,37 @@ static std::string configurationTree_tostring( const boost::property_tree::ptree
 	return res->content();
 }
 
+namespace po = boost::program_options;
+
+struct OptionStruct
+{
+	po::options_description fopt;
+	po::positional_options_description popt;
+
+	OptionStruct()
+		:fopt("Options")
+	{
+		fopt.add_options()
+			( "version,v", "print version" )
+			( "help,h", "print help message" )
+			( "loglevel,l", po::value<std::string>(), "specify the log level on console" )
+			( "input,f", po::value<std::string>(), "specify input file to process by path" )
+			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
+			( "form,r", po::value< std::vector<std::string> >(), "specify form to load by path" )
+			( "printlayout,p", po::value< std::vector<std::string> >(), "specify print layout for a form" )
+			( "transaction,t", po::value< std::vector<std::string> >(), "specify transaction function" )
+			( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
+			( "cmd", po::value<std::string>(), "name of the command to execute")
+			( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
+			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
+			;
+
+		popt.add( "cmd", 1);
+		popt.add( "output-filter", 1);
+		popt.add( "input-filter", 1);
+	}
+};
+
 WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath)
 	:m_printhelp(false)
 	,m_printversion(false)
@@ -98,33 +129,17 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	,m_outbufsize(8<<10)
 	,m_referencePath(referencePath)
 {
-	namespace po = boost::program_options;
-
-	po::options_description fopt("Options");
-	fopt.add_options()
-		( "version,v", "print version" )
-		( "help,h", "print help message" )
-		( "loglevel,l", po::value<std::string>(), "specify the log level on console" )
-		( "input,f", po::value<std::string>(), "specify input file to process by path" )
-		( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
-		( "form,r", po::value< std::vector<std::string> >(), "specify form to load by path" )
-		( "printlayout,p", po::value< std::vector<std::string> >(), "specify print layout for a form" )
-		( "transaction,t", po::value< std::vector<std::string> >(), "specify transaction function" )
-		( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
-		( "cmd", po::value<std::string>(), "name of the command to execute")
-		( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
-		( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
-		;
-
-	po::positional_options_description popt;
-	popt.add( "cmd", 1);
-	popt.add( "output-filter", 1);
-	popt.add( "input-filter", 1);
-
+	static const OptionStruct ost;
 	po::variables_map vmap;
-	po::store( po::command_line_parser(argc, argv).options(fopt).positional(popt).run(), vmap);
-	po::notify( vmap);
-
+	try
+	{
+		po::store( po::command_line_parser(argc, argv).options(ost.fopt).positional(ost.popt).run(), vmap);
+		po::notify( vmap);
+	}
+	catch (std::exception& e)
+	{
+		throw std::runtime_error( std::string("error parsing command line options: ") + e.what());
+	}
 	m_printversion = vmap.count( "version");
 	m_printhelp = vmap.count( "help");
 	if (vmap.count( "loglevel"))
@@ -201,7 +216,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	}
 
 	std::ostringstream dd;
-	dd << fopt;
+	dd << ost.fopt;
 	m_helpstring = dd.str();
 
 	// Load modules
@@ -224,10 +239,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		throw std::runtime_error( "Configuration could not be created from command line");
 	}
 	m_providerConfig->setCanonicalPathes( referencePath);
-	if (!m_providerConfig->check())
-	{
-		throw std::runtime_error( "Configuration created from command line is not valid");
-	}
 }
 
 void WolfilterCommandLine::print(std::ostream& out) const

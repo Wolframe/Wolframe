@@ -127,7 +127,10 @@ TEST_F( WolfilterTest, tests)
 
 		// [2.4] Parse command line in config section of the test description
 		std::vector<std::string> cmd;
-		utils::splitString( cmd, td.config, "\n\t\r ");
+		std::string arg;
+		std::string::const_iterator ai = td.config.begin(), ae = td.config.end();
+		utils::CharTable argop( ""), argtk( "", true);
+		for (; ai != ae && utils::parseNextToken( arg, ai, ae, argop, argtk); ++ai) cmd.push_back( arg);
 
 		std::cerr << "processing test '" << testname << "'" << std::endl;
 		enum {MaxNofArgs=31};

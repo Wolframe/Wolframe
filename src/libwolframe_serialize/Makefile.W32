@@ -33,7 +33,8 @@ CPP_OBJS = \
 	$(TOPDIR)\src\serialize_struct_filtermapParse.obj \
 	$(TOPDIR)\src\serialize_struct_filtermapParseStack.obj \
 	$(TOPDIR)\src\serialize_struct_filtermapSerialize.obj \
-	$(TOPDIR)\src\serialize_struct_filtermapSerializeStack.obj
+	$(TOPDIR)\src\serialize_struct_filtermapSerializeStack.obj \
+	$(TOPDIR)\src\serialize_structOptionParser.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

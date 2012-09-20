@@ -35,7 +35,7 @@
 #include "langbind/transactionFunction.hpp"
 #include "module/transactionFunctionBuilder.hpp"
 #include "logger-v1.hpp"
-#include "echo_cmdhandler.hpp"
+#include "echo_transaction.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 

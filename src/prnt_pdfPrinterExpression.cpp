@@ -258,7 +258,7 @@ static Expression parseFactorExpression( const Expression& op1, std::string::con
 static Expression parseAssignExpression( const Expression& op1, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings);
 static Expression parseAssignExpressionList( char separator, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings);
 static StateDef::MethodCall parseMethodCall( std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings);
-static utils::OperatorTable g_operatorTable( "#(){}[]=+-*/,;?");
+static utils::CharTable g_operatorTable( "#(){}[]=+-*/,;?");
 
 
 static Expression parseOperand( std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings)

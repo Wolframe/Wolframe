@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\file tests/wolfilter/modules/transaction/echo/echo_transaction.cpp
 ///\brief Implementation of a fake transaction handler for tests
-#include "echo_cmdhandler.hpp"
+#include "echo_transaction.hpp"
 #include <string>
 #include <cstring>
 #include <stdexcept>

@@ -190,3 +190,43 @@ bool StructSerializer::getNext( langbind::FilterBase::ElementType& type, langbin
 	return true;
 }
 
+
+class OneElementTypedInputFilter
+	:public langbind::TypedInputFilter
+{
+public:
+	OneElementTypedInputFilter( const std::string& value)
+		:m_value(value)
+		,m_consumed(false){}
+
+	virtual bool getNext( ElementType& type, Element& element)
+	{
+		if (m_consumed) return false;
+		type = TypedInputFilter::Value;
+		element = m_value;
+		m_consumed = true;
+		return true;
+	}
+private:
+	std::string m_value;
+	bool m_consumed;
+};
+
+
+bool StructDescriptionBase::setAtomicValue( void* obj, std::size_t idx, const std::string& value) const
+{
+	if (idx >= nof_elements()) throw std::runtime_error( "structure element index out of range");
+
+	Map::const_iterator itr = begin() + idx;
+	void* objelemptr = (char*)obj + itr->second.ofs();
+	if (itr->second.type() != StructDescriptionBase::Atomic)
+	{
+		throw std::runtime_error( "atomic value expected for call of set atomic value");
+	}
+	Context ctx;
+	FiltermapParseStateStack stk;
+	OneElementTypedInputFilter inp( value);
+	stk.push_back( FiltermapParseState( itr->first.c_str(), itr->second.parse(), objelemptr));
+	return stk.back().parse()( inp, ctx, stk);
+}
+

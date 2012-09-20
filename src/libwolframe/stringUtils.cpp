@@ -42,6 +42,7 @@ Project Wolframe.
 #include <string>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <boost/range/iterator_range.hpp>
 
 using namespace _Wolframe::utils;
 
@@ -54,6 +55,16 @@ void _Wolframe::utils::splitString( std::vector<std::string>& res, const std::st
 	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
 }
 
+void _Wolframe::utils::splitString( std::vector<std::string>& res, std::string::const_iterator begin, std::string::const_iterator end, const char* splitchrs)
+{
+	res.clear();
+	std::vector<std::string> imm;
+	typedef boost::iterator_range<std::string::const_iterator> irange;
+	irange ir = boost::make_iterator_range( begin, end);
+	boost::split( imm, ir, boost::is_any_of(splitchrs));
+	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
+	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
+}
 
 /// Rules:
 /// - trim the string left and right

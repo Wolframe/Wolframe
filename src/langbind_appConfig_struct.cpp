@@ -48,8 +48,8 @@ const serialize::StructDescriptionBase* DDLFormConfigStruct::getStructDescriptio
 		ThisDescription()
 		{
 			(*this)
-			( "DDL",		&DDLFormConfigStruct::DDL)
 			( "file",		&DDLFormConfigStruct::file)
+			( "DDL",		&DDLFormConfigStruct::DDL)
 			;
 		}
 	};
@@ -64,9 +64,9 @@ const serialize::StructDescriptionBase* PrintLayoutConfigStruct::getStructDescri
 		ThisDescription()
 		{
 			(*this)
+			( "file",		&PrintLayoutConfigStruct::file)
 			( "name",		&PrintLayoutConfigStruct::name)
 			( "type",		&PrintLayoutConfigStruct::type)
-			( "file",		&PrintLayoutConfigStruct::file)
 			;
 		}
 	};

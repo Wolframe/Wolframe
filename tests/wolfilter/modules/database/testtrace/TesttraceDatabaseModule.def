@@ -1,0 +1,5 @@
+LIBRARY mod_db_testtrace
+
+EXPORTS
+entryPoint	@1
+

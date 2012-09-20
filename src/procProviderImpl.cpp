@@ -41,10 +41,10 @@
 #include "config/ConfigurationTree.hpp"
 #include "logger-v1.hpp"
 #include "moduleDirectory.hpp"
+#include "utils/miscUtils.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
@@ -162,13 +162,10 @@ void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
 bool ProcProviderConfig::check() const
 {
 	bool correct = true;
-#if PF_DISABLED
-//...Configuration without database can be possible in wolfilter
 	if ( m_dbLabel.empty() )	{
 		LOG_ERROR << logPrefix() << "referenced database ID can not be empty";
 		correct = false;
 	}
-#endif
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		if ( !(*it)->check() )

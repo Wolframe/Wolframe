@@ -105,7 +105,7 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/cmdbind/luaCommandHandler/mod_lua_command_handler --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --printlayout print_invoice.tracepdf:invoice.simplepdf --form invoice.simpleform --script print_table.lua run
+--input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/cmdbind/luaCommandHandler/mod_lua_command_handler --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --printlayout f=invoice.simplepdf,n=print_invoice,t=tracepdf --form invoice.simpleform --script print_table.lua run
 **file: print_table.lua
 
 function run()

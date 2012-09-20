@@ -91,9 +91,10 @@ public:
 	/* we should also decide how we handle db encoding
 	virtual const char* encoding() const = 0; */
 
-	virtual PreparedStatementHandler* getPreparedStatementHandler() const
+	///\brief Get the interface for processing prepared statements in the database
+	virtual PreparedStatementHandler* getPreparedStatementHandler()
 	{
-		return 0; //undefined by default
+		return 0; //undefined (not available) by default
 	}
 
 	/// Close the database connetion

@@ -44,19 +44,14 @@ Project Wolframe.
 
 using namespace _Wolframe::utils;
 
-OperatorTable::OperatorTable( const char* op)
+CharTable::CharTable( const char* op, bool isInverse)
 {
 	std::size_t ii;
-	for (ii=0; ii<sizeof(m_ar); ++ii) m_ar[ii]=false;
-	for (ii=0; op[ii]; ++ii) m_ar[(unsigned char)(op[ii])]=true;
+	for (ii=0; ii<sizeof(m_ar); ++ii) m_ar[ii]=isInverse;
+	for (ii=0; op[ii]; ++ii) m_ar[(unsigned char)(op[ii])]=!isInverse;
 }
 
-static bool isLetter( char ch)
-{
-	return (ch < 0 || ((ch|32) >= 'a' && (ch|32) <= 'z') || (ch >= '0' && ch <= '9') || ch == '_');
-}
-
-char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const OperatorTable& operatorTable)
+char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& operatorTable, const CharTable& alphaTable)
 {
 	char rt = '\0';
 	tok.clear();
@@ -85,13 +80,12 @@ char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 	}
 	else if (operatorTable[ *itr])
 	{
-		tok.push_back( *itr);
 		++itr;
 		return rt;
 	}
-	else if (isLetter( *itr))
+	else if (alphaTable[ *itr])
 	{
-		while ( itr != end && isLetter( *itr)) tok.push_back( *itr++);
+		while (itr != end && (unsigned char)*itr > 32 && alphaTable[ *itr]) tok.push_back( *itr++);
 		return rt;
 	}
 	else
@@ -100,16 +94,27 @@ char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 	}
 }
 
+struct IdentifierTable :public CharTable
+{
+	IdentifierTable() :CharTable( "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"){}
+};
+
+char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& operatorTable)
+{
+	static CharTable identifierTable( "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+	return parseNextToken( tok, itr, end, operatorTable, identifierTable);
+}
+
 char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end)
 {
-	static OperatorTable noOperator;
-	return parseNextToken( tok,itr,end,noOperator);
+	static CharTable noOperator;
+	return parseNextToken( tok, itr, end, noOperator);
 }
 
 
-std::string _Wolframe::utils::readSourceFileContent( const std::string& filename)
+template <class Result>
+static void readSourceFileContentT( const std::string& filename, Result& res)
 {
-	std::ostringstream src;
 	std::ifstream inFile( filename.c_str());
 	try
 	{
@@ -120,23 +125,40 @@ std::string _Wolframe::utils::readSourceFileContent( const std::string& filename
 			std::string ln;
 			if (inFile.eof()) break;
 			std::getline( inFile, ln);
-			src << ln << "\n";
+			res.push_back( ln);
 		}
-		return src.str();
 	}
 	catch (const std::ifstream::failure& e)
 	{
 		if (!(inFile.rdstate() & std::ifstream::eofbit))
 		{
-			// ... puzzle: I try to mask the EOF exception, but it is still thrown. Maybe because of 'getline' ?
 			std::ostringstream msg;
 			msg << "error '" << e.what() << "' reading file '" << filename << "'" << std::endl;
 			throw std::runtime_error( msg.str());
 		}
-		else
-		{
-			return src.str();
-		}
 	}
 }
+
+struct ContentBuffer :public std::ostringstream
+{
+	void push_back( const std::string& line)
+	{
+		(*this) << line << std::endl;
+	}
+};
+
+std::string _Wolframe::utils::readSourceFileContent( const std::string& filename)
+{
+	ContentBuffer rt;
+	readSourceFileContentT<ContentBuffer>( filename, rt);
+	return rt.str();
+}
+
+std::vector<std::string> _Wolframe::utils::readSourceFileLines( const std::string& filename)
+{
+	std::vector<std::string> rt;
+	readSourceFileContentT( filename, rt);
+	return rt;
+}
+
 

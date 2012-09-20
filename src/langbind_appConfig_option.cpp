@@ -1,4 +1,4 @@
-/************************************************************************
+/***********************************************************************
 
  Copyright (C) 2011, 2012 Project Wolframe.
  All rights reserved.
@@ -34,85 +34,42 @@
 ///\brief Implementation of the data structures on command line for the processor environment configuration
 #include "langbind/appConfig_option.hpp"
 #include "langbind/appConfig_struct.hpp"
+#include "serialize/structOptionParser.hpp"
 #include "utils/miscUtils.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-static void parseNameTypeSource( const std::string& opt, bool getFilenameStemAsName, std::string& name, std::string& type, std::string& file)
+DDLFormOption::DDLFormOption( const std::string& opt)
 {
-	const char* cc = std::strchr( opt.c_str(), ':');
-	const char* xx = std::strchr( opt.c_str(), '.');
-	if (cc && cc-opt.c_str() > 1)
+	serialize::parseStructOptionString( *this, opt);
+	if (DDL.empty())
 	{
-		if (xx && xx < cc)
-		{
-			std::string type_name( opt.c_str(), cc-opt.c_str());
-			std::string ext = utils::getFileExtension( type_name);
-			std::string stem = utils::getFileStem( type_name);
-
-			if (!ext.empty()) type = std::string( ext.c_str() + 1);
-			if (!stem.empty()) name = std::string( stem.c_str());
-		}
-		else
-		{
-			type = std::string( opt.c_str(), cc-opt.c_str());
-			name = "";
-		}
-		file = std::string( cc+1);
-		if (type.empty())
-		{
-			std::string ext = utils::getFileExtension( file);
-			if (!ext.empty()) type = std::string( ext.c_str() + 1);
-		}
-		if (name.empty() && getFilenameStemAsName)
-		{
-			std::string stem = utils::getFileStem( file);
-			if (!stem.empty()) name = std::string( stem.c_str());
-		}
-	}
-	else
-	{
-		file = opt;
 		std::string ext = utils::getFileExtension( opt);
-		if (ext.empty()) throw std::runtime_error( "no type of print layout specified (file extension missing)");
-		type = std::string( ext.c_str() + 1);
-
-		if (getFilenameStemAsName)
-		{
-			std::string stem = utils::getFileStem( opt);
-			if (stem.empty()) throw std::runtime_error( "no name of print layout specified (file stem missing)");
-			name = std::string( stem.c_str());
-		}
-	}
-}
-
-DDLFormOption::DDLFormOption( const std::string& src)
-{
-	const char* cc = std::strchr( src.c_str(), ':');
-	if (cc && cc-src.c_str() > 1)
-	{
-		DDL = std::string( src.c_str(), cc-src.c_str());
-		file = std::string( cc+1);
-	}
-	else
-	{
-		std::string ext = utils::getFileExtension( src);
-		if (!ext.size()) throw std::runtime_error( "no DDL specified (file extension missing) for form file");
-
+		if (ext.empty()) throw std::runtime_error( "no DDL specified (file extension missing) for form file");
 		DDL = std::string( ext.c_str()+1);
-		file = src;
 	}
 }
 
 PrintLayoutOption::PrintLayoutOption( const std::string& opt)
 {
-	parseNameTypeSource( opt, true, name, type, file);
+	serialize::parseStructOptionString( *this, opt);
+	if (name.empty())
+	{
+		name = utils::getFileStem( opt);
+		if (name.empty()) throw std::runtime_error( "no name specified for layout description (file stem empty)");
+	}
+	if (type.empty())
+	{
+		std::string ext = utils::getFileExtension( opt);
+		if (ext.empty()) throw std::runtime_error( "no type specified for layout description (file extension missing)");
+		type = std::string( ext.c_str()+1);
+	}
 }
 
-TransactionFunctionOption::TransactionFunctionOption( const std::string& src)
+TransactionFunctionOption::TransactionFunctionOption( const std::string& opt)
 {
-	std::string::const_iterator si = src.begin(), se = src.end();
+	std::string::const_iterator si = opt.begin(), se = opt.end();
 	if (!utils::parseNextToken( name, si, se))
 	{
 		throw std::runtime_error( "illegal transaction function option (name)");
@@ -123,6 +80,12 @@ TransactionFunctionOption::TransactionFunctionOption( const std::string& src)
 	}
 	call.insert( call.end(), si, se);
 }
+
+DatabaseConfigOption::DatabaseConfigOption( const std::string& opt)
+{
+	serialize::parseStructOptionTree( m_tree, opt);
+}
+
 
 
 
