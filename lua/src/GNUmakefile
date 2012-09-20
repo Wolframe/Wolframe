@@ -2,6 +2,8 @@ TOPDIR = ../..
 
 SUBDIRS =
 
+PACKAGE_NAME = wolframe
+
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_LDFLAGS = \
@@ -56,6 +58,8 @@ BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
+libdir=$(execdir)/$(LIBDIR)
+
 # overwrite flags so they fit to how Lua people compile the software.
 # we get too many spurios errors and problems (for instance in abuild
 # checks on openSuSE). This doesn't mean they should not be fixed
@@ -68,6 +72,16 @@ local_clean:
 
 local_distclean:
 
+DIST_HEADERS = \
+	lauxlib.h lua.h lua.hpp luaconf.h lualib.h
+
 local_install:
+	$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)/wolframe/lua
+	$(INSTALL) -m 644 $(DIST_HEADERS) $(DESTDIR)$(includedir)/wolframe/lua
+
+local_uninstall:
+	-rm -rf $(DESTDIR)$(includedir)/wolframe/lua/*
+	-rmdir $(DESTDIR)$(includedir)/wolframe/lua
+	-rmdir $(DESTDIR)$(includedir)/wolframe
 
 local_test:

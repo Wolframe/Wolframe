@@ -545,7 +545,7 @@ for i in \
 	libboost_program_options.so.%{boost_version} libboost_system.so.%{boost_version} \
 	libboost_filesystem.so.%{boost_version} libboost_thread.so.%{boost_version} \
 	libboost_date_time.so.%{boost_version}; do
-    cp /tmp/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
+	cp /tmp/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
 done
 %endif
 
@@ -620,6 +620,18 @@ fi
 %{_libdir}/wolframe/libwolframe.so.0
 %{_libdir}/wolframe/libwolframe_serialize.so.0.0.0
 %{_libdir}/wolframe/libwolframe_serialize.so.0
+%{_libdir}/wolframe/libwolframe_langbind.so.0.0.0
+%{_libdir}/wolframe/libwolframe_langbind.so.0
+
+%if %{with_lua}
+%{_libdir}/wolframe/liblua.so.5.2.0
+%{_libdir}/wolframe/liblua.so.5
+%endif
+
+%if %{with_local_libhpdf}
+%{_libdir}/wolframe/libhpdf.so.2.2.1
+%{_libdir}/wolframe/libhpdf.so.2
+%endif
 
 %dir %{_libdir}/wolframe/modules
 
@@ -638,6 +650,13 @@ fi
 %{_libdir}/wolframe/modules/mod_filter_token.so
 %{_libdir}/wolframe/modules/mod_filter_blob.so
 
+%{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
+
+%{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
+%{_libdir}/wolframe/modules/mod_lua_datetime.so
+
+%{_libdir}/wolframe/modules/mod_lua_command_handler.so
+
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
 
@@ -654,6 +673,21 @@ fi
 %{_libdir}/wolframe/libwolframe.a
 %{_libdir}/wolframe/libwolframe_serialize.so
 %{_libdir}/wolframe/libwolframe_serialize.a
+%{_libdir}/wolframe/libwolframe_langbind.so
+%{_libdir}/wolframe/libwolframe_langbind.a
+%if %{with_lua}
+%{_libdir}/wolframe/liblua.so
+%{_libdir}/wolframe/liblua.a
+%dir %{_includedir}/wolframe/lua
+%{_includedir}/wolframe/lua/*.h
+%{_includedir}/wolframe/lua/*.hpp
+%endif
+%if %{with_local_libhpdf}
+%{_libdir}/wolframe/libhpdf.so
+%{_libdir}/wolframe/libhpdf.a
+%dir %{_includedir}/wolframe/libhpdf
+%{_includedir}/wolframe/libhpdf/*.h
+%endif
 %dir %{_includedir}/wolframe
 %{_includedir}/wolframe/*.hpp
 %dir %{_includedir}/wolframe/langbind/

@@ -2,6 +2,8 @@ TOPDIR = ../..
 
 SUBDIRS =
 
+PACKAGE_NAME = wolframe
+
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_DIRS = \
@@ -92,5 +94,7 @@ local_clean:
 local_distclean:
 
 local_install:
+
+local_uninstall:
 
 local_test:
