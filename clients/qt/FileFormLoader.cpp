@@ -32,13 +32,19 @@ QByteArray FileFormLoader::readFile( QString name )
 	return data;
 }
 
-void FileFormLoader::initiateFormLoad( QString &name, QLocale locale )
+void FileFormLoader::initiateFormLocalizationLoad( QString &name, QLocale locale )
+{
+	QByteArray localization = readFile( m_localeDir + "/" + name + "." + locale.name( ) + ".qm" );
+	
+	emit formLocalizationLoaded( name, localization );
+}
+
+void FileFormLoader::initiateFormLoad( QString &name )
 {
 // read directly here and stuff data into the signal
 	QByteArray form = readFile( m_formDir + "/" + name + ".ui" );
-	QByteArray localization = readFile( m_localeDir + "/" + name + "." + locale.name( ) + ".qm" );
 
-	emit formLoaded( name, form, localization );
+	emit formLoaded( name, form );
 }
 
 QStringList FileFormLoader::getFormNames( )

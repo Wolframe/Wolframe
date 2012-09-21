@@ -56,9 +56,12 @@ void MainWindow::initialize( )
 
 // set default language to the system language
 	m_currentLanguage = QLocale::system( ).name( );
-		
+
 // load default theme
 	loadTheme( QString( QLatin1String( "windows" ) ) );
+
+// load language resources, repaints the whole interface if necessary
+	loadLanguage( QLocale::system( ).name( ) );		
 }
 
 void MainWindow::populateThemesMenu( )
@@ -197,10 +200,13 @@ void MainWindow::formListLoaded( )
 void MainWindow::languageSelected( QAction *action )
 {
 	QString language = action->data( ).toString( );
+	if( language != m_currentLanguage )
+		loadLanguage( language );
+}
+
+void MainWindow::loadLanguage( QString language )
+{		
 	qDebug( ) << "Switching interface language to " << language;
-	if( language == m_currentLanguage ) {
-		return;
-	}
 
 // get list of all translators currently floating around and delete them
 	const QList<QTranslator *> oldTranslators( findChildren<QTranslator *>( ) );
@@ -218,12 +224,15 @@ void MainWindow::languageSelected( QAction *action )
 // install new ones, first the ones of the theme, then the ones of the current form
 // all other forms will reinstall the correct language when called again
 	QTranslator *translator = new QTranslator( this );
-	if( !translator->load( language, "themes" + m_currentTheme ) ) {
+	if( !translator->load( "qtclient." + language, "themes/" + m_currentTheme ) ) {
 		qDebug( ) << "Error while loading translations for theme " <<
 			m_currentTheme << " for locale " << language;
 	}
 	QCoreApplication::instance( )->installTranslator( translator );
 
+// also set language of the form widget
+	m_formWidget->loadLanguage( language );
+	
 	m_currentLanguage = language;
 }
 
@@ -245,7 +254,10 @@ void MainWindow::formSelected( QAction *action )
 void MainWindow::loadForm( QString name )
 {
 // delegate form loading to form widget
-	m_formWidget->loadForm( name, QLocale( m_currentLanguage ) );
+	m_formWidget->loadForm( name );
+
+// also set language of the form widget
+	m_formWidget->loadLanguage( m_currentLanguage );
 
 // remember the name of the current form
 	m_currentForm = name;

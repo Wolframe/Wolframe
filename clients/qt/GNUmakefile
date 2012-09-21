@@ -103,8 +103,8 @@ THEMES = \
 
 I18NS = \
 	i18n/form1.de_CH.qm \
-	themes/windows/de_CH.qm \
-	themes/phone/de_CH.qm
+	themes/windows/qtclient.de_CH.qm \
+	themes/phone/qtclient.de_CH.qm
 
 local_all: $(I18NS)
 
@@ -136,6 +136,6 @@ run: local_all $(CPP_BINS)
 
 .PHONY: buildi18n
 buildi18n:
-	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/de_CH.ts
-	$(QT_LUPDATE) lupdate themes/phonr/MainWindow.ui -ts themes/phone/de_CH.ts
+	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/qtclient.de_CH.ts
+	$(QT_LUPDATE) lupdate themes/phonr/MainWindow.ui -ts themes/phone/qtclient.de_CH.ts
 	$(QT_LUPDATE) lupdate forms/form1.ui -ts i18n/form1.de_CH.ts

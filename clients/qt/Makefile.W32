@@ -85,8 +85,8 @@ themes\phone\de_CH.qm: themes\phone\de_CH.ts
 	
 I18NS = \
 	i18n\form1.de_CH.qm \
-	themes\windows\de_CH.qm \
-	themes\phone\de_CH.qm
+	themes\windows\qtclient.de_CH.qm \
+	themes\phone\qtclient.de_CH.qm
 
 local_all: $(I18NS)
 
@@ -144,6 +144,6 @@ run: $(CPP_BINS)
 	@-test.bat
 
 buildi18n:
-	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\de_CH.ts
-	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe forms\form1.ui -ts i18n\form1.de_CH.ts

@@ -24,7 +24,8 @@ namespace _Wolframe {
 	public:
 		FormWidget( FormLoader *_formLoader, QWidget *_parent );
 		virtual ~FormWidget( );
-		void loadForm( QString name, QLocale locale );
+		void loadForm( QString name );
+		void loadLanguage( QString language );
 	
 	private:
 		QString m_name;			// name of the form
@@ -40,7 +41,8 @@ namespace _Wolframe {
 		void initialize( );
 		
 	private Q_SLOTS:
-		void formLoaded( QString name, QByteArray form, QByteArray localization );
+		void formLoaded( QString name, QByteArray form );
+		void formLocalizationLoaded( QString name, QByteArray localization );
 		void dataLoaded( QString name, QByteArray xml );
 		void dataSaved( QString name );
 

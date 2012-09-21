@@ -40,7 +40,7 @@ namespace _Wolframe {
 		void loadTheme( QString themeName );
 		void loadLanguages( );
 		void loadForm( QString formName );
-		void loadData( QString formName );
+		void loadLanguage( QString language );
 
 	private Q_SLOTS:
 		void themeSelected( QAction *action );

@@ -15,7 +15,7 @@ namespace _Wolframe {
 	namespace QtClient {
 
 FormWidget::FormWidget( FormLoader *_formLoader, QWidget *_parent )
-	: QWidget( _parent ), m_formLoader( _formLoader ), m_ui( 0 )
+	: QWidget( _parent ), m_formLoader( _formLoader ), m_ui( 0 ), m_locale( "en_US" )
 {
 // Qt Designer UI loader, enable automatic language switch handling
 	m_uiLoader = new QUiLoader( );
@@ -35,8 +35,10 @@ FormWidget::FormWidget( FormLoader *_formLoader, QWidget *_parent )
 void FormWidget::initialize( )
 {
 // link the form loader for form loader notifications
-	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray, QByteArray ) ),
-		this, SLOT( formLoaded( QString, QByteArray, QByteArray ) ) );	
+	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
+		this, SLOT( formLoaded( QString, QByteArray ) ) );	
+	QObject::connect( m_formLoader, SIGNAL( formLocalizationLoaded( QString, QByteArray ) ),
+		this, SLOT( formLocalizationLoaded( QString, QByteArray ) ) );	
 
 // link the data loader to our form widget
 	QObject::connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
@@ -53,21 +55,34 @@ FormWidget::~FormWidget( )
 	delete m_uiLoader;
 }
 
-void FormWidget::loadForm( QString name, QLocale locale )
+void FormWidget::loadForm( QString name )
 {
 // indicate busy state
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
 	m_name = name;
-	m_locale = locale;
 
-	qDebug( ) << "Initiating form load for " << name;
-	m_formLoader->initiateFormLoad( name, locale );	
+	qDebug( ) << "Initiating form load for " << m_name;
+	
+	m_formLoader->initiateFormLoad( m_name );
 }	
 
-void FormWidget::formLoaded( QString name, QByteArray form, QByteArray localization )
+void FormWidget::loadLanguage( QString language )
 {
-	qDebug( ) << "Form " << name << " loaded";
+// indicate busy state
+	qApp->setOverrideCursor( Qt::BusyCursor );
+
+	m_locale = QLocale( language );
+	
+	qDebug( ) << "Initiating form locatization load for " << m_name << " and locale "
+		<< m_locale.name( );
+		
+	m_formLoader->initiateFormLocalizationLoad( m_name, m_locale );
+}
+
+void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
+{
+	qDebug( ) << "Form localization loaded for " << name << ", locale " << m_locale.name( );
 
 // get list of all translators for this form and delete them
 	const QList<QTranslator *> oldTranslators( m_ui->findChildren<QTranslator *>( ) );
@@ -76,13 +91,7 @@ void FormWidget::formLoaded( QString name, QByteArray form, QByteArray localizat
 		QCoreApplication::instance( )->removeTranslator( translator );
 	}
 	qDeleteAll( oldTranslators );
-
-// read the form and construct it from the UI file
-	QWidget *oldUi = m_ui;
-	QBuffer buf( &form );
-	m_ui = m_uiLoader->load( &buf, this );
-	buf.close( );
-
+	
 // install translation files for this form
 	QTranslator *translator = new QTranslator( m_ui );
 	if( !translator->load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
@@ -90,6 +99,20 @@ void FormWidget::formLoaded( QString name, QByteArray form, QByteArray localizat
 			name << " for locale " << m_locale.name( );
 	}
 	QCoreApplication::instance( )->installTranslator( translator );
+
+// not busy anymore
+	qApp->restoreOverrideCursor( );	
+}
+
+void FormWidget::formLoaded( QString name, QByteArray form )
+{
+	qDebug( ) << "Form " << name << " loaded";
+
+// read the form and construct it from the UI file
+	QWidget *oldUi = m_ui;
+	QBuffer buf( &form );
+	m_ui = m_uiLoader->load( &buf, this );
+	buf.close( );
 
 // add new form to layout (which covers the whole widget)
 	m_layout->addWidget( m_ui );
@@ -101,6 +124,9 @@ void FormWidget::formLoaded( QString name, QByteArray form, QByteArray localizat
 		oldUi->setParent( 0 );
 	}
 	m_ui->show( );	
+
+// set localization now
+	m_formLoader->initiateFormLocalizationLoad( m_name, m_locale );
 
 // initiate load of form data
 	qDebug( ) << "Initiating loading of form data for form " << name;
