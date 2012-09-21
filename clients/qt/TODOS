@@ -3,7 +3,6 @@
   - Domain names like 'male', 'female', separate view localized form
     and use something different internally, also, should the domains
     come from the ui or as a separate request?
-- investigate why auto-wiring failed in the past
 - add a data handler
   - simplest form is read data as XML from a directory (as for
     the forms)
@@ -32,6 +31,3 @@
 - attach the DebugWindow also to the simple file based form
   and data loader, to test the debugging window. Needs line peeking
   and rewinding QIODevice
-- workflow
-  - save, cancel of form (first step)
-
