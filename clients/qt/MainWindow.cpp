@@ -218,9 +218,9 @@ void MainWindow::languageSelected( QAction *action )
 // install new ones, first the ones of the theme, then the ones of the current form
 // all other forms will reinstall the correct language when called again
 	QTranslator *translator = new QTranslator( this );
-	if( !translator->load( "MainWindow." + language, "themes/" + m_currentTheme ) ) {
+	if( !translator->load( language, "themes" + m_currentTheme ) ) {
 		qDebug( ) << "Error while loading translations for theme " <<
-			m_currentTheme << " for locale " << m_currentLanguage;
+			m_currentTheme << " for locale " << language;
 	}
 	QCoreApplication::instance( )->installTranslator( translator );
 

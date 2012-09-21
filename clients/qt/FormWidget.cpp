@@ -8,7 +8,6 @@
 #include "FileDataLoader.hpp"
 
 #include <QDebug>
-#include <QHBoxLayout>
 #include <QTranslator>
 #include <QApplication>
 
@@ -27,6 +26,8 @@ FormWidget::FormWidget( FormLoader *_formLoader, QWidget *_parent )
 
 // maps data between constructed widgets from .ui and the data loader
 	m_dataHandler = new DataHandler( );	
+
+	m_layout = new QHBoxLayout( this );
 	
 	initialize( );	
 }
@@ -86,12 +87,12 @@ void FormWidget::formLoaded( QString name, QByteArray form, QByteArray localizat
 	QTranslator *translator = new QTranslator( m_ui );
 	if( !translator->load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
 		qDebug( ) << "Error while loading translations for form " <<
-			name << " for locale " << m_locale;
+			name << " for locale " << m_locale.name( );
 	}
 	QCoreApplication::instance( )->installTranslator( translator );
 
-	QHBoxLayout *_layout = new QHBoxLayout( this );
-        _layout->addWidget( m_ui );
+// add new form to layout (which covers the whole widget)
+	m_layout->addWidget( m_ui );
 
 	if( oldUi ) {
 		m_ui->move( oldUi->pos( ) );

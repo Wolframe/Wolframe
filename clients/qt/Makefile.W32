@@ -63,7 +63,9 @@ OBJS = \
 	HistoryLineEdit.obj \
 	moc_HistoryLineEdit.obj \
 	WolframeClient.obj \
-	moc_WolframeClient.obj
+	moc_WolframeClient.obj \
+	FormWidget.obj \
+	moc_FormWidget.obj
 
 CPP_BINS = \
 	qtclient.exe
@@ -72,9 +74,25 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-local_all:
+i18n\form1.de_CH.qm: i18n\form1.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe i18n\form1.de_CH.ts -qm i18n\form1.de_CH.qm
+
+themes\windows\de_CH.qm: themes\windows\de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe themes\windows\de_CH.ts -qm themes\windows\de_CH.qm
+
+themes\phone\de_CH.qm: themes\phone\de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe themes\phone\de_CH.ts -qm themes\phone\de_CH.qm
+	
+I18NS = \
+	i18n\form1.de_CH.qm \
+	themes\windows\de_CH.qm \
+	themes\phone\de_CH.qm
+
+local_all: $(I18NS)
 
 local_clean:
+	@-erase moc_*.cpp
+	@-erase $(I18NS)
 
 qtclient.exe: qtclient.obj
 
@@ -95,6 +113,9 @@ moc_DataLoader.cpp: DataLoader.hpp
 
 moc_WolframeClient.cpp: WolframeClient.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. WolframeClient.hpp -o moc_WolframeClient.cpp
+
+moc_FormWidget.cpp: FormWidget.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormWidget.hpp -o moc_FormWidget.cpp
 
 local_clean:
 	@-erase moc_*.cpp *.dll 2>NUL
@@ -121,3 +142,8 @@ run: $(CPP_BINS)
 	@-echo echo Testing Qt client... >> test.bat
 	@-echo qtclient.exe >> test.bat
 	@-test.bat
+
+buildi18n:
+	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe forms\form1.ui -ts i18n\form1.de_CH.ts

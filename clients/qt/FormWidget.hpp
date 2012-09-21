@@ -12,6 +12,7 @@
 #include <QWidget>
 #include <QBuffer>
 #include <QtUiTools>
+#include <QHBoxLayout>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -33,6 +34,7 @@ namespace _Wolframe {
 		DataLoader *m_dataLoader;	// load and saves data (data form)
 		DataHandler *m_dataHandler;	// form/data handler
 		QLocale m_locale;		// current locale to use for form translations
+		QHBoxLayout *m_layout;		// main layout swallowing the form
 
 	private:
 		void initialize( );
