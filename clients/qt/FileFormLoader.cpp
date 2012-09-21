@@ -25,6 +25,7 @@ void FileFormLoader::initiateListLoad( )
 
 QByteArray FileFormLoader::readFile( QString name )
 {
+	qDebug( ) << "Reading file " << name;
 	QFile file( name );
 	file.open( QFile::ReadOnly );
 	QByteArray data = file.readAll( );

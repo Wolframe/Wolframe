@@ -77,11 +77,11 @@ all: $(OBJS) $(CPP_BINS)
 i18n\form1.de_CH.qm: i18n\form1.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\form1.de_CH.ts -qm i18n\form1.de_CH.qm
 
-themes\windows\de_CH.qm: themes\windows\de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe themes\windows\de_CH.ts -qm themes\windows\de_CH.qm
+themes\windows\qtclient.de_CH.qm: themes\windows\qtclient.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe themes\windows\qtclient.de_CH.ts -qm themes\windows\qtclient.de_CH.qm
 
-themes\phone\de_CH.qm: themes\phone\de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe themes\phone\de_CH.ts -qm themes\phone\de_CH.qm
+themes\phone\qtclient.de_CH.qm: themes\phone\qtclient.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe themes\phone\qtclient.de_CH.ts -qm themes\phone\qtclient.de_CH.qm
 	
 I18NS = \
 	i18n\form1.de_CH.qm \
@@ -89,10 +89,6 @@ I18NS = \
 	themes\phone\qtclient.de_CH.qm
 
 local_all: $(I18NS)
-
-local_clean:
-	@-erase moc_*.cpp
-	@-erase $(I18NS)
 
 qtclient.exe: qtclient.obj
 
@@ -119,12 +115,13 @@ moc_FormWidget.cpp: FormWidget.hpp
 
 local_clean:
 	@-erase moc_*.cpp *.dll 2>NUL
+	@-erase $(I18NS) 2>NUL
 
 local_distclean:
 
 local_test:
 
-run: $(CPP_BINS)
+run: local_all $(CPP_BINS)
 	@-echo @echo off > test.bat
 !IFNDEF DEBUG
 	@-echo set PATH=$(QT_DIR)\binQtCore4.dll . >> test.bat
