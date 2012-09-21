@@ -71,6 +71,7 @@ void FormWidget::formLoaded( QString name, QByteArray form, QByteArray localizat
 // get list of all translators for this form and delete them
 	const QList<QTranslator *> oldTranslators( m_ui->findChildren<QTranslator *>( ) );
 	foreach( QTranslator *translator, oldTranslators ) {
+		qDebug( ) << "Removing old translator " << translator;
 		QCoreApplication::instance( )->removeTranslator( translator );
 	}
 	qDeleteAll( oldTranslators );
@@ -96,6 +97,7 @@ void FormWidget::formLoaded( QString name, QByteArray form, QByteArray localizat
 		m_ui->move( oldUi->pos( ) );
 		oldUi->hide( );
 		oldUi->deleteLater( );
+		oldUi->setParent( 0 );
 	}
 	m_ui->show( );	
 

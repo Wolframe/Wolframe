@@ -105,34 +105,19 @@ void MainWindow::loadTheme( QString theme )
 // set stylesheet of the application (has impact on the whole application)
 	QFile qss( themesFolder + QLatin1String( "MainWindow.qss" ) );
 	qApp->setStyleSheet( QLatin1String( "file:///" ) + QFileInfo( qss ).absoluteFilePath( ) );
-
-// wire standard actions in the menu by name (on_<object>_<signal>)
-// (true autowiring doesn't work: from now signals to ghost signals everything
-// happens)
-	QAction *actionExit = qFindChild<QAction *>( m_ui, "actionExit" );
-	QObject::connect( actionExit, SIGNAL( triggered( ) ), this, SLOT( on_actionExit_triggered( ) ) );
-
-	QAction *actionAbout = qFindChild<QAction *>( m_ui, "actionAbout" );
-	QObject::connect( actionAbout, SIGNAL( triggered( ) ), this, SLOT( on_actionAbout_triggered( ) ) );
-
-	QAction *actionAboutQt = qFindChild<QAction *>( m_ui, "actionAboutQt" );
-	QObject::connect( actionAboutQt, SIGNAL( triggered( ) ), this, SLOT( on_actionAboutQt_triggered( ) ) );
-
-	QAction *actionDebugTerminal = qFindChild<QAction *>( m_ui, "actionDebugTerminal" );
-	QObject::connect( actionDebugTerminal, SIGNAL( triggered( bool ) ), this, SLOT( on_actionDebugTerminal_triggered( bool ) ) ); 
-	// TODO: for this to work the SAME object must implement
-	// the slots!
-	// QMetaObject::connectSlotsByName( this );
 	
 // copy over the location of the old window to the new one
 // also copy over the current form, don't destroy the old ui,
 // events could be outstanding (deleteLater marks the widget 
 // for deletion, will be deleted when returning into the event
-// loop)
+// loop), also set a new empty parent for the old theme, otherwise
+// autowiring rewires the first widget it finds (which can be
+// the one we want to delete)
 	if( oldUi ) {
 		m_ui->move( oldUi->pos( ) );
 		oldUi->hide( );
 		oldUi->deleteLater( );
+		oldUi->setParent( 0 );
 	}
 
 // attach form widget in the right place of the theme main window
@@ -141,6 +126,9 @@ void MainWindow::loadTheme( QString theme )
 
 // show the new gui
 	m_ui->show( );
+
+// wire standard actions in the menu by name (on_<object>_<signal>)
+	QMetaObject::connectSlotsByName( this );
 	
 // remember current theme
 	m_currentTheme = theme;
