@@ -131,8 +131,6 @@ TEST_CPP_BINS = \
 	testWolfilter$(EXE) \
 	stringNormalizationTest$(EXE)
 
-#PF:DISABLED TEMPORARILY: testDatabaseProcessorVM$(EXE)
-
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 logTest$(EXE): $(TOPDIR)/src/libwolframe.a
@@ -145,7 +143,6 @@ configValueParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/l
 configStructParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 stringNormalizationTest$(EXE): $(TOPDIR)/src/libwolframe_utils/libwolframe_utils.a
-#PF:DISABLED TEMPORARILY: testDatabaseProcessorVM$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 local_all:
 
@@ -206,7 +203,6 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testWolfilter
 	@echo
-#PF:DISABLED TEMPORARILY: 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testDatabaseProcessorVM
 	@echo
 	@echo
 endif
