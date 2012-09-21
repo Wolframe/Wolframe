@@ -29,38 +29,43 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file stringUtils.cpp
-///\brief Some utility string function implementations.
-/// They are mainly boost wrappers that are separated because of some warnings needed to be disabled
+///\file strNormalization.cpp
+///\brief string normalization functions implementations.
+///
 
-#ifdef _WIN32
-#pragma warning(disable:4996)
-#endif
-#include "utils/miscUtils.hpp"
-#include <cstring>
-#include <sstream>
 #include <string>
 #include <boost/algorithm/string.hpp>
-#include <boost/range/iterator_range.hpp>
+#include "utils/strNormalization.hpp"
 
 using namespace _Wolframe::utils;
 
-void _Wolframe::utils::splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
+/// Rules:
+/// - trim the string left and right
+/// - remove start and trailing punctuation marks
+/// - replace punctuation marks with one space
+/// - replace all whitespaces with one space
+/// - set the string to uppercase.
+void _Wolframe::utils::normalizeString( std::string& str )
 {
-	res.clear();
-	std::vector<std::string> imm;
-	boost::split( imm, inp, boost::is_any_of(splitchrs));
-	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
-	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
+	for ( std::string::iterator it = str.begin(); it != str.end(); it++ )	{
+		if ( ispunct( *it ))
+			*it++ = ' ';
+	}
+	boost::algorithm::trim( str );
+	for ( std::string::iterator it = str.begin(); it != str.end(); it++ )	{
+		if ( isspace( *it ))	{
+			*it++ = ' ';
+			while ( isspace( *it ) && it != str.end() )
+				str.erase( it );
+		}
+	}
+	boost::algorithm::to_upper( str );
 }
 
-void _Wolframe::utils::splitString( std::vector<std::string>& res, std::string::const_iterator begin, std::string::const_iterator end, const char* splitchrs)
+/// Rules are the same as for normalizeString(...)
+std::string _Wolframe::utils::normalizeString_copy( const std::string& str )
 {
-	res.clear();
-	std::vector<std::string> imm;
-	typedef boost::iterator_range<std::string::const_iterator> irange;
-	irange ir = boost::make_iterator_range( begin, end);
-	boost::split( imm, ir, boost::is_any_of(splitchrs));
-	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
-	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
+	std::string ret = str;
+	normalizeString( ret );
+	return ret;
 }

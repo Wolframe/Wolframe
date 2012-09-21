@@ -105,6 +105,8 @@ clients/qt/FileFormLoader.cpp
 clients/qt/FileFormLoader.hpp
 clients/qt/FormLoader.cpp
 clients/qt/FormLoader.hpp
+clients/qt/FormWidget.cpp
+clients/qt/FormWidget.hpp
 clients/qt/GNUmakefile
 clients/qt/HistoryLineEdit.cpp
 clients/qt/HistoryLineEdit.hpp
@@ -114,6 +116,7 @@ clients/qt/Makefile.W32
 clients/qt/moc_DataLoader.cpp
 clients/qt/moc_DebugTerminal.cpp
 clients/qt/moc_FormLoader.cpp
+clients/qt/moc_FormWidget.cpp
 clients/qt/moc_HistoryLineEdit.cpp
 clients/qt/moc_MainWindow.cpp
 clients/qt/moc_WolframeClient.cpp
@@ -433,6 +436,7 @@ include/serialize/struct/filtermapProperty.hpp
 include/serialize/struct/filtermapSerialize.hpp
 include/serialize/struct/filtermapSerializeStack.hpp
 include/serialize/struct/filtermapTraits.hpp
+include/serialize/structOptionParser.hpp
 include/serverEndpoint.hpp
 include/SSLcertificateInfo.hpp
 include/standardConfigs.hpp
@@ -449,10 +453,13 @@ include/types/singleton.hpp
 include/utils/doctype.hpp
 include/utils/getPassword.hpp
 include/utils/miscUtils.hpp
+include/utils/strNormalization.hpp
+include/utils/strSimilarity.hpp
 include/version.hpp
 INSTALL.Unix
 INSTALL.Windows
 libhpdf/GNUmakefile
+libhpdf/include/GNUmakefile
 libhpdf/include/hpdf_3dmeasure.h
 libhpdf/include/hpdf_annotation.h
 libhpdf/include/hpdf_catalog.h
@@ -705,6 +712,8 @@ src/libwolframe/byte2hex.c
 src/libwolframe/CRAM.cpp
 src/libwolframe/getPassword.cpp
 src/libwolframe/GNUmakefile
+src/libwolframe_langbind/GNUmakefile
+src/libwolframe_langbind/Makefile.W32
 src/libwolframe/logger/logBackendConsole.cpp
 src/libwolframe/logger/logBackendConsole.hpp
 src/libwolframe/logger/logBackendEventlog.cpp
@@ -744,6 +753,11 @@ src/libwolframe/sha2.c
 src/libwolframe/stringUtils.cpp
 src/libwolframe/user.cpp
 src/libwolframe/utils_doctype.cpp
+src/libwolframe_utils/GNUmakefile
+src/libwolframe_utils/Makefile.W32
+src/libwolframe_utils/README
+src/libwolframe_utils/strNormalization.cpp
+src/libwolframe_utils/strSimilarity.cpp
 src/loadModules.cpp
 src/loadModules-dummy.cpp
 src/Makefile.W32
@@ -817,6 +831,8 @@ src/modules/cmdbind/luaCommandHandler/ModLuaCommandHandler.def
 src/modules/cmdbind/Makefile.W32
 src/modules/database/GNUmakefile
 src/modules/database/Makefile.W32
+src/modules/database/MSSQL/Makefile.W32
+src/modules/database/MSSQL/MSSQLmodule.def
 src/modules/database/postgresql/GNUmakefile
 src/modules/database/postgresql/Makefile.W32
 src/modules/database/postgresql/PostgreSQLconfig.cpp
@@ -922,6 +938,7 @@ src/serialize_struct_filtermapParse.cpp
 src/serialize_struct_filtermapParseStack.cpp
 src/serialize_struct_filtermapSerialize.cpp
 src/serialize_struct_filtermapSerializeStack.cpp
+src/serialize_structOptionParser.cpp
 src/serverConfig.cpp
 src/server.cpp
 src/serverEndpoint.cpp
@@ -1046,6 +1063,15 @@ tests/threadLeakTest.cpp
 tests/versionTest.cpp
 tests/wolfilter/GNUmakefile
 tests/wolfilter/Makefile.W32
+tests/wolfilter/modules/database/GNUmakefile
+tests/wolfilter/modules/database/Makefile.W32
+tests/wolfilter/modules/database/testtrace/GNUmakefile
+tests/wolfilter/modules/database/testtrace/Makefile.W32
+tests/wolfilter/modules/database/testtrace/mod_db_testtrace.cpp
+tests/wolfilter/modules/database/testtrace/testtraceDatabase.cpp
+tests/wolfilter/modules/database/testtrace/testtraceDatabase.hpp
+tests/wolfilter/modules/database/testtrace/testtracePreparedStatement.cpp
+tests/wolfilter/modules/database/testtrace/testtracePreparedStatement.hpp
 tests/wolfilter/modules/employee_assignment_convert/employee_assignment_convert.cpp
 tests/wolfilter/modules/employee_assignment_convert/employee_assignment_convert.hpp
 tests/wolfilter/modules/employee_assignment_convert/GNUmakefile
@@ -1053,6 +1079,13 @@ tests/wolfilter/modules/employee_assignment_convert/Makefile.W32
 tests/wolfilter/modules/employee_assignment_convert/mod_employee_assignment_convert.cpp
 tests/wolfilter/modules/GNUmakefile
 tests/wolfilter/modules/Makefile.W32
+tests/wolfilter/modules/transaction/echo/echo_transaction.cpp
+tests/wolfilter/modules/transaction/echo/echo_transaction.hpp
+tests/wolfilter/modules/transaction/echo/GNUmakefile
+tests/wolfilter/modules/transaction/echo/Makefile.W32
+tests/wolfilter/modules/transaction/echo/mod_transaction_echo.cpp
+tests/wolfilter/modules/transaction/GNUmakefile
+tests/wolfilter/modules/transaction/Makefile.W32
 tests/wolfilter/scripts/bcdnumber_calc.lua
 tests/wolfilter/scripts/ddlform_input_generator.lua
 tests/wolfilter/scripts/ddlform_iterator.lua
@@ -1071,8 +1104,6 @@ tests/wolfilter/scripts/print_table.lua
 tests/wolfilter/scripts/transaction_input_generator.lua
 tests/wolfilter/scripts/transaction_iterator.lua
 tests/wolfilter/scripts/transaction_table.lua
-tests/wolfilter/src/echo_cmdhandler.cpp
-tests/wolfilter/src/echo_cmdhandler.hpp
 tests/wolfilter/template/doc/employee_assignment_doctype_2.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_doctype.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_print_2.UTF-8.xml
@@ -1125,6 +1156,8 @@ wtest/Makefile.W32
 wtest/testDescription.cpp
 wtest/testDescription.hpp
 wtest/testHandlerTemplates.hpp
+wtest/testModules.cpp
+wtest/testModules.hpp
 wtest/wtestcheck.cpp
 XML/configuration.rng
 XML/customer.xml

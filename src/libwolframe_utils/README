@@ -1,0 +1,4 @@
+The functions in this library might be used by the daemon or processors
+but they might also get into database functions.
+
+We will see.

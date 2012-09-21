@@ -1,0 +1,39 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
+
+INCLUDE_LIBS =
+
+LIBRARIES = \
+
+CPP_OBJS = \
+	strNormalization.obj \
+	strSimilarity.obj
+
+
+all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+wolframe_utils.lib: $(OBJS) $(CPP_OBJS)
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:

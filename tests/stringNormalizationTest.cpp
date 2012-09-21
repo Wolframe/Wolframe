@@ -2,7 +2,7 @@
 // string normalization unit tests
 //
 
-#include "utils/miscUtils.hpp"
+#include "utils/strNormalization.hpp"
 #include "gtest/gtest.h"
 
 using namespace _Wolframe::utils;
