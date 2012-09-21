@@ -50,7 +50,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
-	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
+	$(TOPDIR)\src\libwolframe_utils\wolframe_utils.lib
 
 # Lua
 !IFDEF WITH_LUA
@@ -142,7 +143,7 @@ configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
 testProtocolLFdotEscaping.exe: testProtocolLFdotEscaping.obj $(TOPDIR)\src\wolframe.lib
 testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
-stringNormalizationTest.exe: stringNormalizationTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+stringNormalizationTest.exe: stringNormalizationTest.obj $(TOPDIR)\src\libwolframe_utils\wolframe_utils.lib
 #PF:DISABLED TEMPORARILY: testDatabaseProcessorVM.exe: testDatabaseProcessorVM.obj $(TOPDIR)\src\wolframe.lib
 testRand.exe: testRand.obj
 testTimestamp.exe: testTimestamp.obj

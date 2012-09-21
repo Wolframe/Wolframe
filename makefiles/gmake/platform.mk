@@ -815,6 +815,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -825,6 +826,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -838,6 +840,7 @@ QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -849,6 +852,7 @@ QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc   
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -860,6 +864,7 @@ QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc   
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -871,6 +876,7 @@ QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -882,6 +888,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -893,6 +900,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -909,6 +917,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -919,6 +928,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -929,6 +939,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -939,6 +950,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -949,6 +961,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -965,6 +978,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -975,6 +989,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -988,6 +1003,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 endif
@@ -1001,6 +1017,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -1011,6 +1028,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -1021,6 +1039,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -1031,6 +1050,7 @@ QT_LIB_DIR ?= $(QT_DIR)/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
@@ -1052,6 +1072,7 @@ QT_LIB_DIR ?= /usr/local/lib/qt4
 QT_BIN_DIR ?= /usr/local/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc-qt4
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 endif
@@ -1068,6 +1089,7 @@ QT_LIB_DIR ?= /usr/local/lib/qt4
 QT_BIN_DIR ?= /usr/local/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc-qt4
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 endif
@@ -1087,6 +1109,7 @@ QT_LIB_DIR ?= /usr/local/lib/qt4
 QT_BIN_DIR ?= /usr/local/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc4
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease4
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate4
 QT_LDFLAGS = -L/usr/X11R6/lib
 endif
 endif
@@ -1106,6 +1129,7 @@ QT_LIB_DIR ?= /usr/pkg/qt4/lib
 QT_BIN_DIR ?= $(QT_DIR)/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 endif

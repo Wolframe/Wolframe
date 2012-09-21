@@ -16,6 +16,12 @@ SUBDIRS = \
 	$(SUBDIRS) sqlite3
 !ENDIF
 
+# MS SQL
+!IFDEF WITH_MSSQL
+SUBDIRS = \
+	$(SUBDIRS) MSSQL
+!ENDIF
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:
