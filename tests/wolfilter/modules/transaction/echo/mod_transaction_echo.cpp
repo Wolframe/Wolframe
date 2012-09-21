@@ -47,7 +47,7 @@ static void setModuleLogger( void* logger )
 	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-static langbind::TransactionFunction* createEchoTransactionFunction( db::DatabaseProvider*, const std::string&)
+static langbind::TransactionFunction* createEchoTransactionFunction( const proc::ProcessorProvider*, const std::string&)
 {
 	return new test::EchoTransactionFunction();
 }

@@ -70,12 +70,14 @@ public:
 	void setCanonicalPathes( const std::string& referencePath);
 
 	const std::string& filename() const		{return m_data.filename;}
+	const std::string& outfilename() const		{return m_data.outfilename;}
 	const std::string& id() const			{return m_data.id;}
 
 private:
 	struct Data
 	{
 		std::string filename;
+		std::string outfilename;
 		std::string id;
 		static const serialize::StructDescriptionBase* getStructDescription();
 	};
@@ -90,9 +92,9 @@ class TesttraceDatabase
 	,public DatabaseUnit
 {
 public:
-	TesttraceDatabase( const std::string& id_, const std::string& filename_, unsigned short, bool);
+	TesttraceDatabase( const std::string& id_, const std::string& filename_, const std::string& outfilename_, unsigned short, bool);
 
-	virtual ~TesttraceDatabase();
+	virtual ~TesttraceDatabase(){}
 
 	virtual const std::string& ID() const
 	{
@@ -117,18 +119,19 @@ public:
 	///\brief Get the interface for processing prepared statements in the database
 	virtual PreparedStatementHandler* getPreparedStatementHandler()
 	{
-		return new PreparedStatementHandler_testtrace( m_id, m_result, this);
+		return new PreparedStatementHandler_testtrace( m_id, m_outfilename, m_result, this);
 	}
 
 private:
 	std::string m_id;
-	const std::vector<std::string> m_result;
+	std::string m_outfilename;
+	std::vector<std::string> m_result;
 };
 
 
 ///\class TesttraceDatabaseConstructor
 ///\brief Testtrace fake database constructor
-class TesttraceDatabaseConstructor : public ConfiguredObjectConstructor<TesttraceDatabase>
+class TesttraceDatabaseConstructor : public ConfiguredObjectConstructor<db::DatabaseUnit>
 {
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
@@ -144,7 +147,7 @@ public:
 	virtual TesttraceDatabase* object( const config::NamedConfiguration& conf_)
 	{
 		const TesttraceDatabaseConfig& conf = dynamic_cast<const TesttraceDatabaseConfig&>( conf_);
-		return new TesttraceDatabase( conf.id(), conf.filename(), 0, false);
+		return new TesttraceDatabase( conf.id(), conf.filename(), conf.outfilename(), 0, false);
 	}
 };
 

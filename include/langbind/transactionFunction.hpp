@@ -39,8 +39,8 @@
 
 ///\brief Forward declaration
 namespace _Wolframe {
-namespace db {
-class DatabaseProvider;
+namespace proc {
+class ProcessorProvider;
 }}
 
 namespace _Wolframe {
@@ -64,7 +64,7 @@ typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
 
 ///\param[in] database name of the database
 ///\param[in] description transaction description source
-typedef TransactionFunction* (*CreateTransactionFunction)( db::DatabaseProvider* provider_, const std::string& description);
+typedef TransactionFunction* (*CreateTransactionFunction)( const proc::ProcessorProvider* provider_, const std::string& description);
 
 }}
 #endif

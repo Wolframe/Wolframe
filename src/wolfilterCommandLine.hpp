@@ -63,13 +63,15 @@ public:
 	const std::string& outputfilter() const				{return m_outputfilter;}
 	std::size_t inbufsize() const					{return m_inbufsize;}
 	std::size_t outbufsize() const					{return m_outbufsize;}
-	const proc::ProcProviderConfig& providerConfig() const		{return *m_providerConfig;}
+	const db::DBproviderConfig& dbProviderConfig() const		{return *m_dbProviderConfig;}
+	const proc::ProcProviderConfig& procProviderConfig() const	{return *m_procProviderConfig;}
 	const module::ModulesDirectory& modulesDirectory() const	{return m_modulesDirectory;}
 
 	void print(std::ostream &) const;
 
 private:
-	config::ConfigurationTree getConfig() const;
+	config::ConfigurationTree getProcProviderConfigTree() const;
+	config::ConfigurationTree getDBProviderConfigTree() const;
 
 private:
 	bool m_printhelp;
@@ -79,13 +81,15 @@ private:
 	std::vector<std::string> m_modules;
 	langbind::EnvironmentConfigStruct m_envconfig;
 	langbind::ScriptEnvironmentConfigStruct m_scriptenvconfig;
+	boost::property_tree::ptree m_dbconfig;
 	std::string m_cmd;
 	std::string m_inputfilter;
 	std::string m_outputfilter;
 	std::string m_helpstring;
 	std::size_t m_inbufsize;
 	std::size_t m_outbufsize;
-	types::CountedReference<proc::ProcProviderConfig> m_providerConfig;
+	types::CountedReference<proc::ProcProviderConfig> m_procProviderConfig;
+	types::CountedReference<db::DBproviderConfig> m_dbProviderConfig;
 	module::ModulesDirectory m_modulesDirectory;
 	std::string m_referencePath;
 };

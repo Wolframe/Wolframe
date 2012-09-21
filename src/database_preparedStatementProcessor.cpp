@@ -540,7 +540,7 @@ static std::string parseParameter( std::string::const_iterator& ii, std::string:
 	return rt;
 }
 
-PreparedStatementTransactionFunction::PreparedStatementTransactionFunction( db::DatabaseProvider* provider_, const std::string& src)
+PreparedStatementTransactionFunction::PreparedStatementTransactionFunction( const proc::ProcessorProvider* provider_, const std::string& src)
 	:m_provider(provider_)
 {
 	std::string::const_iterator ii = src.begin(), ee = src.end();
@@ -889,12 +889,16 @@ langbind::TransactionFunction::ResultR PreparedStatementTransactionFunction::exe
 	PreparedStatementHandler* dbi = 0;
 	try
 	{
-		types::CountedReference<Database> dbref;
-		if (!dbref.get())
+		if (!m_provider)
 		{
-			throw std::runtime_error( "default database for transaction functions not defined");
+			throw std::runtime_error( "no provider defined for getting database access");
 		}
-		dbi = dbref->getPreparedStatementHandler();
+		Database* db = const_cast<db::Database*>( m_provider->transactionDatabase());
+		if (!db)
+		{
+			throw std::runtime_error( "database for transaction functions not defined");
+		}
+		dbi = db->getPreparedStatementHandler();
 		if (!dbi)
 		{
 			if (m_database.empty())
@@ -1003,7 +1007,7 @@ langbind::TransactionFunction::ResultR PreparedStatementTransactionFunction::exe
 	}
 }
 
-langbind::TransactionFunction* _Wolframe::db::createPreparedStatementTransactionFunction( db::DatabaseProvider* provider_, const std::string& description)
+langbind::TransactionFunction* _Wolframe::db::createPreparedStatementTransactionFunction( const proc::ProcessorProvider* provider_, const std::string& description)
 {
 	return new PreparedStatementTransactionFunction( provider_, description);
 }

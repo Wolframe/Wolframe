@@ -46,7 +46,7 @@ typedef ConfiguredBuilder* (*CreateBuilderFunc)();
 static ConfiguredBuilder* createTesttraceDatabaseModule()
 {
 	static module::ConfiguredBuilderDescription< db::TesttraceDatabaseConstructor,
-		db::TesttraceDatabaseConfig > mod( "testtrace database", "database", "Testtrace", "TesttraceDatabase");
+		db::TesttraceDatabaseConfig > mod( "testtrace database", "database", "test", TESTTRACE_DATABASE_CLASSNAME);
 	return &mod;
 }
 

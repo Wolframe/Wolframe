@@ -83,7 +83,7 @@ TransactionFunctionOption::TransactionFunctionOption( const std::string& opt)
 
 DatabaseConfigOption::DatabaseConfigOption( const std::string& opt)
 {
-	serialize::parseStructOptionTree( m_tree, opt);
+	m_tree = serialize::structOptionTree( opt);
 }
 
 

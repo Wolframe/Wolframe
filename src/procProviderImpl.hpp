@@ -58,6 +58,7 @@ class ProcessorProvider::ProcessorProvider_Impl
 {
 public:
 	ProcessorProvider_Impl( const ProcProviderConfig* conf,
+				const ProcessorProvider* this_,
 				const module::ModulesDirectory* modules);
 	~ProcessorProvider_Impl();
 
@@ -71,6 +72,8 @@ public:
 	const ddl::StructType* form( const std::string& name ) const;
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
+
+	const db::Database* transactionDatabase() const;
 
 private:
 	bool loadForm( const std::string& ddlname, const std::string& dataDefinitionFilename);

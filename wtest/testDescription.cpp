@@ -116,7 +116,7 @@ if (boost::starts_with( flag, "DISABLED "))
 	return "";
 }
 
-static void readFile( const std::string& pt, std::vector<std::string>& hdr, std::vector<std::string>& out, std::string& requires)
+static void readFile( const std::string& pt, std::vector<std::string>& hdr, std::vector<std::string>& out, std::string& requires, std::vector<std::string>& outputfile)
 {
 	std::string element;
 	char chb;
@@ -172,6 +172,15 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 				{
 					infh.close();
 					return;
+				}
+				else if (boost::starts_with( tag, "outputfile:"))
+				{
+					std::size_t nn = std::strlen("outputfile:");
+					std::string filename( std::string( tag.c_str()+nn, tag.size()-nn));
+					boost::trim( filename);
+					outputfile.push_back( filename);
+					type = PARSE_NOT;
+					splititr = splitstr.begin();
 				}
 				else if (boost::starts_with( tag, "requires:"))
 				{
@@ -253,7 +262,7 @@ TestDescription::TestDescription( const std::string& pt, const char* argv0)
 
 	std::vector<std::string> header;
 	std::vector<std::string> content;
-	readFile( pt, header, content, requires);
+	readFile( pt, header, content, requires, outputfile);
 
 	std::vector<std::string>::const_iterator hi=header.begin();
 	std::vector<std::string>::const_iterator itr=content.begin(),end=content.end();

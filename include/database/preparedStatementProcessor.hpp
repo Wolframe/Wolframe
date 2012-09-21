@@ -44,8 +44,8 @@
 
 ///\brief Forward declaration
 namespace _Wolframe {
-namespace db {
-class DatabaseProvider;
+namespace proc {
+class ProcessorProvider;
 }}
 
 namespace _Wolframe {
@@ -252,7 +252,7 @@ class PreparedStatementTransactionFunction
 {
 public:
 	PreparedStatementTransactionFunction( const PreparedStatementTransactionFunction& o);
-	PreparedStatementTransactionFunction( db::DatabaseProvider* provider_, const std::string& description);
+	PreparedStatementTransactionFunction( const proc::ProcessorProvider* provider_, const std::string& description);
 	virtual ~PreparedStatementTransactionFunction(){}
 
 	virtual langbind::TransactionFunction::InputR getInput() const;
@@ -263,12 +263,12 @@ private:
 	std::string m_resultname;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
-	db::DatabaseProvider* m_provider;
+	const proc::ProcessorProvider* m_provider;
 };
 
 ///\param[in] handler name of interface to underlaying database
 ///\param[in] description transaction description source
-langbind::TransactionFunction* createPreparedStatementTransactionFunction( db::DatabaseProvider* provider_, const std::string& description);
+langbind::TransactionFunction* createPreparedStatementTransactionFunction( const proc::ProcessorProvider* provider_, const std::string& description);
 
 }}//namespace
 #endif

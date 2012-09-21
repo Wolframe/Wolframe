@@ -95,8 +95,7 @@ public:
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
 
-	///\brief PF:HACK: Reminder Dummy implementation. Problem solved later
-	db::PreparedStatementHandler* getPreparedStatementHandler() {return 0;}
+	const db::Database* transactionDatabase() const;
 
 private:
 	class ProcessorProvider_Impl;

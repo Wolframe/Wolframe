@@ -73,7 +73,9 @@ int main( int argc, char **argv )
 		if (doExit) return 0;
 
 		// Load the modules, scripts, etc. defined in the command line into the global context:
-		proc::ProcessorProvider processorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory());
+		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
+		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory());
+		processorProvider.resolveDB( databaseProvider);
 
 		// Call the function to execute
 		if (cmdline.inputfile().size())

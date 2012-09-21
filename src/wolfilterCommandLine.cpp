@@ -34,13 +34,16 @@
 ///\brief Implementation of the options of a wolfilter call
 #include "wolfilterCommandLine.hpp"
 #include "langbind/appObjects.hpp"
+#include "database/DBprovider.hpp"
 #include "langbind/appConfig_struct.hpp"
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "moduleInterface.hpp"
 #include "config/ConfigurationTree.hpp"
+#include "serialize/structOptionParser.hpp"
 #include "utils/miscUtils.hpp"
 #include "utils/doctype.hpp"
+#include "config/structSerialize.hpp"
 #include "logger-v1.hpp"
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -53,30 +56,63 @@
 using namespace _Wolframe;
 using namespace _Wolframe::config;
 
-config::ConfigurationTree WolfilterCommandLine::getConfig() const
+config::ConfigurationTree WolfilterCommandLine::getDBProviderConfigTree() const
+{
+	boost::property_tree::ptree rt;
+	if (!m_dbconfig.empty())
+	{
+		std::vector<std::pair<std::string,std::string> >
+			dbhl = m_modulesDirectory.getConfigurableSectionKeywords( ObjectConstructorBase::DATABASE_OBJECT);
+		if (dbhl.size() > 1)
+		{
+			// only one database module allowed:
+			throw std::runtime_error( "more than one database module loaded for wolfilter");
+		}
+		rt.add_child( dbhl.begin()->second, m_dbconfig);
+	}
+	return rt;
+}
+
+config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() const
 {
 	boost::property_tree::ptree proccfg;
-	boost::property_tree::ptree envcfg = m_envconfig.toPropertyTree();
-	if (!envcfg.empty())
+	try
 	{
-		proccfg.add_child( "environment", envcfg);
-	}
-	std::vector<std::pair<std::string,std::string> >
-		cmdhl = m_modulesDirectory.getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
-
-	if (!cmdhl.empty() && !m_scriptenvconfig.script.empty())
-	{
-		// if the list of configurable command handlers has one unique element and we have
-		// a configuration of scripts on the command line, then we pass the
-		// configuration to this command handler:
-		if (cmdhl.size() > 1)
+		boost::property_tree::ptree envcfg = m_envconfig.toPropertyTree();
+		if (!m_dbconfig.empty())
 		{
-			// only one command handler allowed:
-			throw std::runtime_error( "more than one command handler module loaded");
+			std::string dbLabel = m_dbconfig.get<std::string>( "id");
+			if (dbLabel.empty())
+			{
+				throw std::runtime_error( "database configuration without 'id' field");
+			}
+			proccfg.add_child( "database", boost::property_tree::ptree( dbLabel));
 		}
-		boost::property_tree::ptree cmdhlcfg;
-		cmdhlcfg.add_child( cmdhl.begin()->second, m_scriptenvconfig.toPropertyTree());
-		proccfg.add_child( cmdhl.begin()->first, cmdhlcfg);
+		if (!envcfg.empty())
+		{
+			proccfg.add_child( "environment", envcfg);
+		}
+		std::vector<std::pair<std::string,std::string> >
+			cmdhl = m_modulesDirectory.getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
+
+		if (!cmdhl.empty() && !m_scriptenvconfig.script.empty())
+		{
+			// if the list of configurable command handlers has one unique element and we have
+			// a configuration of scripts on the command line, then we pass the
+			// configuration to this command handler:
+			if (cmdhl.size() > 1)
+			{
+				// only one command handler allowed:
+				throw std::runtime_error( "more than one command handler module loaded");
+			}
+			boost::property_tree::ptree cmdhlcfg;
+			cmdhlcfg.add_child( cmdhl.begin()->second, m_scriptenvconfig.toPropertyTree());
+			proccfg.add_child( cmdhl.begin()->first, cmdhlcfg);
+		}
+	}
+	catch (std::exception& e)
+	{
+		throw std::runtime_error( std::string( "could not build wolframe configuration from given options: ") + e.what());
 	}
 	return proccfg;
 }
@@ -109,6 +145,7 @@ struct OptionStruct
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 			( "form,r", po::value< std::vector<std::string> >(), "specify form to load by path" )
 			( "printlayout,p", po::value< std::vector<std::string> >(), "specify print layout for a form" )
+			( "database,d", po::value<std::string>(), "specifiy transaction database" )
 			( "transaction,t", po::value< std::vector<std::string> >(), "specify transaction function" )
 			( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
 			( "cmd", po::value<std::string>(), "name of the command to execute")
@@ -197,6 +234,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	if (vmap.count( "cmd")) m_cmd = vmap["cmd"].as<std::string>();
 	if (vmap.count( "input-filter")) m_inputfilter = vmap["input-filter"].as<std::string>();
 	if (vmap.count( "output-filter")) m_outputfilter = vmap["output-filter"].as<std::string>();
+	if (vmap.count( "database")) m_dbconfig = serialize::structOptionTree( vmap["database"].as<std::string>());
 
 	if (m_outputfilter.empty() && !m_inputfilter.empty()) m_outputfilter = m_inputfilter; //... default same filter for input and output
 	if (m_inputfilter.empty() && !m_outputfilter.empty()) m_inputfilter = m_outputfilter; //... default same filter for input and output
@@ -228,17 +266,36 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	}
 
 	// Load, instantiate and check the configuration:
-	m_providerConfig.reset( new proc::ProcProviderConfig());
-	config::ConfigurationTree cfg = getConfig();
+	m_dbProviderConfig.reset( new db::DBproviderConfig());
+	config::ConfigurationTree dbcfg = getDBProviderConfigTree();
 
-	LOG_DEBUG << "Created configuration from command line:";
-	LOG_DEBUG << configurationTree_tostring( cfg);
+	LOG_DEBUG << "Created database provider configuration from command line:";
+	LOG_DEBUG << configurationTree_tostring( dbcfg);
 
-	if (!m_providerConfig->parse( cfg, "", &m_modulesDirectory))
+	if (!m_dbProviderConfig->parse( dbcfg, "", &m_modulesDirectory))
 	{
-		throw std::runtime_error( "Configuration could not be created from command line");
+		throw std::runtime_error( "Database provider configuration could not be created from command line");
 	}
-	m_providerConfig->setCanonicalPathes( referencePath);
+	m_dbProviderConfig->setCanonicalPathes( referencePath);
+	if (!m_dbProviderConfig->check())
+	{
+		throw std::runtime_error( "error in command line. failed to setup a valid database provider configuration");
+	}
+	m_procProviderConfig.reset( new proc::ProcProviderConfig());
+	config::ConfigurationTree ppcfg = getProcProviderConfigTree();
+
+	LOG_DEBUG << "Created processor provider configuration from command line:";
+	LOG_DEBUG << configurationTree_tostring( ppcfg);
+
+	if (!m_procProviderConfig->parse( ppcfg, "", &m_modulesDirectory))
+	{
+		throw std::runtime_error( "Processor provider configuration could not be created from command line");
+	}
+	m_procProviderConfig->setCanonicalPathes( referencePath);
+	if (!m_procProviderConfig->check())
+	{
+		throw std::runtime_error( "error in command line. failed to setup a valid processor provider configuration");
+	}
 }
 
 void WolfilterCommandLine::print(std::ostream& out) const

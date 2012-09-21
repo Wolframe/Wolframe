@@ -35,19 +35,25 @@
 #ifndef _Wolframe_wtest_TESTDESCRIPTION_HPP_INCLUDED
 #define _Wolframe_wtest_TESTDESCRIPTION_HPP_INCLUDED
 #include <string>
+#include <vector>
 namespace _Wolframe {
 namespace wtest {
 
 struct TestDescription
 {
 	std::string input;
+	std::vector<std::string> outputfile;
 	std::string expected;
 	std::string config;
 	std::string requires;
 
 	TestDescription( const std::string& filename, const char* argv0);
 	TestDescription( const TestDescription& o)
-		:input(o.input),expected(o.expected),config(o.config),requires(o.requires)
+		:input(o.input)
+		,outputfile(o.outputfile)
+		,expected(o.expected)
+		,config(o.config)
+		,requires(o.requires)
 	{}
 };
 

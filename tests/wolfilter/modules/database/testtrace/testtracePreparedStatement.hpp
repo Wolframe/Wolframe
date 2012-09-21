@@ -38,7 +38,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <sstream>
+#include <fstream>
 #include <cstdlib>
 
 namespace _Wolframe {
@@ -51,7 +51,10 @@ public:
 	FakeResult( const FakeResult& o)
 		:m_data(o.m_data)
 		,m_itr(o.m_itr)
-		,m_cols(o.m_cols){}
+		,m_cols(o.m_cols)
+	{
+		m_itr = m_data.begin();
+	}
 
 	bool next();
 	unsigned int nofColumns();
@@ -74,16 +77,17 @@ class PreparedStatementHandler_testtrace :public PreparedStatementHandler
 {
 public:
 	///\brief Constructor
-	PreparedStatementHandler_testtrace( const std::string& testname_, const std::vector<std::string>& results_, TesttraceDatabase* db_)
+	PreparedStatementHandler_testtrace( const std::string& testname_, const std::string& outfilename, const std::vector<std::string>& results_, TesttraceDatabase* db_)
 		:m_db(db_)
 		,m_testname(testname_)
+		,m_out(outfilename.c_str())
 		,m_resultidx(0)
 	{
 		std::copy( results_.begin(), results_.end(), std::back_inserter(m_result));
 	}
 
 	///\brief Destructor
-	virtual ~PreparedStatementHandler_testtrace();
+	virtual ~PreparedStatementHandler_testtrace(){}
 
 	///\brief Begin transaction
 	virtual bool begin();
@@ -110,30 +114,11 @@ public:
 	///\brief Skip to the next row of the last result
 	virtual bool next();
 
-	///\brief Get the dump of all traces
-	std::string str() const;
-
-private:
-	enum State
-	{
-		Init,
-		Transaction,
-		Prepared,
-		Executed,
-		Error
-	};
-	static const char* stateName( State i)
-	{
-		const char* ar[] = {"Init","Transaction","Prepared","Executed","Error"};
-		return ar[ (int)i];
-	}
-
 private:
 	TesttraceDatabase* m_db;
-	State m_state;
 	std::vector<FakeResult> m_result;
 	std::string m_testname;
-	std::ostringstream m_out;
+	std::ofstream m_out;
 	std::size_t m_resultidx;
 };
 

@@ -65,15 +65,15 @@ public:
 		return m_createFunc( m_provider, description);
 	}
 
-	void setDatabaseProvider( db::DatabaseProvider* provider_)
+	void setProvider( const proc::ProcessorProvider* provider_)
 	{
 		m_provider = provider_;
 	}
 
 private:
 	const std::string m_name;
-	db::DatabaseProvider* m_provider;
-	const langbind::CreateTransactionFunction m_createFunc;
+	const proc::ProcessorProvider* m_provider;
+	langbind::CreateTransactionFunction m_createFunc;
 };
 
 class TransactionFunctionBuilder :public SimpleBuilder
@@ -94,7 +94,7 @@ public:
 		return new TransactionFunctionConstructor( m_className, m_createFunc);
 	}
 private:
-	const langbind::CreateTransactionFunction m_createFunc;
+	langbind::CreateTransactionFunction m_createFunc;
 };
 
 }}//namespace

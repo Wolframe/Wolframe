@@ -150,14 +150,23 @@ TEST_F( WolfilterTest, tests)
 		if (cmdline.printversion()) std::cerr << "ignored option --version" << std::endl;
 		if (cmdline.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
 
-		proc::ProcessorProvider processorProvider( &cmdline.providerConfig(), &cmdline.modulesDirectory());
+		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
+		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory());
+		processorProvider.resolveDB( databaseProvider);
 
 		std::istringstream in( td.input, std::ios::in | std::ios::binary);
 		std::ostringstream out( std::ios::out | std::ios::binary);
 
 		langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
+		std::string outstr( out.str());
+		std::vector<std::string>::const_iterator oi = td.outputfile.begin(), oe = td.outputfile.end();
+		for (; oi != oe; ++oi)
+		{
+			std::string outfile = utils::getCanonicalPath( *oi, refpath.string());
+			outstr.append( utils::readSourceFileContent( outfile));
+		}
 
-		if (td.expected != out.str())
+		if (td.expected != outstr)
 		{
 			static boost::mutex mutex;
 			boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
@@ -165,7 +174,7 @@ TEST_F( WolfilterTest, tests)
 			// [2.6] Dump test contents to files in case of error
 			boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
 			std::fstream oo( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
-			oo.write( out.str().c_str(), out.str().size());
+			oo.write( outstr.c_str(), outstr.size());
 			if (oo.bad()) std::cerr << "error writing file '" << OUTPUT.string() << "'" << std::endl;
 			oo.close();
 
@@ -188,7 +197,7 @@ TEST_F( WolfilterTest, tests)
 
 			boost::this_thread::sleep( boost::posix_time::seconds( 3));
 		}
-		EXPECT_EQ( td.expected, out.str());
+		EXPECT_EQ( td.expected, outstr);
 		for (int ci=0; ci<cmdargc; ++ci)
 		{
 			free( cmdargv[ci] );

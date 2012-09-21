@@ -41,6 +41,7 @@ using namespace _Wolframe::db;
 
 FakeResult::FakeResult( const std::string& str)
 {
+	m_itr = m_data.begin();
 	if (str.empty()) return;
 	char rowdelim[2];
 	rowdelim[0] = str[0];
@@ -94,7 +95,6 @@ const char* FakeResult::get( std::size_t idx)
 	return (m_itr == m_data.end() || idx == 0 || idx > m_itr->size())?0:(*m_itr)[idx-1].c_str();
 }
 
-
 bool PreparedStatementHandler_testtrace::begin()
 {
 	m_out << "begin();" << std::endl;
@@ -111,6 +111,12 @@ bool PreparedStatementHandler_testtrace::rollback()
 {
 	m_out << "rollback();" << std::endl;
 	return true;
+}
+
+void PreparedStatementHandler_testtrace::clear()
+{
+	m_out << "clear();" << std::endl;
+	m_resultidx = 0;
 }
 
 bool PreparedStatementHandler_testtrace::start( const std::string& stmname)
@@ -141,16 +147,22 @@ bool PreparedStatementHandler_testtrace::execute()
 
 std::size_t PreparedStatementHandler_testtrace::nofColumns()
 {
-	if (m_resultidx == 0 || m_resultidx > m_result.size()) return 0;
-	std::size_t rt = m_result[m_resultidx].nofColumns();
+	std::size_t rt = 0;
+	if (m_resultidx > 0 && m_resultidx <= m_result.size())
+	{
+		rt = m_result[m_resultidx-1].nofColumns();
+	}
 	m_out << "nofColumns(); returns " << rt << std::endl;
 	return rt;
 }
 
 const char* PreparedStatementHandler_testtrace::columnName( std::size_t idx)
 {
-	if (m_resultidx == 0 || m_resultidx > m_result.size()) return 0;
-	const char* rt = m_result[m_resultidx].columnName( idx);
+	const char* rt = 0;
+	if (m_resultidx > 0 && m_resultidx <= m_result.size())
+	{
+		rt = m_result[m_resultidx-1].columnName( idx);
+	}
 	m_out << "columnName( " << idx << " ); returns " << (rt?rt:"NULL") << std::endl;
 	return rt;
 }
@@ -163,23 +175,26 @@ const char* PreparedStatementHandler_testtrace::getLastError()
 
 const char* PreparedStatementHandler_testtrace::get( std::size_t idx)
 {
-	if (m_resultidx == 0 || m_resultidx > m_result.size()) return 0;
-	const char* rt = m_result[m_resultidx].get( idx);
+	const char* rt = 0;
+	if (m_resultidx > 0 && m_resultidx <= m_result.size())
+	{
+		rt = m_result[m_resultidx-1].get( idx);
+	}
 	m_out << "get( " << idx << " ); returns " << (rt?rt:"NULL") << std::endl;
 	return rt;
 }
 
 bool PreparedStatementHandler_testtrace::next()
 {
-	bool rt = m_result[m_resultidx].next();
+	bool rt = false;
+	if (m_resultidx > 0 && m_resultidx <= m_result.size())
+	{
+		rt = m_result[m_resultidx-1].next();
+	}
 	m_out << "next(); returns " << rt << std::endl;
 	return rt;
 }
 
-std::string PreparedStatementHandler_testtrace::str() const
-{
-	return m_out.str();
-}
 
 
 

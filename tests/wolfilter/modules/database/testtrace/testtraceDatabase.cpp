@@ -54,6 +54,7 @@ const serialize::StructDescriptionBase* TesttraceDatabaseConfig::Data::getStruct
 			(*this)
 			( "id",		&This::id)
 			( "file",	&This::filename)
+			( "outfile",	&This::outfilename)
 			;
 		}
 	};
@@ -77,9 +78,14 @@ bool TesttraceDatabaseConfig::parse( const config::ConfigurationTree& pt, const 
 
 bool TesttraceDatabaseConfig::check() const
 {
-	if (!utils::fileExists( m_data.filename))
+	if (!m_data.filename.empty() && !utils::fileExists( m_data.filename))
 	{
 		LOG_ERROR << "Configured file '" << m_data.filename << "' does not exist";
+		return false;
+	}
+	if (m_data.outfilename.empty())
+	{
+		LOG_ERROR << "Output file of test trace DB is not configured";
 		return false;
 	}
 	return true;
@@ -96,13 +102,26 @@ void TesttraceDatabaseConfig::print( std::ostream& os, size_t indent) const
 
 void TesttraceDatabaseConfig::setCanonicalPathes( const std::string& referencePath)
 {
-	m_data.filename = utils::getCanonicalPath( m_data.filename, referencePath);
+	if (!m_data.filename.empty())
+	{
+		m_data.filename = utils::getCanonicalPath( m_data.filename, referencePath);
+	}
+	if (!m_data.outfilename.empty())
+	{
+		m_data.outfilename = utils::getCanonicalPath( m_data.outfilename, referencePath);
+	}
 }
 
 
-TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string& filename_, unsigned short, bool)
-	:m_id(id_),m_result( utils::readSourceFileLines( filename_))
-{}
+TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string& filename_, const std::string& outfilename_, unsigned short, bool)
+	:m_id(id_)
+	,m_outfilename(outfilename_)
+{
+	if (!filename_.empty())
+	{
+		m_result = utils::readSourceFileLines( filename_);
+	}
+}
 
 
 

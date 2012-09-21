@@ -67,7 +67,7 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 			if ( ! Parser::getValue( logPrefix().c_str(), *L1it, m_dbLabel, &isDefined ))
 				retVal = false;
 		}
-		if ( boost::algorithm::iequals( "environment", L1it->first ))
+		else if ( boost::algorithm::iequals( "environment", L1it->first ))
 		{
 			try
 			{
@@ -81,7 +81,7 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 		}
 		else	{
 			if ( modules )	{
-				module::ConfiguredBuilder* builder;
+				module::ConfiguredBuilder* builder = 0;
 				boost::property_tree::ptree::const_iterator kwi=L1it->second.begin(),kwe=L1it->second.end();
 				for (; kwi != kwe; ++kwi)
 				{
@@ -162,10 +162,12 @@ void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
 bool ProcProviderConfig::check() const
 {
 	bool correct = true;
+#if 0 //... PF:HACK: configuration may be without database (wolfilter)
 	if ( m_dbLabel.empty() )	{
 		LOG_ERROR << logPrefix() << "referenced database ID can not be empty";
 		correct = false;
 	}
+#endif
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		if ( !(*it)->check() )
@@ -193,7 +195,7 @@ ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 				      const module::ModulesDirectory* modules )
 	: m_impl(0)
 {
-	m_impl = new ProcessorProvider_Impl( conf, modules );
+	m_impl = new ProcessorProvider_Impl( conf, this, modules );
 }
 
 ProcessorProvider::~ProcessorProvider()
@@ -245,8 +247,15 @@ const langbind::TransactionFunction* ProcessorProvider::transactionFunction( con
 	return m_impl->transactionFunction( name);
 }
 
+const db::Database* ProcessorProvider::transactionDatabase() const
+{
+	return m_impl->transactionDatabase();
+}
+
+
 //**** Processor Provider PIMPL Implementation ******************************
 ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf,
+								   const ProcessorProvider* this_,
 								   const module::ModulesDirectory* modules )
 {
 	m_db = NULL;
@@ -478,6 +487,12 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 		}
 	}
+	///Set link to processor provider for objects that need it:
+	std::list<module::TransactionFunctionConstructor*>::const_iterator ti = m_transactionFunctionCompiler.begin(), te = m_transactionFunctionCompiler.end();
+	for (; ti != te; ++ti)
+	{
+		(*ti)->setProvider( this_);
+	}
 
 	// Build the list of configured objects in the processor environment:
 	bool success = true;
@@ -542,7 +557,6 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 	}
 	return true;
 }
-
 
 langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg ) const
 {
@@ -725,6 +739,11 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofi
 	cmdbind::CommandHandler* hnd = cmdhandler( command);
 	if (!hnd) return NULL;
 	return dynamic_cast<cmdbind::IOFilterCommandHandler*>( hnd);
+}
+
+const db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase() const
+{
+	return m_db;
 }
 
 }} // namespace _Wolframe::proc

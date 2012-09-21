@@ -48,7 +48,7 @@ void parseStructOptionString( Structure& st, const std::string& opt)
 	parseStructOptionStringImpl( st.getStructDescription(), (void*)&st, opt);
 }
 
-void parseStructOptionTree( boost::property_tree::ptree& pt, const std::string& opt);
+boost::property_tree::ptree structOptionTree( const std::string& opt);
 
 }}
 #endif

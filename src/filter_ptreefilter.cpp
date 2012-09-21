@@ -104,10 +104,6 @@ static std::string ptree_tostring( const boost::property_tree::ptree& pt)
 bool PropertyTreeOutputFilter::print( ElementType type, const Element& element)
 {
 	std::string elem = element.tostring();
-	if (std::strchr( elem.c_str(), ' '))
-	{
-		throw std::runtime_error( "illegal character in property tree output filter node");
-	}
 	switch (type)
 	{
 		case TypedFilterBase::OpenTag:
