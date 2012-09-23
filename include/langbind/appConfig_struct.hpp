@@ -61,22 +61,32 @@ struct PrintLayoutConfigStruct
 	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
-struct TransactionFunctionConfigStruct
+struct NormalizeFunctionConfigStruct
 {
 	std::string name;						//< name of the function
-	std::string type;						//< name of the transaction function type (interpreter)
-	std::string call;						//< the source of the transaction function
+	std::string type;						//< name of the normalize function type (interpreter)
+	std::string call;						//< the source of the normalize function description
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
+struct TransactionFunctionConfigStruct
+{
+	std::string name;						//< name of the function
+	std::string type;						//< name of the transaction function type (interpreter)
+	std::string call;						//< the source of the transaction function description
+
+	///\brief Get the configuration structure description
+	static const serialize::StructDescriptionBase* getStructDescription();
+};
 
 struct EnvironmentConfigStruct
 {
-	std::vector<DDLFormConfigStruct> form;				//< definitions of forms
-	std::vector<PrintLayoutConfigStruct> printlayout;		//< definitions of print layouts for forms
-	std::vector<TransactionFunctionConfigStruct> transaction;	//< definitions of transaction function
+	std::vector<DDLFormConfigStruct> form;				//< definition of forms
+	std::vector<PrintLayoutConfigStruct> printlayout;		//< definition of print layouts for forms
+	std::vector<NormalizeFunctionConfigStruct> normalize;		//< definition of string normalize functions
+	std::vector<TransactionFunctionConfigStruct> transaction;	//< definition of transaction functions
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();

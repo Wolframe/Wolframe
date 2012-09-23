@@ -30,52 +30,40 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/appConfig_option.hpp
-///\brief Data structures on command line for the configuration of the processor environment
-#ifndef _Wolframe_APPLICATION_ENVIRONMENT_CMDLINE_OPTION_STRUCT_HPP_INCLUDED
-#define _Wolframe_APPLICATION_ENVIRONMENT_CMDLINE_OPTION_STRUCT_HPP_INCLUDED
-#include "langbind/appConfig_struct.hpp"
-#include <boost/property_tree/ptree.hpp>
+///\file modules/normalize/locale/mod_normalize_locale.hpp
+///\brief Module for normalization functions base on boost locale (ICU)
+#include "module/normalizeFunctionBuilder.hpp"
+#include "logger-v1.hpp"
+#include "localeNormalize.hpp"
 
-namespace _Wolframe {
-namespace langbind {
+_Wolframe::log::LogBackend* logBackendPtr;
 
-struct DDLFormOption :public langbind::DDLFormConfigStruct
+using namespace _Wolframe;
+using namespace _Wolframe::module;
+
+static void setModuleLogger( void* logger )
 {
-	DDLFormOption( const std::string& src);
-};
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
+}
 
-struct PrintLayoutOption :public langbind::PrintLayoutConfigStruct
+static langbind::ResourceHandle localeResource;
+
+namespace {
+struct NormalizeProcessor
 {
-	PrintLayoutOption( const std::string& opt);
-};
 
-struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStruct
-{
-	TransactionFunctionOption( const std::string& src);
-};
-
-struct NormalizeFunctionOption :public langbind::NormalizeFunctionConfigStruct
-{
-	NormalizeFunctionOption( const std::string& src);
-};
-
-
-class DatabaseConfigOption
-{
-public:
-	DatabaseConfigOption( const std::string& opt);
-
-	boost::property_tree::ptree tree() const
+	static SimpleBuilder* constructor()
 	{
-		return m_tree;
+		return new NormalizeFunctionBuilder( "localeconv", langbind::createLocaleNormalizeFunction, &localeResource);
 	}
+};
+}//anonymous namespace
 
-private:
-	boost::property_tree::ptree m_tree;
+enum {NofObjects=1};
+static createBuilderFunc objdef[ NofObjects] =
+{
+	NormalizeProcessor::constructor
 };
 
-}}//namespace
-#endif
-
+ModuleEntryPoint entryPoint( 0, "normalize character conversion functions", setModuleLogger, 0, 0, NofObjects, objdef);
 

@@ -142,20 +142,19 @@ struct OptionStruct
 			( "help,h", "print help message" )
 			( "loglevel,l", po::value<std::string>(), "specify the log level on console" )
 			( "input,f", po::value<std::string>(), "specify input file to process by path" )
-			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
-			( "form,r", po::value< std::vector<std::string> >(), "specify form to load by path" )
-			( "printlayout,p", po::value< std::vector<std::string> >(), "specify print layout for a form" )
-			( "database,d", po::value<std::string>(), "specifiy transaction database" )
-			( "transaction,t", po::value< std::vector<std::string> >(), "specify transaction function" )
-			( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
-			( "cmd", po::value<std::string>(), "name of the command to execute")
 			( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
 			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
+			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
+			( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
+			( "form,F", po::value< std::vector<std::string> >(), "specify form to load by path" )
+			( "printlayout,P", po::value< std::vector<std::string> >(), "specify print layout for a form" )
+			( "database,D", po::value<std::string>(), "specifiy transaction database" )
+			( "transaction,T", po::value< std::vector<std::string> >(), "specify transaction function" )
+			( "normalize,N", po::value< std::vector<std::string> >(), "specify normalization function" )
+			( "cmd", po::value<std::string>(), "name of the command to execute")
 			;
 
 		popt.add( "cmd", 1);
-		popt.add( "output-filter", 1);
-		popt.add( "input-filter", 1);
 	}
 };
 
@@ -210,6 +209,15 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		for (; itr != end; ++itr)
 		{
 			m_envconfig.printlayout.push_back( langbind::PrintLayoutOption( *itr));
+		}
+	}
+	if (vmap.count( "normalize"))
+	{
+		std::vector<std::string> normalizers = vmap["normalize"].as<std::vector<std::string> >();
+		std::vector<std::string>::const_iterator itr=normalizers.begin(), end=normalizers.end();
+		for (; itr != end; ++itr)
+		{
+			m_envconfig.normalize.push_back( langbind::NormalizeFunctionOption( *itr));
 		}
 	}
 	if (vmap.count( "transaction"))

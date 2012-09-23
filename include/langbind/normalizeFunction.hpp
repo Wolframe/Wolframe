@@ -30,52 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/appConfig_option.hpp
-///\brief Data structures on command line for the configuration of the processor environment
-#ifndef _Wolframe_APPLICATION_ENVIRONMENT_CMDLINE_OPTION_STRUCT_HPP_INCLUDED
-#define _Wolframe_APPLICATION_ENVIRONMENT_CMDLINE_OPTION_STRUCT_HPP_INCLUDED
-#include "langbind/appConfig_struct.hpp"
-#include <boost/property_tree/ptree.hpp>
+///\brief Interface for normalize functions
+///\file langbind/normalizeFunction.hpp
+#ifndef _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
+#define _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
+#include "filter/typedfilter.hpp"
+#include "types/countedReference.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-struct DDLFormOption :public langbind::DDLFormConfigStruct
+struct NormalizeFunction
 {
-	DDLFormOption( const std::string& src);
+	NormalizeFunction(){}
+	virtual ~NormalizeFunction(){}
+
+	virtual std::string execute( const std::string& i) const=0;
 };
 
-struct PrintLayoutOption :public langbind::PrintLayoutConfigStruct
-{
-	PrintLayoutOption( const std::string& opt);
-};
+typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
+class ResourceHandle;
 
-struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStruct
-{
-	TransactionFunctionOption( const std::string& src);
-};
+///\param[in,out] rshnd normalization resources handle
+///\param[in] description transaction description source
+typedef NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& description);
 
-struct NormalizeFunctionOption :public langbind::NormalizeFunctionConfigStruct
-{
-	NormalizeFunctionOption( const std::string& src);
-};
-
-
-class DatabaseConfigOption
-{
-public:
-	DatabaseConfigOption( const std::string& opt);
-
-	boost::property_tree::ptree tree() const
-	{
-		return m_tree;
-	}
-
-private:
-	boost::property_tree::ptree m_tree;
-};
-
-}}//namespace
+}}
 #endif
 
 

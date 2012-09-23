@@ -397,6 +397,31 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				break;
 			}
 
+			case ObjectConstructorBase::NORMALIZE_FUNCTION_OBJECT:
+			{	// object is a normalize function compiler
+				module::NormalizeFunctionConstructor* fc = dynamic_cast< module::NormalizeFunctionConstructor* >((*it)->constructor());
+				if ( fc == NULL )
+				{
+					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
+						  << "'' is not a normalize function compiler";
+					throw std::logic_error( "Object is not a normalize function compiler. See log." );
+				}
+				else	{
+					std::string name = fc->objectClassName();
+					boost::algorithm::to_upper( name);
+					std::map< std::string, const module::NormalizeFunctionConstructor* >::const_iterator itr = m_normalizeFunctionCompilerMap.find( name );
+					if ( itr != m_normalizeFunctionCompilerMap.end() )	{
+						LOG_FATAL << "Duplicate normalize function compiler name '" << name << "'";
+						throw std::runtime_error( "Duplicate normalize function compiler name" );
+					}
+					m_normalizeFunctionCompiler.push_back( fc );
+					m_normalizeFunctionCompilerMap[ name ] = fc;
+
+					LOG_TRACE << "'" << name << "' normalize function compiler registered";
+				}
+				break;
+			}
+
 			case ObjectConstructorBase::TRANSACTION_FUNCTION_OBJECT:
 			{	// object is a transaction function compiler
 				module::TransactionFunctionConstructor* ffo = dynamic_cast< module::TransactionFunctionConstructor* >((*it)->constructor());
@@ -508,6 +533,10 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	{
 		success &= declareTransactionFunction( ii->name, ii->type, ii->call);
 	}
+	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=conf->m_environment.normalize.begin(), ee=conf->m_environment.normalize.end(); ii != ee; ++ii)
+	{
+		success &= declareNormalizeFunction( ii->name, ii->type, ii->call);
+	}
 	if (!success)
 	{
 		throw std::logic_error( "Not all configured objects in the processor environment could be loaded. See log." );
@@ -531,6 +560,10 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 
 	for ( std::list< module::DDLCompilerConstructor* >::iterator it = m_ddlcompiler.begin();
 							it != m_ddlcompiler.end(); ++it )
+		delete *it;
+
+	for ( std::list< module::NormalizeFunctionConstructor* >::iterator it = m_normalizeFunctionCompiler.begin();
+							it != m_normalizeFunctionCompiler.end(); ++it )
 		delete *it;
 
 	for ( std::list< module::TransactionFunctionConstructor* >::iterator it = m_transactionFunctionCompiler.begin();
@@ -676,6 +709,37 @@ const prnt::PrintFunction* ProcessorProvider::ProcessorProvider_Impl::printFunct
 		return itr->second.get();
 }
 
+bool ProcessorProvider::ProcessorProvider_Impl::declareNormalizeFunction( const std::string& name, const std::string& type, const std::string& command)
+{
+	try
+	{
+		std::string key = boost::algorithm::to_upper_copy( type);
+		std::map< std::string, const module::NormalizeFunctionConstructor*>::const_iterator itr = m_normalizeFunctionCompilerMap.find( key);
+		if (itr == m_normalizeFunctionCompilerMap.end())
+		{
+			LOG_ERROR << "Cannot declare normalize function '" << name << "'. Normalize function type '" << type << "' is not defined";
+			return false;
+		}
+		langbind::NormalizeFunctionR funcp( itr->second->object( command));
+		std::string funckey( boost::algorithm::to_upper_copy( name));
+
+		std::map< std::string, langbind::NormalizeFunctionR>::const_iterator ip = m_normalizeFunctionMap.find( funckey);
+		if (ip != m_normalizeFunctionMap.end())
+		{
+			LOG_ERROR << "Duplicate definition of normalize function with name '" << name << "'";
+			return false;
+		}
+		m_normalizeFunctionMap[ funckey] = funcp;
+		LOG_TRACE << "Normalize function '" << name << "' (" << type << ") declared";
+		return true;
+	}
+	catch (std::exception& e)
+	{
+		LOG_ERROR << "Cannot declare '" << type << "' normalize function '" << name << "': " <<  e.what();
+		return false;
+	}
+}
+
 bool ProcessorProvider::ProcessorProvider_Impl::declareTransactionFunction( const std::string& name, const std::string& type, const std::string& command)
 {
 	try
@@ -709,6 +773,16 @@ bool ProcessorProvider::ProcessorProvider_Impl::declareTransactionFunction( cons
 		LOG_ERROR << "Cannot declare '" << type << "' transaction function '" << name << "': " <<  e.what();
 		return false;
 	}
+}
+
+const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name ) const
+{
+	std::string key = boost::algorithm::to_upper_copy( name);
+	std::map< std::string, langbind::NormalizeFunctionR>::const_iterator itr = m_normalizeFunctionMap.find( key);
+	if ( itr == m_normalizeFunctionMap.end() )
+		return NULL;
+	else
+		return itr->second.get();
 }
 
 const langbind::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transactionFunction( const std::string& name ) const

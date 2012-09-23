@@ -81,6 +81,20 @@ TransactionFunctionOption::TransactionFunctionOption( const std::string& opt)
 	call.insert( call.end(), si, se);
 }
 
+NormalizeFunctionOption::NormalizeFunctionOption( const std::string& opt)
+{
+	std::string::const_iterator si = opt.begin(), se = opt.end();
+	if (!utils::parseNextToken( name, si, se))
+	{
+		throw std::runtime_error( "illegal normalize function option (name)");
+	}
+	if (!utils::parseNextToken( type, si, se))
+	{
+		throw std::runtime_error( "illegal normalize function option (type)");
+	}
+	call.insert( call.end(), si, se);
+}
+
 DatabaseConfigOption::DatabaseConfigOption( const std::string& opt)
 {
 	m_tree = serialize::structOptionTree( opt);

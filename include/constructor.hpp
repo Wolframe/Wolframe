@@ -53,12 +53,34 @@ public:
 		FILTER_OBJECT,
 		DDL_COMPILER_OBJECT,
 		FORM_FUNCTION_OBJECT,
+		NORMALIZE_FUNCTION_OBJECT,
 		TRANSACTION_FUNCTION_OBJECT,
 		PRINT_FUNCTION_OBJECT,
 		CMD_HANDLER_OBJECT,
 		LANGUAGE_EXTENSION_OBJECT,
 		TEST_OBJECT
 	};
+
+	static const char* objectTypeName( ObjectType tp)
+	{
+		static const char* ar[] =
+		{
+			"Authentication",
+			"Audit",
+			"Authorization",
+			"Database",
+			"Filter",
+			"DLL Compiler",
+			"Form Function",
+			"Normalize Function",
+			"Transaction Function",
+			"Print Function",
+			"Command Handler",
+			"Language Extension",
+			"Test"
+		};
+		return ar[ (int)tp];
+	}
 
 	virtual ~ObjectConstructorBase()	{}
 

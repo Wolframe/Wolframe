@@ -62,7 +62,7 @@ struct TransactionFunction
 
 typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
 
-///\param[in] database name of the database
+///\param[in] provider_ processor provider to get the database to use for transactions
 ///\param[in] description transaction description source
 typedef TransactionFunction* (*CreateTransactionFunction)( const proc::ProcessorProvider* provider_, const std::string& description);
 
