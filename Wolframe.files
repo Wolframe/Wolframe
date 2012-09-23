@@ -1051,7 +1051,6 @@ tests/temp/transaction_input_generator.lua
 tests/temp/transaction_iterator.lua
 tests/temp/transaction_table.lua
 tests/testBoostPath.cpp
-tests/testDatabaseProcessorVM.cpp
 tests/testMethodMemberPointerTemplate.cpp
 tests/testNamedRetVal.cpp
 tests/testProtocolLFdotEscaping.cpp

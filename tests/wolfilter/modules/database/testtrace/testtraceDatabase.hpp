@@ -106,7 +106,7 @@ public:
 		return TESTTRACE_DATABASE_CLASSNAME;
 	}
 
-	virtual const Database& database() const
+	virtual Database& database()
 	{
 		return *this;
 	}

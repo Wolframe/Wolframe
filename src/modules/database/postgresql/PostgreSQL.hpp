@@ -90,7 +90,7 @@ public:
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
-	const Database& database() const	{ return *this; }
+	Database& database()			{ return *this; }
 
 	bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
 			    unsigned short, unsigned short )
@@ -109,7 +109,7 @@ class PostgreSQLconstructor : public ConfiguredObjectConstructor< db::DatabaseUn
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 						{ return DATABASE_OBJECT; }
-	const char* objectClassName() const		{ return POSTGRESQL_DB_CLASS_NAME; }
+	const char* objectClassName() const	{ return POSTGRESQL_DB_CLASS_NAME; }
 	PostgreSQLdatabase* object( const config::NamedConfiguration& conf );
 };
 

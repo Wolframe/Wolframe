@@ -52,7 +52,7 @@ public:
 			       const module::ModulesDirectory* modules );
 	~DatabaseProvider_Impl();
 
-	const Database* database( const std::string& ID ) const;
+	Database* database( const std::string& ID ) const;
 private:
 	std::list< DatabaseUnit* >	m_db;
 };

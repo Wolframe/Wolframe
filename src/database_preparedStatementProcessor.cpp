@@ -893,7 +893,7 @@ langbind::TransactionFunction::ResultR PreparedStatementTransactionFunction::exe
 		{
 			throw std::runtime_error( "no provider defined for getting database access");
 		}
-		Database* db = const_cast<db::Database*>( m_provider->transactionDatabase());
+		Database* db = m_provider->transactionDatabase();
 		if (!db)
 		{
 			throw std::runtime_error( "database for transaction functions not defined");

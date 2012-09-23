@@ -72,7 +72,7 @@ public:
 			  const module::ModulesDirectory* modules );
 	~DatabaseProvider();
 
-	const Database* database( const std::string& ID ) const;
+	Database* database( const std::string& ID ) const;
 
 private:
 	class DatabaseProvider_Impl;

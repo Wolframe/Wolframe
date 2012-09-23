@@ -247,7 +247,7 @@ const langbind::TransactionFunction* ProcessorProvider::transactionFunction( con
 	return m_impl->transactionFunction( name);
 }
 
-const db::Database* ProcessorProvider::transactionDatabase() const
+db::Database *ProcessorProvider::transactionDatabase() const
 {
 	return m_impl->transactionDatabase();
 }
@@ -741,7 +741,7 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofi
 	return dynamic_cast<cmdbind::IOFilterCommandHandler*>( hnd);
 }
 
-const db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase() const
+db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase() const
 {
 	return m_db;
 }

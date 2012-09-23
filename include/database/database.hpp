@@ -115,7 +115,7 @@ public:
 	/// Class names must be unique.
 	virtual const char* className() const = 0;
 
-	virtual const Database& database() const = 0;
+	virtual Database& database() = 0;
 };
 
 }} // namespace _Wolframe::db

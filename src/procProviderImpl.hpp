@@ -31,7 +31,7 @@
 
 ************************************************************************/
 //
-// Wolframe processor provider (group)
+// Wolframe processor provider
 //
 
 #ifndef _WOLFRAME_PROCESSOR_PROVIDER_HPP_INCLUDED
@@ -73,7 +73,7 @@ public:
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
 
-	const db::Database* transactionDatabase() const;
+	db::Database* transactionDatabase() const;
 
 private:
 	bool loadForm( const std::string& ddlname, const std::string& dataDefinitionFilename);
@@ -83,7 +83,7 @@ private:
 
 private:
 	std::string					m_dbLabel;
-	const db::Database*				m_db;
+	db::Database*					m_db;
 	std::list< cmdbind::CommandHandlerConstructor* >	m_cmd;
 	std::map< std::string, std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*> >	m_cmdMap;
 
