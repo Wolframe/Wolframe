@@ -10,6 +10,7 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
@@ -17,6 +18,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS =
 
 LIBRARIES = \
+	wolframe_utils.lib
 
 CPP_OBJS = \
 	strNormalization.obj \
