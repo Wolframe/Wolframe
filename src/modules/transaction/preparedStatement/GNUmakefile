@@ -18,7 +18,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_transaction_pstm.so
 
 CPP_OBJS = \
-	$(TOPDIR)/src/procProviderImplGetTransactionDB.o \
+	$(TOPDIR)/src/procProviderGetTransactionDB.o \
 	$(TOPDIR)/src/database_preparedStatementProcessor.o \
 	$(TOPDIR)/src/types_allocators.o \
 	mod_transaction_pstm.o

@@ -61,7 +61,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.o \
 	serverConfig.o \
 	server.o \
-	procProviderImpl.o
+	procProviderImpl.o \
+	procProviderGetTransactionDB.o
 
 
 #SSL
