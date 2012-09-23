@@ -247,11 +247,6 @@ const langbind::TransactionFunction* ProcessorProvider::transactionFunction( con
 	return m_impl->transactionFunction( name);
 }
 
-const db::Database* ProcessorProvider::transactionDatabase() const
-{
-	return m_impl->transactionDatabase();
-}
-
 
 //**** Processor Provider PIMPL Implementation ******************************
 ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf,
@@ -813,11 +808,6 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofi
 	cmdbind::CommandHandler* hnd = cmdhandler( command);
 	if (!hnd) return NULL;
 	return dynamic_cast<cmdbind::IOFilterCommandHandler*>( hnd);
-}
-
-const db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase() const
-{
-	return m_db;
 }
 
 }} // namespace _Wolframe::proc

@@ -18,6 +18,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS =
 
 LIBRARIES = \
+	wolframe_utils.lib
 
 CPP_OBJS = \
 	strNormalization.obj \
