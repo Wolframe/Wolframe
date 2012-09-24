@@ -51,6 +51,9 @@ namespace db {
 
 static const char* POSTGRESQL_DB_CLASS_NAME = "PostgreSQL";
 
+static const unsigned short POSTGRESQL_MIN_DB_VERSION = 80400;
+static const unsigned short POSTGRESQL_MIN_PROTOCOL_VERSION = 3;
+
 /// PostgreSQL server connection configuration
 class PostgreSQLconfig : public config::NamedConfiguration
 {
