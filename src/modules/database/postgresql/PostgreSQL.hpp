@@ -66,15 +66,21 @@ public:
 	virtual bool check() const;
 	virtual void print( std::ostream& os, size_t indent ) const;
 private:
-	std::string	m_ID;
-	std::string	host;
-	unsigned short	port;
-	std::string	dbName;
-	std::string	user;
-	std::string	password;
-	unsigned short	connectTimeout;
-	unsigned short	connections;
-	unsigned short	acquireTimeout;
+	std::string	m_ID;			///< database identifier
+	std::string	host;			///< server host
+	unsigned short	port;			///< server port
+	std::string	dbName;			///< database name on server
+	std::string	user;			///< database user
+	std::string	password;		///< and password
+	unsigned short	connectTimeout;		///< connection timeout
+	unsigned short	connections;		///< number of database connection (pool size)
+	unsigned short	acquireTimeout;		///< timeout when acquiring a connection from the pool
+	unsigned	statementTimeout;	///< default timeout when executin a statement
+	std::string	sslMode;		///< SSL connection mode
+	std::string	sslCert;		///< client SSL certificate file
+	std::string	sslKey;			///< client SSL key file
+	std::string	sslRootCert;		///< root SSL certificate file
+	std::string	sslCRL;			///< SSL certificate revocation list
 };
 
 
