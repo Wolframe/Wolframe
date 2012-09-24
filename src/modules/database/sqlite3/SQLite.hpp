@@ -81,7 +81,7 @@ public:
 
 	virtual const std::string& ID() const		{ return m_ID; }
 	virtual const char* className() const		{ return SQLite_DB_CLASS_NAME; }
-	virtual const Database& database() const	{ return *this; }
+	virtual Database& database()			{ return *this; }
 
 	virtual bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
 			    unsigned short, unsigned short );

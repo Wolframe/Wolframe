@@ -47,12 +47,12 @@
 namespace _Wolframe {
 namespace proc {
 
-const db::Database* ProcessorProvider::transactionDatabase() const
+db::Database* ProcessorProvider::transactionDatabase() const
 {
 	return m_impl->transactionDatabase();
 }
 
-const db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase() const
+db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase() const
 {
 	return m_db;
 }
