@@ -30,52 +30,34 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/appConfig_option.hpp
-///\brief Data structures on command line for the configuration of the processor environment
-#ifndef _Wolframe_APPLICATION_ENVIRONMENT_CMDLINE_OPTION_STRUCT_HPP_INCLUDED
-#define _Wolframe_APPLICATION_ENVIRONMENT_CMDLINE_OPTION_STRUCT_HPP_INCLUDED
-#include "langbind/appConfig_struct.hpp"
-#include <boost/property_tree/ptree.hpp>
+///\file modules/normalize/locale/localeNormalize.hpp
+///\brief Interface for normalization functions base on boost locale (ICU)
+#ifndef _LANGBIND_LOCALE_NORMALIZE_HPP_INCLUDED
+#define _LANGBIND_LOCALE_NORMALIZE_HPP_INCLUDED
+#include "langbind/normalizeFunction.hpp"
+#include <boost/locale/generator.hpp>
 
 namespace _Wolframe {
 namespace langbind {
 
-struct DDLFormOption :public langbind::DDLFormConfigStruct
-{
-	DDLFormOption( const std::string& src);
-};
-
-struct PrintLayoutOption :public langbind::PrintLayoutConfigStruct
-{
-	PrintLayoutOption( const std::string& opt);
-};
-
-struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStruct
-{
-	TransactionFunctionOption( const std::string& src);
-};
-
-struct NormalizeFunctionOption :public langbind::NormalizeFunctionConfigStruct
-{
-	NormalizeFunctionOption( const std::string& src);
-};
-
-
-class DatabaseConfigOption
+class ResourceHandle
 {
 public:
-	DatabaseConfigOption( const std::string& opt);
-
-	boost::property_tree::ptree tree() const
+	ResourceHandle()
 	{
-		return m_tree;
+		m_gen.locale_cache_enabled( true);
 	}
 
+	std::locale getLocale( const std::string& name)
+	{
+		return m_gen( name);
+	}
 private:
-	boost::property_tree::ptree m_tree;
+	boost::locale::generator m_gen;
 };
+
+NormalizeFunction* createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& description);
 
 }}//namespace
 #endif
-
 

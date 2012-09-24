@@ -30,52 +30,31 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/appConfig_option.hpp
-///\brief Data structures on command line for the configuration of the processor environment
-#ifndef _Wolframe_APPLICATION_ENVIRONMENT_CMDLINE_OPTION_STRUCT_HPP_INCLUDED
-#define _Wolframe_APPLICATION_ENVIRONMENT_CMDLINE_OPTION_STRUCT_HPP_INCLUDED
-#include "langbind/appConfig_struct.hpp"
-#include <boost/property_tree/ptree.hpp>
+//
+// Wolframe processor group
+//
+
+#include "processor/procProvider.hpp"
+#include "procProviderImpl.hpp"
+#include "config/valueParser.hpp"
+#include "config/ConfigurationTree.hpp"
+#include "logger-v1.hpp"
+#include "moduleDirectory.hpp"
+#include "utils/miscUtils.hpp"
+#include <ostream>
+#include <string>
 
 namespace _Wolframe {
-namespace langbind {
+namespace proc {
 
-struct DDLFormOption :public langbind::DDLFormConfigStruct
+const db::Database* ProcessorProvider::transactionDatabase() const
 {
-	DDLFormOption( const std::string& src);
-};
+	return m_impl->transactionDatabase();
+}
 
-struct PrintLayoutOption :public langbind::PrintLayoutConfigStruct
+const db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase() const
 {
-	PrintLayoutOption( const std::string& opt);
-};
+	return m_db;
+}
 
-struct TransactionFunctionOption :public langbind::TransactionFunctionConfigStruct
-{
-	TransactionFunctionOption( const std::string& src);
-};
-
-struct NormalizeFunctionOption :public langbind::NormalizeFunctionConfigStruct
-{
-	NormalizeFunctionOption( const std::string& src);
-};
-
-
-class DatabaseConfigOption
-{
-public:
-	DatabaseConfigOption( const std::string& opt);
-
-	boost::property_tree::ptree tree() const
-	{
-		return m_tree;
-	}
-
-private:
-	boost::property_tree::ptree m_tree;
-};
-
-}}//namespace
-#endif
-
-
+}} // namespace _Wolframe::proc

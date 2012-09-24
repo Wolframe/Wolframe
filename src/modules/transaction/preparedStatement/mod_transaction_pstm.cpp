@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\file modules/transaction/mod_transaction_pstm.cpp
-///\brief Module for testing form functions
+///\brief Module for transaction functions based on the prepared statement database interface
 #include "module/transactionFunctionBuilder.hpp"
 #include "logger-v1.hpp"
 #include "database/preparedStatementProcessor.hpp"

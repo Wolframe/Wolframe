@@ -46,6 +46,7 @@
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "prnt/printFunction.hpp"
+#include "langbind/normalizeFunction.hpp"
 #include "langbind/transactionFunction.hpp"
 #include "langbind/appConfig_struct.hpp"
 
@@ -94,6 +95,7 @@ public:
 	const ddl::StructType* form( const std::string& name ) const;
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
+	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
 
 	db::Database* transactionDatabase() const;
 

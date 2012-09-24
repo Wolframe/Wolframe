@@ -45,6 +45,7 @@
 #include "module/formfunctionBuilder.hpp"
 #include "module/ddlcompilerBuilder.hpp"
 #include "module/printFunctionBuilder.hpp"
+#include "module/normalizeFunctionBuilder.hpp"
 #include "module/transactionFunctionBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 
@@ -72,6 +73,7 @@ public:
 	const ddl::StructType* form( const std::string& name ) const;
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
+	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
 
 	db::Database* transactionDatabase() const;
 
@@ -79,6 +81,7 @@ private:
 	bool loadForm( const std::string& ddlname, const std::string& dataDefinitionFilename);
 	bool loadPrintFunction( const std::string& name, const std::string& type, const std::string& layoutFilename);
 	bool declareTransactionFunction( const std::string& name, const std::string& type, const std::string& command);
+	bool declareNormalizeFunction( const std::string& name, const std::string& type, const std::string& command);
 	bool declareFunctionName( const std::string& name, const char* typestr);
 
 private:
@@ -96,6 +99,10 @@ private:
 	std::list< module::DDLCompilerConstructor* >	m_ddlcompiler;
 	std::map< std::string, ddl::DDLCompilerR >	m_ddlcompilerMap;
 	std::map< std::string, ddl::StructTypeR>	m_formMap;
+
+	std::list< module::NormalizeFunctionConstructor* >	m_normalizeFunctionCompiler;
+	std::map< std::string, const module::NormalizeFunctionConstructor* >	m_normalizeFunctionCompilerMap;
+	std::map< std::string, langbind::NormalizeFunctionR>	m_normalizeFunctionMap;
 
 	std::list< module::TransactionFunctionConstructor* >	m_transactionFunctionCompiler;
 	std::map< std::string, const module::TransactionFunctionConstructor* >	m_transactionFunctionCompilerMap;

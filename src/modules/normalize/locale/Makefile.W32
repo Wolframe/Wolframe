@@ -1,4 +1,4 @@
-TOPDIR = ..\..\..\..\..
+TOPDIR = ..\..\..\..
 
 SUBDIRS =
 
@@ -10,32 +10,30 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
-	/I$(TOPDIR) \
+	/I$(TOPDIR)\src \
+	/I$(TOPDIR)\tests \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
-
+	
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
-	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_db_testtrace.dll
+	mod_normalize_locale.dll
 
 CPP_OBJS = \
-	testtracePreparedStatement.obj \
-	testtraceDatabase.obj \
-	mod_db_testtrace.obj
+	localeNormalize.obj \
+	mod_normalize_locale.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:TesttraceDatabaseModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:ModLocaleNormalize.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 
@@ -44,3 +42,5 @@ local_clean:
 local_distclean:
 
 local_test:
+
+

@@ -15,13 +15,11 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	-lwolframe
 
-DYNAMIC_MODULE = mod_transaction_pstm.so
+DYNAMIC_MODULE = mod_normalize_locale.so
 
 CPP_OBJS = \
-	$(TOPDIR)/src/procProviderGetTransactionDB.o \
-	$(TOPDIR)/src/database_preparedStatementProcessor.o \
-	$(TOPDIR)/src/types_allocators.o \
-	mod_transaction_pstm.o
+	localeNormalize.o \
+	mod_normalize_locale.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

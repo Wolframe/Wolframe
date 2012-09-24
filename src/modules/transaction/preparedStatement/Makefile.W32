@@ -25,6 +25,7 @@ DYNAMIC_MODULE = \
 	mod_transaction_pstm.dll
 
 CPP_OBJS = \
+	$(TOPDIR)\src\procProviderGetTransactionDB.obj \
 	$(TOPDIR)\src\database_preparedStatementProcessor.obj \
 	$(TOPDIR)\src\types_allocators.obj \
 	mod_transaction_pstm.obj

@@ -40,6 +40,7 @@
 #include <map>
 #include <fstream>
 #include <cstdlib>
+#include <iterator>
 
 namespace _Wolframe {
 namespace db {

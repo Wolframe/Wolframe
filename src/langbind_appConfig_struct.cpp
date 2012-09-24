@@ -91,6 +91,23 @@ const serialize::StructDescriptionBase* TransactionFunctionConfigStruct::getStru
 	return &rt;
 }
 
+const serialize::StructDescriptionBase* NormalizeFunctionConfigStruct::getStructDescription()
+{
+	struct ThisDescription :public serialize::StructDescription<NormalizeFunctionConfigStruct>
+	{
+		ThisDescription()
+		{
+			(*this)
+			( "name",		&NormalizeFunctionConfigStruct::name)
+			( "type",		&NormalizeFunctionConfigStruct::type)
+			( "call",		&NormalizeFunctionConfigStruct::call)
+			;
+		}
+	};
+	static const ThisDescription rt;
+	return &rt;
+}
+
 const serialize::StructDescriptionBase* EnvironmentConfigStruct::getStructDescription()
 {
 	struct ThisDescription :public serialize::StructDescription<EnvironmentConfigStruct>
@@ -101,6 +118,7 @@ const serialize::StructDescriptionBase* EnvironmentConfigStruct::getStructDescri
 			( "form",		&EnvironmentConfigStruct::form)
 			( "printlayout",	&EnvironmentConfigStruct::printlayout)
 			( "transaction",	&EnvironmentConfigStruct::transaction)
+			( "normalize",		&EnvironmentConfigStruct::normalize)
 			;
 		}
 	};

@@ -68,7 +68,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \
-	procProviderImpl.obj
+	procProviderImpl.obj \
+	procProviderGetTransactionDB.obj
 
 !IFDEF WITH_SSL
 LOCAL_STATIC_LIB_OBJS = \
