@@ -4,7 +4,7 @@ SUBDIRS = \
 	libwolframe \
 	libwolframe_serialize \
 	libwolframe_langbind \
-	libwolframe_utils \
+	libwolframe_functions \
 	modules
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk

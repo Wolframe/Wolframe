@@ -17,9 +17,9 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 
-STATIC_LIB = libwolframe_utils.a
+STATIC_LIB = libwolframe_functions.a
 
-DYNAMIC_LIB = libwolframe_utils.so
+DYNAMIC_LIB = libwolframe_functions.so
 DYNAMIC_LIB_MAJOR = 0
 DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0

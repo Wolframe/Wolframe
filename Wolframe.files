@@ -713,6 +713,11 @@ src/libwolframe/b64decode.c
 src/libwolframe/b64encode.c
 src/libwolframe/byte2hex.c
 src/libwolframe/CRAM.cpp
+src/libwolframe_functions/GNUmakefile
+src/libwolframe_functions/Makefile.W32
+src/libwolframe_functions/README
+src/libwolframe_functions/strNormalization.cpp
+src/libwolframe_functions/strSimilarity.cpp
 src/libwolframe/getPassword.cpp
 src/libwolframe/GNUmakefile
 src/libwolframe_langbind/GNUmakefile
@@ -756,11 +761,6 @@ src/libwolframe/sha2.c
 src/libwolframe/stringUtils.cpp
 src/libwolframe/user.cpp
 src/libwolframe/utils_doctype.cpp
-src/libwolframe_utils/GNUmakefile
-src/libwolframe_utils/Makefile.W32
-src/libwolframe_utils/README
-src/libwolframe_utils/strNormalization.cpp
-src/libwolframe_utils/strSimilarity.cpp
 src/loadModules.cpp
 src/loadModules-dummy.cpp
 src/Makefile.W32

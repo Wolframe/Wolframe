@@ -17,9 +17,9 @@ class appException : public std::exception
 {
 public:
 	appException( ErrorCode::Error error, ErrorSeverity::Severity severity, const char* Format, ... );
-	~appException() throw ()	{};
+	~appException() throw ()			{}
 
-	ErrorCode::Error error()			{ return error_; };
+	ErrorCode::Error error()			{ return error_; }
 	ErrorSeverity::Severity severity( void )	{ return severity_; }
 	const char* what() const throw()		{ return what_.c_str(); }
 	std::string docRepoAnswer( void );
@@ -41,9 +41,9 @@ class systemException : public std::exception
 public:
 	systemException( ErrorCode::Error error, ErrorSeverity::Severity severity,
 		ErrorModule::Module module = ErrorModule::UNKNOWN, const char* msg = NULL );
-	~systemException() throw ()	{};
+	~systemException() throw ()	{}
 
-	ErrorCode::Error error()			{ return error_; };
+	ErrorCode::Error error()			{ return error_; }
 	ErrorSeverity::Severity severity()		{ return severity_; }
 	ErrorModule::Module module()			{ return module_; }
 	const char* msg()				{ return msg_; }

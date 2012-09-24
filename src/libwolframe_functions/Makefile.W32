@@ -18,7 +18,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS =
 
 LIBRARIES = \
-	wolframe_utils.lib
+	wolframe_functions.lib
 
 CPP_OBJS = \
 	strNormalization.obj \
@@ -29,7 +29,7 @@ all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-wolframe_utils.lib: $(OBJS) $(CPP_OBJS)
+wolframe_functions.lib: $(OBJS) $(CPP_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
 local_all:
