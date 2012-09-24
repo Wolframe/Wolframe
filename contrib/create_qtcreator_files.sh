@@ -7,6 +7,7 @@ find . -name 'GNUmakefile' -type f -print >>/tmp/$$
 find . -name 'Makefile.W32' -type f -print >>/tmp/$$
 find src/modules -name '*.def' -type f -print >>/tmp/$$
 find . -name '*.conf' -type f -print >>/tmp/$$
+find . -name '*.exp' -type f -print >>/tmp/$$
 find . -name '*.xml' -type f -print >>/tmp/$$
 find . -name '*.xsl' -type f -print >>/tmp/$$
 find . -name '*.lua' -type f -print >>/tmp/$$
