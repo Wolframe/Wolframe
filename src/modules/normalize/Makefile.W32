@@ -5,8 +5,7 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 SUBDIRS = \
-	$(SUBDIRS)
-#PF:DISABLED: locale (missing libboost_locale and open questions about ICU support) 
+	$(SUBDIRS) locale
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
