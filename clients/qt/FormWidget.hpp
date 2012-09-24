@@ -26,7 +26,7 @@ namespace _Wolframe {
 		virtual ~FormWidget( );
 		void loadForm( QString name );
 		void loadLanguage( QString language );
-	
+			
 	private:
 		QString m_name;			// name of the form
 		QUiLoader *m_uiLoader;		// UI loader to user for loading designer XML files
@@ -39,8 +39,11 @@ namespace _Wolframe {
 
 	private:
 		void initialize( );
+	
+	signals:
+		void formLoaded( QString name );
 		
-	private Q_SLOTS:
+	private slots:
 		void formLoaded( QString name, QByteArray form );
 		void formLocalizationLoaded( QString name, QByteArray localization );
 		void dataLoaded( QString name, QByteArray xml );

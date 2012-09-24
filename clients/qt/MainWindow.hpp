@@ -42,12 +42,14 @@ namespace _Wolframe {
 		void loadForm( QString formName );
 		void loadLanguage( QString language );
 
-	private Q_SLOTS:
+	private slots:
 		void themeSelected( QAction *action );
 		void formSelected( QAction *action );
 		void languageSelected( QAction *action );
 
 		void formListLoaded( );
+
+		void formLoaded( QString name );
 
 		void on_actionExit_triggered( );
 		void on_actionAbout_triggered( );

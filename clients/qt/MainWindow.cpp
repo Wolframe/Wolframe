@@ -48,6 +48,10 @@ void MainWindow::initialize( )
 	QObject::connect( m_formLoader, SIGNAL( formListLoaded( ) ),
 		this, SLOT( formListLoaded( ) ) );
 
+// get notified if the form widget changes a form
+	QObject::connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+		this, SLOT( formLoaded( QString ) ) );
+
 // create a Wolframe protocol client
 	m_wolframeClient = new WolframeClient( );
 
@@ -256,11 +260,15 @@ void MainWindow::loadForm( QString name )
 // delegate form loading to form widget
 	m_formWidget->loadForm( name );
 
-// also set language of the form widget
-	m_formWidget->loadLanguage( m_currentLanguage );
-
 // remember the name of the current form
 	m_currentForm = name;
+}
+
+void MainWindow::formLoaded( QString name )
+{
+// also set language of the form widget,
+// but wait till the form got loaded, otherwise we get races!
+	m_formWidget->loadLanguage( m_currentLanguage );
 }
 
 void MainWindow::on_actionExit_triggered( )

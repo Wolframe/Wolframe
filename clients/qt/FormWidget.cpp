@@ -136,7 +136,10 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 	QMetaObject::connectSlotsByName( this );
 	
 // not busy anymore
-	qApp->restoreOverrideCursor( );	
+	qApp->restoreOverrideCursor( );
+	
+// signal
+	emit formLoaded( m_name );
 }
 
 void FormWidget::dataSaved( QString name )
