@@ -71,7 +71,7 @@ public:
 	{
 		friend class ModulesDirectory;
 	public:
-		simpleBuilder_iterator()			{}
+		simpleBuilder_iterator()		{}
 		simpleBuilder_iterator( const simpleBuilder_iterator& it )
 			: m_it( it.m_it )		{}
 

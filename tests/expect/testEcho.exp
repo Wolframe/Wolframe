@@ -12,9 +12,9 @@ set serverpid [spawn ../../src/wolframed -c $config -f]
 
 puts "wolframed started with configuration file: $config (pid: $serverpid)"
 # allow the server to start
-sleep 2
+sleep 1
 
-set timeout 3
+set timeout 5
 if { [catch {
 	spawn telnet localhost 7661
 
