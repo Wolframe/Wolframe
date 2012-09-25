@@ -242,6 +242,11 @@ const prnt::PrintFunction* ProcessorProvider::printFunction( const std::string& 
 	return m_impl->printFunction( name);
 }
 
+const langbind::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const
+{
+	return m_impl->normalizeFunction( name );
+}
+
 const langbind::TransactionFunction* ProcessorProvider::transactionFunction( const std::string& name) const
 {
 	return m_impl->transactionFunction( name);

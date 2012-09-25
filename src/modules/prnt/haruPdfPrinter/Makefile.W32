@@ -27,15 +27,7 @@ DYNAMIC_MODULE = \
 	mod_haru_pdf_printer.dll
 
 CPP_OBJS = \
-	$(TOPDIR)\src\types_allocators.obj \
-	$(TOPDIR)\src\types_bcdArithmetic.obj \
-	$(TOPDIR)\src\prnt_pdfPrinter.obj \
-	$(TOPDIR)\src\prnt_pdfPrinter_libhpdf.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterDocument_libhpdf.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterExpression.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterMethod.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterVariable.obj \
-	mod_haru_pdf_printer.obj
+	$(TOPDIR)\src\types_allocators.obj $(TOPDIR)\src\types_bcdArithmetic.obj $(TOPDIR)\src\prnt_pdfPrinter.obj $(TOPDIR)\src\prnt_pdfPrinter_libhpdf.obj $(TOPDIR)\src\prnt_pdfPrinterDocument_libhpdf.obj $(TOPDIR)\src\prnt_pdfPrinterExpression.obj $(TOPDIR)\src\prnt_pdfPrinterMethod.obj $(TOPDIR)\src\prnt_pdfPrinterVariable.obj mod_haru_pdf_printer.obj
 
 all: $(DYNAMIC_MODULE)
 
