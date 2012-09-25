@@ -13,6 +13,7 @@ makefiles/gmake/sub.mk
 makefiles/gmake/top.mk
 makefiles/nmake/clean.mk
 makefiles/nmake/compiler.mk
+makefiles/nmake/config_aba_vc10_32bit_debug_boost_locale.mk
 makefiles/nmake/config_aba_vc10_32bit_debug.mk
 makefiles/nmake/config_aba_vc10_32bit_release.mk
 makefiles/nmake/config_aba_vc9_32bit_release.mk
@@ -459,7 +460,9 @@ include/utils/strNormalization.hpp
 include/utils/strSimilarity.hpp
 include/version.hpp
 INSTALL.Unix
+INSTALL.Unix-Boost-Locale-ICU
 INSTALL.Windows
+INSTALL.Windows-Boost-Locale-ICU
 libhpdf/GNUmakefile
 libhpdf/include/GNUmakefile
 libhpdf/include/hpdf_3dmeasure.h
@@ -912,6 +915,12 @@ src/modules/normalize/locale/Makefile.W32
 src/modules/normalize/locale/ModLocaleNormalize.def
 src/modules/normalize/locale/mod_normalize_locale.cpp
 src/modules/normalize/Makefile.W32
+src/modules/normalize/number/GNUmakefile
+src/modules/normalize/number/Makefile.W32
+src/modules/normalize/number/mod_normalize_number.cpp
+src/modules/normalize/number/ModNumberNormalize.def
+src/modules/normalize/number/numberNormalize.cpp
+src/modules/normalize/number/numberNormalize.hpp
 src/modules/prnt/GNUmakefile
 src/modules/prnt/haruPdfPrinter/GNUmakefile
 src/modules/prnt/haruPdfPrinter/Makefile.W32

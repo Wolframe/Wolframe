@@ -111,11 +111,6 @@ public:
 		return *this;
 	}
 
-	virtual bool doTransaction( DatabaseRequest&, DatabaseAnswer&, unsigned short, unsigned short)
-	{
-		return false;
-	}
-
 	///\brief Get the interface for processing prepared statements in the database
 	virtual PreparedStatementHandler* getPreparedStatementHandler()
 	{
