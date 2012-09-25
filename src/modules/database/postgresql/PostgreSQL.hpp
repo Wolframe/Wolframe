@@ -87,15 +87,18 @@ private:
 };
 
 
-class PostgreSQLdatabase : public Database, public DatabaseUnit
+class PostgreSQLdbUnit : public Database, public DatabaseUnit
 {
 public:
-	PostgreSQLdatabase( const std::string& id,
-			    const std::string& host, unsigned short port, const std::string& dbName,
-			    const std::string& user, const std::string& password,
-			    unsigned short connectTimeout,
-			    size_t connections, unsigned short acquireTimeout );
-	~PostgreSQLdatabase();
+	PostgreSQLdbUnit( const std::string& id,
+			  const std::string& host, unsigned short port, const std::string& dbName,
+			  const std::string& user, const std::string& password,
+			  unsigned short connectTimeout,
+			  size_t connections, unsigned short acquireTimeout,
+			  unsigned statementTimeout,
+			  std::string sslMode, std::string sslCert, std::string sslKey,
+			  std::string sslRootCert, std::string sslCRL );
+	~PostgreSQLdbUnit();
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
@@ -109,6 +112,7 @@ private:
 	std::string		m_connStr;		///< connection string
 	size_t			m_noConnections;	///< number of connections
 	ObjectPool< PGconn* >	m_connPool;		///< pool of connections
+	unsigned		m_statementTimeout;	///< default staement execution timeout
 };
 
 
@@ -117,9 +121,9 @@ class PostgreSQLconstructor : public ConfiguredObjectConstructor< db::DatabaseUn
 {
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
-						{ return DATABASE_OBJECT; }
+	{ return DATABASE_OBJECT; }
 	const char* objectClassName() const	{ return POSTGRESQL_DB_CLASS_NAME; }
-	PostgreSQLdatabase* object( const config::NamedConfiguration& conf );
+	PostgreSQLdbUnit* object( const config::NamedConfiguration& conf );
 };
 
 }} // _Wolframe::db

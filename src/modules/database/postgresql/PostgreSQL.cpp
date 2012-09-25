@@ -105,7 +105,9 @@ static std::string escConnElement( std::string element )
 
 static std::string buildConnStr( const std::string& host, unsigned short port, const std::string& dbName,
 				 const std::string& user, const std::string& password,
-				 unsigned short connectTimeout )
+				 unsigned short connectTimeout,
+				 std::string /*sslMode*/, std::string /*sslCert*/, std::string /*sslKey*/,
+				 std::string /*sslRootCert*/, std::string /*sslCRL*/ )
 {
 	std::stringstream ss;
 
@@ -141,15 +143,20 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 
 
 // This function also needs a lot of work
-PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id,
-					const std::string& host, unsigned short port,
-					const std::string& dbName,
-					const std::string& user, const std::string& password,
-					unsigned short connectTimeout,
-					size_t connections, unsigned short acquireTimeout )
-	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout )
+PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
+				    const std::string& host, unsigned short port,
+				    const std::string& dbName,
+				    const std::string& user, const std::string& password,
+				    unsigned short connectTimeout,
+				    size_t connections, unsigned short acquireTimeout,
+				    unsigned statementTimeout,
+				    std::string sslMode, std::string sslCert, std::string sslKey,
+				    std::string sslRootCert, std::string sslCRL )
+	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
+	  m_statementTimeout( statementTimeout )
 {
-	m_connStr = buildConnStr( host, port,  dbName, user, password, connectTimeout );
+	m_connStr = buildConnStr( host, port,  dbName, user, password, connectTimeout,
+				  sslMode, sslCert, sslKey, sslRootCert, sslCRL );
 	MOD_LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
 
 	for ( size_t i = 0; i < connections; i++ )	{
@@ -205,7 +212,7 @@ PostgreSQLdatabase::PostgreSQLdatabase( const std::string& id,
 
 
 // This function needs a lot of work and thinking...
-PostgreSQLdatabase::~PostgreSQLdatabase()
+PostgreSQLdbUnit::~PostgreSQLdbUnit()
 {
 	size_t connections = 0;
 	m_connPool.timeout( 3 );
