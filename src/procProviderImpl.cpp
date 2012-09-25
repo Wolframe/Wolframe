@@ -516,6 +516,10 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 	// Build the list of configured objects in the processor environment:
 	bool success = true;
+	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=conf->m_environment.normalize.begin(), ee=conf->m_environment.normalize.end(); ii != ee; ++ii)
+	{
+		success &= declareNormalizeFunction( ii->name, ii->type, ii->call);
+	}
 	for (std::vector<langbind::DDLFormConfigStruct>::const_iterator ii=conf->m_environment.form.begin(), ee=conf->m_environment.form.end(); ii != ee; ++ii)
 	{
 		success &= loadForm( ii->DDL, ii->file);
@@ -527,10 +531,6 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	for (std::vector<langbind::TransactionFunctionConfigStruct>::const_iterator ii=conf->m_environment.transaction.begin(), ee=conf->m_environment.transaction.end(); ii != ee; ++ii)
 	{
 		success &= declareTransactionFunction( ii->name, ii->type, ii->call);
-	}
-	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=conf->m_environment.normalize.begin(), ee=conf->m_environment.normalize.end(); ii != ee; ++ii)
-	{
-		success &= declareNormalizeFunction( ii->name, ii->type, ii->call);
 	}
 	if (!success)
 	{
@@ -619,6 +619,21 @@ bool ProcessorProvider::ProcessorProvider_Impl::declareFunctionName( const std::
 	return true;
 }
 
+class ProcessorProvider::ProcessorProvider_Impl::DDLTypeMap :public ddl::TypeMap
+{
+public:
+	explicit DDLTypeMap( const ProcessorProvider::ProcessorProvider_Impl* pp)
+		:m_provider( pp){}
+
+	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
+	{
+		return m_provider->normalizeFunction( name);
+	}
+
+private:
+	const ProcessorProvider::ProcessorProvider_Impl* m_provider;
+};
+
 bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const std::string& ddlname, const std::string& dataDefinitionFilename)
 {
 	try
@@ -630,7 +645,8 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const std::string& ddl
 			LOG_ERROR << "Failed to load form '" << utils::getFileStem( dataDefinitionFilename) << "'. Compiler for DDL '" << ddlname << "' is not defined";
 			return false;
 		}
-		std::pair< std::string, ddl::StructTypeR> def = ddl::loadForm( *itr->second, dataDefinitionFilename);
+		DDLTypeMap typemap( this);
+		std::pair< std::string, ddl::StructTypeR> def = ddl::loadForm( *itr->second, dataDefinitionFilename, &typemap);
 		std::string formkey = boost::algorithm::to_upper_copy( def.first);
 		m_formMap[ formkey] = def.second;
 

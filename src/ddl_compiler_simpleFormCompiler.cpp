@@ -52,45 +52,18 @@ namespace
 class FRMAttribute
 {
 public:
-	enum Type
-	{
-		float_=AtomicType::float_,
-		int_=AtomicType::int_,
-		uint_=AtomicType::uint_,
-		string_=AtomicType::string_,
-		form_
-	};
-
-	static const char* typeName( Type tp)
-	{
-		static const char* ar[] = {"float","int","uint","string","form",0};
-		return ar[ (int)tp];
-	}
-
-	static bool getType( const char* name, Type& tp)
-	{
-		const char* rt;
-		unsigned int ii;
-		for (ii=0,rt=typeName((Type)(ii)); rt!=0; ii++,rt=typeName((Type)(ii)))
-		{
-			if (boost::algorithm::iequals( rt, name))
-			{
-				tp = (Type)ii;
-				return true;
-			}
-		}
-		return false;
-	}
-
-public:
 	FRMAttribute( const FRMAttribute& o)
 		:m_isVector(o.m_isVector)
 		,m_isAttribute(o.m_isAttribute)
+		,m_isForm(o.m_isForm)
 		,m_type(o.m_type)
 		,m_value(o.m_value){}
 
-	explicit FRMAttribute( const std::string& item)
-		:m_isVector(false),m_isAttribute(false),m_type(string_)
+	explicit FRMAttribute( const std::string& item, const TypeMap* typemap)
+		:m_isVector(false)
+		,m_isAttribute(false)
+		,m_isForm(false)
+		,m_type(0)
 	{
 		enum State
 		{
@@ -124,7 +97,7 @@ public:
 						vv.push_back( *ii);
 						continue;
 					}
-					parseType( vv);
+					parseType( vv, typemap);
 					st = ParseEndName;
 					/* no break here !*/
 				case ParseEndName:
@@ -193,7 +166,7 @@ public:
 		}
 		if (st == ParseName)
 		{
-			parseType( vv);
+			parseType( vv, typemap);
 		}
 		else if (st != ParseEnd)
 		{
@@ -203,25 +176,35 @@ public:
 
 	bool isVector() const			{return m_isVector;}
 	bool isAttribute() const		{return m_isAttribute;}
-	Type type() const			{return m_type;}
+	bool isForm() const			{return m_isForm;}
+	const NormalizeFunction* type() const	{return m_type;}
 	const std::string& value() const	{return m_value;}
 
 private:
-	void parseType( const std::string& typestr)
+	void parseType( const std::string& typestr, const TypeMap* typemap)
 	{
 		if (typestr.size() == 0)
 		{
-			m_type = form_;
+			m_isForm = true;
 		}
-		else if (!getType( typestr.c_str(), m_type))
+		else if (boost::algorithm::iequals( typestr, "string"))
 		{
-			throw std::runtime_error( (std::string( "Unknown type: '") += typestr) += "'");
+			m_type = 0;
+		}
+		else
+		{
+			m_type = typemap->getType( typestr);
+			if (!m_type)
+			{
+				throw std::runtime_error( (std::string( "unknown type: '") += typestr) += "'");
+			}
 		}
 	}
 private:
 	bool m_isVector;
 	bool m_isAttribute;
-	Type m_type;
+	bool m_isForm;
+	const NormalizeFunction* m_type;
 	std::string m_value;
 };
 
@@ -239,8 +222,7 @@ static bool isIdentifier( const std::string& name)
 	}
 	return (ii==ee);
 }
-
-static void compile_ptree( const boost::property_tree::ptree& pt, StructType& result)
+static void compile_ptree( const boost::property_tree::ptree& pt, StructType& result, const TypeMap* typemap)
 {
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
@@ -251,12 +233,12 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 		}
 		if (itr->second.begin() == itr->second.end() && itr->second.data().size())
 		{
-			FRMAttribute fa( itr->second.data());
-			if (fa.type() == FRMAttribute::form_)
+			FRMAttribute fa( itr->second.data(), typemap);
+			if (fa.isForm())
 			{
 				throw std::runtime_error( "Semantic error: illegal type specifier");
 			}
-			AtomicType at( (AtomicType::Type)fa.type());
+			AtomicType at( fa.type());
 			at.set( fa.value());
 			StructType val;
 			if (fa.isVector())
@@ -288,8 +270,8 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 		{
 			if (itr->second.data().size())
 			{
-				FRMAttribute fa( itr->second.data());
-				if (fa.type() != FRMAttribute::form_)
+				FRMAttribute fa( itr->second.data(), typemap);
+				if (!fa.isForm())
 				{
 					throw std::runtime_error( "Semantic error: Atomic type declared as structure");
 				}
@@ -301,23 +283,23 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				if (fa.isVector())
 				{
 					StructType prototype;
-					compile_ptree( itr->second, prototype);
+					compile_ptree( itr->second, prototype, typemap);
 					st.defineAsVector( prototype);
 				}
 				else
 				{
-					if (fa.type() == FRMAttribute::form_)
+					if (fa.isForm())
 					{
 						throw std::runtime_error( "Semantic error: Form declared with default value");
 					}
-					compile_ptree( itr->second, st);
+					compile_ptree( itr->second, st, typemap);
 				}
 				result.defineContent( itr->first, st);
 			}
 			else
 			{
 				StructType st;
-				compile_ptree( itr->second, st);
+				compile_ptree( itr->second, st, typemap);
 				result.defineContent( itr->first, st);
 			}
 		}
@@ -350,7 +332,7 @@ static std::string getDoctype( boost::property_tree::ptree& pt)
 	return rt;
 }
 
-StructType SimpleFormCompiler::compile( const std::string& srcstring) const
+StructType SimpleFormCompiler::compile( const std::string& srcstring, const TypeMap* typemap) const
 {
 	StructType rt;
 	std::istringstream src( srcstring);
@@ -358,7 +340,7 @@ StructType SimpleFormCompiler::compile( const std::string& srcstring) const
 	boost::property_tree::info_parser::read_info( src, pt);
 	std::string doctype = getDoctype( pt);
 	if (doctype.size()) rt.defineDoctype( doctype.c_str());
-	compile_ptree( pt, rt);
+	compile_ptree( pt, rt, typemap);
 	return rt;
 }
 

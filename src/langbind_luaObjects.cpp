@@ -36,6 +36,7 @@ Project Wolframe.
 #include "langbind/luaGetFunctionClosure.hpp"
 #include "langbind/luaBcdNumber.hpp"
 #include "langbind/luaDateTime.hpp"
+#include "langbind/normalizeFunction.hpp"
 #include "filter/luafilter.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
@@ -273,6 +274,7 @@ static ObjectType* getGlobalSingletonPointer( lua_State* ls)
 	typedef typename boost::remove_cv<ObjectType>::type ObjectType_ncv;
 	lua_getglobal( ls, metaTableName<ObjectType_ncv>());
 	ObjectType* rt = (ObjectType*)lua_touserdata( ls, -1);
+	if (!rt) throw std::runtime_error("global context not defined");
 	lua_pop( ls, 1);
 	return rt;
 }
@@ -281,6 +283,21 @@ static proc::ProcessorProvider* getProcessorProvider( lua_State* ls)
 {
 	return getGlobalSingletonPointer<proc::ProcessorProvider>( ls);
 }
+
+class DDLTypeMap :public ddl::TypeMap
+{
+public:
+	DDLTypeMap( lua_State* ls)
+		:m_provider( getProcessorProvider( ls)){}
+
+	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
+	{
+		return m_provider->normalizeFunction( name);
+	}
+
+private:
+	const proc::ProcessorProvider* m_provider;
+};
 
 static const LuaModuleMap* getLuaModuleMap( lua_State* ls)
 {
@@ -687,7 +704,8 @@ LUA_FUNCTION_THROWS( "form()", function_form)
 		check_parameters( ls, 0, 1, LUA_TTABLE);
 		TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
 		if (!inp.get()) throw std::runtime_error( "unexpected null object intead of table argument");
-		DDLForm frm( ddl::StructTypeR( new ddl::StructTypeBuild( *inp)));
+		DDLTypeMap typemap( ls);
+		DDLForm frm( ddl::StructTypeR( new ddl::StructTypeBuild( *inp, &typemap)));
 		LuaObject<DDLForm>::push_luastack( ls, frm);
 		return 1;
 	}

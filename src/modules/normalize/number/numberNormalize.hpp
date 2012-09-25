@@ -30,27 +30,23 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for normalize functions
-///\file langbind/normalizeFunction.hpp
-#ifndef _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "ddl/atomicType.hpp"
-#include "types/countedReference.hpp"
+///\file modules/normalize/number/numberNormalize.hpp
+///\brief Interface for normalization functions of simple ASCII numbers
+#ifndef _LANGBIND_NUMBER_NORMALIZE_HPP_INCLUDED
+#define _LANGBIND_NUMBER_NORMALIZE_HPP_INCLUDED
+#include "langbind/normalizeFunction.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-typedef ddl::NormalizeFunction NormalizeFunction;
+class ResourceHandle
+{
+public:
+	ResourceHandle(){}
+};
 
-typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
-class ResourceHandle;
+NormalizeFunction* createNumberNormalizeFunction( ResourceHandle& reshnd, const std::string& description);
 
-///\param[in,out] rshnd normalization resources handle
-///\param[in] description transaction description source
-typedef NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& description);
-
-}}
+}}//namespace
 #endif
-
 

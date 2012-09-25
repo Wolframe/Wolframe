@@ -43,7 +43,7 @@ namespace ddl {
 class StructTypeBuild :public StructType
 {
 public:
-	StructTypeBuild( langbind::TypedInputFilter& inp);
+	StructTypeBuild( langbind::TypedInputFilter& inp, const TypeMap* typemap);
 };
 
 }}//namespace

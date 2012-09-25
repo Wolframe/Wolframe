@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\file modules/normalize/locale/localeNormalize.hpp
-///\brief Interface for normalization functions base on boost locale (ICU)
+///\brief Interface for normalization functions based on boost locale (ICU)
 #ifndef _LANGBIND_LOCALE_NORMALIZE_HPP_INCLUDED
 #define _LANGBIND_LOCALE_NORMALIZE_HPP_INCLUDED
 #include "langbind/normalizeFunction.hpp"

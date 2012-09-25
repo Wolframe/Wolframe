@@ -46,8 +46,8 @@ class SimpleFormCompiler :public DDLCompiler
 public:
 	SimpleFormCompiler() :DDLCompiler( "simpleform") {}
 
-	///\brief Compile a source from a string. See DDLCompiler::compile( const std::string&) const
-	virtual StructType compile( const std::string& srcstring) const;
+	///\brief Compile a source from a string. See DDLCompiler::compile( const std::string&, const TypeMap*) const
+	virtual StructType compile( const std::string& srcstring, const TypeMap* typemap) const;
 };
 
 DDLCompiler* createSimpleFormCompilerFunc();

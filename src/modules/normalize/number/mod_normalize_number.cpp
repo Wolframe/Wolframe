@@ -30,27 +30,40 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for normalize functions
-///\file langbind/normalizeFunction.hpp
-#ifndef _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "ddl/atomicType.hpp"
-#include "types/countedReference.hpp"
+///\file modules/normalize/number/mod_normalize_number.hpp
+///\brief Module for number normalization and validating functions
+#include "module/normalizeFunctionBuilder.hpp"
+#include "logger-v1.hpp"
+#include "numberNormalize.hpp"
 
-namespace _Wolframe {
-namespace langbind {
+_Wolframe::log::LogBackend* logBackendPtr;
 
-typedef ddl::NormalizeFunction NormalizeFunction;
+using namespace _Wolframe;
+using namespace _Wolframe::module;
 
-typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
-class ResourceHandle;
+static void setModuleLogger( void* logger )
+{
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
+}
 
-///\param[in,out] rshnd normalization resources handle
-///\param[in] description transaction description source
-typedef NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& description);
+static langbind::ResourceHandle numberResource;
 
-}}
-#endif
+namespace {
+struct NormalizeProcessor
+{
 
+	static SimpleBuilder* constructor()
+	{
+		return new NormalizeFunctionBuilder( "number", langbind::createNumberNormalizeFunction, &numberResource);
+	}
+};
+}//anonymous namespace
+
+enum {NofObjects=1};
+static createBuilderFunc objdef[ NofObjects] =
+{
+	NormalizeProcessor::constructor
+};
+
+ModuleEntryPoint entryPoint( 0, "normalizers and validators numbers", setModuleLogger, 0, 0, NofObjects, objdef);
 

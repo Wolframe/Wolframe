@@ -111,6 +111,10 @@ char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 	return parseNextToken( tok, itr, end, noOperator);
 }
 
+char _Wolframe::utils::gotoNextToken( std::string::const_iterator& itr, std::string::const_iterator end)
+{
+	while (itr != end && *itr <= 32) ++itr;
+}
 
 template <class Result>
 static void readSourceFileContentT( const std::string& filename, Result& res)

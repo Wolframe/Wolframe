@@ -31,8 +31,8 @@ Project Wolframe.
 ************************************************************************/
 ///\file ddl_structTypeBuild.cpp
 ///\brief Implementation of the building of structure definitions from a buffering filter
-
 #include "ddl/structTypeBuild.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::ddl;
@@ -64,7 +64,7 @@ struct Name
 	}
 };
 
-StructTypeBuild::StructTypeBuild( langbind::TypedInputFilter& src)
+StructTypeBuild::StructTypeBuild( langbind::TypedInputFilter& src, const TypeMap* typemap)
 {
 	langbind::FilterBase::ElementType type,lasttype = langbind::FilterBase::OpenTag;
 	Name attribute;
@@ -78,7 +78,7 @@ StructTypeBuild::StructTypeBuild( langbind::TypedInputFilter& src)
 			{
 				Name tag;
 				tag.set( val.tostring());
-				StructTypeBuild rtElem( src);
+				StructTypeBuild rtElem( src, typemap);
 				if (tag.isAttribute && rtElem.contentType() != StructType::Atomic)
 				{
 					throw std::runtime_error( "Attribute type declared with @ has a non atomic value");
@@ -108,14 +108,17 @@ StructTypeBuild::StructTypeBuild( langbind::TypedInputFilter& src)
 			case langbind::FilterBase::Value:
 			{
 				std::string typenam = val.tostring();
-				AtomicType::Type tp;
-				if (!AtomicType::getType( typenam.c_str(), tp))
+				const NormalizeFunction* tp = 0;
+				if (!boost::algorithm::iequals( typenam, "string"))
 				{
-					std::ostringstream msg;
-					msg << "illegal type in structure (" << typenam << ")";
-					throw std::runtime_error( msg.str());
+					tp = typemap->getType( typenam);
+					if (!tp)
+					{
+						std::ostringstream msg;
+						msg << "unknown type in structure (" << typenam << ")";
+						throw std::runtime_error( msg.str());
+					}
 				}
-
 				AtomicType at( tp);
 				StructType vv;
 				if (lasttype == langbind::FilterBase::Attribute)

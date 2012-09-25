@@ -112,6 +112,8 @@ char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::st
 char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& operatorTable);
 ///\brief See utils::parseNextToken(std::string&,std::string::const_iterator&,std::string::const_iterator,const CharTable&,const CharTable&)
 char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end);
+///\brief Skip to next token (skip white spaces)
+char gotoNextToken( std::string::const_iterator& itr, std::string::const_iterator end);
 
 
 ///\brief Reading the content of a source file
