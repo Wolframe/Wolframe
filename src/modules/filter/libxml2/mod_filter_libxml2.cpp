@@ -53,7 +53,7 @@ namespace {
 struct Libxml2FilterObject
 {
 	static SimpleBuilder* builder()
-		{return new FilterBuilder("xml:libxml2", lb::createLibxml2FilterPtr);}
+		{return new FilterBuilder( "Libxml2Filter", "xml:libxml2", "xml", lb::createLibxml2FilterPtr);}
 };
 
 }//anonymous namespace

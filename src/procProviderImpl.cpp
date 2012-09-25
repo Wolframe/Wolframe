@@ -315,31 +315,27 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					throw std::logic_error( "Object is not a filter. See log." );
 				}
 				else	{
-					std::string name = fltr->objectClassName();
-					boost::algorithm::to_upper( name );
-					std::map < std::string, const module::FilterConstructor* >::const_iterator fltrItr = m_filterMap.find( name );
-					if ( fltrItr != m_filterMap.end() )	{
+					std::string name = boost::algorithm::to_upper_copy( fltr->name());
+					std::string category = boost::algorithm::to_upper_copy( fltr->category());
+
+					std::map < std::string, const module::FilterConstructor* >::const_iterator fltrItr = m_filterMap.find( name);
+					if ( fltrItr != m_filterMap.end())
+					{
 						LOG_FATAL << "Duplicate filter name '" << name << "'";
 						throw std::runtime_error( "Duplicate filter name" );
 					}
 					m_filter.push_back( fltr );
 					m_filterMap[ name ] = fltr;
-					const char* cc = strchr( name.c_str(), ':');
-					if (cc)
+					if (!category.empty())
 					{
-						//filter names with ':' separated segments
-						//in the name have the first segment as name
-						//(default filter for a category like 'xml')
-						//for the first loaded filter:
-						std::string category( name.c_str(), cc - name.c_str());
 						fltrItr = m_filterMap.find( category);
 						if (fltrItr == m_filterMap.end())
 						{
 							m_filterMap[ category ] = fltr;
-							LOG_TRACE << "'" << name << "' as default '" << category << "'filter registered";
+							LOG_TRACE << "'" << fltr->name() << "' as default '" << category << "'filter registered";
 						}
 					}
-					LOG_TRACE << "'" << name << "' filter registered";
+					LOG_TRACE << "'" << fltr->name() << "' (" << fltr->objectClassName() << ") filter registered";
 				}
 				break;
 			}
