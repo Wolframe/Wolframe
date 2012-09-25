@@ -50,6 +50,7 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id,
 				const std::string& filename, unsigned short connections, bool flag )
 	: m_ID( id ), m_filename( filename ), m_flag( flag )
 {
+//	m_db = new SQLiteDatabase( this );
 	for( int i = 0; i < connections; i++ ) {
 		sqlite3 *handle;
 		int res = sqlite3_open( m_filename.c_str( ), &handle );
@@ -72,50 +73,25 @@ SQLiteDBunit::~SQLiteDBunit( )
 		sqlite3_close( handle );
 	}
 
-	MOD_LOG_TRACE << "SQLite database '" << m_ID << "' destroyed";
+//	delete m_db;
+	MOD_LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
 }
 
-bool SQLiteDBunit::doTransaction( DatabaseRequest& /*request*/, DatabaseAnswer& /*answer*/,
-				    unsigned short /*timeout*/, unsigned short /*retries*/ )
-{
-	/*
-// check if user is in the sqlite table
-#if SQLITE_VERSION_NUMBER >= 3005000
-   rc = sqlite3_prepare_v2( m_db, sql.c_str( ), -1, &stmt, &tail );
-#else
-   rc = sqlite3_prepare( m_db, sql.c_str( ), -1, &stmt, &tail );
-#endif
-   if( rc != SQLITE_OK ) {
-    std::ostringstream oss;
-    oss << "Unable to prepare SQL statement '" << sql << ": " << sqlite3_errmsg( m_db );
-    throw std::runtime_error( oss.str( ) );
-   }
+//Database &SQLiteDBunit::database()
+//{
+//	return *m_db;
+//}
 
-   rc = sqlite3_bind_text( stmt, 1, m_login.c_str( ), m_login.length( ), SQLITE_STATIC );
-   if( rc != SQLITE_OK ) {
-    std::ostringstream oss;
-    oss << "Unable to bind parameter login in '" << sql << ": " << sqlite3_errmsg( m_db );
-    throw std::runtime_error( oss.str( ) );
-   }
 
-   rc = sqlite3_step( stmt );
-   if( rc == SQLITE_DONE ) {
-    m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
-    goto FAIL;
-   } else if( rc == SQLITE_ROW ) {
-    pass = (const char *)sqlite3_column_text( stmt, 0 );
-   }
+//SQLiteDatabase::SQLiteDatabase( const SQLiteDBunit* unit )
+//	: m_unit( unit )
+//{
+//}
 
-// user found, but password doesn't match
-   if( strcmp( pass, m_pass.c_str( ) ) != 0 ) {
-    m_state = _Wolframe_DB_SQLITE3_STATE_NEED_LOGIN;
-    goto FAIL;
-   }
-
-   sqlite3_finalize( stmt );
-*/
-	return true;
-}
+//const std::string& SQLiteDatabase::ID() const
+//{
+//	return m_unit->ID();
+//}
 
 }} // _Wolframe::db
 

@@ -68,6 +68,7 @@ public:
 		    const module::ModulesDirectory* modules );
 	virtual bool check() const;
 	virtual void print( std::ostream& os, size_t indent ) const;
+	void setCanonicalPathes( const std::string& referencePath );
 private:
 	std::string	m_ID;			///< database identifier
 	std::string	host;			///< server host
@@ -75,44 +76,57 @@ private:
 	std::string	dbName;			///< database name on server
 	std::string	user;			///< database user
 	std::string	password;		///< and password
-	unsigned short	connectTimeout;		///< connection timeout
-	unsigned short	connections;		///< number of database connection (pool size)
-	unsigned short	acquireTimeout;		///< timeout when acquiring a connection from the pool
-	unsigned	statementTimeout;	///< default timeout when executin a statement
 	std::string	sslMode;		///< SSL connection mode
 	std::string	sslCert;		///< client SSL certificate file
 	std::string	sslKey;			///< client SSL key file
 	std::string	sslRootCert;		///< root SSL certificate file
 	std::string	sslCRL;			///< SSL certificate revocation list
+	unsigned short	connectTimeout;		///< connection timeout
+	unsigned short	connections;		///< number of database connection (pool size)
+	unsigned short	acquireTimeout;		///< timeout when acquiring a connection from the pool
+	unsigned	statementTimeout;	///< default timeout when executin a statement
 };
 
 
-class PostgreSQLdbUnit : public Database, public DatabaseUnit
+//class PostgreSQLdatabase;
+
+//class PostgreSQLdatabase : public Database
+//{
+//public:
+//	PostgreSQLdatabase( const PostgreSQLdbUnit* unit )
+//		: m_unit( unit )		{}
+//	~PostgreSQLdatabase();
+
+//	const std::string& ID() const		{ return m_unit->ID(); }
+//private:
+//	const PostgreSQLdbUnit*	m_unit;		///< parent database unit
+//};
+
+class PostgreSQLdbUnit : public DatabaseUnit, public Database
 {
 public:
 	PostgreSQLdbUnit( const std::string& id,
 			  const std::string& host, unsigned short port, const std::string& dbName,
 			  const std::string& user, const std::string& password,
+			  std::string sslMode, std::string sslCert, std::string sslKey,
+			  std::string sslRootCert, std::string sslCRL,
 			  unsigned short connectTimeout,
 			  size_t connections, unsigned short acquireTimeout,
-			  unsigned statementTimeout,
-			  std::string sslMode, std::string sslCert, std::string sslKey,
-			  std::string sslRootCert, std::string sslCRL );
+			  unsigned statementTimeout );
 	~PostgreSQLdbUnit();
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
+//	Database& database();
 	Database& database()			{ return *this; }
-
-	bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
-			    unsigned short, unsigned short )
-						{ return true; }
 private:
-	const std::string	m_ID;			///< database ID
-	std::string		m_connStr;		///< connection string
-	size_t			m_noConnections;	///< number of connections
-	ObjectPool< PGconn* >	m_connPool;		///< pool of connections
-	unsigned		m_statementTimeout;	///< default staement execution timeout
+	const std::string	m_ID;		///< database ID
+	std::string		m_connStr;	///< connection string
+	size_t			m_noConnections;///< number of connections
+	ObjectPool< PGconn* >	m_connPool;	///< pool of connections
+	unsigned		m_statementTimeout;///< default statement execution timeout
+
+//	PostgreSQLdatabase*	m_db;		///< real database object
 };
 
 
@@ -120,8 +134,8 @@ private:
 class PostgreSQLconstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 {
 public:
-	virtual ObjectConstructorBase::ObjectType objectType() const
-	{ return DATABASE_OBJECT; }
+	ObjectConstructorBase::ObjectType objectType() const
+						{ return DATABASE_OBJECT; }
 	const char* objectClassName() const	{ return POSTGRESQL_DB_CLASS_NAME; }
 	PostgreSQLdbUnit* object( const config::NamedConfiguration& conf );
 };

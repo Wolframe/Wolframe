@@ -45,51 +45,17 @@ namespace db {
 // Forward declaration
 class PreparedStatementHandler;
 
-enum TransactionType	{
-	AUTHENTICATION,
-	AUTHORIZATION,
-	CLIENT_CONFIG,
-	TRANSACTION
-};
-
-
-/// base class for database request
-class DatabaseRequest
-{
-public:
-	virtual ~DatabaseRequest()			{}
-	virtual TransactionType type() const = 0;
-};
-
-/// base class for database answer
-class DatabaseAnswer
-{
-public:
-	virtual ~DatabaseAnswer()			{}
-	virtual TransactionType type() const = 0;
-};
-
-
 /// Base class for database interface
 /// All databases should provide this interface
 class Database
 {
 public:
-	virtual ~Database()				{}
+	virtual ~Database()			{}
 
 	/// Database identification.
 	/// All databases must have an identifier as they are referenced using this identifier.
 	/// The identifier must be unique (of course).
 	virtual const std::string& ID() const = 0;
-
-	/// Perform a database transaction.
-	virtual bool doTransaction( DatabaseRequest& request, DatabaseAnswer& answer,
-				    unsigned short timeout, unsigned short retries ) = 0;
-	/* NOTE */
-	/* There should be a connection to the auditing system somewhere */
-
-	/* we should also decide how we handle db encoding
-	virtual const char* encoding() const = 0; */
 
 	///\brief Get the interface for processing prepared statements in the database
 	virtual PreparedStatementHandler* getPreparedStatementHandler()
@@ -99,7 +65,7 @@ public:
 
 	/// Close the database connetion
 	/// This exists for no good reason (mostly to make code look uniform)
-	virtual void close()	{}
+	virtual void close()			{}
 };
 
 

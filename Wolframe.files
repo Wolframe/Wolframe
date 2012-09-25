@@ -343,7 +343,6 @@ include/connectionEndpoint.hpp
 include/connectionHandler.hpp
 include/constructor.hpp
 include/database/database.hpp
-include/database/databaseOperation.hpp
 include/database/DBprovider.hpp
 include/database/preparedStatement.hpp
 include/database/preparedStatementProcessor.hpp

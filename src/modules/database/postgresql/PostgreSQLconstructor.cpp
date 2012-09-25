@@ -45,11 +45,12 @@ PostgreSQLdbUnit* PostgreSQLconstructor::object( const config::NamedConfiguratio
 	const PostgreSQLconfig& cfg = dynamic_cast< const PostgreSQLconfig& >( conf );
 
 	PostgreSQLdbUnit* m_db = new PostgreSQLdbUnit( cfg.m_ID, cfg.host, cfg.port, cfg.dbName,
-						       cfg.user, cfg.password, cfg.connectTimeout,
-						       cfg.connections, cfg.acquireTimeout,
-						       cfg.statementTimeout,
+						       cfg.user, cfg.password,
 						       cfg.sslMode, cfg.sslCert, cfg.sslKey,
-						       cfg.sslRootCert, cfg.sslCRL );
+						       cfg.sslRootCert, cfg.sslCRL,
+						       cfg.connectTimeout,
+						       cfg.connections, cfg.acquireTimeout,
+						       cfg.statementTimeout );
 	MOD_LOG_TRACE << "PostgreSQL database unit for '" << cfg.m_ID << "' created";
 	return m_db;
 }

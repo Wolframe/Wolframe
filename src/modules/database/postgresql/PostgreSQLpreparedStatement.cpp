@@ -32,6 +32,7 @@
 ************************************************************************/
 ///\brief Implementation of processing prepared statements with postgres client using libpq
 ///\file modules/database/postgres/PostgreSQLpreparedStatement.cpp
+
 #include "PostgreSQLpreparedStatement.hpp"
 #include <iostream>
 #include <sstream>

@@ -36,7 +36,6 @@
 
 #include "logger-v1.hpp"
 #include "PostgreSQL.hpp"
-#include "database/databaseOperation.hpp"
 
 #include <string>
 #include <sstream>
@@ -67,15 +66,31 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << "   Database name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
 	os << indStr << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
 	   << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
+	if ( ! sslMode.empty())
+		os << indStr << "   Database connection SSL mode: " << sslMode << std::endl;
+	if ( ! sslCert.empty())	{
+		os << indStr << "   Client SSL certificate file: " << sslCert << std::endl;
+		if ( ! sslMode.empty())
+			os << indStr << "   Client SSL key file: " << sslKey << std::endl;
+	}
+	if ( ! sslRootCert.empty())
+		os << indStr << "   SSL root CA file: " << sslRootCert << std::endl;
+	if ( ! sslCRL.empty())
+		os << indStr << "   SSL CRL file: " << sslCRL << std::endl;
+
 	if ( connectTimeout == 0 )
 		os << indStr << "   Connect timeout: 0 (wait indefinitely)" << std::endl;
 	else
 		os << indStr << "   Connect timeout: " << connectTimeout << "s" << std::endl;
 	os << indStr << "   Database connections: " << connections << std::endl;
-	if ( connectTimeout == 0 )
+	if ( acquireTimeout == 0 )
 		os << indStr << "   Acquire database connection timeout: 0 (wait indefinitely)" << std::endl;
 	else
 		os << indStr << "   Acquire database connection timeout: " << acquireTimeout << "s" << std::endl;
+	if ( statementTimeout == 0 )
+		os << indStr << "   Default statement execution timeout: 0 (wait indefinitely)" << std::endl;
+	else
+		os << indStr << "   Default statement execution timeout: " << statementTimeout << "ms" << std::endl;
 }
 
 bool PostgreSQLconfig::check() const
@@ -105,9 +120,9 @@ static std::string escConnElement( std::string element )
 
 static std::string buildConnStr( const std::string& host, unsigned short port, const std::string& dbName,
 				 const std::string& user, const std::string& password,
-				 unsigned short connectTimeout,
-				 std::string /*sslMode*/, std::string /*sslCert*/, std::string /*sslKey*/,
-				 std::string /*sslRootCert*/, std::string /*sslCRL*/ )
+				 const std::string& sslMode, const std::string& sslCert, const std::string& sslKey,
+				 std::string& sslRootCert, std::string& sslCRL,
+				 unsigned short connectTimeout )
 {
 	std::stringstream ss;
 
@@ -133,6 +148,31 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 			ss << "password = '" << escConnElement( password ) << "'";
 		}
 	}
+	if ( ! sslMode.empty())	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "sslmode = '" << escConnElement( sslMode ) << "'";
+	}
+	if ( ! sslCert.empty())	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "sslcert = '" << escConnElement( sslCert ) << "'";
+		if ( ! sslKey.empty())	{
+			if ( ! ss.str().empty())
+				ss << " ";
+			ss << "sslkey = '" << escConnElement( sslKey ) << "'";
+		}
+	}
+	if ( ! sslRootCert.empty())	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "sslrootcert = '" << escConnElement( sslRootCert ) << "'";
+	}
+	if ( ! sslCRL.empty())	{
+		if ( ! ss.str().empty())
+			ss << " ";
+		ss << "sslcrl = '" << escConnElement( sslCRL ) << "'";
+	}
 	if ( connectTimeout != 0 )	{
 		if ( ! ss.str().empty())
 			ss << " ";
@@ -147,16 +187,18 @@ PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
 				    const std::string& host, unsigned short port,
 				    const std::string& dbName,
 				    const std::string& user, const std::string& password,
+				    std::string sslMode, std::string sslCert, std::string sslKey,
+				    std::string sslRootCert, std::string sslCRL ,
 				    unsigned short connectTimeout,
 				    size_t connections, unsigned short acquireTimeout,
-				    unsigned statementTimeout,
-				    std::string sslMode, std::string sslCert, std::string sslKey,
-				    std::string sslRootCert, std::string sslCRL )
+				    unsigned statementTimeout )
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
 	  m_statementTimeout( statementTimeout )
 {
-	m_connStr = buildConnStr( host, port,  dbName, user, password, connectTimeout,
-				  sslMode, sslCert, sslKey, sslRootCert, sslCRL );
+//	m_db = new PostgreSQLdatabase( this );
+	m_connStr = buildConnStr( host, port,  dbName, user, password,
+				  sslMode, sslCert, sslKey, sslRootCert, sslCRL,
+				  connectTimeout );
 	MOD_LOG_DATA << "PostgreSQL database '" << m_ID << "' connection string <" << m_connStr << ">";
 
 	for ( size_t i = 0; i < connections; i++ )	{
@@ -253,11 +295,20 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 		}
 	}
 	if ( m_noConnections != 0 )	{
-		MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' destructor: not all connections destroyed";
-		throw std::logic_error( "PostgreSQL database destructor: not all connections destroyed" );
+		MOD_LOG_ALERT << "PostgreSQL database unit '" << m_ID << "' destructor: not all connections destroyed";
+		throw std::logic_error( "PostgreSQL database unit destructor: not all connections destroyed" );
 	}
-	MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' destructor: " << connections << " connections destroyed";
+	MOD_LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destructor: " << connections << " connections destroyed";
+
+//	delete m_db;
+	MOD_LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed";
 }
+
+
+//Database& PostgreSQLdbUnit::database()
+//{
+//	return *m_db;
+//}
 
 }} // _Wolframe::db
 

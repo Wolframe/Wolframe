@@ -45,7 +45,7 @@ SQLiteDBunit* SQLiteConstructor::object( const config::NamedConfiguration& conf 
 	const SQLiteConfig& cfg = dynamic_cast< const SQLiteConfig& >( conf );
 
 	SQLiteDBunit* m_db = new SQLiteDBunit( cfg.m_ID, cfg.filename, /* Aba: temporary */ 10, cfg.flag );
-	MOD_LOG_TRACE << "SQLite database container for '" << cfg.m_ID << "' created";
+	MOD_LOG_TRACE << "SQLite database unit for '" << cfg.m_ID << "' created";
 	return m_db;
 }
 

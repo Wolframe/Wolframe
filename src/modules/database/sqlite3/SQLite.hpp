@@ -55,10 +55,10 @@ class SQLiteConfig : public config::NamedConfiguration
 {
 	friend class SQLiteConstructor;
 public:
-	const char* className() const			{ return SQLite_DB_CLASS_NAME; }
+	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
-	~SQLiteConfig()					{}
+	~SQLiteConfig()				{}
 
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
@@ -72,36 +72,50 @@ private:
 };
 
 
-class SQLiteDBunit : public Database, public DatabaseUnit
+//class SQLiteDBunit;
+
+//class SQLiteDatabase : public Database
+//{
+//public:
+//	SQLiteDatabase( const SQLiteDBunit* unit );
+//	 ~SQLiteDatabase();
+
+//	const std::string& ID() const;
+//private:
+//	const SQLiteDBunit*	m_unit;			///< parent database unit
+//};
+
+
+class SQLiteDBunit : public DatabaseUnit, public Database
 {
 public:
 	SQLiteDBunit( const std::string& id,
-			const std::string& filename, unsigned short connections, bool flag );
-	virtual ~SQLiteDBunit();
+		      const std::string& filename, unsigned short connections, bool flag );
+	~SQLiteDBunit();
 
-	virtual const std::string& ID() const		{ return m_ID; }
-	virtual const char* className() const		{ return SQLite_DB_CLASS_NAME; }
-	virtual Database& database()			{ return *this; }
+	const std::string& ID() const		{ return m_ID; }
+	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
+//	Database &database();
+	Database &database()			{ return *this; }
 
-	virtual bool doTransaction( DatabaseRequest&, DatabaseAnswer&,
-			    unsigned short, unsigned short );
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;
 	bool			m_flag;
-	std::list< sqlite3* >	m_connections;		//< list of DB connections
-	ObjectPool< sqlite3* >	m_connPool;		//< pool of connections
-};
+	std::list< sqlite3* >	m_connections;		///< list of DB connections
+	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
 
+//	SQLiteDatabase*		m_db;
+};
 
 //***  SQLite database constructor  *******************************************
 class SQLiteConstructor : public ConfiguredObjectConstructor< db::DatabaseUnit >
 {
 public:
-	virtual ObjectConstructorBase::ObjectType objectType() const
-							{ return DATABASE_OBJECT; }
-	virtual const char* objectClassName() const		{ return SQLite_DB_CLASS_NAME; }
-	virtual SQLiteDBunit* object( const config::NamedConfiguration& conf );
+	ObjectConstructorBase::ObjectType objectType() const
+						{ return DATABASE_OBJECT; }
+	const char* objectClassName() const	{ return SQLite_DB_CLASS_NAME; }
+	SQLiteDBunit* object( const config::NamedConfiguration& conf );
 };
 
 }} // _Wolframe::db
