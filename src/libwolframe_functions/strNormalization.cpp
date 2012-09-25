@@ -34,6 +34,7 @@ Project Wolframe.
 ///
 
 #include <string>
+#include <cctype>
 #include <boost/algorithm/string.hpp>
 #include "utils/strNormalization.hpp"
 
@@ -48,14 +49,14 @@ using namespace _Wolframe::utils;
 void _Wolframe::utils::normalizeString( std::string& str )
 {
 	for ( std::string::iterator it = str.begin(); it != str.end(); it++ )	{
-		if ( ispunct( *it ))
+		if ( ((unsigned char)*it < 128) && ispunct( *it ))
 			*it++ = ' ';
 	}
 	boost::algorithm::trim( str );
 	for ( std::string::iterator it = str.begin(); it != str.end(); it++ )	{
-		if ( isspace( *it ))	{
+		if ( ((unsigned char)*it < 128) && isspace( *it ))	{
 			*it++ = ' ';
-			while ( isspace( *it ) && it != str.end() )
+			while ( it != str.end() && ((unsigned char)*it < 128) && isspace( *it ) )
 				str.erase( it );
 		}
 	}

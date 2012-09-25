@@ -1,10 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS =
-
--include $(TOPDIR)/makefiles/gmake/platform.mk
-
-SUBDIRS += locale
+SUBDIRS = locale number
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

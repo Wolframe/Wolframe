@@ -31,17 +31,37 @@ Project Wolframe.
 ************************************************************************/
 ///\file tests/testSimpleFormCompiler.cpp
 #include "utils/miscUtils.hpp"
+#include "ddl/atomicType.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <iostream>
 #include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
+#include <boost/algorithm/string.hpp>
 #include <stdexcept>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 //PF:HACK: Include instead of static linking because the module is already used as shared library module and the makefile system cannot handle this yet
 #include "ddl_compiler_simpleFormCompiler.cpp"
+#include "modules/normalize/number/numberNormalize.cpp"
+
+class DDLTypeMap :public ddl::TypeMap
+{
+public:
+	DDLTypeMap(){}
+
+	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
+	{
+		static IntegerNormalizeFunction int_( true, 10);
+		static IntegerNormalizeFunction uint_( false, 10);
+		static FloatNormalizeFunction float_( 10, 10);
+		if (boost::algorithm::iequals( name, "int")) return &int_;
+		if (boost::algorithm::iequals( name, "uint")) return &uint_;
+		if (boost::algorithm::iequals( name, "float")) return &float_;
+		return 0;
+	}
+};
 
 using namespace _Wolframe;
 static boost::filesystem::path g_testdir;
@@ -75,7 +95,8 @@ TEST_F( SimpleFormCompilerTest, tests)
 		boost::filesystem::path pp = g_testdir / "data" / testDescription[ti].srcfile;
 		std::string srcfile = pp.string() + ".simpleform";
 		ddl::SimpleFormCompiler mm;
-		ddl::StructType sr = mm.compile( utils::readSourceFileContent( srcfile));
+		DDLTypeMap typemap;
+		ddl::StructType sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
 		sr.print( std::cerr);
 	}
 }

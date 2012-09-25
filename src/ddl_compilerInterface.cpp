@@ -38,13 +38,13 @@ Project Wolframe.
 using namespace _Wolframe;
 using namespace ddl;
 
-std::pair< std::string, ddl::StructTypeR> _Wolframe::ddl::loadForm( const ddl::DDLCompiler& ddlc, const std::string& ddfilename)
+std::pair< std::string, ddl::StructTypeR> _Wolframe::ddl::loadForm( const ddl::DDLCompiler& ddlc, const std::string& ddfilename, const TypeMap* typemap)
 {
 	std::pair< std::string, ddl::StructTypeR> rt;
 	rt.second.reset( new ddl::StructType());
 	try
 	{
-		*rt.second = ddlc.compile( utils::readSourceFileContent( ddfilename));
+		*rt.second = ddlc.compile( utils::readSourceFileContent( ddfilename), typemap);
 	}
 	catch (const std::exception& e)
 	{

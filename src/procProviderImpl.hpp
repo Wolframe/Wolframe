@@ -78,6 +78,7 @@ public:
 	db::Database* transactionDatabase() const;
 
 private:
+	class DDLTypeMap;
 	bool loadForm( const std::string& ddlname, const std::string& dataDefinitionFilename);
 	bool loadPrintFunction( const std::string& name, const std::string& type, const std::string& layoutFilename);
 	bool declareTransactionFunction( const std::string& name, const std::string& type, const std::string& command);

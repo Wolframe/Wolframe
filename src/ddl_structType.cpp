@@ -235,7 +235,7 @@ void StructType::print( std::ostream& out, size_t level) const
 	{
 		case Atomic:
 		{
-			m_value.print( out, level);
+			out << indent << "'" << m_value.value() << "'" << std::endl;
 			break;
 		}
 		case Vector:
@@ -247,7 +247,7 @@ void StructType::print( std::ostream& out, size_t level) const
 				if (ii->second.m_contentType == Atomic)
 				{
 					out << indent << (idx++) << ":";
-					ii->second.value().print( out);
+					out << "'" << ii->second.value().value() << "'" << std::endl;
 				}
 				else
 				{
@@ -270,7 +270,7 @@ void StructType::print( std::ostream& out, size_t level) const
 				if (ii->second.m_contentType == Atomic)
 				{
 					out << indent << ii->first << "= ";
-					ii->second.value().print( out);
+					out << "'" << ii->second.value().value() << "'" << std::endl;
 				}
 				else if (ii->second.m_contentType == Vector)
 				{

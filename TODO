@@ -15,8 +15,5 @@ PF:
 	- The print form configuration can have an xslt script for preprocessing
 
 - in luaObjects: save load (check pointers or have metatable) of global context objects 'ProcessorProvider' and 'ModuleMap'
-- normalizer module for use in DDL forms (with example using boost ICU & locale based normalizations)
-	(see http://www.boost.org/doc/libs/1_50_0/libs/locale/doc/html/group__convert.html#ga11672e3cc3ed7eecf1dd07060265aab2)
-- make form an own type again with doctype and normalizer module reference
-
+- in ProcProvider: move default object semantics to objects in modules (e.g. syntax with ':' "xml:libxml2" -> xml" default)
 

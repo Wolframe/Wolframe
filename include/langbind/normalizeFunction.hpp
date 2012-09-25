@@ -35,18 +35,13 @@
 #ifndef _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
+#include "ddl/atomicType.hpp"
 #include "types/countedReference.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-struct NormalizeFunction
-{
-	NormalizeFunction(){}
-	virtual ~NormalizeFunction(){}
-
-	virtual std::string execute( const std::string& i) const=0;
-};
+typedef ddl::NormalizeFunction NormalizeFunction;
 
 typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
 class ResourceHandle;

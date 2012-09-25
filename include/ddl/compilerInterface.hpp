@@ -51,8 +51,9 @@ struct DDLCompiler
 
 	///\brief Compile a source from a string. Throws in case of error.
 	///\param[in] srcstring source as string
+	///\param[in] typemap map with atomic type definitions
 	///\return compilation result (a map represented as StructType::Struct of exported structures representing the forms)
-	virtual StructType compile( const std::string& srcstring) const=0;
+	virtual StructType compile( const std::string& srcstring, const TypeMap* typemap) const=0;
 
 	///\brief Get the name of the ddl this compiler is for
 	const std::string& ddlname() const		{return m_ddlname;}
@@ -71,8 +72,9 @@ typedef DDLCompiler* (*CreateDDLCompilerFunc)();
 ///\brief Get a form an its document type identifying the form
 ///\param[in] ddlc compiler of the DDL the form is described in
 ///\param[in] ddfilename data definition source file name as absolute path
+///\param[in] typemap map with atomic type definitions
 ///\return pair (identifier, structure) where the identifier identifies the form and structure describes the form
-std::pair< std::string, ddl::StructTypeR> loadForm( const ddl::DDLCompiler& ddlc, const std::string& ddfilename);
+std::pair< std::string, ddl::StructTypeR> loadForm( const ddl::DDLCompiler& ddlc, const std::string& ddfilename, const TypeMap* typemap);
 
 }}//namespace
 #endif

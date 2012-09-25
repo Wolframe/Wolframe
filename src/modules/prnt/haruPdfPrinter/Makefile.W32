@@ -34,8 +34,10 @@ CPP_OBJS = \
 	$(TOPDIR)\src\prnt_pdfPrinterDocument_libhpdf.obj \
 	$(TOPDIR)\src\prnt_pdfPrinterExpression.obj \
 	$(TOPDIR)\src\prnt_pdfPrinterMethod.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterVariable.obj \
-	mod_haru_pdf_printer.obj
+	$(TOPDIR)\src\prnt_pdfPrinterVariable.obj
+
+CPP_OBJS = \
+	$(CPP_OBJS) mod_haru_pdf_printer.obj
 
 all: $(DYNAMIC_MODULE)
 
