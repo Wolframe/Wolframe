@@ -114,6 +114,7 @@ char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 char _Wolframe::utils::gotoNextToken( std::string::const_iterator& itr, std::string::const_iterator end)
 {
 	while (itr != end && *itr <= 32) ++itr;
+	return (itr == end)?0:*itr;
 }
 
 template <class Result>
