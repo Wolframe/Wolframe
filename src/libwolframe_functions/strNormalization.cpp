@@ -49,14 +49,14 @@ using namespace _Wolframe::utils;
 void _Wolframe::utils::normalizeString( std::string& str )
 {
 	for ( std::string::iterator it = str.begin(); it != str.end(); it++ )	{
-		if ( (*it > 0) && (*it < 128) && ispunct( *it ))
+		if ( ((unsigned char)*it < 128) && ispunct( *it ))
 			*it++ = ' ';
 	}
 	boost::algorithm::trim( str );
 	for ( std::string::iterator it = str.begin(); it != str.end(); it++ )	{
-		if ( (*it > 0) && (*it < 128) && isspace( *it ))	{
+		if ( ((unsigned char)*it < 128) && isspace( *it ))	{
 			*it++ = ' ';
-			while ( it != str.end() && (*it > 0) && (*it < 128) && isspace( *it ) )
+			while ( it != str.end() && ((unsigned char)*it < 128) && isspace( *it ) )
 				str.erase( it );
 		}
 	}
