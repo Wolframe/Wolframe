@@ -46,7 +46,7 @@
 namespace _Wolframe {
 namespace db {
 
-SQLiteDatabase::SQLiteDatabase( const std::string& id,
+SQLiteDBunit::SQLiteDBunit( const std::string& id,
 				const std::string& filename, unsigned short connections, bool flag )
 	: m_ID( id ), m_filename( filename ), m_flag( flag )
 {
@@ -65,7 +65,7 @@ SQLiteDatabase::SQLiteDatabase( const std::string& id,
 		   << "filename '" << m_filename << "'";
 }
 
-SQLiteDatabase::~SQLiteDatabase( )
+SQLiteDBunit::~SQLiteDBunit( )
 {
 	while( m_connPool.available( ) > 0 ) {
 		sqlite3 *handle = m_connPool.get( );
@@ -75,7 +75,7 @@ SQLiteDatabase::~SQLiteDatabase( )
 	MOD_LOG_TRACE << "SQLite database '" << m_ID << "' destroyed";
 }
 
-bool SQLiteDatabase::doTransaction( DatabaseRequest& /*request*/, DatabaseAnswer& /*answer*/,
+bool SQLiteDBunit::doTransaction( DatabaseRequest& /*request*/, DatabaseAnswer& /*answer*/,
 				    unsigned short /*timeout*/, unsigned short /*retries*/ )
 {
 	/*

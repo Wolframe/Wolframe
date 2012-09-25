@@ -100,6 +100,19 @@ private:
 	unsigned			m_timeout;	///< acquire timeout
 };
 
+template < typename objectType >
+class PoolObject : public objectType
+{
+public:
+	PoolObject( ObjectPool< objectType >& pool )
+		: m_pool( pool ), m_object( pool.get())	{}
+	~PoolObject()					{ m_pool.add( m_object ); }
+
+	objectType& object()				{ return m_object; }
+private:
+	ObjectPool< objectType >&	m_pool;
+	objectType&			m_object;
+};
 } // namespace _Wolframe
 
 #endif // _OBJECT_POOL_HPP_INCLUDED
