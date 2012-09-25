@@ -1,0 +1,405 @@
+Build Instructions for Windows
+==============================
+
+Table of Contents
+-----------------
+
+  Prerequisites
+    Boost
+      Compile and install boost
+    OpenSSL
+      Compile and install openssl
+    Compile and install Qt
+    Postgresql C client library
+      Compiling Postgresql
+      Notes for Postgreslql 9.0.4
+    LibXML2
+    LibXSLT
+    Install Tcl and Expect
+  Documentation
+
+Prerequisites
+-------------
+
+- Visual C++ (cl, link and nmake), VC8 or later
+- Platform SDK 6.0a or later
+- mc.exe may be missing in your path (for instance on VC8),
+  usually it is available as part of the Platform SDK,
+  copy it into the path
+- boost 1.43.0 or later
+- optionally (WITH_SSL) openssl 0.9.8 or later
+- optionally (WITH_LUA) lua 5.2
+  (integrated in subdir 'lua')
+- optionally (WITH_QT) Qt 4, 4.5.x or later
+- for database support
+  - optionally (WITH_SQLITE3): using the sources i n 'sqlite3'
+  - optionally (WITH_PGSQL)
+- for XML support
+  - optionally (WITH_LIBXML2): libxml2 (with iconv support)
+  - note, that this may not work with Express
+    editions as ATL is missing from those editions
+- for XSLT processing
+  - optionally (WITH_LIBXSLT): libxslt
+- optionally (WITH_LIBHPDF): for PDF creation,
+  using the provided version in 'libhpdf'
+- optionally for testing (WITH_EXPECT) Expect and Tcl 8.4 or later
+- optionally for packaging:
+  - Wix 3.5 or later (which needs .NET 2.0 during packaging)
+- optionally to build documentation:
+  - doxygen for building the API documentation
+  - xsltproc (from libxslt)
+  - the DocBook XSL stylesheets (for instance for HTMLHelp output)
+  - the 'hhc.exe' compiler from the 'HTML Help Workshop'
+  
+Boost
+-----
+
+Get boost from http://boostpro.com or http://boost.teeks99.com
+
+Install for instance into C:\Program Files\Boost\Boost_1_49
+
+configure 'makefile\nmake\config.mk' and 
+set BOOST_DIR to C:\Program Files\Boost\Boost_1_49
+
+Comile and install icu4c
+------------------------
+ 
+Build your own one to get debug and release versions of the ICU library
+(the release version is available as download package, the debug one not).
+ 
+open allinone.sln in Visual Studio.
+ 
+Build independendly for Debug/Release 32/64-bit targets.
+ 
+In between salvage the generated artifacts:
+mkdir ~/icu-49.1.2-win32-debug
+cp -a include ~/icu-49.1.2-win32-debug/.
+cp -a bin ~/icu-49.1.2-win32-debug/.
+cp -a lib ~/icu-49.1.2-win32-debug/.
+
+Compile and install boost
+-------------------------
+
+If you insist to compile Boost from scratch, do the following
+in a Visual Studio C++ command line:
+
+bootstrap
+.\b2 --prefix=C:\<myplace>\boost_1_49_0
+	--with-thread --with-filesystem --with-system --with-program_options ^
+	--with-date_time --with-locale ^
+	-sICU_PATH="<sowewhere>\icu-49.1.2-win32-debug" ^
+	architecture=x86 address-model=64 toolset=msvc ^
+	install   
+
+with variant, architecture, address-mode and toolset fitting your needs.
+
+Make sure that:
+Performing configuration checks
+   - icu    : yes (shows up, respectively icu64 for 64-bit compilation)
+
+Set BOOST_DIR to C:\<myplace>\boost-1_49_0
+
+These instructions are for boost 1.49, other versions may vary.
+
+Careful: Always check %LIB% and the 'setenv' environment of the SDK! You can
+end up in 64-bit code using 32-bit libraries otherwise. :-)
+
+OpenSSL
+-------
+
+Compile and install openssl
+---------------------------
+
+Easiest is to get the native Windows binary version from:
+
+http://www.slproweb.com/products/Win32OpenSSL.html
+
+Despite the name you get also 64-bit versions there.
+
+Do not copy the OpenSSL binaries to the Windows system directory, copy
+them to the Bin subdirectory of the OpenSSL installation directory!
+
+If you want to compile your own version, use
+- Microsoft Compiler
+- a perl (ActivePerl)
+- optionally NASM
+
+perl Configure debug-VC-WIN32 \
+	--prefix="C:\OpenSSL\openssl-1.0.1-win32-debug"
+
+respectively
+
+perl Configure VC-WIN32 \
+	--prefix="C:\OpenSSL\openssl-1.0.1-win32-release"
+	
+Make sure there prefix has no spaces in it!
+
+ms\do_nasm
+
+nmake /f ms\ntdll.mak
+nmake /f ms\ntdll.mak install
+
+For later usage in Postgresql add the following link libraries:
+
+mkdir C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC
+copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\libeay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC\libeay32MDd.lib
+copy C:\OpenSSL\openssl-1.0.1-win32-debug\lib\ssleay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-debug\lib\VC\ssleay32MDd.lib
+
+respectively
+
+mkdir C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC
+copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\libeay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\libeay32MD.lib
+copy C:\OpenSSL\openssl-1.0.1-win32-release\lib\ssleay32.lib ^
+	C:\OpenSSL\openssl-1.0.1-win32-release\lib\VC\ssleay32MD.lib
+	
+Have a closer look to INSTALL.W32 and INSTALL.W64 of the package itself.
+
+Qt
+--
+
+Compile and install Qt
+----------------------
+
+Easiest is to get a precompiled MSVC version of the SDK.
+But this version is missing SSL support.
+
+If you insist on compiling on your own:
+
+Get the MinGW version of the SDK.
+If you want SSL support, get also OpenSSL (see above).
+
+(The Openssl parts in INCLUDE, LIB and configure are needed if you enable SSL with WITH_SSL=1)
+
+Make sure the SDK variables for compilation and linking are set correctly:
+
+set PLATFORM_SDK=D:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2
+set OPENSSL_DIR=D:\Program Files\OpenSSL-1.0.0d
+set INCLUDE=%INCLUDE%;%PLATFORM_SDK%\include;%OPENSSL_DIR%\include
+set LIB=%LIB%;%PLATFORM_SDK%\lib;%OPENSSL_DIR%\lib
+set PATH=%PATH%;%PLATFORM_SDK%\bin
+
+Clean up first the MinGW build with:
+
+nmake confclean
+del bin\*.dll bin\*.exe
+del lib\*.a
+
+Configure and build it with:
+
+configure -platform win32-msvc2008 -release -openssl
+nmake
+
+See also http://qtnode.net/wiki/Qt4_with_Visual_Studio.
+
+Finally adapt QT_DIR in 'makefiles\nmake\config.mk'.
+
+Postgresql C client library
+---------------------------
+
+Install all in one package. You may have to install libpq64
+as an add-on using the Stack Builder.
+
+Adapt PGSQL_DIR in 'makefiles\nmake\config.mk'.
+
+Compiling Postgresql
+--------------------
+
+This is required if you want for instance to build the debug
+version of the libpq library.
+
+You need at least ActivePerl installed.
+
+cd src\tools\msvc
+copy config_default.pl config.pl
+
+Adapt config.pl to your needs for instance for SSL support:
+
+openssl=>"C:\OpenSSL\openssl-1.0.1-win32-debug"
+
+You may have to touch preproc.c and preproc.h if build wants
+to start bison and you don't have bison installed.
+
+build DEBUG libpq
+
+respectively
+
+build RELEASE libpq
+
+install C:\<somewhere>
+
+or if thata fails, and usually it does (install fails happily with spaces in pathes
+source and destination, copy by hand in this case), do:
+
+mkdir C:\<somewhere>\include
+mkdir C:\<somewhere>\lib
+copy Release\libpq.dll C:\<somewhere>\lib
+copy Release\libpq.lib C:\<somewhere>\lib
+copy src\interfaces\libpq\libpq-fe.h C:\<somewhere>\include
+copy src\include\postgres_ext.h C:\<somewhere>\include
+
+Notes for Postgreslql 9.0.4
+---------------------------
+
+If your disable OpenSSL (for instance for debugging), you have
+to touch sslinfo.sql in contrib/sslinfo Dito for uuid-ossp.sql,
+pgxml.sql.in.
+
+Notes for Visual Studio 2010
+----------------------------
+
+vcbuild.exe disappeared, you need the following patch to build
+with VS2010:
+
+http://archives.postgresql.org/pgsql-hackers/2011-01/msg00118.php
+
+(in Wolframe, see contrib\Windows\Postgresql\VS2010v2.patch)
+
+The patch has some hard coded library names:
+
+cd <openssl-dir>\lib
+mkdir VC
+cd VC
+copy ..\libeay32.dll libeay32MDd.lib (for the 32-bit debug version for example)
+copy ..\ssleay32.dll ssleay32MDd.lib
+
+respectively for the release version:
+
+cd <openssl-dir>\lib
+mkdir VC
+cd VC
+copy ..\libeay32.dll libeay32MD.lib (for the 32-bit debug version for example)
+copy ..\ssleay32.dll ssleay32MD.lib
+
+Maybe newer versions will have the patch integrated.
+
+Notes for 32-bit dependencies
+-----------------------------
+
+You can get gettext/libintl and other libraries from 
+
+http://gnuwin32.sourceforge.net/packages.html
+
+as packages.
+
+LibXML2
+-------
+
+Best is to compile your own libraries
+
+Get sources from: ftp://xmlsoft.org/libxml2/
+
+You also need either libiconv or win_iconv for character set conversion.
+In the following installation instructions we stick to win-iconv.
+
+Get win_iconv from http://code.google.com/p/win-iconv/
+
+Build win-iconv.dll with the supplied makefile from 'contrib\win-iconv\Makefile.msvc':
+
+nmake /nologo /f Makefile.msvc
+
+Adapt WIN_ICONV_DIR in 'makefiles\nmake\config.mk'.
+
+You have to fix the Makefile.msvc:
+
+There are some + where they don't belong:
+
++!if "$(WITH_ICU)" == "1"
++LIBS = $(LIBS) icu.lib
++!endif
+
+Configure libxml2, set location of win-iconv:
+
+cd win32
+cscript configure.js compiler=msvc ^
+	prefix="C:\cygwin\home\Andreas\libxml2-2.7.8-win32" ^
+	lib="C:\cygwin\home\Andreas\win-iconv-0.0.3" ^
+	include="C:\cygwin\home\Andreas\win-iconv-0.0.3" ^
+ 	zlib=no iconv=yes
+
+For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
+
+When there are spaces in the installation prefix, fix it manually in 'config.msvc'
+before building the library:
+
+PREFIX="C:\Program Files\libxml2-2.7.8-win32"
+
+For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
+
+nmake /nologo /f Makefile.msvc all
+nmake /nologo /f Makefile.msvc install
+
+Adapt LIBXML2_DIR in 'makefiles\nmake\config.mk'.
+
+LibXSLT
+-------
+
+Best is to compile your own libraries
+
+Get sources from: ftp://xmlsoft.org/libxslt/
+
+cd win32
+cscript configure.js compiler=msvc ^
+	prefix="C:\cygwin\home\Andreas\libxslt-1.1.26-win32" zlib=no iconv=yes
+	lib="C:\cygwin\home\Andreas\libxml2-2.7.8-win32\lib;C:\cygwin\home\Andreas\win-iconv-win32" ^
+	include="C:\cygwin\home\Andreas\libxml2-2.7.8-win32\include;C:\cygwin\home\Andreas\win-iconv-win32"
+
+For the debug version add debug=yes and cruntime=/MDd to the configure.js call.
+
+When there are spaces in the installation prefix, fix it manually in 'config.msvc'
+before building the library:
+
+PREFIX="C:\Program Files\libxslt-1.1.26-win32"
+
+nmake /nologo /f Makefile.msvc all
+
+For VC2010 also remove the /OPT:NOWIN98 flag in the release flags in 'Makefile.msvc'
+
+In the debug version: the xsltproc.exe binary is missing a manifest treatment,
+so manually execute:
+
+cd win32\bin.msvc
+mt -nologo -manifest xsltproc.exe.manifest -outputresource:xsltproc.exe;1
+
+nmake /nologo /f Makefile.msvc install
+
+Adapt LIBXSLT_DIR in 'makefiles\nmake\config.mk'.
+
+Install Tcl and Expect
+----------------------
+
+Download from http://www.activestate.com/activetcl/ 
+(32-bit version, the 64-bit version had no Expect available,
+at least at the time of writting)
+
+Install ActiveTcl 8.5 to C:\tcl
+
+Then adapt in 'makefiles\nmake\config.mk':
+
+TCP_DIR = C:\tcl
+
+Install Expect 1.1 with:
+
+cd c:\Tcl\bin
+teacup install Expect
+
+Telnet is not enabled by default, enable it in "Control Panel",
+"Windows Features" or call:
+
+pkgmgr /iu:"TelnetClient"
+
+Documentation
+-------------
+
+Get Doxygen from http://www.stack.nl/~dimitri/doxygen/.
+
+Set the path of the installed binary in the variable 'DOXYGEN' 
+in 'makefiles\nmake\config.mk'.
+
+Get the "HTML Help Workshop and Documentation" from Microsoft.
+
+Adapt the 'HHC_LOCATION' variable in 'makefiles\nmake\config.mk' to
+match the 'hhc.exe' binary of the "MS HTML Help Workshop" to
+generate the CHM files.
