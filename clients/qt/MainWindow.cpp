@@ -28,7 +28,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 )
 // pass the form loader to the FormWidget
 	m_formLoader = new FileFormLoader( "forms", "i18n" );	
 
-	m_formWidget = new FormWidget( m_formLoader, this );
+	m_formWidget = new FormWidget( m_formLoader, m_uiLoader, this );
 	
 	initialize( );
 }

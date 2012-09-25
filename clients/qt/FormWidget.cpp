@@ -14,13 +14,9 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-FormWidget::FormWidget( FormLoader *_formLoader, QWidget *_parent )
-	: QWidget( _parent ), m_formLoader( _formLoader ), m_ui( 0 ), m_locale( "en_US" )
+FormWidget::FormWidget( FormLoader *_formLoader, QUiLoader *_uiLoader, QWidget *_parent )
+	: QWidget( _parent ), m_formLoader( _formLoader ), m_uiLoader( _uiLoader ), m_ui( 0 ), m_locale( "en_US" )
 {
-// Qt Designer UI loader, enable automatic language switch handling
-	m_uiLoader = new QUiLoader( );
-	m_uiLoader->setLanguageChangeEnabled ( true );
-
 // for now a from file form and data loader (later wolframe protocol)
 	m_dataLoader = new FileDataLoader( "data" );
 
@@ -52,7 +48,6 @@ FormWidget::~FormWidget( )
 	if( m_ui ) delete m_ui;
 	delete m_dataHandler;
 	delete m_dataLoader;
-	delete m_uiLoader;
 }
 
 void FormWidget::loadForm( QString name )
@@ -82,7 +77,9 @@ void FormWidget::loadLanguage( QString language )
 
 void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 {
-	qDebug( ) << "Form localization loaded for " << name << ", locale " << m_locale.name( );
+	qDebug( ) << "Form localization loaded for " << name
+		<< ", locale " << m_locale.name( )
+		<< ", size " << localization.length( );
 
 // get list of all translators for this form and delete them
 	const QList<QTranslator *> oldTranslators( m_ui->findChildren<QTranslator *>( ) );

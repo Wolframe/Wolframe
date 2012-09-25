@@ -22,7 +22,7 @@ namespace _Wolframe {
 	Q_OBJECT
 
 	public:
-		FormWidget( FormLoader *_formLoader, QWidget *_parent );
+		FormWidget( FormLoader *_formLoader, QUiLoader *_uiLoader, QWidget *_parent );
 		virtual ~FormWidget( );
 		void loadForm( QString name );
 		void loadLanguage( QString language );
