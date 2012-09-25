@@ -5,8 +5,11 @@ Table of Contents
 -----------------
 
   Prerequisites
+    ICU
+      Compile and install ICU (icu4c)
     Boost
       Compile and install boost
+      Notes for Boost 1.50, 1.51
     OpenSSL
       Compile and install openssl
     Compile and install Qt
@@ -26,7 +29,8 @@ Prerequisites
 - mc.exe may be missing in your path (for instance on VC8),
   usually it is available as part of the Platform SDK,
   copy it into the path
-- boost 1.43.0 or later
+- ICU (icu4c 49)
+- boost 1.48.0 or later (boost 1.50 and 1.51 need patching)
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
@@ -50,19 +54,12 @@ Prerequisites
   - xsltproc (from libxslt)
   - the DocBook XSL stylesheets (for instance for HTMLHelp output)
   - the 'hhc.exe' compiler from the 'HTML Help Workshop'
-  
-Boost
------
 
-Get boost from http://boostpro.com or http://boost.teeks99.com
+ICU
+---
 
-Install for instance into C:\Program Files\Boost\Boost_1_49
-
-configure 'makefile\nmake\config.mk' and 
-set BOOST_DIR to C:\Program Files\Boost\Boost_1_49
-
-Comile and install icu4c
-------------------------
+Compile and install ICU (icu4c)
+-------------------------------
  
 Build your own one to get debug and release versions of the ICU library
 (the release version is available as download package, the debug one not).
@@ -72,10 +69,24 @@ open allinone.sln in Visual Studio.
 Build independendly for Debug/Release 32/64-bit targets.
  
 In between salvage the generated artifacts:
-mkdir ~/icu-49.1.2-win32-debug
-cp -a include ~/icu-49.1.2-win32-debug/.
-cp -a bin ~/icu-49.1.2-win32-debug/.
-cp -a lib ~/icu-49.1.2-win32-debug/.
+mkdir /cygdrive/c/<somewhere>/icu-49.1.2-win32-debug
+cp -a include /cygdrive/c/<somwhere>/icu-49.1.2-win32-debug/.
+cp -a bin /cygdrive/c/<somwhere>/icu-49.1.2-win32-debug/.
+cp -a lib /cygdrive/c/<somwhere>/icu-49.1.2-win32-debug/.
+
+configure 'makefile\nmake\config.mk' and 
+set ICU_DIR to C:\<somwhere>\icu-49.1.2-win32-debug
+
+Boost
+-----
+
+Compile your own version of Boost. The default one doesn't include ICU
+support.
+
+Install for instance into C:\Program Files\Boost\Boost_1_49
+
+configure 'makefile\nmake\config.mk' and 
+set BOOST_DIR to C:\Program Files\Boost\Boost_1_49
 
 Compile and install boost
 -------------------------
@@ -86,7 +97,7 @@ in a Visual Studio C++ command line:
 bootstrap
 .\b2 --prefix=C:\<myplace>\boost_1_49_0
 	--with-thread --with-filesystem --with-system --with-program_options ^
-	--with-date_time --with-locale ^
+	--with-date_time --with-locale --with-regex ^
 	-sICU_PATH="<sowewhere>\icu-49.1.2-win32-debug" ^
 	architecture=x86 address-model=64 toolset=msvc ^
 	install   
@@ -103,6 +114,15 @@ These instructions are for boost 1.49, other versions may vary.
 
 Careful: Always check %LIB% and the 'setenv' environment of the SDK! You can
 end up in 64-bit code using 32-bit libraries otherwise. :-)
+
+Notes for Boost 1.50, 1.51
+--------------------------
+
+Boost thread depends on non-header-only libraries without including the
+auto-link-pragmas for MSBC. Apply the 'boost-7045_2.patch' from
+'contrib\Windows\boost', see also:
+
+https://svn.boost.org/trac/boost/ticket/7045
 
 OpenSSL
 -------

@@ -28,12 +28,12 @@ BOOST_VERSION = 1_51_0
 #BOOST_DIR = C:\Programme\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = C:\Program Files\boost\boost_$(BOOST_VERSION)
 #BOOST_DIR = D:\Programme\boost\boost_$(BOOST_VERSION)
-BOOST_DIR = C:\Cygwin\home\Andreas Baumann\boost_1_51_0-win32-debug
+BOOST_DIR = C:\Cygwin\home\Andreas Baumann\boost_1_51_0-win32
 #BOOST_DIR = D:\boost\boost_1_45_0
 #BOOST_DIR = D:\Program Files\boost\boost_$(BOOST_VERSION)
 
 # depends on the choosen boost layout
-BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_49
+BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_51
 #BOOST_INCLUDE_DIR = $(BOOST_DIR)
 
 # visual studio version used for compiling
@@ -55,6 +55,15 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 # precompiled libraries from http://boost.teeks99.com
 #BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32
 #BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib64
+
+# ICU (icu4c)
+#############
+
+ICU_DIR = C:\Cygwin\home\Andreas Baumann\icu-49.1.2-win32-debug
+
+ICU_LDFLAGS = /LIBPATH:"$(ICU_DIR)\lib"
+
+ICU_LIBS = icuind.lib icuucd.lib
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
@@ -144,4 +153,3 @@ DOXYGEN = C:\Program Files\Doxygen\bin\doxygen.exe
 ##########################################################################
 
 HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe
-
