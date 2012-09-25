@@ -43,8 +43,9 @@ namespace module {
 class FilterConstructor :public SimpleObjectConstructor< langbind::Filter >
 {
 public:
-	FilterConstructor( const char* name_, langbind::CreateFilterPtrFunc filterFunc_ )
+	FilterConstructor( const std::string& name_, const std::string& category_, langbind::CreateFilterPtrFunc filterFunc_ )
 		: m_name(name_)
+		, m_category(category_)
 		, m_function(filterFunc_) {}
 
 	virtual ~FilterConstructor(){}
@@ -61,9 +62,18 @@ public:
 	{
 		return m_function( m_name, arg );
 	}
+	const std::string& name() const
+	{
+		return m_name;
+	}
+	const std::string& category() const
+	{
+		return m_category;
+	}
 
 private:
-	const std::string m_name;
+	std::string m_name;
+	std::string m_category;
 	const std::string m_arg;
 	langbind::CreateFilterPtrFunc m_function;
 };
@@ -71,9 +81,11 @@ private:
 class FilterBuilder :public SimpleBuilder
 {
 public:
-	FilterBuilder( const char* name_, langbind::CreateFilterPtrFunc createFunc_)
-		:SimpleBuilder( name_)
-		,m_createFunc(createFunc_){}
+	FilterBuilder( const char* className_, const char* name_, const char* category_, langbind::CreateFilterPtrFunc createFunc_)
+		:SimpleBuilder( className_)
+		,m_createFunc(createFunc_)
+		,m_name(name_)
+		,m_category(category_){}
 
 	virtual ~FilterBuilder(){}
 
@@ -83,12 +95,16 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new FilterConstructor( m_className, m_createFunc);
+		return new FilterConstructor( m_name, m_category, m_createFunc);
 	}
+
 private:
 	langbind::CreateFilterPtrFunc m_createFunc;
+	std::string m_name;
+	std::string m_category;
 };
 
 }}//namespace
 
 #endif
+
