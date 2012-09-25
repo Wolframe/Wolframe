@@ -40,13 +40,16 @@
 namespace _Wolframe {
 namespace db {
 
-PostgreSQLdatabase* PostgreSQLconstructor::object( const config::NamedConfiguration& conf )
+PostgreSQLdbUnit* PostgreSQLconstructor::object( const config::NamedConfiguration& conf )
 {
 	const PostgreSQLconfig& cfg = dynamic_cast< const PostgreSQLconfig& >( conf );
 
-	PostgreSQLdatabase* m_db = new PostgreSQLdatabase( cfg.m_ID, cfg.host, cfg.port, cfg.dbName,
-							   cfg.user, cfg.password, cfg.connectTimeout,
-							   cfg.connections, cfg.acquireTimeout );
+	PostgreSQLdbUnit* m_db = new PostgreSQLdbUnit( cfg.m_ID, cfg.host, cfg.port, cfg.dbName,
+						       cfg.user, cfg.password, cfg.connectTimeout,
+						       cfg.connections, cfg.acquireTimeout,
+						       cfg.statementTimeout,
+						       cfg.sslMode, cfg.sslCert, cfg.sslKey,
+						       cfg.sslRootCert, cfg.sslCRL );
 	MOD_LOG_TRACE << "PostgreSQL database unit for '" << cfg.m_ID << "' created";
 	return m_db;
 }

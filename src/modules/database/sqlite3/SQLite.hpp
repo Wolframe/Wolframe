@@ -72,12 +72,12 @@ private:
 };
 
 
-class SQLiteDatabase : public Database, public DatabaseUnit
+class SQLiteDBunit : public Database, public DatabaseUnit
 {
 public:
-	SQLiteDatabase( const std::string& id,
+	SQLiteDBunit( const std::string& id,
 			const std::string& filename, unsigned short connections, bool flag );
-	virtual ~SQLiteDatabase();
+	virtual ~SQLiteDBunit();
 
 	virtual const std::string& ID() const		{ return m_ID; }
 	virtual const char* className() const		{ return SQLite_DB_CLASS_NAME; }
@@ -101,7 +101,7 @@ public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
 							{ return DATABASE_OBJECT; }
 	virtual const char* objectClassName() const		{ return SQLite_DB_CLASS_NAME; }
-	virtual SQLiteDatabase* object( const config::NamedConfiguration& conf );
+	virtual SQLiteDBunit* object( const config::NamedConfiguration& conf );
 };
 
 }} // _Wolframe::db
