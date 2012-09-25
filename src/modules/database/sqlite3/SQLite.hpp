@@ -72,21 +72,24 @@ private:
 };
 
 
-//class SQLiteDBunit;
+class SQLiteDBunit;
 
-//class SQLiteDatabase : public Database
-//{
-//public:
-//	SQLiteDatabase( const SQLiteDBunit* unit );
-//	 ~SQLiteDatabase();
+class SQLiteDatabase : public Database
+{
+public:
+	SQLiteDatabase( const SQLiteDBunit* unit )
+		: m_unit( unit )		{}
+	 ~SQLiteDatabase()			{}
 
-//	const std::string& ID() const;
-//private:
-//	const SQLiteDBunit*	m_unit;			///< parent database unit
-//};
+	const std::string& ID() const;
+	PreparedStatementHandler* getPreparedStatementHandler()
+						{ return 0; }	//undefined
+private:
+	const SQLiteDBunit*	m_unit;			///< parent database unit
+};
 
 
-class SQLiteDBunit : public DatabaseUnit, public Database
+class SQLiteDBunit : public DatabaseUnit
 {
 public:
 	SQLiteDBunit( const std::string& id,
@@ -95,8 +98,7 @@ public:
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
-//	Database &database();
-	Database &database()			{ return *this; }
+	Database &database();
 
 private:
 	const std::string	m_ID;
@@ -105,7 +107,7 @@ private:
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
 
-//	SQLiteDatabase*		m_db;
+	SQLiteDatabase		m_db;
 };
 
 //***  SQLite database constructor  *******************************************

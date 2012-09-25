@@ -193,9 +193,8 @@ PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
 				    size_t connections, unsigned short acquireTimeout,
 				    unsigned statementTimeout )
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
-	  m_statementTimeout( statementTimeout )
+	  m_statementTimeout( statementTimeout ), m_db( this )
 {
-//	m_db = new PostgreSQLdatabase( this );
 	m_connStr = buildConnStr( host, port,  dbName, user, password,
 				  sslMode, sslCert, sslKey, sslRootCert, sslCRL,
 				  connectTimeout );
@@ -295,20 +294,23 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 		}
 	}
 	if ( m_noConnections != 0 )	{
-		MOD_LOG_ALERT << "PostgreSQL database unit '" << m_ID << "' destructor: not all connections destroyed";
+		MOD_LOG_ALERT << "PostgreSQL database unit '" << m_ID << "' destructor: "
+			      << m_noConnections << " connections not destroyed";
 		throw std::logic_error( "PostgreSQL database unit destructor: not all connections destroyed" );
 	}
-	MOD_LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destructor: " << connections << " connections destroyed";
-
-//	delete m_db;
-	MOD_LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed";
+	MOD_LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
 
-//Database& PostgreSQLdbUnit::database()
-//{
-//	return *m_db;
-//}
+Database& PostgreSQLdbUnit::database()
+{
+	return m_db;
+}
+
+const std::string& PostgreSQLdatabase::ID() const
+{
+	return m_unit->ID();
+}
 
 }} // _Wolframe::db
 

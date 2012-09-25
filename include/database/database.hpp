@@ -58,10 +58,7 @@ public:
 	virtual const std::string& ID() const = 0;
 
 	///\brief Get the interface for processing prepared statements in the database
-	virtual PreparedStatementHandler* getPreparedStatementHandler()
-	{
-		return 0; //undefined (not available) by default
-	}
+	virtual PreparedStatementHandler* getPreparedStatementHandler() = 0;
 
 	/// Close the database connetion
 	/// This exists for no good reason (mostly to make code look uniform)

@@ -48,9 +48,8 @@ namespace db {
 
 SQLiteDBunit::SQLiteDBunit( const std::string& id,
 				const std::string& filename, unsigned short connections, bool flag )
-	: m_ID( id ), m_filename( filename ), m_flag( flag )
+	: m_ID( id ), m_filename( filename ), m_flag( flag ), m_db( this )
 {
-//	m_db = new SQLiteDatabase( this );
 	for( int i = 0; i < connections; i++ ) {
 		sqlite3 *handle;
 		int res = sqlite3_open( m_filename.c_str( ), &handle );
@@ -72,26 +71,18 @@ SQLiteDBunit::~SQLiteDBunit( )
 		sqlite3 *handle = m_connPool.get( );
 		sqlite3_close( handle );
 	}
-
-//	delete m_db;
 	MOD_LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
 }
 
-//Database &SQLiteDBunit::database()
-//{
-//	return *m_db;
-//}
+Database &SQLiteDBunit::database()
+{
+	return m_db;
+}
 
-
-//SQLiteDatabase::SQLiteDatabase( const SQLiteDBunit* unit )
-//	: m_unit( unit )
-//{
-//}
-
-//const std::string& SQLiteDatabase::ID() const
-//{
-//	return m_unit->ID();
-//}
+const std::string& SQLiteDatabase::ID() const
+{
+	return m_unit->ID();
+}
 
 }} // _Wolframe::db
 

@@ -88,21 +88,24 @@ private:
 };
 
 
-//class PostgreSQLdatabase;
+class PostgreSQLdbUnit;
 
-//class PostgreSQLdatabase : public Database
-//{
-//public:
-//	PostgreSQLdatabase( const PostgreSQLdbUnit* unit )
-//		: m_unit( unit )		{}
-//	~PostgreSQLdatabase();
+class PostgreSQLdatabase : public Database
+{
+public:
+	PostgreSQLdatabase( const PostgreSQLdbUnit* unit )
+		: m_unit( unit )		{}
+	~PostgreSQLdatabase()			{}
 
-//	const std::string& ID() const		{ return m_unit->ID(); }
-//private:
-//	const PostgreSQLdbUnit*	m_unit;		///< parent database unit
-//};
+	const std::string& ID() const;
+	PreparedStatementHandler* getPreparedStatementHandler()
+						{ return 0; }	//undefined
+private:
+	const PostgreSQLdbUnit*	m_unit;		///< parent database unit
+};
 
-class PostgreSQLdbUnit : public DatabaseUnit, public Database
+
+class PostgreSQLdbUnit : public DatabaseUnit
 {
 public:
 	PostgreSQLdbUnit( const std::string& id,
@@ -117,8 +120,7 @@ public:
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
-//	Database& database();
-	Database& database()			{ return *this; }
+	Database& database();
 private:
 	const std::string	m_ID;		///< database ID
 	std::string		m_connStr;	///< connection string
@@ -126,7 +128,7 @@ private:
 	ObjectPool< PGconn* >	m_connPool;	///< pool of connections
 	unsigned		m_statementTimeout;///< default statement execution timeout
 
-//	PostgreSQLdatabase*	m_db;		///< real database object
+	PostgreSQLdatabase	m_db;		///< real database object
 };
 
 
