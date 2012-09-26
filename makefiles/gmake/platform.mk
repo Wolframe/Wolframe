@@ -380,29 +380,29 @@ ifeq "$(LINUX_DIST)" "ubuntu"
 
 ifeq "$(LINUX_REV)" "12.04"
 BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= /home/patrick/Projects/boost_1_48_0/stage/lib/
-BOOST_INCLUDE_DIR ?= /home/patrick/Projects/boost_1_48_0
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_LIBRARY_TAG ?=
 endif
 
 ifeq "$(LINUX_REV)" "11.10"
 BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= /home/patrick/Projects/boost_1_48_0/stage/lib/
-BOOST_INCLUDE_DIR ?= /home/patrick/Projects/boost_1_48_0
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_LIBRARY_TAG ?=
 endif
 
 ifeq "$(LINUX_REV)" "11.04"
 BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= /home/patrick/Projects/boost_1_48_0/stage/lib/
-BOOST_INCLUDE_DIR ?= /home/patrick/Projects/boost_1_48_0
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_LIBRARY_TAG ?=
 endif
 
 ifeq "$(LINUX_REV)" "10.10"
 ifdef BOOST_DIR
-BOOST_LIB_DIR ?= /home/patrick/Projects/boost_1_48_0/stage/lib/
-BOOST_INCLUDE_DIR ?= /home/patrick/Projects/boost_1_48_0
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 endif
 ifndef BOOST_DIR
 BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
@@ -413,8 +413,8 @@ endif
 
 ifeq "$(LINUX_REV)" "10.04"
 ifdef BOOST_DIR
-BOOST_LIB_DIR ?= /home/patrick/Projects/boost_1_48_0/stage/lib/
-BOOST_INCLUDE_DIR ?= /home/patrick/Projects/boost_1_48_0
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 endif
 ifndef BOOST_DIR
 BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
