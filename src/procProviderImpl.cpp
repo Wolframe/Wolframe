@@ -259,7 +259,7 @@ db::Database* ProcessorProvider::transactionDatabase() const
 
 //**** Processor Provider PIMPL Implementation ******************************
 ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf,
-								   const ProcessorProvider* this_,
+								   const ProcessorProvider* ownInterface,
 								   const module::ModulesDirectory* modules )
 {
 	m_db = NULL;
@@ -516,7 +516,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	std::list<module::TransactionFunctionConstructor*>::const_iterator ti = m_transactionFunctionCompiler.begin(), te = m_transactionFunctionCompiler.end();
 	for (; ti != te; ++ti)
 	{
-		(*ti)->setProvider( this_);
+		(*ti)->setProvider( ownInterface);
 	}
 
 	// Build the list of configured objects in the processor environment:
