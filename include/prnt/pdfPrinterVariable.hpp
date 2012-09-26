@@ -56,7 +56,8 @@ struct Variable
 		SizeY,					//< Size on the Y axis of the coordinate system
 		LineStyle,				//< Line width and optionally the dash pattern for lines in the page
 		Font,					//< Font type and encoding separated by a ';'
-		FontSize				//< Size of the font
+		FontSize,				//< Size of the font
+		Unit					//< Unit (granularity) for rounding, etc
 	};
 };
 enum {NofVariables=(int)Variable::SizeY+1};

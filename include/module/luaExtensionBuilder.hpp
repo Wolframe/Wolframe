@@ -77,9 +77,9 @@ public:
 	}
 
 private:
-	const std::string m_className;
-	const std::string m_moduleName;
-	const lua_CFunction m_func;
+	std::string m_className;
+	std::string m_moduleName;
+	lua_CFunction m_func;
 };
 
 class LuaExtensionBuilder :public SimpleBuilder

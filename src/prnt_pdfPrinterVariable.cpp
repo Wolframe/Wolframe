@@ -53,6 +53,7 @@ const char* _Wolframe::prnt::variableName( Variable::Id v)
 		"LineStyle",
 		"Font",
 		"FontSize",
+		"Unit",
 		0};
 	return ar[ (int)v];
 }

@@ -83,6 +83,17 @@ void DocumentImpl::execute_enter( Method::Id method, VariableScope& vars)
 {
 	m_stk.push_back( ++m_cnt);
 	m_out << "ENTER " << methodName(method) << ": " << m_cnt << "$ " << vardump(vars) << std::endl;
+
+	if (method == Method::RoundValue)
+	{
+		std::size_t unit_i = vars.getValueIdx( Variable::Unit);
+		std::size_t value_i = vars.getValueIdx( Variable::Text);
+		if (unit_i == 0) throw_error( "RoundValue called and variable 'Unit' with the granularity unit to round with is not defined");
+		if (value_i == 0) throw_error( "RoundValue called and variable 'Text' with the value to round is not defined");
+		types::BigNumber unit( vars.getValue( unit_i));
+		types::BigNumber value( vars.getValue( value_i));
+		vars.define( Variable::Text, value.round( unit).tostring());
+	}
 }
 
 void DocumentImpl::execute_leave( Method::Id method, VariableScope& vars)

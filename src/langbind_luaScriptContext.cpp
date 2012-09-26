@@ -43,7 +43,7 @@ using namespace _Wolframe::langbind;
 
 LuaScriptContext::~LuaScriptContext()
 {
-	std::vector<module::LuaExtensionConstructor*>::const_iterator ii=m_objects.begin(),ee=m_objects.begin();
+	std::vector<module::LuaExtensionConstructor*>::const_iterator ii=m_objects.begin(),ee=m_objects.end();
 	for (; ii != ee; ++ii) delete *ii;
 }
 

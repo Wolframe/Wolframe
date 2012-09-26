@@ -70,6 +70,9 @@ public:
 	BigBCD operator -() const			{return neg();}
 
 	BigBCD shift( int digits) const;
+	BigBCD cut( unsigned int digits) const;
+	BigBCD round( const BigBCD& gran) const;
+
 	void invert_sign()				{m_neg = !m_neg; normalize();}
 	char sign() const				{return m_neg?'-':'+';}
 
@@ -82,6 +85,7 @@ public:
 
 	bool isValid() const;
 	bool isNull() const;
+	std::size_t nof_digits() const			{return begin().size();}
 
 	friend class const_iterator;
 	class const_iterator
@@ -128,6 +132,7 @@ private:
 	static void digits_addition( BigBCD& dest, const BigBCD& this_, const BigBCD& opr, Allocator* allocator);
 	static void digits_subtraction( BigBCD& dest, const BigBCD& this_, const BigBCD& opr, Allocator* allocator);
 	static void digits_shift( BigBCD& dest, const BigBCD& this_, int nof_digits, Allocator* allocator);
+	static void digits_cut( BigBCD& dest, const BigBCD& this_, unsigned int nof_digits, Allocator* allocator);
 	static void digits_nibble_multiplication( BigBCD& dest, const BigBCD& this_, unsigned char factor, Allocator* allocator);
 	static void digits_16_multiplication( BigBCD& dest, const BigBCD& this_, Allocator* allocator);
 	static void digits_multiplication( BigBCD& dest, const BigBCD& this_, FactorType factor, Allocator* allocator);
@@ -179,6 +184,8 @@ public:
 	void format( unsigned int show_prec, unsigned int calc_prec);
 	void setCalcPrecision( unsigned int p)		{format( p, m_calc_precision);}
 	void setShowPrecision( unsigned int p)		{format( m_show_precision, p);}
+
+	BigNumber round( const BigNumber& gran);
 
 	std::string tostring() const;
 

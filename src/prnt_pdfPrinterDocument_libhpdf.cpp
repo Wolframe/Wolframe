@@ -31,6 +31,7 @@ Project Wolframe.
 ************************************************************************/
 ///\file prnt_pdfPrinterDocument_libhpdf.cpp
 #include "prnt/pdfPrinterDocument_libhpdf.hpp"
+#include "types/bcdArithmetic.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include "logger-v1.hpp"
@@ -91,6 +92,17 @@ public:
 				m_pagear.push_back( Page( *this));
 				m_pageidx = m_pagear.size();
 				break;
+
+			case Method::RoundValue:
+			{
+				std::size_t unit_i = vscope.getValueIdx( Variable::Unit);
+				std::size_t value_i = vscope.getValueIdx( Variable::Text);
+				if (unit_i == 0) throw_error( "RoundValue called and variable 'Unit' with the granularity unit to round with is not defined");
+				if (value_i == 0) throw_error( "RoundValue called and variable 'Text' with the value to round is not defined");
+				types::BigNumber unit( vscope.getValue( unit_i));
+				types::BigNumber value( vscope.getValue( value_i));
+				vscope.define( Variable::Text, value.round( unit).tostring());
+			}
 		}
 		m_methodcall = false;
 	}

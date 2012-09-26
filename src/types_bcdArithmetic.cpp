@@ -549,11 +549,66 @@ void BigBCD::digits_shift( BigBCD& rt, const BigBCD& this_, int nof_digits, Allo
 	rt.normalize();
 }
 
+void BigBCD::digits_cut( BigBCD& rt, const BigBCD& this_, unsigned int nof_digits, Allocator* allocator)
+{
+	unsigned int ofs = (unsigned int)nof_digits / NumDigits;
+	unsigned char sfh = (unsigned char)nof_digits % NumDigits;
+	std::size_t ii,nn;
+
+	rt.init( ofs + 1, allocator);
+	rt.m_neg = this_.m_neg;
+	for (ii=0,nn=ofs; ii<nn; ++ii)
+	{
+		rt.m_ar[ ii] = this_.m_ar[ ii];
+	}
+	unsigned int mask = NumMask >> ((NumDigits - sfh) * 4);
+	rt.m_ar[ ii] = this_.m_ar[ ii] & mask;
+	rt.normalize();
+}
+
 BigBCD BigBCD::shift( int digits) const
 {
 	BigBCD rt;
 	digits_shift( rt, *this, digits, 0);
 	return rt;
+}
+
+BigBCD BigBCD::cut( unsigned int digits) const
+{
+	BigBCD rt;
+	digits_cut( rt, *this, digits, 0);
+	return rt;
+}
+
+BigBCD BigBCD::round( const BigBCD& gran) const
+{
+	unsigned int nn = gran.nof_digits();
+	if (gran.m_neg || !nn) throw std::runtime_error( "rounding granularity must be a positive number");
+
+	Allocator allocator;
+	BigBCD aa;
+	aa.copy( *this, &allocator);
+	BigBCD ct;
+	digits_cut( ct, aa, nn, &allocator);
+	ct.m_neg = false;
+
+	unsigned int ft = 0;
+	BigBCD zt;
+	for (;;)
+	{
+		++ft;
+		digits_subtraction( zt, ct, gran, &allocator);
+		if (zt.m_neg) break;
+		ct.copy( zt, &allocator);
+	}
+	if (m_neg)
+	{
+		return *this + zt;
+	}
+	else
+	{
+		return *this - zt;
+	}
 }
 
 void BigBCD::digits_16_multiplication( BigBCD& rt, const BigBCD& this_, Allocator* allocator)
@@ -699,7 +754,7 @@ void BigBCD::digits_multiplication( BigBCD& rt, const BigBCD& this_, const BigBC
 
 static int estimate_shifts( const BigBCD& this_, const BigBCD& match)
 {
-	int rt = (int)(this_.begin().size() - match.begin().size());
+	int rt = (int)(this_.nof_digits() - match.nof_digits());
 	if (*this_.begin() == *match.begin())
 	{
 		return rt;
@@ -1210,5 +1265,15 @@ void BigNumber::format( unsigned int show_prec, unsigned int calc_prec)
 	}
 	m_calc_precision = calc_prec;
 	m_show_precision = show_prec;
+}
+
+BigNumber BigNumber::round( const BigNumber& gran)
+{
+	BigNumber aa = *this;
+	aa.format( gran.m_show_precision, gran.m_show_precision);
+	BigNumber rt( aa.BigBCD::round( gran), 0, 0);
+	rt.m_calc_precision = gran.m_show_precision;
+	rt.m_show_precision = gran.m_show_precision;
+	return rt;
 }
 
