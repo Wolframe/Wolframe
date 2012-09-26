@@ -131,7 +131,7 @@ struct UTF8
 
 	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static UChar value( char* buf, unsigned int& bufpos, Iterator& itr)
+	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
 	{
 		if (bufpos==0)
 		{
@@ -167,7 +167,7 @@ struct UTF8
 
 	///\brief See template<class Buffer>Interface::print(UChar,Buffer&)
 	template <class Buffer_>
-	static void print( UChar chr, Buffer_& buf)
+	void print( UChar chr, Buffer_& buf) const
 	{
 		unsigned int rt;
 		if (chr <= 127)

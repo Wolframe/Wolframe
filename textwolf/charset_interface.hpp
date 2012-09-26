@@ -94,14 +94,14 @@ struct Interface
 	///\param [in,out] itr iterator on the source
 	///\return the value of the unicode character
 	template <class Iterator>
-	static UChar value( char* buf, unsigned int& bufpos, Iterator& itr);
+	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const;
 
 	///\brief Prints a unicode character to a buffer
 	///\tparam Buffer_ STL back insertion sequence
 	///\param [in] chr character to print
 	///\param [out] buf buffer to print to
 	template <class Buffer_>
-	static void print( UChar chr, Buffer_& buf);
+	void print( UChar chr, Buffer_& buf) const;
 };
 
 ///\class ByteOrder

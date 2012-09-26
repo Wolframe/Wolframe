@@ -9,7 +9,7 @@
 # Executing this script in the wrong context might invalidate your test collection.
 #
 # DESCRIPTION
-# - Script called in the context of a test script (as ". output_tst_all.sh") with the following variables set
+# - Same as output_tst_all.sh but for one ISO-8859 character set encoding of a specific code page
 #
 # VARIABLES
 # - testname		name of the test
@@ -18,9 +18,10 @@
 # - docin		input document name
 # - docout		output document name
 # - modules		modules to load
+# - codepage		ISO-8859 codepage to use
 #
-csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4LE UCS-4BE"
+csetlist="ISO-8859-$codepage"
+disabled=1
 . ./output_tst_textwolf.sh
-csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4BE"
 . ./output_tst_libxml2.sh
 

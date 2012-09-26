@@ -133,7 +133,7 @@ TEST_F( WolfilterTest, tests)
 		for (; ai != ae && utils::parseNextToken( arg, ai, ae, argop, argtk); ++ai) cmd.push_back( arg);
 
 		std::cerr << "processing test '" << testname << "'" << std::endl;
-		enum {MaxNofArgs=31};
+		enum {MaxNofArgs=63};
 		int cmdargc = cmd.size()+1;
 		char* cmdargv[MaxNofArgs+1];
 		if (cmdargc > MaxNofArgs) throw std::runtime_error( "too many arguments in test");

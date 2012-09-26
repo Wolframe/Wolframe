@@ -10,10 +10,12 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwolframe
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	-lwolframe
+	-lwolframe \
+	-lboost_locale
 
 DYNAMIC_MODULE = mod_normalize_locale.so
 

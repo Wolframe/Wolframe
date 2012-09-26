@@ -90,7 +90,7 @@ char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iter
 	}
 	else
 	{
-		throw std::runtime_error( std::string( "illegal token character '") + *itr + "'");
+		throw std::runtime_error( std::string( "unexpected token character '") + *itr + "'");
 	}
 }
 

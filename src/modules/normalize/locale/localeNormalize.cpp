@@ -121,17 +121,20 @@ struct Tokenize
 	{
 		std::string text = str;
 		std::string rt;
-		boost::locale::boundary::ssegment_index index( boost::locale::boundary::word, text.begin(), text.end());
-		boost::locale::boundary::ssegment_index::iterator ii = index.begin(), ee = index.end();
-		for (; ii != ee; ++ii)
+		if (!str.empty())
 		{
-			if(ii->rule() & boost::locale::boundary::word_any)
+			boost::locale::boundary::ssegment_index index( boost::locale::boundary::word, text.begin(), text.end());
+			boost::locale::boundary::ssegment_index::iterator ii = index.begin(), ee = index.end();
+			for (; ii != ee; ++ii)
 			{
-				if (!rt.empty())
+				if(ii->rule() & boost::locale::boundary::word_any)
 				{
-					boost::locale::utf::utf_traits<char>::encode( 0x20, std::back_inserter( rt));
+					if (!rt.empty())
+					{
+						boost::locale::utf::utf_traits<char>::encode( 0x20, std::back_inserter( rt));
+					}
+					rt.append( *ii);
 				}
-				rt.append( *ii);
 			}
 		}
 		return rt;
@@ -144,7 +147,7 @@ static std::vector<LocaleConv> parseFunc( const std::string& description)
 	std::string tok;
 	utils::CharTable opTab( ",");
 	std::string::const_iterator ii = description.begin(), ee = description.end();
-	for (; ii!=ee; ++ii)
+	while (ii != ee)
 	{
 		char ch = utils::parseNextToken( tok, ii, ee, opTab);
 		if (ch == '\0') break;
@@ -237,7 +240,7 @@ private:
 NormalizeFunction* _Wolframe::langbind::createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& description)
 {
 	std::vector<LocaleConv> func;
-	utils::CharTable opTab( ":");
+	utils::CharTable opTab( ":,");
 	std::string lc,tok;
 	std::string::const_iterator ii = description.begin(), ee = description.end();
 	char ch = utils::parseNextToken( tok, ii, ee, opTab);

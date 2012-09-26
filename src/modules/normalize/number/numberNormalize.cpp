@@ -45,41 +45,79 @@ using namespace langbind;
 namespace
 {
 
+class TrimNormalizeFunction :public NormalizeFunction
+{
+public:
+	TrimNormalizeFunction(){}
+	virtual std::string execute( const std::string& str) const
+	{
+		std::string::const_iterator ii = str.begin(), ee = str.end();
+		while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
+		std::string::const_iterator ti = ii, te = ii;
+		for (; ii != ee; ++ii)
+		{
+			if ((unsigned char)*ii > 32) te = ii+1;
+		}
+		if (ti == str.begin() && te == str.end())
+		{
+			return str;
+		}
+		else
+		{
+			return std::string( ti, te);
+		}
+	}
+};
+
 class IntegerNormalizeFunction :public NormalizeFunction
 {
 public:
-	IntegerNormalizeFunction( bool sign_, std::size_t size_=0)
+	IntegerNormalizeFunction( bool sign_, std::size_t size_, bool trim_)
 		:m_size(size_)
-		,m_sign(sign_){}
+		,m_sign(sign_)
+		,m_trim(trim_){}
 
 	virtual std::string execute( const std::string& str) const
 	{
 		if (!m_size) return str;
 		std::string::const_iterator ii = str.begin(), ee = str.end();
 		std::size_t cnt = m_size;
+		if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
+		std::string::const_iterator ti = ii;
 		if (m_sign)
 		{
 			if (ii != ee && *ii == '-') ++ii;
 		}
 		for (; cnt && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cnt);
+		std::string::const_iterator te = ii;
+		if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
 		if (ii != ee)
 		{
 			if (cnt) std::runtime_error( "number out of range");
 			std::runtime_error( std::string("illegal token '") + *ii + "' in number");
 		}
-		return str;
+		if (m_trim && (ti != str.begin() || te != str.end()))
+		{
+			return std::string( ti, te);
+		}
+		else
+		{
+			return str;
+		}
 	}
 private:
 	std::size_t m_size;
 	bool m_sign;
+	bool m_trim;
 };
 
 class FloatNormalizeFunction :public NormalizeFunction
 {
 public:
-	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_)
+	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_, bool trim_)
 		:m_sizeG(sizeG_)
-		,m_sizeF(sizeF_){}
+		,m_sizeF(sizeF_)
+		,m_trim(trim_){}
 
 	virtual std::string execute( const std::string& str) const
 	{
@@ -87,6 +125,8 @@ public:
 		std::size_t cntG = m_sizeG?m_sizeG:std::numeric_limits<std::size_t>::max();
 		std::size_t cntF = m_sizeF?m_sizeF:std::numeric_limits<std::size_t>::max();
 
+		if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
+		std::string::const_iterator ti = ii;
 		if (ii != ee && *ii == '-') ++ii;
 		for (; cntG && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cntG);
 		if (ii != ee)
@@ -97,16 +137,26 @@ public:
 				for (; cntF && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cntF);
 			}
 		}
+		std::string::const_iterator te = ii;
+		if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
 		if (ii != ee)
 		{
 			if (*ii >= '0' && *ii <= '9') std::runtime_error( "number out of range");
 			std::runtime_error( std::string("illegal token '") + *ii + "' in number");
 		}
-		return str;
+		if (m_trim && (ti != str.begin() || te != str.end()))
+		{
+			return std::string( ti, te);
+		}
+		else
+		{
+			return str;
+		}
 	}
 private:
 	std::size_t m_sizeG;
 	std::size_t m_sizeF;
+	bool m_trim;
 };
 
 } //anonymous namespace
@@ -181,24 +231,32 @@ NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( ResourceH
 {
 	try
 	{
+		bool doTrim = false;
 		std::string type;
 		std::string::const_iterator ii = description.begin(), ee = description.end();
 		char ch = utils::parseNextToken( type, ii, ee, opTab);
 		if (opTab[ch]) throw std::runtime_error( "type identifier expected");
+		if (boost::algorithm::iequals( type, "trim"))
+		{
+			doTrim = true;
+			ch = utils::parseNextToken( type, ii, ee, opTab);
+			if (ch == '\0') return new TrimNormalizeFunction();
+			if (opTab[ch]) throw std::runtime_error( "type identifier expected");
+		}
 		if (boost::algorithm::iequals( type, "integer"))
 		{
 			std::size_t dim = parseIntegerDescription( ii, ee);
-			return new IntegerNormalizeFunction( true, dim);
+			return new IntegerNormalizeFunction( true, dim, doTrim);
 		}
 		else if (boost::algorithm::iequals( type, "unsigned"))
 		{
 			std::size_t dim = parseIntegerDescription( ii, ee);
-			return new IntegerNormalizeFunction( false, dim);
+			return new IntegerNormalizeFunction( false, dim, doTrim);
 		}
 		else if (boost::algorithm::iequals( type, "float"))
 		{
 			std::pair<std::size_t,std::size_t> dim = parseFloatDescription( ii, ee);
-			return new FloatNormalizeFunction( dim.first, dim.second);
+			return new FloatNormalizeFunction( dim.first, dim.second, doTrim);
 		}
 		else
 		{
