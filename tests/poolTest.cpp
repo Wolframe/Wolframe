@@ -88,7 +88,6 @@ protected:
 	virtual ~ObjectPoolFixture()	{
 	}
 
-
 	// Code here will be called immediately after the constructor (right
 	// before each test).
 	virtual void SetUp() {
@@ -102,8 +101,9 @@ protected:
 	// Code here will be called immediately after each test (right
 	// before the destructor).
 	virtual void TearDown() {
-		for ( unsigned long i = 0; i < poolSize; i++ )
-			objPool.get();
+		if ( ! emptyPool )
+			for ( unsigned long i = 0; i < poolSize; i++ )
+				objPool.get();
 		for ( unsigned long i = 0; i < poolSize; i++ )
 			delete tstObjs[i];
 	}
@@ -115,16 +115,20 @@ protected:
 	_Wolframe::ObjectPool< testObject* >	objPool;
 	unsigned				poolSize;
 	unsigned long				times;
+	bool					emptyPool;
 
 public:
 	static void testThread( _Wolframe::ObjectPool< testObject* > *pool, unsigned count )
 	{
 		for ( std::size_t i = 0; i < count; )	{
-			testObject *tstObj = pool->get();
-			if ( tstObj != NULL )	{
+			try	{
+				testObject *tstObj = pool->get();
 				tstObj->doSomething();
 				pool->add( tstObj );
 				i++;
+			}
+			catch ( _Wolframe::ObjectPoolTimeout )
+			{
 			}
 		}
 	}
@@ -132,11 +136,15 @@ public:
 	static void sleepTestThread( _Wolframe::ObjectPool< testObject* > *pool, unsigned count )
 	{
 		for ( std::size_t i = 0; i < count; )	{
-			testObject *tstObj = pool->get();
-			if ( tstObj != NULL )	{
+			try	{
+				testObject *tstObj = pool->get();
+
 				tstObj->sleepSomething();
 				pool->add( tstObj );
 				i++;
+			}
+			catch ( _Wolframe::ObjectPoolTimeout )
+			{
 			}
 		}
 	}
@@ -169,6 +177,7 @@ TEST_F( ObjectPoolFixture, noTimeout )	{
 	for ( unsigned long i = 0; i < poolSize; i++ )
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	ASSERT_EQ( used, noThreads * times );
+	emptyPool = false;
 }
 
 TEST_F( ObjectPoolFixture, noTimeoutSleep )	{
@@ -195,6 +204,7 @@ TEST_F( ObjectPoolFixture, noTimeoutSleep )	{
 	for ( unsigned long i = 0; i < poolSize; i++ )
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	ASSERT_EQ( used, noThreads * times );
+	emptyPool = false;
 }
 
 TEST_F( ObjectPoolFixture, Timeout )	{
@@ -222,6 +232,7 @@ TEST_F( ObjectPoolFixture, Timeout )	{
 	for ( unsigned long i = 0; i < poolSize; i++ )
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	ASSERT_EQ( used, noThreads * times );
+	emptyPool = false;
 }
 
 TEST_F( ObjectPoolFixture, TimeoutSleep )	{
@@ -249,18 +260,16 @@ TEST_F( ObjectPoolFixture, TimeoutSleep )	{
 	for ( unsigned long i = 0; i < poolSize; i++ )
 		ASSERT_EQ( tstObjs[i]->threads(), 0 );
 	ASSERT_EQ( used, noThreads * times );
+	emptyPool = false;
 }
 
 TEST_F( ObjectPoolFixture, TestTimeout )	{
 	objPool.timeout( 1 );
-	testObject *tstObj;
 
-	for ( unsigned long i = 0; i < poolSize; i++ )	{
-		tstObj = objPool.get();
-	}
-	tstObj = objPool.get();
-
-	ASSERT_EQ( tstObj, (testObject *)NULL );
+	for ( unsigned long i = 0; i < poolSize; i++ )
+		objPool.get();
+	ASSERT_THROW( objPool.get(), _Wolframe::ObjectPoolTimeout );
+	emptyPool = true;
 }
 
 int main( int argc, char **argv )

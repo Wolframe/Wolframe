@@ -14,7 +14,7 @@ puts "wolframed started with configuration file: $config (pid: $serverpid)"
 # allow the server to start
 sleep 1
 
-set timeout 5
+set timeout 3
 if { [catch {
 	spawn telnet localhost 7661
 
@@ -31,6 +31,8 @@ if { [catch {
 	set message "2nd short line with üèöéäà°§"
 	send "$message\r"
 	expect "$message\r"
+
+	sleep 0.5
 
 	send "quit\r"
 	expect "Bye\r"

@@ -45,6 +45,16 @@
 
 namespace _Wolframe {
 
+class ObjectPoolTimeout : public std::exception
+{
+public:
+//	ObjectPoolTimeout() throw();
+//	ObjectPoolTimeout( const ObjectPoolTimeout& ) throw();
+//	ObjectPoolTimeout& operator= ( const ObjectPoolTimeout& ) throw();
+//	virtual ~ObjectPoolTimeout() throw();
+//	virtual const char* what() const throw();
+};
+
 // the object pool
 template < typename objectType >
 class ObjectPool	{
@@ -54,7 +64,7 @@ public:
 	~ObjectPool()	{
 		boost::lock_guard<boost::mutex> lock( m_mutex );
 		if ( !m_availList.empty() )
-			throw std::logic_error( "ObjectPool not empty at destruction" );
+			throw std::runtime_error( "ObjectPool not empty at destruction" );
 	}
 
 	std::size_t available()		{ return m_availList.size(); }
@@ -78,11 +88,11 @@ public:
 							+ boost::posix_time::seconds( m_timeout );
 					while( m_availList.empty() )
 						if ( ! m_cond.timed_wait( lock, absTime ))
-							return NULL;
+							throw ObjectPoolTimeout();
 				}
 			}
 		}
-		return NULL;
+		throw std::logic_error( "Logic error #1 in ObjectPool" );
 	}
 
 	void add ( objectType obj )	{
@@ -106,9 +116,9 @@ class PoolObject : public objectType
 public:
 	PoolObject( ObjectPool< objectType >& pool )
 		: m_pool( pool ), m_object( pool.get())	{}
-	~PoolObject()					{ m_pool.add( m_object ); }
+	~PoolObject()			{ m_pool.add( m_object ); }
 
-	objectType& object()				{ return m_object; }
+	objectType& object()		{ return m_object; }
 private:
 	ObjectPool< objectType >&	m_pool;
 	objectType&			m_object;
