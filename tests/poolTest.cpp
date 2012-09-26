@@ -122,9 +122,8 @@ public:
 	{
 		for ( std::size_t i = 0; i < count; )	{
 			try	{
-				testObject *tstObj = pool->get();
+				_Wolframe::PoolObject< testObject* > tstObj( *pool );
 				tstObj->doSomething();
-				pool->add( tstObj );
 				i++;
 			}
 			catch ( _Wolframe::ObjectPoolTimeout )
@@ -137,10 +136,8 @@ public:
 	{
 		for ( std::size_t i = 0; i < count; )	{
 			try	{
-				testObject *tstObj = pool->get();
-
+				_Wolframe::PoolObject< testObject* > tstObj( *pool );
 				tstObj->sleepSomething();
-				pool->add( tstObj );
 				i++;
 			}
 			catch ( _Wolframe::ObjectPoolTimeout )

@@ -59,15 +59,15 @@ public:
 template < typename objectType >
 class ObjectPool	{
 public:
-	ObjectPool( const unsigned to )	{ m_timeout = to; }
-	ObjectPool()			{ m_timeout = 0; }
+	ObjectPool( const unsigned to )		{ m_timeout = to; }
+	ObjectPool()				{ m_timeout = 0; }
 	~ObjectPool()	{
 		boost::lock_guard<boost::mutex> lock( m_mutex );
 		if ( !m_availList.empty() )
 			throw std::runtime_error( "ObjectPool not empty at destruction" );
 	}
 
-	std::size_t available()		{ return m_availList.size(); }
+	std::size_t available() const		{ return m_availList.size(); }
 
 	objectType get()	{
 		while( true )	{
@@ -101,8 +101,8 @@ public:
 		m_cond.notify_one();
 	}
 
-	unsigned timeout()		{ return m_timeout; }
-	void timeout( unsigned to )	{ m_timeout = to; }
+	unsigned timeout() const		{ return m_timeout; }
+	void timeout( unsigned to )		{ m_timeout = to; }
 private:
 	std::vector< objectType >	m_availList;	///< list (vector really) of available objects
 	boost::mutex			m_mutex;	///< condition variable associated mutex
@@ -111,17 +111,20 @@ private:
 };
 
 template < typename objectType >
-class PoolObject : public objectType
+class PoolObject
 {
 public:
 	PoolObject( ObjectPool< objectType >& pool )
 		: m_pool( pool ), m_object( pool.get())	{}
 	~PoolObject()			{ m_pool.add( m_object ); }
 
-	objectType& object()		{ return m_object; }
+	objectType object() const		{ return m_object; }
+
+	objectType operator ->() const		{ return m_object; }
+	objectType operator *() const		{ return m_object; }
 private:
 	ObjectPool< objectType >&	m_pool;
-	objectType&			m_object;
+	objectType			m_object;
 };
 } // namespace _Wolframe
 
