@@ -53,7 +53,7 @@ DatabaseProvider::~DatabaseProvider()
 	delete m_impl;
 }
 
-Database *DatabaseProvider::database( const std::string& ID ) const
+Database* DatabaseProvider::database( const std::string& ID ) const
 {
 	return m_impl->database( ID );
 }
@@ -96,8 +96,8 @@ Database* DatabaseProvider::DatabaseProvider_Impl::database( const std::string& 
 {
 	for ( std::list<db::DatabaseUnit* >::const_iterator it = m_db.begin();
 							it != m_db.end(); it++ )	{
-		if ( (*it)->database().ID() == id )
-			return &(*it)->database();
+		if ( (*it)->ID() == id )
+			return (*it)->database();
 	}
 	return NULL;
 }

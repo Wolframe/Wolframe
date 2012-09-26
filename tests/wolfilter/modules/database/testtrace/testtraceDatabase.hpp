@@ -106,9 +106,9 @@ public:
 		return TESTTRACE_DATABASE_CLASSNAME;
 	}
 
-	virtual Database& database()
+	virtual Database* database()
 	{
-		return *this;
+		return this;
 	}
 
 	///\brief Get the interface for processing prepared statements in the database

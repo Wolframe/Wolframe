@@ -98,7 +98,7 @@ public:
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
-	Database &database();
+	Database* database();
 
 private:
 	const std::string	m_ID;

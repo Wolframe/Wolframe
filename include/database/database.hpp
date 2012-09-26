@@ -61,7 +61,7 @@ public:
 	virtual PreparedStatementHandler* getPreparedStatementHandler() = 0;
 
 	/// Close the database connetion
-	/// This exists for no good reason (mostly to make code look uniform)
+	/// This exists for no good reason (mostly to make the code look uniform)
 	virtual void close()			{}
 };
 
@@ -78,7 +78,11 @@ public:
 	/// Class names must be unique.
 	virtual const char* className() const = 0;
 
-	virtual Database& database() = 0;
+	/// Database identifier.
+	virtual const std::string& ID() const = 0;
+
+	/// The actual database object
+	virtual Database* database() = 0;
 };
 
 }} // namespace _Wolframe::db

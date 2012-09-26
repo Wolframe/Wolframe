@@ -120,7 +120,7 @@ public:
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
-	Database& database();
+	Database* database();
 private:
 	const std::string	m_ID;		///< database ID
 	std::string		m_connStr;	///< connection string

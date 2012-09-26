@@ -74,9 +74,9 @@ SQLiteDBunit::~SQLiteDBunit( )
 	MOD_LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
 }
 
-Database &SQLiteDBunit::database()
+Database* SQLiteDBunit::database()
 {
-	return m_db;
+	return &m_db;
 }
 
 const std::string& SQLiteDatabase::ID() const

@@ -302,9 +302,9 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 }
 
 
-Database& PostgreSQLdbUnit::database()
+Database* PostgreSQLdbUnit::database()
 {
-	return m_db;
+	return &m_db;
 }
 
 const std::string& PostgreSQLdatabase::ID() const
