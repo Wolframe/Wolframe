@@ -252,6 +252,10 @@ const langbind::TransactionFunction* ProcessorProvider::transactionFunction( con
 	return m_impl->transactionFunction( name);
 }
 
+db::Database* ProcessorProvider::transactionDatabase() const
+{
+	return m_impl->transactionDatabase();
+}
 
 //**** Processor Provider PIMPL Implementation ******************************
 ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf,
@@ -580,7 +584,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 			return true;
 		}
 		else	{
-			LOG_ERROR << "Processor database: database labeled '" << m_dbLabel << "' not found !";
+			LOG_ALERT << "Processor database: database labeled '" << m_dbLabel << "' not found !";
 			return false;
 		}
 	}

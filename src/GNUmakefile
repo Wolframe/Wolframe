@@ -54,7 +54,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_ioFilterCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \
 	cmdbind_directmapCommandHandler.o \
-	database_preparedStatementProcessor.o \
 	types_allocators.o \
 	acceptor.o \
 	serverEndpoint.o \
@@ -62,7 +61,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	serverConfig.o \
 	server.o \
 	procProviderImpl.o \
-	procProviderGetTransactionDB.o
+	database_preparedStatementProcessor.o
 
 
 #SSL
