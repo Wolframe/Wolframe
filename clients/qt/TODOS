@@ -1,5 +1,6 @@
 - use QNetworkSession (for mobiles and roaming profiles)
 - localize forms:
+  - Windows doesn't retranslate on the fly! Why?
   - Domain names like 'male', 'female', separate view localized form
     and use something different internally, also, should the domains
     come from the ui or as a separate request?
