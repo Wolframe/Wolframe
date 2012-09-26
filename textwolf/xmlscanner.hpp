@@ -508,7 +508,7 @@ public:
 	///\param [in] ch unicode character to print
 	void push( UChar ch)
 	{
-		OutputCharSet::print( ch, m_outputBuf);
+		m_output.print( ch, m_outputBuf);
 	}
 
 	///\brief Map a hexadecimal digit to its value
@@ -803,6 +803,7 @@ public:
 	template <class OutputBufferType>
 	static bool parseStaticToken( const IsTokenCharMap& isTok, InputReader ir, OutputBufferType& buf)
 	{
+		static OutputCharSet output;
 		buf.clear();
 		for (;;)
 		{
@@ -822,7 +823,7 @@ public:
 				{
 					return true;
 				}
-				OutputCharSet::print( pc, buf);
+				output.print( pc, buf);
 				ir.skip();
 			}
 		}
@@ -970,6 +971,7 @@ private:
 	InputReader m_src;		//< source input iterator
 	const EntityMap* m_entityMap;	//< map with entities defined by the caller
 	OutputBuffer m_outputBuf;	//< buffer to use for output
+	OutputCharSet m_output;
 
 public:
 	///\brief Constructor
@@ -977,16 +979,19 @@ public:
 	///\param [in] p_outputBuf buffer to use for output
 	///\param [in] p_entityMap read only map of named entities defined by the user
 	XMLScanner( const InputIterator& p_src, const EntityMap& p_entityMap)
-			:state(START),m_doTokenize(false),error(Ok),m_src(p_src),m_entityMap(&p_entityMap)
-	{}
-	XMLScanner( const EntityMap& p_entityMap)
-			:state(START),m_doTokenize(false),error(Ok),m_entityMap(&p_entityMap)
+			:state(START),m_doTokenize(false),error(Ok),m_src(InputCharSet(),p_src),m_entityMap(&p_entityMap),m_output(OutputCharSet())
 	{}
 	XMLScanner( const InputIterator& p_src)
-			:state(START),m_doTokenize(false),error(Ok),m_src(p_src),m_entityMap(0)
+			:state(START),m_doTokenize(false),error(Ok),m_src(InputCharSet(),p_src),m_entityMap(0),m_output(OutputCharSet())
+	{}
+	XMLScanner( const InputCharSet& charset_, const InputIterator& p_src, const EntityMap& p_entityMap)
+			:state(START),m_doTokenize(false),error(Ok),m_src(charset_,p_src),m_entityMap(&p_entityMap),m_output(OutputCharSet())
+	{}
+	XMLScanner( const InputCharSet& charset_, const InputIterator& p_src)
+			:state(START),m_doTokenize(false),error(Ok),m_src(charset_,p_src),m_entityMap(0),m_output(OutputCharSet())
 	{}
 	XMLScanner()
-			:state(START),m_doTokenize(false),error(Ok),m_entityMap(0)
+			:state(START),m_doTokenize(false),error(Ok),m_src(InputCharSet()),m_entityMap(0)
 	{}
 
 	///\brief Copy constructor

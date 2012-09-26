@@ -51,15 +51,17 @@ template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct OutputFilterImpl :public OutputFilter
 {
 	///\brief Constructor
-	OutputFilterImpl()
-		:m_elemitr(0){}
+	OutputFilterImpl( const IOCharset& iocharset_=IOCharset())
+		:m_elemitr(0)
+		,m_output(iocharset_){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
 		:OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
-		,m_elemitr(o.m_elemitr){}
+		,m_elemitr(o.m_elemitr)
+		,m_output(o.m_output){}
 
 	///\brief self copy
 	///\return copy of this
@@ -71,7 +73,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
 	///\param [in] src pointer to string to print
 	///\param [in] srcsize size of src in bytes
-	static void printToBuffer( const char* src, std::size_t srcsize, std::string& buf)
+	void printToBuffer( const char* src, std::size_t srcsize, std::string& buf) const
 	{
 		textwolf::CStringIterator itr( src, srcsize);
 		textwolf::TextScanner<textwolf::CStringIterator,AppCharset> ts( itr);
@@ -79,7 +81,7 @@ struct OutputFilterImpl :public OutputFilter
 		textwolf::UChar ch;
 		while ((ch = ts.chr()) != 0)
 		{
-			IOCharset::print( ch, buf);
+			m_output.print( ch, buf);
 			++ts;
 		}
 	}
@@ -119,7 +121,7 @@ struct OutputFilterImpl :public OutputFilter
 		if (type == Value)
 		{
 			printToBuffer( (const char*)element, elementsize, m_elembuf);
-			IOCharset::print( '\n', m_elembuf);
+			m_output.print( '\n', m_elembuf);
 			if (!emptybuf())
 			{
 				setState( EndOfBuffer);
@@ -131,6 +133,7 @@ struct OutputFilterImpl :public OutputFilter
 private:
 	std::string m_elembuf;				//< buffer for the currently printed element
 	std::size_t m_elemitr;				//< iterator to pass it to output
+	IOCharset m_output;
 };
 
 ///\class InputFilterImpl
@@ -140,8 +143,10 @@ struct InputFilterImpl :public InputFilter
 	typedef textwolf::TextScanner<textwolf::SrcIterator,IOCharset> TextScanner;
 
 	///\brief Constructor
-	InputFilterImpl()
-		:m_src(0)
+	InputFilterImpl( const IOCharset& iocharset_=IOCharset())
+		:m_itr(iocharset_)
+		,m_output(AppCharset())
+		,m_src(0)
 		,m_srcsize(0)
 		,m_srcend(false)
 		,m_srcclosed(false)
@@ -152,6 +157,7 @@ struct InputFilterImpl :public InputFilter
 	InputFilterImpl( const InputFilterImpl& o)
 		:InputFilter( o)
 		,m_itr(o.m_itr)
+		,m_output(o.m_output)
 		,m_elembuf(o.m_elembuf)
 		,m_src(o.m_src)
 		,m_srcsize(o.m_srcsize)
@@ -213,7 +219,7 @@ struct InputFilterImpl :public InputFilter
 				}
 				else
 				{
-					AppCharset::print( ch, m_elembuf);
+					m_output.print( ch, m_elembuf);
 					++m_itr;
 				}
 			}
@@ -241,6 +247,7 @@ struct InputFilterImpl :public InputFilter
 	}
 private:
 	TextScanner m_itr;		//< iterator on source
+	AppCharset m_output;		//< output
 	std::string m_elembuf;		//< buffer for current line
 	const char* m_src;		//< pointer to current chunk parsed
 	std::size_t m_srcsize;		//< size of the current chunk parsed in bytes
@@ -270,8 +277,21 @@ public:
 			if ((enc.size() >= 8 && std::memcmp( enc.c_str(), "isolatin", 8)== 0)
 			||  (enc.size() >= 7 && std::memcmp( enc.c_str(), "iso8859", 7) == 0))
 			{
-				m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin1>());
-				m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin1>());
+				const char* codepage = enc.c_str() + ((enc.c_str()[4] == 'l')?8:7);
+				if (std::strlen( codepage) > 1 || codepage[0] < '0' || codepage[0] > '9')
+				{
+					throw std::runtime_error( "unknown iso-latin code page index");
+				}
+				if (codepage[0] == '1')
+				{
+					m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin>());
+					m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin>());
+				}
+				else
+				{
+					m_inputfilter.reset( new InputFilterImpl<textwolf::charset::IsoLatin>( textwolf::charset::IsoLatin( codepage[0] - '0')));
+					m_outputfilter.reset( new OutputFilterImpl<textwolf::charset::IsoLatin>( textwolf::charset::IsoLatin( codepage[0] - '0')));
+				}
 			}
 			else if (enc.size() == 0 || enc == "utf8")
 			{

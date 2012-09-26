@@ -105,13 +105,17 @@ private:
 		This( const XMLAttributes& a)
 			:m_state(Init),m_attributes(a){}
 
+		This( const XMLAttributes& a, const IOCharset& output_)
+			:m_state(Init),m_attributes(a),m_output(output_){}
+
 		This( const This& o)
 			:m_state(o.m_state),m_buf(o.m_buf),m_tagstack(o.m_tagstack),m_attributes(o.m_attributes){}
+
 
 		///\brief Prints a character string to an STL back insertion sequence buffer in the IO character set encoding
 		///\param [in] src pointer to string to print
 		///\param [in] srcsize size of src in bytes
-		static void printToBuffer( const char* src, std::size_t srcsize, BufferType& buf)
+		void printToBuffer( const char* src, std::size_t srcsize, BufferType& buf) const
 		{
 			CStringIterator itr( src, srcsize);
 			TextScanner<CStringIterator,AppCharset> ts( itr);
@@ -119,7 +123,7 @@ private:
 			UChar ch;
 			while ((ch = ts.chr()) != 0)
 			{
-				IOCharset::print( ch, buf);
+				m_output.print( ch, buf);
 				++ts;
 			}
 		}
@@ -129,18 +133,18 @@ private:
 		///\param [in] nof_echr number of elements in echr and estr
 		///\param [in] echr ASCII characters to substitute
 		///\param [in] estr ASCII strings to substitute with (array parallel to echr)
-		static void printEsc( char ch, BufferType& buf, unsigned int nof_echr, const char* echr, const char** estr)
+		void printEsc( char ch, BufferType& buf, unsigned int nof_echr, const char* echr, const char** estr) const
 		{
 			const char* cc = (const char*)memchr( echr, ch, nof_echr);
 			if (cc)
 			{
 				unsigned int ii = 0;
 				const char* tt = estr[ cc-echr];
-				while (tt[ii]) IOCharset::print( tt[ii++], buf);
+				while (tt[ii]) m_output.print( tt[ii++], buf);
 			}
 			else
 			{
-				IOCharset::print( ch, buf);
+				m_output.print( ch, buf);
 			}
 		}
 
@@ -151,7 +155,7 @@ private:
 		///\param [in] nof_echr number of elements in echr and estr
 		///\param [in] echr ASCII characters to substitute
 		///\param [in] estr ASCII strings to substitute with (array parallel to echr)
-		static void printToBufferSubstChr( const char* src, std::size_t srcsize, BufferType& buf, unsigned int nof_echr, const char* echr, const char** estr)
+		void printToBufferSubstChr( const char* src, std::size_t srcsize, BufferType& buf, unsigned int nof_echr, const char* echr, const char** estr) const
 		{
 			CStringIterator itr( src, srcsize);
 			textwolf::TextScanner<CStringIterator,AppCharset> ts( itr);
@@ -165,7 +169,7 @@ private:
 				}
 				else
 				{
-					IOCharset::print( ch, buf);
+					m_output.print( ch, buf);
 				}
 				++ts;
 			}
@@ -175,21 +179,21 @@ private:
 		///\param [in] src pointer to attribute value string to print
 		///\param [in] srcsize size of src in bytes
 		///\param [in,out] buf buffer to print to
-		static void printToBufferAttributeValue( const char* src, std::size_t srcsize, BufferType& buf)
+		void printToBufferAttributeValue( const char* src, std::size_t srcsize, BufferType& buf) const
 		{
 			enum {nof_echr = 12};
 			static const char* estr[nof_echr] = {"&lt;", "&gt;", "&apos;", "&quot;", "&amp;", "&#0;", "&#8;", "&#9;", "&#10;", "&#13;"};
 			static const char echr[nof_echr+1] = "<>'\"&\0\b\t\n\r";
-			IOCharset::print( '"', buf);
+			m_output.print( '"', buf);
 			printToBufferSubstChr( src, srcsize, buf, nof_echr, echr, estr);
-			IOCharset::print( '"', buf);
+			m_output.print( '"', buf);
 		}
 
 		///\brief print content value string
 		///\param [in] src pointer to content string to print
 		///\param [in] srcsize size of src in bytes
 		///\param [in,out] buf buffer to print to
-		static void printToBufferContent( const char* src, std::size_t srcsize, BufferType& buf)
+		void printToBufferContent( const char* src, std::size_t srcsize, BufferType& buf) const
 		{
 			enum {nof_echr = 6};
 			static const char* estr[nof_echr] = {"&lt;", "&gt;", "&amp;", "&#0;", "&#8;"};
@@ -200,9 +204,9 @@ private:
 		///\brief Prints a character to an STL back insertion sequence buffer in the IO character set encoding
 		///\param [in] ch character to print
 		///\param [in,out] buf buffer to print to
-		static void printToBuffer( char ch, BufferType& buf)
+		void printToBuffer( char ch, BufferType& buf) const
 		{
-			IOCharset::print( (textwolf::UChar)(unsigned char)ch, buf);
+			m_output.print( (textwolf::UChar)(unsigned char)ch, buf);
 		}
 
 		void printHeader( bool standalone, BufferType& buf)
@@ -354,6 +358,7 @@ private:
 		BufferType m_buf;				//< element output  buffer
 		TagStack m_tagstack;				//< tag name stack of open tags
 		XMLAttributes m_attributes;			//< xml encoding
+		IOCharset m_output;				//< output character set encoding
 	};
 
 public:
@@ -523,7 +528,7 @@ private:
 		if ((enc.size() >= 8 && std::memcmp( enc.c_str(), "isolatin", 8)== 0)
 		||  (enc.size() >= 7 && std::memcmp( enc.c_str(), "iso8859", 7) == 0))
 		{
-			m_obj = XMLPrinterObject<BufferType, charset::IsoLatin1, charset::UTF8, XMLAttributes>::create( m_mt, m_attributes);
+			m_obj = XMLPrinterObject<BufferType, charset::IsoLatin, charset::UTF8, XMLAttributes>::create( m_mt, m_attributes);
 		}
 		else if (enc.size() == 0 || enc == "utf8")
 		{

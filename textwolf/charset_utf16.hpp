@@ -114,13 +114,13 @@ public:
 	template <class Iterator>
 	static char asciichar( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
-		UChar ch = value( buf, bufpos, itr);
+		UChar ch = value_impl( buf, bufpos, itr);
 		return (ch > 127)?-1:(char)ch;
 	}
 
 	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static UChar value( char* buf, unsigned int& bufpos, Iterator& itr)
+	static UChar value_impl( char* buf, unsigned int& bufpos, Iterator& itr)
 	{
 		unsigned int bufsize = size( buf, bufpos, itr);
 		UChar rt = (unsigned char)buf[ MSB];
@@ -145,9 +145,15 @@ public:
 		return rt;
 	}
 
+	template <class Iterator>
+	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
+	{
+		return value_impl( buf, bufpos, itr);
+	}
+
 	///\brief See template<class Buffer>Interface::print(UChar,Buffer&)
 	template <class Buffer_>
-	static void print( UChar ch, Buffer_& buf)
+	void print( UChar ch, Buffer_& buf) const
 	{
 		if (ch <= 0xFFFF)
 		{

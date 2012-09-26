@@ -14,6 +14,4 @@ PF:
 - Printing with HPDF
 	- The print form configuration can have an xslt script for preprocessing
 
-- in luaObjects: save load (check pointers or have metatable) of global context objects 'ProcessorProvider' and 'ModuleMap'
-- in ProcProvider: move default object semantics to objects in modules (e.g. syntax with ':' "xml:libxml2" -> xml" default)
 

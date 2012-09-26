@@ -55,6 +55,7 @@ private:
 	UChar val;			//< Unicode character representation of the current character parsed
 	char cur;			//< ASCII character representation of the current character parsed
 	unsigned int state;		//< current state of the text scanner
+	CharSet charset;
 
 public:
 	///\class ControlCharMap
@@ -88,14 +89,20 @@ public:
 	};
 
 	///\brief Constructor
-	TextScanner()
-		:val(0),cur(0),state(0)
+	TextScanner( const CharSet& charset_)
+		:val(0),cur(0),state(0),charset(charset_)
+	{
+		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii] = 0;
+	}
+
+	TextScanner( const CharSet& charset_, const Iterator& p_iterator)
+		:start(p_iterator),input(p_iterator),val(0),cur(0),state(0),charset(charset_)
 	{
 		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii] = 0;
 	}
 
 	TextScanner( const Iterator& p_iterator)
-		:start(p_iterator),input(p_iterator),val(0),cur(0),state(0)
+		:start(p_iterator),input(p_iterator),val(0),cur(0),state(0),charset(CharSet())
 	{
 		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii] = 0;
 	}
@@ -108,6 +115,7 @@ public:
 		,val(orig.val)
 		,cur(orig.cur)
 		,state(orig.state)
+		,charset(orig.charset)
 	{
 		for (unsigned int ii=0; ii<sizeof(buf); ii++) buf[ii]=orig.buf[ii];
 	}
@@ -134,7 +142,7 @@ public:
 	{
 		if (val == 0)
 		{
-			val = CharSet::value( buf, state, input);
+			val = charset.value( buf, state, input);
 		}
 		return val;
 	}

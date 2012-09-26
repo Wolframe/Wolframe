@@ -461,7 +461,7 @@ private:
 		if ((enc.size() >= 8 && std::memcmp( enc.c_str(), "isolatin", 8)== 0)
 		||  (enc.size() >= 7 && std::memcmp( enc.c_str(), "iso8859", 7) == 0))
 		{
-			m_obj = XMLParserObject<SrcIterator,BufferType,charset::IsoLatin1,charset::UTF8>::create( m_mt);
+			m_obj = XMLParserObject<SrcIterator,BufferType,charset::IsoLatin,charset::UTF8>::create( m_mt);
 		}
 		else if (enc.size() == 0 || enc == "utf8")
 		{

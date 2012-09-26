@@ -37,16 +37,20 @@
 #include "textwolf/char.hpp"
 #include "textwolf/charset_interface.hpp"
 #include "textwolf/exception.hpp"
+#include "textwolf/codepages.hpp"
 #include <cstddef>
 
 namespace textwolf {
 namespace charset {
 
-///\class IsoLatin1
-///\brief Character set IsoLatin-1 (ISO-8859-1)
-struct IsoLatin1
+///\class IsoLatin
+///\brief Character set IsoLatin-1,..IsoLatin-9 (ISO-8859-1,...ISO-8859-9)
+struct IsoLatin :public IsoLatinCodePage
 {
-	enum {MaxChar=0xFF};
+	IsoLatin( const IsoLatin& o)
+		:IsoLatinCodePage(o){}
+	IsoLatin( unsigned int codePageIdx=1)
+		:IsoLatinCodePage(codePageIdx){}
 
 	///\brief See template<class Iterator>Interface::skip(char*,unsigned int&,Iterator&)
 	template <class Iterator>
@@ -74,7 +78,7 @@ struct IsoLatin1
 
 	///\brief See template<class Iterator>Interface::value(char*,unsigned int&,Iterator&)
 	template <class Iterator>
-	static UChar value( char* buf, unsigned int& bufpos, Iterator& itr)
+	UChar value( char* buf, unsigned int& bufpos, Iterator& itr) const
 	{
 		if (bufpos == 0)
 		{
@@ -82,22 +86,25 @@ struct IsoLatin1
 			++itr;
 			++bufpos;
 		}
-		return (unsigned char)buf[0];
+		return ucharcode( buf[0]);
 	}
 
 	///\brief See template<class Buffer>Interface::print(UChar,Buffer&)
 	template <class Buffer_>
-	static void print( UChar chr, Buffer_& buf)
+	void print( UChar chr, Buffer_& buf) const
 	{
-		char chr_ = (char)(unsigned char)chr;
-		if (chr > 255)
+		char chr_ = invcode( chr);
+		if (chr_ == 0)
 		{
 			char tb[ 32];
 			char* cc = tb;
 			Encoder::encode( chr, tb, sizeof(tb));
 			while (*cc) buf.push_back( *cc++);
 		}
-		buf.push_back( chr_);
+		else
+		{
+			buf.push_back( chr_);
+		}
 	}
 };
 

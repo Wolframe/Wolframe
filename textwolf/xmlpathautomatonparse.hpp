@@ -68,7 +68,7 @@ public:
 	{
 		std::string idstrings;
 		CStringIterator pitr( esrc, esrcsize);
-		SrcScanner pp( pitr);
+		SrcScanner pp( m_srccharset, pitr);
 		std::vector<std::size_t> idref;
 
 		for (; *pp; skipSpaces( pp))
@@ -98,7 +98,7 @@ public:
 		typename std::vector<std::size_t>::const_iterator di = idref.begin(), de = idref.end();
 
 		CStringIterator itr( esrc, esrcsize);
-		SrcScanner src( itr);
+		SrcScanner src( m_srccharset, itr);
 		PathElement expr( this);
 
 		for (; *src; skipSpaces( src))
@@ -217,9 +217,9 @@ private:
 		std::size_t rt = idstrings.size();
 		for (; src.control() == Undef || src.control() == Any; ++src)
 		{
-			AtmCharSet::print( *src, idstrings);
+			m_atmcharset.print( *src, idstrings);
 		}
-		AtmCharSet::print( 0, idstrings);
+		m_atmcharset.print( 0, idstrings);
 		return rt;
 	}
 
@@ -232,6 +232,10 @@ private:
 	{
 		return idstrings.c_str() + idx;
 	}
+
+private:
+	AtmCharSet m_atmcharset;
+	SrcCharSet m_srccharset;
 };
 
 } //namespace

@@ -53,9 +53,9 @@ public:
 
 	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
 	{
-		static IntegerNormalizeFunction int_( true, 10);
-		static IntegerNormalizeFunction uint_( false, 10);
-		static FloatNormalizeFunction float_( 10, 10);
+		static IntegerNormalizeFunction int_( true, 10, false);
+		static IntegerNormalizeFunction uint_( false, 10, false);
+		static FloatNormalizeFunction float_( 10, 10, false);
 		if (boost::algorithm::iequals( name, "int")) return &int_;
 		if (boost::algorithm::iequals( name, "uint")) return &uint_;
 		if (boost::algorithm::iequals( name, "float")) return &float_;
