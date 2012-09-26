@@ -59,8 +59,8 @@ class ProcessorProvider::ProcessorProvider_Impl
 {
 public:
 	ProcessorProvider_Impl( const ProcProviderConfig* conf,
-				const ProcessorProvider* this_,
-				const module::ModulesDirectory* modules);
+				const ProcessorProvider* ownInterface,
+				const module::ModulesDirectory* modules );
 	~ProcessorProvider_Impl();
 
 	bool resolveDB( const db::DatabaseProvider& db );
