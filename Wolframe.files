@@ -333,6 +333,7 @@ include/cmdbind/commandHandlerUnit.hpp
 include/cmdbind/directmapCommandHandler.hpp
 include/cmdbind/doctypeFilterCommandHandler.hpp
 include/cmdbind/execCommandHandler.hpp
+include/cmdbind/ioFilterCommandHandlerEscDLF.hpp
 include/cmdbind/ioFilterCommandHandler.hpp
 include/cmdbind/lineCommandHandler.hpp
 include/cmdbind/luaCommandHandler.hpp
@@ -671,7 +672,7 @@ src/appSingleton.hpp
 src/cmdbind_directmapCommandHandler.cpp
 src/cmdbind_doctypeFilterCommandHandler.cpp
 src/cmdbind_execCommandHandler.cpp
-src/cmdbind_ioFilterCommandHandler.cpp
+src/cmdbind_ioFilterCommandHandlerEscDLF.cpp
 src/cmdbind_lineCommandHandler.cpp
 src/cmdbind_luaCommandHandler.cpp
 src/connectionBase.hpp
@@ -687,7 +688,6 @@ src/exceptionBase.hpp
 src/filter_blob_filter.cpp
 src/filter_char_filter.cpp
 src/filter_doctype.cpp
-src/filter_filter.cpp
 src/filter_libxml2_filter.cpp
 src/filter_line_filter.cpp
 src/filter_luafilter.cpp
