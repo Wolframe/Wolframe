@@ -20,6 +20,23 @@ BOOST_LIBRARY_TAG=-$(BOOST_VC_VER)$(BOOST_MT)-$(BOOST_VERSION)
 OPENSSL_LIBS = libeay32.lib ssleay32.lib
 !ENDIF
 
+# ICU (icu4c)
+#############
+
+!IFDEF WITH_ICU
+
+ICU_LDFLAGS = /LIBPATH:"$(ICU_DIR)\lib"
+
+!IFNDEF DEBUG
+ICU_LIBS = icuin.lib icuuc.lib
+!ENDIF
+
+!IFDEF DEBUG
+ICU_LIBS = icuind.lib icuucd.lib
+!ENDIF
+
+!ENDIF
+
 # Tcl (for testing with Expect)
 ###############################
 
