@@ -46,13 +46,35 @@ namespace prnt {
 class Expression
 {
 public:
+	enum Operator
+	{
+		UnaryMinus,		//< operator '-'
+		Minus,			//< operator '-'
+		Plus,			//< operator '+'
+		Concat,			//< operator '#'
+		Multiply,		//< operator '*'
+		Divide,			//< operator '/'
+		Round,			//< operator '@'
+		Assign,			//< operator '='
+		AssignUndefined,	//< operator '?='
+		AssignGreater,		//< operator '?<'
+		AssignSmaller		//< operator '?>'
+	};
+
+	static const char* operatorString( Operator i)
+	{
+		static const char* ar[] = {"-","-","+","#","*","/",":","=","?=","?<","?>"};
+		return ar[ (int)i];
+	}
+
+public:
 	Expression()
 		:m_calc_precision(5){}
 	Expression( const Expression& o)
 		:m_ar(o.m_ar)
 		,m_calc_precision(o.m_calc_precision){}
 
-	void push_operator( char chr);
+	void push_operator( Operator chr);
 	void push_value( std::size_t idx);
 	void push_variable( Variable::Id var);
 	void push_tagvariable( Variable::Id var);
@@ -73,7 +95,7 @@ private:
 		union
 		{
 			std::size_t m_idx;
-			char m_opchr;
+			Expression::Operator m_op;
 		} value;
 	};
 

@@ -44,7 +44,6 @@ const char* _Wolframe::prnt::methodName( Method::Id m)
 		"PrintText",
 		"DrawRectangle",
 		"DrawLine",
-		"RoundValue",
 		0};
 	return ar[ (int)m];
 }

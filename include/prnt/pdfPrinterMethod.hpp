@@ -47,8 +47,7 @@ struct Method
 		AddPage,
 		PrintText,
 		DrawRectangle,
-		DrawLine,
-		RoundValue
+		DrawLine
 	};
 };
 
