@@ -1,6 +1,14 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = locale number
+SUBDIRS = number
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+!IFDEF WITH_ICU
+SUBDIRS = \
+	$(SUBDIRS) locale
+!ENDIF
+
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

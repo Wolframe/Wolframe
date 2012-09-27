@@ -42,6 +42,18 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_LIBXML2
 endif
 
+# libxslt
+ifeq ($(WITH_LIBXSLT),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_LIBXSLT
+endif
+
+# icu
+ifeq ($(WITH_ICU),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_ICU
+endif
+
 LOCAL_STATIC_LIB = \
 	wolftest.a
 

@@ -195,6 +195,15 @@ ifeq ($(WITH_LOCAL_LIBHPDF),1)
 	@echo "using local libhpdf.."
 endif
 endif
+ifeq ($(WITH_ICU),1)
+	@echo
+	@echo "using ICU (icu4c) as boost locale backend"
+	@echo
+	@echo "ICU_DIR: $(ICU_DIR)"
+	@echo "ICU_INCLUDE_DIRS: $(ICU_INCLUDE_DIRS)"
+	@echo "ICU_LIB_DIRS: $(ICU_LIB_DIRS)"
+	@echo "ICU_LIBS: $(ICU_LIBS)"
+endif
 	@echo
 	@echo "Additional build options:"
 	@echo

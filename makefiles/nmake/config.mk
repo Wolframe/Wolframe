@@ -61,10 +61,6 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 
 ICU_DIR = C:\Cygwin\home\Andreas Baumann\icu-49.1.2-win32-debug
 
-ICU_LDFLAGS = /LIBPATH:"$(ICU_DIR)\lib"
-
-ICU_LIBS = icuind.lib icuucd.lib
-
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 
