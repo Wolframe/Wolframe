@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/ioFilterCommandHandler.hpp
-#ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_HPP_INCLUDED
+///\file cmdbind/ioFilterCommandHandlerBase.hpp
+#ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
+#define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_BASE_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"
 #include "filter/filter.hpp"
 #include "cmdbind/commandHandler.hpp"
@@ -42,16 +42,14 @@ namespace _Wolframe {
 namespace cmdbind {
 
 ///\class IOFilterCommandHandler
-///\brief Command handler processing filter input/output
+///\brief Abstract class for command handler processing filter input/output
 class IOFilterCommandHandler :public CommandHandler
 {
 public:
-	typedef CommandHandler Parent;
-
 	///\brief Constructor
-	IOFilterCommandHandler();
+	IOFilterCommandHandler(){}
 	///\brief Destructor
-	virtual ~IOFilterCommandHandler();
+	virtual ~IOFilterCommandHandler(){}
 
 	void setFilter( const langbind::InputFilterR& in)
 	{
@@ -63,27 +61,6 @@ public:
 		m_outputfilter = out;
 	}
 
-	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
-	virtual void setInputBuffer( void* buf, std::size_t allocsize);
-
-	///\brief See Parent::setOutputBuffer(void*,std::size_t,std::size_t)
-	virtual void setOutputBuffer( void* buf, std::size_t size, std::size_t pos);
-
-	///\brief See Parent::nextOperation()
-	virtual Operation nextOperation();
-
-	///\brief See Parent::putInput(const void*,std::size_t);
-	virtual void putInput( const void *begin, std::size_t bytesTransferred);
-
-	///\brief See Parent::getInputBlock(void*&,std::size_t&)
-	virtual void getInputBlock( void*& begin, std::size_t& maxBlockSize);
-
-	///\brief See Parent::getOutput(const void*&,std::size_t&)
-	virtual void getOutput( const void*& begin, std::size_t& bytesToTransfer);
-
-	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
-	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
-
 	///\enum CallResult
 	///\brief Enumeration of call states of this application processor instance
 	enum CallResult
@@ -92,6 +69,7 @@ public:
 		Error,		//< termination of call with error (not completed)
 		Yield		//< call interrupted with request for a network operation
 	};
+
 	static const char* callResultName( CallResult cr)
 	{
 		static const char* ar[] = {"Ok","Error","Yield"};
@@ -102,33 +80,6 @@ public:
 	///\return CallResult status of the filter input for the state machine of this command handler
 	virtual CallResult call( const char*& err)=0;
 
-private:
-	enum State
-	{
-		Processing,
-		FlushingOutput,
-		DiscardInput,
-		Terminated
-	};
-	static const char* stateName( State st)
-	{
-		static const char* ar[] = {"Processing","FlushingOutput","DiscardInput","Terminated"};
-		return ar[ (int)st];
-	}
-
-	protocol::EscapeBuffer m_escapeBuffer;
-
-	State m_state;					//< processing state machine state
-	const void* m_writedata;			//< bytes to write next (WRITE)
-	std::size_t m_writedatasize;			//< number of bytes to write next (WRITE)
-
-	protocol::InputBlock m_input;			//< input buffer
-	protocol::OutputBlock m_output;			//< output buffer
-	protocol::InputBlock::iterator m_eoD;		//< input end of data marker
-	std::size_t m_itrpos;				//< read start position in buffer for the command handler
-
-private:
-	void getFilterOutputWriteData();
 protected:
 	langbind::InputFilterR m_inputfilter;		//< input interface for this command handler
 	langbind::OutputFilterR m_outputfilter;		//< output interface for this command handler

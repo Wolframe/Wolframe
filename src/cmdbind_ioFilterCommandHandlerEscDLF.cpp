@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind_ioFilterCommandHandler.cpp
+///\file cmdbind_ioFilterCommandHandlerEscDLF.cpp
 
-#include "cmdbind/ioFilterCommandHandler.hpp"
+#include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include "logger-v1.hpp"
 #include "filter/char_filter.hpp"
 #include "filter/filter.hpp"
@@ -41,7 +41,7 @@ using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::langbind;
 
-IOFilterCommandHandler::IOFilterCommandHandler()
+IOFilterCommandHandlerEscDLF::IOFilterCommandHandlerEscDLF()
 	:m_state(Processing)
 	,m_writedata(0)
 	,m_writedatasize(0)
@@ -52,15 +52,15 @@ IOFilterCommandHandler::IOFilterCommandHandler()
 	m_outputfilter = flt.outputfilter();
 }
 
-IOFilterCommandHandler::~IOFilterCommandHandler()
+IOFilterCommandHandlerEscDLF::~IOFilterCommandHandlerEscDLF()
 {}
 
-void IOFilterCommandHandler::setInputBuffer( void* buf, std::size_t allocsize)
+void IOFilterCommandHandlerEscDLF::setInputBuffer( void* buf, std::size_t allocsize)
 {
 	m_input = protocol::InputBlock( (char*)buf, allocsize);
 }
 
-void IOFilterCommandHandler::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
+void IOFilterCommandHandlerEscDLF::setOutputBuffer( void* buf, std::size_t size, std::size_t pos)
 {
 	m_output = protocol::OutputBlock( buf, size, pos);
 	if (m_outputfilter.get()) m_outputfilter->setOutputBuffer( (char*)buf+pos, size-pos);
@@ -73,7 +73,7 @@ enum
 	ErrResources=-3
 };
 
-void IOFilterCommandHandler::getFilterOutputWriteData()
+void IOFilterCommandHandlerEscDLF::getFilterOutputWriteData()
 {
 	OutputFilter* flt = m_outputfilter.get();
 	m_writedata = m_output.ptr();
@@ -83,7 +83,7 @@ void IOFilterCommandHandler::getFilterOutputWriteData()
 	flt->setOutputBuffer( m_output.ptr(), m_output.size());
 }
 
-CommandHandler::Operation IOFilterCommandHandler::nextOperation()
+CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 {
 	OutputFilter* flt;
 	const char* errmsg = 0;
@@ -191,7 +191,7 @@ CommandHandler::Operation IOFilterCommandHandler::nextOperation()
 }
 
 
-void IOFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
+void IOFilterCommandHandlerEscDLF::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	std::size_t startidx = (const char*)begin - m_input.charptr();
 	m_input.setPos( bytesTransferred + startidx);
@@ -210,7 +210,7 @@ void IOFilterCommandHandler::putInput( const void *begin, std::size_t bytesTrans
 	}
 }
 
-void IOFilterCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
+void IOFilterCommandHandlerEscDLF::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
 	if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
 	{
@@ -219,13 +219,13 @@ void IOFilterCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockS
 	m_itrpos = ((const char*)begin - m_input.charptr());
 }
 
-void IOFilterCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
+void IOFilterCommandHandlerEscDLF::getOutput( const void*& begin, std::size_t& bytesToTransfer)
 {
 	begin = m_writedata;
 	bytesToTransfer = m_writedatasize;
 }
 
-void IOFilterCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
+void IOFilterCommandHandlerEscDLF::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
 	std::size_t pos = m_eoD - m_input.begin();
 	begin = (const void*)(m_input.charptr() + pos);

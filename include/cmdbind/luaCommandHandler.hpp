@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief interface to the lua command handler
 #ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#include "cmdbind/ioFilterCommandHandler.hpp"
+#include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include "langbind/luaObjects.hpp"
 #include "langbind/luaScriptContext.hpp"
 
@@ -42,9 +42,11 @@ namespace cmdbind {
 
 ///\class LuaCommandHandler
 ///\brief command handler instance for processing a call as Lua script
-class LuaCommandHandler :public IOFilterCommandHandler
+class LuaCommandHandler :public IOFilterCommandHandlerEscDLF
 {
 public:
+	typedef IOFilterCommandHandlerEscDLF Parent;
+
 	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
 	typedef langbind::LuaScriptContext ContextStruct;
 

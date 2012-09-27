@@ -39,7 +39,7 @@ CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
 	$(TOPDIR)\src\langbind_appConfig_struct.obj \
 	$(TOPDIR)\src\langbind_scriptConfig_struct.obj \
-	$(TOPDIR)\src\cmdbind_ioFilterCommandHandler.obj \
+	$(TOPDIR)\src\cmdbind_IOFilterCommandHandlerEscDLF.obj \
 	$(TOPDIR)\src\cmdbind_luaCommandHandler.obj \
 	$(TOPDIR)\src\procProviderImpl.obj \
 	mod_lua_command_handler.obj

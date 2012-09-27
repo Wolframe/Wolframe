@@ -51,9 +51,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_iostreamfilter.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
-	cmdbind_ioFilterCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \
-	cmdbind_directmapCommandHandler.o \
 	types_allocators.o \
 	acceptor.o \
 	serverEndpoint.o \
