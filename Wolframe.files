@@ -756,6 +756,9 @@ src/libwolframe/provider/Authorization.cpp
 src/libwolframe/provider/DBproviderConfig.cpp
 src/libwolframe/provider/DBproviderImpl.cpp
 src/libwolframe/provider/DBproviderImpl.hpp
+src/libwolframe/provider/procProvider.cpp
+src/libwolframe/provider/procProviderImpl.cpp
+src/libwolframe/provider/procProviderImpl.hpp
 src/libwolframe/resolvePath.cpp
 src/libwolframe_serialize/GNUmakefile
 src/libwolframe_serialize/Makefile.W32
@@ -946,8 +949,7 @@ src/prnt_pdfPrinter_libhpdf.cpp
 src/prnt_pdfPrinterMethod.cpp
 src/prnt_pdfPrinter_testtrace.cpp
 src/prnt_pdfPrinterVariable.cpp
-src/procProviderImpl.cpp
-src/procProviderImpl.hpp
+src/procProviderGetTransactionDB.cpp
 src/protocol_ioblocks.cpp
 src/serialize_ddl_filtermapParse.cpp
 src/serialize_ddl_filtermapSerialize.cpp

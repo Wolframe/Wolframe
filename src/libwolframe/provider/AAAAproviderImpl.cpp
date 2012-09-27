@@ -68,7 +68,7 @@ Authorizer* AAAAprovider::authorizer() const
 	return m_impl->authorizer();
 }
 
-Auditor* AAAAprovider::auditor()
+Auditor* AAAAprovider::auditor() const
 {
 	return m_impl->auditor();
 }

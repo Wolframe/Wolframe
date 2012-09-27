@@ -81,7 +81,7 @@ public:
 
 	Authenticator* authenticator();
 	Authorizer* authorizer() const;
-	Auditor* auditor();
+	Auditor* auditor() const;
 private:
 	class AAAAprovider_Impl;
 	AAAAprovider_Impl*	m_impl;

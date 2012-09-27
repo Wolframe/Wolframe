@@ -60,7 +60,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.o \
 	serverConfig.o \
 	server.o \
-	procProviderImpl.o \
 	database_preparedStatementProcessor.o
 
 

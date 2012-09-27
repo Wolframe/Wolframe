@@ -68,7 +68,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	connection.obj \
 	serverConfig.obj \
 	server.obj \
-	procProviderImpl.obj \
 	database_preparedStatementProcessor.obj
 
 !IFDEF WITH_SSL

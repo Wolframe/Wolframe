@@ -38,7 +38,6 @@ CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
 	$(TOPDIR)/src/cmdbind_ioFilterCommandHandler.o \
 	$(TOPDIR)/src/cmdbind_luaCommandHandler.o \
-	$(TOPDIR)/src/procProviderImpl.o \
 	mod_lua_command_handler.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
