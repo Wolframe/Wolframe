@@ -32,8 +32,7 @@ CPP_OBJS = \
 	$(TOPDIR)\src\filter_tostringfilter.obj \
 	$(TOPDIR)\src\filter_ptreefilter.obj \
 	$(TOPDIR)\src\filter_typingfilter.obj \
-	$(TOPDIR)\src\filter_textwolf_filter.obj \
-	$(TOPDIR)\src\filter_char_filter.obj
+	$(TOPDIR)\src\filter_null_filter.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

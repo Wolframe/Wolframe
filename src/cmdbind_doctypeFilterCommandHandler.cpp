@@ -34,21 +34,17 @@
 
 #include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
-#include "filter/textwolf_filter.hpp"
-#include "filter/filter.hpp"
 #include "utils/doctype.hpp"
+#include <cstring>
 
 using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
-using namespace _Wolframe::langbind;
 
 DoctypeFilterCommandHandler::DoctypeFilterCommandHandler()
-	:m_state(Processing)
-	,m_itrpos(0)
-{
-	langbind::Filter flt = createTextwolfXmlFilter( "xml:textwolf", "");
-	m_inputfilter = flt.inputfilter();
-}
+	:m_state(Init)
+	,m_lastchar('\n')
+	,m_nullcnt(0)
+{}
 
 DoctypeFilterCommandHandler::~DoctypeFilterCommandHandler()
 {}
@@ -63,65 +59,192 @@ void DoctypeFilterCommandHandler::setOutputBuffer( void*, std::size_t, std::size
 
 std::string DoctypeFilterCommandHandler::doctypeid() const
 {
-	if (m_state != Terminated || m_state != Done) throw std::logic_error( "illegal call of get doctypeid in this state");
+	if (m_state != Done) throw std::logic_error( "illegal call of get doctypeid in this state");
 	return m_doctypeid;
 }
 
 CommandHandler::Operation DoctypeFilterCommandHandler::nextOperation()
 {
-	std::string doctype;
-
-	for (;;) switch (m_state)
-	{
-		case Done:
-		case Terminated:
-			return CLOSE;
-
-		case Processing:
-			if (!m_inputfilter->getDocType( doctype))
-			{
-				return READ;
-			}
-			else
-			{
-				m_doctypeid = utils::getIdFromDoctype( doctype);
-				m_state = Terminated;
-				return CLOSE;
-			}
-		default:
-			break;
-	}
-	LOG_ERROR << "illegal state";
-	return CLOSE;
+	if (m_state == Done) return CLOSE;
+	return READ;
 }
 
+void DoctypeFilterCommandHandler::throw_error( const char* msg) const
+{
+	std::string ex( "failed to parse doctype from XML (state ");
+	ex = ex + stateName( m_state) + ")";
+	if (msg) ex = ex + ": " + msg;
+	throw std::runtime_error( ex);
+}
 
 void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
-	std::size_t startidx = (const char*)begin - m_input.charptr();
-	m_input.setPos( bytesTransferred + startidx);
-	if (m_itrpos != 0)
+	const char* inp = (const char*) begin;
+	std::size_t ii = 0;
+	m_inputbuffer.append( inp, bytesTransferred);
+
+	for (; ii<bytesTransferred && m_state != Done; ++ii)
 	{
-		if (startidx != m_itrpos) throw std::logic_error( "unexpected buffer start for input to cmd handler");
-		startidx = 0; //... start of buffer is end last message (part of eoD marker)
-	}
-	protocol::InputBlock::iterator start = m_input.at( startidx);
-	m_eoD = m_input.getEoD( start);
-	InputFilter* flt = m_inputfilter.get();
-	if (flt)
-	{
-		flt->putInput( start.ptr(), m_eoD-start, m_input.gotEoD());
-		flt->setState( InputFilter::Open);
+		throw_error( "XML header not terminated");
+
+		if (!inp[ii])
+		{
+			++m_nullcnt;
+			if (m_nullcnt > 8) throw_error( "Unknown encoding");
+		}
+		else
+		{
+			if (m_lastchar == '\n' && inp[ii] == '.')
+			{
+				m_state = Done;
+				break;
+			}
+			m_lastchar = inp[ii];
+			m_nullcnt = 0;
+
+			switch (m_state)
+			{
+				case Init:
+					if (inp[ii] == '<')
+					{
+						m_state = ParseHeader0;
+					}
+					else if (inp[ii] < 0 || inp[ii] > 32)
+					{
+						throw_error( "expected '<?'");
+					}
+					break;
+
+				case ParseHeader0:
+					if (inp[ii] == '?')
+					{
+						m_state = ParseHeader;
+					}
+					else
+					{
+						throw_error( "expected '<?'");
+					}
+					break;
+
+				case ParseHeader:
+					if (inp[ii] == '>')
+					{
+						const char* cc = std::strstr( m_itembuf.c_str(), "standalone");
+						if (cc)
+						{
+							cc = std::strchr( cc, '=');
+							if (cc) cc = std::strstr( cc, "yes");
+							if (cc)
+							{
+								m_state = Done;
+								break;
+							}
+						}
+						m_state = SearchDoctypeTag;
+						m_itembuf.clear();
+					}
+					else
+					{
+						m_itembuf.push_back( inp[ii]);
+						if (inp[ii] == '\n' || m_itembuf.size() > 128)
+						{
+							throw_error( "XML header not terminated");
+						}
+					}
+					break;
+
+				case SearchDoctypeTag:
+					if (inp[ii] == '<')
+					{
+						m_state = ParseDoctype0;
+					}
+					else if (inp[ii] < 0 || inp[ii] > 32)
+					{
+						throw_error( "expected '<!'");
+					}
+					break;
+
+				case ParseDoctype0:
+					if (inp[ii] == '!')
+					{
+						m_state = ParseDoctype1;
+					}
+					else
+					{
+						throw_error( "expected '<!'");
+					}
+					break;
+
+				case ParseDoctype1:
+					if (inp[ii] == '-')
+					{
+						m_state = SkipComment;
+					}
+					else if (inp[ii] == 'D')
+					{
+						m_itembuf.push_back( inp[ii]);
+						m_state = ParseDoctype2;
+					}
+					else
+					{
+						throw_error( "expected '<!DOCTYPE' or <!--");
+					}
+					break;
+
+				case SkipComment:
+					if (inp[ii] == '>')
+					{
+						m_state = SearchDoctypeTag;
+					}
+					break;
+
+				case ParseDoctype2:
+					if (inp[ii] <= ' ' && inp[ii] > 0)
+					{
+						if (m_itembuf != "DOCTYPE")
+						{
+							throw_error( "expected '<!DOCTYPE'");
+						}
+						m_state = ParseDoctype;
+						m_itembuf.clear();
+					}
+					else
+					{
+						m_itembuf.push_back( inp[ii]);
+						if (m_itembuf.size() > 8)
+						{
+							throw_error( "expected '<!DOCTYPE'");
+						}
+					}
+					break;
+
+				case ParseDoctype:
+					if (inp[ii] <= ' ' && inp[ii] > 0)
+					{
+						m_doctype.push_back( ' ');
+					}
+					else if (inp[ii] == '>')
+					{
+						m_doctypeid = utils::getIdFromDoctype( m_doctype);
+						m_state = Done;
+					}
+					else
+					{
+						m_doctype.push_back( inp[ii]);
+					}
+					break;
+
+				case Done:
+					break;
+			}
+		}
 	}
 }
 
 void DoctypeFilterCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
 {
-	if (!m_input.getNetworkMessageRead( begin, maxBlockSize))
-	{
-		throw std::logic_error( "buffer too small");
-	}
-	m_itrpos = ((const char*)begin - m_input.charptr());
+	begin = m_input.ptr();
+	maxBlockSize = m_input.size();
 }
 
 void DoctypeFilterCommandHandler::getOutput( const void*& begin, std::size_t& bytesToTransfer)
@@ -132,12 +255,6 @@ void DoctypeFilterCommandHandler::getOutput( const void*& begin, std::size_t& by
 
 void DoctypeFilterCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	if (m_state == Terminated)
-	{
-		std::size_t pos = m_eoD - m_input.begin();
-		m_inputbuffer.append( m_input.charptr() + pos, m_input.pos() - pos);
-		m_state = Done;
-	}
 	begin = (const void*)m_inputbuffer.c_str();
 	nofBytes = m_inputbuffer.size();
 }

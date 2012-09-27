@@ -36,8 +36,8 @@
 #include "langbind/appObjects.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
-#include "filter/char_filter.hpp"
 #include "filter/typingfilter.hpp"
+#include "filter/null_filter.hpp"
 #if WITH_LUA
 #include "cmdbind/luaCommandHandler.hpp"
 #include "langbind/luaObjects.hpp"
@@ -71,7 +71,7 @@ static Filter getFilter( proc::ProcessorProvider* provider, const std::string& i
 	Filter rt;
 	if (ifl_.empty() && ofl_.empty())
 	{
-		return langbind::createCharFilter( "char", "");
+		return langbind::createNullFilter( "", "");
 	}
 	std::pair<std::string,std::string> ifl = filterIdentifier( ifl_);
 	std::pair<std::string,std::string> ofl = filterIdentifier( ofl_);

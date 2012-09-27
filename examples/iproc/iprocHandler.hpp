@@ -38,6 +38,7 @@
 #include "connectionHandler.hpp"
 #include "handlerConfig.hpp"
 #include "cmdbind/commandHandler.hpp"
+#include "filter/filter.hpp"
 #include "protocol/ioblocks.hpp"
 #include "protocol/parser.hpp"
 #include "types/countedReference.hpp"
@@ -124,6 +125,9 @@ private:
 
 	protocol::InputBlock m_input;						//< buffer for network read messages
 	protocol::OutputBlock m_output;						//< buffer for network write messages
+
+	langbind::InputFilterR m_inputfilter;
+	langbind::OutputFilterR m_outputfilter;
 
 	protocol::InputBlock::iterator m_itr;					//< iterator to scan protocol input
 	protocol::InputBlock::iterator m_end;					//< iterator pointing to end of message buffer

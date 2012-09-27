@@ -36,8 +36,7 @@ CPP_OBJS = \
 	$(TOPDIR)/src/langbind_appConfig_option.o \
 	$(TOPDIR)/src/langbind_scriptConfig_struct.o \
 	$(TOPDIR)/src/langbind_scriptConfig_option.o \
-	$(TOPDIR)/src/filter_textwolf_filter.o \
-	$(TOPDIR)/src/filter_char_filter.o \
+	$(TOPDIR)/src/filter_null_filter.o \
 	$(TOPDIR)/src/filter_doctype.o \
 	$(TOPDIR)/src/filter_typingfilter.o \
 	$(TOPDIR)/src/filter_tostringfilter.o \

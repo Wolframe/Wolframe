@@ -34,7 +34,6 @@
 #ifndef _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_DOCTYPE_FILTER_COMMAND_HANDLER_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"
-#include "filter/filter.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "connectionHandler.hpp"
 
@@ -75,51 +74,49 @@ public:
 	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
+	///\brief See Get the document type of the document
 	std::string doctypeid() const;
-
-	///\enum CallResult
-	///\brief Enumeration of call states of this application processor instance
-	enum CallResult
-	{
-		Ok,		//< successful termination of call
-		Error,		//< termination of call with error (not completed)
-		Yield		//< call interrupted with request for a network operation
-	};
-	static const char* callResultName( CallResult cr)
-	{
-		static const char* ar[] = {"Ok","Error","Yield"};
-		return ar[ (int)cr];
-	}
-
-	///\param[out] err error code in case of error
-	///\return CallResult status of the filter input for the state machine of this command handler
-	virtual CallResult call( const char*& err)=0;
 
 private:
 	enum State
 	{
-		Processing,
-		Terminated,
+		Init,
+		ParseHeader0,
+		ParseHeader,
+		SearchDoctypeTag,
+		ParseDoctype0,
+		ParseDoctype1,
+		ParseDoctype2,
+		ParseDoctype,
+		SkipComment,
 		Done
 	};
 	static const char* stateName( State st)
 	{
-		static const char* ar[] = {"Processing","Terminated"};
+		static const char* ar[] = {
+			"Init",
+			"ParseHeader0",
+			"ParseHeader",
+			"SearchDoctypeTag",
+			"ParseDoctype0",
+			"ParseDoctype1",
+			"ParseDoctype2",
+			"ParseDoctype",
+			"SkipComment",
+			"Done"};
 		return ar[ (int)st];
 	}
 
-	protocol::EscapeBuffer m_escapeBuffer;
+	void throw_error( const char* msg=0) const;
 
 	State m_state;					//< processing state machine state
-
+	char m_lastchar;				//< last character parsed
+	unsigned char m_nullcnt;			//< number of null characters parsed in a row
 	protocol::InputBlock m_input;			//< input buffer
-	protocol::InputBlock::iterator m_eoD;		//< input end of data marker
-	std::size_t m_itrpos;				//< read start position in buffer for the command handler
 	std::string m_inputbuffer;			//< buffer for consumed input (is returned to caller because this is a preprocessing command handler)
+	std::string m_itembuf;				//< item parsed (value depending on state)
+	std::string m_doctype;				//< document type extracted
 	std::string m_doctypeid;			//< document type identifier extracted
-
-protected:
-	langbind::InputFilterR m_inputfilter;		//< network input interface for this command handler
 };
 }}
 #endif

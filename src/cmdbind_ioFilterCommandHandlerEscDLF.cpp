@@ -34,7 +34,7 @@
 
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include "logger-v1.hpp"
-#include "filter/char_filter.hpp"
+#include "filter/null_filter.hpp"
 #include "filter/filter.hpp"
 
 using namespace _Wolframe;
@@ -47,7 +47,7 @@ IOFilterCommandHandlerEscDLF::IOFilterCommandHandlerEscDLF()
 	,m_writedatasize(0)
 	,m_itrpos(0)
 {
-	langbind::Filter flt = createCharFilter( "char", "");
+	langbind::Filter flt = createNullFilter( "", "");
 	m_inputfilter = flt.inputfilter();
 	m_outputfilter = flt.outputfilter();
 }
