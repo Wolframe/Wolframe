@@ -35,7 +35,7 @@
 //
 
 #include "logger-v1.hpp"
-#include "PostgreSQL.hpp"
+#include "PostgreSQL.hpp" 
 
 #include <string>
 #include <sstream>
@@ -193,7 +193,7 @@ PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
 				    size_t connections, unsigned short acquireTimeout,
 				    unsigned statementTimeout )
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
-	  m_statementTimeout( statementTimeout ), m_db( this )
+	  m_statementTimeout( statementTimeout ), m_db( this)
 {
 	m_connStr = buildConnStr( host, port,  dbName, user, password,
 				  sslMode, sslCert, sslKey, sslRootCert, sslCRL,

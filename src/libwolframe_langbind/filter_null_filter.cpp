@@ -79,7 +79,7 @@ struct InputFilterImpl :public InputFilter
 	}
 
 	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
-	virtual bool getNext( typename InputFilter::ElementType&, const void*&, std::size_t&)
+	virtual bool getNext( InputFilter::ElementType&, const void*&, std::size_t&)
 	{
 		setState( Error, "input filter not defined");
 		return false;
@@ -110,9 +110,9 @@ struct OutputFilterImpl :public OutputFilter
 		return new OutputFilterImpl( *this);
 	}
 
-	///\brief Implementation of OutputFilter::print(typename OutputFilter::ElementType,const void*,std::size_t)
+	///\brief Implementation of OutputFilter::print(OutputFilter::ElementType,const void*,std::size_t)
 	///\return false with error always
-	bool print( typename OutputFilter::ElementType, const void*, std::size_t)
+	bool print( OutputFilter::ElementType, const void*, std::size_t)
 	{
 		setState( Error, "output filter not defined");
 		return false;

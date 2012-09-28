@@ -31,7 +31,6 @@ LUA_CPP_OBJS = \
 	langbind_luaObjects.o \
 	langbind_luaGetFunctionClosure.o \
 	langbind_luaDebug.o \
-	langbind_luaException.o \
 	langbind_luaScriptContext.o
 
 CPP_OBJS = \

@@ -74,6 +74,7 @@ public:
 	///\param[in] mandatory_ the element is mandatory in the structure it is part of
 	StructType( bool mandatory_=false)
 		:m_contentType( Struct)
+		,m_doctype(0)
 		,m_nof_attributes(0)
 		,m_mandatory(mandatory_){}
 
@@ -97,7 +98,14 @@ public:
 
 	///\brief Assignement operator
 	///\param[in] o element to copy
-	StructType& operator= ( const StructType& o);
+	StructType& operator= ( const StructType& o)
+	{
+		m_contentType = o.m_contentType;
+		m_value = o.m_value;
+		m_elem = o.m_elem;
+		m_nof_attributes = o.m_nof_attributes;
+		return *this;
+	}
 
 	///\brief Find an element of this as a structure
 	///\remark [precondition] this must be of type (ContentType) Struct
@@ -229,11 +237,17 @@ public:
 
 	///\brief Get the document type definition string for this form
 	///\return the document type definition string or 0 if not defined
-	const char* doctype() const;
+	const char* doctype() const
+	{
+		return m_doctype.empty()?0:m_doctype.c_str();
+	}
 
 	///\brief Define the document type definition string for this form
 	///\param[in] doctype_ Document type definition string
-	void defineDoctype( const char* doctype_);
+	void defineDoctype( const char* doctype_)
+	{
+		m_doctype = doctype_;
+	}
 
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
@@ -241,6 +255,7 @@ private:
 	void REQUIRE( ContentType t) const;
 
 	ContentType m_contentType;	//< type of the element
+	std::string m_doctype;
 	AtomicType m_value;		//< value, if the value is atomic
 	Map m_elem;			//< map represented as array
 	std::size_t m_nof_attributes;	//< number of attributes (first N elements of the structure)

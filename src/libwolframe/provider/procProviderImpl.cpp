@@ -36,6 +36,7 @@
 
 #include "processor/procProvider.hpp"
 #include "procProviderImpl.hpp"
+#include "utils/doctype.hpp"
 
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
@@ -449,7 +450,26 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const std::string& ddl
 			return false;
 		}
 		DDLTypeMap typemap( this);
-		std::pair< std::string, ddl::StructTypeR> def = ddl::loadForm( *itr->second, dataDefinitionFilename, &typemap);
+		std::pair< std::string, ddl::StructTypeR> def;
+		def.second.reset( new ddl::StructType());
+		try
+		{
+			*def.second = itr->second->compile( utils::readSourceFileContent( dataDefinitionFilename), &typemap);
+		}
+		catch (const std::exception& e)
+		{
+			std::ostringstream msg;
+			msg << "could not compile data description file '" << dataDefinitionFilename << "': " << e.what() << std::endl;
+			throw std::runtime_error( msg.str());
+		}
+		if (def.second->doctype())
+		{
+			def.first = utils::getIdFromDoctype( def.second->doctype());
+		}
+		else
+		{
+			def.first = utils::getFileStem( dataDefinitionFilename);
+		}
 		std::string formkey = boost::algorithm::to_upper_copy( def.first);
 		m_formMap[ formkey] = def.second;
 

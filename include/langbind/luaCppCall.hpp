@@ -29,56 +29,83 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/luaException.hpp
-///\brief interface for throwing C++ exceptions for lua functions called in a C++ context (outside the interpreter)
-#ifndef _Wolframe_langbind_LUA_EXCEPTION_HPP_INCLUDED
-#define _Wolframe_langbind_LUA_EXCEPTION_HPP_INCLUDED
+///\file langbind/luaCppCall.hpp
+///\brief interface for save calling of C++ functions in lua context
+#ifndef _Wolframe_langbind_LUA_CPP_CALL_HPP_INCLUDED
+#define _Wolframe_langbind_LUA_CPP_CALL_HPP_INCLUDED
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include <cstring>
 
 extern "C" {
-	#include <lua.h>
+	#include <lualib.h>
 	#include <lauxlib.h>
+	#include <lua.h>
 }
 
 namespace _Wolframe {
 namespace langbind {
 
-///\class LuaExceptionHandlerScope
-///\brief Class for calling a Lua function in a C++ scope. Lua longjumps are catched and translated to C++ exceptions
-class LuaExceptionHandlerScope
+///\class LuaErrorMessage
+///\brief Buffer for error message in Lua scope (not leaking when a lua error exception longjump happens)
+class LuaErrorMessage
 {
 public:
-	explicit LuaExceptionHandlerScope( lua_State* ls)
-		:m_ls(ls)
-		,m_panicf( lua_atpanic( ls, luaException))
-	{}
-
-	LuaExceptionHandlerScope( const LuaExceptionHandlerScope& o)
-		:m_panicf(o.m_panicf){}
-
-	~LuaExceptionHandlerScope()
+	LuaErrorMessage()
 	{
-		lua_atpanic( m_ls, m_panicf);
+		m_buf[0] = '\0';
 	}
 
-
-private:
-	static int luaException( lua_State* ls)
+	void init( const char* funcname, const char* msg)
 	{
-		const char* errmsg = lua_tostring( ls, -1);
-		throw std::runtime_error( errmsg?errmsg:"unspecified lua exception");
-		return 0;
+		std::size_t nn = std::strlen( msg);
+		if (nn >= bufsize)
+		{
+			nn = bufsize-1;
+		}
+		std::memcpy( m_buf, msg, nn);
+		m_buf[ nn] = '\0';
+
+		nn = std::strlen( funcname);
+		if (nn >= funcnamesize)
+		{
+			nn = funcnamesize-1;
+		}
+		std::memcpy( m_funcname, funcname, nn);
+		m_funcname[ nn] = '\0';
+	}
+
+	int luaerror( lua_State* ls) const
+	{
+		return luaL_error( ls, "error in function '%s' (%s)", m_funcname, m_buf);
 	}
 private:
-	lua_State* m_ls;
-	lua_CFunction m_panicf;
+	enum {bufsize=224,funcnamesize=32};
+	char m_buf[ bufsize];
+	char m_funcname[ funcnamesize];
+};
+
+
+///\brief Class for calling C++ in a potentially exception throwing context remapping throws to lua errors with complete clean up
+template <class Functor>
+struct LuaFunctionCppCall
+{
+	static int run( const char* name, lua_State* ls)
+	{
+		LuaErrorMessage luaerr;
+		try
+		{
+			return Functor::call( ls);
+		}
+		catch (std::exception& e)
+		{
+			luaerr.init( name, e.what());
+		}
+		return luaerr.luaerror( ls);
+	}
 };
 
 }}//namespace
 #endif
-
-
-
 

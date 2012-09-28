@@ -44,6 +44,7 @@ Project Wolframe.
 #ifndef _Wolframe_LANGBIND_LUA_ARTITHMETIC_TYPE_HPP_INCLUDED
 #define _Wolframe_LANGBIND_LUA_ARTITHMETIC_TYPE_HPP_INCLUDED
 #include "langbind/luaException.hpp"
+#include "langbind/luaCppCall.hpp"
 #include <string>
 #include <stdexcept>
 #include <cstring>

@@ -4,6 +4,7 @@ SUBDIRS = \
 	libwolframe \
 	libwolframe_serialize \
 	libwolframe_langbind \
+	libwolframe_prnt \
 	libwolframe_functions \
 	modules
 
@@ -59,7 +60,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	langbind_iostreamfilter.obj \
 	cmdbind_lineCommandHandler.obj \
 	cmdbind_execCommandHandler.obj \
-	cmdbind_ioFilterCommandHandler.obj \
 	cmdbind_doctypeFilterCommandHandler.obj \
 	cmdbind_directmapCommandHandler.obj \
 	acceptor.obj \

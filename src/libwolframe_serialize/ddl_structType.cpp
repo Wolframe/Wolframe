@@ -207,27 +207,6 @@ void StructType::clear()
 	m_nof_attributes = 0;
 }
 
-StructType& StructType::operator= ( const StructType& o)
-{
-	m_contentType = o.m_contentType;
-	m_value = o.m_value;
-	m_elem = o.m_elem;
-	m_nof_attributes = o.m_nof_attributes;
-	return *this;
-}
-
-const char* StructType::doctype() const
-{
-	REQUIRE(Struct);
-	return m_value.value().size()?m_value.value().c_str():0;
-}
-
-void StructType::defineDoctype( const char* doctype_)
-{
-	REQUIRE(Struct);
-	m_value.set( std::string(doctype_?doctype_:""));
-}
-
 void StructType::print( std::ostream& out, size_t level) const
 {
 	std::string indent( level, '\t');

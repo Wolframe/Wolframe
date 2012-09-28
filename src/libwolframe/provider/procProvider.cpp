@@ -70,14 +70,100 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 		}
 		else if ( boost::algorithm::iequals( "environment", L1it->first ))
 		{
-			try
+			for ( boost::property_tree::ptree::const_iterator eni = L1it->second.begin(); eni != L1it->second.end(); eni++ )
 			{
-				m_environment.initFromPropertyTree( L1it->second);
-			}
-			catch (const std::exception& e)
-			{
-				LOG_ERROR << e.what();
-				retVal = false;
+				if ( boost::algorithm::iequals( "form", eni->first ))
+				{
+					langbind::DDLFormConfigStruct st;
+					for ( boost::property_tree::ptree::const_iterator ai = eni->second.begin(); ai != eni->second.end(); ai++ )
+					{
+						if (boost::algorithm::iequals( "DDL", ai->first ))
+						{
+							st.DDL = ai->second.data();
+						}
+						else if (boost::algorithm::iequals( "file", ai->first ))
+						{
+							st.file = ai->second.data();
+						}
+						else
+						{
+							LOG_ERROR << "invalid form configuration element '" << ai->first << "'";
+						}
+					}
+					m_environment.form.push_back( st);
+				}
+				else if ( boost::algorithm::iequals( "printlayout", eni->first ))
+				{
+					langbind::PrintLayoutConfigStruct st;
+					for ( boost::property_tree::ptree::const_iterator ai = eni->second.begin(); ai != eni->second.end(); ai++ )
+					{
+						if (boost::algorithm::iequals( "name", ai->first ))
+						{
+							st.name = ai->second.data();
+						}
+						else if (boost::algorithm::iequals( "type", ai->first ))
+						{
+							st.type = ai->second.data();
+						}
+						else if (boost::algorithm::iequals( "file", ai->first ))
+						{
+							st.file = ai->second.data();
+						}
+						else
+						{
+							LOG_ERROR << "invalid printlayout configuration element '" << ai->first << "'";
+						}
+					}
+					m_environment.printlayout.push_back( st);
+				}
+				else if ( boost::algorithm::iequals( "normalize", eni->first ))
+				{
+					langbind::NormalizeFunctionConfigStruct st;
+					for ( boost::property_tree::ptree::const_iterator ai = eni->second.begin(); ai != eni->second.end(); ai++ )
+					{
+						if (boost::algorithm::iequals( "name", ai->first ))
+						{
+							st.name = ai->second.data();
+						}
+						else if (boost::algorithm::iequals( "type", ai->first ))
+						{
+							st.type = ai->second.data();
+						}
+						else if (boost::algorithm::iequals( "call", ai->first ))
+						{
+							st.call = ai->second.data();
+						}
+						else
+						{
+							LOG_ERROR << "invalid normalize configuration element '" << ai->first << "'";
+						}
+					}
+					m_environment.normalize.push_back( st);
+				}
+				else if ( boost::algorithm::iequals( "transaction", eni->first ))
+				{
+					langbind::TransactionFunctionConfigStruct st;
+					for ( boost::property_tree::ptree::const_iterator ai = eni->second.begin(); ai != eni->second.end(); ai++ )
+					{
+						if (boost::algorithm::iequals( "name", ai->first ))
+						{
+							st.name = ai->second.data();
+						}
+						else if (boost::algorithm::iequals( "type", ai->first ))
+						{
+							st.type = ai->second.data();
+						}
+						else if (boost::algorithm::iequals( "call", ai->first ))
+						{
+							st.call = ai->second.data();
+						}
+						else
+						{
+							LOG_ERROR << "invalid transaction configuration element '" << ai->first << "'";
+						}
+					}
+					m_environment.transaction.push_back( st);
+				}
 			}
 		}
 		else	{
@@ -154,7 +240,24 @@ void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
 	else
 		os << "   None configured" << std::endl;
 
-	m_environment.print( os, indent);
+	std::string indstr( '\t', indent+1);
+	os << "Environment:" << std::endl;
+	for (std::vector<langbind::DDLFormConfigStruct>::const_iterator ii=m_environment.form.begin(), ee=m_environment.form.end(); ii != ee; ++ii)
+	{
+		os << indstr << "DDL " << ii->DDL << " " << ii->file;
+	}
+	for (std::vector<langbind::PrintLayoutConfigStruct>::const_iterator ii=m_environment.printlayout.begin(), ee=m_environment.printlayout.end(); ii != ee; ++ii)
+	{
+		os << indstr << "printlayout " << ii->name << " (" << ii->type << ") " << ii->file;		
+	}
+	for (std::vector<langbind::TransactionFunctionConfigStruct>::const_iterator ii=m_environment.transaction.begin(), ee=m_environment.transaction.end(); ii != ee; ++ii)
+	{
+		os << indstr << "transaction " << ii->name << " (" << ii->type << ") " << ii->call;		
+	}
+	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=m_environment.normalize.begin(), ee=m_environment.normalize.end(); ii != ee; ++ii)
+	{
+		os << indstr << "normalize " << ii->name << " (" << ii->type << ") " << ii->call;		
+	}
 }
 
 
@@ -173,9 +276,13 @@ bool ProcProviderConfig::check() const
 		if ( !(*it)->check() )
 			correct = false;
 	}
-	if (!m_environment.check())
+	for (std::vector<langbind::DDLFormConfigStruct>::const_iterator ii=m_environment.form.begin(), ee=m_environment.form.end(); ii != ee; ++ii)
 	{
-		correct = false;
+		if (!utils::fileExists( ii->file)) return false;
+	}
+	for (std::vector<langbind::PrintLayoutConfigStruct>::const_iterator ii=m_environment.printlayout.begin(), ee=m_environment.printlayout.end(); ii != ee; ++ii)
+	{
+		if (!utils::fileExists( ii->file)) return false;
 	}
 	return correct;
 }
@@ -186,7 +293,14 @@ void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 								it != m_procConfig.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
 	}
-	m_environment.setCanonicalPathes( refPath );
+	for (std::vector<langbind::DDLFormConfigStruct>::iterator ii=m_environment.form.begin(), ee=m_environment.form.end(); ii != ee; ++ii)
+	{
+		ii->file = utils::getCanonicalPath( ii->file, refPath);
+	}
+	for (std::vector<langbind::PrintLayoutConfigStruct>::iterator ii=m_environment.printlayout.begin(), ee=m_environment.printlayout.end(); ii != ee; ++ii)
+	{
+		ii->file = utils::getCanonicalPath( ii->file, refPath);
+	}
 }
 
 

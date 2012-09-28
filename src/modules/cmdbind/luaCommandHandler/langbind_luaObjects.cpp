@@ -33,6 +33,7 @@ Project Wolframe.
 #include "langbind/appObjects.hpp"
 #include "langbind/luaDebug.hpp"
 #include "langbind/luaException.hpp"
+#include "langbind/luaCppCall.hpp"
 #include "langbind/luaGetFunctionClosure.hpp"
 #include "langbind/luaBcdNumber.hpp"
 #include "langbind/luaDateTime.hpp"
