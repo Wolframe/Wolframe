@@ -24,7 +24,7 @@ DYNAMIC_MODULE = \
 	mod_filter_token.dll
 
 CPP_OBJS = \
-	$(TOPDIR)\src\filter_token_filter.obj \
+	filter_token_filter.obj \
 	mod_filter_token.obj
 
 all: $(DYNAMIC_MODULE)

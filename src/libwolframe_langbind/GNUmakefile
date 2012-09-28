@@ -30,17 +30,16 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
-	$(TOPDIR)/src/protocol_ioblocks.o \
-	$(TOPDIR)/src/langbind_appObjects.o \
-	$(TOPDIR)/src/langbind_appConfig_struct.o \
-	$(TOPDIR)/src/langbind_appConfig_option.o \
-	$(TOPDIR)/src/langbind_scriptConfig_struct.o \
-	$(TOPDIR)/src/langbind_scriptConfig_option.o \
-	$(TOPDIR)/src/filter_null_filter.o \
-	$(TOPDIR)/src/filter_doctype.o \
-	$(TOPDIR)/src/filter_typingfilter.o \
-	$(TOPDIR)/src/filter_tostringfilter.o \
-	$(TOPDIR)/src/filter_ptreefilter.o
+	protocol_ioblocks.o \
+	langbind_appObjects.o \
+	langbind_appConfig_struct.o \
+	langbind_appConfig_option.o \
+	langbind_scriptConfig_struct.o \
+	langbind_scriptConfig_option.o \
+	filter_null_filter.o \
+	filter_typingfilter.o \
+	filter_tostringfilter.o \
+	filter_ptreefilter.o
 
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

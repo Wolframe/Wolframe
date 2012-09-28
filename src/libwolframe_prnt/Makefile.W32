@@ -1,4 +1,4 @@
-TOPDIR = ..\..\..\..
+TOPDIR = ..\..
 
 SUBDIRS =
 
@@ -9,30 +9,29 @@ INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
 	/I. \
-	/I$(TOPDIR) \
 	/I$(TOPDIR)\include \
-	/I$(TOPDIR)\src \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
-INCLUDE_LIBS = \
-	kernel32.lib advapi32.lib Ws2_32.lib
+INCLUDE_LIBS =
 
-DYNAMIC_MODULE = \
-	mod_filter_line.dll
+LIBRARIES = \
+	wolframe_prnt.lib
 
 CPP_OBJS = \
-	filter_line_filter.obj \
-	mod_filter_line.obj
+	prnt_pdfPrinter.obj \
+	prnt_pdfPrinterExpression.obj \
+	prnt_pdfPrinterMethod.obj \
+	prnt_pdfPrinterVariable.obj
 
-all: $(DYNAMIC_MODULE)
+all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-$(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:LineFilter.def /out:$@ $(LDFLAGS) $(LIBS) $?
+wolframe_prnt.lib: $(OBJS) $(CPP_OBJS)
+	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
 local_all:
 

@@ -14,17 +14,20 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_LIBXML2
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_langbind \
+	-L$(TOPDIR)/src/libwolframe_serialize \
 	$(LIBXML2_LIB_DIRS) \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
+	-lwolframe_langbind \
 	$(LIBXML2_LIBS)
 
 DYNAMIC_MODULE = mod_filter_libxml2.so
 
 CPP_OBJS = \
-	$(TOPDIR)/src/filter_doctype.o \
-	$(TOPDIR)/src/filter_libxml2_filter.o \
+	filter_libxml2_filter.o \
 	mod_filter_libxml2.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

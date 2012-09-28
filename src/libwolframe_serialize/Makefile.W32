@@ -15,26 +15,26 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
-INCLUDE_LIBS =
+INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwolframe\wolframe.lib
 
 LIBRARIES = \
 	wolframe_serialize.lib
 
 CPP_OBJS = \
-	$(TOPDIR)\src\libwolframe\utils_doctype.obj \
-	$(TOPDIR)\src\ddl_atomicType.obj \
-	$(TOPDIR)\src\ddl_structType.obj \
-	$(TOPDIR)\src\ddl_structTypeBuild.obj \
-	$(TOPDIR)\src\ddl_compilerInterface.obj \
-	$(TOPDIR)\src\serialize_ddl_filtermapParse.obj \
-	$(TOPDIR)\src\serialize_ddl_filtermapSerialize.obj \
-	$(TOPDIR)\src\serialize_mapContext.obj \
-	$(TOPDIR)\src\serialize_struct_filtermapBase.obj \
-	$(TOPDIR)\src\serialize_struct_filtermapParse.obj \
-	$(TOPDIR)\src\serialize_struct_filtermapParseStack.obj \
-	$(TOPDIR)\src\serialize_struct_filtermapSerialize.obj \
-	$(TOPDIR)\src\serialize_struct_filtermapSerializeStack.obj \
-	$(TOPDIR)\src\serialize_structOptionParser.obj
+	ddl_atomicType.obj \
+	ddl_structType.obj \
+	ddl_structTypeBuild.obj \
+	ddl_compilerInterface.obj \
+	serialize_ddl_filtermapParse.obj \
+	serialize_ddl_filtermapSerialize.obj \
+	serialize_mapContext.obj \
+	serialize_struct_filtermapBase.obj \
+	serialize_struct_filtermapParse.obj \
+	serialize_struct_filtermapParseStack.obj \
+	serialize_struct_filtermapSerialize.obj \
+	serialize_struct_filtermapSerializeStack.obj \
+	serialize_structOptionParser.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

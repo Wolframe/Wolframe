@@ -38,10 +38,6 @@
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/null_filter.hpp"
-#if WITH_LUA
-#include "cmdbind/luaCommandHandler.hpp"
-#include "langbind/luaObjects.hpp"
-#endif
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <fstream>

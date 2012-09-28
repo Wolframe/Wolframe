@@ -17,6 +17,7 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
+	-lwolframe \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_filesystem
 
@@ -28,20 +29,19 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
-	$(TOPDIR)/src/libwolframe/utils_doctype.o \
-	$(TOPDIR)/src/ddl_atomicType.o \
-	$(TOPDIR)/src/ddl_structType.o \
-	$(TOPDIR)/src/ddl_structTypeBuild.o \
-	$(TOPDIR)/src/ddl_compilerInterface.o \
-	$(TOPDIR)/src/serialize_ddl_filtermapParse.o \
-	$(TOPDIR)/src/serialize_ddl_filtermapSerialize.o \
-	$(TOPDIR)/src/serialize_mapContext.o \
-	$(TOPDIR)/src/serialize_struct_filtermapBase.o \
-	$(TOPDIR)/src/serialize_struct_filtermapParse.o \
-	$(TOPDIR)/src/serialize_struct_filtermapParseStack.o \
-	$(TOPDIR)/src/serialize_struct_filtermapSerialize.o \
-	$(TOPDIR)/src/serialize_struct_filtermapSerializeStack.o \
-	$(TOPDIR)/src/serialize_structOptionParser.o
+	ddl_atomicType.o \
+	ddl_structType.o \
+	ddl_structTypeBuild.o \
+	ddl_compilerInterface.o \
+	serialize_ddl_filtermapParse.o \
+	serialize_ddl_filtermapSerialize.o \
+	serialize_mapContext.o \
+	serialize_struct_filtermapBase.o \
+	serialize_struct_filtermapParse.o \
+	serialize_struct_filtermapParseStack.o \
+	serialize_struct_filtermapSerialize.o \
+	serialize_struct_filtermapSerializeStack.o \
+	serialize_structOptionParser.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

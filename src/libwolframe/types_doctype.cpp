@@ -29,14 +29,14 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter_doctype.cpp
-///\brief XML document type definition handling
-#include "filter/doctype.hpp"
+///\file types_doctype.cpp
+///\brief ADT for XML document type definition handling
+#include "types/doctype.hpp"
 #include <cstring>
 #include <stdexcept>
 
 using namespace _Wolframe;
-using namespace _Wolframe::langbind;
+using namespace _Wolframe::types;
 
 static bool skip( std::string::const_iterator& cc, const std::string::const_iterator& ee)
 {

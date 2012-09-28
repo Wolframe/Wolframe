@@ -47,9 +47,15 @@ PROVIDER_OBJS = \
 	provider\procProvider.obj \
 	provider\procProviderImpl.obj \
 
+ADT_OBJS = \
+	types_bcdArithmetic.obj \
+	types_dateArithmetic.obj \
+	types_doctype.obj
+
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
+	$(ADT_OBJS) \
 	getPassword.obj \
 	user.obj \
 	moduleDirectory.obj \

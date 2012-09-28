@@ -29,16 +29,16 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/doctype.hpp
-///\brief XML document type definition handling
+///\file types/doctype.hpp
+///\brief ADT for document type definition handling
 
-#ifndef _Wolframe_FILTER_DOCTYPE_HPP_INCLUDED
-#define _Wolframe_FILTER_DOCTYPE_HPP_INCLUDED
+#ifndef _Wolframe_TYPES_DOCTYPE_HPP_INCLUDED
+#define _Wolframe_TYPES_DOCTYPE_HPP_INCLUDED
 #include <string>
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
-namespace langbind {
+namespace types {
 
 struct DocType
 {

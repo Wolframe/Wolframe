@@ -27,17 +27,17 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_lua_command_handler.so
 
 LUA_CPP_OBJS = \
-	$(TOPDIR)/src/filter_luafilter.o \
-	$(TOPDIR)/src/langbind_luaObjects.o \
-	$(TOPDIR)/src/langbind_luaGetFunctionClosure.o \
-	$(TOPDIR)/src/langbind_luaDebug.o \
-	$(TOPDIR)/src/langbind_luaException.o \
-	$(TOPDIR)/src/langbind_luaScriptContext.o
+	filter_luafilter.o \
+	langbind_luaObjects.o \
+	langbind_luaGetFunctionClosure.o \
+	langbind_luaDebug.o \
+	langbind_luaException.o \
+	langbind_luaScriptContext.o
 
 CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
-	$(TOPDIR)/src/cmdbind_ioFilterCommandHandlerEscDLF.o \
-	$(TOPDIR)/src/cmdbind_luaCommandHandler.o \
+	cmdbind_ioFilterCommandHandlerEscDLF.o \
+	cmdbind_luaCommandHandler.o \
 	mod_lua_command_handler.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

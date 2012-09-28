@@ -50,15 +50,23 @@ PROVIDER_OBJS = \
 	provider/procProvider.o \
 	provider/procProviderImpl.o
 
+ADT_OBJS = \
+	types_bcdArithmetic.o \
+	types_dateArithmetic.o \
+	types_doctype.o
+
 CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
+	$(ADT_OBJS) \
 	getPassword.o \
 	user.o \
 	moduleDirectory.o \
 	resolvePath.o \
 	stringUtils.o \
 	parseUtils.o \
+	utils_doctype.o \
+	types_allocators.o \
 	CRAM.o
 
 OBJS = \

@@ -19,20 +19,15 @@ INCLUDE_LDFLAGS = \
 	
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwolframe_prnt\wolframe_prnt.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
 	mod_test_pdf_printer.dll
 
 CPP_OBJS = \
-	$(TOPDIR)\src\types_allocators.obj \
-	$(TOPDIR)\src\types_bcdArithmetic.obj \
-	$(TOPDIR)\src\prnt_pdfPrinter.obj \
-	$(TOPDIR)\src\prnt_pdfPrinter_testtrace.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterDocument_testtrace.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterExpression.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterMethod.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterVariable.obj \
+	prnt_pdfPrinter_testtrace.obj \
+	prnt_pdfPrinterDocument_testtrace.obj \
 	mod_test_pdf_printer.obj
 
 all: $(DYNAMIC_MODULE)

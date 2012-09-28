@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file filter_textwolf_filter.cpp
 ///\brief Filter implementation reading/writing xml with the textwolf xml library
 #include "filter/textwolf_filter.hpp"
-#include "filter/doctype.hpp"
+#include "types/doctype.hpp"
 #include "textwolf/sourceiterator.hpp"
 #include "textwolf/xmlparser.hpp"
 #include "textwolf/xmlprinter.hpp"
@@ -110,7 +110,7 @@ struct InputFilterImpl:public InputFilter
 	///\brief Implementation of InputFilter::getDocType(std::string&)
 	virtual bool getDocType( std::string& val)
 	{
-		DocType doctype;
+		types::DocType doctype;
 		if (getDocType( doctype))
 		{
 			val = doctype.tostring();
@@ -237,7 +237,7 @@ private:
 	///\param [out] doctype definition parsed
 	///\return true, if success, false, if not.
 	///\remark Check the state when false is returned
-	bool getDocType( DocType& doctype)
+	bool getDocType( types::DocType& doctype)
 	{
 		try
 		{
@@ -327,7 +327,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Implementation of OutputFilter::setDocType( const std::string&)
 	virtual void setDocType( const std::string& value)
 	{
-		DocType doctype( value);
+		types::DocType doctype( value);
 		m_printer.setDocumentType( doctype.rootid, doctype.publicid, doctype.systemid);
 	}
 

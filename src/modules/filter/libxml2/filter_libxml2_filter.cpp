@@ -1,6 +1,6 @@
 #include "filter/libxml2_filter.hpp"
 #include "filter/bufferingfilter.hpp"
-#include "filter/doctype.hpp"
+#include "types/doctype.hpp"
 #include "types/countedReference.hpp"
 #include <cstddef>
 #include <cstring>
@@ -170,7 +170,7 @@ struct InputFilterImpl :public InputFilter
 	///\brief Implements InputFilter::getDocType(std::string&)
 	virtual bool getDocType( std::string& val)
 	{
-		DocType doctype;
+		types::DocType doctype;
 		if (getDocType( doctype))
 		{
 			val = doctype.tostring();
@@ -226,7 +226,7 @@ struct InputFilterImpl :public InputFilter
 		}
 	}
 
-	bool getDocType( DocType& doctype)
+	bool getDocType( types::DocType& doctype)
 	{
 		if (!m_doc.get())
 		{
@@ -433,7 +433,7 @@ public:
 	///\brief Implementation of OutputFilter::setDocType( const std::string&)
 	virtual void setDocType( const std::string& value)
 	{
-		DocType doctype( value);
+		types::DocType doctype( value);
 		if (doctype.rootid)
 		{
 			m_doctype_root = doctype.rootid;

@@ -10,6 +10,9 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_langbind \
+	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS =
@@ -17,7 +20,7 @@ INCLUDE_LIBS =
 DYNAMIC_MODULE = mod_filter_line.so
 
 CPP_OBJS = \
-	$(TOPDIR)/src/filter_line_filter.o \
+	filter_line_filter.o \
 	mod_filter_line.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

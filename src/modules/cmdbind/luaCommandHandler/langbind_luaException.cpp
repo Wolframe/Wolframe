@@ -63,21 +63,5 @@ void LuaErrorMessage::init( const char* funcname, const char* msg)
 	m_funcname[ nn] = '\0';
 }
 
-static int luaException( lua_State* ls)
-{
-	const char* errmsg = lua_tostring( ls, -1);
-	throw std::runtime_error( errmsg?errmsg:"unspecified lua exception");
-	return 0;
-}
-
-LuaExceptionHandlerScope::LuaExceptionHandlerScope( lua_State* ls)
-	:m_ls(ls)
-	,m_panicf( lua_atpanic( ls, luaException))
-{}
-
-LuaExceptionHandlerScope::~LuaExceptionHandlerScope()
-{
-	lua_atpanic( m_ls, m_panicf);
-}
 
 

@@ -18,8 +18,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_transaction_pstm.so
 
 CPP_OBJS = \
-	$(TOPDIR)/src/database_preparedStatementProcessor.o \
-	$(TOPDIR)/src/types_allocators.o \
+	database_preparedStatementProcessor.o \
 	mod_transaction_pstm.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

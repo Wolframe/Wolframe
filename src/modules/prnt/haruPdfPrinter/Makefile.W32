@@ -19,6 +19,7 @@ INCLUDE_LDFLAGS = \
 	
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwolframe_prnt\wolframe_prnt.lib \
 	"$(TOPDIR)\libhpdf\src\hpdf.lib" \
 	"$(TOPDIR)\zlib\zlib.lib" "$(TOPDIR)\libpng\libpng.lib" \
 	kernel32.lib advapi32.lib Ws2_32.lib
@@ -27,14 +28,8 @@ DYNAMIC_MODULE = \
 	mod_haru_pdf_printer.dll
 
 CPP_OBJS = \
-	$(TOPDIR)\src\types_allocators.obj \
-	$(TOPDIR)\src\types_bcdArithmetic.obj \
-	$(TOPDIR)\src\prnt_pdfPrinter.obj \
-	$(TOPDIR)\src\prnt_pdfPrinter_libhpdf.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterDocument_libhpdf.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterExpression.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterMethod.obj \
-	$(TOPDIR)\src\prnt_pdfPrinterVariable.obj
+	prnt_pdfPrinter_libhpdf.obj \
+	prnt_pdfPrinterDocument_libhpdf.obj
 
 CPP_OBJS = \
 	$(CPP_OBJS) mod_haru_pdf_printer.obj

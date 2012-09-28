@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = libwolframe libwolframe_serialize libwolframe_langbind libwolframe_functions modules
+SUBDIRS = libwolframe libwolframe_serialize libwolframe_langbind libwolframe_functions libwolframe_prnt modules
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -52,14 +52,11 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \
-	types_allocators.o \
 	acceptor.o \
 	serverEndpoint.o \
 	connection.o \
 	serverConfig.o \
-	server.o \
-	database_preparedStatementProcessor.o
-
+	server.o
 
 #SSL
 ifeq ($(WITH_SSL),1)

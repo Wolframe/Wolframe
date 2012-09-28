@@ -35,6 +35,7 @@ Project Wolframe.
 #define _Wolframe_langbind_LUA_EXCEPTION_HPP_INCLUDED
 #include <sstream>
 #include <iostream>
+#include <stdexcept>
 
 extern "C" {
 	#include <lua.h>
@@ -90,10 +91,27 @@ struct LuaFunctionCppCall
 class LuaExceptionHandlerScope
 {
 public:
-	explicit LuaExceptionHandlerScope( lua_State* ls);
+	explicit LuaExceptionHandlerScope( lua_State* ls)
+		:m_ls(ls)
+		,m_panicf( lua_atpanic( ls, luaException))
+	{}
+
 	LuaExceptionHandlerScope( const LuaExceptionHandlerScope& o)
 		:m_panicf(o.m_panicf){}
-	~LuaExceptionHandlerScope();
+
+	~LuaExceptionHandlerScope()
+	{
+		lua_atpanic( m_ls, m_panicf);
+	}
+
+
+private:
+	static int luaException( lua_State* ls)
+	{
+		const char* errmsg = lua_tostring( ls, -1);
+		throw std::runtime_error( errmsg?errmsg:"unspecified lua exception");
+		return 0;
+	}
 private:
 	lua_State* m_ls;
 	lua_CFunction m_panicf;

@@ -10,10 +10,13 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
+	-L$(TOPDIR)/src/libwolframe_langbind \
+	-L$(TOPDIR)/src/libwolframe_prnt \
 	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lwolframe
+	-lwolframe \
+	-lwolframe_prnt
 
 # libhpdf
 INCLUDE_CXXFLAGS += \
@@ -34,13 +37,8 @@ DYNAMIC_MODULE = mod_haru_pdf_printer.so
 LIBHPDF_OBJS =
 
 CPP_OBJS = \
-	$(TOPDIR)/src/types_bcdArithmetic.o \
-	$(TOPDIR)/src/prnt_pdfPrinter.o \
-	$(TOPDIR)/src/prnt_pdfPrinter_libhpdf.o \
-	$(TOPDIR)/src/prnt_pdfPrinterDocument_libhpdf.o \
-	$(TOPDIR)/src/prnt_pdfPrinterExpression.o \
-	$(TOPDIR)/src/prnt_pdfPrinterMethod.o \
-	$(TOPDIR)/src/prnt_pdfPrinterVariable.o \
+	prnt_pdfPrinter_libhpdf.o \
+	prnt_pdfPrinterDocument_libhpdf.o \
 	mod_haru_pdf_printer.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

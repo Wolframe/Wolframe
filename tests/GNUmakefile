@@ -37,6 +37,7 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(TOPDIR)/src/libwolframe_functions \
+	-L$(TOPDIR)/src/libwolframe_prnt \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
@@ -47,6 +48,7 @@ INCLUDE_LIBS = \
 	-lwolframe_serialize \
 	-lwolframe_langbind \
 	-lwolframe_functions \
+	-lwolframe_prnt \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_program_options
 
@@ -154,7 +156,7 @@ local_clean:
 
 local_distclean:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_functions:$(LIBXML2_LIB_DIR)"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_functions:$(TOPDIR)/src/libwolframe_prnt:$(LIBXML2_LIB_DIR)"
 
 ifeq ($(WITH_LIBHPDF),1)
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBHPDF_LIB_DIR)"

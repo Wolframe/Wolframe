@@ -10,21 +10,18 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwolframe
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_prnt
 
 INCLUDE_LIBS = \
-	-lwolframe
+	-lwolframe \
+	-lwolframe_prnt
 
 DYNAMIC_MODULE = mod_test_pdf_printer.so
 
 CPP_OBJS = \
-	$(TOPDIR)/src/types_bcdArithmetic.o \
-	$(TOPDIR)/src/prnt_pdfPrinter.o \
-	$(TOPDIR)/src/prnt_pdfPrinter_testtrace.o \
-	$(TOPDIR)/src/prnt_pdfPrinterDocument_testtrace.o \
-	$(TOPDIR)/src/prnt_pdfPrinterExpression.o \
-	$(TOPDIR)/src/prnt_pdfPrinterMethod.o \
-	$(TOPDIR)/src/prnt_pdfPrinterVariable.o \
+	prnt_pdfPrinter_testtrace.o \
+	prnt_pdfPrinterDocument_testtrace.o \
 	mod_test_pdf_printer.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

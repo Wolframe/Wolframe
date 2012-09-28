@@ -62,13 +62,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	cmdbind_ioFilterCommandHandler.obj \
 	cmdbind_doctypeFilterCommandHandler.obj \
 	cmdbind_directmapCommandHandler.obj \
-	types_allocators.obj \
-	database_preparedStatementProcessor.obj \
 	acceptor.obj \
 	connection.obj \
 	serverConfig.obj \
-	server.obj \
-	database_preparedStatementProcessor.obj
+	server.obj
 
 !IFDEF WITH_SSL
 LOCAL_STATIC_LIB_OBJS = \

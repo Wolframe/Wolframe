@@ -43,7 +43,7 @@ Project Wolframe.
 #include <boost/filesystem.hpp>
 
 //PF:HACK: Include instead of static linking because the module is already used as shared library module and the makefile system cannot handle this yet
-#include "ddl_compiler_simpleFormCompiler.cpp"
+#include "modules/ddlcompiler/simpleform/ddl_compiler_simpleFormCompiler.cpp"
 #include "modules/normalize/number/numberNormalize.cpp"
 
 class DDLTypeMap :public ddl::TypeMap

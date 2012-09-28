@@ -22,17 +22,16 @@ LIBRARIES = \
 	wolframe_langbind.lib
 
 CPP_OBJS = \
-	$(TOPDIR)\src\protocol_ioblocks.obj \
-	$(TOPDIR)\src\langbind_appObjects.obj \
-	$(TOPDIR)\src\langbind_appConfig_struct.obj \
-	$(TOPDIR)\src\langbind_appConfig_option.obj \
-	$(TOPDIR)\src\langbind_scriptConfig_struct.obj \
-	$(TOPDIR)\src\langbind_scriptConfig_option.obj \
-	$(TOPDIR)\src\filter_doctype.obj \
-	$(TOPDIR)\src\filter_tostringfilter.obj \
-	$(TOPDIR)\src\filter_ptreefilter.obj \
-	$(TOPDIR)\src\filter_typingfilter.obj \
-	$(TOPDIR)\src\filter_null_filter.obj
+	protocol_ioblocks.obj \
+	langbind_appObjects.obj \
+	langbind_appConfig_struct.obj \
+	langbind_appConfig_option.obj \
+	langbind_scriptConfig_struct.obj \
+	langbind_scriptConfig_option.obj \
+	filter_tostringfilter.obj \
+	filter_ptreefilter.obj \
+	filter_typingfilter.obj \
+	filter_null_filter.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

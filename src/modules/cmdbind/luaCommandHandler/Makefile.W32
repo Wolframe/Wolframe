@@ -28,20 +28,17 @@ DYNAMIC_MODULE = \
 	mod_lua_command_handler.dll
 
 LUA_CPP_OBJS = \
-	$(TOPDIR)\src\filter_luafilter.obj \
-	$(TOPDIR)\src\langbind_luaObjects.obj \
-	$(TOPDIR)\src\langbind_luaGetFunctionClosure.obj \
-	$(TOPDIR)\src\langbind_luaDebug.obj \
-	$(TOPDIR)\src\langbind_luaException.obj \
-	$(TOPDIR)\src\langbind_luaScriptContext.obj
+	filter_luafilter.obj \
+	langbind_luaObjects.obj \
+	langbind_luaGetFunctionClosure.obj \
+	langbind_luaDebug.obj \
+	langbind_luaException.obj \
+	langbind_luaScriptContext.obj
 
 CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
-	$(TOPDIR)\src\langbind_appConfig_struct.obj \
-	$(TOPDIR)\src\langbind_scriptConfig_struct.obj \
-	$(TOPDIR)\src\cmdbind_IOFilterCommandHandlerEscDLF.obj \
-	$(TOPDIR)\src\cmdbind_luaCommandHandler.obj \
-	$(TOPDIR)\src\procProviderImpl.obj \
+	cmdbind_IOFilterCommandHandlerEscDLF.obj \
+	cmdbind_luaCommandHandler.obj \
 	mod_lua_command_handler.obj
 
 all: $(DYNAMIC_MODULE)
