@@ -101,9 +101,11 @@ public:
 	StructType& operator= ( const StructType& o)
 	{
 		m_contentType = o.m_contentType;
+		m_doctype = o.m_doctype;
 		m_value = o.m_value;
 		m_elem = o.m_elem;
 		m_nof_attributes = o.m_nof_attributes;
+		m_mandatory = o.m_mandatory;
 		return *this;
 	}
 
