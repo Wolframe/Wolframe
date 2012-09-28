@@ -74,7 +74,6 @@ public:
 	///\param[in] mandatory_ the element is mandatory in the structure it is part of
 	StructType( bool mandatory_=false)
 		:m_contentType( Struct)
-		,m_doctype(0)
 		,m_nof_attributes(0)
 		,m_mandatory(mandatory_){}
 
@@ -82,6 +81,7 @@ public:
 	///\param[in] o element to copy
 	StructType( const StructType& o)
 		:m_contentType(o.m_contentType)
+		,m_doctype(o.m_doctype)
 		,m_value(o.m_value)
 		,m_elem(o.m_elem)
 		,m_nof_attributes(o.m_nof_attributes)
@@ -246,7 +246,7 @@ public:
 	///\param[in] doctype_ Document type definition string
 	void defineDoctype( const char* doctype_)
 	{
-		m_doctype = doctype_;
+		m_doctype = doctype_?doctype_:"";
 	}
 
 private:
