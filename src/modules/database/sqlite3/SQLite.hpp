@@ -77,9 +77,11 @@ class SQLiteDBunit;
 class SQLiteDatabase : public Database
 {
 public:
-	SQLiteDatabase( const SQLiteDBunit* unit )
-		: m_unit( unit )		{}
+	SQLiteDatabase() : m_unit( NULL )	{}
 	 ~SQLiteDatabase()			{}
+
+	void setUnit( SQLiteDBunit* unit )	{ m_unit = unit; }
+	bool hasUnit() const			{ return m_unit != NULL; }
 
 	const std::string& ID() const;
 	PreparedStatementHandler* getPreparedStatementHandler()

@@ -93,9 +93,11 @@ class PostgreSQLdbUnit;
 class PostgreSQLdatabase : public Database
 {
 public:
-	PostgreSQLdatabase( const PostgreSQLdbUnit* unit )
-		: m_unit( unit )		{}
+	PostgreSQLdatabase() : m_unit( NULL )	{}
 	~PostgreSQLdatabase()			{}
+
+	void setUnit( PostgreSQLdbUnit* unit )	{ m_unit = unit; }
+	bool hasUnit() const			{ return m_unit != NULL; }
 
 	const std::string& ID() const;
 	PreparedStatementHandler* getPreparedStatementHandler()

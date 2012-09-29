@@ -48,7 +48,7 @@ namespace db {
 
 SQLiteDBunit::SQLiteDBunit( const std::string& id,
 				const std::string& filename, unsigned short connections, bool flag )
-	: m_ID( id ), m_filename( filename ), m_flag( flag ), m_db( this )
+	: m_ID( id ), m_filename( filename ), m_flag( flag )
 {
 	for( int i = 0; i < connections; i++ ) {
 		sqlite3 *handle;
@@ -61,12 +61,16 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id,
 		m_connPool.add( handle );
 	}
 
+	m_db.setUnit( this );
+
 	MOD_LOG_DEBUG << "SQLite database '" << m_ID << "' created with "
-		   << "filename '" << m_filename << "'";
+		      << "filename '" << m_filename << "'";
 }
 
 SQLiteDBunit::~SQLiteDBunit( )
 {
+	m_db.setUnit( NULL );
+
 	while( m_connPool.available( ) > 0 ) {
 		sqlite3 *handle = m_connPool.get( );
 		sqlite3_close( handle );
@@ -76,12 +80,15 @@ SQLiteDBunit::~SQLiteDBunit( )
 
 Database* SQLiteDBunit::database()
 {
-	return &m_db;
+	return m_db.hasUnit() ? &m_db : NULL;
 }
 
 const std::string& SQLiteDatabase::ID() const
 {
-	return m_unit->ID();
+	if ( m_unit )
+		return m_unit->ID();
+	else
+		throw std::runtime_error( "SQL database unit not initialized" );
 }
 
 }} // _Wolframe::db
