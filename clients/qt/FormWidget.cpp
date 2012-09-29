@@ -15,7 +15,7 @@ namespace _Wolframe {
 	namespace QtClient {
 
 FormWidget::FormWidget( FormLoader *_formLoader, QUiLoader *_uiLoader, QWidget *_parent )
-	: QWidget( _parent ), m_formLoader( _formLoader ), m_uiLoader( _uiLoader ), m_ui( 0 ), m_locale( "en_US" )
+	: QWidget( _parent ), m_uiLoader( _uiLoader ), m_formLoader( _formLoader ), m_ui( 0 ), m_locale( "en_US" )
 {
 // for now a from file form and data loader (later wolframe protocol)
 	m_dataLoader = new FileDataLoader( "data" );
