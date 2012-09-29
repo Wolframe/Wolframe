@@ -127,10 +127,12 @@ run: local_all $(CPP_BINS)
 	@-echo set PATH=$(QT_DIR)\binQtCore4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtGui4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtNetwork4.dll . >> test.bat
+	@-echo copy $(QT_DIR)\bin\QtWebkit4.dll . >> test.bat
 !ELSE
 	@-echo copy $(QT_DIR)\bin\QtCored4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtGuid4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtNetworkd4.dll . >> test.bat
+	@-echo copy $(QT_DIR)\bin\QtWebkitd4.dll . >> test.bat
 !ENDIF
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
