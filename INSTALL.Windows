@@ -31,9 +31,8 @@ Prerequisites
 - mc.exe may be missing in your path (for instance on VC8),
   usually it is available as part of the Platform SDK,
   copy it into the path
-- boost 1.43.0 or later
-- ICU (icu4c 49)
-- boost 1.48.0 or later (boost 1.50 and 1.51 need patching)
+- boost 1.43.0 or later, for boost-locale/ICU you need at
+  least 1.48.0, boost 1.50 and 1.51 need some patching
 - optionally (WITH_SSL) openssl 0.9.8 or later
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
@@ -49,7 +48,8 @@ Prerequisites
   - optionally (WITH_LIBXSLT): libxslt
 - optionally (WITH_LIBHPDF): for PDF creation,
   using the provided version in 'libhpdf'
-- optionally (WITH_ICU): for boost-locale with ICU support
+- optionally (WITH_ICU): ICU (icu4c, version 49)
+  for boost-locale with ICU support
 - optionally for testing (WITH_EXPECT) Expect and Tcl 8.4 or later
 - optionally for packaging:
   - Wix 3.5 or later (which needs .NET 2.0 during packaging)
