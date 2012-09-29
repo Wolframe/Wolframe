@@ -10,7 +10,7 @@ Table of Contents
     Compile and install boost
     Compile and install openssl
     Compile and install Qt
-  Build instructions for Linux Distributions
+  Build instructions for specific Linux Distributions
     RHEL/Centos/SL 5
     RHEL/Centos/SL 6
     Fedora 14
@@ -46,7 +46,9 @@ Prerequisites
 
 - gcc c++ 4.1.x or later (preferably 512 MB RAM or Swap)
 - GNU make (preferably 3.82 or newer)
-- boost 1.43.0 or later
+- boost 1.43.0 or later: 1.42 is also supported (mainly on
+  OpenBSD), but not recommended. For boost-locale/ICU support
+  boost 1.48 or later is required
 - optionally (WITH_SSL) openssl 0.9.7 or later
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
@@ -73,6 +75,8 @@ Prerequisites
   WITH_LOCAL_LIBHPDF=1 to use the supplied version in
   the 'libhpdf' subdirectory. In this case also 
   'zlib' and 'libpng' development libraries are needed
+- optionally (WITH_ICU): needs a custom build of boost
+  for boost-locale with ICU support
 
 Configuration of the build
 --------------------------
@@ -104,12 +108,19 @@ Manually build the prerequisites
 Compile and install boost
 -------------------------
 
-./bootstrap.sh --prefix=/usr/local/boost-1.48.0 \
+./bootstrap.sh --prefix=/usr/local/boost-1.xx.y \
 	--with-libraries=thread,filesystem,system,program_options,date_time
 ./bjam install
 
+For boost-locale and ICU support you have to specify 'regex' and the 'locale'
+libraries too:
+
+./bootstrap.sh --prefix=/usr/local/boost-1.xx.y \
+	--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
+./bjam install
+
 configure Wolframe in ~/config.mk and
-set BOOST_DIR to /usr/local/boost-1.48.0.
+set BOOST_DIR to /usr/local/boost-1.xx.y.
 
 Compile and install openssl
 ---------------------------
@@ -120,7 +131,7 @@ your Linux distribution.
 Compile and install Qt
 ----------------------
 
-./configure --prefix /usr/local/qt-4.7.4 -openssl
+./configure --prefix /usr/local/qt-4.x.y -openssl
 make
 cd src/3rdparty/webkit/JavaScriptCore/
 make
@@ -128,10 +139,10 @@ cd -
 make install
 
 confiugre Wolframe in ~/config.mk and
-set QT_DIR to /usr/local/qt-4.7.4
+set QT_DIR to /usr/local/qt-4.x.y
 
-Build instructions for Linux Distributions
-------------------------------------------
+Build instructions for specific Linux Distributions
+---------------------------------------------------
 
 RHEL/Centos/SL 5
 ----------------
