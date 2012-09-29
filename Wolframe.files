@@ -769,7 +769,6 @@ src/libwolframe/types_doctype.cpp
 src/libwolframe/user.cpp
 src/libwolframe/utils_doctype.cpp
 src/loadModules.cpp
-src/loadModules-dummy.cpp
 src/Makefile.W32
 src/modules/audit/database/DBauditConfig.cpp
 src/modules/audit/database/DBauditConstructor.cpp

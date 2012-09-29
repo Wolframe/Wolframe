@@ -39,7 +39,6 @@ endif
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
-	$(TOPDIR)/src/loadModules-dummy.o \
 	luaConfig.o \
 	luaHandler.o \
 	$(TOPDIR)/src/posixMain.o
@@ -47,7 +46,7 @@ OBJS = \
 CPP_BINS = \
 	luad$(EXE)
 
-luad$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+luad$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

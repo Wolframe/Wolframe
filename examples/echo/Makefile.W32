@@ -41,7 +41,6 @@ INCLUDE_LIBS = \
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
-	$(TOPDIR)\src\loadModules-dummy.obj \
 	echoConfig.obj \
 	echoHandler.obj \
 	$(TOPDIR)\src\winMain.obj
