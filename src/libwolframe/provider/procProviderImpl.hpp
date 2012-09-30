@@ -70,7 +70,7 @@ public:
 
 	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
 	langbind::FormFunction* formfunction( const std::string& name ) const;
-	const ddl::StructType* form( const std::string& name ) const;
+	const ddl::Form* form( const std::string& name ) const;
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
 	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
@@ -99,7 +99,7 @@ private:
 
 	std::list< module::DDLCompilerConstructor* >	m_ddlcompiler;
 	std::map< std::string, ddl::DDLCompilerR >	m_ddlcompilerMap;
-	std::map< std::string, ddl::StructTypeR>	m_formMap;
+	std::map< std::string, ddl::FormR>	m_formMap;
 
 	std::list< module::NormalizeFunctionConstructor* >	m_normalizeFunctionCompiler;
 	std::map< std::string, const module::NormalizeFunctionConstructor* >	m_normalizeFunctionCompilerMap;

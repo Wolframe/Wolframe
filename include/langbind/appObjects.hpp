@@ -125,6 +125,60 @@ private:
 	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
 };
 
+class DDLFormParser
+	:public serialize::DDLStructParser
+{
+public:
+	explicit DDLFormParser( const ddl::FormR& form_)
+		:DDLStructParser(form_.get())
+		,m_form(form_){}
+
+	DDLFormParser( const DDLFormParser& o)
+		:DDLStructParser(o)
+		,m_form(o.m_form){}
+
+	virtual ~DDLFormParser(){}
+
+	DDLFormParser& operator=( const DDLFormParser& o)
+	{
+		DDLStructParser::operator=( o);
+		m_form = o.m_form;
+		return *this;
+	}
+
+	const ddl::FormR& form() const	{return m_form;}
+
+private:
+	ddl::FormR m_form;
+};
+
+class DDLFormSerializer
+	:public serialize::DDLStructSerializer
+{
+public:
+	DDLFormSerializer(){}
+	explicit DDLFormSerializer( const ddl::FormR& form_)
+		:DDLStructSerializer(form_.get())
+		,m_form(form_){}
+
+	DDLFormSerializer( const DDLFormSerializer& o)
+		:DDLStructSerializer(o)
+		,m_form(o.m_form){}
+	virtual ~DDLFormSerializer(){}
+
+	DDLFormSerializer& operator =( const DDLFormSerializer& o)
+	{
+		DDLStructSerializer::operator=( o);
+		m_form = o.m_form;
+		return *this;
+	}
+
+	const ddl::FormR& form() const	{return m_form;}
+
+private:
+	ddl::FormR m_form;
+};
+
 ///\class RedirectFilterClosure
 class RedirectFilterClosure
 {
@@ -152,37 +206,6 @@ private:
 	TypedOutputFilterR m_outputfilter;	//< output filter
 	InputFilter::ElementType m_elemtype;	//< type of last element read from command result
 	TypedInputFilter::Element m_elem;	//< last element read from command result
-};
-
-
-///\class DDLForm
-class DDLForm
-{
-public:
-	///\brief Default constructor
-	DDLForm(){}
-
-	///\brief Copy constructor
-	///\param[in] o copied item
-	DDLForm( const DDLForm& o)
-		:m_structure(o.m_structure){}
-
-	///\brief Constructor
-	///\param[in] st form data
-	DDLForm( const ddl::StructTypeR& st)
-		:m_structure(st){}
-
-	///\brief Destructor
-	~DDLForm(){}
-
-	const ddl::StructTypeR& structure() const	{return m_structure;}
-
-	std::string tostring() const;
-	DDLForm copy() const;
-
-private:
-	friend class DDLFormFill;
-	ddl::StructTypeR m_structure;
 };
 
 class ApiFormData

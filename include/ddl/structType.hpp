@@ -81,7 +81,6 @@ public:
 	///\param[in] o element to copy
 	StructType( const StructType& o)
 		:m_contentType(o.m_contentType)
-		,m_doctype(o.m_doctype)
 		,m_value(o.m_value)
 		,m_elem(o.m_elem)
 		,m_nof_attributes(o.m_nof_attributes)
@@ -101,7 +100,6 @@ public:
 	StructType& operator= ( const StructType& o)
 	{
 		m_contentType = o.m_contentType;
-		m_doctype = o.m_doctype;
 		m_value = o.m_value;
 		m_elem = o.m_elem;
 		m_nof_attributes = o.m_nof_attributes;
@@ -237,6 +235,42 @@ public:
 	///\return true, if yes
 	bool mandatory() const				{return m_mandatory;}
 
+private:
+	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
+	///\remark Used for checking the preconditions mentioned as remark [precondition]
+	void REQUIRE( ContentType t) const;
+
+	ContentType m_contentType;	//< type of the element
+	AtomicType m_value;		//< value, if the value is atomic
+	Map m_elem;			//< map represented as array
+	std::size_t m_nof_attributes;	//< number of attributes (first N elements of the structure)
+	bool m_mandatory;		//< true, if the field is mandatory
+};
+
+
+class Form
+	:public StructType
+{
+public:
+	///\brief Constructor
+	Form(){}
+	///\brief Copy constructor
+	Form( const StructType& o)
+		:StructType(o){}
+	///\brief Copy constructor
+	Form( const Form& o)
+		:StructType(o)
+		,m_doctype(o.m_doctype){}
+
+	///\brief Assignement operator
+	///\param[in] o object to copy
+	Form& operator= ( const Form& o)
+	{
+		StructType::operator=( o);
+		m_doctype = o.m_doctype;
+		return *this;
+	}
+
 	///\brief Get the document type definition string for this form
 	///\return the document type definition string or 0 if not defined
 	const char* doctype() const
@@ -251,21 +285,13 @@ public:
 		m_doctype = doctype_?doctype_:"";
 	}
 
-private:
-	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
-	///\remark Used for checking the preconditions mentioned as remark [precondition]
-	void REQUIRE( ContentType t) const;
+	void print( std::ostream& out, size_t level=0) const;
 
-	ContentType m_contentType;	//< type of the element
+private:
 	std::string m_doctype;
-	AtomicType m_value;		//< value, if the value is atomic
-	Map m_elem;			//< map represented as array
-	std::size_t m_nof_attributes;	//< number of attributes (first N elements of the structure)
-	bool m_mandatory;		//< true, if the field is mandatory
 };
 
-
-typedef types::CountedReference<StructType> StructTypeR;
+typedef types::CountedReference<Form> FormR;
 
 }}//namespace
 #endif

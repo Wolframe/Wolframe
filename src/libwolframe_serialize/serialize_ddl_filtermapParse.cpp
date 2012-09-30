@@ -282,10 +282,10 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 	throw SerializationErrorException( "illegal state in parse DDL form object", getElementPath( stk));
 }
 
-DDLStructParser::DDLStructParser( const ddl::StructTypeR& st)
+DDLStructParser::DDLStructParser( ddl::StructType* st)
 	:m_st(st)
 {
-	m_stk.push_back( FiltermapDDLParseState( 0, st.get()));
+	m_stk.push_back( FiltermapDDLParseState( 0, st));
 }
 
 DDLStructParser::DDLStructParser( const DDLStructParser& o)
@@ -310,7 +310,7 @@ void DDLStructParser::init( const langbind::TypedInputFilterR& i, Context::Flags
 	m_ctx.clear();
 	m_ctx.setFlags(flags);
 	m_stk.clear();
-	m_stk.push_back( FiltermapDDLParseState( 0, m_st.get()));
+	m_stk.push_back( FiltermapDDLParseState( 0, m_st));
 }
 
 bool DDLStructParser::call()

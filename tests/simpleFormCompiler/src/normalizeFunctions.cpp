@@ -29,28 +29,8 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/compiler/simpleFormCompiler.hpp
-///\brief interface for a compiler of a self defined DDL for forms
+///\file normalizeFunctions.cpp
+///\brief Reference code that is used as module and not in a library
+#include "modules/normalize/number/integerNormalizeFunction.cpp"
+#include "modules/normalize/number/floatNormalizeFunction.cpp"
 
-#ifndef _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
-#define _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
-#include <string>
-#include "ddl/structType.hpp"
-#include "ddl/compilerInterface.hpp"
-
-namespace _Wolframe {
-namespace ddl {
-
-class SimpleFormCompiler :public DDLCompiler
-{
-public:
-	SimpleFormCompiler() :DDLCompiler( "simpleform") {}
-
-	///\brief Compile a source from a string. See DDLCompiler::compile( const std::string&, const TypeMap*) const
-	virtual Form compile( const std::string& srcstring, const TypeMap* typemap) const;
-};
-
-DDLCompiler* createSimpleFormCompilerFunc();
-
-}}
-#endif

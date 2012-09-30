@@ -313,16 +313,16 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 		const ddl::StructType* st = provider->form( proc);
 		if (st)
 		{
-			DDLForm df( ddl::StructTypeR( new ddl::StructType( *st)));
+			ddl::Form df( *st);
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
-			serialize::DDLStructParser closure( df.structure());
+			serialize::DDLStructParser closure( &df);
 			closure.init( inp, serialize::Context::ValidateAttributes);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			serialize::DDLStructSerializer res( df.structure());
+			serialize::DDLStructSerializer res( &df);
 			res.init( outp, serialize::Context::None);
 
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);

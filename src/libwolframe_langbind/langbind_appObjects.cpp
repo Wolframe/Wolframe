@@ -154,45 +154,6 @@ bool RedirectFilterClosure::call()
 	}
 }
 
-DDLForm DDLForm::copy() const
-{
-	DDLForm rt;
-	if (m_structure.get())
-	{
-		rt.m_structure = ddl::StructTypeR( new ddl::StructType( *m_structure));
-	}
-	return rt;
-}
-
-std::string DDLForm::tostring() const
-{
-	ToStringFilter* flt = new ToStringFilter;
-	TypedOutputFilterR out( flt);
-	serialize::DDLStructSerializer ser( m_structure);
-	ser.init( out, serialize::Context::SerializeWithIndices);
-	if (!ser.call())
-	{
-		if (out->state() == OutputFilter::EndOfBuffer)
-		{
-			throw std::logic_error( "internal: tostring serialization with yield");
-		}
-		else
-		{
-			throw std::runtime_error( ser.getError());
-		}
-	}
-	if (m_structure->doctype())
-	{
-		std::string rt = "!DOCTYPE \"";
-		rt.append( m_structure->doctype());
-		rt.append( "\" ");
-		rt.append( flt->content());
-		return rt;
-	}
-	return flt->content();
-}
-
-
 
 ApiFormData::ApiFormData( const serialize::StructDescriptionBase* descr_)
 	:m_descr(descr_)

@@ -32,6 +32,10 @@ Project Wolframe.
 ///\file tests/testSimpleFormCompiler.cpp
 #include "utils/miscUtils.hpp"
 #include "ddl/atomicType.hpp"
+#include "ddl/structType.hpp"
+#include "ddl/compiler/simpleFormCompiler.hpp"
+#include "modules/normalize/number/integerNormalizeFunction.hpp"
+#include "modules/normalize/number/floatNormalizeFunction.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <iostream>
@@ -42,9 +46,8 @@ Project Wolframe.
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
-//PF:HACK: Include instead of static linking because the module is already used as shared library module and the makefile system cannot handle this yet
-#include "modules/ddlcompiler/simpleform/ddl_compiler_simpleFormCompiler.cpp"
-#include "modules/normalize/number/numberNormalize.cpp"
+using namespace _Wolframe;
+using namespace _Wolframe::langbind;
 
 class DDLTypeMap :public ddl::TypeMap
 {
@@ -96,7 +99,7 @@ TEST_F( SimpleFormCompilerTest, tests)
 		std::string srcfile = pp.string() + ".simpleform";
 		ddl::SimpleFormCompiler mm;
 		DDLTypeMap typemap;
-		ddl::StructType sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
+		ddl::Form sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
 		sr.print( std::cerr);
 	}
 }

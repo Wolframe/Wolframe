@@ -346,7 +346,7 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::iofilterhandler( const std::
 	return rt;
 }
 
-const ddl::StructType* ProcessorProvider::form( const std::string& name) const
+const ddl::Form* ProcessorProvider::form( const std::string& name) const
 {
 	return m_impl->form( name);
 }

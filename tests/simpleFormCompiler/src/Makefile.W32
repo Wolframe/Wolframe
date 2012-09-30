@@ -26,9 +26,9 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib
 
-
 OBJS = \
-	$(TOPDIR)\src\ddl_compiler_simpleFormCompiler.obj
+	normalizeFunctions.obj \
+	simpleFormCompiler.obj
 
 TEST_CPP_BINS = \
 	testSimpleFormCompiler.exe

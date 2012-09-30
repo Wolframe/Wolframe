@@ -246,11 +246,11 @@ bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, lang
 	return true;
 }
 
-DDLStructSerializer::DDLStructSerializer( const ddl::StructTypeR& st)
+DDLStructSerializer::DDLStructSerializer( const ddl::StructType* st)
 	:m_st(st)
 {
-	if (!m_st.get()) throw std::runtime_error( "empty form passed to serializer");
-	m_stk.push_back( FiltermapDDLSerializeState( st.get(), langbind::TypedFilterBase::Element()));
+	if (!m_st) throw std::runtime_error( "empty form passed to serializer");
+	m_stk.push_back( FiltermapDDLSerializeState( st, langbind::TypedFilterBase::Element()));
 }
 
 DDLStructSerializer::DDLStructSerializer( const DDLStructSerializer& o)
@@ -275,7 +275,7 @@ void DDLStructSerializer::init( const langbind::TypedOutputFilterR& out, Context
 	m_ctx.clear();
 	m_ctx.setFlags(flags);
 	m_stk.clear();
-	m_stk.push_back( FiltermapDDLSerializeState( m_st.get(), langbind::TypedFilterBase::Element()));
+	m_stk.push_back( FiltermapDDLSerializeState( m_st, langbind::TypedFilterBase::Element()));
 	m_out = out;
 }
 

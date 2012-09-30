@@ -239,10 +239,6 @@ void StructType::print( std::ostream& out, size_t level) const
 		}
 		case Struct:
 		{
-			if (doctype())
-			{
-				out << indent << "!DOCTYPE \"" << doctype() << "\"" << std::endl;
-			}
 			StructType::Map::const_iterator ii = begin(),ee=end();
 			for (; ii != ee; ++ii)
 			{
@@ -272,4 +268,13 @@ void StructType::print( std::ostream& out, size_t level) const
 	}
 }
 
+void Form::print( std::ostream& out, size_t level) const
+{
+	std::string indent( level, '\t');
+	if (doctype())
+	{
+		out << indent << "!DOCTYPE \"" << doctype() << "\"" << std::endl;
+	}
+	StructType::print( out, level);
+}
 

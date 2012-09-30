@@ -92,7 +92,7 @@ public:
 	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
 	langbind::FormFunction* formfunction( const std::string& name) const;
 
-	const ddl::StructType* form( const std::string& name ) const;
+	const ddl::Form* form( const std::string& name ) const;
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
 	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;

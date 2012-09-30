@@ -47,7 +47,7 @@ class DDLStructSerializer :public langbind::TypedInputFilter
 {
 public:
 	DDLStructSerializer(){}
-	explicit DDLStructSerializer( const ddl::StructTypeR& st);
+	explicit DDLStructSerializer( const ddl::StructType* st);
 
 	DDLStructSerializer( const DDLStructSerializer& o);
 	virtual ~DDLStructSerializer(){}
@@ -60,10 +60,8 @@ public:
 
 	bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
 
-	const ddl::StructTypeR& structure() const			{return m_st;}
-
 private:
-	ddl::StructTypeR m_st;
+	const ddl::StructType* m_st;
 	Context m_ctx;
 	langbind::TypedOutputFilterR m_out;
 	FiltermapDDLSerializeStateStack m_stk;

@@ -30,27 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for normalize functions
-///\file langbind/normalizeFunction.hpp
-#ifndef _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "ddl/atomicType.hpp"
-#include "types/countedReference.hpp"
+///\file modules/normalize/number/floatNormalizeFunction.hpp
+///\brief Normalizer for floating point numbers
+#ifndef _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
+#define _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
+#include "langbind/normalizeFunction.hpp"
+#include <string>
 
 namespace _Wolframe {
 namespace langbind {
 
-struct NormalizeFunction :public ddl::NormalizeFunction {};
+class FloatNormalizeFunction :public NormalizeFunction
+{
+public:
+	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_, bool trim_)
+		:m_sizeG(sizeG_)
+		,m_sizeF(sizeF_)
+		,m_trim(trim_){}
 
-typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
-class ResourceHandle;
+	virtual std::string execute( const std::string& str) const;
 
-///\param[in,out] rshnd normalization resources handle
-///\param[in] description transaction description source
-typedef NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& description);
+private:
+	std::size_t m_sizeG;
+	std::size_t m_sizeF;
+	bool m_trim;
+};
 
 }}
 #endif
-
 

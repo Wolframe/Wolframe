@@ -30,27 +30,22 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for normalize functions
-///\file langbind/normalizeFunction.hpp
-#ifndef _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "ddl/atomicType.hpp"
-#include "types/countedReference.hpp"
+///\file modules/normalize/number/trimNormalizeFunction.hpp
+///\brief Normalizer for triming ascii strings
+#ifndef _LANGBIND_TRIM_NORMALIZE_FUNCTION_HPP_INCLUDED
+#define _LANGBIND_TRIM_NORMALIZE_FUNCTION_HPP_INCLUDED
+#include "langbind/normalizeFunction.hpp"
+#include <string>
 
 namespace _Wolframe {
 namespace langbind {
 
-struct NormalizeFunction :public ddl::NormalizeFunction {};
-
-typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
-class ResourceHandle;
-
-///\param[in,out] rshnd normalization resources handle
-///\param[in] description transaction description source
-typedef NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& description);
+class TrimNormalizeFunction :public NormalizeFunction
+{
+public:
+	TrimNormalizeFunction(){}
+	virtual std::string execute( const std::string& str) const;
+};
 
 }}
 #endif
-
-

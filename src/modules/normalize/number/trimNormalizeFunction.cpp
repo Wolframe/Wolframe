@@ -30,27 +30,28 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for normalize functions
-///\file langbind/normalizeFunction.hpp
-#ifndef _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "ddl/atomicType.hpp"
-#include "types/countedReference.hpp"
+///\file modules/normalize/number/trimNormalizeFunction.cpp
+#include "trimNormalizeFunction.hpp"
 
-namespace _Wolframe {
-namespace langbind {
+using namespace _Wolframe;
+using namespace langbind;
 
-struct NormalizeFunction :public ddl::NormalizeFunction {};
-
-typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
-class ResourceHandle;
-
-///\param[in,out] rshnd normalization resources handle
-///\param[in] description transaction description source
-typedef NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& description);
-
-}}
-#endif
-
+std::string TrimNormalizeFunction::execute( const std::string& str) const
+{
+	std::string::const_iterator ii = str.begin(), ee = str.end();
+	while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
+	std::string::const_iterator ti = ii, te = ii;
+	for (; ii != ee; ++ii)
+	{
+		if ((unsigned char)*ii > 32) te = ii+1;
+	}
+	if (ti == str.begin() && te == str.end())
+	{
+		return str;
+	}
+	else
+	{
+		return std::string( ti, te);
+	}
+}
 

@@ -70,9 +70,9 @@ namespace luaname
 	static const char* Output = "wolframe.Output";
 	static const char* Filter = "wolframe.Filter";
 	static const char* RedirectFilterClosure = "wolframe.RedirectFilterClosure";
-	static const char* DDLForm = "wolframe.DDLForm";
-	static const char* DDLStructParser = "wolframe.DDLStructParser";
-	static const char* DDLStructSerializer = "wolframe.DDLStructSerializer";
+	static const char* Form = "wolframe.Form";
+	static const char* DDLFormParser = "wolframe.DDLFormParser";
+	static const char* DDLFormSerializer = "wolframe.DDLFormSerializer";
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
 	static const char* TypedInputFilterR = "wolframe.TypedInputFilterR";
 	static const char* TypedInputFilterClosure = "wolframe.TypedInputFilterClosure";
@@ -93,9 +93,9 @@ template <> const char* metaTableName<Input>()				{return luaname::Input;}
 template <> const char* metaTableName<Output>()				{return luaname::Output;}
 template <> const char* metaTableName<Filter>()				{return luaname::Filter;}
 template <> const char* metaTableName<RedirectFilterClosure>()		{return luaname::RedirectFilterClosure;}
-template <> const char* metaTableName<DDLForm>()			{return luaname::DDLForm;}
-template <> const char* metaTableName<serialize::DDLStructParser>()	{return luaname::DDLStructParser;}
-template <> const char* metaTableName<serialize::DDLStructSerializer>()	{return luaname::DDLStructSerializer;}
+template <> const char* metaTableName<ddl::FormR>()			{return luaname::Form;}
+template <> const char* metaTableName<DDLFormParser>()			{return luaname::DDLFormParser;}
+template <> const char* metaTableName<DDLFormSerializer>()		{return luaname::DDLFormSerializer;}
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
 template <> const char* metaTableName<TypedInputFilterR>()		{return luaname::TypedInputFilterR;}
 template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
@@ -566,10 +566,34 @@ LUA_FUNCTION_THROWS( "scope(..)", function_scope)
 
 LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 {
-	DDLForm* form = LuaObject<DDLForm>::getSelf( ls, "form", "__tostring");
+	ddl::FormR* form = LuaObject<ddl::FormR>::getSelf( ls, "form", "__tostring");
 	check_parameters( ls, 1, 0);
 
-	std::string content = form->tostring();
+	ToStringFilter* flt = new ToStringFilter;
+	TypedOutputFilterR out( flt);
+
+	DDLFormSerializer ser( *form);
+	ser.init( out, serialize::Context::SerializeWithIndices);
+	if (!ser.call())
+	{
+		if (out->state() == OutputFilter::EndOfBuffer)
+		{
+			throw std::logic_error( "internal: tostring serialization with yield");
+		}
+		else
+		{
+			throw std::runtime_error( ser.getError());
+		}
+	}
+	std::string content;
+	if ((*form)->doctype())
+	{
+		content = "!DOCTYPE \"";
+		content.append( (*form)->doctype());
+		content.append( "\"\n");
+	}
+	content.append( flt->content());
+
 	LuaExceptionHandlerScope escope(ls);
 	{
 		lua_pushlstring( ls, content.c_str(), content.size());
@@ -580,10 +604,10 @@ LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 
 LUA_FUNCTION_THROWS( "form:doctype()", function_form_doctype)
 {
-	DDLForm* form = LuaObject<DDLForm>::getSelf( ls, "form", "doctype");
+	ddl::FormR* form = LuaObject<ddl::FormR>::getSelf( ls, "form", "doctype");
 	check_parameters( ls, 1, 0);
 
-	const char* doctype = form->structure()->doctype();
+	const char* doctype = (*form)->doctype();
 	LuaExceptionHandlerScope escope(ls);
 	{
 		if (doctype)
@@ -601,8 +625,8 @@ LUA_FUNCTION_THROWS( "form:doctype()", function_form_doctype)
 
 LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 {
-	DDLForm* form = LuaObject<DDLForm>::getSelf( ls, "form", "fill");
-	serialize::DDLStructParser* closure;
+	ddl::FormR* form = LuaObject<ddl::FormR>::getSelf( ls, "form", "fill");
+	DDLFormParser* closure;
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
@@ -624,14 +648,14 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 			}
 		}
 		TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
-		LuaObject<serialize::DDLStructParser>::push_luastack( ls, serialize::DDLStructParser( form->structure()));
-		closure = LuaObject<serialize::DDLStructParser>::get( ls, -1);
+		LuaObject<DDLFormParser>::push_luastack( ls, DDLFormParser( *form));
+		closure = LuaObject<DDLFormParser>::get( ls, -1);
 		closure->init( inp, flags);
 		lua_pushvalue( ls, 2);		//... iterator argument (table, generator function, etc.)
 	}
 	else
 	{
-		closure = (serialize::DDLStructParser*)lua_touserdata( ls, -1);
+		closure = (DDLFormParser*)lua_touserdata( ls, -1);
 		lua_pop( ls, 1);
 	}
 	if (!closure->call())
@@ -645,22 +669,22 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 
 LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 {
-	DDLForm* form;
-	serialize::DDLStructSerializer* result;
+	ddl::FormR* form;
+	DDLFormSerializer* result;
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
-		form = LuaObject<DDLForm>::getSelf( ls, "form", "table");
+		form = LuaObject<ddl::FormR>::getSelf( ls, "form", "table");
 		check_parameters( ls, 1, 0);
 		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
-		LuaObject<serialize::DDLStructSerializer>::push_luastack( ls, serialize::DDLStructSerializer( form->structure()));
-		result = LuaObject<serialize::DDLStructSerializer>::get( ls, -1);
+		LuaObject<DDLFormSerializer>::push_luastack( ls, DDLFormSerializer( *form));
+		result = LuaObject<DDLFormSerializer>::get( ls, -1);
 		result->init( outp, serialize::Context::SerializeWithIndices);
 	}
 	else
 	{
-		form = (DDLForm*)lua_touserdata( ls, -2);
-		result = (serialize::DDLStructSerializer*)lua_touserdata( ls, -1);
+		form = (ddl::FormR*)lua_touserdata( ls, -2);
+		result = (DDLFormSerializer*)lua_touserdata( ls, -1);
 		lua_pop( ls, 2);
 	}
 	if (!result->call())
@@ -675,10 +699,10 @@ LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 
 LUA_FUNCTION_THROWS( "form:get()", function_form_get)
 {
-	DDLForm* result = LuaObject<DDLForm>::getSelf( ls, "form", "get");
+	ddl::FormR* result = LuaObject<ddl::FormR>::getSelf( ls, "form", "get");
 	check_parameters( ls, 1, 0);
 
-	TypedInputFilterR itr( new serialize::DDLStructSerializer( result->structure()));
+	TypedInputFilterR itr( new DDLFormSerializer( *result));
 	LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure(itr));
 	lua_pushcclosure( ls, function_typedinputfilterClosure_get, 1);
 	return 1;
@@ -694,10 +718,10 @@ LUA_FUNCTION_THROWS( "form()", function_form)
 
 		const char* name = lua_tostring( ls, 1);
 		proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-		const ddl::StructType* st = ctx->form( name);
+		const ddl::Form* st = ctx->form( name);
 		if (!st) throw std::runtime_error( std::string("form '") + name + "' not defined");
-		DDLForm frm( ddl::StructTypeR( new ddl::StructType( *st)));
-		LuaObject<DDLForm>::push_luastack( ls, frm);
+		ddl::FormR frm( new ddl::Form( *st));
+		LuaObject<ddl::FormR>::push_luastack( ls, frm);
 		return 1;
 	}
 	else if (lua_istable( ls, 1))
@@ -706,8 +730,8 @@ LUA_FUNCTION_THROWS( "form()", function_form)
 		TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
 		if (!inp.get()) throw std::runtime_error( "unexpected null object intead of table argument");
 		DDLTypeMap typemap( ls);
-		DDLForm frm( ddl::StructTypeR( new ddl::StructTypeBuild( *inp, &typemap)));
-		LuaObject<DDLForm>::push_luastack( ls, frm);
+		ddl::FormR frm( new ddl::Form( ddl::StructType( ddl::StructTypeBuild( *inp, &typemap))));
+		LuaObject<ddl::FormR>::push_luastack( ls, frm);
 		return 1;
 	}
 	throw std::runtime_error( "expected string or table as argument of form");
@@ -1351,50 +1375,50 @@ LUA_FUNCTION_THROWS( "input:get()", function_input_get)
 }
 
 
-LUA_FUNCTION_THROWS( "input:table()", function_input_table_DDLStructSerializer)
+LUA_FUNCTION_THROWS( "input:table()", function_input_table_DDLFormSerializer)
 {
-	serialize::DDLStructSerializer* result = (serialize::DDLStructSerializer*)lua_touserdata( ls, -1);
+	DDLFormSerializer* result = (DDLFormSerializer*)lua_touserdata( ls, -1);
 	lua_pop( ls, 1);
 
 	if (!result->call())
 	{
 		lua_pushlightuserdata( ls, result);
-		lua_yieldk( ls, 0, 1, function_input_table_DDLStructSerializer);
+		lua_yieldk( ls, 0, 1, function_input_table_DDLFormSerializer);
 	}
 	return 1;
 }
 
-LUA_FUNCTION_THROWS( "input:table()", function_input_table_DDLStructParser)
+LUA_FUNCTION_THROWS( "input:table()", function_input_table_DDLFormParser)
 {
-	serialize::DDLStructParser* closure = (serialize::DDLStructParser*)lua_touserdata( ls, -1);
+	DDLFormParser* closure = (DDLFormParser*)lua_touserdata( ls, -1);
 	lua_pop( ls, 1);
 
 	if (!closure->call())
 	{
 		lua_pushlightuserdata( ls, closure);
-		lua_yieldk( ls, 0, 1, function_input_table_DDLStructParser);
+		lua_yieldk( ls, 0, 1, function_input_table_DDLFormParser);
 	}
 	{
 		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
-		LuaObject<serialize::DDLStructSerializer>::push_luastack( ls, serialize::DDLStructSerializer( closure->structure()));
-		serialize::DDLStructSerializer* result = LuaObject<serialize::DDLStructSerializer>::get( ls, -1);
+		LuaObject<DDLFormSerializer>::push_luastack( ls, DDLFormSerializer( closure->form()));
+		DDLFormSerializer* result = LuaObject<DDLFormSerializer>::get( ls, -1);
 		result->init( outp, serialize::Context::SerializeWithIndices);
 		lua_pushlightuserdata( ls, result);
 	}
-	return function_input_table_DDLStructSerializer(ls);
+	return function_input_table_DDLFormSerializer(ls);
 }
 
-LUA_FUNCTION_THROWS( "input:form()", function_input_form_DDLStructParser)
+LUA_FUNCTION_THROWS( "input:form()", function_input_form_DDLFormParser)
 {
-	serialize::DDLStructParser* closure = (serialize::DDLStructParser*)lua_touserdata( ls, -1);
+	DDLFormParser* closure = (DDLFormParser*)lua_touserdata( ls, -1);
 	lua_pop( ls, 1);
 
 	if (!closure->call())
 	{
 		lua_pushlightuserdata( ls, closure);
-		lua_yieldk( ls, 0, 1, function_input_form_DDLStructParser);
+		lua_yieldk( ls, 0, 1, function_input_form_DDLFormParser);
 	}
-	LuaObject<DDLForm>::push_luastack( ls, DDLForm( closure->structure()));
+	LuaObject<ddl::FormR>::push_luastack( ls, closure->form());
 	return 1;
 }
 
@@ -1429,24 +1453,24 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 			{
 				std::string doctypeid( utils::getIdFromDoctype( doctype));
 				proc::ProcessorProvider* gtc = getProcessorProvider( ls);
-				const ddl::StructType* st = gtc->form( doctypeid);
+				const ddl::Form* st = gtc->form( doctypeid);
 				if (!st) throw std::runtime_error( std::string("form not defined for document type '") + doctypeid + "'");
-				DDLForm form( ddl::StructTypeR( new ddl::StructType( *st)));
+				ddl::FormR form( new ddl::Form( *st));
 
-				serialize::DDLStructParser* closure;
+				DDLFormParser* closure;
 				serialize::Context::Flags flags = serialize::Context::ValidateAttributes;
 				TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
-				LuaObject<serialize::DDLStructParser>::push_luastack( ls, serialize::DDLStructParser( form.structure()));
-				closure = LuaObject<serialize::DDLStructParser>::get( ls, -1);
+				LuaObject<DDLFormParser>::push_luastack( ls, DDLFormParser( form));
+				closure = LuaObject<DDLFormParser>::get( ls, -1);
 				closure->init( inp, flags);
 				lua_pushlightuserdata( ls, closure);
 				if (outputIsTable)
 				{
-					return &function_input_table_DDLStructParser;
+					return &function_input_table_DDLFormParser;
 				}
 				else
 				{
-					return &function_input_form_DDLStructParser;
+					return &function_input_form_DDLFormParser;
 				}
 			}
 			else if (outputIsTable)
@@ -1602,7 +1626,7 @@ static const luaL_Reg struct_methodtable[ 4] =
 	{0,0}
 };
 
-static const luaL_Reg ddlform_methodtable[ 6] =
+static const luaL_Reg form_methodtable[ 6] =
 {
 	{"doctype",&function_form_doctype},
 	{"table",&function_form_table},
@@ -1834,9 +1858,9 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 		LuaExceptionHandlerScope luaThrows(ls);
 		{
 			LuaObject<RedirectFilterClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<DDLForm>::createMetatable( ls, 0, 0, ddlform_methodtable);
-			LuaObject<serialize::DDLStructParser>::createMetatable( ls, 0, 0, 0);
-			LuaObject<serialize::DDLStructSerializer>::createMetatable( ls, 0, 0, 0);
+			LuaObject<ddl::FormR>::createMetatable( ls, 0, 0, form_methodtable);
+			LuaObject<DDLFormParser>::createMetatable( ls, 0, 0, 0);
+			LuaObject<DDLFormSerializer>::createMetatable( ls, 0, 0, 0);
 			LuaObject<serialize::StructSerializer>::createMetatable( ls, 0, 0, struct_methodtable);
 			LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<TypedInputFilterR>::createMetatable( ls, 0, 0, typedinputfilter_methodtable);

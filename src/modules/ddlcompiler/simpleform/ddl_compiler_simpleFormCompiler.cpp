@@ -332,9 +332,9 @@ static std::string getDoctype( boost::property_tree::ptree& pt)
 	return rt;
 }
 
-StructType SimpleFormCompiler::compile( const std::string& srcstring, const TypeMap* typemap) const
+Form SimpleFormCompiler::compile( const std::string& srcstring, const TypeMap* typemap) const
 {
-	StructType rt;
+	Form rt;
 	std::istringstream src( srcstring);
 	boost::property_tree::ptree pt;
 	boost::property_tree::info_parser::read_info( src, pt);

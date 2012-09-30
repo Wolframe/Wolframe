@@ -450,8 +450,8 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const std::string& ddl
 			return false;
 		}
 		DDLTypeMap typemap( this);
-		std::pair< std::string, ddl::StructTypeR> def;
-		def.second.reset( new ddl::StructType());
+		std::pair< std::string, ddl::FormR> def;
+		def.second.reset( new ddl::Form());
 		try
 		{
 			*def.second = itr->second->compile( utils::readSourceFileContent( dataDefinitionFilename), &typemap);
@@ -483,10 +483,10 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const std::string& ddl
 	}
 }
 
-const ddl::StructType* ProcessorProvider::ProcessorProvider_Impl::form( const std::string& name ) const
+const ddl::Form* ProcessorProvider::ProcessorProvider_Impl::form( const std::string& name ) const
 {
 	std::string key = boost::algorithm::to_upper_copy( name);
-	std::map <std::string, ddl::StructTypeR>::const_iterator itr = m_formMap.find( key);
+	std::map <std::string, ddl::FormR>::const_iterator itr = m_formMap.find( key);
 	if ( itr == m_formMap.end() )
 		return NULL;
 	else

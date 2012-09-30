@@ -33,6 +33,9 @@
 ///\file modules/normalize/number/numberNormalize.cpp
 ///\brief Implementation of normalization functions for simple ASCII numbers
 #include "numberNormalize.hpp"
+#include "trimNormalizeFunction.hpp"
+#include "integerNormalizeFunction.hpp"
+#include "floatNormalizeFunction.hpp"
 #include "utils/miscUtils.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -40,126 +43,7 @@
 #include <limits>
 
 using namespace _Wolframe;
-using namespace langbind;
-
-namespace
-{
-
-class TrimNormalizeFunction :public NormalizeFunction
-{
-public:
-	TrimNormalizeFunction(){}
-	virtual std::string execute( const std::string& str) const
-	{
-		std::string::const_iterator ii = str.begin(), ee = str.end();
-		while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
-		std::string::const_iterator ti = ii, te = ii;
-		for (; ii != ee; ++ii)
-		{
-			if ((unsigned char)*ii > 32) te = ii+1;
-		}
-		if (ti == str.begin() && te == str.end())
-		{
-			return str;
-		}
-		else
-		{
-			return std::string( ti, te);
-		}
-	}
-};
-
-class IntegerNormalizeFunction :public NormalizeFunction
-{
-public:
-	IntegerNormalizeFunction( bool sign_, std::size_t size_, bool trim_)
-		:m_size(size_)
-		,m_sign(sign_)
-		,m_trim(trim_){}
-
-	virtual std::string execute( const std::string& str) const
-	{
-		if (!m_size) return str;
-		std::string::const_iterator ii = str.begin(), ee = str.end();
-		std::size_t cnt = m_size;
-		if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
-		std::string::const_iterator ti = ii;
-		if (m_sign)
-		{
-			if (ii != ee && *ii == '-') ++ii;
-		}
-		for (; cnt && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cnt);
-		std::string::const_iterator te = ii;
-		if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
-		if (ii != ee)
-		{
-			if (cnt) std::runtime_error( "number out of range");
-			std::runtime_error( std::string("illegal token '") + *ii + "' in number");
-		}
-		if (m_trim && (ti != str.begin() || te != str.end()))
-		{
-			return std::string( ti, te);
-		}
-		else
-		{
-			return str;
-		}
-	}
-private:
-	std::size_t m_size;
-	bool m_sign;
-	bool m_trim;
-};
-
-class FloatNormalizeFunction :public NormalizeFunction
-{
-public:
-	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_, bool trim_)
-		:m_sizeG(sizeG_)
-		,m_sizeF(sizeF_)
-		,m_trim(trim_){}
-
-	virtual std::string execute( const std::string& str) const
-	{
-		std::string::const_iterator ii = str.begin(), ee = str.end();
-		std::size_t cntG = m_sizeG?m_sizeG:std::numeric_limits<std::size_t>::max();
-		std::size_t cntF = m_sizeF?m_sizeF:std::numeric_limits<std::size_t>::max();
-
-		if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
-		std::string::const_iterator ti = ii;
-		if (ii != ee && *ii == '-') ++ii;
-		for (; cntG && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cntG);
-		if (ii != ee)
-		{
-			if (*ii == '.')
-			{
-				++ii;
-				for (; cntF && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cntF);
-			}
-		}
-		std::string::const_iterator te = ii;
-		if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
-		if (ii != ee)
-		{
-			if (*ii >= '0' && *ii <= '9') std::runtime_error( "number out of range");
-			std::runtime_error( std::string("illegal token '") + *ii + "' in number");
-		}
-		if (m_trim && (ti != str.begin() || te != str.end()))
-		{
-			return std::string( ti, te);
-		}
-		else
-		{
-			return str;
-		}
-	}
-private:
-	std::size_t m_sizeG;
-	std::size_t m_sizeF;
-	bool m_trim;
-};
-
-} //anonymous namespace
+using namespace _Wolframe::langbind;
 
 static utils::CharTable opTab( "(,)");
 static utils::CharTable numTab( "0123456789");

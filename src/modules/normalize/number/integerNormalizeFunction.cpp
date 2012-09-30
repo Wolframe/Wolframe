@@ -30,27 +30,38 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for normalize functions
-///\file langbind/normalizeFunction.hpp
-#ifndef _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "filter/typedfilter.hpp"
-#include "ddl/atomicType.hpp"
-#include "types/countedReference.hpp"
+///\file modules/normalize/number/integerNormalizeFunction.cpp
+#include "integerNormalizeFunction.hpp"
 
-namespace _Wolframe {
-namespace langbind {
+using namespace _Wolframe;
+using namespace langbind;
 
-struct NormalizeFunction :public ddl::NormalizeFunction {};
-
-typedef types::CountedReference<NormalizeFunction> NormalizeFunctionR;
-class ResourceHandle;
-
-///\param[in,out] rshnd normalization resources handle
-///\param[in] description transaction description source
-typedef NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& description);
-
-}}
-#endif
-
+std::string IntegerNormalizeFunction::execute( const std::string& str) const
+{
+	if (!m_size) return str;
+	std::string::const_iterator ii = str.begin(), ee = str.end();
+	std::size_t cnt = m_size;
+	if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
+	std::string::const_iterator ti = ii;
+	if (m_sign)
+	{
+		if (ii != ee && *ii == '-') ++ii;
+	}
+	for (; cnt && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cnt);
+	std::string::const_iterator te = ii;
+	if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
+	if (ii != ee)
+	{
+		if (cnt) std::runtime_error( "number out of range");
+		std::runtime_error( std::string("illegal token '") + *ii + "' in number");
+	}
+	if (m_trim && (ti != str.begin() || te != str.end()))
+	{
+		return std::string( ti, te);
+	}
+	else
+	{
+		return str;
+	}
+}
 
