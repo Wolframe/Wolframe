@@ -25,10 +25,10 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
-	prnt_pdfPrinter.o \
-	prnt_pdfPrinterExpression.o \
-	prnt_pdfPrinterMethod.o \
-	prnt_pdfPrinterVariable.o
+	pdfPrinter.o \
+	pdfPrinterExpression.o \
+	pdfPrinterMethod.o \
+	pdfPrinterVariable.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

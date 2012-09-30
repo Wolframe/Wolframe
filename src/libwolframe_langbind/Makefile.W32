@@ -23,15 +23,15 @@ LIBRARIES = \
 
 CPP_OBJS = \
 	protocol_ioblocks.obj \
-	langbind_appObjects.obj \
-	langbind_appConfig_struct.obj \
-	langbind_appConfig_option.obj \
-	langbind_scriptConfig_struct.obj \
-	langbind_scriptConfig_option.obj \
-	filter_tostringfilter.obj \
-	filter_ptreefilter.obj \
-	filter_typingfilter.obj \
-	filter_null_filter.obj
+	appObjects.obj \
+	appConfig_struct.obj \
+	appConfig_option.obj \
+	scriptConfig_struct.obj \
+	scriptConfig_option.obj \
+	tostringfilter.obj \
+	ptreefilter.obj \
+	typingfilter.obj \
+	null_filter.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

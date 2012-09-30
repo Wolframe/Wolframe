@@ -33,15 +33,15 @@ CPP_OBJS = \
 	ddl_structType.o \
 	ddl_structTypeBuild.o \
 	ddl_compilerInterface.o \
-	serialize_ddl_filtermapParse.o \
-	serialize_ddl_filtermapSerialize.o \
-	serialize_mapContext.o \
-	serialize_struct_filtermapBase.o \
-	serialize_struct_filtermapParse.o \
-	serialize_struct_filtermapParseStack.o \
-	serialize_struct_filtermapSerialize.o \
-	serialize_struct_filtermapSerializeStack.o \
-	serialize_structOptionParser.o
+	ddl_filtermapParse.o \
+	ddl_filtermapSerialize.o \
+	mapContext.o \
+	struct_filtermapBase.o \
+	struct_filtermapParse.o \
+	struct_filtermapParseStack.o \
+	struct_filtermapSerialize.o \
+	struct_filtermapSerializeStack.o \
+	structOptionParser.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -26,15 +26,15 @@ CPP_OBJS = \
 	ddl_structType.obj \
 	ddl_structTypeBuild.obj \
 	ddl_compilerInterface.obj \
-	serialize_ddl_filtermapParse.obj \
-	serialize_ddl_filtermapSerialize.obj \
-	serialize_mapContext.obj \
-	serialize_struct_filtermapBase.obj \
-	serialize_struct_filtermapParse.obj \
-	serialize_struct_filtermapParseStack.obj \
-	serialize_struct_filtermapSerialize.obj \
-	serialize_struct_filtermapSerializeStack.obj \
-	serialize_structOptionParser.obj
+	ddl_filtermapParse.obj \
+	ddl_filtermapSerialize.obj \
+	mapContext.obj \
+	struct_filtermapBase.obj \
+	struct_filtermapParse.obj \
+	struct_filtermapParseStack.obj \
+	struct_filtermapSerialize.obj \
+	struct_filtermapSerializeStack.obj \
+	structOptionParser.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

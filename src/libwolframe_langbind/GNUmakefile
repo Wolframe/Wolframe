@@ -31,15 +31,15 @@ DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
 	protocol_ioblocks.o \
-	langbind_appObjects.o \
-	langbind_appConfig_struct.o \
-	langbind_appConfig_option.o \
-	langbind_scriptConfig_struct.o \
-	langbind_scriptConfig_option.o \
-	filter_null_filter.o \
-	filter_typingfilter.o \
-	filter_tostringfilter.o \
-	filter_ptreefilter.o
+	appObjects.o \
+	appConfig_struct.o \
+	appConfig_option.o \
+	scriptConfig_struct.o \
+	scriptConfig_option.o \
+	null_filter.o \
+	typingfilter.o \
+	tostringfilter.o \
+	ptreefilter.o
 
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

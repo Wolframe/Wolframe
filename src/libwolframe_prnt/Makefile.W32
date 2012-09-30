@@ -22,10 +22,10 @@ LIBRARIES = \
 	wolframe_prnt.lib
 
 CPP_OBJS = \
-	prnt_pdfPrinter.obj \
-	prnt_pdfPrinterExpression.obj \
-	prnt_pdfPrinterMethod.obj \
-	prnt_pdfPrinterVariable.obj
+	pdfPrinter.obj \
+	pdfPrinterExpression.obj \
+	pdfPrinterMethod.obj \
+	pdfPrinterVariable.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 
