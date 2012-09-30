@@ -37,6 +37,9 @@
        <property name="text">
         <string>First Name:</string>
        </property>
+       <property name="buddy">
+        <cstring>first</cstring>
+       </property>
       </widget>
      </item>
      <item row="0" column="1">
@@ -51,6 +54,9 @@
        <property name="text">
         <string>Last Name:</string>
        </property>
+       <property name="buddy">
+        <cstring>last</cstring>
+       </property>
       </widget>
      </item>
      <item row="1" column="1">
@@ -64,6 +70,9 @@
       <widget class="QLabel" name="label_birthDate">
        <property name="text">
         <string>Date Of Birth:</string>
+       </property>
+       <property name="buddy">
+        <cstring>birthDate</cstring>
        </property>
       </widget>
      </item>
@@ -85,6 +94,9 @@
       <widget class="QLabel" name="label_temperature">
        <property name="text">
         <string>Temperature:</string>
+       </property>
+       <property name="buddy">
+        <cstring>temperature</cstring>
        </property>
       </widget>
      </item>
@@ -109,6 +121,9 @@
        <property name="text">
         <string>Age:</string>
        </property>
+       <property name="buddy">
+        <cstring>age</cstring>
+       </property>
       </widget>
      </item>
      <item row="5" column="1">
@@ -132,6 +147,9 @@
        <property name="text">
         <string>Gender:</string>
        </property>
+       <property name="buddy">
+        <cstring>gender</cstring>
+       </property>
       </widget>
      </item>
      <item row="6" column="1">
@@ -153,6 +171,9 @@
        <property name="text">
         <string>Working:</string>
        </property>
+       <property name="buddy">
+        <cstring>working</cstring>
+       </property>
       </widget>
      </item>
      <item row="7" column="1">
@@ -162,6 +183,9 @@
       <widget class="QLabel" name="label_wakeupTime">
        <property name="text">
         <string>Wakeup Time:</string>
+       </property>
+       <property name="buddy">
+        <cstring>wakeupTime</cstring>
        </property>
       </widget>
      </item>
@@ -173,6 +197,9 @@
        <property name="text">
         <string>Another time:</string>
        </property>
+       <property name="buddy">
+        <cstring>anotherTime</cstring>
+       </property>
       </widget>
      </item>
      <item row="9" column="1">
@@ -182,6 +209,9 @@
       <widget class="QLabel" name="label_nofChildren">
        <property name="text">
         <string>Number of children:</string>
+       </property>
+       <property name="buddy">
+        <cstring>nofChildren</cstring>
        </property>
       </widget>
      </item>

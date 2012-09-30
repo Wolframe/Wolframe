@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttons">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>250</y>
+     <width>156</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="favouriteVegetable">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>161</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Favorite Vegetable:</string>
+   </property>
+   <widget class="QRadioButton" name="pumpkin">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>100</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pumpkin</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="cucumber">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>100</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Cucumber</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="carot">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>100</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Carot</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>10</y>
+     <width>181</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Vegetables:</string>
+   </property>
+   <widget class="QCheckBox" name="checkBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>85</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pumpkin</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>85</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Cucumber</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBox_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>85</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Carot</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>pumpkin</tabstop>
+  <tabstop>cucumber</tabstop>
+  <tabstop>carot</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>checkBox_3</tabstop>
+  <tabstop>buttons</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

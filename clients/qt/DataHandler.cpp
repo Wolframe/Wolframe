@@ -19,6 +19,8 @@
 #include <QCheckBox>
 #include <QSlider>
 #include <QPlainTextEdit>
+#include <QRadioButton>
+#include <QGroupBox>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -31,6 +33,8 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	
 	xml.writeStartDocument( );
 	xml.writeStartElement( form_name );
+
+	QString groupName;
 
 	QList<QWidget *> widgets = form->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
@@ -87,7 +91,15 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
 			QString html = textEdit->toHtml( );
 			xml.writeTextElement( "", name, html );
+		} else if( clazz == "QGroupBox" ) {
+			groupName = name;
+		} else if( clazz == "QRadioButton" ) {
+			QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
+			if( !groupName.isNull( ) && radioButton->isChecked( ) ) {
+				xml.writeTextElement( "", groupName, name );
+			}
 		}
+		
 		qDebug( ) << clazz << name;
 	}
 	
@@ -157,6 +169,18 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 						} else if( clazz == "QTextEdit" ) {
 							QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
 							textEdit->setHtml( text );
+						} else if( clazz == "QGroupBox" ) {
+							QList<QWidget *> children = widget->findChildren<QWidget *>( );
+							foreach( QWidget *child, children ) {
+								QString subClazz = child->metaObject( )->className( ); 
+								QString subName = child->objectName( );
+								if( subClazz == "QRadioButton" ) {
+									QRadioButton *radioButton = qobject_cast<QRadioButton *>( child );
+									QString subText = radioButton->text( );
+									qDebug( ) << text << subText << name << subName;
+									radioButton->setChecked( text.compare( subName ) == 0 );
+								}
+							}								
 						}
 					}
 				}
