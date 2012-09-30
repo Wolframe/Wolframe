@@ -35,7 +35,7 @@
 //
 
 #include "logger-v1.hpp"
-#include "PostgreSQL.hpp" 
+#include "PostgreSQL.hpp"
 
 #include <string>
 #include <sstream>
@@ -193,7 +193,7 @@ PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
 				    size_t connections, unsigned short acquireTimeout,
 				    unsigned statementTimeout )
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
-	  m_statementTimeout( statementTimeout ), m_db( this)
+	  m_statementTimeout( statementTimeout )
 {
 	m_connStr = buildConnStr( host, port,  dbName, user, password,
 				  sslMode, sslCert, sslKey, sslRootCert, sslCRL,
@@ -248,6 +248,9 @@ PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
 			m_noConnections++;
 		}
 	}
+
+	m_db.setUnit( this );
+
 	MOD_LOG_DEBUG << "PostgreSQL database '" << m_ID << "' created with a pool of " << m_noConnections << " connections";
 }
 
@@ -256,6 +259,8 @@ PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
 PostgreSQLdbUnit::~PostgreSQLdbUnit()
 {
 	size_t connections = 0;
+
+	m_db.setUnit( NULL );
 	m_connPool.timeout( 3 );
 
 	while ( m_connPool.available() )	{
@@ -304,12 +309,15 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 
 Database* PostgreSQLdbUnit::database()
 {
-	return &m_db;
+	return m_db.hasUnit() ? &m_db : NULL;
 }
 
 const std::string& PostgreSQLdatabase::ID() const
 {
-	return m_unit->ID();
+	if ( m_unit )
+		return m_unit->ID();
+	else
+		throw std::runtime_error( "SQL database unit not initialized" );
 }
 
 }} // _Wolframe::db

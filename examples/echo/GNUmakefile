@@ -35,7 +35,6 @@ endif
 CPP_OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
-	$(TOPDIR)/src/loadModules-dummy.o \
 	echoConfig.o \
 	echoHandler.o \
 	$(TOPDIR)/src/posixMain.o
@@ -43,7 +42,7 @@ CPP_OBJS = \
 CPP_BINS = \
 	echod$(EXE)
 
-echod$(EXE): $(TOPDIR)/src/loadModules-dummy.o $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+echod$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -18,6 +18,7 @@
 #include <QDoubleSpinBox>
 #include <QCheckBox>
 #include <QSlider>
+#include <QPlainTextEdit>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -78,6 +79,14 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			QSlider *slider = qobject_cast<QSlider *>( widget );
 			QString text = QString::number( slider->value( ) );
 			xml.writeTextElement( "", name, text );
+		} else if( clazz == "QPlainTextEdit" ) {
+			QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget );
+			QString text = plainTextEdit->toPlainText( );
+			xml.writeTextElement( "", name, text );
+		} else if( clazz == "QTextEdit" ) {
+			QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
+			QString html = textEdit->toHtml( );
+			xml.writeTextElement( "", name, html );
 		}
 		qDebug( ) << clazz << name;
 	}
@@ -142,6 +151,12 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 						} else if( clazz == "QSlider" ) {
 							QSlider *slider = qobject_cast<QSlider *>( widget );
 							slider->setValue( text.toInt( ) );
+						} else if( clazz == "QPlainTextEdit" ) {
+							QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget );
+							plainTextEdit->setPlainText( text );
+						} else if( clazz == "QTextEdit" ) {
+							QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
+							textEdit->setHtml( text );
 						}
 					}
 				}

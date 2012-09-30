@@ -42,7 +42,6 @@ INCLUDE_LIBS = \
 OBJS = \
 	appProperties.obj \
 	appConfigDefinition.obj \
-	$(TOPDIR)\src\loadModules-dummy.obj \
 	luaConfig.obj \
 	luaHandler.obj \
 	$(TOPDIR)\src\winMain.obj
