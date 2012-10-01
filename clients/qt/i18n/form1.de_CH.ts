@@ -6,7 +6,7 @@
     <message>
         <location filename="../forms/form1.ui" line="21"/>
         <source>Wolframe client form 1</source>
-        <translation type="unfinished">Wolframe Client Form 1</translation>
+        <translation type="unfinished">Wolframe Client Formular 1</translation>
     </message>
     <message>
         <location filename="../forms/form1.ui" line="38"/>
@@ -14,57 +14,57 @@
         <translation type="unfinished">Vorname:</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="52"/>
+        <location filename="../forms/form1.ui" line="55"/>
         <source>Last Name:</source>
         <translation type="unfinished">Nachname:</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="66"/>
+        <location filename="../forms/form1.ui" line="72"/>
         <source>Date Of Birth:</source>
         <translation type="unfinished">Geburtsdatum:</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="87"/>
+        <location filename="../forms/form1.ui" line="96"/>
         <source>Temperature:</source>
         <translation type="unfinished">Temperatur:</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="110"/>
+        <location filename="../forms/form1.ui" line="122"/>
         <source>Age:</source>
         <translation type="unfinished">Alter:</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="133"/>
+        <location filename="../forms/form1.ui" line="148"/>
         <source>Gender:</source>
         <translation type="unfinished">Geschlecht:</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="141"/>
+        <location filename="../forms/form1.ui" line="159"/>
         <source>Male</source>
         <translation type="unfinished">Männlich</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="146"/>
+        <location filename="../forms/form1.ui" line="164"/>
         <source>Female</source>
         <translation type="unfinished">Weiblich</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="154"/>
+        <location filename="../forms/form1.ui" line="172"/>
         <source>Working:</source>
         <translation type="unfinished">Arbeitend:</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="164"/>
+        <location filename="../forms/form1.ui" line="185"/>
         <source>Wakeup Time:</source>
         <translation type="unfinished">Weckzeit:</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="174"/>
+        <location filename="../forms/form1.ui" line="198"/>
         <source>Another time:</source>
         <translation type="unfinished">Irgendeine andere Zeit:</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="184"/>
+        <location filename="../forms/form1.ui" line="211"/>
         <source>Number of children:</source>
         <translation type="unfinished">Anzahl Kinder:</translation>
     </message>
