@@ -18,7 +18,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Calculator Builder</string>
+   <string>Wolframe client form 2</string>
   </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
