@@ -76,6 +76,8 @@ public:
 	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
 
 	db::Database* transactionDatabase() const	{ return m_db; }
+	db::DatabaseTransaction* transaction( const std::string& name ) const
+							{ return m_db->transaction( name ); }
 
 private:
 	class DDLTypeMap;

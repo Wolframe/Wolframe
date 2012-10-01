@@ -31,66 +31,23 @@
 
 ************************************************************************/
 //
-// database.hpp - Wolframe base database class
+//
 //
 
-#ifndef _DATABASE_HPP_INCLUDED
-#define _DATABASE_HPP_INCLUDED
+#ifndef _TRANSACTION_HPP_INCLUDED
+#define _TRANSACTION_HPP_INCLUDED
 
 #include <string>
-
-#include "transaction.hpp"
 
 namespace _Wolframe {
 namespace db {
 
-// Forward declaration
-class PreparedStatementHandler;
-
-/// Base class for database interface
-/// All databases should provide this interface
-class Database
-{
+class DatabaseTransaction	{
 public:
-	virtual ~Database()			{}
-
-	/// Database identification.
-	/// All databases must have an identifier as they are referenced using this identifier.
-	/// The identifier must be unique (of course).
-	virtual const std::string& ID() const = 0;
-
-	///\brief Get the interface for processing prepared statements in the database
-	virtual PreparedStatementHandler* getPreparedStatementHandler() = 0;
-
-	///\ Just and interface at the moment
-	virtual DatabaseTransaction* transaction( const std::string& /*name*/ )
-						{ return NULL; }
-
-	/// Close the database connetion
-	/// This exists for no good reason (mostly to make the code look uniform)
-	virtual void close()			{}
-};
-
-
-/// Database Unit
-/// This is the base class for database unit implementations
-class DatabaseUnit
-{
-public:
-	virtual ~DatabaseUnit()			{}
-
-	/// Database class (module type).
-	/// All database implementations need a class name.
-	/// Class names must be unique.
-	virtual const char* className() const = 0;
-
-	/// Database identifier.
-	virtual const std::string& ID() const = 0;
-
-	/// The actual database object
-	virtual Database* database() = 0;
+	DatabaseTransaction( const std::string& /*name*/ )	{}
+	~DatabaseTransaction()					{}
 };
 
 }} // namespace _Wolframe::db
 
-#endif // _DATABASE_HPP_INCLUDED
+#endif // _TRANSACTION_HPP_INCLUDED

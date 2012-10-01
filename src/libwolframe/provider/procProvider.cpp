@@ -248,15 +248,15 @@ void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
 	}
 	for (std::vector<langbind::PrintLayoutConfigStruct>::const_iterator ii=m_environment.printlayout.begin(), ee=m_environment.printlayout.end(); ii != ee; ++ii)
 	{
-		os << indstr << "printlayout " << ii->name << " (" << ii->type << ") " << ii->file;		
+		os << indstr << "printlayout " << ii->name << " (" << ii->type << ") " << ii->file;
 	}
 	for (std::vector<langbind::TransactionFunctionConfigStruct>::const_iterator ii=m_environment.transaction.begin(), ee=m_environment.transaction.end(); ii != ee; ++ii)
 	{
-		os << indstr << "transaction " << ii->name << " (" << ii->type << ") " << ii->call;		
+		os << indstr << "transaction " << ii->name << " (" << ii->type << ") " << ii->call;
 	}
 	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=m_environment.normalize.begin(), ee=m_environment.normalize.end(); ii != ee; ++ii)
 	{
-		os << indstr << "normalize " << ii->name << " (" << ii->type << ") " << ii->call;		
+		os << indstr << "normalize " << ii->name << " (" << ii->type << ") " << ii->call;
 	}
 }
 
@@ -369,6 +369,11 @@ const langbind::TransactionFunction* ProcessorProvider::transactionFunction( con
 db::Database* ProcessorProvider::transactionDatabase() const
 {
 	return m_impl->transactionDatabase();
+}
+
+db::DatabaseTransaction* ProcessorProvider::transaction( const std::string& name ) const
+{
+	return m_impl->transaction( name );
 }
 
 }} // namespace _Wolframe::proc
