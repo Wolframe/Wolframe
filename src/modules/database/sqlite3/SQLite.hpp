@@ -89,8 +89,8 @@ public:
 
 	void close();
 private:
-	const SQLiteDatabase&	m_db;			///< parent database
-	const SQLiteDBunit&	m_unit;			///< parent database unit
+	SQLiteDatabase&	m_db;				///< parent database
+	SQLiteDBunit&	m_unit;				///< parent database unit
 };
 
 
@@ -112,7 +112,7 @@ public:
 
 	void closeTransaction( const Transaction* t ) const;
 private:
-	const SQLiteDBunit*	m_unit;			///< parent database unit
+	SQLiteDBunit*	m_unit;				///< parent database unit
 };
 
 
@@ -127,7 +127,6 @@ public:
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 	Database* database();
-
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;

@@ -110,6 +110,8 @@ private:
 	unsigned			m_timeout;	///< acquire timeout
 };
 
+
+///\ Simple template to use ObjectPool objects.
 template < typename objectType >
 class PoolObject
 {

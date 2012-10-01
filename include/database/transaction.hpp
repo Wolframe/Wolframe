@@ -50,6 +50,8 @@ public:
 
 	virtual void execute() = 0;
 
+	virtual void doBlaBla() = 0;
+
 	virtual void close() = 0;
 };
 

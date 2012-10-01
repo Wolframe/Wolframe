@@ -117,9 +117,9 @@ const std::string& SQLiteTransaction::databaseID() const
 void SQLiteTransaction::execute()
 {
 	try	{
-//		_Wolframe::PoolObject< sqlite3* > conn( m_unit.m_connPool );
-//		int err = sqlite3_errcode( *conn );
-//		MOD_LOG_DEBUG << "SQLite error code: " << err;
+		_Wolframe::PoolObject< sqlite3* > conn( m_unit.m_connPool );
+		int err = sqlite3_errcode( *conn );
+		MOD_LOG_DEBUG << "SQLite error code: " << err;
 	}
 	catch ( _Wolframe::ObjectPoolTimeout )
 	{

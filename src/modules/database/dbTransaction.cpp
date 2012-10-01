@@ -39,4 +39,8 @@
 namespace _Wolframe {
 namespace db {
 
+void BaseTransaction::doBlaBla()
+{
+}
+
 }} // _Wolframe::db
