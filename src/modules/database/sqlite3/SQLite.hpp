@@ -77,7 +77,7 @@ private:
 class SQLiteDBunit;
 class SQLiteDatabase;
 
-class SQLiteTransaction : public Transaction
+class SQLiteTransaction : public BaseTransaction, virtual Transaction
 {
 public:
 	SQLiteTransaction( SQLiteDatabase& database );

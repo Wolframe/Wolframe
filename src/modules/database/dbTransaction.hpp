@@ -37,8 +37,16 @@
 #ifndef _DATABASE_TRANSACTION_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_HPP_INCLUDED
 
+#include "database/transaction.hpp"
+
 namespace _Wolframe {
 namespace db {
+
+
+class BaseTransaction : public virtual Transaction
+{
+
+};
 
 }} // _Wolframe::db
 
