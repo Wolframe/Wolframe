@@ -46,7 +46,7 @@ namespace db {
 class BaseTransaction : public virtual Transaction
 {
 public:
-	void doBlaBla() = 0;
+	void doBlaBla();
 };
 
 }} // _Wolframe::db

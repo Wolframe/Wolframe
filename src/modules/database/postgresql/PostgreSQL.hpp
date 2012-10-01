@@ -86,6 +86,7 @@ private:
 	unsigned short	connections;		///< number of database connection (pool size)
 	unsigned short	acquireTimeout;		///< timeout when acquiring a connection from the pool
 	unsigned	statementTimeout;	///< default timeout when executin a statement
+	std::string	programFile;		///< main program file
 };
 
 
@@ -121,7 +122,8 @@ public:
 			  std::string sslRootCert, std::string sslCRL,
 			  unsigned short connectTimeout,
 			  size_t connections, unsigned short acquireTimeout,
-			  unsigned statementTimeout );
+			  unsigned statementTimeout,
+			  const std::string& programFile );
 	~PostgreSQLdbUnit();
 
 	const std::string& ID() const		{ return m_ID; }
@@ -133,6 +135,7 @@ private:
 	size_t			m_noConnections;///< number of connections
 	ObjectPool< PGconn* >	m_connPool;	///< pool of connections
 	unsigned		m_statementTimeout;///< default statement execution timeout
+	const std::string	m_programFile;
 
 	PostgreSQLdatabase	m_db;		///< real database object
 };

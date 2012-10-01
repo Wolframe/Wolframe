@@ -71,6 +71,7 @@ private:
 	std::string	m_ID;
 	std::string	filename;
 	bool		flag;
+	std::string	programFile;
 };
 
 

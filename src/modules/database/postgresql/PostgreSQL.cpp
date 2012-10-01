@@ -91,6 +91,8 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 		os << indStr << "   Default statement execution timeout: 0 (wait indefinitely)" << std::endl;
 	else
 		os << indStr << "   Default statement execution timeout: " << statementTimeout << "ms" << std::endl;
+
+	os << indStr << "   Main program file: " << (programFile.empty() ? "none" : programFile) << std::endl;
 }
 
 bool PostgreSQLconfig::check() const
@@ -191,9 +193,10 @@ PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
 				    std::string sslRootCert, std::string sslCRL ,
 				    unsigned short connectTimeout,
 				    size_t connections, unsigned short acquireTimeout,
-				    unsigned statementTimeout )
+				    unsigned statementTimeout,
+				    const std::string &programFile )
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
-	  m_statementTimeout( statementTimeout )
+	  m_statementTimeout( statementTimeout ), m_programFile( programFile )
 {
 	m_connStr = buildConnStr( host, port,  dbName, user, password,
 				  sslMode, sslCert, sslKey, sslRootCert, sslCRL,

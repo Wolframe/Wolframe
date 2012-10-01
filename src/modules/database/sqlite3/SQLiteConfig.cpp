@@ -71,16 +71,26 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 			else	{
 				if ( ! boost::filesystem::path( filename ).is_absolute() )
 					MOD_LOG_WARNING << logPrefix() << "database file path is not absolute: "
-						    << filename;
+							<< filename;
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, flag, Parser::BoolDomain() ))
 				retVal = false;
 		}
+		else if ( boost::algorithm::iequals( L1it->first, "programFile" ))	{
+			bool isDefined = ( !programFile.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile, &isDefined ))
+				retVal = false;
+			else	{
+				if ( ! boost::filesystem::path( programFile ).is_absolute() )
+					MOD_LOG_WARNING << logPrefix() << "program file path is not absolute: "
+							<< programFile;
+			}
+		}
 		else	{
 			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
-				    << L1it->first << "'";
+					<< L1it->first << "'";
 		}
 	}
 	return retVal;
@@ -101,6 +111,7 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 		os << indStr << "   ID: " << m_ID << std::endl;
 	os << indStr << "   Filename: " << filename << std::endl;
 	os << indStr << "   Flags: " << (flag ? "True Flag" : "False Flag") << std::endl;
+	os << indStr << "   Main program file: " << (programFile.empty() ? "none" : programFile) << std::endl;
 }
 
 bool SQLiteConfig::check() const
@@ -122,6 +133,13 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 							  path( refPath ).branch_path()).string());
 		else
 			filename = resolvePath( filename );
+	}
+	if ( ! programFile.empty() )	{
+		if ( ! path( programFile ).is_absolute() )
+			programFile = resolvePath( absolute( programFile,
+							     path( refPath ).branch_path()).string());
+		else
+			programFile = resolvePath( programFile );
 	}
 }
 

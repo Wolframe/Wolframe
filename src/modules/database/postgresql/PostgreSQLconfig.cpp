@@ -169,6 +169,16 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, statementTimeout, &sTdefined ))
 				retVal = false;
 		}
+		else if ( boost::algorithm::iequals( L1it->first, "programFile" ))	{
+			bool isDefined = ( !programFile.empty());
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile, &isDefined ))
+				retVal = false;
+			else	{
+				if ( ! boost::filesystem::path( programFile ).is_absolute() )
+					MOD_LOG_WARNING << logPrefix() << "program file path is not absolute: "
+							<< programFile;
+			}
+		}
 		else	{
 			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
 					<< L1it->first << "'";
@@ -230,6 +240,13 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 							path( refPath ).branch_path()).string());
 		else
 			sslCRL = resolvePath( sslCRL );
+	}
+	if ( ! programFile.empty() )	{
+		if ( ! path( programFile ).is_absolute() )
+			programFile = resolvePath( absolute( programFile,
+							     path( refPath ).branch_path()).string());
+		else
+			programFile = resolvePath( programFile );
 	}
 }
 
