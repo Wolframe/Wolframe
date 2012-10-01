@@ -34,23 +34,9 @@
 //
 //
 
-#ifndef _TRANSACTION_HPP_INCLUDED
-#define _TRANSACTION_HPP_INCLUDED
-
-#include <string>
+#include "dbTransaction.hpp"
 
 namespace _Wolframe {
 namespace db {
 
-class Transaction	{
-public:
-	~Transaction()					{}
-
-	virtual const std::string& databaseID() const = 0;
-protected:
-	virtual void execute()					{}
-};
-
-}} // namespace _Wolframe::db
-
-#endif // _TRANSACTION_HPP_INCLUDED
+}} // _Wolframe::db

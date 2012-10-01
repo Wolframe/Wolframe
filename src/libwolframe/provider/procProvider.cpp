@@ -371,7 +371,7 @@ db::Database* ProcessorProvider::transactionDatabase() const
 	return m_impl->transactionDatabase();
 }
 
-db::DatabaseTransaction* ProcessorProvider::transaction( const std::string& name ) const
+db::Transaction* ProcessorProvider::transaction( const std::string& name ) const
 {
 	return m_impl->transaction( name );
 }

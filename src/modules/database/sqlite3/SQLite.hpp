@@ -45,6 +45,8 @@
 #include "objectPool.hpp"
 #include "sqlite3.h"
 
+#include "../dbTransaction.hpp"
+
 namespace _Wolframe {
 namespace db {
 
@@ -73,9 +75,24 @@ private:
 
 
 class SQLiteDBunit;
+class SQLiteDatabase;
+
+class SQLiteTransaction : public Transaction
+{
+public:
+	SQLiteTransaction( SQLiteDatabase& database );
+	 ~SQLiteTransaction()			{}
+
+	const std::string& databaseID() const;
+private:
+	const SQLiteDatabase&	m_db;			///< parent database
+	const SQLiteDBunit&	m_unit;			///< parent database unit
+};
+
 
 class SQLiteDatabase : public Database
 {
+	friend class SQLiteTransaction;
 public:
 	SQLiteDatabase() : m_unit( NULL )	{}
 	 ~SQLiteDatabase()			{}
@@ -86,6 +103,9 @@ public:
 	const std::string& ID() const;
 	PreparedStatementHandler* getPreparedStatementHandler()
 						{ return 0; }	//undefined
+	///\ Just and interface at the moment
+	Transaction* transaction( const std::string& /*name*/ )
+						{ return NULL; }
 private:
 	const SQLiteDBunit*	m_unit;			///< parent database unit
 };

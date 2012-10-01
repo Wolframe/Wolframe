@@ -63,8 +63,7 @@ public:
 	virtual PreparedStatementHandler* getPreparedStatementHandler() = 0;
 
 	///\ Just and interface at the moment
-	virtual DatabaseTransaction* transaction( const std::string& /*name*/ )
-						{ return NULL; }
+	virtual Transaction* transaction( const std::string& name ) = 0;
 
 	/// Close the database connetion
 	/// This exists for no good reason (mostly to make the code look uniform)

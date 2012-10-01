@@ -117,6 +117,9 @@ public:
 		return new PreparedStatementHandler_testtrace( m_id, m_outfilename, m_result, this);
 	}
 
+	/// it's just a dummy as we need to change a lot
+	virtual Transaction* transaction( const std::string& /*name*/ )
+						{ return NULL; }
 private:
 	std::string m_id;
 	std::string m_outfilename;

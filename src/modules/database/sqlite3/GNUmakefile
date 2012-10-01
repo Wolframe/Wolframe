@@ -25,6 +25,7 @@ DYNAMIC_MODULE = mod_db_sqlite3.so
 
 CPP_OBJS = \
 	SQLite.o \
+	../dbTransaction.o \
 	SQLiteConstructor.o \
 	SQLiteConfig.o \
 	SQLite3PreparedStatement.o \

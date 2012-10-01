@@ -78,6 +78,8 @@ SQLiteDBunit::~SQLiteDBunit( )
 	MOD_LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
 }
 
+
+/*****  SQLite database  **********************************************/
 Database* SQLiteDBunit::database()
 {
 	return m_db.hasUnit() ? &m_db : NULL;
@@ -90,6 +92,19 @@ const std::string& SQLiteDatabase::ID() const
 	else
 		throw std::runtime_error( "SQL database unit not initialized" );
 }
+
+
+/*****  SQLite transaction  *******************************************/
+SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database )
+	: m_db( database ), m_unit( *database.m_unit )
+{
+}
+
+const std::string& SQLiteTransaction::databaseID() const
+{
+	return m_unit.ID();
+}
+
 
 }} // _Wolframe::db
 

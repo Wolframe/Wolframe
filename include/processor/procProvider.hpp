@@ -100,7 +100,7 @@ public:
 	db::Database* transactionDatabase() const;
 
 	/// return a database transaction object for the given name
-	db::DatabaseTransaction* transaction( const std::string& name ) const;
+	db::Transaction* transaction( const std::string& name ) const;
 
 private:
 	class ProcessorProvider_Impl;

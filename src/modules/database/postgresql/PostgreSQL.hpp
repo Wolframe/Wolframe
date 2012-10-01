@@ -45,6 +45,7 @@
 #include "constructor.hpp"
 
 #include "objectPool.hpp"
+#include "../dbTransaction.hpp"
 
 namespace _Wolframe {
 namespace db {
@@ -102,6 +103,9 @@ public:
 	const std::string& ID() const;
 	PreparedStatementHandler* getPreparedStatementHandler()
 						{ return 0; }	//undefined
+	///\ Just and interface at the moment
+	virtual Transaction* transaction( const std::string& /*name*/ )
+						{ return NULL; }
 private:
 	const PostgreSQLdbUnit*	m_unit;		///< parent database unit
 };
