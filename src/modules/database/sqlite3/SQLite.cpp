@@ -47,7 +47,7 @@ namespace _Wolframe {
 namespace db {
 
 SQLiteDBunit::SQLiteDBunit( const std::string& id,
-				const std::string& filename, unsigned short connections, bool flag )
+			    const std::string& filename, unsigned short connections, bool flag )
 	: m_ID( id ), m_filename( filename ), m_flag( flag )
 {
 	for( int i = 0; i < connections; i++ ) {
@@ -93,6 +93,15 @@ const std::string& SQLiteDatabase::ID() const
 		throw std::runtime_error( "SQL database unit not initialized" );
 }
 
+Transaction* SQLiteDatabase::transaction( const std::string& /*name*/ )
+{
+	return new SQLiteTransaction( *this );
+}
+
+void SQLiteDatabase::closeTransaction( const Transaction *t ) const
+{
+	delete t;
+}
 
 /*****  SQLite transaction  *******************************************/
 SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database )
@@ -105,6 +114,22 @@ const std::string& SQLiteTransaction::databaseID() const
 	return m_unit.ID();
 }
 
+void SQLiteTransaction::execute()
+{
+	try	{
+//		_Wolframe::PoolObject< sqlite3* > conn( m_unit.m_connPool );
+//		int err = sqlite3_errcode( *conn );
+//		MOD_LOG_DEBUG << "SQLite error code: " << err;
+	}
+	catch ( _Wolframe::ObjectPoolTimeout )
+	{
+	}
+}
+
+void SQLiteTransaction::close()
+{
+	m_db.closeTransaction( this );
+}
 
 }} // _Wolframe::db
 

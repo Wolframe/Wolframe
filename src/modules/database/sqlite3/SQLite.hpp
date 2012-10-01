@@ -84,6 +84,10 @@ public:
 	 ~SQLiteTransaction()			{}
 
 	const std::string& databaseID() const;
+
+	void execute();
+
+	void close();
 private:
 	const SQLiteDatabase&	m_db;			///< parent database
 	const SQLiteDBunit&	m_unit;			///< parent database unit
@@ -103,9 +107,10 @@ public:
 	const std::string& ID() const;
 	PreparedStatementHandler* getPreparedStatementHandler()
 						{ return 0; }	//undefined
-	///\ Just and interface at the moment
-	Transaction* transaction( const std::string& /*name*/ )
-						{ return NULL; }
+	/// more of a placeholder for now
+	Transaction* transaction( const std::string& name );
+
+	void closeTransaction( const Transaction* t ) const;
 private:
 	const SQLiteDBunit*	m_unit;			///< parent database unit
 };
@@ -113,6 +118,7 @@ private:
 
 class SQLiteDBunit : public DatabaseUnit
 {
+	friend class SQLiteTransaction;
 public:
 	SQLiteDBunit( const std::string& id,
 		      const std::string& filename, unsigned short connections, bool flag );

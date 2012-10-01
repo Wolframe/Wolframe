@@ -44,11 +44,13 @@ namespace db {
 
 class Transaction	{
 public:
-	~Transaction()					{}
+	~Transaction()				{}
 
 	virtual const std::string& databaseID() const = 0;
-protected:
-	virtual void execute()					{}
+
+	virtual void execute() = 0;
+
+	virtual void close() = 0;
 };
 
 }} // namespace _Wolframe::db
