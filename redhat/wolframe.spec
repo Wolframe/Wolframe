@@ -113,6 +113,15 @@
 %define with_qt		1
 %endif
 
+# icu for boost-locale is available natively only on a few platforms,
+# enable it there
+%define with_icu	0
+%if %{fedora}
+%if %{fc17}
+%define with_icu	1
+%endif
+%endif
+
 # Boost has sometimes a different layout in the shared libraries, don't
 # know why
 
@@ -232,7 +241,6 @@ BuildRequires: cyrus-sasl-devel >= 2.1.19
 %if %{with_libxml2}
 %if !%{build_libxml2}
 BuildRequires: libxml2-devel >= 2.6
-Requires: libxml2 >= 2.6
 %endif
 %endif
 %if %{with_libxslt}
@@ -320,6 +328,20 @@ Group: Application/Business
 The libraries and header files used for development with Wolframe.
 
 Requires: %{name} >= %{version}-%{release}
+
+%if %{with_libxml2}
+%package libxml2
+Summary: Wolframe XML filtering module using libxml2
+Group: Application/Business
+
+%description libxml2
+The Wolframe XML parsing module using libxml2.
+
+Requires: %{name} >= %{version}-%{release}
+%if !%{build_libxml2}
+Requires: libxml2 >= 2.6
+%endif
+%endif
 
 %if %{with_pgsql}
 %package postgresql
@@ -455,7 +477,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_EXAMPLES=%{with_examples} \
+	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
@@ -478,7 +500,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_EXAMPLES=%{with_examples} \
+	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
@@ -502,7 +524,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_EXAMPLES=%{with_examples} \
+	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
 cd docs; make doc-doxygen
@@ -533,7 +555,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_EXAMPLES=%{with_examples} \
+	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
@@ -610,11 +632,6 @@ fi
 %{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
 %endif
 
-%if %{build_libxml2}
-%{_libdir}/wolframe/libxml2.so.%{libxml2_version}
-%{_libdir}/wolframe/libxml2.so.2
-%endif
-
 %dir %{_libdir}/wolframe
 %{_libdir}/wolframe/libwolframe.so.0.0.0
 %{_libdir}/wolframe/libwolframe.so.0
@@ -648,7 +665,6 @@ fi
 %{_libdir}/wolframe/modules/mod_authz_database.so
 
 %{_libdir}/wolframe/modules/mod_filter_char.so
-%{_libdir}/wolframe/modules/mod_filter_libxml2.so
 %{_libdir}/wolframe/modules/mod_filter_line.so
 %{_libdir}/wolframe/modules/mod_filter_textwolf.so
 %{_libdir}/wolframe/modules/mod_filter_token.so
@@ -656,10 +672,17 @@ fi
 
 %{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
 
+%if %{with_lua}
 %{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
 %{_libdir}/wolframe/modules/mod_lua_datetime.so
-
 %{_libdir}/wolframe/modules/mod_lua_command_handler.so
+%endif
+
+%{_libdir}/wolframe/modules/mod_normalize_number.so
+
+%if %{with_icu}
+%{_libdir}/wolframe/modules/mod_normalize_locale.so
+%endif
 
 #%dir %{_datadir}/wolframe
 #%doc LICENSE
@@ -735,6 +758,18 @@ fi
 %{_includedir}/wolframe/AAAA/*.hpp
 %dir %{_includedir}/wolframe/module/
 %{_includedir}/wolframe/module/*.hpp
+
+%if %{with_libxml2}
+%files libxml2
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_filter_libxml2.so
+%if %{build_libxml2}
+%{_libdir}/wolframe/libxml2.so.%{libxml2_version}
+%{_libdir}/wolframe/libxml2.so.2
+%endif
+%endif
 
 %if %{with_pgsql}
 %files postgresql
