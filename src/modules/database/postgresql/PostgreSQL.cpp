@@ -40,6 +40,9 @@
 #include <string>
 #include <sstream>
 
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+
 namespace _Wolframe {
 namespace db {
 
@@ -309,13 +312,26 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 	MOD_LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
+bool PostgreSQLdbUnit::loadProgram()
+{
+	// No program file, do nothing
+	if ( m_programFile.empty())
+		return true;
+	if ( !boost::filesystem::exists( m_programFile ))	{
+		MOD_LOG_ALERT << "Program file '" << m_programFile
+			      << "' does not exist (PostgreSQL database '" << m_ID << "')";
+		return false;
+	}
+	return true;
+}
 
-/*****  PostgreSQL database  ******************************************/
 Database* PostgreSQLdbUnit::database()
 {
 	return m_db.hasUnit() ? &m_db : NULL;
 }
 
+
+/*****  PostgreSQL database  ******************************************/
 const std::string& PostgreSQLdatabase::ID() const
 {
 	if ( m_unit )

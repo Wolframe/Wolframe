@@ -151,7 +151,7 @@ public:
 			  const std::string& programFile );
 	~PostgreSQLdbUnit();
 
-	bool loadProgram()			{ return true; }
+	bool loadProgram();
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }

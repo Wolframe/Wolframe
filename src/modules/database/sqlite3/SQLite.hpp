@@ -76,6 +76,7 @@ private:
 	std::string	filename;
 	bool		flag;
 	std::string	programFile;
+	unsigned short	connections;
 };
 
 
@@ -126,10 +127,12 @@ class SQLiteDBunit : public DatabaseUnit
 	friend class SQLiteTransaction;
 public:
 	SQLiteDBunit( const std::string& id,
-		      const std::string& filename, unsigned short connections, bool flag );
+		      const std::string& filename, bool flag,
+		      const std::string& programFile,
+		      unsigned short connections );
 	~SQLiteDBunit();
 
-	bool loadProgram()			{ return true; }
+	bool loadProgram();
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
@@ -138,6 +141,7 @@ private:
 	const std::string	m_ID;
 	const std::string	m_filename;
 	bool			m_flag;
+	const std::string	m_programFile;
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
 

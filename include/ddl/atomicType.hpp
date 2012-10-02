@@ -52,11 +52,13 @@ namespace ddl {
 
 struct NormalizeFunction
 {
+	virtual ~NormalizeFunction()		{}
 	virtual std::string execute( const std::string& i) const=0;
 };
 
 struct TypeMap
 {
+	virtual ~TypeMap()			{}
 	virtual const NormalizeFunction* getType( const std::string& name) const=0;
 };
 
