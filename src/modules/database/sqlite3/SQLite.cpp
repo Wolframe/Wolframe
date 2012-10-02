@@ -98,14 +98,14 @@ Transaction* SQLiteDatabase::transaction( const std::string& /*name*/ )
 	return new SQLiteTransaction( *this );
 }
 
-void SQLiteDatabase::closeTransaction( const Transaction *t ) const
+void SQLiteDatabase::closeTransaction( Transaction *t )
 {
 	delete t;
 }
 
 /*****  SQLite transaction  *******************************************/
 SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database )
-	: m_db( database ), m_unit( *database.m_unit )
+	: m_db( database ), m_unit( database.dbUnit() )
 {
 }
 

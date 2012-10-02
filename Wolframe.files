@@ -1094,6 +1094,7 @@ tests/testProtocolLFdotEscaping.cpp
 tests/testRand.cpp
 tests/testSHA2.cpp
 tests/testTimestamp.cpp
+tests/testVirtualInheritance.cpp
 tests/testWolfilter.cpp
 tests/threadLeakTest.cpp
 tests/versionTest.cpp

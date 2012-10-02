@@ -118,16 +118,19 @@ class PoolObject
 public:
 	PoolObject( ObjectPool< objectType >& pool )
 		: m_pool( pool ), m_object( pool.get())	{}
-	~PoolObject()			{ m_pool.add( m_object ); }
+	~PoolObject()				{ m_pool.add( m_object ); }
 
+	/// the real object
 	objectType object() const		{ return m_object; }
-
+	/// access to object member by dereferencing
 	objectType operator ->() const		{ return m_object; }
+	/// dereferencing the PoolObject gives us the object
 	objectType operator *() const		{ return m_object; }
 private:
-	ObjectPool< objectType >&	m_pool;
-	objectType			m_object;
+	ObjectPool< objectType >&	m_pool;		///< the connected object pool
+	objectType			m_object;	///< the actual object
 };
+
 } // namespace _Wolframe
 
 #endif // _OBJECT_POOL_HPP_INCLUDED
