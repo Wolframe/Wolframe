@@ -2,8 +2,16 @@ TOPDIR = ..
 
 SUBDIRS = modules AAAA simpleFormCompiler wolfilter
 
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
 ifeq ($(WITH_EXPECT),1)
+ifneq "$(PLATFORM)" "NETBSD"
+ifneq "$(PLATFORM)" "FREEBSD"
+ifneq "$(PLATFORM)" "OPENBSD"
 SUBDIRS += expect config
+endif
+endif
+endif
 endif
 
 ifeq ($(WITH_LIBXML2),1)
@@ -19,8 +27,6 @@ endif
 ifeq ($(WITH_LIBHPDF),1)
 SUBDIRS += libhpdf
 endif
-
--include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS = \
 
