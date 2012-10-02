@@ -113,6 +113,15 @@
 %define with_qt		1
 %endif
 
+# icu for boost-locale is available natively only on a few platforms,
+# enable it there
+%define with_icu	0
+%if %{fedora}
+%if %{fc17}
+%define with_icu	1
+%endif
+%endif
+
 # Boost has sometimes a different layout in the shared libraries, don't
 # know why
 
@@ -455,7 +464,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_EXAMPLES=%{with_examples} \
+	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
@@ -478,7 +487,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_EXAMPLES=%{with_examples} \
+	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
@@ -502,7 +511,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_EXAMPLES=%{with_examples} \
+	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
 cd docs; make doc-doxygen
@@ -533,7 +542,7 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
-	WITH_EXAMPLES=%{with_examples} \
+	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
 	sysconfdir=/etc libdir=%{_libdir}
 
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
@@ -656,10 +665,15 @@ fi
 
 %{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
 
+%if %{with_lua}
 %{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
 %{_libdir}/wolframe/modules/mod_lua_datetime.so
-
 %{_libdir}/wolframe/modules/mod_lua_command_handler.so
+%endif
+
+%if %{with_icu}
+%{_libdir}/wolframe/modules/mod_normalize_locale.so
+%endif
 
 #%dir %{_datadir}/wolframe
 #%doc LICENSE

@@ -15,7 +15,8 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lboost_locale
+	-lboost_locale$(BOOST_LIBRARY_TAG) \
+	$(ICU_LIBS)
 
 DYNAMIC_MODULE = mod_normalize_locale.so
 
