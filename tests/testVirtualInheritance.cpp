@@ -12,7 +12,7 @@ class Animal
 {
 	public:
 		Animal( ) { cout << "Constructing animal.." << endl; }
-		virtual ~Animal( ) { cout << "Destroyin animal.." << endl; }
+		virtual ~Animal( ) { cout << "Destroying animal.." << endl; }
 
 		virtual void fly( ) = 0;
 		virtual void trot( ) = 0;
