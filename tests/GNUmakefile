@@ -8,7 +8,9 @@ ifeq ($(WITH_EXPECT),1)
 ifneq "$(PLATFORM)" "NETBSD"
 ifneq "$(PLATFORM)" "FREEBSD"
 ifneq "$(PLATFORM)" "OPENBSD"
+ifneq "$(PLATFORM)" "SUNOS"
 SUBDIRS += expect config
+endif
 endif
 endif
 endif
