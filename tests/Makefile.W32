@@ -91,6 +91,7 @@ INCLUDE_LIBS = \
 TEST_CPP_BINS = \
 	threadLeakTest.exe \
 	testNamedRetVal.exe \
+	testVirtualInheritance.exe \
 	versionTest.exe \
 	testMethodMemberPointerTemplate.exe \
 	counterTest.exe \
@@ -123,6 +124,7 @@ all: $(OBJS) $(CPP_BINS)
 
 threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\wolframe.lib
 testNamedRetVal.exe: testNamedRetVal.obj
+testVirtualInheritance.exe: testVirtualInheritance.obj
 testMethodMemberPointerTemplate.exe: testMethodMemberPointerTemplate.obj
 versionTest.exe: versionTest.obj $(TOPDIR)\src\wolframe.lib
 counterTest.exe: counterTest.obj $(TOPDIR)\src\wolframe.lib
@@ -162,6 +164,7 @@ local_test:
 	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" . >> test.bat
 	@-echo mkdir temp
 	@-echo testNamedRetVal >> test.bat
+	@-echo testVirtualInheritance >> test.bat
 	@-echo logTest >> test.bat
 	@-echo versionTest >> test.bat
 	@-echo counterTest >> test.bat

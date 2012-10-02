@@ -77,6 +77,12 @@ all: $(OBJS) $(CPP_BINS)
 i18n\form1.de_CH.qm: i18n\form1.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\form1.de_CH.ts -qm i18n\form1.de_CH.qm
 
+i18n\form2.de_CH.qm: i18n\form2.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe i18n\form2.de_CH.ts -qm i18n\form2.de_CH.qm
+
+i18n\form3.de_CH.qm: i18n\form3.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe i18n\form3.de_CH.ts -qm i18n\form3.de_CH.qm
+
 themes\windows\qtclient.de_CH.qm: themes\windows\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe themes\windows\qtclient.de_CH.ts -qm themes\windows\qtclient.de_CH.qm
 
