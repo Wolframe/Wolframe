@@ -6,6 +6,10 @@
 
 #include "gtest/gtest.h"
 
+#ifdef _WIN32
+#pragma warning(disable:4250)
+#endif
+
 using namespace std;
 
 class Animal
