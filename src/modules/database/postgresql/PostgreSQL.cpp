@@ -310,6 +310,7 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 }
 
 
+/*****  PostgreSQL database  ******************************************/
 Database* PostgreSQLdbUnit::database()
 {
 	return m_db.hasUnit() ? &m_db : NULL;
@@ -321,6 +322,44 @@ const std::string& PostgreSQLdatabase::ID() const
 		return m_unit->ID();
 	else
 		throw std::runtime_error( "SQL database unit not initialized" );
+}
+
+Transaction* PostgreSQLdatabase::transaction( const std::string& /*name*/ )
+{
+	return new PostgreSQLtransaction( *this );
+}
+
+void PostgreSQLdatabase::closeTransaction( Transaction *t )
+{
+	delete t;
+}
+
+/*****  PostgreSQL transaction  ***************************************/
+PostgreSQLtransaction::PostgreSQLtransaction( PostgreSQLdatabase& database )
+	: m_db( database ), m_unit( database.dbUnit() )
+{
+}
+
+const std::string& PostgreSQLtransaction::databaseID() const
+{
+	return m_unit.ID();
+}
+
+void PostgreSQLtransaction::execute()
+{
+	try	{
+		_Wolframe::PoolObject<  PGconn* > conn( m_unit.m_connPool );
+		int ver = PQprotocolVersion( *conn );
+		MOD_LOG_DEBUG << "PostgreSQL protocol version: " << ver;
+	}
+	catch ( _Wolframe::ObjectPoolTimeout )
+	{
+	}
+}
+
+void PostgreSQLtransaction::close()
+{
+	m_db.closeTransaction( this );
 }
 
 }} // _Wolframe::db

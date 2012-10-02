@@ -82,7 +82,7 @@ private:
 class SQLiteDBunit;
 class SQLiteDatabase;
 
-class SQLiteTransaction : public BaseTransaction, virtual Transaction
+class SQLiteTransaction : public BaseTransaction, public virtual Transaction
 {
 public:
 	SQLiteTransaction( SQLiteDatabase& database );
@@ -94,20 +94,20 @@ public:
 
 	void close();
 private:
-	SQLiteDatabase&	m_db;				///< parent database
-	SQLiteDBunit&	m_unit;				///< parent database unit
+	SQLiteDatabase&	m_db;			///< parent database
+	SQLiteDBunit&	m_unit;			///< parent database unit
 };
 
 
 class SQLiteDatabase : public Database
 {
-	friend class SQLiteTransaction;
 public:
 	SQLiteDatabase() : m_unit( NULL )	{}
 	 ~SQLiteDatabase()			{}
 
 	void setUnit( SQLiteDBunit* unit )	{ m_unit = unit; }
 	bool hasUnit() const			{ return m_unit != NULL; }
+	SQLiteDBunit& dbUnit() const		{ return *m_unit; }
 
 	const std::string& ID() const;
 	PreparedStatementHandler* getPreparedStatementHandler()
@@ -115,9 +115,9 @@ public:
 	/// more of a placeholder for now
 	Transaction* transaction( const std::string& name );
 
-	void closeTransaction( const Transaction* t ) const;
+	void closeTransaction( Transaction* t );
 private:
-	SQLiteDBunit*	m_unit;				///< parent database unit
+	SQLiteDBunit*	m_unit;			///< parent database unit
 };
 
 
