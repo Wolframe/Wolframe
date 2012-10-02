@@ -77,15 +77,16 @@ CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-modules: libwolframe libwolframe_serialize libwolframe_langbind libwolframe_functions
-libwolframe_langbind: libwolframe libwolframe_serialize libwolframe_functions
+modules: libwolframe libwolframe_serialize libwolframe_langbind libwolframe_prnt
+libwolframe_serialize: libwolframe
+libwolframe_langbind: libwolframe libwolframe_serialize
 
-wolframed$(EXE): libwolframe libwolframe_serialize libwolframe_langbind
+wolframed$(EXE): libwolframe libwolframe_serialize libwolframe_langbind libwolframe_prnt
 
 wolframed$(EXE): wolframed.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
-wolfilter$(EXE): libwolframe libwolframe_serialize libwolframe_langbind libwolframe_functions
+wolfilter$(EXE): libwolframe libwolframe_serialize libwolframe_langbind libwolframe_prnt
 
 wolfilter$(EXE): wolfilter.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
