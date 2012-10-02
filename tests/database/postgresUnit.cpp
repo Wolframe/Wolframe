@@ -14,18 +14,19 @@
 using namespace _Wolframe::db;
 using namespace _Wolframe::log;
 
+_Wolframe::log::LogBackend*	logBackendPtr;
 
 // The fixture for testing Wolframe module that log
 class PQmoduleFixture : public ::testing::Test
 {
-	protected:
-		LogBackend& logBack;
+	LogBackend& logBack;
 
 	protected:
-		ModuleFixture( ) :
+		PQmoduleFixture( ) :
 			logBack( LogBackend::instance( ) )
 		{
 			logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
+			logBackendPtr = &logBack;
 		}
 };
 

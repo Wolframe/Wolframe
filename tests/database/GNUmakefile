@@ -10,17 +10,29 @@ ifeq ($(WITH_PGSQL),1)
 
 INCLUDE_DIRS += \
 	-I$(TOPDIR)/include \
-	-I$(TOPDIR)/gtest/include \
-	-I$(TOPDIR)/src/modules/database/postgresql
+	$(PGSQL_INCLUDE_DIRS) \
+	-I$(TOPDIR)/src/modules/database/postgresql \
+	-I$(TOPDIR)/gtest/include
 
 INCLUDE_LDFLAGS += \
-	$(TOPDIR)/src/modules/database/postgresql
+	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS += \
-	$(TOPDIR)/src/libwolframe/libwolframe.a
+	-lboost_thread \
+	-lboost_system \
+	-lboost_filesystem \
+	$(PGSQL_LIBS) \
+	$(TOPDIR)/src/libwolframe/libwolframe.a \
+	$(TOPDIR)/gtest/gtest-all.o
+
+CPP_OBJS = \
+	$(TOPDIR)/src/modules/database/postgresql/PostgreSQL.o \
+	$(TOPDIR)/src/modules/database/dbTransaction.o
 
 TEST_CPP_BINS = \
 	postgresUnit$(EXE)
+
+postgresUnit$(EXE): $(CPP_OBJS)
 endif
 
 
