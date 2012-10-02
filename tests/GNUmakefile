@@ -1,6 +1,7 @@
 TOPDIR = ..
 
 SUBDIRS = modules AAAA simpleFormCompiler wolfilter
+#database
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 

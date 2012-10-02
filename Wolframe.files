@@ -1015,6 +1015,9 @@ tests/config/wolframe-posix.conf
 tests/config/wolframe-win.conf
 tests/counterTest.cpp
 tests/CRAMtest.cpp
+tests/database/GNUmakefile
+tests/database/Makefile.W32
+tests/database/postgresUnit.cpp
 tests/expect/GNUmakefile
 tests/expect/Makefile.W32
 tests/expect/testEcho.exp
