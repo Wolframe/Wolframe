@@ -38,6 +38,7 @@ simple_event_log.h
 src/wolframed
 tests/testNamedRetVal
 tests/singletonTest
+tests/testVirtualInheritance
 tests/versionTest
 tests/logTest
 tests/threadLeakTest
