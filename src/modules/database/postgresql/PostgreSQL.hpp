@@ -47,6 +47,10 @@
 #include "objectPool.hpp"
 #include "../dbTransaction.hpp"
 
+#ifdef _WIN32
+#pragma warning(disable:4250)
+#endif
+
 namespace _Wolframe {
 namespace db {
 
