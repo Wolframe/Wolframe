@@ -203,8 +203,10 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./configStructParser config/structparser.conf
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testProtocolLFdotEscaping
+ifneq "$(PLATFORM)" "NETBSD"
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
+endif
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testWolfilter
 	@echo
