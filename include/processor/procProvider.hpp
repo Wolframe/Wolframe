@@ -61,7 +61,7 @@ public:
 	/// constructor & destructor
 	ProcProviderConfig()
 		: ConfigurationBase( "Processor(s)", NULL, "Processor configuration" )	{}
-	virtual ~ProcProviderConfig();
+	~ProcProviderConfig();
 
 	/// methods
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
