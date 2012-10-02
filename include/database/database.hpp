@@ -83,11 +83,14 @@ public:
 	/// Class names must be unique.
 	virtual const char* className() const = 0;
 
-	/// Database identifier.
+	/// The database identifier. This is the configured name.
 	virtual const std::string& ID() const = 0;
 
-	/// The actual database object
+	/// The actual database object.
 	virtual Database* database() = 0;
+
+	/// Load the transaction program(s) for this database
+	virtual bool loadProgram() = 0;
 };
 
 }} // namespace _Wolframe::db

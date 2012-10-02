@@ -83,6 +83,9 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 			throw std::domain_error( "Unknown database type in DBprovider constructor. See log" );
 		}
 	}
+	// load the transaction definitions / programs
+	for ( std::list< DatabaseUnit* >::iterator it = m_db.begin(); it != m_db.end(); it++ )
+		(*it)->loadProgram();
 }
 
 DatabaseProvider::DatabaseProvider_Impl::~DatabaseProvider_Impl()

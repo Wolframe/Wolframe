@@ -129,6 +129,8 @@ public:
 		      const std::string& filename, unsigned short connections, bool flag );
 	~SQLiteDBunit();
 
+	bool loadProgram()			{ return true; }
+
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 	Database* database();
