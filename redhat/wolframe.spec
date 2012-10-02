@@ -622,6 +622,10 @@ fi
 %{_libdir}/wolframe/libwolframe_serialize.so.0
 %{_libdir}/wolframe/libwolframe_langbind.so.0.0.0
 %{_libdir}/wolframe/libwolframe_langbind.so.0
+%{_libdir}/wolframe/libwolframe_prnt.so.0.0.0
+%{_libdir}/wolframe/libwolframe_prnt.so.0
+%{_libdir}/wolframe/libwolframe_functions.so.0.0.0
+%{_libdir}/wolframe/libwolframe_functions.so.0
 
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so.5.2.0
@@ -650,8 +654,7 @@ fi
 %{_libdir}/wolframe/modules/mod_filter_token.so
 %{_libdir}/wolframe/modules/mod_filter_blob.so
 
-# disabled
-#%{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
+%{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
 
 %{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
 %{_libdir}/wolframe/modules/mod_lua_datetime.so
@@ -676,6 +679,10 @@ fi
 %{_libdir}/wolframe/libwolframe_serialize.a
 %{_libdir}/wolframe/libwolframe_langbind.so
 %{_libdir}/wolframe/libwolframe_langbind.a
+%{_libdir}/wolframe/libwolframe_prnt.so
+%{_libdir}/wolframe/libwolframe_prnt.a
+%{_libdir}/wolframe/libwolframe_functions.so
+%{_libdir}/wolframe/libwolframe_functions.a
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so
 %{_libdir}/wolframe/liblua.a
