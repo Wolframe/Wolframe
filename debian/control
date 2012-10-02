@@ -16,6 +16,12 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Wolframe Daemon
  <insert long description, indented with spaces>
 
+Package: wolframe-libxml2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Descrioption: The Wolframe XML parsing module using libxml2.
+ <insert long description, indented with spaces>
+
 Package: wolframe-sqlite3
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}

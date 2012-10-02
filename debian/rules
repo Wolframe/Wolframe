@@ -88,6 +88,11 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
 
+	# the libxml2 filter module depends on libxml, put it in a separate package
+	cd src/modules/filter/libxml2; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
+
 	# module database sqlite3
 	cd src/modules/database/sqlite3; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-sqlite3; \
@@ -115,6 +120,13 @@ install: build
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-sasl/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-sasl/DEBIAN
+
+	# filter module libxml
+	cd src/modules/filter/libxml2; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libxml2; \
+		cd ../../../..
+	mkdir /usr/src/packages/BUILD/debian/wolframe-libxml2/DEBIAN
+	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-libxml2/DEBIAN
 
 	# copy local versions of shared libraries of boost for platforms missing a decent
 	# version of boost
