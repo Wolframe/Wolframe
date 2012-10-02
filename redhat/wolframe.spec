@@ -241,7 +241,6 @@ BuildRequires: cyrus-sasl-devel >= 2.1.19
 %if %{with_libxml2}
 %if !%{build_libxml2}
 BuildRequires: libxml2-devel >= 2.6
-Requires: libxml2 >= 2.6
 %endif
 %endif
 %if %{with_libxslt}
@@ -329,6 +328,20 @@ Group: Application/Business
 The libraries and header files used for development with Wolframe.
 
 Requires: %{name} >= %{version}-%{release}
+
+%if %{with_libxml2}
+%package libxml2
+Summary: Wolframe XML filtering module using libxml2
+Group: Application/Business
+
+%description libxml2
+The Wolframe XML parsing module using libxml2.
+
+Requires: %{name} >= %{version}-%{release}
+%if !%{build_libxml2}
+Requires: libxml2 >= 2.6
+%endif
+%endif
 
 %if %{with_pgsql}
 %package postgresql
@@ -619,11 +632,6 @@ fi
 %{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
 %endif
 
-%if %{build_libxml2}
-%{_libdir}/wolframe/libxml2.so.%{libxml2_version}
-%{_libdir}/wolframe/libxml2.so.2
-%endif
-
 %dir %{_libdir}/wolframe
 %{_libdir}/wolframe/libwolframe.so.0.0.0
 %{_libdir}/wolframe/libwolframe.so.0
@@ -657,7 +665,6 @@ fi
 %{_libdir}/wolframe/modules/mod_authz_database.so
 
 %{_libdir}/wolframe/modules/mod_filter_char.so
-%{_libdir}/wolframe/modules/mod_filter_libxml2.so
 %{_libdir}/wolframe/modules/mod_filter_line.so
 %{_libdir}/wolframe/modules/mod_filter_textwolf.so
 %{_libdir}/wolframe/modules/mod_filter_token.so
@@ -670,6 +677,8 @@ fi
 %{_libdir}/wolframe/modules/mod_lua_datetime.so
 %{_libdir}/wolframe/modules/mod_lua_command_handler.so
 %endif
+
+%{_libdir}/wolframe/modules/mod_normalize_number.so
 
 %if %{with_icu}
 %{_libdir}/wolframe/modules/mod_normalize_locale.so
@@ -749,6 +758,18 @@ fi
 %{_includedir}/wolframe/AAAA/*.hpp
 %dir %{_includedir}/wolframe/module/
 %{_includedir}/wolframe/module/*.hpp
+
+%if %{with_libxml2}
+%files libxml2
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_filter_libxml2.so
+%if %{build_libxml2}
+%{_libdir}/wolframe/libxml2.so.%{libxml2_version}
+%{_libdir}/wolframe/libxml2.so.2
+%endif
+%endif
 
 %if %{with_pgsql}
 %files postgresql
