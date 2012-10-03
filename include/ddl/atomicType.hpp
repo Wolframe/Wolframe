@@ -52,6 +52,7 @@ namespace ddl {
 
 struct NormalizeFunction
 {
+	virtual ~NormalizeFunction(){}
 	virtual std::string execute( const std::string& i) const=0;
 };
 
