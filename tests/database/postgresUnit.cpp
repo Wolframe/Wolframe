@@ -30,7 +30,7 @@ class PQmoduleFixture : public ::testing::Test
 		}
 };
 
-TEST_F( PQmoduleFixture, CreatePostgreSQLunit )
+TEST_F( PQmoduleFixture, CreatePostgreSQLunit_0 )
 {
 	PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
 			     "wolfusr", "wolfpwd", "", "", "", "", "",
@@ -38,6 +38,16 @@ TEST_F( PQmoduleFixture, CreatePostgreSQLunit )
 	ASSERT_STREQ( "PostgreSQL", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
 	ASSERT_FALSE( db.loadProgram());
+}
+
+TEST_F( PQmoduleFixture, CreatePostgreSQLunit_1 )
+{
+	PostgreSQLdbUnit db( "testDB", "blabla", 0, "wolframe",
+			     "wolfusr", "wolfpwd", "", "", "", "", "",
+			     3, 4, 3, 10, "" );
+	ASSERT_STREQ( "PostgreSQL", db.className());
+	ASSERT_STREQ( "testDB", db.ID().c_str());
+	ASSERT_TRUE( db.loadProgram());
 }
 
 int main( int argc, char **argv )

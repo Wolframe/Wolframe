@@ -349,8 +349,7 @@ include/database/DBprovider.hpp
 include/database/preparedStatement.hpp
 include/database/preparedStatementProcessor.hpp
 include/database/transaction.hpp
-include/database/transactionInputBuilder.hpp
-include/database/transactionObjects.hpp
+include/database/transactionInput.hpp
 include/ddl/atomicType.hpp
 include/ddl/bignumType.hpp
 include/ddl/compilerInterface.hpp

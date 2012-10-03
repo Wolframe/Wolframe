@@ -147,45 +147,45 @@ PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
 	for ( size_t i = 0; i < connections; i++ )	{
 		PGconn* conn = PQconnectdb( m_connStr.c_str() );
 		if ( conn == NULL )
-			MOD_LOG_ALERT << "PostgreSQL PQconnectdb returned NULL";
+			MOD_LOG_ALERT << "Failed to connect to PostgreSQL database '" << m_ID << "'";
 		else	{
 			ConnStatusType stat = PQstatus( conn );
 			switch( stat )	{
 				case CONNECTION_OK:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connected OK. Server answered: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connected OK: '" << PQerrorMessage( conn ) << "'";
 					break;
 				case CONNECTION_BAD:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection BAD. Server answered: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection BAD: '" << PQerrorMessage( conn ) << "'";
 					break;
 				case CONNECTION_STARTED:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection STARTED. Server answered: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection STARTED: '" << PQerrorMessage( conn ) << "'";
 					break;
 				case CONNECTION_MADE:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection MADE. Server answered: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection MADE: '" << PQerrorMessage( conn ) << "'";
 					break;
 				case CONNECTION_AWAITING_RESPONSE:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection AWAITING RESPONSE. Message: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection AWAITING RESPONSE: '" << PQerrorMessage( conn ) << "'";
 					break;
 				case CONNECTION_AUTH_OK:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection AUTH OK. Server answered: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection AUTH OK: '" << PQerrorMessage( conn ) << "'";
 					break;
 				case CONNECTION_SSL_STARTUP:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection SSL start. Server answered: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection SSL start: '" << PQerrorMessage( conn ) << "'";
 					break;
 				case CONNECTION_SETENV:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection SETENV. Server answered: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection SETENV: '" << PQerrorMessage( conn ) << "'";
 					break;
 				case CONNECTION_NEEDED:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection NEEDED. Server answered: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection NEEDED: '" << PQerrorMessage( conn ) << "'";
 					break;
 			}
 			m_connPool.add( conn );
