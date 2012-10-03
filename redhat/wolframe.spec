@@ -232,25 +232,30 @@ Requires: libboost-system1_44_0 >= 1.44.0
 BuildRequires: openssl-devel >= 0.9.7
 Requires: openssl >= 0.9.7
 %endif
+
 %if %{with_pam}
 BuildRequires: pam-devel >= 0.77
 %endif
+
 %if %{with_sasl}
 BuildRequires: cyrus-sasl-devel >= 2.1.19
 %endif
+
 %if %{with_libxml2}
 %if !%{build_libxml2}
 BuildRequires: libxml2-devel >= 2.6
 %endif
 %endif
+
 %if %{with_libxslt}
 BuildRequires: libxslt-devel >= 1.0
-Requires: libxslt >= 1.0
 %endif
+
 %if %{with_libhpdf}
 BuildRequires: libpng-devel
 BuildRequires: zlib-devel
 %endif
+
 BuildRequires: gcc-c++
 BuildRequires: doxygen
 
@@ -329,20 +334,6 @@ The libraries and header files used for development with Wolframe.
 
 Requires: %{name} >= %{version}-%{release}
 
-%if %{with_libxml2}
-%package libxml2
-Summary: Wolframe XML filtering module using libxml2
-Group: Application/Business
-
-%description libxml2
-The Wolframe XML parsing module using libxml2.
-
-Requires: %{name} >= %{version}-%{release}
-%if !%{build_libxml2}
-Requires: libxml2 >= 2.6
-%endif
-%endif
-
 %if %{with_pgsql}
 %package postgresql
 Summary: Wolframe Postgresql database module
@@ -407,6 +398,43 @@ Requires: cyrus-sasl-lib >= 2.1.19
 Requires: cyrus-sasl >= 2.1.22
 %endif
 
+%endif
+
+%if %{with_libxml2}
+%package libxml2
+Summary: Wolframe XML filtering module using libxml2
+Group: Application/Business
+
+%description libxml2
+The Wolframe XML parsing module using libxml2.
+
+Requires: %{name} >= %{version}-%{release}
+%if !%{build_libxml2}
+Requires: libxml2 >= 2.6
+%endif
+%endif
+
+%if %{with_libxslt}
+%package libxslt
+Summary: The Wolframe filter module using libxslt.
+Group: Application/Business
+
+%description libxslt
+The Wolframe filter module using libxslt.
+
+Requires: libxslt >= 1.0
+%endif
+
+%if %{with_libhpdf}
+%package libhpdf
+Summary: Wolframe printing module based on libhpdf/libharu.
+Group: Application/Business
+
+%description libhpdf
+Wolframe printing module based on libhpdf/libharu.
+
+Requires: libpng
+Requires: zlib
 %endif
 
 %if %{with_qt}
@@ -649,11 +677,6 @@ fi
 %{_libdir}/wolframe/liblua.so.5
 %endif
 
-%if %{with_local_libhpdf}
-%{_libdir}/wolframe/libhpdf.so.2.2.1
-%{_libdir}/wolframe/libhpdf.so.2
-%endif
-
 %dir %{_libdir}/wolframe/modules
 
 %{_libdir}/wolframe/modules/mod_audit_textfile.so
@@ -759,18 +782,6 @@ fi
 %dir %{_includedir}/wolframe/module/
 %{_includedir}/wolframe/module/*.hpp
 
-%if %{with_libxml2}
-%files libxml2
-%defattr( -, root, root )
-%dir %{_libdir}/wolframe
-%dir %{_libdir}/wolframe/modules
-%{_libdir}/wolframe/modules/mod_filter_libxml2.so
-%if %{build_libxml2}
-%{_libdir}/wolframe/libxml2.so.%{libxml2_version}
-%{_libdir}/wolframe/libxml2.so.2
-%endif
-%endif
-
 %if %{with_pgsql}
 %files postgresql
 %defattr( -, root, root )
@@ -801,6 +812,38 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_auth_sasl.so
+%endif
+
+%if %{with_libxml2}
+%files libxml2
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_filter_libxml2.so
+%if %{build_libxml2}
+%{_libdir}/wolframe/libxml2.so.%{libxml2_version}
+%{_libdir}/wolframe/libxml2.so.2
+%endif
+%endif
+
+%if %{with_libxslt}
+%files libxslt
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+# later:
+#%{_libdir}/wolframe/modules/mod_filter_libxslt.so
+%endif
+
+%if %{with_libhpdf}
+%files libhpdf
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%if %{with_local_libhpdf}
+%{_libdir}/wolframe/libhpdf.so.2.2.1
+%{_libdir}/wolframe/libhpdf.so.2
+%endif
 %endif
 
 %if %{with_qt}

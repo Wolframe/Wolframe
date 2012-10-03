@@ -92,6 +92,13 @@ install: build
 	cd src/modules/filter/libxml2; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
+	
+	# libxslt
+	
+	# the libhpdf printing module depends on libhpdf, put it in a separate package
+	cd src/modules/prnt/haruPdfPrinter; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ../../../..
 
 	# module database sqlite3
 	cd src/modules/database/sqlite3; $(MAKE) install $(WOLFRAME_PARAMS) \
@@ -121,12 +128,21 @@ install: build
 	mkdir /usr/src/packages/BUILD/debian/wolframe-sasl/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-sasl/DEBIAN
 
-	# filter module libxml
+	# filter module libxml2
 	cd src/modules/filter/libxml2; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libxml2; \
 		cd ../../../..
 	mkdir /usr/src/packages/BUILD/debian/wolframe-libxml2/DEBIAN
 	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-libxml2/DEBIAN
+	
+	# filter module libxslt
+
+	# printing module for libhpdf
+	cd src/modules/prnt/haruPdfPrinter; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libhpdf; \
+		cd ../../../..
+	mkdir /usr/src/packages/BUILD/debian/wolframe-libhpdf/DEBIAN
+	cp debian/shlibs /usr/src/packages/BUILD/debian/wolframe-libhpdf/DEBIAN
 
 	# copy local versions of shared libraries of boost for platforms missing a decent
 	# version of boost

@@ -16,12 +16,6 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Wolframe Daemon
  <insert long description, indented with spaces>
 
-Package: wolframe-libxml2
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Descrioption: The Wolframe XML parsing module using libxml2.
- <insert long description, indented with spaces>
-
 Package: wolframe-sqlite3
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -44,6 +38,24 @@ Package: wolframe-sasl
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: SASL authentication bindings
+ <insert long description, indented with spaces>
+
+Package: wolframe-libxml2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe XML parsing module using libxml2.
+ <insert long description, indented with spaces>
+
+Package: wolframe-libxslt
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe filter module using libxslt.
+ <insert long description, indented with spaces>
+
+Package: wolframe-libhpdf
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe printing module based on libhpdf/libharu.
  <insert long description, indented with spaces>
 
 Package: wolframe-client
