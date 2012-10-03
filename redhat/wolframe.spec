@@ -882,8 +882,8 @@ fi
 # funny, why?!
 %if !%{sles}
 %dir %{_bindir}
-%{_bindir}/wolfcli
 %endif
+%{_bindir}/wolfcli
 
 %if %{with_qt}
 %files qtclient
