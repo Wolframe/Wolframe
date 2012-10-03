@@ -439,8 +439,34 @@ Requires: libpng
 Requires: zlib
 %endif
 
-%if %{with_qt}
 %package client
+Summary: Wolframe client and command line tool
+Group: Application/Business
+
+%description client
+Wolframe command line tool and client library.
+
+%if !%{build_boost}
+BuildRequires: boost-devel
+%if %{rhel} || %{centos} || %{fedora}
+Requires: boost >= 1.43
+Requires: boost-thread >= 1.43
+Requires: boost-date-time >= 1.43
+Requires: boost-filesystem >= 1.43
+Requires: boost-program-options >= 1.43
+Requires: boost-system >= 1.43
+%endif
+%if %{suse}
+Requires: libboost-thread1_44_0 >= 1.44.0
+Requires: libboost-date-time1_44_0 >= 1.44.0
+Requires: libboost-filesystem1_44_0 >= 1.44.0
+Requires: libboost-program-options1_44_0 >= 1.44.0
+Requires: libboost-system1_44_0 >= 1.44.0
+%endif
+%endif
+
+%if %{with_qt}
+%package qtclient
 Summary: Wolframe client
 Group: Application/Business
 
@@ -453,7 +479,7 @@ BuildRequires: libqt4-devel >= 4.5
 Requires: libqt4 >= 4.5
 %endif
 
-%description client
+%description qtclient
 Qt client for the Wolframe server.
 
 %endif
@@ -847,8 +873,16 @@ fi
 %endif
 %endif
 
-%if %{with_qt}
 %files client
+%defattr( -, root, root )
+# funny, why?!
+%if !%{sles}
+%dir %{_bindir}
+%{_bindir}/wolfcli
+%endif
+
+%if %{with_qt}
+%files qtclient
 %defattr( -, root, root )
 # funny, why?!
 %if !%{sles}
