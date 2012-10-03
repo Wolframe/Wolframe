@@ -465,6 +465,10 @@ Requires: libboost-system1_44_0 >= 1.44.0
 %endif
 %endif
 
+%if %{with_ssl}
+Requires: openssl >= 0.9.7
+%endif
+
 %if %{with_qt}
 %package qtclient
 Summary: Wolframe client
