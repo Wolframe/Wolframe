@@ -40,70 +40,11 @@
 #include <string>
 #include <sstream>
 
+#define BOOST_FILESYSTEM_VERSION 3
+#include <boost/filesystem.hpp>
+
 namespace _Wolframe {
 namespace db {
-
-//***  PostgreSQL configuration functions  **********************************
-PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
-	: config::NamedConfiguration( cfgName, logParent, logName )
-{
-	port = 0;
-	connections = 0;
-	acquireTimeout = 0;
-}
-
-void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
-{
-	std::string indStr( indent, ' ' );
-
-	os << indStr << sectionName() << ":" << std::endl;
-	if ( ! m_ID.empty() )
-		os << indStr << "   ID: " << m_ID << std::endl;
-	if ( host.empty())
-		os << indStr << "   Database host: local unix domain socket" << std::endl;
-	else
-		os << indStr << "   Database host: " << host << ":" << port << std::endl;
-	os << indStr << "   Database name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
-	os << indStr << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
-	   << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
-	if ( ! sslMode.empty())
-		os << indStr << "   Database connection SSL mode: " << sslMode << std::endl;
-	if ( ! sslCert.empty())	{
-		os << indStr << "   Client SSL certificate file: " << sslCert << std::endl;
-		if ( ! sslMode.empty())
-			os << indStr << "   Client SSL key file: " << sslKey << std::endl;
-	}
-	if ( ! sslRootCert.empty())
-		os << indStr << "   SSL root CA file: " << sslRootCert << std::endl;
-	if ( ! sslCRL.empty())
-		os << indStr << "   SSL CRL file: " << sslCRL << std::endl;
-
-	if ( connectTimeout == 0 )
-		os << indStr << "   Connect timeout: 0 (wait indefinitely)" << std::endl;
-	else
-		os << indStr << "   Connect timeout: " << connectTimeout << "s" << std::endl;
-	os << indStr << "   Database connections: " << connections << std::endl;
-	if ( acquireTimeout == 0 )
-		os << indStr << "   Acquire database connection timeout: 0 (wait indefinitely)" << std::endl;
-	else
-		os << indStr << "   Acquire database connection timeout: " << acquireTimeout << "s" << std::endl;
-	if ( statementTimeout == 0 )
-		os << indStr << "   Default statement execution timeout: 0 (wait indefinitely)" << std::endl;
-	else
-		os << indStr << "   Default statement execution timeout: " << statementTimeout << "ms" << std::endl;
-
-	os << indStr << "   Main program file: " << (programFile.empty() ? "none" : programFile) << std::endl;
-}
-
-bool PostgreSQLconfig::check() const
-{
-	if ( connections == 0 )	{
-		MOD_LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
-		return false;
-	}
-	return true;
-}
-
 
 //***  PostgreSQL database functions  ***************************************
 static std::string escConnElement( std::string element )
@@ -309,18 +250,70 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 	MOD_LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
+bool PostgreSQLdbUnit::loadProgram()
+{
+	// No program file, do nothing
+	if ( m_programFile.empty())
+		return true;
+	if ( !boost::filesystem::exists( m_programFile ))	{
+		MOD_LOG_ALERT << "Program file '" << m_programFile
+			      << "' does not exist (PostgreSQL database '" << m_ID << "')";
+		return false;
+	}
+	return true;
+}
 
 Database* PostgreSQLdbUnit::database()
 {
 	return m_db.hasUnit() ? &m_db : NULL;
 }
 
+
+/*****  PostgreSQL database  ******************************************/
 const std::string& PostgreSQLdatabase::ID() const
 {
 	if ( m_unit )
 		return m_unit->ID();
 	else
 		throw std::runtime_error( "SQL database unit not initialized" );
+}
+
+Transaction* PostgreSQLdatabase::transaction( const std::string& /*name*/ )
+{
+	return new PostgreSQLtransaction( *this );
+}
+
+void PostgreSQLdatabase::closeTransaction( Transaction *t )
+{
+	delete t;
+}
+
+/*****  PostgreSQL transaction  ***************************************/
+PostgreSQLtransaction::PostgreSQLtransaction( PostgreSQLdatabase& database )
+	: m_db( database ), m_unit( database.dbUnit() )
+{
+}
+
+const std::string& PostgreSQLtransaction::databaseID() const
+{
+	return m_unit.ID();
+}
+
+void PostgreSQLtransaction::execute()
+{
+	try	{
+		_Wolframe::PoolObject<  PGconn* > conn( m_unit.m_connPool );
+		int ver = PQprotocolVersion( *conn );
+		MOD_LOG_DEBUG << "PostgreSQL protocol version: " << ver;
+	}
+	catch ( _Wolframe::ObjectPoolTimeout )
+	{
+	}
+}
+
+void PostgreSQLtransaction::close()
+{
+	m_db.closeTransaction( this );
 }
 
 }} // _Wolframe::db

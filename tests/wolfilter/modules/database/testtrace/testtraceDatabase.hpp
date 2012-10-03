@@ -120,6 +120,7 @@ public:
 	/// it's just a dummy as we need to change a lot
 	virtual Transaction* transaction( const std::string& /*name*/ )
 						{ return NULL; }
+	bool loadProgram()			{ return true; }
 private:
 	std::string m_id;
 	std::string m_outfilename;

@@ -76,13 +76,14 @@ private:
 	std::string	filename;
 	bool		flag;
 	std::string	programFile;
+	unsigned short	connections;
 };
 
 
 class SQLiteDBunit;
 class SQLiteDatabase;
 
-class SQLiteTransaction : public BaseTransaction, virtual Transaction
+class SQLiteTransaction : public BaseTransaction, public virtual Transaction
 {
 public:
 	SQLiteTransaction( SQLiteDatabase& database );
@@ -94,20 +95,20 @@ public:
 
 	void close();
 private:
-	SQLiteDatabase&	m_db;				///< parent database
-	SQLiteDBunit&	m_unit;				///< parent database unit
+	SQLiteDatabase&	m_db;			///< parent database
+	SQLiteDBunit&	m_unit;			///< parent database unit
 };
 
 
 class SQLiteDatabase : public Database
 {
-	friend class SQLiteTransaction;
 public:
 	SQLiteDatabase() : m_unit( NULL )	{}
 	 ~SQLiteDatabase()			{}
 
 	void setUnit( SQLiteDBunit* unit )	{ m_unit = unit; }
 	bool hasUnit() const			{ return m_unit != NULL; }
+	SQLiteDBunit& dbUnit() const		{ return *m_unit; }
 
 	const std::string& ID() const;
 	PreparedStatementHandler* getPreparedStatementHandler()
@@ -115,9 +116,9 @@ public:
 	/// more of a placeholder for now
 	Transaction* transaction( const std::string& name );
 
-	void closeTransaction( const Transaction* t ) const;
+	void closeTransaction( Transaction* t );
 private:
-	SQLiteDBunit*	m_unit;				///< parent database unit
+	SQLiteDBunit*	m_unit;			///< parent database unit
 };
 
 
@@ -126,8 +127,12 @@ class SQLiteDBunit : public DatabaseUnit
 	friend class SQLiteTransaction;
 public:
 	SQLiteDBunit( const std::string& id,
-		      const std::string& filename, unsigned short connections, bool flag );
+		      const std::string& filename, bool flag,
+		      const std::string& programFile,
+		      unsigned short connections );
 	~SQLiteDBunit();
+
+	bool loadProgram();
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
@@ -136,6 +141,7 @@ private:
 	const std::string	m_ID;
 	const std::string	m_filename;
 	bool			m_flag;
+	const std::string	m_programFile;
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
 

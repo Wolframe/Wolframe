@@ -52,6 +52,15 @@ static const unsigned short DEFAULT_STATEMENT_TIMEOUT = 30000;
 namespace _Wolframe {
 namespace db {
 
+//***  PostgreSQL configuration functions  **********************************
+PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
+	: config::NamedConfiguration( cfgName, logParent, logName )
+{
+	port = 0;
+	connections = 0;
+	acquireTimeout = 0;
+}
+
 bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
 			      const module::ModulesDirectory* /*modules*/ )
 {
@@ -248,6 +257,58 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 		else
 			programFile = resolvePath( programFile );
 	}
+}
+
+void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
+{
+	std::string indStr( indent, ' ' );
+
+	os << indStr << sectionName() << ":" << std::endl;
+	if ( ! m_ID.empty() )
+		os << indStr << "   ID: " << m_ID << std::endl;
+	if ( host.empty())
+		os << indStr << "   Database host: local unix domain socket" << std::endl;
+	else
+		os << indStr << "   Database host: " << host << ":" << port << std::endl;
+	os << indStr << "   Database name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
+	os << indStr << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
+	   << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
+	if ( ! sslMode.empty())
+		os << indStr << "   Database connection SSL mode: " << sslMode << std::endl;
+	if ( ! sslCert.empty())	{
+		os << indStr << "   Client SSL certificate file: " << sslCert << std::endl;
+		if ( ! sslMode.empty())
+			os << indStr << "   Client SSL key file: " << sslKey << std::endl;
+	}
+	if ( ! sslRootCert.empty())
+		os << indStr << "   SSL root CA file: " << sslRootCert << std::endl;
+	if ( ! sslCRL.empty())
+		os << indStr << "   SSL CRL file: " << sslCRL << std::endl;
+
+	if ( connectTimeout == 0 )
+		os << indStr << "   Connect timeout: 0 (wait indefinitely)" << std::endl;
+	else
+		os << indStr << "   Connect timeout: " << connectTimeout << "s" << std::endl;
+	os << indStr << "   Database connections: " << connections << std::endl;
+	if ( acquireTimeout == 0 )
+		os << indStr << "   Acquire database connection timeout: 0 (wait indefinitely)" << std::endl;
+	else
+		os << indStr << "   Acquire database connection timeout: " << acquireTimeout << "s" << std::endl;
+	if ( statementTimeout == 0 )
+		os << indStr << "   Default statement execution timeout: 0 (wait indefinitely)" << std::endl;
+	else
+		os << indStr << "   Default statement execution timeout: " << statementTimeout << "ms" << std::endl;
+
+	os << indStr << "   Main program file: " << (programFile.empty() ? "none" : programFile) << std::endl;
+}
+
+bool PostgreSQLconfig::check() const
+{
+	if ( connections == 0 )	{
+		MOD_LOG_ERROR << logPrefix() << "number of database connections cannot be 0";
+		return false;
+	}
+	return true;
 }
 
 }} // namespace _Wolframe::config

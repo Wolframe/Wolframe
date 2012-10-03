@@ -68,7 +68,7 @@ public:
 		    const module::ModulesDirectory* modules );
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
-	virtual void setCanonicalPathes( const std::string& referencePath );
+	void setCanonicalPathes( const std::string& referencePath );
 
 private:
 	std::string					m_dbLabel;

@@ -130,6 +130,32 @@
     </property>
    </widget>
   </widget>
+  <widget class="QRadioButton" name="sensless">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>140</y>
+     <width>100</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>senseless</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="vegetarian">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>170</y>
+     <width>85</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Vegetarian</string>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>pumpkin</tabstop>

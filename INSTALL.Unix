@@ -636,9 +636,11 @@ Optional packages to install from CSW:
   CSWsasl-dev and CSWsasl (2.1.25)
   CSWlibxml2-dev (2-2.7.8)
   CSWlibxslt-dev (1.1.26)
+  CSWlibz-dev (1.2.5)
 
 SUNWlxml is too old, use CSWlibxml2.
 SUNWlxsl is too old, use CSWlibxslt.
+SUNWzlib is missing 64-bit support, use CSWlibz instead!
 
 CSWsqlite3 misses the header files, so use internally supplied version with WITH_LOCAL_SQLITE1=1
 

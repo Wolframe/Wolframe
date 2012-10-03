@@ -73,7 +73,7 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 			if ( db == NULL )	{
 				LOG_ALERT << "DatabaseProvider: '" << builder->objectClassName()
 					  << "' is not a Database Unit builder";
-				throw std::logic_error( "object is not an DatabaseUnit builder" );
+				throw std::logic_error( "Object is not an DatabaseUnit builder" );
 			}
 			m_db.push_back( db->object(**it ) );
 			LOG_TRACE << "'" << db->objectClassName() << "' database unit registered";
@@ -81,6 +81,13 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 		else	{
 			LOG_ALERT << "DatabaseProvider: unknown database module '" << (*it)->className() << "'";
 			throw std::domain_error( "Unknown database type in DBprovider constructor. See log" );
+		}
+	}
+	// load the transaction definitions / programs
+	for ( std::list< DatabaseUnit* >::iterator it = m_db.begin(); it != m_db.end(); it++ )	{
+		if ( !(*it)->loadProgram() )	{
+			LOG_ALERT << "DatabaseProvider: cannot load program for '" << (*it)->ID() << "' database unit";
+			throw std::domain_error( "Cannot load database unit program. See log" );
 		}
 	}
 }

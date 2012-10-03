@@ -40,6 +40,24 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: SASL authentication bindings
  <insert long description, indented with spaces>
 
+Package: wolframe-libxml2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe XML parsing module using libxml2.
+ <insert long description, indented with spaces>
+
+Package: wolframe-libxslt
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: The Wolframe filter module using libxslt.
+ <insert long description, indented with spaces>
+
+Package: wolframe-libhpdf
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe printing module based on libhpdf/libharu.
+ <insert long description, indented with spaces>
+
 Package: wolframe-client
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}

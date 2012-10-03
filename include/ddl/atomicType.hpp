@@ -58,6 +58,7 @@ struct NormalizeFunction
 
 struct TypeMap
 {
+	virtual ~TypeMap(){}
 	virtual const NormalizeFunction* getType( const std::string& name) const=0;
 };
 

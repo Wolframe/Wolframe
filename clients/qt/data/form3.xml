@@ -4,4 +4,6 @@
   <checkBox>true</checkBox>
   <checkBox_2>true</checkBox_2>
   <checkBox_3>false</checkBox_3>
+  <groupBox>sensless</groupBox>
+  <vegetarian>true</vegetarian>
 </form3>

@@ -95,6 +95,24 @@ private:
 
 
 class PostgreSQLdbUnit;
+class PostgreSQLdatabase;
+
+class PostgreSQLtransaction : public BaseTransaction, public virtual Transaction
+{
+public:
+	PostgreSQLtransaction( PostgreSQLdatabase& database );
+	 ~PostgreSQLtransaction()		{}
+
+	const std::string& databaseID() const;
+
+	void execute();
+
+	void close();
+private:
+	PostgreSQLdatabase&	m_db;		///< parent database
+	PostgreSQLdbUnit&	m_unit;		///< parent database unit
+};
+
 
 class PostgreSQLdatabase : public Database
 {
@@ -104,20 +122,23 @@ public:
 
 	void setUnit( PostgreSQLdbUnit* unit )	{ m_unit = unit; }
 	bool hasUnit() const			{ return m_unit != NULL; }
+	PostgreSQLdbUnit& dbUnit() const	{ return *m_unit; }
 
 	const std::string& ID() const;
 	PreparedStatementHandler* getPreparedStatementHandler()
 						{ return 0; }	//undefined
-	///\ Just and interface at the moment
-	virtual Transaction* transaction( const std::string& /*name*/ )
-						{ return NULL; }
+	/// more of a placeholder for now
+	Transaction* transaction( const std::string& name );
+
+	void closeTransaction( Transaction* t );
 private:
-	const PostgreSQLdbUnit*	m_unit;		///< parent database unit
+	PostgreSQLdbUnit*	m_unit;		///< parent database unit
 };
 
 
 class PostgreSQLdbUnit : public DatabaseUnit
 {
+	friend class PostgreSQLtransaction;
 public:
 	PostgreSQLdbUnit( const std::string& id,
 			  const std::string& host, unsigned short port, const std::string& dbName,
@@ -129,6 +150,8 @@ public:
 			  unsigned statementTimeout,
 			  const std::string& programFile );
 	~PostgreSQLdbUnit();
+
+	bool loadProgram();
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }

@@ -48,10 +48,13 @@ using namespace _Wolframe::utils;
 namespace _Wolframe {
 namespace db {
 
+static const unsigned short DEFAULT_SQLITE_CONNECTIONS = 3;
+
 bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string& /*node*/,
 			  const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::config;
+	bool connDefined = false;
 	bool retVal = true;
 
 	for ( boost::property_tree::ptree::const_iterator L1it = pt.begin(); L1it != pt.end(); L1it++ )	{
@@ -78,6 +81,11 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, flag, Parser::BoolDomain() ))
 				retVal = false;
 		}
+		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connections,
+						Parser::RangeDomain<unsigned short>( 0 ), &connDefined ))
+				retVal = false;
+		}
 		else if ( boost::algorithm::iequals( L1it->first, "programFile" ))	{
 			bool isDefined = ( !programFile.empty() );
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile, &isDefined ))
@@ -93,6 +101,8 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 					<< L1it->first << "'";
 		}
 	}
+	if ( ! connDefined )
+		connections = DEFAULT_SQLITE_CONNECTIONS;
 	return retVal;
 }
 

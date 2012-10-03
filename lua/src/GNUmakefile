@@ -66,6 +66,8 @@ libdir=$(execdir)/$(LIBDIR)
 # though upstream!
 ALL_CFLAGS = $(OPTFLAGS) -Wall $(LUA_PLATFORM_CFLAGS) -I. $(SO_COMPILE_FLAGS)
 
+lua.exe: $(STATIC_LIB) $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)
+
 local_all:
 
 local_clean:

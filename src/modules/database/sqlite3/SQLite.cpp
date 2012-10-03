@@ -39,7 +39,7 @@
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include "utils/miscUtils.hpp"
+//#include "utils/miscUtils.hpp"
 
 #include "sqlite3.h"
 
@@ -47,8 +47,11 @@ namespace _Wolframe {
 namespace db {
 
 SQLiteDBunit::SQLiteDBunit( const std::string& id,
-			    const std::string& filename, unsigned short connections, bool flag )
-	: m_ID( id ), m_filename( filename ), m_flag( flag )
+			    const std::string& filename, bool flag,
+			    const std::string& programFile,
+			    unsigned short connections )
+	: m_ID( id ), m_filename( filename ), m_flag( flag ),
+	  m_programFile( programFile )
 {
 	for( int i = 0; i < connections; i++ ) {
 		sqlite3 *handle;
@@ -60,7 +63,6 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id,
 		m_connections.push_back( handle );
 		m_connPool.add( handle );
 	}
-
 	m_db.setUnit( this );
 
 	MOD_LOG_DEBUG << "SQLite database '" << m_ID << "' created with "
@@ -78,13 +80,26 @@ SQLiteDBunit::~SQLiteDBunit( )
 	MOD_LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
 }
 
+bool SQLiteDBunit::loadProgram()
+{
+	// No program file, do nothing
+	if ( m_programFile.empty())
+		return true;
+	if ( !boost::filesystem::exists( m_programFile ))	{
+		MOD_LOG_ALERT << "Program file '" << m_programFile
+			      << "' does not exist (SQLite database '" << m_ID << "')";
+		return false;
+	}
+	return true;
+}
 
-/*****  SQLite database  **********************************************/
 Database* SQLiteDBunit::database()
 {
 	return m_db.hasUnit() ? &m_db : NULL;
 }
 
+
+/*****  SQLite database  **********************************************/
 const std::string& SQLiteDatabase::ID() const
 {
 	if ( m_unit )
@@ -98,14 +113,14 @@ Transaction* SQLiteDatabase::transaction( const std::string& /*name*/ )
 	return new SQLiteTransaction( *this );
 }
 
-void SQLiteDatabase::closeTransaction( const Transaction *t ) const
+void SQLiteDatabase::closeTransaction( Transaction *t )
 {
 	delete t;
 }
 
 /*****  SQLite transaction  *******************************************/
 SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database )
-	: m_db( database ), m_unit( *database.m_unit )
+	: m_db( database ), m_unit( database.dbUnit() )
 {
 }
 
