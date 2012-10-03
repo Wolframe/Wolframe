@@ -422,6 +422,7 @@ Group: Application/Business
 %description libxslt
 The Wolframe filter module using libxslt.
 
+Requires: %{name} >= %{version}-%{release}
 Requires: libxslt >= 1.0
 %endif
 
@@ -433,6 +434,7 @@ Group: Application/Business
 %description libhpdf
 Wolframe printing module based on libhpdf/libharu.
 
+Requires: %{name} >= %{version}-%{release}
 Requires: libpng
 Requires: zlib
 %endif
@@ -693,8 +695,6 @@ fi
 %{_libdir}/wolframe/modules/mod_filter_token.so
 %{_libdir}/wolframe/modules/mod_filter_blob.so
 
-%{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
-
 %if %{with_lua}
 %{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
 %{_libdir}/wolframe/modules/mod_lua_datetime.so
@@ -840,6 +840,7 @@ fi
 %defattr( -, root, root )
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
 %if %{with_local_libhpdf}
 %{_libdir}/wolframe/libhpdf.so.2.2.1
 %{_libdir}/wolframe/libhpdf.so.2
