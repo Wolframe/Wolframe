@@ -2,6 +2,8 @@ TOPDIR = ../..
 
 SUBDIRS =
 
+.NOTPARALLEL:
+
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS =

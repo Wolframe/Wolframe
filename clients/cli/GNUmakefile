@@ -43,6 +43,14 @@ local_clean:
 local_distclean:
 	-rm -f primary.db
 
+local_install:
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(bindir)
+	$(INSTALL) -m 0755 $(CPP_BINS) $(DESTDIR)$(bindir)
+
+local_uninstall:
+	-rm -f $(DESTDIR)$(bindir)/wolfcli(EXE)
+	-rmdir $(DESTDIR)$(bindir)
+
 local_test:
 ifeq ($(WITH_EXPECT),1)
 ifneq "$(PLATFORM)" "NETBSD"
