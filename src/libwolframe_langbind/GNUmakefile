@@ -30,6 +30,7 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
+	databaseTransactionFunction.o \
 	protocol_ioblocks.o \
 	appObjects.o \
 	appConfig_struct.o \

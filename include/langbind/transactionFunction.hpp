@@ -58,6 +58,12 @@ struct TransactionFunction
 
 	virtual InputR getInput() const=0;
 	virtual ResultR execute( const Input* i) const=0;
+
+	const std::string& name() const		{return m_name;}
+	void name( const std::string& name_)	{m_name = name_;}
+
+private:
+	std::string m_name;
 };
 
 typedef types::CountedReference<TransactionFunction> TransactionFunctionR;

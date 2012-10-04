@@ -16,28 +16,29 @@ testcall
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <result><item><id>1</id><name>hugo</name></item><item><id>2</id><name>barbara</name></item></result>
-begin();
+run #1#2
+exec #[1]#[2]
+
 start( 'run' );
 bind( 1, '1' );
 bind( 2, '2' );
 execute();
 nofColumns(); returns 2
+columnName( 1); returns id
+columnName( 2); returns name
 get( 1 ); returns 1
 get( 2 ); returns hugo
 next(); returns 1
 get( 1 ); returns 2
 get( 2 ); returns barbara
 next(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 2
-columnName( 1 ); returns id
-columnName( 2 ); returns name
 start( 'exec' );
 bind( 1, '1' );
 bind( 2, 'hugo' );
 execute();
+nofColumns(); returns 0
 bind( 1, '2' );
 bind( 2, 'barbara' );
 execute();
-commit();
+nofColumns(); returns 0
 **end

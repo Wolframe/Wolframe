@@ -10,15 +10,16 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwolframe
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_langbind
 
 INCLUDE_LIBS = \
-	-lwolframe
+	-lwolframe \
+	-lwolframe_langbind
 
 DYNAMIC_MODULE = mod_transaction_pstm.so
 
 CPP_OBJS = \
-	database_preparedStatementProcessor.o \
 	mod_transaction_pstm.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

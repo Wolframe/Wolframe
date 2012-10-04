@@ -14,16 +14,18 @@ testcall
 #id#2
 **outputfile:DBOUT
 **output
-begin();
+run #1
+exec #[1]
+
 start( 'run' );
 bind( 1, '1' );
 execute();
 nofColumns(); returns 1
+columnName( 1); returns id
 get( 1 ); returns 2
 next(); returns 0
-getLastError(); returns 0
 start( 'exec' );
 bind( 1, '2' );
 execute();
-commit();
+nofColumns(); returns 0
 **end

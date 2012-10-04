@@ -28,6 +28,7 @@ DYNAMIC_MODULE = \
 CPP_OBJS = \
 	testtracePreparedStatement.obj \
 	testtraceDatabase.obj \
+	testtraceTransaction.obj \
 	mod_db_testtrace.obj
 
 all: $(DYNAMIC_MODULE)

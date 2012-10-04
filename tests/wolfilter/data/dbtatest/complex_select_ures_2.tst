@@ -24,123 +24,99 @@ testcall
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <da><da><res>a</res></da><da><res>b</res></da><da><res>c</res></da><do><res>111</res></do><do><res>222</res></do><do><res>333</res></do></da>
-begin();
+run #1#2
+run #11#22
+run #111#222
+get #[1]
+run #[1]
+run #[1]
+run #[1]
+run #[1]
+
 start( 'run' );
 bind( 1, '1' );
 bind( 2, '2' );
 execute();
 nofColumns(); returns 1
+columnName( 1); returns res
 get( 1 ); returns 1
 next(); returns 0
-getLastError(); returns 0
+start( 'run' );
 bind( 1, '11' );
 bind( 2, '22' );
 execute();
 nofColumns(); returns 1
 get( 1 ); returns 2
 next(); returns 0
-getLastError(); returns 0
+start( 'run' );
 bind( 1, '111' );
 bind( 2, '222' );
 execute();
 nofColumns(); returns 1
 get( 1 ); returns 3
 next(); returns 0
-getLastError(); returns 0
 start( 'get' );
 bind( 1, '1' );
 execute();
 nofColumns(); returns 1
+columnName( 1); returns res
 get( 1 ); returns a
 next(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 1
-columnName( 1 ); returns res
 bind( 1, '2' );
 execute();
 nofColumns(); returns 1
 get( 1 ); returns b
 next(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 1
-columnName( 1 ); returns res
 bind( 1, '3' );
 execute();
 nofColumns(); returns 1
 get( 1 ); returns c
 next(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 1
-columnName( 1 ); returns res
 start( 'run' );
 bind( 1, 'a' );
 execute();
 nofColumns(); returns 1
+columnName( 1); returns res
 get( 1 ); returns 111
 next(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 1
-columnName( 1 ); returns res
 bind( 1, 'b' );
 execute();
 nofColumns(); returns 1
 get( 1 ); returns 222
 next(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 1
-columnName( 1 ); returns res
 bind( 1, 'c' );
 execute();
 nofColumns(); returns 1
 get( 1 ); returns 333
 next(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 1
-columnName( 1 ); returns res
+start( 'run' );
 bind( 1, 'a' );
 execute();
-nofColumns(); returns 0
-getLastError(); returns 0
 nofColumns(); returns 0
 bind( 1, 'b' );
 execute();
 nofColumns(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 0
 bind( 1, 'c' );
 execute();
 nofColumns(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 0
+start( 'run' );
 bind( 1, 'a' );
 execute();
-nofColumns(); returns 0
-getLastError(); returns 0
 nofColumns(); returns 0
 bind( 1, 'b' );
 execute();
 nofColumns(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 0
 bind( 1, 'c' );
 execute();
 nofColumns(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 0
+start( 'run' );
 bind( 1, 'a' );
 execute();
-nofColumns(); returns 0
-getLastError(); returns 0
 nofColumns(); returns 0
 bind( 1, 'b' );
 execute();
 nofColumns(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 0
 bind( 1, 'c' );
 execute();
 nofColumns(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 0
-commit();
 **end

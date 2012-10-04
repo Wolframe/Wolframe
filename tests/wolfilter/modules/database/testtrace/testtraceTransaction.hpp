@@ -31,65 +31,47 @@
 
 ************************************************************************/
 //
-// database.hpp - Wolframe base database class
+//
 //
 
-#ifndef _DATABASE_HPP_INCLUDED
-#define _DATABASE_HPP_INCLUDED
-
+#ifndef _TESTTRACE_TRANSACTION_HPP_INCLUDED
+#define _TESTTRACE_TRANSACTION_HPP_INCLUDED
+#include "database/transaction.hpp"
+#include "testtraceDatabase.hpp"
 #include <string>
-
-#include "transaction.hpp"
 
 namespace _Wolframe {
 namespace db {
 
-// Forward declaration
-class PreparedStatementHandler;
-
-/// Base class for database interface
-/// All databases should provide this interface
-class Database
+class TesttraceTransaction
+	:public Transaction
 {
 public:
-	virtual ~Database()			{}
+	explicit TesttraceTransaction( const TesttraceDatabase* dbref_, const std::vector<std::string>& result_)
+		:m_dbref(dbref_)
+		,m_result(result_){}
 
-	/// Database identification.
-	/// All databases must have an identifier as they are referenced using this identifier.
-	/// The identifier must be unique (of course).
-	virtual const std::string& ID() const = 0;
+	virtual ~TesttraceTransaction();
 
-	///\ Just and interface at the moment
-	virtual Transaction* transaction( const std::string& name ) = 0;
+	virtual const std::string& databaseID() const
+	{
+		return m_dbref->ID();
+	}
 
-	/// Close the database connetion
-	/// This exists for no good reason (mostly to make the code look uniform)
-	virtual void close()			{}
-};
+	virtual void execute();
 
+	virtual void putInput( const TransactionInput& input_)		{m_input = input_;}
+	virtual const TransactionOutput& getResult() const		{return m_output;}
 
-/// Database Unit
-/// This is the base class for database unit implementations
-class DatabaseUnit
-{
-public:
-	virtual ~DatabaseUnit()			{}
+	virtual void close(){}
 
-	/// Database class (module type).
-	/// All database implementations need a class name.
-	/// Class names must be unique.
-	virtual const char* className() const = 0;
-
-	/// The database identifier. This is the configured name.
-	virtual const std::string& ID() const = 0;
-
-	/// The actual database object.
-	virtual Database* database() = 0;
-
-	/// Load the transaction program(s) for this database
-	virtual bool loadProgram() = 0;
+private:
+	const TesttraceDatabase* m_dbref;
+	std::vector<std::string> m_result;
+	TransactionInput m_input;
+	TransactionOutput m_output;
 };
 
 }} // namespace _Wolframe::db
 
-#endif // _DATABASE_HPP_INCLUDED
+#endif // _TRANSACTION_HPP_INCLUDED

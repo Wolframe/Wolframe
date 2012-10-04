@@ -41,11 +41,11 @@
 #include <list>
 
 #include "database/database.hpp"
+#include "database/transaction.hpp"
 #include "config/configurationBase.hpp"
 #include "constructor.hpp"
 
 #include "objectPool.hpp"
-#include "../dbTransaction.hpp"
 
 #ifdef _WIN32
 #pragma warning(disable:4250)
@@ -97,20 +97,25 @@ private:
 class PostgreSQLdbUnit;
 class PostgreSQLdatabase;
 
-class PostgreSQLtransaction : public BaseTransaction, public virtual Transaction
+class PostgreSQLtransaction : public Transaction
 {
 public:
 	PostgreSQLtransaction( PostgreSQLdatabase& database );
 	 ~PostgreSQLtransaction()		{}
 
-	const std::string& databaseID() const;
+	virtual const std::string& databaseID() const;
 
-	void execute();
+	virtual void putInput( const TransactionInput& input_)		{m_input = input_;}
+	virtual const TransactionOutput& getResult() const		{return m_output;}
 
-	void close();
+	virtual void execute();
+
+	virtual void close();
 private:
 	PostgreSQLdatabase&	m_db;		///< parent database
 	PostgreSQLdbUnit&	m_unit;		///< parent database unit
+	TransactionInput	m_input;	///< input data structure
+	TransactionOutput	m_output;	///< output data structure
 };
 
 

@@ -36,6 +36,8 @@
 
 #ifndef _TRANSACTION_HPP_INCLUDED
 #define _TRANSACTION_HPP_INCLUDED
+#include "database/transactionInput.hpp"
+#include "database/transactionOutput.hpp"
 
 #include <string>
 
@@ -48,9 +50,10 @@ public:
 
 	virtual const std::string& databaseID() const = 0;
 
-	virtual void execute() = 0;
+	virtual void execute( ) = 0;
 
-	virtual void doBlaBla() = 0;
+	virtual void putInput( const TransactionInput& input) = 0;
+	virtual const TransactionOutput& getResult() const = 0;
 
 	virtual void close() = 0;
 };

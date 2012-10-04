@@ -12,8 +12,9 @@
 testcall
 **outputfile:DBOUT
 **output
-begin();
+run
+
 start( 'run' );
 execute();
-commit();
+nofColumns(); returns 0
 **end

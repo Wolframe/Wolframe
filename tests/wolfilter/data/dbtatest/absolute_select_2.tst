@@ -12,10 +12,11 @@
 testcall
 **outputfile:DBOUT
 **output
-begin();
+run #1#2
+
 start( 'run' );
 bind( 1, '1' );
 bind( 2, '2' );
 execute();
-commit();
+nofColumns(); returns 0
 **end

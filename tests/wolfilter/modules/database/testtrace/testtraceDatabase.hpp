@@ -37,7 +37,6 @@
 #include "database/database.hpp"
 #include "config/configurationBase.hpp"
 #include "serialize/struct/filtermapBase.hpp"
-#include "testtracePreparedStatement.hpp"
 #include "constructor.hpp"
 #include <list>
 #include <string>
@@ -111,16 +110,18 @@ public:
 		return this;
 	}
 
-	///\brief Get the interface for processing prepared statements in the database
-	virtual PreparedStatementHandler* getPreparedStatementHandler()
+	virtual Transaction* transaction( const std::string& /*name*/);
+
+	bool loadProgram()
 	{
-		return new PreparedStatementHandler_testtrace( m_id, m_outfilename, m_result, this);
+		return true;
 	}
 
-	/// it's just a dummy as we need to change a lot
-	virtual Transaction* transaction( const std::string& /*name*/ )
-						{ return NULL; }
-	bool loadProgram()			{ return true; }
+	const std::string& outfilename() const
+	{
+		return m_outfilename;
+	}
+
 private:
 	std::string m_id;
 	std::string m_outfilename;

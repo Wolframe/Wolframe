@@ -34,6 +34,7 @@
 ///\brief Fake database implementation for testing database processing engines
 #include "logger-v1.hpp"
 #include "testtraceDatabase.hpp"
+#include "testtraceTransaction.hpp"
 #include "serialize/struct/filtermapDescription.hpp"
 #include "config/structSerialize.hpp"
 #include "utils/miscUtils.hpp"
@@ -123,5 +124,9 @@ TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string&
 	}
 }
 
+Transaction* TesttraceDatabase::transaction( const std::string& /*name*/ )
+{
+	return new TesttraceTransaction( this, m_result);
+}
 
 

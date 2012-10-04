@@ -586,6 +586,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::declareTransactionFunction( cons
 			return false;
 		}
 		langbind::TransactionFunctionR funcp( itr->second->object( command));
+		funcp->name( name);
 		std::string funckey( boost::algorithm::to_upper_copy( name));
 
 		std::map< std::string, langbind::TransactionFunctionR>::const_iterator ip = m_transactionFunctionMap.find( funckey);

@@ -22,6 +22,7 @@ LIBRARIES = \
 	wolframe_langbind.lib
 
 CPP_OBJS = \
+	databaseTransactionFunction.obj \
 	protocol_ioblocks.obj \
 	appObjects.obj \
 	appConfig_struct.obj \

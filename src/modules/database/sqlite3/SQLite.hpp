@@ -38,14 +38,13 @@
 #define _SQLITE_HPP_INCLUDED
 
 #include "database/database.hpp"
+#include "database/transaction.hpp"
 #include "config/configurationBase.hpp"
 #include "constructor.hpp"
 
 #include <list>
 #include "objectPool.hpp"
 #include "sqlite3.h"
-
-#include "../dbTransaction.hpp"
 
 #ifdef _WIN32
 #pragma warning(disable:4250)
@@ -83,20 +82,25 @@ private:
 class SQLiteDBunit;
 class SQLiteDatabase;
 
-class SQLiteTransaction : public BaseTransaction, public virtual Transaction
+class SQLiteTransaction : public Transaction
 {
 public:
 	SQLiteTransaction( SQLiteDatabase& database );
 	 ~SQLiteTransaction()			{}
 
-	const std::string& databaseID() const;
+	virtual const std::string& databaseID() const;
 
-	void execute();
+	virtual void putInput( const TransactionInput& input_)		{m_input = input_;}
+	virtual const TransactionOutput& getResult() const		{return m_output;}
 
-	void close();
+	virtual void execute();
+
+	virtual void close();
 private:
 	SQLiteDatabase&	m_db;			///< parent database
 	SQLiteDBunit&	m_unit;			///< parent database unit
+	TransactionInput	m_input;	///< input data structure
+	TransactionOutput	m_output;	///< output data structure
 };
 
 

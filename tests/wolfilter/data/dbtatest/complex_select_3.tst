@@ -12,19 +12,26 @@
 testcall
 **outputfile:DBOUT
 **output
-begin();
+run #1#2#3
+run #11#22#33
+run #111#222#333
+
 start( 'run' );
 bind( 1, '1' );
 bind( 2, '2' );
 bind( 3, '3' );
 execute();
+nofColumns(); returns 0
+start( 'run' );
 bind( 1, '11' );
 bind( 2, '22' );
 bind( 3, '33' );
 execute();
+nofColumns(); returns 0
+start( 'run' );
 bind( 1, '111' );
 bind( 2, '222' );
 bind( 3, '333' );
 execute();
-commit();
+nofColumns(); returns 0
 **end

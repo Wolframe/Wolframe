@@ -34,7 +34,7 @@
 ///\brief Module for transaction functions based on the prepared statement database interface
 #include "module/transactionFunctionBuilder.hpp"
 #include "logger-v1.hpp"
-#include "database/preparedStatementProcessor.hpp"
+#include "langbind/databaseTransactionFunction.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 
@@ -51,7 +51,7 @@ struct PreparedStatementProcessor
 {
 	static SimpleBuilder* constructor()
 	{
-		return new TransactionFunctionBuilder( "dbpstm", db::createPreparedStatementTransactionFunction);
+		return new TransactionFunctionBuilder( "dbpstm", langbind::createDatabaseTransactionFunction);
 	}
 };
 }//anonymous namespace

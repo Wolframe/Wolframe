@@ -19,13 +19,18 @@ testcall
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <doc><offen>1</offen></doc>
 <doc><offen>2</offen></doc>
-begin();
+run #1#2#3
+exec #[1]#[2]#[3]
+
 start( 'run' );
 bind( 1, '1' );
 bind( 2, '2' );
 bind( 3, '3' );
 execute();
 nofColumns(); returns 3
+columnName( 1); returns id
+columnName( 2); returns name
+columnName( 3); returns street
 get( 1 ); returns 1
 get( 2 ); returns hugo
 get( 3 ); returns bahnhof strasse 15
@@ -38,18 +43,15 @@ get( 1 ); returns 3
 get( 2 ); returns sara
 get( 3 ); returns tannen steig 12
 next(); returns 0
-getLastError(); returns 0
 start( 'exec' );
 bind( 1, '1' );
 bind( 2, 'hugo' );
 bind( 3, 'bahnhof strasse 15' );
 execute();
 nofColumns(); returns 1
+columnName( 1); returns offen
 get( 1 ); returns 1
 next(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 1
-columnName( 1 ); returns offen
 bind( 1, '2' );
 bind( 2, 'miriam' );
 bind( 3, 'zum gems weg 3' );
@@ -57,15 +59,9 @@ execute();
 nofColumns(); returns 1
 get( 1 ); returns 2
 next(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 1
-columnName( 1 ); returns offen
 bind( 1, '3' );
 bind( 2, 'sara' );
 bind( 3, 'tannen steig 12' );
 execute();
 nofColumns(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 0
-commit();
 **end

@@ -12,10 +12,11 @@
 testcall
 **outputfile:DBOUT
 **output
-begin();
+run #hier ist ein haus text#hier ist ein baum text
+
 start( 'run' );
 bind( 1, 'hier ist ein haus text' );
 bind( 2, 'hier ist ein baum text' );
 execute();
-commit();
+nofColumns(); returns 0
 **end

@@ -16,15 +16,13 @@ testcall
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <result><id>1</id></result>
-begin();
+run #1
+
 start( 'run' );
 bind( 1, '1' );
 execute();
 nofColumns(); returns 1
+columnName( 1); returns id
 get( 1 ); returns 1
 next(); returns 0
-getLastError(); returns 0
-nofColumns(); returns 1
-columnName( 1 ); returns id
-commit();
 **end
