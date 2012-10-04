@@ -39,7 +39,7 @@
 namespace _Wolframe {
 namespace db {
 
-void BaseTransaction::doBlaBla()
+void TransactionClassInTheInterfaceThatIsJustAnExample::doBlaBla()
 {
 }
 

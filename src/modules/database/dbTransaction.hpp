@@ -43,7 +43,7 @@ namespace _Wolframe {
 namespace db {
 
 
-class BaseTransaction : public virtual Transaction
+class TransactionClassInTheInterfaceThatIsJustAnExample : public virtual Transaction
 {
 public:
 	void doBlaBla();

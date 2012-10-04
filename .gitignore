@@ -134,6 +134,7 @@ tests/simpleFormCompiler/src/testSimpleFormCompiler
 tests/AAAA/passwdFileTest
 tests/testSimpleFormCompiler
 tests/stringNormalizationTest
-tests/database/postgresUnit
-tests/database/sqliteUnit
+tests/database/PostgreSQL/postgresUnit
+tests/database/SQLite3/sqliteUnit
+tests/database/SQLite3/test.db
 *.qm

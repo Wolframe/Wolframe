@@ -13,19 +13,19 @@ INCLUDE_DIRS += \
 	-I$(TOPDIR)/gtest/include
 
 INCLUDE_LDFLAGS += \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS += \
-	-lboost_thread$(BOOST_LIBRARY_TAG) \
-	-lboost_system \
-	-lboost_filesystem \
-	$(PGSQL_LIBS) \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	$(TOPDIR)/gtest/gtest-all.o
-
-CPP_OBJS = \
+	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/modules/database/postgresql/PostgreSQL.o \
-	$(TOPDIR)/src/modules/database/dbTransaction.o
+	$(PGSQL_LIBS) \
+	$(TOPDIR)/src/modules/database/dbTransaction.o \
+	-lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lboost_system -lboost_filesystem
+
+CPP_OBJS =
 
 TEST_CPP_BINS = \
 	postgresUnit$(EXE)
@@ -38,7 +38,7 @@ local_clean:
 
 local_distclean:
 
-local_test:
-#$(TEST_CPP_BINS)
+local_test: $(TEST_CPP_BINS)
+	./postgresUnit$(EXE)
 
 local_longtest:
