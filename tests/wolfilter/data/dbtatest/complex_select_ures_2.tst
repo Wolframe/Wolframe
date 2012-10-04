@@ -5,7 +5,7 @@
 **config
 --module ../../src/modules/filter/textwolf/mod_filter_textwolf
 --module ../wolfilter/modules/database/testtrace/mod_db_testtrace
---module ../../src/modules/transaction/preparedStatement/mod_transaction_pstm
+--module ../../src/modules/transaction/databaseTransaction/mod_transaction_database
 --input-filter 'xml:textwolf'
 --database 'id=testdb,outfile=DBOUT,file=DBRES'
 --transaction 'testcall dbpstm run(/doc/item/aa : . ,../bb ) ; da/da =get(:$1);  da/do=run(//bb:$1 )'
