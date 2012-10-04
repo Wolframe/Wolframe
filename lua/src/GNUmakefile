@@ -4,6 +4,8 @@ SUBDIRS =
 
 PACKAGE_NAME = wolframe
 
+.NOTPARALLEL:
+
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_LDFLAGS = \

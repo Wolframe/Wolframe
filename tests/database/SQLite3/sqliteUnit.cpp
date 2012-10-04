@@ -6,10 +6,7 @@
 #include "moduleDirectory.hpp"
 #include "gtest/gtest.h"
 
-#include "PostgreSQL.hpp"
-
-#include <string>
-#include <list>
+#include "SQLite.hpp"
 
 using namespace _Wolframe::db;
 using namespace _Wolframe::log;
@@ -17,12 +14,12 @@ using namespace _Wolframe::log;
 _Wolframe::log::LogBackend*	logBackendPtr;
 
 // The fixture for testing Wolframe module that log
-class PQmoduleFixture : public ::testing::Test
+class SQLiteModuleFixture : public ::testing::Test
 {
 	LogBackend& logBack;
 
 	protected:
-		PQmoduleFixture( ) :
+		SQLiteModuleFixture( ) :
 			logBack( LogBackend::instance( ) )
 		{
 			logBack.setConsoleLevel( LogLevel::LOGLEVEL_DATA );
@@ -30,14 +27,20 @@ class PQmoduleFixture : public ::testing::Test
 		}
 };
 
-TEST_F( PQmoduleFixture, CreatePostgreSQLunit )
+TEST_F( SQLiteModuleFixture, CreateSQLiteUnit_0 )
 {
-	PostgreSQLdbUnit db( "testDB", "localhost", 0, "wolframe",
-			     "wolfusr", "wolfpwd", "", "", "", "", "",
-			     3, 4, 3, 10, "program" );
-	ASSERT_STREQ( "PostgreSQL", db.className());
+	SQLiteDBunit db( "testDB", "test.db", false, "program", 3 );
+	ASSERT_STREQ( "SQLite", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
 	ASSERT_FALSE( db.loadProgram());
+}
+
+TEST_F( SQLiteModuleFixture, CreateSQLiteUnit_1 )
+{
+	SQLiteDBunit db( "testDB", "test.db", false, "", 3 );
+	ASSERT_STREQ( "SQLite", db.className());
+	ASSERT_STREQ( "testDB", db.ID().c_str());
+	ASSERT_TRUE( db.loadProgram());
 }
 
 int main( int argc, char **argv )

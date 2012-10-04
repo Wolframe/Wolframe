@@ -41,7 +41,6 @@
 #include "objectPool.hpp"
 #include "gtest/gtest.h"
 
-
 class testObject	{
 public:
 	testObject()		{ m_threads = 0, m_uses = 0; }

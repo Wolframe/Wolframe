@@ -135,4 +135,5 @@ tests/AAAA/passwdFileTest
 tests/testSimpleFormCompiler
 tests/stringNormalizationTest
 tests/database/postgresUnit
+tests/database/sqliteUnit
 *.qm
