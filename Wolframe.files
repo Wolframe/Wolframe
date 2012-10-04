@@ -277,6 +277,12 @@ examples/tproc/appProperties.cpp
 examples/tproc/GNUmakefile
 examples/tproc/handlerConfig.hpp
 examples/tproc/Makefile.W32
+examples/tproc/tests/temp/echo.lua
+examples/tproc/tests/temp/example_1.lua
+examples/tproc/tests/temp/example_2.lua
+examples/tproc/tests/temp/example_3.lua
+examples/tproc/tests/temp/example_4.lua
+examples/tproc/tests/temp/example_5.lua
 examples/tproc/tests/template/data/multilingual.UTF-8.xml
 examples/tproc/tests/tprocHandlerTest.cpp
 examples/tproc/tproc.conf
@@ -341,9 +347,9 @@ include/constructor.hpp
 include/database/database.hpp
 include/database/DBprovider.hpp
 include/database/preparedStatement.hpp
-include/database/preparedStatementProcessor.hpp
 include/database/transaction.hpp
 include/database/transactionInput.hpp
+include/database/transactionOutput.hpp
 include/ddl/atomicType.hpp
 include/ddl/bignumType.hpp
 include/ddl/compilerInterface.hpp
@@ -375,6 +381,7 @@ include/langbind/appConfig_option.hpp
 include/langbind/appConfig_struct.hpp
 include/langbind/appFormFunction.hpp
 include/langbind/appObjects.hpp
+include/langbind/databaseTransactionFunction.hpp
 include/langbind/iostreamfilter.hpp
 include/langbind/luaArithmeticType.hpp
 include/langbind/luaBcdNumber.hpp
@@ -690,6 +697,7 @@ src/libwolframe/GNUmakefile
 src/libwolframe_langbind/appConfig_option.cpp
 src/libwolframe_langbind/appConfig_struct.cpp
 src/libwolframe_langbind/appObjects.cpp
+src/libwolframe_langbind/databaseTransactionFunction.cpp
 src/libwolframe_langbind/GNUmakefile
 src/libwolframe_langbind/Makefile.W32
 src/libwolframe_langbind/null_filter.cpp
@@ -959,13 +967,12 @@ src/modules/prnt/testPdfPrinter/mod_test_pdf_printer.cpp
 src/modules/prnt/testPdfPrinter/ModTestPdfPrinter.def
 src/modules/prnt/testPdfPrinter/prnt_pdfPrinterDocument_testtrace.cpp
 src/modules/prnt/testPdfPrinter/prnt_pdfPrinter_testtrace.cpp
+src/modules/transaction/databaseTransaction/GNUmakefile
+src/modules/transaction/databaseTransaction/Makefile.W32
+src/modules/transaction/databaseTransaction/mod_transaction_database.cpp
+src/modules/transaction/databaseTransaction/ModTransactionDatabase.def
 src/modules/transaction/GNUmakefile
 src/modules/transaction/Makefile.W32
-src/modules/transaction/preparedStatement/database_preparedStatementProcessor.cpp
-src/modules/transaction/preparedStatement/GNUmakefile
-src/modules/transaction/preparedStatement/Makefile.W32
-src/modules/transaction/preparedStatement/ModTransactionPreparedStatement.def
-src/modules/transaction/preparedStatement/mod_transaction_pstm.cpp
 src/posixMain.cpp
 src/serverConfig.cpp
 src/server.cpp
@@ -1110,6 +1117,8 @@ tests/wolfilter/modules/database/testtrace/testtraceDatabase.cpp
 tests/wolfilter/modules/database/testtrace/testtraceDatabase.hpp
 tests/wolfilter/modules/database/testtrace/testtracePreparedStatement.cpp
 tests/wolfilter/modules/database/testtrace/testtracePreparedStatement.hpp
+tests/wolfilter/modules/database/testtrace/testtraceTransaction.cpp
+tests/wolfilter/modules/database/testtrace/testtraceTransaction.hpp
 tests/wolfilter/modules/employee_assignment_convert/employee_assignment_convert.cpp
 tests/wolfilter/modules/employee_assignment_convert/employee_assignment_convert.hpp
 tests/wolfilter/modules/employee_assignment_convert/GNUmakefile
