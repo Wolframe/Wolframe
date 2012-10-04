@@ -1,0 +1,4 @@
+LIBRARY mod_transaction_database
+
+EXPORTS
+entryPoint	@1

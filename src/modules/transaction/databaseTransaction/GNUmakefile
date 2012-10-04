@@ -17,10 +17,10 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_langbind
 
-DYNAMIC_MODULE = mod_transaction_pstm.so
+DYNAMIC_MODULE = mod_transaction_database.so
 
 CPP_OBJS = \
-	mod_transaction_pstm.o
+	mod_transaction_database.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

@@ -4,7 +4,7 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-SUBDIRS += preparedStatement
+SUBDIRS += databaseTransaction
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
