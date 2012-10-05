@@ -40,7 +40,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-static void executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr)
+static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr)
 {
 	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
@@ -58,9 +58,9 @@ static void executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 				val = ai->value();
 				break;
 		}
-		stmh->bind( argidx, val);
+		if (!stmh->bind( argidx, val)) return false;
 	}
-	stmh->execute();
+	if (!stmh->execute()) return false;
 
 	unsigned int si, se = stmh->nofColumns();
 	if (!cmdres.nofColumns())
@@ -71,7 +71,7 @@ static void executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 			cmdres.addColumn( colname?colname:"");
 		}
 	}
-	if (stmh->nofResults() > 0) do
+	if (stmh->hasResult()) do
 	{
 		cmdres.openRow();
 		for (si=0; si != se; ++si)
@@ -88,9 +88,10 @@ static void executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 		}
 
 	} while (stmh->next());
+	return true;
 }
 
-void PreparedStatementHandler::doTransaction( const TransactionInput& input, TransactionOutput& output)
+bool PreparedStatementHandler::doTransaction( const TransactionInput& input, TransactionOutput& output)
 {
 	std::size_t null_functionidx = std::numeric_limits<std::size_t>::max();
 	TransactionOutput::CommandResultBuilder cmdres( &output, null_functionidx);
@@ -98,7 +99,7 @@ void PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 	TransactionInput::cmd_iterator ci = input.begin(), ce = input.end();
 	for (; ci != ce; ++ci)
 	{
-		start( ci->name());
+		if (!start( ci->name())) return false;
 		if (cmdres.functionidx() != ci->functionidx())
 		{
 			if (cmdres.functionidx() != null_functionidx)
@@ -119,7 +120,7 @@ void PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 				TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
 				for (; wi != we; ++wi)
 				{
-					executeCommand( this, cmdres, wi, ci);
+					if (!executeCommand( this, cmdres, wi, ci)) return false;
 				}
 			}
 		}
@@ -127,13 +128,14 @@ void PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		{
 			// ... command has no result reference, then we call it once
 			TransactionOutput::row_iterator wi;
-			executeCommand( this, cmdres, wi, ci);
+			if (!executeCommand( this, cmdres, wi, ci)) return false;
 		}
 	}
 	if (cmdres.functionidx() != null_functionidx)
 	{
 		output.addCommandResult( cmdres);
 	}
+	return true;
 }
 
 

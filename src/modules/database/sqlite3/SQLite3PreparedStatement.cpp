@@ -32,7 +32,6 @@
 ************************************************************************/
 ///\brief Implementation of processing prepared statements with sqlite3
 ///\file modules/database/sqlite3/SQLite3PreparedStatement.cpp
-
 #include "SQLite3PreparedStatement.hpp"
 #include <iostream>
 #include <sstream>
@@ -219,6 +218,11 @@ bool PreparedStatementHandler_sqlite3::execute()
 		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
 	}
 	return status( sqlite3_step( m_stm), Executed);
+}
+
+bool PreparedStatementHandler_sqlite3::hasResult()
+{
+	return ((std::size_t)sqlite3_data_count( m_stm) != 0);
 }
 
 std::size_t PreparedStatementHandler_sqlite3::nofColumns()

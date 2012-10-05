@@ -68,6 +68,8 @@ struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 	virtual bool bind( std::size_t idx, const char* value);
 	///\brief Execute instance of current statement
 	virtual bool execute();
+	///\brief Return true is the last command has at least one result row returned
+	virtual bool hasResult();
 	///\brief Get the number of columns of the last result
 	virtual std::size_t nofColumns();
 	///\brief Get a column title of the last result

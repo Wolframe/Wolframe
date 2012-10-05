@@ -34,8 +34,6 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	xml.writeStartDocument( );
 	xml.writeStartElement( form_name );
 
-	QString groupName;
-
 	QList<QWidget *> widgets = form->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
 		QString clazz = widget->metaObject( )->className( ); 
@@ -76,9 +74,6 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( widget );
 			QString text = QString::number( spinBox->value( ) );
 			xml.writeTextElement( "", name, text );
-		} else if( clazz == "QCheckBox" ) {
-			QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
-			xml.writeTextElement( "", name, checkBox->isChecked( ) ? "true" : "false" );
 		} else if( clazz == "QSlider" ) {
 			QSlider *slider = qobject_cast<QSlider *>( widget );
 			QString text = QString::number( slider->value( ) );
@@ -91,12 +86,29 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
 			QString html = textEdit->toHtml( );
 			xml.writeTextElement( "", name, html );
-		} else if( clazz == "QGroupBox" ) {
-			groupName = name;
+		} else if( clazz == "QCheckBox" ) {
+			QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
+			QObject *parent = widget->parent( );
+			QString clazzParent = parent->metaObject( )->className( ); 
+			if( clazzParent == "QGroupBox" ) {
+				QString groupName = parent->objectName( );
+				if( checkBox->isChecked( ) ) {
+					xml.writeTextElement( "", groupName, name );
+				}
+			} else {
+				xml.writeTextElement( "", name, checkBox->isChecked( ) ? "true" : "false" );
+			}
 		} else if( clazz == "QRadioButton" ) {
 			QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
-			if( !groupName.isNull( ) && radioButton->isChecked( ) ) {
-				xml.writeTextElement( "", groupName, name );
+			QObject *parent = widget->parent( );
+			QString clazzParent = parent->metaObject( )->className( ); 
+			if( clazzParent == "QGroupBox" ) {
+				QString groupName = parent->objectName( );
+				if( radioButton->isChecked( ) ) {
+					xml.writeTextElement( "", groupName, name );
+				}
+			} else {
+				xml.writeTextElement( "", name, radioButton->isChecked( ) ? "true" : "false" );
 			}
 		}
 		

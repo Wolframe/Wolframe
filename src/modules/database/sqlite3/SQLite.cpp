@@ -36,7 +36,7 @@
 
 #include "logger-v1.hpp"
 #include "SQLite.hpp"
-
+#include "SQLite3PreparedStatement.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
@@ -153,9 +153,24 @@ const std::string& SQLiteTransaction::databaseID() const
 void SQLiteTransaction::execute()
 {
 	try	{
-		_Wolframe::PoolObject< sqlite3* > conn( m_unit.m_connPool );
-		int err = sqlite3_errcode( *conn );
-		MOD_LOG_DEBUG << "SQLite error code: " << err;
+		_Wolframe::PoolObject< sqlite3* > conn( m_unit.m_connPool);
+		PreparedStatementHandler_sqlite3 ph( *conn, m_unit.stmmap());
+		try
+		{
+			if (!ph.begin()
+			||  !ph.doTransaction( m_input, m_output)
+			||  !ph.commit())
+			{
+				const char* err = ph.getLastError();
+				MOD_LOG_ERROR << "error in sqlite database transaction: " << (err?err:"unknown error");
+				ph.rollback();
+			}
+		}
+		catch (const std::runtime_error& e)
+		{
+			MOD_LOG_ERROR << "error in sqlite database transaction: " << e.what();
+			ph.rollback();
+		}
 	}
 	catch ( _Wolframe::ObjectPoolTimeout )
 	{
