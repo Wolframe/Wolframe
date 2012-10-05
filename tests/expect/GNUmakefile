@@ -13,6 +13,7 @@ configTest: $(TOPDIR)/src/wolframed
 local_all:
 
 local_clean:
+	@rm -f primary.db
 
 local_distclean:
 

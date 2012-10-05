@@ -18,6 +18,7 @@ INCLUDE_LIBS = \
 	-lwolframe \
 	$(PGSQL_LIBS)
 
+STATIC_LIB = mod_db_postgresql_lib.a
 DYNAMIC_MODULE = mod_db_postgresql.so
 
 CPP_OBJS = \
