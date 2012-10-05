@@ -37,7 +37,7 @@ local_clean:
 
 local_distclean:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwolframe"
 
 local_test: $(TEST_CPP_BINS)
 	 @LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./postgresUnit$(EXE)
