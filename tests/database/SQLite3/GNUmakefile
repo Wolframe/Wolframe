@@ -5,18 +5,18 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 
-INCLUDE_DIRS += \
+INCLUDE_DIRS = \
 	-I$(TOPDIR)/include \
 	-I$(BOOST_INCLUDE_DIR) \
 	$(SQLITE3_INCLUDE_DIRS) \
 	-I$(TOPDIR)/src/modules/database/sqlite3 \
 	-I$(TOPDIR)/gtest/include
 
-INCLUDE_LDFLAGS += \
+INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(SQLITE3_LIB_DIR)
 
-INCLUDE_LIBS += \
+INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/modules/database/sqlite3/SQLite.o \

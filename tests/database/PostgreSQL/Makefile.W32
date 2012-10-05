@@ -1,4 +1,4 @@
-TOPDIR = ..\..
+TOPDIR = ..\..\..
 
 SUBDIRS =
 
@@ -6,15 +6,30 @@ SUBDIRS =
 
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
+	
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\include \
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I$(TOPDIR)\src\modules\database\postgresql \
+	/I$(TOPDIR)\gtest\include \
+	/I"$(PGSQL_DIR)\include"
 
-INCLUDE_DIRS =
+INCLUDE_LDFLAGS = \
+	$(BOOST_LDFLAGS)
 
-# Note: libraries are picked automatically on Windows!
-INCLUDE_LDFLAGS =
+INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\gtest\gtest-all.obj \
+	$(TOPDIR)\src\modules\database\postgresql\PostgreSQL.obj \
+	"$(PGSQL_DIR)\lib\libpq.lib" \
+	$(TOPDIR)\src\modules\database\dbTransaction.obj \
+	kernel32.lib advapi32.lib Ws2_32.lib
+	
+TEST_CPP_BINS = \
+	postgresUnit.exe
 
-INCLUDE_LIBS =
-
-TEST_CPP_BINS =
+postgresUnit.exe: postgresUnit.obj
 
 all: $(OBJS) $(CPP_BINS)
 
@@ -28,5 +43,14 @@ local_clean:
 local_distclean:
 
 local_test:
-	@-echo @echo off > test.bat
+	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
+!IFDEF PGDLL_WITH_I18N
+	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" .
+	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" .
+!ENDIF
+!IFDEF WITH_SSL
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
+!ENDIF
+	@-postgresUnit
 
