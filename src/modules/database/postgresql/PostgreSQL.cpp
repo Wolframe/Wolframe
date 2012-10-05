@@ -43,6 +43,18 @@
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
+/*****  PostgreSQL specialized template for PoolObject constructor  *******/
+namespace _Wolframe {
+
+template<>
+PoolObject< PGconn* >::PoolObject( ObjectPool< PGconn* >& pool )
+	: m_pool( pool ), m_object( pool.get() )
+{
+}
+
+} // namespace _Wolframe
+
+
 namespace _Wolframe {
 namespace db {
 

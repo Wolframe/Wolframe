@@ -137,6 +137,7 @@ Credits
 database/AAAA/audit.sql
 database/AAAA/authentication.sql
 database/AAAA/authorization.sql
+database/bits/tree.sql
 database/Tutorial-1/address.sql
 database/Tutorial-2/customers.sql
 database/Tutorial-2/notes.sql
@@ -852,8 +853,6 @@ src/modules/cmdbind/luaCommandHandler/Makefile.W32
 src/modules/cmdbind/luaCommandHandler/mod_lua_command_handler.cpp
 src/modules/cmdbind/luaCommandHandler/ModLuaCommandHandler.def
 src/modules/cmdbind/Makefile.W32
-src/modules/database/dbTransaction.cpp
-src/modules/database/dbTransaction.hpp
 src/modules/database/GNUmakefile
 src/modules/database/Makefile.W32
 src/modules/database/MSSQL/Makefile.W32
@@ -1249,4 +1248,3 @@ zlib/zconf.h
 zlib/zlib.h
 zlib/zutil.c
 zlib/zutil.h
-database/bits/tree.sql
