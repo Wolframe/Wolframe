@@ -26,7 +26,6 @@ DYNAMIC_MODULE = \
 	mod_db_testtrace.dll
 
 CPP_OBJS = \
-	testtracePreparedStatement.obj \
 	testtraceDatabase.obj \
 	testtraceTransaction.obj \
 	mod_db_testtrace.obj

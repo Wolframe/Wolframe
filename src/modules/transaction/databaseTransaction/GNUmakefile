@@ -11,11 +11,11 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_langbind
+	-L$(TOPDIR)/src/libwolframe_database
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lwolframe_langbind
+	-lwolframe_database
 
 DYNAMIC_MODULE = mod_transaction_database.so
 

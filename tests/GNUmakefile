@@ -165,7 +165,7 @@ local_clean:
 
 local_distclean:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_functions:$(TOPDIR)/src/libwolframe_prnt:$(LIBXML2_LIB_DIR)"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_functions:$(TOPDIR)/src/libwolframe_prnt:$(TOPDIR)/src/libwolframe_database:$(LIBXML2_LIB_DIR)"
 
 ifeq ($(WITH_LIBHPDF),1)
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBHPDF_LIB_DIR)"

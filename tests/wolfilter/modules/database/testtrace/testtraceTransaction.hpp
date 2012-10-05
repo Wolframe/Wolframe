@@ -47,11 +47,11 @@ class TesttraceTransaction
 	:public Transaction
 {
 public:
-	explicit TesttraceTransaction( const TesttraceDatabase* dbref_, const std::vector<std::string>& result_)
+	TesttraceTransaction( const TesttraceDatabase* dbref_, const std::vector<std::string>& result_)
 		:m_dbref(dbref_)
 		,m_result(result_){}
 
-	virtual ~TesttraceTransaction();
+	virtual ~TesttraceTransaction(){}
 
 	virtual const std::string& databaseID() const
 	{

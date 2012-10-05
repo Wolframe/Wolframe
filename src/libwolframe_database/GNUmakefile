@@ -10,8 +10,7 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
-	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_serialize
+	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR) -I$(TOPDIR)/include \
@@ -19,28 +18,18 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
-	-lwolframe -lwolframe_serialize \
 	-lboost_filesystem
 
-STATIC_LIB = libwolframe_langbind.a
+STATIC_LIB = libwolframe_database.a
 
-DYNAMIC_LIB = libwolframe_langbind.so
+DYNAMIC_LIB = libwolframe_database.so
 DYNAMIC_LIB_MAJOR = 0
 DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
-	protocol_ioblocks.o \
-	appObjects.o \
-	appConfig_struct.o \
-	appConfig_option.o \
-	scriptConfig_struct.o \
-	scriptConfig_option.o \
-	null_filter.o \
-	typingfilter.o \
-	tostringfilter.o \
-	ptreefilter.o
-
+	databaseTransactionFunction.o \
+	preparedStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

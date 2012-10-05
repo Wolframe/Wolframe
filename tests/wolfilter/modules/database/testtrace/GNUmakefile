@@ -8,7 +8,7 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_DIRS = \
@@ -17,14 +17,13 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lwolframe_serialize \
+	-lwolframe_database \
 	-lboost_filesystem
 
 DYNAMIC_MODULE = \
 	mod_db_testtrace.so
 
 CPP_OBJS = \
-	testtracePreparedStatement.o \
 	testtraceDatabase.o \
 	testtraceTransaction.o \
 	mod_db_testtrace.o

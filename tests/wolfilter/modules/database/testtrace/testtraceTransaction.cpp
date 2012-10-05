@@ -33,6 +33,7 @@
 ///\brief Fake implementation to "process" database commands for testing
 ///\file modules/database/testtrace/testtraceTransaction.cpp
 #include "testtraceTransaction.hpp"
+#include "database/preparedStatement.hpp"
 #include "utils/miscUtils.hpp"
 #include <iostream>
 #include <fstream>
@@ -133,27 +134,37 @@ FakeResult::FakeResult( const std::string& str)
 }
 
 
-class StatementHandler
+class TransactionHandler :public PreparedStatementHandler
 {
 public:
 	///\brief Constructor
-	StatementHandler( std::ostream* out, const std::vector<std::string>& res)
+	TransactionHandler( std::ostream* out, const std::vector<std::string>& res)
 		:m_res(res)
 		,m_out(out)
 	{
 		m_resitr = m_res.begin();
 	}
 
-	void start( const std::string& stmname)
-		{(*m_out) << "start( '" << stmname << "' );" << std::endl;}
+	virtual bool start( const std::string& stmname)
+	{
+		(*m_out) << "start( '" << stmname << "' );" << std::endl;
+		return true;
+	}
 
-	void bind( std::size_t idx, const char* value)
-		{(*m_out) << "bind( " << idx << ", '" << value << "' );" << std::endl;}
+	virtual bool bind( std::size_t idx, const char* value)
+	{
+		if (value)
+		{
+			(*m_out) << "bind( " << idx << ", '" << value << "' );" << std::endl;
+		}
+		else
+		{
+			(*m_out) << "bind( " << idx << ", NULL );" << std::endl;
+		}
+		return true;
+	}
 
-	void bindnull( std::size_t idx)
-		{(*m_out) << "bind( " << idx << ", NULL );" << std::endl;}
-
-	void execute()
+	virtual bool execute()
 	{
 		(*m_out) << "execute();" << std::endl;
 		if (m_resitr == m_res.end())
@@ -164,35 +175,36 @@ public:
 		{
 			m_fakeres = FakeResult( *m_resitr++);
 		}
+		return true;
 	}
 
-	bool hasResult()
+	virtual std::size_t nofResults()
 	{
 		return m_fakeres.nofResults();
 	}
 
-	bool next()
+	virtual bool next()
 	{
 		bool rt = m_fakeres.next();
 		(*m_out) << "next(); returns " << (int)rt << std::endl;
 		return rt;
 	}
 
-	std::size_t nofColumns()
+	virtual std::size_t nofColumns()
 	{
 		std::size_t rt = m_fakeres.nofColumns();
 		(*m_out) << "nofColumns(); returns " << rt << std::endl;
 		return rt;
 	}
 
-	const char* columnName( std::size_t idx)
+	virtual const char* columnName( std::size_t idx)
 	{
 		const char* rt = m_fakeres.columnName( idx);
 		(*m_out) << "columnName( " << idx << "); returns " << (rt?rt:"NULL") << std::endl;
 		return rt;
 	}
 
-	const char* get( std::size_t idx)
+	virtual const char* get( std::size_t idx)
 	{
 		const char* rt = m_fakeres.get( idx);
 		(*m_out) << "get( " << idx << " ); returns " << rt << std::endl;
@@ -233,114 +245,14 @@ static void printTransactionInput( std::ostream& out, const TransactionInput& in
 	out << std::endl;
 }
 
-static void executeCommand( StatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr)
-{
-	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
-	for (int argidx=1; ai != ae; ++ai,++argidx)
-	{
-		const char* val = 0;
-		switch (ai->type())
-		{
-			case TransactionInput::Element::ResultColumn:
-				if (ai->ref() == 0) throw std::runtime_error( "result reference out of range. must be >= 1");
-				if (ai->ref() > resrow->size()) throw std::runtime_error( "result reference out of range. array bound read");
-				val = (*resrow)[ ai->ref() -1];
-				break;
-
-			case TransactionInput::Element::String:
-				val = ai->value();
-				break;
-		}
-		if (val)
-		{
-			stmh->bind( argidx, val);
-		}
-		else
-		{
-			stmh->bindnull( argidx);
-		}
-	}
-	stmh->execute();
-
-	unsigned int si, se = stmh->nofColumns();
-	if (!cmdres.nofColumns())
-	{
-		for (si=0; si != se; ++si)
-		{
-			const char* colname = stmh->columnName( si+1);
-			cmdres.addColumn( colname?colname:"");
-		}
-	}
-	if (stmh->hasResult()) do
-	{
-		cmdres.openRow();
-		for (si=0; si != se; ++si)
-		{
-			const char* col = stmh->get( si+1);
-			if (col)
-			{
-				cmdres.addValue( col);
-			}
-			else
-			{
-				cmdres.addNull();
-			}
-		}
-
-	} while (stmh->next());
-}
-
 void TesttraceTransaction::execute()
 {
-	std::size_t null_functionidx = std::numeric_limits<std::size_t>::max();
 	std::ofstream buf( m_dbref->outfilename().c_str());
 	printTransactionInput( buf, m_input);
 
-	StatementHandler stm( &buf, m_result);
-	TransactionOutput::CommandResultBuilder cmdres( &m_output, null_functionidx);
-
-	TransactionInput::cmd_iterator ci = m_input.begin(), ce = m_input.end();
-	for (; ci != ce; ++ci)
-	{
-		stm.start( ci->name());
-		if (cmdres.functionidx() != ci->functionidx())
-		{
-			if (cmdres.functionidx() != null_functionidx)
-			{
-				m_output.addCommandResult( cmdres);
-			}
-			cmdres = TransactionOutput::CommandResultBuilder( &m_output, ci->functionidx());
-		}
-		TransactionInput::arg_iterator ai = ci->begin(), ae = ci->end();
-
-		for (; ai != ae && ai->type() != TransactionInput::Element::ResultColumn; ++ai);
-		if (ai != ae)
-		{
-			// ... command has result reference, then we call it for every result row
-			TransactionOutput::result_iterator ri = m_output.last();
-			if (ri->functionidx() == ci->functionidx() -1)
-			{
-				TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
-				for (; wi != we; ++wi)
-				{
-					executeCommand( &stm, cmdres, wi, ci);
-				}
-			}
-		}
-		else
-		{
-			// ... command has no result reference, then we call it once
-			TransactionOutput::row_iterator wi;
-			executeCommand( &stm, cmdres, wi, ci);
-		}
-	}
-	if (cmdres.functionidx() != null_functionidx)
-	{
-		m_output.addCommandResult( cmdres);
-	}
+	TransactionHandler stm( &buf, m_result);
+	stm.doTransaction( m_input, m_output);
 }
 
-TesttraceTransaction::~TesttraceTransaction()
-{}
 
 

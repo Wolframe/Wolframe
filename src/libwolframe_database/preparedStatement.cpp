@@ -1,0 +1,139 @@
+/************************************************************************
+
+ Copyright (C) 2011, 2012 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
+///\brief Implements execution of a transaction using a prepared statement interface
+///\file preparedStatement.cpp
+#include "database/preparedStatement.hpp"
+#include <iostream>
+#include <fstream>
+#include <limits>
+
+using namespace _Wolframe;
+using namespace _Wolframe::db;
+
+static void executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr)
+{
+	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
+	for (int argidx=1; ai != ae; ++ai,++argidx)
+	{
+		const char* val = 0;
+		switch (ai->type())
+		{
+			case TransactionInput::Element::ResultColumn:
+				if (ai->ref() == 0) throw std::runtime_error( "result reference out of range. must be >= 1");
+				if (ai->ref() > resrow->size()) throw std::runtime_error( "result reference out of range. array bound read");
+				val = (*resrow)[ ai->ref() -1];
+				break;
+
+			case TransactionInput::Element::String:
+				val = ai->value();
+				break;
+		}
+		stmh->bind( argidx, val);
+	}
+	stmh->execute();
+
+	unsigned int si, se = stmh->nofColumns();
+	if (!cmdres.nofColumns())
+	{
+		for (si=0; si != se; ++si)
+		{
+			const char* colname = stmh->columnName( si+1);
+			cmdres.addColumn( colname?colname:"");
+		}
+	}
+	if (stmh->nofResults() > 0) do
+	{
+		cmdres.openRow();
+		for (si=0; si != se; ++si)
+		{
+			const char* col = stmh->get( si+1);
+			if (col)
+			{
+				cmdres.addValue( col);
+			}
+			else
+			{
+				cmdres.addNull();
+			}
+		}
+
+	} while (stmh->next());
+}
+
+void PreparedStatementHandler::doTransaction( const TransactionInput& input, TransactionOutput& output)
+{
+	std::size_t null_functionidx = std::numeric_limits<std::size_t>::max();
+	TransactionOutput::CommandResultBuilder cmdres( &output, null_functionidx);
+
+	TransactionInput::cmd_iterator ci = input.begin(), ce = input.end();
+	for (; ci != ce; ++ci)
+	{
+		start( ci->name());
+		if (cmdres.functionidx() != ci->functionidx())
+		{
+			if (cmdres.functionidx() != null_functionidx)
+			{
+				output.addCommandResult( cmdres);
+			}
+			cmdres = TransactionOutput::CommandResultBuilder( &output, ci->functionidx());
+		}
+		TransactionInput::arg_iterator ai = ci->begin(), ae = ci->end();
+
+		for (; ai != ae && ai->type() != TransactionInput::Element::ResultColumn; ++ai);
+		if (ai != ae)
+		{
+			// ... command has result reference, then we call it for every result row
+			TransactionOutput::result_iterator ri = output.last();
+			if (ri->functionidx() == ci->functionidx() -1)
+			{
+				TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
+				for (; wi != we; ++wi)
+				{
+					executeCommand( this, cmdres, wi, ci);
+				}
+			}
+		}
+		else
+		{
+			// ... command has no result reference, then we call it once
+			TransactionOutput::row_iterator wi;
+			executeCommand( this, cmdres, wi, ci);
+		}
+	}
+	if (cmdres.functionidx() != null_functionidx)
+	{
+		output.addCommandResult( cmdres);
+	}
+}
+
+

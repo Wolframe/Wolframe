@@ -34,7 +34,8 @@
 ///\file database/preparedStatement.hpp
 #ifndef _DATABASE_PREPARED_STATEMENT_HPP_INCLUDED
 #define _DATABASE_PREPARED_STATEMENT_HPP_INCLUDED
-#include "types/countedReference.hpp"
+#include "database/transactionInput.hpp"
+#include "database/transactionOutput.hpp"
 #include <string>
 #include <cstdlib>
 
@@ -46,19 +47,11 @@ namespace db {
 class PreparedStatementHandler
 {
 public:
-	PreparedStatementHandler()
-		:m_timeout(0)
-		,m_retries(0){}
-
+	///\brief Constructor
+	PreparedStatementHandler(){}
+	///\brief Destructor
 	virtual ~PreparedStatementHandler(){}
-	///\brief Begin transaction
-	virtual bool begin()=0;
-	///\brief Commit current transaction
-	virtual bool commit()=0;
-	///\brief Rollback current transaction
-	virtual bool rollback()=0;
-	///\brief Clear object and set initial state
-	virtual void clear(){}
+
 	///\brief Start new command statement
 	///\param[in] stmname name of prepared statement
 	virtual bool start( const std::string& stmname)=0;
@@ -70,28 +63,16 @@ public:
 	virtual std::size_t nofColumns()=0;
 	///\brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx)=0;
-	///\brief Get the last database error as string
-	virtual const char* getLastError()=0;
 	///\brief Get a column of the last result
 	virtual const char* get( std::size_t idx)=0;
 	///\brief Skip to the next row of the last result
 	virtual bool next()=0;
+	///\brief Get the number of rows of the last result
+	virtual std::size_t nofResults()=0;
 
-public:
-	void timeout( unsigned short v)		{m_timeout=v;}
-	void retries( unsigned short v)		{m_retries=v;}
-	unsigned short timeout() const		{return m_timeout;}
-	unsigned short retries() const		{return m_retries;}
-
-private:
-	unsigned short m_timeout;
-	unsigned short m_retries;
+	///\brief Executes the transaction using the interface defined
+	void doTransaction( const TransactionInput& input, TransactionOutput& output);
 };
-
-typedef types::CountedReference<PreparedStatementHandler> PreparedStatementHandlerR;
-
-typedef PreparedStatementHandlerR (*CreatePreparedStatementHandlerFunc)();
-
 
 }}//namespace
 #endif

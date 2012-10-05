@@ -5,6 +5,7 @@ SUBDIRS = \
 	libwolframe_serialize \
 	libwolframe_langbind \
 	libwolframe_prnt \
+	libwolframe_database \
 	libwolframe_functions \
 	modules
 
