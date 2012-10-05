@@ -68,10 +68,12 @@ public:
 	///\brief Skip to the next row of the last result
 	virtual bool next()=0;
 	///\brief Get the number of rows of the last result
-	virtual std::size_t nofResults()=0;
+	virtual bool hasResult()=0;
+	///\brief Get the last database error as string
+	virtual const char* getLastError()=0;
 
 	///\brief Executes the transaction using the interface defined
-	void doTransaction( const TransactionInput& input, TransactionOutput& output);
+	bool doTransaction( const TransactionInput& input, TransactionOutput& output);
 };
 
 }}//namespace

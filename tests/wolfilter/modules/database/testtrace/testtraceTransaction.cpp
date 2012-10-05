@@ -178,9 +178,9 @@ public:
 		return true;
 	}
 
-	virtual std::size_t nofResults()
+	virtual bool hasResult()
 	{
-		return m_fakeres.nofResults();
+		return (m_fakeres.nofResults() != 0);
 	}
 
 	virtual bool next()
@@ -209,6 +209,11 @@ public:
 		const char* rt = m_fakeres.get( idx);
 		(*m_out) << "get( " << idx << " ); returns " << rt << std::endl;
 		return rt;
+	}
+
+	virtual const char* getLastError()
+	{
+		return 0;
 	}
 
 private:

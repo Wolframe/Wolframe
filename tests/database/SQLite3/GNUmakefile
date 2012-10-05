@@ -14,14 +14,17 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
-	-L$(SQLITE3_LIB_DIR)
+	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_database \
+	$(SQLITE3_LIB_DIRS)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/modules/database/sqlite3/SQLite.o \
+	$(TOPDIR)/src/modules/database/sqlite3/SQLite3PreparedStatement.o \
+	-lwolframe \
+	-lwolframe_database \
+	$(TOPDIR)/gtest/gtest-all.o \
 	$(SQLITE3_LIBS) \
-	$(TOPDIR)/src/modules/database/dbTransaction.o \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem
 
@@ -39,7 +42,7 @@ local_clean:
 
 local_distclean:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_database"
 
 local_test: $(TEST_CPP_BINS)
 	 @LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./sqliteUnit$(EXE)

@@ -8,6 +8,7 @@ INCLUDE_CXXFLAGS =
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(BOOST_LIB_DIR) \
 	$(SQLITE3_LIB_DIRS)
 
@@ -18,6 +19,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	-lwolframe \
+	-lwolframe_database \
 	-lboost_filesystem \
 	$(SQLITE3_LIBS)
 
@@ -26,7 +28,6 @@ DYNAMIC_MODULE = mod_db_sqlite3.so
 
 CPP_OBJS = \
 	SQLite.o \
-	../dbTransaction.o \
 	SQLiteConstructor.o \
 	SQLiteConfig.o \
 	SQLite3PreparedStatement.o \
