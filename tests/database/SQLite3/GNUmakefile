@@ -30,18 +30,23 @@ CPP_OBJS =
 TEST_CPP_BINS = \
 	sqliteUnit$(EXE)
 
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
+
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe"
+
 
 local_all:
 
 local_clean:
-	@rm -f test.db
+	@rm -f test.db garbage.db
 
 local_distclean:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe"
-
 local_test: $(TEST_CPP_BINS)
-	 @LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./sqliteUnit$(EXE)
+	@rm -f test.db
+	@dd if=/dev/urandom of=garbage.db bs=4096 count=1
+	@sqlite3 test.db < testDB.sql
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./sqliteUnit$(EXE)
 
 local_longtest:

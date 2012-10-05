@@ -687,6 +687,10 @@ src/libwolframe/b64decode.c
 src/libwolframe/b64encode.c
 src/libwolframe/byte2hex.c
 src/libwolframe/CRAM.cpp
+src/libwolframe_database/databaseTransactionFunction.cpp
+src/libwolframe_database/GNUmakefile
+src/libwolframe_database/Makefile.W32
+src/libwolframe_database/preparedStatement.cpp
 src/libwolframe_functions/GNUmakefile
 src/libwolframe_functions/Makefile.W32
 src/libwolframe_functions/README
@@ -697,7 +701,6 @@ src/libwolframe/GNUmakefile
 src/libwolframe_langbind/appConfig_option.cpp
 src/libwolframe_langbind/appConfig_struct.cpp
 src/libwolframe_langbind/appObjects.cpp
-src/libwolframe_langbind/databaseTransactionFunction.cpp
 src/libwolframe_langbind/GNUmakefile
 src/libwolframe_langbind/Makefile.W32
 src/libwolframe_langbind/null_filter.cpp
@@ -1020,9 +1023,11 @@ tests/database/Makefile.W32
 tests/database/PostgreSQL/GNUmakefile
 tests/database/PostgreSQL/Makefile.W32
 tests/database/PostgreSQL/postgresUnit.cpp
+tests/database/PostgreSQL/README.txt
 tests/database/SQLite3/GNUmakefile
 tests/database/SQLite3/Makefile.W32
 tests/database/SQLite3/sqliteUnit.cpp
+tests/database/SQLite3/testDB.sql
 tests/expect/GNUmakefile
 tests/expect/Makefile.W32
 tests/expect/testEcho.exp
@@ -1115,8 +1120,6 @@ tests/wolfilter/modules/database/testtrace/Makefile.W32
 tests/wolfilter/modules/database/testtrace/mod_db_testtrace.cpp
 tests/wolfilter/modules/database/testtrace/testtraceDatabase.cpp
 tests/wolfilter/modules/database/testtrace/testtraceDatabase.hpp
-tests/wolfilter/modules/database/testtrace/testtracePreparedStatement.cpp
-tests/wolfilter/modules/database/testtrace/testtracePreparedStatement.hpp
 tests/wolfilter/modules/database/testtrace/testtraceTransaction.cpp
 tests/wolfilter/modules/database/testtrace/testtraceTransaction.hpp
 tests/wolfilter/modules/employee_assignment_convert/employee_assignment_convert.cpp

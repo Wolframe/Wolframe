@@ -43,6 +43,11 @@ TEST_F( SQLiteModuleFixture, CreateSQLiteUnit_1 )
 	ASSERT_TRUE( db.loadProgram());
 }
 
+TEST_F( SQLiteModuleFixture, OpenGarbage )
+{
+	ASSERT_THROW( SQLiteDBunit db( "testDB", "garbage.db", false, "", 3 ), std::runtime_error );
+}
+
 int main( int argc, char **argv )
 {
 	::testing::InitGoogleTest( &argc, argv );

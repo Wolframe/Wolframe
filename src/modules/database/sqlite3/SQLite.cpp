@@ -39,7 +39,6 @@
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-//#include "utils/miscUtils.hpp"
 
 #include "sqlite3.h"
 
@@ -53,20 +52,42 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id,
 	: m_ID( id ), m_filename( filename ), m_flag( flag ),
 	  m_programFile( programFile )
 {
+	bool	checked = false;
+
 	for( int i = 0; i < connections; i++ ) {
 		sqlite3 *handle;
-		int res = sqlite3_open( m_filename.c_str( ), &handle );
-		if( res != SQLITE_OK ) {
-			MOD_LOG_ERROR << "Unable to open Sqlite3 database '" << filename << ": " << sqlite3_errmsg( handle );
+		int res = sqlite3_open_v2( m_filename.c_str( ), &handle,
+					   SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, "unix" );
+		if( res != SQLITE_OK )	{
+			MOD_LOG_ALERT << "Unable to open SQLite database '" << filename
+				      << "': " << sqlite3_errmsg( handle );
+				sqlite3_close( handle );	// really ?!?
+			throw std::runtime_error( "Unable to open SQLite database" );
 		}
-
-		m_connections.push_back( handle );
-		m_connPool.add( handle );
+		else	{
+			if ( !checked )	{
+				char* err;
+//				res = sqlite3_exec( handle, "PRAGMA quick_check", NULL, &err );
+				res = sqlite3_exec( handle, "PRAGMA integrity_check", NULL, NULL, &err );
+				if( res != SQLITE_OK )	{
+					MOD_LOG_ALERT << "Corrupt SQLite database '" << filename
+						      << "': " << err;
+					sqlite3_close( handle );
+				}
+				if( err )
+					sqlite3_free( err );
+				if( res != SQLITE_OK )
+					throw std::runtime_error( "Corrupt SQLite database" );
+				checked = true;
+			}
+			m_connections.push_back( handle );
+			m_connPool.add( handle );
+		}
 	}
 	m_db.setUnit( this );
 
-	MOD_LOG_DEBUG << "SQLite database '" << m_ID << "' created with "
-		      << "filename '" << m_filename << "'";
+	MOD_LOG_DEBUG << "SQLite database unit '" << m_ID << "' created with "
+		      << connections << " connections to file '" << m_filename << "'";
 }
 
 SQLiteDBunit::~SQLiteDBunit( )
