@@ -121,6 +121,7 @@ public:
 	Transaction* transaction( const std::string& name );
 
 	void closeTransaction( Transaction* t );
+
 private:
 	SQLiteDBunit*	m_unit;			///< parent database unit
 };
@@ -141,6 +142,12 @@ public:
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 	Database* database();
+
+	const std::map<std::string,std::string>* stmmap() const
+	{
+		return &m_stmmap;
+	}
+
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;
@@ -148,7 +155,7 @@ private:
 	const std::string	m_programFile;
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
-
+	std::map<std::string,std::string> m_stmmap;	///< map of statements (commands)
 	SQLiteDatabase		m_db;
 };
 

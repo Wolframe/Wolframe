@@ -866,13 +866,14 @@ bool TransactionFunctionResult::getNext( ElementType& type, TypedFilterBase::Ele
 langbind::TransactionFunction::ResultR DatabaseTransactionFunction::execute( const langbind::TransactionFunction::Input* inputi) const
 {
 	db::Transaction* trs = 0;
+	types::CountedReference<db::Transaction> trsr;
 	try
 	{
 		if (!m_provider)
 		{
 			throw std::runtime_error( "no provider defined for getting database access");
 		}
-		trs = m_provider->transaction( name());
+		trsr.reset( trs = m_provider->transaction( name()));
 		if (!trs)
 		{
 			throw std::runtime_error( std::string("could not allocate transaction object for '") + name() + "'");
