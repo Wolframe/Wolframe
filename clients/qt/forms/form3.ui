@@ -78,7 +78,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox">
+  <widget class="QGroupBox" name="vegetables">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -90,7 +90,7 @@
    <property name="title">
     <string>Vegetables:</string>
    </property>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="pumpkins">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -103,7 +103,7 @@
      <string>Pumpkin</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_2">
+   <widget class="QCheckBox" name="cucumbers">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -116,7 +116,7 @@
      <string>Cucumber</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox_3">
+   <widget class="QCheckBox" name="carots">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -161,9 +161,9 @@
   <tabstop>pumpkin</tabstop>
   <tabstop>cucumber</tabstop>
   <tabstop>carot</tabstop>
-  <tabstop>checkBox</tabstop>
-  <tabstop>checkBox_2</tabstop>
-  <tabstop>checkBox_3</tabstop>
+  <tabstop>pumpkins</tabstop>
+  <tabstop>cucumbers</tabstop>
+  <tabstop>carots</tabstop>
   <tabstop>buttons</tabstop>
  </tabstops>
  <resources/>
