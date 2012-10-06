@@ -13,7 +13,6 @@
       - grouped QCheckBoxes: multiple select in a small list of
         items
       - QListView: list of things to select (multiple select)
-      - QPlainTextEdit: tags in rich text?
       - QTreeWidget
       - file upload
       - file download
