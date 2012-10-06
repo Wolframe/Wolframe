@@ -1,0 +1,30 @@
+Description: Fix inclusion of header push_front.hpp
+ Without this, a simple
+  #include <boost/fusion/algorithm/transformation/push_front.hpp>
+ fails to compile. Patch taken from upstream changeset 76238
+Author: Joel de Guzman
+Bug: 653812
+Forwarded: https://svn.boost.org/trac/boost/ticket/6338
+
+
+--- boost1.48-1.48.0.orig/boost/fusion/view/iterator_range/detail/segmented_iterator_range.hpp
++++ boost1.48-1.48.0/boost/fusion/view/iterator_range/detail/segmented_iterator_range.hpp
+@@ -39,11 +39,18 @@
+     {
+         template <typename Sequence, typename T>
+         struct push_back;
++
++        template <typename Sequence, typename T>
++        struct push_front;
+     }
+ 
+     template <typename Sequence, typename T>
+     typename result_of::push_back<Sequence const, T>::type
+     push_back(Sequence const& seq, T const& x);
++
++    template <typename Sequence, typename T>
++    typename result_of::push_front<Sequence const, T>::type
++    push_front(Sequence const& seq, T const& x);
+ }}
+ 
+ namespace boost { namespace fusion { namespace detail

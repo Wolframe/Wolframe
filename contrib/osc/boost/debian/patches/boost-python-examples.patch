@@ -1,5 +1,7 @@
-Patch courtesy of Georg Schmid
-http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=452410#17
+Description: Patch to build examples using installed Boost.Python
+Author: Georg Schmid
+Bug: 452410
+Forwarded: no
 
 
 --- boost1.42-1.42.0.orig/libs/python/example/Jamroot

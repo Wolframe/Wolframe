@@ -97,8 +97,8 @@ public:
 
 	virtual void close();
 private:
-	SQLiteDatabase&	m_db;			///< parent database
-	SQLiteDBunit&	m_unit;			///< parent database unit
+	SQLiteDatabase&		m_db;		///< parent database
+	SQLiteDBunit&		m_unit;		///< parent database unit
 	TransactionInput	m_input;	///< input data structure
 	TransactionOutput	m_output;	///< output data structure
 };

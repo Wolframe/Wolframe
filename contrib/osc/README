@@ -15,8 +15,8 @@ deb http://download.opensuse.org/repositories/home:/andreas_baumann/xUbuntu_11.0
 wget 'http://download.opensuse.org/repositories/home:/andreas_baumann/CentOS_CentOS-5/repodata/repomd.xml.key
 apt-key add repomd.xml.key
 
-# add libboost1.46-dev
-apt-get install libboost1.46-dev libboost-thread1.46-dev libboost-system1.46-dev libboost-program-options1.46-dev libboost-filesystem1.46-dev
+# add libboost1.48-dev
+apt-get install libboost1.48-dev libboost-thread1.48-dev libboost-system1.48-dev libboost-program-options1.48-dev libboost-filesystem1.48-dev
 
 # add BOOST_DIR=/usr to the make in Wolframe
 
@@ -29,3 +29,7 @@ prepare the /var/tmp/osbuild-packagecache package cache (from CDs,
 mirrors, etc., Xubuntu version loads them directly from the mirrors))
 
 # set use_keyring=0 in the general secion of ~/.oscrc !!
+
+# local build with ccache
+cd home:andreas_baumann/Wolframe
+osc build -ccache wolframe.spec

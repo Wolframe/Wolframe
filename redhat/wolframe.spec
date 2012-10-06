@@ -10,14 +10,8 @@
 #%if 0%{?opensuse_bs}
 
 %define rhel 0
-%define rhel4 0
 %define rhel5 0
 %define rhel6 0
-%if 0%{?rhel_version} >= 400 && 0%{?rhel_version} <= 499
-%define dist rhel4
-%define rhel 1
-%define rhel4 1
-%endif
 %if 0%{?rhel_version} >= 500 && 0%{?rhel_version} <= 599
 %define dist rhel5
 %define rhel 1
@@ -133,10 +127,10 @@
 # build local boost for distributions which have a too old version
 
 %define build_boost 0
-%if %{rhel} || %{fc14} || %{centos} || %{sles}
+%if %{rhel} || %{fc14} || %{fc15} || %{fc16} || %{centos} || %{sles}
 %define build_boost 1
-%define boost_version 1.46.1
-%define boost_underscore_version 1_46_1
+%define boost_version 1.48.0
+%define boost_underscore_version 1_48_0
 %endif
 
 # build local libxml2 for distributions which have a too old broken version
@@ -177,7 +171,8 @@ License: Wolframe License
 Group: Application/Business
 Source: %{name}_%{version}.tar.gz
 %if %{build_boost}
-Source1: boost_%{boost_underscore_version}.tar.gz 
+Source1: boost_%{boost_underscore_version}.tar.gz
+Patch0: boost_%{boost_underscore_version}-gcc-compile.patch
 %endif
 %if %{build_libxml2}
 Source2: libxml2-sources-%{libxml2_version}.tar.gz
@@ -209,7 +204,16 @@ BuildRequires: sles-release
 BuildRequires: pwdutils >= 3.2
 %endif
 
-%if !%{build_boost}
+%if %{build_boost}
+%if %{centos} || %{fedora}
+BuildRequires: libicu-devel >= 3.6
+%else
+%if !%{rhel6}
+# see http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779
+BuildRequires: libicu-devel >= 3.6
+%endif
+%endif
+%else
 BuildRequires: boost-devel
 %if %{rhel} || %{centos} || %{fedora}
 Requires: boost >= 1.43
@@ -268,7 +272,23 @@ BuildRequires: doxygen
 
 # postgres database module
 %if %{with_pgsql}
-BuildRequires: postgresql-devel >= 7.0
+%if %{rhel} 
+%if %{rhel5}
+BuildRequires: postgresql84-devel >= 8.4
+%else
+BuildRequires: postgresql-devel >= 8.3
+%endif
+%endif
+%if %{centos}
+%if %{centos5}
+BuildRequires: postgresql84-devel >= 8.4
+%else
+BuildRequires: postgresql-devel >= 8.3
+%endif
+%endif
+%if %{fedora} || %{suse} || %{sles}
+BuildRequires: postgresql-devel >= 8.3
+%endif
 %endif
 
 # build local sqlite3 for distibutions with no or too old version
@@ -276,7 +296,7 @@ BuildRequires: postgresql-devel >= 7.0
 %define build_sqlite 0   
 %if %{with_sqlite}
 %if %{rhel}
-%if %{rhel4} || %{rhel5}
+%if %{rhel5}
 %define build_sqlite 1
 %endif
 %endif
@@ -492,9 +512,15 @@ Qt client for the Wolframe server.
 
 %if %{build_boost} && %{build_libxml2}
 %setup -T -D -b 0 -b 1 -b 2
+cd ../boost_%{boost_underscore_version}
+%patch -P 0 -p1
+cd ../%{name}-%{version}
 %else
 %if %{build_boost}
 %setup -T -D -b 0 -b 1
+cd ../boost_%{boost_underscore_version}
+%patch -P 0 -p1
+cd ../%{name}-%{version}
 %else
 %setup
 %endif
@@ -505,7 +531,7 @@ Qt client for the Wolframe server.
 %if %{build_boost}
 cd %{_builddir}/boost_%{boost_underscore_version}
 ./bootstrap.sh --prefix=/tmp/boost-%{boost_version} \
-	--with-libraries=thread,filesystem,system,program_options,date_time
+	--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
 ./bjam %{?_smp_mflags} install
 %endif
 
@@ -621,12 +647,13 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
 
 # copy local versions of shared libraries of boost for platforms missing a decent
-# version of boost
+# version of boost (RHEL, for Debian like systems there is an OSC boost package)
 %if %{build_boost}
 for i in \
 	libboost_program_options.so.%{boost_version} libboost_system.so.%{boost_version} \
 	libboost_filesystem.so.%{boost_version} libboost_thread.so.%{boost_version} \
-	libboost_date_time.so.%{boost_version}; do
+	libboost_date_time.so.%{boost_version} libboost_locale.so.%{boost_version} \
+	libboost_regex.so.%{boost_version}; do
 	cp /tmp/boost-%{boost_version}/lib/$i $RPM_BUILD_ROOT%{_libdir}/wolframe/
 done
 %endif
@@ -690,6 +717,8 @@ fi
 %{_libdir}/wolframe/libboost_filesystem.so.%{boost_version}
 %{_libdir}/wolframe/libboost_thread.so.%{boost_version}
 %{_libdir}/wolframe/libboost_date_time.so.%{boost_version}
+%{_libdir}/wolframe/libboost_locale.so.%{boost_version}
+%{_libdir}/wolframe/libboost_regex.so.%{boost_version}
 %endif
 
 %dir %{_libdir}/wolframe
@@ -703,6 +732,8 @@ fi
 %{_libdir}/wolframe/libwolframe_prnt.so.0
 %{_libdir}/wolframe/libwolframe_functions.so.0.0.0
 %{_libdir}/wolframe/libwolframe_functions.so.0
+%{_libdir}/wolframe/libwolframe_database.so.0.0.0
+%{_libdir}/wolframe/libwolframe_database.so.0
 
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so.5.2.0
@@ -759,6 +790,8 @@ fi
 %{_libdir}/wolframe/libwolframe_prnt.a
 %{_libdir}/wolframe/libwolframe_functions.so
 %{_libdir}/wolframe/libwolframe_functions.a
+%{_libdir}/wolframe/libwolframe_database.so
+%{_libdir}/wolframe/libwolframe_database.a
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so
 %{_libdir}/wolframe/liblua.a

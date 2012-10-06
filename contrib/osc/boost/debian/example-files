@@ -2,12 +2,20 @@ doc/html/boost_asio/example
 doc/html/date_time/examples
 libs/python/example
 libs/accumulators/example
+libs/geometry/doc/src/examples
+libs/geometry/doc/src/docutils/tools/doxygen_xml2qbk/sample/src/examples
+libs/geometry/example
 libs/range/doc/reference/adaptors/examples
+libs/phoenix/doc/html/phoenix/examples
+libs/phoenix/doc/examples
+libs/phoenix/example
 libs/icl/doc/html/boost_icl/examples
 libs/icl/example
 libs/date_time/example
+libs/move/example
 libs/scope_exit/example
 libs/graph/example
+libs/chrono/example
 libs/preprocessor/doc/examples
 libs/xpressive/example
 libs/mpi/example
@@ -24,6 +32,8 @@ libs/filesystem/v3/example
 libs/graph_parallel/example
 libs/multi_index/example
 libs/program_options/example
+libs/ratio/example
+libs/container/example
 libs/functional/hash/examples
 libs/serialization/example
 libs/asio/example
@@ -33,6 +43,7 @@ libs/spirit/phoenix/example
 libs/spirit/repository/example
 libs/spirit/example
 libs/proto/example
+libs/pool/example
 libs/flyweight/example
 libs/iostreams/example
 libs/thread/example
@@ -48,6 +59,7 @@ libs/dynamic_bitset/example
 libs/test/doc/src/examples
 libs/test/example
 libs/smart_ptr/example
+libs/locale/examples
 libs/gil/example
 libs/regex/example
 libs/property_map/example
@@ -63,4 +75,5 @@ libs/math/example
 libs/multi_array/example
 libs/type_traits/doc/html/boost_typetraits/examples
 libs/type_traits/examples
+libs/timer/example
 tools/build/v2/example

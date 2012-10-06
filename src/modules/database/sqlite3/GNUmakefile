@@ -23,7 +23,8 @@ INCLUDE_LIBS = \
 	-lboost_filesystem \
 	$(SQLITE3_LIBS)
 
-STATIC_LIB = mod_db_sqlite3_lib.a
+NOINST_STATIC_LIB = mod_db_sqlite3_lib.a
+
 DYNAMIC_MODULE = mod_db_sqlite3.so
 
 CPP_OBJS = \

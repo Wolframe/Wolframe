@@ -1,6 +1,10 @@
-Add support for Renesas SH CPU.
-Patch based on initial work by Nobuhiro Iwamatsu
-See http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=535930
+Description: Patch to build smart_ptr on Renesas SH
+ Add support for Renesas SH CPU.
+ Patch based on initial work by Nobuhiro Iwamatsu
+Author: Steve Robbins <smr@debian.org>
+Bug: 535930
+Forwarded: https://svn.boost.org/trac/boost/ticket/6099
+
 
 --- boost1.42-1.42.0.orig/boost/smart_ptr/detail/sp_has_sync.hpp
 +++ boost1.42-1.42.0/boost/smart_ptr/detail/sp_has_sync.hpp

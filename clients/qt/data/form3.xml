@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form3>
-  <favouriteVegetable>cucumber</favouriteVegetable>
-  <checkBox>true</checkBox>
-  <checkBox_2>true</checkBox_2>
-  <checkBox_3>false</checkBox_3>
-  <groupBox>sensless</groupBox>
+  <favouriteVegetable>carot</favouriteVegetable>
+  <vegetables>pumpkins</vegetables>
+  <vegetables>cucumbers</vegetables>
+  <vegetables>carots</vegetables>
+  <sensless>false</sensless>
   <vegetarian>true</vegetarian>
 </form3>

@@ -137,4 +137,5 @@ tests/stringNormalizationTest
 tests/database/PostgreSQL/postgresUnit
 tests/database/SQLite3/sqliteUnit
 tests/database/SQLite3/test.db
+tests/database/SQLite3/garbage.db
 *.qm

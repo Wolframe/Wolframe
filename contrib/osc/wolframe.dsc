@@ -5,8 +5,9 @@ Binary: wolframe
 Maintainer: contact@wolframe.net
 Architecture: any
 Build-Depends: debhelper (>= 4.1.16),
- libboost1.46-dev, libboost-thread1.46-dev, libboost-system1.46-dev,
- libboost-program-options1.46-dev, libboost-filesystem1.46-dev,
+ libboost1.48-dev, libboost-thread1.48-dev, libboost-system1.48-dev,
+ libboost-program-options1.48-dev, libboost-filesystem1.48-dev,
+ libboost-locale1.48-dev, libboost-regex1.48-dev,
  libssl-dev, libqt4-dev, libpam-dev, libsasl2-dev,
  libsqlite3-dev, libpq-dev, libxml2-dev, libxslt1-dev,
  xsltproc, docbook-xsl, doxygen, graphviz, lsb-release,

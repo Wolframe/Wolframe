@@ -77,7 +77,9 @@ public:
 
 	db::Database* transactionDatabase() const	{ return m_db; }
 	db::Transaction* transaction( const std::string& name ) const
-							{ return m_db->transaction( name ); }
+							{ if ( m_db ) return m_db->transaction( name );
+							  else return NULL;
+							}
 
 private:
 	class DDLTypeMap;
