@@ -29,3 +29,7 @@ prepare the /var/tmp/osbuild-packagecache package cache (from CDs,
 mirrors, etc., Xubuntu version loads them directly from the mirrors))
 
 # set use_keyring=0 in the general secion of ~/.oscrc !!
+
+# local build with ccache
+cd home:andreas_baumann/Wolframe
+osc build -ccache wolframe.spec

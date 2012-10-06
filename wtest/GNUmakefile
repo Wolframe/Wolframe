@@ -54,10 +54,10 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_ICU
 endif
 
-LOCAL_STATIC_LIB = \
+MY_STATIC_LIB = \
 	wolftest.a
 
-LOCAL_STATIC_LIB_OBJS = \
+MY_STATIC_LIB_OBJS = \
 	testDescription.o \
 	testModules.o
 
@@ -70,13 +70,13 @@ CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-local_all: $(LOCAL_STATIC_LIB)
+local_all: $(MY_STATIC_LIB)
 
-$(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
-	ar rcs $(LOCAL_STATIC_LIB) $(LOCAL_STATIC_LIB_OBJS)
+$(MY_STATIC_LIB): $(MY_STATIC_LIB_OBJS)
+	ar rcs $(MY_STATIC_LIB) $(MY_STATIC_LIB_OBJS)
 
 local_clean:
-	@rm -f $(LOCAL_STATIC_LIB)
+	@rm -f $(MY_STATIC_LIB)
 
 local_distclean:
 
