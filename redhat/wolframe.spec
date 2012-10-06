@@ -205,7 +205,14 @@ BuildRequires: pwdutils >= 3.2
 %endif
 
 %if %{build_boost}
+%if %{centos} || %{fedora}
 BuildRequires: libicu-devel >= 3.6
+%else
+%if !%{rhel6}
+# see http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779
+BuildRequires: libicu-devel >= 3.6
+%endif
+%endif
 %else
 BuildRequires: boost-devel
 %if %{rhel} || %{centos} || %{fedora}
@@ -269,18 +276,18 @@ BuildRequires: doxygen
 %if %{rhel5}
 BuildRequires: postgresql84-devel >= 8.4
 %else
-BuildRequires: postgresql-devel >= 7.0
+BuildRequires: postgresql-devel >= 8.3
 %endif
 %endif
 %if %{centos}
 %if %{centos5}
 BuildRequires: postgresql84-devel >= 8.4
 %else
-BuildRequires: postgresql-devel >= 7.0
+BuildRequires: postgresql-devel >= 8.3
 %endif
 %endif
 %if %{fedora} || %{suse} || %{sles}
-BuildRequires: postgresql-devel >= 7.0
+BuildRequires: postgresql-devel >= 8.3
 %endif
 %endif
 
