@@ -20,7 +20,6 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/src/modules/database/postgresql/PostgreSQL.o \
 	$(PGSQL_LIBS) \
-	$(TOPDIR)/src/modules/database/dbTransaction.o \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem
 

@@ -25,7 +25,6 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\src\modules\database\sqlite3\SQLite.obj \
 	$(TOPDIR)\src\modules\database\sqlite3\SQLite3PreparedStatement.obj \
 	$(TOPDIR)\sqlite3\sqlite3.lib \
-	$(TOPDIR)\src\modules\database\dbTransaction.obj \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 TEST_CPP_BINS = \

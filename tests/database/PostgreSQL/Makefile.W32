@@ -6,7 +6,7 @@ SUBDIRS =
 
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
-	
+
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
@@ -23,9 +23,8 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\gtest\gtest-all.obj \
 	$(TOPDIR)\src\modules\database\postgresql\PostgreSQL.obj \
 	"$(PGSQL_DIR)\lib\libpq.lib" \
-	$(TOPDIR)\src\modules\database\dbTransaction.obj \
 	kernel32.lib advapi32.lib Ws2_32.lib
-	
+
 TEST_CPP_BINS = \
 	postgresUnit.exe
 
