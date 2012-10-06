@@ -28,6 +28,7 @@ clean: clean_recursive clean_po local_clean
 	-@rm -f exec/* 2>/dev/null
 	-@rm -f *.core  2>/dev/null
 	-@rm -rf $(STATIC_LIB) 2>/dev/null
+	-@rm -rf $(NOINST_STATIC_LIB) 2>/dev/null
 	-@rm -f $(SH_OBJS) rm -f $(SHPP_OBJS) 2>/dev/null
 ifneq "$(DYNAMIC_LIB)" ""
 	-@rm -rf $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) 2>/dev/null
