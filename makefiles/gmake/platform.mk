@@ -543,8 +543,6 @@ BOOST_LIBRARY_TAG ?=
 endif
 endif
 
-endif
-
 ifeq "$(PLATFORM)" "FREEBSD"
 ifeq "$(OS_MAJOR_VERSION)" "8"
 BOOST_DIR ?= /usr/local
