@@ -283,10 +283,6 @@ ifeq "$(LINUX_REV)" "11.04"
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
 endif
@@ -295,27 +291,12 @@ endif
 
 # Debian
 ifeq "$(LINUX_DIST)" "debian"
-ifeq "$(LINUX_REV)" "5"
-XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
-endif
 ifeq "$(LINUX_REV)" "6"
 XSLT_MAN_STYLESHEET ?= /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
 endif
 endif
 
 ifeq "$(LINUX_DIST)" "redhat"
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
-XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
-XSLT_VERSION ?= $(shell rpm -q --queryformat '%{VERSION}' docbook-style-xsl)
-XSLT_MAN_STYLESHEET ?= /usr/share/sgml/docbook/xsl-stylesheets-$(XSLT_VERSION)/manpages/docbook.xsl
-endif
 
 # Fedora 16
 ifeq "$(LINUX_REV)" "16"
@@ -400,11 +381,6 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_LIBRARY_TAG ?=
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-ifdef BOOST_DIR
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-endif
 ifndef BOOST_DIR
 BOOST_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 BOOST_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
@@ -527,26 +503,6 @@ endif
 
 endif
 
-# Fedora 14
-ifeq "$(LINUX_DIST)" "redhat"
-ifeq "$(LINUX_REV)" "14"
-BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?= -mt
-endif
-endif
-
-# Fedora 15
-ifeq "$(LINUX_DIST)" "redhat"
-ifeq "$(LINUX_REV)" "15"
-BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?= -mt
-endif
-endif
-
 # Fedora 16
 ifeq "$(LINUX_DIST)" "redhat"
 ifeq "$(LINUX_REV)" "16"
@@ -585,8 +541,6 @@ BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
 endif
-endif
-
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
@@ -664,10 +618,6 @@ ifeq "$(LINUX_REV)" "11.04"
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
@@ -677,10 +627,6 @@ endif
 # Debian
 
 ifeq "$(LINUX_DIST)" "debian"
-
-ifeq "$(LINUX_REV)" "5"
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
 
 ifeq "$(LINUX_REV)" "6"
 OPENSSL_LIBS ?= -lssl -lcrypto
@@ -697,16 +643,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
 OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 
@@ -833,30 +769,6 @@ endif
 
 ifeq "$(LINUX_DIST)" "redhat"
 
-# Fedora 14 puts Qt in a subdir in /usr/lib
-ifeq "$(LINUX_REV)" "14"
-QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
-QT_INCLUDE_DIR ?= /usr/include
-QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
-QT_BIN_DIR ?= $(QT_DIR)/bin
-QT_MOC ?= $(QT_BIN_DIR)/moc
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
-QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
-QT_LDFLAGS =
-endif
-
-# Fedora 15 puts Qt in a subdir in /usr/lib
-ifeq "$(LINUX_REV)" "15"
-QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
-QT_INCLUDE_DIR ?= /usr/include
-QT_LIB_DIR ?= $(SYSTEM_LIBDIR)
-QT_BIN_DIR ?= $(QT_DIR)/bin
-QT_MOC ?= $(QT_BIN_DIR)/moc   
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
-QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
-QT_LDFLAGS =
-endif
-
 # Fedora 16 puts Qt in a subdir in /usr/lib
 ifeq "$(LINUX_REV)" "16"
 QT_DIR ?= $(SYSTEM_LIBDIR)/qt4
@@ -944,17 +856,6 @@ QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-QT_DIR ?= /usr
-QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
-QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_BIN_DIR ?= $(QT_DIR)/bin
-QT_MOC ?= $(QT_BIN_DIR)/moc
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
-QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
-QT_LDFLAGS =
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
@@ -971,17 +872,6 @@ endif
 # Debian
 
 ifeq "$(LINUX_DIST)" "debian"
-
-ifeq "$(LINUX_REV)" "5"
-QT_DIR ?= /usr
-QT_INCLUDE_DIR ?= $(QT_DIR)/include/qt4
-QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_BIN_DIR ?= $(QT_DIR)/bin
-QT_MOC ?= $(QT_BIN_DIR)/moc
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
-QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
-QT_LDFLAGS =
-endif
 
 ifeq "$(LINUX_REV)" "6"
 QT_DIR ?= /usr
@@ -1184,13 +1074,6 @@ PAM_LIB_DIR ?= /lib
 PAM_LIBS ?= -lpam
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-PAM_DIR ?= /usr
-PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
-PAM_LIB_DIR ?= /lib
-PAM_LIBS ?= -lpam
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 PAM_DIR ?= /usr
 PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
@@ -1204,13 +1087,6 @@ endif
 
 ifeq "$(LINUX_DIST)" "debian"
 
-ifeq "$(LINUX_REV)" "5"
-PAM_DIR ?= /usr
-PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
-PAM_LIB_DIR ?= /lib
-PAM_LIBS ?= -lpam
-endif
-
 ifeq "$(LINUX_REV)" "6"
 PAM_DIR ?= /usr
 PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
@@ -1221,22 +1097,6 @@ endif
 endif
 
 ifeq "$(LINUX_DIST)" "redhat"
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-PAM_DIR ?= /usr
-PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
-PAM_LIB_DIR ?= /lib
-PAM_LIBS ?= -lpam
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
-PAM_DIR ?= /usr
-PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
-PAM_LIB_DIR ?= /lib
-PAM_LIBS ?= -lpam
-endif
 
 # Fedora 16
 ifeq "$(LINUX_REV)" "16"
@@ -1380,13 +1240,6 @@ SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-SASL_DIR ?= /usr
-SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
-SASL_LIB_DIR ?= $(SASL_DIR)/lib
-SASL_LIBS ?= -lsasl2
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 SASL_DIR ?= /usr
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
@@ -1399,13 +1252,6 @@ endif
 # Debian
 
 ifeq "$(LINUX_DIST)" "debian"
-
-ifeq "$(LINUX_REV)" "5"
-SASL_DIR ?= /usr
-SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
-SASL_LIB_DIR ?= $(SASL_DIR)/lib
-SASL_LIBS ?= -lsasl2
-endif
 
 ifeq "$(LINUX_REV)" "6"
 SASL_DIR ?= /usr
@@ -1428,22 +1274,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-SASL_DIR ?= /usr
-SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
-SASL_LIB_DIR ?= $(SASL_DIR)/lib
-SASL_LIBS ?= -lsasl2
-endif
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-SASL_DIR ?= /usr
-SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
-SASL_LIB_DIR ?= $(SASL_DIR)/lib
-SASL_LIBS ?= -lsasl2
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
 SASL_DIR ?= /usr
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
 SASL_LIB_DIR ?= $(SASL_DIR)/lib
@@ -1587,13 +1417,6 @@ SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-SQLITE3_DIR ?= /usr
-SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
-SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
-SQLITE3_LIBS ?= -lsqlite3
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
@@ -1607,12 +1430,6 @@ endif
 
 ifeq "$(LINUX_DIST)" "debian"
 
-ifeq "$(LINUX_REV)" "5"
-SQLITE3_DIR ?= /usr
-SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
-SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
-SQLITE3_LIBS ?= -lsqlite3
-endif
 ifeq "$(LINUX_REV)" "6"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
@@ -1633,22 +1450,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-SQLITE3_DIR ?= /usr
-SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
-SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
-SQLITE3_LIBS ?= -lsqlite3
-endif
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-SQLITE3_DIR ?= /usr
-SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
-SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
-SQLITE3_LIBS ?= -lsqlite3
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
 SQLITE3_DIR ?= /usr
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
@@ -1809,15 +1610,6 @@ PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
 PGSQL_LIBS ?= -lpq
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-PGSQL_DIR ?= /usr
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
-PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
-PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
-PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
-PGSQL_LIBS ?= -lpq
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
@@ -1833,14 +1625,6 @@ endif
 
 ifeq "$(LINUX_DIST)" "debian"
 
-ifeq "$(LINUX_REV)" "5"
-PGSQL_DIR ?= /usr
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
-PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
-PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
-PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
-PGSQL_LIBS ?= -lpq
-endif
 ifeq "$(LINUX_REV)" "6"
 PGSQL_DIR ?= /usr
 PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
@@ -1870,22 +1654,6 @@ PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
 PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
 PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
-PGSQL_LIBS ?= -lpq
-endif
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-PGSQL_DIR ?= /usr
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
-PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
-PGSQL_LIBS ?= -lpq
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
-PGSQL_DIR ?= /usr
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include
-PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
 PGSQL_LIBS ?= -lpq
 endif
 
@@ -2039,15 +1807,6 @@ LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
 LIBXML2_LIBS ?= -lxml2
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-LIBXML2_DIR ?= /usr
-LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
-LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
-LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
-LIBXML2_LIBS ?= -lxml2
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
@@ -2062,15 +1821,6 @@ endif
 # Debian
 
 ifeq "$(LINUX_DIST)" "debian"
-
-ifeq "$(LINUX_REV)" "5"
-LIBXML2_DIR ?= /usr
-LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
-LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
-LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
-LIBXML2_LIBS ?= -lxml2
-endif
 
 ifeq "$(LINUX_REV)" "6"
 LIBXML2_DIR ?= /usr
@@ -2097,26 +1847,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBXML2_DIR ?= /usr
-LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
-LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
-LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
-LIBXML2_LIBS ?= -lxml2
-endif
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-LIBXML2_DIR ?= /usr
-LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
-LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
-LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
-LIBXML2_LIBS ?= -lxml2
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
 LIBXML2_DIR ?= /usr
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
@@ -2279,15 +2009,6 @@ LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
 LIBXSLT_LIBS ?= -lxslt
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-LIBXSLT_DIR ?= /usr
-LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
-LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
-LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
-LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
-LIBXSLT_LIBS ?= -lxslt
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 LIBXSLT_DIR ?= /usr
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
@@ -2302,15 +2023,6 @@ endif
 # Debian
 
 ifeq "$(LINUX_DIST)" "debian"
-
-ifeq "$(LINUX_REV)" "5"
-LIBXSLT_DIR ?= /usr
-LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
-LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
-LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
-LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
-LIBXSLT_LIBS ?= -lxslt
-endif
 
 ifeq "$(LINUX_REV)" "6"
 LIBXSLT_DIR ?= /usr
@@ -2337,26 +2049,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBXSLT_DIR ?= /usr
-LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
-LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
-LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
-LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
-LIBXSLT_LIBS ?= -lxslt
-endif
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-LIBXSLT_DIR ?= /usr
-LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
-LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
-LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
-LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
-LIBXSLT_LIBS ?= -lxslt
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
 LIBXSLT_DIR ?= /usr
 LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
 LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
@@ -2522,15 +2214,6 @@ LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
@@ -2556,26 +2239,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
 LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
@@ -2747,15 +2410,6 @@ LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
 LIBPNG_LIBS ?= -lpng
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-LIBPNG_DIR ?= /usr
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
-LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
-LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
-LIBPNG_LIBS ?= -lpng
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 LIBPNG_DIR ?= /usr
 LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
@@ -2770,15 +2424,6 @@ endif
 # Debian
 
 ifeq "$(LINUX_DIST)" "debian"
-
-ifeq "$(LINUX_REV)" "5"
-LIBPNG_DIR ?= /usr
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
-LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
-LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
-LIBPNG_LIBS ?= -lpng
-endif
 
 ifeq "$(LINUX_REV)" "6"
 LIBPNG_DIR ?= /usr
@@ -2805,26 +2450,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBPNG_DIR ?= /usr
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
-LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
-LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
-LIBPNG_LIBS ?= -lpng
-endif
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-LIBPNG_DIR ?= /usr
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
-LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
-LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
-LIBPNG_LIBS ?= -lpng
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
 LIBPNG_DIR ?= /usr
 LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
 LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
@@ -2993,15 +2618,6 @@ LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
 LIBZ_LIBS ?= -lz
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-LIBZ_DIR ?= /usr
-LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
-LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
-LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
-LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
-LIBZ_LIBS ?= -lz
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 LIBZ_DIR ?= /usr
 LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
@@ -3016,15 +2632,6 @@ endif
 # Debian
 
 ifeq "$(LINUX_DIST)" "debian"
-
-ifeq "$(LINUX_REV)" "5"
-LIBZ_DIR ?= /usr
-LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
-LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
-LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
-LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
-LIBZ_LIBS ?= -lz
-endif
 
 ifeq "$(LINUX_REV)" "6"
 LIBZ_DIR ?= /usr
@@ -3051,26 +2658,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-LIBZ_DIR ?= /usr
-LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
-LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
-LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
-LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
-LIBZ_LIBS ?= -lz
-endif
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-LIBZ_DIR ?= /usr
-LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
-LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
-LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
-LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
-LIBZ_LIBS ?= -lz
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
 LIBZ_DIR ?= /usr
 LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
 LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
@@ -3239,15 +2826,6 @@ ICU_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
 ICU_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 
-ifeq "$(LINUX_REV)" "10.10"
-ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
 ifeq "$(LINUX_REV)" "10.04"
 ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 ICU_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
@@ -3262,15 +2840,6 @@ endif
 # Debian
 
 ifeq "$(LINUX_DIST)" "debian"
-
-ifeq "$(LINUX_REV)" "5"
-ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
 
 ifeq "$(LINUX_REV)" "6"
 ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
@@ -3297,26 +2866,6 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
-# Fedora 14
-ifeq "$(LINUX_REV)" "14"
-ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-
-# Fedora 15
-ifeq "$(LINUX_REV)" "15"
 ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 ICU_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 ICU_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
