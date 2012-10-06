@@ -1,21 +1,66 @@
-boost1.46 (1.46.1-5ubuntu2) oneiric; urgency=low
+boost1.48 (1.48.0-3) unstable; urgency=low
 
-  * No change rebuild to drop Python 3.1 support.
+  * patches/fusion-push-front-broken.patch: New.  Upstream patch that
+    fixes #include <boost/fusion/algorithm/transformation/push_front.hpp>.
+    Closes: #653812.
 
- -- Barry Warsaw <barry@ubuntu.com>  Fri, 03 Jun 2011 16:28:02 -0400
+  * patches/math-define-l.patch: New.  Rename class template parameter
+    "L".  Closes: #653764.
 
-boost1.46 (1.46.1-5ubuntu1) oneiric; urgency=low
+  * patches/gcc-4.7-threading-detection.patch: New, from upstream.  Enable
+    gcc 4.7 threading detection.  Closes: #654425.
 
-  * Merge from debian unstable.  Remaining changes:
-    - Detect gcc atomic intrinsics, needed for arm spinlock (LP: 513721)
-    - Drop libboost-mpi, libboost-mpi-python, and libboost-graph-parallel (and
-      related -dev packages): we don't want to pull all of the mpi packages
-      into main.  These are provided in a separate boost-mpi-source1.46
-      package
-    - Drop libboost1.46-all-dev and provide from boost-mpi-source1.46
-    - Adjust debian/rules and debian/control
+  * patches/mpi-allocator-c++0x.patch: New.  Workaround to enable using
+    Boost.MPI with -std=c++0x mode on gcc 4.6.  Fix will be in gcc 4.6.3
+    and 4.7.  Closes: #639862.
 
- -- Scott Kitterman <scott@kitterman.com>  Fri, 20 May 2011 09:46:06 -0400
+ -- Steve M. Robbins <smr@debian.org>  Wed, 04 Jan 2012 23:50:52 -0600
+
+boost1.48 (1.48.0-2) unstable; urgency=low
+
+  * patches/foreach.patch: New.  Upstream patch to fix BOOST_FOREACH build
+    issues.  Closes: #652677.
+
+ -- Steve M. Robbins <smr@debian.org>  Tue, 20 Dec 2011 00:03:03 -0600
+
+boost1.48 (1.48.0-1) unstable; urgency=low
+
+  * New upstream.  Closes: #634245.
+    - patches/changeset_71050.diff:
+    - patches/date_time_date_formatting_hpp.patch:
+    - patches/fusion-name-qual.patch:
+    - patches/mips-asm.patch:
+    - patches/openssl-no-ssl2.patch:
+    - patches/python2.5-elementtree.patch: Removed.  Applied upstream.
+  
+  * New library packages for: chrono, locale, and timer.
+  
+  * patches/pythonid.patch: New.  Fix jam option --python-buildid.
+  
+  * patches/hurd-ellint_rd.patch:
+  * patches/hurd-execution_monitor.patch: Remove.  Pino Toscano advised
+    that the hurd no longer needs these.
+
+ -- Steve M. Robbins <smr@debian.org>  Sun, 27 Nov 2011 22:18:35 -0600
+
+boost1.46 (1.46.1-7) unstable; urgency=low
+
+  * control: Fix ungrammatical description for iostreams packages.
+    Closes: #633865.
+  
+  * rules: Dump boostrap log file if bootstrapping fails.
+  
+  * libboost-doc.README.Debian: Remove reference to packages bjam and
+    boost-build; now only need boostX.YZ-dev.  Closes: #630529.
+
+ -- Steve M. Robbins <smr@debian.org>  Wed, 17 Aug 2011 23:18:52 -0500
+
+boost1.46 (1.46.1-6) unstable; urgency=low
+
+  * control(libboost-mpi-python1.46.1, libboost-python1.46.1): Suggests a
+    python interpreter.  Closes: #620775.
+
+ -- Steve M. Robbins <smr@debian.org>  Sun, 12 Jun 2011 00:37:42 -0500
 
 boost1.46 (1.46.1-5) unstable; urgency=low
 
@@ -24,26 +69,6 @@ boost1.46 (1.46.1-5) unstable; urgency=low
     Closes: #621402, #622027, #622070.
 
  -- Steve M. Robbins <smr@debian.org>  Mon, 09 May 2011 21:34:12 -0500
-
-boost1.46 (1.46.1-4ubuntu2) oneiric; urgency=low
-
-  * Restore libboost-python$(PKGVERSION)-dev install rule inadvertently
-    dropped during merge
-
- -- Scott Kitterman <scott@kitterman.com>  Fri, 29 Apr 2011 09:09:28 -0400
-
-boost1.46 (1.46.1-4ubuntu1) oneiric; urgency=low
-
-  * Merge from Debian Unstable (based on boost1.42). Remaining Ubuntu changes:
-    - Detect gcc atomic intrinsics, needed for arm spinlock (LP: 513721)
-    - Drop libboost-mpi, libboost-mpi-python, and libboost-graph-parallel (and
-      related -dev packages): we don't want to pull all of the mpi packages
-      into main.  These are provided in a separate boost-mpi-source1.46
-      package
-    - Drop libboost1.46-all-dev and provide from boost-mpi-source1.46
-    - Adjust debian/rules and debian/control
-
- -- Scott Kitterman <scott@kitterman.com>  Thu, 28 Apr 2011 10:07:48 -0400
 
 boost1.46 (1.46.1-4) unstable; urgency=low
 
@@ -1726,4 +1751,3 @@ boost (1.21.1-1) unstable; urgency=low
   * First upstream version.
 
  -- Raphael Bossek <bossekr@debian.org>  Mon, 12 Mar 2001 23:37:49 +0100
-

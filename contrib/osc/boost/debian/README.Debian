@@ -16,31 +16,45 @@ for multithreaded applications.
 
   Component              Link Flag                      Library Type
   ---------              ---------                      ------------
+  Boost.Chrono           -lboost_chrono                 static  shared
   Boost.Date_Time        -lboost_date_time            	static  shared
   Boost.Filesystem       -lboost_filesystem           	static  shared
   Boost.Graph            -lboost_graph                	static  shared
   Boost.Graph_parallel   -lboost_graph_parallel       	static  shared
   Boost.IOStreams        -lboost_iostreams            	static  shared
+  Boost.Locale           -lboost_locale                 static  shared
   Boost.Math		 -lboost_math_c99             	static  shared
   			 -lboost_math_c99f            	static  shared
-  			 -lboost_math_c99l            	static  shared
+  			 -lboost_math_c99l          [1] static  shared
   			 -lboost_math_tr1            	static  shared
   			 -lboost_math_tr1f            	static  shared
-  			 -lboost_math_tr1l            	static  shared
+  			 -lboost_math_tr1l          [1] static  shared
   Boost.MPI		 -lboost_mpi   		      	static  shared
   Boost.Program_options  -lboost_program_options      	static  shared
-  Boost.Python           -lboost_python-py24       	static  shared
-  			 -lboost_python-py25       	static  shared
+  Boost.Python           -lboost_python-pyPQ        [2] static  shared
+                         -lboost_python             [3] static  shared
+                         -lboost_mpi_python-pyPQ    [2] static  shared
+                         -lboost_mpi_python         [3] static  shared
+  Boost.Random           -lboost_random                 static  shared
   Boost.Regex            -lboost_regex                	static  shared
   Boost.Serialization    -lboost_serialization        	static  shared
                          -lboost_wserialization       	static  shared
   Boost.Signals          -lboost_signals              	static  shared
   Boost.System		 -lboost_system   	      	static  shared
   Boost.Test             -lboost_prg_exec_monitor     	static  shared
+                         -lboost_test_exec_monitor      static    x
                          -lboost_unit_test_framework   	static  shared
   Boost.Thread           -lboost_thread               	static  shared
+  Boost.Timer            -lboost_timer                  static  shared
   Boost.Wave             -lboost_wave   		static  shared
 
+
+[1] Not available on all architectures.
+[2] Boost.Python is built for multiple Python versions.  
+    For example, Boost 1.48.0 is built for Python 2.6, 2.7, and 3.2; 
+    the corresponding libraries are -lboost_python-py26, -py27, and
+    -py32.
+[3] Symbolic link to the default version of Python (as of build time).
 
 Most of Boost is installed using the package libboostX.Y-dev.
 The components with a shared library have separate -dev packages.
@@ -116,4 +130,4 @@ Please see the manual and the following thread for more details
   http://lists.boost.org/boost-users/2008/03/34486.php
 
 
- -- Steve M. Robbins <smr@debian.org>, Sat, 19 Sep 2009 15:16:51 z
+ -- Steve M. Robbins <smr@debian.org>, Sun, 27 Nov 2011 20:32:05 -0600

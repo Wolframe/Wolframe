@@ -1,0 +1,377 @@
+Description: Rename class template parameter "L".
+ Allows boost-using code to define function macro "L()".
+ Upstream changelist 76278.
+Author: John Maddock
+Bug: 653764
+Forwarded: http://lists.boost.org/Archives/boost/2012/01/189218.php
+
+
+
+Index: boost/math/special_functions/beta.hpp
+===================================================================
+--- old/boost/math/special_functions/beta.hpp	(revision 76277)
++++ new/boost/math/special_functions/beta.hpp	(revision 76278)
+@@ -29,8 +29,8 @@
+ //
+ // Implementation of Beta(a,b) using the Lanczos approximation:
+ //
+-template <class T, class L, class Policy>
+-T beta_imp(T a, T b, const L&, const Policy& pol)
++template <class T, class Lanczos, class Policy>
++T beta_imp(T a, T b, const Lanczos&, const Policy& pol)
+ {
+    BOOST_MATH_STD_USING  // for ADL of std names
+ 
+@@ -81,10 +81,10 @@
+       std::swap(a, b);
+ 
+    // Lanczos calculation:
+-   T agh = a + L::g() - T(0.5);
+-   T bgh = b + L::g() - T(0.5);
+-   T cgh = c + L::g() - T(0.5);
+-   result = L::lanczos_sum_expG_scaled(a) * L::lanczos_sum_expG_scaled(b) / L::lanczos_sum_expG_scaled(c);
++   T agh = a + Lanczos::g() - T(0.5);
++   T bgh = b + Lanczos::g() - T(0.5);
++   T cgh = c + Lanczos::g() - T(0.5);
++   result = Lanczos::lanczos_sum_expG_scaled(a) * Lanczos::lanczos_sum_expG_scaled(b) / Lanczos::lanczos_sum_expG_scaled(c);
+    T ambh = a - T(0.5) - b;
+    if((fabs(b * ambh) < (cgh * 100)) && (a > 100))
+    {
+@@ -107,7 +107,7 @@
+    result *= prefix;
+ 
+    return result;
+-} // template <class T, class L> beta_imp(T a, T b, const L&)
++} // template <class T, class Lanczos> beta_imp(T a, T b, const Lanczos&)
+ 
+ //
+ // Generic implementation of Beta(a,b) without Lanczos approximation support
+@@ -191,12 +191,12 @@
+ // powers are *hard* though, and using logarithms just leads to
+ // horrendous cancellation errors.
+ //
+-template <class T, class L, class Policy>
++template <class T, class Lanczos, class Policy>
+ T ibeta_power_terms(T a,
+                         T b,
+                         T x,
+                         T y,
+-                        const L&,
++                        const Lanczos&,
+                         bool normalised,
+                         const Policy& pol)
+ {
+@@ -214,10 +214,10 @@
+    T c = a + b;
+ 
+    // combine power terms with Lanczos approximation:
+-   T agh = a + L::g() - T(0.5);
+-   T bgh = b + L::g() - T(0.5);
+-   T cgh = c + L::g() - T(0.5);
+-   result = L::lanczos_sum_expG_scaled(c) / (L::lanczos_sum_expG_scaled(a) * L::lanczos_sum_expG_scaled(b));
++   T agh = a + Lanczos::g() - T(0.5);
++   T bgh = b + Lanczos::g() - T(0.5);
++   T cgh = c + Lanczos::g() - T(0.5);
++   result = Lanczos::lanczos_sum_expG_scaled(c) / (Lanczos::lanczos_sum_expG_scaled(a) * Lanczos::lanczos_sum_expG_scaled(b));
+ 
+    // l1 and l2 are the base of the exponents minus one:
+    T l1 = (x * b - y * agh) / agh;
+@@ -465,8 +465,8 @@
+    int n;
+ };
+ 
+-template <class T, class L, class Policy>
+-T ibeta_series(T a, T b, T x, T s0, const L&, bool normalised, T* p_derivative, T y, const Policy& pol)
++template <class T, class Lanczos, class Policy>
++T ibeta_series(T a, T b, T x, T s0, const Lanczos&, bool normalised, T* p_derivative, T y, const Policy& pol)
+ {
+    BOOST_MATH_STD_USING
+ 
+@@ -479,10 +479,10 @@
+       T c = a + b;
+ 
+       // incomplete beta power term, combined with the Lanczos approximation:
+-      T agh = a + L::g() - T(0.5);
+-      T bgh = b + L::g() - T(0.5);
+-      T cgh = c + L::g() - T(0.5);
+-      result = L::lanczos_sum_expG_scaled(c) / (L::lanczos_sum_expG_scaled(a) * L::lanczos_sum_expG_scaled(b));
++      T agh = a + Lanczos::g() - T(0.5);
++      T bgh = b + Lanczos::g() - T(0.5);
++      T cgh = c + Lanczos::g() - T(0.5);
++      result = Lanczos::lanczos_sum_expG_scaled(c) / (Lanczos::lanczos_sum_expG_scaled(a) * Lanczos::lanczos_sum_expG_scaled(b));
+       if(a * b < bgh * 10)
+          result *= exp((b - 0.5f) * boost::math::log1p(a / bgh, pol));
+       else
+@@ -836,7 +836,7 @@
+       }
+    }
+    return sum;
+-} // template <class T, class L>T beta_small_b_large_a_series(T a, T b, T x, T y, T s0, T mult, const L& l, bool normalised)
++} // template <class T, class Lanczos>T beta_small_b_large_a_series(T a, T b, T x, T y, T s0, T mult, const Lanczos& l, bool normalised)
+ 
+ //
+ // For integer arguments we can relate the incomplete beta to the
+@@ -1220,7 +1220,7 @@
+       }
+    }
+    return invert ? (normalised ? 1 : boost::math::beta(a, b, pol)) - fract : fract;
+-} // template <class T, class L>T ibeta_imp(T a, T b, T x, const L& l, bool inv, bool normalised)
++} // template <class T, class Lanczos>T ibeta_imp(T a, T b, T x, const Lanczos& l, bool inv, bool normalised)
+ 
+ template <class T, class Policy>
+ inline T ibeta_imp(T a, T b, T x, const Policy& pol, bool inv, bool normalised)
+Index: boost/math/special_functions/detail/lgamma_small.hpp
+===================================================================
+--- old/boost/math/special_functions/detail/lgamma_small.hpp	(revision 76277)
++++ new/boost/math/special_functions/detail/lgamma_small.hpp	(revision 76278)
+@@ -17,13 +17,13 @@
+ //
+ // lgamma for small arguments:
+ //
+-template <class T, class Policy, class L>
+-T lgamma_small_imp(T z, T zm1, T zm2, const mpl::int_<64>&, const Policy& /* l */, const L&)
++template <class T, class Policy, class Lanczos>
++T lgamma_small_imp(T z, T zm1, T zm2, const mpl::int_<64>&, const Policy& /* l */, const Lanczos&)
+ {
+    // This version uses rational approximations for small
+    // values of z accurate enough for 64-bit mantissas
+    // (80-bit long doubles), works well for 53-bit doubles as well.
+-   // L is only used to select the Lanczos function.
++   // Lanczos is only used to select the Lanczos function.
+ 
+    BOOST_MATH_STD_USING  // for ADL of std names
+    T result = 0;
+@@ -206,8 +206,8 @@
+    }
+    return result;
+ }
+-template <class T, class Policy, class L>
+-T lgamma_small_imp(T z, T zm1, T zm2, const mpl::int_<113>&, const Policy& /* l */, const L&)
++template <class T, class Policy, class Lanczos>
++T lgamma_small_imp(T z, T zm1, T zm2, const mpl::int_<113>&, const Policy& /* l */, const Lanczos&)
+ {
+    //
+    // This version uses rational approximations for small
+@@ -463,8 +463,8 @@
+    BOOST_MATH_INSTRUMENT_CODE(result);
+    return result;
+ }
+-template <class T, class Policy, class L>
+-T lgamma_small_imp(T z, T zm1, T zm2, const mpl::int_<0>&, const Policy& pol, const L&)
++template <class T, class Policy, class Lanczos>
++T lgamma_small_imp(T z, T zm1, T zm2, const mpl::int_<0>&, const Policy& pol, const Lanczos&)
+ {
+    //
+    // No rational approximations are available because either
+@@ -482,28 +482,28 @@
+    else if(z < 0.5)
+    {
+       // taking the log of tgamma reduces the error, no danger of overflow here:
+-      result = log(gamma_imp(z, pol, L()));
++      result = log(gamma_imp(z, pol, Lanczos()));
+    }
+    else if(z >= 3)
+    {
+       // taking the log of tgamma reduces the error, no danger of overflow here:
+-      result = log(gamma_imp(z, pol, L()));
++      result = log(gamma_imp(z, pol, Lanczos()));
+    }
+    else if(z >= 1.5)
+    {
+       // special case near 2:
+       T dz = zm2;
+-      result = dz * log((z + L::g() - T(0.5)) / boost::math::constants::e<T>());
+-      result += boost::math::log1p(dz / (L::g() + T(1.5)), pol) * T(1.5);
+-      result += boost::math::log1p(L::lanczos_sum_near_2(dz), pol);
++      result = dz * log((z + Lanczos::g() - T(0.5)) / boost::math::constants::e<T>());
++      result += boost::math::log1p(dz / (Lanczos::g() + T(1.5)), pol) * T(1.5);
++      result += boost::math::log1p(Lanczos::lanczos_sum_near_2(dz), pol);
+    }
+    else
+    {
+       // special case near 1:
+       T dz = zm1;
+-      result = dz * log((z + L::g() - T(0.5)) / boost::math::constants::e<T>());
+-      result += boost::math::log1p(dz / (L::g() + T(0.5)), pol) / 2;
+-      result += boost::math::log1p(L::lanczos_sum_near_1(dz), pol);
++      result = dz * log((z + Lanczos::g() - T(0.5)) / boost::math::constants::e<T>());
++      result += boost::math::log1p(dz / (Lanczos::g() + T(0.5)), pol) / 2;
++      result += boost::math::log1p(Lanczos::lanczos_sum_near_1(dz), pol);
+    }
+    return result;
+ }
+Index: boost/math/special_functions/erf.hpp
+===================================================================
+--- old/boost/math/special_functions/erf.hpp	(revision 76277)
++++ new/boost/math/special_functions/erf.hpp	(revision 76278)
+@@ -365,7 +365,7 @@
+    }
+ 
+    return result;
+-} // template <class T, class L>T erf_imp(T z, bool invert, const L& l, const mpl::int_<53>& t)
++} // template <class T, class Lanczos>T erf_imp(T z, bool invert, const Lanczos& l, const mpl::int_<53>& t)
+ 
+ 
+ template <class T, class Policy>
+@@ -571,7 +571,7 @@
+    }
+ 
+    return result;
+-} // template <class T, class L>T erf_imp(T z, bool invert, const L& l, const mpl::int_<64>& t)
++} // template <class T, class Lanczos>T erf_imp(T z, bool invert, const Lanczos& l, const mpl::int_<64>& t)
+ 
+ 
+ template <class T, class Policy>
+@@ -976,7 +976,7 @@
+    }
+ 
+    return result;
+-} // template <class T, class L>T erf_imp(T z, bool invert, const L& l, const mpl::int_<113>& t)
++} // template <class T, class Lanczos>T erf_imp(T z, bool invert, const Lanczos& l, const mpl::int_<113>& t)
+ 
+ } // namespace detail
+ 
+Index: boost/math/special_functions/gamma.hpp
+===================================================================
+--- a/boost/math/special_functions/gamma.hpp	(revision 76277)
++++ b/boost/math/special_functions/gamma.hpp	(revision 76278)
+@@ -127,8 +127,8 @@
+ //
+ // tgamma(z), with Lanczos support:
+ //
+-template <class T, class Policy, class L>
+-T gamma_imp(T z, const Policy& pol, const L& l)
++template <class T, class Policy, class Lanczos>
++T gamma_imp(T z, const Policy& pol, const Lanczos& l)
+ {
+    BOOST_MATH_STD_USING
+ 
+@@ -178,13 +178,13 @@
+    }
+    else
+    {
+-      result *= L::lanczos_sum(z);
++      result *= Lanczos::lanczos_sum(z);
+       BOOST_MATH_INSTRUMENT_VARIABLE(result);
+       BOOST_MATH_INSTRUMENT_VARIABLE(tools::log_max_value<T>());
+       if(z * log(z) > tools::log_max_value<T>())
+       {
+          // we're going to overflow unless this is done with care:
+-         T zgh = (z + static_cast<T>(L::g()) - boost::math::constants::half<T>());
++         T zgh = (z + static_cast<T>(Lanczos::g()) - boost::math::constants::half<T>());
+          BOOST_MATH_INSTRUMENT_VARIABLE(zgh);
+          if(log(zgh) * z / 2 > tools::log_max_value<T>())
+             return policies::raise_overflow_error<T>(function, "Result of tgamma is too large to represent.", pol);
+@@ -199,7 +199,7 @@
+       }
+       else
+       {
+-         T zgh = (z + static_cast<T>(L::g()) - boost::math::constants::half<T>());
++         T zgh = (z + static_cast<T>(Lanczos::g()) - boost::math::constants::half<T>());
+          BOOST_MATH_INSTRUMENT_VARIABLE(zgh);
+          BOOST_MATH_INSTRUMENT_VARIABLE(pow(zgh, z - boost::math::constants::half<T>()));
+          BOOST_MATH_INSTRUMENT_VARIABLE(exp(zgh));
+@@ -212,8 +212,8 @@
+ //
+ // lgamma(z) with Lanczos support:
+ //
+-template <class T, class Policy, class L>
+-T lgamma_imp(T z, const Policy& pol, const L& l, int* sign = 0)
++template <class T, class Policy, class Lanczos>
++T lgamma_imp(T z, const Policy& pol, const Lanczos& l, int* sign = 0)
+ {
+ #ifdef BOOST_MATH_INSTRUMENT
+    static bool b = false;
+@@ -274,10 +274,10 @@
+    else
+    {
+       // regular evaluation:
+-      T zgh = static_cast<T>(z + L::g() - boost::math::constants::half<T>());
++      T zgh = static_cast<T>(z + Lanczos::g() - boost::math::constants::half<T>());
+       result = log(zgh) - 1;
+       result *= z - 0.5f;
+-      result += log(L::lanczos_sum_expG_scaled(z));
++      result += log(Lanczos::lanczos_sum_expG_scaled(z));
+    }
+ 
+    if(sign)
+@@ -447,8 +447,8 @@
+ // This helper calculates tgamma(dz+1)-1 without cancellation errors,
+ // used by the upper incomplete gamma with z < 1:
+ //
+-template <class T, class Policy, class L>
+-T tgammap1m1_imp(T dz, Policy const& pol, const L& l)
++template <class T, class Policy, class Lanczos>
++T tgammap1m1_imp(T dz, Policy const& pol, const Lanczos& l)
+ {
+    BOOST_MATH_STD_USING
+ 
+@@ -460,7 +460,7 @@
+          mpl::greater<precision_type, mpl::int_<113> >
+       >,
+       typename mpl::if_<
+-         is_same<L, lanczos::lanczos24m113>,
++         is_same<Lanczos, lanczos::lanczos24m113>,
+          mpl::int_<113>,
+          mpl::int_<0>
+       >::type,
+@@ -612,13 +612,13 @@
+ // Compute (z^a)(e^-z)/tgamma(a)
+ // most if the error occurs in this function:
+ //
+-template <class T, class Policy, class L>
+-T regularised_gamma_prefix(T a, T z, const Policy& pol, const L& l)
++template <class T, class Policy, class Lanczos>
++T regularised_gamma_prefix(T a, T z, const Policy& pol, const Lanczos& l)
+ {
+    BOOST_MATH_STD_USING
+-   T agh = a + static_cast<T>(L::g()) - T(0.5);
++   T agh = a + static_cast<T>(Lanczos::g()) - T(0.5);
+    T prefix;
+-   T d = ((z - a) - static_cast<T>(L::g()) + T(0.5)) / agh;
++   T d = ((z - a) - static_cast<T>(Lanczos::g()) + T(0.5)) / agh;
+ 
+    if(a < 1)
+    {
+@@ -646,7 +646,7 @@
+    else if((fabs(d*d*a) <= 100) && (a > 150))
+    {
+       // special case for large a and a ~ z.
+-      prefix = a * boost::math::log1pmx(d, pol) + z * static_cast<T>(0.5 - L::g()) / agh;
++      prefix = a * boost::math::log1pmx(d, pol) + z * static_cast<T>(0.5 - Lanczos::g()) / agh;
+       prefix = exp(prefix);
+    }
+    else
+@@ -688,7 +688,7 @@
+          prefix = pow(z / agh, a) * exp(amz);
+       }
+    }
+-   prefix *= sqrt(agh / boost::math::constants::e<T>()) / L::lanczos_sum_expG_scaled(a);
++   prefix *= sqrt(agh / boost::math::constants::e<T>()) / Lanczos::lanczos_sum_expG_scaled(a);
+    return prefix;
+ }
+ //
+@@ -1092,11 +1092,11 @@
+ //
+ // Ratios of two gamma functions:
+ //
+-template <class T, class Policy, class L>
+-T tgamma_delta_ratio_imp_lanczos(T z, T delta, const Policy& pol, const L&)
++template <class T, class Policy, class Lanczos>
++T tgamma_delta_ratio_imp_lanczos(T z, T delta, const Policy& pol, const Lanczos&)
+ {
+    BOOST_MATH_STD_USING
+-   T zgh = z + L::g() - constants::half<T>();
++   T zgh = z + Lanczos::g() - constants::half<T>();
+    T result;
+    if(fabs(delta) < 10)
+    {
+@@ -1107,7 +1107,7 @@
+       result = pow(zgh / (zgh + delta), z - constants::half<T>());
+    }
+    result *= pow(constants::e<T>() / (zgh + delta), delta);
+-   result *= L::lanczos_sum(z) / L::lanczos_sum(T(z + delta));
++   result *= Lanczos::lanczos_sum(z) / Lanczos::lanczos_sum(T(z + delta));
+    return result;
+ }
+ //

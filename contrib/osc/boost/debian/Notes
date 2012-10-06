@@ -1,11 +1,3 @@
-	Thread Support
-	--------------
-
-All debian libraries are supposed to be built with _REENTRANT defined
-(policy 10.2).  We thus use "<define>_REENTRANT" on the bjam command
-line in debian/rules.
-
-
 	Documentation
 	-------------
 

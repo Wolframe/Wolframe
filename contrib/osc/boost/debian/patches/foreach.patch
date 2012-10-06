@@ -1,0 +1,72 @@
+Description: Fixes compile errors related to BOOST_FOREACH
+ Patch taken from upstream commit 75634.
+Author: Eric Niebler
+Forwarded: https://svn.boost.org/trac/boost/ticket/6131
+
+
+--- boost1.48-1.48.0.orig/boost/foreach.hpp
++++ boost1.48-1.48.0/boost/foreach.hpp
+@@ -165,7 +165,7 @@
+ //   this one works on legacy compilers. Overload boost_foreach_is_lightweight_proxy
+ //   at the global namespace for your type.
+ template<typename T>
+-inline boost::foreach::is_lightweight_proxy<T> *
++inline boost::BOOST_FOREACH::is_lightweight_proxy<T> *
+ boost_foreach_is_lightweight_proxy(T *&, BOOST_FOREACH_TAG_DEFAULT) { return 0; }
+ 
+ template<typename T>
+@@ -190,7 +190,7 @@
+ //   this one works on legacy compilers. Overload boost_foreach_is_noncopyable
+ //   at the global namespace for your type.
+ template<typename T>
+-inline boost::foreach::is_noncopyable<T> *
++inline boost::BOOST_FOREACH::is_noncopyable<T> *
+ boost_foreach_is_noncopyable(T *&, BOOST_FOREACH_TAG_DEFAULT) { return 0; }
+ 
+ namespace boost
+--- boost1.48-1.48.0.orig/boost/foreach_fwd.hpp
++++ boost1.48-1.48.0/boost/foreach_fwd.hpp
+@@ -14,6 +14,8 @@
+ #ifndef BOOST_FOREACH_FWD_HPP
+ #define BOOST_FOREACH_FWD_HPP
+ 
++#include <utility> // for std::pair
++
+ // This must be at global scope, hence the uglified name
+ enum boost_foreach_argument_dependent_lookup_hack
+ {
+@@ -25,6 +27,9 @@
+ 
+ namespace foreach
+ {
++    template<typename T>
++    std::pair<T, T> in_range(T begin, T end);
++
+     ///////////////////////////////////////////////////////////////////////////////
+     // boost::foreach::tag
+     //
+@@ -46,6 +51,24 @@
+ 
+ } // namespace foreach
+ 
++// Workaround for unfortunate https://svn.boost.org/trac/boost/ticket/6131
++namespace BOOST_FOREACH
++{
++    using foreach::in_range;
++    using foreach::tag;
++
++    template<typename T>
++    struct is_lightweight_proxy
++      : foreach::is_lightweight_proxy<T>
++    {};
++
++    template<typename T>
++    struct is_noncopyable
++      : foreach::is_noncopyable<T>
++    {};
++
++} // namespace BOOST_FOREACH
++
+ } // namespace boost
+ 
+ #endif

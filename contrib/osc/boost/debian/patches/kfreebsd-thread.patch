@@ -1,3 +1,11 @@
+Description: Compute hardware_concurrency() using get_nprocs() on GLIBC systems
+ All glibc-based systems have get_nprocs(), which can be used to
+ implement hardware_concurrency().
+ This patch fixes a build failure on Debian/kfreebsd.
+ http://lists.debian.org/debian-bsd/2010/01/msg00036.html
+Author: Petr Salinger <Petr.Salinger@seznam.cz>
+Forwarded: https://svn.boost.org/trac/boost/ticket/6100
+
 --- boost1.44-1.44.0.orig/libs/thread/src/pthread/thread.cpp
 +++ boost1.44-1.44.0/libs/thread/src/pthread/thread.cpp
 @@ -14,7 +14,7 @@

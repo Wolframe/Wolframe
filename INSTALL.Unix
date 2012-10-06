@@ -286,7 +286,7 @@ For checking the validity of various XML files you need 'libxml2-utils' (for xml
 Ubuntu 11.10
 ------------
 
-Required packages: libboost-dev (1.46), libboost-program-options-dev,
+Required packages: libboost-dev (1.48), libboost-program-options-dev,
                    libboost-filesystem-dev, libboost-thread-dev,
                    libboost-random-dev
 
@@ -313,7 +313,7 @@ For checking the validity of various XML files you need 'libxml2-utils' (for xml
 Ubuntu 12.04
 ------------
 
-Required packages: libboost-dev (1.46), libboost-program-options-dev,
+Required packages: libboost-dev (1.48), libboost-program-options-dev,
                    libboost-filesystem-dev, libboost-thread-dev,
                    libboost-random-dev
 
