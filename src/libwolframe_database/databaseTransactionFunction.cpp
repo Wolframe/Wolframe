@@ -36,6 +36,7 @@
 #include "database/transaction.hpp"
 #include "processor/procProvider.hpp"
 #include "types/countedReference.hpp"
+#include "utils/miscUtils.hpp"
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/charset.hpp"
@@ -501,7 +502,6 @@ bool FunctionCall::hasResultReference() const
 
 DatabaseTransactionFunction::DatabaseTransactionFunction( const DatabaseTransactionFunction& o)
 	:TransactionFunction(o)
-	,m_database(o.m_database)
 	,m_resultname(o.m_resultname)
 	,m_call(o.m_call)
 	,m_tagmap(o.m_tagmap)
@@ -516,118 +516,111 @@ static bool isAlphaNumeric( char ch)
 	return false;
 }
 
-static void skipSpaces( std::string::const_iterator& ii, std::string::const_iterator& ee)
+bool checkIdentifier( const std::string& id)
 {
-	while (ii < ee && *ii > 0 && *ii <= 32) ++ii;
+	std::string::const_iterator ii = id.begin(), ie = id.end();
+	while (ii != ie && isAlphaNumeric( *ii)) ++ii;
+	return (ii != ie);
 }
 
-static void nextToken( std::string::const_iterator& ii, std::string::const_iterator& ee)
-{
-	skipSpaces(ii,ee);
-	if (ii == ee) throw std::runtime_error( "unexpected end of expression");
-}
-
-static std::string parseParameter( std::string::const_iterator& ii, std::string::const_iterator& ee)
-{
-	std::string rt;
-	while (ii < ee && *ii != ',' && *ii != ')')
-	{
-		rt.push_back( *ii);
-		++ii;
-	}
-	boost::trim( rt);
-	if (rt.empty()) throw std::runtime_error( "empty element in parameter list");
-	return rt;
-}
-
-DatabaseTransactionFunction::DatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::string& src)
+DatabaseTransactionFunction::DatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::vector<TransactionDescription>& description)
 	:m_provider(provider_)
 {
-	std::string::const_iterator ii = src.begin(), ee = src.end();
-	while (ii != ee)
-	{
-		// Parse result name and function name "bla/bla=func(" or "bla=func(" of "func(":
-		nextToken(ii,ee);
-		std::string resname,functionname;
-		while (ii < ee && (isAlphaNumeric( *ii) || *ii == '/'))
-		{
-			functionname.push_back( *ii);
-			++ii;
-		}
-		nextToken(ii,ee);
-		if (*ii == '=')
-		{
-			++ii; nextToken(ii,ee);
-			resname = functionname;
-			functionname.clear();
-			for (; ii < ee && isAlphaNumeric( *ii); ++ii)
-			{
-				functionname.push_back( *ii);
-			}
-			if (functionname.empty()) throw std::runtime_error("expected identifier for function name after '='");
-		}
-		nextToken(ii,ee);
-		if (*ii != '(') throw std::runtime_error( "syntax error in expression '(' expected");
-		++ii; nextToken(ii,ee);
+	typedef TransactionDescription::Error Error;
+	TransactionDescription::ElementName elementName = TransactionDescription::Call;
 
-		// Parse selector "/doc/aa:":
-		std::string selectorstr;
-		while (ii < ee && *ii != ':' && *ii != ',' && *ii != ')' && *ii != '(' && *ii != ';')
+	std::vector<TransactionDescription>::const_iterator di = description.begin(), de = description.end();
+	for (; di != de; ++di)
+	{
+		elementName = TransactionDescription::Call;
+		std::size_t eidx = di - description.begin();
+		// Parse the function call
+		std::string::const_iterator ci = di->call.begin(), ce = di->call.end();
+		utils::gotoNextToken( ci, ce);
+
+		std::string functionname;
+		while (ci < ce && isAlphaNumeric( *ci))
 		{
-			selectorstr.push_back( *ii);
-			++ii;
+			functionname.push_back( *ci);
+			++ci;
 		}
-		nextToken(ii,ee);
-		if (*ii != ':') throw std::runtime_error( "expected ':' after selection");
-		++ii; nextToken(ii,ee);
+		if (functionname.empty())
+		{
+			throw Error( elementName, eidx, "identifier expected for name of function");
+		}
+		utils::gotoNextToken( ci, ce);
+		if (*ci != '(')
+		{
+			throw Error( elementName, eidx, "'(' expected after function name");
+		}
+		++ci; utils::gotoNextToken( ci, ce);
 
 		// Parse parameter list:
 		std::vector<std::string> paramstr;
-		if (*ii == ')')
+		if (*ci == ')')
 		{
 			// ... empty parameter list
-			++ii;
+			++ci;
 		}
 		else
 		{
 			for (;;)
 			{
-				paramstr.push_back( parseParameter( ii, ee));
-				nextToken(ii,ee);
-				if (*ii == ')')
+				std::string pp;
+				while (ci < ce && *ci != ',' && *ci != ')')
 				{
-					++ii;
+					pp.push_back( *ci);
+					++ci;
+				}
+				boost::trim( pp);
+				if (pp.empty())
+				{
+					throw Error( elementName, eidx, "empty element in parameter list");
+				}
+				paramstr.push_back( pp);
+
+				utils::gotoNextToken( ci, ce);
+				if (*ci == ')')
+				{
+					++ci;
 					break;
 				}
-				else if (*ii == ',')
+				else if (*ci == ',')
 				{
-					++ii; nextToken(ii,ee);
+					++ci; utils::gotoNextToken( ci, ce);
 					continue;
 				}
 			}
 		}
+		if (utils::gotoNextToken( ci, ce))
+		{
+			throw Error( elementName, eidx, "unexpected token after function call");
+		}
 
 		// Build Function call object for parsed function:
-		Path selector( selectorstr, &m_tagmap);
-		std::vector<Path> param;
-		std::vector<std::string>::const_iterator ai = paramstr.begin(), ae = paramstr.end();
-		for (; ai != ae; ++ai)
+		try
 		{
-			Path pp( *ai, &m_tagmap);
-			param.push_back( pp);
+			elementName = TransactionDescription::Selector;
+			Path selector( di->selector, &m_tagmap);
+			elementName = TransactionDescription::Call;
+			std::vector<Path> param;
+			std::vector<std::string>::const_iterator ai = paramstr.begin(), ae = paramstr.end();
+			for (; ai != ae; ++ai)
+			{
+				Path pp( *ai, &m_tagmap);
+				param.push_back( pp);
+			}
+			FunctionCall cc( di->output, functionname, selector, param);
+			m_call.push_back( cc);
 		}
-		FunctionCall cc( resname, functionname, selector, param);
-		m_call.push_back( cc);
-
-		// Skip to end of next semicolon that starts a new function call definition:
-		skipSpaces(ii,ee);
-		if (ii == ee) break;
-		if (*ii != ';') throw std::runtime_error( "missing semicolon as expression separator");
-		++ii; skipSpaces(ii,ee);
-		if (ii == ee) throw std::runtime_error( "superfluous semicolon at end of expression. ';' is a separator and not the terminator of a function call definition");
+		catch (const std::runtime_error& e)
+		{
+			throw Error( elementName, eidx, e.what());
+		}
 	}
 
 	// calculating common result name prefix:
+	elementName = TransactionDescription::Output;
 	std::vector<FunctionCall>::iterator ci = m_call.begin(), ce = m_call.end();
 	m_resultname.clear();
 	ci = m_call.begin(), ce = m_call.end();
@@ -638,8 +631,10 @@ DatabaseTransactionFunction::DatabaseTransactionFunction( const proc::ProcessorP
 		if (pp)
 		{
 			prefix.append( ci->resultname().c_str(), pp-ci->resultname().c_str());
-			if (std::strchr( pp+1, '/')) throw std::runtime_error( "Illegal result prefix. Only one '/' allowed");
-
+			if (std::strchr( pp+1, '/'))
+			{
+				throw Error( elementName, ci - m_call.begin(), "illegal result prefix. Only one '/' allowed");
+			}
 			if (m_resultname.empty())
 			{
 				m_resultname = prefix;
@@ -651,26 +646,32 @@ DatabaseTransactionFunction::DatabaseTransactionFunction( const proc::ProcessorP
 			}
 			else
 			{
-				throw std::runtime_error( "no common result prefix");
+				throw Error( elementName, ci - m_call.begin(), "no common result prefix");
 			}
+		}
+		if (!checkIdentifier( ci->resultname()) || !checkIdentifier( m_resultname))
+		{
+			throw Error( elementName, ci - m_call.begin(), "identifier or two identifiers separated by a '/' expected for output");
 		}
 	}
 
 	// checking the program
+	elementName = TransactionDescription::Selector;
 	ci = m_call.begin(), ce = m_call.end();
 	for (; ci != ce; ++ci)
 	{
 		if (ci->selector().resultReference())
 		{
-			throw std::runtime_error( "undefined: result variable reference as selector");
+			throw Error( elementName, ci - m_call.begin(), "undefined: result variable reference in selector");
 		}
 	}
+	elementName = TransactionDescription::Output;
 	ci = m_call.begin();
 	if (ci != ce)
 	{
 		if (ci->hasResultReference())
 		{
-			throw std::runtime_error( "result variable reference in first command leads to an empty result");
+			throw Error( elementName, 0, "result variable reference in first command leads to an empty result");
 		}
 	}
 }
@@ -898,7 +899,7 @@ langbind::TransactionFunction::ResultR DatabaseTransactionFunction::execute( con
 	}
 }
 
-langbind::TransactionFunction* _Wolframe::langbind::createDatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::string& description)
+langbind::TransactionFunction* _Wolframe::langbind::createDatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::vector<TransactionDescription>& description)
 {
 	return new DatabaseTransactionFunction( provider_, description);
 }
