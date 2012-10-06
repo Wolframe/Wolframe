@@ -265,12 +265,10 @@ void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
 bool ProcProviderConfig::check() const
 {
 	bool correct = true;
-#if 0 //... PF:HACK: configuration may be without database (wolfilter)
 	if ( m_dbLabel.empty() )	{
-		LOG_ERROR << logPrefix() << "referenced database ID can not be empty";
-		correct = false;
+		LOG_WARNING << logPrefix() << "no database configured";
+//		correct = false;
 	}
-#endif
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		if ( !(*it)->check() )

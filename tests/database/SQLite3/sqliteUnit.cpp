@@ -32,6 +32,7 @@ TEST_F( SQLiteModuleFixture, CreateSQLiteUnit_0 )
 	SQLiteDBunit db( "testDB", "test.db", false, "program", 3 );
 	ASSERT_STREQ( "SQLite", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
+	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
 	ASSERT_FALSE( db.loadProgram());
 }
 
@@ -40,6 +41,7 @@ TEST_F( SQLiteModuleFixture, CreateSQLiteUnit_1 )
 	SQLiteDBunit db( "testDB", "test.db", false, "", 3 );
 	ASSERT_STREQ( "SQLite", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
+	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
 	ASSERT_TRUE( db.loadProgram());
 }
 

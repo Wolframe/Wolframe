@@ -50,6 +50,18 @@ template<>
 PoolObject< PGconn* >::PoolObject( ObjectPool< PGconn* >& pool )
 	: m_pool( pool ), m_object( pool.get() )
 {
+	m_object = pool.get();
+	ConnStatusType stat = PQstatus( m_object );
+	if ( stat == CONNECTION_OK )
+		return;
+	else if ( stat == CONNECTION_BAD )	{
+			PQreset( m_object );
+			return;
+	}
+	else	{
+		MOD_LOG_ALERT << "Unexpected connection status " << stat << " for PostgreSQL database";
+		throw std::range_error( "PostgreSQL database: unexpected connection status" );
+	}
 }
 
 } // namespace _Wolframe
