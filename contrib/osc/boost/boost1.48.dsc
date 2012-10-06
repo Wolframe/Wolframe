@@ -1,10 +1,10 @@
 Format: 3.0 (quilt)
 Source: boost1.48
-Binary: libboost1.48-dbg, libboost1.48-dev, libboost1.48-all-dev, libboost1.48-doc, libboost-chrono1.48.0, libboost-chrono1.48-dev, libboost-date-time1.48.0, libboost-date-time1.48-dev, libboost-filesystem1.48.0, libboost-filesystem1.48-dev, libboost-graph1.48.0, libboost-graph1.48-dev, libboost-graph-parallel1.48.0, libboost-graph-parallel1.48-dev, libboost-iostreams1.48.0, libboost-iostreams1.48-dev, libboost-locale1.48.0, libboost-locale1.48-dev, libboost-math1.48.0, libboost-math1.48-dev, libboost-mpi1.48.0, libboost-mpi1.48-dev, libboost-mpi-python1.48.0, libboost-mpi-python1.48-dev, libboost-program-options1.48.0, libboost-program-options1.48-dev, libboost-python1.48.0, libboost-python1.48-dev, libboost-random1.48.0, libboost-random1.48-dev, libboost-regex1.48.0, libboost-regex1.48-dev, libboost-serialization1.48.0, libboost-serialization1.48-dev, libboost-signals1.48.0, libboost-signals1.48-dev, libboost-system1.48.0, libboost-system1.48-dev, libboost-test1.48.0,
+Binary: libboost1.48-dbg, libboost1.48-dev, libboost1.48-all-dev, libboost1.48-doc, libboost-chrono1.48.0, libboost-chrono1.48-dev, libboost-date-time1.48.0, libboost-date-time1.48-dev, libboost-filesystem1.48.0, libboost-filesystem1.48-dev, libboost-graph1.48.0, libboost-graph1.48-dev, libboost-graph-parallel1.48.0, libboost-graph-parallel1.48-dev, libboost-iostreams1.48.0, libboost-iostreams1.48-dev, libboost-locale1.48.0, libboost-locale1.48-dev, libboost-math1.48.0, libboost-math1.48-dev, libboost-program-options1.48.0, libboost-program-options1.48-dev, libboost-python1.48.0, libboost-python1.48-dev, libboost-random1.48.0, libboost-random1.48-dev, libboost-regex1.48.0, libboost-regex1.48-dev, libboost-serialization1.48.0, libboost-serialization1.48-dev, libboost-signals1.48.0, libboost-signals1.48-dev, libboost-system1.48.0, libboost-system1.48-dev, libboost-test1.48.0,
  libboost-test1.48-dev, libboost-thread1.48.0, libboost-thread1.48-dev, libboost-timer1.48.0, libboost-timer1.48-dev, libboost-wave1.48.0,
  libboost-wave1.48-dev
 Architecture: any all
-Version: 1.48.0-3
+Version: 1.48.0
 Maintainer: Debian Boost Team <pkg-boost-devel@lists.alioth.debian.org>
 Uploaders: Steve M. Robbins <smr@debian.org>, Domenico Andreoli <cavok@debian.org>
 Homepage: http://www.boost.org/
@@ -30,10 +30,6 @@ Package-List:
  libboost-locale1.48.0 deb libs optional
  libboost-math1.48-dev deb libdevel optional
  libboost-math1.48.0 deb libs optional
- libboost-mpi-python1.48-dev deb libdevel optional
- libboost-mpi-python1.48.0 deb python optional
- libboost-mpi1.48-dev deb libdevel optional
- libboost-mpi1.48.0 deb libs optional
  libboost-program-options1.48-dev deb libdevel optional
  libboost-program-options1.48.0 deb libs optional
  libboost-python1.48-dev deb libdevel optional
