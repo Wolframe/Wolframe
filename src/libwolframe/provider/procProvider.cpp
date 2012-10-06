@@ -265,10 +265,7 @@ void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
 bool ProcProviderConfig::check() const
 {
 	bool correct = true;
-	if ( m_dbLabel.empty() )	{
-		LOG_WARNING << logPrefix() << "no database configured";
-//		correct = false;
-	}
+
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		if ( !(*it)->check() )
