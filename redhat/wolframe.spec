@@ -127,7 +127,7 @@
 # build local boost for distributions which have a too old version
 
 %define build_boost 0
-%if %{rhel} || %{fc14} || %{centos} || %{sles}
+%if %{rhel} || %{fc14} || %{fc15} || %{fc16} || %{centos} || %{sles}
 %define build_boost 1
 %define boost_version 1.48.0
 %define boost_underscore_version 1_48_0

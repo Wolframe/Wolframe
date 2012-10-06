@@ -11,7 +11,7 @@ make \
 cp wolframe-$VERSION.tar.gz $OSC_HOME/wolframe_$VERSION.tar.gz
 cp redhat/wolframe.spec $OSC_HOME/wolframe.spec
 
-cp boost/boost_1_48_0-gcc-compile.patch $OSC_HOME/.
+cp contrib/osc/boost/boost_1_48_0-gcc-compile.patch $OSC_HOME/.
 
 SIZE=`stat -c '%s' $OSC_HOME/wolframe_$VERSION.tar.gz`
 CHKSUM=`md5sum $OSC_HOME/wolframe_$VERSION.tar.gz  | cut -f 1 -d' '`
