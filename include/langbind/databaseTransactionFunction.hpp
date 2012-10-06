@@ -30,8 +30,8 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface of the processor of database commands
-///\file database/preparedStatementProcessor.hpp
+///\brief Interface to transactions in the database for language bindings
+///\file database/databaseTransactionFunction.hpp
 #ifndef _LANGBIND_DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
 #define _LANGBIND_DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
 #include "types/allocators.hpp"
@@ -190,8 +190,8 @@ public:
 	const std::vector<Path>& arg() const		{return m_arg;}
 	const std::string& name() const			{return m_name;}
 	const std::string& resultname() const		{return m_resultname;}
-
 	void resultname( const char* r)			{m_resultname = r;}
+
 	bool hasResultReference() const;
 
 private:
@@ -243,12 +243,52 @@ private:
 };
 
 
+struct TransactionDescription
+{
+	TransactionDescription(){}
+	TransactionDescription( const TransactionDescription& o)
+		:selector(o.selector)
+		,call(o.call)
+		,output(o.output){}
+
+	void clear()
+	{
+		selector.clear();
+		call.clear();
+		output.clear();
+	}
+
+	enum ElementName
+	{
+		Selector,Call,Output
+	};
+
+	///\class Error
+	///\brief Error thrown by createDatabaseTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
+	struct Error
+	{
+		Error( ElementName elemname_, std::size_t elemidx_, const std::string& msg_)
+			:elemname(elemname_)
+			,elemidx(elemidx_)
+			,msg(msg_){}
+
+		ElementName elemname;
+		std::size_t elemidx;
+		std::string msg;
+	};
+
+	std::string name;
+	std::string selector;
+	std::string call;
+	std::string output;
+};
+
 class DatabaseTransactionFunction
 	:public TransactionFunction
 {
 public:
 	DatabaseTransactionFunction( const DatabaseTransactionFunction& o);
-	DatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::string& description);
+	DatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::vector<TransactionDescription>& description);
 	virtual ~DatabaseTransactionFunction(){}
 
 	virtual TransactionFunction::InputR getInput() const;
@@ -257,7 +297,6 @@ public:
 private:
 	db::TransactionInput databaseTransactionInput( const TransactionFunctionInput&) const;
 
-	std::string m_database;
 	std::string m_resultname;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
@@ -266,7 +305,7 @@ private:
 
 ///\param[in] provider_ processor provider interface
 ///\param[in] description transaction description source
-TransactionFunction* createDatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::string& description);
+TransactionFunction* createDatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::vector<TransactionDescription>& description);
 
 }}//namespace
 #endif

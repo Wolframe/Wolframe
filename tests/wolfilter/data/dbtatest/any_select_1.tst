@@ -1,11 +1,11 @@
 **
+**requires: DISABLED
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <doc><item><aa>1</aa><cc>3</cc><bb>2</bb><dd></dd></item><item><aa>11</aa><cc>33</cc><bb></bb><dd>44</dd></item></doc>
 **config
 --module ../../src/modules/filter/textwolf/mod_filter_textwolf
 --module ../wolfilter/modules/database/testtrace/mod_db_testtrace
---module ../../src/modules/transaction/databaseTransaction/mod_transaction_database
 --input-filter 'xml:textwolf'
 --database 'id=testdb,outfile=DBOUT'
 --transaction 'testcall dbpstm run(//*/aa: ., ../*/../bb, .././cc, ../*/..//dd/.)'
