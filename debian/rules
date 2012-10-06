@@ -19,9 +19,9 @@ export DH_COMPAT=4
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-export WOLFRAME_PARAMS=BOOST_DIR=/usr libdir=/usr/lib/$(DEB_HOST_MULTIARCH) WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_QT=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_EXAMPLES=1 WITH_LOCAL_LIBHPDF=1 RELEASE=1
+export WOLFRAME_PARAMS=BOOST_DIR=/usr libdir=/usr/lib/$(DEB_HOST_MULTIARCH) WITH_SSL=1 WITH_SYSTEM_SQLITE3=1 WITH_LUA=1 WITH_PAM=1 WITH_SASL=1 WITH_PGSQL=1 WITH_QT=1 WITH_LIBXML2=1 WITH_LIBXSLT=1 WITH_EXAMPLES=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 RELEASE=1
 
-export BOOST_VERSION=1.46.1
+export BOOST_VERSION=1.48.0
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
@@ -149,9 +149,14 @@ install: build
 	# TODO: lib, lib64, lib32
 	mkdir -p /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
 	for i in \
-		libboost_program_options.so.$(BOOST_VERSION) libboost_system.so.$(BOOST_VERSION) \
-		libboost_filesystem.so.$(BOOST_VERSION) libboost_thread.so.$(BOOST_VERSION) \
-		libboost_date_time.so.$(BOOST_VERSION); do \
+		libboost_program_options.so.$(BOOST_VERSION) \
+		libboost_system.so.$(BOOST_VERSION) \
+		libboost_filesystem.so.$(BOOST_VERSION) \
+		libboost_thread.so.$(BOOST_VERSION) \
+		libboost_date_time.so.$(BOOST_VERSION); \
+		libboost_locale.so.$(BOOST_VERSION); \
+		libboost_regex.so.$(BOOST_VERSION); \
+		do \
 		cp /usr/lib/$$i /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe; \
 	done
 
