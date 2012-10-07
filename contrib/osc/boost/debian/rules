@@ -331,8 +331,8 @@ binary-common:
 	dh_strip --dbg-package=libboost$(PKGVERSION)-dbg -X"-d-"
 	dh_link
 	dh_compress -Xlibboost$(PKGVERSION)-doc/HTML
-	dh_python2
-	dh_python3
+#	dh_python2
+#	dh_python3
 	dh_fixperms
 
 	@if [ "$(DH_OPTIONS)" = "-a" ]; then \
