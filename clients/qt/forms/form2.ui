@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>399</width>
-    <height>301</height>
+    <width>501</width>
+    <height>379</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,12 +25,12 @@
     <rect>
      <x>14</x>
      <y>69</y>
-     <width>371</width>
-     <height>191</height>
+     <width>471</width>
+     <height>271</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -41,8 +41,8 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>351</width>
-       <height>151</height>
+       <width>451</width>
+       <height>231</height>
       </rect>
      </property>
      <property name="centerOnScroll">
@@ -59,8 +59,8 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>351</width>
-       <height>151</height>
+       <width>451</width>
+       <height>231</height>
       </rect>
      </property>
     </widget>
@@ -74,8 +74,8 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>351</width>
-       <height>151</height>
+       <width>451</width>
+       <height>231</height>
       </rect>
      </property>
      <property name="url">
@@ -89,8 +89,8 @@
   <widget class="QDialogButtonBox" name="buttons">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>270</y>
+     <x>190</x>
+     <y>340</y>
      <width>156</width>
      <height>24</height>
     </rect>

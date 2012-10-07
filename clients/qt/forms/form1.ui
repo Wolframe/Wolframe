@@ -302,7 +302,7 @@
       </widget>
      </item>
      <item row="12" column="1">
-      <widget class="QListView" name="vegetable"/>
+      <widget class="QListWidget" name="vegetable"/>
      </item>
     </layout>
    </item>

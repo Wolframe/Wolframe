@@ -21,6 +21,7 @@
 #include <QPlainTextEdit>
 #include <QRadioButton>
 #include <QGroupBox>
+#include <QListWidget>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -110,6 +111,12 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			} else {
 				xml.writeTextElement( "", name, radioButton->isChecked( ) ? "true" : "false" );
 			}
+		} else if( clazz == "QListWidget" ) {
+			QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+			QList<QListWidgetItem *> items = listWidget->selectedItems( );
+			foreach( QListWidgetItem *item, items ) {
+				xml.writeTextElement( "", name, "selected_item" );
+			}
 		}
 		
 		qDebug( ) << "Wrote " << clazz << name;
@@ -167,6 +174,9 @@ void DataHandler::resetForm( QWidget *form )
 		} else if( clazz == "QRadioButton" ) {
 			QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
 			radioButton->setChecked( false );
+		} else if( clazz == "QListWidget" ) {
+			QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+			listWidget->clear( );
 		}
 		
 		qDebug( ) << "Reset " << clazz << name;
@@ -271,6 +281,9 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 									}
 								}
 							}								
+						} else if( clazz == "QListWidget" ) {
+							QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+							// TODO: set selection
 						}
 					}
 				}

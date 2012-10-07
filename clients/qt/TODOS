@@ -8,10 +8,6 @@
   - simplest form is read data as XML from a directory (as for
     the forms)
     - classes to map from/to:
-      - grouped QRadioButtons: exclusive, select one item from
-        a small list of possible items in a domain
-      - grouped QCheckBoxes: multiple select in a small list of
-        items
       - QListView: list of things to select (multiple select)
       - QTreeWidget
       - file upload
