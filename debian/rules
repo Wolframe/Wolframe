@@ -153,8 +153,8 @@ install: build
 		libboost_system.so.$(BOOST_VERSION) \
 		libboost_filesystem.so.$(BOOST_VERSION) \
 		libboost_thread.so.$(BOOST_VERSION) \
-		libboost_date_time.so.$(BOOST_VERSION); \
-		libboost_locale.so.$(BOOST_VERSION); \
+		libboost_date_time.so.$(BOOST_VERSION) \
+		libboost_locale.so.$(BOOST_VERSION) \
 		libboost_regex.so.$(BOOST_VERSION); \
 		do \
 		cp /usr/lib/$$i /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe; \
