@@ -20,10 +20,12 @@ namespace _Wolframe {
 			virtual ~DataLoader( ) {};
 			virtual void initiateDataLoad( QString form_name ) = 0;
 			virtual void initiateDataSave( QString form_name, QByteArray data ) = 0;
+			virtual void initiateDomainDataLoad( QString form_name, QString widget_name ) = 0;
 
-		Q_SIGNALS:
+		signals:
 			void dataLoaded( QString form_name, QByteArray data );
-			void dataSaved( QString form_name );
+			void dataSaved( QString form_name );		
+			void domainDataLoaded( QString form_name, QString widget_name, QByteArray data );
 	};
 } // namespace QtClient
 } // namespace _Wolframe

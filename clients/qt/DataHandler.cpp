@@ -26,6 +26,10 @@
 namespace _Wolframe {
 	namespace QtClient {
 
+DataHandler::DataHandler( DataLoader *_dataLoader ) : m_dataLoader( _dataLoader )
+{
+}
+
 void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *data )
 {
 	QXmlStreamWriter xml( data );
@@ -115,7 +119,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
 			QList<QListWidgetItem *> items = listWidget->selectedItems( );
 			foreach( QListWidgetItem *item, items ) {
-				xml.writeTextElement( "", name, "selected_item" );
+				xml.writeTextElement( "", name, item->data( Qt::DisplayRole ).toString( ) );
 			}
 		}
 		
@@ -126,7 +130,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	xml.writeEndDocument( );
 }
 
-void DataHandler::resetForm( QWidget *form )
+void DataHandler::resetFormData( QWidget *form )
 {
 	QList<QWidget *> widgets = form->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
@@ -152,7 +156,8 @@ void DataHandler::resetForm( QWidget *form )
 			QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
 		} else if( clazz == "QComboBox" ) {
 			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
-			comboBox->clear( );
+			// TODO: also removes values from a UI? Domain load!
+			//comboBox->clear( );
 		} else if( clazz == "QSpinBox" ) {
 			QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
 			// TODO
@@ -183,6 +188,54 @@ void DataHandler::resetForm( QWidget *form )
 	}
 }
 
+void DataHandler::loadFormDomains( QString form_name, QWidget *form )
+{
+	QList<QWidget *> widgets = form->findChildren<QWidget *>( );
+	foreach( QWidget *widget, widgets ) {
+		QString clazz = widget->metaObject( )->className( ); 
+		QString name = widget->objectName( );
+// ignore internal elements
+		if( name == "" || name.startsWith( "qt_" ) ||
+			clazz == "QLabel" ||
+			!widget->isEnabled( ) ) {
+			continue;
+		}
+		
+		if( clazz == "QComboBox" ) {
+			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
+			// TODO: either it is in the desinger form (hard coded), but then how
+			// is i18n done? better load the items to pick?
+		} else if( clazz == "QListWidget" ) {
+			m_dataLoader->initiateDomainDataLoad( form_name, name );
+		}
+		
+		qDebug( ) << "Domain load in " << clazz << name;
+	}
+}
+
+void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data )
+{
+	QWidget *widget = form->findChild<QWidget *>( widget_name );
+	QString clazz = widget->metaObject( )->className( ); 
+
+	QXmlStreamReader xml( data );
+	while( !xml.atEnd( ) ) {
+		xml.readNext( );
+		if( xml.isStartElement( ) && xml.name( ) == "value" ) {
+			QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
+			if( clazz == "QListWidget" ) {
+				QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+				listWidget->addItem( text );
+			}	
+		}
+	}
+	if( xml.hasError( ) ) {
+		qDebug( ) << xml.errorString( );
+	}
+	
+	qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
+}
+
 void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 {
 	QXmlStreamReader xml( data );
@@ -190,7 +243,8 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 	bool inForm = false;
 	QString clazz;
 	
-	resetForm( form );
+	resetFormData( form );
+	loadFormDomains( name, form );
 	
 	while( !xml.atEnd( ) ) {
 		xml.readNext( );
@@ -283,7 +337,10 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 							}								
 						} else if( clazz == "QListWidget" ) {
 							QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
-							// TODO: set selection
+							QList<QListWidgetItem *> items = listWidget->findItems( text, Qt::MatchExactly );
+							foreach( QListWidgetItem *item, items ) {
+								item->setSelected( true );
+							}
 						}
 					}
 				}

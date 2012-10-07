@@ -21,7 +21,7 @@ FormWidget::FormWidget( FormLoader *_formLoader, QUiLoader *_uiLoader, QWidget *
 	m_dataLoader = new FileDataLoader( "data" );
 
 // maps data between constructed widgets from .ui and the data loader
-	m_dataHandler = new DataHandler( );	
+	m_dataHandler = new DataHandler( m_dataLoader );	
 
 	m_layout = new QHBoxLayout( this );
 	
@@ -41,6 +41,10 @@ void FormWidget::initialize( )
 		this, SLOT( dataLoaded( QString, QByteArray ) ) );
 	QObject::connect( m_dataLoader, SIGNAL( dataSaved( QString ) ),
 		this, SLOT( dataSaved( QString ) ) );
+
+// link the data loader to the data handler
+	QObject::connect( m_dataLoader, SIGNAL( domainDataLoaded( QString, QString, QByteArray ) ),
+		this, SLOT( formDomainLoaded( QString, QString, QByteArray ) ) );
 }
 
 FormWidget::~FormWidget( )
@@ -150,6 +154,11 @@ void FormWidget::dataLoaded( QString name, QByteArray xml )
 		<< xml;
 	
 	m_dataHandler->readFormData( name, m_ui, xml );
+}
+
+void FormWidget::formDomainLoaded( QString form_name, QString widget_name, QByteArray data )
+{
+	m_dataHandler->loadFormDomain( form_name, widget_name, m_ui, data );
 }
 
 void FormWidget::on_buttons_accepted( )

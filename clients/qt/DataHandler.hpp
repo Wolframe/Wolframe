@@ -9,17 +9,28 @@
 #include <QString>
 #include <QByteArray>
 
+#include "DataLoader.hpp"
+
 namespace _Wolframe {
 	namespace QtClient {
 
-	class DataHandler
-	{	
+	class DataHandler : public QObject
+	{
+		Q_OBJECT
+		
 		public:
-			DataHandler( ) {};
+			DataHandler( DataLoader *_dataLoader );
 			virtual ~DataHandler( ) {};
 			void readFormData( QString name, QWidget *form, QByteArray &data );
 			void writeFormData( QString name, QWidget *form, QByteArray *data );
-			void resetForm( QWidget *form );
+			void resetFormData( QWidget *form );
+			void loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data );
+
+		private:
+			void loadFormDomains( QString name, QWidget *form );
+		
+		private:
+			DataLoader *m_dataLoader;
 	};
 } // namespace QtClient
 } // namespace _Wolframe
