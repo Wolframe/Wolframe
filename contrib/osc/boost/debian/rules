@@ -13,7 +13,8 @@ PKGVERSION = 1.48
 SOVERSION = 1.48.0
 SHLIBS_VERSION = (>= 1.48.0-1)
 
-pyversions = $(shell pyversions -rv) $(shell py3versions -rv)
+pyversions =
+#pyversions = $(shell pyversions -rv) $(shell py3versions -rv)
 
 # Boost libraries for which we want separate packages
 boost_libs := date-time filesystem program-options system thread locale regex
@@ -157,7 +158,9 @@ bbv2dir = $(CURDIR)/tools/build/v2
 JAM = $(bjam) $(JOBS) -d2 $(JAM_OPT) --layout=system --ignore-site-config --user-config=$(CURDIR)/user-config.jam debug-symbols=on
 
 $(bjam):
-	./bootstrap.sh --with-icu --prefix=$(CURDIR)/debian/tmp/usr \
+	./bootstrap.sh --with-icu \
+		--prefix=$(CURDIR)/debian/tmp/usr \
+		--with-libraries=thread,filesystem,system,program_options,date_time,locale,regex \
 	  || cat bootstrap.log
 
 debian/bjam.1: $(bjam)
@@ -174,7 +177,7 @@ build: build-stamp
 build-stamp: $(bjam) user-config.jam
 	dh_testdir
 
-	$(JAM) --without-python                        
+	$(JAM) --without-python --without-mpi
 	for pyver in $(pyversions); do \
 	 	pyid=$$(echo $$pyver | tr -d .); \
 		echo "Building Boost.Python for python version $$pyver"; \
