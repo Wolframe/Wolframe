@@ -28,6 +28,10 @@ CPP_OBJS =
 TEST_CPP_BINS = \
 	postgresUnit$(EXE)
 
+
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwolframe"
+DB_EXISTS = $(shell PGPASSWORD="wolfpwd" psql -h localhost -U wolfusr -d wolframe -c "" >/dev/null 2>&1; echo $$?)
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
@@ -36,9 +40,12 @@ local_clean:
 
 local_distclean:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/src/libwolframe"
-
 local_test: $(TEST_CPP_BINS)
-	 @LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./postgresUnit$(EXE)
+ifeq ($(DB_EXISTS),0)
+	echo $(DB_EXISTS)
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./postgresUnit$(EXE)
+else
+	@echo "No properly configured database for tests"
+endif
 
 local_longtest:

@@ -177,7 +177,7 @@ PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
 			switch( stat )	{
 				case CONNECTION_OK:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connected OK: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connected OK.";
 					break;
 				case CONNECTION_BAD:	{
 					std::string err = PQerrorMessage( conn );
