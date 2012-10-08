@@ -21,9 +21,14 @@
 #include <QPlainTextEdit>
 #include <QRadioButton>
 #include <QGroupBox>
+#include <QListWidget>
 
 namespace _Wolframe {
 	namespace QtClient {
+
+DataHandler::DataHandler( DataLoader *_dataLoader ) : m_dataLoader( _dataLoader )
+{
+}
 
 void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *data )
 {
@@ -110,13 +115,125 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			} else {
 				xml.writeTextElement( "", name, radioButton->isChecked( ) ? "true" : "false" );
 			}
+		} else if( clazz == "QListWidget" ) {
+			QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+			QList<QListWidgetItem *> items = listWidget->selectedItems( );
+			foreach( QListWidgetItem *item, items ) {
+				xml.writeTextElement( "", name, item->data( Qt::DisplayRole ).toString( ) );
+			}
 		}
 		
-		qDebug( ) << clazz << name;
+		qDebug( ) << "Wrote " << clazz << name;
 	}
 	
 	xml.writeEndElement( );
 	xml.writeEndDocument( );
+}
+
+void DataHandler::resetFormData( QWidget *form )
+{
+	QList<QWidget *> widgets = form->findChildren<QWidget *>( );
+	foreach( QWidget *widget, widgets ) {
+		QString clazz = widget->metaObject( )->className( ); 
+		QString name = widget->objectName( );
+// ignore internal elements
+		if( name == "" || name.startsWith( "qt_" ) ||
+			clazz == "QLabel" ||
+			!widget->isEnabled( ) ) {
+			continue;
+		}
+		
+		if( clazz == "QLineEdit" ) {
+			QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
+			lineEdit->clear( );
+		} else if( clazz == "QDateEdit" ) {
+			QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
+			// TODO
+		} else if( clazz == "QTimeEdit" ) {
+			QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>( widget );
+			// TODO
+		} else if( clazz == "QDateTimeEdit" ) {
+			QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
+		} else if( clazz == "QComboBox" ) {
+			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
+			// TODO: also removes values from a UI? Domain load!
+			//comboBox->clear( );
+		} else if( clazz == "QSpinBox" ) {
+			QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
+			// TODO
+		} else if( clazz == "QDoubleSpinBox" ) {
+			QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( widget );
+			// TODO
+		} else if( clazz == "QSlider" ) {
+			QSlider *slider = qobject_cast<QSlider *>( widget );
+			// TODO
+		} else if( clazz == "QPlainTextEdit" ) {
+			QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget );
+			plainTextEdit->clear( );
+		} else if( clazz == "QTextEdit" ) {
+			QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
+			textEdit->clear( );
+		} else if( clazz == "QCheckBox" ) {
+			QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
+			checkBox->setChecked( false );
+		} else if( clazz == "QRadioButton" ) {
+			QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
+			radioButton->setChecked( false );
+		} else if( clazz == "QListWidget" ) {
+			QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+			listWidget->clear( );
+		}
+		
+		qDebug( ) << "Reset " << clazz << name;
+	}
+}
+
+void DataHandler::loadFormDomains( QString form_name, QWidget *form )
+{
+	QList<QWidget *> widgets = form->findChildren<QWidget *>( );
+	foreach( QWidget *widget, widgets ) {
+		QString clazz = widget->metaObject( )->className( ); 
+		QString name = widget->objectName( );
+// ignore internal elements
+		if( name == "" || name.startsWith( "qt_" ) ||
+			clazz == "QLabel" ||
+			!widget->isEnabled( ) ) {
+			continue;
+		}
+		
+		if( clazz == "QComboBox" ) {
+			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
+			// TODO: either it is in the desinger form (hard coded), but then how
+			// is i18n done? better load the items to pick?
+		} else if( clazz == "QListWidget" ) {
+			m_dataLoader->initiateDomainDataLoad( form_name, name );
+		}
+		
+		qDebug( ) << "Domain load in " << clazz << name;
+	}
+}
+
+void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data )
+{
+	QWidget *widget = form->findChild<QWidget *>( widget_name );
+	QString clazz = widget->metaObject( )->className( ); 
+
+	QXmlStreamReader xml( data );
+	while( !xml.atEnd( ) ) {
+		xml.readNext( );
+		if( xml.isStartElement( ) && xml.name( ) == "value" ) {
+			QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
+			if( clazz == "QListWidget" ) {
+				QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+				listWidget->addItem( text );
+			}	
+		}
+	}
+	if( xml.hasError( ) ) {
+		qDebug( ) << xml.errorString( );
+	}
+	
+	qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
 }
 
 void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
@@ -125,6 +242,9 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 	QWidget *widget = 0;
 	bool inForm = false;
 	QString clazz;
+	
+	resetFormData( form );
+	loadFormDomains( name, form );
 	
 	while( !xml.atEnd( ) ) {
 		xml.readNext( );
@@ -166,11 +286,26 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 								}
 							}
 						} else if( clazz == "QCheckBox" ) {
-							QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
-							if( text == "true"  ) {
-								checkBox->setChecked( true );
-							} else {
-								checkBox->setChecked( false );
+							QObject *parent = widget->parent( );
+							QString clazzParent = parent->metaObject( )->className( ); 
+							if( clazzParent != "QGroupBox" ) {
+								QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
+								if( text == "true"  ) {
+									checkBox->setChecked( true );
+								} else {
+									checkBox->setChecked( false );
+								}
+							}
+						} else if( clazz == "QRadioButton" ) {
+							QObject *parent = widget->parent( );
+							QString clazzParent = parent->metaObject( )->className( ); 
+							if( clazzParent != "QGroupBox" ) {
+								QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
+								if( text == "true"  ) {
+									radioButton->setChecked( true );
+								} else {
+									radioButton->setChecked( false );
+								}
 							}
 						} else if( clazz == "QSlider" ) {
 							QSlider *slider = qobject_cast<QSlider *>( widget );
@@ -189,10 +324,23 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 								if( subClazz == "QRadioButton" ) {
 									QRadioButton *radioButton = qobject_cast<QRadioButton *>( child );
 									QString subText = radioButton->text( );
-									qDebug( ) << text << subText << name << subName;
+									qDebug( ) << "radio" << name << subText << subText << name << subName;
 									radioButton->setChecked( text.compare( subName ) == 0 );
+								} else if( subClazz == "QCheckBox" ) {
+									QCheckBox *checkBox = qobject_cast<QCheckBox *>( child );
+									QString subText = checkBox->text( );
+									qDebug( ) << "checkbox" << name << subText << subText << name << subName;
+									if( text.compare( subName ) == 0 ) {
+										checkBox->setChecked( true );
+									}
 								}
 							}								
+						} else if( clazz == "QListWidget" ) {
+							QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+							QList<QListWidgetItem *> items = listWidget->findItems( text, Qt::MatchExactly );
+							foreach( QListWidgetItem *item, items ) {
+								item->setSelected( true );
+							}
 						}
 					}
 				}

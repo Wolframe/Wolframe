@@ -48,6 +48,7 @@ namespace _Wolframe {
 		void formLocalizationLoaded( QString name, QByteArray localization );
 		void dataLoaded( QString name, QByteArray xml );
 		void dataSaved( QString name );
+		void formDomainLoaded( QString form_name, QString widget_name, QByteArray data );
 
 		void on_buttons_accepted( );
 		void on_buttons_rejected( );

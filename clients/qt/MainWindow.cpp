@@ -42,6 +42,25 @@ MainWindow::~MainWindow( )
 	delete m_uiLoader;
 }
 
+static DebugTerminal *debugTerminal = 0;
+
+static void myMessageOutput( QtMsgType type, const char *msg )
+{
+	switch( type ) {
+		case QtDebugMsg:
+		case QtWarningMsg:
+		case QtCriticalMsg:
+		case QtFatalMsg:
+			debugTerminal->sendLine( msg );
+			fprintf( stderr, msg );
+			fprintf( stderr, "\n" );
+			break;
+			
+		default:
+			break;
+	}
+}
+
 void MainWindow::initialize( )
 {
 // link the form loader for form loader notifications
@@ -57,6 +76,9 @@ void MainWindow::initialize( )
 
 // create debuging terminal
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
+	debugTerminal = m_debugTerminal;
+	qInstallMsgHandler( &myMessageOutput );
+	qDebug( ) << "Debug window initialized";
 
 // set default language to the system language
 	m_currentLanguage = QLocale::system( ).name( );

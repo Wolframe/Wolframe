@@ -33,5 +33,14 @@ void FileDataLoader::initiateDataSave( QString name, QByteArray data )
 	emit dataSaved( name );
 }
 
+void FileDataLoader::initiateDomainDataLoad( QString form_name, QString widget_name )
+{
+	QFile file( m_dir + "/domain_" + form_name + "_" + widget_name + ".xml" );
+	file.open( QFile::ReadOnly );
+	QByteArray data = file.readAll( );
+	file.close( );
+	emit domainDataLoaded( form_name, widget_name, data );
+}
+
 } // namespace QtClient
 } // namespace _Wolframe

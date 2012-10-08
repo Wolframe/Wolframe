@@ -13,14 +13,11 @@ PKGVERSION = 1.48
 SOVERSION = 1.48.0
 SHLIBS_VERSION = (>= 1.48.0-1)
 
-pyversions = $(shell pyversions -rv) $(shell py3versions -rv)
+pyversions =
+#pyversions = $(shell pyversions -rv) $(shell py3versions -rv)
 
 # Boost libraries for which we want separate packages
-boost_libs := chrono date-time filesystem graph-parallel graph iostreams locale math \
-	mpi mpi-python						       \
-	program-options python regex random serialization signals      \
-	system test						       \
-	thread timer wave
+boost_libs := date-time filesystem program-options system thread locale regex
 
 # these are special cases, where /usr/lib name differs from Boost library name
 boost_lib_math := math_c99 math_c99f math_tr1 math_tr1f
@@ -161,7 +158,9 @@ bbv2dir = $(CURDIR)/tools/build/v2
 JAM = $(bjam) $(JOBS) -d2 $(JAM_OPT) --layout=system --ignore-site-config --user-config=$(CURDIR)/user-config.jam debug-symbols=on
 
 $(bjam):
-	./bootstrap.sh --with-icu --prefix=$(CURDIR)/debian/tmp/usr \
+	./bootstrap.sh --with-icu \
+		--prefix=$(CURDIR)/debian/tmp/usr \
+		--with-libraries=thread,filesystem,system,program_options,date_time,locale,regex \
 	  || cat bootstrap.log
 
 debian/bjam.1: $(bjam)
@@ -178,7 +177,7 @@ build: build-stamp
 build-stamp: $(bjam) user-config.jam
 	dh_testdir
 
-	$(JAM) --without-python                        
+	$(JAM) --without-python --without-mpi
 	for pyver in $(pyversions); do \
 	 	pyid=$$(echo $$pyver | tr -d .); \
 		echo "Building Boost.Python for python version $$pyver"; \
@@ -297,23 +296,23 @@ install: build clean-debhelper $(filtered_files) debian/bjam.1
 	find $(exampledir) -type f | xargs chmod 644
 
 	# package libboost-mpi-python$(SOVERSION)
-	dh_install -plibboost-mpi-python$(SOVERSION)
-	for pyver in $(pyversions); do \
-		pyid=`echo $$pyver | tr -d .`; \
-		dh_install -plibboost-mpi-python$(SOVERSION) libs/mpi/build/__init__.py usr/lib/python$$pyver/site-packages/boost; \
-		dh_installdirs -plibboost-mpi-python$(SOVERSION) usr/lib/python$$pyver/site-packages/boost; \
-		cp stage/lib/mpi-py$$pyid.so debian/libboost-mpi-python$(SOVERSION)/usr/lib/python$$pyver/site-packages/boost/mpi.so; \
-	done
+	#dh_install -plibboost-mpi-python$(SOVERSION)
+	#for pyver in $(pyversions); do \
+	#	pyid=`echo $$pyver | tr -d .`; \
+	#	dh_install -plibboost-mpi-python$(SOVERSION) libs/mpi/build/__init__.py usr/lib/python$$pyver/site-packages/boost; \
+	#	dh_installdirs -plibboost-mpi-python$(SOVERSION) usr/lib/python$$pyver/site-packages/boost; \
+	#	cp stage/lib/mpi-py$$pyid.so debian/libboost-mpi-python$(SOVERSION)/usr/lib/python$$pyver/site-packages/boost/mpi.so; \
+	#done
 	# package libboost-mpi-python$(PKGVERSION)-dev
-	dh_install -plibboost-python$(PKGVERSION)-dev --autodest \
-	   debian/tmp/usr/share/python/runtime.d/libboost-mpi-python$(PKGVERSION)-dev.rtupdate
+	#dh_install -plibboost-python$(PKGVERSION)-dev --autodest \
+	#   debian/tmp/usr/share/python/runtime.d/libboost-mpi-python$(PKGVERSION)-dev.rtupdate
 	# package libboost-python$(PKGVERSION)-dev
 	dh_install -plibboost-python$(PKGVERSION)-dev --autodest \
 	   debian/tmp/usr/share/python/runtime.d/libboost-python$(PKGVERSION)-dev.rtupdate
 
-	cd libs/python/pyste/install && python setup.py install --no-compile --prefix=$(pyste_prefix) --install-lib=$(pyste_prefix)/share/pyshared
-	mv $(pyste_prefix)/bin/pyste.py $(pyste_prefix)/bin/pyste
-	dh_installman -plibboost-python$(PKGVERSION)-dev debian/pyste.1
+	#cd libs/python/pyste/install && python setup.py install --no-compile --prefix=$(pyste_prefix) --install-lib=$(pyste_prefix)/share/pyshared
+	#mv $(pyste_prefix)/bin/pyste.py $(pyste_prefix)/bin/pyste
+	#dh_installman -plibboost-python$(PKGVERSION)-dev debian/pyste.1
 
 
 # This single target is used to build all the packages, all at once, or
@@ -332,8 +331,8 @@ binary-common:
 	dh_strip --dbg-package=libboost$(PKGVERSION)-dbg -X"-d-"
 	dh_link
 	dh_compress -Xlibboost$(PKGVERSION)-doc/HTML
-	dh_python2
-	dh_python3
+#	dh_python2
+#	dh_python3
 	dh_fixperms
 
 	@if [ "$(DH_OPTIONS)" = "-a" ]; then \

@@ -4,8 +4,8 @@ Section: libs
 Priority: optional
 Maintainer: Debian Boost Team <pkg-boost-devel@lists.alioth.debian.org>
 Uploaders: Steve M. Robbins <smr@debian.org>, Domenico Andreoli <cavok@debian.org>
-Build-Depends: debhelper (>= 8), 
- zlib1g-dev, libbz2-dev, libicu-dev, mpi-default-dev,
+Build-Depends: debhelper (>= 4.1.16), 
+ zlib1g-dev, libbz2-dev, libicu-dev,
  bison, flex, docbook-to-man, help2man, xsltproc, doxygen, 
  python, python-all-dev, 
  python3, python3-all-dev (>= 3.1)
@@ -39,7 +39,6 @@ Suggests: libboost1.48-doc,
  libboost-iostreams1.48-dev,
  libboost-locale1.48-dev,
  libboost-math1.48-dev,
- libboost-mpi1.48-dev,
  libboost-program-options1.48-dev,
  libboost-python1.48-dev,
  libboost-random1.48-dev,
@@ -72,7 +71,7 @@ Description: Boost C++ Libraries development files
  bcp, inspect, boostbook and quickbook.
  .
  For the following subprojects separate packages exist: chrono, date-time,
- filesystem, graph, iostreams, locale, math, mpi, program_options, python,
+ filesystem, graph, iostreams, locale, math, program_options, python,
  regex, serialization, signals, system, test, thread, timer, and wave.
 
 Package: libboost1.48-all-dev
@@ -88,8 +87,6 @@ Depends: ${misc:Depends},
  libboost-iostreams1.48-dev, 
  libboost-locale1.48-dev,
  libboost-math1.48-dev, 
- libboost-mpi1.48-dev, 
- libboost-mpi-python1.48-dev, 
  libboost-program-options1.48-dev, 
  libboost-python1.48-dev, 
  libboost-random1.48-dev, 

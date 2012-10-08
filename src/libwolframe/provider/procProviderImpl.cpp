@@ -563,4 +563,35 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofi
 	return dynamic_cast<cmdbind::IOFilterCommandHandler*>( hnd);
 }
 
+db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase() const
+{
+	if ( ! m_db )
+		LOG_ALERT << "No database defined for the processor provider";
+	return m_db;
+}
+
+db::Transaction* ProcessorProvider::ProcessorProvider_Impl::transaction( const std::string& name ) const
+{
+	if ( m_db )
+		return m_db->transaction( name );
+	else	{
+		LOG_ALERT << "No database defined for the processor provider";
+		return NULL;
+	}
+}
+
+const langbind::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transactionFunction( const std::string& name ) const
+{
+	{
+		if ( m_db )
+		{
+			return m_db->transactionFunction( name );
+		}
+		else
+		{
+			return 0;
+		}
+	}
+}
+
 }} // namespace _Wolframe::proc

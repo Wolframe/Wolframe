@@ -68,6 +68,13 @@ void DebugTerminal::bringToFront( )
 	m_input->setFocus( );
 }
 
+void DebugTerminal::sendLine( QString line )
+{
+	m_output->setTextColor( QColor( "grey" ) );
+	m_output->append( line );
+	m_output->setTextColor( QColor( "black" ) );
+}
+
 void DebugTerminal::lineEntered( QString line )
 {
 	m_output->append( line );

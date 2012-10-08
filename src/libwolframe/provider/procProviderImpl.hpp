@@ -72,15 +72,9 @@ public:
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
 
-	db::Database* transactionDatabase() const	{ return m_db; }
-	db::Transaction* transaction( const std::string& name ) const
-							{ if ( m_db ) return m_db->transaction( name );
-							  else return NULL;
-							}
-	const langbind::TransactionFunction* transactionFunction( const std::string& name ) const
-							{ if ( m_db ) return m_db->transactionFunction( name );
-							  else return NULL;
-							}
+	db::Database* transactionDatabase() const;
+	db::Transaction* transaction( const std::string& name ) const;
+	const langbind::TransactionFunction* transactionFunction( const std::string& name ) const;
 
 private:
 	class DDLTypeMap;
