@@ -32,7 +32,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/wtest/wolftest.a \
 	$(LIBS_DL)
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR)"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR)"
 
 
 # openssl

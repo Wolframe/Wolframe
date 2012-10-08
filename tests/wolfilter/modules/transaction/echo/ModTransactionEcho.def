@@ -1,4 +1,0 @@
-LIBRARY mod_transaction_echo
-
-EXPORTS
-entryPoint	@1
