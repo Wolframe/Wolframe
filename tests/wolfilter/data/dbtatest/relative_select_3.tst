@@ -1,5 +1,4 @@
 **
-**requires: DISABLED
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <garten>1</garten><wald>3</wald><wiese>2</wiese>
@@ -7,9 +6,12 @@
 --module ../../src/modules/filter/textwolf/mod_filter_textwolf
 --module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 --input-filter 'xml:textwolf'
---database 'id=testdb,outfile=DBOUT'
---transaction 'testcall dbpstm run(: wald, wiese, garten)'
+--database 'id=testdb,outfile=DBOUT,program=DBIN'
 testcall
+**file:DBIN
+TRANSACTION testcall BEGIN
+	DO run( wald, wiese, garten);
+END
 **outputfile:DBOUT
 **output
 run #3#2#1

@@ -1,5 +1,4 @@
 **
-**requires: DISABLED
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <doc><item></item><item><aa>1</aa><bb>2</bb></item><item><aa>11</aa><bb>22</bb></item><item><aa>111</aa><bb>222</bb></item><item><bb></bb></item></doc>
@@ -7,9 +6,10 @@
 --module ../../src/modules/filter/textwolf/mod_filter_textwolf
 --module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 --input-filter 'xml:textwolf'
---database 'id=testdb,outfile=DBOUT'
---transaction 'testcall dbpstm run(/doc/item/aa: ., ../bb)'
+--database 'id=testdb,outfile=DBOUT,program=DBIN'
 testcall
+**file:DBIN
+TRANSACTION testcall BEGIN WITH/doc/item/aa DO run(., ../bb);END
 **outputfile:DBOUT
 **output
 run #1#2

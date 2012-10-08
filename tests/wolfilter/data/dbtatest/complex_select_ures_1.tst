@@ -1,5 +1,4 @@
 **
-**requires: DISABLED
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <root><item><aa>1</aa></item><item></item><item><bb></bb></item></root>
@@ -7,9 +6,14 @@
 --module ../../src/modules/filter/textwolf/mod_filter_textwolf
 --module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 --input-filter 'xml:textwolf'
---database 'id=testdb,outfile=DBOUT,file=DBRES'
---transaction 'testcall dbpstm run(//aa: .); result/person=call(//aa: . , $1 ) ; result/age =get ( //aa : .,$1 ,$2 ,$3)'
+--database 'id=testdb,outfile=DBOUT,file=DBRES,program=DBIN'
 testcall
+**file:DBIN
+TRANSACTION testcall BEGIN
+	WITH //aa DO run(.);
+	WITH //aa INTO result/person DO call(. , $1 ) ;
+	WITH //aa INTO result/age DO get ( .,$1 ,$2 ,$3);
+END
 **file: DBRES
 #res#1#2
 #vorname name beruf#karin fischer beamte

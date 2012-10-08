@@ -1,5 +1,4 @@
 **
-**requires: DISABLED
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <aa>1</aa><cc>3</cc><bb>2</bb>
@@ -7,9 +6,13 @@
 --module ../../src/modules/filter/textwolf/mod_filter_textwolf
 --module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 --input-filter 'xml:textwolf'
---database 'id=testdb,outfile=DBOUT,file=DBRES'
---transaction 'testcall dbpstm doc/address=run(: /aa, /bb, /cc)'
+--database 'id=testdb,outfile=DBOUT,file=DBRES,program=DBIN'
 testcall
+**file:DBIN
+TRANSACTION testcall
+BEGIN
+	INTO doc/address DO run( /aa, /bb, /cc);
+END
 **file: DBRES
 #id name street#1 hugo "bahnhofstrasse 15"#2 miriam "zum gemsweg 3"#3 sara "tannensteig 12"
 **outputfile:DBOUT

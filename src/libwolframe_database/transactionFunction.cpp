@@ -675,7 +675,7 @@ static bool checkIdentifier( const std::string& id)
 {
 	std::string::const_iterator ii = id.begin(), ie = id.end();
 	while (ii != ie && isAlphaNumeric( *ii)) ++ii;
-	return (ii != ie);
+	return (ii == ie);
 }
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* func_)

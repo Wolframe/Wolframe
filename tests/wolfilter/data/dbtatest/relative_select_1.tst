@@ -1,5 +1,4 @@
 **
-**requires: DISABLED
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <guru>ein parameter text</guru>
@@ -7,9 +6,12 @@
 --module ../../src/modules/filter/textwolf/mod_filter_textwolf
 --module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 --input-filter 'xml:textwolf'
---database 'id=testdb,outfile=DBOUT'
---transaction 'testcall dbpstm run(: guru)'
+--database 'id=testdb,outfile=DBOUT,program=DBIN'
 testcall
+**file:DBIN
+TRANSACTION testcall BEGIN
+	DO run( guru);
+END
 **outputfile:DBOUT
 **output
 run #ein parameter text

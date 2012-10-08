@@ -47,7 +47,8 @@ using namespace _Wolframe::utils;
 CharTable::CharTable( const char* op, bool isInverse)
 {
 	std::size_t ii;
-	for (ii=0; ii<sizeof(m_ar); ++ii) m_ar[ii]=isInverse;
+	for (ii=0; ii<=32; ++ii) m_ar[ii]=false;
+	for (ii=33; ii<sizeof(m_ar); ++ii) m_ar[ii]=isInverse;
 	for (ii=0; op[ii]; ++ii) m_ar[(unsigned char)(op[ii])]=!isInverse;
 }
 
@@ -99,16 +100,32 @@ struct IdentifierTable :public CharTable
 	IdentifierTable() :CharTable( "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"){}
 };
 
+const CharTable& _Wolframe::utils::identifierCharTable()
+{
+	static const IdentifierTable rt;
+	return rt;
+}
+
+const CharTable& _Wolframe::utils::emptyCharTable()
+{
+	static CharTable rt;
+	return rt;
+}
+
+const CharTable& _Wolframe::utils::anyCharTable()
+{
+	static CharTable rt( "", true);
+	return rt;
+}
+
 char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& operatorTable)
 {
-	static CharTable identifierTable( "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-	return parseNextToken( tok, itr, end, operatorTable, identifierTable);
+	return parseNextToken( tok, itr, end, operatorTable, identifierCharTable());
 }
 
 char _Wolframe::utils::parseNextToken( std::string& tok, std::string::const_iterator& itr, std::string::const_iterator end)
 {
-	static CharTable noOperator;
-	return parseNextToken( tok, itr, end, noOperator);
+	return parseNextToken( tok, itr, end, emptyCharTable());
 }
 
 char _Wolframe::utils::gotoNextToken( std::string::const_iterator& itr, std::string::const_iterator end)

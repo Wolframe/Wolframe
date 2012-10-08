@@ -161,165 +161,179 @@ void Program::load( const std::string& source)
 	std::vector<std::vector<std::string::const_iterator> > tdsrcar;
 	std::vector<std::string::const_iterator> tstartar;
 
-	while ((ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
+	try
 	{
-		if (ch == m_commentopr[0])
+		while ((ch = utils::gotoNextToken( si, se)) != 0)
 		{
-			std::string::const_iterator ci = m_commentopr.begin()+1, ce = m_commentopr.end();
-			while (ci != ce && si != se && *ci == *si)
+			std::string::const_iterator tokstart = si;
+			ch = utils::parseNextToken( tok, si, se, g_optab);
+			if (ch == m_commentopr[0])
 			{
-				ci++;
-				si++;
+				std::string::const_iterator ci = m_commentopr.begin()+1, ce = m_commentopr.end();
+				while (ci != ce && si != se && *ci == *si)
+				{
+					ci++;
+					si++;
+				}
+				if (ci == ce)
+				{
+					// skip to end of line
+					while (si != se && *si != '\n') ++si;
+				}
 			}
-			if (ci == ce)
+			else if ((ch|32) == 't'
+				&& boost::algorithm::iequals( tok, "TRANSACTION")
+				&& isLineStart( tokstart, source))
 			{
-				// skip to end of line
-				while (si != se && *si != '\n') ++si;
+				std::string::const_iterator dbe = lineStart( tokstart, source);
+				tstartar.push_back( dbe);
+				dbsource.append( std::string( dbi, dbe));
+				dbi = dbe;
+
+				ch = utils::parseNextToken( tok, si, se, g_optab);
+				if (g_optab[ ch])
+				{
+					throw Error( LineInfo( source.begin(), si),
+							"identifier (transaction name) expected", ch);
+				}
+				tdnamear.push_back( tok);
+				tdsrcar.push_back( std::vector<std::string::const_iterator>());
+				tdar.push_back( std::vector<TransactionDescription>());
+
+				TransactionDescription desc;
+				unsigned int mask = 0;
+
+				ch = utils::parseNextToken( tok, si, se, g_optab);
+				if (!boost::algorithm::iequals( tok, "BEGIN"))
+				{
+					throw Error( LineInfo( source.begin(), si),
+							"BEGIN (transaction) expected", ch);
+				}
+				while ((ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
+				{
+					if (tdsrcar.back().size() <= tdar.back().size())
+					{
+						tdsrcar.back().push_back( si);
+					}
+					if (ch == ';')
+					{
+						if (mask)
+						{
+							tdar.back().push_back( desc);
+							desc.clear();
+							mask = 0;
+						}
+					}
+					else if (g_optab[ch])
+					{
+						throw Error( LineInfo( source.begin(), si),
+								"keyword (END,WITH,INTO,DO) expected instead of operator", ch);
+					}
+					else if (ch == '\'' || ch == '\"')
+					{
+						throw Error( LineInfo( source.begin(), si),
+								"keyword (END,WITH,INTO,DO) expected instead string");
+					}
+					else if (boost::algorithm::iequals( tok, "END"))
+					{
+						break;
+					}
+					else if (boost::algorithm::iequals( tok, "WITH"))
+					{
+						if (0 != (mask & (1 << (unsigned)TransactionDescription::Selector)))
+						{
+							throw Error( LineInfo( source.begin(), si),
+									"selector (WITH ..) specified twice in a transaction description");
+						}
+						mask |= (1 << (unsigned)TransactionDescription::Selector);
+
+						ch = utils::parseNextToken( desc.selector, si, se, utils::emptyCharTable(), utils::anyCharTable());
+						if (!ch) throw Error( LineInfo( source.begin(), si),
+									"unexpected end of description. sector path expected after WITH");
+					}
+					else if (boost::algorithm::iequals( tok, "INTO"))
+					{
+						if (0 != (mask & (1 << (unsigned)TransactionDescription::Output)))
+						{
+							throw Error( LineInfo( source.begin(), si),
+									"function result (INTO ..) specified twice in a transaction description");
+						}
+						mask |= (1 << (unsigned)TransactionDescription::Output);
+
+						ch = utils::parseNextToken( desc.output, si, se, utils::emptyCharTable(), utils::anyCharTable());
+						if (!ch) throw Error( LineInfo( source.begin(), si),
+									"unexpected end of description. result tag path expected after INTO");
+					}
+					else if (boost::algorithm::iequals( tok, "DO"))
+					{
+						if (0 != (mask & (1 << (unsigned)TransactionDescription::Call)))
+						{
+							throw Error( LineInfo( source.begin(), si),
+									"function call (DO ..) specified twice in a transaction description");
+						}
+						mask |= (1 << (unsigned)TransactionDescription::Call);
+
+						int st = 0;
+						std::string::const_iterator fcallstart = si;
+						while (st < 3 && (ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
+						{
+							if (!ch)
+							{
+								throw Error( LineInfo( source.begin(), si),
+										"unexpected end of description. unterminated function call (DO ..)");
+							}
+							switch (st)
+							{
+								case 0:
+									if (g_optab[ch] || ch == '\'' || ch == '\"')
+									{
+										throw Error( LineInfo( source.begin(), si),
+												"function call identifier expected after DO instead of operator or string", ch);
+									}
+									st = 1;
+									continue;
+								case 1:
+									if (ch != '(')
+									{
+										throw Error( LineInfo( source.begin(), si),
+												"'(' expected in function call after function name (DO ..)", ch);
+									}
+									st = 2;
+									continue;
+								case 2:
+									if (ch == ')')
+									{
+										st = 3;
+										break;
+									}
+									else if (ch == '(')
+									{	throw Error( LineInfo( source.begin(), si),
+													"unexpected '('. unterminated function call (DO ..)");
+									}
+									continue;
+							}
+						}
+						desc.call = std::string( fcallstart, si);
+					}
+					else
+					{
+						throw Error( LineInfo( source.begin(), si),
+								"keyword (END,WITH,INTO,DO) expected", tok);
+					}
+				}
+				// append empty lines to keep line info for the dbsource:
+				dbsource.append( std::string( lineCount( dbi, si), '\n'));
+				dbi = si;
 			}
 		}
-		else if ((ch|32) == 't'
-			&& boost::algorithm::iequals( tok, "TRANSACTION")
-			&& isLineStart( si, source))
-		{
-			std::string::const_iterator dbe = lineStart( si, source);
-			tstartar.push_back( dbe);
-			dbsource.append( std::string( dbi, dbe));
-			dbi = dbe;
-
-			ch = utils::parseNextToken( tok, si, se, g_optab);
-			if (g_optab[ ch])
-			{
-				throw Error( LineInfo( source.begin(), si),
-						"identifier (transaction name) expected", ch);
-			}
-			tdnamear.push_back( tok);
-			tdsrcar.push_back( std::vector<std::string::const_iterator>());
-			tdar.push_back( std::vector<TransactionDescription>());
-
-			TransactionDescription desc;
-			unsigned int mask = 0;
-
-			ch = utils::parseNextToken( tok, si, se, g_optab);
-			if (!boost::algorithm::iequals( tok, "BEGIN"))
-			{
-				throw Error( LineInfo( source.begin(), si),
-						"BEGIN (transaction) expected", ch);
-			}
-			while ((ch = parseNextToken( tok, si, se, g_optab)) != 0)
-			{
-				if (tdsrcar.back().size() < tdar.back().size())
-				{
-					tdsrcar.back().push_back( si);
-				}
-				if (ch == ';')
-				{
-					if (mask)
-					{
-						tdar.back().push_back( desc);
-						desc.clear();
-						mask = 0;
-					}
-				}
-				else if (g_optab[ch])
-				{
-					throw Error( LineInfo( source.begin(), si),
-							"keyword (END,WITH,INTO,DO) expected instead of operator", ch);
-				}
-				else if (ch == '\'' || ch == '\"')
-				{
-					throw Error( LineInfo( source.begin(), si),
-							"keyword (END,WITH,INTO,DO) expected instead string");
-				}
-				else if (boost::algorithm::iequals( tok, "END"))
-				{
-					break;
-				}
-				else if (boost::algorithm::iequals( tok, "WITH"))
-				{
-					if (0 != (mask & (1 << (unsigned)TransactionDescription::Selector)))
-					{
-						throw Error( LineInfo( source.begin(), si),
-								"selector (WITH ..) specified twice in a transaction description");
-					}
-					mask |= (1 << (unsigned)TransactionDescription::Selector);
-
-					ch = utils::parseNextToken( desc.selector, si, se);
-					if (!ch) throw Error( LineInfo( source.begin(), si),
-								"unexpected end of description. sector path expected after WITH");
-				}
-				else if (boost::algorithm::iequals( tok, "INTO"))
-				{
-					if (0 != (mask & (1 << (unsigned)TransactionDescription::Output)))
-					{
-						throw Error( LineInfo( source.begin(), si),
-								"function result (INTO ..) specified twice in a transaction description");
-					}
-					mask |= (1 << (unsigned)TransactionDescription::Output);
-
-					ch = utils::parseNextToken( desc.output, si, se);
-					if (!ch) throw Error( LineInfo( source.begin(), si),
-								"unexpected end of description. result tag path expected after INTO");
-				}
-				else if (boost::algorithm::iequals( tok, "DO"))
-				{
-					if (0 != (mask & (1 << (unsigned)TransactionDescription::Call)))
-					{
-						throw Error( LineInfo( source.begin(), si),
-								"function call (DO ..) specified twice in a transaction description");
-					}
-					mask |= (1 << (unsigned)TransactionDescription::Call);
-
-					int st = 0;
-					std::string::const_iterator fcallstart = si;
-					while ((ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
-					{
-						if (st == 0)
-						{
-							if (!st)
-							{
-								throw Error( LineInfo( source.begin(), si),
-										"unexpected end of description. unterminated function call (DO ..)");
-							}
-							if (g_optab[ch] || ch == '\'' || ch == '\"')
-							{
-								throw Error( LineInfo( source.begin(), si),
-										"function call identifier expected after DO instead of operator or string", ch);
-							}
-							st = 1;
-						}
-						else if (st == 1)
-						{
-							if (!st) throw Error( LineInfo( source.begin(), si),
-										"unexpected end of description. unterminated function call (DO ..)");
-							if (ch != '(')
-							{
-								throw Error( LineInfo( source.begin(), si),
-										"'(' expected in function call after function name (DO ..)", ch);
-							}
-							st = 2;
-						}
-						else if (st == 2)
-						{
-							if (!st) throw Error( LineInfo( source.begin(), si),
-										"unexpected end of description. unterminated function call (DO ..)");
-							if (ch == ')') break;
-							if (ch == '(') throw Error( LineInfo( source.begin(), si),
-										"unexpected '('. unterminated function call (DO ..)");
-						}
-					}
-					desc.call = std::string( fcallstart, si);
-				}
-				else
-				{
-					throw Error( LineInfo( source.begin(), si),
-							"keyword (END,WITH,INTO,DO) expected instead of operator", tok);
-				}
-				tdar.back().push_back( desc);
-			}
-			// append empty lines to keep line info for the dbsource:
-			dbsource.append( std::string( '\n', lineCount( dbi, si)));
-			dbi = si;
-		}
+	}
+	catch (const Error& e)
+	{
+		throw e;
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw Error( LineInfo( source.begin(), si), e.what());
 	}
 	loadDatabasePart( dbsource);
 

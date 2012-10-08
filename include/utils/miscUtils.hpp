@@ -94,6 +94,10 @@ private:
 	bool m_ar[256];
 };
 
+const CharTable& identifierCharTable();
+const CharTable& emptyCharTable();
+const CharTable& anyCharTable();
+
 ///\brief Parsing the next token in a UTF-8 or Isolatin-1 string that is either
 // - a single quoted (') string backslash escaping returned without the delimiting quotes and escaping resolved
 // - a double quoted (") string backslash escaping returned without the delimiting quotes and escaping resolved
