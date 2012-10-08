@@ -580,7 +580,7 @@ db::Transaction* ProcessorProvider::ProcessorProvider_Impl::transaction( const s
 	}
 }
 
-const langbind::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transactionFunction( const std::string& name ) const
+const db::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transactionFunction( const std::string& name ) const
 {
 	{
 		if ( m_db )

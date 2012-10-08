@@ -35,7 +35,7 @@ Project Wolframe.
 #define _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
 #include "langbind/appFormFunction.hpp"
-#include "langbind/transactionFunction.hpp"
+#include "database/transactionFunction.hpp"
 #include "prnt/printFunction.hpp"
 #include "processor/procProvider.hpp"
 #include "ddl/structType.hpp"
@@ -43,7 +43,6 @@ Project Wolframe.
 #include "serialize/struct/filtermapBase.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
-#include "database/preparedStatement.hpp"
 #include <stack>
 #include <string>
 #include <algorithm>
@@ -262,7 +261,7 @@ class TransactionFunctionClosure
 public:
 	///\brief Constructor
 	///\param[in] f function called
-	TransactionFunctionClosure( const proc::ProcessorProvider* provider_, const TransactionFunction* f);
+	TransactionFunctionClosure( const proc::ProcessorProvider* provider_, const db::TransactionFunction* f);
 
 	///\brief Copy constructor
 	///\param[in] o copied item
@@ -283,7 +282,7 @@ public:
 
 private:
 	const proc::ProcessorProvider* m_provider;	//< processor provider to get transaction object
-	const TransactionFunction* m_func;		//< function to execute
+	const db::TransactionFunction* m_func;		//< function to execute
 	int m_state;					//< current state of call
 	RedirectFilterClosure m_input;			//< builder of structure from input
 	TypedOutputFilterR m_inputstruct;		//< input structure

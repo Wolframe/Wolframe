@@ -31,11 +31,10 @@
 
 ************************************************************************/
 ///\brief Interface to transactions in the database for language bindings
-///\file database/databaseTransactionFunction.hpp
-#ifndef _LANGBIND_DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
-#include "types/allocators.hpp"
-#include "langbind/transactionFunction.hpp"
+///\file database/transactionFunction.hpp
+#ifndef _DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
+#define _DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
+#include "types/countedReference.hpp"
 #include "filter/typedfilter.hpp"
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
@@ -48,7 +47,7 @@
 namespace _Wolframe {
 namespace db {
 
-class DatabaseTransactionFunction;
+class TransactionFunction;
 
 class TransactionFunctionOutput
 	:public langbind::TypedInputFilter
@@ -71,7 +70,7 @@ class TransactionFunctionInput
 public:
 	class Structure;
 
-	explicit TransactionFunctionInput( const DatabaseTransactionFunction* func_);
+	explicit TransactionFunctionInput( const TransactionFunction* func_);
 	TransactionFunctionInput( const TransactionFunctionInput& o);
 	virtual ~TransactionFunctionInput();
 
@@ -85,7 +84,7 @@ public:
 
 private:
 	Structure* m_structure;
-	const DatabaseTransactionFunction* m_func;
+	const TransactionFunction* m_func;
 	langbind::TypedInputFilter::ElementType m_lasttype;
 };
 
@@ -111,7 +110,7 @@ struct TransactionDescription
 	};
 
 	///\class Error
-	///\brief Error thrown by createDatabaseTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
+	///\brief Error thrown by createTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
 	struct Error
 	{
 		Error( ElementName elemname_, std::size_t elemidx_, const std::string& msg_)
@@ -130,16 +129,18 @@ struct TransactionDescription
 	std::string output;
 };
 
-class DatabaseTransactionFunction
-	:public langbind::TransactionFunction
+class TransactionFunction
 {
 public:
-	DatabaseTransactionFunction( const DatabaseTransactionFunction& o);
-	DatabaseTransactionFunction( const std::vector<TransactionDescription>& description);
-	virtual ~DatabaseTransactionFunction();
+	TransactionFunction( const TransactionFunction& o);
+	TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description);
+	virtual ~TransactionFunction();
 
 	virtual langbind::TypedOutputFilter* getInput() const;
 	virtual langbind::TypedInputFilter* getOutput( const db::TransactionOutput& o) const;
+
+	const std::string& name() const			{return m_name;}
+	void name( const std::string& name_)		{m_name = name_;}
 
 	class TagTable;
 	const TagTable* tagmap() const;
@@ -151,12 +152,16 @@ public:
 	}
 
 private:
+	std::string m_name;
 	Impl* m_impl;
 };
 
 ///\brief Creates a database transaction function from its description source
+///\param[in] name name of  the transaction
 ///\param[in] description transaction description source
-langbind::TransactionFunction* createDatabaseTransactionFunction( const std::vector<TransactionDescription>& description);
+TransactionFunction* createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description);
+
+typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
 
 }}//namespace
 #endif

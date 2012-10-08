@@ -39,7 +39,6 @@ Project Wolframe.
 #include "utils/miscUtils.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
-#include "database/databaseTransactionFunction.hpp"
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <cctype>
@@ -218,7 +217,7 @@ bool FormFunctionClosure::call()
 }
 
 
-TransactionFunctionClosure::TransactionFunctionClosure( const proc::ProcessorProvider* p, const TransactionFunction* f)
+TransactionFunctionClosure::TransactionFunctionClosure( const proc::ProcessorProvider* p, const db::TransactionFunction* f)
 	:m_provider(p)
 	,m_func(f)
 	,m_state(0)

@@ -39,7 +39,7 @@
 
 #include <boost/noncopyable.hpp>
 #include "database/DBprovider.hpp"
-#include "database/preparedStatement.hpp"
+#include "database/transactionFunction.hpp"
 #include "filter/filter.hpp"
 #include "langbind/appFormFunction.hpp"
 #include "cmdbind/commandHandler.hpp"
@@ -47,7 +47,6 @@
 #include "ddl/compilerInterface.hpp"
 #include "prnt/printFunction.hpp"
 #include "langbind/normalizeFunction.hpp"
-#include "langbind/transactionFunction.hpp"
 #include "langbind/appConfig_struct.hpp"
 
 namespace _Wolframe {
@@ -94,13 +93,14 @@ public:
 
 	const ddl::Form* form( const std::string& name ) const;
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
-	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
 	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
 
 	db::Database* transactionDatabase() const;
 
 	/// return a database transaction object for the given name
 	db::Transaction* transaction( const std::string& name ) const;
+
+	const db::TransactionFunction* transactionFunction( const std::string& name) const;
 
 private:
 	class ProcessorProvider_Impl;

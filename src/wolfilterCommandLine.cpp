@@ -149,7 +149,6 @@ struct OptionStruct
 			( "form,F", po::value< std::vector<std::string> >(), "specify form to load by path" )
 			( "printlayout,P", po::value< std::vector<std::string> >(), "specify print layout for a form" )
 			( "database,D", po::value<std::string>(), "specifiy transaction database" )
-			( "transaction,T", po::value< std::vector<std::string> >(), "specify transaction function" )
 			( "normalize,N", po::value< std::vector<std::string> >(), "specify normalization function" )
 			( "cmd", po::value<std::string>(), "name of the command to execute")
 			;
@@ -218,15 +217,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		for (; itr != end; ++itr)
 		{
 			m_envconfig.normalize.push_back( langbind::NormalizeFunctionOption( *itr));
-		}
-	}
-	if (vmap.count( "transaction"))
-	{
-		std::vector<std::string> transactions = vmap["transaction"].as<std::vector<std::string> >();
-		std::vector<std::string>::const_iterator itr=transactions.begin(), end=transactions.end();
-		for (; itr != end; ++itr)
-		{
-			m_envconfig.transaction.push_back( langbind::TransactionFunctionOption( *itr));
 		}
 	}
 	if (vmap.count( "script"))

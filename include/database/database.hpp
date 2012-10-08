@@ -39,8 +39,8 @@
 
 #include <string>
 
-#include "transaction.hpp"
-#include "langbind/transactionFunction.hpp"
+#include "database/transaction.hpp"
+#include "database/transactionFunction.hpp"
 
 namespace _Wolframe {
 namespace db {
@@ -63,7 +63,7 @@ public:
 	///\ Just and interface at the moment
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
-	virtual const langbind::TransactionFunction* transactionFunction( const std::string&)
+	virtual const TransactionFunction* transactionFunction( const std::string&)
 	{
 		return 0;
 	}

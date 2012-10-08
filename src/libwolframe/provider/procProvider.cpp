@@ -140,30 +140,6 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 					}
 					m_environment.normalize.push_back( st);
 				}
-				else if ( boost::algorithm::iequals( "transaction", eni->first ))
-				{
-					langbind::TransactionFunctionConfigStruct st;
-					for ( boost::property_tree::ptree::const_iterator ai = eni->second.begin(); ai != eni->second.end(); ai++ )
-					{
-						if (boost::algorithm::iequals( "name", ai->first ))
-						{
-							st.name = ai->second.data();
-						}
-						else if (boost::algorithm::iequals( "type", ai->first ))
-						{
-							st.type = ai->second.data();
-						}
-						else if (boost::algorithm::iequals( "call", ai->first ))
-						{
-							st.call = ai->second.data();
-						}
-						else
-						{
-							LOG_ERROR << "invalid transaction configuration element '" << ai->first << "'";
-						}
-					}
-					m_environment.transaction.push_back( st);
-				}
 			}
 		}
 		else	{
@@ -249,10 +225,6 @@ void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
 	for (std::vector<langbind::PrintLayoutConfigStruct>::const_iterator ii=m_environment.printlayout.begin(), ee=m_environment.printlayout.end(); ii != ee; ++ii)
 	{
 		os << indstr << "printlayout " << ii->name << " (" << ii->type << ") " << ii->file;
-	}
-	for (std::vector<langbind::TransactionFunctionConfigStruct>::const_iterator ii=m_environment.transaction.begin(), ee=m_environment.transaction.end(); ii != ee; ++ii)
-	{
-		os << indstr << "transaction " << ii->name << " (" << ii->type << ") " << ii->call;
 	}
 	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=m_environment.normalize.begin(), ee=m_environment.normalize.end(); ii != ee; ++ii)
 	{
@@ -356,7 +328,7 @@ const langbind::NormalizeFunction* ProcessorProvider::normalizeFunction( const s
 	return m_impl->normalizeFunction( name );
 }
 
-const langbind::TransactionFunction* ProcessorProvider::transactionFunction( const std::string& name) const
+const db::TransactionFunction* ProcessorProvider::transactionFunction( const std::string& name) const
 {
 	return m_impl->transactionFunction( name);
 }

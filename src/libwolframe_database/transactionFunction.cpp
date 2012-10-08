@@ -31,11 +31,11 @@
 
 ************************************************************************/
 ///\brief Implementation of the builder of transaction input and reader of output
-///\file databaseTransactionFunction.cpp
-#include "database/databaseTransactionFunction.hpp"
-#include "database/transaction.hpp"
-#include "types/countedReference.hpp"
+///\file transactionFunction.cpp
+#include "types/allocators.hpp"
 #include "utils/miscUtils.hpp"
+#include "database/transactionFunction.hpp"
+#include "database/transaction.hpp"
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/charset.hpp"
@@ -48,7 +48,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-class DatabaseTransactionFunction::TagTable
+class TransactionFunction::TagTable
 {
 public:
 	TagTable()
@@ -70,7 +70,7 @@ private:
 class TransactionFunctionInput::Structure
 {
 public:
-	Structure( const DatabaseTransactionFunction::TagTable* tagmap);
+	Structure( const TransactionFunction::TagTable* tagmap);
 	Structure( const Structure& o);
 
 	struct Node
@@ -130,7 +130,7 @@ public:
 private:
 	types::TypedArrayDoublingAllocator<Node> m_nodemem;
 	types::TypedArrayDoublingAllocator<char> m_strmem;
-	const DatabaseTransactionFunction::TagTable* m_tagmap;
+	const TransactionFunction::TagTable* m_tagmap;
 	std::size_t m_rootidx;
 	std::size_t m_rootsize;
 	typedef std::vector< std::vector<Node> > BuildNodeStruct;
@@ -161,7 +161,7 @@ public:
 	};
 
 	Path(){}
-	Path( const std::string& src, DatabaseTransactionFunction::TagTable* tagmap);
+	Path( const std::string& src, TransactionFunction::TagTable* tagmap);
 	Path( const Path& o);
 	std::string tostring() const;
 
@@ -198,7 +198,7 @@ private:
 	std::vector<Path> m_arg;
 };
 
-struct DatabaseTransactionFunction::Impl
+struct TransactionFunction::Impl
 {
 	std::string m_resultname;
 	std::vector<std::string> m_elemname;
@@ -223,20 +223,20 @@ static std::string normalizeTagName( const std::string& tagname)
 	return rt;
 }
 
-int DatabaseTransactionFunction::TagTable::find( const char* tag, std::size_t tagsize) const
+int TransactionFunction::TagTable::find( const char* tag, std::size_t tagsize) const
 {
 	const std::string tagnam( tag, tagsize);
 	return find( tagnam);
 }
 
-int DatabaseTransactionFunction::TagTable::find( const std::string& tagnam) const
+int TransactionFunction::TagTable::find( const std::string& tagnam) const
 {
 	std::map< std::string, int>::const_iterator ii = m_map.find( tagnam);
 	if (ii == m_map.end()) return 0;
 	return ii->second;
 }
 
-int DatabaseTransactionFunction::TagTable::get( const std::string& tagnam)
+int TransactionFunction::TagTable::get( const std::string& tagnam)
 {
 	std::map< std::string, int>::const_iterator ii = m_map.find( tagnam);
 	if (ii == m_map.end())
@@ -250,13 +250,13 @@ int DatabaseTransactionFunction::TagTable::get( const std::string& tagnam)
 	}
 }
 
-int DatabaseTransactionFunction::TagTable::get( const char* tag, std::size_t tagsize)
+int TransactionFunction::TagTable::get( const char* tag, std::size_t tagsize)
 {
 	const std::string tagstr( tag, tagsize);
 	return get( tagstr);
 }
 
-int DatabaseTransactionFunction::TagTable::unused() const
+int TransactionFunction::TagTable::unused() const
 {
 	return m_size +1;
 }
@@ -279,7 +279,7 @@ TransactionFunctionInput::Structure::Structure( const Structure& o)
 	{}
 
 
-TransactionFunctionInput::Structure::Structure( const DatabaseTransactionFunction::TagTable* tagmap)
+TransactionFunctionInput::Structure::Structure( const TransactionFunction::TagTable* tagmap)
 	:m_tagmap(tagmap)
 	,m_rootidx(0)
 	,m_rootsize(0)
@@ -497,7 +497,7 @@ const char* TransactionFunctionInput::Structure::nodevalue( const Node& nd) cons
 	return rt;
 }
 
-Path::Path( const std::string& pt, DatabaseTransactionFunction::TagTable* tagmap)
+Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap)
 {
 	Element elem;
 	std::string::const_iterator ii = pt.begin(), ee = pt.end();
@@ -678,7 +678,7 @@ static bool checkIdentifier( const std::string& id)
 	return (ii != ie);
 }
 
-TransactionFunctionInput::TransactionFunctionInput( const DatabaseTransactionFunction* func_)
+TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* func_)
 	:m_structure( new Structure( func_->tagmap()))
 	,m_func(func_)
 	,m_lasttype( langbind::TypedInputFilter::Value){}
@@ -895,7 +895,7 @@ bool TransactionFunctionOutput::getNext( ElementType& type, TypedFilterBase::Ele
 }
 
 
-DatabaseTransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& description)
+TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& description)
 {
 	typedef TransactionDescription::Error Error;
 	TransactionDescription::ElementName elementName = TransactionDescription::Call;
@@ -1052,43 +1052,44 @@ DatabaseTransactionFunction::Impl::Impl( const std::vector<TransactionDescriptio
 	}
 }
 
-DatabaseTransactionFunction::Impl::Impl( const Impl& o)
+TransactionFunction::Impl::Impl( const Impl& o)
 	:m_resultname(o.m_resultname)
 	,m_elemname(o.m_elemname)
 	,m_call(o.m_call)
 	,m_tagmap(o.m_tagmap){}
 
 
-DatabaseTransactionFunction::DatabaseTransactionFunction( const std::vector<TransactionDescription>& description)
-	:m_impl( new Impl( description)){}
+TransactionFunction::TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description)
+	:m_name(name_)
+	,m_impl( new Impl( description)){}
 
-DatabaseTransactionFunction::DatabaseTransactionFunction( const DatabaseTransactionFunction& o)
-	:TransactionFunction(o)
+TransactionFunction::TransactionFunction( const TransactionFunction& o)
+	:m_name(o.m_name)
 	,m_impl( new Impl( *o.m_impl)){}
 
-DatabaseTransactionFunction::~DatabaseTransactionFunction()
+TransactionFunction::~TransactionFunction()
 {
 	delete m_impl;
 }
 
-const DatabaseTransactionFunction::TagTable* DatabaseTransactionFunction::tagmap() const
+const TransactionFunction::TagTable* TransactionFunction::tagmap() const
 {
 	return &m_impl->m_tagmap;
 }
 
-langbind::TypedOutputFilter* DatabaseTransactionFunction::getInput() const
+langbind::TypedOutputFilter* TransactionFunction::getInput() const
 {
 	return new TransactionFunctionInput( this);
 }
 
-langbind::TypedInputFilter* DatabaseTransactionFunction::getOutput( const db::TransactionOutput& o) const
+langbind::TypedInputFilter* TransactionFunction::getOutput( const db::TransactionOutput& o) const
 {
 	return new TransactionFunctionOutput( m_impl->m_resultname, m_impl->m_elemname, o);
 }
 
-langbind::TransactionFunction* _Wolframe::db::createDatabaseTransactionFunction( const std::vector<TransactionDescription>& description)
+TransactionFunction* _Wolframe::db::createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description)
 {
-	return new DatabaseTransactionFunction( description);
+	return new TransactionFunction( name, description);
 }
 
 

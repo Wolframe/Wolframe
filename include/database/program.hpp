@@ -34,8 +34,8 @@
 ///\file database/preparedStatement.hpp
 #ifndef _DATABASE_PROGRAM_HPP_INCLUDED
 #define _DATABASE_PROGRAM_HPP_INCLUDED
-#include "langbind/transactionFunction.hpp"
 #include "types/countedReference.hpp"
+#include "database/transactionFunction.hpp"
 #include <string>
 #include <map>
 #include <cstdlib>
@@ -95,10 +95,10 @@ public:
 	virtual void loadDatabasePart( const std::string&);
 
 	///\brief Get a loaded function by name
-	const langbind::TransactionFunction* function( const std::string& name) const;
+	const TransactionFunction* function( const std::string& name) const;
 
 private:
-	std::map<std::string, langbind::TransactionFunctionR> m_functionmap;
+	std::map<std::string, TransactionFunctionR> m_functionmap;
 	std::string m_commentopr;
 };
 

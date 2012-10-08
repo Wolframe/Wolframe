@@ -22,7 +22,7 @@ LIBRARIES = \
 	wolframe_database.lib
 
 CPP_OBJS = \
-	databaseTransactionFunction.obj \
+	transactionFunction.obj \
 	preparedStatement.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)

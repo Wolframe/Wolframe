@@ -33,7 +33,6 @@
 ///\brief Implemention of programs for the database
 ///\file libwolframe_database/program.hpp
 #include "database/program.hpp"
-#include "database/databaseTransactionFunction.hpp"
 #include "utils/miscUtils.hpp"
 #include <boost/algorithm/string.hpp>
 
@@ -333,7 +332,7 @@ void Program::load( const std::string& source)
 		try
 		{
 			std::string name = boost::algorithm::to_lower_copy( *ni);
-			m_functionmap[ name] = langbind::TransactionFunctionR( createDatabaseTransactionFunction( *di));
+			m_functionmap[ name] = TransactionFunctionR( createTransactionFunction( *ni, *di));
 		}
 		catch (const TransactionDescription::Error& err)
 		{
@@ -365,10 +364,10 @@ void Program::load( const std::string& source)
 	}
 }
 
-const langbind::TransactionFunction* Program::function( const std::string& name) const
+const TransactionFunction* Program::function( const std::string& name) const
 {
 	std::string key = boost::algorithm::to_lower_copy( name);
-	std::map<std::string, langbind::TransactionFunctionR>::const_iterator fi = m_functionmap.find( key);
+	std::map<std::string, TransactionFunctionR>::const_iterator fi = m_functionmap.find( key);
 	if (fi == m_functionmap.end()) return 0;
 	return fi->second.get();
 }

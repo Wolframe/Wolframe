@@ -264,7 +264,6 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				{
 					try
 					{
-						langbind::TransactionFunctionR tfunc;
 						const std::string& procname = m_cmds[ m_cmdidx - m_nofParentCmds - 2];
 						if (!m_provider)
 						{

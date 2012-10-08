@@ -115,7 +115,7 @@ public:
 
 	virtual Transaction* transaction( const std::string& /*name*/);
 
-	virtual const langbind::TransactionFunction* transactionFunction( const std::string& name )
+	virtual const TransactionFunction* transactionFunction( const std::string& name )
 	{
 		return m_program.function( name);
 	}

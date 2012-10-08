@@ -333,7 +333,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 		}
 	}
 	{
-		const TransactionFunction* func = provider->transactionFunction( proc);
+		const db::TransactionFunction* func = provider->transactionFunction( proc);
 		if (func)
 		{
 			flt.inputfilter()->setValue( "empty", "false");

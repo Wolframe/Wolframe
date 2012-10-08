@@ -74,7 +74,7 @@ public:
 
 	db::Database* transactionDatabase() const;
 	db::Transaction* transaction( const std::string& name ) const;
-	const langbind::TransactionFunction* transactionFunction( const std::string& name ) const;
+	const db::TransactionFunction* transactionFunction( const std::string& name ) const;
 
 private:
 	class DDLTypeMap;
