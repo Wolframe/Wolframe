@@ -48,6 +48,168 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
+class DatabaseTransactionFunction::TagTable
+{
+public:
+	TagTable()
+		:m_size(0){}
+	TagTable( const TagTable& o)
+		:m_size(o.m_size),m_map(o.m_map){}
+
+	int find( const char* tag, std::size_t tagsize) const;
+	int find( const std::string& tagstr) const;
+	int get( const std::string& tagstr);
+	int get( const char* tag, std::size_t tagsize);
+	int unused() const;
+
+private:
+	int m_size;
+	std::map< std::string, int> m_map;
+};
+
+class TransactionFunctionInput::Structure
+{
+public:
+	Structure( const DatabaseTransactionFunction::TagTable* tagmap);
+	Structure( const Structure& o);
+
+	struct Node
+	{
+		int m_parent;
+		int m_tag;
+		int m_elementsize;
+		int m_element;
+
+		Node()
+			:m_parent(0)
+			,m_tag(0)
+			,m_elementsize(0)
+			,m_element(0){}
+
+		Node( const Node& o)
+			:m_parent(o.m_parent)
+			,m_tag(o.m_tag)
+			,m_elementsize(o.m_elementsize)
+			,m_element(o.m_element){}
+
+		Node( int p, int t, int size, int e)
+			:m_parent(p)
+			,m_tag(t)
+			,m_elementsize(size)
+			,m_element(e){}
+
+		bool operator == (const Node& o) const;
+		bool operator != (const Node& o) const		{return !operator==(o);}
+
+		static int ref_element( std::size_t idx)	{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return -(int)idx;}
+		static int val_element( std::size_t idx)	{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return (int)idx;}
+
+		std::size_t childidx() const			{return (m_element < 0)?(std::size_t)-m_element:0;}
+		std::size_t nofchild() const			{return (m_element < 0)?(std::size_t)m_elementsize:0;}
+		std::size_t valueidx() const			{return (m_element > 0)?(std::size_t)m_element:0;}
+		std::size_t valuesize() const			{return (m_element > 0)?(std::size_t)m_elementsize:0;}
+	};
+
+	Node root() const;
+	void next( const Node& nd, int tag, std::vector<Node>& rt) const;
+	void find( const Node& nd, int tag, std::vector<Node>& rt) const;
+	void up( const Node& nd, std::vector<Node>& rt) const;
+	const char* nodevalue( const Node& nd) const;
+
+	const std::string tostring() const;
+
+	void setParentLinks( std::size_t mi);
+	void openTag( const char* tag, std::size_t tagsize);
+	void openTag( const std::string& tag);
+	void closeTag();
+	void createRootNode();
+	void pushValue( const char* val, std::size_t valsize);
+	void pushValue( const std::string& val);
+	void check() const;
+
+private:
+	types::TypedArrayDoublingAllocator<Node> m_nodemem;
+	types::TypedArrayDoublingAllocator<char> m_strmem;
+	const DatabaseTransactionFunction::TagTable* m_tagmap;
+	std::size_t m_rootidx;
+	std::size_t m_rootsize;
+	typedef std::vector< std::vector<Node> > BuildNodeStruct;
+	BuildNodeStruct m_data;
+};
+
+class Path
+{
+public:
+	enum ElementType
+	{
+		Next,
+		Find,
+		Up,
+		Result
+	};
+
+	static const char* elementTypeName( ElementType i)
+	{
+		static const char* ar[] ={"Next","Find","Current","Up","Result"};
+		return ar[(int)i];
+	}
+
+	struct Element
+	{
+		ElementType m_type;
+		int m_tag;
+	};
+
+	Path(){}
+	Path( const std::string& src, DatabaseTransactionFunction::TagTable* tagmap);
+	Path( const Path& o);
+	std::string tostring() const;
+
+	std::size_t resultReference() const;
+	void selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node& nd, std::vector<TransactionFunctionInput::Structure::Node>& ar) const;
+
+	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
+	std::vector<Element>::const_iterator end() const		{return m_path.end();}
+	std::size_t size() const					{return m_path.size();}
+
+private:
+	std::vector<Element> m_path;
+};
+
+class FunctionCall
+{
+public:
+	FunctionCall(){}
+	FunctionCall( const FunctionCall& o);
+	FunctionCall( const std::string& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg);
+
+	const Path& selector() const			{return m_selector;}
+	const std::vector<Path>& arg() const		{return m_arg;}
+	const std::string& name() const			{return m_name;}
+	const std::string& resultname() const		{return m_resultname;}
+	void resultname( const char* r)			{m_resultname = r;}
+
+	bool hasResultReference() const;
+
+private:
+	std::string m_resultname;
+	std::string m_name;
+	Path m_selector;
+	std::vector<Path> m_arg;
+};
+
+struct DatabaseTransactionFunction::Impl
+{
+	std::string m_resultname;
+	std::vector<std::string> m_elemname;
+	std::vector<FunctionCall> m_call;
+	TagTable m_tagmap;
+
+	Impl( const std::vector<TransactionDescription>& description);
+	Impl( const Impl& o);
+};
+
+
 static std::string normalizeTagName( const std::string& tagname)
 {
 	std::string rt;
@@ -61,20 +223,20 @@ static std::string normalizeTagName( const std::string& tagname)
 	return rt;
 }
 
-int TagTable::find( const char* tag, std::size_t tagsize) const
+int DatabaseTransactionFunction::TagTable::find( const char* tag, std::size_t tagsize) const
 {
 	const std::string tagnam( tag, tagsize);
 	return find( tagnam);
 }
 
-int TagTable::find( const std::string& tagnam) const
+int DatabaseTransactionFunction::TagTable::find( const std::string& tagnam) const
 {
 	std::map< std::string, int>::const_iterator ii = m_map.find( tagnam);
 	if (ii == m_map.end()) return 0;
 	return ii->second;
 }
 
-int TagTable::get( const std::string& tagnam)
+int DatabaseTransactionFunction::TagTable::get( const std::string& tagnam)
 {
 	std::map< std::string, int>::const_iterator ii = m_map.find( tagnam);
 	if (ii == m_map.end())
@@ -88,18 +250,18 @@ int TagTable::get( const std::string& tagnam)
 	}
 }
 
-int TagTable::get( const char* tag, std::size_t tagsize)
+int DatabaseTransactionFunction::TagTable::get( const char* tag, std::size_t tagsize)
 {
 	const std::string tagstr( tag, tagsize);
 	return get( tagstr);
 }
 
-int TagTable::unused() const
+int DatabaseTransactionFunction::TagTable::unused() const
 {
 	return m_size +1;
 }
 
-bool Structure::Node::operator == (const Node& o) const
+bool TransactionFunctionInput::Structure::Node::operator == (const Node& o) const
 {
 	if (m_parent != o.m_parent) return false;
 	if (m_tag != o.m_tag) return false;
@@ -108,7 +270,7 @@ bool Structure::Node::operator == (const Node& o) const
 	return true;
 }
 
-Structure::Structure( const Structure& o)
+TransactionFunctionInput::Structure::Structure( const Structure& o)
 	:m_nodemem(o.m_nodemem)
 	,m_strmem(o.m_strmem)
 	,m_tagmap(o.m_tagmap)
@@ -117,7 +279,7 @@ Structure::Structure( const Structure& o)
 	{}
 
 
-Structure::Structure( const TagTable* tagmap)
+TransactionFunctionInput::Structure::Structure( const DatabaseTransactionFunction::TagTable* tagmap)
 	:m_tagmap(tagmap)
 	,m_rootidx(0)
 	,m_rootsize(0)
@@ -127,7 +289,7 @@ Structure::Structure( const TagTable* tagmap)
 	m_data.push_back( std::vector<Node>());
 }
 
-void Structure::check() const
+void TransactionFunctionInput::Structure::check() const
 {
 	if (m_data.size() != 1)
 	{
@@ -135,7 +297,7 @@ void Structure::check() const
 	}
 }
 
-void Structure::setParentLinks( std::size_t mi)
+void TransactionFunctionInput::Structure::setParentLinks( std::size_t mi)
 {
 	Node* nd = &m_nodemem[mi];
 	std::size_t ii = 0, nn = nd->nofchild(), ci = nd->childidx();
@@ -150,7 +312,7 @@ void Structure::setParentLinks( std::size_t mi)
 	}
 }
 
-const std::string Structure::tostring() const
+const std::string TransactionFunctionInput::Structure::tostring() const
 {
 	std::vector <std::pair< std::size_t, std::size_t> > stk;
 	std::ostringstream rt;
@@ -187,13 +349,13 @@ const std::string Structure::tostring() const
 	return rt.str();
 }
 
-void Structure::openTag( const char* tag, std::size_t tagsize)
+void TransactionFunctionInput::Structure::openTag( const char* tag, std::size_t tagsize)
 {
 	const std::string tagstr( tag, tagsize);
 	openTag( tagstr);
 }
 
-void Structure::openTag( const std::string& tagstr)
+void TransactionFunctionInput::Structure::openTag( const std::string& tagstr)
 {
 	int mi = (int)m_tagmap->find( tagstr);
 	if (mi == 0) mi = (int)m_tagmap->unused();
@@ -202,7 +364,7 @@ void Structure::openTag( const std::string& tagstr)
 	m_data.push_back( std::vector<Node>());
 }
 
-void Structure::createRootNode()
+void TransactionFunctionInput::Structure::createRootNode()
 {
 	m_rootsize = m_data.back().size();
 	m_rootidx = m_nodemem.alloc( m_rootsize);
@@ -214,7 +376,7 @@ void Structure::createRootNode()
 	}
 }
 
-void Structure::closeTag()
+void TransactionFunctionInput::Structure::closeTag()
 {
 	if (m_data.size() == 1)
 	{
@@ -241,7 +403,7 @@ void Structure::closeTag()
 	}
 }
 
-void Structure::pushValue( const char* val, std::size_t valsize)
+void TransactionFunctionInput::Structure::pushValue( const char* val, std::size_t valsize)
 {
 	std::size_t mi = m_strmem.alloc( valsize+1);
 	char* mem = m_strmem.base() + mi;
@@ -250,12 +412,12 @@ void Structure::pushValue( const char* val, std::size_t valsize)
 	m_data.back().push_back( Node( 0, 0, valsize, Node::val_element( mi)));
 }
 
-void Structure::pushValue( const std::string& val)
+void TransactionFunctionInput::Structure::pushValue( const std::string& val)
 {
 	pushValue( val.c_str(), val.size());
 }
 
-void Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
+void TransactionFunctionInput::Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
 {
 	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
 	if (nn)
@@ -274,7 +436,7 @@ void Structure::next( const Node& nd, int tag, std::vector<Node>& nextnd) const
 	}
 }
 
-void Structure::find( const Node& nd, int tag, std::vector<Node>& findnd) const
+void TransactionFunctionInput::Structure::find( const Node& nd, int tag, std::vector<Node>& findnd) const
 {
 	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
 	if (nn)
@@ -297,7 +459,7 @@ void Structure::find( const Node& nd, int tag, std::vector<Node>& findnd) const
 	}
 }
 
-void Structure::up( const Node& nd, std::vector<Node>& rt) const
+void TransactionFunctionInput::Structure::up( const Node& nd, std::vector<Node>& rt) const
 {
 	if (nd.m_parent != 0)
 	{
@@ -309,13 +471,13 @@ void Structure::up( const Node& nd, std::vector<Node>& rt) const
 	}
 }
 
-Structure::Node Structure::root() const
+TransactionFunctionInput::Structure::Node TransactionFunctionInput::Structure::root() const
 {
 	Node rt( 0, 0, m_rootsize, Node::ref_element(m_rootidx));
 	return rt;
 }
 
-const char* Structure::nodevalue( const Node& nd) const
+const char* TransactionFunctionInput::Structure::nodevalue( const Node& nd) const
 {
 	const char* rt = 0;
 	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
@@ -335,7 +497,7 @@ const char* Structure::nodevalue( const Node& nd) const
 	return rt;
 }
 
-Path::Path( const std::string& pt, TagTable* tagmap)
+Path::Path( const std::string& pt, DatabaseTransactionFunction::TagTable* tagmap)
 {
 	Element elem;
 	std::string::const_iterator ii = pt.begin(), ee = pt.end();
@@ -441,9 +603,10 @@ std::string Path::tostring() const
 	return rt.str();
 }
 
-void Path::selectNodes( const Structure& st, const Structure::Node& nd, std::vector<Structure::Node>& ar) const
+void Path::selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node& nd, std::vector<TransactionFunctionInput::Structure::Node>& ar) const
 {
-	std::vector<Structure::Node> ar1,ar2;
+	typedef TransactionFunctionInput::Structure::Node Node;
+	std::vector<Node> ar1,ar2;
 	ar1.push_back( nd);
 
 	// [B.1] Find selected nodes:
@@ -451,7 +614,7 @@ void Path::selectNodes( const Structure& st, const Structure::Node& nd, std::vec
 	for (; si != se; ++si)
 	{
 		ar2.clear();
-		std::vector<Structure::Node>::const_iterator ni = ar1.begin(), ne = ar1.end();
+		std::vector<Node>::const_iterator ni = ar1.begin(), ne = ar1.end();
 		for (; ni != ne; ++ni)
 		{
 			switch (si->m_type)
@@ -499,13 +662,6 @@ bool FunctionCall::hasResultReference() const
 	return false;
 }
 
-DatabaseTransactionFunction::DatabaseTransactionFunction( const DatabaseTransactionFunction& o)
-	:TransactionFunction(o)
-	,m_resultname(o.m_resultname)
-	,m_elemname(o.m_elemname)
-	,m_call(o.m_call)
-	,m_tagmap(o.m_tagmap){}
-
 static bool isAlphaNumeric( char ch)
 {
 	if (ch >= '0' && ch <= '9') return true;
@@ -522,7 +678,224 @@ static bool checkIdentifier( const std::string& id)
 	return (ii != ie);
 }
 
-DatabaseTransactionFunction::DatabaseTransactionFunction( const std::vector<TransactionDescription>& description)
+TransactionFunctionInput::TransactionFunctionInput( const DatabaseTransactionFunction* func_)
+	:m_structure( new Structure( func_->tagmap()))
+	,m_func(func_)
+	,m_lasttype( langbind::TypedInputFilter::Value){}
+
+TransactionFunctionInput::~TransactionFunctionInput()
+{
+	delete m_structure;
+}
+
+TransactionFunctionInput::TransactionFunctionInput( const TransactionFunctionInput& o)
+	:langbind::TypedOutputFilter(o)
+	,m_structure( new Structure( *o.m_structure))
+	,m_func(o.m_func)
+	,m_lasttype(o.m_lasttype){}
+
+bool TransactionFunctionInput::print( ElementType type, const Element& element)
+{
+	switch (type)
+	{
+		case langbind::TypedInputFilter::OpenTag:
+			m_structure->openTag( element.tostring());
+		break;
+		case langbind::TypedInputFilter::CloseTag:
+			m_structure->closeTag();
+		break;
+		case langbind::TypedInputFilter::Attribute:
+			m_structure->openTag( element.tostring());
+		break;
+		case langbind::TypedInputFilter::Value:
+			m_structure->pushValue( element.tostring());
+			if (m_lasttype == langbind::TypedInputFilter::Attribute)
+			{
+				m_structure->closeTag();
+			}
+		break;
+	}
+	m_lasttype = type;
+	return true;
+}
+
+static void bindArguments( TransactionInput& ti, const FunctionCall& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::Node& selectornode)
+{
+	typedef TransactionFunctionInput::Structure::Node Node;
+
+	std::vector<Path>::const_iterator pi=call.arg().begin(), pe=call.arg().end();
+	for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
+	{
+		std::size_t residx = pi->resultReference();
+		if (residx)
+		{
+			ti.bindCommandArgAsResultReference( residx);
+		}
+		else
+		{
+			std::vector<Node> param;
+			pi->selectNodes( inputst->structure(), selectornode, param);
+			if (param.size() == 0)
+			{
+				ti.bindCommandArgAsNull();
+			}
+			else
+			{
+				std::vector<Node>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
+				for (; gi != ge; ++gi)
+				{
+					if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
+				}
+				const char* value = inputst->structure().nodevalue( *gs);
+				ti.bindCommandArgAsValue( value);
+			}
+		}
+	}
+}
+
+TransactionInput TransactionFunctionInput::get() const
+{
+	TransactionInput rt;
+	std::vector<FunctionCall>::const_iterator ci = m_func->impl().m_call.begin(), ce = m_func->impl().m_call.end();
+	for (std::size_t ii=0; ci != ce; ++ci,++ii)
+	{
+		// Select the nodes to execute the command with:
+		std::vector<Structure::Node> nodearray;
+		ci->selector().selectNodes( structure(), structure().root(), nodearray);
+
+		// For each selected node do expand the function call arguments:
+		std::vector<Structure::Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
+		for (; vi != ve; ++vi)
+		{
+			rt.startCommand( ii, ci->name());
+			bindArguments( rt, *ci, this, *vi);
+		}
+	}
+	return rt;
+}
+
+struct TransactionFunctionOutput::Impl
+{
+	int m_state;
+	int m_rowidx;
+	int m_colidx;
+	int m_colend;
+	std::string m_rootname;
+	std::vector<std::string> m_resname;
+	db::TransactionOutput::result_iterator m_resitr;
+	db::TransactionOutput::result_iterator m_resend;
+	db::TransactionOutput::row_iterator m_rowitr;
+	db::TransactionOutput::row_iterator m_rowend;
+	db::TransactionOutput m_data;
+
+	Impl( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& data_)
+		:m_state(0)
+		,m_rowidx(0)
+		,m_colidx(0)
+		,m_colend(0)
+		,m_rootname(rootname_)
+		,m_resname(resname_)
+		,m_data(data_){}
+
+	bool getNext( ElementType& type, TypedFilterBase::Element& element)
+	{
+		for (;;) switch (m_state)
+		{
+			case 0:
+				m_resitr = m_data.begin();
+				m_resend = m_data.end();
+				m_state = 1;
+				if (!m_rootname.empty())
+				{
+					type = TypedInputFilter::OpenTag;
+					element = m_rootname;
+					return true;
+				}
+				/* no break here !*/
+			case 1:
+				if (m_resitr == m_resend)
+				{
+					// close tag marking end of data:
+					type = TypedInputFilter::CloseTag;
+					element = TypedInputFilter::Element();
+					return true;
+				}
+				if (m_resname[ m_resitr->functionidx()].empty())
+				{
+					// result is not part of output:
+					++m_resitr;
+					continue;
+				}
+				m_rowitr = m_resitr->begin();
+				m_rowend = m_resitr->end();
+				m_rowidx = 0;
+				m_colidx = 0;
+				m_colend = m_resitr->nofColumns();
+				m_state = 2;
+				/* no break here ! */
+			case 2:
+				m_colidx = 0;
+				if (m_rowitr == m_rowend)
+				{
+					++m_resitr;
+					m_state = 1;
+					continue;
+				}
+				m_state = 3;
+				type = TypedInputFilter::OpenTag;
+				element = m_resname[ m_resitr->functionidx()];
+				return true;
+			case 3:
+				if (m_colidx == m_colend)
+				{
+					++m_rowitr;
+					++m_rowidx;
+					m_state = 2;
+					continue;
+				}
+				m_state = 4;
+				type = TypedInputFilter::OpenTag;
+				element = m_resitr->columnName( m_colidx);
+				return true;
+			case 4:
+				m_state = 5;
+				type = TypedInputFilter::Value;
+				element = (*m_rowitr)[ m_colidx];
+				return true;
+			case 5:
+				m_state = 6;
+				type = TypedInputFilter::CloseTag;
+				element = TypedInputFilter::Element();
+				++m_colidx;
+				return true;
+			case 6:
+				m_state = 3;
+				if (m_colidx == m_colend)
+				{
+					type = TypedInputFilter::CloseTag;
+					element = TypedInputFilter::Element();
+					return true;
+				}
+				continue;
+		}
+	}
+};
+
+TransactionFunctionOutput::TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& data_)
+	:m_impl( new Impl( rootname_, resname_, data_)){}
+
+TransactionFunctionOutput::~TransactionFunctionOutput()
+{
+	delete m_impl;
+}
+
+bool TransactionFunctionOutput::getNext( ElementType& type, TypedFilterBase::Element& element)
+{
+	return m_impl->getNext( type, element);
+}
+
+
+DatabaseTransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& description)
 {
 	typedef TransactionDescription::Error Error;
 	TransactionDescription::ElementName elementName = TransactionDescription::Call;
@@ -679,186 +1052,38 @@ DatabaseTransactionFunction::DatabaseTransactionFunction( const std::vector<Tran
 	}
 }
 
-TransactionFunctionInput::TransactionFunctionInput( const DatabaseTransactionFunction* func_)
-	:Structure(func_->tagmap())
-	,m_func(func_)
-	,m_lasttype(langbind::TypedInputFilter::Value){}
+DatabaseTransactionFunction::Impl::Impl( const Impl& o)
+	:m_resultname(o.m_resultname)
+	,m_elemname(o.m_elemname)
+	,m_call(o.m_call)
+	,m_tagmap(o.m_tagmap){}
 
-TransactionFunctionInput::TransactionFunctionInput( const TransactionFunctionInput& o)
-	:langbind::TypedOutputFilter(o)
-	,Structure(o)
-	,m_func(o.m_func)
-	,m_lasttype(o.m_lasttype){}
 
-bool TransactionFunctionInput::print( ElementType type, const Element& element)
+DatabaseTransactionFunction::DatabaseTransactionFunction( const std::vector<TransactionDescription>& description)
+	:m_impl( new Impl( description)){}
+
+DatabaseTransactionFunction::DatabaseTransactionFunction( const DatabaseTransactionFunction& o)
+	:TransactionFunction(o)
+	,m_impl( new Impl( *o.m_impl)){}
+
+DatabaseTransactionFunction::~DatabaseTransactionFunction()
 {
-	switch (type)
-	{
-		case langbind::TypedInputFilter::OpenTag:
-			openTag( element.tostring());
-		break;
-		case langbind::TypedInputFilter::CloseTag:
-			closeTag();
-		break;
-		case langbind::TypedInputFilter::Attribute:
-			openTag( element.tostring());
-		break;
-		case langbind::TypedInputFilter::Value:
-			pushValue( element.tostring());
-			if (m_lasttype == langbind::TypedInputFilter::Attribute)
-			{
-				closeTag();
-			}
-		break;
-	}
-	m_lasttype = type;
-	return true;
+	delete m_impl;
 }
 
-static void bindArguments( TransactionInput& ti, const FunctionCall& call, const TransactionFunctionInput* inputst, const Structure::Node& selectornode)
+const DatabaseTransactionFunction::TagTable* DatabaseTransactionFunction::tagmap() const
 {
-	std::vector<Path>::const_iterator pi=call.arg().begin(), pe=call.arg().end();
-	for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
-	{
-		std::size_t residx = pi->resultReference();
-		if (residx)
-		{
-			ti.bindCommandArgAsResultReference( residx);
-		}
-		else
-		{
-			std::vector<Structure::Node> param;
-			pi->selectNodes( *inputst, selectornode, param);
-			if (param.size() == 0)
-			{
-				ti.bindCommandArgAsNull();
-			}
-			else
-			{
-				std::vector<Structure::Node>::const_iterator gs = param.begin(), gi = param.begin()+1, ge = param.end();
-				for (; gi != ge; ++gi)
-				{
-					if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
-				}
-				const char* value = inputst->nodevalue( *gs);
-				ti.bindCommandArgAsValue( value);
-			}
-		}
-	}
+	return &m_impl->m_tagmap;
 }
 
-TransactionInput TransactionFunctionInput::get() const
+langbind::TypedOutputFilter* DatabaseTransactionFunction::getInput() const
 {
-	TransactionInput rt;
-	std::vector<FunctionCall>::const_iterator ci = m_func->call().begin(), ce = m_func->call().end();
-	for (; ci != ce; ++ci)
-	{
-		// Select the nodes to execute the command with:
-		std::vector<Structure::Node> nodearray;
-		ci->selector().selectNodes( *this, root(), nodearray);
-
-		// For each selected node do expand the function call arguments:
-		std::vector<Structure::Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
-		for (; vi != ve; ++vi)
-		{
-			rt.startCommand( ci - m_func->call().begin(), ci->name());
-			bindArguments( rt, *ci, this, *vi);
-		}
-	}
-	return rt;
+	return new TransactionFunctionInput( this);
 }
 
-TransactionFunctionOutput::TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& data_)
-	:m_state(0)
-	,m_rowidx(0)
-	,m_colidx(0)
-	,m_colend(0)
-	,m_rootname(rootname_)
-	,m_resname(resname_)
-	,m_data(data_){}
-
-bool TransactionFunctionOutput::getNext( ElementType& type, TypedFilterBase::Element& element)
+langbind::TypedInputFilter* DatabaseTransactionFunction::getOutput( const db::TransactionOutput& o) const
 {
-	for (;;) switch (m_state)
-	{
-		case 0:
-			m_resitr = m_data.begin();
-			m_resend = m_data.end();
-			m_state = 1;
-			if (!m_rootname.empty())
-			{
-				type = TypedInputFilter::OpenTag;
-				element = m_rootname;
-				return true;
-			}
-			/* no break here !*/
-		case 1:
-			if (m_resitr == m_resend)
-			{
-				// close tag marking end of data:
-				type = TypedInputFilter::CloseTag;
-				element = TypedInputFilter::Element();
-				return true;
-			}
-			if (m_resname[ m_resitr->functionidx()].empty())
-			{
-				// result is not part of output:
-				++m_resitr;
-				continue;
-			}
-			m_rowitr = m_resitr->begin();
-			m_rowend = m_resitr->end();
-			m_rowidx = 0;
-			m_colidx = 0;
-			m_colend = m_resitr->nofColumns();
-			m_state = 2;
-			/* no break here ! */
-		case 2:
-			m_colidx = 0;
-			if (m_rowitr == m_rowend)
-			{
-				++m_resitr;
-				m_state = 1;
-				continue;
-			}
-			m_state = 3;
-			type = TypedInputFilter::OpenTag;
-			element = m_resname[ m_resitr->functionidx()];
-			return true;
-		case 3:
-			if (m_colidx == m_colend)
-			{
-				++m_rowitr;
-				++m_rowidx;
-				m_state = 2;
-				continue;
-			}
-			m_state = 4;
-			type = TypedInputFilter::OpenTag;
-			element = m_resitr->columnName( m_colidx);
-			return true;
-		case 4:
-			m_state = 5;
-			type = TypedInputFilter::Value;
-			element = (*m_rowitr)[ m_colidx];
-			return true;
-		case 5:
-			m_state = 6;
-			type = TypedInputFilter::CloseTag;
-			element = TypedInputFilter::Element();
-			++m_colidx;
-			return true;
-		case 6:
-			m_state = 3;
-			if (m_colidx == m_colend)
-			{
-				type = TypedInputFilter::CloseTag;
-				element = TypedInputFilter::Element();
-				return true;
-			}
-			continue;
-
-	}
+	return new TransactionFunctionOutput( m_impl->m_resultname, m_impl->m_elemname, o);
 }
 
 langbind::TransactionFunction* _Wolframe::db::createDatabaseTransactionFunction( const std::vector<TransactionDescription>& description)

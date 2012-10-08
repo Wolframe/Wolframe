@@ -48,200 +48,43 @@
 namespace _Wolframe {
 namespace db {
 
-class TagTable
-{
-public:
-	TagTable()
-		:m_size(0){}
-	TagTable( const TagTable& o)
-		:m_size(o.m_size),m_map(o.m_map){}
-
-	int find( const char* tag, std::size_t tagsize) const;
-	int find( const std::string& tagstr) const;
-	int get( const std::string& tagstr);
-	int get( const char* tag, std::size_t tagsize);
-	int unused() const;
-
-private:
-	int m_size;
-	std::map< std::string, int> m_map;
-};
-
-
-class Structure
-{
-public:
-	Structure( const TagTable* tagmap);
-	Structure( const Structure& o);
-
-	struct Node
-	{
-		int m_parent;
-		int m_tag;
-		int m_elementsize;
-		int m_element;
-
-		Node()
-			:m_parent(0)
-			,m_tag(0)
-			,m_elementsize(0)
-			,m_element(0){}
-
-		Node( const Node& o)
-			:m_parent(o.m_parent)
-			,m_tag(o.m_tag)
-			,m_elementsize(o.m_elementsize)
-			,m_element(o.m_element){}
-
-		Node( int p, int t, int size, int e)
-			:m_parent(p)
-			,m_tag(t)
-			,m_elementsize(size)
-			,m_element(e){}
-
-		bool operator == (const Node& o) const;
-		bool operator != (const Node& o) const		{return !operator==(o);}
-
-		static int ref_element( std::size_t idx)	{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return -(int)idx;}
-		static int val_element( std::size_t idx)	{if (idx >= (std::size_t)std::numeric_limits<int>::max()) throw std::bad_alloc(); return (int)idx;}
-
-		std::size_t childidx() const			{return (m_element < 0)?(std::size_t)-m_element:0;}
-		std::size_t nofchild() const			{return (m_element < 0)?(std::size_t)m_elementsize:0;}
-		std::size_t valueidx() const			{return (m_element > 0)?(std::size_t)m_element:0;}
-		std::size_t valuesize() const			{return (m_element > 0)?(std::size_t)m_elementsize:0;}
-	};
-
-	Node root() const;
-	void next( const Node& nd, int tag, std::vector<Node>& rt) const;
-	void find( const Node& nd, int tag, std::vector<Node>& rt) const;
-	void up( const Node& nd, std::vector<Node>& rt) const;
-	const char* nodevalue( const Node& nd) const;
-
-	const std::string tostring() const;
-
-protected:
-	void setParentLinks( std::size_t mi);
-	void openTag( const char* tag, std::size_t tagsize);
-	void openTag( const std::string& tag);
-	void closeTag();
-	void createRootNode();
-	void pushValue( const char* val, std::size_t valsize);
-	void pushValue( const std::string& val);
-	void check() const;
-
-private:
-	types::TypedArrayDoublingAllocator<Node> m_nodemem;
-	types::TypedArrayDoublingAllocator<char> m_strmem;
-	const TagTable* m_tagmap;
-	std::size_t m_rootidx;
-	std::size_t m_rootsize;
-	typedef std::vector< std::vector<Node> > BuildNodeStruct;
-	BuildNodeStruct m_data;
-};
-
-
-class Path
-{
-public:
-	enum ElementType
-	{
-		Next,
-		Find,
-		Up,
-		Result
-	};
-
-	static const char* elementTypeName( ElementType i)
-	{
-		static const char* ar[] ={"Next","Find","Current","Up","Result"};
-		return ar[(int)i];
-	}
-
-	struct Element
-	{
-		ElementType m_type;
-		int m_tag;
-	};
-
-	Path(){}
-	Path( const std::string& src, TagTable* tagmap);
-	Path( const Path& o);
-	std::string tostring() const;
-
-	std::size_t resultReference() const;
-	void selectNodes( const Structure& st, const Structure::Node& nd, std::vector<Structure::Node>& ar) const;
-
-	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
-	std::vector<Element>::const_iterator end() const		{return m_path.end();}
-	std::size_t size() const					{return m_path.size();}
-
-private:
-	std::vector<Element> m_path;
-};
-
-
-class FunctionCall
-{
-public:
-	FunctionCall(){}
-	FunctionCall( const FunctionCall& o);
-	FunctionCall( const std::string& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg);
-
-	const Path& selector() const			{return m_selector;}
-	const std::vector<Path>& arg() const		{return m_arg;}
-	const std::string& name() const			{return m_name;}
-	const std::string& resultname() const		{return m_resultname;}
-	void resultname( const char* r)			{m_resultname = r;}
-
-	bool hasResultReference() const;
-
-private:
-	std::string m_resultname;
-	std::string m_name;
-	Path m_selector;
-	std::vector<Path> m_arg;
-};
-
+class DatabaseTransactionFunction;
 
 class TransactionFunctionOutput
 	:public langbind::TypedInputFilter
 {
 public:
 	TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& data_);
-	virtual ~TransactionFunctionOutput(){}
+	virtual ~TransactionFunctionOutput();
 
 	virtual bool getNext( ElementType& type, TypedFilterBase::Element& element);
 
 private:
-	int m_state;
-	int m_rowidx;
-	int m_colidx;
-	int m_colend;
-	std::string m_rootname;
-	std::vector<std::string> m_resname;
-	db::TransactionOutput::result_iterator m_resitr;
-	db::TransactionOutput::result_iterator m_resend;
-	db::TransactionOutput::row_iterator m_rowitr;
-	db::TransactionOutput::row_iterator m_rowend;
-	db::TransactionOutput m_data;
+	struct Impl;
+	Impl* m_impl;
 };
 
 
-class DatabaseTransactionFunction;
-
 class TransactionFunctionInput
 	:public langbind::TypedOutputFilter
-	,public Structure
 {
 public:
+	class Structure;
+
 	explicit TransactionFunctionInput( const DatabaseTransactionFunction* func_);
 	TransactionFunctionInput( const TransactionFunctionInput& o);
-	virtual ~TransactionFunctionInput(){}
+	virtual ~TransactionFunctionInput();
 
 	virtual bool print( ElementType type, const Element& element);
 	virtual TransactionInput get() const;
 
+	const Structure& structure() const
+	{
+		return *m_structure;
+	}
+
 private:
+	Structure* m_structure;
 	const DatabaseTransactionFunction* m_func;
 	langbind::TypedInputFilter::ElementType m_lasttype;
 };
@@ -293,35 +136,22 @@ class DatabaseTransactionFunction
 public:
 	DatabaseTransactionFunction( const DatabaseTransactionFunction& o);
 	DatabaseTransactionFunction( const std::vector<TransactionDescription>& description);
-	virtual ~DatabaseTransactionFunction(){}
+	virtual ~DatabaseTransactionFunction();
 
-	virtual langbind::TypedOutputFilter* getInput() const
-	{
-		return new TransactionFunctionInput( this);
-	}
+	virtual langbind::TypedOutputFilter* getInput() const;
+	virtual langbind::TypedInputFilter* getOutput( const db::TransactionOutput& o) const;
 
-	virtual langbind::TypedInputFilter* getOutput( const db::TransactionOutput& o) const
-	{
-		return new TransactionFunctionOutput( m_resultname, m_elemname, o);
-	}
+	class TagTable;
+	const TagTable* tagmap() const;
 
-	const TagTable* tagmap() const
+	struct Impl;
+	const Impl& impl() const
 	{
-		return &m_tagmap;
-	}
-
-	const std::vector<FunctionCall>& call() const
-	{
-		return m_call;
+		return *m_impl;
 	}
 
 private:
-	TransactionInput databaseTransactionInput( const TransactionFunctionInput&) const;
-
-	std::string m_resultname;
-	std::vector<std::string> m_elemname;
-	std::vector<FunctionCall> m_call;
-	TagTable m_tagmap;
+	Impl* m_impl;
 };
 
 ///\brief Creates a database transaction function from its description source
