@@ -221,13 +221,17 @@ TransactionFunctionClosure::TransactionFunctionClosure( const proc::ProcessorPro
 	:m_provider(p)
 	,m_func(f)
 	,m_state(0)
-	,m_inputstruct(f->getInput()){}
+	,m_inputstructptr(f->getInput())
+{
+	m_inputstruct.reset( m_inputstructptr);
+}
 
 TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctionClosure& o)
 	:m_provider(o.m_provider)
 	,m_func(o.m_func)
 	,m_state(o.m_state)
 	,m_input(o.m_input)
+	,m_inputstructptr(o.m_inputstructptr)
 	,m_inputstruct(o.m_inputstruct)
 	,m_result(o.m_result){}
 
@@ -248,12 +252,7 @@ bool TransactionFunctionClosure::call()
 				throw std::runtime_error( "failed to allocate transaction object");
 			}
 			types::CountedReference<db::Transaction> trsr( trs);
-			db::TransactionFunctionInput* trsinput = dynamic_cast<db::TransactionFunctionInput*>( m_inputstruct.get());
-			if (!trsinput)
-			{
-				throw std::logic_error( "input of transaction has wrong type");
-			}
-			trs->putInput( trsinput->get());
+			trs->putInput( m_inputstructptr->get());
 			trs->execute();
 			m_result.reset( m_func->getOutput( trs->getResult()));
 			m_state = 3;
@@ -266,7 +265,7 @@ bool TransactionFunctionClosure::call()
 
 void TransactionFunctionClosure::init( const TypedInputFilterR& i)
 {
-	m_inputstruct.reset( m_func->getInput());
+	m_inputstruct.reset( m_inputstructptr = m_func->getInput());
 	m_input.init( i, m_inputstruct);
 	m_state = 1;
 }

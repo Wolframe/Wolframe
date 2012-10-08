@@ -285,6 +285,7 @@ private:
 	const db::TransactionFunction* m_func;		//< function to execute
 	int m_state;					//< current state of call
 	RedirectFilterClosure m_input;			//< builder of structure from input
+	db::TransactionFunctionInput* m_inputstructptr;	//< input structure implementation interface
 	TypedOutputFilterR m_inputstruct;		//< input structure
 	TypedInputFilterR m_result;			//< function call result
 };

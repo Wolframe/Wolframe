@@ -1077,12 +1077,12 @@ const TransactionFunction::TagTable* TransactionFunction::tagmap() const
 	return &m_impl->m_tagmap;
 }
 
-langbind::TypedOutputFilter* TransactionFunction::getInput() const
+TransactionFunctionInput* TransactionFunction::getInput() const
 {
 	return new TransactionFunctionInput( this);
 }
 
-langbind::TypedInputFilter* TransactionFunction::getOutput( const db::TransactionOutput& o) const
+TransactionFunctionOutput* TransactionFunction::getOutput( const db::TransactionOutput& o) const
 {
 	return new TransactionFunctionOutput( m_impl->m_resultname, m_impl->m_elemname, o);
 }

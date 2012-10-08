@@ -136,8 +136,8 @@ public:
 	TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description);
 	virtual ~TransactionFunction();
 
-	virtual langbind::TypedOutputFilter* getInput() const;
-	virtual langbind::TypedInputFilter* getOutput( const db::TransactionOutput& o) const;
+	virtual TransactionFunctionInput* getInput() const;
+	virtual TransactionFunctionOutput* getOutput( const db::TransactionOutput& o) const;
 
 	const std::string& name() const			{return m_name;}
 	void name( const std::string& name_)		{m_name = name_;}
