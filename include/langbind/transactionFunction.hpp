@@ -36,28 +36,20 @@
 #define _LANGBIND_TRANSACTION_FUNCTION_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
 #include "types/countedReference.hpp"
-
-///\brief Forward declaration
-namespace _Wolframe {
-namespace proc {
-class ProcessorProvider;
-}}
+#include "types/countedReference.hpp"
+#include "database/transactionInput.hpp"
+#include "database/transactionOutput.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
 struct TransactionFunction
 {
-	typedef TypedInputFilter Result;
-	typedef types::CountedReference<Result> ResultR;
-	typedef TypedOutputFilter Input;
-	typedef types::CountedReference<Input> InputR;
-
 	TransactionFunction(){}
 	virtual ~TransactionFunction(){}
 
-	virtual InputR getInput() const=0;
-	virtual ResultR execute( const Input* i) const=0;
+	virtual TypedOutputFilter* getInput() const=0;
+	virtual TypedInputFilter* getOutput( const db::TransactionOutput& o) const=0;
 
 	const std::string& name() const		{return m_name;}
 	void name( const std::string& name_)	{m_name = name_;}
@@ -68,9 +60,9 @@ private:
 
 typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
 
-///\param[in] provider_ processor provider to get the database to use for transactions
+///\brief Creates a database transaction function from its description source
 ///\param[in] description transaction description source
-typedef TransactionFunction* (*CreateTransactionFunction)( const proc::ProcessorProvider* provider_, const std::string& description);
+typedef TransactionFunction* (*CreateTransactionFunction)( const std::string& description);
 
 }}
 #endif

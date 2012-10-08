@@ -35,6 +35,7 @@
 #ifndef _TESTTRACE_FAKE_DATABASE_HPP_INCLUDED
 #define _TESTTRACE_FAKE_DATABASE_HPP_INCLUDED
 #include "database/database.hpp"
+#include "database/program.hpp"
 #include "config/configurationBase.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "constructor.hpp"
@@ -63,19 +64,21 @@ public:
 		return TESTTRACE_DATABASE_CLASSNAME;
 	}
 
-	bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules);
-	bool check() const;
+	virtual bool parse( const config::ConfigurationTree& pt, const std::string& node, const module::ModulesDirectory* modules);
+	virtual bool check() const;
 	void print( std::ostream& os, size_t indent) const;
-	void setCanonicalPathes( const std::string& referencePath);
+	virtual void setCanonicalPathes( const std::string& referencePath);
 
-	const std::string& filename() const		{return m_data.filename;}
+	const std::string& resultfilename() const	{return m_data.resultfilename;}
+	const std::string& programfilename() const	{return m_data.programfilename;}
 	const std::string& outfilename() const		{return m_data.outfilename;}
 	const std::string& id() const			{return m_data.id;}
 
 private:
 	struct Data
 	{
-		std::string filename;
+		std::string resultfilename;
+		std::string programfilename;
 		std::string outfilename;
 		std::string id;
 		static const serialize::StructDescriptionBase* getStructDescription();
@@ -91,7 +94,7 @@ class TesttraceDatabase
 	,public DatabaseUnit
 {
 public:
-	TesttraceDatabase( const std::string& id_, const std::string& filename_, const std::string& outfilename_, unsigned short, bool);
+	TesttraceDatabase( const std::string& id_, const std::string& programfilename_, const std::string& resultfilename_, const std::string& outfilename_, unsigned short, bool);
 
 	virtual ~TesttraceDatabase(){}
 
@@ -112,10 +115,12 @@ public:
 
 	virtual Transaction* transaction( const std::string& /*name*/);
 
-	bool loadProgram()
+	virtual const langbind::TransactionFunction* transactionFunction( const std::string& name )
 	{
-		return true;
+		return m_program.function( name);
 	}
+
+	virtual bool loadProgram();
 
 	const std::string& outfilename() const
 	{
@@ -126,6 +131,8 @@ private:
 	std::string m_id;
 	std::string m_outfilename;
 	std::vector<std::string> m_result;
+	db::Program m_program;
+	std::string m_programsrc;
 };
 
 
@@ -147,7 +154,7 @@ public:
 	virtual TesttraceDatabase* object( const config::NamedConfiguration& conf_)
 	{
 		const TesttraceDatabaseConfig& conf = dynamic_cast<const TesttraceDatabaseConfig&>( conf_);
-		return new TesttraceDatabase( conf.id(), conf.filename(), conf.outfilename(), 0, false);
+		return new TesttraceDatabase( conf.id(), conf.programfilename(), conf.resultfilename(), conf.outfilename(), 0, false);
 	}
 };
 

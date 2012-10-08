@@ -46,7 +46,6 @@
 #include "module/ddlcompilerBuilder.hpp"
 #include "module/printFunctionBuilder.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
-#include "module/transactionFunctionBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 
 #include <list>
@@ -59,7 +58,6 @@ class ProcessorProvider::ProcessorProvider_Impl
 {
 public:
 	ProcessorProvider_Impl( const ProcProviderConfig* conf,
-				const ProcessorProvider* ownInterface,
 				const module::ModulesDirectory* modules );
 	~ProcessorProvider_Impl();
 
@@ -72,7 +70,6 @@ public:
 	langbind::FormFunction* formfunction( const std::string& name ) const;
 	const ddl::Form* form( const std::string& name ) const;
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
-	const langbind::TransactionFunction* transactionFunction( const std::string& name) const;
 	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
 
 	db::Database* transactionDatabase() const	{ return m_db; }
@@ -80,12 +77,15 @@ public:
 							{ if ( m_db ) return m_db->transaction( name );
 							  else return NULL;
 							}
+	const langbind::TransactionFunction* transactionFunction( const std::string& name ) const
+							{ if ( m_db ) return m_db->transactionFunction( name );
+							  else return NULL;
+							}
 
 private:
 	class DDLTypeMap;
 	bool loadForm( const std::string& ddlname, const std::string& dataDefinitionFilename);
 	bool loadPrintFunction( const std::string& name, const std::string& type, const std::string& layoutFilename);
-	bool declareTransactionFunction( const std::string& name, const std::string& type, const std::string& command);
 	bool declareNormalizeFunction( const std::string& name, const std::string& type, const std::string& command);
 	bool declareFunctionName( const std::string& name, const char* typestr);
 
@@ -108,10 +108,6 @@ private:
 	std::list< module::NormalizeFunctionConstructor* >	m_normalizeFunctionCompiler;
 	std::map< std::string, const module::NormalizeFunctionConstructor* >	m_normalizeFunctionCompilerMap;
 	std::map< std::string, langbind::NormalizeFunctionR>	m_normalizeFunctionMap;
-
-	std::list< module::TransactionFunctionConstructor* >	m_transactionFunctionCompiler;
-	std::map< std::string, const module::TransactionFunctionConstructor* >	m_transactionFunctionCompilerMap;
-	std::map< std::string, langbind::TransactionFunctionR>	m_transactionFunctionMap;
 
 	std::list< module::PrintFunctionConstructor* >	m_printFunctionCompiler;
 	std::map< std::string, const module::PrintFunctionConstructor* >	m_printFunctionCompilerMap;

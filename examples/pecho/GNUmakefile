@@ -15,6 +15,7 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(BOOST_LIB_DIR)
 
@@ -25,6 +26,7 @@ INCLUDE_LIBS = \
 	-lboost_filesystem \
 	-lwolframe \
 	-lwolframe_serialize \
+	-lwolframe_database \
 	-lwolframe_langbind \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(TOPDIR)/wtest/wolftest.a \

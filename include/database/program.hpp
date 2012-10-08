@@ -50,9 +50,8 @@ class Program
 {
 public:
 	///\brief Constructor
-	Program( const proc::ProcessorProvider* provider_)
-		:m_commentopr("--")
-		,m_provider(provider_){}
+	Program()
+		:m_commentopr("--"){}
 	///\brief Destructor
 	virtual ~Program(){}
 
@@ -101,7 +100,6 @@ public:
 private:
 	std::map<std::string, langbind::TransactionFunctionR> m_functionmap;
 	std::string m_commentopr;
-	const proc::ProcessorProvider* m_provider;
 };
 
 typedef types::CountedReference<Program> ProgramR;

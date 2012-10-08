@@ -43,6 +43,7 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(TOPDIR)/src/libwolframe_functions \
 	-L$(TOPDIR)/src/libwolframe_prnt \
@@ -54,6 +55,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframe.a \
 	-lwolframe \
 	-lwolframe_serialize \
+	-lwolframe_database \
 	-lwolframe_langbind \
 	-lwolframe_functions \
 	-lwolframe_prnt \

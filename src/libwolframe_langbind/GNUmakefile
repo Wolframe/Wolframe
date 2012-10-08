@@ -11,6 +11,7 @@ INCLUDE_CXXFLAGS =
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_serialize
 
 INCLUDE_DIRS = \
@@ -19,7 +20,7 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
-	-lwolframe -lwolframe_serialize \
+	-lwolframe -lwolframe_serialize -lwolframe_database \
 	-lboost_filesystem
 
 STATIC_LIB = libwolframe_langbind.a

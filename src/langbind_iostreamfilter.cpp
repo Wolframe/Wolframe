@@ -339,7 +339,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
-			TransactionFunctionClosure closure( func);
+			TransactionFunctionClosure closure( provider, func);
 			closure.init( inp);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);

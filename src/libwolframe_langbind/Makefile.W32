@@ -16,7 +16,8 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
-INCLUDE_LIBS =
+INCLUDE_LIBS = \
+	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 
 LIBRARIES = \
 	wolframe_langbind.lib

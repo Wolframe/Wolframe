@@ -307,7 +307,7 @@ ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
 				      const module::ModulesDirectory* modules )
 	: m_impl(0)
 {
-	m_impl = new ProcessorProvider_Impl( conf, this, modules );
+	m_impl = new ProcessorProvider_Impl( conf, modules );
 }
 
 ProcessorProvider::~ProcessorProvider()

@@ -11,4 +11,5 @@ testcmd="$opt run"					# command to execute by the test
 testscripts="$luascript"				# list of scripts of the test
 docin=employee_assignment_print				# input document name
 docout=lua_ddlform_iterator				# output document name
+disabled=1
 . ./output_tst_all.sh

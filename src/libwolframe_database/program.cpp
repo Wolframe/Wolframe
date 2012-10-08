@@ -33,7 +33,7 @@
 ///\brief Implemention of programs for the database
 ///\file libwolframe_database/program.hpp
 #include "database/program.hpp"
-#include "langbind/databaseTransactionFunction.hpp"
+#include "database/databaseTransactionFunction.hpp"
 #include "utils/miscUtils.hpp"
 #include <boost/algorithm/string.hpp>
 
@@ -157,7 +157,7 @@ void Program::load( const std::string& source)
 	std::string::const_iterator si = source.begin(), se = source.end();
 	std::string dbsource;
 	std::string::const_iterator dbi = source.begin();
-	std::vector<std::vector< langbind::TransactionDescription> > tdar;
+	std::vector<std::vector< TransactionDescription> > tdar;
 	std::vector<std::string> tdnamear;
 	std::vector<std::vector<std::string::const_iterator> > tdsrcar;
 	std::vector<std::string::const_iterator> tstartar;
@@ -195,9 +195,9 @@ void Program::load( const std::string& source)
 			}
 			tdnamear.push_back( tok);
 			tdsrcar.push_back( std::vector<std::string::const_iterator>());
-			tdar.push_back( std::vector<langbind::TransactionDescription>());
+			tdar.push_back( std::vector<TransactionDescription>());
 
-			langbind::TransactionDescription desc;
+			TransactionDescription desc;
 			unsigned int mask = 0;
 
 			ch = utils::parseNextToken( tok, si, se, g_optab);
@@ -237,12 +237,12 @@ void Program::load( const std::string& source)
 				}
 				else if (boost::algorithm::iequals( tok, "WITH"))
 				{
-					if (0 != (mask & (1 << (unsigned)langbind::TransactionDescription::Selector)))
+					if (0 != (mask & (1 << (unsigned)TransactionDescription::Selector)))
 					{
 						throw Error( LineInfo( source.begin(), si),
 								"selector (WITH ..) specified twice in a transaction description");
 					}
-					mask |= (1 << (unsigned)langbind::TransactionDescription::Selector);
+					mask |= (1 << (unsigned)TransactionDescription::Selector);
 
 					ch = utils::parseNextToken( desc.selector, si, se);
 					if (!ch) throw Error( LineInfo( source.begin(), si),
@@ -250,12 +250,12 @@ void Program::load( const std::string& source)
 				}
 				else if (boost::algorithm::iequals( tok, "INTO"))
 				{
-					if (0 != (mask & (1 << (unsigned)langbind::TransactionDescription::Output)))
+					if (0 != (mask & (1 << (unsigned)TransactionDescription::Output)))
 					{
 						throw Error( LineInfo( source.begin(), si),
 								"function result (INTO ..) specified twice in a transaction description");
 					}
-					mask |= (1 << (unsigned)langbind::TransactionDescription::Output);
+					mask |= (1 << (unsigned)TransactionDescription::Output);
 
 					ch = utils::parseNextToken( desc.output, si, se);
 					if (!ch) throw Error( LineInfo( source.begin(), si),
@@ -263,12 +263,12 @@ void Program::load( const std::string& source)
 				}
 				else if (boost::algorithm::iequals( tok, "DO"))
 				{
-					if (0 != (mask & (1 << (unsigned)langbind::TransactionDescription::Call)))
+					if (0 != (mask & (1 << (unsigned)TransactionDescription::Call)))
 					{
 						throw Error( LineInfo( source.begin(), si),
 								"function call (DO ..) specified twice in a transaction description");
 					}
-					mask |= (1 << (unsigned)langbind::TransactionDescription::Call);
+					mask |= (1 << (unsigned)TransactionDescription::Call);
 
 					int st = 0;
 					std::string::const_iterator fcallstart = si;
@@ -324,7 +324,7 @@ void Program::load( const std::string& source)
 	}
 	loadDatabasePart( dbsource);
 
-	std::vector<std::vector< langbind::TransactionDescription> >::const_iterator di = tdar.begin(), de = tdar.end();
+	std::vector<std::vector< TransactionDescription> >::const_iterator di = tdar.begin(), de = tdar.end();
 	std::vector<std::string>::const_iterator ni = tdnamear.begin();
 	std::vector<std::vector< std::string::const_iterator> >::const_iterator pi = tdsrcar.begin();
 
@@ -333,20 +333,20 @@ void Program::load( const std::string& source)
 		try
 		{
 			std::string name = boost::algorithm::to_lower_copy( *ni);
-			m_functionmap[ name] = langbind::TransactionFunctionR( createDatabaseTransactionFunction( m_provider, *di));
+			m_functionmap[ name] = langbind::TransactionFunctionR( createDatabaseTransactionFunction( *di));
 		}
-		catch (const langbind::TransactionDescription::Error& err)
+		catch (const TransactionDescription::Error& err)
 		{
 			std::string errlocation;
 			switch (err.elemname)
 			{
-				case langbind::TransactionDescription::Selector:
+				case TransactionDescription::Selector:
 					errlocation = "in selector expression (WITH ..)";
 				break;
-				case langbind::TransactionDescription::Output:
+				case TransactionDescription::Output:
 					errlocation = "in transaction ouput (INTO ..)";
 				break;
-				case langbind::TransactionDescription::Call:
+				case TransactionDescription::Call:
 					errlocation = "in transaction call (DO ..)";
 				break;
 			}

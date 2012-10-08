@@ -36,6 +36,7 @@
 #define _LANGBIND_DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
 #include "types/allocators.hpp"
 #include "langbind/transactionFunction.hpp"
+#include "filter/typedfilter.hpp"
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
 #include <string>
@@ -45,7 +46,7 @@
 #include <stdexcept>
 
 namespace _Wolframe {
-namespace langbind {
+namespace db {
 
 class TagTable
 {
@@ -202,19 +203,17 @@ private:
 };
 
 
-class TransactionFunctionResult
-	:public TransactionFunction::Result
-	,public db::TransactionOutput
+class TransactionFunctionOutput
+	:public langbind::TypedInputFilter
 {
 public:
-	TransactionFunctionResult( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& o);
-	virtual ~TransactionFunctionResult(){}
+	TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& data_);
+	virtual ~TransactionFunctionOutput(){}
 
 	virtual bool getNext( ElementType& type, TypedFilterBase::Element& element);
 
 private:
 	int m_state;
-	int m_residx;
 	int m_rowidx;
 	int m_colidx;
 	int m_colend;
@@ -224,22 +223,27 @@ private:
 	db::TransactionOutput::result_iterator m_resend;
 	db::TransactionOutput::row_iterator m_rowitr;
 	db::TransactionOutput::row_iterator m_rowend;
+	db::TransactionOutput m_data;
 };
 
 
+class DatabaseTransactionFunction;
+
 class TransactionFunctionInput
-	:public TransactionFunction::Input
+	:public langbind::TypedOutputFilter
 	,public Structure
 {
 public:
-	explicit TransactionFunctionInput( const TagTable* tagmap);
+	explicit TransactionFunctionInput( const DatabaseTransactionFunction* func_);
 	TransactionFunctionInput( const TransactionFunctionInput& o);
 	virtual ~TransactionFunctionInput(){}
 
 	virtual bool print( ElementType type, const Element& element);
+	virtual TransactionInput get() const;
 
 private:
-	TypedInputFilter::ElementType m_lasttype;
+	const DatabaseTransactionFunction* m_func;
+	langbind::TypedInputFilter::ElementType m_lasttype;
 };
 
 
@@ -284,28 +288,45 @@ struct TransactionDescription
 };
 
 class DatabaseTransactionFunction
-	:public TransactionFunction
+	:public langbind::TransactionFunction
 {
 public:
 	DatabaseTransactionFunction( const DatabaseTransactionFunction& o);
-	DatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::vector<TransactionDescription>& description);
+	DatabaseTransactionFunction( const std::vector<TransactionDescription>& description);
 	virtual ~DatabaseTransactionFunction(){}
 
-	virtual TransactionFunction::InputR getInput() const;
-	virtual TransactionFunction::ResultR execute( const TransactionFunction::Input* input) const;
+	virtual langbind::TypedOutputFilter* getInput() const
+	{
+		return new TransactionFunctionInput( this);
+	}
+
+	virtual langbind::TypedInputFilter* getOutput( const db::TransactionOutput& o) const
+	{
+		return new TransactionFunctionOutput( m_resultname, m_elemname, o);
+	}
+
+	const TagTable* tagmap() const
+	{
+		return &m_tagmap;
+	}
+
+	const std::vector<FunctionCall>& call() const
+	{
+		return m_call;
+	}
 
 private:
-	db::TransactionInput databaseTransactionInput( const TransactionFunctionInput&) const;
+	TransactionInput databaseTransactionInput( const TransactionFunctionInput&) const;
 
 	std::string m_resultname;
+	std::vector<std::string> m_elemname;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
-	const proc::ProcessorProvider* m_provider;
 };
 
-///\param[in] provider_ processor provider interface
+///\brief Creates a database transaction function from its description source
 ///\param[in] description transaction description source
-TransactionFunction* createDatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::vector<TransactionDescription>& description);
+langbind::TransactionFunction* createDatabaseTransactionFunction( const std::vector<TransactionDescription>& description);
 
 }}//namespace
 #endif

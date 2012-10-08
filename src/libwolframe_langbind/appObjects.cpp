@@ -39,10 +39,7 @@ Project Wolframe.
 #include "utils/miscUtils.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
-#include "filter/blob_filter.hpp"
-#include "filter/char_filter.hpp"
-#include "filter/line_filter.hpp"
-#include "filter/token_filter.hpp"
+#include "database/databaseTransactionFunction.hpp"
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <cctype>
@@ -221,13 +218,15 @@ bool FormFunctionClosure::call()
 }
 
 
-TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunction* f)
-	:m_func(f)
+TransactionFunctionClosure::TransactionFunctionClosure( const proc::ProcessorProvider* p, const TransactionFunction* f)
+	:m_provider(p)
+	,m_func(f)
 	,m_state(0)
 	,m_inputstruct(f->getInput()){}
 
 TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctionClosure& o)
-	:m_func(o.m_func)
+	:m_provider(o.m_provider)
+	,m_func(o.m_func)
 	,m_state(o.m_state)
 	,m_input(o.m_input)
 	,m_inputstruct(o.m_inputstruct)
@@ -243,9 +242,24 @@ bool TransactionFunctionClosure::call()
 			if (!m_input.call()) return false;
 			m_state = 2;
 		case 2:
-			m_result = m_func->execute( m_inputstruct.get());
+		{
+			db::Transaction* trs = m_provider->transaction( m_func->name());
+			if (!trs)
+			{
+				throw std::runtime_error( "failed to allocate transaction object");
+			}
+			types::CountedReference<db::Transaction> trsr( trs);
+			db::TransactionFunctionInput* trsinput = dynamic_cast<db::TransactionFunctionInput*>( m_inputstruct.get());
+			if (!trsinput)
+			{
+				throw std::logic_error( "input of transaction has wrong type");
+			}
+			trs->putInput( trsinput->get());
+			trs->execute();
+			m_result.reset( m_func->getOutput( trs->getResult()));
 			m_state = 3;
 			return true;
+		}
 		default:
 			return true;
 	}
@@ -253,7 +267,7 @@ bool TransactionFunctionClosure::call()
 
 void TransactionFunctionClosure::init( const TypedInputFilterR& i)
 {
-	m_inputstruct = m_func->getInput();
+	m_inputstruct.reset( m_func->getInput());
 	m_input.init( i, m_inputstruct);
 	m_state = 1;
 }

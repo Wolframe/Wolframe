@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = libwolframe libwolframe_serialize libwolframe_langbind libwolframe_functions libwolframe_prnt libwolframe_database modules
+SUBDIRS = libwolframe libwolframe_serialize libwolframe_database libwolframe_langbind libwolframe_functions libwolframe_prnt modules
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
@@ -10,6 +10,7 @@ INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind
 
 INCLUDE_DIRS = \
@@ -20,6 +21,7 @@ INCLUDE_DIRS = \
 INCLUDE_LIBS = \
 	-lwolframe \
 	-lwolframe_serialize \
+	-lwolframe_database \
 	-lwolframe_langbind \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
 	-lboost_program_options \

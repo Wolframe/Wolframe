@@ -37,6 +37,7 @@ Project Wolframe.
 #include "langbind/appFormFunction.hpp"
 #include "langbind/transactionFunction.hpp"
 #include "prnt/printFunction.hpp"
+#include "processor/procProvider.hpp"
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
@@ -261,7 +262,7 @@ class TransactionFunctionClosure
 public:
 	///\brief Constructor
 	///\param[in] f function called
-	TransactionFunctionClosure( const TransactionFunction* f);
+	TransactionFunctionClosure( const proc::ProcessorProvider* provider_, const TransactionFunction* f);
 
 	///\brief Copy constructor
 	///\param[in] o copied item
@@ -275,14 +276,18 @@ public:
 	///\param[in] i call input
 	void init( const TypedInputFilterR& i);
 
-	const TransactionFunction::ResultR& result() const	{return m_result;}
+	const TypedInputFilterR& result() const
+	{
+		return m_result;
+	}
 
 private:
+	const proc::ProcessorProvider* m_provider;	//< processor provider to get transaction object
 	const TransactionFunction* m_func;		//< function to execute
 	int m_state;					//< current state of call
 	RedirectFilterClosure m_input;			//< builder of structure from input
-	TransactionFunction::InputR m_inputstruct;	//< input structure
-	TransactionFunction::ResultR m_result;		//< function call result
+	TypedOutputFilterR m_inputstruct;		//< input structure
+	TypedInputFilterR m_result;			//< function call result
 };
 
 ///\class PrintFunctionClosure

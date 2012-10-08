@@ -1,6 +1,6 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = employee_assignment_convert database transaction
+SUBDIRS = employee_assignment_convert database
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

@@ -955,7 +955,7 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 	const TransactionFunction* tf = ctx->transactionFunction( name);
 	if (tf)
 	{
-		LuaObject<TransactionFunctionClosure>::push_luastack( ls, TransactionFunctionClosure( tf));
+		LuaObject<TransactionFunctionClosure>::push_luastack( ls, TransactionFunctionClosure( ctx, tf));
 		lua_pushcclosure( ls, function_transactionfunction_call, 1);
 		return 1;
 	}

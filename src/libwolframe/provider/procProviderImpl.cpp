@@ -58,7 +58,6 @@ namespace proc {
 
 //**** Processor Provider PIMPL Implementation ******************************
 ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf,
-								   const ProcessorProvider* ownInterface,
 								   const module::ModulesDirectory* modules )
 {
 	m_db = NULL;
@@ -221,31 +220,6 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				break;
 			}
 
-			case ObjectConstructorBase::TRANSACTION_FUNCTION_OBJECT:
-			{	// object is a transaction function compiler
-				module::TransactionFunctionConstructor* ffo = dynamic_cast< module::TransactionFunctionConstructor* >((*it)->constructor());
-				if ( ffo == NULL )
-				{
-					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not a transaction function compiler";
-					throw std::logic_error( "Object is not a transaction function compiler. See log." );
-				}
-				else	{
-					std::string name = ffo->objectClassName();
-					boost::algorithm::to_upper( name);
-					std::map< std::string, const module::TransactionFunctionConstructor* >::const_iterator itr = m_transactionFunctionCompilerMap.find( name );
-					if ( itr != m_transactionFunctionCompilerMap.end() )	{
-						LOG_FATAL << "Duplicate transaction function compiler name '" << name << "'";
-						throw std::runtime_error( "Duplicate transaction function compiler name" );
-					}
-					m_transactionFunctionCompiler.push_back( ffo );
-					m_transactionFunctionCompilerMap[ name ] = ffo;
-
-					LOG_TRACE << "'" << name << "' transaction function compiler registered";
-				}
-				break;
-			}
-
 			case ObjectConstructorBase::PRINT_FUNCTION_OBJECT:
 			{	// object is a print function compiler
 				module::PrintFunctionConstructor* ffo = dynamic_cast< module::PrintFunctionConstructor* >((*it)->constructor());
@@ -311,13 +285,6 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 		}
 	}
-	///Set link to processor provider for objects that need it:
-	std::list<module::TransactionFunctionConstructor*>::const_iterator ti = m_transactionFunctionCompiler.begin(), te = m_transactionFunctionCompiler.end();
-	for (; ti != te; ++ti)
-	{
-		(*ti)->setProvider( ownInterface);
-	}
-
 	// Build the list of configured objects in the processor environment:
 	bool success = true;
 	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=conf->m_environment.normalize.begin(), ee=conf->m_environment.normalize.end(); ii != ee; ++ii)
@@ -331,10 +298,6 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	for (std::vector<langbind::PrintLayoutConfigStruct>::const_iterator ii=conf->m_environment.printlayout.begin(), ee=conf->m_environment.printlayout.end(); ii != ee; ++ii)
 	{
 		success &= loadPrintFunction( ii->name, ii->type, ii->file);
-	}
-	for (std::vector<langbind::TransactionFunctionConfigStruct>::const_iterator ii=conf->m_environment.transaction.begin(), ee=conf->m_environment.transaction.end(); ii != ee; ++ii)
-	{
-		success &= declareTransactionFunction( ii->name, ii->type, ii->call);
 	}
 	if (!success)
 	{
@@ -363,10 +326,6 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 
 	for ( std::list< module::NormalizeFunctionConstructor* >::iterator it = m_normalizeFunctionCompiler.begin();
 							it != m_normalizeFunctionCompiler.end(); ++it )
-		delete *it;
-
-	for ( std::list< module::TransactionFunctionConstructor* >::iterator it = m_transactionFunctionCompiler.begin();
-							it != m_transactionFunctionCompiler.end(); ++it )
 		delete *it;
 
 	for ( std::list< module::PrintFunctionConstructor* >::iterator it = m_printFunctionCompiler.begin();
@@ -574,57 +533,11 @@ bool ProcessorProvider::ProcessorProvider_Impl::declareNormalizeFunction( const 
 	}
 }
 
-bool ProcessorProvider::ProcessorProvider_Impl::declareTransactionFunction( const std::string& name, const std::string& type, const std::string& command)
-{
-	try
-	{
-		std::string key = boost::algorithm::to_upper_copy( type);
-		std::map< std::string, const module::TransactionFunctionConstructor*>::const_iterator itr = m_transactionFunctionCompilerMap.find( key);
-		if (itr == m_transactionFunctionCompilerMap.end())
-		{
-			LOG_ERROR << "Cannot declare transaction function '" << name << "'. Transaction function type '" << type << "' is not defined";
-			return false;
-		}
-		langbind::TransactionFunctionR funcp( itr->second->object( command));
-		funcp->name( name);
-		std::string funckey( boost::algorithm::to_upper_copy( name));
-
-		std::map< std::string, langbind::TransactionFunctionR>::const_iterator ip = m_transactionFunctionMap.find( funckey);
-		if (ip != m_transactionFunctionMap.end())
-		{
-			LOG_ERROR << "Duplicate definition of transaction function with name '" << name << "'";
-			return false;
-		}
-		if (!declareFunctionName( name, "transaction function name"))
-		{
-			return false;
-		}
-		m_transactionFunctionMap[ funckey] = funcp;
-		LOG_TRACE << "Transaction function '" << name << "' (" << type << ") declared";
-		return true;
-	}
-	catch (std::exception& e)
-	{
-		LOG_ERROR << "Cannot declare '" << type << "' transaction function '" << name << "': " <<  e.what();
-		return false;
-	}
-}
-
 const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name ) const
 {
 	std::string key = boost::algorithm::to_upper_copy( name);
 	std::map< std::string, langbind::NormalizeFunctionR>::const_iterator itr = m_normalizeFunctionMap.find( key);
 	if ( itr == m_normalizeFunctionMap.end() )
-		return NULL;
-	else
-		return itr->second.get();
-}
-
-const langbind::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transactionFunction( const std::string& name ) const
-{
-	std::string key = boost::algorithm::to_upper_copy( name);
-	std::map< std::string, langbind::TransactionFunctionR>::const_iterator itr = m_transactionFunctionMap.find( key);
-	if ( itr == m_transactionFunctionMap.end() )
 		return NULL;
 	else
 		return itr->second.get();

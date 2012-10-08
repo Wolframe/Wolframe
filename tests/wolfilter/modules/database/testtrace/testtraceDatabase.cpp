@@ -54,7 +54,8 @@ const serialize::StructDescriptionBase* TesttraceDatabaseConfig::Data::getStruct
 		{
 			(*this)
 			( "id",		&This::id)
-			( "file",	&This::filename)
+			( "program",	&This::programfilename)
+			( "file",	&This::resultfilename)
 			( "outfile",	&This::outfilename)
 			;
 		}
@@ -79,9 +80,14 @@ bool TesttraceDatabaseConfig::parse( const config::ConfigurationTree& pt, const 
 
 bool TesttraceDatabaseConfig::check() const
 {
-	if (!m_data.filename.empty() && !utils::fileExists( m_data.filename))
+	if (!m_data.programfilename.empty() && !utils::fileExists( m_data.programfilename))
 	{
-		LOG_ERROR << "Configured file '" << m_data.filename << "' does not exist";
+		LOG_ERROR << "Configured program file '" << m_data.programfilename << "' does not exist";
+		return false;
+	}
+	if (!m_data.resultfilename.empty() && !utils::fileExists( m_data.resultfilename))
+	{
+		LOG_ERROR << "Configured result file '" << m_data.resultfilename << "' does not exist";
 		return false;
 	}
 	if (m_data.outfilename.empty())
@@ -103,9 +109,13 @@ void TesttraceDatabaseConfig::print( std::ostream& os, size_t indent) const
 
 void TesttraceDatabaseConfig::setCanonicalPathes( const std::string& referencePath)
 {
-	if (!m_data.filename.empty())
+	if (!m_data.programfilename.empty())
 	{
-		m_data.filename = utils::getCanonicalPath( m_data.filename, referencePath);
+		m_data.programfilename = utils::getCanonicalPath( m_data.programfilename, referencePath);
+	}
+	if (!m_data.resultfilename.empty())
+	{
+		m_data.resultfilename = utils::getCanonicalPath( m_data.resultfilename, referencePath);
 	}
 	if (!m_data.outfilename.empty())
 	{
@@ -114,13 +124,17 @@ void TesttraceDatabaseConfig::setCanonicalPathes( const std::string& referencePa
 }
 
 
-TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string& filename_, const std::string& outfilename_, unsigned short, bool)
+TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string& programfilename_, const std::string& resultfilename_, const std::string& outfilename_, unsigned short, bool)
 	:m_id(id_)
 	,m_outfilename(outfilename_)
 {
-	if (!filename_.empty())
+	if (!resultfilename_.empty())
 	{
-		m_result = utils::readSourceFileLines( filename_);
+		m_result = utils::readSourceFileLines( resultfilename_);
+	}
+	if (!programfilename_.empty())
+	{
+		m_programsrc = utils::readSourceFileContent( programfilename_);
 	}
 }
 
@@ -129,4 +143,17 @@ Transaction* TesttraceDatabase::transaction( const std::string& /*name*/ )
 	return new TesttraceTransaction( this, m_result);
 }
 
+bool TesttraceDatabase::loadProgram()
+{
+	try
+	{
+		m_program.load( m_programsrc);
+		return true;
+	}
+	catch (std::runtime_error& e)
+	{
+		LOG_ERROR << "failed to load database program: " << e.what();
+		return false;
+	}
+}
 

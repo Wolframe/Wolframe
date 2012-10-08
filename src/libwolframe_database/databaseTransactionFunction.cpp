@@ -31,10 +31,9 @@
 
 ************************************************************************/
 ///\brief Implementation of the builder of transaction input and reader of output
-///\file src/libwolframe_langbind/databaseTransactionFunction.cpp
-#include "langbind/databaseTransactionFunction.hpp"
+///\file databaseTransactionFunction.cpp
+#include "database/databaseTransactionFunction.hpp"
 #include "database/transaction.hpp"
-#include "processor/procProvider.hpp"
 #include "types/countedReference.hpp"
 #include "utils/miscUtils.hpp"
 #include "textwolf/xmlscanner.hpp"
@@ -47,7 +46,7 @@
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
-using namespace _Wolframe::langbind;
+using namespace _Wolframe::db;
 
 static std::string normalizeTagName( const std::string& tagname)
 {
@@ -503,9 +502,9 @@ bool FunctionCall::hasResultReference() const
 DatabaseTransactionFunction::DatabaseTransactionFunction( const DatabaseTransactionFunction& o)
 	:TransactionFunction(o)
 	,m_resultname(o.m_resultname)
+	,m_elemname(o.m_elemname)
 	,m_call(o.m_call)
-	,m_tagmap(o.m_tagmap)
-	,m_provider(o.m_provider){}
+	,m_tagmap(o.m_tagmap){}
 
 static bool isAlphaNumeric( char ch)
 {
@@ -516,15 +515,14 @@ static bool isAlphaNumeric( char ch)
 	return false;
 }
 
-bool checkIdentifier( const std::string& id)
+static bool checkIdentifier( const std::string& id)
 {
 	std::string::const_iterator ii = id.begin(), ie = id.end();
 	while (ii != ie && isAlphaNumeric( *ii)) ++ii;
 	return (ii != ie);
 }
 
-DatabaseTransactionFunction::DatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::vector<TransactionDescription>& description)
-	:m_provider(provider_)
+DatabaseTransactionFunction::DatabaseTransactionFunction( const std::vector<TransactionDescription>& description)
 {
 	typedef TransactionDescription::Error Error;
 	TransactionDescription::ElementName elementName = TransactionDescription::Call;
@@ -674,15 +672,22 @@ DatabaseTransactionFunction::DatabaseTransactionFunction( const proc::ProcessorP
 			throw Error( elementName, 0, "result variable reference in first command leads to an empty result");
 		}
 	}
+	ci = m_call.begin(), ce = m_call.end();
+	for (; ci != ce; ++ci)
+	{
+		m_elemname.push_back( ci->resultname());
+	}
 }
 
-TransactionFunctionInput::TransactionFunctionInput( const TagTable* tagmap)
-	:Structure(tagmap)
+TransactionFunctionInput::TransactionFunctionInput( const DatabaseTransactionFunction* func_)
+	:Structure(func_->tagmap())
+	,m_func(func_)
 	,m_lasttype(langbind::TypedInputFilter::Value){}
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunctionInput& o)
-	:langbind::TransactionFunction::Input(o)
+	:langbind::TypedOutputFilter(o)
 	,Structure(o)
+	,m_func(o.m_func)
 	,m_lasttype(o.m_lasttype){}
 
 bool TransactionFunctionInput::print( ElementType type, const Element& element)
@@ -710,14 +715,7 @@ bool TransactionFunctionInput::print( ElementType type, const Element& element)
 	return true;
 }
 
-
-langbind::TransactionFunction::InputR DatabaseTransactionFunction::getInput() const
-{
-	langbind::TransactionFunction::InputR rt( new TransactionFunctionInput( &m_tagmap));
-	return rt;
-}
-
-static void bindArguments( db::TransactionInput& ti, const FunctionCall& call, const TransactionFunctionInput* inputst, const Structure::Node& selectornode)
+static void bindArguments( TransactionInput& ti, const FunctionCall& call, const TransactionFunctionInput* inputst, const Structure::Node& selectornode)
 {
 	std::vector<Path>::const_iterator pi=call.arg().begin(), pe=call.arg().end();
 	for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
@@ -749,44 +747,43 @@ static void bindArguments( db::TransactionInput& ti, const FunctionCall& call, c
 	}
 }
 
-db::TransactionInput DatabaseTransactionFunction::databaseTransactionInput( const TransactionFunctionInput& inputst) const
+TransactionInput TransactionFunctionInput::get() const
 {
-	db::TransactionInput rt;
-	std::vector<FunctionCall>::const_iterator ci = m_call.begin(), ce = m_call.end();
+	TransactionInput rt;
+	std::vector<FunctionCall>::const_iterator ci = m_func->call().begin(), ce = m_func->call().end();
 	for (; ci != ce; ++ci)
 	{
 		// Select the nodes to execute the command with:
 		std::vector<Structure::Node> nodearray;
-		Structure::Node root = inputst.root();
-		ci->selector().selectNodes( inputst, root, nodearray);
+		ci->selector().selectNodes( *this, root(), nodearray);
 
 		// For each selected node do expand the function call arguments:
 		std::vector<Structure::Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
 		for (; vi != ve; ++vi)
 		{
-			rt.startCommand( ci - m_call.begin(), ci->name());
-			bindArguments( rt, *ci, &inputst, *vi);
+			rt.startCommand( ci - m_func->call().begin(), ci->name());
+			bindArguments( rt, *ci, this, *vi);
 		}
 	}
 	return rt;
 }
 
-TransactionFunctionResult::TransactionFunctionResult( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& o)
-	:db::TransactionOutput(o)
-	,m_state(0)
+TransactionFunctionOutput::TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& data_)
+	:m_state(0)
 	,m_rowidx(0)
 	,m_colidx(0)
 	,m_colend(0)
 	,m_rootname(rootname_)
-	,m_resname(resname_){}
+	,m_resname(resname_)
+	,m_data(data_){}
 
-bool TransactionFunctionResult::getNext( ElementType& type, TypedFilterBase::Element& element)
+bool TransactionFunctionOutput::getNext( ElementType& type, TypedFilterBase::Element& element)
 {
 	for (;;) switch (m_state)
 	{
 		case 0:
-			m_resitr = db::TransactionOutput::begin();
-			m_resend = db::TransactionOutput::end();
+			m_resitr = m_data.begin();
+			m_resend = m_data.end();
 			m_state = 1;
 			if (!m_rootname.empty())
 			{
@@ -864,44 +861,9 @@ bool TransactionFunctionResult::getNext( ElementType& type, TypedFilterBase::Ele
 	}
 }
 
-langbind::TransactionFunction::ResultR DatabaseTransactionFunction::execute( const langbind::TransactionFunction::Input* inputi) const
+langbind::TransactionFunction* _Wolframe::db::createDatabaseTransactionFunction( const std::vector<TransactionDescription>& description)
 {
-	db::Transaction* trs = 0;
-	types::CountedReference<db::Transaction> trsr;
-	try
-	{
-		if (!m_provider)
-		{
-			throw std::runtime_error( "no provider defined for getting database access");
-		}
-		trsr.reset( trs = m_provider->transaction( name()));
-		if (!trs)
-		{
-			throw std::runtime_error( std::string("could not allocate transaction object for '") + name() + "'");
-		}
-		const TransactionFunctionInput* inputst = dynamic_cast<const TransactionFunctionInput*>( inputi);
-		if (!inputst) throw std::logic_error( "function called with unknown input type");
-
-		std::vector<std::string> elemNames;
-		std::vector<FunctionCall>::const_iterator ci = m_call.begin(), ce = m_call.end();
-		for (; ci != ce; ++ci)
-		{
-			elemNames.push_back( ci->resultname());
-		}
-		trs->putInput( databaseTransactionInput( *inputst));
-		trs->execute();
-		langbind::TransactionFunction::ResultR rt( new TransactionFunctionResult( m_resultname, elemNames, trs->getResult()));
-		return rt;
-	}
-	catch (const std::exception& e)
-	{
-		throw std::runtime_error( std::string("error in database transaction '") + TransactionFunction::name() + "': " + e.what());
-	}
-}
-
-langbind::TransactionFunction* _Wolframe::langbind::createDatabaseTransactionFunction( const proc::ProcessorProvider* provider_, const std::vector<TransactionDescription>& description)
-{
-	return new DatabaseTransactionFunction( provider_, description);
+	return new DatabaseTransactionFunction( description);
 }
 
 
