@@ -215,6 +215,14 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 
 For running non-gtest tests you need 'expect'.
 
+For running the Sasl AAAA tests you need 'sasl2-bin'.
+
+For running the Postgresql database tests you need 'postgresql-client'.
+
+For running the Sqlite3 database tests you need 'sqlite3'.
+
+For running some tests you need 'telnet' (0.17).
+
 Fedora 17
 ---------
 
@@ -235,6 +243,12 @@ For building the PDF wolfbook install 'fop'.
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
 For running non-gtest tests you need 'expect' (5.45).
+
+For running the Sasl AAAA tests you need 'sasl2-bin'.
+
+For running the Postgresql database tests you need 'postgresql-client'.
+
+For running the Sqlite3 database tests you need 'sqlite3'.
 
 For running some tests you need 'telnet' (0.17).
 
@@ -260,6 +274,12 @@ For running non-gtest tests you need 'expect'.
 
 For running the Sasl AAAA tests you need 'sasl2-bin'.
 
+For running the Postgresql database tests you need 'postgresql-client'.
+
+For running the Sqlite3 database tests you need 'sqlite3'.
+
+For running some tests you need 'telnet' (0.17).
+
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
 
 Ubuntu 11.04
@@ -280,6 +300,12 @@ When rebuilding the SVG images of the documentation you also need 'dia'.
 For running non-gtest tests you need 'expect'.
 
 For running the Sasl AAAA tests you need 'sasl2-bin'.
+
+For running the Postgresql database tests you need 'postgresql-client'.
+
+For running the Sqlite3 database tests you need 'sqlite3'.
+
+For running some tests you need 'telnet' (0.17).
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
 
@@ -306,7 +332,11 @@ For running non-gtest tests you need 'expect'.
 
 For running the Sasl AAAA tests you need 'sasl2-bin'.
 
+For running the Postgresql database tests you need 'postgresql-client'.
+
 For running the Sqlite3 database tests you need 'sqlite3'.
+
+For running some tests you need 'telnet' (0.17).
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
 
@@ -333,7 +363,11 @@ For running non-gtest tests you need 'expect'.
 
 For running the Sasl AAAA tests you need 'sasl2-bin'.
 
+For running the Postgresql database tests you need 'postgresql-client'.
+
 For running the Sqlite3 database tests you need 'sqlite3'.
+
+For running some tests you need 'telnet' (0.17).
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
 
@@ -353,6 +387,12 @@ For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
 For running the Sasl AAAA tests you need 'sasl2-bin'.
+
+For running the Postgresql database tests you need 'postgresql-client'.
+
+For running the Sqlite3 database tests you need 'sqlite3'.
+
+For running some tests you need 'telnet' (0.17).
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
 
