@@ -15,13 +15,19 @@ OBJS = \
 
 LIBRARIES = \
 	sqlite3.lib
+
+BINS = \
+	sqlite3.exe
 	
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
+sqlite3.exe: shell.obj sqlite3.lib
+	$(LINK) /out:$@ $(STATIC_LDFLAGS) $?
+	
 sqlite3.lib: $(OBJS)
 	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $?
 
-local_all: $(LIBRARIES)
+local_all: $(LIBRARIES) $(BINS)
 
 local_clean:
 

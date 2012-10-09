@@ -57,3 +57,9 @@ SETUPBLD = "$(WIX_DIR)\bin\setupbld.exe"
 ################
 
 XSLTPROC = $(LIBXSLT_DIR)\bin\xsltproc.exe
+
+# Sqlite3 (always embedded)
+###########################
+
+SQLITE3 = $(TOPDIR)\sqlite3\sqlite3
+

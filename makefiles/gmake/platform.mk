@@ -1538,6 +1538,9 @@ endif
 SQLITE3_INCLUDE_DIRS = -I$(SQLITE3_INCLUDE_DIR)
 SQLITE3_LIB_DIRS = -L$(SQLITE3_LIB_DIR)
 
+# we expect the shell to be in the path
+SQLITE3 = sqlite3
+
 endif
 
 ifeq ($(WITH_LOCAL_SQLITE3),1)
@@ -1546,7 +1549,8 @@ SQLITE3_INCLUDE_DIR = $(SQLITE3_DIR)
 SQLITE3_INCLUDE_DIRS = -I$(SQLITE3_DIR)
 SQLITE3_LIB_DIR =
 SQLITE3_LIB_DIRS =
-SQLITE3_LIBS = $(TOPDIR)/sqlite3/libsqlite3.a
+SQLITE3_LIBS = $(SQLITE3_DIR)/libsqlite3.a
+SQLITE3 = $(SQLITE3_DIR)/sqlite3
 endif
 
 # Postgresql

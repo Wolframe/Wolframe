@@ -39,10 +39,16 @@ all: $(OBJS) $(CPP_BINS)
 local_all:
 
 local_clean:
-	@-erase test.bat 2>NUL
+	@-erase test.db garbage.db 2>NUL
 
 local_distclean:
 
-local_test:
+local_test: $(TEST_CPP_BINS)
+	@-erase test.db garbage.db 2>NUL
+	@-copy Makefile.W32 garbage.db
+	@$(SQLITE3) test.db < testDB.sql
 	@-sqliteUnit
+
+# Aba: on Windows?
+#	@dd if=/dev/urandom of=garbage.db bs=4096 count=1
 

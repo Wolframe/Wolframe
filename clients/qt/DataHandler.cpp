@@ -22,6 +22,7 @@
 #include <QRadioButton>
 #include <QGroupBox>
 #include <QListWidget>
+#include <QTreeWidget>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -182,6 +183,9 @@ void DataHandler::resetFormData( QWidget *form )
 		} else if( clazz == "QListWidget" ) {
 			QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
 			listWidget->clear( );
+		} else if( clazz == "QTreeWidget" ) {
+			QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
+			treeWidget->clear( );
 		}
 		
 		qDebug( ) << "Reset " << clazz << name;
@@ -206,6 +210,8 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 			// TODO: either it is in the desinger form (hard coded), but then how
 			// is i18n done? better load the items to pick?
 		} else if( clazz == "QListWidget" ) {
+			m_dataLoader->initiateDomainDataLoad( form_name, name );
+		} else if( clazz == "QTreeWidget" ) {
 			m_dataLoader->initiateDomainDataLoad( form_name, name );
 		}
 		

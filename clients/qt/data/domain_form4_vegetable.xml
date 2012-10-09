@@ -1,14 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<values>
-   <value>pumpkin</value>
-   <value>cucumber</value>
-   <value>broccoli</value>
-   <value>cauliflower</value>
-   <value>globe artichokes</value>
-   <value>capers</value>
-   <value>Sweet corn</value>
-   <value>peas</value>
-   <value>beans</value>
+<tree>
+	<item>
+		<vegetable>Flower bud</vegetable>
+		<description>A bud is the part of a plant that will develop into a flower.</description>	
+		<tree>
+			<item>
+				<vegetable>Broccoli</vegetable>
+				<description>Broccoli is a plant in the cabbage family, whose large flower head is used as a vegetable.</description>
+			</item>
+			<item>
+				<vegetable>Cauliflower</vegetable>
+				<description>Cauliflower is one of several vegetables in the species Brassica oleracea, in the family Brassicaceae.</description>
+			</item>
+			<item>
+				<vegetable>Globe artichokes</vegetable>
+				<description>The globe artichoke (Cynara cardunculus var. scolymus)[1] is a perennial thistle of the genus Cynara originating in Southern Europe around the Mediterranean.</description>
+			</item>
+			<item>
+				<vegetable>Capers</vegetable>
+				<description>Capparis spinosa, the caper bush, also called Flinders rose,[1] is a perennial winter-deciduous plant that bears rounded, fleshy leaves and large white to pinkish-white flowers.</description>
+			</item>
+		</tree>
+	</item>
+	<item>
+		<vegetable>Seeds</vegetable>
+		<description>A seed is a small embryonic plant enclosed in a covering called the seed coat, usually with some stored food.</description>
+		<tree>
+			<item>
+				<vegetable>Sweet corn (maize)</vegetable>
+				<description>A grain domesticated by indigenous peoples in Mesoamerica in prehistoric times.</description>
+			</item>
+			<item>
+				<vegetable>Peas</vegetable>
+				<description>The pea is most commonly the small spherical seed or the seed-pod of the pod fruit Pisum sativum.</description>
+			</item>
+			<item>
+				<vegetable>Beans</vegetable>
+				<description>Bean is a common name for large plant seeds of several genera of the family Fabaceae (alternately Leguminosae) some of which are used for human food or animal feed.</description>
+				<tree>
+					<item>
+						<vegetable>Red kidney beans</vegetable>
+						<description>re-soaked and subsequently heated to the boiling point for at least 10 minutes</description>
+					</item>
+				</tree>
+			</item>
+		</tree>
+	</item>
+</tree>	
+
+<!--		
+Leaves
+kale, collard greens, spinach, arugula, beet greens, bok choy, chard, choi sum, turnip greens, endive, lettuce, mustard greens, watercress, garlic chives, gai lan
+Leaf sheaths
+leeks
+Buds
+Brussels sprouts
+Stem
+Kohlrabi, galangal, and ginger
+Stems of leaves
+celery, rhubarb, cardoon, Chinese celery
+Stem shoots
+asparagus, bamboo shoots
+Tubers
+potatoes, Jerusalem artichokes, sweet potatoes, taro, and yams
+Whole-plant sprouts
+soybean (moyashi), mung beans, urad, and alfalfa.
+Roots
+carrots, parsnips, beets, radishes, rutabagas, turnips, and burdocks.
+Bulbs
+onions, shallots, garlic
+Fruits in the botanical sense, but used as vegetables
+tomatoes, cucumbers, squash, zucchinis, pumpkins, peppers, eggplant, tomatillos, christophene, okra, breadfruit and avocado, and also the following: 
+Legumes
+green beans, lentils, snow peas, soybean
+
+
    <value>kale</value>
    <value>collard greens</value>
    <value>spinach</value>
@@ -72,3 +138,5 @@
    <value>snow peas</value>
    <value>soybean</value>
 </values>
+-->
+
