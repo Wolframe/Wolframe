@@ -88,10 +88,10 @@ CPP_BINS = \
 all: dependencies $(CPP_OBJS) $(CPP_BINS)
 
 dependencies:
-	cd libwolframe & $(MAKE) /nologo /f Makefile.w32 all
-	cd libwolframe_serialize & $(MAKE) /nologo /f Makefile.w32 all
-	cd libwolframe_database & $(MAKE) /nologo /f Makefile.w32 all
-	cd libwolframe_langbind & $(MAKE) /nologo /f Makefile.w32 all
+	@cd libwolframe & $(MAKE) /nologo /f Makefile.w32 all
+	@cd libwolframe_serialize & $(MAKE) /nologo /f Makefile.w32 all
+	@cd libwolframe_database & $(MAKE) /nologo /f Makefile.w32 all
+	@cd libwolframe_langbind & $(MAKE) /nologo /f Makefile.w32 all
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
