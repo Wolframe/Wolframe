@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\brief Interface to process prepared statements with sqlite3
-///\file modules/database/sqlite3/SQLite3PreparedStatement.hpp
+///\file modules/database/sqlite3/SQLitePreparedStatement.hpp
 #ifndef _DATABASE_PREPARED_STATEMENT_SQLITE3_HPP_INCLUDED
 #define _DATABASE_PREPARED_STATEMENT_SQLITE3_HPP_INCLUDED
 #include "database/preparedStatement.hpp"
@@ -55,13 +55,12 @@ struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 	virtual ~PreparedStatementHandler_sqlite3();
 
 	///\brief Begin transaction
-	virtual bool begin();
+	bool begin();
 	///\brief Commit current transaction
-	virtual bool commit();
+	bool commit();
 	///\brief Rollback current transaction
-	virtual bool rollback();
-	///\brief Clear object and set initial state
-	virtual void clear();
+	bool rollback();
+
 	///\brief Start new command statement
 	virtual bool start( const std::string& stmname);
 	///\brief Bind parameter value on current command statement
@@ -82,6 +81,8 @@ struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 	virtual bool next();
 
 private:
+	void clear();
+
 	enum State
 	{
 		Init,

@@ -8,9 +8,10 @@
   - simplest form is read data as XML from a directory (as for
     the forms)
     - classes to map from/to:
-      - QListView: list of things to select (multiple select)
-      - QTreeWidget
-      - file upload
+      - QListWidget: localization
+      - QTreeWidget: map XML elements in columns, map hierarchies,
+        we need that for categorization
+      - file upload: we need that for product images, etc.
       - file download
     - where to put things like validators? (mandatory field,
       isnumber, regex, etc.)

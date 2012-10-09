@@ -734,8 +734,6 @@ fi
 %{_libdir}/wolframe/libwolframe_prnt.so.0
 %{_libdir}/wolframe/libwolframe_functions.so.0.0.0
 %{_libdir}/wolframe/libwolframe_functions.so.0
-%{_libdir}/wolframe/libwolframe_database.so.0.0.0
-%{_libdir}/wolframe/libwolframe_database.so.0
 
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so.5.2.0
@@ -794,8 +792,6 @@ fi
 %{_libdir}/wolframe/libwolframe_prnt.a
 %{_libdir}/wolframe/libwolframe_functions.so
 %{_libdir}/wolframe/libwolframe_functions.a
-%{_libdir}/wolframe/libwolframe_database.so
-%{_libdir}/wolframe/libwolframe_database.a
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so
 %{_libdir}/wolframe/liblua.a

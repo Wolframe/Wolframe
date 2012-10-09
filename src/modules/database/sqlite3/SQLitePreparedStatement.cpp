@@ -31,8 +31,8 @@
 
 ************************************************************************/
 ///\brief Implementation of processing prepared statements with sqlite3
-///\file modules/database/sqlite3/SQLite3PreparedStatement.cpp
-#include "SQLite3PreparedStatement.hpp"
+///\file modules/database/sqlite3/SQLitePreparedStatement.cpp
+#include "SQLitePreparedStatement.hpp"
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
