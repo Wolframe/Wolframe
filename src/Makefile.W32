@@ -3,9 +3,9 @@ TOPDIR = ..
 SUBDIRS = \
 	libwolframe \
 	libwolframe_serialize \
+	libwolframe_database \
 	libwolframe_langbind \
 	libwolframe_prnt \
-	libwolframe_database \
 	libwolframe_functions \
 	modules
 
@@ -90,6 +90,7 @@ all: dependencies $(CPP_OBJS) $(CPP_BINS)
 dependencies:
 	cd libwolframe & $(MAKE) /nologo /f Makefile.w32 all
 	cd libwolframe_serialize & $(MAKE) /nologo /f Makefile.w32 all
+	cd libwolframe_database & $(MAKE) /nologo /f Makefile.w32 all
 	cd libwolframe_langbind & $(MAKE) /nologo /f Makefile.w32 all
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
