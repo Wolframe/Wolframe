@@ -726,6 +726,8 @@ fi
 %{_libdir}/wolframe/libwolframe.so.0
 %{_libdir}/wolframe/libwolframe_serialize.so.0.0.0
 %{_libdir}/wolframe/libwolframe_serialize.so.0
+%{_libdir}/wolframe/libwolframe_database.so.0.0.0
+%{_libdir}/wolframe/libwolframe_database.so.0
 %{_libdir}/wolframe/libwolframe_langbind.so.0.0.0
 %{_libdir}/wolframe/libwolframe_langbind.so.0
 %{_libdir}/wolframe/libwolframe_prnt.so.0.0.0
@@ -784,6 +786,8 @@ fi
 %{_libdir}/wolframe/libwolframe.a
 %{_libdir}/wolframe/libwolframe_serialize.so
 %{_libdir}/wolframe/libwolframe_serialize.a
+%{_libdir}/wolframe/libwolframe_database.so
+%{_libdir}/wolframe/libwolframe_database.a
 %{_libdir}/wolframe/libwolframe_langbind.so
 %{_libdir}/wolframe/libwolframe_langbind.a
 %{_libdir}/wolframe/libwolframe_prnt.so
