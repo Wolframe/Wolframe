@@ -20,7 +20,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)/src/modules/database/sqlite3/SQLite.o \
-	$(TOPDIR)/src/modules/database/sqlite3/SQLite3PreparedStatement.o \
+	$(TOPDIR)/src/modules/database/sqlite3/SQLitePreparedStatement.o \
 	-lwolframe \
 	-lwolframe_database \
 	$(TOPDIR)/gtest/gtest-all.o \
