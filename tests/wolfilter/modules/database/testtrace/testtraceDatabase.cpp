@@ -147,13 +147,50 @@ bool TesttraceDatabase::loadProgram()
 {
 	try
 	{
-		m_program.load( m_programsrc);
+		std::string dbsource;
+		m_program.load( m_programsrc, dbsource);
+		loadProgram( dbsource);
 		return true;
 	}
 	catch (std::runtime_error& e)
 	{
 		LOG_ERROR << "failed to load database program: " << e.what();
 		return false;
+	}
+}
+
+void TesttraceDatabase::loadProgram( const std::string& source)
+{
+	static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
+	std::string::const_iterator si = source.begin(), se = source.end();
+	char ch;
+	std::string tok;
+	const char* commentopr = "--";
+
+	while ((ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
+	{
+		if (ch == commentopr[0])
+		{
+			std::size_t ci = 1;
+			while (!commentopr[ci] && commentopr[ci] == *si)
+			{
+				ci++;
+				si++;
+			}
+			if (!commentopr[ci])
+			{
+				// skip to end of line
+				while (si != se && *si != '\n') ++si;
+			}
+		}
+		else if (g_optab[ch])
+		{
+			throw Program::Error( Program::LineInfo( source.begin(), si), "unexpected token", ch);
+		}
+		else
+		{
+			throw Program::Error( Program::LineInfo( source.begin(), si), "unexpected token", tok);
+		}
 	}
 }
 

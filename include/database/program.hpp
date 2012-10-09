@@ -50,8 +50,14 @@ class Program
 {
 public:
 	///\brief Constructor
-	Program()
-		:m_commentopr("--"){}
+	explicit Program( const char* commentopr_ = "--")
+		:m_commentopr(commentopr_){}
+
+	///\brief Copy constructor
+	Program( const Program& o)
+		:m_functionmap(o.m_functionmap)
+		,m_commentopr(o.m_commentopr){}
+
 	///\brief Destructor
 	virtual ~Program(){}
 
@@ -87,12 +93,16 @@ public:
 	};
 
 	///\brief Load transaction program source
+	///\param[in] source source for database with included transaction definitions to parse
+	///\param[out] dbsource source for database without transaction definitions
 	///\remark Throws Program::Error exception
-	void load( const std::string& source);
+	virtual void load( const std::string& source, std::string& dbsource);
 
-	///\brief Load of the database specific part of the program
-	///\note default method checks, if source is empty after loading the transaction part and should be overloaded with some meaningful method
-	virtual void loadDatabasePart( const std::string&);
+	///\brief Load transaction program source
+	///\param[in] filename file with source for database with included transaction definitions to parse
+	///\param[out] dbsource source for database without transaction definitions
+	///\remark Throws std::runtime_error exception with positional error and filename
+	void loadfile( const std::string& filename, std::string& dbsource);
 
 	///\brief Get a loaded function by name
 	const TransactionFunction* function( const std::string& name) const;

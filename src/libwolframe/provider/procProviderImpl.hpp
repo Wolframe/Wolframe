@@ -86,6 +86,7 @@ private:
 private:
 	std::string					m_dbLabel;
 	db::Database*					m_db;
+
 	std::list< cmdbind::CommandHandlerConstructor* >	m_cmd;
 	std::map< std::string, std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*> >	m_cmdMap;
 
