@@ -101,10 +101,12 @@ FORMS = \
 
 DATA = \
 	data/form1.xml \
+	data/domain_form1_vegetable.xml \
 	data/form2.xml \
 	data/form3.xml \
-	data/form4.xml
-
+	data/form4.xml \
+	data/domain_form4_vegetable.xml
+	
 THEMES = \
 	themes/phone/MainWindow.ui \
 	themes/windows/MainWindow.ui
@@ -141,7 +143,7 @@ local_test:
 	@echo "Testing validity of forms.."
 	@for i in $(FORMS); do xmllint --noout --schema qt-ui-4.7.xsd $$i; done
 	@echo "Testing validity of XML data.."
-	@for i in $(DATA); do xmllint --noout $$i; done
+	@for i in $(DATA); do xmllint --noout $$i && echo "$$i validates"; done
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."

@@ -20,9 +20,8 @@ Table of Contents
     Ubuntu 11.10
     Ubuntu 12.04 LTS
     Debian 6.0
-    OpenSuSE 11.3
     OpenSuSE 11.4
-    SLES 11 SP1
+    SLES 11 SP1/SP2
     Slackware 13.37
     Archlinux
   Instructions for other Unixes
@@ -41,6 +40,7 @@ Table of Contents
     Fedora 15
     Debian 5.0
     Ubuntu 10.10
+    OpenSuSE 11.3
 
 Prerequisites
 -------------
@@ -396,15 +396,6 @@ For running some tests you need 'telnet' (0.17).
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
 
-OpenSuSE 11.3
--------------
-
-Optional packages: qt-devel (4.6.3), pam-devel (1.1.1), cyrus-sasl-devel (2.1.23),
-                   sqlite3-devel (3.6.23), postgresql-devel (8.4.7)
-
-boost is 1.42, only missing some new filesystem stuff, but you'll have to
-compile your own one.
-
 OpenSuSE 11.4
 -------------
 
@@ -437,6 +428,13 @@ For building the PDF wolfbook install 'fop'.
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+SLES 11 SP2
+-----------
+
+see SLES 11 SP1. Package versions are different.
+
+TODO: add proper docu here.
 
 Slackware 13.37
 ---------------
@@ -857,3 +855,13 @@ For running non-gtest tests you need 'expect'.
 For running the Sasl AAAA tests you need 'sasl2-bin'.
 
 For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
+
+OpenSuSE 11.3
+-------------
+
+Optional packages: qt-devel (4.6.3), pam-devel (1.1.1), cyrus-sasl-devel (2.1.23),
+                   sqlite3-devel (3.6.23), postgresql-devel (8.4.7)
+
+boost is 1.42, only missing some new filesystem stuff, but you'll have to
+compile your own one.
+

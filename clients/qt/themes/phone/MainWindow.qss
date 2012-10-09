@@ -1,117 +1,182 @@
-QMainWindow .QWidget, QStatusBar {
-    background: #f1eecf;
+/* first some screen dependent changes */
+/* this file is for QVGA devices */
+
+/*
+ *  Logviewer 
+ */
+ QLineEdit{
+	background-color: #848284;
+	color: white;
+	border-radius: 3px;
+	
 }
 
-#movieWidget {
-    border: 1px solid #dc9c20;
-    border-radius: 5px;
+QTabWidget {
+	background-color: black;
+	/*max-width: 240;*/
 }
 
-#stopButton, #pauseButton, #playButton {
-    border: 1px solid transparent;
-    padding: 3px;
+/* initiate the tab-bar so we can style it */
+QTabWidget::tab-bar{}
+
+/* make a border on the top */
+QTabWidget::pane { /* The tab widget frame */
+    border-top: 1px solid #848284;
 }
 
-#stopButton:hover, #pauseButton:hover, #playButton:hover {
-    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #f1eba7, stop: 1 #e0ce00);
-    border: 1px solid gray;
-    border-radius: 5px;
+/* style the TabBar */
+QTabBar::tab {
+	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #313031, stop: 0.1 #292829, stop: 0.49 #212421, stop: 0.5 #181818, stop: 1 #100C10);
+	color: white;
+	border-top-left-radius: 2;
+	border-top-right-radius: 2;
+	padding: 3px;
+	margin-right: 3px;
+}
+QTabBar::tab:selected {
+	/* do some magic with Gardient colors */
+	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #3C3C3C, stop: 0.1 #525252, stop: 0.49 #6F6F6F, stop: 0.5 #757575, stop: 1 #999999);
+}
+
+/* style the QCalendarWidget (must be refered to as QTableView) */
+QTableView {
+	/* because QCalendarWidget is picky on color syntax
+	 * we will use rgb(red,green,blue) method to add the
+	 * color code #848284
+	 */
+	background-color: rgb(132,130,132);
+	alternate-background-color: rgb(139, 141, 151);
+}
+
+/* 
+ * MainWindow
+ */
+
+QWidget#centerWidget{
+	background-color: black;
+}
+
+QMainWindow {
+	background-color: black;
+}
+
+QWidget#scrollAreaWidgetContents {
+	background-color: black;
+}
+
+QListWidget{
+	background-color: #848284;
+	color: white;
+	border-radius: 3px;
+}
+QListWidget::item{
+	background-color: #848284;
+}
+QListWidget::item:selected{
+	background-color: #6F717B
+}
+
+QTextEdit {
+	background-color: #848284;
+	color: white;
+	border-radius: 3px;
 }
 
 
-#stopButton:pressed, #pauseButton:pressed, #playButton:pressed,
-#stopButton:checked, #pauseButton:checked, #playButton:checked {
-    background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #e0ce00, stop: 1 #f1eba7);
-    border: 1px solid #dc9c20;
-    border-radius: 5px;
+/*
+ * Global styles (all windows)
+ */
+QDialog {
+	background-color: black;
+}
+QLabel {
+	color: white;
+}
+QGroupBox {
+	color: white;
+	background-color: black;
 }
 
-#timeLabel {
-    color: #b7a909;
+/* lets style those default plastique buttons
+ * on android to something more native looking
+ */
+QPushButton {
+	/* make the fonts black on all buttons */
+	color: black;
+	
+	/* do some magic with Gardient colors */
+	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #EFEFEF, stop: 0.1 #E7E7E7, stop: 0.49 #CECBCE, stop: 0.5 #BDBABD, stop: 1 #C6C3C6);
+	
+	/* make a border around them for shadowing */
+	border-width: 1px;
+	
+	/* make the border grey */
+	border-color: grey;/*#339;*/
+	
+	/* make the border a solid line */
+	border-style: solid;
+	
+	/* round the edges of the border */
+	border-radius: 7;
+
+
+	/* default font size */
+	font-size: 10px;
+	
+	/* lets place up the buttons nicely after styling */
+	margin: 3px;
+	margin-left: 5px;
+	margin-right: 5px;
+	min-height: 32px;
+	min-width: 40px;
+	font-size: 15px;
+	font-weight: bold;
+}
+QPushButton:Pressed {
+	/* do some magic with Gardient colors */
+	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #FFD342, stop: 0.1 #F7BE18, stop: 0.49 #EF9E00, stop: 0.5 #EFA610, stop: 1 #F7AA18);
 }
 
-QSizeGrip {
-    image: url(sizegrip.png);
+/* lets make it easier to hit those darn scrollbars */
+QScrollbar::handle{
+	background: black;
+	min-height: 30px;
+	min-width: 35px;
 }
 
-#timeLineSlider::groove:horizontal {
-    border: 1px solid #cac15b;
-    height: 6px;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ece273, stop:1 #f1e776);
+/* style the TabBar */
+QToolBox::tab {
+	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #313031, stop: 0.1 #292829, stop: 0.49 #212421, stop: 0.5 #181818, stop: 1 #100C10);
+	color: white;
+	border-top-left-radius: 2;
+	border-top-right-radius: 2;
+	padding: 3px;
+	margin-right: 3px;
+}
+QToolBox::tab:selected {
+	/* do some magic with Gardient colors */
+	background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #3C3C3C, stop: 0.1 #525252, stop: 0.49 #6F6F6F, stop: 0.5 #757575, stop: 1 #999999);
+}
+QWidget#scrollAreaWidgetContents_2{
+	background-color: rgb(43, 43, 43);
 }
 
-#timeLineSlider::handle:horizontal {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #ede69c, stop:1 #e7d400);
-    border: 1px solid #beb44c;
-    width: 18px;
-    margin: -4px 0;
-    border-radius: 3px;
+QWidget#toolBoxPage1{
+	background-color: rgb(43, 43, 43);
+}
+QWidget#scrollAreaWidgetContents_3{
+	background-color: rgb(43, 43, 43);
 }
 
-QMenuBar {
-     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                       stop:0 #e5de8a, stop:1 #ded03b);
- }
-
-QMenuBar::item {
-    spacing: 3px; /* spacing between menu bar items */
-    padding: 1px 4px;
-    background: transparent;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+QWidget#toolBoxPage2{
+	background-color: rgb(43, 43, 43);
 }
-
-QMenuBar::item:selected { /* when selected using mouse or keyboard */
-    background: #66a5b4;
+QWidget#toolBoxPage3{
+	background-color: rgb(43, 43, 43);
 }
-
-QMenuBar::item:pressed {
-    background: #3f91a6;
+QCheckBox::indicator{
+	color: white;
 }
-
-QMenu {
-    background-color: #ffebae;
-    border: 1px solid #a7800a;
-    padding: 1px;
+QAbstractButton#forceEnglish{
+	color: white;
 }
-
-QMenu::item {
-    padding: 2px 2px 2px 20px;
-    border: 1px solid transparent;
-    min-width: 8ex;
-}
-
-QMenu::item:selected {
-    border-color: #a47b00;
-    background: #e1bd51;
-}
-
-QMenu::icon:checked {
-    background: #dc9c20;
-    border: 1px inset #dc9c20;
-    position: absolute;
-    top: 1px;
-    right: 1px;
-    bottom: 1px;
-    left: 1px;
-}
-
-QMenu::indicator {
-    image: none;
-}
-
-QMenu::indicator:checked {
-    image: url(tick_black.png);
-}
-
-QMenu::indicator:checked:selected {
-    image: url(tick_white.png);
-}
-
-QMenu::separator {
-    height: 2px;
-    background: #9a7504;
-    margin-left: 10px;
-    margin-right: 5px;
-}
-
