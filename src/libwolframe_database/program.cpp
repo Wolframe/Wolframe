@@ -116,50 +116,29 @@ static std::size_t lineCount( std::string::const_iterator si, std::string::const
 
 static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
 
-void Program::loadDatabasePart( const std::string& source)
+void Program::loadfile( const std::string& filename, std::string& dbsource)
 {
-	std::string::const_iterator si = source.begin(), se = source.end();
-	char ch;
-	std::string tok;
-
-	while ((ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
+	try
 	{
-		if (ch == m_commentopr[0])
-		{
-			std::string::const_iterator ci = m_commentopr.begin()+1, ce = m_commentopr.end();
-			while (ci != ce && si != se && *ci == *si)
-			{
-				ci++;
-				si++;
-			}
-			if (ci == ce)
-			{
-				// skip to end of line
-				while (si != se && *si != '\n') ++si;
-			}
-		}
-		else if (g_optab[ch])
-		{
-			throw Error( LineInfo( source.begin(), si), "unexpected token", ch);
-		}
-		else
-		{
-			throw Error( LineInfo( source.begin(), si), "unexpected token", tok);
-		}
+		load( utils::readSourceFileContent( filename), dbsource);
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( "error in file '") + utils::getFileStem( filename) + "' " + e.what());
 	}
 }
 
-void Program::load( const std::string& source)
+void Program::load( const std::string& source, std::string& dbsource)
 {
 	char ch;
 	std::string tok;
 	std::string::const_iterator si = source.begin(), se = source.end();
-	std::string dbsource;
 	std::string::const_iterator dbi = source.begin();
 	std::vector<std::vector< TransactionDescription> > tdar;
 	std::vector<std::string> tdnamear;
 	std::vector<std::vector<std::string::const_iterator> > tdsrcar;
 	std::vector<std::string::const_iterator> tstartar;
+	dbsource.clear();
 
 	try
 	{
@@ -335,7 +314,6 @@ void Program::load( const std::string& source)
 	{
 		throw Error( LineInfo( source.begin(), si), e.what());
 	}
-	loadDatabasePart( dbsource);
 
 	std::vector<std::vector< TransactionDescription> >::const_iterator di = tdar.begin(), de = tdar.end();
 	std::vector<std::string>::const_iterator ni = tdnamear.begin();

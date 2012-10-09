@@ -37,19 +37,15 @@
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED
 
-#include <string>
-
 #include "database/transaction.hpp"
 #include "database/transactionFunction.hpp"
+#include <string>
 
 namespace _Wolframe {
 namespace db {
 
-// Forward declaration
-class PreparedStatementHandler;
-
-/// Base class for database interface
-/// All databases should provide this interface
+///\class Database
+///\brief Base class for database interface. All databases should provide this interface
 class Database
 {
 public:
@@ -63,6 +59,7 @@ public:
 	///\ Just and interface at the moment
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
+	/// DEPRECATED:
 	virtual const TransactionFunction* transactionFunction( const std::string&)
 	{
 		return 0;
@@ -74,26 +71,30 @@ public:
 };
 
 
-/// Database Unit
-/// This is the base class for database unit implementations
+///\class DatabaseUnit
+///\brief This is the base class for database unit implementations
 class DatabaseUnit
 {
 public:
 	virtual ~DatabaseUnit()			{}
 
-	/// Database class (module type).
-	/// All database implementations need a class name.
-	/// Class names must be unique.
+	///\brief Database class (module type).
+	///\remark All database implementations need a class name.
+	///\remark Class names must be unique.
 	virtual const char* className() const = 0;
 
-	/// The database identifier. This is the configured name.
+	///\brief The database identifier. This is the configured name.
 	virtual const std::string& ID() const = 0;
 
-	/// The actual database object.
+	///\brief The actual database object.
 	virtual Database* database() = 0;
 
-	/// Load the transaction program(s) for this database
+	/// DEPRECATED:
 	virtual bool loadProgram() = 0;
+
+	///\brief Load the database specific part of the transaction program for this database
+	///\remark throws std::runtime_error with position info in case of error
+	virtual void loadProgram( const std::string& ) = 0;
 };
 
 }} // namespace _Wolframe::db

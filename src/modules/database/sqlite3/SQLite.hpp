@@ -115,8 +115,7 @@ public:
 	SQLiteDBunit& dbUnit() const		{ return *m_unit; }
 
 	const std::string& ID() const;
-	PreparedStatementHandler* getPreparedStatementHandler()
-						{ return 0; }	//undefined
+
 	/// more of a placeholder for now
 	Transaction* transaction( const std::string& name );
 
@@ -137,7 +136,8 @@ public:
 		      unsigned short connections );
 	~SQLiteDBunit();
 
-	bool loadProgram();
+	virtual bool loadProgram();
+	virtual void loadProgram( const std::string& ){};
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }

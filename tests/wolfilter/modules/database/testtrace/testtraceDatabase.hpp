@@ -115,12 +115,16 @@ public:
 
 	virtual Transaction* transaction( const std::string& /*name*/);
 
+	/// DEPRECATED:
 	virtual const TransactionFunction* transactionFunction( const std::string& name )
 	{
 		return m_program.function( name);
 	}
 
+	/// DEPRECATED:
 	virtual bool loadProgram();
+
+	virtual void loadProgram( const std::string& source);
 
 	const std::string& outfilename() const
 	{
@@ -131,8 +135,8 @@ private:
 	std::string m_id;
 	std::string m_outfilename;
 	std::vector<std::string> m_result;
-	db::Program m_program;
 	std::string m_programsrc;
+	db::Program m_program;
 };
 
 
