@@ -34,32 +34,81 @@ Project Wolframe.
 #ifndef _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #include "langbind/appObjects.hpp"
-#include "ioFilterCommandHandler.hpp"
+#include "langbind/directmapConfig_struct.hpp"
+#include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
+#include "types/countedReference.hpp"
 
 namespace _Wolframe {
 namespace cmdbind {
 
+///\class DirectmapContext
+struct DirectmapContext
+{
+	DirectmapContext(){}
+	~DirectmapContext(){}
+
+	void load( const langbind::DirectmapConfigStruct& cfg_);
+
+	///\brief Get the list of commands
+	std::list<std::string> commands() const;
+
+	const langbind::DirectmapCommandConfigStruct* command( const std::string& name) const
+	{
+		std::map<std::string, std::size_t>::const_iterator itr = m_map.find( name);
+		if (itr == m_map.end()) return 0;
+		return &m_cfg.command[ itr->second];
+	}
+
+private:
+	std::map<std::string, std::size_t> m_map;
+	langbind::DirectmapConfigStruct m_cfg;
+};
+
 ///\class DirectmapCommandHandler
-///\brief command handler instance for processing a call as Directmap (mapping with forms and a transaction function)
-class DirectmapCommandHandler :public IOFilterCommandHandler
+///\brief Command handler instance for processing a call as Directmap (mapping with forms and a transaction or form function)
+class DirectmapCommandHandler :public IOFilterCommandHandlerEscDLF
 {
 public:
-	///\class Context
-	///\brief Execution context of the command handler
-	struct Context;
-
 	///\brief Constructor
-	DirectmapCommandHandler();
+	explicit DirectmapCommandHandler( const DirectmapContext* ctx_)
+		:m_ctx(ctx_)
+		,m_cmd(0)
+		,m_state(0)
+		,m_function(0)
+		,m_inputform_defined(false)
+		,m_outputform_defined(false){}
+
 	///\brief Destructor
-	virtual ~DirectmapCommandHandler();
+	virtual ~DirectmapCommandHandler(){}
 
 	///\brief Execute the Directmap
 	///\param[out] err error code in case of error
 	///\return CallResult status (See IOFilterCommandHandler::CallResult)
 	virtual CallResult call( const char*& err);
 
+	///\brief Get the identifier of this command handler type
+	static const char* identifier()
+	{
+		return "DirectmapCommandHandler";
+	}
+
 private:
-	Context* m_context;		//< execution context of the command handler
+	void initcall();
+private:
+	const DirectmapContext* m_ctx;				//< execution context of the command handler
+	const langbind::DirectmapCommandConfigStruct* m_cmd;	//< description of command to execute
+	int m_state;
+	const db::TransactionFunction* m_function;
+	ddl::Form m_inputform;
+	ddl::Form m_outputform;
+	bool m_inputform_defined;
+	bool m_outputform_defined;
+	langbind::TypedInputFilterR m_input;
+	langbind::TypedOutputFilterR m_output;
+	types::CountedReference<langbind::TransactionFunctionClosure> m_functionclosure;
+	langbind::TypedInputFilterR m_outputform_serialize;
+	types::CountedReference<serialize::DDLStructParser> m_inputform_parser;
+	langbind::RedirectFilterClosure m_outputprinter;
 };
 
 }}//namespace

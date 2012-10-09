@@ -310,7 +310,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 		}
 	}
 	{
-		const ddl::StructType* st = provider->form( proc);
+		const ddl::Form* st = provider->form( proc);
 		if (st)
 		{
 			ddl::Form df( *st);

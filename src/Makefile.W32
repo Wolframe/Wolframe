@@ -60,10 +60,6 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceBanner.obj \
 	appConfig.obj \
 	langbind_iostreamfilter.obj \
-	cmdbind_lineCommandHandler.obj \
-	cmdbind_execCommandHandler.obj \
-	cmdbind_doctypeFilterCommandHandler.obj \
-	cmdbind_directmapCommandHandler.obj \
 	acceptor.obj \
 	connection.obj \
 	serverConfig.obj \

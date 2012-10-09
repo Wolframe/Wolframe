@@ -37,10 +37,17 @@ CPP_OBJS = \
 	appConfig_option.o \
 	scriptConfig_struct.o \
 	scriptConfig_option.o \
+	directmapConfig_struct.o \
+	directmapConfig_option.o \
 	null_filter.o \
 	typingfilter.o \
 	tostringfilter.o \
-	ptreefilter.o
+	ptreefilter.o \
+	cmdbind_lineCommandHandler.o \
+	cmdbind_execCommandHandler.o \
+	cmdbind_doctypeFilterCommandHandler.o \
+	cmdbind_directmapCommandHandler.o \
+	cmdbind_ioFilterCommandHandlerEscDLF.o
 
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

@@ -41,8 +41,8 @@
 #include "processor/procProvider.hpp"
 #include "langbind/appConfig_struct.hpp"
 #include "langbind/appConfig_option.hpp"
-#include "langbind/scriptConfig_struct.hpp"
 #include "langbind/scriptConfig_option.hpp"
+#include "langbind/directmapConfig_option.hpp"
 
 namespace _Wolframe {
 namespace config {
@@ -81,6 +81,7 @@ private:
 	std::vector<std::string> m_modules;
 	langbind::EnvironmentConfigStruct m_envconfig;
 	langbind::ScriptEnvironmentConfigStruct m_scriptenvconfig;
+	langbind::DirectmapConfigStruct m_directmapconfig;
 	boost::property_tree::ptree m_dbconfig;
 	std::string m_cmd;
 	std::string m_inputfilter;

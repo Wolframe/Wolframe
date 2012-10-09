@@ -36,6 +36,7 @@
 #include "langbind/appObjects.hpp"
 #include "database/DBprovider.hpp"
 #include "langbind/appConfig_struct.hpp"
+#include "langbind/directmapConfig_option.hpp"
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "moduleInterface.hpp"
@@ -95,19 +96,40 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 		std::vector<std::pair<std::string,std::string> >
 			cmdhl = m_modulesDirectory.getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
 
-		if (!cmdhl.empty() && !m_scriptenvconfig.script.empty())
+		if (!cmdhl.empty())
 		{
-			// if the list of configurable command handlers has one unique element and we have
-			// a configuration of scripts on the command line, then we pass the
-			// configuration to this command handler:
-			if (cmdhl.size() > 1)
+			if (!m_directmapconfig.command.empty() && !m_scriptenvconfig.script.empty())
 			{
-				// only one command handler allowed:
-				throw std::runtime_error( "more than one command handler module loaded");
+				throw std::runtime_error( "contradicting options. both directmap and script specified");
 			}
-			boost::property_tree::ptree cmdhlcfg;
-			cmdhlcfg.add_child( cmdhl.begin()->second, m_scriptenvconfig.toPropertyTree());
-			proccfg.add_child( cmdhl.begin()->first, cmdhlcfg);
+			if (!m_scriptenvconfig.script.empty())
+			{
+				// if the list of configurable command handlers has one unique element and we have
+				// a configuration of scripts on the command line, then we pass the
+				// configuration to this command handler:
+				if (cmdhl.size() > 1)
+				{
+					// only one command handler allowed:
+					throw std::runtime_error( "more than one command handler module loaded");
+				}
+				boost::property_tree::ptree cmdhlcfg;
+				cmdhlcfg.add_child( cmdhl.begin()->second, m_scriptenvconfig.toPropertyTree());
+				proccfg.add_child( cmdhl.begin()->first, cmdhlcfg);
+			}
+			if (!m_directmapconfig.command.empty())
+			{
+				// if the list of configurable command handlers has one unique element and we have
+				// a configuration of scripts on the command line, then we pass the
+				// configuration to this command handler:
+				if (cmdhl.size() > 1)
+				{
+					// only one command handler allowed:
+					throw std::runtime_error( "more than one command handler module loaded");
+				}
+				boost::property_tree::ptree cmdhlcfg;
+				cmdhlcfg.add_child( cmdhl.begin()->second, m_directmapconfig.toPropertyTree());
+				proccfg.add_child( cmdhl.begin()->first, cmdhlcfg);
+			}
 		}
 	}
 	catch (std::exception& e)
@@ -146,6 +168,7 @@ struct OptionStruct
 			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 			( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
+			( "directmap,d", po::value< std::vector<std::string> >(), "specify directmap definition" )
 			( "form,F", po::value< std::vector<std::string> >(), "specify form to load by path" )
 			( "printlayout,P", po::value< std::vector<std::string> >(), "specify print layout for a form" )
 			( "database,D", po::value<std::string>(), "specifiy transaction database" )
@@ -226,6 +249,15 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		for (; itr != end; ++itr)
 		{
 			m_scriptenvconfig.script.push_back( langbind::ScriptCommandOption( *itr));
+		}
+	}
+	if (vmap.count( "directmap"))
+	{
+		std::vector<std::string> directmaps = vmap["directmap"].as<std::vector<std::string> >();
+		std::vector<std::string>::const_iterator itr=directmaps.begin(), end=directmaps.end();
+		for (; itr != end; ++itr)
+		{
+			m_directmapconfig.command.push_back( langbind::DirectmapCommandOption( *itr));
 		}
 	}
 

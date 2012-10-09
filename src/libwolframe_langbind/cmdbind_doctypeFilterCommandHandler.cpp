@@ -90,7 +90,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 		if (!inp[ii])
 		{
 			++m_nullcnt;
-			if (m_nullcnt > 8) throw_error( "Unknown encoding");
+			if (m_nullcnt > 4) throw_error( "Unknown encoding");
 		}
 		else
 		{

@@ -36,7 +36,6 @@ Project Wolframe.
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
-#include "processor/procProvider.hpp"
 #include "langbind/scriptConfig_struct.hpp"
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"

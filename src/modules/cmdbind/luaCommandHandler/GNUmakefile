@@ -35,7 +35,6 @@ LUA_CPP_OBJS = \
 
 CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
-	cmdbind_ioFilterCommandHandlerEscDLF.o \
 	cmdbind_luaCommandHandler.o \
 	mod_lua_command_handler.o
 
