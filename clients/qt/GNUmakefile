@@ -96,12 +96,14 @@ moc_FormWidget.cpp: FormWidget.hpp
 FORMS = \
 	forms/form1.ui \
 	forms/form2.ui \
-	forms/form3.ui
+	forms/form3.ui \
+	forms/form4.ui
 
 DATA = \
 	data/form1.xml \
 	data/form2.xml \
-	data/form3.xml
+	data/form3.xml \
+	data/form4.xml
 
 THEMES = \
 	themes/phone/MainWindow.ui \
