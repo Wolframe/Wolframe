@@ -49,7 +49,7 @@ local_distclean:
 local_test: $(TEST_CPP_BINS)
 	@rm -f test.db
 	@dd if=/dev/urandom of=garbage.db bs=4096 count=1
-	@sqlite3 test.db < testDB.sql
+	@$(SQLITE3) test.db < testDB.sql
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./sqliteUnit$(EXE)
 
 local_longtest:
