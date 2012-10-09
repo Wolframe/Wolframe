@@ -18,6 +18,7 @@
 # - docin		input document name
 # - docout		output document name
 # - csetlist		list of character set encodings
+# - testdata		(optional) additionaly defined test data
 #
 TESTCMD="$testcmd"
 TESTNAME="$testname"

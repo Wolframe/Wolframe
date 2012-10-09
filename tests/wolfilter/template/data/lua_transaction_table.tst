@@ -1,15 +1,21 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
 opt=""
-modpath="../wolfilter/modules"				# module directory relative from tests/temp
-mod="$modpath/transaction/echo/mod_transaction_echo"	# module to load
-opt="$opt --module $mod"
-opt="$opt --transaction 'echo_transaction test'"	# declare the transaction function used
+modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
+opt="$opt --module $modpath/testtrace/mod_db_testtrace"
+opt="$opt --database 'id=testdb,outfile=DBOUT,file=DBRES,program=DBIN'"
 luascript=`echo $testname | sed 's/lua_//'`.lua
 opt="$opt --script $luascript"
 testcmd="$opt run"					# command to execute by the test
 testscripts="$luascript"				# list of scripts of the test
 docin=employee_assignment_print				# input document name
 docout=$testname					# output document name
-disabled=1
+testdata="
+**file: DBRES
+#name#job1#job2#job3#job4
+**file:DBIN
+TRANSACTION test_transaction
+BEGIN
+	INTO doc/title WITH //task DO run( title);
+END"
 . ./output_tst_all.sh

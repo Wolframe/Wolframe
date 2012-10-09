@@ -20,6 +20,7 @@
 # - docout		output document name
 # - inputfilter		input filter name
 # - outputfilter	output filter name
+# - testdata		(optional) additionaly defined test data
 #
 output="../data/$testname.$cset.tst"
 rm -f $output
@@ -41,6 +42,9 @@ echo '**input' >> $output
 cat doc/$docin.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
 echo '**config' >> $output
 echo "--input-filter $inputfilter --output-filter $outputfilter $testcmd" >> $output
+if [ x"$testdata" != x ]; then
+	echo "$testdata" >> $output
+fi
 for script in $testscripts
 do
 	echo "**file: $script" >> $output

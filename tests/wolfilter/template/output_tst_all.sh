@@ -18,6 +18,7 @@
 # - docin		input document name
 # - docout		output document name
 # - modules		modules to load
+# - testdata		(optional) additionaly defined test data
 #
 csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4LE UCS-4BE"
 . ./output_tst_textwolf.sh
