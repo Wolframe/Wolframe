@@ -42,7 +42,6 @@ local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 ifeq ($(DB_EXISTS),0)
-	echo $(DB_EXISTS)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./postgresUnit$(EXE)
 else
 	@echo "No properly configured database for tests"
