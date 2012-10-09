@@ -69,7 +69,13 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id,
 	for( int i = 0; i < connections; i++ ) {
 		sqlite3 *handle;
 		int res = sqlite3_open_v2( m_filename.c_str( ), &handle,
-					   SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, "unix" );
+					   SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX,
+#ifndef _WIN32
+					   "unix"
+#else
+						NULL
+#endif
+					   );
 		if( res != SQLITE_OK )	{
 			MOD_LOG_ALERT << "Unable to open SQLite database '" << filename
 				      << "': " << sqlite3_errmsg( handle );

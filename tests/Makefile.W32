@@ -50,7 +50,7 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
-	$(TOPDIR)\src\libwolframe_serialize\wolframe_database.lib \
+	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	$(TOPDIR)\src\libwolframe_functions\wolframe_functions.lib
 

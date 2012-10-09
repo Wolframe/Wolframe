@@ -38,7 +38,7 @@ build-stamp:
 	$(MAKE) help
 	$(MAKE) $(WOLFRAME_PARAMS) config
 	$(MAKE) LDFLAGS=-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe \
-		LDFLAGS=-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH) $(WOLFRAME_PARAMS) all
+		$(WOLFRAME_PARAMS) all
 	cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc-doxygen; cd ..
 
 	# --- end custom part for compiling

@@ -726,14 +726,14 @@ fi
 %{_libdir}/wolframe/libwolframe.so.0
 %{_libdir}/wolframe/libwolframe_serialize.so.0.0.0
 %{_libdir}/wolframe/libwolframe_serialize.so.0
+%{_libdir}/wolframe/libwolframe_database.so.0.0.0
+%{_libdir}/wolframe/libwolframe_database.so.0
 %{_libdir}/wolframe/libwolframe_langbind.so.0.0.0
 %{_libdir}/wolframe/libwolframe_langbind.so.0
 %{_libdir}/wolframe/libwolframe_prnt.so.0.0.0
 %{_libdir}/wolframe/libwolframe_prnt.so.0
 %{_libdir}/wolframe/libwolframe_functions.so.0.0.0
 %{_libdir}/wolframe/libwolframe_functions.so.0
-%{_libdir}/wolframe/libwolframe_database.so.0.0.0
-%{_libdir}/wolframe/libwolframe_database.so.0
 
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so.5.2.0
@@ -784,14 +784,14 @@ fi
 %{_libdir}/wolframe/libwolframe.a
 %{_libdir}/wolframe/libwolframe_serialize.so
 %{_libdir}/wolframe/libwolframe_serialize.a
+%{_libdir}/wolframe/libwolframe_database.so
+%{_libdir}/wolframe/libwolframe_database.a
 %{_libdir}/wolframe/libwolframe_langbind.so
 %{_libdir}/wolframe/libwolframe_langbind.a
 %{_libdir}/wolframe/libwolframe_prnt.so
 %{_libdir}/wolframe/libwolframe_prnt.a
 %{_libdir}/wolframe/libwolframe_functions.so
 %{_libdir}/wolframe/libwolframe_functions.a
-%{_libdir}/wolframe/libwolframe_database.so
-%{_libdir}/wolframe/libwolframe_database.a
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so
 %{_libdir}/wolframe/liblua.a
