@@ -20,6 +20,7 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\gtest\gtest-all.obj \
 	$(TOPDIR)\src\modules\database\postgresql\PostgreSQL.obj \
 	"$(PGSQL_DIR)\lib\libpq.lib" \
