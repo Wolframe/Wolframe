@@ -224,22 +224,63 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 	QWidget *widget = form->findChild<QWidget *>( widget_name );
 	QString clazz = widget->metaObject( )->className( ); 
 
+	qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
+
 	QXmlStreamReader xml( data );
-	while( !xml.atEnd( ) ) {
-		xml.readNext( );
-		if( xml.isStartElement( ) && xml.name( ) == "value" ) {
-			QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
-			if( clazz == "QListWidget" ) {
-				QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+	if( clazz == "QListWidget" ) {
+		QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+		while( !xml.atEnd( ) ) {
+			xml.readNext( );
+			if( xml.isStartElement( ) && xml.name( ) == "value" ) {
+				QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 				listWidget->addItem( text );
-			}	
+			}
 		}
+	} else if( clazz == "QTreeWidget" ) {
+		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
+		QTreeWidgetItem *header = treeWidget->headerItem( );
+		QStringList headers;
+		for( int i = 0; i < header->columnCount( ); i++ ) {
+			QString headerText = header->data( i, Qt::DisplayRole ).toString( );
+			headers << headerText;
+			qDebug( ) << "header" << i << headerText;
+		}
+		QTreeWidgetItem *parent = treeWidget->invisibleRootItem( );
+		QTreeWidgetItem *item = treeWidget->invisibleRootItem( );
+		while( !xml.atEnd( ) ) {
+			xml.readNext( );
+			if( xml.isStartElement( ) ) {
+				if( xml.name( ) == "tree" ) {
+					parent = item;
+				} else if( xml.name( ) == "item" ) {
+					item = new QTreeWidgetItem( parent );
+				} else {
+					int col = headers.indexOf( xml.name( ).toString( ) );
+					if( col != -1 ) {
+						QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
+						item->setText( col, text );
+					}
+				}
+			} else if( xml.isEndElement( ) ) {
+				if( xml.name( ) == "tree" ) {
+					item = parent;
+					if( parent ) {
+						parent = parent->parent( );
+						if( !parent ) {
+							parent = treeWidget->invisibleRootItem( );
+						}
+					}
+				} else if( xml.name( ) == "item" ) {
+					parent->addChild( item );
+				}
+			}
+		}
+	} else {
+		qDebug( ) << "Unknown domain for class " << clazz;
 	}
 	if( xml.hasError( ) ) {
 		qDebug( ) << xml.errorString( );
 	}
-	
-	qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
 }
 
 void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
