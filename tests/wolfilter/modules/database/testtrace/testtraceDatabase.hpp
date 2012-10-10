@@ -124,6 +124,10 @@ public:
 	/// DEPRECATED:
 	virtual bool loadProgram();
 
+	virtual void addTransactionDefinition( const std::string& /*definition*/ ) {}
+	const std::string* getTransactionDefinition( const std::string& /*name*/ )
+						{ return NULL; }
+
 	virtual void loadProgram( const std::string& source);
 
 	const std::string& outfilename() const

@@ -87,13 +87,14 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "programFile" ))	{
-			bool isDefined = ( !programFile.empty() );
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile, &isDefined ))
+			std::string programFile;
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( programFile ).is_absolute() )
 					MOD_LOG_WARNING << logPrefix() << "program file path is not absolute: "
 							<< programFile;
+				programFiles.push_back( programFile );
 			}
 		}
 		else	{
@@ -121,7 +122,16 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 		os << indStr << "   ID: " << m_ID << std::endl;
 	os << indStr << "   Filename: " << filename << std::endl;
 	os << indStr << "   Flags: " << (flag ? "True Flag" : "False Flag") << std::endl;
-	os << indStr << "   Main program file: " << (programFile.empty() ? "none" : programFile) << std::endl;
+	if ( programFiles.size() == 0 )
+		os << indStr << "   Program file: none" << std::endl;
+	else if ( programFiles.size() == 1 )
+		os << indStr << "   Program file: " << programFiles.front() << std::endl;
+	else	{
+		std::list< std::string >::const_iterator it = programFiles.begin();
+		os << indStr << "   Program files: " << *it << std::endl;
+		while ( it != programFiles.end() )
+			os << indStr << "                  " << *it++ << std::endl;
+	}
 }
 
 bool SQLiteConfig::check() const
@@ -144,12 +154,12 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 		else
 			filename = resolvePath( filename );
 	}
-	if ( ! programFile.empty() )	{
-		if ( ! path( programFile ).is_absolute() )
-			programFile = resolvePath( absolute( programFile,
-							     path( refPath ).branch_path()).string());
+	for ( std::list< std::string >::iterator it = programFiles.begin();
+						it != programFiles.end(); it++ )	{
+		if ( ! path( *it ).is_absolute() )
+			*it = resolvePath( absolute( *it, path( refPath ).branch_path()).string());
 		else
-			programFile = resolvePath( programFile );
+			*it = resolvePath( *it );
 	}
 }
 

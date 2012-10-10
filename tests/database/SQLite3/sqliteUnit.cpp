@@ -29,25 +29,23 @@ class SQLiteModuleFixture : public ::testing::Test
 
 TEST_F( SQLiteModuleFixture, CreateSQLiteUnit_0 )
 {
-	SQLiteDBunit db( "testDB", "test.db", false, "program", 3 );
+	SQLiteDBunit db( "testDB", "test.db", false, 3 );
 	ASSERT_STREQ( "SQLite", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
 	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
-	ASSERT_FALSE( db.loadProgram());
 }
 
 TEST_F( SQLiteModuleFixture, CreateSQLiteUnit_1 )
 {
-	SQLiteDBunit db( "testDB", "test.db", false, "", 3 );
+	SQLiteDBunit db( "testDB", "test.db", false, 3 );
 	ASSERT_STREQ( "SQLite", db.className());
 	ASSERT_STREQ( "testDB", db.ID().c_str());
 	ASSERT_STREQ( "testDB", db.database()->ID().c_str());
-	ASSERT_TRUE( db.loadProgram());
 }
 
 TEST_F( SQLiteModuleFixture, OpenGarbage )
 {
-	ASSERT_THROW( SQLiteDBunit db( "testDB", "garbage.db", false, "", 3 ), std::runtime_error );
+	ASSERT_THROW( SQLiteDBunit db( "testDB", "garbage.db", false, 3 ), std::runtime_error );
 }
 
 int main( int argc, char **argv )

@@ -39,6 +39,7 @@
 
 #include "database/transaction.hpp"
 #include "database/transactionFunction.hpp"
+#include "program.hpp"
 #include <string>
 
 namespace _Wolframe {
@@ -89,12 +90,16 @@ public:
 	///\brief The actual database object.
 	virtual Database* database() = 0;
 
-	/// DEPRECATED:
-	virtual bool loadProgram() = 0;
-
 	///\brief Load the database specific part of the transaction program for this database
 	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadProgram( const std::string& ) = 0;
+	virtual void loadProgram( const std::string& filename ) = 0;
+
+	///\brief add a database transaction program to the list of transaction programs
+	///\remark throws std::runtime_error with position info in case of error
+	virtual void addTransactionDefinition( const std::string& definition ) = 0;
+
+	///\brief get a database transaction program from the list of transaction programs
+	virtual const std::string* getTransactionDefinition( const std::string& name ) = 0;
 };
 
 }} // namespace _Wolframe::db
