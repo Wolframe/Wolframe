@@ -83,13 +83,13 @@ DatabaseProvider::DatabaseProvider_Impl::DatabaseProvider_Impl( const DBprovider
 			throw std::domain_error( "Unknown database type in DBprovider constructor. See log" );
 		}
 	}
-	// load the transaction definitions / programs
-	for ( std::list< DatabaseUnit* >::iterator it = m_db.begin(); it != m_db.end(); it++ )	{
-		if ( !(*it)->loadProgram() )	{
-			LOG_ALERT << "DatabaseProvider: cannot load program for '" << (*it)->ID() << "' database unit";
-			throw std::domain_error( "Cannot load database unit program. See log" );
-		}
-	}
+//	// load the transaction definitions / programs
+//	for ( std::list< DatabaseUnit* >::iterator it = m_db.begin(); it != m_db.end(); it++ )	{
+//		if ( !(*it)->loadProgram() )	{
+//			LOG_ALERT << "DatabaseProvider: cannot load program for '" << (*it)->ID() << "' database unit";
+//			throw std::domain_error( "Cannot load database unit program. See log" );
+//		}
+//	}
 }
 
 DatabaseProvider::DatabaseProvider_Impl::~DatabaseProvider_Impl()

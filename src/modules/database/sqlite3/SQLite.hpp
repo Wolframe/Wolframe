@@ -74,8 +74,8 @@ private:
 	std::string	m_ID;
 	std::string	filename;
 	bool		flag;
-	std::string	programFile;
 	unsigned short	connections;
+	std::list< std::string > programFiles;	///< list of program files
 };
 
 
@@ -132,16 +132,18 @@ class SQLiteDBunit : public DatabaseUnit
 public:
 	SQLiteDBunit( const std::string& id,
 		      const std::string& filename, bool flag,
-		      const std::string& programFile,
 		      unsigned short connections );
 	~SQLiteDBunit();
 
-	virtual bool loadProgram();
-	virtual void loadProgram( const std::string& ){};
+	virtual void loadProgram( const std::string& filename );
 
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 	Database* database();
+
+	virtual void addTransactionDefinition( const std::string& /*definition*/ ) {}
+	const std::string* getTransactionDefinition( const std::string& /*name*/ )
+						{ return NULL; }
 
 	const std::map<std::string,std::string>* stmmap() const
 	{
@@ -152,9 +154,11 @@ private:
 	const std::string	m_ID;
 	const std::string	m_filename;
 	bool			m_flag;
-	const std::string	m_programFile;
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
+
+	Program			m_program;		///< database programs ???
+
 	std::map<std::string,std::string> m_stmmap;	///< map of statements (commands)
 	SQLiteDatabase		m_db;
 };

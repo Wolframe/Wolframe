@@ -57,12 +57,10 @@ PoolObject< sqlite3* >::PoolObject( ObjectPool< sqlite3* >& pool )
 namespace _Wolframe {
 namespace db {
 
-SQLiteDBunit::SQLiteDBunit( const std::string& id,
+SQLiteDBunit::SQLiteDBunit(const std::string& id,
 			    const std::string& filename, bool flag,
-			    const std::string& programFile,
 			    unsigned short connections )
-	: m_ID( id ), m_filename( filename ), m_flag( flag ),
-	  m_programFile( programFile )
+	: m_ID( id ), m_filename( filename ), m_flag( flag )
 {
 	bool	checked = false;
 
@@ -119,17 +117,17 @@ SQLiteDBunit::~SQLiteDBunit( )
 	MOD_LOG_TRACE << "SQLite database unit '" << m_ID << "' destroyed";
 }
 
-bool SQLiteDBunit::loadProgram()
+void SQLiteDBunit::loadProgram( const std::string& filename )
 {
 	// No program file, do nothing
-	if ( m_programFile.empty())
-		return true;
-	if ( !boost::filesystem::exists( m_programFile ))	{
-		MOD_LOG_ALERT << "Program file '" << m_programFile
+	if ( filename.empty())
+		return;
+	if ( !boost::filesystem::exists( filename ))	{
+		MOD_LOG_ALERT << "Program file '" << filename
 			      << "' does not exist (SQLite database '" << m_ID << "')";
-		return false;
+		return;
 	}
-	return true;
+	return;
 }
 
 Database* SQLiteDBunit::database()

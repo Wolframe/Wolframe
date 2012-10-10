@@ -150,7 +150,7 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 
 
 // This function also needs a lot of work
-PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
+PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 				    const std::string& host, unsigned short port,
 				    const std::string& dbName,
 				    const std::string& user, const std::string& password,
@@ -158,10 +158,9 @@ PostgreSQLdbUnit::PostgreSQLdbUnit( const std::string& id,
 				    std::string sslRootCert, std::string sslCRL ,
 				    unsigned short connectTimeout,
 				    size_t connections, unsigned short acquireTimeout,
-				    unsigned statementTimeout,
-				    const std::string &programFile )
+				    unsigned statementTimeout )
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
-	  m_statementTimeout( statementTimeout ), m_programFile( programFile )
+	  m_statementTimeout( statementTimeout )
 {
 	m_connStr = buildConnStr( host, port,  dbName, user, password,
 				  sslMode, sslCert, sslKey, sslRootCert, sslCRL,
@@ -288,17 +287,17 @@ PostgreSQLdbUnit::~PostgreSQLdbUnit()
 	MOD_LOG_TRACE << "PostgreSQL database unit '" << m_ID << "' destroyed, " << connections << " connections destroyed";
 }
 
-bool PostgreSQLdbUnit::loadProgram()
+void PostgreSQLdbUnit::loadProgram( const std::string& filename )
 {
 	// No program file, do nothing
-	if ( m_programFile.empty())
-		return true;
-	if ( !boost::filesystem::exists( m_programFile ))	{
-		MOD_LOG_ALERT << "Program file '" << m_programFile
+	if ( filename.empty())
+		return;
+	if ( !boost::filesystem::exists( filename ))	{
+		MOD_LOG_ALERT << "Program file '" << filename
 			      << "' does not exist (PostgreSQL database '" << m_ID << "')";
-		return false;
+		return;
 	}
-	return true;
+	return;
 }
 
 Database* PostgreSQLdbUnit::database()
