@@ -22,6 +22,7 @@ Table of Contents
     LibXSLT
     Install Tcl and Expect
   Documentation
+  Using ccache with MSVC
 
 Prerequisites
 -------------
@@ -437,3 +438,21 @@ Get the "HTML Help Workshop and Documentation" from Microsoft.
 Adapt the 'HHC_LOCATION' variable in 'makefiles\nmake\config.mk' to
 match the 'hhc.exe' binary of the "MS HTML Help Workshop" to
 generate the CHM files.
+
+Using ccache with MSVC
+----------------------
+
+Get ccache with msvc support from:
+
+http://ccgit.freedesktop.org/libreoffice/contrib/dev-tools/tree/ccache-msvc
+
+You also need the Cygwin runtime.
+
+Set CYGWIN=nodosfilewarning
+
+to get rid of funny warnings.
+
+Set CC and CXX in the following way in your config.mk:
+
+CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"

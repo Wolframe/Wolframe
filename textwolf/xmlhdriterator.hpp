@@ -50,6 +50,11 @@ class XmlHdrSrcIterator :public SrcIterator
 {
 public:
 	///\brief Constructor
+	template <class InputIterator>
+	explicit XmlHdrSrcIterator( InputIterator&)
+		:m_state(Left0)
+		,m_cnt0(0){}
+
 	XmlHdrSrcIterator()
 		:m_state(Left0)
 		,m_cnt0(0){}

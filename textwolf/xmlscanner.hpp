@@ -990,6 +990,9 @@ public:
 	XMLScanner( const InputCharSet& charset_, const InputIterator& p_src)
 			:state(START),m_doTokenize(false),error(Ok),m_src(charset_,p_src),m_entityMap(0),m_output(OutputCharSet())
 	{}
+	XMLScanner( const InputCharSet& charset_)
+			:state(START),m_doTokenize(false),error(Ok),m_src(charset_),m_entityMap(0)
+	{}
 	XMLScanner()
 			:state(START),m_doTokenize(false),error(Ok),m_src(InputCharSet()),m_entityMap(0)
 	{}
