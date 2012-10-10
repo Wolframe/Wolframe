@@ -29,7 +29,7 @@ filter="xml:libxml2"
 modpath="../../src/modules"
 testcmd="--module $modpath/filter/libxml2/mod_filter_libxml2 $testcmd"
 if [ `echo $testcmd | grep '.lua' | grep -c -- '--script'` != 0 ]; then
-	testcmd="--module $modpath/cmdbind/luaCommandHandler/mod_lua_command_handler $testcmd"
+	testcmd="--module $modpath/cmdbind/lua/mod_command_lua $testcmd"
 fi
 
 testname="$TESTNAME""_libxml2"

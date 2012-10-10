@@ -45,8 +45,8 @@ namespace langbind {
 
 struct DirectmapCommandConfigStruct
 {
-	std::string name;						//< (optional) name of the command. default is the value of function
-	std::string function;						//< name of the transaction or form function
+	std::string name;						//< (optional) name of the command. default is the value of call
+	std::string call;						//< name of the transaction or form function
 	std::string filter;						//< name of the input/ouput filter
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
@@ -58,7 +58,7 @@ struct DirectmapCommandConfigStruct
 
 struct DirectmapConfigStruct
 {
-	std::vector<DirectmapCommandConfigStruct> command;		//< definitions of directmap functions
+	std::vector<DirectmapCommandConfigStruct> command;		//< definitions of directmap commands
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();

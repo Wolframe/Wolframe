@@ -1,0 +1,4 @@
+LIBRARY mod_command_directmap
+
+EXPORTS
+entryPoint	@1

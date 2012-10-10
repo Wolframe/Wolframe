@@ -54,8 +54,10 @@ class ScriptCommandHandlerConfig
 {
 private:// Concept checks:
 
-	///\brief Check for class CommandHandlerType::ContextStruct exists
+	///\brief Check for existence of class CommandHandlerType::ContextStruct
 	BOOST_STATIC_ASSERT((boost::is_class< typename CommandHandlerType::ContextStruct>::value));
+	///\brief Check for existence of class CommandHandlerType::ConfigStruct
+	BOOST_STATIC_ASSERT((boost::is_class< typename CommandHandlerType::ConfigStruct>::value));
 
 	///\brief Check for method CommandHandlerType::ContextStruct::load with expected paraters
 	template<typename T>
@@ -64,7 +66,7 @@ private:// Concept checks:
 		typedef char small_type;
 		struct large_type {small_type dummy[2];};
 
-		template<void (T::*)(const langbind::ScriptEnvironmentConfigStruct&, const module::ModulesDirectory*)> struct tester_member_signature;
+		template<void (T::*)(const typename CommandHandlerType::ConfigStruct&, const module::ModulesDirectory*)> struct tester_member_signature;
 
 		template<typename U>
 		static small_type has_matching_member(tester_member_signature<&U::load>*);
@@ -133,7 +135,7 @@ public:
 	}
 
 private:
-	langbind::ScriptEnvironmentConfigStruct m_struct;
+	typename CommandHandlerType::ConfigStruct m_struct;
 	const module::ModulesDirectory* m_modules;
 	ContextStruct m_context;
 	const char* m_classname;

@@ -5,13 +5,12 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x504 /DWITH_LUA
+	/D_WIN32_WINNT=0x504
 
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
-	/I$(TOPDIR)\lua\src \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \
@@ -20,24 +19,16 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
 	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
-	kernel32.lib advapi32.lib Ws2_32.lib \
-	$(TOPDIR)\lua\src\lua.lib
+	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_lua_command_handler.dll
-
-LUA_CPP_OBJS = \
-	filter_luafilter.obj \
-	langbind_luaObjects.obj \
-	langbind_luaGetFunctionClosure.obj \
-	langbind_luaDebug.obj \
-	langbind_luaScriptContext.obj
+	mod_command_directmap.dll
 
 CPP_OBJS = \
-	$(LUA_CPP_OBJS) \
-	cmdbind_luaCommandHandler.obj \
-	mod_lua_command_handler.obj
+	cmdbind_directmapCommandHandler.obj \
+	mod_command_directmap.obj
 
 all: $(DYNAMIC_MODULE)
 

@@ -77,16 +77,45 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 	std::vector<std::pair<std::string,std::string> >
 		cmdhl = g_modulesDirectory->getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
 
-	if (!cmdhl.empty() && !script_env.script.empty())
+	if (!script_env.script.empty())
 	{
-		if (cmdhl.size() > 1)
+		std::vector<langbind::ScriptCommandConfigStruct>::const_iterator ci = script_env.script.begin(), ce = script_env.script.end();
+		std::string extension = utils::getFileExtension( ci->file);
+		if (extension.empty())
 		{
-			// only one command handler allowed:
-			throw std::runtime_error( "more than one command handler module loaded");
+			throw std::runtime_error( "script without extension specified. Cannot assign it to one command handler");
+		}
+		for (++ci; ci!=ce; ++ci)
+		{
+			if (!boost::iequals( extension, utils::getFileExtension(ci->file)))
+			{
+				throw std::runtime_error( "multiple scripts with different extension specified. Cannot assign them to one command handler");
+			}
+		}
+		std::string cmdhndname = std::string( extension.c_str() +1);
+
+		std::pair<std::string,std::string> cfgid;
+		bool cfgid_set = false;
+		std::vector<std::pair<std::string,std::string> >::const_iterator pi = cmdhl.begin(), pe = cmdhl.end();
+		for (; pi != pe; ++pi)
+		{
+			if (boost::istarts_with( pi->second, cmdhndname))
+			{
+				if (cfgid_set)
+				{
+					throw std::runtime_error( std::string( "more than one command handler module loaded that match to scripts selected (") + cmdhndname + ")");
+				}
+				cfgid = *pi;
+				cfgid_set = true;
+			}
+		}
+		if (!cfgid_set)
+		{
+			throw std::runtime_error( std::string( "no command handler module loaded that matches to scripts selected (") + cmdhndname + ")");
 		}
 		boost::property_tree::ptree cmdhlcfg;
-		cmdhlcfg.add_child( cmdhl.begin()->second, script_env.toPropertyTree());
-		proccfg.add_child( cmdhl.begin()->first, cmdhlcfg);
+		cmdhlcfg.add_child( cfgid.second, script_env.toPropertyTree());
+		proccfg.add_child( cfgid.first, cmdhlcfg);
 	}
 	if (!rt->parse( (const config::ConfigurationTree&)proccfg, std::string(""), g_modulesDirectory))
 	{

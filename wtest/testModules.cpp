@@ -49,7 +49,10 @@ std::list<std::string> _Wolframe::wtest::getTestModuleList( const std::string& t
 #if WITH_LIBXML2
 		"filter/libxml2/mod_filter_libxml2",
 #endif
-		"cmdbind/luaCommandHandler/mod_lua_command_handler",
+#if WITH_LUA
+		"cmdbind/lua/mod_command_lua",
+#endif
+		"cmdbind/directmap/mod_command_directmap",
 		0};
 	std::size_t ii = 0;
 	while (ar[ii])

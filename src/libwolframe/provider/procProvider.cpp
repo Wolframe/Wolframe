@@ -245,11 +245,20 @@ bool ProcProviderConfig::check() const
 	}
 	for (std::vector<langbind::DDLFormConfigStruct>::const_iterator ii=m_environment.form.begin(), ee=m_environment.form.end(); ii != ee; ++ii)
 	{
-		if (!utils::fileExists( ii->file)) return false;
+		if (!utils::fileExists( ii->file))
+		{
+			LOG_ERROR << "Form file does not exist '" << ii->file << "'";
+			return false;
+		}
 	}
 	for (std::vector<langbind::PrintLayoutConfigStruct>::const_iterator ii=m_environment.printlayout.begin(), ee=m_environment.printlayout.end(); ii != ee; ++ii)
 	{
-		if (!utils::fileExists( ii->file)) return false;
+		if (!utils::fileExists( ii->file))
+		{
+			LOG_ERROR << "Print layout file does not exist '" << ii->file << "'";
+			return false;
+		}
+
 	}
 	return correct;
 }

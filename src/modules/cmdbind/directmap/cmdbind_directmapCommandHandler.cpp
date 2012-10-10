@@ -32,6 +32,7 @@ Project Wolframe.
 #include "cmdbind/directmapCommandHandler.hpp"
 #include "langbind/directmapConfig_struct.hpp"
 #include "serialize/struct/filtermapBase.hpp"
+#include "utils/doctype.hpp"
 #include "langbind/appObjects.hpp"
 #include "filter/typingfilter.hpp"
 #include "logger-v1.hpp"
@@ -44,7 +45,7 @@ using namespace _Wolframe;
 using namespace cmdbind;
 using namespace langbind;
 
-void DirectmapContext::load( const DirectmapConfigStruct& cfg_)
+void DirectmapContext::load( const DirectmapConfigStruct& cfg_, const module::ModulesDirectory*)
 {
 	std::vector<DirectmapCommandConfigStruct>::const_iterator ii = cfg_.command.begin(), ee = cfg_.command.end();
 	std::size_t idx = m_cfg.command.size();
@@ -94,10 +95,10 @@ void DirectmapCommandHandler::initcall()
 		m_outputform = *df;
 		m_outputform_defined = true;
 	}
-	m_function = m_provider->transactionFunction( m_cmd->function);
+	m_function = m_provider->transactionFunction( m_cmd->call);
 	if (!m_function)
 	{
-		throw std::runtime_error( std::string( "transaction function not defined '") + m_cmd->function + "'");
+		throw std::runtime_error( std::string( "transaction function not defined '") + m_cmd->call + "'");
 	}
 	types::CountedReference<langbind::Filter> filter( m_provider->filter( m_cmd->filter, ""));
 	if (!filter.get())
@@ -110,14 +111,8 @@ void DirectmapCommandHandler::initcall()
 	}
 	if (m_inputfilter.get())
 	{
-		// assign the rest of the input to the new filter attached
-		const void* chunk;
-		std::size_t chunksize;
-		bool chunkend;
-		m_inputfilter->getRest( chunk, chunksize, chunkend);
-		filter->inputfilter()->putInput( chunk, chunksize, chunkend);
-		filter->inputfilter()->setValue( "empty", "false");
-		m_inputfilter = filter->inputfilter();
+		setFilterAs( filter->inputfilter());
+		m_inputfilter->setValue( "empty", "false");
 	}
 	if (!filter->outputfilter().get())
 	{
@@ -125,12 +120,11 @@ void DirectmapCommandHandler::initcall()
 	}
 	if (m_outputfilter.get())
 	{
-		filter->outputfilter()->assignState( *m_outputfilter);
+		setFilterAs( filter->outputfilter());
 		if (m_outputform.doctype())
 		{
-			filter->outputfilter()->setDocType( m_outputform.doctype());
+			m_outputfilter->setDocType( m_outputform.doctype());
 		}
-		m_outputfilter = filter->outputfilter();
 	}
 	m_input.reset( new langbind::TypingInputFilter( m_inputfilter));
 	m_output.reset( new langbind::TypingOutputFilter( m_outputfilter));
@@ -156,8 +150,31 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				}
 				else
 				{
-					m_state = 3;
-					continue;
+					std::string doctype;
+					if (m_inputfilter->getDocType( doctype) && !doctype.empty())
+					{
+						// if no input form is defined we check for the input document type and set the form on our own:
+						std::string doctypeid( utils::getIdFromDoctype( doctype));
+						const ddl::Form* df = m_provider->form( doctypeid);
+						if (!df) throw std::runtime_error( std::string( "input form '") + doctypeid + "' is not defined (document type '" + doctypeid + "')");
+
+						m_inputform = *df;
+						m_inputform_parser.reset( new serialize::DDLStructParser( &m_inputform));
+						m_inputform_parser->init( m_input, serialize::Context::ValidateAttributes);
+						m_state = 2;
+						continue;
+					}
+					else
+					{
+						// check if the input is standalone and continue without mapping input to a form (state 3):
+						switch (m_inputfilter->state())
+						{
+							case InputFilter::Open: m_state = 3; continue;
+							case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
+							case InputFilter::Error: throw std::runtime_error( std::string( "error in input: ") + m_inputfilter->getError());
+						}
+						return IOFilterCommandHandler::Error;
+					}
 				}
 			case 2:
 				if (!m_inputform_parser->call()) return IOFilterCommandHandler::Yield;
@@ -200,7 +217,8 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 	}
 	catch (const std::runtime_error& e)
 	{
-		err = e.what();
+		m_errormsg = e.what();
+		err = m_errormsg.c_str();
 		return IOFilterCommandHandler::Error;
 	}
 }

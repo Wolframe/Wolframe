@@ -49,6 +49,8 @@ public:
 
 	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
 	typedef langbind::LuaScriptContext ContextStruct;
+	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
+	typedef langbind::ScriptEnvironmentConfigStruct ConfigStruct;
 
 public:
 	///\brief Constructor

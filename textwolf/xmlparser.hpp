@@ -138,7 +138,7 @@ struct XMLParserObject
 		return obj->getPosition();
 	}
 
-	static void* create( XMLParserBase::MethodTable& mt)
+	static void* create( XMLParserBase::MethodTable& mt, IOCharset chs=IOCharset())
 	{
 		mt.m_getNext = getNextProc;
 		mt.m_del = deleteObj;
@@ -146,7 +146,7 @@ struct XMLParserObject
 		mt.m_setFlag = setFlag;
 		mt.m_putInput = putInput;
 		mt.m_getPosition = getPosition;
-		return new This();
+		return new This( chs);
 	}
 };
 
@@ -171,7 +171,7 @@ public:
 		,m_attributes(a)
 		,m_doctype_state(0)
 	{
-		m_obj = XMLParserObject<XmlHdrSrcIterator,BufferType,charset::UTF8,charset::UTF8>::create( m_mt);
+		m_obj = XMLParserObject<XmlHdrSrcIterator,BufferType,charset::UTF8,charset::UTF8>::create( m_mt, charset::UTF8());
 	}
 
 	XMLParser( const XMLParser& o)
@@ -461,7 +461,19 @@ private:
 		if ((enc.size() >= 8 && std::memcmp( enc.c_str(), "isolatin", 8)== 0)
 		||  (enc.size() >= 7 && std::memcmp( enc.c_str(), "iso8859", 7) == 0))
 		{
-			m_obj = XMLParserObject<SrcIterator,BufferType,charset::IsoLatin,charset::UTF8>::create( m_mt);
+			const char* codepage = enc.c_str() + ((enc.c_str()[4] == 'l')?8:7);
+			if (std::strlen( codepage) > 1 || codepage[0] < '0' || codepage[0] > '9')
+			{
+				return false;
+			}
+			if (codepage[0] == '1')
+			{
+				m_obj = XMLParserObject<SrcIterator,BufferType,charset::IsoLatin,charset::UTF8>::create( m_mt);
+			}
+			else
+			{
+				m_obj = XMLParserObject<SrcIterator,BufferType,charset::IsoLatin,charset::UTF8>::create( m_mt, charset::IsoLatin( codepage[0] - '0'));
+			}
 		}
 		else if (enc.size() == 0 || enc == "utf8")
 		{

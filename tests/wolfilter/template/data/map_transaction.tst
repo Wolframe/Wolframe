@@ -1,8 +1,20 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
-testcmd="echo_transaction"				# command to execute by the test
-testscripts="$luascript $formname"			# list of scripts of the test
+opt=""
+modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
+opt="$opt --module $modpath/testtrace/mod_db_testtrace"
+opt="$opt --database 'id=testdb,outfile=DBOUT,file=DBRES,program=DBIN'"
+testcmd="$opt test_transaction"				# command to execute by the test
 docin=employee_assignment_print				# input document name
-docout=map_ddlform					# output document name
-disabled=1
+docout=$testname					# output document name
+testdata="
+**file: DBRES
+#id task start end#11 'bla bla' '12:04:19 1/3/2012' '12:41:34 1/3/2012'#12 'bli blu' '07:14:23 1/3/2012' '08:01:51 1/3/2012'
+#id task start end#21 'gardening' '09:24:28 1/3/2012' '11:11:07 1/3/2012'#22 'helo' '11:31:01 1/3/2012' '12:07:55 1/3/2012'
+#id task start end#31 'hula hop' '19:14:38 1/4/2012' '20:01:12 1/4/2012'#32 'hula hip' '11:31:01 1/3/2012' '12:07:55 1/3/2012'#33 'hula hup' '11:31:01 1/3/2012' '12:07:55 1/3/2012'
+**file:DBIN
+TRANSACTION test_transaction
+BEGIN
+	INTO doc/task WITH //task DO run( title);
+END"
 . ./output_tst_all.sh

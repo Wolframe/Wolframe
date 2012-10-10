@@ -4,8 +4,9 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
+SUBDIRS += directmap
 ifeq ($(WITH_LUA),1)
-SUBDIRS += luaCommandHandler
+SUBDIRS += lua
 endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

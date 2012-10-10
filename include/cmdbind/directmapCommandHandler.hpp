@@ -42,12 +42,13 @@ namespace _Wolframe {
 namespace cmdbind {
 
 ///\class DirectmapContext
-struct DirectmapContext
+class DirectmapContext
 {
+public:
 	DirectmapContext(){}
 	~DirectmapContext(){}
 
-	void load( const langbind::DirectmapConfigStruct& cfg_);
+	void load( const langbind::DirectmapConfigStruct& cfg_, const module::ModulesDirectory*);
 
 	///\brief Get the list of commands
 	std::list<std::string> commands() const;
@@ -69,6 +70,11 @@ private:
 class DirectmapCommandHandler :public IOFilterCommandHandlerEscDLF
 {
 public:
+	///\brief Declaration for cmdbind::ScriptCommandHandlerConstructor
+	typedef DirectmapContext ContextStruct;
+	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
+	typedef langbind::DirectmapConfigStruct ConfigStruct;
+
 	///\brief Constructor
 	explicit DirectmapCommandHandler( const DirectmapContext* ctx_)
 		:m_ctx(ctx_)
@@ -95,20 +101,23 @@ public:
 private:
 	void initcall();
 private:
-	const DirectmapContext* m_ctx;				//< execution context of the command handler
-	const langbind::DirectmapCommandConfigStruct* m_cmd;	//< description of command to execute
-	int m_state;
-	const db::TransactionFunction* m_function;
-	ddl::Form m_inputform;
-	ddl::Form m_outputform;
-	bool m_inputform_defined;
-	bool m_outputform_defined;
-	langbind::TypedInputFilterR m_input;
-	langbind::TypedOutputFilterR m_output;
-	types::CountedReference<langbind::TransactionFunctionClosure> m_functionclosure;
-	langbind::TypedInputFilterR m_outputform_serialize;
-	types::CountedReference<serialize::DDLStructParser> m_inputform_parser;
-	langbind::RedirectFilterClosure m_outputprinter;
+	const DirectmapContext* m_ctx;					//< execution context of the command handler
+	const langbind::DirectmapCommandConfigStruct* m_cmd;		//< description of command to execute
+	int m_state;							//< internal state
+	const db::TransactionFunction* m_function;			//< function object with input/output transaction serialization description
+	ddl::Form m_inputform;						//< (optional) form for validating and formating input
+	ddl::Form m_outputform;						//< (optional) form for validating and formating output
+	bool m_inputform_defined;					//< true if m_inputform defined
+	bool m_outputform_defined;					//< true if m_outputform defined
+	langbind::TypedInputFilterR m_input;				//< structure for input
+	langbind::TypedOutputFilterR m_output;				//< structure for output
+	types::CountedReference<langbind::TransactionFunctionClosure>
+		 m_functionclosure;					//< processor for the transaction
+	langbind::TypedInputFilterR m_outputform_serialize;		//< serializer of the data in the output form
+	types::CountedReference<serialize::DDLStructParser>
+		m_inputform_parser;					//< parser to map the input to the input form
+	langbind::RedirectFilterClosure m_outputprinter;		//< processor for redirection of the transaction call result or if defined the output form content to output
+	std::string m_errormsg;						//< buffer for error message returned
 };
 
 }}//namespace

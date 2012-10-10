@@ -49,7 +49,7 @@ const serialize::StructDescriptionBase* DirectmapCommandConfigStruct::getStructD
 		{
 			(*this)
 			( "name",		&DirectmapCommandConfigStruct::name)
-			( "function",		&DirectmapCommandConfigStruct::function)
+			( "call",		&DirectmapCommandConfigStruct::call)
 			( "filter",		&DirectmapCommandConfigStruct::filter)
 			( "inputform",		&DirectmapCommandConfigStruct::inputform)
 			( "outputform",		&DirectmapCommandConfigStruct::outputform)

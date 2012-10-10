@@ -61,6 +61,24 @@ public:
 		m_outputfilter = out;
 	}
 
+	void setFilterAs( const langbind::InputFilterR& in)
+	{
+		// assign the rest of the input to the new filter attached
+		const void* chunk;
+		std::size_t chunksize;
+		bool chunkend;
+		m_inputfilter->getRest( chunk, chunksize, chunkend);
+		m_inputfilter.reset( in->copy());
+		m_inputfilter->putInput( chunk, chunksize, chunkend);
+	}
+
+	void setFilterAs( const langbind::OutputFilterR& out)
+	{
+		langbind::OutputFilter* of = out->copy();
+		of->assignState( *m_outputfilter);
+		m_outputfilter.reset( of);;
+	}
+
 	///\enum CallResult
 	///\brief Enumeration of call states of this application processor instance
 	enum CallResult

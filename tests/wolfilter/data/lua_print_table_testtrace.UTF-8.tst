@@ -104,7 +104,7 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/cmdbind/luaCommandHandler/mod_lua_command_handler --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --normalize 'int number integer(10)' --normalize 'uint number unsigned(10)' --normalize 'float number float(10,10)' --printlayout f=invoice.simplepdf,n=print_invoice,t=tracepdf --form invoice.simpleform --script print_table.lua run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --normalize 'int number integer(10)' --normalize 'uint number unsigned(10)' --normalize 'float number float(10,10)' --printlayout f=invoice.simplepdf,n=print_invoice,t=tracepdf --form invoice.simpleform --script print_table.lua run
 **file: print_table.lua
 
 function run()

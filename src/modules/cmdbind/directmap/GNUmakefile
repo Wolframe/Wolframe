@@ -4,39 +4,30 @@ SUBDIRS =
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CXXFLAGS += \
-	-DWITH_LUA
-
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
-	-I$(TOPDIR)/lua/src \
 	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
+	-L$(TOPDIR)/src/libwolframe_serialize \
+	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind
 
 INCLUDE_LIBS = \
 	-lwolframe \
+	-lwolframe_serialize \
+	-lwolframe_database \
 	-lwolframe_langbind \
-	$(TOPDIR)/lua/src/liblua.a \
 	$(LIBS_DL)
 
 
-DYNAMIC_MODULE = mod_lua_command_handler.so
-
-LUA_CPP_OBJS = \
-	filter_luafilter.o \
-	langbind_luaObjects.o \
-	langbind_luaGetFunctionClosure.o \
-	langbind_luaDebug.o \
-	langbind_luaScriptContext.o
+DYNAMIC_MODULE = mod_command_directmap.so
 
 CPP_OBJS = \
-	$(LUA_CPP_OBJS) \
-	cmdbind_luaCommandHandler.o \
-	mod_lua_command_handler.o
+	cmdbind_directmapCommandHandler.o \
+	mod_command_directmap.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

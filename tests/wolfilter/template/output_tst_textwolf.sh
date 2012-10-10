@@ -29,7 +29,7 @@ filter="xml:textwolf"
 modpath="../../src/modules"
 testcmd="--module $modpath/filter/textwolf/mod_filter_textwolf $testcmd"
 if [ `echo $testcmd | grep '.lua ' | grep -c -- '--script'` != 0 ]; then
-	testcmd="--module $modpath/cmdbind/luaCommandHandler/mod_lua_command_handler $testcmd"
+	testcmd="--module $modpath/cmdbind/lua/mod_command_lua $testcmd"
 fi
 
 for cset in $csetlist

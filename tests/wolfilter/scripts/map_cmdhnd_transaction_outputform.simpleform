@@ -1,0 +1,11 @@
+!DOCTYPE "doc 'http://www.wolframe.org/example-doc/map_cmdhnd_transaction_outputform.dtd'"
+doc
+{
+	task []
+	{
+		task string
+		start string
+		end string
+		id int
+	}
+}

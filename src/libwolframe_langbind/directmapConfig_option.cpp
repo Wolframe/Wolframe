@@ -45,8 +45,8 @@ DirectmapCommandOption::DirectmapCommandOption( const std::string& opt)
 	serialize::parseStructOptionString( *this, opt);
 	if (name.empty())
 	{
-		name = function;
-		if (function.empty()) throw std::runtime_error( "no function name specified for direct map");
+		name = call;
+		if (call.empty()) throw std::runtime_error( "no 'call' specified for direct map");
 	}
 	if (filter.empty())
 	{

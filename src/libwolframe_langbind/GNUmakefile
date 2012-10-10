@@ -46,7 +46,6 @@ CPP_OBJS = \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \
-	cmdbind_directmapCommandHandler.o \
 	cmdbind_ioFilterCommandHandlerEscDLF.o
 
 

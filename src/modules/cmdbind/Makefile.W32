@@ -4,9 +4,11 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
+SUBDIRS = \
+	$(SUBDIRS) directmap
 !IFDEF WITH_LUA
 SUBDIRS = \
-	$(SUBDIRS) luaCommandHandler
+	$(SUBDIRS) lua
 !ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk

@@ -453,7 +453,12 @@ public:
 		:m_obj(0),m_attributes(a){}
 
 	XMLPrinter( const XMLPrinter& o)
-		:m_mt(o.m_mt),m_obj(0),m_attributes(o.m_attributes)
+		:m_mt(o.m_mt)
+		,m_obj(0)
+		,m_attributes(o.m_attributes)
+		,m_doctype_root(o.m_doctype_root)
+		,m_doctype_public(o.m_doctype_public)
+		,m_doctype_system(o.m_doctype_system)
 	{
 		if (o.m_obj)
 		{

@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/cmdbind/mod_lua_command_handler.cpp
-///\brief Module for command handler executing lua scripts
+///\file modules/cmdbind/mod_command_directmap.cpp
+///\brief Module for command handler executing direct mappings to transactions or functions
 #include "module/scriptCommandHandlerBuilder.hpp"
-#include "cmdbind/luaCommandHandler.hpp"
+#include "cmdbind/directmapCommandHandler.hpp"
 #include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
@@ -47,10 +47,10 @@ static void setModuleLogger( void* logger)
 }
 
 namespace {
-static ConfiguredBuilder* createLuaCommandHandlerModule()
+static ConfiguredBuilder* createDirectmapCommandHandlerModule()
 {
-	static ScriptCommandHandlerBuilder<cmdbind::LuaCommandHandler>
-		mod( "LuaCommandHandler", "command handler for lua scripts", "cmdhandler", "lua", "LuaCommandHandler");
+	static ScriptCommandHandlerBuilder<cmdbind::DirectmapCommandHandler>
+		mod( "DirectmapCommandHandler", "command handler for direct mappings", "cmdhandler", "directmap", "DirectmapCommandHandler");
 	return &mod;
 }
 }//anonymous namespace
@@ -58,9 +58,9 @@ static ConfiguredBuilder* createLuaCommandHandlerModule()
 enum {NofContainers=1};
 static ConfiguredBuilder* (*containers[ NofContainers])() =
 {
-	createLuaCommandHandlerModule
+	createDirectmapCommandHandlerModule
 };
 
-ModuleEntryPoint entryPoint( 0, "command handler for lua scripts",
+ModuleEntryPoint entryPoint( 0, "command handler for direct mappings",
 				setModuleLogger, NofContainers, containers, 0, 0);
 
