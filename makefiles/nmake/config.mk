@@ -149,3 +149,9 @@ DOXYGEN = C:\Program Files\Doxygen\bin\doxygen.exe
 ##########################################################################
 
 HHC_LOCATION = C:\Program Files\HTML Help Workshop\hhc.exe
+
+# CCacche
+#########
+
+CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
