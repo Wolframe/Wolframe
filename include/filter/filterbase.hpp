@@ -55,6 +55,10 @@ public:
 		setError( o.m_errorbuf);
 	}
 
+	~FilterBase( )
+	{
+	}
+
 	///\enum ElementType
 	///\brief Content element type that describes the role of the element in the structured input
 	enum ElementType
