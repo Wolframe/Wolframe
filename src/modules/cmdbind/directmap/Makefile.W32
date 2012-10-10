@@ -35,7 +35,7 @@ all: $(DYNAMIC_MODULE)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:ModLuaCommandHandler.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:ModDirectmapCommandHandler.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 
