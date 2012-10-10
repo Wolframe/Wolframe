@@ -53,6 +53,7 @@ public:
 	~DatabaseProvider_Impl();
 
 	Database* database( const std::string& ID ) const;
+
 private:
 	std::list< DatabaseUnit* >	m_db;
 };

@@ -34,7 +34,6 @@
 ///\file modules/database/sqlite3/SQLiteProgram.hpp
 #ifndef _DATABASE_PROGRAM_SQLITE3_HPP_INCLUDED
 #define _DATABASE_PROGRAM_SQLITE3_HPP_INCLUDED
-#include "database/program.hpp"
 #include <string>
 #include <map>
 #include <cstdlib>
@@ -43,14 +42,21 @@
 namespace _Wolframe {
 namespace db {
 
-class Program_sqlite3 :public Program
+class SQLiteProgram
 {
 public:
-	Program_sqlite3()
-		:Program( ""){}
-	Program_sqlite3( const Program_sqlite3& o)
-		:Program( o){}
+	SQLiteProgram(){}
+	SQLiteProgram( const SQLiteProgram& o)
+		:m_statementmap(o.m_statementmap){}
+
+	void load( const std::string& dbsource);
+	const std::map<std::string,std::string>* statementmap() const
+	{
+		return &m_statementmap;
+	}
+
 private:
+	std::map<std::string,std::string> m_statementmap;
 };
 
 }}

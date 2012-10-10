@@ -59,7 +59,7 @@ public:
 		,m_commentopr(o.m_commentopr){}
 
 	///\brief Destructor
-	virtual ~Program(){}
+	~Program(){}
 
 	void defineCommentOpr( const std::string& commentopr_)
 	{
@@ -96,7 +96,7 @@ public:
 	///\param[in] source source for database with included transaction definitions to parse
 	///\param[out] dbsource source for database without transaction definitions
 	///\remark Throws Program::Error exception
-	virtual void load( const std::string& source, std::string& dbsource);
+	void load( const std::string& source, std::string& dbsource);
 
 	///\brief Load transaction program source
 	///\param[in] filename file with source for database with included transaction definitions to parse

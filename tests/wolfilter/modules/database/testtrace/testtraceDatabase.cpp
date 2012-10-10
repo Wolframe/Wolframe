@@ -127,14 +127,11 @@ void TesttraceDatabaseConfig::setCanonicalPathes( const std::string& referencePa
 TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string& programfilename_, const std::string& resultfilename_, const std::string& outfilename_, unsigned short, bool)
 	:m_id(id_)
 	,m_outfilename(outfilename_)
+	,m_programfilename(programfilename_)
 {
 	if (!resultfilename_.empty())
 	{
 		m_result = utils::readSourceFileLines( resultfilename_);
-	}
-	if (!programfilename_.empty())
-	{
-		m_programsrc = utils::readSourceFileContent( programfilename_);
 	}
 }
 
@@ -143,23 +140,7 @@ Transaction* TesttraceDatabase::transaction( const std::string& /*name*/ )
 	return new TesttraceTransaction( this, m_result);
 }
 
-bool TesttraceDatabase::loadProgram()
-{
-	try
-	{
-		std::string dbsource;
-		m_program.load( m_programsrc, dbsource);
-		loadProgram( dbsource);
-		return true;
-	}
-	catch (std::runtime_error& e)
-	{
-		LOG_ERROR << "failed to load database program: " << e.what();
-		return false;
-	}
-}
-
-void TesttraceDatabase::loadProgram( const std::string& source)
+void TesttraceDatabase::loadProgram_HACK( const std::string& source)
 {
 	static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
 	std::string::const_iterator si = source.begin(), se = source.end();

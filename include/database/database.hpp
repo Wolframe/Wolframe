@@ -38,7 +38,6 @@
 #define _DATABASE_HPP_INCLUDED
 
 #include "database/transaction.hpp"
-#include "database/transactionFunction.hpp"
 #include "program.hpp"
 #include <string>
 
@@ -60,11 +59,13 @@ public:
 	///\ Just and interface at the moment
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
-	/// DEPRECATED:
-	virtual const TransactionFunction* transactionFunction( const std::string&)
+	///\brief Get the list of available transaction programs for this database
+	virtual std::vector<std::string> getProgramFiles_HACK() const
 	{
-		return 0;
+		return std::vector<std::string>();
 	}
+
+	virtual void loadProgram_HACK( const std::string& /*content*/){}
 
 	/// Close the database connetion
 	/// This exists for no good reason (mostly to make the code look uniform)
@@ -92,7 +93,7 @@ public:
 
 	///\brief Load the database specific part of the transaction program for this database
 	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadProgram( const std::string& filename ) = 0;
+	virtual void loadProgram( const std::string& content ) = 0;
 
 	///\brief add a database transaction program to the list of transaction programs
 	///\remark throws std::runtime_error with position info in case of error

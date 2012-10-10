@@ -41,7 +41,7 @@
 #include "database/transaction.hpp"
 #include "config/configurationBase.hpp"
 #include "constructor.hpp"
-
+#include "SQLiteProgram.hpp"
 #include <list>
 #include "objectPool.hpp"
 #include "sqlite3.h"
@@ -147,7 +147,7 @@ public:
 
 	const std::map<std::string,std::string>* stmmap() const
 	{
-		return &m_stmmap;
+		return m_program.statementmap();
 	}
 
 private:
@@ -157,9 +157,7 @@ private:
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
 
-	Program			m_program;		///< database programs ???
-
-	std::map<std::string,std::string> m_stmmap;	///< map of statements (commands)
+	SQLiteProgram		m_program;		///< database programs
 	SQLiteDatabase		m_db;
 };
 

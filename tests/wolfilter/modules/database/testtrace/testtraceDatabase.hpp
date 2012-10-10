@@ -115,20 +115,22 @@ public:
 
 	virtual Transaction* transaction( const std::string& /*name*/);
 
-	/// DEPRECATED:
-	virtual const TransactionFunction* transactionFunction( const std::string& name )
-	{
-		return m_program.function( name);
-	}
-
-	/// DEPRECATED:
-	virtual bool loadProgram();
-
 	virtual void addTransactionDefinition( const std::string& /*definition*/ ) {}
 	const std::string* getTransactionDefinition( const std::string& /*name*/ )
 						{ return NULL; }
 
-	virtual void loadProgram( const std::string& source);
+	virtual void loadProgram_HACK( const std::string& source);
+	virtual void loadProgram( const std::string& source)
+	{
+		loadProgram_HACK( source);
+	}
+
+	virtual std::vector<std::string> getProgramFiles_HACK() const
+	{
+		std::vector<std::string> rt;
+		rt.push_back( m_programfilename);
+		return rt;
+	}
 
 	const std::string& outfilename() const
 	{
@@ -138,9 +140,8 @@ public:
 private:
 	std::string m_id;
 	std::string m_outfilename;
+	std::string m_programfilename;
 	std::vector<std::string> m_result;
-	std::string m_programsrc;
-	db::Program m_program;
 };
 
 

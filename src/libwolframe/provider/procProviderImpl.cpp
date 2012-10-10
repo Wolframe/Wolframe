@@ -299,6 +299,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	{
 		success &= loadPrintFunction( ii->name, ii->type, ii->file);
 	}
+
 	if (!success)
 	{
 		throw std::logic_error( "Not all configured objects in the processor environment could be loaded. See log." );
@@ -338,8 +339,16 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			LOG_DEBUG << "Processor database: database reference '" << m_dbLabel << "' resolved";
-			return true;
+			if (loadTransactionPrograms())
+			{
+				LOG_DEBUG << "Processor database: database reference '" << m_dbLabel << "' resolved";
+				return true;
+			}
+			else
+			{
+				LOG_ALERT << "Processor database loading programs failed !";
+				return false;
+			}
 		}
 		else	{
 			LOG_ALERT << "Processor database: database labeled '" << m_dbLabel << "' not found !";
@@ -533,6 +542,28 @@ bool ProcessorProvider::ProcessorProvider_Impl::declareNormalizeFunction( const 
 	}
 }
 
+bool ProcessorProvider::ProcessorProvider_Impl::loadTransactionPrograms()
+{
+	bool rt = true;
+	std::vector<std::string> prgfiles = m_db->getProgramFiles_HACK();
+	std::vector<std::string>::const_iterator pi = prgfiles.begin(), pe = prgfiles.end();
+	for (; pi != pe; pi++)
+	{
+		try
+		{
+			std::string dbsrc;
+			m_program.loadfile( *pi, dbsrc);
+			m_db->loadProgram_HACK( dbsrc);
+		}
+		catch (const std::runtime_error& err)
+		{
+			LOG_ALERT << "failed to load transaction program '" << *pi << "': " << err.what();
+			rt = false;
+		}
+	}
+	return rt;
+}
+
 const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name ) const
 {
 	std::string key = boost::algorithm::to_upper_copy( name);
@@ -582,16 +613,7 @@ db::Transaction* ProcessorProvider::ProcessorProvider_Impl::transaction( const s
 
 const db::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transactionFunction( const std::string& name ) const
 {
-	{
-		if ( m_db )
-		{
-			return m_db->transactionFunction( name );
-		}
-		else
-		{
-			return 0;
-		}
-	}
+	return m_program.function( name );
 }
 
 }} // namespace _Wolframe::proc
