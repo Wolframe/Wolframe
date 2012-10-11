@@ -122,6 +122,12 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			foreach( QListWidgetItem *item, items ) {
 				xml.writeTextElement( "", name, item->data( Qt::DisplayRole ).toString( ) );
 			}
+		} else if( clazz == "QTreeWidget" ) {
+			QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
+			QList<QTreeWidgetItem *> items = treeWidget->selectedItems( );
+			foreach( QTreeWidgetItem *item, items ) {
+				xml.writeTextElement( "", name, item->data( 0, Qt::DisplayRole ).toString( ) );
+			}
 		}
 		
 		qDebug( ) << "Wrote " << clazz << name;
@@ -387,6 +393,17 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 							QList<QListWidgetItem *> items = listWidget->findItems( text, Qt::MatchExactly );
 							foreach( QListWidgetItem *item, items ) {
 								item->setSelected( true );
+							}
+						} else if( clazz == "QTreeWidget" ) {
+							QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
+							QList<QTreeWidgetItem *> items = treeWidget->findItems( text, Qt::MatchExactly | Qt::MatchRecursive, 0 );
+							foreach( QTreeWidgetItem *item, items ) {
+								item->setSelected( true );
+								QTreeWidgetItem *parent = item->parent( );
+								while( parent != 0 && parent != treeWidget->invisibleRootItem( ) ) {
+									parent->setExpanded( true );
+									parent = parent->parent( );
+								}
 							}
 						}
 					}
