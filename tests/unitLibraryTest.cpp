@@ -30,37 +30,49 @@
  Project Wolframe.
 
 ************************************************************************/
-///
-///\brief Interface to read a program for the database
-///\file unitProgram.hpp
-///
+//
+// function library template unit tests
+//
 
-#ifndef _UNIT_PROGRAM_HPP_INCLUDED
-#define _UNIT_PROGRAM_HPP_INCLUDED
+#include "unitLibrary.hpp"
+#include "gtest/gtest.h"
 
-#include <string>
-#include <map>
-#include <vector>
 
-namespace _Wolframe {
+// The fixture for testing Wolframe::ObjectPool template
+class FunctionLibraryFixture : public ::testing::Test	{
+protected:
+	// Set-up work for each test here.
+	FunctionLibraryFixture()	{
+	}
 
-///\brief Template for program unit mechs
-template < typename UnitFunction >
-class Program
-{
+	// Clean-up work that doesn't throw exceptions here.
+	virtual ~FunctionLibraryFixture()	{
+	}
+
+	// Code here will be called immediately after the constructor
+	// (right before each test).
+	virtual void SetUp() {
+	}
+
+	// Code here will be called immediately after each test (right
+	// before the destructor).
+	virtual void TearDown() {
+	}
+
+	// Objects declared here can be used by all tests in the test case.
+	_Wolframe::UnitLibrary< integer >	library;
+	size_t					libSize;
 public:
-	Program()		{}
-	~Program()		{}
-
-	bool addFunction( const UnitFunction );
-	const UnitFunction* function( const std::string& name ) const;
-
-private:
-	std::vector< UnitFunction >		m_functions;
-	std::map< std::string, UnitFunction* >	m_funcMap;
 };
 
-} // namespace _Wolframe
 
-#endif // _UNIT_PROGRAM_HPP_INCLUDED
+// Tests the ObjectPool get & release
+TEST_F( FunctionLibraryFixture, Add_Retrieve )	{
+}
 
+
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS();
+}

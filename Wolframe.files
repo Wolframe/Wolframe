@@ -465,7 +465,7 @@ include/types/dateArithmetic.hpp
 include/types/doctype.hpp
 include/types/sha2.h
 include/types/singleton.hpp
-include/unitProgram.hpp
+include/unitLibrary.hpp
 include/utils/doctype.hpp
 include/utils/getPassword.hpp
 include/utils/miscUtils.hpp
@@ -1121,6 +1121,7 @@ tests/testTimestamp.cpp
 tests/testVirtualInheritance.cpp
 tests/testWolfilter.cpp
 tests/threadLeakTest.cpp
+tests/unitLibraryTest.cpp
 tests/versionTest.cpp
 tests/wolfilter/GNUmakefile
 tests/wolfilter/Makefile.W32

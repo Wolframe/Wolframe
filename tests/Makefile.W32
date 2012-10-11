@@ -114,7 +114,8 @@ TEST_CPP_BINS = \
 	testProtocolLFdotEscaping.exe \
 	testTimestamp.exe \
 	testWolfilter.exe \
-	stringNormalizationTest.exe
+	stringNormalizationTest.exe \
+#	unitLibraryTest.exe
 
 
 OBJS = \
@@ -147,6 +148,7 @@ testWolfilter.exe: testWolfilter.obj $(TOPDIR)\src\wolframe.lib
 stringNormalizationTest.exe: stringNormalizationTest.obj $(TOPDIR)\src\libwolframe_functions\wolframe_functions.lib
 testRand.exe: testRand.obj
 testTimestamp.exe: testTimestamp.obj
+#unitLibraryTest.exe: unitLibraryTest.obj
 
 local_all:
 
@@ -182,6 +184,7 @@ local_test:
 	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo testWolfilter >> test.bat
 	@-echo stringNormalizationTest >> test.bat
+#	@-echo unitLibraryTest >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
 
