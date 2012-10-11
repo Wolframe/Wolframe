@@ -163,8 +163,7 @@ void DataHandler::resetFormData( QWidget *form )
 			QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
 		} else if( clazz == "QComboBox" ) {
 			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
-			// TODO: also removes values from a UI? Domain load!
-			//comboBox->clear( );
+			comboBox->clear( );
 		} else if( clazz == "QSpinBox" ) {
 			QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
 			// TODO
@@ -213,8 +212,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 		
 		if( clazz == "QComboBox" ) {
 			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
-			// TODO: either it is in the desinger form (hard coded), but then how
-			// is i18n done? better load the items to pick?
+			m_dataLoader->initiateDomainDataLoad( form_name, name );
 		} else if( clazz == "QListWidget" ) {
 			m_dataLoader->initiateDomainDataLoad( form_name, name );
 		} else if( clazz == "QTreeWidget" ) {
@@ -233,7 +231,16 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 	qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
 
 	QXmlStreamReader xml( data );
-	if( clazz == "QListWidget" ) {
+	if( clazz == "QComboBox" ) {
+		QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
+		while( !xml.atEnd( ) ) {
+			xml.readNext( );
+			if( xml.isStartElement( ) && xml.name( ) == "value" ) {
+				QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
+				comboBox->addItem( text );
+			}
+		}
+	} else if( clazz == "QListWidget" ) {
 		QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
