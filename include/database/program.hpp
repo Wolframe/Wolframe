@@ -31,7 +31,8 @@
 
 ************************************************************************/
 ///\brief Interface to read a program for the database
-///\file database/preparedStatement.hpp
+///\file database/program.hpp
+//
 #ifndef _DATABASE_PROGRAM_HPP_INCLUDED
 #define _DATABASE_PROGRAM_HPP_INCLUDED
 #include "types/countedReference.hpp"
