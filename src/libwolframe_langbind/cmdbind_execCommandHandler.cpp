@@ -269,15 +269,21 @@ LOG_ERROR << "EXEC COMMAND HANDLER STATE: " << stateName(m_state);
 						if (!m_provider)
 						{
 							LOG_ERROR << "Processor provider undefined";
-							m_statusCode = -1;
-							return CLOSE;
+							m_output.print( "BAD command not defined\r\n");
+							m_state = EnterCommand;
+							m_buffer.clear();
+							m_argBuffer.clear();
+							return WRITE;
 						}
 						m_cmdhandler.reset( m_provider->cmdhandler( procname));
 						if (!m_cmdhandler.get())
 						{
 							LOG_ERROR << "Command handler not found for '" << procname << "'";
-							m_statusCode = -1;
-							return CLOSE;
+							m_output.print( "BAD command not defined\r\n");
+							m_state = EnterCommand;
+							m_buffer.clear();
+							m_argBuffer.clear();
+							return WRITE;
 						}
 						m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
 						m_state = Processing;
