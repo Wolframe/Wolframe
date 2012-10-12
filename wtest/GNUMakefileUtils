@@ -3,10 +3,8 @@
 all: cleanInput
 
 cleanInput: cleanInput.o
-	g++ -o cleanInput  -L/usr/local/lib -L/usr/lib cleanInput.o
+	g++ -o cleanInput -L/usr/local/lib -L/usr/lib cleanInput.o
 
 cleanInput.o: cleanInput.cpp
 	g++ -c -o cleanInput.o -g -pedantic -Wall cleanInput.cpp
-
-
 

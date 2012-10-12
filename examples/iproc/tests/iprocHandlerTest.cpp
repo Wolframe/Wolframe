@@ -52,6 +52,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/shared_ptr.hpp>
 
 using namespace _Wolframe;
@@ -414,6 +415,11 @@ int main( int argc, char **argv )
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
 		return 1;
 	}
+	// iproc handler tests write and read their configuration files as temp/test.cfg
+	// and have therefore to be executed sequentially:
+	static boost::mutex mutex;
+	boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
+
 	wtest::Data::createDataDir( "temp", g_gtest_ARGV[0]);
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
 	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );

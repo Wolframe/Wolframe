@@ -58,7 +58,6 @@ static const char* SQLite_DB_CLASS_NAME = "SQLite";
 /// SQLite database configuration
 class SQLiteConfig : public config::NamedConfiguration
 {
-	friend class SQLiteConstructor;
 public:
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 
@@ -70,12 +69,19 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
+
+	const std::string& ID() const				{return m_ID;}
+	const std::string& filename() const			{return m_filename;}
+	bool flag() const					{return m_flag;}
+	unsigned short connections() const			{return m_connections;}
+	const std::list< std::string > programFiles() const	{return m_programFiles;}
+
 private:
 	std::string	m_ID;
-	std::string	filename;
-	bool		flag;
-	unsigned short	connections;
-	std::list< std::string > programFiles;	///< list of program files
+	std::string	m_filename;
+	bool		m_flag;
+	unsigned short	m_connections;
+	std::list< std::string > m_programFiles;		//< list of program files
 };
 
 

@@ -2,6 +2,14 @@ TOPDIR = ..\..\..\..
 
 SUBDIRS = testtrace
 
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+# sqlite3
+!IFDEF WITH_SQLITE3
+SUBDIRS = \
+	$(SUBDIRS) sqlite3
+!ENDIF
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:
