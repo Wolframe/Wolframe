@@ -138,6 +138,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 {
 	for (;;)
 	{
+LOG_ERROR << "LINE COMMAND HANDLER STATE: " << commandStateName(m_cmdstateidx);
 		switch( m_cmdstateidx)
 		{
 			case Init:
