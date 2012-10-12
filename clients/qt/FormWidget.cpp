@@ -31,19 +31,19 @@ FormWidget::FormWidget( FormLoader *_formLoader, QUiLoader *_uiLoader, QWidget *
 void FormWidget::initialize( )
 {
 // link the form loader for form loader notifications
-	QObject::connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
+	connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
 		this, SLOT( formLoaded( QString, QByteArray ) ) );	
-	QObject::connect( m_formLoader, SIGNAL( formLocalizationLoaded( QString, QByteArray ) ),
+	connect( m_formLoader, SIGNAL( formLocalizationLoaded( QString, QByteArray ) ),
 		this, SLOT( formLocalizationLoaded( QString, QByteArray ) ) );	
 
 // link the data loader to our form widget
-	QObject::connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
+	connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
 		this, SLOT( dataLoaded( QString, QByteArray ) ) );
-	QObject::connect( m_dataLoader, SIGNAL( dataSaved( QString ) ),
+	connect( m_dataLoader, SIGNAL( dataSaved( QString ) ),
 		this, SLOT( dataSaved( QString ) ) );
 
 // link the data loader to the data handler
-	QObject::connect( m_dataLoader, SIGNAL( domainDataLoaded( QString, QString, QByteArray ) ),
+	connect( m_dataLoader, SIGNAL( domainDataLoaded( QString, QString, QByteArray ) ),
 		this, SLOT( formDomainLoaded( QString, QString, QByteArray ) ) );
 }
 

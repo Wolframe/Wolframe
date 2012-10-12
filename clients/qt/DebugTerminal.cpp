@@ -49,10 +49,10 @@ void DebugTerminal::initialize( )
 	completer->setCompletionMode( QCompleter::InlineCompletion );
 	m_input->setCompleter( completer );
 
-	QObject::connect( m_input, SIGNAL( lineEntered( QString ) ), this, SLOT( lineEntered( QString ) ) );
+	connect( m_input, SIGNAL( lineEntered( QString ) ), this, SLOT( lineEntered( QString ) ) );
 
-	QObject::connect( m_wolframeClient, SIGNAL( error( QString ) ), this, SLOT( networkError( QString ) ) );
-	QObject::connect( m_wolframeClient, SIGNAL( lineReceived( QString ) ), this, SLOT( lineReceived( QString ) ) );
+	connect( m_wolframeClient, SIGNAL( error( QString ) ), this, SLOT( networkError( QString ) ) );
+	connect( m_wolframeClient, SIGNAL( lineReceived( QString ) ), this, SLOT( lineReceived( QString ) ) );
 }
 
 DebugTerminal::~DebugTerminal( )

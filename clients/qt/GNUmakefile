@@ -47,9 +47,11 @@ OBJS = \
 	FormLoader.o \
 	moc_FormLoader.o \
 	FileFormLoader.o \
+	NetworkFormLoader.o \
 	DataLoader.o \
 	moc_DataLoader.o \
 	FileDataLoader.o \
+	NetworkDataLoader.o \
 	DataHandler.o \
 	moc_DataHandler.o \
 	DebugTerminal.o \
@@ -59,7 +61,9 @@ OBJS = \
 	WolframeClient.o \
 	moc_WolframeClient.o \
 	FormWidget.o \
-	moc_FormWidget.o
+	moc_FormWidget.o \
+	qcommandline.o \
+	moc_qcommandline.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -92,6 +96,8 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormWidget.hpp -o moc_FormWidget.cpp
 
+moc_qcommandline.cpp: qcommandline.h
+	$(QT_MOC) $(MOC_FLAGS) qcommandline.h -o moc_qcommandline.cpp
 	
 FORMS = \
 	forms/form1.ui \
@@ -109,7 +115,8 @@ DATA = \
 	
 THEMES = \
 	themes/phone/MainWindow.ui \
-	themes/windows/MainWindow.ui
+	themes/windows/MainWindow.ui \
+	themes/eeepc/MainWindow.ui
 
 %.qm : %.ts
 	$(QT_LRELEASE) $< -qm $@
@@ -119,7 +126,8 @@ I18NS = \
 	i18n/form2.de_CH.qm \
 	i18n/form3.de_CH.qm \
 	themes/windows/qtclient.de_CH.qm \
-	themes/phone/qtclient.de_CH.qm
+	themes/phone/qtclient.de_CH.qm \
+	themes/eeepc/qtclient.de_CH.qm
 
 local_all: $(I18NS)
 
@@ -153,6 +161,7 @@ run: local_all $(CPP_BINS)
 buildi18n:
 	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/qtclient.de_CH.ts
 	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/qtclient.de_CH.ts
+	$(QT_LUPDATE) themes/eeepc/MainWindow.ui -ts themes/phone/qtclient.de_CH.ts
 	$(QT_LUPDATE) forms/form1.ui -ts i18n/form1.de_CH.ts
 	$(QT_LUPDATE) forms/form2.ui -ts i18n/form2.de_CH.ts
 	$(QT_LUPDATE) forms/form3.ui -ts i18n/form3.de_CH.ts

@@ -23,7 +23,7 @@ void HistoryLineEdit::initialize( )
 	readHistory( );
 	m_pos = m_history->size( ) - 1;
 
-	QObject::connect( this, SIGNAL( returnPressed( ) ), this, SLOT( returnPressed( ) ) );
+	connect( this, SIGNAL( returnPressed( ) ), this, SLOT( returnPressed( ) ) );
 }
 
 HistoryLineEdit::~HistoryLineEdit( )

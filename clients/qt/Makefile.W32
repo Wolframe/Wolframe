@@ -5,7 +5,8 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x403
+	/D_WIN32_WINNT=0x403 \
+	/DQCOMMANDLINE_STATIC
 
 INCLUDE_DIRS = \
 	/I. \
@@ -54,9 +55,11 @@ OBJS = \
 	FormLoader.obj \
 	moc_FormLoader.obj \
 	FileFormLoader.obj \
+	NetworkFormLoader.obj \
 	DataLoader.obj \
 	moc_DataLoader.obj \
 	FileDataLoader.obj \
+	NetworkDataLoader.obj \
 	DataHandler.obj \
 	moc_DataHandler.obj \
 	DebugTerminal.obj \
@@ -66,7 +69,9 @@ OBJS = \
 	WolframeClient.obj \
 	moc_WolframeClient.obj \
 	FormWidget.obj \
-	moc_FormWidget.obj
+	moc_FormWidget.obj \
+	qcommandline.obj \
+	moc_qcommandline.obj
 
 CPP_BINS = \
 	qtclient.exe
@@ -89,13 +94,17 @@ themes\windows\qtclient.de_CH.qm: themes\windows\qtclient.de_CH.ts
 
 themes\phone\qtclient.de_CH.qm: themes\phone\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe themes\phone\qtclient.de_CH.ts -qm themes\phone\qtclient.de_CH.qm
+
+themes\eeepc\qtclient.de_CH.qm: themes\eeepc\qtclient.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe themes\eeepc\qtclient.de_CH.ts -qm themes\eeepc\qtclient.de_CH.qm
 	
 I18NS = \
 	i18n\form1.de_CH.qm \
 	i18n\form2.de_CH.qm \
 	i18n\form3.de_CH.qm \
 	themes\windows\qtclient.de_CH.qm \
-	themes\phone\qtclient.de_CH.qm
+	themes\phone\qtclient.de_CH.qm \
+	themes\eeepc\qtclient.de_CH.qm
 
 local_all: $(I18NS)
 
@@ -124,6 +133,9 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormWidget.hpp -o moc_FormWidget.cpp
+
+moc_qcommandline.cpp: qcommandline.h
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. qcommandline.h -o moc_qcommandline.cpp
 
 local_clean:
 	@-erase moc_*.cpp *.dll 2>NUL
@@ -157,6 +169,7 @@ run: local_all $(CPP_BINS)
 buildi18n:
 	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe themes\eeepc\MainWindow.ui -ts themes\eeepc\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe forms\form1.ui -ts i18n\form1.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe forms\form2.ui -ts i18n\form2.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe forms\form3.ui -ts i18n\form3.de_CH.ts
