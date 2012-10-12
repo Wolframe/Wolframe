@@ -41,7 +41,6 @@
 #include "database/DBprovider.hpp"
 #include "AAAA/AAAAprovider.hpp"
 #include "processor/procProvider.hpp"
-#include "mainConnectionHandler.hpp"
 
 namespace _Wolframe {
 
@@ -53,7 +52,6 @@ namespace _Wolframe {
 		config::ServiceBanner		*bannerCfg;
 		AAAA::AAAAconfiguration		*aaaaCfg;
 		proc::ProcProviderConfig	*procCfg;
-		proc::Configuration		*appCfg;
 
 		/// constructor
 		HandlerConfiguration()
@@ -62,7 +60,6 @@ namespace _Wolframe {
 			databaseCfg = new db::DBproviderConfig();
 			aaaaCfg = new AAAA::AAAAconfiguration();
 			procCfg = new proc::ProcProviderConfig();
-			appCfg = new proc::Configuration();
 		}
 
 		~HandlerConfiguration()
@@ -71,10 +68,8 @@ namespace _Wolframe {
 			if ( databaseCfg ) delete databaseCfg;
 			if ( aaaaCfg ) delete aaaaCfg;
 			if ( procCfg ) delete procCfg;
-			if ( appCfg ) delete appCfg;
 		}
 	};
-
 
 } // namespace _Wolframe
 

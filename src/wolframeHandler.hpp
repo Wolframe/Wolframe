@@ -42,6 +42,7 @@
 #include "database/database.hpp"
 #include "AAAA/AAAAprovider.hpp"
 #include "processor/procProvider.hpp"
+#include "mainConnectionHandler.hpp"
 
 namespace _Wolframe {
 
@@ -94,7 +95,8 @@ private:
 		SIGNALLED,			///<
 		FORBIDDEN,			///<
 		TERMINATING,			///<
-		FINISHED			///<
+		FINISHED,			///<
+		COMMAND_HANDLER			///< in main command handler
 	};
 
 	///\brief Returns the state as string for logging etc.
@@ -138,10 +140,14 @@ private:
 	FSMstate			m_state;		///< top processor FSM state
 
 	protocol::InputBlock		m_readBuf;		///< network read buffer
+	protocol::OutputBlock		m_outputBuf;
 	char*				m_dataStart;
 	std::size_t			m_dataSize;
 	/// Output buffer
 	std::string			m_outMsg;
+
+	// Adding protocol
+	proc::CommandHandler		m_cmdHandler;
 };
 
 /// The server handler container

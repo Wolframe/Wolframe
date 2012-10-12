@@ -59,6 +59,11 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<CommandHandler>
 };
 static STM stm;
 
+CommandHandler::CommandHandler()
+	:cmdbind::LineCommandHandlerTemplate<CommandHandler>( &stm )
+{
+	m_commands.push_back( Command( "RUN", "test"));
+}
 
 int CommandHandler::endRun( cmdbind::CommandHandler* ch, std::ostream& out)
 {
@@ -157,9 +162,8 @@ const net::NetworkOperation Connection::nextOperation()
 	return net::CloseConnection();
 }
 
-Connection::Connection( const net::LocalEndpoint& local, const Configuration* config)
-	:m_config(config)
-	,m_cmdhandler( &stm, config)
+Connection::Connection( const net::LocalEndpoint& local)
+	:m_cmdhandler()
 	,m_terminated(false)
 {
 	m_cmdhandler.setInputBuffer( m_input.ptr(), m_input.size());

@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\file mainConnectionHandler.hpp
-///\brief example connection handler as processor executing lua scripts with a complex protocol
+///
 
 #ifndef _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #define _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
@@ -39,46 +39,17 @@
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
 #include "cmdbind/execCommandHandler.hpp"
-#include "config/configurationBase.hpp"
 #include "protocol/ioblocks.hpp"
 
 namespace _Wolframe {
 namespace proc {
-
-///\class Configuration
-///\brief Configuration structure
-class Configuration :public config::ConfigurationBase
-{
-public:
-	Configuration()
-		:ConfigurationBase( "processor", 0, "processor") {}
-
-	Configuration( const Configuration& o)
-		:config::ConfigurationBase(o){}
-
-	///\brief interface implementation of ConfigurationBase::parse( const config::ConfigurationTree&, const std::string&, const module::ModulesDirectory*)
-	bool parse( const config::ConfigurationTree& , const std::string& , const module::ModulesDirectory* ) {return true;}
-
-	///\brief interface implementation of ConfigurationBase::test() const
-	virtual bool test() const	{return true;}
-
-	///\brief interface implementation of ConfigurationBase::check() const
-	virtual bool check() const	{return true;}
-
-	///\brief interface implementation of ConfigurationBase::print(std::ostream& os, size_t indent) const
-	virtual void print( std::ostream&, size_t) const{}
-};
 
 class CommandHandler :public cmdbind::LineCommandHandlerTemplate<CommandHandler>
 {
 public:
 	typedef cmdbind::ExecCommandHandler::Command Command;
 
-	CommandHandler( const cmdbind::LineCommandHandlerSTM* stm, const Configuration* cfg)
-		:cmdbind::LineCommandHandlerTemplate<CommandHandler>( stm),m_config(cfg)
-	{
-		m_commands.push_back( Command( "RUN", "test"));
-	}
+	CommandHandler();
 
 	//methods called by the protocol and implemented here
 	int doHello( int argc, const char** argv, std::ostream& out);
@@ -90,7 +61,6 @@ public:
 		return m_commands;
 	}
 private:
-	const Configuration* m_config;		//< configuration reference
 	std::vector<Command> m_commands;	//< commands available
 };
 
@@ -100,7 +70,7 @@ class Connection : public net::ConnectionHandler
 {
 public:
 	///\brief Constructor
-	Connection( const net::LocalEndpoint& local, const Configuration* config);
+	Connection( const net::LocalEndpoint& local);
 
 	///\brief Destructor
 	virtual ~Connection();
@@ -128,7 +98,6 @@ public:
 	}
 
 private:
-	const Configuration* m_config;			//< configuration reference
 	CommandHandler m_cmdhandler;			//< top level instance executing commands
 	protocol::InputBlock m_input;			//< buffer for network read messages
 	protocol::OutputBlock m_output;			//< buffer for network write messages

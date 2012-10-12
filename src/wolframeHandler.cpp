@@ -54,7 +54,7 @@ namespace _Wolframe	{
 wolframeConnection::wolframeConnection( const WolframeHandler& context,
 					const net::LocalEndpoint& local )
 	: m_globalCtx( context ),
-	  m_readBuf( 16536 )
+	  m_readBuf( 16536 ), m_outputBuf( 4096 )
 {
 	m_remoteEP = NULL;
 	net::ConnectionEndpoint::ConnectionType type = local.type();
@@ -94,6 +94,8 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 	m_authorization = NULL;
 	m_audit = NULL;
 //	m_proc = NULL;
+	m_cmdHandler.setInputBuffer( m_readBuf.charptr(), m_readBuf.size() );
+	m_cmdHandler.setOutputBuffer( m_outputBuf.charptr(), m_outputBuf.size() );
 }
 
 
@@ -191,7 +193,9 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 		}
 
 		case SEND_HELLO:	{
-			m_state = READ_INPUT;
+			m_state = COMMAND_HANDLER;
+			m_cmdHandler.putInput(m_readBuf.charptr(), m_readBuf.pos());
+//			m_state = READ_INPUT;
 			return net::NetworkOperation( net::ReadData( m_readBuf.ptr(), m_readBuf.size(), 30 ));
 		}
 
@@ -254,6 +258,27 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 		case FINISHED:
 			LOG_DEBUG << "Processor in FINISHED state";
 			break;
+
+		case COMMAND_HANDLER:	{
+			void* inpp;
+			std::size_t inppsize;
+			const void* outpp;
+			std::size_t outppsize;
+			switch(m_cmdHandler.nextOperation())
+			{
+				case cmdbind::CommandHandler::READ:
+					m_cmdHandler.getInputBlock( inpp, inppsize);
+					return net::ReadData( inpp, inppsize);
+
+				case cmdbind::CommandHandler::WRITE:
+					m_cmdHandler.getOutput( outpp, outppsize);
+					return net::SendData( outpp, outppsize);
+
+				case cmdbind::CommandHandler::CLOSE:
+					m_state = TERMINATING;
+					return net::CloseConnection();
+			}
+		}
 	} /* switch( m_state ) */
 
 	LOG_ALERT << "Connection FSM out of states";
@@ -262,10 +287,15 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 
 /// Parse incoming data..
-void wolframeConnection::networkInput( const void*, std::size_t bytesTransferred )
+void wolframeConnection::networkInput( const void* begin, std::size_t bytesTransferred )
 {
-	LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
-	m_dataSize += bytesTransferred;
+	if ( m_state == COMMAND_HANDLER )	{
+		m_cmdHandler.putInput( begin, bytesTransferred );
+	}
+	else	{
+		LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
+		m_dataSize += bytesTransferred;
+	}
 }
 
 
