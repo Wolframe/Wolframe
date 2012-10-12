@@ -57,13 +57,12 @@ public:
 	bool addFunction( const Function& func, const std::string& name )
 	{
 		std::string upperName = boost::algorithm::to_upper_copy( name );
-		typename std::map< std::string, Function* >::const_iterator it = m_funcMap.find( upperName );
+		std::map< std::string, std::size_t >::const_iterator it = m_funcMap.find( upperName );
 		if ( it != m_funcMap.end() )
 			return false;
 
+		m_funcMap[ upperName ] = m_functions.size();
 		m_functions.push_back( func );
-		m_funcMap[ upperName ] = &m_functions.back();
-std::cout << func << ", front: " << m_functions.back() << std::endl;
 		return true;
 	}
 
@@ -74,9 +73,9 @@ std::cout << func << ", front: " << m_functions.back() << std::endl;
 	const Function* function( const std::string& name ) const
 	{
 		std::string upperName = boost::algorithm::to_upper_copy( name );
-		typename std::map< std::string, Function* >::const_iterator it = m_funcMap.find( upperName );
+		std::map< std::string, std::size_t >::const_iterator it = m_funcMap.find( upperName );
 		if ( it != m_funcMap.end() )
-			return it->second;
+			return &m_functions[ it->second ];
 		else
 			return NULL;
 	}
@@ -103,9 +102,9 @@ std::cout << func << ", front: " << m_functions.back() << std::endl;
 							{ return m_it != rhs.m_it; }
 
 	private:
-		typename std::map< std::string, Function* >::const_iterator	m_it;
+		std::map< std::string, std::size_t >::const_iterator	m_it;
 
-		const_iterator( const typename std::map< std::string, Function* >::const_iterator& it )
+		const_iterator( const std::map< std::string, std::size_t >::const_iterator& it )
 			: m_it( it )			{}
 	};
 
@@ -113,7 +112,7 @@ std::cout << func << ", front: " << m_functions.back() << std::endl;
 	const const_iterator end() const	{ return const_iterator( m_funcMap.end() ); }
 private:
 	std::vector< Function >			m_functions;
-	std::map< std::string, Function* >	m_funcMap;
+	std::map< std::string, std::size_t >	m_funcMap;
 };
 
 } // namespace _Wolframe

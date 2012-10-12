@@ -126,7 +126,14 @@ clients/qt/moc_FormLoader.cpp
 clients/qt/moc_FormWidget.cpp
 clients/qt/moc_HistoryLineEdit.cpp
 clients/qt/moc_MainWindow.cpp
+clients/qt/moc_qcommandline.cpp
 clients/qt/moc_WolframeClient.cpp
+clients/qt/NetworkDataLoader.cpp
+clients/qt/NetworkDataLoader.hpp
+clients/qt/NetworkFormLoader.cpp
+clients/qt/NetworkFormLoader.hpp
+clients/qt/qcommandline.cpp
+clients/qt/qcommandline.h
 clients/qt/qtclient.cpp
 clients/qt/README
 clients/qt/TODOS
@@ -789,6 +796,8 @@ src/libwolframe/types_doctype.cpp
 src/libwolframe/user.cpp
 src/libwolframe/utils_doctype.cpp
 src/loadModules.cpp
+src/mainConnectionHandler.cpp
+src/mainConnectionHandler.hpp
 src/Makefile.W32
 src/modules/audit/database/DBauditConfig.cpp
 src/modules/audit/database/DBauditConstructor.cpp
