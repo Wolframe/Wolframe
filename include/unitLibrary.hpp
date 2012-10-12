@@ -41,6 +41,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/algorithm/string.hpp>
 
 namespace _Wolframe {
 
@@ -53,8 +54,16 @@ public:
 	~UnitLibrary()		{}
 
 	/// \brief Add a new function to the directory.
-	bool addFunction( const Function& /*func*/, const std::string& /*name*/ )
+	bool addFunction( const Function& func, const std::string& name )
 	{
+		std::string upperName = boost::algorithm::to_upper_copy( name );
+		typename std::map< std::string, Function* >::const_iterator it = m_funcMap.find( upperName );
+		if ( it != m_funcMap.end() )
+			return false;
+
+		m_functions.push_back( func );
+		m_funcMap[ upperName ] = &m_functions.back();
+std::cout << func << ", front: " << m_functions.back() << std::endl;
 		return true;
 	}
 
@@ -64,9 +73,10 @@ public:
 	/// \return	pointer to function or NULL if not found
 	const Function* function( const std::string& name ) const
 	{
-		std::map< std::string, Function* >::const_iterator it = m_funcMap.find( name );
+		std::string upperName = boost::algorithm::to_upper_copy( name );
+		typename std::map< std::string, Function* >::const_iterator it = m_funcMap.find( upperName );
 		if ( it != m_funcMap.end() )
-			return *it;
+			return it->second;
 		else
 			return NULL;
 	}
@@ -93,10 +103,9 @@ public:
 							{ return m_it != rhs.m_it; }
 
 	private:
-		template < typename Function >
-		std::map< std::string, Function* >::const_iterator	m_it;
+		typename std::map< std::string, Function* >::const_iterator	m_it;
 
-		const_iterator( const std::map< std::string, Function* >::const_iterator& it )
+		const_iterator( const typename std::map< std::string, Function* >::const_iterator& it )
 			: m_it( it )			{}
 	};
 

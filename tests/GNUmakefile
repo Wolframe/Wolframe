@@ -143,7 +143,7 @@ TEST_CPP_BINS = \
 	testTimestamp$(EXE) \
 	testWolfilter$(EXE) \
 	stringNormalizationTest$(EXE) \
-#	unitLibraryTest$(EXE)
+	unitLibraryTest$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -221,8 +221,8 @@ endif
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testWolfilter
 	@echo
-#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./unitLibraryTest
-#	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./unitLibraryTest
+	@echo
 	@echo
 	@echo
 endif

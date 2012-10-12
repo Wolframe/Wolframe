@@ -36,6 +36,7 @@
 
 #include "unitLibrary.hpp"
 #include "gtest/gtest.h"
+#include <boost/lexical_cast.hpp>
 
 
 // The fixture for testing Wolframe::ObjectPool template
@@ -43,6 +44,7 @@ class FunctionLibraryFixture : public ::testing::Test	{
 protected:
 	// Set-up work for each test here.
 	FunctionLibraryFixture()	{
+		libSize = 47;
 	}
 
 	// Clean-up work that doesn't throw exceptions here.
@@ -60,14 +62,23 @@ protected:
 	}
 
 	// Objects declared here can be used by all tests in the test case.
-	_Wolframe::UnitLibrary< integer >	library;
-	size_t					libSize;
+	_Wolframe::UnitLibrary< int >	library;
+	size_t				libSize;
 public:
 };
 
 
 // Tests the ObjectPool get & release
 TEST_F( FunctionLibraryFixture, Add_Retrieve )	{
+//	for ( int i = 0; i < libSize; i++ )	{
+//		bool ret = library.addFunction( i, boost::lexical_cast<std::string>( i ) );
+//		ASSERT_TRUE( ret );
+//	}
+//	for ( int i = 0; i < libSize; i++ )	{
+//		const int* ret = library.function( boost::lexical_cast<std::string>( i ) );
+//		ASSERT_NE( (const int*)0, ret );
+//		ASSERT_EQ( *ret, i );
+//	}
 }
 
 
