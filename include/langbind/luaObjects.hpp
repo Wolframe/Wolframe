@@ -153,7 +153,7 @@ public:
 	///\param[in] output_ output definition for the output to print
 	///\param[in] provider_ processor provider for allocation of objects accessed
 	///\return true on success, false else
-	bool initLuaScriptInstance( LuaScriptInstance* lsi, const Input& input_, const Output& output_, proc::ProcessorProvider* provider_) const;
+	bool initLuaScriptInstance( LuaScriptInstance* lsi, const Input& input_, const Output& output_, const proc::ProcessorProvider* provider_) const;
 
 	///\brief Get the list of commands
 	std::list<std::string> commands() const;

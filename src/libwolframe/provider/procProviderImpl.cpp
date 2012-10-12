@@ -574,7 +574,7 @@ const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::no
 		return itr->second.get();
 }
 
-cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command )
+cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command) const
 {
 	std::string cmdName = boost::algorithm::to_upper_copy( command );
 	std::map< std::string, std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*> >::const_iterator cmd = m_cmdMap.find( cmdName );
@@ -587,7 +587,7 @@ cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( 
 	return constructor->object( *cfg);
 }
 
-cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofilterhandler( const std::string& command )
+cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofilterhandler( const std::string& command ) const
 {
 	cmdbind::CommandHandler* hnd = cmdhandler( command);
 	if (!hnd) return NULL;

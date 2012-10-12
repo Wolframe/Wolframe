@@ -280,7 +280,7 @@ static ObjectType* getGlobalSingletonPointer( lua_State* ls)
 	return rt;
 }
 
-static proc::ProcessorProvider* getProcessorProvider( lua_State* ls)
+static const proc::ProcessorProvider* getProcessorProvider( lua_State* ls)
 {
 	return getGlobalSingletonPointer<proc::ProcessorProvider>( ls);
 }
@@ -717,7 +717,7 @@ LUA_FUNCTION_THROWS( "form()", function_form)
 		check_parameters( ls, 0, 1, LUA_TSTRING);
 
 		const char* name = lua_tostring( ls, 1);
-		proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+		const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
 		const ddl::Form* st = ctx->form( name);
 		if (!st) throw std::runtime_error( std::string("form '") + name + "' not defined");
 		ddl::FormR frm( new ddl::Form( *st));
@@ -944,7 +944,7 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 	check_parameters( ls, 0, 1, LUA_TSTRING);
 
 	const char* name = lua_tostring( ls, 1);
-	proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
 	FormFunctionR ff( ctx->formfunction( name));
 	if (ff.get())
 	{
@@ -1179,7 +1179,7 @@ LUA_FUNCTION_THROWS( "filter(..)", function_filter)
 			name = lua_tostring( ls, 1);
 			if (!name) throw std::runtime_error( "filter name is not a string");
 
-			proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+			const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
 			types::CountedReference<Filter> flt( ctx->filter( name, encoding));
 			if (!flt.get())
 			{
@@ -1452,7 +1452,7 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 			if (doctype.size())
 			{
 				std::string doctypeid( utils::getIdFromDoctype( doctype));
-				proc::ProcessorProvider* gtc = getProcessorProvider( ls);
+				const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
 				const ddl::Form* st = gtc->form( doctypeid);
 				if (!st) throw std::runtime_error( std::string("form not defined for document type '") + doctypeid + "'");
 				ddl::FormR form( new ddl::Form( *st));
@@ -1850,7 +1850,7 @@ bool LuaFunctionMap::getLuaScriptInstance( const std::string& procname, LuaScrip
 	return true;
 }
 
-bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input& input_, const Output& output_, proc::ProcessorProvider* provider_) const
+bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input& input_, const Output& output_, const proc::ProcessorProvider* provider_) const
 {
 	lua_State* ls = lsi->ls();
 	try
@@ -1868,7 +1868,7 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			LuaObject<FormFunctionClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<TransactionFunctionClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<PrintFunctionClosure>::createMetatable( ls, 0, 0, 0);
-			setGlobalSingletonPointer<proc::ProcessorProvider>( ls, provider_);
+			setGlobalSingletonPointer<const proc::ProcessorProvider>( ls, provider_);
 			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
 			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
 			LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);

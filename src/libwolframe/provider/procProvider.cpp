@@ -333,14 +333,14 @@ langbind::FormFunction* ProcessorProvider::formfunction( const std::string& name
 	return m_impl->formfunction( name );
 }
 
-cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& name )
+cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& name ) const
 {
 	cmdbind::CommandHandler* rt = m_impl->cmdhandler( name );
 	if (rt) rt->setProcProvider( this);
 	return rt;
 }
 
-cmdbind::IOFilterCommandHandler* ProcessorProvider::iofilterhandler( const std::string& name )
+cmdbind::IOFilterCommandHandler* ProcessorProvider::iofilterhandler( const std::string& name ) const
 {
 	cmdbind::IOFilterCommandHandler* rt = m_impl->iofilterhandler( name );
 	if (rt) rt->setProcProvider( this);

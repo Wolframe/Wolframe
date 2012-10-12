@@ -86,8 +86,8 @@ public:
 
 	bool resolveDB( const db::DatabaseProvider& db );
 
-	cmdbind::CommandHandler* cmdhandler( const std::string& command );
-	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command);
+	cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
+	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command) const;
 
 	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
 	langbind::FormFunction* formfunction( const std::string& name) const;

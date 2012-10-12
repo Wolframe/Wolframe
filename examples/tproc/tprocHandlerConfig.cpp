@@ -118,7 +118,7 @@ bool Configuration::check() const
 void Configuration::print( std::ostream& o, size_t i) const
 {
 	std::vector<cmdbind::ExecCommandHandler::Command>::const_iterator itr=m_commands.begin(),end=m_commands.end();
-	std::string ind( '\t', i);
+	std::string ind( i, '\t');
 	for (;itr!=end; ++itr)
 	{
 		o << ind << "command '" << itr->m_cmdname << "'" << " -> '" << itr->m_procname << "'" << std::endl;

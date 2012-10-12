@@ -107,14 +107,14 @@ public:
 
 	///\brief Pass the reference to the processor provider to the command handler
 	///\param[in] the reference to the processor provider
-	void setProcProvider( proc::ProcessorProvider* p)
+	void setProcProvider( const proc::ProcessorProvider* p)
 	{
 		m_provider = p;
 	}
 
 	///\brief Get the reference to the processor provider
 	///\return the reference to the processor provider
-	proc::ProcessorProvider* procProvider()
+	const proc::ProcessorProvider* procProvider()
 	{
 		return m_provider;
 	}
@@ -133,7 +133,7 @@ protected:
 	int m_statusCode;				//< error code of operation for the client
 	std::string m_name;				//< name of the command to execute
 	std::vector< std::string > m_argBuffer;		//< the command arguments
-	proc::ProcessorProvider* m_provider;		//< the reference to the global processor provider
+	const proc::ProcessorProvider* m_provider;	//< the reference to the global processor provider
 };
 
 typedef types::CountedReference<CommandHandler> CommandHandlerR;

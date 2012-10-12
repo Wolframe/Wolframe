@@ -96,6 +96,7 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 //	m_proc = NULL;
 	m_cmdHandler.setInputBuffer( m_readBuf.charptr(), m_readBuf.size() );
 	m_cmdHandler.setOutputBuffer( m_outputBuf.charptr(), m_outputBuf.size() );
+	m_cmdHandler.setProcProvider( &context.proc());
 }
 
 
