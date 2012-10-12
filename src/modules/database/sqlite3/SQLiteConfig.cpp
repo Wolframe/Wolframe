@@ -68,21 +68,21 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "file" ) ||
 			  boost::algorithm::iequals( L1it->first, "filename" ))	{
-			bool isDefined = ( !filename.empty() );
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, filename, &isDefined ))
+			bool isDefined = ( !m_filename.empty() );
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_filename, &isDefined ))
 				retVal = false;
 			else	{
-				if ( ! boost::filesystem::path( filename ).is_absolute() )
+				if ( ! boost::filesystem::path( m_filename ).is_absolute() )
 					MOD_LOG_WARNING << logPrefix() << "database file path is not absolute: "
-							<< filename;
+							<< m_filename;
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, flag, Parser::BoolDomain() ))
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_flag, Parser::BoolDomain() ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connections,
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_connections,
 						Parser::RangeDomain<unsigned short>( 0 ), &connDefined ))
 				retVal = false;
 		}
@@ -94,7 +94,7 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 				if ( ! boost::filesystem::path( programFile ).is_absolute() )
 					MOD_LOG_WARNING << logPrefix() << "program file path is not absolute: "
 							<< programFile;
-				programFiles.push_back( programFile );
+				m_programFiles.push_back( programFile );
 			}
 		}
 		else	{
@@ -103,14 +103,14 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 		}
 	}
 	if ( ! connDefined )
-		connections = DEFAULT_SQLITE_CONNECTIONS;
+		m_connections = DEFAULT_SQLITE_CONNECTIONS;
 	return retVal;
 }
 
 SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
 	: config::NamedConfiguration( name, logParent, logName )
 {
-	flag = false;
+	m_flag = false;
 }
 
 void SQLiteConfig::print( std::ostream& os, size_t indent ) const
@@ -120,23 +120,23 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << sectionName() << ":" << std::endl;
 	if ( ! m_ID.empty() )
 		os << indStr << "   ID: " << m_ID << std::endl;
-	os << indStr << "   Filename: " << filename << std::endl;
-	os << indStr << "   Flags: " << (flag ? "True Flag" : "False Flag") << std::endl;
-	if ( programFiles.size() == 0 )
+	os << indStr << "   Filename: " << m_filename << std::endl;
+	os << indStr << "   Flags: " << (m_flag ? "True Flag" : "False Flag") << std::endl;
+	if ( m_programFiles.size() == 0 )
 		os << indStr << "   Program file: none" << std::endl;
-	else if ( programFiles.size() == 1 )
-		os << indStr << "   Program file: " << programFiles.front() << std::endl;
+	else if ( m_programFiles.size() == 1 )
+		os << indStr << "   Program file: " << m_programFiles.front() << std::endl;
 	else	{
-		std::list< std::string >::const_iterator it = programFiles.begin();
+		std::list< std::string >::const_iterator it = m_programFiles.begin();
 		os << indStr << "   Program files: " << *it << std::endl;
-		while ( it != programFiles.end() )
+		while ( it != m_programFiles.end() )
 			os << indStr << "                  " << *it++ << std::endl;
 	}
 }
 
 bool SQLiteConfig::check() const
 {
-	if ( filename.empty() )	{
+	if ( m_filename.empty() )	{
 		MOD_LOG_ERROR << logPrefix() << "SQLite database filename cannot be empty";
 		return false;
 	}
@@ -147,15 +147,15 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 {
 	using namespace boost::filesystem;
 
-	if ( ! filename.empty() )	{
-		if ( ! path( filename ).is_absolute() )
-			filename = resolvePath( absolute( filename,
+	if ( ! m_filename.empty() )	{
+		if ( ! path( m_filename ).is_absolute() )
+			m_filename = resolvePath( absolute( m_filename,
 							  path( refPath ).branch_path()).string());
 		else
-			filename = resolvePath( filename );
+			m_filename = resolvePath( m_filename );
 	}
-	for ( std::list< std::string >::iterator it = programFiles.begin();
-						it != programFiles.end(); it++ )	{
+	for ( std::list< std::string >::iterator it = m_programFiles.begin();
+						it != m_programFiles.end(); it++ )	{
 		if ( ! path( *it ).is_absolute() )
 			*it = resolvePath( absolute( *it, path( refPath ).branch_path()).string());
 		else

@@ -55,7 +55,6 @@
 #include "gtest/gtest.h"
 #include <boost/thread/thread.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <map>
 #include <string>
 #include <vector>
@@ -247,9 +246,6 @@ TEST_F( TProcHandlerTest, tests)
 
 			if (test.expected() != test.output())
 			{
-				static boost::mutex mutex;
-				boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
-
 				boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
 				std::fstream outputf( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);
 				outputf.write( test.output().c_str(), test.output().size());

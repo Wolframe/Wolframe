@@ -46,8 +46,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -143,22 +141,25 @@ TEST_F( WolfilterTest, tests)
 			cmdargv[ci] = strdup( cmd[ci-1].c_str() );
 		}
 		boost::filesystem::path refpath( g_testdir / "temp" / "test.cfg");
-		config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string());
+		std::string outstr;
+		{
+			config::WolfilterCommandLine cmdline( cmdargc, cmdargv, refpath.string());
 
-		// [2.5] Call iostreamfilter
-		if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;
-		if (cmdline.printversion()) std::cerr << "ignored option --version" << std::endl;
-		if (cmdline.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
+			// [2.5] Call iostreamfilter
+			if (cmdline.printhelp()) std::cerr << "ignored option --help" << std::endl;
+			if (cmdline.printversion()) std::cerr << "ignored option --version" << std::endl;
+			if (cmdline.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
 
-		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
-		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory());
-		processorProvider.resolveDB( databaseProvider);
+			db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
+			proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory());
+			processorProvider.resolveDB( databaseProvider);
 
-		std::istringstream in( td.input, std::ios::in | std::ios::binary);
-		std::ostringstream out( std::ios::out | std::ios::binary);
+			std::istringstream in( td.input, std::ios::in | std::ios::binary);
+			std::ostringstream out( std::ios::out | std::ios::binary);
 
-		langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
-		std::string outstr( out.str());
+			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
+			outstr.append( out.str());
+		}
 		std::vector<std::string>::const_iterator oi = td.outputfile.begin(), oe = td.outputfile.end();
 		for (; oi != oe; ++oi)
 		{
@@ -168,9 +169,6 @@ TEST_F( WolfilterTest, tests)
 
 		if (td.expected != outstr)
 		{
-			static boost::mutex mutex;
-			boost::interprocess::scoped_lock<boost::mutex> lock(mutex);
-
 			// [2.6] Dump test contents to files in case of error
 			boost::filesystem::path OUTPUT( g_testdir / "temp" / "OUTPUT");
 			std::fstream oo( OUTPUT.string().c_str(), std::ios::out | std::ios::binary);

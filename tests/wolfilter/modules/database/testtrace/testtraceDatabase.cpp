@@ -53,7 +53,7 @@ const serialize::StructDescriptionBase* TesttraceDatabaseConfig::Data::getStruct
 		ThisDescription()
 		{
 			(*this)
-			( "id",		&This::id)
+			( "identifier",	&This::id)
 			( "program",	&This::programfilename)
 			( "file",	&This::resultfilename)
 			( "outfile",	&This::outfilename)

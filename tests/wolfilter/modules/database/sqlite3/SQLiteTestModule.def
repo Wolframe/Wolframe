@@ -1,0 +1,5 @@
+LIBRARY mod_db_sqlite3test
+
+EXPORTS
+entryPoint	@1
+

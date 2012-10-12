@@ -54,6 +54,18 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_ICU
 endif
 
+# sqlite3
+ifeq ($(WITH_SQLITE3),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_SQLITE3
+endif
+
+# postgres sql
+ifeq ($(WITH_PGSQL),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_PGSQL
+endif
+
 MY_STATIC_LIB = \
 	wolftest.a
 

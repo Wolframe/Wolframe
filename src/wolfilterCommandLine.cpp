@@ -82,10 +82,10 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 		boost::property_tree::ptree envcfg = m_envconfig.toPropertyTree();
 		if (!m_dbconfig.empty())
 		{
-			std::string dbLabel = m_dbconfig.get<std::string>( "id");
+			std::string dbLabel = m_dbconfig.get<std::string>( "identifier");
 			if (dbLabel.empty())
 			{
-				throw std::runtime_error( "database configuration without 'id' field");
+				throw std::runtime_error( "database configuration without 'identifier' field");
 			}
 			proccfg.add_child( "database", boost::property_tree::ptree( dbLabel));
 		}
