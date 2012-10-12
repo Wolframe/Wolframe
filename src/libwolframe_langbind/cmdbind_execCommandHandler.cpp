@@ -154,7 +154,6 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 {
 	for (;;)
 	{
-LOG_ERROR << "EXEC COMMAND HANDLER STATE: " << stateName(m_state);
 		switch( m_state)
 		{
 			case Init:
@@ -182,7 +181,9 @@ LOG_ERROR << "EXEC COMMAND HANDLER STATE: " << stateName(m_state);
 					}
 					else
 					{
-						return CLOSE;
+						m_state = ProtocolError;
+						m_output.print( "BAD command\r\n");
+						return WRITE;
 					}
 				}
 				else
@@ -284,6 +285,7 @@ LOG_ERROR << "EXEC COMMAND HANDLER STATE: " << stateName(m_state);
 							m_buffer.clear();
 							m_argBuffer.clear();
 							return WRITE;
+
 						}
 						m_cmdhandler->passParameters( procname, m_argBuffer.argc(), m_argBuffer.argv());
 						m_state = Processing;

@@ -138,7 +138,6 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 {
 	for (;;)
 	{
-LOG_ERROR << "LINE COMMAND HANDLER STATE: " << commandStateName(m_cmdstateidx);
 		switch( m_cmdstateidx)
 		{
 			case Init:
@@ -180,14 +179,7 @@ LOG_ERROR << "LINE COMMAND HANDLER STATE: " << commandStateName(m_cmdstateidx);
 							m_resultitr = 0;
 
 							putInput( r_begin, r_nofBytes);
-							if (m_resultstr.size() > 0)
-							{
-								return WRITE;
-							}
-							else
-							{
-								continue;
-							}
+							continue;
 						}
 						catch (std::exception& e)
 						{

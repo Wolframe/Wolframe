@@ -252,6 +252,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 		}
 
 		case TERMINATING:	{
+/*[-]*/LOG_ERROR << "State TERMINATING";
 			m_state = FINISHED;
 			return net::NetworkOperation( net::CloseConnection() );
 		}
@@ -277,7 +278,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 				case cmdbind::CommandHandler::CLOSE:
 					m_state = TERMINATING;
-					return net::CloseConnection();
+					return net::SendData( "BYE\r\n", 5);
 			}
 		}
 	} /* switch( m_state ) */
