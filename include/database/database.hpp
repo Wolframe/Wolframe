@@ -65,7 +65,7 @@ public:
 		return std::vector<std::string>();
 	}
 
-	virtual void loadProgram_HACK( const std::string& /*content*/){}
+	virtual void addProgram( const std::string& /*content*/){}
 
 	/// Close the database connetion
 	/// This exists for no good reason (mostly to make the code look uniform)
@@ -97,10 +97,10 @@ public:
 
 	///\brief add a database transaction program to the list of transaction programs
 	///\remark throws std::runtime_error with position info in case of error
-	virtual void addTransactionDefinition( const std::string& definition ) = 0;
+	virtual void addProgram( const std::string& content ) = 0;
 
 	///\brief get a database transaction program from the list of transaction programs
-	virtual const std::string* getTransactionDefinition( const std::string& name ) = 0;
+	virtual const std::string* getProgram( const std::string& name ) = 0;
 };
 
 }} // namespace _Wolframe::db

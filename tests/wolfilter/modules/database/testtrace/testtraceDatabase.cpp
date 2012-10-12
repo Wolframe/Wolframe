@@ -140,7 +140,7 @@ Transaction* TesttraceDatabase::transaction( const std::string& /*name*/ )
 	return new TesttraceTransaction( this, m_result);
 }
 
-void TesttraceDatabase::loadProgram_HACK( const std::string& source)
+void TesttraceDatabase::addProgram( const std::string& source)
 {
 	static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
 	std::string::const_iterator si = source.begin(), se = source.end();
