@@ -306,7 +306,7 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 		os << indStr << "   Program file: " << programFiles.front() << std::endl;
 	else	{
 		std::list< std::string >::const_iterator it = programFiles.begin();
-		os << indStr << "   Program files: " << *it << std::endl;
+		os << indStr << "   Program files: " << *it++ << std::endl;
 		while ( it != programFiles.end() )
 			os << indStr << "                  " << *it++ << std::endl;
 	}

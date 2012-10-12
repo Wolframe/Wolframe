@@ -68,6 +68,17 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 			if ( ! Parser::getValue( logPrefix().c_str(), *L1it, m_dbLabel, &isDefined ))
 				retVal = false;
 		}
+		else if ( boost::algorithm::iequals( "programFile", L1it->first ))	{
+			std::string programFile;
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
+				retVal = false;
+			else	{
+				if ( ! boost::filesystem::path( programFile ).is_absolute() )
+					LOG_WARNING << logPrefix() << "program file path is not absolute: "
+						    << programFile;
+				m_programFiles.push_back( programFile );
+			}
+		}
 		else if ( boost::algorithm::iequals( "environment", L1it->first ))
 		{
 			for ( boost::property_tree::ptree::const_iterator eni = L1it->second.begin(); eni != L1it->second.end(); eni++ )
@@ -216,19 +227,29 @@ void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
 	else
 		os << "   None configured" << std::endl;
 
-	std::string indstr( '\t', indent+1);
+	std::string indStr( indent + 1, '\t');
 	os << "Environment:" << std::endl;
 	for (std::vector<langbind::DDLFormConfigStruct>::const_iterator ii=m_environment.form.begin(), ee=m_environment.form.end(); ii != ee; ++ii)
 	{
-		os << indstr << "DDL " << ii->DDL << " " << ii->file;
+		os << indStr << "DDL " << ii->DDL << " " << ii->file;
 	}
 	for (std::vector<langbind::PrintLayoutConfigStruct>::const_iterator ii=m_environment.printlayout.begin(), ee=m_environment.printlayout.end(); ii != ee; ++ii)
 	{
-		os << indstr << "printlayout " << ii->name << " (" << ii->type << ") " << ii->file;
+		os << indStr << "printlayout " << ii->name << " (" << ii->type << ") " << ii->file;
 	}
 	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=m_environment.normalize.begin(), ee=m_environment.normalize.end(); ii != ee; ++ii)
 	{
-		os << indstr << "normalize " << ii->name << " (" << ii->type << ") " << ii->call;
+		os << indStr << "normalize " << ii->name << " (" << ii->type << ") " << ii->call;
+	}
+	if ( m_programFiles.size() == 0 )
+		os << "   Program file: none" << std::endl;
+	else if ( m_programFiles.size() == 1 )
+		os << "   Program file: " << m_programFiles.front() << std::endl;
+	else	{
+		std::list< std::string >::const_iterator it = m_programFiles.begin();
+		os << "   Program files: " << *it++ << std::endl;
+		while ( it != m_programFiles.end() )
+			os << "                  " << *it++ << std::endl;
 	}
 }
 
@@ -268,6 +289,10 @@ void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_procConfig.begin();
 								it != m_procConfig.end(); it++ )	{
 		(*it)->setCanonicalPathes( refPath );
+	}
+	for ( std::list< std::string >::iterator it = m_programFiles.begin();
+						it != m_programFiles.end(); it++ )	{
+		*it = utils::getCanonicalPath( *it, refPath );
 	}
 	for (std::vector<langbind::DDLFormConfigStruct>::iterator ii=m_environment.form.begin(), ee=m_environment.form.end(); ii != ee; ++ii)
 	{

@@ -128,7 +128,7 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 		os << indStr << "   Program file: " << m_programFiles.front() << std::endl;
 	else	{
 		std::list< std::string >::const_iterator it = m_programFiles.begin();
-		os << indStr << "   Program files: " << *it << std::endl;
+		os << indStr << "   Program files: " << *it++ << std::endl;
 		while ( it != m_programFiles.end() )
 			os << indStr << "                  " << *it++ << std::endl;
 	}

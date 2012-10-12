@@ -100,11 +100,11 @@ std::string _Wolframe::utils::getCanonicalPath( const std::string& path, const s
 	boost::filesystem::path pt( path);
 	if (pt.is_absolute())
 	{
-		return pt.string();
+		return resolvePath( pt.string() );
 	}
 	else
 	{
-		return boost::filesystem::absolute( pt, boost::filesystem::path( refpath).branch_path()).string();
+		return resolvePath( boost::filesystem::absolute( pt, boost::filesystem::path( refpath).branch_path()).string() );
 	}
 }
 

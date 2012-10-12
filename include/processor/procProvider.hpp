@@ -73,7 +73,7 @@ private:
 	std::string					m_dbLabel;
 	std::list< config::NamedConfiguration* >	m_procConfig;
 	langbind::EnvironmentConfigStruct		m_environment;
-	std::list< std::string >			m_programs;
+	std::list< std::string >			m_programFiles;
 };
 
 /// Processor provider

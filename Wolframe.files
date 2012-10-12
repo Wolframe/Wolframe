@@ -91,6 +91,7 @@ clients/cli/wolframe.conf
 clients/GNUmakefile
 clients/Makefile.W32
 clients/qt/BUGS
+clients/qt/data/domain_form1_gender.xml
 clients/qt/data/domain_form1_vegetable.xml
 clients/qt/data/domain_form4_vegetable.xml
 clients/qt/data/form1.xml
@@ -1127,6 +1128,12 @@ tests/wolfilter/GNUmakefile
 tests/wolfilter/Makefile.W32
 tests/wolfilter/modules/database/GNUmakefile
 tests/wolfilter/modules/database/Makefile.W32
+tests/wolfilter/modules/database/sqlite3/GNUmakefile
+tests/wolfilter/modules/database/sqlite3/Makefile.W32
+tests/wolfilter/modules/database/sqlite3/mod_db_sqlite3test.cpp
+tests/wolfilter/modules/database/sqlite3/SQLiteModuleFiles.cpp
+tests/wolfilter/modules/database/sqlite3/SQLiteTest.cpp
+tests/wolfilter/modules/database/sqlite3/SQLiteTest.hpp
 tests/wolfilter/modules/database/testtrace/GNUmakefile
 tests/wolfilter/modules/database/testtrace/Makefile.W32
 tests/wolfilter/modules/database/testtrace/mod_db_testtrace.cpp
@@ -1159,6 +1166,7 @@ tests/wolfilter/scripts/print_table.lua
 tests/wolfilter/scripts/transaction_input_generator.lua
 tests/wolfilter/scripts/transaction_iterator.lua
 tests/wolfilter/scripts/transaction_table.lua
+tests/wolfilter/template/db/schema_select_task_by_id.sql
 tests/wolfilter/template/doc/charconv_example.IsoLatin-1.xml
 tests/wolfilter/template/doc/charconv_example.UTF-8.xml
 tests/wolfilter/template/doc/employee_assignment_doctype_2.UTF-8.xml
