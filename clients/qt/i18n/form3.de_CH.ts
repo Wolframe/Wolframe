@@ -36,5 +36,15 @@
         <source>Vegetables:</source>
         <translation type="unfinished">Gemüse:</translation>
     </message>
+    <message>
+        <location filename="../forms/form3.ui" line="143"/>
+        <source>senseless</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../forms/form3.ui" line="156"/>
+        <source>Vegetarian</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

@@ -43,7 +43,7 @@ namespace _Wolframe {
 #endif
 
 	public:
-		WolframeClient( QWidget *_parent = 0 );
+		WolframeClient( QString host = "localhost", unsigned short port = 7661, QWidget *_parent = 0 );
 		virtual ~WolframeClient( );
 
 		void connect( );

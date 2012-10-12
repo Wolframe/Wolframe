@@ -7,6 +7,7 @@
 
 #include <QWidget>
 #include <QtUiTools>
+#include <QCommandLine>	
 
 #include "FormLoader.hpp"
 #include "DebugTerminal.hpp"
@@ -25,6 +26,7 @@ namespace _Wolframe {
 		virtual ~MainWindow( );
 	
 	private:
+		QCommandLine *m_cmdline;	// command line parser	
 		QWidget *m_ui;			// main window from theme
 		FormWidget *m_formWidget;	// current active form
 		QString m_currentTheme;		// the name of the currently selected theme
@@ -34,7 +36,10 @@ namespace _Wolframe {
 		WolframeClient *m_wolframeClient; // the client protocol class
 		QString m_currentLanguage;	// code of the current interface language
 		QUiLoader *m_uiLoader;		// the designer UI loader
+		QString m_host;
+		unsigned short m_port;
 
+		void parseArgs( );
 		void initialize( );
 		void populateThemesMenu( );
 		void loadTheme( QString themeName );
@@ -43,6 +48,11 @@ namespace _Wolframe {
 		void loadLanguage( QString language );
 
 	private slots:
+		void switchFound( const QString &name );
+		void optionFound( const QString &name, const QVariant &value );
+		void paramFound( const QString &name, const QVariant &value );
+		void parseError( const QString &error );
+		
 		void themeSelected( QAction *action );
 		void formSelected( QAction *action );
 		void languageSelected( QAction *action );

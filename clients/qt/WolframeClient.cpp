@@ -12,8 +12,11 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-WolframeClient::WolframeClient( QWidget *_parent ) :
+WolframeClient::WolframeClient( QString _host, unsigned short _port, QWidget *_parent ) :
+	m_host( _host ),
+	m_port( _port ),
 	m_state( Disconnected ),
+	m_secure( false ),
 	m_parent( _parent ),
 	m_hasErrors( false )
 {
@@ -40,6 +43,8 @@ WolframeClient::WolframeClient( QWidget *_parent ) :
 	QObject::connect( m_socket, SIGNAL( peerVerifyError( const QSslError & ) ),
 		this, SLOT( peerVerifyError( const QSslError & ) ) );
 #endif
+
+	connect( );
 }
 
 #ifdef WITH_SSL

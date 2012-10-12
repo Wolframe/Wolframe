@@ -68,5 +68,10 @@
         <source>Number of children:</source>
         <translation type="unfinished">Anzahl Kinder:</translation>
     </message>
+    <message>
+        <location filename="../forms/form1.ui" line="300"/>
+        <source>Vegatable</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

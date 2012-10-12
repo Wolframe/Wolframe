@@ -18,18 +18,10 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ), m_ui( 0 )
+MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
+	m_ui( 0 ), m_host( "localhost" ), m_port( 7661 )
 {
-// a Qt UI loader for the main theme window
-	m_uiLoader = new QUiLoader( );
-	m_uiLoader->setLanguageChangeEnabled ( true );
-
-// for testing, load lists of available forms from the files system,
-// pass the form loader to the FormWidget
-	m_formLoader = new FileFormLoader( "forms", "i18n" );	
-
-	m_formWidget = new FormWidget( m_formLoader, m_uiLoader, this );
-	
+	parseArgs( );
 	initialize( );
 }
 
@@ -52,8 +44,7 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 		case QtCriticalMsg:
 		case QtFatalMsg:
 			debugTerminal->sendLine( msg );
-			fprintf( stderr, msg );
-			fprintf( stderr, "\n" );
+			fprintf( stderr, "%s\n", msg );
 			break;
 			
 		default:
@@ -61,18 +52,86 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 	}
 }
 
+void MainWindow::parseArgs( )
+{
+	const struct QCommandLineConfigEntry conf[] =
+	{
+		{ QCommandLine::Option, 'H', "host", "Wolframe host", QCommandLine::Optional },
+		{ QCommandLine::Option, 'p', "port", "Wolframe port", QCommandLine::Optional },
+		{ QCommandLine::Switch, 'l', "local", "Run with local data and form loader", QCommandLine::Optional },
+		{ QCommandLine::Option, 'v', "verbose", "verbose level", QCommandLine::Optional },
+		QCOMMANDLINE_CONFIG_ENTRY_END
+	};
+	
+	m_cmdline = new QCommandLine( this );
+	m_cmdline->setConfig( conf );
+	m_cmdline->enableVersion( true );
+	m_cmdline->enableHelp( true );
+
+	connect( m_cmdline, SIGNAL( switchFound( const QString & ) ),
+		this, SLOT( switchFound( const QString & ) ) );
+
+	connect( m_cmdline, SIGNAL( optionFound( const QString &, const QVariant & ) ),
+		this, SLOT( optionFound( const QString &, const QVariant & ) ) );
+
+	connect( m_cmdline, SIGNAL( paramFound( const QString &, const QVariant & ) ),
+		this, SLOT( paramFound( const QString &, const QVariant & ) ) );
+
+	connect( m_cmdline, SIGNAL( parseError( const QString & ) ),
+		this, SLOT( parseError( const QString & ) ) );
+		
+	m_cmdline->parse( );
+}
+
+void MainWindow::switchFound( const QString &name )
+{
+	qDebug( ) << "switch" << name;
+}
+
+void MainWindow::optionFound( const QString &name, const QVariant &value )
+{
+	qDebug( ) << "option" << name << "with" << value;
+	if( name == "host" ) {
+		m_host = value.toString( );
+	} else if( name == "port" ) {
+		m_port = value.toString( ).toUShort( );
+	}
+}
+
+void MainWindow::paramFound( const QString &name, const QVariant &value )
+{
+	qDebug( ) << "param" << name << "with" << value;
+}
+
+void MainWindow::parseError( const QString &error )
+{
+	qWarning( ) << qPrintable( error );
+	m_cmdline->showHelp( true, -1 );
+	QCoreApplication::quit( );
+}
+
 void MainWindow::initialize( )
 {
+// a Qt UI loader for the main theme window
+	m_uiLoader = new QUiLoader( );
+	m_uiLoader->setLanguageChangeEnabled ( true );
+
+// for testing, load lists of available forms from the files system,
+// pass the form loader to the FormWidget
+	m_formLoader = new FileFormLoader( "forms", "i18n" );	
+
+	m_formWidget = new FormWidget( m_formLoader, m_uiLoader, this );
+	
 // link the form loader for form loader notifications
-	QObject::connect( m_formLoader, SIGNAL( formListLoaded( ) ),
+	connect( m_formLoader, SIGNAL( formListLoaded( ) ),
 		this, SLOT( formListLoaded( ) ) );
 
 // get notified if the form widget changes a form
-	QObject::connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
 
 // create a Wolframe protocol client
-	m_wolframeClient = new WolframeClient( );
+	m_wolframeClient = new WolframeClient( m_host, m_port );
 
 // create debuging terminal
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
@@ -107,7 +166,7 @@ void MainWindow::populateThemesMenu( )
 
 // connect signal for theme selection
 	themes_menu->addActions( themesGroup->actions( ) );
-	QObject::connect( themesGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( themeSelected( QAction * ) ) );
+	connect( themesGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( themeSelected( QAction * ) ) );
 }
 
 void MainWindow::loadTheme( QString theme )
@@ -197,7 +256,7 @@ void MainWindow::loadLanguages( )
 		if( language == m_currentLanguage ) action->setChecked( true );		
 	}
 	languageMenu->addActions( languageGroup->actions( ) );
-	QObject::connect( languageGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( languageSelected( QAction * ) ) );
+	connect( languageGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( languageSelected( QAction * ) ) );
 }
 
 void MainWindow::formListLoaded( )
@@ -217,7 +276,7 @@ void MainWindow::formListLoaded( )
 		if( form == m_currentForm ) action->setChecked( true );
 	}
 	formsMenu->addActions( formGroup->actions( ) );
-	QObject::connect( formGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( formSelected( QAction * ) ) );
+	connect( formGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( formSelected( QAction * ) ) );
 	
 // not busy anymore
 	qApp->restoreOverrideCursor();

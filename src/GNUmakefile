@@ -137,7 +137,7 @@ endif
 
 run:
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./wolframed -c wolframe.conf -f
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./wolframed -d DATA -c wolframe.conf -f
 
 check:
 	@echo "Running the Wolframe server..."
