@@ -5,7 +5,8 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x403
+	/D_WIN32_WINNT=0x403 \
+	/DQCOMMANDLINE_STATIC
 
 INCLUDE_DIRS = \
 	/I. \
@@ -132,6 +133,9 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormWidget.hpp -o moc_FormWidget.cpp
+
+moc_qcommandline.cpp: qcommandline.h
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. qcommandline.h -o moc_qcommandline.cpp
 
 local_clean:
 	@-erase moc_*.cpp *.dll 2>NUL
