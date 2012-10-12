@@ -160,8 +160,8 @@ public:
 
 	virtual void loadProgram( const std::string& filename );
 
-	virtual void addTransactionDefinition( const std::string& /*definition*/ ) {}
-	const std::string* getTransactionDefinition( const std::string& /*name*/ )
+	virtual void addProgram( const std::string& /*definition*/ ) {}
+	const std::string* getProgram( const std::string& /*name*/ )
 						{ return NULL; }
 private:
 	const std::string	m_ID;			///< database ID

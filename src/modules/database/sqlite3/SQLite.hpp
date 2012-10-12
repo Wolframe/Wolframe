@@ -147,8 +147,8 @@ public:
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 	Database* database();
 
-	virtual void addTransactionDefinition( const std::string& /*definition*/ ) {}
-	const std::string* getTransactionDefinition( const std::string& /*name*/ )
+	virtual void addProgram( const std::string& /*definition*/ ) {}
+	const std::string* getProgram( const std::string& /*name*/ )
 						{ return NULL; }
 
 	const std::map<std::string,std::string>* stmmap() const

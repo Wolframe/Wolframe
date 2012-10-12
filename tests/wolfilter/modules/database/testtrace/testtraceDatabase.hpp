@@ -115,14 +115,13 @@ public:
 
 	virtual Transaction* transaction( const std::string& /*name*/);
 
-	virtual void addTransactionDefinition( const std::string& /*definition*/ ) {}
-	const std::string* getTransactionDefinition( const std::string& /*name*/ )
+	const std::string* getProgram( const std::string& /*name*/ )
 						{ return NULL; }
 
-	virtual void loadProgram_HACK( const std::string& source);
+	virtual void addProgram( const std::string& source);
 	virtual void loadProgram( const std::string& source)
 	{
-		loadProgram_HACK( source);
+		addProgram( source);
 	}
 
 	virtual std::vector<std::string> getProgramFiles_HACK() const
