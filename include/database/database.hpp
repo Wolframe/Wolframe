@@ -93,7 +93,7 @@ public:
 
 	///\brief Load the database specific part of the transaction program for this database
 	///\remark throws std::runtime_error with position info in case of error
-	virtual void loadProgram( const std::string& content ) = 0;
+	virtual void loadProgram( const std::string& filename ) = 0;
 
 	///\brief add a database transaction program to the list of transaction programs
 	///\remark throws std::runtime_error with position info in case of error

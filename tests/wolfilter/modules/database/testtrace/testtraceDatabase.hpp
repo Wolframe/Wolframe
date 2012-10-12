@@ -115,7 +115,6 @@ public:
 
 	virtual Transaction* transaction( const std::string& /*name*/);
 
-	virtual void addProgram( const std::string& /*definition*/ ) {}
 	const std::string* getProgram( const std::string& /*name*/ )
 						{ return NULL; }
 

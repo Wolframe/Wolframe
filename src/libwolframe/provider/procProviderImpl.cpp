@@ -553,7 +553,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadTransactionPrograms()
 		{
 			std::string dbsrc;
 			m_program.loadfile( *pi, dbsrc);
-			m_db->loadProgram_HACK( dbsrc);
+			m_db->addProgram( dbsrc);
 		}
 		catch (const std::runtime_error& err)
 		{
