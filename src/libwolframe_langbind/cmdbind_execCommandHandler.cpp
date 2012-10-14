@@ -237,8 +237,10 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				else if (m_cmdidx == m_nofParentCmds)
 				{
 					///.. CAPAbilities
-					m_capastr = m_parser.capabilities();
+					m_capastr = m_parser.capabilities() + "\r\n";
 					m_capaitr = 0;
+					m_state = PrintCapabilities;
+					continue;
 				}
 				else if (m_cmdidx == m_nofParentCmds+1)
 				{
