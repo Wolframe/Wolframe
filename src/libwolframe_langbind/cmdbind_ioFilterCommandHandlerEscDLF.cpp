@@ -88,106 +88,111 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 	OutputFilter* flt;
 	const char* errmsg = 0;
 
-	for (;;) switch (m_state)
+	for (;;)
 	{
-		case Terminated:
-			return CLOSE;
+		LOG_TRACE << "STATE IOFilterCommandHandlerEscDLF " << stateName( m_state);
 
-		case FlushingOutput:
-			if (!(flt = m_outputfilter.get()))
-			{
-				LOG_ERROR << "Output filter undefined";
-				m_statusCode = ErrInternal;
-				m_state = DiscardInput;
-				return READ;
-			}
-			getFilterOutputWriteData();
-			if (!m_escapeBuffer.hasData())
-			{
-				m_state = Processing;
-				flt->setState( OutputFilter::Open);
-			}
-			return WRITE;
+		switch (m_state)
+		{
+			case Terminated:
+				return CLOSE;
 
-		case DiscardInput:
-			if (m_outputfilter.get())
-			{
-				getFilterOutputWriteData();
-				if (m_writedatasize) return WRITE;
-			}
-			if (m_input.gotEoD())
-			{
-				m_outputfilter.reset(0);
-				m_writedata = "\r\n.\r\n";
-				m_writedatasize = std::strlen("\r\n.\r\n");
-				m_state = Terminated;
-				return WRITE;
-			}
-			return READ;
-
-		case Processing:
-			switch (call( errmsg))
-			{
-				case Ok:
-					m_state = DiscardInput;
-					continue;
-
-				case Error:
-					m_state = DiscardInput;
-					if (errmsg)
-					{
-						LOG_ERROR << "Error calling procedure: " << (errmsg?errmsg:"unknown");
-						m_statusCode = ErrProcessing;
-					}
-					continue;
-
-				case Yield:
-					if (m_inputfilter.get())
-					{
-						switch (m_inputfilter->state())
-						{
-							case InputFilter::Open:
-								break;
-
-							case InputFilter::EndOfMessage:
-								return READ;
-
-							case InputFilter::Error:
-								errmsg = m_inputfilter->getError();
-								LOG_ERROR << "Error in input filter: " << (errmsg?errmsg:"unknown");
-								m_statusCode = ErrProcessing;
-								m_state = DiscardInput;
-								return READ;
-						}
-					}
-					if (m_outputfilter.get())
-					{
-						switch (m_outputfilter->state())
-						{
-							case OutputFilter::Open:
-								m_state = FlushingOutput;
-								continue;
-
-							case OutputFilter::EndOfBuffer:
-								m_state = FlushingOutput;
-								continue;
-
-							case OutputFilter::Error:
-								errmsg = m_outputfilter->getError();
-								LOG_ERROR << "Error in output filter: " << (errmsg?errmsg:"unknown");
-								m_statusCode = ErrProcessing;
-								m_state = DiscardInput;
-								return READ;
-						}
-					}
-					LOG_ERROR << "Illegal state (missing filter)";
+			case FlushingOutput:
+				if (!(flt = m_outputfilter.get()))
+				{
+					LOG_ERROR << "Output filter undefined";
 					m_statusCode = ErrInternal;
 					m_state = DiscardInput;
 					return READ;
-			}
+				}
+				getFilterOutputWriteData();
+				if (!m_escapeBuffer.hasData())
+				{
+					m_state = Processing;
+					flt->setState( OutputFilter::Open);
+				}
+				return WRITE;
+
+			case DiscardInput:
+				if (m_outputfilter.get())
+				{
+					getFilterOutputWriteData();
+					if (m_writedatasize) return WRITE;
+				}
+				if (m_input.gotEoD())
+				{
+					m_outputfilter.reset(0);
+					m_writedata = "\r\n.\r\n";
+					m_writedatasize = std::strlen("\r\n.\r\n");
+					m_state = Terminated;
+					return WRITE;
+				}
+				return READ;
+
+			case Processing:
+				switch (call( errmsg))
+				{
+					case Ok:
+						m_state = DiscardInput;
+						continue;
+
+					case Error:
+						m_state = DiscardInput;
+						if (errmsg)
+						{
+							LOG_ERROR << "Error calling procedure: " << (errmsg?errmsg:"unknown");
+							m_statusCode = ErrProcessing;
+						}
+						continue;
+
+					case Yield:
+						if (m_inputfilter.get())
+						{
+							switch (m_inputfilter->state())
+							{
+								case InputFilter::Open:
+									break;
+
+								case InputFilter::EndOfMessage:
+									return READ;
+
+								case InputFilter::Error:
+									errmsg = m_inputfilter->getError();
+									LOG_ERROR << "Error in input filter: " << (errmsg?errmsg:"unknown");
+									m_statusCode = ErrProcessing;
+									m_state = DiscardInput;
+									return READ;
+							}
+						}
+						if (m_outputfilter.get())
+						{
+							switch (m_outputfilter->state())
+							{
+								case OutputFilter::Open:
+									m_state = FlushingOutput;
+									continue;
+
+								case OutputFilter::EndOfBuffer:
+									m_state = FlushingOutput;
+									continue;
+
+								case OutputFilter::Error:
+									errmsg = m_outputfilter->getError();
+									LOG_ERROR << "Error in output filter: " << (errmsg?errmsg:"unknown");
+									m_statusCode = ErrProcessing;
+									m_state = DiscardInput;
+									return READ;
+							}
+						}
+						LOG_ERROR << "Illegal state (missing filter)";
+						m_statusCode = ErrInternal;
+						m_state = DiscardInput;
+						return READ;
+				}
+		}
+		LOG_ERROR << "illegal state";
+		return CLOSE;
 	}
-	LOG_ERROR << "illegal state";
-	return CLOSE;
 }
 
 

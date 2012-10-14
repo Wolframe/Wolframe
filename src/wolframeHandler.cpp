@@ -183,6 +183,9 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 /// Handle a request and produce a reply.
 const net::NetworkOperation wolframeConnection::nextOperation()
 {
+	for (;;)
+	{
+	LOG_TRACE << "STATE wolframeConnection handler " << stateName( m_state);
 	switch( m_state )	{
 		case NEW_CONNECTION:	{
 			m_state = SEND_HELLO;
@@ -196,7 +199,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 		case SEND_HELLO:	{
 			m_state = COMMAND_HANDLER;
 			m_cmdHandler.putInput(m_readBuf.charptr(), m_readBuf.pos());
-//			m_state = READ_INPUT;
+//DEPRECATED: old state machine:	m_state = READ_INPUT;
 			return net::NetworkOperation( net::ReadData( m_readBuf.ptr(), m_readBuf.size(), 30 ));
 		}
 
@@ -226,7 +229,8 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 					return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
 				}
 			}
-			break;		// should be unreachable
+			LOG_ALERT << "Internal: Processor in illegal state << (" << (int)__LINE__ << ")";
+			return net::NetworkOperation( net::CloseConnection() );
 
 		case OUTPUT_MSG:
 			memmove( m_readBuf.ptr(), m_dataStart, m_dataSize );
@@ -252,14 +256,13 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 		}
 
 		case TERMINATING:	{
-/*[-]*/LOG_ERROR << "State TERMINATING";
 			m_state = FINISHED;
 			return net::NetworkOperation( net::CloseConnection() );
 		}
 
 		case FINISHED:
 			LOG_DEBUG << "Processor in FINISHED state";
-			break;
+			return net::NetworkOperation( net::CloseConnection() );
 
 		case COMMAND_HANDLER:	{
 			void* inpp;
@@ -277,14 +280,15 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 					return net::SendData( outpp, outppsize);
 
 				case cmdbind::CommandHandler::CLOSE:
-					m_state = TERMINATING;
-					return net::SendData( "BYE\r\n", 5);
+					m_state = FINISHED;
+					return net::NetworkOperation( net::CloseConnection());
 			}
 		}
+		default:
+			LOG_ALERT << "Internal: Processor in illegal state << (" << (int)__LINE__ << ")";
+			return net::NetworkOperation( net::CloseConnection() );
 	} /* switch( m_state ) */
-
-	LOG_ALERT << "Connection FSM out of states";
-	return net::NetworkOperation( net::CloseConnection() );
+	} /* for (;;) */
 }
 
 

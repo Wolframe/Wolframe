@@ -154,6 +154,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 {
 	for (;;)
 	{
+		LOG_TRACE << "STATE ExecCommandHandler " << stateName( m_state);
 		switch( m_state)
 		{
 			case Init:

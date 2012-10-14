@@ -77,16 +77,21 @@ void DoctypeFilterCommandHandler::throw_error( const char* msg) const
 	throw std::runtime_error( ex);
 }
 
+void DoctypeFilterCommandHandler::setState( State state_)
+{
+	m_state = state_;
+	LOG_TRACE << "STATE DoctypeCommandHandler " << stateName( m_state);
+}
+
 void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	const char* inp = (const char*) begin;
 	std::size_t ii = 0;
 	m_inputbuffer.append( inp, bytesTransferred);
 
+	LOG_TRACE << "STATE DoctypeCommandHandler " << stateName( m_state) << " (put input)";
 	for (; ii<bytesTransferred && m_state != Done; ++ii)
 	{
-		throw_error( "XML header not terminated");
-
 		if (!inp[ii])
 		{
 			++m_nullcnt;
@@ -96,7 +101,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 		{
 			if (m_lastchar == '\n' && inp[ii] == '.')
 			{
-				m_state = Done;
+				setState( Done);
 				break;
 			}
 			m_lastchar = inp[ii];
@@ -107,7 +112,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 				case Init:
 					if (inp[ii] == '<')
 					{
-						m_state = ParseHeader0;
+						setState( ParseHeader0);
 					}
 					else if (inp[ii] < 0 || inp[ii] > 32)
 					{
@@ -118,7 +123,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 				case ParseHeader0:
 					if (inp[ii] == '?')
 					{
-						m_state = ParseHeader;
+						setState( ParseHeader);
 					}
 					else
 					{
@@ -136,11 +141,11 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 							if (cc) cc = std::strstr( cc, "yes");
 							if (cc)
 							{
-								m_state = Done;
+								setState( Done);
 								break;
 							}
 						}
-						m_state = SearchDoctypeTag;
+						setState( SearchDoctypeTag);
 						m_itembuf.clear();
 					}
 					else
@@ -156,7 +161,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 				case SearchDoctypeTag:
 					if (inp[ii] == '<')
 					{
-						m_state = ParseDoctype0;
+						setState( ParseDoctype0);
 					}
 					else if (inp[ii] < 0 || inp[ii] > 32)
 					{
@@ -167,7 +172,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 				case ParseDoctype0:
 					if (inp[ii] == '!')
 					{
-						m_state = ParseDoctype1;
+						setState( ParseDoctype1);
 					}
 					else
 					{
@@ -178,12 +183,12 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 				case ParseDoctype1:
 					if (inp[ii] == '-')
 					{
-						m_state = SkipComment;
+						setState( SkipComment);
 					}
 					else if (inp[ii] == 'D')
 					{
 						m_itembuf.push_back( inp[ii]);
-						m_state = ParseDoctype2;
+						setState( ParseDoctype2);
 					}
 					else
 					{
@@ -194,7 +199,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 				case SkipComment:
 					if (inp[ii] == '>')
 					{
-						m_state = SearchDoctypeTag;
+						setState( SearchDoctypeTag);
 					}
 					break;
 
@@ -205,7 +210,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						{
 							throw_error( "expected '<!DOCTYPE'");
 						}
-						m_state = ParseDoctype;
+						setState( ParseDoctype);
 						m_itembuf.clear();
 					}
 					else
@@ -226,7 +231,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 					else if (inp[ii] == '>')
 					{
 						m_doctypeid = utils::getIdFromDoctype( m_doctype);
-						m_state = Done;
+						setState( Done);
 					}
 					else
 					{

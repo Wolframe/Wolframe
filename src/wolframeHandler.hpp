@@ -104,7 +104,8 @@ private:
 	static const char* stateName( FSMstate state )
 	{
 		const char* names[] = { "NEW", "HELLO SENT", "READ INPUT", "OUTPUT MESSAGE",
-					"TIMEOUT", "SIGNALLED", "TERMINATE", "FINISHED" };
+					"TIMEOUT", "SIGNALLED", "FORBIDDEN", "TERMINATE",
+					"FINISHED", "COMMAND_HANDLER" };
 		return names[ state ];
 	}
 

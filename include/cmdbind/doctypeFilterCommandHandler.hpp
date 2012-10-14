@@ -108,7 +108,9 @@ private:
 	}
 
 	void throw_error( const char* msg=0) const;
+	void setState( State state_);
 
+private:
 	State m_state;					//< processing state machine state
 	char m_lastchar;				//< last character parsed
 	unsigned char m_nullcnt;			//< number of null characters parsed in a row
