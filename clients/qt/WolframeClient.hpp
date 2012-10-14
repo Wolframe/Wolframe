@@ -40,14 +40,22 @@ namespace _Wolframe {
 #ifdef WITH_SSL
 		bool m_initializedSsl;
 #endif
+		QString m_answer;
 
 	public:
 		WolframeClient( QString host = "localhost", unsigned short port = 7661, QWidget *_parent = 0 );
 		virtual ~WolframeClient( );
 
+// low-level commands, pre-protocol, for debugging mainly
 		void connect( );
 		void disconnect( );
 		void sendLine( QString line );
+
+// generic send command function, implementing the frame of the protocol
+		void sendCommand( QString command );
+
+// high-level commands
+		void hello( );
 
 		Q_PROPERTY( QString m_host READ host WRITE setHost )
 		QString host( ) const { return m_host; }
@@ -76,9 +84,20 @@ namespace _Wolframe {
 		void connected( );
 		void disconnected( );
 
+		void handleHello( QString result );
+
 	signals:
 		void error( QString error );
+
+// low-level commands, pre-protocol, for debugging mainly
 		void lineReceived( QString line );
+		
+// generic implementation of a command execute implementing the frame of the protocol
+		void resultReceived( QString result );
+		void helloReceived( );
+		
+
+// high-level commands
 	};
 } // namespace QtClient
 } // namespace _Wolframe

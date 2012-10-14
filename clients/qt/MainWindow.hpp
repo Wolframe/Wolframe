@@ -55,10 +55,15 @@ namespace _Wolframe {
 		void loadLanguage( QString language );
 
 	private slots:
+// slots for command line parsing
 		void switchFound( const QString &name );
 		void optionFound( const QString &name, const QVariant &value );
 		void paramFound( const QString &name, const QVariant &value );
 		void parseError( const QString &error );
+
+// slots for the wolframe client		
+		void wolframeError( QString error );
+		void helloReceived( );
 		
 		void themeSelected( QAction *action );
 		void formSelected( QAction *action );

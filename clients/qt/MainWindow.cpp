@@ -14,6 +14,7 @@
 #include <QTranslator>
 #include <QLocale>
 #include <QtAlgorithms>
+#include <QMessageBox>
 
 #include <QDebug>
 
@@ -120,6 +121,23 @@ void MainWindow::initialize( )
 // create a Wolframe protocol client
 	m_wolframeClient = new WolframeClient( m_host, m_port );
 
+// connect the wolframe client to protocols, authenticate
+	switch( m_loadMode ) {
+		case Local:
+			break;
+		case Network:
+			m_wolframeClient->connect( );
+			connect( m_wolframeClient, SIGNAL( helloReceived( ) ),
+				this, SLOT( helloReceived( ) ) );
+			connect( m_wolframeClient, SIGNAL( error( QString ) ),
+				this, SLOT( wolframeError( QString ) ) );
+			m_wolframeClient->hello( );
+			break;
+		default:
+			qWarning( ) << "Illegal load mode" << m_loadMode;
+			QCoreApplication::quit( );
+	}
+
 // a Qt UI loader for the main theme window
 	m_uiLoader = new QUiLoader( );
 	m_uiLoader->setLanguageChangeEnabled ( true );
@@ -168,6 +186,20 @@ void MainWindow::initialize( )
 
 // load language resources, repaints the whole interface if necessary
 	loadLanguage( QLocale::system( ).name( ) );		
+}
+
+void MainWindow::wolframeError( QString error )
+{
+	if( !m_debugTerminal->isVisible( ) ) {
+		QMessageBox msgBox;
+		msgBox.setText( error );
+		msgBox.exec( );
+	}
+}
+
+void MainWindow::helloReceived( )
+{
+	qDebug( ) << "hello received";
 }
 
 void MainWindow::populateThemesMenu( )
