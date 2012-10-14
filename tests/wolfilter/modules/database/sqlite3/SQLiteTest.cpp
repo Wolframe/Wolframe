@@ -58,13 +58,11 @@ static void removeFileIfExists( const std::string& filename)
 	boost::system::error_code errcode;
 	try
 	{
-		if (boost::filesystem::remove( filename, errcode))
-		{
-			if (errcode != boost::system::errc::no_such_file_or_directory)
-			{
-				throw std::runtime_error( std::string( "failed to remove file '") + filename + "'");
-			}
-		}
+		boost::filesystem::remove( filename);
+	}
+	catch (const boost::filesystem::filesystem_error& err)
+	{
+		throw std::runtime_error( std::string( "failed to remove file '") + filename + "': " + err.what());
 	}
 	catch (std::exception& err)
 	{
@@ -171,7 +169,7 @@ static void dump_table( FILE* fh, sqlite3 *db, const char* tablename)
 
 static std::vector<std::string> getTableNames( sqlite3* handle)
 {
-	static const char* tableselect = "SELECT * FROM sqlite_master WHERE type='table';";
+	static const char* tableselect = "SELECT name FROM sqlite_master WHERE type='table';";
 	std::vector<std::string> rt;
 	sqlite3_stmt* stm = 0;
 
@@ -188,7 +186,7 @@ static std::vector<std::string> getTableNames( sqlite3* handle)
 	return rt;
 }
 
-void SQLiteTestConfig::dump_database()
+void SQLiteTestConstructor::dump_database()
 {
 	FILE *fh = fopen( m_dump_filename.c_str(), "w");
 	if (fh == NULL) throw std::runtime_error( std::string("failed to open file for database dump (") + boost::lexical_cast<std::string>(errno) + "), file '" + m_dump_filename + "'");
@@ -196,7 +194,7 @@ void SQLiteTestConfig::dump_database()
 
 	sqlite3* handle;
 	int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
-	int res = sqlite3_open_v2( filename().c_str(), &handle, flags, OPERATING_SYSTEM);
+	int res = sqlite3_open_v2( m_db_filename.c_str(), &handle, flags, OPERATING_SYSTEM);
 	boost::shared_ptr<sqlite3> handle_disposer( handle, sqlite3_close);
 
 	if (res != SQLITE_OK)

@@ -3,7 +3,8 @@ testname=`basename $0 ".tst"`				# name of the test
 opt=""
 modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
 opt="$opt --module $modpath/testtrace/mod_db_testtrace"
-opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES,program=DBIN'"
+opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
+opt="$opt --program=DBIN"
 luascript=`echo $testname | sed 's/lua_//'`.lua		# script to execute
 opt="$opt --script $luascript"
 testcmd="$opt run"					# command to execute by the test

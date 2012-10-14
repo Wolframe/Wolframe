@@ -35,6 +35,7 @@
 //
 
 #include "logger-v1.hpp"
+#include "utils/miscUtils.hpp"
 #include "SQLite.hpp"
 #include "SQLitePreparedStatement.hpp"
 #define BOOST_FILESYSTEM_VERSION 3
@@ -127,7 +128,8 @@ void SQLiteDBunit::loadProgram( const std::string& filename )
 			      << "' does not exist (SQLite database '" << m_ID << "')";
 		return;
 	}
-	return;
+	std::string dbsource = utils::readSourceFileContent( filename);
+	addProgram( dbsource);
 }
 
 Database* SQLiteDBunit::database()

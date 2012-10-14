@@ -50,10 +50,7 @@ public:
 	SQLiteTestConfig( const char* name, const char* logParent, const char* logName )
 		:SQLiteConfig( name, logParent, logName){}
 
-	virtual ~SQLiteTestConfig()
-	{
-		dump_database();
-	}
+	virtual ~SQLiteTestConfig(){}
 
 	virtual bool parse( const config::ConfigurationTree& pt, const std::string& node,
 				const module::ModulesDirectory* modules )
@@ -68,11 +65,11 @@ public:
 	}
 
 	const std::string& input_filename() const	{return m_input_filename;}
+	const std::string& dump_filename() const	{return m_dump_filename;}
 
 private:
 	config::ConfigurationTree extractMyNodes( const config::ConfigurationTree& pt);
 	void setMyCanonicalPathes( const std::string& referencePath);
-	void dump_database();
 
 	std::string m_input_filename;
 	std::string m_dump_filename;
@@ -83,17 +80,26 @@ class SQLiteTestConstructor : public SQLiteConstructor
 {
 public:
 	SQLiteTestConstructor(){}
-	virtual ~SQLiteTestConstructor(){}
+	virtual ~SQLiteTestConstructor()
+	{
+		dump_database();
+	}
 
 	virtual SQLiteDBunit* object( const config::NamedConfiguration& conf)
 	{
 		const SQLiteTestConfig& cfg = dynamic_cast< const SQLiteTestConfig&>( conf);
 		createTestDatabase( cfg.filename(), cfg.input_filename());
+		m_db_filename = cfg.filename();
+		m_dump_filename = cfg.dump_filename();
 		return SQLiteConstructor::object( conf);
 	}
 
 private:
 	static void createTestDatabase( const std::string& filename_, const std::string& inputfile_);
+	void dump_database();
+
+	std::string m_db_filename;
+	std::string m_dump_filename;
 };
 
 }} // _Wolframe::db

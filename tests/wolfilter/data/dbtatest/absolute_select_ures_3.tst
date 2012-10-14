@@ -6,7 +6,8 @@
 --module ../../src/modules/filter/textwolf/mod_filter_textwolf
 --module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 --input-filter 'xml:textwolf'
---database 'identifier=testdb,outfile=DBOUT,file=DBRES,program=DBIN'
+--database 'identifier=testdb,outfile=DBOUT,file=DBRES'
+--program=DBIN
 testcall
 **file:DBIN
 TRANSACTION testcall

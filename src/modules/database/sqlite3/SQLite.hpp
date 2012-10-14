@@ -147,9 +147,19 @@ public:
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 	Database* database();
 
-	virtual void addProgram( const std::string& /*definition*/ ) {}
-	const std::string* getProgram( const std::string& /*name*/ )
-						{ return NULL; }
+	virtual void addProgram( const std::string& source)
+	{
+		m_program.load( source);
+	}
+
+	const std::string* getProgram( const std::string& name)
+	{
+		const std::map<std::string,std::string>* mm = m_program.statementmap();
+		if (!mm) return 0;
+		std::map<std::string,std::string>::const_iterator mi = mm->find( name);
+		if (mi == mm->end()) return 0;
+		return &mi->second;
+	}
 
 	const std::map<std::string,std::string>* stmmap() const
 	{

@@ -63,6 +63,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 	m_db = NULL;
 	if ( !conf->m_dbLabel.empty())
 		m_dbLabel = conf->m_dbLabel;
+	m_programfiles = conf->programFiles();
 
 	// Build the list of command handlers
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = conf->m_procConfig.begin();
@@ -336,26 +337,36 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 
 bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabaseProvider& db )
 {
+	bool rt = true;
 	if ( m_db == NULL && ! m_dbLabel.empty() )	{
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
-			if (loadTransactionPrograms())
-			{
-				LOG_DEBUG << "Processor database: database reference '" << m_dbLabel << "' resolved";
-				return true;
-			}
-			else
-			{
-				LOG_ALERT << "Processor database loading programs failed !";
-				return false;
-			}
+			LOG_DEBUG << "Processor database: database reference '" << m_dbLabel << "' resolved";
 		}
 		else	{
 			LOG_ALERT << "Processor database: database labeled '" << m_dbLabel << "' not found !";
 			return false;
 		}
+		// load programs:
+		db::DatabaseUnit* dbu = db.databaseunit( m_dbLabel);
+		std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
+		for (; pi != pe; ++pi)
+		{
+			try
+			{
+				std::string dbsrc;
+				m_program.loadfile( *pi, dbsrc);
+				dbu->addProgram( dbsrc);
+			}
+			catch (const std::runtime_error& err)
+			{
+				LOG_ERROR << "failed to load transaction program '" << *pi << "': " << err.what();
+				rt = false;
+			}
+
+		}
 	}
-	return true;
+	return rt;
 }
 
 langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg ) const
@@ -540,28 +551,6 @@ bool ProcessorProvider::ProcessorProvider_Impl::declareNormalizeFunction( const 
 		LOG_ERROR << "Cannot declare '" << type << "' normalize function '" << name << "': " <<  e.what();
 		return false;
 	}
-}
-
-bool ProcessorProvider::ProcessorProvider_Impl::loadTransactionPrograms()
-{
-	bool rt = true;
-	std::vector<std::string> prgfiles = m_db->getProgramFiles_HACK();
-	std::vector<std::string>::const_iterator pi = prgfiles.begin(), pe = prgfiles.end();
-	for (; pi != pe; pi++)
-	{
-		try
-		{
-			std::string dbsrc;
-			m_program.loadfile( *pi, dbsrc);
-			m_db->addProgram( dbsrc);
-		}
-		catch (const std::runtime_error& err)
-		{
-			LOG_ALERT << "failed to load transaction program '" << *pi << "': " << err.what();
-			rt = false;
-		}
-	}
-	return rt;
 }
 
 const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name ) const

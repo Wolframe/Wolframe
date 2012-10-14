@@ -82,7 +82,6 @@ private:
 	bool loadPrintFunction( const std::string& name, const std::string& type, const std::string& layoutFilename);
 	bool declareNormalizeFunction( const std::string& name, const std::string& type, const std::string& command);
 	bool declareFunctionName( const std::string& name, const char* typestr);
-	bool loadTransactionPrograms();
 
 private:
 	std::string					m_dbLabel;
@@ -110,6 +109,7 @@ private:
 	std::map< std::string, prnt::PrintFunctionR>	m_printFunctionMap;
 
 	std::map< std::string, const char*>	m_langfunctionIdentifierMap;
+	std::list< std::string >	m_programfiles;
 	db::Program m_program;
 };
 

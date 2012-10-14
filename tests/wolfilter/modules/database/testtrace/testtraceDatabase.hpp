@@ -70,7 +70,6 @@ public:
 	virtual void setCanonicalPathes( const std::string& referencePath);
 
 	const std::string& resultfilename() const	{return m_data.resultfilename;}
-	const std::string& programfilename() const	{return m_data.programfilename;}
 	const std::string& outfilename() const		{return m_data.outfilename;}
 	const std::string& id() const			{return m_data.id;}
 
@@ -78,7 +77,6 @@ private:
 	struct Data
 	{
 		std::string resultfilename;
-		std::string programfilename;
 		std::string outfilename;
 		std::string id;
 		static const serialize::StructDescriptionBase* getStructDescription();
@@ -94,7 +92,7 @@ class TesttraceDatabase
 	,public DatabaseUnit
 {
 public:
-	TesttraceDatabase( const std::string& id_, const std::string& programfilename_, const std::string& resultfilename_, const std::string& outfilename_, unsigned short, bool);
+	TesttraceDatabase( const std::string& id_, const std::string& resultfilename_, const std::string& outfilename_, unsigned short, bool);
 
 	virtual ~TesttraceDatabase(){}
 
@@ -124,13 +122,6 @@ public:
 		addProgram( source);
 	}
 
-	virtual std::vector<std::string> getProgramFiles_HACK() const
-	{
-		std::vector<std::string> rt;
-		rt.push_back( m_programfilename);
-		return rt;
-	}
-
 	const std::string& outfilename() const
 	{
 		return m_outfilename;
@@ -139,7 +130,6 @@ public:
 private:
 	std::string m_id;
 	std::string m_outfilename;
-	std::string m_programfilename;
 	std::vector<std::string> m_result;
 };
 
@@ -162,7 +152,7 @@ public:
 	virtual TesttraceDatabase* object( const config::NamedConfiguration& conf_)
 	{
 		const TesttraceDatabaseConfig& conf = dynamic_cast<const TesttraceDatabaseConfig&>( conf_);
-		return new TesttraceDatabase( conf.id(), conf.programfilename(), conf.resultfilename(), conf.outfilename(), 0, false);
+		return new TesttraceDatabase( conf.id(), conf.resultfilename(), conf.outfilename(), 0, false);
 	}
 };
 

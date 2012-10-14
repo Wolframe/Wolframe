@@ -57,6 +57,11 @@ Database* DatabaseProvider::database( const std::string& ID ) const
 	return m_impl->database( ID );
 }
 
+DatabaseUnit* DatabaseProvider::databaseunit( const std::string& ID ) const
+{
+	return m_impl->databaseunit( ID );
+}
+
 
 /// DatabaseProvider PIMPL implementation
 
@@ -104,6 +109,15 @@ Database* DatabaseProvider::DatabaseProvider_Impl::database( const std::string& 
 							it != m_db.end(); it++ )	{
 		if ( (*it)->ID() == id )
 			return (*it)->database();
+	}
+	return NULL;
+}
+
+DatabaseUnit* DatabaseProvider::DatabaseProvider_Impl::databaseunit( const std::string& id ) const
+{
+	for ( std::list<db::DatabaseUnit* >::const_iterator it = m_db.begin();
+							it != m_db.end(); it++ )	{
+		if ( (*it)->ID() == id ) return *it;
 	}
 	return NULL;
 }

@@ -54,7 +54,6 @@ const serialize::StructDescriptionBase* TesttraceDatabaseConfig::Data::getStruct
 		{
 			(*this)
 			( "identifier",	&This::id)
-			( "program",	&This::programfilename)
 			( "file",	&This::resultfilename)
 			( "outfile",	&This::outfilename)
 			;
@@ -80,11 +79,6 @@ bool TesttraceDatabaseConfig::parse( const config::ConfigurationTree& pt, const 
 
 bool TesttraceDatabaseConfig::check() const
 {
-	if (!m_data.programfilename.empty() && !utils::fileExists( m_data.programfilename))
-	{
-		LOG_ERROR << "Configured program file '" << m_data.programfilename << "' does not exist";
-		return false;
-	}
 	if (!m_data.resultfilename.empty() && !utils::fileExists( m_data.resultfilename))
 	{
 		LOG_ERROR << "Configured result file '" << m_data.resultfilename << "' does not exist";
@@ -109,10 +103,6 @@ void TesttraceDatabaseConfig::print( std::ostream& os, size_t indent) const
 
 void TesttraceDatabaseConfig::setCanonicalPathes( const std::string& referencePath)
 {
-	if (!m_data.programfilename.empty())
-	{
-		m_data.programfilename = utils::getCanonicalPath( m_data.programfilename, referencePath);
-	}
 	if (!m_data.resultfilename.empty())
 	{
 		m_data.resultfilename = utils::getCanonicalPath( m_data.resultfilename, referencePath);
@@ -124,10 +114,9 @@ void TesttraceDatabaseConfig::setCanonicalPathes( const std::string& referencePa
 }
 
 
-TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string& programfilename_, const std::string& resultfilename_, const std::string& outfilename_, unsigned short, bool)
+TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string& resultfilename_, const std::string& outfilename_, unsigned short, bool)
 	:m_id(id_)
 	,m_outfilename(outfilename_)
-	,m_programfilename(programfilename_)
 {
 	if (!resultfilename_.empty())
 	{

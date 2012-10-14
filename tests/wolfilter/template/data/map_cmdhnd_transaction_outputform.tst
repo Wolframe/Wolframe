@@ -16,7 +16,8 @@ modpath="../../src/modules/cmdbind/directmap"		# module directory relative from 
 opt="$opt --module $modpath/mod_command_directmap"
 modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
 opt="$opt --module $modpath/testtrace/mod_db_testtrace"
-opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES,program=DBIN'"
+opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
+opt="$opt --program=DBIN"
 opt="$opt --directmap 'f=xml,c=test_transaction,n=run,o=$testname'"
 testcmd="$opt run"					# command to execute by the test
 testscripts="$formname"					# list of scripts of the test

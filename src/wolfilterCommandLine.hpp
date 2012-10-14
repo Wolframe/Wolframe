@@ -79,6 +79,7 @@ private:
 	std::string m_loglevel;
 	std::string m_inputfile;
 	std::vector<std::string> m_modules;
+	std::vector<std::string> m_programs;
 	langbind::EnvironmentConfigStruct m_envconfig;
 	langbind::ScriptEnvironmentConfigStruct m_scriptenvconfig;
 	langbind::DirectmapConfigStruct m_directmapconfig;

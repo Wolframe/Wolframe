@@ -59,12 +59,6 @@ public:
 	///\ Just and interface at the moment
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
-	///\brief Get the list of available transaction programs for this database
-	virtual std::vector<std::string> getProgramFiles_HACK() const
-	{
-		return std::vector<std::string>();
-	}
-
 	virtual void addProgram( const std::string& /*content*/){}
 
 	/// Close the database connetion

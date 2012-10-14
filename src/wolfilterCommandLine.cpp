@@ -161,6 +161,11 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			cmdhlcfg.add_child( cfgid.second, m_directmapconfig.toPropertyTree());
 			proccfg.add_child( cfgid.first, cmdhlcfg);
 		}
+		std::vector<std::string>::const_iterator pi = m_programs.begin(), pe = m_programs.end();
+		for (; pi != pe; ++pi)
+		{
+			proccfg.add_child( "programFile", boost::property_tree::ptree( *pi));
+		}
 	}
 	catch (std::exception& e)
 	{
@@ -197,6 +202,7 @@ struct OptionStruct
 			( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
 			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
+			( "program,p", po::value< std::vector<std::string> >(), "specify program to load by path" )
 			( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
 			( "directmap,d", po::value< std::vector<std::string> >(), "specify directmap definition" )
 			( "form,F", po::value< std::vector<std::string> >(), "specify form to load by path" )
@@ -244,6 +250,10 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		{
 			*itr = utils::getCanonicalPath( *itr, referencePath);
 		}
+	}
+	if (vmap.count( "program"))
+	{
+		m_programs = vmap["program"].as<std::vector<std::string> >();
 	}
 	if (vmap.count( "form"))
 	{

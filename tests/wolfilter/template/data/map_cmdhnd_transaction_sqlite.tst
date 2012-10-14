@@ -5,7 +5,8 @@ modpath="../../src/modules/cmdbind/directmap"		# module directory relative from 
 opt="$opt --module $modpath/mod_command_directmap"
 modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
 opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
-opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA,program=DBPRG'"
+opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
+opt="$opt --program=DBPRG"
 opt="$opt --directmap 'f=xml,c=test_transaction,n=run'"
 testcmd="$opt run"					# command to execute by the test
 docin=employee_assignment_print				# input document name

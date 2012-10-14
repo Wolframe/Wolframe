@@ -68,6 +68,10 @@ public:
 	bool check() const;
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
+	const std::list<std::string>& programFiles() const
+	{
+		return m_programFiles;
+	}
 
 private:
 	std::string					m_dbLabel;
