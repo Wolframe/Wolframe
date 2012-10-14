@@ -25,8 +25,7 @@ namespace _Wolframe {
 			virtual void initiateListLoad( );
 			virtual void initiateFormLoad( QString &name );
 			virtual void initiateFormLocalizationLoad( QString &name, QLocale locale );
-			virtual QStringList getFormNames( );
-			virtual QStringList getLanguageCodes( );
+			virtual void initiateGetLanguageCodes( );
 		
 		private:
 			WolframeClient *m_client;

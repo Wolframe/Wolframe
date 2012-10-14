@@ -19,8 +19,14 @@ NetworkFormLoader::NetworkFormLoader( WolframeClient *_client )
 
 void NetworkFormLoader::initiateListLoad( )
 {
-// doing nothing here, deferred to getFormNames on demand
-	//~ emit formListLoaded( );
+	QStringList forms;
+
+	emit formListLoaded( forms );
+	
+//~ // read list of forms directory on demand
+	//~ QDir formsDir( QLatin1String( "forms" ) );
+	//~ QStringList forms = formsDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
+		//~ .replaceInStrings( ".ui", "" );
 }
 
 void NetworkFormLoader::initiateFormLocalizationLoad( QString &name, QLocale locale )
@@ -38,18 +44,7 @@ void NetworkFormLoader::initiateFormLoad( QString &name )
 	//~ emit formLoaded( name, form );
 }
 
-QStringList NetworkFormLoader::getFormNames( )
-{
-	QStringList forms;
-	
-//~ // read list of forms directory on demand
-	//~ QDir formsDir( QLatin1String( "forms" ) );
-	//~ QStringList forms = formsDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
-		//~ .replaceInStrings( ".ui", "" );
-	return forms;
-}
-
-QStringList NetworkFormLoader::getLanguageCodes( )
+void NetworkFormLoader::initiateGetLanguageCodes( )
 {
 	QStringList languageCodes;
 	languageCodes.push_back( "en_US" ); // default locale, always around
@@ -71,7 +66,7 @@ QStringList NetworkFormLoader::getLanguageCodes( )
 	//~ 
 	//~ languageCodes.removeDuplicates( );
 
-	return languageCodes;
+	emit languageCodesLoaded( languageCodes );
 }
 
 } // namespace QtClient

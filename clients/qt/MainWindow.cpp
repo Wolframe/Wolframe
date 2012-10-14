@@ -140,11 +140,15 @@ void MainWindow::initialize( )
 			QCoreApplication::quit( );
 	}
 
+// create delegate widget for form handling (one for now), in theory may are possible
 	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this );
 	
-// link the form loader for form loader notifications
-	connect( m_formLoader, SIGNAL( formListLoaded( ) ),
-		this, SLOT( formListLoaded( ) ) );
+// link the form loader for form loader notifications needed by the main window
+// (list of forms for form menu, list of language for language picker)
+	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
+		this, SLOT( languageCodesLoaded( QStringList ) ) );
+	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
+		this, SLOT( formListLoaded( QStringList ) ) );
 
 // get notified if the form widget changes a form
 	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
@@ -257,8 +261,11 @@ void MainWindow::loadTheme( QString theme )
 void MainWindow::loadLanguages( )
 {
 // get the list of available languages
-	QStringList languages = m_formLoader->getLanguageCodes( );
+	m_formLoader->initiateGetLanguageCodes( );
+}
 
+void MainWindow::languageCodesLoaded( QStringList languages )
+{
 // construct a menu showing all languages
 	QMenu *languageMenu = qFindChild<QMenu *>( m_ui, "menuLanguages" );
 	languageMenu->clear( );
@@ -276,11 +283,8 @@ void MainWindow::loadLanguages( )
 	connect( languageGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( languageSelected( QAction * ) ) );
 }
 
-void MainWindow::formListLoaded( )
+void MainWindow::formListLoaded( QStringList forms )
 {
-// get the list of available forms
-	QStringList forms = m_formLoader->getFormNames( );
-
 // contruct a menu which shows and wires them in the menu
 	QMenu *formsMenu = qFindChild<QMenu *>( m_ui, "menuForms" );
 	formsMenu->clear( );

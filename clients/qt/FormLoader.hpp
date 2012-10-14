@@ -23,13 +23,13 @@ namespace _Wolframe {
 			virtual void initiateListLoad( ) = 0;
 			virtual void initiateFormLoad( QString &name ) = 0;
 			virtual void initiateFormLocalizationLoad( QString &name, QLocale locale ) = 0;
-			virtual QStringList getFormNames( ) = 0;
-			virtual QStringList getLanguageCodes( ) = 0;
+			virtual void initiateGetLanguageCodes( ) = 0;
 
 		Q_SIGNALS:
-			void formListLoaded( );
+			void formListLoaded( QStringList forms );
 			void formLoaded( QString form_name, QByteArray form );
 			void formLocalizationLoaded( QString form_name, QByteArray localization );
+			void languageCodesLoaded( QStringList languages );
 	};
 } // namespace QtClient
 } // namespace _Wolframe

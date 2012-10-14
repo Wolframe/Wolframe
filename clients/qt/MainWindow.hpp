@@ -64,7 +64,8 @@ namespace _Wolframe {
 		void formSelected( QAction *action );
 		void languageSelected( QAction *action );
 
-		void formListLoaded( );
+		void languageCodesLoaded( QStringList languages );
+		void formListLoaded( QStringList forms );
 
 		void formLoaded( QString name );
 

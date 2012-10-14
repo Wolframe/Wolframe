@@ -19,8 +19,10 @@ FileFormLoader::FileFormLoader( QString formDir, QString localeDir )
 
 void FileFormLoader::initiateListLoad( )
 {
-// doing nothing here, deferred to getFormNames on demand
-	emit formListLoaded( );
+	QDir formsDir( QLatin1String( "forms" ) );
+	QStringList forms = formsDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
+		.replaceInStrings( ".ui", "" );
+	emit formListLoaded( forms );
 }
 
 QByteArray FileFormLoader::readFile( QString name )
@@ -48,21 +50,13 @@ void FileFormLoader::initiateFormLoad( QString &name )
 	emit formLoaded( name, form );
 }
 
-QStringList FileFormLoader::getFormNames( )
-{
-// read list of forms directory on demand
-	QDir formsDir( QLatin1String( "forms" ) );
-	QStringList forms = formsDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
-		.replaceInStrings( ".ui", "" );
-	return forms;
-}
 
-QStringList FileFormLoader::getLanguageCodes( )
+void FileFormLoader::initiateGetLanguageCodes( )
 {
 	QStringList languageCodes;
 	languageCodes.push_back( "en_US" ); // default locale, always around
 	
-// read list of supperted languages for all forms based on their qm files available
+// read list of supported languages for all forms based on their qm files available
 	QDir translationDir( QLatin1String( "i18n" ) );
 	translationDir.setFilter( QDir::Files | QDir::NoDotAndDotDot );
 	translationDir.setSorting( QDir::Name );
@@ -79,7 +73,7 @@ QStringList FileFormLoader::getLanguageCodes( )
 	
 	languageCodes.removeDuplicates( );
 
-	return languageCodes;
+	emit languageCodesLoaded( languageCodes );
 }
 
 } // namespace QtClient
