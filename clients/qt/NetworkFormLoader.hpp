@@ -10,6 +10,7 @@
 #include <QByteArray>
 
 #include "FormLoader.hpp"
+#include "WolframeClient.hpp"
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -19,19 +20,15 @@ namespace _Wolframe {
 		// intentionally omitting Q_OBJECT here, is done in FormLoader!
 		
 		public:
-			NetworkFormLoader( QString formDir, QString localeDir );
+			NetworkFormLoader( WolframeClient *_client );
 			virtual ~NetworkFormLoader( ) {};
 			virtual void initiateListLoad( );
 			virtual void initiateFormLoad( QString &name );
 			virtual void initiateFormLocalizationLoad( QString &name, QLocale locale );
-			virtual QStringList getFormNames( );
-			virtual QStringList getLanguageCodes( );
+			virtual void initiateGetLanguageCodes( );
 		
 		private:
-			QString m_formDir;
-			QString m_localeDir;
-			
-			QByteArray readFile( QString fileName );
+			WolframeClient *m_client;
 
 	};
 } // namespace QtClient

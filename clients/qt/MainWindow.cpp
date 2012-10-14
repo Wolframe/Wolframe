@@ -5,6 +5,8 @@
 #include "MainWindow.hpp"
 #include "FileFormLoader.hpp"
 #include "FileDataLoader.hpp"
+#include "NetworkFormLoader.hpp"
+#include "NetworkDataLoader.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -19,7 +21,7 @@ namespace _Wolframe {
 	namespace QtClient {
 
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
-	m_ui( 0 ), m_host( "localhost" ), m_port( 7661 )
+	m_ui( 0 ), m_host( "localhost" ), m_port( 7661 ), m_loadMode( Network )
 {
 	parseArgs( );
 	initialize( );
@@ -86,6 +88,9 @@ void MainWindow::parseArgs( )
 void MainWindow::switchFound( const QString &name )
 {
 	qDebug( ) << "switch" << name;
+	if( name == "local" ) {
+		m_loadMode = Local;
+	}
 }
 
 void MainWindow::optionFound( const QString &name, const QVariant &value )
@@ -112,26 +117,42 @@ void MainWindow::parseError( const QString &error )
 
 void MainWindow::initialize( )
 {
+// create a Wolframe protocol client
+	m_wolframeClient = new WolframeClient( m_host, m_port );
+
 // a Qt UI loader for the main theme window
 	m_uiLoader = new QUiLoader( );
 	m_uiLoader->setLanguageChangeEnabled ( true );
 
 // for testing, load lists of available forms from the files system,
 // pass the form loader to the FormWidget
-	m_formLoader = new FileFormLoader( "forms", "i18n" );	
+	switch( m_loadMode ) {
+		case Local:
+			m_formLoader = new FileFormLoader( "forms", "i18n" );
+			m_dataLoader = new FileDataLoader( "data" );
+			break;
+		case Network:
+			m_formLoader = new NetworkFormLoader( m_wolframeClient );
+			m_dataLoader = new NetworkDataLoader( m_wolframeClient );
+			break;
+		default:
+			qWarning( ) << "Illegal load mode" << m_loadMode;
+			QCoreApplication::quit( );
+	}
 
-	m_formWidget = new FormWidget( m_formLoader, m_uiLoader, this );
+// create delegate widget for form handling (one for now), in theory may are possible
+	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this );
 	
-// link the form loader for form loader notifications
-	connect( m_formLoader, SIGNAL( formListLoaded( ) ),
-		this, SLOT( formListLoaded( ) ) );
+// link the form loader for form loader notifications needed by the main window
+// (list of forms for form menu, list of language for language picker)
+	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
+		this, SLOT( languageCodesLoaded( QStringList ) ) );
+	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
+		this, SLOT( formListLoaded( QStringList ) ) );
 
 // get notified if the form widget changes a form
 	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
-
-// create a Wolframe protocol client
-	m_wolframeClient = new WolframeClient( m_host, m_port );
 
 // create debuging terminal
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
@@ -240,8 +261,11 @@ void MainWindow::loadTheme( QString theme )
 void MainWindow::loadLanguages( )
 {
 // get the list of available languages
-	QStringList languages = m_formLoader->getLanguageCodes( );
+	m_formLoader->initiateGetLanguageCodes( );
+}
 
+void MainWindow::languageCodesLoaded( QStringList languages )
+{
 // construct a menu showing all languages
 	QMenu *languageMenu = qFindChild<QMenu *>( m_ui, "menuLanguages" );
 	languageMenu->clear( );
@@ -259,11 +283,8 @@ void MainWindow::loadLanguages( )
 	connect( languageGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( languageSelected( QAction * ) ) );
 }
 
-void MainWindow::formListLoaded( )
+void MainWindow::formListLoaded( QStringList forms )
 {
-// get the list of available forms
-	QStringList forms = m_formLoader->getFormNames( );
-
 // contruct a menu which shows and wires them in the menu
 	QMenu *formsMenu = qFindChild<QMenu *>( m_ui, "menuForms" );
 	formsMenu->clear( );

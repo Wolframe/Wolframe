@@ -27,8 +27,7 @@ namespace _Wolframe {
 			AboutToConnect,
 			Connected,
 			AboutToDisconnect
-		};
-	
+		};	
 
 	private:
 		QString m_host;

@@ -6,6 +6,7 @@
 #define _NETWORK_DATA_LOADER_INCLUDED
 
 #include "DataLoader.hpp"
+#include "WolframeClient.hpp"
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -15,7 +16,7 @@ namespace _Wolframe {
 		// intentionally omitting Q_OBJECT here, is done in DataLoader!
 		
 		public:
-			NetworkDataLoader( QString dir );
+			NetworkDataLoader( WolframeClient *_client );
 			virtual ~NetworkDataLoader( ) {};
 
 			virtual void initiateDataLoad( QString form_name );
@@ -23,7 +24,7 @@ namespace _Wolframe {
 			virtual void initiateDomainDataLoad( QString form_name, QString widget_name );
 		
 		private:
-			QString m_dir;
+			WolframeClient *m_client;
 	};
 } // namespace QtClient
 } // namespace _Wolframe
