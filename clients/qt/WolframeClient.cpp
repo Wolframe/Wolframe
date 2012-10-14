@@ -15,8 +15,8 @@ namespace _Wolframe {
 WolframeClient::WolframeClient( QString _host, unsigned short _port, QWidget *_parent ) :
 	m_host( _host ),
 	m_port( _port ),
-	m_state( Disconnected ),
 	m_secure( false ),
+	m_state( Disconnected ),
 	m_parent( _parent ),
 	m_hasErrors( false )
 {
@@ -44,7 +44,8 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, QWidget *_p
 		this, SLOT( peerVerifyError( const QSslError & ) ) );
 #endif
 
-	connect( );
+	QObject::connect( this, SIGNAL( resultReceived( QString ) ),
+		this, SLOT( handleHello( QString ) ) );
 }
 
 #ifdef WITH_SSL
@@ -163,7 +164,7 @@ void WolframeClient::disconnect( )
 			break;
 
 		case Connected:
-			m_socket->write( QByteArray( "quit\n" ) );
+			sendCommand( "quit" );
 			m_state = AboutToDisconnect;
 			break;
 
@@ -270,6 +271,20 @@ void WolframeClient::dataAvailable( )
 				char buf[1024];
 				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
 				if( buf[len-1] == '\n' ) buf[len-1] = '\0';
+// protocol answer
+				if( strncmp( buf, "BYE", 3 ) == 0 ) {
+				} else if( strncmp( buf, "BAD", 3 ) == 0 ) {
+					emit error( tr( "Protocol error, received: %1." ).arg( buf + 4 ) );
+				} else if( strncmp( buf, "OK", 2 ) == 0 ) {
+					emit resultReceived( m_answer );
+					m_answer = "";
+				} else if( buf[0] == '.' && buf[1] == '\n' ) {
+					emit resultReceived( m_answer );
+					m_answer = "";
+				} else {
+					m_answer.append( buf );
+				}
+// generic clients (aka debug window)				
 				emit lineReceived( QString( QByteArray( buf, len ) ) );
 			}
 			break;
@@ -283,6 +298,22 @@ void WolframeClient::sendLine( QString line )
 {
 	m_socket->write( line.toAscii( ).append( "\n" ) );
 	m_socket->flush( );
+}
+
+// high-level
+void WolframeClient::sendCommand( QString command )
+{
+	sendLine( command );
+}
+
+void WolframeClient::hello( )
+{
+	sendCommand( "hello" );
+}
+
+void WolframeClient::handleHello( QString )
+{
+	emit helloReceived( );
 }
 
 } // namespace QtClient
