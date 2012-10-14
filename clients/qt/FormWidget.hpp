@@ -22,7 +22,7 @@ namespace _Wolframe {
 	Q_OBJECT
 
 	public:
-		FormWidget( FormLoader *_formLoader, QUiLoader *_uiLoader, QWidget *_parent );
+		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent );
 		virtual ~FormWidget( );
 		void loadForm( QString name );
 		void loadLanguage( QString language );
@@ -31,8 +31,8 @@ namespace _Wolframe {
 		QString m_name;			// name of the form
 		QUiLoader *m_uiLoader;		// UI loader to user for loading designer XML files
 		FormLoader *m_formLoader;	// form loader (visible form)
-		QWidget *m_ui;			// the ui loaded from the designer XML file
 		DataLoader *m_dataLoader;	// load and saves data (data form)
+		QWidget *m_ui;			// the ui loaded from the designer XML file
 		DataHandler *m_dataHandler;	// form/data handler
 		QLocale m_locale;		// current locale to use for form translations
 		QHBoxLayout *m_layout;		// main layout swallowing the form

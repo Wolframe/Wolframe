@@ -4,9 +4,6 @@
 
 #include "FormWidget.hpp"
 
-#include "FileFormLoader.hpp"
-#include "FileDataLoader.hpp"
-
 #include <QDebug>
 #include <QTranslator>
 #include <QApplication>
@@ -14,12 +11,10 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-FormWidget::FormWidget( FormLoader *_formLoader, QUiLoader *_uiLoader, QWidget *_parent )
-	: QWidget( _parent ), m_uiLoader( _uiLoader ), m_formLoader( _formLoader ), m_ui( 0 ), m_locale( "en_US" )
+FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent )
+	: QWidget( _parent ), m_uiLoader( _uiLoader ), m_dataLoader( _dataLoader ),
+	  m_formLoader( _formLoader ), m_ui( 0 ), m_locale( "en_US" )
 {
-// for now a from file form and data loader (later wolframe protocol)
-	m_dataLoader = new FileDataLoader( "data" );
-
 // maps data between constructed widgets from .ui and the data loader
 	m_dataHandler = new DataHandler( m_dataLoader );	
 

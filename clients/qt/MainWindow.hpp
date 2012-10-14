@@ -24,6 +24,11 @@ namespace _Wolframe {
 	public:
 		MainWindow( QWidget *_parent = 0 );
 		virtual ~MainWindow( );
+
+		enum LoadMode {
+			Network,
+			Local
+		};
 	
 	private:
 		QCommandLine *m_cmdline;	// command line parser	
@@ -32,12 +37,14 @@ namespace _Wolframe {
 		QString m_currentTheme;		// the name of the currently selected theme
 		QString m_currentForm;		// the name of the form currently visible
 		FormLoader *m_formLoader;	// form loader (visible form)
+		DataLoader *m_dataLoader;	// load and saves data (data form)
 		DebugTerminal *m_debugTerminal;	// protocol debug terminal (interactive)
 		WolframeClient *m_wolframeClient; // the client protocol class
 		QString m_currentLanguage;	// code of the current interface language
 		QUiLoader *m_uiLoader;		// the designer UI loader
-		QString m_host;
-		unsigned short m_port;
+		QString m_host;			// wolframe server port to use
+		unsigned short m_port;		// wolframe port to use
+		LoadMode m_loadMode;		// whether to use local loader or not
 
 		void parseArgs( );
 		void initialize( );

@@ -40,7 +40,7 @@ void DebugTerminal::initialize( )
 	m_input->setFocus( );
 
 	QStringList wordList;
-	wordList << "connect" << "quit" << "caps" << "help";
+	wordList << "connect" << "quit" << "help";
 #ifdef WITH_SSL
 	wordList << "sconnect";
 #endif
@@ -107,10 +107,6 @@ void DebugTerminal::lineEntered( QString line )
 		m_output->append( "SCONNECT host:port - connect to Wolframe server (secure)" );
 #endif
 		m_output->append( "QUIT - terminate connection to Wolframe server" );
-		m_output->setTextColor( QColor( "black" ) );
-	} else if( line.toLower( ).startsWith( "caps" ) ) {
-		m_output->setTextColor( QColor( "blue" ) );
-		m_output->append( "OK QUIT CAPS" );
 		m_output->setTextColor( QColor( "black" ) );
 	} else {
 		m_wolframeClient->sendLine( line );
