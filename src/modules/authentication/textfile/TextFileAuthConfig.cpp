@@ -70,8 +70,8 @@ bool TextFileAuthConfig::parse( const config::ConfigurationTree& pt, const std::
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( m_file ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "authentication file path is not absolute: "
-						    << m_file;
+					MOD_LOG_NOTICE << logPrefix() << "authentication file path is not absolute: "
+						       << m_file;
 			}
 		}
 		else	{

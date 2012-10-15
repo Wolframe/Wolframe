@@ -126,8 +126,8 @@ bool LoggerConfiguration::parse( const config::ConfigurationTree& pt, const std:
 						retVal = false;
 					else	{
 						if ( ! boost::filesystem::path( logFile ).is_absolute() )
-							LOG_WARNING << logPrefix() << "log file is not absolute: '"
-								    << logFile <<"'";
+							LOG_NOTICE << logPrefix() << "log file is not absolute: '"
+								   << logFile <<"'";
 					}
 				}
 				else

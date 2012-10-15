@@ -74,8 +74,8 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( programFile ).is_absolute() )
-					LOG_WARNING << logPrefix() << "program file path is not absolute: "
-						    << programFile;
+					LOG_NOTICE << logPrefix() << "program file path is not absolute: "
+						   << programFile;
 				m_programFiles.push_back( programFile );
 			}
 		}

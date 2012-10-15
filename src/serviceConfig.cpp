@@ -83,8 +83,8 @@ bool ServiceConfiguration::parse( const ConfigurationTree& pt, const std::string
 					retVal = false;
 				else	{
 					if ( ! boost::filesystem::path( pidFile ).is_absolute() )
-						LOG_WARNING << logPrefix() << "pid file path is not absolute: "
-							    << pidFile;
+						LOG_NOTICE << logPrefix() << "pid file path is not absolute: "
+							   << pidFile;
 				}
 			}
 			else	{

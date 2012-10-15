@@ -73,8 +73,8 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( m_filename ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "database file path is not absolute: "
-							<< m_filename;
+					MOD_LOG_NOTICE << logPrefix() << "database file path is not absolute: "
+						       << m_filename;
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
@@ -92,8 +92,8 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( programFile ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "program file path is not absolute: "
-							<< programFile;
+					MOD_LOG_NOTICE << logPrefix() << "program file path is not absolute: "
+						       << programFile;
 				m_programFiles.push_back( programFile );
 			}
 		}

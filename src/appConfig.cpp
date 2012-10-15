@@ -224,8 +224,8 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 						}
 						else	{
 							if ( ! boost::filesystem::path( modFile ).is_absolute() )
-								LOG_WARNING << MODULE_SECTION_MSG << " file path is not absolute: "
-									    << modFile;
+								LOG_NOTICE << MODULE_SECTION_MSG << " file path is not absolute: "
+									   << modFile;
 							bool isDuplicate = false;
 							for ( std::list< std::string >::const_iterator Vit = m_modFiles.begin();
 													Vit != m_modFiles.end(); Vit++ )	{

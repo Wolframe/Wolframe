@@ -70,8 +70,8 @@ bool LuaConfiguration::parse( const config::ConfigurationTree& pt, const std::st
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( script ).is_absolute() )
-					LOG_WARNING << logPrefix() << "script file path is not absolute: "
-						    << script;
+					LOG_NOTICE << logPrefix() << "script file path is not absolute: "
+						   << script;
 			}
 		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
 			std::string preload_lib;

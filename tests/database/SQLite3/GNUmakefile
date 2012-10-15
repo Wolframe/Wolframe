@@ -20,7 +20,6 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)/src/modules/database/sqlite3/SQLite.o \
-	$(TOPDIR)/src/modules/database/sqlite3/SQLiteProgram.o \
 	$(TOPDIR)/src/modules/database/sqlite3/SQLitePreparedStatement.o \
 	$(TOPDIR)/src/modules/database/sqlite3/SQLiteProgram.o \
 	-lwolframe \

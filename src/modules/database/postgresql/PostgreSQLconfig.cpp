@@ -127,8 +127,8 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( sslCert ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "certificate file path is not absolute: "
-							<< sslCert;
+					MOD_LOG_NOTICE << logPrefix() << "certificate file path is not absolute: "
+						       << sslCert;
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "sslKey" ))	{
@@ -137,8 +137,8 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( sslKey ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "key file path is not absolute: "
-							<< sslKey;
+					MOD_LOG_NOTICE << logPrefix() << "key file path is not absolute: "
+						       << sslKey;
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "sslRootCert" ))	{
@@ -147,8 +147,8 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( sslRootCert ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "root CA file path is not absolute: "
-							<< sslRootCert;
+					MOD_LOG_NOTICE << logPrefix() << "root CA file path is not absolute: "
+						       << sslRootCert;
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "sslCRL" ))	{
@@ -157,8 +157,8 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( sslCRL ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "CRL file path is not absolute: "
-							<< sslCRL;
+					MOD_LOG_NOTICE << logPrefix() << "CRL file path is not absolute: "
+						       << sslCRL;
 			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connectionTimeout" ))	{
@@ -184,8 +184,8 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( programFile ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "program file path is not absolute: "
-							<< programFile;
+					MOD_LOG_NOTICE << logPrefix() << "program file path is not absolute: "
+						       << programFile;
 				programFiles.push_back( programFile );
 			}
 		}
