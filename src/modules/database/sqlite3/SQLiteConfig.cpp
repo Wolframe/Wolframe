@@ -86,7 +86,8 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 						Parser::RangeDomain<unsigned short>( 0 ), &connDefined ))
 				retVal = false;
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "programFile" ))	{
+		else if ( boost::algorithm::iequals( L1it->first, "programFile" )
+			  || boost::algorithm::iequals( L1it->first, "program" ))	{
 			std::string programFile;
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
 				retVal = false;

@@ -178,7 +178,8 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, statementTimeout, &sTdefined ))
 				retVal = false;
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "programFile" ))	{
+		else if ( boost::algorithm::iequals( L1it->first, "programFile" )
+			  || boost::algorithm::iequals( L1it->first, "program" ) )	{
 			std::string programFile;
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
 				retVal = false;
