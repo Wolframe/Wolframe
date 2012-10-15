@@ -68,11 +68,6 @@ bool LuaConfiguration::parse( const config::ConfigurationTree& pt, const std::st
 			bool isDefined = ( !script.empty());
 			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, script, &isDefined ))
 				retVal = false;
-			else	{
-				if ( ! boost::filesystem::path( script ).is_absolute() )
-					LOG_WARNING << logPrefix() << "script file path is not absolute: "
-						    << script;
-			}
 		} else if ( boost::algorithm::iequals( L1it->first, "preload_lib" ))	{
 			std::string preload_lib;
 			if ( !config::Parser::getValue( logPrefix().c_str(), *L1it, preload_lib ))
@@ -187,11 +182,11 @@ void LuaConfiguration::setCanonicalPathes( const std::string& refPath )
 {
 	using namespace boost::filesystem;
 	if ( ! script.empty() )	{
-		if ( ! path( script ).is_absolute() )
-			script = resolvePath( absolute( script,
-							path( refPath ).branch_path()).string());
-		else
-			script = resolvePath( script );
+		std::string oldPath = script;
+		script = utils::getCanonicalPath( script, refPath );
+		if ( oldPath != script )
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using script absolute filename '" << script
+				   << "' instead of '" << oldPath << "'";
 	}
 }
 

@@ -144,7 +144,28 @@ const std::string& SQLiteDatabase::ID() const
 	if ( m_unit )
 		return m_unit->ID();
 	else
-		throw std::runtime_error( "SQL database unit not initialized" );
+		throw std::runtime_error( "SQLite database unit not initialized" );
+}
+
+void SQLiteDatabase::loadProgram( const std::string& filename )
+{
+	if ( !m_unit )
+		throw std::runtime_error( "loadProgram: SQLite database unit not initialized" );
+	m_unit->loadProgram( filename );
+}
+
+void SQLiteDatabase::addProgram( const std::string& program )
+{
+	if ( !m_unit )
+		throw std::runtime_error( "addProgram: SQLite database unit not initialized" );
+	m_unit->addProgram( program );
+}
+
+const std::string* SQLiteDatabase::getProgram( const std::string& name) const
+{
+	if ( !m_unit )
+		throw std::runtime_error( "getProgram: SQLite database unit not initialized" );
+	return m_unit->getProgram( name );
 }
 
 Transaction* SQLiteDatabase::transaction( const std::string& /*name*/ )

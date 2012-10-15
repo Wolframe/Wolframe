@@ -51,7 +51,7 @@ struct SimpleformDDLCompiler
 {
 	static SimpleBuilder* constructor()
 	{
-		return new DDLCompilerBuilder( "simpleform", ddl::createSimpleFormCompilerFunc);
+		return new DDLCompilerBuilder( "ddl::SimpleFormCompiler", "simpleform", ddl::createSimpleFormCompilerFunc);
 	}
 };
 }//anonymous namespace

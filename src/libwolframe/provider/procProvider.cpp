@@ -68,16 +68,13 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 			if ( ! Parser::getValue( logPrefix().c_str(), *L1it, m_dbLabel, &isDefined ))
 				retVal = false;
 		}
-		else if ( boost::algorithm::iequals( "program", L1it->first ))	{
+		else if ( boost::algorithm::iequals( "programFile", L1it->first )
+			  || boost::algorithm::iequals( "program", L1it->first ) )	{
 			std::string programFile;
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
 				retVal = false;
-			else	{
-				if ( ! boost::filesystem::path( programFile ).is_absolute() )
-					LOG_NOTICE << logPrefix() << "program file path is not absolute: "
-						    << programFile;
+			else
 				m_programFiles.push_back( programFile );
-			}
 		}
 		else if ( boost::algorithm::iequals( "environment", L1it->first ))
 		{
@@ -292,15 +289,11 @@ void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 	}
 	for ( std::list< std::string >::iterator it = m_programFiles.begin();
 						it != m_programFiles.end(); it++ )	{
+		std::string oldPath = *it;
 		*it = utils::getCanonicalPath( *it, refPath );
-	}
-	for (std::vector<langbind::DDLFormConfigStruct>::iterator ii=m_environment.form.begin(), ee=m_environment.form.end(); ii != ee; ++ii)
-	{
-		ii->file = utils::getCanonicalPath( ii->file, refPath);
-	}
-	for (std::vector<langbind::PrintLayoutConfigStruct>::iterator ii=m_environment.printlayout.begin(), ee=m_environment.printlayout.end(); ii != ee; ++ii)
-	{
-		ii->file = utils::getCanonicalPath( ii->file, refPath);
+		if ( oldPath != *it )
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using program absolute filename '" << *it
+				   << "' instead of '" << oldPath << "'";
 	}
 }
 

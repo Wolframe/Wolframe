@@ -37,6 +37,7 @@
 #include <string>
 #include "serverEndpoint.hpp"
 #include "utils/miscUtils.hpp"
+#include "logger-v1.hpp"
 
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
@@ -52,32 +53,32 @@ namespace _Wolframe	{
 void ServerSSLendpoint::setAbsolutePath( const std::string& refPath )
 {
 	if ( ! cert_.empty() )	{
-		if ( ! boost::filesystem::path( cert_ ).is_absolute() )
-			cert_ = resolvePath( boost::filesystem::absolute( cert_,
-							boost::filesystem::path( refPath ).branch_path()).string());
-		else
-			cert_ = resolvePath( cert_ );
+		std::string oldPath = cert_;
+		cert_ = utils::getCanonicalPath( cert_, refPath );
+		if ( oldPath != cert_ )
+/*MBa ?!?*/		LOG_NOTICE << "Using absolute SSL certificate filename '" << cert_
+				   << "' instead of '" << oldPath << "'";
 	}
 	if ( ! key_.empty() )	{
-		if ( ! boost::filesystem::path( key_ ).is_absolute() )
-			key_ = resolvePath( boost::filesystem::absolute( key_,
-							boost::filesystem::path( refPath ).branch_path()).string());
-		else
-			key_ = resolvePath( key_ );
+		std::string oldPath = key_;
+		key_ = utils::getCanonicalPath( key_, refPath );
+		if ( oldPath != key_ )
+/*MBa ?!?*/		LOG_NOTICE << "Using absolute SSL key filename '" << key_
+				   << "' instead of '" << oldPath << "'";
 	}
 	if ( ! CAdir_.empty() )	{
-		if ( ! boost::filesystem::path( CAdir_ ).is_absolute() )
-			CAdir_ = resolvePath( boost::filesystem::absolute( CAdir_,
-							boost::filesystem::path( refPath ).branch_path()).string());
-		else
-			CAdir_ = resolvePath( CAdir_ );
+		std::string oldPath = CAdir_;
+		CAdir_ = utils::getCanonicalPath( CAdir_, refPath );
+		if ( oldPath != CAdir_ )
+/*MBa ?!?*/		LOG_NOTICE << "Using absolute CA directory '" << CAdir_
+				   << "' instead of '" << oldPath << "'";
 	}
 	if ( ! CAchain_.empty() )	{
-		if ( ! boost::filesystem::path( CAchain_ ).is_absolute() )
-			CAchain_ = resolvePath( boost::filesystem::absolute( CAchain_,
-							boost::filesystem::path( refPath ).branch_path()).string());
-		else
-			CAchain_ = resolvePath( CAchain_);
+		std::string oldPath = CAchain_;
+		CAchain_ = utils::getCanonicalPath( CAchain_, refPath );
+		if ( oldPath != CAchain_ )
+/*MBa ?!?*/		LOG_NOTICE << "Using absolute CA chain filename '" << CAchain_
+				   << "' instead of '" << oldPath << "'";
 	}
 }
 #endif // WITH_SSL

@@ -21,7 +21,7 @@ opt="$opt --normalize 'f_float number trim float(10,10)'"
 opt="$opt --normalize 'text_ascii_de localeconv latinword,ascii_de'"
 opt="$opt --normalize 'text_ascii_eu localeconv latinword,ascii_eu'"
 
-opt="$opt --form $formname"				# form for invoice
+opt="$opt --program $formname"				# form for invoice
 testcmd="$opt typed_invoice"				# command to execute by the test
 testscripts="$formname"					# list of scripts of the test
 docin=charconv_example					# input document name

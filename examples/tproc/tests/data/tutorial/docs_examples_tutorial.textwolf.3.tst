@@ -25,11 +25,7 @@ provider
 	{
 		lua
 		{
-			script
-			{
-				name run
-				file example_3.lua
-			}
+			program example_3.lua
 		}
 	}
 }

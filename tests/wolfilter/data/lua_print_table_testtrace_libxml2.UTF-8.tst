@@ -105,7 +105,7 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --normalize 'int number integer(10)' --normalize 'uint number unsigned(10)' --normalize 'float number float(10,10)' --printlayout f=invoice.simplepdf,n=print_invoice,t=tracepdf --form invoice.simpleform --script print_table.lua run
+--input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/cmdbind/lua/mod_command_lua --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/prnt//testPdfPrinter/mod_test_pdf_printer --module ../../src/modules/filter//blob/mod_filter_blob --normalize 'int number integer(10)' --normalize 'uint number unsigned(10)' --normalize 'float number float(10,10)' --program invoice.simplepdf --program invoice.simpleform --program print_table.lua run
 **file: print_table.lua
 
 function run()
@@ -173,6 +173,7 @@ invoice
 }
 
 **file: invoice.simplepdf
+!NAME=print_invoice
 /invoice: {Text="invoice"} PrintText()
 //name: {Text ?= "text"; [Index] ?= -1; [Index] = Index + 1} PrintText()
 //address: {R1 ?= -1; [R1] = R1 + 1} PrintText()

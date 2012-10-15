@@ -28,7 +28,7 @@ topdir=`dirname $PWD/$0`"/../../../../"
 filter="xml:textwolf"
 modpath="../../src/modules"
 testcmd="--module $modpath/filter/textwolf/mod_filter_textwolf $testcmd"
-if [ `echo $testcmd | grep '.lua ' | grep -c -- '--script'` != 0 ]; then
+if [ `echo $testcmd | grep '.lua ' | grep -c -- '--program'` != 0 ]; then
 	testcmd="--module $modpath/cmdbind/lua/mod_command_lua $testcmd"
 fi
 

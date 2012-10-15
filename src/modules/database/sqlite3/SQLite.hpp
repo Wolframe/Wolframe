@@ -122,6 +122,10 @@ public:
 
 	const std::string& ID() const;
 
+	virtual void loadProgram( const std::string& filename );
+	virtual void addProgram( const std::string& program );
+	virtual const std::string* getProgram( const std::string& name) const;
+
 	/// more of a placeholder for now
 	Transaction* transaction( const std::string& name );
 
@@ -141,18 +145,18 @@ public:
 		      unsigned short connections );
 	~SQLiteDBunit();
 
-	virtual void loadProgram( const std::string& filename );
-
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 	Database* database();
 
-	virtual void addProgram( const std::string& source)
-	{
-		m_program.load( source);
-	}
+	virtual void loadProgram( const std::string& filename );
+	/// MBa: to be defined after some more cleaning...
+	virtual void loadAllPrograms()		{}
 
-	const std::string* getProgram( const std::string& name)
+	virtual void addProgram( const std::string& program )
+						{ m_program.load( program ); }
+
+	virtual const std::string* getProgram( const std::string& name) const
 	{
 		const std::map<std::string,std::string>* mm = m_program.statementmap();
 		if (!mm) return 0;

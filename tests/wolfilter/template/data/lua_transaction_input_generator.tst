@@ -4,9 +4,9 @@ opt=""
 modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
 opt="$opt --module $modpath/testtrace/mod_db_testtrace"
 opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
-opt="$opt --program=DBIN"
+opt="$opt --program=DBIN.tdl"
 luascript=`echo $testname | sed 's/lua_//'`.lua		# script to execute
-opt="$opt --script $luascript"
+opt="$opt --program $luascript"
 testcmd="$opt run"					# command to execute by the test
 testscripts="$luascript"				# list of scripts of the test
 docin=employee_assignment_print				# input document name
@@ -14,7 +14,7 @@ docout=$testname					# output document name
 testdata="
 **file: DBRES
 #name#job1#job2#job3#job4
-**file:DBIN
+**file:DBIN.tdl
 TRANSACTION test_transaction
 BEGIN
 	INTO doc/title WITH //task DO run( title);

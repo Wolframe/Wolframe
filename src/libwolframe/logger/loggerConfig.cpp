@@ -124,11 +124,6 @@ bool LoggerConfiguration::parse( const config::ConfigurationTree& pt, const std:
 					bool isDefined = ( ! logFile.empty());
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, logFile, &isDefined ))
 						retVal = false;
-					else	{
-						if ( ! boost::filesystem::path( logFile ).is_absolute() )
-							LOG_WARNING << logPrefix() << "log file is not absolute: '"
-								    << logFile <<"'";
-					}
 				}
 				else
 					LOG_WARNING << logPrefix() << "logfile: unknown configuration option: '"
@@ -328,11 +323,11 @@ void LoggerConfiguration::setCanonicalPathes( const std::string& refPath )
 	using namespace boost::filesystem;
 
 	if ( ! logFile.empty() )	{
-		if ( ! path( logFile ).is_absolute() )
-			logFile = resolvePath( absolute( logFile,
-							 path( refPath ).branch_path()).string());
-		else
-			logFile = resolvePath( logFile );
+		std::string oldPath = logFile;
+		logFile = utils::getCanonicalPath( logFile, refPath );
+		if ( oldPath != logFile )
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute filename '" << logFile
+				   << "' instead of '" << oldPath << "'";
 	}
 }
 

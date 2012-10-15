@@ -57,7 +57,7 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//locale/mod_normalize_locale --module ../../src/modules/normalize//number/mod_normalize_number --normalize 'int number integer(10)' --normalize 'f_int number trim integer(10)' --normalize 'uint number unsigned(10)' --normalize 'f_uint number trim unsigned(10)' --normalize 'float number float(10,10)' --normalize 'f_float number trim float(10,10)' --normalize 'text_ascii_de localeconv latinword,ascii_de' --normalize 'text_ascii_eu localeconv latinword,ascii_eu' --form typed_invoice.simpleform typed_invoice
+--input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//locale/mod_normalize_locale --module ../../src/modules/normalize//number/mod_normalize_number --normalize 'int number integer(10)' --normalize 'f_int number trim integer(10)' --normalize 'uint number unsigned(10)' --normalize 'f_uint number trim unsigned(10)' --normalize 'float number float(10,10)' --normalize 'f_float number trim float(10,10)' --normalize 'text_ascii_de localeconv latinword,ascii_de' --normalize 'text_ascii_eu localeconv latinword,ascii_eu' --program typed_invoice.simpleform typed_invoice
 **file: typed_invoice.simpleform
 !DOCTYPE "invoice 'http://www.wolframe.org/example-doc/typed_invoice.dtd'"
 invoice

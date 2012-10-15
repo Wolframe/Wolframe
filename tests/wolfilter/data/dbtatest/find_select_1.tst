@@ -7,9 +7,9 @@
 --module ../wolfilter/modules/database/testtrace/mod_db_testtrace
 --input-filter 'xml:textwolf'
 --database 'identifier=testdb,outfile=DBOUT'
---program=DBIN
+--program=DBIN.tdl
 testcall
-**file:DBIN
+**file:DBIN.tdl
 TRANSACTION testcall BEGIN
 	WITH //aa DO run(.);
 END

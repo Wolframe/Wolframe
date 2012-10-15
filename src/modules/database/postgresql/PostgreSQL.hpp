@@ -131,6 +131,10 @@ public:
 
 	const std::string& ID() const;
 
+	virtual void loadProgram( const std::string& filename );
+	virtual void addProgram( const std::string& program );
+	virtual const std::string* getProgram( const std::string& name) const;
+
 	/// more of a placeholder for now
 	Transaction* transaction( const std::string& name );
 
@@ -159,9 +163,12 @@ public:
 	Database* database();
 
 	virtual void loadProgram( const std::string& filename );
+	/// MBa: I have to think a bit how to handle this
+	virtual void loadAllPrograms()		{}
+
 
 	virtual void addProgram( const std::string& /*definition*/ ) {}
-	const std::string* getProgram( const std::string& /*name*/ )
+	virtual const std::string* getProgram( const std::string& /*name*/ ) const
 						{ return NULL; }
 private:
 	const std::string	m_ID;			///< database ID

@@ -287,12 +287,13 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		}
 	}
 	// Load the programs except database programs:
-	bool success = loadPrograms();
-
+	bool success = true;
 	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=conf->m_environment.normalize.begin(), ee=conf->m_environment.normalize.end(); ii != ee; ++ii)
 	{
 		success &= declareNormalizeFunction( ii->name, ii->type, ii->call);
 	}
+	success &= loadPrograms();
+
 	if (!success)
 	{
 		throw std::logic_error( "Not all configured objects in the processor environment could be loaded. See log." );
@@ -334,7 +335,12 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 	for (; pi != pe; ++pi)
 	{
 		std::string ext = utils::getFileExtension( *pi);
-		if (!ext.empty() && !boost::iequals( ext, ".tdl"))
+		if (ext.empty())
+		{
+			LOG_ERROR << "Program file has no extension. Cannot load '" << *pi << "'";
+			rt = false;
+		}
+		else if (!boost::iequals( ext, ".tdl"))
 		{
 			std::string key = boost::algorithm::to_upper_copy( std::string( ext.c_str() + 1));
 			std::map< std::string, ddl::DDLCompilerR >::const_iterator ci = m_ddlcompilerMap.find( key);

@@ -67,25 +67,15 @@ void LuaScriptContext::load( const ScriptEnvironmentConfigStruct& cfg, const mod
 	}
 
 	// load scripts:
-	std::vector<ScriptCommandConfigStruct>::const_iterator si=cfg.script.begin(), se=cfg.script.end();
+	std::vector<std::string>::const_iterator si=cfg.program.begin(), se=cfg.program.end();
 	for (;si != se; ++si)
 	{
-		langbind::LuaScript script( si->file);
-		const std::string scriptname = utils::getFileStem( si->file);
-		std::string name = si->name;
-		if (name.empty())
+		langbind::LuaScript script( *si);
+		std::vector<std::string>::const_iterator ni = script.functions().begin(), ne = script.functions().end();
+		for (; ni != ne; ++ni)
 		{
-			if (script.functions().empty())
-			{
-				throw std::runtime_error( std::string( "no functions defined in script '") + scriptname + "'");
-			}
-			else
-			{
-				// no function name specified, then the last function in the script is the name of the exported function
-				name = script.functions().back();
-			}
+			funcmap.defineLuaFunction( *ni, script);
 		}
-		funcmap.defineLuaFunction( name, script);
 	}
 }
 

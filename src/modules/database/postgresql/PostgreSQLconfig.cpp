@@ -125,41 +125,21 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 			bool isDefined = ( !sslCert.empty());
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslCert, &isDefined ))
 				retVal = false;
-			else	{
-				if ( ! boost::filesystem::path( sslCert ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "certificate file path is not absolute: "
-							<< sslCert;
-			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "sslKey" ))	{
 			bool isDefined = ( !sslKey.empty());
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslKey, &isDefined ))
 				retVal = false;
-			else	{
-				if ( ! boost::filesystem::path( sslKey ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "key file path is not absolute: "
-							<< sslKey;
-			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "sslRootCert" ))	{
 			bool isDefined = ( !sslRootCert.empty());
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslRootCert, &isDefined ))
 				retVal = false;
-			else	{
-				if ( ! boost::filesystem::path( sslRootCert ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "root CA file path is not absolute: "
-							<< sslRootCert;
-			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "sslCRL" ))	{
 			bool isDefined = ( !sslCRL.empty());
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, sslCRL, &isDefined ))
 				retVal = false;
-			else	{
-				if ( ! boost::filesystem::path( sslCRL ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "CRL file path is not absolute: "
-							<< sslCRL;
-			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connectionTimeout" ))	{
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, connectTimeout, &cTdefined ))
@@ -178,14 +158,12 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, statementTimeout, &sTdefined ))
 				retVal = false;
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "programFile" ))	{
+		else if ( boost::algorithm::iequals( L1it->first, "programFile" )
+			  || boost::algorithm::iequals( L1it->first, "program" ) )	{
 			std::string programFile;
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
 				retVal = false;
 			else	{
-				if ( ! boost::filesystem::path( programFile ).is_absolute() )
-					MOD_LOG_WARNING << logPrefix() << "program file path is not absolute: "
-							<< programFile;
 				programFiles.push_back( programFile );
 			}
 		}
@@ -221,42 +199,41 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 
 void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 {
-	using namespace boost::filesystem;
-
 	if ( ! sslCert.empty() )	{
-		if ( ! path( sslCert ).is_absolute() )
-			sslCert = resolvePath( absolute( sslCert,
-							 path( refPath ).branch_path()).string());
-		else
-			sslCert = resolvePath( sslCert );
+		std::string oldPath = sslCert;
+		sslCert = utils::getCanonicalPath( sslCert, refPath);
+		if ( oldPath != sslCert )
+/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute SSL certificate filename '" << sslCert
+				       << "' instead of '" << oldPath << "'";
 	}
 	if ( ! sslKey.empty() )	{
-		if ( ! path( sslKey ).is_absolute() )
-			sslKey = resolvePath( absolute( sslKey,
-							path( refPath ).branch_path()).string());
-		else
-			sslKey = resolvePath( sslKey );
+		std::string oldPath = sslKey;
+		sslKey = utils::getCanonicalPath( sslKey, refPath );
+		if ( oldPath != sslKey )
+/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute SSL key filename '" << sslKey
+				       << "' instead of '" << oldPath << "'";
 	}
 	if ( ! sslRootCert.empty() )	{
-		if ( ! path( sslRootCert ).is_absolute() )
-			sslRootCert = resolvePath( absolute( sslRootCert,
-							     path( refPath ).branch_path()).string());
-		else
-			sslRootCert = resolvePath( sslRootCert );
+		std::string oldPath = sslRootCert;
+		sslRootCert = utils::getCanonicalPath( sslRootCert, refPath );
+		if ( oldPath != sslRootCert )
+/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute CA certificate filename '" << sslRootCert
+				       << "' instead of '" << oldPath << "'";
 	}
 	if ( ! sslCRL.empty() )	{
-		if ( ! path( sslCRL ).is_absolute() )
-			sslCRL = resolvePath( absolute( sslCRL,
-							path( refPath ).branch_path()).string());
-		else
-			sslCRL = resolvePath( sslCRL );
+		std::string oldPath = sslCRL;
+		sslCRL = utils::getCanonicalPath( sslCRL, refPath );
+		if ( oldPath != sslCRL )
+/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute CRL filename '" << sslCRL
+				       << "' instead of '" << oldPath << "'";
 	}
 	for ( std::list< std::string >::iterator it = programFiles.begin();
 						it != programFiles.end(); it++ )	{
-		if ( ! path( *it ).is_absolute() )
-			*it = resolvePath( absolute( *it, path( refPath ).branch_path()).string());
-		else
-			*it = resolvePath( *it );
+		std::string oldPath = *it;
+		*it = utils::getCanonicalPath( *it, refPath );
+		if ( oldPath != *it )
+/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
+				       << "' instead of '" << oldPath << "'";
 	}
 }
 

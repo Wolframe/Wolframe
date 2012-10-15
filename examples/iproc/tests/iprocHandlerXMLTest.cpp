@@ -64,26 +64,23 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 {
 	boost::shared_ptr<proc::ProcProviderConfig> rt( new proc::ProcProviderConfig());
 	langbind::ScriptEnvironmentConfigStruct script_env;
-	langbind::ScriptCommandConfigStruct scriptcfg;
-	scriptcfg.name = "run";
-	scriptcfg.file = script.string();
-	script_env.script.push_back( scriptcfg);
+	script_env.program.push_back( script.string());
 
 	boost::property_tree::ptree proccfg;
 	std::vector<std::pair<std::string,std::string> >
 		cmdhl = g_modulesDirectory->getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
 
-	if (!script_env.script.empty())
+	if (!script_env.program.empty())
 	{
-		std::vector<langbind::ScriptCommandConfigStruct>::const_iterator ci = script_env.script.begin(), ce = script_env.script.end();
-		std::string extension = utils::getFileExtension( ci->file);
+		std::vector<std::string>::const_iterator ci = script_env.program.begin(), ce = script_env.program.end();
+		std::string extension = utils::getFileExtension( *ci);
 		if (extension.empty())
 		{
 			throw std::runtime_error( "script without extension specified. Cannot assign it to one command handler");
 		}
 		for (++ci; ci!=ce; ++ci)
 		{
-			if (!boost::iequals( extension, utils::getFileExtension(ci->file)))
+			if (!boost::iequals( extension, utils::getFileExtension(*ci)))
 			{
 				throw std::runtime_error( "multiple scripts with different extension specified. Cannot assign them to one command handler");
 			}

@@ -125,10 +125,10 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 				{
 					cmdhandler_programs[ cmdhndname].push_back( *gi);
 				}
-				else
-				{
-					proccfg.add_child( "program", boost::property_tree::ptree( *gi));
-				}
+			}
+			if (!cfgid_set)
+			{
+				proccfg.add_child( "program", boost::property_tree::ptree( *gi));
 			}
 		}
 		std::map<std::string,std::vector<std::string> >::const_iterator mi = cmdhandler_programs.begin(), me = cmdhandler_programs.end();
@@ -205,8 +205,6 @@ struct OptionStruct
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 			( "program,p", po::value< std::vector<std::string> >(), "specify program to load by path" )
 			( "directmap,d", po::value< std::vector<std::string> >(), "specify directmap definition" )
-			( "form,F", po::value< std::vector<std::string> >(), "specify form to load by path of the DDL description" )
-			( "printlayout,P", po::value< std::vector<std::string> >(), "specify print layout for a form" )
 			( "database,D", po::value<std::string>(), "specifiy transaction database" )
 			( "normalize,N", po::value< std::vector<std::string> >(), "specify normalization function" )
 			( "cmd", po::value<std::string>(), "name of the command to execute")
@@ -254,24 +252,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	if (vmap.count( "program"))
 	{
 		m_programs = vmap["program"].as<std::vector<std::string> >();
-	}
-	if (vmap.count( "form"))
-	{
-		std::vector<std::string> formparams = vmap["form"].as<std::vector<std::string> >();
-		std::vector<std::string>::const_iterator itr=formparams.begin(), end=formparams.end();
-		for (; itr != end; ++itr)
-		{
-			m_envconfig.form.push_back( langbind::DDLFormOption( *itr));
-		}
-	}
-	if (vmap.count( "printlayout"))
-	{
-		std::vector<std::string> printlayouts = vmap["printlayout"].as<std::vector<std::string> >();
-		std::vector<std::string>::const_iterator itr=printlayouts.begin(), end=printlayouts.end();
-		for (; itr != end; ++itr)
-		{
-			m_envconfig.printlayout.push_back( langbind::PrintLayoutOption( *itr));
-		}
 	}
 	if (vmap.count( "normalize"))
 	{
