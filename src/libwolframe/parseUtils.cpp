@@ -134,6 +134,78 @@ char _Wolframe::utils::gotoNextToken( std::string::const_iterator& itr, std::str
 	return (itr == end)?0:*itr;
 }
 
+std::string _Wolframe::utils::parseNextLine( std::string::const_iterator& itr, std::string::const_iterator end)
+{
+	std::string rt;
+	for (; itr != end && *itr != '\n'; ++itr)
+	{
+		if (*itr == '\\')
+		{
+			++itr;
+			if (itr == end) throw std::runtime_error( "found '\\' at end of input");
+			if (*itr != '\n')
+			{
+				rt.push_back( '\\');
+				rt.push_back( *itr);
+				std::string::const_iterator next = itr;
+				for (;next != end && *next != '\n' && *next > 0 && *next <= 32; ++next);
+				if (next != end && *next == '\n') std::runtime_error( "found spaces after a '\\' at end of a line");
+			}
+		}
+		else
+		{
+			rt.push_back( *itr);
+		}
+	}
+	if (itr != end) ++itr;
+	return rt;
+}
+
+std::pair<std::string,std::string> _Wolframe::utils::parseTokenAssignement( std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& alphaTable)
+{
+	std::pair<std::string,std::string> rt;
+	static CharTable optab("=");
+
+	switch (utils::parseNextToken( rt.first, itr, end, optab))
+	{
+		case '\0':
+		case '=': std::runtime_error( "identifier expected of assignment before '='");
+		default:
+			if (utils::gotoNextToken( itr, end) != '=')
+			{
+				std::runtime_error( "'=' expected after identifier of assignment");
+			}
+			++itr;
+			if (utils::parseNextToken( rt.second, itr, end, optab, alphaTable) == '\0')
+			{
+				std::runtime_error( "unexpected end of file in attribute '!name=..' definition");
+			}
+	}
+	return rt;
+}
+
+std::pair<std::string,std::string> _Wolframe::utils::parseTokenAssignement( std::string::const_iterator& itr, std::string::const_iterator end)
+{
+	return parseTokenAssignement( itr, end, identifierCharTable());
+}
+
+std::pair<unsigned int,unsigned int> _Wolframe::utils::getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
+{
+	std::pair<unsigned int,unsigned int> rt(1,1);
+	std::string::const_iterator ii = start;
+	for (; ii!=pos; ++ii)
+	{
+		if (*ii == '\n')
+		{
+			rt.second = 0;
+			rt.first += 1;
+			continue;
+		}
+		++rt.second;
+	}
+	return rt;
+}
+
 template <class Result>
 static void readSourceFileContentT( const std::string& filename, Result& res)
 {

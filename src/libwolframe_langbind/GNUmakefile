@@ -36,7 +36,6 @@ CPP_OBJS = \
 	appConfig_struct.o \
 	appConfig_option.o \
 	scriptConfig_struct.o \
-	scriptConfig_option.o \
 	directmapConfig_struct.o \
 	directmapConfig_option.o \
 	null_filter.o \

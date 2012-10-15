@@ -1669,7 +1669,7 @@ LuaScript::LuaScript( const std::string& path_)
 			const char* uname = lua_getupvalue( ls, -1, 1);
 			if (uname)
 			{
-				if (std::strcmp( uname, "ENV_"))
+				if (uname[0])
 				{
 					m_functions.push_back( lua_tostring( ls, -3));
 				}

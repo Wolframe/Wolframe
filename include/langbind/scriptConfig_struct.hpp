@@ -43,19 +43,9 @@
 namespace _Wolframe {
 namespace langbind {
 
-struct ScriptCommandConfigStruct
-{
-	std::string name;						//< (optional for some languages) name of the function in the script (globally unique)
-	std::string file;						//< path of the script source
-
-	///\brief Get the configuration structure description
-	static const serialize::StructDescriptionBase* getStructDescription();
-};
-
-
 struct ScriptEnvironmentConfigStruct
 {
-	std::vector<ScriptCommandConfigStruct> script;			//< definitions of script functions
+	std::vector<std::string> program;		//< definitions of programs
 
 	///\brief Get the configuration structure description
 	static const serialize::StructDescriptionBase* getStructDescription();

@@ -36,8 +36,10 @@ Project Wolframe.
 #include "prnt/pdfPrinterMethod.hpp"
 #include "prnt/pdfPrinterExpression.hpp"
 #include "prnt/pdfPrinterDocument.hpp"
+#include "utils/miscUtils.hpp"
 #include "textwolf/xmlpathautomatonparse.hpp"
 #include "textwolf/xmlpathselect.hpp"
+#include <boost/algorithm/string.hpp>
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
@@ -58,38 +60,6 @@ static bool isEmpty( const std::string& line)
 	const std::string::const_iterator end = line.end();
 	for (; itr != end; ++itr) if (*itr < 0 || *itr > 32) return false;
 	return true;
-}
-
-static std::string getLine( std::size_t& linecnt, std::string::const_iterator& itr, const std::string::const_iterator& end)
-{
-	std::string rt;
-	++linecnt;
-	for (; itr != end && *itr != '\n'; ++itr)
-	{
-		if (*itr == '\\')
-		{
-			++itr;
-			if (itr == end) throw std::runtime_error( "found '\\' at end of input");
-			if (*itr != '\n')
-			{
-				rt.push_back( '\\');
-				rt.push_back( *itr);
-				std::string::const_iterator next = itr;
-				for (;next != end && *next != '\n' && isSpace(*next); ++next);
-				if (next != end && *next == '\n') std::runtime_error( "found spaces after a '\\' at end of a line");
-			}
-			else
-			{
-				++linecnt;
-			}
-		}
-		else
-		{
-			rt.push_back( *itr);
-		}
-	}
-	if (itr != end) ++itr;
-	return rt;
 }
 
 static std::string getSelectionExpression( std::string::const_iterator& itr, const std::string::const_iterator& end)
@@ -121,18 +91,20 @@ public:
 		:m_createDocument(createDocument_)
 	{
 		m_exprstrings.push_back( '\0');
-		std::size_t linecnt = 0;
 		std::string::const_iterator itr = src.begin(), end=src.end();
 		try
 		{
+			while (utils::gotoNextToken( itr, end) == '!')
+			{
+				++itr;
+				std::pair<std::string,std::string> assignment = utils::parseTokenAssignement( itr, end);
+				m_attributes[ boost::algorithm::to_lower_copy( assignment.first)] = assignment.second;
+			}
 			while (itr != end)
 			{
-				std::string line = getLine( linecnt, itr, end);
-				if (isEmpty( line))
-				{
-					++linecnt;
-					continue;
-				}
+				std::string line = utils::parseNextLine( itr, end);
+				if (isEmpty( line)) continue;
+
 				std::string::const_iterator li=line.begin(), le=line.end();
 				std::string xpathstr = getSelectionExpression( li, le);
 				int xerr = m_parser.addExpression( (int)m_statedef.size()+1, xpathstr.c_str(), xpathstr.size());
@@ -147,7 +119,8 @@ public:
 		}
 		catch (const std::runtime_error& e)
 		{
-			throw std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(linecnt) + " of PDF printer layout description source (" + e.what() + ")");
+			std::pair<unsigned int,unsigned int> pos = utils::getLineInfo( src.begin(), itr);
+			throw std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(pos.first) + " of PDF printer layout description source (" + e.what() + ")");
 		}
 	}
 
@@ -156,9 +129,21 @@ public:
 	const XMLPathSelectAutomatonParser& parser() const	{return m_parser;}
 	Document* createDocument() const			{return m_createDocument();}
 
+	const std::string& attribute( const std::string n_) const
+	{
+		static const std::string empty;
+		std::map<std::string,std::string>::const_iterator ai = m_attributes.find( n_);
+		return ai == m_attributes.end() ? empty:ai->second;
+	}
+
 	std::string tostring() const
 	{
 		std::ostringstream out;
+		std::map<std::string,std::string>::const_iterator ai = m_attributes.begin(), ae = m_attributes.end();
+		for (; ai != ae; ++ai)
+		{
+			out << "ATTRIBUTE " << ai->first << " = '" << ai->second << "'" << std::endl;
+		}
 		std::vector<StateDef>::const_iterator is = m_statedef.begin(), es = m_statedef.end();
 		for (; is != es; ++is)
 		{
@@ -169,11 +154,13 @@ public:
 
 		return out.str();
 	}
+
 private:
 	XMLPathSelectAutomatonParser m_parser;
 	std::vector<StateDef> m_statedef;
 	std::string m_exprstrings;
 	CreateDocumentFunc m_createDocument;
+	std::map<std::string,std::string> m_attributes;
 };
 
 HaruPdfPrintFunction::HaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument)
@@ -289,6 +276,11 @@ std::string HaruPdfPrintFunction::execute( const Input* input_) const
 std::string HaruPdfPrintFunction::tostring() const
 {
 	return m_impl->tostring();
+}
+
+const std::string& HaruPdfPrintFunction::name() const
+{
+	return m_impl->attribute("name");
 }
 
 PrintFunction* _Wolframe::prnt::createHaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument)

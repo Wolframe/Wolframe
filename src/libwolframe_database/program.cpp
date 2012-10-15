@@ -40,19 +40,10 @@ using namespace _Wolframe;
 using namespace _Wolframe::db;
 
 Program::LineInfo::LineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
-	:line(1),col(1)
 {
-	std::string::const_iterator ii = start;
-	for (; ii!=pos; ++ii)
-	{
-		if (*ii == '\n')
-		{
-			col = 0;
-			line += 1;
-			continue;
-		}
-		++col;
-	}
+	std::pair<unsigned int,unsigned int> info = utils::getLineInfo( start, pos);
+	line = info.first;
+	col = info.second;
 }
 
 Program::Error::Error( const LineInfo& pos_, const std::string& msg_)

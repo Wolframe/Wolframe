@@ -52,7 +52,7 @@ struct PdfPrinter
 {
 	static SimpleBuilder* constructor()
 	{
-		return new PrintFunctionBuilder( "simplepdf", prnt::createHaruPdfPrintFunction);
+		return new PrintFunctionBuilder( "HaruPdfPrintFunction", "simplepdf", prnt::createHaruPdfPrintFunction);
 	}
 };
 }//anonymous namespace

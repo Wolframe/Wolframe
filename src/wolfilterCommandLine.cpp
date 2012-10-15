@@ -36,6 +36,7 @@
 #include "langbind/appObjects.hpp"
 #include "database/DBprovider.hpp"
 #include "langbind/appConfig_struct.hpp"
+#include "langbind/scriptConfig_struct.hpp"
 #include "langbind/directmapConfig_option.hpp"
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
@@ -96,46 +97,50 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 		std::vector<std::pair<std::string,std::string> >
 			cmdhl = m_modulesDirectory.getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
 
-		if (!m_scriptenvconfig.script.empty())
+		std::map<std::string,std::vector<std::string> > cmdhandler_programs;
+		std::vector<std::string>::const_iterator gi = m_programs.begin(), ge = m_programs.end();
+		for (; gi != ge; ++gi)
 		{
-			std::vector<langbind::ScriptCommandConfigStruct>::const_iterator ci = m_scriptenvconfig.script.begin(), ce = m_scriptenvconfig.script.end();
-			std::string extension = utils::getFileExtension( ci->file);
-			if (extension.empty())
-			{
-				throw std::runtime_error( "script without extension specified. Cannot assign it to one command handler");
-			}
-			for (++ci; ci!=ce; ++ci)
-			{
-				if (!boost::iequals( extension, utils::getFileExtension(ci->file)))
-				{
-					throw std::runtime_error( "multiple scripts with different extension specified. Cannot assign them to one command handler");
-				}
-			}
-			std::string cmdhndname = std::string( extension.c_str() +1);
-
-			std::pair<std::string,std::string> cfgid;
 			bool cfgid_set = false;
-			std::vector<std::pair<std::string,std::string> >::const_iterator pi = cmdhl.begin(), pe = cmdhl.end();
-			for (; pi != pe; ++pi)
+			std::pair<std::string,std::string> cfgid;
+			std::string extension = utils::getFileExtension( *gi);
+			if (!extension.empty())
 			{
-				if (boost::istarts_with( pi->second, cmdhndname))
+				std::string cmdhndname = std::string( extension.c_str() +1);
+				std::vector<std::pair<std::string,std::string> >::const_iterator pi = cmdhl.begin(), pe = cmdhl.end();
+				for (; pi != pe; ++pi)
 				{
-					if (cfgid_set)
+					if (boost::iequals( pi->first, "cmdhandler")
+					&&  boost::iequals( pi->second, cmdhndname))
 					{
-						throw std::runtime_error( std::string( "more than one command handler module loaded that match to scripts selected (") + cmdhndname + ")");
+						if (cfgid_set)
+						{
+							throw std::runtime_error( std::string( "more than one command handler module loaded that match to program selected (") + cmdhndname + ")");
+						}
+						cfgid = *pi;
+						cfgid_set = true;
 					}
-					cfgid = *pi;
-					cfgid_set = true;
+				}
+				if (cfgid_set)
+				{
+					cmdhandler_programs[ cmdhndname].push_back( *gi);
+				}
+				else
+				{
+					proccfg.add_child( "program", boost::property_tree::ptree( *gi));
 				}
 			}
-			if (!cfgid_set)
-			{
-				throw std::runtime_error( std::string( "no command handler module loaded that matches to scripts selected (") + cmdhndname + ")");
-			}
-			boost::property_tree::ptree cmdhlcfg;
-			cmdhlcfg.add_child( cfgid.second, m_scriptenvconfig.toPropertyTree());
-			proccfg.add_child( cfgid.first, cmdhlcfg);
 		}
+		std::map<std::string,std::vector<std::string> >::const_iterator mi = cmdhandler_programs.begin(), me = cmdhandler_programs.end();
+		for (; mi != me; ++mi)
+		{
+			langbind::ScriptEnvironmentConfigStruct scfg;
+			scfg.program = mi->second;
+			boost::property_tree::ptree cmdhlcfg;
+			cmdhlcfg.add_child( mi->first, scfg.toPropertyTree());
+			proccfg.add_child( "cmdhandler", cmdhlcfg);
+		}
+
 		if (!m_directmapconfig.command.empty())
 		{
 			std::pair<std::string,std::string> cfgid;
@@ -143,7 +148,8 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			std::vector<std::pair<std::string,std::string> >::const_iterator pi = cmdhl.begin(), pe = cmdhl.end();
 			for (; pi != pe; ++pi)
 			{
-				if (boost::istarts_with( pi->second, "directmap"))
+				if (boost::iequals( pi->first, "cmdhandler")
+				&&  boost::istarts_with( pi->second, "directmap"))
 				{
 					if (cfgid_set)
 					{
@@ -155,16 +161,11 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			}
 			if (!cfgid_set)
 			{
-				throw std::runtime_error( "no command handler module loaded that matches to directmap");
+				throw std::runtime_error( "no command handler module loaded that handles the directmap defined");
 			}
 			boost::property_tree::ptree cmdhlcfg;
 			cmdhlcfg.add_child( cfgid.second, m_directmapconfig.toPropertyTree());
 			proccfg.add_child( cfgid.first, cmdhlcfg);
-		}
-		std::vector<std::string>::const_iterator pi = m_programs.begin(), pe = m_programs.end();
-		for (; pi != pe; ++pi)
-		{
-			proccfg.add_child( "programFile", boost::property_tree::ptree( *pi));
 		}
 	}
 	catch (std::exception& e)
@@ -203,9 +204,8 @@ struct OptionStruct
 			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 			( "program,p", po::value< std::vector<std::string> >(), "specify program to load by path" )
-			( "script,s", po::value< std::vector<std::string> >(), "specify script to load by path" )
 			( "directmap,d", po::value< std::vector<std::string> >(), "specify directmap definition" )
-			( "form,F", po::value< std::vector<std::string> >(), "specify form to load by path" )
+			( "form,F", po::value< std::vector<std::string> >(), "specify form to load by path of the DDL description" )
 			( "printlayout,P", po::value< std::vector<std::string> >(), "specify print layout for a form" )
 			( "database,D", po::value<std::string>(), "specifiy transaction database" )
 			( "normalize,N", po::value< std::vector<std::string> >(), "specify normalization function" )
@@ -280,15 +280,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		for (; itr != end; ++itr)
 		{
 			m_envconfig.normalize.push_back( langbind::NormalizeFunctionOption( *itr));
-		}
-	}
-	if (vmap.count( "script"))
-	{
-		std::vector<std::string> scripts = vmap["script"].as<std::vector<std::string> >();
-		std::vector<std::string>::const_iterator itr=scripts.begin(), end=scripts.end();
-		for (; itr != end; ++itr)
-		{
-			m_scriptenvconfig.script.push_back( langbind::ScriptCommandOption( *itr));
 		}
 	}
 	if (vmap.count( "directmap"))

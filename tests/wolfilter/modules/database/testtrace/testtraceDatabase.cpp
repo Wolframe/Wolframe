@@ -164,3 +164,9 @@ void TesttraceDatabase::addProgram( const std::string& source)
 	}
 }
 
+void TesttraceDatabase::loadProgram( const std::string& filename)
+{
+	std::string dbsource = utils::readSourceFileContent( filename);
+	addProgram( dbsource);
+}
+

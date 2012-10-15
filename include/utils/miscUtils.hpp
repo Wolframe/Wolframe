@@ -105,8 +105,8 @@ const CharTable& anyCharTable();
 // - a single character operator from an operator table
 ///
 ///\remark throws exception on error
-///\return the first character of the token parsed in the source if a token was found and parsed, '\0' when no token was found (EOF)
-///\param[out] tok token parsed
+///\return the token as character in case of an operator, else the first character of the token parsed in the source, '\0' when no token was found (EOF)
+///\param[out] tok non operator token parsed
 ///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the token parsed)
 ///\param[in] end iterator marking the end of the source
 ///\param[in] operatorTable (optional) operator table
@@ -119,6 +119,19 @@ char parseNextToken( std::string& tok, std::string::const_iterator& itr, std::st
 ///\brief Skip to next token (skip white spaces)
 char gotoNextToken( std::string::const_iterator& itr, std::string::const_iterator end);
 
+///\brief Parse a token assignement 'identifier = token'
+///\return pair with assignement first = identifier, second = token
+std::pair<std::string,std::string> parseTokenAssignement( std::string::const_iterator& itr, std::string::const_iterator end, const CharTable& alphaTable);
+std::pair<std::string,std::string> parseTokenAssignement( std::string::const_iterator& itr, std::string::const_iterator end);
+
+///\remark throws exception on error
+///\return line parsed
+///\param[in,out] itr scanning iterator passed as start of the source to parse and returned as source position after the token parsed)
+///\param[in] end iterator marking the end of the source
+std::string parseNextLine( std::string::const_iterator& itr, std::string::const_iterator end);
+
+///\brief Get the line/column info from a source iterator
+std::pair<unsigned int,unsigned int> getLineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos);
 
 ///\brief Reading the content of a source file
 ///\remark Throws on error

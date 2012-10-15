@@ -152,7 +152,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					throw std::logic_error( "Object is not a form function. See log." );
 				}
 				else	{
-					std::string name = ffo->objectClassName();
+					std::string name = ffo->programFileType();
 					boost::algorithm::to_upper( name);
 					std::map< std::string, ddl::DDLCompilerR >::const_iterator itr = m_ddlcompilerMap.find( name );
 					if ( itr != m_ddlcompilerMap.end() )	{
@@ -232,7 +232,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				}
 				else
 				{
-					std::string name = ffo->objectClassName();
+					std::string name = ffo->programFileType();
 					std::string key = boost::algorithm::to_upper_copy( name);
 					std::map< std::string, const module::PrintFunctionConstructor* >::const_iterator itr = m_printFunctionCompilerMap.find( key );
 					if ( itr != m_printFunctionCompilerMap.end() )	{
@@ -286,21 +286,13 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 		}
 	}
-	// Build the list of configured objects in the processor environment:
-	bool success = true;
+	// Load the programs except database programs:
+	bool success = loadPrograms();
+
 	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=conf->m_environment.normalize.begin(), ee=conf->m_environment.normalize.end(); ii != ee; ++ii)
 	{
 		success &= declareNormalizeFunction( ii->name, ii->type, ii->call);
 	}
-	for (std::vector<langbind::DDLFormConfigStruct>::const_iterator ii=conf->m_environment.form.begin(), ee=conf->m_environment.form.end(); ii != ee; ++ii)
-	{
-		success &= loadForm( ii->DDL, ii->file);
-	}
-	for (std::vector<langbind::PrintLayoutConfigStruct>::const_iterator ii=conf->m_environment.printlayout.begin(), ee=conf->m_environment.printlayout.end(); ii != ee; ++ii)
-	{
-		success &= loadPrintFunction( ii->name, ii->type, ii->file);
-	}
-
 	if (!success)
 	{
 		throw std::logic_error( "Not all configured objects in the processor environment could be loaded. See log." );
@@ -335,6 +327,33 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 		delete *it;
 }
 
+bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
+{
+	bool rt = true;
+	std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
+	for (; pi != pe; ++pi)
+	{
+		std::string ext = utils::getFileExtension( *pi);
+		if (!ext.empty() && !boost::iequals( ext, ".tdl"))
+		{
+			std::string key = boost::algorithm::to_upper_copy( std::string( ext.c_str() + 1));
+			std::map< std::string, ddl::DDLCompilerR >::const_iterator ci = m_ddlcompilerMap.find( key);
+			if (ci != m_ddlcompilerMap.end())
+			{
+				rt &= loadForm( ci->second.get(), *pi);
+				continue;
+			}
+			std::map< std::string, const module::PrintFunctionConstructor*>::const_iterator ri = m_printFunctionCompilerMap.find( key);
+			if (ri != m_printFunctionCompilerMap.end())
+			{
+				rt &= loadPrintProgram( ri->second, *pi);
+			}
+		}
+	}
+	return rt;
+}
+
+
 bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabaseProvider& db )
 {
 	bool rt = true;
@@ -347,23 +366,25 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 			LOG_ALERT << "Processor database: database labeled '" << m_dbLabel << "' not found !";
 			return false;
 		}
-		// load programs:
-		db::DatabaseUnit* dbu = db.databaseunit( m_dbLabel);
+		// load database programs:
 		std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
 		for (; pi != pe; ++pi)
 		{
-			try
+			std::string ext = utils::getFileExtension( *pi);
+			if (boost::iequals( ext, ".tdl"))
 			{
-				std::string dbsrc;
-				m_program.loadfile( *pi, dbsrc);
-				dbu->addProgram( dbsrc);
+				try
+				{
+					std::string dbsrc;
+					m_program.loadfile( *pi, dbsrc);
+					m_db->addProgram( dbsrc);
+				}
+				catch (const std::runtime_error& err)
+				{
+					LOG_ERROR << "failed to load transaction program '" << *pi << "': " << err.what();
+					rt = false;
+				}
 			}
-			catch (const std::runtime_error& err)
-			{
-				LOG_ERROR << "failed to load transaction program '" << *pi << "': " << err.what();
-				rt = false;
-			}
-
 		}
 	}
 	return rt;
@@ -417,23 +438,16 @@ private:
 	const ProcessorProvider::ProcessorProvider_Impl* m_provider;
 };
 
-bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const std::string& ddlname, const std::string& dataDefinitionFilename)
+bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const ddl::DDLCompiler* dc, const std::string& dataDefinitionFilename)
 {
 	try
 	{
-		std::string key = boost::algorithm::to_upper_copy( ddlname);
-		std::map< std::string, ddl::DDLCompilerR>::const_iterator itr = m_ddlcompilerMap.find( key);
-		if (itr == m_ddlcompilerMap.end())
-		{
-			LOG_ERROR << "Failed to load form '" << utils::getFileStem( dataDefinitionFilename) << "'. Compiler for DDL '" << ddlname << "' is not defined";
-			return false;
-		}
 		DDLTypeMap typemap( this);
 		std::pair< std::string, ddl::FormR> def;
 		def.second.reset( new ddl::Form());
 		try
 		{
-			*def.second = itr->second->compile( utils::readSourceFileContent( dataDefinitionFilename), &typemap);
+			*def.second = dc->compile( utils::readSourceFileContent( dataDefinitionFilename), &typemap);
 		}
 		catch (const std::exception& e)
 		{
@@ -452,7 +466,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const std::string& ddl
 		std::string formkey = boost::algorithm::to_upper_copy( def.first);
 		m_formMap[ formkey] = def.second;
 
-		LOG_TRACE << "Form '" << def.first << "' in '" << utils::getFileStem( dataDefinitionFilename) << "' for DDL '" << ddlname << "' loaded";
+		LOG_TRACE << "Form '" << def.first << "' in '" << utils::getFileStem( dataDefinitionFilename) << "' loaded";
 		return true;
 	}
 	catch (std::exception& e)
@@ -472,19 +486,12 @@ const ddl::Form* ProcessorProvider::ProcessorProvider_Impl::form( const std::str
 		return itr->second.get();
 }
 
-bool ProcessorProvider::ProcessorProvider_Impl::loadPrintFunction( const std::string& name, const std::string& type, const std::string& layoutFilename)
+bool ProcessorProvider::ProcessorProvider_Impl::loadPrintProgram( const module::PrintFunctionConstructor* pc, const std::string& layoutFilename)
 {
 	try
 	{
-		std::string typekey = boost::algorithm::to_upper_copy( type);
-		std::map< std::string, const module::PrintFunctionConstructor*>::const_iterator itr = m_printFunctionCompilerMap.find( typekey);
-		if (itr == m_printFunctionCompilerMap.end())
-		{
-			LOG_ERROR << "Failed to load print layout '" << utils::getFileStem( layoutFilename) << "'. Printer type '" << type << "' is not defined";
-			return false;
-		}
-		prnt::PrintFunctionR funcp( itr->second->object( utils::readSourceFileContent( layoutFilename)));
-		std::string funcname( name);
+		prnt::PrintFunctionR funcp( pc->object( utils::readSourceFileContent( layoutFilename)));
+		std::string funcname( funcp->name());
 		if (funcname.empty())
 		{
 			funcname = utils::getFileStem( layoutFilename);
@@ -502,7 +509,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrintFunction( const std::st
 			return false;
 		}
 		m_printFunctionMap[ funckey] = funcp;
-		LOG_TRACE << "Print layout '" << funcname << "' for printer '" << name << "' loaded";
+		LOG_TRACE << "Print layout '" << funcname << "' loaded";
 		return true;
 	}
 	catch (std::exception& e)

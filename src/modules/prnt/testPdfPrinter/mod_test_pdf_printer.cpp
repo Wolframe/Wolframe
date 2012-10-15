@@ -52,7 +52,7 @@ struct PdfPrinter
 {
 	static SimpleBuilder* constructor()
 	{
-		return new PrintFunctionBuilder( "tracepdf", prnt::createHaruPdfPrintFunction);
+		return new PrintFunctionBuilder( "TestPdfPrintFunction", "tracepdf", prnt::createHaruPdfPrintFunction);
 	}
 };
 }//anonymous namespace
@@ -63,5 +63,5 @@ static createBuilderFunc objdef[ NofObjects] =
 	PdfPrinter::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "simple PDF print function tester", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "simple PDF print function for test", setModuleLogger, 0, 0, NofObjects, objdef);
 

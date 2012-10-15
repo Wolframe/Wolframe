@@ -59,6 +59,8 @@ public:
 	///\ Just and interface at the moment
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
+	///\brief add a database transaction program to the list of transaction programs
+	///\remark throws std::runtime_error with position info in case of error
 	virtual void addProgram( const std::string& /*content*/){}
 
 	/// Close the database connetion
@@ -88,13 +90,6 @@ public:
 	///\brief Load the database specific part of the transaction program for this database
 	///\remark throws std::runtime_error with position info in case of error
 	virtual void loadProgram( const std::string& filename ) = 0;
-
-	///\brief add a database transaction program to the list of transaction programs
-	///\remark throws std::runtime_error with position info in case of error
-	virtual void addProgram( const std::string& content ) = 0;
-
-	///\brief get a database transaction program from the list of transaction programs
-	virtual const std::string* getProgram( const std::string& name ) = 0;
 };
 
 }} // namespace _Wolframe::db

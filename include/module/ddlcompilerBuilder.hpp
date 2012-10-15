@@ -43,8 +43,9 @@ namespace module {
 class DDLCompilerConstructor :public SimpleObjectConstructor< ddl::DDLCompiler >
 {
 public:
-	DDLCompilerConstructor( const char* name_, ddl::CreateDDLCompilerFunc createFunc_ )
-		: m_name(name_)
+	DDLCompilerConstructor( const char* classname_, const char* name_, ddl::CreateDDLCompilerFunc createFunc_ )
+		: m_classname(classname_)
+		, m_name(name_)
 		, m_createFunc(createFunc_) {}
 
 	virtual ~DDLCompilerConstructor(){}
@@ -55,6 +56,10 @@ public:
 	}
 	virtual const char* objectClassName() const
 	{
+		return m_classname.c_str();
+	}
+	virtual const char* programFileType() const
+	{
 		return m_name.c_str();
 	}
 	virtual ddl::DDLCompiler* object() const
@@ -63,15 +68,17 @@ public:
 	}
 
 private:
-	const std::string m_name;
+	std::string m_classname;
+	std::string m_name;
 	ddl::CreateDDLCompilerFunc m_createFunc;
 };
 
 class DDLCompilerBuilder :public SimpleBuilder
 {
 public:
-	DDLCompilerBuilder( const char* name_, ddl::CreateDDLCompilerFunc createFunc_)
-		:SimpleBuilder( name_)
+	DDLCompilerBuilder( const char* classname_, const char* name_, ddl::CreateDDLCompilerFunc createFunc_)
+		:SimpleBuilder( classname_)
+		,m_name( name_)
 		,m_createFunc(createFunc_){}
 
 	virtual ~DDLCompilerBuilder(){}
@@ -82,9 +89,10 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new DDLCompilerConstructor( m_className, m_createFunc);
+		return new DDLCompilerConstructor( m_className, m_name, m_createFunc);
 	}
 private:
+	const char* m_name;
 	ddl::CreateDDLCompilerFunc m_createFunc;
 };
 

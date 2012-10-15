@@ -219,7 +219,7 @@ int main( int argc, char **argv )
 		selectedTestName = argv[1];
 	}
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
-	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_INFO );
+	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_WARNING );
 	return RUN_ALL_TESTS();
 }
 

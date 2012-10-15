@@ -41,22 +41,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-const serialize::StructDescriptionBase* ScriptCommandConfigStruct::getStructDescription()
-{
-	struct ThisDescription :public serialize::StructDescription<ScriptCommandConfigStruct>
-	{
-		ThisDescription()
-		{
-			(*this)
-			( "name",		&ScriptCommandConfigStruct::name)
-			( "file",		&ScriptCommandConfigStruct::file)
-			;
-		}
-	};
-	static const ThisDescription rt;
-	return &rt;
-}
-
 const serialize::StructDescriptionBase* ScriptEnvironmentConfigStruct::getStructDescription()
 {
 	struct ThisDescription :public serialize::StructDescription<ScriptEnvironmentConfigStruct>
@@ -64,7 +48,7 @@ const serialize::StructDescriptionBase* ScriptEnvironmentConfigStruct::getStruct
 		ThisDescription()
 		{
 			(*this)
-			( "script",		&ScriptEnvironmentConfigStruct::script)
+			("program",	&ScriptEnvironmentConfigStruct::program)
 			;
 		}
 	};
@@ -75,10 +59,10 @@ const serialize::StructDescriptionBase* ScriptEnvironmentConfigStruct::getStruct
 void ScriptEnvironmentConfigStruct::setCanonicalPathes( const std::string& referencePath)
 {
 	{
-		std::vector<ScriptCommandConfigStruct>::iterator itr=script.begin(),end=script.end();
+		std::vector<std::string>::iterator itr=program.begin(),end=program.end();
 		for (;itr!=end; ++itr)
 		{
-			itr->file = utils::getCanonicalPath( itr->file, referencePath);
+			*itr = utils::getCanonicalPath( *itr, referencePath);
 		}
 	}
 }
@@ -95,9 +79,9 @@ void ScriptEnvironmentConfigStruct::initFromPropertyTree( const boost::property_
 
 bool ScriptEnvironmentConfigStruct::check() const
 {
-	for (std::vector<ScriptCommandConfigStruct>::const_iterator ii=script.begin(), ee=script.end(); ii != ee; ++ii)
+	for (std::vector<std::string>::const_iterator ii=program.begin(), ee=program.end(); ii != ee; ++ii)
 	{
-		if (!utils::fileExists( ii->file)) return false;
+		if (!utils::fileExists( *ii)) return false;
 	}
 	return true;
 }

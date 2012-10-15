@@ -78,10 +78,12 @@ public:
 
 private:
 	class DDLTypeMap;
-	bool loadForm( const std::string& ddlname, const std::string& dataDefinitionFilename);
-	bool loadPrintFunction( const std::string& name, const std::string& type, const std::string& layoutFilename);
+	bool loadForm( const ddl::DDLCompiler*, const std::string& dataDefinitionFilename);
+	bool loadPrintProgram( const module::PrintFunctionConstructor* pc, const std::string& layoutFilename);
 	bool declareNormalizeFunction( const std::string& name, const std::string& type, const std::string& command);
 	bool declareFunctionName( const std::string& name, const char* typestr);
+
+	bool loadPrograms();
 
 private:
 	std::string					m_dbLabel;

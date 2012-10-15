@@ -43,9 +43,10 @@ namespace module {
 class PrintFunctionConstructor :public SimpleObjectConstructor< prnt::PrintFunction >
 {
 public:
-	PrintFunctionConstructor( const char* name_, prnt::CreatePrintFunction createFunc_ )
-		: m_name(name_)
-		, m_createFunc(createFunc_) {}
+	PrintFunctionConstructor( const char* classname_, const char* name_, prnt::CreatePrintFunction createFunc_ )
+		:m_classname(classname_)
+		,m_name(name_)
+		,m_createFunc(createFunc_) {}
 
 	virtual ~PrintFunctionConstructor(){}
 
@@ -55,6 +56,10 @@ public:
 	}
 	virtual const char* objectClassName() const
 	{
+		return m_classname.c_str();
+	}
+	virtual const char* programFileType() const
+	{
 		return m_name.c_str();
 	}
 	virtual prnt::PrintFunction* object( const std::string& layout_source) const
@@ -63,15 +68,17 @@ public:
 	}
 
 private:
-	const std::string m_name;
+	std::string m_classname;
+	std::string m_name;
 	prnt::CreatePrintFunction m_createFunc;
 };
 
 class PrintFunctionBuilder :public SimpleBuilder
 {
 public:
-	PrintFunctionBuilder( const char* name_, prnt::CreatePrintFunction createFunc_)
-		:SimpleBuilder( name_)
+	PrintFunctionBuilder( const char* classname_, const char* name_, prnt::CreatePrintFunction createFunc_)
+		:SimpleBuilder( classname_)
+		,m_name( name_)
 		,m_createFunc(createFunc_){}
 
 	virtual ~PrintFunctionBuilder(){}
@@ -82,10 +89,11 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new PrintFunctionConstructor( m_className, m_createFunc);
+		return new PrintFunctionConstructor( m_className, m_name, m_createFunc);
 	}
 
 private:
+	const char* m_name;
 	prnt::CreatePrintFunction m_createFunc;
 };
 

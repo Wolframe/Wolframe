@@ -117,10 +117,7 @@ public:
 						{ return NULL; }
 
 	virtual void addProgram( const std::string& source);
-	virtual void loadProgram( const std::string& source)
-	{
-		addProgram( source);
-	}
+	virtual void loadProgram( const std::string& filename);
 
 	const std::string& outfilename() const
 	{

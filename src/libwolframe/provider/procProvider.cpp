@@ -68,13 +68,13 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 			if ( ! Parser::getValue( logPrefix().c_str(), *L1it, m_dbLabel, &isDefined ))
 				retVal = false;
 		}
-		else if ( boost::algorithm::iequals( "programFile", L1it->first ))	{
+		else if ( boost::algorithm::iequals( "program", L1it->first ))	{
 			std::string programFile;
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
 				retVal = false;
 			else	{
 				if ( ! boost::filesystem::path( programFile ).is_absolute() )
-					LOG_WARNING << logPrefix() << "program file path is not absolute: "
+					LOG_NOTICE << logPrefix() << "program file path is not absolute: "
 						    << programFile;
 				m_programFiles.push_back( programFile );
 			}

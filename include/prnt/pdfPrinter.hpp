@@ -56,6 +56,8 @@ public:
 	virtual std::string execute( const Input* i) const;
 
 	virtual std::string tostring() const;
+	virtual const std::string& name() const;
+
 public:
 	struct Impl;
 private:
