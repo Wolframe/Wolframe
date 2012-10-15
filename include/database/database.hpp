@@ -59,7 +59,16 @@ public:
 	///\ Just and interface at the moment
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
-	virtual void addProgram( const std::string& /*content*/){}
+	///\brief Load the database transaction programs for this database from file
+	///\remark throws std::runtime_error with position info in case of error
+	virtual void loadProgram( const std::string& filename ) = 0;
+
+	///\brief add a database program to the list of transaction programs
+	///\remark throws std::runtime_error with position info in case of error
+	virtual void addProgram( const std::string& program ) = 0;
+
+	///\brief get a database transaction program from the list of transaction programs
+	virtual const std::string* getProgram( const std::string& name ) const = 0;
 
 	/// Close the database connetion
 	/// This exists for no good reason (mostly to make the code look uniform)
@@ -85,16 +94,21 @@ public:
 	///\brief The actual database object.
 	virtual Database* database() = 0;
 
-	///\brief Load the database specific part of the transaction program for this database
+	///\brief Load the database transaction programs for this database from file
 	///\remark throws std::runtime_error with position info in case of error
 	virtual void loadProgram( const std::string& filename ) = 0;
 
-	///\brief add a database transaction program to the list of transaction programs
+	///\brief Load the transaction programs for this database from all
+	///       the program files configured for it
 	///\remark throws std::runtime_error with position info in case of error
-	virtual void addProgram( const std::string& content ) = 0;
+	virtual void loadAllPrograms() = 0;
+
+	///\brief add a database program to the list of transaction programs
+	///\remark throws std::runtime_error with position info in case of error
+	virtual void addProgram( const std::string& program ) = 0;
 
 	///\brief get a database transaction program from the list of transaction programs
-	virtual const std::string* getProgram( const std::string& name ) = 0;
+	virtual const std::string* getProgram( const std::string& name ) const = 0;
 };
 
 }} // namespace _Wolframe::db

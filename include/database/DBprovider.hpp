@@ -73,7 +73,6 @@ public:
 	~DatabaseProvider();
 
 	Database* database( const std::string& ID ) const;
-	DatabaseUnit* databaseunit( const std::string& ID ) const;
 
 private:
 	class DatabaseProvider_Impl;

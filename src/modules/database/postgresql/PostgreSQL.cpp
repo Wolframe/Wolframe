@@ -312,7 +312,28 @@ const std::string& PostgreSQLdatabase::ID() const
 	if ( m_unit )
 		return m_unit->ID();
 	else
-		throw std::runtime_error( "SQL database unit not initialized" );
+		throw std::runtime_error( "PostgreSQL database unit not initialized" );
+}
+
+void PostgreSQLdatabase::loadProgram( const std::string& filename )
+{
+	if ( !m_unit )
+		throw std::runtime_error( "loadProgram: PostgreSQL database unit not initialized" );
+	m_unit->loadProgram( filename );
+}
+
+void PostgreSQLdatabase::addProgram( const std::string& program )
+{
+	if ( !m_unit )
+		throw std::runtime_error( "addProgram: PostgreSQL database unit not initialized" );
+	m_unit->addProgram( program );
+}
+
+const std::string* PostgreSQLdatabase::getProgram( const std::string& name) const
+{
+	if ( !m_unit )
+		throw std::runtime_error( "getProgram: PostgreSQL database unit not initialized" );
+	return m_unit->getProgram( name );
 }
 
 Transaction* PostgreSQLdatabase::transaction( const std::string& /*name*/ )

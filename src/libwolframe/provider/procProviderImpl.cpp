@@ -342,28 +342,27 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 		m_db = db.database( m_dbLabel );
 		if ( m_db )	{
 			LOG_DEBUG << "Processor database: database reference '" << m_dbLabel << "' resolved";
+			// load database programs:
+			std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
+			for (; pi != pe; ++pi)
+			{
+				try
+				{
+					std::string dbsrc;
+					m_program.loadfile( *pi, dbsrc);
+					m_db->addProgram( dbsrc);
+				}
+				catch (const std::runtime_error& err)
+				{
+					LOG_ERROR << "failed to load transaction program '" << *pi << "': " << err.what();
+					rt = false;
+				}
+
+			}
 		}
 		else	{
 			LOG_ALERT << "Processor database: database labeled '" << m_dbLabel << "' not found !";
 			return false;
-		}
-		// load programs:
-		db::DatabaseUnit* dbu = db.databaseunit( m_dbLabel);
-		std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
-		for (; pi != pe; ++pi)
-		{
-			try
-			{
-				std::string dbsrc;
-				m_program.loadfile( *pi, dbsrc);
-				dbu->addProgram( dbsrc);
-			}
-			catch (const std::runtime_error& err)
-			{
-				LOG_ERROR << "failed to load transaction program '" << *pi << "': " << err.what();
-				rt = false;
-			}
-
 		}
 	}
 	return rt;
