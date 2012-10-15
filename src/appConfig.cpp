@@ -223,14 +223,20 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 							retVal = false;
 						}
 						else	{
-							if ( ! boost::filesystem::path( modFile ).is_absolute() )
-								LOG_NOTICE << MODULE_SECTION_MSG << " file path is not absolute: "
-									   << modFile;
+							// resolv relative path
+							std::string oldPath = modFile;
+							assert( ! modFile.empty() );
+							modFile = utils::getCanonicalPath( modFile, configFile );
+							if ( oldPath != modFile)
+/*MBa ?!?*/							LOG_NOTICE << MODULE_SECTION_MSG << "using absolute filename '" << modFile
+									   << "' instead of '" << oldPath << "'";
+							// check for duplicates
 							bool isDuplicate = false;
 							for ( std::list< std::string >::const_iterator Vit = m_modFiles.begin();
 													Vit != m_modFiles.end(); Vit++ )	{
 								if ( boost::algorithm::iequals( *Vit, modFile ))	{
-									LOG_WARNING << "duplicate module file: '" << modFile << "'. Ignoring the second file.";
+									LOG_WARNING << MODULE_SECTION_MSG << "duplicate module file: '"
+										    << modFile << "'. Ignoring the second request.";
 //									retVal = false;
 									isDuplicate = true;
 								}
@@ -248,16 +254,6 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 		}
 		LOG_TRACE << "Configuration : parsing modules list finished " << (retVal ? "OK" : "with errors");
 
-		// resolv relative pathes
-		for ( std::list< std::string >::iterator it = m_modFiles.begin();
-							it != m_modFiles.end(); it++ )	{
-			assert( ! it->empty() );
-			if ( ! path( *it ).is_absolute() )
-				(*it) = resolvePath( absolute( *it,
-							       path( configFile ).branch_path()).string());
-			else
-				(*it) = resolvePath( *it );
-		}
 		return retVal;
 	}
 	catch( std::exception& e )	{

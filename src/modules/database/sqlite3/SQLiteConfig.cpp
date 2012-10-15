@@ -71,11 +71,6 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 			bool isDefined = ( !m_filename.empty() );
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_filename, &isDefined ))
 				retVal = false;
-			else	{
-				if ( ! boost::filesystem::path( m_filename ).is_absolute() )
-					MOD_LOG_NOTICE << logPrefix() << "database file path is not absolute: "
-						       << m_filename;
-			}
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_flag, Parser::BoolDomain() ))
@@ -92,9 +87,6 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
 				retVal = false;
 			else	{
-				if ( ! boost::filesystem::path( programFile ).is_absolute() )
-					MOD_LOG_NOTICE << logPrefix() << "program file path is not absolute: "
-						       << programFile;
 				m_programFiles.push_back( programFile );
 			}
 		}
@@ -146,21 +138,20 @@ bool SQLiteConfig::check() const
 
 void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 {
-	using namespace boost::filesystem;
-
 	if ( ! m_filename.empty() )	{
-		if ( ! path( m_filename ).is_absolute() )
-			m_filename = resolvePath( absolute( m_filename,
-							  path( refPath ).branch_path()).string());
-		else
-			m_filename = resolvePath( m_filename );
+		std::string oldPath = m_filename;
+		m_filename = utils::getCanonicalPath( m_filename, refPath);
+		if ( oldPath != m_filename )
+/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute database filename '" << m_filename
+				       << "' instead of '" << oldPath << "'";
 	}
 	for ( std::list< std::string >::iterator it = m_programFiles.begin();
 						it != m_programFiles.end(); it++ )	{
-		if ( ! path( *it ).is_absolute() )
-			*it = resolvePath( absolute( *it, path( refPath ).branch_path()).string());
-		else
-			*it = resolvePath( *it );
+		std::string oldPath = *it;
+		*it = utils::getCanonicalPath( *it, refPath );
+		if ( oldPath != *it )
+/*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
+				       << "' instead of '" << oldPath << "'";
 	}
 }
 

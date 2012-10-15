@@ -166,41 +166,21 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 					bool isDefined = ( ! certFile.empty());
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, certFile, &isDefined ))
 						retVal = false;
-					else	{
-						if ( ! boost::filesystem::path( certFile ).is_absolute() )
-							LOG_NOTICE << logPrefix() << "certificate file path is not absolute: '"
-								   << certFile << "'";
-					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "key" ))	{
 					bool isDefined = ( ! keyFile.empty());
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, keyFile, &isDefined ))
 						retVal = false;
-					else	{
-						if ( ! boost::filesystem::path( keyFile ).is_absolute() )
-							LOG_NOTICE << logPrefix() << "key file path is not absolute: "
-								   << keyFile << "'";
-					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "CAdirectory" ))	{
 					bool isDefined = ( ! CAdirectory.empty());
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, CAdirectory, &isDefined ))
 						retVal = false;
-					else	{
-						if ( ! boost::filesystem::path( CAdirectory ).is_absolute() )
-							LOG_NOTICE << logPrefix() << "CA directory path is not absolute: "
-								   << CAdirectory << "'";
-					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "CAchainFile" ))	{
 					bool isDefined = ( ! CAchainFile.empty());
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, CAchainFile, &isDefined ))
 						retVal = false;
-					else	{
-						if ( ! boost::filesystem::path( CAchainFile ).is_absolute() )
-							LOG_NOTICE << logPrefix() << "CA chain file path is not absolute: "
-								   << CAchainFile << "'";
-					}
 				}
 				else if ( boost::algorithm::iequals( L2it->first, "verify" ))	{
 					if ( ! config::Parser::getValue( logPrefix().c_str(), *L2it, verify,

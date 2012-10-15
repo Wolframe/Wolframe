@@ -75,11 +75,11 @@ void SaslAuthConfig::setCanonicalPathes( const std::string& refPath )
 	using namespace boost::filesystem;
 
 	if ( ! m_confPath.empty() )	{
-		if ( ! path( m_confPath ).is_absolute() )
-			m_confPath = resolvePath( absolute( m_confPath,
-							path( refPath ).branch_path()).string());
-		else
-			m_confPath = resolvePath( m_confPath );
+		std::string oldPath = m_confPath;
+		m_confPath = utils::getCanonicalPath( m_confPath, refPath );
+		if ( oldPath != m_confPath )
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute for SASL configuration filename '"
+				   << m_confPath << "' instead of '" << oldPath << "'";
 	}
 }
 

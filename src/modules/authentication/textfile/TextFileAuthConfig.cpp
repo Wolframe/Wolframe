@@ -68,11 +68,6 @@ bool TextFileAuthConfig::parse( const config::ConfigurationTree& pt, const std::
 			bool isDefined = ( !m_file.empty() );
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_file, &isDefined ))
 				retVal = false;
-			else	{
-				if ( ! boost::filesystem::path( m_file ).is_absolute() )
-					MOD_LOG_NOTICE << logPrefix() << "authentication file path is not absolute: "
-						       << m_file;
-			}
 		}
 		else	{
 			MOD_LOG_WARNING << logPrefix() << "unknown configuration option: '"
@@ -105,11 +100,11 @@ void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
 	using namespace boost::filesystem;
 
 	if ( ! m_file.empty() )	{
-		if ( ! path( m_file ).is_absolute() )
-			m_file = resolvePath( absolute( m_file,
-							path( refPath ).branch_path()).string());
-		else
-			m_file = resolvePath( m_file );
+		std::string oldPath = m_file;
+		m_file = utils::getCanonicalPath( m_file, refPath );
+		if ( oldPath != m_file )
+/*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute filename '" << m_file
+				   << "' instead of '" << oldPath << "' for the password file";
 	}
 }
 
