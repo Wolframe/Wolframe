@@ -22,7 +22,8 @@ namespace _Wolframe {
 	namespace QtClient {
 
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
-	m_ui( 0 ), m_host( "localhost" ), m_port( 7661 ), m_loadMode( Network )
+	m_ui( 0 ), m_host( "localhost" ), m_port( 7661 ), m_secure( false ),
+	m_loadMode( Network )
 {
 	parseArgs( );
 	initialize( );
@@ -62,6 +63,7 @@ void MainWindow::parseArgs( )
 	{
 		{ QCommandLine::Option, 'H', "host", "Wolframe host", QCommandLine::Optional },
 		{ QCommandLine::Option, 'p', "port", "Wolframe port", QCommandLine::Optional },
+		{ QCommandLine::Switch, 's', "secure", "connect securely via SSL", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'l', "local", "Run with local data and form loader", QCommandLine::Optional },
 		{ QCommandLine::Option, 'v', "verbose", "verbose level", QCommandLine::Optional },
 		QCOMMANDLINE_CONFIG_ENTRY_END
@@ -92,6 +94,8 @@ void MainWindow::switchFound( const QString &name )
 	qDebug( ) << "switch" << name;
 	if( name == "local" ) {
 		m_loadMode = Local;
+	} else if( name == "secure" ) {
+		m_secure = true;
 	}
 }
 
@@ -120,7 +124,7 @@ void MainWindow::parseError( const QString &error )
 void MainWindow::initialize( )
 {
 // create a Wolframe protocol client
-	m_wolframeClient = new WolframeClient( m_host, m_port );
+	m_wolframeClient = new WolframeClient( m_host, m_port, m_secure );
 
 // create debuging terminal
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );

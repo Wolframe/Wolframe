@@ -44,6 +44,7 @@ namespace _Wolframe {
 		QUiLoader *m_uiLoader;		// the designer UI loader
 		QString m_host;			// wolframe server port to use
 		unsigned short m_port;		// wolframe port to use
+		bool m_secure;			// use SSL for wolframe protocol
 		LoadMode m_loadMode;		// whether to use local loader or not
 
 		void parseArgs( );

@@ -45,7 +45,7 @@ namespace _Wolframe {
 		QString m_command;
 
 	public:
-		WolframeClient( QString host = "localhost", unsigned short port = 7661, QWidget *_parent = 0 );
+		WolframeClient( QString host = "localhost", unsigned short port = 7661, bool secure = false, QWidget *_parent = 0 );
 		virtual ~WolframeClient( );
 
 // low-level commands, pre-protocol, for debugging mainly

@@ -14,10 +14,10 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-WolframeClient::WolframeClient( QString _host, unsigned short _port, QWidget *_parent ) :
+WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secure, QWidget *_parent ) :
 	m_host( _host ),
 	m_port( _port ),
-	m_secure( false ),
+	m_secure( _secure ),
 	m_state( Disconnected ),
 	m_timeout( 4000 ),
 	m_parent( _parent ),
