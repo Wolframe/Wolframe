@@ -28,7 +28,7 @@ namespace _Wolframe {
 			virtual void initiateGetLanguageCodes( );
 		
 		private:
-			WolframeClient *m_client;
+			WolframeClient *m_wolframeClient;
 
 	};
 } // namespace QtClient

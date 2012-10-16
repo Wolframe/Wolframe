@@ -63,7 +63,9 @@ OBJS = \
 	FormWidget.o \
 	moc_FormWidget.o \
 	qcommandline.o \
-	moc_qcommandline.o
+	moc_qcommandline.o \
+	qxtsignalwaiter.o \
+	moc_qxtsignalwaiter.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -98,6 +100,9 @@ moc_FormWidget.cpp: FormWidget.hpp
 
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_MOC) $(MOC_FLAGS) qcommandline.h -o moc_qcommandline.cpp
+
+moc_qxtsignalwaiter.cpp: qxtsignalwaiter.h
+	$(QT_MOC) $(MOC_FLAGS) qxtsignalwaiter.h -o moc_qxtsignalwaiter.cpp
 	
 FORMS = \
 	forms/form1.ui \

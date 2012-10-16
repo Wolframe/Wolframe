@@ -34,6 +34,7 @@ namespace _Wolframe {
 		unsigned short m_port;
 		bool m_secure;
 		State m_state;
+		unsigned int m_timeout;
 		QAbstractSocket *m_socket;
 		QWidget *m_parent;
 		bool m_hasErrors;
@@ -41,6 +42,7 @@ namespace _Wolframe {
 		bool m_initializedSsl;
 #endif
 		QString m_answer;
+		QString m_command;
 
 	public:
 		WolframeClient( QString host = "localhost", unsigned short port = 7661, QWidget *_parent = 0 );
@@ -56,7 +58,13 @@ namespace _Wolframe {
 
 // high-level commands
 		void hello( );
+		void run( QString cmd );
 
+// synchonous commands
+		bool syncConnect( );
+		bool syncHello( );
+		QString syncRun( QString cmd );
+		
 		Q_PROPERTY( QString m_host READ host WRITE setHost )
 		QString host( ) const { return m_host; }
 		void setHost( QString _host ) { m_host = _host; }
@@ -64,6 +72,10 @@ namespace _Wolframe {
 		Q_PROPERTY( unsigned short m_port READ port WRITE setPort )
 		unsigned short port( ) const { return m_port; }
 		void setPort( unsigned short _port ) { m_port = _port; }
+		
+		Q_PROPERTY( unsigned int m_timeout READ timeout WRITE setTimeout )
+		unsigned int timeout( ) const { return m_timeout; }
+		void setTimeout( unsigned int _timeout ) { m_timeout = _timeout; }
 
 #ifdef WITH_SSL		
 		Q_PROPERTY( bool m_secure READ secure WRITE setSecure )
@@ -81,21 +93,22 @@ namespace _Wolframe {
 		void peerVerifyError( const QSslError &e );
 #endif
 		void dataAvailable( );
-		void connected( );
+		void privateConnected( );
 		void disconnected( );
 
-		void handleHello( QString result );
+		void handleResult( );
 
 	signals:
+		void connected( );
 		void error( QString error );
 
 // low-level commands, pre-protocol, for debugging mainly
 		void lineReceived( QString line );
 		
 // generic implementation of a command execute implementing the frame of the protocol
-		void resultReceived( QString result );
+		void resultReceived( );
 		void helloReceived( );
-		
+		void runReceived( QString cmd, QString answer );
 
 // high-level commands
 	};
