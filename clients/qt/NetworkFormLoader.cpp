@@ -38,10 +38,9 @@ void NetworkFormLoader::initiateFormLocalizationLoad( QString &name, QLocale loc
 
 void NetworkFormLoader::initiateFormLoad( QString &name )
 {
-//~ // read directly here and stuff data into the signal
-	//~ QByteArray form = readFile( m_formDir + "/" + name + ".ui" );
-//~ 
-	//~ emit formLoaded( name, form );
+	QString s = m_wolframeClient->syncRun( "getForm " + name );
+	
+	emit formLoaded( name, s.toUtf8( ) );
 }
 
 void NetworkFormLoader::initiateGetLanguageCodes( )
@@ -49,7 +48,7 @@ void NetworkFormLoader::initiateGetLanguageCodes( )
 	QStringList languageCodes;
 	languageCodes.push_back( "en_US" ); // default locale, always around
 	
-	QString s = m_wolframeClient->syncRun( "formlanguages" );
+	QString s = m_wolframeClient->syncRun( "getFormLanguages" );
 	if( s.isNull( ) ) {
 		qWarning( ) << "Trouble getting form languages";
 	} else {

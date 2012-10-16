@@ -14,14 +14,15 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-WolframeClient::WolframeClient( QString _host, unsigned short _port, QWidget *_parent ) :
+WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secure, QWidget *_parent ) :
 	m_host( _host ),
 	m_port( _port ),
-	m_secure( false ),
+	m_secure( _secure ),
 	m_state( Disconnected ),
 	m_timeout( 4000 ),
 	m_parent( _parent ),
 	m_hasErrors( false ),
+	m_initializedSsl( false ),
 	m_command( "CONNECT" )
 {
 #ifdef WITH_SSL
@@ -57,6 +58,7 @@ void WolframeClient::initializeSsl( )
 {
 	if( m_initializedSsl ) return;
 
+	reinterpret_cast<QSslSocket *>( m_socket )->setPeerVerifyMode( QSslSocket::VerifyNone );
 	QList<QSslCertificate> certs;
 	certs.append( getCertificate( "./CA.cert.pem" ) );
 	certs.append( getCertificate( "./CAclient.cert.pem" ) );
