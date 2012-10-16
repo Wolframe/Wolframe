@@ -125,7 +125,7 @@ std::string PasswordSalt::toBCD() const
 
 	if ( byte2hex( m_salt, PASSWORD_DIGEST_SIZE,
 		       buffer, PASSWORD_HASH_BCD_SIZE ) == NULL )
-		throw std::logic_error( "PasswordHash::toBCD() cannot convert hash ?!?" );
+		throw std::logic_error( "PasswordSalt::toBCD() cannot convert hash ?!?" );
 
 	return std::string( buffer );
 }
@@ -137,8 +137,8 @@ std::string PasswordSalt::toBase64() const
 	memset( buffer, 0, PASSWORD_HASH_BASE64_SIZE );
 
 	if ( base64::encode( m_salt, PASSWORD_DIGEST_SIZE,
-			     buffer, PASSWORD_HASH_BCD_SIZE, 0 ) < 0 )
-		throw std::logic_error( "PasswordHash::toBase64() cannot convert hash ?!?" );
+			     buffer, PASSWORD_HASH_BASE64_SIZE, 0 ) < 0 )
+		throw std::logic_error( "PasswordSalt::toBase64() cannot convert hash ?!?" );
 
 	return std::string( buffer );
 }
@@ -165,12 +165,12 @@ std::string PasswordHash::toBCD() const
 
 std::string PasswordHash::toBase64() const
 {
-	char	buffer[ PASSWORD_HASH_BCD_SIZE ];
+	char	buffer[ PASSWORD_HASH_BASE64_SIZE ];
 
 	memset( buffer, 0, PASSWORD_HASH_BCD_SIZE );
 
 	if ( byte2hex( m_hash, PASSWORD_DIGEST_SIZE,
-		       buffer, PASSWORD_HASH_BCD_SIZE ) == NULL )
+		       buffer, PASSWORD_HASH_BASE64_SIZE ) == NULL )
 		throw std::logic_error( "PasswordHash::toString() cannot convert hash ?!?" );
 
 	return std::string( buffer );
@@ -240,7 +240,7 @@ std::string CRAMchallenge::toBCD() const
 
 	if ( byte2hex( m_challenge, CRAM_CHALLENGE_SIZE,
 		       buffer, CRAM_CHALLENGE_STRING_SIZE ) == NULL )
-		throw std::logic_error( "PasswordHash::toString() cannot convert challenge ?!?" );
+		throw std::logic_error( "CRAMchallenge::toBCD() cannot convert challenge ?!?" );
 
 	return std::string( buffer );
 }
@@ -287,7 +287,7 @@ std::string CRAMresponse::toBCD() const
 
 	if ( byte2hex( m_response, CRAM_RESPONSE_SIZE,
 		       buffer, CRAM_RESPONSE_STRING_SIZE ) == NULL )
-		throw std::logic_error( "PasswordHash::toString() cannot convert response ?!?" );
+		throw std::logic_error( "CRAMresponse::toBCD() cannot convert response ?!?" );
 
 	return std::string( buffer );
 }

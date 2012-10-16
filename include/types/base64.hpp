@@ -43,13 +43,13 @@
 namespace _Wolframe	{
 namespace base64	{
 
-size_t encodedSize( size_t dataSize, unsigned short lineLength )
+inline size_t encodedSize( size_t dataSize, unsigned short lineLength )
 {
 	return base64_encodedSize( dataSize, lineLength );
 }
 
-int encode( const void* data, size_t dataSize,
-	    char* encoded, size_t encodedMaxSize, unsigned short lineLength )
+inline int encode( const void* data, size_t dataSize,
+		   char* encoded, size_t encodedMaxSize, unsigned short lineLength )
 {
 	return base64_encode(  data, dataSize, encoded, encodedMaxSize, lineLength );
 }
@@ -113,7 +113,7 @@ private:
 };
 
 
-int decode( const char* encoded, size_t encodedSize, void* data, size_t dataMaxSize )
+inline int decode( const char* encoded, size_t encodedSize, void* data, size_t dataMaxSize )
 {
 	return base64_decode( encoded, encodedSize, data, dataMaxSize );
 }

@@ -64,6 +64,7 @@ CPP_OBJS = \
 	parseUtils.obj \
 	utils_doctype.obj \
 	types_allocators.obj \
+	HMAC.obj \
 	CRAM.obj
 
 OBJS = \

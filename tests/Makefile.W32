@@ -103,6 +103,7 @@ TEST_CPP_BINS = \
 	base64Test.exe \
 	base64Utility.exe \
 	CRAMtest.exe \
+	HMACtest.exe \
 	testSHA2.exe \
 	poolTest.exe \
 	logTest.exe \
@@ -139,6 +140,7 @@ byte2hexTest.exe: byte2hexTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Test.exe: base64Test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Utility.exe: base64Utility.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 CRAMtest.exe: CRAMtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
+HMACtest.exe: HMACtest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
 configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
@@ -180,6 +182,7 @@ local_test:
 	@-echo testRand >> test.bat
 	@-echo testTimestamp >> test.bat
 	@-echo CRAMtest >> test.bat
+	@-echo HMACtest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo testWolfilter >> test.bat

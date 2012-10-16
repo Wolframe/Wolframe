@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 //
 // byte <-> ASCII hex conversion tests
 
@@ -63,7 +62,7 @@ TEST( byte2hex, Bytes_to_HEX_Overflow )
 	char		output[33];
 
 	ASSERT_TRUE( byte2hex( bytes, 16, output, 33 ) != NULL );
-	ASSERT_TRUE( byte2hex( bytes, 17, output, 0 ) == NULL );
+	ASSERT_TRUE( byte2hex( bytes, 17, output, 34 ) == NULL );
 	ASSERT_TRUE( byte2hex( bytes, 0, output, 0 ) == NULL );
 	ASSERT_TRUE( byte2hex( bytes, 0, output, 1 ) != NULL );
 }

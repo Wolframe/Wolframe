@@ -48,6 +48,7 @@ tests/byte2hexTest
 tests/base64Test
 tests/base64Utility
 tests/CRAMtest
+tests/HMACtest
 tests/xmlselectHandlerTest
 tests/protocolArgumentParsing
 tests/poolTest

@@ -115,9 +115,9 @@ char *byte2hex( const unsigned char *data, size_t size, char *outStr, size_t out
  * @param	outData	pointer to the buffer for the output data
  * @param	outSize	size of the output buffer
  *
- * @return	pointer to the output buffer if successful
- *		or NULL if the output buffer is not large enough
- *		or if the string has invalid hex characters
+ * @return	length of the output if successful
+ *		-1 if the output buffer is not large enough
+ *		-2 if the string has invalid hex characters
  */
 int hex2byte( const char *hexStr, unsigned char *outData, size_t outSize )
 {
@@ -154,7 +154,6 @@ int hex2byte( const char *hexStr, unsigned char *outData, size_t outSize )
 	}
 	return( data - outData );
 }
-
 
 /** @} *//* hex2byte */
 
