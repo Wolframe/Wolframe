@@ -52,11 +52,18 @@ class HMAC_SHA256
 	static const size_t HMAC_BASE64_SIZE = (( HMAC_DIGEST_SIZE * 4 ) / 3 ) +
 				(( HMAC_DIGEST_SIZE % 3 ) ? ( 3 - ( HMAC_DIGEST_SIZE % 3 )) : 0 ) + 1;
 public:
-	HMAC_SHA256( const std::string& key, const std::string& message );
+	HMAC_SHA256( const unsigned char* key, size_t keySize,
+		     const unsigned char* msg, size_t msgSize )
+					{ init( key, keySize, msg, msgSize ); }
+	HMAC_SHA256( const std::string& key, const std::string& message )
+					{ init( (const unsigned char*)key.data(), key.size(), (const unsigned char*)message.data(), message.size()); }
 
 	std::string toBCD() const;
 	std::string toBase64() const;
 private:
+	void init( const unsigned char* key, size_t keyLen,
+		   const unsigned char* msg, size_t msgLen );
+
 	unsigned char	m_HMAC[ HMAC_DIGEST_SIZE ];
 };
 

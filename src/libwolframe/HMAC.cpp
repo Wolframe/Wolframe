@@ -47,7 +47,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-HMAC_SHA256::HMAC_SHA256( const std::string& key, const std::string& message )
+void HMAC_SHA256::init( const unsigned char *key, size_t keyLen,
+		   const unsigned char *msg, size_t msgLen )
 {
 	unsigned char	pad[ HMAC_BLOCK_SIZE ];
 	unsigned char	intKey[ HMAC_BLOCK_SIZE ];
@@ -55,13 +56,13 @@ HMAC_SHA256::HMAC_SHA256( const std::string& key, const std::string& message )
 
 	sha256_ctx	ctx;
 
-	if ( key.size() > HMAC_BLOCK_SIZE )	{
+	if ( keyLen > HMAC_BLOCK_SIZE )	{
 		assert( HMAC_BLOCK_SIZE == SHA512_DIGEST_SIZE );
-		sha512( (const unsigned char*)key.c_str(), key.size(), intKey );
+		sha512( key, keyLen, intKey );
 	}
 	else	{
 		memset( intKey, 0, HMAC_BLOCK_SIZE );
-		for ( size_t i = 0; i < key.size(); i ++ )
+		for ( size_t i = 0; i < keyLen; i ++ )
 			intKey[ i ] = key[ i ];
 	}
 
@@ -70,7 +71,7 @@ HMAC_SHA256::HMAC_SHA256( const std::string& key, const std::string& message )
 		pad[ i ] ^= intKey[ i ];
 	sha256_init( &ctx );
 	sha256_update( &ctx, pad, HMAC_BLOCK_SIZE );
-	sha256_update( &ctx, (const unsigned char*)message.c_str(), message.size() );
+	sha256_update( &ctx, msg, msgLen );
 	sha256_final( &ctx, hash );
 
 	memset( pad, 0x5c, HMAC_BLOCK_SIZE );
