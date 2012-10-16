@@ -48,11 +48,11 @@ CAdir			CA directory
 client.crt		client certificate, signed with CAclient.cert
 client.key		key for client.crt
 
-Wolfclient.crt		client certificate signed with CA.cert
-Wolfclient.key		key for Wolfclient
+WolfClient.crt		client certificate signed with CA.cert
+WolfClient.key		key for Wolfclient
 
 wolframed.crt		server certificate (signed with CA.cert)
 wolframed.key		key for wolframed.crt
 
 wolframedpwd.crt	server certificate (signed with CA.cert)
-wolframedpwd.key	same as for wolframed but password protected
+wolframedpwd.key	key for wolframedpwd.crt, password protected

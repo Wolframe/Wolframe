@@ -6,3 +6,7 @@ V	120301000440Z		05	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Din
 V	120301000705Z		06	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Server (password protected)/emailAddress=server@wolframe.net
 V	120301000934Z		07	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Client/emailAddress=client@wolframe.net
 V	120301002419Z		08	unknown	/C=YZ/ST=Client Empire/L=Client City/O=Client Inc./OU=Client Users Group/CN=Ordinary Client/emailAddress=ordinary@client.yz
+V	131016145833Z		09	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Client/emailAddress=client@wolframe.net
+V	131016150157Z		0A	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Server/emailAddress=server@wolframe.net
+V	131016150833Z		0B	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Server (password protected)/emailAddress=server-pwd@wolframe.net
+V	131016151725Z		0C	unknown	/C=YZ/ST=Client Empire/L=Client City/O=Client Inc./OU=Client Users Group/CN=Ordinary Client/emailAddress=ordinary@client.yz

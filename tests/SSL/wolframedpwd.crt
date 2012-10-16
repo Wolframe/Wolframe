@@ -1,0 +1,73 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 11 (0xb)
+    Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=XY, ST=Wolfland, L=Wolfville, O=Wolf Pack Ltd, OU=Dinowolves Group, CN=Wolf CA/emailAddress=CA@wolframe.net
+        Validity
+            Not Before: Oct 16 15:08:33 2012 GMT
+            Not After : Oct 16 15:08:33 2013 GMT
+        Subject: C=XY, ST=Wolfland, L=Wolfville, O=Wolf Pack Ltd, OU=Dinowolves Group, CN=Wolframe Server (password protected)/emailAddress=server-pwd@wolframe.net
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (1024 bit)
+                Modulus:
+                    00:b5:fb:16:e8:c7:10:99:89:83:18:fe:cc:3f:4b:
+                    f4:5a:08:55:90:6c:85:77:95:cd:4f:19:a7:69:49:
+                    7e:3c:bd:aa:e3:00:84:50:b8:92:32:21:f7:8c:02:
+                    2c:54:98:88:bc:fa:2a:c7:91:5f:dd:9a:7e:cd:76:
+                    bf:0d:ba:be:27:aa:6d:0b:0d:64:da:bb:0d:1e:84:
+                    3a:28:e5:55:d5:4d:d5:34:d2:40:47:a7:2d:77:49:
+                    fc:15:54:37:c7:d7:90:0f:f9:db:39:7c:1a:65:29:
+                    53:6c:91:1b:ad:cf:15:c0:d4:71:9e:83:22:29:dc:
+                    a4:16:db:bd:71:19:34:b1:01
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                B8:D8:2E:89:A7:F0:DF:E8:60:86:6A:4C:A7:A7:35:9D:B8:54:B1:FE
+            X509v3 Authority Key Identifier: 
+                keyid:4E:BA:C7:16:FD:E0:E8:D2:F8:E8:33:2C:8B:60:04:9C:17:E8:78:BD
+
+    Signature Algorithm: sha1WithRSAEncryption
+         42:ab:ba:54:3e:09:05:48:ea:36:a6:be:e9:c4:7f:88:2d:1c:
+         62:46:64:98:74:3d:61:34:43:62:8e:9b:8c:15:9d:c7:11:0b:
+         6b:e5:c6:05:2b:26:f8:e6:81:6e:99:34:a0:6e:1d:33:6a:8b:
+         ac:5b:9e:d9:9b:bc:2a:da:f5:6c:d1:22:40:9d:b5:e8:d6:f3:
+         fd:a8:94:8e:8d:6b:0b:ce:11:98:5b:fb:a4:70:ee:97:2b:97:
+         5c:fa:f6:ae:a2:1f:70:79:c1:ed:5d:60:4f:fc:b9:6f:86:0d:
+         46:0b:8f:d0:a2:4e:5b:6e:18:59:1c:10:b9:1e:d9:9e:35:fa:
+         61:b0:23:a8:b9:92:28:c6:01:f4:2a:e3:05:09:18:71:0c:c4:
+         ae:4b:91:dd:92:44:30:a8:d7:9e:77:4c:22:89:83:45:7e:06:
+         67:57:a0:72:d8:c0:9f:4b:f1:4e:b2:31:97:5f:21:a5:72:ac:
+         ec:b6:95:57:c8:cb:62:45:f9:aa:1a:f7:93:d4:17:e2:f5:76:
+         10:49:57:b3:58:8b:e2:e9:9a:f3:2d:83:7c:ba:97:9d:e7:dd:
+         18:6a:fd:d3:f1:ae:3e:31:0c:f7:ca:02:4b:5c:c2:84:6b:08:
+         f1:51:c2:66:2e:d0:d5:f3:52:c8:a9:22:b0:f5:c7:3c:cb:a0:
+         62:67:a4:c5
+-----BEGIN CERTIFICATE-----
+MIIDyzCCArOgAwIBAgIBCzANBgkqhkiG9w0BAQUFADCBmTELMAkGA1UEBhMCWFkx
+ETAPBgNVBAgTCFdvbGZsYW5kMRIwEAYDVQQHEwlXb2xmdmlsbGUxFjAUBgNVBAoT
+DVdvbGYgUGFjayBMdGQxGTAXBgNVBAsTEERpbm93b2x2ZXMgR3JvdXAxEDAOBgNV
+BAMTB1dvbGYgQ0ExHjAcBgkqhkiG9w0BCQEWD0NBQHdvbGZyYW1lLm5ldDAeFw0x
+MjEwMTYxNTA4MzNaFw0xMzEwMTYxNTA4MzNaMIG+MQswCQYDVQQGEwJYWTERMA8G
+A1UECBMIV29sZmxhbmQxEjAQBgNVBAcTCVdvbGZ2aWxsZTEWMBQGA1UEChMNV29s
+ZiBQYWNrIEx0ZDEZMBcGA1UECxMQRGlub3dvbHZlcyBHcm91cDEtMCsGA1UEAxMk
+V29sZnJhbWUgU2VydmVyIChwYXNzd29yZCBwcm90ZWN0ZWQpMSYwJAYJKoZIhvcN
+AQkBFhdzZXJ2ZXItcHdkQHdvbGZyYW1lLm5ldDCBnzANBgkqhkiG9w0BAQEFAAOB
+jQAwgYkCgYEAtfsW6McQmYmDGP7MP0v0WghVkGyFd5XNTxmnaUl+PL2q4wCEULiS
+MiH3jAIsVJiIvPoqx5Ff3Zp+zXa/Dbq+J6ptCw1k2rsNHoQ6KOVV1U3VNNJAR6ct
+d0n8FVQ3x9eQD/nbOXwaZSlTbJEbrc8VwNRxnoMiKdykFtu9cRk0sQECAwEAAaN7
+MHkwCQYDVR0TBAIwADAsBglghkgBhvhCAQ0EHxYdT3BlblNTTCBHZW5lcmF0ZWQg
+Q2VydGlmaWNhdGUwHQYDVR0OBBYEFLjYLomn8N/oYIZqTKenNZ24VLH+MB8GA1Ud
+IwQYMBaAFE66xxb94OjS+OgzLItgBJwX6Hi9MA0GCSqGSIb3DQEBBQUAA4IBAQBC
+q7pUPgkFSOo2pr7pxH+ILRxiRmSYdD1hNENijpuMFZ3HEQtr5cYFKyb45oFumTSg
+bh0zaousW57Zm7wq2vVs0SJAnbXo1vP9qJSOjWsLzhGYW/ukcO6XK5dc+vauoh9w
+ecHtXWBP/Llvhg1GC4/Qok5bbhhZHBC5HtmeNfphsCOouZIoxgH0KuMFCRhxDMSu
+S5HdkkQwqNeed0wiiYNFfgZnV6By2MCfS/FOsjGXXyGlcqzstpVXyMtiRfmqGveT
+1Bfi9XYQSVezWIvi6ZrzLYN8uped590Yav3T8a4+MQz3ygJLXMKEawjxUcJmLtDV
+81LIqSKw9cc8y6BiZ6TF
+-----END CERTIFICATE-----
