@@ -58,7 +58,7 @@ void WolframeClient::initializeSsl( )
 	if( m_initializedSsl ) return;
 
 	QList<QSslCertificate> certs;
-	certs.append( getCertificate( "./CA.cert.pem" ) );
+	//~ certs.append( getCertificate( "./CA.cert.pem" ) );
 	certs.append( getCertificate( "./CAclient.cert.pem" ) );
 	reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificates( certs );
 	reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate(
