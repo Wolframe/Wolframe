@@ -12,8 +12,8 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-NetworkFormLoader::NetworkFormLoader( WolframeClient *_client )
-	: m_client( _client )
+NetworkFormLoader::NetworkFormLoader( WolframeClient *_wolframeClient )
+	: m_wolframeClient( _wolframeClient )
 {
 }
 
@@ -49,23 +49,16 @@ void NetworkFormLoader::initiateGetLanguageCodes( )
 	QStringList languageCodes;
 	languageCodes.push_back( "en_US" ); // default locale, always around
 	
-//~ // read list of supperted languages for all forms based on their qm files available
-	//~ QDir translationDir( QLatin1String( "i18n" ) );
-	//~ translationDir.setFilter( QDir::Files | QDir::NoDotAndDotDot );
-	//~ translationDir.setSorting( QDir::Name );
-	//~ QStringList filters;
-	//~ filters << "*.qm";
-	//~ translationDir.setNameFilters( filters );
-	//~ QStringList localeFiles = translationDir.entryList( );
-	//~ QMutableStringListIterator it( localeFiles );
-	//~ while( it.hasNext( ) ) {
-		//~ it.next( );
-		//~ QStringList parts = it.value( ).split( "." );
-		//~ languageCodes.push_back( parts[1] );		
-	//~ }
-	//~ 
-	//~ languageCodes.removeDuplicates( );
-
+	QString s = m_wolframeClient->syncRun( "formlanguages" );
+	if( s.isNull( ) ) {
+		qWarning( ) << "Trouble getting form languages";
+	} else {
+		QStringList lines = s.split( "\n", QString::SkipEmptyParts );
+		languageCodes.append( lines );
+		languageCodes.removeDuplicates( );
+		qDebug( ) << s << ": " << lines << ": " << languageCodes;
+	}
+	
 	emit languageCodesLoaded( languageCodes );
 }
 

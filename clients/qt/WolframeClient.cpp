@@ -9,6 +9,8 @@
 #include <QFile>
 #include <QList>
 
+#include <qxtsignalwaiter.h>
+
 namespace _Wolframe {
 	namespace QtClient {
 
@@ -17,8 +19,10 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, QWidget *_p
 	m_port( _port ),
 	m_secure( false ),
 	m_state( Disconnected ),
+	m_timeout( 4000 ),
 	m_parent( _parent ),
-	m_hasErrors( false )
+	m_hasErrors( false ),
+	m_command( "CONNECT" )
 {
 #ifdef WITH_SSL
 	m_socket = new QSslSocket( this );
@@ -31,7 +35,7 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, QWidget *_p
 	QObject::connect( m_socket, SIGNAL( readyRead( ) ),
 		this, SLOT( dataAvailable( ) ) );
 	QObject::connect( m_socket, SIGNAL( connected( ) ),
-		this, SLOT( connected( ) ) );
+		this, SLOT( privateConnected( ) ) );
 	QObject::connect( m_socket, SIGNAL( disconnected( ) ),
 		this, SLOT( disconnected( ) ) );
 
@@ -44,8 +48,8 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, QWidget *_p
 		this, SLOT( peerVerifyError( const QSslError & ) ) );
 #endif
 
-	QObject::connect( this, SIGNAL( resultReceived( QString ) ),
-		this, SLOT( handleHello( QString ) ) );
+	QObject::connect( this, SIGNAL( resultReceived( ) ),
+		this, SLOT( handleResult( ) ) );
 }
 
 #ifdef WITH_SSL
@@ -213,7 +217,7 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 	}
 }
 
-void WolframeClient::connected( )
+void WolframeClient::privateConnected( )
 {
 	switch( m_state ) {
 		case Disconnected:
@@ -250,6 +254,7 @@ void WolframeClient::disconnected( )
 		case AboutToDisconnect:
 			m_socket->close( );
 			m_state = Disconnected;
+			m_command = "CONNECT";
 			break;
 
 		default:
@@ -270,17 +275,22 @@ void WolframeClient::dataAvailable( )
 			while( m_socket->canReadLine( ) ) {
 				char buf[1024];
 				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
-				if( buf[len-1] == '\n' ) buf[len-1] = '\0';
+				if( len > 1 )
+					if( buf[len-1] == '\n' ) buf[len-1] = '\0';
+				if( len > 2 )
+					if( buf[len-2] == '\r' ) buf[len-2] = '\0';
 // protocol answer
 				if( strncmp( buf, "BYE", 3 ) == 0 ) {
 				} else if( strncmp( buf, "BAD", 3 ) == 0 ) {
-					emit error( tr( "Protocol error, received: %1." ).arg( buf + 4 ) );
+					m_hasErrors = true;
+					emit error( tr( "Protocol error, received: %1." ).arg( buf + 3 ) );
 				} else if( strncmp( buf, "OK", 2 ) == 0 ) {
-					emit resultReceived( m_answer );
-					m_answer = "";
+					if( len > 3 ) {
+						m_answer = QString( QByteArray( buf+3, len-3 ) );
+					}
+					emit resultReceived( );
 				} else if( buf[0] == '.' && buf[1] == '\n' ) {
-					emit resultReceived( m_answer );
-					m_answer = "";
+					emit resultReceived( );
 				} else {
 					m_answer.append( buf );
 				}
@@ -303,6 +313,9 @@ void WolframeClient::sendLine( QString line )
 // high-level
 void WolframeClient::sendCommand( QString command )
 {
+	m_answer = "";
+	m_command = command;
+	m_hasErrors = false;
 	sendLine( command );
 }
 
@@ -311,9 +324,48 @@ void WolframeClient::hello( )
 	sendCommand( "hello" );
 }
 
-void WolframeClient::handleHello( QString )
+void WolframeClient::run( QString cmd )
 {
-	emit helloReceived( );
+	sendCommand( "run " + cmd );
+}
+
+void WolframeClient::handleResult( )
+{
+	qDebug( ) << "handle result" << m_command << m_answer;
+	if( m_command == "CONNECT" ) {
+		// swallow greeting line from server after connect
+		emit connected( );
+	} else if( m_command == "hello" ) {
+		emit helloReceived( );
+	} else if( m_command.startsWith( "run" ) ) {
+		emit runReceived( m_command, m_answer );
+	}
+}
+
+// synchonous versions
+
+bool WolframeClient::syncConnect( )
+{
+	m_command = "CONNECT";
+	connect( );
+	return( QxtSignalWaiter::wait( this, SIGNAL( connected( ) ), m_timeout ) );
+}
+
+bool WolframeClient::syncHello( )
+{
+	hello( );
+	return( QxtSignalWaiter::wait( this, SIGNAL( helloReceived( ) ), m_timeout ) );
+}
+
+QString WolframeClient::syncRun( QString cmd )
+{
+	run( cmd );
+	if( QxtSignalWaiter::wait( this, SIGNAL( runReceived( QString, QString ) ), SIGNAL( error( QString ) ), m_timeout ) ) {
+		if( m_hasErrors ) return 0;
+		return m_answer;
+	} else {
+		return 0;
+	}
 }
 
 } // namespace QtClient

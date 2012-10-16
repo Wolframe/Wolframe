@@ -46,7 +46,8 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 		case QtWarningMsg:
 		case QtCriticalMsg:
 		case QtFatalMsg:
-			debugTerminal->sendLine( msg );
+			if( debugTerminal )
+				debugTerminal->sendLine( msg );
 			fprintf( stderr, "%s\n", msg );
 			break;
 			
@@ -121,22 +122,35 @@ void MainWindow::initialize( )
 // create a Wolframe protocol client
 	m_wolframeClient = new WolframeClient( m_host, m_port );
 
+// create debuging terminal
+	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
+	debugTerminal = m_debugTerminal;
+	qInstallMsgHandler( &myMessageOutput );
+	qDebug( ) << "Debug window initialized";
+
 // connect the wolframe client to protocols, authenticate
 	switch( m_loadMode ) {
 		case Local:
 			break;
 		case Network:
-			m_wolframeClient->connect( );
+			if( !m_wolframeClient->syncConnect( ) ) {
+				qWarning( ) << "Can't connect to Wolframe daemon!";
+				QCoreApplication::quit( );
+			}
 			connect( m_wolframeClient, SIGNAL( helloReceived( ) ),
 				this, SLOT( helloReceived( ) ) );
-			connect( m_wolframeClient, SIGNAL( error( QString ) ),
-				this, SLOT( wolframeError( QString ) ) );
-			m_wolframeClient->hello( );
+			if( !m_wolframeClient->syncHello( ) ) {
+				qWarning( ) << "Can't send HELLO to Wolframe daemon!";
+				QCoreApplication::quit( );
+			}
 			break;
 		default:
 			qWarning( ) << "Illegal load mode" << m_loadMode;
 			QCoreApplication::quit( );
 	}
+
+	connect( m_wolframeClient, SIGNAL( error( QString ) ),
+		this, SLOT( wolframeError( QString ) ) );
 
 // a Qt UI loader for the main theme window
 	m_uiLoader = new QUiLoader( );
@@ -172,12 +186,6 @@ void MainWindow::initialize( )
 	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
 
-// create debuging terminal
-	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
-	debugTerminal = m_debugTerminal;
-	qInstallMsgHandler( &myMessageOutput );
-	qDebug( ) << "Debug window initialized";
-
 // set default language to the system language
 	m_currentLanguage = QLocale::system( ).name( );
 
@@ -190,10 +198,8 @@ void MainWindow::initialize( )
 
 void MainWindow::wolframeError( QString error )
 {
-	if( !m_debugTerminal->isVisible( ) ) {
-		QMessageBox msgBox;
-		msgBox.setText( error );
-		msgBox.exec( );
+	if( m_debugTerminal && !m_debugTerminal->isVisible( ) ) {
+		m_debugTerminal->bringToFront( );
 	}
 }
 
@@ -407,6 +413,9 @@ void MainWindow::formLoaded( QString name )
 
 void MainWindow::on_actionExit_triggered( )
 {
+	disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+	debugTerminal = 0;
+	
 	close( );
 }
 
