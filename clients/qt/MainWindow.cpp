@@ -7,6 +7,7 @@
 #include "FileDataLoader.hpp"
 #include "NetworkFormLoader.hpp"
 #include "NetworkDataLoader.hpp"
+#include "LoginDialog.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -208,7 +209,17 @@ void MainWindow::initialize( )
 	loadTheme( QString( QLatin1String( "windows" ) ) );
 
 // load language resources, repaints the whole interface if necessary
-	loadLanguage( QLocale::system( ).name( ) );		
+	loadLanguage( QLocale::system( ).name( ) );	
+
+	if( m_loadMode == Network ) {
+		LoginDialog* loginDialog = new LoginDialog( this );
+		//loginDialog->setUsername( "Luca" );  // optional
+
+		//~ connect( loginDialog, SIGNAL( acceptLogin( QString&, QString&, int& ) ),
+			//~ this, SLOT( slotAcceptUserLogin( QString&, QString&) ) );
+
+		loginDialog->exec( );	
+	}
 }
 
 void MainWindow::wolframeError( QString error )
@@ -429,6 +440,7 @@ void MainWindow::formLoaded( QString name )
 void MainWindow::on_actionExit_triggered( )
 {
 	disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+	m_debugTerminal = 0;
 	debugTerminal = 0;
 	
 	close( );
