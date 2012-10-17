@@ -9,7 +9,8 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-LoginDialog::LoginDialog( QWidget *_parent ) : QDialog( _parent )
+LoginDialog::LoginDialog( WolframeClient *_wolframeClient, QWidget *_parent ) :
+	QDialog( _parent ), m_wolframeClient( _wolframeClient )
 {
 	initialize( );
 	setWindowTitle( tr( "Login" ) );
@@ -32,6 +33,25 @@ void LoginDialog::initialize( )
 	m_buttons->button( QDialogButtonBox::Cancel )->setText( tr( "Abort" ) );
 	formLayout->addRow( m_buttons );
 	setLayout( formLayout );
+	
+	connect( m_buttons->button( QDialogButtonBox::Cancel ), SIGNAL( clicked( ) ),
+		this, SLOT( close( ) ) );
+		
+	connect( m_buttons->button( QDialogButtonBox::Ok ), SIGNAL( clicked( ) ),
+		this, SLOT( login( ) ) );
+}
+
+void LoginDialog::login( )
+{
+	QString username = m_username->currentText( );
+	QString password = m_password->text( );
+	
+	// TODO
+	//m_wolframeClient->syncLogin( );
+	
+	// TODO: emit success and failure signals
+	
+	close( );
 }
 
 } // namespace QtClient

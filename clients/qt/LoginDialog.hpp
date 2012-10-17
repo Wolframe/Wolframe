@@ -13,6 +13,8 @@
 #include <QGridLayout>
 #include <QStringList>
 
+#include "WolframeClient.hpp"
+
 namespace _Wolframe {
 	namespace QtClient {
 
@@ -21,19 +23,21 @@ namespace _Wolframe {
 	Q_OBJECT
 		
 	public:
-		LoginDialog( QWidget *_parent = 0 );
+		LoginDialog( WolframeClient *_wolframeClient, QWidget *_parent = 0 );
 	
 	private:
 		QComboBox *m_username;
 		QLineEdit *m_password;
 		QDialogButtonBox* m_buttons;
-
+		WolframeClient *m_wolframeClient;
+		
 	private:
 		void initialize( );
 
 	protected:
 
 	private slots:
+		void login( );
 
 	};
 } // namespace QtClient

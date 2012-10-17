@@ -212,12 +212,7 @@ void MainWindow::initialize( )
 	loadLanguage( QLocale::system( ).name( ) );	
 
 	if( m_loadMode == Network ) {
-		LoginDialog* loginDialog = new LoginDialog( this );
-		//loginDialog->setUsername( "Luca" );  // optional
-
-		//~ connect( loginDialog, SIGNAL( acceptLogin( QString&, QString&, int& ) ),
-			//~ this, SLOT( slotAcceptUserLogin( QString&, QString&) ) );
-
+		LoginDialog* loginDialog = new LoginDialog( m_wolframeClient, this );
 		loginDialog->exec( );	
 	}
 }
