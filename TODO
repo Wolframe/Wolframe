@@ -14,5 +14,7 @@ PF:
 - Printing with HPDF
 	- The print form configuration can have an xslt script for preprocessing
 
-
+- Add dispatcher to main protocol of wolframed
+- Make database run
+- Mihai mail -> key file parsing for authentication
 
