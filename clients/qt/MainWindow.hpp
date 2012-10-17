@@ -68,6 +68,8 @@ namespace _Wolframe {
 // slots for the wolframe client		
 		void wolframeError( QString error );
 		void helloReceived( );
+		void authenticationOk( );
+		void authenticationFailed( );
 		
 		void themeSelected( QAction *action );
 		void formSelected( QAction *action );

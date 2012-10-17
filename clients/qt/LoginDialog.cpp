@@ -10,7 +10,7 @@ namespace _Wolframe {
 	namespace QtClient {
 
 LoginDialog::LoginDialog( WolframeClient *_wolframeClient, QWidget *_parent ) :
-	QDialog( _parent ), m_wolframeClient( _wolframeClient )
+	QDialog( _parent ), m_wolframeClient( _wolframeClient ), m_succeeded( false )
 {
 	initialize( );
 	setWindowTitle( tr( "Login" ) );
@@ -41,6 +41,24 @@ void LoginDialog::initialize( )
 		this, SLOT( login( ) ) );
 }
 
+void LoginDialog::closeEvent( QCloseEvent *_event )
+{
+	qDebug( ) << "LoginDialog closeEvent" << m_succeeded;
+	
+	if( !m_succeeded ) {
+		emit authenticationFailed( );
+	}
+	
+	_event->accept( );
+}
+
+void LoginDialog::keyPressEvent( QKeyEvent *_event )
+{
+	if( _event->key( ) == Qt::Key_Escape ) {
+		_event->ignore( );
+	}
+}
+
 void LoginDialog::login( )
 {
 	QString username = m_username->currentText( );
@@ -51,7 +69,10 @@ void LoginDialog::login( )
 	
 	// TODO: emit success and failure signals
 	
+	m_succeeded = true;
 	close( );
+	
+	emit authenticationOk( );
 }
 
 } // namespace QtClient

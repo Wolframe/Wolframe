@@ -431,7 +431,7 @@ QCommandLine::help(bool logo)
     h += QFileInfo(d->args[0]).baseName();
   else
     h += QCoreApplication::applicationName();
-  h.append(QLatin1String(" [switchs] [options]"));
+  h.append(QLatin1String(" [options]"));
   /* Arguments, short */
   foreach (QCommandLineConfigEntry entry, d->config) {
     if (entry.type == QCommandLine::Option) {

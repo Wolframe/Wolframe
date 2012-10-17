@@ -210,11 +210,6 @@ void MainWindow::initialize( )
 
 // load language resources, repaints the whole interface if necessary
 	loadLanguage( QLocale::system( ).name( ) );	
-
-	if( m_loadMode == Network ) {
-		LoginDialog* loginDialog = new LoginDialog( m_wolframeClient, this );
-		loginDialog->exec( );	
-	}
 }
 
 void MainWindow::wolframeError( QString error )
@@ -227,6 +222,26 @@ void MainWindow::wolframeError( QString error )
 void MainWindow::helloReceived( )
 {
 	qDebug( ) << "hello received";
+	LoginDialog* loginDialog = new LoginDialog( m_wolframeClient, this );
+	
+	connect( loginDialog, SIGNAL( authenticationOk( ) ),
+		this, SLOT( authenticationOk( ) ) );
+		
+	connect( loginDialog, SIGNAL( authenticationFailed( ) ),
+		this, SLOT( authenticationFailed( ) ) );
+		
+	loginDialog->exec( );
+	delete loginDialog;
+}
+
+void MainWindow::authenticationOk( )
+{
+	qDebug( ) << "authentication succeeded";
+}
+
+void MainWindow::authenticationFailed( )
+{
+	qDebug( ) << "authentication failed";
 }
 
 void MainWindow::populateThemesMenu( )

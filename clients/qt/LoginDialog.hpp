@@ -12,6 +12,8 @@
 #include <QComboBox>
 #include <QGridLayout>
 #include <QStringList>
+#include <QCloseEvent>
+#include <QKeyEvent>
 
 #include "WolframeClient.hpp"
 
@@ -30,12 +32,19 @@ namespace _Wolframe {
 		QLineEdit *m_password;
 		QDialogButtonBox* m_buttons;
 		WolframeClient *m_wolframeClient;
+		bool m_succeeded;
+
+	signals:
+		void authenticationOk( );
+		void authenticationFailed( );
 		
 	private:
 		void initialize( );
 
 	protected:
-
+		void closeEvent( QCloseEvent *event );
+		void keyPressEvent( QKeyEvent *e );
+		
 	private slots:
 		void login( );
 
