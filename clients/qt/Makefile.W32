@@ -72,6 +72,8 @@ OBJS = \
 	moc_FormWidget.obj \
 	qcommandline.obj \
 	moc_qcommandline.obj \
+	qxtsignalwaiter.obj \
+	moc_qxtsignalwaiter.obj \
 	LoginDialog.obj \
 	moc_LoginDialog.obj
 
