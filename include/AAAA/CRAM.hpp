@@ -57,17 +57,17 @@ static const int CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
 
 class PasswordSalt
 {
-	friend class PasswordHash;
+	static const std::size_t PASSWORD_SALT_SIZE = 128 / 8;
 public:
 	/// Construct an empty salt (all bits 0).
 	PasswordSalt();
 	/// Construct a salt from the given byte array.
-	explicit PasswordSalt( const unsigned char* salt );
+	explicit PasswordSalt( const unsigned char* salt, size_t bytes );
 	/// Construct a random salt using randomDevice to generate random bytes.
 	explicit PasswordSalt( const std::string& randomDevice );
 
 	/// The size of the salt in bytes
-	static size_t size()		{ return PASSWORD_SALT_SIZE; }
+	size_t size() const			{ return m_size; }
 
 	/// Set the salt value from the BCD encoded string.
 	void fromBCD( const std::string& salt );
@@ -79,7 +79,8 @@ public:
 	/// Return the salt as a base64 encoded string.
 	std::string toBase64() const;
 private:
-	unsigned char		m_salt[ PASSWORD_SALT_SIZE ];
+	std::size_t	m_size;
+	unsigned char	m_salt[ PASSWORD_SALT_SIZE ];
 };
 
 

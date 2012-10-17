@@ -68,14 +68,16 @@ static const int CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
 
 PasswordSalt::PasswordSalt()
 {
+	m_size = 0;
 	memset( m_salt, 0, PASSWORD_SALT_SIZE );
 }
 
 /// \note The byte array is considered to be of size PASSWORD_SALT_SIZE
 /// and it can not be changed.
-PasswordSalt::PasswordSalt( const unsigned char* salt )
+PasswordSalt::PasswordSalt( const unsigned char* salt , size_t bytes )
 {
-	memcpy( m_salt, salt, PASSWORD_SALT_SIZE );
+	m_size = bytes > PASSWORD_SALT_SIZE ? PASSWORD_SALT_SIZE : bytes;
+	memcpy( m_salt, salt, m_size );
 }
 
 PasswordSalt::PasswordSalt( const std::string& randomDevice )
@@ -92,7 +94,7 @@ PasswordSalt::PasswordSalt( const std::string& randomDevice )
 		std::string errMsg = "Error reading '" + randomDevice + "'";
 		throw std::runtime_error( errMsg );
 	}
-	else if ( rndPart < PASSWORD_SALT_SIZE )	{
+	else if ( rndPart < (int)PASSWORD_SALT_SIZE )	{
 		std::string errMsg = "Not enough entropy in '" + randomDevice + "' ?!?";
 		throw std::logic_error( errMsg );
 	}
@@ -114,7 +116,7 @@ PasswordSalt::PasswordSalt( const std::string& randomDevice )
 		throw std::runtime_error( "Error closing cyrpto context" );
 	}
 #endif
-
+	m_size = PASSWORD_SALT_SIZE;
 }
 
 std::string PasswordSalt::toBCD() const
