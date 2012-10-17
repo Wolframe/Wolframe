@@ -23,6 +23,8 @@ namespace _Wolframe {
 
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_ui( 0 ), m_host( "localhost" ), m_port( 7661 ), m_secure( false ),
+	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
+	m_CACertFile( "./certs/CAclient.cert.pem" ),
 	m_loadMode( Network )
 {
 	parseArgs( );
@@ -63,9 +65,12 @@ void MainWindow::parseArgs( )
 	{
 		{ QCommandLine::Option, 'H', "host", "Wolframe host", QCommandLine::Optional },
 		{ QCommandLine::Option, 'p', "port", "Wolframe port", QCommandLine::Optional },
-		{ QCommandLine::Switch, 's', "secure", "connect securely via SSL", QCommandLine::Optional },
+		{ QCommandLine::Switch, 'S', "secure", "connect securely via SSL", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'l', "local", "Run with local data and form loader", QCommandLine::Optional },
 		{ QCommandLine::Option, 'v', "verbose", "verbose level", QCommandLine::Optional },
+		{ QCommandLine::Option, 'c', "client-cert-file", "client certificate to present to the server (default: ./certs/client.crt)", QCommandLine::Optional },
+		{ QCommandLine::Option, 'k', "client-key-file", "client key file (default: ./private/client.key)", QCommandLine::Optional },
+		{ QCommandLine::Option, 'C', "CA-cert-file", "certificate file containing the CA (default: ./certs/CAclient.cert.pem)", QCommandLine::Optional },
 		QCOMMANDLINE_CONFIG_ENTRY_END
 	};
 	
@@ -106,6 +111,12 @@ void MainWindow::optionFound( const QString &name, const QVariant &value )
 		m_host = value.toString( );
 	} else if( name == "port" ) {
 		m_port = value.toString( ).toUShort( );
+	} else if( name == "client-cert-file" ) {
+		m_clientCertFile = value.toString( );
+	} else if( name == "client-key-file" ) {
+		m_clientKeyFile = value.toString( );
+	} else if( name == "CA-cert-file" ) {
+		m_CACertFile = value.toString( );
 	}
 }
 
@@ -124,7 +135,7 @@ void MainWindow::parseError( const QString &error )
 void MainWindow::initialize( )
 {
 // create a Wolframe protocol client
-	m_wolframeClient = new WolframeClient( m_host, m_port, m_secure );
+	m_wolframeClient = new WolframeClient( m_host, m_port, m_secure, m_clientCertFile, m_clientKeyFile, m_CACertFile );
 
 // create debuging terminal
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );

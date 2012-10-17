@@ -1,0 +1,73 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 12 (0xc)
+    Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=YZ, ST=Client Empire, L=Client City, O=Client Inc., OU=:Client Administration, CN=Client Certificate Authority/emailAddress=CA@client.yz
+        Validity
+            Not Before: Oct 16 15:17:25 2012 GMT
+            Not After : Oct 16 15:17:25 2013 GMT
+        Subject: C=YZ, ST=Client Empire, L=Client City, O=Client Inc., OU=Client Users Group, CN=Ordinary Client/emailAddress=ordinary@client.yz
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (1024 bit)
+                Modulus:
+                    00:9b:a7:66:89:b1:a2:39:90:b6:8d:bb:2f:cd:34:
+                    27:ae:74:e9:49:f5:cd:d4:e9:c2:d4:ba:b5:2b:67:
+                    57:9c:9e:3d:c2:e4:6e:63:6b:d2:12:9f:51:8a:34:
+                    5a:18:be:20:bb:3e:ac:60:8c:06:20:f5:4f:49:b8:
+                    7f:cb:7c:a8:1e:da:30:ff:4f:11:9a:bb:6f:44:66:
+                    8a:c7:98:73:5c:c8:06:62:8e:83:d6:6a:59:6a:9e:
+                    62:6c:3b:f9:fb:7a:f8:6e:5c:3f:17:ff:6a:50:12:
+                    89:b2:7e:61:d8:62:fb:be:57:4e:61:5e:62:d3:04:
+                    f4:67:74:3c:f6:ef:7c:5b:9f
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                92:A4:47:01:72:83:9D:AA:6F:00:16:94:19:D1:6E:A1:5A:65:63:66
+            X509v3 Authority Key Identifier: 
+                keyid:92:7A:3E:AD:D1:05:01:A3:BB:28:B1:1B:C1:57:D4:DA:1B:85:BB:14
+
+    Signature Algorithm: sha1WithRSAEncryption
+         a4:c5:e7:2c:7a:de:d5:af:da:0a:5d:ec:07:f5:c4:f9:19:9c:
+         7e:30:6c:93:6c:d9:b7:f0:42:fd:f7:4c:91:2a:3c:db:52:8e:
+         f9:62:eb:82:2e:84:62:8f:8d:00:61:ce:7d:83:d1:bf:3b:a7:
+         cc:ca:47:b0:39:c2:82:1b:71:8b:09:ca:cc:23:d8:4c:65:cc:
+         36:50:41:4f:a1:f9:8c:b3:02:4c:91:2d:e3:fe:90:05:b0:45:
+         cf:fd:ce:e0:70:6e:79:43:6b:bb:0a:87:0a:a8:90:0d:05:e3:
+         ac:15:e0:6d:da:f2:5d:44:fc:4f:b9:82:d2:ec:2f:d0:c0:30:
+         f1:0d:72:68:27:0e:c2:41:01:37:b2:87:ff:0d:7b:bf:0d:5d:
+         70:6e:94:90:8f:ca:ae:ce:27:13:fe:66:b8:cc:70:06:9c:d6:
+         c1:72:7d:02:c2:6a:2f:1e:17:61:7e:a8:89:91:02:54:bf:ed:
+         fa:f5:be:68:cf:60:f9:af:a6:aa:b8:71:5c:bd:34:8b:2f:8f:
+         4c:b0:1e:17:02:2d:d9:91:97:8c:0c:b7:ee:4f:0c:62:97:de:
+         de:60:88:8a:cf:45:b6:18:cf:2b:37:18:6a:b4:6f:ac:84:75:
+         2e:55:f9:ef:4e:c7:6a:ef:3a:be:80:64:ea:16:7a:75:c5:aa:
+         08:ac:97:5a
+-----BEGIN CERTIFICATE-----
+MIID1TCCAr2gAwIBAgIBDDANBgkqhkiG9w0BAQUFADCBtjELMAkGA1UEBhMCWVox
+FjAUBgNVBAgTDUNsaWVudCBFbXBpcmUxFDASBgNVBAcTC0NsaWVudCBDaXR5MRQw
+EgYDVQQKEwtDbGllbnQgSW5jLjEfMB0GA1UECxMWOkNsaWVudCBBZG1pbmlzdHJh
+dGlvbjElMCMGA1UEAxMcQ2xpZW50IENlcnRpZmljYXRlIEF1dGhvcml0eTEbMBkG
+CSqGSIb3DQEJARYMQ0FAY2xpZW50Lnl6MB4XDTEyMTAxNjE1MTcyNVoXDTEzMTAx
+NjE1MTcyNVowgasxCzAJBgNVBAYTAllaMRYwFAYDVQQIEw1DbGllbnQgRW1waXJl
+MRQwEgYDVQQHEwtDbGllbnQgQ2l0eTEUMBIGA1UEChMLQ2xpZW50IEluYy4xGzAZ
+BgNVBAsTEkNsaWVudCBVc2VycyBHcm91cDEYMBYGA1UEAxMPT3JkaW5hcnkgQ2xp
+ZW50MSEwHwYJKoZIhvcNAQkBFhJvcmRpbmFyeUBjbGllbnQueXowgZ8wDQYJKoZI
+hvcNAQEBBQADgY0AMIGJAoGBAJunZomxojmQto27L800J6506Un1zdTpwtS6tStn
+V5yePcLkbmNr0hKfUYo0Whi+ILs+rGCMBiD1T0m4f8t8qB7aMP9PEZq7b0RmiseY
+c1zIBmKOg9ZqWWqeYmw7+ft6+G5cPxf/alASibJ+Ydhi+75XTmFeYtME9Gd0PPbv
+fFufAgMBAAGjezB5MAkGA1UdEwQCMAAwLAYJYIZIAYb4QgENBB8WHU9wZW5TU0wg
+R2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1UdDgQWBBSSpEcBcoOdqm8AFpQZ0W6h
+WmVjZjAfBgNVHSMEGDAWgBSSej6t0QUBo7sosRvBV9TaG4W7FDANBgkqhkiG9w0B
+AQUFAAOCAQEApMXnLHre1a/aCl3sB/XE+RmcfjBsk2zZt/BC/fdMkSo821KO+WLr
+gi6EYo+NAGHOfYPRvzunzMpHsDnCghtxiwnKzCPYTGXMNlBBT6H5jLMCTJEt4/6Q
+BbBFz/3O4HBueUNruwqHCqiQDQXjrBXgbdryXUT8T7mC0uwv0MAw8Q1yaCcOwkEB
+N7KH/w17vw1dcG6UkI/Krs4nE/5muMxwBpzWwXJ9AsJqLx4XYX6oiZECVL/t+vW+
+aM9g+a+mqrhxXL00iy+PTLAeFwIt2ZGXjAy37k8MYpfe3mCIis9FthjPKzcYarRv
+rIR1LlX5707Hau86voBk6hZ6dcWqCKyXWg==
+-----END CERTIFICATE-----

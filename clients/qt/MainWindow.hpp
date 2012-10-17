@@ -45,6 +45,9 @@ namespace _Wolframe {
 		QString m_host;			// wolframe server port to use
 		unsigned short m_port;		// wolframe port to use
 		bool m_secure;			// use SSL for wolframe protocol
+		QString m_clientCertFile;	// filename of the client certfificate
+		QString m_clientKeyFile;	// filename of the client key file
+		QString m_CACertFile;		// filename of the CA certificate
 		LoadMode m_loadMode;		// whether to use local loader or not
 
 		void parseArgs( );

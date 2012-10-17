@@ -358,9 +358,9 @@ int main( int argc, char *argv[] )
 		( "read-timeout", boost::program_options::value<int>( ), "in seconds, terminate after inactivity" )
 #ifdef WITH_SSL
 		( "ssl,S", "use SSL encryption" )
-		( "CA-cert-file", boost::program_options::value<std::string>( ), "certificate file containing the CA" )
-		( "client-cert-file", boost::program_options::value<std::string>( ), "client certificate to present to the server" )
-		( "client-cert-key", boost::program_options::value<std::string>( ), "client key file" )
+		( "CA-cert-file,C", boost::program_options::value<std::string>( ), "certificate file containing the CA (default: ./certs/CAclient.cert.pem)" )
+		( "client-cert-file,c", boost::program_options::value<std::string>( ), "client certificate to present to the server (default: ./certs/client.crt)" )
+		( "client-cert-key,k", boost::program_options::value<std::string>( ), "client key file (default: ./private/client.key)" )
 #endif
 		( "host", "the host to connect to" )
 		( "port", "the port to connect to" )
@@ -416,8 +416,8 @@ int main( int argc, char *argv[] )
 			CACertFile = map["CA-cert-file"].as< std::string >( );
 			ctx.load_verify_file( CACertFile );
 		} else {
-			std::cerr << "ERROR: you must provide a CA certificate chain, otherwise no secure communication is possible!" << std::endl;
-			return 1;
+//			std::cerr << "ERROR: you must provide a CA certificate chain, otherwise no secure communication is possible!" << std::endl;
+//			return 1;
 		}
 
 		if( map.count( "client-cert-file" ) ) {

@@ -14,10 +14,13 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secure, QWidget *_parent ) :
+WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secure, QString _clientCertFile, QString _clientKeyFile, QString _CACertfile, QWidget *_parent ) :
 	m_host( _host ),
 	m_port( _port ),
 	m_secure( _secure ),
+	m_clientCertFile( _clientCertFile ),
+	m_clientKeyFile( _clientKeyFile ),
+	m_CACertFile( _CACertfile ),	
 	m_state( Disconnected ),
 	m_timeout( 4000 ),
 	m_parent( _parent ),
@@ -58,14 +61,15 @@ void WolframeClient::initializeSsl( )
 {
 	if( m_initializedSsl ) return;
 
-	reinterpret_cast<QSslSocket *>( m_socket )->setPeerVerifyMode( QSslSocket::VerifyNone );
 	QList<QSslCertificate> certs;
-	certs.append( getCertificate( "./CA.cert.pem" ) );
-	certs.append( getCertificate( "./CAclient.cert.pem" ) );
+// CA certificate to verify the client certificate
+	certs.append( getCertificate( m_CACertFile ) );
 	reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificates( certs );
+// our local client certificate we present to the server
 	reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate(
-		getCertificate( "./client.crt" ) );
-	reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( "./client.key" );
+		getCertificate( m_clientCertFile ) );
+// the key for using the client certificate
+	reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( m_clientKeyFile );
 
 	m_initializedSsl = true;
 }

@@ -37,3 +37,6 @@
 - stop flickering in hour glas
 - QIODevice for data loader and handler instead of a fixed byte
   array in the signal (otherwise the debug window gets complicated)
+- network loader via protocol
+  - get rid of synchronous protocol executions
+- add authentication dialog

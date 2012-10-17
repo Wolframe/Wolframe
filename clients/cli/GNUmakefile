@@ -59,7 +59,10 @@ endif
 endif
 
 run:
-	@./wolfcli localhost 7661
+	@./wolfcli 127.0.0.1 7661
 
 runssl:
-	@./wolfcli -S --CA-cert-file=CA.cert.pem --client-cert-file=client.crt --client-cert-key=client.key localhost 7961
+	@./wolfcli -S --CA-cert-file=certs/CA.cert.pem \
+		--client-cert-file=certs/client.crt \
+		--client-cert-key=private/client.key \
+		127.0.0.1 7961

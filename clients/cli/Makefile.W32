@@ -70,6 +70,6 @@ runssl: $(CPP_BINS)
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
 !ENDIF
-	@-echo wolfcli.exe -S --CA-cert-file=CA.cert.pem --client-cert-file=client.crt --client-cert-key=client.key 127.0.0.1 7961 >> test.bat
+	@-echo wolfcli.exe -S --CA-cert-file=certs\CA.cert.pem --client-cert-file=certs\client.crt --client-cert-key=private\client.key 127.0.0.1 7961 >> test.bat
 	@-test.bat
 

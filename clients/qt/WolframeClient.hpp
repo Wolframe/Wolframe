@@ -33,6 +33,9 @@ namespace _Wolframe {
 		QString m_host;
 		unsigned short m_port;
 		bool m_secure;
+		QString m_clientCertFile;	// filename of the client certfificate
+		QString m_clientKeyFile;	// filename of the client key file
+		QString m_CACertFile;		// filename of the CA certificate
 		State m_state;
 		unsigned int m_timeout;
 		QAbstractSocket *m_socket;
@@ -45,7 +48,11 @@ namespace _Wolframe {
 		QString m_command;
 
 	public:
-		WolframeClient( QString host = "localhost", unsigned short port = 7661, bool secure = false, QWidget *_parent = 0 );
+		WolframeClient( QString host = "localhost", unsigned short port = 7661,
+			bool secure = false, QString _clientCertFile = "./certs/client.crt",
+			QString _clientKeyFile = "./private/client.key",
+			QString _CACertfile = "./certs/CAclient.cert.crt",
+			QWidget *_parent = 0 );
 		virtual ~WolframeClient( );
 
 // low-level commands, pre-protocol, for debugging mainly
