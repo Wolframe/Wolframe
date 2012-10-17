@@ -440,6 +440,7 @@ void MainWindow::formLoaded( QString name )
 void MainWindow::on_actionExit_triggered( )
 {
 	disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+	m_debugTerminal = 0;
 	debugTerminal = 0;
 	
 	close( );
