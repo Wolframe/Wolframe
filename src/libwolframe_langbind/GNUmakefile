@@ -42,6 +42,7 @@ CPP_OBJS = \
 	ptreefilter.o \
 	formLibrary.o \
 	normalizeProgram.o \
+	printProgram.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \

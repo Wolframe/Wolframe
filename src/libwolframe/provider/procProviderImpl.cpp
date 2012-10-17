@@ -176,10 +176,6 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 						LOG_FATAL << "Duplicate form function name '" << name << "'";
 						throw std::runtime_error( "Duplicate form function name" );
 					}
-					if (!declareFunctionName( name, "form function"))
-					{
-						throw std::runtime_error( "Duplicate function identifier used for form function");
-					}
 					m_formfunction.push_back( ffo );
 					m_formfunctionMap[ name ] = ffo;
 
@@ -207,26 +203,17 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 			case ObjectConstructorBase::PRINT_FUNCTION_OBJECT:
 			{	// object is a print function compiler
-				module::PrintFunctionConstructor* ffo = dynamic_cast< module::PrintFunctionConstructor* >((*it)->constructor());
-				if ( ffo == NULL )
+				langbind::PrintFunctionConstructorR constructor( dynamic_cast< module::PrintFunctionConstructor* >((*it)->constructor()));
+				if (!constructor.get())
 				{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not a print function compiler";
-					throw std::logic_error( "Object is not a print function compiler. See log." );
+						  << "'' is not a print layout description compiler";
+					throw std::logic_error( "Object is not a print layout description compiler. See log." );
 				}
 				else
 				{
-					std::string name = ffo->programFileType();
-					std::string key = boost::algorithm::to_upper_copy( name);
-					std::map< std::string, const module::PrintFunctionConstructor* >::const_iterator itr = m_printFunctionCompilerMap.find( key );
-					if ( itr != m_printFunctionCompilerMap.end() )	{
-						LOG_FATAL << "Duplicate print function compiler name '" << name << "'";
-						throw std::runtime_error( "Duplicate print function compiler name" );
-					}
-					m_printFunctionCompiler.push_back( ffo );
-					m_printFunctionCompilerMap[ key ] = ffo;
-
-					LOG_TRACE << "'" << name << "' print function compiler registered";
+					m_printprogram.addConstructor( constructor);
+					LOG_TRACE << "'" << constructor->programFileType() << "' print layout description compiler registered";
 				}
 				break;
 			}
@@ -291,10 +278,6 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 	for ( std::list< module::FormFunctionConstructor* >::iterator it = m_formfunction.begin();
 							it != m_formfunction.end(); it++ )
 		delete *it;
-
-	for ( std::list< module::PrintFunctionConstructor* >::iterator it = m_printFunctionCompiler.begin();
-							it != m_printFunctionCompiler.end(); ++it )
-		delete *it;
 }
 
 class ProcessorProvider::ProcessorProvider_Impl::DDLTypeMap :public ddl::TypeMap
@@ -329,14 +312,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 	}
 	for(pi = m_programfiles.begin(); pi != pe; ++pi)
 	{
-		std::string ext = utils::getFileExtension( *pi);
-		if (ext.empty()) throw std::runtime_error( "program file has no extension");
-		std::string key = boost::algorithm::to_upper_copy( std::string( ext.c_str() + 1));
-		std::map< std::string, const module::PrintFunctionConstructor*>::const_iterator ri = m_printFunctionCompilerMap.find( key);
-		if (ri != m_printFunctionCompilerMap.end())
-		{
-			rt &= loadPrintProgram( ri->second, *pi);
-		}
+		if (m_printprogram.is_mine( *pi)) m_printprogram.loadProgram( *pi);
 	}
 	return rt;
 }
@@ -397,65 +373,14 @@ langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formfunction(
 		return ffo->second->object();
 }
 
-bool ProcessorProvider::ProcessorProvider_Impl::declareFunctionName( const std::string& name, const char* typestr)
-{
-	std::string key = boost::algorithm::to_upper_copy( name);
-	std::map< std::string, const char*>::const_iterator idt = m_langfunctionIdentifierMap.find( key);
-	if (idt != m_langfunctionIdentifierMap.end())
-	{
-		LOG_ERROR << "Duplicate function identifier for "<< typestr << " with name '" << name << "' already used for a " << idt->second << "";
-		return false;
-	}
-	m_langfunctionIdentifierMap[ key] = typestr;
-	return true;
-}
-
 const ddl::Form* ProcessorProvider::ProcessorProvider_Impl::form( const std::string& name ) const
 {
 	return m_formlibrary.get( name);
 }
 
-bool ProcessorProvider::ProcessorProvider_Impl::loadPrintProgram( const module::PrintFunctionConstructor* pc, const std::string& layoutFilename)
-{
-	try
-	{
-		prnt::PrintFunctionR funcp( pc->object( utils::readSourceFileContent( layoutFilename)));
-		std::string funcname( funcp->name());
-		if (funcname.empty())
-		{
-			funcname = utils::getFileStem( layoutFilename);
-		}
-		std::string funckey( boost::algorithm::to_upper_copy( funcname));
-
-		std::map <std::string, prnt::PrintFunctionR>::const_iterator ip = m_printFunctionMap.find( funckey);
-		if (ip != m_printFunctionMap.end())
-		{
-			LOG_ERROR << "Duplicate definition of print layout with name '" << funcname << "'";
-			return false;
-		}
-		if (!declareFunctionName( funcname, "print function name"))
-		{
-			return false;
-		}
-		m_printFunctionMap[ funckey] = funcp;
-		LOG_TRACE << "Print layout '" << funcname << "' loaded";
-		return true;
-	}
-	catch (std::exception& e)
-	{
-		LOG_ERROR << "Cannot load print layout from file '" << utils::getFileStem( layoutFilename) << "': " <<  e.what();
-		return false;
-	}
-}
-
 const prnt::PrintFunction* ProcessorProvider::ProcessorProvider_Impl::printFunction( const std::string& name ) const
 {
-	std::string key = boost::algorithm::to_upper_copy( name);
-	std::map< std::string, prnt::PrintFunctionR>::const_iterator itr = m_printFunctionMap.find( key);
-	if ( itr == m_printFunctionMap.end() )
-		return NULL;
-	else
-		return itr->second.get();
+	return m_printprogram.get( name);
 }
 
 const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name ) const
