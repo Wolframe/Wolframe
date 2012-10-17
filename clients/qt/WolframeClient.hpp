@@ -27,7 +27,7 @@ namespace _Wolframe {
 			AboutToConnect,
 			Connected,
 			AboutToDisconnect
-		};	
+		};
 
 	private:
 		QString m_host;
@@ -65,13 +65,13 @@ namespace _Wolframe {
 
 // high-level commands
 		void hello( );
-		void run( QString cmd, QString data = 0 );
+		void run( QString cmd, QString data = QString::null );
 
 // synchonous commands
 		bool syncConnect( );
 		bool syncHello( );
-		QString syncRun( QString cmd, QString data = 0 );
-		
+		QString syncRun( QString cmd, QString data = QString::null );
+
 		Q_PROPERTY( QString m_host READ host WRITE setHost )
 		QString host( ) const { return m_host; }
 		void setHost( QString _host ) { m_host = _host; }
@@ -79,12 +79,12 @@ namespace _Wolframe {
 		Q_PROPERTY( unsigned short m_port READ port WRITE setPort )
 		unsigned short port( ) const { return m_port; }
 		void setPort( unsigned short _port ) { m_port = _port; }
-		
+
 		Q_PROPERTY( unsigned int m_timeout READ timeout WRITE setTimeout )
 		unsigned int timeout( ) const { return m_timeout; }
 		void setTimeout( unsigned int _timeout ) { m_timeout = _timeout; }
 
-#ifdef WITH_SSL		
+#ifdef WITH_SSL
 		Q_PROPERTY( bool m_secure READ secure WRITE setSecure )
 		bool secure( ) const { return m_secure; }
 		void setSecure( bool _secure ) { m_secure = _secure; }
@@ -111,7 +111,7 @@ namespace _Wolframe {
 
 // low-level commands, pre-protocol, for debugging mainly
 		void lineReceived( QString line );
-		
+
 // generic implementation of a command execute implementing the frame of the protocol
 		void resultReceived( );
 		void helloReceived( );
