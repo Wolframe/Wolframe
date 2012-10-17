@@ -167,7 +167,7 @@ std::string PasswordHash::toBase64() const
 {
 	char	buffer[ PASSWORD_HASH_BASE64_SIZE ];
 
-	memset( buffer, 0, PASSWORD_HASH_BCD_SIZE );
+	memset( buffer, 0, PASSWORD_HASH_BASE64_SIZE );
 
 	if ( byte2hex( m_hash, PASSWORD_DIGEST_SIZE,
 		       buffer, PASSWORD_HASH_BASE64_SIZE ) == NULL )
