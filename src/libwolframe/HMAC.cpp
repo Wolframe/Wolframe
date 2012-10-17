@@ -56,12 +56,13 @@ void HMAC_SHA256::init( const unsigned char *key, size_t keyLen,
 
 	sha256_ctx	ctx;
 
+	memset( intKey, 0, HMAC_BLOCK_SIZE );
 	if ( keyLen > HMAC_BLOCK_SIZE )	{
-		assert( HMAC_BLOCK_SIZE == SHA512_DIGEST_SIZE );
-		sha512( key, keyLen, intKey );
+		sha256( key, keyLen, intKey );
+// This is non-standard
+//		sha512( key, keyLen, intKey );
 	}
 	else	{
-		memset( intKey, 0, HMAC_BLOCK_SIZE );
 		for ( size_t i = 0; i < keyLen; i ++ )
 			intKey[ i ] = key[ i ];
 	}
@@ -107,6 +108,20 @@ std::string HMAC_SHA256::toBase64() const
 		throw std::logic_error( "HMAC-SHA256::toBase64() cannot convert hash ?!?" );
 
 	return std::string( buffer );
+}
+
+bool HMAC_SHA256::operator == ( const HMAC_SHA256& rhs ) const
+{
+	return !memcmp( this->m_HMAC, rhs.m_HMAC, HMAC_DIGEST_SIZE );
+}
+
+bool HMAC_SHA256::operator == ( const std::string& rhs ) const
+{
+	unsigned char	buffer[ HMAC_DIGEST_SIZE ];
+
+	if ( hex2byte( rhs.data(), buffer, HMAC_DIGEST_SIZE ) != HMAC_DIGEST_SIZE )
+		return false;
+	return !memcmp( this->m_HMAC, buffer, HMAC_DIGEST_SIZE );
 }
 
 }} // namespace _Wolframe::AAAA
