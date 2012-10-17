@@ -33,8 +33,8 @@
 ///\brief Templates for parsing with positional error messages
 ///\file config/programBase.hpp
 //
-#ifndef _CONFIG_PROGRAM_HPP_INCLUDED
-#define _CONFIG_PROGRAM_HPP_INCLUDED
+#ifndef _CONFIG_PROGRAM_BASE_HPP_INCLUDED
+#define _CONFIG_PROGRAM_BASE_HPP_INCLUDED
 #include "utils/miscUtils.hpp"
 #include <string>
 #include <cstdlib>
