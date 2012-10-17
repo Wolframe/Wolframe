@@ -65,7 +65,9 @@ OBJS = \
 	qcommandline.o \
 	moc_qcommandline.o \
 	qxtsignalwaiter.o \
-	moc_qxtsignalwaiter.o
+	moc_qxtsignalwaiter.o \
+	LoginDialog.o \
+	moc_LoginDialog.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -97,6 +99,9 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormWidget.hpp -o moc_FormWidget.cpp
+
+moc_LoginDialog.cpp: LoginDialog.hpp
+	$(QT_MOC) $(MOC_FLAGS) LoginDialog.hpp -o moc_LoginDialog.cpp
 
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_MOC) $(MOC_FLAGS) qcommandline.h -o moc_qcommandline.cpp

@@ -71,7 +71,11 @@ OBJS = \
 	FormWidget.obj \
 	moc_FormWidget.obj \
 	qcommandline.obj \
-	moc_qcommandline.obj
+	moc_qcommandline.obj \
+	qxtsignalwaiter.obj \
+	moc_qxtsignalwaiter.obj \
+	LoginDialog.obj \
+	moc_LoginDialog.obj
 
 CPP_BINS = \
 	qtclient.exe
@@ -134,8 +138,14 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormWidget.hpp -o moc_FormWidget.cpp
 
+moc_LoginDialog.cpp: LoginDialog.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. LoginDialog.hpp -o moc_LoginDialog.cpp
+
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. qcommandline.h -o moc_qcommandline.cpp
+
+moc_qxtsignalwaiter.cpp: qxtsignalwaiter.h
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. qxtsignalwaiter.h -o moc_qxtsignalwaiter.cpp
 
 local_clean:
 	@-erase moc_*.cpp *.dll 2>NUL

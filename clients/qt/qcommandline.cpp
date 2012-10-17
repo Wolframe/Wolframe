@@ -472,14 +472,31 @@ QCommandLine::help(bool logo)
       max = val.size();
 
     vals.append(val);
-    descrs.append(entry.descr + QLatin1String("\n"));
+    descrs.append(entry.descr);
   }
 
   for (int i = 0; i < vals.size(); ++i) {
-    h.append(QLatin1String("  "));
-    h.append(vals[i]);
-    h.append(QString(QLatin1String(" ")).repeated(max - vals[i].size() + 2));
-    h.append(descrs[i]);
+    QStringList words = descrs[i].split(QRegExp("\\b"));
+    int windex = 0;
+    bool first = true;
+    do {
+      if (first) {
+        h.append(QLatin1String("  "));
+        h.append(vals[i]);
+        first = false;
+      } else {
+        h.append(QString(QLatin1String(" ")).repeated(2 + vals[i].size()));
+      }
+      h.append(QString(QLatin1String(" ")).repeated(max - vals[i].size() + 2));
+      int sofar = max;
+      while (windex < words.size() && sofar+words[windex].size() < 79) {
+        h.append(words[windex]);
+        sofar += words[windex].size();
+        windex++;
+      }
+      if (windex < words.size() && words[windex] == " ") windex++;
+      h.append(QLatin1String("\n"));
+    } while (windex < words.size());
   }
 
   h.append(tr("\nMandatory arguments to long options are mandatory for short options too.\n"));

@@ -64,6 +64,11 @@ TEST( SHA2fixture, SHA224 )
 	char output[ 2 * SHA224_DIGEST_SIZE + 1 ];
 	output[ 2 * SHA224_DIGEST_SIZE ] = '\0';
 
+	unsigned char digest2[ SHA224_DIGEST_SIZE ];
+	sha224_ctx ctx;
+	char output2[ 2 * SHA224_DIGEST_SIZE + 1 ];
+	output2[ 2 * SHA224_DIGEST_SIZE ] = '\0';
+
 	sha224((const unsigned char *)message1, strlen( message1 ), digest );
 	for ( int i = 0; i < SHA224_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
@@ -81,6 +86,14 @@ TEST( SHA2fixture, SHA224 )
 	for ( int i = 0; i < SHA224_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	ASSERT_STREQ( output, testVectors[2] );
+
+	sha224_init( &ctx );
+	sha224_update( &ctx, message3, message3len / 2 );
+	sha224_update( &ctx, message3 + message3len / 2, message3len - message3len / 2 );
+	sha224_final( &ctx, digest2 );
+	for ( int i = 0; i < SHA224_DIGEST_SIZE; i++ )
+		sprintf( output2 + 2 * i, "%02x", digest2[i] );
+	ASSERT_STREQ( output, output2 );
 }
 
 /* SHA-256 */
@@ -95,6 +108,11 @@ TEST( SHA2fixture, SHA256 )
 	unsigned char digest[ SHA256_DIGEST_SIZE ];
 	char output[ 2 * SHA256_DIGEST_SIZE + 1 ];
 	output[ 2 * SHA256_DIGEST_SIZE ] = '\0';
+
+	unsigned char digest2[ SHA256_DIGEST_SIZE ];
+	sha256_ctx ctx;
+	char output2[ 2 * SHA256_DIGEST_SIZE + 1 ];
+	output2[ 2 * SHA256_DIGEST_SIZE ] = '\0';
 
 	sha256((const unsigned char *)message1, strlen( message1 ), digest );
 	for ( int i = 0; i < SHA256_DIGEST_SIZE; i++ )
@@ -113,6 +131,14 @@ TEST( SHA2fixture, SHA256 )
 	for ( int i = 0; i < SHA256_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	ASSERT_STREQ( output, testVectors[2] );
+
+	sha256_init( &ctx );
+	sha256_update( &ctx, message3, message3len / 2 );
+	sha256_update( &ctx, message3 + message3len / 2, message3len - message3len / 2 );
+	sha256_final( &ctx, digest2 );
+	for ( int i = 0; i < SHA256_DIGEST_SIZE; i++ )
+		sprintf( output2 + 2 * i, "%02x", digest2[i] );
+	ASSERT_STREQ( output, output2 );
 }
 
 /* SHA-384 */
@@ -131,6 +157,11 @@ TEST( SHA2fixture, SHA384 )
 	char output[ 2 * SHA384_DIGEST_SIZE + 1 ];
 	output[ 2 * SHA384_DIGEST_SIZE ] = '\0';
 
+	unsigned char digest2[ SHA384_DIGEST_SIZE ];
+	sha384_ctx ctx;
+	char output2[ 2 * SHA384_DIGEST_SIZE + 1 ];
+	output2[ 2 * SHA384_DIGEST_SIZE ] = '\0';
+
 	sha384((const unsigned char *)message1, strlen( message1 ), digest );
 	for ( int i = 0; i < SHA384_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
@@ -148,6 +179,14 @@ TEST( SHA2fixture, SHA384 )
 	for ( int i = 0; i < SHA384_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	ASSERT_STREQ( output, testVectors[2] );
+
+	sha384_init( &ctx );
+	sha384_update( &ctx, message3, message3len / 2 );
+	sha384_update( &ctx, message3 + message3len / 2, message3len - message3len / 2 );
+	sha384_final( &ctx, digest2 );
+	for ( int i = 0; i < SHA384_DIGEST_SIZE; i++ )
+		sprintf( output2 + 2 * i, "%02x", digest2[i] );
+	ASSERT_STREQ( output, output2 );
 }
 
 /* SHA-512 */
@@ -166,6 +205,11 @@ TEST( SHA2fixture, SHA512 )
 	char output[ 2 * SHA512_DIGEST_SIZE + 1 ];
 	output[ 2 * SHA512_DIGEST_SIZE ] = '\0';
 
+	unsigned char digest2[ SHA512_DIGEST_SIZE ];
+	sha512_ctx ctx;
+	char output2[ 2 * SHA512_DIGEST_SIZE + 1 ];
+	output2[ 2 * SHA512_DIGEST_SIZE ] = '\0';
+
 	sha512((const unsigned char *)message1, strlen( message1 ), digest );
 	for ( int i = 0; i < SHA512_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
@@ -183,6 +227,14 @@ TEST( SHA2fixture, SHA512 )
 	for ( int i = 0; i < SHA512_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	ASSERT_STREQ( output, testVectors[2] );
+
+	sha512_init( &ctx );
+	sha512_update( &ctx, message3, message3len / 2 );
+	sha512_update( &ctx, message3 + message3len / 2, message3len - message3len / 2 );
+	sha512_final( &ctx, digest2 );
+	for ( int i = 0; i < SHA512_DIGEST_SIZE; i++ )
+		sprintf( output2 + 2 * i, "%02x", digest2[i] );
+	ASSERT_STREQ( output, output2 );
 }
 
 int main( int argc, char **argv )

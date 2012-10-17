@@ -18,15 +18,15 @@ namespace _Wolframe {
 	class NetworkFormLoader : public FormLoader
 	{
 		// intentionally omitting Q_OBJECT here, is done in FormLoader!
-		
+
 		public:
 			NetworkFormLoader( WolframeClient *_client );
-			virtual ~NetworkFormLoader( ) {};
+			virtual ~NetworkFormLoader( ) {}
 			virtual void initiateListLoad( );
 			virtual void initiateFormLoad( QString &name );
 			virtual void initiateFormLocalizationLoad( QString &name, QLocale locale );
 			virtual void initiateGetLanguageCodes( );
-		
+
 		private:
 			WolframeClient *m_wolframeClient;
 

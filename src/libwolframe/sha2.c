@@ -326,13 +326,13 @@ static void sha256_transf(sha256_ctx *ctx, const unsigned char *message,
 	}
 }
 
-void sha256(const unsigned char *message, unsigned int len, unsigned char *digest)
+void sha256( const unsigned char *message, unsigned int len, unsigned char *digest )
 {
 	sha256_ctx ctx;
 
-	sha256_init(&ctx);
-	sha256_update(&ctx, message, len);
-	sha256_final(&ctx, digest);
+	sha256_init( &ctx );
+	sha256_update( &ctx, message, len );
+	sha256_final( &ctx, digest );
 }
 
 void sha256_init(sha256_ctx *ctx)
@@ -522,8 +522,7 @@ static void sha512_transf(sha512_ctx *ctx, const unsigned char *message,
 	}
 }
 
-void sha512(const unsigned char *message, unsigned int len,
-	    unsigned char *digest)
+void sha512( const unsigned char *message, unsigned int len, unsigned char *digest )
 {
 	sha512_ctx ctx;
 
@@ -624,8 +623,7 @@ void sha512_final(sha512_ctx *ctx, unsigned char *digest)
 
 /* SHA-384 functions */
 
-void sha384(const unsigned char *message, unsigned int len,
-	    unsigned char *digest)
+void sha384( const unsigned char *message, unsigned int len, unsigned char *digest )
 {
 	sha384_ctx ctx;
 
@@ -724,8 +722,7 @@ void sha384_final(sha384_ctx *ctx, unsigned char *digest)
 
 /* SHA-224 functions */
 
-void sha224(const unsigned char *message, unsigned int len,
-	    unsigned char *digest)
+void sha224( const unsigned char *message, unsigned int len, unsigned char *digest )
 {
 	sha224_ctx ctx;
 

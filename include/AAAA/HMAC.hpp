@@ -56,7 +56,19 @@ public:
 		     const unsigned char* msg, size_t msgSize )
 					{ init( key, keySize, msg, msgSize ); }
 	HMAC_SHA256( const std::string& key, const std::string& message )
-					{ init( (const unsigned char*)key.data(), key.size(), (const unsigned char*)message.data(), message.size()); }
+					{ init( (const unsigned char*)key.data(), key.size(),
+						(const unsigned char*)message.data(), message.size()); }
+	HMAC_SHA256( const unsigned char* key, size_t keySize, const std::string& message )
+					{ init( key, keySize, (const unsigned char*)message.data(), message.size()); }
+	HMAC_SHA256( const std::string& key, const unsigned char* msg, size_t msgSize )
+					{ init( (const unsigned char*)key.data(), key.size(), msg, msgSize ); }
+
+	bool operator == ( const HMAC_SHA256& rhs ) const;
+	bool operator != ( const HMAC_SHA256& rhs ) const	{ return !( *this == rhs ); }
+
+	///\note The string is a BCD representation of the value
+	bool operator == ( const std::string& rhs ) const;
+	bool operator != ( const std::string& rhs ) const	{ return !( *this == rhs ); }
 
 	std::string toBCD() const;
 	std::string toBase64() const;
