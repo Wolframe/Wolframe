@@ -40,6 +40,7 @@ CPP_OBJS = \
 	typingfilter.o \
 	tostringfilter.o \
 	ptreefilter.o \
+	formLibrary.o \
 	normalizeProgram.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \

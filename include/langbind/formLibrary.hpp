@@ -30,47 +30,50 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for normalization programs
-///\file langbind/normalizeProgram.hpp
-#ifndef _LANGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED
-#define _LANGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+///\brief Interface for a form library
+///\file langbind/formLibrary.hpp
+#ifndef _LANGBIND_FORM_LIBRARY_HPP_INCLUDED
+#define _LANGBIND_FORM_LIBRARY_HPP_INCLUDED
+#include "langbind/formLibrary.hpp"
 #include "types/keymap.hpp"
-#include "module/normalizeFunctionBuilder.hpp"
+#include "ddl/compilerInterface.hpp"
+#include "ddl/structType.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace langbind {
 
-typedef boost::shared_ptr<module::NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
-
-class NormalizeProgram
-	:public types::keymap<NormalizeFunctionR>
+class FormLibrary
+	:public types::keymap<ddl::FormR>
 {
 public:
-	typedef types::keymap<NormalizeFunctionR> Parent;
+	typedef types::keymap<ddl::FormR> Parent;
 
-	NormalizeProgram(){}
-	NormalizeProgram( const NormalizeProgram& o)
-		:types::keymap<NormalizeFunctionR>(o)
+	FormLibrary(){}
+	FormLibrary( const FormLibrary& o)
+		:Parent(o)
 		,m_constructormap(o.m_constructormap){}
-	~NormalizeProgram(){}
+	~FormLibrary(){}
 
-	void addConstructor( const NormalizeFunctionConstructorR& c);
+	void setTypeMap( const ddl::TypeMapR& typemap_)
+	{
+		m_typemap = typemap_;
+	}
+	void addConstructor( const ddl::DDLCompilerR& constructor);
 
 	bool is_mine( const std::string& filename) const;
 	void addProgram( const std::string& source);
 	void loadProgram( const std::string& filename);
 
-	const NormalizeFunction* get( const std::string& name) const
+	const ddl::Form* get( const std::string& name) const
 	{
-		types::keymap<NormalizeFunctionR>::const_iterator rt = Parent::find( name);
+		Parent::const_iterator rt = Parent::find( name);
 		return (rt == Parent::end())?0:rt->second.get();
 	}
 
 private:
-	NormalizeFunction* createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg);
-	types::keymap<NormalizeFunctionConstructorR> m_constructormap;
+	types::keymap<ddl::DDLCompilerR> m_constructormap;
+	ddl::TypeMapR m_typemap;
 };
 
 }}

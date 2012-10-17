@@ -63,6 +63,10 @@ void NormalizeProgram::loadProgram( const std::string& filename)
 	{
 		throw config::PositionalErrorException( filename, e);
 	}
+	catch (const std::runtime_error& err)
+	{
+		throw std::runtime_error( std::string( "error in normalize program file '") + filename + "' :" + err.what());
+	}
 }
 
 NormalizeFunction* NormalizeProgram::createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg)

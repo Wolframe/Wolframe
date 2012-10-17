@@ -152,18 +152,10 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					throw std::logic_error( "Object is not a form function. See log." );
 				}
 				else	{
-					std::string name = ffo->programFileType();
-					boost::algorithm::to_upper( name);
-					std::map< std::string, ddl::DDLCompilerR >::const_iterator itr = m_ddlcompilerMap.find( name );
-					if ( itr != m_ddlcompilerMap.end() )	{
-						LOG_FATAL << "Duplicate DDL compiler name '" << name << "'";
-						throw std::runtime_error( "Duplicate DDL compiler name" );
-					}
-					m_ddlcompiler.push_back( ffo );
-					const ddl::DDLCompilerR cc( ffo->object());
-					m_ddlcompilerMap[ name ] = cc;
-
-					LOG_TRACE << "'" << name << "' DDL compiler registered";
+					ddl::DDLCompilerR constructor( ffo->object());
+					m_formlibrary.addConstructor( constructor);
+					delete ffo;
+					LOG_TRACE << "'" << constructor->ddlname() << "' DDL compiler registered";
 				}
 				break;
 			}
@@ -300,18 +292,25 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 							it != m_formfunction.end(); it++ )
 		delete *it;
 
-	for ( std::list< module::DDLCompilerConstructor* >::iterator it = m_ddlcompiler.begin();
-							it != m_ddlcompiler.end(); ++it )
-		delete *it;
-
-	for ( std::list< module::NormalizeFunctionConstructor* >::iterator it = m_normalizeFunctionCompiler.begin();
-							it != m_normalizeFunctionCompiler.end(); ++it )
-		delete *it;
-
 	for ( std::list< module::PrintFunctionConstructor* >::iterator it = m_printFunctionCompiler.begin();
 							it != m_printFunctionCompiler.end(); ++it )
 		delete *it;
 }
+
+class ProcessorProvider::ProcessorProvider_Impl::DDLTypeMap :public ddl::TypeMap
+{
+public:
+	explicit DDLTypeMap( const ProcessorProvider::ProcessorProvider_Impl* pp)
+		:m_provider( pp){}
+
+	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
+	{
+		return m_provider->normalizeFunction( name);
+	}
+
+private:
+	const ProcessorProvider::ProcessorProvider_Impl* m_provider;
+};
 
 bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 {
@@ -319,22 +318,20 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 	std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
 	for (; pi != pe; ++pi)
 	{
-		if (m_normprogram.is_mine( *pi))
-		{
-			m_normprogram.loadProgram( *pi);
-		}
+		if (m_normprogram.is_mine( *pi)) m_normprogram.loadProgram( *pi);
+	}
+	m_formtypemap.reset( new DDLTypeMap( this));
+	m_formlibrary.setTypeMap( m_formtypemap);
+
+	for(pi = m_programfiles.begin(); pi != pe; ++pi)
+	{
+		if (m_formlibrary.is_mine( *pi)) m_formlibrary.loadProgram( *pi);
 	}
 	for(pi = m_programfiles.begin(); pi != pe; ++pi)
 	{
 		std::string ext = utils::getFileExtension( *pi);
 		if (ext.empty()) throw std::runtime_error( "program file has no extension");
 		std::string key = boost::algorithm::to_upper_copy( std::string( ext.c_str() + 1));
-		std::map< std::string, ddl::DDLCompilerR >::const_iterator ci = m_ddlcompilerMap.find( key);
-		if (ci != m_ddlcompilerMap.end())
-		{
-			rt &= loadForm( ci->second.get(), *pi);
-			continue;
-		}
 		std::map< std::string, const module::PrintFunctionConstructor*>::const_iterator ri = m_printFunctionCompilerMap.find( key);
 		if (ri != m_printFunctionCompilerMap.end())
 		{
@@ -413,67 +410,9 @@ bool ProcessorProvider::ProcessorProvider_Impl::declareFunctionName( const std::
 	return true;
 }
 
-class ProcessorProvider::ProcessorProvider_Impl::DDLTypeMap :public ddl::TypeMap
-{
-public:
-	explicit DDLTypeMap( const ProcessorProvider::ProcessorProvider_Impl* pp)
-		:m_provider( pp){}
-
-	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
-	{
-		return m_provider->normalizeFunction( name);
-	}
-
-private:
-	const ProcessorProvider::ProcessorProvider_Impl* m_provider;
-};
-
-bool ProcessorProvider::ProcessorProvider_Impl::loadForm( const ddl::DDLCompiler* dc, const std::string& dataDefinitionFilename)
-{
-	try
-	{
-		DDLTypeMap typemap( this);
-		std::pair< std::string, ddl::FormR> def;
-		def.second.reset( new ddl::Form());
-		try
-		{
-			*def.second = dc->compile( utils::readSourceFileContent( dataDefinitionFilename), &typemap);
-		}
-		catch (const std::exception& e)
-		{
-			std::ostringstream msg;
-			msg << "could not compile data description file '" << dataDefinitionFilename << "': " << e.what() << std::endl;
-			throw std::runtime_error( msg.str());
-		}
-		if (def.second->doctype())
-		{
-			def.first = utils::getIdFromDoctype( def.second->doctype());
-		}
-		else
-		{
-			def.first = utils::getFileStem( dataDefinitionFilename);
-		}
-		std::string formkey = boost::algorithm::to_upper_copy( def.first);
-		m_formMap[ formkey] = def.second;
-
-		LOG_TRACE << "Form '" << def.first << "' in '" << utils::getFileStem( dataDefinitionFilename) << "' loaded";
-		return true;
-	}
-	catch (std::exception& e)
-	{
-		LOG_ERROR << e.what();
-		return false;
-	}
-}
-
 const ddl::Form* ProcessorProvider::ProcessorProvider_Impl::form( const std::string& name ) const
 {
-	std::string key = boost::algorithm::to_upper_copy( name);
-	std::map <std::string, ddl::FormR>::const_iterator itr = m_formMap.find( key);
-	if ( itr == m_formMap.end() )
-		return NULL;
-	else
-		return itr->second.get();
+	return m_formlibrary.get( name);
 }
 
 bool ProcessorProvider::ProcessorProvider_Impl::loadPrintProgram( const module::PrintFunctionConstructor* pc, const std::string& layoutFilename)

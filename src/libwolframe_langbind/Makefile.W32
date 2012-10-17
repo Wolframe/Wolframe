@@ -32,6 +32,7 @@ CPP_OBJS = \
 	ptreefilter.obj \
 	typingfilter.obj \
 	null_filter.obj \
+	formLibrary.obj \
 	normalizeProgram.obj \
 	cmdbind_lineCommandHandler.obj \
 	cmdbind_execCommandHandler.obj \

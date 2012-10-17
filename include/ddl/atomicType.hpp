@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_DDL_ATOMICTYPE_HPP_INCLUDED
 #define _Wolframe_DDL_ATOMICTYPE_HPP_INCLUDED
+#include "types/countedReference.hpp"
 #include <string>
 #include <stdexcept>
 #include <cstddef>
@@ -61,6 +62,9 @@ struct TypeMap
 	virtual ~TypeMap(){}
 	virtual const NormalizeFunction* getType( const std::string& name) const=0;
 };
+
+typedef types::CountedReference<TypeMap> TypeMapR;
+
 
 ///\class AtomicType
 ///\brief atomic type for DDL language binding

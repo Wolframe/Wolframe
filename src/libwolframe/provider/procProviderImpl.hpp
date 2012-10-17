@@ -49,7 +49,7 @@
 #include "cmdbind/commandHandlerUnit.hpp"
 #include "langbind/normalizeProgram.hpp"
 #include "database/transactionProgram.hpp"
-
+#include "langbind/formLibrary.hpp"
 #include <list>
 #include <map>
 
@@ -80,10 +80,8 @@ public:
 
 private:
 	class DDLTypeMap;
-	bool loadForm( const ddl::DDLCompiler*, const std::string& dataDefinitionFilename);
 	bool loadPrintProgram( const module::PrintFunctionConstructor* pc, const std::string& layoutFilename);
 	bool declareFunctionName( const std::string& name, const char* typestr);
-
 	bool loadPrograms();
 
 private:
@@ -99,14 +97,6 @@ private:
 	std::list< module::FormFunctionConstructor* >	m_formfunction;
 	std::map< std::string, const module::FormFunctionConstructor* >	m_formfunctionMap;
 
-	std::list< module::DDLCompilerConstructor* >	m_ddlcompiler;
-	std::map< std::string, ddl::DDLCompilerR >	m_ddlcompilerMap;
-	std::map< std::string, ddl::FormR>	m_formMap;
-
-	std::list< module::NormalizeFunctionConstructor* >	m_normalizeFunctionCompiler;
-	std::map< std::string, const module::NormalizeFunctionConstructor* >	m_normalizeFunctionCompilerMap;
-	std::map< std::string, langbind::NormalizeFunctionR>	m_normalizeFunctionMap;
-
 	std::list< module::PrintFunctionConstructor* >	m_printFunctionCompiler;
 	std::map< std::string, const module::PrintFunctionConstructor* >	m_printFunctionCompilerMap;
 	std::map< std::string, prnt::PrintFunctionR>	m_printFunctionMap;
@@ -115,6 +105,8 @@ private:
 	std::list< std::string >	m_programfiles;
 	db::TransactionProgram m_dbprogram;
 	langbind::NormalizeProgram m_normprogram;
+	ddl::TypeMapR m_formtypemap;
+	langbind::FormLibrary m_formlibrary;
 };
 
 }} // namespace _Wolframe::proc

@@ -179,8 +179,8 @@ static struct {const char* name; LocaleConv func;} g_functions[] =
 	//Compatibility decomposition followed by canonical composition.
 	{"nfkc", &CompositionNormalizer<boost::locale::norm_nfkc>::localeConv},
 	{"latinword", &Tokenize::latinWord},
-	{"ascii_de", &GermanAsciiNormalizer::latinWord},
-	{"ascii_eu", &EuropeanAsciiNormalizer::latinWord},
+	{"ascii_de", &GermanAsciiNormalizer::localeConv},
+	{"ascii_eu", &EuropeanAsciiNormalizer::localeConv},
 	{0,0}
 };
 
@@ -194,7 +194,7 @@ NormalizeFunction* _Wolframe::langbind::createLocaleNormalizeFunction( ResourceH
 	{
 		if (name == g_functions[ii].name)
 		{
-			return new LocaleConvNormalizeFunction( reshnd, lc, g_functions[ii].func);
+			return new LocaleConvNormalizeFunction( reshnd, arg, g_functions[ii].func);
 		}
 	}
 	return 0;
