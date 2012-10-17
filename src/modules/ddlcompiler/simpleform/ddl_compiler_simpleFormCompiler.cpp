@@ -35,7 +35,6 @@ Project Wolframe.
 #include "ddl/compiler/simpleFormCompiler.hpp"
 #include <string>
 #include <vector>
-#include <map>
 #include <cstring>
 #include <cstddef>
 #include <boost/lexical_cast.hpp>

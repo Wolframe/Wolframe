@@ -23,6 +23,6 @@ testdata="
 **file: DBDATA
 `cat program/schema_select_task_by_id.sql`
 **file:DBPRG.tdl
-`cat program/schema_select_task_by_id.prg`
+`cat program/schema_select_task_by_id.tdl`
 **outputfile:DBDUMP"
 . ./output_tst_all.sh

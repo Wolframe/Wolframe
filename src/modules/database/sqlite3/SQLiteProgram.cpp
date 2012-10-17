@@ -77,7 +77,7 @@ void SQLiteProgram::load( const std::string& source)
 				throw ERROR( si, MSG << "unexpected token '" << ch << "'");
 			}
 			std::string stmkey = boost::to_lower_copy( stmname);
-			std::string::const_iterator stmstart;
+			std::string::const_iterator stmstart = si;
 			while (utils::parseNextToken( stmname, si, se, g_optab) != ';');
 			std::string stm( stmstart, si - 1);
 

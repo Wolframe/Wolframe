@@ -35,6 +35,7 @@
 #ifndef _DATABASE_TRANSACTION_PROGRAM_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_PROGRAM_HPP_INCLUDED
 #include "types/countedReference.hpp"
+#include "types/keymap.hpp"
 #include "database/transactionFunction.hpp"
 #include <string>
 #include <map>
@@ -85,7 +86,7 @@ public:
 	const TransactionFunction* function( const std::string& name) const;
 
 private:
-	std::map<std::string, TransactionFunctionR> m_functionmap;
+	types::keymap<TransactionFunctionR> m_functionmap;
 	std::string m_commentopr;
 };
 

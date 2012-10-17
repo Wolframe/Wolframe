@@ -42,7 +42,8 @@ using namespace _Wolframe::db;
 
 static bool isLineStart( std::string::const_iterator si, const std::string& src)
 {
-	for (; si >= src.begin() && *si <= ' ' && *si > '\0'; --si)
+	if (si == src.begin()) return true;
+	for (--si; si >= src.begin() && *si <= ' ' && *si > '\0'; --si)
 	{
 		if (*si == '\n') return true;
 	}
@@ -51,7 +52,8 @@ static bool isLineStart( std::string::const_iterator si, const std::string& src)
 
 static std::string::const_iterator lineStart( std::string::const_iterator si, const std::string& src)
 {
-	for (; si >= src.begin() && *si <= ' ' && *si > '\0'; --si)
+	if (si == src.begin()) return si;
+	for (--si; si >= src.begin() && *si <= ' ' && *si > '\0'; --si)
 	{
 		if (*si == '\n') return --si;
 	}
@@ -260,6 +262,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 	{
 		throw ERROR( si, e.what());
 	}
+	dbsource.append( std::string( dbi, source.end()));
 
 	std::vector<std::vector< TransactionDescription> >::const_iterator di = tdar.begin(), de = tdar.end();
 	std::vector<std::string>::const_iterator ni = tdnamear.begin();
@@ -269,8 +272,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 	{
 		try
 		{
-			std::string name = boost::algorithm::to_lower_copy( *ni);
-			m_functionmap[ name] = TransactionFunctionR( createTransactionFunction( *ni, *di));
+			m_functionmap[ *ni] = TransactionFunctionR( createTransactionFunction( *ni, *di));
 		}
 		catch (const TransactionDescription::Error& err)
 		{
@@ -298,8 +300,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 
 const TransactionFunction* TransactionProgram::function( const std::string& name) const
 {
-	std::string key = boost::algorithm::to_lower_copy( name);
-	std::map<std::string, TransactionFunctionR>::const_iterator fi = m_functionmap.find( key);
+	types::keymap<TransactionFunctionR>::const_iterator fi = m_functionmap.find( name);
 	if (fi == m_functionmap.end()) return 0;
 	return fi->second.get();
 }

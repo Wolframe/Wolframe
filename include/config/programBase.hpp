@@ -77,32 +77,29 @@ public:
 	PositionalErrorMessageBase( const std::string& source)
 		:m_start( source.begin()){}
 
-	template <typename MessageObject>
-	typename boost::enable_if_c<
-		boost::is_convertible<MessageObject,std::string>::value
-		,PositionalErrorException>::type
-	operator()( const std::string::const_iterator& pos_, const MessageObject& msgobj)
-	{
-		return PositionalErrorException( LineInfo( m_start, pos_), std::string(msgobj));
-	}
-
-	template <typename MessageObject>
-	typename boost::enable_if_c<
-		!boost::is_convertible<MessageObject,std::string>::value
-		,PositionalErrorException>::type
-	operator()( const std::string::const_iterator& pos_, const MessageObject& msgobj)
-	{
-		return PositionalErrorException( LineInfo( m_start, pos_), boost::lexical_cast<std::string>(msgobj));
-	}
-
-	struct Message :public std::ostringstream
+	struct Message :public std::string
 	{
 		Message(){}
-		operator std::string()
+		Message& operator << (const std::string& arg)
 		{
-			return std::ostringstream::str();
+			append( arg);
+			return *this;
+		}
+		template <typename T>
+		typename boost::enable_if_c<
+			boost::is_arithmetic<T>::value
+			,Message&>::type operator << (const T& arg)
+		{
+			append( boost::lexical_cast<std::string>( arg));
+			return *this;
 		}
 	};
+
+	PositionalErrorException operator()( const std::string::const_iterator& pos_, const std::string& msgobj) const
+	{
+		return PositionalErrorException( LineInfo( m_start, pos_), msgobj);
+	}
+
 private:
 	std::string::const_iterator m_start;
 };
