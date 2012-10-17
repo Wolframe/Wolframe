@@ -330,7 +330,7 @@ void WolframeClient::hello( )
 	sendCommand( "hello" );
 }
 
-void WolframeClient::run( QString cmd )
+void WolframeClient::run( QString cmd, QString data )
 {
 	sendCommand( "run " + cmd );
 }

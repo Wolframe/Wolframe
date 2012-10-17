@@ -65,7 +65,7 @@ namespace _Wolframe {
 
 // high-level commands
 		void hello( );
-		void run( QString cmd );
+		void run( QString cmd, QString data = 0 );
 
 // synchonous commands
 		bool syncConnect( );
