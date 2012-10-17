@@ -30,49 +30,44 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for a form library
-///\file langbind/formLibrary.hpp
-#ifndef _LANGBIND_FORM_LIBRARY_HPP_INCLUDED
-#define _LANGBIND_FORM_LIBRARY_HPP_INCLUDED
-#include "langbind/formLibrary.hpp"
+///\brief Interface for programs for printing
+///\file langbind/printProgram.hpp
+#ifndef _LANGBIND_PRINT_PROGRAM_HPP_INCLUDED
+#define _LANGBIND_PRINT_PROGRAM_HPP_INCLUDED
 #include "types/keymap.hpp"
-#include "ddl/compilerInterface.hpp"
-#include "ddl/structType.hpp"
+#include "module/printFunctionBuilder.hpp"
 #include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace langbind {
 
-class FormLibrary
-	:public types::keymap<ddl::FormR>
+typedef boost::shared_ptr<module::PrintFunctionConstructor> PrintFunctionConstructorR;
+
+class PrintProgram
+	:public types::keymap<prnt::PrintFunctionR>
 {
 public:
-	typedef types::keymap<ddl::FormR> Parent;
+	typedef types::keymap<prnt::PrintFunctionR> Parent;
 
-	FormLibrary(){}
-	FormLibrary( const FormLibrary& o)
-		:Parent(o)
+	PrintProgram(){}
+	PrintProgram( const PrintProgram& o)
+		:types::keymap<prnt::PrintFunctionR>(o)
 		,m_constructormap(o.m_constructormap){}
-	~FormLibrary(){}
+	~PrintProgram(){}
 
-	void setTypeMap( const ddl::TypeMapR& typemap_)
-	{
-		m_typemap = typemap_;
-	}
-	void addConstructor( const ddl::DDLCompilerR& constructor);
+	void addConstructor( const PrintFunctionConstructorR& c);
 
 	bool is_mine( const std::string& filename) const;
 	void loadProgram( const std::string& filename);
 
-	const ddl::Form* get( const std::string& name) const
+	const prnt::PrintFunction* get( const std::string& name) const
 	{
-		Parent::const_iterator rt = Parent::find( name);
+		types::keymap<prnt::PrintFunctionR>::const_iterator rt = Parent::find( name);
 		return (rt == Parent::end())?0:rt->second.get();
 	}
 
 private:
-	types::keymap<ddl::DDLCompilerR> m_constructormap;
-	ddl::TypeMapR m_typemap;
+	types::keymap<PrintFunctionConstructorR> m_constructormap;
 };
 
 }}
