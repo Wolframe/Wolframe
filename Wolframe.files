@@ -66,6 +66,7 @@ makefiles/nmake/top.mk
 .Attic/mtproc/propertyTree.cpp
 .Attic/mtproc/propertyTree.hpp
 .Attic/printers.c
+.Attic/printMemory.c
 .Attic/rijndael.c
 .Attic/SSLtest.c
 .Attic/streamIterator.hpp
@@ -135,6 +136,8 @@ clients/qt/NetworkFormLoader.hpp
 clients/qt/qcommandline.cpp
 clients/qt/qcommandline.h
 clients/qt/qtclient.cpp
+clients/qt/qxtsignalwaiter.cpp
+clients/qt/qxtsignalwaiter.h
 clients/qt/README
 clients/qt/TODOS
 clients/qt/WolframeClient.cpp
@@ -1715,4 +1718,3 @@ zlib/zconf.h
 zlib/zlib.h
 zlib/zutil.c
 zlib/zutil.h
-.Attic/printMemory.c
