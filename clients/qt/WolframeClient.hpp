@@ -70,7 +70,7 @@ namespace _Wolframe {
 // synchonous commands
 		bool syncConnect( );
 		bool syncHello( );
-		QString syncRun( QString cmd );
+		QString syncRun( QString cmd, QString data = 0 );
 		
 		Q_PROPERTY( QString m_host READ host WRITE setHost )
 		QString host( ) const { return m_host; }

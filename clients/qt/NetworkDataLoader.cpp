@@ -10,37 +10,39 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-NetworkDataLoader::NetworkDataLoader( WolframeClient *_client )
-	: m_client( _client )
+NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient )
+	: m_wolframeClient( _wolframeClient )
 {
 }
 
 void NetworkDataLoader::initiateDataLoad( QString name )
 {
-//~ // read directly here and stuff data into the signal
-	//~ QFile file( m_dir + "/" + name + ".xml" );
-	//~ file.open( QFile::ReadOnly );
-	//~ QByteArray data = file.readAll( );
-	//~ file.close( );	
-	//~ emit dataLoaded( name, data );
+	QString s = m_wolframeClient->syncRun( "getData " + name );
+	if( s.isNull( ) ) {
+		qWarning( ) << "Trouble loading form data for form" << name;
+	} else {
+		emit dataLoaded( name, s.toUtf8( ) );
+	}
 }
 
 void NetworkDataLoader::initiateDataSave( QString name, QByteArray data )
 {
-	//~ QFile file( m_dir + "/" + name + ".xml" );
-	//~ file.open( QFile::WriteOnly );
-	//~ file.write( data );
-	//~ file.close( );
-	//~ emit dataSaved( name );
+	QString s = m_wolframeClient->syncRun( "saveData " + name, QString( data ) );
+	if( s.isNull( ) ) {
+		qWarning( ) << "Trouble saving form data for form" << name;
+	} else {
+		emit dataSaved( name );
+	}
 }
 
 void NetworkDataLoader::initiateDomainDataLoad( QString form_name, QString widget_name )
 {
-	//~ QFile file( m_dir + "/domain_" + form_name + "_" + widget_name + ".xml" );
-	//~ file.open( QFile::ReadOnly );
-	//~ QByteArray data = file.readAll( );
-	//~ file.close( );
-	//~ emit domainDataLoaded( form_name, widget_name, data );
+	QString s = m_wolframeClient->syncRun( "getDomain " + form_name + " " + widget_name );
+	if( s.isNull( ) ) {
+		qWarning( ) << "Trouble loading domain data for form" << form_name << "and widget" << widget_name;
+	} else {
+		emit domainDataLoaded( form_name, widget_name, s.toUtf8( ) );
+	}
 }
 
 } // namespace QtClient

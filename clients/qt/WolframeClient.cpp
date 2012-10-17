@@ -363,9 +363,10 @@ bool WolframeClient::syncHello( )
 	return( QxtSignalWaiter::wait( this, SIGNAL( helloReceived( ) ), m_timeout ) );
 }
 
-QString WolframeClient::syncRun( QString cmd )
+QString WolframeClient::syncRun( QString cmd, QString data )
 {
 	run( cmd );
+	// TODO: send data now
 	if( QxtSignalWaiter::wait( this, SIGNAL( runReceived( QString, QString ) ), SIGNAL( error( QString ) ), m_timeout ) ) {
 		if( m_hasErrors ) return 0;
 		return m_answer;

@@ -21,26 +21,37 @@ void NetworkFormLoader::initiateListLoad( )
 {
 	QStringList forms;
 
+	QString s = m_wolframeClient->syncRun( "getForms" );
+	if( s.isNull( ) ) {
+		qWarning( ) << "Trouble getting list of forms";
+	} else {
+		QStringList lines = s.split( "\n", QString::SkipEmptyParts );
+		forms.append( lines );
+		forms.removeDuplicates( );
+	}
+
 	emit formListLoaded( forms );
-	
-//~ // read list of forms directory on demand
-	//~ QDir formsDir( QLatin1String( "forms" ) );
-	//~ QStringList forms = formsDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
-		//~ .replaceInStrings( ".ui", "" );
 }
 
 void NetworkFormLoader::initiateFormLocalizationLoad( QString &name, QLocale locale )
 {
-	//~ QByteArray localization = readFile( m_localeDir + "/" + name + "." + locale.name( ) + ".qm" );
-	//~ 
-	//~ emit formLocalizationLoaded( name, localization );
+	QString s = m_wolframeClient->syncRun( "getFormLocalization " + name + " " + locale.name( ) );
+	if( s.isNull( ) ) {
+		qWarning( ) << "Trouble loading localization for form" << name << "and locale" << locale;
+	} else {
+		// TODO: encoding of binary data? or transfered binary?
+		emit formLocalizationLoaded( name, s.toUtf8( ) );
+	}
 }
 
 void NetworkFormLoader::initiateFormLoad( QString &name )
 {
 	QString s = m_wolframeClient->syncRun( "getForm " + name );
-	
-	emit formLoaded( name, s.toUtf8( ) );
+	if( s.isNull( ) ) {
+		qWarning( ) << "Trouble loading form" << name;
+	} else {
+		emit formLoaded( name, s.toUtf8( ) );
+	}
 }
 
 void NetworkFormLoader::initiateGetLanguageCodes( )
@@ -55,7 +66,6 @@ void NetworkFormLoader::initiateGetLanguageCodes( )
 		QStringList lines = s.split( "\n", QString::SkipEmptyParts );
 		languageCodes.append( lines );
 		languageCodes.removeDuplicates( );
-		qDebug( ) << s << ": " << lines << ": " << languageCodes;
 	}
 	
 	emit languageCodesLoaded( languageCodes );

@@ -62,7 +62,7 @@ run:
 	@./wolfcli 127.0.0.1 7661
 
 runssl:
-	@./wolfcli -S --CA-cert-file=certs/CA.cert.pem \
+	@./wolfcli -S --CA-cert-file=certs/CAclient.cert.pem \
 		--client-cert-file=certs/client.crt \
 		--client-cert-key=private/client.key \
 		127.0.0.1 7961

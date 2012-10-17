@@ -16,7 +16,7 @@ namespace _Wolframe {
 		// intentionally omitting Q_OBJECT here, is done in DataLoader!
 		
 		public:
-			NetworkDataLoader( WolframeClient *_client );
+			NetworkDataLoader( WolframeClient *_wolframeClient );
 			virtual ~NetworkDataLoader( ) {};
 
 			virtual void initiateDataLoad( QString form_name );
@@ -24,7 +24,7 @@ namespace _Wolframe {
 			virtual void initiateDomainDataLoad( QString form_name, QString widget_name );
 		
 		private:
-			WolframeClient *m_client;
+			WolframeClient *m_wolframeClient;
 	};
 } // namespace QtClient
 } // namespace _Wolframe
