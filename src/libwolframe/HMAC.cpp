@@ -119,7 +119,7 @@ bool HMAC_SHA256::operator == ( const std::string& rhs ) const
 {
 	unsigned char	buffer[ HMAC_DIGEST_SIZE ];
 
-	if ( hex2byte( rhs.data(), buffer, HMAC_DIGEST_SIZE ) != HMAC_DIGEST_SIZE )
+	if ( hex2byte( rhs.data(), buffer, HMAC_DIGEST_SIZE ) != (int)HMAC_DIGEST_SIZE )
 		return false;
 	return !memcmp( this->m_HMAC, buffer, HMAC_DIGEST_SIZE );
 }
