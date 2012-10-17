@@ -35,7 +35,6 @@
 #include "wolfilterCommandLine.hpp"
 #include "langbind/appObjects.hpp"
 #include "database/DBprovider.hpp"
-#include "langbind/appConfig_struct.hpp"
 #include "langbind/scriptConfig_struct.hpp"
 #include "langbind/directmapConfig_option.hpp"
 #include "filter/ptreefilter.hpp"
@@ -80,7 +79,6 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 	boost::property_tree::ptree proccfg;
 	try
 	{
-		boost::property_tree::ptree envcfg = m_envconfig.toPropertyTree();
 		if (!m_dbconfig.empty())
 		{
 			std::string dbLabel = m_dbconfig.get<std::string>( "identifier");
@@ -89,10 +87,6 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 				throw std::runtime_error( "database configuration without 'identifier' field");
 			}
 			proccfg.add_child( "database", boost::property_tree::ptree( dbLabel));
-		}
-		if (!envcfg.empty())
-		{
-			proccfg.add_child( "environment", envcfg);
 		}
 		std::vector<std::pair<std::string,std::string> >
 			cmdhl = m_modulesDirectory.getConfigurableSectionKeywords( ObjectConstructorBase::CMD_HANDLER_OBJECT);
@@ -140,7 +134,6 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			cmdhlcfg.add_child( mi->first, scfg.toPropertyTree());
 			proccfg.add_child( "cmdhandler", cmdhlcfg);
 		}
-
 		if (!m_directmapconfig.command.empty())
 		{
 			std::pair<std::string,std::string> cfgid;
@@ -206,7 +199,6 @@ struct OptionStruct
 			( "program,p", po::value< std::vector<std::string> >(), "specify program to load by path" )
 			( "directmap,d", po::value< std::vector<std::string> >(), "specify directmap definition" )
 			( "database,D", po::value<std::string>(), "specifiy transaction database" )
-			( "normalize,N", po::value< std::vector<std::string> >(), "specify normalization function" )
 			( "cmd", po::value<std::string>(), "name of the command to execute")
 			;
 
@@ -252,15 +244,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	if (vmap.count( "program"))
 	{
 		m_programs = vmap["program"].as<std::vector<std::string> >();
-	}
-	if (vmap.count( "normalize"))
-	{
-		std::vector<std::string> normalizers = vmap["normalize"].as<std::vector<std::string> >();
-		std::vector<std::string>::const_iterator itr=normalizers.begin(), end=normalizers.end();
-		for (; itr != end; ++itr)
-		{
-			m_envconfig.normalize.push_back( langbind::NormalizeFunctionOption( *itr));
-		}
 	}
 	if (vmap.count( "directmap"))
 	{

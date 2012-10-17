@@ -56,7 +56,17 @@
 <country>Switzerland</country>
 </address>
 </invoice>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//locale/mod_normalize_locale --module ../../src/modules/normalize//number/mod_normalize_number --normalize 'int number integer(10)' --normalize 'f_int number trim integer(10)' --normalize 'uint number unsigned(10)' --normalize 'f_uint number trim unsigned(10)' --normalize 'float number float(10,10)' --normalize 'f_float number trim float(10,10)' --normalize 'text_ascii_de localeconv latinword,ascii_de' --normalize 'text_ascii_eu localeconv latinword,ascii_eu' --program typed_invoice.simpleform typed_invoice
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//locale/mod_normalize_locale --module ../../src/modules/normalize//number/mod_normalize_number --program simpleform_complex.normalize --program typed_invoice.simpleform typed_invoice
+
+**file:simpleform_complex.normalize
+int= number: integEr( 10 );
+f_int= number :trim  ,numbeR:integer( 10);
+uint =number:uNsigned(10 );
+f_uint =number:trim, number:unsiGned( 10) ;
+float = number:float(12,12);
+f_floAt = number:trim ,Number:float(12,12);
+text_Ascii_de =  localeConv :latinword, ascii_de
+text_ascii_eu=localeconv :  latinword ,ascii_eu ;
 **file: typed_invoice.simpleform
 !DOCTYPE "invoice 'http://www.wolframe.org/example-doc/typed_invoice.dtd'"
 invoice

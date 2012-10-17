@@ -45,7 +45,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-static utils::CharTable opTab( "(,)");
+static utils::CharTable opTab( ",");
 static utils::CharTable numTab( "0123456789");
 
 static std::size_t parseNumber( std::string::const_iterator& ii, const std::string::const_iterator ee)
@@ -53,7 +53,7 @@ static std::size_t parseNumber( std::string::const_iterator& ii, const std::stri
 	std::string tok;
 	char ch = utils::parseNextToken( tok, ii, ee, opTab, numTab);
 	if (ch == '\0') throw std::runtime_error( "unexpected end of dimension description");
-	if (ch == ',' || ch == ')' || ch == '(') throw std::runtime_error( "syntax error in dimension description");
+	if (ch == ',') throw std::runtime_error( "syntax error in dimension description");
 	return boost::lexical_cast<std::size_t>( tok);
 }
 
@@ -62,18 +62,12 @@ static std::pair<std::size_t,std::size_t> parseDimension2Description( std::strin
 	std::string tok;
 	std::size_t gsize=0,fsize=0;
 	char ch;
-	ch = utils::parseNextToken( tok, ii, ee, opTab, numTab);
-	if (ch == '\0') return std::pair<std::size_t,std::size_t>( 0, 0);
-	if (ch != '(') throw std::runtime_error( "syntax error in dimension description");
 	gsize = parseNumber( ii, ee);
 	ch = utils::parseNextToken( tok, ii, ee, opTab, numTab);
-	if (ch == ')') return std::pair<std::size_t,std::size_t>( 0, gsize);
-	if (ch == '\0') throw std::runtime_error( "unexpected end in dimension description");
+	if (ch == '\0') return std::pair<std::size_t,std::size_t>( 0, gsize);
 	if (ch != ',') throw std::runtime_error( "syntax error in dimension description");
 	fsize = parseNumber( ii, ee);
-	ch = utils::parseNextToken( tok, ii, ee, opTab, numTab);
-	if (ch == '\0') throw std::runtime_error( "unexpected end in dimension description");
-	if (ch != ')') throw std::runtime_error( "expected ')' at end of dimension description");
+	if (utils::gotoNextToken( ii, ee)) throw std::runtime_error( "unexpected token at end of dimension description");
 	return std::pair<std::size_t,std::size_t>( gsize, fsize);
 }
 
@@ -81,70 +75,55 @@ static std::size_t parseDimension1Description( std::string::const_iterator& ii, 
 {
 	std::string tok;
 	std::size_t size=0;
-	char ch;
-	ch = utils::parseNextToken( tok, ii, ee, opTab, numTab);
-	if (ch == '\0') return 0;
-	if (ch != '(') throw std::runtime_error( "syntax error in dimension description");
 	size = parseNumber( ii, ee);
-	ch = utils::parseNextToken( tok, ii, ee, opTab, numTab);
-	if (ch != ')') throw std::runtime_error( "syntax error in dimension description");
+	if (utils::gotoNextToken( ii, ee)) throw std::runtime_error( "unexpected token at end of dimension description");
 	return size;
 }
 
 static std::pair<std::size_t,std::size_t> parseFloatDescription( std::string::const_iterator& ii, const std::string::const_iterator ee)
 {
 	std::pair<std::size_t,std::size_t> rt = parseDimension2Description( ii, ee);
-	if (utils::gotoNextToken( ii, ee))
-	{
-		throw std::runtime_error( "unexpected token after dimension description");
-	}
 	return rt;
 }
 
 static std::size_t parseIntegerDescription( std::string::const_iterator& ii, const std::string::const_iterator ee)
 {
 	std::size_t rt = parseDimension1Description( ii, ee);
-	if (utils::gotoNextToken( ii, ee))
-	{
-		throw std::runtime_error( "unexpected token after dimension description");
-	}
 	return rt;
 }
 
-NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( ResourceHandle&, const std::string& description)
+NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( ResourceHandle&, const std::string& name, const std::string& arg)
 {
 	try
 	{
-		bool doTrim = false;
-		std::string type;
-		std::string::const_iterator ii = description.begin(), ee = description.end();
-		char ch = utils::parseNextToken( type, ii, ee, opTab);
-		if (opTab[ch]) throw std::runtime_error( "type identifier expected");
+		std::string::const_iterator ii = arg.begin(), ee = arg.end();
+		std::string type = boost::algorithm::to_lower_copy( name);
 		if (boost::algorithm::iequals( type, "trim"))
 		{
-			doTrim = true;
-			ch = utils::parseNextToken( type, ii, ee, opTab);
-			if (ch == '\0') return new TrimNormalizeFunction();
-			if (opTab[ch]) throw std::runtime_error( "type identifier expected");
+			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
+			return new TrimNormalizeFunction();
 		}
 		if (boost::algorithm::iequals( type, "integer"))
 		{
-			std::size_t dim = parseIntegerDescription( ii, ee);
-			return new IntegerNormalizeFunction( true, dim, doTrim);
+			std::size_t dim = std::numeric_limits<std::size_t>::max();
+			if (utils::gotoNextToken( ii, ee)) dim = parseIntegerDescription( ii, ee);
+			return new IntegerNormalizeFunction( true, dim);
 		}
 		else if (boost::algorithm::iequals( type, "unsigned"))
 		{
-			std::size_t dim = parseIntegerDescription( ii, ee);
-			return new IntegerNormalizeFunction( false, dim, doTrim);
+			std::size_t dim = std::numeric_limits<std::size_t>::max();
+			if (utils::gotoNextToken( ii, ee)) dim = parseIntegerDescription( ii, ee);
+			return new IntegerNormalizeFunction( false, dim);
 		}
 		else if (boost::algorithm::iequals( type, "float"))
 		{
-			std::pair<std::size_t,std::size_t> dim = parseFloatDescription( ii, ee);
-			return new FloatNormalizeFunction( dim.first, dim.second, doTrim);
+			std::pair<std::size_t,std::size_t> dim( std::numeric_limits<std::size_t>::max(), std::numeric_limits<std::size_t>::max());
+			if (utils::gotoNextToken( ii, ee)) dim = parseFloatDescription( ii, ee);
+			return new FloatNormalizeFunction( dim.first, dim.second);
 		}
 		else
 		{
-			throw std::runtime_error( std::string( "unknown number type '") + type + "'");
+			throw std::runtime_error( std::string( "unknown number type '") + name + "'");
 		}
 	}
 	catch (const std::runtime_error& e)
@@ -153,4 +132,20 @@ NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( ResourceH
 	}
 }
 
+
+const std::vector<std::string>& _Wolframe::langbind::normalizeFunctions()
+{
+	struct NormalizeFunctions :public std::vector<std::string>
+	{
+		NormalizeFunctions()
+		{
+			push_back( "trim");
+			push_back( "integer");
+			push_back( "unsigned");
+			push_back( "float");
+		}
+	};
+	static NormalizeFunctions rt;
+	return rt;
+}
 

@@ -54,7 +54,7 @@ struct NormalizeProcessor
 
 	static SimpleBuilder* constructor()
 	{
-		return new NormalizeFunctionBuilder( "localeconv", langbind::createLocaleNormalizeFunction, &localeResource);
+		return new NormalizeFunctionBuilder( "BoostLocaleNormalizer", "localeconv", langbind::normalizeFunctions, langbind::createLocaleNormalizeFunction, &localeResource);
 	}
 };
 }//anonymous namespace

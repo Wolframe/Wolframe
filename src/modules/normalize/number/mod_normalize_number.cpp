@@ -54,7 +54,7 @@ struct NormalizeProcessor
 
 	static SimpleBuilder* constructor()
 	{
-		return new NormalizeFunctionBuilder( "number", langbind::createNumberNormalizeFunction, &numberResource);
+		return new NormalizeFunctionBuilder( "NumberNormalizer", "number", langbind::normalizeFunctions, langbind::createNumberNormalizeFunction, &numberResource);
 	}
 };
 }//anonymous namespace

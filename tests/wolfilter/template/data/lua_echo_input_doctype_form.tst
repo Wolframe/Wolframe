@@ -10,12 +10,14 @@ opt="$opt --module $mod"
 modpath="../../src/modules/normalize/"			# module directory for normalizers relative from tests/temp
 mod="$modpath/number/mod_normalize_number"		# module to load
 opt="$opt --module $mod"
-opt="$opt --normalize 'int number integer(10)'"		# default form datatype for singed integer number
-opt="$opt --normalize 'uint number unsigned(10)'"	# default form datatype for unsinged integer number
-opt="$opt --normalize 'float number float(10,10)'"	# default form datatype for floating point number
+ddltypeprg="simpleform_range.normalize"
+opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 opt="$opt --program $formname"
 opt="$opt --program $luascript"
 testcmd="$opt run"					# command to execute by the test
 docin=employee_assignment_doctype			# input document name
 docout=$testname					# output document name
+testdata="
+**file:$ddltypeprg
+`cat program/$ddltypeprg`"
 . ./output_tst_all.sh

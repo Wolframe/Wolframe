@@ -36,9 +36,7 @@
 
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED
-
 #include "database/transaction.hpp"
-#include "program.hpp"
 #include <string>
 
 namespace _Wolframe {

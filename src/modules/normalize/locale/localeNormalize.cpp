@@ -141,77 +141,11 @@ struct Tokenize
 	}
 };
 
-static std::vector<LocaleConv> parseFunc( const std::string& description)
-{
-	std::vector<LocaleConv> rt;
-	std::string tok;
-	utils::CharTable opTab( ",");
-	std::string::const_iterator ii = description.begin(), ee = description.end();
-	while (ii != ee)
-	{
-		char ch = utils::parseNextToken( tok, ii, ee, opTab);
-		if (ch == '\0') break;
-		if (ch == ',') throw std::runtime_error( "syntax error in normalize function description: unexpected ','");
-		std::string name = boost::algorithm::to_lower_copy( tok);
-
-		if (name == "toupper")
-		{
-			rt.push_back( &boost::locale::to_upper);
-		}
-		else if (name == "tolower")
-		{
-			rt.push_back( &boost::locale::to_lower);
-		}
-		else if (name == "totitle")
-		{
-			rt.push_back( &boost::locale::to_title);
-		}
-		else if (name == "foldcase")
-		{
-			rt.push_back( &boost::locale::fold_case);
-		}
-		else if (name == "nfd")
-		{
-			//Canonical decomposition
-			rt.push_back( &CompositionNormalizer<boost::locale::norm_nfd>::localeConv);
-		}
-		else if (name == "nfc")
-		{
-			//Canonical decomposition followed by canonical composition.
-			rt.push_back( &CompositionNormalizer<boost::locale::norm_nfc>::localeConv);
-		}
-		else if (name == "nfkd")
-		{
-			//Compatibility decomposition.
-			rt.push_back( &CompositionNormalizer<boost::locale::norm_nfkd>::localeConv);
-		}
-		else if (name == "nfkc")
-		{
-			//Compatibility decomposition followed by canonical composition.
-			rt.push_back( &CompositionNormalizer<boost::locale::norm_nfkc>::localeConv);
-		}
-		else if (name == "latinword")
-		{
-			rt.push_back( &Tokenize::latinWord);
-		}
-		else if (name == "ascii_de")
-		{
-			rt.push_back( &GermanAsciiNormalizer::localeConv);
-		}
-		else if (name == "ascii_eu")
-		{
-			rt.push_back( &EuropeanAsciiNormalizer::localeConv);
-		}
-		ch = utils::parseNextToken( tok, ii, ee, opTab);
-		if (ch != ',' && ch != '\0') throw std::runtime_error( "comma ',' expected as normalization function separator");
-	}
-	return rt;
-}
 }//anonymous namespace
 
 struct LocaleConvNormalizeFunction :public NormalizeFunction
 {
-	LocaleConvNormalizeFunction( ResourceHandle& reshnd, const std::string& lc, const std::vector<LocaleConv>& func)
+	LocaleConvNormalizeFunction( ResourceHandle& reshnd, const std::string& lc, const LocaleConv& func)
 		:m_reshnd(&reshnd)
 		,m_func(func)
 		,m_lc(lc){}
@@ -221,42 +155,64 @@ struct LocaleConvNormalizeFunction :public NormalizeFunction
 	virtual std::string execute( const std::string& i) const
 	{
 		std::locale loc = m_reshnd->getLocale( m_lc);
-		if (m_func.empty()) return i;
-		std::vector<LocaleConv>::const_iterator ii = m_func.begin(), ee = m_func.end();
-		std::string rt = (*ii)( i, loc);
-		for (++ii; ii != ee; ++ii)
-		{
-			rt = (*ii)( rt, loc);
-		}
-		return rt;
+		return m_func( i, loc);
 	}
 private:
 	ResourceHandle* m_reshnd;
-	std::vector<LocaleConv> m_func;
+	LocaleConv m_func;
 	std::string m_lc;
 };
 
 
-NormalizeFunction* _Wolframe::langbind::createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& description)
+static struct {const char* name; LocaleConv func;} g_functions[] =
 {
-	std::vector<LocaleConv> func;
-	utils::CharTable opTab( ":,");
-	std::string lc,tok;
-	std::string::const_iterator ii = description.begin(), ee = description.end();
-	char ch = utils::parseNextToken( tok, ii, ee, opTab);
-	if (ch != '\0' && ch != ':')
+	{"tolower", &boost::locale::to_lower},
+	{"toupper", &boost::locale::to_upper},
+	{"totitle", &boost::locale::to_title},
+	{"foldcase", &boost::locale::fold_case},
+	//Canonical decomposition
+	{"nfd", &CompositionNormalizer<boost::locale::norm_nfd>::localeConv},
+	//Canonical decomposition followed by canonical composition.
+	{"nfc", &CompositionNormalizer<boost::locale::norm_nfc>::localeConv},
+	//Compatibility decomposition.
+	{"nfkd", &CompositionNormalizer<boost::locale::norm_nfkd>::localeConv},
+	//Compatibility decomposition followed by canonical composition.
+	{"nfkc", &CompositionNormalizer<boost::locale::norm_nfkc>::localeConv},
+	{"latinword", &Tokenize::latinWord},
+	{"ascii_de", &GermanAsciiNormalizer::latinWord},
+	{"ascii_eu", &EuropeanAsciiNormalizer::latinWord},
+	{0,0}
+};
+
+NormalizeFunction* _Wolframe::langbind::createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg)
+{
+	std::string key = boost::algorithm::to_lower_copy( name);
+	if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
+
+	std::vector<std::pair< std::string, NormalizeFunctionR> > rt;
+	for (int ii=0; g_functions[ii].name; ++ii)
 	{
-		if (utils::parseNextToken( tok, ii, ee, opTab) == ':')
+		if (name == g_functions[ii].name)
 		{
-			func = parseFunc( std::string( ii, ee));
-			lc = tok;
-		}
-		else
-		{
-			func = parseFunc( description);
-			lc = "";
+			return new LocaleConvNormalizeFunction( reshnd, lc, g_functions[ii].func);
 		}
 	}
-	return new LocaleConvNormalizeFunction( reshnd, lc, func);
+	return 0;
+}
+
+const std::vector<std::string>& _Wolframe::langbind::normalizeFunctions()
+{
+	struct NormalizeFunctions :public std::vector<std::string>
+	{
+		NormalizeFunctions()
+		{
+			for (int ii=0; g_functions[ii].name; ++ii)
+			{
+				push_back( g_functions[ii].name);
+			}
+		}
+	};
+	static NormalizeFunctions rt;
+	return rt;
 }
 

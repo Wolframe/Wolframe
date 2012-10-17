@@ -47,7 +47,6 @@
 #include "ddl/compilerInterface.hpp"
 #include "prnt/printFunction.hpp"
 #include "langbind/normalizeFunction.hpp"
-#include "langbind/appConfig_struct.hpp"
 
 namespace _Wolframe {
 namespace proc {
@@ -76,7 +75,6 @@ public:
 private:
 	std::string					m_dbLabel;
 	std::list< config::NamedConfiguration* >	m_procConfig;
-	langbind::EnvironmentConfigStruct		m_environment;
 	std::list< std::string >			m_programFiles;
 };
 

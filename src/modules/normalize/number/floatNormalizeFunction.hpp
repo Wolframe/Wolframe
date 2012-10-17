@@ -43,17 +43,15 @@ namespace langbind {
 class FloatNormalizeFunction :public NormalizeFunction
 {
 public:
-	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_, bool trim_)
+	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_)
 		:m_sizeG(sizeG_)
-		,m_sizeF(sizeF_)
-		,m_trim(trim_){}
+		,m_sizeF(sizeF_){}
 
 	virtual std::string execute( const std::string& str) const;
 
 private:
 	std::size_t m_sizeG;
 	std::size_t m_sizeF;
-	bool m_trim;
 };
 
 }}

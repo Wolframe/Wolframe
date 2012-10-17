@@ -31,51 +31,14 @@
 
 ************************************************************************/
 ///\brief Implemention of programs for the database
-///\file libwolframe_database/program.hpp
-#include "database/program.hpp"
+///\file transactionProgram.cpp
+#include "database/transactionProgram.hpp"
 #include "utils/miscUtils.hpp"
+#include "config/programBase.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
-
-Program::LineInfo::LineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos)
-{
-	std::pair<unsigned int,unsigned int> info = utils::getLineInfo( start, pos);
-	line = info.first;
-	col = info.second;
-}
-
-Program::Error::Error( const LineInfo& pos_, const std::string& msg_)
-	:std::runtime_error(msg_)
-{
-	std::ostringstream msg;
-	msg << "error on line " << pos_.line << " column " << pos_.col << ":" << msg_;
-	m_msg = msg.str();
-}
-
-Program::Error::Error( const LineInfo& pos_, const std::string& msg_, const std::string& arg_)
-	:std::runtime_error(msg_)
-{
-	std::ostringstream msg;
-	msg << "error on line " << pos_.line << " column " << pos_.col << ":" << msg_ << " (" << arg_ << ")";
-	m_msg = msg.str();
-}
-
-Program::Error::Error( const LineInfo& pos_, const std::string& msg_, char arg_)
-	:std::runtime_error(msg_)
-{
-	std::ostringstream msg;
-	if (arg_ < 32)
-	{
-		msg << "error on line " << pos_.line << " column " << pos_.col << ":" << msg_ << " ('" << arg_ << "')";
-	}
-	else
-	{
-		msg << "error on line " << pos_.line << " column " << pos_.col << ":" << msg_ << " (" << (unsigned int)(unsigned char)arg_ << ")";
-	}
-	m_msg = msg.str();
-}
 
 static bool isLineStart( std::string::const_iterator si, const std::string& src)
 {
@@ -107,19 +70,24 @@ static std::size_t lineCount( std::string::const_iterator si, std::string::const
 
 static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
 
-void Program::loadfile( const std::string& filename, std::string& dbsource)
+void TransactionProgram::loadfile( const std::string& filename, std::string& dbsource)
 {
 	try
 	{
 		load( utils::readSourceFileContent( filename), dbsource);
 	}
-	catch (const std::runtime_error& e)
+	catch (const config::PositionalErrorException& e)
 	{
-		throw std::runtime_error( std::string( "error in file '") + utils::getFileStem( filename) + "' " + e.what());
+		throw config::PositionalErrorException( filename, e);
 	}
 }
 
-void Program::load( const std::string& source, std::string& dbsource)
+bool TransactionProgram::is_mine( const std::string& filename) const
+{
+	return boost::algorithm::to_lower_copy( utils::getFileExtension( filename)) == ".tdl";
+}
+
+void TransactionProgram::load( const std::string& source, std::string& dbsource)
 {
 	char ch;
 	std::string tok;
@@ -130,6 +98,8 @@ void Program::load( const std::string& source, std::string& dbsource)
 	std::vector<std::vector<std::string::const_iterator> > tdsrcar;
 	std::vector<std::string::const_iterator> tstartar;
 	dbsource.clear();
+	config::PositionalErrorMessageBase ERROR(source);
+	config::PositionalErrorMessageBase::Message MSG;
 
 	try
 	{
@@ -161,11 +131,9 @@ void Program::load( const std::string& source, std::string& dbsource)
 				dbi = dbe;
 
 				ch = utils::parseNextToken( tok, si, se, g_optab);
-				if (g_optab[ ch])
-				{
-					throw Error( LineInfo( source.begin(), si),
-							"identifier (transaction name) expected", ch);
-				}
+				if (!ch) throw ERROR( si, MSG << "unexpected end of transaction definition (transaction name expected)");
+				if (g_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
+
 				tdnamear.push_back( tok);
 				tdsrcar.push_back( std::vector<std::string::const_iterator>());
 				tdar.push_back( std::vector<TransactionDescription>());
@@ -176,8 +144,7 @@ void Program::load( const std::string& source, std::string& dbsource)
 				ch = utils::parseNextToken( tok, si, se, g_optab);
 				if (!boost::algorithm::iequals( tok, "BEGIN"))
 				{
-					throw Error( LineInfo( source.begin(), si),
-							"BEGIN (transaction) expected", ch);
+					throw ERROR( si, "BEGIN (transaction) expected");
 				}
 				while ((ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
 				{
@@ -196,13 +163,11 @@ void Program::load( const std::string& source, std::string& dbsource)
 					}
 					else if (g_optab[ch])
 					{
-						throw Error( LineInfo( source.begin(), si),
-								"keyword (END,WITH,INTO,DO) expected instead of operator", ch);
+						throw ERROR( si, MSG << "keyword (END,WITH,INTO,DO) expected instead of operator '" << ch << "'");
 					}
 					else if (ch == '\'' || ch == '\"')
 					{
-						throw Error( LineInfo( source.begin(), si),
-								"keyword (END,WITH,INTO,DO) expected instead string");
+						throw ERROR( si, "keyword (END,WITH,INTO,DO) expected instead string");
 					}
 					else if (boost::algorithm::iequals( tok, "END"))
 					{
@@ -212,34 +177,29 @@ void Program::load( const std::string& source, std::string& dbsource)
 					{
 						if (0 != (mask & (1 << (unsigned)TransactionDescription::Selector)))
 						{
-							throw Error( LineInfo( source.begin(), si),
-									"selector (WITH ..) specified twice in a transaction description");
+							throw ERROR( si, "selector (WITH ..) specified twice in a transaction description");
 						}
 						mask |= (1 << (unsigned)TransactionDescription::Selector);
 
 						ch = utils::parseNextToken( desc.selector, si, se, utils::emptyCharTable(), utils::anyCharTable());
-						if (!ch) throw Error( LineInfo( source.begin(), si),
-									"unexpected end of description. sector path expected after WITH");
+						if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after WITH");
 					}
 					else if (boost::algorithm::iequals( tok, "INTO"))
 					{
 						if (0 != (mask & (1 << (unsigned)TransactionDescription::Output)))
 						{
-							throw Error( LineInfo( source.begin(), si),
-									"function result (INTO ..) specified twice in a transaction description");
+							throw ERROR( si, "function result (INTO ..) specified twice in a transaction description");
 						}
 						mask |= (1 << (unsigned)TransactionDescription::Output);
 
 						ch = utils::parseNextToken( desc.output, si, se, utils::emptyCharTable(), utils::anyCharTable());
-						if (!ch) throw Error( LineInfo( source.begin(), si),
-									"unexpected end of description. result tag path expected after INTO");
+						if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after INTO");
 					}
 					else if (boost::algorithm::iequals( tok, "DO"))
 					{
 						if (0 != (mask & (1 << (unsigned)TransactionDescription::Call)))
 						{
-							throw Error( LineInfo( source.begin(), si),
-									"function call (DO ..) specified twice in a transaction description");
+							throw ERROR( si, "function call (DO ..) specified twice in a transaction description");
 						}
 						mask |= (1 << (unsigned)TransactionDescription::Call);
 
@@ -249,24 +209,21 @@ void Program::load( const std::string& source, std::string& dbsource)
 						{
 							if (!ch)
 							{
-								throw Error( LineInfo( source.begin(), si),
-										"unexpected end of description. unterminated function call (DO ..)");
+								throw ERROR( si, "unexpected end of description. unterminated function call (DO ..)");
 							}
 							switch (st)
 							{
 								case 0:
 									if (g_optab[ch] || ch == '\'' || ch == '\"')
 									{
-										throw Error( LineInfo( source.begin(), si),
-												"function call identifier expected after DO instead of operator or string", ch);
+										throw ERROR( si, MSG << "function call identifier expected after DO instead of operator or string '" << ch << "'");
 									}
 									st = 1;
 									continue;
 								case 1:
 									if (ch != '(')
 									{
-										throw Error( LineInfo( source.begin(), si),
-												"'(' expected in function call after function name (DO ..)", ch);
+										throw ERROR( si, MSG << "'(' expected in function call after function name (DO ..) instead of '" << ch << "'");
 									}
 									st = 2;
 									continue;
@@ -277,8 +234,7 @@ void Program::load( const std::string& source, std::string& dbsource)
 										break;
 									}
 									else if (ch == '(')
-									{	throw Error( LineInfo( source.begin(), si),
-													"unexpected '('. unterminated function call (DO ..)");
+									{	throw ERROR( si, "unexpected '('. unterminated function call (DO ..)");
 									}
 									continue;
 							}
@@ -287,8 +243,7 @@ void Program::load( const std::string& source, std::string& dbsource)
 					}
 					else
 					{
-						throw Error( LineInfo( source.begin(), si),
-								"keyword (END,WITH,INTO,DO) expected", tok);
+						throw ERROR( si, MSG << "keyword (END,WITH,INTO,DO) expected instead of '" << tok << "'");
 					}
 				}
 				// append empty lines to keep line info for the dbsource:
@@ -297,13 +252,13 @@ void Program::load( const std::string& source, std::string& dbsource)
 			}
 		}
 	}
-	catch (const Error& e)
+	catch (const config::PositionalErrorException& e)
 	{
 		throw e;
 	}
 	catch (const std::runtime_error& e)
 	{
-		throw Error( LineInfo( source.begin(), si), e.what());
+		throw ERROR( si, e.what());
 	}
 
 	std::vector<std::vector< TransactionDescription> >::const_iterator di = tdar.begin(), de = tdar.end();
@@ -332,22 +287,16 @@ void Program::load( const std::string& source, std::string& dbsource)
 					errlocation = "in transaction call (DO ..)";
 				break;
 			}
-			std::ostringstream msg;
-			LineInfo lineinfo( source.begin(), (*pi)[ err.elemidx]);
-			msg << "error in definition of transaction '" << *ni << "' " << errlocation << ": "<< err.msg;
-			throw Error( lineinfo, msg.str());
+			throw ERROR( (*pi)[ err.elemidx], MSG << "error in definition of transaction '" << *ni << "' " << errlocation << ": "<< err.msg);
 		}
 		catch (const std::runtime_error& err)
 		{
-			std::ostringstream msg;
-			msg << "error in definition of transaction '" << *ni << "': " << err.what();
-			LineInfo lineinfo( source.begin(), tstartar[ di - tdar.begin()]);
-			throw Error( lineinfo, msg.str());
+			throw ERROR( tstartar[ di - tdar.begin()], MSG << "error in definition of transaction '" << *ni << "': " << err.what());
 		}
 	}
 }
 
-const TransactionFunction* Program::function( const std::string& name) const
+const TransactionFunction* TransactionProgram::function( const std::string& name) const
 {
 	std::string key = boost::algorithm::to_lower_copy( name);
 	std::map<std::string, TransactionFunctionR>::const_iterator fi = m_functionmap.find( key);

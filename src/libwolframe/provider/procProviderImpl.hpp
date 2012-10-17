@@ -47,6 +47,8 @@
 #include "module/printFunctionBuilder.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
+#include "langbind/normalizeProgram.hpp"
+#include "database/transactionProgram.hpp"
 
 #include <list>
 #include <map>
@@ -80,7 +82,6 @@ private:
 	class DDLTypeMap;
 	bool loadForm( const ddl::DDLCompiler*, const std::string& dataDefinitionFilename);
 	bool loadPrintProgram( const module::PrintFunctionConstructor* pc, const std::string& layoutFilename);
-	bool declareNormalizeFunction( const std::string& name, const std::string& type, const std::string& command);
 	bool declareFunctionName( const std::string& name, const char* typestr);
 
 	bool loadPrograms();
@@ -112,7 +113,8 @@ private:
 
 	std::map< std::string, const char*>	m_langfunctionIdentifierMap;
 	std::list< std::string >	m_programfiles;
-	db::Program m_program;
+	db::TransactionProgram m_dbprogram;
+	langbind::NormalizeProgram m_normprogram;
 };
 
 }} // namespace _Wolframe::proc

@@ -197,26 +197,18 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 			}
 
 			case ObjectConstructorBase::NORMALIZE_FUNCTION_OBJECT:
-			{	// object is a normalize function compiler
-				module::NormalizeFunctionConstructor* fc = dynamic_cast< module::NormalizeFunctionConstructor* >((*it)->constructor());
-				if ( fc == NULL )
+			{	// object is a normalize function constructor
+				langbind::NormalizeFunctionConstructorR constructor( dynamic_cast< module::NormalizeFunctionConstructor* >((*it)->constructor()));
+				if ( !constructor.get() )
 				{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
-						  << "'' is not a normalize function compiler";
-					throw std::logic_error( "Object is not a normalize function compiler. See log." );
+						  << "'' is not a normalize function constructor";
+					throw std::logic_error( "Object is not a normalize function constructor. See log." );
 				}
-				else	{
-					std::string name = fc->objectClassName();
-					boost::algorithm::to_upper( name);
-					std::map< std::string, const module::NormalizeFunctionConstructor* >::const_iterator itr = m_normalizeFunctionCompilerMap.find( name );
-					if ( itr != m_normalizeFunctionCompilerMap.end() )	{
-						LOG_FATAL << "Duplicate normalize function compiler name '" << name << "'";
-						throw std::runtime_error( "Duplicate normalize function compiler name" );
-					}
-					m_normalizeFunctionCompiler.push_back( fc );
-					m_normalizeFunctionCompilerMap[ name ] = fc;
-
-					LOG_TRACE << "'" << name << "' normalize function compiler registered";
+				else
+				{
+					m_normprogram.addConstructor( constructor);
+					LOG_TRACE << "'" << constructor->objectClassName() << "' normalize function constructor for domain \"*." << constructor->domain() << "registered";
 				}
 				break;
 			}
@@ -287,16 +279,9 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 		}
 	}
 	// Load the programs except database programs:
-	bool success = true;
-	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=conf->m_environment.normalize.begin(), ee=conf->m_environment.normalize.end(); ii != ee; ++ii)
+	if (!loadPrograms())
 	{
-		success &= declareNormalizeFunction( ii->name, ii->type, ii->call);
-	}
-	success &= loadPrograms();
-
-	if (!success)
-	{
-		throw std::logic_error( "Not all configured objects in the processor environment could be loaded. See log." );
+		throw std::logic_error( "Not all programs could be loaded. See log." );
 	}
 }
 
@@ -334,26 +319,26 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 	std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
 	for (; pi != pe; ++pi)
 	{
-		std::string ext = utils::getFileExtension( *pi);
-		if (ext.empty())
+		if (m_normprogram.is_mine( *pi))
 		{
-			LOG_ERROR << "Program file has no extension. Cannot load '" << *pi << "'";
-			rt = false;
+			m_normprogram.loadProgram( *pi);
 		}
-		else if (!boost::iequals( ext, ".tdl"))
+	}
+	for(pi = m_programfiles.begin(); pi != pe; ++pi)
+	{
+		std::string ext = utils::getFileExtension( *pi);
+		if (ext.empty()) throw std::runtime_error( "program file has no extension");
+		std::string key = boost::algorithm::to_upper_copy( std::string( ext.c_str() + 1));
+		std::map< std::string, ddl::DDLCompilerR >::const_iterator ci = m_ddlcompilerMap.find( key);
+		if (ci != m_ddlcompilerMap.end())
 		{
-			std::string key = boost::algorithm::to_upper_copy( std::string( ext.c_str() + 1));
-			std::map< std::string, ddl::DDLCompilerR >::const_iterator ci = m_ddlcompilerMap.find( key);
-			if (ci != m_ddlcompilerMap.end())
-			{
-				rt &= loadForm( ci->second.get(), *pi);
-				continue;
-			}
-			std::map< std::string, const module::PrintFunctionConstructor*>::const_iterator ri = m_printFunctionCompilerMap.find( key);
-			if (ri != m_printFunctionCompilerMap.end())
-			{
-				rt &= loadPrintProgram( ri->second, *pi);
-			}
+			rt &= loadForm( ci->second.get(), *pi);
+			continue;
+		}
+		std::map< std::string, const module::PrintFunctionConstructor*>::const_iterator ri = m_printFunctionCompilerMap.find( key);
+		if (ri != m_printFunctionCompilerMap.end())
+		{
+			rt &= loadPrintProgram( ri->second, *pi);
 		}
 	}
 	return rt;
@@ -376,13 +361,12 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 		std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
 		for (; pi != pe; ++pi)
 		{
-			std::string ext = utils::getFileExtension( *pi);
-			if (boost::iequals( ext, ".tdl"))
+			if (m_dbprogram.is_mine( *pi))
 			{
 				try
 				{
 					std::string dbsrc;
-					m_program.loadfile( *pi, dbsrc);
+					m_dbprogram.loadfile( *pi, dbsrc);
 					m_db->addProgram( dbsrc);
 				}
 				catch (const std::runtime_error& err)
@@ -535,45 +519,9 @@ const prnt::PrintFunction* ProcessorProvider::ProcessorProvider_Impl::printFunct
 		return itr->second.get();
 }
 
-bool ProcessorProvider::ProcessorProvider_Impl::declareNormalizeFunction( const std::string& name, const std::string& type, const std::string& command)
-{
-	try
-	{
-		std::string key = boost::algorithm::to_upper_copy( type);
-		std::map< std::string, const module::NormalizeFunctionConstructor*>::const_iterator itr = m_normalizeFunctionCompilerMap.find( key);
-		if (itr == m_normalizeFunctionCompilerMap.end())
-		{
-			LOG_ERROR << "Cannot declare normalize function '" << name << "'. Normalize function type '" << type << "' is not defined";
-			return false;
-		}
-		langbind::NormalizeFunctionR funcp( itr->second->object( command));
-		std::string funckey( boost::algorithm::to_upper_copy( name));
-
-		std::map< std::string, langbind::NormalizeFunctionR>::const_iterator ip = m_normalizeFunctionMap.find( funckey);
-		if (ip != m_normalizeFunctionMap.end())
-		{
-			LOG_ERROR << "Duplicate definition of normalize function with name '" << name << "'";
-			return false;
-		}
-		m_normalizeFunctionMap[ funckey] = funcp;
-		LOG_TRACE << "Normalize function '" << name << "' (" << type << ") declared";
-		return true;
-	}
-	catch (std::exception& e)
-	{
-		LOG_ERROR << "Cannot declare '" << type << "' normalize function '" << name << "': " <<  e.what();
-		return false;
-	}
-}
-
 const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name ) const
 {
-	std::string key = boost::algorithm::to_upper_copy( name);
-	std::map< std::string, langbind::NormalizeFunctionR>::const_iterator itr = m_normalizeFunctionMap.find( key);
-	if ( itr == m_normalizeFunctionMap.end() )
-		return NULL;
-	else
-		return itr->second.get();
+	return m_normprogram.get( name);
 }
 
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command) const
@@ -615,7 +563,7 @@ db::Transaction* ProcessorProvider::ProcessorProvider_Impl::transaction( const s
 
 const db::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transactionFunction( const std::string& name ) const
 {
-	return m_program.function( name );
+	return m_dbprogram.function( name );
 }
 
 }} // namespace _Wolframe::proc

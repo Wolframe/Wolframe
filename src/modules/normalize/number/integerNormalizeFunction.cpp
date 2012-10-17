@@ -41,27 +41,16 @@ std::string IntegerNormalizeFunction::execute( const std::string& str) const
 	if (!m_size) return str;
 	std::string::const_iterator ii = str.begin(), ee = str.end();
 	std::size_t cnt = m_size;
-	if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
-	std::string::const_iterator ti = ii;
 	if (m_sign)
 	{
 		if (ii != ee && *ii == '-') ++ii;
 	}
 	for (; cnt && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cnt);
-	std::string::const_iterator te = ii;
-	if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
 	if (ii != ee)
 	{
 		if (cnt) std::runtime_error( "number out of range");
 		std::runtime_error( std::string("illegal token '") + *ii + "' in number");
 	}
-	if (m_trim && (ti != str.begin() || te != str.end()))
-	{
-		return std::string( ti, te);
-	}
-	else
-	{
-		return str;
-	}
+	return str;
 }
 

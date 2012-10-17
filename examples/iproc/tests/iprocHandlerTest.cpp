@@ -38,7 +38,6 @@
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
 #include "langbind/appObjects.hpp"
-#include "langbind/appConfig_struct.hpp"
 #include "langbind/scriptConfig_struct.hpp"
 #include "processor/procProvider.hpp"
 #include "moduleDirectory.hpp"

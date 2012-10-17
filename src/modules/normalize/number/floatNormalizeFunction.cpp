@@ -42,8 +42,6 @@ std::string FloatNormalizeFunction::execute( const std::string& str) const
 	std::size_t cntG = m_sizeG?m_sizeG:std::numeric_limits<std::size_t>::max();
 	std::size_t cntF = m_sizeF?m_sizeF:std::numeric_limits<std::size_t>::max();
 
-	if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
-	std::string::const_iterator ti = ii;
 	if (ii != ee && *ii == '-') ++ii;
 	for (; cntG && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cntG);
 	if (ii != ee)
@@ -54,20 +52,11 @@ std::string FloatNormalizeFunction::execute( const std::string& str) const
 			for (; cntF && ii != ee && *ii >= '0' && *ii <= '9'; ++ii, --cntF);
 		}
 	}
-	std::string::const_iterator te = ii;
-	if (m_trim) while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
 	if (ii != ee)
 	{
 		if (*ii >= '0' && *ii <= '9') std::runtime_error( "number out of range");
 		std::runtime_error( std::string("illegal token '") + *ii + "' in number");
 	}
-	if (m_trim && (ti != str.begin() || te != str.end()))
-	{
-		return std::string( ti, te);
-	}
-	else
-	{
-		return str;
-	}
+	return str;
 }
 

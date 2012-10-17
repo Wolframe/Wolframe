@@ -68,43 +68,12 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 			if ( ! Parser::getValue( logPrefix().c_str(), *L1it, m_dbLabel, &isDefined ))
 				retVal = false;
 		}
-		else if ( boost::algorithm::iequals( "programFile", L1it->first )
-			  || boost::algorithm::iequals( "program", L1it->first ) )	{
+		else if ( boost::algorithm::iequals( "program", L1it->first ) )	{
 			std::string programFile;
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
 				retVal = false;
 			else
 				m_programFiles.push_back( programFile );
-		}
-		else if ( boost::algorithm::iequals( "environment", L1it->first ))
-		{
-			for ( boost::property_tree::ptree::const_iterator eni = L1it->second.begin(); eni != L1it->second.end(); eni++ )
-			{
-				if ( boost::algorithm::iequals( "normalize", eni->first ))
-				{
-					langbind::NormalizeFunctionConfigStruct st;
-					for ( boost::property_tree::ptree::const_iterator ai = eni->second.begin(); ai != eni->second.end(); ai++ )
-					{
-						if (boost::algorithm::iequals( "name", ai->first ))
-						{
-							st.name = ai->second.data();
-						}
-						else if (boost::algorithm::iequals( "type", ai->first ))
-						{
-							st.type = ai->second.data();
-						}
-						else if (boost::algorithm::iequals( "call", ai->first ))
-						{
-							st.call = ai->second.data();
-						}
-						else
-						{
-							LOG_ERROR << "invalid normalize configuration element '" << ai->first << "'";
-						}
-					}
-					m_environment.normalize.push_back( st);
-				}
-			}
 		}
 		else	{
 			if ( modules )	{
@@ -181,11 +150,6 @@ void ProcProviderConfig::print( std::ostream& os, size_t indent ) const
 		os << "   None configured" << std::endl;
 
 	std::string indStr( indent + 1, '\t');
-	os << "Environment:" << std::endl;
-	for (std::vector<langbind::NormalizeFunctionConfigStruct>::const_iterator ii=m_environment.normalize.begin(), ee=m_environment.normalize.end(); ii != ee; ++ii)
-	{
-		os << indStr << "normalize " << ii->name << " (" << ii->type << ") " << ii->call;
-	}
 	if ( m_programFiles.size() == 0 )
 		os << "   Program file: none" << std::endl;
 	else if ( m_programFiles.size() == 1 )

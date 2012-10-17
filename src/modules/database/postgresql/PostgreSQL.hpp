@@ -39,12 +39,10 @@
 
 #include <libpq-fe.h>
 #include <list>
-
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "config/configurationBase.hpp"
 #include "constructor.hpp"
-
 #include "objectPool.hpp"
 
 #ifdef _WIN32
@@ -176,9 +174,6 @@ private:
 	size_t			m_noConnections;	///< number of connections
 	ObjectPool< PGconn* >	m_connPool;		///< pool of connections
 	unsigned		m_statementTimeout;	///< default statement execution timeout
-
-	Program			m_program;		///< database programs ???
-
 	PostgreSQLdatabase	m_db;			///< real database object
 };
 

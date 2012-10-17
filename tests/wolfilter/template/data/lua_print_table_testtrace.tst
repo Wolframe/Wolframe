@@ -15,9 +15,8 @@ opt="$opt --module $mod"
 modpath="../../src/modules/filter/"			# filter module directory relative from tests/temp
 mod="$modpath/blob/mod_filter_blob"			# blob filter module for output to load
 opt="$opt --module $mod"
-opt="$opt --normalize 'int number integer(10)'"		# default form datatype for singed integer number
-opt="$opt --normalize 'uint number unsigned(10)'"	# default form datatype for unsinged integer number
-opt="$opt --normalize 'float number float(10,10)'"	# default form datatype for floating point number
+ddltypeprg="simpleform_range.normalize"
+opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 opt="$opt --program invoice.simplepdf"			# layout for printing invoice
 opt="$opt --program $formname"				# form for invoice
 opt="$opt --program $luascript"				# script to execute
@@ -25,4 +24,7 @@ testcmd="$opt run"					# command to execute by the test
 testscripts="$luascript $formname invoice.simplepdf"	# list of scripts of the test
 docin=invoice_example					# input document name
 docout=$testname					# output document name
+testdata="
+**file:$ddltypeprg
+`cat program/$ddltypeprg`"
 . ./output_tst_all.sh

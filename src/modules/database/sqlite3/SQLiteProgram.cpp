@@ -33,7 +33,7 @@
 ///\brief Implementation of programs for a sqlite3 database
 ///\file modules/database/sqlite3/SQLiteProgram.cpp
 #include "SQLiteProgram.hpp"
-#include "database/program.hpp"
+#include "config/programBase.hpp"
 #include "utils/miscUtils.hpp"
 #include "sqlite3.h"
 #include <boost/algorithm/string.hpp>
@@ -45,6 +45,8 @@ static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
 
 void SQLiteProgram::load( const std::string& source)
 {
+	config::PositionalErrorMessageBase ERROR(source);
+	config::PositionalErrorMessageBase::Message MSG;
 	std::string::const_iterator si = source.begin(), se = source.end();
 	char ch;
 	std::string tok;
@@ -72,7 +74,7 @@ void SQLiteProgram::load( const std::string& source)
 			ch = utils::parseNextToken( stmname, si, se, g_optab);
 			if (g_optab[ch])
 			{
-				throw Program::Error( Program::LineInfo( source.begin(), si), "unexpected token", ch);
+				throw ERROR( si, MSG << "unexpected token '" << ch << "'");
 			}
 			std::string stmkey = boost::to_lower_copy( stmname);
 			std::string::const_iterator stmstart;
@@ -81,17 +83,17 @@ void SQLiteProgram::load( const std::string& source)
 
 			if (m_statementmap.find( stmkey) != m_statementmap.end())
 			{
-				throw Program::Error( Program::LineInfo( source.begin(), si), std::string( "duplicate statement name '") + stmname + "'");
+				throw ERROR( si, MSG << "duplicate statement name '" << stmname << "'");
 			}
 			m_statementmap[ stmkey] = stm;
 		}
 		else if (g_optab[ch])
 		{
-			throw Program::Error( Program::LineInfo( source.begin(), si), "unexpected token", ch);
+			throw ERROR( si, MSG << "unexpected token '" << ch << "'");
 		}
 		else
 		{
-			throw Program::Error( Program::LineInfo( source.begin(), si), "unexpected token", tok);
+			throw ERROR( si, MSG << "unexpected token '" << tok << "'");
 		}
 	}
 }

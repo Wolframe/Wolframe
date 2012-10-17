@@ -33,8 +33,6 @@ DYNAMIC_LIB_PATCH = 0
 CPP_OBJS = \
 	protocol_ioblocks.o \
 	appObjects.o \
-	appConfig_struct.o \
-	appConfig_option.o \
 	scriptConfig_struct.o \
 	directmapConfig_struct.o \
 	directmapConfig_option.o \
@@ -42,6 +40,7 @@ CPP_OBJS = \
 	typingfilter.o \
 	tostringfilter.o \
 	ptreefilter.o \
+	normalizeProgram.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \
 	cmdbind_doctypeFilterCommandHandler.o \

@@ -42,7 +42,6 @@
 #include "moduleDirectory.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "langbind/appObjects.hpp"
-#include "langbind/appConfig_struct.hpp"
 #include "langbind/scriptConfig_struct.hpp"
 #include "processor/procProvider.hpp"
 #include "testHandlerTemplates.hpp"

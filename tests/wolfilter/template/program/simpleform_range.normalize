@@ -1,0 +1,4 @@
+iNt=number:integer(10);
+uint=numbeR:unsigned(10);
+float=number:fLoat(10,10);
+

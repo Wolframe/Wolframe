@@ -43,17 +43,15 @@ namespace langbind {
 class IntegerNormalizeFunction :public NormalizeFunction
 {
 public:
-	IntegerNormalizeFunction( bool sign_, std::size_t size_, bool trim_)
+	IntegerNormalizeFunction( bool sign_, std::size_t size_)
 		:m_size(size_)
-		,m_sign(sign_)
-		,m_trim(trim_){}
+		,m_sign(sign_){}
 
 	virtual std::string execute( const std::string& str) const;
 
 private:
 	std::size_t m_size;
 	bool m_sign;
-	bool m_trim;
 };
 
 }}

@@ -23,7 +23,7 @@ LIBRARIES = \
 
 CPP_OBJS = \
 	transactionFunction.obj \
-	program.obj \
+	transactionProgram.obj \
 	preparedStatement.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)

@@ -35,6 +35,7 @@
 #include "logger-v1.hpp"
 #include "testtraceDatabase.hpp"
 #include "testtraceTransaction.hpp"
+#include "config/programBase.hpp"
 #include "serialize/struct/filtermapDescription.hpp"
 #include "config/structSerialize.hpp"
 #include "utils/miscUtils.hpp"
@@ -131,6 +132,8 @@ Transaction* TesttraceDatabase::transaction( const std::string& /*name*/ )
 
 void TesttraceDatabase::addProgram( const std::string& source)
 {
+	config::PositionalErrorMessageBase ERROR(source);
+	config::PositionalErrorMessageBase::Message MSG;
 	static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
 	std::string::const_iterator si = source.begin(), se = source.end();
 	char ch;
@@ -155,11 +158,11 @@ void TesttraceDatabase::addProgram( const std::string& source)
 		}
 		else if (g_optab[ch])
 		{
-			throw Program::Error( Program::LineInfo( source.begin(), si), "unexpected token", ch);
+			throw ERROR( si, MSG << "unexpected token '" << ch << "'");
 		}
 		else
 		{
-			throw Program::Error( Program::LineInfo( source.begin(), si), "unexpected token", tok);
+			throw ERROR( si, MSG << "unexpected token '" << tok << "'");
 		}
 	}
 }

@@ -35,6 +35,7 @@
 #ifndef _LANGBIND_LOCALE_NORMALIZE_HPP_INCLUDED
 #define _LANGBIND_LOCALE_NORMALIZE_HPP_INCLUDED
 #include "langbind/normalizeFunction.hpp"
+#include <vector>
 #include <boost/locale/generator.hpp>
 
 namespace _Wolframe {
@@ -56,7 +57,8 @@ private:
 	boost::locale::generator m_gen;
 };
 
-NormalizeFunction* createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& description);
+NormalizeFunction* createLocaleNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
+const std::vector<std::string>& normalizeFunctions();
 
 }}//namespace
 #endif

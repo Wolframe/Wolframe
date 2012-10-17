@@ -43,10 +43,12 @@ namespace module {
 class NormalizeFunctionConstructor :public SimpleObjectConstructor< langbind::NormalizeFunction >
 {
 public:
-	NormalizeFunctionConstructor( const char* name_, langbind::ResourceHandle* rh, langbind::CreateNormalizeFunction createFunc_)
-		:m_name(name_)
+	NormalizeFunctionConstructor( const char* classname_, const char* name_, langbind::GetNormalizeFunctions getNormalizeFunctions_, langbind::ResourceHandle* rh, langbind::CreateNormalizeFunction createFunc_)
+		:m_classname(classname_)
+		,m_name(name_)
 		,m_resource(rh)
-		,m_createFunc(createFunc_) {}
+		,m_createFunc(createFunc_)
+		,m_getNormalizeFunctions(getNormalizeFunctions_) {}
 
 	virtual ~NormalizeFunctionConstructor(){}
 
@@ -57,25 +59,39 @@ public:
 
 	virtual const char* objectClassName() const
 	{
-		return m_name.c_str();
+		return m_classname;
 	}
 
-	virtual langbind::NormalizeFunction* object( const std::string& description) const
+	virtual langbind::NormalizeFunction* object( const std::string& name_, const std::string& arg_) const
 	{
-		return m_createFunc( *m_resource, description);
+		return m_createFunc( *m_resource, name_, arg_);
+	}
+
+	const std::vector<std::string>& functions() const
+	{
+		return m_getNormalizeFunctions();
+	}
+
+	const char* domain() const
+	{
+		return m_name;
 	}
 
 private:
-	const std::string m_name;
+	const char* m_classname;
+	const char* m_name;
 	langbind::ResourceHandle* m_resource;
 	langbind::CreateNormalizeFunction m_createFunc;
+	langbind::GetNormalizeFunctions m_getNormalizeFunctions;
 };
 
 class NormalizeFunctionBuilder :public SimpleBuilder
 {
 public:
-	NormalizeFunctionBuilder( const char* name_, langbind::CreateNormalizeFunction createFunc_, langbind::ResourceHandle* r=0)
-		:SimpleBuilder( name_)
+	NormalizeFunctionBuilder( const char* classname_, const char* name_, langbind::GetNormalizeFunctions getNormalizeFunctions_, langbind::CreateNormalizeFunction createFunc_, langbind::ResourceHandle* r=0)
+		:SimpleBuilder( classname_)
+		,m_name(name_)
+		,m_getNormalizeFunctions(getNormalizeFunctions_)
 		,m_createFunc(createFunc_)
 		,m_resource(r){}
 
@@ -86,11 +102,15 @@ public:
 	{
 		return ObjectConstructorBase::NORMALIZE_FUNCTION_OBJECT;
 	}
+
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new NormalizeFunctionConstructor( m_className, m_resource, m_createFunc);
+		return new NormalizeFunctionConstructor( m_className, m_name, m_getNormalizeFunctions, m_resource, m_createFunc);
 	}
+
 private:
+	const char* m_name;
+	langbind::GetNormalizeFunctions m_getNormalizeFunctions;
 	langbind::CreateNormalizeFunction m_createFunc;
 	langbind::ResourceHandle* m_resource;
 };

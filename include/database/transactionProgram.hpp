@@ -31,10 +31,9 @@
 
 ************************************************************************/
 ///\brief Interface to read a program for the database
-///\file database/program.hpp
-//
-#ifndef _DATABASE_PROGRAM_HPP_INCLUDED
-#define _DATABASE_PROGRAM_HPP_INCLUDED
+///\file database/transactionProgram.hpp
+#ifndef _DATABASE_TRANSACTION_PROGRAM_HPP_INCLUDED
+#define _DATABASE_TRANSACTION_PROGRAM_HPP_INCLUDED
 #include "types/countedReference.hpp"
 #include "database/transactionFunction.hpp"
 #include <string>
@@ -45,53 +44,30 @@
 namespace _Wolframe {
 namespace db {
 
-///\class Program
+///\class TransactionProgram
 ///\brief Database program
-class Program
+class TransactionProgram
 {
 public:
 	///\brief Constructor
-	explicit Program( const char* commentopr_ = "--")
+	explicit TransactionProgram( const char* commentopr_ = "--")
 		:m_commentopr(commentopr_){}
 
 	///\brief Copy constructor
-	Program( const Program& o)
+	TransactionProgram( const TransactionProgram& o)
 		:m_functionmap(o.m_functionmap)
 		,m_commentopr(o.m_commentopr){}
 
 	///\brief Destructor
-	~Program(){}
+	~TransactionProgram(){}
 
 	void defineCommentOpr( const std::string& commentopr_)
 	{
 		m_commentopr = commentopr_;
 	}
 
-	struct LineInfo
-	{
-		LineInfo( unsigned int line_, unsigned int col_)
-			:line(line_),col(col_){}
-		LineInfo( const std::string::const_iterator& start, const std::string::const_iterator& pos);
-
-		unsigned int line;
-		unsigned int col;
-	};
-
-	class Error :public std::runtime_error
-	{
-	public:
-		Error( const LineInfo& pos_, const std::string& msg_);
-		Error( const LineInfo& pos_, const std::string& msg_, const std::string& arg_);
-		Error( const LineInfo& pos_, const std::string& msg_, char arg_);
-		virtual ~Error() throw(){}
-
-		const char* what() const throw()
-		{
-			return m_msg.c_str();
-		}
-	private:
-		std::string m_msg;
-	};
+	///\brief Ask if the program is one of this class
+	bool is_mine( const std::string& filename) const;
 
 	///\brief Load transaction program source
 	///\param[in] source source for database with included transaction definitions to parse
@@ -113,7 +89,7 @@ private:
 	std::string m_commentopr;
 };
 
-typedef types::CountedReference<Program> ProgramR;
+typedef types::CountedReference<TransactionProgram> TransactionProgramR;
 
 }}//namespace
 #endif

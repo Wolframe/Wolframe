@@ -29,7 +29,7 @@ DYNAMIC_LIB_PATCH = 0
 
 CPP_OBJS = \
 	transactionFunction.o \
-	program.o \
+	transactionProgram.o \
 	preparedStatement.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

@@ -35,6 +35,7 @@
 #ifndef _LANGBIND_NUMBER_NORMALIZE_HPP_INCLUDED
 #define _LANGBIND_NUMBER_NORMALIZE_HPP_INCLUDED
 #include "langbind/normalizeFunction.hpp"
+#include <vector>
 
 namespace _Wolframe {
 namespace langbind {
@@ -45,7 +46,8 @@ public:
 	ResourceHandle(){}
 };
 
-NormalizeFunction* createNumberNormalizeFunction( ResourceHandle& reshnd, const std::string& description);
+NormalizeFunction* createNumberNormalizeFunction( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
+const std::vector<std::string>& normalizeFunctions();
 
 }}//namespace
 #endif

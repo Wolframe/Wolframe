@@ -37,6 +37,9 @@
 #include "filter/typedfilter.hpp"
 #include "ddl/atomicType.hpp"
 #include "types/countedReference.hpp"
+#include "types/keymap.hpp"
+#include <string>
+#include <vector>
 
 namespace _Wolframe {
 namespace langbind {
@@ -48,7 +51,8 @@ class ResourceHandle;
 
 ///\param[in,out] rshnd normalization resources handle
 ///\param[in] description transaction description source
-typedef NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& description);
+typedef NormalizeFunction* (*CreateNormalizeFunction)( ResourceHandle& reshnd, const std::string& name, const std::string& arg);
+typedef const std::vector<std::string>& (*GetNormalizeFunctions)();
 
 }}
 #endif

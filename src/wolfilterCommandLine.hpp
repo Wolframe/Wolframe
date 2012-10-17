@@ -39,8 +39,6 @@
 #include <iostream>
 #include "moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
-#include "langbind/appConfig_struct.hpp"
-#include "langbind/appConfig_option.hpp"
 #include "langbind/directmapConfig_option.hpp"
 
 namespace _Wolframe {
@@ -56,7 +54,6 @@ public:
 	bool printversion() const					{return m_printversion;}
 	const std::string& inputfile() const				{return m_inputfile;}
 	const std::vector<std::string>& modules() const			{return m_modules;}
-	const langbind::EnvironmentConfigStruct& envconfig() const	{return m_envconfig;}
 	const std::string& cmd() const					{return m_cmd;}
 	const std::string& inputfilter() const				{return m_inputfilter;}
 	const std::string& outputfilter() const				{return m_outputfilter;}
@@ -79,7 +76,6 @@ private:
 	std::string m_inputfile;
 	std::vector<std::string> m_modules;
 	std::vector<std::string> m_programs;
-	langbind::EnvironmentConfigStruct m_envconfig;
 	langbind::DirectmapConfigStruct m_directmapconfig;
 	boost::property_tree::ptree m_dbconfig;
 	std::string m_cmd;

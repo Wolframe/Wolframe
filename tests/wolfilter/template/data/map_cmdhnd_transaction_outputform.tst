@@ -9,9 +9,8 @@ opt="$opt --module $mod"
 modpath="../../src/modules/normalize/"			# module directory for normalizers relative from tests/temp
 mod="$modpath/number/mod_normalize_number"		# module to load
 opt="$opt --module $mod"
-opt="$opt --normalize 'int number integer(10)'"		# default form datatype for singed integer number
-opt="$opt --normalize 'uint number unsigned(10)'"	# default form datatype for unsinged integer number
-opt="$opt --normalize 'float number float(10,10)'"	# default form datatype for floating point number
+ddltypeprg="simpleform.normalize"
+opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 modpath="../../src/modules/cmdbind/directmap"		# module directory relative from tests/temp
 opt="$opt --module $modpath/mod_command_directmap"
 modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
@@ -24,6 +23,8 @@ testscripts="$formname"					# list of scripts of the test
 docin=employee_assignment_print				# input document name
 docout=map_cmdhnd_transaction_outputform		# output document name
 testdata="
+**file:$ddltypeprg
+`cat program/$ddltypeprg`
 **file: DBRES
 #id task start end#11 'bla bla' '12:04:19 1/3/2012' '12:41:34 1/3/2012'#12 'bli blu' '07:14:23 1/3/2012' '08:01:51 1/3/2012'
 #id task start end#21 'gardening' '09:24:28 1/3/2012' '11:11:07 1/3/2012'#22 'helo' '11:31:01 1/3/2012' '12:07:55 1/3/2012'
