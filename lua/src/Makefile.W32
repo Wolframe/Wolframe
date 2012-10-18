@@ -85,7 +85,7 @@ STATIC_LIB = \
 	lua_static.lib
 
 DYNAMIC_LIB = \
-	lua.dll
+	lua52.dll
 
 LIBRARIES = \
 	$(STATIC_LIB) \
@@ -96,12 +96,12 @@ BINS = \
 	
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-lua.dll: $(DYNAMIC_OBJS)
+lua52.dll: $(DYNAMIC_OBJS)
 	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $?
 
 lua.obj: lua.c
 lua.exe: lua.obj
-	$(LINK) $(LDFLAGS) $(LIBS) /out:$@ lua.lib $**
+	$(LINK) $(LDFLAGS) $(LIBS) /out:$@ lua52.lib $**
 	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1
 
 lua_static.lib: $(OBJS)
