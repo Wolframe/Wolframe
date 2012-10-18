@@ -38,7 +38,7 @@ void LoginDialog::initialize( )
 		this, SLOT( close( ) ) );
 		
 	connect( m_buttons->button( QDialogButtonBox::Ok ), SIGNAL( clicked( ) ),
-		this, SLOT( login( ) ) );
+		this, SLOT( login( ) ) );	
 }
 
 void LoginDialog::closeEvent( QCloseEvent *_event )
@@ -54,8 +54,22 @@ void LoginDialog::closeEvent( QCloseEvent *_event )
 
 void LoginDialog::keyPressEvent( QKeyEvent *_event )
 {
-	if( _event->key( ) == Qt::Key_Escape ) {
-		_event->ignore( );
+	switch( _event->key( ) ) {
+		case Qt::Key_Escape:
+			_event->ignore( );
+			break;
+			
+		case Qt::Key_Enter:
+		case Qt::Key_Return:
+			if( m_username->hasFocus( ) ) {
+				m_password->setFocus( );
+			} else if( m_password->hasFocus( ) ) {
+				m_buttons->button( QDialogButtonBox::Ok )->click( );
+			}
+			break;
+		
+		default:
+			QDialog::keyPressEvent( _event );
 	}
 }
 
@@ -65,7 +79,7 @@ void LoginDialog::login( )
 	QString password = m_password->text( );
 	
 	// TODO
-	m_succeeded = m_wolframeClient->syncLogin( username, password );
+	//m_succeeded = m_wolframeClient->syncLogin( username, password );
 	
 	close( );
 	
