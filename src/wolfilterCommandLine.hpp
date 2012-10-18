@@ -67,7 +67,9 @@ public:
 
 private:
 	config::ConfigurationTree getProcProviderConfigTree() const;
-	config::ConfigurationTree getDBProviderConfigTree() const;
+	config::ConfigurationTree getDBProviderConfigTree( const std::string& dbopt) const;
+	std::vector<std::string> configModules() const;
+	boost::property_tree::ptree getConfigNode( const std::string& name) const;
 
 private:
 	bool m_printhelp;
@@ -78,6 +80,7 @@ private:
 	std::vector<std::string> m_programs;
 	langbind::DirectmapConfigStruct m_directmapconfig;
 	boost::property_tree::ptree m_dbconfig;
+	boost::property_tree::ptree m_config;
 	std::string m_cmd;
 	std::string m_inputfilter;
 	std::string m_outputfilter;

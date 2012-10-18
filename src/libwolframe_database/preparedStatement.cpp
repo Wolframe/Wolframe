@@ -71,23 +71,26 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 			cmdres.addColumn( colname?colname:"");
 		}
 	}
-	if (stmh->hasResult()) do
+	if (stmh->hasResult())
 	{
-		cmdres.openRow();
-		for (si=0; si != se; ++si)
+		do
 		{
-			const char* col = stmh->get( si+1);
-			if (col)
+			cmdres.openRow();
+			for (si=0; si != se; ++si)
 			{
-				cmdres.addValue( col);
+				const char* col = stmh->get( si+1);
+				if (col)
+				{
+					cmdres.addValue( col);
+				}
+				else
+				{
+					cmdres.addNull();
+				}
 			}
-			else
-			{
-				cmdres.addNull();
-			}
-		}
 
-	} while (stmh->next());
+		} while (stmh->next());
+	}
 	return true;
 }
 

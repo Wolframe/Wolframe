@@ -37,6 +37,7 @@
 #define _MISC_UTILS_HPP_INCLUDED
 #include <string>
 #include <vector>
+#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
 namespace utils {
@@ -137,6 +138,13 @@ std::pair<unsigned int,unsigned int> getLineInfo( const std::string::const_itera
 ///\remark Throws on error
 std::string readSourceFileContent( const std::string& filename);
 std::vector<std::string> readSourceFileLines( const std::string& filename);
+boost::property_tree::ptree readPropertyTreeFile( const std::string& filename);
+
+///\brief Get the file type as string
+///\remark Very simplistic implementation for now
+///\return file type ("XML","TEXT:UTF-8","TEXT:ASCII", "" (unknown))
+std::string getFileType( const std::string& filename);
+
 
 }} //namespace _Wolframe::utils
 

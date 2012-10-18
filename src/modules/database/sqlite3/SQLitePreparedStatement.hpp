@@ -35,6 +35,7 @@
 #ifndef _DATABASE_PREPARED_STATEMENT_SQLITE3_HPP_INCLUDED
 #define _DATABASE_PREPARED_STATEMENT_SQLITE3_HPP_INCLUDED
 #include "database/preparedStatement.hpp"
+#include "types/keymap.hpp"
 #include <string>
 #include <map>
 #include <cstdlib>
@@ -49,7 +50,7 @@ namespace db {
 struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 {
 	///\brief Constructor
-	PreparedStatementHandler_sqlite3( sqlite3* conn, const std::map<std::string,std::string>* stmmap);
+	PreparedStatementHandler_sqlite3( sqlite3* conn, const types::keymap<std::string>* stmmap);
 
 	///\brief Destructor
 	virtual ~PreparedStatementHandler_sqlite3();
@@ -105,7 +106,9 @@ private:
 private:
 	State m_state;
 	sqlite3* m_conn;
-	const std::map<std::string,std::string>* m_stmmap;
+	const types::keymap<std::string>* m_stmmap;
+	types::keymap<std::string>::const_iterator m_curstm;
+	bool m_hasResult;
 	std::string m_lasterror;
 	sqlite3_stmt* m_stm;
 };

@@ -1,4 +1,4 @@
-STATEMENT get_task SELECT * FROM task WHERE id=$1;
+PREPARE get_task AS SELECT * FROM task WHERE id=? ORDER BY id ASC;
 
 TRANSACTION test_transaction
 BEGIN

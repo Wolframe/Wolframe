@@ -68,24 +68,26 @@ void SQLiteProgram::load( const std::string& source)
 				while (si != se && *si != '\n') ++si;
 			}
 		}
-		else if ((ch|32) == 's' && boost::iequals( tok, "STATEMENT"))
+		else if ((ch|32) == 'p' && boost::iequals( tok, "PREPARE"))
 		{
 			std::string stmname;
 			ch = utils::parseNextToken( stmname, si, se, g_optab);
-			if (g_optab[ch])
+			if (!ch) throw ERROR( si, MSG << "unexpected end of file");
+			if (g_optab[ch]) throw ERROR( si, MSG << "unexpected token '" << ch << "'");
+
+			ch = utils::parseNextToken( tok, si, se, g_optab);
+			if (!ch) throw ERROR( si, MSG << "unexpected end of file");
+			if (g_optab[ch]) throw ERROR( si, MSG << "unexpected token '" << ch << "'");
+			if (!boost::iequals( tok, "AS") && !boost::iequals( tok, "FROM"))
 			{
-				throw ERROR( si, MSG << "unexpected token '" << ch << "'");
+				throw ERROR( si, MSG << "unexpected token '" << tok << "'");
 			}
-			std::string stmkey = boost::to_lower_copy( stmname);
+
 			std::string::const_iterator stmstart = si;
-			while (utils::parseNextToken( stmname, si, se, g_optab) != ';');
+			while (utils::parseNextToken( tok, si, se, g_optab) != ';');
 			std::string stm( stmstart, si - 1);
 
-			if (m_statementmap.find( stmkey) != m_statementmap.end())
-			{
-				throw ERROR( si, MSG << "duplicate statement name '" << stmname << "'");
-			}
-			m_statementmap[ stmkey] = stm;
+			m_statementmap.insert( stmname, stm);
 		}
 		else if (g_optab[ch])
 		{

@@ -18,6 +18,7 @@
 # - testscripts		list of scripts of the test
 # - docin		input document name
 # - docout		output document name
+# - dumpout		(optional) file to dump to expected output too
 # - inputfilter		input filter name
 # - outputfilter	output filter name
 # - testdata		(optional) additionaly defined test data
@@ -64,5 +65,8 @@ elif [ -f doc/$docout.xml ]; then
 	cat doc/$docout.xml >> $output
 else
 	echo "OUTPUT FILE doc/$docout.UTF-8.xml OR doc/$docout.xml NOT FOUND !"
+fi
+if [ x"$dumpout" != "x" ]; then
+	cat $dumpout >> $output
 fi
 echo '**end' >> $output

@@ -16,5 +16,5 @@ PF:
 
 - Add dispatcher to main protocol of wolframed
 - Make database run
-- Mihai mail -> key file parsing for authentication
+- directmap programs instead of config
 

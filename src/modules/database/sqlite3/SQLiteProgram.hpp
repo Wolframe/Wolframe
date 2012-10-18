@@ -34,6 +34,7 @@
 ///\file modules/database/sqlite3/SQLiteProgram.hpp
 #ifndef _DATABASE_PROGRAM_SQLITE3_HPP_INCLUDED
 #define _DATABASE_PROGRAM_SQLITE3_HPP_INCLUDED
+#include "types/keymap.hpp"
 #include <string>
 #include <map>
 #include <cstdlib>
@@ -50,13 +51,13 @@ public:
 		:m_statementmap(o.m_statementmap){}
 
 	void load( const std::string& dbsource);
-	const std::map<std::string,std::string>* statementmap() const
+	const types::keymap<std::string>* statementmap() const
 	{
 		return &m_statementmap;
 	}
 
 private:
-	std::map<std::string,std::string> m_statementmap;
+	types::keymap<std::string> m_statementmap;
 };
 
 }}

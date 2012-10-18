@@ -40,6 +40,7 @@
 #include "database/database.hpp"
 #include "database/transaction.hpp"
 #include "config/configurationBase.hpp"
+#include "types/keymap.hpp"
 #include "constructor.hpp"
 #include "SQLiteProgram.hpp"
 #include <list>
@@ -158,14 +159,14 @@ public:
 
 	virtual const std::string* getProgram( const std::string& name) const
 	{
-		const std::map<std::string,std::string>* mm = m_program.statementmap();
+		const types::keymap<std::string>* mm = m_program.statementmap();
 		if (!mm) return 0;
-		std::map<std::string,std::string>::const_iterator mi = mm->find( name);
+		types::keymap<std::string>::const_iterator mi = mm->find( name);
 		if (mi == mm->end()) return 0;
 		return &mi->second;
 	}
 
-	const std::map<std::string,std::string>* stmmap() const
+	const types::keymap<std::string>* stmmap() const
 	{
 		return m_program.statementmap();
 	}

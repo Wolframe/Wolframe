@@ -84,7 +84,6 @@ SQLiteDBunit::SQLiteDBunit(const std::string& id,
 		else	{
 			if ( !checked )	{
 				char* err;
-//				res = sqlite3_exec( handle, "PRAGMA quick_check", NULL, &err );
 				res = sqlite3_exec( handle, "PRAGMA integrity_check", NULL, NULL, &err );
 				if( res != SQLITE_OK )	{
 					MOD_LOG_ALERT << "Corrupt SQLite database '" << filename

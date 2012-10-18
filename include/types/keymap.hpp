@@ -34,6 +34,7 @@ Project Wolframe.
 
 #ifndef _Wolframe_TYPES_KEYMAP_HPP_INCLUDED
 #define _Wolframe_TYPES_KEYMAP_HPP_INCLUDED
+#include "types/traits.hpp"
 #include <map>
 #include <string>
 #include <algorithm>
@@ -77,14 +78,35 @@ struct keymap
 
 	template <class KeyList>
 	typename boost::enable_if_c<
-		boost::is_convertible<typename KeyList::value_type, keystring>::value
-		&& boost::has_pre_increment<typename KeyList::const_iterator>::value
+		boost::is_convertible<typename KeyList::const_iterator::value_type, keystring>::value
+		&& types::traits::has_pre_increment<typename KeyList::const_iterator>::value
 		&& boost::has_dereference<typename KeyList::const_iterator>::value
 		,void>::type
 	insert( const KeyList& keylist, const ValueType& value)
 	{
 		typename KeyList::const_iterator ki = keylist.begin(), ke =  keylist.end();
 		for (; ki != ke; ++ki) insert( *ki, value);
+	}
+
+	template <class KeyList>
+	typename boost::enable_if_c<
+		types::traits::is_back_insertion_sequence<KeyList>::value
+		,void>::type
+	getkeys( KeyList& rt)
+	{
+		typename Parent::const_iterator ki = Parent::begin(), ke = Parent::end();
+		for (; ki != ke; ++ki) rt.push_back( ki->first);
+	}
+
+	template <class KeyList>
+	typename boost::enable_if_c<
+		types::traits::is_back_insertion_sequence<KeyList>::value
+		,KeyList>::type
+	getkeys()
+	{
+		KeyList rt;
+		getkeys(rt);
+		return rt;
 	}
 };
 

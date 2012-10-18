@@ -38,6 +38,7 @@
 #include <cstdlib>
 #include <limits>
 #include <stdexcept>
+#include <boost/lexical_cast.hpp>
 #if SQLITE_VERSION_NUMBER < 3005000
 #error This SQLite version is not supported by this module. It relies on the 'V2' interface
 #endif
@@ -45,11 +46,15 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* conn, const std::map<std::string,std::string>* stmmap)
+PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* conn, const types::keymap<std::string>* stmmap)
 	:m_state(Init)
 	,m_conn(conn)
 	,m_stmmap(stmmap)
-	,m_stm(0){}
+	,m_hasResult(false)
+	,m_stm(0)
+{
+	m_curstm = m_stmmap->end();
+}
 
 PreparedStatementHandler_sqlite3::~PreparedStatementHandler_sqlite3()
 {
@@ -64,6 +69,8 @@ void PreparedStatementHandler_sqlite3::clear()
 		sqlite3_finalize( m_stm);
 		m_stm = 0;
 	}
+	m_hasResult = false;
+	m_curstm = m_stmmap->end();
 	m_state = Init;
 }
 
@@ -76,16 +83,22 @@ void PreparedStatementHandler_sqlite3::setDatabaseErrorMessage()
 #else
 	int extcode = 0;
 #endif
-
+	std::string context;
+	if (m_curstm != m_stmmap->end())
+	{
+		context = std::string( " in statement '") + m_curstm->second + "'";
+	}
 	std::ostringstream msg;
 	msg << "SQLite error " << errcode;
 	if (extcode != 0) msg << " (extended error code " << extcode << ")";
-	msg << "; message: '" << str << "'";
+	msg << "; message: '" << str << "'" << context;
 	m_lasterror = msg.str();
 }
 
 bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, State newstate)
 {
+	m_hasResult = false;
+	m_curstm = m_stmmap->end();
 	sqlite3_stmt* inst = 0;
 	const char *stmtail;
 	int rc = sqlite3_prepare_v2( m_conn, stmstr, -1, &inst, &stmtail);
@@ -130,7 +143,7 @@ bool PreparedStatementHandler_sqlite3::rollback()
 
 bool PreparedStatementHandler_sqlite3::status( int rc, State newstate)
 {
-	if (rc != SQLITE_OK && rc != SQLITE_DONE)
+	if (rc != SQLITE_OK && rc != SQLITE_DONE && rc != SQLITE_ROW)
 	{
 		if (m_state != Error)
 		{
@@ -155,6 +168,8 @@ bool PreparedStatementHandler_sqlite3::errorStatus( const std::string& message)
 
 bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
 {
+	m_hasResult = false;
+	m_curstm = m_stmmap->find( stmname);
 	if (m_state == Executed || m_state == Prepared)
 	{
 		sqlite3_finalize( m_stm);
@@ -165,13 +180,12 @@ bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
 	{
 		return errorStatus( std::string( "call of start not allowed in state '") + stateName(m_state) + "'");
 	}
-	std::map<std::string,std::string>::const_iterator si = m_stmmap->find( stmname);
-	if (si == m_stmmap->end())
+	if (m_curstm == m_stmmap->end())
 	{
 		return errorStatus( std::string( "statement not found '") + stmname + "'");
 	}
 	const char *stmtail;
-	int rc = sqlite3_prepare_v2( m_conn, si->second.c_str(), -1, &m_stm, &stmtail);
+	int rc = sqlite3_prepare_v2( m_conn, m_curstm->second.c_str(), -1, &m_stm, &stmtail);
 	if (rc == SQLITE_OK)
 	{
 		if (stmtail != 0)
@@ -195,19 +209,20 @@ bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const char* value)
 	}
 	if (idx == 0 || idx >= (std::size_t)std::numeric_limits<int>::max())
 	{
-		return errorStatus( "bind index out of range");
+		return errorStatus( std::string( "bind index out of range (") + boost::lexical_cast<std::string>(idx) + ")");
 	}
-	if (idx >= (std::size_t)sqlite3_bind_parameter_count( m_stm))
+	std::size_t stmcnt = (std::size_t)sqlite3_bind_parameter_count( m_stm);
+	if (idx > stmcnt)
 	{
-		return errorStatus( "bind parameter index bigger than number of parameters in prepared statement");
+		return errorStatus( std::string( "bind parameter index bigger than number of parameters in prepared statement (") + boost::lexical_cast<std::string>(idx) + " in " + m_curstm->second + ")");
 	}
 	if (value)
 	{
-		return status( sqlite3_bind_text( m_stm, (int)idx-1, value, 0,  SQLITE_STATIC), Prepared);
+		return status( sqlite3_bind_text( m_stm, (int)idx, value, std::strlen( value),  SQLITE_STATIC), Prepared);
 	}
 	else
 	{
-		return status( sqlite3_bind_null( m_stm, (int)idx-1), Prepared);
+		return status( sqlite3_bind_null( m_stm, (int)idx), Prepared);
 	}
 }
 
@@ -217,12 +232,14 @@ bool PreparedStatementHandler_sqlite3::execute()
 	{
 		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
 	}
-	return status( sqlite3_step( m_stm), Executed);
+	int rc = sqlite3_step( m_stm);
+	m_hasResult = (rc == SQLITE_ROW);
+	return status( rc, Executed);
 }
 
 bool PreparedStatementHandler_sqlite3::hasResult()
 {
-	return ((std::size_t)sqlite3_data_count( m_stm) != 0);
+	return m_hasResult;
 }
 
 std::size_t PreparedStatementHandler_sqlite3::nofColumns()
@@ -244,13 +261,13 @@ const char* PreparedStatementHandler_sqlite3::columnName( std::size_t idx)
 	}
 	if (idx == 0 || idx >= (std::size_t)std::numeric_limits<int>::max())
 	{
-		errorStatus( "column index out of range");
+		errorStatus( std::string( "column index out of range (") + boost::lexical_cast<std::string>(idx) + ")");
 		return 0;
 	}
 	const char* rt = sqlite3_column_name( m_stm, (int)idx-1);
 	if (!rt && idx <= (std::size_t)sqlite3_column_count( m_stm))
 	{
-		throw std::bad_alloc();
+		throw std::logic_error( "array bound read accessing column name");
 	}
 	return rt;
 }
@@ -269,7 +286,7 @@ const char* PreparedStatementHandler_sqlite3::get( std::size_t idx)
 	}
 	if (idx == 0 || idx >= (std::size_t)std::numeric_limits<int>::max())
 	{
-		errorStatus( "column index out of range");
+		errorStatus( std::string( "column index out of range (") + boost::lexical_cast<std::string>(idx) + ")");
 		return 0;
 	}
 	if (sqlite3_column_type( m_stm, (int)idx-1) == SQLITE_NULL)
@@ -279,7 +296,7 @@ const char* PreparedStatementHandler_sqlite3::get( std::size_t idx)
 	const char* rt = (const char*)sqlite3_column_text( m_stm, (int)idx-1);
 	if (!rt && idx <= (std::size_t)sqlite3_column_count( m_stm))
 	{
-		errorStatus( "cannot convert result value to string for column");
+		errorStatus( std::string( "cannot convert result value to string for column (") + boost::lexical_cast<std::string>(idx) + ")");
 		return 0;
 	}
 	return rt;
@@ -293,6 +310,7 @@ bool PreparedStatementHandler_sqlite3::next()
 	}
 	int rc = sqlite3_step( m_stm);
 	if (rc == SQLITE_ROW) return true;
+	if (rc == SQLITE_DONE) return false;
 	return status( rc, Executed);
 }
 

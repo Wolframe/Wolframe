@@ -14,9 +14,9 @@ opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=D
 opt="$opt --program=DBPRG.tdl"
 opt="$opt --directmap 'f=xml,c=test_transaction,n=run'"
 testcmd="$opt run"					# command to execute by the test
-docin=employee_assignment_print				# input document name
-docout=map_transaction					# output document name
-disabled=1
+docin=schema_select_task_by_id				# input document name
+docout=output_schema_select_task_by_id			# output document name
+dumpout="program/schema_select_task_by_id.dbdump.txt"	# resource dump to add to expected test output
 testdata="
 **file:$ddltypeprg
 `cat program/$ddltypeprg`

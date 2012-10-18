@@ -2,6 +2,7 @@ testname=`basename $0 ".tst"`				# name of the test
 luascript=`echo $testname | sed 's/lua_//'`.lua
 testscripts=$luascript					# list of scripts of the test
 modpath="../../src/modules"				# module directory relative from tests/temp
+opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
 mod="$modpath/filter/line/mod_filter_line"		# filter module to load
 opt="--module $mod"
 mod="$modpath/lua/bcdnumber/mod_lua_bcdnumber"

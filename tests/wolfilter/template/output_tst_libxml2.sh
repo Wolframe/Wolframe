@@ -17,6 +17,7 @@
 # - testscripts		list of scripts of the test
 # - docin		input document name
 # - docout		output document name
+# - dumpout		(optional) file to dump to expected output too
 # - csetlist		list of character set encodings
 # - testdata		(optional) additionaly defined test data
 #
@@ -26,10 +27,9 @@ PWD=`pwd`
 topdir=`dirname $PWD/$0`"/../../../../"
 
 filter="xml:libxml2"
-modpath="../../src/modules"
-testcmd="--module $modpath/filter/libxml2/mod_filter_libxml2 $testcmd"
-if [ `echo $testcmd | grep '.lua' | grep -c -- '--program'` != 0 ]; then
-	testcmd="--module $modpath/cmdbind/lua/mod_command_lua $testcmd"
+if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
+	modpath="../../src/modules"
+	testcmd="--module $modpath/filter/libxml2/mod_filter_libxml2 $testcmd"
 fi
 
 testname="$TESTNAME""_libxml2"
