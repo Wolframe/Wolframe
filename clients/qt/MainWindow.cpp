@@ -151,13 +151,15 @@ void MainWindow::initialize( )
 		case Network:
 			if( !m_wolframeClient->syncConnect( ) ) {
 				qWarning( ) << "Can't connect to Wolframe daemon!";
+				m_loadMode = Local;
 				QCoreApplication::quit( );
-			}
-			connect( m_wolframeClient, SIGNAL( helloReceived( ) ),
-				this, SLOT( helloReceived( ) ) );
-			if( !m_wolframeClient->syncHello( ) ) {
-				qWarning( ) << "Can't send HELLO to Wolframe daemon!";
-				QCoreApplication::quit( );
+			} else {
+				connect( m_wolframeClient, SIGNAL( helloReceived( ) ),
+					this, SLOT( helloReceived( ) ) );
+				if( !m_wolframeClient->syncHello( ) ) {
+					qWarning( ) << "Can't send HELLO to Wolframe daemon!";
+					QCoreApplication::quit( );
+				}
 			}
 			break;
 		default:
@@ -214,9 +216,7 @@ void MainWindow::initialize( )
 
 void MainWindow::wolframeError( QString error )
 {
-	if( m_debugTerminal && !m_debugTerminal->isVisible( ) ) {
-		m_debugTerminal->bringToFront( );
-	}
+	qDebug( ) << error;
 }
 
 void MainWindow::helloReceived( )

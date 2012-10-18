@@ -13,6 +13,40 @@ INCLUDE_DIRS = \
 
 INCLUDE_LIBS =
 
+DYNAMIC_OBJS = \
+	lapi.dllobj \
+	lauxlib.dllobj \
+	lbaselib.dllobj \
+	lbitlib.dllobj \
+	lcode.dllobj \
+	lcorolib.dllobj \
+	lctype.dllobj \
+	ldblib.dllobj \
+	ldebug.dllobj \
+	ldo.dllobj \
+	ldump.dllobj \
+	lfunc.dllobj \
+	lgc.dllobj \
+	linit.dllobj \
+	liolib.dllobj \
+	llex.dllobj \
+	lmathlib.dllobj \
+	lmem.dllobj \
+	loadlib.dllobj \
+	lobject.dllobj \
+	lopcodes.dllobj \
+	loslib.dllobj \
+	lparser.dllobj \
+	lstate.dllobj \
+	lstring.dllobj \
+	lstrlib.dllobj \
+	ltable.dllobj \
+	ltablib.dllobj \
+	ltm.dllobj \
+	lundump.dllobj \
+	lvm.dllobj \
+	lzio.dllobj
+
 OBJS = \
 	lapi.obj \
 	lauxlib.obj \
@@ -47,22 +81,30 @@ OBJS = \
 	lvm.obj \
 	lzio.obj
 
+STATIC_LIB = \
+	lua_static.lib
+
+DYNAMIC_LIB = \
+	lua52.dll
+
 LIBRARIES = \
-	lua.lib
-
-INCLUDE_LIBS = $(INCLUDE_LIBS) $(LOCAL_STATIC_LIB)
-
+	$(STATIC_LIB) \
+	$(DYNAMIC_LIB)
+	
 BINS = \
 	lua.exe
 	
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
+lua52.dll: $(DYNAMIC_OBJS)
+	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $?
+
 lua.obj: lua.c
-lua.exe: lua.lib
-	$(LINK) $(LDFLAGS) $(LIBS) /out:$@ lua.lib lua.obj $**
+lua.exe: lua.obj
+	$(LINK) $(LDFLAGS) $(LIBS) /out:$@ lua52.lib $**
 	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1
 
-lua.lib: $(OBJS)
+lua_static.lib: $(OBJS)
 	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
 local_all: $(LIBRARIES) $(BINS)

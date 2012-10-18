@@ -25,6 +25,7 @@ wolframemsg.h
 *.ilk
 *.exp
 *.obj
+*.dllobj
 *.lib
 *.log
 *.so.*

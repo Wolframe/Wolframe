@@ -115,6 +115,9 @@ copy_prereq:
 	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
 	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
 !ENDIF
+!IFDEF WITH_LUA
+	@-copy ..\lua\src\lua.dll .
+!ENDIF
 !IFDEF WITH_PGSQL
 	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
 !IFDEF PGDLL_WITH_I18N

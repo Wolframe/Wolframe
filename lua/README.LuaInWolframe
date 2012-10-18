@@ -6,3 +6,9 @@ Makefile has been renamed to 'Makefile.orig'.
 Wolframe project.
 
 The CFLAGS should be the same as in the original Makefile.
+
+The define switch for creating DLLs is called 'BUILD_SHARED' in
+Wolframe. We use it in 'luaconf.h' to trigger the correct
+DLL function markers as in:
+
+#if defined(LUA_BUILD_AS_DLL) || defined(BUILD_SHARED)	/* { */

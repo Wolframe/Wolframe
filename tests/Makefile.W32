@@ -61,7 +61,7 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	$(INCLUDE_DIRS) /I$(TOPDIR)\lua\src
 INCLUDE_LIBS = \
-	$(INCLUDE_LIBS) $(TOPDIR)\lua\src\lua.lib
+	$(INCLUDE_LIBS) $(TOPDIR)\lua\src\lua_static.lib
 !ENDIF
 
 # libxml2

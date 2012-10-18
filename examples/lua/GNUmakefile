@@ -12,7 +12,8 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	-L$(TOPDIR)/lua/src
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
@@ -21,7 +22,7 @@ INCLUDE_LIBS = \
 	-lboost_date_time \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	$(TOPDIR)/lua/src/liblua.a \
+	-llua \
 	$(LIBS_DL)
 
 # openssl
@@ -71,4 +72,4 @@ endif
 
 run: $(CPP_BINS)
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR) ./luad -c luad.conf -f
+	@LD_LIBRARY_PATH=$(BOOST_LIB_DIR):$(TOPDIR)/lua/src ./luad -c luad.conf -f -d DATA

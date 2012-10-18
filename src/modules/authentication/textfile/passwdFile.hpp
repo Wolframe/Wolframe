@@ -38,36 +38,66 @@
 #define _PASSWDFILE_HPP_INCLUDED
 
 #include <string>
-#include <cstdio>
 
 namespace _Wolframe {
 namespace AAAA {
 
+struct PwdFileUser	{
+	std::string	user;
+	unsigned long	expiry;
+	std::string	hash;
+	std::string	info;
+};
+
+///\brief Password file
+///\note The password file format is:
+/// <username>:<password hash>:<expiry date>:<user info (name)>:.....(ignored)
+/// blank lines and the lines starting with # are ignored
 class PasswordFile
 {
 public:
+	///\brief constructor
+	///\param filename	password file filename
+	///\param create	flag, create the file if it doesn't exist.
+	///			this flag is set only in the password utility
 	PasswordFile( const std::string& filename, bool create = false )
 		: m_filename( filename ), m_create( create )	{}
 
-	/// Return the string as it is in the password file
-	static std::string passwdLine( const std::string& user, const std::string& password,
-				       const std::string& info = "" );
+	///\brief Return the string as it would be in the password file.
+	///	  Used by the password utility in 'no action' mode
+	///\param user	A filled PwdFileUser structure
+	static std::string passwdLine( const PwdFileUser& user );
 
-	/// Parse the password string and split it into fields
-	/// \param
-	static bool parsePwdLine( const std::string& pwdLine,
-				  std::string& user, std::string& password, std::string& info );
+	///\brief Add an user to the password file
+	///\param username	A filled PwdFileUser structure
+	///\return		true if the user has been add or false
+	///			if the user already exists in the file
+	///\note Throws in case of file operation error.
+	bool addUser( const PwdFileUser& user );
 
-	/// Return the salt used for the password file
-	std::string salt();
+	///\brief Delete an user from the password file
+	///\param username	The username of the user to delete
+	///\return		true if the user has been deleted or false
+	///			if the user doesn't exist in the file
+	///\note Throws in case of file operation error.
+	bool delUser( const std::string& username );
 
-	void addUser( const std::string& user, const std::string& password );
+	///\brief Get an user from the password file
+	///\param [in] username	The username of the user to get
+	///\param [out] user	A filled PwdFileUser structure
+	///\return		true if the user has been deleted or false
+	///			if the user doesn't exist in the file
+	///\note Throws in case of file operation error.
+	bool getUser( const std::string& username, PwdFileUser& user ) const;
 
-	bool delUser( const std::string& user );
+	///\brief Change an user from the password file
+	///\param username	The username of the user to change
+	///\param user		A filled PwdFileUser structure
+	///\return		true if the user has been deleted or false
+	///			if the user doesn't exist in the file
+	///\note Throws in case of file operation error.
+	bool modifyUser( const std::string& username, const PwdFileUser& user );
 
-	bool getUser( const std::string& user, std::string& password );
-	bool getUser( const std::string& challenge, const std::string& response,
-		      std::string& user, std::string& password );
 private:
 	const std::string	m_filename;
 	const bool		m_create;
