@@ -73,6 +73,10 @@ Project Wolframe.
 								<File Id="wolframemsg.dll" Name="wolframemsg.dll" DiskId="1" Source="..\src\libwolframe\logger\wolframemsg.dll"/>								
 							</Component>
 							
+							<Component Id="WolfilterBinary" Guid="{10d4d86a-78e3-4262-8d61-279b20ef5fc2}">
+								<File Id="wolfilter.exe" Name="wolfilter.exe" DiskId="1" Source="..\src\wolfilter.exe"/>
+							</Component>
+							
 							<Component Id="ServiceBinary" Guid="{112265CD-F35C-49B5-A4A1-F685B32BC208}">
 								<File Id="wolframed.exe" Name="wolframed.exe" DiskId="1" Source="..\src\wolframed.exe"/>
 
@@ -94,6 +98,21 @@ Project Wolframe.
 								<ServiceControl Id="ServiceControl" Name="wolframe" Remove="uninstall"
 								                Stop="both" Wait="yes"/>
 							</Component>
+							
+							<?ifdef with_sqlite3?>
+								<Component Id="Sqlite3Binary" Guid="{d675f10d-261d-4834-a3fb-3bb9ec08768b}">
+									<File Id="sqlite3.exe" Name="sqlite3.exe" DiskId="1" Source="..\sqlite3\sqlite3.exe"/>
+								</Component>
+							<?endif?>
+							
+							<?ifdef with_lua?>
+								<Component Id="LuaBinary" Guid="{cdf17532-02be-4259-b3c9-90aea143341b}">
+									<File Id="lua.exe" Name="lua.exe" Source="..\lua\src\lua.exe"/>
+								</Component>
+								<Component Id="LuaDll" Guid="{7dc29da2-ab0b-47ff-b98d-5d3bfaf75544}">
+									<File Id="lua.dll" Name="lua.dll" Source="..\lua\src\lua.dll"/>
+								</Component>
+							<?endif?>
 
 							<Component Id="EventLogRegistryEntries" Guid="{f0a03f1a-155c-46b8-88bf-0ea608222b92}">
 								<!-- register event logger source (TODO, couple with config) -->
@@ -202,8 +221,8 @@ Project Wolframe.
 								<util:XmlFile Id="AppendDBconfigPostgresqlPort" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
 								              Name="port" Value="[WOLFRAME_DATABASE_PORT]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="4"/>
-								<util:XmlFile Id="AppendDBconfigPostgresqlName" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
-								              Name="name" Value="[WOLFRAME_DATABASE_NAME]"
+								<util:XmlFile Id="AppendDBconfigPostgresqlDatabase" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
+								              Name="database" Value="[WOLFRAME_DATABASE_DATABASE]"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="5"/>
 								<util:XmlFile Id="AppendDBconfigPostgresqlUser" Action="createElement" ElementPath="/configuration/database/PostgreSQL"
 								              Name="user" Value="[WOLFRAME_DATABASE_USER]"
@@ -376,25 +395,28 @@ Project Wolframe.
 			<Feature Id="MainProgram" Title="Wolframe Service" Description="The basic Wolframe server." Level="1" AllowAdvertise="no" Absent="disallow" InstallDefault="local">
 				<ComponentRef Id="License"/>
 				<ComponentRef Id="ServiceBinary"/>
+				<ComponentRef Id="WolfilterBinary"/>				
 				<ComponentRef Id="ServiceRegistryEntries"/>
 				<ComponentRef Id="EventLogDlls"/>
 				<ComponentRef Id="EventLogRegistryEntries"/>
 				<?ifdef var.with_ssl?>				
 				<ComponentRef Id="OpenSSL"/>
 				<?endif?>
-				<?ifdef var.with_libxml2?>
-				<ComponentRef Id="LibXML2"/>
+				<?ifdef with_lua?>
+					<ComponentRef Id="LuaBinary"/>
+					<ComponentRef Id="LuaDll"/>
 				<?endif?>
 				<ComponentRef Id="WolframeConfigXml"/>
 				<ComponentRef Id="ApplicationShortcut"/>
 				<ComponentRef Id="EmptyLogDir"/>
 				<ComponentRef Id="EmptyDataDir"/>
 			</Feature>
-			
+						
 			<Feature Id="DatabaseModules" Title="Database Modules" Description="Connectors to databases" Level="3">
 				<?ifdef with_sqlite3?>
 				<Feature Id="Sqlite3DB" Title="SQlite3 database driver" Description="Access local Sqlite3 database files." Level="3" InstallDefault="local" TypicalDefault="install">
 					<ComponentRef Id="ModDbSqlite3"/>
+					<ComponentRef Id="Sqlite3Binary"/>
 				</Feature>				
 				<?endif?>
 				
@@ -449,6 +471,7 @@ Project Wolframe.
 				<?ifdef var.with_libxml2?>
 					<Feature Id="FilterModuleLibXml2" Title="Libxml2 filter module" Description="Libxml filter module." Level="3" InstallDefault="local" TypicalDefault="install">
 						<ComponentRef Id="ModFilterLibXml2"/>
+						<ComponentRef Id="LibXML2"/>
 					</Feature>
 				<?endif?>
 				

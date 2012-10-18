@@ -11,6 +11,11 @@ WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_ssl=1
 !ENDIF
 
+!IFDEF WITH_LUA
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_lua=1
+!ENDIF
+
 !IFDEF WITH_PGSQL
 WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_pgsql=1
