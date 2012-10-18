@@ -330,6 +330,14 @@ void WolframeClient::hello( )
 	sendCommand( "hello" );
 }
 
+void WolframeClient::login( QString username, QString password )
+{
+	sendCommand( "login" );
+	// TODO: challenge isuing username/password
+	
+	emit loginOk( );
+}
+
 void WolframeClient::run( QString cmd, QString data )
 {
 	sendCommand( "run " + cmd );
@@ -363,15 +371,24 @@ bool WolframeClient::syncHello( )
 	return( QxtSignalWaiter::wait( this, SIGNAL( helloReceived( ) ), m_timeout ) );
 }
 
+bool WolframeClient::syncLogin( QString username, QString password )
+{
+	login( username, password );
+	if( QxtSignalWaiter::wait( this, SIGNAL( loginFailed( ) ), SIGNAL( loginOk( ) ), m_timeout ) ) {
+		if( m_hasErrors ) return false;
+		return true;
+	}
+}
+
 QString WolframeClient::syncRun( QString cmd, QString data )
 {
 	run( cmd );
 	// TODO: send data now
 	if( QxtSignalWaiter::wait( this, SIGNAL( runReceived( QString, QString ) ), SIGNAL( error( QString ) ), m_timeout ) ) {
-		if( m_hasErrors ) return 0;
+		if( m_hasErrors ) return QString::null;
 		return m_answer;
 	} else {
-		return 0;
+		return QString::null;
 	}
 }
 

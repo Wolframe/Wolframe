@@ -65,14 +65,15 @@ void LoginDialog::login( )
 	QString password = m_password->text( );
 	
 	// TODO
-	//m_wolframeClient->syncLogin( );
+	m_succeeded = m_wolframeClient->syncLogin( username, password );
 	
-	// TODO: emit success and failure signals
-	
-	m_succeeded = true;
 	close( );
 	
-	emit authenticationOk( );
+	if( m_succeeded ) {
+		emit authenticationOk( );
+	} else {
+		emit authenticationFailed( );
+	}
 }
 
 } // namespace QtClient
