@@ -377,6 +377,8 @@ bool WolframeClient::syncLogin( QString username, QString password )
 	if( QxtSignalWaiter::wait( this, SIGNAL( loginFailed( ) ), SIGNAL( loginOk( ) ), m_timeout ) ) {
 		if( m_hasErrors ) return false;
 		return true;
+	} else {
+		return false;
 	}
 }
 
