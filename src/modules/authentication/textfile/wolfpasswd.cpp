@@ -158,7 +158,10 @@ int main( int argc, char* argv[] )
 		else
 			passwd = args[1];
 		// now do the job
-		std::cout << WA::PasswordFile::passwdLine( args[1], passwd );
+		WA::PwdFileUser user;
+		user.user = args[1];
+		user.hash = passwd;
+		std::cout << WA::PasswordFile::passwdLine( user );
 	}
 	// delete user
 	else if ( delUser )	{
@@ -238,7 +241,10 @@ int main( int argc, char* argv[] )
 				passwd = WA::getPassword();
 			else
 				passwd = args[2];
-			pwdFile.addUser( args[1], passwd );
+			WA::PwdFileUser user;
+			user.user = args[1];
+			user.hash = passwd;
+			pwdFile.addUser( user );
 			std::cout << "User '" << args[1] << "' added to password file '"
 				  << filename << "'";
 		}

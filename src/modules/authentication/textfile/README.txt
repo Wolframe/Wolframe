@@ -2,7 +2,7 @@ Text File Authentication
 
 The format of the file is:
 
-<username>:<SHA-224 of the password>:<user info (name)>:.....(ignored)
+<username>:<password hash>:<expiry date>:<user info (name)>:.....(ignored)
 
 The PLAIN TEXT protocol is very simple. It is one message in the format
 	USER <username> PASS(WORD) <password>

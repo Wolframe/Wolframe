@@ -51,110 +51,109 @@ namespace AAAA {
 
 static const std::size_t PWD_LINE_SIZE = 1024;
 
-std::string PasswordFile::passwdLine( const std::string& user,
-				      const std::string& password , const std::string &info )
+std::string PasswordFile::passwdLine( const PwdFileUser& user )
 {
 	std::stringstream ss;
-	ss << "Display only, user '" << user << "' with password '" << password << "', info: '"
-	   << info << "'\n";
+	ss << "Display only, user '" << user.user << "' with password '" << user.hash << "', info: '"
+	   << user.info << "'\n";
 	return ss.str();
 }
 
-bool PasswordFile::parsePwdLine( const std::string& pwdLine,
-				 std::string& user, std::string& password, std::string& info )
-{
-	std::string line = boost::algorithm::trim_copy( pwdLine );
-	if ( line.empty() || line[0] == '#' )	{
-		user.clear();
-		password.clear();
-		info.clear();
-		return true;
-	}
+//bool PasswordFile::parsePwdLine( const std::string& pwdLine,
+//				 std::string& user, std::string& password, std::string& info )
+//{
+//	std::string line = boost::algorithm::trim_copy( pwdLine );
+//	if ( line.empty() || line[0] == '#' )	{
+//		user.clear();
+//		password.clear();
+//		info.clear();
+//		return true;
+//	}
 
-	std::size_t  start = 0, end = 0;
-	if ( end != std::string::npos )	{
-		end = line.find( ":", start );
-		user = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-		start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-		boost::algorithm::trim( user );
-	}
+//	std::size_t  start = 0, end = 0;
+//	if ( end != std::string::npos )	{
+//		end = line.find( ":", start );
+//		user = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+//		start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+//		boost::algorithm::trim( user );
+//	}
 
-	if ( end != std::string::npos )	{
-		end = line.find( ":", start );
-		password = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-		start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-		boost::algorithm::trim( password );
-	}
-	else	{
-		password.clear();
-		info.clear();
-		return false;
-	}
+//	if ( end != std::string::npos )	{
+//		end = line.find( ":", start );
+//		password = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+//		start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+//		boost::algorithm::trim( password );
+//	}
+//	else	{
+//		password.clear();
+//		info.clear();
+//		return false;
+//	}
 
-	if ( end != std::string::npos )	{
-		end = line.find( ":", start );
-		info = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-		boost::algorithm::trim( info );
-	}
-	return true;
-}
+//	if ( end != std::string::npos )	{
+//		end = line.find( ":", start );
+//		info = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+//		boost::algorithm::trim( info );
+//	}
+//	return true;
+//}
 
-std::string PasswordFile::salt()
-{
-	if ( !boost::filesystem::exists( m_filename ))	{
-		std::string msg = "password file '";
-		msg += m_filename + "' does not exist";
-		throw std::runtime_error( msg );
-	}
+//std::string PasswordFile::salt()
+//{
+//	if ( !boost::filesystem::exists( m_filename ))	{
+//		std::string msg = "password file '";
+//		msg += m_filename + "' does not exist";
+//		throw std::runtime_error( msg );
+//	}
 
-	FILE*	file;
-	if ( ! ( file = fopen( m_filename.c_str(), "r" )))	{
-		std::string msg = "error opening password file '";
-		msg += m_filename + "'";
-		throw std::runtime_error( msg );
-	}
+//	FILE*	file;
+//	if ( ! ( file = fopen( m_filename.c_str(), "r" )))	{
+//		std::string msg = "error opening password file '";
+//		msg += m_filename + "'";
+//		throw std::runtime_error( msg );
+//	}
 
-	char lineBuf[ PWD_LINE_SIZE + 2];
-	while( ! feof( file ))	{
-		if ( ! fgets( lineBuf,  PWD_LINE_SIZE, file ))	{
-			if ( feof( file ))	{		// EOF reached with nothing to read
-				fclose( file );
-				return std::string();
-			}
-			else	{
-				std::string msg = "error reading password file '";
-				msg += m_filename + "'";
-				fclose( file );
-				throw std::runtime_error( msg );
-			}
-		}
+//	char lineBuf[ PWD_LINE_SIZE + 2];
+//	while( ! feof( file ))	{
+//		if ( ! fgets( lineBuf,  PWD_LINE_SIZE, file ))	{
+//			if ( feof( file ))	{		// EOF reached with nothing to read
+//				fclose( file );
+//				return std::string();
+//			}
+//			else	{
+//				std::string msg = "error reading password file '";
+//				msg += m_filename + "'";
+//				fclose( file );
+//				throw std::runtime_error( msg );
+//			}
+//		}
 
-		std::string line( lineBuf );
-		boost::algorithm::trim( line );
-		if ( line[0] == '#' || line.empty() )
-			continue;
+//		std::string line( lineBuf );
+//		boost::algorithm::trim( line );
+//		if ( line[0] == '#' || line.empty() )
+//			continue;
 
-		std::size_t  start = 0, end = 0;
-		std::string pwd;
-		// skip username
-		if ( end != std::string::npos )	{
-			end = line.find( ":", start );
-			line.substr( start, (end == std::string::npos) ? std::string::npos : end - start );
-			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-		}
-		// get password
-		if ( end != std::string::npos )	{
-			end = line.find( ":", start );
-			pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-		}
-		return pwd;
-	}
+//		std::size_t  start = 0, end = 0;
+//		std::string pwd;
+//		// skip username
+//		if ( end != std::string::npos )	{
+//			end = line.find( ":", start );
+//			line.substr( start, (end == std::string::npos) ? std::string::npos : end - start );
+//			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+//		}
+//		// get password
+//		if ( end != std::string::npos )	{
+//			end = line.find( ":", start );
+//			pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
+//			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
+//		}
+//		return pwd;
+//	}
 
-	return std::string( "" );
-}
+//	return std::string( "" );
+//}
 
-void PasswordFile::addUser(const std::string& /*user*/, const std::string& /*password*/ )
+bool PasswordFile::addUser( const PwdFileUser& /*user*/ )
 {
 //	FILE*	file;
 
@@ -170,22 +169,22 @@ void PasswordFile::addUser(const std::string& /*user*/, const std::string& /*pas
 	else	{
 
 	}
+	return true;
 }
 
-bool PasswordFile::delUser( const std::string& user )
+bool PasswordFile::delUser( const std::string& username )
 {
-	std::cout << "Delete user '" << user << "' from password file '"
+	std::cout << "Delete user '" << username << "' from password file '"
 		  << m_filename << "'\n";
 	return true;
 }
 
-bool getUser( const std::string& /*user*/, std::string& /*password*/ )
+bool PasswordFile::getUser( const std::string& /*username*/, PwdFileUser& /*user*/ ) const
 {
 	return true;
 }
 
-bool getUser( const std::string& /*challenge*/, const std::string& /*response*/,
-	      std::string& /*user*/, std::string& /*password*/ )
+bool PasswordFile::modifyUser( const std::string& /*username*/, const PwdFileUser& /*user*/ )
 {
 	return true;
 }
