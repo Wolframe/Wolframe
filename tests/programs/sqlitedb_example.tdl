@@ -1,0 +1,7 @@
+PREPARE get_task AS SELECT * FROM task WHERE id=? ORDER BY id ASC;
+
+TRANSACTION test_transaction
+BEGIN
+	INTO doc/task WITH //task DO get_task( id);
+END
+
