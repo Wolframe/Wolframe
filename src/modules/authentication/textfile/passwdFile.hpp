@@ -44,14 +44,14 @@ namespace AAAA {
 
 struct PwdFileUser	{
 	std::string	user;
-	unsigned long	expiry;
 	std::string	hash;
 	std::string	info;
+	unsigned long	expiry;
 };
 
 ///\brief Password file
 ///\note The password file format is:
-/// <username>:<password hash>:<expiry date>:<user info (name)>:.....(ignored)
+/// <username>:<password hash>:<user info>:<expiry date>
 /// blank lines and the lines starting with # are ignored
 class PasswordFile
 {
