@@ -186,7 +186,7 @@ static std::vector<std::string> getTableNames( sqlite3* handle)
 	return rt;
 }
 
-void SQLiteTestConstructor::dump_database()
+void SQLiteTestConfig::dump_database()
 {
 	FILE *fh = fopen( m_dump_filename.c_str(), "w");
 	try
@@ -195,7 +195,7 @@ void SQLiteTestConstructor::dump_database()
 
 		sqlite3* handle;
 		int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
-		int res = sqlite3_open_v2( m_db_filename.c_str(), &handle, flags, OPERATING_SYSTEM);
+		int res = sqlite3_open_v2( filename().c_str(), &handle, flags, OPERATING_SYSTEM);
 		boost::shared_ptr<sqlite3> handle_disposer( handle, sqlite3_close);
 
 		if (res != SQLITE_OK)
