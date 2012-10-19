@@ -12,8 +12,7 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR) \
-	-L$(TOPDIR)/lua/src
+	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lboost_thread$(BOOST_LIBRARY_TAG) -lboost_system \
@@ -22,7 +21,7 @@ INCLUDE_LIBS = \
 	-lboost_date_time \
 	$(TOPDIR)/src/libwolframe.a \
 	$(TOPDIR)/src/libwolframe/libwolframe.a \
-	-llua \
+	$(TOPDIR)/lua/src/liblua.a \
 	$(LIBS_DL)
 
 # openssl
@@ -37,7 +36,7 @@ INCLUDE_LIBS += \
 
 endif
 
-OBJS = \
+CPP_OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \
 	luaConfig.o \
@@ -47,7 +46,7 @@ OBJS = \
 CPP_BINS = \
 	luad$(EXE)
 
-luad$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+#luad$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
