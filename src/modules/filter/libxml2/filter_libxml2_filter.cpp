@@ -207,6 +207,8 @@ struct InputFilterImpl :public InputFilter
 	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* content, std::size_t contentsize, bool end)
 	{
+/*[-]*/std::cout << "XMLFILTER INPUT [" << std::string( (const char*)content, contentsize) << "]" << std::endl;
+
 		if (!end) throw std::logic_error( "internal: need buffering input filter");
 		m_nodestk.clear();
 
@@ -216,13 +218,16 @@ struct InputFilterImpl :public InputFilter
 			xmlError* err = xmlGetLastError();
 			setState( Error, err->message);
 		}
-		m_node = xmlDocGetRootElement( m_doc.get());
-
-		const xmlChar* ec = m_doc.get()->encoding;
-		m_encoding.reset( new std::string);
-		for (int ii=0; ec[ii]!=0; ii++)
+		else
 		{
-			m_encoding->push_back((unsigned char)ec[ii]);
+			m_node = xmlDocGetRootElement( m_doc.get());
+
+			const xmlChar* ec = m_doc.get()->encoding;
+			m_encoding.reset( new std::string);
+			for (int ii=0; ec[ii]!=0; ii++)
+			{
+				m_encoding->push_back((unsigned char)ec[ii]);
+			}
 		}
 	}
 

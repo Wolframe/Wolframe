@@ -333,11 +333,8 @@ static Expression parseOperand( std::string::const_iterator& itr, const std::str
 	Expression rt;
 	Expression::Operator opr;
 
-/*[-]*/std::cout << "ENTER parseOperand" << std::endl;
-
 	if (parseOperator( opr, itr, end))
 	{
-/*[-]*/std::cout << "OPERATOR " << Expression::operatorString( opr) << std::endl;
 		if (opr == Expression::Minus)
 		{
 			Expression subexpr = parseOperand( itr, end, exprstrings);
@@ -366,7 +363,6 @@ static Expression parseOperand( std::string::const_iterator& itr, const std::str
 		case ')': break;
 		case '(':
 		{
-/*[-]*/std::cout << "ENTER sub expression" << std::endl;
 			++itr;
 			Expression op1 = parseOperand( itr, end, exprstrings);
 			if (!op1.size()) throw std::runtime_error( "empty subexpression");
@@ -374,7 +370,6 @@ static Expression parseOperand( std::string::const_iterator& itr, const std::str
 			ch = utils::gotoNextToken( itr, end);
 			if (ch != ')') throw std::runtime_error( "subexpression not terminated. ')' expected");
 			rt.push_expression( subexpr);
-/*[-]*/std::cout << "LEAVE sub expression" << std::endl;
 			break;
 		}
 		case '\'':
@@ -382,7 +377,6 @@ static Expression parseOperand( std::string::const_iterator& itr, const std::str
 		{
 			std::string tok;
 			ch = utils::parseNextToken( tok, itr, end, g_operatorTable);
-/*[-]*/std::cout << "TOKEN '" << tok << "'" << std::endl;
 			rt.push_value( exprstrings.size());
 			exprstrings.append( tok);
 			exprstrings.push_back( '\0');
@@ -392,7 +386,6 @@ static Expression parseOperand( std::string::const_iterator& itr, const std::str
 		{
 			std::string tok;
 			ch = utils::parseNextToken( tok, itr, end, g_operatorTable);
-/*[-]*/std::cout << "TOKEN '" << tok << "'" << std::endl;
 			if (isIdentifierToken(ch))
 			{
 				if (!checkIdentifier( tok)) throw std::runtime_error( std::string( "illegal identifier '") + tok + "'");
@@ -411,7 +404,6 @@ static Expression parseOperand( std::string::const_iterator& itr, const std::str
 			}
 		}
 	}
-/*[-]*/std::cout << "LEAVE parseOperand" << std::endl;
 	return rt;
 }
 
@@ -421,11 +413,8 @@ static Expression parseFactorExpression( const Expression& op1, std::string::con
 	std::string tok;
 	Expression::Operator opr;
 
-/*[-]*/std::cout << "ENTER parseFactorExpression" << std::endl;
-
 	if (parseOperator( opr, itr, end))
 	{
-/*[-]*/std::cout << "OPERATOR " << Expression::operatorString( opr) << std::endl;
 		if (opr == Expression::Minus || opr == Expression::Plus || opr == Expression::Concat)
 		{
 			rt.push_expression( op1);
@@ -457,7 +446,6 @@ static Expression parseFactorExpression( const Expression& op1, std::string::con
 		default:
 			throw std::runtime_error( "end of expression or binary operator {'+','-','#','/','*',':'} expected");
 	}
-/*[-]*/std::cout << "LEAVE parseFactorExpression" << std::endl;
 	return rt;
 }
 
@@ -466,12 +454,8 @@ static Expression parseSumExpression( const Expression& op1, std::string::const_
 	Expression rt;
 	Expression::Operator opr;
 
-/*[-]*/std::cout << "ENTER parseSumExpression" << std::endl;
-
 	if (parseOperator( opr, itr, end))
 	{
-/*[-]*/std::cout << "OPERATOR " << Expression::operatorString( opr) << std::endl;
-
 		if (opr == Expression::Minus || opr == Expression::Plus || opr == Expression::Concat)
 		{
 			Expression op2 = parseOperand( itr, end, exprstrings);
@@ -507,7 +491,6 @@ static Expression parseSumExpression( const Expression& op1, std::string::const_
 		default:
 			throw std::runtime_error( "end of expression or binary operator {'+','-','#','/','*',':'} expected");
 	}
-/*[-]*/std::cout << "LEAVE parseSumExpression" << std::endl;
 	return rt;
 }
 
@@ -516,11 +499,8 @@ static Expression parseAssignExpression( const Expression& op1, std::string::con
 	Expression rt;
 	Expression::Operator opr;
 
-/*[-]*/std::cout << "ENTER parseAssignExpression " << std::endl;
-
 	if (parseOperator( opr, itr, end))
 	{
-/*[-]*/std::cout << "OPERATOR " << Expression::operatorString( opr) << std::endl;
 		if (opr == Expression::Assign || opr == Expression::AssignUndefined || opr == Expression::AssignGreater || opr == Expression::AssignSmaller)
 		{
 			Expression op2 = parseOperand( itr, end, exprstrings);
@@ -534,14 +514,12 @@ static Expression parseAssignExpression( const Expression& op1, std::string::con
 		}
 	}
 	throw std::runtime_error( "binary assignment operator '=' or '?=' expected");
-/*[-]*/std::cout << "LEAVE parseAssignExpression " << std::endl;
 }
 
 static Expression parseAssignExpressionList( char separator, std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings)
 {
 	Expression rt;
 
-/*[-]*/std::cout << "ENTER parseAssignExpressionList " << std::endl;
 	char ch = utils::gotoNextToken( itr, end);
 	switch (ch)
 	{
@@ -612,7 +590,6 @@ static Expression parseAssignExpressionList( char separator, std::string::const_
 			throw std::runtime_error( std::string( "identifier or identifier in [ ] brackets expected instead of '") + ch + "'");
 		}
 	}
-/*[-]*/std::cout << "LEAVE parseAssignExpressionList " << std::endl;
 }
 
 static StateDef::MethodCall parseMethodCall( std::string::const_iterator& itr, const std::string::const_iterator& end, std::string& exprstrings)

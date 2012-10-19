@@ -90,159 +90,168 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 	m_inputbuffer.append( inp, bytesTransferred);
 
 	LOG_TRACE << "STATE DoctypeCommandHandler " << stateName( m_state) << " (put input)";
-	for (; ii<bytesTransferred && m_state != Done; ++ii)
+	try
 	{
-		if (!inp[ii])
+		for (; ii<bytesTransferred && m_state != Done; ++ii)
 		{
-			++m_nullcnt;
-			if (m_nullcnt > 4) throw_error( "Unknown encoding");
-		}
-		else
-		{
-			if (m_lastchar == '\n' && inp[ii] == '.')
+			if (!inp[ii])
 			{
-				setState( Done);
-				break;
+				++m_nullcnt;
+				if (m_nullcnt > 4) throw_error( "Unknown encoding");
 			}
-			m_lastchar = inp[ii];
-			m_nullcnt = 0;
-
-			switch (m_state)
+			else
 			{
-				case Init:
-					if (inp[ii] == '<')
-					{
-						setState( ParseHeader0);
-					}
-					else if (inp[ii] < 0 || inp[ii] > 32)
-					{
-						throw_error( "expected '<?'");
-					}
+				if (m_lastchar == '\n' && inp[ii] == '.')
+				{
+					setState( Done);
 					break;
+				}
+				m_lastchar = inp[ii];
+				m_nullcnt = 0;
 
-				case ParseHeader0:
-					if (inp[ii] == '?')
-					{
-						setState( ParseHeader);
-					}
-					else
-					{
-						throw_error( "expected '<?'");
-					}
-					break;
-
-				case ParseHeader:
-					if (inp[ii] == '>')
-					{
-						const char* cc = std::strstr( m_itembuf.c_str(), "standalone");
-						if (cc)
+				switch (m_state)
+				{
+					case Init:
+						if (inp[ii] == '<')
 						{
-							cc = std::strchr( cc, '=');
-							if (cc) cc = std::strstr( cc, "yes");
+							setState( ParseHeader0);
+						}
+						else if (inp[ii] < 0 || inp[ii] > 32)
+						{
+							throw_error( "expected '<?'");
+						}
+						break;
+
+					case ParseHeader0:
+						if (inp[ii] == '?')
+						{
+							setState( ParseHeader);
+						}
+						else
+						{
+							throw_error( "expected '<?'");
+						}
+						break;
+
+					case ParseHeader:
+						if (inp[ii] == '>')
+						{
+							const char* cc = std::strstr( m_itembuf.c_str(), "standalone");
 							if (cc)
 							{
-								setState( Done);
-								break;
+								cc = std::strchr( cc, '=');
+								if (cc) cc = std::strstr( cc, "yes");
+								if (cc)
+								{
+									setState( Done);
+									break;
+								}
+							}
+							setState( SearchDoctypeTag);
+							m_itembuf.clear();
+						}
+						else
+						{
+							m_itembuf.push_back( inp[ii]);
+							if (inp[ii] == '\n' || m_itembuf.size() > 128)
+							{
+								throw_error( "XML header not terminated");
 							}
 						}
-						setState( SearchDoctypeTag);
-						m_itembuf.clear();
-					}
-					else
-					{
-						m_itembuf.push_back( inp[ii]);
-						if (inp[ii] == '\n' || m_itembuf.size() > 128)
+						break;
+
+					case SearchDoctypeTag:
+						if (inp[ii] == '<')
 						{
-							throw_error( "XML header not terminated");
+							setState( ParseDoctype0);
 						}
-					}
-					break;
-
-				case SearchDoctypeTag:
-					if (inp[ii] == '<')
-					{
-						setState( ParseDoctype0);
-					}
-					else if (inp[ii] < 0 || inp[ii] > 32)
-					{
-						throw_error( "expected '<!'");
-					}
-					break;
-
-				case ParseDoctype0:
-					if (inp[ii] == '!')
-					{
-						setState( ParseDoctype1);
-					}
-					else
-					{
-						throw_error( "expected '<!'");
-					}
-					break;
-
-				case ParseDoctype1:
-					if (inp[ii] == '-')
-					{
-						setState( SkipComment);
-					}
-					else if (inp[ii] == 'D')
-					{
-						m_itembuf.push_back( inp[ii]);
-						setState( ParseDoctype2);
-					}
-					else
-					{
-						throw_error( "expected '<!DOCTYPE' or <!--");
-					}
-					break;
-
-				case SkipComment:
-					if (inp[ii] == '>')
-					{
-						setState( SearchDoctypeTag);
-					}
-					break;
-
-				case ParseDoctype2:
-					if (inp[ii] <= ' ' && inp[ii] > 0)
-					{
-						if (m_itembuf != "DOCTYPE")
+						else if (inp[ii] < 0 || inp[ii] > 32)
 						{
-							throw_error( "expected '<!DOCTYPE'");
+							throw_error( "expected '<!'");
 						}
-						setState( ParseDoctype);
-						m_itembuf.clear();
-					}
-					else
-					{
-						m_itembuf.push_back( inp[ii]);
-						if (m_itembuf.size() > 8)
+						break;
+
+					case ParseDoctype0:
+						if (inp[ii] == '!')
 						{
-							throw_error( "expected '<!DOCTYPE'");
+							setState( ParseDoctype1);
 						}
-					}
-					break;
+						else
+						{
+							throw_error( "expected '<!'");
+						}
+						break;
 
-				case ParseDoctype:
-					if (inp[ii] <= ' ' && inp[ii] > 0)
-					{
-						m_doctype.push_back( ' ');
-					}
-					else if (inp[ii] == '>')
-					{
-						m_doctypeid = utils::getIdFromDoctype( m_doctype);
-						setState( Done);
-					}
-					else
-					{
-						m_doctype.push_back( inp[ii]);
-					}
-					break;
+					case ParseDoctype1:
+						if (inp[ii] == '-')
+						{
+							setState( SkipComment);
+						}
+						else if (inp[ii] == 'D')
+						{
+							m_itembuf.push_back( inp[ii]);
+							setState( ParseDoctype2);
+						}
+						else
+						{
+							throw_error( "expected '<!DOCTYPE' or <!--");
+						}
+						break;
 
-				case Done:
-					break;
+					case SkipComment:
+						if (inp[ii] == '>')
+						{
+							setState( SearchDoctypeTag);
+						}
+						break;
+
+					case ParseDoctype2:
+						if (inp[ii] <= ' ' && inp[ii] > 0)
+						{
+							if (m_itembuf != "DOCTYPE")
+							{
+								throw_error( "expected '<!DOCTYPE'");
+							}
+							setState( ParseDoctype);
+							m_itembuf.clear();
+						}
+						else
+						{
+							m_itembuf.push_back( inp[ii]);
+							if (m_itembuf.size() > 8)
+							{
+								throw_error( "expected '<!DOCTYPE'");
+							}
+						}
+						break;
+
+					case ParseDoctype:
+						if (inp[ii] <= ' ' && inp[ii] > 0)
+						{
+							m_doctype.push_back( ' ');
+						}
+						else if (inp[ii] == '>')
+						{
+							m_doctypeid = utils::getIdFromDoctype( m_doctype);
+							setState( Done);
+						}
+						else
+						{
+							m_doctype.push_back( inp[ii]);
+						}
+						break;
+
+					case Done:
+						break;
+				}
 			}
 		}
+	}
+	catch (const std::runtime_error& err)
+	{
+		m_statusCode = -(int)m_state - 100;
+		LOG_ERROR << "error in document type recognition: " << err.what();
+		m_state = Done;
 	}
 }
 

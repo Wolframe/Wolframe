@@ -176,10 +176,18 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 							m_delegateHandlerEnd = 0;
 							m_cmdstateidx = ProcessOutput;
 							m_resultstate = (*l_delegateHandlerEnd)( (void*)this, l_delegateHandler, out);
+							if (m_delegateHandler)
+							{
+								m_delegateHandler->setInputBuffer( m_input.ptr(), m_input.size());
+								m_delegateHandler->putInput( r_begin, r_nofBytes);
+								m_delegateHandler->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
+							}
+							else
+							{
+								putInput( r_begin, r_nofBytes);
+							}
 							m_resultstr = out.str();
 							m_resultitr = 0;
-
-							putInput( r_begin, r_nofBytes);
 							continue;
 						}
 						catch (std::exception& e)
