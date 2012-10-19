@@ -19,7 +19,7 @@ INCLUDE_LDFLAGS = \
 	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	Advapi32.lib $(TOPDIR)\lua\src\lua52.lib
+	Advapi32.lib $(TOPDIR)\lua\src\lua_static.lib
 
 # openssl
 
