@@ -12,7 +12,7 @@
 **file:DBIN.tdl
 TRANSACTION test_transaction
 BEGIN
-	INTO doc/task WITH //task DO run( title);
+	INTO doc/task FOREACH //task DO run( title);
 END
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

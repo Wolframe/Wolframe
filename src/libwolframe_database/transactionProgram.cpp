@@ -165,26 +165,26 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 					}
 					else if (g_optab[ch])
 					{
-						throw ERROR( si, MSG << "keyword (END,WITH,INTO,DO) expected instead of operator '" << ch << "'");
+						throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of operator '" << ch << "'");
 					}
 					else if (ch == '\'' || ch == '\"')
 					{
-						throw ERROR( si, "keyword (END,WITH,INTO,DO) expected instead string");
+						throw ERROR( si, "keyword (END,FOREACH,INTO,DO) expected instead string");
 					}
 					else if (boost::algorithm::iequals( tok, "END"))
 					{
 						break;
 					}
-					else if (boost::algorithm::iequals( tok, "WITH"))
+					else if (boost::algorithm::iequals( tok, "FOREACH"))
 					{
 						if (0 != (mask & (1 << (unsigned)TransactionDescription::Selector)))
 						{
-							throw ERROR( si, "selector (WITH ..) specified twice in a transaction description");
+							throw ERROR( si, "selector (FOREACH ..) specified twice in a transaction description");
 						}
 						mask |= (1 << (unsigned)TransactionDescription::Selector);
 
 						ch = utils::parseNextToken( desc.selector, si, se, utils::emptyCharTable(), utils::anyCharTable());
-						if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after WITH");
+						if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
 					}
 					else if (boost::algorithm::iequals( tok, "INTO"))
 					{
@@ -245,7 +245,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 					}
 					else
 					{
-						throw ERROR( si, MSG << "keyword (END,WITH,INTO,DO) expected instead of '" << tok << "'");
+						throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of '" << tok << "'");
 					}
 				}
 				// append empty lines to keep line info for the dbsource:
@@ -280,7 +280,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 			switch (err.elemname)
 			{
 				case TransactionDescription::Selector:
-					errlocation = "in selector expression (WITH ..)";
+					errlocation = "in selector expression (FOREACH ..)";
 				break;
 				case TransactionDescription::Output:
 					errlocation = "in transaction ouput (INTO ..)";

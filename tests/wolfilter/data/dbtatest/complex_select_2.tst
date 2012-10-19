@@ -10,7 +10,7 @@
 --program=DBIN.tdl
 testcall
 **file:DBIN.tdl
-TRANSACTION testcall BEGIN WITH/doc/item/aa DO run(., ../bb);END
+TRANSACTION testcall BEGIN FOREACH/doc/item/aa DO run(., ../bb);END
 **outputfile:DBOUT
 **output
 run #1#2

@@ -11,7 +11,7 @@
 testcall
 **file:DBIN.tdl
 TRANSACTION testcall BEGIN
-	WITH //item/aa DO run ( . , ../bb, .././cc, ..//dd/.);
+	FOREACH //item/aa DO run ( . , ../bb, .././cc, ..//dd/.);
 END
 **outputfile:DBOUT
 **output

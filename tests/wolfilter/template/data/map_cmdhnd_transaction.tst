@@ -19,6 +19,6 @@ testdata="
 **file:DBIN.tdl
 TRANSACTION test_transaction
 BEGIN
-	INTO doc/task WITH //task DO run( title);
+	INTO doc/task FOREACH //task DO run( title);
 END"
 . ./output_tst_all.sh

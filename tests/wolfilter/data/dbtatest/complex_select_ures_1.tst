@@ -11,9 +11,9 @@
 testcall
 **file:DBIN.tdl
 TRANSACTION testcall BEGIN
-	WITH //aa DO run(.);
-	WITH //aa INTO result/person DO call(. , $1 ) ;
-	WITH //aa INTO result/age DO get ( .,$1 ,$2 ,$3);
+	FOREACH //aa DO run(.);
+	FOREACH //aa INTO result/person DO call(. , $1 ) ;
+	FOREACH //aa INTO result/age DO get ( .,$1 ,$2 ,$3);
 END
 **file: DBRES
 #res#1#2

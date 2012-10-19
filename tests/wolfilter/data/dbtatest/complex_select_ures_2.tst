@@ -11,9 +11,9 @@
 testcall
 **file:DBIN.tdl
 TRANSACTION testcall BEGIN
-	wITH /doc/item/aa DO run(. ,../bb ) ;
+	FOREACH /doc/item/aa DO run(. ,../bb ) ;
 	INTO da/da DO get($1);
-	WITH //bb INTO da/do DO run( $1 );
+	FOREACH //bb INTO da/do DO run( $1 );
 END
 **file: DBRES
 #res#1
