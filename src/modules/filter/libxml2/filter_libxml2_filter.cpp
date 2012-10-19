@@ -207,8 +207,6 @@ struct InputFilterImpl :public InputFilter
 	///\brief Implements InputFilter::putInput(const void*,std::size_t,bool)
 	virtual void putInput( const void* content, std::size_t contentsize, bool end)
 	{
-/*[-]*/std::cout << "XMLFILTER INPUT [" << std::string( (const char*)content, contentsize) << "]" << std::endl;
-
 		if (!end) throw std::logic_error( "internal: need buffering input filter");
 		m_nodestk.clear();
 
