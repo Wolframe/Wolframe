@@ -240,6 +240,7 @@ docs/SDK/Tutorials.xml
 docs/WolfBook.xml
 docs/wolframe.conf-man.xml
 docs/wolframed-man.xml
+examples/demo/wolframe.conf
 examples/echo/appConfigDefinition.cpp
 examples/echo/appProperties.cpp
 examples/echo/echo.conf
@@ -364,6 +365,7 @@ include/appProperties.hpp
 include/cmdbind/commandHandler.hpp
 include/cmdbind/commandHandlerUnit.hpp
 include/cmdbind/directmapCommandHandler.hpp
+include/cmdbind/discardInputCommandHandlerEscDLF.hpp
 include/cmdbind/doctypeFilterCommandHandler.hpp
 include/cmdbind/execCommandHandler.hpp
 include/cmdbind/ioFilterCommandHandlerEscDLF.hpp
@@ -1118,6 +1120,7 @@ tests/modules/tests/mod_test/Makefile.W32
 tests/modules/tests/mod_test/mod_test.cpp
 tests/modules/tests/mod_test/mod_test.hpp
 tests/poolTest.cpp
+tests/programs/sqlitedb_example.sql
 tests/protocolArgumentParsing.cpp
 tests/resolvePathTest.cpp
 tests/simpleFormCompiler/GNUmakefile
