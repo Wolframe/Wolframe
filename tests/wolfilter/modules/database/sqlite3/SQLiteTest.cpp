@@ -189,23 +189,31 @@ static std::vector<std::string> getTableNames( sqlite3* handle)
 void SQLiteTestConstructor::dump_database()
 {
 	FILE *fh = fopen( m_dump_filename.c_str(), "w");
-	if (fh == NULL) throw std::runtime_error( std::string("failed to open file for database dump (") + boost::lexical_cast<std::string>(errno) + "), file '" + m_dump_filename + "'");
-	boost::shared_ptr<FILE> fh_disposer( fh, fclose);
-
-	sqlite3* handle;
-	int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
-	int res = sqlite3_open_v2( m_db_filename.c_str(), &handle, flags, OPERATING_SYSTEM);
-	boost::shared_ptr<sqlite3> handle_disposer( handle, sqlite3_close);
-
-	if (res != SQLITE_OK)
+	try
 	{
-		throw std::runtime_error( "unable to open SQLite test database for dump");
+		if (fh == NULL) throw std::runtime_error( std::string("failed to open file for database dump (") + boost::lexical_cast<std::string>(errno) + "), file '" + m_dump_filename + "'");
+
+		sqlite3* handle;
+		int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
+		int res = sqlite3_open_v2( m_db_filename.c_str(), &handle, flags, OPERATING_SYSTEM);
+		boost::shared_ptr<sqlite3> handle_disposer( handle, sqlite3_close);
+
+		if (res != SQLITE_OK)
+		{
+			throw std::runtime_error( "unable to open SQLite test database for dump");
+		}
+		std::vector<std::string> tablenames = getTableNames( handle);
+		std::vector<std::string>::const_iterator ti = tablenames.begin(), te = tablenames.end();
+		for (; ti != te; ++ti)
+		{
+			dump_table( fh, handle, ti->c_str());
+		}
+		fclose( fh);
 	}
-	std::vector<std::string> tablenames = getTableNames( handle);
-	std::vector<std::string>::const_iterator ti = tablenames.begin(), te = tablenames.end();
-	for (; ti != te; ++ti)
+	catch (const std::exception& err)
 	{
-		dump_table( fh, handle, ti->c_str());
+		if (fh) fclose( fh);
+		throw err;
 	}
 }
 

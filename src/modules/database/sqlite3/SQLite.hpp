@@ -63,7 +63,7 @@ public:
 	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
-	~SQLiteConfig()				{}
+	~SQLiteConfig(){}
 
 	bool parse( const config::ConfigurationTree& pt, const std::string& node,
 		    const module::ModulesDirectory* modules );
