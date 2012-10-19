@@ -59,16 +59,18 @@ protected:
 
 TEST_F( PasswdFileFixture, parsingLine )
 {
-//	std::string user, password, info;
-//	bool result;
+	PasswordFile	pwdFile( "passwd", false );
+	PwdFileUser	user;
+	bool result;
 
-//	result = PasswordFile::parsePwdLine( "user:password:info",
-//					     user, password, info );
+	result = pwdFile.getUser( "Admin", user );
+	EXPECT_FALSE( result );
 
-//	ASSERT_TRUE( result );
-//	ASSERT_STREQ( "user", user.c_str() );
-//	ASSERT_STREQ( "password", password.c_str() );
-//	ASSERT_STREQ( "info", info.c_str() );
+	result = pwdFile.getUser( "admin", user );
+	ASSERT_TRUE( result );
+	EXPECT_STREQ( "admin", user.user.c_str() );
+	EXPECT_STREQ( "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6", user.hash.c_str() );
+	EXPECT_STREQ( "Wolframe Administrator", user.info.c_str() );
 }
 
 //****************************************************************************
