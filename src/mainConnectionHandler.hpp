@@ -53,15 +53,21 @@ public:
 
 	//methods called by the protocol and implemented here
 	int doHello( int argc, const char** argv, std::ostream& out);
-	int doCmdQUIT( int argc, const char** argv, std::ostream& out);
-	int endRun( cmdbind::CommandHandler* ch, std::ostream& out);
+	int endHello( cmdbind::CommandHandler* ch, std::ostream& out);
 
-	const std::vector<Command>& commands() const
-	{
-		return m_commands;
-	}
+	int doRun( int argc, const char** argv, std::ostream& out);
+	int endRun( cmdbind::CommandHandler* ch, std::ostream& out);
+	int endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out);
+	int endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out);
+
+	int doCmdQUIT( int argc, const char** argv, std::ostream& out);
+
+private:
+	int execRun( const std::string& doctype);
+
 private:
 	std::vector<Command> m_commands;	//< commands available
+	std::string m_doctype;
 };
 
 
