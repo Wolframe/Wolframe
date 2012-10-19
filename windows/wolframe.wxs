@@ -110,7 +110,7 @@ Project Wolframe.
 									<File Id="lua.exe" Name="lua.exe" Source="..\lua\src\lua.exe"/>
 								</Component>
 								<Component Id="LuaDll" Guid="{7dc29da2-ab0b-47ff-b98d-5d3bfaf75544}">
-									<File Id="lua.dll" Name="lua.dll" Source="..\lua\src\lua.dll"/>
+									<File Id="lua52.dll" Name="lua52.dll" Source="..\lua\src\lua52.dll"/>
 								</Component>
 							<?endif?>
 

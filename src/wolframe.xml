@@ -237,9 +237,10 @@ Project Wolframe.
 	<Processor>
 	<!--	<database>pgdb</database> -->
 		<database>sqlitedb</database>
-		<EchoProcessor>
+<!--		<EchoProcessor>
 			<timeout>10</timeout>
 		</EchoProcessor>
+-->
 	</Processor>
 
 </configuration>
