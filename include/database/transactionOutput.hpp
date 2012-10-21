@@ -46,6 +46,9 @@ class TransactionOutput
 public:
 	TransactionOutput()
 		:m_strings("\0\0",2){}
+	TransactionOutput( const TransactionOutput& o)
+		:m_result(o.m_result)
+		,m_strings(o.m_strings){}
 
 	class CommandResultBuilder;
 

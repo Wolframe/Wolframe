@@ -47,6 +47,9 @@ class TransactionInput
 public:
 	TransactionInput()
 		:m_strings("\0\0",2){}
+	TransactionInput( const TransactionInput& o)
+		:m_cmd(o.m_cmd)
+		,m_strings(o.m_strings){}
 
 	class Element
 	{

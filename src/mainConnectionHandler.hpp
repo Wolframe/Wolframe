@@ -63,9 +63,6 @@ public:
 	int doCmdQUIT( int argc, const char** argv, std::ostream& out);
 
 private:
-	int execRun( const std::string& doctype);
-
-private:
 	std::vector<Command> m_commands;	//< commands available
 	std::string m_doctype;
 };

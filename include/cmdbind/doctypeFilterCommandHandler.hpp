@@ -77,6 +77,9 @@ public:
 	///\brief See Get the document type of the document
 	std::string doctypeid() const;
 
+	///\brief Get all input consumed (buffered)
+	void getInputBuffer( void*& begin, std::size_t& nofBytes);
+
 private:
 	enum State
 	{

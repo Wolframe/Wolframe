@@ -14,7 +14,6 @@ TRANSACTION testcall
 BEGIN
 	DO run( /aa, /bb, /cc);
 END
-testcall
 **outputfile:DBOUT
 **output
 run #1#2#3

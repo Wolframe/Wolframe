@@ -269,8 +269,13 @@ void DoctypeFilterCommandHandler::getOutput( const void*& begin, std::size_t& by
 
 void DoctypeFilterCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	begin = (const void*)m_inputbuffer.c_str();
-	nofBytes = m_inputbuffer.size();
+	begin = m_input.ptr();
+	nofBytes = 0;
 }
 
+void DoctypeFilterCommandHandler::getInputBuffer( void*& begin, std::size_t& nofBytes)
+{
+	begin = (void*)m_inputbuffer.c_str();
+	nofBytes = m_inputbuffer.size();
+}
 

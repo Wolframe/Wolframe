@@ -34,8 +34,8 @@
 
 #include "mainConnectionHandler.hpp"
 #include "cmdbind/execCommandHandler.hpp"
-#include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
+#include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
@@ -127,25 +127,29 @@ int CommandHandler::endRun( cmdbind::CommandHandler* chnd, std::ostream& out)
 	return rt;
 }
 
-int CommandHandler::execRun( const std::string& doctype)
+static bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out)
 {
-	m_doctype = doctype;
-	cmdbind::CommandHandler* ch = m_provider->cmdhandler( doctype);
-	if (!ch)
+	void* buf;
+	std::size_t bufsize;
+	fromh->getInputBuffer( buf, bufsize);
+	toh->setInputBuffer( buf, bufsize);
+	toh->putInput( buf, bufsize);
+
+	for (;;) switch (toh->nextOperation())
 	{
-		std::ostringstream msg;
-		msg << "unable to execute - command handler for document type '" << doctype << "' is not defined";
-		cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
-		delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
-		return stateidx();
+		case cmdbind::CommandHandler::READ:
+			return true;
+		case cmdbind::CommandHandler::WRITE:
+		{
+			const void* toh_output;
+			std::size_t toh_outputsize;
+			toh->getOutput( toh_output, toh_outputsize);
+			out << std::string( (const char*)toh_output, toh_outputsize);
+			continue;
+		}
+		case cmdbind::CommandHandler::CLOSE:
+			return false;
 	}
-	else
-	{
-		ch->passParameters( doctype, 0, 0);
-		ch->setProcProvider( m_provider);
-		delegateProcessing<&CommandHandler::endRun>( ch);
-	}
-	return stateidx();
 }
 
 int CommandHandler::endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out)
@@ -155,11 +159,12 @@ int CommandHandler::endErrDocumentType( cmdbind::CommandHandler* ch, std::ostrea
 	return stateidx();
 }
 
-int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream&)
+int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out)
 {
 	cmdbind::DoctypeFilterCommandHandler* chnd = dynamic_cast<cmdbind::DoctypeFilterCommandHandler*>( ch);
 	cmdbind::CommandHandlerR chr( ch);
 	std::string doctype = chnd->doctypeid();
+
 	int stc = ch->statusCode();
 	if (stc)
 	{
@@ -177,7 +182,28 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 	}
 	else
 	{
-		return execRun( doctype);
+		cmdbind::CommandHandler* execch = m_provider->cmdhandler( doctype);
+		if (!execch)
+		{
+			std::ostringstream msg;
+			msg << "unable to execute - command handler for document type '" << doctype << "' is not defined";
+			execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
+			if (redirectConsumedInput( chnd, execch, out))
+			{
+				delegateProcessing<&CommandHandler::endErrDocumentType>( ch);
+			}
+		}
+		else
+		{
+			m_doctype = doctype;
+			execch->passParameters( doctype, 0, 0);
+			execch->setProcProvider( m_provider);
+			if (redirectConsumedInput( chnd, execch, out))
+			{
+				delegateProcessing<&CommandHandler::endRun>( execch);
+			}
+		}
+		return stateidx();
 	}
 }
 
@@ -193,7 +219,22 @@ int CommandHandler::doRun( int argc, const char** argv, std::ostream& out)
 		}
 		else
 		{
-			return execRun( argv[0]);
+			cmdbind::CommandHandler* ch = m_provider->cmdhandler( argv[0]);
+			if (!ch)
+			{
+				std::ostringstream msg;
+				msg << "unable to execute - command handler for document type '" << argv[0] << "' is not defined";
+				ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
+				delegateProcessing<&CommandHandler::endErrDocumentType>( ch);
+			}
+			else
+			{
+				m_doctype = argv[0];
+				ch->passParameters( m_doctype, 0, 0);
+				ch->setProcProvider( m_provider);
+				delegateProcessing<&CommandHandler::endRun>( ch);
+			}
+			return stateidx();
 		}
 	}
 	else
