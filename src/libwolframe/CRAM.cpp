@@ -60,7 +60,7 @@
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe;
 
-static const int PASSWORD_HASH_BCD_SIZE = 2 * PASSWORD_DIGEST_SIZE + 1;
+static const int PASSWORD_SALT_BCD_SIZE = 2 * PASSWORD_DIGEST_SIZE + 1;
 static const int PASSWORD_HASH_BASE64_SIZE = (( PASSWORD_DIGEST_SIZE + 2 ) / 3 ) * 4 + 1;
 static const int CRAM_CHALLENGE_STRING_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
 static const int CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
@@ -121,12 +121,10 @@ PasswordSalt::PasswordSalt( const std::string& randomDevice )
 
 std::string PasswordSalt::toBCD() const
 {
-	char	buffer[ PASSWORD_HASH_BCD_SIZE ];
+	char	buffer[ PASSWORD_SALT_BCD_SIZE ];
 
-	memset( buffer, 0, PASSWORD_HASH_BCD_SIZE );
-
-	if ( byte2hex( m_salt, PASSWORD_DIGEST_SIZE,
-		       buffer, PASSWORD_HASH_BCD_SIZE ) == NULL )
+	if ( byte2hex( m_salt, PASSWORD_SALT_SIZE,
+		       buffer, PASSWORD_SALT_BCD_SIZE ) == NULL )
 		throw std::logic_error( "PasswordSalt::toBCD() cannot convert hash ?!?" );
 
 	return std::string( buffer );
@@ -134,12 +132,10 @@ std::string PasswordSalt::toBCD() const
 
 std::string PasswordSalt::toBase64() const
 {
-	char	buffer[ PASSWORD_HASH_BASE64_SIZE ];
+	char	buffer[ PASSWORD_SALT_BASE64_SIZE ];
 
-	memset( buffer, 0, PASSWORD_HASH_BASE64_SIZE );
-
-	if ( base64::encode( m_salt, PASSWORD_DIGEST_SIZE,
-			     buffer, PASSWORD_HASH_BASE64_SIZE, 0 ) < 0 )
+	if ( base64::encode( m_salt, PASSWORD_SALT_SIZE,
+			     buffer, PASSWORD_SALT_BASE64_SIZE, 0 ) < 0 )
 		throw std::logic_error( "PasswordSalt::toBase64() cannot convert hash ?!?" );
 
 	return std::string( buffer );
@@ -154,12 +150,12 @@ PasswordHash::PasswordHash( const PasswordSalt& pwdSalt, const std::string& pass
 
 std::string PasswordHash::toBCD() const
 {
-	char	buffer[ PASSWORD_HASH_BCD_SIZE ];
+	char	buffer[ PASSWORD_SALT_BCD_SIZE ];
 
-	memset( buffer, 0, PASSWORD_HASH_BCD_SIZE );
+	memset( buffer, 0, PASSWORD_SALT_BCD_SIZE );
 
 	if ( byte2hex( m_hash, PASSWORD_DIGEST_SIZE,
-		       buffer, PASSWORD_HASH_BCD_SIZE ) == NULL )
+		       buffer, PASSWORD_SALT_BCD_SIZE ) == NULL )
 		throw std::logic_error( "PasswordHash::toBCD() cannot convert hash ?!?" );
 
 	return std::string( buffer );

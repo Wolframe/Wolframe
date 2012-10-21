@@ -55,8 +55,7 @@ static const std::size_t PWD_FILE_LINE_SIZE = 1024 + 1;
 std::string PasswordFile::passwdLine( const PwdFileUser& user )
 {
 	std::stringstream ss;
-	ss << "Display only, user '" << user.user << "' with password '" << user.hash << "', info: '"
-	   << user.info << "'\n";
+	ss << user.user << ":" << user.hash << ":" << user.info << ":" << user.expiry;
 	return ss.str();
 }
 
@@ -113,15 +112,51 @@ static bool parsePwdLine( const char* pwdLine, PwdFileUser& user )
 }
 
 
-bool PasswordFile::addUser( const PwdFileUser& /*user*/ )
+bool PasswordFile::addUser( const PwdFileUser& user )
 {
-	if ( !boost::filesystem::exists( m_filename ) && !m_create )	{
-		std::string msg = "password file '";
-		msg += m_filename + "' does not exist";
-		throw std::runtime_error( msg );
+	FILE*	file;
+	bool	fileCreated = false;
+
+	if ( !boost::filesystem::exists( m_filename ) )	{
+		if ( !m_create )	{
+			std::string msg = "password file '";
+			msg += m_filename + "' does not exist";
+			throw std::runtime_error( msg );
+		}
+		else	{
+			if (( file = fopen( m_filename.c_str(), "w+" )) == NULL )	{
+				int err = errno;
+				std::string msg = "password file '";
+				msg += m_filename + "' could not be opened: " + strerror( err );
+				throw std::runtime_error( msg );
+			}
+			fileCreated = true;
+		}
 	}
 	else	{
+		PwdFileUser tmpUser;
+		if ( getUser( user.user, tmpUser ))
+			return false;
+		if (( file = fopen( m_filename.c_str(), "a+" )) == NULL )	{
+			int err = errno;
+			std::string msg = "password file '";
+			msg += m_filename + "' could not be opened: " + strerror( err );
+			throw std::runtime_error( msg );
+		}
 	}
+
+	std::string pwdLine = passwdLine( user );
+	assert( !pwdLine.empty() );			// the password line should not be empty
+	assert( *pwdLine.rbegin() != '\n' );		// there should be no newline yet
+	pwdLine += "\n";
+	if ( fputs( pwdLine.c_str(), file ) < 0 )	{
+		int err = errno;
+		fclose( file );
+		std::string msg = "error writing to password file '";
+		msg += m_filename + "': " + strerror( err );
+		throw std::runtime_error( msg );
+	}
+	fclose( file );
 	return true;
 }
 
@@ -178,11 +213,5 @@ bool PasswordFile::getUser( const std::string& username, PwdFileUser& user ) con
 	}
 	return false;
 }
-
-bool PasswordFile::modifyUser( const std::string& /*username*/, const PwdFileUser& /*user*/ )
-{
-	return true;
-}
-
 
 }} // namepspace _Wolframe::AAAA

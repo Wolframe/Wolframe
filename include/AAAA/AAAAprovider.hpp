@@ -61,7 +61,6 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 private:
-	bool						m_allowAnonymous;
 	std::string					m_randomDevice;
 	std::list< config::NamedConfiguration* >	m_authConfig;
 	bool						m_authzDefault;

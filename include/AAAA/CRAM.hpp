@@ -50,14 +50,17 @@ namespace AAAA {
 static const int CRAM_BLOCK_SIZE = 1024 / 8;
 static const int CRAM_DIGEST_SIZE = 512 / 8;
 static const int PASSWORD_DIGEST_SIZE = 224 / 8;
-static const int PASSWORD_SALT_SIZE = 128 / 8;
 static const int CRAM_CHALLENGE_SIZE = CRAM_BLOCK_SIZE;
 static const int CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
 
+static const size_t PASSWORD_SALT_SIZE = 128 / 8;
+static const size_t PASSWORD_SALT_BCD_SIZE = PASSWORD_SALT_SIZE * 2 + 1;
+static const size_t PASSWORD_SALT_BASE64_SIZE = (( PASSWORD_SALT_SIZE * 4 ) / 3 ) +
+			(( PASSWORD_SALT_SIZE % 3 ) ? ( 3 - ( PASSWORD_SALT_SIZE % 3 )) : 0 ) + 1;
 
 class PasswordSalt
 {
-	static const std::size_t PASSWORD_SALT_SIZE = 128 / 8;
+	friend class PasswordHash;
 public:
 	/// Construct an empty salt (all bits 0).
 	PasswordSalt();
