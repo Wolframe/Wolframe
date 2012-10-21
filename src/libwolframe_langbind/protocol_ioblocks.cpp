@@ -30,6 +30,8 @@ Project Wolframe.
 
 ************************************************************************/
 #include "protocol/ioblocks.hpp"
+#include <vector>
+#include <string>
 #include <cstring>
 #include <cstdlib>
 
@@ -79,55 +81,71 @@ MemBlock& MemBlock::operator=( const MemBlock& o)
 	return *this;
 }
 
+static void remove_chars_from_buf( char* buf, std::size_t& bufsize, const std::vector<std::size_t>& delchrs)
+{
+	if (!delchrs.empty())
+	{
+		char* ibuf = buf;
+		char* cpbuf = buf;
+		std::size_t dpos = 0;
+		std::vector<std::size_t>::const_iterator di = delchrs.begin(), de = delchrs.end();
+		for (; di != de; ++di)
+		{
+			if (*di <= dpos && di != delchrs.begin())
+			{
+				throw std::logic_error( "illegal state in getEoDpos (params remove_chars_from_buf)");
+			}
+			for (std::size_t ii = 0, nn = *di - dpos; ii < nn; ++ii) *cpbuf++ = *ibuf++;
+			dpos = *di + 1;
+			++ibuf;
+		}
+		for (std::size_t ii = 0, nn = bufsize - dpos; ii < nn; ++ii) *cpbuf++ = *ibuf++;
+		if ((std::size_t)(ibuf - cpbuf) != delchrs.size())
+		{
+			throw std::logic_error( "illegal state in getEoDpos (consistency remove_chars_from_buf)");
+		}
+		bufsize -= delchrs.size();
+	}
+}
+
 int InputBlock::getEoDpos( std::size_t offset)
 {
 	if (pos()<=offset) return -1;
 
 	std::size_t bufsize = pos()-offset;
 	char* buf = charptr()+offset;
+	std::vector<std::size_t> delchrs;
 	std::size_t bufpos = 0;
 	std::size_t srcendpos = bufsize;
 	char ecb[8];
 	unsigned int eci=0;
 
-	while (bufpos<bufsize)
+	for (; bufpos<bufsize; ++bufpos)
 	{
 		switch (m_eodState)
 		{
 			case EoD::SRC:
-			{
-				srcendpos = bufsize;
-				while (bufpos<bufsize)
+				if (buf[bufpos] == '\r')
 				{
-					if (buf[bufpos] == '\r')
-					{
-						m_eodState = EoD::CR;
-						srcendpos = bufpos;
-						ecb[ 0] = '\r';
-						eci = 1;
-						++bufpos;
-						break;
-					}
-					else if (buf[bufpos] == '\n')
-					{
-						m_eodState = EoD::CR_LF;
-						srcendpos = bufpos;
-						ecb[ 0] = '\n';
-						eci = 1;
-						++bufpos;
-						break;
-					}
-					++bufpos;
+					m_eodState = EoD::CR;
+					srcendpos = bufpos;
+					ecb[ 0] = '\r';
+					eci = 1;
+				}
+				else if (buf[bufpos] == '\n')
+				{
+					m_eodState = EoD::CR_LF;
+					srcendpos = bufpos;
+					ecb[ 0] = '\n';
+					eci = 1;
 				}
 				break;
-			}
 
 			case EoD::CR:
 				if (buf[bufpos] == '\n')
 				{
 					m_eodState = EoD::CR_LF;
 					ecb[ eci++] = '\n';
-					++bufpos;
 				}
 				else if (buf[bufpos] == '\r')
 				{
@@ -136,12 +154,10 @@ int InputBlock::getEoDpos( std::size_t offset)
 					srcendpos = bufpos;
 					ecb[ 0] = '\r';
 					eci = 1;
-					++bufpos;
 				}
 				else
 				{
 					m_eodState = EoD::SRC;
-					srcendpos = bufpos;
 					eci = 0;
 				}
 				break;
@@ -151,9 +167,7 @@ int InputBlock::getEoDpos( std::size_t offset)
 				{
 					m_eodState = EoD::CR_LF_DOT;
 					ecb[ eci++] = '.';
-					std::memmove( buf+bufpos, buf+bufpos+1, bufsize-bufpos-1);
-					bufsize -= 1;
-					setPos( bufsize + offset);
+					delchrs.push_back( bufpos);
 				}
 				else if (buf[bufpos] == '\n')
 				{
@@ -161,7 +175,6 @@ int InputBlock::getEoDpos( std::size_t offset)
 					srcendpos = bufpos;
 					ecb[ 0] = '\n';
 					eci = 1;
-					++bufpos;
 				}
 				else if (buf[bufpos] == '\r')
 				{
@@ -169,12 +182,10 @@ int InputBlock::getEoDpos( std::size_t offset)
 					srcendpos = bufpos;
 					ecb[ 0] = '\r';
 					eci = 1;
-					++bufpos;
 				}
 				else
 				{
 					m_eodState = EoD::SRC;
-					srcendpos = bufpos;
 					eci = 0;
 				}
 				break;
@@ -184,18 +195,17 @@ int InputBlock::getEoDpos( std::size_t offset)
 				{
 					m_eodState = EoD::CR_LF_DOT_CR;
 					ecb[ eci++] = '\r';
-					++bufpos;
 				}
 				else if (buf[bufpos] == '\n')
 				{
 					m_eodState = EoD::CR_LF_DOT_CR_LF;
-					++bufpos;
+					remove_chars_from_buf( buf, bufsize, delchrs);
+					setPos( bufsize + offset);
 					return srcendpos;
 				}
 				else
 				{
 					m_eodState = EoD::SRC;
-					srcendpos = bufpos;
 					eci = 0;
 				}
 				break;
@@ -204,7 +214,8 @@ int InputBlock::getEoDpos( std::size_t offset)
 				if (buf[bufpos] == '\n')
 				{
 					m_eodState = EoD::CR_LF_DOT_CR_LF;
-					++bufpos;
+					remove_chars_from_buf( buf, bufsize, delchrs);
+					setPos( bufsize + offset);
 					return srcendpos;
 				}
 				else if (buf[bufpos] == '\r')
@@ -213,24 +224,44 @@ int InputBlock::getEoDpos( std::size_t offset)
 					srcendpos = bufpos;
 					ecb[ 0] = '\r';
 					eci = 1;
-					++bufpos;
 				}
 				else
 				{
 					m_eodState = EoD::SRC;
-					srcendpos = bufpos;
 					eci = 0;
 				}
 				break;
 
 			case EoD::CR_LF_DOT_CR_LF:
-				return srcendpos;
+				throw std::logic_error( "getEoDpos called after getting eoD");
 		}
 	}
-	m_eodcharbuf.clear();
-	m_eodcharbuf.append( ecb, eci);
-	m_eodState = EoD::SRC;
-	setPos( srcendpos + offset);
+	if (m_eodState == EoD::SRC)
+	{
+		srcendpos = bufpos;
+	}
+	else
+	{
+		m_eodcharbuf.clear();
+		m_eodcharbuf.append( ecb, eci);
+		m_eodState = EoD::SRC;
+	}
+	remove_chars_from_buf( buf, bufsize, delchrs);
+	if (delchrs.empty())
+	{
+		setPos( srcendpos + offset);
+	}
+	else
+	{
+		if (delchrs.back() >= srcendpos)
+		{
+			setPos( srcendpos + offset - delchrs.size() + 1);
+		}
+		else
+		{
+			setPos( srcendpos + offset - delchrs.size());
+		}
+	}
 	return -1;
 }
 
