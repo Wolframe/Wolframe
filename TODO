@@ -9,12 +9,12 @@ ABa:
 
 PF:
 - bignum tests (only bigint tested until now)
-- Postgres/sqlite3 preparedStatementHandler wolfilter tests
 - XSLT filter + tests
 - Printing with HPDF
 	- The print form configuration can have an xslt script for preprocessing
 
-- Add dispatcher to main protocol of wolframed
-- Make database run
+- Make postgres database run transactions
 - directmap programs instead of config
+- define main protocol according notes
 
+- Open Issue: Error messages for the client
