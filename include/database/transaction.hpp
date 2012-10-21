@@ -53,6 +53,7 @@ struct Transaction
 	virtual void execute() = 0;
 
 	virtual void putInput( const TransactionInput& input) = 0;
+
 	virtual const TransactionOutput& getResult() const = 0;
 
 	virtual void close() = 0;
