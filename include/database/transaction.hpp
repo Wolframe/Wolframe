@@ -46,13 +46,13 @@ namespace db {
 
 class Transaction	{
 public:
-	~Transaction()				{}
+    virtual ~Transaction()				{}
 
 	virtual const std::string& databaseID() const = 0;
 
-	virtual void execute( ) = 0;
+    virtual void execute() = 0;
 
-	virtual void putInput( const TransactionInput& input) = 0;
+    virtual void putInput( const TransactionInput& input ) = 0;
 	virtual const TransactionOutput& getResult() const = 0;
 
 	virtual void close() = 0;
