@@ -44,6 +44,8 @@
 #include "langbind/appFormFunction.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
+#include "cmdbind/lineCommandHandler.hpp"
+#include "cmdbind/authCommandHandler.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "prnt/printFunction.hpp"
 #include "langbind/normalizeFunction.hpp"
@@ -104,6 +106,28 @@ public:
 	db::Transaction* transaction( const std::string& name ) const;
 
 	const db::TransactionFunction* transactionFunction( const std::string& name) const;
+
+	///\brief Get the list of available authorization mechanisms
+	std::vector<std::string> authMechanims() const
+	{
+		/// make it just compile
+		return std::vector<std::string>();
+	}
+
+	///\brief Create a handler for a specific authorization mechanisms by name
+	cmdbind::AuthCommandHandler* authHandler( const std::string& /*auth mech*/) const
+	{
+		/// make it just compile
+		return 0;
+	}
+
+	///\Get the list of UI-forms
+	///\return map name -> uiform xml without header
+	std::map<std::string,std::string> uiforms( const std::string& /*auth_ticket*/, int /*min_version*/, int& /*version*/) const
+	{
+		/// make it just compile
+		return std::map<std::string,std::string>();
+	}
 
 private:
 	class ProcessorProvider_Impl;

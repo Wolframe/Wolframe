@@ -39,6 +39,7 @@ Project Wolframe.
 #include <stdexcept>
 #include <cstring>
 #include <cstddef>
+#include <string>
 
 namespace _Wolframe {
 namespace protocol {
@@ -369,6 +370,14 @@ private:
 	std::size_t m_size;
 	State m_state;
 };
+
+
+///\brief escapes LF DOT sequences
+std::string escapeStringDLF( const std::string& src);
+
+///\brief unescapes LF DOT sequences
+///\remark Has no statemachine and assumes that the string is complete (does not end in the middle of a line)
+std::string::const_iterator unescapeStringDLF( const std::string& src, std::string& buf);
 
 } // namespace protocol
 } // namespace _Wolframe

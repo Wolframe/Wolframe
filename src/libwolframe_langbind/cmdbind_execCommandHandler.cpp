@@ -183,7 +183,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					else
 					{
 						m_state = ProtocolError;
-						m_output.print( "BAD command\r\n");
+						m_output.print( "ERR unknown command\r\n");
 						return WRITE;
 					}
 				}
@@ -206,7 +206,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					else
 					{
 						m_state = ProtocolError;
-						m_output.print( "BAD arguments\r\n");
+						m_output.print( "ERR unexpected arguments\r\n");
 						return WRITE;
 					}
 				}
@@ -225,7 +225,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					else
 					{
 						m_state = ProtocolError;
-						m_output.print( "BAD command\r\n");
+						m_output.print( "ERR unknown command\r\n");
 						return WRITE;
 					}
 				}
@@ -248,7 +248,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					if (m_argBuffer.argc())
 					{
 						m_state = ProtocolError;
-						m_output.print( "BAD command\r\n");
+						m_output.print( "ERR empty command with arguments\r\n");
 						return WRITE;
 					}
 					else
@@ -262,7 +262,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				else if (m_cmdidx == (int)m_parser.size())
 				{
 					m_state = ProtocolError;
-					m_output.print( "BAD unknown\r\n");
+					m_output.print( "ERR unknown command\r\n");
 					return WRITE;
 				}
 				else
@@ -273,7 +273,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 						if (!m_provider)
 						{
 							LOG_ERROR << "Processor provider undefined";
-							m_output.print( "BAD command not defined\r\n");
+							m_output.print( "ERR command not defined\r\n");
 							m_state = EnterCommand;
 							m_buffer.clear();
 							m_argBuffer.clear();
@@ -283,7 +283,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 						if (!m_cmdhandler.get())
 						{
 							LOG_ERROR << "Command handler not found for '" << procname << "'";
-							m_output.print( "BAD command not defined\r\n");
+							m_output.print( "ERR command not defined\r\n");
 							m_state = EnterCommand;
 							m_buffer.clear();
 							m_argBuffer.clear();

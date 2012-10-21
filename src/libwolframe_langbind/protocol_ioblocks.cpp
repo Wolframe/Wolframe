@@ -35,8 +35,8 @@ Project Wolframe.
 #include <cstring>
 #include <cstdlib>
 
-namespace _Wolframe {
-namespace protocol {
+using namespace _Wolframe;
+using namespace _Wolframe::protocol;
 
 MemBlock::MemBlock()							:m_ptr(0),m_size(0),m_pos(0),m_allocated(false) {}
 MemBlock::MemBlock( std::size_t p_size)					:m_ptr(0),m_size(p_size),m_pos(0),m_allocated(false)
@@ -355,5 +355,66 @@ void EscapeBuffer::process( char* aa, std::size_t aasize, std::size_t& aapos)
 	}
 }
 
-}}//namespace
+
+std::string _Wolframe::protocol::escapeStringDLF( const std::string& src)
+{
+	std::string rt;
+	std::string::const_iterator si = src.begin(), se = src.end();
+	for (; si != se; ++si)
+	{
+		rt.push_back( *si);
+		if (*si == '\n')
+		{
+			++si;
+			if (si != se)
+			{
+				rt.push_back( *si);
+				if (*si == '.') rt.push_back( '.');
+			}
+		}
+	}
+	return rt;
+}
+
+std::string::const_iterator _Wolframe::protocol::unescapeStringDLF( const std::string& src, std::string& buf)
+{
+	std::string::const_iterator si = src.begin(), se = src.end();
+	for (; si != se; ++si)
+	{
+		buf.push_back( *si);
+		if (*si == '\n')
+		{
+			++si;
+			if (si != se)
+			{
+				if (*si == '.')
+				{
+					std::size_t idx = buf.size();
+					++si;
+					if (*si == '\r')
+					{
+						buf.push_back( '\r');
+						++si;
+					}
+					if (*si == '\n')
+					{
+						buf.append( std::string( si, se));
+						return buf.begin() + idx;
+					}
+					else
+					{
+						buf.push_back( *si);
+					}
+				}
+				else
+				{
+					buf.push_back( *si);
+				}
+			}
+		}
+	}
+	return buf.end();
+}
+
+
 

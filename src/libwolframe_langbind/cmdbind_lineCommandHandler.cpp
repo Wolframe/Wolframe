@@ -212,7 +212,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					}
 					else
 					{
-						m_output.print( "BAD command\r\n");
+						m_output.print( "ERR unknown command\r\n");
 						m_cmdstateidx = ProtocolError;
 						m_buffer.clear();
 						return WRITE;
@@ -237,7 +237,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					}
 					else
 					{
-						m_output.print( m_cmdidx?"BAD arguments\r\n":"BAD line\r\n");
+						m_output.print( "ERR bad arguments\r\n");
 						m_cmdstateidx = ProtocolError;
 						return WRITE;
 					}
@@ -259,7 +259,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					}
 					else
 					{
-						m_output.print( "BAD line\r\n");
+						m_output.print( "ERR bad command line\r\n");
 						m_cmdstateidx = ProtocolError;
 						return WRITE;
 					}
@@ -269,7 +269,7 @@ CommandHandler::Operation LineCommandHandler::nextOperation()
 					if (m_argBuffer.argc() > 0)
 					{
 						///...line beginning with space
-						m_output.print( "BAD line\r\n");
+						m_output.print( "ERR command line starting with spaces\r\n");
 						m_cmdstateidx = ProtocolError;
 						return WRITE;
 					}

@@ -33,19 +33,22 @@
 ///\file mainConnectionHandler.cpp
 
 #include "mainConnectionHandler.hpp"
-#include "cmdbind/execCommandHandler.hpp"
 #include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
 #include "cmdbind/doctypeFilterCommandHandler.hpp"
+#include "cmdbind/authCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::proc;
 
 enum State
 {
-	State0
+	Unauthorized,
+	Authorization,
+	Authorized
 };
 
 struct STM :public cmdbind::LineCommandHandlerSTMTemplate<CommandHandler>
@@ -53,26 +56,60 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<CommandHandler>
 	STM()
 	{
 		(*this)
-			[State0]
-				.cmd< &CommandHandler::doHello >( "HELLO")
-				.cmd< &CommandHandler::doRun >( "RUN")
-				.cmd< &CommandHandler::doCmdQUIT >( "QUIT")
+			[Unauthorized]
+				.cmd< &CommandHandler::doAuth >( "AUTH")
+				.cmd< &CommandHandler::doQuit >( "QUIT")
+				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
+			[Authorization]
+				.cmd< &CommandHandler::doAuth >( "MECH")
+				.cmd< &CommandHandler::doQuit >( "QUIT")
+				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
+			[Authorized]
+				.cmd< &CommandHandler::doRequest >( "REQUEST")
+				.cmd< &CommandHandler::doInterface >( "INTERFACE")
+				.cmd< &CommandHandler::doAuth >( "AUTH")
+				.cmd< &CommandHandler::doQuit >( "QUIT")
+				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
 		;
 	}
 };
 static STM stm;
 
 CommandHandler::CommandHandler()
-	:cmdbind::LineCommandHandlerTemplate<CommandHandler>( &stm )
+	:cmdbind::LineCommandHandlerTemplate<CommandHandler>( &stm ){}
+
+static const unsigned long getNumber( const char* aa)
 {
-	m_commands.push_back( Command( "RUN", "test"));
+	unsigned long result = 0;
+	for (int ii=0; aa[ii] <= '9' && aa[0] >= '0'; ++ii)
+	{
+		unsigned long xx = result * 10 + aa[0] - '0';
+		if (xx < result) throw std::runtime_error( "number out of range");
+		result = xx;
+	}
+	return result;
+
 }
 
-int CommandHandler::doCmdQUIT( int argc, const char**, std::ostream& out)
+int CommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
-		out << "BAD arguments" << endl();
+		out << "ERR unexpected arguments" << endl();
+		return stateidx();
+	}
+	else
+	{
+		out << "OK " << boost::algorithm::join( cmds(), " ") << endl();
+		return stateidx();
+	}
+}
+
+int CommandHandler::doQuit( int argc, const char**, std::ostream& out)
+{
+	if (argc != 0)
+	{
+		out << "ERR unexpected arguments" << endl();
 		return stateidx();
 	}
 	else
@@ -82,47 +119,95 @@ int CommandHandler::doCmdQUIT( int argc, const char**, std::ostream& out)
 	}
 }
 
-int CommandHandler::endHello( cmdbind::CommandHandler* ch, std::ostream& out)
-{
-	cmdbind::ExecCommandHandler* chnd = dynamic_cast<cmdbind::ExecCommandHandler*>( ch);
-	cmdbind::CommandHandlerR chr( ch);
-	int argc;
-	const char** argv;
-	const char* lastcmd = chnd->getCommand( argc, argv);
-	m_statusCode = ch->statusCode();
-	int rt = stateidx();
-
-	if (lastcmd) rt = runCommand( lastcmd, argc, argv, out);
-	return rt;
-}
-
-int CommandHandler::doHello( int argc, const char**, std::ostream& out)
+int CommandHandler::doAuth( int argc, const char**, std::ostream& out)
 {
 	if (argc != 0)
 	{
-		out << "BAD arguments" << endl();
+		out << "ERR AUTH no arguments expected" << endl();
 		return stateidx();
 	}
-	CommandHandler* ch = (CommandHandler*)new cmdbind::ExecCommandHandler( cmds(), m_commands);
-	ch->setProcProvider( m_provider);
-	delegateProcessing<&CommandHandler::endHello>( ch);
+	else
+	{
+		out << "MECHS " << boost::algorithm::join( m_provider->authMechanims(), " ") << std::endl;
+		return Authorization;
+	}
+}
+
+int CommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
+{
+	cmdbind::AuthCommandHandler* chnd = dynamic_cast<cmdbind::AuthCommandHandler*>( ch);
+	cmdbind::CommandHandlerR chr( ch);
+	int authstatus = ch->statusCode();
+
+	if (authstatus)
+	{
+		out << "ERR MECH" << authstatus << endl();
+		return -1;
+	}
+	else
+	{
+		m_authtickets.push_back( chnd->ticket());
+		return Authorized;
+	}
+}
+
+int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
+{
+	if (argc == 0)
+	{
+		out << "ERR argument (mechanism identifier) expected for MECH" << endl();
+		return stateidx();
+	}
+	if (argc >= 2)
+	{
+		out << "ERR to many arguments for MECH" << endl();
+		return stateidx();
+	}
+	cmdbind::AuthCommandHandler* authch = m_provider->authHandler( argv[0]);
+	if (authch)
+	{
+		out << "ERR no handler defined for authorization mechanism " << argv[0] << "'" << endl();
+	}
+	authch->setProcProvider( m_provider);
+	delegateProcessing<&CommandHandler::endMech>( authch);
 	return stateidx();
 }
 
+int CommandHandler::doInterface( int argc, const char** argv, std::ostream& out)
+{
+	int min_version = 0;
+	int version = 0;
+	if (argc == 1)
+	{
 
-int CommandHandler::endRun( cmdbind::CommandHandler* chnd, std::ostream& out)
+		min_version = getNumber( argv[0]);
+	}
+	typedef std::map<std::string,std::string> UIForms;
+	UIForms uiforms = m_provider->uiforms( m_authtickets.back(), min_version, version);
+	UIForms::const_iterator fi = uiforms.begin(), fe = uiforms.end();
+	out << "INTERFACES " << version << endl();
+	for (; fi != fe; ++fi)
+	{
+		out << "UIFORM " << fi->first << endl();
+		out << protocol::escapeStringDLF( fi->second);
+		out << endl() << "." << endl();
+	}
+	out << "OK";
+}
+
+int CommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out)
 {
 	cmdbind::CommandHandlerR chr( chnd);
 	int rt = stateidx();
 	int stc = statusCode();
 	if (!stc)
 	{
-		out << "OK RUN " << m_doctype << endl();
+		out << "OK REQUEST " << m_doctype << endl();
 	}
 	else
 	{
-		out << "ERR " << stc << endl();
-		LOG_ERROR << "error in execution of RUN " << m_doctype << ". status code " << stc;
+		out << "ERR REQUEST " << stc << endl();
+		LOG_ERROR << "error in execution of REQUEST " << m_doctype << ". status code " << stc;
 	}
 	return rt;
 }
@@ -156,7 +241,7 @@ static bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, 
 int CommandHandler::endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out)
 {
 	cmdbind::CommandHandlerR chr( ch);
-	out << "ERR cannot process this document type" << LineCommandHandler::endl();
+	out << "ERR document type" << LineCommandHandler::endl();
 	return stateidx();
 }
 
@@ -201,21 +286,22 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 			execch->setProcProvider( m_provider);
 			if (redirectConsumedInput( chnd, execch, out))
 			{
-				delegateProcessing<&CommandHandler::endRun>( execch);
+				out << "ANSWER" << endl();
+				delegateProcessing<&CommandHandler::endRequest>( execch);
 			}
 		}
 		return stateidx();
 	}
 }
 
-int CommandHandler::doRun( int argc, const char** argv, std::ostream& out)
+int CommandHandler::doRequest( int argc, const char** argv, std::ostream& out)
 {
 	m_doctype.clear();
 	if (argc)
 	{
 		if (argc > 1)
 		{
-			out << "BAD to many arguments" << endl();
+			out << "ERR to many arguments" << endl();
 			return stateidx();
 		}
 		else
@@ -233,7 +319,8 @@ int CommandHandler::doRun( int argc, const char** argv, std::ostream& out)
 				m_doctype = argv[0];
 				ch->passParameters( m_doctype, 0, 0);
 				ch->setProcProvider( m_provider);
-				delegateProcessing<&CommandHandler::endRun>( ch);
+				out << "ANSWER" << endl();
+				delegateProcessing<&CommandHandler::endRequest>( ch);
 			}
 			return stateidx();
 		}

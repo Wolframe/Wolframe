@@ -38,8 +38,9 @@
 #include "connectionHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
-#include "cmdbind/execCommandHandler.hpp"
 #include "protocol/ioblocks.hpp"
+#include "types/keymap.hpp"
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace proc {
@@ -47,24 +48,30 @@ namespace proc {
 class CommandHandler :public cmdbind::LineCommandHandlerTemplate<CommandHandler>
 {
 public:
-	typedef cmdbind::ExecCommandHandler::Command Command;
-
 	CommandHandler();
+	virtual ~CommandHandler(){}
 
-	//methods called by the protocol and implemented here
-	int doHello( int argc, const char** argv, std::ostream& out);
-	int endHello( cmdbind::CommandHandler* ch, std::ostream& out);
+public:
+	int doAuth( int argc, const char** argv, std::ostream& out);
 
-	int doRun( int argc, const char** argv, std::ostream& out);
-	int endRun( cmdbind::CommandHandler* ch, std::ostream& out);
+	int doMech( int argc, const char** argv, std::ostream& out);
+	int endMech( cmdbind::CommandHandler* ch, std::ostream& out);
+
+	int doRequest( int argc, const char** argv, std::ostream& out);
+	int endRequest( cmdbind::CommandHandler* ch, std::ostream& out);
+
+	int doInterface( int argc, const char** argv, std::ostream& out);
+	int endInterface( cmdbind::CommandHandler* ch, std::ostream& out);
+
+	int doCapabilities( int argc, const char** argv, std::ostream& out);
+	int doQuit( int argc, const char** argv, std::ostream& out);
+
 	int endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out);
 	int endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out);
 
-	int doCmdQUIT( int argc, const char** argv, std::ostream& out);
-
 private:
-	std::vector<Command> m_commands;	//< commands available
 	std::string m_doctype;
+	std::vector<std::string> m_authtickets;
 };
 
 
