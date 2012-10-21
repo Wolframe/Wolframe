@@ -53,10 +53,10 @@ namespace WU = _Wolframe::utils;
 int main( int argc, char* argv[] )
 {
 	PO::options_description desc( "Usage:\n"
-				      "  wolfpasswd [-cD] passwordfile username\n"
-				      "  wolfpasswd -b[c] passwordfile username password\n"
-				      "  wolfpasswd -n [-s salt] username\n"
-				      "  wolfpasswd -nb [-s salt] username password\n"
+				      "  wolfpasswd [-cD] passwordfile username [user info]\n"
+				      "  wolfpasswd -b[c] passwordfile username password [user info]\n"
+				      "  wolfpasswd -n [-s salt] username [user info]\n"
+				      "  wolfpasswd -nb [-s salt] username password [user info]\n"
 				      "  wolfpasswd -h\n"
 				      "Options" );
 	desc.add_options()
@@ -135,13 +135,13 @@ int main( int argc, char* argv[] )
 				std::cerr << "\nERROR: too few arguments.";
 				wrong = true;
 			}
-			else if ( args.size() > 2 )	{
+			else if ( args.size() > 3 )	{
 				std::cerr << "\nERROR: too many arguments.";
 				wrong = true;
 			}
 		}
 		else	{
-			if ( args.size() > 1 )	{
+			if ( args.size() > 2 )	{
 				std::cerr << "\nERROR: too many arguments.";
 				wrong = true;
 			}
@@ -153,15 +153,22 @@ int main( int argc, char* argv[] )
 
 		// All parameters are OK
 		std::string passwd;
-		if ( ! batchPwd )
-			passwd = WA::getPassword();
-		else
-			passwd = args[1];
-		// now do the job
 		WA::PwdFileUser user;
-		user.user = args[1];
+		if ( ! batchPwd )	{
+			passwd = WA::getPassword();
+			if( args.size() == 2 )
+				user.info = args[1];
+		}
+		else	{
+			passwd = args[1];
+			if( args.size() == 3 )
+				user.info = args[2];
+		}
+		// now do the job
+		user.user = args[0];
 		user.hash = passwd;
-		std::cout << WA::PasswordFile::passwdLine( user );
+		user.expiry = 0;
+		std::cout << "Password line: " << WA::PasswordFile::passwdLine( user );
 	}
 	// delete user
 	else if ( delUser )	{
@@ -190,10 +197,10 @@ int main( int argc, char* argv[] )
 
 			if ( pwdFile.delUser( args[1] ))
 				std::cout << "User '" << args[1] << "' removed from password file '"
-					  << filename << "'";
+					  << filename << "'.";
 			else
 				std::cout << "User '" << args[1] << "' not found in password file '"
-					  << filename << "'";
+					  << filename << "'.";
 		}
 		catch( std::exception& e )	{
 			std::cerr << "Error removing user '" << args[1] << "': " << e.what() << "\n\n";
@@ -208,7 +215,7 @@ int main( int argc, char* argv[] )
 				std::cerr << "\nERROR: too few arguments.";
 				wrong = true;
 			}
-			else if ( args.size() > 3 )	{
+			else if ( args.size() > 4 )	{
 				std::cerr << "\nERROR: too many arguments.";
 				wrong = true;
 			}
@@ -218,7 +225,7 @@ int main( int argc, char* argv[] )
 				std::cerr << "\nERROR: too few arguments.";
 				wrong = true;
 			}
-			if ( args.size() > 2 )	{
+			if ( args.size() > 3 )	{
 				std::cerr << "\nERROR: too many arguments.";
 				wrong = true;
 			}
@@ -235,18 +242,29 @@ int main( int argc, char* argv[] )
 		try	{
 			std::string filename = WU::resolvePath( boost::filesystem::absolute( args[0] ).string());
 			WA::PasswordFile pwdFile( filename, create );
+			WA::PwdFileUser user;
 
 			std::string passwd;
-			if ( ! batchPwd )
+			if ( ! batchPwd )	{
 				passwd = WA::getPassword();
-			else
+				if( args.size() == 3 )
+					user.info = args[2];
+			}
+			else	{
 				passwd = args[2];
-			WA::PwdFileUser user;
+				if( args.size() == 4 )
+					user.info = args[3];
+			}
 			user.user = args[1];
 			user.hash = passwd;
-			pwdFile.addUser( user );
-			std::cout << "User '" << args[1] << "' added to password file '"
-				  << filename << "'";
+			user.expiry = 0;
+			if ( pwdFile.addUser( user ) )
+				std::cout << "User '" << args[1] << "' added to the password file '"
+					  << filename << "'.";
+			else
+				std::cout << "Error: user '" << args[1] << "' already exists in the password file '"
+					  << filename << "'.";
+
 		}
 		catch( std::exception& e )	{
 			std::cerr << "Error adding user '" << args[1] << "': " << e.what() << "\n\n";

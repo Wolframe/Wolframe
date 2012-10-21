@@ -49,7 +49,7 @@ namespace AAAA {
 /// constructor
 AAAAconfiguration::AAAAconfiguration()
 	: config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
-	  m_allowAnonymous( false ), m_authzDefault( false ), m_mandatoryAudit( true )
+	  m_authzDefault( false ), m_mandatoryAudit( true )
 {}
 
 /// destructor
@@ -74,7 +74,6 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 {
 	using namespace _Wolframe::config;
 	bool retVal = true;
-	bool allowDefined = false;
 	bool authzDfltDefined = false;
 	bool mandatoryDefined = false;
 
@@ -84,12 +83,7 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 			std::string logStr = logPrefix() + "authentication: ";
 			for ( boost::property_tree::ptree::const_iterator L2it = L1it->second.begin();
 									L2it != L1it->second.end(); L2it++ )	{
-				if ( boost::algorithm::iequals( "allowAnonymous", L2it->first ))	{
-					if ( ! Parser::getValue( logStr.c_str(), *L2it, m_allowAnonymous,
-								 Parser::BoolDomain(), &allowDefined ))
-						retVal = false;
-				}
-				else if ( boost::algorithm::iequals( "randomDevice", L2it->first ))	{
+				if ( boost::algorithm::iequals( "randomDevice", L2it->first ))	{
 					bool isDefined = ( !m_randomDevice.empty() );
 					if ( ! Parser::getValue( logStr.c_str(), *L2it, m_randomDevice, &isDefined ))
 						retVal = false;
@@ -184,8 +178,7 @@ void AAAAconfiguration::print( std::ostream& os, size_t /* indent */ ) const
 {
 	os << sectionName() << std::endl;
 	os << "   Authentication" << std::endl;
-	os << "      Allow anonymous login: " << (m_allowAnonymous ? "yes" : "no") << std::endl;
-	os << "      Random numbers device: " << m_randomDevice << std::endl;
+	os << "      Random number device: " << m_randomDevice << std::endl;
 	for ( std::list< config::NamedConfiguration* >::const_iterator it = m_authConfig.begin();
 								it != m_authConfig.end(); it++ )
 		(*it)->print( os, 6 );

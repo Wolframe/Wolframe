@@ -90,14 +90,6 @@ public:
 	///\note Throws in case of file operation error.
 	bool getUser( const std::string& username, PwdFileUser& user ) const;
 
-	///\brief Change an user from the password file
-	///\param username	The username of the user to change
-	///\param user		A filled PwdFileUser structure
-	///\return		true if the user has been deleted or false
-	///			if the user doesn't exist in the file
-	///\note Throws in case of file operation error.
-	bool modifyUser( const std::string& username, const PwdFileUser& user );
-
 private:
 	const std::string	m_filename;
 	const bool		m_create;
