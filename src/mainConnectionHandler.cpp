@@ -131,6 +131,9 @@ static bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, 
 {
 	void* buf;
 	std::size_t bufsize;
+	const void* toh_output;
+	std::size_t toh_outputsize;
+	int cmdStatus = 0;
 	fromh->getInputBuffer( buf, bufsize);
 	toh->setInputBuffer( buf, bufsize);
 	toh->putInput( buf, bufsize);
@@ -140,14 +143,12 @@ static bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, 
 		case cmdbind::CommandHandler::READ:
 			return true;
 		case cmdbind::CommandHandler::WRITE:
-		{
-			const void* toh_output;
-			std::size_t toh_outputsize;
 			toh->getOutput( toh_output, toh_outputsize);
 			out << std::string( (const char*)toh_output, toh_outputsize);
 			continue;
-		}
 		case cmdbind::CommandHandler::CLOSE:
+			cmdStatus = toh->statusCode();
+			if (cmdStatus) out << "ERR " << cmdStatus << std::endl;
 			return false;
 	}
 }
@@ -155,7 +156,7 @@ static bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, 
 int CommandHandler::endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out)
 {
 	cmdbind::CommandHandlerR chr( ch);
-	out << "ERR cannot process this document type" << endl();
+	out << "ERR cannot process this document type" << LineCommandHandler::endl();
 	return stateidx();
 }
 
