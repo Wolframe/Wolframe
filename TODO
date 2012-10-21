@@ -16,3 +16,5 @@ PF:
 - Make postgres database run transactions
 - directmap programs instead of config
 - define main protocol according notes
+
+- Open Issue: Error messages for the client
