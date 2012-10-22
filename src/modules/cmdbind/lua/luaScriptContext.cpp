@@ -47,7 +47,7 @@ LuaScriptContext::~LuaScriptContext()
 	for (; ii != ee; ++ii) delete *ii;
 }
 
-void LuaScriptContext::load( const ScriptEnvironmentConfigStruct& cfg, const module::ModulesDirectory* modules)
+void LuaScriptContext::load( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* modules)
 {
 	// load language extension module objects:
 	module::ModulesDirectory::simpleBuilder_iterator mi = modules->objectsBegin(), me = modules->objectsEnd();
@@ -67,7 +67,7 @@ void LuaScriptContext::load( const ScriptEnvironmentConfigStruct& cfg, const mod
 	}
 
 	// load scripts:
-	std::vector<std::string>::const_iterator si=cfg.program.begin(), se=cfg.program.end();
+	std::vector<std::string>::const_iterator si=prgfiles_.begin(), se=prgfiles_.end();
 	for (;si != se; ++si)
 	{
 		langbind::LuaScript script( *si);

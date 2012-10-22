@@ -36,6 +36,8 @@ Project Wolframe.
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include "langbind/luaObjects.hpp"
 #include "langbind/luaScriptContext.hpp"
+#include <vector>
+#include <string>
 
 namespace _Wolframe {
 namespace cmdbind {
@@ -49,12 +51,10 @@ public:
 
 	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
 	typedef langbind::LuaScriptContext ContextStruct;
-	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
-	typedef langbind::ScriptEnvironmentConfigStruct ConfigStruct;
 
 public:
 	///\brief Constructor
-	explicit LuaCommandHandler( const ContextStruct* ctx_)
+	explicit LuaCommandHandler( const langbind::LuaScriptContext* ctx_)
 		:m_ctx(ctx_){}
 
 	///\brief Destructor

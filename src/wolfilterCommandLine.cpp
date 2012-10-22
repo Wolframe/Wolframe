@@ -35,7 +35,6 @@
 #include "wolfilterCommandLine.hpp"
 #include "langbind/appObjects.hpp"
 #include "database/DBprovider.hpp"
-#include "langbind/scriptConfig_struct.hpp"
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "moduleInterface.hpp"
@@ -182,10 +181,13 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 		std::map<std::string,std::vector<std::string> >::const_iterator mi = cmdhandler_programs.begin(), me = cmdhandler_programs.end();
 		for (; mi != me; ++mi)
 		{
-			langbind::ScriptEnvironmentConfigStruct scfg;
-			scfg.program = mi->second;
-			boost::property_tree::ptree cmdhlcfg;
-			cmdhlcfg.add_child( mi->first, scfg.toPropertyTree());
+			boost::property_tree::ptree programcfg,cmdhlcfg;
+			std::vector<std::string>::const_iterator ri = mi->second.begin(), re = mi->second.end();
+			for (; ri != re; ++ri)
+			{
+				programcfg.add_child( "program", boost::property_tree::ptree(*ri));
+			}
+			cmdhlcfg.add_child( mi->first, programcfg);
 			proccfg.add_child( "cmdhandler", cmdhlcfg);
 		}
 	}

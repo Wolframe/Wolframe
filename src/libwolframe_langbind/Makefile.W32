@@ -25,7 +25,6 @@ LIBRARIES = \
 CPP_OBJS = \
 	protocol_ioblocks.obj \
 	appObjects.obj \
-	scriptConfig_struct.obj \
 	tostringfilter.obj \
 	ptreefilter.obj \
 	typingfilter.obj \

@@ -35,7 +35,6 @@ Project Wolframe.
 #define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #include "langbind/appObjects.hpp"
 #include "langbind/directmapProgram.hpp"
-#include "langbind/scriptConfig_struct.hpp"
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include "types/countedReference.hpp"
 #include "types/keymap.hpp"
@@ -50,7 +49,7 @@ public:
 	DirectmapContext(){}
 	~DirectmapContext(){}
 
-	void load( const langbind::ScriptEnvironmentConfigStruct& cfg_, const module::ModulesDirectory* mdir);
+	void load( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* mdir);
 
 	///\brief Get the list of commands
 	std::list<std::string> commands() const
@@ -74,8 +73,6 @@ class DirectmapCommandHandler :public IOFilterCommandHandlerEscDLF
 public:
 	///\brief Declaration for cmdbind::ScriptCommandHandlerConstructor
 	typedef DirectmapContext ContextStruct;
-	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
-	typedef langbind::ScriptEnvironmentConfigStruct ConfigStruct;
 
 	///\brief Constructor
 	explicit DirectmapCommandHandler( const DirectmapContext* ctx_)

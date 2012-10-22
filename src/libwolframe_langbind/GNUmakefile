@@ -33,7 +33,6 @@ DYNAMIC_LIB_PATCH = 0
 CPP_OBJS = \
 	protocol_ioblocks.o \
 	appObjects.o \
-	scriptConfig_struct.o \
 	null_filter.o \
 	typingfilter.o \
 	tostringfilter.o \

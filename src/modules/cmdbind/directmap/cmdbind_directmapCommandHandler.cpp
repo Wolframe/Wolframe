@@ -44,9 +44,9 @@ using namespace _Wolframe;
 using namespace cmdbind;
 using namespace langbind;
 
-void DirectmapContext::load( const ScriptEnvironmentConfigStruct& cfg_, const module::ModulesDirectory*)
+void DirectmapContext::load( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory*)
 {
-	std::vector<std::string>::const_iterator ci = cfg_.program.begin(), ce = cfg_.program.end();
+	std::vector<std::string>::const_iterator ci = prgfiles_.begin(), ce = prgfiles_.end();
 	for (; ci != ce; ++ci) m_program.loadProgram( *ci);
 }
 

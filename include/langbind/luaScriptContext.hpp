@@ -36,7 +36,6 @@
 #define _Wolframe_langbind_LUA_SCRIPT_CONTEXT_HPP_INCLUDED
 #include "processor/procProvider.hpp"
 #include "langbind/luaObjects.hpp"
-#include "langbind/scriptConfig_struct.hpp"
 #include "module/luaExtensionBuilder.hpp"
 #include <vector>
 
@@ -51,7 +50,7 @@ struct LuaScriptContext
 	LuaScriptContext() :funcmap(&modulemap){}
 	~LuaScriptContext();
 
-	void load( const ScriptEnvironmentConfigStruct& cfg, const module::ModulesDirectory* modules);
+	void load( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* modules);
 
 	///\brief Get the list of commands
 	std::list<std::string> commands() const

@@ -36,12 +36,15 @@ Project Wolframe.
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
-#include "langbind/scriptConfig_struct.hpp"
+#include "config/ConfigurationTree.hpp"
 #include "logger-v1.hpp"
 #include "moduleInterface.hpp"
+#include "utils/miscUtils.hpp"
 #include "constructor.hpp"
 #include <boost/type_traits.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/concept_check.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
 namespace module {
@@ -56,8 +59,6 @@ private:// Concept checks:
 
 	///\brief Check for existence of class CommandHandlerType::ContextStruct
 	BOOST_STATIC_ASSERT((boost::is_class< typename CommandHandlerType::ContextStruct>::value));
-	///\brief Check for existence of class CommandHandlerType::ConfigStruct
-	BOOST_STATIC_ASSERT((boost::is_class< typename CommandHandlerType::ConfigStruct>::value));
 
 	///\brief Check for method CommandHandlerType::ContextStruct::load with expected paraters
 	template<typename T>
@@ -66,7 +67,7 @@ private:// Concept checks:
 		typedef char small_type;
 		struct large_type {small_type dummy[2];};
 
-		template<void (T::*)(const typename CommandHandlerType::ConfigStruct&, const module::ModulesDirectory*)> struct tester_member_signature;
+		template<void (T::*)(const std::vector<std::string>&, const module::ModulesDirectory*)> struct tester_member_signature;
 
 		template<typename U>
 		static small_type has_matching_member(tester_member_signature<&U::load>*);
@@ -76,7 +77,6 @@ private:// Concept checks:
 		static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
 	};
 	BOOST_STATIC_ASSERT(struct_has_load_method<typename CommandHandlerType::ContextStruct>::value);
-
 
 public:
 	typedef typename CommandHandlerType::ContextStruct ContextStruct;
@@ -93,7 +93,18 @@ public:
 		m_modules = modules;
 		try
 		{
-			m_struct.initFromPropertyTree( (const boost::property_tree::ptree&)pt);
+			boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
+			for (; pi != pe; ++pi)
+			{
+				if (boost::iequals( pi->first, "program"))
+				{
+					m_programfiles.push_back( pi->second.get_value<std::string>());
+				}
+				else
+				{
+					throw std::runtime_error( std::string("expected 'program' definition instead of '") + pi->first + "'");
+				}
+			}
 		}
 		catch (std::runtime_error& e)
 		{
@@ -105,18 +116,38 @@ public:
 
 	virtual void setCanonicalPathes( const std::string& referencePath)
 	{
-		m_struct.setCanonicalPathes( referencePath);
-		m_context.load( m_struct, m_modules);
+
+		std::vector<std::string>::iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
+		for (; pi != pe; ++pi)
+		{
+			*pi = utils::getCanonicalPath( *pi, referencePath);
+		}
+		m_context.load( m_programfiles, m_modules);
 	}
 
 	virtual bool check() const
 	{
-		return m_struct.check();
+		bool rt = true;
+		std::vector<std::string>::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
+		for (; pi != pe; ++pi)
+		{
+			if (!utils::fileExists( *pi))
+			{
+				LOG_ERROR << "program file '" << *pi << "' does not exist";
+				rt = false;
+			}
+		}
+		return rt;
 	}
 
 	virtual void print( std::ostream& os, size_t indent ) const
 	{
-		m_struct.print( os, indent);
+		std::string indentstr( indent*3, ' ');
+		std::vector<std::string>::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
+		for (; pi != pe; ++pi)
+		{
+			os << indentstr << "program " << *pi;
+		}
 	}
 
 	const ContextStruct* context() const
@@ -135,7 +166,7 @@ public:
 	}
 
 private:
-	typename CommandHandlerType::ConfigStruct m_struct;
+	std::vector<std::string> m_programfiles;
 	const module::ModulesDirectory* m_modules;
 	ContextStruct m_context;
 	const char* m_classname;
