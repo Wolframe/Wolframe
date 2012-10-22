@@ -51,6 +51,7 @@
 #endif
 
 #include "AAAA/CRAM.hpp"
+#include "AAAA/password.hpp"
 #include "types/byte2hex.h"
 #include "types/base64.hpp"
 #include "types/sha2.h"
@@ -60,119 +61,8 @@
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe;
 
-static const int PASSWORD_SALT_BCD_SIZE = 2 * PASSWORD_DIGEST_SIZE + 1;
-static const int PASSWORD_HASH_BASE64_SIZE = (( PASSWORD_DIGEST_SIZE + 2 ) / 3 ) * 4 + 1;
 static const int CRAM_CHALLENGE_STRING_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
 static const int CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
-
-
-PasswordSalt::PasswordSalt()
-{
-	m_size = 0;
-	memset( m_salt, 0, PASSWORD_SALT_SIZE );
-}
-
-/// \note The byte array is considered to be of size PASSWORD_SALT_SIZE
-/// and it can not be changed.
-PasswordSalt::PasswordSalt( const unsigned char* salt , size_t bytes )
-{
-	m_size = bytes > PASSWORD_SALT_SIZE ? PASSWORD_SALT_SIZE : bytes;
-	memcpy( m_salt, salt, m_size );
-}
-
-PasswordSalt::PasswordSalt( const std::string& randomDevice )
-{
-#ifndef _WIN32
-	int hndl = open( randomDevice.c_str(), O_RDONLY );
-	if ( hndl < 0 )	{
-		std::string errMsg = "Error opening '" + randomDevice + "': ";
-		throw std::runtime_error( errMsg );
-	}
-
-	int rndPart = read( hndl, m_salt, PASSWORD_SALT_SIZE );
-	if ( rndPart < 0 )	{
-		std::string errMsg = "Error reading '" + randomDevice + "'";
-		throw std::runtime_error( errMsg );
-	}
-	else if ( rndPart < (int)PASSWORD_SALT_SIZE )	{
-		std::string errMsg = "Not enough entropy in '" + randomDevice + "' ?!?";
-		throw std::logic_error( errMsg );
-	}
-
-	close( hndl );
-#else
-	HCRYPTPROV provider = 0;
-
-	if( !CryptAcquireContext( &provider, 0, randomDevice.c_str( ), PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
-		throw std::runtime_error( "Error opening cyrpto context" );
-	}
-
-	if( !CryptGenRandom( provider, PASSWORD_SALT_SIZE, static_cast<BYTE *>( m_salt ))) {
-		CryptReleaseContext( provider, 0 );
-		throw std::runtime_error( "Error generating random data " );
-	}
-
-	if( !CryptReleaseContext( provider, 0 ) ) {
-		throw std::runtime_error( "Error closing cyrpto context" );
-	}
-#endif
-	m_size = PASSWORD_SALT_SIZE;
-}
-
-std::string PasswordSalt::toBCD() const
-{
-	char	buffer[ PASSWORD_SALT_BCD_SIZE ];
-
-	if ( byte2hex( m_salt, PASSWORD_SALT_SIZE,
-		       buffer, PASSWORD_SALT_BCD_SIZE ) == NULL )
-		throw std::logic_error( "PasswordSalt::toBCD() cannot convert hash ?!?" );
-
-	return std::string( buffer );
-}
-
-std::string PasswordSalt::toBase64() const
-{
-	char	buffer[ PASSWORD_SALT_BASE64_SIZE ];
-
-	if ( base64::encode( m_salt, PASSWORD_SALT_SIZE,
-			     buffer, PASSWORD_SALT_BASE64_SIZE, 0 ) < 0 )
-		throw std::logic_error( "PasswordSalt::toBase64() cannot convert hash ?!?" );
-
-	return std::string( buffer );
-}
-
-
-PasswordHash::PasswordHash( const PasswordSalt& pwdSalt, const std::string& password )
-	: m_salt( pwdSalt )
-{
-	sha224((const unsigned char*)password.c_str(), password.length(), m_hash );
-}
-
-std::string PasswordHash::toBCD() const
-{
-	char	buffer[ PASSWORD_SALT_BCD_SIZE ];
-
-	memset( buffer, 0, PASSWORD_SALT_BCD_SIZE );
-
-	if ( byte2hex( m_hash, PASSWORD_DIGEST_SIZE,
-		       buffer, PASSWORD_SALT_BCD_SIZE ) == NULL )
-		throw std::logic_error( "PasswordHash::toBCD() cannot convert hash ?!?" );
-
-	return std::string( buffer );
-}
-
-std::string PasswordHash::toBase64() const
-{
-	char	buffer[ PASSWORD_HASH_BASE64_SIZE ];
-
-	memset( buffer, 0, PASSWORD_HASH_BASE64_SIZE );
-
-	if ( byte2hex( m_hash, PASSWORD_DIGEST_SIZE,
-		       buffer, PASSWORD_HASH_BASE64_SIZE ) == NULL )
-		throw std::logic_error( "PasswordHash::toString() cannot convert hash ?!?" );
-
-	return std::string( buffer );
-}
 
 CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 {
@@ -252,7 +142,7 @@ CRAMresponse::CRAMresponse( const CRAMchallenge& challenge,
 	memset( buffer, 0, CRAM_CHALLENGE_SIZE );
 	memcpy( buffer, username.c_str(),
 		CRAM_CHALLENGE_SIZE / 2 > username.length() ? username.length() : CRAM_CHALLENGE_SIZE / 2 );
-	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != PASSWORD_DIGEST_SIZE )
+	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != PASSWORD_HASH_SIZE )
 		throw std::runtime_error( "CRAM response: password hash is invalid" );
 	for ( int i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
 		buffer[ i ] ^= challenge.m_challenge[ i ];
@@ -268,7 +158,7 @@ CRAMresponse::CRAMresponse( const std::string& challenge,
 	memset( buffer, 0, CRAM_CHALLENGE_SIZE );
 	memcpy( buffer, username.c_str(),
 		CRAM_CHALLENGE_SIZE / 2 > username.length() ? username.length() : CRAM_CHALLENGE_SIZE / 2 );
-	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != PASSWORD_DIGEST_SIZE )
+	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != PASSWORD_HASH_SIZE )
 		throw std::runtime_error( "CRAM response: password hash is invalid" );
 	if ( hex2byte( challenge.c_str(), chlng, CRAM_CHALLENGE_SIZE ) != CRAM_CHALLENGE_SIZE )
 		throw std::runtime_error( "CRAM response: challenge is invalid" );
@@ -280,8 +170,6 @@ CRAMresponse::CRAMresponse( const std::string& challenge,
 std::string CRAMresponse::toBCD() const
 {
 	char	buffer[ CRAM_RESPONSE_STRING_SIZE ];
-
-	memset( buffer, 0, CRAM_RESPONSE_STRING_SIZE );
 
 	if ( byte2hex( m_response, CRAM_RESPONSE_SIZE,
 		       buffer, CRAM_RESPONSE_STRING_SIZE ) == NULL )

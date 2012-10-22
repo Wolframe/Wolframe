@@ -46,6 +46,13 @@
 namespace _Wolframe {
 namespace AAAA {
 
+#ifdef _WIN32
+	static const std::string DEFAULT_RANDOM_GENERATOR = MS_DEF_PROV;
+#else
+	static const std::string DEFAULT_RANDOM_GENERATOR = "/dev/urandom";
+#endif
+
+
 /// constructor
 AAAAconfiguration::AAAAconfiguration()
 	: config::ConfigurationBase( "AAAA", NULL, "AAAA configuration"  ),
@@ -170,6 +177,9 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}
+	if ( m_randomDevice.empty() )
+		m_randomDevice = DEFAULT_RANDOM_GENERATOR;
+
 	return retVal;
 }
 

@@ -44,13 +44,10 @@
 namespace _Wolframe {
 namespace AAAA {
 
+static const size_t HMAC_DIGEST_SIZE = SHA256_DIGEST_SIZE;
+
 class HMAC_SHA256
 {
-	static const size_t HMAC_BLOCK_SIZE = SHA256_BLOCK_SIZE;
-	static const size_t HMAC_DIGEST_SIZE = SHA256_DIGEST_SIZE;
-	static const size_t HMAC_BCD_SIZE = HMAC_DIGEST_SIZE * 2 + 1;
-	static const size_t HMAC_BASE64_SIZE = (( HMAC_DIGEST_SIZE * 4 ) / 3 ) +
-				(( HMAC_DIGEST_SIZE % 3 ) ? ( 3 - ( HMAC_DIGEST_SIZE % 3 )) : 0 ) + 1;
 public:
 	HMAC_SHA256( const unsigned char* key, size_t keySize,
 		     const unsigned char* msg, size_t msgSize )

@@ -31,63 +31,66 @@
 
 ************************************************************************/
 //
-/// \file CRAM.hpp
-/// Challenge Response Authentication Mechanism classes
+/// \file password.hpp
+/// Wolframe password hashes
 ///
-/// \note This implementation of a CRAM mechanism is specific to the Wolframe Project.
-/// It is not supposed to be compatible to other implementations.
-/// But we hope that is at least as secure as any other authentication implementation.
-//
 
-#ifndef _CRAM_HPP_INCLUDED
-#define _CRAM_HPP_INCLUDED
+#ifndef _PASSWORD_HPP_INCLUDED
+#define _PASSWORD_HPP_INCLUDED
 
 #include <string>
 
 namespace _Wolframe {
 namespace AAAA {
 
-static const int CRAM_BLOCK_SIZE = 1024 / 8;
-static const int CRAM_DIGEST_SIZE = 512 / 8;
-static const int CRAM_CHALLENGE_SIZE = CRAM_BLOCK_SIZE;
-static const int CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
+static const size_t PASSWORD_HASH_SIZE = 224 / 8;
+static const size_t PASSWORD_SALT_SIZE = 128 / 8;
 
-class CRAMchallenge
+class PasswordSalt
 {
-	friend class CRAMresponse;
+	friend class PasswordHash;
 public:
-	CRAMchallenge( const std::string& randomDevice );
+	/// Construct an empty salt (all bits 0).
+	PasswordSalt();
+	/// Construct a salt from the given byte array.
+	explicit PasswordSalt( const unsigned char* salt, size_t bytes );
+	/// Construct a random salt using randomDevice to generate random bytes.
+	explicit PasswordSalt( const std::string& randomDevice );
 
+	/// The size of the salt in bytes
+	size_t size() const			{ return m_size; }
+
+	/// Set the salt value from the BCD encoded string.
+	void fromBCD( const std::string& salt );
+	/// Set the salt value from the base64 encoded string.
+	void fromBase64( const std::string& salt );
+
+	/// Return the salt as a BCD encoded string.
 	std::string toBCD() const;
+	/// Return the salt as a base64 encoded string.
 	std::string toBase64() const;
 private:
-	unsigned char		m_challenge[ CRAM_CHALLENGE_SIZE ];
+	std::size_t	m_size;
+	unsigned char	m_salt[ PASSWORD_SALT_SIZE ];
 };
 
 
-class CRAMresponse
+class PasswordHash
 {
 public:
-	CRAMresponse( const CRAMchallenge& challenge,
-		      const std::string& username, const std::string &pwdHash );
-	CRAMresponse( const std::string& challenge,
-		      const std::string& username, const std::string& pwdHash );
+	PasswordHash( const PasswordSalt& pwdSalt, const std::string& password );
+	PasswordHash( const std::string& hash );
 
 	std::string toBCD() const;
 	std::string toBase64() const;
 
-	/// True if the 2 CRAM responses are identical, false otherwise
-	bool operator == ( const CRAMresponse& rhs );
-	bool operator != ( const CRAMresponse& rhs )	{ return !( *this == rhs ); }
-	/// True if the CRAM response base64 encoding is equivalent to the given argument,
-	/// false otherwise
-	bool operator == ( const std::string& rhs );
-	bool operator != ( const std::string& rhs )	{ return !( *this == rhs ); }
+	const PasswordSalt& salt() const	{ return m_salt; }
 private:
-	unsigned char		m_response[ CRAM_RESPONSE_SIZE ];
+	unsigned char		m_hash[ PASSWORD_HASH_SIZE ];
+	const PasswordSalt	m_salt;
 };
 
 }} // namespace _Wolframe::AAAA
 
-#endif	// _CRAM_HPP_INCLUDED
+#endif	// _PASSWORD_HPP_INCLUDED
 

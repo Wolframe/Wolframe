@@ -359,9 +359,11 @@ include/AAAA/authentication.hpp
 include/AAAA/authorization.hpp
 include/AAAA/CRAM.hpp
 include/AAAA/HMAC.hpp
+include/AAAA/password.hpp
 include/AAAA/user.hpp
 include/appConfig.hpp
 include/appProperties.hpp
+include/cmdbind/authCommandHandler.hpp
 include/cmdbind/commandHandler.hpp
 include/cmdbind/commandHandlerUnit.hpp
 include/cmdbind/directmapCommandHandler.hpp
@@ -781,6 +783,7 @@ src/libwolframe/logger/syslog_win32.h
 src/libwolframe/Makefile.W32
 src/libwolframe/moduleDirectory.cpp
 src/libwolframe/parseUtils.cpp
+src/libwolframe/password.cpp
 src/libwolframe_prnt/GNUmakefile
 src/libwolframe_prnt/Makefile.W32
 src/libwolframe_prnt/pdfPrinter.cpp
@@ -824,6 +827,7 @@ src/libwolframe/types_doctype.cpp
 src/libwolframe/user.cpp
 src/libwolframe/utils_doctype.cpp
 src/loadModules.cpp
+src/mainConnectionHandler_auth.hpp
 src/mainConnectionHandler.cpp
 src/mainConnectionHandler.hpp
 src/Makefile.W32
