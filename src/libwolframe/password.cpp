@@ -150,24 +150,15 @@ PasswordHash::PasswordHash( const PasswordSalt& pwdSalt, const std::string& pass
 	sha224((const unsigned char*)password.c_str(), password.length(), m_hash );
 }
 
-std::string PasswordHash::toBCD() const
-{
-	char	buffer[ PASSWORD_HASH_BCD_SIZE ];
-
-	if ( byte2hex( m_hash, PASSWORD_HASH_SIZE,
-		       buffer, PASSWORD_HASH_BCD_SIZE ) == NULL )
-		throw std::logic_error( "PasswordHash::toBCD() cannot convert hash ?!?" );
-
-	return std::string( buffer );
-}
-
-std::string PasswordHash::toBase64() const
+std::string PasswordHash::toString() const
 {
 	char	buffer[ PASSWORD_HASH_BASE64_SIZE ];
 
 	if ( base64::encode( m_hash, PASSWORD_HASH_SIZE,
 			     buffer, PASSWORD_HASH_BASE64_SIZE, 0 ) < 0 )
-		throw std::logic_error( "PasswordHash::toBase64() cannot convert hash ?!?" );
+		throw std::logic_error( "PasswordHash::toString() cannot convert hash ?!?" );
 
-	return std::string( buffer );
+	std::string s = "$";
+	s += m_salt.toBase64() + "$" + buffer;
+	return s;
 }

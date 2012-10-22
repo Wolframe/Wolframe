@@ -78,11 +78,14 @@ private:
 class PasswordHash
 {
 public:
+	/// Construct the password hash from salt and password (plain text)
 	PasswordHash( const PasswordSalt& pwdSalt, const std::string& password );
+	/// Construct the password hash from a combined password hash string (base64)
 	PasswordHash( const std::string& hash );
 
-	std::string toBCD() const;
-	std::string toBase64() const;
+	/// Return the password hash as a string
+	/// The format is $<salt>$<hash> on one line, no whitespaces
+	std::string toString() const;
 
 	const PasswordSalt& salt() const	{ return m_salt; }
 private:
