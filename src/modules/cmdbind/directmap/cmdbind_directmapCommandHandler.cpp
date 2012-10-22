@@ -30,7 +30,6 @@ Project Wolframe.
 
 ************************************************************************/
 #include "cmdbind/directmapCommandHandler.hpp"
-#include "langbind/directmapConfig_struct.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "utils/doctype.hpp"
 #include "langbind/appObjects.hpp"
@@ -45,31 +44,10 @@ using namespace _Wolframe;
 using namespace cmdbind;
 using namespace langbind;
 
-void DirectmapContext::load( const DirectmapConfigStruct& cfg_, const module::ModulesDirectory*)
+void DirectmapContext::load( const ScriptEnvironmentConfigStruct& cfg_, const module::ModulesDirectory*)
 {
-	std::vector<DirectmapCommandConfigStruct>::const_iterator ii = cfg_.command.begin(), ee = cfg_.command.end();
-	std::size_t idx = m_cfg.command.size();
-	for (; ii != ee; ++ii,++idx)
-	{
-		std::string key( boost::algorithm::to_lower_copy( ii->name));
-		if (m_map.find( key) != m_map.end())
-		{
-			throw std::runtime_error( std::string( "duplicate definition of directmap command '") + ii->name + "'");
-		}
-		m_map[ key] = idx;
-		m_cfg.command.push_back( *ii);
-	}
-}
-
-std::list<std::string> DirectmapContext::commands() const
-{
-	std::list<std::string> rt;
-	std::vector<DirectmapCommandConfigStruct>::const_iterator ii = m_cfg.command.begin(), ee = m_cfg.command.end();
-	for (; ii != ee; ++ii)
-	{
-		rt.push_back( ii->name);
-	}
-	return rt;
+	std::vector<std::string>::const_iterator ci = cfg_.program.begin(), ce = cfg_.program.end();
+	for (; ci != ce; ++ci) m_program.loadProgram( *ci);
 }
 
 void DirectmapCommandHandler::initcall()

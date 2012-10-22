@@ -30,47 +30,55 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for normalization programs
-///\file langbind/normalizeProgram.hpp
-#ifndef _LANGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED
-#define _LANGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+///\brief Interface for directmap programs
+///\file langbind/directmapProgram.hpp
+#ifndef _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
+#define _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
 #include "types/keymap.hpp"
-#include "module/normalizeFunctionBuilder.hpp"
-#include <boost/shared_ptr.hpp>
+#include <string>
 
 namespace _Wolframe {
 namespace langbind {
 
-typedef boost::shared_ptr<module::NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
+struct DirectmapCommandDescription
+{
+	DirectmapCommandDescription(){}
+	DirectmapCommandDescription( const DirectmapCommandDescription& o)
+		:call(o.call)
+		,filter(o.filter)
+		,inputform(o.inputform)
+		,outputform(o.outputform){}
 
-class NormalizeProgram
-	:public types::keymap<NormalizeFunctionR>
+	std::string call;						//< name of the transaction or form function
+	std::string filter;						//< name of the input/ouput filter
+	std::string inputform;						//< name of the input form
+	std::string outputform;						//< name of the output form
+};
+
+///\class DirectmapProgram
+///\brief Program describing direct mappings (many function descriptions per source file)
+//	Function description syntax: identifier = call( filter :inputform) :outputform;
+//
+class DirectmapProgram
+	:public types::keymap<DirectmapCommandDescription>
 {
 public:
-	typedef types::keymap<NormalizeFunctionR> Parent;
+	typedef types::keymap<DirectmapCommandDescription> Parent;
 
-	NormalizeProgram(){}
-	NormalizeProgram( const NormalizeProgram& o)
-		:Parent(o)
-		,m_constructormap(o.m_constructormap){}
-	~NormalizeProgram(){}
-
-	void addConstructor( const NormalizeFunctionConstructorR& c);
+	DirectmapProgram(){}
+	DirectmapProgram( const DirectmapProgram& o)
+		:Parent(o){}
+	~DirectmapProgram(){}
 
 	bool is_mine( const std::string& filename) const;
 	void addProgram( const std::string& source);
 	void loadProgram( const std::string& filename);
 
-	const NormalizeFunction* get( const std::string& name) const
+	const DirectmapCommandDescription* get( const std::string& name) const
 	{
 		Parent::const_iterator rt = Parent::find( name);
-		return (rt == Parent::end())?0:rt->second.get();
+		return (rt == Parent::end())?0:&rt->second;
 	}
-
-private:
-	NormalizeFunction* createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg);
-	types::keymap<NormalizeFunctionConstructorR> m_constructormap;
 };
 
 }}

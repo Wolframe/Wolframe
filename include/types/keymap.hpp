@@ -92,7 +92,7 @@ struct keymap
 	typename boost::enable_if_c<
 		types::traits::is_back_insertion_sequence<KeyList>::value
 		,void>::type
-	getkeys( KeyList& rt)
+	getkeys( KeyList& rt) const
 	{
 		typename Parent::const_iterator ki = Parent::begin(), ke = Parent::end();
 		for (; ki != ke; ++ki) rt.push_back( ki->first);
@@ -102,7 +102,7 @@ struct keymap
 	typename boost::enable_if_c<
 		types::traits::is_back_insertion_sequence<KeyList>::value
 		,KeyList>::type
-	getkeys()
+	getkeys() const
 	{
 		KeyList rt;
 		getkeys(rt);

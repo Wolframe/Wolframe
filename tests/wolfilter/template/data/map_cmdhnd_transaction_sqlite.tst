@@ -12,12 +12,14 @@ modpath="../wolfilter/modules/database"			# module directory relative from tests
 opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
 opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
 opt="$opt --program=DBPRG.tdl"
-opt="$opt --directmap 'f=xml,c=test_transaction,n=run'"
+opt="$opt --program=test.directmap"
 testcmd="$opt run"					# command to execute by the test
 docin=schema_select_task_by_id				# input document name
 docout=output_schema_select_task_by_id			# output document name
 dumpout="program/schema_select_task_by_id.dbdump.txt"	# resource dump to add to expected test output
 testdata="
+**file: test.directmap
+run = test_transaction( xml);
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
 **file: DBDATA

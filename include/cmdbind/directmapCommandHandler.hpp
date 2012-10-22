@@ -34,9 +34,11 @@ Project Wolframe.
 #ifndef _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #include "langbind/appObjects.hpp"
-#include "langbind/directmapConfig_struct.hpp"
+#include "langbind/directmapProgram.hpp"
+#include "langbind/scriptConfig_struct.hpp"
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include "types/countedReference.hpp"
+#include "types/keymap.hpp"
 
 namespace _Wolframe {
 namespace cmdbind {
@@ -48,21 +50,21 @@ public:
 	DirectmapContext(){}
 	~DirectmapContext(){}
 
-	void load( const langbind::DirectmapConfigStruct& cfg_, const module::ModulesDirectory*);
+	void load( const langbind::ScriptEnvironmentConfigStruct& cfg_, const module::ModulesDirectory* mdir);
 
 	///\brief Get the list of commands
-	std::list<std::string> commands() const;
-
-	const langbind::DirectmapCommandConfigStruct* command( const std::string& name) const
+	std::list<std::string> commands() const
 	{
-		std::map<std::string, std::size_t>::const_iterator itr = m_map.find( name);
-		if (itr == m_map.end()) return 0;
-		return &m_cfg.command[ itr->second];
+		return m_program.getkeys< std::list<std::string> >();
+	}
+
+	const langbind::DirectmapCommandDescription* command( const std::string& name) const
+	{
+		return m_program.get( name);
 	}
 
 private:
-	std::map<std::string, std::size_t> m_map;
-	langbind::DirectmapConfigStruct m_cfg;
+	langbind::DirectmapProgram m_program;
 };
 
 ///\class DirectmapCommandHandler
@@ -73,7 +75,7 @@ public:
 	///\brief Declaration for cmdbind::ScriptCommandHandlerConstructor
 	typedef DirectmapContext ContextStruct;
 	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
-	typedef langbind::DirectmapConfigStruct ConfigStruct;
+	typedef langbind::ScriptEnvironmentConfigStruct ConfigStruct;
 
 	///\brief Constructor
 	explicit DirectmapCommandHandler( const DirectmapContext* ctx_)
@@ -102,7 +104,7 @@ private:
 	void initcall();
 private:
 	const DirectmapContext* m_ctx;					//< execution context of the command handler
-	const langbind::DirectmapCommandConfigStruct* m_cmd;		//< description of command to execute
+	const langbind::DirectmapCommandDescription* m_cmd;		//< description of command to execute
 	int m_state;							//< internal state
 	const db::TransactionFunction* m_function;			//< function object with input/output transaction serialization description
 	ddl::Form m_inputform;						//< (optional) form for validating and formating input

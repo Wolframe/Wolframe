@@ -36,7 +36,6 @@
 #include "langbind/appObjects.hpp"
 #include "database/DBprovider.hpp"
 #include "langbind/scriptConfig_struct.hpp"
-#include "langbind/directmapConfig_option.hpp"
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "moduleInterface.hpp"
@@ -189,32 +188,6 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 			cmdhlcfg.add_child( mi->first, scfg.toPropertyTree());
 			proccfg.add_child( "cmdhandler", cmdhlcfg);
 		}
-		if (!m_directmapconfig.command.empty())
-		{
-			std::pair<std::string,std::string> cfgid;
-			bool cfgid_set = false;
-			std::vector<std::pair<std::string,std::string> >::const_iterator pi = cmdhl.begin(), pe = cmdhl.end();
-			for (; pi != pe; ++pi)
-			{
-				if (boost::iequals( pi->first, "cmdhandler")
-				&&  boost::istarts_with( pi->second, "directmap"))
-				{
-					if (cfgid_set)
-					{
-						throw std::runtime_error( "more than one command handler module loaded that matches to directmap");
-					}
-					cfgid = *pi;
-					cfgid_set = true;
-				}
-			}
-			if (!cfgid_set)
-			{
-				throw std::runtime_error( "no command handler module loaded that handles the directmap defined");
-			}
-			boost::property_tree::ptree cmdhlcfg;
-			cmdhlcfg.add_child( cfgid.second, m_directmapconfig.toPropertyTree());
-			proccfg.add_child( cfgid.first, cmdhlcfg);
-		}
 	}
 	catch (std::exception& e)
 	{
@@ -242,7 +215,6 @@ struct OptionStruct
 			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 			( "program,p", po::value< std::vector<std::string> >(), "specify program to load by path" )
-			( "directmap,d", po::value< std::vector<std::string> >(), "specify directmap definition" )
 			( "config,C", po::value<std::string>(), "specify configuration file to load" )
 			( "database,D", po::value<std::string>(), "specifiy transaction database" )
 			( "cmd", po::value<std::string>(), "name of the command to execute")
@@ -283,7 +255,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		m_config = utils::readPropertyTreeFile( configfile);
 		if (vmap.count( "module")) throw std::runtime_error( "incompatible options: --config specified with --module");
 		if (vmap.count( "program")) throw std::runtime_error( "incompatible options: --config specified with --program");
-		if (vmap.count( "directmap")) throw std::runtime_error( "incompatible options: --config specified with --directmap");
 		if (vmap.count( "database")) throw std::runtime_error( "incompatible options: --config specified with --database");
 	}
 	if (vmap.count( "input")) m_inputfile = vmap["input"].as<std::string>();
@@ -309,16 +280,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 		m_programs = vmap["program"].as<std::vector<std::string> >();
 	}
-	if (vmap.count( "directmap"))
-	{
-		std::vector<std::string> directmaps = vmap["directmap"].as<std::vector<std::string> >();
-		std::vector<std::string>::const_iterator itr=directmaps.begin(), end=directmaps.end();
-		for (; itr != end; ++itr)
-		{
-			m_directmapconfig.command.push_back( langbind::DirectmapCommandOption( *itr));
-		}
-	}
-
 	if (vmap.count( "cmd")) m_cmd = vmap["cmd"].as<std::string>();
 	if (vmap.count( "input-filter")) m_inputfilter = vmap["input-filter"].as<std::string>();
 	if (vmap.count( "output-filter")) m_outputfilter = vmap["output-filter"].as<std::string>();
