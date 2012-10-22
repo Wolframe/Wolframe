@@ -30,27 +30,34 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file authCommandHandler.hpp
-///\brief Interface to AUTH command handler
-#ifndef _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
+///\file mainConnectionHandler_auth.hpp
+///
+#ifndef _Wolframe_MAIN_CONNECTION_HANDLER_AUTH_HPP_INCLUDED
+#define _Wolframe_MAIN_CONNECTION_HANDLER_AUTH_HPP_INCLUDED
 #include "cmdbind/lineCommandHandler.hpp"
+#include "cmdbind/authCommandHandler.hpp"
+#include <vector>
+#include <string>
 
 namespace _Wolframe {
-namespace cmdbind {
+namespace proc {
 
-class AuthCommandHandler :public cmdbind::LineCommandHandlerTemplate<CommandHandler>
+struct AuthMechanisms
 {
-public:
-	AuthCommandHandler();
-	virtual ~AuthCommandHandler(){}
+	///\brief Get the list of available authorization mechanisms
+	std::vector<std::string> list() const
+	{
+		/// make it just compile
+		return std::vector<std::string>();
+	}
 
-	const std::string& ticket() const	{return m_ticket;}
-
-private:
-	std::string m_ticket;
+	///\brief Create a handler for a specific authorization mechanisms by name
+	cmdbind::AuthCommandHandler* get( const std::string& /*auth mech*/) const
+	{
+		/// make it just compile
+		return 0;
+	}
 };
 
 }}//namespace
 #endif
-

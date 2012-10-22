@@ -32,12 +32,12 @@
 ************************************************************************/
 ///\file mainConnectionHandler.hpp
 ///
-
 #ifndef _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #define _Wolframe_MAIN_CONNECTION_HANDLER_HPP_INCLUDED
 #include "connectionHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
+#include "mainConnectionHandler_auth.hpp"
 #include "protocol/ioblocks.hpp"
 #include "types/keymap.hpp"
 #include <boost/shared_ptr.hpp>
@@ -70,6 +70,7 @@ public:
 	int endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out);
 
 private:
+	AuthMechanisms m_authMechanisms;
 	std::string m_doctype;
 	std::vector<std::string> m_authtickets;
 };

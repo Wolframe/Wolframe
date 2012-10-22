@@ -31,7 +31,6 @@
 
 ************************************************************************/
 ///\file mainConnectionHandler.cpp
-
 #include "mainConnectionHandler.hpp"
 #include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
 #include "cmdbind/doctypeFilterCommandHandler.hpp"
@@ -78,7 +77,7 @@ static STM stm;
 CommandHandler::CommandHandler()
 	:cmdbind::LineCommandHandlerTemplate<CommandHandler>( &stm ){}
 
-static const unsigned long getNumber( const char* aa)
+static unsigned long getNumber( const char* aa)
 {
 	unsigned long result = 0;
 	for (int ii=0; aa[ii] <= '9' && aa[0] >= '0'; ++ii)
@@ -128,7 +127,7 @@ int CommandHandler::doAuth( int argc, const char**, std::ostream& out)
 	}
 	else
 	{
-		out << "MECHS " << boost::algorithm::join( m_provider->authMechanims(), " ") << std::endl;
+		out << "MECHS " << boost::algorithm::join( m_authMechanisms.list(), " ") << std::endl;
 		return Authorization;
 	}
 }
@@ -163,7 +162,7 @@ int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		out << "ERR to many arguments for MECH" << endl();
 		return stateidx();
 	}
-	cmdbind::AuthCommandHandler* authch = m_provider->authHandler( argv[0]);
+	cmdbind::AuthCommandHandler* authch = m_authMechanisms.get( argv[0]);
 	if (authch)
 	{
 		out << "ERR no handler defined for authorization mechanism " << argv[0] << "'" << endl();
@@ -193,6 +192,7 @@ int CommandHandler::doInterface( int argc, const char** argv, std::ostream& out)
 		out << endl() << "." << endl();
 	}
 	out << "OK";
+	return stateidx();
 }
 
 int CommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out)
