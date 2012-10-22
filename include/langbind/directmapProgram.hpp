@@ -30,51 +30,58 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind/directmapConfig_struct.hpp
-///\brief Data structures of the configuration of a directmap command handler
-#ifndef _Wolframe_DIRECTMAP_CONFIGURATION_STRUCT_HPP_INCLUDED
-#define _Wolframe_DIRECTMAP_CONFIGURATION_STRUCT_HPP_INCLUDED
-#include "serialize/struct/filtermapBase.hpp"
-#include "config/ConfigurationTree.hpp"
-#include <vector>
+///\brief Interface for directmap programs
+///\file langbind/directmapProgram.hpp
+#ifndef _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
+#define _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
+#include "types/keymap.hpp"
 #include <string>
-#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
 namespace langbind {
 
-struct DirectmapCommandConfigStruct
+struct DirectmapCommandDescription
 {
-	std::string name;						//< (optional) name of the command. default is the value of call
+	DirectmapCommandDescription(){}
+	DirectmapCommandDescription( const DirectmapCommandDescription& o)
+		:call(o.call)
+		,filter(o.filter)
+		,inputform(o.inputform)
+		,outputform(o.outputform){}
+
 	std::string call;						//< name of the transaction or form function
 	std::string filter;						//< name of the input/ouput filter
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
-
-	///\brief Get the configuration structure description
-	static const serialize::StructDescriptionBase* getStructDescription();
 };
 
-
-struct DirectmapConfigStruct
+///\class DirectmapProgram
+///\brief Program describing direct mappings (many function descriptions per source file)
+//	Function description syntax: identifier = call( filter :inputform) :outputform;
+//
+class DirectmapProgram
+	:public types::keymap<DirectmapCommandDescription>
 {
-	std::vector<DirectmapCommandConfigStruct> command;		//< definitions of directmap commands
+public:
+	typedef types::keymap<DirectmapCommandDescription> Parent;
 
-	///\brief Get the configuration structure description
-	static const serialize::StructDescriptionBase* getStructDescription();
+	DirectmapProgram(){}
+	DirectmapProgram( const DirectmapProgram& o)
+		:Parent(o){}
+	~DirectmapProgram(){}
 
-	void setCanonicalPathes( const std::string& referencePath);
+	bool is_mine( const std::string& filename) const;
+	void addProgram( const std::string& source);
+	void loadProgram( const std::string& filename);
 
-	boost::property_tree::ptree toPropertyTree() const;
-	void initFromPropertyTree( const boost::property_tree::ptree& pt);
-	void initFromPropertyTree( const config::ConfigurationTree& pt);
-
-	void print( std::ostream& os, size_t indent) const;
-
-	bool check() const;
+	const DirectmapCommandDescription* get( const std::string& name) const
+	{
+		Parent::const_iterator rt = Parent::find( name);
+		return (rt == Parent::end())?0:&rt->second;
+	}
 };
 
-}}//namespace
+}}
 #endif
 
 

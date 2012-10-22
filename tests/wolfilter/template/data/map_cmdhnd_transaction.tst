@@ -7,11 +7,13 @@ modpath="../wolfilter/modules/database"			# module directory relative from tests
 opt="$opt --module $modpath/testtrace/mod_db_testtrace"
 opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
 opt="$opt --program=DBIN.tdl"
-opt="$opt --directmap 'f=xml,c=test_transaction,n=run'"
+opt="$opt --program=test.directmap"
 testcmd="$opt run"					# command to execute by the test
 docin=employee_assignment_print				# input document name
 docout=map_transaction					# output document name
 testdata="
+**file: test.directmap
+run = test_transaction( xml);
 **file: DBRES
 #id task start end#11 'bla bla' '12:04:19 1/3/2012' '12:41:34 1/3/2012'#12 'bli blu' '07:14:23 1/3/2012' '08:01:51 1/3/2012'
 #id task start end#21 'gardening' '09:24:28 1/3/2012' '11:11:07 1/3/2012'#22 'helo' '11:31:01 1/3/2012' '12:07:55 1/3/2012'

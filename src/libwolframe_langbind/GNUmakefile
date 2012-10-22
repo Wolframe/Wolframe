@@ -34,14 +34,13 @@ CPP_OBJS = \
 	protocol_ioblocks.o \
 	appObjects.o \
 	scriptConfig_struct.o \
-	directmapConfig_struct.o \
-	directmapConfig_option.o \
 	null_filter.o \
 	typingfilter.o \
 	tostringfilter.o \
 	ptreefilter.o \
 	formLibrary.o \
 	normalizeProgram.o \
+	directmapProgram.o \
 	printProgram.o \
 	cmdbind_lineCommandHandler.o \
 	cmdbind_execCommandHandler.o \

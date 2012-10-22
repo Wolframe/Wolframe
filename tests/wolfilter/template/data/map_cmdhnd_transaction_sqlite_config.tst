@@ -7,6 +7,8 @@ docin=schema_select_task_by_id				# input document name
 docout=output_schema_select_task_by_id			# output document name
 dumpout="program/schema_select_task_by_id.dbdump.txt"	# resource dump to add to expected test output
 testdata="
+**file: test.directmap
+`cat program/schema_select_task_by_id.directmap`
 **file:wolframe.conf
 `cat ../config/wolframe.conf`
 **file:simpleform.normalize

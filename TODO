@@ -14,6 +14,8 @@ PF:
 	- The print form configuration can have an xslt script for preprocessing
 
 - Make postgres database run transactions
-- directmap programs instead of config
 
 - Open Issue: Error messages for the client
+
+
+

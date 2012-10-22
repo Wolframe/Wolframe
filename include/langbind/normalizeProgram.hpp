@@ -52,7 +52,7 @@ public:
 
 	NormalizeProgram(){}
 	NormalizeProgram( const NormalizeProgram& o)
-		:types::keymap<NormalizeFunctionR>(o)
+		:Parent(o)
 		,m_constructormap(o.m_constructormap){}
 	~NormalizeProgram(){}
 
@@ -64,7 +64,7 @@ public:
 
 	const NormalizeFunction* get( const std::string& name) const
 	{
-		types::keymap<NormalizeFunctionR>::const_iterator rt = Parent::find( name);
+		Parent::const_iterator rt = Parent::find( name);
 		return (rt == Parent::end())?0:rt->second.get();
 	}
 

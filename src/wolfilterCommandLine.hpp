@@ -39,7 +39,7 @@
 #include <iostream>
 #include "moduleDirectory.hpp"
 #include "processor/procProvider.hpp"
-#include "langbind/directmapConfig_option.hpp"
+#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
 namespace config {
@@ -78,7 +78,6 @@ private:
 	std::string m_inputfile;
 	std::vector<std::string> m_modules;
 	std::vector<std::string> m_programs;
-	langbind::DirectmapConfigStruct m_directmapconfig;
 	boost::property_tree::ptree m_dbconfig;
 	boost::property_tree::ptree m_config;
 	std::string m_cmd;
