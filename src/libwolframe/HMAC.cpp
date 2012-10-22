@@ -49,8 +49,7 @@ namespace AAAA {
 
 static const size_t HMAC_BLOCK_SIZE = SHA256_BLOCK_SIZE;
 static const size_t HMAC_BCD_SIZE = HMAC_DIGEST_SIZE * 2 + 1;
-static const size_t HMAC_BASE64_SIZE = (( HMAC_DIGEST_SIZE * 4 ) / 3 ) +
-			(( HMAC_DIGEST_SIZE % 3 ) ? ( 3 - ( HMAC_DIGEST_SIZE % 3 )) : 0 ) + 1;
+static const size_t HMAC_BASE64_SIZE = (( HMAC_DIGEST_SIZE - 1 ) / 3 ) * 4 + 5;
 
 void HMAC_SHA256::init( const unsigned char *key, size_t keyLen,
 			const unsigned char *msg, size_t msgLen )
@@ -88,6 +87,19 @@ void HMAC_SHA256::init( const unsigned char *key, size_t keyLen,
 	sha256_update( &ctx, hash, HMAC_DIGEST_SIZE );
 	sha256_final( &ctx, m_HMAC );
 }
+
+HMAC_SHA256::HMAC_SHA256( const std::string& hash )
+{
+	memset( m_HMAC, 0, HMAC_DIGEST_SIZE );
+
+	int ret;
+	if (( ret = base64_decode( hash.data(), hash.size(),
+				   m_HMAC, HMAC_DIGEST_SIZE )) < 0 )	{
+		std::string errMsg = "Cannot convert '" + hash + "' to a HMAC-SHA256";
+		throw std::runtime_error( errMsg );
+	}
+}
+
 
 std::string HMAC_SHA256::toBCD() const
 {

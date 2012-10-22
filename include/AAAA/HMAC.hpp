@@ -59,6 +59,7 @@ public:
 					{ init( key, keySize, (const unsigned char*)message.data(), message.size()); }
 	HMAC_SHA256( const std::string& key, const unsigned char* msg, size_t msgSize )
 					{ init( (const unsigned char*)key.data(), key.size(), msg, msgSize ); }
+	HMAC_SHA256( const std::string& hash );
 
 	bool operator == ( const HMAC_SHA256& rhs ) const;
 	bool operator != ( const HMAC_SHA256& rhs ) const	{ return !( *this == rhs ); }

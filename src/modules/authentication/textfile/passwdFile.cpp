@@ -41,6 +41,7 @@
 #include <iostream>
 
 #include "passwdFile.hpp"
+#include "AAAA/HMAC.hpp"
 
 #include <boost/algorithm/string.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
@@ -115,7 +116,6 @@ static bool parsePwdLine( const char* pwdLine, PwdFileUser& user )
 bool PasswordFile::addUser( const PwdFileUser& user )
 {
 	FILE*	file;
-	bool	fileCreated = false;
 
 	if ( !boost::filesystem::exists( m_filename ) )	{
 		if ( !m_create )	{
@@ -130,7 +130,6 @@ bool PasswordFile::addUser( const PwdFileUser& user )
 				msg += m_filename + "' could not be opened: " + strerror( err );
 				throw std::runtime_error( msg );
 			}
-			fileCreated = true;
 		}
 	}
 	else	{
@@ -205,6 +204,52 @@ bool PasswordFile::getUser( const std::string& username, PwdFileUser& user ) con
 			}
 		}
 		if ( pwdLineUser( line ) == trimmedName )	{
+			fclose( file );
+			bool found = parsePwdLine( line, user );
+			assert( found == true );
+			return true;
+		}
+	}
+	return false;
+}
+
+bool PasswordFile::getHMACuser( const std::string& hash, const std::string& key,
+				PwdFileUser& user ) const
+{
+	FILE*	file;
+	char	line[ PWD_FILE_LINE_SIZE ];
+
+	HMAC_SHA256 userHash( hash );
+
+	if ( !boost::filesystem::exists( m_filename ) && !m_create )	{
+		std::string msg = "password file '";
+		msg += m_filename + "' does not exist";
+		throw std::runtime_error( msg );
+	}
+
+	if (( file = fopen( m_filename.c_str(), "r" )) == NULL )	{
+		int err = errno;
+		std::string msg = "password file '";
+		msg += m_filename + "' could not be opened: " + strerror( err );
+		throw std::runtime_error( msg );
+	}
+
+	while ( !feof( file ) )	{
+		char* ret = fgets( line, PWD_FILE_LINE_SIZE, file );
+		if ( ret == NULL )	{
+			if ( feof( file ))	{
+				fclose( file );
+				return false;
+			}
+			else	{
+				int err = errno;
+				fclose( file );
+				std::string msg = "error reading from password file '";
+				msg += m_filename + "': " + strerror( err );
+				throw std::runtime_error( msg );
+			}
+		}
+		if ( HMAC_SHA256( key, pwdLineUser( line )) == userHash )	{
 			fclose( file );
 			bool found = parsePwdLine( line, user );
 			assert( found == true );

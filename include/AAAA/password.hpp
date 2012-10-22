@@ -54,21 +54,19 @@ public:
 	PasswordSalt();
 	/// Construct a salt from the given byte array.
 	explicit PasswordSalt( const unsigned char* salt, size_t bytes );
-	/// Construct a random salt using randomDevice to generate random bytes.
-	explicit PasswordSalt( const std::string& randomDevice );
+	/// Construct a salt by setting the value from the base64 encoded string.
+	explicit PasswordSalt( const std::string& salt );
+
+	/// Construct a random salt using device to generate random bytes.
+	void generate( const std::string& device );
 
 	/// The size of the salt in bytes
 	size_t size() const			{ return m_size; }
 
-	/// Set the salt value from the BCD encoded string.
-	void fromBCD( const std::string& salt );
-	/// Set the salt value from the base64 encoded string.
-	void fromBase64( const std::string& salt );
-
 	/// Return the salt as a BCD encoded string.
 	std::string toBCD() const;
 	/// Return the salt as a base64 encoded string.
-	std::string toBase64() const;
+	std::string toString() const;
 private:
 	std::size_t	m_size;
 	unsigned char	m_salt[ PASSWORD_SALT_SIZE ];
@@ -80,13 +78,19 @@ class PasswordHash
 public:
 	/// Construct the password hash from salt and password (plain text)
 	PasswordHash( const PasswordSalt& pwdSalt, const std::string& password );
+
 	/// Construct the password hash from a combined password hash string (base64)
+	///\param	str	password hash string in format $<salt>$<hash>
+	///			if the string doesn't start with '$' then
+	///			the string is considered to represent only the
+	///			password hash as base64 and the salt will be zeroed
 	PasswordHash( const std::string& hash );
 
 	/// Return the password hash as a string
 	/// The format is $<salt>$<hash> on one line, no whitespaces
 	std::string toString() const;
 
+	/// Return the password salt
 	const PasswordSalt& salt() const	{ return m_salt; }
 private:
 	unsigned char		m_hash[ PASSWORD_HASH_SIZE ];

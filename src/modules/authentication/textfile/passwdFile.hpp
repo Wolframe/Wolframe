@@ -90,6 +90,16 @@ public:
 	///\note Throws in case of file operation error.
 	bool getUser( const std::string& username, PwdFileUser& user ) const;
 
+	///\brief Get an user from the password file defined by an username hash
+	///\param [in] hash	The HMAC-SHA256 hash of the username (base64)
+	///\param [in] key	The HMAC-SHA256 key (base64 string)
+	///\param [out] user	A filled PwdFileUser structure
+	///\return		true if the user has been deleted or false
+	///			if the user doesn't exist in the file
+	///\note Throws in case of file operation error or if the hash cannot
+	///			be converted to a HMAC-SHA256
+	bool getHMACuser( const std::string& hash, const std::string& key,
+			  PwdFileUser& user ) const;
 private:
 	const std::string	m_filename;
 	const bool		m_create;

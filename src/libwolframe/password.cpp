@@ -60,13 +60,9 @@
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe;
 
+/****  Password Salt  ************************************************/
 static const size_t PASSWORD_SALT_BCD_SIZE = PASSWORD_SALT_SIZE * 2 + 1;
-static const size_t PASSWORD_SALT_BASE64_SIZE = (( PASSWORD_SALT_SIZE * 4 ) / 3 ) +
-			(( PASSWORD_SALT_SIZE % 3 ) ? ( 3 - ( PASSWORD_SALT_SIZE % 3 )) : 0 ) + 1;
-
-static const size_t PASSWORD_HASH_BCD_SIZE = PASSWORD_HASH_SIZE * 2 + 1;
-static const size_t PASSWORD_HASH_BASE64_SIZE = (( PASSWORD_HASH_SIZE * 4 ) / 3 ) +
-			(( PASSWORD_HASH_SIZE % 3 ) ? ( 3 - ( PASSWORD_HASH_SIZE % 3 )) : 0 ) + 1;
+static const size_t PASSWORD_SALT_BASE64_SIZE = (( PASSWORD_SALT_SIZE - 1 ) / 3 ) * 4 + 5;
 
 PasswordSalt::PasswordSalt()
 {
@@ -82,22 +78,34 @@ PasswordSalt::PasswordSalt( const unsigned char* salt , size_t bytes )
 	memcpy( m_salt, salt, m_size );
 }
 
-PasswordSalt::PasswordSalt( const std::string& randomDevice )
+PasswordSalt::PasswordSalt( const std::string& salt )
+{
+	int ret;
+	if (( ret = base64_decode( salt.data(), salt.size(),
+				   m_salt, PASSWORD_SALT_SIZE )) < 0 )	{
+		std::string errMsg = "Cannot convert '" + salt + "' to a password salt";
+		throw std::runtime_error( errMsg );
+	}
+	m_size = ret;
+}
+
+
+void PasswordSalt::generate( const std::string& device )
 {
 #ifndef _WIN32
-	int hndl = open( randomDevice.c_str(), O_RDONLY );
+	int hndl = open( device.c_str(), O_RDONLY );
 	if ( hndl < 0 )	{
-		std::string errMsg = "Error opening '" + randomDevice + "': ";
+		std::string errMsg = "Error opening '" + device + "': ";
 		throw std::runtime_error( errMsg );
 	}
 
 	int rndPart = read( hndl, m_salt, PASSWORD_SALT_SIZE );
 	if ( rndPart < 0 )	{
-		std::string errMsg = "Error reading '" + randomDevice + "'";
+		std::string errMsg = "Error reading '" + device + "'";
 		throw std::runtime_error( errMsg );
 	}
 	else if ( rndPart < (int)PASSWORD_SALT_SIZE )	{
-		std::string errMsg = "Not enough entropy in '" + randomDevice + "' ?!?";
+		std::string errMsg = "Not enough entropy in '" + device + "' ?!?";
 		throw std::logic_error( errMsg );
 	}
 
@@ -121,6 +129,7 @@ PasswordSalt::PasswordSalt( const std::string& randomDevice )
 	m_size = PASSWORD_SALT_SIZE;
 }
 
+
 std::string PasswordSalt::toBCD() const
 {
 	char	buffer[ PASSWORD_SALT_BCD_SIZE ];
@@ -132,17 +141,20 @@ std::string PasswordSalt::toBCD() const
 	return std::string( buffer );
 }
 
-std::string PasswordSalt::toBase64() const
+std::string PasswordSalt::toString() const
 {
 	char	buffer[ PASSWORD_SALT_BASE64_SIZE ];
 
 	if ( base64::encode( m_salt, PASSWORD_SALT_SIZE,
 			     buffer, PASSWORD_SALT_BASE64_SIZE, 0 ) < 0 )
-		throw std::logic_error( "PasswordSalt::toBase64() cannot convert hash ?!?" );
+		throw std::logic_error( "PasswordSalt::toBase64() cannot convert hash to base64 ?!?" );
 
 	return std::string( buffer );
 }
 
+
+/****  Password Hash  ************************************************/
+static const size_t PASSWORD_HASH_BASE64_SIZE = (( PASSWORD_HASH_SIZE - 1 ) / 3 ) * 4 + 5;
 
 PasswordHash::PasswordHash( const PasswordSalt& pwdSalt, const std::string& password )
 	: m_salt( pwdSalt )
@@ -156,9 +168,9 @@ std::string PasswordHash::toString() const
 
 	if ( base64::encode( m_hash, PASSWORD_HASH_SIZE,
 			     buffer, PASSWORD_HASH_BASE64_SIZE, 0 ) < 0 )
-		throw std::logic_error( "PasswordHash::toString() cannot convert hash ?!?" );
+		throw std::logic_error( "PasswordHash::toString() cannot convert hash to base64?!?" );
 
 	std::string s = "$";
-	s += m_salt.toBase64() + "$" + buffer;
+	s += m_salt.toString() + "$" + buffer;
 	return s;
 }

@@ -61,8 +61,8 @@
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe;
 
-static const int CRAM_CHALLENGE_STRING_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
-static const int CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
+static const size_t CRAM_CHALLENGE_STRING_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
+static const size_t CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
 
 CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 {
@@ -96,7 +96,7 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 		std::string errMsg = "Error reading '" + randomDevice + "'";
 		throw std::runtime_error( errMsg );
 	}
-	else if ( rndPart < CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE )	{
+	else if ( rndPart < (int)CRAM_CHALLENGE_SIZE - (int)SHA256_DIGEST_SIZE )	{
 		std::string errMsg = "Not enough bytes in '" + randomDevice + "' ?!?";
 		throw std::logic_error( errMsg );
 	}
@@ -142,9 +142,9 @@ CRAMresponse::CRAMresponse( const CRAMchallenge& challenge,
 	memset( buffer, 0, CRAM_CHALLENGE_SIZE );
 	memcpy( buffer, username.c_str(),
 		CRAM_CHALLENGE_SIZE / 2 > username.length() ? username.length() : CRAM_CHALLENGE_SIZE / 2 );
-	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != PASSWORD_HASH_SIZE )
+	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != (int)PASSWORD_HASH_SIZE )
 		throw std::runtime_error( "CRAM response: password hash is invalid" );
-	for ( int i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
+	for ( size_t i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
 		buffer[ i ] ^= challenge.m_challenge[ i ];
 	sha512( buffer, CRAM_CHALLENGE_SIZE, m_response );
 }
@@ -158,11 +158,11 @@ CRAMresponse::CRAMresponse( const std::string& challenge,
 	memset( buffer, 0, CRAM_CHALLENGE_SIZE );
 	memcpy( buffer, username.c_str(),
 		CRAM_CHALLENGE_SIZE / 2 > username.length() ? username.length() : CRAM_CHALLENGE_SIZE / 2 );
-	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != PASSWORD_HASH_SIZE )
+	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != (int)PASSWORD_HASH_SIZE )
 		throw std::runtime_error( "CRAM response: password hash is invalid" );
-	if ( hex2byte( challenge.c_str(), chlng, CRAM_CHALLENGE_SIZE ) != CRAM_CHALLENGE_SIZE )
+	if ( hex2byte( challenge.c_str(), chlng, CRAM_CHALLENGE_SIZE ) != (int)CRAM_CHALLENGE_SIZE )
 		throw std::runtime_error( "CRAM response: challenge is invalid" );
-	for ( int i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
+	for ( size_t i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
 		buffer[ i ] ^= chlng[ i ];
 	sha512( buffer, CRAM_CHALLENGE_SIZE, m_response );
 }
@@ -187,7 +187,7 @@ bool CRAMresponse::operator == ( const std::string& rhs )
 {
 	unsigned char	buffer[ CRAM_RESPONSE_SIZE ];
 
-	if ( hex2byte( rhs.c_str(), buffer, CRAM_RESPONSE_SIZE ) != CRAM_RESPONSE_SIZE )
+	if ( hex2byte( rhs.c_str(), buffer, CRAM_RESPONSE_SIZE ) != (int)CRAM_RESPONSE_SIZE )
 		return false;
 	return !memcmp( this->m_response, buffer, CRAM_RESPONSE_SIZE );
 }
