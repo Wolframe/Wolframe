@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///
-///
+/// Standard HMAC-SHA256 implementation
 ///
 
 #include <cstring>
@@ -47,8 +47,13 @@
 namespace _Wolframe {
 namespace AAAA {
 
+static const size_t HMAC_BLOCK_SIZE = SHA256_BLOCK_SIZE;
+static const size_t HMAC_BCD_SIZE = HMAC_DIGEST_SIZE * 2 + 1;
+static const size_t HMAC_BASE64_SIZE = (( HMAC_DIGEST_SIZE * 4 ) / 3 ) +
+			(( HMAC_DIGEST_SIZE % 3 ) ? ( 3 - ( HMAC_DIGEST_SIZE % 3 )) : 0 ) + 1;
+
 void HMAC_SHA256::init( const unsigned char *key, size_t keyLen,
-		   const unsigned char *msg, size_t msgLen )
+			const unsigned char *msg, size_t msgLen )
 {
 	unsigned char	pad[ HMAC_BLOCK_SIZE ];
 	unsigned char	intKey[ HMAC_BLOCK_SIZE ];
@@ -59,8 +64,8 @@ void HMAC_SHA256::init( const unsigned char *key, size_t keyLen,
 	memset( intKey, 0, HMAC_BLOCK_SIZE );
 	if ( keyLen > HMAC_BLOCK_SIZE )	{
 		sha256( key, keyLen, intKey );
-// This is non-standard
-//		sha512( key, keyLen, intKey );
+		// This is non-standard
+		//		sha512( key, keyLen, intKey );
 	}
 	else	{
 		for ( size_t i = 0; i < keyLen; i ++ )
@@ -88,8 +93,6 @@ std::string HMAC_SHA256::toBCD() const
 {
 	char	buffer[ HMAC_BCD_SIZE ];
 
-	memset( buffer, 0, HMAC_BCD_SIZE );
-
 	if ( byte2hex( m_HMAC, HMAC_DIGEST_SIZE,
 		       buffer, HMAC_BCD_SIZE ) == NULL )
 		throw std::logic_error( "HMAC-SHA256::toBCD() cannot convert hash ?!?" );
@@ -100,8 +103,6 @@ std::string HMAC_SHA256::toBCD() const
 std::string HMAC_SHA256::toBase64() const
 {
 	char	buffer[ HMAC_BASE64_SIZE ];
-
-	memset( buffer, 0, HMAC_BASE64_SIZE );
 
 	if ( base64::encode( m_HMAC, HMAC_DIGEST_SIZE,
 			     buffer, HMAC_BASE64_SIZE, 0 ) < 0 )
