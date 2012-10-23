@@ -132,6 +132,7 @@ TEST_CPP_BINS = \
 	base64Test$(EXE) \
 	base64Utility$(EXE) \
 	testSHA2$(EXE) \
+	testMD5$(EXE) \
 	CRAMtest$(EXE) \
 	HMACtest$(EXE) \
 	poolTest$(EXE) \
@@ -150,6 +151,7 @@ TEST_CPP_BINS = \
 
 logTest$(EXE): $(TOPDIR)/src/libwolframe.a
 testSHA2$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+testMD5$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 HMACtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
@@ -198,6 +200,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./singletonTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testSHA2
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testMD5
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./byte2hexTest
 	@echo
