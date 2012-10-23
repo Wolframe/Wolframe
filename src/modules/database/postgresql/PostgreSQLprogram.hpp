@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to programs of a sqlite3 database
-///\file modules/database/sqlite3/SQLiteProgram.hpp
-#ifndef _DATABASE_PROGRAM_SQLITE3_HPP_INCLUDED
-#define _DATABASE_PROGRAM_SQLITE3_HPP_INCLUDED
+///\brief Interface to programs of a postgres database
+///\file PostgreSQLprogram.hpp
+#ifndef _DATABASE_PROGRAM_POSTGRES_HPP_INCLUDED
+#define _DATABASE_PROGRAM_POSTGRES_HPP_INCLUDED
 #include "types/keymap.hpp"
 #include <string>
 #include <map>
@@ -42,11 +42,11 @@
 namespace _Wolframe {
 namespace db {
 
-class SQLiteProgram
+class PostgreSQLprogram
 {
 public:
-	SQLiteProgram(){}
-	SQLiteProgram( const SQLiteProgram& o)
+	PostgreSQLprogram(){}
+	PostgreSQLprogram( const PostgreSQLprogram& o)
 		:m_statementmap(o.m_statementmap){}
 
 	void load( const std::string& dbsource);

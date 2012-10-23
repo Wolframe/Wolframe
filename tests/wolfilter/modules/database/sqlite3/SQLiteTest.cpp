@@ -109,10 +109,6 @@ config::ConfigurationTree SQLiteTestConfig::extractMyNodes( const config::Config
 		{
 			m_dump_filename = pi->second.data();
 		}
-		else if (boost::algorithm::iequals( pi->first, "program" ))
-		{
-			m_program_filename = pi->second.data();
-		}
 		else
 		{
 			rt.add_child( pi->first, pi->second);
@@ -130,10 +126,6 @@ void SQLiteTestConfig::setMyCanonicalPathes( const std::string& referencePath)
 	if (!m_dump_filename.empty())
 	{
 		m_dump_filename = utils::getCanonicalPath( m_dump_filename, referencePath);
-	}
-	if (!m_program_filename.empty())
-	{
-		m_program_filename = utils::getCanonicalPath( m_program_filename, referencePath);
 	}
 }
 

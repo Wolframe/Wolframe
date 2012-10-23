@@ -30,35 +30,38 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to programs of a sqlite3 database
-///\file modules/database/sqlite3/SQLiteProgram.hpp
-#ifndef _DATABASE_PROGRAM_SQLITE3_HPP_INCLUDED
-#define _DATABASE_PROGRAM_SQLITE3_HPP_INCLUDED
-#include "types/keymap.hpp"
-#include <string>
-#include <map>
-#include <cstdlib>
+///\file mod_db_postgresqltest.cpp
+///\brief Module for a database implementation used for tests based on the postgres database module
+#include "PostgreSQLTest.hpp"
+#include "moduleInterface.hpp"
+#include "logger-v1.hpp"
+
+_Wolframe::log::LogBackend* logBackendPtr;
 
 namespace _Wolframe {
-namespace db {
+namespace module {
 
-class SQLiteProgram
+typedef ConfiguredBuilder* (*CreateBuilderFunc)();
+
+static ConfiguredBuilder* createDatabase()
 {
-public:
-	SQLiteProgram(){}
-	SQLiteProgram( const SQLiteProgram& o)
-		:m_statementmap(o.m_statementmap){}
+	static module::ConfiguredBuilderDescription< db::PostgreSQLTestConstructor,
+		db::PostgreSQLTestConfig > mod( "test PostgreSQL database", "database", "PostgreSQLTest", db::POSTGRESQL_DB_CLASS_NAME);
+	return &mod;
+}
 
-	void load( const std::string& dbsource);
-	const types::keymap<std::string>* statementmap() const
-	{
-		return &m_statementmap;
-	}
+static void setModuleLogger( void* logger)
+{
+	logBackendPtr = reinterpret_cast<_Wolframe::log::LogBackend*>( logger);
+}
 
-private:
-	types::keymap<std::string> m_statementmap;
+enum {NofObjects=1};
+static CreateBuilderFunc containers[ NofObjects] =
+{
+	createDatabase
 };
 
-}}
-#endif
+ModuleEntryPoint entryPoint( 0, "PostgreSQL test database", setModuleLogger, NofObjects, containers, 0, 0);
+
+}} // namespace _Wolframe::module
 

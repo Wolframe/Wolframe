@@ -31,10 +31,12 @@
 
 ************************************************************************/
 ///\brief Interface to process prepared statements with postgres client using libpq
-///\file modules/database/postgres/PostgreSQLpreparedStatement.hpp
+///\file PostgreSQLpreparedStatement.hpp
 #ifndef _DATABASE_PREPARED_STATEMENT_POSTGRESQL_LIBPQ_HPP_INCLUDED
 #define _DATABASE_PREPARED_STATEMENT_POSTGRESQL_LIBPQ_HPP_INCLUDED
 #include "database/preparedStatement.hpp"
+#include "database/bindStatementParams.hpp"
+#include "types/keymap.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -49,25 +51,26 @@ namespace db {
 struct PreparedStatementHandler_postgres :public PreparedStatementHandler
 {
 	///\brief Constructor
-	PreparedStatementHandler_postgres( PGconn* conn);
+	PreparedStatementHandler_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_);
 
 	///\brief Destructor
 	virtual ~PreparedStatementHandler_postgres();
 
 	///\brief Begin transaction
-	virtual bool begin();
+	bool begin();
 	///\brief Commit current transaction
-	virtual bool commit();
+	bool commit();
 	///\brief Rollback current transaction
-	virtual bool rollback();
-	///\brief Clear object and set initial state
-	virtual void clear();
+	bool rollback();
+
 	///\brief Start new command statement
 	virtual bool start( const std::string& stmname);
 	///\brief Bind parameter value on current command statement
 	virtual bool bind( std::size_t idx, const char* value);
 	///\brief Execute instance of current statement
 	virtual bool execute();
+	///\brief Return true is the last command has at least one result row returned
+	virtual bool hasResult();
 	///\brief Get the number of columns of the last result
 	virtual std::size_t nofColumns();
 	///\brief Get a column title of the last result
@@ -80,6 +83,8 @@ struct PreparedStatementHandler_postgres :public PreparedStatementHandler
 	virtual bool next();
 
 private:
+	void clear();
+
 	enum State
 	{
 		Init,
@@ -104,11 +109,10 @@ private:
 
 	State m_state;
 	PGconn* m_conn;
+	const types::keymap<std::string>* m_stmmap;
 	PGresult* m_lastresult;
 	std::string m_lasterror;
-	std::string m_stmname;
-	std::string m_stmparamstr;
-	std::vector<std::size_t> m_bind;
+	Statement m_statement;
 	std::size_t m_nof_rows;
 	std::size_t m_idx_row;
 };

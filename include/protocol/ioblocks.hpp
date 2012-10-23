@@ -33,9 +33,9 @@ Project Wolframe.
 #define _Wolframe_PROTOCOL_IO_BLOCKS_HPP_INCLUDED
 ///\file protocol/ioblocks.hpp
 ///\brief Network message blocks as seen from the protocol with the input iterator classes and print functions
-
 #include "iterators.hpp"
 #include "buffers.hpp"
+#include "types/allocators.hpp"
 #include <stdexcept>
 #include <cstring>
 #include <cstddef>
@@ -338,6 +338,18 @@ public:
 
 	///\brief Release a written memory block (reset cursor position)
 	void release()						{setPos(0);}
+};
+
+
+struct CharBuffer :public types::ArrayDoublingAllocator
+{
+	CharBuffer(){}
+
+	void append( const char* ptr_, std::size_t size_)
+	{
+		std::size_t mi = alloc( size_);
+		std::memcpy( (char*)base() + mi, ptr_, size_);
+	}
 };
 
 

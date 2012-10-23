@@ -27,6 +27,7 @@ CPP_OBJS = \
 	PostgreSQLconstructor.o \
 	PostgreSQL.o \
 	PostgreSQLpreparedStatement.o \
+	PostgreSQLprogram.o \
 	PostgreSQLmodule.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

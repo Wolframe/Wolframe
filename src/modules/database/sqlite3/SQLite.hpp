@@ -127,7 +127,6 @@ public:
 	virtual void addProgram( const std::string& program );
 	virtual const std::string* getProgram( const std::string& name) const;
 
-	/// more of a placeholder for now
 	Transaction* transaction( const std::string& name );
 
 	void closeTransaction( Transaction* t );

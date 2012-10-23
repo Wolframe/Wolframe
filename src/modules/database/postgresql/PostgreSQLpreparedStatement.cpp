@@ -40,19 +40,18 @@
 #include <cstring>
 #include <limits>
 #include <stdexcept>
+#include <boost/shared_ptr.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-PreparedStatementHandler_postgres::PreparedStatementHandler_postgres( PGconn* conn)
+PreparedStatementHandler_postgres::PreparedStatementHandler_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_)
 	:m_state(Init)
-	,m_conn(conn)
+	,m_conn(conn_)
+	,m_stmmap(stmmap_)
 	,m_lastresult(0)
 	,m_nof_rows(0)
-	,m_idx_row(0)
-{
-	m_stmparamstr.push_back( '\0');
-}
+	,m_idx_row(0){}
 
 PreparedStatementHandler_postgres::~PreparedStatementHandler_postgres()
 {
@@ -67,10 +66,7 @@ void PreparedStatementHandler_postgres::clear()
 		m_lastresult = 0;
 	}
 	m_lasterror.clear();
-	m_stmname.clear();
-	m_stmparamstr.clear();
-	m_stmparamstr.push_back( '\0');
-	m_bind.clear();
+	m_statement.clear();
 	m_state = Init;
 	m_nof_rows = 0;
 	m_idx_row = 0;
@@ -152,7 +148,12 @@ bool PreparedStatementHandler_postgres::start( const std::string& stmname)
 		return errorStatus( std::string( "call of start not allowed in state '") + stateName(m_state) + "'");
 	}
 	clear();
-	m_stmname = stmname;
+	types::keymap<std::string>::const_iterator si = m_stmmap->find( stmname);
+	if (si == m_stmmap->end())
+	{
+		throw std::runtime_error( std::string( "statement '") + stmname + "' is not defined");
+	}
+	m_statement.init( si->second);
 	m_state = Prepared;
 	return true;
 }
@@ -167,10 +168,22 @@ bool PreparedStatementHandler_postgres::bind( std::size_t idx, const char* value
 	{
 		return errorStatus( std::string( "index of bind parameter out of range (required to be in range 1..64)"));
 	}
-	while (m_bind.size() <= idx) m_bind.push_back( 0);
-	if (!value) return true;
-	m_bind[ idx] = m_stmparamstr.size();
-	m_stmparamstr.append( value, std::strlen(value)+1);
+	if (value)
+	{
+		size_t valuesize = std::strlen( value);
+		char* encvalue = (char*)std::malloc( valuesize * 2 + 3);
+		encvalue[0] = '\'';
+		boost::shared_ptr<void> encvaluer( encvalue, std::free);
+		int error = 0;
+		size_t encvaluesize = PQescapeStringConn( m_conn, encvalue+1, value, valuesize, &error);
+		encvalue[encvaluesize+1] = '\'';
+		std::string bindval( encvalue, encvaluesize+2);
+		m_statement.bind( idx, bindval);
+	}
+	else
+	{
+		m_statement.bind( idx, "NULL");
+	}
 	m_state = Prepared;
 	return true;
 }
@@ -179,28 +192,15 @@ bool PreparedStatementHandler_postgres::execute()
 {
 	if (m_state != Prepared)
 	{
-		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
-	}
-	const char* paramValues[ MaxBindParameters];
-	int paramLengths[ MaxBindParameters];
-	int paramFormats[ MaxBindParameters];
-	const int resultFormat = 0;
-
-	std::size_t ii=0, nn=m_bind.size();
-	for (; ii<nn; ++ii)
-	{
-		paramValues[ ii] = m_stmparamstr.c_str() + m_bind[ ii];
-		paramLengths[ ii] = 0;
-		paramFormats[ ii] = 0;
+		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
 	}
 	if (m_lastresult)
 	{
 		PQclear( m_lastresult);
 		m_lastresult = 0;
 	}
-	m_lastresult = PQexecPrepared( m_conn, m_stmname.c_str(), m_bind.size(),
-					paramValues, paramLengths, paramFormats,
-					resultFormat);
+	std::string stmstr = m_statement.expanded();
+	m_lastresult = PQexec( m_conn, stmstr.c_str());
 
 	bool rt = status( m_lastresult, Executed);
 	if (rt)
@@ -209,6 +209,11 @@ bool PreparedStatementHandler_postgres::execute()
 		m_idx_row = 0;
 	}
 	return rt;
+}
+
+bool PreparedStatementHandler_postgres::hasResult()
+{
+	return (m_nof_rows > 0);
 }
 
 std::size_t PreparedStatementHandler_postgres::nofColumns()
@@ -222,7 +227,6 @@ std::size_t PreparedStatementHandler_postgres::nofColumns()
 		return errorStatus( "command result is empty");
 	}
 	return PQnfields( m_lastresult);
-
 }
 
 const char* PreparedStatementHandler_postgres::columnName( std::size_t idx)
@@ -237,7 +241,7 @@ const char* PreparedStatementHandler_postgres::columnName( std::size_t idx)
 		errorStatus( "command result is empty");
 		return 0;
 	}
-	if (idx == 0 || idx > m_bind.size())
+	if (idx == 0 || idx > m_statement.maxparam())
 	{
 		errorStatus( std::string( "index of parameter out of range (required to be in range 1..64)"));
 		return 0;
@@ -263,7 +267,7 @@ const char* PreparedStatementHandler_postgres::get( std::size_t idx)
 		return 0;
 	}
 	if (m_idx_row >= m_nof_rows) return 0;
-	if (idx == 0 || idx > m_bind.size())
+	if (idx == 0 || idx > m_statement.maxparam())
 	{
 		errorStatus( std::string( "index of parameter out of range (required to be in range 1..64)"));
 		return 0;

@@ -1,4 +1,4 @@
-TOPDIR = ..\..\..\..
+TOPDIR = ..\..\..\..\..
 
 SUBDIRS =
 
@@ -10,6 +10,7 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
+	/I$(TOPDIR)\src\modules\database\postgresql \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I"$(PGSQL_DIR)\include"
 
@@ -23,22 +24,18 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_db_postgresql.dll
+	mod_db_postgresqltest.dll
 
 CPP_OBJS = \
-	PostgreSQLconfig.obj \
-	PostgreSQLconstructor.obj \
-	PostgreSQL.obj \
-	PostgreSQLpreparedStatement.obj \
-	PostgreSQLprogram.obj \
-	PostgreSQLmodule.obj
+	PostgreSQLTest.obj \
+	mod_db_postgresqltest.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:PostgreSQLmodule.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:PostgreSQLTestModule.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 

@@ -31,26 +31,26 @@
 
 ************************************************************************/
 //
-// Wolframe SQLite test client
+// Wolframe Postgres test client
 //
-#ifndef _SQLITE_TEST_HPP_INCLUDED
-#define _SQLITE_TEST_HPP_INCLUDED
-#include "SQLite.hpp"
+#ifndef _POSTGRES_TEST_HPP_INCLUDED
+#define _POSTGRES_TEST_HPP_INCLUDED
+#include "PostgreSQL.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include "config/ConfigurationTree.hpp"
 
 namespace _Wolframe {
 namespace db {
 
-///\class SQLiteTestConfig
-///\brief SQLite test database configuration
-class SQLiteTestConfig : public SQLiteConfig
+///\class PostgreSQLTestConfig
+///\brief PostgreSQL test database configuration
+class PostgreSQLTestConfig : public PostgreSQLconfig
 {
 public:
-	SQLiteTestConfig( const char* name, const char* logParent, const char* logName )
-		:SQLiteConfig( name, logParent, logName){}
+	PostgreSQLTestConfig( const char* name, const char* logParent, const char* logName )
+		:PostgreSQLconfig( name, logParent, logName){}
 
-	virtual ~SQLiteTestConfig()
+	virtual ~PostgreSQLTestConfig()
 	{
 		dump_database();
 	}
@@ -58,12 +58,12 @@ public:
 	virtual bool parse( const config::ConfigurationTree& pt, const std::string& node,
 				const module::ModulesDirectory* modules )
 	{
-		return SQLiteConfig::parse( extractMyNodes( pt), node, modules);
+		return PostgreSQLconfig::parse( extractMyNodes( pt), node, modules);
 	}
 
 	virtual void setCanonicalPathes( const std::string& referencePath)
 	{
-		SQLiteConfig::setCanonicalPathes( referencePath);
+		PostgreSQLconfig::setCanonicalPathes( referencePath);
 		setMyCanonicalPathes( referencePath);
 	}
 
@@ -79,21 +79,21 @@ private:
 	std::string m_dump_filename;
 };
 
-class SQLiteTestConstructor : public SQLiteConstructor
+class PostgreSQLTestConstructor : public PostgreSQLconstructor
 {
 public:
-	SQLiteTestConstructor(){}
-	virtual ~SQLiteTestConstructor(){}
+	PostgreSQLTestConstructor(){}
+	virtual ~PostgreSQLTestConstructor(){}
 
-	virtual SQLiteDBunit* object( const config::NamedConfiguration& conf)
+	virtual PostgreSQLdbUnit* object( const config::NamedConfiguration& conf)
 	{
-		const SQLiteTestConfig& cfg = dynamic_cast< const SQLiteTestConfig&>( conf);
-		createTestDatabase( cfg.filename(), cfg.input_filename());
-		return SQLiteConstructor::object( conf);
+		const PostgreSQLTestConfig& cfg = dynamic_cast< const PostgreSQLTestConfig&>( conf);
+		createTestDatabase( cfg);
+		return PostgreSQLconstructor::object( conf);
 	}
 
 private:
-	static void createTestDatabase( const std::string& filename_, const std::string& inputfile_);
+	static void createTestDatabase( const PostgreSQLTestConfig& cfg_);
 };
 
 }} // _Wolframe::db

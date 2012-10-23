@@ -36,7 +36,7 @@
 
 #include "logger-v1.hpp"
 #include "PostgreSQL.hpp"
-
+#include "PostgreSQLpreparedStatement.hpp"
 #include <string>
 #include <sstream>
 
@@ -363,6 +363,29 @@ void PostgreSQLtransaction::execute()
 		_Wolframe::PoolObject<  PGconn* > conn( m_unit.m_connPool );
 		int ver = PQprotocolVersion( *conn );
 		MOD_LOG_DEBUG << "PostgreSQL protocol version: " << ver;
+	}
+	catch ( _Wolframe::ObjectPoolTimeout )
+	{
+	}
+	try	{
+		_Wolframe::PoolObject< PGconn* > conn( m_unit.m_connPool);
+		PreparedStatementHandler_postgres ph( *conn, m_unit.stmmap());
+		try
+		{
+			if (!ph.begin()
+			||  !ph.doTransaction( m_input, m_output)
+			||  !ph.commit())
+			{
+				const char* err = ph.getLastError();
+				MOD_LOG_ERROR << "error in sqlite database transaction: " << (err?err:"unknown error");
+				ph.rollback();
+			}
+		}
+		catch (const std::runtime_error& e)
+		{
+			MOD_LOG_ERROR << "error in sqlite database transaction: " << e.what();
+			ph.rollback();
+		}
 	}
 	catch ( _Wolframe::ObjectPoolTimeout )
 	{

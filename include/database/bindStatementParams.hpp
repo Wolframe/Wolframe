@@ -30,35 +30,51 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface to programs of a sqlite3 database
-///\file modules/database/sqlite3/SQLiteProgram.hpp
-#ifndef _DATABASE_PROGRAM_SQLITE3_HPP_INCLUDED
-#define _DATABASE_PROGRAM_SQLITE3_HPP_INCLUDED
-#include "types/keymap.hpp"
+///\brief Interface to substitute parameters in an SQL statement in prepared statement syntax
+///\file database/bindStatementParams.hpp
+#ifndef _DATABASE_BIND_STATEMENT_PARAMETER_STATEMENT_HPP_INCLUDED
+#define _DATABASE_BIND_STATEMENT_PARAMETER_STATEMENT_HPP_INCLUDED
 #include <string>
+#include <vector>
 #include <map>
+#include <utility>
 #include <cstdlib>
 
 namespace _Wolframe {
 namespace db {
 
-class SQLiteProgram
+class Statement
 {
 public:
-	SQLiteProgram(){}
-	SQLiteProgram( const SQLiteProgram& o)
-		:m_statementmap(o.m_statementmap){}
+	Statement()
+		:m_maxparam(0){}
+	Statement( const Statement& o)
+		:m_data(o.m_data)
+		,m_maxparam(o.m_maxparam)
+		,m_bind(o.m_bind){}
+	explicit Statement( const std::string& stmstr);
 
-	void load( const std::string& dbsource);
-	const types::keymap<std::string>* statementmap() const
+	void clear();
+	void init( const std::string& stmstr);
+
+	///\remark Does no escaping of parameter because this is dependent on the database !
+	void bind( unsigned int idx, const std::string& arg);
+
+	std::string expanded() const;
+
+	unsigned int maxparam() const
 	{
-		return &m_statementmap;
+		return m_maxparam;
 	}
 
 private:
-	types::keymap<std::string> m_statementmap;
+	typedef std::pair<unsigned int,std::string> Element;
+	std::vector<Element> m_data;
+	unsigned int m_maxparam;
+	std::map<unsigned int,std::string> m_bind;
 };
 
-}}
+
+}}//namespace
 #endif
 

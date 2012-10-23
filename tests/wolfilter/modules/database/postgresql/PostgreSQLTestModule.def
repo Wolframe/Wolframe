@@ -1,0 +1,5 @@
+LIBRARY mod_db_postgresqltest
+
+EXPORTS
+entryPoint	@1
+

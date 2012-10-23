@@ -20,19 +20,24 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	$(TOPDIR)\gtest\gtest-all.obj \
-	$(TOPDIR)\src\modules\database\postgresql\PostgreSQL.obj \
 	"$(PGSQL_DIR)\lib\libpq.lib" \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
+OBJS = \
+	PostgreSQLModuleFiles.obj
+
 CPP_BINS = \
+	postgresUnit.exe \
 	dbPing.exe
 
 TEST_CPP_BINS = \
 	postgresUnit.exe
 
-postgresUnit.exe: postgresUnit.obj
+postgresUnit.exe: postgresUnit.obj PostgreSQLModuleFiles.obj
 dbPing.exe: dbPing.obj
 
 all: $(OBJS) $(CPP_BINS)

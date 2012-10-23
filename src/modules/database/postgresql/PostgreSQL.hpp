@@ -41,6 +41,7 @@
 #include <list>
 #include "database/database.hpp"
 #include "database/transaction.hpp"
+#include "PostgreSQLprogram.hpp"
 #include "config/configurationBase.hpp"
 #include "constructor.hpp"
 #include "objectPool.hpp"
@@ -133,7 +134,6 @@ public:
 	virtual void addProgram( const std::string& program );
 	virtual const std::string* getProgram( const std::string& name) const;
 
-	/// more of a placeholder for now
 	Transaction* transaction( const std::string& name );
 
 	void closeTransaction( Transaction* t );
@@ -168,6 +168,11 @@ public:
 	virtual void addProgram( const std::string& /*definition*/ ) {}
 	virtual const std::string* getProgram( const std::string& /*name*/ ) const
 						{ return NULL; }
+
+	const types::keymap<std::string>* stmmap() const
+	{
+		return m_program.statementmap();
+	}
 private:
 	const std::string	m_ID;			///< database ID
 	std::string		m_connStr;		///< connection string
@@ -175,6 +180,7 @@ private:
 	ObjectPool< PGconn* >	m_connPool;		///< pool of connections
 	unsigned		m_statementTimeout;	///< default statement execution timeout
 	PostgreSQLdatabase	m_db;			///< real database object
+	PostgreSQLprogram	m_program;
 };
 
 

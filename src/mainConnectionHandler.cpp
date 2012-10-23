@@ -140,11 +140,12 @@ int CommandHandler::endMech( cmdbind::CommandHandler* ch, std::ostream& out)
 
 	if (authstatus)
 	{
-		out << "ERR MECH" << authstatus << endl();
+		out << "ERR authorization " << authstatus << endl();
 		return -1;
 	}
 	else
 	{
+		out << "OK authorization" << endl();
 		m_authtickets.push_back( chnd->ticket());
 		return Authorized;
 	}
@@ -184,7 +185,7 @@ int CommandHandler::doInterface( int argc, const char** argv, std::ostream& out)
 	typedef std::map<std::string,std::string> UIForms;
 	UIForms uiforms = m_provider->uiforms( m_authtickets.back(), min_version, version);
 	UIForms::const_iterator fi = uiforms.begin(), fe = uiforms.end();
-	out << "INTERFACES " << version << endl();
+	out << "INTERFACE " << version << endl();
 	for (; fi != fe; ++fi)
 	{
 		out << "UIFORM " << fi->first << endl();

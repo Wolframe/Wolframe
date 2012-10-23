@@ -4,6 +4,11 @@ SUBDIRS = testtrace
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
+# PostgreSQL
+!IFDEF WITH_PGSQL
+SUBDIRS = \
+        $(SUBDIRS) postgresql
+!ENDIF
 # sqlite3
 !IFDEF WITH_SQLITE3
 SUBDIRS = \
