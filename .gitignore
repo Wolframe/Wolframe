@@ -45,6 +45,7 @@ tests/logTest
 tests/threadLeakTest
 tests/counterTest
 tests/testSHA2
+tests/testMD5
 tests/byte2hexTest
 tests/base64Test
 tests/base64Utility

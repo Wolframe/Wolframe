@@ -255,6 +255,11 @@ const db::TransactionFunction* ProcessorProvider::transactionFunction( const std
 	return m_impl->transactionFunction( name);
 }
 
+const UI::UserInterfaceSupplier* ProcessorProvider::UIsupplier() const
+{
+	return m_impl->UIsupplier();
+}
+
 db::Database* ProcessorProvider::transactionDatabase() const
 {
 	return m_impl->transactionDatabase();

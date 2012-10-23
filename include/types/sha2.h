@@ -106,5 +106,5 @@ void sha512( const unsigned char *message, unsigned int len,
 }
 #endif
 
-#endif /* !_SHA2_H_INCLUDED */
+#endif /* _SHA2_H_INCLUDED */
 
