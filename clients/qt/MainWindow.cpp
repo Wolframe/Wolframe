@@ -154,12 +154,9 @@ void MainWindow::initialize( )
 				m_loadMode = Local;
 				QCoreApplication::quit( );
 			} else {
-				connect( m_wolframeClient, SIGNAL( helloReceived( ) ),
-					this, SLOT( helloReceived( ) ) );
-				if( !m_wolframeClient->syncHello( ) ) {
-					qWarning( ) << "Can't send HELLO to Wolframe daemon!";
-					QCoreApplication::quit( );
-				}
+				connect( m_wolframeClient, SIGNAL( mechsReceived( QStringList ) ),
+					this, SLOT( mechsReceived( QStringList ) ) );
+				m_wolframeClient->auth( );
 			}
 			break;
 		default:
@@ -219,9 +216,8 @@ void MainWindow::wolframeError( QString error )
 	qDebug( ) << error;
 }
 
-void MainWindow::helloReceived( )
+void MainWindow::mechsReceived( QStringList mechs )
 {
-	qDebug( ) << "hello received";
 	LoginDialog* loginDialog = new LoginDialog( m_wolframeClient, this );
 	
 	connect( loginDialog, SIGNAL( authenticationOk( ) ),

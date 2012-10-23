@@ -287,7 +287,7 @@ void WolframeClient::dataAvailable( )
 					if( buf[len-2] == '\r' ) buf[len-2] = '\0';
 // protocol answer
 				if( strncmp( buf, "BYE", 3 ) == 0 ) {
-				} else if( strncmp( buf, "BAD", 3 ) == 0 ) {
+				} else if( strncmp( buf, "ERR", 3 ) == 0 ) {
 					m_hasErrors = true;
 					emit error( tr( "Protocol error, received: %1." ).arg( buf + 3 ) );
 				} else if( strncmp( buf, "OK", 2 ) == 0 ) {
@@ -325,9 +325,9 @@ void WolframeClient::sendCommand( QString command )
 	sendLine( command );
 }
 
-void WolframeClient::hello( )
+void WolframeClient::auth( )
 {
-	sendCommand( "hello" );
+	sendCommand( "auth" );
 }
 
 void WolframeClient::login( QString username, QString password )
@@ -349,8 +349,9 @@ void WolframeClient::handleResult( )
 	if( m_command == "CONNECT" ) {
 		// swallow greeting line from server after connect
 		emit connected( );
-	} else if( m_command == "hello" ) {
-		emit helloReceived( );
+	} else if( m_command == "auth" ) {
+		QStringList mechList;
+		emit mechsReceived( mechList );
 	} else if( m_command.startsWith( "run" ) ) {
 		emit runReceived( m_command, m_answer );
 	}
@@ -365,10 +366,16 @@ bool WolframeClient::syncConnect( )
 	return( QxtSignalWaiter::wait( this, SIGNAL( connected( ) ), m_timeout ) );
 }
 
-bool WolframeClient::syncHello( )
+QStringList WolframeClient::syncAuth( )
 {
-	hello( );
-	return( QxtSignalWaiter::wait( this, SIGNAL( helloReceived( ) ), m_timeout ) );
+	QStringList mechList;
+	auth( );
+	if( QxtSignalWaiter::wait( this, SIGNAL( authReceived( ) ), m_timeout ) ) {
+		if( m_hasErrors ) return mechList;
+		return mechList;
+	} else {
+		return mechList;
+	}
 }
 
 bool WolframeClient::syncLogin( QString username, QString password )
