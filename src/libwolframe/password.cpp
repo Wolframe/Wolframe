@@ -37,6 +37,7 @@
 
 #include <stdexcept>
 #include <cstring>
+#include <cassert>
 
 #ifndef _WIN32
 #include <fcntl.h>
@@ -56,6 +57,7 @@
 #include "types/sha2.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe;
@@ -72,18 +74,18 @@ PasswordSalt::PasswordSalt()
 
 /// \note The byte array is considered to be of size PASSWORD_SALT_SIZE
 /// and it can not be changed.
-PasswordSalt::PasswordSalt( const unsigned char* salt , size_t bytes )
+PasswordSalt::PasswordSalt( const unsigned char* data , size_t bytes )
 {
 	m_size = bytes > PASSWORD_SALT_SIZE ? PASSWORD_SALT_SIZE : bytes;
-	memcpy( m_salt, salt, m_size );
+	memcpy( m_salt, data, m_size );
 }
 
-PasswordSalt::PasswordSalt( const std::string& salt )
+PasswordSalt::PasswordSalt( const std::string& str )
 {
 	int ret;
-	if (( ret = base64_decode( salt.data(), salt.size(),
+	if (( ret = base64_decode( str.data(), str.size(),
 				   m_salt, PASSWORD_SALT_SIZE )) < 0 )	{
-		std::string errMsg = "Cannot convert '" + salt + "' to a password salt";
+		std::string errMsg = "Cannot convert '" + str + "' to a password salt";
 		throw std::runtime_error( errMsg );
 	}
 	m_size = ret;
@@ -130,13 +132,29 @@ void PasswordSalt::generate( const std::string& device )
 }
 
 
+PasswordSalt& PasswordSalt::operator = ( const PasswordSalt& rhs )
+{
+	m_size = rhs.m_size;
+	memcpy( m_salt, rhs.m_salt, PASSWORD_SALT_SIZE );
+	return *this;
+}
+
+
+bool PasswordSalt::operator == ( const PasswordSalt& rhs )
+{
+	if ( m_size != rhs.m_size || memcmp( m_salt, rhs.m_salt, m_size ))
+		return false;
+	return true;
+}
+
+
 std::string PasswordSalt::toBCD() const
 {
 	char	buffer[ PASSWORD_SALT_BCD_SIZE ];
 
-	if ( byte2hex( m_salt, PASSWORD_SALT_SIZE,
+	if ( byte2hex( m_salt, m_size,
 		       buffer, PASSWORD_SALT_BCD_SIZE ) == NULL )
-		throw std::logic_error( "PasswordSalt::toBCD() cannot convert hash ?!?" );
+		throw std::logic_error( "PasswordSalt::toBCD() cannot convert salt to BCD ?!?" );
 
 	return std::string( buffer );
 }
@@ -144,16 +162,22 @@ std::string PasswordSalt::toBCD() const
 std::string PasswordSalt::toString() const
 {
 	char	buffer[ PASSWORD_SALT_BASE64_SIZE ];
+	int	len;
 
-	if ( base64::encode( m_salt, PASSWORD_SALT_SIZE,
-			     buffer, PASSWORD_SALT_BASE64_SIZE, 0 ) < 0 )
-		throw std::logic_error( "PasswordSalt::toBase64() cannot convert hash to base64 ?!?" );
+	if (( len = base64::encode( m_salt, m_size,
+				    buffer, PASSWORD_SALT_BASE64_SIZE, 0 )) < 0 )
+		throw std::logic_error( "PasswordSalt::toBase64() cannot convert salt to base64 ?!?" );
 
+	assert( len < (int)PASSWORD_SALT_BASE64_SIZE );
+	while ( len > 0 && buffer[ len - 1 ] == '=' )
+		len--;
+	buffer[ len ] = 0;
 	return std::string( buffer );
 }
 
 
 /****  Password Hash  ************************************************/
+static const size_t PASSWORD_HASH_BCD_SIZE = PASSWORD_HASH_SIZE * 2 + 1;
 static const size_t PASSWORD_HASH_BASE64_SIZE = (( PASSWORD_HASH_SIZE - 1 ) / 3 ) * 4 + 5;
 
 PasswordHash::PasswordHash( const PasswordSalt& pwdSalt, const std::string& password )
@@ -162,14 +186,62 @@ PasswordHash::PasswordHash( const PasswordSalt& pwdSalt, const std::string& pass
 	sha224((const unsigned char*)password.c_str(), password.length(), m_hash );
 }
 
+PasswordHash::PasswordHash( const std::string& str )
+{
+	std::string s = boost::algorithm::trim_copy( str );
+	if ( s[ 0 ] == '$' )	{
+		size_t hashStart = s.find( "$", 1 );
+		if ( hashStart == s.npos )	{
+			std::string errMsg = "'";
+			errMsg += s + "' is not a valid password hash";
+			throw std::runtime_error( errMsg );
+		}
+		m_salt = PasswordSalt( s.substr( 1, hashStart - 1 ));
+		int ret = base64_decode( s.substr( hashStart ).c_str(), s.length() - hashStart,
+					 m_hash, PASSWORD_HASH_SIZE );
+		if ( ret < 0 )	{
+			std::string errMsg = "'";
+			errMsg += s + "' is not a valid password hash";
+			throw std::runtime_error( errMsg );
+		}
+	}
+	else	{
+		int ret = base64_decode( s.c_str(), s.length(),
+					 m_hash, PASSWORD_HASH_SIZE );
+		if ( ret < 0 )	{
+			std::string errMsg = "'";
+			errMsg += s + "' is not a valid password hash";
+			throw std::runtime_error( errMsg );
+		}
+	}
+}
+
+std::string PasswordHash::toBCD() const
+{
+	char	buffer[ PASSWORD_HASH_BCD_SIZE ];
+
+	if ( byte2hex( m_hash, PASSWORD_HASH_SIZE,
+		       buffer, PASSWORD_HASH_BCD_SIZE ) == NULL )
+		throw std::logic_error( "PasswordHash::toBCD() cannot convert hash to BCD ?!?" );
+
+	std::string s = "$";
+	s += m_salt.toBCD() + "$" + buffer;
+	return s;
+}
+
 std::string PasswordHash::toString() const
 {
 	char	buffer[ PASSWORD_HASH_BASE64_SIZE ];
+	int	len;
 
-	if ( base64::encode( m_hash, PASSWORD_HASH_SIZE,
-			     buffer, PASSWORD_HASH_BASE64_SIZE, 0 ) < 0 )
+	if (( len = base64::encode( m_hash, PASSWORD_HASH_SIZE,
+				    buffer, PASSWORD_HASH_BASE64_SIZE, 0 )) < 0 )
 		throw std::logic_error( "PasswordHash::toString() cannot convert hash to base64?!?" );
 
+	assert( len < (int)PASSWORD_HASH_BASE64_SIZE );
+	while ( len > 0 && buffer[ len - 1 ] == '=' )
+		len--;
+	buffer[ len ] = 0;
 	std::string s = "$";
 	s += m_salt.toString() + "$" + buffer;
 	return s;
