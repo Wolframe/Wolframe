@@ -60,7 +60,7 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<CommandHandler>
 				.cmd< &CommandHandler::doQuit >( "QUIT")
 				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
 			[Authorization]
-				.cmd< &CommandHandler::doAuth >( "MECH")
+				.cmd< &CommandHandler::doMech >( "MECH")
 				.cmd< &CommandHandler::doQuit >( "QUIT")
 				.cmd< &CommandHandler::doCapabilities >( "CAPABILITIES")
 			[Authorized]
@@ -127,7 +127,7 @@ int CommandHandler::doAuth( int argc, const char**, std::ostream& out)
 	}
 	else
 	{
-		out << "MECHS " << boost::algorithm::join( m_authMechanisms.list(), " ") << std::endl;
+		out << "MECHS " << boost::algorithm::join( m_authMechanisms.list(), " ") << "NONE" << endl();
 		return Authorization;
 	}
 }
@@ -163,6 +163,12 @@ int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		out << "ERR to many arguments for MECH" << endl();
 		return stateidx();
 	}
+	if (boost::iequals( std::string(argv[0]), "NONE"))
+	{
+		out << "OK authorization" << endl();
+		m_authtickets.push_back( "none");
+		return Authorized;
+	}
 	cmdbind::AuthCommandHandler* authch = m_authMechanisms.get( argv[0]);
 	if (authch)
 	{
@@ -192,7 +198,7 @@ int CommandHandler::doInterface( int argc, const char** argv, std::ostream& out)
 		out << protocol::escapeStringDLF( fi->second);
 		out << endl() << "." << endl();
 	}
-	out << "OK";
+	out << "OK" << endl();
 	return stateidx();
 }
 
@@ -234,7 +240,7 @@ static bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, 
 			continue;
 		case cmdbind::CommandHandler::CLOSE:
 			cmdStatus = toh->statusCode();
-			if (cmdStatus) out << "ERR " << cmdStatus << std::endl;
+			if (cmdStatus) out << "ERR " << cmdStatus << CommandHandler::endl();
 			return false;
 	}
 }
@@ -277,7 +283,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 			execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
 			if (redirectConsumedInput( chnd, execch, out))
 			{
-				delegateProcessing<&CommandHandler::endErrDocumentType>( ch);
+				delegateProcessing<&CommandHandler::endErrDocumentType>( execch);
 			}
 		}
 		else
