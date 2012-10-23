@@ -44,25 +44,36 @@
 
 #include "utils/getPassword.hpp"
 #include "passwdFile.hpp"
+#include "AAAA/password.hpp"
 
 namespace PO = boost::program_options;
 namespace WA = _Wolframe::AAAA;
 namespace WU = _Wolframe::utils;
 
+#ifdef _WIN32
+	static const std::string DEFAULT_RANDOM_GENERATOR = MS_DEF_PROV;
+#else
+	static const std::string DEFAULT_RANDOM_GENERATOR = "/dev/urandom";
+#endif
 
 int main( int argc, char* argv[] )
 {
+	unsigned	days;
+	std::string	saltStr;
+
 	PO::options_description desc( "Usage:\n"
-				      "  wolfpasswd [-cD] passwordfile username [user info]\n"
-				      "  wolfpasswd -b[c] passwordfile username password [user info]\n"
-				      "  wolfpasswd -n [-s salt] username [user info]\n"
-				      "  wolfpasswd -nb [-s salt] username password [user info]\n"
+				      "  wolfpasswd -D passwordfile username\n"
+				      "  wolfpasswd [-c] [-d days] passwordfile username [user info]\n"
+				      "  wolfpasswd -b[c] [-d days] passwordfile username password [user info]\n"
+				      "  wolfpasswd -n [-s salt][-d days] username [user info]\n"
+				      "  wolfpasswd -nb [-s salt][-d days] username password [user info]\n"
 				      "  wolfpasswd -h\n"
 				      "Options" );
 	desc.add_options()
 			( "help,h", "Display this help message." )
 			( "create,c", "Create the file if it doesn't exist." )
-			( "salt,s", "Use the specified salt (only valid with --display-only)." )
+			( "salt,s", PO::value< std::string >( &saltStr ), "Use the specified salt (only valid with --display-only)." )
+			( "days,d", PO::value< unsigned >( &days )->default_value( 0 ), "Set the password expiration after <days>." )
 			( "display-only,n", "Don't update the password file; display results on stdout." )
 			( "batch,b", "Use the password from the command line instead of prompting for it.")
 			( "delete,D", "Delete the specified user." )
@@ -165,8 +176,11 @@ int main( int argc, char* argv[] )
 				user.info = args[2];
 		}
 		// now do the job
+		WA::PasswordSalt salt;
+		salt.generate( DEFAULT_RANDOM_GENERATOR );
+		WA::PasswordHash pwd( salt, passwd );
 		user.user = args[0];
-		user.hash = passwd;
+		user.hash = pwd.toString();
 		user.expiry = 0;
 		std::cout << "Password line: " << WA::PasswordFile::passwdLine( user );
 	}
@@ -255,8 +269,11 @@ int main( int argc, char* argv[] )
 				if( args.size() == 4 )
 					user.info = args[3];
 			}
+			WA::PasswordSalt salt;
+			salt.generate( DEFAULT_RANDOM_GENERATOR );
+			WA::PasswordHash pwd( salt, passwd );
 			user.user = args[1];
-			user.hash = passwd;
+			user.hash = pwd.toString();
 			user.expiry = 0;
 			if ( pwdFile.addUser( user ) )
 				std::cout << "User '" << args[1] << "' added to the password file '"

@@ -53,19 +53,28 @@ public:
 	/// Construct an empty salt (all bits 0).
 	PasswordSalt();
 	/// Construct a salt from the given byte array.
-	explicit PasswordSalt( const unsigned char* salt, size_t bytes );
+	PasswordSalt( const unsigned char* data, size_t bytes );
 	/// Construct a salt by setting the value from the base64 encoded string.
-	explicit PasswordSalt( const std::string& salt );
+	PasswordSalt( const std::string& str );
 
 	/// Construct a random salt using device to generate random bytes.
 	void generate( const std::string& device );
 
+	/// Deep copy
+	PasswordSalt& operator = ( const PasswordSalt& rhs );
+
+	/// True if the 2 password salts are identical, false otherwise
+	bool operator == ( const PasswordSalt& rhs );
+	bool operator != ( const PasswordSalt& rhs )	{ return !( *this == rhs ); }
+
 	/// The size of the salt in bytes
 	size_t size() const			{ return m_size; }
+	/// The unsigned char vector of the salt
+	const unsigned char* salt() const	{ return m_salt; }
 
 	/// Return the salt as a BCD encoded string.
 	std::string toBCD() const;
-	/// Return the salt as a base64 encoded string.
+	/// Return the salt as a base64 encoded string (without base64 padding).
 	std::string toString() const;
 private:
 	std::size_t	m_size;
@@ -84,17 +93,26 @@ public:
 	///			if the string doesn't start with '$' then
 	///			the string is considered to represent only the
 	///			password hash as base64 and the salt will be zeroed
-	PasswordHash( const std::string& hash );
-
-	/// Return the password hash as a string
-	/// The format is $<salt>$<hash> on one line, no whitespaces
-	std::string toString() const;
+	PasswordHash( const std::string& str );
 
 	/// Return the password salt
 	const PasswordSalt& salt() const	{ return m_salt; }
+
+	/// The size of the password hash without the salt in bytes
+	size_t size() const			{ return PASSWORD_HASH_SIZE; }
+	/// The unsigned char vector of the password hash
+	const unsigned char* hash() const	{ return m_hash; }
+
+	/// Return the password hash as a BCD string.
+	/// The format is $<salt>$<hash> on one line, no whitespaces.
+	std::string toBCD() const;
+	/// Return the password hash as a base64 string without base64 padding.
+	/// The format is $<salt>$<hash> on one line, no whitespaces.
+	std::string toString() const;
+
 private:
-	unsigned char		m_hash[ PASSWORD_HASH_SIZE ];
-	const PasswordSalt	m_salt;
+	unsigned char	m_hash[ PASSWORD_HASH_SIZE ];
+	PasswordSalt	m_salt;
 };
 
 }} // namespace _Wolframe::AAAA
