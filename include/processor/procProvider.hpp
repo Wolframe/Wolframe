@@ -102,6 +102,9 @@ public:
 
 	db::Database* transactionDatabase() const;
 
+	///\ Just and interface at the moment
+	const UI::UserInterfaceSupplier* UIsupplier() const;
+
 	/// return a database transaction object for the given name
 	db::Transaction* transaction( const std::string& name ) const;
 

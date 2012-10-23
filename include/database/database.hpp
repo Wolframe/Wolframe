@@ -59,7 +59,8 @@ public:
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
 	///\ Just and interface at the moment
-	virtual UI::UserInterfaceSupplier* UIsupplier()	{ return NULL; }
+	virtual const UI::UserInterfaceSupplier* UIsupplier() const
+						{ return NULL; }
 
 	///\brief Load the database transaction programs for this database from file
 	///\remark throws std::runtime_error with position info in case of error

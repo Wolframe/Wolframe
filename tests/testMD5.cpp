@@ -120,6 +120,22 @@ TEST( MD5fixture, MD5 )
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( "7707D6AE4E027C70EEA2A935C2296F21", output );
+
+// message=128 zero bits, hash=4AE71336E44BF9BF79D2752E234818A5
+	memset( longMessage, 0, 128 / 8 );
+	MD5( longMessage, 128 / 8, digest );
+	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
+		sprintf( output + 2 * i, "%02x", digest[i] );
+	EXPECT_STRCASEEQ( output, "4AE71336E44BF9BF79D2752E234818A5" );
+
+//// iterated 100000 times, hash=1A83F51285E4D89403D00C46EF8508FE
+//	MD5_Init( &ctx );
+//	for ( int i = 0; i < 100000; i++ )
+//		MD5_Update( &ctx, longMessage, 128 / 8 );
+//	MD5_Final( digest, &ctx );
+//	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
+//		sprintf( output + 2 * i, "%02x", digest[i] );
+//	EXPECT_STRCASEEQ( "1A83F51285E4D89403D00C46EF8508FE", output );
 }
 
 
