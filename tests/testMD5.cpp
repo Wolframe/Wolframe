@@ -38,7 +38,7 @@
 #include <cstring>
 #include "types/md5.h"
 
-TEST( MD5fixture, MD5 )
+TEST( MD5fixture, md5 )
 {
 	unsigned char digest[ MD5_DIGEST_SIZE ];
 	char output[ 2 * MD5_DIGEST_SIZE + 1 ];
@@ -47,35 +47,35 @@ TEST( MD5fixture, MD5 )
 
 //	message="" (empty string), hash=D41D8CD98F00B204E9800998ECF8427E
 	message = "";
-	MD5((const unsigned char *)message, strlen( message ), digest );
+	md5((const unsigned char *)message, strlen( message ), digest );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( "D41D8CD98F00B204E9800998ECF8427E", output );
 
 // message="a", hash=0CC175B9C0F1B6A831C399E269772661
 	message = "a";
-	MD5((const unsigned char *)message, strlen( message ), digest );
+	md5((const unsigned char *)message, strlen( message ), digest );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( "0CC175B9C0F1B6A831C399E269772661", output );
 
 // message="abc", hash=900150983CD24FB0D6963F7D28E17F72
 	message = "abc";
-	MD5((const unsigned char *)message, strlen( message ), digest );
+	md5((const unsigned char *)message, strlen( message ), digest );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( "900150983CD24FB0D6963F7D28E17F72", output );
 
 // message="message digest", hash=F96B697D7CB7938D525A2F31AAF161D0
 	message = "message digest";
-	MD5((const unsigned char *)message, strlen( message ), digest );
+	md5((const unsigned char *)message, strlen( message ), digest );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( "F96B697D7CB7938D525A2F31AAF161D0", output );
 
 // message="abcdefghijklmnopqrstuvwxyz", hash=C3FCD3D76192E4007DFB496CCA67E13B
 	message = "abcdefghijklmnopqrstuvwxyz";
-	MD5((const unsigned char *)message, strlen( message ), digest );
+	md5((const unsigned char *)message, strlen( message ), digest );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( "C3FCD3D76192E4007DFB496CCA67E13B", output );
@@ -83,21 +83,21 @@ TEST( MD5fixture, MD5 )
 // message="abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
 // hash=8215EF0796A20BCAAAE116D3876C664A
 	message = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
-	MD5((const unsigned char *)message, strlen( message ), digest );
+	md5((const unsigned char *)message, strlen( message ), digest );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( "8215EF0796A20BCAAAE116D3876C664A", output );
 
 // message="A...Za...z0...9", hash=D174AB98D277D9F5A5611C2C9F419D9F
 	message = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	MD5((const unsigned char *)message, strlen( message ), digest );
+	md5((const unsigned char *)message, strlen( message ), digest );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( "D174AB98D277D9F5A5611C2C9F419D9F", output );
 
 // message=8 times "1234567890", hash=57EDF4A22BE3C955AC49DA2E2107B67A
 	message = "12345678901234567890123456789012345678901234567890123456789012345678901234567890";
-	MD5((const unsigned char *)message, strlen( message ), digest );
+	md5((const unsigned char *)message, strlen( message ), digest );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( "57EDF4A22BE3C955AC49DA2E2107B67A", output );
@@ -107,23 +107,23 @@ TEST( MD5fixture, MD5 )
 	unsigned char* longMessage = (unsigned char *)malloc( longMessageLen );
 	EXPECT_TRUE( longMessage != NULL );
 	memset( longMessage, 'a', longMessageLen );
-	MD5( longMessage, longMessageLen, digest );
+	md5( longMessage, longMessageLen, digest );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( output, "7707D6AE4E027C70EEA2A935C2296F21" );
 
-	MD5_CTX ctx;
-	MD5_Init( &ctx );
-	MD5_Update( &ctx, longMessage, longMessageLen / 2 );
-	MD5_Update( &ctx, longMessage + longMessageLen / 2, longMessageLen - longMessageLen / 2 );
-	MD5_Final( digest, &ctx );
+	md5_ctx ctx;
+	md5_init( &ctx );
+	md5_update( &ctx, longMessage, longMessageLen / 2 );
+	md5_update( &ctx, longMessage + longMessageLen / 2, longMessageLen - longMessageLen / 2 );
+	md5_final( digest, &ctx );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( "7707D6AE4E027C70EEA2A935C2296F21", output );
 
 // message=128 zero bits, hash=4AE71336E44BF9BF79D2752E234818A5
 	memset( longMessage, 0, 128 / 8 );
-	MD5( longMessage, 128 / 8, digest );
+	md5( longMessage, 128 / 8, digest );
 	for ( int i = 0; i < MD5_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
 	EXPECT_STRCASEEQ( output, "4AE71336E44BF9BF79D2752E234818A5" );
