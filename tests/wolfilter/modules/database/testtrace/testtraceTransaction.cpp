@@ -145,6 +145,13 @@ public:
 		m_resitr = m_res.begin();
 	}
 
+	TransactionHandler( const TransactionHandler& o)
+		:m_res(o.m_res)
+		,m_out(o.m_out)
+	{
+		m_resitr = m_res.begin();
+	}
+
 	virtual bool start( const std::string& stmname)
 	{
 		(*m_out) << "start( '" << stmname << "' );" << std::endl;

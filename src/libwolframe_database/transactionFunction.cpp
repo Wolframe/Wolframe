@@ -276,8 +276,8 @@ TransactionFunctionInput::Structure::Structure( const Structure& o)
 	,m_tagmap(o.m_tagmap)
 	,m_rootidx(o.m_rootidx)
 	,m_rootsize(o.m_rootsize)
+	,m_data(o.m_data)
 	{}
-
 
 TransactionFunctionInput::Structure::Structure( const TransactionFunction::TagTable* tagmap)
 	:m_tagmap(tagmap)

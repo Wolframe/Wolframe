@@ -73,7 +73,7 @@ public:
 	virtual const char* getLastError()=0;
 
 	///\brief Executes the transaction using the interface defined
-	bool doTransaction( const TransactionInput& input, TransactionOutput& output);
+	virtual bool doTransaction( const TransactionInput& input, TransactionOutput& output);
 };
 
 }}//namespace
