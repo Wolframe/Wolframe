@@ -72,7 +72,8 @@ OBJS = \
 	b64encode.obj \
 	b64decode.obj \
 	byte2hex.obj \
-	sha2.obj
+	sha2.obj \
+	md5.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 

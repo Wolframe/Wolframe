@@ -67,7 +67,7 @@ namespace _Wolframe {
 
 // slots for the wolframe client		
 		void wolframeError( QString error );
-		void helloReceived( );
+		void mechsReceived( QStringList mechs );
 		void authenticationOk( );
 		void authenticationFailed( );
 		
