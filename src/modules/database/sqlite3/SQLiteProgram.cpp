@@ -95,7 +95,7 @@ void SQLiteProgram::load( const std::string& source)
 		}
 		else
 		{
-			throw ERROR( si, MSG << "unexpected token '" << tok << "'");
+			throw ERROR( si, MSG << "unexpected token in DB source: '" << tok << "'");
 		}
 	}
 }
