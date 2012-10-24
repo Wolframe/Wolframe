@@ -53,6 +53,8 @@
  * There's ABSOLUTELY NO WARRANTY, express or implied.
  *
  * See md5.c for more information.
+ *
+ * Modified for Wolframe by the Wolframe Team (c) 2012
  */
 
 #ifndef _MD5_H_INCLUDED

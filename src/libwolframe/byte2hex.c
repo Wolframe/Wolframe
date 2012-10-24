@@ -85,17 +85,17 @@ static unsigned char hDigit2byte( int hex )
  * @param	outStr	pointer to the buffer for the output string
  * @param	outSize	size of the output buffer
  *
- * @return	pointer to the output string if successful
- *		or NULL if the output buffer is not large enough
+ * @return	length of the output if successful not counting the final 0
+ *		-1 if the output buffer is not large enough
  */
 
-char *byte2hex( const unsigned char *data, size_t size, char *outStr, size_t outSize )
+int byte2hex( const unsigned char *data, size_t size, char *outStr, size_t outSize )
 {
 	size_t	i;
 	char	*p;
 
 	if ( outSize < 2 * size + 1 )
-		return( NULL );
+		return( -1 );
 
 	p = outStr;
 	for ( i = 0; i < size; i++ )	{
@@ -104,7 +104,7 @@ char *byte2hex( const unsigned char *data, size_t size, char *outStr, size_t out
 		data++;
 	}
 	*p = 0;
-	return( outStr );
+	return( p - outStr );
 }
 
 

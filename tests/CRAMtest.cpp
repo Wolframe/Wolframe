@@ -50,13 +50,15 @@ TEST( CRAM, Challenge )
 	_Wolframe::AAAA::CRAMchallenge	challenge( "/dev/urandom" );
 #endif
 	std::cout << challenge.toBCD();
-	ASSERT_TRUE( true );
+	_Wolframe::AAAA::CRAMresponse	resp1( challenge, "admin", "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6" );
+	_Wolframe::AAAA::CRAMresponse	resp2( challenge.toBCD(), "admin", "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6" );
+	EXPECT_TRUE( resp1 == resp2 );
 }
 
 #ifndef _WIN32
 TEST( CRAM, WrongDevice )
 {
-	ASSERT_THROW( _Wolframe::AAAA::CRAMchallenge challenge( "/Wrong/Device" ), std::runtime_error );
+	EXPECT_THROW( _Wolframe::AAAA::CRAMchallenge challenge( "/Wrong/Device" ), std::runtime_error );
 }
 #endif
 

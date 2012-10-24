@@ -50,7 +50,7 @@
 extern "C" {
 #endif
 
-char *byte2hex( const unsigned char *data, size_t size, char *outStr, size_t outSize );
+int byte2hex( const unsigned char *data, size_t size, char *outStr, size_t outSize );
 
 int hex2byte( const char *hexStr, unsigned char *outData, size_t outSize );
 

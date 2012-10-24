@@ -46,6 +46,9 @@ namespace AAAA {
 
 static const size_t HMAC_DIGEST_SIZE = SHA256_DIGEST_SIZE;
 
+/// Standard HMAC-SHA256 implementation
+///\note There is a mixup of BCD and base64 strings, we will sort it out later,
+///      but be carefull what the encoding is for each function / operator.
 class HMAC_SHA256
 {
 public:
@@ -59,6 +62,8 @@ public:
 					{ init( key, keySize, (const unsigned char*)message.data(), message.size()); }
 	HMAC_SHA256( const std::string& key, const unsigned char* msg, size_t msgSize )
 					{ init( (const unsigned char*)key.data(), key.size(), msg, msgSize ); }
+
+	///\note The string is a base64 representation of the value
 	HMAC_SHA256( const std::string& hash );
 
 	bool operator == ( const HMAC_SHA256& rhs ) const;
