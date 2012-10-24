@@ -51,6 +51,10 @@ public:
 		:m_dbref(dbref_)
 		,m_result(result_){}
 
+	TesttraceTransaction( const TesttraceTransaction& o)
+		:m_dbref(o.m_dbref)
+		,m_result(o.m_result){}
+
 	virtual ~TesttraceTransaction(){}
 
 	virtual const std::string& databaseID() const

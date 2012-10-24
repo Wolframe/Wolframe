@@ -11,7 +11,8 @@ INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src\modules\database\sqlite3 \
-	/I"$(BOOST_INCLUDE_DIR)"
+	/I"$(BOOST_INCLUDE_DIR)" \
+	/I"$(TOPDIR)\sqlite3"
 
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
@@ -26,6 +27,7 @@ DYNAMIC_MODULE = \
 	mod_db_sqlite3test.dll
 
 CPP_OBJS = \
+	SQLiteModuleFiles.obj \
 	SQLiteTest.obj \
 	mod_db_sqlite3test.obj
 
