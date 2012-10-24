@@ -226,6 +226,7 @@ static int bufferAppendString( wolfcli_Buffer* buffer, const char* str)
 
 static void bufferConsume( wolfcli_Buffer* buffer, size_t pos)
 {
+	if (pos == 0 || buffer->size/4 > pos) return;
 	size_t newallocsize;
 	memmove( buffer->ptr, buffer->ptr+pos, buffer->size - pos);
 	buffer->size = buffer->size - pos;

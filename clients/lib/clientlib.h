@@ -31,14 +31,14 @@
 
 ************************************************************************/
 ///\file clientlib.h
-///\brief Ansi-C client library protocol interface
+///\brief C client library protocol interface
 //
 // Provide an abstraction of the wolframe client statemachine, so that the client
-// can react on events with complete data (UI-forms, Requests, Answers).
+// can process complete data items (UI-forms, requests, answers).
 // The idea is that the client creates an object that describes what type of session
-// should be established and with what certificates, etc.
-// When the session is established he pushes Requests and get Events with complete data
-// only from the system.
+// should be established.
+// When the session is established the client pushes requests. Callbacks are used to notify
+// the client with the answers and resulting events with complete data.
 //
 
 #ifndef _WOLFRAME_PROTOCOL_CLIENTLIB_HPP_INCLUDED
@@ -106,7 +106,7 @@ typedef enum
 	WOLFCLI_CALL_CLOSED				//< the client has to terminate becaues it cannot work anymore or the server will close the connection
 } wolfcli_CallResult;
 
-///\brief Call the event handler state machine
+///\brief Call the event handler state machine to establish the session and to process the client requests to the server
 wolfcli_CallResult wolfcli_EventHandler_run( wolfcli_EventHandler* handler);
 
 #endif
