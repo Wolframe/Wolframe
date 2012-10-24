@@ -36,28 +36,28 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct wolfcli_EventQueueItem_
+typedef struct EventQueueItem_
 {
 	wolfcli_Event* event;
-	struct wolfcli_EventQueueItem_* next;
-	struct wolfcli_EventQueueItem_* prev;
+	struct EventQueueItem_* next;
+	struct EventQueueItem_* prev;
 }
-wolfcli_EventQueueItem;
+EventQueueItem;
 
-typedef struct wolfcli_EventQueue_
+typedef struct EventQueue_
 {
-	wolfcli_EventQueueItem* head;
-	wolfcli_EventQueueItem* tail;
+	EventQueueItem* head;
+	EventQueueItem* tail;
 }
-wolfcli_EventQueue;
+EventQueue;
 
-typedef struct wolfcli_Buffer_
+typedef struct Buffer_
 {
 	char* ptr;
 	size_t size;
 	size_t allocsize;
 }
-wolfcli_Buffer;
+Buffer;
 
 typedef enum
 {
@@ -75,12 +75,12 @@ struct wolfcli_EventHandler_
 {
 	wolfcli_EventCallback* eventNotifier;
 	void* clientobject;
-	wolfcli_EventQueue requestqueue;
-	wolfcli_Buffer buffer;
+	EventQueue requestqueue;
+	Buffer buffer;
 	size_t bufferpos;
 	wolfcli_EventHandlerState state;
-	wolfcli_Buffer statearg;
-	wolfcli_Buffer docbuffer;
+	Buffer statearg;
+	Buffer docbuffer;
 };
 
 static void destroyEvent( wolfcli_Event* event)
@@ -123,18 +123,18 @@ ERROR:
 	return NULL;
 }
 
-static void initQueue( wolfcli_EventQueue* que)
+static void initQueue( EventQueue* que)
 {
 	que->head = NULL;
 	que->tail = NULL;
 }
 
-static void resetQueue( wolfcli_EventQueue* que)
+static void resetQueue( EventQueue* que)
 {
-	wolfcli_EventQueueItem* itm = que->head;
+	EventQueueItem* itm = que->head;
 	while (itm != NULL)
 	{
-		wolfcli_EventQueueItem* next = itm->next;
+		EventQueueItem* next = itm->next;
 		destroyEvent( itm->event);
 		free( itm);
 		itm = next;
@@ -143,9 +143,9 @@ static void resetQueue( wolfcli_EventQueue* que)
 	que->tail = NULL;
 }
 
-static int queuePut( wolfcli_EventQueue* que, wolfcli_Event* event_)
+static int queuePut( EventQueue* que, wolfcli_Event* event_)
 {
-	wolfcli_EventQueueItem* item = (wolfcli_EventQueueItem*)calloc( 1, sizeof( wolfcli_EventQueueItem));
+	EventQueueItem* item = (EventQueueItem*)calloc( 1, sizeof( EventQueueItem));
 	if (!item) return 0;
 	item->event = event_;
 	item->next = que->head;
@@ -162,10 +162,10 @@ static int queuePut( wolfcli_EventQueue* que, wolfcli_Event* event_)
 	return 1;
 }
 
-static wolfcli_Event* queueGet( wolfcli_EventQueue* que)
+static wolfcli_Event* queueGet( EventQueue* que)
 {
 	wolfcli_Event* rt;
-	wolfcli_EventQueueItem* item = que->tail;
+	EventQueueItem* item = que->tail;
 	if (que->tail == NULL) return 0;
 	que->tail = que->tail->prev;
 	if (que->tail == NULL)
@@ -181,7 +181,7 @@ static wolfcli_Event* queueGet( wolfcli_EventQueue* que)
 	return rt;
 }
 
-static void initBuffer( wolfcli_Buffer* buffer, size_t allocsize_)
+static void initBuffer( Buffer* buffer, size_t allocsize_)
 {
 	buffer->ptr = NULL;
 	buffer->size = 0;
@@ -193,14 +193,14 @@ static void initBuffer( wolfcli_Buffer* buffer, size_t allocsize_)
 	}
 }
 
-static void resetBuffer( wolfcli_Buffer* buffer, size_t allocsize_)
+static void resetBuffer( Buffer* buffer, size_t allocsize_)
 {
 	if (buffer->ptr != NULL) free( buffer->ptr);
 	initBuffer( buffer, allocsize_);
 }
 
 #define BUFFER_INITSIZE (1<<14)
-static int bufferAppend( wolfcli_Buffer* buffer, const char* data, size_t datasize)
+static int bufferAppend( Buffer* buffer, const char* data, size_t datasize)
 {
 	char* newptr;
 	size_t newallocsize = buffer->allocsize?buffer->allocsize:BUFFER_INITSIZE;
@@ -219,15 +219,15 @@ static int bufferAppend( wolfcli_Buffer* buffer, const char* data, size_t datasi
 	return 1;
 }
 
-static int bufferAppendString( wolfcli_Buffer* buffer, const char* str)
+static int bufferAppendString( Buffer* buffer, const char* str)
 {
 	return bufferAppend( buffer, str, strlen(str)+1);
 }
 
-static void bufferConsume( wolfcli_Buffer* buffer, size_t pos)
+static void bufferConsume( Buffer* buffer, size_t pos)
 {
-	if (pos == 0 || buffer->size/4 > pos) return;
 	size_t newallocsize;
+	if (pos == 0 || buffer->size/4 > pos) return;
 	memmove( buffer->ptr, buffer->ptr+pos, buffer->size - pos);
 	buffer->size = buffer->size - pos;
 	newallocsize = buffer->allocsize;
@@ -342,7 +342,7 @@ typedef enum
 	DOCSTATE_ERROR
 } DocState;
 
-static DocState getContentUnescaped( wolfcli_Buffer* docbuffer, char* baseptr, size_t* pos, size_t size)
+static DocState getContentUnescaped( Buffer* docbuffer, char* baseptr, size_t* pos, size_t size)
 {
 	Line line;
 	while (getLine( &line, baseptr, pos, size, 0))
@@ -360,7 +360,7 @@ static DocState getContentUnescaped( wolfcli_Buffer* docbuffer, char* baseptr, s
 	return DOCSTATE_READING;
 }
 
-static int getContentEscaped( wolfcli_Buffer* docbuffer, char* ptr, size_t size)
+static int getContentEscaped( Buffer* docbuffer, char* ptr, size_t size)
 {
 	Line line;
 	size_t pos = 0;
@@ -416,7 +416,7 @@ _ERROR:
 static int sendDocument( wolfcli_EventHandler* handler, int context, char* id, char* doc, size_t docsize)
 {
 	wolfcli_Event* event = NULL;
-	wolfcli_Buffer docbuffer;
+	Buffer docbuffer;
 	initBuffer( &docbuffer, 0);
 
 	if (!getContentEscaped( &docbuffer, doc, docsize)) goto _ERROR;
