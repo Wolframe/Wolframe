@@ -76,19 +76,17 @@ static unsigned char hDigit2byte( int hex )
 	}
 }
 
-
-/**
- * @brief	Get the ASCII hex string for a data block
+/*
+ * Get the ASCII hex string for a data block
  *
- * @param	data	pointer to the data block
- * @param	size	size of the data block
- * @param	outStr	pointer to the buffer for the output string
- * @param	outSize	size of the output buffer
+ * data	pointer to the data block
+ * size	size of the data block
+ * outStr	pointer to the buffer for the output string
+ * outSize	size of the output buffer
  *
- * @return	length of the output if successful not counting the final 0
+ * returns	length of the output if successful not counting the final 0
  *		-1 if the output buffer is not large enough
  */
-
 int byte2hex( const unsigned char *data, size_t size, char *outStr, size_t outSize )
 {
 	size_t	i;
@@ -107,15 +105,14 @@ int byte2hex( const unsigned char *data, size_t size, char *outStr, size_t outSi
 	return( p - outStr );
 }
 
-
-/**
- * @brief	Get the data block from the ASCII hex string
+/*
+ * Get the data block from the ASCII hex string
  *
- * @param	hexStr	pointer to the ASCII hex string
- * @param	outData	pointer to the buffer for the output data
- * @param	outSize	size of the output buffer
+ * hexStr	pointer to the ASCII hex string
+ * outData	pointer to the buffer for the output data
+ * outSize	size of the output buffer
  *
- * @return	length of the output if successful
+ * returns	length of the output if successful
  *		-1 if the output buffer is not large enough
  *		-2 if the string has invalid hex characters
  */
