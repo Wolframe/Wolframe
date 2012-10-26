@@ -73,8 +73,8 @@ protected:
 };
 
 
-static User* CRAMauth( TextFileAuthenticator& auth, const std::string& user, const std::string& passwd,
-			    bool caseSensitve )
+static User* CRAMauth( TextFileAuthenticator& auth, const std::string& /*user*/,
+		       const std::string& passwd, bool caseSensitive )
 {
 #ifdef _WIN32
 	CRAMchallenge	challenge( MS_DEF_PROV );
@@ -82,20 +82,12 @@ static User* CRAMauth( TextFileAuthenticator& auth, const std::string& user, con
 	CRAMchallenge	challenge( "/dev/urandom" );
 #endif
 
-	std::string usr;
-	if ( caseSensitve )
-		usr = user;
-	else
-		usr = boost::algorithm::to_lower_copy( user );
-
 	unsigned char digest[ SHA224_DIGEST_SIZE ];
 	sha224((const unsigned char *)passwd.c_str(), passwd.length(), digest );
-	char digestStr[ 2 * SHA224_DIGEST_SIZE + 1 ];
-	byte2hex( digest, SHA224_DIGEST_SIZE, digestStr, 2 * SHA224_DIGEST_SIZE + 1 );
 
-	CRAMresponse	response( challenge, usr, digestStr );
+	CRAMresponse	response( challenge, digest, SHA224_DIGEST_SIZE );
 
-	return auth.authenticate( challenge, response, caseSensitve );
+	return auth.authenticate( challenge, response, caseSensitive );
 }
 
 

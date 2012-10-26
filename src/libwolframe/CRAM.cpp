@@ -61,8 +61,12 @@
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe;
 
-static const size_t CRAM_CHALLENGE_STRING_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
-static const size_t CRAM_RESPONSE_STRING_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
+static const size_t CRAM_CHALLENGE_BCD_SIZE = 2 * CRAM_CHALLENGE_SIZE + 1;
+static const size_t CRAM_CHALLENGE_BASE64_SIZE = (( CRAM_CHALLENGE_SIZE - 1 ) / 3 ) * 4 + 5;
+
+static const size_t CRAM_RESPONSE_BCD_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
+static const size_t CRAM_RESPONSE_BASE64_SIZE = (( CRAM_RESPONSE_SIZE - 1 ) / 3 ) * 4 + 5;
+
 
 CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 {
@@ -122,62 +126,127 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 
 std::string CRAMchallenge::toBCD() const
 {
-	char	buffer[ CRAM_CHALLENGE_STRING_SIZE ];
+	char	buffer[ CRAM_CHALLENGE_BCD_SIZE ];
 
 	int len = byte2hex( m_challenge, CRAM_CHALLENGE_SIZE,
-			    buffer, CRAM_CHALLENGE_STRING_SIZE );
+			    buffer, CRAM_CHALLENGE_BCD_SIZE );
 	assert( len == CRAM_CHALLENGE_SIZE * 2 );
 
 	return std::string( buffer );
 }
 
 
-CRAMresponse::CRAMresponse( const CRAMchallenge& challenge,
-			    const std::string& username, const std::string& pwdHash )
+std::string CRAMchallenge::toString() const
+{
+	char	buffer[ CRAM_CHALLENGE_BASE64_SIZE ];
+
+	int len = base64_encode( m_challenge, CRAM_CHALLENGE_SIZE,
+				 buffer, CRAM_CHALLENGE_BASE64_SIZE, 0 );
+	assert( len >= 0 && len < (int)CRAM_CHALLENGE_BASE64_SIZE );
+	while ( len > 0 && buffer[ len - 1 ] == '=' )
+		len--;
+	buffer[ len ] = 0;
+	return std::string( buffer );
+}
+
+
+static void computeResponse ( const unsigned char* challenge, const unsigned char* hash,
+			      std::size_t hashSize, unsigned char* response )
 {
 	unsigned char buffer[ CRAM_CHALLENGE_SIZE ];
 
-	memset( buffer, 0, CRAM_CHALLENGE_SIZE );
+	memset( buffer, 0x3c, CRAM_CHALLENGE_SIZE );
+	if ( hashSize > CRAM_CHALLENGE_SIZE )	{
+		assert( CRAM_CHALLENGE_SIZE == SHA512_DIGEST_SIZE );
+		sha512( hash, hashSize, buffer );
+	}
+	else
+		memcpy( buffer, hash, hashSize );
 
-	memcpy( buffer, username.c_str(),
-		CRAM_CHALLENGE_SIZE / 2 > username.length() ? username.length() : CRAM_CHALLENGE_SIZE / 2 );
-	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != (int)PASSWORD_HASH_SIZE )
-		throw std::runtime_error( "CRAM response: password hash is invalid" );
 	for ( size_t i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
-		buffer[ i ] ^= challenge.m_challenge[ i ];
-	sha512( buffer, CRAM_CHALLENGE_SIZE, m_response );
+		buffer[ i ] ^= challenge[ i ];
+
+	assert( CRAM_RESPONSE_SIZE == SHA256_DIGEST_SIZE );
+	sha256( buffer, CRAM_CHALLENGE_SIZE, response );
+}
+
+CRAMresponse::CRAMresponse( const CRAMchallenge& challenge,
+			    const unsigned char* hash, std::size_t hashSize )
+{
+	computeResponse( challenge.m_challenge, hash, hashSize, m_response );
 }
 
 CRAMresponse::CRAMresponse( const std::string& challenge,
-			    const std::string &username, const std::string& pwdHash )
+			    const unsigned char* hash, std::size_t hashSize )
 {
 	unsigned char chlng[ CRAM_CHALLENGE_SIZE ];
-	unsigned char buffer[ CRAM_CHALLENGE_SIZE ];
 
 	memset( chlng, 0, CRAM_CHALLENGE_SIZE );
-	memset( buffer, 0, CRAM_CHALLENGE_SIZE );
 
-	memcpy( buffer, username.c_str(),
-		CRAM_CHALLENGE_SIZE / 2 > username.length() ? username.length() : CRAM_CHALLENGE_SIZE / 2 );
-	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != (int)PASSWORD_HASH_SIZE )
-		throw std::runtime_error( "CRAM response: password hash is invalid" );
-	if ( hex2byte( challenge.c_str(), chlng, CRAM_CHALLENGE_SIZE ) != (int)CRAM_CHALLENGE_SIZE )
+	if ( hex2byte( challenge.data(), chlng, CRAM_CHALLENGE_SIZE ) != (int)CRAM_CHALLENGE_SIZE )
 		throw std::runtime_error( "CRAM response: challenge is invalid" );
-	for ( size_t i = 0; i < CRAM_CHALLENGE_SIZE; i++ )
-		buffer[ i ] ^= chlng[ i ];
-	sha512( buffer, CRAM_CHALLENGE_SIZE, m_response );
+
+	computeResponse( chlng, hash, hashSize, m_response );
 }
+
+CRAMresponse::CRAMresponse( const CRAMchallenge& challenge, const std::string& pwdHash )
+{
+	unsigned char hash[ PASSWORD_HASH_SIZE ];
+
+	memset( hash, 0, PASSWORD_HASH_SIZE );
+
+	int pwdLen;
+	if (( pwdLen = hex2byte( pwdHash.data(), hash, CRAM_CHALLENGE_SIZE )) < 0 )
+		throw std::runtime_error( "CRAM response: password hash is invalid" );
+
+	computeResponse( challenge.m_challenge, hash, pwdLen, m_response );
+}
+
+
+CRAMresponse::CRAMresponse( const std::string& challenge, const std::string& pwdHash )
+{
+	unsigned char chlng[ CRAM_CHALLENGE_SIZE ];
+	unsigned char hash[ PASSWORD_HASH_SIZE ];
+
+	memset( chlng, 0, CRAM_CHALLENGE_SIZE );
+	memset( hash, 0, PASSWORD_HASH_SIZE );
+
+	int pwdLen;
+
+	if ( hex2byte( challenge.data(), chlng, CRAM_CHALLENGE_SIZE ) != (int)CRAM_CHALLENGE_SIZE )
+		throw std::runtime_error( "CRAM response: challenge is invalid" );
+	if (( pwdLen = hex2byte( pwdHash.data(), hash, CRAM_CHALLENGE_SIZE )) < 0 )
+		throw std::runtime_error( "CRAM response: password hash is invalid" );
+
+	computeResponse( chlng, hash, pwdLen, m_response );
+}
+
+
 
 std::string CRAMresponse::toBCD() const
 {
-	char	buffer[ CRAM_RESPONSE_STRING_SIZE ];
+	char	buffer[ CRAM_RESPONSE_BCD_SIZE ];
 
 	int len = byte2hex( m_response, CRAM_RESPONSE_SIZE,
-			    buffer, CRAM_RESPONSE_STRING_SIZE );
+			    buffer, CRAM_RESPONSE_BCD_SIZE );
 	assert( len == CRAM_RESPONSE_SIZE * 2 );
 
 	return std::string( buffer );
 }
+
+std::string CRAMresponse::toString() const
+{
+	char	buffer[ CRAM_RESPONSE_BASE64_SIZE ];
+
+	int len = base64_encode( m_response, CRAM_RESPONSE_SIZE,
+				 buffer, CRAM_RESPONSE_BASE64_SIZE, 0 );
+	assert( len >= 0 && len < (int)CRAM_RESPONSE_BASE64_SIZE );
+	while ( len > 0 && buffer[ len - 1 ] == '=' )
+		len--;
+	buffer[ len ] = 0;
+	return std::string( buffer );
+}
+
 
 bool CRAMresponse::operator == ( const CRAMresponse& rhs )
 {
@@ -188,7 +257,8 @@ bool CRAMresponse::operator == ( const std::string& rhs )
 {
 	unsigned char	buffer[ CRAM_RESPONSE_SIZE ];
 
-	if ( hex2byte( rhs.c_str(), buffer, CRAM_RESPONSE_SIZE ) != (int)CRAM_RESPONSE_SIZE )
+	if ( base64_decode( rhs.data(), rhs.size(),
+			    buffer, CRAM_RESPONSE_SIZE ) != (int)CRAM_RESPONSE_SIZE )
 		return false;
 	return !memcmp( this->m_response, buffer, CRAM_RESPONSE_SIZE );
 }

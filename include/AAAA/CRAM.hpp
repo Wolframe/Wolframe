@@ -47,8 +47,8 @@
 namespace _Wolframe {
 namespace AAAA {
 
-static const size_t CRAM_BLOCK_SIZE = 1024 / 8;
-static const size_t CRAM_DIGEST_SIZE = 512 / 8;
+static const size_t CRAM_BLOCK_SIZE = 512 / 8;
+static const size_t CRAM_DIGEST_SIZE = 256 / 8;
 static const size_t CRAM_CHALLENGE_SIZE = CRAM_BLOCK_SIZE;
 static const size_t CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
 
@@ -59,32 +59,39 @@ public:
 	CRAMchallenge( const std::string& randomDevice );
 
 	std::string toBCD() const;
-	std::string toBase64() const;
+	std::string toString() const;
 private:
-	unsigned char		m_challenge[ CRAM_CHALLENGE_SIZE ];
+	unsigned char	m_challenge[ CRAM_CHALLENGE_SIZE ];
 };
 
 
 class CRAMresponse
 {
 public:
+	/// Constructor
+	/// \note The strings are base64 encoded, with or without end padding.
 	CRAMresponse( const CRAMchallenge& challenge,
-		      const std::string& username, const std::string &pwdHash );
+		      const unsigned char *hash, std::size_t hashSize );
 	CRAMresponse( const std::string& challenge,
-		      const std::string& username, const std::string& pwdHash );
+		      const unsigned char *hash, std::size_t hashSize  );
+	CRAMresponse( const CRAMchallenge& challenge, const std::string& pwdHash );
+	CRAMresponse( const std::string& challenge, const std::string& pwdHash );
+
 
 	std::string toBCD() const;
-	std::string toBase64() const;
+	std::string toString() const;
 
-	/// True if the 2 CRAM responses are identical, false otherwise
+	/// True if the 2 CRAM responses are identical, false otherwise.
 	bool operator == ( const CRAMresponse& rhs );
 	bool operator != ( const CRAMresponse& rhs )	{ return !( *this == rhs ); }
+
 	/// True if the CRAM response base64 encoding is equivalent to the given argument,
-	/// false otherwise
+	/// false otherwise.
+	/// \note The strings are base64 encoded, with or without end padding.
 	bool operator == ( const std::string& rhs );
 	bool operator != ( const std::string& rhs )	{ return !( *this == rhs ); }
 private:
-	unsigned char		m_response[ CRAM_RESPONSE_SIZE ];
+	unsigned char	m_response[ CRAM_RESPONSE_SIZE ];
 };
 
 }} // namespace _Wolframe::AAAA

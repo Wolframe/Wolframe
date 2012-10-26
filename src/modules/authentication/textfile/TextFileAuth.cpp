@@ -206,7 +206,7 @@ User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
 			usr = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
 			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
 		}
-		if ( caseSensitveUser  )
+		if ( caseSensitveUser )
 			boost::to_lower( usr );
 
 		if ( end != std::string::npos )	{
@@ -216,7 +216,7 @@ User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
 		}
 
 		try	{
-			CRAMresponse	local( challenge, usr, pwd );
+			CRAMresponse	local( challenge, pwd );
 			if ( local != response )
 				continue;
 		}

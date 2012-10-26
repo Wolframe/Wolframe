@@ -90,10 +90,9 @@ clients/cli/Makefile.W32
 clients/cli/wolfcli.cpp
 clients/cli/wolframe.conf
 clients/GNUmakefile
-clients/lib/clientlib.c
+clients/lib/clientlib_connect.cpp
 clients/lib/clientlib.h
-clients/lib/clientlib_plainconnect.cpp
-clients/lib/clientlib_sslconnect.cpp
+clients/lib/clientlib_protocol.c
 clients/lib/GNUmakefile
 clients/lib/Makefile.W32
 clients/Makefile.W32
