@@ -124,11 +124,9 @@ std::string CRAMchallenge::toBCD() const
 {
 	char	buffer[ CRAM_CHALLENGE_STRING_SIZE ];
 
-	memset( buffer, 0, CRAM_CHALLENGE_STRING_SIZE );
-
-	if ( byte2hex( m_challenge, CRAM_CHALLENGE_SIZE,
-		       buffer, CRAM_CHALLENGE_STRING_SIZE ) == NULL )
-		throw std::logic_error( "CRAMchallenge::toBCD() cannot convert challenge ?!?" );
+	int len = byte2hex( m_challenge, CRAM_CHALLENGE_SIZE,
+			    buffer, CRAM_CHALLENGE_STRING_SIZE );
+	assert( len == CRAM_CHALLENGE_SIZE * 2 );
 
 	return std::string( buffer );
 }
@@ -140,6 +138,7 @@ CRAMresponse::CRAMresponse( const CRAMchallenge& challenge,
 	unsigned char buffer[ CRAM_CHALLENGE_SIZE ];
 
 	memset( buffer, 0, CRAM_CHALLENGE_SIZE );
+
 	memcpy( buffer, username.c_str(),
 		CRAM_CHALLENGE_SIZE / 2 > username.length() ? username.length() : CRAM_CHALLENGE_SIZE / 2 );
 	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != (int)PASSWORD_HASH_SIZE )
@@ -155,7 +154,9 @@ CRAMresponse::CRAMresponse( const std::string& challenge,
 	unsigned char chlng[ CRAM_CHALLENGE_SIZE ];
 	unsigned char buffer[ CRAM_CHALLENGE_SIZE ];
 
+	memset( chlng, 0, CRAM_CHALLENGE_SIZE );
 	memset( buffer, 0, CRAM_CHALLENGE_SIZE );
+
 	memcpy( buffer, username.c_str(),
 		CRAM_CHALLENGE_SIZE / 2 > username.length() ? username.length() : CRAM_CHALLENGE_SIZE / 2 );
 	if ( hex2byte( pwdHash.c_str(), buffer + CRAM_CHALLENGE_SIZE / 2, CRAM_CHALLENGE_SIZE / 2 ) != (int)PASSWORD_HASH_SIZE )
@@ -171,9 +172,9 @@ std::string CRAMresponse::toBCD() const
 {
 	char	buffer[ CRAM_RESPONSE_STRING_SIZE ];
 
-	if ( byte2hex( m_response, CRAM_RESPONSE_SIZE,
-		       buffer, CRAM_RESPONSE_STRING_SIZE ) == NULL )
-		throw std::logic_error( "CRAMresponse::toBCD() cannot convert response ?!?" );
+	int len = byte2hex( m_response, CRAM_RESPONSE_SIZE,
+			    buffer, CRAM_RESPONSE_STRING_SIZE );
+	assert( len == CRAM_RESPONSE_SIZE * 2 );
 
 	return std::string( buffer );
 }

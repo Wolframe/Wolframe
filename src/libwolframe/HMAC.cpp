@@ -105,9 +105,8 @@ std::string HMAC_SHA256::toBCD() const
 {
 	char	buffer[ HMAC_BCD_SIZE ];
 
-	if ( byte2hex( m_HMAC, HMAC_DIGEST_SIZE,
-		       buffer, HMAC_BCD_SIZE ) == NULL )
-		throw std::logic_error( "HMAC-SHA256::toBCD() cannot convert hash ?!?" );
+	int len = byte2hex( m_HMAC, HMAC_DIGEST_SIZE, buffer, HMAC_BCD_SIZE );
+	assert( len == HMAC_DIGEST_SIZE * 2 );
 
 	return std::string( buffer );
 }
@@ -116,9 +115,12 @@ std::string HMAC_SHA256::toBase64() const
 {
 	char	buffer[ HMAC_BASE64_SIZE ];
 
-	if ( base64::encode( m_HMAC, HMAC_DIGEST_SIZE,
-			     buffer, HMAC_BASE64_SIZE, 0 ) < 0 )
-		throw std::logic_error( "HMAC-SHA256::toBase64() cannot convert hash ?!?" );
+	int len = base64::encode( m_HMAC, HMAC_DIGEST_SIZE, buffer, HMAC_BASE64_SIZE, 0 );
+	assert( len > 0 && len < (int)HMAC_BASE64_SIZE );
+
+	while ( len > 0 && buffer[ len - 1 ] == '=' )
+		len--;
+	buffer[ len ] = 0;
 
 	return std::string( buffer );
 }

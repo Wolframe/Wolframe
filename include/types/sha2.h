@@ -75,32 +75,24 @@ typedef	sha512_ctx	sha384_ctx;
 typedef	sha256_ctx	sha224_ctx;
 
 void sha224_init( sha224_ctx *ctx );
-void sha224_update( sha224_ctx *ctx, const unsigned char *message,
-		    unsigned int len );
-void sha224_final( sha224_ctx *ctx, unsigned char *digest );
-void sha224( const unsigned char *message, unsigned int len,
-	     unsigned char *digest );
+void sha224_update( sha224_ctx *ctx, const void *data, unsigned long size );
+void sha224_final( sha224_ctx *ctx, unsigned char *hash );
+void sha224( const void *data, unsigned long size, unsigned char *hash );
 
 void sha256_init( sha256_ctx * ctx );
-void sha256_update( sha256_ctx *ctx, const unsigned char *message,
-		    unsigned int len );
-void sha256_final( sha256_ctx *ctx, unsigned char *digest );
-void sha256( const unsigned char *message, unsigned int len,
-	     unsigned char *digest );
+void sha256_update( sha256_ctx *ctx, const void *data, unsigned long size );
+void sha256_final( sha256_ctx *ctx, unsigned char *hash );
+void sha256( const void *data, unsigned long size, unsigned char *hash );
 
 void sha384_init( sha384_ctx *ctx );
-void sha384_update( sha384_ctx *ctx, const unsigned char *message,
-		    unsigned int len );
-void sha384_final( sha384_ctx *ctx, unsigned char *digest );
-void sha384( const unsigned char *message, unsigned int len,
-	     unsigned char *digest );
+void sha384_update( sha384_ctx *ctx, const void *data, unsigned long size );
+void sha384_final( sha384_ctx *ctx, unsigned char *hash );
+void sha384( const void *data, unsigned long size, unsigned char *hash );
 
 void sha512_init( sha512_ctx *ctx );
-void sha512_update( sha512_ctx *ctx, const unsigned char *message,
-		    unsigned int len );
-void sha512_final( sha512_ctx *ctx, unsigned char *digest );
-void sha512( const unsigned char *message, unsigned int len,
-	     unsigned char *digest );
+void sha512_update( sha512_ctx *ctx, const void *data, unsigned long size );
+void sha512_final( sha512_ctx *ctx, unsigned char *hash );
+void sha512( const void *data, unsigned long size, unsigned char *hash );
 
 #ifdef __cplusplus
 }

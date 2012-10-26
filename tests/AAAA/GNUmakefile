@@ -92,8 +92,8 @@ TEST_CPP_BINS = \
 
 
 authenticationTest$(EXE): $(CPP_OBJS)
-textFileTest$(EXE): $(CPP_OBJS)
 passwdFileTest$(EXE): $(CPP_OBJS)
+textFileTest$(EXE): $(CPP_OBJS)
 
 
 local_all:

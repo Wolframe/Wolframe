@@ -92,6 +92,7 @@ static User* CRAMauth( TextFileAuthenticator& auth, const std::string& user, con
 	sha224((const unsigned char *)passwd.c_str(), passwd.length(), digest );
 	char digestStr[ 2 * SHA224_DIGEST_SIZE + 1 ];
 	byte2hex( digest, SHA224_DIGEST_SIZE, digestStr, 2 * SHA224_DIGEST_SIZE + 1 );
+
 	CRAMresponse	response( challenge, usr, digestStr );
 
 	return auth.authenticate( challenge, response, caseSensitve );
@@ -101,7 +102,7 @@ static User* CRAMauth( TextFileAuthenticator& auth, const std::string& user, con
 TEST_F( AuthenticationFixture, typeName )
 {
 	TextFileAuthenticator authenticator( "", "passwd" );
-	ASSERT_STREQ( authenticator.className( ), "TextFileAuth" );
+	EXPECT_STREQ( authenticator.className( ), "TextFileAuth" );
 }
 
 TEST_F( AuthenticationFixture, fileWithoutNewLine )
@@ -111,20 +112,20 @@ TEST_F( AuthenticationFixture, fileWithoutNewLine )
 
 	user = authenticator.authenticatePlain( "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "admin", user->uname().c_str() );
-	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
+	EXPECT_STREQ( "admin", user->uname().c_str() );
+	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticatePlain( "goodusr", "User PassWord", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "goodusr", user->uname().c_str() );
-	ASSERT_STREQ( "Good User", user->name().c_str() );
+	EXPECT_STREQ( "goodusr", user->uname().c_str() );
+	EXPECT_STREQ( "Good User", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticatePlain( "badusr", "User BadWord", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "badusr", user->uname().c_str() );
-	ASSERT_STREQ( "Bad User", user->name().c_str() );
+	EXPECT_STREQ( "badusr", user->uname().c_str() );
+	EXPECT_STREQ( "Bad User", user->name().c_str() );
 	delete user;
 }
 
@@ -135,19 +136,19 @@ TEST_F( AuthenticationFixture, validUsers )
 
 	user = authenticator.authenticatePlain( "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "admin", user->uname().c_str() );
-	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
+	EXPECT_STREQ( "admin", user->uname().c_str() );
+	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticatePlain( "goodusr", "User PassWord", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "goodusr", user->uname().c_str() );
+	EXPECT_STREQ( "goodusr", user->uname().c_str() );
 	delete user;
 
 	user = authenticator.authenticatePlain( "badusr", "User BadWord", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "badusr", user->uname().c_str() );
-	ASSERT_STREQ( "Bad User", user->name().c_str() );
+	EXPECT_STREQ( "badusr", user->uname().c_str() );
+	EXPECT_STREQ( "Bad User", user->name().c_str() );
 	delete user;
 }
 
@@ -159,19 +160,19 @@ TEST_F( AuthenticationFixture, caseInsensitive_Pass )
 
 	user = authenticator.authenticatePlain( "AdMiN", "Good Password", false );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "admin", user->uname().c_str() );
-	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
+	EXPECT_STREQ( "admin", user->uname().c_str() );
+	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
 	user = authenticator.authenticatePlain( "GoodUsr", "User PassWord", false );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "goodusr", user->uname().c_str() );
+	EXPECT_STREQ( "goodusr", user->uname().c_str() );
 	delete user;
 
 	user = authenticator.authenticatePlain( "BadUsr", "User BadWord", false );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "badusr", user->uname().c_str() );
-	ASSERT_STREQ( "Bad User", user->name().c_str() );
+	EXPECT_STREQ( "badusr", user->uname().c_str() );
+	EXPECT_STREQ( "Bad User", user->name().c_str() );
 	delete user;
 }
 
@@ -181,11 +182,11 @@ TEST_F( AuthenticationFixture, caseInsensitive_Fail )
 	TextFileAuthenticator authenticator( "", "passwd" );
 
 	user = authenticator.authenticatePlain( "AdMiN", "Good Password", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "GoodUsr", "User PassWord", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "BadUsr", "User BadWord", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 }
 
 TEST_F( AuthenticationFixture, wrongPasswords )
@@ -194,11 +195,11 @@ TEST_F( AuthenticationFixture, wrongPasswords )
 	TextFileAuthenticator authenticator( "", "passwd" );
 
 	user = authenticator.authenticatePlain( "admin", "Goood Password", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "goodusr", "User Password", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "badusr", "user BadWord", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 }
 
 TEST_F( AuthenticationFixture, nonExistentUsers )
@@ -207,11 +208,11 @@ TEST_F( AuthenticationFixture, nonExistentUsers )
 	TextFileAuthenticator authenticator( "", "passwd" );
 
 	user = authenticator.authenticatePlain( "adminn", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "gooduser", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "baduser", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 }
 
 TEST_F( AuthenticationFixture, invalidPasswordHashes )
@@ -221,11 +222,11 @@ TEST_F( AuthenticationFixture, invalidPasswordHashes )
 
 
 	user = authenticator.authenticatePlain( "badmin", "Good Password", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "wrongusr", "User PassWord", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "shortusr", "User BadWord", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 }
 
 TEST_F( AuthenticationFixture, nonexistentFile )
@@ -234,11 +235,11 @@ TEST_F( AuthenticationFixture, nonexistentFile )
 	TextFileAuthenticator authenticator( "", "passwds" );
 
 	user = authenticator.authenticatePlain( "admin", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "goodusr", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = authenticator.authenticatePlain( "badusr", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 }
 
 //******  CRAM  **************************************************************
@@ -250,20 +251,20 @@ TEST_F( AuthenticationFixture, CRAM_fileWithoutNewLine )
 
 	user = CRAMauth( authenticator, "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "admin", user->uname().c_str() );
-	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
+	EXPECT_STREQ( "admin", user->uname().c_str() );
+	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
 	user = CRAMauth( authenticator, "goodusr", "User PassWord", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "goodusr", user->uname().c_str() );
-	ASSERT_STREQ( "Good User", user->name().c_str() );
+	EXPECT_STREQ( "goodusr", user->uname().c_str() );
+	EXPECT_STREQ( "Good User", user->name().c_str() );
 	delete user;
 
 	user = CRAMauth( authenticator, "badusr", "User BadWord", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "badusr", user->uname().c_str() );
-	ASSERT_STREQ( "Bad User", user->name().c_str() );
+	EXPECT_STREQ( "badusr", user->uname().c_str() );
+	EXPECT_STREQ( "Bad User", user->name().c_str() );
 	delete user;
 }
 
@@ -274,19 +275,19 @@ TEST_F( AuthenticationFixture, CRAM_validUsers )
 
 	user = CRAMauth( authenticator, "admin", "Good Password", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "admin", user->uname().c_str() );
-	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
+	EXPECT_STREQ( "admin", user->uname().c_str() );
+	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
 	user = CRAMauth( authenticator, "goodusr", "User PassWord", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "goodusr", user->uname().c_str() );
+	EXPECT_STREQ( "goodusr", user->uname().c_str() );
 	delete user;
 
 	user = CRAMauth( authenticator, "badusr", "User BadWord", true );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "badusr", user->uname().c_str() );
-	ASSERT_STREQ( "Bad User", user->name().c_str() );
+	EXPECT_STREQ( "badusr", user->uname().c_str() );
+	EXPECT_STREQ( "Bad User", user->name().c_str() );
 	delete user;
 }
 
@@ -298,19 +299,19 @@ TEST_F( AuthenticationFixture, CRAM_caseInsensitive_Pass )
 
 	user = CRAMauth( authenticator, "AdMiN", "Good Password", false );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "admin", user->uname().c_str() );
-	ASSERT_STREQ( "Wolframe Administrator", user->name().c_str() );
+	EXPECT_STREQ( "admin", user->uname().c_str() );
+	EXPECT_STREQ( "Wolframe Administrator", user->name().c_str() );
 	delete user;
 
 	user = CRAMauth( authenticator, "GoodUsr", "User PassWord", false );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "goodusr", user->uname().c_str() );
+	EXPECT_STREQ( "goodusr", user->uname().c_str() );
 	delete user;
 
 	user = CRAMauth( authenticator, "BadUsr", "User BadWord", false );
 	ASSERT_TRUE( user != NULL );
-	ASSERT_STREQ( "badusr", user->uname().c_str() );
-	ASSERT_STREQ( "Bad User", user->name().c_str() );
+	EXPECT_STREQ( "badusr", user->uname().c_str() );
+	EXPECT_STREQ( "Bad User", user->name().c_str() );
 	delete user;
 }
 
@@ -320,11 +321,11 @@ TEST_F( AuthenticationFixture, CRAM_caseInsensitive_Fail )
 	TextFileAuthenticator authenticator( "", "passwd" );
 
 	user = CRAMauth( authenticator, "AdMiN", "Good Password", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = CRAMauth( authenticator, "GoodUsr", "User PassWord", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = CRAMauth( authenticator, "BadUsr", "User BadWord", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 }
 
 TEST_F( AuthenticationFixture, CRAM_wrongPasswords )
@@ -333,11 +334,11 @@ TEST_F( AuthenticationFixture, CRAM_wrongPasswords )
 	TextFileAuthenticator authenticator( "", "passwd" );
 
 	user = CRAMauth( authenticator, "admin", "Goood Password", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = CRAMauth( authenticator, "goodusr", "User Password", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = CRAMauth( authenticator, "badusr", "user BadWord", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 }
 
 TEST_F( AuthenticationFixture, CRAM_nonExistentUsers )
@@ -346,11 +347,11 @@ TEST_F( AuthenticationFixture, CRAM_nonExistentUsers )
 	TextFileAuthenticator authenticator( "", "passwd" );
 
 	user = CRAMauth( authenticator, "adminn", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = CRAMauth( authenticator, "gooduser", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = CRAMauth( authenticator, "baduser", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 }
 
 TEST_F( AuthenticationFixture, CRAM_invalidPasswordHashes )
@@ -360,11 +361,11 @@ TEST_F( AuthenticationFixture, CRAM_invalidPasswordHashes )
 
 
 	user = CRAMauth( authenticator, "badmin", "Good Password", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = CRAMauth( authenticator, "wrongusr", "User PassWord", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = CRAMauth( authenticator, "shortusr", "User BadWord", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 }
 
 TEST_F( AuthenticationFixture, CRAM_nonexistentFile )
@@ -373,11 +374,11 @@ TEST_F( AuthenticationFixture, CRAM_nonexistentFile )
 	TextFileAuthenticator authenticator( "", "passwds" );
 
 	user = CRAMauth( authenticator, "admin", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = CRAMauth( authenticator, "goodusr", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 	user = CRAMauth( authenticator, "badusr", "xx", true );
-	ASSERT_EQ( NULL, user );
+	EXPECT_EQ( NULL, user );
 }
 
 //****************************************************************************

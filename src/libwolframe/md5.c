@@ -1,35 +1,3 @@
-/************************************************************************
-
- Copyright (C) 2011, 2012 Project Wolframe.
- All rights reserved.
-
- This file is part of Project Wolframe.
-
- Commercial Usage
-    Licensees holding valid Project Wolframe Commercial licenses may
-    use this file in accordance with the Project Wolframe
-    Commercial License Agreement provided with the Software or,
-    alternatively, in accordance with the terms contained
-    in a written agreement between the licensee and Project Wolframe.
-
- GNU General Public License Usage
-    Alternatively, you can redistribute this file and/or modify it
-    under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    Wolframe is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
-
- If you have questions regarding the use of this file, please contact
- Project Wolframe.
-
-************************************************************************/
 /*
  * This is an OpenSSL-compatible implementation of the RSA Data Security, Inc.
  * MD5 Message-Digest Algorithm (RFC 1321).
@@ -65,6 +33,8 @@
  * It is meant to be fast, but not as fast as possible.  Some known
  * optimizations are not included to reduce source code size and avoid
  * compile-time configuration.
+ *
+ * Modified for Wolframe by the Wolframe Team (c) 2012
  */
 
 #include <string.h>
@@ -101,16 +71,16 @@
  */
 #if defined(__i386__) || defined(__x86_64__) || defined(__vax__)
 #define SET(n) \
-	(*(const MD5_u32plus *)&ptr[(n) * 4])
+	(*(const md5_u32plus *)&ptr[(n) * 4])
 #define GET(n) \
 	SET(n)
 #else
 #define SET(n) \
 	(ctx->block[(n)] = \
-	(const MD5_u32plus)ptr[(n) * 4] | \
-	((const MD5_u32plus)ptr[(n) * 4 + 1] << 8) | \
-	((const MD5_u32plus)ptr[(n) * 4 + 2] << 16) | \
-	((const MD5_u32plus)ptr[(n) * 4 + 3] << 24))
+	( const md5_u32plus)ptr[(n) * 4] | \
+	((const md5_u32plus)ptr[(n) * 4 + 1] << 8) | \
+	((const md5_u32plus)ptr[(n) * 4 + 2] << 16) | \
+	((const md5_u32plus)ptr[(n) * 4 + 3] << 24))
 #define GET(n) \
 	(ctx->block[(n)])
 #endif
@@ -119,11 +89,11 @@
  * This processes one or more 64-byte data blocks, but does NOT update
  * the bit counters.  There are no alignment requirements.
  */
-static const void* body( MD5_CTX *ctx, const void *data, unsigned long size )
+static const void* body( md5_ctx *ctx, const void *data, unsigned long size )
 {
 	const unsigned char *ptr;
-	MD5_u32plus a, b, c, d;
-	MD5_u32plus saved_a, saved_b, saved_c, saved_d;
+	md5_u32plus a, b, c, d;
+	md5_u32plus saved_a, saved_b, saved_c, saved_d;
 
 	ptr = (const unsigned char *)data;
 
@@ -226,7 +196,7 @@ static const void* body( MD5_CTX *ctx, const void *data, unsigned long size )
 	return ptr;
 }
 
-void MD5_Init( MD5_CTX *ctx )
+void md5_init( md5_ctx *ctx )
 {
 	ctx->a = 0x67452301;
 	ctx->b = 0xefcdab89;
@@ -237,9 +207,9 @@ void MD5_Init( MD5_CTX *ctx )
 	ctx->hi = 0;
 }
 
-void MD5_Update( MD5_CTX *ctx, const void *data, unsigned long size )
+void md5_update( md5_ctx *ctx, const void *data, unsigned long size )
 {
-	MD5_u32plus saved_lo;
+	md5_u32plus saved_lo;
 	unsigned long used, free;
 
 	saved_lo = ctx->lo;
@@ -271,7 +241,7 @@ void MD5_Update( MD5_CTX *ctx, const void *data, unsigned long size )
 	memcpy(ctx->buffer, data, size);
 }
 
-void MD5_Final(unsigned char *result, MD5_CTX *ctx)
+void md5_final( unsigned char *digest, md5_ctx *ctx )
 {
 	unsigned long used, free;
 
@@ -302,31 +272,31 @@ void MD5_Final(unsigned char *result, MD5_CTX *ctx)
 
 	body(ctx, ctx->buffer, 64);
 
-	result[0] = ctx->a;
-	result[1] = ctx->a >> 8;
-	result[2] = ctx->a >> 16;
-	result[3] = ctx->a >> 24;
-	result[4] = ctx->b;
-	result[5] = ctx->b >> 8;
-	result[6] = ctx->b >> 16;
-	result[7] = ctx->b >> 24;
-	result[8] = ctx->c;
-	result[9] = ctx->c >> 8;
-	result[10] = ctx->c >> 16;
-	result[11] = ctx->c >> 24;
-	result[12] = ctx->d;
-	result[13] = ctx->d >> 8;
-	result[14] = ctx->d >> 16;
-	result[15] = ctx->d >> 24;
+	digest[0] = ctx->a;
+	digest[1] = ctx->a >> 8;
+	digest[2] = ctx->a >> 16;
+	digest[3] = ctx->a >> 24;
+	digest[4] = ctx->b;
+	digest[5] = ctx->b >> 8;
+	digest[6] = ctx->b >> 16;
+	digest[7] = ctx->b >> 24;
+	digest[8] = ctx->c;
+	digest[9] = ctx->c >> 8;
+	digest[10] = ctx->c >> 16;
+	digest[11] = ctx->c >> 24;
+	digest[12] = ctx->d;
+	digest[13] = ctx->d >> 8;
+	digest[14] = ctx->d >> 16;
+	digest[15] = ctx->d >> 24;
 
 	memset(ctx, 0, sizeof(*ctx));
 }
 
-void MD5( const void *data, unsigned long size, unsigned char *digest )
+void md5( const void *data, unsigned long size, unsigned char *hash )
 {
-	MD5_CTX ctx;
+	md5_ctx ctx;
 
-	MD5_Init( &ctx );
-	MD5_Update( &ctx, data, size );
-	MD5_Final( digest, &ctx );
+	md5_init( &ctx );
+	md5_update( &ctx, data, size );
+	md5_final( hash, &ctx );
 }

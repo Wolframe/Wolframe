@@ -50,8 +50,30 @@
 extern "C" {
 #endif
 
-char *byte2hex( const unsigned char *data, size_t size, char *outStr, size_t outSize );
+/**
+ * @brief	Get the ASCII hex string for a data block
+ *
+ * @param	data	pointer to the data block
+ * @param	size	size of the data block
+ * @param	outStr	pointer to the buffer for the output string
+ * @param	outSize	size of the output buffer
+ *
+ * @return	length of the output if successful not counting the final 0
+ *		-1 if the output buffer is not large enough
+ */
+int byte2hex( const unsigned char *data, size_t size, char *outStr, size_t outSize );
 
+/**
+ * @brief	Get the data block from the ASCII hex string
+ *
+ * @param	hexStr	pointer to the ASCII hex string
+ * @param	outData	pointer to the buffer for the output data
+ * @param	outSize	size of the output buffer
+ *
+ * @return	length of the output if successful
+ *		-1 if the output buffer is not large enough
+ *		-2 if the string has invalid hex characters
+ */
 int hex2byte( const char *hexStr, unsigned char *outData, size_t outSize );
 
 #ifdef __cplusplus

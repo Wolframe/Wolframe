@@ -43,10 +43,15 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
+#ifdef _WIN32
+#include <wincrypt.h>
+#endif
+
 namespace _Wolframe {
 namespace AAAA {
 
 #ifdef _WIN32
+#include <wincrypt.h>
 	static const std::string DEFAULT_RANDOM_GENERATOR = MS_DEF_PROV;
 #else
 	static const std::string DEFAULT_RANDOM_GENERATOR = "/dev/urandom";

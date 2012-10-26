@@ -53,6 +53,8 @@
  * There's ABSOLUTELY NO WARRANTY, express or implied.
  *
  * See md5.c for more information.
+ *
+ * Modified for Wolframe by the Wolframe Team (c) 2012
  */
 
 #ifndef _MD5_H_INCLUDED
@@ -65,20 +67,20 @@ extern "C" {
 #endif
 
 /* Any 32-bit or wider unsigned integer data type will do */
-typedef unsigned int MD5_u32plus;
+typedef unsigned int md5_u32plus;
 
 typedef struct {
-	MD5_u32plus lo, hi;
-	MD5_u32plus a, b, c, d;
+	md5_u32plus lo, hi;
+	md5_u32plus a, b, c, d;
 	unsigned char buffer[64];
-	MD5_u32plus block[16];
-} MD5_CTX;
+	md5_u32plus block[16];
+} md5_ctx;
 
-void MD5_Init( MD5_CTX *ctx );
-void MD5_Update( MD5_CTX *ctx, const void *data, unsigned long size );
-void MD5_Final( unsigned char *result, MD5_CTX *ctx );
+void md5_init( md5_ctx *ctx );
+void md5_update( md5_ctx *ctx, const void *data, unsigned long size );
+void md5_final( unsigned char *digest, md5_ctx *ctx );
 
-void MD5( const void *data, unsigned long size, unsigned char *digest );
+void md5( const void *data, unsigned long size, unsigned char *hash );
 
 #ifdef __cplusplus
 }

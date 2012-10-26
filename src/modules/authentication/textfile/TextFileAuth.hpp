@@ -82,7 +82,7 @@ public:
 	User* authenticatePlain( const std::string& username, const std::string& password,
 				 bool caseSensitveUser ) const;
 
-	User* authenticate(const CRAMchallenge &username, const std::string& response,
+	User* authenticate( const CRAMchallenge &username, const std::string& response,
 			    bool caseSensitveUser ) const;
 	User* authenticate( const CRAMchallenge& challenge, const CRAMresponse& response,
 			    bool caseSensitveUser ) const;

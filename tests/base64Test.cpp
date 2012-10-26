@@ -50,7 +50,7 @@
 
 //#define _BASE64_WRITE_OUTPUT
 #define _BASE64_LOOP_TEST
-#define _BASE64_NOF_LOOPS	1024
+#define _BASE64_NOF_LOOPS	4096
 //#define _BASE64_PRINT_TEST_PARAMETRS
 
 using namespace _Wolframe;
@@ -81,16 +81,14 @@ static const size_t bufSize = 512 + 1;
 static int strEncode( const char* data, char* encoded, size_t codeSize )
 {
 	base64::Encoder E;
-	int ret = E.encodeChunk((const unsigned char *)data, strlen((const char *)data ), encoded, codeSize - 1 );
+	int ret = E.encodeChunk((const unsigned char *)data, strlen((const char *)data ), encoded, codeSize );
 	if ( ret >= 0 )	{
 		int	retEnd;
-		if (( retEnd = E.encodeEndChunk( encoded + ret, codeSize - ret - 1 )) >= 0 )
+		if (( retEnd = E.encodeEndChunk( encoded + ret, codeSize - ret )) >= 0 )
 			ret += retEnd;
 		else
 			return retEnd;
 	}
-	if ( ret >= 0 )
-		encoded[ ret ] = 0;
 	return ret;
 }
 
@@ -305,7 +303,7 @@ TEST( Base64, RandomData )
 
 		data = new unsigned char[ dataSize ];
 		encoded1 = new char[ encodedSize + 1 ];
-		encoded2 = new char[ encodedSize ];
+		encoded2 = new char[ encodedSize + 1 ];
 		decoded = new unsigned char[ dataSize + 1 ];
 
 		for ( size_t j = 0; j < dataSize; j++ )
@@ -339,7 +337,7 @@ TEST( Base64, RandomData )
 		EXPECT_GE( partialResult, 0 );
 		encodeResult += partialResult;
 		EXPECT_LE( encodeResult, encodedSize );
-		int encodeEndResult = E.encodeEndChunk( encoded1 + encodeResult, encodedSize - encodeResult );
+		int encodeEndResult = E.encodeEndChunk( encoded1 + encodeResult, encodedSize - encodeResult + 1 );
 #ifdef _BASE64_PRINT_TEST_PARAMETRS
 		std::cout << ", encoded size: " << encodeResult << " + " << encodeEndResult << std::endl;
 #endif
@@ -352,7 +350,7 @@ TEST( Base64, RandomData )
 #endif
 		EXPECT_EQ( encodeResult, encodedSize );
 
-		encodeResult = base64::encode( data, dataSize, encoded2, encodedSize, lineLength );
+		encodeResult = base64::encode( data, dataSize, encoded2, encodedSize + 1, lineLength );
 #ifdef _BASE64_WRITE_OUTPUT
 		// encoded file
 		std::ofstream edata2( "b64encoded2", std::ios_base::out | std::ios_base::binary );
