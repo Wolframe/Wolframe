@@ -53,11 +53,11 @@
 ///\brief Enumeration of protocol event types
 typedef enum
 {
-	WOLFCLI_PROT_UIFORM=	1,	//< UI form sent from server to client in the initialization phase
-	WOLFCLI_PROT_SEND_DATA=	2,	//< data with messages from the protocol to be sent to the server
-	WOLFCLI_PROT_ERROR=	3,	//< error reported by the server
+	WOLFCLI_PROT_SEND_DATA=	1,	//< data with messages from the protocol to be sent to the server
+	WOLFCLI_PROT_UIFORM=	2,	//< UI form sent from server to client in the initialization phase
+	WOLFCLI_PROT_REQUEST=	3,	//< (internal) request from client to server in a session
 	WOLFCLI_PROT_STATE=	4,	//< selected state info for the client
-	WOLFCLI_PROT_REQUEST=	5	//< (internal) request from client to server in a session
+	WOLFCLI_PROT_ERROR=	5	//< error reported by the server
 }
 wolfcli_ProtocolEventType;
 
@@ -126,22 +126,30 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler);
 typedef enum
 {
 	WOLFCLI_COMM_CONNECTED= 0,
-	WOLFCLI_COMM_READ=	1,	//< connection is ready to read
-	WOLFCLI_COMM_WRITE=	2,	//< connection is ready to write
-	WOLFCLI_COMM_TIMEOUT=	3,	//< connection got timeout
-	WOLFCLI_COMM_CLOSED=	4,	//< connection closed
-	WOLFCLI_COMM_ERROR=	5	//< connection error
+	WOLFCLI_COMM_DATA=	1,	//< connection has data to read
+	WOLFCLI_COMM_CLOSED=	2,	//< connection closed
+	WOLFCLI_COMM_STATE=	3,
+	WOLFCLI_COMM_ERROR=	4	//< connection error
 }
 wolfcli_ConnectionEventType;
+
+///\struct wolfcli_ConnectionEvent
+///\brief Structure for a connection event
+typedef struct wolfcli_ConnectionEvent_
+{
+	wolfcli_ConnectionEventType type;	//< type of the connection event
+	const char* content;			//< data of the connection event
+	size_t contentsize;			//< size of the event data in bytes
+}
+wolfcli_ConnectionEvent;
 
 ///\brief PIMPL for internal connection data structure
 typedef struct wolfcli_ConnectionStruct wolfcli_Connection;
 
 ///\brief Callback function for notifying connection events
 typedef void (*wolfcli_ConnectionEventCallback)(
-	wolfcli_Connection conn,
 	void* clientobject,
-	wolfcli_ConnectionEventType event);
+	wolfcli_ConnectionEvent* event);
 
 ///\brief Create a connection (plain tcp)
 wolfcli_Connection wolfcli_createConnection(
@@ -163,10 +171,7 @@ wolfcli_Connection wolfcli_createConnection_SSL(
 void wolfcli_destroyConnection(
 	wolfcli_Connection conn);
 
-size_t wolfcli_connection_read(
-	wolfcli_Connection conn,
-	char* buf,
-	size_t bufsize);
+size_t wolfcli_connection_read( wolfcli_Connection conn);
 
 size_t wolfcli_connection_write(
 	wolfcli_Connection conn,

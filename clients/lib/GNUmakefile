@@ -11,9 +11,26 @@ INCLUDE_CXXFLAGS =
 INCLUDE_LDFLAGS =
 
 INCLUDE_DIRS = \
-	-I.
+	-I. \
+	-I$(BOOST_INCLUDE_DIR)
 
-INCLUDE_LIBS =
+INCLUDE_LDFLAGS = \
+	-L$(BOOST_LIB_DIR)
+
+INCLUDE_LIBS = \
+	-lboost_thread$(BOOST_LIBRARY_TAG) \
+	-lboost_system
+
+# openssl
+ifeq ($(WITH_SSL),1)
+
+INCLUDE_CXXFLAGS += \
+	-DWITH_SSL
+
+INCLUDE_LIBS += \
+	$(OPENSSL_LIBS)
+endif
+
 
 STATIC_LIB = libwolframe_client.a
 
@@ -23,7 +40,10 @@ DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
 OBJS = \
-	clientlib.o
+	clientlib_protocol.o
+
+CPP_OBJS = \
+	clientlib_connect.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
