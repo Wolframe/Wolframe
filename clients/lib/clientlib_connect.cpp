@@ -37,7 +37,9 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
+#ifdef WITH_SSL
 #include <boost/asio/ssl.hpp>
+#endif
 #include <boost/shared_ptr.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -66,6 +68,7 @@ struct ContextConfig
 };
 
 
+#ifdef WITH_SSL
 struct TransportLayerSSL
 {
 	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket_type;
@@ -99,6 +102,7 @@ struct TransportLayerSSL
 		return new socket_type( io_service, ctx);
 	}
 };
+#endif
 
 struct TransportLayerPlain
 {
@@ -207,6 +211,7 @@ private:
 		boost::system::error_code ec;
 		handle_handshake( ec);
 	}
+#ifdef WITH_SSL
 	template <class TL>
 	typename boost::enable_if_c<boost::is_same<TL,TransportLayerSSL>::value,void>::type
 	handshake_()
@@ -215,6 +220,7 @@ private:
 		m_deadline_timer->expires_from_now( boost::posix_time::seconds( m_connect_timeout));
 		m_socket->async_handshake( boost::asio::ssl::stream_base::client, boost::bind(&ConnectionImpl::handle_handshake, this, _1));
 	}
+#endif
 	void handshake()
 	{
 		handshake_<TransportLayer>();
@@ -350,6 +356,7 @@ wolfcli_Connection wolfcli_createConnection(
 	}
 }
 
+#ifdef WITH_SSL
 wolfcli_Connection wolfcli_createConnection_SSL(
 	const char* address,
 	const char* name,
@@ -380,6 +387,7 @@ wolfcli_Connection wolfcli_createConnection_SSL(
 		return 0;
 	}
 }
+#endif
 
 void wolfcli_destroyConnection(
 	wolfcli_Connection conn)

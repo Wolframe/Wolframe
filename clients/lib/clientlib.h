@@ -149,7 +149,7 @@ typedef void (*wolfcli_ConnectionEventCallback)(
 	void* clientobject,
 	wolfcli_ConnectionEvent* event);
 
-///\brief Create a connection (plain tcp)
+///\brief Create a connection (plain TCP/IP)
 wolfcli_Connection wolfcli_createConnection(
 	const char* address,
 	const char* name,
@@ -158,6 +158,7 @@ wolfcli_Connection wolfcli_createConnection(
 	void* clientobject,
 	wolfcli_ConnectionEventCallback notifier);
 
+#ifdef WITH_SSL
 ///\brief Create a connection (with SSL layer)
 wolfcli_Connection wolfcli_createConnection_SSL(
 	const char* address,
@@ -169,6 +170,7 @@ wolfcli_Connection wolfcli_createConnection_SSL(
 	const char* CA_cert_file,
 	const char* client_cert_file,
 	const char* client_cert_key);
+#endif
 
 void wolfcli_destroyConnection(
 	wolfcli_Connection conn);

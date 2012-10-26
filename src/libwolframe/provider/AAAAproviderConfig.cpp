@@ -39,24 +39,13 @@
 #include "AAAAproviderImpl.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "config/valueParser.hpp"
+#include "provider/cryptdefs.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
-#ifdef _WIN32
-#include <wincrypt.h>
-#endif
-
 namespace _Wolframe {
 namespace AAAA {
-
-#ifdef _WIN32
-#include <wincrypt.h>
-	static const std::string DEFAULT_RANDOM_GENERATOR = MS_DEF_PROV;
-#else
-	static const std::string DEFAULT_RANDOM_GENERATOR = "/dev/urandom";
-#endif
-
 
 /// constructor
 AAAAconfiguration::AAAAconfiguration()
@@ -183,7 +172,7 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 				    << L1it->first << "'";
 	}
 	if ( m_randomDevice.empty() )
-		m_randomDevice = DEFAULT_RANDOM_GENERATOR;
+		m_randomDevice = DEFAULT_RANDOM_GENERATOR();
 
 	return retVal;
 }
