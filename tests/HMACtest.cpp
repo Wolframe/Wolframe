@@ -53,73 +53,73 @@ TEST( HMAC, TestVectors )
 	const char* testVec8 = "9b09ffa71b942fcb27635fbcd5b0e944bfdc63644f0713938a7f51535c3a35e2";
 
 	HMAC_SHA256	test1( "", "" );
-	HMAC_SHA256	test1_0( test1.toBase64());
+	HMAC_SHA256	test1_0( test1.toString());
 
 	HMAC_SHA256	test2( "key", "The quick brown fox jumps over the lazy dog" );
-	HMAC_SHA256	test2_0( test2.toBase64());
+	HMAC_SHA256	test2_0( test2.toString());
 
 	unsigned char	key3[ 20 ];
 	memset( key3, 0x0b, 20 );
 	HMAC_SHA256	test3( key3, 20, "Hi There" );
-	HMAC_SHA256	test3_0( test3.toBase64());
+	HMAC_SHA256	test3_0( test3.toString());
 
 	HMAC_SHA256	test4( "Jefe", "what do ya want for nothing?" );
-	HMAC_SHA256	test4_0( test4.toBase64());
+	HMAC_SHA256	test4_0( test4.toString());
 
 	unsigned char	key5[ 20 ];
 	memset( key5, 0xaa, 20 );
 	unsigned char	data5[ 50 ];
 	memset( data5, 0xdd, 50 );
 	HMAC_SHA256	test5( key5, 20, data5, 50 );
-	HMAC_SHA256	test5_0( test5.toBase64());
+	HMAC_SHA256	test5_0( test5.toString());
 
 	unsigned char	key6[ 25 ];
 	for ( unsigned char i = 0; i < 25; i++ ) key6[ i ] = i + 1;
 	unsigned char	data6[ 50 ];
 	memset( data6, 0xcd, 50 );
 	HMAC_SHA256	test6( key6, 25, data6, 50 );
-	HMAC_SHA256	test6_0( test6.toBase64());
+	HMAC_SHA256	test6_0( test6.toString());
 
 	unsigned char	key7[ 131 ];
 	memset( key7, 0xaa, 131 );
 	HMAC_SHA256	test7( key7, 131, "Test Using Larger Than Block-Size Key - Hash Key First" );
-	HMAC_SHA256	test7_0( test7.toBase64());
+	HMAC_SHA256	test7_0( test7.toString());
 
 	unsigned char	key8[ 131 ];
 	memset( key8, 0xaa, 131 );
 	HMAC_SHA256	test8( key8, 131, "This is a test using a larger than block-size key and a larger than block-size data. The key needs to be hashed before being used by the HMAC algorithm." );
-	HMAC_SHA256	test8_0( test8.toBase64());
+	HMAC_SHA256	test8_0( test8.toString());
 
 	EXPECT_STRCASEEQ( testVec1, test1.toBCD().c_str() );
-	EXPECT_TRUE( test1 == testVec1 );
+	EXPECT_TRUE( test1 == test1_0.toString() );
 	EXPECT_TRUE( test1 == test1_0 );
 
 	EXPECT_STRCASEEQ( testVec2, test2.toBCD().c_str() );
-	EXPECT_TRUE( test2 == testVec2 );
+	EXPECT_TRUE( test2 == test2_0.toString() );
 	EXPECT_TRUE( test2 == test2_0 );
 
 	EXPECT_STRCASEEQ( testVec3, test3.toBCD().c_str() );
-	EXPECT_TRUE( test3 == testVec3 );
+	EXPECT_TRUE( test3 == test3_0.toString() );
 	EXPECT_TRUE( test3 == test3_0 );
 
 	EXPECT_STRCASEEQ( testVec4, test4.toBCD().c_str() );
-	EXPECT_TRUE( test4 == testVec4 );
+	EXPECT_TRUE( test4 == test4_0.toString() );
 	EXPECT_TRUE( test4 == test4_0 );
 
 	EXPECT_STRCASEEQ( testVec5, test5.toBCD().c_str() );
-	EXPECT_TRUE( test5 == testVec5 );
+	EXPECT_TRUE( test5 == test5_0.toString() );
 	EXPECT_TRUE( test5 == test5_0 );
 
 	EXPECT_STRCASEEQ( testVec6, test6.toBCD().c_str() );
-	EXPECT_TRUE( test6 == testVec6 );
+	EXPECT_TRUE( test6 == test6_0.toString() );
 	EXPECT_TRUE( test6 == test6_0 );
 
 	EXPECT_STRCASEEQ( testVec7, test7.toBCD().c_str() );
-	EXPECT_TRUE( test7 == testVec7 );
+	EXPECT_TRUE( test7 == test7_0.toString() );
 	EXPECT_TRUE( test7 == test7_0 );
 
 	EXPECT_STRCASEEQ( testVec8, test8.toBCD().c_str() );
-	EXPECT_TRUE( test8 == testVec8 );
+	EXPECT_TRUE( test8 == test8_0.toString() );
 	EXPECT_TRUE( test8 == test8_0 );
 }
 
