@@ -42,8 +42,13 @@ using namespace _Wolframe::client;
 ProtocolHandler::ProtocolHandler()
 	:m_impl(0)
 {
-	m_impl = wolfcli_createProtocolHandler( &ProtocolHandler::notifier, this);
-	if (!m_impl) throw std::runtime_error( m_lasterror);
+	m_impl = wolfcli_createProtocolHandler( &ProtocolHandler::eventhandler, this);
+	if (!m_impl) throw std::bad_alloc();
+}
+
+ProtocolHandler::~ProtocolHandler()
+{
+	if (m_impl) wolfcli_destroyProtocolHandler( m_impl);
 }
 
 void ProtocolHandler::pushData( const char* data, std::size_t datasize)
@@ -73,6 +78,7 @@ const char* ProtocolHandler::eventTypeName( wolfcli_ProtocolEventType type)
 		case WOLFCLI_PROT_ANSWER:	return "ANSWER";
 		case WOLFCLI_PROT_STATE:	return "STATE";
 		case WOLFCLI_PROT_ERROR:	return "ERROR";
+		case WOLFCLI_PROT_BADALLOC:	return "BADALLOC";
 	}
 	return "(null)";
 }
@@ -84,7 +90,21 @@ std::string ProtocolHandler::eventstring( const wolfcli_ProtocolEvent* event)
 	return msg.str();
 }
 
-void ProtocolHandler::notifier( const wolfcli_ProtocolEvent* event)
+int ProtocolHandler::eventhandler( void* this_, const wolfcli_ProtocolEvent* event)
+{
+	try
+	{
+		((ProtocolHandler*)this_)->eventhandler( event);
+		return 0;
+	}
+	catch (const std::bad_alloc&)
+	{
+		((ProtocolHandler*)this_)->notifyBadAlloc();
+		return -1;
+	}
+}
+
+void ProtocolHandler::eventhandler( const wolfcli_ProtocolEvent* event)
 {
 	switch (event->type)
 	{
@@ -95,9 +115,9 @@ void ProtocolHandler::notifier( const wolfcli_ProtocolEvent* event)
 			receiveUIForm( event->content, event->contentsize);
 			break;
 		case WOLFCLI_PROT_REQUEST:
-			throw std::logic_error("request should not get here (notifier)");
+			throw std::logic_error("request should not get here (ProtocolHandler::eventhandler)");
 		case WOLFCLI_PROT_ANSWER:
-			if (!m_rhqueue.empty()) std::logic_error("answer without request (notifier)");
+			if (!m_rhqueue.empty()) std::logic_error("answer without request (ProtocolHandler::eventhandler)");
 			(*m_rhqueue.begin())->handleAnswer( event->content, event->contentsize);
 			m_rhqueue.erase( m_rhqueue.begin());
 			break;
@@ -105,10 +125,84 @@ void ProtocolHandler::notifier( const wolfcli_ProtocolEvent* event)
 			notifyState( std::string( event->content, event->contentsize));
 			break;
 		case WOLFCLI_PROT_ERROR:
-			m_lasterror = std::string( event->id?event->id:"") + ": " + std::string( event->content, event->contentsize);
-			if (m_impl) notifyError( eventstring( event));
+			notifyError( eventstring( event));
+			break;
+		case WOLFCLI_PROT_BADALLOC:
+			notifyBadAlloc();
+			break;
 	}
-	if (m_impl) debugMessage( eventstring( event));
+}
+
+
+ConnectionHandler::~ConnectionHandler()
+{
+	if (m_impl) wolfcli_destroyConnection( m_impl);
+}
+
+void ConnectionHandler::sendData( const char* data, std::size_t datasize)
+{
+	if (!m_impl) throw std::runtime_error( "no connection (sendData)");
+	wolfcli_connection_write( m_impl, data, datasize);
+}
+
+const char* ConnectionHandler::eventTypeName( wolfcli_ConnectionEventType type)
+{
+	switch (type)
+	{
+		case WOLFCLI_CONN_CONNECTED:	return "CONNECTED";
+		case WOLFCLI_CONN_DATA:		return "DATA";
+		case WOLFCLI_CONN_CLOSED:	return "CLOSED";
+		case WOLFCLI_CONN_STATE:	return "STATE";
+		case WOLFCLI_CONN_ERROR:	return "ERROR";
+		case WOLFCLI_CONN_BADALLOC:	return "BADALLOC";
+	}
+	return "(unknown)";
+}
+
+std::string ConnectionHandler::eventstring( const wolfcli_ConnectionEvent* event)
+{
+	std::ostringstream msg;
+	msg << eventTypeName( event->type) << " '" << std::string( event->content, event->contentsize) << "'";
+	return msg.str();
+}
+
+int ConnectionHandler::eventhandler( void* this_, const wolfcli_ConnectionEvent* event)
+{
+	try
+	{
+		((ConnectionHandler*)this_)->eventhandler( event);
+		return 0;
+	}
+	catch (const std::bad_alloc&)
+	{
+		((ConnectionHandler*)this_)->notifyBadAlloc();
+		return -1;
+	}
+}
+
+void ConnectionHandler::eventhandler( const wolfcli_ConnectionEvent* event)
+{
+	switch (event->type)
+	{
+		case WOLFCLI_CONN_CONNECTED:
+//!!! HIER WEITER
+			break;
+		case WOLFCLI_CONN_DATA:
+			pushData( event->content, event->contentsize);
+			break;
+		case WOLFCLI_CONN_CLOSED:
+//!!! HIER WEITER
+			break;
+		case WOLFCLI_CONN_STATE:
+			notifyState( std::string( event->content, event->contentsize));
+			break;
+		case WOLFCLI_CONN_ERROR:
+			notifyError( eventstring( event));
+			break;
+		case WOLFCLI_CONN_BADALLOC:
+			notifyBadAlloc();
+			break;
+	}
 }
 
 

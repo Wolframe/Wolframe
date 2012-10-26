@@ -57,7 +57,8 @@ typedef enum
 	WOLFCLI_PROT_REQUEST=	3,	//< (internal) request from client to server in a session
 	WOLFCLI_PROT_ANSWER=	4,	//< answer of a requset from the server to the client in a session
 	WOLFCLI_PROT_STATE=	5,	//< selected state info for the client
-	WOLFCLI_PROT_ERROR=	6	//< error reported by the server
+	WOLFCLI_PROT_ERROR=	6,	//< error reported by the server
+	WOLFCLI_PROT_BADALLOC=	7
 }
 wolfcli_ProtocolEventType;
 
@@ -76,7 +77,7 @@ wolfcli_ProtocolEvent;
 typedef struct wolfcli_ProtocolHandlerStruct* wolfcli_ProtocolHandler;
 
 ///\brief Callback function type for the notification of protocol events to the client
-typedef void (*wolfcli_ProtocolEventCallback)( void* clientobject, const wolfcli_ProtocolEvent* event);
+typedef int (*wolfcli_ProtocolEventCallback)( void* clientobject, const wolfcli_ProtocolEvent* event);
 
 ///\brief Constructor of a protocol event handler
 wolfcli_ProtocolHandler wolfcli_createProtocolHandler(
@@ -128,7 +129,8 @@ typedef enum
 	WOLFCLI_CONN_DATA=	1,	//< connection has data to read
 	WOLFCLI_CONN_CLOSED=	2,	//< connection closed
 	WOLFCLI_CONN_STATE=	3,
-	WOLFCLI_CONN_ERROR=	4	//< connection error
+	WOLFCLI_CONN_ERROR=	4,	//< connection error
+	WOLFCLI_CONN_BADALLOC=	5	//< allocation error
 }
 wolfcli_ConnectionEventType;
 
@@ -146,11 +148,11 @@ wolfcli_ConnectionEvent;
 typedef struct wolfcli_ConnectionStruct* wolfcli_Connection;
 
 ///\brief Callback function for notifying connection events
-typedef void (*wolfcli_ConnectionEventCallback)(
+typedef int (*wolfcli_ConnectionEventCallback)(
 	void* clientobject,
 	const wolfcli_ConnectionEvent* event);
 
-///\brief Create a connection (plain tcp)
+///\brief Create a connection (plain TCP/IP)
 wolfcli_Connection wolfcli_createConnection(
 	const char* address,
 	const char* name,
@@ -159,6 +161,7 @@ wolfcli_Connection wolfcli_createConnection(
 	void* clientobject,
 	wolfcli_ConnectionEventCallback notifier);
 
+#ifdef WITH_SSL
 ///\brief Create a connection (with SSL layer)
 wolfcli_Connection wolfcli_createConnection_SSL(
 	const char* address,
@@ -170,6 +173,7 @@ wolfcli_Connection wolfcli_createConnection_SSL(
 	const char* CA_cert_file,
 	const char* client_cert_file,
 	const char* client_cert_key);
+#endif
 
 void wolfcli_destroyConnection(
 	wolfcli_Connection conn);

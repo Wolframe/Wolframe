@@ -245,6 +245,8 @@ static void bufferConsume( Buffer* buffer, size_t pos)
 	}
 }
 
+static wolfcli_ProtocolEvent g_badAllocEvent = {WOLFCLI_PROT_BADALLOC, 0, 0, 0};
+
 wolfcli_ProtocolHandler wolfcli_createProtocolHandler(
 	wolfcli_ProtocolEventCallback notifier_,
 	void* clientobject_)
@@ -403,10 +405,12 @@ static int sendLine( wolfcli_ProtocolHandler handler, const char* msg, const cha
 	linebuf[ msgsize] = '\r';
 	linebuf[ msgsize+1] = '\n';
 	event = createProtocolEvent( WOLFCLI_PROT_SEND_DATA, 0, linebuf, msgsize+2);
-	if (!event) goto _ERROR;
-	handler->eventNotifier( handler->clientobject, event);
+	if (!event) goto _BADALLOC;
+	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
 	destroyProtocolEvent( event);
 	return 1;
+_BADALLOC:
+	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
 _ERROR:
 	if (!event) destroyProtocolEvent( event);
 	return 0;
@@ -420,11 +424,13 @@ static int sendDocument( wolfcli_ProtocolHandler handler, char* id, char* doc, s
 
 	if (!getContentEscaped( &docbuffer, doc, docsize)) goto _ERROR;
 	event = createProtocolEvent( WOLFCLI_PROT_SEND_DATA, id, docbuffer.ptr, docbuffer.size);
-	if (!event) goto _ERROR;
-	handler->eventNotifier( handler->clientobject, event);
+	if (!event) goto _BADALLOC;
+	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
 	resetBuffer( &docbuffer, 0);
 	destroyProtocolEvent( event);
 	return 1;
+_BADALLOC:
+	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
 _ERROR:
 	resetBuffer( &docbuffer, 0);
 	if (!event) destroyProtocolEvent( event);
@@ -435,37 +441,57 @@ _ERROR:
 static int notifyError( wolfcli_ProtocolHandler handler, const char* id)
 {
 	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_ERROR, id, 0, 0);
-	if (!event) return 0;
-	handler->eventNotifier( handler->clientobject, event);
+	if (!event) goto _BADALLOC;
+	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
 	destroyProtocolEvent( event);
 	return 1;
+_BADALLOC:
+	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
+_ERROR:
+	if (!event) destroyProtocolEvent( event);
+	return 0;
 }
 
 static int notifyErrorMessage( wolfcli_ProtocolHandler handler, const char* id, const char* msg)
 {
 	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_ERROR, id, msg, msg?strlen(msg):0);
-	if (!event) return 0;
-	handler->eventNotifier( handler->clientobject, event);
+	if (!event) goto _BADALLOC;
+	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
 	destroyProtocolEvent( event);
 	return 1;
+_BADALLOC:
+	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
+_ERROR:
+	if (!event) destroyProtocolEvent( event);
+	return 0;
 }
 
 static int notifyState( wolfcli_ProtocolHandler handler, const char* id)
 {
 	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_STATE, id, 0, 0);
-	if (!event) return 0;
-	handler->eventNotifier( handler->clientobject, event);
+	if (!event) goto _BADALLOC;
+	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
 	destroyProtocolEvent( event);
 	return 1;
+_BADALLOC:
+	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
+_ERROR:
+	if (!event) destroyProtocolEvent( event);
+	return 0;
 }
 
 static int notifyUIForm( wolfcli_ProtocolHandler handler)
 {
 	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_UIFORM, handler->statearg.ptr, handler->docbuffer.ptr, handler->docbuffer.size);
-	if (!event) return 0;
-	handler->eventNotifier( handler->clientobject, event);
+	if (!event) goto _BADALLOC;
+	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
 	destroyProtocolEvent( event);
 	return 1;
+_BADALLOC:
+	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
+_ERROR:
+	if (!event) destroyProtocolEvent( event);
+	return 0;
 }
 
 int wolfcli_protocol_pushRequest( wolfcli_ProtocolHandler handler, const char* data, size_t datasize)

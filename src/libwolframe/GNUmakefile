@@ -43,6 +43,7 @@ PROVIDER_OBJS = \
 	provider/Authentication.o \
 	provider/Authorization.o \
 	provider/Audit.o \
+	provider/cryptdefs.o \
 	provider/AAAAproviderImpl.o \
 	provider/AAAAproviderConfig.o \
 	provider/DBproviderImpl.o \

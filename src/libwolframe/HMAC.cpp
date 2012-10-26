@@ -55,47 +55,47 @@ void HMAC_SHA256::init( const unsigned char *key, size_t keyLen,
 			const unsigned char *msg, size_t msgLen )
 {
 	unsigned char	pad[ HMAC_BLOCK_SIZE ];
-	unsigned char	intKey[ HMAC_BLOCK_SIZE ];
-	unsigned char	hash[ HMAC_DIGEST_SIZE ];
+	unsigned char	normalizedKey[ HMAC_BLOCK_SIZE ];
+	unsigned char	intermediateHash[ HMAC_DIGEST_SIZE ];
 
 	sha256_ctx	ctx;
 
-	memset( intKey, 0, HMAC_BLOCK_SIZE );
+	memset( normalizedKey, 0, HMAC_BLOCK_SIZE );
 	if ( keyLen > HMAC_BLOCK_SIZE )	{
-		sha256( key, keyLen, intKey );
+		sha256( key, keyLen, normalizedKey );
 		// This is non-standard
 		//		sha512( key, keyLen, intKey );
 	}
 	else	{
 		for ( size_t i = 0; i < keyLen; i ++ )
-			intKey[ i ] = key[ i ];
+			normalizedKey[ i ] = key[ i ];
 	}
 
 	memset( pad, 0x36, HMAC_BLOCK_SIZE );
 	for ( size_t i = 0; i < HMAC_BLOCK_SIZE; i ++ )
-		pad[ i ] ^= intKey[ i ];
+		pad[ i ] ^= normalizedKey[ i ];
 	sha256_init( &ctx );
 	sha256_update( &ctx, pad, HMAC_BLOCK_SIZE );
 	sha256_update( &ctx, msg, msgLen );
-	sha256_final( &ctx, hash );
+	sha256_final( &ctx, intermediateHash );
 
 	memset( pad, 0x5c, HMAC_BLOCK_SIZE );
 	for ( size_t i = 0; i < HMAC_BLOCK_SIZE; i ++ )
-		pad[ i ] ^= intKey[ i ];
+		pad[ i ] ^= normalizedKey[ i ];
 	sha256_init( &ctx );
 	sha256_update( &ctx, pad, HMAC_BLOCK_SIZE );
-	sha256_update( &ctx, hash, HMAC_DIGEST_SIZE );
+	sha256_update( &ctx, intermediateHash, HMAC_DIGEST_SIZE );
 	sha256_final( &ctx, m_HMAC );
 }
 
-HMAC_SHA256::HMAC_SHA256( const std::string& hash )
+HMAC_SHA256::HMAC_SHA256( const std::string& digest )
 {
 	memset( m_HMAC, 0, HMAC_DIGEST_SIZE );
 
 	int ret;
-	if (( ret = base64_decode( hash.data(), hash.size(),
+	if (( ret = base64_decode( digest.data(), digest.size(),
 				   m_HMAC, HMAC_DIGEST_SIZE )) < 0 )	{
-		std::string errMsg = "Cannot convert '" + hash + "' to a HMAC-SHA256";
+		std::string errMsg = "Cannot convert '" + digest + "' to a HMAC-SHA256";
 		throw std::runtime_error( errMsg );
 	}
 }
@@ -111,7 +111,7 @@ std::string HMAC_SHA256::toBCD() const
 	return std::string( buffer );
 }
 
-std::string HMAC_SHA256::toBase64() const
+std::string HMAC_SHA256::toString() const
 {
 	char	buffer[ HMAC_BASE64_SIZE ];
 
@@ -134,7 +134,8 @@ bool HMAC_SHA256::operator == ( const std::string& rhs ) const
 {
 	unsigned char	buffer[ HMAC_DIGEST_SIZE ];
 
-	if ( hex2byte( rhs.data(), buffer, HMAC_DIGEST_SIZE ) != (int)HMAC_DIGEST_SIZE )
+	memset( buffer, 0, HMAC_DIGEST_SIZE );
+	if ( base64_decode( rhs.data(), rhs.size(), buffer, HMAC_DIGEST_SIZE ) < 0 )
 		return false;
 	return !memcmp( this->m_HMAC, buffer, HMAC_DIGEST_SIZE );
 }

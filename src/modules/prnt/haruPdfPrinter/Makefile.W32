@@ -45,6 +45,8 @@ $(DYNAMIC_MODULE): $(CPP_OBJS)
 local_all:
 
 local_clean:
+	@-erase $(DYNAMIC_MODULE) 2>NUL
+	@-erase $(CPP_OBJS) 2>NUL
 
 local_distclean:
 

@@ -52,7 +52,7 @@ struct RequestHandler
 	virtual void handleError( const std::string& msg);
 };
 
-struct SessionHandler
+struct SessionHandlerBase
 {
 	virtual void doRequest( RequestHandler* handler, const char* data, std::size_t datasize)=0;
 	virtual void receiveUIForm( const char* data, std::size_t datasize)=0;
@@ -61,14 +61,14 @@ struct SessionHandler
 	virtual void debugMessage( const std::string& msg)=0;
 	virtual void notifyState( const std::string& msg)=0;
 	virtual void notifyError( const std::string& msg)=0;
+	virtual void notifyBadAlloc()=0;
 };
 
-class ProtocolHandler :virtual SessionHandler
+class ProtocolHandler :virtual SessionHandlerBase
 {
 public:
 	ProtocolHandler();
-
-	virtual ~ProtocolHandler(){}
+	virtual ~ProtocolHandler();
 
 	virtual void pushData( const char* data, std::size_t datasize);
 	virtual void doRequest( RequestHandler* handler, const char* data, std::size_t datasize);
@@ -76,11 +76,8 @@ public:
 private:
 	static const char* eventTypeName( wolfcli_ProtocolEventType type);
 	static std::string eventstring( const wolfcli_ProtocolEvent* event);
-	static void notifier( void* this_, const wolfcli_ProtocolEvent* event)
-	{
-		((ProtocolHandler*)this_)->notifier( event);
-	}
-	void notifier( const wolfcli_ProtocolEvent* event);
+	static int eventhandler( void* this_, const wolfcli_ProtocolEvent* event);
+	void eventhandler( const wolfcli_ProtocolEvent* event);
 
 private:
 	wolfcli_ProtocolHandler m_impl;
@@ -89,16 +86,22 @@ private:
 };
 
 
-class ConnectionHandler :virtual SessionHandler
+class ConnectionHandler :virtual SessionHandlerBase
 {
 public:
 	ConnectionHandler();
+	virtual ~ConnectionHandler();
 
-	virtual ~ConnectionHandler(){}
+	virtual void sendData( const char* data, std::size_t datasize);
 
-	virtual void pushData( const char* data, std::size_t datasize);
-	virtual void doRequest( RequestHandler* handler, const char* data, std::size_t datasize);
 private:
+	static const char* eventTypeName( wolfcli_ConnectionEventType type);
+	static std::string eventstring( const wolfcli_ConnectionEvent* event);
+	static int eventhandler( void* this_, const wolfcli_ConnectionEvent* event);
+	void eventhandler( const wolfcli_ConnectionEvent* event);
+
+private:
+	wolfcli_Connection m_impl;
 };
 
 

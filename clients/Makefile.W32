@@ -1,7 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = cli
-#PF:DISABLED (work in progress): lib
+SUBDIRS = cli lib
 
 !IFDEF WITH_QT
 SUBDIRS = \
