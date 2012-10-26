@@ -8,20 +8,40 @@ INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
 
 INCLUDE_DIRS = \
-	/I.
+	/I. \
+	/I"$(BOOST_INCLUDE_DIR)"
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS = \
+	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+
+INCLUDE_LIBS = \
+	Advapi32.lib Ws2_32.lib
+
+# openssl
+!IFDEF WITH_SSL
+
+INCLUDE_DIRS = \
+	$(INCLUDE_DIRS)	/I"$(OPENSSL_DIR)\include"
+
+INCLUDE_CXXFLAGS = \
+	$(INCLUDE_CXXFLAGS) /DWITH_SSL
 
 INCLUDE_LDFLAGS = \
-	$(BOOST_LDFLAGS)
+	$(INCLUDE_LDFLAGS) /LIBPATH:"$(OPENSSL_DIR)\lib"
 
-INCLUDE_LIBS =
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
+!ENDIF
 
 LIBRARIES = \
 	libwolframe_client.lib
 
-LOGGER_OBJS = \
-
 OBJS = \
-	clientlib.obj
+	clientlib_protocol.obj
+
+CPP_OBJS = \
+	clientlib_connect.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 
