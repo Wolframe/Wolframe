@@ -66,7 +66,6 @@ wolfcli_ProtocolEventType;
 typedef struct wolfcli_ProtocolEvent_
 {
 	wolfcli_ProtocolEventType type;	//< type of the protocol event
-	int context;			//< context identifier given by the caller
 	char* id;			//< protocol event identifier
 	char* content;			//< data of the protocol event
 	size_t contentsize;		//< size of the event data in bytes
@@ -97,7 +96,6 @@ int wolfcli_protocol_pushData(
 ///\brief Method to push a request to the server that will be served when the session is established
 int wolfcli_protocol_pushRequest(
 	wolfcli_ProtocolHandler handler,		//< protocol event handler
-	unsigned int context,				//< context identifier
 	const char* data,				//< request data (decrypted plain data)
 	size_t datasize);				//< size of data in bytes
 
@@ -125,11 +123,11 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler);
 ///\brief Enumeration of connection event types
 typedef enum
 {
-	WOLFCLI_COMM_CONNECTED= 0,
-	WOLFCLI_COMM_DATA=	1,	//< connection has data to read
-	WOLFCLI_COMM_CLOSED=	2,	//< connection closed
-	WOLFCLI_COMM_STATE=	3,
-	WOLFCLI_COMM_ERROR=	4	//< connection error
+	WOLFCLI_CONN_CONNECTED= 0,
+	WOLFCLI_CONN_DATA=	1,	//< connection has data to read
+	WOLFCLI_CONN_CLOSED=	2,	//< connection closed
+	WOLFCLI_CONN_STATE=	3,
+	WOLFCLI_CONN_ERROR=	4	//< connection error
 }
 wolfcli_ConnectionEventType;
 
@@ -144,7 +142,7 @@ typedef struct wolfcli_ConnectionEvent_
 wolfcli_ConnectionEvent;
 
 ///\brief PIMPL for internal connection data structure
-typedef struct wolfcli_ConnectionStruct wolfcli_Connection;
+typedef struct wolfcli_ConnectionStruct* wolfcli_Connection;
 
 ///\brief Callback function for notifying connection events
 typedef void (*wolfcli_ConnectionEventCallback)(
@@ -155,6 +153,8 @@ typedef void (*wolfcli_ConnectionEventCallback)(
 wolfcli_Connection wolfcli_createConnection(
 	const char* address,
 	const char* name,
+	unsigned short connect_timeout,
+	unsigned short read_timeout,
 	void* clientobject,
 	wolfcli_ConnectionEventCallback notifier);
 
@@ -162,6 +162,8 @@ wolfcli_Connection wolfcli_createConnection(
 wolfcli_Connection wolfcli_createConnection_SSL(
 	const char* address,
 	const char* name,
+	unsigned short connect_timeout,
+	unsigned short read_timeout,
 	void* clientobject,
 	wolfcli_ConnectionEventCallback notifier,
 	const char* CA_cert_file,
@@ -171,9 +173,9 @@ wolfcli_Connection wolfcli_createConnection_SSL(
 void wolfcli_destroyConnection(
 	wolfcli_Connection conn);
 
-size_t wolfcli_connection_read( wolfcli_Connection conn);
+void wolfcli_connection_read( wolfcli_Connection conn);
 
-size_t wolfcli_connection_write(
+void wolfcli_connection_write(
 	wolfcli_Connection conn,
 	const char* data,
 	size_t datasize);

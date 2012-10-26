@@ -95,7 +95,6 @@ static void destroyProtocolEvent( wolfcli_ProtocolEvent* event)
 
 static wolfcli_ProtocolEvent* createProtocolEvent(
 	wolfcli_ProtocolEventType type_,
-	int context_,
 	const char* id_,
 	const void* content_,
 	size_t contentsize_)
@@ -116,7 +115,6 @@ static wolfcli_ProtocolEvent* createProtocolEvent(
 		memcpy( rt->id, id_, idsize);
 	}
 	rt->type = type_;
-	rt->context = context_;
 	return rt;
 ERROR:
 	destroyProtocolEvent( rt);
@@ -403,7 +401,7 @@ static int sendLine( wolfcli_ProtocolHandler handler, const char* msg, const cha
 	}
 	linebuf[ msgsize] = '\r';
 	linebuf[ msgsize+1] = '\n';
-	event = createProtocolEvent( WOLFCLI_PROT_SEND_DATA, 0, 0, linebuf, msgsize+2);
+	event = createProtocolEvent( WOLFCLI_PROT_SEND_DATA, 0, linebuf, msgsize+2);
 	if (!event) goto _ERROR;
 	handler->eventNotifier( handler->clientobject, event);
 	destroyProtocolEvent( event);
@@ -413,14 +411,14 @@ _ERROR:
 	return 0;
 }
 
-static int sendDocument( wolfcli_ProtocolHandler handler, int context, char* id, char* doc, size_t docsize)
+static int sendDocument( wolfcli_ProtocolHandler handler, char* id, char* doc, size_t docsize)
 {
 	wolfcli_ProtocolEvent* event = NULL;
 	Buffer docbuffer;
 	initBuffer( &docbuffer, 0);
 
 	if (!getContentEscaped( &docbuffer, doc, docsize)) goto _ERROR;
-	event = createProtocolEvent( WOLFCLI_PROT_SEND_DATA, context, id, docbuffer.ptr, docbuffer.size);
+	event = createProtocolEvent( WOLFCLI_PROT_SEND_DATA, id, docbuffer.ptr, docbuffer.size);
 	if (!event) goto _ERROR;
 	handler->eventNotifier( handler->clientobject, event);
 	resetBuffer( &docbuffer, 0);
@@ -435,16 +433,16 @@ _ERROR:
 
 static int notifyError( wolfcli_ProtocolHandler handler, const char* id)
 {
-	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_ERROR, 0, id, 0, 0);
+	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_ERROR, id, 0, 0);
 	if (!event) return 0;
 	handler->eventNotifier( handler->clientobject, event);
 	destroyProtocolEvent( event);
 	return 1;
 }
 
-static int notifyErrorMessage( wolfcli_ProtocolHandler handler, const char* id, int context, const char* msg)
+static int notifyErrorMessage( wolfcli_ProtocolHandler handler, const char* id, const char* msg)
 {
-	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_ERROR, context, id, msg, msg?strlen(msg):0);
+	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_ERROR, id, msg, msg?strlen(msg):0);
 	if (!event) return 0;
 	handler->eventNotifier( handler->clientobject, event);
 	destroyProtocolEvent( event);
@@ -453,7 +451,7 @@ static int notifyErrorMessage( wolfcli_ProtocolHandler handler, const char* id, 
 
 static int notifyState( wolfcli_ProtocolHandler handler, const char* id)
 {
-	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_STATE, 0, id, 0, 0);
+	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_STATE, id, 0, 0);
 	if (!event) return 0;
 	handler->eventNotifier( handler->clientobject, event);
 	destroyProtocolEvent( event);
@@ -462,17 +460,17 @@ static int notifyState( wolfcli_ProtocolHandler handler, const char* id)
 
 static int notifyUIForm( wolfcli_ProtocolHandler handler)
 {
-	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_UIFORM, 0, handler->statearg.ptr, handler->docbuffer.ptr, handler->docbuffer.size);
+	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_UIFORM, handler->statearg.ptr, handler->docbuffer.ptr, handler->docbuffer.size);
 	if (!event) return 0;
 	handler->eventNotifier( handler->clientobject, event);
 	destroyProtocolEvent( event);
 	return 1;
 }
 
-int wolfcli_protocol_pushRequest( wolfcli_ProtocolHandler handler, unsigned int context, const char* data, size_t datasize)
+int wolfcli_protocol_pushRequest( wolfcli_ProtocolHandler handler, const char* data, size_t datasize)
 {
 	int rt;
-	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_REQUEST, context, 0, data, datasize);
+	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_REQUEST, 0, data, datasize);
 	if (!event) return 0;
 	rt = queuePut( &handler->requestqueue, event);
 	if (!rt) destroyProtocolEvent( event);
@@ -541,7 +539,7 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 			else if (isequal( arg.ptr[0], "ERR"))
 			{
 				msg = (arg.size == 1)?0:arg.ptr[1];
-				if (!notifyErrorMessage( handler, "AUTH command failed", 0, msg)) goto _ERROR;
+				if (!notifyErrorMessage( handler, "AUTH command failed", msg)) goto _ERROR;
 				handler->state = WOLFCLI_STATE_INIT;
 				continue;
 			}
@@ -565,7 +563,7 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 			else if (isequal( arg.ptr[0], "ERR"))
 			{
 				msg = (arg.size == 1)?0:arg.ptr[1];
-				if (!notifyErrorMessage( handler, "refused", 0, msg)) goto _ERROR;
+				if (!notifyErrorMessage( handler, "refused", msg)) goto _ERROR;
 				goto _CLOSED;
 			}
 
@@ -578,7 +576,7 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 				const char* formid;
 				if (arg.size == 1)
 				{
-					if (!notifyErrorMessage( handler, "protocol", 0, "UIFORM missing argument")) goto _ERROR;
+					if (!notifyErrorMessage( handler, "protocol", "UIFORM missing argument")) goto _ERROR;
 					goto _CLOSED;
 				}
 				else
@@ -601,7 +599,7 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 			else if (isequal( arg.ptr[0], "ERR"))
 			{
 				msg = (arg.size == 1)?0:arg.ptr[1];
-				if (!notifyErrorMessage( handler, "UI formloader", 0, msg)) goto _ERROR;
+				if (!notifyErrorMessage( handler, "UI formloader", msg)) goto _ERROR;
 				goto _CLOSED;
 			}
 
@@ -626,7 +624,7 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 		case WOLFCLI_STATE_SESSION:
 			event = queueGet( &handler->requestqueue);
 			if (!event) goto _IDLE;
-			success = sendDocument( handler, event->context, event->id, event->content, event->contentsize);
+			success = sendDocument( handler, event->id, event->content, event->contentsize);
 			destroyProtocolEvent( event);
 			if (!success) goto _ERROR;
 			continue;
