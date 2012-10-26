@@ -31,22 +31,21 @@
 
 ************************************************************************/
 ///\file clientlib.h
-///\brief C client library protocol interface
-//
-// Provide an abstraction of the wolframe client statemachine, so that the client
-// can process complete data items (UI-forms, requests, answers).
-// The idea is that the client creates an object that describes what type of session
-// should be established.
-// When the session is established the client pushes requests. Callbacks are used to notify
-// the client with the answers and resulting events with complete data.
-//
+///\brief C client library interface
 
-#ifndef _WOLFRAME_CLIENTLIB_HPP_INCLUDED
-#define _WOLFRAME_CLIENTLIB_HPP_INCLUDED
+#ifndef _WOLFRAME_CLIENTLIB_H_INCLUDED
+#define _WOLFRAME_CLIENTLIB_H_INCLUDED
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ///\defgroup protocol
+///\brief Interface to the client protocol handling.
+// Provides an abstraction of the wolframe client protocol statemachine
+// to process complete data items.
 ///@{
 
 ///\struct wolfcli_ProtocolEventType
@@ -56,8 +55,9 @@ typedef enum
 	WOLFCLI_PROT_SEND_DATA=	1,	//< data with messages from the protocol to be sent to the server
 	WOLFCLI_PROT_UIFORM=	2,	//< UI form sent from server to client in the initialization phase
 	WOLFCLI_PROT_REQUEST=	3,	//< (internal) request from client to server in a session
-	WOLFCLI_PROT_STATE=	4,	//< selected state info for the client
-	WOLFCLI_PROT_ERROR=	5	//< error reported by the server
+	WOLFCLI_PROT_ANSWER=	4,	//< answer of a requset from the server to the client in a session
+	WOLFCLI_PROT_STATE=	5,	//< selected state info for the client
+	WOLFCLI_PROT_ERROR=	6	//< error reported by the server
 }
 wolfcli_ProtocolEventType;
 
@@ -76,7 +76,7 @@ wolfcli_ProtocolEvent;
 typedef struct wolfcli_ProtocolHandlerStruct* wolfcli_ProtocolHandler;
 
 ///\brief Callback function type for the notification of protocol events to the client
-typedef void (*wolfcli_ProtocolEventCallback)( void* clientobject, wolfcli_ProtocolEvent* event);
+typedef void (*wolfcli_ProtocolEventCallback)( void* clientobject, const wolfcli_ProtocolEvent* event);
 
 ///\brief Constructor of a protocol event handler
 wolfcli_ProtocolHandler wolfcli_createProtocolHandler(
@@ -117,6 +117,7 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler);
 
 
 ///\defgroup connection
+///\brief Interface to the client connection handling
 ///@{
 
 ///\struct wolfcli_ConnectionEventType
@@ -147,7 +148,7 @@ typedef struct wolfcli_ConnectionStruct* wolfcli_Connection;
 ///\brief Callback function for notifying connection events
 typedef void (*wolfcli_ConnectionEventCallback)(
 	void* clientobject,
-	wolfcli_ConnectionEvent* event);
+	const wolfcli_ConnectionEvent* event);
 
 ///\brief Create a connection (plain tcp)
 wolfcli_Connection wolfcli_createConnection(
@@ -181,6 +182,10 @@ void wolfcli_connection_write(
 	size_t datasize);
 
 ///@} end group connection
+
+#ifdef __cplusplus
+}//extern "C"
+#endif
 
 #endif
 

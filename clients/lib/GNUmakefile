@@ -43,7 +43,8 @@ OBJS = \
 	clientlib_protocol.o
 
 CPP_OBJS = \
-	clientlib_connect.o
+	clientlib_connect.o \
+	clientlib.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

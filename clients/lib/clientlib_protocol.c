@@ -30,8 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file clientlib.c
-///\brief C client library protocol interface
+///\file clientlib_protocol.c
+///\brief Implementation of the client protocol handling
+
 #include "clientlib.h"
 #include <stdlib.h>
 #include <string.h>
@@ -647,5 +648,4 @@ _CLOSED:
 	handler->state = WOLFCLI_STATE_CLOSED;
 	return WOLFCLI_CALL_CLOSED;
 }
-
 

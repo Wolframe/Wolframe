@@ -1,4 +1,5 @@
 /************************************************************************
+///\file client
 
  Copyright (C) 2011, 2012 Project Wolframe.
  All rights reserved.
@@ -30,6 +31,8 @@
  Project Wolframe.
 
 ************************************************************************/
+///\file clientlib_connect.cpp
+///\brief Implementation of the client connection handling
 #include "clientlib.h"
 #include <iostream>
 #include <sstream>
@@ -322,7 +325,7 @@ static void notifyError( void* clientobject, wolfcli_ConnectionEventCallback not
 	notifier( clientobject, &event);
 }
 
-wolfcli_Connection wolfcli_createConnection(
+extern "C" wolfcli_Connection wolfcli_createConnection(
 	const char* address,
 	const char* name,
 	unsigned short connect_timeout,
@@ -350,7 +353,7 @@ wolfcli_Connection wolfcli_createConnection(
 	}
 }
 
-wolfcli_Connection wolfcli_createConnection_SSL(
+extern "C" wolfcli_Connection wolfcli_createConnection_SSL(
 	const char* address,
 	const char* name,
 	unsigned short connect_timeout,
@@ -381,14 +384,14 @@ wolfcli_Connection wolfcli_createConnection_SSL(
 	}
 }
 
-void wolfcli_destroyConnection(
+extern "C" void wolfcli_destroyConnection(
 	wolfcli_Connection conn)
 {
 	delete conn->m_impl;
 	std::free( conn);
 }
 
-void wolfcli_connection_read( wolfcli_Connection conn)
+extern "C" void wolfcli_connection_read( wolfcli_Connection conn)
 {
 	try
 	{
@@ -400,7 +403,7 @@ void wolfcli_connection_read( wolfcli_Connection conn)
 	}
 }
 
-void wolfcli_connection_write(
+extern "C" void wolfcli_connection_write(
 	wolfcli_Connection conn,
 	const char* data,
 	size_t datasize)
