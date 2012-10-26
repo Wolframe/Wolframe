@@ -44,14 +44,15 @@
 
 TEST( CRAM, Challenge )
 {
+	unsigned char* pwdHash = (unsigned char*)"1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6";
 #ifdef _WIN32
 	_Wolframe::AAAA::CRAMchallenge	challenge( MS_DEF_PROV );
 #else
 	_Wolframe::AAAA::CRAMchallenge	challenge( "/dev/urandom" );
 #endif
 	std::cout << challenge.toBCD();
-	_Wolframe::AAAA::CRAMresponse	resp1( challenge, "admin", "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6" );
-	_Wolframe::AAAA::CRAMresponse	resp2( challenge.toBCD(), "admin", "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6" );
+	_Wolframe::AAAA::CRAMresponse	resp1( challenge, pwdHash, 224 / 8 );
+	_Wolframe::AAAA::CRAMresponse	resp2( challenge.toBCD(), pwdHash, 224 / 8 );
 	EXPECT_TRUE( resp1 == resp2 );
 }
 
