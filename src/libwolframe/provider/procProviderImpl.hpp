@@ -75,7 +75,7 @@ public:
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
 
-	const UI::UserInterfaceSupplier* UIsupplier() const;
+	const UI::UserInterfaceLibrary* UIsupplier() const;
 
 	db::Database* transactionDatabase() const;
 	db::Transaction* transaction( const std::string& name ) const;

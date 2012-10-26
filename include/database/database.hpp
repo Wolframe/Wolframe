@@ -59,7 +59,7 @@ public:
 	virtual Transaction* transaction( const std::string& name ) = 0;
 
 	///\ Just and interface at the moment
-	virtual const UI::UserInterfaceSupplier* UIsupplier() const
+	virtual const UI::UserInterfaceLibrary* UIsupplier() const
 						{ return NULL; }
 
 	///\brief Load the database transaction programs for this database from file

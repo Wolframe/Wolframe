@@ -43,27 +43,61 @@
 namespace _Wolframe {
 namespace UI {
 
+/// User Interface form header.
+class UIformHeader
+{
+public:
+	enum FormType	{
+		FORM,
+		MENU
+	};
+
+	UIformHeader()				{}
+
+	FormType type() const			{ return m_type; }
+	const std::string& name() const		{ return m_name; }
+	const Version& version() const		{ return m_version; }
+	const std::string& description() const	{ return m_description; }
+private:
+	FormType	m_type;			///< the type of the form
+	std::string	m_name;			///< the name of the form
+	Version		m_version;		///< the version of the form
+	std::string	m_description;		///< the description of the form
+};
+
+/// User Interface form body.
+class UIformBody
+{
+public:
+	UIformBody()				{}
+
+	const std::string& body() const		{ return m_body; }
+private:
+	std::string	m_body;			///< the body of the form
+};
+
+
 /// User Interface form.
-/// For now this is just a rudimentary skeleton
 class UIform
 {
 public:
 	UIform()				{}
-private:
-	std::string	m_name;		///< the name of the form
-	Version		m_version;	///< the version of the form
-	std::string	m_body;		///< the body of the form
-};
 
+	const UIformHeader& header() const	{ return m_header; }
+	const UIformBody& body() const		{ return m_body; }
+private:
+	UIformHeader	m_header;		///< the header of the form
+	UIformBody	m_body;			///< the body of the form
+};
 
 /// Supplier of user interface elements.
 /// Work in progress...
-class UserInterfaceSupplier
+class UserInterfaceLibrary
 {
 public:
-	UserInterfaceSupplier()				{}
+	UserInterfaceLibrary()			{}
 
-	virtual ~UserInterfaceSupplier()		{}
+	virtual ~UserInterfaceLibrary()		{}
 };
 
 

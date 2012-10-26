@@ -409,7 +409,7 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofi
 }
 
 
-const UI::UserInterfaceSupplier* ProcessorProvider::ProcessorProvider_Impl::UIsupplier() const
+const UI::UserInterfaceLibrary* ProcessorProvider::ProcessorProvider_Impl::UIsupplier() const
 {
 	if ( m_db )
 		return m_db->UIsupplier();
