@@ -37,20 +37,28 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct ProtocolEventQueueItem_
+typedef struct Request_
 {
-	wolfcli_ProtocolEvent* event;
-	struct ProtocolEventQueueItem_* next;
-	struct ProtocolEventQueueItem_* prev;
+	char* content;			//< data of the request
+	size_t contentsize;		//< size of the request data in bytes
 }
-ProtocolEventQueueItem;
+Request;
 
-typedef struct ProtocolEventQueue_
+typedef struct RequestQueueItem_
 {
-	ProtocolEventQueueItem* head;
-	ProtocolEventQueueItem* tail;
+	Request* item;
+	struct RequestQueueItem_* next;
+	struct RequestQueueItem_* prev;
 }
-ProtocolEventQueue;
+RequestQueueItem;
+
+typedef struct RequestQueue_
+{
+	RequestQueueItem* head;
+	RequestQueueItem* tail;
+	int open;
+}
+RequestQueue;
 
 typedef struct Buffer_
 {
@@ -69,6 +77,7 @@ typedef enum
 	WOLFCLI_STATE_LOAD_UIFORM_DATA,
 	WOLFCLI_STATE_SESSION,
 	WOLFCLI_STATE_SESSION_ANSWER,
+	WOLFCLI_STATE_SESSION_ANSWER_DATA,
 	WOLFCLI_STATE_CLOSED
 } wolfcli_ProtocolHandlerState;
 
@@ -76,7 +85,7 @@ struct wolfcli_ProtocolHandlerStruct
 {
 	wolfcli_ProtocolEventCallback eventNotifier;
 	void* clientobject;
-	ProtocolEventQueue requestqueue;
+	RequestQueue requestqueue;
 	Buffer buffer;
 	size_t bufferpos;
 	wolfcli_ProtocolHandlerState state;
@@ -84,57 +93,59 @@ struct wolfcli_ProtocolHandlerStruct
 	Buffer docbuffer;
 };
 
-static void destroyProtocolEvent( wolfcli_ProtocolEvent* event)
+static wolfcli_ProtocolEvent* initProtocolEvent(
+	wolfcli_ProtocolEvent* rt,
+	wolfcli_ProtocolEventType type_,
+	const char* id_,
+	const char* content_,
+	size_t contentsize_)
 {
-	if (event != NULL)
+	memset( rt, 0, sizeof( wolfcli_ProtocolEvent));
+	rt->type = type_;
+	rt->id = id_;
+	rt->content = content_;
+	rt->contentsize = contentsize_;
+	return rt;
+}
+
+static void destroyRequest( Request* request)
+{
+	if (request != NULL)
 	{
-		if (event->content != NULL) free( event->content);
-		if (event->id != NULL) free( event->content);
-		free( event);
+		if (request->content != NULL) free( request->content);
+		free( request);
 	}
 }
 
-static wolfcli_ProtocolEvent* createProtocolEvent(
-	wolfcli_ProtocolEventType type_,
-	const char* id_,
+static Request* createRequest(
 	const void* content_,
 	size_t contentsize_)
 {
-	wolfcli_ProtocolEvent* rt = (wolfcli_ProtocolEvent*)calloc( 1, sizeof( wolfcli_ProtocolEvent));
+	Request* rt = (Request*)calloc( 1, sizeof( Request));
 	if (rt == NULL) goto ERROR;
-	if (content_ != NULL)
-	{
-		rt->content = (char*)malloc( rt->contentsize = contentsize_);
-		if (rt->content == NULL) goto ERROR;
-		memcpy( rt->content, content_, contentsize_);
-	}
-	if (id_ != NULL)
-	{
-		size_t idsize = strlen( id_)+1;
-		rt->id = (char*)malloc( idsize);
-		if (rt->id == NULL) goto ERROR;
-		memcpy( rt->id, id_, idsize);
-	}
-	rt->type = type_;
+	rt->content = (char*)malloc( rt->contentsize = contentsize_);
+	if (rt->content == NULL) goto ERROR;
+	memcpy( rt->content, content_, contentsize_);
 	return rt;
 ERROR:
-	destroyProtocolEvent( rt);
+	destroyRequest( rt);
 	return NULL;
 }
 
-static void initQueue( ProtocolEventQueue* que)
+static void initQueue( RequestQueue* que)
 {
 	que->head = NULL;
 	que->tail = NULL;
+	que->open = 1;
 }
 
-static void resetQueue( ProtocolEventQueue* que)
+static void resetQueue( RequestQueue* que)
 {
-	ProtocolEventQueueItem* itm = que->head;
+	RequestQueueItem* itm = que->head;
 	while (itm != NULL)
 	{
-		ProtocolEventQueueItem* next = itm->next;
-		destroyProtocolEvent( itm->event);
+		RequestQueueItem* next = itm->next;
+		destroyRequest( itm->item);
 		free( itm);
 		itm = next;
 	}
@@ -142,11 +153,13 @@ static void resetQueue( ProtocolEventQueue* que)
 	que->tail = NULL;
 }
 
-static int queuePut( ProtocolEventQueue* que, wolfcli_ProtocolEvent* event_)
+static int queuePut( RequestQueue* que, Request* request_)
 {
-	ProtocolEventQueueItem* item = (ProtocolEventQueueItem*)calloc( 1, sizeof( ProtocolEventQueueItem));
+	RequestQueueItem* item;
+	if (!que->open) return 0;
+	item = (RequestQueueItem*)calloc( 1, sizeof( RequestQueueItem));
 	if (!item) return 0;
-	item->event = event_;
+	item->item = request_;
 	item->next = que->head;
 	item->prev = NULL;
 	if (que->head)
@@ -161,10 +174,10 @@ static int queuePut( ProtocolEventQueue* que, wolfcli_ProtocolEvent* event_)
 	return 1;
 }
 
-static wolfcli_ProtocolEvent* queueGet( ProtocolEventQueue* que)
+static Request* queueGet( RequestQueue* que)
 {
-	wolfcli_ProtocolEvent* rt;
-	ProtocolEventQueueItem* item = que->tail;
+	Request* rt;
+	RequestQueueItem* item = que->tail;
 	if (que->tail == NULL) return 0;
 	que->tail = que->tail->prev;
 	if (que->tail == NULL)
@@ -175,10 +188,16 @@ static wolfcli_ProtocolEvent* queueGet( ProtocolEventQueue* que)
 	{
 		que->tail->next = NULL;
 	}
-	rt = item->event;
+	rt = item->item;
 	free( item);
 	return rt;
 }
+
+static void closeQueue( RequestQueue* que)
+{
+	que->open = 0;
+}
+
 
 static void initBuffer( Buffer* buffer, size_t allocsize_)
 {
@@ -244,8 +263,6 @@ static void bufferConsume( Buffer* buffer, size_t pos)
 		}
 	}
 }
-
-static wolfcli_ProtocolEvent g_badAllocEvent = {WOLFCLI_PROT_BADALLOC, 0, 0, 0};
 
 wolfcli_ProtocolHandler wolfcli_createProtocolHandler(
 	wolfcli_ProtocolEventCallback notifier_,
@@ -388,13 +405,13 @@ int wolfcli_protocol_pushData( wolfcli_ProtocolHandler handler, const char* data
 
 static int sendLine( wolfcli_ProtocolHandler handler, const char* msg, const char* arg)
 {
-	wolfcli_ProtocolEvent* event = NULL;
+	wolfcli_ProtocolEvent event;
 	char linebuf[ 1024];
 	size_t msgsize = strlen( msg);
 	size_t argsize = arg?strlen( arg):0;
-	if (sizeof(linebuf)-2 < argsize) goto _ERROR;
-	if (sizeof(linebuf)-2 < msgsize) goto _ERROR;
-	if (sizeof(linebuf)-2 < msgsize+argsize+1) goto _ERROR;
+	if (sizeof(linebuf)-2 < argsize) return 0;
+	if (sizeof(linebuf)-2 < msgsize) return 0;
+	if (sizeof(linebuf)-2 < msgsize+argsize+1) return 0;
 	memcpy( linebuf, msg, msgsize);
 	if (arg)
 	{
@@ -404,103 +421,76 @@ static int sendLine( wolfcli_ProtocolHandler handler, const char* msg, const cha
 	}
 	linebuf[ msgsize] = '\r';
 	linebuf[ msgsize+1] = '\n';
-	event = createProtocolEvent( WOLFCLI_PROT_SEND_DATA, 0, linebuf, msgsize+2);
-	if (!event) goto _BADALLOC;
-	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
-	destroyProtocolEvent( event);
+	initProtocolEvent( &event, WOLFCLI_PROT_SEND, 0, linebuf, msgsize+2);
+	if (!handler->eventNotifier( handler->clientobject, &event)) return 0;
 	return 1;
-_BADALLOC:
-	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
-_ERROR:
-	if (!event) destroyProtocolEvent( event);
-	return 0;
 }
 
-static int sendDocument( wolfcli_ProtocolHandler handler, char* id, char* doc, size_t docsize)
+static int sendRequest( wolfcli_ProtocolHandler handler, char* doc, size_t docsize)
 {
-	wolfcli_ProtocolEvent* event = NULL;
+	int rt;
+	wolfcli_ProtocolEvent event;
 	Buffer docbuffer;
 	initBuffer( &docbuffer, 0);
 
-	if (!getContentEscaped( &docbuffer, doc, docsize)) goto _ERROR;
-	event = createProtocolEvent( WOLFCLI_PROT_SEND_DATA, id, docbuffer.ptr, docbuffer.size);
-	if (!event) goto _BADALLOC;
-	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
+	if (!getContentEscaped( &docbuffer, doc, docsize)) return 0;
+	initProtocolEvent( &event, WOLFCLI_PROT_SEND, 0, docbuffer.ptr, docbuffer.size);
+	rt = handler->eventNotifier( handler->clientobject, &event);
 	resetBuffer( &docbuffer, 0);
-	destroyProtocolEvent( event);
-	return 1;
-_BADALLOC:
-	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
-_ERROR:
-	resetBuffer( &docbuffer, 0);
-	if (!event) destroyProtocolEvent( event);
-	return 0;
+	return rt;
 }
 
 
 static int notifyError( wolfcli_ProtocolHandler handler, const char* id)
 {
-	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_ERROR, id, 0, 0);
-	if (!event) goto _BADALLOC;
-	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
-	destroyProtocolEvent( event);
-	return 1;
-_BADALLOC:
-	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
-_ERROR:
-	if (!event) destroyProtocolEvent( event);
-	return 0;
+	wolfcli_ProtocolEvent event;
+	initProtocolEvent( &event, WOLFCLI_PROT_ERROR, 0, id, strlen(id));
+	return handler->eventNotifier( handler->clientobject, &event);
 }
 
-static int notifyErrorMessage( wolfcli_ProtocolHandler handler, const char* id, const char* msg)
+static int notifyRequestError( wolfcli_ProtocolHandler handler, const char* id)
 {
-	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_ERROR, id, msg, msg?strlen(msg):0);
-	if (!event) goto _BADALLOC;
-	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
-	destroyProtocolEvent( event);
-	return 1;
-_BADALLOC:
-	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
-_ERROR:
-	if (!event) destroyProtocolEvent( event);
-	return 0;
+	wolfcli_ProtocolEvent event;
+	initProtocolEvent( &event, WOLFCLI_PROT_REQERR, 0, id, strlen(id));
+	return handler->eventNotifier( handler->clientobject, &event);
 }
+
 
 static int notifyState( wolfcli_ProtocolHandler handler, const char* id)
 {
-	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_STATE, id, 0, 0);
-	if (!event) goto _BADALLOC;
-	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
-	destroyProtocolEvent( event);
-	return 1;
-_BADALLOC:
-	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
-_ERROR:
-	if (!event) destroyProtocolEvent( event);
-	return 0;
+	wolfcli_ProtocolEvent event;
+	initProtocolEvent( &event, WOLFCLI_PROT_STATE, id, 0, 0);
+	return handler->eventNotifier( handler->clientobject, &event);
 }
 
 static int notifyUIForm( wolfcli_ProtocolHandler handler)
 {
-	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_UIFORM, handler->statearg.ptr, handler->docbuffer.ptr, handler->docbuffer.size);
-	if (!event) goto _BADALLOC;
-	if (!handler->eventNotifier( handler->clientobject, event)) goto _ERROR;
-	destroyProtocolEvent( event);
-	return 1;
-_BADALLOC:
-	handler->eventNotifier( handler->clientobject, &g_badAllocEvent);
-_ERROR:
-	if (!event) destroyProtocolEvent( event);
-	return 0;
+	int rt;
+	wolfcli_ProtocolEvent event;
+	initProtocolEvent( &event, WOLFCLI_PROT_UIFORM, handler->statearg.ptr, handler->docbuffer.ptr, handler->docbuffer.size);
+	rt = handler->eventNotifier( handler->clientobject, &event);
+	resetBuffer( &handler->docbuffer, 0);
+	resetBuffer( &handler->statearg, 0);
+	return rt;
+}
+
+static int notifyAnswer( wolfcli_ProtocolHandler handler)
+{
+	int rt;
+	wolfcli_ProtocolEvent event;
+	initProtocolEvent( &event, WOLFCLI_PROT_ANSWER, 0, handler->docbuffer.ptr, handler->docbuffer.size);
+	rt = handler->eventNotifier( handler->clientobject, &event);
+	resetBuffer( &handler->docbuffer, 0);
+	return rt;
 }
 
 int wolfcli_protocol_pushRequest( wolfcli_ProtocolHandler handler, const char* data, size_t datasize)
 {
 	int rt;
-	wolfcli_ProtocolEvent* event = createProtocolEvent( WOLFCLI_PROT_REQUEST, 0, data, datasize);
-	if (!event) return 0;
-	rt = queuePut( &handler->requestqueue, event);
-	if (!rt) destroyProtocolEvent( event);
+	Request* request = createRequest( data, datasize);
+	if (!request) return 0;
+	rt = queuePut( &handler->requestqueue, request);
+	if (!rt) destroyRequest( request);
 	return rt;
 }
 
@@ -524,11 +514,21 @@ static const char* selectAuthMech( wolfcli_ProtocolHandler handler, const LineSp
 	return 0;
 }
 
+int wolfcli_protocol_open( wolfcli_ProtocolHandler handler)
+{
+	return handler->requestqueue.open;
+}
+
+void wolfcli_protocol_quit( wolfcli_ProtocolHandler handler)
+{
+	closeQueue( &handler->requestqueue);
+}
+
 wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 {
 	Line line;
 	LineSplit arg;
-	wolfcli_ProtocolEvent* event;
+	Request* request;
 	const char* authmech;
 	const char* msg;
 	DocState docState;
@@ -550,14 +550,14 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 				if (arg.size == 1)
 				{
 					if (!notifyError( handler, "NO AUTH MECHS")) goto _ERROR;
-					goto _CLOSED;
+					goto _FAILURE;
 				}
 				if (!getLineSplit_space( &arg, &line, 0)) goto _ERROR;
 				authmech = selectAuthMech( handler, &arg);
 				if (!authmech)
 				{
 					if (!notifyError( handler, "NO MATCHING AUTH MECH")) goto _ERROR;
-					goto _CLOSED;
+					goto _FAILURE;
 				}
 				if (!sendLine( handler, "MECH", authmech)) goto _ERROR;
 				handler->state = WOLFCLI_STATE_AUTH_WAIT;
@@ -566,14 +566,14 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 			else if (isequal( arg.ptr[0], "ERR"))
 			{
 				msg = (arg.size == 1)?0:arg.ptr[1];
-				if (!notifyErrorMessage( handler, "AUTH command failed", msg)) goto _ERROR;
+				if (!notifyError( handler, msg)) goto _ERROR;
 				handler->state = WOLFCLI_STATE_INIT;
 				continue;
 			}
 			else
 			{
 				if (!notifyError( handler, "PROTOCOL")) goto _ERROR;
-				goto _CLOSED;
+				goto _FAILURE;
 			}
 
 		case WOLFCLI_STATE_AUTH_WAIT:
@@ -590,8 +590,8 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 			else if (isequal( arg.ptr[0], "ERR"))
 			{
 				msg = (arg.size == 1)?0:arg.ptr[1];
-				if (!notifyErrorMessage( handler, "refused", msg)) goto _ERROR;
-				goto _CLOSED;
+				if (!notifyError( handler, msg)) goto _ERROR;
+				goto _FAILURE;
 			}
 
 		case WOLFCLI_STATE_LOAD_UIFORM:
@@ -603,8 +603,8 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 				const char* formid;
 				if (arg.size == 1)
 				{
-					if (!notifyErrorMessage( handler, "protocol", "UIFORM missing argument")) goto _ERROR;
-					goto _CLOSED;
+					if (!notifyError( handler, "UIFORM missing argument")) goto _ERROR;
+					goto _FAILURE;
 				}
 				else
 				{
@@ -619,15 +619,15 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 			}
 			else if (isequal( arg.ptr[0], "OK"))
 			{
-				if (!notifyState( handler, "Interfaces loaded")) goto _ERROR;
+				if (!notifyState( handler, "session")) goto _ERROR;
 				handler->state = WOLFCLI_STATE_SESSION;
 				continue;
 			}
 			else if (isequal( arg.ptr[0], "ERR"))
 			{
 				msg = (arg.size == 1)?0:arg.ptr[1];
-				if (!notifyErrorMessage( handler, "UI formloader", msg)) goto _ERROR;
-				goto _CLOSED;
+				if (!notifyError( handler, msg)) goto _ERROR;
+				goto _FAILURE;
 			}
 
 		case WOLFCLI_STATE_LOAD_UIFORM_DATA:
@@ -636,8 +636,6 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 			{
 				case DOCSTATE_EOD:
 					if (!notifyUIForm( handler)) goto _ERROR;
-					resetBuffer( &handler->docbuffer, 0);
-					resetBuffer( &handler->statearg, 0);
 					handler->state = WOLFCLI_STATE_LOAD_UIFORM;
 					continue;
 
@@ -647,17 +645,56 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler)
 				case DOCSTATE_ERROR:
 					goto _ERROR;
 			}
+			goto _ERROR;
 
 		case WOLFCLI_STATE_SESSION:
-			event = queueGet( &handler->requestqueue);
-			if (!event) goto _IDLE;
-			success = sendDocument( handler, event->id, event->content, event->contentsize);
-			destroyProtocolEvent( event);
+			request = queueGet( &handler->requestqueue);
+			if (!request)
+			{
+				if (handler->requestqueue.open) goto _IDLE;
+				if (!sendLine( handler, "QUIT", 0)) goto _ERROR;
+				goto _CLOSED;
+			}
+			success = (sendLine( handler, "REQUEST", 0)
+				&& sendRequest( handler, request->content, request->contentsize));
+			destroyRequest( request);
 			if (!success) goto _ERROR;
 			continue;
 
 		case WOLFCLI_STATE_SESSION_ANSWER:
-		//TODO: continue here with ANSWER, handle event of send document
+			if (!getLine( &line, handler->buffer.ptr, &handler->bufferpos, handler->buffer.size, 0)) goto _DATA;
+			if (!getLineSplit_space( &arg, &line, 2)) goto _ERROR;
+			if (!arg.size) continue;
+			if (isequal( arg.ptr[0], "OK"))
+			{
+				resetBuffer( &handler->docbuffer, 0);
+				handler->state = WOLFCLI_STATE_SESSION_ANSWER_DATA;
+				continue;
+			}
+			else if (isequal( arg.ptr[0], "ERR"))
+			{
+				msg = (arg.size == 1)?0:arg.ptr[1];
+				if (!notifyRequestError( handler, msg)) goto _ERROR;
+				handler->state = WOLFCLI_STATE_SESSION;
+				continue;
+			}
+
+		case WOLFCLI_STATE_SESSION_ANSWER_DATA:
+			docState = getContentUnescaped( &handler->docbuffer, handler->buffer.ptr, &handler->bufferpos, handler->buffer.size);
+			switch (docState)
+			{
+				case DOCSTATE_EOD:
+					if (!notifyAnswer( handler)) goto _ERROR;
+					handler->state = WOLFCLI_STATE_SESSION;
+					continue;
+
+				case DOCSTATE_READING:
+					goto _DATA;
+
+				case DOCSTATE_ERROR:
+					goto _ERROR;
+			}
+			goto _ERROR;
 
 		case WOLFCLI_STATE_CLOSED:
 			goto _CLOSED;
@@ -668,6 +705,9 @@ _DATA:
 _IDLE:
 	return WOLFCLI_CALL_IDLE;
 _ERROR:
+	handler->state = WOLFCLI_STATE_CLOSED;
+	return WOLFCLI_CALL_ERROR;
+_FAILURE:
 	handler->state = WOLFCLI_STATE_CLOSED;
 	return WOLFCLI_CALL_ERROR;
 _CLOSED:

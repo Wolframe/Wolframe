@@ -121,9 +121,17 @@ struct TransportLayerPlain
 
 struct ConnectionBase
 {
+	ConnectionBase()
+		:m_state(WOLFCLI_CONNSTATE_INIT){}
+
 	virtual ~ConnectionBase(){}
 	virtual void write( const char* data, std::size_t size)=0;
 	virtual void read()=0;
+
+	wolfcli_ConnectionState state()		{return m_state;}
+
+protected:
+	wolfcli_ConnectionState m_state;
 };
 
 
@@ -159,9 +167,18 @@ public:
 			boost::bind( &ConnectionImpl::handle_connect, this, _1, endpoint_iter));
 		m_deadline_timer->async_wait( boost::bind( &ConnectionImpl::check_deadline, this));
 		notify( WOLFCLI_CONN_STATE, "connect");
+		m_state = WOLFCLI_CONNSTATE_OPEN;
 	}
 
-	virtual ~ConnectionImpl(){}
+	virtual ~ConnectionImpl()
+	{
+		if (m_state == WOLFCLI_CONNSTATE_OPEN || m_state == WOLFCLI_CONNSTATE_READY)
+		{
+			m_socket->lowest_layer().close();
+			m_io_service.stop();
+			notify( WOLFCLI_CONN_STATE, "terminated");
+		}
+	}
 
 private:
 	void notify( wolfcli_ConnectionEventType type, const char* content, size_t contentsize)
@@ -182,7 +199,8 @@ private:
 	{
 		m_socket->lowest_layer().close();
 		m_io_service.stop();
-		notify( WOLFCLI_CONN_CLOSED, "terminated");
+		notify( WOLFCLI_CONN_STATE, "terminated");
+		m_state = WOLFCLI_CONNSTATE_CLOSED;
 	}
 
 	void conn_error( const char* errmsg, const boost::system::error_code &ec)
@@ -239,8 +257,8 @@ private:
 		else
 		{
 			m_deadline_timer->expires_from_now( boost::posix_time::seconds( m_read_timeout));
-			notify( WOLFCLI_CONN_STATE, "ready");
-			notify( WOLFCLI_CONN_CONNECTED);
+			notify( WOLFCLI_CONN_STATE, "connected");
+			m_state = WOLFCLI_CONNSTATE_READY;
 		}
 	}
 
@@ -287,9 +305,12 @@ private:
 			if( ec.category() == boost::system::system_category() &&
 				ec.value() == boost::system::errc::operation_canceled) {
 				// The server sends a timeout, we get a ECANCELED (errno.h)
-				notify( WOLFCLI_CONN_CLOSED, "canceled");
+				notify( WOLFCLI_CONN_STATE, "canceled");
 			}
-			conn_error( "read error", ec);
+			else
+			{
+				conn_error( "read error", ec);
+			}
 			conn_stop();
 		}
 		else
@@ -309,7 +330,6 @@ private:
 	void* m_clientobject;
 	enum { BufferSize = 1<<12 };
 	char m_buffer[ BufferSize];
-
 };
 
 }} //namespace
@@ -399,19 +419,26 @@ extern "C" void wolfcli_destroyConnection(
 	std::free( conn);
 }
 
-extern "C" void wolfcli_connection_read( wolfcli_Connection conn)
+extern "C" wolfcli_ConnectionState wolfcli_connection_state( wolfcli_Connection conn)
+{
+	return conn->m_impl?conn->m_impl->state():WOLFCLI_CONNSTATE_NULL;
+}
+
+extern "C" int wolfcli_connection_read( wolfcli_Connection conn)
 {
 	try
 	{
 		conn->m_impl->read();
+		return 1;
 	}
 	catch (const std::exception& e)
 	{
 		notifyError( conn->m_clientobject, conn->m_notifier, e.what());
+		return 0;
 	}
 }
 
-extern "C" void wolfcli_connection_write(
+extern "C" int wolfcli_connection_write(
 	wolfcli_Connection conn,
 	const char* data,
 	size_t datasize)
@@ -419,10 +446,12 @@ extern "C" void wolfcli_connection_write(
 	try
 	{
 		conn->m_impl->write( data, datasize);
+		return 1;
 	}
 	catch (const std::exception& e)
 	{
 		notifyError( conn->m_clientobject, conn->m_notifier, e.what());
+		return 0;
 	}
 }
 

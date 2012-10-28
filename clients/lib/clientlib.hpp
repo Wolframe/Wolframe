@@ -49,61 +49,84 @@ struct RequestHandler
 {
 	virtual ~RequestHandler(){}
 	virtual void handleAnswer( const char* data, std::size_t datasize);
-	virtual void handleError( const std::string& msg);
+	virtual void handleError( const char* msg);
 };
 
-struct SessionHandlerBase
+class SessionHandlerBase
 {
-	virtual void doRequest( RequestHandler* handler, const char* data, std::size_t datasize)=0;
+public://callbacks implemented by the SessionHandler
 	virtual void receiveUIForm( const char* data, std::size_t datasize)=0;
+	virtual void notifyState( const char* msg)=0;
+	virtual void notifyError( const char* msg)=0;
+
+public://protocol
+	virtual bool doRequest( RequestHandler* handler, const char* data, std::size_t datasize)=0;
+	virtual void run()=0;
+	virtual void quit()=0;
+public://connection
+	virtual bool ready() const=0;
+
+private://protocol
+	friend class ProtocolHandler;
 	virtual void pushData( const char* data, std::size_t datasize)=0;
+private://connection
+	friend class ConnectionHandler;
 	virtual void sendData( const char* data, std::size_t datasize)=0;
-	virtual void debugMessage( const std::string& msg)=0;
-	virtual void notifyState( const std::string& msg)=0;
-	virtual void notifyError( const std::string& msg)=0;
-	virtual void notifyBadAlloc()=0;
+	virtual void recvData()=0;
+	virtual void close()=0;
 };
 
-class ProtocolHandler :virtual SessionHandlerBase
+
+class ProtocolHandler :public virtual SessionHandlerBase
 {
 public:
 	ProtocolHandler();
 	virtual ~ProtocolHandler();
 
 	virtual void pushData( const char* data, std::size_t datasize);
-	virtual void doRequest( RequestHandler* handler, const char* data, std::size_t datasize);
+	virtual bool doRequest( RequestHandler* handler, const char* data, std::size_t datasize);
+	virtual void run();
+	virtual void quit();
 
 private:
-	static const char* eventTypeName( wolfcli_ProtocolEventType type);
-	static std::string eventstring( const wolfcli_ProtocolEvent* event);
 	static int eventhandler( void* this_, const wolfcli_ProtocolEvent* event);
 	void eventhandler( const wolfcli_ProtocolEvent* event);
+	static std::string eventstring( const wolfcli_ProtocolEvent* event);
 
 private:
 	wolfcli_ProtocolHandler m_impl;
-	std::string m_lasterror;
 	std::list<RequestHandler*> m_rhqueue;
 };
 
 
-class ConnectionHandler :virtual SessionHandlerBase
+class ConnectionHandler :public virtual SessionHandlerBase
 {
 public:
 	ConnectionHandler();
 	virtual ~ConnectionHandler();
 
 	virtual void sendData( const char* data, std::size_t datasize);
+	virtual void recvData();
+	virtual bool ready() const;
+	virtual void close();
 
 private:
-	static const char* eventTypeName( wolfcli_ConnectionEventType type);
-	static std::string eventstring( const wolfcli_ConnectionEvent* event);
 	static int eventhandler( void* this_, const wolfcli_ConnectionEvent* event);
 	void eventhandler( const wolfcli_ConnectionEvent* event);
+	static std::string eventstring( const wolfcli_ConnectionEvent* event);
 
 private:
 	wolfcli_Connection m_impl;
 };
 
+
+struct SessionHandler
+	:public ProtocolHandler
+	,public ConnectionHandler
+{
+	SessionHandler(){}
+	virtual ~SessionHandler(){}
+};
 
 }} //namespace
 #endif

@@ -52,13 +52,12 @@ extern "C" {
 ///\brief Enumeration of protocol event types
 typedef enum
 {
-	WOLFCLI_PROT_SEND_DATA=	1,	//< data with messages from the protocol to be sent to the server
+	WOLFCLI_PROT_SEND=	1,	//< data with messages from the protocol to be sent to the server
 	WOLFCLI_PROT_UIFORM=	2,	//< UI form sent from server to client in the initialization phase
-	WOLFCLI_PROT_REQUEST=	3,	//< (internal) request from client to server in a session
-	WOLFCLI_PROT_ANSWER=	4,	//< answer of a requset from the server to the client in a session
-	WOLFCLI_PROT_STATE=	5,	//< selected state info for the client
-	WOLFCLI_PROT_ERROR=	6,	//< error reported by the server
-	WOLFCLI_PROT_BADALLOC=	7
+	WOLFCLI_PROT_ANSWER=	3,	//< answer of a requset from the server to the client in a session
+	WOLFCLI_PROT_STATE=	4,	//< selected state info for the client
+	WOLFCLI_PROT_REQERR=	5,	//< error in request (negative answer)
+	WOLFCLI_PROT_ERROR=	6	//< error reported by the server
 }
 wolfcli_ProtocolEventType;
 
@@ -67,8 +66,8 @@ wolfcli_ProtocolEventType;
 typedef struct wolfcli_ProtocolEvent_
 {
 	wolfcli_ProtocolEventType type;	//< type of the protocol event
-	char* id;			//< protocol event identifier
-	char* content;			//< data of the protocol event
+	const char* id;			//< protocol event identifier
+	const char* content;		//< data of the protocol event
 	size_t contentsize;		//< size of the event data in bytes
 }
 wolfcli_ProtocolEvent;
@@ -100,6 +99,14 @@ int wolfcli_protocol_pushRequest(
 	const char* data,				//< request data (decrypted plain data)
 	size_t datasize);				//< size of data in bytes
 
+///\brief Return 1, if requests can be processed
+int wolfcli_protocol_open( wolfcli_ProtocolHandler handler);
+
+///\brief Quit session when all requests are processed
+void wolfcli_protocol_quit( wolfcli_ProtocolHandler handler);
+
+
+
 typedef enum
 {
 	WOLFCLI_CALL_DATA,				//< the protocol event handler is requesting more data. all input (complete lines have been consumed)
@@ -125,12 +132,9 @@ wolfcli_CallResult wolfcli_protocol_run( wolfcli_ProtocolHandler handler);
 ///\brief Enumeration of connection event types
 typedef enum
 {
-	WOLFCLI_CONN_CONNECTED= 0,
 	WOLFCLI_CONN_DATA=	1,	//< connection has data to read
-	WOLFCLI_CONN_CLOSED=	2,	//< connection closed
-	WOLFCLI_CONN_STATE=	3,
-	WOLFCLI_CONN_ERROR=	4,	//< connection error
-	WOLFCLI_CONN_BADALLOC=	5	//< allocation error
+	WOLFCLI_CONN_STATE=	2,	//< state of connection
+	WOLFCLI_CONN_ERROR=	3	//< connection error
 }
 wolfcli_ConnectionEventType;
 
@@ -175,12 +179,23 @@ wolfcli_Connection wolfcli_createConnection_SSL(
 	const char* client_cert_key);
 #endif
 
-void wolfcli_destroyConnection(
-	wolfcli_Connection conn);
+void wolfcli_destroyConnection( wolfcli_Connection conn);
 
-void wolfcli_connection_read( wolfcli_Connection conn);
+typedef enum
+{
+	WOLFCLI_CONNSTATE_NULL=		0,
+	WOLFCLI_CONNSTATE_INIT=		1,	//< connection is in initialization
+	WOLFCLI_CONNSTATE_OPEN=		2,	//< connection context is created
+	WOLFCLI_CONNSTATE_READY=	3,	//< connection is ready
+	WOLFCLI_CONNSTATE_CLOSED=	4	//< connection has been closed
+}
+wolfcli_ConnectionState;
 
-void wolfcli_connection_write(
+wolfcli_ConnectionState wolfcli_connection_state( wolfcli_Connection conn);
+
+int wolfcli_connection_read( wolfcli_Connection conn);
+
+int wolfcli_connection_write(
 	wolfcli_Connection conn,
 	const char* data,
 	size_t datasize);
