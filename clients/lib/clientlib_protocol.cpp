@@ -43,7 +43,7 @@ using namespace _Wolframe::client;
 namespace {
 struct Line
 {
-	char* ptr;
+	const char* ptr;
 	size_t size;
 };
 
@@ -144,7 +144,7 @@ private:
 	size_t m_allocsize;
 };
 
-static bool getLine( Line* line, char* baseptr, size_t* pos, size_t size, bool withCR=false)
+static bool getLine( Line* line, const char* baseptr, size_t* pos, size_t size, bool withCR=false)
 {
 	size_t ii,nn;
 	if (*pos == size) return false;
@@ -161,7 +161,6 @@ static bool getLine( Line* line, char* baseptr, size_t* pos, size_t size, bool w
 		{
 			line->size = ii;
 		}
-		line->ptr[ line->size] = 0;
 		*pos = ii+1;
 		return true;
 	}
@@ -169,32 +168,38 @@ static bool getLine( Line* line, char* baseptr, size_t* pos, size_t size, bool w
 }
 
 #define MAX_LINESPLIT_SIZE 64
+#define MAX_LINEBUF_SIZE 1024
 struct LineSplit
 {
-	const char* ptr[ MAX_LINESPLIT_SIZE];
+	char* ptr[ MAX_LINESPLIT_SIZE];
 	size_t size;
+	char line[ MAX_LINEBUF_SIZE];
+	size_t linesize;
 };
 
-static void getLineSplit_space( LineSplit* split, Line* line, size_t max_nof_elements)
+static void getLineSplit_space( LineSplit& split, const Line& line, size_t max_nof_elements)
 {
-	size_t ii;
+	if (line.size >= MAX_LINEBUF_SIZE) throw std::runtime_error( "protocol: line too big");
+	std::memcpy( split.line, line.ptr, line.size);
+	split.line[ split.linesize = line.size] = 0;
+	std::size_t ii;
 	if (max_nof_elements > MAX_LINESPLIT_SIZE) throw std::logic_error( "get line split max nof elements parameter out of range");
-	for (ii=0; ii < MAX_LINESPLIT_SIZE; ++ii) split->ptr[ ii] = 0;
-	split->size = 0;
-	for (ii=0; ii < line->size && line->ptr[ii] >= 0 && line->ptr[ii] <= 32; ++ii);
-	if (ii == line->size) return;
-	split->ptr[ line->size++] = line->ptr + ii;
+	for (ii=0; ii < MAX_LINESPLIT_SIZE; ++ii) split.ptr[ ii] = 0;
+	split.size = 0;
+	for (ii=0; ii < split.linesize && split.line[ii] >= 0 && split.line[ii] <= 32; ++ii);
+	if (ii == split.linesize) return;
+	split.ptr[ ++split.size] = split.line + ii;
 
-	for (; ii < line->size; ++ii)
+	for (; ii < split.linesize; ++ii)
 	{
-		if (line->ptr[ii] >= 0 && line->ptr[ii] <= 32)
+		if (split.line[ii] >= 0 && split.line[ii] <= 32)
 		{
-			line->ptr[ii] = 0;
-			if (split->size == MAX_LINESPLIT_SIZE) throw std::runtime_error( "too many elements in protocol line");
-			if (split->size == max_nof_elements) return;
-			for (; ii < line->size && line->ptr[ii] > 0 && line->ptr[ii] < 32; ++ii);
-			if (ii == line->size) return;
-			split->ptr[ ++split->size] = line->ptr + ii;
+			split.line[ii] = 0;
+			if (split.size == MAX_LINESPLIT_SIZE) throw std::runtime_error( "too many elements in protocol line");
+			if (split.size == max_nof_elements) return;
+			for (; ii < split.linesize && split.line[ii] > 0 && split.line[ii] < 32; ++ii);
+			if (ii == split.linesize) return;
+			split.ptr[ ++split.size] = split.line + ii;
 		}
 	}
 }
@@ -217,7 +222,7 @@ static bool getContentUnescaped( Buffer* docbuffer, char* baseptr, size_t* pos, 
 	return false;
 }
 
-static void getContentEscaped( Buffer* docbuffer, char* ptr, size_t size)
+static void getContentEscaped( Buffer* docbuffer, const char* ptr, size_t size)
 {
 	Line line;
 	size_t pos = 0;
@@ -244,8 +249,39 @@ static int isequal( const char* aa, const char* bb)
 }
 
 
+class Request
+{
+public:
+	Request( Protocol::AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_)
+		:m_notifier(notifier_)
+		,m_requestobject(requestobject_)
+		,m_data((char*)std::malloc(datasize_))
+		,m_datasize(datasize_)
+	{
+		if (!m_data) throw std::bad_alloc();
+		std::memcpy( m_data, data_, datasize_);
+	}
 
-typedef Buffer Request;
+	~Request()
+	{
+		if (m_data) std::free( m_data);
+	}
+
+	const char* data() const	{return m_data;}
+	std::size_t datasize() const	{return m_datasize;}
+
+	void answer( const Protocol::Event& event)
+	{
+		m_notifier( m_requestobject, event);
+	}
+
+private:
+	Protocol::AnswerCallback m_notifier;
+	void* m_requestobject;
+	char* m_data;
+	std::size_t m_datasize;
+};
+
 typedef boost::shared_ptr<Request> RequestR;
 
 struct ProtocolState
@@ -261,6 +297,7 @@ struct ProtocolState
 		SESSION_QUIT,
 		SESSION_ANSWER,
 		SESSION_ANSWER_DATA,
+		SESSION_ANSWER_RESULT,
 		CLOSED
 	};
 };
@@ -278,9 +315,9 @@ public:
 		,m_bufferpos(0)
 		,m_state(ProtocolState::INIT){}
 
-	bool putRequest( const char* data_, std::size_t datasize_)
+	bool putRequest( Protocol::AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_)
 	{
-		RequestR request( new Request( data_, datasize_));
+		RequestR request( new Request( notifier_, requestobject_, data_, datasize_));
 		boost::lock_guard<boost::mutex> lock(m_requestqueue_mutex);
 		if (!m_requestqueue_open) return false;
 		m_requestqueue.push_back( request);
@@ -347,7 +384,7 @@ public:
 		m_notifier( m_clientobject, event);
 	}
 
-	void sendContent( char* doc, size_t docsize)
+	void sendContent( const char* doc, size_t docsize)
 	{
 		Buffer docbuffer;
 		getContentEscaped( &m_docbuffer, doc, docsize);
@@ -358,12 +395,6 @@ public:
 	void notifyError( const char* id)
 	{
 		Protocol::Event event( Protocol::Event::ERROR, 0, id, strlen(id));
-		m_notifier( m_clientobject, event);
-	}
-
-	void notifyRequestError( const char* id)
-	{
-		Protocol::Event event( Protocol::Event::REQERR, 0, id, strlen(id));
 		m_notifier( m_clientobject, event);
 	}
 
@@ -381,10 +412,19 @@ public:
 		m_statearg.reset();
 	}
 
-	void notifyAnswer()
+	void notifyAnswerOk()
 	{
 		Protocol::Event event( Protocol::Event::ANSWER, 0, m_docbuffer.ptr(), m_docbuffer.size());
-		m_notifier( m_clientobject, event);
+		m_request->answer( event);
+		m_request.reset();
+		m_docbuffer.reset();
+	}
+
+	void notifyAnswerError( const char* id)
+	{
+		Protocol::Event event( Protocol::Event::ERROR, 0, id, strlen(id));
+		m_request->answer( event);
+		m_request.reset();
 		m_docbuffer.reset();
 	}
 
@@ -441,7 +481,7 @@ public:
 					{
 						return Protocol::CALL_DATA;
 					}
-					getLineSplit_space( &arg, &line, 2);
+					getLineSplit_space( arg, line, 2);
 					if (!arg.size) continue;
 					if (isequal( arg.ptr[0], "MECHS"))
 					{
@@ -451,7 +491,7 @@ public:
 							state( ProtocolState::CLOSED);
 							return Protocol::CALL_ERROR;
 						}
-						getLineSplit_space( &arg, &line, 0);
+						getLineSplit_space( arg, line, 0);
 						authmech = selectAuthMech( arg);
 						if (!authmech)
 						{
@@ -482,7 +522,7 @@ public:
 					{
 						return Protocol::CALL_DATA;
 					}
-					getLineSplit_space( &arg, &line, 2);
+					getLineSplit_space( arg, line, 2);
 					if (!arg.size) continue;
 					if (isequal( arg.ptr[0], "OK"))
 					{
@@ -510,7 +550,7 @@ public:
 					{
 						return Protocol::CALL_DATA;
 					}
-					getLineSplit_space( &arg, &line, 2);
+					getLineSplit_space( arg, line, 2);
 					if (!arg.size) continue;
 					if (isequal( arg.ptr[0], "UIFORM"))
 					{
@@ -560,8 +600,8 @@ public:
 
 				case ProtocolState::SESSION:
 				{
-					RequestR request = fetchRequest();
-					if (!request.get())
+					m_request = fetchRequest();
+					if (!m_request.get())
 					{
 						if (isOpen())
 						{
@@ -573,7 +613,8 @@ public:
 					else
 					{
 						sendLine( "REQUEST");
-						sendContent( request->ptr(), request->size());
+						sendContent( m_request->data(), m_request->datasize());
+						state( ProtocolState::SESSION_ANSWER);
 						continue;
 					}
 				}
@@ -583,7 +624,7 @@ public:
 					{
 						return Protocol::CALL_DATA;
 					}
-					getLineSplit_space( &arg, &line, 2);
+					getLineSplit_space( arg, line, 2);
 					if (!arg.size) continue;
 					if (isequal( arg.ptr[0], "BYE"))
 					{
@@ -603,24 +644,32 @@ public:
 					{
 						return Protocol::CALL_DATA;
 					}
-					getLineSplit_space( &arg, &line, 2);
+					getLineSplit_space( arg, line, 2);
 					if (!arg.size) continue;
-					if (isequal( arg.ptr[0], "OK"))
+					if (isequal( arg.ptr[0], "ANSWER"))
 					{
 						m_docbuffer.reset();
 						state( ProtocolState::SESSION_ANSWER_DATA);
 						continue;
 					}
+					else if (isequal( arg.ptr[0], "OK"))
+					{
+						m_docbuffer.reset();
+						m_request.reset();
+						state( ProtocolState::SESSION);
+						continue;
+					}
 					else if (isequal( arg.ptr[0], "ERR"))
 					{
 						msg = (arg.size == 1)?"unspecified error in request":arg.ptr[1];
-						notifyRequestError( msg);
+						notifyAnswerError( msg);
 						state( ProtocolState::SESSION);
 						continue;
 					}
 					else
 					{
-						notifyError( "protocol error in ANSWER (OK or ERR expected)");
+						notifyError( "protocol error in REQUEST (ANSWER, OK or ERR expected)");
+						notifyAnswerError( "protocol error");
 						state( ProtocolState::CLOSED);
 						return Protocol::CALL_ERROR;
 					}
@@ -630,9 +679,36 @@ public:
 					{
 						return Protocol::CALL_DATA;
 					}
-					notifyAnswer();
-					state( ProtocolState::SESSION);
+					state( ProtocolState::SESSION_ANSWER_RESULT);
 					continue;
+
+				case ProtocolState::SESSION_ANSWER_RESULT:
+					if (!getLine( &line, dataptr(), &di.pos, datasize()))
+					{
+						return Protocol::CALL_DATA;
+					}
+					getLineSplit_space( arg, line, 2);
+					if (!arg.size) continue;
+					if (isequal( arg.ptr[0], "OK"))
+					{
+						notifyAnswerOk();
+						state( ProtocolState::SESSION);
+						continue;
+					}
+					else if (isequal( arg.ptr[0], "ERR"))
+					{
+						msg = (arg.size == 1)?"unspecified error in request":arg.ptr[1];
+						notifyAnswerError( msg);
+						state( ProtocolState::SESSION);
+						continue;
+					}
+					else
+					{
+						notifyError( "protocol error in answer after data (OK or ERR expected)");
+						notifyAnswerError( "protocol error");
+						state( ProtocolState::CLOSED);
+						return Protocol::CALL_ERROR;
+					}
 
 				case ProtocolState::CLOSED:
 					return Protocol::CALL_CLOSED;
@@ -647,6 +723,7 @@ private:
 	std::list<RequestR> m_requestqueue;
 	boost::mutex m_requestqueue_mutex;
 	bool m_requestqueue_open;
+	RequestR m_request;
  	Buffer m_buffer;
 	boost::mutex m_buffer_mutex;
 	std::size_t m_bufferpos;
@@ -666,9 +743,36 @@ void Protocol::doQuit()
 	m_impl->closeRequestQueue();
 }
 
+bool Protocol::pushRequest( AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_)
+{
+	return m_impl->putRequest( notifier_, requestobject_, data_, datasize_);
+}
 
 Protocol::CallResult Protocol::run()
 {
 	return m_impl->run();
 }
+
+static const char* eventTypeName( Protocol::Event::Type type)
+{
+	switch (type)
+	{
+		case Protocol::Event::SEND:	return "SEND";
+		case Protocol::Event::UIFORM:	return "UIFORM";
+		case Protocol::Event::ANSWER:	return "ANSWER";
+		case Protocol::Event::STATE:	return "STATE";
+		case Protocol::Event::ERROR:	return "ERROR";
+	}
+	return "(null)";
+}
+
+std::string Protocol::Event::tostring() const
+{
+	std::ostringstream msg;
+	msg << eventTypeName( m_type) << " " << (m_id?m_id:"") << " '" << std::string( m_content, m_contentsize) << "'";
+	return msg.str();
+}
+
+
+
 

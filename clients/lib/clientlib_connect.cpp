@@ -104,6 +104,7 @@ struct Connection::Impl
 	virtual ~Impl(){}
 	virtual void write( const char* data, std::size_t size)=0;
 	virtual void read()=0;
+	virtual void conn_stop()=0;
 
 	Connection::State state() const		{return m_state;}
 
@@ -155,6 +156,14 @@ public:
 		}
 	}
 
+	virtual void conn_stop()
+	{
+		m_socket->lowest_layer().close();
+		m_io_service.stop();
+		notify( Connection::Event::STATE, "terminated");
+		m_state = Connection::CLOSED;
+	}
+
 private:
 	void notify( Connection::Event::Type type, const char* content, std::size_t contentsize)
 	{
@@ -164,14 +173,6 @@ private:
 	void notify( Connection::Event::Type type, const char* content=0)
 	{
 		m_notifier( m_clientobject, Connection::Event( type, content));
-	}
-
-	void conn_stop()
-	{
-		m_socket->lowest_layer().close();
-		m_io_service.stop();
-		notify( Connection::Event::STATE, "terminated");
-		m_state = Connection::CLOSED;
 	}
 
 	void conn_error( const char* errmsg, const boost::system::error_code &ec)
@@ -230,6 +231,7 @@ private:
 			m_deadline_timer->expires_from_now( boost::posix_time::seconds( m_read_timeout));
 			notify( Connection::Event::STATE, "connected");
 			m_state = Connection::READY;
+			notify( Connection::Event::READY);
 		}
 	}
 
@@ -336,6 +338,30 @@ void Connection::read()
 void Connection::write( const char* data, std::size_t datasize)
 {
 	m_impl->write( data, datasize);
+}
+
+void Connection::close()
+{
+	m_impl->conn_stop();
+}
+
+static const char* eventTypeName( Connection::Event::Type type)
+{
+	switch (type)
+	{
+		case Connection::Event::DATA:	return "DATA";
+		case Connection::Event::READY:	return "READY";
+		case Connection::Event::STATE:	return "STATE";
+		case Connection::Event::ERROR:	return "ERROR";
+	}
+	return "(null)";
+}
+
+std::string Connection::Event::tostring() const
+{
+	std::ostringstream msg;
+	msg << eventTypeName( m_type) << " '" << std::string( m_content, m_contentsize) << "'";
+	return msg.str();
 }
 
 

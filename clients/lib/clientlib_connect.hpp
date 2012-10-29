@@ -48,7 +48,7 @@ namespace client {
 ///@{
 
 ///\class Connection
-///\brief Connection handler object
+///\brief Client connection handler
 class Connection
 {
 public:
@@ -62,7 +62,8 @@ public:
 		{
 			DATA=	1,		//< connection has data to read
 			STATE=	2,		//< state of connection
-			ERROR=	3		//< connection error
+			READY=	3,		//< connection ready (signal sent once)
+			ERROR=	4		//< connection error
 		};
 		Event( Type t, const char* c, std::size_t s)
 			:m_type(t),m_content(c),m_contentsize(s){}
@@ -74,6 +75,7 @@ public:
 		Type type() const			{return m_type;}
 		const char* content() const		{return m_content;}
 		std::size_t contentsize() const		{return m_contentsize;}
+		std::string tostring() const;
 
 	private:
 		Type m_type;			//< type of the connection event
@@ -134,6 +136,7 @@ public:
 
 	void read();
 	void write( const char* data, std::size_t datasize);
+	void close();
 
 	///\enum State
 	///\brief Connection state

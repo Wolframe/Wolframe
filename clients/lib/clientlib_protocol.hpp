@@ -48,7 +48,7 @@ namespace client {
 // to process complete data items.
 ///@{
 
-///\brief Protocol handler
+///\brief Client protocol handler
 class Protocol
 {
 public:
@@ -64,8 +64,7 @@ public:
 			UIFORM=	2,		//< UI form sent from server to client in the initialization phase
 			ANSWER=	3,		//< answer of a requset from the server to the client in a session
 			STATE=	4,		//< selected state info for the client
-			REQERR=	5,		//< error in request (negative answer)
-			ERROR=	6		//< error reported by the server
+			ERROR=	5		//< error reported by the server
 		};
 
 		Event( Type t, const char* i, const char* c, std::size_t s)
@@ -77,6 +76,7 @@ public:
 		const char* id() const			{return m_id;}
 		const char* content() const		{return m_content;}
 		std::size_t contentsize() const		{return m_contentsize;}
+		std::string tostring() const;
 
 	private:
 		Type m_type;			//< type of the protocol event
@@ -86,6 +86,7 @@ public:
 	};
 
 	typedef void (*Callback)( void* clientobject, const Protocol::Event& event);
+	typedef void (*AnswerCallback)( void* requestobject, const Protocol::Event& event);
 
 	///\brief Constructor
 	///\param[in] notifier_ callback for event notification
@@ -99,9 +100,11 @@ public:
 	void pushData( const char* data, std::size_t datasize);
 
 	///\brief Push a request that will be served when the session is established
-	///\param[in] data request data (decrypted plain data)
-	///\param[in] datasize size of data in bytes
-	void pushRequest( const char* data, std::size_t datasize);
+	///\param[in] notifier_ to return answer to
+	///\param[in] requestobject_ handler for request answer
+	///\param[in] data_ request data (decrypted plain data)
+	///\param[in] datasize_ size of data in bytes
+	bool pushRequest( AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_);
 
 	bool isOpen() const;
 

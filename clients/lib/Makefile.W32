@@ -37,12 +37,10 @@ INCLUDE_LIBS = \
 LIBRARIES = \
 	libwolframe_client.lib
 
-OBJS = \
-	clientlib_protocol.obj
-
 CPP_OBJS = \
+	clientlib_session.obj \
 	clientlib_connect.obj \
-	clientlib.obj
+	clientlib_protocol.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 
