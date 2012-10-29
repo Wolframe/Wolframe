@@ -173,7 +173,7 @@ static void computeResponse ( const unsigned char* challenge, const unsigned cha
 CRAMresponse::CRAMresponse( const CRAMchallenge& challenge,
 			    const unsigned char* hash, std::size_t hashSize )
 {
-	computeResponse( challenge.m_challenge, hash, hashSize, m_response );
+	computeResponse( challenge.challenge(), hash, hashSize, m_response );
 }
 
 CRAMresponse::CRAMresponse( const std::string& challenge,
@@ -199,7 +199,7 @@ CRAMresponse::CRAMresponse( const CRAMchallenge& challenge, const std::string& p
 	if (( pwdLen = hex2byte( pwdHash.data(), hash, CRAM_CHALLENGE_SIZE )) < 0 )
 		throw std::runtime_error( "CRAM response: password hash is invalid" );
 
-	computeResponse( challenge.m_challenge, hash, pwdLen, m_response );
+	computeResponse( challenge.challenge(), hash, pwdLen, m_response );
 }
 
 

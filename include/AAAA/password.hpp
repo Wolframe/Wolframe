@@ -46,47 +46,74 @@ namespace AAAA {
 static const size_t PASSWORD_HASH_SIZE = 224 / 8;
 static const size_t PASSWORD_SALT_SIZE = 128 / 8;
 
-class PasswordSalt
-{
-	friend class PasswordHash;
-public:
-	/// Construct an empty salt (all bits 0).
-	PasswordSalt();
-	/// Construct a salt from the given byte array.
-	PasswordSalt( const unsigned char* data, size_t bytes );
-	/// Construct a salt by setting the value from the base64 encoded string.
-	PasswordSalt( const std::string& str );
-
-	/// Construct a random salt using device to generate random bytes.
-	void generate( const std::string& device );
-
-	/// Deep copy
-	PasswordSalt& operator = ( const PasswordSalt& rhs );
-
-	/// True if the 2 password salts are identical, false otherwise
-	bool operator == ( const PasswordSalt& rhs );
-	bool operator != ( const PasswordSalt& rhs )	{ return !( *this == rhs ); }
-
-	/// The size of the salt in bytes
-	size_t size() const			{ return m_size; }
-	/// The unsigned char vector of the salt
-	const unsigned char* salt() const	{ return m_salt; }
-
-	/// Return the salt as a BCD encoded string.
-	std::string toBCD() const;
-	/// Return the salt as a base64 encoded string (without base64 padding).
-	std::string toString() const;
-private:
-	std::size_t	m_size;
-	unsigned char	m_salt[ PASSWORD_SALT_SIZE ];
-};
-
 
 class PasswordHash
 {
 public:
+	class Salt
+	{
+		friend class PasswordHash;
+	public:
+		/// Construct an empty salt (all bits 0).
+		Salt();
+		/// Construct a salt from the given byte array.
+		Salt( const unsigned char* data, size_t bytes );
+		/// Construct a salt by setting the value from the base64 encoded string.
+		Salt( const std::string& str );
+
+		/// Construct a random salt using device to generate random bytes.
+		void generate( const std::string& device );
+
+		/// True if the 2 password salts are identical, false otherwise
+		bool operator == ( const Salt& rhs );
+		bool operator != ( const Salt& rhs )	{ return !( *this == rhs ); }
+
+		/// The size of the salt in bytes
+		size_t size() const			{ return m_size; }
+		/// The unsigned char vector of the salt
+		const unsigned char* salt() const	{ return m_salt; }
+
+		/// Return the salt as a BCD encoded string.
+		std::string toBCD() const;
+		/// Return the salt as a base64 encoded string (without base64 padding).
+		std::string toString() const;
+	private:
+		std::size_t	m_size;
+		unsigned char	m_salt[ PASSWORD_SALT_SIZE ];
+	};
+
+	class Hash
+	{
+		friend class PasswordHash;
+	public:
+		/// Construct an empty password hash (all bits 0).
+		Hash();
+		/// Construct the password hash from the given byte array.
+		Hash( const unsigned char* data, size_t bytes );
+		/// Construct the password hash by setting the value from the base64 encoded string.
+		Hash( const std::string& str );
+
+		/// True if the 2 password hashes are identical, false otherwise
+		bool operator == ( const Hash& rhs );
+		bool operator != ( const Hash& rhs )	{ return !( *this == rhs ); }
+
+		/// The size of the password hash in bytes
+		size_t size() const			{ return m_size; }
+		/// The unsigned char vector of the password hash
+		const unsigned char* hash() const	{ return m_hash; }
+
+		/// Return the password hash as a BCD encoded string.
+		std::string toBCD() const;
+		/// Return the password hash as a base64 encoded string
+		/// (without base64 padding).
+		std::string toString() const;
+	private:
+		std::size_t	m_size;
+		unsigned char	m_hash[ PASSWORD_HASH_SIZE ];
+	};
+
 	/// Construct the password hash from salt and password (plain text)
-	PasswordHash( const PasswordSalt& pwdSalt, const std::string& password );
+	PasswordHash( const std::string& pwdSalt, const std::string& password );
 
 	/// Construct the password hash from a combined password hash string (base64)
 	///\param	str	password hash string in format $<salt>$<hash>
@@ -95,13 +122,15 @@ public:
 	///			password hash as base64 and the salt will be zeroed
 	PasswordHash( const std::string& str );
 
-	/// Return the password salt
-	const PasswordSalt& salt() const	{ return m_salt; }
 
-	/// The size of the password hash without the salt in bytes
-	size_t size() const			{ return PASSWORD_HASH_SIZE; }
+	/// Generate a password salt and compute the password hash using the salt
+	void computeHash( const std::string& random, const std::string& password );
+
+	/// The password salt
+	const Salt& salt() const	{ return m_salt; }
+
 	/// The unsigned char vector of the password hash
-	const unsigned char* hash() const	{ return m_hash; }
+	const Hash& hash() const	{ return m_hash; }
 
 	/// Return the password hash as a BCD string.
 	/// The format is $<salt>$<hash> on one line, no whitespaces.
@@ -111,8 +140,8 @@ public:
 	std::string toString() const;
 
 private:
-	unsigned char	m_hash[ PASSWORD_HASH_SIZE ];
-	PasswordSalt	m_salt;
+	Hash	m_hash;
+	Salt	m_salt;
 };
 
 }} // namespace _Wolframe::AAAA
