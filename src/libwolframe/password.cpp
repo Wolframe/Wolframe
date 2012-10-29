@@ -171,7 +171,6 @@ static const size_t PASSWORD_HASH_BASE64_SIZE = (( PASSWORD_HASH_SIZE - 1 ) / 3 
 
 PasswordHash::Hash::Hash()
 {
-	m_size = 0;
 	memset( m_hash, 0, PASSWORD_HASH_SIZE );
 }
 
@@ -179,27 +178,25 @@ PasswordHash::Hash::Hash()
 /// and it can not be changed.
 PasswordHash::Hash::Hash( const unsigned char* data , size_t bytes )
 {
-	m_size = bytes > PASSWORD_HASH_SIZE ? PASSWORD_HASH_SIZE : bytes;
-	memcpy( m_hash, data, m_size );
+	memset( m_hash, 0, PASSWORD_HASH_SIZE );
+	memcpy( m_hash, data, (bytes > PASSWORD_HASH_SIZE ? PASSWORD_HASH_SIZE : bytes) );
 }
 
 PasswordHash::Hash::Hash( const std::string& str )
 {
-	int ret;
-	if (( ret = base64_decode( str.data(), str.size(),
-				   m_hash, PASSWORD_HASH_SIZE )) < 0 )	{
+	memset( m_hash, 0, PASSWORD_HASH_SIZE );
+
+	if (( base64_decode( str.data(), str.size(),
+			     m_hash, PASSWORD_HASH_SIZE )) < 0 )	{
 		std::string errMsg = "Cannot convert '" + str + "' to a password hash";
 		throw std::runtime_error( errMsg );
 	}
-	m_size = ret;
 }
-
-
 
 
 bool PasswordHash::Hash::operator == ( const Hash& rhs )
 {
-	if ( m_size != rhs.m_size || memcmp( m_hash, rhs.m_hash, m_size ))
+	if ( memcmp( m_hash, rhs.m_hash, PASSWORD_HASH_SIZE ))
 		return false;
 	return true;
 }
@@ -209,8 +206,8 @@ std::string PasswordHash::Hash::toBCD() const
 {
 	char	buffer[ PASSWORD_HASH_BCD_SIZE ];
 
-	int len = byte2hex( m_hash, m_size, buffer, PASSWORD_HASH_BCD_SIZE );
-	assert( len == (int)m_size * 2 );
+	int len = byte2hex( m_hash, PASSWORD_HASH_SIZE, buffer, PASSWORD_HASH_BCD_SIZE );
+	assert( len == (int)PASSWORD_HASH_SIZE * 2 );
 
 	return std::string( buffer );
 }
@@ -219,7 +216,7 @@ std::string PasswordHash::Hash::toString() const
 {
 	char	buffer[ PASSWORD_HASH_BASE64_SIZE ];
 
-	int len = base64::encode( m_hash, m_size, buffer, PASSWORD_HASH_BASE64_SIZE, 0 );
+	int len = base64::encode( m_hash, PASSWORD_HASH_SIZE, buffer, PASSWORD_HASH_BASE64_SIZE, 0 );
 	assert( len >= 0 && len < (int)PASSWORD_HASH_BASE64_SIZE );
 	while ( len > 0 && buffer[ len - 1 ] == '=' )
 		len--;
@@ -229,7 +226,7 @@ std::string PasswordHash::Hash::toString() const
 
 /****  PasswordHash  *************************************************/
 static void hashPassword( const unsigned char* /*pwdSalt*/, size_t /*saltSize*/, const std::string& password,
-			  unsigned char* hash, size_t /*hashSize*/ )
+			  unsigned char* hash )
 {
 	sha224((const unsigned char*)password.c_str(), password.length(), hash );
 }
@@ -238,7 +235,7 @@ static void hashPassword( const unsigned char* /*pwdSalt*/, size_t /*saltSize*/,
 PasswordHash::PasswordHash( const std::string& pwdSalt, const std::string& password )
 	: m_salt( pwdSalt )
 {
-	hashPassword( m_salt.salt(), m_salt.size(), password, m_hash.m_hash, PASSWORD_HASH_SIZE );
+	hashPassword( m_salt.salt(), m_salt.size(), password, m_hash.m_hash );
 }
 
 PasswordHash::PasswordHash( const std::string& str )
@@ -262,7 +259,7 @@ PasswordHash::PasswordHash( const std::string& str )
 void PasswordHash::computeHash( const std::string& random, const std::string& password )
 {
 	m_salt.generate( random );
-	hashPassword( m_salt.salt(), m_salt.size(), password, m_hash.m_hash, PASSWORD_HASH_SIZE );
+	hashPassword( m_salt.salt(), m_salt.size(), password, m_hash.m_hash );
 }
 
 

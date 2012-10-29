@@ -40,6 +40,7 @@
 #include <sstream>
 #include <iostream>
 
+#include "types/base64.h"
 #include "passwdFile.hpp"
 #include "AAAA/HMAC.hpp"
 
@@ -52,6 +53,7 @@ namespace _Wolframe {
 namespace AAAA {
 
 static const std::size_t PWD_FILE_LINE_SIZE = 1024 + 1;
+static const std::size_t MAX_HMAC_KEY_SIZE = 1024;
 
 std::string PasswordFile::passwdLine( const PwdFileUser& user )
 {
@@ -113,7 +115,7 @@ static bool parsePwdLine( const char* pwdLine, PwdFileUser& user )
 }
 
 
-bool PasswordFile::addUser( const PwdFileUser& user )
+bool PasswordFile::addUser( const PwdFileUser& user, bool caseSensitive )
 {
 	FILE*	file;
 
@@ -134,7 +136,7 @@ bool PasswordFile::addUser( const PwdFileUser& user )
 	}
 	else	{
 		PwdFileUser tmpUser;
-		if ( getUser( user.user, tmpUser ))
+		if ( getUser( user.user, tmpUser, caseSensitive ))
 			return false;
 		if (( file = fopen( m_filename.c_str(), "a+" )) == NULL )	{
 			int err = errno;
@@ -159,17 +161,18 @@ bool PasswordFile::addUser( const PwdFileUser& user )
 	return true;
 }
 
-bool PasswordFile::delUser( const std::string& username )
+bool PasswordFile::delUser( const std::string& username, bool caseSensitive )
 {
 	PwdFileUser user;
-	if ( ! getUser( username, user ))
+	if ( ! getUser( username, user, caseSensitive ))
 		return false;
 	std::cout << "Delete user '" << username << "' from password file '"
 		  << m_filename << "'\n";
 	return true;
 }
 
-bool PasswordFile::getUser( const std::string& username, PwdFileUser& user ) const
+bool PasswordFile::getUser( const std::string& username, PwdFileUser& user,
+			    bool caseSensitive ) const
 {
 	FILE*	file;
 	char	line[ PWD_FILE_LINE_SIZE ];
@@ -188,6 +191,8 @@ bool PasswordFile::getUser( const std::string& username, PwdFileUser& user ) con
 	}
 
 	std::string trimmedName = boost::algorithm::trim_copy( username );
+	if ( !caseSensitive )
+		boost::algorithm::to_lower( trimmedName );
 	while ( !feof( file ) )	{
 		char* ret = fgets( line, PWD_FILE_LINE_SIZE, file );
 		if ( ret == NULL )	{
@@ -203,7 +208,12 @@ bool PasswordFile::getUser( const std::string& username, PwdFileUser& user ) con
 				throw std::runtime_error( msg );
 			}
 		}
-		if ( pwdLineUser( line ) == trimmedName )	{
+		std::string uname = pwdLineUser( line );
+		if ( uname.empty() )
+			continue;
+		if ( !caseSensitive )
+			boost::algorithm::to_lower( uname );
+		if ( uname == trimmedName )	{
 			fclose( file );
 			bool found = parsePwdLine( line, user );
 			assert( found == true );
@@ -214,12 +224,19 @@ bool PasswordFile::getUser( const std::string& username, PwdFileUser& user ) con
 }
 
 bool PasswordFile::getHMACuser( const std::string& hash, const std::string& key,
-				PwdFileUser& user ) const
+				PwdFileUser& user, bool caseSensitive ) const
 {
-	FILE*	file;
-	char	line[ PWD_FILE_LINE_SIZE ];
+	FILE*		file;
+	char		line[ PWD_FILE_LINE_SIZE ];
+	unsigned char	binKey[ MAX_HMAC_KEY_SIZE ];
+	int		keySize;
 
 	HMAC_SHA256 userHash( hash );
+	if (( keySize = base64_decode( key.data(), key.size(),
+				       binKey, MAX_HMAC_KEY_SIZE )) < 0 )	{
+		std::string msg = "Cannot convert '" + key + "' to a HMAC binary key";
+		throw std::runtime_error( msg );
+	}
 
 	if ( !boost::filesystem::exists( m_filename ) && !m_create )	{
 		std::string msg = "password file '";
@@ -249,7 +266,13 @@ bool PasswordFile::getHMACuser( const std::string& hash, const std::string& key,
 				throw std::runtime_error( msg );
 			}
 		}
-		if ( HMAC_SHA256( key, pwdLineUser( line )) == userHash )	{
+		std::string uname = pwdLineUser( line );
+		if ( uname.empty())
+			continue;
+		if ( !caseSensitive )
+			boost::algorithm::to_lower( uname );
+		HMAC_SHA256	hsh( binKey, keySize, uname );
+		if ( hsh == userHash )	{
 			fclose( file );
 			bool found = parsePwdLine( line, user );
 			assert( found == true );

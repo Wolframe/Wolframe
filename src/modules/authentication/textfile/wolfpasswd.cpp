@@ -176,7 +176,8 @@ int main( int argc, char* argv[] )
 				user.info = args[2];
 		}
 		// now do the job
-		WA::PasswordHash pwd( DEFAULT_RANDOM_GENERATOR, passwd );
+		WA::PasswordHash pwd;
+		pwd.computeHash( DEFAULT_RANDOM_GENERATOR, passwd );
 		user.user = args[0];
 		user.hash = pwd.toString();
 		user.expiry = 0;
@@ -267,7 +268,8 @@ int main( int argc, char* argv[] )
 				if( args.size() == 4 )
 					user.info = args[3];
 			}
-			WA::PasswordHash pwd( DEFAULT_RANDOM_GENERATOR, passwd );
+			WA::PasswordHash pwd;
+			pwd.computeHash( DEFAULT_RANDOM_GENERATOR, passwd );
 			user.user = args[1];
 			user.hash = pwd.toString();
 			user.expiry = 0;

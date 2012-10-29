@@ -98,7 +98,7 @@ public:
 		bool operator != ( const Hash& rhs )	{ return !( *this == rhs ); }
 
 		/// The size of the password hash in bytes
-		size_t size() const			{ return m_size; }
+		size_t size() const			{ return PASSWORD_HASH_SIZE; }
 		/// The unsigned char vector of the password hash
 		const unsigned char* hash() const	{ return m_hash; }
 
@@ -108,18 +108,22 @@ public:
 		/// (without base64 padding).
 		std::string toString() const;
 	private:
-		std::size_t	m_size;
 		unsigned char	m_hash[ PASSWORD_HASH_SIZE ];
 	};
 
+	/// Construct an empty password hash.
+	PasswordHash()			{}
+
 	/// Construct the password hash from salt and password (plain text)
+	/// \param pwdSalt	password salt as a base64 string
+	/// \param password	password as plain text
 	PasswordHash( const std::string& pwdSalt, const std::string& password );
 
 	/// Construct the password hash from a combined password hash string (base64)
-	///\param	str	password hash string in format $<salt>$<hash>
-	///			if the string doesn't start with '$' then
-	///			the string is considered to represent only the
-	///			password hash as base64 and the salt will be zeroed
+	/// \param str	password hash string in format $<salt>$<hash>
+	///		if the string doesn't start with '$' then
+	///		the string is considered to represent only the
+	///		password hash as base64 and the salt will be zeroed
 	PasswordHash( const std::string& str );
 
 
