@@ -60,8 +60,8 @@ protected:
 
 TEST_F( PasswdFileFixture, PasswordSaltTest )
 {
-	unsigned char	salt[ PASSWORD_SALT_SIZE ];
-	PasswordSalt	salt0;
+	unsigned char		salt[ PASSWORD_SALT_SIZE ];
+	PasswordHash::Salt	salt0;
 
 	EXPECT_EQ( salt0.size(), 0 );
 	EXPECT_STREQ( "", salt0.toBCD().c_str() );
@@ -69,8 +69,8 @@ TEST_F( PasswdFileFixture, PasswordSaltTest )
 
 	for ( size_t i = 0; i < PASSWORD_SALT_SIZE; i++ )
 		salt[ i ] = 0;
-	PasswordSalt	salt1( salt, PASSWORD_SALT_SIZE );
-	PasswordSalt	salt1_0( "AAAAAAAAAAAAAAAAAAAAAA" );
+	PasswordHash::Salt	salt1( salt, PASSWORD_SALT_SIZE );
+	PasswordHash::Salt	salt1_0( "AAAAAAAAAAAAAAAAAAAAAA" );
 	EXPECT_EQ( salt1.size(), 16 );
 	EXPECT_STRCASEEQ( "00000000000000000000000000000000", salt1.toBCD().c_str() );
 	EXPECT_STRCASEEQ( "AAAAAAAAAAAAAAAAAAAAAA", salt1.toString().c_str() );
@@ -78,14 +78,14 @@ TEST_F( PasswdFileFixture, PasswordSaltTest )
 
 	for ( size_t i = 0; i < PASSWORD_SALT_SIZE; i++ )
 		salt[ i ] = i;
-	PasswordSalt	salt2( salt, PASSWORD_SALT_SIZE );
+	PasswordHash::Salt	salt2( salt, PASSWORD_SALT_SIZE );
 	EXPECT_EQ( salt2.size(), PASSWORD_SALT_SIZE );
 	EXPECT_STRCASEEQ( "000102030405060708090a0b0c0d0e0f", salt2.toBCD().c_str() );
 	EXPECT_STRCASEEQ( "AAECAwQFBgcICQoLDA0ODw", salt2.toString().c_str() );
 
 	for ( size_t i = 0; i < PASSWORD_SALT_SIZE; i++ )
 		salt[ i ] = 0xff;
-	PasswordSalt	salt3( salt, PASSWORD_SALT_SIZE );
+	PasswordHash::Salt	salt3( salt, PASSWORD_SALT_SIZE );
 	EXPECT_EQ( salt3.size(), PASSWORD_SALT_SIZE );
 	EXPECT_STRCASEEQ( "ffffffffffffffffffffffffffffffff", salt3.toBCD().c_str() );
 	EXPECT_STRCASEEQ( "/////////////////////w", salt3.toString().c_str() );
@@ -96,7 +96,7 @@ TEST_F( PasswdFileFixture, PasswordHashTest )
 	PasswordHash	hash0( "$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAA");
 
 	EXPECT_STREQ( "00000000000000000000000000000000", hash0.salt().toBCD().c_str() );
-	EXPECT_EQ( 0, hash0.hash()[ 0 ] );
+	EXPECT_EQ( 0, hash0.hash().hash()[0] );
 	std::cout << hash0.toString();
 }
 

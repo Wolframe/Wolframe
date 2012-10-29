@@ -54,9 +54,11 @@ static const size_t CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
 
 class CRAMchallenge
 {
-	friend class CRAMresponse;
 public:
 	CRAMchallenge( const std::string& randomDevice );
+
+	const unsigned char* challenge() const		{ return m_challenge; }
+	std::size_t size() const			{ return CRAM_CHALLENGE_SIZE; }
 
 	std::string toBCD() const;
 	std::string toString() const;
@@ -77,6 +79,8 @@ public:
 	CRAMresponse( const CRAMchallenge& challenge, const std::string& pwdHash );
 	CRAMresponse( const std::string& challenge, const std::string& pwdHash );
 
+	const unsigned char* response() const		{ return m_response; }
+	std::size_t size() const			{ return CRAM_RESPONSE_SIZE; }
 
 	std::string toBCD() const;
 	std::string toString() const;

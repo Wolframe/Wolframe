@@ -176,9 +176,7 @@ int main( int argc, char* argv[] )
 				user.info = args[2];
 		}
 		// now do the job
-		WA::PasswordSalt salt;
-		salt.generate( DEFAULT_RANDOM_GENERATOR );
-		WA::PasswordHash pwd( salt, passwd );
+		WA::PasswordHash pwd( DEFAULT_RANDOM_GENERATOR, passwd );
 		user.user = args[0];
 		user.hash = pwd.toString();
 		user.expiry = 0;
@@ -269,9 +267,7 @@ int main( int argc, char* argv[] )
 				if( args.size() == 4 )
 					user.info = args[3];
 			}
-			WA::PasswordSalt salt;
-			salt.generate( DEFAULT_RANDOM_GENERATOR );
-			WA::PasswordHash pwd( salt, passwd );
+			WA::PasswordHash pwd( DEFAULT_RANDOM_GENERATOR, passwd );
 			user.user = args[1];
 			user.hash = pwd.toString();
 			user.expiry = 0;

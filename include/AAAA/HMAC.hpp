@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///
-///
+/// Standard HMAC-SHA256 implementation
 ///
 
 #ifndef _HMAC_HPP_INCLUDED
