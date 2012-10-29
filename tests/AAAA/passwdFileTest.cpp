@@ -38,6 +38,7 @@
 #include "gtest/gtest.h"
 #include "passwdFile.hpp"
 #include "AAAA/password.hpp"
+#include "AAAA/HMAC.hpp"
 
 #ifdef _WIN32
 #define WIN32_MEAN_AND_LEAN
@@ -117,6 +118,37 @@ TEST_F( PasswdFileFixture, getUser )
 	EXPECT_STREQ( "Wolframe Administrator", user.info.c_str() );
 }
 
+TEST_F( PasswdFileFixture, getHMACuser )
+{
+	PasswordFile	pwdFile( "passwd", false );
+	PwdFileUser	user;
+	PasswordHash::Salt	salt;
+	bool result;
+
+	salt.generate( "/dev/urandom" );
+	HMAC_SHA256	hmac0( salt.salt(), salt.size(), "Admin" );
+	result = pwdFile.getHMACuser( hmac0.toString(), salt.toString(), user, true );
+	EXPECT_FALSE( result );
+
+	HMAC_SHA256	hmac1( salt.salt(), salt.size(), "admin" );
+	result = pwdFile.getHMACuser( hmac1.toString(), salt.toString(), user, false );
+	ASSERT_TRUE( result );
+	EXPECT_STREQ( "admin", user.user.c_str() );
+	EXPECT_STREQ( "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6", user.hash.c_str() );
+	EXPECT_STREQ( "Wolframe Administrator", user.info.c_str() );
+
+	result = pwdFile.getHMACuser( hmac1.toString(), salt.toString(), user, true );
+	ASSERT_TRUE( result );
+	EXPECT_STREQ( "admin", user.user.c_str() );
+	EXPECT_STREQ( "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6", user.hash.c_str() );
+	EXPECT_STREQ( "Wolframe Administrator", user.info.c_str() );
+
+	result = pwdFile.getHMACuser( hmac1.toString(), salt.toString(), user, false );
+	ASSERT_TRUE( result );
+	EXPECT_STREQ( "admin", user.user.c_str() );
+	EXPECT_STREQ( "1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6", user.hash.c_str() );
+	EXPECT_STREQ( "Wolframe Administrator", user.info.c_str() );
+}
 //****************************************************************************
 
 int main( int argc, char **argv )
