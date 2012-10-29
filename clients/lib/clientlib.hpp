@@ -31,8 +31,7 @@
 
 ************************************************************************/
 ///\file clientlib.hpp
-///\brief C++ client library interface
-
+///\brief Client library interface
 #ifndef _WOLFRAME_CLIENTLIB_HPP_INCLUDED
 #define _WOLFRAME_CLIENTLIB_HPP_INCLUDED
 #include "clientlib.h"

@@ -33,7 +33,7 @@
 ************************************************************************/
 ///\file clientlib_connect.cpp
 ///\brief Implementation of the client connection handling
-#include "clientlib.h"
+#include "clientlib_connect.hpp"
 #include <iostream>
 #include <sstream>
 #include <cstring>
@@ -47,29 +47,8 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/utility/enable_if.hpp>
 
-namespace _Wolframe {
-namespace client {
-
-struct ContextConfig
-{
-	ContextConfig( const char* address_, const char* name_, const char* clientKeyFile_, const char* clientCertFile_, const char* CACertFile_)
-		:m_address(address_)
-		,m_name(name_)
-		,m_clientKeyFile(clientKeyFile_)
-		,m_clientCertFile(clientCertFile_)
-		,m_CACertFile(CACertFile_){}
-
-	ContextConfig( const char* address_, const char* name_)
-		:m_address(address_)
-		,m_name(name_){}
-
-	std::string m_address;
-	std::string m_name;
-	std::string m_clientKeyFile;
-	std::string m_clientCertFile;
-	std::string m_CACertFile;
-};
-
+using namespace _Wolframe;
+using namespace _Wolframe::client;
 
 #ifdef WITH_SSL
 struct TransportLayerSSL
@@ -77,7 +56,7 @@ struct TransportLayerSSL
 	typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket_type;
 	typedef void (*handshake_handler_type)( const boost::system::error_code &ec);
 
-	static socket_type* socket( boost::asio::io_service& io_service, const ContextConfig& config)
+	static socket_type* socket( boost::asio::io_service& io_service, const Connection::Configuration& config)
 	{
 		boost::system::error_code ec;
 		boost::asio::ssl::context ctx( io_service, boost::asio::ssl::context::sslv23);
@@ -87,15 +66,15 @@ struct TransportLayerSSL
 		ctx.set_verify_mode( boost::asio::ssl::context::verify_peer
 			| boost::asio::ssl::context::verify_fail_if_no_peer_cert );
 
-		ctx.load_verify_file( config.m_CACertFile );
-		ctx.use_certificate_file( config.m_clientCertFile, boost::asio::ssl::context::pem, ec);
+		ctx.load_verify_file( config.m_CA_cert_file);
+		ctx.use_certificate_file( config.m_client_cert_file, boost::asio::ssl::context::pem, ec);
 		if (ec)
 		{
 			std::ostringstream msg;
 			msg << "client certificate illegal or in wrong format (expecting PEM): " << ec.message( ) << " (" << ec.value( ) << ")";
 			throw std::runtime_error( msg.str());
 		}
-		ctx.use_private_key_file( config.m_clientKeyFile, boost::asio::ssl::context::pem, ec);
+		ctx.use_private_key_file( config.m_client_cert_key, boost::asio::ssl::context::pem, ec);
 		if (ec)
 		{
 			std::ostringstream msg;
@@ -112,40 +91,36 @@ struct TransportLayerPlain
 	typedef boost::asio::ip::tcp::socket socket_type;
 	typedef void (*handshake_handler_type)( const boost::system::error_code &ec);
 
-	static socket_type* socket( boost::asio::io_service& io_service, const ContextConfig&)
+	static socket_type* socket( boost::asio::io_service& io_service, const Connection::Configuration&)
 	{
 		return new socket_type( io_service);
 	}
 };
 
 
-struct ConnectionBase
+struct Connection::Impl
 {
-	ConnectionBase()
-		:m_state(WOLFCLI_CONNSTATE_INIT){}
-
-	virtual ~ConnectionBase(){}
+	Impl() :m_state(INIT){}
+	virtual ~Impl(){}
 	virtual void write( const char* data, std::size_t size)=0;
 	virtual void read()=0;
 
-	wolfcli_ConnectionState state()		{return m_state;}
+	Connection::State state() const		{return m_state;}
 
 protected:
-	wolfcli_ConnectionState m_state;
+	Connection::State m_state;
 };
 
 
 template <class TransportLayer>
-class ConnectionImpl :public ConnectionBase
+class ConnectionImpl :public Connection::Impl
 {
 public:
-	ConnectionImpl(	const ContextConfig& config,
-			unsigned short connect_timeout,
-			unsigned short read_timeout,
-			wolfcli_ConnectionEventCallback notifier_,
+	ConnectionImpl( const Connection::Configuration& config,
+			Connection::Callback  notifier_,
 			void* clientobject_)
-		:m_connect_timeout(connect_timeout)
-		,m_read_timeout(read_timeout)
+		:m_connect_timeout(config.m_connect_timeout)
+		,m_read_timeout(config.m_read_timeout)
 		,m_notifier(notifier_)
 		,m_clientobject(clientobject_)
 	{
@@ -156,9 +131,9 @@ public:
 
 		if (endpoint_iter != boost::asio::ip::tcp::resolver::iterator())
 		{
-			notify( WOLFCLI_CONN_ERROR, "unable to resove host");
+			notify( Connection::Event::ERROR, "unable to resove host");
 		}
-		notify( WOLFCLI_CONN_STATE, "resolved");
+		notify( Connection::Event::STATE, "resolved");
 
 		m_socket.reset( TransportLayer::socket( m_io_service, config));
 		m_deadline_timer.reset( new boost::asio::deadline_timer( m_io_service));
@@ -166,48 +141,44 @@ public:
 		m_socket->lowest_layer().async_connect( endpoint_iter->endpoint(),
 			boost::bind( &ConnectionImpl::handle_connect, this, _1, endpoint_iter));
 		m_deadline_timer->async_wait( boost::bind( &ConnectionImpl::check_deadline, this));
-		notify( WOLFCLI_CONN_STATE, "connect");
-		m_state = WOLFCLI_CONNSTATE_OPEN;
+		notify( Connection::Event::STATE, "connect");
+		m_state = Connection::OPEN;
 	}
 
 	virtual ~ConnectionImpl()
 	{
-		if (m_state == WOLFCLI_CONNSTATE_OPEN || m_state == WOLFCLI_CONNSTATE_READY)
+		if (m_state == Connection::OPEN || m_state == Connection::READY)
 		{
 			m_socket->lowest_layer().close();
 			m_io_service.stop();
-			notify( WOLFCLI_CONN_STATE, "terminated");
+			notify( Connection::Event::STATE, "terminated");
 		}
 	}
 
 private:
-	void notify( wolfcli_ConnectionEventType type, const char* content, size_t contentsize)
+	void notify( Connection::Event::Type type, const char* content, std::size_t contentsize)
 	{
-		wolfcli_ConnectionEvent event;
-		event.type = type;
-		event.content = content;
-		event.contentsize = contentsize;
-		m_notifier( m_clientobject, &event);
+		m_notifier( m_clientobject, Connection::Event( type, content, contentsize));
 	}
 
-	void notify( wolfcli_ConnectionEventType type, const char* content=0)
+	void notify( Connection::Event::Type type, const char* content=0)
 	{
-		notify( type, content, content?std::strlen(content):0);
+		m_notifier( m_clientobject, Connection::Event( type, content));
 	}
 
 	void conn_stop()
 	{
 		m_socket->lowest_layer().close();
 		m_io_service.stop();
-		notify( WOLFCLI_CONN_STATE, "terminated");
-		m_state = WOLFCLI_CONNSTATE_CLOSED;
+		notify( Connection::Event::STATE, "terminated");
+		m_state = Connection::CLOSED;
 	}
 
 	void conn_error( const char* errmsg, const boost::system::error_code &ec)
 	{
 		std::ostringstream msg;
 		msg << errmsg << ": " << ec.message() << " (" << ec.value() << ")";
-		notify( WOLFCLI_CONN_ERROR, ec.message().c_str());
+		notify( Connection::Event::ERROR, ec.message().c_str());
 	}
 
 	void handle_connect( const boost::system::error_code &ec, boost::asio::ip::tcp::resolver::iterator)
@@ -219,7 +190,7 @@ private:
 		}
 		else
 		{
-			notify( WOLFCLI_CONN_STATE, "connect");
+			notify( Connection::Event::STATE, "connect");
 			handshake();
 		}
 	}
@@ -257,8 +228,8 @@ private:
 		else
 		{
 			m_deadline_timer->expires_from_now( boost::posix_time::seconds( m_read_timeout));
-			notify( WOLFCLI_CONN_STATE, "connected");
-			m_state = WOLFCLI_CONNSTATE_READY;
+			notify( Connection::Event::STATE, "connected");
+			m_state = Connection::READY;
 		}
 	}
 
@@ -267,7 +238,7 @@ private:
 		if( m_deadline_timer->expires_at() <= boost::asio::deadline_timer::traits_type::now())
 		{
 			m_deadline_timer->expires_at( boost::posix_time::pos_infin);
-			notify( WOLFCLI_CONN_ERROR, "timeout");
+			notify( Connection::Event::ERROR, "timeout");
 			conn_stop();
 		}
 		else
@@ -278,14 +249,7 @@ private:
 
 	virtual void write( const char* data, std::size_t size)
 	{
-		try
-		{
-			boost::asio::write( *m_socket, boost::asio::buffer( data, size));
-		}
-		catch (const std::exception& e)
-		{
-			notify( WOLFCLI_CONN_ERROR, e.what());
-		}
+		boost::asio::write( *m_socket, boost::asio::buffer( data, size));
 	}
 
 	virtual void read()
@@ -305,7 +269,7 @@ private:
 			if( ec.category() == boost::system::system_category() &&
 				ec.value() == boost::system::errc::operation_canceled) {
 				// The server sends a timeout, we get a ECANCELED (errno.h)
-				notify( WOLFCLI_CONN_STATE, "canceled");
+				notify( Connection::Event::STATE, "canceled");
 			}
 			else
 			{
@@ -315,7 +279,7 @@ private:
 		}
 		else
 		{
-			notify( WOLFCLI_CONN_DATA, m_buffer, bytes_transferred);
+			notify( Connection::Event::DATA, m_buffer, bytes_transferred);
 		}
 	}
 
@@ -326,133 +290,54 @@ private:
 	boost::shared_ptr<boost::asio::deadline_timer> m_deadline_timer;
 	unsigned short m_connect_timeout;
 	unsigned short m_read_timeout;
-	wolfcli_ConnectionEventCallback m_notifier;
+	Connection::Callback m_notifier;
 	void* m_clientobject;
 	enum { BufferSize = 1<<12 };
 	char m_buffer[ BufferSize];
 };
 
-}} //namespace
 
-
-struct wolfcli_ConnectionStruct
+Connection::Connection( const Configuration& cfg, Callback notifier_, void* clientobject_)
+	:m_impl(0)
+	,m_notifier(notifier_)
+	,m_clientobject(clientobject_)
 {
-	_Wolframe::client::ConnectionBase* m_impl;
-	void* m_clientobject;
-	wolfcli_ConnectionEventCallback m_notifier;
-};
-
-static void notifyError( void* clientobject, wolfcli_ConnectionEventCallback notifier, const char* msg)
-{
-	wolfcli_ConnectionEvent event;
-	event.type = WOLFCLI_CONN_ERROR;
-	event.content = msg;
-	event.contentsize = strlen(msg);
-	notifier( clientobject, &event);
-}
-
-extern "C" wolfcli_Connection wolfcli_createConnection(
-	const char* address,
-	const char* name,
-	unsigned short connect_timeout,
-	unsigned short read_timeout,
-	void* clientobject,
-	wolfcli_ConnectionEventCallback notifier)
-{
-	wolfcli_Connection rt = (wolfcli_Connection) std::malloc( sizeof( wolfcli_ConnectionStruct));
-	if (!rt) return 0;
-	try
+	switch (cfg.m_transportLayerType)
 	{
-		rt->m_impl = new _Wolframe::client::ConnectionImpl<_Wolframe::client::TransportLayerPlain>(
-					_Wolframe::client::ContextConfig( address, name),
-					connect_timeout, read_timeout,
-					notifier, clientobject);
-		rt->m_clientobject = clientobject;
-		rt->m_notifier = notifier;
-		return rt;
-	}
-	catch (const std::exception& err)
-	{
-		notifyError( clientobject, notifier, err.what());
-		std::free( rt);
-		return 0;
-	}
-}
-
-#ifdef WITH_SSL
-extern "C" wolfcli_Connection wolfcli_createConnection_SSL(
-	const char* address,
-	const char* name,
-	unsigned short connect_timeout,
-	unsigned short read_timeout,
-	void* clientobject,
-	wolfcli_ConnectionEventCallback notifier,
-	const char* CA_cert_file,
-	const char* client_cert_file,
-	const char* client_cert_key)
-{
-	wolfcli_Connection rt = (wolfcli_Connection) std::malloc( sizeof( wolfcli_ConnectionStruct));
-	if (!rt) return 0;
-	try
-	{
-		rt->m_impl = new _Wolframe::client::ConnectionImpl<_Wolframe::client::TransportLayerSSL>(
-					_Wolframe::client::ContextConfig( address, name, CA_cert_file, client_cert_file, client_cert_key),
-					connect_timeout, read_timeout,
-					notifier, clientobject);
-		rt->m_clientobject = clientobject;
-		rt->m_notifier = notifier;
-		return rt;
-	}
-	catch (const std::exception& err)
-	{
-		notifyError( clientobject, notifier, err.what());
-		std::free( rt);
-		return 0;
-	}
-}
+		case Configuration::SSL:
+#if !WITH_SSL
+			throw std::runtime_error( "no SSL support built in (WITH_SSL=1)");
 #endif
-
-extern "C" void wolfcli_destroyConnection(
-	wolfcli_Connection conn)
-{
-	delete conn->m_impl;
-	std::free( conn);
-}
-
-extern "C" wolfcli_ConnectionState wolfcli_connection_state( wolfcli_Connection conn)
-{
-	return conn->m_impl?conn->m_impl->state():WOLFCLI_CONNSTATE_NULL;
-}
-
-extern "C" int wolfcli_connection_read( wolfcli_Connection conn)
-{
-	try
-	{
-		conn->m_impl->read();
-		return 1;
-	}
-	catch (const std::exception& e)
-	{
-		notifyError( conn->m_clientobject, conn->m_notifier, e.what());
-		return 0;
+			m_impl = new ConnectionImpl<TransportLayerSSL>( cfg, notifier_, clientobject_);
+			break;
+		case Configuration::Plain:
+			m_impl = new ConnectionImpl<TransportLayerPlain>( cfg, notifier_, clientobject_);
+			break;
+		default:
+			throw std::runtime_error( "undefined transport layer type (WITH_SSL=1)");
 	}
 }
 
-extern "C" int wolfcli_connection_write(
-	wolfcli_Connection conn,
-	const char* data,
-	size_t datasize)
+Connection::~Connection()
 {
-	try
-	{
-		conn->m_impl->write( data, datasize);
-		return 1;
-	}
-	catch (const std::exception& e)
-	{
-		notifyError( conn->m_clientobject, conn->m_notifier, e.what());
-		return 0;
-	}
+	delete m_impl;
 }
+
+Connection::State Connection::state() const
+{
+	return m_impl->state();
+}
+
+void Connection::read()
+{
+	m_impl->read();
+}
+
+void Connection::write( const char* data, std::size_t datasize)
+{
+	m_impl->write( data, datasize);
+}
+
+
 
 

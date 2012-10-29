@@ -39,12 +39,11 @@ DYNAMIC_LIB_MAJOR = 0
 DYNAMIC_LIB_MINOR = 0
 DYNAMIC_LIB_PATCH = 0
 
-OBJS = \
-	clientlib_protocol.o
+OBJS =
 
 CPP_OBJS = \
 	clientlib_connect.o \
-	clientlib.o
+	clientlib_protocol.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
