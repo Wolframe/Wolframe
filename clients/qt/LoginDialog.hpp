@@ -51,6 +51,7 @@ namespace _Wolframe {
 		void mechsReceived( QStringList mechs );
 		void login( );
 		void authOk( );
+		void authFailed( );
 	};
 } // namespace QtClient
 } // namespace _Wolframe

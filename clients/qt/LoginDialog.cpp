@@ -49,6 +49,9 @@ void LoginDialog::initialize( )
 
 	connect( m_wolframeClient, SIGNAL( authOk( ) ),
 		this, SLOT( authOk( ) ) );
+
+	connect( m_wolframeClient, SIGNAL( authFailed( ) ),
+		this, SLOT( authFailed( ) ) );
 		
 	m_wolframeClient->auth( );		
 }
@@ -106,13 +109,11 @@ void LoginDialog::authOk( )
 	emit authenticationOk( );
 }
 
-/*			
-	if( m_succeeded ) {
-	} else {
-		emit authenticationFailed( );
-	}
+void LoginDialog::authFailed( )
+{
+	close( );
+	emit authenticationFailed( );
 }
-*/
 
 } // namespace QtClient
 } // namespace _Wolframe

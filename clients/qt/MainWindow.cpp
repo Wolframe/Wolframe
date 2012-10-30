@@ -204,48 +204,6 @@ void MainWindow::initialize( )
 	loadLanguage( QLocale::system( ).name( ) );
 }
 
-/* network loading after authentication
-// for testing, load lists of available forms from the files system,
-// pass the form loader to the FormWidget
-	switch( m_loadMode ) {
-		case Local:
-			m_formLoader = new FileFormLoader( "forms", "i18n" );
-			m_dataLoader = new FileDataLoader( "data" );
-			break;
-		case Network:
-			// TODO: load later
-			//m_formLoader = new NetworkFormLoader( m_wolframeClient );
-			//m_dataLoader = new NetworkDataLoader( m_wolframeClient );
-			break;
-		default:
-			qWarning( ) << "Illegal load mode" << m_loadMode;
-			QCoreApplication::quit( );
-	}
-
-// create delegate widget for form handling (one for now), in theory may are possible
-	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this );
-	
-// link the form loader for form loader notifications needed by the main window
-// (list of forms for form menu, list of language for language picker)
-	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
-		this, SLOT( languageCodesLoaded( QStringList ) ) );
-	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
-		this, SLOT( formListLoaded( QStringList ) ) );
-
-// get notified if the form widget changes a form
-	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
-		this, SLOT( formLoaded( QString ) ) );
-
-// set default language to the system language
-	m_currentLanguage = QLocale::system( ).name( );
-
-// load default theme
-	loadTheme( QString( QLatin1String( "windows" ) ) );
-
-// load language resources, repaints the whole interface if necessary
-	loadLanguage( QLocale::system( ).name( ) );
- */
-
 void MainWindow::connected( )
 {
 	m_loginDialog = new LoginDialog( m_wolframeClient, this );
@@ -270,6 +228,33 @@ void MainWindow::authenticationOk( )
 	m_loginDialog->deleteLater( );
 	
 	qDebug( ) << "authentication succeeded";
+
+// create network based form and data loaders
+	m_formLoader = new NetworkFormLoader( m_wolframeClient );
+	m_dataLoader = new NetworkDataLoader( m_wolframeClient );
+
+// create delegate widget for form handling (one for now), in theory may are possible
+	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this );
+	
+// link the form loader for form loader notifications needed by the main window
+// (list of forms for form menu, list of language for language picker)
+	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
+		this, SLOT( languageCodesLoaded( QStringList ) ) );
+	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
+		this, SLOT( formListLoaded( QStringList ) ) );
+
+// get notified if the form widget changes a form
+	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+		this, SLOT( formLoaded( QString ) ) );
+
+// set default language to the system language
+	m_currentLanguage = QLocale::system( ).name( );
+
+// load default theme
+	loadTheme( QString( QLatin1String( "windows" ) ) );
+
+// load language resources, repaints the whole interface if necessary
+	loadLanguage( QLocale::system( ).name( ) );	
 }
 
 void MainWindow::authenticationFailed( )

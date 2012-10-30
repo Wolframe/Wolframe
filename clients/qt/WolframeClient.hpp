@@ -62,6 +62,7 @@ namespace _Wolframe {
 
 // generic send command function, implementing the frame of the protocol
 		void sendCommand( QString command );
+		void sendCommand( QString command, QStringList params );
 
 // high-level commands
 		void auth( );
@@ -121,6 +122,7 @@ namespace _Wolframe {
 		void resultReceived( );
 		void mechsReceived( QStringList mechList );
 		void authOk( );
+		void authFailed( );
 		void loginOk( );
 		void loginFailed( );
 		void runReceived( QString cmd, QString answer );

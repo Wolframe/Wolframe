@@ -299,8 +299,7 @@ void WolframeClient::dataAvailable( )
 					if( len > 6 ) {
 						m_answer = QString( QByteArray( buf+6, len-6 ) );
 					}
-					QStringList mechs = m_answer.split( " \t", QString::SkipEmptyParts );
-					emit mechsReceived( mechs );					
+					emit resultReceived( );
 				} else if( buf[0] == '.' && buf[1] == '\n' ) {
 					emit resultReceived( );
 				} else {
@@ -332,14 +331,33 @@ void WolframeClient::sendCommand( QString command )
 	sendLine( command );
 }
 
+void WolframeClient::sendCommand( QString command, QStringList params )
+{
+	QString line;
+	
+	m_answer = "";
+	m_command = command;
+	m_hasErrors = false;
+	
+	line.append( command );
+	foreach( QString param, params ) {  
+		line.append( ' ' );
+		line.append( param );
+	}
+	
+	sendLine( line );	
+}
+
 void WolframeClient::auth( )
 {
-	sendCommand( "auth" );
+	sendCommand( "AUTH" );
 }
 
 void WolframeClient::mech( QString mech )
 {
-	sendCommand( "mech " + mech );
+	QStringList params;
+	params << mech;
+	sendCommand( "MECH", params );
 }
 
 void WolframeClient::login( QString username, QString password )
@@ -361,9 +379,15 @@ void WolframeClient::handleResult( )
 	if( m_command == "CONNECT" ) {
 		// swallow greeting line from server after connect
 		emit connected( );
-	} else if( m_command == "auth" ) {
-		QStringList mechList;
+	} else if( m_command == "AUTH" ) {
+		QStringList mechList = m_answer.split( " \t", QString::SkipEmptyParts );
 		emit mechsReceived( mechList );
+	} else if( m_command == "MECH" ) {
+		if( m_answer == "authorization" ) {
+			emit authOk( );
+		} else {
+			emit authFailed( );
+		}
 	} else if( m_command.startsWith( "run" ) ) {
 		emit runReceived( m_command, m_answer );
 	}
