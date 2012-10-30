@@ -9,8 +9,6 @@
 #include <QFile>
 #include <QList>
 
-#include <qxtsignalwaiter.h>
-
 namespace _Wolframe {
 	namespace QtClient {
 
@@ -353,24 +351,11 @@ void WolframeClient::auth( )
 	sendCommand( "AUTH" );
 }
 
-void WolframeClient::mech( QString mech )
+void WolframeClient::mech( QString _mech )
 {
 	QStringList params;
-	params << mech;
+	params << _mech;
 	sendCommand( "MECH", params );
-}
-
-void WolframeClient::login( QString username, QString password )
-{
-	sendCommand( "login" );
-	// TODO: challenge isuing username/password
-	
-	emit loginOk( );
-}
-
-void WolframeClient::run( QString cmd, QString data )
-{
-	sendCommand( "run " + cmd );
 }
 
 void WolframeClient::handleResult( )
@@ -388,52 +373,6 @@ void WolframeClient::handleResult( )
 		} else {
 			emit authFailed( );
 		}
-	} else if( m_command.startsWith( "run" ) ) {
-		emit runReceived( m_command, m_answer );
-	}
-}
-
-// synchonous versions
-
-bool WolframeClient::syncConnect( )
-{
-	m_command = "CONNECT";
-	connect( );
-	return( QxtSignalWaiter::wait( this, SIGNAL( connected( ) ), m_timeout ) );
-}
-
-QStringList WolframeClient::syncAuth( )
-{
-	QStringList mechList;
-	auth( );
-	if( QxtSignalWaiter::wait( this, SIGNAL( authReceived( ) ), m_timeout ) ) {
-		if( m_hasErrors ) return mechList;
-		return mechList;
-	} else {
-		return mechList;
-	}
-}
-
-bool WolframeClient::syncLogin( QString username, QString password )
-{
-	login( username, password );
-	if( QxtSignalWaiter::wait( this, SIGNAL( loginFailed( ) ), SIGNAL( loginOk( ) ), m_timeout ) ) {
-		if( m_hasErrors ) return false;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-QString WolframeClient::syncRun( QString cmd, QString data )
-{
-	run( cmd );
-	// TODO: send data now
-	if( QxtSignalWaiter::wait( this, SIGNAL( runReceived( QString, QString ) ), SIGNAL( error( QString ) ), m_timeout ) ) {
-		if( m_hasErrors ) return QString::null;
-		return m_answer;
-	} else {
-		return QString::null;
 	}
 }
 

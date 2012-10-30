@@ -67,15 +67,6 @@ namespace _Wolframe {
 // high-level commands
 		void auth( );
 		void mech( QString mech );
-		void login( QString username, QString password );
-		void run( QString cmd, QString data = QString::null );
-
-// synchonous commands
-		bool syncConnect( );
-		QStringList syncAuth( );
-		bool sync( QString mech );
-		bool syncLogin( QString username, QString password );
-		QString syncRun( QString cmd, QString data = QString::null );
 
 		Q_PROPERTY( QString m_host READ host WRITE setHost )
 		QString host( ) const { return m_host; }
@@ -123,9 +114,6 @@ namespace _Wolframe {
 		void mechsReceived( QStringList mechList );
 		void authOk( );
 		void authFailed( );
-		void loginOk( );
-		void loginFailed( );
-		void runReceived( QString cmd, QString answer );
 
 // high-level commands
 	};
