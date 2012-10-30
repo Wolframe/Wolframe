@@ -221,9 +221,8 @@ void MainWindow::connected( )
 
 void MainWindow::disconnected( )
 {
-	qDebug( ) << "lost connection to server";
-
 	disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+	m_debugTerminal->close( );
 	m_debugTerminal = 0;
 	debugTerminal = 0;
 		
