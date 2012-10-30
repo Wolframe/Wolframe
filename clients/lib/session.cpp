@@ -35,7 +35,6 @@
 #include "session.hpp"
 #include <stdexcept>
 #include <iostream>
-#include <boost/move/move.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::client;

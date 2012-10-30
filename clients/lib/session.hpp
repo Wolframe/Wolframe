@@ -48,7 +48,7 @@ namespace client {
 // to process complete data items.
 ///@{
 
-///\brief Client request handler. Handles single request in a session
+///\brief Client request handler. Handles a single request in a session
 struct RequestHandler
 {
 	virtual ~RequestHandler(){}

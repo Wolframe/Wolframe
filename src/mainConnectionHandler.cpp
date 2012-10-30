@@ -170,9 +170,10 @@ int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 		return Authorized;
 	}
 	cmdbind::AuthCommandHandler* authch = m_authMechanisms.get( argv[0]);
-	if (authch)
+	if (!authch)
 	{
 		out << "ERR no handler defined for authorization mechanism " << argv[0] << "'" << endl();
+		return stateidx();
 	}
 	authch->setProcProvider( m_provider);
 	delegateProcessing<&CommandHandler::endMech>( authch);
