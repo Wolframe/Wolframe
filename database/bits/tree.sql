@@ -1,5 +1,6 @@
 --
 -- Generic tree implementation for SQL databases
+-- (Modified Preorder Tree Traversal)
 --
 -- Note: the parent restriction assumes that references accept NULL
 -- Note: if DEFERRED does not work on UNIQUE constraints then the
@@ -18,7 +19,7 @@ CREATE TABLE tree	(
 
 INSERT INTO tree ( ID, parent, name, lft, rgt ) VALUES ( 1, NULL, 'Albert', 1, 12 );
 INSERT INTO tree ( ID, parent, name, lft, rgt ) VALUES ( 2, 1, 'Bert', 2, 3 );
-INSERT INTO tree ( ID, parent, name, lft, rgt ) VALUES ( 3, 2, 'Chuck', 4, 11 );
+INSERT INTO tree ( ID, parent, name, lft, rgt ) VALUES ( 3, 1, 'Chuck', 4, 11 );
 INSERT INTO tree ( ID, parent, name, lft, rgt ) VALUES ( 4, 3, 'Donna', 5, 6 );
 INSERT INTO tree ( ID, parent, name, lft, rgt ) VALUES ( 5, 3, 'Eddie', 7, 8 );
 INSERT INTO tree ( ID, parent, name, lft, rgt ) VALUES ( 6, 3, 'Fred', 9, 10 );
@@ -49,31 +50,31 @@ SELECT P1.* FROM tree AS P1, tree AS P2
 
 
 -- Get the levels of the nodes
-SELECT count( P2.* ), P1.name FROM tree AS P1, tree AS P2
+SELECT count( P2.* ) AS level, P1.name FROM tree AS P1, tree AS P2
 	WHERE P1.lft BETWEEN P2.lft AND P2.rgt
-	GROUP BY P1.name;
+	GROUP BY P1.name ORDER BY level ASC;
 
 
 -- Insert a node as a child of PARENT in the last position
 CREATE FUNCTION addNodeToParent( parentID int, nodeName text )
 RETURNS void
 AS $$
-DECLARE parentRgt	INTEGER;		-- rgt of the parent
+	DECLARE parentRgt	INTEGER;	-- rgt of the parent
 BEGIN
-parentRgt := ( SELECT rgt FROM tree WHERE ID = parentID );
+	parentRgt := ( SELECT rgt FROM tree WHERE ID = parentID );
 
-UPDATE tree SET rgt = CASE
-			WHEN rgt >= parentRgt THEN rgt + 2
-			ELSE rgt
-		END,
-		lft = CASE
-			WHEN lft > parentRgt THEN lft + 2
-			ELSE lft
-		END
-	WHERE rgt >= parentRgt;
+	UPDATE tree SET rgt = CASE
+				WHEN rgt >= parentRgt THEN rgt + 2
+				ELSE rgt
+			END,
+			lft = CASE
+				WHEN lft > parentRgt THEN lft + 2
+				ELSE lft
+			END
+		WHERE rgt >= parentRgt;
 
-INSERT INTO tree ( parent, name, lft, rgt )
-	VALUES ( parentID, nodeName, parentRgt, ( parentRgt + 1 ));
+	INSERT INTO tree ( parent, name, lft, rgt )
+		VALUES ( parentID, nodeName, parentRgt, ( parentRgt + 1 ));
 END;
 $$ LANGUAGE plpgsql;
 
@@ -95,13 +96,14 @@ DECLARE
 	rightMargin	INTEGER;		-- the right margin of the subtree
 	width		INTEGER;		-- the total width of the subtree
 BEGIN
-SELECT lft, rgt INTO leftMargin, rightMargin FROM tree WHERE ID = topNodeID;
-width := rightMargin - leftMargin + 1;
+	SELECT lft, rgt INTO leftMargin, rightMargin FROM tree
+		WHERE ID = topNodeID;
+	width := rightMargin - leftMargin + 1;
 
-DELETE FROM tree WHERE lft BETWEEN leftMargin AND rightMargin;
+	DELETE FROM tree WHERE lft BETWEEN leftMargin AND rightMargin;
 
-UPDATE tree SET lft = lft - width WHERE lft > rightMargin;
-UPDATE tree SET rgt = rgt - width WHERE rgt > rightMargin;
+	UPDATE tree SET lft = lft - width WHERE lft > rightMargin;
+	UPDATE tree SET rgt = rgt - width WHERE rgt > rightMargin;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -111,7 +113,7 @@ SELECT deleteSubtree( 8 );
 SELECT deleteSubtree( 9 );
 SELECT deleteSubtree( 10 );
 
--- NOT READY YET
+----
 ---- Move a subtree
 --CREATE FUNCTION moveSubtree( topNodeID int, newParentID int )
 --RETURNS void
@@ -124,19 +126,20 @@ SELECT deleteSubtree( 10 );
 --	distance	INTEGER;		-- the distance the subtree will be moved
 
 --BEGIN
---newLeft := ( SELECT rgt FROM tree WHERE ID = newParentID );
---width := ( SELECT rgt - lft + 1 FROM tree WHERE ID = topNodeID );
+--	newLeft := ( SELECT rgt FROM tree WHERE ID = newParentID );
+--	width := ( SELECT rgt - lft + 1 FROM tree WHERE ID = topNodeID );
 
---UPDATE tree SET lft = lft + width WHERE lft >= newLeft;
---UPDATE tree SET rgt = rgt + width WHERE rgt >= newLeft;
+--	-- move part of the tree to get space for the subtree
+--	UPDATE tree SET lft = lft + width WHERE lft >= newLeft;
+--	UPDATE tree SET rgt = rgt + width WHERE rgt >= newLeft;
 
---SELECT lft, rgt INTO tmpLeft, tmpRight FROM tree WHERE ID = topNodeID;
---distance := newLeft - tmpLeft;
---UPDATE tree SET lft = lft + distance, rgt = rgt + distance
---	WHERE lft >= tmpLeft AND rgt < tmpRight;
+--	SELECT lft, rgt INTO tmpLeft, tmpRight FROM tree WHERE ID = topNodeID;
+--	distance := newLeft - tmpLeft;
+--	UPDATE tree SET lft = lft + distance, rgt = rgt + distance
+--		WHERE lft >= tmpLeft AND rgt < tmpRight;
 
---UPDATE tree SET lft = lft - width WHERE lft > tmpLeft;
---UPDATE tree SET rgt = rgt - width WHERE rgt > tmpRight;
+--	UPDATE tree SET lft = lft - width WHERE lft > tmpLeft;
+--	UPDATE tree SET rgt = rgt - width WHERE rgt > tmpRight;
 --END;
 --$$ LANGUAGE plpgsql;
 
