@@ -97,12 +97,13 @@ namespace _Wolframe {
 #endif
 		void dataAvailable( );
 		void privateConnected( );
-		void disconnected( );
+		void privateDisconnected( );
 
 		void handleResult( );
 
 	signals:
 		void connected( );
+		void disconnected( );
 		void error( QString error );
 
 // low-level commands, pre-protocol, for debugging mainly

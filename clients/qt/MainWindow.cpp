@@ -171,6 +171,8 @@ void MainWindow::initialize( )
 // connect the wolframe client to protocols, authenticate
 		connect( m_wolframeClient, SIGNAL( connected( ) ),
 			this, SLOT( connected( ) ) );
+		connect( m_wolframeClient, SIGNAL( disconnected( ) ),
+			this, SLOT( disconnected( ) ) );
 		m_wolframeClient->connect( );
 		return;
 	}
@@ -216,6 +218,17 @@ void MainWindow::connected( )
 		
 	m_loginDialog->show( );
 }	
+
+void MainWindow::disconnected( )
+{
+	qDebug( ) << "lost connection to server";
+
+	disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+	m_debugTerminal = 0;
+	debugTerminal = 0;
+		
+	close( );
+}
 
 void MainWindow::wolframeError( QString error )
 {
@@ -472,11 +485,16 @@ void MainWindow::formLoaded( QString name )
 
 void MainWindow::on_actionExit_triggered( )
 {
-	disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
-	m_debugTerminal = 0;
-	debugTerminal = 0;
-	
-	close( );
+	if( m_loadMode == Network ) {
+		m_wolframeClient->disconnect( );
+	} else {
+// terminate brutally in local mode	
+		disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+		m_debugTerminal = 0;
+		debugTerminal = 0;
+		
+		close( );
+	}
 }
 
 void MainWindow::on_actionAbout_triggered( )
