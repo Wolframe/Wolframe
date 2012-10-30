@@ -27,7 +27,10 @@ namespace _Wolframe {
 		DebugTerminal( WolframeClient *_wolframeClient, QWidget *_parent = 0 );
 		virtual ~DebugTerminal( );
 		void bringToFront( );
+
+	public slots:
 		void sendLine( QString line );
+		void sendComment( QString line );
 	
 	private:
 		void initialize( );

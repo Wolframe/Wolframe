@@ -295,6 +295,12 @@ void WolframeClient::dataAvailable( )
 						m_answer = QString( QByteArray( buf+3, len-3 ) );
 					}
 					emit resultReceived( );
+				} else if( strncmp( buf, "MECHS", 5 ) == 0 ) {
+					if( len > 6 ) {
+						m_answer = QString( QByteArray( buf+6, len-6 ) );
+					}
+					QStringList mechs = m_answer.split( " \t", QString::SkipEmptyParts );
+					emit mechsReceived( mechs );					
 				} else if( buf[0] == '.' && buf[1] == '\n' ) {
 					emit resultReceived( );
 				} else {
@@ -314,6 +320,7 @@ void WolframeClient::sendLine( QString line )
 {
 	m_socket->write( line.toAscii( ).append( "\n" ) );
 	m_socket->flush( );
+	emit lineSent( line );
 }
 
 // high-level
@@ -328,6 +335,11 @@ void WolframeClient::sendCommand( QString command )
 void WolframeClient::auth( )
 {
 	sendCommand( "auth" );
+}
+
+void WolframeClient::mech( QString mech )
+{
+	sendCommand( "mech " + mech );
 }
 
 void WolframeClient::login( QString username, QString password )

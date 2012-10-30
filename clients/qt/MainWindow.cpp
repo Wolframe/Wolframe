@@ -7,7 +7,6 @@
 #include "FileDataLoader.hpp"
 #include "NetworkFormLoader.hpp"
 #include "NetworkDataLoader.hpp"
-#include "LoginDialog.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -23,22 +22,16 @@ namespace _Wolframe {
 	namespace QtClient {
 
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
-	m_ui( 0 ), m_host( "localhost" ), m_port( 7661 ), m_secure( false ),
+	m_ui( 0 ), m_formWidget( 0 ), m_formLoader( 0 ), m_dataLoader( 0 ),
+	m_debugTerminal( 0 ), m_wolframeClient( 0 ), m_uiLoader( 0 ),
+	m_host( "localhost" ), m_port( 7661 ), m_secure( false ),
 	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
 	m_CACertFile( "./certs/CAclient.cert.pem" ),
-	m_loadMode( Network )
+	m_loadMode( Network ), m_debug( false ),
+	m_loginDialog( 0 )
 {
 	parseArgs( );
 	initialize( );
-}
-
-MainWindow::~MainWindow( )
-{
-	delete m_formWidget;
-	delete m_debugTerminal;
-	delete m_wolframeClient;
-	delete m_formLoader;
-	delete m_uiLoader;
 }
 
 static DebugTerminal *debugTerminal = 0;
@@ -51,13 +44,26 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 		case QtCriticalMsg:
 		case QtFatalMsg:
 			if( debugTerminal )
-				debugTerminal->sendLine( msg );
+				debugTerminal->sendComment( msg );
 			fprintf( stderr, "%s\n", msg );
 			break;
 			
 		default:
 			break;
 	}
+}
+
+MainWindow::~MainWindow( )
+{
+	if( m_formWidget ) delete m_formWidget;
+	if( m_debugTerminal ) {
+		delete m_debugTerminal;
+		debugTerminal = 0;
+	}
+	if( m_wolframeClient ) delete m_wolframeClient;
+	if( m_formLoader ) delete m_formLoader;
+	if( m_dataLoader ) delete m_dataLoader;
+	if( m_uiLoader ) delete m_uiLoader;
 }
 
 void MainWindow::parseArgs( )
@@ -68,6 +74,7 @@ void MainWindow::parseArgs( )
 		{ QCommandLine::Option, 'p', "port", "Wolframe port", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'S', "secure", "connect securely via SSL", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'l', "local", "Run with local data and form loader", QCommandLine::Optional },
+		{ QCommandLine::Switch, 'd', "debug", "Enable debug window when starting", QCommandLine::Optional },
 		{ QCommandLine::Option, 'v', "verbose", "verbose level", QCommandLine::Optional },
 		{ QCommandLine::Option, 'c', "client-cert-file", "client certificate to present to the server (default: ./certs/client.crt)", QCommandLine::Optional },
 		{ QCommandLine::Option, 'k', "client-key-file", "client key file (default: ./private/client.key)", QCommandLine::Optional },
@@ -102,6 +109,8 @@ void MainWindow::switchFound( const QString &name )
 		m_loadMode = Local;
 	} else if( name == "secure" ) {
 		m_secure = true;
+	} else if( name == "debug" ) {
+		m_debug = true;
 	}
 }
 
@@ -142,35 +151,60 @@ void MainWindow::initialize( )
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
 	debugTerminal = m_debugTerminal;
 	qInstallMsgHandler( &myMessageOutput );
+	if( m_debug ) m_debugTerminal->bringToFront( );
 	qDebug( ) << "Debug window initialized";
 
-// connect the wolframe client to protocols, authenticate
-	switch( m_loadMode ) {
-		case Local:
-			break;
-		case Network:
-			if( !m_wolframeClient->syncConnect( ) ) {
-				qWarning( ) << "Can't connect to Wolframe daemon!";
-				m_loadMode = Local;
-				QCoreApplication::quit( );
-			} else {
-				connect( m_wolframeClient, SIGNAL( mechsReceived( QStringList ) ),
-					this, SLOT( mechsReceived( QStringList ) ) );
-				m_wolframeClient->auth( );
-			}
-			break;
-		default:
-			qWarning( ) << "Illegal load mode" << m_loadMode;
-			QCoreApplication::quit( );
-	}
-
+// catch error of network protocol
 	connect( m_wolframeClient, SIGNAL( error( QString ) ),
 		this, SLOT( wolframeError( QString ) ) );
 
+// connect lines sent by anybody to the debug window
+	connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
+		m_debugTerminal, SLOT( sendLine( QString ) ) );
+		
 // a Qt UI loader for the main theme window
 	m_uiLoader = new QUiLoader( );
 	m_uiLoader->setLanguageChangeEnabled ( true );
 
+// end of what we can do in network mode, initiate connect here and bail out
+	if( m_loadMode == Network ) {
+// connect the wolframe client to protocols, authenticate
+		connect( m_wolframeClient, SIGNAL( connected( ) ),
+			this, SLOT( connected( ) ) );
+		m_wolframeClient->connect( );
+		return;
+	}
+	
+// for testing, load lists of available forms from the files system,
+// pass the form loader to the FormWidget
+	m_formLoader = new FileFormLoader( "forms", "i18n" );
+	m_dataLoader = new FileDataLoader( "data" );
+
+// create delegate widget for form handling (one for now), in theory may are possible
+	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this );
+	
+// link the form loader for form loader notifications needed by the main window
+// (list of forms for form menu, list of language for language picker)
+	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
+		this, SLOT( languageCodesLoaded( QStringList ) ) );
+	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
+		this, SLOT( formListLoaded( QStringList ) ) );
+
+// get notified if the form widget changes a form
+	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+		this, SLOT( formLoaded( QString ) ) );
+
+// set default language to the system language
+	m_currentLanguage = QLocale::system( ).name( );
+
+// load default theme
+	loadTheme( QString( QLatin1String( "windows" ) ) );
+
+// load language resources, repaints the whole interface if necessary
+	loadLanguage( QLocale::system( ).name( ) );
+}
+
+/* network loading after authentication
 // for testing, load lists of available forms from the files system,
 // pass the form loader to the FormWidget
 	switch( m_loadMode ) {
@@ -179,8 +213,9 @@ void MainWindow::initialize( )
 			m_dataLoader = new FileDataLoader( "data" );
 			break;
 		case Network:
-			m_formLoader = new NetworkFormLoader( m_wolframeClient );
-			m_dataLoader = new NetworkDataLoader( m_wolframeClient );
+			// TODO: load later
+			//m_formLoader = new NetworkFormLoader( m_wolframeClient );
+			//m_dataLoader = new NetworkDataLoader( m_wolframeClient );
 			break;
 		default:
 			qWarning( ) << "Illegal load mode" << m_loadMode;
@@ -208,36 +243,43 @@ void MainWindow::initialize( )
 	loadTheme( QString( QLatin1String( "windows" ) ) );
 
 // load language resources, repaints the whole interface if necessary
-	loadLanguage( QLocale::system( ).name( ) );	
-}
+	loadLanguage( QLocale::system( ).name( ) );
+ */
+
+void MainWindow::connected( )
+{
+	m_loginDialog = new LoginDialog( m_wolframeClient, this );
+	
+	connect( m_loginDialog, SIGNAL( authenticationOk( ) ),
+		this, SLOT( authenticationOk( ) ) );
+		
+	connect( m_loginDialog, SIGNAL( authenticationFailed( ) ),
+		this, SLOT( authenticationFailed( ) ) );
+		
+	m_loginDialog->show( );
+}	
 
 void MainWindow::wolframeError( QString error )
 {
 	qDebug( ) << error;
 }
 
-void MainWindow::mechsReceived( QStringList mechs )
-{
-	LoginDialog* loginDialog = new LoginDialog( m_wolframeClient, this );
-	
-	connect( loginDialog, SIGNAL( authenticationOk( ) ),
-		this, SLOT( authenticationOk( ) ) );
-		
-	connect( loginDialog, SIGNAL( authenticationFailed( ) ),
-		this, SLOT( authenticationFailed( ) ) );
-		
-	loginDialog->exec( );
-	delete loginDialog;
-}
-
 void MainWindow::authenticationOk( )
 {
+	m_loginDialog->close( );
+	m_loginDialog->deleteLater( );
+	
 	qDebug( ) << "authentication succeeded";
 }
 
 void MainWindow::authenticationFailed( )
 {
+	m_loginDialog->close( );
+	m_loginDialog->deleteLater( );
+
 	qDebug( ) << "authentication failed";
+	
+	QCoreApplication::quit( );
 }
 
 void MainWindow::populateThemesMenu( )
