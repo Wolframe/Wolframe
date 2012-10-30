@@ -80,6 +80,7 @@ examples/iproc/iprocd
 examples/tproc/tprocd
 tests/expect/primary.db
 clients/qt/qtclient
+clients/cmdline/wolframec
 moc_*.cpp
 clients/qt/.history
 clients/Android/local.properties
