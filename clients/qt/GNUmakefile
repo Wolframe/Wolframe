@@ -64,8 +64,6 @@ OBJS = \
 	moc_FormWidget.o \
 	qcommandline.o \
 	moc_qcommandline.o \
-	qxtsignalwaiter.o \
-	moc_qxtsignalwaiter.o \
 	LoginDialog.o \
 	moc_LoginDialog.o
 
@@ -106,9 +104,6 @@ moc_LoginDialog.cpp: LoginDialog.hpp
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_MOC) $(MOC_FLAGS) qcommandline.h -o moc_qcommandline.cpp
 
-moc_qxtsignalwaiter.cpp: qxtsignalwaiter.h
-	$(QT_MOC) $(MOC_FLAGS) qxtsignalwaiter.h -o moc_qxtsignalwaiter.cpp
-	
 FORMS = \
 	forms/form1.ui \
 	forms/form2.ui \

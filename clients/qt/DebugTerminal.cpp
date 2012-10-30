@@ -70,11 +70,18 @@ void DebugTerminal::bringToFront( )
 
 void DebugTerminal::sendLine( QString line )
 {
-	m_output->setTextColor( QColor( "grey" ) );
+	m_output->setTextColor( QColor( "green" ) );
 	m_output->append( line );
 	m_output->setTextColor( QColor( "black" ) );
 }
 
+void DebugTerminal::sendComment( QString line )
+{
+	m_output->setTextColor( QColor( "grey" ) );
+	m_output->append( line );
+	m_output->setTextColor( QColor( "black" ) );
+}
+	
 void DebugTerminal::lineEntered( QString line )
 {
 	m_output->append( line );

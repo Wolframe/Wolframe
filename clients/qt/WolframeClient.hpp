@@ -62,17 +62,11 @@ namespace _Wolframe {
 
 // generic send command function, implementing the frame of the protocol
 		void sendCommand( QString command );
+		void sendCommand( QString command, QStringList params );
 
 // high-level commands
 		void auth( );
-		void login( QString username, QString password );
-		void run( QString cmd, QString data = QString::null );
-
-// synchonous commands
-		bool syncConnect( );
-		QStringList syncAuth( );
-		bool syncLogin( QString username, QString password );
-		QString syncRun( QString cmd, QString data = QString::null );
+		void mech( QString mech );
 
 		Q_PROPERTY( QString m_host READ host WRITE setHost )
 		QString host( ) const { return m_host; }
@@ -113,13 +107,13 @@ namespace _Wolframe {
 
 // low-level commands, pre-protocol, for debugging mainly
 		void lineReceived( QString line );
+		void lineSent( QString line );
 
 // generic implementation of a command execute implementing the frame of the protocol
 		void resultReceived( );
 		void mechsReceived( QStringList mechList );
-		void loginOk( );
-		void loginFailed( );
-		void runReceived( QString cmd, QString answer );
+		void authOk( );
+		void authFailed( );
 
 // high-level commands
 	};

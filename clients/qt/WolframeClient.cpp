@@ -9,8 +9,6 @@
 #include <QFile>
 #include <QList>
 
-#include <qxtsignalwaiter.h>
-
 namespace _Wolframe {
 	namespace QtClient {
 
@@ -295,6 +293,11 @@ void WolframeClient::dataAvailable( )
 						m_answer = QString( QByteArray( buf+3, len-3 ) );
 					}
 					emit resultReceived( );
+				} else if( strncmp( buf, "MECHS", 5 ) == 0 ) {
+					if( len > 6 ) {
+						m_answer = QString( QByteArray( buf+6, len-6 ) );
+					}
+					emit resultReceived( );
 				} else if( buf[0] == '.' && buf[1] == '\n' ) {
 					emit resultReceived( );
 				} else {
@@ -314,6 +317,7 @@ void WolframeClient::sendLine( QString line )
 {
 	m_socket->write( line.toAscii( ).append( "\n" ) );
 	m_socket->flush( );
+	emit lineSent( line );
 }
 
 // high-level
@@ -325,22 +329,33 @@ void WolframeClient::sendCommand( QString command )
 	sendLine( command );
 }
 
+void WolframeClient::sendCommand( QString command, QStringList params )
+{
+	QString line;
+	
+	m_answer = "";
+	m_command = command;
+	m_hasErrors = false;
+	
+	line.append( command );
+	foreach( QString param, params ) {  
+		line.append( ' ' );
+		line.append( param );
+	}
+	
+	sendLine( line );	
+}
+
 void WolframeClient::auth( )
 {
-	sendCommand( "auth" );
+	sendCommand( "AUTH" );
 }
 
-void WolframeClient::login( QString username, QString password )
+void WolframeClient::mech( QString _mech )
 {
-	sendCommand( "login" );
-	// TODO: challenge isuing username/password
-	
-	emit loginOk( );
-}
-
-void WolframeClient::run( QString cmd, QString data )
-{
-	sendCommand( "run " + cmd );
+	QStringList params;
+	params << _mech;
+	sendCommand( "MECH", params );
 }
 
 void WolframeClient::handleResult( )
@@ -349,55 +364,15 @@ void WolframeClient::handleResult( )
 	if( m_command == "CONNECT" ) {
 		// swallow greeting line from server after connect
 		emit connected( );
-	} else if( m_command == "auth" ) {
-		QStringList mechList;
+	} else if( m_command == "AUTH" ) {
+		QStringList mechList = m_answer.split( " \t", QString::SkipEmptyParts );
 		emit mechsReceived( mechList );
-	} else if( m_command.startsWith( "run" ) ) {
-		emit runReceived( m_command, m_answer );
-	}
-}
-
-// synchonous versions
-
-bool WolframeClient::syncConnect( )
-{
-	m_command = "CONNECT";
-	connect( );
-	return( QxtSignalWaiter::wait( this, SIGNAL( connected( ) ), m_timeout ) );
-}
-
-QStringList WolframeClient::syncAuth( )
-{
-	QStringList mechList;
-	auth( );
-	if( QxtSignalWaiter::wait( this, SIGNAL( authReceived( ) ), m_timeout ) ) {
-		if( m_hasErrors ) return mechList;
-		return mechList;
-	} else {
-		return mechList;
-	}
-}
-
-bool WolframeClient::syncLogin( QString username, QString password )
-{
-	login( username, password );
-	if( QxtSignalWaiter::wait( this, SIGNAL( loginFailed( ) ), SIGNAL( loginOk( ) ), m_timeout ) ) {
-		if( m_hasErrors ) return false;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-QString WolframeClient::syncRun( QString cmd, QString data )
-{
-	run( cmd );
-	// TODO: send data now
-	if( QxtSignalWaiter::wait( this, SIGNAL( runReceived( QString, QString ) ), SIGNAL( error( QString ) ), m_timeout ) ) {
-		if( m_hasErrors ) return QString::null;
-		return m_answer;
-	} else {
-		return QString::null;
+	} else if( m_command == "MECH" ) {
+		if( m_answer == "authorization" ) {
+			emit authOk( );
+		} else {
+			emit authFailed( );
+		}
 	}
 }
 

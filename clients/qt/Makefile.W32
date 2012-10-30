@@ -72,8 +72,6 @@ OBJS = \
 	moc_FormWidget.obj \
 	qcommandline.obj \
 	moc_qcommandline.obj \
-	qxtsignalwaiter.obj \
-	moc_qxtsignalwaiter.obj \
 	LoginDialog.obj \
 	moc_LoginDialog.obj
 
@@ -143,9 +141,6 @@ moc_LoginDialog.cpp: LoginDialog.hpp
 
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. qcommandline.h -o moc_qcommandline.cpp
-
-moc_qxtsignalwaiter.cpp: qxtsignalwaiter.h
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. qxtsignalwaiter.h -o moc_qxtsignalwaiter.cpp
 
 local_clean:
 	@-erase moc_*.cpp *.dll 2>NUL

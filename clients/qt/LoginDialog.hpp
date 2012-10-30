@@ -28,11 +28,13 @@ namespace _Wolframe {
 		LoginDialog( WolframeClient *_wolframeClient, QWidget *_parent = 0 );
 	
 	private:
+		QComboBox *m_mechs;
 		QComboBox *m_username;
 		QLineEdit *m_password;
 		QDialogButtonBox* m_buttons;
 		WolframeClient *m_wolframeClient;
 		bool m_succeeded;
+		QStringList m_mechList;
 
 	signals:
 		void authenticationOk( );
@@ -46,8 +48,10 @@ namespace _Wolframe {
 		void keyPressEvent( QKeyEvent *e );
 		
 	private slots:
+		void mechsReceived( QStringList mechs );
 		void login( );
-
+		void authOk( );
+		void authFailed( );
 	};
 } // namespace QtClient
 } // namespace _Wolframe

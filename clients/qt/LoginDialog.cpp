@@ -10,7 +10,8 @@ namespace _Wolframe {
 	namespace QtClient {
 
 LoginDialog::LoginDialog( WolframeClient *_wolframeClient, QWidget *_parent ) :
-	QDialog( _parent ), m_wolframeClient( _wolframeClient ), m_succeeded( false )
+	QDialog( _parent ), m_wolframeClient( _wolframeClient ),
+	m_succeeded( false )
 {
 	initialize( );
 	setWindowTitle( tr( "Login" ) );
@@ -20,6 +21,9 @@ LoginDialog::LoginDialog( WolframeClient *_wolframeClient, QWidget *_parent ) :
 void LoginDialog::initialize( )
 {
 	QFormLayout *formLayout = new QFormLayout( );
+	
+	m_mechs = new QComboBox( this );
+	formLayout->addRow( tr( "&Authentication method:" ), m_mechs );		
 	m_username = new QComboBox( this );
 	m_username->setEditable( true );
 	m_password = new QLineEdit( this );
@@ -39,6 +43,17 @@ void LoginDialog::initialize( )
 		
 	connect( m_buttons->button( QDialogButtonBox::Ok ), SIGNAL( clicked( ) ),
 		this, SLOT( login( ) ) );	
+
+	connect( m_wolframeClient, SIGNAL( mechsReceived( QStringList ) ),
+		this, SLOT( mechsReceived( QStringList ) ) );
+
+	connect( m_wolframeClient, SIGNAL( authOk( ) ),
+		this, SLOT( authOk( ) ) );
+
+	connect( m_wolframeClient, SIGNAL( authFailed( ) ),
+		this, SLOT( authFailed( ) ) );
+		
+	m_wolframeClient->auth( );		
 }
 
 void LoginDialog::closeEvent( QCloseEvent *_event )
@@ -73,21 +88,31 @@ void LoginDialog::keyPressEvent( QKeyEvent *_event )
 	}
 }
 
+void LoginDialog::mechsReceived( QStringList mechs )
+{
+	m_mechList = mechs;
+	m_mechs->addItems( m_mechList );
+}
+
 void LoginDialog::login( )
 {
+	QString mech = m_mechs->itemText( m_mechs->currentIndex( ) );
 	QString username = m_username->currentText( );
 	QString password = m_password->text( );
 	
-	// TODO
-	//m_succeeded = m_wolframeClient->syncLogin( username, password );
-	
+	m_wolframeClient->mech( mech );
+}
+
+void LoginDialog::authOk( )
+{
 	close( );
-	
-	if( m_succeeded ) {
-		emit authenticationOk( );
-	} else {
-		emit authenticationFailed( );
-	}
+	emit authenticationOk( );
+}
+
+void LoginDialog::authFailed( )
+{
+	close( );
+	emit authenticationFailed( );
 }
 
 } // namespace QtClient

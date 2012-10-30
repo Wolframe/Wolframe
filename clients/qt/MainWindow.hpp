@@ -13,6 +13,7 @@
 #include "DebugTerminal.hpp"
 #include "WolframeClient.hpp"
 #include "FormWidget.hpp"
+#include "LoginDialog.hpp"
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -49,6 +50,8 @@ namespace _Wolframe {
 		QString m_clientKeyFile;	// filename of the client key file
 		QString m_CACertFile;		// filename of the CA certificate
 		LoadMode m_loadMode;		// whether to use local loader or not
+		bool m_debug;			// show debug windows from the beginning
+		LoginDialog *m_loginDialog;	// the login dialog
 
 		void parseArgs( );
 		void initialize( );
@@ -67,7 +70,7 @@ namespace _Wolframe {
 
 // slots for the wolframe client		
 		void wolframeError( QString error );
-		void mechsReceived( QStringList mechs );
+		void connected( );
 		void authenticationOk( );
 		void authenticationFailed( );
 		
