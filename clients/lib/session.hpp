@@ -30,12 +30,12 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file clientlib.hpp
-///\brief Client library interface
-#ifndef _WOLFRAME_CLIENTLIB_HPP_INCLUDED
-#define _WOLFRAME_CLIENTLIB_HPP_INCLUDED
-#include "clientlib_connect.hpp"
-#include "clientlib_protocol.hpp"
+///\file session.hpp
+///\brief Client library session interface
+#ifndef _WOLFRAME_CLIENTLIB_SESSION_HPP_INCLUDED
+#define _WOLFRAME_CLIENTLIB_SESSION_HPP_INCLUDED
+#include "connection.hpp"
+#include "protocol.hpp"
 #include <string>
 #include <boost/thread.hpp>
 
@@ -52,8 +52,8 @@ namespace client {
 struct RequestHandler
 {
 	virtual ~RequestHandler(){}
-	virtual void answer( const char* data, std::size_t datasize);
-	virtual void error( const char* msg);
+	virtual void answer( const char* data, std::size_t datasize)=0;
+	virtual void error( const char* msg)=0;
 };
 
 ///\brief Client session handler
@@ -63,12 +63,14 @@ public:
 	Session( const Connection::Configuration& cfg);
 	virtual ~Session();
 
+	void start();
+	void stop();
 	bool doRequest( RequestHandler* handler, const char* data, std::size_t datasize);
-	void doQuit();
 
 public://methods to be implemented by the session
-	virtual void receiveUIForm( const char* data, std::size_t datasize)=0;
+	virtual void receiveUIForm( const char* id, const char* data, std::size_t datasize)=0;
 	virtual void notifyState( const char* msg)=0;
+	virtual void notifyAttribute( const char* id, const char* value)=0;
 	virtual void notifyError( const char* msg)=0;
 
 private:

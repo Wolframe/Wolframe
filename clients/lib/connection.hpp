@@ -30,15 +30,14 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file clientlib_connect.hpp
-///\brief C client library interface
+///\file connection.hpp
+///\brief C client library connection interface
 
 #ifndef _WOLFRAME_CLIENTLIB_CONNECTION_HPP_INCLUDED
 #define _WOLFRAME_CLIENTLIB_CONNECTION_HPP_INCLUDED
 #include <string>
 #include <cstring>
 #include <cstdlib>
-
 
 namespace _Wolframe {
 namespace client {
@@ -60,10 +59,11 @@ public:
 		///\brief Enumeration of connection event types
 		enum Type
 		{
-			DATA=	1,		//< connection has data to read
-			STATE=	2,		//< state of connection
-			READY=	3,		//< connection ready (signal sent once)
-			ERROR=	4		//< connection error
+			DATA,			//< connection has data to read
+			STATE,			//< state of connection
+			READY,			//< connection ready (signal sent once)
+			ERROR,			//< connection error
+			TERMINATED		//< connection error
 		};
 		Event( Type t, const char* c, std::size_t s)
 			:m_type(t),m_content(c),m_contentsize(s){}
@@ -86,7 +86,7 @@ public:
 	typedef void (*Callback)( void* clientobject, const Connection::Event& event);
 	struct Configuration
 	{
-		Configuration( std::string address_, std::string name_, unsigned short connect_timeout_=30, unsigned short read_timeout_=30)
+		explicit Configuration( std::string address_="127.0.0.1", std::string name_="7661", unsigned short connect_timeout_=30, unsigned short read_timeout_=30)
 			:m_address(address_)
 			,m_name(name_)
 			,m_connect_timeout(connect_timeout_)
@@ -134,6 +134,7 @@ public:
 	Connection( const Configuration& cfg, Callback notifier_, void* clientobject_);
 	virtual ~Connection();
 
+	bool connect();
 	void read();
 	void write( const char* data, std::size_t datasize);
 	void close();
@@ -147,6 +148,11 @@ public:
 		READY,			//< connection is ready
 		CLOSED			//< connection has been closed
 	};
+	static const char* stateName( State i)
+	{
+		static const char* ar[] = {"INIT","OPEN","READY","CLOSED"};
+		return ar[(int)i];
+	}
 	State state() const;
 
 private:

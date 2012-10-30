@@ -30,14 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file clientlib_protocol.hpp
-///\brief C client library interface
+///\file protocol.hpp
+///\brief C client library protocol interface
 
 #ifndef _WOLFRAME_CLIENTLIB_PROTOCOL_HPP_INCLUDED
 #define _WOLFRAME_CLIENTLIB_PROTOCOL_HPP_INCLUDED
 #include <string>
 #include <cstdlib>
-
 
 namespace _Wolframe {
 namespace client {
@@ -60,11 +59,12 @@ public:
 		///\brief Enumeration of protocol event types
 		enum Type
 		{
-			SEND=	1,		//< data with messages from the protocol to be sent to the server
-			UIFORM=	2,		//< UI form sent from server to client in the initialization phase
-			ANSWER=	3,		//< answer of a requset from the server to the client in a session
-			STATE=	4,		//< selected state info for the client
-			ERROR=	5		//< error reported by the server
+			SEND,		//< data with messages from the protocol to be sent to the server
+			UIFORM,		//< UI form sent from server to client in the initialization phase
+			ANSWER,		//< answer of a requset from the server to the client in a session
+			STATE,		//< selected state info for the client
+			ATTRIBUTE,	//< attribute value pair ("server GogoServer", "software Wolframe", "version 0.0.1"),etc.)
+			ERROR		//< error reported by the server
 		};
 
 		Event( Type t, const char* i, const char* c, std::size_t s)
@@ -105,9 +105,7 @@ public:
 	///\param[in] data_ request data (decrypted plain data)
 	///\param[in] datasize_ size of data in bytes
 	bool pushRequest( AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_);
-
 	bool isOpen() const;
-
 	void doQuit();
 
 	typedef enum

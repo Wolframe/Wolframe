@@ -42,9 +42,9 @@ DYNAMIC_LIB_PATCH = 0
 OBJS =
 
 CPP_OBJS = \
-	clientlib_session.o \
-	clientlib_connect.o \
-	clientlib_protocol.o
+	connection.o \
+	protocol.o \
+	session.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

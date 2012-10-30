@@ -39,6 +39,7 @@ Project Wolframe.
 #include <string>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -209,14 +210,15 @@ std::pair<unsigned int,unsigned int> _Wolframe::utils::getLineInfo( const std::s
 	return rt;
 }
 
-static void readFileContent( const std::string& filename, std::string& res, bool textmode=true)
+static void readFileContent( const std::string& filename, std::string& res)
 {
 	unsigned char ch;
-	FILE* fh = fopen( filename.c_str(), textmode?"r":"rb");
+	FILE* fh = fopen( filename.c_str(), "r");
 	if (!fh)
 	{
 		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
 	}
+	boost::shared_ptr<FILE> fhr( fh, fclose);
 	while (1 == fread( &ch, 1, 1, fh))
 	{
 		res.push_back( ch);
@@ -226,7 +228,6 @@ static void readFileContent( const std::string& filename, std::string& res, bool
 		int ec = ferror( fh);
 		if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
 	}
-	fclose( fh);
 }
 
 static void readSourceFileLines_( const std::string& filename, std::vector<std::string>& res)
@@ -238,6 +239,7 @@ static void readSourceFileLines_( const std::string& filename, std::vector<std::
 	{
 		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
 	}
+	boost::shared_ptr<FILE> fhr( fh, fclose);
 	while (1 == fread( &ch, 1, 1, fh))
 	{
 		if (ch == '\n')
@@ -255,13 +257,35 @@ static void readSourceFileLines_( const std::string& filename, std::vector<std::
 		int ec = ferror( fh);
 		if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
 	}
-	fclose( fh);
+}
+
+void _Wolframe::utils::writeFile( const std::string& filename, const std::string& content)
+{
+	std::string rt;
+	unsigned char ch;
+	FILE* fh = fopen( filename.c_str(), "w");
+	if (!fh)
+	{
+		throw std::runtime_error( std::string( "failed (errno " + boost::lexical_cast<std::string>(errno) + ") to open file ") + filename + "' for reading");
+	}
+	boost::shared_ptr<FILE> fhr( fh, fclose);
+	std::string::const_iterator fi = content.begin(), fe = content.end();
+	for (; fi != fe; ++fi)
+	{
+		ch = *fi;
+		if (1 > fwrite( &ch, 1, 1, fh))
+		{
+			int ec = ferror( fh);
+			if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
+		}
+	}
+	return rt;
 }
 
 std::string _Wolframe::utils::readSourceFileContent( const std::string& filename)
 {
 	std::string rt;
-	readFileContent( filename, rt, true);
+	readFileContent( filename, rt);
 	return rt;
 }
 

@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file clientlib_protocol.cpp
+///\file protocol.cpp
 ///\brief Implementation of the client protocol handling
-#include "clientlib_protocol.hpp"
+#include "protocol.hpp"
 #include <list>
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
@@ -162,6 +162,7 @@ static bool getLine( Line* line, const char* baseptr, size_t* pos, size_t size, 
 			line->size = ii;
 		}
 		*pos = ii+1;
+/*[-]*/		std::cerr << "get line " << std::string( line->ptr, line->size) << "'" << std::endl;
 		return true;
 	}
 	return false;
@@ -172,9 +173,9 @@ static bool getLine( Line* line, const char* baseptr, size_t* pos, size_t size, 
 struct LineSplit
 {
 	char* ptr[ MAX_LINESPLIT_SIZE];
-	size_t size;
+	std::size_t size;
 	char line[ MAX_LINEBUF_SIZE];
-	size_t linesize;
+	std::size_t linesize;
 };
 
 static void getLineSplit_space( LineSplit& split, const Line& line, size_t max_nof_elements)
@@ -188,8 +189,7 @@ static void getLineSplit_space( LineSplit& split, const Line& line, size_t max_n
 	split.size = 0;
 	for (ii=0; ii < split.linesize && split.line[ii] >= 0 && split.line[ii] <= 32; ++ii);
 	if (ii == split.linesize) return;
-	split.ptr[ ++split.size] = split.line + ii;
-
+	split.ptr[ split.size++] = split.line + ii;
 	for (; ii < split.linesize; ++ii)
 	{
 		if (split.line[ii] >= 0 && split.line[ii] <= 32)
@@ -197,9 +197,9 @@ static void getLineSplit_space( LineSplit& split, const Line& line, size_t max_n
 			split.line[ii] = 0;
 			if (split.size == MAX_LINESPLIT_SIZE) throw std::runtime_error( "too many elements in protocol line");
 			if (split.size == max_nof_elements) return;
-			for (; ii < split.linesize && split.line[ii] > 0 && split.line[ii] < 32; ++ii);
+			for (; ii < split.linesize && split.line[ii] >= 0 && split.line[ii] <= 32; ++ii);
 			if (ii == split.linesize) return;
-			split.ptr[ ++split.size] = split.line + ii;
+			split.ptr[ split.size++] = split.line + ii;
 		}
 	}
 }
@@ -300,6 +300,24 @@ struct ProtocolState
 		SESSION_ANSWER_RESULT,
 		CLOSED
 	};
+	static const char* name( Id id)
+	{
+		static const char* ar[] =
+		{
+			"INIT",
+			"AUTH",
+			"AUTH_WAIT",
+			"LOAD_UIFORM",
+			"LOAD_UIFORM_DATA",
+			"SESSION",
+			"SESSION_QUIT",
+			"SESSION_ANSWER",
+			"SESSION_ANSWER_DATA",
+			"SESSION_ANSWER_RESULT",
+			"CLOSED"
+		};
+		return ar[(int)id];
+	}
 };
 
 }//anonymous namespace
@@ -404,6 +422,22 @@ public:
 		m_notifier( m_clientobject, event);
 	}
 
+	void notifyAttribute( const char* name, const char* value)
+	{
+		Protocol::Event event( Protocol::Event::ATTRIBUTE, name, value, std::strlen(value));
+		m_notifier( m_clientobject, event);
+	}
+
+	bool checkWelcome( char** ar, std::size_t size)
+	{
+		if (size != 5) return false;
+		if (!isequal( ar[1], "Wolframe")) return false;
+		if (!isequal( ar[2], "version")) return false;
+		notifyAttribute( "server", ar[0]);
+		notifyAttribute( "version", ar[3]);
+		return true;
+	}
+
 	void notifyUIForm()
 	{
 		Protocol::Event event( Protocol::Event::UIFORM, m_statearg.ptr(), m_docbuffer.ptr(), m_docbuffer.size());
@@ -446,7 +480,6 @@ public:
 	ProtocolState::Id state() const		{return m_state;}
 	void state( ProtocolState::Id id)	{m_state = id;}
 
-
 	Protocol::CallResult run()
 	{
 		Line line;
@@ -469,250 +502,265 @@ public:
 
 		for (;;)
 		{
-			switch (state())
-			{
-				case ProtocolState::INIT:
-					sendLine( "AUTH");
-					state( ProtocolState::AUTH);
+/*[-]*/		std::cerr << "protocol state " << ProtocolState::name(state()) << std::endl;
+		switch (state())
+		{
+			case ProtocolState::INIT:
+				if (!getLine( &line, dataptr(), &di.pos, datasize()))
+				{
+					return Protocol::CALL_DATA;
+				}
+				getLineSplit_space( arg, line, 5);
+				if (!arg.size) continue;
+				if (!checkWelcome( arg.ptr, arg.size))
+				{
+					std::ostringstream errmsg;
+					errmsg << "unknown server welcome message '" << std::string(line.ptr,line.size) << "'";
+					notifyError( errmsg.str().c_str());
+					state( ProtocolState::CLOSED);
+					return Protocol::CALL_ERROR;
+				}
+				sendLine( "AUTH");
+				state( ProtocolState::AUTH);
+				continue;
+
+			case ProtocolState::AUTH:
+				if (!getLine( &line, dataptr(), &di.pos, datasize()))
+				{
+					return Protocol::CALL_DATA;
+				}
+				getLineSplit_space( arg, line, 2);
+				if (!arg.size) continue;
+				if (isequal( arg.ptr[0], "MECHS"))
+				{
+					if (arg.size == 1)
+					{
+						notifyError( "NO AUTH MECHS");
+						state( ProtocolState::CLOSED);
+						return Protocol::CALL_ERROR;
+					}
+					getLineSplit_space( arg, line, 0);
+					authmech = selectAuthMech( arg);
+					if (!authmech)
+					{
+						notifyError( "NO MATCHING AUTH MECH");
+						state( ProtocolState::CLOSED);
+						return Protocol::CALL_ERROR;
+					}
+					sendLine( "MECH", authmech);
+					state( ProtocolState::AUTH_WAIT);
 					continue;
+				}
+				else if (isequal( arg.ptr[0], "ERR"))
+				{
+					msg = (arg.size == 1)?"AUTH returned error":arg.ptr[1];
+					notifyError( msg);
+					state( ProtocolState::INIT);
+					continue;
+				}
+				else
+				{
+					notifyError( "protocol error in AUTH reply");
+					state( ProtocolState::CLOSED);
+					return Protocol::CALL_ERROR;
+				}
 
-				case ProtocolState::AUTH:
-					if (!getLine( &line, dataptr(), &di.pos, datasize()))
-					{
-						return Protocol::CALL_DATA;
-					}
-					getLineSplit_space( arg, line, 2);
-					if (!arg.size) continue;
-					if (isequal( arg.ptr[0], "MECHS"))
-					{
-						if (arg.size == 1)
-						{
-							notifyError( "NO AUTH MECHS");
-							state( ProtocolState::CLOSED);
-							return Protocol::CALL_ERROR;
-						}
-						getLineSplit_space( arg, line, 0);
-						authmech = selectAuthMech( arg);
-						if (!authmech)
-						{
-							notifyError( "NO MATCHING AUTH MECH");
-							state( ProtocolState::CLOSED);
-							return Protocol::CALL_ERROR;
-						}
-						sendLine( "MECH", authmech);
-						state( ProtocolState::AUTH_WAIT);
-						continue;
-					}
-					else if (isequal( arg.ptr[0], "ERR"))
-					{
-						msg = (arg.size == 1)?"AUTH returned error":arg.ptr[1];
-						notifyError( msg);
-						state( ProtocolState::INIT);
-						continue;
-					}
-					else
-					{
-						notifyError( "protocol error in AUTH reply");
-						state( ProtocolState::CLOSED);
-						return Protocol::CALL_ERROR;
-					}
-
-				case ProtocolState::AUTH_WAIT:
-					if (!getLine( &line, dataptr(), &di.pos, datasize()))
-					{
-						return Protocol::CALL_DATA;
-					}
-					getLineSplit_space( arg, line, 2);
-					if (!arg.size) continue;
-					if (isequal( arg.ptr[0], "OK"))
-					{
-						notifyState( "authorized");
-						sendLine( "INTERFACE");
-						state( ProtocolState::LOAD_UIFORM);
-						continue;
-					}
-					else if (isequal( arg.ptr[0], "ERR"))
-					{
-						msg = (arg.size == 1)?"interface retrieval failed":arg.ptr[1];
-						notifyError( msg);
-						state( ProtocolState::CLOSED);
-						return Protocol::CALL_ERROR;
-					}
-					else
-					{
-						notifyError( "protocol error in INTERFACE reply");
-						state( ProtocolState::CLOSED);
-						return Protocol::CALL_ERROR;
-					}
-
-				case ProtocolState::LOAD_UIFORM:
-					if (!getLine( &line, dataptr(), &di.pos, datasize()))
-					{
-						return Protocol::CALL_DATA;
-					}
-					getLineSplit_space( arg, line, 2);
-					if (!arg.size) continue;
-					if (isequal( arg.ptr[0], "UIFORM"))
-					{
-						if (arg.size == 1)
-						{
-							notifyError( "UIFORM missing argument");
-							state( ProtocolState::CLOSED);
-							return Protocol::CALL_ERROR;
-						}
-						else
-						{
-							const char* formid = arg.ptr[1];
-							m_statearg.reset( formid, strlen( formid)+1);
-							m_docbuffer.reset();
-							state( ProtocolState::LOAD_UIFORM_DATA);
-							continue;
-						}
-					}
-					else if (isequal( arg.ptr[0], "OK"))
-					{
-						notifyState( "session");
-						state( ProtocolState::SESSION);
-						continue;
-					}
-					else if (isequal( arg.ptr[0], "ERR"))
-					{
-						msg = (arg.size == 1)?"unspecified error instead of UIFORM":arg.ptr[1];
-						notifyError( msg);
-						state( ProtocolState::CLOSED);
-						return Protocol::CALL_ERROR;
-					}
-					else
-					{
-						notifyError( "protocol error in INTERFACE reply (UIFORM,OK expected)");
-						state( ProtocolState::CLOSED);
-						return Protocol::CALL_ERROR;
-					}
-
-				case ProtocolState::LOAD_UIFORM_DATA:
-					if (!getContentUnescaped( &m_docbuffer, dataptr(), &di.pos, datasize()))
-					{
-						return Protocol::CALL_DATA;
-					}
-					notifyUIForm();
+			case ProtocolState::AUTH_WAIT:
+				if (!getLine( &line, dataptr(), &di.pos, datasize()))
+				{
+					return Protocol::CALL_DATA;
+				}
+				getLineSplit_space( arg, line, 2);
+				if (!arg.size) continue;
+				if (isequal( arg.ptr[0], "OK"))
+				{
+					notifyState( "authorized");
+					sendLine( "INTERFACE");
 					state( ProtocolState::LOAD_UIFORM);
 					continue;
-
-				case ProtocolState::SESSION:
+				}
+				else if (isequal( arg.ptr[0], "ERR"))
 				{
-					m_request = fetchRequest();
-					if (!m_request.get())
+					msg = (arg.size == 1)?"interface retrieval failed":arg.ptr[1];
+					notifyError( msg);
+					state( ProtocolState::CLOSED);
+					return Protocol::CALL_ERROR;
+				}
+				else
+				{
+					notifyError( "protocol error in INTERFACE reply");
+					state( ProtocolState::CLOSED);
+					return Protocol::CALL_ERROR;
+				}
+
+			case ProtocolState::LOAD_UIFORM:
+				if (!getLine( &line, dataptr(), &di.pos, datasize()))
+				{
+					return Protocol::CALL_DATA;
+				}
+				getLineSplit_space( arg, line, 2);
+				if (!arg.size) continue;
+				if (isequal( arg.ptr[0], "UIFORM"))
+				{
+					if (arg.size == 1)
 					{
-						if (isOpen())
-						{
-							return Protocol::CALL_DATA;
-						}
-						sendLine( "QUIT");
-						continue;
+						notifyError( "UIFORM missing argument");
+						state( ProtocolState::CLOSED);
+						return Protocol::CALL_ERROR;
 					}
 					else
 					{
-						sendLine( "REQUEST");
-						sendContent( m_request->data(), m_request->datasize());
-						state( ProtocolState::SESSION_ANSWER);
+						const char* formid = arg.ptr[1];
+						m_statearg.reset( formid, strlen( formid)+1);
+						m_docbuffer.reset();
+						state( ProtocolState::LOAD_UIFORM_DATA);
 						continue;
 					}
 				}
-
-				case ProtocolState::SESSION_QUIT:
-					if (!getLine( &line, dataptr(), &di.pos, datasize()))
-					{
-						return Protocol::CALL_DATA;
-					}
-					getLineSplit_space( arg, line, 2);
-					if (!arg.size) continue;
-					if (isequal( arg.ptr[0], "BYE"))
-					{
-						notifyState( "closed");
-						state( ProtocolState::CLOSED);
-						return Protocol::CALL_CLOSED;
-					}
-					else
-					{
-						notifyError( "protocol error in QUIT reply (BYE expected)");
-						state( ProtocolState::CLOSED);
-						return Protocol::CALL_ERROR;
-					}
-
-				case ProtocolState::SESSION_ANSWER:
-					if (!getLine( &line, dataptr(), &di.pos, datasize()))
-					{
-						return Protocol::CALL_DATA;
-					}
-					getLineSplit_space( arg, line, 2);
-					if (!arg.size) continue;
-					if (isequal( arg.ptr[0], "ANSWER"))
-					{
-						m_docbuffer.reset();
-						state( ProtocolState::SESSION_ANSWER_DATA);
-						continue;
-					}
-					else if (isequal( arg.ptr[0], "OK"))
-					{
-						m_docbuffer.reset();
-						m_request.reset();
-						state( ProtocolState::SESSION);
-						continue;
-					}
-					else if (isequal( arg.ptr[0], "ERR"))
-					{
-						msg = (arg.size == 1)?"unspecified error in request":arg.ptr[1];
-						notifyAnswerError( msg);
-						state( ProtocolState::SESSION);
-						continue;
-					}
-					else
-					{
-						notifyError( "protocol error in REQUEST (ANSWER, OK or ERR expected)");
-						notifyAnswerError( "protocol error");
-						state( ProtocolState::CLOSED);
-						return Protocol::CALL_ERROR;
-					}
-
-				case ProtocolState::SESSION_ANSWER_DATA:
-					if (!getContentUnescaped( &m_docbuffer, dataptr(), &di.pos, datasize()))
-					{
-						return Protocol::CALL_DATA;
-					}
-					state( ProtocolState::SESSION_ANSWER_RESULT);
+				else if (isequal( arg.ptr[0], "OK"))
+				{
+					notifyState( "session");
+					state( ProtocolState::SESSION);
 					continue;
+				}
+				else if (isequal( arg.ptr[0], "ERR"))
+				{
+					msg = (arg.size == 1)?"unspecified error instead of UIFORM":arg.ptr[1];
+					notifyError( msg);
+					state( ProtocolState::CLOSED);
+					return Protocol::CALL_ERROR;
+				}
+				else
+				{
+					notifyError( "protocol error in INTERFACE reply (UIFORM,OK expected)");
+					state( ProtocolState::CLOSED);
+					return Protocol::CALL_ERROR;
+				}
 
-				case ProtocolState::SESSION_ANSWER_RESULT:
-					if (!getLine( &line, dataptr(), &di.pos, datasize()))
+			case ProtocolState::LOAD_UIFORM_DATA:
+				if (!getContentUnescaped( &m_docbuffer, dataptr(), &di.pos, datasize()))
+				{
+					return Protocol::CALL_DATA;
+				}
+				notifyUIForm();
+				state( ProtocolState::LOAD_UIFORM);
+				continue;
+
+			case ProtocolState::SESSION:
+			{
+				m_request = fetchRequest();
+				if (!m_request.get())
+				{
+					if (isOpen())
 					{
 						return Protocol::CALL_DATA;
 					}
-					getLineSplit_space( arg, line, 2);
-					if (!arg.size) continue;
-					if (isequal( arg.ptr[0], "OK"))
-					{
-						notifyAnswerOk();
-						state( ProtocolState::SESSION);
-						continue;
-					}
-					else if (isequal( arg.ptr[0], "ERR"))
-					{
-						msg = (arg.size == 1)?"unspecified error in request":arg.ptr[1];
-						notifyAnswerError( msg);
-						state( ProtocolState::SESSION);
-						continue;
-					}
-					else
-					{
-						notifyError( "protocol error in answer after data (OK or ERR expected)");
-						notifyAnswerError( "protocol error");
-						state( ProtocolState::CLOSED);
-						return Protocol::CALL_ERROR;
-					}
-
-				case ProtocolState::CLOSED:
-					return Protocol::CALL_CLOSED;
+					sendLine( "QUIT");
+					continue;
+				}
+				else
+				{
+					sendLine( "REQUEST");
+					sendContent( m_request->data(), m_request->datasize());
+					state( ProtocolState::SESSION_ANSWER);
+					continue;
+				}
 			}
+
+			case ProtocolState::SESSION_QUIT:
+				if (!getLine( &line, dataptr(), &di.pos, datasize()))
+				{
+					return Protocol::CALL_DATA;
+				}
+				getLineSplit_space( arg, line, 2);
+				if (!arg.size) continue;
+				if (isequal( arg.ptr[0], "BYE"))
+				{
+					notifyState( "closed");
+					state( ProtocolState::CLOSED);
+					return Protocol::CALL_CLOSED;
+				}
+				else
+				{
+					notifyError( "protocol error in QUIT reply (BYE expected)");
+					state( ProtocolState::CLOSED);
+					return Protocol::CALL_ERROR;
+				}
+
+			case ProtocolState::SESSION_ANSWER:
+				if (!getLine( &line, dataptr(), &di.pos, datasize()))
+				{
+					return Protocol::CALL_DATA;
+				}
+				getLineSplit_space( arg, line, 2);
+				if (!arg.size) continue;
+				if (isequal( arg.ptr[0], "ANSWER"))
+				{
+					m_docbuffer.reset();
+					state( ProtocolState::SESSION_ANSWER_DATA);
+					continue;
+				}
+				else if (isequal( arg.ptr[0], "OK"))
+				{
+					m_docbuffer.reset();
+					m_request.reset();
+					state( ProtocolState::SESSION);
+					continue;
+				}
+				else if (isequal( arg.ptr[0], "ERR"))
+				{
+					msg = (arg.size == 1)?"unspecified error in request":arg.ptr[1];
+					notifyAnswerError( msg);
+					state( ProtocolState::SESSION);
+					continue;
+				}
+				else
+				{
+					notifyError( "protocol error in REQUEST (ANSWER, OK or ERR expected)");
+					notifyAnswerError( "protocol error");
+					state( ProtocolState::CLOSED);
+					return Protocol::CALL_ERROR;
+				}
+
+			case ProtocolState::SESSION_ANSWER_DATA:
+				if (!getContentUnescaped( &m_docbuffer, dataptr(), &di.pos, datasize()))
+				{
+					return Protocol::CALL_DATA;
+				}
+				state( ProtocolState::SESSION_ANSWER_RESULT);
+				continue;
+
+			case ProtocolState::SESSION_ANSWER_RESULT:
+				if (!getLine( &line, dataptr(), &di.pos, datasize()))
+				{
+					return Protocol::CALL_DATA;
+				}
+				getLineSplit_space( arg, line, 2);
+				if (!arg.size) continue;
+				if (isequal( arg.ptr[0], "OK"))
+				{
+					notifyAnswerOk();
+					state( ProtocolState::SESSION);
+					continue;
+				}
+				else if (isequal( arg.ptr[0], "ERR"))
+				{
+					msg = (arg.size == 1)?"unspecified error in request":arg.ptr[1];
+					notifyAnswerError( msg);
+					state( ProtocolState::SESSION);
+					continue;
+				}
+				else
+				{
+					notifyError( "protocol error in answer after data (OK or ERR expected)");
+					notifyAnswerError( "protocol error");
+					state( ProtocolState::CLOSED);
+					return Protocol::CALL_ERROR;
+				}
+
+			case ProtocolState::CLOSED:
+				return Protocol::CALL_CLOSED;
+		}
 		}
 	}
 
@@ -732,6 +780,24 @@ private:
 	Buffer m_docbuffer;
 };
 
+Protocol::Protocol( Protocol::Callback notifier_, void* clientobject_)
+	:m_impl( new Protocol::Impl( notifier_, clientobject_))
+{}
+
+Protocol::~Protocol()
+{
+	delete m_impl;
+}
+
+void Protocol::pushData( const char* data_, std::size_t datasize_)
+{
+	m_impl->pushData( data_, datasize_);
+}
+
+bool Protocol::pushRequest( AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_)
+{
+	return m_impl->putRequest( notifier_, requestobject_, data_, datasize_);
+}
 
 bool Protocol::isOpen() const
 {
@@ -743,11 +809,6 @@ void Protocol::doQuit()
 	m_impl->closeRequestQueue();
 }
 
-bool Protocol::pushRequest( AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_)
-{
-	return m_impl->putRequest( notifier_, requestobject_, data_, datasize_);
-}
-
 Protocol::CallResult Protocol::run()
 {
 	return m_impl->run();
@@ -757,11 +818,12 @@ static const char* eventTypeName( Protocol::Event::Type type)
 {
 	switch (type)
 	{
-		case Protocol::Event::SEND:	return "SEND";
-		case Protocol::Event::UIFORM:	return "UIFORM";
-		case Protocol::Event::ANSWER:	return "ANSWER";
-		case Protocol::Event::STATE:	return "STATE";
-		case Protocol::Event::ERROR:	return "ERROR";
+		case Protocol::Event::SEND: return "SEND";
+		case Protocol::Event::UIFORM: return "UIFORM";
+		case Protocol::Event::ANSWER: return "ANSWER";
+		case Protocol::Event::STATE: return "STATE";
+		case Protocol::Event::ATTRIBUTE: return "ATTRIBUTE";
+		case Protocol::Event::ERROR: return "ERROR";
 	}
 	return "(null)";
 }
@@ -772,7 +834,5 @@ std::string Protocol::Event::tostring() const
 	msg << eventTypeName( m_type) << " " << (m_id?m_id:"") << " '" << std::string( m_content, m_contentsize) << "'";
 	return msg.str();
 }
-
-
 
 

@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Program using filters to map stdin to stdout
+///\brief Program using wolframe functions to map stdin to stdout
 #include <fstream>
 #include <iostream>
 #include <cstring>

@@ -140,6 +140,10 @@ std::string readSourceFileContent( const std::string& filename);
 std::vector<std::string> readSourceFileLines( const std::string& filename);
 boost::property_tree::ptree readPropertyTreeFile( const std::string& filename);
 
+///\brief Writing a file
+///\remark Throws on error
+void writeFile( const std::string& filename, const std::string& content);
+
 ///\brief Get the file type as string
 ///\remark Very simplistic implementation for now
 ///\return file type ("XML","TEXT:UTF-8","TEXT:ASCII", "" (unknown))

@@ -30,10 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file clientlib_session.cpp
+///\file session.cpp
 ///\brief Implementation C++ client session
-#include "clientlib_session.hpp"
+#include "session.hpp"
 #include <stdexcept>
+#include <iostream>
 #include <boost/move/move.hpp>
 
 using namespace _Wolframe;
@@ -43,15 +44,10 @@ using namespace _Wolframe::client;
 Session::Session( const Connection::Configuration& cfg)
 	:m_connection(cfg,&connectionCallback_void,this)
 	,m_protocol(&protocolCallback_void,this)
-	,m_run_signal(false)
-{
-	m_run_thread = boost::thread( runSession, this);
-}
+	,m_run_signal(false){}
 
 Session::~Session()
-{
-	m_run_thread.join();
-}
+{}
 
 void Session::signal_runSession()
 {
@@ -64,31 +60,71 @@ void Session::signal_runSession()
 
 void Session::runSession( Session* session)
 {
-	while (session->m_connection.state() != Connection::CLOSED)
+	try
 	{
+		if (!session->m_connection.connect())
 		{
-			boost::unique_lock<boost::mutex> lock(session->m_run_mutex);
-			while(!session->m_run_signal)
-			{
-				session->m_run_cond.wait(lock);
-			}
-			session->m_run_signal = false;
+			throw std::runtime_error( "failed to connect to server");
 		}
-		switch (session->m_protocol.run())
+		while (session->m_connection.state() != Connection::CLOSED)
 		{
-			case Protocol::CALL_DATA:
-				session->m_connection.read();
-				break;
-			case Protocol::CALL_IDLE:
-				break;
-			case Protocol::CALL_ERROR:
-				session->m_connection.close();
-				break;
-			case Protocol::CALL_CLOSED:
-				session->m_connection.close();
-				break;
+			{
+				boost::unique_lock<boost::mutex> lock(session->m_run_mutex);
+				while(!session->m_run_signal)
+				{
+					session->m_run_cond.wait(lock);
+				}
+				session->m_run_signal = false;
+			}
+			if (session->m_connection.state() != Connection::CLOSED)
+			{
+				switch (session->m_protocol.run())
+				{
+					case Protocol::CALL_DATA:
+						session->m_connection.read();
+						break;
+					case Protocol::CALL_IDLE:
+						break;
+					case Protocol::CALL_ERROR:
+						session->m_connection.close();
+						break;
+					case Protocol::CALL_CLOSED:
+						session->m_connection.close();
+						break;
+				}
+			}
 		}
 	}
+	catch (const std::runtime_error& err)
+	{
+		std::ostringstream msg;
+		msg << "runtime error in session thread: " << err.what();
+		session->notifyError( msg.str().c_str());
+	}
+	catch (const std::bad_alloc& err)
+	{
+		session->notifyError( err.what());
+	}
+	catch (const std::exception& err)
+	{
+		std::ostringstream msg;
+		msg << "exception thrown in session thread: " << err.what();
+		session->notifyError( err.what());
+	}
+}
+
+void Session::start()
+{
+	m_run_thread = boost::thread( runSession, this);
+}
+
+void Session::stop()
+{
+/*[-]*/	std::cerr << "stopping session" << std::endl;
+	m_protocol.doQuit();
+	signal_runSession();
+	m_run_thread.join();
+/*[-]*/	std::cerr << "session stopped" << std::endl;
 }
 
 void Session::requestCallback( void* this_, const Protocol::Event& event)
@@ -99,6 +135,7 @@ void Session::requestCallback( void* this_, const Protocol::Event& event)
 		case Protocol::Event::UIFORM: throw std::logic_error( "request handler cannot handle answer event UIFORM");
 		case Protocol::Event::ANSWER: ((RequestHandler*)this_)->answer( event.content(), event.contentsize());
 		case Protocol::Event::STATE: throw std::logic_error( "request handler cannot handle answer event STATE");
+		case Protocol::Event::ATTRIBUTE: throw std::logic_error( "request handler cannot handle answer event ATTRIBUTE");
 		case Protocol::Event::ERROR: ((RequestHandler*)this_)->error( event.id());
 	}
 }
@@ -113,11 +150,6 @@ bool Session::doRequest( RequestHandler* handler, const char* data, std::size_t 
 	return rt;
 }
 
-void Session::doQuit()
-{
-	m_protocol.doQuit();
-}
-
 void Session::protocolCallback( const Protocol::Event& event)
 {
 	switch (event.type())
@@ -127,7 +159,7 @@ void Session::protocolCallback( const Protocol::Event& event)
 			break;
 
 		case Protocol::Event::UIFORM:
-			receiveUIForm( event.content(), event.contentsize());
+			receiveUIForm( event.id(), event.content(), event.contentsize());
 			break;
 
 		case Protocol::Event::ANSWER:
@@ -135,6 +167,10 @@ void Session::protocolCallback( const Protocol::Event& event)
 
 		case Protocol::Event::STATE:
 			notifyState( event.id());
+			break;
+
+		case Protocol::Event::ATTRIBUTE:
+			notifyAttribute( event.id(), event.content());
 			break;
 
 		case Protocol::Event::ERROR:
@@ -166,6 +202,9 @@ void Session::connectionCallback( const Connection::Event& event)
 			break;
 		case Connection::Event::ERROR:
 			notifyError( event.content());
+			break;
+		case Connection::Event::TERMINATED:
+			signal_runSession();
 			break;
 	}
 }
