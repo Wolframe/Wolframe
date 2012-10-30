@@ -261,7 +261,6 @@ static void readSourceFileLines_( const std::string& filename, std::vector<std::
 
 void _Wolframe::utils::writeFile( const std::string& filename, const std::string& content)
 {
-	std::string rt;
 	unsigned char ch;
 	FILE* fh = fopen( filename.c_str(), "w");
 	if (!fh)
@@ -279,7 +278,6 @@ void _Wolframe::utils::writeFile( const std::string& filename, const std::string
 			if (ec) throw std::runtime_error( std::string( "failed to read (errno " + boost::lexical_cast<std::string>(ec) + ") from file ") + filename + "'");
 		}
 	}
-	return rt;
 }
 
 std::string _Wolframe::utils::readSourceFileContent( const std::string& filename)
@@ -310,7 +308,7 @@ std::string _Wolframe::utils::getFileType( const std::string& filename)
 		B11111111 = 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1
 	};
 	std::string source;
-	readFileContent( filename, source, false);
+	readFileContent( filename, source);
 	if (source[0] == '<') return "XML";
 	std::string::const_iterator si = source.begin(), se = source.end();
 	bool ascii = true;
