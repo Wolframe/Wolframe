@@ -62,7 +62,7 @@ MainWindow::~MainWindow( )
 	}
 	if( m_wolframeClient ) delete m_wolframeClient;
 	if( m_formLoader ) delete m_formLoader;
-//	if( m_dataLoader ) delete m_dataLoader;
+	if( m_dataLoader ) delete m_dataLoader;
 	if( m_uiLoader ) delete m_uiLoader;
 }
 

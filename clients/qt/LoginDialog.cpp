@@ -10,8 +10,7 @@ namespace _Wolframe {
 	namespace QtClient {
 
 LoginDialog::LoginDialog( WolframeClient *_wolframeClient, QWidget *_parent ) :
-	QDialog( _parent ), m_wolframeClient( _wolframeClient ),
-	m_succeeded( false )
+	QDialog( _parent ), m_wolframeClient( _wolframeClient )
 {
 	initialize( );
 	setWindowTitle( tr( "Login" ) );
@@ -56,17 +55,6 @@ void LoginDialog::initialize( )
 	m_wolframeClient->auth( );		
 }
 
-void LoginDialog::closeEvent( QCloseEvent *_event )
-{
-	qDebug( ) << "LoginDialog closeEvent" << m_succeeded;
-	
-	if( !m_succeeded ) {
-		emit authenticationFailed( );
-	}
-	
-	_event->accept( );
-}
-
 void LoginDialog::keyPressEvent( QKeyEvent *_event )
 {
 	switch( _event->key( ) ) {
@@ -76,7 +64,9 @@ void LoginDialog::keyPressEvent( QKeyEvent *_event )
 			
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
-			if( m_username->hasFocus( ) ) {
+			if( m_mechs->hasFocus( ) ) {
+				m_username->setFocus( );
+			} else if( m_username->hasFocus( ) ) {
 				m_password->setFocus( );
 			} else if( m_password->hasFocus( ) ) {
 				m_buttons->button( QDialogButtonBox::Ok )->click( );

@@ -46,7 +46,6 @@ FormWidget::~FormWidget( )
 {
 	if( m_ui ) delete m_ui;
 	delete m_dataHandler;
-	delete m_dataLoader;
 }
 
 void FormWidget::loadForm( QString name )

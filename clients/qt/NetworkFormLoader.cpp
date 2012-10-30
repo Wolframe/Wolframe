@@ -56,9 +56,9 @@ void NetworkFormLoader::initiateFormLoad( QString &name )
 
 void NetworkFormLoader::initiateGetLanguageCodes( )
 {
-	//~ QStringList languageCodes;
-	//~ languageCodes.push_back( "en_US" ); // default locale, always around
-	//~ 
+	QStringList languageCodes;
+	languageCodes.push_back( "en_US" ); // default locale, always around
+	
 	//~ QString s = m_wolframeClient->syncRun( "getFormLanguages" );
 	//~ if( s.isNull( ) ) {
 		//~ qWarning( ) << "Trouble getting form languages";
@@ -67,8 +67,8 @@ void NetworkFormLoader::initiateGetLanguageCodes( )
 		//~ languageCodes.append( lines );
 		//~ languageCodes.removeDuplicates( );
 	//~ }
-	//~ 
-	//~ emit languageCodesLoaded( languageCodes );
+	
+	emit languageCodesLoaded( languageCodes );
 }
 
 } // namespace QtClient
