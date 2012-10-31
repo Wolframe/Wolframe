@@ -97,20 +97,24 @@ namespace _Wolframe {
 #endif
 		void dataAvailable( );
 		void privateConnected( );
-		void disconnected( );
+		void privateDisconnected( );
 
 		void handleResult( );
 
 	signals:
+// low-level events
 		void connected( );
+		void disconnected( );
 		void error( QString error );
-
+		
 // low-level commands, pre-protocol, for debugging mainly
 		void lineReceived( QString line );
 		void lineSent( QString line );
 
 // generic implementation of a command execute implementing the frame of the protocol
 		void resultReceived( );
+
+// high-level commands
 		void mechsReceived( QStringList mechList );
 		void authOk( );
 		void authFailed( );

@@ -84,8 +84,6 @@ void DebugTerminal::sendComment( QString line )
 	
 void DebugTerminal::lineEntered( QString line )
 {
-	m_output->append( line );
-
 	if( line.toLower( ).startsWith( "connect" ) ||
 		line.toLower( ).startsWith( "sconnect" ) ) {
 		QRegExp rx( "^s?connect\\s+([^:]+):(\\d+)$", Qt::CaseInsensitive );

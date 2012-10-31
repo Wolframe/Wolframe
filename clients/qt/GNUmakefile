@@ -134,6 +134,8 @@ I18NS = \
 	themes/phone/qtclient.de_CH.qm \
 	themes/eeepc/qtclient.de_CH.qm
 
+I18NS_TS = $(I18NS:.qm=.ts)
+
 local_all: $(I18NS)
 
 local_clean:
@@ -152,15 +154,17 @@ local_uninstall:
 
 local_test:
 	@echo "Testing validity of themes.."
-	@for i in $(THEMES); do xmllint --noout --schema qt-ui-4.7.xsd $$i; done
+	@for i in $(THEMES); do xmllint --noout --schema schemas/qt-ui-4.7.xsd $$i; done
 	@echo "Testing validity of forms.."
-	@for i in $(FORMS); do xmllint --noout --schema qt-ui-4.7.xsd $$i; done
+	@for i in $(FORMS); do xmllint --noout --schema schemas/qt-ui-4.7.xsd $$i; done
 	@echo "Testing validity of XML data.."
+	@echo "Testing validity of form translation sources.."
+	@for i in $(I18NS_TS); do xmllint --noout -dtdvalid schemas/qt-ts-2.0.dtd $$i && echo "$$i validates"; done
 	@for i in $(DATA); do xmllint --noout $$i && echo "$$i validates"; done
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
-	@LD_LIBRARY_PATH=$(QT_LIB_DIR) ./qtclient
+	@LD_LIBRARY_PATH=$(QT_LIB_DIR) ./qtclient -d
 
 .PHONY: buildi18n
 buildi18n:

@@ -23,7 +23,9 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secur
 	m_timeout( 4000 ),
 	m_parent( _parent ),
 	m_hasErrors( false ),
+#ifdef WITH_SSL
 	m_initializedSsl( false ),
+#endif
 	m_command( "CONNECT" )
 {
 #ifdef WITH_SSL
@@ -39,7 +41,7 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secur
 	QObject::connect( m_socket, SIGNAL( connected( ) ),
 		this, SLOT( privateConnected( ) ) );
 	QObject::connect( m_socket, SIGNAL( disconnected( ) ),
-		this, SLOT( disconnected( ) ) );
+		this, SLOT( privateDisconnected( ) ) );
 
 #ifdef WITH_SSL
 	QObject::connect( m_socket, SIGNAL( sslErrors( const QList<QSslError> & ) ),
@@ -172,7 +174,7 @@ void WolframeClient::disconnect( )
 			break;
 
 		case Connected:
-			sendCommand( "quit" );
+			sendCommand( "QUIT" );
 			m_state = AboutToDisconnect;
 			break;
 
@@ -246,7 +248,7 @@ void WolframeClient::privateConnected( )
 	}
 }
 
-void WolframeClient::disconnected( )
+void WolframeClient::privateDisconnected( )
 {
 	switch( m_state ) {
 		case AboutToConnect:
@@ -258,7 +260,6 @@ void WolframeClient::disconnected( )
 		case AboutToDisconnect:
 			m_socket->close( );
 			m_state = Disconnected;
-			m_command = "CONNECT";
 			break;
 
 		default:
@@ -285,9 +286,13 @@ void WolframeClient::dataAvailable( )
 					if( buf[len-2] == '\r' ) buf[len-2] = '\0';
 // protocol answer
 				if( strncmp( buf, "BYE", 3 ) == 0 ) {
+// BYE has no additional data, one liner
+					emit resultReceived( );
+// ERR has a message, one liner
 				} else if( strncmp( buf, "ERR", 3 ) == 0 ) {
 					m_hasErrors = true;
 					emit error( tr( "Protocol error, received: %1." ).arg( buf + 3 ) );
+// OK has a message, one liner
 				} else if( strncmp( buf, "OK", 2 ) == 0 ) {
 					if( len > 3 ) {
 						m_answer = QString( QByteArray( buf+3, len-3 ) );
@@ -364,6 +369,8 @@ void WolframeClient::handleResult( )
 	if( m_command == "CONNECT" ) {
 		// swallow greeting line from server after connect
 		emit connected( );
+	} else if( m_command == "QUIT" ) {
+		emit disconnected( );
 	} else if( m_command == "AUTH" ) {
 		QStringList mechList = m_answer.split( " \t", QString::SkipEmptyParts );
 		emit mechsReceived( mechList );

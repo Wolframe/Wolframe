@@ -168,7 +168,7 @@ run: local_all $(CPP_BINS)
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
 !ENDIF
 	@-echo echo Testing Qt client... >> test.bat
-	@-echo qtclient.exe >> test.bat
+	@-echo qtclient.exe -d >> test.bat
 	@-test.bat
 
 buildi18n:

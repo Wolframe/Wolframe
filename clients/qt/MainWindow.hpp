@@ -71,18 +71,21 @@ namespace _Wolframe {
 // slots for the wolframe client		
 		void wolframeError( QString error );
 		void connected( );
+		void disconnected( );
 		void authenticationOk( );
 		void authenticationFailed( );
-		
+
+// menu slots		
 		void themeSelected( QAction *action );
 		void formSelected( QAction *action );
 		void languageSelected( QAction *action );
 
+// form loader slots
 		void languageCodesLoaded( QStringList languages );
 		void formListLoaded( QStringList forms );
-
 		void formLoaded( QString name );
 
+// auto-wired slots for the menu
 		void on_actionExit_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
