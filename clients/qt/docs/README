@@ -1,8 +1,95 @@
-Other ideas:
+UIForm
+------
 
-http://zee-qt.googlecode.com: more of a XML-based desktop application
-development. We will have a less generic need for forms.
+Contains the XML for rendering the Form, it's exactly the
+thing I can load into Qt 'designer'
+The schema is in 'qt-ui-4.7.xsd'.
 
-XUL
+Currently those are the files in 'forms'.
 
-XAML
+Should be cashed on the client.
+
+UIFormTranslation
+-----------------
+
+language: de_CH, en_US, etc.
+
+source:
+
+Currently using the Qt translation format, version 2.0
+(files with extentions .ts in directory 'i18n').
+Could also be gettext PO files and others.
+
+binary:
+
+Lookup tables similar to gettext MO files. Those are used
+productive at runtime to translate the forms.
+
+Should be cashed on the client.
+
+UIStylesheet
+------------
+
+A Qt stylesheet similar to CSS in HTML influencing the look-and-feel
+of the form widgets. Syntax check not really possible (maybe with
+a QSS-loader and interpreter program?). The format is plain text ASCII.
+
+Currently in the 'themes/XXX/' directory as '*.qss' files.
+
+The Qt designer currently doesn't load and apply external stylesheets, only 
+manual local style changes to widgets are possible.
+
+Can also be embedded as a top-level form property 'styleSheet' directly into
+the form, but then we get an DRY-problem! So this is just an option for 
+rendering/designing as a transitional format! Unless of couse we use one
+theme UI loading may form UIs..
+
+Should be cashed on the client.
+
+Domain data
+-----------
+
+Currently the *.xml files in the 'data' directory. Per form and widget
+there is a XML file containing the pickable values.
+
+Could be embedded in the UI, but translations get complicated this way.
+
+Could be big, so paging and partial model updates could be an issue
+(think a million cities and a completion widget).
+
+Domain data gets choosen based on the current interface language.
+
+Simple schema:
+
+<domain>
+   <form>form1</form>
+   <widget>widget1</widget>
+   <language>de_CH</language>
+   <values>
+      <value id="language_independent_key">translated value</value>
+      ...
+   </values>
+</domain>
+
+Those could also be forms..
+
+Should not be cached on the client.
+
+Current data
+------------
+
+Those are forms..
+
+Must not be cached on the client.
+
+Theme
+-----
+
+Currently those are the files in 'themes/XXX'. They just contain an
+empty main window and some menu hooks.
+
+Are not a class per se. They are a form (with a menu and statusbar) and
+a stylesheet and some translations. Can be seen as a special form. They
+may also disappear completly and all data is contained in each UIForm
+(makes the loading process a little bit more tricky).
+
