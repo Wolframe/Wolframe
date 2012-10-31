@@ -57,8 +57,6 @@ struct OptionStruct
 		fopt.add_options()
 			( "version,v", "print version")
 			( "help,h", "print help message")
-			( "connect-timeout", boost::program_options::value<unsigned short>(), "in seconds, how long to wait for connect")
-			( "read-timeout", boost::program_options::value<unsigned short>(), "in seconds, terminate after inactivity")
 			( "uiformdir,u", boost::program_options::value<std::string>(), "directory containing the forms (where to write the uiforms to)")
 			( "outputfile,o", boost::program_options::value<std::string>(), "output file (where to write the request answers to)")
 			( "request,q", boost::program_options::value<std::vector<std::string> >(), "file containing a request to process")
@@ -68,6 +66,8 @@ struct OptionStruct
 			( "client-cert-file,c", boost::program_options::value<std::string>(), "client certificate to present to the server (default: ./certs/client.crt)")
 			( "client-cert-key,k", boost::program_options::value<std::string>(), "client key file (default: ./private/client.key)")
 #endif
+			( "connect-timeout", boost::program_options::value<unsigned short>(), "in seconds, how long to wait for connect")
+			( "read-timeout", boost::program_options::value<unsigned short>(), "in seconds, terminate after inactivity")
 			( "host", po::value<std::string>(), "the host to connect to (default 127.0.0.1)")
 			( "port", po::value<std::string>(), "the port to connect to (default 7661)")
 			;

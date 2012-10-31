@@ -88,10 +88,8 @@ private:
 private:
 	Connection m_connection;		//< connection handler
 	Protocol m_protocol;			//< protocol statemachine
-	boost::condition_variable m_run_cond;	//< condition object for signalling the runSession thread
-	boost::mutex m_run_mutex;		//< mutex for mutual exclusion on the runSession signal
-	bool m_run_signal;			//< boolean variable as runSession signalling flag
-	boost::thread m_run_thread;		//< thread that executes runSession
+	struct Impl;
+	Impl* m_impl;				//< session object internals
 };
 
 

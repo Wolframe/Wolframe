@@ -126,7 +126,7 @@ public:
 		,m_clientobject(clientobject_)
 	{}
 
-	bool connect()
+	virtual bool connect()
 	{
 		boost::asio::ip::tcp::resolver::iterator endpoint_iter;
 		boost::asio::ip::tcp::resolver resolver( m_io_service);
@@ -156,12 +156,38 @@ public:
 
 	virtual void stop()
 	{
-		m_socket->lowest_layer().close();
-		m_io_service.stop();
-		notify( Connection::Event::STATE, "terminated");
-		notify( Connection::Event::TERMINATED);
-		m_state = Connection::CLOSED;
+		m_io_service.post( boost::bind( &ConnectionImpl::conn_stop, this));
 		m_io_service_thread.join();
+	}
+
+	class WriteBuffer
+	{
+	public:
+		std::size_t datasize() const	{return m_datasize;}
+		const char* data() const	{return m_data;}
+
+		static boost::shared_ptr<WriteBuffer> create( const char* data_, std::size_t datasize_)
+		{
+			WriteBuffer* rt = (WriteBuffer*) std::malloc( sizeof( WriteBuffer) + datasize_);
+			if (!rt) throw std::bad_alloc();
+			rt->m_datasize = datasize_;
+			std::memcpy( &rt->m_data, data_, datasize_);
+			return boost::shared_ptr<WriteBuffer>( rt, std::free);
+		}
+
+	private:
+		std::size_t m_datasize;
+		char m_data[1];
+	};
+
+	virtual void write( const char* data, std::size_t datasize)
+	{
+		m_io_service.post( boost::bind( &ConnectionImpl::conn_write, this, WriteBuffer::create( data, datasize)));
+	}
+
+	virtual void read()
+	{
+		m_io_service.post( boost::bind( &ConnectionImpl::conn_read, this));
 	}
 
 private:
@@ -175,6 +201,15 @@ private:
 		m_notifier( m_clientobject, Connection::Event( type, content));
 	}
 
+	void conn_stop()
+	{
+		m_state = Connection::CLOSED;
+		m_io_service.stop();
+		m_socket->lowest_layer().close();
+		notify( Connection::Event::STATE, "terminated");
+		notify( Connection::Event::TERMINATED);
+	}
+
 	void conn_error( const char* errmsg, const boost::system::error_code &ec)
 	{
 		std::ostringstream msg;
@@ -184,11 +219,10 @@ private:
 
 	void handle_connect( const boost::system::error_code &ec, boost::asio::ip::tcp::resolver::iterator)
 	{
-/*[-]*/		std::cerr << "handle connect " << Connection::stateName(m_state) << std::endl;
 		if (ec)
 		{
 			conn_error( "connection error", ec);
-			stop();
+			conn_stop();
 		}
 		else
 		{
@@ -222,11 +256,10 @@ private:
 
 	void handle_handshake( const boost::system::error_code &ec)
 	{
-/*[-]*/		std::cerr << "handle handshake " << Connection::stateName(m_state) << std::endl;
 		if (ec)
 		{
 			conn_error( "error in handshake", ec);
-			stop();
+			conn_stop();
 		}
 		else
 		{
@@ -239,12 +272,11 @@ private:
 
 	void check_deadline()
 	{
-/*[-]*/		std::cerr << "check deadline " << Connection::stateName(m_state) << std::endl;
 		if (m_deadline_timer->expires_at() <= boost::asio::deadline_timer::traits_type::now())
 		{
 			m_deadline_timer->expires_at( boost::posix_time::pos_infin);
 			notify( Connection::Event::ERROR, "timeout");
-			stop();
+			conn_stop();
 		}
 		else
 		{
@@ -252,27 +284,23 @@ private:
 		}
 	}
 
-	virtual void write( const char* data, std::size_t size)
+	void conn_write( const boost::shared_ptr<WriteBuffer>& wb)
 	{
-/*[-]*/		std::cerr << "connection write " << Connection::stateName(m_state) << " '" << std::string(data,size) << "'" << std::endl;
-		boost::asio::write( *m_socket, boost::asio::buffer( data, size));
+		boost::asio::write( *m_socket, boost::asio::buffer( wb->data(), wb->datasize()));
 	}
 
-	virtual void read()
+	void conn_read()
 	{
-/*[-]*/		std::cerr << "connection read " << Connection::stateName(m_state) << std::endl;
 		m_deadline_timer->expires_from_now( boost::posix_time::seconds( m_config.m_read_timeout));
 		m_socket->async_read_some(
 			boost::asio::buffer( m_buffer, sizeof(m_buffer)),
 			boost::bind( &ConnectionImpl::handle_read, this,
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred));
-/*[-]*/		std::cerr << "connection read called " << Connection::stateName(m_state) << std::endl;
 	}
 
 	void handle_read( const boost::system::error_code &ec, std::size_t bytes_transferred)
 	{
-/*[-]*/		std::cerr << "handle read " << Connection::stateName(m_state) << std::endl;
 		if (ec)
 		{
 			if (ec != boost::asio::error::eof)
@@ -287,12 +315,12 @@ private:
 					conn_error( "read error", ec);
 				}
 			}
-			stop();
+			conn_stop();
 		}
 		else
 		{
 			notify( Connection::Event::DATA, m_buffer, bytes_transferred);
-			read();
+			conn_read();
 		}
 	}
 
@@ -356,7 +384,7 @@ void Connection::write( const char* data, std::size_t datasize)
 	m_impl->write( data, datasize);
 }
 
-void Connection::close()
+void Connection::stop()
 {
 	m_impl->stop();
 }

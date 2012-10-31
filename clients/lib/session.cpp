@@ -35,26 +35,41 @@
 #include "session.hpp"
 #include <stdexcept>
 #include <iostream>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::client;
 
+struct Session::Impl
+{
+	boost::mutex m_notify_mutex;		//< mutex for session handler notifiers
+	boost::condition_variable m_run_cond;	//< condition object for signalling the runSession thread
+	boost::mutex m_run_mutex;		//< mutex for mutual exclusion on the runSession signal
+	bool m_run_signal;			//< boolean variable as runSession signalling flag
+	boost::thread m_run_thread;		//< thread that executes runSession
+
+	Impl()
+		:m_run_signal(false){}
+	~Impl(){}
+};
 
 Session::Session( const Connection::Configuration& cfg)
 	:m_connection(cfg,&connectionCallback_void,this)
 	,m_protocol(&protocolCallback_void,this)
-	,m_run_signal(false){}
+	,m_impl(new Impl()){}
 
 Session::~Session()
-{}
+{
+	delete m_impl;
+}
 
 void Session::signal_runSession()
 {
 	{
-		boost::lock_guard<boost::mutex> lock(m_run_mutex);
-		m_run_signal = true;
+		boost::lock_guard<boost::mutex> lock(m_impl->m_run_mutex);
+		m_impl->m_run_signal = true;
 	}
-	m_run_cond.notify_one();
+	m_impl->m_run_cond.notify_one();
 }
 
 void Session::runSession( Session* session)
@@ -68,12 +83,12 @@ void Session::runSession( Session* session)
 		while (session->m_connection.state() != Connection::CLOSED)
 		{
 			{
-				boost::unique_lock<boost::mutex> lock(session->m_run_mutex);
-				while(!session->m_run_signal)
+				boost::unique_lock<boost::mutex> lock( session->m_impl->m_run_mutex);
+				while (!session->m_impl->m_run_signal)
 				{
-					session->m_run_cond.wait(lock);
+					session->m_impl->m_run_cond.wait(lock);
 				}
-				session->m_run_signal = false;
+				session->m_impl->m_run_signal = false;
 			}
 			if (session->m_connection.state() != Connection::CLOSED)
 			{
@@ -84,12 +99,8 @@ void Session::runSession( Session* session)
 						break;
 					case Protocol::CALL_IDLE:
 						break;
-					case Protocol::CALL_ERROR:
-						session->m_connection.close();
-						break;
 					case Protocol::CALL_CLOSED:
-						session->m_connection.close();
-						break;
+						return;
 				}
 			}
 		}
@@ -98,32 +109,34 @@ void Session::runSession( Session* session)
 	{
 		std::ostringstream msg;
 		msg << "runtime error in session thread: " << err.what();
+		boost::interprocess::scoped_lock<boost::mutex> lock( session->m_impl->m_notify_mutex);
 		session->notifyError( msg.str().c_str());
 	}
 	catch (const std::bad_alloc& err)
 	{
+		boost::interprocess::scoped_lock<boost::mutex> lock( session->m_impl->m_notify_mutex);
 		session->notifyError( err.what());
 	}
 	catch (const std::exception& err)
 	{
 		std::ostringstream msg;
 		msg << "exception thrown in session thread: " << err.what();
+		boost::interprocess::scoped_lock<boost::mutex> lock( session->m_impl->m_notify_mutex);
 		session->notifyError( err.what());
 	}
 }
 
 void Session::start()
 {
-	m_run_thread = boost::thread( runSession, this);
+	m_impl->m_run_thread = boost::thread( runSession, this);
 }
 
 void Session::stop()
 {
-/*[-]*/	std::cerr << "stopping session" << std::endl;
 	m_protocol.doQuit();
 	signal_runSession();
-	m_run_thread.join();
-/*[-]*/	std::cerr << "session stopped" << std::endl;
+	m_impl->m_run_thread.join();
+	m_connection.stop();
 }
 
 void Session::requestCallback( void* this_, const Protocol::Event& event)
@@ -158,23 +171,32 @@ void Session::protocolCallback( const Protocol::Event& event)
 			break;
 
 		case Protocol::Event::UIFORM:
+		{
+			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			receiveUIForm( event.id(), event.content(), event.contentsize());
 			break;
-
+		}
 		case Protocol::Event::ANSWER:
 			std::logic_error("answer not passed to request (SessionHandler::protocolCallback)");
 
 		case Protocol::Event::STATE:
+		{
+			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			notifyState( event.id());
 			break;
-
+		}
 		case Protocol::Event::ATTRIBUTE:
+		{
+			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			notifyAttribute( event.id(), event.content());
 			break;
-
+		}
 		case Protocol::Event::ERROR:
+		{
+			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			notifyError( event.id());
 			break;
+		}
 	}
 }
 
@@ -186,7 +208,6 @@ void Session::protocolCallback_void( void* this_, const Protocol::Event& event)
 
 void Session::connectionCallback( const Connection::Event& event)
 {
-
 	switch (event.type())
 	{
 		case Connection::Event::DATA:
@@ -197,11 +218,17 @@ void Session::connectionCallback( const Connection::Event& event)
 			signal_runSession();
 			break;
 		case Connection::Event::STATE:
+		{
+			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			notifyState( event.content());
 			break;
+		}
 		case Connection::Event::ERROR:
+		{
+			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			notifyError( event.content());
 			break;
+		}
 		case Connection::Event::TERMINATED:
 			signal_runSession();
 			break;

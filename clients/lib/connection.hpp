@@ -137,7 +137,7 @@ public:
 	bool connect();
 	void read();
 	void write( const char* data, std::size_t datasize);
-	void close();
+	void stop();
 
 	///\enum State
 	///\brief Connection state

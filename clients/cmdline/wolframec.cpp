@@ -41,6 +41,7 @@
 #include <stdexcept>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+#include <boost/thread.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::client;
@@ -70,21 +71,22 @@ public:
 
 	virtual void notifyState( const char* msg)
 	{
-		std::cerr << "state " << msg << std::endl;
+		std::cerr << "state '" << msg << "'" << std::endl;
 	}
 
 	virtual void notifyAttribute( const char* id, const char* value)
 	{
-		std::cerr << "attribute " << id << "=" << value << std::endl;
+		std::cerr << "attribute " << id << " '" << value << "'" << std::endl;
 	}
 
 	virtual void notifyError( const char* msg)
 	{
-		std::cerr << "ERROR '" << msg << "'" << std::endl;
+		std::cerr << "error '" << msg << "'" << std::endl;
 	}
 
 private:
 	std::string m_uiformdir;
+	boost::mutex m_io_mutex;
 };
 
 class CmdlineRequestHandler :public RequestHandler

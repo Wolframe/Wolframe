@@ -112,7 +112,6 @@ public:
 	{
 		CALL_DATA,	//< the protocol event handler is requesting more data. all input (complete lines have been consumed)
 		CALL_IDLE,	//< the protocol event handler is in an established session state and has processed all requests until now.
-		CALL_ERROR,	//< an internal error (memory allocation error) has occurred
 		CALL_CLOSED	//< the client has to terminate becaues it cannot work anymore or the server will close the connection
 	} CallResult;
 
