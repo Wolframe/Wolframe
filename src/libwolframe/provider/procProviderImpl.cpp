@@ -409,10 +409,10 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofi
 }
 
 
-const UI::UserInterfaceLibrary* ProcessorProvider::ProcessorProvider_Impl::UIsupplier() const
+const UI::UserInterfaceLibrary* ProcessorProvider::ProcessorProvider_Impl::UIlibrary() const
 {
 	if ( m_db )
-		return m_db->UIsupplier();
+		return m_db->UIlibrary();
 	else	{
 		LOG_ALERT << "No database defined for the processor provider";
 		return NULL;

@@ -178,6 +178,11 @@ void SQLiteDatabase::closeTransaction( Transaction *t )
 }
 
 
+const UI::UserInterfaceLibrary* SQLiteDatabase::UIlibrary() const
+{
+	return new SQLiteUIlibrary( *this );
+}
+
 /*****  SQLite transaction  *******************************************/
 SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database )
 	: m_db( database ), m_unit( database.dbUnit() )
@@ -221,6 +226,53 @@ void SQLiteTransaction::close()
 	m_db.closeTransaction( this );
 }
 
+
+/*****  SQLite user interface library  ********************************/
+SQLiteUIlibrary::SQLiteUIlibrary( SQLiteDatabase& database )
+	: m_unit( database.dbUnit() )
+{}
+
+
+const std::list< UI::UIformHeader > SQLiteUIlibrary::formHeaders() const
+{
+	std::list< UI::UIformHeader >	forms;
+	return forms;
+}
+
+const std::list< UI::UIformHeader > SQLiteUIlibrary::formHeaders( std::string& /*role*/ ) const
+{
+	std::list< UI::UIformHeader >	forms;
+	return forms;
+}
+
+const std::list< UI::UIformHeader > SQLiteUIlibrary::formHeaders( std::list< std::string >& /*roles*/ ) const
+{
+	std::list< UI::UIformHeader >	forms;
+	return forms;
+}
+
+const std::list< UI::UIformHeader > SQLiteUIlibrary::formVersions( const std::string& /*name*/ ) const
+{
+	std::list< UI::UIformHeader >	forms;
+	return forms;
+}
+
+const UI::UIform SQLiteUIlibrary::form( const std::string& /*name*/ ) const
+{
+	UI::UIform	form;
+	return form;
+}
+
+const UI::UIform SQLiteUIlibrary::form( const std::string& /*name*/, const Version& /*version*/ ) const
+{
+	UI::UIform	form;
+	return form;
+}
+
+const UI::UIform SQLiteUIlibrary::form( const UI::UIformHeader& /*header*/ ) const
+{
+	UI::UIform	form;
+	return form;
+}
+
 }} // _Wolframe::db
-
-

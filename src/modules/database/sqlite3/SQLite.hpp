@@ -39,6 +39,7 @@
 
 #include "database/database.hpp"
 #include "database/transaction.hpp"
+#include "UserInterface.hpp"
 #include "config/configurationBase.hpp"
 #include "types/keymap.hpp"
 #include "constructor.hpp"
@@ -111,6 +112,28 @@ private:
 };
 
 
+class SQLiteUIlibrary : public UI::UserInterfaceLibrary
+{
+public:
+	SQLiteUIlibrary( SQLiteDatabase& database );
+	 ~SQLiteUIlibrary()			{}
+
+	virtual const std::list< UI::UIformHeader > formHeaders() const;
+	virtual const std::list< UI::UIformHeader > formHeaders( std::string& role ) const;
+	virtual const std::list< UI::UIformHeader > formHeaders( std::list< std::string >& roles ) const;
+
+	virtual const std::list< UI::UIformHeader > formVersions( const std::string& name ) const = 0;
+
+	virtual const UI::UIform form( const std::string& name ) const = 0;
+	virtual const UI::UIform form( const std::string& name, const Version& version ) const = 0;
+	virtual const UI::UIform form( const UI::UIformHeader& header ) const = 0;
+
+	virtual void close()			{ delete this; }
+private:
+	SQLiteDBunit&		m_unit;		///< parent database unit
+};
+
+
 class SQLiteDatabase : public Database
 {
 public:
@@ -128,9 +151,10 @@ public:
 	virtual const std::string* getProgram( const std::string& name) const;
 
 	Transaction* transaction( const std::string& name );
-
 	void closeTransaction( Transaction* t );
 
+	///\brief Get a user interface library
+	virtual const UI::UserInterfaceLibrary* UIlibrary() const;
 private:
 	SQLiteDBunit*	m_unit;			///< parent database unit
 };

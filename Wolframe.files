@@ -91,6 +91,13 @@ clients/cli/GNUmakefile
 clients/cli/Makefile.W32
 clients/cli/wolfcli.cpp
 clients/cli/wolframe.conf
+clients/cmdline/GNUmakefile
+clients/cmdline/Makefile.W32
+clients/cmdline/options.cpp
+clients/cmdline/options.hpp
+clients/cmdline/utils.cpp
+clients/cmdline/utils.hpp
+clients/cmdline/wolframec.cpp
 clients/GNUmakefile
 clients/lib/connection.cpp
 clients/lib/connection.hpp
@@ -146,6 +153,7 @@ clients/qt/DataLoader.hpp
 clients/qt/DebugTerminal.cpp
 clients/qt/DebugTerminal.hpp
 clients/qt/docs/README
+clients/qt/docs/README.Other
 clients/qt/FileDataLoader.cpp
 clients/qt/FileDataLoader.hpp
 clients/qt/FileFormLoader.cpp
@@ -171,7 +179,6 @@ clients/qt/moc_HistoryLineEdit.cpp
 clients/qt/moc_LoginDialog.cpp
 clients/qt/moc_MainWindow.cpp
 clients/qt/moc_qcommandline.cpp
-clients/qt/moc_qxtsignalwaiter.cpp
 clients/qt/moc_WolframeClient.cpp
 clients/qt/NetworkDataLoader.cpp
 clients/qt/NetworkDataLoader.hpp
