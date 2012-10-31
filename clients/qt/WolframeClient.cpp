@@ -23,7 +23,9 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secur
 	m_timeout( 4000 ),
 	m_parent( _parent ),
 	m_hasErrors( false ),
+#ifdef WITH_SSL
 	m_initializedSsl( false ),
+#endif
 	m_command( "CONNECT" )
 {
 #ifdef WITH_SSL
