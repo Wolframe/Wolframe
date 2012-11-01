@@ -102,10 +102,10 @@ struct Connection::Impl
 {
 	Impl() :m_state(INIT){}
 	virtual ~Impl(){}
-	virtual void write( const char* data, std::size_t size)=0;
-	virtual void read()=0;
+
+	virtual void connect()=0;
 	virtual void stop()=0;
-	virtual bool connect()=0;
+	virtual void post_operation()=0;
 
 	Connection::State state() const		{return m_state;}
 
@@ -119,14 +119,18 @@ class ConnectionImpl :public Connection::Impl
 {
 public:
 	ConnectionImpl( const Connection::Configuration& config,
+			ConnectionHandler* connectionHandler_,
 			Connection::Callback  notifier_,
 			void* clientobject_)
 		:m_config(config)
+		,m_connectionHandler(connectionHandler_)
 		,m_notifier(notifier_)
 		,m_clientobject(clientobject_)
 	{}
 
-	virtual bool connect()
+	virtual ~ConnectionImpl(){}
+
+	virtual void connect()
 	{
 		boost::asio::ip::tcp::resolver::iterator endpoint_iter;
 		boost::asio::ip::tcp::resolver resolver( m_io_service);
@@ -136,23 +140,23 @@ public:
 		if (endpoint_iter == boost::asio::ip::tcp::resolver::iterator())
 		{
 			notify( Connection::Event::ERROR, "unable to resove host");
-			return false;
+			notify( Connection::Event::STATE, "terminated");
+			notify( Connection::Event::TERMINATED);
 		}
-		notify( Connection::Event::STATE, "resolved");
-
-		m_socket.reset( TransportLayer::socket( m_io_service, m_config));
-		m_deadline_timer.reset( new boost::asio::deadline_timer( m_io_service));
-		m_deadline_timer->expires_from_now( boost::posix_time::seconds( m_config.m_connect_timeout));
-		m_socket->lowest_layer().async_connect( endpoint_iter->endpoint(),
-			boost::bind( &ConnectionImpl::handle_connect, this, _1, endpoint_iter));
-		m_deadline_timer->async_wait( boost::bind( &ConnectionImpl::check_deadline, this));
-		notify( Connection::Event::STATE, "connect");
-		m_state = Connection::OPEN;
-		m_io_service_thread = boost::thread( boost::bind( &boost::asio::io_service::run, &m_io_service));
-		return true;
+		else
+		{
+			notify( Connection::Event::STATE, "resolved");
+			m_socket.reset( TransportLayer::socket( m_io_service, m_config));
+			m_deadline_timer.reset( new boost::asio::deadline_timer( m_io_service));
+			m_deadline_timer->expires_from_now( boost::posix_time::seconds( m_config.m_connect_timeout));
+			m_socket->lowest_layer().async_connect( endpoint_iter->endpoint(),
+				boost::bind( &ConnectionImpl::handle_connect, this, _1, endpoint_iter));
+			m_deadline_timer->async_wait( boost::bind( &ConnectionImpl::check_deadline, this));
+			notify( Connection::Event::STATE, "connect");
+			m_state = Connection::OPEN;
+			m_io_service_thread = boost::thread( boost::bind( &boost::asio::io_service::run, &m_io_service));
+		}
 	}
-
-	virtual ~ConnectionImpl(){}
 
 	virtual void stop()
 	{
@@ -160,34 +164,9 @@ public:
 		m_io_service_thread.join();
 	}
 
-	class WriteBuffer
+	virtual void post_operation()
 	{
-	public:
-		std::size_t datasize() const	{return m_datasize;}
-		const char* data() const	{return m_data;}
-
-		static boost::shared_ptr<WriteBuffer> create( const char* data_, std::size_t datasize_)
-		{
-			WriteBuffer* rt = (WriteBuffer*) std::malloc( sizeof( WriteBuffer) + datasize_);
-			if (!rt) throw std::bad_alloc();
-			rt->m_datasize = datasize_;
-			std::memcpy( &rt->m_data, data_, datasize_);
-			return boost::shared_ptr<WriteBuffer>( rt, std::free);
-		}
-
-	private:
-		std::size_t m_datasize;
-		char m_data[1];
-	};
-
-	virtual void write( const char* data, std::size_t datasize)
-	{
-		m_io_service.post( boost::bind( &ConnectionImpl::conn_write, this, WriteBuffer::create( data, datasize)));
-	}
-
-	virtual void read()
-	{
-		m_io_service.post( boost::bind( &ConnectionImpl::conn_read, this));
+		m_io_service.post( boost::bind( &ConnectionImpl::handle_operation, this));
 	}
 
 private:
@@ -226,7 +205,7 @@ private:
 		}
 		else
 		{
-			notify( Connection::Event::STATE, "connect");
+			notify( Connection::Event::STATE, "connected");
 			handshake();
 		}
 	}
@@ -264,9 +243,11 @@ private:
 		else
 		{
 			m_deadline_timer->expires_from_now( boost::posix_time::seconds( m_config.m_read_timeout));
-			notify( Connection::Event::STATE, "connected");
+			notify( Connection::Event::STATE, "ready");
 			m_state = Connection::READY;
 			notify( Connection::Event::READY);
+			conn_read();
+			post_operation();
 		}
 	}
 
@@ -284,9 +265,9 @@ private:
 		}
 	}
 
-	void conn_write( const boost::shared_ptr<WriteBuffer>& wb)
+	void conn_write( const char* data, std::size_t datasize)
 	{
-		boost::asio::write( *m_socket, boost::asio::buffer( wb->data(), wb->datasize()));
+		boost::asio::write( *m_socket, boost::asio::buffer( data, datasize));
 	}
 
 	void conn_read()
@@ -319,8 +300,29 @@ private:
 		}
 		else
 		{
-			notify( Connection::Event::DATA, m_buffer, bytes_transferred);
+			m_connectionHandler->pushData( m_buffer, bytes_transferred);
 			conn_read();
+			post_operation();
+		}
+	}
+
+	void handle_operation()
+	{
+		ConnectionHandler::Operation op = m_connectionHandler->nextop();
+		switch (op.id)
+		{
+			case ConnectionHandler::Operation::READ:
+				conn_read();
+				break;
+			case ConnectionHandler::Operation::WRITE:
+				conn_write( op.data, op.datasize);
+				post_operation();
+				break;
+			case ConnectionHandler::Operation::IDLE:
+				break;
+			case ConnectionHandler::Operation::CLOSE:
+				conn_stop();
+				break;
 		}
 	}
 
@@ -331,6 +333,7 @@ private:
 	boost::shared_ptr<Socket> m_socket;
 	boost::shared_ptr<boost::asio::deadline_timer> m_deadline_timer;
 	Connection::Configuration m_config;
+	ConnectionHandler* m_connectionHandler;
 	Connection::Callback m_notifier;
 	void* m_clientobject;
 	enum { BufferSize = 1<<12 };
@@ -338,7 +341,7 @@ private:
 };
 
 
-Connection::Connection( const Configuration& cfg, Callback notifier_, void* clientobject_)
+Connection::Connection( const Connection::Configuration& cfg, ConnectionHandler* connhnd, Callback notifier_, void* clientobject_)
 	:m_impl(0)
 	,m_notifier(notifier_)
 	,m_clientobject(clientobject_)
@@ -349,10 +352,10 @@ Connection::Connection( const Configuration& cfg, Callback notifier_, void* clie
 #if !WITH_SSL
 			throw std::runtime_error( "no SSL support built in (WITH_SSL=1)");
 #endif
-			m_impl = new ConnectionImpl<TransportLayerSSL>( cfg, notifier_, clientobject_);
+			m_impl = new ConnectionImpl<TransportLayerSSL>( cfg, connhnd, notifier_, clientobject_);
 			break;
 		case Configuration::Plain:
-			m_impl = new ConnectionImpl<TransportLayerPlain>( cfg, notifier_, clientobject_);
+			m_impl = new ConnectionImpl<TransportLayerPlain>( cfg, connhnd, notifier_, clientobject_);
 			break;
 		default:
 			throw std::runtime_error( "undefined transport layer type (WITH_SSL=1)");
@@ -369,19 +372,9 @@ Connection::State Connection::state() const
 	return m_impl->state();
 }
 
-bool Connection::connect()
+void Connection::connect()
 {
-	return m_impl->connect();
-}
-
-void Connection::read()
-{
-	m_impl->read();
-}
-
-void Connection::write( const char* data, std::size_t datasize)
-{
-	m_impl->write( data, datasize);
+	m_impl->connect();
 }
 
 void Connection::stop()
@@ -389,11 +382,15 @@ void Connection::stop()
 	m_impl->stop();
 }
 
+void Connection::post_request()
+{
+	m_impl->post_operation();
+}
+
 static const char* eventTypeName( Connection::Event::Type type)
 {
 	switch (type)
 	{
-		case Connection::Event::DATA: return "DATA";
 		case Connection::Event::READY: return "READY";
 		case Connection::Event::STATE: return "STATE";
 		case Connection::Event::ERROR: return "ERROR";
