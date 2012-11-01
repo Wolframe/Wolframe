@@ -38,19 +38,17 @@
 
 namespace _Wolframe	{
 
-GlobalRandomGenerator::GlobalRandomGenerator( std::string& /*rndDev*/ )
+GlobalRandomGenerator::GlobalRandomGenerator( std::string& rndDev )
 {
-//	m_device = rndDev;
-	t.reset( this );
-	m_initialized = true;
+	m_device = rndDev;
 }
 
-unsigned GlobalRandomGenerator::random()
+unsigned GlobalRandomGenerator::random() const
 {
 	return 0;
 }
 
-int GlobalRandomGenerator::random( unsigned char* /*buffer*/, size_t /*bytes*/ )
+int GlobalRandomGenerator::random( unsigned char* /*buffer*/, size_t /*bytes*/ ) const
 {
 	return 0;
 }
