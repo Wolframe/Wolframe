@@ -486,10 +486,7 @@ public:
 		struct OP_CLOSE :public ConnectionHandler::Operation
 		{OP_CLOSE() :ConnectionHandler::Operation( ConnectionHandler::Operation::CLOSE){}};
 
-		for (;;)
-		{
-/*[-]*/		std::cerr << "STATE '" << ProtocolState::name(state()) << "'" << std::endl;
-		switch (state())
+		for (;;) switch (state())
 		{
 			case ProtocolState::INIT:
 				state( ProtocolState::BANNER);
@@ -734,7 +731,6 @@ public:
 				{
 					return OP_READ();
 				}
-/*[-]*/				std::cerr << "LINE '" << std::string(line.ptr,line.size) << "'" << std::endl;
 				getLineSplit_space( arg, line, 2);
 				if (!arg.size) continue;
 				if (isequal( arg.ptr[0], "ANSWER"))
@@ -803,7 +799,6 @@ public:
 
 			case ProtocolState::CLOSED:
 				return OP_CLOSE();
-		}
 		}
 	}
 
