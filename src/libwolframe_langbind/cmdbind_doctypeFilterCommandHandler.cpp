@@ -249,7 +249,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 	}
 	catch (const std::runtime_error& err)
 	{
-		m_statusCode = -(int)m_state - 100;
+		m_lastError = "failed to extract document type from xml";
 		LOG_ERROR << "error in document type recognition: " << err.what();
 		m_state = Done;
 	}

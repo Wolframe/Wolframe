@@ -432,7 +432,7 @@ public:
 
 	void notifyAnswerError( const char* id)
 	{
-		Protocol::Event event( Protocol::Event::ERROR, 0, id, strlen(id));
+		Protocol::Event event( Protocol::Event::ERROR, id, 0, 0);
 		m_request->answer( event);
 		m_request.reset();
 		m_docbuffer.reset();
@@ -486,7 +486,10 @@ public:
 		struct OP_CLOSE :public ConnectionHandler::Operation
 		{OP_CLOSE() :ConnectionHandler::Operation( ConnectionHandler::Operation::CLOSE){}};
 
-		for (;;) switch (state())
+		for (;;)
+		{
+/*[-]*/		std::cerr << "STATE '" << ProtocolState::name(state()) << "'" << std::endl;
+		switch (state())
 		{
 			case ProtocolState::INIT:
 				state( ProtocolState::BANNER);
@@ -731,6 +734,7 @@ public:
 				{
 					return OP_READ();
 				}
+/*[-]*/				std::cerr << "LINE '" << std::string(line.ptr,line.size) << "'" << std::endl;
 				getLineSplit_space( arg, line, 2);
 				if (!arg.size) continue;
 				if (isequal( arg.ptr[0], "ANSWER"))
@@ -799,6 +803,7 @@ public:
 
 			case ProtocolState::CLOSED:
 				return OP_CLOSE();
+		}
 		}
 	}
 

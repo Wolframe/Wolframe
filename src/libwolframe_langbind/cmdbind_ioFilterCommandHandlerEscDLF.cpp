@@ -101,7 +101,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 				if (!(flt = m_outputfilter.get()))
 				{
 					LOG_ERROR << "Output filter undefined";
-					m_statusCode = ErrInternal;
+					m_lastError = "internal";
 					m_state = DiscardInput;
 					return READ;
 				}
@@ -141,7 +141,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 						if (errmsg)
 						{
 							LOG_ERROR << "Error calling procedure: " << (errmsg?errmsg:"unknown");
-							m_statusCode = ErrProcessing;
+							m_lastError = "processing error";
 						}
 						continue;
 
@@ -159,7 +159,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 								case InputFilter::Error:
 									errmsg = m_inputfilter->getError();
 									LOG_ERROR << "Error in input filter: " << (errmsg?errmsg:"unknown");
-									m_statusCode = ErrProcessing;
+									m_lastError = "input";
 									m_state = DiscardInput;
 									return READ;
 							}
@@ -179,13 +179,13 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 								case OutputFilter::Error:
 									errmsg = m_outputfilter->getError();
 									LOG_ERROR << "Error in output filter: " << (errmsg?errmsg:"unknown");
-									m_statusCode = ErrProcessing;
+									m_lastError = "internal";
 									m_state = DiscardInput;
 									return READ;
 							}
 						}
 						LOG_ERROR << "Illegal state (missing filter)";
-						m_statusCode = ErrInternal;
+						m_lastError = "internal";
 						m_state = DiscardInput;
 						return READ;
 				}

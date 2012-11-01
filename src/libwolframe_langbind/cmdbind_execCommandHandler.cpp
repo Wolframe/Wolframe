@@ -299,7 +299,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 					catch (std::exception& e)
 					{
 						LOG_ERROR << "Command handler creation thrown exception: " << e.what();
-						m_statusCode = -1;
+						m_lastError = "failed to execute command";
 						return CLOSE;
 					}
 					continue;
@@ -311,7 +311,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				const void* content;
 				std::size_t contentsize;
 				std::size_t pos;
-				int err;
+				const char* err;
 
 				try
 				{
@@ -329,13 +329,13 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 							m_input.setPos( pos + contentsize);
 							m_itr = m_input.at( pos);
 							m_end = m_input.end();
-							err = m_cmdhandler.get()->statusCode();
+							err = m_cmdhandler.get()->lastError();
 							m_cmdhandler.reset(0);
 							m_state = EnterCommand;
-							if (err != 0)
+							if (err)
 							{
 								m_output.print( "ERR ");
-								m_output.printNumber( err);
+								m_output.print( err);
 								m_output.print( "\r\n");
 								return WRITE;
 							}
@@ -350,7 +350,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 				catch (std::exception& e)
 				{
 					LOG_ERROR << "Command execution thrown exception: " << e.what();
-					m_statusCode = -2;
+					m_lastError = "failed to execute command";
 					return CLOSE;
 				}
 			}

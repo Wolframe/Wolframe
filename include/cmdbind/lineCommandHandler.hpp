@@ -127,8 +127,6 @@ public:
 	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
-	///\brief Get the error code of command execution to be returned to the client
-	int statusCode() const				{return m_statusCode;}
 	///\brief Get the current state (toplevel)
 	std::size_t stateidx() const			{return m_stateidx;}
 

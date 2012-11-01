@@ -171,7 +171,7 @@ int CommandHandler::endRun( cmdbind::CommandHandler* ch, std::ostream& out)
 	int argc;
 	const char** argv;
 	const char* lastcmd = chnd->getCommand( argc, argv);
-	m_statusCode = ch->statusCode();
+	if (ch->lastError()) m_lastError = ch->lastError();
 	int rt = stateidx();
 
 	if (lastcmd)
@@ -183,7 +183,7 @@ int CommandHandler::endRun( cmdbind::CommandHandler* ch, std::ostream& out)
 		catch (const std::exception& e)
 		{
 			LOG_ERROR << "exception in command execution: " << e.what();
-			m_statusCode = -1;
+			m_lastError = "exception";
 		}
 	}
 	delete ch;

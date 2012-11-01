@@ -59,33 +59,6 @@ const net::NetworkOperation Connection::WriteLine( const char* str, const char* 
 	return net::SendData( msg, msgsize);
 }
 
-const net::NetworkOperation Connection::WriteLine( const char* str, int code)
-{
-	bool sg;
-	char arg[128];
-	unsigned int ii=sizeof(arg)-1;
-	arg[ii] = 0;
-	if (code < 0)
-	{
-		sg = true;
-		code = -code;
-	}
-	if (code == 0)
-	{
-		arg[--ii] = '0';
-	}
-	while (code > 0)
-	{
-		arg[--ii] = code%10 + '0';
-		code = code / 10;
-	}
-	if (sg)
-	{
-		arg[--ii] = '-';
-	}
-	return WriteLine( str, arg+ii);
-}
-
 void Connection::networkInput( const void* dt, std::size_t nofBytes)
 {
 	m_input.setPos( nofBytes + ((const char*)dt - m_input.charptr()));
@@ -294,7 +267,7 @@ const net::NetworkOperation Connection::nextOperation()
 				const void* content;
 				std::size_t contentsize;
 				std::size_t pos;
-				int err;
+				const char* err;
 
 				try
 				{
@@ -314,10 +287,10 @@ const net::NetworkOperation Connection::nextOperation()
 							m_itr = m_input.at( pos);
 							m_end = m_input.end();
 
-							err = m_cmdhandler.get()->statusCode();
+							err = m_cmdhandler.get()->lastError();
 							m_cmdhandler.reset(0);
 							m_state = EnterCommand;
-							if (err != 0)
+							if (err)
 							{
 								return WriteLine( "ERR", err);
 							}

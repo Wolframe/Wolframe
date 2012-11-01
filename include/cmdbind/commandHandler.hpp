@@ -61,8 +61,7 @@ public:
 
 	///\brief Defaul constructor
 	CommandHandler()
-		:m_statusCode(0)
-		,m_provider(0){}
+		:m_provider(0){}
 
 	///\brief Destructor
 	virtual ~CommandHandler(){}
@@ -103,7 +102,10 @@ public:
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes)=0;
 
 	///\brief Get the error code of command execution to be returned to the client
-	int statusCode() const				{return m_statusCode;}
+	const char* lastError() const
+	{
+		return m_lastError.empty()?0:m_lastError.c_str();
+	}
 
 	///\brief Pass the reference to the processor provider to the command handler
 	///\param[in] the reference to the processor provider
@@ -130,7 +132,7 @@ public:
 	}
 
 protected:
-	int m_statusCode;				//< error code of operation for the client
+	std::string m_lastError;			//< error operation for the client
 	std::string m_name;				//< name of the command to execute
 	std::vector< std::string > m_argBuffer;		//< the command arguments
 	const proc::ProcessorProvider* m_provider;	//< the reference to the global processor provider
