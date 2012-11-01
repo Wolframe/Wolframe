@@ -9,7 +9,6 @@ INCLUDE_CXXFLAGS = \
 	
 INCLUDE_DIRS = \
 	/I. \
-	/I"$(PLATFORM_SDK_DIR)\Include" \
 	/I..\include \
 	/I$(TOPDIR)\zlib \
 	/I$(TOPDIR)\libpng

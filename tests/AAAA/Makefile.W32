@@ -11,14 +11,13 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include /I. \
 	/I$(TOPDIR)\src \
 	/I"$(BOOST_INCLUDE_DIR)" \
-	/I"$(PLATFORM_SDK_DIR)\Include" \
 	/I$(TOPDIR)\gtest\include \
 	/I$(TOPDIR)\src\modules\authentication\textfile \
 	/I$(TOPDIR)\src\modules\authentication\database
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
-	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \

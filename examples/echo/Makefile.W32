@@ -10,12 +10,11 @@ INCLUDE_CXXFLAGS = \
 INCLUDE_DIRS = \
 	/I. \
 	/I$(TOPDIR)\include \
-	/I"$(BOOST_INCLUDE_DIR)" \
-	/I"$(PLATFORM_SDK_DIR)\Include"
+	/I"$(BOOST_INCLUDE_DIR)"
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
-	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	Advapi32.lib
