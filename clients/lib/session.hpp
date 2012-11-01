@@ -82,6 +82,7 @@ public:
 public://notification methods to be implemented by the session:
 	virtual void receiveUIForm( const char* id, const char* data, std::size_t datasize)=0;
 	virtual void notifyError( const char* msg)=0;
+
 public://notification methods optionally implemented by the session:
 	virtual void notifyState( const char* /*msg*/){}
 	virtual void notifyAttribute( const char* /*id*/, const char* /*value*/){}
