@@ -38,6 +38,7 @@
 #define _USER_INTERFACE_HPP_INCLUDED
 
 #include <string>
+#include <list>
 #include "version.hpp"
 
 namespace _Wolframe {
@@ -91,15 +92,43 @@ private:
 };
 
 /// Supplier of user interface elements.
-/// Work in progress...
+/// This is an interface (base class).
 class UserInterfaceLibrary
 {
 public:
-	UserInterfaceLibrary()			{}
-
 	virtual ~UserInterfaceLibrary()		{}
-};
 
+	/// \brief Get a list of all form headers, latest versions
+	virtual const std::list< UIformHeader > formHeaders() const = 0;
+
+	/// \brief Get a list of all form headers, latest versions
+	/// \param role	a role for which to get the form headers
+	virtual const std::list< UIformHeader > formHeaders( std::string& role ) const = 0;
+
+	/// \brief Get a list of all form headers, latest versions
+	/// \param roles a list of roles for which to get the form headers
+	virtual const std::list< UIformHeader > formHeaders( std::list< std::string >& roles ) const = 0;
+
+	/// \brief Get a list of form headers for all the versions of a form
+	/// \param name	the name of the form
+	virtual const std::list< UIformHeader > formVersions( const std::string& name ) const = 0;
+
+	/// \brief Get the form
+	/// \param name	the name of the form
+	virtual const UIform form( const std::string& name ) const = 0;
+
+	/// \brief Get the form
+	/// \param name		the name of the form
+	/// \param version	the version of the form
+	virtual const UIform form( const std::string& name, const Version& version ) const = 0;
+
+	/// \brief Get the form
+	/// \param name		the name of the form
+	/// \param version	the version of the form
+	virtual const UIform form( const UIformHeader& header ) const = 0;
+
+	virtual void close()			{}
+};
 
 }} // namespace _Wolframe::UI
 

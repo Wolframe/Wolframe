@@ -91,6 +91,13 @@ clients/cli/GNUmakefile
 clients/cli/Makefile.W32
 clients/cli/wolfcli.cpp
 clients/cli/wolframe.conf
+clients/cmdline/GNUmakefile
+clients/cmdline/Makefile.W32
+clients/cmdline/options.cpp
+clients/cmdline/options.hpp
+clients/cmdline/utils.cpp
+clients/cmdline/utils.hpp
+clients/cmdline/wolframec.cpp
 clients/GNUmakefile
 clients/lib/connection.cpp
 clients/lib/connection.hpp
@@ -146,6 +153,7 @@ clients/qt/DataLoader.hpp
 clients/qt/DebugTerminal.cpp
 clients/qt/DebugTerminal.hpp
 clients/qt/docs/README
+clients/qt/docs/README.Other
 clients/qt/FileDataLoader.cpp
 clients/qt/FileDataLoader.hpp
 clients/qt/FileFormLoader.cpp
@@ -171,7 +179,6 @@ clients/qt/moc_HistoryLineEdit.cpp
 clients/qt/moc_LoginDialog.cpp
 clients/qt/moc_MainWindow.cpp
 clients/qt/moc_qcommandline.cpp
-clients/qt/moc_qxtsignalwaiter.cpp
 clients/qt/moc_WolframeClient.cpp
 clients/qt/NetworkDataLoader.cpp
 clients/qt/NetworkDataLoader.hpp
@@ -345,12 +352,6 @@ examples/tproc/appProperties.cpp
 examples/tproc/GNUmakefile
 examples/tproc/handlerConfig.hpp
 examples/tproc/Makefile.W32
-examples/tproc/tests/temp/echo.lua
-examples/tproc/tests/temp/example_1.lua
-examples/tproc/tests/temp/example_2.lua
-examples/tproc/tests/temp/example_3.lua
-examples/tproc/tests/temp/example_4.lua
-examples/tproc/tests/temp/example_5.lua
 examples/tproc/tests/template/data/multilingual.UTF-8.xml
 examples/tproc/tests/template/expand.sh
 examples/tproc/tests/template/output_provider_cfg.sh
@@ -871,6 +872,7 @@ src/libwolframe/types_dateArithmetic.cpp
 src/libwolframe/types_doctype.cpp
 src/libwolframe/user.cpp
 src/libwolframe/utils_doctype.cpp
+src/libwolframe/version.cpp
 src/loadModules.cpp
 src/mainConnectionHandler_auth.hpp
 src/mainConnectionHandler.cpp
@@ -1085,7 +1087,6 @@ src/serviceConfig.cpp
 src/SSLcertificateInfo.cpp
 src/standardProcessor.cpp
 src/standardProcessor.hpp
-src/version.cpp
 src/winMain.cpp
 src/wolfilterCommandLine.cpp
 src/wolfilterCommandLine.hpp
@@ -1107,6 +1108,9 @@ tests/AAAA/sasl.conf
 tests/AAAA/textFileTest.cpp
 tests/base64Test.cpp
 tests/base64Utility.cpp
+tests/boost-locale/boostLocaleTest.cpp
+tests/boost-locale/GNUmakefile
+tests/boost-locale/Makefile.W32
 tests/byte2hexTest.cpp
 tests/config/checkConfig.exp
 tests/config/checkConfig.sh

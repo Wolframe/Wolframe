@@ -1,6 +1,6 @@
 TOPDIR = ..\..
 
-SUBDIRS = tests
+SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -8,29 +8,28 @@ INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x504
 
 INCLUDE_DIRS = \
-	/I$(TOPDIR)\include /I. \
-	/I$(TOPDIR)\src \
+	/I. \
 	/I"$(BOOST_INCLUDE_DIR)" \
 	/I$(TOPDIR)\gtest\include
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
-	$(BOOST_LDFLAGS)
+	$(BOOST_LDFLAGS) \
+	$(ICU_LDFLAGS)
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
-	$(TOPDIR)\src\loadModules.obj \
 	$(TOPDIR)\gtest\gtest-all.obj \
-	$(TOPDIR)\src\libwolframe\wolframe.lib
-
+	$(ICU_LIBS)
+	
 TEST_CPP_BINS = \
-	moduleTest.exe
+	boostLocaleTest.exe
 
 OBJS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-moduleTest.exe: moduleTest.obj $(TOPDIR)\src\wolframe.lib
+boostLocaleTest.exe: boostLocaleTest.obj
 
 local_all:
 
@@ -39,11 +38,9 @@ local_clean:
 
 local_distclean:
 
-# cd tests...: Temporary hotfix to avoid running the module test before having built the modules
 local_test:
-	@cd tests & $(MAKE) /nologo /f Makefile.w32 test & cd ..
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
-	@-echo moduleTest >> test.bat
+	@-echo boostLocaleTest >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat

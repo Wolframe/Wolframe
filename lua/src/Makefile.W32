@@ -8,8 +8,7 @@ INCLUDE_CFLAGS = \
 	/D_WIN32_WINNT=0x504
 
 INCLUDE_DIRS = \
-	/I. \
-	/I"$(PLATFORM_SDK_DIR)\Include"
+	/I.
 
 INCLUDE_LIBS =
 

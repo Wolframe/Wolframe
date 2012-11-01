@@ -13,7 +13,7 @@ INCLUDE_DIRS = \
 
 # Note: libraries are picked automatically on Windows!
 INCLUDE_LDFLAGS = \
-	$(SDK_LDFLAGS) $(BOOST_LDFLAGS)
+	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib

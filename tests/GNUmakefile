@@ -30,6 +30,10 @@ ifeq ($(WITH_LIBHPDF),1)
 SUBDIRS += libhpdf
 endif
 
+ifeq ($(WITH_ICU),1)
+SUBDIRS += boost-locale
+endif
+
 INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \

@@ -57,6 +57,7 @@ CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
 	$(ADT_OBJS) \
+	version.obj \
 	getPassword.obj \
 	user.obj \
 	moduleDirectory.obj \

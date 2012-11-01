@@ -145,3 +145,4 @@ tests/database/SQLite3/garbage.db
 tests/unitLibraryTest
 *.qm
 sqlite3/sqlite3
+tests/boost-locale/boostLocaleTest
