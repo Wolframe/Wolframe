@@ -228,7 +228,7 @@ void SQLiteTransaction::close()
 
 
 /*****  SQLite user interface library  ********************************/
-SQLiteUIlibrary::SQLiteUIlibrary( SQLiteDatabase& database )
+SQLiteUIlibrary::SQLiteUIlibrary( const SQLiteDatabase &database )
 	: m_unit( database.dbUnit() )
 {}
 
@@ -259,20 +259,20 @@ const std::list< UI::UIformHeader > SQLiteUIlibrary::formVersions( const std::st
 
 const UI::UIform SQLiteUIlibrary::form( const std::string& /*name*/ ) const
 {
-	UI::UIform	form;
-	return form;
+	UI::UIform	form_;
+	return form_;
 }
 
 const UI::UIform SQLiteUIlibrary::form( const std::string& /*name*/, const Version& /*version*/ ) const
 {
-	UI::UIform	form;
-	return form;
+	UI::UIform	form_;
+	return form_;
 }
 
 const UI::UIform SQLiteUIlibrary::form( const UI::UIformHeader& /*header*/ ) const
 {
-	UI::UIform	form;
-	return form;
+	UI::UIform	form_;
+	return form_;
 }
 
 }} // _Wolframe::db

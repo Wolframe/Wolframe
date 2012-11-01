@@ -115,18 +115,18 @@ private:
 class SQLiteUIlibrary : public UI::UserInterfaceLibrary
 {
 public:
-	SQLiteUIlibrary( SQLiteDatabase& database );
-	 ~SQLiteUIlibrary()			{}
+	SQLiteUIlibrary( const SQLiteDatabase& database );
+	~SQLiteUIlibrary()			{}
 
 	virtual const std::list< UI::UIformHeader > formHeaders() const;
 	virtual const std::list< UI::UIformHeader > formHeaders( std::string& role ) const;
 	virtual const std::list< UI::UIformHeader > formHeaders( std::list< std::string >& roles ) const;
 
-	virtual const std::list< UI::UIformHeader > formVersions( const std::string& name ) const = 0;
+	virtual const std::list< UI::UIformHeader > formVersions( const std::string& name ) const;
 
-	virtual const UI::UIform form( const std::string& name ) const = 0;
-	virtual const UI::UIform form( const std::string& name, const Version& version ) const = 0;
-	virtual const UI::UIform form( const UI::UIformHeader& header ) const = 0;
+	virtual const UI::UIform form( const std::string& name ) const;
+	virtual const UI::UIform form( const std::string& name, const Version& version ) const;
+	virtual const UI::UIform form( const UI::UIformHeader& header ) const;
 
 	virtual void close()			{ delete this; }
 private:

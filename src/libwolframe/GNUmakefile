@@ -60,6 +60,7 @@ CPP_OBJS = \
 	$(LOGGER_OBJS) \
 	$(PROVIDER_OBJS) \
 	$(ADT_OBJS) \
+	version.o \
 	getPassword.o \
 	user.o \
 	moduleDirectory.o \

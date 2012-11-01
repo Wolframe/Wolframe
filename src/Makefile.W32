@@ -52,7 +52,6 @@ LOCAL_STATIC_LIB = \
 	wolframe.lib
 
 LOCAL_STATIC_LIB_OBJS = \
-	version.obj \
 	wolframedCommandLine.obj \
 	wolfilterCommandLine.obj \
 	mainConnectionHandler.obj \
