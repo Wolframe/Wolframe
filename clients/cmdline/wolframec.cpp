@@ -36,12 +36,11 @@
 #include "session.hpp"
 #include <fstream>
 #include <iostream>
-#include <cstring>
-#include <cstdlib>
 #include <stdexcept>
+#include <boost/thread.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
-#include <boost/thread.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::client;
@@ -55,9 +54,10 @@ static const unsigned short APP_BUILD = 0;
 class CmdlineSession :public Session
 {
 public:
-	CmdlineSession( const Connection::Configuration& cfg, const std::string& uiformdir_)
+	CmdlineSession( const Session::Configuration& cfg, const std::string& uiformdir_)
 		:Session(cfg)
-		,m_uiformdir(uiformdir_){}
+		,m_uiformdir(uiformdir_)
+		,m_termination_signal(false){}
 
 	virtual void receiveUIForm( const char* id, const char* data, std::size_t datasize)
 	{
@@ -71,22 +71,46 @@ public:
 
 	virtual void notifyState( const char* msg)
 	{
+		boost::interprocess::scoped_lock<boost::mutex> lock( m_io_mutex);
 		std::cerr << "state '" << msg << "'" << std::endl;
 	}
 
 	virtual void notifyAttribute( const char* id, const char* value)
 	{
+		boost::interprocess::scoped_lock<boost::mutex> lock( m_io_mutex);
 		std::cerr << "attribute " << id << " '" << value << "'" << std::endl;
 	}
 
 	virtual void notifyError( const char* msg)
 	{
+		boost::interprocess::scoped_lock<boost::mutex> lock( m_io_mutex);
 		std::cerr << "error '" << msg << "'" << std::endl;
+	}
+
+	virtual void notifyTermination()
+	{
+		{
+			boost::lock_guard<boost::mutex> lock(m_termination_mutex);
+			m_termination_signal = true;
+		}
+		m_termination_cond.notify_one();
+	}
+
+	void waitTermination()
+	{
+		boost::unique_lock<boost::mutex> lock( m_termination_mutex);
+		while (!m_termination_signal)
+		{
+			m_termination_cond.wait( lock);
+		}
 	}
 
 private:
 	std::string m_uiformdir;
 	boost::mutex m_io_mutex;
+	boost::mutex m_termination_mutex;
+	boost::condition_variable m_termination_cond;
+	bool m_termination_signal;
 };
 
 class CmdlineRequestHandler :public RequestHandler
@@ -146,7 +170,7 @@ int main( int argc, char **argv )
 		}
 		if (doExit) return 0;
 
-		CmdlineSession session( cmdline.conncfg(), cmdline.uiformdirectory());
+		CmdlineSession session( cmdline.config(), cmdline.uiformdirectory());
 		CmdlineRequestHandler requesthandler( cmdline.outputfile());
 		session.start();
 
@@ -158,6 +182,8 @@ int main( int argc, char **argv )
 				std::cerr << "REQUEST ERROR service not ready" << std::endl;
 			}
 		}
+		session.quit();
+		session.waitTermination();
 		session.stop();
 	}
 	catch (const std::bad_alloc& e)

@@ -37,7 +37,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "connection.hpp"
+#include "session.hpp"
 
 namespace _Wolframe {
 namespace client {
@@ -52,7 +52,7 @@ public:
 	bool printversion() const					{return m_printversion;}
 	void print(std::ostream &) const;
 
-	const Connection::Configuration& conncfg() const		{return m_conncfg;}
+	const Session::Configuration& config() const			{return m_config;}
 	const std::vector<std::string>& request() const			{return m_request;}
 	const std::string& uiformdirectory() const			{return m_uiformdirectory;}
 	const std::string& outputfile() const				{return m_outputfile;}
@@ -61,7 +61,7 @@ private:
 	bool m_printhelp;
 	bool m_printversion;
 	std::string m_helpstring;
-	Connection::Configuration m_conncfg;
+	Session::Configuration m_config;
 	std::vector<std::string> m_request;
 	std::string m_uiformdirectory;
 	std::string m_outputfile;

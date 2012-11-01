@@ -21,7 +21,7 @@
 # version of the boost library
 
 #BOOST_VERSION = 1_46_1
-BOOST_VERSION = 1_51_0
+BOOST_VERSION = 1_51
 
 # base dir where boost is installed
 
@@ -43,7 +43,7 @@ BOOST_INCLUDE_DIR = $(BOOST_DIR)\Include\boost-1_51
 BOOST_VC_VER = vc100
 
 # TODO: probe those
-#BOOST_MT = -mt
+BOOST_MT = -mt
 
 # preinstalled binaries
 BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
@@ -60,6 +60,9 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 #############
 
 ICU_DIR = C:\Cygwin\home\Andreas Baumann\icu-49.1.2-win32-debug
+
+# the library version (how the DLLs are tagged)
+ICU_LIB_VERSION = 49
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################

@@ -20,8 +20,15 @@ class BoostLocaleFixture : public ::testing::Test
 		{
 			m_gen.locale_cache_enabled( true );
 			boost::locale::generator gen;
-			std::locale loc = gen( "" );
+			
+			// initialize a standard locale
+			std::locale loc = gen( "en_US.UTF-8" );
 			std::locale::global( loc );
+			
+			// switch localization backend to ICU
+			boost::locale::localization_backend_manager manager =
+				boost::locale::localization_backend_manager::global( );
+			manager.select( "icu" );
 		}
 };
 
