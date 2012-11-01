@@ -31,50 +31,43 @@
 
 ************************************************************************/
 //
-// singleton.hpp
+// Sort of a pseudo-singleton
 //
 
-#ifndef _SINGLETON_HPP_INCLUDED
-#define _SINGLETON_HPP_INCLUDED
+#ifndef _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
+#define _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
 
+#include <string>
+#include <stdexcept>
 #include <boost/utility.hpp>
-#include <boost/thread/once.hpp>
 #include <boost/scoped_ptr.hpp>
 
-// Warning: If T's constructor throws, instance() will return a null reference.
+namespace _Wolframe	{
 
-// the initialized flag might not be needed but it looks like it increases performance
-
-template<class T>
-class Singleton : private boost::noncopyable
+class GlobalRandomGenerator : public boost::noncopyable
 {
 public:
-	static T& instance()
+	GlobalRandomGenerator( std::string& rndDev );
+
+	static GlobalRandomGenerator& instance()
 	{
-		if ( !initialized )
-			boost::call_once( init, flag );
+		if ( !m_initialized )
+			throw std::runtime_error( "Global random number generator not instantiated yet" );
 		return *t;
 	}
 
-protected:
-	Singleton()	{}
-	~Singleton()	{}
-
-	static void init() // never throws
-	{
-		t.reset( new T() );
-		initialized = true;
-	}
+//	const std::string& device() const	{ return m_device; }
+	unsigned random();
+	int random( unsigned char* buffer, size_t bytes );
 
 private:
-	static boost::scoped_ptr<T>	t;
-	static boost::once_flag		flag;
-	static bool			initialized;
+	std::string	m_device;		///< random generator device
+	static bool	m_initialized;
+	static boost::scoped_ptr< GlobalRandomGenerator >	t;
 };
+boost::scoped_ptr< GlobalRandomGenerator > GlobalRandomGenerator::t( 0 );
+bool GlobalRandomGenerator::m_initialized = false;
 
+} // namespace _Wolframe
 
-template<class T> boost::scoped_ptr<T> Singleton<T>::t(0);
-template<class T> boost::once_flag Singleton<T>::flag = BOOST_ONCE_INIT;
-template<class T> bool Singleton<T>::initialized = false;
-
-#endif	// _SINGLETON_HPP_INCLUDED
+#endif // _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED

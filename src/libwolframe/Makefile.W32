@@ -67,6 +67,7 @@ CPP_OBJS = \
 	utils_doctype.obj \
 	types_allocators.obj \
 	password.obj \
+	globalRndGen.o \
 	HMAC.obj \
 	CRAM.obj
 
