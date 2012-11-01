@@ -101,9 +101,11 @@ private:
 	static void runSession( Session* session);
 	void signal_runSession();
 
+public:
+	struct Impl;
+
 private:
-	Connection m_connection;		//< connection handler
-	Protocol m_protocol;			//< protocol statemachine
+	Impl* m_impl;
 };
 
 

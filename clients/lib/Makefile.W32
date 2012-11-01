@@ -35,7 +35,7 @@ INCLUDE_LIBS = \
 !ENDIF
 
 LIBRARIES = \
-	libwolframe_client.lib
+	wolframe_client.lib
 
 CPP_OBJS = \
 	connection.obj \
@@ -46,7 +46,7 @@ all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-libwolframe_client.lib: $(OBJS) $(CPP_OBJS)
+wolframe_client.lib: $(OBJS) $(CPP_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
 local_all:

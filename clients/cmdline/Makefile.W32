@@ -17,7 +17,7 @@ INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)\clients\lib\libwolframe_client.a \
+	$(TOPDIR)\clients\lib\wolframe_client.lib \
 	Advapi32.lib Ws2_32.lib
 
 # openssl
@@ -37,16 +37,17 @@ INCLUDE_LIBS = \
 !ENDIF
 
 CPP_OBJS = \
-	options.o
+	options.obj \
+	utils.obj
 
 CPP_BINS = \
 	wolframec.exe
 
-all: $(OBJS) $(CPP_BINS)
+all: $(CPP_OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-wolframec.exe: wolframec.obj
+wolframec.exe: wolframec.obj $(CPP_OBJS)
 
 local_all:
 

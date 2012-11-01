@@ -139,7 +139,7 @@ public:
 
 		if (endpoint_iter == boost::asio::ip::tcp::resolver::iterator())
 		{
-			notify( Connection::Event::ERROR, "unable to resove host");
+			notify( Connection::Event::FAILED, "unable to resove host");
 			notify( Connection::Event::STATE, "terminated");
 			notify( Connection::Event::TERMINATED);
 		}
@@ -193,7 +193,7 @@ private:
 	{
 		std::ostringstream msg;
 		msg << errmsg << ": " << ec.message() << " (" << ec.value() << ")";
-		notify( Connection::Event::ERROR, ec.message().c_str());
+		notify( Connection::Event::FAILED, ec.message().c_str());
 	}
 
 	void handle_connect( const boost::system::error_code &ec, boost::asio::ip::tcp::resolver::iterator)
@@ -256,7 +256,7 @@ private:
 		if (m_deadline_timer->expires_at() <= boost::asio::deadline_timer::traits_type::now())
 		{
 			m_deadline_timer->expires_at( boost::posix_time::pos_infin);
-			notify( Connection::Event::ERROR, "timeout");
+			notify( Connection::Event::FAILED, "timeout");
 			conn_stop();
 		}
 		else
@@ -349,10 +349,11 @@ Connection::Connection( const Connection::Configuration& cfg, ConnectionHandler*
 	switch (cfg.m_transportLayerType)
 	{
 		case Configuration::SSL:
-#if !WITH_SSL
+#if WITH_SSL
+			m_impl = new ConnectionImpl<TransportLayerSSL>( cfg, connhnd, notifier_, clientobject_);
+#else
 			throw std::runtime_error( "no SSL support built in (WITH_SSL=1)");
 #endif
-			m_impl = new ConnectionImpl<TransportLayerSSL>( cfg, connhnd, notifier_, clientobject_);
 			break;
 		case Configuration::Plain:
 			m_impl = new ConnectionImpl<TransportLayerPlain>( cfg, connhnd, notifier_, clientobject_);
@@ -393,7 +394,7 @@ static const char* eventTypeName( Connection::Event::Type type)
 	{
 		case Connection::Event::READY: return "READY";
 		case Connection::Event::STATE: return "STATE";
-		case Connection::Event::ERROR: return "ERROR";
+		case Connection::Event::FAILED: return "FAILED";
 		case Connection::Event::TERMINATED: return "TERMINATED";
 	}
 	return "(null)";
