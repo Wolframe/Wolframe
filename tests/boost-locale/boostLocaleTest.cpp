@@ -22,7 +22,7 @@ class BoostLocaleFixture : public ::testing::Test
 			boost::locale::generator gen;
 			
 			// initialize a standard locale
-			std::locale loc = gen( "" );
+			std::locale loc = gen( "en_US.UTF-8" );
 			std::locale::global( loc );
 			
 			// switch localization backend to ICU
