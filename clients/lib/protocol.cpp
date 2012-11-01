@@ -33,10 +33,12 @@
 ///\file protocol.cpp
 ///\brief Implementation of the client protocol handling
 #include "protocol.hpp"
+#include "connection.hpp"
 #include <list>
-#include <boost/thread.hpp>
+#include <stdexcept>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::client;
@@ -108,6 +110,11 @@ struct Buffer
 	void append( const char* data)
 	{
 		append( data, std::strlen( data));
+	}
+
+	void append( const std::string& data)
+	{
+		append( data.c_str(), data.size());
 	}
 
 	bool consume( size_t pos)
@@ -299,6 +306,7 @@ struct ProtocolState
 		LOAD_UIFORM_DATA,
 		SESSION,
 		SESSION_QUIT,
+		SESSION_REQUEST,
 		SESSION_ANSWER,
 		SESSION_ANSWER_DATA,
 		SESSION_ANSWER_RESULT,
@@ -318,6 +326,7 @@ struct ProtocolState
 			"LOAD_UIFORM_DATA",
 			"SESSION",
 			"SESSION_QUIT",
+			"SESSION_REQUEST",
 			"SESSION_ANSWER",
 			"SESSION_ANSWER_DATA",
 			"SESSION_ANSWER_RESULT",
@@ -333,8 +342,9 @@ struct ProtocolState
 struct Protocol::Impl
 {
 public:
-	Impl( Protocol::Callback notifier_, void* clientobject_)
-		:m_notifier(notifier_)
+	Impl( Protocol::Configuration config_, Protocol::Callback notifier_, void* clientobject_)
+		:m_config(config_)
+		,m_notifier(notifier_)
 		,m_clientobject(clientobject_)
 		,m_requestqueue_open(true)
 		,m_bufferpos(0)
@@ -367,13 +377,11 @@ public:
 
 	void pushData( const char* data_, std::size_t datasize_)
 	{
-		boost::lock_guard<boost::mutex> lock(m_buffer_mutex);
 		m_buffer.append( data_, datasize_);
 	}
 
 	void consumeData( std::size_t datasize_)
 	{
-		boost::lock_guard<boost::mutex> lock(m_buffer_mutex);
 		if (datasize_ + m_bufferpos > m_buffer.size()) throw std::logic_error( "illegal buffer resize (consumeData)");
 		if (m_buffer.consume( datasize_ + m_bufferpos))
 		{
@@ -387,36 +395,6 @@ public:
 
 	char* dataptr()			{return m_buffer.ptr() + m_bufferpos;}
 	std::size_t datasize()		{return m_buffer.size() - m_bufferpos;}
-
-	void sendLine( const char* msg, const char* arg=0)
-	{
-/*[-]*/notifyAttribute( "sendline ", msg);
-		char linebuf[ 1024];
-		size_t msgsize = strlen( msg);
-		size_t argsize = arg?strlen( arg):0;
-		if (sizeof(linebuf)-2 < argsize) throw std::bad_alloc();
-		if (sizeof(linebuf)-2 < msgsize) throw std::bad_alloc();
-		if (sizeof(linebuf)-2 < msgsize+argsize+1) throw std::bad_alloc();
-		memcpy( linebuf, msg, msgsize);
-		if (arg)
-		{
-			linebuf[ msgsize] = ' ';
-			memcpy( linebuf+msgsize+1, arg, argsize);
-			msgsize += argsize + 1;
-		}
-		linebuf[ msgsize] = '\r';
-		linebuf[ msgsize+1] = '\n';
-		Protocol::Event event( Protocol::Event::SEND, 0, linebuf, msgsize+2);
-		m_notifier( m_clientobject, event);
-	}
-
-	void sendContent( const char* doc, size_t docsize)
-	{
-		Buffer docbuffer;
-		getContentEscaped( &m_docbuffer, doc, docsize);
-		Protocol::Event event( Protocol::Event::SEND, 0, m_docbuffer.ptr(), m_docbuffer.size());
-		m_notifier( m_clientobject, event);
-	}
 
 	void notifyError( const char* id)
 	{
@@ -478,7 +456,7 @@ public:
 	ProtocolState::Id state() const		{return m_state;}
 	void state( ProtocolState::Id id)	{m_state = id;}
 
-	Protocol::CallResult run()
+	ConnectionHandler::Operation nextop()
 	{
 		Line line;
 		LineSplit arg;
@@ -498,9 +476,17 @@ public:
 		};
 		DataIterator di( this);
 
-		for (;;)
-		{
-		switch (state())
+		struct OP_READ :public ConnectionHandler::Operation
+		{OP_READ() :ConnectionHandler::Operation( ConnectionHandler::Operation::READ){}};
+		struct OP_WRITE :public ConnectionHandler::Operation
+		{OP_WRITE( const char* data_, std::size_t datasize_) :ConnectionHandler::Operation( ConnectionHandler::Operation::WRITE, data_, datasize_){}
+		 OP_WRITE( const char* data_) :ConnectionHandler::Operation( ConnectionHandler::Operation::WRITE, data_, std::strlen(data_)){}};
+		struct OP_IDLE :public ConnectionHandler::Operation
+		{OP_IDLE() :ConnectionHandler::Operation( ConnectionHandler::Operation::IDLE){}};
+		struct OP_CLOSE :public ConnectionHandler::Operation
+		{OP_CLOSE() :ConnectionHandler::Operation( ConnectionHandler::Operation::CLOSE){}};
+
+		for (;;) switch (state())
 		{
 			case ProtocolState::INIT:
 				state( ProtocolState::BANNER);
@@ -509,7 +495,7 @@ public:
 			case ProtocolState::BANNER:
 				if (!getLine( &line, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				getLineSplit_space( arg, line, 1);
 				if (!arg.size) continue;
@@ -520,34 +506,33 @@ public:
 			case ProtocolState::START:
 				if (!getLine( &line, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				getLineSplit_space( arg, line, 2);
 				if (!arg.size) continue;
 				if (isequal( arg.ptr[0], "OK"))
 				{
-					sendLine( "AUTH");
 					state( ProtocolState::AUTH);
-					continue;
+					return OP_WRITE( "AUTH\r\n");
 				}
 				else if (isequal( arg.ptr[0], "ERR"))
 				{
 					msg = (arg.size == 1)?"rejected connection":arg.ptr[1];
 					notifyError( msg);
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 				else
 				{
 					notifyError( "protocol error in server connection reply");
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 
 			case ProtocolState::AUTH:
 				if (!getLine( &line, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				getLineSplit_space( arg, line, 2);
 				if (!arg.size) continue;
@@ -557,7 +542,7 @@ public:
 					{
 						notifyError( "NO AUTH MECHS");
 						state( ProtocolState::CLOSED);
-						return Protocol::CALL_CLOSED;
+						return OP_CLOSE();
 					}
 					getLineSplit_space( arg, line, 0);
 					authmech = selectAuthMech( arg);
@@ -565,58 +550,64 @@ public:
 					{
 						notifyError( "NO MATCHING AUTH MECH");
 						state( ProtocolState::CLOSED);
-						return Protocol::CALL_CLOSED;
+						return OP_CLOSE();
 					}
-					sendLine( "MECH", authmech);
 					state( ProtocolState::AUTH_WAIT);
-					continue;
+					m_statearg.reset();
+					m_statearg.append( "MECH ");
+					m_statearg.append( authmech);
+					m_statearg.append( "\r\n");
+					return OP_WRITE( m_statearg.ptr(), m_statearg.size());
 				}
 				else if (isequal( arg.ptr[0], "ERR"))
 				{
 					msg = (arg.size == 1)?"AUTH returned error":arg.ptr[1];
 					notifyError( msg);
-					state( ProtocolState::INIT);
-					continue;
+					state( ProtocolState::SESSION_QUIT);
+					return OP_WRITE( "QUIT\r\n");
 				}
 				else
 				{
 					notifyError( "protocol error in AUTH reply");
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 
 			case ProtocolState::AUTH_WAIT:
 				if (!getLine( &line, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				getLineSplit_space( arg, line, 2);
 				if (!arg.size) continue;
 				if (isequal( arg.ptr[0], "OK"))
 				{
 					notifyState( "authorized");
-					sendLine( "INTERFACE");
 					state( ProtocolState::INTERFACE);
-					continue;
+					m_statearg.reset();
+					m_statearg.append( "INTERFACE ");
+					m_statearg.append( boost::lexical_cast<std::string>(m_config.uiform_minindex));
+					m_statearg.append( "\r\n");
+					return OP_WRITE( m_statearg.ptr(), m_statearg.size());
 				}
 				else if (isequal( arg.ptr[0], "ERR"))
 				{
 					msg = (arg.size == 1)?"authorization (MECH command) failed":arg.ptr[1];
 					notifyError( msg);
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 				else
 				{
 					notifyError( "protocol error in authorization (MECH command reply)");
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 
 			case ProtocolState::INTERFACE:
 				if (!getLine( &line, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				getLineSplit_space( arg, line, 2);
 				if (!arg.size) continue;
@@ -631,19 +622,19 @@ public:
 					msg = (arg.size == 1)?"interface retrieval failed":arg.ptr[1];
 					notifyError( msg);
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 				else
 				{
 					notifyError( "protocol error in INTERFACE reply");
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 
 			case ProtocolState::LOAD_UIFORM:
 				if (!getLine( &line, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				getLineSplit_space( arg, line, 2);
 				if (!arg.size) continue;
@@ -653,7 +644,7 @@ public:
 					{
 						notifyError( "UIFORM missing argument");
 						state( ProtocolState::CLOSED);
-						return Protocol::CALL_CLOSED;
+						return OP_CLOSE();
 					}
 					else
 					{
@@ -675,19 +666,19 @@ public:
 					msg = (arg.size == 1)?"unspecified error instead of UIFORM":arg.ptr[1];
 					notifyError( msg);
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 				else
 				{
 					notifyError( "protocol error in INTERFACE reply (UIFORM,OK expected)");
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 
 			case ProtocolState::LOAD_UIFORM_DATA:
 				if (!getContentUnescaped( &m_docbuffer, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				notifyUIForm();
 				state( ProtocolState::LOAD_UIFORM);
@@ -698,27 +689,22 @@ public:
 				m_request = fetchRequest();
 				if (!m_request.get())
 				{
-					if (isOpen())
-					{
-						return Protocol::CALL_DATA;
-					}
-					sendLine( "QUIT");
+					if (isOpen()) return OP_IDLE();
 					state( ProtocolState::SESSION_QUIT);
-					continue;
+					return OP_WRITE( "QUIT\r\n");
 				}
 				else
 				{
-					sendLine( "REQUEST");
-					sendContent( m_request->data(), m_request->datasize());
-					state( ProtocolState::SESSION_ANSWER);
-					continue;
+					m_docbuffer.reset();
+					state( ProtocolState::SESSION_REQUEST);
+					return OP_WRITE( "REQUEST\r\n");
 				}
 			}
 
 			case ProtocolState::SESSION_QUIT:
 				if (!getLine( &line, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				getLineSplit_space( arg, line, 2);
 				if (!arg.size) continue;
@@ -726,19 +712,24 @@ public:
 				{
 					notifyState( "closed");
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 				else
 				{
 					notifyError( "protocol error in QUIT reply (BYE expected)");
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
+
+			case ProtocolState::SESSION_REQUEST:
+				getContentEscaped( &m_docbuffer, m_request->data(), m_request->datasize());
+				state( ProtocolState::SESSION_ANSWER);
+				return OP_WRITE( m_docbuffer.ptr(), m_docbuffer.size());
 
 			case ProtocolState::SESSION_ANSWER:
 				if (!getLine( &line, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				getLineSplit_space( arg, line, 2);
 				if (!arg.size) continue;
@@ -767,13 +758,13 @@ public:
 					notifyError( "protocol error in REQUEST (ANSWER, OK or ERR expected)");
 					notifyAnswerError( "protocol error");
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 
 			case ProtocolState::SESSION_ANSWER_DATA:
 				if (!getContentUnescaped( &m_docbuffer, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				state( ProtocolState::SESSION_ANSWER_RESULT);
 				continue;
@@ -781,7 +772,7 @@ public:
 			case ProtocolState::SESSION_ANSWER_RESULT:
 				if (!getLine( &line, dataptr(), &di.pos, datasize()))
 				{
-					return Protocol::CALL_DATA;
+					return OP_READ();
 				}
 				getLineSplit_space( arg, line, 2);
 				if (!arg.size) continue;
@@ -803,17 +794,17 @@ public:
 					notifyError( "protocol error in answer after data (OK or ERR expected)");
 					notifyAnswerError( "protocol error");
 					state( ProtocolState::CLOSED);
-					return Protocol::CALL_CLOSED;
+					return OP_CLOSE();
 				}
 
 			case ProtocolState::CLOSED:
-				return Protocol::CALL_CLOSED;
-		}
+				return OP_CLOSE();
 		}
 	}
 
 
 private:
+	Protocol::Configuration m_config;
 	Protocol::Callback m_notifier;
 	void* m_clientobject;
 	std::list<RequestR> m_requestqueue;
@@ -821,15 +812,14 @@ private:
 	bool m_requestqueue_open;
 	RequestR m_request;
  	Buffer m_buffer;
-	boost::mutex m_buffer_mutex;
 	std::size_t m_bufferpos;
 	ProtocolState::Id m_state;
 	Buffer m_statearg;
 	Buffer m_docbuffer;
 };
 
-Protocol::Protocol( Protocol::Callback notifier_, void* clientobject_)
-	:m_impl( new Protocol::Impl( notifier_, clientobject_))
+Protocol::Protocol( const Configuration& config_, Callback notifier_, void* clientobject_)
+	:m_impl( new Protocol::Impl( config_, notifier_, clientobject_))
 {}
 
 Protocol::~Protocol()
@@ -837,19 +827,9 @@ Protocol::~Protocol()
 	delete m_impl;
 }
 
-void Protocol::pushData( const char* data_, std::size_t datasize_)
-{
-	m_impl->pushData( data_, datasize_);
-}
-
 bool Protocol::pushRequest( AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_)
 {
 	return m_impl->putRequest( notifier_, requestobject_, data_, datasize_);
-}
-
-bool Protocol::isOpen() const
-{
-	return m_impl->isOpen();
 }
 
 void Protocol::doQuit()
@@ -857,16 +837,20 @@ void Protocol::doQuit()
 	m_impl->closeRequestQueue();
 }
 
-Protocol::CallResult Protocol::run()
+void Protocol::pushData( const char* data_, std::size_t datasize_)
 {
-	return m_impl->run();
+	m_impl->pushData( data_, datasize_);
+}
+
+ConnectionHandler::Operation Protocol::nextop()
+{
+	return m_impl->nextop();
 }
 
 static const char* eventTypeName( Protocol::Event::Type type)
 {
 	switch (type)
 	{
-		case Protocol::Event::SEND: return "SEND";
 		case Protocol::Event::UIFORM: return "UIFORM";
 		case Protocol::Event::ANSWER: return "ANSWER";
 		case Protocol::Event::STATE: return "STATE";

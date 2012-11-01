@@ -116,14 +116,14 @@ WolframecCommandLine::WolframecCommandLine( int argc, char** argv)
 		if (vmap.count("uiformdir")) m_uiformdirectory = vmap[ "uiformdir"].as<std::string>();
 		if (vmap.count("outputfile")) m_outputfile = vmap[ "outputfile"].as<std::string>();
 
-		m_conncfg = Connection::Configuration( address, name, connect_timeout, read_timeout);
+		m_config = Session::Configuration( address, name, connect_timeout, read_timeout);
 
 		if (vmap.count("ssl"))
 		{
 			if (vmap.count( "CA-cert-file")) CA_cert_file = vmap["CA-cert-file"].as<std::string>();
 			if (vmap.count( "client-cert-file")) client_cert_file = vmap["client-cert-file"].as<std::string>();
 			if (vmap.count( "client-cert-key")) client_cert_key = vmap["client-cert-key"].as<std::string>();
-			m_conncfg.ssl_certificate( CA_cert_file, client_cert_file, client_cert_key);
+			m_config.ssl_certificate( CA_cert_file, client_cert_file, client_cert_key);
 		}
 		else
 		{

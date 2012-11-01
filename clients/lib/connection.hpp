@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\file connection.hpp
-///\brief C client library connection interface
+///\brief Client library connection interface
 
 #ifndef _WOLFRAME_CLIENTLIB_CONNECTION_HPP_INCLUDED
 #define _WOLFRAME_CLIENTLIB_CONNECTION_HPP_INCLUDED
@@ -46,6 +46,54 @@ namespace client {
 ///\brief Interface to the client connection handling
 ///@{
 
+///\defgroup Connection handler interface
+///\brief The object determining the operations on the client connection
+///@{
+class ConnectionHandler
+{
+public:
+	virtual ~ConnectionHandler(){}
+
+	///\class Operation
+	///\brief Connection operation description
+	struct Operation
+	{
+		enum Id
+		{
+			READ,	//< the protocol event handler is requesting to read more data. all input (complete lines have been consumed)
+			WRITE,	//< the protocol event handler is requesting to write data. all input (complete lines have been consumed)
+			IDLE,	//< the protocol event handler is in an established session state and has processed all requests until now.
+			CLOSE	//< the client has to terminate becaues it cannot work anymore or the server will close the connection
+		};
+		static const char* name( Id id)
+		{
+			const char* ar[] = {"READ","WRITE","IDLE","CLOSE"};
+			return ar[ (int)id];
+		}
+
+		Operation( Id id_, const char* data_, std::size_t datasize_)
+			:id(id_),data(data_),datasize(datasize_){}
+		Operation( Id id_)
+			:id(id_),data(0),datasize(0){}
+		Operation( const Operation& o)
+			:id(o.id),data(o.data),datasize(o.datasize){}
+
+		Id id;
+		const char* data;
+		std::size_t datasize;
+	};
+
+	///\brief Push data as answer to a READ operation
+	///\param[in] data pointer to data to push
+	///\param[in] datasize size of data in bytes
+	virtual void pushData( const char* data, std::size_t datasize)=0;
+
+	///\brief Call the protocol handler state machine
+	///\return The next operation to post on the connection
+	virtual Operation nextop()=0;
+};
+
+
 ///\class Connection
 ///\brief Client connection handler
 class Connection
@@ -59,11 +107,10 @@ public:
 		///\brief Enumeration of connection event types
 		enum Type
 		{
-			DATA,			//< connection has data to read
 			STATE,			//< state of connection
 			READY,			//< connection ready (signal sent once)
 			ERROR,			//< connection error
-			TERMINATED		//< connection error
+			TERMINATED		//< connection terminated
 		};
 		Event( Type t, const char* c, std::size_t s)
 			:m_type(t),m_content(c),m_contentsize(s){}
@@ -129,14 +176,18 @@ public:
 	};
 
 	///\brief Constructor
+	///\param[in] cfg the connection configuration
+	///\param[in] handler_ object determining the network operations
 	///\param[in] notifier_ callback for event notification
 	///\param[in] clientobject_ first parameter of notifier_
-	Connection( const Configuration& cfg, Callback notifier_, void* clientobject_);
+	Connection( const Configuration& cfg, ConnectionHandler* connhnd, Callback notifier_, void* clientobject_);
 	virtual ~Connection();
 
-	bool connect();
-	void read();
-	void write( const char* data, std::size_t datasize);
+	///\brief Connect and build up a session
+	void connect();
+	///\brief Tell the connection handler that a request or a quit has been issued and that the handler should wake up in the case of beeing in idle sleep (forever)
+	void post_request();
+	///\brief Stop the connection
 	void stop();
 
 	///\enum State

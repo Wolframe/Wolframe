@@ -34,108 +34,30 @@
 ///\brief Implementation C++ client session
 #include "session.hpp"
 #include <stdexcept>
-#include <iostream>
-#include <boost/interprocess/sync/scoped_lock.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::client;
 
-struct Session::Impl
-{
-	boost::mutex m_notify_mutex;		//< mutex for session handler notifiers
-	boost::condition_variable m_run_cond;	//< condition object for signalling the runSession thread
-	boost::mutex m_run_mutex;		//< mutex for mutual exclusion on the runSession signal
-	bool m_run_signal;			//< boolean variable as runSession signalling flag
-	boost::thread m_run_thread;		//< thread that executes runSession
+Session::Session( const Configuration& config)
+	:m_connection(config,&m_protocol,&connectionCallback_void,this)
+	,m_protocol(config,&protocolCallback_void,this){}
 
-	Impl()
-		:m_run_signal(false){}
-	~Impl(){}
-};
-
-Session::Session( const Connection::Configuration& cfg)
-	:m_connection(cfg,&connectionCallback_void,this)
-	,m_protocol(&protocolCallback_void,this)
-	,m_impl(new Impl()){}
-
-Session::~Session()
-{
-	delete m_impl;
-}
-
-void Session::signal_runSession()
-{
-	{
-		boost::lock_guard<boost::mutex> lock(m_impl->m_run_mutex);
-		m_impl->m_run_signal = true;
-	}
-	m_impl->m_run_cond.notify_one();
-}
-
-void Session::runSession( Session* session)
-{
-	try
-	{
-		if (!session->m_connection.connect())
-		{
-			throw std::runtime_error( "failed to connect to server");
-		}
-		while (session->m_connection.state() != Connection::CLOSED)
-		{
-			{
-				boost::unique_lock<boost::mutex> lock( session->m_impl->m_run_mutex);
-				while (!session->m_impl->m_run_signal)
-				{
-					session->m_impl->m_run_cond.wait(lock);
-				}
-				session->m_impl->m_run_signal = false;
-			}
-			if (session->m_connection.state() != Connection::CLOSED)
-			{
-				switch (session->m_protocol.run())
-				{
-					case Protocol::CALL_DATA:
-						session->m_connection.read();
-						break;
-					case Protocol::CALL_IDLE:
-						break;
-					case Protocol::CALL_CLOSED:
-						return;
-				}
-			}
-		}
-	}
-	catch (const std::runtime_error& err)
-	{
-		std::ostringstream msg;
-		msg << "runtime error in session thread: " << err.what();
-		boost::interprocess::scoped_lock<boost::mutex> lock( session->m_impl->m_notify_mutex);
-		session->notifyError( msg.str().c_str());
-	}
-	catch (const std::bad_alloc& err)
-	{
-		boost::interprocess::scoped_lock<boost::mutex> lock( session->m_impl->m_notify_mutex);
-		session->notifyError( err.what());
-	}
-	catch (const std::exception& err)
-	{
-		std::ostringstream msg;
-		msg << "exception thrown in session thread: " << err.what();
-		boost::interprocess::scoped_lock<boost::mutex> lock( session->m_impl->m_notify_mutex);
-		session->notifyError( err.what());
-	}
-}
+Session::~Session(){}
 
 void Session::start()
 {
-	m_impl->m_run_thread = boost::thread( runSession, this);
+	m_connection.connect();
+}
+
+void Session::quit()
+{
+	m_protocol.doQuit();
 }
 
 void Session::stop()
 {
 	m_protocol.doQuit();
-	signal_runSession();
-	m_impl->m_run_thread.join();
+	m_connection.post_request();
 	m_connection.stop();
 }
 
@@ -143,7 +65,6 @@ void Session::requestCallback( void* this_, const Protocol::Event& event)
 {
 	switch (event.type())
 	{
-		case Protocol::Event::SEND: throw std::logic_error( "request handler cannot handle answer event SEND");
 		case Protocol::Event::UIFORM: throw std::logic_error( "request handler cannot handle answer event UIFORM");
 		case Protocol::Event::ANSWER: ((RequestHandler*)this_)->answer( event.content(), event.contentsize());
 		case Protocol::Event::STATE: throw std::logic_error( "request handler cannot handle answer event STATE");
@@ -155,10 +76,7 @@ void Session::requestCallback( void* this_, const Protocol::Event& event)
 bool Session::doRequest( RequestHandler* handler, const char* data, std::size_t datasize)
 {
 	bool rt = m_protocol.pushRequest( requestCallback, handler, data, datasize);
-	if (rt)
-	{
-		signal_runSession();
-	}
+	m_connection.post_request();
 	return rt;
 }
 
@@ -166,37 +84,24 @@ void Session::protocolCallback( const Protocol::Event& event)
 {
 	switch (event.type())
 	{
-		case Protocol::Event::SEND:
-			m_connection.write( event.content(), event.contentsize());
-			break;
-
 		case Protocol::Event::UIFORM:
-		{
-			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			receiveUIForm( event.id(), event.content(), event.contentsize());
 			break;
-		}
+
 		case Protocol::Event::ANSWER:
 			std::logic_error("answer not passed to request (SessionHandler::protocolCallback)");
 
 		case Protocol::Event::STATE:
-		{
-			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			notifyState( event.id());
 			break;
-		}
+
 		case Protocol::Event::ATTRIBUTE:
-		{
-			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			notifyAttribute( event.id(), event.content());
 			break;
-		}
+
 		case Protocol::Event::ERROR:
-		{
-			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			notifyError( event.id());
 			break;
-		}
 	}
 }
 
@@ -210,27 +115,20 @@ void Session::connectionCallback( const Connection::Event& event)
 {
 	switch (event.type())
 	{
-		case Connection::Event::DATA:
-			m_protocol.pushData( event.content(), event.contentsize());
-			signal_runSession();
-			break;
 		case Connection::Event::READY:
-			signal_runSession();
+			notifyReady();
 			break;
+
 		case Connection::Event::STATE:
-		{
-			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			notifyState( event.content());
 			break;
-		}
+
 		case Connection::Event::ERROR:
-		{
-			boost::interprocess::scoped_lock<boost::mutex> lock( m_impl->m_notify_mutex);
 			notifyError( event.content());
 			break;
-		}
+
 		case Connection::Event::TERMINATED:
-			signal_runSession();
+			notifyTermination();
 			break;
 	}
 }

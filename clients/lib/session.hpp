@@ -60,18 +60,33 @@ struct RequestHandler
 class Session
 {
 public:
-	Session( const Connection::Configuration& cfg);
+	struct Configuration
+		:public Connection::Configuration
+		,public Protocol::Configuration
+	{
+		Configuration( std::string address_="127.0.0.1", std::string name_="7661", unsigned short connect_timeout_=30, unsigned short read_timeout_=30)
+			:Connection::Configuration(address_,name_,connect_timeout_,read_timeout_){}
+		Configuration( const Configuration& o)
+			:Connection::Configuration(o)
+			,Protocol::Configuration(o){}
+	};
+
+	Session( const Configuration& config);
 	virtual ~Session();
 
 	void start();
+	void quit();
 	void stop();
 	bool doRequest( RequestHandler* handler, const char* data, std::size_t datasize);
 
-public://methods to be implemented by the session
+public://notification methods to be implemented by the session:
 	virtual void receiveUIForm( const char* id, const char* data, std::size_t datasize)=0;
-	virtual void notifyState( const char* msg)=0;
-	virtual void notifyAttribute( const char* id, const char* value)=0;
 	virtual void notifyError( const char* msg)=0;
+public://notification methods optionally implemented by the session:
+	virtual void notifyState( const char* /*msg*/){}
+	virtual void notifyAttribute( const char* /*id*/, const char* /*value*/){}
+	virtual void notifyTermination(){}
+	virtual void notifyReady(){}
 
 private:
 	static void requestCallback( void* this_, const Protocol::Event& event);
@@ -88,8 +103,6 @@ private:
 private:
 	Connection m_connection;		//< connection handler
 	Protocol m_protocol;			//< protocol statemachine
-	struct Impl;
-	Impl* m_impl;				//< session object internals
 };
 
 
