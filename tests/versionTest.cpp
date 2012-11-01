@@ -62,6 +62,7 @@ protected:
 		ver0 = _Wolframe::Version( major, minor, revision, build );
 		ver1 = _Wolframe::Version( major, minor, 0 );
 		ver2 = _Wolframe::Version( major, minor );
+		ver3 = _Wolframe::Version( major * 1000000lu, minor * 10000lu, revision * 100, 0 );
 		sprintf( verStr0, "%d.%d.%d.%u", major, minor, revision, build );
 		sprintf( verStr1, "%d.%d.%d", major, minor, revision );
 		sprintf( verStr2, "%d.%d", major, minor );
@@ -71,7 +72,7 @@ protected:
 	// Objects declared here can be used by all tests in the test case.
 	unsigned short		major, minor, revision;
 	unsigned		build;
-	_Wolframe::Version	ver0, ver1, ver2;
+	_Wolframe::Version	ver0, ver1, ver2, ver3;
 	char			verStr0[MAX_STRING];
 	char			verStr1[MAX_STRING];
 	char			verStr2[MAX_STRING];

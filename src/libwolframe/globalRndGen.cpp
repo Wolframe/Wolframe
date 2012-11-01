@@ -31,50 +31,29 @@
 
 ************************************************************************/
 //
-// singleton.hpp
+// Global random number generator implementation
 //
 
-#ifndef _SINGLETON_HPP_INCLUDED
-#define _SINGLETON_HPP_INCLUDED
+#include "utils/globalRngGen.hpp"
 
-#include <boost/utility.hpp>
-#include <boost/thread/once.hpp>
-#include <boost/scoped_ptr.hpp>
+namespace _Wolframe	{
 
-// Warning: If T's constructor throws, instance() will return a null reference.
-
-// the initialized flag might not be needed but it looks like it increases performance
-
-template<class T>
-class Singleton : private boost::noncopyable
+GlobalRandomGenerator::GlobalRandomGenerator( std::string& /*rndDev*/ )
 {
-public:
-	static T& instance()
-	{
-		if ( !initialized )
-			boost::call_once( init, flag );
-		return *t;
-	}
+//	m_device = rndDev;
+	t.reset( this );
+	m_initialized = true;
+}
 
-protected:
-	Singleton()	{}
-	~Singleton()	{}
+unsigned GlobalRandomGenerator::random()
+{
+	return 0;
+}
 
-	static void init() // never throws
-	{
-		t.reset( new T() );
-		initialized = true;
-	}
+int GlobalRandomGenerator::random( unsigned char* /*buffer*/, size_t /*bytes*/ )
+{
+	return 0;
+}
 
-private:
-	static boost::scoped_ptr<T>	t;
-	static boost::once_flag		flag;
-	static bool			initialized;
-};
+} // namespace _Wolframe
 
-
-template<class T> boost::scoped_ptr<T> Singleton<T>::t(0);
-template<class T> boost::once_flag Singleton<T>::flag = BOOST_ONCE_INIT;
-template<class T> bool Singleton<T>::initialized = false;
-
-#endif	// _SINGLETON_HPP_INCLUDED

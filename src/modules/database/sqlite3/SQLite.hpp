@@ -118,15 +118,21 @@ public:
 	SQLiteUIlibrary( const SQLiteDatabase& database );
 	~SQLiteUIlibrary()			{}
 
-	virtual const std::list< UI::UIformHeader > formHeaders() const;
-	virtual const std::list< UI::UIformHeader > formHeaders( std::string& role ) const;
-	virtual const std::list< UI::UIformHeader > formHeaders( std::list< std::string >& roles ) const;
+	virtual const std::list< UI::UIform::Info > formInfos( const std::string& platform ) const;
+	virtual const std::list< UI::UIform::Info > formInfos( const std::string& platform,
+							       const std::string& role ) const;
+	virtual const std::list< UI::UIform::Info > formInfos( const std::string& platform,
+							       const std::list< std::string >& roles ) const;
 
-	virtual const std::list< UI::UIformHeader > formVersions( const std::string& name ) const;
+	virtual const std::list< UI::UIform::Info > formVersions( const std::string& platform,
+								  const std::string& name ) const;
 
-	virtual const UI::UIform form( const std::string& name ) const;
-	virtual const UI::UIform form( const std::string& name, const Version& version ) const;
-	virtual const UI::UIform form( const UI::UIformHeader& header ) const;
+	virtual const UI::UIform form( const std::string& platform,
+				       const std::string& name ) const;
+	virtual const UI::UIform form( const std::string& platform,
+				       const std::string& name, const Version& version ) const;
+	virtual const UI::UIform form( const std::string& platform,
+				       const UI::UIform::Info& info ) const;
 
 	virtual void close()			{ delete this; }
 private:

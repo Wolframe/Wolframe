@@ -44,90 +44,103 @@
 namespace _Wolframe {
 namespace UI {
 
-/// User Interface form header.
-class UIformHeader
+/// User Interface form.
+class UIform
 {
 public:
+	/// Types of forms
 	enum FormType	{
 		FORM,
 		MENU
 	};
 
-	UIformHeader()				{}
+	/// User Interface form information.
+	class Info
+	{
+	public:
+		Info( FormType type_, const std::string& name_,
+			    unsigned long version_, const std::string& description_ )
+			: m_type( type_ ), m_name( name_ ),
+			  m_version( version_ ), m_description( description_ )	{}
 
-	FormType type() const			{ return m_type; }
-	const std::string& name() const		{ return m_name; }
-	const Version& version() const		{ return m_version; }
-	const std::string& description() const	{ return m_description; }
+		FormType type() const			{ return m_type; }
+		const std::string& name() const		{ return m_name; }
+		const Version& version() const		{ return m_version; }
+		const std::string& description() const	{ return m_description; }
+	private:
+		const FormType		m_type;		///< the type of the form
+		const std::string	m_name;		///< the name of the form
+		const Version		m_version;	///< the version of the form
+		const std::string	m_description;	///< the description of the form
+	};
+
+	/// Constructor
+	UIform( FormType type_, const std::string& name_,
+		unsigned long version_, const std::string& description_,
+		const std::string& body_ )
+		: m_info( type_, name_, version_, description_ ),
+		  m_body ( body_ )		{}
+
+	const Info& header() const			{ return m_info; }
+	const std::string& body() const			{ return m_body; }
 private:
-	FormType	m_type;			///< the type of the form
-	std::string	m_name;			///< the name of the form
-	Version		m_version;		///< the version of the form
-	std::string	m_description;		///< the description of the form
+	const Info		m_info;			///< the header of the form
+	const std::string	m_body;			///< the body of the form
 };
 
-/// User Interface form body.
-class UIformBody
-{
-public:
-	UIformBody()				{}
 
-	const std::string& body() const		{ return m_body; }
-private:
-	std::string	m_body;			///< the body of the form
-};
-
-
-/// User Interface form.
-class UIform
-{
-public:
-	UIform()				{}
-
-	const UIformHeader& header() const	{ return m_header; }
-	const UIformBody& body() const		{ return m_body; }
-private:
-	UIformHeader	m_header;		///< the header of the form
-	UIformBody	m_body;			///< the body of the form
-};
-
-/// Supplier of user interface elements.
+/// Library of user interface elements.
 /// This is an interface (base class).
 class UserInterfaceLibrary
 {
 public:
-	virtual ~UserInterfaceLibrary()		{}
+	virtual ~UserInterfaceLibrary()	{}
 
-	/// \brief Get a list of all form headers, latest versions
-	virtual const std::list< UIformHeader > formHeaders() const = 0;
+	/// \brief Get a list of all form infos, latest versions
+	/// \param platform	the platform for which to get the form info
+	///			use an epmty string, "*" or "all"
+	///			to get the form info for all platforms
+	virtual const std::list< UIform::Info > formInfos( const std::string& platform ) const = 0;
 
-	/// \brief Get a list of all form headers, latest versions
-	/// \param role	a role for which to get the form headers
-	virtual const std::list< UIformHeader > formHeaders( std::string& role ) const = 0;
+	/// \brief Get a list of all form infos, latest versions
+	/// \param platform	the platform for which to get the form info
+	/// \param role		a role for which to get the form infos
+	virtual const std::list< UIform::Info > formInfos( const std::string& platform,
+							   const std::string& role ) const = 0;
 
-	/// \brief Get a list of all form headers, latest versions
-	/// \param roles a list of roles for which to get the form headers
-	virtual const std::list< UIformHeader > formHeaders( std::list< std::string >& roles ) const = 0;
+	/// \brief Get a list of all form infos, latest versions
+	/// \param platform	the platform for which to get the form info
+	/// \param roles	a list of roles for which to get the form infos
+	virtual const std::list< UIform::Info > formInfos( const std::string& platform,
+							   const std::list< std::string >& roles ) const = 0;
 
-	/// \brief Get a list of form headers for all the versions of a form
-	/// \param name	the name of the form
-	virtual const std::list< UIformHeader > formVersions( const std::string& name ) const = 0;
+	/// \brief Get a list of form infos for all the versions of a form
+	/// \param platform	the platform for which to get the form info
+	/// \param name		the name of the form
+	virtual const std::list< UIform::Info > formVersions( const std::string& platform,
+							      const std::string& name ) const = 0;
 
 	/// \brief Get the form
-	/// \param name	the name of the form
-	virtual const UIform form( const std::string& name ) const = 0;
+	/// \param platform	the platform for which to get the form info
+	/// \param name		the name of the form
+	virtual const UIform form( const std::string& platform,
+				   const std::string& name ) const = 0;
 
 	/// \brief Get the form
+	/// \param platform	the platform for which to get the form info
 	/// \param name		the name of the form
 	/// \param version	the version of the form
-	virtual const UIform form( const std::string& name, const Version& version ) const = 0;
+	virtual const UIform form( const std::string& platform,
+				   const std::string& name, const Version& version ) const = 0;
 
 	/// \brief Get the form
+	/// \param platform	the platform for which to get the form info
 	/// \param name		the name of the form
 	/// \param version	the version of the form
-	virtual const UIform form( const UIformHeader& header ) const = 0;
+	virtual const UIform form( const std::string& platform,
+				   const UIform::Info& info ) const = 0;
 
-	virtual void close()			{}
+	virtual void close()		{}
 };
 
 }} // namespace _Wolframe::UI
