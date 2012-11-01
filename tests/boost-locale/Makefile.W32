@@ -17,10 +17,13 @@ INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS) \
 	$(ICU_LDFLAGS)
 
+# Note: broken auto-linking in boost-locale!
 INCLUDE_LIBS = \
 	Advapi32.lib Ws2_32.lib \
 	$(TOPDIR)\gtest\gtest-all.obj \
-	$(ICU_LIBS)
+	$(ICU_LIBS) \
+	"$(BOOST_DIR)\lib\libboost_system$(BOOST_LIBRARY_TAG).lib" \
+	"$(BOOST_DIR)\lib\libboost_thread$(BOOST_LIBRARY_TAG).lib"
 	
 TEST_CPP_BINS = \
 	boostLocaleTest.exe
@@ -40,6 +43,14 @@ local_distclean:
 
 local_test:
 	@-echo @echo off > test.bat
+!IFNDEF DEBUG
+	@-echo copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" . >> test.bat
+	@-echo copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" . >> test.bat
+!ELSE
+	@-echo copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION)d.dll" . >> test.bat
+	@-echo copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION)d.dll" . >> test.bat
+!ENDIF
+	@-echo copy "$(ICU_DIR)\bin\icudt$(ICU_LIB_VERSION).dll" . >> test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo boostLocaleTest >> test.bat
 	@-echo echo off >> test.bat
