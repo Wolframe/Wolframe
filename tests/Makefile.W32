@@ -25,6 +25,10 @@ SUBDIRS = \
 	$(SUBDIRS) libhpdf
 !ENDIF
 
+!IFDEF WITH_ICU
+SUBDIRS = \
+	$(SUBDIRS) boost-locale
+!ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
