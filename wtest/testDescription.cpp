@@ -81,6 +81,33 @@ if (boost::starts_with( flag, "DISABLED "))
 	}
 	if (nargs == 0) return "DISABLED ";
 }
+	enum Platform {p_UNKNOWN,p_WIN32,p_LINUX,p_SUNOS,p_FREEBSD,p_OPENBSD,p_NETBSD};
+	Platform platform = p_UNKNOWN;
+#ifdef _WIN32
+	platform = p_WIN32;
+#endif
+#ifdef LINUX
+	platform = p_LINUX;
+#endif
+#ifdef SUNOS
+	platform = p_SUNOS;
+#endif
+#ifdef FREEBSD
+	platform = p_FREEBSD;
+#endif
+#ifdef OPENBSD
+	platform = p_OPENBSD;
+#endif
+#ifdef NETBSD
+	platform = p_NETBSD;
+#endif
+	if (platform != p_WIN32 && boost::iequals( flag, "WIN32")) return "only on platform WINDOWS";
+	if (platform != p_LINUX && boost::iequals( flag, "LINUX")) return "only on platform LINUX";
+	if (platform != p_SUNOS && boost::iequals( flag, "SUNOS")) return "only on platform SUNOS";
+	if (platform != p_FREEBSD && boost::iequals( flag, "FREEBSD")) return "only on platform FREEBSD";
+	if (platform != p_OPENBSD && boost::iequals( flag, "OPENBSD")) return "only on platform OPENBSD";
+	if (platform != p_NETBSD && boost::iequals( flag, "NETBSD")) return "only on platform NETBSD";
+
 #if !(WITH_LUA)
 	if (boost::iequals( flag, "LUA")) return "WITH_LUA=1 ";
 #endif

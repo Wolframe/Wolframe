@@ -38,27 +38,42 @@
 using namespace _Wolframe;
 using namespace _Wolframe::client;
 
-Session::Session( const Configuration& config)
-	:m_connection(config,&m_protocol,&connectionCallback_void,this)
-	,m_protocol(config,&protocolCallback_void,this){}
+struct Session::Impl
+{
+	Impl( const Configuration& config, void* this_)
+		:m_connection(config,&m_protocol,&connectionCallback_void,this_)
+		,m_protocol(config,&protocolCallback_void,this_){}
 
-Session::~Session(){}
+	Connection m_connection;		//< connection handler
+	Protocol m_protocol;			//< protocol statemachine
+};
+
+Session::Session( const Configuration& config)
+	:m_impl(0)
+{
+	m_impl = new Impl( config, this);
+}
+
+Session::~Session()
+{
+	delete m_impl;
+}
 
 void Session::start()
 {
-	m_connection.connect();
+	m_impl->m_connection.connect();
 }
 
 void Session::quit()
 {
-	m_protocol.doQuit();
+	m_impl->m_protocol.doQuit();
 }
 
 void Session::stop()
 {
-	m_protocol.doQuit();
-	m_connection.post_request();
-	m_connection.stop();
+	m_impl->m_protocol.doQuit();
+	m_impl->m_connection.post_request();
+	m_impl->m_connection.stop();
 }
 
 void Session::requestCallback( void* this_, const Protocol::Event& event)
@@ -75,8 +90,8 @@ void Session::requestCallback( void* this_, const Protocol::Event& event)
 
 bool Session::doRequest( RequestHandler* handler, const char* data, std::size_t datasize)
 {
-	bool rt = m_protocol.pushRequest( requestCallback, handler, data, datasize);
-	m_connection.post_request();
+	bool rt = m_impl->m_protocol.pushRequest( requestCallback, handler, data, datasize);
+	m_impl->m_connection.post_request();
 	return rt;
 }
 
@@ -123,7 +138,7 @@ void Session::connectionCallback( const Connection::Event& event)
 			notifyState( event.content());
 			break;
 
-		case Connection::Event::ERROR:
+		case Connection::Event::FAILED:
 			notifyError( event.content());
 			break;
 

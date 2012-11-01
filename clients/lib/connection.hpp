@@ -109,7 +109,7 @@ public:
 		{
 			STATE,			//< state of connection
 			READY,			//< connection ready (signal sent once)
-			ERROR,			//< connection error
+			FAILED,			//< connection error
 			TERMINATED		//< connection terminated
 		};
 		Event( Type t, const char* c, std::size_t s)
@@ -206,12 +206,14 @@ public:
 	}
 	State state() const;
 
-private:
-	Connection( const Connection&){}	//non copyable
-
+public:
 	///\class Impl
 	///\brief PIMPL for internal connection handler data structure
 	struct Impl;
+
+private:
+	Connection( const Connection&){}	//non copyable
+
 	Impl* m_impl;
 	Callback m_notifier;
 	void* m_clientobject;
