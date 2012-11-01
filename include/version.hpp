@@ -53,6 +53,7 @@ private:
 public:
 	/// Empty Version constructor.
 	Version();
+	Version( unsigned long version );
 	Version( unsigned short M, unsigned short m );
 	Version( unsigned short M, unsigned short m, unsigned short r );
 	Version( unsigned short M, unsigned short m, unsigned short r, unsigned b );

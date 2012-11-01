@@ -47,6 +47,13 @@ Version::Version()
 	  m_build( 0 ), m_hasBuild( false )
 {}
 
+Version::Version( unsigned long version )
+	: m_major( version / 1000000lu ),
+	  m_minor(( version % 1000000lu ) / 10000 ),
+	  m_revision( ( version % 10000lu ) / 100 ), m_hasRevision( true ),
+	  m_build( version % 100 ), m_hasBuild( true )
+{}
+
 Version::Version( unsigned short M, unsigned short m )
 	: m_major( M ), m_minor( m ),
 	  m_revision( 0 ), m_hasRevision( false ),

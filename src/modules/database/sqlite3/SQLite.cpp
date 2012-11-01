@@ -233,45 +233,54 @@ SQLiteUIlibrary::SQLiteUIlibrary( const SQLiteDatabase &database )
 {}
 
 
-const std::list< UI::UIformHeader > SQLiteUIlibrary::formHeaders() const
+const std::list< UI::UIform::Info > SQLiteUIlibrary::formInfos( const std::string& /*platform*/ ) const
 {
-	std::list< UI::UIformHeader >	forms;
+	std::list< UI::UIform::Info >	forms;
 	return forms;
 }
 
-const std::list< UI::UIformHeader > SQLiteUIlibrary::formHeaders( std::string& /*role*/ ) const
+const std::list< UI::UIform::Info > SQLiteUIlibrary::formInfos( const std::string& /*platform*/,
+								const std::string& /*role*/ ) const
 {
-	std::list< UI::UIformHeader >	forms;
+	std::list< UI::UIform::Info >	forms;
 	return forms;
 }
 
-const std::list< UI::UIformHeader > SQLiteUIlibrary::formHeaders( std::list< std::string >& /*roles*/ ) const
+const std::list< UI::UIform::Info > SQLiteUIlibrary::formInfos( const std::string& /*platform*/,
+								const std::list< std::string >& /*roles*/ ) const
 {
-	std::list< UI::UIformHeader >	forms;
+	std::list< UI::UIform::Info >	forms;
 	return forms;
 }
 
-const std::list< UI::UIformHeader > SQLiteUIlibrary::formVersions( const std::string& /*name*/ ) const
+const std::list< UI::UIform::Info > SQLiteUIlibrary::formVersions( const std::string& /*platform*/,
+								   const std::string& /*name*/ ) const
 {
-	std::list< UI::UIformHeader >	forms;
+	std::list< UI::UIform::Info >	forms;
 	return forms;
 }
 
-const UI::UIform SQLiteUIlibrary::form( const std::string& /*name*/ ) const
+const UI::UIform SQLiteUIlibrary::form( const std::string& /*platform*/, const std::string& /*name*/ ) const
 {
-	UI::UIform	form_;
+	UI::UIform	form_( UI::UIform::FORM, "dummy test", 01000000,
+			       "Dummy form for now", "" );
 	return form_;
 }
 
-const UI::UIform SQLiteUIlibrary::form( const std::string& /*name*/, const Version& /*version*/ ) const
+const UI::UIform SQLiteUIlibrary::form( const std::string& /*platform*/,
+					const std::string& /*name*/,
+					const Version& /*version*/ ) const
 {
-	UI::UIform	form_;
+	UI::UIform	form_( UI::UIform::FORM, "dummy test", 01000000,
+			       "Dummy form for now", "" );
 	return form_;
 }
 
-const UI::UIform SQLiteUIlibrary::form( const UI::UIformHeader& /*header*/ ) const
+const UI::UIform SQLiteUIlibrary::form( const std::string& /*platform*/,
+					const UI::UIform::Info& /*info*/ ) const
 {
-	UI::UIform	form_;
+	UI::UIform	form_( UI::UIform::FORM, "dummy test", 01000000,
+			       "Dummy form for now", "" );
 	return form_;
 }
 
