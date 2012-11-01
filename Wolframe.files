@@ -70,6 +70,7 @@ makefiles/nmake/top.mk
 .Attic/printers.c
 .Attic/printMemory.c
 .Attic/rijndael.c
+.Attic/singleton.hpp
 .Attic/SSLtest.c
 .Attic/streamIterator.hpp
 .Attic/testLeak.cpp

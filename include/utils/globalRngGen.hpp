@@ -38,35 +38,22 @@
 #define _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
 
 #include <string>
-#include <stdexcept>
-#include <boost/utility.hpp>
-#include <boost/scoped_ptr.hpp>
+#include "types/singleton.hpp"
 
 namespace _Wolframe	{
 
-class GlobalRandomGenerator : public boost::noncopyable
+class GlobalRandomGenerator : public Singleton< GlobalRandomGenerator >
 {
 public:
 	GlobalRandomGenerator( std::string& rndDev );
 
-	static GlobalRandomGenerator& instance()
-	{
-		if ( !m_initialized )
-			throw std::runtime_error( "Global random number generator not instantiated yet" );
-		return *t;
-	}
-
-//	const std::string& device() const	{ return m_device; }
-	unsigned random();
-	int random( unsigned char* buffer, size_t bytes );
+	const std::string& device() const	{ return m_device; }
+	unsigned random() const ;
+	int random( unsigned char* buffer, size_t bytes ) const;
 
 private:
 	std::string	m_device;		///< random generator device
-	static bool	m_initialized;
-	static boost::scoped_ptr< GlobalRandomGenerator >	t;
 };
-boost::scoped_ptr< GlobalRandomGenerator > GlobalRandomGenerator::t( 0 );
-bool GlobalRandomGenerator::m_initialized = false;
 
 } // namespace _Wolframe
 
