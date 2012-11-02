@@ -39,8 +39,6 @@ CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-wolframec$(EXE): ../lib
-
 local_all:
 
 local_clean:

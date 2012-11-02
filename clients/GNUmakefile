@@ -8,6 +8,8 @@ endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
+cmdline: lib
+
 local_all:
 
 local_test:
