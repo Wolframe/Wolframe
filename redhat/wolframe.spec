@@ -128,7 +128,7 @@
 # icu for boost-locale is available natively only on a few platforms,
 # enable it there. If we build our own boost, try hard to enable ICU
 # everywhere
-#define with_icu	0
+%define with_icu	0
 %if !%{build_boost}
 %define with_icu	0
 %if %{fedora}
