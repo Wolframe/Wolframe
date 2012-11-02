@@ -86,25 +86,9 @@ else
 				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
 				;;
 				
-		OpenBSD*)	PLATFORM=OPENBSD
-				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
-				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2 | cut -d - -f 1`
-				;;
-
-		NetBSD*)	PLATFORM=NETBSD
-				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
-				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2`
-				;;
-
 		SunOS*)		PLATFORM=SUNOS
 				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
 				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2`
-				;;
-
-		CYGWIN_NT*)	PLATFORM=CYGWIN
-				_tmp=`echo $UNAME_SYSTEM | cut -d - -f 2`
-				OS_MAJOR_VERSION=`echo $_tmp | cut -d . -f 1`
-				OS_MINOR_VERSION=`echo $_tmp | cut -d . -f 2`
 				;;
 
 		*)
@@ -175,13 +159,6 @@ else
 		ICC_VERSION=`icc -dumpversion`
 		ICC_MAJOR_VERSION=`echo $ICC_VERSION | cut -d . -f 1`
 		ICC_MINOR_VERSION=`echo $ICC_VERSION | cut -d . -f 2`
-	fi
-
-	# version of spro (Sun Pro compiler, Sun Studio)
-
-	if test $COMPILER = "spro"; then
-		SPRO_VERSION=`$CC -xhelp=readme | head -n 1 | cut -d ' ' -f 3`
-		SPRO_MAJOR_VERSION=`echo $SPRO_VERSION | cut -d : -f 1`
 	fi
 
 	# generate the makefile snippet with conditional variables

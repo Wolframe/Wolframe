@@ -231,17 +231,6 @@ PTHREADS_CFLAGS = -D_REENTRANT -pthread
 PTHREADS_LDFLAGS = -pthread
 PTHREADS_LIBS =
 endif
-ifeq "$(PLATFORM)" "OPENBSD"
-PTHREADS_CFLAGS = -D_REENTRANT -pthread
-PTHREADS_LDFLAGS = -pthread
-PTHREADS_LIBS =
-endif
-ifeq "$(PLATFORM)" "CYGWIN"
-PTHREADS_CFLAGS =
-PTHREADS_LDFLAGS =
-PTHREADS_LIBS =
-endif
-
 ifeq "$(COMPILER)" "icc"
 ifeq "$(PLATFORM)" "LINUX"
 PTHREADS_CFLAGS = -D_REENTRANT -pthread
@@ -264,16 +253,6 @@ endif
 ifeq "$(PLATFORM)" "FREEBSD"
 SO_COMPILE_FLAGS = -fPIC
 endif
-ifeq "$(PLATFORM)" "NETBSD"
-SO_COMPILE_FLAGS = -fPIC
-endif
-ifeq "$(PLATFORM)" "OPENBSD"
-SO_COMPILE_FLAGS = -fPIC
-endif
-ifeq "$(PLATFORM)" "CYGWIN"
-# code on Cygwin is always position independend
-SO_COMPILE_FLAGS =
-endif
 endif
 
 ifeq "$(COMPILER)" "icc"
@@ -281,15 +260,6 @@ ifeq "$(PLATFORM)" "LINUX"
 SO_COMPILE_FLAGS = -fPIC
 endif
 endif
-
-# TODO: test this
-#ifeq "$(COMPILER)" "spro"
-#ifeq "$(PLATFORM)" "SUNOS"
-#ifeq "$(ARCH)" "sun4u"
-#SO_COMPILE_FLAGS = -xcode=pic32
-#endif
-#endif
-#endif
 
 ALL_CFLAGS = $(CFLAGS) $(COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) $(INCLUDE_CFLAGS) $(PTHREADS_CFLAGS)
 ALL_CXXFLAGS = $(CXXFLAGS) $(CXX_COMPILE_FLAGS) $(PLATFORM_COMPILE_FLAGS) $(INCLUDE_DIRS) $(INCLUDE_CXXFLAGS) $(PTHREADS_CFLAGS)

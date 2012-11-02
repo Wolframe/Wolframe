@@ -78,11 +78,7 @@ local_test:$(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
 	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) tests/pechoHandlerTest$(EXE)
 ifeq ($(WITH_EXPECT),1)
-ifneq "$(PLATFORM)" "OPENBSD"
-ifneq "$(PLATFORM)" "NETBSD"
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) tests/testPEcho
-endif
-endif
 endif
 endif
 
