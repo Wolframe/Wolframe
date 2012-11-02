@@ -72,6 +72,19 @@ public:
 		return *m_t;
 	}
 
+	template< typename ArgType0, typename ArgType1 >
+	static T& instance( ArgType0 arg0, ArgType1 arg1 )
+	{
+		if ( !m_initialized )	{
+			boost::lock_guard<boost::mutex> lock( m_mutex );
+			if ( !m_initialized )	{
+				m_t.reset( new T( arg0, arg1 ) );
+				m_initialized = true;
+			}
+		}
+		return *m_t;
+	}
+
 protected:
 	Singleton()	{}
 	~Singleton()	{}
