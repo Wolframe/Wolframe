@@ -107,14 +107,6 @@
 %define with_qt		1
 %endif
 
-# icu for boost-locale is available natively only on a few platforms,
-# enable it there
-%define with_icu	0
-%if %{fedora}
-%if %{fc17}
-%define with_icu	1
-%endif
-%endif
 
 # Boost has sometimes a different layout in the shared libraries, don't
 # know why
@@ -133,7 +125,22 @@
 %define boost_underscore_version 1_48_0
 %endif
 
+# icu for boost-locale is available natively only on a few platforms,
+# enable it there. If we build our own boost, try hard to enable ICU
+# everywhere
+%if !%{build_boost}
+%define with_icu	0
+%if %{fedora}
+%if %{fc17}
+%define with_icu	1
+%endif
+%endif
+%else
+%define with_icu	1
+%endif
+
 # build local libxml2 for distributions which have a too old broken version
+# (broken in respect to some character encodings, not broken as such)
 
 %if %{with_libxml2}
 %define build_libxml2 0
@@ -205,6 +212,7 @@ BuildRequires: pwdutils >= 3.2
 %endif
 
 %if %{build_boost}
+%if %{with_icu}
 %if %{centos} || %{fedora}
 BuildRequires: libicu-devel >= 3.6
 %else
@@ -213,15 +221,29 @@ BuildRequires: libicu-devel >= 3.6
 BuildRequires: libicu-devel >= 3.6
 %endif
 %endif
+%endif
 %else
 BuildRequires: boost-devel
 %if %{rhel} || %{centos} || %{fedora}
+%if %{with_icu}
+Requires: boost >= 1.48
+Requires: boost-thread >= 1.48
+Requires: boost-date-time >= 1.48
+Requires: boost-filesystem >= 1.48
+Requires: boost-program-options >= 1.48
+Requires: boost-system >= 1.48
+Requires: boost-locale >= 1.48
+Requires: boost-regex >= 1.48
+Requires: libicu >= 3.6
+%else
 Requires: boost >= 1.43
 Requires: boost-thread >= 1.43
 Requires: boost-date-time >= 1.43
 Requires: boost-filesystem >= 1.43
 Requires: boost-program-options >= 1.43
 Requires: boost-system >= 1.43
+Requires: boost-regex >= 1.43
+%endif
 %endif
 %if %{suse}
 Requires: libboost-thread1_44_0 >= 1.44.0
@@ -229,6 +251,7 @@ Requires: libboost-date-time1_44_0 >= 1.44.0
 Requires: libboost-filesystem1_44_0 >= 1.44.0
 Requires: libboost-program-options1_44_0 >= 1.44.0
 Requires: libboost-system1_44_0 >= 1.44.0
+Requires: libboost-regex1_44_0 >= 1.44.0
 %endif
 %endif
 
