@@ -30,7 +30,15 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_loadMode( Network ), m_debug( false ),
 	m_loginDialog( 0 )
 {
+#ifdef Q_OS_ANDROID
+	//parseArgs( ); // croaks in cmdline.hpp, TODO: are there command line options anyway?
+	// TODO: read a configuration, where to store that on Android, config dialog?
+	m_loadMode = Network;
+	m_host = "andreasbaumann.dyndns.org";
+	//m_host = "10.0.2.2";
+#else
 	parseArgs( );
+#endif
 	initialize( );
 }
 
@@ -150,8 +158,11 @@ void MainWindow::initialize( )
 // create debuging terminal
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
 	debugTerminal = m_debugTerminal;
+#ifndef Q_OS_ANDROID
+// crashes somehow on Android, must investigate
 	qInstallMsgHandler( &myMessageOutput );
 	if( m_debug ) m_debugTerminal->bringToFront( );
+#endif
 	qDebug( ) << "Debug window initialized";
 
 // catch error of network protocol
@@ -200,7 +211,11 @@ void MainWindow::initialize( )
 	m_currentLanguage = QLocale::system( ).name( );
 
 // load default theme
+#ifdef Q_OS_ANDROID
+	loadTheme( QString( QLatin1String( "phone" ) ) );
+#else
 	loadTheme( QString( QLatin1String( "windows" ) ) );
+#endif
 
 // load language resources, repaints the whole interface if necessary
 	loadLanguage( QLocale::system( ).name( ) );
@@ -305,7 +320,11 @@ void MainWindow::loadTheme( QString theme )
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
 // set working directory to theme
+#ifdef Q_OS_ANDROID
+	QString themesFolder( QLatin1String( "assets:/themes/" ) + theme + QLatin1Char( '/' ) );
+#else
 	QString themesFolder( QLatin1String( "themes/" ) + theme + QLatin1Char( '/' ) );
+#endif
 
 // tell the loader that this is the working directory
 	m_uiLoader->setWorkingDirectory( themesFolder );
@@ -322,7 +341,11 @@ void MainWindow::loadTheme( QString theme )
 
 // set stylesheet of the application (has impact on the whole application)
 	QFile qss( themesFolder + QLatin1String( "MainWindow.qss" ) );
+#ifdef Q_OS_ANDROID
+	qApp->setStyleSheet( QFileInfo( qss ) );
+#else
 	qApp->setStyleSheet( QLatin1String( "file:///" ) + QFileInfo( qss ).absoluteFilePath( ) );
+#endif
 	
 // copy over the location of the old window to the new one
 // also copy over the current form, don't destroy the old ui,
