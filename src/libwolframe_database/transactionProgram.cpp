@@ -106,7 +106,7 @@ char TransactionProgram::gotoNextToken( std::string::const_iterator& si, const s
 			if (ci == ce)
 			{
 				// skip to end of line
-				while (ti != se && *ti != '\n') ++si;
+				while (ti != se && *ti != '\n') ++ti;
 				si = ti;
 				continue;
 			}

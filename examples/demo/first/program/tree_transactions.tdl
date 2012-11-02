@@ -47,9 +47,11 @@ END
 PREPARE tree_selectNodeAndParentsById   AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = ?;
 PREPARE tree_selectNodeAndParentsByName AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = ?;
 TRANSACTION treeSelectNodeAndParents -- (/node/id)
+BEGIN
 	FOREACH /node DO tree_selectNodeAndParentsById( id) INTO /node;
 END
 TRANSACTION treeSelectNodeAndParentsByName -- (/node/name)
+BEGIN
 	FOREACH /node DO tree_selectNodeAndParentsByName( name) INTO /node;
 END
 
@@ -60,9 +62,11 @@ END
 PREPARE tree_selectParentsById   AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = ?;
 PREPARE tree_selectParentsByName AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = ?;
 TRANSACTION treeSelectParents -- (/node/id)
+BEGIN
 	FOREACH /node DO tree_selectParentsById( id) INTO /node;
 END
 TRANSACTION treeSelectParentsByName -- (/node/name)
+BEGIN
 	FOREACH /node DO tree_selectParentsByName( name) INTO /node;
 END
 
@@ -73,9 +77,11 @@ END
 PREPARE tree_selectNodeAndChildrenById   AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = ?;
 PREPARE tree_selectNodeAndChildrenByName AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = ?;
 TRANSACTION treeSelectNodeAndChildren -- (/node/id)
+BEGIN
 	FOREACH /node DO tree_selectNodeAndChildrenById( name) INTO /node;
 END
 TRANSACTION treeSelectNodeAndChildrenByName -- (/node/name)
+BEGIN
 	FOREACH /node DO tree_selectNodeAndChildrenByName( name) INTO /node;
 END
 
@@ -86,9 +92,11 @@ END
 PREPARE tree_selectChildrenById   AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = ?;
 PREPARE tree_selectChildrenByName AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = ?;
 TRANSACTION treeSelectChildren -- (/node/id)
+BEGIN
 	FOREACH /node DO tree_selectChildrenById( id) INTO /node;
 END
 TRANSACTION treeSelectChildrenByName -- (/node/name)
+BEGIN
 	FOREACH /node DO tree_selectChildrenByName( name) INTO /node;
 END
 
@@ -97,6 +105,7 @@ END
 --
 PREPARE tree_selectNodeWithLevels AS SELECT count(P2.*) AS level, P1.ID, P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt GROUP BY P1.name ORDER BY level ASC;
 TRANSACTION treeSelectNodeWithLevels
+BEGIN
 	DO tree_selectNodeWithLevels() INTO /node;
 END
 
