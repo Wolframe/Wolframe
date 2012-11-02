@@ -43,6 +43,7 @@
 #include <unistd.h>
 #else
 #define WIN32_MEAN_AND_LEAN
+#include <windows.h>
 #include <wincrypt.h>
 #endif
 
