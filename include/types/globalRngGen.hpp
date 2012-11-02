@@ -30,26 +30,31 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cryptdefs.cpp
-#include "cryptdefs.hpp"
+//
+// Sort of a pseudo-singleton
+//
 
-#ifdef _WIN32
-#include <Windows.h>
-#include <Wincrypt.h>
-#endif
+#ifndef _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
+#define _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED
 
-using namespace _Wolframe;
-using namespace _Wolframe::AAAA;
+#include <string>
+#include "types/singleton.hpp"
 
-#ifdef _WIN32
-	const char* _Wolframe::AAAA::DEFAULT_RANDOM_GENERATOR()
-	{
-		return MS_DEF_PROV;
-	}
-#else
-	const char* _Wolframe::AAAA::DEFAULT_RANDOM_GENERATOR()
-	{
-		return "/dev/urandom";
-	}
-#endif
+namespace _Wolframe	{
 
+class GlobalRandomGenerator : public Singleton< GlobalRandomGenerator >
+{
+public:
+	GlobalRandomGenerator( std::string& rndDev );
+
+	const std::string& device() const	{ return m_device; }
+	unsigned random() const ;
+	void random( unsigned char* buffer, size_t bytes ) const;
+
+private:
+	std::string	m_device;		///< random generator device
+};
+
+} // namespace _Wolframe
+
+#endif // _GLOBAL_RANDOM_GENERATOR_HPP_INCLUDED

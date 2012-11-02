@@ -34,13 +34,35 @@
 // Global random number generator implementation
 //
 
-#include "utils/globalRngGen.hpp"
+#include <stdexcept>
+#include <cstring>
+
+#ifndef _WIN32
+#include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
+#else
+#define WIN32_MEAN_AND_LEAN
+#include <wincrypt.h>
+#endif
+
+#include "types/globalRngGen.hpp"
 
 namespace _Wolframe	{
 
+#ifdef _WIN32
+	#define	DEFAULT_RANDOM_DEVICE	(MS_DEF_PROV)
+#else
+	#define	DEFAULT_RANDOM_DEVICE	"/dev/urandom";
+#endif
+
 GlobalRandomGenerator::GlobalRandomGenerator( std::string& rndDev )
 {
-	m_device = rndDev;
+	if ( rndDev.empty() )	{
+		m_device = DEFAULT_RANDOM_DEVICE;
+	}
+	else
+		m_device = rndDev;
 }
 
 unsigned GlobalRandomGenerator::random() const
@@ -48,9 +70,42 @@ unsigned GlobalRandomGenerator::random() const
 	return 0;
 }
 
-int GlobalRandomGenerator::random( unsigned char* /*buffer*/, size_t /*bytes*/ ) const
+void GlobalRandomGenerator::random( unsigned char* buffer, size_t bytes ) const
 {
-	return 0;
+#ifndef _WIN32
+	int hndl = open( m_device.c_str(), O_RDONLY );
+	if ( hndl < 0 )	{
+		std::string errMsg = "Error opening '" + m_device + "': ";
+		throw std::runtime_error( errMsg );
+	}
+
+	int rndBytes = read( hndl, buffer, bytes );
+	if ( rndBytes < 0 )	{
+		std::string errMsg = "Error reading '" + m_device + "'";
+		throw std::runtime_error( errMsg );
+	}
+	else if ( rndBytes < (int)bytes )	{
+		std::string errMsg = "Not enough entropy in '" + m_device + "'";
+		throw std::logic_error( errMsg );
+	}
+
+	close( hndl );
+#else
+	HCRYPTPROV provider = 0;
+
+	if( !CryptAcquireContext( &provider, 0, m_device.c_str( ), PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
+		throw std::runtime_error( "Error opening cyrpto context" );
+	}
+
+	if( !CryptGenRandom( provider, bytes, (BYTE *)buffer ) ) {
+		CryptReleaseContext( provider, 0 );
+		throw std::runtime_error( "Error generating random data" );
+	}
+
+	if( !CryptReleaseContext( provider, 0 ) ) {
+		throw std::runtime_error( "Error closing cyrpto context" );
+	}
+#endif
 }
 
 } // namespace _Wolframe

@@ -40,7 +40,6 @@ PROVIDER_OBJS = \
 	provider\Authentication.obj \
 	provider\Authorization.obj \
 	provider\Audit.obj \
-	provider\cryptdefs.obj \
 	provider\AAAAproviderImpl.obj \
 	provider\AAAAproviderConfig.obj \
 	provider\DBproviderImpl.obj \
