@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Test1MainWindow</class>
- <widget class="QWidget" name="Test1MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>734</width>
-    <height>524</height>
-   </rect>
-  </property>
+ <class>exit</class>
+ <widget class="QWidget" name="exit">
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -90,13 +82,26 @@
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>29</y>
-     <width>721</width>
-     <height>491</height>
+     <x>10</x>
+     <y>60</y>
+     <width>341</width>
+     <height>381</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="mainAreaLayout"/>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>83</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PushButton</string>
+   </property>
   </widget>
   <action name="actionOpen">
    <property name="icon">

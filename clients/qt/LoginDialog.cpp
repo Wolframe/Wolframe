@@ -22,7 +22,7 @@ void LoginDialog::initialize( )
 	QFormLayout *formLayout = new QFormLayout( );
 	
 	m_mechs = new QComboBox( this );
-	formLayout->addRow( tr( "&Authentication method:" ), m_mechs );		
+    formLayout->addRow( tr( "&Mech:" ), m_mechs );
 	m_username = new QComboBox( this );
 	m_username->setEditable( true );
 	m_password = new QLineEdit( this );

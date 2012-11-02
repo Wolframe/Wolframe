@@ -54,8 +54,6 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secur
 
 	QObject::connect( this, SIGNAL( resultReceived( ) ),
 		this, SLOT( handleResult( ) ) );
-
-    qDebug( ) << "wolframeclient created";
 }
 
 #ifdef WITH_SSL
@@ -126,7 +124,6 @@ WolframeClient::~WolframeClient( )
 
 void WolframeClient::connect( )
 {
-    qDebug( ) << "wolframeclient connect";
 	switch( m_state ) {
 		case Disconnected:
 			if( m_secure ) {
@@ -161,9 +158,7 @@ void WolframeClient::connect( )
 
 void WolframeClient::disconnect( )
 {
-    qDebug( ) << "wolframeclient disconnect";
-
-    m_hasErrors = false;
+	m_hasErrors = false;
 
 	switch( m_state ) {
 		case Disconnected:
