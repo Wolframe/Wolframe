@@ -136,7 +136,16 @@
 %endif
 %endif
 %else
+%if %{rhel}
+%if %{rhel6}
+# No icu-devel on RHEL6 on OSC
+%define with_icu	0
+%else
 %define with_icu	1
+%else
+%define with_icu	1
+%endif
+%endif
 %endif
 
 # build local libxml2 for distributions which have a too old broken version
