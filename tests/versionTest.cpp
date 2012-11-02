@@ -52,17 +52,15 @@ protected:
 	// Set-up work for each test here.
 	VersionFixture()	{
 		srand((unsigned)time(0));
-		major = (unsigned short)( rand() % USHRT_MAX );
-		minor = (unsigned short)( rand() % USHRT_MAX );
-		revision = (unsigned short)( rand() % USHRT_MAX );
-		build = (unsigned)( rand() % UINT_MAX );
-		if ( !build )
-			build++;
+		major = (unsigned short)( rand() % 100 );
+		minor = (unsigned short)( rand() % 100 );
+		revision = (unsigned short)( rand() % 100 );
+		build = (unsigned)( rand() % 100 );
 
 		ver0 = _Wolframe::Version( major, minor, revision, build );
 		ver1 = _Wolframe::Version( major, minor, 0 );
 		ver2 = _Wolframe::Version( major, minor );
-		ver3 = _Wolframe::Version( major * 1000000lu, minor * 10000lu, revision * 100, 0 );
+		ver3 = _Wolframe::Version( major * 1000000lu + minor * 10000lu + revision * 100 + build );
 		sprintf( verStr0, "%d.%d.%d.%u", major, minor, revision, build );
 		sprintf( verStr1, "%d.%d.%d", major, minor, revision );
 		sprintf( verStr2, "%d.%d", major, minor );
@@ -86,6 +84,13 @@ TEST_F( VersionFixture, Members )	{
 	ASSERT_EQ( ver0.Minor(), minor );
 	ASSERT_EQ( ver0.Revision(), revision );
 	ASSERT_EQ( ver0.Build(), build );
+
+	ASSERT_EQ( ver3.Major(), major );
+	ASSERT_EQ( ver3.Minor(), minor );
+	ASSERT_EQ( ver3.Revision(), revision );
+	ASSERT_EQ( ver3.Build(), build );
+
+	ASSERT_TRUE( ver0 == ver3 );
 }
 
 // Tests the Version operators
