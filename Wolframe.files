@@ -168,9 +168,7 @@ clients/qtandroid2/HistoryLineEdit.hpp
 clients/qtandroid2/LoginDialog.cpp
 clients/qtandroid2/LoginDialog.hpp
 clients/qtandroid2/main.cpp
-clients/qtandroid2/mainwindow.cpp
 clients/qtandroid2/MainWindow.cpp
-clients/qtandroid2/mainwindow.h
 clients/qtandroid2/MainWindow.hpp
 clients/qtandroid2/NetworkDataLoader.cpp
 clients/qtandroid2/NetworkDataLoader.hpp
@@ -237,6 +235,10 @@ clients/qt/WolframeClient.cpp
 clients/qt/WolframeClient.hpp
 clients/README
 contrib/create_qtcreator_files.sh
+contrib/FreeBSD/files/patch-boost_interprocess_errors.hpp
+contrib/FreeBSD/files/patch-boost_locale_conversion.hpp
+contrib/FreeBSD/files/patch-boost_locale_date__time__facet.hpp
+contrib/FreeBSD/README
 contrib/osc/boost/debian/README.Debian
 contrib/osc/boost/debian/README.source
 contrib/osc/deploy_boost_to_osc.sh
@@ -329,6 +331,8 @@ examples/configurator/postgres.sql
 examples/configurator/README.txt
 examples/configurator/sqlite.sql
 examples/demo/first/database/schema.sql
+examples/demo/first/database/tree_data.sql
+examples/demo/first/database/tree_schema.sql
 examples/demo/first/tests/treenode.xml
 examples/demo/first/tests/unknown.xml
 examples/demo/first/wolframe.conf
@@ -1820,7 +1824,6 @@ TODO
 windows/Makefile.W32
 windows/Readme.txt
 windows/wolframe.xml
-wolframed.sh
 wtest/cleanInput.cpp
 wtest/GNUmakefile
 wtest/Makefile.W32

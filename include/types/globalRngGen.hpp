@@ -45,11 +45,12 @@ namespace _Wolframe	{
 class GlobalRandomGenerator : public Singleton< GlobalRandomGenerator >
 {
 public:
-	GlobalRandomGenerator( std::string& rndDev );
+	GlobalRandomGenerator();
+	GlobalRandomGenerator( const std::string &rndDev );
 
 	const std::string& device() const	{ return m_device; }
-	unsigned random() const ;
-	void random( unsigned char* buffer, size_t bytes ) const;
+	unsigned random() const;
+	void generate( unsigned char* buffer, size_t bytes ) const;
 
 private:
 	std::string	m_device;		///< random generator device

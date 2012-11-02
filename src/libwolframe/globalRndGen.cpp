@@ -56,8 +56,9 @@ namespace _Wolframe	{
 	#define	DEFAULT_RANDOM_DEVICE	"/dev/urandom";
 #endif
 
-GlobalRandomGenerator::GlobalRandomGenerator( std::string& rndDev )
+GlobalRandomGenerator::GlobalRandomGenerator( const std::string& rndDev )
 {
+	std::cout << "\nGlobal random generator constructed with device '" << rndDev << "'\n";
 	if ( rndDev.empty() )	{
 		m_device = DEFAULT_RANDOM_DEVICE;
 	}
@@ -65,12 +66,18 @@ GlobalRandomGenerator::GlobalRandomGenerator( std::string& rndDev )
 		m_device = rndDev;
 }
 
+GlobalRandomGenerator::GlobalRandomGenerator()
+{
+	std::cout << "\nGlobal random generator constructed with default device";
+	m_device = DEFAULT_RANDOM_DEVICE;
+}
+
 unsigned GlobalRandomGenerator::random() const
 {
 	return 0;
 }
 
-void GlobalRandomGenerator::random( unsigned char* buffer, size_t bytes ) const
+void GlobalRandomGenerator::generate( unsigned char* buffer, size_t bytes ) const
 {
 #ifndef _WIN32
 	int hndl = open( m_device.c_str(), O_RDONLY );

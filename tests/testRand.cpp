@@ -1,59 +1,56 @@
-#include <iostream>
-#include <iomanip>
+/************************************************************************
+
+ Copyright (C) 2011, 2012 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
+//
+//
 
 #include "gtest/gtest.h"
 
-#ifndef _WIN32
-#include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#else
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
-#endif
+#include "types/globalRngGen.hpp"
 
 TEST( Random, Randomness )
 {
 	unsigned char buf[39];
-	
-#ifndef _WIN32
-	ssize_t bytes;
-	
-	int f = open( "/dev/urandom", O_RDONLY );
-	if( f < 0 ) {
-		FAIL( ) << "open /dev/urandom";
-	}
 
-	if( ( bytes = read( f, (void *)buf, 39 ) ) < 0 ) {
-		(void)close( f );
-		FAIL( ) << "read error";
-	}
-	
-	if( bytes != 39 ) {
-		FAIL( ) << "short read, got only " << bytes << " bytes";
-	}
+	_Wolframe::GlobalRandomGenerator::instance( "" );
 
-	(void)close( f );
-#else
-	HCRYPTPROV provider = 0;
+	_Wolframe::GlobalRandomGenerator& rng = _Wolframe::GlobalRandomGenerator::instance();
 
-	if( !CryptAcquireContext( &provider, 0, MS_DEF_PROV, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
-		FAIL( ) << "CryptGenRandom";
-	}
+	rng.generate( buf, 39 );
 
-	if( !CryptGenRandom( provider, 39, static_cast<BYTE *>( buf ) ) ) {
-		CryptReleaseContext( provider, 0 );
-		FAIL( ) << "CryptGenRandom";
-	}
-
-	if( !CryptReleaseContext( provider, 0 ) ) {
-		FAIL( ) << "CryptReleaseContext";
-	}
-#endif
-
-	for( int i = 0; i < 39; i++ ) { 
+	for( int i = 0; i < 39; i++ ) {
 		std::cout 	<< std::hex << std::setfill( '0' ) << std::setw( 2 )
-				<< static_cast<unsigned int>( buf[i] );
+				<< (unsigned int)buf[i];
+//				<< static_cast<unsigned int>( buf[i] );
 	}
 	std::cout << std::endl;
 
