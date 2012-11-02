@@ -37,7 +37,6 @@
 #include <list>
 #include <stdexcept>
 #include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/thread.hpp>
 
 using namespace _Wolframe;
@@ -584,10 +583,10 @@ public:
 				{
 					notifyState( "authorized");
 					state( ProtocolState::INTERFACE);
+					std::ostringstream il;
+					il << "INTERFACE " << m_config.uiform_minindex << "\r\n";
 					m_statearg.reset();
-					m_statearg.append( "INTERFACE ");
-					m_statearg.append( boost::lexical_cast<std::string>(m_config.uiform_minindex));
-					m_statearg.append( "\r\n");
+					m_statearg.append( il.str());
 					return OP_WRITE( m_statearg.ptr(), m_statearg.size());
 				}
 				else if (isequal( arg.ptr[0], "ERR"))
