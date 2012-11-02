@@ -39,7 +39,6 @@
 #include "AAAAproviderImpl.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "config/valueParser.hpp"
-#include "provider/cryptdefs.hpp"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
@@ -171,8 +170,6 @@ bool AAAAconfiguration::parse( const config::ConfigurationTree& pt, const std::s
 			LOG_WARNING << logPrefix() << "unknown configuration option: '"
 				    << L1it->first << "'";
 	}
-	if ( m_randomDevice.empty() )
-		m_randomDevice = DEFAULT_RANDOM_GENERATOR();
 
 	return retVal;
 }

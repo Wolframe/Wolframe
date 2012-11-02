@@ -1,0 +1,11 @@
+/usr/ports/devel/boost-libs
+
+Changes to FreeBSD ports package
+
+Makefile: added 'locale' to 'BOOST_LIBS' variable
+
+added patch for compilation problems in boost-locale in 'files'.
+
+Build with WITH_ICU enabled.
+
+

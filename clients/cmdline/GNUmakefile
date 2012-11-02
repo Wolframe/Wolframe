@@ -55,11 +55,13 @@ local_uninstall:
 
 local_test:
 
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/clients/lib"
+
 run:
-	@./wolframec 127.0.0.1 7661
+	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./wolframec 127.0.0.1 7661
 
 runssl:
-	@./wolframec -S --CA-cert-file=certs/CAclient.cert.pem \
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./wolframec -S --CA-cert-file=certs/CAclient.cert.pem \
 		--client-cert-file=certs/client.crt \
 		--client-cert-key=private/client.key \
 		127.0.0.1 7961

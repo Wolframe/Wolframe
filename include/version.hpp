@@ -80,7 +80,13 @@ public:
 	std::string toString() const;
 
 	/// \brief Print the version using custom format.
+	/// \param	format	the format string
 	std::string toString( const char* format ) const;
+
+	/// \brief Output the version as an unsigned long
+	/// The format of the output is MMmmrrbb
+	/// \note All numbers (major, minor...) will be cut to the 2 most significant decimal digits
+	unsigned long toNumber() const;
 };
 
 } // namespace _Wolframe

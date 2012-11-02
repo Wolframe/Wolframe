@@ -144,4 +144,35 @@ std::string Version::toString( const char* format ) const
 	return o.str();
 }
 
+
+unsigned long Version::toNumber() const
+{
+	unsigned	bld = 0;
+	unsigned short	rev = 0;
+	unsigned short	mnr = 0;
+	unsigned short	mjr = 0;
+
+	if ( m_hasBuild )	{
+		bld = m_build;
+		while( bld > 100 )
+			bld /= 10;
+	}
+
+	if ( m_hasRevision )	{
+		rev = m_revision;
+		while( rev > 100 )
+			rev /= 10;
+	}
+
+	mnr = m_minor;
+	while( mnr > 100 )
+		mnr /= 10;
+
+	mjr = m_major;
+	while( mjr > 100 )
+		mjr /= 10;
+
+	return bld + rev * 100 + mnr * 10000 + mjr * 1000000;
+}
+
 } // namespace _Wolframe

@@ -101,7 +101,7 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 		throw std::runtime_error( errMsg );
 	}
 	else if ( rndPart < (int)CRAM_CHALLENGE_SIZE - (int)SHA256_DIGEST_SIZE )	{
-		std::string errMsg = "Not enough bytes in '" + randomDevice + "' ?!?";
+		std::string errMsg = "Not enough entropy in '" + randomDevice + "'";
 		throw std::logic_error( errMsg );
 	}
 

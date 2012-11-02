@@ -128,6 +128,7 @@
 # icu for boost-locale is available natively only on a few platforms,
 # enable it there. If we build our own boost, try hard to enable ICU
 # everywhere
+%define with_icu	0
 %if !%{build_boost}
 %define with_icu	0
 %if %{fedora}
@@ -136,7 +137,16 @@
 %endif
 %endif
 %else
+%if %{rhel}
+%if %{rhel6}
+# No icu-devel on RHEL6 on OSC
+%define with_icu	0
+%else
 %define with_icu	1
+%else
+%define with_icu	1
+%endif
+%endif
 %endif
 
 # build local libxml2 for distributions which have a too old broken version
@@ -779,10 +789,12 @@ fi
 %{_libdir}/wolframe/modules/mod_filter_token.so
 %{_libdir}/wolframe/modules/mod_filter_blob.so
 
+%{_libdir}/wolframe/modules/mod_command_directmap.so
+
 %if %{with_lua}
 %{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
 %{_libdir}/wolframe/modules/mod_lua_datetime.so
-%{_libdir}/wolframe/modules/mod_lua_command_handler.so
+%{_libdir}/wolframe/modules/mod_command_lua.so
 %endif
 
 %{_libdir}/wolframe/modules/mod_normalize_number.so
@@ -815,6 +827,8 @@ fi
 %{_libdir}/wolframe/libwolframe_prnt.a
 %{_libdir}/wolframe/libwolframe_functions.so
 %{_libdir}/wolframe/libwolframe_functions.a
+%{_libdir}/wolframe/libwolframe_client.so
+%{_libdir}/wolframe/libwolframe_client.a
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so
 %{_libdir}/wolframe/liblua.a
@@ -939,7 +953,14 @@ fi
 %if !%{sles}
 %dir %{_bindir}
 %endif
+# will disappear
 %{_bindir}/wolfcli
+%if !%{sles}
+%dir %{_libdir}/wolframe/
+%endif
+%{_libdir}/wolframe/libwolframe_client.so.0.0.0
+%{_libdir}/wolframe/libwolframe_client.so.0
+%{_bindir}/wolframec
 
 %if %{with_qt}
 %files qtclient
