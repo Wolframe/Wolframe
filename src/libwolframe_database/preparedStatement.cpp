@@ -103,9 +103,13 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 	for (; ci != ce; ++ci)
 	{
 		if (!start( ci->name())) return false;
+
 		if (cmdres.functionidx() != ci->functionidx())
 		{
-			if (cmdres.functionidx() != null_functionidx)
+			// When we get to the next group of functions with the same id
+			// we add the result if there exist one of the previous
+			// function group as last result (to be referenced by $1,$2,etc.).
+			if (cmdres.functionidx() != null_functionidx && cmdres.nofColumns())
 			{
 				output.addCommandResult( cmdres);
 			}
@@ -118,7 +122,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		{
 			// ... command has result reference, then we call it for every result row
 			TransactionOutput::result_iterator ri = output.last();
-			if (ri->functionidx() == ci->functionidx() -1)
+			if (ri != output.end())
 			{
 				TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
 				for (; wi != we; ++wi)

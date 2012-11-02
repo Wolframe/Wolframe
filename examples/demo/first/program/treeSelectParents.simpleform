@@ -1,0 +1,5 @@
+!DOCTYPE treeSelectParents
+node
+{
+	id int
+}

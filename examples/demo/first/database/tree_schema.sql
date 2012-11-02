@@ -7,12 +7,12 @@
 --       UNIQUE constraint must be dropped
 -- Joe Celko example from http://www.ibase.ru/devinfo/DBMSTrees/sqltrees.html
 
-CREATE TABLE tree	(
-	ID		SERIAL	PRIMARY KEY,
-	parent		INT	REFERENCES tree( ID ),
-	name		TEXT,
-	lft		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( lft > 0 ),
-	rgt		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( rgt > 1 ),
-	CONSTRAINT order_check CHECK ( rgt > lft )
+CREATE TABLE tree (
+ ID SERIAL PRIMARY KEY,
+ parent INT REFERENCES tree( ID ),
+ name TEXT,
+ lft INT NOT NULL UNIQUE DEFERRABLE CHECK ( lft > 0 ),
+ rgt INT NOT NULL UNIQUE DEFERRABLE CHECK ( rgt > 1 ),
+ CONSTRAINT order_check CHECK ( rgt > lft )
 );
 

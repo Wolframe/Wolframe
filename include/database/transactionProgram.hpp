@@ -37,6 +37,7 @@
 #include "types/countedReference.hpp"
 #include "types/keymap.hpp"
 #include "database/transactionFunction.hpp"
+#include "utils/miscUtils.hpp"
 #include <string>
 #include <map>
 #include <cstdlib>
@@ -86,6 +87,11 @@ public:
 	const TransactionFunction* function( const std::string& name) const;
 
 private:
+	char gotoNextToken( std::string::const_iterator& si, const std::string::const_iterator se);
+	char parseNextToken( std::string& tok, std::string::const_iterator& si, std::string::const_iterator se);
+
+private:
+	static const utils::CharTable m_optab;
 	types::keymap<TransactionFunctionR> m_functionmap;
 	std::string m_commentopr;
 };

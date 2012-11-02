@@ -196,7 +196,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					m_normprogram.addConstructor( constructor);
-					LOG_TRACE << "'" << constructor->objectClassName() << "' normalize function constructor for domain \"*." << constructor->domain() << "registered";
+					LOG_TRACE << "'" << constructor->objectClassName() << "' normalize function constructor for domain " << constructor->domain() << " registered";
 				}
 				break;
 			}

@@ -485,7 +485,10 @@ public:
 		struct OP_CLOSE :public ConnectionHandler::Operation
 		{OP_CLOSE() :ConnectionHandler::Operation( ConnectionHandler::Operation::CLOSE){}};
 
-		for (;;) switch (state())
+		for (;;)
+		{
+/*[-]*/		std::cerr << "STATE " << ProtocolState::name(state()) << std::endl;
+		switch (state())
 		{
 			case ProtocolState::INIT:
 				state( ProtocolState::BANNER);
@@ -798,6 +801,7 @@ public:
 
 			case ProtocolState::CLOSED:
 				return OP_CLOSE();
+		}
 		}
 	}
 

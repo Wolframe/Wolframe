@@ -1,0 +1,4 @@
+treeSelectParents = treeSelectParents( xml );
+treeSelectChildren = treeSelectChildren( xml );
+treeAddNode = treeAddNode( xml );
+treeDeleteSubtree = treeDeleteSubtree( xml );

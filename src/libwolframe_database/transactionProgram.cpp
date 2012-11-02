@@ -70,7 +70,7 @@ static std::size_t lineCount( std::string::const_iterator si, std::string::const
 	return rt;
 }
 
-static const utils::CharTable g_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
+const utils::CharTable TransactionProgram::m_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
 
 void TransactionProgram::loadfile( const std::string& filename, std::string& dbsource)
 {
@@ -89,11 +89,46 @@ bool TransactionProgram::is_mine( const std::string& filename) const
 	return boost::algorithm::to_lower_copy( utils::getFileExtension( filename)) == ".tdl";
 }
 
+char TransactionProgram::gotoNextToken( std::string::const_iterator& si, const std::string::const_iterator se)
+{
+	char ch;
+	while ((ch = utils::gotoNextToken( si, se)) != 0)
+	{
+		if (ch == m_commentopr[0])
+		{
+			std::string::const_iterator ti = si;
+			std::string::const_iterator ci = m_commentopr.begin()+1, ce = m_commentopr.end();
+			while (ci != ce && ti != se && *ci == *ti)
+			{
+				ci++;
+				ti++;
+			}
+			if (ci == ce)
+			{
+				// skip to end of line
+				while (ti != se && *ti != '\n') ++si;
+				si = ti;
+				continue;
+			}
+		}
+		break;
+	}
+	return ch;
+}
+
+char TransactionProgram::parseNextToken( std::string& tok, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	char ch = gotoNextToken( si, se);
+	if (!ch) return 0;
+	return utils::parseNextToken( tok, si, se, m_optab);
+}
+
 void TransactionProgram::load( const std::string& source, std::string& dbsource)
 {
 	char ch;
 	std::string tok;
 	std::string::const_iterator si = source.begin(), se = source.end();
+	std::string::const_iterator tokstart;
 	std::string::const_iterator dbi = source.begin();
 	std::vector<std::vector< TransactionDescription> > tdar;
 	std::vector<std::string> tdnamear;
@@ -105,36 +140,20 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 
 	try
 	{
-		while ((ch = utils::gotoNextToken( si, se)) != 0)
+		while ((ch = gotoNextToken( si, se)) != 0)
 		{
-			std::string::const_iterator tokstart = si;
-			ch = utils::parseNextToken( tok, si, se, g_optab);
-			if (ch == m_commentopr[0])
-			{
-				std::string::const_iterator ci = m_commentopr.begin()+1, ce = m_commentopr.end();
-				while (ci != ce && si != se && *ci == *si)
-				{
-					ci++;
-					si++;
-				}
-				if (ci == ce)
-				{
-					// skip to end of line
-					while (si != se && *si != '\n') ++si;
-				}
-			}
-			else if ((ch|32) == 't'
-				&& boost::algorithm::iequals( tok, "TRANSACTION")
-				&& isLineStart( tokstart, source))
+			tokstart = si;
+			ch = parseNextToken( tok, si, se);
+			if (boost::algorithm::iequals( tok, "TRANSACTION") && isLineStart( tokstart, source))
 			{
 				std::string::const_iterator dbe = lineStart( tokstart, source);
 				tstartar.push_back( dbe);
 				dbsource.append( std::string( dbi, dbe));
 				dbi = dbe;
 
-				ch = utils::parseNextToken( tok, si, se, g_optab);
+				ch = parseNextToken( tok, si, se);
 				if (!ch) throw ERROR( si, MSG << "unexpected end of transaction definition (transaction name expected)");
-				if (g_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
+				if (m_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
 
 				tdnamear.push_back( tok);
 				tdsrcar.push_back( std::vector<std::string::const_iterator>());
@@ -143,12 +162,12 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 				TransactionDescription desc;
 				unsigned int mask = 0;
 
-				ch = utils::parseNextToken( tok, si, se, g_optab);
+				ch = parseNextToken( tok, si, se);
 				if (!boost::algorithm::iequals( tok, "BEGIN"))
 				{
 					throw ERROR( si, "BEGIN (transaction) expected");
 				}
-				while ((ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
+				while ((ch = parseNextToken( tok, si, se)) != 0)
 				{
 					if (tdsrcar.back().size() <= tdar.back().size())
 					{
@@ -163,7 +182,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 							mask = 0;
 						}
 					}
-					else if (g_optab[ch])
+					else if (m_optab[ch])
 					{
 						throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of operator '" << ch << "'");
 					}
@@ -207,7 +226,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 
 						int st = 0;
 						std::string::const_iterator fcallstart = si;
-						while (st < 3 && (ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
+						while (st < 3 && (ch = parseNextToken( tok, si, se)) != 0)
 						{
 							if (!ch)
 							{
@@ -216,7 +235,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 							switch (st)
 							{
 								case 0:
-									if (g_optab[ch] || ch == '\'' || ch == '\"')
+									if (m_optab[ch] || ch == '\'' || ch == '\"')
 									{
 										throw ERROR( si, MSG << "function call identifier expected after DO instead of operator or string '" << ch << "'");
 									}

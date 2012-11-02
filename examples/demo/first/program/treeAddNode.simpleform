@@ -1,0 +1,6 @@
+!DOCTYPE treeAddNode
+node
+{
+	parentid int
+	name name
+}
