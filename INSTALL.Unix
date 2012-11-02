@@ -495,6 +495,9 @@ Optional packages: qt4-gui (4.7.4), qt4-moc (4.7.4), qt4-network (4.7.4),
                    sqlite3 (3.7.9), postgresql (9.1.2), libxml2 (2.7.8_1),
                    libxslt (1.1.26_3), png (1.4.8), zlib (1.1.0)
 
+If you need boost with ICU support, compile your own boost from the
+ports tree. Change the 'Makefile' and add 'locale' to 'BOOST_LIBS'.
+
 You need 'gmake' (3.82).
 
 So far no PAM support.
