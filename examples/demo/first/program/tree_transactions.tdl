@@ -1,0 +1,60 @@
+PREPARE tree_get_parentRgt AS SELECT rgt FROM tree WHERE ID = ?1;
+PREPARE tree_insert_node AS INSERT INTO tree (parent, name, parentRgt) VALUES (?1, ?2, ?3, ?3+1);
+PREPARE tree_insert_node_update_lft
+
+TRANSACTION tree_addNodeToParent -- (/node/parentID, /node/name)
+	FOREACH /node DO get_parentRgt( parentID);
+	UPDATE tree SET lft = lft + 2 WHERE lft > $1;
+	UPDATE tree SET rgt = rgt + 2 WHERE rgt >= $1;
+
+	FOREACH /node DO tree_insert_node( parentID, name, $1);
+END
+
+
+-- tree_select_margin( topNodeID) /return leftMargin,rightMargin,width
+PREPARE tree_select_margin AS SELECT lft,rgt,width=rgt-lft+1 FROM tree WHERE ID = ?1;
+
+-- tree_delete_lft_range( leftMargin, rightMargin)
+PREPARE tree_delete_lft_range AS DELETE FROM tree WHERE lft >= ?1 AND lft <= ?2;
+
+-- tree_delete_update_lft( rightMargin, width)
+PREPARE tree_delete_update_lft AS UPDATE tree SET lft = lft-?2 WHERE lft>?1;
+
+-- tree_delete_update_rgt( rightMargin, width)
+PREPARE tree_delete_update_rgt AS UPDATE tree SET rgt = rgt-?2 WHERE rgt>?1;
+
+TRANSACTION tree_deleteSubtree -- ( /node/id)
+	FOREACH /node DO tree_select_margin( id);	--[leftMargin,rightMargin,width]
+	DO tree_delete_lft_range( $1, $2 );
+	DO tree_delete_update_lft( $2, $3 );
+	DO tree_delete_update_rgt( $2, $3 );
+END
+
+-- Get the node and its parents
+PREPARE tree_selectNodeAndParentsByName AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = ?;
+TRANSACTION tree_selectNodeAndParentsByName -- (/node/name)
+	FOREACH /node DO tree_selectNodeAndParentsByName( name) INTO /node;
+END
+
+-- Get the node and its parents
+PREPARE tree_selectParentsByName AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = ?;
+TRANSACTION tree_selectParentsByName -- (/node/name)
+	FOREACH /node DO tree_selectParentsByName( name) INTO /node;
+END
+
+-- Get the node and its children
+PREPARE tree_selectNodeAndChildrenByName AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = ?;
+TRANSACTION tree_selectNodeAndChildrenByName -- (/node/name)
+	FOREACH /node DO tree_selectNodeAndChildrenByName( name) INTO /node;
+END
+
+PREPARE tree_selectChildrenByName AS SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = ?;
+TRANSACTION tree_selectChildrenByName -- (/node/name)
+	FOREACH /node DO tree_selectChildrenByName( name) INTO /node;
+END
+
+PREPARE tree_selectNodeWithLevels AS SELECT count(P2.*) AS level, P1.ID, P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt GROUP BY P1.name ORDER BY level ASC;
+TRANSACTION tree_selectNodeWithLevels
+	DO tree_selectNodeWithLevels() INTO /node;
+END
+

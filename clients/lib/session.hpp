@@ -37,7 +37,6 @@
 #include "connection.hpp"
 #include "protocol.hpp"
 #include <string>
-#include <boost/thread.hpp>
 
 namespace _Wolframe {
 namespace client {
