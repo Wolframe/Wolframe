@@ -76,6 +76,12 @@ struct keymap
 		Parent::operator[](key) = value;
 	}
 
+	void insert( const keymap& m)
+	{
+		typename Parent::const_iterator ki = m.begin(), ke = m.end();
+		for (; ki != ke; ++ki) insert( ki->first, ki->second);
+	}
+
 	template <class KeyList>
 	typename boost::enable_if_c<
 		boost::is_convertible<typename KeyList::const_iterator::value_type, keystring>::value

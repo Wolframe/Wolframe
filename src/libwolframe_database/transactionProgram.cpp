@@ -70,7 +70,7 @@ static std::size_t lineCount( std::string::const_iterator si, std::string::const
 	return rt;
 }
 
-const utils::CharTable TransactionProgram::m_optab( ";:-,.=)(<>[]/&%*|+-#?!$");
+const utils::CharTable TransactionProgram::m_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
 
 void TransactionProgram::loadfile( const std::string& filename, std::string& dbsource)
 {
@@ -123,6 +123,86 @@ char TransactionProgram::parseNextToken( std::string& tok, std::string::const_it
 	return utils::parseNextToken( tok, si, se, m_optab);
 }
 
+bool TransactionProgram::isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se)
+{
+	if (si == se) return false;
+	std::string tok;
+	char ch = utils::gotoNextToken( si, se);
+	if (ch == '"' || ch == '(' || ch == '[' || ch == '{') return true;
+	if (!ch) return false;
+	ch = utils::parseNextToken( tok, si, se, m_optab);
+	if (!m_optab[ ch])
+	{
+		ch = utils::gotoNextToken( si, se);
+		if (ch == '(') return false;
+		return true;
+	}
+	return false;
+}
+
+std::string TransactionProgram::parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& si, std::string::const_iterator se)
+{
+	std::string stmname;
+	stmname.append( "__");
+	stmname.append( funcname);
+	stmname.append( "_");
+	stmname.append( boost::lexical_cast<std::string>( index));
+
+	std::string tok;
+	int bcnt = 1;
+	char sb = *si;
+	char eb;
+	if (sb == '[')
+	{
+		eb = ']';
+		++si;
+	}
+	else if (sb == '(')
+	{
+		eb = ')';
+		++si;
+	}
+	else if (sb == '{')
+	{
+		eb = '}';
+		++si;
+	}
+	else if (sb == '"')
+	{
+		eb = '"';
+		++si;
+	}
+	else
+	{
+		eb = ';';
+	}
+	std::string::const_iterator start = si;
+	char ch = utils::parseNextToken( tok, si, se, m_optab);
+	for (; si != se && ch; ch = utils::parseNextToken( tok, si, se, m_optab))
+	{
+		if (ch == eb)
+		{
+			bcnt -= 1;
+		}
+		else if (ch == sb)
+		{
+			bcnt += 1;
+		}
+		if (bcnt == 0) break;
+	}
+	if (bcnt)
+	{
+		throw std::runtime_error( std::string( "unterminated embedded command ") + sb + "..." + eb);
+	}
+	std::string stm( start, si);
+	if (eb == ';')
+	{
+		--si;
+	}
+	m_embeddedStatementMap.insert( stmname, stm);
+	return stmname;
+}
+
 void TransactionProgram::load( const std::string& source, std::string& dbsource)
 {
 	char ch;
@@ -150,12 +230,14 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 				tstartar.push_back( dbe);
 				dbsource.append( std::string( dbi, dbe));
 				dbi = dbe;
+				std::string transactionName;
+				int embstm_index = 0;
 
-				ch = parseNextToken( tok, si, se);
+				ch = parseNextToken( transactionName, si, se);
 				if (!ch) throw ERROR( si, MSG << "unexpected end of transaction definition (transaction name expected)");
 				if (m_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
 
-				tdnamear.push_back( tok);
+				tdnamear.push_back( transactionName);
 				tdsrcar.push_back( std::vector<std::string::const_iterator>());
 				tdar.push_back( std::vector<TransactionDescription>());
 
@@ -224,8 +306,16 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						}
 						mask |= (1 << (unsigned)TransactionDescription::Call);
 
-						int st = 0;
+						int st = 0; // parse state
 						std::string::const_iterator fcallstart = si;
+
+						if (isEmbeddedStatement( si, se))
+						{
+							desc.call.append( parseEmbeddedStatement( transactionName, embstm_index, si, se));
+							if (*si == ';') desc.call.append("()");
+							st = 1; //... function identifier parsed
+						}
+						ch = gotoNextToken( si, se);
 						while (st < 3 && (ch = parseNextToken( tok, si, se)) != 0)
 						{
 							if (!ch)
@@ -260,7 +350,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 									continue;
 							}
 						}
-						desc.call = std::string( fcallstart, si);
+						desc.call.append( std::string( fcallstart, si));
 					}
 					else
 					{

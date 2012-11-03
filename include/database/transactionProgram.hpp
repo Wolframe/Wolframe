@@ -86,13 +86,21 @@ public:
 	///\brief Get a loaded function by name
 	const TransactionFunction* function( const std::string& name) const;
 
+	const types::keymap<std::string>& embeddedStatementMap() const
+	{
+		return m_embeddedStatementMap;
+	}
+
 private:
 	char gotoNextToken( std::string::const_iterator& si, const std::string::const_iterator se);
 	char parseNextToken( std::string& tok, std::string::const_iterator& si, std::string::const_iterator se);
+	std::string parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& si, std::string::const_iterator se);
+	bool isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se);
 
 private:
 	static const utils::CharTable m_optab;
 	types::keymap<TransactionFunctionR> m_functionmap;
+	types::keymap<std::string> m_embeddedStatementMap;
 	std::string m_commentopr;
 };
 

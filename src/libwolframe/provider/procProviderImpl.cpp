@@ -339,6 +339,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 				{
 					std::string dbsrc;
 					m_dbprogram.loadfile( *pi, dbsrc);
+					m_db->addStatements( m_dbprogram.embeddedStatementMap());
 					m_db->addProgram( dbsrc);
 				}
 				catch (const std::runtime_error& err)

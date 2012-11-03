@@ -200,6 +200,12 @@ public:
 		return m_program.statementmap();
 	}
 
+	///\brief Add a set of named statements to the sqlite program
+	virtual void addStatements( const types::keymap<std::string>& stmmap_)
+	{
+		m_program.addStatements( stmmap_);
+	}
+
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;
