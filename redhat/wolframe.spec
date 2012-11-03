@@ -65,16 +65,22 @@
 %endif
 
 %define suse 0
+%define osu114 0
+%define osu121 0
+%define osu122 0
 %if 0%{?suse_version} == 1140
 %define dist osu114
+%define osu114 1
 %define suse 1
 %endif
 %if 0%{?suse_version} == 1210
 %define dist osu121
+%define osu121 1
 %define suse 1
 %endif
 %if 0%{?suse_version} >= 1220
 %define dist osu122
+%define osu122 1
 %define suse 1
 %endif
 
@@ -147,15 +153,18 @@
 %define with_icu	1
 %endif
 %endif
-%else
+%if %{suse}
+%if %{osu122}
+%define with_icu	1
+%endif
+%endif
+
+%if %{build_boost}
+%define with_icu	1
 %if %{rhel}
 %if %{rhel6}
-# No icu-devel on RHEL6 on OSC
+# No icu-devel on RHEL6 on OSC due to license issues from Redhat!
 %define with_icu	0
-%else
-%define with_icu	1
-%else
-%define with_icu	1
 %endif
 %endif
 %endif
