@@ -27,9 +27,6 @@ output="../data/$testname.$cset.tst"
 rm -f $output
 echo "Writing test file $output"
 echo '**' >> $output
-if [ `echo $cset | grep -c '4'` != "0" ]; then
-	echo '**requires:DISABLED NETBSD' >> $output
-fi
 if [ `echo $testname | grep -c 'lua_'` != "0" ]; then
 	echo '**requires:LUA' >> $output
 fi

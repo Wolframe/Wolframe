@@ -590,6 +590,7 @@ Those are other unsuccessful builds on Solaris 10, mainly due to
 too old C++ compilers or boost.
 
 OpenBSD has only boost 1.42, which is too old.
+NetBSD has an old boost 1.47.
 
 OpenBSD 5.1
 -----------

@@ -1,6 +1,6 @@
 **
 **requires:LUA
-**requires:DISABLED NETBSD OPENBSD FREEBSD SUNOS
+**requires:DISABLED FREEBSD SUNOS
 **input
 2005-04-01 67 +
 1968-11-18 8975 +
