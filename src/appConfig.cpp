@@ -41,7 +41,6 @@
 #include "standardConfigs.hpp"		// fuck-up - idiotic interaction with ...
 #include "logger-v1.hpp"
 
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "utils/miscUtils.hpp"
 

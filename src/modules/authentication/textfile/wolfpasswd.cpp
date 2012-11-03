@@ -35,7 +35,6 @@
 //
 
 #include <boost/program_options.hpp>
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "utils/miscUtils.hpp"
 

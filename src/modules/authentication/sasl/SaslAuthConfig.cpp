@@ -41,7 +41,6 @@
 #include "SaslAuth.hpp"
 
 #include "boost/algorithm/string.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe::utils;

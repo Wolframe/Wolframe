@@ -33,7 +33,6 @@
 ///\file wtest/testModules.cpp
 ///\brief Implements a function to get list of modules available for a test program
 #include "wtest/testModules.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;

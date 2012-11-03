@@ -43,7 +43,6 @@ Project Wolframe.
 #include <boost/thread/thread.hpp>
 #include <boost/algorithm/string.hpp>
 #include <stdexcept>
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;

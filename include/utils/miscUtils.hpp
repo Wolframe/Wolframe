@@ -152,11 +152,4 @@ std::string getFileType( const std::string& filename);
 
 }} //namespace _Wolframe::utils
 
-/// Temporary, till libboost 1.42 support goes away
-#include <boost/version.hpp>
-#if BOOST_VERSION < 104300
-#define is_absolute is_complete
-#define absolute complete
-#endif
-
 #endif // _MISC_UTILS_HPP_INCLUDED

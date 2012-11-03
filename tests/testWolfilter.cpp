@@ -42,7 +42,6 @@
 #include "processor/procProvider.hpp"
 #include "prnt/pdfPrinter.hpp"
 
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/thread.hpp>
