@@ -342,7 +342,7 @@ void MainWindow::loadTheme( QString theme )
 // set stylesheet of the application (has impact on the whole application)
 	QFile qss( themesFolder + QLatin1String( "MainWindow.qss" ) );
 #ifdef Q_OS_ANDROID
-	qApp->setStyleSheet( QFileInfo( qss ) );
+	qApp->setStyleSheet( QFileInfo( qss ).filePath( ) );
 #else
 	qApp->setStyleSheet( QLatin1String( "file:///" ) + QFileInfo( qss ).absoluteFilePath( ) );
 #endif
