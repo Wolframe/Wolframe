@@ -1,7 +1,12 @@
-Necessitas
-----------
+Requirements
+------------
 
-alpha 4.1
+- Necessitas, alpha 4.1
+
+Build instructions
+------------------
+
+Open 'qtclient.pro' in Necessitas. Build, deploy and run there.
 
 Emulator instructions
 ---------------------
@@ -12,5 +17,6 @@ wget 'http://files.kde.org/necessitas/installer/release/Ministro%20II.apk'
 /opt/necessitas/android-sdk/platform-tools/adb install MinstroConfigurationTool\ II.apk
 start the ministro configuration tool
 
-ministro leads to screenshot1 or a black screen
-deploying local qt files leads to screenshot2
+Somehow the GUI looks distorted that way.
+
+Use the 'install local Qt library' option once on the emulator.
