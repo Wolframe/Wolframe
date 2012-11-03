@@ -40,24 +40,6 @@ namespace types {
 namespace traits {
 
 template<typename T>
-struct has_pre_increment
-{
-	typedef char small_type;
-	struct large_type {small_type dummy[2];};
-
-	template<T& (T::*)()> struct tester_member_signature;
-
-	template<typename U>
-	static small_type has_matching_member(tester_member_signature<&U::operator++>*);
-	template<typename U>
-	static large_type has_matching_member(...);
-
-	///\brief value with the boolean property corresponding
-	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
-};
-
-
-template<typename T>
 struct is_back_insertion_sequence
 {
 	typedef char small_type;

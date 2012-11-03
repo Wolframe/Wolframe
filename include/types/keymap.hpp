@@ -79,7 +79,7 @@ struct keymap
 	template <class KeyList>
 	typename boost::enable_if_c<
 		boost::is_convertible<typename KeyList::const_iterator::value_type, keystring>::value
-		&& types::traits::has_pre_increment<typename KeyList::const_iterator>::value
+		&& boost::has_pre_increment<typename KeyList::const_iterator>::value
 		&& boost::has_dereference<typename KeyList::const_iterator>::value
 		,void>::type
 	insert( const KeyList& keylist, const ValueType& value)
