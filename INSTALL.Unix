@@ -544,6 +544,10 @@ Solaris 10
 Solaris 10 (CSW toolchain)
 --------------------------
 
+You may have to install a SFWgtar or CSWgtar in order to unpack the
+sources. Make sure to rename them to 'gtar' to avoid collisions with
+the standard SUN 'tar'!
+
 http://www.opencsw.org
 
 pkgadd -d http://get.opencsw.org/now
@@ -555,15 +559,27 @@ Make sure the build environment is always set as follows:
 PATH=/opt/csw/bin:/usr/ccs/bin:/usr/bin:/bin:/opt/csw/sbin:/usr/sbin:/sbin
 export PATH
 
-Boost is too old (CSWboostdevel is 1.33)
-and has to be compiled from scratch, use the lastest version (1.48.0).
+Boost is too old (CSWboostdevel is 1.33) or it has no ICU locale
+support (CSWboost-gcc-dev, 1.49).
+It has to be compiled from scratch, use the version 1.48.0.
 
 Do not use boost 1.49.0, it has a missing function fchmodat, see
 http://lists.boost.org/boost-build/2012/02/25680.php
 causing building of libboost_filesystem to fail!
 
+Boost 1.50.0 and 1.51.0 have never been tested with Wolframe, so don't
+use those!
+
+Optional packages to install from CSW for boost (if boost-locale should
+have ICU support):
+  libicu_dev (4.8.1)
+  libiconv_dev (1.14), as fallback backend for boost-locale
+
+Make sure you DON'T compile against SUNWicud!
+
 First apply the following patch to 'boost/cstdint.ppp' for boost
-(https://svn.boost.org/trac/boost/ticket/6158):
+(https://svn.boost.org/trac/boost/ticket/6158, see also
+'contrib/Solaris/' for patch files):
 
 ...
 namespace boost
@@ -579,15 +595,19 @@ namespace boost
 Patch the correct architecture (V8 is not really supported, but V8
 is also very old) in 'tools/build/v2/user-config.jam':
 
-using gcc : 4.6.2 : g++ : <compileflags>-mcpu=v9 ; 
+using gcc : 4.6.3 : g++ : <compileflags>-mcpu=v9 ; 
+
+Apply all compilation patches from 'contrib/Solaris/' now.
 
 Build and install normally:
 
 ./bootstrap.sh --prefix=/opt/csw/boost-1.48.0 \
-	--with-libraries=thread,filesystem,system,program_options,date_time
-./b2 -d2 install
+	--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale \
+	--with-icu=/opt/csw
 
-Optional packages to install from CSW:
+./b2 -a -sICU_PATH=/opt/csw -sICONV_PATH=/opt/csw -d2 install
+
+Optional packages to install from CSW for Wolframe:
   libssl_dev (0.9.8t)
   CSWpostgresql (8.3.1)
   CSWexpect (5.41.1)

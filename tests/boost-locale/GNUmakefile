@@ -12,7 +12,8 @@ INCLUDE_DIRS = \
 	-I$(TOPDIR)/gtest/include
 
 INCLUDE_LDFLAGS = \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	$(ICU_LIB_DIRS)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)/gtest/gtest-all.o \

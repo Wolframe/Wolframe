@@ -1,0 +1,14 @@
+--- boost_1_48_0/boost/cstdint.hpp.orig	Sat Nov  3 15:28:32 2012
++++ boost_1_48_0/boost/cstdint.hpp	Sat Nov  3 15:29:10 2012
+@@ -100,7 +100,11 @@
+ namespace boost
+ {
+ 
++#if defined(sun) || defined(__sun)
++  typedef signed char int8_t;
++#else
+   using ::int8_t;             
++#endif
+   using ::int_least8_t;       
+   using ::int_fast8_t;        
+   using ::uint8_t;            
