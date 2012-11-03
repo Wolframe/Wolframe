@@ -166,48 +166,6 @@ endif
 
 # end of gcc section
 
-# start of icc section
-
-# currently we don't need this, the icc flags are fairly consistent
-#ICC_MAJOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --icc-major-version $(CC) "$(CURDIR)" $(TOPDIR))
-#ICC_MINOR_VERSION ?=	$(shell $(TOPDIR)/makefiles/gmake/guess_env --icc-minor-version $(CC) "$(CURDIR)" $(TOPDIR))
-
-# -vec-report0: turn of SSE2 vector usage messages (they are common since P-4 anyway!)
-
-ifeq "$(COMPILER)" "icc"
-COMPILE_FLAGS = \
-	-Wall -Werror -w1 -vec-report0
-endif
-
-# end of icc section
-
-# start of spro section
-
-# -xc99=all: full C99 compliance for the code (syntax and library functions)
-# -mt: enable mutlithreading (-D_REENTRANT for header files, -lthread for ld)
-# -errwarn=%all: convert all warnings to errors
-
-ifeq "$(COMPILER)" "spro"
-
-CC=CC
-CXX=CC
-
-STD99_COMPILE_FLAGS = \
-	-xc99=all
-
-COMMON_COMPILE_FLAGS = \
-	-errwarn=%all -mt
-
-COMPILE_FLAGS = \
-	$(STD99_COMPILE_FLAGS) $(COMMON_COMPILE_FLAGS)
-
-CXX_COMPILE_FLAGS = \
-	$(COMMON_COMPILE_FLAGS)
-
-endif
-
-# end of spro section
-
 # set flags for threading support using POSIX threads. This is completly different
 # between compiler/platforms
 ifeq "$(COMPILER)" "gcc"
@@ -226,18 +184,6 @@ PTHREADS_CFLAGS = -D_REENTRANT -pthread
 PTHREADS_LDFLAGS = -pthread
 PTHREADS_LIBS =
 endif
-ifeq "$(PLATFORM)" "NETBSD"
-PTHREADS_CFLAGS = -D_REENTRANT -pthread
-PTHREADS_LDFLAGS = -pthread
-PTHREADS_LIBS =
-endif
-ifeq "$(COMPILER)" "icc"
-ifeq "$(PLATFORM)" "LINUX"
-PTHREADS_CFLAGS = -D_REENTRANT -pthread
-PTHREADS_LDFLAGS = -pthread
-PTHREADS_LIBS =
-endif
-endif
 
 endif
 
@@ -251,12 +197,6 @@ ifeq "$(PLATFORM)" "SUNOS"
 SO_COMPILE_FLAGS = -fPIC
 endif
 ifeq "$(PLATFORM)" "FREEBSD"
-SO_COMPILE_FLAGS = -fPIC
-endif
-endif
-
-ifeq "$(COMPILER)" "icc"
-ifeq "$(PLATFORM)" "LINUX"
 SO_COMPILE_FLAGS = -fPIC
 endif
 endif

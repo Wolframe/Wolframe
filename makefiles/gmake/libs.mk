@@ -29,9 +29,6 @@ ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(COMPILER)" "gcc"  
 SONAME_FLAGS=-Wl,-h,$(SONAME)
 endif
-ifeq "$(COMPILER)" "spro"
-SONAME_FLAGS=-h $(SONAME)
-endif
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
@@ -48,10 +45,6 @@ endif
 ifeq "$(COMPILER)" "gcc"
 SO_LIB_FLAGS = -shared $(SONAME_FLAGS)
 SO_MOD_FLAGS = -shared
-endif
-ifeq "$(COMPILER)" "spro"
-SO_LIB_FLAGS = -G $(SONAME_FLAGS)
-SO_MOD_FLAGS = -G
 endif
 
 ifneq "$(STATIC_LIB)" ""

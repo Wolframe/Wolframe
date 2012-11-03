@@ -131,18 +131,7 @@ else
 	if test $? = 0; then
 		COMPILER='gcc'
 	else
-	#	( $CC -V 2>&1 | grep l_cproc_p ) >/dev/null
-		( $CC -V 2>&1 | grep "Intel(R) C" | grep "Compiler" ) >/dev/null
-		if test $? = 0; then
-			COMPILER='icc'
-		else
-			( $CC -xhelp=readme | head -n 1 | grep 'Sun Studio' ) >/dev/null
-			if test $? = 0; then
-				COMPILER='spro'
-			else
-				COMPILER='unknown'
-			fi
-		fi
+		COMPILER='unknown'
 	fi
 
 	# version of gcc (GNU C compiler)
@@ -151,14 +140,6 @@ else
 		GCC_VERSION=`gcc -dumpversion`
 		GCC_MAJOR_VERSION=`echo $GCC_VERSION | cut -d . -f 1`
 		GCC_MINOR_VERSION=`echo $GCC_VERSION | cut -d . -f 2`
-	fi
-
-	# version of icc (Intel C compiler)
-
-	if test $COMPILER = "icc"; then
-		ICC_VERSION=`icc -dumpversion`
-		ICC_MAJOR_VERSION=`echo $ICC_VERSION | cut -d . -f 1`
-		ICC_MINOR_VERSION=`echo $ICC_VERSION | cut -d . -f 2`
 	fi
 
 	# generate the makefile snippet with conditional variables
@@ -217,15 +198,6 @@ case "$1" in
 				;;
 
 	--gcc-minor-version)	echo $GCC_MINOR_VERSION
-				;;
-
-	--icc-major-version)	echo $ICC_MAJOR_VERSION
-				;;
-
-	--icc-minor-version)	echo $ICC_MINOR_VERSION
-				;;
-
-	--spro-major-version)	echo $SPRO_MAJOR_VERSION
 				;;
 
 	*)			echo "unkown flag '$1' requested!"
