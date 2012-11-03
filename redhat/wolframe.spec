@@ -355,6 +355,7 @@ BuildRequires: postgresql-devel >= 8.3
 %endif
 
 # sqlite database module
+%if !%{build_sqlite}
 %if %{with_sqlite}
 %if %{rhel} || %{centos} || %{fedora}
 %if %{rhel}
@@ -367,6 +368,7 @@ BuildRequires: sqlite-devel >= 3.0
 %endif
 %if %{suse} || %{sles}
 BuildRequires: sqlite3-devel >= 3.0
+%endif
 %endif
 %endif
 
