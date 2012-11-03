@@ -40,12 +40,8 @@
 #include "TextFileAuth.hpp"
 #include "types/sha2.h"
 #include "types/byte2hex.h"
+#include "globalRngGen.hpp"
 #include <boost/algorithm/string.hpp>
-
-#ifdef _WIN32
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
-#endif
 
 using namespace _Wolframe::AAAA;
 using namespace _Wolframe::log;
@@ -64,6 +60,9 @@ protected:
 	AuthenticationFixture( ) :
 		logBack( LogBackend::instance( ) )
 	{
+		// Initialize the global random number generator
+		_Wolframe::RandomGenerator::instance( "" );
+
 		// set temporary logger pointer to the logger instantiated
 		// in the test fixture
 		logBackendPtr = &logBack;
@@ -76,11 +75,8 @@ protected:
 static User* CRAMauth( TextFileAuthenticator& auth, const std::string& /*user*/,
 		       const std::string& passwd, bool caseSensitive )
 {
-#ifdef _WIN32
-	CRAMchallenge	challenge( MS_DEF_PROV );
-#else
-	CRAMchallenge	challenge( "/dev/urandom" );
-#endif
+
+	CRAMchallenge	challenge;
 
 	unsigned char digest[ SHA224_DIGEST_SIZE ];
 	sha224((const unsigned char *)passwd.c_str(), passwd.length(), digest );

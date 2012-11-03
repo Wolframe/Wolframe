@@ -44,16 +44,12 @@
 #include "utils/getPassword.hpp"
 #include "passwdFile.hpp"
 #include "AAAA/password.hpp"
+#include "globalRngGen.hpp"
 
 namespace PO = boost::program_options;
 namespace WA = _Wolframe::AAAA;
 namespace WU = _Wolframe::utils;
 
-#ifdef _WIN32
-	static const std::string DEFAULT_RANDOM_GENERATOR = MS_DEF_PROV;
-#else
-	static const std::string DEFAULT_RANDOM_GENERATOR = "/dev/urandom";
-#endif
 
 int main( int argc, char* argv[] )
 {
@@ -129,6 +125,8 @@ int main( int argc, char* argv[] )
 	}
 	const std::vector<std::string>& args = vm["posArgs"].as< std::vector<std::string> >();
 
+	_Wolframe::RandomGenerator::instance( "" );
+
 	// display only
 	if ( displayOnly )	{
 		bool	wrong = false;
@@ -176,7 +174,7 @@ int main( int argc, char* argv[] )
 		}
 		// now do the job
 		WA::PasswordHash pwd;
-		pwd.computeHash( DEFAULT_RANDOM_GENERATOR, passwd );
+		pwd.computeHash( passwd );
 		user.user = args[0];
 		user.hash = pwd.toString();
 		user.expiry = 0;
@@ -268,7 +266,7 @@ int main( int argc, char* argv[] )
 					user.info = args[3];
 			}
 			WA::PasswordHash pwd;
-			pwd.computeHash( DEFAULT_RANDOM_GENERATOR, passwd );
+			pwd.computeHash( passwd );
 			user.user = args[1];
 			user.hash = pwd.toString();
 			user.expiry = 0;

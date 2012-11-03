@@ -55,6 +55,7 @@
 #include "types/byte2hex.h"
 #include "types/base64.hpp"
 #include "types/sha2.h"
+#include "globalRngGen.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -68,7 +69,7 @@ static const size_t CRAM_RESPONSE_BCD_SIZE = 2 * CRAM_RESPONSE_SIZE + 1;
 static const size_t CRAM_RESPONSE_BASE64_SIZE = (( CRAM_RESPONSE_SIZE - 1 ) / 3 ) * 4 + 5;
 
 
-CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
+CRAMchallenge::CRAMchallenge()
 {
 	memset( m_challenge, 0, CRAM_CHALLENGE_SIZE );
 
@@ -88,40 +89,8 @@ CRAMchallenge::CRAMchallenge( const std::string& randomDevice )
 	sha256((const unsigned char *)&ft, sizeof( ft ), m_challenge );
 #endif
 
-#ifndef _WIN32
-	int hndl = open( randomDevice.c_str(), O_RDONLY );
-	if ( hndl < 0 )	{
-		std::string errMsg = "Error opening '" + randomDevice + "': ";
-		throw std::runtime_error( errMsg );
-	}
-
-	int rndPart = read( hndl, m_challenge + SHA256_DIGEST_SIZE, CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
-	if ( rndPart < 0 )	{
-		std::string errMsg = "Error reading '" + randomDevice + "'";
-		throw std::runtime_error( errMsg );
-	}
-	else if ( rndPart < (int)CRAM_CHALLENGE_SIZE - (int)SHA256_DIGEST_SIZE )	{
-		std::string errMsg = "Not enough entropy in '" + randomDevice + "'";
-		throw std::logic_error( errMsg );
-	}
-
-	close( hndl );
-#else
-	HCRYPTPROV provider = 0;
-
-	if( !CryptAcquireContext( &provider, 0, randomDevice.c_str( ), PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
-		throw std::runtime_error( "Error opening cyrpto context" );
-	}
-
-	if( !CryptGenRandom( provider, CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE, static_cast<BYTE *>( m_challenge + SHA256_DIGEST_SIZE ) ) ) {
-		CryptReleaseContext( provider, 0 );
-		throw std::runtime_error( "Error generating random data " );
-	}
-
-	if( !CryptReleaseContext( provider, 0 ) ) {
-		throw std::runtime_error( "Error closing cyrpto context" );
-	}
-#endif
+	RandomGenerator& rnd = RandomGenerator::instance();
+	rnd.generate( m_challenge + SHA256_DIGEST_SIZE, CRAM_CHALLENGE_SIZE - SHA256_DIGEST_SIZE );
 }
 
 std::string CRAMchallenge::toBCD() const

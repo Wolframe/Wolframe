@@ -55,7 +55,7 @@ static const size_t CRAM_RESPONSE_SIZE = CRAM_DIGEST_SIZE;
 class CRAMchallenge
 {
 public:
-	CRAMchallenge( const std::string& randomDevice );
+	CRAMchallenge();
 
 	const unsigned char* challenge() const		{ return m_challenge; }
 	std::size_t size() const			{ return CRAM_CHALLENGE_SIZE; }

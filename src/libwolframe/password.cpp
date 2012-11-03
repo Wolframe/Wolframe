@@ -39,23 +39,11 @@
 #include <cstring>
 #include <cassert>
 
-#ifndef _WIN32
-#include <fcntl.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <cerrno>
-#else
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
-#include <sys/types.h>
-#include <sys/timeb.h>
-#include <time.h>
-#endif
-
 #include "AAAA/password.hpp"
 #include "types/byte2hex.h"
 #include "types/base64.hpp"
 #include "types/sha2.h"
+#include "globalRngGen.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string.hpp>
@@ -93,43 +81,11 @@ PasswordHash::Salt::Salt( const std::string& str )
 }
 
 
-void PasswordHash::Salt::generate( const std::string& device )
+void PasswordHash::Salt::generate()
 {
-#ifndef _WIN32
-	int hndl = open( device.c_str(), O_RDONLY );
-	if ( hndl < 0 )	{
-		int err = errno;
-		std::string errMsg = "Error opening '" + device + "': " + strerror( err );
-		throw std::runtime_error( errMsg );
-	}
+	RandomGenerator& rnd = RandomGenerator::instance();
 
-	int rndPart = read( hndl, m_salt, PASSWORD_SALT_SIZE );
-	if ( rndPart < 0 )	{
-		std::string errMsg = "Error reading '" + device + "'";
-		throw std::runtime_error( errMsg );
-	}
-	else if ( rndPart < (int)PASSWORD_SALT_SIZE )	{
-		std::string errMsg = "Not enough entropy in '" + device + "' ?!?";
-		throw std::logic_error( errMsg );
-	}
-
-	close( hndl );
-#else
-	HCRYPTPROV provider = 0;
-
-	if( !CryptAcquireContext( &provider, 0, device.c_str( ), PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT ) ) {
-		throw std::runtime_error( "Error opening cyrpto context" );
-	}
-
-	if( !CryptGenRandom( provider, PASSWORD_SALT_SIZE, static_cast<BYTE *>( m_salt ))) {
-		CryptReleaseContext( provider, 0 );
-		throw std::runtime_error( "Error generating random data " );
-	}
-
-	if( !CryptReleaseContext( provider, 0 ) ) {
-		throw std::runtime_error( "Error closing cyrpto context" );
-	}
-#endif
+	rnd.generate( m_salt, PASSWORD_SALT_SIZE );
 	m_size = PASSWORD_SALT_SIZE;
 }
 
@@ -256,9 +212,9 @@ PasswordHash::PasswordHash( const std::string& str )
 }
 
 
-void PasswordHash::computeHash( const std::string& random, const std::string& password )
+void PasswordHash::computeHash( const std::string& password )
 {
-	m_salt.generate( random );
+	m_salt.generate();
 	hashPassword( m_salt.salt(), m_salt.size(), password, m_hash.m_hash );
 }
 
