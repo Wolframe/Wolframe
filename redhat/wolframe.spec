@@ -158,6 +158,7 @@
 %define with_icu	1
 %endif
 %endif
+%endif
 
 %if %{build_boost}
 %define with_icu	1
