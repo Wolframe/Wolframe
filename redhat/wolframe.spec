@@ -254,7 +254,7 @@ BuildRequires: libicu-devel >= 3.6
 %endif
 %endif
 %if %{suse} || %{sles}
-BuildRequires: libicu-devel >= 4.4
+BuildRequires: libicu-devel >= 4.0
 %endif
 %endif
 %else
