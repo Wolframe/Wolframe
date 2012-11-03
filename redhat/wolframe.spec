@@ -69,8 +69,12 @@
 %define dist osu114
 %define suse 1
 %endif
-%if 0%{?suse_version} > 1140
+%if 0%{?suse_version} == 1210
 %define dist osu121
+%define suse 1
+%endif
+%if 0%{?suse_version} >= 1220
+%define dist osu122
 %define suse 1
 %endif
 
@@ -123,6 +127,13 @@
 %define build_boost 1
 %define boost_version 1.48.0
 %define boost_underscore_version 1_48_0
+%endif
+%if %{suse}
+%if %{osu114} || %{osu121}
+%define build_boost 1
+%define boost_version 1.48.0
+%define boost_underscore_version 1_48_0
+%endif
 %endif
 
 # icu for boost-locale is available natively only on a few platforms,
@@ -225,17 +236,20 @@ BuildRequires: pwdutils >= 3.2
 %if %{with_icu}
 %if %{centos} || %{fedora}
 BuildRequires: libicu-devel >= 3.6
-%else
+%endif
+%if %{rhel}
 %if !%{rhel6}
 # see http://permalink.gmane.org/gmane.linux.suse.opensuse.buildservice/17779
 BuildRequires: libicu-devel >= 3.6
 %endif
 %endif
+%if %{suse} || %{sles}
+BuildRequires: libicu-devel >= 4.4
+%endif
 %endif
 %else
 BuildRequires: boost-devel
 %if %{rhel} || %{centos} || %{fedora}
-%if %{with_icu}
 Requires: boost >= 1.48
 Requires: boost-thread >= 1.48
 Requires: boost-date-time >= 1.48
@@ -244,24 +258,14 @@ Requires: boost-program-options >= 1.48
 Requires: boost-system >= 1.48
 Requires: boost-locale >= 1.48
 Requires: boost-regex >= 1.48
-Requires: libicu >= 3.6
-%else
-Requires: boost >= 1.43
-Requires: boost-thread >= 1.43
-Requires: boost-date-time >= 1.43
-Requires: boost-filesystem >= 1.43
-Requires: boost-program-options >= 1.43
-Requires: boost-system >= 1.43
-Requires: boost-regex >= 1.43
-%endif
 %endif
 %if %{suse}
-Requires: libboost-thread1_44_0 >= 1.44.0
-Requires: libboost-date-time1_44_0 >= 1.44.0
-Requires: libboost-filesystem1_44_0 >= 1.44.0
-Requires: libboost-program-options1_44_0 >= 1.44.0
-Requires: libboost-system1_44_0 >= 1.44.0
-Requires: libboost-regex1_44_0 >= 1.44.0
+Requires: libboost-thread1_48_0 >= 1.48.0
+Requires: libboost-date-time1_48_0 >= 1.48.0
+Requires: libboost-filesystem1_48_0 >= 1.48.0
+Requires: libboost-program-options1_48_0 >= 1.48.0
+Requires: libboost-system1_48_0 >= 1.48.0
+Requires: libboost-regex1_48_0 >= 1.48.0
 %endif
 %endif
 
@@ -502,19 +506,19 @@ Wolframe command line tool and client library.
 %if !%{build_boost}
 BuildRequires: boost-devel
 %if %{rhel} || %{centos} || %{fedora}
-Requires: boost >= 1.43
-Requires: boost-thread >= 1.43
-Requires: boost-date-time >= 1.43
-Requires: boost-filesystem >= 1.43
-Requires: boost-program-options >= 1.43
-Requires: boost-system >= 1.43
+Requires: boost >= 1.48
+Requires: boost-thread >= 1.48
+Requires: boost-date-time >= 1.48
+Requires: boost-filesystem >= 1.48
+Requires: boost-program-options >= 1.48
+Requires: boost-system >= 1.48
 %endif
 %if %{suse}
-Requires: libboost-thread1_44_0 >= 1.44.0
-Requires: libboost-date-time1_44_0 >= 1.44.0
-Requires: libboost-filesystem1_44_0 >= 1.44.0
-Requires: libboost-program-options1_44_0 >= 1.44.0
-Requires: libboost-system1_44_0 >= 1.44.0
+Requires: libboost-thread1_48_0 >= 1.48.0
+Requires: libboost-date-time1_48_0 >= 1.48.0
+Requires: libboost-filesystem1_48_0 >= 1.48.0
+Requires: libboost-program-options1_48_0 >= 1.48.0
+Requires: libboost-system1_48_0 >= 1.48.0
 %endif
 %endif
 
