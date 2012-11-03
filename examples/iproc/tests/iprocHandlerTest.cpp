@@ -46,7 +46,6 @@
 #include "utils/miscUtils.hpp"
 #include "gtest/gtest.h"
 #include "wtest/testModules.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/thread.hpp>

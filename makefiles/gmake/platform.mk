@@ -75,14 +75,6 @@ ifeq "$(PLATFORM)" "FREEBSD"
 LIBDIR=lib
 endif
 
-ifeq "$(PLATFORM)" "OPENBSD"
-LIBDIR=lib
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-LIBDIR=lib
-endif
-
 # Sparc or Intel, always 'lib'
 ifeq "$(PLATFORM)" "SUNOS"
 LIBDIR=lib
@@ -103,13 +95,6 @@ PLATFORM_COMPILE_FLAGS = \
 ifeq "$(PLATFORM)" "LINUX"
 PLATFORM_COMPILE_FLAGS += \
 			-DLINUX_DIST=$(LINUX_DIST) -DLINUX_REV=$(LINUX_REV)
-endif
-
-# extensions for binaries
-ifeq "$(PLATFORM)" "CYGWIN"
-EXE = .exe
-else
-EXE =
 endif
 
 # extensions for shared libraries
@@ -148,12 +133,6 @@ endif
 ifeq "$(PLATFORM)" "FREEBSD"
 LDFLAGS_DL = -Wl,-E
 endif
-ifeq "$(PLATFORM)" "OPENBSD"
-LDFLAGS_DL = -Wl,-E
-endif
-ifeq "$(PLATFORM)" "NETBSD"
-LDFLAGS_DL = -Wl,-E
-endif
 
 # i18n, gettext/libintl
 #######################
@@ -187,24 +166,6 @@ LDFLAGS_LT = -L/usr/local/lib
 LIBS_LT = -lintl
 endif
 
-ifeq "$(PLATFORM)" "OPENBSD"
-INCLUDE_FLAGS_LT = -I/usr/local/include
-LDFLAGS_LT = -L/usr/local/lib
-LIBS_LT = -lintl -liconv
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-INCLUDE_FLAGS_LT =
-LDFLAGS_LT =
-LIBS_LT = -lintl
-endif
-
-ifeq "$(PLATFORM)" "CYGWIN"
-INCLUDE_FLAGS_LT =
-LDFLAGS_LT =
-LIBS_LT = -lintl
-endif
-
 PLATFORM_COMPILE_FLAGS +=  $(INCLUDE_FLAGS_LT)
 
 endif
@@ -228,24 +189,6 @@ LIBS_NET = -lsocket -lnsl
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
-LIBS_NET =
-endif
-
-ifeq "$(PLATFORM)" "OPENBSD"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
-LIBS_NET =
-endif
-
-ifeq "$(PLATFORM)" "CYGWIN"
-INCLUDE_FLAGS_NET =
-LDFLAGS_NET =
-LIBS_NET =
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
 INCLUDE_FLAGS_NET =
 LDFLAGS_NET =
 LIBS_NET =
@@ -443,32 +386,6 @@ endif
 
 ifeq "$(LINUX_DIST)" "suse"
 
-ifeq "$(LINUX_REV)" "11.4"
-ifdef BOOST_DIR
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-endif
-ifndef BOOST_DIR
-BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?=
-endif
-endif
-
-ifeq "$(LINUX_REV)" "12.1"
-ifdef BOOST_DIR
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-endif
-ifndef BOOST_DIR
-BOOST_DIR ?= /usr
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?=
-endif
-endif
-
 ifeq "$(LINUX_REV)" "12.2"
 ifdef BOOST_DIR
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
@@ -563,24 +480,6 @@ BOOST_LIBRARY_TAG ?=
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 BOOST_DIR ?= /usr/local
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?=
-endif
-endif
-
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-BOOST_DIR ?= /usr/local
-BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
-BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
-BOOST_LIBRARY_TAG ?= -mt
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-BOOST_DIR ?= /usr/pkg
 BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
 BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
 BOOST_LIBRARY_TAG ?=
@@ -703,18 +602,6 @@ OPENSSL_LIBS ?= -lssl -lcrypto
 endif
 endif
 
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-OPENSSL_LIBS ?= -lssl -lcrypto
-endif
-endif
-
 endif
 
 # Lua 5.2
@@ -734,18 +621,6 @@ LUA_PLATFORM_LDFLAGS = -ldl -lm
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
-LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
-LUA_PLATFORM_LDFLAGS =
-LUA_PLATFORM_LIBS = -lm
-endif
-
-ifeq "$(PLATFORM)" "OPENBSD"
-LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
-LUA_PLATFORM_LDFLAGS =
-LUA_PLATFORM_LIBS = -lm
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
 LUA_PLATFORM_CFLAGS = -DLUA_USE_POSIX -DLUA_USE_DLOPEN
 LUA_PLATFORM_LDFLAGS =
 LUA_PLATFORM_LIBS = -lm
@@ -927,28 +802,6 @@ endif
 
 ifeq "$(LINUX_DIST)" "suse"
 
-ifeq "$(LINUX_REV)" "11.4"
-QT_DIR ?= /usr
-QT_INCLUDE_DIR ?= $(QT_DIR)/include
-QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_BIN_DIR ?= $(QT_DIR)/bin
-QT_MOC ?= $(QT_BIN_DIR)/moc
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
-QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
-QT_LDFLAGS =
-endif
-
-ifeq "$(LINUX_REV)" "12.1"
-QT_DIR ?= /usr
-QT_INCLUDE_DIR ?= $(QT_DIR)/include
-QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_BIN_DIR ?= $(QT_DIR)/bin
-QT_MOC ?= $(QT_BIN_DIR)/moc
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
-QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
-QT_LDFLAGS =
-endif
-
 ifeq "$(LINUX_REV)" "12.2"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
@@ -1005,46 +858,6 @@ QT_INCLUDE_DIR ?= /usr/local/include/qt4
 QT_LIB_DIR ?= /usr/local/lib/qt4
 QT_BIN_DIR ?= /usr/local/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc-qt4
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
-QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
-QT_LDFLAGS =
-endif
-endif
-endif
-
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-ifdef QT_DIR
-QT_INCLUDE_DIR ?= $(QT_DIR)/include
-QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_LDFLAGS = -L/usr/X11R6/lib
-endif
-ifndef QT_DIR
-QT_DIR ?= /usr/local/lib/qt4
-QT_INCLUDE_DIR ?= /usr/local/include/X11/qt4
-QT_LIB_DIR ?= /usr/local/lib/qt4
-QT_BIN_DIR ?= /usr/local/bin
-QT_MOC ?= $(QT_BIN_DIR)/moc4
-QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease4
-QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate4
-QT_LDFLAGS = -L/usr/X11R6/lib
-endif
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-ifdef QT_DIR
-QT_INCLUDE_DIR ?= $(QT_DIR)/include
-QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_LDFLAGS =
-endif
-ifndef QT_DIR
-QT_DIR ?= /usr/pkg/qt4
-QT_INCLUDE_DIR ?= /usr/pkg/qt4/include
-QT_LIB_DIR ?= /usr/pkg/qt4/lib
-QT_BIN_DIR ?= $(QT_DIR)/bin
-QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_LDFLAGS =
@@ -1207,24 +1020,6 @@ PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 endif
 
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-PAM_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-PAM_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-PAM_DIR ?= /usr
-PAM_INCLUDE_DIR ?= $(PAM_DIR)/include
-PAM_LIB_DIR ?= $(PAM_DIR)/lib
-PAM_LIBS ?= -lpam
-endif
-endif
-
 endif
 
 # Cyrus SASL2
@@ -1374,24 +1169,6 @@ SASL_LIBS ?= -lsasl2
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 SASL_DIR ?= /usr/local
-SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
-SASL_LIB_DIR ?= $(SASL_DIR)/lib
-SASL_LIBS ?= -lsasl2
-endif
-endif
-
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-SASL_DIR ?= /usr/local
-SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
-SASL_LIB_DIR ?= $(SASL_DIR)/lib
-SASL_LIBS ?= -lsasl2
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-SASL_DIR ?= /usr/pkg
 SASL_INCLUDE_DIR ?= $(SASL_DIR)/include
 SASL_LIB_DIR ?= $(SASL_DIR)/lib
 SASL_LIBS ?= -lsasl2
@@ -1557,24 +1334,6 @@ SQLITE3_LIBS ?= -lsqlite3
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 SQLITE3_DIR ?= /usr/local
-SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
-SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
-SQLITE3_LIBS ?= -lsqlite3
-endif
-endif
-
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-SQLITE3_DIR ?= /usr/local
-SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
-SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
-SQLITE3_LIBS ?= -lsqlite3
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-SQLITE3_DIR ?= /usr/pkg
 SQLITE3_INCLUDE_DIR ?= $(SQLITE3_DIR)/include
 SQLITE3_LIB_DIR ?= $(SQLITE3_DIR)/lib
 SQLITE3_LIBS ?= -lsqlite3
@@ -1787,28 +1546,6 @@ PGSQL_LIBS ?= -lpq
 endif
 endif
 
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-PGSQL_DIR ?= /usr/local
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
-PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
-PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
-PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
-PGSQL_LIBS ?= -lpq
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-PGSQL_DIR ?= /usr/pkg
-PGSQL_INCLUDE_DIR ?= $(PGSQL_DIR)/include/postgresql
-PGSQL_INCLUDE_DIRS = -I$(PGSQL_INCLUDE_DIR)
-PGSQL_LIB_DIR ?= $(PGSQL_DIR)/lib
-PGSQL_LIB_DIRS = -L$(PGSQL_LIB_DIR)
-PGSQL_LIBS ?= -lpq
-endif
-endif
-
 endif
 
 # libxml2
@@ -1990,28 +1727,6 @@ LIBXML2_LIBS ?= -lxml2
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
 LIBXML2_DIR ?= /usr/local
-LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
-LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
-LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
-LIBXML2_LIBS ?= -lxml2
-endif
-endif
-
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-LIBXML2_DIR ?= /usr/local
-LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
-LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
-LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
-LIBXML2_LIB_DIRS = -L$(LIBXML2_LIB_DIR)
-LIBXML2_LIBS ?= -lxml2
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-LIBXML2_DIR ?= /usr/pkg
 LIBXML2_INCLUDE_DIR ?= $(LIBXML2_DIR)/include/libxml2
 LIBXML2_INCLUDE_DIRS = -I$(LIBXML2_INCLUDE_DIR)
 LIBXML2_LIB_DIR ?= $(LIBXML2_DIR)/lib
@@ -2209,28 +1924,6 @@ LIBXSLT_LIBS ?= -lxslt
 endif
 endif
 
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-LIBXSLT_DIR ?= /usr/local
-LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
-LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
-LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
-LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
-LIBXSLT_LIBS ?= -lxslt
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-LIBXSLT_DIR ?= /usr/pkg
-LIBXSLT_INCLUDE_DIR ?= $(LIBXSLT_DIR)/include
-LIBXSLT_INCLUDE_DIRS = -I$(LIBXSLT_INCLUDE_DIR)
-LIBXSLT_LIB_DIR ?= $(LIBXSLT_DIR)/lib
-LIBXSLT_LIB_DIRS = -L$(LIBXSLT_LIB_DIR)
-LIBXSLT_LIBS ?= -lxslt
-endif
-endif
-
 endif
 
 
@@ -2399,28 +2092,6 @@ LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
 endif
 ifeq "$(OS_MAJOR_VERSION)" "9"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-endif
-
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-LIBHPDF_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
 LIBHPDF_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
 LIBHPDF_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
@@ -2628,28 +2299,6 @@ LIBPNG_LIBS ?= -lpng
 endif
 endif
 
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-LIBPNG_DIR ?= /usr/local
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include/libpng
-LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
-LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
-LIBPNG_LIBS ?= -lpng
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-LIBPNG_DIR ?= /usr/pkg
-LIBPNG_INCLUDE_DIR ?= $(LIBPNG_DIR)/include
-LIBPNG_INCLUDE_DIRS = -I$(LIBPNG_INCLUDE_DIR)
-LIBPNG_LIB_DIR ?= $(LIBPNG_DIR)/lib
-LIBPNG_LIB_DIRS = -L$(LIBPNG_LIB_DIR)
-LIBPNG_LIBS ?= -lpng15
-endif
-endif
-
 endif
 
 ifeq ($(WITH_LOCAL_LIBHPDF),1)
@@ -2845,28 +2494,6 @@ LIBZ_LIBS ?= -lz
 endif
 endif
 
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-LIBZ_DIR ?= /usr
-LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
-LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
-LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
-LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
-LIBZ_LIBS ?= -lz
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-LIBZ_DIR ?= /usr
-LIBZ_INCLUDE_DIR ?= $(LIBZ_DIR)/include
-LIBZ_INCLUDE_DIRS = -I$(LIBZ_INCLUDE_DIR)
-LIBZ_LIB_DIR ?= $(LIBZ_DIR)/lib
-LIBZ_LIB_DIRS = -L$(LIBZ_LIB_DIR)
-LIBZ_LIBS ?= -lz
-endif
-endif
-
 endif
 
 ifeq ($(WITH_LOCAL_LIBHPDF),1)
@@ -2980,12 +2607,12 @@ endif
 
 # RHEL6
 ifeq "$(LINUX_REV)" "6"
-ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
+ICU_DIR ?= /usr
+ICU_INCLUDE_DIR ?= $(ICU_DIR)/include
+ICU_INCLUDE_DIRS = -I$(ICU_INCLUDE_DIR)
+ICU_LIB_DIR ?= $(ICU_DIR)/lib
+ICU_LIB_DIRS = -L$(ICU_LIB_DIR)
+ICU_LIBS ?=
 endif
 
 # Fedora 16
@@ -3062,28 +2689,6 @@ ICU_LIBS ?=
 endif
 endif
 
-ifeq "$(PLATFORM)" "OPENBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-ifeq "$(OS_MAJOR_VERSION)" "5"
-ICU_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_INCLUDE_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIR ?= NOT SUPPLIED ON THIS PLATFORM
-ICU_LIB_DIRS = NOT SUPPLIED ON THIS PLATFORM
-ICU_LIBS ?= NOT SUPPLIED ON THIS PLATFORM
-endif
-endif
-
 endif
 
 
@@ -3098,14 +2703,6 @@ endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 EXPECT = /usr/local/bin/expect
-endif
-
-ifeq "$(PLATFORM)" "OPENBSD"
-EXPECT = /usr/local/bin/expect
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-EXPECT = /usr/pkg/bin/expect
 endif
 
 ifeq "$(PLATFORM)" "SUNOS"

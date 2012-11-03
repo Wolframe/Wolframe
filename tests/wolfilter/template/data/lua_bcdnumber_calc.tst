@@ -16,7 +16,7 @@ output="../data/$testname.tst"
 
 echo '**' > $output
 echo '**requires:LUA' >> $output
-echo '**requires:DISABLED NETBSD OPENBSD FREEBSD SUNOS' >> $output
+echo '**requires:DISABLED FREEBSD SUNOS' >> $output
 echo '**input' >> $output
 cat $docin >> $output
 echo '**output' >> $output

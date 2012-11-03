@@ -39,7 +39,6 @@
 #include <stdexcept>
 #include <boost/thread.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;

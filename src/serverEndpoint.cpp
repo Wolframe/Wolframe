@@ -39,7 +39,6 @@
 #include "utils/miscUtils.hpp"
 #include "logger-v1.hpp"
 
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "utils/miscUtils.hpp"
 

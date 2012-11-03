@@ -26,17 +26,6 @@ ifeq "$(COMPILER)" "gcc"
 
 endif
 
-ifeq "$(COMPILER)" "spro"
-
-%.d : %.c
-	@echo Generating dependencies for $<
-	@$(CC) -DMAKE_DEPENDENCIES -xM1 $(ALL_CFLAGS) $< > $@
-
-%.d : %.cpp
-	@echo Generating dependencies for $<
-	@$(CXX) -DMAKE_DEPENDENCIES -xM1 $(ALL_CXXFLAGS) $< > $@
-endif
-
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),distclean)
 -include $(OBJS:.o=.d)

@@ -39,7 +39,7 @@
 #include "AAAAproviderImpl.hpp"
 #include "logger-v1.hpp"
 #include "boost/algorithm/string.hpp"
-#include "types/globalRngGen.hpp"
+#include "globalRngGen.hpp"
 
 namespace _Wolframe {
 namespace AAAA {
@@ -83,7 +83,7 @@ AAAAprovider::AAAAprovider_Impl::AAAAprovider_Impl( const AAAAconfiguration* con
 	  m_auditor( conf->m_auditConfig, modules )
 {
 	// initialize the global rnd generator
-	GlobalRandomGenerator::instance( conf->m_randomDevice );
+	RandomGenerator::instance( conf->m_randomDevice );
 }
 
 bool AAAAprovider::AAAAprovider_Impl::resolveDB( const db::DatabaseProvider& db )

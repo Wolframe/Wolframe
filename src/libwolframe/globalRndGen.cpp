@@ -47,7 +47,8 @@
 #include <wincrypt.h>
 #endif
 
-#include "types/globalRngGen.hpp"
+#include "logger-v1.hpp"
+#include "globalRngGen.hpp"
 
 namespace _Wolframe	{
 
@@ -57,28 +58,29 @@ namespace _Wolframe	{
 	#define	DEFAULT_RANDOM_DEVICE	"/dev/urandom";
 #endif
 
-GlobalRandomGenerator::GlobalRandomGenerator( const std::string& rndDev )
+RandomGenerator::RandomGenerator( const std::string& rndDev )
 {
-	std::cout << "\nGlobal random generator constructed with device '" << rndDev << "'\n";
 	if ( rndDev.empty() )	{
 		m_device = DEFAULT_RANDOM_DEVICE;
 	}
 	else
 		m_device = rndDev;
+	LOG_DEBUG << "Random generator initialized. Using device '" << m_device << "'";
 }
 
-GlobalRandomGenerator::GlobalRandomGenerator()
+RandomGenerator::RandomGenerator()
 {
-	std::cout << "\nGlobal random generator constructed with default device";
-	m_device = DEFAULT_RANDOM_DEVICE;
+	throw std::logic_error( "Random generator default constructor called. This should not happen." );
 }
 
-unsigned GlobalRandomGenerator::random() const
+unsigned RandomGenerator::random() const
 {
-	return 0;
+	unsigned ret;
+	generate((unsigned char*)(&ret), sizeof( ret ));
+	return ret;
 }
 
-void GlobalRandomGenerator::generate( unsigned char* buffer, size_t bytes ) const
+void RandomGenerator::generate( unsigned char* buffer, size_t bytes ) const
 {
 #ifndef _WIN32
 	int hndl = open( m_device.c_str(), O_RDONLY );

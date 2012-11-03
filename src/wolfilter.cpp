@@ -40,7 +40,6 @@
 #include "wolfilterCommandLine.hpp"
 #include "moduleInterface.hpp"
 #include "processor/procProvider.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;

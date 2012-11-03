@@ -46,7 +46,6 @@
 #include "testHandlerTemplates.hpp"
 #include "utils/miscUtils.hpp"
 #include "wtest/testModules.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/algorithm/string.hpp>

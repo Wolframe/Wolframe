@@ -34,7 +34,6 @@ Project Wolframe.
 
 #include "config/structSerialize.hpp"
 #include "serialize/struct/filtermapDescription.hpp"
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "utils/miscUtils.hpp"
 #ifdef _WIN32

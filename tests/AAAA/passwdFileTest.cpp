@@ -37,13 +37,9 @@
 #include "logger-v1.hpp"
 #include "gtest/gtest.h"
 #include "passwdFile.hpp"
+#include "globalRngGen.hpp"
 #include "AAAA/password.hpp"
 #include "AAAA/HMAC.hpp"
-
-#ifdef _WIN32
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
-#endif
 
 using namespace _Wolframe::AAAA;
 using namespace std;
@@ -55,7 +51,10 @@ _Wolframe::log::LogBackend*	logBackendPtr;
 class PasswdFileFixture : public ::testing::Test
 {
 protected:
-	PasswdFileFixture( )	{}
+	PasswdFileFixture( )
+	{
+		_Wolframe::RandomGenerator::instance( "" );
+	}
 };
 
 
@@ -125,7 +124,7 @@ TEST_F( PasswdFileFixture, getHMACuser )
 	PasswordHash::Salt	salt;
 	bool result;
 
-	salt.generate( "/dev/urandom" );
+	salt.generate();
 	HMAC_SHA256	hmac0( salt.salt(), salt.size(), "Admin" );
 	result = pwdFile.getHMACuser( hmac0.toString(), salt.toString(), user, true );
 	EXPECT_FALSE( result );

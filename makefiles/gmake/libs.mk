@@ -29,25 +29,10 @@ ifeq "$(PLATFORM)" "SUNOS"
 ifeq "$(COMPILER)" "gcc"  
 SONAME_FLAGS=-Wl,-h,$(SONAME)
 endif
-ifeq "$(COMPILER)" "spro"
-SONAME_FLAGS=-h $(SONAME)
-endif
 endif
 
 ifeq "$(PLATFORM)" "FREEBSD"
 SONAME_FLAGS=-Wl,-x,-soname,$(SONAME)
-endif
-
-ifeq "$(PLATFORM)" "OPENBSD"
-SONAME_FLAGS=-Wl,-soname,$(SONAME)
-endif
-
-ifeq "$(PLATFORM)" "NETBSD"
-SONAME_FLAGS=-Wl,-soname,$(SONAME)
-endif
-
-ifeq "$(PLATFORM)" "CYGWIN"
-SONAME_FLAGS=-Wl,-soname,$(SONAME)
 endif
 
 # no soname and versioning for loadable modules, just dynamic linking
@@ -60,10 +45,6 @@ endif
 ifeq "$(COMPILER)" "gcc"
 SO_LIB_FLAGS = -shared $(SONAME_FLAGS)
 SO_MOD_FLAGS = -shared
-endif
-ifeq "$(COMPILER)" "spro"
-SO_LIB_FLAGS = -G $(SONAME_FLAGS)
-SO_MOD_FLAGS = -G
 endif
 
 ifneq "$(STATIC_LIB)" ""

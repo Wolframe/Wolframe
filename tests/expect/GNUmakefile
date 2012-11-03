@@ -19,10 +19,6 @@ local_distclean:
 
 local_test:
 ifeq ($(RUN_TESTS),1)
-ifneq "$(PLATFORM)" "OPENBSD"
-ifneq "$(PLATFORM)" "NETBSD"
 #	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testEcho.exp
 #	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testPecho.exp
-endif
-endif
 endif

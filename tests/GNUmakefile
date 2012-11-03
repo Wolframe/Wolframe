@@ -5,13 +5,9 @@ SUBDIRS = modules database AAAA simpleFormCompiler wolfilter
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 ifeq ($(WITH_EXPECT),1)
-ifneq "$(PLATFORM)" "NETBSD"
 ifneq "$(PLATFORM)" "FREEBSD"
-ifneq "$(PLATFORM)" "OPENBSD"
 ifneq "$(PLATFORM)" "SUNOS"
 SUBDIRS += expect config
-endif
-endif
 endif
 endif
 endif
@@ -226,10 +222,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./configStructParser config/structparser.conf
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testProtocolLFdotEscaping
-ifneq "$(PLATFORM)" "NETBSD"
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
-endif
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testWolfilter
 	@echo

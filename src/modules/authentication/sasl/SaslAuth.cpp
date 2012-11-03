@@ -40,7 +40,6 @@
 #include "logger-v1.hpp"
 #include "SaslAuth.hpp"
 
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include "utils/miscUtils.hpp"
 

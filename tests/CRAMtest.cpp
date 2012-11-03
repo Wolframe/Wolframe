@@ -36,32 +36,24 @@
 #include "gtest/gtest.h"
 #include <stdexcept>
 #include "AAAA/CRAM.hpp"
+#include "globalRngGen.hpp"
 
-#ifdef _WIN32
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
-#endif
+TEST( CRAM, UninitializedRandomGenerator )
+{
+	EXPECT_THROW( _Wolframe::AAAA::CRAMchallenge	challenge, std::logic_error );
+}
 
 TEST( CRAM, Challenge )
 {
+	_Wolframe::RandomGenerator::instance( "" );
+
 	unsigned char* pwdHash = (unsigned char*)"1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6";
-#ifdef _WIN32
-	_Wolframe::AAAA::CRAMchallenge	challenge( MS_DEF_PROV );
-#else
-	_Wolframe::AAAA::CRAMchallenge	challenge( "/dev/urandom" );
-#endif
+	_Wolframe::AAAA::CRAMchallenge	challenge;
 	std::cout << challenge.toBCD();
 	_Wolframe::AAAA::CRAMresponse	resp1( challenge, pwdHash, 224 / 8 );
 	_Wolframe::AAAA::CRAMresponse	resp2( challenge.toBCD(), pwdHash, 224 / 8 );
 	EXPECT_TRUE( resp1 == resp2 );
 }
-
-#ifndef _WIN32
-TEST( CRAM, WrongDevice )
-{
-	EXPECT_THROW( _Wolframe::AAAA::CRAMchallenge challenge( "/Wrong/Device" ), std::runtime_error );
-}
-#endif
 
 int main( int argc, char **argv )
 {

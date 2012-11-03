@@ -21,17 +21,19 @@ Table of Contents
     Ubuntu 12.04 LTS
     Debian 6.0
     OpenSuSE 11.4
+    OpenSuSE 12.1
+    OpenSuSE 12.2
     SLES 11 SP1/SP2
     Slackware 13.37
     Archlinux
   Instructions for other Unixes
     FreeBSD 8.2
     FreeBSD 9.0
-    NetBSD 5.1
-    OpenBSD 5.1
     Solaris 10
       Solaris 10 (CSW toolchain)
   Broken and non-working instructions for other Unixes
+    OpenBSD 5.1
+    NetBSD 5.1
     Solaris 10 (SFW gcc toolchain)
     Solaris 10 (Sun Forte toolchain)
     Solaris 10 (Sunfreeware GCC toolchain)
@@ -47,9 +49,7 @@ Prerequisites
 
 - gcc c++ 4.1.x or later (preferably 512 MB RAM or Swap)
 - GNU make (preferably 3.82 or newer)
-- boost 1.43.0 or later: 1.42 is also supported (mainly on
-  OpenBSD), but not recommended. For boost-locale/ICU support
-  boost 1.48 or later is required
+- boost 1.48.0 or later
 - optionally (WITH_SSL) openssl 0.9.7 or later
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
@@ -399,12 +399,44 @@ For checking the validity of various XML files you need 'libxml2-utils' (for xml
 OpenSuSE 11.4
 -------------
 
-No problems with the supplied packages at all, everything builds out of the box:
-
-Required packages: boost-devel (1.44.0)
 Optional packages: qt-devel (4.7.1), pam-devel (1.1.3), cyrus-sasl-devel (2.1.23),
-                   sqlite3-devel (3.7.5), postgresql-devel (9.0.3), libxml2-dev (2.7.8),
-                   libxslt-devel (1.1.26), zlib-devel (1.2.5-9.10.1), libpng-devel (1.2.47-0.8.1)
+                   sqlite3-devel (3.7.5), postgresql-devel (9.0.3), libxml2-devel (2.7.8),
+                   libxslt-devel (1.1.26), zlib-devel (1.2.5), libpng14-devel (1.4.4),
+                   lilicu-devel (4.4.2)
+
+Boost 1.44 is too old, compile your own.
+
+For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
+For building the PDF wolfbook install 'fop'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+OpenSuSE 12.1
+-------------
+
+Optional packages: qt-devel (4.7.4), pam-devel (1.1.4), cyrus-sasl-devel (2.1.23),
+                   sqlite3-devel (3.7.8), postgresql-devel (9.1.1), libxml2-devel (2.7.8),
+                   libxslt-devel (1.1.26), zlib-devel (1.2.5), libpng14-devel (1.4.8),
+                   lilicu-devel (4.6.1)
+
+Boost 1.44 is too old, compile your own.
+
+For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
+For building the PDF wolfbook install 'fop'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+OpenSuSE 12.2
+-------------
+
+Required packages: boost-devel (1.49.0)
+Optional packages: qt-devel (4.8.1), pam-devel (1.1.5), cyrus-sasl-devel (2.1.25),
+                   sqlite3-devel (3.7.12.1), postgresql-devel (9.1.1), libxml2-devel (2.7.8),
+                   libxslt-devel (1.1.26), zlib-devel (1.2.7), libpng14-devel (1.4.11)
 
 For building the documentation you need 'libxslt', 'docbook-style-xsl' and 'doxygen'.
 For building the PDF wolfbook install 'fop'.
@@ -506,53 +538,6 @@ So far no PAM support.
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 
-NetBSD 5.1
-----------
-
-(Packages are all from pkgsrc)
-
-Required packages: boost-headers (1.47.0), boost-libs (1.47.0)
-Optional packages: cyrus-sasl (2.1.25), qt4 (4.7.4),
-                   sqlite3 (3.7.9), postgresql91-client (9.1.2),
-                   libxml2 (2.7.8nb8), libxslt (1.1.26nb1),
-                   zlib (1.2.3), png (1.5.9)
-
-You need 'gmake' (3.82db3).
-
-NetBSD contains SSL libraries per default no packages needed.
-Also PAM modules.
-
-For testing you need 'tcl-expect' (5.43.0nb1).
-
-Use WITH_LOCAL_LIBHPDF=1 for PDF support.
-
-OpenBSD 5.1
------------
-
-Required packages: boost (1.42.0p12)
-Optional packages: cyrus-sasl2 (from ports tree, 2.1.25p2, install
-                   dependencies like groff before building it!),
-                   qt4 (qt4-4.7.4p3),
-                   sqlite3 (3.7.9p0), postgresql-client (9.1.2),
-                   libxml (2.7.8p4), libxslt (1.1.26p3),
-                   png (1.5.6p0) 
-
-You need 'gmake' (3.82).
-
-For NLS support you need 'libintl' and 'gettext'.
-
-OpenBSD has no PAM, but BSD Authentication, which is currently not
-supported by Wolframe.
-
-OpenBSD contains SSL libraries per default no packages needed.
-
-For some optional packages you need the OpenBSD ports tree and
-you have to build the packages on your own.
-
-For testing you need 'expect-5.44.1.15p0-no_tk'.
-
-Use WITH_LOCAL_LIBHPDF=1 for PDF support.
-
 Solaris 10
 ----------
 
@@ -635,7 +620,58 @@ OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql \
 Broken and non-working instructions for other Unixes
 ----------------------------------------------------
 
-Those are other unsuccessful builds on Solaris 10.
+Those are other unsuccessful builds on Solaris 10, mainly due to
+too old C++ compilers or boost.
+
+OpenBSD has only boost 1.42, which is too old.
+NetBSD has an old boost 1.47.
+
+OpenBSD 5.1
+-----------
+
+Required packages: boost (1.42.0p12)
+Optional packages: cyrus-sasl2 (from ports tree, 2.1.25p2, install
+                   dependencies like groff before building it!),
+                   qt4 (qt4-4.7.4p3),
+                   sqlite3 (3.7.9p0), postgresql-client (9.1.2),
+                   libxml (2.7.8p4), libxslt (1.1.26p3),
+                   png (1.5.6p0) 
+
+You need 'gmake' (3.82).
+
+For NLS support you need 'libintl' and 'gettext'.
+
+OpenBSD has no PAM, but BSD Authentication, which is currently not
+supported by Wolframe.
+
+OpenBSD contains SSL libraries per default no packages needed.
+
+For some optional packages you need the OpenBSD ports tree and
+you have to build the packages on your own.
+
+For testing you need 'expect-5.44.1.15p0-no_tk'.
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+NetBSD 5.1
+----------
+
+(Packages are all from pkgsrc)
+
+Required packages: boost-headers (1.47.0), boost-libs (1.47.0)
+Optional packages: cyrus-sasl (2.1.25), qt4 (4.7.4),
+                   sqlite3 (3.7.9), postgresql91-client (9.1.2),
+                   libxml2 (2.7.8nb8), libxslt (1.1.26nb1),
+                   zlib (1.2.3), png (1.5.9)
+
+You need 'gmake' (3.82db3).
+
+NetBSD contains SSL libraries per default no packages needed.
+Also PAM modules.
+
+For testing you need 'tcl-expect' (5.43.0nb1).
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
 
 Solaris 10 (SFW gcc toolchain)
 ------------------------------

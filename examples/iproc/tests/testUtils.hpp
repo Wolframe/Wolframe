@@ -34,7 +34,6 @@
 #define _Wolframe_TEST_UTILITIES_HPP_INCLUDED
 ///\file tests/testUtils.hpp
 ///\brief Some common code of tests (not in an own object file because of test program build issues)
-#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 #include <string>

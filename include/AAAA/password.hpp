@@ -61,10 +61,10 @@ public:
 		/// Construct a salt by setting the value from the base64 encoded string.
 		Salt( const std::string& str );
 
-		/// Construct a random salt using device to generate random bytes.
-		void generate( const std::string& device );
+		/// Construct a random salt using the global random number generator.
+		void generate();
 
-		/// True if the 2 password salts are identical, false otherwise
+		/// True if the 2 password salts are identical, false otherwise.
 		bool operator == ( const Salt& rhs );
 		bool operator != ( const Salt& rhs )	{ return !( *this == rhs ); }
 
@@ -128,7 +128,7 @@ public:
 
 
 	/// Generate a password salt and compute the password hash using the salt
-	void computeHash( const std::string& random, const std::string& password );
+	void computeHash( const std::string& password );
 
 	/// The password salt
 	const Salt& salt() const	{ return m_salt; }

@@ -19,7 +19,5 @@ local_distclean:
 # Aba, test hangs on FreeBSD, Windows is out of reach!
 local_test:
 ifeq ($(RUN_TESTS),1)
-ifneq "$(PLATFORM)" "NETBSD"
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./checkConfig.sh $(EXPECT)
-endif
 endif

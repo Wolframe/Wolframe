@@ -30,6 +30,16 @@ namespace _Wolframe {
 			Network,
 			Local
 		};
+
+	enum ScreenOrientation {
+		ScreenOrientationLockPortrait,
+		ScreenOrientationLockLandscape,
+		ScreenOrientationAuto
+	};
+
+	// Note that this will only have an effect on Fremantle.
+	void setOrientation( ScreenOrientation orientation );
+	void showExpanded( );
 	
 	private:
 		QCommandLine *m_cmdline;	// command line parser	
@@ -89,7 +99,7 @@ namespace _Wolframe {
 		void on_actionExit_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
-		void on_actionDebugTerminal_triggered( bool checked );
+		void on_actionDebugTerminal_triggered( bool checked );       
 	};
 } // namespace QtClient
 } // namespace _Wolframe
