@@ -89,21 +89,22 @@ bool TransactionProgram::is_mine( const std::string& filename) const
 	return boost::algorithm::to_lower_copy( utils::getFileExtension( filename)) == ".tdl";
 }
 
-char TransactionProgram::gotoNextToken( std::string::const_iterator& si, const std::string::const_iterator se)
+char TransactionProgram::gotoNextToken( std::string::const_iterator& si, const std::string::const_iterator se) const
 {
+	const char* commentopr = m_langdescr->eoln_commentopr();
 	char ch;
 	while ((ch = utils::gotoNextToken( si, se)) != 0)
 	{
-		if (ch == m_commentopr[0])
+		if (ch == commentopr[0])
 		{
-			std::string::const_iterator ti = si;
-			std::string::const_iterator ci = m_commentopr.begin()+1, ce = m_commentopr.end();
-			while (ci != ce && ti != se && *ci == *ti)
+			std::string::const_iterator ti = si+1;
+			std::size_t ci = 1;
+			while (commentopr[ci] && ti != se && commentopr[ci] == *ti)
 			{
-				ci++;
-				ti++;
+				++ci;
+				++ti;
 			}
-			if (ci == ce)
+			if (!commentopr[ci])
 			{
 				// skip to end of line
 				while (ti != se && *ti != '\n') ++ti;
@@ -116,91 +117,116 @@ char TransactionProgram::gotoNextToken( std::string::const_iterator& si, const s
 	return ch;
 }
 
-char TransactionProgram::parseNextToken( std::string& tok, std::string::const_iterator& si, std::string::const_iterator se)
+char TransactionProgram::parseNextToken( std::string& tok, std::string::const_iterator& si, std::string::const_iterator se) const
 {
 	char ch = gotoNextToken( si, se);
 	if (!ch) return 0;
 	return utils::parseNextToken( tok, si, se, m_optab);
 }
 
-bool TransactionProgram::isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se)
+std::string TransactionProgram::parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose)
 {
-	if (si == se) return false;
+	std::string stm;
+	std::string dbstm = m_langdescr->parseEmbeddedStatement( osi, ose);
+	std::string::const_iterator start = dbstm.begin(), si = dbstm.begin(), se = dbstm.end();
+	std::vector< std::string > arg;
 	std::string tok;
-	char ch = utils::gotoNextToken( si, se);
-	if (ch == '"' || ch == '(' || ch == '[' || ch == '{') return true;
-	if (!ch) return false;
-	ch = utils::parseNextToken( tok, si, se, m_optab);
-	if (!m_optab[ ch])
-	{
-		ch = utils::gotoNextToken( si, se);
-		if (ch == '(') return false;
-		return true;
-	}
-	return false;
-}
 
-std::string TransactionProgram::parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& si, std::string::const_iterator se)
-{
+	char ch = utils::parseNextToken( tok, si, se, m_optab);
+	for (; si != se && ch; ch = utils::parseNextToken( tok, si, se, m_optab))
+	{
+		if (ch == '$')
+		{
+			stm.append( start, si - 1);
+			start = si - 1;
+			ch = utils::gotoNextToken( si, se);
+			if (ch == '(')
+			{
+				++si;
+				std::string::const_iterator argstart = si;
+				ch = utils::parseNextToken( tok, si, se, m_optab);
+				for (; ch && ch != ')'; ++si, ch=utils::parseNextToken( tok, si, se, m_optab));
+				if (ch == ')')
+				{
+					arg.push_back( std::string( argstart, si-1));
+					start = si;
+					stm.append( m_langdescr->stm_argument_reference( arg.size()));
+				}
+			}
+			else if (ch >= '0' && ch <= '9')
+			{
+				std::string::const_iterator argstart = si;
+				for (; si!=se && *si>= '0' && *si<= '9'; ++si);
+				arg.push_back( std::string("$") + std::string( argstart, si));
+				start = si;
+				stm.append( m_langdescr->stm_argument_reference( arg.size()));
+			}
+		}
+	}
+	stm.append( start, si);
+
 	std::string stmname;
 	stmname.append( "__");
 	stmname.append( funcname);
 	stmname.append( "_");
 	stmname.append( boost::lexical_cast<std::string>( index));
-
-	std::string tok;
-	int bcnt = 1;
-	char sb = *si;
-	char eb;
-	if (sb == '[')
-	{
-		eb = ']';
-		++si;
-	}
-	else if (sb == '(')
-	{
-		eb = ')';
-		++si;
-	}
-	else if (sb == '{')
-	{
-		eb = '}';
-		++si;
-	}
-	else if (sb == '"')
-	{
-		eb = '"';
-		++si;
-	}
-	else
-	{
-		eb = ';';
-	}
-	std::string::const_iterator start = si;
-	char ch = utils::parseNextToken( tok, si, se, m_optab);
-	for (; si != se && ch; ch = utils::parseNextToken( tok, si, se, m_optab))
-	{
-		if (ch == eb)
-		{
-			bcnt -= 1;
-		}
-		else if (ch == sb)
-		{
-			bcnt += 1;
-		}
-		if (bcnt == 0) break;
-	}
-	if (bcnt)
-	{
-		throw std::runtime_error( std::string( "unterminated embedded command ") + sb + "..." + eb);
-	}
-	std::string stm( start, si);
-	if (eb == ';')
-	{
-		--si;
-	}
 	m_embeddedStatementMap.insert( stmname, stm);
-	return stmname;
+
+	std::string functioncall;
+	functioncall.append( stmname);
+	functioncall.append( "(");
+	std::vector<std::string>::const_iterator ai = arg.begin(), ae = arg.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai != arg.begin()) functioncall.append( ",");
+		functioncall.append( *ai);
+	}
+	functioncall.append( ")");
+	return functioncall;
+}
+
+std::string TransactionProgram::parseCallStatement( std::string::const_iterator& si, std::string::const_iterator se) const
+{
+	std::string tok;
+	int st = 0; // parse state
+	std::string::const_iterator fcallstart = si;
+	char ch = gotoNextToken( si, se);
+	while (st < 3 && (ch = parseNextToken( tok, si, se)) != 0)
+	{
+		if (!ch)
+		{
+			throw std::runtime_error( "unexpected end of description. unterminated function call (DO ..)");
+		}
+		switch (st)
+		{
+			case 0:
+				if (m_optab[ch] || ch == '\'' || ch == '\"')
+				{
+					throw std::runtime_error( std::string( "function call identifier expected after DO instead of operator or string '") + ch + "'");
+				}
+				st = 1;
+				continue;
+			case 1:
+				if (ch != '(')
+				{
+					throw std::runtime_error( std::string( "'(' expected in function call after function name (DO ..) instead of '") + ch + "'");
+				}
+				st = 2;
+				continue;
+			case 2:
+				if (ch == ')')
+				{
+					st = 3;
+					break;
+				}
+				else if (ch == '(')
+				{
+					throw std::runtime_error( "unexpected '('. unterminated function call (DO ..)");
+				}
+				continue;
+		}
+	}
+	return std::string( fcallstart, si);
 }
 
 void TransactionProgram::load( const std::string& source, std::string& dbsource)
@@ -217,6 +243,8 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 	dbsource.clear();
 	config::PositionalErrorMessageBase ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
+
+	if (!m_langdescr) throw std::logic_error( "no database language description defined");
 
 	try
 	{
@@ -305,52 +333,19 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 							throw ERROR( si, "function call (DO ..) specified twice in a transaction description");
 						}
 						mask |= (1 << (unsigned)TransactionDescription::Call);
-
-						int st = 0; // parse state
-						std::string::const_iterator fcallstart = si;
-
-						if (isEmbeddedStatement( si, se))
+						if (!gotoNextToken( si, se))
+						{
+							throw ERROR( si, "unexpected end of transaction description after DO");
+						}
+						if (m_langdescr->isEmbeddedStatement( si, se))
 						{
 							desc.call.append( parseEmbeddedStatement( transactionName, embstm_index, si, se));
-							if (*si == ';') desc.call.append("()");
-							st = 1; //... function identifier parsed
+							++embstm_index;
 						}
-						ch = gotoNextToken( si, se);
-						while (st < 3 && (ch = parseNextToken( tok, si, se)) != 0)
+						else
 						{
-							if (!ch)
-							{
-								throw ERROR( si, "unexpected end of description. unterminated function call (DO ..)");
-							}
-							switch (st)
-							{
-								case 0:
-									if (m_optab[ch] || ch == '\'' || ch == '\"')
-									{
-										throw ERROR( si, MSG << "function call identifier expected after DO instead of operator or string '" << ch << "'");
-									}
-									st = 1;
-									continue;
-								case 1:
-									if (ch != '(')
-									{
-										throw ERROR( si, MSG << "'(' expected in function call after function name (DO ..) instead of '" << ch << "'");
-									}
-									st = 2;
-									continue;
-								case 2:
-									if (ch == ')')
-									{
-										st = 3;
-										break;
-									}
-									else if (ch == '(')
-									{	throw ERROR( si, "unexpected '('. unterminated function call (DO ..)");
-									}
-									continue;
-							}
+							desc.call.append( parseCallStatement( si, se));
 						}
-						desc.call.append( std::string( fcallstart, si));
 					}
 					else
 					{

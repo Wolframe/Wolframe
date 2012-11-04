@@ -139,6 +139,16 @@ private:
 	SQLiteDBunit&		m_unit;		///< parent database unit
 };
 
+struct SQLiteLanguageDescription :public LanguageDescription
+{
+	///\brief String used for declaring a reference to an argument by index (starting with 1).
+	virtual std::string stm_argument_reference( int index)
+	{
+		std::ostringstream rt;
+		rt << "?" << index;
+		return rt.str();
+	}
+};
 
 class SQLiteDatabase : public Database
 {
@@ -158,6 +168,15 @@ public:
 
 	Transaction* transaction( const std::string& name );
 	void closeTransaction( Transaction* t );
+
+	///\brief Add a set of named statements to the sqlite program
+	virtual void addStatements( const types::keymap<std::string>& stmmap_);
+
+	virtual const LanguageDescription* getLanguageDescription() const
+	{
+		static SQLiteLanguageDescription langdescr;
+		return &langdescr;
+	}
 
 	///\brief Get a user interface library
 	virtual const UI::UserInterfaceLibrary* UIlibrary() const;
@@ -186,6 +205,12 @@ public:
 	virtual void addProgram( const std::string& program )
 						{ m_program.load( program ); }
 
+	///\brief Add a set of named statements to the sqlite program
+	virtual void addStatements( const types::keymap<std::string>& stmmap_)
+	{
+		m_program.addStatements( stmmap_);
+	}
+
 	virtual const std::string* getProgram( const std::string& name) const
 	{
 		const types::keymap<std::string>* mm = m_program.statementmap();
@@ -198,12 +223,6 @@ public:
 	const types::keymap<std::string>* stmmap() const
 	{
 		return m_program.statementmap();
-	}
-
-	///\brief Add a set of named statements to the sqlite program
-	virtual void addStatements( const types::keymap<std::string>& stmmap_)
-	{
-		m_program.addStatements( stmmap_);
 	}
 
 private:

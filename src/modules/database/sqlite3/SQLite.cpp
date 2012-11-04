@@ -159,6 +159,13 @@ void SQLiteDatabase::addProgram( const std::string& program )
 	m_unit->addProgram( program );
 }
 
+void SQLiteDatabase::addStatements( const types::keymap<std::string>& stmmap_)
+{
+	if ( !m_unit )
+		throw std::runtime_error( "addStatements: SQLite database unit not initialized" );
+	m_unit->addStatements( stmmap_);
+}
+
 const std::string* SQLiteDatabase::getProgram( const std::string& name) const
 {
 	if ( !m_unit )

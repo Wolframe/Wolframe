@@ -30,6 +30,7 @@ DYNAMIC_LIB_PATCH = 0
 CPP_OBJS = \
 	transactionFunction.o \
 	transactionProgram.o \
+	databaseLanguage.o \
 	preparedStatement.o \
 	bindStatementParams.o
 

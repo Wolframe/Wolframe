@@ -330,6 +330,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 			return false;
 		}
 		// load database programs:
+		m_dbprogram.defineEmbeddedLanguageDescription( m_db->getLanguageDescription());
 		std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
 		for (; pi != pe; ++pi)
 		{
@@ -339,7 +340,6 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 				{
 					std::string dbsrc;
 					m_dbprogram.loadfile( *pi, dbsrc);
-					m_db->addStatements( m_dbprogram.embeddedStatementMap());
 					m_db->addProgram( dbsrc);
 				}
 				catch (const std::runtime_error& err)
@@ -349,6 +349,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 				}
 			}
 		}
+		m_db->addStatements( m_dbprogram.embeddedStatementMap());
 	}
 	return rt;
 }

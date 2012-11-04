@@ -305,6 +305,7 @@ Database* PostgreSQLdbUnit::database()
 }
 
 
+
 /*****  PostgreSQL database  ******************************************/
 const std::string& PostgreSQLdatabase::ID() const
 {
@@ -326,6 +327,13 @@ void PostgreSQLdatabase::addProgram( const std::string& program )
 	if ( !m_unit )
 		throw std::runtime_error( "addProgram: PostgreSQL database unit not initialized" );
 	m_unit->addProgram( program );
+}
+
+void PostgreSQLdatabase::addStatements( const types::keymap<std::string>& stmmap_)
+{
+	if ( !m_unit )
+		throw std::runtime_error( "addStatements: PostgreSQL database unit not initialized" );
+	m_unit->addStatements( stmmap_);
 }
 
 const std::string* PostgreSQLdatabase::getProgram( const std::string& name) const

@@ -132,6 +132,10 @@ public:
 
 	virtual void loadProgram( const std::string& filename );
 	virtual void addProgram( const std::string& program );
+
+	///\brief Add a set of named statements to the postgresql program
+	virtual void addStatements( const types::keymap<std::string>& stmmap_);
+
 	virtual const std::string* getProgram( const std::string& name) const;
 
 	Transaction* transaction( const std::string& name );

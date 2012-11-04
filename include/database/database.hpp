@@ -37,9 +37,13 @@
 #ifndef _DATABASE_HPP_INCLUDED
 #define _DATABASE_HPP_INCLUDED
 #include "database/transaction.hpp"
+#include "database/databaseLanguage.hpp"
 #include "types/keymap.hpp"
+#include "utils/miscUtils.hpp"
 #include "UserInterface.hpp"
 #include <string>
+#include <iostream>
+#include <sstream>
 
 namespace _Wolframe {
 namespace db {
@@ -80,6 +84,12 @@ public:
 	///\brief Get a database transaction program from the list of transaction programs
 	virtual const std::string* getProgram( const std::string& name ) const = 0;
 
+	virtual const LanguageDescription* getLanguageDescription() const
+	{
+		static LanguageDescription langdescr;
+		return &langdescr;
+	}
+
 	/// Close the database connetion
 	/// This exists for no good reason (mostly to make the code look uniform)
 	virtual void close()			{}
@@ -109,13 +119,17 @@ public:
 	virtual void loadProgram( const std::string& filename ) = 0;
 
 	///\brief Load the transaction programs for this database from all
-	///       the program files configured for it
+	//        the program files configured for it
 	///\remark throws std::runtime_error with position info in case of error
 	virtual void loadAllPrograms() = 0;
 
 	///\brief add a database program to the list of transaction programs
 	///\remark throws std::runtime_error with position info in case of error
 	virtual void addProgram( const std::string& program ) = 0;
+	virtual void addStatements( const types::keymap<std::string>& stmmap)
+	{
+		if (!stmmap.empty()) throw std::runtime_error( "embedded statements not defined for this database");
+	}
 
 	///\brief get a database transaction program from the list of transaction programs
 	virtual const std::string* getProgram( const std::string& name ) const = 0;

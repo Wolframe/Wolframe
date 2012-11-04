@@ -37,6 +37,7 @@
 #include "types/countedReference.hpp"
 #include "types/keymap.hpp"
 #include "database/transactionFunction.hpp"
+#include "database/databaseLanguage.hpp"
 #include "utils/miscUtils.hpp"
 #include <string>
 #include <map>
@@ -52,20 +53,21 @@ class TransactionProgram
 {
 public:
 	///\brief Constructor
-	explicit TransactionProgram( const char* commentopr_ = "--")
-		:m_commentopr(commentopr_){}
+	TransactionProgram()
+		:m_langdescr(0){}
 
 	///\brief Copy constructor
 	TransactionProgram( const TransactionProgram& o)
 		:m_functionmap(o.m_functionmap)
-		,m_commentopr(o.m_commentopr){}
+		,m_embeddedStatementMap(o.m_embeddedStatementMap)
+		,m_langdescr(o.m_langdescr){}
 
 	///\brief Destructor
 	~TransactionProgram(){}
 
-	void defineCommentOpr( const std::string& commentopr_)
+	void defineEmbeddedLanguageDescription( const LanguageDescription* langdescr_)
 	{
-		m_commentopr = commentopr_;
+		m_langdescr = langdescr_;
 	}
 
 	///\brief Ask if the program is one of this class
@@ -92,16 +94,20 @@ public:
 	}
 
 private:
-	char gotoNextToken( std::string::const_iterator& si, const std::string::const_iterator se);
-	char parseNextToken( std::string& tok, std::string::const_iterator& si, std::string::const_iterator se);
+	///\brief Goto the next token ignoring comments
+	char gotoNextToken( std::string::const_iterator& si, const std::string::const_iterator se) const;
+	///\brief Parse the next token ignoring comments
+	char parseNextToken( std::string& tok, std::string::const_iterator& si, std::string::const_iterator se) const;
+	///\brief Parse embedded database statement in language defined with 'defineEmbeddedLanguageDescription(const LanguageDescription*)'
 	std::string parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& si, std::string::const_iterator se);
-	bool isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se);
+	///\brief Parse statement of the form [identifier '(' arg { ',' arg } ')']
+	std::string parseCallStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
 
 private:
 	static const utils::CharTable m_optab;
 	types::keymap<TransactionFunctionR> m_functionmap;
 	types::keymap<std::string> m_embeddedStatementMap;
-	std::string m_commentopr;
+	const LanguageDescription* m_langdescr;
 };
 
 typedef types::CountedReference<TransactionProgram> TransactionProgramR;
