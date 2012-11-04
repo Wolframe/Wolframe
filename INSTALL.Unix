@@ -570,12 +570,16 @@ causing building of libboost_filesystem to fail!
 Boost 1.50.0 and 1.51.0 have never been tested with Wolframe, so don't
 use those!
 
-Optional packages to install from CSW for boost (if boost-locale should
-have ICU support):
-  libicu_dev (4.8.1)
-  libiconv_dev (1.14), as fallback backend for boost-locale
+SUNWicud/SUNWicu and CSW libicu_dev are both linked for the Forte C++
+compiler. It's better, to compile your own version compiled with the
+gcc compiler from CSW:
 
-Make sure you DON'T compile against SUNWicud!
+gtar zxf icu4c-49_1_2-src.tgz
+# apply the icu_source_configure patch (for V9 CPU and some standard header files)
+cd source/icu
+./runConfigureICU Solaris/GCC --prefix=/opt/csw/icu4c-49.1.2
+gmake
+gmake install
 
 First apply the following patch to 'boost/cstdint.ppp' for boost
 (https://svn.boost.org/trac/boost/ticket/6158, see also
@@ -603,9 +607,9 @@ Build and install normally:
 
 ./bootstrap.sh --prefix=/opt/csw/boost-1.48.0 \
 	--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale \
-	--with-icu=/opt/csw
+	--with-icu=/opt/csw/icu4c-49.1.2
 
-./b2 -a -sICU_PATH=/opt/csw -sICONV_PATH=/opt/csw -d2 install
+./b2 -a -sICU_PATH=/opt/csw/icu4c-49.1.2 -d2 install
 
 Optional packages to install from CSW for Wolframe:
   libssl_dev (0.9.8t)
@@ -634,6 +638,7 @@ OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
 	WITH_LIBXSLT=1 WITH_LOCAL_SQLITE3=1 WITH_LOCAL_SQLITE1=1 \
 	WITH_PAM=1 WITH_SASL=1 WITH_LOCAL_LIBHPDF=1 \
+	WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2
 	gmake \
 		CC=gcc CXX=g++ CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
 

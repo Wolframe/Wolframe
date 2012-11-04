@@ -1,0 +1,21 @@
+--- icu/source/configure.orig	Sun Nov  4 10:35:52 2012
++++ icu/source/configure	Sun Nov  4 10:38:14 2012
+@@ -4263,8 +4263,7 @@
+         then
+             case "${host}" in
+             *-*-solaris*)
+-                CFLAGS="$CFLAGS -Wall -ansi -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -Wno-long-long"
+-                CFLAGS="$CFLAGS -D__STDC__=0";;
++            	CFLAGS="$CFLAGS -Wall -ansi -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -Wno-long-long -mcpu=v9";;
+             *-*-hpux*)
+                 echo "# Note: We are not using '-ansi' with HP/UX GCC because int64_t broke, see <http://bugs.icu-project.org/trac/ticket/8493>"
+                 CFLAGS="$CFLAGS -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings -Wno-long-long";;
+@@ -4285,7 +4284,7 @@
+             CXXFLAGS="$CXXFLAGS -W -Wall -ansi -pedantic -Wpointer-arith -Wwrite-strings -Wno-long-long"
+             case "${host}" in
+             *-*-solaris*)
+-                CXXFLAGS="$CXXFLAGS -D__STDC__=0";;
++            	CXXFLAGS="$CXXFLAGS -D_XPG6 -mcpu=v9";;
+             esac
+         else
+             case "${host}" in

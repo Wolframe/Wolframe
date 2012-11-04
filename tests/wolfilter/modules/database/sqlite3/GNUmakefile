@@ -14,7 +14,8 @@ INCLUDE_LDFLAGS = \
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \
 	-I$(TOPDIR)/src/modules/database/sqlite3 \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	$(SQLITE3_INCLUDE_DIRS)
 
 INCLUDE_LIBS = \
 	-lwolframe \
