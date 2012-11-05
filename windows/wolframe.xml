@@ -118,7 +118,6 @@ Project Wolframe.
 	<AAAA>
 
 		<authentication>
-			<allowAnonymous>yes</allowAnonymous>
 			<database>
 				<identifier>database authentication</identifier>
 				<database>#inserted by installer#</database>

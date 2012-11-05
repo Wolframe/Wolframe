@@ -182,7 +182,6 @@ Project Wolframe.
 	<AAAA>
 
 		<authentication>
-			<allowAnonymous>yes</allowAnonymous>
 			<database>
 				<identifier>SQLite database authentication</identifier>
 				<database>sqlitedb</database>
