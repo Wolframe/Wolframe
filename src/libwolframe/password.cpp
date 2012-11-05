@@ -187,6 +187,11 @@ static void hashPassword( const unsigned char* /*pwdSalt*/, size_t /*saltSize*/,
 	sha224((const unsigned char*)password.c_str(), password.length(), hash );
 }
 
+PasswordHash::PasswordHash( const Salt& pwdSalt, const std::string& password )
+	: m_salt( pwdSalt )
+{
+	hashPassword( m_salt.salt(), m_salt.size(), password, m_hash.m_hash );
+}
 
 PasswordHash::PasswordHash( const std::string& pwdSalt, const std::string& password )
 	: m_salt( pwdSalt )

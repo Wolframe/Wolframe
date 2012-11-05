@@ -31,8 +31,9 @@ CPP_OBJS = \
 
 TEST_CPP_BINS = \
 	authenticationTest.exe \
-	textFileTest.exe \
-	passwdFileTest.exe
+	passwdFileTest.exe \
+	textFileTest.exe
+
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -53,6 +54,6 @@ local_test:
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo authenticationTest >> test.bat
 	@-echo passwdFileTest >> test.bat
-	@-echo textFileTest >> test.bat
+#	@-echo textFileTest >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat
