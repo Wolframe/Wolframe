@@ -28,6 +28,18 @@ BEGIN
 	DO UPDATE tree SET rgt = rgt-$3 WHERE rgt>$2;
 END
 
+--
+-- treeSelectNode       :Get the node
+-- treeSelectNodeByName :Get the node by name
+--
+TRANSACTION treeSelectNode -- (/node/id)
+BEGIN
+	FOREACH /node INTO /node DO SELECT ID,parent,name FROM tree WHERE ID = $(id);
+END
+TRANSACTION treeSelectNodeByName -- (/node/name)
+BEGIN
+	FOREACH /node INTO /node DO SELECT ID,parent,name FROM tree WHERE name = $(name);
+END
 
 --
 -- treeSelectNodeAndParents       :Get the node and its parents
@@ -61,11 +73,11 @@ END
 --
 TRANSACTION treeSelectNodeAndChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 TRANSACTION treeSelectNodeAndChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
 END
 
 --

@@ -3,164 +3,161 @@
 **requires:SQLITE3
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<class name='indogermanic'>
-	<class name='celtic' status='living'>
-		<class name='gaulisch' status='dead'></class>
-		<class name='goidelic' status='dead'>
-			<class name='old irish' status='dead'></class>
-			<class name='middle irish' status='dead'></class>
-			<class name='manx' status='dead'></class>
-			<class name='irish' status='living'></class>
-			<class name='scotts gaelic' status='living'></class>
+<class name="indogermanic">
+	<class name="celtic" status="living">
+		<class name="gaulisch" status="dead"/>
+		<class name="goidelic" status="dead">
+			<class name="old irish" status="dead"/>
+			<class name="middle irish" status="dead"/>
+			<class name="manx" status="dead"/>
+			<class name="irish" status="living"/>
+			<class name="scotts gaelic" status="living"/>
 		</class>
-		<class name='brythonic' status='dead'>
-			<class name='comish' status='dead'></class>
-			<class name='welsh' status='living'></class>
-			<class name='breton' status='living'></class>
+		<class name="brythonic" status="dead">
+			<class name="comish" status="dead"/>
+			<class name="welsh" status="living"/>
+			<class name="breton" status="living"/>
 		</class>
 	</class>
-	<class name='germanic' status='living'>
-		<class name='west germanic' status='living'>
-			<class name='anglo-frisian' status='living'>
-				<class name='old english' status='dead'>
-					<class name='middle english' status='dead'>
-						<class name='english' status='living'></class>
+	<class name="germanic" status="living">
+		<class name="west germanic" status="living">
+			<class name="anglo-frisian" status="living">
+				<class name="old english" status="dead">
+					<class name="middle english" status="dead">
+						<class name="english" status="living"/>
 					</class>
 				</class>
-				<class name='old frisian' status='dead'>
-					<class name='frisian' status='living'></class>
+				<class name="old frisian" status="dead">
+					<class name="frisian" status="living"/>
 				</class>
 			</class>
-			<class name='german' status='living'>
-				<class name='low german' status='living'>
-					<class name='old saxon' status='dead'>
-						<class name='plattdeutsch' status='dead'></class>
+			<class name="german" status="living">
+				<class name="low german" status="living">
+					<class name="old saxon" status="dead">
+						<class name="plattdeutsch" status="dead"/>
 					</class>
-					<class name='old low franconian' status='dead'>
-						<class name='dutch' status='living'></class>
-						<class name='flemish' status='living'></class>
-						<class name='afrikaans' status='living'></class>
-						<class name='south african dutch' status='dead'></class>
+					<class name="old low franconian" status="dead">
+						<class name="dutch" status="living"/>
+						<class name="flemish" status="living"/>
+						<class name="afrikaans" status="living"/>
+						<class name="south african dutch" status="dead"/>
 					</class>
 				</class>
-				<class name='high german' status='living'>
-					<class name='alemannic' status='living'></class>
-					<class name='alsatian' status='living'></class>
-					<class name='bavarian' status='living'></class>
-					<class name='franconian' status='living'></class>
-					<class name='german' status='living'></class>
-					<class name='pensilvania german' status='living'></class>
-					<class name='swiss' status='living'></class>
-					<class name='yiddish' status='living'></class>
+				<class name="high german" status="living">
+					<class name="alemannic" status="living"/>
+					<class name="alsatian" status="living"/>
+					<class name="bavarian" status="living"/>
+					<class name="franconian" status="living"/>
+					<class name="german" status="living"/>
+					<class name="pensilvania german" status="living"/>
+					<class name="swiss" status="living"/>
+					<class name="yiddish" status="living"/>
 				</class>
 			</class>
 		</class>
-		<class name='east germanic' status='living'>
-		</class>
-		<class name='north germanic' status='living'>
-			<class name='old west norse' status='living'>
-				<class name='islandic' status='living'></class>
-				<class name='faroese' status='living'></class>
+		<class name="east germanic" status="living"/>
+		<class name="north germanic" status="living">
+			<class name="old west norse" status="living">
+				<class name="islandic" status="living"/>
+				<class name="faroese" status="living"/>
 			</class>
-			<class name='old east norse' status='living'>
+			<class name="old east norse" status="living">
 				<node>
-					<class name='norwegian' status='living'></class>
+					<class name="norwegian" status="living"/>
 				</node>
 				<node>
-					<class name='danish' status='living'></class>
-					<class name='swedish' status='living'></class>
+					<class name="danish" status="living"/>
+					<class name="swedish" status="living"/>
 				</node>
 			</class>
 		</class>
 	</class>
-	<class name='italic' status='living'>
-		<class name='oscan' status='dead'></class>
-		<class name='umbrian' status='dead'></class>
-		<class name='old latin' status='living'>
-			<class name='catalan' status='living'></class>
-			<class name='french' status='living'></class>
-			<class name='galician' status='living'></class>
-			<class name='portuguese' status='living'></class>
-			<class name='italian' status='living'></class>
-			<class name='provencal' status='living'></class>
-			<class name='romansch' status='living'></class>
-			<class name='romanian' status='living'></class>
-			<class name='spanish' status='living'></class>
+	<class name="italic" status="living">
+		<class name="oscan" status="dead"/>
+		<class name="umbrian" status="dead"/>
+		<class name="old latin" status="living">
+			<class name="catalan" status="living"/>
+			<class name="french" status="living"/>
+			<class name="galician" status="living"/>
+			<class name="portuguese" status="living"/>
+			<class name="italian" status="living"/>
+			<class name="provencal" status="living"/>
+			<class name="romansch" status="living"/>
+			<class name="romanian" status="living"/>
+			<class name="spanish" status="living"/>
 		</class>
 	</class>
-	<class name='slavonic' status='living'>
-		<class name='west slavic' status='living'>
-			<class name='chech' status='living'></class>
-			<class name='polish' status='living'></class>
-			<class name='slovak' status='living'></class>
-			<class name='sorbian' status='living'></class>
+	<class name="slavonic" status="living">
+		<class name="west slavic" status="living">
+			<class name="chech" status="living"/>
+			<class name="polish" status="living"/>
+			<class name="slovak" status="living"/>
+			<class name="sorbian" status="living"/>
 		</class>
-		<class name='east slavic' status='living'>
-			<class name='belarussian' status='living'></class>
-			<class name='russian' status='living'></class>
-			<class name='ukrainian' status='living'></class>
+		<class name="east slavic" status="living">
+			<class name="belarussian" status="living"/>
+			<class name="russian" status="living"/>
+			<class name="ukrainian" status="living"/>
 		</class>
-		<class name='south slavic' status='living'>
-			<class name='bosnian' status='living'></class>
-			<class name='bulgarian' status='living'></class>
-			<class name='macedonian' status='living'></class>
-			<class name='serbo-croatian' status='living'></class>
-			<class name='slovene' status='living'></class>
+		<class name="south slavic" status="living">
+			<class name="bosnian" status="living"/>
+			<class name="bulgarian" status="living"/>
+			<class name="macedonian" status="living"/>
+			<class name="serbo-croatian" status="living"/>
+			<class name="slovene" status="living"/>
 		</class>
 	</class>
-	<class name='albanian' status='living'>
+	<class name="albanian" status="living"/>
+	<class name="armenian" status="living"/>
+	<class name="hellenic" status="living">
+		<class name="greek" status="living"/>
 	</class>
-	<class name='armenian' status='living'>
-	</class>
-	<class name='hellenic' status='living'>
-		<class name='greek' status='living'></class>
-	</class>
-	<class name='baltic' status='living'>
+	<class name="baltic" status="living">
 		<node>
-			<class name='lettish' status='living'></class>
+			<class name="lettish" status="living"/>
 		</node>
 		<node>
-			<class name='latvian' status='living'></class>
-			<class name='lithuanian' status='living'></class>
+			<class name="latvian" status="living"/>
+			<class name="lithuanian" status="living"/>
 		</node>
 	</class>
-	<class name='hittie' status='dead'>
+	<class name="hittie" status="dead">
 	</class>
-	<class name='indo iranian' status='living'>
-		<class name='iranian' status='living'>
-			<class name='avestan' status='dead'>
-				<class name='pashto' status='living'></class>
+	<class name="indo iranian" status="living">
+		<class name="iranian" status="living">
+			<class name="avestan" status="dead">
+				<class name="pashto" status="living"/>
 			</class>
-			<class name='old persian' status='dead'>
-				<class name='balushti' status='living'></class>
-				<class name='kurdish' status='living'></class>
-				<class name='ossetic' status='living'></class>
-				<class name='pashto' status='living'></class>
-				<class name='persian' status='living'></class>
+			<class name="old persian" status="dead">
+				<class name="balushti" status="living"/>
+				<class name="kurdish" status="living"/>
+				<class name="ossetic" status="living"/>
+				<class name="pashto" status="living"/>
+				<class name="persian" status="living"/>
 			</class>
-			<class name='scythian' status='dead'></class>
+			<class name="scythian" status="dead"/>
 		</class>
-		<class name='indic' status='living'>
-			<class name='sanskrit' status='dead'></class>
-			<class name='prakrit' status='dead'></class>
-			<class name='pali' status='dead'></class>
-			<class name='bengali' status='living'></class>
-			<class name='bihari' status='living'></class>
-			<class name='bhili' status='living'></class>
-			<class name='gujarati' status='living'></class>
-			<class name='hindi' status='living'></class>
-			<class name='hindustani' status='living'></class>
-			<class name='marati' status='living'></class>
-			<class name='nepali' status='living'></class>
-			<class name='bahari' status='living'></class>
-			<class name='punjabi' status='living'></class>
-			<class name='rajasthani' status='living'></class>
-			<class name='sindhi' status='living'></class>
-			<class name='singhalese' status='living'></class>
-			<class name='urdu' status='living'></class>
+		<class name="indic" status="living">
+			<class name="sanskrit" status="dead"/>
+			<class name="prakrit" status="dead"/>
+			<class name="pali" status="dead"/>
+			<class name="bengali" status="living"/>
+			<class name="bihari" status="living"/>
+			<class name="bhili" status="living"/>
+			<class name="gujarati" status="living"/>
+			<class name="hindi" status="living"/>
+			<class name="hindustani" status="living"/>
+			<class name="marati" status="living"/>
+			<class name="nepali" status="living"/>
+			<class name="bahari" status="living"/>
+			<class name="punjabi" status="living"/>
+			<class name="rajasthani" status="living"/>
+			<class name="sindhi" status="living"/>
+			<class name="singhalese" status="living"/>
+			<class name="urdu" status="living"/>
 		</class>
 	</class>
-	<class name='tocharian' status='dead'>
+	<class name="tocharian" status="dead">
 	</class>
 </class>**config
 --input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_demo_ig_lang_cat.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
@@ -218,6 +215,18 @@ BEGIN
 	DO UPDATE tree SET rgt = rgt-$3 WHERE rgt>$2;
 END
 
+--
+-- treeSelectNode       :Get the node
+-- treeSelectNodeByName :Get the node by name
+--
+TRANSACTION treeSelectNode -- (/node/id)
+BEGIN
+	FOREACH /node INTO /node DO SELECT ID,parent,name FROM tree WHERE ID = $(id);
+END
+TRANSACTION treeSelectNodeByName -- (/node/name)
+BEGIN
+	FOREACH /node INTO /node DO SELECT ID,parent,name FROM tree WHERE name = $(name);
+END
 
 --
 -- treeSelectNodeAndParents       :Get the node and its parents
@@ -251,11 +260,11 @@ END
 --
 TRANSACTION treeSelectNodeAndChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 TRANSACTION treeSelectNodeAndChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
 END
 
 --
@@ -302,21 +311,199 @@ function insert_class( parentid, itr)
 	end
 end
 
+function get_tree( parentid)
+	local f = formfunction( "treeSelectNodeAndChildren" )
+	local r = f( { node = { id=parentid } } )
+	local t = r:table()
+	local a = {}
+	for i,v in ipairs( t[ "node" ]) do
+		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
+	end
+	for i,v in ipairs( a) do
+		if v.parent ~= 0 then
+			table.insert( a[ v.parent ].children, i )
+		end
+	end
+	return a
+end
+
+function print_tree( tree, nodeid, indent)
+	if (indent ~= "") then
+		output:print( "\n" .. indent)
+	end
+	output:opentag( "class")
+	output:print( tree[ nodeid].name, "name")
+	local n = 0
+	for i,v in ipairs( tree[ nodeid].children) do
+		print_tree( tree, v, indent .. "\t")
+		n = n + 1
+	end
+	if n > 0 then
+		output:print( "\n" .. indent)
+	end
+	output:closetag()
+end
+
 function run()
 	filter().empty = false
-	output:opentag( "class")
 	local itr = input:get()
 	for v,t in itr do
 		if t == "class" then
 			insert_class( idcnt, scope( itr))
 		end
 	end
-	output:closetag()
+	print_tree( get_tree( 1), 1, "")
 end
 
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<class/>
+<class name="indogermanic">
+	<class name="celtic">
+		<class name="gaulisch"/>
+		<class name="goidelic">
+			<class name="old irish"/>
+			<class name="middle irish"/>
+			<class name="manx"/>
+			<class name="irish"/>
+			<class name="scotts gaelic"/>
+		</class>
+		<class name="brythonic">
+			<class name="comish"/>
+			<class name="welsh"/>
+			<class name="breton"/>
+		</class>
+	</class>
+	<class name="germanic">
+		<class name="west germanic">
+			<class name="anglo-frisian">
+				<class name="old english">
+					<class name="middle english">
+						<class name="english"/>
+					</class>
+				</class>
+				<class name="old frisian">
+					<class name="frisian"/>
+				</class>
+			</class>
+			<class name="german">
+				<class name="low german">
+					<class name="old saxon">
+						<class name="plattdeutsch"/>
+					</class>
+					<class name="old low franconian">
+						<class name="dutch"/>
+						<class name="flemish"/>
+						<class name="afrikaans"/>
+						<class name="south african dutch"/>
+					</class>
+				</class>
+				<class name="high german">
+					<class name="alemannic"/>
+					<class name="alsatian"/>
+					<class name="bavarian"/>
+					<class name="franconian"/>
+					<class name="german"/>
+					<class name="pensilvania german"/>
+					<class name="swiss"/>
+					<class name="yiddish"/>
+				</class>
+			</class>
+		</class>
+		<class name="east germanic"/>
+		<class name="north germanic">
+			<class name="old west norse">
+				<class name="islandic"/>
+				<class name="faroese"/>
+			</class>
+			<class name="old east norse">
+				<class name="norwegian"/>
+				<class name="danish"/>
+				<class name="swedish"/>
+			</class>
+		</class>
+	</class>
+	<class name="italic">
+		<class name="oscan"/>
+		<class name="umbrian"/>
+		<class name="old latin">
+			<class name="catalan"/>
+			<class name="french"/>
+			<class name="galician"/>
+			<class name="portuguese"/>
+			<class name="italian"/>
+			<class name="provencal"/>
+			<class name="romansch"/>
+			<class name="romanian"/>
+			<class name="spanish"/>
+		</class>
+	</class>
+	<class name="slavonic">
+		<class name="west slavic">
+			<class name="chech"/>
+			<class name="polish"/>
+			<class name="slovak"/>
+			<class name="sorbian"/>
+		</class>
+		<class name="east slavic">
+			<class name="belarussian"/>
+			<class name="russian"/>
+			<class name="ukrainian"/>
+		</class>
+		<class name="south slavic">
+			<class name="bosnian"/>
+			<class name="bulgarian"/>
+			<class name="macedonian"/>
+			<class name="serbo-croatian"/>
+			<class name="slovene"/>
+		</class>
+	</class>
+	<class name="albanian"/>
+	<class name="armenian"/>
+	<class name="hellenic">
+		<class name="greek"/>
+	</class>
+	<class name="baltic">
+		<class name="lettish"/>
+		<class name="latvian"/>
+		<class name="lithuanian"/>
+	</class>
+	<class name="hittie"/>
+	<class name="indo iranian">
+		<class name="iranian">
+			<class name="avestan">
+				<class name="pashto"/>
+			</class>
+			<class name="old persian">
+				<class name="balushti"/>
+				<class name="kurdish"/>
+				<class name="ossetic"/>
+				<class name="pashto"/>
+				<class name="persian"/>
+			</class>
+			<class name="scythian"/>
+		</class>
+		<class name="indic">
+			<class name="sanskrit"/>
+			<class name="prakrit"/>
+			<class name="pali"/>
+			<class name="bengali"/>
+			<class name="bihari"/>
+			<class name="bhili"/>
+			<class name="gujarati"/>
+			<class name="hindi"/>
+			<class name="hindustani"/>
+			<class name="marati"/>
+			<class name="nepali"/>
+			<class name="bahari"/>
+			<class name="punjabi"/>
+			<class name="rajasthani"/>
+			<class name="sindhi"/>
+			<class name="singhalese"/>
+			<class name="urdu"/>
+		</class>
+	</class>
+	<class name="tocharian"/>
+</class>
 tree:
 '1', '0', 'indogermanic', '1', '232'
 '2', '1', 'celtic', '2', '25'

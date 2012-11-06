@@ -72,7 +72,15 @@ static void removeFileIfExists( const std::string& filename)
 void SQLiteTestConstructor::createTestDatabase( const std::string& filename, const std::string& inputfile)
 {
 	removeFileIfExists( filename);
-
+	static bool sqlite3_config_called = false;
+	if (!sqlite3_config_called)
+	{
+		if (sqlite3_config( SQLITE_CONFIG_SINGLETHREAD) != SQLITE_OK)
+		{
+			throw std::logic_error( "unable to configure SQLite test database" );
+		}
+		sqlite3_config_called = true;
+	}
 	sqlite3* handle = 0;
 	int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX;
 	int res = sqlite3_open_v2( filename.c_str(), &handle, flags, OPERATING_SYSTEM);
