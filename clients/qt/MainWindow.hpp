@@ -15,6 +15,8 @@
 #include "FormWidget.hpp"
 #include "LoginDialog.hpp"
 
+#define SESSION_NAME "qtclient-db"
+
 namespace _Wolframe {
 	namespace QtClient {
 
@@ -62,6 +64,7 @@ namespace _Wolframe {
 		LoadMode m_loadMode;		// whether to use local loader or not
 		bool m_debug;			// show debug windows from the beginning
 		LoginDialog *m_loginDialog;	// the login dialog
+		QString m_dbName;
 
 		void parseArgs( );
 		void initialize( );

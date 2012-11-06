@@ -20,7 +20,7 @@ DEPLOYMENTFOLDERS = dir1 dir2 dir3 dir4
 # CONFIG += mobility
 # MOBILITY +=
 
-QT += core gui network
+QT += core gui network sql
 
 SOURCES += \
 	MainWindow.cpp \
@@ -30,6 +30,7 @@ SOURCES += \
 	DataLoader.cpp \
 	FileDataLoader.cpp \
 	NetworkDataLoader.cpp \
+	SqliteFormLoader.cpp \
 	DataHandler.cpp \
 	DebugTerminal.cpp \
 	HistoryLineEdit.cpp \
@@ -44,6 +45,7 @@ HEADERS += \
 	DataLoader.hpp \
 	FileDataLoader.hpp \
 	FileFormLoader.hpp \
+	SqliteFormLoader.hpp \
 	DebugTerminal.hpp \
 	FormLoader.hpp \
 	FormWidget.hpp \

@@ -14,7 +14,8 @@ INCLUDE_DIRS = \
 	/I"$(QT_DIR)\include\QtCore" \
 	/I"$(QT_DIR)\include\QtGui" \
 	/I"$(QT_DIR)\include\QtUiTools" \
-	/I"$(QT_DIR)\include\QtNetwork"
+	/I"$(QT_DIR)\include\QtNetwork" \
+	/I"$(QT_DIR)\include\QtSql"
 
 QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
 INCLUDE_LDFLAGS = \
@@ -22,10 +23,10 @@ INCLUDE_LDFLAGS = \
 
 !IFNDEF DEBUG
 INCLUDE_LIBS = \
-	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib
+	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib QtSql4.dll
 !ELSE
 INCLUDE_LIBS = \
-	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib
+	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtSqld4.dll
 !ENDIF
 
 # openssl
@@ -73,7 +74,8 @@ OBJS = \
 	qcommandline.obj \
 	moc_qcommandline.obj \
 	LoginDialog.obj \
-	moc_LoginDialog.obj
+	moc_LoginDialog.obj \
+	SqliteFormLoader.obj
 
 CPP_BINS = \
 	qtclient.exe
