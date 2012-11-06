@@ -7,6 +7,7 @@
 #include "FileDataLoader.hpp"
 #include "NetworkFormLoader.hpp"
 #include "NetworkDataLoader.hpp"
+#include "SqliteFormLoader.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -15,6 +16,8 @@
 #include <QLocale>
 #include <QtAlgorithms>
 #include <QMessageBox>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 
 #include <QDebug>
 
@@ -72,6 +75,13 @@ MainWindow::~MainWindow( )
 	if( m_formLoader ) delete m_formLoader;
 	if( m_dataLoader ) delete m_dataLoader;
 	if( m_uiLoader ) delete m_uiLoader;
+
+	{
+		QSqlDatabase db = QSqlDatabase::database( SESSION_NAME );
+		db.rollback( );
+		db.close( );
+	}
+	QSqlDatabase::removeDatabase( SESSION_NAME ); 	
 }
 
 void MainWindow::parseArgs( )
@@ -87,6 +97,7 @@ void MainWindow::parseArgs( )
 		{ QCommandLine::Option, 'c', "client-cert-file", "client certificate to present to the server (default: ./certs/client.crt)", QCommandLine::Optional },
 		{ QCommandLine::Option, 'k', "client-key-file", "client key file (default: ./private/client.key)", QCommandLine::Optional },
 		{ QCommandLine::Option, 'C', "CA-cert-file", "certificate file containing the CA (default: ./certs/CAclient.cert.pem)", QCommandLine::Optional },
+		{ QCommandLine::Option, 'f', "db-file", "Sqlite3 file for local storage", QCommandLine::Optional },
 		QCOMMANDLINE_CONFIG_ENTRY_END
 	};
 	
@@ -135,6 +146,8 @@ void MainWindow::optionFound( const QString &name, const QVariant &value )
 		m_clientKeyFile = value.toString( );
 	} else if( name == "CA-cert-file" ) {
 		m_CACertFile = value.toString( );
+	} else if( name == "db-file" ) {
+		m_dbName = value.toString( );
 	}
 }
 
@@ -165,6 +178,24 @@ void MainWindow::initialize( )
 #endif
 	qDebug( ) << "Debug window initialized";
 
+// open local sqlite database
+	QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE", SESSION_NAME );
+	db.setDatabaseName( m_dbName );
+	if( !db.open( ) ) {
+		QString msg = tr( "Unable to open or create Sqlite database file '%1'" ).
+			arg( QFileInfo( m_dbName ).fileName( ) );
+		QMessageBox::warning( this, "qtclient", msg );
+		QCoreApplication::quit( );
+	}
+	
+	QSqlQuery q( "select 1 from sqlite_master", db );
+	if( !q.exec( ) ) {
+		QString msg = tr( "Unable to query the Sqlite database file '%1', most likely not a database." ).
+			arg( QFileInfo( m_dbName ).fileName( ) );
+		QMessageBox::warning( this, "qtclient", msg );
+		QCoreApplication::quit( );
+	}
+
 // catch error of network protocol
 	connect( m_wolframeClient, SIGNAL( error( QString ) ),
 		this, SLOT( wolframeError( QString ) ) );
@@ -190,8 +221,10 @@ void MainWindow::initialize( )
 	
 // for testing, load lists of available forms from the files system,
 // pass the form loader to the FormWidget
-	m_formLoader = new FileFormLoader( "forms", "i18n" );
+	//m_formLoader = new FileFormLoader( "forms", "i18n" );
 	m_dataLoader = new FileDataLoader( "data" );
+
+	m_formLoader = new SqliteFormLoader( SESSION_NAME );
 
 // create delegate widget for form handling (one for now), in theory may are possible
 	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this );

@@ -14,7 +14,8 @@ INCLUDE_DIRS = \
 	-I$(QT_INCLUDE_DIR)/QtCore \
 	-I$(QT_INCLUDE_DIR)/QtNetwork \
 	-I$(QT_INCLUDE_DIR)/QtGui \
-	-I$(QT_INCLUDE_DIR)/QtUiTools
+	-I$(QT_INCLUDE_DIR)/QtUiTools \
+	-I$(QT_INCLUDE_DIR)/QtSql
 
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
@@ -22,7 +23,7 @@ INCLUDE_LDFLAGS = \
 	$(QT_LDFLAGS)
 
 INCLUDE_LIBS = \
-	-lQtCore -lQtGui -lQtUiTools -lQtNetwork -lQtXml
+	-lQtCore -lQtGui -lQtUiTools -lQtNetwork -lQtXml -lQtSql
 
 MOC_FLAGS = \
 	$(INCLUDE_DIRS)
@@ -65,7 +66,8 @@ OBJS = \
 	qcommandline.o \
 	moc_qcommandline.o \
 	LoginDialog.o \
-	moc_LoginDialog.o
+	moc_LoginDialog.o \
+	SqliteFormLoader.o
 
 CPP_BINS = \
 	qtclient$(EXE)
