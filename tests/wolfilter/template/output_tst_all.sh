@@ -20,12 +20,22 @@
 # - dumpout		(optional) file to dump to expected output too
 # - testdata		(optional) additionaly defined test data
 #
+CSETLIST=$csetlist
 if [ `echo $testcmd | grep -c -- '--config'` = 0 ]; then
-	csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4LE UCS-4BE"
+	if [ x"$csetlist" = x ]; then
+		csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4LE UCS-4BE"
+	fi
 	. ./output_tst_textwolf.sh
-	csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4BE"
+	csetlist="$CSETLIST"
+	if [ x"$csetlist" = x ]; then
+		csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4BE"
+	fi
 	. ./output_tst_libxml2.sh
+	csetlist="$CSETLIST"
 else
-	csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4BE"
+	if [ x"$csetlist" = x ]; then
+		csetlist="UTF-8 UTF-16LE UTF-16BE UCS-2LE UCS-2BE UCS-4BE"
+	fi
 	. ./output_tst_nofilter.sh
+	csetlist="$CSETLIST"
 fi

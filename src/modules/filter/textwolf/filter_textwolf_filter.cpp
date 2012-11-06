@@ -232,6 +232,31 @@ struct InputFilterImpl:public InputFilter
 		};
 		return false;
 	}
+
+	virtual bool getMetadata()
+	{
+		try
+		{
+			const char* ee;
+			std::size_t eesize;
+			for (;;) switch (m_parser.state())
+			{
+				case XMLParser::ParseHeader:
+					m_parser.getNext( ee, eesize);
+					continue;
+
+				case XMLParser::ParseSource:
+				case XMLParser::ParseDoctype:
+					return true;
+			}
+		}
+		catch (textwolf::SrcIterator::EoM)
+		{
+			setState( EndOfMessage);
+			return false;
+		};
+	}
+
 private:
 	///\brief Get the document type definition, if available
 	///\param [out] doctype definition parsed

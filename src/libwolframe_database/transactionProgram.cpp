@@ -55,9 +55,9 @@ static std::string::const_iterator lineStart( std::string::const_iterator si, co
 	if (si == src.begin()) return si;
 	for (--si; si >= src.begin() && *si <= ' ' && *si > '\0'; --si)
 	{
-		if (*si == '\n') return --si;
+		if (*si == '\n') return si+1;
 	}
-	return si;
+	throw std::logic_error( "internal: Called lineStart without calling isLineStart before");
 }
 
 static std::size_t lineCount( std::string::const_iterator si, std::string::const_iterator se)
@@ -145,7 +145,7 @@ std::string TransactionProgram::parseEmbeddedStatement( const std::string& funcn
 				++si;
 				std::string::const_iterator argstart = si;
 				ch = utils::parseNextToken( tok, si, se, m_optab);
-				for (; ch && ch != ')'; ++si, ch=utils::parseNextToken( tok, si, se, m_optab));
+				for (; ch && ch != ')'; ch=utils::parseNextToken( tok, si, se, m_optab));
 				if (ch == ')')
 				{
 					arg.push_back( std::string( argstart, si-1));
@@ -333,6 +333,13 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 							throw ERROR( si, "function call (DO ..) specified twice in a transaction description");
 						}
 						mask |= (1 << (unsigned)TransactionDescription::Call);
+
+						std::string::const_iterator oi = si;
+						if (parseNextToken( tok, oi, se) &&  boost::algorithm::iequals( tok, "NONEMPTY"))
+						{
+							desc.nonempty = true;
+							si = oi;
+						}
 						if (!gotoNextToken( si, se))
 						{
 							throw ERROR( si, "unexpected end of transaction description after DO");

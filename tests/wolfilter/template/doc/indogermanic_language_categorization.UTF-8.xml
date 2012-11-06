@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<languages>
+<source="http://www.vaughns-1-pagers.com/language/european-languages.htm"/>
+<class name='celtic' status='living'>
+</class>
+<class name='germanic' status='living'>
+</class>
+<class name='italic' status='living'>
+</class>
+<class name='slavonic' status='living'>
+</class>
+<class name='albanian' status='living'>
+</class>
+<class name='armenian' status='living'>
+</class>
+<class name='hellenic' status='living'>
+</class>
+<class name='baltic' status='living'>
+</class>
+<class name='hittie' status='dead'>
+</class>
+<class name='indo iranian' status='living'>
+</class>
+<class name='tocharian' status='dead'>
+</class>
+</languages>

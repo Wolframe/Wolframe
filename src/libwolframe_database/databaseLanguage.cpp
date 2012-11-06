@@ -51,12 +51,12 @@ std::string LanguageDescription::stm_argument_reference( int index) const
 bool LanguageDescription::isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const
 {
 	std::string::const_iterator start = si;
-	while (si != se && *si > 0 && *si <= 32) ++si;
+	while (si != se && (*si < 0 || *si > 32)) ++si;
 	std::string keyword = boost::algorithm::to_lower_copy( std::string( start, si));
-	if (boost::iequals( keyword, "select")) return true;
-	if (boost::iequals( keyword, "update")) return true;
-	if (boost::iequals( keyword, "insert")) return true;
-	if (boost::iequals( keyword, "delete")) return true;
+	if (keyword == "select") return true;
+	if (keyword == "update") return true;
+	if (keyword == "insert") return true;
+	if (keyword == "delete") return true;
 	return false;
 }
 
@@ -90,11 +90,13 @@ std::string LanguageDescription::parseEmbeddedStatement( std::string::const_iter
 				continue;
 			}
 		}
-		break;
-
 	}
-	if (ch != ';') throw std::runtime_error( "embedded statement not terminated");
-	rt.append( std::string( start, si-1));
+	if (ch != ';')
+	{
+		throw std::runtime_error( "embedded statement not terminated");
+	}
+	--si; //... terminating ';' is not swallowed
+	rt.append( std::string( start, si));
 	return rt;
 }
 

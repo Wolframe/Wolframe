@@ -213,6 +213,7 @@ private:
 		{
 			if (m_state != Init) throw std::logic_error( "printing document not starting with xml header");
 			std::string enc = m_attributes.getEncoding();
+			if (enc.empty()) enc = "UTF-8";
 			printToBuffer( "<?xml version=\"1.0\" encoding=\"", 30, buf);
 			printToBuffer( enc.c_str(), enc.size(), buf);
 			if (standalone)

@@ -15,7 +15,10 @@ docin=employee_assignment_print				# input document name
 docout=$testname					# output document name
 testdata="
 **file: DBRES
-#name#job1#job2#job3#job4
+#name#job1
+#name#job2
+#name#job3
+#name#job4
 **file:DBIN.tdl
 TRANSACTION test_transaction
 BEGIN

@@ -236,6 +236,11 @@ public:
 		ParseDoctype,			//< parsing DOCTYPE definition if available
 		ParseSource			//< parsing the XML content section
 	};
+	static const char* stateName( State i)
+	{
+		static const char* ar[] = {"ParseHeader", "ParseDoctype", "ParseSource"};
+		return ar[ (int)i];
+	}
 
 	State state() const
 	{

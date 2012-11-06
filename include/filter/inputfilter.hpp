@@ -108,6 +108,11 @@ public:
 		return true;
 	}
 
+	virtual bool getMetadata()
+	{
+		return true;
+	}
+
 	///\brief Get the current state
 	///\return the current state
 	State state() const				{return m_state;}

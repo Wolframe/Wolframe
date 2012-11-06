@@ -40,7 +40,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr)
+static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr, bool requiresNonemptyResult)
 {
 	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
@@ -63,33 +63,43 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 	if (!stmh->execute()) return false;
 
 	unsigned int si, se = stmh->nofColumns();
-	if (!cmdres.nofColumns())
+	if (se)
 	{
-		for (si=0; si != se; ++si)
+		if (!cmdres.nofColumns())
 		{
-			const char* colname = stmh->columnName( si+1);
-			cmdres.addColumn( colname?colname:"");
-		}
-	}
-	if (stmh->hasResult())
-	{
-		do
-		{
-			cmdres.openRow();
 			for (si=0; si != se; ++si)
 			{
-				const char* col = stmh->get( si+1);
-				if (col)
-				{
-					cmdres.addValue( col);
-				}
-				else
-				{
-					cmdres.addNull();
-				}
+				const char* colname = stmh->columnName( si+1);
+				cmdres.addColumn( colname?colname:"");
 			}
-
-		} while (stmh->next());
+		}
+		if (stmh->hasResult())
+		{
+			do
+			{
+				cmdres.openRow();
+				for (si=0; si != se; ++si)
+				{
+					const char* col = stmh->get( si+1);
+					if (col)
+					{
+						cmdres.addValue( col);
+					}
+					else
+					{
+						cmdres.addNull();
+					}
+				}
+			} while (stmh->next());
+		}
+		else if (requiresNonemptyResult)
+		{
+			throw std::runtime_error( std::string( "missing result for command (NONEMPTY) ") + cmditr->name());
+		}
+	}
+	else if (requiresNonemptyResult)
+	{
+		throw std::runtime_error( std::string( "unexpected condition NONEMPTY on result for a command without result set: ") + cmditr->name());
 	}
 	return true;
 }
@@ -127,7 +137,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 				TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
 				for (; wi != we; ++wi)
 				{
-					if (!executeCommand( this, cmdres, wi, ci)) return false;
+					if (!executeCommand( this, cmdres, wi, ci, input.hasNonemptyResult( ci->functionidx()))) return false;
 				}
 			}
 		}
@@ -135,7 +145,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		{
 			// ... command has no result reference, then we call it once
 			TransactionOutput::row_iterator wi;
-			if (!executeCommand( this, cmdres, wi, ci)) return false;
+			if (!executeCommand( this, cmdres, wi, ci, input.hasNonemptyResult( ci->functionidx()))) return false;
 		}
 	}
 	if (cmdres.functionidx() != null_functionidx)

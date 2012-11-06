@@ -179,9 +179,10 @@ private:
 class FunctionCall
 {
 public:
-	FunctionCall(){}
+	FunctionCall()
+		:m_nonemptyResult(false){}
 	FunctionCall( const FunctionCall& o);
-	FunctionCall( const std::string& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg);
+	FunctionCall( const std::string& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg, bool setNonemptyResult_);
 
 	const Path& selector() const			{return m_selector;}
 	const std::vector<Path>& arg() const		{return m_arg;}
@@ -190,12 +191,14 @@ public:
 	void resultname( const char* r)			{m_resultname = r;}
 
 	bool hasResultReference() const;
+	bool hasNonemptyResult() const			{return m_nonemptyResult;}
 
 private:
 	std::string m_resultname;
 	std::string m_name;
 	Path m_selector;
 	std::vector<Path> m_arg;
+	bool m_nonemptyResult;
 };
 
 struct TransactionFunction::Impl
@@ -640,17 +643,19 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 	ar.insert( ar.end(), ar1.begin(), ar1.end());
 }
 
-FunctionCall::FunctionCall( const std::string& r, const std::string& n, const Path& s, const std::vector<Path>& a)
+FunctionCall::FunctionCall( const std::string& r, const std::string& n, const Path& s, const std::vector<Path>& a, bool q)
 	:m_resultname(r)
 	,m_name(n)
 	,m_selector(s)
-	,m_arg(a) {}
+	,m_arg(a)
+	,m_nonemptyResult(q){}
 
 FunctionCall::FunctionCall( const FunctionCall& o)
 	:m_resultname(o.m_resultname)
 	,m_name(o.m_name)
 	,m_selector(o.m_selector)
-	,m_arg(o.m_arg) {}
+	,m_arg(o.m_arg)
+	,m_nonemptyResult(o.m_nonemptyResult){}
 
 bool FunctionCall::hasResultReference() const
 {
@@ -759,6 +764,8 @@ TransactionInput TransactionFunctionInput::get() const
 	std::vector<FunctionCall>::const_iterator ci = m_func->impl().m_call.begin(), ce = m_func->impl().m_call.end();
 	for (std::size_t ii=0; ci != ce; ++ci,++ii)
 	{
+		if (ci->hasNonemptyResult()) rt.setNonemptyResult( ii);
+
 		// Select the nodes to execute the command with:
 		std::vector<Structure::Node> nodearray;
 		ci->selector().selectNodes( structure(), structure().root(), nodearray);
@@ -981,7 +988,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 				Path pp( *ai, &m_tagmap);
 				param.push_back( pp);
 			}
-			FunctionCall cc( di->output, functionname, selector, param);
+			FunctionCall cc( di->output, functionname, selector, param, di->nonempty);
 			m_call.push_back( cc);
 		}
 		catch (const std::runtime_error& e)

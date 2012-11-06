@@ -263,7 +263,10 @@ void TesttraceTransaction::execute()
 	printTransactionInput( buf, m_input);
 
 	TransactionHandler stm( &buf, m_result);
-	stm.doTransaction( m_input, m_output);
+	if (!stm.doTransaction( m_input, m_output))
+	{
+		throw std::runtime_error( "transaction failed!");
+	}
 }
 
 

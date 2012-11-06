@@ -8,7 +8,7 @@
 -- Joe Celko example from http://www.ibase.ru/devinfo/DBMSTrees/sqltrees.html
 
 CREATE TABLE tree (
- ID SERIAL PRIMARY KEY,
+ ID INTEGER PRIMARY KEY AUTOINCREMENT,
  parent INT REFERENCES tree( ID ),
  name TEXT,
  lft INT NOT NULL UNIQUE DEFERRABLE CHECK ( lft > 0 ),
