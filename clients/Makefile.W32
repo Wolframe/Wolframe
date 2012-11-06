@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = cli lib cmdline
+SUBDIRS = lib cmdline
 
 !IFDEF WITH_QT
 SUBDIRS = \

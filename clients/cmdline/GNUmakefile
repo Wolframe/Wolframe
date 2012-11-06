@@ -53,9 +53,13 @@ local_uninstall:
 	-rm -f $(DESTDIR)$(bindir)/wolframec$(EXE)
 	-rmdir $(DESTDIR)$(bindir)
 
-local_test:
-
 LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/clients/lib"
+
+local_test:
+ifeq ($(WITH_EXPECT),1)
+# currently disabled, must be adapted
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(EXPECT) ./testWolframec
+endif
 
 run:
 	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./wolframec 127.0.0.1 7661

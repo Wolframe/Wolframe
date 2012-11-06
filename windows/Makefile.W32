@@ -6,6 +6,11 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
+!IFDEF DEBUG
+WIX_FLAGS = $(WIX_FLAGS) \
+	-ddebug=1
+!ENDIF
+
 !IFDEF WITH_SSL
 WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_ssl=1
@@ -29,6 +34,11 @@ WIX_FLAGS = $(WIX_FLAGS) \
 !IFDEF WITH_LIBXML2
 WIX_FLAGS = $(WIX_FLAGS) \
 	-dwith_libxml2=1
+!ENDIF
+
+!IFDEF WITH_ICU
+WIX_FLAGS = $(WIX_FLAGS) \
+	-dwith_icu=1 -dicu_lib_version=$(ICU_LIB_VERSION)
 !ENDIF
 
 # The name of libintl and libiconv are not always the same
