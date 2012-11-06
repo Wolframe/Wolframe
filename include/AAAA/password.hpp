@@ -117,6 +117,11 @@ public:
 	/// Construct the password hash from salt and password (plain text)
 	/// \param pwdSalt	password salt as a base64 string
 	/// \param password	password as plain text
+	PasswordHash( const Salt& pwdSalt, const std::string& password );
+
+	/// Construct the password hash from salt and password (plain text)
+	/// \param pwdSalt	password salt as a base64 string
+	/// \param password	password as plain text
 	PasswordHash( const std::string& pwdSalt, const std::string& password );
 
 	/// Construct the password hash from a combined password hash string (base64)

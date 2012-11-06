@@ -44,6 +44,8 @@
 #include "types/sha2.h"
 #include "types/byte2hex.h"
 #include "AAAA/CRAM.hpp"
+#include "AAAA/password.hpp"
+#include "passwdFile.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -56,10 +58,10 @@ namespace AAAA {
 //***********************************************************************
 TextFileAuthenticator::TextFileAuthenticator( const std::string& Identifier,
 					      const std::string& filename )
-	: AuthenticationUnit( Identifier ), m_file( filename )
+	: AuthenticationUnit( Identifier ), m_pwdFile( filename, false )
 {
 	MOD_LOG_DEBUG << "Text file authenticator '" << identifier()
-		      << "' created with file '" << m_file << "'";
+		      << "' created with file '" << m_pwdFile.filename() << "'";
 }
 
 TextFileAuthenticator::~TextFileAuthenticator()
@@ -78,168 +80,44 @@ User* TextFileAuthenticator::authenticatePlain( const std::string& username,
 						const std::string& password,
 						bool caseSensitveUser ) const
 {
-	FILE*	pwdFile;
-	if ( ! ( pwdFile = fopen( m_file.c_str(), "r" )))	{
-		MOD_LOG_ERROR << "Authentication: " << identifier() << ": unable to open authentication file '"
-			      << m_file << "': " << strerror( errno );
-		return NULL;
+	PwdFileUser	user;
+
+	if ( m_pwdFile.getUser( username, user, caseSensitveUser ))	{
+		PasswordHash	filePwd( user.hash );
+		PasswordHash	clientPwd( filePwd.salt(), password );
+
+		PasswordHash::Hash	h0 = filePwd.hash();
+		PasswordHash::Hash	h1 = clientPwd.hash();
+		if ( h0 == h1 )
+			return new User( "TextFile", user.user, user.info );
 	}
-	MOD_LOG_TRACE << "Authentication: " << identifier() << ": opened file '" << m_file << "'";
-
-	char	lineBuf[ PWD_LINE_SIZE + 2];
-	while( ! feof( pwdFile ))	{
-		if ( ! fgets( lineBuf,  PWD_LINE_SIZE, pwdFile ))	{
-			int err = errno;
-			if ( feof( pwdFile ))	{		// EOF reached with nothing to read
-				fclose( pwdFile );
-				return NULL;
-			}
-			else	{
-				MOD_LOG_ERROR << "Authentication: " << identifier()
-					      << ": unable to read from authentication file '"
-					      << m_file << "': " << strerror( err );
-				fclose( pwdFile );
-				return NULL;
-			}
-		}
-
-		std::string line( lineBuf );
-		boost::algorithm::trim( line );
-		if ( line.empty() || line[0] == '#' )
-			continue;
-
-		std::size_t  start = 0, end = 0;
-		std::string usr, pwd, name;
-		if ( end != std::string::npos )	{
-			end = line.find( ":", start );
-			usr = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-		}
-		if (( caseSensitveUser && usr != username ) ||
-				( !caseSensitveUser && !boost::algorithm::iequals( usr, username )))
-			continue;
-
-		if ( end != std::string::npos )	{
-			end = line.find( ":", start );
-			pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-		}
-
-		unsigned char pwDigest[ SHA224_DIGEST_SIZE ];
-		if ( hex2byte( pwd.c_str(), pwDigest, SHA224_DIGEST_SIZE ) < 0 )	{
-			MOD_LOG_ERROR << "Authentication: " << identifier() << ": error parsing password hash for user '"
-				      << usr << "'";
-			fclose( pwdFile );
-			return NULL;
-		}
-		unsigned char inDigest[ SHA224_DIGEST_SIZE ];
-		sha224((const unsigned char *)password.c_str(), password.length(), inDigest );
-
-		if ( memcmp( pwDigest, inDigest, SHA224_DIGEST_SIZE ))	{
-			fclose( pwdFile );
-			return NULL;
-		}
-
-		if ( end != std::string::npos )	{
-			end = line.find( ":", start );
-			name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-			boost::algorithm::trim( name );
-		}
-
-		if ( name.empty())
-			MOD_LOG_WARNING << "Authentication: " << identifier() << ": no name for user '"
-					<< usr << "'";
-		fclose( pwdFile );
-		return new User( "TextFile", usr, name );
-	}
-	fclose( pwdFile );
 	return NULL;
 }
 
 
-User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
-					   const CRAMresponse& response,
-					   bool caseSensitveUser ) const
-{
-	return authenticate( challenge, response.toString(), caseSensitveUser );
-}
+//User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
+//					   const CRAMresponse& response,
+//					   bool caseSensitveUser ) const
+//{
+//	return authenticate( challenge, response.toString(), caseSensitveUser );
+//}
 
-User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
-					   const std::string& response,
-					   bool caseSensitveUser ) const
-{
-	FILE*	pwdFile;
-	if ( ! ( pwdFile = fopen( m_file.c_str(), "r" )))	{
-		MOD_LOG_ERROR << "Authentication: " << identifier() << ": unable to open authentication file '"
-			      << m_file << "': " << strerror( errno );
-		return NULL;
-	}
-	MOD_LOG_TRACE << "Authentication: " << identifier() << ": opened file '" << m_file << "'";
+//User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
+//					   const std::string& response,
+//					   bool caseSensitveUser ) const
+//{
+//	PwdFileUser	user;
 
-	char	lineBuf[ PWD_LINE_SIZE + 2];
-	while( ! feof( pwdFile ))	{
-		if ( ! fgets( lineBuf,  PWD_LINE_SIZE, pwdFile ))	{
-			int err = errno;
-			if ( feof( pwdFile ))	{		// EOF reached with nothing to read
-				fclose( pwdFile );
-				return NULL;
-			}
-			else	{
-				MOD_LOG_ERROR << "Authentication: " << identifier()
-					      << ": unable to read from authentication file '"
-					      << m_file << "': " << strerror( err );
-				fclose( pwdFile );
-				return NULL;
-			}
-		}
-
-		std::string line( lineBuf );
-		boost::algorithm::trim( line );
-		if ( line.empty() || line[0] == '#' )
-			continue;
-
-		std::size_t  start = 0, end = 0;
-		std::string usr, pwd, name;
-		if ( end != std::string::npos )	{
-			end = line.find( ":", start );
-			usr = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-		}
-		if ( caseSensitveUser )
-			boost::to_lower( usr );
-
-		if ( end != std::string::npos )	{
-			end = line.find( ":", start );
-			pwd = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-			start = (( end > ( std::string::npos - 1 )) ?  std::string::npos : end + 1 );
-		}
-
-		try	{
-			CRAMresponse	local( challenge, pwd );
-			if ( local != response )
-				continue;
-		}
-		catch ( std::exception& e)	{
-			MOD_LOG_ERROR << "Authentication: " << identifier() << ": error parsing password hash for user '"
-				      << usr << "'";
-			continue;
-		}
-
-		if ( end != std::string::npos )	{
-			end = line.find( ":", start );
-			name = ( line.substr( start, (end == std::string::npos) ? std::string::npos : end - start ));
-			boost::algorithm::trim( name );
-		}
-
-		if ( name.empty())
-			MOD_LOG_WARNING << "Authentication: " << identifier() << ": no name for user '"
-					<< usr << "'";
-		fclose( pwdFile );
-		return new User( "TextFile", usr, name );
-	}
-	fclose( pwdFile );
-	return NULL;
-}
+//	if ( m_pwdFile.getUser( username, user, caseSensitveUser ))	{
+//		PasswordHash	filePwd( user.hash );
+//		try	{
+//			CRAMresponse	local( challenge, filePwd.hash() );
+//			if ( local == response )
+//				return new User( "TextFile", user.user, user.info );
+//		}
+//	}
+//	return NULL;
+//}
 
 
 // Text file authentication - authentication slice

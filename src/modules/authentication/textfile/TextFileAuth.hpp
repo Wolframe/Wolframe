@@ -43,6 +43,13 @@
 #include "constructor.hpp"
 #include "AAAA/user.hpp"
 #include "AAAA/CRAM.hpp"
+#include "passwdFile.hpp"
+
+#ifndef _WIN32
+static const bool	USERNAME_DEFAULT_CASE_SENSIVE = true;
+#else
+static const bool	USERNAME_DEFAULT_CASE_SENSIVE = false;
+#endif
 
 namespace _Wolframe {
 namespace AAAA {
@@ -83,11 +90,11 @@ public:
 				 bool caseSensitveUser = true ) const;
 
 	User* authenticate( const CRAMchallenge& challenge, const std::string& response,
-			    bool caseSensitveUser ) const;
+			    bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 	User* authenticate( const CRAMchallenge& challenge, const CRAMresponse& response,
-			    bool caseSensitveUser ) const;
+			    bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 private:
-	const std::string		m_file;
+	const PasswordFile	m_pwdFile;
 };
 
 

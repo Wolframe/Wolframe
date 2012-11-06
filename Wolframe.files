@@ -289,6 +289,12 @@ examples/configurator/sqlite.sql
 examples/demo/first/database/schema.sql
 examples/demo/first/database/tree_data.sql
 examples/demo/first/database/tree_schema.sql
+examples/demo/first/data/treeAddNode01.xml
+examples/demo/first/data/treeAddNode02.xml
+examples/demo/first/data/treeAddNode03.xml
+examples/demo/first/data/treeAddNode04.xml
+examples/demo/first/data/treeAddNode05.xml
+examples/demo/first/data/treeAddNode06.xml
 examples/demo/first/tests/treenode.xml
 examples/demo/first/tests/unknown.xml
 examples/demo/first/wolframe.conf
@@ -439,6 +445,7 @@ include/connectionHandler.hpp
 include/constructor.hpp
 include/database/bindStatementParams.hpp
 include/database/database.hpp
+include/database/databaseLanguage.hpp
 include/database/DBprovider.hpp
 include/database/preparedStatement.hpp
 include/database/transactionFunction.hpp
@@ -787,6 +794,7 @@ src/libwolframe/b64encode.c
 src/libwolframe/byte2hex.c
 src/libwolframe/CRAM.cpp
 src/libwolframe_database/bindStatementParams.cpp
+src/libwolframe_database/databaseLanguage.cpp
 src/libwolframe_database/GNUmakefile
 src/libwolframe_database/Makefile.W32
 src/libwolframe_database/preparedStatement.cpp
