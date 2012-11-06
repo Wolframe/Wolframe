@@ -115,7 +115,7 @@ copy_prereq:
 	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
 !ENDIF
 !IFDEF WITH_LUA
-	@-copy ..\lua\src\lua.dll .
+	@-copy ..\lua\src\lua52.dll .
 !ENDIF
 !IFDEF WITH_PGSQL
 	@-copy "$(PGSQL_DIR)\lib\libpq.dll" .
@@ -127,6 +127,15 @@ copy_prereq:
 !IFDEF WITH_LIBXML2
 	@-copy "$(WIN_ICONV_DIR)\iconv.dll" .
 	@-copy "$(LIBXML2_DIR)\lib\libxml2.dll" .
+!ENDIF
+!IFDEF WITH_ICU
+!IFNDEF DEBUG
+	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" .
+	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" .
+!ELSE
+	@-copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION)d.dll" .
+	@-copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION)d.dll" .
+!ENDIF
 !ENDIF
 
 run: copy_prereq

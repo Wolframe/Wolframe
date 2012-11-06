@@ -113,7 +113,7 @@ Project Wolframe.
 									<File Id="lua52.dll" Name="lua52.dll" Source="..\lua\src\lua52.dll"/>
 								</Component>
 							<?endif?>
-
+							
 							<Component Id="EventLogRegistryEntries" Guid="{f0a03f1a-155c-46b8-88bf-0ea608222b92}">
 								<!-- register event logger source (TODO, couple with config) -->
 								<RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\Wolframe">
@@ -148,6 +148,18 @@ Project Wolframe.
 								<File Id="iconv.dll" Name="iconv.dll" DiskId="1" Source="..\src\iconv.dll"/>
 							</Component>
 							<?endif?>
+							
+							<?ifdef var.with_icu?>
+							<Component Id="ICUDlls" Guid="{205cf449-6a2e-4d43-969a-5740fc4f737b}">
+								<?ifdef var.debug?>
+									<File Id="icuin49d.dll" Name="icuind.dll" DiskId="1" Source="..\src\icuin49d.dll"/>
+									<File Id="icuuc49d.dll" Name="icuucd.dll" DiskId="1" Source="..\src\icuuc49d.dll"/>
+								<?else?>
+									<File Id="icuin49.dll" Name="icuin.dll" DiskId="1" Source="..\src\icuin49.dll"/>
+									<File Id="icuuc49.dll" Name="icuuc.dll" DiskId="1" Source="..\src\icuuc49.dll"/>
+								<?endif?>
+							</Component>
+							<?endif?>							
 							
 							<?ifdef with_pgsql?>
 							<Component Id="PostgresqlDlls" Guid="{3BD6483F-70B2-44D3-9C65-26787635A44B}">
@@ -313,7 +325,7 @@ Project Wolframe.
 											  File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
 								</Component>
 							<?endif?>
-
+							
 							<Component Id="ModFilterLine" Guid="{60e8af7a-488b-4b50-81ba-e1f0685e5987}">
 								<File Id="mod_filter_line.dll" Name="mod_filter_line.dll" DiskId="1" Source="..\src\modules\filter\line\mod_filter_line.dll"/>
 								<util:XmlFile Id="AppendConfigModFilterLine" Action="createElement" ElementPath="/configuration/LoadModules"
@@ -333,6 +345,16 @@ Project Wolframe.
 								<util:XmlFile Id="AppendConfigModFilterToken" Action="createElement" ElementPath="/configuration/LoadModules"
 								              Name="module" Value="[INSTALLDIR]modules\mod_filter_token.dll"
 									      File="[#wolframe.xml]" SelectionLanguage="XPath" Sequence="1"/>
+							</Component>
+
+							<?ifdef var.with_icu?>
+								<Component Id="ModNormalizeLocale" Guid="{619a69fe-f857-40e3-abd1-8acc44b6f939}">
+									<File Id="mod_normalize_locale.dll" Name="mod_normalize_locale.dll" DiskId="1" Source="..\src\modules\normalize\locale\mod_normalize_locale.dll"/>
+								</Component>
+							<?endif?>
+
+							<Component Id="ModNormalizeNumber" Guid="{a77a21c2-5586-470b-a3fa-96968c708705}">
+								<File Id="mod_normalize_number.dll" Name="mod_normalize_number.dll" DiskId="1" Source="..\src\modules\normalize\number\mod_normalize_number.dll"/>
 							</Component>
 
 						</Directory>
@@ -476,6 +498,20 @@ Project Wolframe.
 				<?endif?>
 				
 			</Feature>			
+			
+			<Feature Id="NormalizationModules" Title="Normalization Modules" Description="Normalization modules" Level="3">
+				<Feature Id="StandardNormalizationModules" Title="Standard normalization modules" Description="Standard normalization modules." Level="3" InstallDefault="local" TypicalDefault="install">
+					<ComponentRef Id="ModNormalizeNumber"/>
+				</Feature>
+
+				<?ifdef var.with_icu?>
+					<Feature Id="NormalizationModuleLocale" Title="Normalization Module with ICU" Description="Normalization Module with ICU." Level="3" InstallDefault="local" TypicalDefault="install">
+						<ComponentRef Id="ModNormalizeLocale"/>
+						<ComponentRef Id="ICUDlls"/>
+					</Feature>
+				<?endif?>
+				
+			</Feature>
 			
 			<Feature Id="Clients" Title="Clients" Description="Client programmes talking to Wolframe." Level="3"  InstallDefault="local">
 				<Feature Id="QtClient" Title="Qt Client" Description="A Qt client to access the Wolframe server." Level="1000">
