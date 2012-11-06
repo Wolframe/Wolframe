@@ -26,7 +26,7 @@ INCLUDE_LIBS = \
 	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib QtSql4.dll
 !ELSE
 INCLUDE_LIBS = \
-	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtSqld4.dll
+	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtSqld4.lib
 !ENDIF
 
 # openssl
@@ -159,11 +159,13 @@ run: local_all $(CPP_BINS)
 	@-echo copy $(QT_DIR)\bin\QtGui4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtNetwork4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtWebkit4.dll . >> test.bat
+	@-echo copy $(QT_DIR)\bin\QtSql4.dll . >> test.bat
 !ELSE
 	@-echo copy $(QT_DIR)\bin\QtCored4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtGuid4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtNetworkd4.dll . >> test.bat
 	@-echo copy $(QT_DIR)\bin\QtWebkitd4.dll . >> test.bat
+	@-echo copy $(QT_DIR)\bin\QtSqld4.dll . >> test.bat
 !ENDIF
 !IFDEF WITH_SSL
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
