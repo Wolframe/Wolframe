@@ -29,7 +29,8 @@ CPP_OBJS = \
 	TextFileAuthConfig.obj \
 	TextFileAuthConstructor.obj \
 	TextFileAuth.obj \
-	TextFileAuthModule.obj
+	TextFileAuthModule.obj \
+	$(PASSWD_OBJS)
 
 all: $(DYNAMIC_MODULE)
 
