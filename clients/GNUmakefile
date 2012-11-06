@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = cli lib cmdline
+SUBDIRS = lib cmdline
 
 ifeq ($(WITH_QT),1)
 SUBDIRS += qt

@@ -10,13 +10,13 @@ set config wolframe.conf
 set timeout 3
 set serverpid [spawn ../../src/wolframed -c $config -f]
 
-puts "wolframe lua echo started with configuration file: $config (pid: $serverpid)"
+puts "wolframe daemon started with configuration file: $config (pid: $serverpid)"
 # allow the server to start
-sleep 2
+sleep 3
 
 set timeout 3
 if { [catch {
-	spawn ./wolfcli 127.0.0.1 7661
+	spawn ./wolframec 127.0.0.1 7661
 
 	expect 	{
 		timeout	{ return "--> oops. timeout occured waiting for server banner\n" }
