@@ -295,9 +295,23 @@ public:
 		m_cmd.back().bind( Element::ResultColumn, resultref);
 	}
 
+	bool hasNonemptyResult( std::size_t functionidx) const
+	{
+		if (functionidx >= m_nonemptyResult.size()) return false;
+		return m_nonemptyResult.at( functionidx);
+	}
+
+	void setNonemptyResult( std::size_t functionidx)
+	{
+		std::size_t nn = (functionidx >= m_nonemptyResult.size())?(functionidx-m_nonemptyResult.size()+1):0;
+		for (; nn>0; --nn) m_nonemptyResult.push_back(false);
+		m_nonemptyResult[ functionidx] = true;
+	}
+
 private:
 	std::vector<Command> m_cmd;
 	std::string m_strings;
+	std::vector<bool> m_nonemptyResult;
 };
 
 

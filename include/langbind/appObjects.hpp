@@ -66,13 +66,21 @@ class Output
 {
 public:
 	///\brief Constructor
-	Output() :m_state(0){}
+	Output()
+		:m_state(0)
+		,m_called(false){}
 	///\brief Copy constructor
 	///\param[in] o copied item
-	Output( const Output& o) :m_outputfilter(o.m_outputfilter),m_state(o.m_state){}
+	Output( const Output& o)
+		:m_outputfilter(o.m_outputfilter)
+		,m_state(o.m_state)
+		,m_called(o.m_called){}
 	///\brief Constructor by output filter
 	///\param[in] flt output filter reference
-	Output( const OutputFilterR& flt) :m_outputfilter(flt),m_state(0){}
+	Output( const OutputFilterR& flt)
+		:m_outputfilter(flt)
+		,m_state(0)
+		,m_called(false){}
 	///\brief Destructor
 	~Output(){}
 
@@ -87,9 +95,13 @@ public:
 	const OutputFilterR& outputfilter() const		{return m_outputfilter;}
 	OutputFilterR& outputfilter()				{return m_outputfilter;}
 
+	bool called() const					{return m_called;}
+	void called( bool yes)					{m_called=yes;}
+
 private:
 	OutputFilterR m_outputfilter;				//< output filter reference
 	unsigned int m_state;					//< current state for outputs with more than one elements
+	bool m_called;						//< has already been called
 };
 
 ///\class Input

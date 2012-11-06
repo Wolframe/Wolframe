@@ -325,7 +325,7 @@ static void check_parameters( lua_State* ls, int si, int nn, ...)
 			const char* expectname = lua_typename( ls, expect);
 			const char* typname = lua_typename( ls, typ);
 			std::ostringstream msg;
-			msg << "expected " << (expectname?expectname:"?") << "instead of " << (typname?typname:"?") << "as argument " << (ii-si+1);
+			msg << "expected " << (expectname?expectname:"?") << " instead of " << (typname?typname:"?") << " as argument " << (ii-si+1);
 			throw std::runtime_error( msg.str());
 		}
 	}
@@ -1039,6 +1039,27 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print_object)
 	return 0;
 }
 
+LUA_FUNCTION_THROWS( "output:print(..)", function_output_print_object_metadata)
+{
+	RedirectFilterClosure* closure = (RedirectFilterClosure*)lua_touserdata( ls, -3);
+	Input* input = (Input*)lua_touserdata( ls, -2);
+	Output* output = (Output*)lua_touserdata( ls, -1);
+	lua_pop( ls, 3);
+
+	if (!output->called())
+	{
+		if (!input->inputfilter()->getMetadata())
+		{
+			lua_pushlightuserdata( ls, closure);
+			lua_pushlightuserdata( ls, input);
+			lua_pushlightuserdata( ls, output);
+			lua_yieldk( ls, 0, 1, function_output_print_object_metadata);
+		}
+		output->called(true);
+	}
+	lua_pushlightuserdata( ls, closure);
+	return function_output_print_object( ls);
+}
 
 LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 {
@@ -1062,15 +1083,30 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 			case 2:
 				if (!get_printop( ls, 2, item[0], itemsize[0]))
 				{
+					RedirectFilterClosure* closure;
 					if (item[1] != 0) throw std::runtime_error( "invalid type of first argument");
 					{
 						TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
 						TypedOutputFilterR outp( new TypingOutputFilter( output->outputfilter()));
 						LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
-						RedirectFilterClosure* closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
-						lua_pushvalue( ls, 2);			//... iterator argument
-						lua_pushlightuserdata( ls, closure);	//... redirect closure object
+						closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
 					}
+					if (!output->called())
+					{
+						Input* input = LuaObject<Input>::getGlobal( ls, "input");
+						bool md = input->inputfilter()->getMetadata();
+						if (!md)
+						{
+							lua_pushvalue( ls, 2);			//... iterator argument
+							lua_pushlightuserdata( ls, closure);	//... redirect closure object
+							lua_pushlightuserdata( ls, input);
+							lua_pushlightuserdata( ls, output);
+							return function_output_print_object_metadata( ls);
+						}
+						output->called( true);
+					}
+					lua_pushvalue( ls, 2);			//... iterator argument
+					lua_pushlightuserdata( ls, closure);	//... redirect closure object
 					return function_output_print_object( ls);
 				}
 				break;
@@ -1086,6 +1122,20 @@ LUA_FUNCTION_THROWS( "output:print(..)", function_output_print)
 		itemsize[1] = (std::size_t)lua_tointeger( ls, -2);
 		output = (Output*)lua_touserdata( ls, -1);
 		lua_pop( ls, 5);
+	}
+	if (!output->called())
+	{
+		Input* input = LuaObject<Input>::getGlobal( ls, "input");
+		if (!input->inputfilter()->getMetadata())
+		{
+			lua_pushlightuserdata( ls, const_cast<void*>( (const void*)item[0]));
+			lua_pushinteger( ls, itemsize[0]);
+			lua_pushlightuserdata( ls, const_cast<void*>( (const void*)item[1]));
+			lua_pushinteger( ls, itemsize[1]);
+			lua_pushlightuserdata( ls, output);
+			lua_yieldk( ls, 0, 1, function_output_print);
+		}
+		output->called(true);
 	}
 	if (!output->print( item[1]/*tag*/, itemsize[1], item[0]/*val*/, itemsize[0]))
 	{
@@ -1120,6 +1170,18 @@ LUA_FUNCTION_THROWS( "output:opentag(..)", function_output_opentag)
 		output = (Output*)lua_touserdata( ls, -1);
 		lua_pop( ls, 3);
 	}
+	if (!output->called())
+	{
+		Input* input = LuaObject<Input>::getGlobal( ls, "input");
+		if (!input->inputfilter()->getMetadata())
+		{
+			lua_pushlightuserdata( ls, const_cast<void*>( (const void*)tag));
+			lua_pushinteger( ls, tagsize);
+			lua_pushlightuserdata( ls, output);
+			lua_yieldk( ls, 0, 1, function_output_opentag);
+		}
+		output->called(true);
+	}
 	if (!output->print( tag, tagsize, 0/*val*/, 0))
 	{
 		lua_pushlightuserdata( ls, const_cast<void*>( (const void*)tag));
@@ -1144,6 +1206,16 @@ LUA_FUNCTION_THROWS( "output:closetag(..)", function_output_closetag)
 	{
 		output = (Output*)lua_touserdata( ls, -1);
 		lua_pop( ls, 1);
+	}
+	if (!output->called())
+	{
+		Input* input = LuaObject<Input>::getGlobal( ls, "input");
+		if (!input->inputfilter()->getMetadata())
+		{
+			lua_pushlightuserdata( ls, output);
+			lua_yieldk( ls, 0, 1, function_output_closetag);
+		}
+		output->called(true);
 	}
 	if (!output->print( 0/*tag*/, 0, 0/*val*/, 0))
 	{

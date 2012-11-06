@@ -214,12 +214,14 @@ void SQLiteTransaction::execute()
 				const char* err = ph.getLastError();
 				MOD_LOG_ERROR << "error in sqlite database transaction: " << (err?err:"unknown error");
 				ph.rollback();
+				throw std::runtime_error( "transaction failed");
 			}
 		}
 		catch (const std::runtime_error& e)
 		{
 			MOD_LOG_ERROR << "error in sqlite database transaction: " << e.what();
 			ph.rollback();
+			throw std::runtime_error( std::string("transaction failed: ") + e.what());
 		}
 	}
 	catch ( _Wolframe::ObjectPoolTimeout )

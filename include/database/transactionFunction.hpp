@@ -91,17 +91,21 @@ private:
 
 struct TransactionDescription
 {
-	TransactionDescription(){}
+	TransactionDescription()
+		:nonempty(false){}
+
 	TransactionDescription( const TransactionDescription& o)
 		:selector(o.selector)
 		,call(o.call)
-		,output(o.output){}
+		,output(o.output)
+		,nonempty(o.nonempty){}
 
 	void clear()
 	{
 		selector.clear();
 		call.clear();
 		output.clear();
+		nonempty = false;
 	}
 
 	enum ElementName
@@ -123,10 +127,10 @@ struct TransactionDescription
 		std::string msg;
 	};
 
-	std::string name;
 	std::string selector;
 	std::string call;
 	std::string output;
+	bool nonempty;
 };
 
 class TransactionFunction

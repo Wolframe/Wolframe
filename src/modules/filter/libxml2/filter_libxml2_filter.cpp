@@ -229,6 +229,11 @@ struct InputFilterImpl :public InputFilter
 		}
 	}
 
+	virtual bool getMetadata()
+	{
+		return (m_doc.get());
+	}
+
 	bool getDocType( types::DocType& doctype)
 	{
 		if (!m_doc.get())

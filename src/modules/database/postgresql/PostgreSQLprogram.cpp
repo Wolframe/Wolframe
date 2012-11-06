@@ -51,23 +51,27 @@ void PostgreSQLprogram::load( const std::string& source)
 	std::string tok;
 	const char* commentopr = "--";
 
-	while ((ch = utils::parseNextToken( tok, si, se, g_optab)) != 0)
+	while ((ch = utils::gotoNextToken( si, se)) != 0)
 	{
 		if (ch == commentopr[0])
 		{
-			std::size_t ci = 1;
-			while (!commentopr[ci] && commentopr[ci] == *si)
+			std::string::const_iterator ti = si;
+			std::size_t ci = 0;
+			while (commentopr[ci] && commentopr[ci] == *ti)
 			{
 				ci++;
-				si++;
+				ti++;
 			}
 			if (!commentopr[ci])
 			{
 				// skip to end of line
-				while (si != se && *si != '\n') ++si;
+				while (ti != se && *ti != '\n') ++ti;
+				si = ti;
+				continue;
 			}
 		}
-		else if ((ch|32) == 'p' && boost::iequals( tok, "PREPARE"))
+		ch = utils::parseNextToken( tok, si, se, g_optab);
+		if ((ch|32) == 'p' && boost::iequals( tok, "PREPARE"))
 		{
 			std::string stmname;
 			ch = utils::parseNextToken( stmname, si, se, g_optab);
