@@ -46,17 +46,17 @@ void SqliteFormLoader::initialize( )
 			qDebug( ) << "error when inserting the version into the schema: " << qs.lastError( ).text( );
 		}
 
-		if( !qs.exec( "create table uiform( id int, name text, version text, source blob )" ) ) {
+		if( !qs.exec( "create table uiform( name text primary key, version text, source blob )" ) ) {
 			qDebug( ) << "error when creating uiform table: " << qs.lastError( ).text( );
 			return;
 		}
 
-		if( !qs.exec( "create table uitranslation( form_id int, language text, version text, source blob, binary blob )" ) ) {
+		if( !qs.exec( "create table uitranslation( form_name text, locale text, version text, source blob, binary blob, foreign key( form_name ) references form( name ) )" ) ) {
 			qDebug( ) << "error when creating uitranslation table: " << qs.lastError( ).text( );
 			return;
 		}
 
-		if( !qs.exec( "create table uistylesheet( form_id int, version text, source blob )" ) ) {
+		if( !qs.exec( "create table uistylesheet( form_name text, version text, source blob, foreign key( form_name ) references form( name ) )" ) ) {
 			qDebug( ) << "error when creating uistylesheet table: " << qs.lastError( ).text( );
 			return;
 		}	
@@ -93,51 +93,72 @@ Version SqliteFormLoader::getSchemaVersion( )
 
 void SqliteFormLoader::initiateListLoad( )
 {
-	//~ QDir formsDir( QLatin1String( "forms" ) );
-	//~ QStringList forms = formsDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
-		//~ .replaceInStrings( ".ui", "" );
-	//~ emit formListLoaded( forms );
-}
+	QStringList forms;
+	
+	QSqlDatabase db = QSqlDatabase::database( m_dbName );
+	QSqlQuery q( "select name from uiform", db );
+	if( q.exec( ) ) {
+		QSqlRecord r = q.record( );
+		int nameIdx = r.indexOf( "name" );
+		while( q.next( ) ) {
+			forms.append( q.value( nameIdx ).toString( ) );
+		}
+	}
 
-void SqliteFormLoader::initiateFormLocalizationLoad( QString &name, QLocale locale )
-{
-	//~ QByteArray localization = readFile( m_localeDir + "/" + name + "." + locale.name( ) + ".qm" );
-	//~ 
-	//~ emit formLocalizationLoaded( name, localization );
+	emit formListLoaded( forms );
 }
 
 void SqliteFormLoader::initiateFormLoad( QString &name )
 {
-//~ // read directly here and stuff data into the signal
-	//~ QByteArray form = readFile( m_formDir + "/" + name + ".ui" );
-//~ 
-	//~ emit formLoaded( name, form );
+	QSqlDatabase db = QSqlDatabase::database( m_dbName );
+	QSqlQuery q( "select source from uiform where name=:name", db );
+	q.bindValue( ":name", name );
+	if( q.exec( ) ) {
+		QSqlRecord r = q.record( );
+		int sourceIdx = r.indexOf( "source" );
+		while( q.next( ) ) {
+			QByteArray form = q.value( sourceIdx ).toByteArray( );
+			emit formLoaded( name, form );
+			return;
+		}
+		// more than one form with the same name?
+	}
 }
 
+void SqliteFormLoader::initiateFormLocalizationLoad( QString &name, QLocale locale )
+{
+	QSqlDatabase db = QSqlDatabase::database( m_dbName );
+	QSqlQuery q( "select binary from uitranslation where name=:name and locale=:locale", db );
+	q.bindValue( ":name", name );
+	q.bindValue( ":locale", locale );
+	if( q.exec( ) ) {
+		QSqlRecord r = q.record( );
+		int binaryIdx = r.indexOf( "binary" );
+		while( q.next( ) ) {
+			QByteArray localization = q.value( binaryIdx ).toByteArray( );
+			emit formLocalizationLoaded( name, localization );
+			return;
+		}
+		// more than one localization per form/locale with the same name?
+	}
+}
 
 void SqliteFormLoader::initiateGetLanguageCodes( )
 {
-	//~ QStringList languageCodes;
-	//~ languageCodes.push_back( "en_US" ); // default locale, always around
-	//~ 
-//~ // read list of supported languages for all forms based on their qm files available
-	//~ QDir translationDir( QLatin1String( "i18n" ) );
-	//~ translationDir.setFilter( QDir::Files | QDir::NoDotAndDotDot );
-	//~ translationDir.setSorting( QDir::Name );
-	//~ QStringList filters;
-	//~ filters << "*.qm";
-	//~ translationDir.setNameFilters( filters );
-	//~ QStringList localeFiles = translationDir.entryList( );
-	//~ QMutableStringListIterator it( localeFiles );
-	//~ while( it.hasNext( ) ) {
-		//~ it.next( );
-		//~ QStringList parts = it.value( ).split( "." );
-		//~ languageCodes.push_back( parts[1] );		
-	//~ }
-	//~ 
-	//~ languageCodes.removeDuplicates( );
-//~ 
-	//~ emit languageCodesLoaded( languageCodes );
+	QStringList languageCodes;
+	languageCodes.push_back( "en_US" ); // default locale, always around
+
+	QSqlDatabase db = QSqlDatabase::database( m_dbName );
+	QSqlQuery q( "select distinct( locale ) from uitranslation", db );
+	if( q.exec( ) ) {
+		QSqlRecord r = q.record( );
+		int localeIdx = r.indexOf( "locale" );
+		while( q.next( ) ) {
+			languageCodes.append( q.value( localeIdx ).toString( ) );
+		}
+	}
+	
+	emit languageCodesLoaded( languageCodes );
 }
 
 } // namespace QtClient

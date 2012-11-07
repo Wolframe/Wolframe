@@ -34,6 +34,7 @@
 ///\brief Client library session interface
 #ifndef _WOLFRAME_CLIENTLIB_SESSION_HPP_INCLUDED
 #define _WOLFRAME_CLIENTLIB_SESSION_HPP_INCLUDED
+#include "exportable.hpp"
 #include "connection.hpp"
 #include "protocol.hpp"
 #include <string>
@@ -70,23 +71,23 @@ public:
 			,Protocol::Configuration(o){}
 	};
 
-	Session( const Configuration& config);
-	virtual ~Session();
+	WOLFRAME_DLL_VISIBLE Session( const Configuration& config);
+	WOLFRAME_DLL_VISIBLE virtual ~Session();
 
-	void start();
-	void quit();
-	void stop();
-	bool doRequest( RequestHandler* handler, const char* data, std::size_t datasize);
+	WOLFRAME_DLL_VISIBLE void start();
+	WOLFRAME_DLL_VISIBLE void quit();
+	WOLFRAME_DLL_VISIBLE void stop();
+	WOLFRAME_DLL_VISIBLE bool doRequest( RequestHandler* handler, const char* data, std::size_t datasize);
 
 public://notification methods to be implemented by the session:
-	virtual void receiveUIForm( const char* id, const char* data, std::size_t datasize)=0;
-	virtual void notifyError( const char* msg)=0;
+	WOLFRAME_DLL_VISIBLE virtual void receiveUIForm( const char* id, const char* data, std::size_t datasize)=0;
+	WOLFRAME_DLL_VISIBLE virtual void notifyError( const char* msg)=0;
 
 public://notification methods optionally implemented by the session:
-	virtual void notifyState( const char* /*msg*/){}
-	virtual void notifyAttribute( const char* /*id*/, const char* /*value*/){}
-	virtual void notifyTermination(){}
-	virtual void notifyReady(){}
+	WOLFRAME_DLL_VISIBLE virtual void notifyState( const char* /*msg*/){}
+	WOLFRAME_DLL_VISIBLE virtual void notifyAttribute( const char* /*id*/, const char* /*value*/){}
+	WOLFRAME_DLL_VISIBLE virtual void notifyTermination(){}
+	WOLFRAME_DLL_VISIBLE virtual void notifyReady(){}
 
 private:
 	static void requestCallback( void* this_, const Protocol::Event& event);

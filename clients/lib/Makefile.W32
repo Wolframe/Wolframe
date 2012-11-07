@@ -5,7 +5,7 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x504
+	/D_WIN32_WINNT=0x504 /DBUILDING_WOLFRAME_LIB
 
 INCLUDE_DIRS = \
 	/I. \
@@ -34,22 +34,37 @@ INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
 !ENDIF
 
-LIBRARIES = \
-	wolframe_client.lib
+DYNAMIC_OBJS = \
+	connection.dllobj \
+	protocol.dllobj \
+	session.dllobj
 
 CPP_OBJS = \
 	connection.obj \
 	protocol.obj \
 	session.obj
 
-all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)
+STATIC_LIB = \
+	wolframe_client_static.lib
+
+DYNAMIC_LIB = \
+	wolframe_client.dll
+
+LIBRARIES = \
+	$(STATIC_LIB) \
+	$(DYNAMIC_LIB)
+
+all: $(OBJS) $(CPP_OBJS) $(DYNAMIC_OBJS) $(LIBRARIES)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-wolframe_client.lib: $(OBJS) $(CPP_OBJS)
-	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
+wolframe_client_static.lib: $(OBJS) $(CPP_OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
 
-local_all:
+wolframe_client.dll: $(DYNAMIC_OBJS)
+	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $?
+
+local_all: $(LIBRARIES)
 
 local_clean:
 

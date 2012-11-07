@@ -199,7 +199,16 @@ void MainWindow::initialize( )
 		QMessageBox::warning( this, "qtclient", msg );
 		QCoreApplication::quit( );
 	}
-
+	
+// enable foreign key
+	QSqlQuery qp( "PRAGMA foreign_keys = ON", db );
+	if( !qp.exec( ) ) {
+		QString msg = tr( "Unable to enable foreign key support in the Sqlite database file '%1'." ).
+			arg( QFileInfo( m_dbName ).fileName( ) );
+		QMessageBox::warning( this, "qtclient", msg );
+		QCoreApplication::quit( );
+	}
+		
 // catch error of network protocol
 	connect( m_wolframeClient, SIGNAL( error( QString ) ),
 		this, SLOT( wolframeError( QString ) ) );
