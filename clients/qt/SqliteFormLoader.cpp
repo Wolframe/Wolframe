@@ -24,42 +24,66 @@ SqliteFormLoader::SqliteFormLoader( QString dbName )
 
 void SqliteFormLoader::initialize( )
 {
+// check version of schema, create schema if necessary
 	Version v = getSchemaVersion( );
 	if( v.valid( ) ) {
 		qDebug( ) << "version of schema is " << v.toString( );
 	} else {
 		qDebug( ) << "No version info found in database, creating schema now";
 		QSqlDatabase db = QSqlDatabase::database( m_dbName );
-		
+
+// schema creation		
 		QSqlQuery qs( db );
-		if( !qs.exec( "create table version( major int, minor int )" ) ) {
+		if( !qs.exec( "create table version( version text )" ) ) {
 			qDebug( ) << "error when creating version table: " << qs.lastError( ).text( );
 			return;
 		}
-		
-		QSqlQuery q( "insert into version( major, minor ) values( :major, :minor )", db );
-		q.bindValue( ":major", VERSION_MAJOR );
-		q.bindValue( ":minor", VERSION_MINOR );
+
+		QSqlQuery q( "insert into version( version ) values( :version )", db );
+		v = Version( VERSION_MAJOR, VERSION_MINOR );
+		q.bindValue( ":version", v.toString( ) );
 		if( !q.exec( ) ) {
 			qDebug( ) << "error when inserting the version into the schema: " << qs.lastError( ).text( );
 		}
+
+		if( !qs.exec( "create table uiform( id int, name text, version text, source blob )" ) ) {
+			qDebug( ) << "error when creating uiform table: " << qs.lastError( ).text( );
+			return;
+		}
+
+		if( !qs.exec( "create table uitranslation( form_id int, language text, version text, source blob, binary blob )" ) ) {
+			qDebug( ) << "error when creating uitranslation table: " << qs.lastError( ).text( );
+			return;
+		}
+
+		if( !qs.exec( "create table uistylesheet( form_id int, version text, source blob )" ) ) {
+			qDebug( ) << "error when creating uistylesheet table: " << qs.lastError( ).text( );
+			return;
+		}	
 	}
-	
+
+// compare versions of schema	
 	v = getSchemaVersion( );
 	if( !v.valid( ) ) {
 		qDebug( ) << "no version info after creating it, funny!";
+	}
+	if( v > Version( VERSION_MAJOR, VERSION_MINOR ) ) {
+		if( v.getMajor( ) == VERSION_MAJOR ) {
+			qDebug( ) << "Version " << v.toString( ) << " runs in backward compatibility mode";
+		} else {
+			qDebug( ) << "Schema in database newer than the one in the code. Can't run!";
+		}
 	}
 }
 
 Version SqliteFormLoader::getSchemaVersion( )
 {
-	QSqlQuery q( "select major,minor from version", QSqlDatabase::database( m_dbName ) );
+	QSqlQuery q( "select version from version", QSqlDatabase::database( m_dbName ) );
 	if( q.exec( ) ) {
 		QSqlRecord r = q.record( );
-		int minorIdx = r.indexOf( "major" ); 
-		int majorIdx = r.indexOf( "minor" );
+		int versionIdx = r.indexOf( "version" ); 
 		while( q.next( ) ) {
-			return Version( q.value( minorIdx ).toInt( ), q.value( majorIdx ).toInt( ) );
+			return Version( q.value( versionIdx ).toString( ) );
 		}
 		return Version::invalidVersion( );
 	} else {

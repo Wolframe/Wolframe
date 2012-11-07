@@ -67,7 +67,8 @@ OBJS = \
 	moc_qcommandline.o \
 	LoginDialog.o \
 	moc_LoginDialog.o \
-	SqliteFormLoader.o
+	SqliteFormLoader.o \
+	SqliteDataLoader.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -143,6 +144,8 @@ local_all: $(I18NS)
 local_clean:
 	@-rm -f moc_*.cpp
 	@-rm -f $(I18NS)
+	@-rm -f geany.c++.tags
+	@-rm -f Makefile
 
 local_distclean:
 
@@ -176,3 +179,6 @@ buildi18n:
 	$(QT_LUPDATE) forms/form1.ui -ts i18n/form1.de_CH.ts
 	$(QT_LUPDATE) forms/form2.ui -ts i18n/form2.de_CH.ts
 	$(QT_LUPDATE) forms/form3.ui -ts i18n/form3.de_CH.ts
+
+geany-ctags:
+	CFLAGS="$(ALL_CXXFLAGS)" geany -g geany.c++.tags `find . -name '*.[ch]pp'`

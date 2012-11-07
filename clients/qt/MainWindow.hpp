@@ -30,9 +30,10 @@ namespace _Wolframe {
 
 		enum LoadMode {
 			Network,
-			Local
+			LocalFile,
+			LocalSqlite
 		};
-
+		
 	enum ScreenOrientation {
 		ScreenOrientationLockPortrait,
 		ScreenOrientationLockLandscape,

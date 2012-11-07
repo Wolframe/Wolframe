@@ -50,6 +50,7 @@ endif
 #  mixing C99 and C++98 features, let's hope c++0 sorts this out
 # -Wmissing-return: functions returning and throwing exceptions are no longer
 #  possible, this is an annoying feature!
+# -Wfloat-equal: Qt header files get more and more broken with this
 
 # compilation flags and compilers
 COMMON_COMPILE_FLAGS = \
@@ -59,7 +60,7 @@ COMMON_COMPILE_FLAGS = \
 	-Wno-long-long \
 	-Wunused -Wno-import \
 	-Wformat -Wformat-y2k -Wformat-nonliteral -Wformat-security \
-	-Wswitch-enum -Wunknown-pragmas -Wfloat-equal \
+	-Wswitch-enum -Wunknown-pragmas \
 	-Wshadow -Wpointer-arith \
 	-Wcast-qual -Wcast-align \
 	-Wwrite-strings \

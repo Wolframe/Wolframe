@@ -7,56 +7,15 @@
 
 #include <QObject>
 #include <QString>
-#include <QByteArray>
-#include <QSqlDatabase>
 
 #include "FormLoader.hpp"
+#include "Version.hpp"
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 0
 
 namespace _Wolframe {
 	namespace QtClient {
-
-	class Version
-	{
-		public:
-			Version( )
-				: m_major( -1 ), m_minor( -1 )
-			{
-			}
-			
-			Version( int major, int minor )
-				: m_major( major ), m_minor( minor )
-			{
-			}
-			
-			bool valid( )
-			{
-				return m_major != -1 && m_minor != -1;
-			}
-			
-			static Version invalidVersion( )
-			{
-				return Version( );
-			}
-			
-			QString toString( )
-			{
-				if( valid( ) ) {
-					return QString( "%1.%2" ).arg( m_major ).arg( m_minor );
-				} else {
-					return QString( "<invalid version>" );
-				}
-			}
-			
-		private:
-			int m_major;
-			int m_minor;
-			
-			int major( ) { return m_major; }
-			int minor( ) { return m_minor; }			
-	};
 
 	class SqliteFormLoader : public FormLoader
 	{

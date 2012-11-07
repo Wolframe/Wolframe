@@ -8,6 +8,7 @@
 #include "NetworkFormLoader.hpp"
 #include "NetworkDataLoader.hpp"
 #include "SqliteFormLoader.hpp"
+#include "SqliteDataLoader.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -91,7 +92,8 @@ void MainWindow::parseArgs( )
 		{ QCommandLine::Option, 'H', "host", "Wolframe host", QCommandLine::Optional },
 		{ QCommandLine::Option, 'p', "port", "Wolframe port", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'S', "secure", "connect securely via SSL", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'l', "local", "Run with local data and form loader", QCommandLine::Optional },
+		{ QCommandLine::Switch, 'l', "local-file", "Run with local data and form loader (in filesystem)", QCommandLine::Optional },
+		{ QCommandLine::Switch, 'L', "local-db", "Run with local data and form loader (in sqllite DB)", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'd', "debug", "Enable debug window when starting", QCommandLine::Optional },
 		{ QCommandLine::Option, 'v', "verbose", "verbose level", QCommandLine::Optional },
 		{ QCommandLine::Option, 'c', "client-cert-file", "client certificate to present to the server (default: ./certs/client.crt)", QCommandLine::Optional },
@@ -124,8 +126,10 @@ void MainWindow::parseArgs( )
 void MainWindow::switchFound( const QString &name )
 {
 	qDebug( ) << "switch" << name;
-	if( name == "local" ) {
-		m_loadMode = Local;
+	if( name == "local-file" ) {
+		m_loadMode = LocalFile;
+	} else if( name == "local-db" ) {
+		m_loadMode = LocalSqlite;
 	} else if( name == "secure" ) {
 		m_secure = true;
 	} else if( name == "debug" ) {
@@ -219,12 +223,19 @@ void MainWindow::initialize( )
 		return;
 	}
 	
-// for testing, load lists of available forms from the files system,
-// pass the form loader to the FormWidget
-	//m_formLoader = new FileFormLoader( "forms", "i18n" );
-	m_dataLoader = new FileDataLoader( "data" );
-
-	m_formLoader = new SqliteFormLoader( SESSION_NAME );
+// for testing, load lists of available forms from the files system or
+// a local sqlite database, pass the form loader to the FormWidget
+	switch( m_loadMode ) {
+		case LocalFile:
+			m_formLoader = new FileFormLoader( "forms", "i18n" );
+			m_dataLoader = new FileDataLoader( "data" );
+			break;
+		
+		case LocalSqlite:
+			m_formLoader = new SqliteFormLoader( SESSION_NAME );
+			m_dataLoader = new SqliteDataLoader( SESSION_NAME );
+			break;	
+	}
 
 // create delegate widget for form handling (one for now), in theory may are possible
 	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this );

@@ -27,10 +27,11 @@ SOURCES += \
 	FormLoader.cpp \
 	FileFormLoader.cpp \
 	NetworkFormLoader.cpp \
+	SqliteFormLoader.cpp \
 	DataLoader.cpp \
 	FileDataLoader.cpp \
 	NetworkDataLoader.cpp \
-	SqliteFormLoader.cpp \
+	SqliteDataLoader.cpp \
 	DataHandler.cpp \
 	DebugTerminal.cpp \
 	HistoryLineEdit.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
 	FileDataLoader.hpp \
 	FileFormLoader.hpp \
 	SqliteFormLoader.hpp \
+	SqliteDataLoader.hpp \
 	DebugTerminal.hpp \
 	FormLoader.hpp \
 	FormWidget.hpp \
@@ -55,7 +57,8 @@ HEADERS += \
 	WolframeClient.hpp \
 	MainWindow.hpp \
 	NetworkDataLoader.hpp \
-	NetworkFormLoader.hpp
+	NetworkFormLoader.hpp \
+	Version.hpp
 
 FORMS +=
 

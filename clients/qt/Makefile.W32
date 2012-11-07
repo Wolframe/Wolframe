@@ -75,7 +75,8 @@ OBJS = \
 	moc_qcommandline.obj \
 	LoginDialog.obj \
 	moc_LoginDialog.obj \
-	SqliteFormLoader.obj
+	SqliteFormLoader.obj \
+	SqliteDataLoader.obj
 
 CPP_BINS = \
 	qtclient.exe
