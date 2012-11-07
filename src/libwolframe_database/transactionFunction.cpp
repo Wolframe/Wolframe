@@ -180,9 +180,10 @@ class FunctionCall
 {
 public:
 	FunctionCall()
-		:m_nonemptyResult(false){}
+		:m_nonemptyResult(false)
+		,m_uniqueResult(false){}
 	FunctionCall( const FunctionCall& o);
-	FunctionCall( const std::string& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg, bool setNonemptyResult_);
+	FunctionCall( const std::string& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg, bool setNonemptyResult_, bool setUniqueResult_);
 
 	const Path& selector() const			{return m_selector;}
 	const std::vector<Path>& arg() const		{return m_arg;}
@@ -192,6 +193,7 @@ public:
 
 	bool hasResultReference() const;
 	bool hasNonemptyResult() const			{return m_nonemptyResult;}
+	bool hasUniqueResult() const			{return m_uniqueResult;}
 
 private:
 	std::string m_resultname;
@@ -199,12 +201,14 @@ private:
 	Path m_selector;
 	std::vector<Path> m_arg;
 	bool m_nonemptyResult;
+	bool m_uniqueResult;
 };
 
 struct TransactionFunction::Impl
 {
 	std::string m_resultname;
 	std::vector<std::string> m_elemname;
+	std::vector<bool> m_elemunique;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
 
@@ -643,19 +647,21 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 	ar.insert( ar.end(), ar1.begin(), ar1.end());
 }
 
-FunctionCall::FunctionCall( const std::string& r, const std::string& n, const Path& s, const std::vector<Path>& a, bool q)
+FunctionCall::FunctionCall( const std::string& r, const std::string& n, const Path& s, const std::vector<Path>& a, bool q, bool u)
 	:m_resultname(r)
 	,m_name(n)
 	,m_selector(s)
 	,m_arg(a)
-	,m_nonemptyResult(q){}
+	,m_nonemptyResult(q)
+	,m_uniqueResult(u){}
 
 FunctionCall::FunctionCall( const FunctionCall& o)
 	:m_resultname(o.m_resultname)
 	,m_name(o.m_name)
 	,m_selector(o.m_selector)
 	,m_arg(o.m_arg)
-	,m_nonemptyResult(o.m_nonemptyResult){}
+	,m_nonemptyResult(o.m_nonemptyResult)
+	,m_uniqueResult(o.m_uniqueResult){}
 
 bool FunctionCall::hasResultReference() const
 {
@@ -752,7 +758,14 @@ static void bindArguments( TransactionInput& ti, const FunctionCall& call, const
 					if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
 				}
 				const char* value = inputst->structure().nodevalue( *gs);
-				ti.bindCommandArgAsValue( value);
+				if (value)
+				{
+					ti.bindCommandArgAsValue( value);
+				}
+				else
+				{
+					ti.bindCommandArgAsNull();
+				}
 			}
 		}
 	}
@@ -765,6 +778,7 @@ TransactionInput TransactionFunctionInput::get() const
 	for (std::size_t ii=0; ci != ce; ++ci,++ii)
 	{
 		if (ci->hasNonemptyResult()) rt.setNonemptyResult( ii);
+		if (ci->hasUniqueResult()) rt.setUniqueResult( ii);
 
 		// Select the nodes to execute the command with:
 		std::vector<Structure::Node> nodearray;
@@ -785,31 +799,41 @@ struct TransactionFunctionOutput::Impl
 {
 	int m_state;
 	int m_rowidx;
+	int m_residx;
 	int m_colidx;
 	int m_colend;
 	std::string m_rootname;
 	std::vector<std::string> m_resname;
+	std::vector<bool> m_resunique;
 	db::TransactionOutput::result_iterator m_resitr;
 	db::TransactionOutput::result_iterator m_resend;
 	db::TransactionOutput::row_iterator m_rowitr;
 	db::TransactionOutput::row_iterator m_rowend;
 	db::TransactionOutput m_data;
 
-	Impl( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& data_)
+	Impl( const std::string& rootname_, const std::vector<std::string>& resname_, const std::vector<bool>& resunique_, const db::TransactionOutput& data_)
 		:m_state(0)
 		,m_rowidx(0)
+		,m_residx(0)
 		,m_colidx(0)
 		,m_colend(0)
 		,m_rootname(rootname_)
 		,m_resname(resname_)
+		,m_resunique(resunique_)
 		,m_data(data_){}
 
-	bool getNext( ElementType& type, TypedFilterBase::Element& element)
+	void resetIterator()
+	{
+		m_state = 0;
+	}
+
+	bool getNext( ElementType& type, TypedFilterBase::Element& element, bool doSerializeWithIndices)
 	{
 		for (;;) switch (m_state)
 		{
 			case 0:
 				m_resitr = m_data.begin();
+				m_residx = 1;
 				m_resend = m_data.end();
 				m_state = 1;
 				if (!m_rootname.empty())
@@ -831,6 +855,7 @@ struct TransactionFunctionOutput::Impl
 				{
 					// result is not part of output:
 					++m_resitr;
+					++m_residx;
 					continue;
 				}
 				m_rowitr = m_resitr->begin();
@@ -839,19 +864,61 @@ struct TransactionFunctionOutput::Impl
 				m_colidx = 0;
 				m_colend = m_resitr->nofColumns();
 				m_state = 2;
+				if (doSerializeWithIndices)
+				{
+					// open array tag:
+					type = TypedInputFilter::OpenTag;
+					element = m_resname[ m_resitr->functionidx()];
+					return true;
+				}
 				/* no break here ! */
 			case 2:
 				m_colidx = 0;
 				if (m_rowitr == m_rowend)
 				{
-					++m_resitr;
-					m_state = 1;
-					continue;
+					if (doSerializeWithIndices && !m_resunique[ m_resitr->functionidx()])
+					{
+						// close array tag:
+						type = TypedInputFilter::CloseTag;
+						element = TypedInputFilter::Element();
+						// next result:
+						++m_resitr;
+						++m_residx;
+						m_state = 1;
+						return true;
+					}
+					else
+					{
+						// next result:
+						++m_resitr;
+						++m_residx;
+						m_state = 1;
+						continue;
+					}
 				}
 				m_state = 3;
-				type = TypedInputFilter::OpenTag;
-				element = m_resname[ m_resitr->functionidx()];
-				return true;
+				if (doSerializeWithIndices)
+				{
+					// tag is array (element) index
+					if (!m_resunique[ m_resitr->functionidx()])
+					{
+						// ... we set it only for non unique results
+						type = TypedInputFilter::OpenTag;
+						element = TypedInputFilter::Element( m_rowidx+1);
+						return true;
+					}
+					else
+					{
+						continue;
+					}
+				}
+				else
+				{
+					// tag is result (element) name
+					type = TypedInputFilter::OpenTag;
+					element = m_resname[ m_resitr->functionidx()];
+					return true;
+				}
 			case 3:
 				if (m_colidx == m_colend)
 				{
@@ -888,8 +955,8 @@ struct TransactionFunctionOutput::Impl
 	}
 };
 
-TransactionFunctionOutput::TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& data_)
-	:m_impl( new Impl( rootname_, resname_, data_)){}
+TransactionFunctionOutput::TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const std::vector<bool>& resunique_, const db::TransactionOutput& data_)
+	:m_impl( new Impl( rootname_, resname_, resunique_, data_)){}
 
 TransactionFunctionOutput::~TransactionFunctionOutput()
 {
@@ -898,9 +965,14 @@ TransactionFunctionOutput::~TransactionFunctionOutput()
 
 bool TransactionFunctionOutput::getNext( ElementType& type, TypedFilterBase::Element& element)
 {
-	return m_impl->getNext( type, element);
+	bool rt = m_impl->getNext( type, element, flag( SerializeWithIndices));
+	return rt;
 }
 
+void TransactionFunctionOutput::resetIterator()
+{
+	m_impl->resetIterator();
+}
 
 TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& description)
 {
@@ -910,6 +982,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 	std::vector<TransactionDescription>::const_iterator di = description.begin(), de = description.end();
 	for (; di != de; ++di)
 	{
+		m_elemunique.push_back( di->unique);
 		elementName = TransactionDescription::Call;
 		std::size_t eidx = di - description.begin();
 		// Parse the function call
@@ -988,7 +1061,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 				Path pp( *ai, &m_tagmap);
 				param.push_back( pp);
 			}
-			FunctionCall cc( di->output, functionname, selector, param, di->nonempty);
+			FunctionCall cc( di->output, functionname, selector, param, di->nonempty, di->unique);
 			m_call.push_back( cc);
 		}
 		catch (const std::runtime_error& e)
@@ -1091,7 +1164,7 @@ TransactionFunctionInput* TransactionFunction::getInput() const
 
 TransactionFunctionOutput* TransactionFunction::getOutput( const db::TransactionOutput& o) const
 {
-	return new TransactionFunctionOutput( m_impl->m_resultname, m_impl->m_elemname, o);
+	return new TransactionFunctionOutput( m_impl->m_resultname, m_impl->m_elemname, m_impl->m_elemunique, o);
 }
 
 TransactionFunction* _Wolframe::db::createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description)

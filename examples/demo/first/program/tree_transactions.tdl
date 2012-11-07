@@ -22,7 +22,7 @@ END
 --
 TRANSACTION treeDeleteSubtree -- ( /node/id)
 BEGIN
-	FOREACH /node DO NONEMPTY SELECT lft,rgt,width=rgt-lft+1 FROM tree WHERE ID = $(id);
+	FOREACH /node DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM tree WHERE ID = $(id);
 	DO DELETE FROM tree WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE tree SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE tree SET rgt = rgt-$3 WHERE rgt>$2;
@@ -34,11 +34,11 @@ END
 --
 TRANSACTION treeSelectNode -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT ID,parent,name FROM tree WHERE ID = $(id);
+	FOREACH /node INTO /node DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE ID = $(id);
 END
 TRANSACTION treeSelectNodeByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT ID,parent,name FROM tree WHERE name = $(name);
+	FOREACH /node INTO /node DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE name = $(name);
 END
 
 --
@@ -86,20 +86,13 @@ END
 --
 TRANSACTION treeSelectChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
 END
 TRANSACTION treeSelectChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name);
 END
 
---
--- treeSelectNodeWithLevels :Get all the nodes with their level
---
-TRANSACTION treeSelectNodeWithLevels
-BEGIN
-	INTO /node DO SELECT count(P2.*) AS level, P1.ID, P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt GROUP BY P1.name ORDER BY level ASC;
-END
 
 
 

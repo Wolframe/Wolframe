@@ -53,13 +53,15 @@ public:
 
 	///\brief Constructor
 	TypedInputFilter()
-		:m_state(InputFilter::Open) {}
+		:m_state(InputFilter::Open)
+		,m_flags(None){}
 
 	///\brief Copy constructor
 	///\param[in] o typed output filter to copy
 	TypedInputFilter( const TypedInputFilter& o)
 		:TypedFilterBase(o)
-		,m_state(o.m_state){}
+		,m_state(o.m_state)
+		,m_flags(o.m_flags){}
 
 	///\brief Destructor
 	virtual ~TypedInputFilter(){}
@@ -80,8 +82,22 @@ public:
 	///\param [in] msg (optional) error to set
 	void setState( State s, const char* msg=0)	{m_state=s; setError(msg);}
 
+	///\brief Set the iterator to the start (if implemented)
+	virtual void resetIterator(){}
+
+	enum Flags
+	{
+		None=0x00,
+		SerializeWithIndices=0x01				//< do serialization with array index elements, if implemented
+	};
+
+	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
+	void setFlags( Flags f)						{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff;}
+	void resetFlags()						{m_flags = None;}
+
 private:
 	State m_state;					//< state
+	Flags m_flags;
 };
 
 ///\typedef TypedInputFilterR

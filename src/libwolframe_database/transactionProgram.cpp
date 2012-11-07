@@ -335,10 +335,22 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						mask |= (1 << (unsigned)TransactionDescription::Call);
 
 						std::string::const_iterator oi = si;
-						if (parseNextToken( tok, oi, se) &&  boost::algorithm::iequals( tok, "NONEMPTY"))
+						while (parseNextToken( tok, oi, se))
 						{
-							desc.nonempty = true;
-							si = oi;
+							if (boost::algorithm::iequals( tok, "NONEMPTY"))
+							{
+								desc.nonempty = true;
+								si = oi;
+							}
+							else if (boost::algorithm::iequals( tok, "UNIQUE"))
+							{
+								desc.unique = true;
+								si = oi;
+							}
+							else
+							{
+								break;
+							}
 						}
 						if (!gotoNextToken( si, se))
 						{

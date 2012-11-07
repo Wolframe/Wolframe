@@ -805,6 +805,7 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_struct_get)
 LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_typedinputfilter_tostring)
 {
 	TypedInputFilterR* obj = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "__tostring");
+	if (obj->get()) (*obj)->resetIterator();
 	check_parameters( ls, 1, 0);
 
 	ToStringFilter* flt = new ToStringFilter();
@@ -815,6 +816,7 @@ LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_typedinputfilter_tostr
 		throw std::logic_error( "internal: tostring serialization with yield");
 	}
 	std::string content = flt->content();
+	if (obj->get()) (*obj)->resetIterator();
 	LuaExceptionHandlerScope escope(ls);
 	{
 		lua_pushlstring( ls, content.c_str(), content.size());
@@ -826,24 +828,36 @@ LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_typedinputfilter_tostr
 LUA_FUNCTION_THROWS( "<structure>:table()", function_typedinputfilter_table)
 {
 	TypedInputFilterR* obj;
+	RedirectFilterClosure* closure;
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
 		obj = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "table");
+		if (obj->get())
+		{
+			(*obj)->setFlags( TypedInputFilter::SerializeWithIndices);
+			(*obj)->resetIterator();
+		}
 		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
 		LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( *obj, outp));
-		RedirectFilterClosure* closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
-		lua_pushvalue( ls, 2);			//... iterator argument
-		lua_pushlightuserdata( ls, closure);	//... redirect closure object
+		closure = LuaObject<RedirectFilterClosure>::get( ls, -1);
 	}
-	obj = (TypedInputFilterR*)lua_touserdata( ls, -2);
-	RedirectFilterClosure* closure = (RedirectFilterClosure*)lua_touserdata( ls, -1);
-	lua_pop( ls, 2);
+	else
+	{
+		obj = (TypedInputFilterR*)lua_touserdata( ls, -2);
+		closure = (RedirectFilterClosure*)lua_touserdata( ls, -1);
+		lua_pop( ls, 2);
+	}
 	if (!closure->call())
 	{
 		lua_pushlightuserdata( ls, obj);
 		lua_pushlightuserdata( ls, closure);
 		lua_yieldk( ls, 0, 1, function_typedinputfilter_table);
+	}
+	if (obj->get())
+	{
+		(*obj)->resetFlags();
+		(*obj)->resetIterator();
 	}
 	return 1;
 }
@@ -852,6 +866,7 @@ LUA_FUNCTION_THROWS( "<structure>:table()", function_typedinputfilter_table)
 LUA_FUNCTION_THROWS( "<structure>:get()", function_typedinputfilter_get)
 {
 	TypedInputFilterR* obj = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "get");
+	(*obj)->resetIterator();
 	check_parameters( ls, 1, 0);
 
 	LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure( *obj));

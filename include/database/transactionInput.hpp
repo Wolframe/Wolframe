@@ -297,21 +297,49 @@ public:
 
 	bool hasNonemptyResult( std::size_t functionidx) const
 	{
-		if (functionidx >= m_nonemptyResult.size()) return false;
-		return m_nonemptyResult.at( functionidx);
+		return hasFlag( functionidx, NonEmptyResult);
+	}
+
+	bool hasUniqueResult( std::size_t functionidx) const
+	{
+		return hasFlag( functionidx, NonEmptyResult);
 	}
 
 	void setNonemptyResult( std::size_t functionidx)
 	{
-		std::size_t nn = (functionidx >= m_nonemptyResult.size())?(functionidx-m_nonemptyResult.size()+1):0;
-		for (; nn>0; --nn) m_nonemptyResult.push_back(false);
-		m_nonemptyResult[ functionidx] = true;
+		setFlag( functionidx, NonEmptyResult);
+	}
+
+	void setUniqueResult( std::size_t functionidx)
+	{
+		setFlag( functionidx, UniqueResult);
+	}
+
+private:
+	enum Flags
+	{
+		None=0x0,
+		NonEmptyResult=0x1,
+		UniqueResult=0x2
+	};
+
+	void setFlag( std::size_t functionidx, Flags f)
+	{
+		std::size_t nn = (functionidx >= m_flags.size())?(functionidx-m_flags.size()+1):0;
+		for (; nn>0; --nn) m_flags.push_back(None);
+		m_flags[ functionidx] = (Flags)((int)(m_flags[ functionidx])|(int)f);
+	}
+
+	bool hasFlag( std::size_t functionidx, Flags f) const
+	{
+		if (functionidx >= m_flags.size()) return false;
+		return (int)(m_flags[ functionidx])&(int)f;
 	}
 
 private:
 	std::vector<Command> m_cmd;
 	std::string m_strings;
-	std::vector<bool> m_nonemptyResult;
+	std::vector<Flags> m_flags;
 };
 
 

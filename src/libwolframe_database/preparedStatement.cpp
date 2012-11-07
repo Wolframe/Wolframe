@@ -40,7 +40,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr, bool requiresNonemptyResult)
+static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr, bool nonempty, bool unique)
 {
 	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
 	for (int argidx=1; ai != ae; ++ai,++argidx)
@@ -75,8 +75,10 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 		}
 		if (stmh->hasResult())
 		{
+			std::size_t rescnt = 0;
 			do
 			{
+				rescnt += 1;
 				cmdres.openRow();
 				for (si=0; si != se; ++si)
 				{
@@ -91,15 +93,26 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 					}
 				}
 			} while (stmh->next());
+			if (unique && rescnt > 1)
+			{
+				throw std::runtime_error( std::string( "more than one result result for command (UNIQUE) ") + cmditr->name());
+			}
 		}
-		else if (requiresNonemptyResult)
+		else if (nonempty)
 		{
 			throw std::runtime_error( std::string( "missing result for command (NONEMPTY) ") + cmditr->name());
 		}
 	}
-	else if (requiresNonemptyResult)
+	else
 	{
-		throw std::runtime_error( std::string( "unexpected condition NONEMPTY on result for a command without result set: ") + cmditr->name());
+		if (nonempty)
+		{
+			throw std::runtime_error( std::string( "unexpected condition NONEMPTY on result for a command without result set: ") + cmditr->name());
+		}
+		if (unique)
+		{
+			throw std::runtime_error( std::string( "unexpected condition UNIQUE on result for a command without result set: ") + cmditr->name());
+		}
 	}
 	return true;
 }
@@ -113,6 +126,8 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 	for (; ci != ce; ++ci)
 	{
 		if (!start( ci->name())) return false;
+		bool nonempty = input.hasNonemptyResult( ci->functionidx());
+		bool unique = input.hasUniqueResult( ci->functionidx());
 
 		if (cmdres.functionidx() != ci->functionidx())
 		{
@@ -137,7 +152,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 				TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
 				for (; wi != we; ++wi)
 				{
-					if (!executeCommand( this, cmdres, wi, ci, input.hasNonemptyResult( ci->functionidx()))) return false;
+					if (!executeCommand( this, cmdres, wi, ci, nonempty, unique)) return false;
 				}
 			}
 		}
@@ -145,7 +160,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		{
 			// ... command has no result reference, then we call it once
 			TransactionOutput::row_iterator wi;
-			if (!executeCommand( this, cmdres, wi, ci, input.hasNonemptyResult( ci->functionidx()))) return false;
+			if (!executeCommand( this, cmdres, wi, ci, nonempty, unique)) return false;
 		}
 	}
 	if (cmdres.functionidx() != null_functionidx)

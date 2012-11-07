@@ -53,10 +53,11 @@ class TransactionFunctionOutput
 	:public langbind::TypedInputFilter
 {
 public:
-	TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const db::TransactionOutput& data_);
+	TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const std::vector<bool>& resunique_, const db::TransactionOutput& data_);
 	virtual ~TransactionFunctionOutput();
 
 	virtual bool getNext( ElementType& type, TypedFilterBase::Element& element);
+	virtual void resetIterator();
 
 private:
 	struct Impl;
@@ -92,13 +93,15 @@ private:
 struct TransactionDescription
 {
 	TransactionDescription()
-		:nonempty(false){}
+		:nonempty(false)
+		,unique(false){}
 
 	TransactionDescription( const TransactionDescription& o)
 		:selector(o.selector)
 		,call(o.call)
 		,output(o.output)
-		,nonempty(o.nonempty){}
+		,nonempty(o.nonempty)
+		,unique(o.unique){}
 
 	void clear()
 	{
@@ -106,6 +109,7 @@ struct TransactionDescription
 		call.clear();
 		output.clear();
 		nonempty = false;
+		unique = false;
 	}
 
 	enum ElementName
@@ -131,6 +135,7 @@ struct TransactionDescription
 	std::string call;
 	std::string output;
 	bool nonempty;
+	bool unique;
 };
 
 class TransactionFunction

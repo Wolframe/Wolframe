@@ -265,7 +265,8 @@ void TesttraceTransaction::execute()
 	TransactionHandler stm( &buf, m_result);
 	if (!stm.doTransaction( m_input, m_output))
 	{
-		throw std::runtime_error( "transaction failed!");
+		const char* err = stm.getLastError();
+		throw std::runtime_error( err?err:"unspecified error");
 	}
 }
 

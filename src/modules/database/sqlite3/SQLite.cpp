@@ -214,7 +214,7 @@ void SQLiteTransaction::execute()
 				const char* err = ph.getLastError();
 				MOD_LOG_ERROR << "error in sqlite database transaction: " << (err?err:"unknown error");
 				ph.rollback();
-				throw std::runtime_error( "transaction failed");
+				throw std::runtime_error( err?err:"unspecified error");
 			}
 		}
 		catch (const std::runtime_error& e)
