@@ -5,7 +5,7 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x504
+	/D_WIN32_WINNT=0x504 /DBUILD_SHARED
 
 INCLUDE_DIRS = \
 	/I. \
@@ -63,6 +63,7 @@ run: $(CPP_BINS)
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
 !ENDIF
+	@-echo copy "$(TOPDIR)\clients\lib\wolframe_client.dll" . >> test.bat
 	@-echo wolframec.exe 127.0.0.1 7661 >> test.bat
 	@-test.bat
 
@@ -72,6 +73,7 @@ runssl: $(CPP_BINS)
 	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
 	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
 !ENDIF
+	@-echo copy "$(TOPDIR)\clients\lib\wolframe_client.dll" . >> test.bat
 	@-echo wolframec.exe -S --CA-cert-file=certs\CAclient.cert.pem --client-cert-file=certs\client.crt --client-cert-key=private\client.key 127.0.0.1 7961 >> test.bat
 	@-test.bat
 

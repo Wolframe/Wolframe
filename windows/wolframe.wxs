@@ -44,10 +44,18 @@ Project Wolframe.
 	
 	<?if $(sys.BUILDARCH) = "x64" ?>
 		<?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
-		<?define ProductName = "Wolframe (64-bit)" ?>
+		<?ifdef var.debug?>
+			<?define ProductName = "Wolframe (64-bit, debug version)" ?>
+		<?else?>
+			<?define ProductName = "Wolframe (64-bit)" ?>
+		<?endif?>
 	<?elseif $(sys.BUILDARCH) = "x86" ?>
 		<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
-		<?define ProductName = "Wolframe (32-bit)" ?>
+		<?ifdef var.debug?>
+			<?define ProductName = "Wolframe (32-bit, debug version)" ?>
+		<?else?>
+			<?define ProductName = "Wolframe (32-bit)" ?>
+		<?endif?>
 	<?endif?>
 	
 	<Product Name="$(var.ProductName)" Version="$(var.ProductVersion)" Manufacturer="Wolframe Team"
@@ -75,6 +83,14 @@ Project Wolframe.
 							
 							<Component Id="WolfilterBinary" Guid="{10d4d86a-78e3-4262-8d61-279b20ef5fc2}">
 								<File Id="wolfilter.exe" Name="wolfilter.exe" DiskId="1" Source="..\src\wolfilter.exe"/>
+							</Component>
+							
+							<Component Id="Wolframec" Guid="{0cf1d114-d387-4b9d-a10d-e4c158f82744}">
+								<File Id="wolframec.exe" Name="wolframec.exe" DiskId="1" Source="..\clients\cmdline\wolframec.exe"/>
+							</Component>
+							
+							<Component Id="WolframeCppClientLib" Guid="{5211387d-521f-48d2-930f-efc6de422981}">
+								<File Id="wolframec.exe" Name="wolframec.exe" DiskId="1" Source="..\clients\cmdline\wolframec.exe"/>
 							</Component>
 							
 							<Component Id="ServiceBinary" Guid="{112265CD-F35C-49B5-A4A1-F685B32BC208}">
@@ -152,11 +168,11 @@ Project Wolframe.
 							<?ifdef var.with_icu?>
 							<Component Id="ICUDlls" Guid="{205cf449-6a2e-4d43-969a-5740fc4f737b}">
 								<?ifdef var.debug?>
-									<File Id="icuin49d.dll" Name="icuind.dll" DiskId="1" Source="..\src\icuin49d.dll"/>
-									<File Id="icuuc49d.dll" Name="icuucd.dll" DiskId="1" Source="..\src\icuuc49d.dll"/>
+									<File Id="icuin$(var.icu_lib_version)d.dll" Name="icuind.dll" DiskId="1" Source="..\src\icuin49d.dll"/>
+									<File Id="icuuc$(var.icu_lib_version)d.dll" Name="icuucd.dll" DiskId="1" Source="..\src\icuuc49d.dll"/>
 								<?else?>
-									<File Id="icuin49.dll" Name="icuin.dll" DiskId="1" Source="..\src\icuin49.dll"/>
-									<File Id="icuuc49.dll" Name="icuuc.dll" DiskId="1" Source="..\src\icuuc49.dll"/>
+									<File Id="icuin$(var.icu_lib_version).dll" Name="icuin.dll" DiskId="1" Source="..\src\icuin49.dll"/>
+									<File Id="icuuc$(var.icu_lib_version).dll" Name="icuuc.dll" DiskId="1" Source="..\src\icuuc49.dll"/>
 								<?endif?>
 							</Component>
 							<?endif?>							
@@ -513,10 +529,12 @@ Project Wolframe.
 				
 			</Feature>
 			
-			<Feature Id="Clients" Title="Clients" Description="Client programmes talking to Wolframe." Level="3"  InstallDefault="local">
-				<Feature Id="QtClient" Title="Qt Client" Description="A Qt client to access the Wolframe server." Level="1000">
+			<Feature Id="Clients" Title="Clients" Description="Client programs talking to Wolframe." Level="3"  InstallDefault="local">
+				<Feature Id="ClientLibrary" Title="Client C++ library" Description="A simple command line interpreter to access the Wolframe server." Level="3">
 				</Feature>
-				<Feature Id="Cli" Title="Command Line Interface" Description="A simple command line interpreter to access the Wolframe server." Level="3">
+				<Feature Id="CommandLineTool" Title="Command Line Tool" Description="A simple command line interpreter to access the Wolframe server." Level="3">
+				</Feature>
+				<Feature Id="QtClient" Title="Qt Client" Description="A Qt client to access the Wolframe server." Level="1000">
 				</Feature>
 			</Feature>
 			
