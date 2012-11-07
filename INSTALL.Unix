@@ -54,7 +54,7 @@ Prerequisites
 - optionally (WITH_LUA) lua 5.2
   (integrated in subdir 'lua')
 - for the optional Qt client
-  - optionally (WITH_QT) Qt 4, 4.5.x or later
+  - optionally (WITH_QT) Qt 4, 4.6.x or later
 - for database support (WITH_SYSTEM_SQLITE3): sqlite3
   WITH_LOCAL_SQLITE3=1 uses the supplied amalgamation
   instead of the system version

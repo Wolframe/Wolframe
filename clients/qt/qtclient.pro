@@ -39,7 +39,8 @@ SOURCES += \
 	FormWidget.cpp \
 	qcommandline.cpp \
 	LoginDialog.cpp \
-	qtclient.cpp
+	qtclient.cpp \
+	Preferences.cpp
 
 HEADERS += \
 	DataHandler.hpp \
@@ -58,7 +59,8 @@ HEADERS += \
 	MainWindow.hpp \
 	NetworkDataLoader.hpp \
 	NetworkFormLoader.hpp \
-	Version.hpp
+	Version.hpp \
+	Preferences.hpp
 
 FORMS +=
 

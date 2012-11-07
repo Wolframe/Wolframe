@@ -9,6 +9,7 @@
 #include "NetworkDataLoader.hpp"
 #include "SqliteFormLoader.hpp"
 #include "SqliteDataLoader.hpp"
+#include "Preferences.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -34,15 +35,19 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_loadMode( Network ), m_debug( false ),
 	m_loginDialog( 0 )
 {
-#ifdef Q_OS_ANDROID
-	//parseArgs( ); // croaks in cmdline.hpp, TODO: are there command line options anyway?
-	// TODO: read a configuration, where to store that on Android, config dialog?
-	m_loadMode = Network;
-	m_host = "andreasbaumann.dyndns.org";
-	//m_host = "10.0.2.2";
-#else
+// settings override built in defaults
+	Preferences *prefs = Preferences::instance( );
+	m_host = prefs->host( );
+	m_port = prefs->port( );
+
+// command line options override settings
+#ifndef Q_OS_ANDROID
 	parseArgs( );
+#else
+	// TODO: move to prerences as default for qt application
+	m_loadMode = Network;
 #endif
+
 	initialize( );
 }
 
@@ -183,32 +188,34 @@ void MainWindow::initialize( )
 	qDebug( ) << "Debug window initialized";
 
 // open local sqlite database
-	QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE", SESSION_NAME );
-	db.setDatabaseName( m_dbName );
-	if( !db.open( ) ) {
-		QString msg = tr( "Unable to open or create Sqlite database file '%1'" ).
-			arg( QFileInfo( m_dbName ).fileName( ) );
-		QMessageBox::warning( this, "qtclient", msg );
-		QCoreApplication::quit( );
-	}
-	
-	QSqlQuery q( "select 1 from sqlite_master", db );
-	if( !q.exec( ) ) {
-		QString msg = tr( "Unable to query the Sqlite database file '%1', most likely not a database." ).
-			arg( QFileInfo( m_dbName ).fileName( ) );
-		QMessageBox::warning( this, "qtclient", msg );
-		QCoreApplication::quit( );
-	}
-	
-// enable foreign key
-	QSqlQuery qp( "PRAGMA foreign_keys = ON", db );
-	if( !qp.exec( ) ) {
-		QString msg = tr( "Unable to enable foreign key support in the Sqlite database file '%1'." ).
-			arg( QFileInfo( m_dbName ).fileName( ) );
-		QMessageBox::warning( this, "qtclient", msg );
-		QCoreApplication::quit( );
-	}
+	if( m_loadMode == LocalSqlite ) {
+		QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE", SESSION_NAME );
+		db.setDatabaseName( m_dbName );
+		if( !db.open( ) ) {
+			QString msg = tr( "Unable to open or create Sqlite database file '%1'" ).
+				arg( QFileInfo( m_dbName ).fileName( ) );
+			QMessageBox::warning( this, "qtclient", msg );
+			QCoreApplication::quit( );
+		}
 		
+		QSqlQuery q( "select 1 from sqlite_master", db );
+		if( !q.exec( ) ) {
+			QString msg = tr( "Unable to query the Sqlite database file '%1', most likely not a database." ).
+				arg( QFileInfo( m_dbName ).fileName( ) );
+			QMessageBox::warning( this, "qtclient", msg );
+			QCoreApplication::quit( );
+		}
+
+// enable foreign key
+		QSqlQuery qp( "PRAGMA foreign_keys = ON", db );
+		if( !qp.exec( ) ) {
+			QString msg = tr( "Unable to enable foreign key support in the Sqlite database file '%1'." ).
+				arg( QFileInfo( m_dbName ).fileName( ) );
+			QMessageBox::warning( this, "qtclient", msg );
+			QCoreApplication::quit( );
+		}
+	}
+			
 // catch error of network protocol
 	connect( m_wolframeClient, SIGNAL( error( QString ) ),
 		this, SLOT( wolframeError( QString ) ) );
@@ -559,6 +566,10 @@ void MainWindow::formLoaded( QString name )
 
 void MainWindow::on_actionExit_triggered( )
 {
+// store settings to config file/registry, TODO: move to prefs dialog later	
+	Preferences *prefs = Preferences::instance( );
+	prefs->storeSettings( );
+	
 	if( m_loadMode == Network ) {
 		m_wolframeClient->disconnect( );
 	} else {
