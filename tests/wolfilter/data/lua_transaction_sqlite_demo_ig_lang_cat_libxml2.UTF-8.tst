@@ -214,11 +214,11 @@ END
 --
 TRANSACTION treeSelectNode -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE ID = $(id);
+	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE ID = $(id);
 END
 TRANSACTION treeSelectNodeByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE name = $(name);
+	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE name = $(name);
 END
 
 --
@@ -297,13 +297,13 @@ function insert_class( parentid, itr)
 end
 
 function delete_subtree( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table()["node"].ID
+	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
 	logger.print( "ERROR", "PARAM treeSelectNodeByName ", name, " ", id)
 	formfunction( "treeDeleteSubtree")( { node={ id=id } } )
 end
 
 function select_subtree( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table()["node"].ID
+	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
 	local nodear = formfunction( "treeSelectNodeAndChildren")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "subtree")
 	output:print( name, "name")
@@ -336,7 +336,7 @@ function select_subtree2( name)
 end
 
 function select_children( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table()["node"].ID
+	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
 	local nodear = formfunction( "treeSelectChildren")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "children")
 	output:print( name, "name")
@@ -369,7 +369,7 @@ function select_children2( name)
 end
 
 function select_cover( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table()["node"].ID
+	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
 	local nodear = formfunction( "treeSelectNodeAndParents")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "cover")
 	output:print( name, "name")
@@ -402,7 +402,7 @@ function select_cover2( name)
 end
 
 function select_parents( name)
-	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table()["node"].ID
+	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
 	local nodear = formfunction( "treeSelectParents")( { node={ id=id } } ):table()["node"] or {}
 	output:opentag( "parents")
 	output:print( name, "name")

@@ -682,8 +682,9 @@ static bool isAlphaNumeric( char ch)
 	return false;
 }
 
-static bool checkIdentifier( const std::string& id)
+static bool checkResultIdentifier( const std::string& id)
 {
+	if (id == ".") return true;
 	std::string::const_iterator ii = id.begin(), ie = id.end();
 	while (ii != ie && isAlphaNumeric( *ii)) ++ii;
 	return (ii == ie);
@@ -827,6 +828,11 @@ struct TransactionFunctionOutput::Impl
 		m_state = 0;
 	}
 
+	bool hasResultName( std::size_t functionidx)
+	{
+		return (m_resname[ functionidx].size() != 1 || m_resname[ functionidx][0] != '.');
+	}
+
 	bool getNext( ElementType& type, TypedFilterBase::Element& element, bool doSerializeWithIndices)
 	{
 		for (;;) switch (m_state)
@@ -864,19 +870,22 @@ struct TransactionFunctionOutput::Impl
 				m_colidx = 0;
 				m_colend = m_resitr->nofColumns();
 				m_state = 2;
-				if (doSerializeWithIndices)
+				if (doSerializeWithIndices
+				&&  hasResultName( m_resitr->functionidx()))
 				{
 					// open array tag:
 					type = TypedInputFilter::OpenTag;
 					element = m_resname[ m_resitr->functionidx()];
 					return true;
 				}
-				/* no break here ! */
+				/* no break here !*/
 			case 2:
 				m_colidx = 0;
 				if (m_rowitr == m_rowend)
 				{
-					if (doSerializeWithIndices && !m_resunique[ m_resitr->functionidx()])
+					if (doSerializeWithIndices
+					&&  !m_resunique[ m_resitr->functionidx()]
+					&&  hasResultName( m_resitr->functionidx()))
 					{
 						// close array tag:
 						type = TypedInputFilter::CloseTag;
@@ -912,13 +921,14 @@ struct TransactionFunctionOutput::Impl
 						continue;
 					}
 				}
-				else
+				else if (hasResultName( m_resitr->functionidx()))
 				{
 					// tag is result (element) name
 					type = TypedInputFilter::OpenTag;
 					element = m_resname[ m_resitr->functionidx()];
 					return true;
 				}
+				/* no break here !*/
 			case 3:
 				if (m_colidx == m_colend)
 				{
@@ -946,9 +956,13 @@ struct TransactionFunctionOutput::Impl
 				m_state = 3;
 				if (m_colidx == m_colend)
 				{
-					type = TypedInputFilter::CloseTag;
-					element = TypedInputFilter::Element();
-					return true;
+					if (doSerializeWithIndices
+					||  hasResultName( m_resitr->functionidx()))
+					{
+						type = TypedInputFilter::CloseTag;
+						element = TypedInputFilter::Element();
+						return true;
+					}
 				}
 				continue;
 		}
@@ -1100,9 +1114,13 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 				throw Error( elementName, ci - m_call.begin(), "no common result prefix");
 			}
 		}
-		if (!checkIdentifier( ci->resultname()) || !checkIdentifier( m_resultname))
+		if (m_resultname == ".")
 		{
-			throw Error( elementName, ci - m_call.begin(), "identifier or two identifiers separated by a '/' expected for output");
+			m_resultname = "";
+		}
+		if (!checkResultIdentifier( ci->resultname()) || !checkResultIdentifier( m_resultname))
+		{
+			throw Error( elementName, ci - m_call.begin(), "'.' or identifier or two identifiers separated by a '/' expected for output");
 		}
 	}
 

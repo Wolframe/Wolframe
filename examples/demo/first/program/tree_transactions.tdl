@@ -34,11 +34,11 @@ END
 --
 TRANSACTION treeSelectNode -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE ID = $(id);
+	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE ID = $(id);
 END
 TRANSACTION treeSelectNodeByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE name = $(name);
+	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE name = $(name);
 END
 
 --
