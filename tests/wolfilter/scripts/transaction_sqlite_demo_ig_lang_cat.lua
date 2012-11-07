@@ -22,7 +22,6 @@ end
 
 function delete_subtree( name)
 	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	logger.print( "ERROR", "PARAM treeSelectNodeByName ", name, " ", id)
 	formfunction( "treeDeleteSubtree")( { node={ id=id } } )
 end
 
@@ -32,7 +31,7 @@ function select_subtree( name)
 	output:opentag( "subtree")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -48,7 +47,7 @@ function select_subtree2( name)
 	output:opentag( "subtree")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -65,7 +64,7 @@ function select_children( name)
 	output:opentag( "children")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -81,7 +80,7 @@ function select_children2( name)
 	output:opentag( "children")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -98,7 +97,7 @@ function select_cover( name)
 	output:opentag( "cover")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -114,7 +113,7 @@ function select_cover2( name)
 	output:opentag( "cover")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -131,7 +130,7 @@ function select_parents( name)
 	output:opentag( "parents")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -147,7 +146,7 @@ function select_parents2( name)
 	output:opentag( "parents")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -161,10 +160,10 @@ end
 function get_tree( parentid)
 	local t = formfunction( "treeSelectNodeAndChildren")( { node = { id=parentid } } ):table()["node"] or {}
 	local a = {}
-	for i,v in ipairs( t) do
+	for i,v in pairs( t) do
 		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
 	end
-	for i,v in ipairs( a) do
+	for i,v in pairs( a) do
 		if v.parent ~= 0 then
 			table.insert( a[ v.parent ].children, i )
 		end
@@ -179,7 +178,7 @@ function print_tree( tree, nodeid, indent)
 	output:opentag( "class")
 	output:print( tree[ nodeid].name, "name")
 	local n = 0
-	for i,v in ipairs( tree[ nodeid].children) do
+	for i,v in pairs( tree[ nodeid].children) do
 		print_tree( tree, v, indent .. "\t")
 		n = n + 1
 	end
@@ -215,10 +214,10 @@ function run()
 	select_parents( "slavonic")
 	select_parents2( "east germanic")
 	select_parents2( "indic")
-	-- delete_subtree( "hellenic")
-	-- delete_subtree( "hittie")
-	-- delete_subtree( "celtic")
-	-- delete_subtree( "indo iranian")
+	delete_subtree( "hellenic")
+	delete_subtree( "hittie")
+	delete_subtree( "celtic")
+	delete_subtree( "indo iranian")
 	output:opentag( "sparsetree")
 	print_tree( get_tree( 1), 1, "")
 	output:closetag()

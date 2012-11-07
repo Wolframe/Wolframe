@@ -201,7 +201,7 @@ END
 --
 TRANSACTION treeDeleteSubtree -- ( /node/id)
 BEGIN
-	FOREACH /node DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM tree WHERE ID = $(id);
+	FOREACH /node DO NONEMPTY SELECT lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(id);
 	DO DELETE FROM tree WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE tree SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE tree SET rgt = rgt-$3 WHERE rgt>$2;
@@ -297,7 +297,6 @@ end
 
 function delete_subtree( name)
 	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	logger.print( "ERROR", "PARAM treeSelectNodeByName ", name, " ", id)
 	formfunction( "treeDeleteSubtree")( { node={ id=id } } )
 end
 
@@ -307,7 +306,7 @@ function select_subtree( name)
 	output:opentag( "subtree")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -323,7 +322,7 @@ function select_subtree2( name)
 	output:opentag( "subtree")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -340,7 +339,7 @@ function select_children( name)
 	output:opentag( "children")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -356,7 +355,7 @@ function select_children2( name)
 	output:opentag( "children")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -373,7 +372,7 @@ function select_cover( name)
 	output:opentag( "cover")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -389,7 +388,7 @@ function select_cover2( name)
 	output:opentag( "cover")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -406,7 +405,7 @@ function select_parents( name)
 	output:opentag( "parents")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -422,7 +421,7 @@ function select_parents2( name)
 	output:opentag( "parents")
 	output:print( name, "name")
 	output:print( "\n")
-	for i,v in ipairs( nodear) do
+	for i,v in pairs( nodear) do
 		output:opentag( "node")
 		output:print( v.ID, "id")
 		output:print( v.name, "name")
@@ -436,10 +435,10 @@ end
 function get_tree( parentid)
 	local t = formfunction( "treeSelectNodeAndChildren")( { node = { id=parentid } } ):table()["node"] or {}
 	local a = {}
-	for i,v in ipairs( t) do
+	for i,v in pairs( t) do
 		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
 	end
-	for i,v in ipairs( a) do
+	for i,v in pairs( a) do
 		if v.parent ~= 0 then
 			table.insert( a[ v.parent ].children, i )
 		end
@@ -454,7 +453,7 @@ function print_tree( tree, nodeid, indent)
 	output:opentag( "class")
 	output:print( tree[ nodeid].name, "name")
 	local n = 0
-	for i,v in ipairs( tree[ nodeid].children) do
+	for i,v in pairs( tree[ nodeid].children) do
 		print_tree( tree, v, indent .. "\t")
 		n = n + 1
 	end
@@ -490,10 +489,10 @@ function run()
 	select_parents( "slavonic")
 	select_parents2( "east germanic")
 	select_parents2( "indic")
-	-- delete_subtree( "hellenic")
-	-- delete_subtree( "hittie")
-	-- delete_subtree( "celtic")
-	-- delete_subtree( "indo iranian")
+	delete_subtree( "hellenic")
+	delete_subtree( "hittie")
+	delete_subtree( "celtic")
+	delete_subtree( "indo iranian")
 	output:opentag( "sparsetree")
 	print_tree( get_tree( 1), 1, "")
 	output:closetag()
@@ -789,21 +788,6 @@ end
 <node id="87" name="indo iranian"/>
 </parents>
 <sparsetree><class name="indogermanic">
-	<class name="celtic">
-		<class name="gaulisch"/>
-		<class name="goidelic">
-			<class name="old irish"/>
-			<class name="middle irish"/>
-			<class name="manx"/>
-			<class name="irish"/>
-			<class name="scotts gaelic"/>
-		</class>
-		<class name="brythonic">
-			<class name="comish"/>
-			<class name="welsh"/>
-			<class name="breton"/>
-		</class>
-	</class>
 	<class name="germanic">
 		<class name="west germanic">
 			<class name="anglo-frisian">
@@ -890,168 +874,86 @@ end
 	</class>
 	<class name="albanian"/>
 	<class name="armenian"/>
-	<class name="hellenic">
-		<class name="greek"/>
-	</class>
 	<class name="baltic">
 		<class name="lettish"/>
 		<class name="latvian"/>
 		<class name="lithuanian"/>
 	</class>
-	<class name="hittie"/>
-	<class name="indo iranian">
-		<class name="iranian">
-			<class name="avestan">
-				<class name="pashto"/>
-			</class>
-			<class name="old persian">
-				<class name="balushti"/>
-				<class name="kurdish"/>
-				<class name="ossetic"/>
-				<class name="pashto"/>
-				<class name="persian"/>
-			</class>
-			<class name="scythian"/>
-		</class>
-		<class name="indic">
-			<class name="sanskrit"/>
-			<class name="prakrit"/>
-			<class name="pali"/>
-			<class name="bengali"/>
-			<class name="bihari"/>
-			<class name="bhili"/>
-			<class name="gujarati"/>
-			<class name="hindi"/>
-			<class name="hindustani"/>
-			<class name="marati"/>
-			<class name="nepali"/>
-			<class name="bahari"/>
-			<class name="punjabi"/>
-			<class name="rajasthani"/>
-			<class name="sindhi"/>
-			<class name="singhalese"/>
-			<class name="urdu"/>
-		</class>
-	</class>
 	<class name="tocharian"/>
 </class></sparsetree></result>
 tree:
-'1', '0', 'indogermanic', '1', '232'
-'2', '1', 'celtic', '2', '25'
-'3', '2', 'gaulisch', '3', '4'
-'4', '2', 'goidelic', '5', '16'
-'5', '4', 'old irish', '6', '7'
-'6', '4', 'middle irish', '8', '9'
-'7', '4', 'manx', '10', '11'
-'8', '4', 'irish', '12', '13'
-'9', '4', 'scotts gaelic', '14', '15'
-'10', '2', 'brythonic', '17', '24'
-'11', '10', 'comish', '18', '19'
-'12', '10', 'welsh', '20', '21'
-'13', '10', 'breton', '22', '23'
-'14', '1', 'germanic', '26', '95'
-'15', '14', 'west germanic', '27', '76'
-'16', '15', 'anglo-frisian', '28', '39'
-'17', '16', 'old english', '29', '34'
-'18', '17', 'middle english', '30', '33'
-'19', '18', 'english', '31', '32'
-'20', '16', 'old frisian', '35', '38'
-'21', '20', 'frisian', '36', '37'
-'22', '15', 'german', '40', '75'
-'23', '22', 'low german', '41', '56'
-'24', '23', 'old saxon', '42', '45'
-'25', '24', 'plattdeutsch', '43', '44'
-'26', '23', 'old low franconian', '46', '55'
-'27', '26', 'dutch', '47', '48'
-'28', '26', 'flemish', '49', '50'
-'29', '26', 'afrikaans', '51', '52'
-'30', '26', 'south african dutch', '53', '54'
-'31', '22', 'high german', '57', '74'
-'32', '31', 'alemannic', '58', '59'
-'33', '31', 'alsatian', '60', '61'
-'34', '31', 'bavarian', '62', '63'
-'35', '31', 'franconian', '64', '65'
-'36', '31', 'german', '66', '67'
-'37', '31', 'pensilvania german', '68', '69'
-'38', '31', 'swiss', '70', '71'
-'39', '31', 'yiddish', '72', '73'
-'40', '14', 'east germanic', '77', '78'
-'41', '14', 'north germanic', '79', '94'
-'42', '41', 'old west norse', '80', '85'
-'43', '42', 'islandic', '81', '82'
-'44', '42', 'faroese', '83', '84'
-'45', '41', 'old east norse', '86', '93'
-'46', '45', 'norwegian', '87', '88'
-'47', '45', 'danish', '89', '90'
-'48', '45', 'swedish', '91', '92'
-'49', '1', 'italic', '96', '121'
-'50', '49', 'oscan', '97', '98'
-'51', '49', 'umbrian', '99', '100'
-'52', '49', 'old latin', '101', '120'
-'53', '52', 'catalan', '102', '103'
-'54', '52', 'french', '104', '105'
-'55', '52', 'galician', '106', '107'
-'56', '52', 'portuguese', '108', '109'
-'57', '52', 'italian', '110', '111'
-'58', '52', 'provencal', '112', '113'
-'59', '52', 'romansch', '114', '115'
-'60', '52', 'romanian', '116', '117'
-'61', '52', 'spanish', '118', '119'
-'62', '1', 'slavonic', '122', '153'
-'63', '62', 'west slavic', '123', '132'
-'64', '63', 'chech', '124', '125'
-'65', '63', 'polish', '126', '127'
-'66', '63', 'slovak', '128', '129'
-'67', '63', 'sorbian', '130', '131'
-'68', '62', 'east slavic', '133', '140'
-'69', '68', 'belarussian', '134', '135'
-'70', '68', 'russian', '136', '137'
-'71', '68', 'ukrainian', '138', '139'
-'72', '62', 'south slavic', '141', '152'
-'73', '72', 'bosnian', '142', '143'
-'74', '72', 'bulgarian', '144', '145'
-'75', '72', 'macedonian', '146', '147'
-'76', '72', 'serbo-croatian', '148', '149'
-'77', '72', 'slovene', '150', '151'
-'78', '1', 'albanian', '154', '155'
-'79', '1', 'armenian', '156', '157'
-'80', '1', 'hellenic', '158', '161'
-'81', '80', 'greek', '159', '160'
-'82', '1', 'baltic', '162', '169'
-'83', '82', 'lettish', '163', '164'
-'84', '82', 'latvian', '165', '166'
-'85', '82', 'lithuanian', '167', '168'
-'86', '1', 'hittie', '170', '171'
-'87', '1', 'indo iranian', '172', '229'
-'88', '87', 'iranian', '173', '192'
-'89', '88', 'avestan', '174', '177'
-'90', '89', 'pashto', '175', '176'
-'91', '88', 'old persian', '178', '189'
-'92', '91', 'balushti', '179', '180'
-'93', '91', 'kurdish', '181', '182'
-'94', '91', 'ossetic', '183', '184'
-'95', '91', 'pashto', '185', '186'
-'96', '91', 'persian', '187', '188'
-'97', '88', 'scythian', '190', '191'
-'98', '87', 'indic', '193', '228'
-'99', '98', 'sanskrit', '194', '195'
-'100', '98', 'prakrit', '196', '197'
-'101', '98', 'pali', '198', '199'
-'102', '98', 'bengali', '200', '201'
-'103', '98', 'bihari', '202', '203'
-'104', '98', 'bhili', '204', '205'
-'105', '98', 'gujarati', '206', '207'
-'106', '98', 'hindi', '208', '209'
-'107', '98', 'hindustani', '210', '211'
-'108', '98', 'marati', '212', '213'
-'109', '98', 'nepali', '214', '215'
-'110', '98', 'bahari', '216', '217'
-'111', '98', 'punjabi', '218', '219'
-'112', '98', 'rajasthani', '220', '221'
-'113', '98', 'sindhi', '222', '223'
-'114', '98', 'singhalese', '224', '225'
-'115', '98', 'urdu', '226', '227'
-'116', '1', 'tocharian', '230', '231'
+'1', '0', 'indogermanic', '1', '148'
+'14', '1', 'germanic', '3', '72'
+'15', '14', 'west germanic', '4', '53'
+'16', '15', 'anglo-frisian', '5', '16'
+'17', '16', 'old english', '6', '11'
+'18', '17', 'middle english', '7', '10'
+'19', '18', 'english', '8', '9'
+'20', '16', 'old frisian', '12', '15'
+'21', '20', 'frisian', '13', '14'
+'22', '15', 'german', '17', '52'
+'23', '22', 'low german', '18', '33'
+'24', '23', 'old saxon', '19', '22'
+'25', '24', 'plattdeutsch', '20', '21'
+'26', '23', 'old low franconian', '23', '32'
+'27', '26', 'dutch', '24', '25'
+'28', '26', 'flemish', '26', '27'
+'29', '26', 'afrikaans', '28', '29'
+'30', '26', 'south african dutch', '30', '31'
+'31', '22', 'high german', '34', '51'
+'32', '31', 'alemannic', '35', '36'
+'33', '31', 'alsatian', '37', '38'
+'34', '31', 'bavarian', '39', '40'
+'35', '31', 'franconian', '41', '42'
+'36', '31', 'german', '43', '44'
+'37', '31', 'pensilvania german', '45', '46'
+'38', '31', 'swiss', '47', '48'
+'39', '31', 'yiddish', '49', '50'
+'40', '14', 'east germanic', '54', '55'
+'41', '14', 'north germanic', '56', '71'
+'42', '41', 'old west norse', '57', '62'
+'43', '42', 'islandic', '58', '59'
+'44', '42', 'faroese', '60', '61'
+'45', '41', 'old east norse', '63', '70'
+'46', '45', 'norwegian', '64', '65'
+'47', '45', 'danish', '66', '67'
+'48', '45', 'swedish', '68', '69'
+'49', '1', 'italic', '73', '98'
+'50', '49', 'oscan', '74', '75'
+'51', '49', 'umbrian', '76', '77'
+'52', '49', 'old latin', '78', '97'
+'53', '52', 'catalan', '79', '80'
+'54', '52', 'french', '81', '82'
+'55', '52', 'galician', '83', '84'
+'56', '52', 'portuguese', '85', '86'
+'57', '52', 'italian', '87', '88'
+'58', '52', 'provencal', '89', '90'
+'59', '52', 'romansch', '91', '92'
+'60', '52', 'romanian', '93', '94'
+'61', '52', 'spanish', '95', '96'
+'62', '1', 'slavonic', '99', '130'
+'63', '62', 'west slavic', '100', '109'
+'64', '63', 'chech', '101', '102'
+'65', '63', 'polish', '103', '104'
+'66', '63', 'slovak', '105', '106'
+'67', '63', 'sorbian', '107', '108'
+'68', '62', 'east slavic', '110', '117'
+'69', '68', 'belarussian', '111', '112'
+'70', '68', 'russian', '113', '114'
+'71', '68', 'ukrainian', '115', '116'
+'72', '62', 'south slavic', '118', '129'
+'73', '72', 'bosnian', '119', '120'
+'74', '72', 'bulgarian', '121', '122'
+'75', '72', 'macedonian', '123', '124'
+'76', '72', 'serbo-croatian', '125', '126'
+'77', '72', 'slovene', '127', '128'
+'78', '1', 'albanian', '131', '132'
+'79', '1', 'armenian', '133', '134'
+'82', '1', 'baltic', '136', '143'
+'83', '82', 'lettish', '137', '138'
+'84', '82', 'latvian', '139', '140'
+'85', '82', 'lithuanian', '141', '142'
+'116', '1', 'tocharian', '146', '147'
 
 sqlite_sequence:
 'tree', '116'

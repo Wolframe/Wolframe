@@ -286,21 +286,6 @@
 <node id="87" name="indo iranian"/>
 </parents>
 <sparsetree><class name="indogermanic">
-	<class name="celtic">
-		<class name="gaulisch"/>
-		<class name="goidelic">
-			<class name="old irish"/>
-			<class name="middle irish"/>
-			<class name="manx"/>
-			<class name="irish"/>
-			<class name="scotts gaelic"/>
-		</class>
-		<class name="brythonic">
-			<class name="comish"/>
-			<class name="welsh"/>
-			<class name="breton"/>
-		</class>
-	</class>
 	<class name="germanic">
 		<class name="west germanic">
 			<class name="anglo-frisian">
@@ -387,48 +372,10 @@
 	</class>
 	<class name="albanian"/>
 	<class name="armenian"/>
-	<class name="hellenic">
-		<class name="greek"/>
-	</class>
 	<class name="baltic">
 		<class name="lettish"/>
 		<class name="latvian"/>
 		<class name="lithuanian"/>
-	</class>
-	<class name="hittie"/>
-	<class name="indo iranian">
-		<class name="iranian">
-			<class name="avestan">
-				<class name="pashto"/>
-			</class>
-			<class name="old persian">
-				<class name="balushti"/>
-				<class name="kurdish"/>
-				<class name="ossetic"/>
-				<class name="pashto"/>
-				<class name="persian"/>
-			</class>
-			<class name="scythian"/>
-		</class>
-		<class name="indic">
-			<class name="sanskrit"/>
-			<class name="prakrit"/>
-			<class name="pali"/>
-			<class name="bengali"/>
-			<class name="bihari"/>
-			<class name="bhili"/>
-			<class name="gujarati"/>
-			<class name="hindi"/>
-			<class name="hindustani"/>
-			<class name="marati"/>
-			<class name="nepali"/>
-			<class name="bahari"/>
-			<class name="punjabi"/>
-			<class name="rajasthani"/>
-			<class name="sindhi"/>
-			<class name="singhalese"/>
-			<class name="urdu"/>
-		</class>
 	</class>
 	<class name="tocharian"/>
 </class></sparsetree></result>
