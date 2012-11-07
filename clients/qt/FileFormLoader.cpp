@@ -76,5 +76,21 @@ void FileFormLoader::initiateGetLanguageCodes( )
 	emit languageCodesLoaded( languageCodes );
 }
 
+void FileFormLoader::initiateFormSave( QString name, QByteArray form )
+{
+}
+
+void FileFormLoader::initiateFormLocalizationSave( QString name, QLocale locale, QByteArray localizationSrc, QByteArray localizationBin )
+{
+}
+			
+void FileFormLoader::initiateFormDelete( QString name )
+{
+}
+
+void FileFormLoader::initiateFormLocalizationDelete( QString name, QLocale locale )
+{
+}
+
 } // namespace QtClient
 } // namespace _Wolframe

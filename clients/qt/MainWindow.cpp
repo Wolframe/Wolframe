@@ -219,18 +219,7 @@ void MainWindow::initialize( )
 		
 // a Qt UI loader for the main theme window
 	m_uiLoader = new QUiLoader( );
-	m_uiLoader->setLanguageChangeEnabled ( true );
-
-// end of what we can do in network mode, initiate connect here and bail out
-	if( m_loadMode == Network ) {
-// connect the wolframe client to protocols, authenticate
-		connect( m_wolframeClient, SIGNAL( connected( ) ),
-			this, SLOT( connected( ) ) );
-		connect( m_wolframeClient, SIGNAL( disconnected( ) ),
-			this, SLOT( disconnected( ) ) );
-		m_wolframeClient->connect( );
-		return;
-	}
+	m_uiLoader->setLanguageChangeEnabled( true );
 	
 // for testing, load lists of available forms from the files system or
 // a local sqlite database, pass the form loader to the FormWidget
@@ -243,7 +232,17 @@ void MainWindow::initialize( )
 		case LocalSqlite:
 			m_formLoader = new SqliteFormLoader( SESSION_NAME );
 			m_dataLoader = new SqliteDataLoader( SESSION_NAME );
-			break;	
+			break;
+			
+		case Network:
+// end of what we can do in network mode, initiate connect here and bail out
+// connect the wolframe client to protocols, authenticate
+			connect( m_wolframeClient, SIGNAL( connected( ) ),
+				this, SLOT( connected( ) ) );
+			connect( m_wolframeClient, SIGNAL( disconnected( ) ),
+				this, SLOT( disconnected( ) ) );
+			m_wolframeClient->connect( );
+		return;
 	}
 
 // create delegate widget for form handling (one for now), in theory may are possible
