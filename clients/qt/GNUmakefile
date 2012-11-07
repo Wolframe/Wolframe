@@ -68,7 +68,9 @@ OBJS = \
 	LoginDialog.o \
 	moc_LoginDialog.o \
 	SqliteFormLoader.o \
-	SqliteDataLoader.o
+	SqliteDataLoader.o \
+	Preferences.o \
+	moc_Preferences.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -106,6 +108,9 @@ moc_LoginDialog.cpp: LoginDialog.hpp
 
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_MOC) $(MOC_FLAGS) qcommandline.h -o moc_qcommandline.cpp
+
+moc_Preferences.cpp: Preferences.hpp
+	$(QT_MOC) $(MOC_FLAGS) Preferences.hpp -o moc_Preferences.cpp
 
 FORMS = \
 	forms/form1.ui \

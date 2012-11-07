@@ -76,7 +76,9 @@ OBJS = \
 	LoginDialog.obj \
 	moc_LoginDialog.obj \
 	SqliteFormLoader.obj \
-	SqliteDataLoader.obj
+	SqliteDataLoader.obj \
+	Preferences.obj \
+	moc_Preferences.obj
 
 CPP_BINS = \
 	qtclient.exe
@@ -144,6 +146,9 @@ moc_LoginDialog.cpp: LoginDialog.hpp
 
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. qcommandline.h -o moc_qcommandline.cpp
+
+moc_Preferences.cpp: Preferences.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. Preferences.hpp -o moc_Preferences.cpp
 
 local_clean:
 	@-erase moc_*.cpp *.dll 2>NUL

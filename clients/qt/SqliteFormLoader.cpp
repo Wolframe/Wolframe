@@ -161,5 +161,50 @@ void SqliteFormLoader::initiateGetLanguageCodes( )
 	emit languageCodesLoaded( languageCodes );
 }
 
+void SqliteFormLoader::initiateFormSave( QString name, QByteArray form )
+{
+	QSqlDatabase db = QSqlDatabase::database( m_dbName );
+	QSqlQuery q( "insert or replace into uiform( name, source ) values( :name, :source ) where name=:name", db );
+	q.bindValue( ":name", name );
+	q.bindValue( ":source", form, QSql::In | QSql::Binary );
+	if( q.exec( ) ) {
+		emit formSaved( name );
+	}
+}
+
+void SqliteFormLoader::initiateFormLocalizationSave( QString name, QLocale locale, QByteArray localizationSrc, QByteArray localizationBin )
+{
+	QSqlDatabase db = QSqlDatabase::database( m_dbName );
+	QSqlQuery q( "insert or replace into uitranslation( name, locale, source, binary ) values( :name, :locale, :source, :binary ) where name=:name and locale=:locale", db );
+	q.bindValue( ":name", name );
+	q.bindValue( ":locale", locale );
+	q.bindValue( ":source", localizationSrc, QSql::In | QSql::Binary );
+	q.bindValue( ":binary", localizationBin, QSql::In | QSql::Binary );
+	if( q.exec( ) ) {
+		emit formLocalizationSaved( name );
+	}
+}
+			
+void SqliteFormLoader::initiateFormDelete( QString name )
+{
+	QSqlDatabase db = QSqlDatabase::database( m_dbName );
+	QSqlQuery q( "delete from uiform where name=:name", db );
+	q.bindValue( ":name", name );
+	if( q.exec( ) ) {
+		emit formDeleted( name );
+	}
+}
+
+void SqliteFormLoader::initiateFormLocalizationDelete( QString name, QLocale locale )
+{
+	QSqlDatabase db = QSqlDatabase::database( m_dbName );
+	QSqlQuery q( "delete from uitranslation where name=:name and locale=:locale", db );
+	q.bindValue( ":name", name );
+	q.bindValue( ":locale", locale );
+	if( q.exec( ) ) {
+		emit formLocalizationDeleted( name );
+	}
+}
+
 } // namespace QtClient
 } // namespace _Wolframe

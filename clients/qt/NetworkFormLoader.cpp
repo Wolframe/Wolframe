@@ -71,5 +71,21 @@ void NetworkFormLoader::initiateGetLanguageCodes( )
 	emit languageCodesLoaded( languageCodes );
 }
 
+void NetworkFormLoader::initiateFormSave( QString name, QByteArray form )
+{
+}
+
+void NetworkFormLoader::initiateFormLocalizationSave( QString name, QLocale locale, QByteArray localizationSrc, QByteArray localizationBin )
+{
+}
+			
+void NetworkFormLoader::initiateFormDelete( QString name )
+{
+}
+
+void NetworkFormLoader::initiateFormLocalizationDelete( QString name, QLocale locale )
+{
+}
+
 } // namespace QtClient
 } // namespace _Wolframe
