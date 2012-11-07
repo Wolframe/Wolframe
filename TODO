@@ -8,6 +8,8 @@ ABa:
 
 
 PF:
+- Fix bug on Windows when loading std config.xml: "error in input filter 'no input filter defined'"
+
 - Form loader in client and server
 - Tree tests in database
 
