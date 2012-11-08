@@ -68,8 +68,7 @@ CPP_OBJS = \
 	password.obj \
 	globalRndGen.obj \
 	HMAC.obj \
-	CRAM.obj \
-	UIplatform.obj
+	CRAM.obj
 
 OBJS = \
 	b64encode.obj \

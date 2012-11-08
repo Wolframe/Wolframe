@@ -40,7 +40,6 @@
 #include <string>
 #include <list>
 #include "version.hpp"
-#include "UIplatform.hpp"
 
 namespace _Wolframe {
 namespace UI {
