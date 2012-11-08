@@ -30,7 +30,7 @@
  Project Wolframe.
 
 ************************************************************************/
-#include "langbind/luaDebug.hpp"
+#include "luaDebug.hpp"
 #include "langbind/luaException.hpp"
 #include <stdexcept>
 #include <cstddef>

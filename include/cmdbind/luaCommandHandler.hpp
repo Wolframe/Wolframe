@@ -34,8 +34,8 @@ Project Wolframe.
 #ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
-#include "langbind/luaObjects.hpp"
-#include "langbind/luaScriptContext.hpp"
+#include "luaObjects.hpp"
+#include "luaScriptContext.hpp"
 #include <vector>
 #include <string>
 

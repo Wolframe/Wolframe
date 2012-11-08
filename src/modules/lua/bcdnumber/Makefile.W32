@@ -26,7 +26,7 @@ DYNAMIC_MODULE = \
 	mod_lua_bcdnumber.dll
 
 CPP_OBJS = \
-	langbind_luaBcdNumber.obj \
+	luaBcdNumber.obj \
 	mod_lua_bcdnumber.obj
 
 all: $(DYNAMIC_MODULE)

@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file langbind_luaScriptConfig.cpp
+///\file luaScriptConfig.cpp
 ///\brief Implementation of the lua script objects configuration
-#include "langbind/luaScriptContext.hpp"
+#include "luaScriptContext.hpp"
 #include "utils/miscUtils.hpp"
 #include "moduleInterface.hpp"
 #include "moduleDirectory.hpp"

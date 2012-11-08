@@ -32,7 +32,7 @@ Project Wolframe.
 ///\file filter_luafilter.cpp
 ///\brief implementation of lua filters
 #include "filter/luafilter.hpp"
-#include "langbind/luaDebug.hpp"
+#include "luaDebug.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <cstring>

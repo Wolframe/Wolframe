@@ -30,9 +30,9 @@ Project Wolframe.
 
 ************************************************************************/
 #include "cmdbind/luaCommandHandler.hpp"
-#include "langbind/luaDebug.hpp"
+#include "luaDebug.hpp"
 #include "langbind/appObjects.hpp"
-#include "langbind/luaObjects.hpp"
+#include "luaObjects.hpp"
 #include "utils/miscUtils.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>

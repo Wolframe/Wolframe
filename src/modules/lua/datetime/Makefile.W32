@@ -26,7 +26,7 @@ DYNAMIC_MODULE = \
 	mod_lua_datetime.dll
 
 CPP_OBJS = \
-	langbind_luaDateTime.obj \
+	luaDateTime.obj \
 	mod_lua_datetime.obj
 
 all: $(DYNAMIC_MODULE)

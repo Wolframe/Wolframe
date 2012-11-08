@@ -317,7 +317,11 @@
 					<class name="franconian"/>
 					<class name="german"/>
 					<class name="pensilvania german"/>
-					<class name="swiss"/>
+					<class name="swiss">
+						<class name="bern german"/>
+						<class name="eastern swiss german"/>
+						<class name="grison german"/>
+					</class>
 					<class name="yiddish"/>
 				</class>
 			</class>
@@ -378,4 +382,5 @@
 		<class name="lithuanian"/>
 	</class>
 	<class name="tocharian"/>
+	<class name="hittie"/>
 </class></sparsetree></result>

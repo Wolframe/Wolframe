@@ -25,7 +25,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_lua_bcdnumber.so
 
 CPP_OBJS = \
-	langbind_luaBcdNumber.o \
+	luaBcdNumber.o \
 	mod_lua_bcdnumber.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

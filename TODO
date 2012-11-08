@@ -9,9 +9,7 @@ ABa:
 
 PF:
 - Fix bug on Windows when loading std config.xml: "error in input filter 'no input filter defined'"
-
 - Form loader in client and server
-- Tree tests in database
 
 - bignum tests (only bigint tested until now)
 - XSLT filter + tests
@@ -19,6 +17,4 @@ PF:
 	- The print form configuration can have an xslt script for preprocessing
 
 - Make postgres database run transactions
-
-
 

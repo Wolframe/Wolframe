@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind_luaBcdNumber.cpp
+///\file luaBcdNumber.cpp
 ///\brief Implements a BCD number type of arbitrary length ("bigint") and a BCD fixed point number of any defined precision and arbitrary length ("bignum") for Lua
-#include "langbind/luaBcdNumber.hpp"
+#include "luaBcdNumber.hpp"
 #include "types/bcdArithmetic.hpp"
 #include "langbind/luaArithmeticType.hpp"
 #include <limits>

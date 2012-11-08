@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/lua/mod_lua_datetime.cpp
+///\file mod_lua_datetime.cpp
 ///\brief Lua extension module for date and time arithmetic
 #include "module/luaExtensionBuilder.hpp"
 #include "logger-v1.hpp"
-#include "langbind/luaDateTime.hpp"
+#include "luaDateTime.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 

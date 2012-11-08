@@ -1,6 +1,6 @@
 idcnt = 0
 
-function insert_class( parentid, itr)
+function insert_tree( parentid, itr)
 	local id = idcnt + 1
 	for v,t in itr do
 		if (t == "name") then
@@ -15,10 +15,17 @@ function insert_class( parentid, itr)
 			idcnt = idcnt + 1
 		end
 		if (t == "class") then
-			insert_class( id, scope( itr))
+			insert_tree( id, scope( itr))
 		end
 	end
 end
+
+function insert_node( parentname, name)
+	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
+	logger.printc( "treeAddNode ", parentid, " ", parentname, " ", name)
+	formfunction( "treeAddNode")( { node = { name=name, parentid=parentid} } )
+end
+
 
 function delete_subtree( name)
 	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
@@ -194,7 +201,7 @@ function run()
 	local itr = input:get()
 	for v,t in itr do
 		if t == "class" then
-			insert_class( idcnt, scope( itr))
+			insert_tree( idcnt, scope( itr))
 		end
 	end
 	print_tree( get_tree( 1), 1, "")
@@ -216,6 +223,10 @@ function run()
 	select_parents2( "indic")
 	delete_subtree( "hellenic")
 	delete_subtree( "hittie")
+	insert_node( "swiss", "bern german")
+	insert_node( "swiss", "eastern swiss german")
+	insert_node( "swiss", "grison german")
+	insert_node( "indogermanic", "hittie")
 	delete_subtree( "celtic")
 	delete_subtree( "indo iranian")
 	output:opentag( "sparsetree")

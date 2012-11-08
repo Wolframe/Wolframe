@@ -30,11 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/lua/mod_lua_bcdnumber.cpp
+///\file mod_lua_bcdnumber.cpp
 ///\brief Lua extension module for arbitrary precision bcd number arithmetic
 #include "module/luaExtensionBuilder.hpp"
 #include "logger-v1.hpp"
-#include "langbind/luaBcdNumber.hpp"
+#include "luaBcdNumber.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 

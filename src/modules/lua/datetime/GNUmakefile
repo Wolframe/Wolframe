@@ -25,7 +25,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_lua_datetime.so
 
 CPP_OBJS = \
-	langbind_luaDateTime.o \
+	luaDateTime.o \
 	mod_lua_datetime.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

@@ -12,8 +12,8 @@ END
 TRANSACTION treeAddNode -- (/node/parentid, /node/name)
 BEGIN
 	FOREACH /node DO NONEMPTY SELECT rgt FROM tree WHERE ID = $(parentid);
-	DO UPDATE tree SET lft = lft + 2 WHERE lft > $1;
 	DO UPDATE tree SET rgt = rgt + 2 WHERE rgt >= $1;
+	DO UPDATE tree SET lft = lft + 2 WHERE lft > $1;
 	FOREACH /node DO INSERT INTO tree (parent, name, lft, rgt) VALUES ($(parentid), $(name), $1, $1+1);
 END
 

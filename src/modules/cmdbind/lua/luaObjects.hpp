@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/luaObjects.hpp
+///\file luaObjects.hpp
 ///\brief interface to system objects for processor language bindings
 #ifndef _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_OBJECTS_HPP_INCLUDED

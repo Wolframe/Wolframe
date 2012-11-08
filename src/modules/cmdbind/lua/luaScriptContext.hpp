@@ -1,4 +1,4 @@
-/************************************************************************
+ /************************************************************************
 
  Copyright (C) 2011, 2012 Project Wolframe.
  All rights reserved.
@@ -30,22 +30,40 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file luaDebug.hpp
-///\brief Logger interface for the lua application processor
-#ifndef _langbind_LUA_DEBUG_HPP_INCLUDED
-#define _langbind_LUA_DEBUG_HPP_INCLUDED
-#include <string>
-
-extern "C" {
-#include "lua.h"
-}
+///\file langbind/luaScriptContext.hpp
+///\brief Objects defined by a command handler processing lua scripts
+#ifndef _Wolframe_langbind_LUA_SCRIPT_CONTEXT_HPP_INCLUDED
+#define _Wolframe_langbind_LUA_SCRIPT_CONTEXT_HPP_INCLUDED
+#include "processor/procProvider.hpp"
+#include "luaObjects.hpp"
+#include "module/luaExtensionBuilder.hpp"
+#include <vector>
 
 namespace _Wolframe {
 namespace langbind {
 
-std::string getDescription( lua_State *ls, int index);
-bool getDescription( lua_State *ls, int index, std::string& ret);
+struct LuaScriptContext
+{
+	LuaModuleMap modulemap;
+	LuaFunctionMap funcmap;
+
+	LuaScriptContext() :funcmap(&modulemap){}
+	~LuaScriptContext();
+
+	void load( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* modules);
+
+	///\brief Get the list of commands
+	std::list<std::string> commands() const
+	{
+		return funcmap.commands();
+	}
+
+private:
+	std::vector<module::LuaExtensionConstructor*> m_objects;
+
+private:
+	LuaScriptContext( const LuaScriptContext&) :funcmap(&modulemap){}	//non copyable
+};
 
 }}//namespace
 #endif
-

@@ -29,12 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#include "langbind/luaObjects.hpp"
+#include "luaObjects.hpp"
 #include "langbind/appObjects.hpp"
-#include "langbind/luaDebug.hpp"
+#include "luaDebug.hpp"
 #include "langbind/luaException.hpp"
 #include "langbind/luaCppCall.hpp"
-#include "langbind/luaGetFunctionClosure.hpp"
+#include "luaGetFunctionClosure.hpp"
 #include "langbind/luaBcdNumber.hpp"
 #include "langbind/luaDateTime.hpp"
 #include "langbind/normalizeFunction.hpp"
@@ -58,7 +58,6 @@ extern "C"
 #include "lualib.h"
 #include "lauxlib.h"
 }
-#include "langbind/luaDebug.hpp"
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -1636,19 +1635,23 @@ LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
 	/* first parameter maps to a log level, rest gets printed depending on
 	 * whether it's a string or a number
 	 */
-	int ii,nn = lua_gettop(ls);
+	int ii,sofs=0,nn = lua_gettop(ls);
 	if (nn <= 0)
 	{
 		throw std::runtime_error( "missing arguments");
 	}
-	const char *logLevel = lua_tostring( ls, 1);
+	if (luaL_testudata( ls, 1, metaTableName<Logger>()))
+	{
+		sofs = 1;
+	}
+	const char *logLevel = lua_tostring( ls, 1+sofs);
 	if (!logLevel)
 	{
 		throw std::runtime_error( "first argument log level is not a string");
 	}
 	std::string logmsg;
 
-	for (ii=2; ii<=nn; ii++)
+	for (ii=2+sofs; ii<=nn; ii++)
 	{
 		if (!getDescription( ls, ii, logmsg))
 		{
@@ -1670,10 +1673,33 @@ LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
 }
 
 
+LUA_FUNCTION_THROWS( "logger.printc(..)", function_logger_printc)
+{
+	/* first parameter maps to a log level, rest gets printed depending on
+	 * whether it's a string or a number
+	 */
+	int ii,sofs=0,nn = lua_gettop(ls);
+	if (nn && luaL_testudata( ls, 1, metaTableName<Logger>()))
+	{
+		sofs = 1;
+	}
+	std::string logmsg;
+	for (ii=1+sofs; ii<=nn; ii++)
+	{
+		if (!getDescription( ls, ii, logmsg))
+		{
+			throw std::runtime_error( "failed to map arguments to strings");
+		}
+	}
+	std::cerr << logmsg << "\n";
+	return 0;
+}
 
-static const luaL_Reg logger_methodtable[ 2] =
+
+static const luaL_Reg logger_methodtable[ 3] =
 {
 	{"print",&function_logger_print},
+	{"printc",&function_logger_printc},
 	{0,0}
 };
 

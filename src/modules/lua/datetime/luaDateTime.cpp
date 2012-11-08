@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind_luaDateTime.cpp
+///\file luaDateTime.cpp
 ///\brief Implements types for date/time arithmetic and formated parsing/printing for Lua
-#include "langbind/luaDateTime.hpp"
+#include "luaDateTime.hpp"
 #include "types/dateArithmetic.hpp"
 #include "langbind/luaArithmeticType.hpp"
 #include <limits>
