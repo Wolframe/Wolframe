@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>exit</class>
  <widget class="QWidget" name="exit">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>351</width>
+    <height>441</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -35,6 +43,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -150,6 +159,11 @@
   <action name="actionLanguage">
    <property name="text">
     <string>&amp;Language</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>&amp;Preferences</string>
    </property>
   </action>
  </widget>

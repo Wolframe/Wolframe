@@ -70,7 +70,11 @@ OBJS = \
 	SqliteFormLoader.o \
 	SqliteDataLoader.o \
 	Preferences.o \
-	moc_Preferences.o
+	moc_Preferences.o \
+	PreferencesDialog.o \
+	moc_PreferencesDialog.o \
+	FileChooser.o \
+	moc_FileChooser.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -111,6 +115,12 @@ moc_qcommandline.cpp: qcommandline.h
 
 moc_Preferences.cpp: Preferences.hpp
 	$(QT_MOC) $(MOC_FLAGS) Preferences.hpp -o moc_Preferences.cpp
+
+moc_PreferencesDialog.cpp: PreferencesDialog.hpp
+	$(QT_MOC) $(MOC_FLAGS) PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
+
+moc_FileChooser.cpp: FileChooser.hpp
+	$(QT_MOC) $(MOC_FLAGS) FileChooser.hpp -o moc_FileChooser.cpp
 
 FORMS = \
 	forms/form1.ui \

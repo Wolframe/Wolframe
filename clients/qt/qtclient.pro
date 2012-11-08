@@ -40,7 +40,9 @@ SOURCES += \
 	qcommandline.cpp \
 	LoginDialog.cpp \
 	qtclient.cpp \
-	Preferences.cpp
+	Preferences.cpp \
+	PreferencesDialog.cpp \
+	FileChooser.cpp
 
 HEADERS += \
 	DataHandler.hpp \
@@ -60,7 +62,9 @@ HEADERS += \
 	NetworkDataLoader.hpp \
 	NetworkFormLoader.hpp \
 	Version.hpp \
-	Preferences.hpp
+	Preferences.hpp \
+	PreferencesDialog.hpp \
+	FileChooser.hpp
 
 FORMS +=
 

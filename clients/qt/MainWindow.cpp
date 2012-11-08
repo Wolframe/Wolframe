@@ -10,6 +10,7 @@
 #include "SqliteFormLoader.hpp"
 #include "SqliteDataLoader.hpp"
 #include "Preferences.hpp"
+#include "PreferencesDialog.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -463,8 +464,8 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 	QActionGroup *languageGroup = new QActionGroup( languageMenu );
 	languageGroup->setExclusive( true );
 	foreach( QString language, languages ) {
-		QLocale locale( language );
-		QAction *action = new QAction( locale.languageToString( locale.language( ) ) + " (" + language + ")", languageGroup );
+		QLocale myLocale( language );
+		QAction *action = new QAction( myLocale.languageToString( myLocale.language( ) ) + " (" + language + ")", languageGroup );
 		action->setCheckable( true );
 		action->setData( QVariant( language ) );
 		languageGroup->addAction( action );
@@ -565,11 +566,7 @@ void MainWindow::formLoaded( QString name )
 }
 
 void MainWindow::on_actionExit_triggered( )
-{
-// store settings to config file/registry, TODO: move to prefs dialog later	
-	Preferences *prefs = Preferences::instance( );
-	prefs->storeSettings( );
-	
+{	
 	if( m_loadMode == Network ) {
 		m_wolframeClient->disconnect( );
 	} else {
@@ -580,6 +577,12 @@ void MainWindow::on_actionExit_triggered( )
 		
 		close( );
 	}
+}
+
+void MainWindow::on_actionPreferences_triggered( )
+{
+	PreferencesDialog prefs( this );
+	prefs.exec( );	
 }
 
 void MainWindow::on_actionAbout_triggered( )
@@ -609,16 +612,16 @@ void MainWindow::setOrientation( ScreenOrientation orientation )
 #if QT_VERSION < 0x040702
 // Qt < 4.7.2 does not yet have the Qt::WA_*Orientation attributes
 		case ScreenOrientationLockPortrait:
-			attribute = static_cast<Qt::WidgetAttribute>(128);
+			attribute = static_cast<Qt::WidgetAttribute>( 128 );
 			break;
 
 		case ScreenOrientationLockLandscape:
-			attribute = static_cast<Qt::WidgetAttribute>(129);
+			attribute = static_cast<Qt::WidgetAttribute>( 129 );
 			break;
 
 		case ScreenOrientationAuto:
 		default:
-			attribute = static_cast<Qt::WidgetAttribute>(130);
+			attribute = static_cast<Qt::WidgetAttribute>( 130 );
 			break;
 #else // QT_VERSION < 0x040702
 		case ScreenOrientationLockPortrait:
