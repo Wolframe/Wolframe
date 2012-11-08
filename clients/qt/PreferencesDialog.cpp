@@ -6,6 +6,7 @@
 #include "Preferences.hpp"
 
 #include <QFormLayout>
+#include <QDebug>
 
 namespace _Wolframe {
 	namespace QtClient {

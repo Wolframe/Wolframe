@@ -5,6 +5,7 @@
 #include "Preferences.hpp"
 
 #include <QSettings>
+#include <QDebug>
 
 namespace _Wolframe {
 	namespace QtClient {
