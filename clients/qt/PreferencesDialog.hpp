@@ -38,6 +38,7 @@ namespace _Wolframe {
 		void loadSettings( );
 		
 	private slots:
+		void toggleSecure( int state );
 		void apply( );
 		void cancel( );
 	};

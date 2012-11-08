@@ -52,6 +52,9 @@ void PreferencesDialog::initialize( )
 	formLayout->addRow( m_buttons );
 	setLayout( formLayout );
 	
+	connect( m_secure, SIGNAL( stateChanged( int state ) ),
+		this, SLOT( toggleSecure( int state ) ) );
+		
 	connect( m_buttons->button( QDialogButtonBox::Ok ), SIGNAL( clicked( ) ),
 		this, SLOT( apply( ) ) );
 		
@@ -91,6 +94,11 @@ void PreferencesDialog::apply( )
 void PreferencesDialog::cancel( )
 {
 	close( );
+}
+
+void PreferencesDialog::toggleSecure( int state )
+{
+	qDebug( ) << "State" << state;
 }
 
 } // namespace QtClient

@@ -23,7 +23,7 @@ INCLUDE_LDFLAGS = \
 
 !IFNDEF DEBUG
 INCLUDE_LIBS = \
-	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib QtSql4.dll
+	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib QtSql4.lib
 !ELSE
 INCLUDE_LIBS = \
 	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtSqld4.lib

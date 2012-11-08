@@ -5,7 +5,11 @@ MBa:
 
 
 ABa:
-
+- qtclient cont.
+- makefiles
+  - fix libchrono transitive dependency in boost in 1.50/1.51
+  - error checking after dependency generation, avoid funny mistakes
+  - parallel builds in lua and qtclient fail, lib, cmdline, wolfcli
 
 PF:
 - Fix bug on Windows when loading std config.xml: "error in input filter 'no input filter defined'"
