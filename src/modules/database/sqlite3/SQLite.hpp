@@ -118,19 +118,25 @@ public:
 	SQLiteUIlibrary( const SQLiteDatabase& database );
 	~SQLiteUIlibrary()			{}
 
-	virtual const std::list< UI::UIform::Info > formInfos( const std::string& platform ) const;
 	virtual const std::list< UI::UIform::Info > formInfos( const std::string& platform,
-							       const std::string& role ) const;
+							       const std::string& culture = "" ) const;
 	virtual const std::list< UI::UIform::Info > formInfos( const std::string& platform,
-							       const std::list< std::string >& roles ) const;
+							       const std::string& role,
+							       const std::string& culture = "" ) const;
+	virtual const std::list< UI::UIform::Info > formInfos( const std::string& platform,
+							       const std::list< std::string >& roles,
+							       const std::string& culture = "" ) const;
 
 	virtual const std::list< UI::UIform::Info > formVersions( const std::string& platform,
-								  const std::string& name ) const;
+								  const std::string& name,
+								  const std::string& culture = "" ) const;
 
 	virtual const UI::UIform form( const std::string& platform,
-				       const std::string& name ) const;
+				       const std::string& name,
+				       const std::string& culture = "" ) const;
 	virtual const UI::UIform form( const std::string& platform,
-				       const std::string& name, const Version& version ) const;
+				       const std::string& name, const Version& version,
+				       const std::string& culture = "" ) const;
 	virtual const UI::UIform form( const std::string& platform,
 				       const UI::UIform::Info& info ) const;
 
