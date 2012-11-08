@@ -35,9 +35,7 @@
 //
 
 #include <string>
-
-#include <cstdio>
-#include <cerrno>
+#include <cassert>
 
 #include "logger-v1.hpp"
 #include "TextFileAuth.hpp"
@@ -70,7 +68,7 @@ TextFileAuthenticator::~TextFileAuthenticator()
 
 AuthenticatorInstance* TextFileAuthenticator::instance()
 {
-	return new TextFileAuthSlice( *this );
+	return new TextFileAuthInstance( *this );
 }
 
 
@@ -95,65 +93,51 @@ User* TextFileAuthenticator::authenticatePlain( const std::string& username,
 }
 
 
-//User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
-//					   const CRAMresponse& response,
-//					   bool caseSensitveUser ) const
-//{
-//	return authenticate( challenge, response.toString(), caseSensitveUser );
-//}
-
-//User* TextFileAuthenticator::authenticate( const CRAMchallenge& challenge,
-//					   const std::string& response,
-//					   bool caseSensitveUser ) const
-//{
-//	PwdFileUser	user;
-
-//	if ( m_pwdFile.getUser( username, user, caseSensitveUser ))	{
-//		PasswordHash	filePwd( user.hash );
-//		try	{
-//			CRAMresponse	local( challenge, filePwd.hash() );
-//			if ( local == response )
-//				return new User( "TextFile", user.user, user.info );
-//		}
-//	}
-//	return NULL;
-//}
+PwdFileUser TextFileAuthenticator::getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
+					    bool caseSensitveUser ) const
+{
+	if ( m_pwdFile.getHMACuser( hash, key, user, caseSensitveUser ))
+		assert( !user.user.empty() );
+	else
+		user.user.clear();
+	return user;
+}
 
 
 // Text file authentication - authentication slice
 //***********************************************************************
-TextFileAuthSlice::TextFileAuthSlice( const TextFileAuthenticator& backend )
+TextFileAuthInstance::TextFileAuthInstance( const TextFileAuthenticator& backend )
 	: m_backend( backend )
 {
 	m_user = NULL;
 }
 
-TextFileAuthSlice::~TextFileAuthSlice()
+TextFileAuthInstance::~TextFileAuthInstance()
 {
 	if ( m_user != NULL )
 		delete m_user;
 }
 
-void TextFileAuthSlice::receiveData( const void* /*data*/, std::size_t /*size*/ )
+void TextFileAuthInstance::receiveData( const void* /*data*/, std::size_t /*size*/ )
 {
 }
 
-const FSM::Operation TextFileAuthSlice::nextOperation()
+const FSM::Operation TextFileAuthInstance::nextOperation()
 {
 	FSM::Operation	op;
 	return op;
 }
 
-void TextFileAuthSlice::signal( FSM::Signal /*event*/ )
+void TextFileAuthInstance::signal( FSM::Signal /*event*/ )
 {
 }
 
-std::size_t TextFileAuthSlice::dataLeft( const void*& /*begin*/ )
+std::size_t TextFileAuthInstance::dataLeft( const void*& /*begin*/ )
 {
 	return 0;
 }
 
-User* TextFileAuthSlice::user()
+User* TextFileAuthInstance::user()
 {
 	User* ret = m_user;
 	m_user = NULL;

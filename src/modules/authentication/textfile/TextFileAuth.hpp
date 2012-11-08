@@ -86,29 +86,36 @@ public:
 
 	AuthenticatorInstance* instance();
 
+	/// \brief
 	User* authenticatePlain( const std::string& username, const std::string& password,
-				 bool caseSensitveUser = true ) const;
+				 bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 
-	User* authenticate( const CRAMchallenge& challenge, const std::string& response,
-			    bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
-	User* authenticate( const CRAMchallenge& challenge, const CRAMresponse& response,
-			    bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
+	/// \brief
+	PwdFileUser getUser( const std::string& hash, const std::string& key, PwdFileUser& user,
+			     bool caseSensitveUser = USERNAME_DEFAULT_CASE_SENSIVE ) const;
 private:
 	const PasswordFile	m_pwdFile;
 };
 
 
-class TextFileAuthSlice : public AuthenticatorInstance
+/// Flow:
+/// Initialize --> send HMAC key --> receive username HMAC +-> user found --> send salt + challenge --> (*)
+///                                                        +-> user not found --> finish
+///
+/// (*) --> receive response --> send result
+///
+class TextFileAuthInstance : public AuthenticatorInstance
 {
 	enum	FSMstate	{
-		INIT,
+		INITIALIZED,			///< It has been initialized OK.
+		HMAC_KEY_SENT,			///< Sent HMAC key
 		PARSING,
 		FINISHED
 	};
 
 public:
-	TextFileAuthSlice( const TextFileAuthenticator& backend );
-	~TextFileAuthSlice();
+	TextFileAuthInstance( const TextFileAuthenticator& backend );
+	~TextFileAuthInstance();
 	void close()					{ delete this; }
 
 	const char* typeName() const			{ return m_backend.className(); }
@@ -122,9 +129,8 @@ public:
 	User* user();
 private:
 	const TextFileAuthenticator&	m_backend;
+	struct PwdFileUser		m_usr;
 	User*				m_user;
-	std::string			m_username;
-	std::string			m_password;
 };
 
 
@@ -134,7 +140,7 @@ class TextFileAuthConstructor : public ConfiguredObjectConstructor< Authenticati
 {
 public:
 	virtual ObjectConstructorBase::ObjectType objectType() const
-						{ return AUTHENTICATION_OBJECT; }
+							{ return AUTHENTICATION_OBJECT; }
 	const char* objectClassName() const		{ return TEXT_FILE_AUTHENTICATION_CLASS_NAME; }
 	TextFileAuthenticator* object( const config::NamedConfiguration& conf );
 };
