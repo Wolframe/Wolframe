@@ -11,6 +11,7 @@
 #include "SqliteDataLoader.hpp"
 #include "Preferences.hpp"
 #include "PreferencesDialog.hpp"
+#include "ManageStorageDialog.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -593,6 +594,12 @@ void MainWindow::on_actionPreferences_triggered( )
 {
 	PreferencesDialog prefs( this );
 	prefs.exec( );	
+}
+
+void MainWindow::on_actionManageStorage_triggered( )
+{
+	ManageStorageDialog d( this );
+	d.exec( );
 }
 
 void MainWindow::on_actionAbout_triggered( )

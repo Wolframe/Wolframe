@@ -42,7 +42,9 @@ SOURCES += \
 	qtclient.cpp \
 	Preferences.cpp \
 	PreferencesDialog.cpp \
-	FileChooser.cpp
+	FileChooser.cpp \
+	StorageWidget.cpp \
+	ManageStorage.cpp
 
 HEADERS += \
 	DataHandler.hpp \
@@ -65,7 +67,9 @@ HEADERS += \
 	Preferences.hpp \
 	PreferencesDialog.hpp \
 	FileChooser.hpp \
-	LoadMode.hpp
+	LoadMode.hpp \
+	StorageWidget.hpp \
+	ManageStorageDialog.hpp
 
 FORMS +=
 
