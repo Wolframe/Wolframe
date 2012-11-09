@@ -135,7 +135,7 @@ I18NS = \
 	themes\windows\qtclient.ro_RO.qm \
 	themes\phone\qtclient.de_CH.qm \
 	themes\phone\qtclient.ro_RO.qm \
-	themes\eeepc\qtclient.de_CH.qm
+	themes\eeepc\qtclient.de_CH.qm \
 	themes\eeepc\qtclient.ro_RO.qm
 
 local_all: $(I18NS)
