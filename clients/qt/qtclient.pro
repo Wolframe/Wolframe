@@ -64,7 +64,8 @@ HEADERS += \
 	Version.hpp \
 	Preferences.hpp \
 	PreferencesDialog.hpp \
-	FileChooser.hpp
+	FileChooser.hpp \
+	LoadMode.hpp
 
 FORMS +=
 

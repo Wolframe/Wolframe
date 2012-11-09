@@ -4,9 +4,12 @@
 
 #include "PreferencesDialog.hpp"
 #include "Preferences.hpp"
+#include "LoadMode.hpp"
 
 #include <QFormLayout>
-#include <QDebug>
+#include <QGroupBox>
+#include <QRadioButton>
+#include <QVBoxLayout>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -45,6 +48,26 @@ void PreferencesDialog::initialize( )
 	m_CACertFile = new FileChooser( this );
 	formLayout->addRow( tr( "C&A file:" ), m_CACertFile );
 	
+	QGroupBox *groupBox = new QGroupBox( );
+	m_loadModeLocalFile = new QRadioButton( tr( "Local &file" ) );
+	m_loadModeLocalDatabase = new QRadioButton( tr( "Local &database" ) );
+	m_loadModeNetwork = new QRadioButton( tr( "&Network" ) );
+	
+	QVBoxLayout *vbox = new QVBoxLayout( );
+	vbox->addWidget( m_loadModeLocalFile );
+	vbox->addWidget( m_loadModeLocalDatabase );
+	vbox->addWidget( m_loadModeNetwork );
+	vbox->addStretch( 1 );
+	groupBox->setLayout( vbox );
+	
+	formLayout->addRow( tr( "&Load mode:" ), groupBox );
+	
+	m_dbName = new FileChooser( this );
+	formLayout->addRow( tr( "&Db file:" ), m_dbName );
+
+	m_debug = new QCheckBox( this );
+	formLayout->addRow( tr( "&Debug:" ), m_debug );
+	
 	m_buttons = new QDialogButtonBox( this );
 	m_buttons->addButton( QDialogButtonBox::Ok );
 	m_buttons->addButton( QDialogButtonBox::Cancel );
@@ -53,8 +76,11 @@ void PreferencesDialog::initialize( )
 	formLayout->addRow( m_buttons );
 	setLayout( formLayout );
 	
-	connect( m_secure, SIGNAL( stateChanged( int state ) ),
-		this, SLOT( toggleSecure( int state ) ) );
+	connect( m_secure, SIGNAL( stateChanged( int ) ),
+		this, SLOT( toggleSecure( int ) ) );
+	
+	connect( m_loadModeLocalDatabase, SIGNAL( toggled( bool ) ),
+		this, SLOT( toggleLocalDb( bool ) ) );
 		
 	connect( m_buttons->button( QDialogButtonBox::Ok ), SIGNAL( clicked( ) ),
 		this, SLOT( apply( ) ) );
@@ -71,8 +97,31 @@ void PreferencesDialog::loadSettings( )
 	m_port->setValue( prefs->port( ) );
 	m_secure->setChecked( prefs->secure( ) );
 	m_clientCertFile->setFileName( prefs->clientCertFile( ) );
+	m_clientCertFile->setEnabled( prefs->secure( ) );
 	m_clientKeyFile->setFileName( prefs->clientKeyFile( ) );
+	m_clientKeyFile->setEnabled( prefs->secure( ) );
 	m_CACertFile->setFileName( prefs->caCertFile( ) );
+	m_CACertFile->setEnabled( prefs->secure( ) );
+	m_loadModeLocalFile->setChecked( false );
+	m_loadModeLocalDatabase->setChecked( false );
+	m_loadModeNetwork->setChecked( false );
+	m_dbName->setEnabled( false );
+	switch( prefs->loadMode( ) ) {
+		case Preferences::LocalFile:
+			m_loadModeLocalFile->setChecked( true );
+			break;
+
+		case Preferences::LocalDb:
+			m_loadModeLocalDatabase->setChecked( true );
+			m_dbName->setEnabled( true );
+			break;
+
+		case Preferences::Network:
+			m_loadModeNetwork->setChecked( true );
+			break;
+	}
+	m_dbName->setFileName( prefs->dbName( ) );
+	m_debug->setChecked( prefs->debug( ) );
 }
 
 void PreferencesDialog::apply( )
@@ -85,11 +134,21 @@ void PreferencesDialog::apply( )
 	prefs->setClientCertFile( m_clientCertFile->fileName( ) );
 	prefs->setClientKeyFile( m_clientKeyFile->fileName( ) );
 	prefs->setCaCertFile( m_CACertFile->fileName( ) );
+	if( m_loadModeLocalFile->isChecked( ) ) {
+		prefs->setLoadMode( Preferences::LocalFile );
+	} else if( m_loadModeLocalDatabase->isChecked( ) ) {
+		prefs->setLoadMode( Preferences::LocalDb );
+	} else if( m_loadModeNetwork->isChecked( ) ) {
+		prefs->setLoadMode( Preferences::Network );
+	}
+	prefs->setDbName( m_dbName->fileName( ) );
+	prefs->setDebug( m_debug->isChecked( ) );
 	
-// store settings to config file/registry, TODO: move to prefs dialog later	
 	prefs->storeSettings( );
 	
 	close( );
+	
+	emit prefsChanged( );
 }
 
 void PreferencesDialog::cancel( )
@@ -97,9 +156,17 @@ void PreferencesDialog::cancel( )
 	close( );
 }
 
-void PreferencesDialog::toggleSecure( int state )
+void PreferencesDialog::toggleSecure( int /* state */ )
 {
-	qDebug( ) << "State" << state;
+	bool secure = m_secure->isChecked( );
+	m_clientCertFile->setEnabled( secure );
+	m_clientKeyFile->setEnabled( secure );
+	m_CACertFile->setEnabled( secure );
+}
+
+void PreferencesDialog::toggleLocalDb( bool /* checked */ )
+{
+	m_dbName->setEnabled( m_loadModeLocalDatabase->isChecked( ) );
 }
 
 } // namespace QtClient

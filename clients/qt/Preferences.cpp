@@ -5,8 +5,8 @@
 #include "Preferences.hpp"
 
 #include <QSettings>
-#include <QDebug>
-
+#include <QMetaEnum>
+ 
 namespace _Wolframe {
 	namespace QtClient {
 
@@ -31,6 +31,12 @@ void Preferences::loadSettings( )
 	m_clientCertFile = s.value( "wolframe/client-cert-file", "./certs/client.crt" ).toString( );
 	m_clientKeyFile = s.value( "wolframe/client-key-file", "./private/client.key" ) .toString( );
 	m_CACertFile = s.value( "wolframe/ca-cert-file", "./certs/CAclient.cert.pem" ).toString( );
+	const QMetaObject &mo = Preferences::staticMetaObject;
+	int idx = mo.indexOfEnumerator( "LoadMode" );
+	QMetaEnum metaEnum = mo.enumerator( idx );
+	m_loadMode = static_cast< LoadMode >( metaEnum.keyToValue( s.value( "wolframe/loadmode", "Network" ).toString( ).toStdString( ).c_str( ) ) );
+	m_dbName = s.value( "wolframe/dbname", "./data.db" ).toString( );
+	m_debug = s.value( "wolframe/debug", false ).toBool( );
 }
 
 void Preferences::storeSettings( )
@@ -42,6 +48,12 @@ void Preferences::storeSettings( )
 	s.setValue( "wolframe/client-cert-file", m_clientCertFile );
 	s.setValue( "wolframe/client-key-file", m_clientKeyFile );
 	s.setValue( "wolframe/ca-cert-file", m_CACertFile );
+	const QMetaObject &mo = Preferences::staticMetaObject;
+	int idx = mo.indexOfEnumerator( "LoadMode" );
+	QMetaEnum metaEnum = mo.enumerator( idx );
+	s.setValue( "wolframe/loadmode", metaEnum.valueToKey( m_loadMode ) );
+	s.setValue( "wolframe/dbname", m_dbName );
+	s.setValue( "wolframe/debug", m_debug );
 }
 
 Preferences *Preferences::instance( )

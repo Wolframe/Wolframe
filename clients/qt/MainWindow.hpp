@@ -14,6 +14,7 @@
 #include "WolframeClient.hpp"
 #include "FormWidget.hpp"
 #include "LoginDialog.hpp"
+#include "LoadMode.hpp"
 
 #define SESSION_NAME "qtclient-db"
 
@@ -26,19 +27,12 @@ namespace _Wolframe {
 
 	public:
 		MainWindow( QWidget *_parent = 0 );
-		virtual ~MainWindow( );
-
-		enum LoadMode {
-			Network,
-			LocalFile,
-			LocalSqlite
+		virtual ~MainWindow( );		
+		enum ScreenOrientation {
+			ScreenOrientationLockPortrait,
+			ScreenOrientationLockLandscape,
+			ScreenOrientationAuto
 		};
-		
-	enum ScreenOrientation {
-		ScreenOrientationLockPortrait,
-		ScreenOrientationLockLandscape,
-		ScreenOrientationAuto
-	};
 
 	// Note that this will only have an effect on Fremantle.
 	void setOrientation( ScreenOrientation orientation );

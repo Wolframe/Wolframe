@@ -11,6 +11,7 @@
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QCheckBox>
+#include <QRadioButton>
 
 #include "FileChooser.hpp"
 
@@ -32,6 +33,14 @@ namespace _Wolframe {
 		FileChooser *m_clientKeyFile;
 		FileChooser *m_CACertFile;
 		QDialogButtonBox* m_buttons;
+		QRadioButton *m_loadModeLocalFile;
+		QRadioButton *m_loadModeLocalDatabase;
+		QRadioButton *m_loadModeNetwork;
+		FileChooser *m_dbName;
+		QCheckBox *m_debug;
+	
+	signals:
+		void prefsChanged( );
 		
 	private:
 		void initialize( );
@@ -39,6 +48,7 @@ namespace _Wolframe {
 		
 	private slots:
 		void toggleSecure( int state );
+		void toggleLocalDb( bool checked );
 		void apply( );
 		void cancel( );
 	};

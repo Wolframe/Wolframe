@@ -45,6 +45,9 @@
       (e.g. combobox, selection)
     - representation of lists of variable size, e.g. list of
       phone numbers
+    - states (enable/disabled, read/write or read/only) can depend
+      on states of other widgets, best example is a checked group
+      box for a bunch of settings, see preferences dialog)
   - 1:n relations (pick a foreign reference to another
     object), domains (e.g. pick a city in a list of possibilities)
   - grid views
