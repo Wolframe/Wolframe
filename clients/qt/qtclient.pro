@@ -75,6 +75,7 @@ qtcAddDeployment()
 
 TRANSLATIONS += \
 	i18n/form1.de_CH.ts \
+	i18n/form1.ro_RO.ts \
 	i18n/form2.de_CH.ts \
 	i18n/form3.de_CH.ts \
 	themes/eeepc/qtclient.de_CH.ts \

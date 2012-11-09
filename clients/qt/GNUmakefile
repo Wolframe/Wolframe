@@ -146,11 +146,15 @@ THEMES = \
 
 I18NS = \
 	i18n/form1.de_CH.qm \
+	i18n/form1.ro_RO.qm \
 	i18n/form2.de_CH.qm \
 	i18n/form3.de_CH.qm \
 	themes/windows/qtclient.de_CH.qm \
+	themes/windows/qtclient.ro_RO.qm \
 	themes/phone/qtclient.de_CH.qm \
-	themes/eeepc/qtclient.de_CH.qm
+	themes/phone/qtclient.ro_RO.qm \
+	themes/eeepc/qtclient.de_CH.qm \
+	themes/eeepc/qtclient.ro_RO.qm
 
 I18NS_TS = $(I18NS:.qm=.ts)
 
@@ -189,9 +193,13 @@ run: local_all $(CPP_BINS)
 .PHONY: buildi18n
 buildi18n:
 	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/qtclient.de_CH.ts
+	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/qtclient.ro_RO.ts
 	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/qtclient.de_CH.ts
+	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/qtclient.ro_RO.ts
 	$(QT_LUPDATE) themes/eeepc/MainWindow.ui -ts themes/phone/qtclient.de_CH.ts
+	$(QT_LUPDATE) themes/eeepc/MainWindow.ui -ts themes/phone/qtclient.ro_RO.ts
 	$(QT_LUPDATE) forms/form1.ui -ts i18n/form1.de_CH.ts
+	$(QT_LUPDATE) forms/form1.ui -ts i18n/form1.ro_RO.ts
 	$(QT_LUPDATE) forms/form2.ui -ts i18n/form2.de_CH.ts
 	$(QT_LUPDATE) forms/form3.ui -ts i18n/form3.de_CH.ts
 

@@ -47,7 +47,7 @@ INCLUDE_LIBS = \
 
 MOC_FLAGS = \
 	-DWITH_SSL
-	
+
 !ENDIF
 
 OBJS = \
@@ -86,7 +86,7 @@ OBJS = \
 
 CPP_BINS = \
 	qtclient.exe
-	
+
 all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
@@ -94,28 +94,49 @@ all: $(OBJS) $(CPP_BINS)
 i18n\form1.de_CH.qm: i18n\form1.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\form1.de_CH.ts -qm i18n\form1.de_CH.qm
 
+i18n\form1.ro_RO.qm: i18n\form1.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe i18n\form1.ro_RO.ts -qm i18n\form1.ro_RO.qm
+
+
 i18n\form2.de_CH.qm: i18n\form2.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\form2.de_CH.ts -qm i18n\form2.de_CH.qm
+
 
 i18n\form3.de_CH.qm: i18n\form3.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\form3.de_CH.ts -qm i18n\form3.de_CH.qm
 
+
 themes\windows\qtclient.de_CH.qm: themes\windows\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe themes\windows\qtclient.de_CH.ts -qm themes\windows\qtclient.de_CH.qm
+
+themes\windows\qtclient.ro_RO.qm: themes\windows\qtclient.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe themes\windows\qtclient.ro_RO.ts -qm themes\windows\qtclient.ro_RO.qm
+
 
 themes\phone\qtclient.de_CH.qm: themes\phone\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe themes\phone\qtclient.de_CH.ts -qm themes\phone\qtclient.de_CH.qm
 
+themes\phone\qtclient.ro_RO.qm: themes\phone\qtclient.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe themes\phone\qtclient.ro_RO.ts -qm themes\phone\qtclient.ro_RO.qm
+
+
 themes\eeepc\qtclient.de_CH.qm: themes\eeepc\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe themes\eeepc\qtclient.de_CH.ts -qm themes\eeepc\qtclient.de_CH.qm
-	
+
+themes\eeepc\qtclient.ro_RO.qm: themes\eeepc\qtclient.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe themes\eeepc\qtclient.ro_RO.ts -qm themes\eeepc\qtclient.ro_RO.qm
+
 I18NS = \
 	i18n\form1.de_CH.qm \
+	i18n\form1.ro_RO.qm \
 	i18n\form2.de_CH.qm \
 	i18n\form3.de_CH.qm \
 	themes\windows\qtclient.de_CH.qm \
+	themes\windows\qtclient.ro_RO.qm \
 	themes\phone\qtclient.de_CH.qm \
+	themes\phone\qtclient.ro_RO.qm \
 	themes\eeepc\qtclient.de_CH.qm
+	themes\eeepc\qtclient.ro_RO.qm
 
 local_all: $(I18NS)
 
@@ -195,8 +216,12 @@ run: local_all $(CPP_BINS) copy_prereq
 
 buildi18n:
 	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe themes\eeepc\MainWindow.ui -ts themes\eeepc\qtclient.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe themes\eeepc\MainWindow.ui -ts themes\eeepc\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe forms\form1.ui -ts i18n\form1.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe forms\form1.ui -ts i18n\form1.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe forms\form2.ui -ts i18n\form2.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe forms\form3.ui -ts i18n\form3.de_CH.ts
