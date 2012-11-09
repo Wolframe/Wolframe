@@ -27,6 +27,7 @@
 namespace _Wolframe {
 	namespace QtClient {
 
+// built-in defaults
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_ui( 0 ), m_formWidget( 0 ), m_formLoader( 0 ), m_dataLoader( 0 ),
 	m_debugTerminal( 0 ), m_wolframeClient( 0 ), m_uiLoader( 0 ),
@@ -34,22 +35,31 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
 	m_CACertFile( "./certs/CAclient.cert.pem" ),
 	m_loadMode( Network ), m_debug( false ),
-	m_loginDialog( 0 )
+	m_loginDialog( 0 ), m_dbName( "./data.db" )
 {
-// settings override built in defaults
-	Preferences *prefs = Preferences::instance( );
-	m_host = prefs->host( );
-	m_port = prefs->port( );
-
+// settings override built-in defaults
+	readSettings( );
+	
 // command line options override settings
 #ifndef Q_OS_ANDROID
 	parseArgs( );
-#else
-	// TODO: move to prerences as default for qt application
-	m_loadMode = Network;
 #endif
 
 	initialize( );
+}
+
+void MainWindow::readSettings( )
+{
+	Preferences *prefs = Preferences::instance( );
+	m_host = prefs->host( );
+	m_port = prefs->port( );
+	m_secure = prefs->secure( );
+	m_clientCertFile = prefs->clientCertFile( );
+	m_clientKeyFile = prefs->clientKeyFile( );
+	m_CACertFile = prefs->caCertFile( );
+	m_loadMode = prefs->loadMode( );
+	m_dbName = prefs->dbName( );
+	m_debug = prefs->debug( );
 }
 
 static DebugTerminal *debugTerminal = 0;
@@ -135,7 +145,7 @@ void MainWindow::switchFound( const QString &name )
 	if( name == "local-file" ) {
 		m_loadMode = LocalFile;
 	} else if( name == "local-db" ) {
-		m_loadMode = LocalSqlite;
+		m_loadMode = LocalDb;
 	} else if( name == "secure" ) {
 		m_secure = true;
 	} else if( name == "debug" ) {
@@ -189,7 +199,7 @@ void MainWindow::initialize( )
 	qDebug( ) << "Debug window initialized";
 
 // open local sqlite database
-	if( m_loadMode == LocalSqlite ) {
+	if( m_loadMode == LocalDb ) {
 		QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE", SESSION_NAME );
 		db.setDatabaseName( m_dbName );
 		if( !db.open( ) ) {
@@ -237,7 +247,7 @@ void MainWindow::initialize( )
 			m_dataLoader = new FileDataLoader( "data" );
 			break;
 		
-		case LocalSqlite:
+		case LocalDb:
 			m_formLoader = new SqliteFormLoader( SESSION_NAME );
 			m_dataLoader = new SqliteDataLoader( SESSION_NAME );
 			break;
@@ -558,7 +568,7 @@ void MainWindow::loadForm( QString name )
 	m_currentForm = name;
 }
 
-void MainWindow::formLoaded( QString name )
+void MainWindow::formLoaded( QString /* name */ )
 {
 // also set language of the form widget,
 // but wait till the form got loaded, otherwise we get races!

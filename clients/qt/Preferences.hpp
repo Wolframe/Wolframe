@@ -18,8 +18,11 @@ namespace _Wolframe {
 	class Preferences : public QObject
 	{
 		Q_OBJECT
+		Q_ENUMS( LoadMode )
 		
 		public:
+			#include "LoadMode.hpp"
+			
 			Preferences( QObject *parent = 0 );
 			virtual ~Preferences( );
 			
@@ -52,6 +55,18 @@ namespace _Wolframe {
 			QString caCertFile( ) const { return m_CACertFile; }
 			void setCaCertFile( QString _CACertFile ) { m_CACertFile = _CACertFile; }
 			
+			Q_PROPERTY( LoadMode m_loadMode READ loadMode WRITE setLoadMode )
+			LoadMode loadMode( ) const { return m_loadMode; }
+			void setLoadMode( LoadMode _loadMode ) { m_loadMode = _loadMode; }
+			
+			Q_PROPERTY( QString m_dbName READ dbName WRITE setDbName )
+			QString dbName( ) const { return m_dbName; }
+			void setDbName( QString _dbName ) { m_dbName = _dbName; }
+			
+			Q_PROPERTY( bool m_debug READ debug WRITE setDebug )
+			bool debug( ) const { return m_debug; }
+			void setDebug( bool _debug ) { m_debug = _debug; }
+			
 		private:
 			static QScopedPointer<Preferences> m_instance;
 			
@@ -61,6 +76,9 @@ namespace _Wolframe {
 			QString m_clientCertFile;
 			QString m_clientKeyFile;
 			QString m_CACertFile;
+			LoadMode m_loadMode;
+			QString m_dbName;
+			bool m_debug;
 	};
 	
 } // namespace QtClient
