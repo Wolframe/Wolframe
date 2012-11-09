@@ -78,10 +78,10 @@ TRANSLATIONS += \
 	i18n/form2.de_CH.ts \
 	i18n/form3.de_CH.ts \
 	themes/eeepc/qtclient.de_CH.ts \
-	themes/phone/qtclient.de_CH.ts \
-	themes/windows/qtclient.de_CH.ts \
 	themes/eeepc/qtclient.ro_RO.ts \
+	themes/phone/qtclient.de_CH.ts \
 	themes/phone/qtclient.ro_RO.ts \
+	themes/windows/qtclient.de_CH.ts \
 	themes/windows/qtclient.ro_RO.ts
 
 QT_LRELEASE = $$QMAKE_MOC 
