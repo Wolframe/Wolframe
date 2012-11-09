@@ -92,6 +92,7 @@ The tree are encoded as in:
             ...
         </tree>
      </item>
+   </tree>
 </domain>
 
 Items in a tree can have a tuple of (key,value) at the moment
