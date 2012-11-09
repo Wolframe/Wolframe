@@ -275,7 +275,7 @@ const std::list< UI::UIform::Info > SQLiteUIlibrary::formVersions( const std::st
 const UI::UIform SQLiteUIlibrary::form( const std::string& /*platform*/, const std::string& /*name*/,
 					const std::string& /*culture*/ ) const
 {
-	UI::UIform	form_( UI::UIform::FORM, "dummy test", "mo_MO", 01000000,
+	UI::UIform	form_( UI::UIform::FORM, "Linux", "dummy test", "mo_MO", 01000000,
 			       "Dummy form for now", "" );
 	return form_;
 }
@@ -284,17 +284,25 @@ const UI::UIform SQLiteUIlibrary::form( const std::string& /*platform*/,
 					const std::string& /*name*/, const Version& /*version*/,
 					const std::string& /*culture*/ ) const
 {
-	UI::UIform	form_( UI::UIform::FORM, "dummy test", "mo_MO", 01000000,
+	UI::UIform	form_( UI::UIform::FORM, "Linux", "dummy test", "mo_MO", 01000000,
 			       "Dummy form for now", "" );
 	return form_;
 }
 
-const UI::UIform SQLiteUIlibrary::form( const std::string& /*platform*/,
-					const UI::UIform::Info& /*info*/ ) const
+const UI::UIform SQLiteUIlibrary::form( const UI::UIform::Info& /*info*/ ) const
 {
-	UI::UIform	form_( UI::UIform::FORM, "dummy test", "mo_MO", 01000000,
+	UI::UIform	form_( UI::UIform::FORM, "Linux", "dummy test", "mo_MO", 01000000,
 			       "Dummy form for now", "" );
 	return form_;
+}
+
+void SQLiteUIlibrary::addForm( const UI::UIform& /*newForm*/ ) const
+{
+}
+
+bool SQLiteUIlibrary::deleteForm( const UI::UIform::Info& /*info*/ ) const
+{
+	return true;
 }
 
 }} // _Wolframe::db

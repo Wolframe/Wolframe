@@ -58,18 +58,22 @@ public:
 	class Info
 	{
 	public:
-		Info( FormType type_, const std::string& name_, const std::string& culture_,
-			    unsigned long version_, const std::string& description_ )
-			: m_type( type_ ), m_name( name_ ), m_culture( culture_ ),
+		Info( FormType type_, const std::string& platform_,
+		      const std::string& name_, const std::string& culture_,
+		      unsigned long version_, const std::string& description_ )
+			: m_type( type_ ), m_platform( platform_ ),
+			  m_name( name_ ), m_culture( culture_ ),
 			  m_version( version_ ), m_description( description_ )	{}
 
 		FormType type() const			{ return m_type; }
 		const std::string& name() const		{ return m_name; }
+		const std::string& platform() const	{ return m_platform; }
 		const std::string& culture() const	{ return m_culture; }
 		const Version& version() const		{ return m_version; }
 		const std::string& description() const	{ return m_description; }
 	private:
 		const FormType		m_type;		///< the type of the form
+		const std::string	m_platform;	///< the platform of the form
 		const std::string	m_name;		///< the name of the form
 		const std::string	m_culture;	///< the culture of the form
 		const Version		m_version;	///< the version of the form
@@ -77,10 +81,11 @@ public:
 	};
 
 	/// Constructor
-	UIform( FormType type_, const std::string& name_, const std::string& culture_,
+	UIform( FormType type_, const std::string& platform_,
+		const std::string& name_, const std::string& culture_,
 		unsigned long version_, const std::string& description_,
 		const std::string& body_ )
-		: m_info( type_, name_, culture_, version_, description_ ),
+		: m_info( type_, platform_, name_, culture_, version_, description_ ),
 		  m_body ( body_ )		{}
 
 	const Info& header() const			{ return m_info; }
@@ -102,12 +107,16 @@ public:
 	/// \param platform	the platform for which to get the form info
 	///			use an epmty string, "*" or "all"
 	///			to get the form info for all platforms
+	/// \param culture	the culture for which to get the form info
+	///			use an epmty string, "*" or "all"
+	///			to get the form info for all cultures
 	virtual const std::list< UIform::Info > formInfos( const std::string& platform,
 							   const std::string& culture = "" ) const = 0;
 
 	/// \brief Get a list of all form infos, latest versions
 	/// \param platform	the platform for which to get the form info
 	/// \param role		a role for which to get the form infos
+	/// \param culture	the culture for which to get the form info
 	virtual const std::list< UIform::Info > formInfos( const std::string& platform,
 							   const std::string& role,
 							   const std::string& culture = "" ) const = 0;
@@ -115,6 +124,7 @@ public:
 	/// \brief Get a list of all form infos, latest versions
 	/// \param platform	the platform for which to get the form info
 	/// \param roles	a list of roles for which to get the form infos
+	/// \param culture	the culture for which to get the form info
 	virtual const std::list< UIform::Info > formInfos( const std::string& platform,
 							   const std::list< std::string >& roles,
 							   const std::string& culture = "" ) const = 0;
@@ -122,6 +132,7 @@ public:
 	/// \brief Get a list of form infos for all the versions of a form
 	/// \param platform	the platform for which to get the form info
 	/// \param name		the name of the form
+	/// \param culture	the culture for which to get the form info
 	virtual const std::list< UIform::Info > formVersions( const std::string& platform,
 							      const std::string& name,
 							      const std::string& culture = "" ) const = 0;
@@ -129,6 +140,7 @@ public:
 	/// \brief Get the form
 	/// \param platform	the platform for which to get the form info
 	/// \param name		the name of the form
+	/// \param culture	the culture for which to get the form info
 	virtual const UIform form( const std::string& platform,
 				   const std::string& name,
 				   const std::string& culture = "" ) const = 0;
@@ -137,16 +149,22 @@ public:
 	/// \param platform	the platform for which to get the form info
 	/// \param name		the name of the form
 	/// \param version	the version of the form
+	/// \param culture	the culture for which to get the form info
 	virtual const UIform form( const std::string& platform,
 				   const std::string& name, const Version& version,
 				   const std::string& culture = "" ) const = 0;
 
 	/// \brief Get the form
-	/// \param platform	the platform for which to get the form info
-	/// \param name		the name of the form
-	/// \param version	the version of the form
-	virtual const UIform form( const std::string& platform,
-				   const UIform::Info& info ) const = 0;
+	/// \param info		the form info
+	virtual const UIform form( const UIform::Info& info ) const = 0;
+
+	/// \brief Add a form
+	/// \param info		the form info
+	virtual void addForm( const UIform& newForm ) const = 0;
+
+	/// \brief Delete a form
+	/// \param info		the form info
+	virtual bool deleteForm( const UIform::Info& info ) const = 0;
 
 	virtual void close()		{}
 };

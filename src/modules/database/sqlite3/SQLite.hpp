@@ -137,8 +137,12 @@ public:
 	virtual const UI::UIform form( const std::string& platform,
 				       const std::string& name, const Version& version,
 				       const std::string& culture = "" ) const;
-	virtual const UI::UIform form( const std::string& platform,
-				       const UI::UIform::Info& info ) const;
+	virtual const UI::UIform form( const UI::UIform::Info& info ) const;
+
+	virtual void addForm( const UI::UIform& newForm ) const;
+
+	virtual bool deleteForm( const UI::UIform::Info& info ) const;
+
 
 	virtual void close()			{ delete this; }
 private:
