@@ -111,6 +111,7 @@ void MainWindow::parseArgs( )
 		{ QCommandLine::Switch, 'S', "secure", "connect securely via SSL", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'l', "local-file", "Run with local data and form loader (in filesystem)", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'L', "local-db", "Run with local data and form loader (in sqllite DB)", QCommandLine::Optional },
+		{ QCommandLine::Switch, 'n', "network", "Run with network storage", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'd', "debug", "Enable debug window when starting", QCommandLine::Optional },
 		{ QCommandLine::Option, 'v', "verbose", "verbose level", QCommandLine::Optional },
 		{ QCommandLine::Option, 'c', "client-cert-file", "client certificate to present to the server (default: ./certs/client.crt)", QCommandLine::Optional },
@@ -147,6 +148,8 @@ void MainWindow::switchFound( const QString &name )
 		m_loadMode = LocalFile;
 	} else if( name == "local-db" ) {
 		m_loadMode = LocalDb;
+	} else if( name == "network" ) {
+		m_loadMode = Network;
 	} else if( name == "secure" ) {
 		m_secure = true;
 	} else if( name == "debug" ) {

@@ -28,6 +28,20 @@ void PreferencesDialog::initialize( )
 {
 	QFormLayout *formLayout = new QFormLayout( );
 	
+	QGroupBox *groupBox = new QGroupBox( );
+	m_loadModeLocalFile = new QRadioButton( tr( "Local &file" ) );
+	m_loadModeLocalDatabase = new QRadioButton( tr( "Local &database" ) );
+	m_loadModeNetwork = new QRadioButton( tr( "&Network" ) );
+	
+	QVBoxLayout *vbox = new QVBoxLayout( );
+	vbox->addWidget( m_loadModeLocalFile );
+	vbox->addWidget( m_loadModeLocalDatabase );
+	vbox->addWidget( m_loadModeNetwork );
+	vbox->addStretch( 1 );
+	groupBox->setLayout( vbox );
+	
+	formLayout->addRow( tr( "&Load mode:" ), groupBox );
+
 	m_host = new QLineEdit( this );
 	formLayout->addRow( tr( "&Host:" ), m_host );
 	m_host->setFocus( );
@@ -47,21 +61,7 @@ void PreferencesDialog::initialize( )
 	
 	m_CACertFile = new FileChooser( this );
 	formLayout->addRow( tr( "C&A file:" ), m_CACertFile );
-	
-	QGroupBox *groupBox = new QGroupBox( );
-	m_loadModeLocalFile = new QRadioButton( tr( "Local &file" ) );
-	m_loadModeLocalDatabase = new QRadioButton( tr( "Local &database" ) );
-	m_loadModeNetwork = new QRadioButton( tr( "&Network" ) );
-	
-	QVBoxLayout *vbox = new QVBoxLayout( );
-	vbox->addWidget( m_loadModeLocalFile );
-	vbox->addWidget( m_loadModeLocalDatabase );
-	vbox->addWidget( m_loadModeNetwork );
-	vbox->addStretch( 1 );
-	groupBox->setLayout( vbox );
-	
-	formLayout->addRow( tr( "&Load mode:" ), groupBox );
-	
+		
 	m_dbName = new FileChooser( this );
 	formLayout->addRow( tr( "&Db file:" ), m_dbName );
 
@@ -79,8 +79,14 @@ void PreferencesDialog::initialize( )
 	connect( m_secure, SIGNAL( stateChanged( int ) ),
 		this, SLOT( toggleSecure( int ) ) );
 	
+	connect( m_loadModeLocalFile, SIGNAL( toggled( bool ) ),
+		this, SLOT( toggleLoadMode( bool ) ) );
+		
 	connect( m_loadModeLocalDatabase, SIGNAL( toggled( bool ) ),
-		this, SLOT( toggleLocalDb( bool ) ) );
+		this, SLOT( toggleLoadMode( bool ) ) );
+
+	connect( m_loadModeNetwork, SIGNAL( toggled( bool ) ),
+		this, SLOT( toggleLoadMode( bool ) ) );
 		
 	connect( m_buttons->button( QDialogButtonBox::Ok ), SIGNAL( clicked( ) ),
 		this, SLOT( apply( ) ) );
@@ -164,9 +170,15 @@ void PreferencesDialog::toggleSecure( int /* state */ )
 	m_CACertFile->setEnabled( secure );
 }
 
-void PreferencesDialog::toggleLocalDb( bool /* checked */ )
+void PreferencesDialog::toggleLoadMode( bool /* checked */ )
 {
 	m_dbName->setEnabled( m_loadModeLocalDatabase->isChecked( ) );
+	m_host->setEnabled( m_loadModeNetwork->isChecked( ) );
+	m_port->setEnabled( m_loadModeNetwork->isChecked( ) );
+	m_secure->setEnabled( m_loadModeNetwork->isChecked( ) );
+	m_clientCertFile->setEnabled( m_loadModeNetwork->isChecked( ) && m_secure->isChecked( ) );
+	m_clientKeyFile->setEnabled( m_loadModeNetwork->isChecked( ) && m_secure->isChecked( ) );
+	m_CACertFile->setEnabled( m_loadModeNetwork->isChecked( ) && m_secure->isChecked( ) );
 }
 
 } // namespace QtClient
