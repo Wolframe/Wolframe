@@ -71,14 +71,59 @@ Simple schema:
    </values>
 </domain>
 
-Those could also be forms..
+widget1 is for instance a drop down selection (single select) or
+a list multi-selection.
+
+The tree are encoded as in:
+
+<domain>
+   <form>form1</form>
+   <widget>widget1</widget>
+   <language>de_CH</language>
+   <tree>
+     <item id="language_independent_key">
+        <value>translated value</value>
+        <description>translated value</value>
+        ...
+        <tree>
+          <item id="language_independent_key">
+            <value>translated value</value>
+            <description>translated value</value>
+            ...
+        </tree>
+     </item>
+</domain>
+
+Items in a tree can have a tuple of (key,value) at the moment
+(correspond to the columns in the tree view).
 
 Should not be cached on the client.
 
 Current data
 ------------
 
-Those are forms..
+<?xml version="1.0" encoding="UTF-8"?>
+<form1>
+  <first>Jon</first>
+  <last>Doe</last>
+  <working>true</working>
+ ..
+  <vegetable>
+    <value>language_independent_key</value>
+    ...
+    <value>language_independent_key</value>
+  </vegetable>
+</form1>
+
+The top-level tag corresponds to the UIform name.
+
+The name of the tags correspond to the name of the widgets in the
+UIform.
+
+Values are the contents of the UI fields (e.g. text field).
+For lists, drop-downs and groups of checkboxes those are the
+language-independent keys in the values of the domain or the
+ids in the nodes in the tree.
 
 Must not be cached on the client.
 
