@@ -303,8 +303,10 @@ void WolframeClient::dataAvailable( )
 						m_answer = QString( QByteArray( buf+6, len-6 ) );
 					}
 					emit resultReceived( );
-				} else if( buf[0] == '.' && buf[1] == '\n' ) {
+				} else if( strncmp( buf, "ANSWER", 6 ) == 0 ) {
 					emit resultReceived( );
+				} else if( buf[0] == '.' && buf[1] == '\n' ) {
+					//emit resultReceived( );
 				} else {
 					m_answer.append( buf );
 				}
@@ -351,6 +353,11 @@ void WolframeClient::sendCommand( QString command, QStringList params )
 	sendLine( line );	
 }
 
+void WolframeClient::sendCommand( QString command, QStringList params, QString content )
+{
+	sendCommand( command, params );
+}
+
 void WolframeClient::auth( )
 {
 	sendCommand( "AUTH" );
@@ -361,6 +368,11 @@ void WolframeClient::mech( QString _mech )
 	QStringList params;
 	params << _mech;
 	sendCommand( "MECH", params );
+}
+
+void WolframeClient::request( QString content )
+{
+	sendCommand( "REQUEST", QStringList( ), content );
 }
 
 void WolframeClient::handleResult( )
@@ -380,6 +392,8 @@ void WolframeClient::handleResult( )
 		} else {
 			emit authFailed( );
 		}
+	} else if( m_command == "REQUEST" ) {
+		emit answerReceived( m_answer );
 	}
 }
 

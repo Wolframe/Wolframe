@@ -63,10 +63,12 @@ namespace _Wolframe {
 // generic send command function, implementing the frame of the protocol
 		void sendCommand( QString command );
 		void sendCommand( QString command, QStringList params );
+		void sendCommand( QString command, QStringList params, QString content );
 
 // high-level commands
 		void auth( );
 		void mech( QString mech );
+		void request( QString content );
 
 		Q_PROPERTY( QString m_host READ host WRITE setHost )
 		QString host( ) const { return m_host; }
@@ -118,6 +120,7 @@ namespace _Wolframe {
 		void mechsReceived( QStringList mechList );
 		void authOk( );
 		void authFailed( );
+		void answerReceived( QString content );
 
 // high-level commands
 	};
