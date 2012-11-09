@@ -27,6 +27,7 @@
 namespace _Wolframe {
 	namespace QtClient {
 
+// built-in defaults
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_ui( 0 ), m_formWidget( 0 ), m_formLoader( 0 ), m_dataLoader( 0 ),
 	m_debugTerminal( 0 ), m_wolframeClient( 0 ), m_uiLoader( 0 ),
@@ -36,20 +37,29 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_loadMode( Network ), m_debug( false ),
 	m_loginDialog( 0 ), m_dbName( "./data.db" )
 {
-// settings override built in defaults
-	Preferences *prefs = Preferences::instance( );
-	m_host = prefs->host( );
-	m_port = prefs->port( );
-	m_loadMode = prefs->loadMode( );
-	m_dbName = prefs->dbName( );
-	m_debug = prefs->debug( );
-
+// settings override built-in defaults
+	readSettings( );
+	
 // command line options override settings
 #ifndef Q_OS_ANDROID
 	parseArgs( );
 #endif
 
 	initialize( );
+}
+
+void MainWindow::readSettings( )
+{
+	Preferences *prefs = Preferences::instance( );
+	m_host = prefs->host( );
+	m_port = prefs->port( );
+	m_secure = prefs->secure( );
+	m_clientCertFile = prefs->clientCertFile( );
+	m_clientKeyFile = prefs->clientKeyFile( );
+	m_CACertFile = prefs->caCertFile( );
+	m_loadMode = prefs->loadMode( );
+	m_dbName = prefs->dbName( );
+	m_debug = prefs->debug( );
 }
 
 static DebugTerminal *debugTerminal = 0;

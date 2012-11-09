@@ -61,6 +61,7 @@ namespace _Wolframe {
 		LoginDialog *m_loginDialog;	// the login dialog
 		QString m_dbName;
 
+		void readSettings( );
 		void parseArgs( );
 		void initialize( );
 		void populateThemesMenu( );

@@ -51,6 +51,7 @@
   - 1:n relations (pick a foreign reference to another
     object), domains (e.g. pick a city in a list of possibilities)
   - grid views
+  - handle prefsChanged in a smart way, for now just restart the client
 - stop flickering in hour glas
 - QIODevice for data loader and handler instead of a fixed byte
   array in the signal (otherwise the debug window gets complicated)
