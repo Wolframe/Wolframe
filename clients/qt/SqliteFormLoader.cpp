@@ -12,6 +12,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <QVariant>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -41,7 +42,7 @@ void SqliteFormLoader::initialize( )
 
 		QSqlQuery q( "insert into version( version ) values( :version )", db );
 		v = Version( VERSION_MAJOR, VERSION_MINOR );
-		q.bindValue( ":version", v.toString( ) );
+		q.bindValue( ":version", QVariant( v.toString( ) ) );
 		if( !q.exec( ) ) {
 			qDebug( ) << "error when inserting the version into the schema: " << qs.lastError( ).text( );
 		}
