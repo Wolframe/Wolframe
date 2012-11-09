@@ -97,6 +97,7 @@ namespace _Wolframe {
 // auto-wired slots for the menu
 		void on_actionExit_triggered( );
 		void on_actionPreferences_triggered( );
+		void on_actionManageStorage_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
 		void on_actionDebugTerminal_triggered( bool checked );       

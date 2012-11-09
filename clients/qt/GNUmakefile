@@ -74,7 +74,11 @@ OBJS = \
 	PreferencesDialog.o \
 	moc_PreferencesDialog.o \
 	FileChooser.o \
-	moc_FileChooser.o
+	moc_FileChooser.o \
+	StorageWidget.o \
+	moc_StorageWidget.o \
+	ManageStorageDialog.o \
+	moc_ManageStorageDialog.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -121,6 +125,12 @@ moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 
 moc_FileChooser.cpp: FileChooser.hpp
 	$(QT_MOC) $(MOC_FLAGS) FileChooser.hpp -o moc_FileChooser.cpp
+
+moc_StorageWidget.cpp: StorageWidget.hpp
+	$(QT_MOC) $(MOC_FLAGS) StorageWidget.hpp -o moc_StorageWidget.cpp
+
+moc_ManageStorageDialog.cpp: ManageStorageDialog.hpp
+	$(QT_MOC) $(MOC_FLAGS) ManageStorageDialog.hpp -o moc_ManageStorageDialog.cpp
 
 FORMS = \
 	forms/form1.ui \
