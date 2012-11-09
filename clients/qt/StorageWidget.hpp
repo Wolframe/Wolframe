@@ -32,15 +32,15 @@ namespace _Wolframe {
 		void loadTree( );
 				
 	private:
+		QRadioButton *m_loadModeLocalFile;
+		QRadioButton *m_loadModeLocalDatabase;
+		QRadioButton *m_loadModeNetwork;
 		QLineEdit *m_host;
 		QSpinBox *m_port;
 		QCheckBox *m_secure;
 		FileChooser *m_clientCertFile;
 		FileChooser *m_clientKeyFile;
 		FileChooser *m_CACertFile;
-		QRadioButton *m_loadModeLocalFile;
-		QRadioButton *m_loadModeLocalDatabase;
-		QRadioButton *m_loadModeNetwork;
 		FileChooser *m_dbName;
 		QTreeWidget *m_treeWidget;
 		QCheckBox *m_toggleAll;

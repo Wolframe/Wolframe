@@ -26,6 +26,9 @@ namespace _Wolframe {
 		PreferencesDialog( QWidget *_parent = 0 );
 	
 	private:
+		QRadioButton *m_loadModeLocalFile;
+		QRadioButton *m_loadModeLocalDatabase;
+		QRadioButton *m_loadModeNetwork;
 		QLineEdit *m_host;
 		QSpinBox *m_port;
 		QCheckBox *m_secure;
@@ -33,9 +36,6 @@ namespace _Wolframe {
 		FileChooser *m_clientKeyFile;
 		FileChooser *m_CACertFile;
 		QDialogButtonBox* m_buttons;
-		QRadioButton *m_loadModeLocalFile;
-		QRadioButton *m_loadModeLocalDatabase;
-		QRadioButton *m_loadModeNetwork;
 		FileChooser *m_dbName;
 		QCheckBox *m_debug;
 	
@@ -48,7 +48,7 @@ namespace _Wolframe {
 		
 	private slots:
 		void toggleSecure( int state );
-		void toggleLocalDb( bool checked );
+		void toggleLoadMode( bool checked );
 		void apply( );
 		void cancel( );
 	};
