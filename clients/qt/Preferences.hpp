@@ -9,8 +9,10 @@
 #include <QString>
 #include <QScopedPointer>
 
-#define SETTINGS_DOMAIN "wolframe.org"
-#define SETTINGS_APP "qtclient"
+#include "global.hpp"
+
+#define DEFAULT_DOMAIN "wolframe"
+#define DEFAULT_APP "qtclient"
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -23,11 +25,12 @@ namespace _Wolframe {
 		public:
 			#include "LoadMode.hpp"
 			
-			Preferences( QObject *parent = 0 );
+			Preferences( QString organization = ORGANIZATION_NAME, QString application = APPLICATION_NAME, QObject *parent = 0 );
 			virtual ~Preferences( );
 			
 			void loadSettings( );
 			void storeSettings( );
+			bool exists( );
 			
 			static Preferences *instance( );
 
@@ -69,6 +72,9 @@ namespace _Wolframe {
 			
 		private:
 			static QScopedPointer<Preferences> m_instance;
+			
+			QString m_organization;
+			QString m_application;
 			
 			QString m_host;
 			unsigned short m_port;

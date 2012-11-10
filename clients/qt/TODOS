@@ -53,7 +53,14 @@
   - grid views
   - handle prefsChanged in a smart way, for now just restart the client
 - stop flickering in hour glas
+- allow multiple setting files for different application/servers
+- on connect ask always for connection data
+- allow multiple appliations, this means the file form and data loader
+  must be configurable
+- loadmode must be split in UI-loadmode and data-loadmode
 - QIODevice for data loader and handler instead of a fixed byte
   array in the signal (otherwise the debug window gets complicated)
-- network loader via protocol or use client library?
+- protocol
+  - add doctype to data XML
+  - network loader via protocol or use client library?
 - add authentication dialog

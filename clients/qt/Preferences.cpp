@@ -12,8 +12,8 @@ namespace _Wolframe {
 
 QScopedPointer<Preferences> Preferences::m_instance;
 
-Preferences::Preferences( QObject *_parent )
-	: QObject( _parent )
+Preferences::Preferences( QString _organization, QString _application, QObject *_parent )
+	: QObject( _parent ), m_organization( _organization ), m_application( _application )
 {
 	loadSettings( );
 }
@@ -22,10 +22,16 @@ Preferences::~Preferences( )
 {
 }
 
+bool Preferences::exists( )
+{
+	QSettings s( m_organization, m_application );
+	return( s.contains( "wolframe/loadmode" ) );
+}
+
 void Preferences::loadSettings( )
 {
-	QSettings s( SETTINGS_DOMAIN, SETTINGS_APP );
-	m_host = s.value( "wolframe/host", "andreasbaumann.dyndns.org" ).toString( );
+	QSettings s( m_organization, m_application );
+	m_host = s.value( "wolframe/host", "localhost" ).toString( );
 	m_port = s.value( "wolframe/port", 7661 ).toString( ).toUShort( );
 	m_secure = s.value( "wolframe/secure", false ).toBool( );
 	m_clientCertFile = s.value( "wolframe/client-cert-file", "./certs/client.crt" ).toString( );
@@ -41,7 +47,7 @@ void Preferences::loadSettings( )
 
 void Preferences::storeSettings( )
 {
-	QSettings s( SETTINGS_DOMAIN, SETTINGS_APP );
+	QSettings s( m_organization, m_application );
 	s.setValue( "wolframe/host", m_host );
 	s.setValue( "wolframe/port", m_port );
 	s.setValue( "wolframe/secure", m_secure );

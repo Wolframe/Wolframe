@@ -147,10 +147,10 @@ void StorageWidget::toggleLoadMode( bool /* checked */ )
 
 void StorageWidget::loadTree( )
 {
-	QTreeWidgetItem *parent = m_treeWidget->invisibleRootItem( );
-	QTreeWidgetItem *item = new QTreeWidgetItem( parent );
+	QTreeWidgetItem *_parent = m_treeWidget->invisibleRootItem( );
+	QTreeWidgetItem *item = new QTreeWidgetItem( _parent );
 	item->setText( 0, "forms" );
-	parent->addChild( item );
+	_parent->addChild( item );
 }
 
 } // namespace QtClient

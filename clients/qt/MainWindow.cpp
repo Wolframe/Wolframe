@@ -39,7 +39,13 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_loginDialog( 0 ), m_dbName( "./data.db" )
 {
 // settings override built-in defaults
-	readSettings( );
+	if( !Preferences::instance( )->exists( ) ) {
+		PreferencesDialog d;
+		d.exec( );
+		readSettings( );
+	} else {
+		readSettings( );
+	}
 	
 // command line options override settings
 #ifndef Q_OS_ANDROID
