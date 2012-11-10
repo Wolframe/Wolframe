@@ -3,17 +3,19 @@
 //
 
 #include "Preferences.hpp"
+#include "global.hpp"
 
 #include <QMetaEnum>
+#include <QDebug>
  
 namespace _Wolframe {
 	namespace QtClient {
 
 QScopedPointer<Preferences> Preferences::m_instance;
+QString Preferences::m_fileName;
 
 Preferences::Preferences( QString _organization, QString _application, QObject *_parent )
-	: QObject( _parent ), m_organization( _organization ), m_application( _application ),
-	  m_fileName( )
+	: QObject( _parent ), m_organization( _organization ), m_application( _application )
 {
 	loadSettings( );
 }
@@ -25,9 +27,9 @@ Preferences::~Preferences( )
 bool Preferences::exists( )
 {
 	QSettings *s = createSettings( );
-	bool exists = s->contains( "wolframe/loadmode" );
+	bool e = s->contains( "wolframe/loadmode" );
 	delete s;
-	return exists;
+	return e;
 }
 
 void Preferences::setFileName( const QString &_fileName )
@@ -40,8 +42,10 @@ QSettings *Preferences::createSettings( )
 	QSettings *s;
 	if( m_fileName.isNull( ) ) {
 		s = new QSettings( m_organization, m_application );
+		qDebug( ) << "Using default settings file";
 	} else {
 		s = new QSettings( m_fileName, QSettings::IniFormat );
+		qDebug( ) << "Using file " << m_fileName << "as settings file";
 	}
 	
 	return s;
@@ -60,8 +64,11 @@ void Preferences::loadSettings( )
 	int idx = mo.indexOfEnumerator( "LoadMode" );
 	QMetaEnum metaEnum = mo.enumerator( idx );
 	m_loadMode = static_cast< LoadMode >( metaEnum.keyToValue( s->value( "wolframe/loadmode", "Network" ).toString( ).toStdString( ).c_str( ) ) );
-	m_dbName = s->value( "wolframe/dbname", "./data.db" ).toString( );
+	m_dbName = s->value( "wolframe/dbname", DEFAULT_SQLITE_FILENAME ).toString( );
 	m_debug = s->value( "wolframe/debug", false ).toBool( );
+	m_uiFormsDir = s->value( "wolframe/uiFormDir", DEFAULT_UI_FORMS_DIR ).toString( );
+	m_uiFormTranslationsDir = s->value( "wolframe/uiFormTranslationsDir", DEFAULT_UI_FORM_TRANSLATIONS_DIR ).toString( );
+	m_dataLoaderDir = s->value( "wolframe/dataLoaderDir", DEFAULT_DATA_LOADER_DIR ).toString( );
 	delete s;
 }
 
@@ -80,6 +87,9 @@ void Preferences::storeSettings( )
 	s->setValue( "wolframe/loadmode", metaEnum.valueToKey( m_loadMode ) );
 	s->setValue( "wolframe/dbname", m_dbName );
 	s->setValue( "wolframe/debug", m_debug );
+	s->setValue( "wolframe/uiFormDir", m_uiFormsDir );
+	s->setValue( "wolframe/uiFormTranslationsDir", m_uiFormTranslationsDir );
+	s->setValue( "wolframe/dataLoaderDir", m_dataLoaderDir );
 	delete s;
 }
 

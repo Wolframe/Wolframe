@@ -12,6 +12,7 @@
 #include "Preferences.hpp"
 #include "PreferencesDialog.hpp"
 #include "ManageStorageDialog.hpp"
+#include "global.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -37,7 +38,10 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
 	m_CACertFile( "./certs/CAclient.cert.pem" ),
 	m_loadMode( Network ), m_debug( false ),
-	m_loginDialog( 0 ), m_dbName( "./data.db" ), m_settings( )
+	m_loginDialog( 0 ), m_dbName( DEFAULT_SQLITE_FILENAME ), m_settings( ),
+	m_uiFormsDir( DEFAULT_UI_FORMS_DIR ),
+	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
+	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR )
 {
 // read arguments for the '-s <setting file>' parameter
 #ifndef Q_OS_ANDROID
@@ -46,7 +50,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	
 // settings override built-in defaults
 	if( !m_settings.isNull( ) ) {
-		Preferences::instance( )->setFileName( m_settings );
+		Preferences::setFileName( m_settings );
 	}
 	if( !Preferences::instance( )->exists( ) ) {
 		PreferencesDialog d;
@@ -76,6 +80,9 @@ void MainWindow::readSettings( )
 	m_loadMode = prefs->loadMode( );
 	m_dbName = prefs->dbName( );
 	m_debug = prefs->debug( );
+	m_uiFormsDir = prefs->uiFormsDir( );
+	m_uiFormTranslationsDir = prefs->uiFormTranslationsDir( );
+	m_dataLoaderDir = prefs->dataLoaderDir( );
 }
 
 static DebugTerminal *debugTerminal = 0;
@@ -267,8 +274,8 @@ void MainWindow::initialize( )
 // a local sqlite database, pass the form loader to the FormWidget
 	switch( m_loadMode ) {
 		case LocalFile:
-			m_formLoader = new FileFormLoader( "forms", "i18n" );
-			m_dataLoader = new FileDataLoader( "data" );
+			m_formLoader = new FileFormLoader( m_uiFormsDir, m_uiFormTranslationsDir );
+			m_dataLoader = new FileDataLoader( m_dataLoaderDir );
 			break;
 		
 		case LocalDb:

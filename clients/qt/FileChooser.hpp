@@ -18,9 +18,15 @@ namespace _Wolframe {
 	{
 	Q_OBJECT
 	Q_PROPERTY( QString m_fileName READ fileName WRITE setFileName )
-			
+	Q_ENUMS( SelectionMode )
+		
 	public:
-		FileChooser( QWidget *_parent = 0 );
+		enum SelectionMode {
+			SelectExistingFile,
+			SelectExistingDir
+		};
+		
+		FileChooser( SelectionMode _selectionMode, QWidget *_parent = 0 );
 		
 		QString fileName( ) const;
 
@@ -34,6 +40,7 @@ namespace _Wolframe {
 		void chooseFile( );
 		
 	private:
+		SelectionMode m_selectionMode;
 		QLineEdit *m_lineEdit;
 		QPushButton *m_button;	
 	};

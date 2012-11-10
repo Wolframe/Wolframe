@@ -32,8 +32,8 @@ namespace _Wolframe {
 			void loadSettings( );
 			void storeSettings( );
 			bool exists( );
-			void setFileName( const QString &fileName );
-			
+
+			static void setFileName( const QString &fileName );			
 			static Preferences *instance( );
 
 			Q_PROPERTY( QString m_host READ host WRITE setHost )
@@ -71,12 +71,25 @@ namespace _Wolframe {
 			Q_PROPERTY( bool m_debug READ debug WRITE setDebug )
 			bool debug( ) const { return m_debug; }
 			void setDebug( bool _debug ) { m_debug = _debug; }
+
+			Q_PROPERTY( QString m_uiFormsDir READ uiFormsDir WRITE setUiFormsDir )
+			QString uiFormsDir( ) const { return m_uiFormsDir; }
+			void setUiFormsDir( QString _uiFormsDir ) { m_uiFormsDir = _uiFormsDir; }
+
+			Q_PROPERTY( QString m_uiFormTranslationsDir READ uiFormTranslationsDir WRITE setUiFormTranslationsDir )
+			QString uiFormTranslationsDir( ) const { return m_uiFormTranslationsDir; }
+			void setUiFormTranslationsDir( QString _uiFormTranslationsDir ) { m_uiFormTranslationsDir = _uiFormTranslationsDir; }
+			
+			Q_PROPERTY( QString m_dataLoaderDir READ dataLoaderDir WRITE setDataLoaderDir )
+			QString dataLoaderDir( ) const { return m_dataLoaderDir; }
+			void setDataLoaderDir( QString _dataLoaderDir ) { m_dataLoaderDir = _dataLoaderDir; }
 		
 		private:
 			QSettings *createSettings( );
 			
 		private:
 			static QScopedPointer<Preferences> m_instance;
+			static QString m_fileName;
 			
 			QString m_organization;
 			QString m_application;
@@ -90,7 +103,9 @@ namespace _Wolframe {
 			LoadMode m_loadMode;
 			QString m_dbName;
 			bool m_debug;
-			QString m_fileName;
+			QString m_uiFormsDir;
+			QString m_uiFormTranslationsDir;
+			QString m_dataLoaderDir;
 	};
 	
 } // namespace QtClient

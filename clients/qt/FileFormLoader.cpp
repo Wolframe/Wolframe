@@ -19,7 +19,7 @@ FileFormLoader::FileFormLoader( QString formDir, QString localeDir )
 
 void FileFormLoader::initiateListLoad( )
 {
-	QDir formsDir( QLatin1String( "forms" ) );
+	QDir formsDir( m_formDir );
 	QStringList forms = formsDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name )
 		.replaceInStrings( ".ui", "" );
 	emit formListLoaded( forms );
@@ -57,7 +57,7 @@ void FileFormLoader::initiateGetLanguageCodes( )
 	languageCodes.push_back( "en_US" ); // default locale, always around
 	
 // read list of supported languages for all forms based on their qm files available
-	QDir translationDir( QLatin1String( "i18n" ) );
+	QDir translationDir( m_localeDir );
 	translationDir.setFilter( QDir::Files | QDir::NoDotAndDotDot );
 	translationDir.setSorting( QDir::Name );
 	QStringList filters;

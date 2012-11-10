@@ -54,9 +54,8 @@
   - handle prefsChanged in a smart way, for now just restart the client
 - stop flickering in hour glas
 - on connect ask always for connection data
-- allow multiple applications, this means the file form and data loader
-  must be configurable
-- loadmode must be split in UI-loadmode and data-loadmode
+- loadmode must be split in UI-loadmode and data-loadmode (at least for
+  now when we use local forms and network data connections in parallel)
 - QIODevice for data loader and handler instead of a fixed byte
   array in the signal (otherwise the debug window gets complicated)
 - protocol
