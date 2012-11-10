@@ -30,15 +30,24 @@ namespace _Wolframe {
 
 // built-in defaults
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
+	m_cmdline( 0 ),
 	m_ui( 0 ), m_formWidget( 0 ), m_formLoader( 0 ), m_dataLoader( 0 ),
 	m_debugTerminal( 0 ), m_wolframeClient( 0 ), m_uiLoader( 0 ),
 	m_host( "localhost" ), m_port( 7661 ), m_secure( false ),
 	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
 	m_CACertFile( "./certs/CAclient.cert.pem" ),
 	m_loadMode( Network ), m_debug( false ),
-	m_loginDialog( 0 ), m_dbName( "./data.db" )
+	m_loginDialog( 0 ), m_dbName( "./data.db" ), m_settings( )
 {
+// read arguments for the '-s <setting file>' parameter
+#ifndef Q_OS_ANDROID
+	parseArgs( );
+#endif
+	
 // settings override built-in defaults
+	if( !m_settings.isNull( ) ) {
+		Preferences::instance( )->setFileName( m_settings );
+	}
 	if( !Preferences::instance( )->exists( ) ) {
 		PreferencesDialog d;
 		d.exec( );
@@ -112,6 +121,7 @@ void MainWindow::parseArgs( )
 {
 	const struct QCommandLineConfigEntry conf[] =
 	{
+		{ QCommandLine::Option, 's', "settings", "Use settings from this file", QCommandLine::Optional },
 		{ QCommandLine::Option, 'H', "host", "Wolframe host", QCommandLine::Optional },
 		{ QCommandLine::Option, 'p', "port", "Wolframe port", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'S', "secure", "connect securely via SSL", QCommandLine::Optional },
@@ -126,24 +136,26 @@ void MainWindow::parseArgs( )
 		{ QCommandLine::Option, 'f', "db-file", "Sqlite3 file for local storage", QCommandLine::Optional },
 		QCOMMANDLINE_CONFIG_ENTRY_END
 	};
+
+	if( !m_cmdline ) {
+		m_cmdline = new QCommandLine( this );
+		m_cmdline->setConfig( conf );
+		m_cmdline->enableVersion( true );
+		m_cmdline->enableHelp( true );
+
+		connect( m_cmdline, SIGNAL( switchFound( const QString & ) ),
+			this, SLOT( switchFound( const QString & ) ) );
+
+		connect( m_cmdline, SIGNAL( optionFound( const QString &, const QVariant & ) ),
+			this, SLOT( optionFound( const QString &, const QVariant & ) ) );
+
+		connect( m_cmdline, SIGNAL( paramFound( const QString &, const QVariant & ) ),
+			this, SLOT( paramFound( const QString &, const QVariant & ) ) );
+
+		connect( m_cmdline, SIGNAL( parseError( const QString & ) ),
+			this, SLOT( parseError( const QString & ) ) );
+	}
 	
-	m_cmdline = new QCommandLine( this );
-	m_cmdline->setConfig( conf );
-	m_cmdline->enableVersion( true );
-	m_cmdline->enableHelp( true );
-
-	connect( m_cmdline, SIGNAL( switchFound( const QString & ) ),
-		this, SLOT( switchFound( const QString & ) ) );
-
-	connect( m_cmdline, SIGNAL( optionFound( const QString &, const QVariant & ) ),
-		this, SLOT( optionFound( const QString &, const QVariant & ) ) );
-
-	connect( m_cmdline, SIGNAL( paramFound( const QString &, const QVariant & ) ),
-		this, SLOT( paramFound( const QString &, const QVariant & ) ) );
-
-	connect( m_cmdline, SIGNAL( parseError( const QString & ) ),
-		this, SLOT( parseError( const QString & ) ) );
-		
 	m_cmdline->parse( );
 }
 
@@ -166,7 +178,9 @@ void MainWindow::switchFound( const QString &name )
 void MainWindow::optionFound( const QString &name, const QVariant &value )
 {
 	qDebug( ) << "option" << name << "with" << value;
-	if( name == "host" ) {
+	if( name == "settings" ) {
+		m_settings = value.toString( );
+	} else if( name == "host" ) {
 		m_host = value.toString( );
 	} else if( name == "port" ) {
 		m_port = value.toString( ).toUShort( );

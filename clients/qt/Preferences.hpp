@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QString>
 #include <QScopedPointer>
+#include <QSettings>
 
 #include "global.hpp"
 
@@ -31,6 +32,7 @@ namespace _Wolframe {
 			void loadSettings( );
 			void storeSettings( );
 			bool exists( );
+			void setFileName( const QString &fileName );
 			
 			static Preferences *instance( );
 
@@ -69,6 +71,9 @@ namespace _Wolframe {
 			Q_PROPERTY( bool m_debug READ debug WRITE setDebug )
 			bool debug( ) const { return m_debug; }
 			void setDebug( bool _debug ) { m_debug = _debug; }
+		
+		private:
+			QSettings *createSettings( );
 			
 		private:
 			static QScopedPointer<Preferences> m_instance;
@@ -85,6 +90,7 @@ namespace _Wolframe {
 			LoadMode m_loadMode;
 			QString m_dbName;
 			bool m_debug;
+			QString m_fileName;
 	};
 	
 } // namespace QtClient
