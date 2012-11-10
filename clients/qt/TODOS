@@ -48,12 +48,11 @@
     - states (enable/disabled, read/write or read/only) can depend
       on states of other widgets, best example is a checked group
       box for a bunch of settings, see preferences dialog)
-  - 1:n relations (pick a foreign reference to another
-    object), domains (e.g. pick a city in a list of possibilities)
-  - grid views
-  - handle prefsChanged in a smart way, for now just restart the client
-- stop flickering in hour glas
+- handle prefsChanged in a smart way, for now just restart the client
 - on connect ask always for connection data
+- add a init.ui form which is presented after successful login:
+  - what to do on connection errors? back to the connect dialog for now
+- stop flickering in hour glas
 - loadmode must be split in UI-loadmode and data-loadmode (at least for
   now when we use local forms and network data connections in parallel)
 - QIODevice for data loader and handler instead of a fixed byte
@@ -62,3 +61,7 @@
   - add doctype to data XML
   - network loader via protocol or use client library?
 - add authentication dialog
+- most likely not the idea
+  - 1:n relations (pick a foreign reference to another
+    object), domains (e.g. pick a city in a list of possibilities)
+  - grid views
