@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QLineEdit>
+#include <QSpinBox>
 #include <QComboBox>
 #include <QStringList>
 #include <QKeyEvent>
@@ -26,6 +27,9 @@ namespace _Wolframe {
 		LoginDialog( WolframeClient *_wolframeClient, QWidget *_parent = 0 );
 	
 	private:
+		QLineEdit *m_host;
+		QSpinBox *m_port;
+		QPushButton *m_prefs;
 		QComboBox *m_mechs;
 		QComboBox *m_username;
 		QLineEdit *m_password;
@@ -48,6 +52,7 @@ namespace _Wolframe {
 		void login( );
 		void authOk( );
 		void authFailed( );
+		void showPreferences( );
 	};
 } // namespace QtClient
 } // namespace _Wolframe

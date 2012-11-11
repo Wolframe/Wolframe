@@ -48,7 +48,11 @@
     - states (enable/disabled, read/write or read/only) can depend
       on states of other widgets, best example is a checked group
       box for a bunch of settings, see preferences dialog)
-- on connect ask always for connection data
+- workflow for form
+  - init form
+  - flow of forms, buttons to switch between forms
+  - menues for picking forms
+  - forms in forms: show multiple views
 - add a init.ui form which is presented after successful login:
   - what to do on connection errors? back to the connect dialog for now
 - stop flickering in hour glas

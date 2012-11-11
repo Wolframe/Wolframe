@@ -3,8 +3,11 @@
 //
 
 #include "LoginDialog.hpp"
+#include "Preferences.hpp"
+#include "PreferencesDialog.hpp"
 
 #include <QFormLayout>
+#include <QApplication>
 
 namespace _Wolframe {
 	namespace QtClient {
@@ -21,6 +24,14 @@ void LoginDialog::initialize( )
 {
 	QFormLayout *formLayout = new QFormLayout( );
 	
+	m_host = new QLineEdit( this );
+	formLayout->addRow( tr( "&Host:" ), m_host );
+	m_port = new QSpinBox( this );
+	m_port->setRange( 1024, 49151 );
+	formLayout->addRow( tr( "&Port:" ), m_port );
+	m_prefs = new QPushButton( tr( "..." ) );
+        m_prefs->setFixedWidth( m_prefs->fontMetrics( ).width( "..." ) * 2 );
+	formLayout->addRow( tr( "&Preferences" ), m_prefs );
 	m_mechs = new QComboBox( this );
 	formLayout->addRow( tr( "&Mech:" ), m_mechs );
 	m_username = new QComboBox( this );
@@ -43,6 +54,8 @@ void LoginDialog::initialize( )
 	connect( m_buttons->button( QDialogButtonBox::Ok ), SIGNAL( clicked( ) ),
 		this, SLOT( login( ) ) );	
 
+	connect( m_prefs, SIGNAL( clicked( ) ), this, SLOT( showPreferences( ) ) );
+	
 	connect( m_wolframeClient, SIGNAL( mechsReceived( QStringList ) ),
 		this, SLOT( mechsReceived( QStringList ) ) );
 
@@ -51,6 +64,11 @@ void LoginDialog::initialize( )
 
 	connect( m_wolframeClient, SIGNAL( authFailed( ) ),
 		this, SLOT( authFailed( ) ) );
+
+	Preferences *prefs = Preferences::instance( );
+	
+	m_host->setText( prefs->host( ) );
+	m_port->setValue( prefs->port( ) );
 		
 	m_wolframeClient->auth( );		
 }
@@ -103,6 +121,16 @@ void LoginDialog::authFailed( )
 {
 	close( );
 	emit authenticationFailed( );
+}
+
+void LoginDialog::showPreferences( )
+{
+	PreferencesDialog prefs;
+	
+	if( prefs.exec( ) == QDialog::Accepted ) {
+		qDebug( ) << "Reloading application";
+		QApplication::instance( )->exit( RESTART_CODE );
+	}
 }
 
 } // namespace QtClient
