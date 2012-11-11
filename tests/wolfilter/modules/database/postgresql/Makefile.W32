@@ -28,6 +28,7 @@ DYNAMIC_MODULE = \
 
 CPP_OBJS = \
 	PostgreSQLTest.obj \
+	PostgreSQLModuleFiles.obj \
 	mod_db_postgresqltest.obj
 
 all: $(DYNAMIC_MODULE)
