@@ -12,6 +12,7 @@
 #include "Preferences.hpp"
 #include "PreferencesDialog.hpp"
 #include "ManageStorageDialog.hpp"
+#include "global.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -30,16 +31,34 @@ namespace _Wolframe {
 
 // built-in defaults
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
+	m_cmdline( 0 ),
 	m_ui( 0 ), m_formWidget( 0 ), m_formLoader( 0 ), m_dataLoader( 0 ),
 	m_debugTerminal( 0 ), m_wolframeClient( 0 ), m_uiLoader( 0 ),
 	m_host( "localhost" ), m_port( 7661 ), m_secure( false ),
 	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
 	m_CACertFile( "./certs/CAclient.cert.pem" ),
 	m_loadMode( Network ), m_debug( false ),
-	m_loginDialog( 0 ), m_dbName( "./data.db" )
+	m_loginDialog( 0 ), m_dbName( DEFAULT_SQLITE_FILENAME ), m_settings( ),
+	m_uiFormsDir( DEFAULT_UI_FORMS_DIR ),
+	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
+	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR )
 {
+// read arguments for the '-s <setting file>' parameter
+#ifndef Q_OS_ANDROID
+	parseArgs( );
+#endif
+	
 // settings override built-in defaults
-	readSettings( );
+	if( !m_settings.isNull( ) ) {
+		Preferences::setFileName( m_settings );
+	}
+	if( !Preferences::instance( )->exists( ) ) {
+		PreferencesDialog d;
+		d.exec( );
+		readSettings( );
+	} else {
+		readSettings( );
+	}
 	
 // command line options override settings
 #ifndef Q_OS_ANDROID
@@ -61,6 +80,9 @@ void MainWindow::readSettings( )
 	m_loadMode = prefs->loadMode( );
 	m_dbName = prefs->dbName( );
 	m_debug = prefs->debug( );
+	m_uiFormsDir = prefs->uiFormsDir( );
+	m_uiFormTranslationsDir = prefs->uiFormTranslationsDir( );
+	m_dataLoaderDir = prefs->dataLoaderDir( );
 }
 
 static DebugTerminal *debugTerminal = 0;
@@ -106,6 +128,7 @@ void MainWindow::parseArgs( )
 {
 	const struct QCommandLineConfigEntry conf[] =
 	{
+		{ QCommandLine::Option, 's', "settings", "Use settings from this file", QCommandLine::Optional },
 		{ QCommandLine::Option, 'H', "host", "Wolframe host", QCommandLine::Optional },
 		{ QCommandLine::Option, 'p', "port", "Wolframe port", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'S', "secure", "connect securely via SSL", QCommandLine::Optional },
@@ -120,24 +143,26 @@ void MainWindow::parseArgs( )
 		{ QCommandLine::Option, 'f', "db-file", "Sqlite3 file for local storage", QCommandLine::Optional },
 		QCOMMANDLINE_CONFIG_ENTRY_END
 	};
+
+	if( !m_cmdline ) {
+		m_cmdline = new QCommandLine( this );
+		m_cmdline->setConfig( conf );
+		m_cmdline->enableVersion( true );
+		m_cmdline->enableHelp( true );
+
+		connect( m_cmdline, SIGNAL( switchFound( const QString & ) ),
+			this, SLOT( switchFound( const QString & ) ) );
+
+		connect( m_cmdline, SIGNAL( optionFound( const QString &, const QVariant & ) ),
+			this, SLOT( optionFound( const QString &, const QVariant & ) ) );
+
+		connect( m_cmdline, SIGNAL( paramFound( const QString &, const QVariant & ) ),
+			this, SLOT( paramFound( const QString &, const QVariant & ) ) );
+
+		connect( m_cmdline, SIGNAL( parseError( const QString & ) ),
+			this, SLOT( parseError( const QString & ) ) );
+	}
 	
-	m_cmdline = new QCommandLine( this );
-	m_cmdline->setConfig( conf );
-	m_cmdline->enableVersion( true );
-	m_cmdline->enableHelp( true );
-
-	connect( m_cmdline, SIGNAL( switchFound( const QString & ) ),
-		this, SLOT( switchFound( const QString & ) ) );
-
-	connect( m_cmdline, SIGNAL( optionFound( const QString &, const QVariant & ) ),
-		this, SLOT( optionFound( const QString &, const QVariant & ) ) );
-
-	connect( m_cmdline, SIGNAL( paramFound( const QString &, const QVariant & ) ),
-		this, SLOT( paramFound( const QString &, const QVariant & ) ) );
-
-	connect( m_cmdline, SIGNAL( parseError( const QString & ) ),
-		this, SLOT( parseError( const QString & ) ) );
-		
 	m_cmdline->parse( );
 }
 
@@ -160,7 +185,9 @@ void MainWindow::switchFound( const QString &name )
 void MainWindow::optionFound( const QString &name, const QVariant &value )
 {
 	qDebug( ) << "option" << name << "with" << value;
-	if( name == "host" ) {
+	if( name == "settings" ) {
+		m_settings = value.toString( );
+	} else if( name == "host" ) {
 		m_host = value.toString( );
 	} else if( name == "port" ) {
 		m_port = value.toString( ).toUShort( );
@@ -247,8 +274,8 @@ void MainWindow::initialize( )
 // a local sqlite database, pass the form loader to the FormWidget
 	switch( m_loadMode ) {
 		case LocalFile:
-			m_formLoader = new FileFormLoader( "forms", "i18n" );
-			m_dataLoader = new FileDataLoader( "data" );
+			m_formLoader = new FileFormLoader( m_uiFormsDir, m_uiFormTranslationsDir );
+			m_dataLoader = new FileDataLoader( m_dataLoaderDir );
 			break;
 		
 		case LocalDb:
@@ -596,7 +623,10 @@ void MainWindow::on_actionExit_triggered( )
 void MainWindow::on_actionPreferences_triggered( )
 {
 	PreferencesDialog prefs( this );
-	prefs.exec( );	
+	if( prefs.exec( ) == QDialog::Accepted ) {
+		qDebug( ) << "Reloading application";
+		QApplication::instance( )->exit( RESTART_CODE );
+	}
 }
 
 void MainWindow::on_actionManageStorage_triggered( )

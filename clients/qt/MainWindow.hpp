@@ -59,8 +59,12 @@ namespace _Wolframe {
 		LoadMode m_loadMode;		// whether to use local loader or not
 		bool m_debug;			// show debug windows from the beginning
 		LoginDialog *m_loginDialog;	// the login dialog
-		QString m_dbName;
-
+		QString m_dbName;		// name of the local database file for storing forms
+		QString m_settings;		// file to read settings from
+		QString m_uiFormsDir;		// for FileFormLoader (forms dir)
+		QString m_uiFormTranslationsDir; // for FileFormLoader (i18n dir)
+		QString m_dataLoaderDir;	// for FileDataLoader (data dir)
+		
 		void readSettings( );
 		void parseArgs( );
 		void initialize( );

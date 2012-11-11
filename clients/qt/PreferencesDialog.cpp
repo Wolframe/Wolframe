@@ -53,17 +53,26 @@ void PreferencesDialog::initialize( )
 	m_secure = new QCheckBox( this );
 	formLayout->addRow( tr( "&Secure:" ), m_secure );
 
-	m_clientCertFile = new FileChooser( this );
+	m_clientCertFile = new FileChooser( FileChooser::SelectExistingFile, this );
 	formLayout->addRow( tr( "&Client Certificate:" ), m_clientCertFile );
 	
-	m_clientKeyFile = new FileChooser( this );
+	m_clientKeyFile = new FileChooser( FileChooser::SelectExistingFile, this );
 	formLayout->addRow( tr( "Client &Key:" ), m_clientKeyFile );
 	
-	m_CACertFile = new FileChooser( this );
+	m_CACertFile = new FileChooser( FileChooser::SelectExistingFile, this );
 	formLayout->addRow( tr( "C&A file:" ), m_CACertFile );
 		
-	m_dbName = new FileChooser( this );
+	m_dbName = new FileChooser( FileChooser::SelectExistingFile, this );
 	formLayout->addRow( tr( "&Db file:" ), m_dbName );
+
+	m_uiFormsDir = new FileChooser( FileChooser::SelectExistingDir, this );
+	formLayout->addRow( tr( "Form dir:" ), m_uiFormsDir );
+
+	m_uiFormTranslationsDir = new FileChooser( FileChooser::SelectExistingDir, this );
+	formLayout->addRow( tr( "I18N dir:" ), m_uiFormTranslationsDir );
+
+	m_dataLoaderDir = new FileChooser( FileChooser::SelectExistingDir, this );
+	formLayout->addRow( tr( "Data dir:" ), m_dataLoaderDir );
 
 	m_debug = new QCheckBox( this );
 	formLayout->addRow( tr( "&Debug:" ), m_debug );
@@ -112,9 +121,15 @@ void PreferencesDialog::loadSettings( )
 	m_loadModeLocalDatabase->setChecked( false );
 	m_loadModeNetwork->setChecked( false );
 	m_dbName->setEnabled( false );
+	m_uiFormsDir->setEnabled( false );
+	m_uiFormTranslationsDir->setEnabled( false );
+	m_dataLoaderDir->setEnabled( false );
 	switch( prefs->loadMode( ) ) {
-		case Preferences::LocalFile:
+		case Preferences::LocalFile:			
 			m_loadModeLocalFile->setChecked( true );
+			m_uiFormsDir->setEnabled( true );
+			m_uiFormTranslationsDir->setEnabled( true );
+			m_dataLoaderDir->setEnabled( true );
 			break;
 
 		case Preferences::LocalDb:
@@ -128,6 +143,9 @@ void PreferencesDialog::loadSettings( )
 	}
 	m_dbName->setFileName( prefs->dbName( ) );
 	m_debug->setChecked( prefs->debug( ) );
+	m_uiFormsDir->setFileName( prefs->uiFormsDir( ) );
+	m_uiFormTranslationsDir->setFileName( prefs->uiFormTranslationsDir( ) );
+	m_dataLoaderDir->setFileName( prefs->dataLoaderDir( ) );
 }
 
 void PreferencesDialog::apply( )
@@ -149,12 +167,15 @@ void PreferencesDialog::apply( )
 	}
 	prefs->setDbName( m_dbName->fileName( ) );
 	prefs->setDebug( m_debug->isChecked( ) );
+	prefs->setUiFormsDir( m_uiFormsDir->fileName( ) );
+	prefs->setUiFormTranslationsDir( m_uiFormTranslationsDir->fileName( ) );
+	prefs->setDataLoaderDir( m_dataLoaderDir->fileName( ) );
 	
 	prefs->storeSettings( );
-	
-	close( );
-	
+
 	emit prefsChanged( );
+	
+	accept( );	
 }
 
 void PreferencesDialog::cancel( )
@@ -179,6 +200,9 @@ void PreferencesDialog::toggleLoadMode( bool /* checked */ )
 	m_clientCertFile->setEnabled( m_loadModeNetwork->isChecked( ) && m_secure->isChecked( ) );
 	m_clientKeyFile->setEnabled( m_loadModeNetwork->isChecked( ) && m_secure->isChecked( ) );
 	m_CACertFile->setEnabled( m_loadModeNetwork->isChecked( ) && m_secure->isChecked( ) );
+	m_uiFormsDir->setEnabled( m_loadModeLocalFile->isChecked( ) );
+	m_uiFormTranslationsDir->setEnabled( m_loadModeLocalFile->isChecked( ) );
+	m_dataLoaderDir->setEnabled( m_loadModeLocalFile->isChecked( ) );
 }
 
 } // namespace QtClient

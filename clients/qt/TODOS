@@ -48,12 +48,23 @@
     - states (enable/disabled, read/write or read/only) can depend
       on states of other widgets, best example is a checked group
       box for a bunch of settings, see preferences dialog)
+- workflow for form
+  - init form
+  - flow of forms, buttons to switch between forms
+  - menues for picking forms
+  - forms in forms: show multiple views
+- add a init.ui form which is presented after successful login:
+  - what to do on connection errors? back to the connect dialog for now
+- stop flickering in hour glas
+- loadmode must be split in UI-loadmode and data-loadmode (at least for
+  now when we use local forms and network data connections in parallel)
+- QIODevice for data loader and handler instead of a fixed byte
+  array in the signal (otherwise the debug window gets complicated)
+- protocol
+  - add doctype to data XML
+  - network loader via protocol or use client library?
+- add authentication dialog
+- most likely not the idea
   - 1:n relations (pick a foreign reference to another
     object), domains (e.g. pick a city in a list of possibilities)
   - grid views
-  - handle prefsChanged in a smart way, for now just restart the client
-- stop flickering in hour glas
-- QIODevice for data loader and handler instead of a fixed byte
-  array in the signal (otherwise the debug window gets complicated)
-- network loader via protocol or use client library?
-- add authentication dialog

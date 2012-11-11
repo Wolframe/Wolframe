@@ -95,19 +95,17 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-i18n\form1.de_CH.qm: i18n\form1.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe i18n\form1.de_CH.ts -qm i18n\form1.de_CH.qm
+apps\test\i18n\form1.de_CH.qm: apps\test\i18n\form1.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form1.de_CH.ts -qm apps\test\i18n\form1.de_CH.qm
 
-i18n\form1.ro_RO.qm: i18n\form1.ro_RO.ts
-	$(QT_DIR)\bin\lrelease.exe i18n\form1.ro_RO.ts -qm i18n\form1.ro_RO.qm
+apps\test\i18n\form1.ro_RO.qm: apps\test\i18n\form1.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form1.ro_RO.ts -qm apps\test\i18n\form1.ro_RO.qm
 
+apps\test\i18n\form2.de_CH.qm: apps\test\i18n\form2.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form2.de_CH.ts -qm apps\test\i18n\form2.de_CH.qm
 
-i18n\form2.de_CH.qm: i18n\form2.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe i18n\form2.de_CH.ts -qm i18n\form2.de_CH.qm
-
-
-i18n\form3.de_CH.qm: i18n\form3.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe i18n\form3.de_CH.ts -qm i18n\form3.de_CH.qm
+apps\test\i18n\form3.de_CH.qm: apps\test\i18n\form3.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form3.de_CH.ts -qm apps\test\i18n\form3.de_CH.qm
 
 
 themes\windows\qtclient.de_CH.qm: themes\windows\qtclient.de_CH.ts
@@ -124,23 +122,15 @@ themes\phone\qtclient.ro_RO.qm: themes\phone\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe themes\phone\qtclient.ro_RO.ts -qm themes\phone\qtclient.ro_RO.qm
 
 
-themes\eeepc\qtclient.de_CH.qm: themes\eeepc\qtclient.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe themes\eeepc\qtclient.de_CH.ts -qm themes\eeepc\qtclient.de_CH.qm
-
-themes\eeepc\qtclient.ro_RO.qm: themes\eeepc\qtclient.ro_RO.ts
-	$(QT_DIR)\bin\lrelease.exe themes\eeepc\qtclient.ro_RO.ts -qm themes\eeepc\qtclient.ro_RO.qm
-
 I18NS = \
-	i18n\form1.de_CH.qm \
-	i18n\form1.ro_RO.qm \
-	i18n\form2.de_CH.qm \
-	i18n\form3.de_CH.qm \
+	apps\test\i18n\form1.de_CH.qm \
+	apps\test\i18n\form1.ro_RO.qm \
+	apps\test\i18n\form2.de_CH.qm \
+	apps\test\i18n\form3.de_CH.qm \
 	themes\windows\qtclient.de_CH.qm \
 	themes\windows\qtclient.ro_RO.qm \
 	themes\phone\qtclient.de_CH.qm \
-	themes\phone\qtclient.ro_RO.qm \
-	themes\eeepc\qtclient.de_CH.qm \
-	themes\eeepc\qtclient.ro_RO.qm
+	themes\phone\qtclient.ro_RO.qm
 
 local_all: $(I18NS)
 
@@ -229,9 +219,7 @@ buildi18n:
 	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.ro_RO.ts
-	$(QT_DIR)\bin\lupdate.exe themes\eeepc\MainWindow.ui -ts themes\eeepc\qtclient.de_CH.ts
-	$(QT_DIR)\bin\lupdate.exe themes\eeepc\MainWindow.ui -ts themes\eeepc\qtclient.ro_RO.ts
-	$(QT_DIR)\bin\lupdate.exe forms\form1.ui -ts i18n\form1.de_CH.ts
-	$(QT_DIR)\bin\lupdate.exe forms\form1.ui -ts i18n\form1.ro_RO.ts
-	$(QT_DIR)\bin\lupdate.exe forms\form2.ui -ts i18n\form2.de_CH.ts
-	$(QT_DIR)\bin\lupdate.exe forms\form3.ui -ts i18n\form3.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form1.ui -ts apps\test\i18n\form1.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form1.ui -ts apps\test\i18n\form1.ro_RO.ts
+	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form2.ui -ts apps\test\i18n\form2.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form3.ui -ts apps\test\i18n\form3.de_CH.ts

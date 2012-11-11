@@ -133,38 +133,35 @@ moc_ManageStorageDialog.cpp: ManageStorageDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) ManageStorageDialog.hpp -o moc_ManageStorageDialog.cpp
 
 FORMS = \
-	forms/form1.ui \
-	forms/form2.ui \
-	forms/form3.ui \
-	forms/form4.ui
+	apps/test/forms/form1.ui \
+	apps/test/forms/form2.ui \
+	apps/test/forms/form3.ui \
+	apps/test/forms/form4.ui
 
 DATA = \
-	data/form1.xml \
-	data/domain_form1_vegetable.xml \
-	data/form2.xml \
-	data/form3.xml \
-	data/form4.xml \
-	data/domain_form4_vegetable.xml
+	apps/test/data/form1.xml \
+	apps/test/data/domain_form1_vegetable.xml \
+	apps/test/data/form2.xml \
+	apps/test/data/form3.xml \
+	apps/test/data/form4.xml \
+	apps/test/data/domain_form4_vegetable.xml
 	
 THEMES = \
 	themes/phone/MainWindow.ui \
-	themes/windows/MainWindow.ui \
-	themes/eeepc/MainWindow.ui
+	themes/windows/MainWindow.ui
 
 %.qm : %.ts
 	$(QT_LRELEASE) $< -qm $@
 
 I18NS = \
-	i18n/form1.de_CH.qm \
-	i18n/form1.ro_RO.qm \
-	i18n/form2.de_CH.qm \
-	i18n/form3.de_CH.qm \
+	apps/test/i18n/form1.de_CH.qm \
+	apps/test/i18n/form1.ro_RO.qm \
+	apps/test/i18n/form2.de_CH.qm \
+	apps/test/i18n/form3.de_CH.qm \
 	themes/windows/qtclient.de_CH.qm \
 	themes/windows/qtclient.ro_RO.qm \
 	themes/phone/qtclient.de_CH.qm \
-	themes/phone/qtclient.ro_RO.qm \
-	themes/eeepc/qtclient.de_CH.qm \
-	themes/eeepc/qtclient.ro_RO.qm
+	themes/phone/qtclient.ro_RO.qm
 
 I18NS_TS = $(I18NS:.qm=.ts)
 
@@ -206,12 +203,10 @@ buildi18n:
 	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/qtclient.ro_RO.ts
 	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/qtclient.de_CH.ts
 	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/qtclient.ro_RO.ts
-	$(QT_LUPDATE) themes/eeepc/MainWindow.ui -ts themes/eeepc/qtclient.de_CH.ts
-	$(QT_LUPDATE) themes/eeepc/MainWindow.ui -ts themes/eeepc/qtclient.ro_RO.ts
-	$(QT_LUPDATE) forms/form1.ui -ts i18n/form1.de_CH.ts
-	$(QT_LUPDATE) forms/form1.ui -ts i18n/form1.ro_RO.ts
-	$(QT_LUPDATE) forms/form2.ui -ts i18n/form2.de_CH.ts
-	$(QT_LUPDATE) forms/form3.ui -ts i18n/form3.de_CH.ts
+	$(QT_LUPDATE) apps/test/forms/form1.ui -ts apps/test/i18n/form1.de_CH.ts
+	$(QT_LUPDATE) apps/test/forms/form1.ui -ts apps/test/i18n/form1.ro_RO.ts
+	$(QT_LUPDATE) apps/test/forms/form2.ui -ts apps/test/i18n/form2.de_CH.ts
+	$(QT_LUPDATE) apps/test/forms/form3.ui -ts apps/test/i18n/form3.de_CH.ts
 
 geany-ctags:
 	CFLAGS="$(ALL_CXXFLAGS)" geany -g geany.c++.tags `find . -name '*.[ch]pp'`

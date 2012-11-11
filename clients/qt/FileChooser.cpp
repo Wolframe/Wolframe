@@ -10,8 +10,8 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-FileChooser::FileChooser( QWidget *_parent )
-	: QWidget( _parent )
+FileChooser::FileChooser( SelectionMode _selectionMode, QWidget *_parent )
+	: QWidget( _parent ), m_selectionMode( _selectionMode )
 {
 	initialize( );
 }
@@ -47,8 +47,18 @@ QString FileChooser::fileName( ) const
 void FileChooser::chooseFile( )
 {
 	QString f;
-	f = QFileDialog::getOpenFileName( this, tr( "Choose a file" ),
-		m_lineEdit->text( ), QString::null /* filter */ );
+	
+	switch( m_selectionMode ) {
+		case SelectExistingFile:
+			f = QFileDialog::getOpenFileName( this, tr( "Choose a file" ),
+				m_lineEdit->text( ), QString::null /* filter */ );
+			break;
+		
+		case SelectExistingDir:
+			f = QFileDialog::getExistingDirectory( this, tr( "Choose a directory" ),
+				m_lineEdit->text( ), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
+			break;
+	}
 			
 	if( !f.isEmpty( ) ) {
 		m_lineEdit->setText( f );

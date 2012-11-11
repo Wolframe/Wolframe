@@ -8,11 +8,8 @@ CONFIG += thread qt debug uitools
 # by adapting the examples below.
 # file1.source = myfile
 # dir1.source = mydir
-dir1.source = themes
-dir2.source = data
-dir3.source = i18n
-dir4.source = forms
-DEPLOYMENTFOLDERS = dir1 dir2 dir3 dir4
+dir1.source = apps
+DEPLOYMENTFOLDERS = dir1
 
 # If your application uses the Qt Mobility libraries, uncomment
 # the following lines and add the respective components to the 
@@ -78,12 +75,10 @@ include(deployment.pri)
 qtcAddDeployment()
 
 TRANSLATIONS += \
-	i18n/form1.de_CH.ts \
-	i18n/form1.ro_RO.ts \
-	i18n/form2.de_CH.ts \
-	i18n/form3.de_CH.ts \
-	themes/eeepc/qtclient.de_CH.ts \
-	themes/eeepc/qtclient.ro_RO.ts \
+	apps/test/i18n/form1.de_CH.ts \
+	apps/test/i18n/form1.ro_RO.ts \
+	apps/test/i18n/form2.de_CH.ts \
+	apps/test/i18n/form3.de_CH.ts \
 	themes/phone/qtclient.de_CH.ts \
 	themes/phone/qtclient.ro_RO.ts \
 	themes/windows/qtclient.de_CH.ts \

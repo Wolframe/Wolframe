@@ -1,19 +1,21 @@
 //
-// Preferences.cpp
+// Preferences->cpp
 //
 
 #include "Preferences.hpp"
+#include "global.hpp"
 
-#include <QSettings>
 #include <QMetaEnum>
+#include <QDebug>
  
 namespace _Wolframe {
 	namespace QtClient {
 
 QScopedPointer<Preferences> Preferences::m_instance;
+QString Preferences::m_fileName;
 
-Preferences::Preferences( QObject *_parent )
-	: QObject( _parent )
+Preferences::Preferences( QString _organization, QString _application, QObject *_parent )
+	: QObject( _parent ), m_organization( _organization ), m_application( _application )
 {
 	loadSettings( );
 }
@@ -22,38 +24,73 @@ Preferences::~Preferences( )
 {
 }
 
+bool Preferences::exists( )
+{
+	QSettings *s = createSettings( );
+	bool e = s->contains( "wolframe/loadmode" );
+	delete s;
+	return e;
+}
+
+void Preferences::setFileName( const QString &_fileName )
+{
+	m_fileName = _fileName;
+}
+
+QSettings *Preferences::createSettings( )
+{
+	QSettings *s;
+	if( m_fileName.isNull( ) ) {
+		s = new QSettings( m_organization, m_application );
+		qDebug( ) << "Using default settings file";
+	} else {
+		s = new QSettings( m_fileName, QSettings::IniFormat );
+		qDebug( ) << "Using file " << m_fileName << "as settings file";
+	}
+	
+	return s;
+}
+
 void Preferences::loadSettings( )
 {
-	QSettings s( SETTINGS_DOMAIN, SETTINGS_APP );
-	m_host = s.value( "wolframe/host", "andreasbaumann.dyndns.org" ).toString( );
-	m_port = s.value( "wolframe/port", 7661 ).toString( ).toUShort( );
-	m_secure = s.value( "wolframe/secure", false ).toBool( );
-	m_clientCertFile = s.value( "wolframe/client-cert-file", "./certs/client.crt" ).toString( );
-	m_clientKeyFile = s.value( "wolframe/client-key-file", "./private/client.key" ) .toString( );
-	m_CACertFile = s.value( "wolframe/ca-cert-file", "./certs/CAclient.cert.pem" ).toString( );
+	QSettings *s = createSettings( );
+	m_host = s->value( "wolframe/host", "localhost" ).toString( );
+	m_port = s->value( "wolframe/port", 7661 ).toString( ).toUShort( );
+	m_secure = s->value( "wolframe/secure", false ).toBool( );
+	m_clientCertFile = s->value( "wolframe/client-cert-file", "./certs/client.crt" ).toString( );
+	m_clientKeyFile = s->value( "wolframe/client-key-file", "./private/client.key" ) .toString( );
+	m_CACertFile = s->value( "wolframe/ca-cert-file", "./certs/CAclient.cert.pem" ).toString( );
 	const QMetaObject &mo = Preferences::staticMetaObject;
 	int idx = mo.indexOfEnumerator( "LoadMode" );
 	QMetaEnum metaEnum = mo.enumerator( idx );
-	m_loadMode = static_cast< LoadMode >( metaEnum.keyToValue( s.value( "wolframe/loadmode", "Network" ).toString( ).toStdString( ).c_str( ) ) );
-	m_dbName = s.value( "wolframe/dbname", "./data.db" ).toString( );
-	m_debug = s.value( "wolframe/debug", false ).toBool( );
+	m_loadMode = static_cast< LoadMode >( metaEnum.keyToValue( s->value( "wolframe/loadmode", "Network" ).toString( ).toStdString( ).c_str( ) ) );
+	m_dbName = s->value( "wolframe/dbname", DEFAULT_SQLITE_FILENAME ).toString( );
+	m_debug = s->value( "wolframe/debug", false ).toBool( );
+	m_uiFormsDir = s->value( "wolframe/uiFormDir", DEFAULT_UI_FORMS_DIR ).toString( );
+	m_uiFormTranslationsDir = s->value( "wolframe/uiFormTranslationsDir", DEFAULT_UI_FORM_TRANSLATIONS_DIR ).toString( );
+	m_dataLoaderDir = s->value( "wolframe/dataLoaderDir", DEFAULT_DATA_LOADER_DIR ).toString( );
+	delete s;
 }
 
 void Preferences::storeSettings( )
 {
-	QSettings s( SETTINGS_DOMAIN, SETTINGS_APP );
-	s.setValue( "wolframe/host", m_host );
-	s.setValue( "wolframe/port", m_port );
-	s.setValue( "wolframe/secure", m_secure );
-	s.setValue( "wolframe/client-cert-file", m_clientCertFile );
-	s.setValue( "wolframe/client-key-file", m_clientKeyFile );
-	s.setValue( "wolframe/ca-cert-file", m_CACertFile );
+	QSettings *s = createSettings( );
+	s->setValue( "wolframe/host", m_host );
+	s->setValue( "wolframe/port", m_port );
+	s->setValue( "wolframe/secure", m_secure );
+	s->setValue( "wolframe/client-cert-file", m_clientCertFile );
+	s->setValue( "wolframe/client-key-file", m_clientKeyFile );
+	s->setValue( "wolframe/ca-cert-file", m_CACertFile );
 	const QMetaObject &mo = Preferences::staticMetaObject;
 	int idx = mo.indexOfEnumerator( "LoadMode" );
 	QMetaEnum metaEnum = mo.enumerator( idx );
-	s.setValue( "wolframe/loadmode", metaEnum.valueToKey( m_loadMode ) );
-	s.setValue( "wolframe/dbname", m_dbName );
-	s.setValue( "wolframe/debug", m_debug );
+	s->setValue( "wolframe/loadmode", metaEnum.valueToKey( m_loadMode ) );
+	s->setValue( "wolframe/dbname", m_dbName );
+	s->setValue( "wolframe/debug", m_debug );
+	s->setValue( "wolframe/uiFormDir", m_uiFormsDir );
+	s->setValue( "wolframe/uiFormTranslationsDir", m_uiFormTranslationsDir );
+	s->setValue( "wolframe/dataLoaderDir", m_dataLoaderDir );
+	delete s;
 }
 
 Preferences *Preferences::instance( )

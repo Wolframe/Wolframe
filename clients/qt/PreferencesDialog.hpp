@@ -37,6 +37,9 @@ namespace _Wolframe {
 		FileChooser *m_CACertFile;
 		QDialogButtonBox* m_buttons;
 		FileChooser *m_dbName;
+		FileChooser *m_uiFormsDir;
+		FileChooser *m_uiFormTranslationsDir;
+		FileChooser *m_dataLoaderDir;
 		QCheckBox *m_debug;
 	
 	signals:

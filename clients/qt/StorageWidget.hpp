@@ -42,6 +42,9 @@ namespace _Wolframe {
 		FileChooser *m_clientKeyFile;
 		FileChooser *m_CACertFile;
 		FileChooser *m_dbName;
+		FileChooser *m_uiFormsDir;
+		FileChooser *m_uiFormTranslationsDir;
+		FileChooser *m_dataLoaderDir;
 		QTreeWidget *m_treeWidget;
 		QCheckBox *m_toggleAll;
 
