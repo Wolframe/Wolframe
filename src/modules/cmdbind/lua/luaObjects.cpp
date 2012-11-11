@@ -1884,7 +1884,7 @@ void LuaScriptInstance::init( const LuaModuleMap* modulemap_)
 		if (luaL_loadbuffer( m_ls, m_script->content().c_str(), m_script->content().size(), m_script->path().c_str()))
 		{
 			std::ostringstream buf;
-			buf << "Failed to load script '" << m_script->path() << "':" << lua_tostring( m_ls, -1);
+			buf << "Failed to load script '" << m_script->path() << "':" << luaErrorMessage( m_ls, -1);
 			throw std::runtime_error( buf.str());
 		}
 		// open standard lua libraries (we load all of them):

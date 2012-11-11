@@ -4,8 +4,7 @@ local function insert_tree_itr( parentid, itr)
 	local name = ""
 	for v,t in itr do
 		if (t == "name") then
-			local f = formfunction( "treeAddNode")
-			id = f( { node = { name=v, parentid=parentid} } ):table().ID
+			id = formfunction( "treeAddNode")( {name=v, parentid=parentid} ):table().ID
 		elseif (t == "class") then
 			insert_tree_itr( id, scope( itr))
 		end
@@ -14,11 +13,9 @@ end
 
 local function insert_topnode( name, parentid)
 	if not parentid then
-		local f = formfunction( "treeAddRoot")
-		f( { node = { name=name } } )
+		formfunction( "treeAddRoot")( {name=name} )
 	else
-		local f = formfunction( "treeAddNode")
-		id = f( { node = { name=name, parentid=parentid} } ):table().ID
+		formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 	end
 end
 

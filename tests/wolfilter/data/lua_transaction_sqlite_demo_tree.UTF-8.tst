@@ -4,12 +4,12 @@
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <transactions>
-<treeAddRoot><node><name>Albert</name></node></treeAddRoot>
-<treeAddNode><node><parentid>1</parentid><name>Bert</name></node></treeAddNode>
-<treeAddNode><node><parentid>1</parentid><name>Chuck</name></node></treeAddNode>
-<treeAddNode><node><parentid>3</parentid><name>Donna</name></node></treeAddNode>
-<treeAddNode><node><parentid>3</parentid><name>Eddie</name></node></treeAddNode>
-<treeAddNode><node><parentid>3</parentid><name>Fred</name></node></treeAddNode>
+<treeAddRoot><name>Albert</name></treeAddRoot>
+<treeAddNode><parentid>1</parentid><name>Bert</name></treeAddNode>
+<treeAddNode><parentid>1</parentid><name>Chuck</name></treeAddNode>
+<treeAddNode><parentid>3</parentid><name>Donna</name></treeAddNode>
+<treeAddNode><parentid>3</parentid><name>Eddie</name></treeAddNode>
+<treeAddNode><parentid>3</parentid><name>Fred</name></treeAddNode>
 </transactions>**config
 --input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_demo_tree.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
@@ -31,41 +31,54 @@ CREATE TABLE tree (
  ID INTEGER PRIMARY KEY AUTOINCREMENT,
  parent INT REFERENCES tree( ID ),
  name TEXT,
- lft INT NOT NULL UNIQUE DEFERRABLE CHECK ( lft > 0 ),
- rgt INT NOT NULL UNIQUE DEFERRABLE CHECK ( rgt > 1 ),
+ lft INT NOT NULL DEFERRABLE CHECK ( lft > 0 ),
+ rgt INT NOT NULL DEFERRABLE CHECK ( rgt > 1 ),
  CONSTRAINT order_check CHECK ( rgt > lft )
 );
 **file:DBPRG.tdl
 --
 -- treeAddRoot
 --
-TRANSACTION treeAddRoot -- (/node/name)
+TRANSACTION treeAddRoot -- (name)
 BEGIN
-	FOREACH /node DO INSERT INTO tree (parent, name, lft, rgt) VALUES (0, $(name), 1, 2);
+	DO INSERT INTO tree (ID, parent, name, lft, rgt) VALUES (1, 0, $(name), 1, 2);
 END
 
 --
 -- treeAddNode
 --
-TRANSACTION treeAddNode -- (/node/parentid, /node/name)
+TRANSACTION treeAddNode -- (parentid, name)
 BEGIN
-	FOREACH /node DO NONEMPTY SELECT rgt FROM tree WHERE ID = $(parentid);
-	DO UPDATE tree SET lft = lft + 2 WHERE lft > $1;
+	DO NONEMPTY UNIQUE SELECT rgt FROM tree WHERE ID = $(parentid);
 	DO UPDATE tree SET rgt = rgt + 2 WHERE rgt >= $1;
-	FOREACH /node DO INSERT INTO tree (parent, name, lft, rgt) VALUES ($(parentid), $(name), $1, $1+1);
+	DO UPDATE tree SET lft = lft + 2 WHERE lft > $1;
+	DO INSERT INTO tree (parent, name, lft, rgt) VALUES ($(parentid), $(name), $1, $1+1);
+	INTO . DO NONEMPTY UNIQUE SELECT ID from tree WHERE lft = $1;
 END
 
 --
 -- treeDeleteSubtree
 --
-TRANSACTION treeDeleteSubtree -- ( /node/id)
+TRANSACTION treeDeleteSubtree -- (id)
 BEGIN
-	FOREACH /node DO NONEMPTY SELECT lft,rgt,width=rgt-lft+1 FROM tree WHERE ID = $(id);
+	DO NONEMPTY SELECT lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(id);
 	DO DELETE FROM tree WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE tree SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE tree SET rgt = rgt-$3 WHERE rgt>$2;
 END
 
+--
+-- treeSelectNode       :Get the node
+-- treeSelectNodeByName :Get the node by name
+--
+TRANSACTION treeSelectNode -- (/node/id)
+BEGIN
+	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE ID = $(id);
+END
+TRANSACTION treeSelectNodeByName -- (/node/name)
+BEGIN
+	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name FROM tree WHERE name = $(name);
+END
 
 --
 -- treeSelectNodeAndParents       :Get the node and its parents
@@ -99,11 +112,11 @@ END
 --
 TRANSACTION treeSelectNodeAndChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 TRANSACTION treeSelectNodeAndChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
 END
 
 --
@@ -112,19 +125,11 @@ END
 --
 TRANSACTION treeSelectChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
 END
 TRANSACTION treeSelectChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name);
-END
-
---
--- treeSelectNodeWithLevels :Get all the nodes with their level
---
-TRANSACTION treeSelectNodeWithLevels
-BEGIN
-	INTO /node DO SELECT count(P2.*) AS level, P1.ID, P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt GROUP BY P1.name ORDER BY level ASC;
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name);
 END
 **outputfile:DBDUMP
 **file: transaction_sqlite_demo_tree.lua
@@ -143,7 +148,7 @@ end
 
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<result></result>
+<result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result>
 tree:
 '1', '0', 'Albert', '1', '12'
 '2', '1', 'Bert', '2', '3'

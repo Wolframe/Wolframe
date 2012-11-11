@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <transactions>
-<treeAddRoot><node><name>Albert</name></node></treeAddRoot>
-<treeAddNode><node><parentid>1</parentid><name>Bert</name></node></treeAddNode>
-<treeAddNode><node><parentid>1</parentid><name>Chuck</name></node></treeAddNode>
-<treeAddNode><node><parentid>3</parentid><name>Donna</name></node></treeAddNode>
-<treeAddNode><node><parentid>3</parentid><name>Eddie</name></node></treeAddNode>
-<treeAddNode><node><parentid>3</parentid><name>Fred</name></node></treeAddNode>
+<treeAddRoot><name>Albert</name></treeAddRoot>
+<treeAddNode><parentid>1</parentid><name>Bert</name></treeAddNode>
+<treeAddNode><parentid>1</parentid><name>Chuck</name></treeAddNode>
+<treeAddNode><parentid>3</parentid><name>Donna</name></treeAddNode>
+<treeAddNode><parentid>3</parentid><name>Eddie</name></treeAddNode>
+<treeAddNode><parentid>3</parentid><name>Fred</name></treeAddNode>
 </transactions>

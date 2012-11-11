@@ -181,29 +181,29 @@ CREATE TABLE tree (
 --
 -- treeAddRoot
 --
-TRANSACTION treeAddRoot -- (/node/name)
+TRANSACTION treeAddRoot -- (name)
 BEGIN
-	DO INSERT INTO tree (ID, parent, name, lft, rgt) VALUES (1, 0, $(/node/name), 1, 2);
+	DO INSERT INTO tree (ID, parent, name, lft, rgt) VALUES (1, 0, $(name), 1, 2);
 END
 
 --
 -- treeAddNode
 --
-TRANSACTION treeAddNode -- (/node/parentid, /node/name)
+TRANSACTION treeAddNode -- (parentid, name)
 BEGIN
-	DO NONEMPTY UNIQUE SELECT rgt FROM tree WHERE ID = $(/node/parentid);
+	DO NONEMPTY UNIQUE SELECT rgt FROM tree WHERE ID = $(parentid);
 	DO UPDATE tree SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE tree SET lft = lft + 2 WHERE lft > $1;
-	DO INSERT INTO tree (parent, name, lft, rgt) VALUES ($(/node/parentid), $(/node/name), $1, $1+1);
+	DO INSERT INTO tree (parent, name, lft, rgt) VALUES ($(parentid), $(name), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from tree WHERE lft = $1;
 END
 
 --
 -- treeDeleteSubtree
 --
-TRANSACTION treeDeleteSubtree -- ( /node/id)
+TRANSACTION treeDeleteSubtree -- (id)
 BEGIN
-	FOREACH /node DO NONEMPTY SELECT lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(id);
+	DO NONEMPTY SELECT lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(id);
 	DO DELETE FROM tree WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE tree SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE tree SET rgt = rgt-$3 WHERE rgt>$2;
@@ -283,11 +283,9 @@ function insert_tree( parentid, itr)
 		if (t == "name") then
 			local name = v
 			if idcnt == 0 then
-				local f = formfunction( "treeAddRoot")
-				f( { node = { name=name } } )
+				formfunction( "treeAddRoot")( {name=name} )
 			else
-				local f = formfunction( "treeAddNode")
-				f( { node = { name=name, parentid=parentid} } )
+				formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 			end
 			idcnt = idcnt + 1
 		end
@@ -299,13 +297,13 @@ end
 
 function insert_node( parentname, name)
 	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
-	formfunction( "treeAddNode")( { node = { name=name, parentid=parentid} } )
+	formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 end
 
 
 function delete_subtree( name)
 	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	formfunction( "treeDeleteSubtree")( { node={ id=id } } )
+	formfunction( "treeDeleteSubtree")( {id=id} )
 end
 
 function select_subtree( name)

@@ -6,11 +6,9 @@ function insert_tree( parentid, itr)
 		if (t == "name") then
 			local name = v
 			if idcnt == 0 then
-				local f = formfunction( "treeAddRoot")
-				f( { node = { name=name } } )
+				formfunction( "treeAddRoot")( {name=name} )
 			else
-				local f = formfunction( "treeAddNode")
-				f( { node = { name=name, parentid=parentid} } )
+				formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 			end
 			idcnt = idcnt + 1
 		end
@@ -22,13 +20,13 @@ end
 
 function insert_node( parentname, name)
 	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
-	formfunction( "treeAddNode")( { node = { name=name, parentid=parentid} } )
+	formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 end
 
 
 function delete_subtree( name)
 	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
-	formfunction( "treeDeleteSubtree")( { node={ id=id } } )
+	formfunction( "treeDeleteSubtree")( {id=id} )
 end
 
 function select_subtree( name)
