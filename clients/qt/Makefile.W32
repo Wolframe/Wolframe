@@ -96,7 +96,7 @@ all: $(OBJS) $(CPP_BINS)
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 apps\test\i18n\form1.de_CH.qm: apps\test\i18n\form1.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe apps\test\apps\test\i18n\form1.de_CH.ts -qm apps\test\apps\test\i18n\form1.de_CH.qm
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form1.de_CH.ts -qm apps\test\i18n\form1.de_CH.qm
 
 apps\test\i18n\form1.ro_RO.qm: apps\test\i18n\form1.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form1.ro_RO.ts -qm apps\test\i18n\form1.ro_RO.qm
@@ -122,12 +122,6 @@ themes\phone\qtclient.ro_RO.qm: themes\phone\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe themes\phone\qtclient.ro_RO.ts -qm themes\phone\qtclient.ro_RO.qm
 
 
-themes\eeepc\qtclient.de_CH.qm: themes\eeepc\qtclient.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe themes\eeepc\qtclient.de_CH.ts -qm themes\eeepc\qtclient.de_CH.qm
-
-themes\eeepc\qtclient.ro_RO.qm: themes\eeepc\qtclient.ro_RO.ts
-	$(QT_DIR)\bin\lrelease.exe themes\eeepc\qtclient.ro_RO.ts -qm themes\eeepc\qtclient.ro_RO.qm
-
 I18NS = \
 	apps\test\i18n\form1.de_CH.qm \
 	apps\test\i18n\form1.ro_RO.qm \
@@ -136,9 +130,7 @@ I18NS = \
 	themes\windows\qtclient.de_CH.qm \
 	themes\windows\qtclient.ro_RO.qm \
 	themes\phone\qtclient.de_CH.qm \
-	themes\phone\qtclient.ro_RO.qm \
-	themes\eeepc\qtclient.de_CH.qm \
-	themes\eeepc\qtclient.ro_RO.qm
+	themes\phone\qtclient.ro_RO.qm
 
 local_all: $(I18NS)
 
