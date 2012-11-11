@@ -172,10 +172,10 @@ void PreferencesDialog::apply( )
 	prefs->setDataLoaderDir( m_dataLoaderDir->fileName( ) );
 	
 	prefs->storeSettings( );
-	
-	close( );
-	
+
 	emit prefsChanged( );
+	
+	accept( );	
 }
 
 void PreferencesDialog::cancel( )

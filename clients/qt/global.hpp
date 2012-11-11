@@ -14,4 +14,6 @@
 #define DEFAULT_UI_FORM_TRANSLATIONS_DIR "./apps/test/i18n"
 #define DEFAULT_DATA_LOADER_DIR "./apps/test/data"
 
+#define RESTART_CODE 1000
+
 #endif // _GLOBAL_HPP_INCLUDED

@@ -623,7 +623,10 @@ void MainWindow::on_actionExit_triggered( )
 void MainWindow::on_actionPreferences_triggered( )
 {
 	PreferencesDialog prefs( this );
-	prefs.exec( );	
+	if( prefs.exec( ) == QDialog::Accepted ) {
+		qDebug( ) << "Reloading application";
+		QApplication::instance( )->exit( RESTART_CODE );
+	}
 }
 
 void MainWindow::on_actionManageStorage_triggered( )

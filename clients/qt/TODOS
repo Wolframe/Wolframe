@@ -48,7 +48,6 @@
     - states (enable/disabled, read/write or read/only) can depend
       on states of other widgets, best example is a checked group
       box for a bunch of settings, see preferences dialog)
-- handle prefsChanged in a smart way, for now just restart the client
 - on connect ask always for connection data
 - add a init.ui form which is presented after successful login:
   - what to do on connection errors? back to the connect dialog for now
