@@ -257,6 +257,21 @@ static void printTransactionInput( std::ostream& out, const TransactionInput& in
 	out << std::endl;
 }
 
+void TesttraceTransaction::begin()
+{
+	throw std::runtime_error( "transactional context (begin) not implemented in testtrace database");
+}
+
+void TesttraceTransaction::commit()
+{
+	throw std::runtime_error( "transactional context (commit) not implemented in testtrace database");
+}
+
+void TesttraceTransaction::rollback()
+{
+	throw std::runtime_error( "transactional context (rollback) not implemented in testtrace database");
+}
+
 void TesttraceTransaction::execute()
 {
 	std::ofstream buf( m_dbref->outfilename().c_str());

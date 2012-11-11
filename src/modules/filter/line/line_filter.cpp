@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter_char_filter.cpp
-///\brief Filter implementation reading/writing character by character
+///\file line_filter.cpp
+///\brief Implementation of a filter reading/writing line by line
 
-#include "filter/char_filter.hpp"
+#include "line_filter.hpp"
 #include "textwolf/charset.hpp"
 #include "textwolf/sourceiterator.hpp"
 #include "textwolf/textscanner.hpp"
@@ -46,97 +46,7 @@ using namespace langbind;
 
 namespace {
 
-///\class InputFilterImpl
-///\brief input filter for single characters
-template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
-struct InputFilterImpl :public InputFilter
-{
-	typedef textwolf::TextScanner<textwolf::SrcIterator,IOCharset> TextScanner;
-
-	///\brief Constructor
-	InputFilterImpl( const IOCharset& iocharset_=IOCharset())
-		:m_itr( iocharset_)
-		,m_output(AppCharset())
-		,m_elembuf( m_elembufmem, sizeof(m_elembufmem))
-		,m_src(0)
-		,m_srcsize(0)
-		,m_srcend(false){}
-
-	///\brief Copy constructor
-	///\param [in] o output filter to copy
-	InputFilterImpl( const InputFilterImpl& o)
-		:InputFilter( o)
-		,m_itr(o.m_itr)
-		,m_output(o.m_output)
-		,m_elembuf( m_elembufmem, sizeof(m_elembufmem))
-		,m_src(o.m_src)
-		,m_srcsize(o.m_srcsize)
-		,m_srcend(o.m_srcend)
-	{
-		m_elembuf.resize( o.m_elembuf.size());
-		std::memcpy( m_elembufmem, o.m_elembufmem, o.m_elembuf.size());
-	}
-
-	///\brief self copy
-	///\return copy of this
-	virtual InputFilter* copy() const
-	{
-		return new InputFilterImpl( *this);
-	}
-
-	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
-	virtual void putInput( const void* ptr, std::size_t size, bool end)
-	{
-		m_src = (const char*)ptr;
-		m_srcend = end;
-		m_srcsize = size;
-		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, m_srcend));
-	}
-
-	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
-	{
-		std::size_t pos = m_itr.getPosition();
-		ptr = m_src + pos;
-		size = (m_srcsize > pos)?(m_srcsize - pos):0;
-		end = m_srcend;
-	}
-
-	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
-	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
-	{
-		setState( Open);
-		type = Value;
-		try
-		{
-			textwolf::UChar ch;
-			if ((ch = *m_itr) != 0)
-			{
-				++m_itr;
-				m_output.print( ch, m_elembuf);
-				element = m_elembuf.ptr();
-				elementsize = m_elembuf.size();
-				m_elembuf.clear();
-				return true;
-			}
-		}
-		catch (textwolf::SrcIterator::EoM)
-		{
-			setState( EndOfMessage);
-		}
-		return false;
-	}
-private:
-	TextScanner m_itr;			//< iterator on input
-	AppCharset m_output;			//< output
-	char m_elembufmem[16];
-	textwolf::StaticBuffer m_elembuf;
-	const char* m_src;			//< pointer to current chunk parsed
-	std::size_t m_srcsize;			//< size of the current chunk parsed in bytes
-	bool m_srcend;				//< true if end of message is in current chunk parsed
-};
-
 ///\class OutputFilterImpl
-///\brief output filter filter for single characters
 template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
 struct OutputFilterImpl :public OutputFilter
 {
@@ -194,7 +104,7 @@ struct OutputFilterImpl :public OutputFilter
 	///\param [in] element pointer to the element to print
 	///\param [in] elementsize size of the element to print in bytes
 	///\return true, if success, false else
-	bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
+	virtual bool print( typename OutputFilter::ElementType type, const void* element, std::size_t elementsize)
 	{
 		setState( Open);
 		if (m_elemitr < m_elembuf.size())
@@ -211,6 +121,7 @@ struct OutputFilterImpl :public OutputFilter
 		if (type == Value)
 		{
 			printToBuffer( (const char*)element, elementsize, m_elembuf);
+			m_output.print( '\n', m_elembuf);
 			if (!emptybuf())
 			{
 				setState( EndOfBuffer);
@@ -224,12 +135,134 @@ private:
 	std::size_t m_elemitr;				//< iterator to pass it to output
 	IOCharset m_output;
 };
+
+///\class InputFilterImpl
+template <class IOCharset, class AppCharset=textwolf::charset::UTF8>
+struct InputFilterImpl :public InputFilter
+{
+	typedef textwolf::TextScanner<textwolf::SrcIterator,IOCharset> TextScanner;
+
+	///\brief Constructor
+	InputFilterImpl( const IOCharset& iocharset_=IOCharset())
+		:m_itr(iocharset_)
+		,m_output(AppCharset())
+		,m_src(0)
+		,m_srcsize(0)
+		,m_srcend(false)
+		,m_srcclosed(false)
+		,m_linecomplete(false){}
+
+	///\brief Copy constructor
+	///\param [in] o output filter to copy
+	InputFilterImpl( const InputFilterImpl& o)
+		:InputFilter( o)
+		,m_itr(o.m_itr)
+		,m_output(o.m_output)
+		,m_elembuf(o.m_elembuf)
+		,m_src(o.m_src)
+		,m_srcsize(o.m_srcsize)
+		,m_srcend(o.m_srcend)
+		,m_srcclosed(o.m_srcclosed)
+		,m_linecomplete(o.m_linecomplete){}
+
+	///\brief self copy
+	///\return copy of this
+	virtual InputFilter* copy() const
+	{
+		return new InputFilterImpl( *this);
+	}
+
+	///\brief implement interface member InputFilter::putInput(const void*,std::size_t,bool)
+	virtual void putInput( const void* ptr, std::size_t size, bool end)
+	{
+		m_src = (const char*)ptr;
+		m_srcend = end;
+		m_srcsize = size;
+		m_itr.setSource( textwolf::SrcIterator( m_src, m_srcsize, m_srcend));
+	}
+
+	virtual void getRest( const void*& ptr, std::size_t& size, bool& end)
+	{
+		std::size_t pos = m_itr.getPosition();
+		ptr = m_src + pos;
+		size = (m_srcsize > pos)?(m_srcsize - pos):0;
+		end = m_srcend;
+	}
+
+	///\brief implement interface member InputFilter::getNext( typename InputFilter::ElementType&,const void*&,std::size_t&)
+	virtual bool getNext( typename InputFilter::ElementType& type, const void*& element, std::size_t& elementsize)
+	{
+		if (m_linecomplete)
+		{
+			m_elembuf.clear();
+			m_linecomplete = false;
+		}
+		setState( Open);
+		type = Value;
+		try
+		{
+			textwolf::UChar ch;
+			while ((ch = *m_itr) != 0)
+			{
+				if (ch == '\r')
+				{
+					++m_itr;
+					continue;
+				}
+				if (ch == '\n')
+				{
+					element = m_elembuf.c_str();
+					elementsize = m_elembuf.size();
+					++m_itr;
+					m_linecomplete = true;
+					return true;
+				}
+				else
+				{
+					m_output.print( ch, m_elembuf);
+					++m_itr;
+				}
+			}
+			if (m_elembuf.size() != 0)
+			{
+				element = m_elembuf.c_str();
+				elementsize = m_elembuf.size();
+				m_linecomplete = true;
+				return true;
+			}
+			else if (!m_srcclosed)
+			{
+				type = InputFilter::CloseTag;
+				element = 0;
+				elementsize = 0;
+				m_srcclosed = true;
+				return true;
+			}
+		}
+		catch (textwolf::SrcIterator::EoM)
+		{
+			setState( EndOfMessage);
+		}
+		return false;
+	}
+private:
+	TextScanner m_itr;		//< iterator on source
+	AppCharset m_output;		//< output
+	std::string m_elembuf;		//< buffer for current line
+	const char* m_src;		//< pointer to current chunk parsed
+	std::size_t m_srcsize;		//< size of the current chunk parsed in bytes
+	bool m_srcend;			//< true if end of message is in current chunk parsed
+	bool m_srcclosed;		//< true if the finishing close tag has been returned
+	bool m_linecomplete;		//< true if the last getNext could complete a line
+};
+
 }//end anonymous namespace
 
 
-struct CharFilter :public Filter
+class LineFilter :public Filter
 {
-	CharFilter( const char *encoding=0)
+public:
+	LineFilter( const char *encoding=0)
 	{
 		if (!encoding)
 		{
@@ -316,18 +349,20 @@ struct CharFilter :public Filter
 	}
 };
 
-Filter _Wolframe::langbind::createCharFilter( const std::string& name, const std::string& arg)
+
+Filter _Wolframe::langbind::createLineFilter( const std::string& name, const std::string& arg)
 {
-	const char* filterbasename = "char";
+	const char* filterbasename = "line";
 	std::string nam( name);
 	std::transform( nam.begin(), nam.end(), nam.begin(), ::tolower);
-	if (nam != filterbasename) throw std::runtime_error( "char filter name does not match");
-	if (arg.empty()) return CharFilter();
+	if (nam != filterbasename) throw std::runtime_error( "line filter name does not match");
+	if (arg.empty()) return LineFilter();
 	const char* encoding = arg.c_str();
-	return CharFilter( encoding);
+	return LineFilter( encoding);
 }
 
-Filter* _Wolframe::langbind::createCharFilterPtr( const std::string& name, const std::string& arg)
+Filter* _Wolframe::langbind::createLineFilterPtr( const std::string& name, const std::string& arg)
 {
-	return new Filter( createCharFilter( name, arg));
+	return new Filter( createLineFilter( name, arg));
 }
+

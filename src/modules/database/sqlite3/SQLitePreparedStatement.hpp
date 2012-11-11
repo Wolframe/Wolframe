@@ -50,7 +50,7 @@ namespace db {
 struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 {
 	///\brief Constructor
-	PreparedStatementHandler_sqlite3( sqlite3* conn, const types::keymap<std::string>* stmmap);
+	PreparedStatementHandler_sqlite3( sqlite3* conn, const types::keymap<std::string>* stmmap, bool inTransactionContext=false);
 
 	///\brief Destructor
 	virtual ~PreparedStatementHandler_sqlite3();

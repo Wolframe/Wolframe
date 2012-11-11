@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/cmdbind/mod_command_directmap.cpp
+///\file mod_command_directmap.cpp
 ///\brief Module for command handler executing direct mappings to transactions or functions
 #include "module/scriptCommandHandlerBuilder.hpp"
-#include "cmdbind/directmapCommandHandler.hpp"
+#include "directmapCommandHandler.hpp"
 #include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

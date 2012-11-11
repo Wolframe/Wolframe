@@ -25,7 +25,7 @@ DYNAMIC_MODULE = \
 	mod_filter_textwolf.dll
 
 CPP_OBJS = \
-	filter_textwolf_filter.obj \
+	textwolf_filter.obj \
 	mod_filter_textwolf.obj
 
 all: $(DYNAMIC_MODULE)

@@ -63,6 +63,9 @@ public:
 	}
 
 	virtual void execute();
+	virtual void begin();
+	virtual void commit();
+	virtual void rollback();
 
 	virtual void putInput( const TransactionInput& input_)		{m_input = input_;}
 	virtual const TransactionOutput& getResult() const		{return m_output;}

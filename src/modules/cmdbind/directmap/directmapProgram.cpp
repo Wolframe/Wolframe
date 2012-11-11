@@ -32,7 +32,7 @@
 ************************************************************************/
 ///\brief Implementation of directmap programs
 ///\file directmapProgram.cpp
-#include "langbind/directmapProgram.hpp"
+#include "directmapProgram.hpp"
 #include "utils/miscUtils.hpp"
 #include "config/programBase.hpp"
 #include <stdexcept>

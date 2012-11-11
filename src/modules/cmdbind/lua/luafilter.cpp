@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter_luafilter.cpp
-///\brief implementation of lua filters
-#include "filter/luafilter.hpp"
+///\file luafilter.cpp
+///\brief Implementation of lua filters (serialization/deserialization of lua tables)
+#include "luafilter.hpp"
 #include "luaDebug.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>

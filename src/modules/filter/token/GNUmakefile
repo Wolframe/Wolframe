@@ -21,7 +21,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_filter_token.so
 
 CPP_OBJS = \
-	filter_token_filter.o \
+	token_filter.o \
 	mod_filter_token.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

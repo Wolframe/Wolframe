@@ -29,7 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#include "cmdbind/luaCommandHandler.hpp"
+///\file luaCommandHandler.hpp
+///\brief Implementation of the lua command handler
+#include "luaCommandHandler.hpp"
 #include "luaDebug.hpp"
 #include "langbind/appObjects.hpp"
 #include "luaObjects.hpp"
@@ -50,6 +52,50 @@ using namespace _Wolframe;
 using namespace langbind;
 using namespace cmdbind;
 
+void LuaCommandHandler::initcall()
+{
+	if (!m_ctx->funcmap.getLuaScriptInstance( m_name, m_interp))
+	{
+		throw std::runtime_error( std::string( "unknown lua script '") + m_name + "'");
+	}
+	if (!m_ctx->funcmap.initLuaScriptInstance( m_interp.get(), Input(m_inputfilter), Output(m_outputfilter), m_provider))
+	{
+		throw std::runtime_error( std::string( "error initializing lua script '") + m_name + "'");
+	}
+	if (!m_ctx->defaultfilter().empty())
+	{
+		types::CountedReference<langbind::Filter> filter( m_provider->filter( m_ctx->defaultfilter(), ""));
+		if (!filter.get())
+		{
+			throw std::runtime_error( std::string( "filter not defined '") + m_ctx->defaultfilter() + "'");
+		}
+		if (!filter->inputfilter().get())
+		{
+			throw std::runtime_error( std::string( "input filter not defined '") + m_ctx->defaultfilter() + "'");
+		}
+		if (m_inputfilter.get())
+		{
+			setFilterAs( filter->inputfilter());
+		}
+		else
+		{
+			m_inputfilter = filter->inputfilter();
+		}
+		if (!filter->outputfilter().get())
+		{
+			throw std::runtime_error( std::string( "output filter not defined '") + m_ctx->defaultfilter() + "'");
+		}
+		if (m_outputfilter.get())
+		{
+			setFilterAs( filter->outputfilter());
+		}
+		else
+		{
+			m_outputfilter = filter->outputfilter();
+		}
+	}
+}
+
 LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 {
 	int rt = 0;
@@ -60,16 +106,7 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	{
 		try
 		{
-			if (!m_ctx->funcmap.getLuaScriptInstance( m_name, m_interp))
-			{
-				LOG_ERROR << "unknown lua script '" << m_name << "'";
-				return Error;
-			}
-			if (!m_ctx->funcmap.initLuaScriptInstance( m_interp.get(), Input(m_inputfilter), Output(m_outputfilter), m_provider))
-			{
-				LOG_ERROR << "error initializing lua script '" << m_name << "'";
-				return Error;
-			}
+			initcall();
 		}
 		catch (const std::exception& e)
 		{

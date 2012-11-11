@@ -95,7 +95,6 @@ bool ProcProviderConfig::parse( const config::ConfigurationTree& pt, const std::
 							delete conf;
 							retVal = false;
 						}
-						break;
 					}
 				}
 				if (!builder)

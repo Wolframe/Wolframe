@@ -52,14 +52,25 @@ struct LuaScriptContext
 
 	void load( const std::vector<std::string>& prgfiles_, const module::ModulesDirectory* modules);
 
+	void setDefaultFilter( const std::string& defaultfilter_)
+	{
+		m_defaultfilter = defaultfilter_;
+	}
+
 	///\brief Get the list of commands
 	std::list<std::string> commands() const
 	{
 		return funcmap.commands();
 	}
 
+	const std::string& defaultfilter() const
+	{
+		return m_defaultfilter;
+	}
+
 private:
 	std::vector<module::LuaExtensionConstructor*> m_objects;
+	std::string m_defaultfilter;
 
 private:
 	LuaScriptContext( const LuaScriptContext&) :funcmap(&modulemap){}	//non copyable

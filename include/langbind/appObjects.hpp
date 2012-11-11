@@ -273,7 +273,7 @@ class TransactionFunctionClosure
 public:
 	///\brief Constructor
 	///\param[in] f function called
-	TransactionFunctionClosure( const proc::ProcessorProvider* provider_, const db::TransactionFunction* f);
+	TransactionFunctionClosure( const proc::ProcessorProvider* provider_, const db::TransactionFunction* f, const db::TransactionR& t=db::TransactionR());
 
 	///\brief Copy constructor
 	///\param[in] o copied item
@@ -300,6 +300,7 @@ private:
 	db::TransactionFunctionInput* m_inputstructptr;	//< input structure implementation interface
 	TypedOutputFilterR m_inputstruct;		//< input structure
 	TypedInputFilterR m_result;			//< function call result
+	db::TransactionR m_transaction;			//< transaction context, created in the transaction (autocommit) if not defined
 };
 
 ///\class PrintFunctionClosure

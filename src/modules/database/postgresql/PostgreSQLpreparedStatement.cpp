@@ -45,8 +45,8 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-PreparedStatementHandler_postgres::PreparedStatementHandler_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_)
-	:m_state(Init)
+PreparedStatementHandler_postgres::PreparedStatementHandler_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext)
+	:m_state(inTransactionContext?Transaction:Init)
 	,m_conn(conn_)
 	,m_stmmap(stmmap_)
 	,m_lastresult(0)

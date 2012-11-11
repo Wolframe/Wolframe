@@ -1,4 +1,4 @@
-#include "filter/libxml2_filter.hpp"
+#include "libxml2_filter.hpp"
 #include "filter/bufferingfilter.hpp"
 #include "types/doctype.hpp"
 #include "types/countedReference.hpp"

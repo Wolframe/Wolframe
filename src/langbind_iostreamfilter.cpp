@@ -266,8 +266,26 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 		{
 			cmdbind::CommandHandlerR cmdhnd( hnd);
 			hnd->passParameters( proc, 0, 0);
-			hnd->setFilter( flt.inputfilter());
-			hnd->setFilter( flt.outputfilter());
+			// Take the input filter defined in the command handler if not passed as parameter:
+			if (ifl.empty() && hnd->inputfilter().get())
+			{
+				flt.inputfilter() = hnd->inputfilter();
+			}
+			else
+			{
+				hnd->setFilter( flt.inputfilter());
+			}
+			// Take the output filter defined in the command handler if not passed as parameter:
+			if (ofl.empty() && hnd->outputfilter().get())
+			{
+				flt.outputfilter() = hnd->outputfilter();
+				hnd->outputfilter()->setOutputBuffer( buf.outbuf, buf.outsize);
+			}
+			else
+			{
+				hnd->setFilter( flt.outputfilter());
+			}
+			// Processing:
 			const char* errmsg;
 			cmdbind::IOFilterCommandHandler::CallResult res;
 

@@ -45,6 +45,7 @@
 #include "config/configurationBase.hpp"
 #include "constructor.hpp"
 #include "objectPool.hpp"
+#include "types/countedReference.hpp"
 
 #ifdef _WIN32
 #pragma warning(disable:4250)
@@ -108,13 +109,23 @@ public:
 	virtual const TransactionOutput& getResult() const		{return m_output;}
 
 	virtual void execute();
-
+	virtual void begin();
+	virtual void commit();
+	virtual void rollback();
 	virtual void close();
+
 private:
-	PostgreSQLdatabase&	m_db;		///< parent database
-	PostgreSQLdbUnit&	m_unit;		///< parent database unit
-	TransactionInput	m_input;	///< input data structure
-	TransactionOutput	m_output;	///< output data structure
+	void execute_statement( const char* statement);
+	void execute_with_autocommit();
+	void execute_transaction_operation();
+
+private:
+	PostgreSQLdatabase&	m_db;		//< parent database
+	PostgreSQLdbUnit&	m_unit;		//< parent database unit
+	TransactionInput	m_input;	//< input data structure
+	TransactionOutput	m_output;	//< output data structure
+	typedef types::CountedReference<PoolObject<PGconn*> > Connection;
+	Connection m_conn;			//< connection object from pool
 };
 
 

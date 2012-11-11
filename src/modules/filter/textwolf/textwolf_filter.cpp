@@ -29,9 +29,9 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter_textwolf_filter.cpp
+///\file textwolf_filter.cpp
 ///\brief Filter implementation reading/writing xml with the textwolf xml library
-#include "filter/textwolf_filter.hpp"
+#include "textwolf_filter.hpp"
 #include "types/doctype.hpp"
 #include "textwolf/sourceiterator.hpp"
 #include "textwolf/xmlparser.hpp"
@@ -210,7 +210,6 @@ struct InputFilterImpl:public InputFilter
 				const char* ee;
 				textwolf::XMLScannerBase::ElementType et = m_parser.getNext( ee, elementsize);
 				element = (const void*)ee;
-
 				int st = tmap[ et];
 				if (st < 0)
 				{

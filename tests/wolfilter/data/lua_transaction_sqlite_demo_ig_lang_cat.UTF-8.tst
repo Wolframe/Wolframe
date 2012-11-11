@@ -182,7 +182,7 @@ CREATE TABLE tree (
 --
 TRANSACTION treeAddRoot -- (/node/name)
 BEGIN
-	FOREACH /node DO INSERT INTO tree (parent, name, lft, rgt) VALUES (0, $(name), 1, 2);
+	DO INSERT INTO tree (ID, parent, name, lft, rgt) VALUES (1, 0, $(/node/name), 1, 2);
 END
 
 --
@@ -190,10 +190,11 @@ END
 --
 TRANSACTION treeAddNode -- (/node/parentid, /node/name)
 BEGIN
-	FOREACH /node DO NONEMPTY SELECT rgt FROM tree WHERE ID = $(parentid);
+	DO NONEMPTY UNIQUE SELECT rgt FROM tree WHERE ID = $(/node/parentid);
 	DO UPDATE tree SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE tree SET lft = lft + 2 WHERE lft > $1;
-	FOREACH /node DO INSERT INTO tree (parent, name, lft, rgt) VALUES ($(parentid), $(name), $1, $1+1);
+	DO INSERT INTO tree (parent, name, lft, rgt) VALUES ($(/node/parentid), $(/node/name), $1, $1+1);
+	INTO . DO NONEMPTY UNIQUE SELECT ID from tree WHERE lft = $1;
 END
 
 --
@@ -297,7 +298,6 @@ end
 
 function insert_node( parentname, name)
 	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
-	logger.printc( "treeAddNode ", parentid, " ", parentname, " ", name)
 	formfunction( "treeAddNode")( { node = { name=name, parentid=parentid} } )
 end
 
@@ -473,12 +473,14 @@ end
 function run()
 	filter().empty = false
 	output:opentag( "result")
+	transaction:begin( "insert")
 	local itr = input:get()
 	for v,t in itr do
 		if t == "class" then
 			insert_tree( idcnt, scope( itr))
 		end
 	end
+	transaction:commit()
 	print_tree( get_tree( 1), 1, "")
 	select_subtree( "italic")
 	select_subtree( "brythonic")

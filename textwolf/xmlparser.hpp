@@ -121,6 +121,15 @@ struct XMLParserObject
 	{
 		This* obj = (This*)obj_;
 		XMLScannerBase::ElementType rt = obj->nextItem();
+		if (rt == XMLScannerBase::ErrorOccurred)
+		{
+			obj->getError( &elemptr);
+			if (elemptr)
+			{
+				elemsize = std::strlen( elemptr);
+				return rt;
+			}
+		}
 		elemptr = obj->getItem();
 		elemsize = obj->getItemSize();
 		return rt;

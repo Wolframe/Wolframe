@@ -24,7 +24,7 @@ DYNAMIC_MODULE = \
 	mod_filter_line.dll
 
 CPP_OBJS = \
-	filter_line_filter.obj \
+	line_filter.obj \
 	mod_filter_line.obj
 
 all: $(DYNAMIC_MODULE)

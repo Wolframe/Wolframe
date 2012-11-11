@@ -35,7 +35,7 @@ LUA_CPP_OBJS = \
 
 CPP_OBJS = \
 	$(LUA_CPP_OBJS) \
-	cmdbind_luaCommandHandler.o \
+	luaCommandHandler.o \
 	mod_command_lua.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

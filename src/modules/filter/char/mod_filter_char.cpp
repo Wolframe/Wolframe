@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/filter/char/mod_filter_char.cpp
+///\file mod_filter_char.cpp
 ///\brief Module for char filters
 #include "module/filterBuilder.hpp"
-#include "filter/char_filter.hpp"
+#include "char_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 

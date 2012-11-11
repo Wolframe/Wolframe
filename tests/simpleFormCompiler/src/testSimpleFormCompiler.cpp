@@ -33,7 +33,7 @@ Project Wolframe.
 #include "utils/miscUtils.hpp"
 #include "ddl/atomicType.hpp"
 #include "ddl/structType.hpp"
-#include "ddl/compiler/simpleFormCompiler.hpp"
+#include "modules/ddlcompiler/simpleform/simpleFormCompiler.hpp"
 #include "modules/normalize/number/integerNormalizeFunction.hpp"
 #include "modules/normalize/number/floatNormalizeFunction.hpp"
 #include <boost/property_tree/ptree.hpp>

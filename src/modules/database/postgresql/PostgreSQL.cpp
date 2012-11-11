@@ -364,18 +364,47 @@ const std::string& PostgreSQLtransaction::databaseID() const
 	return m_unit.ID();
 }
 
-void PostgreSQLtransaction::execute()
+void PostgreSQLtransaction::execute_statement( const char* statement)
 {
-	try	{
-		_Wolframe::PoolObject<  PGconn* > conn( m_unit.m_connPool );
-		int ver = PQprotocolVersion( *conn );
-		MOD_LOG_DEBUG << "PostgreSQL protocol version: " << ver;
-	}
-	catch ( _Wolframe::ObjectPoolTimeout )
+	if (!m_conn.get()) throw std::runtime_error( "executing transaction statement without transaction context");
+	std::ostringstream msg;
+	bool success = true;
+	PGresult* res = PQexec( **m_conn, statement);
+	if (PQresultStatus( res) != PGRES_COMMAND_OK)
 	{
+		const char* statusType = PQresStatus( PQresultStatus( res));
+		const char* errmsg = PQresultErrorMessage( res);
+		success = false;
+		msg << "PostgreSQL status " << (statusType?statusType:"unknown");
+		msg << "; message: '" << (errmsg?errmsg:"unknown") << "'";
 	}
-	try	{
-		_Wolframe::PoolObject< PGconn* > conn( m_unit.m_connPool);
+	PQclear( res);
+	if (!success) throw std::runtime_error( msg.str());
+}
+
+void PostgreSQLtransaction::begin()
+{
+	m_conn.reset( new PoolObject<PGconn*>( m_unit.m_connPool));
+	execute_statement( "BEGIN;");
+}
+
+void PostgreSQLtransaction::commit()
+{
+	execute_statement( "COMMIT;");
+	m_conn.reset();
+}
+
+void PostgreSQLtransaction::rollback()
+{
+	execute_statement( "ROLLBACK;");
+	m_conn.reset();
+}
+
+void PostgreSQLtransaction::execute_with_autocommit()
+{
+	try
+	{
+		PoolObject<PGconn*> conn( m_unit.m_connPool);
 		PreparedStatementHandler_postgres ph( *conn, m_unit.stmmap());
 		try
 		{
@@ -384,25 +413,57 @@ void PostgreSQLtransaction::execute()
 			||  !ph.commit())
 			{
 				const char* err = ph.getLastError();
-				MOD_LOG_ERROR << "error in sqlite database transaction: " << (err?err:"unknown error");
-				ph.rollback();
-				throw std::runtime_error( std::string("transaction failed: ") + (err?err:"unknown error"));
+				throw std::runtime_error(err?err:"unknown error");
 			}
 		}
 		catch (const std::runtime_error& e)
 		{
-			MOD_LOG_ERROR << "error in sqlite database transaction: " << e.what();
+			MOD_LOG_ERROR << "error in postgres database transaction: " << e.what();
 			ph.rollback();
 			throw std::runtime_error( std::string("transaction failed: ") + e.what());
 		}
 	}
 	catch ( _Wolframe::ObjectPoolTimeout )
 	{
+		throw std::runtime_error("timeout in database connection pool object allocation");
+	}
+}
+
+void PostgreSQLtransaction::execute_transaction_operation()
+{
+	PreparedStatementHandler_postgres ph( **m_conn.get(), m_unit.stmmap(), true);
+	try
+	{
+		if (!ph.doTransaction( m_input, m_output))
+		{
+			const char* err = ph.getLastError();
+			throw std::runtime_error(err?err:"unknown error");
+		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		MOD_LOG_ERROR << "error in postgres database transaction operation: " << e.what();
+		ph.rollback();
+		throw std::runtime_error( std::string("transaction operation failed: ") + e.what());
+	}
+}
+
+void PostgreSQLtransaction::execute()
+{
+	if (m_conn.get())
+	{
+		execute_transaction_operation();
+	}
+	else
+	{
+		execute_with_autocommit();
 	}
 }
 
 void PostgreSQLtransaction::close()
 {
+	if (m_conn.get()) MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
+	m_conn.reset();
 	m_db.closeTransaction( this );
 }
 

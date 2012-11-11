@@ -31,5 +31,5 @@ Project Wolframe.
 ************************************************************************/
 ///\file simpleFormCompiler.cpp
 ///\brief Reference code that is used as module and not in a library
-#include "modules/ddlcompiler/simpleform/ddl_compiler_simpleFormCompiler.cpp"
+#include "modules/ddlcompiler/simpleform/simpleFormCompiler.cpp"
 

@@ -88,8 +88,18 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					for (std::list<std::string>::const_iterator cmdIt = cmds.begin(); cmdIt != cmds.end(); cmdIt++)
 					{
 						std::string opName = boost::algorithm::to_upper_copy( *cmdIt );
-						m_cmdMap[ opName ] = std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*>( cnstrctr, *it);
-
+						CmdMap::const_iterator ci = m_cmdMap.find( opName);
+						if (ci != m_cmdMap.end())
+						{
+							const char* c1 = ci->second.second->className();
+							const char* c2 = (*it)->className();
+							LOG_ERROR << "Duplicate definition of command '" << opName << "' (in '" << c1 << "' and in '" << c2 << "')";
+							throw std::runtime_error( "duplicate command definition");
+						}
+						else
+						{
+							m_cmdMap[ opName ] = std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*>( cnstrctr, *it);
+						}
 						LOG_TRACE << "Command '" << opName << "' registered for '" << cnstrctr->objectClassName() << "' command handler";
 					}
 				}

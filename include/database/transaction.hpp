@@ -38,7 +38,7 @@
 #define _TRANSACTION_HPP_INCLUDED
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
-
+#include "types/countedReference.hpp"
 #include <string>
 
 namespace _Wolframe {
@@ -47,17 +47,17 @@ namespace db {
 struct Transaction
 {
 	virtual ~Transaction(){}
-
 	virtual const std::string& databaseID() const = 0;
-
 	virtual void execute() = 0;
-
 	virtual void putInput( const TransactionInput& input) = 0;
-
 	virtual const TransactionOutput& getResult() const = 0;
-
 	virtual void close() = 0;
+	virtual void begin() = 0;
+	virtual void commit() = 0;
+	virtual void rollback() = 0;
 };
+
+typedef types::CountedReference<Transaction> TransactionR;
 
 }} // namespace _Wolframe::db
 

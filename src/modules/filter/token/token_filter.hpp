@@ -29,28 +29,28 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/compiler/simpleFormCompiler.hpp
-///\brief interface for a compiler of a self defined DDL for forms
+///\file token_filter.hpp
+///\brief Filter reading/writing the tokens of a filter input/output for debugging purposes
 
-#ifndef _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
-#define _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
-#include <string>
-#include "ddl/structType.hpp"
-#include "ddl/compilerInterface.hpp"
+#ifndef _Wolframe_FILTER_TOKEN_HPP_INCLUDED
+#define _Wolframe_FILTER_TOKEN_HPP_INCLUDED
+#include "filter/filter.hpp"
 
 namespace _Wolframe {
-namespace ddl {
+namespace langbind {
 
-class SimpleFormCompiler :public DDLCompiler
+enum TokenType
 {
-public:
-	SimpleFormCompiler() :DDLCompiler( "simpleform") {}
-
-	///\brief Compile a source from a string. See DDLCompiler::compile( const std::string&, const TypeMap*) const
-	virtual Form compile( const std::string& srcstring, const TypeMap* typemap) const;
+	TokenOpenTag='>',
+	TokenCloseTag='<',
+	TokenAttribute='@',
+	TokenValue='=',
+	TokenNextLine='.'
 };
 
-DDLCompiler* createSimpleFormCompilerFunc();
+Filter createTokenFilter( const std::string& name, const std::string& arg);
+Filter* createTokenFilterPtr( const std::string& name, const std::string& arg);
 
-}}
+}}//namespace
 #endif
+

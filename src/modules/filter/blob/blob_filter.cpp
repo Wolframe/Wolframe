@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter_blob_filter.cpp
+///\file blob_filter.cpp
 ///\brief Filter implementation reading/writing of uninterpreted binary data
 
-#include "filter/blob_filter.hpp"
+#include "blob_filter.hpp"
 #include <cstring>
 #include <cstddef>
 #include <algorithm>

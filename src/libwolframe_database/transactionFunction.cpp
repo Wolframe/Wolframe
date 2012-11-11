@@ -937,10 +937,19 @@ struct TransactionFunctionOutput::Impl
 					m_state = 2;
 					continue;
 				}
-				m_state = 4;
-				type = TypedInputFilter::OpenTag;
-				element = m_resitr->columnName( m_colidx);
-				return true;
+				if ((*m_rowitr)[ m_colidx])
+				{
+					m_state = 4;
+					type = TypedInputFilter::OpenTag;
+					element = m_resitr->columnName( m_colidx);
+					return true;
+				}
+				else
+				{
+					m_state = 6;
+					++m_colidx;
+					continue;
+				}
 			case 4:
 				m_state = 5;
 				type = TypedInputFilter::Value;

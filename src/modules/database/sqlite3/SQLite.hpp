@@ -102,13 +102,23 @@ public:
 	virtual const TransactionOutput& getResult() const		{return m_output;}
 
 	virtual void execute();
-
+	virtual void begin();
+	virtual void commit();
+	virtual void rollback();
 	virtual void close();
+
 private:
-	SQLiteDatabase&		m_db;		///< parent database
-	SQLiteDBunit&		m_unit;		///< parent database unit
-	TransactionInput	m_input;	///< input data structure
-	TransactionOutput	m_output;	///< output data structure
+	void execute_statement( const char* stmstr);
+	void execute_with_autocommit();
+	void execute_transaction_operation();
+
+private:
+	SQLiteDatabase&		m_db;		//< parent database
+	SQLiteDBunit&		m_unit;		//< parent database unit
+	TransactionInput	m_input;	//< input data structure
+	TransactionOutput	m_output;	//< output data structure
+	typedef types::CountedReference<PoolObject<sqlite3*> > Connection;
+	Connection m_conn;			//< connection object from pool
 };
 
 

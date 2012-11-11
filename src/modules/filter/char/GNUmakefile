@@ -20,7 +20,7 @@ INCLUDE_LIBS =
 DYNAMIC_MODULE = mod_filter_char.so
 
 CPP_OBJS = \
-	filter_char_filter.o \
+	char_filter.o \
 	mod_filter_char.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

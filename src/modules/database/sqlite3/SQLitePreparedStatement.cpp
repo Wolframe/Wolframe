@@ -47,8 +47,8 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* conn, const types::keymap<std::string>* stmmap)
-	:m_state(Init)
+PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* conn, const types::keymap<std::string>* stmmap, bool inTransactionContext)
+	:m_state(inTransactionContext?Transaction:Init)
 	,m_conn(conn)
 	,m_stmmap(stmmap)
 	,m_hasResult(false)
@@ -104,7 +104,7 @@ bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, S
 	const char *stmtail;
 	int rc = sqlite3_prepare_v2( m_conn, stmstr, -1, &inst, &stmtail);
 
-	if (rc != SQLITE_OK) return status( rc, newstate);
+	if (rc != SQLITE_OK && rc != SQLITE_DONE) return status( rc, newstate);
 
 	if (stmtail != 0)
 	{
@@ -119,6 +119,9 @@ bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, S
 
 bool PreparedStatementHandler_sqlite3::begin()
 {
+#ifdef LOWLEVEL_DEBUG
+	std::cerr << "CALL begin()" << std::endl;
+#endif
 	if (m_state != Init)
 	{
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
@@ -128,6 +131,9 @@ bool PreparedStatementHandler_sqlite3::begin()
 
 bool PreparedStatementHandler_sqlite3::commit()
 {
+#ifdef LOWLEVEL_DEBUG
+	std::cerr << "CALL commit()" << std::endl;
+#endif
 	if (m_state != Executed)
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
@@ -137,6 +143,9 @@ bool PreparedStatementHandler_sqlite3::commit()
 
 bool PreparedStatementHandler_sqlite3::rollback()
 {
+#ifdef LOWLEVEL_DEBUG
+	std::cerr << "CALL rollback()" << std::endl;
+#endif
 	bool rt = executeInstruction( "ROLLBACK TRANSACTION;", Init);
 	clear();
 	return rt;

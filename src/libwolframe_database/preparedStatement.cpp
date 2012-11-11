@@ -125,6 +125,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 	TransactionInput::cmd_iterator ci = input.begin(), ce = input.end();
 	for (; ci != ce; ++ci)
 	{
+
 		if (!start( ci->name())) return false;
 		bool nonempty = input.hasNonemptyResult( ci->functionidx());
 		bool unique = input.hasUniqueResult( ci->functionidx());

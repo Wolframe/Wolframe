@@ -29,28 +29,26 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/token_filter.hpp
-///\brief Filter reading/writing the tokens of a filter input/output for debugging purposes
+///\file textwolf_filter.hpp
+///\brief Filter reading/writing xml with the textwolf xml library
 
-#ifndef _Wolframe_FILTER_TOKEN_HPP_INCLUDED
-#define _Wolframe_FILTER_TOKEN_HPP_INCLUDED
+#ifndef _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
+#define _Wolframe_TEXTWOLF_FILTER_XML_HPP_INCLUDED
+
 #include "filter/filter.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-enum TokenType
-{
-	TokenOpenTag='>',
-	TokenCloseTag='<',
-	TokenAttribute='@',
-	TokenValue='=',
-	TokenNextLine='.'
-};
+Filter createTextwolfXmlFilter( const std::string& name, const std::string& arg);
+Filter* createTextwolfXmlFilterPtr( const std::string& name, const std::string& arg);
 
-Filter createTokenFilter( const std::string& name, const std::string& arg);
-Filter* createTokenFilterPtr( const std::string& name, const std::string& arg);
 
 }}//namespace
 #endif
+
+
+
+
+
 

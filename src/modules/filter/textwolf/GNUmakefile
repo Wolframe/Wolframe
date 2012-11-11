@@ -21,7 +21,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_filter_textwolf.so
 
 CPP_OBJS = \
-	filter_textwolf_filter.o \
+	textwolf_filter.o \
 	mod_filter_textwolf.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

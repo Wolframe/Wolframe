@@ -47,6 +47,7 @@ struct Line
 {
 	const char* ptr;
 	size_t size;
+	size_t size_with_eoln;
 };
 
 struct Buffer
@@ -160,6 +161,7 @@ static bool getLine( Line* line, const char* baseptr, size_t* pos, size_t size, 
 	for (ii = 0; ii < nn && line->ptr[ii] != '\n'; ++ii);
 	if (ii < nn)
 	{
+		line->size_with_eoln = ii+1;
 		if (!withCR && ii > 0 && line->ptr[ii-1] == '\r')
 		{
 			line->size = ii-1;
@@ -201,9 +203,9 @@ static void getLineSplit_space( LineSplit& split, const Line& line, size_t max_n
 	{
 		if (split.line[ii] >= 0 && split.line[ii] <= 32)
 		{
-			split.line[ii] = 0;
-			if (split.size == MAX_LINESPLIT_SIZE) throw std::runtime_error( "too many elements in protocol line");
 			if (split.size == max_nof_elements) return;
+			if (split.size == MAX_LINESPLIT_SIZE) throw std::runtime_error( "too many elements in protocol line");
+			split.line[ii] = 0;
 			for (; ii < split.linesize && split.line[ii] >= 0 && split.line[ii] <= 32; ++ii);
 			if (ii == split.linesize) return;
 			split.ptr[ split.size++] = split.line + ii;
@@ -219,11 +221,11 @@ static bool getContentUnescaped( Buffer* docbuffer, char* baseptr, size_t* pos, 
 		if (line.ptr[0] == '.')
 		{
 			if (line.size == 1) return true;
-			docbuffer->append( line.ptr+1, line.size-1);
+			docbuffer->append( line.ptr+1, line.size_with_eoln-1);
 		}
 		else
 		{
-			docbuffer->append( line.ptr, line.size);
+			docbuffer->append( line.ptr, line.size_with_eoln);
 		}
 	}
 	return false;
@@ -238,11 +240,11 @@ static void getContentEscaped( Buffer* docbuffer, const char* ptr, size_t size)
 		if (line.ptr[0] == '.')
 		{
 			docbuffer->append( line.ptr, 1);
-			docbuffer->append( line.ptr, line.size);
+			docbuffer->append( line.ptr, line.size_with_eoln);
 		}
 		else
 		{
-			docbuffer->append( line.ptr, line.size);
+			docbuffer->append( line.ptr, line.size_with_eoln);
 		}
 	}
 	docbuffer->append( "\r\n.\r\n", 5);
@@ -487,7 +489,6 @@ public:
 
 		for (;;)
 		{
-/*[-]*/		std::cerr << "STATE " << ProtocolState::name(state()) << std::endl;
 		switch (state())
 		{
 			case ProtocolState::INIT:

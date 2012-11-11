@@ -30,37 +30,43 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/ddlcompiler/mod_ddlcompiler_simpleform.cpp
-///\brief Module for testing form functions
-#include "module/ddlcompilerBuilder.hpp"
-#include "simpleFormCompiler.hpp"
-#include "logger-v1.hpp"
-
-_Wolframe::log::LogBackend* logBackendPtr;
+///\brief Implementation of the transaction output
+///\file transactionOutput.cpp
+#include "database/transactionOutput.hpp"
+#include <iostream>
+#include <sstream>
+#include <string>
 
 using namespace _Wolframe;
-using namespace _Wolframe::module;
+using namespace _Wolframe::db;
 
-static void setModuleLogger( void* logger )
+std::string TransactionOutput::tostring() const
 {
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
-
-namespace {
-struct SimpleformDDLCompiler
-{
-	static SimpleBuilder* constructor()
+	std::ostringstream rt;
+	result_iterator ri = begin(), re = end();
+	for (; ri != re; ++ri)
 	{
-		return new DDLCompilerBuilder( "ddl::SimpleFormCompiler", "simpleform", ddl::createSimpleFormCompilerFunc);
+		std::size_t ci = 0,ce = ri->nofColumns();
+		rt << "RESULT " << ri->functionidx() << " COLUMNS " << ce << ":";
+		for (; ci<ce; ++ci) rt << " " << ri->columnName( ci);
+		rt << std::endl;
+		row_iterator wi = ri->begin(), we = ri->end();
+		for (;wi != we; ++wi)
+		{
+			rt << ">";
+			for (ci=0; ci<ce; ++ci)
+			{
+				if ((*wi)[ci])
+				{
+					rt << " '" << (*wi)[ci] << "'";
+				}
+				else
+				{
+					rt << " NULL";
+				}
+			}
+			rt << std::endl;
+		}
 	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	SimpleformDDLCompiler::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "simple form DDL compiler", setModuleLogger, 0, 0, NofObjects, objdef);
-
+	return rt.str();
+}

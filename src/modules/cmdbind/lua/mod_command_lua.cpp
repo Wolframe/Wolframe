@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/cmdbind/mod_command_lua.cpp
+///\file mod_command_lua.cpp
 ///\brief Module for command handler executing lua scripts
 #include "module/scriptCommandHandlerBuilder.hpp"
-#include "cmdbind/luaCommandHandler.hpp"
+#include "luaCommandHandler.hpp"
 #include "logger-v1.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;

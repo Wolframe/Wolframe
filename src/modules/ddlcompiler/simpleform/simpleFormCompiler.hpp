@@ -29,53 +29,28 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/luaCommandHandler.hpp
-///\brief interface to the lua command handler
-#ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
-#include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
-#include "luaObjects.hpp"
-#include "luaScriptContext.hpp"
-#include <vector>
+///\file simpleFormCompiler.hpp
+///\brief Interface for a compiler of a simple language to describe forms
+
+#ifndef _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
+#define _Wolframe_DDL_SIMPLEFORM_COMPILER_HPP_INCLUDED
 #include <string>
+#include "ddl/structType.hpp"
+#include "ddl/compilerInterface.hpp"
 
 namespace _Wolframe {
-namespace cmdbind {
+namespace ddl {
 
-///\class LuaCommandHandler
-///\brief command handler instance for processing a call as Lua script
-class LuaCommandHandler :public IOFilterCommandHandlerEscDLF
+class SimpleFormCompiler :public DDLCompiler
 {
 public:
-	typedef IOFilterCommandHandlerEscDLF Parent;
+	SimpleFormCompiler() :DDLCompiler( "simpleform") {}
 
-	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
-	typedef langbind::LuaScriptContext ContextStruct;
-
-public:
-	///\brief Constructor
-	explicit LuaCommandHandler( const langbind::LuaScriptContext* ctx_)
-		:m_ctx(ctx_){}
-
-	///\brief Destructor
-	virtual ~LuaCommandHandler(){}
-
-	///\brief Execute the Lua script
-	///\param[out] err error code in case of error
-	///\return CallResult status (See IOFilterCommandHandler::CallResult)
-	virtual CallResult call( const char*& err);
-
-	///\brief Get the identifier of this command handler type
-	static const char* identifier()
-	{
-		return "LuaCommandHandler";
-	}
-
-private:
-	const langbind::LuaScriptContext* m_ctx;
-	langbind::LuaScriptInstanceR m_interp;
+	///\brief Compile a source from a string. See DDLCompiler::compile( const std::string&, const TypeMap*) const
+	virtual Form compile( const std::string& srcstring, const TypeMap* typemap) const;
 };
 
-}}//namespace
-#endif
+DDLCompiler* createSimpleFormCompilerFunc();
 
+}}
+#endif

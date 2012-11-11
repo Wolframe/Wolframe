@@ -23,7 +23,7 @@ DYNAMIC_MODULE = \
 	mod_filter_blob.dll
 
 CPP_OBJS = \
-	filter_blob_filter.obj \
+	blob_filter.obj \
 	mod_filter_blob.obj
 
 all: $(DYNAMIC_MODULE)

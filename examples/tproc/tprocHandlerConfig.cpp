@@ -36,7 +36,6 @@
 #include "tprocHandlerConfig.hpp"
 #include "langbind/appObjects.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
-#include "cmdbind/directmapCommandHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "config/structSerialize.hpp"
 #include "serialize/struct/filtermapDescription.hpp"

@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/filter/line/mod_filter_line.cpp
+///\file mod_filter_line.cpp
 ///\brief Module for line filters
 #include "module/filterBuilder.hpp"
-#include "filter/line_filter.hpp"
+#include "line_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 

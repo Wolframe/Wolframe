@@ -277,7 +277,6 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 				case cmdbind::CommandHandler::WRITE:
 					m_cmdHandler.getOutput( outpp, outppsize);
-/*[-]*/LOG_TRACE << "WRITE {" << std::string( (const char*)outpp, outppsize) << "}";
 					return net::SendData( outpp, outppsize);
 
 				case cmdbind::CommandHandler::CLOSE:

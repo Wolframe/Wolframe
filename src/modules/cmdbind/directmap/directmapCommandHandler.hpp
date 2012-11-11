@@ -29,12 +29,12 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/directmapCommandHandler.hpp
-///\brief interface to the directmap command handler
+///\file directmapCommandHandler.hpp
+///\brief Interface to the directmap command handler
 #ifndef _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
 #define _Wolframe_cmdbind_DIRECTMAP_COMMAND_HANDLER_HPP_INCLUDED
+#include "directmapProgram.hpp"
 #include "langbind/appObjects.hpp"
-#include "langbind/directmapProgram.hpp"
 #include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
 #include "types/countedReference.hpp"
 #include "types/keymap.hpp"
@@ -99,6 +99,7 @@ public:
 
 private:
 	void initcall();
+
 private:
 	const DirectmapContext* m_ctx;					//< execution context of the command handler
 	const langbind::DirectmapCommandDescription* m_cmd;		//< description of command to execute

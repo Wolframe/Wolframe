@@ -61,6 +61,16 @@ public:
 		m_outputfilter = out;
 	}
 
+	langbind::InputFilterR inputfilter()
+	{
+		return m_inputfilter;
+	}
+
+	langbind::OutputFilterR outputfilter()
+	{
+		return m_outputfilter;
+	}
+
 	void setFilterAs( const langbind::InputFilterR& in)
 	{
 		// assign the rest of the input to the new filter attached

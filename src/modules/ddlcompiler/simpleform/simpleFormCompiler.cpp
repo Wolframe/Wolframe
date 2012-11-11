@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl_compiler_SimpleFormCompiler.cpp
+///\file simpleFormCompiler.cpp
 ///\brief Implementation of a compiler for a self defined form DDL called 'simple form DDL'
 
-#include "ddl/compiler/simpleFormCompiler.hpp"
+#include "simpleFormCompiler.hpp"
 #include <string>
 #include <vector>
 #include <cstring>

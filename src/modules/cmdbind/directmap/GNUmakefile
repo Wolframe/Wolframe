@@ -26,7 +26,8 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_command_directmap.so
 
 CPP_OBJS = \
-	cmdbind_directmapCommandHandler.o \
+	directmapProgram.o \
+	directmapCommandHandler.o \
 	mod_command_directmap.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

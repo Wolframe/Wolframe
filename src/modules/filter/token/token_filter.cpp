@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter_token_filter.cpp
+///\file token_filter.cpp
 ///\brief Filter implementation of a filter for debug input/output
 
-#include "filter/token_filter.hpp"
+#include "token_filter.hpp"
 #include "textwolf/charset.hpp"
 #include "textwolf/sourceiterator.hpp"
 #include "textwolf/textscanner.hpp"

@@ -30,13 +30,13 @@ Project Wolframe.
 
 ************************************************************************/
 #include "luaObjects.hpp"
-#include "langbind/appObjects.hpp"
 #include "luaDebug.hpp"
+#include "luafilter.hpp"
+#include "luaGetFunctionClosure.hpp"
+#include "langbind/appObjects.hpp"
 #include "langbind/luaException.hpp"
 #include "langbind/luaCppCall.hpp"
-#include "luaGetFunctionClosure.hpp"
 #include "langbind/normalizeFunction.hpp"
-#include "filter/luafilter.hpp"
 #include "filter/typingfilter.hpp"
 #include "filter/tostringfilter.hpp"
 #include "ddl/structTypeBuild.hpp"
@@ -75,6 +75,7 @@ namespace luaname
 	static const char* TypedInputFilterClosure = "wolframe.TypedInputFilterClosure";
 	static const char* FormFunctionClosure = "wolframe.FormFunctionClosure";
 	static const char* TransactionFunctionClosure = "wolframe.TransactionFunctionClosure";
+	static const char* Transaction = "wolframe.Transaction";
 	static const char* PrintFunctionClosure = "wolframe.PrintFunctionClosure";
 	static const char* StructSerializer = "wolframe.StructSerializer";
 	static const char* ProcessorProvider = ":wolframe.ProcessorProvider";
@@ -98,6 +99,7 @@ template <> const char* metaTableName<TypedInputFilterR>()		{return luaname::Typ
 template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
 template <> const char* metaTableName<FormFunctionClosure>()		{return luaname::FormFunctionClosure;}
 template <> const char* metaTableName<TransactionFunctionClosure>()	{return luaname::TransactionFunctionClosure;}
+template <> const char* metaTableName<db::TransactionR>()		{return luaname::Transaction;}
 template <> const char* metaTableName<PrintFunctionClosure>()		{return luaname::PrintFunctionClosure;}
 template <> const char* metaTableName<serialize::StructSerializer>()	{return luaname::StructSerializer;}
 template <> const char* metaTableName<proc::ProcessorProvider>()	{return luaname::ProcessorProvider;}
@@ -951,6 +953,38 @@ LUA_FUNCTION_THROWS( "<formfunction>(..)", function_printfunction_call)
 	return 1;
 }
 
+LUA_FUNCTION_THROWS( "transaction:begin(..)", function_transaction_begin)
+{
+	db::TransactionR* transaction = LuaObject<db::TransactionR>::getSelf( ls, "transaction", "begin");
+	check_parameters( ls, 1, 1, LUA_TSTRING);
+	const char* name = lua_tostring( ls, 2);
+	if (transaction->get()) throw std::runtime_error( "subsequent transaction begins without commit or rollback");
+	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+	transaction->reset( ctx->transaction( name));
+	(*transaction)->begin();
+	return 0;
+}
+
+LUA_FUNCTION_THROWS( "transaction:commit()", function_transaction_commit)
+{
+	db::TransactionR* transaction = LuaObject<db::TransactionR>::getSelf( ls, "transaction", "commit");
+	check_parameters( ls, 1, 0);
+	if (!transaction->get()) throw std::runtime_error( "commit called without calling transaction:begin() before");
+	(*transaction)->commit();
+	transaction->reset();
+	return 0;
+}
+
+LUA_FUNCTION_THROWS( "transaction:rollback()", function_transaction_rollback)
+{
+	db::TransactionR* transaction = LuaObject<db::TransactionR>::getSelf( ls, "transaction", "commit");
+	check_parameters( ls, 1, 0);
+	if (!transaction->get()) throw std::runtime_error( "rollback called without calling transaction:begin() before");
+	(*transaction)->rollback();
+	transaction->reset();
+	return 0;
+}
+
 LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 {
 	check_parameters( ls, 0, 1, LUA_TSTRING);
@@ -967,7 +1001,8 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 	const db::TransactionFunction* tf = ctx->transactionFunction( name);
 	if (tf)
 	{
-		LuaObject<TransactionFunctionClosure>::push_luastack( ls, TransactionFunctionClosure( ctx, tf));
+		db::TransactionR* transaction = LuaObject<db::TransactionR>::getGlobal( ls, "transaction");
+		LuaObject<TransactionFunctionClosure>::push_luastack( ls, TransactionFunctionClosure( ctx, tf, (transaction && transaction->get())?*transaction:db::TransactionR()));
 		lua_pushcclosure( ls, function_transactionfunction_call, 1);
 		return 1;
 	}
@@ -1712,6 +1747,13 @@ static const luaL_Reg input_methodtable[ 7] =
 	{0,0}
 };
 
+static const luaL_Reg transaction_methodtable[ 3] =
+{
+	{"begin",function_transaction_begin},
+	{"commit",function_transaction_commit},
+	{"rollback",function_transaction_rollback},
+};
+
 static const luaL_Reg output_methodtable[ 5] =
 {
 	{"as",&function_output_as},
@@ -1982,6 +2024,7 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			setGlobalSingletonPointer<const proc::ProcessorProvider>( ls, provider_);
 			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
 			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
+			LuaObject<db::TransactionR>::createGlobal( ls, "transaction", db::TransactionR(), transaction_methodtable);
 			LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
 			lua_pushcfunction( ls, &function_filter);
 			lua_setglobal( ls, "filter");

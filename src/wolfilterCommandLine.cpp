@@ -214,6 +214,7 @@ struct OptionStruct
 			( "input,f", po::value<std::string>(), "specify input file to process by path" )
 			( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
 			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
+			( "filter,t", po::value<std::string>(), "specify input/output filter by name (if not specified separately)" )
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 			( "program,p", po::value< std::vector<std::string> >(), "specify program to load by path" )
 			( "config,C", po::value<std::string>(), "specify configuration file to load" )
@@ -282,8 +283,18 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		m_programs = vmap["program"].as<std::vector<std::string> >();
 	}
 	if (vmap.count( "cmd")) m_cmd = vmap["cmd"].as<std::string>();
-	if (vmap.count( "input-filter")) m_inputfilter = vmap["input-filter"].as<std::string>();
-	if (vmap.count( "output-filter")) m_outputfilter = vmap["output-filter"].as<std::string>();
+	if (vmap.count( "filter"))
+	{
+		m_inputfilter = vmap["filter"].as<std::string>();
+		m_outputfilter = vmap["filter"].as<std::string>();
+		if (vmap.count( "input-filter")) throw std::runtime_error( "incompatible options: --filter specified with --input-filter");
+		if (vmap.count( "output-filter")) throw std::runtime_error( "incompatible options: --filter specified with --output-filter");
+	}
+	else
+	{
+		if (vmap.count( "input-filter")) m_inputfilter = vmap["input-filter"].as<std::string>();
+		if (vmap.count( "output-filter")) m_outputfilter = vmap["output-filter"].as<std::string>();
+	}
 	if (vmap.count( "database"))
 	{
 		m_dbconfig = getDBProviderConfigTree( vmap["database"].as<std::string>());
@@ -292,9 +303,6 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 		m_dbconfig = getConfigNode( "database");
 	}
-	if (m_outputfilter.empty() && !m_inputfilter.empty()) m_outputfilter = m_inputfilter; //... default same filter for input and output
-	if (m_inputfilter.empty() && !m_outputfilter.empty()) m_inputfilter = m_outputfilter; //... default same filter for input and output
-
 	const char* bp;
 	bp = std::strchr( m_inputfilter.c_str(), '/');
 	if (bp)

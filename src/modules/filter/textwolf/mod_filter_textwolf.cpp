@@ -30,10 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/filter/textwolf/mod_filter_textwolf.cpp
+///\file mod_filter_textwolf.cpp
 ///\brief Module for textwolf XML filters
 #include "module/filterBuilder.hpp"
-#include "filter/textwolf_filter.hpp"
+#include "textwolf_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 

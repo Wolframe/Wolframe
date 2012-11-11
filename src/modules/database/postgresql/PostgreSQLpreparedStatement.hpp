@@ -51,7 +51,7 @@ namespace db {
 struct PreparedStatementHandler_postgres :public PreparedStatementHandler
 {
 	///\brief Constructor
-	PreparedStatementHandler_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_);
+	PreparedStatementHandler_postgres( PGconn* conn_, const types::keymap<std::string>* stmmap_, bool inTransactionContext=false);
 
 	///\brief Destructor
 	virtual ~PreparedStatementHandler_postgres();

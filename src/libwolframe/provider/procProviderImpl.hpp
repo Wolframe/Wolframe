@@ -90,7 +90,8 @@ private:
 	db::Database*					m_db;
 
 	std::list< cmdbind::CommandHandlerConstructor* >	m_cmd;
-	std::map< std::string, std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*> >	m_cmdMap;
+	typedef std::map< std::string, std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*> > CmdMap;
+	CmdMap	m_cmdMap;
 
 	std::list< module::FilterConstructor* >	m_filter;
 	std::map< std::string, const module::FilterConstructor* >	m_filterMap;

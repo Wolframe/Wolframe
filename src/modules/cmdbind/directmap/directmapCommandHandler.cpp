@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#include "cmdbind/directmapCommandHandler.hpp"
+#include "directmapCommandHandler.hpp"
 #include "serialize/struct/filtermapBase.hpp"
 #include "utils/doctype.hpp"
 #include "langbind/appObjects.hpp"
@@ -73,36 +73,53 @@ void DirectmapCommandHandler::initcall()
 		m_outputform = *df;
 		m_outputform_defined = true;
 	}
+	std::string filtername;
+	if (m_cmd->filter.empty())
+	{
+		throw std::runtime_error( "empty filter definition in command");
+	}
+	else
+	{
+		filtername = m_cmd->filter;
+	}
 	m_function = m_provider->transactionFunction( m_cmd->call);
 	if (!m_function)
 	{
 		throw std::runtime_error( std::string( "transaction function not defined '") + m_cmd->call + "'");
 	}
-	types::CountedReference<langbind::Filter> filter( m_provider->filter( m_cmd->filter, ""));
+	types::CountedReference<langbind::Filter> filter( m_provider->filter( filtername, ""));
 	if (!filter.get())
 	{
-		throw std::runtime_error( std::string( "filter not defined '") + m_cmd->filter + "'");
+		throw std::runtime_error( std::string( "filter not defined '") + filtername + "'");
 	}
 	if (!filter->inputfilter().get())
 	{
-		throw std::runtime_error( std::string( "input filter not defined '") + m_cmd->filter + "'");
+		throw std::runtime_error( std::string( "input filter not defined '") + filtername + "'");
 	}
 	if (m_inputfilter.get())
 	{
 		setFilterAs( filter->inputfilter());
 		m_inputfilter->setValue( "empty", "false");
 	}
+	else
+	{
+		m_inputfilter = filter->inputfilter();
+	}
 	if (!filter->outputfilter().get())
 	{
-		throw std::runtime_error( std::string( "output filter not defined '") + m_cmd->filter + "'");
+		throw std::runtime_error( std::string( "output filter not defined '") + filtername + "'");
 	}
 	if (m_outputfilter.get())
 	{
 		setFilterAs( filter->outputfilter());
-		if (m_outputform.doctype())
-		{
-			m_outputfilter->setDocType( m_outputform.doctype());
-		}
+	}
+	else
+	{
+		m_outputfilter = filter->outputfilter();
+	}
+	if (m_outputform.doctype())
+	{
+		m_outputfilter->setDocType( m_outputform.doctype());
 	}
 	m_input.reset( new langbind::TypingInputFilter( m_inputfilter));
 	m_output.reset( new langbind::TypingOutputFilter( m_outputfilter));

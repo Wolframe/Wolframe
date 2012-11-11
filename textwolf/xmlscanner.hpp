@@ -254,11 +254,20 @@ public:
 	{
 		enum {NofErrors=16};
 		static const char* sError[NofErrors]
-			= {0,"IllegalDocumentAttributeDef", "ExpectedOpenTag", "ExpectedXMLTag","UnexpectedEndOfText",
-				"OutputBufferTooSmall","SyntaxToken","StringNotTerminated",
-				"UndefinedCharacterEntity","ExpectedTagEnd",
-				"ExpectedEqual", "ExpectedTagAttribute","ExpectedCDATATag","Internal",
-				"UnexpectedEndOfInput", "ExpectedEndOfLine"
+			= {0,"illegal document attribute definition",
+				"expected open tag",
+				"expected XML tag",
+				"unexpected end of text",
+				"syntax token",
+				"string not terminated",
+				"undefined character entity",
+				"expected tag end",
+				"expected equal",
+				"expected tag attribute",
+				"expected CDATA tag",
+				"internal",
+				"unexpected end of input",
+				"expected end of line"
 		};
 		return sError[(unsigned int)ee];
 	}

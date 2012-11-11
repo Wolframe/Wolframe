@@ -261,16 +261,22 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 	if (error)
 	{
 		std::ostringstream msg;
-		msg << "unable to execute - failed to retrieve document type (" << error << ")";
+		msg << "failed to retrieve document type (" << error << ")";
 		cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
 		out << "ANSWER" << endl();
-		delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
+		if (redirectConsumedInput( chnd, delegate_ch, out))
+		{
+			delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
+		}
 	}
 	else if (doctype.empty())
 	{
-		cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( "unable to execute - no document type defined");
+		cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( "no document type defined");
 		out << "ANSWER" << endl();
-		delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
+		if (redirectConsumedInput( chnd, delegate_ch, out))
+		{
+			delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
+		}
 	}
 	else
 	{
@@ -278,7 +284,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		if (!execch)
 		{
 			std::ostringstream msg;
-			msg << "unable to execute - command handler for document type '" << doctype << "' is not defined";
+			msg << "undefined command handler for document type '" << doctype << "'";
 			execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
 			out << "ANSWER" << endl();
 			if (redirectConsumedInput( chnd, execch, out))
@@ -317,7 +323,7 @@ int CommandHandler::doRequest( int argc, const char** argv, std::ostream& out)
 			if (!ch)
 			{
 				std::ostringstream msg;
-				msg << "unable to execute - command handler for document type '" << argv[0] << "' is not defined";
+				msg << "undefined command handler for document type '" << argv[0] << "'";
 				ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
 				out << "ANSWER" << endl();
 				delegateProcessing<&CommandHandler::endErrDocumentType>( ch);

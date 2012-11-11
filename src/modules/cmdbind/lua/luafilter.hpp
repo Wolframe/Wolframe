@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/luafilter.hpp
+///\file luafilter.hpp
 ///\brief Interface for a lua table as filter
 
 #ifndef _Wolframe_LUA_FILTER_HPP_INCLUDED

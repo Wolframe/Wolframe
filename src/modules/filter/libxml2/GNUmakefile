@@ -27,7 +27,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_filter_libxml2.so
 
 CPP_OBJS = \
-	filter_libxml2_filter.o \
+	libxml2_filter.o \
 	mod_filter_libxml2.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

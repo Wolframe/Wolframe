@@ -141,7 +141,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 						if (errmsg)
 						{
 							LOG_ERROR << "Error calling procedure: " << (errmsg?errmsg:"unknown");
-							m_lastError = "processing error";
+							m_lastError = (errmsg?errmsg:"processing error");
 						}
 						continue;
 

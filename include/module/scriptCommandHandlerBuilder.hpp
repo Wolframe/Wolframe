@@ -45,6 +45,10 @@ Project Wolframe.
 #include <boost/algorithm/string.hpp>
 #include <boost/concept_check.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits.hpp>
+#include <string>
+#include <map>
 
 namespace _Wolframe {
 namespace module {
@@ -60,7 +64,36 @@ private:// Concept checks:
 	///\brief Check for existence of class CommandHandlerType::ContextStruct
 	BOOST_STATIC_ASSERT((boost::is_class< typename CommandHandlerType::ContextStruct>::value));
 
-	///\brief Check for method CommandHandlerType::ContextStruct::load with expected paraters
+	///\brief Check for method CommandHandlerType::ContextStruct::setDefaultFilter with expected parameters
+	template<typename T>
+	struct struct_has_setDefaultFilter_method
+	{
+		typedef char small_type;
+		struct large_type {small_type dummy[2];};
+
+		template<void (T::*)(const std::string&)> struct tester_member_signature;
+
+		template<typename U>
+		static small_type has_matching_member(tester_member_signature<&U::setDefaultFilter>*);
+		template<typename U>
+		static large_type has_matching_member(...);
+
+		static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
+	};
+	///\brief Set the configurable default filter
+	template <class T>
+	typename boost::enable_if_c<struct_has_setDefaultFilter_method<typename T::ContextStruct>::value,bool>::type
+	setDefaultFilter_( const std::string& f) {m_context.setDefaultFilter(f); return true;}
+
+	///\brief Stub for setting a configurable default filter that fails, because it is not defined
+	template <class T>
+	typename boost::enable_if_c<!struct_has_setDefaultFilter_method<typename T::ContextStruct>::value,bool>::type
+	setDefaultFilter_( const std::string&) {return false;}
+
+	///\brief Set the configurable default filter if defined
+	bool setDefaultFilter( const std::string& f) {return setDefaultFilter_<CommandHandlerType>(f);}
+
+	///\brief Check for method CommandHandlerType::ContextStruct::load with expected parameters
 	template<typename T>
 	struct struct_has_load_method
 	{
@@ -93,16 +126,25 @@ public:
 		m_modules = modules;
 		try
 		{
+			std::string optional_cfg_param_str = "or 'filter'";
 			boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
 			for (; pi != pe; ++pi)
 			{
+				// optional configuration parameters:
+				if (boost::iequals( pi->first, "filter"))
+				{
+					std::string filtername = pi->second.get_value<std::string>();
+					if (filtername.empty()) throw std::runtime_error( "expected non empty filter definition");
+					if (setDefaultFilter( filtername)) continue;
+				}
+				// required configuration parameters:
 				if (boost::iequals( pi->first, "program"))
 				{
 					m_programfiles.push_back( pi->second.get_value<std::string>());
 				}
 				else
 				{
-					throw std::runtime_error( std::string("expected 'program' definition instead of '") + pi->first + "'");
+					throw std::runtime_error( std::string("expected 'program' ") + optional_cfg_param_str + " definition instead of '" + pi->first + "'");
 				}
 			}
 		}
@@ -116,7 +158,6 @@ public:
 
 	virtual void setCanonicalPathes( const std::string& referencePath)
 	{
-
 		std::vector<std::string>::iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
 		for (; pi != pe; ++pi)
 		{

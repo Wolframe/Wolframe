@@ -29,62 +29,56 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file ddl/bignumType.hpp
-///\brief Defines a bignum type for the DDLs used for forms
-#ifndef _Wolframe_DDL_BIGNUMTYPE_HPP_INCLUDED
-#define _Wolframe_DDL_BIGNUMTYPE_HPP_INCLUDED
+///\file luaCommandHandler.hpp
+///\brief Interface to the lua command handler
+#ifndef _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_cmdbind_LUA_COMMAND_HANDLER_HPP_INCLUDED
+#include "cmdbind/ioFilterCommandHandlerEscDLF.hpp"
+#include "luaObjects.hpp"
+#include "luaScriptContext.hpp"
+#include <vector>
 #include <string>
-#include <boost/lexical_cast.hpp>
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace _Wolframe {
-namespace ddl {
+namespace cmdbind {
 
-struct Bigint
+///\class LuaCommandHandler
+///\brief command handler instance for processing a call as Lua script
+class LuaCommandHandler :public IOFilterCommandHandlerEscDLF
 {
-	Bigint() {}
-	~Bigint() {}
+public:
+	typedef IOFilterCommandHandlerEscDLF Parent;
 
-	template <typename Type>
-	bool set( const Type& o)
+	///\brief Type definition for instantiation of cmdbind::ScriptCommandHandlerBuilder
+	typedef langbind::LuaScriptContext ContextStruct;
+
+public:
+	///\brief Constructor
+	explicit LuaCommandHandler( const langbind::LuaScriptContext* ctx_)
+		:m_ctx(ctx_){}
+
+	///\brief Destructor
+	virtual ~LuaCommandHandler(){}
+
+	///\brief Execute the Lua script
+	///\param[out] err error code in case of error
+	///\return CallResult status (See IOFilterCommandHandler::CallResult)
+	virtual CallResult call( const char*& err);
+
+	///\brief Get the identifier of this command handler type
+	static const char* identifier()
 	{
-		try
-		{
-			m_value = boost::lexical_cast<std::string>(o);
-			std::string::const_iterator itr = m_value.begin();
-			if (*itr == '-') ++itr;
-			for (; itr!=m_value.end(); ++itr)
-			{
-				if (*itr < '0' || *itr > '9')
-				{
-					m_value.clear();
-					throw std::logic_error("cannot convert to bigint");
-				}
-			}
-			return true;
-		}
-		catch (const std::exception&)
-		{
-			return false;
-		}
+		return "LuaCommandHandler";
 	}
 
-	template <typename Type>
-	bool get( Type& o)
-	{
-		try
-		{
-			o = boost::lexical_cast<Type>( m_value);
-			return true;
-		}
-		catch (const std::exception&)
-		{
-			return false;
-		}
-	}
 private:
-	std::string m_value;
+	void initcall();
+
+private:
+	const langbind::LuaScriptContext* m_ctx;
+	langbind::LuaScriptInstanceR m_interp;
 };
 
-}} //namespace
+}}//namespace
 #endif
+

@@ -188,6 +188,8 @@ public:
 
 	std::size_t size() const						{return m_result.size();}
 
+	std::string tostring() const;
+
 public:
 	// interface for constructing the result:
 	void openCommandResult( std::size_t functionidx)			{m_result.push_back( CommandResult( functionidx));}

@@ -34,7 +34,6 @@ Project Wolframe.
 #include "langbind/appObjects.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
-#include "ddl/compiler/simpleFormCompiler.hpp"
 #include "filter/filter.hpp"
 #include "utils/miscUtils.hpp"
 #include "filter/typingfilter.hpp"
@@ -217,11 +216,12 @@ bool FormFunctionClosure::call()
 }
 
 
-TransactionFunctionClosure::TransactionFunctionClosure( const proc::ProcessorProvider* p, const db::TransactionFunction* f)
+TransactionFunctionClosure::TransactionFunctionClosure( const proc::ProcessorProvider* p, const db::TransactionFunction* f, const db::TransactionR& t)
 	:m_provider(p)
 	,m_func(f)
 	,m_state(0)
 	,m_inputstructptr(f->getInput())
+	,m_transaction(t)
 {
 	m_inputstruct.reset( m_inputstructptr);
 }
@@ -233,7 +233,8 @@ TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctio
 	,m_input(o.m_input)
 	,m_inputstructptr(o.m_inputstructptr)
 	,m_inputstruct(o.m_inputstruct)
-	,m_result(o.m_result){}
+	,m_result(o.m_result)
+	,m_transaction(o.m_transaction){}
 
 bool TransactionFunctionClosure::call()
 {
@@ -246,15 +247,15 @@ bool TransactionFunctionClosure::call()
 			m_state = 2;
 		case 2:
 		{
-			db::Transaction* trs = m_provider->transaction( m_func->name());
-			if (!trs)
+			types::CountedReference<db::Transaction> trsr = m_transaction;
+			if (!trsr.get())
 			{
-				throw std::runtime_error( "failed to allocate transaction object");
+				trsr.reset( m_provider->transaction( m_func->name()));
+				if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
 			}
-			types::CountedReference<db::Transaction> trsr( trs);
-			trs->putInput( m_inputstructptr->get());
-			trs->execute();
-			m_result.reset( m_func->getOutput( trs->getResult()));
+			trsr->putInput( m_inputstructptr->get());
+			trsr->execute();
+			m_result.reset( m_func->getOutput( trsr->getResult()));
 			m_state = 3;
 			return true;
 		}

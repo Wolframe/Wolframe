@@ -20,7 +20,7 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_ddlcompiler_simpleform.so
 
 CPP_OBJS = \
-	ddl_compiler_simpleFormCompiler.o \
+	simpleFormCompiler.o \
 	mod_ddlcompiler_simpleform.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

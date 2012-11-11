@@ -33,7 +33,7 @@
 ///\file modules/filter/char/mod_filter_char.cpp
 ///\brief Module for blob filters that forward the data as binary blob as it is
 #include "module/filterBuilder.hpp"
-#include "filter/blob_filter.hpp"
+#include "blob_filter.hpp"
 #include "logger-v1.hpp"
 #include <cstring>
 

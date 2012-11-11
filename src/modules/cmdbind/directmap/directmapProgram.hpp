@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///\brief Interface for directmap programs
-///\file langbind/directmapProgram.hpp
+///\file directmapProgram.hpp
 #ifndef _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
 #define _LANGBIND_DIRECTMAP_PROGRAM_HPP_INCLUDED
 #include "types/keymap.hpp"
