@@ -49,12 +49,8 @@
       on states of other widgets, best example is a checked group
       box for a bunch of settings, see preferences dialog)
 - workflow for form
-  - init form
-  - flow of forms, buttons to switch between forms
-  - menues for picking forms
+  - combine form loading and data operation trigger
   - forms in forms: show multiple views
-- add a init.ui form which is presented after successful login:
-  - what to do on connection errors? back to the connect dialog for now
 - stop flickering in hour glas
 - loadmode must be split in UI-loadmode and data-loadmode (at least for
   now when we use local forms and network data connections in parallel)
@@ -68,3 +64,6 @@
   - 1:n relations (pick a foreign reference to another
     object), domains (e.g. pick a city in a list of possibilities)
   - grid views
+- language picker must show the union of all languages of all forms
+  and the languages/translations in themes
+  

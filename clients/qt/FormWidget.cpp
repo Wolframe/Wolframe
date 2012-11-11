@@ -129,7 +129,7 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 
 // connect standard form actions
 	QMetaObject::connectSlotsByName( this );
-	
+
 // not busy anymore
 	qApp->restoreOverrideCursor( );
 	
