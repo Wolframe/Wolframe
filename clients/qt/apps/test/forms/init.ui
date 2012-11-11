@@ -16,14 +16,66 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>100</y>
+     <x>20</x>
+     <y>20</y>
      <width>81</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
     <string>Welcome !</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="form1">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>83</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Form 1</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="form2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>83</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Form 2</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="form3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>110</y>
+     <width>83</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Form 3</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="form4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>140</y>
+     <width>83</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Form 4</string>
    </property>
   </widget>
  </widget>

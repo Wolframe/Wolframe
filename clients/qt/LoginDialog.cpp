@@ -49,7 +49,7 @@ void LoginDialog::initialize( )
 	setLayout( formLayout );
 	
 	connect( m_buttons->button( QDialogButtonBox::Cancel ), SIGNAL( clicked( ) ),
-		this, SLOT( close( ) ) );
+		this, SLOT( authFailed( ) ) );
 		
 	connect( m_buttons->button( QDialogButtonBox::Ok ), SIGNAL( clicked( ) ),
 		this, SLOT( login( ) ) );	

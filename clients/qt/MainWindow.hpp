@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QtUiTools>
 #include <QCommandLine>	
+#include <QSignalMapper>
 
 #include "FormLoader.hpp"
 #include "DebugTerminal.hpp"
@@ -64,7 +65,10 @@ namespace _Wolframe {
 		QString m_uiFormsDir;		// for FileFormLoader (forms dir)
 		QString m_uiFormTranslationsDir; // for FileFormLoader (i18n dir)
 		QString m_dataLoaderDir;	// for FileDataLoader (data dir)
-		
+		QStringList m_forms;		// name of all currently loaded forms
+		QSignalMapper *m_signalMapper;
+
+	public slots:
 		void readSettings( );
 		void parseArgs( );
 		void initialize( );
