@@ -128,6 +128,7 @@ bool RedirectFilterClosure::call()
 			}
 			/*no break here!*/
 		case 1:
+/*[-]*/std::cerr << "OUTPUT " << OutputFilter::elementTypeName( m_elemtype) << " '" << m_elem.tostring() << "'" << std::endl;
 			if (!m_outputfilter->print( m_elemtype, m_elem))
 			{
 				switch (m_outputfilter->state())

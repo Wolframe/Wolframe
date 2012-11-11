@@ -134,6 +134,30 @@ int LineCommandHandler::runCommand( const char* cmd_, int argc_, const char** ar
 	return m_stm->runCommand( m_stateidx, (std::size_t)cmdidx-1, this, argc_, argv_, out_);
 }
 
+bool LineCommandHandler::redirectInput( void* data, std::size_t datasize, cmdbind::CommandHandler* toh, std::ostream& out)
+{
+	const void* toh_output;
+	std::size_t toh_outputsize;
+	const char* error;
+	toh->setInputBuffer( data, datasize);
+	toh->putInput( data, datasize);
+	toh->setOutputBuffer( m_output.ptr(), m_output.size(), m_output.pos());
+
+	for (;;) switch (toh->nextOperation())
+	{
+		case cmdbind::CommandHandler::READ:
+			return true;
+		case cmdbind::CommandHandler::WRITE:
+			toh->getOutput( toh_output, toh_outputsize);
+			out << std::string( (const char*)toh_output, toh_outputsize);
+			continue;
+		case cmdbind::CommandHandler::CLOSE:
+			error = toh->lastError();
+			if (error) LOG_ERROR << "error redirect input: " << error;
+			return false;
+	}
+}
+
 CommandHandler::Operation LineCommandHandler::nextOperation()
 {
 	for (;;)

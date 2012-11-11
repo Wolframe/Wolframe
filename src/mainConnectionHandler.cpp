@@ -33,7 +33,6 @@
 ///\file mainConnectionHandler.cpp
 #include "mainConnectionHandler.hpp"
 #include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
-#include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "cmdbind/authCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "logger-v1.hpp"
@@ -219,36 +218,19 @@ int CommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out
 	return rt;
 }
 
-static bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out)
+bool CommandHandler::redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out)
 {
 	void* buf;
 	std::size_t bufsize;
-	const void* toh_output;
-	std::size_t toh_outputsize;
-	const char* error;
 	fromh->getInputBuffer( buf, bufsize);
-	toh->setInputBuffer( buf, bufsize);
-	toh->putInput( buf, bufsize);
-
-	for (;;) switch (toh->nextOperation())
-	{
-		case cmdbind::CommandHandler::READ:
-			return true;
-		case cmdbind::CommandHandler::WRITE:
-			toh->getOutput( toh_output, toh_outputsize);
-			out << std::string( (const char*)toh_output, toh_outputsize);
-			continue;
-		case cmdbind::CommandHandler::CLOSE:
-			error = toh->lastError();
-			if (error) out << "ERR " << (error?error:"unspecified") << CommandHandler::endl();
-			return false;
-	}
+	return Parent::redirectInput( buf, bufsize, toh, out);
 }
 
 int CommandHandler::endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out)
 {
 	cmdbind::CommandHandlerR chr( ch);
-	out << "ERR document type" << LineCommandHandler::endl();
+	const char* err = ch->lastError();
+	out << "ERR " << (err?err:"document type")<< LineCommandHandler::endl();
 	return stateidx();
 }
 
@@ -268,6 +250,10 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		{
 			delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
 		}
+		else
+		{
+			out << "ERR doctype detection " << error << endl();
+		}
 	}
 	else if (doctype.empty())
 	{
@@ -277,6 +263,10 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		{
 			delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
 		}
+		else
+		{
+			out << "ERR no document type defined" << endl();
+		}
 	}
 	else
 	{
@@ -284,12 +274,16 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		if (!execch)
 		{
 			std::ostringstream msg;
-			msg << "undefined command handler for document type '" << doctype << "'";
+			msg << "no command handler for '" << doctype << "'";
 			execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
 			out << "ANSWER" << endl();
 			if (redirectConsumedInput( chnd, execch, out))
 			{
 				delegateProcessing<&CommandHandler::endErrDocumentType>( execch);
+			}
+			else
+			{
+				out << "ERR " << msg.str() << endl();
 			}
 		}
 		else
@@ -301,6 +295,14 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 			if (redirectConsumedInput( chnd, execch, out))
 			{
 				delegateProcessing<&CommandHandler::endRequest>( execch);
+			}
+			else if (execch->lastError())
+			{
+				out << "ERR " << execch->lastError() << endl();
+			}
+			else
+			{
+				out << "OK REQUEST" << endl();
 			}
 		}
 	}

@@ -81,10 +81,10 @@ void Session::requestCallback( void* this_, const Protocol::Event& event)
 	switch (event.type())
 	{
 		case Protocol::Event::UIFORM: throw std::logic_error( "request handler cannot handle answer event UIFORM");
-		case Protocol::Event::ANSWER: ((RequestHandler*)this_)->answer( event.content(), event.contentsize());
+		case Protocol::Event::ANSWER: ((RequestHandler*)this_)->answer( event.content(), event.contentsize()); break;
 		case Protocol::Event::STATE: throw std::logic_error( "request handler cannot handle answer event STATE");
 		case Protocol::Event::ATTRIBUTE: throw std::logic_error( "request handler cannot handle answer event ATTRIBUTE");
-		case Protocol::Event::ERROR: ((RequestHandler*)this_)->error( event.id());
+		case Protocol::Event::ERROR: ((RequestHandler*)this_)->error( event.id()); break;
 	}
 }
 

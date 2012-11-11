@@ -151,6 +151,14 @@ protected:
 	///\param[in] argc_ the arguments to pass to the command
 	int runCommand( const char* cmd_, int argc_, const char** argv_, std::ostream& out);
 
+
+	///\brief Redirect data as input and the output buffer to a command handler
+	///\param[in] data pointer to input data for the command handler
+	///\param[in] datasize size of 'data' in bytes
+	///\param[in] toh command handler to address
+	///\param[in,out] out buffer for protocol write
+	bool redirectInput( void* data, std::size_t datasize, cmdbind::CommandHandler* toh, std::ostream& out);
+
 private:
 	protocol::InputBlock m_input;				//< buffer for network read messages
 	protocol::OutputBlock m_output;				//< buffer for network write messages

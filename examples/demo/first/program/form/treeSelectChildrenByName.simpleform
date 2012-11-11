@@ -1,0 +1,5 @@
+!DOCTYPE treeSelectChildrenByName
+node
+{
+	name string
+}

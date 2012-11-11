@@ -37,6 +37,7 @@
 #include "connectionHandler.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
+#include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "mainConnectionHandler_auth.hpp"
 #include "protocol/ioblocks.hpp"
 #include "types/keymap.hpp"
@@ -48,6 +49,7 @@ namespace proc {
 class CommandHandler :public cmdbind::LineCommandHandlerTemplate<CommandHandler>
 {
 public:
+	typedef cmdbind::LineCommandHandlerTemplate<CommandHandler> Parent;
 	CommandHandler();
 	virtual ~CommandHandler(){}
 
@@ -68,6 +70,9 @@ public:
 
 	int endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostream& out);
 	int endErrDocumentType( cmdbind::CommandHandler* ch, std::ostream& out);
+
+private:
+	bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out);
 
 private:
 	AuthMechanisms m_authMechanisms;
