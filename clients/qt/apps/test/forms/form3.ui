@@ -13,19 +13,6 @@
   <property name="windowTitle">
    <string>Wolframe client form 1</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttons">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>250</y>
-     <width>156</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
   <widget class="QGroupBox" name="favouriteVegetable">
    <property name="geometry">
     <rect>
@@ -156,6 +143,63 @@
     <string>Vegetarian</string>
    </property>
   </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>260</y>
+     <width>249</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="save">
+      <property name="text">
+       <string>Save</string>
+      </property>
+      <property name="autoDefault">
+       <bool>true</bool>
+      </property>
+      <property name="default">
+       <bool>true</bool>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">init</string>
+      </property>
+      <property name="action" stdset="0">
+       <string notr="true">save</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="reset">
+      <property name="text">
+       <string>Reset</string>
+      </property>
+      <property name="action" stdset="0">
+       <string notr="true">reset</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="cancel">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">init</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <zorder>favouriteVegetable</zorder>
+  <zorder>vegetables</zorder>
+  <zorder>sensless</zorder>
+  <zorder>vegetarian</zorder>
+  <zorder>layoutWidget</zorder>
+  <zorder>cancel</zorder>
  </widget>
  <tabstops>
   <tabstop>pumpkin</tabstop>
@@ -164,7 +208,6 @@
   <tabstop>pumpkins</tabstop>
   <tabstop>cucumbers</tabstop>
   <tabstop>carots</tabstop>
-  <tabstop>buttons</tabstop>
  </tabstops>
  <resources/>
  <connections/>

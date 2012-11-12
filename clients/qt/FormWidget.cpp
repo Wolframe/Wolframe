@@ -7,13 +7,14 @@
 #include <QDebug>
 #include <QTranslator>
 #include <QApplication>
+#include <QPushButton>
 
 namespace _Wolframe {
 	namespace QtClient {
 
 FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent )
 	: QWidget( _parent ), m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
-	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_locale( "en_US" )
+	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_locale( "en_US" ), m_forms( )
 {
 // maps data between constructed widgets from .ui and the data loader
 	m_dataHandler = new DataHandler( m_dataLoader );	
@@ -30,6 +31,8 @@ void FormWidget::initialize( )
 		this, SLOT( formLoaded( QString, QByteArray ) ) );	
 	connect( m_formLoader, SIGNAL( formLocalizationLoaded( QString, QByteArray ) ),
 		this, SLOT( formLocalizationLoaded( QString, QByteArray ) ) );	
+	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
+		this, SLOT( formListLoaded( QStringList ) ) );
 
 // link the data loader to our form widget
 	connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
@@ -40,6 +43,41 @@ void FormWidget::initialize( )
 // link the data loader to the data handler
 	connect( m_dataLoader, SIGNAL( domainDataLoaded( QString, QString, QByteArray ) ),
 		this, SLOT( formDomainLoaded( QString, QString, QByteArray ) ) );
+
+// signal dispatcher for form buttons
+	m_signalMapper = new QSignalMapper( this );
+	
+// the form must be switched after 'action' has been taken in the current form
+	connect( m_signalMapper, SIGNAL( mapped( QObject * ) ),
+		this, SLOT( switchForm( QObject * ) ) );
+}
+
+void FormWidget::formListLoaded( QStringList forms )
+{
+// remember list of forms, so we can connect buttons to them
+	m_forms = forms;
+}
+
+void FormWidget::switchForm( QObject *object )
+{
+	WidgetProperties *widget = qobject_cast<WidgetProperties *>( object );
+	
+	qDebug( ) << "Got " << widget->toString( );
+	
+	if( !widget->action( ).isNull( ) ) {
+		if( widget->action( ) == "save" ) {
+			actionSave( );
+		} else if( widget->action( ) == "reset" ) {
+			actionReset( );
+		} else {
+			qDebug( ) << "Unknown action" << widget->action( );
+		}
+	}
+	
+// switch form now, formLoaded will inform parent and others
+	if( !widget->nextForm( ).isNull( ) ) {
+		loadForm( widget->nextForm( ) );
+	}
 }
 
 FormWidget::~FormWidget( )
@@ -99,6 +137,17 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 	qApp->restoreOverrideCursor( );	
 }
 
+QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )
+{
+	QVariant v = o->property( name );
+	qDebug( ) << o << "property" << name << ":" << v;
+	if( !v.isValid( ) ) {
+		return QString( );
+	} else {
+		return v.toString( );
+	}
+}
+
 void FormWidget::formLoaded( QString name, QByteArray form )
 {
 	qDebug( ) << "Form " << name << " loaded";
@@ -127,8 +176,41 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 	qDebug( ) << "Initiating loading of form data for form " << name;
 	m_dataLoader->initiateDataLoad( name );
 
-// connect standard form actions
-	QMetaObject::connectSlotsByName( this );
+// connect actions and forms
+// connect push buttons with form names to loadForms
+	QList<QWidget *> widgets = findChildren<QWidget *>( );
+	foreach( QWidget *widget, widgets ) {
+		QString clazz = widget->metaObject( )->className( ); 
+		QString _name = widget->objectName( );
+		
+		if( clazz == "QPushButton" ) {
+			WidgetProperties *props = new WidgetProperties( );
+			QString propValue = readDynamicStringProperty( widget, "form" );
+			
+			if( !propValue.isNull( ) ) {
+// the explicit dynamic property 'form' is set to a name of a form..
+				props->setNextForm( propValue );
+			} else if( m_forms.contains( _name ) ) {
+// or the name of the button is equals to the name of the form
+				props->setNextForm( _name );
+			}
+
+// what actions do we have to perform when clicking the button?			
+			propValue = readDynamicStringProperty( widget, "action" );
+			if( !propValue.isNull( ) ) {
+				props->setAction( propValue );
+			}
+
+			qDebug( ) << "connecting button" << _name << "to properties" << props->toString( );
+
+			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
+			
+			connect( pushButton, SIGNAL( clicked( ) ),
+				m_signalMapper, SLOT( map( ) ) );
+
+			m_signalMapper->setMapping( pushButton, props );
+		}
+	}
 
 // not busy anymore
 	qApp->restoreOverrideCursor( );
@@ -150,14 +232,14 @@ void FormWidget::dataLoaded( QString name, QByteArray xml )
 	m_dataHandler->readFormData( name, m_ui, xml );
 }
 
-void FormWidget::formDomainLoaded( QString form_name, QString widget_name, QByteArray data )
+void FormWidget::formDomainLoaded( QString form_name, QString widget_name, QByteArray _data )
 {
-	m_dataHandler->loadFormDomain( form_name, widget_name, m_ui, data );
+	m_dataHandler->loadFormDomain( form_name, widget_name, m_ui, _data );
 }
 
-void FormWidget::on_buttons_accepted( )
+void FormWidget::actionSave( )
 {
-	qDebug( ) << "Form" << m_name << " accepted";
+	qDebug( ) << "Saving data of form " << m_name;
 	
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_name, m_ui, &xml );
@@ -165,9 +247,9 @@ void FormWidget::on_buttons_accepted( )
 	m_dataLoader->initiateDataSave( m_name, xml );
 }
 
-void FormWidget::on_buttons_rejected( )
+void FormWidget::actionReset( )
 {
-	qDebug( ) << "Form" << m_name << " rejected";
+	qDebug( ) << "Reseting data of form " << m_name;
 	
 	m_dataLoader->initiateDataLoad( m_name );
 }

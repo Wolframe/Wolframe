@@ -13,10 +13,33 @@
 #include <QBuffer>
 #include <QtUiTools>
 #include <QHBoxLayout>
+#include <QSignalMapper>
 
 namespace _Wolframe {
 	namespace QtClient {
 
+	class WidgetProperties : public QObject
+	{
+	Q_OBJECT
+	
+	public:
+		WidgetProperties( ) : m_action( ), m_nextForm( ) { }
+		
+		void setNextForm( const QString &_nextForm ) { m_nextForm = _nextForm; }
+		QString nextForm( ) const { return m_nextForm; }
+		void setAction( const QString &_action ) { m_action = _action; }
+		QString action( ) const { return m_action; }
+
+		QString toString( ) const
+		{
+			return QString( "[nextForm %1, action %2]" ).arg( m_nextForm ).arg( m_action );
+		}
+		
+	private:
+		QString m_action;		// action to execute
+		QString m_nextForm;		// next form to show
+	};
+	
 	class FormWidget : public QWidget
 	{
 	Q_OBJECT
@@ -36,9 +59,12 @@ namespace _Wolframe {
 		DataHandler *m_dataHandler;	// form/data handler
 		QLocale m_locale;		// current locale to use for form translations
 		QHBoxLayout *m_layout;		// main layout swallowing the form
-
+		QSignalMapper *m_signalMapper;	// delegate for form push buttons pointing to forms
+		QStringList m_forms;		// names of all currently loaded forms
+		
 	private:
 		void initialize( );
+		QString readDynamicStringProperty( QObject *o, const char *name );
 	
 	signals:
 		void formLoaded( QString name );
@@ -46,12 +72,14 @@ namespace _Wolframe {
 	private slots:
 		void formLoaded( QString name, QByteArray form );
 		void formLocalizationLoaded( QString name, QByteArray localization );
+		void formListLoaded( QStringList forms );
 		void dataLoaded( QString name, QByteArray xml );
 		void dataSaved( QString name );
 		void formDomainLoaded( QString form_name, QString widget_name, QByteArray data );
 
-		void on_buttons_accepted( );
-		void on_buttons_rejected( );
+		void switchForm( QObject *object );
+		void actionSave( );
+		void actionReset( );
 	};
 	
 } // namespace QtClient
