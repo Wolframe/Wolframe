@@ -5,6 +5,7 @@
 #include "PreferencesDialog.hpp"
 #include "Preferences.hpp"
 #include "LoadMode.hpp"
+#include "global.hpp"
 
 #include <QFormLayout>
 #include <QGroupBox>
@@ -14,18 +15,25 @@
 namespace _Wolframe {
 	namespace QtClient {
 
-PreferencesDialog::PreferencesDialog( QWidget *_parent ) :
-	QDialog( _parent )
+PreferencesDialog::PreferencesDialog( QWidget *_parent )
+	: QDialog( _parent ), m_languages( )
 {
 	initialize( );
 	loadSettings( );
-	
-	setWindowTitle( tr( "Preferences" ) );
-	setModal( true );
+}
+
+PreferencesDialog::PreferencesDialog( QStringList _languages, QWidget *_parent )
+	: QDialog( _parent ), m_languages( _languages )
+{
+	initialize( );
+	loadSettings( );
 }
 
 void PreferencesDialog::initialize( )
 {
+	setWindowTitle( tr( "Preferences" ) );
+	setModal( true );
+	
 	QFormLayout *formLayout = new QFormLayout( );
 	
 	QGroupBox *groupBox = new QGroupBox( );
@@ -76,6 +84,22 @@ void PreferencesDialog::initialize( )
 
 	m_debug = new QCheckBox( this );
 	formLayout->addRow( tr( "&Debug:" ), m_debug );
+
+	if( !m_languages.empty( ) ) {
+		m_systemLanguage = new QCheckBox( this );
+		formLayout->addRow( tr( "&Use system language:" ), m_systemLanguage );
+
+		connect( m_systemLanguage, SIGNAL( stateChanged( int ) ),
+			this, SLOT( toggleSystemLanguage( int ) ) );
+		
+		m_locale = new QComboBox( this );
+		foreach( QString language, m_languages ) {
+			QLocale myLocale( language );
+			QString printableLanguage = myLocale.languageToString( myLocale.language( ) ) + " (" + language + ")";
+			m_locale->addItem( printableLanguage, language );
+		}
+		formLayout->addRow( tr( "&Locale:" ), m_locale );		
+	}
 	
 	m_buttons = new QDialogButtonBox( this );
 	m_buttons->addButton( QDialogButtonBox::Ok );
@@ -145,7 +169,19 @@ void PreferencesDialog::loadSettings( )
 	m_debug->setChecked( prefs->debug( ) );
 	m_uiFormsDir->setFileName( prefs->uiFormsDir( ) );
 	m_uiFormTranslationsDir->setFileName( prefs->uiFormTranslationsDir( ) );
-	m_dataLoaderDir->setFileName( prefs->dataLoaderDir( ) );
+	m_dataLoaderDir->setFileName( prefs->dataLoaderDir( ) );		
+	if( !m_languages.empty( ) ) {
+		QString lang = prefs->locale( );
+		if( lang == SYSTEM_LANGUAGE ) {
+			m_systemLanguage->setChecked( true );
+		} else {
+			m_systemLanguage->setChecked( false );
+			int idx = m_locale->findData( prefs->locale( ) );
+			if( idx != -1 ) {
+				m_locale->setCurrentIndex( idx );
+			}
+		}
+	}
 }
 
 void PreferencesDialog::apply( )
@@ -170,6 +206,14 @@ void PreferencesDialog::apply( )
 	prefs->setUiFormsDir( m_uiFormsDir->fileName( ) );
 	prefs->setUiFormTranslationsDir( m_uiFormTranslationsDir->fileName( ) );
 	prefs->setDataLoaderDir( m_dataLoaderDir->fileName( ) );
+	if( !m_languages.empty( ) ) {
+		if( m_systemLanguage->isChecked( ) ) {
+			prefs->setLocale( SYSTEM_LANGUAGE );
+		} else {
+			QString lang = m_locale->itemData( m_locale->currentIndex( ) ).toString( );
+			prefs->setLocale( lang );
+		}
+	}
 	
 	prefs->storeSettings( );
 
@@ -203,6 +247,11 @@ void PreferencesDialog::toggleLoadMode( bool /* checked */ )
 	m_uiFormsDir->setEnabled( m_loadModeLocalFile->isChecked( ) );
 	m_uiFormTranslationsDir->setEnabled( m_loadModeLocalFile->isChecked( ) );
 	m_dataLoaderDir->setEnabled( m_loadModeLocalFile->isChecked( ) );
+}
+
+void PreferencesDialog::toggleSystemLanguage( int /* state */ )
+{
+	m_locale->setEnabled( !( m_systemLanguage->isChecked( ) ) );
 }
 
 } // namespace QtClient

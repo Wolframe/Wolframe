@@ -84,6 +84,10 @@ namespace _Wolframe {
 			QString dataLoaderDir( ) const { return m_dataLoaderDir; }
 			void setDataLoaderDir( QString _dataLoaderDir ) { m_dataLoaderDir = _dataLoaderDir; }
 		
+			Q_PROPERTY( QString m_locale READ locale WRITE setLocale )
+			QString locale( ) const { return m_locale; }
+			void setLocale( QString _locale ) { m_locale = _locale; }
+			
 		private:
 			QSettings *createSettings( );
 			
@@ -106,6 +110,7 @@ namespace _Wolframe {
 			QString m_uiFormsDir;
 			QString m_uiFormTranslationsDir;
 			QString m_dataLoaderDir;
+			QString m_locale;
 	};
 	
 } // namespace QtClient

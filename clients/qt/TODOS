@@ -49,33 +49,31 @@
       on states of other widgets, best example is a checked group
       box for a bunch of settings, see preferences dialog)
 - workflow for form
-  - forms in forms: show multiple views
+  - forms in forms: show multiple views, in theory a widget of
+    FormWidget's should to the trick
   - what has to be communicated between forms? example: edit
     existing item, add new item.
+  - passing hidden parameters between forms (example ID of a
+    product to show)
 - stop flickering in hour glas
 - loadmode must be split in UI-loadmode and data-loadmode (at least for
   now when we use local forms and network data connections in parallel)
-- QIODevice for data loader and handler instead of a fixed byte
-  array in the signal (otherwise the debug window gets complicated)
 - protocol
   - add doctype to data XML
   - network loader via protocol or use client library?
 - add authentication dialog
+- language picker must show the union of all languages of all forms
+  and the languages/translations in themes
+- action/form switchForm:
+  - need a small state machine for handling the sequence [{action}] <form>
+    correctly with error handling
+  - as with state machines we would have a "go back wherever you came from"
 - most likely not the idea
   - 1:n relations (pick a foreign reference to another
     object), domains (e.g. pick a city in a list of possibilities)
   - grid views
-- language picker must show the union of all languages of all forms
-  and the languages/translations in themes
-- define dyamic properties for wiring things up, they have higher precedence
-  than the build-in glue by name:
-  - form: string, the next form to show
-  - data: string, save/load
-  - they must be combinable
-  - as with state machines we would have a "go back wherever you came from"
-  - if the type is string, we have to manually deselect the 'translatable',
-    otherwise linguist let's us translate programming tokens.
-- action/form switchForm:
-  - need a small state machine for handling the sequence [{action}] <form>
-    correctly with error handling
-    
+- QIODevice for data loader and handler instead of a fixed byte
+  array in the signal (otherwise the debug window gets complicated)
+- qtclient.XXX.qm is for translation of the application (fixed dialogs
+  and C++ code), MainWindow.XXX.qm will be the translation for the 
+  main window of the theme only

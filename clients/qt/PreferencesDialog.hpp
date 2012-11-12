@@ -6,12 +6,14 @@
 #define _PREFERENCES_DIALOG_HPP_INCLUDED
 
 #include <QDialog>
+#include <QStringList>
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QRadioButton>
+#include <QComboBox>
 
 #include "FileChooser.hpp"
 
@@ -24,6 +26,7 @@ namespace _Wolframe {
 		
 	public:
 		PreferencesDialog( QWidget *_parent = 0 );
+		PreferencesDialog( QStringList _languages, QWidget *_parent = 0 );
 	
 	private:
 		QRadioButton *m_loadModeLocalFile;
@@ -41,6 +44,9 @@ namespace _Wolframe {
 		FileChooser *m_uiFormTranslationsDir;
 		FileChooser *m_dataLoaderDir;
 		QCheckBox *m_debug;
+		QComboBox *m_locale;
+		QCheckBox *m_systemLanguage;
+		QStringList m_languages;
 	
 	signals:
 		void prefsChanged( );
@@ -52,6 +58,7 @@ namespace _Wolframe {
 	private slots:
 		void toggleSecure( int state );
 		void toggleLoadMode( bool checked );
+		void toggleSystemLanguage( int state );
 		void apply( );
 		void cancel( );
 	};

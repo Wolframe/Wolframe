@@ -3,6 +3,7 @@
 //
 
 #include "NetworkFormLoader.hpp"
+#include "global.hpp"
 
 #include <QDir>
 #include <QFile>
@@ -57,7 +58,7 @@ void NetworkFormLoader::initiateFormLoad( QString &name )
 void NetworkFormLoader::initiateGetLanguageCodes( )
 {
 	QStringList languageCodes;
-	languageCodes.push_back( "en_US" ); // default locale, always around
+	languageCodes.push_back( DEFAULT_LOCALE ); // default locale, always around
 	
 	//~ QString s = m_wolframeClient->syncRun( "getFormLanguages" );
 	//~ if( s.isNull( ) ) {
