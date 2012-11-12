@@ -13,42 +13,87 @@
   <property name="windowTitle">
    <string>Wolframe client form 1</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QTreeWidget" name="vegetable">
-     <property name="selectionMode">
-      <enum>QAbstractItemView::MultiSelection</enum>
-     </property>
-     <property name="columnCount">
-      <number>2</number>
-     </property>
-     <attribute name="headerVisible">
-      <bool>true</bool>
-     </attribute>
-     <column>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>260</y>
+     <width>249</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <widget class="QPushButton" name="save_3">
       <property name="text">
-       <string>vegetable</string>
+       <string>Save</string>
       </property>
-     </column>
-     <column>
+      <property name="autoDefault">
+       <bool>true</bool>
+      </property>
+      <property name="default">
+       <bool>true</bool>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">init</string>
+      </property>
+      <property name="action" stdset="0">
+       <string notr="true">save</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="reset_3">
       <property name="text">
-       <string>description</string>
+       <string>Reset</string>
       </property>
-     </column>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttons">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
-  </layout>
+      <property name="action" stdset="0">
+       <string notr="true">reset</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="cancel_3">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">init</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QTreeWidget" name="vegetable">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>381</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="selectionMode">
+    <enum>QAbstractItemView::MultiSelection</enum>
+   </property>
+   <property name="columnCount">
+    <number>2</number>
+   </property>
+   <attribute name="headerVisible">
+    <bool>true</bool>
+   </attribute>
+   <column>
+    <property name="text">
+     <string>vegetable</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>description</string>
+    </property>
+   </column>
+  </widget>
  </widget>
- <tabstops>
-  <tabstop>buttons</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

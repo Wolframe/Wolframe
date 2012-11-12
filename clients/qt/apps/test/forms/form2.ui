@@ -86,19 +86,6 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QDialogButtonBox" name="buttons">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>340</y>
-     <width>156</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
@@ -157,6 +144,57 @@
     <cstring>first</cstring>
    </property>
   </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>350</y>
+     <width>249</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <widget class="QPushButton" name="save_3">
+      <property name="text">
+       <string>Save</string>
+      </property>
+      <property name="autoDefault">
+       <bool>true</bool>
+      </property>
+      <property name="default">
+       <bool>true</bool>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">init</string>
+      </property>
+      <property name="action" stdset="0">
+       <string notr="true">save</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="reset_3">
+      <property name="text">
+       <string>Reset</string>
+      </property>
+      <property name="action" stdset="0">
+       <string notr="true">reset</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="cancel_3">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">init</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -170,7 +208,6 @@
   <tabstop>last</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>text</tabstop>
-  <tabstop>buttons</tabstop>
  </tabstops>
  <resources/>
  <connections/>

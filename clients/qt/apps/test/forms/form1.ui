@@ -313,6 +313,16 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>Cancel</string>
+         </property>
+         <property name="form" stdset="0">
+          <string notr="true">init</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
