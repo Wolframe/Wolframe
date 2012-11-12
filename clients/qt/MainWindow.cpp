@@ -621,6 +621,12 @@ void MainWindow::formLoaded( QString name )
 	}
 }
 
+void MainWindow::on_actionRestart_triggered( )
+{
+	qDebug( ) << "Restarting application";
+	QApplication::instance( )->exit( RESTART_CODE );
+}
+
 void MainWindow::on_actionExit_triggered( )
 {	
 	if( m_loadMode == Network ) {

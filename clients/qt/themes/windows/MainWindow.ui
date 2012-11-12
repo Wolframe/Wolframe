@@ -48,6 +48,7 @@
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>
+    <addaction name="actionRestart"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuForms">
@@ -100,7 +101,11 @@
      <height>491</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="mainAreaLayout"/>
+   <layout class="QVBoxLayout" name="mainAreaLayout">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetMaximumSize</enum>
+    </property>
+   </layout>
   </widget>
   <action name="actionOpen">
    <property name="icon">
@@ -159,6 +164,11 @@
   <action name="actionManageStorage">
    <property name="text">
     <string>&amp;Manage Storage</string>
+   </property>
+  </action>
+  <action name="actionRestart">
+   <property name="text">
+    <string>&amp;Restart</string>
    </property>
   </action>
  </widget>

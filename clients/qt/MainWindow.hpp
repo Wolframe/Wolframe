@@ -100,6 +100,7 @@ namespace _Wolframe {
 		void formLoaded( QString name );
 
 // auto-wired slots for the menu
+		void on_actionRestart_triggered( );
 		void on_actionExit_triggered( );
 		void on_actionPreferences_triggered( );
 		void on_actionManageStorage_triggered( );
