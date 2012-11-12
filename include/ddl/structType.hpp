@@ -280,9 +280,9 @@ public:
 
 	///\brief Define the document type definition string for this form
 	///\param[in] doctype_ Document type definition string
-	void defineDoctype( const char* doctype_)
+	void defineDoctype( const std::string& doctype_)
 	{
-		m_doctype = doctype_?doctype_:"";
+		m_doctype = doctype_;
 	}
 
 	void print( std::ostream& out, size_t level=0) const;

@@ -1,20 +1,22 @@
 !DOCTYPE "assignmentlist 'http://www.wolframe.org/example-doc/employee_assignment_print.dtd'"
-assignmentlist
 {
-	assignment []
+	assignmentlist
 	{
-		task []
+		assignment []
 		{
-			title string
-			key string
-			customernumber int
+			task []
+			{
+				title string
+				key string
+				customernumber int
+			}
+			employee
+			{
+				firstname string
+				surname string
+				phone string
+			}
+			issuedate string
 		}
-		employee
-		{
-			firstname string
-			surname string
-			phone string
-		}
-		issuedate string
 	}
 }

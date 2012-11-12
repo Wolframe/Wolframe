@@ -1,5 +1,7 @@
-!DOCTYPE treeSelectChildrenByName
-node
+DOCTYPE "node treeSelectChildrenByName"
 {
-	name string
+	node
+	{
+		name string
+	}
 }

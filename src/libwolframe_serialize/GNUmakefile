@@ -32,7 +32,6 @@ CPP_OBJS = \
 	ddl_atomicType.o \
 	ddl_structType.o \
 	ddl_structTypeBuild.o \
-	ddl_compilerInterface.o \
 	ddl_filtermapParse.o \
 	ddl_filtermapSerialize.o \
 	mapContext.o \

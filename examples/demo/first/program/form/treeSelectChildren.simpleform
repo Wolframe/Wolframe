@@ -1,5 +1,7 @@
-!DOCTYPE treeSelectChildren
-node
+DOCTYPE "node treeSelectChildren"
 {
-	id int
+	node
+	{
+		id int
+	}
 }

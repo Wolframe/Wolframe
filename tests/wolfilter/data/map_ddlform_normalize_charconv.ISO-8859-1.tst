@@ -68,59 +68,60 @@ f_floAt = number:trim ,Number:float(12,12);
 text_Ascii_de =  localeConv :latinword, ascii_de
 text_ascii_eu=localeconv :  latinword ,ascii_eu ;
 **file: typed_invoice.simpleform
-!DOCTYPE "invoice 'http://www.wolframe.org/example-doc/typed_invoice.dtd'"
-invoice
+DOCTYPE "invoice 'http://www.wolframe.org/example-doc/typed_invoice.dtd'"
 {
-	order
+	invoice
 	{
-		number f_int
-		reference string
-		representative string
-		terms uint
-		issuedate string
-		duedate string
-		description text_ascii_de
-	}
-	item []
-	{
-		name text_ascii_de
-		description text_ascii_de
-		quantity f_uint
-		discount f_float
-		price
+		order
 		{
-			unit float
-			total float
-			tax
+			number f_int
+			reference string
+			representative string
+			terms uint
+			issuedate string
+			duedate string
+			description text_ascii_de
+		}
+		item []
+		{
+			name text_ascii_de
+			description text_ascii_de
+			quantity f_uint
+			discount f_float
+			price
 			{
-				description @string
-				_ float
+				unit float
+				total float
+				tax
+				{
+					description @string
+					_ float
+				}
+				gross float
 			}
-			gross float
 		}
-	}
-	bill
-	{
-		price
+		bill
 		{
-			total float
-			tax float
-			gross float
+			price
+			{
+				total float
+				tax float
+				gross float
+			}
+			payed float
+			open float
 		}
-		payed float
-		open float
-	}
-	address []
-	{
-		id @string
-		name text_ascii_eu
-		street text_ascii_de
-		postalcode uint
-		city string
-		country string
+		address []
+		{
+			id @string
+			name text_ascii_eu
+			street text_ascii_de
+			postalcode uint
+			city string
+			country string
+		}
 	}
 }
-
 **output
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE invoice SYSTEM 'http://www.wolframe.org/example-doc/typed_invoice.dtd'>

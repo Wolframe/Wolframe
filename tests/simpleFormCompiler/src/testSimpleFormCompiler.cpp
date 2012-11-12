@@ -98,8 +98,12 @@ TEST_F( SimpleFormCompilerTest, tests)
 		std::string srcfile = pp.string() + ".simpleform";
 		ddl::SimpleFormCompiler mm;
 		DDLTypeMap typemap;
-		ddl::Form sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
-		sr.print( std::cerr);
+		std::vector<ddl::Form> sr = mm.compile( utils::readSourceFileContent( srcfile), &typemap);
+		std::vector<ddl::Form>::const_iterator si = sr.begin(), se = sr.end();
+		for (; si != se; ++si)
+		{
+			si->print( std::cerr);
+		}
 	}
 }
 

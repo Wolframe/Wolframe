@@ -1,11 +1,13 @@
-!DOCTYPE "doc 'http://www.wolframe.org/example-doc/map_cmdhnd_transaction_outputform.dtd'"
-doc
+DOCTYPE "doc 'http://www.wolframe.org/example-doc/map_cmdhnd_transaction_outputform.dtd'"
 {
-	task []
+	doc
 	{
-		task string
-		start string
-		end string
-		id int
+		task []
+		{
+			task string
+			start string
+			end string
+			id int
+		}
 	}
 }

@@ -38,6 +38,7 @@ Project Wolframe.
 #include "ddl/structType.hpp"
 #include "types/countedReference.hpp"
 #include <string>
+#include <vector>
 
 namespace _Wolframe {
 namespace ddl {
@@ -52,8 +53,8 @@ struct DDLCompiler
 	///\brief Compile a source from a string. Throws in case of error.
 	///\param[in] srcstring source as string
 	///\param[in] typemap map with atomic type definitions
-	///\return compilation result (a Form)
-	virtual Form compile( const std::string& srcstring, const TypeMap* typemap) const=0;
+	///\return compilation result (a list of forms)
+	virtual std::vector<Form> compile( const std::string& srcstring, const TypeMap* typemap) const=0;
 
 	///\brief Get the name of the ddl this compiler is for
 	const std::string& ddlname() const		{return m_ddlname;}
@@ -68,13 +69,6 @@ typedef types::CountedReference<DDLCompiler> DDLCompilerR;
 ///\brief Describes the creation of a DDL compiler object
 typedef DDLCompiler* (*CreateDDLCompilerFunc)();
 
-
-///\brief Get a form an its document type identifying the form
-///\param[in] ddlc compiler of the DDL the form is described in
-///\param[in] ddfilename data definition source file name as absolute path
-///\param[in] typemap map with atomic type definitions
-///\return pair (identifier, structure) where the identifier identifies the form and structure describes the form
-std::pair< std::string, ddl::FormR> loadForm( const ddl::DDLCompiler& ddlc, const std::string& ddfilename, const TypeMap* typemap);
 
 }}//namespace
 #endif

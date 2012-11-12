@@ -94,26 +94,29 @@ function run()
 end
 
 **file: employee_assignment_print.simpleform
-!DOCTYPE "assignmentlist 'http://www.wolframe.org/example-doc/employee_assignment_print.dtd'"
-assignmentlist
+DOCTYPE "assignmentlist 'http://www.wolframe.org/example-doc/employee_assignment_print.dtd'"
 {
-	assignment []
+	assignmentlist
 	{
-		task []
+		assignment []
 		{
-			title string
-			key string
-			customernumber int
+			task []
+			{
+				title string
+				key string
+				customernumber int
+			}
+			employee
+			{
+				firstname string
+				surname string
+				phone string
+			}
+			issuedate string
 		}
-		employee
-		{
-			firstname string
-			surname string
-			phone string
-		}
-		issuedate string
 	}
 }
+
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assignmentlist><assignment><issuedate>13.5.2006</issuedate><employee><firstname>Julia</firstname><phone>098 765 43 21</phone><surname>Tegel-Sacher</surname></employee><task><customernumber>324</customernumber><key>A123</key><title>job 1</title></task><task><customernumber>567</customernumber><key>V456</key><title>job 2</title></task></assignment><assignment><issuedate>13.5.2006</issuedate><employee><firstname>Jakob</firstname><phone>012 345 67 89</phone><surname>Stegelin</surname></employee><task><customernumber>567</customernumber><key>A456</key><title>job 3</title></task><task><customernumber>890</customernumber><key>V789</key><title>job 4</title></task></assignment></assignmentlist>

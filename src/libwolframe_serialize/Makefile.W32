@@ -25,7 +25,6 @@ CPP_OBJS = \
 	ddl_atomicType.obj \
 	ddl_structType.obj \
 	ddl_structTypeBuild.obj \
-	ddl_compilerInterface.obj \
 	ddl_filtermapParse.obj \
 	ddl_filtermapSerialize.obj \
 	mapContext.obj \

@@ -64,17 +64,23 @@ void FormLibrary::loadProgram( const std::string& filename)
 		if (ext.empty()) std::runtime_error( std::string( "unknown DDL type for file '") + filename + "'");
 		types::keymap<ddl::DDLCompilerR>::const_iterator ci = m_constructormap.find( std::string( ext.c_str()+1));
 		if (ci == m_constructormap.end()) throw std::runtime_error( std::string( "unknown DDL type for file '") + filename + "'");
-		ddl::FormR form( new ddl::Form( ci->second->compile( utils::readSourceFileContent( filename), m_typemap.get())));
-		std::string name;
-		if (form->doctype())
+
+		std::vector<ddl::Form> forms = ci->second->compile( utils::readSourceFileContent( filename), m_typemap.get());
+		std::vector<ddl::Form>::const_iterator fi = forms.begin(), fe = forms.end();
+		for (; fi != fe; ++fi)
 		{
-			name = utils::getIdFromDoctype( form->doctype());
+			ddl::FormR form( new ddl::Form( *fi));
+			std::string name;
+			if (fi->doctype())
+			{
+				name = utils::getIdFromDoctype( fi->doctype());
+			}
+			else
+			{
+				name = utils::getFileStem( filename);
+			}
+			insert( name, form);
 		}
-		else
-		{
-			name = utils::getFileStem( filename);
-		}
-		insert( name, form);
 	}
 	catch (const config::PositionalErrorException& e)
 	{

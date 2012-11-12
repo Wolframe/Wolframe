@@ -1,6 +1,8 @@
-!DOCTYPE treeAddNode
-node
+DOCTYPE "node treeAddNode"
 {
-	parentid int
-	name name
+	node
+	{
+		parentid int
+		name name
+	}
 }

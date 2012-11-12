@@ -160,7 +160,7 @@ public:
 					{
 						break;
 					}
-					throw std::runtime_error( "Syntax error in Simple Form Attribute: Illegal character after end of attribute");
+					throw std::runtime_error( "Syntax error in simple form attribute: Illegal character after end of attribute");
 			}
 		}
 		if (st == ParseName)
@@ -221,6 +221,7 @@ static bool isIdentifier( const std::string& name)
 	}
 	return (ii==ee);
 }
+
 static void compile_ptree( const boost::property_tree::ptree& pt, StructType& result, const TypeMap* typemap)
 {
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
@@ -305,41 +306,42 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 	}
 }
 
-static std::string getDoctype( boost::property_tree::ptree& pt)
+static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Form>& result, const TypeMap* typemap)
 {
-	std::string rt;
-	boost::property_tree::ptree::iterator itr=pt.begin(),end=pt.end();
-	while (itr != end)
+	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
+	if (itr != end && !boost::algorithm::iequals( itr->first, "DOCTYPE"))
 	{
-		if (itr->second.begin() == itr->second.end() && itr->second.data().size())
+		// ... single form
+		Form form;
+		compile_ptree( pt, form, typemap);
+		result.push_back( form);
+	}
+	else
+	{
+		for (;itr != end; ++itr)
 		{
-			if (itr->first[0] == '!')
+			Form form;
+			if (boost::algorithm::iequals( itr->first, "DOCTYPE"))
 			{
-				if (boost::algorithm::iequals( itr->first, "!DOCTYPE"))
-				{
-					if (rt.size()) throw std::runtime_error( "attribute !DOCTYPE defined twice");
-					rt = itr->second.data();
-				}
-				boost::property_tree::ptree::iterator dd = itr;
-				itr++;
-				pt.erase( dd);
-				continue;
+				form.defineDoctype( itr->second.data());
+				compile_ptree( itr->second, form, typemap);
+				result.push_back( form);
+			}
+			else
+			{
+				throw std::runtime_error( "DOCTYPE expected as top level node");
 			}
 		}
-		++itr;
 	}
-	return rt;
 }
 
-Form SimpleFormCompiler::compile( const std::string& srcstring, const TypeMap* typemap) const
+std::vector<Form> SimpleFormCompiler::compile( const std::string& srcstring, const TypeMap* typemap) const
 {
-	Form rt;
+	std::vector<Form> rt;
 	std::istringstream src( srcstring);
 	boost::property_tree::ptree pt;
 	boost::property_tree::info_parser::read_info( src, pt);
-	std::string doctype = getDoctype( pt);
-	if (doctype.size()) rt.defineDoctype( doctype.c_str());
-	compile_ptree( pt, rt, typemap);
+	compile_forms( pt, rt, typemap);
 	return rt;
 }
 
