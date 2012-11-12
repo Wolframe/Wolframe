@@ -16,4 +16,8 @@
 
 #define RESTART_CODE 1000
 
+#define DEFAULT_LOCALE "en_US"
+
+#define SYSTEM_LANGUAGE "SYSTEM"
+
 #endif // _GLOBAL_HPP_INCLUDED

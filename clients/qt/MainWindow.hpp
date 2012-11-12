@@ -34,9 +34,9 @@ namespace _Wolframe {
 			ScreenOrientationAuto
 		};
 
-	// Note that this will only have an effect on Fremantle.
-	void setOrientation( ScreenOrientation orientation );
-	void showExpanded( );
+		// Note that this will only have an effect on Fremantle.
+		void setOrientation( ScreenOrientation orientation );
+		void showExpanded( );
 	
 	private:
 		QCommandLine *m_cmdline;	// command line parser	
@@ -64,7 +64,9 @@ namespace _Wolframe {
 		QString m_uiFormsDir;		// for FileFormLoader (forms dir)
 		QString m_uiFormTranslationsDir; // for FileFormLoader (i18n dir)
 		QString m_dataLoaderDir;	// for FileDataLoader (data dir)
-
+		QStringList m_languages;	// available interface translations
+		QString m_language;		// the current language of the interface
+		
 	public slots:
 		void readSettings( );
 		void parseArgs( );

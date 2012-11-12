@@ -40,7 +40,8 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_loginDialog( 0 ), m_dbName( DEFAULT_SQLITE_FILENAME ), m_settings( ),
 	m_uiFormsDir( DEFAULT_UI_FORMS_DIR ),
 	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
-	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR )
+	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR ),
+	m_languages( ), m_language( )
 {
 // read arguments for the '-s <setting file>' parameter
 #ifndef Q_OS_ANDROID
@@ -52,7 +53,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 		Preferences::setFileName( m_settings );
 	}
 	if( !Preferences::instance( )->exists( ) ) {
-		PreferencesDialog d;
+		PreferencesDialog d( this );
 		d.exec( );
 		readSettings( );
 	} else {
@@ -82,6 +83,11 @@ void MainWindow::readSettings( )
 	m_uiFormsDir = prefs->uiFormsDir( );
 	m_uiFormTranslationsDir = prefs->uiFormTranslationsDir( );
 	m_dataLoaderDir = prefs->dataLoaderDir( );
+	if( prefs->locale( ) == SYSTEM_LANGUAGE ) {
+		m_language = QLocale::system( ).name( );
+	} else {
+		m_language = prefs->locale( );
+	}
 }
 
 static DebugTerminal *debugTerminal = 0;
@@ -311,7 +317,7 @@ void MainWindow::initialize( )
 		this, SLOT( loadForm( QString ) ) );
 
 // set default language to the system language
-	m_currentLanguage = QLocale::system( ).name( );
+	m_currentLanguage = m_language;
 
 // load default theme
 #ifdef Q_OS_ANDROID
@@ -321,7 +327,7 @@ void MainWindow::initialize( )
 #endif
 
 // load language resources, repaints the whole interface if necessary
-	loadLanguage( QLocale::system( ).name( ) );
+	loadLanguage( m_currentLanguage );
 	
 // load initial form
 	loadForm( "init" );
@@ -381,13 +387,13 @@ void MainWindow::authenticationOk( )
 		this, SLOT( formLoaded( QString ) ) );
 
 // set default language to the system language
-	m_currentLanguage = QLocale::system( ).name( );
+	m_currentLanguage = m_language;
 
 // load default theme
 	loadTheme( QString( QLatin1String( "windows" ) ) );
 
 // load language resources, repaints the whole interface if necessary
-	loadLanguage( QLocale::system( ).name( ) );	
+	loadLanguage( m_currentLanguage );	
 
 // load initial form
 	loadForm( "init" );
@@ -507,6 +513,9 @@ void MainWindow::loadLanguages( )
 
 void MainWindow::languageCodesLoaded( QStringList languages )
 {
+// remember languages for preferences dialog
+	m_languages = languages;
+	
 // construct a menu showing all languages
 	QMenu *languageMenu = qFindChild<QMenu *>( m_ui, "menuLanguages" );
 	languageMenu->clear( );
@@ -563,7 +572,7 @@ void MainWindow::loadLanguage( QString language )
 	qDeleteAll( oldTranslators );
 
 // this it the default language, bail out as no translations are necessary
-	if( language == "en_US" ) {
+	if( language == DEFAULT_LOCALE ) {
 		m_currentLanguage = language;
 		return;
 	}
@@ -643,7 +652,7 @@ void MainWindow::on_actionExit_triggered( )
 
 void MainWindow::on_actionPreferences_triggered( )
 {
-	PreferencesDialog prefs( this );
+	PreferencesDialog prefs( m_languages, this );
 	if( prefs.exec( ) == QDialog::Accepted ) {
 		qDebug( ) << "Reloading application";
 		QApplication::instance( )->exit( RESTART_CODE );

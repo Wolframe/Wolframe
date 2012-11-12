@@ -3,6 +3,7 @@
 //
 
 #include "FileFormLoader.hpp"
+#include "global.hpp"
 
 #include <QDir>
 #include <QFile>
@@ -54,7 +55,7 @@ void FileFormLoader::initiateFormLoad( QString &name )
 void FileFormLoader::initiateGetLanguageCodes( )
 {
 	QStringList languageCodes;
-	languageCodes.push_back( "en_US" ); // default locale, always around
+	languageCodes.push_back( DEFAULT_LOCALE ); // default locale, always around
 	
 // read list of supported languages for all forms based on their qm files available
 	QDir translationDir( m_localeDir );

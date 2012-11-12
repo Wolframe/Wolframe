@@ -203,10 +203,16 @@ buildi18n:
 	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/qtclient.ro_RO.ts
 	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/qtclient.de_CH.ts
 	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/qtclient.ro_RO.ts
+	$(QT_LUPDATE) apps/test/forms/init.ui -ts apps/test/i18n/init.de_CH.ts
+	$(QT_LUPDATE) apps/test/forms/init.ui -ts apps/test/i18n/init.ro_RO.ts
 	$(QT_LUPDATE) apps/test/forms/form1.ui -ts apps/test/i18n/form1.de_CH.ts
 	$(QT_LUPDATE) apps/test/forms/form1.ui -ts apps/test/i18n/form1.ro_RO.ts
 	$(QT_LUPDATE) apps/test/forms/form2.ui -ts apps/test/i18n/form2.de_CH.ts
+	$(QT_LUPDATE) apps/test/forms/form2.ui -ts apps/test/i18n/form2.ro_RO.ts
 	$(QT_LUPDATE) apps/test/forms/form3.ui -ts apps/test/i18n/form3.de_CH.ts
+	$(QT_LUPDATE) apps/test/forms/form3.ui -ts apps/test/i18n/form3.ro_RO.ts
+	$(QT_LUPDATE) apps/test/forms/form4.ui -ts apps/test/i18n/form4.de_CH.ts
+	$(QT_LUPDATE) apps/test/forms/form4.ui -ts apps/test/i18n/form4.ro_RO.ts
 
 geany-ctags:
 	CFLAGS="$(ALL_CXXFLAGS)" geany -g geany.c++.tags `find . -name '*.[ch]pp'`

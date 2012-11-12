@@ -3,6 +3,7 @@
 //
 
 #include "SqliteFormLoader.hpp"
+#include "global.hpp"
 
 #include <QDir>
 #include <QFile>
@@ -147,7 +148,7 @@ void SqliteFormLoader::initiateFormLocalizationLoad( QString &name, QLocale loca
 void SqliteFormLoader::initiateGetLanguageCodes( )
 {
 	QStringList languageCodes;
-	languageCodes.push_back( "en_US" ); // default locale, always around
+	languageCodes.push_back( DEFAULT_LOCALE ); // default locale, always around
 
 	QSqlDatabase db = QSqlDatabase::database( m_dbName );
 	QSqlQuery q( "select distinct( locale ) from uitranslation", db );

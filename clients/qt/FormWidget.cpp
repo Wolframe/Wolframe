@@ -3,6 +3,7 @@
 //
 
 #include "FormWidget.hpp"
+#include "global.hpp"
 
 #include <QDebug>
 #include <QTranslator>
@@ -14,7 +15,7 @@ namespace _Wolframe {
 
 FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent )
 	: QWidget( _parent ), m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
-	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_locale( "en_US" ), m_forms( )
+	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_locale( DEFAULT_LOCALE ), m_forms( )
 {
 // maps data between constructed widgets from .ui and the data loader
 	m_dataHandler = new DataHandler( m_dataLoader );	
@@ -140,7 +141,6 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )
 {
 	QVariant v = o->property( name );
-	qDebug( ) << o << "property" << name << ":" << v;
 	if( !v.isValid( ) ) {
 		return QString( );
 	} else {
