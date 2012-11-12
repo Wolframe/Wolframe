@@ -1,7 +1,0 @@
-DOCTYPE "node treeSelectChildrenByName"
-{
-	node
-	{
-		name string
-	}
-}

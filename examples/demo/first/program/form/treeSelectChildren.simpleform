@@ -1,7 +1,0 @@
-DOCTYPE "node treeSelectChildren"
-{
-	node
-	{
-		id int
-	}
-}

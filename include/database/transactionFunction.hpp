@@ -35,6 +35,7 @@
 #ifndef _DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_FUNCTION_HPP_INCLUDED
 #include "types/countedReference.hpp"
+#include "types/keymap.hpp"
 #include "filter/typedfilter.hpp"
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
@@ -138,11 +139,14 @@ struct TransactionDescription
 	bool unique;
 };
 
+class TransactionFunction;
+typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
+
 class TransactionFunction
 {
 public:
 	TransactionFunction( const TransactionFunction& o);
-	TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description);
+	TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap);
 	virtual ~TransactionFunction();
 
 	virtual TransactionFunctionInput* getInput() const;
@@ -168,9 +172,7 @@ private:
 ///\brief Creates a database transaction function from its description source
 ///\param[in] name name of  the transaction
 ///\param[in] description transaction description source
-TransactionFunction* createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description);
-
-typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
+TransactionFunction* createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap);
 
 }}//namespace
 #endif

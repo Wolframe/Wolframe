@@ -1,8 +1,0 @@
-DOCTYPE "node treeDeleteSubtree"
-{
-	node
-	{
-		id int
-	}
-}
-

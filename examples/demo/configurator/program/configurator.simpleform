@@ -1,0 +1,50 @@
+DOCTYPE "products productList"
+{
+	products
+	{
+		item []
+		{
+			title string
+			key string
+			customernumber int
+			issuedate string
+		}
+	}
+}
+DOCTYPE "node treeAddNode"
+{
+	node
+	{
+		parentid int
+		name name
+	}
+}
+DOCTYPE "node treeDeleteSubtree"
+{
+	node
+	{
+		id int
+	}
+}
+
+DOCTYPE "node treeSelectChildrenByName"
+{
+	node
+	{
+		name string
+	}
+}
+DOCTYPE "node treeSelectChildren"
+{
+	node
+	{
+		id int
+	}
+}
+DOCTYPE "node treeSelectParents"
+{
+	node
+	{
+		id int
+	}
+}

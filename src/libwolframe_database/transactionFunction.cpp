@@ -62,6 +62,16 @@ public:
 	int get( const char* tag, std::size_t tagsize);
 	int unused() const;
 
+	std::map<int,int> insert( const TagTable& o)
+	{
+		std::map<int,int> rt;
+		std::map< std::string, int>::const_iterator oi = o.m_map.begin(), oe = o.m_map.end();
+		for (; oi != oe; ++oi)
+		{
+			rt[ oi->second] = get( oi->first);
+		}
+		return rt;
+	}
 private:
 	int m_size;
 	std::map< std::string, int> m_map;
@@ -172,6 +182,22 @@ public:
 	std::vector<Element>::const_iterator end() const		{return m_path.end();}
 	std::size_t size() const					{return m_path.size();}
 
+	void rewrite( const std::map<int,int>& rwtab)
+	{
+		std::vector<Element>::iterator pi = m_path.begin(), pe = m_path.end();
+		for (; pi != pe; ++pi)
+		{
+			std::map<int,int>::const_iterator re = rwtab.find( pi->m_tag);
+			if (re == rwtab.end()) throw std::logic_error( "rewrite table not complete");
+			pi->m_tag = re->second;
+		}
+	}
+
+	void append( const Path& o)
+	{
+		m_path.insert( m_path.end(), o.begin(), o.end());
+	}
+
 private:
 	std::vector<Element> m_path;
 };
@@ -212,7 +238,7 @@ struct TransactionFunction::Impl
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
 
-	Impl( const std::vector<TransactionDescription>& description);
+	Impl( const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap);
 	Impl( const Impl& o);
 };
 
@@ -997,11 +1023,12 @@ void TransactionFunctionOutput::resetIterator()
 	m_impl->resetIterator();
 }
 
-TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& description)
+TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap)
 {
 	typedef TransactionDescription::Error Error;
 	TransactionDescription::ElementName elementName = TransactionDescription::Call;
 
+	std::vector<std::size_t> functionidx;
 	std::vector<TransactionDescription>::const_iterator di = description.begin(), de = description.end();
 	for (; di != de; ++di)
 	{
@@ -1084,8 +1111,58 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 				Path pp( *ai, &m_tagmap);
 				param.push_back( pp);
 			}
-			FunctionCall cc( di->output, functionname, selector, param, di->nonempty, di->unique);
-			m_call.push_back( cc);
+			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( functionname);
+			if (fui == functionmap.end())
+			{
+				FunctionCall cc( di->output, functionname, selector, param, di->nonempty, di->unique);
+				m_call.push_back( cc);
+				functionidx.push_back( eidx);
+			}
+			else
+			{
+				Impl* func = fui->second->m_impl;
+				std::map<int,int> rwtab = m_tagmap.insert( func->m_tagmap);
+				std::vector<FunctionCall>::const_iterator fsi = func->m_call.begin(), fse = func->m_call.end();
+				for (; fsi != fse; ++fsi)
+				{
+					std::string resultname;
+					if (di->output.size())
+					{
+						resultname.append( di->output);
+					}
+					if (func->m_resultname.size())
+					{
+						resultname.append( "/");
+						resultname.append( func->m_resultname);
+					}
+					if (fsi->resultname().size())
+					{
+						resultname.append( "/");
+						resultname.append( fsi->resultname());
+					}
+					if (di->nonempty)
+					{
+						throw Error( elementName, eidx, "NONEMTY not supported for call of function here");
+					}
+					if (di->unique)
+					{
+						throw Error( elementName, eidx, "UNIQUE not supported for call of function here");
+					}
+					Path fselector = fsi->selector();
+					fselector.rewrite( rwtab);
+					Path cselector = selector;
+					cselector.append( fselector);
+					std::vector<Path> fparam = fsi->arg();
+					std::vector<Path>::iterator fai = fparam.begin(), fae = fparam.end();
+					for (; fai != fae; ++fai)
+					{
+						fai->rewrite( rwtab);
+					}
+					FunctionCall cc( resultname, fsi->name(), fselector, fparam, false, false);
+					m_call.push_back( cc);
+					functionidx.push_back( eidx);
+				}
+			}
 		}
 		catch (const std::runtime_error& e)
 		{
@@ -1100,6 +1177,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 	ci = m_call.begin(), ce = m_call.end();
 	for (; ci != ce; ++ci)
 	{
+		std::size_t eidx = functionidx[ci - m_call.begin()];
 		std::string prefix;
 		const char* pp = std::strchr( ci->resultname().c_str(), '/');
 		if (pp)
@@ -1107,7 +1185,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 			prefix.append( ci->resultname().c_str(), pp-ci->resultname().c_str());
 			if (std::strchr( pp+1, '/'))
 			{
-				throw Error( elementName, ci - m_call.begin(), "illegal result prefix. Only one '/' allowed");
+				throw Error( elementName, eidx, "illegal result prefix. Only one '/' allowed");
 			}
 			if (m_resultname.empty())
 			{
@@ -1120,7 +1198,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 			}
 			else
 			{
-				throw Error( elementName, ci - m_call.begin(), "no common result prefix");
+				throw Error( elementName, eidx, "no common result prefix");
 			}
 		}
 		if (m_resultname == ".")
@@ -1129,7 +1207,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 		}
 		if (!checkResultIdentifier( ci->resultname()) || !checkResultIdentifier( m_resultname))
 		{
-			throw Error( elementName, ci - m_call.begin(), "'.' or identifier or two identifiers separated by a '/' expected for output");
+			throw Error( elementName, eidx, "'.' or identifier or two identifiers separated by a '/' expected for output");
 		}
 	}
 
@@ -1138,9 +1216,10 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 	ci = m_call.begin(), ce = m_call.end();
 	for (; ci != ce; ++ci)
 	{
+		std::size_t eidx = functionidx[ci - m_call.begin()];
 		if (ci->selector().resultReference())
 		{
-			throw Error( elementName, ci - m_call.begin(), "undefined: result variable reference in selector");
+			throw Error( elementName, eidx, "undefined: result variable reference in selector");
 		}
 	}
 	elementName = TransactionDescription::Output;
@@ -1166,9 +1245,9 @@ TransactionFunction::Impl::Impl( const Impl& o)
 	,m_tagmap(o.m_tagmap){}
 
 
-TransactionFunction::TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description)
+TransactionFunction::TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap)
 	:m_name(name_)
-	,m_impl( new Impl( description)){}
+	,m_impl( new Impl( description, functionmap)){}
 
 TransactionFunction::TransactionFunction( const TransactionFunction& o)
 	:m_name(o.m_name)
@@ -1194,9 +1273,9 @@ TransactionFunctionOutput* TransactionFunction::getOutput( const db::Transaction
 	return new TransactionFunctionOutput( m_impl->m_resultname, m_impl->m_elemname, m_impl->m_elemunique, o);
 }
 
-TransactionFunction* _Wolframe::db::createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description)
+TransactionFunction* _Wolframe::db::createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap)
 {
-	return new TransactionFunction( name, description);
+	return new TransactionFunction( name, description, functionmap);
 }
 
 

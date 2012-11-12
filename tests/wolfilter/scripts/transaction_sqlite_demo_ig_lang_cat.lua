@@ -23,6 +23,12 @@ function insert_node( parentname, name)
 	formfunction( "treeAddNode")( {name=name, parentid=parentid} )
 end
 
+function copy_node( name, parentname)
+	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
+	local nodeid = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	formfunction( "treeCopyNode")( {nodeid=nodeid, newparentid=parentid} )
+end
+
 
 function delete_subtree( name)
 	local id = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
@@ -168,7 +174,7 @@ function get_tree( parentid)
 		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
 	end
 	for i,v in pairs( a) do
-		if v.parent ~= 0 then
+		if v.parent and v.parent ~= 0 then
 			table.insert( a[ v.parent ].children, i )
 		end
 	end

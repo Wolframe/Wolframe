@@ -1,8 +1,0 @@
-DOCTYPE "node treeAddNode"
-{
-	node
-	{
-		parentid int
-		name name
-	}
-}

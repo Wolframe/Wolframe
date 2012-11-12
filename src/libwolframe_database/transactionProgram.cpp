@@ -395,7 +395,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 	{
 		try
 		{
-			m_functionmap[ *ni] = TransactionFunctionR( createTransactionFunction( *ni, *di));
+			m_functionmap[ *ni] = TransactionFunctionR( createTransactionFunction( *ni, *di, m_functionmap));
 		}
 		catch (const TransactionDescription::Error& err)
 		{

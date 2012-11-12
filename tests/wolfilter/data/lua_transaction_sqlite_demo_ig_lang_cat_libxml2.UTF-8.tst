@@ -183,7 +183,7 @@ CREATE TABLE tree (
 --
 TRANSACTION treeAddRoot -- (name)
 BEGIN
-	DO INSERT INTO tree (ID, parent, name, lft, rgt) VALUES (1, 0, $(name), 1, 2);
+	DO INSERT INTO tree (ID, parent, name, lft, rgt) VALUES (1, NULL, $(name), 1, 2);
 END
 
 --
@@ -273,6 +273,87 @@ TRANSACTION treeSelectChildrenByName -- (/node/name)
 BEGIN
 	FOREACH /node INTO /node DO SELECT P1.ID,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name);
 END
+
+
+--
+-- treeMoveNode             :Move a node from one parent to another
+--
+TRANSACTION treeMoveNode -- (nodeid, newparentid)
+BEGIN
+	-- get parent boundaries
+	DO NONEMPTY UNIQUE SELECT lft,rgt FROM tree WHERE ID = $(newparentid);
+
+	-- mark parent left and child width
+	-- verify constraint that new parent is not a child of the copied/moved node
+	DO NONEMPTY UNIQUE SELECT $1,rgt-lft AS width FROM tree WHERE ID = $(nodeid) AND NOT ($1 >= lft AND $2 < rgt);
+
+	-- get place for the move/copy in the destination node area
+	DO UPDATE tree SET rgt = rgt + $2 WHERE rgt >= $1;
+	DO UPDATE tree SET lft = lft + $2 WHERE lft > $1;
+
+	-- Get the variables we need for the move/copy
+	-- $1 = lft destination
+	-- $2 = rgt destination
+	-- $3 = width destination
+	-- $4 = lft node
+	-- $5 = rgt node
+	-- $6 = width node
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(newparentid);
+	DO NONEMPTY UNIQUE SELECT $1,$2,$3,lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(nodeid);
+
+	-- make a copy of the node to move/copy as child of the destination node
+	DO INSERT INTO TREE
+		SELECT P1.ID AS ID,
+			P1.parent AS parent,
+			P1.lgt-$4+$1 AS lgt,
+			P1.rgt-$5+$2 AS rgt,
+			P1.name AS name
+		FROM tree AS P1, tree AS P2
+		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
+
+	-- delete the original node
+	DO DELETE FROM tree WHERE lft >= $4 AND lft <= $5;
+	DO UPDATE tree SET lft = lft-$6 WHERE lft>=$5;
+	DO UPDATE tree SET rgt = rgt-$6 WHERE rgt>$5;
+END
+
+
+--
+-- treeCopyNode             :Copy a node in the tree
+--
+TRANSACTION treeCopyNode -- (nodeid, newparentid)
+BEGIN
+	-- get parent boundaries
+	DO NONEMPTY UNIQUE SELECT lft,rgt FROM tree WHERE ID = $(newparentid);
+
+	-- mark parent left and child width
+	-- verify constraint that new parent is not a child of the copied/moved node
+	DO NONEMPTY UNIQUE SELECT $1,rgt-lft AS width FROM tree WHERE ID = $(nodeid) AND NOT ($1 >= lft AND $2 < rgt);
+
+	-- get place for the move/copy in the destination node area
+	DO UPDATE tree SET rgt = rgt + $2 WHERE rgt >= $1;
+	DO UPDATE tree SET lft = lft + $2 WHERE lft > $1;
+
+	-- Get the variables we need for the move/copy
+	-- $1 = lft destination
+	-- $2 = rgt destination
+	-- $3 = width destination
+	-- $4 = lft node
+	-- $5 = rgt node
+	-- $6 = width node
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(newparentid);
+	DO NONEMPTY UNIQUE SELECT $1,$2,$3,lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(nodeid);
+
+	-- make a copy of the node to move/copy as child of the destination node
+	DO INSERT INTO TREE
+		SELECT P1.ID AS ID,
+			P1.parent AS parent,
+			P1.lgt-$4+$1 AS lgt,
+			P1.rgt-$5+$2 AS rgt,
+			P1.name AS name
+		FROM tree AS P1, tree AS P2
+		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
+END
 **outputfile:DBDUMP
 **file: transaction_sqlite_demo_ig_lang_cat.lua
 idcnt = 0
@@ -298,6 +379,12 @@ end
 function insert_node( parentname, name)
 	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
 	formfunction( "treeAddNode")( {name=name, parentid=parentid} )
+end
+
+function copy_node( name, parentname)
+	local parentid = formfunction( "treeSelectNodeByName")( { node={ name=parentname } } ):table().ID
+	local nodeid = formfunction( "treeSelectNodeByName")( { node={ name=name } } ):table().ID
+	formfunction( "treeCopyNode")( {nodeid=nodeid, newparentid=parentid} )
 end
 
 
@@ -445,7 +532,7 @@ function get_tree( parentid)
 		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
 	end
 	for i,v in pairs( a) do
-		if v.parent ~= 0 then
+		if v.parent and v.parent ~= 0 then
 			table.insert( a[ v.parent ].children, i )
 		end
 	end
@@ -899,7 +986,7 @@ end
 	<class name="hittie"/>
 </class></sparsetree></result>
 tree:
-'1', '0', 'indogermanic', '1', '156'
+'1', NULL, 'indogermanic', '1', '156'
 '14', '1', 'germanic', '3', '78'
 '15', '14', 'west germanic', '4', '59'
 '16', '15', 'anglo-frisian', '5', '16'
