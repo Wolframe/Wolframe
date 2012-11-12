@@ -20,7 +20,6 @@
 #include <QTranslator>
 #include <QLocale>
 #include <QtAlgorithms>
-#include <QPushButton>
 #include <QMessageBox>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -41,7 +40,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_loginDialog( 0 ), m_dbName( DEFAULT_SQLITE_FILENAME ), m_settings( ),
 	m_uiFormsDir( DEFAULT_UI_FORMS_DIR ),
 	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
-	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR ), m_forms( )
+	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR )
 {
 // read arguments for the '-s <setting file>' parameter
 #ifndef Q_OS_ANDROID
@@ -216,12 +215,6 @@ void MainWindow::parseError( const QString &error )
 
 void MainWindow::initialize( )
 {
-// signal dispatcher for form buttons
-	m_signalMapper = new QSignalMapper( this );
-	
-	connect( m_signalMapper, SIGNAL( mapped( QString ) ),
-		this, SLOT( loadForm( QString ) ) );
-
 // create a Wolframe protocol client
 	m_wolframeClient = new WolframeClient( m_host, m_port, m_secure, m_clientCertFile, m_clientKeyFile, m_CACertFile );
 
@@ -313,6 +306,9 @@ void MainWindow::initialize( )
 // get notified if the form widget changes a form
 	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
+// the form widget can choose to switch the form
+	connect( m_formWidget, SIGNAL( switchForm( QString ) ),
+		this, SLOT( loadForm( QString ) ) );
 
 // set default language to the system language
 	m_currentLanguage = QLocale::system( ).name( );
@@ -530,9 +526,6 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 
 void MainWindow::formListLoaded( QStringList forms )
 {
-// remember list of forms, so we can connect buttons to them
-	m_forms = forms;
-	
 // contruct a menu which shows and wires them in the menu
 	QMenu *formsMenu = qFindChild<QMenu *>( m_ui, "menuForms" );
 	formsMenu->clear( );
@@ -600,7 +593,7 @@ void MainWindow::themeSelected( QAction *action )
 void MainWindow::formSelected( QAction *action )
 {		
 	QString form = action->text( );
-	qDebug( ) << "Form " << form << " selected";
+	qDebug( ) << "Form " << form << " selected (current form:" << m_currentForm << ")";
 	if( form != m_currentForm )
 		loadForm( form );
 }
@@ -608,31 +601,14 @@ void MainWindow::formSelected( QAction *action )
 void MainWindow::loadForm( QString name )
 {
 // delegate form loading to form widget
-	m_formWidget->loadForm( name );
-	
-// remember the name of the current form
-	m_currentForm = name;
+	m_formWidget->loadForm( name );	
 }
 
 void MainWindow::formLoaded( QString name )
 {
-// connect push buttons with form names to loadForms
-	QList<QWidget *> widgets = findChildren<QWidget *>( );
-	foreach( QWidget *widget, widgets ) {
-		QString clazz = widget->metaObject( )->className( ); 
-		QString _name = widget->objectName( );
-		
-		if( clazz == "QPushButton" && m_forms.contains( _name ) ) {
-			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
-			qDebug( ) << "connecting form action for form " << _name;
-			
-			connect( pushButton, SIGNAL( clicked( ) ),
-				m_signalMapper, SLOT( map( ) ) );
-
-			m_signalMapper->setMapping( pushButton, _name );
-		}
-	}
-
+// remember the name of the current form
+	m_currentForm = name;
+	
 // also set language of the form widget,
 // but wait till the form got loaded, otherwise we get races!
 	m_formWidget->loadLanguage( m_currentLanguage );
