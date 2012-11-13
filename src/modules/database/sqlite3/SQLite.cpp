@@ -316,67 +316,59 @@ SQLiteUIlibrary::SQLiteUIlibrary( const SQLiteDatabase &database )
 	: m_unit( database.dbUnit() )
 {}
 
-
-const std::list< UI::UIform::Info > SQLiteUIlibrary::formInfos( const std::string& /*platform*/,
-								const std::string& /*culture*/ ) const
+const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::infos( const std::string& /*platform*/,
+								     const std::string& /*role*/,
+								     const std::string& /*culture*/ ) const
 {
-	std::list< UI::UIform::Info >	forms;
-	return forms;
+	std::list< UI::InterfaceObject::Info >	objs;
+	return objs;
 }
 
-const std::list< UI::UIform::Info > SQLiteUIlibrary::formInfos( const std::string& /*platform*/,
-								const std::string& /*role*/,
-								const std::string& /*culture*/ ) const
+const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::infos( const std::string& /*platform*/,
+								     const std::list< std::string >& /*roles*/,
+								     const std::string& /*culture*/ ) const
 {
-	std::list< UI::UIform::Info >	forms;
-	return forms;
+	std::list< UI::InterfaceObject::Info >	objs;
+	return objs;
 }
 
-const std::list< UI::UIform::Info > SQLiteUIlibrary::formInfos( const std::string& /*platform*/,
-								const std::list< std::string >& /*roles*/,
-								const std::string& /*culture*/ ) const
+const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::versions( const std::string& /*platform*/,
+									const std::string& /*name*/,
+									const std::string& /*culture*/ ) const
 {
-	std::list< UI::UIform::Info >	forms;
-	return forms;
+	std::list< UI::InterfaceObject::Info >	objs;
+	return objs;
 }
 
-const std::list< UI::UIform::Info > SQLiteUIlibrary::formVersions( const std::string& /*platform*/,
-								   const std::string& /*name*/,
-								   const std::string& /*culture*/ ) const
+const UI::InterfaceObject SQLiteUIlibrary::object( const std::string& /*platform*/, const std::string& /*name*/,
+						   const std::string& /*culture*/ ) const
 {
-	std::list< UI::UIform::Info >	forms;
-	return forms;
+	UI::InterfaceObject	obj( "FORM", "Linux", "dummy test", "mo_MO", 01000000,
+				     "Dummy form for now", "" );
+	return obj;
 }
 
-const UI::UIform SQLiteUIlibrary::form( const std::string& /*platform*/, const std::string& /*name*/,
-					const std::string& /*culture*/ ) const
+const UI::InterfaceObject SQLiteUIlibrary::object( const std::string& /*platform*/,
+						   const std::string& /*name*/, const Version& /*version*/,
+						   const std::string& /*culture*/ ) const
 {
-	UI::UIform	form_( UI::UIform::FORM, "Linux", "dummy test", "mo_MO", 01000000,
-			       "Dummy form for now", "" );
-	return form_;
+	UI::InterfaceObject	obj( "FORM", "Linux", "dummy test", "mo_MO", 01000000,
+				     "Dummy form for now", "" );
+	return obj;
 }
 
-const UI::UIform SQLiteUIlibrary::form( const std::string& /*platform*/,
-					const std::string& /*name*/, const Version& /*version*/,
-					const std::string& /*culture*/ ) const
+const UI::InterfaceObject SQLiteUIlibrary::object( const UI::InterfaceObject::Info& /*info*/ ) const
 {
-	UI::UIform	form_( UI::UIform::FORM, "Linux", "dummy test", "mo_MO", 01000000,
-			       "Dummy form for now", "" );
-	return form_;
+	UI::InterfaceObject	obj( "FORM", "Linux", "dummy test", "mo_MO", 01000000,
+				     "Dummy form for now", "" );
+	return obj;
 }
 
-const UI::UIform SQLiteUIlibrary::form( const UI::UIform::Info& /*info*/ ) const
-{
-	UI::UIform	form_( UI::UIform::FORM, "Linux", "dummy test", "mo_MO", 01000000,
-			       "Dummy form for now", "" );
-	return form_;
-}
-
-void SQLiteUIlibrary::addForm( const UI::UIform& /*newForm*/ ) const
+void SQLiteUIlibrary::addObject( const UI::InterfaceObject& /*newObject*/ ) const
 {
 }
 
-bool SQLiteUIlibrary::deleteForm( const UI::UIform::Info& /*info*/ ) const
+bool SQLiteUIlibrary::deleteObject( const UI::InterfaceObject::Info& /*info*/ ) const
 {
 	return true;
 }

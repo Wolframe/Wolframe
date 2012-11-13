@@ -49,50 +49,51 @@
 #endif // defined( _WIN32 )
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	class LogBackend::LogBackendImpl
-	{
-	public:
-		LogBackendImpl( );
+class LogBackend::LogBackendImpl
+{
+public:
+	LogBackendImpl( );
 
-		~LogBackendImpl( );
+	~LogBackendImpl( );
 
-		void setConsoleLevel( const LogLevel::Level level );
+	void setConsoleLevel( const LogLevel::Level level );
 
-		void setLogfileLevel( const LogLevel::Level level );
+	void setLogfileLevel( const LogLevel::Level level );
 
-		void setLogfileName( const std::string filename );
+	void setLogfileName( const std::string filename );
 
-		void setSyslogLevel( const LogLevel::Level level );
+	void setSyslogLevel( const LogLevel::Level level );
 
-		void setSyslogFacility( const SyslogFacility::Facility facility );
+	void setSyslogFacility( const SyslogFacility::Facility facility );
 
-		void setSyslogIdent( const std::string ident );
+	void setSyslogIdent( const std::string ident );
 
 #if defined( _WIN32 )
-		void setEventlogLevel( const LogLevel::Level level );
+	void setEventlogLevel( const LogLevel::Level level );
 
-		void setEventlogLog( const std::string log );
+	void setEventlogLog( const std::string log );
 
-		void setEventlogSource( const std::string source );
-		
-		void setWinDebugLevel( const LogLevel::Level level );
+	void setEventlogSource( const std::string source );
+
+	void setWinDebugLevel( const LogLevel::Level level );
 #endif // defined( _WIN32 )
 
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
+	void log( const LogComponent component, const LogLevel::Level level,
+		  const std::string& msg );
 
-	private:
-		ConsoleLogBackend consoleLogger_;
-		LogfileBackend logfileLogger_;
-		SyslogBackend syslogLogger_;
+private:
+	ConsoleLogBackend consoleLogger_;
+	LogfileBackend logfileLogger_;
+	SyslogBackend syslogLogger_;
 #ifdef _WIN32
-		WinDebugLogBackend windebugLogger_;
-		EventlogBackend eventlogLogger_;
+	WinDebugLogBackend windebugLogger_;
+	EventlogBackend eventlogLogger_;
 #endif // _WIN32
-	};
+};
 
-	} // namespace log
+} // namespace log
 } // namespace _Wolframe
 
 #endif // _LOG_BACKEND_IMPL_HPP_INCLUDED

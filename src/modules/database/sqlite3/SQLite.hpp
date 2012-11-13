@@ -128,30 +128,28 @@ public:
 	SQLiteUIlibrary( const SQLiteDatabase& database );
 	~SQLiteUIlibrary()			{}
 
-	virtual const std::list< UI::UIform::Info > formInfos( const std::string& platform,
-							       const std::string& culture = "" ) const;
-	virtual const std::list< UI::UIform::Info > formInfos( const std::string& platform,
+	virtual const std::list< UI::InterfaceObject::Info > infos( const std::string& platform,
 							       const std::string& role,
-							       const std::string& culture = "" ) const;
-	virtual const std::list< UI::UIform::Info > formInfos( const std::string& platform,
+							       const std::string& culture ) const;
+	virtual const std::list< UI::InterfaceObject::Info > infos( const std::string& platform,
 							       const std::list< std::string >& roles,
-							       const std::string& culture = "" ) const;
+							       const std::string& culture ) const;
 
-	virtual const std::list< UI::UIform::Info > formVersions( const std::string& platform,
+	virtual const std::list< UI::InterfaceObject::Info > versions( const std::string& platform,
 								  const std::string& name,
-								  const std::string& culture = "" ) const;
+								  const std::string& culture ) const;
 
-	virtual const UI::UIform form( const std::string& platform,
+	virtual const UI::InterfaceObject object( const std::string& platform,
 				       const std::string& name,
-				       const std::string& culture = "" ) const;
-	virtual const UI::UIform form( const std::string& platform,
+				       const std::string& culture ) const;
+	virtual const UI::InterfaceObject object( const std::string& platform,
 				       const std::string& name, const Version& version,
-				       const std::string& culture = "" ) const;
-	virtual const UI::UIform form( const UI::UIform::Info& info ) const;
+				       const std::string& culture ) const;
+	virtual const UI::InterfaceObject object( const UI::InterfaceObject::Info& info ) const;
 
-	virtual void addForm( const UI::UIform& newForm ) const;
+	virtual void addObject( const UI::InterfaceObject& newObject ) const;
 
-	virtual bool deleteForm( const UI::UIform::Info& info ) const;
+	virtual bool deleteObject( const UI::InterfaceObject::Info& info ) const;
 
 
 	virtual void close()			{ delete this; }
