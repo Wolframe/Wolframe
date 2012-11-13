@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackendImpl.cpp
 /// \brief implementation of logging backends
@@ -104,7 +103,8 @@ void LogBackend::LogBackendImpl::setWinDebugLevel( const LogLevel::Level level )
 
 #endif // defined( _WIN32 )
 
-inline void LogBackend::LogBackendImpl::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
+inline void LogBackend::LogBackendImpl::log( const LogComponent component,
+					     const LogLevel::Level level, const std::string& msg )
 {
 	consoleLogger_.log( component, level, msg );
 	logfileLogger_.log( component, level, msg );

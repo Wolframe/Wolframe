@@ -35,6 +35,11 @@ void NetworkDataLoader::initiateDataSave( QString name, QByteArray data )
 	//~ }
 }
 
+void NetworkDataLoader::initiateDataDelete( QString name )
+{
+	//~ emit dataDeleted( name );
+}
+
 void NetworkDataLoader::initiateDomainDataLoad( QString form_name, QString widget_name )
 {
 	//~ QString s = m_wolframeClient->syncRun( "getDomain " + form_name + " " + widget_name );

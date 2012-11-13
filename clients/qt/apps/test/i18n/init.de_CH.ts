@@ -6,32 +6,27 @@
     <message>
         <location filename="../forms/init.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Formular</translation>
     </message>
     <message>
         <location filename="../forms/init.ui" line="26"/>
-        <source>Welcome !</source>
-        <translation type="unfinished"></translation>
+        <source>Form 1</source>
+        <translation>Formular 1</translation>
     </message>
     <message>
         <location filename="../forms/init.ui" line="39"/>
-        <source>Form 1</source>
-        <translation type="unfinished"></translation>
+        <source>Form 2</source>
+        <translation>Formular 2</translation>
     </message>
     <message>
         <location filename="../forms/init.ui" line="52"/>
-        <source>Form 2</source>
-        <translation type="unfinished"></translation>
+        <source>Form 3</source>
+        <translation>Formular 3</translation>
     </message>
     <message>
         <location filename="../forms/init.ui" line="65"/>
-        <source>Form 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../forms/init.ui" line="78"/>
         <source>Form 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Formular 4</translation>
     </message>
 </context>
 </TS>

@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackendConsole.hpp
 /// \brief header file for the console backend
@@ -57,7 +56,7 @@ namespace _Wolframe {
 		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
 		void reopen( );
-		
+
 	private:
 		LogLevel::Level	logLevel_;
 	};

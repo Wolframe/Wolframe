@@ -1,11 +1,22 @@
+-- SQLite test database creation script
+--
+
+-- User Interface
+--
+DROP TABLE IF EXISTS UIobject;
+DROP TABLE IF EXISTS UIobjectName;
+DROP TABLE IF EXISTS UIobjectType;
+DROP TABLE IF EXISTS Locale;
+DROP TABLE IF EXISTS Platform;
+
 -- The platforms tree
 --
 CREATE TABLE Platform	(
-	ID		SERIAL	PRIMARY KEY,
-	parent		INT	REFERENCES Platform( ID ),
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	parent		INTEGER	REFERENCES Platform( ID ),
 	name		TEXT,
-	lft		INT,
-	rgt		INT,
+	lft		INTEGER	NOT NULL UNIQUE DEFERRABLE CHECK ( lft > 0 ),
+	rgt		INTEGER	NOT NULL UNIQUE DEFERRABLE CHECK ( rgt > 1 ),
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
 
@@ -19,43 +30,88 @@ INSERT INTO Platform ( ID, parent, name, lft, rgt ) VALUES ( 7, 4, 'Mac OS', 12,
 
 -- Table of locales
 --
-CREATE TABLE locale (
+CREATE TABLE Locale (
 	ID		TEXT	PRIMARY KEY,
-	name		TEXT,
+	ENname		TEXT,
 	localName	TEXT
 );
 
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'en', 'English', 'English' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'en-GB', 'English (United Kingdom)', 'English (United Kingdom)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'en-US', 'English (United States)', 'English (United States)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'fi', 'Finnish', 'suomi' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'fi-FI', 'Finnish (Finland)', 'suomi (Suomi)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'fr', 'French', 'français' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'fr-FR', 'French (France)', 'français (France)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'fr-CH', 'French (Switzerland)', 'français (Suisse)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'de', 'German', 'Deutsch' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'de-DE', 'German (Germany)', 'Deutsch (Deutschland)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'de-LI', 'German (Liechtenstein)', 'Deutsch (Liechtenstein)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'de-CH', 'German (Switzerland)', 'Deutsch (Schweiz)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'it', 'Italian', 'italiano' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'it-IT', 'Italian (Italy)', 'italiano (Italia)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'it-CH', 'Italian (Switzerland)', 'italiano (Svizzera)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'ro', 'Romanian', 'română' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'ro-RO', 'Romanian (Romania)', 'română (România)' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'rm', 'Romansh', 'Rumantsch' );
-INSERT INTO locale ( ID, name, localName ) VALUES ( 'rm-CH', 'Romansh (Switzerland)', 'Rumantsch (Svizra)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'en', 'English', 'English' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'en-GB', 'English (United Kingdom)', 'English (United Kingdom)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'en-US', 'English (United States)', 'English (United States)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'fi', 'Finnish', 'suomi' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'fi-FI', 'Finnish (Finland)', 'suomi (Suomi)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'fr', 'French', 'français' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'fr-FR', 'French (France)', 'français (France)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'fr-CH', 'French (Switzerland)', 'français (Suisse)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'de', 'German', 'Deutsch' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'de-DE', 'German (Germany)', 'Deutsch (Deutschland)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'de-LI', 'German (Liechtenstein)', 'Deutsch (Liechtenstein)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'de-CH', 'German (Switzerland)', 'Deutsch (Schweiz)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'it', 'Italian', 'italiano' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'it-IT', 'Italian (Italy)', 'italiano (Italia)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'it-CH', 'Italian (Switzerland)', 'italiano (Svizzera)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'ro', 'Romanian', 'română' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'ro-RO', 'Romanian (Romania)', 'română (România)' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'rm', 'Romansh', 'Rumantsch' );
+INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'rm-CH', 'Romansh (Switzerland)', 'Rumantsch (Svizra)' );
 
-CREATE TABLE formName (
-	ID		SERIAL	PRIMARY KEY,
-	name		TEXT	NOT NULL,
+
+CREATE TABLE UIobjectType (
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	typeName	TEXT
+);
+
+
+CREATE TABLE UIobjectName (
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	ENname		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE
 );
 
 
-CREATE TABLE form (
-	ID		INT	REFERENCES formName( ID ),
-	Platform	INT	REFERENCES Platform( ID ),
+CREATE TABLE UIobject (
+	ID		INTEGER	REFERENCES UIobjectName( ID ),
+	platformID	INTEGER	REFERENCES Platform( ID ),
+	typeID		INTEGER	REFERENCES UIobjectType( ID ),
 	locale		TEXT	REFERENCES locale( ID ),
-	bersion		INT,
+	version		INTEGER,
 	body		TEXT
 );
+
+
+-- Authentication
+--
+DROP TABLE IF EXISTS Password;
+
+CREATE TABLE Password (
+	username	TEXT	UNIQUE,
+	salt		TEXT,
+	pwdHash		TEXT
+);
+
+
+-- Authorization tables
+--
+DROP TABLE IF EXISTS AuthzMatrix;
+DROP TABLE IF EXISTS AuthorizationName;
+DROP TABLE IF EXISTS Role;
+
+CREATE TABLE AuthorizationName (
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	name		TEXT	NOT NULL UNIQUE,
+	description	TEXT
+);
+
+CREATE TABLE Role (
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	name		TEXT	NOT NULL UNIQUE,
+	description	TEXT
+);
+
+CREATE TABLE AuthzMatrix (
+	role		INTEGER	REFERENCES Role( ID ),
+	authzName	INTEGER	REFERENCES AuthorizationName( ID ),
+	UNIQUE (role, authzName)
+);
+

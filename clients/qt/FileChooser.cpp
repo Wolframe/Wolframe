@@ -7,9 +7,6 @@
 #include <QHBoxLayout>
 #include <QFileDialog>
 
-namespace _Wolframe {
-	namespace QtClient {
-
 FileChooser::FileChooser( SelectionMode _selectionMode, QWidget *_parent )
 	: QWidget( _parent ), m_selectionMode( _selectionMode )
 {
@@ -64,6 +61,3 @@ void FileChooser::chooseFile( )
 		m_lineEdit->setText( f );
 	}
 }
-
-} // namespace QtClient
-} // namespace _Wolframe

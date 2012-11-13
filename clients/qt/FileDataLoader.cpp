@@ -33,6 +33,13 @@ void FileDataLoader::initiateDataSave( QString name, QByteArray data )
 	emit dataSaved( name );
 }
 
+void FileDataLoader::initiateDataDelete( QString name )
+{
+	QFile file( m_dir + "/" + name + ".xml" );
+	file.remove( );	
+	emit dataDeleted( name );
+}
+
 void FileDataLoader::initiateDomainDataLoad( QString form_name, QString widget_name )
 {
 	QFile file( m_dir + "/domain_" + form_name + "_" + widget_name + ".xml" );

@@ -81,6 +81,8 @@ TRANSLATIONS += \
 	themes/phone/MainWindow.ro_RO.ts \
 	themes/windows/MainWindow.de_CH.ts \
 	themes/windows/MainWindow.ro_RO.ts \
+	apps/test/i18n/init.de_CH.ts \
+	apps/test/i18n/init.ro_RO.ts \
 	apps/test/i18n/form1.de_CH.ts \
 	apps/test/i18n/form1.ro_RO.ts \
 	apps/test/i18n/form2.de_CH.ts \

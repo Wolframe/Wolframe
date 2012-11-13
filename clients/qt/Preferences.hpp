@@ -60,9 +60,13 @@ namespace _Wolframe {
 			QString caCertFile( ) const { return m_CACertFile; }
 			void setCaCertFile( QString _CACertFile ) { m_CACertFile = _CACertFile; }
 			
-			Q_PROPERTY( LoadMode m_loadMode READ loadMode WRITE setLoadMode )
-			LoadMode loadMode( ) const { return m_loadMode; }
-			void setLoadMode( LoadMode _loadMode ) { m_loadMode = _loadMode; }
+			Q_PROPERTY( LoadMode m_uiLoadMode READ uiLoadMode WRITE setUiLoadMode )
+			LoadMode uiLoadMode( ) const { return m_uiLoadMode; }
+			void setUiLoadMode( LoadMode _uiLoadMode ) { m_uiLoadMode = _uiLoadMode; }
+
+			Q_PROPERTY( LoadMode m_dataLoadMode READ dataLoadMode WRITE setDataLoadMode )
+			LoadMode dataLoadMode( ) const { return m_dataLoadMode; }
+			void setDataLoadMode( LoadMode _dataLoadMode ) { m_dataLoadMode = _dataLoadMode; }
 			
 			Q_PROPERTY( QString m_dbName READ dbName WRITE setDbName )
 			QString dbName( ) const { return m_dbName; }
@@ -104,7 +108,8 @@ namespace _Wolframe {
 			QString m_clientCertFile;
 			QString m_clientKeyFile;
 			QString m_CACertFile;
-			LoadMode m_loadMode;
+			LoadMode m_uiLoadMode;
+			LoadMode m_dataLoadMode;
 			QString m_dbName;
 			bool m_debug;
 			QString m_uiFormsDir;

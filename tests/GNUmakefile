@@ -119,7 +119,6 @@ endif
 TEST_OBJS =
 
 TEST_CPP_BINS = \
-	threadLeakTest$(EXE) \
 	testMethodMemberPointerTemplate$(EXE) \
 	testNamedRetVal$(EXE) \
 	testVirtualInheritance$(EXE) \

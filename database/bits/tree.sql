@@ -113,35 +113,45 @@ SELECT deleteSubtree( 8 );
 SELECT deleteSubtree( 9 );
 SELECT deleteSubtree( 10 );
 
-----
----- Move a subtree
---CREATE FUNCTION moveSubtree( topNodeID int, newParentID int )
---RETURNS void
---AS $$
---DECLARE
---	width		INTEGER;		-- the total width of the subtree
---	newLeft		INTEGER;		-- the final left margin of the subtree
---	tmpLeft		INTEGER;		-- temporary left and right of the subtree
---	tmpRight	INTEGER;
---	distance	INTEGER;		-- the distance the subtree will be moved
+--
+-- Move a subtree
+CREATE FUNCTION moveSubtree( topNodeID int, newParentID int )
+RETURNS void
+AS $$
+DECLARE
+	width		INTEGER;		-- the total width of the subtree
+	newLeft		INTEGER;		-- the final left margin of the subtree
+	tmpLeft		INTEGER;		-- temporary left and right of the subtree
+	tmpRight	INTEGER;
+	distance	INTEGER;		-- the distance the subtree will be moved
 
---BEGIN
---	newLeft := ( SELECT rgt FROM tree WHERE ID = newParentID );
---	width := ( SELECT rgt - lft + 1 FROM tree WHERE ID = topNodeID );
+BEGIN
+	newLeft := ( SELECT rgt FROM tree WHERE ID = newParentID );
+	width := ( SELECT rgt - lft + 1 FROM tree WHERE ID = topNodeID );
 
---	-- move part of the tree to get space for the subtree
---	UPDATE tree SET lft = lft + width WHERE lft >= newLeft;
---	UPDATE tree SET rgt = rgt + width WHERE rgt >= newLeft;
+	-- move part of the tree to get space for the subtree
+	UPDATE tree SET rgt = rgt + width WHERE rgt >= newLeft;
+	UPDATE tree SET lft = lft + width WHERE lft >= newLeft;
 
---	SELECT lft, rgt INTO tmpLeft, tmpRight FROM tree WHERE ID = topNodeID;
---	distance := newLeft - tmpLeft;
---	UPDATE tree SET lft = lft + distance, rgt = rgt + distance
---		WHERE lft >= tmpLeft AND rgt < tmpRight;
+	SELECT lft, rgt INTO tmpLeft, tmpRight FROM tree WHERE ID = topNodeID;
+	distance := newLeft - tmpLeft;
+	UPDATE tree SET lft = lft + distance, rgt = rgt + distance
+		WHERE lft >= tmpLeft AND rgt <= tmpRight;
 
---	UPDATE tree SET lft = lft - width WHERE lft > tmpLeft;
---	UPDATE tree SET rgt = rgt - width WHERE rgt > tmpRight;
---END;
---$$ LANGUAGE plpgsql;
+	UPDATE tree SET parent = newParentID WHERE ID = topNodeID;
 
----- move tests
---SELECT moveSubtree( 3, 2 );
+	UPDATE tree SET lft = lft - width WHERE lft > tmpLeft;
+	UPDATE tree SET rgt = rgt - width WHERE rgt > tmpRight;
+END;
+$$ LANGUAGE plpgsql;
+
+-- move tests
+SELECT moveSubtree( 3, 2 );
+
+
+-- testing if the tree is consistent
+-- the result should be number of nodes * 2 for both of them
+SELECT count(*) FROM (SELECT DISTINCT * FROM (SELECT lft FROM tree UNION SELECT rgt FROM tree) AS m1) AS m2;
+SELECT max( val ) FROM (SELECT lft AS val FROM tree UNION SELECT rgt AS val FROM tree) AS m1;
+-- find children with wrong parent
+SELECT P1.* FROM tree AS P1, tree AS P2 WHERE P1.lft < P2.lft AND P1.rgt > P2.rgt AND P1.parent = P2.ID;

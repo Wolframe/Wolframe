@@ -40,6 +40,8 @@ void FormWidget::initialize( )
 		this, SLOT( dataLoaded( QString, QByteArray ) ) );
 	connect( m_dataLoader, SIGNAL( dataSaved( QString ) ),
 		this, SLOT( dataSaved( QString ) ) );
+	connect( m_dataLoader, SIGNAL( dataDeleted( QString ) ),
+		this, SLOT( dataDeleted( QString ) ) );
 
 // link the data loader to the data handler
 	connect( m_dataLoader, SIGNAL( domainDataLoaded( QString, QString, QByteArray ) ),
@@ -66,10 +68,14 @@ void FormWidget::switchForm( QObject *object )
 	qDebug( ) << "Got " << widget->toString( );
 	
 	if( !widget->action( ).isNull( ) ) {
-		if( widget->action( ) == "save" ) {
-			actionSave( );
-		} else if( widget->action( ) == "reset" ) {
-			actionReset( );
+		if( widget->action( ) == "send" ) {
+			actionSend( );
+		} else if( widget->action( ) == "get" ) {
+			actionGet( );
+		} else if( widget->action( ) == "init" ) {
+			actionInit( );
+		} else if( widget->action( ) == "delete" ) {
+			actionDelete( );
 		} else {
 			qDebug( ) << "Unknown action" << widget->action( );
 		}
@@ -156,6 +162,12 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 	QWidget *oldUi = m_ui;
 	QBuffer buf( &form );
 	m_ui = m_uiLoader->load( &buf, this );
+	if( m_ui == 0 ) {
+// something went wrong loading or constructing the form
+		m_ui = oldUi;
+		emit error( tr( "Unable to create form %1, does it exist?" ).arg( name ) );
+		return;
+	}
 	buf.close( );
 
 // add new form to layout (which covers the whole widget)
@@ -219,11 +231,6 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 	emit formLoaded( m_name );
 }
 
-void FormWidget::dataSaved( QString name )
-{	
-	qDebug( ) << "Saved data for form " << name;
-}
-
 void FormWidget::dataLoaded( QString name, QByteArray xml )
 {
 	qDebug( ) << "Loaded data for form " << name << ":\n"
@@ -232,14 +239,24 @@ void FormWidget::dataLoaded( QString name, QByteArray xml )
 	m_dataHandler->readFormData( name, m_ui, xml );
 }
 
+void FormWidget::dataSaved( QString name )
+{	
+	qDebug( ) << "Saved data for form " << name;
+}
+
+void FormWidget::dataDeleted( QString name )
+{
+	qDebug( ) << "Deleted data of form " << name;
+}
+
 void FormWidget::formDomainLoaded( QString form_name, QString widget_name, QByteArray _data )
 {
 	m_dataHandler->loadFormDomain( form_name, widget_name, m_ui, _data );
 }
 
-void FormWidget::actionSave( )
+void FormWidget::actionSend( )
 {
-	qDebug( ) << "Saving data of form " << m_name;
+	qDebug( ) << "Sending data of form " << m_name;
 	
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_name, m_ui, &xml );
@@ -247,11 +264,25 @@ void FormWidget::actionSave( )
 	m_dataLoader->initiateDataSave( m_name, xml );
 }
 
-void FormWidget::actionReset( )
+void FormWidget::actionGet( )
 {
 	qDebug( ) << "Reseting data of form " << m_name;
 	
 	m_dataLoader->initiateDataLoad( m_name );
+}
+
+void FormWidget::actionInit( )
+{
+	qDebug( ) << "Initializing form " << m_name;
+	
+	m_dataHandler->resetFormData( m_ui );
+}
+
+void FormWidget::actionDelete( )
+{
+	qDebug( ) << "Sending delete request for form " << m_name;
+	
+	// TODO: REQUEST with parameters
 }
 
 } // namespace QtClient

@@ -47,7 +47,7 @@
     <message>
         <location filename="../qcommandline.cpp" line="311"/>
         <source>%1 %2 is mandatory</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2 ist notwendig</translation>
     </message>
     <message>
         <location filename="../qcommandline.cpp" line="502"/>
@@ -62,12 +62,12 @@ Mandatory arguments to long options are mandatory for short options too.
     <message>
         <location filename="../DebugTerminal.cpp" line="26"/>
         <source>Debug Terminal</source>
-        <translation type="unfinished"></translation>
+        <translation>Debugfenster</translation>
     </message>
     <message>
         <location filename="../DebugTerminal.cpp" line="31"/>
         <source>Ctrl-D enables/disables the protocol debug window</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl-D schaltet das Debugfenster ein und aus</translation>
     </message>
 </context>
 <context>
@@ -75,12 +75,20 @@ Mandatory arguments to long options are mandatory for short options too.
     <message>
         <location filename="../FileChooser.cpp" line="53"/>
         <source>Choose a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Wähle eine Datei aus</translation>
     </message>
     <message>
         <location filename="../FileChooser.cpp" line="58"/>
         <source>Choose a directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Wähle ein Verzeichnis aus</translation>
+    </message>
+</context>
+<context>
+    <name>_Wolframe::QtClient::FormWidget</name>
+    <message>
+        <location filename="../FormWidget.cpp" line="168"/>
+        <source>Unable to create form %1, does it exist?</source>
+        <translation>Kann Formular %1 nicht erstellen, existiert es?</translation>
     </message>
 </context>
 <context>
@@ -135,24 +143,24 @@ Mandatory arguments to long options are mandatory for short options too.
 <context>
     <name>_Wolframe::QtClient::MainWindow</name>
     <message>
-        <location filename="../MainWindow.cpp" line="242"/>
+        <location filename="../MainWindow.cpp" line="252"/>
         <source>Unable to open or create Sqlite database file &apos;%1&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="250"/>
+        <location filename="../MainWindow.cpp" line="260"/>
         <source>Unable to query the Sqlite database file &apos;%1&apos;, most likely not a database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="259"/>
+        <location filename="../MainWindow.cpp" line="269"/>
         <source>Unable to enable foreign key support in the Sqlite database file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="670"/>
-        <location filename="../MainWindow.cpp" line="671"/>
-        <location filename="../MainWindow.cpp" line="676"/>
+        <location filename="../MainWindow.cpp" line="701"/>
+        <location filename="../MainWindow.cpp" line="702"/>
+        <location filename="../MainWindow.cpp" line="707"/>
         <source>qtclient</source>
         <translation type="unfinished"></translation>
     </message>
@@ -162,27 +170,27 @@ Mandatory arguments to long options are mandatory for short options too.
     <message>
         <location filename="../ManageStorageDialog.cpp" line="23"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="35"/>
         <source>&lt;--</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="37"/>
         <source>--&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="40"/>
         <source>Left to right</source>
-        <translation type="unfinished"></translation>
+        <translation>Links nach rechts</translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="41"/>
         <source>Right to left</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechts nach links</translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="42"/>
@@ -197,17 +205,17 @@ Mandatory arguments to long options are mandatory for short options too.
     <message>
         <location filename="../ManageStorageDialog.cpp" line="45"/>
         <source>&amp;Synchronize</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Synchronisieren</translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="47"/>
         <source>&amp;Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Löschen</translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="49"/>
         <source>&amp;Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Beenden</translation>
     </message>
 </context>
 <context>
@@ -219,96 +227,104 @@ Mandatory arguments to long options are mandatory for short options too.
     </message>
     <message>
         <location filename="../PreferencesDialog.cpp" line="40"/>
+        <location filename="../PreferencesDialog.cpp" line="52"/>
         <source>Local &amp;file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../PreferencesDialog.cpp" line="41"/>
+        <location filename="../PreferencesDialog.cpp" line="53"/>
         <source>Local &amp;database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../PreferencesDialog.cpp" line="42"/>
+        <location filename="../PreferencesDialog.cpp" line="54"/>
         <source>&amp;Network</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="51"/>
-        <source>&amp;Load mode:</source>
+        <location filename="../PreferencesDialog.cpp" line="49"/>
+        <source>&amp;UI load mode:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="54"/>
+        <location filename="../PreferencesDialog.cpp" line="61"/>
+        <source>&amp;Data load mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PreferencesDialog.cpp" line="64"/>
         <source>&amp;Host:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="59"/>
+        <location filename="../PreferencesDialog.cpp" line="69"/>
         <source>&amp;Port:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="62"/>
+        <location filename="../PreferencesDialog.cpp" line="72"/>
         <source>&amp;Secure:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="65"/>
+        <location filename="../PreferencesDialog.cpp" line="75"/>
         <source>&amp;Client Certificate:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="68"/>
+        <location filename="../PreferencesDialog.cpp" line="78"/>
         <source>Client &amp;Key:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="71"/>
+        <location filename="../PreferencesDialog.cpp" line="81"/>
         <source>C&amp;A file:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="74"/>
+        <location filename="../PreferencesDialog.cpp" line="84"/>
         <source>&amp;Db file:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="77"/>
+        <location filename="../PreferencesDialog.cpp" line="87"/>
         <source>Form dir:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="80"/>
+        <location filename="../PreferencesDialog.cpp" line="90"/>
         <source>I18N dir:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="83"/>
+        <location filename="../PreferencesDialog.cpp" line="93"/>
         <source>Data dir:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="86"/>
+        <location filename="../PreferencesDialog.cpp" line="96"/>
         <source>&amp;Debug:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="90"/>
+        <location filename="../PreferencesDialog.cpp" line="100"/>
         <source>&amp;Use system language:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="101"/>
+        <location filename="../PreferencesDialog.cpp" line="111"/>
         <source>&amp;Locale:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="107"/>
+        <location filename="../PreferencesDialog.cpp" line="117"/>
         <source>Apply</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../PreferencesDialog.cpp" line="108"/>
+        <location filename="../PreferencesDialog.cpp" line="118"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -317,96 +333,104 @@ Mandatory arguments to long options are mandatory for short options too.
     <name>_Wolframe::QtClient::StorageWidget</name>
     <message>
         <location filename="../StorageWidget.cpp" line="34"/>
+        <location filename="../StorageWidget.cpp" line="46"/>
         <source>Local &amp;file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../StorageWidget.cpp" line="35"/>
+        <location filename="../StorageWidget.cpp" line="47"/>
         <source>Local &amp;database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../StorageWidget.cpp" line="36"/>
+        <location filename="../StorageWidget.cpp" line="48"/>
         <source>&amp;Network</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="45"/>
-        <source>&amp;Load mode:</source>
+        <location filename="../StorageWidget.cpp" line="43"/>
+        <source>&amp;UI load mode:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="48"/>
+        <location filename="../StorageWidget.cpp" line="55"/>
+        <source>&amp;Data load mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../StorageWidget.cpp" line="58"/>
         <source>&amp;Host:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="53"/>
+        <location filename="../StorageWidget.cpp" line="63"/>
         <source>&amp;Port:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="56"/>
+        <location filename="../StorageWidget.cpp" line="66"/>
         <source>&amp;Secure:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="59"/>
+        <location filename="../StorageWidget.cpp" line="69"/>
         <source>&amp;Client Certificate:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="62"/>
+        <location filename="../StorageWidget.cpp" line="72"/>
         <source>Client &amp;Key:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="65"/>
+        <location filename="../StorageWidget.cpp" line="75"/>
         <source>C&amp;A file:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="68"/>
+        <location filename="../StorageWidget.cpp" line="78"/>
         <source>&amp;Db file:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="71"/>
+        <location filename="../StorageWidget.cpp" line="81"/>
         <source>Form dir:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="74"/>
+        <location filename="../StorageWidget.cpp" line="84"/>
         <source>I18N dir:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="77"/>
+        <location filename="../StorageWidget.cpp" line="87"/>
         <source>Data dir:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="81"/>
+        <location filename="../StorageWidget.cpp" line="91"/>
         <source>Item</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="81"/>
+        <location filename="../StorageWidget.cpp" line="91"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="81"/>
+        <location filename="../StorageWidget.cpp" line="91"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="81"/>
+        <location filename="../StorageWidget.cpp" line="91"/>
         <source>Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../StorageWidget.cpp" line="86"/>
+        <location filename="../StorageWidget.cpp" line="96"/>
         <source>&amp;Toggle all:</source>
         <translation type="unfinished"></translation>
     </message>
