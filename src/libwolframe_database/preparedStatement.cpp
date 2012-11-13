@@ -117,16 +117,60 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 	return true;
 }
 
+static bool pushArguments( TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr)
+{
+	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
+	cmdres.openRow();
+	for (int argidx=1; ai != ae; ++ai,++argidx)
+	{
+		const char* val = 0;
+		switch (ai->type())
+		{
+			case TransactionInput::Element::ResultColumn:
+				if (ai->ref() == 0) throw std::runtime_error( "result reference out of range. must be >= 1");
+				if (ai->ref() > resrow->size()) throw std::runtime_error( "result reference out of range. array bound read");
+				val = (*resrow)[ ai->ref() -1];
+				break;
+
+			case TransactionInput::Element::String:
+				val = ai->value();
+				break;
+		}
+		if (val)
+		{
+			cmdres.addValue( val);
+		}
+		else
+		{
+			cmdres.addNull();
+		}
+	}
+	return true;
+}
+
 bool PreparedStatementHandler::doTransaction( const TransactionInput& input, TransactionOutput& output)
 {
+	enum OperationType
+	{
+		DatabaseCall,
+		PushArguments
+	};
+	OperationType optype = DatabaseCall;
 	std::size_t null_functionidx = std::numeric_limits<std::size_t>::max();
-	TransactionOutput::CommandResultBuilder cmdres( &output, null_functionidx);
+	TransactionOutput::CommandResultBuilder cmdres( &output, null_functionidx, 0);
 
 	TransactionInput::cmd_iterator ci = input.begin(), ce = input.end();
 	for (; ci != ce; ++ci)
 	{
-
-		if (!start( ci->name())) return false;
+		if (ci->name().empty())
+		{
+			optype = PushArguments;
+		}
+		else
+		{
+			optype = DatabaseCall;
+			if (!start( ci->name())) return false;
+		}
 		bool nonempty = input.hasNonemptyResult( ci->functionidx());
 		bool unique = input.hasUniqueResult( ci->functionidx());
 
@@ -139,7 +183,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 			{
 				output.addCommandResult( cmdres);
 			}
-			cmdres = TransactionOutput::CommandResultBuilder( &output, ci->functionidx());
+			cmdres = TransactionOutput::CommandResultBuilder( &output, ci->functionidx(), ci->level());
 		}
 		TransactionInput::arg_iterator ai = ci->begin(), ae = ci->end();
 
@@ -147,21 +191,56 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 		if (ai != ae)
 		{
 			// ... command has result reference, then we call it for every result row
-			TransactionOutput::result_iterator ri = output.last();
-			if (ri != output.end())
+			TransactionOutput::result_iterator ri;
+			switch (optype)
 			{
-				TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
-				for (; wi != we; ++wi)
-				{
-					if (!executeCommand( this, cmdres, wi, ci, nonempty, unique)) return false;
-				}
+				case PushArguments:
+					ri = output.last( ci->level()-1);
+					if (ri != output.end())
+					{
+						TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
+						if (wi != we)
+						{
+							if (!pushArguments( cmdres, wi, ci)) return false;
+							++wi;
+							if (wi != we) throw std::runtime_error( "more than one result element referenced for OPERATION call");
+							///< PF:TODO: Implement stack with loop iterators (result_iterator, jump address :cmd_iterator)
+						}
+					}
+					else
+					{
+						//... no result, we have to jump over all function of the operation, not only the parameter passing
+						std::size_t level = ci->level();
+						for (++ci; ci != ce && (ci->level() > level || (ci->level() == level && ci->name().empty())); ++ci);
+						--ci;
+					}
+					break;
+
+				case DatabaseCall:
+					ri = output.last( ci->level());
+					if (ri != output.end())
+					{
+						TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
+						for (; wi != we; ++wi)
+						{
+							if (!executeCommand( this, cmdres, wi, ci, nonempty, unique)) return false;
+						}
+					}
 			}
 		}
 		else
 		{
 			// ... command has no result reference, then we call it once
 			TransactionOutput::row_iterator wi;
-			if (!executeCommand( this, cmdres, wi, ci, nonempty, unique)) return false;
+			switch (optype)
+			{
+				case PushArguments:
+					if (!pushArguments( cmdres, wi, ci)) return false;
+					break;
+				case DatabaseCall:
+					if (!executeCommand( this, cmdres, wi, ci, nonempty, unique)) return false;
+					break;
+			}
 		}
 	}
 	if (cmdres.functionidx() != null_functionidx)

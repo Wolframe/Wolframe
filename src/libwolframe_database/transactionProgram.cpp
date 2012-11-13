@@ -229,6 +229,23 @@ std::string TransactionProgram::parseCallStatement( std::string::const_iterator&
 	return std::string( fcallstart, si);
 }
 
+namespace {
+struct Operation
+{
+	Operation( const std::string& name_, std::string::const_iterator start_, bool isTransaction_)
+		:name(name_),start(start_),isTransaction(isTransaction_),embstm_index(0){}
+	Operation( const Operation& o)
+		:name(o.name),start(o.start),isTransaction(o.isTransaction),descar(o.descar),callstartar(o.callstartar),embstm_index(o.embstm_index){}
+
+	std::string name;
+	std::string::const_iterator start;
+	bool isTransaction;
+	std::vector<TransactionDescription> descar;
+	std::vector<std::string::const_iterator> callstartar;
+	int embstm_index;
+};
+}// anonymous namespace
+
 void TransactionProgram::load( const std::string& source, std::string& dbsource)
 {
 	char ch;
@@ -236,39 +253,48 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 	std::string::const_iterator si = source.begin(), se = source.end();
 	std::string::const_iterator tokstart;
 	std::string::const_iterator dbi = source.begin();
-	std::vector<std::vector< TransactionDescription> > tdar;
-	std::vector<std::string> tdnamear;
-	std::vector<std::vector<std::string::const_iterator> > tdsrcar;
-	std::vector<std::string::const_iterator> tstartar;
-	dbsource.clear();
+	Operation* curop = 0;
+	std::vector<Operation> operationar;
+	types::keymap<TransactionFunctionR> operationmap;
+
 	config::PositionalErrorMessageBase ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
 
-	if (!m_langdescr) throw std::logic_error( "no database language description defined");
+	dbsource.clear();
 
+	if (!m_langdescr) throw std::logic_error( "no database language description defined");
 	try
 	{
 		while ((ch = gotoNextToken( si, se)) != 0)
 		{
 			tokstart = si;
 			ch = parseNextToken( tok, si, se);
+			bool enterDefinition = false;
+			bool isTransaction = false;
 			if (boost::algorithm::iequals( tok, "TRANSACTION") && isLineStart( tokstart, source))
 			{
+				isTransaction = true;
+				enterDefinition = true;
+			}
+			else if (boost::algorithm::iequals( tok, "OPERATION") && isLineStart( tokstart, source))
+			{
+				isTransaction = false;
+				enterDefinition = true;
+			}
+			if (enterDefinition)
+			{
 				std::string::const_iterator dbe = lineStart( tokstart, source);
-				tstartar.push_back( dbe);
-				dbsource.append( std::string( dbi, dbe));
-				dbi = dbe;
 				std::string transactionName;
-				int embstm_index = 0;
 
 				ch = parseNextToken( transactionName, si, se);
 				if (!ch) throw ERROR( si, MSG << "unexpected end of transaction definition (transaction name expected)");
 				if (m_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
 
-				tdnamear.push_back( transactionName);
-				tdsrcar.push_back( std::vector<std::string::const_iterator>());
-				tdar.push_back( std::vector<TransactionDescription>());
+				operationar.push_back( Operation( transactionName, dbe, isTransaction));
+				curop = &operationar.back();
 
+				dbsource.append( std::string( dbi, dbe));
+				dbi = dbe;
 				TransactionDescription desc;
 				unsigned int mask = 0;
 
@@ -279,15 +305,15 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 				}
 				while ((ch = parseNextToken( tok, si, se)) != 0)
 				{
-					if (tdsrcar.back().size() <= tdar.back().size())
+					while (curop->callstartar.size() <= curop->descar.size())
 					{
-						tdsrcar.back().push_back( si);
+						curop->callstartar.push_back( si);
 					}
 					if (ch == ';')
 					{
 						if (mask)
 						{
-							tdar.back().push_back( desc);
+							curop->descar.push_back( desc);
 							desc.clear();
 							mask = 0;
 						}
@@ -358,8 +384,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						}
 						if (m_langdescr->isEmbeddedStatement( si, se))
 						{
-							desc.call.append( parseEmbeddedStatement( transactionName, embstm_index, si, se));
-							++embstm_index;
+							desc.call.append( parseEmbeddedStatement( transactionName, curop->embstm_index++, si, se));
 						}
 						else
 						{
@@ -387,15 +412,19 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 	}
 	dbsource.append( std::string( dbi, source.end()));
 
-	std::vector<std::vector< TransactionDescription> >::const_iterator di = tdar.begin(), de = tdar.end();
-	std::vector<std::string>::const_iterator ni = tdnamear.begin();
-	std::vector<std::vector< std::string::const_iterator> >::const_iterator pi = tdsrcar.begin();
-
-	for (; di != de; ++di,++pi,++ni)
+	std::vector<Operation>::const_iterator oi = operationar.begin(), oe = operationar.end();
+	for (; oi != oe; ++oi)
 	{
 		try
 		{
-			m_functionmap[ *ni] = TransactionFunctionR( createTransactionFunction( *ni, *di, m_functionmap));
+			if (oi->isTransaction)
+			{
+				m_functionmap[ oi->name] = TransactionFunctionR( createTransactionFunction( oi->name, oi->descar, operationmap));
+			}
+			else
+			{
+				operationmap[ oi->name] = TransactionFunctionR( createTransactionFunction( oi->name, oi->descar, operationmap));
+			}
 		}
 		catch (const TransactionDescription::Error& err)
 		{
@@ -412,11 +441,11 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 					errlocation = "in transaction call (DO ..)";
 				break;
 			}
-			throw ERROR( (*pi)[ err.elemidx], MSG << "error in definition of transaction '" << *ni << "' " << errlocation << ": "<< err.msg);
+			throw ERROR( oi->callstartar[ err.elemidx], MSG << "error in definition of transaction '" << oi->name << "' " << errlocation << ": "<< err.msg);
 		}
 		catch (const std::runtime_error& err)
 		{
-			throw ERROR( tstartar[ di - tdar.begin()], MSG << "error in definition of transaction '" << *ni << "': " << err.what());
+			throw ERROR( oi->start, MSG << "error in definition of transaction '" << oi->name << "': " << err.what());
 		}
 	}
 }

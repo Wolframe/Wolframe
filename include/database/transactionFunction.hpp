@@ -83,6 +83,10 @@ public:
 	{
 		return *m_structure;
 	}
+	const TransactionFunction* func() const
+	{
+		return m_func;
+	}
 
 private:
 	Structure* m_structure;

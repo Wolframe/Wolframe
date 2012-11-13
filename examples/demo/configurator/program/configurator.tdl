@@ -1,157 +1,194 @@
 --
 -- treeAddRoot
 --
-TRANSACTION treeAddRoot -- (tree, name, normalizedName)
+OPERATION treeAddRoot -- (tree)(name, normalizedName)
 BEGIN
-	DO INSERT INTO $(tree) (ID, parent, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
+	DO INSERT INTO $1 (ID, parent, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
 END
 
 --
 -- treeAddNode
 --
-TRANSACTION treeAddNode -- (tree, parent, name, normalizedName)
+OPERATION treeAddNode -- (tree)(parent, name, normalizedName)
 BEGIN
-	DO NONEMPTY UNIQUE SELECT rgt FROM $(tree) WHERE ID = $(parent);
-	DO UPDATE $(tree) SET rgt = rgt + 2 WHERE rgt >= $1;
-	DO UPDATE $(tree) SET lft = lft + 2 WHERE lft > $1;
-	DO INSERT INTO $(tree) (parent, name, normalizedName, lft, rgt) VALUES ($(parent), $(name), $(normalizedName), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from $(tree) WHERE lft = $1;
+	DO NONEMPTY UNIQUE SELECT '$1',rgt FROM $1 WHERE ID = $(parent);
+	DO UPDATE $1 SET rgt = rgt + 2 WHERE rgt >= $2;
+	DO UPDATE $1 SET lft = lft + 2 WHERE lft > $2;
+	DO INSERT INTO $1 (parent, name, normalizedName, lft, rgt) VALUES ($(parent), $(name), $(normalizedName), $2, $2+1);
+	INTO . DO NONEMPTY UNIQUE SELECT ID from $1 WHERE lft = $2;
 END
 
 --
 -- treeDeleteSubtree
 --
-TRANSACTION treeDeleteSubtree -- (tree, id)
+OPERATION treeDeleteSubtree -- (tree)(id)
 BEGIN
-	DO NONEMPTY SELECT lft,rgt,rgt-lft AS width FROM $(tree) WHERE ID = $(id);
-	DO DELETE FROM $(tree) WHERE lft >= $1 AND lft <= $2;
-	DO UPDATE $(tree) SET lft = lft-$3 WHERE lft>$2;
-	DO UPDATE $(tree) SET rgt = rgt-$3 WHERE rgt>$2;
+	DO NONEMPTY SELECT '$1',lft,rgt,rgt-lft+1 AS width FROM $1 WHERE ID = $(id);
+	DO DELETE FROM $1 WHERE lft >= $2 AND lft <= $3;
+	DO UPDATE $1 SET lft = lft-$4 WHERE lft>$3;
+	DO UPDATE $1 SET rgt = rgt-$4 WHERE rgt>$3;
 END
 
 --
 -- treeSelectNode                 :Get the node
 -- treeSelectNodeByNormalizedName :Get the node by its normalized name
 --
-TRANSACTION treeSelectNode -- (tree, node/id)
+OPERATION treeSelectNode -- (tree)(node/id)
 BEGIN
-	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name FROM $(/tree) WHERE ID = $(id);
+	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name FROM $1 WHERE ID = $(id);
 END
-TRANSACTION treeSelectNodeByNormalizedName -- (tree, node/id, node/normalizedName)
+OPERATION treeSelectNodeByNormalizedName -- (tree)(node/normalizedName)
 BEGIN
-	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT * FROM $(/tree) WHERE normalizedName = $(normalizedName);
+	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT * FROM $1 WHERE normalizedName = $(normalizedName);
 END
 
 --
 -- treeSelectNodeAndParents       :Get the node and its parents
 --
-TRANSACTION treeSelectNodeAndParents -- (tree, node/id)
+OPERATION treeSelectNodeAndParents -- (tree)(node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM $(/tree) AS P1, $(/tree) AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id);
+	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM $1 AS P1, $1 AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id);
 END
 
 --
 -- treeSelectParents       :Get the parents of a node
 --
-TRANSACTION treeSelectParents -- (tree, node/id)
+OPERATION treeSelectParents -- (tree)(node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM $(/tree) AS P1, $(/tree) AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM $1 AS P1, $1 AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
 -- treeSelectNodeAndChildren       :Get the node and its children
 --
-TRANSACTION treeSelectNodeAndChildren -- (tree, node/id)
+OPERATION treeSelectNodeAndChildren -- (tree)(node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P1.ID,P1.parent,P1.name FROM $(/tree) AS P1, $(/tree) AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.parent,P1.name FROM $1 AS P1, $1 AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 
 --
 -- treeSelectChildren       :Get the children of a node
 --
-TRANSACTION treeSelectChildren -- (tree, node/id)
+TRANSACTION treeSelectChildren -- (tree)(node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P1.ID,P1.name FROM $(/tree) AS P1, $(/tree) AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
+	FOREACH /node INTO /node DO SELECT P1.ID,P1.name FROM $1 AS P1, $1 AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
 END
 
+
+--
+-- treeCopyNode             :Copy a node from one parent to another
+--
+OPERATION treeCopyNode -- (tree)(id, newparent)
+BEGIN
+	-- get parent boundaries
+	DO NONEMPTY UNIQUE SELECT '$1',lft,rgt FROM $1 WHERE ID = $(newparent);
+
+	-- mark parent left and child width
+	-- verify constraint that new parent is not a child of the copied/moved node
+	DO NONEMPTY UNIQUE SELECT '$1',$2,rgt-lft AS width FROM $1 WHERE ID = $(id) AND NOT ($2 >= lft AND $3 < rgt);
+
+	-- get place for the move/copy in the destination node area
+	DO UPDATE $1 SET rgt = rgt + $3 WHERE rgt >= $2;
+	DO UPDATE $1 SET lft = lft + $3 WHERE lft > $2;
+
+	-- Get the variables we need for the move/copy
+	-- $1 = tree
+	-- $2 = lft destination
+	-- $3 = rgt destination
+	-- $4 = width destination
+	-- $5 = lft node
+	-- $6 = rgt node
+	-- $7 = width node
+	DO NONEMPTY UNIQUE SELECT '$1',lft,rgt,rgt-lft+1 AS width FROM $1 WHERE ID = $(newparent);
+	DO NONEMPTY UNIQUE SELECT '$1',$2,$3,$4,lft,rgt,rgt-lft+1 AS width FROM $1 WHERE ID = $(id);
+
+	-- make a copy of the node to move/copy as child of the destination node
+	DO INSERT INTO $1
+		SELECT P1.ID AS ID,
+			P1.parent AS parent,
+			P1.lgt-$5+$2 AS lgt,
+			P1.rgt-$6+$3 AS rgt,
+			P1.name AS name
+		FROM $1 AS P1, $1 AS P2
+		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+END
 
 --
 -- treeMoveNode             :Move a node from one parent to another
 --
-TRANSACTION treeMoveNode -- (tree, nodeid, newparent)
+OPERATION treeMoveNode -- (tree)(id, newparent)
 BEGIN
-	-- get parent boundaries
-	DO NONEMPTY UNIQUE SELECT lft,rgt FROM $(tree) WHERE ID = $(newparent);
+	DO NONEMPTY UNIQUE SELECT '$1',lft,rgt,rgt-lgt+1 AS width FROM $1 WHERE ID = $(id);
+	DO treeCopyNode( $1);
 
-	-- mark parent left and child width
-	-- verify constraint that new parent is not a child of the copied/moved node
-	DO NONEMPTY UNIQUE SELECT $1,rgt-lft AS width FROM $(tree) WHERE ID = $(nodeid) AND NOT ($1 >= lft AND $2 < rgt);
-
-	-- get place for the move/copy in the destination node area
-	DO UPDATE $(tree) SET rgt = rgt + $2 WHERE rgt >= $1;
-	DO UPDATE $(tree) SET lft = lft + $2 WHERE lft > $1;
-
-	-- Get the variables we need for the move/copy
-	-- $1 = lft destination
-	-- $2 = rgt destination
-	-- $3 = width destination
-	-- $4 = lft node
-	-- $5 = rgt node
-	-- $6 = width node
-	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft AS width FROM $(tree) WHERE ID = $(newparent);
-	DO NONEMPTY UNIQUE SELECT $1,$2,$3,lft,rgt,rgt-lft AS width FROM $(tree) WHERE ID = $(nodeid);
-
-	-- make a copy of the node to move/copy as child of the destination node
-	DO INSERT INTO $(tree)
-		SELECT P1.ID AS ID,
-			P1.parent AS parent,
-			P1.lgt-$4+$1 AS lgt,
-			P1.rgt-$5+$2 AS rgt,
-			P1.name AS name
-		FROM $(tree) AS P1, $(tree) AS P2
-		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
-
-	-- delete the original node
-	DO DELETE FROM $(tree) WHERE lft >= $4 AND lft <= $5;
-	DO UPDATE $(tree) SET lft = lft-$6 WHERE lft>=$5;
-	DO UPDATE $(tree) SET rgt = rgt-$6 WHERE rgt>$5;
+	DO DELETE FROM $1 WHERE lft >= $2 AND lft <= $3;
+	DO UPDATE $1 SET lft = lft-$4 WHERE lft>$3;
+	DO UPDATE $1 SET rgt = rgt-$4 WHERE rgt>$3;
 END
 
 
+
 --
--- treeCopyNode             :Copy a node in the tree
+-- Category Transactions
 --
-TRANSACTION treeCopyNode -- (tree, nodeid, newparent)
-BEGIN
-	-- get parent boundaries
-	DO NONEMPTY UNIQUE SELECT lft,rgt FROM $(tree) WHERE ID = $(newparent);
-
-	-- mark parent left and child width
-	-- verify constraint that new parent is not a child of the copied/moved node
-	DO NONEMPTY UNIQUE SELECT $1,rgt-lft AS width FROM $(tree) WHERE ID = $(nodeid) AND NOT ($1 >= lft AND $2 < rgt);
-
-	-- get place for the move/copy in the destination node area
-	DO UPDATE $(tree) SET rgt = rgt + $2 WHERE rgt >= $1;
-	DO UPDATE $(tree) SET lft = lft + $2 WHERE lft > $1;
-
-	-- Get the variables we need for the move/copy
-	-- $1 = lft destination
-	-- $2 = rgt destination
-	-- $3 = width destination
-	-- $4 = lft node
-	-- $5 = rgt node
-	-- $6 = width node
-	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft AS width FROM $(tree) WHERE ID = $(newparent);
-	DO NONEMPTY UNIQUE SELECT $1,$2,$3,lft,rgt,rgt-lft AS width FROM $(tree) WHERE ID = $(nodeid);
-
-	-- make a copy of the node to move/copy as child of the destination node
-	DO INSERT INTO $(tree)
-		SELECT P1.ID AS ID,
-			P1.parent AS parent,
-			P1.lgt-$4+$1 AS lgt,
-			P1.rgt-$5+$2 AS rgt,
-			P1.name AS name
-		FROM $(tree) AS P1, $(tree) AS P2
-		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
+TRANSACTION addCategoryRoot
+	DO treeAddRoot( "Category")
 END
+TRANSACTION addCategory
+	DO treeAddNode( "Category")
+END
+TRANSACTION addDeleteCategory
+	DO treeDeleteSubtree( "Category")
+END
+TRANSACTION addSelectCategory
+	DO treeSelectNode( "Category")
+END
+TRANSACTION addSelectCategoryByNormalizedName
+	DO treeSelectNode( "Category")
+END
+TRANSACTION addSelectCategoryAndParents
+	DO treeSelectNodeAndParents( "Category")
+END
+TRANSACTION addSelectCategoryParents
+	DO treeSelectParents( "Category")
+END
+TRANSACTION addSelectCategoryAndChildren
+	DO treeSelectNodeAndChildren( "Category")
+END
+TRANSACTION addSelectCategoryChildren
+	DO treeSelectChildren( "Category")
+END
+
+--
+-- Feature Transactions
+--
+TRANSACTION addFeatureRoot
+	DO treeAddRoot( "Feature")
+END
+TRANSACTION addFeature
+	DO treeAddNode( "Feature")
+END
+TRANSACTION addDeleteFeature
+	DO treeDeleteSubtree( "Feature")
+END
+TRANSACTION addSelectFeature
+	DO treeSelectNode( "Feature")
+END
+TRANSACTION addSelectFeatureByNormalizedName
+	DO treeSelectNode( "Feature")
+END
+TRANSACTION addSelectFeatureAndParents
+	DO treeSelectNodeAndParents( "Feature")
+END
+TRANSACTION addSelectFeatureParents
+	DO treeSelectParents( "Feature")
+END
+TRANSACTION addSelectFeatureAndChildren
+	DO treeSelectNodeAndChildren( "Feature")
+END
+TRANSACTION addSelectFeatureChildren
+	DO treeSelectChildren( "Feature")
+END
+
+
 

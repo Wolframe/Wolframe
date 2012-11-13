@@ -62,7 +62,7 @@ END
 --
 TRANSACTION treeDeleteSubtree -- (id)
 BEGIN
-	DO NONEMPTY SELECT lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(id);
+	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM tree WHERE ID = $(id);
 	DO DELETE FROM tree WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE tree SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE tree SET rgt = rgt-$3 WHERE rgt>$2;

@@ -80,12 +80,15 @@ public:
 	{
 	public:
 		Command()
-			:m_functionidx(0){}
-		Command( std::size_t functionidx_, const std::string& name_)
+			:m_functionidx(0)
+			,m_level(0){}
+		Command( std::size_t functionidx_, std::size_t level_, const std::string& name_)
 			:m_functionidx(functionidx_)
+			,m_level(level_)
 			,m_name(name_){}
 		Command( const Command& o)
 			:m_functionidx(o.m_functionidx)
+			,m_level(o.m_level)
 			,m_name(o.m_name)
 			,m_arg(o.m_arg){}
 
@@ -94,12 +97,14 @@ public:
 			m_arg.push_back( Element( type, idx));
 		}
 
+		std::size_t level() const				{return m_level;}
 		std::size_t functionidx() const				{return m_functionidx;}
 		const std::string& name() const				{return m_name;}
 		const std::vector<Element>& arg() const			{return m_arg;}
 
 	private:
 		std::size_t m_functionidx;
+		std::size_t m_level;
 		std::string m_name;
 		std::vector<Element> m_arg;
 	};
@@ -145,14 +150,14 @@ public:
 				,m_value(o.m_value)
 				,m_ref(o.m_ref){}
 
-			void init( const char* value_)
+			void initString( const char* value_)
 			{
 				m_type = Element::String;
 				m_value = value_;
 				m_ref = 0;
 			}
 
-			void init( std::size_t ref_)
+			void initResultColumn( std::size_t ref_)
 			{
 				m_type = Element::ResultColumn;
 				m_value = 0;
@@ -177,17 +182,17 @@ public:
 		{
 			if (m_itr == m_end)
 			{
-				m_content.init( (const char*)0);
+				m_content.initString( (const char*)0);
 			}
 			else
 			{
 				switch (m_itr->type())
 				{
 					case Element::String:
-						m_content.init( m_ref->value( m_itr->idx()));
+						m_content.initString( m_ref->value( m_itr->idx()));
 						break;
 					case Element::ResultColumn:
-						m_content.init( m_itr->idx());
+						m_content.initResultColumn( m_itr->idx());
 						break;
 				}
 			}
@@ -213,6 +218,8 @@ public:
 
 		cmd_iterator& operator++()				{++m_content.m_itr; return *this;}
 		cmd_iterator operator++(int)				{cmd_iterator rt(*this); ++m_content.m_itr; return rt;}
+		cmd_iterator& operator--()				{--m_content.m_itr; return *this;}
+		cmd_iterator operator--(int)				{cmd_iterator rt(*this); --m_content.m_itr; return rt;}
 
 		struct Content
 		{
@@ -221,6 +228,7 @@ public:
 
 			const std::string& name() const			{return m_itr->name();}
 			std::size_t functionidx() const			{return m_itr->functionidx();}
+			std::size_t level() const			{return m_itr->level();}
 
 			arg_iterator begin() const			{return arg_iterator(m_ref, m_itr->arg().begin(), m_itr->arg().end());}
 			arg_iterator end() const			{return arg_iterator(m_ref, m_itr->arg().end(), m_itr->arg().end());}
@@ -269,9 +277,9 @@ public:
 public:
 	///\brief Start new command statement
 	///\param[in] stmname name of prepared statement
-	void startCommand( std::size_t functionidx, const std::string& stmname)
+	void startCommand( std::size_t functionidx, std::size_t level, const std::string& stmname)
 	{
-		m_cmd.push_back( Command( functionidx, stmname));
+		m_cmd.push_back( Command( functionidx, level, stmname));
 	}
 
 	///\brief Bind parameter value on current command statement
