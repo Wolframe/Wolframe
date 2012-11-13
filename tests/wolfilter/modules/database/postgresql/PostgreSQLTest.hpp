@@ -48,7 +48,7 @@ class PostgreSQLTestConfig : public PostgreSQLconfig
 {
 public:
 	PostgreSQLTestConfig( const char* name, const char* logParent, const char* logName )
-		:PostgreSQLconfig( name, logParent, logName){}
+		: PostgreSQLconfig( name, logParent, logName )	{}
 
 	virtual ~PostgreSQLTestConfig()
 	{
@@ -56,19 +56,19 @@ public:
 	}
 
 	virtual bool parse( const config::ConfigurationTree& pt, const std::string& node,
-				const module::ModulesDirectory* modules )
+			    const module::ModulesDirectory* modules )
 	{
-		return PostgreSQLconfig::parse( extractMyNodes( pt), node, modules);
+		return PostgreSQLconfig::parse( extractMyNodes( pt), node, modules );
 	}
 
-	virtual void setCanonicalPathes( const std::string& referencePath)
+	virtual void setCanonicalPathes( const std::string& referencePath )
 	{
-		PostgreSQLconfig::setCanonicalPathes( referencePath);
-		setMyCanonicalPathes( referencePath);
+		PostgreSQLconfig::setCanonicalPathes( referencePath );
+		setMyCanonicalPathes( referencePath );
 	}
 
-	const std::string& input_filename() const	{return m_input_filename;}
-	const std::string& dump_filename() const	{return m_dump_filename;}
+	const std::string& input_filename() const	{ return m_input_filename; }
+	const std::string& dump_filename() const	{ return m_dump_filename; }
 
 private:
 	config::ConfigurationTree extractMyNodes( const config::ConfigurationTree& pt);
@@ -85,15 +85,15 @@ public:
 	PostgreSQLTestConstructor(){}
 	virtual ~PostgreSQLTestConstructor(){}
 
-	virtual PostgreSQLdbUnit* object( const config::NamedConfiguration& conf)
+	virtual PostgreSQLdbUnit* object( const config::NamedConfiguration& conf )
 	{
-		const PostgreSQLTestConfig& cfg = dynamic_cast< const PostgreSQLTestConfig&>( conf);
-		createTestDatabase( cfg);
+		const PostgreSQLTestConfig& cfg = dynamic_cast< const PostgreSQLTestConfig& >( conf );
+		createTestDatabase( cfg );
 		return PostgreSQLconstructor::object( conf);
 	}
 
 private:
-	static void createTestDatabase( const PostgreSQLTestConfig& cfg_);
+	static void createTestDatabase( const PostgreSQLTestConfig& cfg_ );
 };
 
 }} // _Wolframe::db

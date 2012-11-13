@@ -44,60 +44,32 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-static void removeFileIfExists( const std::string& filename)
-{
-	boost::system::error_code errcode;
-	try
-	{
-		boost::filesystem::remove( filename);
-	}
-	catch (const boost::filesystem::filesystem_error& err)
-	{
-		throw std::runtime_error( std::string( "failed to remove file '") + filename + "': " + err.what());
-	}
-	catch (std::exception& err)
-	{
-		throw std::runtime_error( std::string("error removing file: '") + err.what() + "'");
-	}
-}
-
 void PostgreSQLTestConstructor::createTestDatabase( const PostgreSQLTestConfig& )
 {
 }
 
-config::ConfigurationTree PostgreSQLTestConfig::extractMyNodes( const config::ConfigurationTree& pt)
+config::ConfigurationTree PostgreSQLTestConfig::extractMyNodes( const config::ConfigurationTree& pt )
 {
 	boost::property_tree::ptree rt;
 	boost::property_tree::ptree::const_iterator pi = pt.begin(), pe = pt.end();
 
-	for (; pi != pe; ++pi)
-	{
+	for ( ; pi != pe; ++pi )	{
 		if (boost::algorithm::iequals( pi->first, "inputfile" ))
-		{
 			m_input_filename = pi->second.data();
-		}
 		else if (boost::algorithm::iequals( pi->first, "dumpfile" ))
-		{
 			m_dump_filename = pi->second.data();
-		}
 		else
-		{
-			rt.add_child( pi->first, pi->second);
-		}
+			rt.add_child( pi->first, pi->second );
 	}
 	return rt;
 }
 
-void PostgreSQLTestConfig::setMyCanonicalPathes( const std::string& referencePath)
+void PostgreSQLTestConfig::setMyCanonicalPathes( const std::string& referencePath )
 {
-	if (!m_input_filename.empty())
-	{
-		m_input_filename = utils::getCanonicalPath( m_input_filename, referencePath);
-	}
+	if ( !m_input_filename.empty() )
+		m_input_filename = utils::getCanonicalPath( m_input_filename, referencePath );
 	if (!m_dump_filename.empty())
-	{
-		m_dump_filename = utils::getCanonicalPath( m_dump_filename, referencePath);
-	}
+		m_dump_filename = utils::getCanonicalPath( m_dump_filename, referencePath );
 }
 
 void PostgreSQLTestConfig::dump_database()

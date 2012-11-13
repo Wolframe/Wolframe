@@ -54,7 +54,6 @@ using namespace _Wolframe::db;
 
 static void removeFileIfExists( const std::string& filename)
 {
-	boost::system::error_code errcode;
 	try
 	{
 		boost::filesystem::remove( filename);

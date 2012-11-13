@@ -30,8 +30,10 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_db_postgresqltest.cpp
-///\brief Module for a database implementation used for tests based on the postgres database module
+/// \file  mod_db_postgresqltest.cpp
+/// \brief Module for a database implementation used for tests
+///  based on the postgres database module
+
 #include "PostgreSQLTest.hpp"
 #include "moduleInterface.hpp"
 #include "logger-v1.hpp"
@@ -55,7 +57,7 @@ static void setModuleLogger( void* logger)
 	logBackendPtr = reinterpret_cast<_Wolframe::log::LogBackend*>( logger);
 }
 
-enum {NofObjects=1};
+enum { NofObjects = 1 };
 static CreateBuilderFunc containers[ NofObjects] =
 {
 	createDatabase
