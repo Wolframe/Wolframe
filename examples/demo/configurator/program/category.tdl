@@ -1,0 +1,97 @@
+--
+-- addCategoryRoot
+--
+TRANSACTION addCategoryRoot -- (name, normalizedName)
+BEGIN
+	DO INSERT INTO Category (ID, parent, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
+END
+
+--
+-- addCategory
+--
+TRANSACTION addCategory -- (parentid, name, normalizedName)
+BEGIN
+	DO NONEMPTY UNIQUE SELECT rgt FROM Category WHERE ID = $(parentid);
+	DO UPDATE Category SET rgt = rgt + 2 WHERE rgt >= $1;
+	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
+	DO INSERT INTO Category (parent, name, normalizedName, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $1, $1+1);
+	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE lft = $1;
+END
+
+--
+-- deleteCategory
+--
+TRANSACTION deleteCategory -- (id)
+BEGIN
+	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Category WHERE ID = $(id);
+	DO DELETE FROM Category WHERE lft >= $1 AND lft <= $2;
+	DO UPDATE Category SET lft = lft-$3 WHERE lft>$2;
+	DO UPDATE Category SET rgt = rgt-$3 WHERE rgt>$2;
+END
+
+--
+-- selectCategory       :Get the category
+-- selectCategoryByName :Get the category by name
+--
+TRANSACTION selectCategory -- (/category/id)
+BEGIN
+	FOREACH /category INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Category WHERE ID = $(id);
+END
+TRANSACTION selectCategoryByName -- (/category/name)
+BEGIN
+	FOREACH /category INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Category WHERE name = $(name);
+END
+
+--
+-- selectCategoryAndParents       :Get the category and its parents
+-- selectCategoryAndParentsByName :Get the category and its parents by name
+--
+TRANSACTION selectCategoryAndParents -- (/category/id)
+BEGIN
+	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id);
+END
+TRANSACTION selectCategoryAndParentsByName -- (/category/name)
+BEGIN
+	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = $(name);
+END
+
+--
+-- selectCategoryParents       :Get the parents of a category
+-- selectCategoryParentsByName :Get the parents of a category by name
+--
+TRANSACTION selectCategoryParents -- (/category/id)
+BEGIN
+	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+END
+TRANSACTION selectCategoryParentsByName -- (/category/name)
+BEGIN
+	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = $(name);
+END
+
+--
+-- selectCategoryAndChildren       :Get the category and its children
+-- selectCategoryAndChildrenByName :Get the category and its children by name
+--
+TRANSACTION selectCategoryAndChildren -- (/category/id)
+BEGIN
+	FOREACH /category INTO /category DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+END
+TRANSACTION selectCategoryAndChildrenByName -- (/category/name)
+BEGIN
+	FOREACH /category INTO /category DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
+END
+
+--
+-- selectCategoryChildren       :Get the children of a category
+-- selectCategoryChildrenByName :Get the children of a category by name
+--
+TRANSACTION selectChildren -- (/category/id)
+BEGIN
+	FOREACH /category INTO /category DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
+END
+TRANSACTION selectChildrenByName -- (/category/name)
+BEGIN
+	FOREACH /category INTO /category DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name);
+END
+
+

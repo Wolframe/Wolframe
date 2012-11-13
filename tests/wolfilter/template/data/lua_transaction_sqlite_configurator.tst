@@ -27,7 +27,8 @@ testdata="
 **file: DBDATA
 `cat ../../../examples/demo/configurator/database/schema_sqlite.sql`
 **file:DBPRG.tdl
-`cat ../../../examples/demo/configurator/program/configurator.tdl`
+`cat ../../../examples/demo/configurator/program/category.tdl`
+`cat ../../../examples/demo/configurator/program/feature.tdl`
 **outputfile:DBDUMP"
 csetlist="UTF-8"
 . ./output_tst_all.sh
