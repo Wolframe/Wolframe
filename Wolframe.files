@@ -33,6 +33,7 @@ makefiles/nmake/top.mk
 .Attic/AES-256/demo.c
 .Attic/appException.cpp
 .Attic/appException.hpp
+.Attic/argPassTest.cpp
 .Attic/clientlib.h
 .Attic/clientlib_protocol.c
 .Attic/config/config_descriptionBase.cpp
@@ -78,6 +79,7 @@ makefiles/nmake/top.mk
 .Attic/streamIterator.hpp
 .Attic/testLeak.cpp
 .Attic/testPGleak.cpp
+.Attic/threadLeakTest.cpp
 .Attic/types/BCDarithmeticOwnIncrement.c
 .Attic/types/bignum.hpp
 .Attic/types/dateArithmetic.hpp
@@ -1268,7 +1270,6 @@ tests/testTimestamp.cpp
 tests/testVirtualInheritance.cpp
 tests/testWolfilter.cpp
 tests/testWolfilter.sh
-tests/threadLeakTest.cpp
 tests/unitLibraryTest.cpp
 tests/versionTest.cpp
 tests/wolfilter/config/wolframe_unix.conf
