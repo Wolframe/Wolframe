@@ -133,6 +133,12 @@ themes\phone\MainWindow.ro_RO.qm: themes\phone\MainWindow.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe themes\phone\MainWindow.ro_RO.ts -qm themes\phone\MainWindow.ro_RO.qm
 
 
+apps\test\i18n\init.de_CH.qm: apps\test\i18n\init.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\init.de_CH.ts -qm apps\test\i18n\init.de_CH.qm
+
+apps\test\i18n\init.ro_RO.qm: apps\test\i18n\init.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\init.ro_RO.ts -qm apps\test\i18n\init.ro_RO.qm
+
 apps\test\i18n\form1.de_CH.qm: apps\test\i18n\form1.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form1.de_CH.ts -qm apps\test\i18n\form1.de_CH.qm
 
