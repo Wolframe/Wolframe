@@ -54,7 +54,11 @@
      </widget>
     </item>
     <item row="2" column="1">
-     <widget class="FileChooser" name="picture" native="true"/>
+     <widget class="FileChooser" name="picture">
+      <property name="m_fileName" stdset="0">
+       <string/>
+      </property>
+     </widget>
     </item>
     <item row="3" column="1">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -103,10 +107,16 @@
   <customwidget>
    <class>FileChooser</class>
    <extends>QWidget</extends>
-   <header>filechooser.h</header>
+   <header>FileChooser.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>vegetable</tabstop>
+  <tabstop>description</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

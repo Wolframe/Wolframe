@@ -127,6 +127,13 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>vegetable</tabstop>
+  <tabstop>save_3</tabstop>
+  <tabstop>reset_3</tabstop>
+  <tabstop>reset_4</tabstop>
+  <tabstop>cancel_3</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS =
+SUBDIRS = plugins
 
 .NOTPARALLEL:
 
@@ -42,7 +42,7 @@ MOC_FLAGS += \
 	-DWITH_SSL
 endif
 
-OBJS = \
+CPP_OBJS = \
 	moc_MainWindow.o \
 	MainWindow.o \
 	FormLoader.o \

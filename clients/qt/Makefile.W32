@@ -1,6 +1,6 @@
 TOPDIR = ..\..
 
-SUBDIRS =
+SUBDIRS = plugins
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -50,7 +50,7 @@ MOC_FLAGS = \
 
 !ENDIF
 
-OBJS = \
+CPP_OBJS = \
 	moc_MainWindow.obj \
 	MainWindow.obj \
 	FormLoader.obj \

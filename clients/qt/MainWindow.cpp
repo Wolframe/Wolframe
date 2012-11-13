@@ -345,9 +345,6 @@ void MainWindow::finishInitialize( )
 // get notified if the form widget changes a form
 	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
-// the form widget can choose to switch the form
-	connect( m_formWidget, SIGNAL( switchForm( QString ) ),
-		this, SLOT( loadForm( QString ) ) );
 // errors in the form widget
 	connect( m_formWidget, SIGNAL( error( QString ) ),
 		this, SLOT( formError( QString ) ) );

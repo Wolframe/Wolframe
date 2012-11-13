@@ -11,10 +11,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 
-namespace _Wolframe {
-	namespace QtClient {
-
-	class FileChooser : public QWidget
+class FileChooser : public QWidget
 	{
 	Q_OBJECT
 	Q_PROPERTY( QString m_fileName READ fileName WRITE setFileName )
@@ -43,9 +40,6 @@ namespace _Wolframe {
 		SelectionMode m_selectionMode;
 		QLineEdit *m_lineEdit;
 		QPushButton *m_button;	
-	};
-
-} // namespace QtClient
-} // namespace _Wolframe
+};
 
 #endif // _FILECHOOSER_HPP_INCLUDED

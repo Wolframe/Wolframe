@@ -21,10 +21,7 @@ show-stoppers:
     - delete elements/subtrees
   - file upload: we need that for product images, etc.
     - FileChooser as designer custom widget
-- some desinger custom widgets for
-  - how to make custom widgets work in QUiTools?
-  - FileChooser
-    - drawing should be easy as it is a textline + button
+- designer custom widgets for
   - FormWidget:
     - provide a preview of the form?
 - localize forms:
