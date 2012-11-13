@@ -29,9 +29,12 @@ namespace _Wolframe {
 		PreferencesDialog( QStringList _languages, QWidget *_parent = 0 );
 	
 	private:
-		QRadioButton *m_loadModeLocalFile;
-		QRadioButton *m_loadModeLocalDatabase;
-		QRadioButton *m_loadModeNetwork;
+		QRadioButton *m_uiLoadModeLocalFile;
+		QRadioButton *m_uiLoadModeLocalDatabase;
+		QRadioButton *m_uiLoadModeNetwork;
+		QRadioButton *m_dataLoadModeLocalFile;
+		QRadioButton *m_dataLoadModeLocalDatabase;
+		QRadioButton *m_dataLoadModeNetwork;
 		QLineEdit *m_host;
 		QSpinBox *m_port;
 		QCheckBox *m_secure;

@@ -56,7 +56,8 @@ namespace _Wolframe {
 		QString m_clientCertFile;	// filename of the client certfificate
 		QString m_clientKeyFile;	// filename of the client key file
 		QString m_CACertFile;		// filename of the CA certificate
-		LoadMode m_loadMode;		// whether to use local loader or not
+		LoadMode m_uiLoadMode;		// how to load UI forms and data
+		LoadMode m_dataLoadMode;	// how to load data domains
 		bool m_debug;			// show debug windows from the beginning
 		LoginDialog *m_loginDialog;	// the login dialog
 		QString m_dbName;		// name of the local database file for storing forms
@@ -71,6 +72,7 @@ namespace _Wolframe {
 		void readSettings( );
 		void parseArgs( );
 		void initialize( );
+		void finishInitialize( );
 		void populateThemesMenu( );
 		void loadTheme( QString themeName );
 		void loadLanguages( );

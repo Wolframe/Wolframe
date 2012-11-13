@@ -36,7 +36,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_host( "localhost" ), m_port( 7661 ), m_secure( false ),
 	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
 	m_CACertFile( "./certs/CAclient.cert.pem" ),
-	m_loadMode( Network ), m_debug( false ),
+	m_uiLoadMode( Network ), m_dataLoadMode( Network ), m_debug( false ),
 	m_loginDialog( 0 ), m_dbName( DEFAULT_SQLITE_FILENAME ), m_settings( ),
 	m_uiFormsDir( DEFAULT_UI_FORMS_DIR ),
 	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
@@ -77,7 +77,8 @@ void MainWindow::readSettings( )
 	m_clientCertFile = prefs->clientCertFile( );
 	m_clientKeyFile = prefs->clientKeyFile( );
 	m_CACertFile = prefs->caCertFile( );
-	m_loadMode = prefs->loadMode( );
+	m_uiLoadMode = prefs->uiLoadMode( );
+	m_dataLoadMode = prefs->dataLoadMode( );
 	m_dbName = prefs->dbName( );
 	m_debug = prefs->debug( );
 	m_uiFormsDir = prefs->uiFormsDir( );
@@ -137,9 +138,12 @@ void MainWindow::parseArgs( )
 		{ QCommandLine::Option, 'H', "host", "Wolframe host", QCommandLine::Optional },
 		{ QCommandLine::Option, 'p', "port", "Wolframe port", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'S', "secure", "connect securely via SSL", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'l', "local-file", "Run with local data and form loader (in filesystem)", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'L', "local-db", "Run with local data and form loader (in sqllite DB)", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'n', "network", "Run with network storage", QCommandLine::Optional },
+		{ QCommandLine::Switch, '\0', "ui-local-file", "Run with local form loader (in filesystem)", QCommandLine::Optional },
+		{ QCommandLine::Switch, '\0', "ui-local-db", "Run with local dform loader (in sqllite DB)", QCommandLine::Optional },
+		{ QCommandLine::Switch, '\0', "ui-network", "Run with network storage for forms", QCommandLine::Optional },
+		{ QCommandLine::Switch, '\0', "data-local-file", "Run with local form loader (in filesystem)", QCommandLine::Optional },
+		{ QCommandLine::Switch, '\0', "data-local-db", "Run with local data loader (in sqllite DB)", QCommandLine::Optional },
+		{ QCommandLine::Switch, '\0', "data-network", "Run with network storage for data", QCommandLine::Optional },
 		{ QCommandLine::Switch, 'd', "debug", "Enable debug window when starting", QCommandLine::Optional },
 		{ QCommandLine::Option, 'v', "verbose", "verbose level", QCommandLine::Optional },
 		{ QCommandLine::Option, 'c', "client-cert-file", "client certificate to present to the server (default: ./certs/client.crt)", QCommandLine::Optional },
@@ -174,12 +178,18 @@ void MainWindow::parseArgs( )
 void MainWindow::switchFound( const QString &name )
 {
 	qDebug( ) << "switch" << name;
-	if( name == "local-file" ) {
-		m_loadMode = LocalFile;
-	} else if( name == "local-db" ) {
-		m_loadMode = LocalDb;
-	} else if( name == "network" ) {
-		m_loadMode = Network;
+	if( name == "ui-local-file" ) {
+		m_uiLoadMode = LocalFile;
+	} else if( name == "ui-local-db" ) {
+		m_uiLoadMode = LocalDb;
+	} else if( name == "ui-network" ) {
+		m_uiLoadMode = Network;
+	} else if( name == "data-local-file" ) {
+		m_dataLoadMode = LocalFile;
+	} else if( name == "data-local-db" ) {
+		m_dataLoadMode = LocalDb;
+	} else if( name == "data-network" ) {
+		m_dataLoadMode = Network;
 	} else if( name == "secure" ) {
 		m_secure = true;
 	} else if( name == "debug" ) {
@@ -235,7 +245,7 @@ void MainWindow::initialize( )
 	qDebug( ) << "Debug window initialized";
 
 // open local sqlite database
-	if( m_loadMode == LocalDb ) {
+	if( m_uiLoadMode == LocalDb || m_dataLoadMode == LocalDb ) {
 		QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE", SESSION_NAME );
 		db.setDatabaseName( m_dbName );
 		if( !db.open( ) ) {
@@ -277,28 +287,51 @@ void MainWindow::initialize( )
 	
 // for testing, load lists of available forms from the files system or
 // a local sqlite database, pass the form loader to the FormWidget
-	switch( m_loadMode ) {
+	switch( m_uiLoadMode ) {
 		case LocalFile:
 			m_formLoader = new FileFormLoader( m_uiFormsDir, m_uiFormTranslationsDir );
-			m_dataLoader = new FileDataLoader( m_dataLoaderDir );
 			break;
 		
 		case LocalDb:
 			m_formLoader = new SqliteFormLoader( SESSION_NAME );
+			break;
+			
+		case Network:
+			// skip, delay
+			break;
+	}
+			
+// ..same for the data loader
+	switch( m_dataLoadMode ) {
+		case LocalFile:
+			m_dataLoader = new FileDataLoader( m_dataLoaderDir );
+			break;
+		
+		case LocalDb:
 			m_dataLoader = new SqliteDataLoader( SESSION_NAME );
 			break;
 			
 		case Network:
-// end of what we can do in network mode, initiate connect here and bail out
-// connect the wolframe client to protocols, authenticate
-			connect( m_wolframeClient, SIGNAL( connected( ) ),
-				this, SLOT( connected( ) ) );
-			connect( m_wolframeClient, SIGNAL( disconnected( ) ),
-				this, SLOT( disconnected( ) ) );
-			m_wolframeClient->connect( );
-		return;
+			// skip, delay
+			break;
 	}
 
+// end of what we can do in network mode, initiate connect here and bail out
+// connect the wolframe client to protocols, authenticate
+	if( m_uiLoadMode == Network || m_dataLoadMode == Network ) {
+		connect( m_wolframeClient, SIGNAL( connected( ) ),
+			this, SLOT( connected( ) ) );
+		connect( m_wolframeClient, SIGNAL( disconnected( ) ),
+			this, SLOT( disconnected( ) ) );
+		m_wolframeClient->connect( );
+		return;
+	}
+	
+	finishInitialize( );
+}
+
+void MainWindow::finishInitialize( )
+{
 // create delegate widget for form handling (one for now), in theory may are possible
 	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this );
 	
@@ -368,35 +401,17 @@ void MainWindow::authenticationOk( )
 	
 	qDebug( ) << "authentication succeeded";
 
-// create network based form and data loaders
-	m_formLoader = new NetworkFormLoader( m_wolframeClient );
-	m_dataLoader = new NetworkDataLoader( m_wolframeClient );
-
-// create delegate widget for form handling (one for now), in theory may are possible
-	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this );
+// create network based form ...
+	if( m_uiLoadMode == Network ) {
+		m_formLoader = new NetworkFormLoader( m_wolframeClient );
+	}
 	
-// link the form loader for form loader notifications needed by the main window
-// (list of forms for form menu, list of language for language picker)
-	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
-		this, SLOT( languageCodesLoaded( QStringList ) ) );
-	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
-		this, SLOT( formListLoaded( QStringList ) ) );
+// ...and data loaders
+	if( m_dataLoadMode == Network ) {
+		m_dataLoader = new NetworkDataLoader( m_wolframeClient );
+	}
 
-// get notified if the form widget changes a form
-	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
-		this, SLOT( formLoaded( QString ) ) );
-
-// set default language to the system language
-	m_currentLanguage = m_language;
-
-// load default theme
-	loadTheme( QString( QLatin1String( "windows" ) ) );
-
-// load language resources, repaints the whole interface if necessary
-	loadLanguage( m_currentLanguage );	
-
-// load initial form
-	loadForm( "init" );
+	finishInitialize( );
 }
 
 void MainWindow::authenticationFailed( )
@@ -646,7 +661,7 @@ void MainWindow::on_actionRestart_triggered( )
 
 void MainWindow::on_actionExit_triggered( )
 {	
-	if( m_loadMode == Network ) {
+	if( m_uiLoadMode == Network || m_dataLoadMode == Network ) {
 		m_wolframeClient->disconnect( );
 	} else {
 // terminate brutally in local mode	
