@@ -93,7 +93,6 @@ INCLUDE_LIBS = \
 !ENDIF
 
 TEST_CPP_BINS = \
-	threadLeakTest.exe \
 	testNamedRetVal.exe \
 	testVirtualInheritance.exe \
 	versionTest.exe \
@@ -129,7 +128,6 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-threadLeakTest.exe: threadLeakTest.obj $(TOPDIR)\src\wolframe.lib
 testNamedRetVal.exe: testNamedRetVal.obj
 testVirtualInheritance.exe: testVirtualInheritance.obj
 testMethodMemberPointerTemplate.exe: testMethodMemberPointerTemplate.obj
