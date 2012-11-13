@@ -28,7 +28,7 @@ Preferences::~Preferences( )
 bool Preferences::exists( )
 {
 	QSettings *s = createSettings( );
-	bool e = s->contains( "wolframe/loadmode" );
+	bool e = s->contains( "wolframe/locale" );
 	delete s;
 	return e;
 }
