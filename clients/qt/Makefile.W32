@@ -1,6 +1,6 @@
 TOPDIR = ..\..
 
-SUBDIRS = plugins
+SUBDIRS = 
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -29,6 +29,8 @@ INCLUDE_LIBS = \
 	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtSqld4.lib
 !ENDIF
 
+MOC_FLAGS =
+
 # openssl
 
 !IFDEF WITH_SSL
@@ -46,11 +48,11 @@ INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) $(OPENSSL_LIBS)
 
 MOC_FLAGS = \
-	-DWITH_SSL
+	$(MOC_FLAGS) /DWITH_SSL
 
 !ENDIF
 
-CPP_OBJS = \
+OBJS = \
 	moc_MainWindow.obj \
 	MainWindow.obj \
 	FormLoader.obj \
@@ -243,7 +245,7 @@ copy_prereq:
 run: local_all $(CPP_BINS) copy_prereq
 	@-echo @echo off > test.bat
 	@-echo echo Testing Qt client... >> test.bat
-	@-echo qtclient.exe -d >> test.bat
+	@-echo qtclient.exe >> test.bat
 	@-test.bat
 
 buildi18n:

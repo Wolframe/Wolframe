@@ -21,8 +21,13 @@ show-stoppers:
     - delete elements/subtrees
   - file upload: we need that for product images, etc.
     - FileChooser as designer custom widget
-- designer custom widgets for
+- designer custom widgets
+  - load designer widgets in qtclient relativ to the deployment path
+    of the qtclient, not the designer in Qt!
+  - Windows: make linking plugin DLL without qmake work
   - FormWidget:
+    - implement a form widget as placeholder for the real thing
+    - loads via a form/data loader?
     - provide a preview of the form?
 - localize forms:
   - Windows doesn't retranslate on the fly! Why?
