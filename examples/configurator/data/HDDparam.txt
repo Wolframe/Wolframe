@@ -1,0 +1,17 @@
+Rotational speed
+15,000
+10,000
+7,200
+5,400
+4,800
+
+HDD Interface
+SCSI	Small Computer System Interface
+SAS	Serial Attached SCSI
+(P)ATA	(Parallel) AT Attachment
+SATA	Serial ATA
+
+HDD form factor
+3.5"	4 in × 1 in × 5.75 in (101.6 mm × 25.4 mm × 146 mm)
+2.5"	2.75 in × 0.275–0.59 in × 3.945 in (69.85 mm × 7–15 mm × 100 mm)
+1.8"	54 mm × 8 mm × 71 mm
