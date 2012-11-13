@@ -101,7 +101,7 @@ I18NS = \
 	themes\windows\MainWindow.de_CH.qm \
 	themes\windows\MainWindow.ro_RO.qm \
 	themes\phone\MainWindow.de_CH.qm \
-	themes\phone\MainWindow.ro_RO.qm
+	themes\phone\MainWindow.ro_RO.qm \
 	apps\test\i18n\form1.de_CH.qm \
 	apps\test\i18n\form1.ro_RO.qm \
 	apps\test\i18n\form2.de_CH.qm \
