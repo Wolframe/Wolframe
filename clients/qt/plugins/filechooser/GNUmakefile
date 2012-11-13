@@ -41,7 +41,15 @@ DYNAMIC_MODULE = libwolframefilechooser.so
 
 local_all:
 
+../../moc_FileChooser.cpp: ../../FileChooser.hpp
+	$(QT_MOC) $(MOC_FLAGS) ../../FileChooser.hpp -o ../../moc_FileChooser.cpp
+
+moc_FileChooserPlugin.cpp: FileChooserPlugin.hpp
+	$(QT_MOC) $(MOC_FLAGS) FileChooserPlugin.hpp -o moc_FileChooserPlugin.cpp
+
 local_clean:
+	@-rm -f moc_*.cpp
+	@-rm -f Makefile
 
 local_distclean:
 
