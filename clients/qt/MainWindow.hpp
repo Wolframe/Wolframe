@@ -102,6 +102,7 @@ namespace _Wolframe {
 		void languageCodesLoaded( QStringList languages );
 		void formListLoaded( QStringList forms );
 		void formLoaded( QString name );
+		void formError( QString error );
 
 // auto-wired slots for the menu
 		void on_actionRestart_triggered( );

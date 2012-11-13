@@ -68,6 +68,7 @@ namespace _Wolframe {
 	
 	signals:
 		void formLoaded( QString name );
+		void error( QString error );
 		
 	private slots:
 		void formLoaded( QString name, QByteArray form );

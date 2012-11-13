@@ -162,6 +162,12 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 	QWidget *oldUi = m_ui;
 	QBuffer buf( &form );
 	m_ui = m_uiLoader->load( &buf, this );
+	if( m_ui == 0 ) {
+// something went wrong loading or constructing the form
+		m_ui = oldUi;
+		emit error( tr( "Unable to create form %1, does it exist?" ).arg( name ) );
+		return;
+	}
 	buf.close( );
 
 // add new form to layout (which covers the whole widget)

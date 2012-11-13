@@ -149,7 +149,7 @@ void MainWindow::parseArgs( )
 		{ QCommandLine::Option, 'c', "client-cert-file", "client certificate to present to the server (default: ./certs/client.crt)", QCommandLine::Optional },
 		{ QCommandLine::Option, 'k', "client-key-file", "client key file (default: ./private/client.key)", QCommandLine::Optional },
 		{ QCommandLine::Option, 'C', "CA-cert-file", "certificate file containing the CA (default: ./certs/CAclient.cert.pem)", QCommandLine::Optional },
-		{ QCommandLine::Option, 'f', "db-file", "Sqlite3 file for local storage", QCommandLine::Optional },
+		{ QCommandLine::Option, 'D', "db-file", "Sqlite3 file for local storage", QCommandLine::Optional },
 		QCOMMANDLINE_CONFIG_ENTRY_END
 	};
 
@@ -348,7 +348,10 @@ void MainWindow::finishInitialize( )
 // the form widget can choose to switch the form
 	connect( m_formWidget, SIGNAL( switchForm( QString ) ),
 		this, SLOT( loadForm( QString ) ) );
-
+// errors in the form widget
+	connect( m_formWidget, SIGNAL( error( QString ) ),
+		this, SLOT( formError( QString ) ) );
+		
 // set default language to the system language
 	m_currentLanguage = m_language;
 
@@ -651,6 +654,16 @@ void MainWindow::formLoaded( QString name )
 	foreach( QAction *action, _actions ) {
 		if( action->text( ) == name ) action->setChecked( true );
 	}
+}
+
+void MainWindow::formError( QString error )
+{
+	qDebug( ) << "Form error: " << error;
+ 	
+// not busy anymore
+	qApp->restoreOverrideCursor();
+
+	QMessageBox::information( this, tr( "Form error" ), error,QMessageBox::Ok );
 }
 
 void MainWindow::on_actionRestart_triggered( )

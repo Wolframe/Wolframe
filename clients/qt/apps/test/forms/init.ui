@@ -65,6 +65,19 @@
     <string>Form 4</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="form5">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>140</y>
+     <width>83</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Form 5</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

@@ -47,7 +47,7 @@
     <message>
         <location filename="../qcommandline.cpp" line="311"/>
         <source>%1 %2 is mandatory</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2 ist notwendig</translation>
     </message>
     <message>
         <location filename="../qcommandline.cpp" line="502"/>
@@ -62,12 +62,12 @@ Mandatory arguments to long options are mandatory for short options too.
     <message>
         <location filename="../DebugTerminal.cpp" line="26"/>
         <source>Debug Terminal</source>
-        <translation type="unfinished"></translation>
+        <translation>Debugfenster</translation>
     </message>
     <message>
         <location filename="../DebugTerminal.cpp" line="31"/>
         <source>Ctrl-D enables/disables the protocol debug window</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl-D schaltet das Debugfenster ein und aus</translation>
     </message>
 </context>
 <context>
@@ -75,12 +75,20 @@ Mandatory arguments to long options are mandatory for short options too.
     <message>
         <location filename="../FileChooser.cpp" line="53"/>
         <source>Choose a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Wähle eine Datei aus</translation>
     </message>
     <message>
         <location filename="../FileChooser.cpp" line="58"/>
         <source>Choose a directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Wähle ein Verzeichnis aus</translation>
+    </message>
+</context>
+<context>
+    <name>_Wolframe::QtClient::FormWidget</name>
+    <message>
+        <location filename="../FormWidget.cpp" line="168"/>
+        <source>Unable to create form %1, does it exist?</source>
+        <translation>Kann Formular %1 nicht erstellen, existiert es?</translation>
     </message>
 </context>
 <context>
@@ -150,9 +158,9 @@ Mandatory arguments to long options are mandatory for short options too.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="693"/>
-        <location filename="../MainWindow.cpp" line="694"/>
-        <location filename="../MainWindow.cpp" line="699"/>
+        <location filename="../MainWindow.cpp" line="701"/>
+        <location filename="../MainWindow.cpp" line="702"/>
+        <location filename="../MainWindow.cpp" line="707"/>
         <source>qtclient</source>
         <translation type="unfinished"></translation>
     </message>
@@ -162,27 +170,27 @@ Mandatory arguments to long options are mandatory for short options too.
     <message>
         <location filename="../ManageStorageDialog.cpp" line="23"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="35"/>
         <source>&lt;--</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="37"/>
         <source>--&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="40"/>
         <source>Left to right</source>
-        <translation type="unfinished"></translation>
+        <translation>Links nach rechts</translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="41"/>
         <source>Right to left</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechts nach links</translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="42"/>
@@ -197,17 +205,17 @@ Mandatory arguments to long options are mandatory for short options too.
     <message>
         <location filename="../ManageStorageDialog.cpp" line="45"/>
         <source>&amp;Synchronize</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Synchronisieren</translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="47"/>
         <source>&amp;Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Löschen</translation>
     </message>
     <message>
         <location filename="../ManageStorageDialog.cpp" line="49"/>
         <source>&amp;Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Beenden</translation>
     </message>
 </context>
 <context>

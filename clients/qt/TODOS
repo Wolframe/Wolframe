@@ -1,7 +1,4 @@
 show-stoppers:
-- protocol
-  - add doctype to data XML
-  - network loader via protocol or use client library?
 - workflow for form
   - forms in forms: show multiple views, in theory a widget of
     FormWidget's should to the trick
@@ -9,6 +6,27 @@ show-stoppers:
     existing item, add new item.
   - passing hidden parameters between forms (example ID of a
     product to show)
+- define actions (CRUD)
+  - init: empty form with default values (C)
+  - get: request data from server (R)
+  - send: send data to server (U)
+  - delete (D)
+- protocol
+  - add doctype to data XML
+  - network loader via protocol or use client library?
+- element operations
+  - reorganize tree
+    - add elements 
+    - move elements/subtrees
+    - delete elements/subtrees
+  - file upload: we need that for product images, etc.
+    - FileChooser as designer custom widget
+- some desinger custom widgets for
+  - how to make custom widgets work in QUiTools?
+  - FileChooser
+    - drawing should be easy as it is a textline + button
+  - FormWidget:
+    - provide a preview of the form?
 - localize forms:
   - Windows doesn't retranslate on the fly! Why?
   - Windows doesn't respect language on startup for form
@@ -22,24 +40,13 @@ show-stoppers:
       - form init doesn't work when language is not en_US
     - QTreeWidget
       - localization
-- element operations
-  - reorganize tree
-    - add elements 
-    - move elements/subtrees
-    - delete elements/subtrees
-  - file upload: we need that for product images, etc.
-    - FileChooser as designer custom widget
-- define actions (CRUD)
-  - init: empty form with default values (C)
-  - get: request data from server (R)
-  - send: send data to server (U)
-  - delete (D)
 
 must do:
 - for completion and presentation of big data
   - QListView: with model for big data, on request
   - QTreeView: with model for big data, on request
 - file download, later, for reports, PDFs, etc.
+- default focus on a textfield (funny, designer has no way to do it?)
 
 nice to do:
 - work more on Android port
