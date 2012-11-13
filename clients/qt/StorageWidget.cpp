@@ -30,19 +30,29 @@ void StorageWidget::initialize( )
 	QFormLayout *formLayout = new QFormLayout( );
 	formLayout->setMargin( 0 );
 	
-	QGroupBox *groupBox = new QGroupBox( );
-	m_loadModeLocalFile = new QRadioButton( tr( "Local &file" ) );
-	m_loadModeLocalDatabase = new QRadioButton( tr( "Local &database" ) );
-	m_loadModeNetwork = new QRadioButton( tr( "&Network" ) );
-	
-	QVBoxLayout *vbox = new QVBoxLayout( );
-	vbox->addWidget( m_loadModeLocalFile );
-	vbox->addWidget( m_loadModeLocalDatabase );
-	vbox->addWidget( m_loadModeNetwork );
-	vbox->addStretch( 1 );
-	groupBox->setLayout( vbox );
-	
-	formLayout->addRow( tr( "&Load mode:" ), groupBox );
+	QGroupBox *groupBox1 = new QGroupBox( );
+	m_uiLoadModeLocalFile = new QRadioButton( tr( "Local &file" ) );
+	m_uiLoadModeLocalDatabase = new QRadioButton( tr( "Local &database" ) );
+	m_uiLoadModeNetwork = new QRadioButton( tr( "&Network" ) );
+	QVBoxLayout *vbox1 = new QVBoxLayout( );
+	vbox1->addWidget( m_uiLoadModeLocalFile );
+	vbox1->addWidget( m_uiLoadModeLocalDatabase );
+	vbox1->addWidget( m_uiLoadModeNetwork );
+	vbox1->addStretch( 1 );
+	groupBox1->setLayout( vbox1 );
+	formLayout->addRow( tr( "&UI load mode:" ), groupBox1 );
+
+	QGroupBox *groupBox2 = new QGroupBox( );
+	m_dataLoadModeLocalFile = new QRadioButton( tr( "Local &file" ) );
+	m_dataLoadModeLocalDatabase = new QRadioButton( tr( "Local &database" ) );
+	m_dataLoadModeNetwork = new QRadioButton( tr( "&Network" ) );
+	QVBoxLayout *vbox2 = new QVBoxLayout( );
+	vbox2->addWidget( m_dataLoadModeLocalFile );
+	vbox2->addWidget( m_dataLoadModeLocalDatabase );
+	vbox2->addWidget( m_dataLoadModeNetwork );
+	vbox2->addStretch( 1 );
+	groupBox2->setLayout( vbox2 );
+	formLayout->addRow( tr( "&Data load mode:" ), groupBox2 );
 
 	m_host = new QLineEdit( this );
 	formLayout->addRow( tr( "&Host:" ), m_host );
@@ -90,13 +100,22 @@ void StorageWidget::initialize( )
 	connect( m_secure, SIGNAL( stateChanged( int ) ),
 		this, SLOT( toggleSecure( int ) ) );
 	
-	connect( m_loadModeLocalFile, SIGNAL( toggled( bool ) ),
+	connect( m_uiLoadModeLocalFile, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 		
-	connect( m_loadModeLocalDatabase, SIGNAL( toggled( bool ) ),
+	connect( m_uiLoadModeLocalDatabase, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 
-	connect( m_loadModeNetwork, SIGNAL( toggled( bool ) ),
+	connect( m_uiLoadModeNetwork, SIGNAL( toggled( bool ) ),
+		this, SLOT( toggleLoadMode( bool ) ) );
+
+	connect( m_dataLoadModeLocalFile, SIGNAL( toggled( bool ) ),
+		this, SLOT( toggleLoadMode( bool ) ) );
+		
+	connect( m_dataLoadModeLocalDatabase, SIGNAL( toggled( bool ) ),
+		this, SLOT( toggleLoadMode( bool ) ) );
+
+	connect( m_dataLoadModeNetwork, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 }
 
@@ -113,28 +132,45 @@ void StorageWidget::loadSettings( )
 	m_clientKeyFile->setEnabled( prefs->secure( ) );
 	m_CACertFile->setFileName( prefs->caCertFile( ) );
 	m_CACertFile->setEnabled( prefs->secure( ) );
-	m_loadModeLocalFile->setChecked( false );
-	m_loadModeLocalDatabase->setChecked( false );
-	m_loadModeNetwork->setChecked( false );
+	m_uiLoadModeLocalFile->setChecked( false );
+	m_uiLoadModeLocalDatabase->setChecked( false );
+	m_uiLoadModeNetwork->setChecked( false );
+	m_dataLoadModeLocalFile->setChecked( false );
+	m_dataLoadModeLocalDatabase->setChecked( false );
+	m_dataLoadModeNetwork->setChecked( false );
 	m_dbName->setEnabled( false );
 	m_uiFormsDir->setEnabled( false );
 	m_uiFormTranslationsDir->setEnabled( false );
 	m_dataLoaderDir->setEnabled( false );
-	switch( prefs->loadMode( ) ) {
-		case Preferences::LocalFile:
-			m_loadModeLocalFile->setChecked( true );
+	switch( prefs->uiLoadMode( ) ) {
+		case Preferences::LocalFile:			
+			m_uiLoadModeLocalFile->setChecked( true );
 			m_uiFormsDir->setEnabled( true );
 			m_uiFormTranslationsDir->setEnabled( true );
-			m_dataLoaderDir->setEnabled( true );
 			break;
 
 		case Preferences::LocalDb:
-			m_loadModeLocalDatabase->setChecked( true );
+			m_uiLoadModeLocalDatabase->setChecked( true );
 			m_dbName->setEnabled( true );
 			break;
 
 		case Preferences::Network:
-			m_loadModeNetwork->setChecked( true );
+			m_uiLoadModeNetwork->setChecked( true );
+			break;
+	}
+	switch( prefs->dataLoadMode( ) ) {
+		case Preferences::LocalFile:			
+			m_dataLoadModeLocalFile->setChecked( true );
+			m_dataLoaderDir->setEnabled( true );
+			break;
+
+		case Preferences::LocalDb:
+			m_dataLoadModeLocalDatabase->setChecked( true );
+			m_dbName->setEnabled( true );
+			break;
+
+		case Preferences::Network:
+			m_dataLoadModeNetwork->setChecked( true );
 			break;
 	}
 	m_dbName->setFileName( prefs->dbName( ) );
@@ -154,16 +190,16 @@ void StorageWidget::toggleSecure( int /* state */ )
 
 void StorageWidget::toggleLoadMode( bool /* checked */ )
 {
-	m_dbName->setEnabled( m_loadModeLocalDatabase->isChecked( ) );
-	m_host->setEnabled( m_loadModeNetwork->isChecked( ) );
-	m_port->setEnabled( m_loadModeNetwork->isChecked( ) );
-	m_secure->setEnabled( m_loadModeNetwork->isChecked( ) );
-	m_clientCertFile->setEnabled( m_loadModeNetwork->isChecked( ) && m_secure->isChecked( ) );
-	m_clientKeyFile->setEnabled( m_loadModeNetwork->isChecked( ) && m_secure->isChecked( ) );
-	m_CACertFile->setEnabled( m_loadModeNetwork->isChecked( ) && m_secure->isChecked( ) );
-	m_uiFormsDir->setEnabled( m_loadModeLocalFile->isChecked( ) );
-	m_uiFormTranslationsDir->setEnabled( m_loadModeLocalFile->isChecked( ) );
-	m_dataLoaderDir->setEnabled( m_loadModeLocalFile->isChecked( ) );
+	m_dbName->setEnabled( m_uiLoadModeLocalDatabase->isChecked( ) || m_dataLoadModeLocalDatabase->isChecked( ) );
+	m_host->setEnabled( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) );
+	m_port->setEnabled( m_uiLoadModeNetwork->isChecked( ) | m_dataLoadModeNetwork->isChecked( ) );
+	m_secure->setEnabled( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) );
+	m_clientCertFile->setEnabled( ( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) ) && m_secure->isChecked( ) );
+	m_clientKeyFile->setEnabled( ( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) ) && m_secure->isChecked( ) );
+	m_CACertFile->setEnabled( ( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) ) && m_secure->isChecked( ) );
+	m_uiFormsDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );
+	m_uiFormTranslationsDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );
+	m_dataLoaderDir->setEnabled( m_dataLoadModeLocalFile->isChecked( ) );
 }
 
 void StorageWidget::loadTree( )

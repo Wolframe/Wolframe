@@ -2,8 +2,6 @@ show-stoppers:
 - protocol
   - add doctype to data XML
   - network loader via protocol or use client library?
-- loadmode must be split in UI-loadmode and data-loadmode (at least for
-  now when we use local forms and network data connections in parallel)
 - workflow for form
   - forms in forms: show multiple views, in theory a widget of
     FormWidget's should to the trick
@@ -21,6 +19,7 @@ show-stoppers:
   - classes to map from/to:
     - QListWidget
       - localization
+      - form init doesn't work when language is not en_US
     - QTreeWidget
       - localization
 - element operations
@@ -33,7 +32,7 @@ show-stoppers:
 - define actions (CRUD)
   - init: empty form with default values (C)
   - get: request data from server (R)
-  - write: send data to server (U)
+  - send: send data to server (U)
   - delete (D)
 
 must do:
