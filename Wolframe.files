@@ -147,6 +147,9 @@ clients/qt/apps/test/data/form1.xml
 clients/qt/apps/test/data/form2.xml
 clients/qt/apps/test/data/form3.xml
 clients/qt/apps/test/data/form4.xml
+clients/qt/apps/test/data/form5_item.xml
+clients/qt/apps/test/data/form5.xml
+clients/qt/apps/test/data/item5_item.xml
 clients/qt/BUGS
 clients/qt/DataHandler.cpp
 clients/qt/DataHandler.hpp
@@ -1173,6 +1176,7 @@ tests/database/PostgreSQL/Makefile.W32
 tests/database/PostgreSQL/PostgreSQLModuleFiles.cpp
 tests/database/PostgreSQL/postgresUnit.cpp
 tests/database/PostgreSQL/README.txt
+tests/database/PostgreSQL/testDB.sql
 tests/database/SQLite3/GNUmakefile
 tests/database/SQLite3/Makefile.W32
 tests/database/SQLite3/sqliteUnit.cpp
