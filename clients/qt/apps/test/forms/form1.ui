@@ -299,7 +299,7 @@
           <string notr="true">init</string>
          </property>
          <property name="action" stdset="0">
-          <string notr="true">save</string>
+          <string notr="true">send</string>
          </property>
         </widget>
        </item>
@@ -309,7 +309,7 @@
           <string>Reset</string>
          </property>
          <property name="action" stdset="0">
-          <string notr="true">reset</string>
+          <string notr="true">get</string>
          </property>
         </widget>
        </item>

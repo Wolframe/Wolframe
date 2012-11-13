@@ -6,52 +6,52 @@
     <message>
         <location filename="../forms/form2.ui" line="21"/>
         <source>Wolframe client form 2</source>
-        <translation type="unfinished">Wolframe Client Formular 2</translation>
+        <translation>Wolframe Client Formular 2</translation>
     </message>
     <message>
         <location filename="../forms/form2.ui" line="37"/>
         <source>Plain text</source>
-        <translation type="unfinished">Text</translation>
+        <translation>Text</translation>
     </message>
     <message>
         <location filename="../forms/form2.ui" line="55"/>
         <source>HTML text</source>
-        <translation type="unfinished">HTML Text</translation>
+        <translation>HTML Text</translation>
     </message>
     <message>
         <location filename="../forms/form2.ui" line="70"/>
         <source>Web</source>
-        <translation type="unfinished">Internet</translation>
+        <translation>Internet</translation>
     </message>
     <message>
         <location filename="../forms/form2.ui" line="83"/>
         <source>http://wolframe.net/</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../forms/form2.ui" line="99"/>
         <source>Last name:</source>
-        <translation type="unfinished">Vorname:</translation>
+        <translation>Vorname:</translation>
     </message>
     <message>
         <location filename="../forms/form2.ui" line="141"/>
         <source>First name:</source>
-        <translation type="unfinished">Nachname:</translation>
+        <translation>Nachname:</translation>
     </message>
     <message>
         <location filename="../forms/form2.ui" line="160"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <location filename="../forms/form2.ui" line="179"/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <location filename="../forms/form2.ui" line="189"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbruch</translation>
     </message>
 </context>
 </TS>

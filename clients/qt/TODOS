@@ -19,6 +19,7 @@ show-stoppers:
   - classes to map from/to:
     - QListWidget
       - localization
+      - form init doesn't work when language is not en_US
     - QTreeWidget
       - localization
 - element operations
@@ -31,7 +32,7 @@ show-stoppers:
 - define actions (CRUD)
   - init: empty form with default values (C)
   - get: request data from server (R)
-  - write: send data to server (U)
+  - send: send data to server (U)
   - delete (D)
 
 must do:

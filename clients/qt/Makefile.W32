@@ -102,6 +102,8 @@ I18NS = \
 	themes\windows\MainWindow.ro_RO.qm \
 	themes\phone\MainWindow.de_CH.qm \
 	themes\phone\MainWindow.ro_RO.qm \
+	apps\test\i18n\init.de_CH.qm \
+	apps\test\i18n\init.ro_RO.qm \
 	apps\test\i18n\form1.de_CH.qm \
 	apps\test\i18n\form1.ro_RO.qm \
 	apps\test\i18n\form2.de_CH.qm \
@@ -244,7 +246,13 @@ buildi18n:
 	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.ro_RO.ts
+	$(QT_DIR)\bin\lupdate.exe apps\test\forms\init.ui -ts apps\test\i18n\init.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe apps\test\forms\init.ui -ts apps\test\i18n\init.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form1.ui -ts apps\test\i18n\form1.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form1.ui -ts apps\test\i18n\form1.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form2.ui -ts apps\test\i18n\form2.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form2.ui -ts apps\test\i18n\form2.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form3.ui -ts apps\test\i18n\form3.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form3.ui -ts apps\test\i18n\form3.ro_RO.ts
+	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form4.ui -ts apps\test\i18n\form4.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form4.ui -ts apps\test\i18n\form4.ro_RO.ts

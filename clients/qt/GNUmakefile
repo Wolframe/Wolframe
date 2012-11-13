@@ -160,6 +160,8 @@ I18NS = \
 	themes/windows/MainWindow.ro_RO.qm \
 	themes/phone/MainWindow.de_CH.qm \
 	themes/phone/MainWindow.ro_RO.qm \
+	apps/test/i18n/init.de_CH.qm \
+	apps/test/i18n/init.ro_RO.qm \
 	apps/test/i18n/form1.de_CH.qm \
 	apps/test/i18n/form1.ro_RO.qm \
 	apps/test/i18n/form2.de_CH.qm \
@@ -208,8 +210,8 @@ buildi18n:
 	$(QT_LUPDATE) -extensions hpp,cpp . -ts i18n/qtclient.de_CH.ts
 	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/MainWindow.de_CH.ts
 	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/MainWindow.ro_RO.ts
-	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/qtclient.de_CH.ts
-	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/qtclient.ro_RO.ts
+	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/MainWindow.de_CH.ts
+	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/MainWindow.ro_RO.ts
 	$(QT_LUPDATE) apps/test/forms/init.ui -ts apps/test/i18n/init.de_CH.ts
 	$(QT_LUPDATE) apps/test/forms/init.ui -ts apps/test/i18n/init.ro_RO.ts
 	$(QT_LUPDATE) apps/test/forms/form1.ui -ts apps/test/i18n/form1.de_CH.ts

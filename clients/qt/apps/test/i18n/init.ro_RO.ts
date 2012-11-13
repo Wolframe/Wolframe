@@ -10,26 +10,21 @@
     </message>
     <message>
         <location filename="../forms/init.ui" line="26"/>
-        <source>Welcome !</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../forms/init.ui" line="39"/>
         <source>Form 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../forms/init.ui" line="52"/>
+        <location filename="../forms/init.ui" line="39"/>
         <source>Form 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../forms/init.ui" line="65"/>
+        <location filename="../forms/init.ui" line="52"/>
         <source>Form 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../forms/init.ui" line="78"/>
+        <location filename="../forms/init.ui" line="65"/>
         <source>Form 4</source>
         <translation type="unfinished"></translation>
     </message>

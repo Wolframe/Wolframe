@@ -75,11 +75,14 @@ namespace _Wolframe {
 		void formListLoaded( QStringList forms );
 		void dataLoaded( QString name, QByteArray xml );
 		void dataSaved( QString name );
+		void dataDeleted( QString name );
 		void formDomainLoaded( QString form_name, QString widget_name, QByteArray data );
 
 		void switchForm( QObject *object );
-		void actionSave( );
-		void actionReset( );
+		void actionSend( );
+		void actionGet( );
+		void actionInit( );
+		void actionDelete( );
 	};
 	
 } // namespace QtClient
