@@ -163,7 +163,7 @@ Argumentele obligatorii pentru opțiunile lungi sunt obligatorii și pentru opț
     <message>
         <location filename="../../PreferencesDialog.cpp" line="46"/>
         <source>Client &amp;Key:</source>
-        <translation type="unfinished">Cheie Client:</translation>
+        <translation>C&amp;heie Client:</translation>
     </message>
     <message>
         <location filename="../../PreferencesDialog.cpp" line="49"/>
@@ -183,12 +183,12 @@ Argumentele obligatorii pentru opțiunile lungi sunt obligatorii și pentru opț
     <message>
         <location filename="../../PreferencesDialog.cpp" line="54"/>
         <source>&amp;Network</source>
-        <translation type="unfinished">Rețea</translation>
+        <translation>&amp;Rețea</translation>
     </message>
     <message>
         <location filename="../../PreferencesDialog.cpp" line="63"/>
         <source>&amp;Load mode:</source>
-        <translation type="unfinished">Mod de încărcare:</translation>
+        <translation>&amp;Mod de încărcare:</translation>
     </message>
     <message>
         <location filename="../../PreferencesDialog.cpp" line="66"/>

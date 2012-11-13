@@ -95,6 +95,42 @@ all: $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
+I18NS = \
+	i18n\qtclient.de_CH.qm \
+	i18n\qtclient.ro_RO.qm \
+	themes\windows\MainWindow.de_CH.qm \
+	themes\windows\MainWindow.ro_RO.qm \
+	themes\phone\MainWindow.de_CH.qm \
+	themes\phone\MainWindow.ro_RO.qm
+	apps\test\i18n\form1.de_CH.qm \
+	apps\test\i18n\form1.ro_RO.qm \
+	apps\test\i18n\form2.de_CH.qm \
+	apps\test\i18n\form2.ro_RO.qm \
+	apps\test\i18n\form3.de_CH.qm \
+	apps\test\i18n\form3.ro_RO.qm \
+	apps\test\i18n\form4.de_CH.qm \
+	apps\test\i18n\form4.ro_RO.qm
+	
+i18n\qtclient.de_CH.qm: i18n\qtclient.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe i18n\qtclient.de_CH.ts -qm i18n\qtclient.de_CH.qm
+
+i18n\qtclient.ro_RO.qm: i18n\qtclient.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe i18n\qtclient.ro_RO.ts -qm i18n\qtclient.ro_RO.qm
+
+
+themes\windows\MainWindow.de_CH.qm: themes\windows\MainWindow.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe themes\windows\MainWindow.de_CH.ts -qm themes\windows\MainWindow.de_CH.qm
+
+themes\windows\MainWindow.ro_RO.qm: themes\windows\MainWindow.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe themes\windows\MainWindow.ro_RO.ts -qm themes\windows\MainWindow.ro_RO.qm
+
+themes\phone\MainWindow.de_CH.qm: themes\phone\MainWindow.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe themes\phone\MainWindow.de_CH.ts -qm themes\phone\MainWindow.de_CH.qm
+
+themes\phone\MainWindow.ro_RO.qm: themes\phone\MainWindow.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe themes\phone\MainWindow.ro_RO.ts -qm themes\phone\MainWindow.ro_RO.qm
+
+
 apps\test\i18n\form1.de_CH.qm: apps\test\i18n\form1.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form1.de_CH.ts -qm apps\test\i18n\form1.de_CH.qm
 
@@ -104,33 +140,21 @@ apps\test\i18n\form1.ro_RO.qm: apps\test\i18n\form1.ro_RO.ts
 apps\test\i18n\form2.de_CH.qm: apps\test\i18n\form2.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form2.de_CH.ts -qm apps\test\i18n\form2.de_CH.qm
 
+apps\test\i18n\form2.ro_RO.qm: apps\test\i18n\form2.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form2.ro_RO.ts -qm apps\test\i18n\form2.ro_RO.qm
+
 apps\test\i18n\form3.de_CH.qm: apps\test\i18n\form3.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form3.de_CH.ts -qm apps\test\i18n\form3.de_CH.qm
 
+apps\test\i18n\form3.ro_RO.qm: apps\test\i18n\form3.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form3.ro_RO.ts -qm apps\test\i18n\form3.ro_RO.qm
 
-themes\windows\qtclient.de_CH.qm: themes\windows\qtclient.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe themes\windows\qtclient.de_CH.ts -qm themes\windows\qtclient.de_CH.qm
+apps\test\i18n\form4.de_CH.qm: apps\test\i18n\form4.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form4.de_CH.ts -qm apps\test\i18n\form4.de_CH.qm
 
-themes\windows\qtclient.ro_RO.qm: themes\windows\qtclient.ro_RO.ts
-	$(QT_DIR)\bin\lrelease.exe themes\windows\qtclient.ro_RO.ts -qm themes\windows\qtclient.ro_RO.qm
+apps\test\i18n\form4.ro_RO.qm: apps\test\i18n\form4.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form4.ro_RO.ts -qm apps\test\i18n\form4.ro_RO.qm
 
-
-themes\phone\qtclient.de_CH.qm: themes\phone\qtclient.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe themes\phone\qtclient.de_CH.ts -qm themes\phone\qtclient.de_CH.qm
-
-themes\phone\qtclient.ro_RO.qm: themes\phone\qtclient.ro_RO.ts
-	$(QT_DIR)\bin\lrelease.exe themes\phone\qtclient.ro_RO.ts -qm themes\phone\qtclient.ro_RO.qm
-
-
-I18NS = \
-	apps\test\i18n\form1.de_CH.qm \
-	apps\test\i18n\form1.ro_RO.qm \
-	apps\test\i18n\form2.de_CH.qm \
-	apps\test\i18n\form3.de_CH.qm \
-	themes\windows\qtclient.de_CH.qm \
-	themes\windows\qtclient.ro_RO.qm \
-	themes\phone\qtclient.de_CH.qm \
-	themes\phone\qtclient.ro_RO.qm
 
 local_all: $(I18NS)
 
@@ -215,6 +239,7 @@ run: local_all $(CPP_BINS) copy_prereq
 	@-test.bat
 
 buildi18n:
+	$(QT_DIR)\bin\lupdate.exe) -extensions hpp,cpp . -ts i18n\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.de_CH.ts

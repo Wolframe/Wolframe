@@ -75,14 +75,20 @@ include(deployment.pri)
 qtcAddDeployment()
 
 TRANSLATIONS += \
+	i18n/qtclient.de_CH.ts \
+	i18n/qtclient.ro_RO.ts \
+	themes/phone/MainWindow.de_CH.ts \
+	themes/phone/MainWindow.ro_RO.ts \
+	themes/windows/MainWindow.de_CH.ts \
+	themes/windows/MainWindow.ro_RO.ts \
 	apps/test/i18n/form1.de_CH.ts \
 	apps/test/i18n/form1.ro_RO.ts \
 	apps/test/i18n/form2.de_CH.ts \
+	apps/test/i18n/form2.ro_RO.ts \
 	apps/test/i18n/form3.de_CH.ts \
-	themes/phone/qtclient.de_CH.ts \
-	themes/phone/qtclient.ro_RO.ts \
-	themes/windows/qtclient.de_CH.ts \
-	themes/windows/qtclient.ro_RO.ts
+	apps/test/i18n/form3.ro_RO.ts \
+	apps/test/i18n/form4.de_CH.ts \
+	apps/test/i18n/form4.ro_RO.ts
 
 QT_LRELEASE = $$QMAKE_MOC 
 QT_LRELEASE ~= s,moc,lrelease,

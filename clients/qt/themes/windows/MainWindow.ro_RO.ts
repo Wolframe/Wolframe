@@ -24,75 +24,85 @@
         <translation>&amp;Fișier</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="53"/>
+        <location filename="MainWindow.ui" line="56"/>
         <source>F&amp;orms</source>
         <translation>F&amp;ormulare</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="58"/>
+        <location filename="MainWindow.ui" line="61"/>
         <source>&amp;Help</source>
         <translation>&amp;Ajutor</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="68"/>
+        <location filename="MainWindow.ui" line="71"/>
         <source>Th&amp;emes</source>
         <translation>T&amp;eme</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="73"/>
-        <location filename="MainWindow.ui" line="149"/>
+        <location filename="MainWindow.ui" line="76"/>
+        <location filename="MainWindow.ui" line="156"/>
         <source>&amp;Language</source>
         <translation>&amp;Limbă</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="109"/>
+        <location filename="MainWindow.ui" line="116"/>
         <source>&amp;Open</source>
         <translation>&amp;Deschide</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="112"/>
+        <location filename="MainWindow.ui" line="119"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="117"/>
+        <location filename="MainWindow.ui" line="124"/>
         <source>&amp;Exit</source>
         <translation>&amp;Ieșire</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="120"/>
+        <location filename="MainWindow.ui" line="127"/>
         <source>Ctrl+X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="125"/>
+        <location filename="MainWindow.ui" line="132"/>
         <source>&amp;About</source>
         <translation>&amp;Despre</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="130"/>
+        <location filename="MainWindow.ui" line="137"/>
         <source>About &amp;Qt</source>
         <translation>Despre &amp;Qt</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="138"/>
+        <location filename="MainWindow.ui" line="145"/>
         <source>&amp;Debug Terminal</source>
         <translation>Terminal &amp;Depanare</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="141"/>
+        <location filename="MainWindow.ui" line="148"/>
         <source>Debug Terminal</source>
         <translation>Terminal Depanare</translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="144"/>
+        <location filename="MainWindow.ui" line="151"/>
         <source>Ctrl+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="MainWindow.ui" line="154"/>
+        <location filename="MainWindow.ui" line="161"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Preferințe</translation>
+    </message>
+    <message>
+        <location filename="MainWindow.ui" line="166"/>
+        <source>&amp;Manage Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="MainWindow.ui" line="171"/>
+        <source>&amp;Restart</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

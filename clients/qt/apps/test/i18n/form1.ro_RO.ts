@@ -69,9 +69,24 @@
         <translation>Număr de copii:</translation>
     </message>
     <message>
-        <location filename="../forms/form1.ui" line="300"/>
+        <location filename="../forms/form1.ui" line="274"/>
         <source>Vegatable</source>
         <translation>Legume</translation>
+    </message>
+    <message>
+        <location filename="../forms/form1.ui" line="290"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../forms/form1.ui" line="309"/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../forms/form1.ui" line="319"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
