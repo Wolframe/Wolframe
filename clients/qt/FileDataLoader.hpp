@@ -7,8 +7,6 @@
 
 #include "DataLoader.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class FileDataLoader : public DataLoader
 	{	
@@ -26,8 +24,6 @@ namespace _Wolframe {
 		private:
 			QString m_dir;
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _FILE_DATA_LOADER_INCLUDED
 //

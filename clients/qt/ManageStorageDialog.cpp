@@ -12,8 +12,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 ManageStorageDialog::ManageStorageDialog( QWidget *_parent ) :
 	QDialog( _parent )
@@ -63,5 +61,3 @@ void ManageStorageDialog::terminate( )
 	close( );
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

@@ -14,8 +14,6 @@
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 0
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class SqliteFormLoader : public FormLoader
 	{
@@ -42,7 +40,5 @@ namespace _Wolframe {
 		private:
 			QString m_dbName;
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _SQLITE_FORM_LOADER_HPP_INCLUDED

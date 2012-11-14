@@ -3,7 +3,6 @@
 #include "global.hpp"
 #include "MainWindow.hpp"
 
-using namespace _Wolframe::QtClient;
 
 int main( int argc, char* argv[] ) {
 	QCoreApplication::setOrganizationName( ORGANIZATION_NAME );

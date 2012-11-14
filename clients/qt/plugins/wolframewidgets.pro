@@ -2,7 +2,7 @@ TEMPLATE    = lib
 TARGET      = wolframewidgets
 CONFIG     += qt warn_on plugin
 QT         += 
-INCLUDEPATH += .. filechooser
+INCLUDEPATH += .. filechooser formwidget
 
 CONFIG += designer
 win32|mac: CONFIG+= debug_and_release
@@ -22,9 +22,13 @@ build_all:!build_pass {
 SOURCES += \
 	WolframeWidgets.cpp \
 	filechooser/FileChooserPlugin.cpp \
-	../FileChooser.cpp
+	../FileChooser.cpp \
+	formwidget/FormWidgetPlugin.cpp \
+	../FormWidget.cpp
 
 HEADERS += \
 	WolframeWidgets.hpp \
 	filechooser/FileChooserPlugin.hpp \
 	../FileChooser.hpp
+	formwidget/FormWidgetPlugin.hpp \
+	FormWidget.hpp

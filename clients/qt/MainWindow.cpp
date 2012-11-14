@@ -25,8 +25,6 @@
 #include <QSqlQuery>
 #include <QDebug>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 // built-in defaults
 MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
@@ -769,6 +767,4 @@ void MainWindow::showExpanded( )
 #endif
 }
 
-} // namespace QtClient
-} // namespace _Wolframe
 

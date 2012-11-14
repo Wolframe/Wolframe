@@ -17,8 +17,6 @@
 
 #include "FileChooser.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class PreferencesDialog : public QDialog
 	{
@@ -66,7 +64,5 @@ namespace _Wolframe {
 		void cancel( );
 	};
 
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _PREFERENCES_DIALOG_HPP_INCLUDED

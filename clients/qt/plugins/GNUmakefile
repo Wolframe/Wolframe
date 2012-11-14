@@ -14,10 +14,12 @@ INCLUDE_DIRS = \
 	-I. \
 	-I.. \
 	-Ifilechooser \
+	-Iformwidget \
 	-I$(QT_INCLUDE_DIR) \
 	-I$(QT_INCLUDE_DIR)/QtCore \
 	-I$(QT_INCLUDE_DIR)/QtGui \
-	-I$(QT_INCLUDE_DIR)/QtDesigner
+	-I$(QT_INCLUDE_DIR)/QtDesigner \
+	-I$(QT_INCLUDE_DIR)/QtUiTools
 
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
@@ -36,7 +38,11 @@ CPP_OBJS = \
 	../FileChooser.o \
 	../moc_FileChooser.o \
 	filechooser/FileChooserPlugin.o \
-	filechooser/moc_FileChooserPlugin.o
+	filechooser/moc_FileChooserPlugin.o \
+	formwidget/FormWidgetPlugin.o \
+	formwidget/moc_FormWidgetPlugin.o \
+	../FormWidget.o \
+	../moc_FormWidget.o
 
 DYNAMIC_MODULE = libwolframewidgets.so
 
@@ -53,8 +59,11 @@ moc_WolframeWidgets.cpp: WolframeWidgets.hpp
 filechooser/moc_FileChooserPlugin.cpp: filechooser/FileChooserPlugin.hpp
 	$(QT_MOC) $(MOC_FLAGS) filechooser/FileChooserPlugin.hpp -o filechooser/moc_FileChooserPlugin.cpp
 
+formwidget/moc_FormWidgetPlugin.cpp: formwidget/FormWidgetPlugin.hpp
+	$(QT_MOC) $(MOC_FLAGS) formwidget/FormWidgetPlugin.hpp -o formwidget/moc_FormWidgetPlugin.cpp
+
 local_clean:
-	@-rm -f moc_*.cpp filechooser/moc_*.cpp
+	@-rm -f moc_*.cpp filechooser/moc_*.cpp formwidget/moc_*.cpp
 	@-rm -f Makefile
 
 local_distclean:

@@ -14,8 +14,6 @@
 #include <QList>
 #endif
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class WolframeClient : public QObject
 	{
@@ -124,7 +122,5 @@ namespace _Wolframe {
 
 // high-level commands
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _Wolframe_CLIENT_HPP_INCLUDED

@@ -11,8 +11,6 @@
 
 #include "FormLoader.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class FileFormLoader : public FormLoader
 	{
@@ -39,7 +37,5 @@ namespace _Wolframe {
 			QByteArray readFile( QString fileName );
 
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _FILE_FORM_LOADER_HPP_INCLUDED

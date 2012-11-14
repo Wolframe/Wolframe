@@ -9,8 +9,6 @@
 #include <QStringList>
 #include <QKeyEvent>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class HistoryLineEdit : public QLineEdit
 	{
@@ -40,7 +38,5 @@ namespace _Wolframe {
 	protected:
 		virtual void keyPressEvent( QKeyEvent *event );
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _HISTORY_LINE_EDIT_HPP_INCLUDED

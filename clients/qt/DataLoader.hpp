@@ -9,8 +9,6 @@
 #include <QString>
 #include <QByteArray>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class DataLoader : public QObject
 	{	
@@ -29,7 +27,5 @@ namespace _Wolframe {
 			void dataDeleted( QString form_name );	
 			void domainDataLoaded( QString form_name, QString widget_name, QByteArray data );
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _DATA_LOADER_INCLUDED

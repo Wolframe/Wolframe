@@ -9,8 +9,6 @@
 #include <QFile>
 #include <QList>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secure, QString _clientCertFile, QString _clientKeyFile, QString _CACertfile, QWidget *_parent ) :
 	m_host( _host ),
@@ -397,5 +395,3 @@ void WolframeClient::handleResult( )
 	}
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

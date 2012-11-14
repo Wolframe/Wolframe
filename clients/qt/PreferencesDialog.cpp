@@ -12,8 +12,6 @@
 #include <QRadioButton>
 #include <QVBoxLayout>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 PreferencesDialog::PreferencesDialog( QWidget *_parent )
 	: QDialog( _parent ), m_languages( )
@@ -297,5 +295,3 @@ void PreferencesDialog::toggleSystemLanguage( int /* state */ )
 	m_locale->setEnabled( !( m_systemLanguage->isChecked( ) ) );
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

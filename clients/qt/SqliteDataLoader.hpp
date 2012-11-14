@@ -7,8 +7,6 @@
 
 #include "DataLoader.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class SqliteDataLoader : public DataLoader
 	{	
@@ -26,8 +24,6 @@ namespace _Wolframe {
 		private:
 			QString m_dbName;
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _SQLITE_DATA_LOADER_INCLUDED
 //

@@ -18,10 +18,12 @@ INCLUDE_DIRS = \
 	/I. \
 	/I.. \
 	/Ifilechooser \
+	/Iformwidget \
 	/I"$(QT_DIR)\include" \
 	/I"$(QT_DIR)\include\QtCore" \
 	/I"$(QT_DIR)\include\QtGui" \
-	/I"$(QT_DIR)\include\QtDesigner"
+	/I"$(QT_DIR)\include\QtDesigner" \
+	/I"$(QT_DIR)\include\QtUiTools"
 
 QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
 INCLUDE_LDFLAGS = \
@@ -41,9 +43,11 @@ OBJS = \
 	WolframeWidgets.obj \
 	moc_WolframeWidgets.obj \
 	..\FileChooser.obj \
-	moc_FileChooser.obj \
+	..\moc_FileChooser.obj \
 	filechooser\FileChooserPlugin.obj \
-	filechooser\moc_FileChooserPlugin.obj
+	filechooser\moc_FileChooserPlugin.obj \
+	formwidget\FormWidgetPlugin.obj \
+	formwidget\moc_FormWidgetPlugin.obj
 
 DYNAMIC_MODULE = \
 	wolframewidgets.dll
@@ -55,19 +59,22 @@ all: $(OBJS) $(DYNAMIC_MODULE)
 local_all:
 
 moc_WolframeWidgets.cpp: WolframeWidgets.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser -I"$(QT_DIR)\include\QtDesigner" WolframeWidgets.hpp -o moc_WolframeWidgets.cpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -I"$(QT_DIR)\include\QtDesigner" WolframeWidgets.hpp -o moc_WolframeWidgets.cpp
 
-moc_FileChooser.cpp: ..\FileChooser.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\FileChooser.hpp -o moc_FileChooser.cpp
+..\moc_FileChooser.cpp: ..\FileChooser.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\FileChooser.hpp -o ..\moc_FileChooser.cpp
 
 filechooser\moc_FileChooserPlugin.cpp: filechooser\FileChooserPlugin.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser -I"$(QT_DIR)\include\QtDesigner" filechooser\FileChooserPlugin.hpp -o filechooser\moc_FileChooserPlugin.cpp
+
+formwidget\moc_FormWidgetPlugin.cpp: formwidget\FormWidgetPlugin.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Iformwidget -I"$(QT_DIR)\include\QtDesigner" formwidget\FormWidgetPlugin.hpp -o formwidget\moc_FormWidgetPlugin.cpp
 
 $(DYNAMIC_MODULE): $(OBJS)
 	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_clean:
-	@-erase moc_*.cpp filechooser\moc_*.cpp 2>NUL
+	@-erase moc_*.cpp filechooser\moc_*.cpp formwidget\moc_*.cpp 2>NUL
 	@-erase Makefile Makefile.Release Makefile.Debug 2>NUL
 	
 local_distclean:

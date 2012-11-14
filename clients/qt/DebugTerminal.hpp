@@ -11,8 +11,6 @@
 #include "HistoryLineEdit.hpp"
 #include "WolframeClient.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class DebugTerminal : public QWidget
 	{
@@ -44,7 +42,5 @@ namespace _Wolframe {
 		void lineReceived( QString line );
 
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _DEBUG_TERMINAL_HPP_INCLUDED

@@ -15,8 +15,6 @@
 #define DEFAULT_DOMAIN "wolframe"
 #define DEFAULT_APP "qtclient"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class Preferences : public QObject
 	{
@@ -118,7 +116,5 @@ namespace _Wolframe {
 			QString m_locale;
 	};
 	
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _PREFERENCES_HPP_INCLUDED

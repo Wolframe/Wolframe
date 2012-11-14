@@ -10,8 +10,6 @@
 
 #include <QDebug>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 NetworkFormLoader::NetworkFormLoader( WolframeClient *_wolframeClient )
 	: m_wolframeClient( _wolframeClient )
@@ -88,5 +86,3 @@ void NetworkFormLoader::initiateFormLocalizationDelete( QString name, QLocale lo
 {
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

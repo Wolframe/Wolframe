@@ -7,8 +7,6 @@
 #include <QHBoxLayout>
 #include <QFileDialog>
 
-// intentionally no namespace here, is part of a Qt custom widget plugin!
-
 FileChooser::FileChooser( SelectionMode _selectionMode, QWidget *_parent )
 	: QWidget( _parent ), m_selectionMode( _selectionMode )
 {

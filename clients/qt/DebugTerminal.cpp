@@ -11,8 +11,6 @@
 #include <QColor>
 #include <QRegExp>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 DebugTerminal::DebugTerminal( WolframeClient *_wolframeClient, QWidget *_parent ) :
 	QWidget( _parent, Qt::Tool | Qt::WindowTitleHint ),
@@ -141,5 +139,3 @@ void DebugTerminal::lineReceived( QString line )
 	m_output->setTextColor( QColor( "black" ) );
 }
 
-} // namespace QtClient
-} // namespace _Wolframe
