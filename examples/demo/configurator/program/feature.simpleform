@@ -13,7 +13,7 @@ DOCTYPE "feature addFeature"
 		name name
 	}
 }
-DOCTYPE "feature deleteCategory"
+DOCTYPE "feature deleteFeature"
 {
 	feature
 	{
@@ -31,7 +31,7 @@ DOCTYPE "feature selectFeatureByNormalizedName"
 {
 	feature
 	{
-		normalizedName string
+		normalizedName name
 	}
 }
 DOCTYPE "feature selectFeatureByName"

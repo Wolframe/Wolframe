@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE node SYSTEM 'addCategoryHierarchy.simpleform'>
+<node name="category">
+	<node name="computer">
+	</class>
+</node>

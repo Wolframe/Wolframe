@@ -1,49 +1,58 @@
-DOCTYPE "products productList"
+DOCTYPE "category addCategoryRoot"
 {
-	products
+	category
 	{
-		item []
-		{
-			title string
-			key string
-			customernumber int
-			issuedate string
-		}
+		name string
+		normalizedName name
 	}
 }
-DOCTYPE "node treeAddNode"
+DOCTYPE "category addCategory"
 {
-	node
+	category
 	{
 		parentid int
-		name name
+		name string
+		normalizedName name
 	}
 }
-DOCTYPE "node treeDeleteSubtree"
+DOCTYPE "category deleteCategory"
 {
-	node
+	category
 	{
 		id int
 	}
 }
-
-DOCTYPE "node treeSelectChildrenByName"
+DOCTYPE "category selectCategory"
 {
-	node
+	category
+	{
+		id int
+	}
+}
+DOCTYPE "category selectCategoryByName"
+{
+	category
 	{
 		name string
 	}
 }
-DOCTYPE "node treeSelectChildren"
+DOCTYPE "category selectCategoryByNormalizedName"
 {
-	node
+	category
+	{
+		normalizedName name
+	}
+}
+DOCTYPE "category selectSubCategories"
+{
+	category
 	{
 		id int
 	}
 }
-DOCTYPE "node treeSelectParents"
+DOCTYPE "category selectTopCategories"
 {
-	node
+	category
 	{
 		id int
 	}
