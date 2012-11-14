@@ -281,9 +281,12 @@ void MainWindow::initialize( )
 	connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
 		m_debugTerminal, SLOT( sendLine( QString ) ) );
 		
-// a Qt UI loader for the main theme window
+// a Qt UI loader for the main theme window and also used by all form widgets
 	m_uiLoader = new QUiLoader( );
 	m_uiLoader->setLanguageChangeEnabled( true );
+	m_uiLoader->addPluginPath( "plugins/filechooser" );
+	QStringList paths = m_uiLoader->pluginPaths( );
+	qDebug( ) << "Will load custom widget plugins from" << paths;
 	
 // for testing, load lists of available forms from the files system or
 // a local sqlite database, pass the form loader to the FormWidget

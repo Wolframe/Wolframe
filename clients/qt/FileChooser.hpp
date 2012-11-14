@@ -11,6 +11,8 @@
 #include <QLineEdit>
 #include <QPushButton>
 
+// intentionally no namespace here, is part of a Qt custom widget plugin!
+
 class FileChooser : public QWidget
 	{
 	Q_OBJECT
