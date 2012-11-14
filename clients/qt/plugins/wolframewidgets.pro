@@ -1,5 +1,5 @@
 TEMPLATE    = lib
-TARGET      = wolframefilechooser
+TARGET      = wolframewidgets
 CONFIG     += qt warn_on plugin
 QT         += 
 INCLUDEPATH += .. filechooser
@@ -25,5 +25,6 @@ SOURCES += \
 	../FileChooser.cpp
 
 HEADERS += \
+	WolframeWidgets.hpp \
 	filechooser/FileChooserPlugin.hpp \
 	../FileChooser.hpp

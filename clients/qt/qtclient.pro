@@ -41,7 +41,7 @@ SOURCES += \
 	PreferencesDialog.cpp \
 	FileChooser.cpp \
 	StorageWidget.cpp \
-	ManageStorage.cpp
+	ManageStorageDialog.cpp
 
 HEADERS += \
 	DataHandler.hpp \
