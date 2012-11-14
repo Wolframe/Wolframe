@@ -6,6 +6,7 @@
 #include "FormWidget.hpp"
 
 #include <QtPlugin>
+#include <QDebug>
  
 FormWidgetPlugin::FormWidgetPlugin( QObject *_parent )
 	: QObject( _parent ), m_initialized( false )
@@ -70,12 +71,18 @@ QString FormWidgetPlugin::whatsThis( ) const
 
 QWidget *FormWidgetPlugin::createWidget( QWidget *_parent )
 {
-	return new FormWidget( _parent );
+	if( m_initialized ) {
+// in designer mode, return a preview version only
+		return new FormWidget( _parent );
+	} else {
+// in normal form load mode, but we must inject some parent pointers, how?
+		return new FormWidget( _parent );
+	}
 }
 
 void FormWidgetPlugin::initialize( QDesignerFormEditorInterface* /* core */ )
 {
 	if( m_initialized ) return;
-	
+
 	m_initialized = true;
 }

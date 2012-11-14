@@ -6,26 +6,36 @@ show-stoppers:
     existing item, add new item.
   - passing hidden parameters between forms (example ID of a
     product to show)
+  - action (CRUD) is a parameter to REQUEST <action>
 - define actions (CRUD)
   - init: empty form with default values (C)
   - get: request data from server (R)
   - send: send data to server (U)
   - delete (D)
 - protocol
+  - add action
   - add doctype to data XML
-  - network loader via protocol or use client library?
+  - content handling by line
+  - base64
 - element operations
   - reorganize tree
     - add elements 
     - move elements/subtrees
     - delete elements/subtrees
   - file upload: we need that for product images, etc.
-    - FileChooser as designer custom widget
+    - base64 encoding of file uploads
+
+musts:
+- protocol
+  - network loader via protocol or use client library?
 - designer custom widgets
   - FormWidget:
     - implement a form widget as placeholder for the real thing
     - loads via a form/data loader?
     - provide a preview of the form?
+  - them in MainWindow:
+    - the now case is FormWidget<init>
+    - MDI or tabbed view
 - localize forms:
   - Windows doesn't retranslate on the fly! Why?
   - Windows doesn't respect language on startup for form
@@ -39,8 +49,6 @@ show-stoppers:
       - form init doesn't work when language is not en_US
     - QTreeWidget
       - localization
-
-must do:
 - for completion and presentation of big data
   - QListView: with model for big data, on request
   - QTreeView: with model for big data, on request

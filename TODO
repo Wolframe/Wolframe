@@ -1,24 +1,30 @@
 MBa:
 
-- SSL must require certificate from peer if verify is on
-- * in network interface definition should add BOTH ipv4 and ipv6 IPs
-
 
 ABa:
 - qtclient cont.
+  - deployment is ZIP for client on Windows
+- configurator
+  - caption + other info + file picker (image)
+  - categories + features, trees with add/delete/edit
+
 - makefiles
   - fix libchrono transitive dependency in boost in 1.50/1.51
   - error checking after dependency generation, avoid funny mistakes
   - parallel builds in lua and qtclient fail, lib, cmdline, wolfcli
 
 PF:
-- Form loader in client and server
-- TODOs in libwolframe_database (doTransaction)
 
-- bignum tests (only bigint tested until now)
-- XSLT filter + tests
-- Printing with HPDF
-	- The print form configuration can have an xslt script for preprocessing
-
+- configurator
+  - request with <command+args+doctype> as descriminator for scripts
+  - sqlite schemas, scripts
+    - categories, features as trees
+    - products
+- other
+  - Form loader in client and server
+  - TODOs in libwolframe_database (doTransaction)
+  - bignum tests (only bigint tested until now)
+  - XSLT filter + tests
+  - Printing with HPDF
+    - The print form configuration can have an xslt script for preprocessing
 - Make postgres database run transactions
-
