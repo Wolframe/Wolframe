@@ -1,7 +1,8 @@
-treeSelectParents = treeSelectParents( xml );
-treeSelectChildren = treeSelectChildren( xml );
-treeSelectChildrenByName = treeSelectChildrenByName( xml );
-treeAddNode = treeAddNode( xml );
-treeDeleteSubtree = treeDeleteSubtree( xml );
-treeSelectNode = treeSelectNodeByName( xml );
-treeSelectNodeByName = treeSelectNodeByName( xml );
+selectTopCategories = selectTopCategories( xml );
+selectSubCategories = selectSubCategories( xml );
+addCategory = addCategory( xml );
+deleteCategory = deleteCategory( xml );
+selectCategory = selectCategory( xml );
+selectCategoryByName = selectCategoryByName( xml );
+selectCategoryByNormalizedName = selectCategoryByNormalizedame( xml );
+addCategoryHierarchy = addCategoryHierarchy( xml);
