@@ -33,8 +33,7 @@ LOGGER_OBJS = \
 	logger\logBackendEventlog.obj \
 	logger\logBackendWinDebug.obj \
 	logger\logBackendImpl.obj \
-	logger\loggerConfig.obj \
-	logger\logger.obj
+	logger\loggerConfig.obj
 
 PROVIDER_OBJS = \
 	provider\Authentication.obj \

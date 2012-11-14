@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logComponent.cpp
 /// \brief implementation of logging components
@@ -41,33 +40,32 @@
 #include <ostream>
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	const LogComponent LogComponent::LogNone( LogComponent::LOGCOMPONENT_NONE );
-	const LogComponent LogComponent::LogLogging( LogComponent::LOGCOMPONENT_LOGGING );
-	const LogComponent LogComponent::LogNetwork( LogComponent::LOGCOMPONENT_NETWORK );
-	const LogComponent LogComponent::LogAuth( LogComponent::LOGCOMPONENT_AUTH );
-	const LogComponent LogComponent::LogLua( LogComponent::LOGCOMPONENT_LUA );
+const LogComponent LogComponent::LogNone( LogComponent::LOGCOMPONENT_NONE );
+const LogComponent LogComponent::LogLogging( LogComponent::LOGCOMPONENT_LOGGING );
+const LogComponent LogComponent::LogNetwork( LogComponent::LOGCOMPONENT_NETWORK );
+const LogComponent LogComponent::LogAuth( LogComponent::LOGCOMPONENT_AUTH );
+const LogComponent LogComponent::LogLua( LogComponent::LOGCOMPONENT_LUA );
 
-	/// output a logging component in an output stream
-	const char* LogComponent::str( ) const {
-		static const char *const s[] = {
-			"", "Logging", "Network", "Auth", "Lua" };
-		if( static_cast< size_t >( _component ) < ( sizeof( s ) / sizeof( *s ) ) ) {
-			return s[_component];
-		} else {
-			return "";
-		}
+/// output a logging component in an output stream
+const char* LogComponent::str( ) const {
+	static const char *const s[] = {
+		"", "Logging", "Network", "Auth", "Lua" };
+	if( static_cast< size_t >( _component ) < ( sizeof( s ) / sizeof( *s ) ) ) {
+		return s[_component];
+	} else {
+		return "";
 	}
+}
 
-	/// component marker in a logger stream, the specific logging method decides
-	/// how to output the component of a log messages (event log category, prefix
-	/// in a logfile, etc.)
-	Logger& operator<<( Logger& logger, LogComponent c )
-	{
-		logger.component_ = c;
-		return logger;
-	}
+/// component marker in a logger stream, the specific logging method decides
+/// how to output the component of a log messages (event log category, prefix
+/// in a logfile, etc.)
+Logger& operator<<( Logger& logger, LogComponent c )
+{
+	logger.component_ = c;
+	return logger;
+}
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log

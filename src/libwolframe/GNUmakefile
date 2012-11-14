@@ -36,8 +36,7 @@ LOGGER_OBJS = \
 	logger/logBackendFile.o \
 	logger/logBackendSyslog.o \
 	logger/logBackendImpl.o \
-	logger/loggerConfig.o \
-	logger/logger.o
+	logger/loggerConfig.o
 
 PROVIDER_OBJS = \
 	provider/Authentication.o \

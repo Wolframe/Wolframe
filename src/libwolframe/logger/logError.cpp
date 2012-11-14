@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logError.cpp
 /// \brief implementation of logging error
@@ -55,10 +54,10 @@
 #endif
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	const LogError LogError::LogStrerror( LogError::LOGERROR_STRERROR );
-	const LogError LogError::LogWinerror( LogError::LOGERROR_WINERROR );
+const LogError LogError::LogStrerror( LogError::LOGERROR_STRERROR );
+const LogError LogError::LogWinerror( LogError::LOGERROR_WINERROR );
 
 // template functions for error markers in the output stream
 // e.g. LOG_ERROR << "f() had a booboo, reason: " << Logger::LogStrerror
@@ -96,16 +95,16 @@ Logger& operator<<( Logger& logger, LogError e )
 			DWORD wres;
 
 			wres = FormatMessage(
-				FORMAT_MESSAGE_ALLOCATE_BUFFER |
-				FORMAT_MESSAGE_FROM_SYSTEM |
-				FORMAT_MESSAGE_IGNORE_INSERTS |
-				FORMAT_MESSAGE_MAX_WIDTH_MASK,
-				NULL,			// message is from system
-				last_error,		// code of last error (GetLastError)
-				0,			// default language (TODO: fit to i18n of rest)
-				(LPTSTR)&werrbuf,	// use LocalAlloc for the message string
-				0,			// minimal allocation size
-				NULL );			// no arguments to the message
+						FORMAT_MESSAGE_ALLOCATE_BUFFER |
+						FORMAT_MESSAGE_FROM_SYSTEM |
+						FORMAT_MESSAGE_IGNORE_INSERTS |
+						FORMAT_MESSAGE_MAX_WIDTH_MASK,
+						NULL,			// message is from system
+						last_error,		// code of last error (GetLastError)
+						0,			// default language (TODO: fit to i18n of rest)
+						(LPTSTR)&werrbuf,	// use LocalAlloc for the message string
+						0,			// minimal allocation size
+						NULL );			// no arguments to the message
 
 			if( wres == 0 ) {
 				StringCbCopy( errbuf, 512, _T( "No message available" ) );
@@ -137,5 +136,4 @@ Logger& operator<<( Logger& logger, LogError e )
 	}
 }
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log

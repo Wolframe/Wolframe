@@ -851,7 +851,6 @@ src/libwolframe/logger/logBackendWinDebug.hpp
 src/libwolframe/logger/logComponent.cpp
 src/libwolframe/logger/logError.cpp
 src/libwolframe/logger/loggerConfig.cpp
-src/libwolframe/logger/logger.cpp
 src/libwolframe/logger/logLevel.cpp
 src/libwolframe/logger/logSyslogFacility.cpp
 src/libwolframe/logger/syslog_win32.c

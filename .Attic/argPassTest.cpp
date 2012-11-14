@@ -38,14 +38,40 @@
 #include <iostream>
 #include <string>
 
-class TestPrinter
+class TestBackend
 {
 public:
-	TestPrinter( int val )	{ m_val = val; std::cout << "printer created with value: " << m_val << "\n"; }
-	~TestPrinter()		{std::cout << "printer with value: " << m_val << "destroyed\n"; }
+	TestBackend( int val )	{ m_val = val; std::cout << "backend created with value: " << m_val << "\n"; }
+	~TestBackend()		{ std::cout << "backend with value: " << m_val << "destroyed\n"; }
+	inline int value() const	{ return m_val; }
 private:
 	int	m_val;
 };
+
+
+class TestPrinter
+{
+public:
+	TestPrinter( int val, TestBackend& back )
+		: m_backend( back )
+				{ m_val = val; std::cout << "printer created with value: " << m_val << "\n"; }
+	~TestPrinter()		{ std::cout << "printer with value: " << m_val << "destroyed\n"; }
+
+	template<typename T> friend TestPrinter& operator << ( TestPrinter& printer, T object );
+
+protected:
+	std::ostringstream	os;
+private:
+	int			m_val;
+	const TestBackend&	m_backend;
+};
+
+template<typename T>
+TestPrinter& operator << ( TestPrinter& printer, T obj )
+{
+	printer.os << obj;
+	return printer;
+}
 
 
 class TestObject
