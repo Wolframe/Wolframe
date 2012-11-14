@@ -1,0 +1,57 @@
+DOCTYPE "feature addFeatureRoot"
+{
+	feature
+	{
+		name name
+	}
+}
+DOCTYPE "feature addFeature"
+{
+	feature
+	{
+		parentid int
+		name name
+	}
+}
+DOCTYPE "feature deleteFeature"
+{
+	feature
+	{
+		id int
+	}
+}
+DOCTYPE "feature selectFeature"
+{
+	feature
+	{
+		id int
+	}
+}
+DOCTYPE "feature selectFeatureByNormalizedName"
+{
+	feature
+	{
+		normalizedName name
+	}
+}
+DOCTYPE "feature selectFeatureByName"
+{
+	feature
+	{
+		name string
+	}
+}
+DOCTYPE "feature selectSubFeatures"
+{
+	feature
+	{
+		id int
+	}
+}
+DOCTYPE "feature selectTopFeatures"
+{
+	feature
+	{
+		id int
+	}
+}
