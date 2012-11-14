@@ -9,26 +9,37 @@
 #include <QTranslator>
 #include <QApplication>
 #include <QPushButton>
-
+#include <QHBoxLayout>
+#include <QFrame>
 
 FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent )
-	: QWidget( _parent ), m_mode( RunMode ), m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
+	: QWidget( _parent ), m_mode( RunMode ), m_form( ),
+	  m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
 	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_dataHandler( 0 ),
 	  m_locale( DEFAULT_LOCALE ), m_forms( )
 {
-	initialize( );	
+	initializeNormal( );	
 }
 
 FormWidget::FormWidget( QWidget *_parent )
-	: QWidget( _parent ), m_mode( DesignerMode ), m_ui( 0 ),
-	  m_dataHandler( 0 )
+	: QWidget( _parent ), m_mode( DesignerMode ), m_form( ),
+	  m_ui( 0 ), m_dataHandler( 0 )
 {
+	initializeDesigner( );
 }
 
-void FormWidget::initialize( )
+void FormWidget::initializeDesigner( )
 {
-	if( m_mode == FormWidget::DesignerMode ) return;
+	QHBoxLayout *l = new QHBoxLayout( this );
+	l->setMargin( 0 );
 	
+	m_text = new QLabel( m_form.isNull( ) ? tr( "<no name>" ) : m_form );
+	m_text->setFrameStyle( QFrame::Box );
+	l->addWidget( m_text );
+}
+
+void FormWidget::initializeNormal( )
+{
 // maps data between constructed widgets from .ui and the data loader
 	m_dataHandler = new DataHandler( m_dataLoader );	
 
@@ -100,16 +111,35 @@ FormWidget::~FormWidget( )
 	if( m_dataHandler ) delete m_dataHandler;
 }
 
+void FormWidget::setForm( const QString &_form )
+{
+	switch( m_mode ) {
+		case DesignerMode:
+			m_form = _form;
+			m_text->setText( _form );
+			break;
+		
+		case RunMode:
+			loadForm( _form );
+			break;
+	}
+}
+
+QString FormWidget::form( ) const
+{
+	return m_form;
+}
+
 void FormWidget::loadForm( QString name )
 {
 // indicate busy state
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
-	m_name = name;
+	m_form = name;
 
-	qDebug( ) << "Initiating form load for " << m_name;
+	qDebug( ) << "Initiating form load for " << m_form;
 	
-	m_formLoader->initiateFormLoad( m_name );
+	m_formLoader->initiateFormLoad( m_form );
 }	
 
 void FormWidget::loadLanguage( QString language )
@@ -119,10 +149,10 @@ void FormWidget::loadLanguage( QString language )
 
 	m_locale = QLocale( language );
 	
-	qDebug( ) << "Initiating form locatization load for " << m_name << " and locale "
+	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
 		<< m_locale.name( );
 		
-	m_formLoader->initiateFormLocalizationLoad( m_name, m_locale );
+	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 }
 
 void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
@@ -189,7 +219,7 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 	m_ui->show( );	
 
 // set localization now
-	m_formLoader->initiateFormLocalizationLoad( m_name, m_locale );
+	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 
 // initiate load of form data
 	qDebug( ) << "Initiating loading of form data for form " << name;
@@ -235,7 +265,7 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 	qApp->restoreOverrideCursor( );
 	
 // signal
-	emit formLoaded( m_name );
+	emit formLoaded( m_form );
 }
 
 void FormWidget::dataLoaded( QString name, QByteArray xml )
@@ -263,31 +293,31 @@ void FormWidget::formDomainLoaded( QString form_name, QString widget_name, QByte
 
 void FormWidget::actionSend( )
 {
-	qDebug( ) << "Sending data of form " << m_name;
+	qDebug( ) << "Sending data of form " << m_form;
 	
 	QByteArray xml;
-	m_dataHandler->writeFormData( m_name, m_ui, &xml );
+	m_dataHandler->writeFormData( m_form, m_ui, &xml );
 	
-	m_dataLoader->initiateDataSave( m_name, xml );
+	m_dataLoader->initiateDataSave( m_form, xml );
 }
 
 void FormWidget::actionGet( )
 {
-	qDebug( ) << "Reseting data of form " << m_name;
+	qDebug( ) << "Reseting data of form " << m_form;
 	
-	m_dataLoader->initiateDataLoad( m_name );
+	m_dataLoader->initiateDataLoad( m_form );
 }
 
 void FormWidget::actionInit( )
 {
-	qDebug( ) << "Initializing form " << m_name;
+	qDebug( ) << "Initializing form " << m_form;
 	
 	m_dataHandler->resetFormData( m_ui );
 }
 
 void FormWidget::actionDelete( )
 {
-	qDebug( ) << "Sending delete request for form " << m_name;
+	qDebug( ) << "Sending delete request for form " << m_form;
 	
 	// TODO: REQUEST with parameters
 }

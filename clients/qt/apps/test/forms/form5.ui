@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>499</width>
-    <height>364</height>
+    <width>496</width>
+    <height>373</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>461</width>
+     <width>331</width>
      <height>361</height>
     </rect>
    </property>
@@ -126,7 +126,24 @@
     </item>
    </layout>
   </widget>
+  <widget class="FormWidget" name="formWidget">
+   <property name="geometry">
+    <rect>
+     <x>339</x>
+     <y>10</y>
+     <width>141</width>
+     <height>311</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FormWidget</class>
+   <extends>QWidget</extends>
+   <header>FormWidget.hpp</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>vegetable</tabstop>
   <tabstop>save_3</tabstop>

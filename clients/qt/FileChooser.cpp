@@ -41,6 +41,16 @@ QString FileChooser::fileName( ) const
 	return m_lineEdit->text( );
 }
 
+void FileChooser::setSelectionMode( const FileChooser::SelectionMode _mode )
+{
+	m_selectionMode = _mode;
+}
+
+FileChooser::SelectionMode FileChooser::selectionMode( ) const
+{
+	return m_selectionMode;
+}
+
 void FileChooser::chooseFile( )
 {
 	QString f;

@@ -12,10 +12,11 @@
 #include <QPushButton>
 
 class FileChooser : public QWidget
-	{
+{
 	Q_OBJECT
-	Q_PROPERTY( QString m_fileName READ fileName WRITE setFileName )
 	Q_ENUMS( SelectionMode )
+	Q_PROPERTY( QString fileName READ fileName WRITE setFileName )
+	Q_PROPERTY( SelectionMode selectionMode READ selectionMode WRITE setSelectionMode )
 		
 	public:
 		enum SelectionMode {
@@ -26,9 +27,11 @@ class FileChooser : public QWidget
 		FileChooser( SelectionMode _selectionMode, QWidget *_parent = 0 );
 		
 		QString fileName( ) const;
+		SelectionMode selectionMode( ) const;
 
 	public slots:
-		void setFileName( const QString &fn );
+		void setFileName( const QString &_filename );
+		void setSelectionMode( const SelectionMode _mode );
 	
 	private:
 		void initialize( );

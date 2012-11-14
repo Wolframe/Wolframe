@@ -14,9 +14,10 @@
 #include <QtUiTools>
 #include <QHBoxLayout>
 #include <QSignalMapper>
+#include <QLabel>
 
-	class WidgetProperties : public QObject
-	{
+class WidgetProperties : public QObject
+{
 	Q_OBJECT
 	
 	public:
@@ -35,11 +36,12 @@
 	private:
 		QString m_action;		// action to execute
 		QString m_nextForm;		// next form to show
-	};
+};
 		
-	class FormWidget : public QWidget
-	{
+class FormWidget : public QWidget
+{
 	Q_OBJECT
+	Q_PROPERTY( QString form READ form WRITE setForm )
 
 	public:
 		enum FormWidgetMode {
@@ -52,10 +54,16 @@
 		virtual ~FormWidget( );
 		void loadForm( QString name );
 		void loadLanguage( QString language );
+	
+	public:
+		QString form( ) const;
+		
+	public slots:
+		void setForm( const QString &_form );
 			
 	private:
 		FormWidgetMode m_mode;		// run mode of the widget
-		QString m_name;			// name of the form
+		QString m_form;			// name of the form
 		QUiLoader *m_uiLoader;		// UI loader to user for loading designer XML files
 		FormLoader *m_formLoader;	// form loader (visible form)
 		DataLoader *m_dataLoader;	// load and saves data (data form)
@@ -65,9 +73,11 @@
 		QHBoxLayout *m_layout;		// main layout swallowing the form
 		QSignalMapper *m_signalMapper;	// delegate for form push buttons pointing to forms
 		QStringList m_forms;		// names of all currently loaded forms
+		QLabel *m_text;			// placeholder of form name in designer mode
 		
 	private:
-		void initialize( );
+		void initializeNormal( );
+		void initializeDesigner( );
 		QString readDynamicStringProperty( QObject *o, const char *name );
 	
 	signals:
@@ -88,6 +98,6 @@
 		void actionGet( );
 		void actionInit( );
 		void actionDelete( );
-	};
+};
 	
 #endif // _FORM_WIDGET_HPP_INCLUDED

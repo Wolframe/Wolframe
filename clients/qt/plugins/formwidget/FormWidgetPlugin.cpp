@@ -39,9 +39,6 @@ QString FormWidgetPlugin::domXml( ) const
 		"    <height>100</height>\n"
 		"   </rect>\n"
 		"  </property>\n"
-		"  <property name=\"form\" >\n"
-		"   <string></string>\n"
-		"  </property>\n"
 		" </widget>\n"
 		"</ui>\n";
 }

@@ -39,9 +39,6 @@ QString FileChooserPlugin::domXml( ) const
 		"    <height>100</height>\n"
 		"   </rect>\n"
 		"  </property>\n"
-		"  <property name=\"fileName\" >\n"
-		"   <string></string>\n"
-		"  </property>\n"
 		" </widget>\n"
 		"</ui>\n";
 }
@@ -73,7 +70,7 @@ QString FileChooserPlugin::whatsThis( ) const
 
 QWidget *FileChooserPlugin::createWidget( QWidget *_parent )
 {
-	// TODO: add pick mode, for now fix files
+	// is overridden by property
 	return new FileChooser( FileChooser::SelectExistingFile, _parent );
 }
 
