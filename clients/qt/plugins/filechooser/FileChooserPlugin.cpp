@@ -83,5 +83,3 @@ void FileChooserPlugin::initialize( QDesignerFormEditorInterface* /* core */ )
 	
 	m_initialized = true;
 }
-
-Q_EXPORT_PLUGIN2( wolframefilechooser, FileChooserPlugin )

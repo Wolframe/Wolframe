@@ -1,13 +1,69 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = filechooser
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x403 \
+	/DQT_PLUGIN /DQT_DLL /DQT_NO_DEBUG \
+	/DQDESIGNER_EXPORT_WIDGETS
+
+INCLUDE_DIRS = \
+	/I. \
+	/I.. \
+	/Ifilechooser \
+	/I"$(QT_DIR)\include" \
+	/I"$(QT_DIR)\include\QtCore" \
+	/I"$(QT_DIR)\include\QtGui" \
+	/I"$(QT_DIR)\include\QtDesigner"
+
+QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
+INCLUDE_LDFLAGS = \
+	$(QT_LDFLAGS)
+
+!IFNDEF DEBUG
+INCLUDE_LIBS = \
+	QtCore4.lib QtGui4.lib QtDesigner4.lib
+!ELSE
+INCLUDE_LIBS = \
+	QtCored4.lib QtGuid4.lib QtDesignerd4.lib
+!ENDIF
+
+#MOC_FLAGS = $(INCLUDE_DIRS)
+
+OBJS = \
+	WolframeWidgets.obj \
+	moc_WolframeWidgets.obj \
+	..\FileChooser.obj \
+	..\moc_FileChooser.obj \
+	filechooser\FileChooserPlugin.obj \
+	filechooser\moc_FileChooserPlugin.obj
+
+DYNAMIC_MODULE = \
+	wolframewidgets.dll
+
+all: $(OBJS) $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 local_all:
 
-local_test:
+moc_WolframeWidgets.cpp: WolframeWidgets.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -I"$(QT_DIR)\include\QtDesigner" WolframeWidgets.hpp -o moc_WolframeWidgets.cpp
+
+..\moc_FileChooser.cpp: ..\FileChooser.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. ..\FileChooser.hpp -o ..\moc_FileChooser.cpp
+
+filechooser\moc_FileChooserPlugin.cpp: filechooser\FileChooserPlugin.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -I"$(QT_DIR)\include\QtDesigner" filechooser\FileChooserPlugin.hpp -o filechooser\moc_FileChooserPlugin.cpp
+
+$(DYNAMIC_MODULE): $(OBJS)
+	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_clean:
+	@-erase moc_*.cpp filechooser\moc_*.cpp 2>NUL
 
 local_distclean:
+
+local_test:

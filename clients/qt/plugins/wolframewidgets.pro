@@ -2,7 +2,7 @@ TEMPLATE    = lib
 TARGET      = wolframefilechooser
 CONFIG     += qt warn_on plugin
 QT         += 
-INCLUDEPATH += ../..
+INCLUDEPATH += .. filechooser
 
 CONFIG += designer
 win32|mac: CONFIG+= debug_and_release
@@ -19,5 +19,11 @@ build_all:!build_pass {
 }
 
 # Input
-SOURCES += FileChooserPlugin.cpp ../../FileChooser.cpp
-HEADERS += FileChooserPlugin.hpp ../../FileChooser.hpp
+SOURCES += \
+	WolframeWidgets.cpp \
+	filechooser/FileChooserPlugin.cpp \
+	../FileChooser.cpp
+
+HEADERS += \
+	filechooser/FileChooserPlugin.hpp \
+	../FileChooser.hpp
