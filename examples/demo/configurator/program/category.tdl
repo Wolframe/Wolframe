@@ -41,57 +41,26 @@ TRANSACTION selectCategoryByName -- (/category/name)
 BEGIN
 	FOREACH /category INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Category WHERE name = $(name);
 END
-
---
--- selectCategoryAndParents       :Get the category and its parents
--- selectCategoryAndParentsByName :Get the category and its parents by name
---
-TRANSACTION selectCategoryAndParents -- (/category/id)
+TRANSACTION selectCategoryByNormalizedName -- (/category/normalizedName)
 BEGIN
-	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id);
-END
-TRANSACTION selectCategoryAndParentsByName -- (/category/name)
-BEGIN
-	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = $(name);
+	FOREACH /category INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Category WHERE normalizedName = $(normalizedName);
 END
 
 --
--- selectCategoryParents       :Get the parents of a category
--- selectCategoryParentsByName :Get the parents of a category by name
+-- selectTopCategories       :Get the parents of a category
 --
-TRANSACTION selectCategoryParents -- (/category/id)
+TRANSACTION selectTopCategories -- (/category/id)
 BEGIN
 	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
-TRANSACTION selectCategoryParentsByName -- (/category/name)
-BEGIN
-	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = $(name);
-END
 
 --
--- selectCategoryAndChildren       :Get the category and its children
--- selectCategoryAndChildrenByName :Get the category and its children by name
+-- selectSubCategories       :Get the categories
 --
-TRANSACTION selectCategoryAndChildren -- (/category/id)
+TRANSACTION selectSubCategories -- (/category/id)
 BEGIN
 	FOREACH /category INTO /category DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
-TRANSACTION selectCategoryAndChildrenByName -- (/category/name)
-BEGIN
-	FOREACH /category INTO /category DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
-END
 
---
--- selectCategoryChildren       :Get the children of a category
--- selectCategoryChildrenByName :Get the children of a category by name
---
-TRANSACTION selectChildren -- (/category/id)
-BEGIN
-	FOREACH /category INTO /category DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
-END
-TRANSACTION selectChildrenByName -- (/category/name)
-BEGIN
-	FOREACH /category INTO /category DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name);
-END
 
 

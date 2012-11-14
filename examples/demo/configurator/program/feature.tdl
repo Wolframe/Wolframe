@@ -41,57 +41,27 @@ TRANSACTION selectFeatureByName -- (/feature/name)
 BEGIN
 	FOREACH /feature INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Feature WHERE name = $(name);
 END
-
---
--- selectFeatureAndParents       :Get the feature and its parents
--- selectFeatureAndParentsByName :Get the feature and its parents by name
---
-TRANSACTION selectFeatureAndParents -- (/feature/id)
+TRANSACTION selectFeatureByNormalizedName -- (/feature/normalizedName)
 BEGIN
-	FOREACH /feature INTO /feature DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id);
-END
-TRANSACTION selectFeatureAndParentsByName -- (/feature/name)
-BEGIN
-	FOREACH /feature INTO /feature DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = $(name);
+	FOREACH /feature INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Feature WHERE normalizedName = $(normalizedName);
 END
 
 --
--- selectFeatureParents       :Get the parents of a feature
--- selectFeatureParentsByName :Get the parents of a feature by name
+-- selectTopFeatures       :Get the parents of a feature
 --
-TRANSACTION selectFeatureParents -- (/feature/id)
+TRANSACTION selectTopFeatures -- (/feature/id)
 BEGIN
-	FOREACH /feature INTO /feature DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
-END
-TRANSACTION selectFeatureParentsByName -- (/feature/name)
-BEGIN
-	FOREACH /feature INTO /feature DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = $(name);
+	FOREACH /feature INTO /feature DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
--- selectFeatureAndChildren       :Get the feature and its children
--- selectFeatureAndChildrenByName :Get the feature and its children by name
+-- selectSubFeatures       :Get the sub features
 --
-TRANSACTION selectFeatureAndChildren -- (/feature/id)
+TRANSACTION selectSubFeatures -- (/feature/id)
 BEGIN
-	FOREACH /feature INTO /feature DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
-END
-TRANSACTION selectFeatureAndChildrenByName -- (/feature/name)
-BEGIN
-	FOREACH /feature INTO /feature DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
+	FOREACH /feature INTO /feature DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 
---
--- selectFeatureChildren       :Get the children of a feature
--- selectFeatureChildrenByName :Get the children of a feature by name
---
-TRANSACTION selectChildren -- (/feature/id)
-BEGIN
-	FOREACH /feature INTO /feature DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
-END
-TRANSACTION selectChildrenByName -- (/feature/name)
-BEGIN
-	FOREACH /feature INTO /feature DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name);
-END
+
 
 
