@@ -2,7 +2,7 @@
 -- The categories tree
 --
 CREATE TABLE Category	(
-	ID		SERIAL	PRIMARY KEY,
+	ID INTEGER PRIMARY KEY AUTOINCREMENT,
 	parent		INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
@@ -14,7 +14,7 @@ CREATE TABLE Category	(
 -- The features tree
 --
 CREATE TABLE Feature	(
-	ID		SERIAL	PRIMARY KEY,
+	ID INTEGER PRIMARY KEY AUTOINCREMENT,
 	parent		INT	REFERENCES Feature( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,

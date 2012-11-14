@@ -1,25 +1,31 @@
+local function normalizeName( name)
+	return name:gsub("[^%s]+", string.lower):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
+end
 
-local function insert_tree_itr( parentid, itr)
+local function insert_itr( tablename, parentid, itr)
 	local id = 1
 	local name = ""
 	for v,t in itr do
 		if (t == "name") then
-			id = formfunction( "treeAddNode")( {name=v, parentid=parentid} ):table().ID
-		elseif (t == "class") then
-			insert_tree_itr( id, scope( itr))
+			local nname = normalizeName( v)
+			id = formfunction( "add" .. tablename)( {name=v, normalizedName=nname, parentid=parentid} ):table().ID
+		elseif (t == "node") then
+			insert_itr( tablename, id, scope( itr))
 		end
 	end
 end
 
-local function insert_topnode( name, parentid)
+local function insert_topnode( tablename, name, parentid)
+	local nname = normalizeName( name)
 	if not parentid then
-		formfunction( "treeAddRoot")( {name=name} )
+		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name} )
+		return 1
 	else
-		formfunction( "treeAddNode")( {name=name, parentid=parentid} )
+		return formfunction( "add" .. tablename)( {normalizedName=nname, name=name, parentid=parentid} ):table().ID
 	end
 end
 
-local function insert_tree_topnode( itr)
+local function insert_tree_topnode( tablename, itr)
 	local parentid = nil
 	local id = 1
 	local name = nil
@@ -28,21 +34,21 @@ local function insert_tree_topnode( itr)
 			parentid = tonumber( v)
 		elseif (t == "name") then
 			name = v
-		elseif (t == "class") then
+		elseif (t == "node") then
 			if name then
-				insert_topnode( name, parentid)
+				id = insert_topnode( tablename, name, parentid)
 				name = nil
 			end
-			insert_tree_itr( id, scope( itr))
+			insert_itr( tablename, id, scope( itr))
 		end
 	end
 	if name then
-		insert_topnode( name, parentid)
+		insert_topnode( tablename, name, parentid)
 	end
 end
 
-local function get_tree( parentid)
-	local t = formfunction( "treeSelectNodeAndChildren")( { node = { id=parentid } } ):table()["node"] or {}
+local function get_tree( tablename, parentid)
+	local t = formfunction( "selectSub" .. tablename)( { node = { id=parentid } } ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
 		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
@@ -55,15 +61,16 @@ local function get_tree( parentid)
 	return a
 end
 
-local function print_tree_xml( tree, nodeid, indent)
+local function print_tree( tree, nodeid, indent)
 	if (indent ~= "") then
 		output:print( "\n" .. indent)
 	end
-	output:opentag( "class")
+	output:opentag( "node")
 	output:print( tree[ nodeid].name, "name")
+	output:print( nodeid, "id")
 	local n = 0
 	for i,v in pairs( tree[ nodeid].children) do
-		print_tree_xml( tree, v, indent .. "\t")
+		print_tree( tree, v, indent .. "\t")
 		n = n + 1
 	end
 	if n > 0 then
@@ -72,25 +79,42 @@ local function print_tree_xml( tree, nodeid, indent)
 	output:closetag()
 end
 
-function treeSelectHierarchy()
+local function select_tree( tablename)
 	filter().empty = false
-	output:opentag( "result")
-	for v,t in itr do
+	output:as( "tree 'hierarchy" .. tablename .. "'")
+	output:opentag( "tree")
+	for v,t in input:get() do
 		if t == "id" then
 			local id = tonumber( v)
-			print_tree_xml( get_tree( id), id, "")
+			print_tree( get_tree( tablename, id), id, "")
 		end
 	end
 	output:closetag()
 end
 
-function treeAddHierarchy()
+function selectCategoryHierarchy()
+	select_tree( "Category")
+end
+
+function selectFeatureHierarchy()
+	select_tree( "Feature")
+end
+
+local function add_tree( tablename)
 	filter().empty = false
 	local itr = input:get()
 	for v,t in itr do
-		if t == "class" then
-			insert_tree_topnode( scope( itr))
+		if t == "node" then
+			insert_tree_topnode( tablename, scope( itr))
 		end
 	end
+end
+
+function addCategoryHierarchy()
+	add_tree( "Category")
+end
+
+function addFeatureHierarchy()
+	add_tree( "Feature")
 end
 

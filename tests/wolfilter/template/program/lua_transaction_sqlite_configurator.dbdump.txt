@@ -1,0 +1,42 @@
+Category:
+'1', NULL, 'category', 'category', '1', '18'
+'2', '1', 'Computer', 'computer', '2', '17'
+'3', '2', 'Laptop', 'laptop', '3', '10'
+'4', '3', 'Laptop 1', 'laptop 1', '4', '5'
+'5', '3', 'Laptop 2', 'laptop 2', '6', '7'
+'6', '3', 'Laptop 3', 'laptop 3', '8', '9'
+'7', '2', 'Desktop', 'desktop', '11', '12'
+'8', '2', 'Server', 'server', '13', '14'
+'9', '2', 'Pad', 'pad', '15', '16'
+
+sqlite_sequence:
+'Category', '9'
+
+Feature:
+
+Manufacturer:
+
+Components:
+
+CategRequires:
+
+CategProvides:
+
+CategoryCheck:
+
+ComponentRequires:
+
+ComponentProvides:
+
+ComponentCheck:
+
+Receipe:
+
+ReceipeContent:
+
+Configuration:
+
+ConfigComponent:
+
+ComposedConfig:
+

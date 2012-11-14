@@ -1442,38 +1442,56 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 {
 	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");	//< self argument (mandatory)
-	Filter* filter;								//< 1st argument (mandatory)
+	Filter* filter = 0;								//< 1st argument (mandatory)
 	const char* doctype = 0;						//< 2nd argument (optional)
-	switch (lua_gettop( ls))
+	int ii=2,nn = lua_gettop( ls);
+	if (nn <= 1)
 	{
-		case 3:
-			doctype = lua_tostring( ls, 3);
-			if (!doctype) throw std::runtime_error( "string expected as second argument");
-			/*no break here!*/
-		case 2:
-			filter = LuaObject<Filter>::get( ls, 2);
-			if (!filter) throw std::runtime_error( "filter object expected as first argument");
-			break;
-		case 1:
-			throw std::runtime_error( "too few arguments");
-		default:
-			throw std::runtime_error( "too many arguments");
+		throw std::runtime_error( "too few arguments");
 	}
-	OutputFilter* ff = 0;
-	if (filter->outputfilter().get())
+	else if (nn > 3)
 	{
-		ff = filter->outputfilter()->copy();
-		if (output->outputfilter().get())
+		throw std::runtime_error( "too many arguments");
+	}
+	for (; ii <= nn; ++ii)
+	{
+		if (lua_type( ls, ii) == LUA_TSTRING)
 		{
-			ff->assignState( *output->outputfilter());
-			if (doctype) ff->setDocType( doctype);
+			if (doctype) std::runtime_error( "doctype specified twice");
+			doctype = lua_tostring( ls, ii);
+		}
+		else if (lua_type( ls, ii) == LUA_TUSERDATA)
+		{
+			if (filter) std::runtime_error( "filter specified twice");
+			filter = LuaObject<Filter>::get( ls, ii);
+			if (!filter) throw std::runtime_error( "filter object expected as first argument");
+		}
+		else
+		{
+			std::runtime_error( "string (doctype) or filter expected as argument");
 		}
 	}
-	else
+	OutputFilter* ff = 0;
+	if (filter)
 	{
-		throw std::runtime_error( "called with undefined output for the argument filter object");
+		if (filter->outputfilter().get())
+		{
+			ff = filter->outputfilter()->copy();
+			if (output->outputfilter().get())
+			{
+				ff->assignState( *output->outputfilter());
+			}
+			output->outputfilter().reset( ff);
+		}
+		else
+		{
+			throw std::runtime_error( "called with undefined output for the argument filter object");
+		}
 	}
-	output->outputfilter().reset( ff);
+	if (doctype)
+	{
+		output->outputfilter()->setDocType( doctype);
+	}
 	return 0;
 }
 

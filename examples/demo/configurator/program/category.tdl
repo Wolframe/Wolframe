@@ -47,15 +47,15 @@ BEGIN
 END
 
 --
--- selectTopCategories       :Get the parents of a category
+-- selectTopCategory       :Get the parents of a category
 --
-TRANSACTION selectTopCategories -- (/category/id)
+TRANSACTION selectTopCategory -- (/category/id)
 BEGIN
 	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
--- selectSubCategories       :Get the categories
+-- selectSubCategory       :Get the categories
 --
 TRANSACTION selectSubCategories -- (/category/id)
 BEGIN

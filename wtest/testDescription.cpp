@@ -266,9 +266,16 @@ static void readFile( const std::string& pt, std::vector<std::string>& hdr, std:
 
 static void writeFile( const std::string& pt, const std::string& content)
 {
-	std::fstream ff( pt.c_str(), std::ios::out | std::ios::binary);
-	ff.exceptions( std::ifstream::failbit | std::ifstream::badbit);
-	ff.write( content.c_str(), content.size());
+	try
+	{
+		std::fstream ff( pt.c_str(), std::ios::out | std::ios::binary);
+		ff.exceptions( std::ifstream::failbit | std::ifstream::badbit);
+		ff.write( content.c_str(), content.size());
+	}
+	catch (std::exception& e)
+	{
+		std::runtime_error( std::string( "failed to write file '") + pt + "':" + e.what());
+	}
 }
 
 

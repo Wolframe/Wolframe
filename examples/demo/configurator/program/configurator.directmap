@@ -1,8 +1,14 @@
-selectTopCategories = selectTopCategories( xml );
-selectSubCategories = selectSubCategories( xml );
+selectTopCategory = selectTopCategory( xml );
+selectSubCategory = selectSubCategory( xml );
 addCategory = addCategory( xml );
 deleteCategory = deleteCategory( xml );
 selectCategory = selectCategory( xml );
 selectCategoryByName = selectCategoryByName( xml );
 selectCategoryByNormalizedName = selectCategoryByNormalizedame( xml );
-addCategoryHierarchy = addCategoryHierarchy( xml);
+selectTopFeature = selectTopFeature( xml );
+selectSubFeature = selectSubFeature( xml );
+addFeature = addFeature( xml );
+deleteFeature = deleteFeature( xml );
+selectFeature = selectFeature( xml );
+selectFeatureByName = selectFeatureByName( xml );
+selectFeatureByNormalizedName = selectFeatureByNormalizedame( xml );
