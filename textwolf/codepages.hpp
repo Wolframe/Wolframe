@@ -137,7 +137,7 @@ public:
 
 	char invcode( UChar ch) const
 	{
-		char rt;
+		char rt = 0;
 		if (ch <= 128) return ch;
 		if (ch <= 255) rt = m_invcd[ ch - 128];
 		if (rt == 0)
