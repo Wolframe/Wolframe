@@ -1,6 +1,6 @@
 TOPDIR = ..\..
 
-SUBDIRS = 
+SUBDIRS = plugins
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
