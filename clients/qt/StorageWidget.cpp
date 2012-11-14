@@ -14,8 +14,6 @@
 #include "SqliteFormLoader.hpp"
 #include "NetworkFormLoader.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 StorageWidget::StorageWidget( QWidget *_parent )
 	: QWidget( _parent )
@@ -210,5 +208,3 @@ void StorageWidget::loadTree( )
 	_parent->addChild( item );
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

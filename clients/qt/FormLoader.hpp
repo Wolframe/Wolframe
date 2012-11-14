@@ -11,8 +11,6 @@
 #include <QByteArray>
 #include <QLocale>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class FormLoader : public QObject
 	{	
@@ -43,7 +41,5 @@ namespace _Wolframe {
 			void formDeleted( QString name );
 			void formLocalizationDeleted( QString name );
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _FORM_LOADER_HPP_INCLUDED

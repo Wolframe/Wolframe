@@ -9,8 +9,6 @@
 #include <QDebug>
 #include <QLocale>
  
-namespace _Wolframe {
-	namespace QtClient {
 
 QScopedPointer<Preferences> Preferences::m_instance;
 QString Preferences::m_fileName;
@@ -107,5 +105,3 @@ Preferences *Preferences::instance( )
 	return m_instance.data( );
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

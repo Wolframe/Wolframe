@@ -9,8 +9,6 @@
 #include <QFormLayout>
 #include <QApplication>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 LoginDialog::LoginDialog( WolframeClient *_wolframeClient, QWidget *_parent ) :
 	QDialog( _parent ), m_wolframeClient( _wolframeClient )
@@ -133,5 +131,3 @@ void LoginDialog::showPreferences( )
 	}
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

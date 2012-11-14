@@ -15,9 +15,6 @@
 #include <QHBoxLayout>
 #include <QSignalMapper>
 
-namespace _Wolframe {
-	namespace QtClient {
-
 	class WidgetProperties : public QObject
 	{
 	Q_OBJECT
@@ -39,18 +36,25 @@ namespace _Wolframe {
 		QString m_action;		// action to execute
 		QString m_nextForm;		// next form to show
 	};
-	
+		
 	class FormWidget : public QWidget
 	{
 	Q_OBJECT
 
 	public:
-		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent );
+		enum FormWidgetMode {
+			RunMode,		// when running in qtclient
+			DesignerMode		// when running in designer
+		};
+
+		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent = 0 );
+		FormWidget( QWidget *parent = 0 );
 		virtual ~FormWidget( );
 		void loadForm( QString name );
 		void loadLanguage( QString language );
 			
 	private:
+		FormWidgetMode m_mode;		// run mode of the widget
 		QString m_name;			// name of the form
 		QUiLoader *m_uiLoader;		// UI loader to user for loading designer XML files
 		FormLoader *m_formLoader;	// form loader (visible form)
@@ -86,7 +90,4 @@ namespace _Wolframe {
 		void actionDelete( );
 	};
 	
-} // namespace QtClient
-} // namespace _Wolframe
-
 #endif // _FORM_WIDGET_HPP_INCLUDED

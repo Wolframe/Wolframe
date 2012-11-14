@@ -15,8 +15,6 @@
 #include <QSqlRecord>
 #include <QVariant>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 SqliteFormLoader::SqliteFormLoader( QString dbName )
 	: m_dbName( dbName )
@@ -208,5 +206,3 @@ void SqliteFormLoader::initiateFormLocalizationDelete( QString name, QLocale loc
 	}
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

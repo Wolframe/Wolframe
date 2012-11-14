@@ -16,8 +16,6 @@
 
 #include "FileChooser.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class StorageWidget : public QWidget
 	{
@@ -56,7 +54,5 @@ namespace _Wolframe {
 		void toggleLoadMode( bool checked );
 	};
 
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _STORAGEWIDGET_HPP_INCLUDED

@@ -7,8 +7,6 @@
 #include <QFile>
 #include <QTextStream>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 HistoryLineEdit::HistoryLineEdit( QWidget *_parent ) : QLineEdit( _parent ),
 	m_historyFilename( ".history" ), m_pos( 0 )
@@ -92,5 +90,3 @@ void HistoryLineEdit::complete( )
 	end( false );
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

@@ -10,23 +10,30 @@
 #include <QApplication>
 #include <QPushButton>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent )
-	: QWidget( _parent ), m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
-	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_locale( DEFAULT_LOCALE ), m_forms( )
+	: QWidget( _parent ), m_mode( RunMode ), m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
+	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_dataHandler( 0 ),
+	  m_locale( DEFAULT_LOCALE ), m_forms( )
 {
+	initialize( );	
+}
+
+FormWidget::FormWidget( QWidget *_parent )
+	: QWidget( _parent ), m_mode( DesignerMode ), m_ui( 0 ),
+	  m_dataHandler( 0 )
+{
+}
+
+void FormWidget::initialize( )
+{
+	if( m_mode == FormWidget::DesignerMode ) return;
+	
 // maps data between constructed widgets from .ui and the data loader
 	m_dataHandler = new DataHandler( m_dataLoader );	
 
 	m_layout = new QHBoxLayout( this );
 	
-	initialize( );	
-}
-
-void FormWidget::initialize( )
-{
 // link the form loader for form loader notifications
 	connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
 		this, SLOT( formLoaded( QString, QByteArray ) ) );	
@@ -90,7 +97,7 @@ void FormWidget::switchForm( QObject *object )
 FormWidget::~FormWidget( )
 {
 	if( m_ui ) delete m_ui;
-	delete m_dataHandler;
+	if( m_dataHandler ) delete m_dataHandler;
 }
 
 void FormWidget::loadForm( QString name )
@@ -285,5 +292,3 @@ void FormWidget::actionDelete( )
 	// TODO: REQUEST with parameters
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

@@ -7,8 +7,6 @@
 #include <QDir>
 #include <QFile>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient )
 	: m_wolframeClient( _wolframeClient )
@@ -50,5 +48,3 @@ void NetworkDataLoader::initiateDomainDataLoad( QString form_name, QString widge
 	//~ }
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

@@ -8,8 +8,6 @@
 #include <QObject>
 #include <QString>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class Version
 	{
@@ -102,7 +100,5 @@ namespace _Wolframe {
 			int m_minor;
 	};
 	
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _VERSION_HPP_INCLUDED

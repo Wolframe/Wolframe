@@ -10,8 +10,6 @@
 
 #include <QDebug>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 FileFormLoader::FileFormLoader( QString formDir, QString localeDir )
 	: m_formDir( formDir ), m_localeDir( localeDir ) 
@@ -93,5 +91,3 @@ void FileFormLoader::initiateFormLocalizationDelete( QString name, QLocale local
 {
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

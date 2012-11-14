@@ -7,8 +7,6 @@
 #include <QDir>
 #include <QFile>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 FileDataLoader::FileDataLoader( QString dir ) : m_dir( dir ) 
 {
@@ -49,5 +47,3 @@ void FileDataLoader::initiateDomainDataLoad( QString form_name, QString widget_n
 	emit domainDataLoaded( form_name, widget_name, data );
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

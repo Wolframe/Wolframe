@@ -24,8 +24,6 @@
 #include <QListWidget>
 #include <QTreeWidget>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 DataHandler::DataHandler( DataLoader *_dataLoader ) : m_dataLoader( _dataLoader )
 {
@@ -423,5 +421,3 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 	}
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

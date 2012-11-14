@@ -18,8 +18,6 @@
 
 #define SESSION_NAME "qtclient-db"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class MainWindow : public QWidget
 	{
@@ -113,7 +111,5 @@ namespace _Wolframe {
 		void on_actionAboutQt_triggered( );
 		void on_actionDebugTerminal_triggered( bool checked );       
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _MAIN_WINDOW_HPP_INCLUDED

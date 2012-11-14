@@ -12,8 +12,6 @@
 #include "FileChooser.hpp"
 #include "StorageWidget.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class ManageStorageDialog : public QDialog
 	{
@@ -41,7 +39,5 @@ namespace _Wolframe {
 
 	};
 
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _MANAGE_STORAGE_DIALOG_HPP_INCLUDED

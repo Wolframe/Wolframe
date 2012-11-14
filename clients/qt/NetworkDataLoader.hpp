@@ -8,8 +8,6 @@
 #include "DataLoader.hpp"
 #include "WolframeClient.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class NetworkDataLoader : public DataLoader
 	{	
@@ -27,8 +25,6 @@ namespace _Wolframe {
 		private:
 			WolframeClient *m_wolframeClient;
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _NETWORK_DATA_LOADER_INCLUDED
 //

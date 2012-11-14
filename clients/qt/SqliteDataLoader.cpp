@@ -7,8 +7,6 @@
 #include <QDir>
 #include <QFile>
 
-namespace _Wolframe {
-	namespace QtClient {
 
 SqliteDataLoader::SqliteDataLoader( QString dbName )
 	: m_dbName( dbName ) 
@@ -48,5 +46,3 @@ void SqliteDataLoader::initiateDomainDataLoad( QString form_name, QString widget
 	//~ emit domainDataLoaded( form_name, widget_name, data );
 }
 
-} // namespace QtClient
-} // namespace _Wolframe

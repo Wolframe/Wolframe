@@ -16,8 +16,6 @@
 
 #include "WolframeClient.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class LoginDialog : public QDialog
 	{
@@ -54,7 +52,5 @@ namespace _Wolframe {
 		void authFailed( );
 		void showPreferences( );
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _LOGIN_DIALOG_HPP_INCLUDED

@@ -12,8 +12,6 @@
 #include "FormLoader.hpp"
 #include "WolframeClient.hpp"
 
-namespace _Wolframe {
-	namespace QtClient {
 
 	class NetworkFormLoader : public FormLoader
 	{
@@ -37,7 +35,5 @@ namespace _Wolframe {
 			WolframeClient *m_wolframeClient;
 
 	};
-} // namespace QtClient
-} // namespace _Wolframe
 
 #endif // _NETWORK_FORM_LOADER_HPP_INCLUDED
