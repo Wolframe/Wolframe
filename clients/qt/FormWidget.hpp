@@ -76,26 +76,20 @@ class FormWidget : public QWidget
 		void initializeDesigner( );
 		QString readDynamicStringProperty( QObject *o, const char *name );
 		void readDynamicStringProperties( QHash<QString, QString> *props, QObject *obj );
+		void sendRequest( QHash<QString, QString> *props );
 	
 	signals:
 		void formLoaded( QString name );
 		void error( QString error );
-		
+
 	private slots:
 		void formLoaded( QString name, QByteArray form );
 		void formLocalizationLoaded( QString name, QByteArray localization );
 		void formListLoaded( QStringList forms );
-		void slotDataCreated( QString name );
-		void slotDataRead( QString name, QByteArray xml );
-		void slotDataUpdated( QString name );
-		void slotDataDeleted( QString name );
-		void formDomainLoaded( QString form_name, QString widget_name, QByteArray data );
-
+		
+		void gotAnswer( QString formName, QString widgetName, QByteArray xml );
+		
 		void switchForm( QObject *object );
-		void actionCreate( QHash<QString, QString> *props );
-		void actionUpdate( QHash<QString, QString> *props );
-		void actionRead( QHash<QString, QString> *props );
-		void actionDelete( QHash<QString, QString> *props );
 };
 	
 #endif // _FORM_WIDGET_HPP_INCLUDED

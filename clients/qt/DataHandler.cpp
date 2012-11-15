@@ -227,13 +227,16 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 			continue;
 		}
 		
+		// TODO: widgets can also have custom properties for the domain handling
+		QHash<QString, QString> *props = new QHash<QString, QString>( );
+		props->insert( "action", "read" );
 		if( clazz == "QComboBox" ) {
 			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
-			m_dataLoader->initiateDomainDataLoad( form_name, name );
+			m_dataLoader->request( form_name, name, QByteArray( ), props );
 		} else if( clazz == "QListWidget" ) {
-			m_dataLoader->initiateDomainDataLoad( form_name, name );
+			m_dataLoader->request( form_name, name, QByteArray( ), props );
 		} else if( clazz == "QTreeWidget" ) {
-			m_dataLoader->initiateDomainDataLoad( form_name, name );
+			m_dataLoader->request( form_name, name, QByteArray( ), props );
 		}
 		
 		qDebug( ) << "Domain load in " << clazz << name;

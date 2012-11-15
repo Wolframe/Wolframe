@@ -5,31 +5,22 @@
 #ifndef _DATA_LOADER_INCLUDED
 #define _DATA_LOADER_INCLUDED
 
-#include <QObject>
-#include <QString>
 #include <QByteArray>
+#include <QString>
+#include <QObject>
+#include <QHash>
 
-
-	class DataLoader : public QObject
-	{	
-		Q_OBJECT
+class DataLoader : public QObject
+{	
+	Q_OBJECT
+	
+	public:
+		virtual ~DataLoader( ) {};
 		
-		public:
-			virtual ~DataLoader( ) {};
-			virtual void initiateDataCreate( QString form_name, QByteArray data ) = 0;
-			virtual void initiateDataRead( QString form_name ) = 0;
-			virtual void initiateDataUpdate( QString form_name, QByteArray data ) = 0;
-			virtual void initiateDataDelete( QString form_name ) = 0;
-			
-			virtual void initiateDomainDataLoad( QString form_name, QString widget_name ) = 0;
-			
-		signals:
-			void dataCreated( QString form_name );
-			void dataRead( QString form_name, QByteArray data );
-			void dataUpdated( QString form_name );
-			void dataDeleted( QString form_name );
-			
-			void domainDataLoaded( QString form_name, QString widget_name, QByteArray data );
-	};
+		virtual void request( QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props ) = 0;
+	
+	Q_SIGNALS:
+		void answer( QString formName, QString widgetName, QByteArray xml );
+};
 
 #endif // _DATA_LOADER_INCLUDED
