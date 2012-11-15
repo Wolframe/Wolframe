@@ -59,7 +59,7 @@ struct OptionStruct
 			( "help,h", "print help message")
 			( "uiformdir,u", boost::program_options::value<std::string>(), "directory containing the forms (where to write the uiforms to)")
 			( "outputfile,o", boost::program_options::value<std::string>(), "output file (where to write the request answers to)")
-			( "request,q", boost::program_options::value<std::vector<std::string> >(), "type of requests to process")
+			( "request,q", boost::program_options::value<std::string>(), "type of requests to process")
 			( "document,d", boost::program_options::value<std::vector<std::string> >(), "file containing a document of a request to process")
 #ifdef WITH_SSL
 			( "ssl,S", "use SSL encryption")
@@ -105,7 +105,7 @@ WolframecCommandLine::WolframecCommandLine( int argc, char** argv)
 		if (vmap.count("read-timeout")) read_timeout = vmap[ "read-timeout"].as<unsigned short>();
 		if (vmap.count("host")) address = vmap[ "host"].as<std::string>();
 		if (vmap.count("port")) name = vmap[ "port"].as<std::string>();
-		if (vmap.count("request")) name = vmap[ "request"].as<std::string>();
+		if (vmap.count("request")) m_request = vmap[ "request"].as<std::string>();
 		if (vmap.count("document"))
 		{
 			documentfiles = vmap[ "document"].as< std::vector< std::string> >();

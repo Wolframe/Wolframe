@@ -286,7 +286,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		}
 		else if (execch->lastError())
 		{
-			out << "ERR " << m_command << execch->lastError() << endl();
+			out << "ERR REQUEST " << m_command << " " << execch->lastError() << endl();
 		}
 		else
 		{

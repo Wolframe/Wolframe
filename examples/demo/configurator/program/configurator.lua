@@ -86,8 +86,7 @@ local function select_tree( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			local id = tonumber( v)
-			local tr = get_tree( tablename, id)
-			print_tree( tr, id, "")
+			print_tree( get_tree( tablename, id), id, "")
 		end
 	end
 end
@@ -121,7 +120,9 @@ local function create_node( tablename, itr)
 	local name = nil;
 	local parentid = nil;
 	for v,t in itr do
-		if t == "parent" then
+		if t == "id" then
+			parentid = v
+		elseif t == "parent" then
 			parentid = v
 		elseif t ==  "name" then
 			name = v
@@ -168,36 +169,36 @@ end
 function editCategory()
 	edit_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	select_tree( "Category")
+	print_tree( get_tree( "Category", 1), 1, "")
 end
 
 function editFeature()
 	edit_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	select_tree( "Feature")
+	print_tree( get_tree( "Feature", 1), 1, "")
 end
 
 function deleteCategory()
 	delete_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	select_tree( "Category")
+	print_tree( get_tree( "Category", 1), 1, "")
 end
 
 function deleteFeature()
 	delete_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	select_tree( "Feature")
+	print_tree( get_tree( "Feature", 1), 1, "")
 end
 
 function createCategory()
 	create_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	select_tree( "Category")
+	print_tree( get_tree( "Category", 1), 1, "")
 end
 
 function createFeature()
 	create_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	select_tree( "Feature")
+	print_tree( get_tree( "Feature", 1), 1, "")
 end
 
