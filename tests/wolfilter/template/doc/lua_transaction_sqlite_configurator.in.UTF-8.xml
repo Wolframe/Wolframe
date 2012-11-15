@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE node SYSTEM 'addCategoryHierarchy.simpleform'>
+<!DOCTYPE test SYSTEM 'test.simpleform'>
+<test>
+<addCategoryHierarchy>
 <node name="category">
 	<node name="Computer">
 		<node name="Laptop">
@@ -15,3 +17,5 @@
 		</node>
 	</node>
 </node>
+</addCategoryHierarchy>
+</test>

@@ -4,7 +4,8 @@ requestdoctype='addCategoryHierarchy'
 opt=""
 modpath="../../src/modules"				# module directory relative from tests/temp
 opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
-opt="$opt --program=configurator.lua"
+luascript=`echo $testname | sed 's/lua_//'`.lua
+opt="$opt --program=$luascript"
 ddltypeprg="simpleform.normalize"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 modpath="../../src/modules/normalize/"			# module directory for normalizers relative from tests/temp
@@ -17,7 +18,6 @@ opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
 opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
 opt="$opt --program=DBPRG.tdl"
 demopath=../../../examples/demo/configurator
-luascript=transaction_sqlite_configurator.lua
 genscript=../scripts/$luascript
 projectpath=../../../examples/demo/configurator/program
 cat $projectpath/configurator.lua > $genscript

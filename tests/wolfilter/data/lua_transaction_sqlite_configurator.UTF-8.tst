@@ -3,7 +3,9 @@
 **requires:SQLITE3
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE node SYSTEM 'addCategoryHierarchy.simpleform'>
+<!DOCTYPE test SYSTEM 'test.simpleform'>
+<test>
+<addCategoryHierarchy>
 <node name="category">
 	<node name="Computer">
 		<node name="Laptop">
@@ -18,8 +20,10 @@
 		<node name="Pad">
 		</node>
 	</node>
-</node>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=configurator.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl addCategoryHierarchy
+</node>
+</addCategoryHierarchy>
+</test>**config
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
 **file:simpleform.normalize
 int=number:integer;
@@ -292,7 +296,7 @@ BEGIN
 	FOREACH /feature INTO /feature DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 **outputfile:DBDUMP
-**file: configurator.lua
+**file: transaction_sqlite_configurator.lua
 local function normalizeName( name)
 	return name:gsub("[^%s]+", string.lower):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
 end
@@ -374,11 +378,10 @@ local function print_tree( tree, nodeid, indent)
 	output:closetag()
 end
 
-local function select_tree( tablename)
+local function select_tree( tablename, itr)
 	filter().empty = false
-	output:as( "tree 'hierarchy" .. tablename .. "'")
 	output:opentag( "tree")
-	for v,t in input:get() do
+	for v,t in itr do
 		if t == "id" then
 			local id = tonumber( v)
 			print_tree( get_tree( tablename, id), id, "")
@@ -388,16 +391,17 @@ local function select_tree( tablename)
 end
 
 function selectCategoryHierarchy()
+	output:as( "tree 'hierarchyCategory")
 	select_tree( "Category")
 end
 
 function selectFeatureHierarchy()
+	output:as( "tree 'hierarchyFeature")
 	select_tree( "Feature")
 end
 
-local function add_tree( tablename)
+local function add_tree( tablename, itr)
 	filter().empty = false
-	local itr = input:get()
 	for v,t in itr do
 		if t == "node" then
 			insert_tree_topnode( tablename, scope( itr))
@@ -406,13 +410,37 @@ local function add_tree( tablename)
 end
 
 function addCategoryHierarchy()
-	add_tree( "Category")
+	add_tree( "Category", input:get())
 end
 
 function addFeatureHierarchy()
-	add_tree( "Feature")
+	add_tree( "Feature", input:get())
 end
 
+function selectCategoryHierarchy()
+	select_tree( "Category", input:get())
+end
+
+function selectFeatureHierarchy()
+	select_tree( "Feature", input:get())
+end
+
+
+function run()
+	filter().empty = false
+	local itr = input:get()
+	for v,t in itr do
+		if (t == "addCategoryHierarchy") then
+			add_tree( "Category", scope(itr))
+		elseif (t == "addFeatureHierarchy") then
+			add_tree( "Feature", scope(itr))
+		elseif (t == "selectCategoryHierarchy") then
+			select_tree( "Category", scope(itr))
+		elseif (t == "selectFeatureHierarchy") then
+			select_tree( "Feature", scope(itr))
+		end
+	end
+end
 **output
 Category:
 '1', NULL, 'category', 'category', '1', '18'
