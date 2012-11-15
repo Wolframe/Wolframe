@@ -86,27 +86,28 @@ void FormWidget::formListLoaded( QStringList forms )
 
 void FormWidget::switchForm( QObject *object )
 {
-	WidgetProperties *widget = qobject_cast<WidgetProperties *>( object );
-	
-	qDebug( ) << "Got " << widget->toString( );
-	
-	if( !widget->action( ).isNull( ) ) {
-		if( widget->action( ) == "create" ) {
-			actionCreate( );
-		} else if( widget->action( ) == "read" ) {
-			actionRead( );
-		} else if( widget->action( ) == "update" ) {
-			actionUpdate( );
-		} else if( widget->action( ) == "delete" ) {
-			actionDelete( );
+	WidgetProperties *widgetProps = qobject_cast<WidgetProperties *>( object );
+	QHash<QString, QString> *props = widgetProps->props( );
+		
+	if( props->contains( "action" ) ) {
+		QString action = props->value( "action" );
+		if( action == "create" ) {
+			actionCreate( props );
+		} else if( action == "read" ) {
+			actionRead( props );
+		} else if( action == "update" ) {
+			actionUpdate( props );
+		} else if( action == "delete" ) {
+			actionDelete( props );
 		} else {
-			qDebug( ) << "Unknown action" << widget->action( );
+			qDebug( ) << "Unknown action" << action;
 		}
 	}
 	
 // switch form now, formLoaded will inform parent and others
-	if( !widget->nextForm( ).isNull( ) ) {
-		loadForm( widget->nextForm( ) );
+	if( props->contains( "form" ) ) {
+		QString nextForm = props->value( "form" );
+		loadForm( nextForm );
 	}
 }
 
@@ -228,6 +229,15 @@ QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )
 	}
 }
 
+void FormWidget::readDynamicStringProperties( QHash<QString, QString> *props, QObject *o )
+{
+	foreach( QByteArray b, o->dynamicPropertyNames( ) ) {
+		QString propName = QString::fromAscii( b.data( ) );
+		QString propValue = readDynamicStringProperty( o, b.data( ) );
+		props->insert( propName, propValue );
+	}
+}
+
 void FormWidget::formLoaded( QString name, QByteArray formXml )
 {
 // that's not us
@@ -284,31 +294,18 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		QString _name = widget->objectName( );
 		
 		if( clazz == "QPushButton" ) {
-			WidgetProperties *props = new WidgetProperties( );
-			QString propValue = readDynamicStringProperty( widget, "form" );
-			
-			if( !propValue.isNull( ) ) {
-// the explicit dynamic property 'form' is set to a name of a form..
-				props->setNextForm( propValue );
-			} else if( m_forms.contains( _name ) ) {
-// or the name of the button is equals to the name of the form
-				props->setNextForm( _name );
-			}
-
-// what actions do we have to perform when clicking the button?			
-			propValue = readDynamicStringProperty( widget, "action" );
-			if( !propValue.isNull( ) ) {
-				props->setAction( propValue );
-			}
-
-			qDebug( ) << "connecting button" << _name << "to properties" << props->toString( );
+			QHash<QString, QString> *props = new QHash<QString, QString>( );
+			readDynamicStringProperties( props, widget );
+						
+			qDebug( ) << "connecting button" << _name << "to properties" << *props;
 
 			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
 			
 			connect( pushButton, SIGNAL( clicked( ) ),
 				m_signalMapper, SLOT( map( ) ) );
 
-			m_signalMapper->setMapping( pushButton, props );
+			WidgetProperties *widgetProps = new WidgetProperties( props );
+			m_signalMapper->setMapping( pushButton, widgetProps );
 		}
 	}
 
@@ -316,16 +313,18 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	qApp->restoreOverrideCursor( );
 
 // check for 'initAction'
-	QString initAction = readDynamicStringProperty( m_ui, "initAction" );
-	if( !initAction.isNull( ) ) {
+	QHash<QString, QString> *props = new QHash<QString, QString>( );
+	readDynamicStringProperties( props, m_ui );
+	if( props->contains( "initAction" ) ) {
+		QString initAction = props->value( "initAction" );
 		if( initAction == "create" ) {
-			actionCreate( );
+			actionCreate( props );
 		} else if( initAction == "read" ) {
-			actionRead( );
+			actionRead( props );
 		} else if( initAction == "update" ) {
-			actionUpdate( );
+			actionUpdate( props );
 		} else if( initAction == "delete" ) {
-			actionDelete( );
+			actionDelete( props );
 		} else {
 			qDebug( ) << "Unknown init action" << initAction;
 		}
@@ -371,9 +370,9 @@ void FormWidget::formDomainLoaded( QString form_name, QString widget_name, QByte
 	m_dataHandler->loadFormDomain( form_name, widget_name, m_ui, _data );
 }
 
-void FormWidget::actionCreate( )
+void FormWidget::actionCreate( QHash<QString, QString> *props )
 {
-	qDebug( ) << "Creating data of form " << m_form;
+	qDebug( ) << "Creating data of form " << m_form << "[" << *props << "]";
 	
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_form, m_ui, &xml );
@@ -381,9 +380,9 @@ void FormWidget::actionCreate( )
 	m_dataLoader->initiateDataSave( m_form, xml );
 }
 
-void FormWidget::actionUpdate( )
+void FormWidget::actionUpdate( QHash<QString, QString> *props )
 {
-	qDebug( ) << "Updating data of form " << m_form;
+	qDebug( ) << "Updating data of form " << m_form << "[" << *props << "]";
 	
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_form, m_ui, &xml );
@@ -391,16 +390,16 @@ void FormWidget::actionUpdate( )
 	m_dataLoader->initiateDataSave( m_form, xml );
 }
 
-void FormWidget::actionRead( )
+void FormWidget::actionRead( QHash<QString, QString> *props )
 {
-	qDebug( ) << "Reading data for form " << m_form;
+	qDebug( ) << "Reading data for form " << m_form << "[" << *props << "]";
 	
 	m_dataLoader->initiateDataLoad( m_form );
 }
 
-void FormWidget::actionDelete( )
+void FormWidget::actionDelete( QHash<QString, QString> *props )
 {
-	qDebug( ) << "Sending delete request for form " << m_form;
+	qDebug( ) << "Sending delete request for form " << m_form << "[" << *props << "]";
 	
 	// TODO: REQUEST with parameters
 }
