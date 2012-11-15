@@ -85,9 +85,10 @@ class FormWidget : public QWidget
 		void formLoaded( QString name, QByteArray form );
 		void formLocalizationLoaded( QString name, QByteArray localization );
 		void formListLoaded( QStringList forms );
-		void dataLoaded( QString name, QByteArray xml );
-		void dataSaved( QString name );
-		void dataDeleted( QString name );
+		void slotDataCreated( QString name );
+		void slotDataRead( QString name, QByteArray xml );
+		void slotDataUpdated( QString name );
+		void slotDataDeleted( QString name );
 		void formDomainLoaded( QString form_name, QString widget_name, QByteArray data );
 
 		void switchForm( QObject *object );

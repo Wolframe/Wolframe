@@ -33,7 +33,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -68,11 +68,11 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_3">
+   <widget class="QWidget" name="tab_4">
     <attribute name="title">
-     <string>Web</string>
+     <string>File Upload</string>
     </attribute>
-    <widget class="QWebView" name="webView">
+    <widget class="QWidget" name="formLayoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -81,11 +81,18 @@
        <height>231</height>
       </rect>
      </property>
-     <property name="url">
-      <url>
-       <string>http://wolframe.net/</string>
-      </url>
-     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_fileUpload">
+        <property name="text">
+         <string>File to upload:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="FileChooser" name="file"/>
+      </item>
+     </layout>
     </widget>
    </widget>
   </widget>
@@ -201,9 +208,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QWebView</class>
+   <class>FileChooser</class>
    <extends>QWidget</extends>
-   <header>QtWebKit/QWebView</header>
+   <header>FileChooser.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

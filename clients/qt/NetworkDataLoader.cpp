@@ -13,7 +13,17 @@ NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient )
 {
 }
 
-void NetworkDataLoader::initiateDataLoad( QString name )
+void NetworkDataLoader::initiateDataCreate( QString name, QByteArray data )
+{
+	//~ QString s = m_wolframeClient->syncRun( "saveData " + name, QString( data ) );
+	//~ if( s.isNull( ) ) {
+		//~ qWarning( ) << "Trouble saving form data for form" << name;
+	//~ } else {
+		//~ emit dataCreated( name );
+	//~ }
+}
+
+void NetworkDataLoader::initiateDataRead( QString name )
 {
 	//~ QString s = m_wolframeClient->syncRun( "getData " + name );
 	//~ if( s.isNull( ) ) {
@@ -23,7 +33,7 @@ void NetworkDataLoader::initiateDataLoad( QString name )
 	//~ }
 }
 
-void NetworkDataLoader::initiateDataSave( QString name, QByteArray data )
+void NetworkDataLoader::initiateDataUpdate( QString name, QByteArray data )
 {
 	//~ QString s = m_wolframeClient->syncRun( "saveData " + name, QString( data ) );
 	//~ if( s.isNull( ) ) {

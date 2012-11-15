@@ -23,6 +23,9 @@
 #include <QGroupBox>
 #include <QListWidget>
 #include <QTreeWidget>
+#include <QFile>
+
+#include "FileChooser.hpp"
 
 
 DataHandler::DataHandler( DataLoader *_dataLoader ) : m_dataLoader( _dataLoader )
@@ -92,10 +95,10 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			xml.writeTextElement( "", name, html );
 		} else if( clazz == "QCheckBox" ) {
 			QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
-			QObject *parent = widget->parent( );
-			QString clazzParent = parent->metaObject( )->className( ); 
+			QObject *_parent = widget->parent( );
+			QString clazzParent = _parent->metaObject( )->className( ); 
 			if( clazzParent == "QGroupBox" ) {
-				QString groupName = parent->objectName( );
+				QString groupName = _parent->objectName( );
 				if( checkBox->isChecked( ) ) {
 					xml.writeTextElement( "", groupName, name );
 				}
@@ -104,10 +107,10 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			}
 		} else if( clazz == "QRadioButton" ) {
 			QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
-			QObject *parent = widget->parent( );
-			QString clazzParent = parent->metaObject( )->className( ); 
+			QObject *_parent = widget->parent( );
+			QString clazzParent = _parent->metaObject( )->className( ); 
 			if( clazzParent == "QGroupBox" ) {
-				QString groupName = parent->objectName( );
+				QString groupName = _parent->objectName( );
 				if( radioButton->isChecked( ) ) {
 					xml.writeTextElement( "", groupName, name );
 				}
@@ -126,6 +129,19 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			foreach( QTreeWidgetItem *item, items ) {
 				xml.writeTextElement( "", name, item->data( 0, Qt::DisplayRole ).toString( ) );
 			}
+		} else if( clazz == "FileChooser" ) {
+			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
+			QString fileName = fileChooser->fileName( );
+			xml.writeStartElement( name );
+			xml.writeAttribute( "filename", fileName );
+			QFile file( fileName );
+			file.open( QFile::ReadOnly );
+			QByteArray fileContent = file.readAll( );
+			xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
+			QString encoded = QString( fileContent.toBase64( ) );
+			file.close( );	
+			xml.writeCharacters( encoded );
+			xml.writeEndElement( );
 		}
 		
 		qDebug( ) << "Wrote " << clazz << name;
@@ -152,24 +168,24 @@ void DataHandler::resetFormData( QWidget *form )
 			QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
 			lineEdit->clear( );
 		} else if( clazz == "QDateEdit" ) {
-			QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
+			//~ QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
 			// TODO
 		} else if( clazz == "QTimeEdit" ) {
-			QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>( widget );
+			//~ QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>( widget );
 			// TODO
 		} else if( clazz == "QDateTimeEdit" ) {
-			QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
+			//~ QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
 		} else if( clazz == "QComboBox" ) {
 			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
 			comboBox->clear( );
 		} else if( clazz == "QSpinBox" ) {
-			QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
+			//~ QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
 			// TODO
 		} else if( clazz == "QDoubleSpinBox" ) {
-			QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( widget );
+			//~ QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( widget );
 			// TODO
 		} else if( clazz == "QSlider" ) {
-			QSlider *slider = qobject_cast<QSlider *>( widget );
+			//~ QSlider *slider = qobject_cast<QSlider *>( widget );
 			// TODO
 		} else if( clazz == "QPlainTextEdit" ) {
 			QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget );
@@ -189,6 +205,9 @@ void DataHandler::resetFormData( QWidget *form )
 		} else if( clazz == "QTreeWidget" ) {
 			QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 			treeWidget->clear( );
+		} else if( clazz == "FileChooser" ) {
+			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
+			fileChooser->setFileName( "" );
 		}
 		
 		qDebug( ) << "Reset " << clazz << name;
@@ -316,6 +335,7 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 					widget = qFindChild<QWidget *>( form, xml.name( ).toString( ) );
 					if( widget ) {
 						clazz = widget->metaObject( )->className( ); 
+						QXmlStreamAttributes attributes = xml.attributes( );
 						QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 						if( clazz == "QLineEdit" ) {
 							QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
@@ -410,6 +430,10 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 									parent = parent->parent( );
 								}
 							}
+						} else if( clazz == "FileChooser" ) {
+							FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
+							QString fileName = attributes.value( "", "filename" ).toString( );
+							fileChooser->setFileName( fileName );
 						}
 					}
 				}

@@ -84,9 +84,6 @@
         <property name="form" stdset="0">
          <string notr="true">form5_create</string>
         </property>
-        <property name="vegetableId" stdset="0">
-         <string>{vegetable.vegetable[currentIndex]}</string>
-        </property>
        </widget>
       </item>
       <item>
@@ -97,9 +94,6 @@
         <property name="form" stdset="0">
          <string notr="true">form5_update</string>
         </property>
-        <property name="vegetableId" stdset="0">
-         <string>{vegetable.vegetable[currentIndex]}</string>
-        </property>
        </widget>
       </item>
       <item>
@@ -109,9 +103,6 @@
         </property>
         <property name="action" stdset="0">
          <string notr="true">delete</string>
-        </property>
-        <property name="vegetableId" stdset="0">
-         <string>{vegetable.vegetable[currentIndex]}</string>
         </property>
        </widget>
       </item>

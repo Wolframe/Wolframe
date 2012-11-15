@@ -25,8 +25,6 @@ show-stoppers:
     - add elements 
     - move elements/subtrees
     - delete elements/subtrees
-  - file upload: we need that for product images, etc.
-    - base64 encoding of file uploads
   
 musts:
 - protocol
