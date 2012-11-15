@@ -26,7 +26,7 @@ cat scripts/$luascript >> $genscript
 testscripts="$luascript"
 testcmd="$opt run"					# command to execute by the test
 docin=$testname.in					# input document name
-docout=''						# output document name
+docout=$testname.out					# output document name
 dumpout="program/$testname.dbdump.txt"			# resource dump to add to expected test output
 testdata="
 **file:$ddltypeprg

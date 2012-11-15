@@ -33,6 +33,7 @@
 ///\brief Implementation of processing prepared statements with sqlite3
 ///\file modules/database/sqlite3/SQLitePreparedStatement.cpp
 #include "SQLitePreparedStatement.hpp"
+#include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
@@ -134,7 +135,11 @@ bool PreparedStatementHandler_sqlite3::commit()
 #ifdef LOWLEVEL_DEBUG
 	std::cerr << "CALL commit()" << std::endl;
 #endif
-	if (m_state != Executed)
+	if (m_state == Transaction)
+	{
+		LOG_WARNING << "executed transaction is empty";
+	}
+	else if (m_state != Executed)
 	{
 		return errorStatus( std::string( "call of commit not allowed in state '") + stateName(m_state) + "'");
 	}

@@ -1,5 +1,5 @@
 local function normalizeName( name)
-	return name:gsub("[^%s]+", string.lower):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
+	return name:gsub("[^%s]+", string.lower):gsub("[%-()]+", " "):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
 end
 
 local function insert_itr( tablename, parentid, itr)
@@ -48,13 +48,13 @@ local function insert_tree_topnode( tablename, itr)
 end
 
 local function get_tree( tablename, parentid)
-	local t = formfunction( "selectSub" .. tablename)( { node = { id=parentid } } ):table()["node"] or {}
+	local t = formfunction( "selectSub" .. tablename)( {id=parentid} ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
 		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
 	end
 	for i,v in pairs( a) do
-		if v.parent ~= 0 then
+		if i ~= parentid and v.parent then
 			table.insert( a[ v.parent ].children, i )
 		end
 	end
@@ -81,23 +81,21 @@ end
 
 local function select_tree( tablename, itr)
 	filter().empty = false
-	output:opentag( "tree")
 	for v,t in itr do
 		if t == "id" then
 			local id = tonumber( v)
 			print_tree( get_tree( tablename, id), id, "")
 		end
 	end
-	output:closetag()
 end
 
 function selectCategoryHierarchy()
-	output:as( "tree 'hierarchyCategory")
+	output:as( "node SYSTEM 'hierarchyCategory.simpleform'")
 	select_tree( "Category")
 end
 
 function selectFeatureHierarchy()
-	output:as( "tree 'hierarchyFeature")
+	output:as( "node SYSTEM 'hierarchyFeature.simpleform'")
 	select_tree( "Feature")
 end
 
@@ -129,6 +127,8 @@ end
 
 function run()
 	filter().empty = false
+	output:as( "result SYSTEM 'test.simpleform'")
+	output:opentag("result")
 	local itr = input:get()
 	for v,t in itr do
 		if (t == "addCategoryHierarchy") then
@@ -141,4 +141,5 @@ function run()
 			select_tree( "Feature", scope(itr))
 		end
 	end
+	output:closetag()
 end
