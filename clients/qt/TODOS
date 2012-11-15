@@ -3,7 +3,7 @@ show-stoppers:
   - forms in forms: show multiple views, in theory a widget of
     FormWidget's should to the trick
   - what has to be communicated between forms? example: edit
-    existing item, add new item.
+    existing item, add new item, show item data (example form5 in test)
   - passing hidden parameters between forms (example ID of a
     product to show)
   - action (CRUD) is a parameter to REQUEST <action>

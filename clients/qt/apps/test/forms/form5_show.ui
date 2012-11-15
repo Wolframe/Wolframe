@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="initAction" stdset="0">
+   <string notr="true">read</string>
+  </property>
   <widget class="QWidget" name="formLayoutWidget">
    <property name="geometry">
     <rect>
