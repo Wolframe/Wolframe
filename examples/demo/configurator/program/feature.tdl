@@ -49,17 +49,17 @@ END
 --
 -- selectTopFeatures       :Get the parents of a feature
 --
-TRANSACTION selectTopFeatures -- (/feature/id)
+TRANSACTION selectTopFeatures -- (id)
 BEGIN
-	FOREACH /feature INTO /feature DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
 -- selectSubFeatures       :Get the sub features
 --
-TRANSACTION selectSubFeatures -- (/feature/id)
+TRANSACTION selectSubFeatures -- (id)
 BEGIN
-	FOREACH /feature INTO /feature DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 
 

@@ -49,17 +49,17 @@ END
 --
 -- selectTopCategory       :Get the parents of a category
 --
-TRANSACTION selectTopCategory -- (/category/id)
+TRANSACTION selectTopCategory -- (id)
 BEGIN
-	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
--- selectSubCategory       :Get the categories
+-- selectSubCategory       :Get the Category
 --
-TRANSACTION selectSubCategories -- (/category/id)
+TRANSACTION selectSubCategory -- (id)
 BEGIN
-	FOREACH /category INTO /category DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 
 

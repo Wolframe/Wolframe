@@ -7,22 +7,72 @@
 <!DOCTYPE test SYSTEM 'test.simpleform'>
 <test>
 <addCategoryHierarchy>
-<node name="category">
-	<node name="Computer">
+<node name="computer">
+	<node name="Minicomputer">
+		<node name="Superminicomputer"/>
+		<node name="Minicluster"/>
+		<node name="Server (Minicomputer)"/>
+		<node name="Workstation (Minicomputer)"/>
+	</node>
+	<node name="Microcomputer">
+		<node name="Tower PC"></node>
+		<node name="Mid-Tower PC"></node>
+		<node name="Mini-Tower PC"></node>
+		<node name="Server (Microcomputer)"></node>
+		<node name="Workstation (Microcomputer)"></node>
+		<node name="Personal computer"></node>
+		<node name="Desktop computer"></node>
+		<node name="Home computer"></node>
+	</node>
+	<node name="Mobile">
+		<node name="Desknote"></node>
 		<node name="Laptop">
-			<node name="Laptop 1"></node>
-			<node name="Laptop 2"></node>
-			<node name="Laptop 3"></node>
+			<node name="Notebook">
+				<node name="Subnotebook"/>
+			</node>
+			<node name="Tablet personal computer"></node>
+			<node name="slabtop computer">
+				<node name="Word-processing keyboard"/>
+				<node name="TRS-80 Model 100"/>
+			</node>
+			<node name="Handheld computer">
+				<node name="Ultra-mobile personal computer"/>
+				<node name="Personal digital assistant">
+					<node name="HandheldPC"/>
+					<node name="Palmtop computer"/>
+					<node name="Pocket personal computer"/>
+				</node>
+				<node name="Electronic organizer"/>
+				<node name="Pocket computer"/>
+				<node name="Calculator">
+					<node name="Graphing calculator"/>
+					<node name="Scientific calculator"/>
+					<node name="Programmable calculator"/>
+					<node name="Financial Calculator"/>
+				</node>
+				<node name="Handheld game console"/>
+				<node name="Portable media player"/>
+				<node name="Portable data terminal"/>
+				<node name="Information appliance">
+					<node name="QWERTY Smartphone"/>
+					<node name="Smartphone"/>
+				</node>
+			</node>
+			<node name="Wearable computer"/>
 		</node>
-		<node name="Desktop">
-		</node>
-		<node name="Server">
-		</node>
-		<node name="Pad">
-		</node>
+		<node name="Single board computer"/>
+		<node name="Wireless sensor network component"/>
+		<node name="Plug computer"/>
+		<node name="Microcontroller"/>
+		<node name="Smartdust"/>
+		<node name="Nanocomputer"/>
 	</node>
 </node>
 </addCategoryHierarchy>
+<selectCategoryHierarchy><category id="1"/></selectCategoryHierarchy>
+<selectCategoryHierarchy><category id="43"/></selectCategoryHierarchy>
+<selectCategoryHierarchy><category id="33"/></selectCategoryHierarchy>
+<selectCategoryHierarchy><category id="16"/></selectCategoryHierarchy>
 </test>**config
 --input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
@@ -221,17 +271,17 @@ END
 --
 -- selectTopCategory       :Get the parents of a category
 --
-TRANSACTION selectTopCategory -- (/category/id)
+TRANSACTION selectTopCategory -- (id)
 BEGIN
-	FOREACH /category INTO /category DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
--- selectSubCategory       :Get the categories
+-- selectSubCategory       :Get the Category
 --
-TRANSACTION selectSubCategories -- (/category/id)
+TRANSACTION selectSubCategory -- (id)
 BEGIN
-	FOREACH /category INTO /category DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 --
 -- addFeatureRoot
@@ -284,22 +334,22 @@ END
 --
 -- selectTopFeatures       :Get the parents of a feature
 --
-TRANSACTION selectTopFeatures -- (/feature/id)
+TRANSACTION selectTopFeatures -- (id)
 BEGIN
-	FOREACH /feature INTO /feature DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
 -- selectSubFeatures       :Get the sub features
 --
-TRANSACTION selectSubFeatures -- (/feature/id)
+TRANSACTION selectSubFeatures -- (id)
 BEGIN
-	FOREACH /feature INTO /feature DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 **outputfile:DBDUMP
 **file: transaction_sqlite_configurator.lua
 local function normalizeName( name)
-	return name:gsub("[^%s]+", string.lower):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
+	return name:gsub("[^%s]+", string.lower):gsub("[%-()]+", " "):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
 end
 
 local function insert_itr( tablename, parentid, itr)
@@ -348,13 +398,13 @@ local function insert_tree_topnode( tablename, itr)
 end
 
 local function get_tree( tablename, parentid)
-	local t = formfunction( "selectSub" .. tablename)( { node = { id=parentid } } ):table()["node"] or {}
+	local t = formfunction( "selectSub" .. tablename)( {id=parentid} ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
 		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
 	end
 	for i,v in pairs( a) do
-		if v.parent ~= 0 then
+		if i ~= parentid and v.parent then
 			table.insert( a[ v.parent ].children, i )
 		end
 	end
@@ -381,23 +431,21 @@ end
 
 local function select_tree( tablename, itr)
 	filter().empty = false
-	output:opentag( "tree")
 	for v,t in itr do
 		if t == "id" then
 			local id = tonumber( v)
 			print_tree( get_tree( tablename, id), id, "")
 		end
 	end
-	output:closetag()
 end
 
 function selectCategoryHierarchy()
-	output:as( "tree 'hierarchyCategory")
+	output:as( "node SYSTEM 'hierarchyCategory.simpleform'")
 	select_tree( "Category")
 end
 
 function selectFeatureHierarchy()
-	output:as( "tree 'hierarchyFeature")
+	output:as( "node SYSTEM 'hierarchyFeature.simpleform'")
 	select_tree( "Feature")
 end
 
@@ -429,6 +477,8 @@ end
 
 function run()
 	filter().empty = false
+	output:as( "result SYSTEM 'test.simpleform'")
+	output:opentag("result")
 	local itr = input:get()
 	for v,t in itr do
 		if (t == "addCategoryHierarchy") then
@@ -441,21 +491,172 @@ function run()
 			select_tree( "Feature", scope(itr))
 		end
 	end
+	output:closetag()
 end
 **output
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE result SYSTEM "test.simpleform"><result><node name="computer" id="1">
+	<node name="Minicomputer" id="2">
+		<node name="Superminicomputer" id="3"/>
+		<node name="Minicluster" id="4"/>
+		<node name="Server (Minicomputer)" id="5"/>
+		<node name="Workstation (Minicomputer)" id="6"/>
+	</node>
+	<node name="Microcomputer" id="7">
+		<node name="Tower PC" id="8"/>
+		<node name="Mid-Tower PC" id="9"/>
+		<node name="Mini-Tower PC" id="10"/>
+		<node name="Server (Microcomputer)" id="11"/>
+		<node name="Workstation (Microcomputer)" id="12"/>
+		<node name="Personal computer" id="13"/>
+		<node name="Desktop computer" id="14"/>
+		<node name="Home computer" id="15"/>
+	</node>
+	<node name="Mobile" id="16">
+		<node name="Desknote" id="17"/>
+		<node name="Laptop" id="18">
+			<node name="Notebook" id="19">
+				<node name="Subnotebook" id="20"/>
+			</node>
+			<node name="Tablet personal computer" id="21"/>
+			<node name="slabtop computer" id="22">
+				<node name="Word-processing keyboard" id="23"/>
+				<node name="TRS-80 Model 100" id="24"/>
+			</node>
+			<node name="Handheld computer" id="25">
+				<node name="Ultra-mobile personal computer" id="26"/>
+				<node name="Personal digital assistant" id="27">
+					<node name="HandheldPC" id="28"/>
+					<node name="Palmtop computer" id="29"/>
+					<node name="Pocket personal computer" id="30"/>
+				</node>
+				<node name="Electronic organizer" id="31"/>
+				<node name="Pocket computer" id="32"/>
+				<node name="Calculator" id="33">
+					<node name="Graphing calculator" id="34"/>
+					<node name="Scientific calculator" id="35"/>
+					<node name="Programmable calculator" id="36"/>
+					<node name="Financial Calculator" id="37"/>
+				</node>
+				<node name="Handheld game console" id="38"/>
+				<node name="Portable media player" id="39"/>
+				<node name="Portable data terminal" id="40"/>
+				<node name="Information appliance" id="41">
+					<node name="QWERTY Smartphone" id="42"/>
+					<node name="Smartphone" id="43"/>
+				</node>
+			</node>
+			<node name="Wearable computer" id="44"/>
+		</node>
+		<node name="Single board computer" id="45"/>
+		<node name="Wireless sensor network component" id="46"/>
+		<node name="Plug computer" id="47"/>
+		<node name="Microcontroller" id="48"/>
+		<node name="Smartdust" id="49"/>
+		<node name="Nanocomputer" id="50"/>
+	</node>
+</node><node name="Smartphone" id="43"/><node name="Calculator" id="33">
+	<node name="Scientific calculator" id="35"/>
+	<node name="Programmable calculator" id="36"/>
+	<node name="Financial Calculator" id="37"/>
+	<node name="Graphing calculator" id="34"/>
+</node><node name="Mobile" id="16">
+	<node name="Desknote" id="17"/>
+	<node name="Laptop" id="18">
+		<node name="Notebook" id="19">
+			<node name="Subnotebook" id="20"/>
+		</node>
+		<node name="Tablet personal computer" id="21"/>
+		<node name="slabtop computer" id="22">
+			<node name="Word-processing keyboard" id="23"/>
+			<node name="TRS-80 Model 100" id="24"/>
+		</node>
+		<node name="Handheld computer" id="25">
+			<node name="Ultra-mobile personal computer" id="26"/>
+			<node name="Personal digital assistant" id="27">
+				<node name="HandheldPC" id="28"/>
+				<node name="Palmtop computer" id="29"/>
+				<node name="Pocket personal computer" id="30"/>
+			</node>
+			<node name="Electronic organizer" id="31"/>
+			<node name="Pocket computer" id="32"/>
+			<node name="Calculator" id="33">
+				<node name="Graphing calculator" id="34"/>
+				<node name="Scientific calculator" id="35"/>
+				<node name="Programmable calculator" id="36"/>
+				<node name="Financial Calculator" id="37"/>
+			</node>
+			<node name="Handheld game console" id="38"/>
+			<node name="Portable media player" id="39"/>
+			<node name="Portable data terminal" id="40"/>
+			<node name="Information appliance" id="41">
+				<node name="QWERTY Smartphone" id="42"/>
+				<node name="Smartphone" id="43"/>
+			</node>
+		</node>
+		<node name="Wearable computer" id="44"/>
+	</node>
+	<node name="Single board computer" id="45"/>
+	<node name="Wireless sensor network component" id="46"/>
+	<node name="Plug computer" id="47"/>
+	<node name="Microcontroller" id="48"/>
+	<node name="Smartdust" id="49"/>
+	<node name="Nanocomputer" id="50"/>
+</node></result>
 Category:
-'1', NULL, 'category', 'category', '1', '18'
-'2', '1', 'Computer', 'computer', '2', '17'
-'3', '2', 'Laptop', 'laptop', '3', '10'
-'4', '3', 'Laptop 1', 'laptop 1', '4', '5'
-'5', '3', 'Laptop 2', 'laptop 2', '6', '7'
-'6', '3', 'Laptop 3', 'laptop 3', '8', '9'
-'7', '2', 'Desktop', 'desktop', '11', '12'
-'8', '2', 'Server', 'server', '13', '14'
-'9', '2', 'Pad', 'pad', '15', '16'
+'1', NULL, 'computer', 'computer', '1', '100'
+'2', '1', 'Minicomputer', 'minicomputer', '2', '11'
+'3', '2', 'Superminicomputer', 'superminicomputer', '3', '4'
+'4', '2', 'Minicluster', 'minicluster', '5', '6'
+'5', '2', 'Server (Minicomputer)', 'server minicomputer', '7', '8'
+'6', '2', 'Workstation (Minicomputer)', 'workstation minicomputer', '9', '10'
+'7', '1', 'Microcomputer', 'microcomputer', '12', '29'
+'8', '7', 'Tower PC', 'tower pc', '13', '14'
+'9', '7', 'Mid-Tower PC', 'mid tower pc', '15', '16'
+'10', '7', 'Mini-Tower PC', 'mini tower pc', '17', '18'
+'11', '7', 'Server (Microcomputer)', 'server microcomputer', '19', '20'
+'12', '7', 'Workstation (Microcomputer)', 'workstation microcomputer', '21', '22'
+'13', '7', 'Personal computer', 'personal computer', '23', '24'
+'14', '7', 'Desktop computer', 'desktop computer', '25', '26'
+'15', '7', 'Home computer', 'home computer', '27', '28'
+'16', '1', 'Mobile', 'mobile', '30', '99'
+'17', '16', 'Desknote', 'desknote', '31', '32'
+'18', '16', 'Laptop', 'laptop', '33', '86'
+'19', '18', 'Notebook', 'notebook', '34', '37'
+'20', '19', 'Subnotebook', 'subnotebook', '35', '36'
+'21', '18', 'Tablet personal computer', 'tablet personal computer', '38', '39'
+'22', '18', 'slabtop computer', 'slabtop computer', '40', '45'
+'23', '22', 'Word-processing keyboard', 'word processing keyboard', '41', '42'
+'24', '22', 'TRS-80 Model 100', 'trs 80 model 100', '43', '44'
+'25', '18', 'Handheld computer', 'handheld computer', '46', '83'
+'26', '25', 'Ultra-mobile personal computer', 'ultra mobile personal computer', '47', '48'
+'27', '25', 'Personal digital assistant', 'personal digital assistant', '49', '56'
+'28', '27', 'HandheldPC', 'handheldpc', '50', '51'
+'29', '27', 'Palmtop computer', 'palmtop computer', '52', '53'
+'30', '27', 'Pocket personal computer', 'pocket personal computer', '54', '55'
+'31', '25', 'Electronic organizer', 'electronic organizer', '57', '58'
+'32', '25', 'Pocket computer', 'pocket computer', '59', '60'
+'33', '25', 'Calculator', 'calculator', '61', '70'
+'34', '33', 'Graphing calculator', 'graphing calculator', '62', '63'
+'35', '33', 'Scientific calculator', 'scientific calculator', '64', '65'
+'36', '33', 'Programmable calculator', 'programmable calculator', '66', '67'
+'37', '33', 'Financial Calculator', 'financial calculator', '68', '69'
+'38', '25', 'Handheld game console', 'handheld game console', '71', '72'
+'39', '25', 'Portable media player', 'portable media player', '73', '74'
+'40', '25', 'Portable data terminal', 'portable data terminal', '75', '76'
+'41', '25', 'Information appliance', 'information appliance', '77', '82'
+'42', '41', 'QWERTY Smartphone', 'qwerty smartphone', '78', '79'
+'43', '41', 'Smartphone', 'smartphone', '80', '81'
+'44', '18', 'Wearable computer', 'wearable computer', '84', '85'
+'45', '16', 'Single board computer', 'single board computer', '87', '88'
+'46', '16', 'Wireless sensor network component', 'wireless sensor network component', '89', '90'
+'47', '16', 'Plug computer', 'plug computer', '91', '92'
+'48', '16', 'Microcontroller', 'microcontroller', '93', '94'
+'49', '16', 'Smartdust', 'smartdust', '95', '96'
+'50', '16', 'Nanocomputer', 'nanocomputer', '97', '98'
 
 sqlite_sequence:
-'Category', '9'
+'Category', '50'
 
 Feature:
 
