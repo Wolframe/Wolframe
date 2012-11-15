@@ -20,6 +20,9 @@
   <property name="windowTitle">
    <string>Wolframe client form 1</string>
   </property>
+  <property name="initAction" stdset="0">
+   <string>read</string>
+  </property>
   <layout class="QGridLayout">
    <property name="margin">
     <number>9</number>
@@ -299,7 +302,7 @@
           <string notr="true">init</string>
          </property>
          <property name="action" stdset="0">
-          <string notr="true">send</string>
+          <string notr="true">update</string>
          </property>
         </widget>
        </item>
@@ -309,7 +312,7 @@
           <string>Reset</string>
          </property>
          <property name="action" stdset="0">
-          <string notr="true">get</string>
+          <string notr="true">read</string>
          </property>
         </widget>
        </item>

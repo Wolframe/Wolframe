@@ -50,10 +50,14 @@ class FormWidget : public QWidget
 		};
 
 		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent = 0 );
-		FormWidget( QWidget *parent = 0 );
+		FormWidget( FormWidgetMode _mode, QWidget *parent = 0 );
 		virtual ~FormWidget( );
 		void loadForm( QString name );
 		void loadLanguage( QString language );
+		void setFormLoader( FormLoader *_formLoader );
+		void setDataLoader( DataLoader *_dataLoader );
+		void setUiLoader( QUiLoader *_uiLoader );
+		void loadDelayedForm( const QString &_form );
 	
 	public:
 		QString form( ) const;
@@ -94,9 +98,9 @@ class FormWidget : public QWidget
 		void formDomainLoaded( QString form_name, QString widget_name, QByteArray data );
 
 		void switchForm( QObject *object );
-		void actionSend( );
-		void actionGet( );
-		void actionInit( );
+		void actionCreate( );
+		void actionUpdate( );
+		void actionRead( );
 		void actionDelete( );
 };
 	

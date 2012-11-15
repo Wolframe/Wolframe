@@ -73,10 +73,10 @@ QWidget *FormWidgetPlugin::createWidget( QWidget *_parent )
 {
 	if( m_initialized ) {
 // in designer mode, return a preview version only
-		return new FormWidget( _parent );
+		return new FormWidget( FormWidget::DesignerMode, _parent );
 	} else {
 // in normal form load mode, but we must inject some parent pointers, how?
-		return new FormWidget( _parent );
+		return new FormWidget( FormWidget::RunMode, _parent );
 	}
 }
 

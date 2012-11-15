@@ -8,10 +8,13 @@ show-stoppers:
     product to show)
   - action (CRUD) is a parameter to REQUEST <action>
 - define actions (CRUD)
-  - init: empty form with default values (C)
+  - init: empty form with default values (I)
+  - create: request new item from server (C)
   - get: request data from server (R)
   - send: send data to server (U)
   - delete (D)
+  => first step, so we can do the file/db implementations, the network
+     sees only request(action), action being a mere parameter
 - protocol
   - add action
   - add doctype to data XML
@@ -24,7 +27,7 @@ show-stoppers:
     - delete elements/subtrees
   - file upload: we need that for product images, etc.
     - base64 encoding of file uploads
-
+  
 musts:
 - protocol
   - network loader via protocol or use client library?
@@ -36,6 +39,8 @@ musts:
   - them in MainWindow:
     - the now case is FormWidget<init>
     - MDI or tabbed view
+  - picture viewer
+    - show 0 to N pictures, scrollable
 - localize forms:
   - Windows doesn't retranslate on the fly! Why?
   - Windows doesn't respect language on startup for form

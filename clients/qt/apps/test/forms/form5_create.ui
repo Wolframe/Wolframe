@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="initAction" stdset="0">
+   <string>init</string>
+  </property>
   <widget class="QWidget" name="formLayoutWidget">
    <property name="geometry">
     <rect>
@@ -81,13 +84,13 @@
       <item>
        <widget class="QPushButton" name="pushButton_2">
         <property name="text">
-         <string>Save</string>
+         <string>Insert</string>
         </property>
         <property name="form" stdset="0">
          <string notr="true">form5</string>
         </property>
         <property name="action" stdset="0">
-         <string notr="true">send</string>
+         <string notr="true">create</string>
         </property>
        </widget>
       </item>

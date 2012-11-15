@@ -16,6 +16,9 @@
   <property name="toolTip">
    <string/>
   </property>
+  <property name="initAction" stdset="0">
+   <string>read</string>
+  </property>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
@@ -32,7 +35,7 @@
     <item>
      <widget class="QTreeWidget" name="vegetable">
       <property name="selectionMode">
-       <enum>QAbstractItemView::MultiSelection</enum>
+       <enum>QAbstractItemView::SingleSelection</enum>
       </property>
       <property name="columnCount">
        <number>2</number>
@@ -79,10 +82,7 @@
          <bool>true</bool>
         </property>
         <property name="form" stdset="0">
-         <string notr="true">form5_item</string>
-        </property>
-        <property name="action" stdset="0">
-         <string notr="true">send</string>
+         <string notr="true">form5_create</string>
         </property>
        </widget>
       </item>
@@ -91,11 +91,8 @@
         <property name="text">
          <string>Edit</string>
         </property>
-        <property name="action" stdset="0">
-         <string notr="true">get</string>
-        </property>
         <property name="form" stdset="0">
-         <string notr="true">form5_item</string>
+         <string notr="true">form5_update</string>
         </property>
        </widget>
       </item>
@@ -106,9 +103,6 @@
         </property>
         <property name="action" stdset="0">
          <string notr="true">delete</string>
-        </property>
-        <property name="form" stdset="0">
-         <string notr="true">item5_item</string>
         </property>
        </widget>
       </item>

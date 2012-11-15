@@ -21,8 +21,9 @@ FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoa
 	initializeNormal( );	
 }
 
-FormWidget::FormWidget( QWidget *_parent )
-	: QWidget( _parent ), m_mode( DesignerMode ), m_form( ),
+FormWidget::FormWidget( FormWidgetMode _mode, QWidget *_parent )
+	: QWidget( _parent ), m_mode( _mode ), m_form( ),
+	  m_uiLoader( 0 ), m_formLoader( 0 ), m_dataLoader( 0 ),
 	  m_ui( 0 ), m_dataHandler( 0 )
 {
 	initializeDesigner( );
@@ -86,12 +87,12 @@ void FormWidget::switchForm( QObject *object )
 	qDebug( ) << "Got " << widget->toString( );
 	
 	if( !widget->action( ).isNull( ) ) {
-		if( widget->action( ) == "send" ) {
-			actionSend( );
-		} else if( widget->action( ) == "get" ) {
-			actionGet( );
-		} else if( widget->action( ) == "init" ) {
-			actionInit( );
+		if( widget->action( ) == "create" ) {
+			actionCreate( );
+		} else if( widget->action( ) == "read" ) {
+			actionRead( );
+		} else if( widget->action( ) == "update" ) {
+			actionUpdate( );
 		} else if( widget->action( ) == "delete" ) {
 			actionDelete( );
 		} else {
@@ -111,6 +112,34 @@ FormWidget::~FormWidget( )
 	if( m_dataHandler ) delete m_dataHandler;
 }
 
+void FormWidget::setFormLoader( FormLoader *_formLoader )
+{
+	m_formLoader = _formLoader;
+	
+	loadDelayedForm( m_form );
+}
+
+void FormWidget::setDataLoader( DataLoader *_dataLoader )
+{
+	m_dataLoader = _dataLoader;
+
+	loadDelayedForm( m_form );
+}
+
+void FormWidget::setUiLoader( QUiLoader *_uiLoader )
+{
+	m_uiLoader = _uiLoader;
+
+	loadDelayedForm( m_form );
+}
+
+void FormWidget::loadDelayedForm( const QString &_form )
+{
+	if( !m_formLoader || !m_dataLoader || !m_uiLoader ) return;
+	
+	loadForm( _form );
+}
+
 void FormWidget::setForm( const QString &_form )
 {
 	switch( m_mode ) {
@@ -120,6 +149,7 @@ void FormWidget::setForm( const QString &_form )
 			break;
 		
 		case RunMode:
+			m_form = _form;
 			loadForm( _form );
 			break;
 	}
@@ -132,6 +162,8 @@ QString FormWidget::form( ) const
 
 void FormWidget::loadForm( QString name )
 {
+	if( !m_formLoader ) return;
+	
 // indicate busy state
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
@@ -191,13 +223,16 @@ QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )
 	}
 }
 
-void FormWidget::formLoaded( QString name, QByteArray form )
+void FormWidget::formLoaded( QString name, QByteArray formXml )
 {
+// that's not us
+	if( name != m_form ) return;
+	
 	qDebug( ) << "Form " << name << " loaded";
 
 // read the form and construct it from the UI file
 	QWidget *oldUi = m_ui;
-	QBuffer buf( &form );
+	QBuffer buf( &formXml );
 	m_ui = m_uiLoader->load( &buf, this );
 	if( m_ui == 0 ) {
 // something went wrong loading or constructing the form
@@ -206,6 +241,7 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 		return;
 	}
 	buf.close( );
+	qDebug( ) << "Constructed UI form XML for form" << name;
 
 // add new form to layout (which covers the whole widget)
 	m_layout->addWidget( m_ui );
@@ -219,15 +255,49 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 	m_ui->show( );	
 
 // set localization now
+	qDebug( ) << "Starting to load localization for form" << name;
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 
 // initiate load of form data
-	qDebug( ) << "Initiating loading of form data for form " << name;
-	m_dataLoader->initiateDataLoad( name );
+	//qDebug( ) << "Initiating loading of form data for form " << name;
+	//m_dataLoader->initiateDataLoad( name );
+
+#if 0
+// sub form widgets have to be propertly initialized with the data/form and
+// ui loaders and their signals have to be wired to our form widget
+	qDebug( ) << "Checking for subforms in form" << name << ", wire them as necessary";
+	QList<FormWidget *> subforms = m_ui->findChildren<FormWidget *>( );
+	foreach( FormWidget *subform, subforms ) {
+// link the form loader for form loader notifications
+		connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
+			subform, SLOT( formLoaded( QString, QByteArray ) ) );	
+		connect( m_formLoader, SIGNAL( formLocalizationLoaded( QString, QByteArray ) ),
+			subform, SLOT( formLocalizationLoaded( QString, QByteArray ) ) );	
+		connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
+			subform, SLOT( formListLoaded( QStringList ) ) );
+
+// link the data loader to our form widget
+		connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
+			subform, SLOT( dataLoaded( QString, QByteArray ) ) );
+		connect( m_dataLoader, SIGNAL( dataSaved( QString ) ),
+			subform, SLOT( dataSaved( QString ) ) );
+		connect( m_dataLoader, SIGNAL( dataDeleted( QString ) ),
+			subform, SLOT( dataDeleted( QString ) ) );
+
+// link the data loader to the data handler
+		connect( m_dataLoader, SIGNAL( domainDataLoaded( QString, QString, QByteArray ) ),
+			subform, SLOT( formDomainLoaded( QString, QString, QByteArray ) ) );
+			
+		subform->setFormLoader( m_formLoader );
+		subform->setDataLoader( m_dataLoader );
+		subform->setUiLoader( m_uiLoader );
+	}
+#endif
 
 // connect actions and forms
 // connect push buttons with form names to loadForms
-	QList<QWidget *> widgets = findChildren<QWidget *>( );
+	qDebug( ) << "Checking form" << name << "for dynamic properties 'form' and 'action'";
+	QList<QWidget *> widgets = m_ui->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
 		QString clazz = widget->metaObject( )->className( ); 
 		QString _name = widget->objectName( );
@@ -263,13 +333,33 @@ void FormWidget::formLoaded( QString name, QByteArray form )
 
 // not busy anymore
 	qApp->restoreOverrideCursor( );
-	
+
+// check for 'initAction'
+	QString initAction = readDynamicStringProperty( m_ui, "initAction" );
+	if( !initAction.isNull( ) ) {
+		if( initAction == "create" ) {
+			actionCreate( );
+		} else if( initAction == "read" ) {
+			actionRead( );
+		} else if( initAction == "update" ) {
+			actionUpdate( );
+		} else if( initAction == "delete" ) {
+			actionDelete( );
+		} else {
+			qDebug( ) << "Unknown init action" << initAction;
+		}
+	}
+		
 // signal
+	qDebug( ) << "Done loading form" << name;
 	emit formLoaded( m_form );
 }
 
 void FormWidget::dataLoaded( QString name, QByteArray xml )
 {
+// that's not us
+	if( name != m_form ) return;
+
 	qDebug( ) << "Loaded data for form " << name << ":\n"
 		<< xml;
 	
@@ -278,22 +368,31 @@ void FormWidget::dataLoaded( QString name, QByteArray xml )
 
 void FormWidget::dataSaved( QString name )
 {	
+// that's not us
+	if( name != m_form ) return;
+
 	qDebug( ) << "Saved data for form " << name;
 }
 
 void FormWidget::dataDeleted( QString name )
 {
+// that's not us
+	if( name != m_form ) return;
+
 	qDebug( ) << "Deleted data of form " << name;
 }
 
 void FormWidget::formDomainLoaded( QString form_name, QString widget_name, QByteArray _data )
 {
+// that's not us
+	if( form_name != m_form ) return;
+
 	m_dataHandler->loadFormDomain( form_name, widget_name, m_ui, _data );
 }
 
-void FormWidget::actionSend( )
+void FormWidget::actionCreate( )
 {
-	qDebug( ) << "Sending data of form " << m_form;
+	qDebug( ) << "Creating data of form " << m_form;
 	
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_form, m_ui, &xml );
@@ -301,18 +400,21 @@ void FormWidget::actionSend( )
 	m_dataLoader->initiateDataSave( m_form, xml );
 }
 
-void FormWidget::actionGet( )
+void FormWidget::actionUpdate( )
 {
-	qDebug( ) << "Reseting data of form " << m_form;
+	qDebug( ) << "Updating data of form " << m_form;
 	
-	m_dataLoader->initiateDataLoad( m_form );
+	QByteArray xml;
+	m_dataHandler->writeFormData( m_form, m_ui, &xml );
+	
+	m_dataLoader->initiateDataSave( m_form, xml );
 }
 
-void FormWidget::actionInit( )
+void FormWidget::actionRead( )
 {
-	qDebug( ) << "Initializing form " << m_form;
+	qDebug( ) << "Reading data for form " << m_form;
 	
-	m_dataHandler->resetFormData( m_ui );
+	m_dataLoader->initiateDataLoad( m_form );
 }
 
 void FormWidget::actionDelete( )
@@ -321,4 +423,3 @@ void FormWidget::actionDelete( )
 	
 	// TODO: REQUEST with parameters
 }
-
