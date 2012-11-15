@@ -9,24 +9,19 @@
 #include "WolframeClient.hpp"
 
 
-	class NetworkDataLoader : public DataLoader
-	{	
+class NetworkDataLoader : public DataLoader
+{	
 		// intentionally omitting Q_OBJECT here, is done in DataLoader!
 		
 		public:
 			NetworkDataLoader( WolframeClient *_wolframeClient );
 			virtual ~NetworkDataLoader( ) {};
 
-			virtual void initiateDataCreate( QString form_name, QByteArray data );
-			virtual void initiateDataRead( QString form_name );
-			virtual void initiateDataUpdate( QString form_name, QByteArray data );
-			virtual void initiateDataDelete( QString form_name );
-			
-			virtual void initiateDomainDataLoad( QString form_name, QString widget_name );
-		
+			virtual void request( QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props );
+					
 		private:
 			WolframeClient *m_wolframeClient;
-	};
+};
 
 #endif // _NETWORK_DATA_LOADER_INCLUDED
 //

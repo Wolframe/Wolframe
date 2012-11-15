@@ -1,20 +1,10 @@
 show-stoppers:
 - workflow for form
-  - forms in forms: show multiple views, in theory a widget of
-    FormWidget's should to the trick
   - what has to be communicated between forms? example: edit
     existing item, add new item, show item data (example form5 in test)
   - passing hidden parameters between forms (example ID of a
     product to show)
   - action (CRUD) is a parameter to REQUEST <action>
-- define actions (CRUD)
-  - init: empty form with default values (I)
-  - create: request new item from server (C)
-  - get: request data from server (R)
-  - send: send data to server (U)
-  - delete (D)
-  => first step, so we can do the file/db implementations, the network
-     sees only request(action), action being a mere parameter
 - protocol
   - add action
   - add doctype to data XML

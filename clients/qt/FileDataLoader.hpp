@@ -7,25 +7,26 @@
 
 #include "DataLoader.hpp"
 
+class FileDataLoader : public DataLoader
+{	
+	// intentionally omitting Q_OBJECT here, is done in DataLoader!
+	
+	public:
+		FileDataLoader( QString dir );
+		virtual ~FileDataLoader( ) {};
 
-	class FileDataLoader : public DataLoader
-	{	
-		// intentionally omitting Q_OBJECT here, is done in DataLoader!
-		
-		public:
-			FileDataLoader( QString dir );
-			virtual ~FileDataLoader( ) {};
+		virtual void request( QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props );
 
-			virtual void initiateDataCreate( QString form_name, QByteArray data );
-			virtual void initiateDataRead( QString form_name );
-			virtual void initiateDataUpdate( QString form_name, QByteArray data );
-			virtual void initiateDataDelete( QString form_name );
-			
-			virtual void initiateDomainDataLoad( QString form_name, QString widget_name );
+	private:
+		void handleCreate( QString name, QByteArray data, QHash<QString, QString> *props );
+		void handleRead( QString name, QHash<QString, QString> *props );
+		void handleUpdate( QString name, QByteArray data, QHash<QString, QString> *props );
+		void handleDelete( QString name, QHash<QString, QString> *props );
+		void handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> *props );
 		
-		private:
-			QString m_dir;
-	};
+	private:
+		QString m_dir;
+};
 
 #endif // _FILE_DATA_LOADER_INCLUDED
 //

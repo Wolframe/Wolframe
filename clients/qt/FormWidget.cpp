@@ -59,18 +59,8 @@ void FormWidget::initializeNormal( )
 		this, SLOT( formListLoaded( QStringList ) ) );
 
 // link the data loader to our form widget
-	connect( m_dataLoader, SIGNAL( dataCreated( QString ) ),
-		this, SLOT( slotDataCreated( QString ) ) );
-	connect( m_dataLoader, SIGNAL( dataRead( QString, QByteArray ) ),
-		this, SLOT( slotDataRead( QString, QByteArray ) ) );
-	connect( m_dataLoader, SIGNAL( dataUpdated( QString ) ),
-		this, SLOT( slotDataUpdated( QString ) ) );
-	connect( m_dataLoader, SIGNAL( dataDeleted( QString ) ),
-		this, SLOT( slotDataDeleted( QString ) ) );
-
-// link the data loader to the data handler
-	connect( m_dataLoader, SIGNAL( domainDataLoaded( QString, QString, QByteArray ) ),
-		this, SLOT( formDomainLoaded( QString, QString, QByteArray ) ) );
+	connect( m_dataLoader, SIGNAL( answer( QString, QString, QByteArray ) ),
+		this, SLOT( gotAnswer( QString, QString, QByteArray ) ) );
 
 // signal dispatcher for form buttons
 	m_signalMapper = new QSignalMapper( this );
@@ -90,21 +80,9 @@ void FormWidget::switchForm( QObject *object )
 {
 	WidgetProperties *widgetProps = qobject_cast<WidgetProperties *>( object );
 	QHash<QString, QString> *props = widgetProps->props( );
-		
-	if( props->contains( "action" ) ) {
-		QString action = props->value( "action" );
-		if( action == "create" ) {
-			actionCreate( props );
-		} else if( action == "read" ) {
-			actionRead( props );
-		} else if( action == "update" ) {
-			actionUpdate( props );
-		} else if( action == "delete" ) {
-			actionDelete( props );
-		} else {
-			qDebug( ) << "Unknown action" << action;
-		}
-	}
+	
+// execute the action (eventually)
+	sendRequest( props );
 	
 // switch form now, formLoaded will inform parent and others
 	if( props->contains( "form" ) ) {
@@ -319,17 +297,8 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	readDynamicStringProperties( props, m_ui );
 	if( props->contains( "initAction" ) ) {
 		QString initAction = props->value( "initAction" );
-		if( initAction == "create" ) {
-			actionCreate( props );
-		} else if( initAction == "read" ) {
-			actionRead( props );
-		} else if( initAction == "update" ) {
-			actionUpdate( props );
-		} else if( initAction == "delete" ) {
-			actionDelete( props );
-		} else {
-			qDebug( ) << "Unknown init action" << initAction;
-		}
+		props->insert( "action", initAction );
+		sendRequest( props );
 	}
 		
 // signal
@@ -337,79 +306,32 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	emit formLoaded( m_form );
 }
 
-void FormWidget::slotDataCreated( QString name )
-{	
-// that's not us
-	if( name != m_form ) return;
-
-	qDebug( ) << "Created data for form " << name;
-}
-
-void FormWidget::slotDataRead( QString name, QByteArray xml )
+void FormWidget::sendRequest( QHash<QString, QString> *props )
 {
-// that's not us
-	if( name != m_form ) return;
+	qDebug( ) << "Handling reguest for form " << m_form << "[" << *props << "]";
 
-	qDebug( ) << "Loaded data for form " << name << ":\n"
-		<< xml;
-	
-	m_dataHandler->readFormData( name, m_ui, xml );
-}
-
-void FormWidget::slotDataUpdated( QString name )
-{	
-// that's not us
-	if( name != m_form ) return;
-
-	qDebug( ) << "Updated data for form " << name;
-}
-
-void FormWidget::slotDataDeleted( QString name )
-{
-// that's not us
-	if( name != m_form ) return;
-
-	qDebug( ) << "Deleted data of form " << name;
-}
-
-void FormWidget::formDomainLoaded( QString form_name, QString widget_name, QByteArray _data )
-{
-// that's not us
-	if( form_name != m_form ) return;
-
-	m_dataHandler->loadFormDomain( form_name, widget_name, m_ui, _data );
-}
-
-void FormWidget::actionCreate( QHash<QString, QString> *props )
-{
-	qDebug( ) << "Creating data of form " << m_form << "[" << *props << "]";
-	
+// go trought the widgets of the form and construct the request XML
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_form, m_ui, &xml );
-	
-	m_dataLoader->initiateDataUpdate( m_form, xml );
+
+// send request		
+	m_dataLoader->request( m_form, QString( ), xml, props );
 }
 
-void FormWidget::actionUpdate( QHash<QString, QString> *props )
+void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml )
 {
-	qDebug( ) << "Updating data of form " << m_form << "[" << *props << "]";
+// that's not us
+	if( formName != m_form ) return;
 	
-	QByteArray xml;
-	m_dataHandler->writeFormData( m_form, m_ui, &xml );
-	
-	m_dataLoader->initiateDataUpdate( m_form, xml );
-}
+	qDebug( ) << "Got answer for form" << formName;
 
-void FormWidget::actionRead( QHash<QString, QString> *props )
-{
-	qDebug( ) << "Reading data for form " << m_form << "[" << *props << "]";
-	
-	m_dataLoader->initiateDataRead( m_form );
-}
-
-void FormWidget::actionDelete( QHash<QString, QString> *props )
-{
-	qDebug( ) << "Sending delete request for form " << m_form << "[" << *props << "]";
-	
-	// TODO: REQUEST with parameters
+// do whatever we have to do with data to the widgets	
+	if( !xml.isEmpty( ) ) {
+		if( !widgetName.isEmpty( ) ) {
+			qDebug( ) << "Answer is for local widget" << widgetName << "in form" << formName;
+			m_dataHandler->loadFormDomain( formName, widgetName, m_ui, xml );
+		} else {
+			m_dataHandler->readFormData( formName, m_ui, xml );	
+		}
+	}
 }

@@ -13,48 +13,7 @@ NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient )
 {
 }
 
-void NetworkDataLoader::initiateDataCreate( QString name, QByteArray data )
+void NetworkDataLoader::request( QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props )
 {
-	//~ QString s = m_wolframeClient->syncRun( "saveData " + name, QString( data ) );
-	//~ if( s.isNull( ) ) {
-		//~ qWarning( ) << "Trouble saving form data for form" << name;
-	//~ } else {
-		//~ emit dataCreated( name );
-	//~ }
-}
-
-void NetworkDataLoader::initiateDataRead( QString name )
-{
-	//~ QString s = m_wolframeClient->syncRun( "getData " + name );
-	//~ if( s.isNull( ) ) {
-		//~ qWarning( ) << "Trouble loading form data for form" << name;
-	//~ } else {
-		//~ emit dataLoaded( name, s.toUtf8( ) );
-	//~ }
-}
-
-void NetworkDataLoader::initiateDataUpdate( QString name, QByteArray data )
-{
-	//~ QString s = m_wolframeClient->syncRun( "saveData " + name, QString( data ) );
-	//~ if( s.isNull( ) ) {
-		//~ qWarning( ) << "Trouble saving form data for form" << name;
-	//~ } else {
-		//~ emit dataSaved( name );
-	//~ }
-}
-
-void NetworkDataLoader::initiateDataDelete( QString name )
-{
-	//~ emit dataDeleted( name );
-}
-
-void NetworkDataLoader::initiateDomainDataLoad( QString form_name, QString widget_name )
-{
-	//~ QString s = m_wolframeClient->syncRun( "getDomain " + form_name + " " + widget_name );
-	//~ if( s.isNull( ) ) {
-		//~ qWarning( ) << "Trouble loading domain data for form" << form_name << "and widget" << widget_name;
-	//~ } else {
-		//~ emit domainDataLoaded( form_name, widget_name, s.toUtf8( ) );
-	//~ }
 }
 
