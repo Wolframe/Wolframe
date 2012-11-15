@@ -5,7 +5,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE test SYSTEM 'test.simpleform'>
 <test>
-<addCategoryHierarchy>
+<pushCategoryHierarchy>
 <node name="computer">
 	<node name="Minicomputer">
 		<node name="Superminicomputer"/>
@@ -67,11 +67,11 @@
 		<node name="Nanocomputer"/>
 	</node>
 </node>
-</addCategoryHierarchy>
-<selectCategoryHierarchy><category id="1"/></selectCategoryHierarchy>
-<selectCategoryHierarchy><category id="43"/></selectCategoryHierarchy>
-<selectCategoryHierarchy><category id="33"/></selectCategoryHierarchy>
-<selectCategoryHierarchy><category id="16"/></selectCategoryHierarchy>
+</pushCategoryHierarchy>
+<CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
+<CategoryHierarchyRequest><category id="43"/></CategoryHierarchyRequest>
+<CategoryHierarchyRequest><category id="33"/></CategoryHierarchyRequest>
+<CategoryHierarchyRequest><category id="16"/></CategoryHierarchyRequest>
 </test>**config
 --input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
@@ -457,19 +457,19 @@ local function add_tree( tablename, itr)
 	end
 end
 
-function addCategoryHierarchy()
+function pushCategoryHierarchy()
 	add_tree( "Category", input:get())
 end
 
-function addFeatureHierarchy()
+function pushFeatureHierarchy()
 	add_tree( "Feature", input:get())
 end
 
-function selectCategoryHierarchy()
+function CategoryHierarchyRequest()
 	select_tree( "Category", input:get())
 end
 
-function selectFeatureHierarchy()
+function FeatureHierarchyRequest()
 	select_tree( "Feature", input:get())
 end
 
@@ -480,13 +480,13 @@ function run()
 	output:opentag("result")
 	local itr = input:get()
 	for v,t in itr do
-		if (t == "addCategoryHierarchy") then
+		if (t == "pushCategoryHierarchy") then
 			add_tree( "Category", scope(itr))
-		elseif (t == "addFeatureHierarchy") then
+		elseif (t == "pushFeatureHierarchy") then
 			add_tree( "Feature", scope(itr))
-		elseif (t == "selectCategoryHierarchy") then
+		elseif (t == "CategoryHierarchyRequest") then
 			select_tree( "Category", scope(itr))
-		elseif (t == "selectFeatureHierarchy") then
+		elseif (t == "FeatureHierarchyRequest") then
 			select_tree( "Feature", scope(itr))
 		end
 	end

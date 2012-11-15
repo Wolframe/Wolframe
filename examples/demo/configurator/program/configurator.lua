@@ -108,18 +108,18 @@ local function add_tree( tablename, itr)
 	end
 end
 
-function addCategoryHierarchy()
+function pushCategoryHierarchy()
 	add_tree( "Category", input:get())
 end
 
-function addFeatureHierarchy()
+function pushFeatureHierarchy()
 	add_tree( "Feature", input:get())
 end
 
-function selectCategoryHierarchy()
+function CategoryHierarchyRequest()
 	select_tree( "Category", input:get())
 end
 
-function selectFeatureHierarchy()
+function FeatureHierarchyRequest()
 	select_tree( "Feature", input:get())
 end

@@ -108,19 +108,19 @@ local function add_tree( tablename, itr)
 	end
 end
 
-function addCategoryHierarchy()
+function pushCategoryHierarchy()
 	add_tree( "Category", input:get())
 end
 
-function addFeatureHierarchy()
+function pushFeatureHierarchy()
 	add_tree( "Feature", input:get())
 end
 
-function selectCategoryHierarchy()
+function CategoryHierarchyRequest()
 	select_tree( "Category", input:get())
 end
 
-function selectFeatureHierarchy()
+function FeatureHierarchyRequest()
 	select_tree( "Feature", input:get())
 end
 
@@ -131,13 +131,13 @@ function run()
 	output:opentag("result")
 	local itr = input:get()
 	for v,t in itr do
-		if (t == "addCategoryHierarchy") then
+		if (t == "pushCategoryHierarchy") then
 			add_tree( "Category", scope(itr))
-		elseif (t == "addFeatureHierarchy") then
+		elseif (t == "pushFeatureHierarchy") then
 			add_tree( "Feature", scope(itr))
-		elseif (t == "selectCategoryHierarchy") then
+		elseif (t == "CategoryHierarchyRequest") then
 			select_tree( "Category", scope(itr))
-		elseif (t == "selectFeatureHierarchy") then
+		elseif (t == "FeatureHierarchyRequest") then
 			select_tree( "Feature", scope(itr))
 		end
 	end

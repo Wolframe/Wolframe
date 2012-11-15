@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE test SYSTEM 'test.simpleform'>
 <test>
-<addCategoryHierarchy>
+<pushCategoryHierarchy>
 <node name="computer">
 	<node name="Minicomputer">
 		<node name="Superminicomputer"/>
@@ -63,9 +63,9 @@
 		<node name="Nanocomputer"/>
 	</node>
 </node>
-</addCategoryHierarchy>
-<selectCategoryHierarchy><category id="1"/></selectCategoryHierarchy>
-<selectCategoryHierarchy><category id="43"/></selectCategoryHierarchy>
-<selectCategoryHierarchy><category id="33"/></selectCategoryHierarchy>
-<selectCategoryHierarchy><category id="16"/></selectCategoryHierarchy>
+</pushCategoryHierarchy>
+<CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
+<CategoryHierarchyRequest><category id="43"/></CategoryHierarchyRequest>
+<CategoryHierarchyRequest><category id="33"/></CategoryHierarchyRequest>
+<CategoryHierarchyRequest><category id="16"/></CategoryHierarchyRequest>
 </test>

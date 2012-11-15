@@ -5,13 +5,13 @@ function run()
 	output:opentag("result")
 	local itr = input:get()
 	for v,t in itr do
-		if (t == "addCategoryHierarchy") then
+		if (t == "pushCategoryHierarchy") then
 			add_tree( "Category", scope(itr))
-		elseif (t == "addFeatureHierarchy") then
+		elseif (t == "pushFeatureHierarchy") then
 			add_tree( "Feature", scope(itr))
-		elseif (t == "selectCategoryHierarchy") then
+		elseif (t == "CategoryHierarchyRequest") then
 			select_tree( "Category", scope(itr))
-		elseif (t == "selectFeatureHierarchy") then
+		elseif (t == "FeatureHierarchyRequest") then
 			select_tree( "Feature", scope(itr))
 		end
 	end
