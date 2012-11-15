@@ -1,7 +1,7 @@
 All commands executed in 'examples/demo/configurator'
 with wolframed running with examples/demo/configurator/wolframe.conf
 
-../../../clients/cmdline/wolframec -q request/pushCategoryHierarchy.xml
+../../../clients/cmdline/wolframec -d request/pushCategoryHierarchy.xml
 # Insert the whole example category tree
 # client protocol "REQUEST" (no arguments) with this document as content
 
