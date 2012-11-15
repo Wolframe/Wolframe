@@ -68,14 +68,14 @@
 	</node>
 </node>
 </pushCategoryHierarchy>
+<deleteCategory><category id="42"/></deleteCategory>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
 <CategoryHierarchyRequest><category id="43"/></CategoryHierarchyRequest>
 <CategoryHierarchyRequest><category id="33"/></CategoryHierarchyRequest>
 <CategoryHierarchyRequest><category id="16"/></CategoryHierarchyRequest>
 <editCategory><category id="46" name="Wireless network component"/></editCategory>
-<vdeleteCategory><category id="42"/></vdeleteCategory>
-<vdeleteCategory><category id="22"/></vdeleteCategory>
-<vdeleteCategory><category id="7"/></vdeleteCategory>
+<deleteCategory><category id="22"/></deleteCategory>
+<deleteCategory><category id="25"/></deleteCategory>
 <createCategory><category id="7" name="Device from outer space" parent="1"/></createCategory>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
 </test>**config
@@ -94,8 +94,8 @@ CREATE TABLE Category	(
 	parent		INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
-	lft		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( lft > 0 ),
-	rgt		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( rgt > 1 ),
+	lft		INT	NOT NULL,
+	rgt		INT	NOT NULL,
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
 
@@ -457,8 +457,7 @@ local function select_tree( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			local id = tonumber( v)
-			local tr = get_tree( tablename, id)
-			print_tree( tr, id, "")
+			print_tree( get_tree( tablename, id), id, "")
 		end
 	end
 end
@@ -492,7 +491,9 @@ local function create_node( tablename, itr)
 	local name = nil;
 	local parentid = nil;
 	for v,t in itr do
-		if t == "parent" then
+		if t == "id" then
+			parentid = v
+		elseif t == "parent" then
 			parentid = v
 		elseif t ==  "name" then
 			name = v
@@ -539,37 +540,37 @@ end
 function editCategory()
 	edit_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	select_tree( "Category")
+	print_tree( get_tree( "Category", 1), 1, "")
 end
 
 function editFeature()
 	edit_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	select_tree( "Feature")
+	print_tree( get_tree( "Feature", 1), 1, "")
 end
 
 function deleteCategory()
 	delete_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	select_tree( "Category")
+	print_tree( get_tree( "Category", 1), 1, "")
 end
 
 function deleteFeature()
 	delete_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	select_tree( "Feature")
+	print_tree( get_tree( "Feature", 1), 1, "")
 end
 
 function createCategory()
 	create_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	select_tree( "Category")
+	print_tree( get_tree( "Category", 1), 1, "")
 end
 
 function createFeature()
 	create_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	select_tree( "Feature")
+	print_tree( get_tree( "Feature", 1), 1, "")
 end
 
 
@@ -653,7 +654,6 @@ end
 				<node name="Portable media player" id="39"/>
 				<node name="Portable data terminal" id="40"/>
 				<node name="Information appliance" id="41">
-					<node name="QWERTY Smartphone" id="42"/>
 					<node name="Smartphone" id="43"/>
 				</node>
 			</node>
@@ -701,7 +701,6 @@ end
 			<node name="Portable media player" id="39"/>
 			<node name="Portable data terminal" id="40"/>
 			<node name="Information appliance" id="41">
-				<node name="QWERTY Smartphone" id="42"/>
 				<node name="Smartphone" id="43"/>
 			</node>
 		</node>
@@ -737,46 +736,19 @@ end
 				<node name="Subnotebook" id="20"/>
 			</node>
 			<node name="Tablet personal computer" id="21"/>
-			<node name="slabtop computer" id="22">
-				<node name="Word-processing keyboard" id="23"/>
-				<node name="TRS-80 Model 100" id="24"/>
-			</node>
-			<node name="Handheld computer" id="25">
-				<node name="Ultra-mobile personal computer" id="26"/>
-				<node name="Personal digital assistant" id="27">
-					<node name="HandheldPC" id="28"/>
-					<node name="Palmtop computer" id="29"/>
-					<node name="Pocket personal computer" id="30"/>
-				</node>
-				<node name="Electronic organizer" id="31"/>
-				<node name="Pocket computer" id="32"/>
-				<node name="Calculator" id="33">
-					<node name="Graphing calculator" id="34"/>
-					<node name="Scientific calculator" id="35"/>
-					<node name="Programmable calculator" id="36"/>
-					<node name="Financial Calculator" id="37"/>
-				</node>
-				<node name="Handheld game console" id="38"/>
-				<node name="Portable media player" id="39"/>
-				<node name="Portable data terminal" id="40"/>
-				<node name="Information appliance" id="41">
-					<node name="QWERTY Smartphone" id="42"/>
-					<node name="Smartphone" id="43"/>
-				</node>
-			</node>
 			<node name="Wearable computer" id="44"/>
 		</node>
+		<node name="Smartdust" id="49"/>
+		<node name="Nanocomputer" id="50"/>
 		<node name="Single board computer" id="45"/>
 		<node name="Wireless network component" id="46"/>
 		<node name="Plug computer" id="47"/>
 		<node name="Microcontroller" id="48"/>
-		<node name="Smartdust" id="49"/>
-		<node name="Nanocomputer" id="50"/>
 	</node>
 	<node name="Device from outer space" id="51"/>
 </node></result>
 Category:
-'1', NULL, 'computer', 'computer', '1', '102'
+'1', NULL, 'computer', 'computer', '1', '58'
 '2', '1', 'Minicomputer', 'minicomputer', '2', '11'
 '3', '2', 'Superminicomputer', 'superminicomputer', '3', '4'
 '4', '2', 'Minicluster', 'minicluster', '5', '6'
@@ -791,42 +763,20 @@ Category:
 '13', '7', 'Personal computer', 'personal computer', '23', '24'
 '14', '7', 'Desktop computer', 'desktop computer', '25', '26'
 '15', '7', 'Home computer', 'home computer', '27', '28'
-'16', '1', 'Mobile', 'mobile', '30', '99'
+'16', '1', 'Mobile', 'mobile', '30', '55'
 '17', '16', 'Desknote', 'desknote', '31', '32'
-'18', '16', 'Laptop', 'laptop', '33', '86'
+'18', '16', 'Laptop', 'laptop', '33', '42'
 '19', '18', 'Notebook', 'notebook', '34', '37'
 '20', '19', 'Subnotebook', 'subnotebook', '35', '36'
 '21', '18', 'Tablet personal computer', 'tablet personal computer', '38', '39'
-'22', '18', 'slabtop computer', 'slabtop computer', '40', '45'
-'23', '22', 'Word-processing keyboard', 'word processing keyboard', '41', '42'
-'24', '22', 'TRS-80 Model 100', 'trs 80 model 100', '43', '44'
-'25', '18', 'Handheld computer', 'handheld computer', '46', '83'
-'26', '25', 'Ultra-mobile personal computer', 'ultra mobile personal computer', '47', '48'
-'27', '25', 'Personal digital assistant', 'personal digital assistant', '49', '56'
-'28', '27', 'HandheldPC', 'handheldpc', '50', '51'
-'29', '27', 'Palmtop computer', 'palmtop computer', '52', '53'
-'30', '27', 'Pocket personal computer', 'pocket personal computer', '54', '55'
-'31', '25', 'Electronic organizer', 'electronic organizer', '57', '58'
-'32', '25', 'Pocket computer', 'pocket computer', '59', '60'
-'33', '25', 'Calculator', 'calculator', '61', '70'
-'34', '33', 'Graphing calculator', 'graphing calculator', '62', '63'
-'35', '33', 'Scientific calculator', 'scientific calculator', '64', '65'
-'36', '33', 'Programmable calculator', 'programmable calculator', '66', '67'
-'37', '33', 'Financial Calculator', 'financial calculator', '68', '69'
-'38', '25', 'Handheld game console', 'handheld game console', '71', '72'
-'39', '25', 'Portable media player', 'portable media player', '73', '74'
-'40', '25', 'Portable data terminal', 'portable data terminal', '75', '76'
-'41', '25', 'Information appliance', 'information appliance', '77', '82'
-'42', '41', 'QWERTY Smartphone', 'qwerty smartphone', '78', '79'
-'43', '41', 'Smartphone', 'smartphone', '80', '81'
-'44', '18', 'Wearable computer', 'wearable computer', '84', '85'
-'45', '16', 'Single board computer', 'single board computer', '87', '88'
-'46', '16', 'Wireless network component', 'wireless network component', '89', '90'
-'47', '16', 'Plug computer', 'plug computer', '91', '92'
-'48', '16', 'Microcontroller', 'microcontroller', '93', '94'
-'49', '16', 'Smartdust', 'smartdust', '95', '96'
-'50', '16', 'Nanocomputer', 'nanocomputer', '97', '98'
-'51', '1', 'Device from outer space', 'device from outer space', '100', '101'
+'44', '18', 'Wearable computer', 'wearable computer', '40', '41'
+'45', '16', 'Single board computer', 'single board computer', '43', '44'
+'46', '16', 'Wireless network component', 'wireless network component', '45', '46'
+'47', '16', 'Plug computer', 'plug computer', '47', '48'
+'48', '16', 'Microcontroller', 'microcontroller', '49', '50'
+'49', '16', 'Smartdust', 'smartdust', '51', '52'
+'50', '16', 'Nanocomputer', 'nanocomputer', '53', '54'
+'51', '1', 'Device from outer space', 'device from outer space', '56', '57'
 
 sqlite_sequence:
 'Category', '51'

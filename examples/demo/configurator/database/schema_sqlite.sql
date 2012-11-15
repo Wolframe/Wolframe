@@ -6,8 +6,8 @@ CREATE TABLE Category	(
 	parent		INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
-	lft		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( lft > 0 ),
-	rgt		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( rgt > 1 ),
+	lft		INT	NOT NULL,
+	rgt		INT	NOT NULL,
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
 
