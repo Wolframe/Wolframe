@@ -25,3 +25,32 @@ with wolframed running with examples/demo/configurator/wolframe.conf
 # Returns the whole updated tree
 # client "REQUEST delete" with this document as content (example)
 
+
+
+All commands executed in 'examples/demo/configurator'
+with wolframed running with examples/demo/configurator/wolframe.conf
+
+../../../clients/cmdline/wolframec -d request/pushFeatureHierarchy.xml
+# Insert the whole example feature tree
+# client protocol "REQUEST" (no arguments) with this document as content
+
+../../../clients/cmdline/wolframec -d request/FeatureHierarchyRequest.xml
+# Get the whole feature tree
+# Returns the whole tree
+# client "REQUEST" (no arguments) with this document as content
+
+../../../clients/cmdline/wolframec -q create -d request/createFeature.xml
+# Create a new feature node in the tree
+# Returns the whole updated tree
+# client "REQUEST create" with this document as content (example)
+
+../../../clients/cmdline/wolframec -q edit -d request/editFeature.xml
+# Update a node in the feature tree
+# Returns the whole updated tree
+# client "REQUEST edit" with this document as content (example)
+
+../../../clients/cmdline/wolframec -q delete -d request/deleteFeature.xml
+# Delete a node and all its sub categories in the feature tree
+# Returns the whole updated tree
+# client "REQUEST delete" with this document as content (example)
+
