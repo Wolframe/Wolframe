@@ -7,28 +7,36 @@
 #include <QDir>
 #include <QFile>
 
-
 FileDataLoader::FileDataLoader( QString dir ) : m_dir( dir ) 
 {
 }
 
-void FileDataLoader::initiateDataLoad( QString name )
+void FileDataLoader::initiateDataCreate( QString name, QByteArray data )
+{
+	QFile file( m_dir + "/" + name + ".xml" );
+	file.open( QFile::WriteOnly );
+	file.write( data );
+	file.close( );
+	emit dataCreated( name );
+}
+
+void FileDataLoader::initiateDataRead( QString name )
 {
 // read directly here and stuff data into the signal
 	QFile file( m_dir + "/" + name + ".xml" );
 	file.open( QFile::ReadOnly );
 	QByteArray data = file.readAll( );
 	file.close( );	
-	emit dataLoaded( name, data );
+	emit dataRead( name, data );
 }
 
-void FileDataLoader::initiateDataSave( QString name, QByteArray data )
+void FileDataLoader::initiateDataUpdate( QString name, QByteArray data )
 {
 	QFile file( m_dir + "/" + name + ".xml" );
 	file.open( QFile::WriteOnly );
 	file.write( data );
 	file.close( );
-	emit dataSaved( name );
+	emit dataUpdated( name );
 }
 
 void FileDataLoader::initiateDataDelete( QString name )

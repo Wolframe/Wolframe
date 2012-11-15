@@ -13,23 +13,32 @@ SqliteDataLoader::SqliteDataLoader( QString dbName )
 {
 }
 
-void SqliteDataLoader::initiateDataLoad( QString name )
+void SqliteDataLoader::initiateDataCreate( QString name, QByteArray data )
+{
+	//~ QFile file( m_dir + "/" + name + ".xml" );
+	//~ file.open( QFile::WriteOnly );
+	//~ file.write( data );
+	//~ file.close( );
+	//~ emit dataCreated( name );
+}
+
+void SqliteDataLoader::initiateDataRead( QString name )
 {
 //~ // read directly here and stuff data into the signal
 	//~ QFile file( m_dir + "/" + name + ".xml" );
 	//~ file.open( QFile::ReadOnly );
 	//~ QByteArray data = file.readAll( );
 	//~ file.close( );	
-	//~ emit dataLoaded( name, data );
+	//~ emit dataRead( name, data );
 }
 
-void SqliteDataLoader::initiateDataSave( QString name, QByteArray data )
+void SqliteDataLoader::initiateDataUpdate( QString name, QByteArray data )
 {
 	//~ QFile file( m_dir + "/" + name + ".xml" );
 	//~ file.open( QFile::WriteOnly );
 	//~ file.write( data );
 	//~ file.close( );
-	//~ emit dataSaved( name );
+	//~ emit dataUpdated( name );
 }
 
 void SqliteDataLoader::initiateDataDelete( QString name )

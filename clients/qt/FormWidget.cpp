@@ -59,12 +59,14 @@ void FormWidget::initializeNormal( )
 		this, SLOT( formListLoaded( QStringList ) ) );
 
 // link the data loader to our form widget
-	connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
-		this, SLOT( dataLoaded( QString, QByteArray ) ) );
-	connect( m_dataLoader, SIGNAL( dataSaved( QString ) ),
-		this, SLOT( dataSaved( QString ) ) );
+	connect( m_dataLoader, SIGNAL( dataCreated( QString ) ),
+		this, SLOT( slotDataCreated( QString ) ) );
+	connect( m_dataLoader, SIGNAL( dataRead( QString, QByteArray ) ),
+		this, SLOT( slotDataRead( QString, QByteArray ) ) );
+	connect( m_dataLoader, SIGNAL( dataUpdated( QString ) ),
+		this, SLOT( slotDataUpdated( QString ) ) );
 	connect( m_dataLoader, SIGNAL( dataDeleted( QString ) ),
-		this, SLOT( dataDeleted( QString ) ) );
+		this, SLOT( slotDataDeleted( QString ) ) );
 
 // link the data loader to the data handler
 	connect( m_dataLoader, SIGNAL( domainDataLoaded( QString, QString, QByteArray ) ),
@@ -335,7 +337,15 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	emit formLoaded( m_form );
 }
 
-void FormWidget::dataLoaded( QString name, QByteArray xml )
+void FormWidget::slotDataCreated( QString name )
+{	
+// that's not us
+	if( name != m_form ) return;
+
+	qDebug( ) << "Created data for form " << name;
+}
+
+void FormWidget::slotDataRead( QString name, QByteArray xml )
 {
 // that's not us
 	if( name != m_form ) return;
@@ -346,15 +356,15 @@ void FormWidget::dataLoaded( QString name, QByteArray xml )
 	m_dataHandler->readFormData( name, m_ui, xml );
 }
 
-void FormWidget::dataSaved( QString name )
+void FormWidget::slotDataUpdated( QString name )
 {	
 // that's not us
 	if( name != m_form ) return;
 
-	qDebug( ) << "Saved data for form " << name;
+	qDebug( ) << "Updated data for form " << name;
 }
 
-void FormWidget::dataDeleted( QString name )
+void FormWidget::slotDataDeleted( QString name )
 {
 // that's not us
 	if( name != m_form ) return;
@@ -377,7 +387,7 @@ void FormWidget::actionCreate( QHash<QString, QString> *props )
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_form, m_ui, &xml );
 	
-	m_dataLoader->initiateDataSave( m_form, xml );
+	m_dataLoader->initiateDataUpdate( m_form, xml );
 }
 
 void FormWidget::actionUpdate( QHash<QString, QString> *props )
@@ -387,14 +397,14 @@ void FormWidget::actionUpdate( QHash<QString, QString> *props )
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_form, m_ui, &xml );
 	
-	m_dataLoader->initiateDataSave( m_form, xml );
+	m_dataLoader->initiateDataUpdate( m_form, xml );
 }
 
 void FormWidget::actionRead( QHash<QString, QString> *props )
 {
 	qDebug( ) << "Reading data for form " << m_form << "[" << *props << "]";
 	
-	m_dataLoader->initiateDataLoad( m_form );
+	m_dataLoader->initiateDataRead( m_form );
 }
 
 void FormWidget::actionDelete( QHash<QString, QString> *props )
