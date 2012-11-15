@@ -15,29 +15,21 @@
 #include <QHBoxLayout>
 #include <QSignalMapper>
 #include <QLabel>
+#include <QHash>
 
 class WidgetProperties : public QObject
 {
 	Q_OBJECT
 	
 	public:
-		WidgetProperties( ) : m_action( ), m_nextForm( ) { }
-		
-		void setNextForm( const QString &_nextForm ) { m_nextForm = _nextForm; }
-		QString nextForm( ) const { return m_nextForm; }
-		void setAction( const QString &_action ) { m_action = _action; }
-		QString action( ) const { return m_action; }
-
-		QString toString( ) const
-		{
-			return QString( "[nextForm %1, action %2]" ).arg( m_nextForm ).arg( m_action );
-		}
+		WidgetProperties( QHash<QString, QString> *_props = 0 ) : m_props( _props ) { }
+	
+		QHash<QString, QString> *props( ) { return m_props; }
 		
 	private:
-		QString m_action;		// action to execute
-		QString m_nextForm;		// next form to show
-};
-		
+		QHash<QString, QString> *m_props;
+};               
+
 class FormWidget : public QWidget
 {
 	Q_OBJECT
@@ -83,6 +75,7 @@ class FormWidget : public QWidget
 		void initializeNormal( );
 		void initializeDesigner( );
 		QString readDynamicStringProperty( QObject *o, const char *name );
+		void readDynamicStringProperties( QHash<QString, QString> *props, QObject *obj );
 	
 	signals:
 		void formLoaded( QString name );
@@ -98,10 +91,10 @@ class FormWidget : public QWidget
 		void formDomainLoaded( QString form_name, QString widget_name, QByteArray data );
 
 		void switchForm( QObject *object );
-		void actionCreate( );
-		void actionUpdate( );
-		void actionRead( );
-		void actionDelete( );
+		void actionCreate( QHash<QString, QString> *props );
+		void actionUpdate( QHash<QString, QString> *props );
+		void actionRead( QHash<QString, QString> *props );
+		void actionDelete( QHash<QString, QString> *props );
 };
 	
 #endif // _FORM_WIDGET_HPP_INCLUDED

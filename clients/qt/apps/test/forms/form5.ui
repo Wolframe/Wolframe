@@ -85,7 +85,7 @@
          <string notr="true">form5_create</string>
         </property>
         <property name="vegetableId" stdset="0">
-         <string>{vegetable.currentIndex}</string>
+         <string>{vegetable.vegetable[currentIndex]}</string>
         </property>
        </widget>
       </item>
@@ -98,7 +98,7 @@
          <string notr="true">form5_update</string>
         </property>
         <property name="vegetableId" stdset="0">
-         <string>{vegetable.currentIndex}</string>
+         <string>{vegetable.vegetable[currentIndex]}</string>
         </property>
        </widget>
       </item>
@@ -111,7 +111,7 @@
          <string notr="true">delete</string>
         </property>
         <property name="vegetableId" stdset="0">
-         <string>{vegetable.currentIndex}</string>
+         <string>{vegetable.vegetable[currentIndex]}</string>
         </property>
        </widget>
       </item>
