@@ -16,7 +16,7 @@ FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoa
 	: QWidget( _parent ), m_mode( RunMode ), m_form( ),
 	  m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
 	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_dataHandler( 0 ),
-	  m_locale( DEFAULT_LOCALE ), m_forms( )
+	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( )
 {
 	initializeNormal( );	
 }
@@ -24,19 +24,21 @@ FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoa
 FormWidget::FormWidget( FormWidgetMode _mode, QWidget *_parent )
 	: QWidget( _parent ), m_mode( _mode ), m_form( ),
 	  m_uiLoader( 0 ), m_formLoader( 0 ), m_dataLoader( 0 ),
-	  m_ui( 0 ), m_dataHandler( 0 )
+	  m_ui( 0 ), m_dataHandler( 0 ),
+	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( )
 {
 	initializeDesigner( );
 }
 
 void FormWidget::initializeDesigner( )
 {
-	QHBoxLayout *l = new QHBoxLayout( this );
-	l->setMargin( 0 );
+	m_layout = new QHBoxLayout( this );
+	m_layout->setMargin( 0 );
 	
 	m_text = new QLabel( m_form.isNull( ) ? tr( "<no name>" ) : m_form );
 	m_text->setFrameStyle( QFrame::Box );
-	l->addWidget( m_text );
+	
+	m_layout->addWidget( m_text );
 }
 
 void FormWidget::initializeNormal( )
@@ -44,7 +46,9 @@ void FormWidget::initializeNormal( )
 // maps data between constructed widgets from .ui and the data loader
 	m_dataHandler = new DataHandler( m_dataLoader );	
 
-	m_layout = new QHBoxLayout( this );
+	if( !m_layout ) {
+		m_layout = new QHBoxLayout( this );
+	}
 	
 // link the form loader for form loader notifications
 	connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
@@ -149,7 +153,6 @@ void FormWidget::setForm( const QString &_form )
 			break;
 		
 		case RunMode:
-			m_form = _form;
 			loadForm( _form );
 			break;
 	}
@@ -163,6 +166,8 @@ QString FormWidget::form( ) const
 void FormWidget::loadForm( QString name )
 {
 	if( !m_formLoader ) return;
+
+	if( name == m_form ) return;
 	
 // indicate busy state
 	qApp->setOverrideCursor( Qt::BusyCursor );
@@ -252,47 +257,23 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		oldUi->deleteLater( );
 		oldUi->setParent( 0 );
 	}
-	m_ui->show( );	
+	m_ui->show( );
 
 // set localization now
 	qDebug( ) << "Starting to load localization for form" << name;
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 
-// initiate load of form data
-	//qDebug( ) << "Initiating loading of form data for form " << name;
-	//m_dataLoader->initiateDataLoad( name );
-
-#if 0
 // sub form widgets have to be propertly initialized with the data/form and
 // ui loaders and their signals have to be wired to our form widget
 	qDebug( ) << "Checking for subforms in form" << name << ", wire them as necessary";
 	QList<FormWidget *> subforms = m_ui->findChildren<FormWidget *>( );
 	foreach( FormWidget *subform, subforms ) {
-// link the form loader for form loader notifications
-		connect( m_formLoader, SIGNAL( formLoaded( QString, QByteArray ) ),
-			subform, SLOT( formLoaded( QString, QByteArray ) ) );	
-		connect( m_formLoader, SIGNAL( formLocalizationLoaded( QString, QByteArray ) ),
-			subform, SLOT( formLocalizationLoaded( QString, QByteArray ) ) );	
-		connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
-			subform, SLOT( formListLoaded( QStringList ) ) );
-
-// link the data loader to our form widget
-		connect( m_dataLoader, SIGNAL( dataLoaded( QString, QByteArray ) ),
-			subform, SLOT( dataLoaded( QString, QByteArray ) ) );
-		connect( m_dataLoader, SIGNAL( dataSaved( QString ) ),
-			subform, SLOT( dataSaved( QString ) ) );
-		connect( m_dataLoader, SIGNAL( dataDeleted( QString ) ),
-			subform, SLOT( dataDeleted( QString ) ) );
-
-// link the data loader to the data handler
-		connect( m_dataLoader, SIGNAL( domainDataLoaded( QString, QString, QByteArray ) ),
-			subform, SLOT( formDomainLoaded( QString, QString, QByteArray ) ) );
-			
 		subform->setFormLoader( m_formLoader );
 		subform->setDataLoader( m_dataLoader );
 		subform->setUiLoader( m_uiLoader );
+		subform->initializeNormal( );
+		subform->m_text->hide( );		
 	}
-#endif
 
 // connect actions and forms
 // connect push buttons with form names to loadForms

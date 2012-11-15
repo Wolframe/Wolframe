@@ -92,7 +92,7 @@
          <string>Reset</string>
         </property>
         <property name="action" stdset="0">
-         <string notr="true">get</string>
+         <string notr="true">read</string>
         </property>
        </widget>
       </item>

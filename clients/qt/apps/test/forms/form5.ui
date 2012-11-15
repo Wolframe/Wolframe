@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>496</width>
+    <width>594</width>
     <height>373</height>
    </rect>
   </property>
@@ -84,6 +84,9 @@
         <property name="form" stdset="0">
          <string notr="true">form5_create</string>
         </property>
+        <property name="vegetableId" stdset="0">
+         <string>{vegetable.currentIndex}</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -94,6 +97,9 @@
         <property name="form" stdset="0">
          <string notr="true">form5_update</string>
         </property>
+        <property name="vegetableId" stdset="0">
+         <string>{vegetable.currentIndex}</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -103,6 +109,9 @@
         </property>
         <property name="action" stdset="0">
          <string notr="true">delete</string>
+        </property>
+        <property name="vegetableId" stdset="0">
+         <string>{vegetable.currentIndex}</string>
         </property>
        </widget>
       </item>
@@ -125,7 +134,7 @@
     <rect>
      <x>339</x>
      <y>10</y>
-     <width>141</width>
+     <width>241</width>
      <height>311</height>
     </rect>
    </property>
