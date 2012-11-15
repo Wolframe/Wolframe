@@ -17,9 +17,14 @@ opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
 opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
 opt="$opt --program=DBPRG.tdl"
 demopath=../../../examples/demo/configurator
+luascript=transaction_sqlite_configurator.lua
+genscript=../scripts/$luascript
 projectpath=../../../examples/demo/configurator/program
-testscripts=$projectpath/configurator.lua
-testcmd="$opt addCategoryHierarchy"			# command to execute by the test
+cat $projectpath/configurator.lua > $genscript
+echo >> $genscript
+cat scripts/$luascript >> $genscript
+testscripts="$luascript"
+testcmd="$opt run"					# command to execute by the test
 docin=$testname.in					# input document name
 docout=''						# output document name
 dumpout="program/$testname.dbdump.txt"			# resource dump to add to expected test output

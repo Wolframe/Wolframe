@@ -79,11 +79,10 @@ local function print_tree( tree, nodeid, indent)
 	output:closetag()
 end
 
-local function select_tree( tablename)
+local function select_tree( tablename, itr)
 	filter().empty = false
-	output:as( "tree 'hierarchy" .. tablename .. "'")
 	output:opentag( "tree")
-	for v,t in input:get() do
+	for v,t in itr do
 		if t == "id" then
 			local id = tonumber( v)
 			print_tree( get_tree( tablename, id), id, "")
@@ -93,16 +92,17 @@ local function select_tree( tablename)
 end
 
 function selectCategoryHierarchy()
+	output:as( "tree 'hierarchyCategory")
 	select_tree( "Category")
 end
 
 function selectFeatureHierarchy()
+	output:as( "tree 'hierarchyFeature")
 	select_tree( "Feature")
 end
 
-local function add_tree( tablename)
+local function add_tree( tablename, itr)
 	filter().empty = false
-	local itr = input:get()
 	for v,t in itr do
 		if t == "node" then
 			insert_tree_topnode( tablename, scope( itr))
@@ -111,10 +111,17 @@ local function add_tree( tablename)
 end
 
 function addCategoryHierarchy()
-	add_tree( "Category")
+	add_tree( "Category", input:get())
 end
 
 function addFeatureHierarchy()
-	add_tree( "Feature")
+	add_tree( "Feature", input:get())
 end
 
+function selectCategoryHierarchy()
+	select_tree( "Category", input:get())
+end
+
+function selectFeatureHierarchy()
+	select_tree( "Feature", input:get())
+end
