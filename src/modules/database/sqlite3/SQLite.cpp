@@ -192,8 +192,7 @@ const UI::UserInterfaceLibrary* SQLiteDatabase::UIlibrary() const
 /*****  SQLite transaction  *******************************************/
 SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database )
 	: m_db( database ), m_unit( database.dbUnit() )
-{
-}
+{}
 
 const std::string& SQLiteTransaction::databaseID() const
 {

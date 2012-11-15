@@ -1,3 +1,11 @@
+DOCTYPE "category Category"
+{
+	category
+	{
+		parentid int
+		name string
+	}
+}
 DOCTYPE "category addCategoryRoot"
 {
 	category

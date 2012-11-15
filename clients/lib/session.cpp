@@ -88,9 +88,9 @@ void Session::requestCallback( void* this_, const Protocol::Event& event)
 	}
 }
 
-bool Session::doRequest( RequestHandler* handler, const char* data, std::size_t datasize)
+bool Session::doRequest( RequestHandler* handler, const std::string& request, const char* data, std::size_t datasize)
 {
-	bool rt = m_impl->m_protocol.pushRequest( requestCallback, handler, data, datasize);
+	bool rt = m_impl->m_protocol.pushRequest( requestCallback, handler, request, data, datasize);
 	m_impl->m_connection.post_request();
 	return rt;
 }

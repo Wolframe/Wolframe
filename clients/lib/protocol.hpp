@@ -109,9 +109,10 @@ public:
 	///\brief Push a request that will be served when the session is established
 	///\param[in] notifier_ to return answer to
 	///\param[in] requestobject_ handler for request answer
+	///\param[in] request_ request type
 	///\param[in] data_ request data (decrypted plain data)
 	///\param[in] datasize_ size of data in bytes
-	bool pushRequest( AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_);
+	bool pushRequest( AnswerCallback notifier_, void* requestobject_, const std::string& request_, const char* data_, std::size_t datasize_);
 
 	///\brief Push a quit request that closes the queue for further requests and closes the session when all pending requests are processed
 	void doQuit();

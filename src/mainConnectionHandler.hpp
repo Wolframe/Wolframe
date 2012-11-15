@@ -76,7 +76,7 @@ private:
 
 private:
 	AuthMechanisms m_authMechanisms;
-	std::string m_doctype;
+	std::string m_command;
 	std::vector<std::string> m_authtickets;
 };
 

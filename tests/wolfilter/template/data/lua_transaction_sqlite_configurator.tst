@@ -19,8 +19,8 @@ opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=D
 opt="$opt --program=DBPRG.tdl"
 demopath=../../../examples/demo/configurator
 genscript=../scripts/$luascript
-projectpath=../../../examples/demo/configurator/program
-cat $projectpath/configurator.lua > $genscript
+projectpath=../../../examples/demo/configurator
+cat $projectpath/program/configurator.lua > $genscript
 echo >> $genscript
 cat scripts/$luascript >> $genscript
 testscripts="$luascript"
@@ -32,10 +32,10 @@ testdata="
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
 **file: DBDATA
-`cat ../../../examples/demo/configurator/database/schema_sqlite.sql`
+`cat $projectpath/database/schema_sqlite.sql`
 **file:DBPRG.tdl
-`cat ../../../examples/demo/configurator/program/category.tdl`
-`cat ../../../examples/demo/configurator/program/feature.tdl`
+`cat $projectpath/program/category.tdl`
+`cat $projectpath/program/feature.tdl`
 **outputfile:DBDUMP"
 csetlist="UTF-8"
 . ./output_tst_all.sh

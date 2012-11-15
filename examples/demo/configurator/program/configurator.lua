@@ -13,6 +13,7 @@ local function insert_itr( tablename, parentid, itr)
 			insert_itr( tablename, id, scope( itr))
 		end
 	end
+	return id
 end
 
 local function insert_topnode( tablename, name, parentid)
@@ -21,7 +22,8 @@ local function insert_topnode( tablename, name, parentid)
 		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name} )
 		return 1
 	else
-		return formfunction( "add" .. tablename)( {normalizedName=nname, name=name, parentid=parentid} ):table().ID
+		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, parentid=parentid} ):table().ID
+		return id
 	end
 end
 
@@ -84,19 +86,48 @@ local function select_tree( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			local id = tonumber( v)
-			print_tree( get_tree( tablename, id), id, "")
+			local tr = get_tree( tablename, id)
+			print_tree( tr, id, "")
 		end
 	end
 end
 
-function selectCategoryHierarchy()
-	output:as( "node SYSTEM 'hierarchyCategory.simpleform'")
-	select_tree( "Category")
+local function edit_node( tablename, itr)
+	local name = nil;
+	local nname = nil;
+	local id = nil;
+	for v,t in itr do
+		if t == "id" then
+			id = v
+		elseif t ==  "name" then
+			name = v
+			nname = normalizeName( name)
+		end
+	end
+	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, id=id} )
 end
 
-function selectFeatureHierarchy()
-	output:as( "node SYSTEM 'hierarchyFeature.simpleform'")
-	select_tree( "Feature")
+local function delete_node( tablename, itr)
+	local id = nil;
+	for v,t in itr do
+		if t == "id" then
+			id = v
+		end
+	end
+	formfunction( "delete" .. tablename)( {id=id} )
+end
+
+local function create_node( tablename, itr)
+	local name = nil;
+	local parentid = nil;
+	for v,t in itr do
+		if t == "parent" then
+			parentid = v
+		elseif t ==  "name" then
+			name = v
+		end
+	end
+	insert_topnode( tablename, name, parentid)
 end
 
 local function add_tree( tablename, itr)
@@ -106,6 +137,16 @@ local function add_tree( tablename, itr)
 			insert_tree_topnode( tablename, scope( itr))
 		end
 	end
+end
+
+function CategoryHierarchyRequest()
+	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	select_tree( "Category")
+end
+
+function FeatureHierarchyRequest()
+	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	select_tree( "Feature")
 end
 
 function pushCategoryHierarchy()
@@ -123,3 +164,40 @@ end
 function FeatureHierarchyRequest()
 	select_tree( "Feature", input:get())
 end
+
+function editCategory()
+	edit_node( "Category", input:get())
+	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	select_tree( "Category")
+end
+
+function editFeature()
+	edit_node( "Feature", input:get())
+	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	select_tree( "Feature")
+end
+
+function deleteCategory()
+	delete_node( "Category", input:get())
+	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	select_tree( "Category")
+end
+
+function deleteFeature()
+	delete_node( "Feature", input:get())
+	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	select_tree( "Feature")
+end
+
+function createCategory()
+	create_node( "Category", input:get())
+	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	select_tree( "Category")
+end
+
+function createFeature()
+	create_node( "Feature", input:get())
+	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	select_tree( "Feature")
+end
+

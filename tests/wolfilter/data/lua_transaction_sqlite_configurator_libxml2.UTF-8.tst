@@ -73,6 +73,12 @@
 <CategoryHierarchyRequest><category id="43"/></CategoryHierarchyRequest>
 <CategoryHierarchyRequest><category id="33"/></CategoryHierarchyRequest>
 <CategoryHierarchyRequest><category id="16"/></CategoryHierarchyRequest>
+<editCategory><category id="46" name="Wireless network component"/></editCategory>
+<vdeleteCategory><category id="42"/></vdeleteCategory>
+<vdeleteCategory><category id="22"/></vdeleteCategory>
+<vdeleteCategory><category id="7"/></vdeleteCategory>
+<createCategory><category id="7" name="Device from outer space" parent="1"/></createCategory>
+<CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
 </test>**config
 --input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
@@ -237,7 +243,7 @@ BEGIN
 	DO UPDATE Category SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parent, name, normalizedName, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE lft = $1;
+	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
 END
 
 --
@@ -249,6 +255,14 @@ BEGIN
 	DO DELETE FROM Category WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Category SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE Category SET rgt = rgt-$3 WHERE rgt>$2;
+END
+
+--
+-- updateCategory
+--
+TRANSACTION updateCategory -- (id, name, normalizedName)
+BEGIN
+	DO UPDATE Category SET name = $(name),normalizedName = $(normalizedName) WHERE ID = $(id);
 END
 
 --
@@ -315,6 +329,14 @@ BEGIN
 END
 
 --
+-- updteFeature
+--
+TRANSACTION updateFeature -- (id, name, normalizedName)
+BEGIN
+	DO UPDATE Feature SET name = $(name),normalizedName = $(normalizedName) WHERE ID = $(id);
+END
+
+--
 -- selectFeature       :Get the feature
 -- selectFeatureByName :Get the feature by name
 --
@@ -363,6 +385,7 @@ local function insert_itr( tablename, parentid, itr)
 			insert_itr( tablename, id, scope( itr))
 		end
 	end
+	return id
 end
 
 local function insert_topnode( tablename, name, parentid)
@@ -371,7 +394,8 @@ local function insert_topnode( tablename, name, parentid)
 		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name} )
 		return 1
 	else
-		return formfunction( "add" .. tablename)( {normalizedName=nname, name=name, parentid=parentid} ):table().ID
+		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, parentid=parentid} ):table().ID
+		return id
 	end
 end
 
@@ -434,19 +458,48 @@ local function select_tree( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			local id = tonumber( v)
-			print_tree( get_tree( tablename, id), id, "")
+			local tr = get_tree( tablename, id)
+			print_tree( tr, id, "")
 		end
 	end
 end
 
-function selectCategoryHierarchy()
-	output:as( "node SYSTEM 'hierarchyCategory.simpleform'")
-	select_tree( "Category")
+local function edit_node( tablename, itr)
+	local name = nil;
+	local nname = nil;
+	local id = nil;
+	for v,t in itr do
+		if t == "id" then
+			id = v
+		elseif t ==  "name" then
+			name = v
+			nname = normalizeName( name)
+		end
+	end
+	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, id=id} )
 end
 
-function selectFeatureHierarchy()
-	output:as( "node SYSTEM 'hierarchyFeature.simpleform'")
-	select_tree( "Feature")
+local function delete_node( tablename, itr)
+	local id = nil;
+	for v,t in itr do
+		if t == "id" then
+			id = v
+		end
+	end
+	formfunction( "delete" .. tablename)( {id=id} )
+end
+
+local function create_node( tablename, itr)
+	local name = nil;
+	local parentid = nil;
+	for v,t in itr do
+		if t == "parent" then
+			parentid = v
+		elseif t ==  "name" then
+			name = v
+		end
+	end
+	insert_topnode( tablename, name, parentid)
 end
 
 local function add_tree( tablename, itr)
@@ -456,6 +509,16 @@ local function add_tree( tablename, itr)
 			insert_tree_topnode( tablename, scope( itr))
 		end
 	end
+end
+
+function CategoryHierarchyRequest()
+	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	select_tree( "Category")
+end
+
+function FeatureHierarchyRequest()
+	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	select_tree( "Feature")
 end
 
 function pushCategoryHierarchy()
@@ -474,6 +537,43 @@ function FeatureHierarchyRequest()
 	select_tree( "Feature", input:get())
 end
 
+function editCategory()
+	edit_node( "Category", input:get())
+	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	select_tree( "Category")
+end
+
+function editFeature()
+	edit_node( "Feature", input:get())
+	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	select_tree( "Feature")
+end
+
+function deleteCategory()
+	delete_node( "Category", input:get())
+	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	select_tree( "Category")
+end
+
+function deleteFeature()
+	delete_node( "Feature", input:get())
+	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	select_tree( "Feature")
+end
+
+function createCategory()
+	create_node( "Category", input:get())
+	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	select_tree( "Category")
+end
+
+function createFeature()
+	create_node( "Feature", input:get())
+	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	select_tree( "Feature")
+end
+
+
 
 function run()
 	filter().empty = false
@@ -489,6 +589,18 @@ function run()
 			select_tree( "Category", scope(itr))
 		elseif (t == "FeatureHierarchyRequest") then
 			select_tree( "Feature", scope(itr))
+		elseif (t == "editCategory") then
+			edit_node( "Category", scope(itr))
+		elseif (t == "editFeature") then
+			edit_node( "Feature", scope(itr))
+		elseif (t == "deleteCategory") then
+			delete_node( "Category", scope(itr))
+		elseif (t == "deleteFeature") then
+			delete_node( "Feature", scope(itr))
+		elseif (t == "createCategory") then
+			create_node( "Category", scope(itr))
+		elseif (t == "createFeature") then
+			create_node( "Feature", scope(itr))
 		end
 	end
 	output:closetag()
@@ -602,9 +714,70 @@ end
 	<node name="Microcontroller" id="48"/>
 	<node name="Smartdust" id="49"/>
 	<node name="Nanocomputer" id="50"/>
+</node><node name="computer" id="1">
+	<node name="Minicomputer" id="2">
+		<node name="Superminicomputer" id="3"/>
+		<node name="Minicluster" id="4"/>
+		<node name="Server (Minicomputer)" id="5"/>
+		<node name="Workstation (Minicomputer)" id="6"/>
+	</node>
+	<node name="Microcomputer" id="7">
+		<node name="Tower PC" id="8"/>
+		<node name="Mid-Tower PC" id="9"/>
+		<node name="Mini-Tower PC" id="10"/>
+		<node name="Server (Microcomputer)" id="11"/>
+		<node name="Workstation (Microcomputer)" id="12"/>
+		<node name="Personal computer" id="13"/>
+		<node name="Desktop computer" id="14"/>
+		<node name="Home computer" id="15"/>
+	</node>
+	<node name="Mobile" id="16">
+		<node name="Desknote" id="17"/>
+		<node name="Laptop" id="18">
+			<node name="Notebook" id="19">
+				<node name="Subnotebook" id="20"/>
+			</node>
+			<node name="Tablet personal computer" id="21"/>
+			<node name="slabtop computer" id="22">
+				<node name="Word-processing keyboard" id="23"/>
+				<node name="TRS-80 Model 100" id="24"/>
+			</node>
+			<node name="Handheld computer" id="25">
+				<node name="Ultra-mobile personal computer" id="26"/>
+				<node name="Personal digital assistant" id="27">
+					<node name="HandheldPC" id="28"/>
+					<node name="Palmtop computer" id="29"/>
+					<node name="Pocket personal computer" id="30"/>
+				</node>
+				<node name="Electronic organizer" id="31"/>
+				<node name="Pocket computer" id="32"/>
+				<node name="Calculator" id="33">
+					<node name="Graphing calculator" id="34"/>
+					<node name="Scientific calculator" id="35"/>
+					<node name="Programmable calculator" id="36"/>
+					<node name="Financial Calculator" id="37"/>
+				</node>
+				<node name="Handheld game console" id="38"/>
+				<node name="Portable media player" id="39"/>
+				<node name="Portable data terminal" id="40"/>
+				<node name="Information appliance" id="41">
+					<node name="QWERTY Smartphone" id="42"/>
+					<node name="Smartphone" id="43"/>
+				</node>
+			</node>
+			<node name="Wearable computer" id="44"/>
+		</node>
+		<node name="Single board computer" id="45"/>
+		<node name="Wireless network component" id="46"/>
+		<node name="Plug computer" id="47"/>
+		<node name="Microcontroller" id="48"/>
+		<node name="Smartdust" id="49"/>
+		<node name="Nanocomputer" id="50"/>
+	</node>
+	<node name="Device from outer space" id="51"/>
 </node></result>
 Category:
-'1', NULL, 'computer', 'computer', '1', '100'
+'1', NULL, 'computer', 'computer', '1', '102'
 '2', '1', 'Minicomputer', 'minicomputer', '2', '11'
 '3', '2', 'Superminicomputer', 'superminicomputer', '3', '4'
 '4', '2', 'Minicluster', 'minicluster', '5', '6'
@@ -649,14 +822,15 @@ Category:
 '43', '41', 'Smartphone', 'smartphone', '80', '81'
 '44', '18', 'Wearable computer', 'wearable computer', '84', '85'
 '45', '16', 'Single board computer', 'single board computer', '87', '88'
-'46', '16', 'Wireless sensor network component', 'wireless sensor network component', '89', '90'
+'46', '16', 'Wireless network component', 'wireless network component', '89', '90'
 '47', '16', 'Plug computer', 'plug computer', '91', '92'
 '48', '16', 'Microcontroller', 'microcontroller', '93', '94'
 '49', '16', 'Smartdust', 'smartdust', '95', '96'
 '50', '16', 'Nanocomputer', 'nanocomputer', '97', '98'
+'51', '1', 'Device from outer space', 'device from outer space', '100', '101'
 
 sqlite_sequence:
-'Category', '50'
+'Category', '51'
 
 Feature:
 

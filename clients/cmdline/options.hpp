@@ -53,7 +53,8 @@ public:
 	void print(std::ostream &) const;
 
 	const Session::Configuration& config() const			{return m_config;}
-	const std::vector<std::string>& request() const			{return m_request;}
+	const std::string& request() const				{return m_request;}
+	const std::vector<std::string>& document() const		{return m_document;}
 	const std::string& uiformdirectory() const			{return m_uiformdirectory;}
 	const std::string& outputfile() const				{return m_outputfile;}
 
@@ -62,7 +63,8 @@ private:
 	bool m_printversion;
 	std::string m_helpstring;
 	Session::Configuration m_config;
-	std::vector<std::string> m_request;
+	std::string m_request;
+	std::vector<std::string> m_document;
 	std::string m_uiformdirectory;
 	std::string m_outputfile;
 };

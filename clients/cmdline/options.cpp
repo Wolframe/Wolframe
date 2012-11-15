@@ -59,7 +59,8 @@ struct OptionStruct
 			( "help,h", "print help message")
 			( "uiformdir,u", boost::program_options::value<std::string>(), "directory containing the forms (where to write the uiforms to)")
 			( "outputfile,o", boost::program_options::value<std::string>(), "output file (where to write the request answers to)")
-			( "request,q", boost::program_options::value<std::vector<std::string> >(), "file containing a request to process")
+			( "request,q", boost::program_options::value<std::vector<std::string> >(), "type of requests to process")
+			( "document,d", boost::program_options::value<std::vector<std::string> >(), "file containing a document of a request to process")
 #ifdef WITH_SSL
 			( "ssl,S", "use SSL encryption")
 			( "CA-cert-file,C", boost::program_options::value<std::string>(), "certificate file containing the CA (default: ./certs/CAclient.cert.pem)")
@@ -84,7 +85,7 @@ WolframecCommandLine::WolframecCommandLine( int argc, char** argv)
 	static const OptionStruct ost;
 	std::string address = "127.0.0.1";
 	std::string name = "7661";
-	std::vector<std::string> requestfiles;
+	std::vector<std::string> documentfiles;
 	unsigned short connect_timeout = 30;
 	unsigned short read_timeout = 30;
 	std::string CA_cert_file = "./certs/CAclient.cert.pem";
@@ -104,13 +105,14 @@ WolframecCommandLine::WolframecCommandLine( int argc, char** argv)
 		if (vmap.count("read-timeout")) read_timeout = vmap[ "read-timeout"].as<unsigned short>();
 		if (vmap.count("host")) address = vmap[ "host"].as<std::string>();
 		if (vmap.count("port")) name = vmap[ "port"].as<std::string>();
-		if (vmap.count("request"))
+		if (vmap.count("request")) name = vmap[ "request"].as<std::string>();
+		if (vmap.count("document"))
 		{
-			requestfiles = vmap[ "request"].as< std::vector< std::string> >();
-			std::vector<std::string>::const_iterator ri = requestfiles.begin(), re = requestfiles.end();
+			documentfiles = vmap[ "document"].as< std::vector< std::string> >();
+			std::vector<std::string>::const_iterator ri = documentfiles.begin(), re = documentfiles.end();
 			for (; ri != re; ++ri)
 			{
-				m_request.push_back( readFile( *ri));
+				m_document.push_back( readFile( *ri));
 			}
 		}
 		if (vmap.count("uiformdir")) m_uiformdirectory = vmap[ "uiformdir"].as<std::string>();

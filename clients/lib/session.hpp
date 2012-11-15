@@ -77,7 +77,7 @@ public:
 	WOLFRAME_DLL_VISIBLE void start();
 	WOLFRAME_DLL_VISIBLE void quit();
 	WOLFRAME_DLL_VISIBLE void stop();
-	WOLFRAME_DLL_VISIBLE bool doRequest( RequestHandler* handler, const char* data, std::size_t datasize);
+	WOLFRAME_DLL_VISIBLE bool doRequest( RequestHandler* handler, const std::string& request, const char* data, std::size_t datasize);
 
 public://notification methods to be implemented by the session:
 	WOLFRAME_DLL_VISIBLE virtual void receiveUIForm( const char* id, const char* data, std::size_t datasize)=0;

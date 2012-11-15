@@ -1,5 +1,5 @@
 Category:
-'1', NULL, 'computer', 'computer', '1', '100'
+'1', NULL, 'computer', 'computer', '1', '102'
 '2', '1', 'Minicomputer', 'minicomputer', '2', '11'
 '3', '2', 'Superminicomputer', 'superminicomputer', '3', '4'
 '4', '2', 'Minicluster', 'minicluster', '5', '6'
@@ -44,14 +44,15 @@ Category:
 '43', '41', 'Smartphone', 'smartphone', '80', '81'
 '44', '18', 'Wearable computer', 'wearable computer', '84', '85'
 '45', '16', 'Single board computer', 'single board computer', '87', '88'
-'46', '16', 'Wireless sensor network component', 'wireless sensor network component', '89', '90'
+'46', '16', 'Wireless network component', 'wireless network component', '89', '90'
 '47', '16', 'Plug computer', 'plug computer', '91', '92'
 '48', '16', 'Microcontroller', 'microcontroller', '93', '94'
 '49', '16', 'Smartdust', 'smartdust', '95', '96'
 '50', '16', 'Nanocomputer', 'nanocomputer', '97', '98'
+'51', '1', 'Device from outer space', 'device from outer space', '100', '101'
 
 sqlite_sequence:
-'Category', '50'
+'Category', '51'
 
 Feature:
 

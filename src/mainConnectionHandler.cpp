@@ -209,11 +209,11 @@ int CommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out
 	if (error)
 	{
 		out << "ERR REQUEST " << error << endl();
-		LOG_ERROR << "error in execution of REQUEST " << m_doctype << ":" << (error?error:"unspecified error");
+		LOG_ERROR << "error in execution of REQUEST " << m_command << ":" << (error?error:"unspecified error");
 	}
 	else
 	{
-		out << "OK REQUEST " << m_doctype << endl();
+		out << "OK REQUEST " << m_command << endl();
 	}
 	return rt;
 }
@@ -255,55 +255,42 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 			out << "ERR doctype detection " << error << endl();
 		}
 	}
-	else if (doctype.empty())
+	if (!doctype.empty())
 	{
-		cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( "no document type defined");
+		m_command.append(doctype);
+	}
+	cmdbind::CommandHandler* execch = m_provider->cmdhandler( m_command);
+	if (!execch)
+	{
+		std::ostringstream msg;
+		msg << "no command handler for '" << m_command << "'";
+		execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
 		out << "ANSWER" << endl();
-		if (redirectConsumedInput( chnd, delegate_ch, out))
+		if (redirectConsumedInput( chnd, execch, out))
 		{
-			delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
+			delegateProcessing<&CommandHandler::endErrDocumentType>( execch);
 		}
 		else
 		{
-			out << "ERR no document type defined" << endl();
+			out << "ERR " << msg.str() << endl();
 		}
 	}
 	else
 	{
-		cmdbind::CommandHandler* execch = m_provider->cmdhandler( doctype);
-		if (!execch)
+		execch->passParameters( m_command, 0, 0);
+		execch->setProcProvider( m_provider);
+		out << "ANSWER" << endl();
+		if (redirectConsumedInput( chnd, execch, out))
 		{
-			std::ostringstream msg;
-			msg << "no command handler for '" << doctype << "'";
-			execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
-			out << "ANSWER" << endl();
-			if (redirectConsumedInput( chnd, execch, out))
-			{
-				delegateProcessing<&CommandHandler::endErrDocumentType>( execch);
-			}
-			else
-			{
-				out << "ERR " << msg.str() << endl();
-			}
+			delegateProcessing<&CommandHandler::endRequest>( execch);
+		}
+		else if (execch->lastError())
+		{
+			out << "ERR " << m_command << execch->lastError() << endl();
 		}
 		else
 		{
-			m_doctype = doctype;
-			execch->passParameters( doctype, 0, 0);
-			execch->setProcProvider( m_provider);
-			out << "ANSWER" << endl();
-			if (redirectConsumedInput( chnd, execch, out))
-			{
-				delegateProcessing<&CommandHandler::endRequest>( execch);
-			}
-			else if (execch->lastError())
-			{
-				out << "ERR " << execch->lastError() << endl();
-			}
-			else
-			{
-				out << "OK REQUEST" << endl();
-			}
+			out << "OK REQUEST " << m_command << endl();
 		}
 	}
 	return stateidx();
@@ -311,7 +298,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 
 int CommandHandler::doRequest( int argc, const char** argv, std::ostream& out)
 {
-	m_doctype.clear();
+	m_command.clear();
 	if (argc)
 	{
 		if (argc > 1)
@@ -321,32 +308,12 @@ int CommandHandler::doRequest( int argc, const char** argv, std::ostream& out)
 		}
 		else
 		{
-			cmdbind::CommandHandler* ch = m_provider->cmdhandler( argv[0]);
-			if (!ch)
-			{
-				std::ostringstream msg;
-				msg << "undefined command handler for document type '" << argv[0] << "'";
-				ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
-				out << "ANSWER" << endl();
-				delegateProcessing<&CommandHandler::endErrDocumentType>( ch);
-			}
-			else
-			{
-				m_doctype = argv[0];
-				ch->passParameters( m_doctype, 0, 0);
-				ch->setProcProvider( m_provider);
-				out << "ANSWER" << endl();
-				delegateProcessing<&CommandHandler::endRequest>( ch);
-			}
-			return stateidx();
+			m_command = argv[0];
 		}
 	}
-	else
-	{
-		CommandHandler* ch = (CommandHandler*)new cmdbind::DoctypeFilterCommandHandler();
-		delegateProcessing<&CommandHandler::endDoctypeDetection>( ch);
-		return stateidx();
-	}
+	CommandHandler* ch = (CommandHandler*)new cmdbind::DoctypeFilterCommandHandler();
+	delegateProcessing<&CommandHandler::endDoctypeDetection>( ch);
+	return stateidx();
 }
 
 void Connection::networkInput( const void* dt, std::size_t nofBytes)

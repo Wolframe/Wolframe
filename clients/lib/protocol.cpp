@@ -261,9 +261,10 @@ static int isequal( const char* aa, const char* bb)
 class Request
 {
 public:
-	Request( Protocol::AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_)
+	Request( Protocol::AnswerCallback notifier_, void* requestobject_, const std::string& type_, const char* data_, std::size_t datasize_)
 		:m_notifier(notifier_)
 		,m_requestobject(requestobject_)
+		,m_type(type_)
 		,m_data((char*)std::malloc(datasize_))
 		,m_datasize(datasize_)
 	{
@@ -271,11 +272,23 @@ public:
 		std::memcpy( m_data, data_, datasize_);
 	}
 
+	Request( const Request& o)
+		:m_notifier(o.m_notifier)
+		,m_requestobject(o.m_requestobject)
+		,m_type(o.m_type)
+		,m_data((char*)std::malloc(o.m_datasize))
+		,m_datasize(o.m_datasize)
+	{
+		if (!m_data) throw std::bad_alloc();
+		std::memcpy( m_data, o.m_data, m_datasize);
+	}
+
 	~Request()
 	{
 		if (m_data) std::free( m_data);
 	}
 
+	const char* type() const	{return m_type.empty()?0:m_type.c_str();}
 	const char* data() const	{return m_data;}
 	std::size_t datasize() const	{return m_datasize;}
 
@@ -287,6 +300,7 @@ public:
 private:
 	Protocol::AnswerCallback m_notifier;
 	void* m_requestobject;
+	std::string m_type;
 	char* m_data;
 	std::size_t m_datasize;
 };
@@ -351,9 +365,9 @@ public:
 		,m_bufferpos(0)
 		,m_state(ProtocolState::INIT){}
 
-	bool putRequest( Protocol::AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_)
+	bool putRequest( Protocol::AnswerCallback notifier_, void* requestobject_, const std::string& request_, const char* data_, std::size_t datasize_)
 	{
-		RequestR request( new Request( notifier_, requestobject_, data_, datasize_));
+		RequestR request( new Request( notifier_, requestobject_, request_, data_, datasize_));
 		boost::lock_guard<boost::mutex> lock(m_requestqueue_mutex);
 		if (!m_requestqueue_open) return false;
 		m_requestqueue.push_back( request);
@@ -425,7 +439,7 @@ public:
 
 	void notifyAnswerOk()
 	{
-		Protocol::Event event( Protocol::Event::ANSWER, 0, m_docbuffer.ptr(), m_docbuffer.size());
+		Protocol::Event event( Protocol::Event::ANSWER, m_request->type(), m_docbuffer.ptr(), m_docbuffer.size());
 		m_request->answer( event);
 		m_request.reset();
 		m_docbuffer.reset();
@@ -700,7 +714,18 @@ public:
 				{
 					m_docbuffer.reset();
 					state( ProtocolState::SESSION_REQUEST);
-					return OP_WRITE( "REQUEST\r\n");
+					if (m_request->type())
+					{
+						m_statearg.reset();
+						m_statearg.append( "REQUEST ");
+						m_statearg.append( m_request->type());
+						m_statearg.append( "\r\n");
+						return OP_WRITE( m_statearg.ptr(), m_statearg.size());
+					}
+					else
+					{
+						return OP_WRITE( "REQUEST\r\n");
+					}
 				}
 			}
 
@@ -725,6 +750,7 @@ public:
 				}
 
 			case ProtocolState::SESSION_REQUEST:
+				m_statearg.reset();
 				getContentEscaped( &m_docbuffer, m_request->data(), m_request->datasize());
 				state( ProtocolState::SESSION_ANSWER);
 				return OP_WRITE( m_docbuffer.ptr(), m_docbuffer.size());
@@ -831,9 +857,9 @@ Protocol::~Protocol()
 	delete m_impl;
 }
 
-bool Protocol::pushRequest( AnswerCallback notifier_, void* requestobject_, const char* data_, std::size_t datasize_)
+bool Protocol::pushRequest( AnswerCallback notifier_, void* requestobject_, const std::string& request_, const char* data_, std::size_t datasize_)
 {
-	return m_impl->putRequest( notifier_, requestobject_, data_, datasize_);
+	return m_impl->putRequest( notifier_, requestobject_, request_, data_, datasize_);
 }
 
 void Protocol::doQuit()

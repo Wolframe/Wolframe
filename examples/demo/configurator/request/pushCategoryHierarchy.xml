@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE test SYSTEM 'test.simpleform'>
-<test>
-<pushCategoryHierarchy>
+<!DOCTYPE node SYSTEM 'pushCategoryHierarchy.simpleform'>
 <node name="computer">
 	<node name="Minicomputer">
 		<node name="Superminicomputer"/>
@@ -63,15 +61,5 @@
 		<node name="Nanocomputer"/>
 	</node>
 </node>
-</pushCategoryHierarchy>
-<CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
-<CategoryHierarchyRequest><category id="43"/></CategoryHierarchyRequest>
-<CategoryHierarchyRequest><category id="33"/></CategoryHierarchyRequest>
-<CategoryHierarchyRequest><category id="16"/></CategoryHierarchyRequest>
-<editCategory><category id="46" name="Wireless network component"/></editCategory>
-<vdeleteCategory><category id="42"/></vdeleteCategory>
-<vdeleteCategory><category id="22"/></vdeleteCategory>
-<vdeleteCategory><category id="7"/></vdeleteCategory>
-<createCategory><category id="7" name="Device from outer space" parent="1"/></createCategory>
-<CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
-</test>
+
+

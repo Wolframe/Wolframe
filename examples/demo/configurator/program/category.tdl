@@ -15,7 +15,7 @@ BEGIN
 	DO UPDATE Category SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parent, name, normalizedName, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE lft = $1;
+	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
 END
 
 --
@@ -27,6 +27,14 @@ BEGIN
 	DO DELETE FROM Category WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Category SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE Category SET rgt = rgt-$3 WHERE rgt>$2;
+END
+
+--
+-- updateCategory
+--
+TRANSACTION updateCategory -- (id, name, normalizedName)
+BEGIN
+	DO UPDATE Category SET name = $(name),normalizedName = $(normalizedName) WHERE ID = $(id);
 END
 
 --

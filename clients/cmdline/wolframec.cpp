@@ -173,10 +173,10 @@ int main( int argc, char **argv )
 		CmdlineRequestHandler requesthandler( cmdline.outputfile());
 		session.start();
 
-		std::vector<std::string>::const_iterator qi = cmdline.request().begin(), qe = cmdline.request().end();
+		std::vector<std::string>::const_iterator qi = cmdline.document().begin(), qe = cmdline.document().end();
 		for (; qi != qe; ++qi)
 		{
-			if (!session.doRequest( &requesthandler, qi->c_str(), qi->size()))
+			if (!session.doRequest( &requesthandler, cmdline.request(), qi->c_str(), qi->size()))
 			{
 				std::cerr << "REQUEST ERROR service not ready" << std::endl;
 			}

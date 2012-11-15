@@ -1,3 +1,11 @@
+DOCTYPE "feature Feature"
+{
+	feature
+	{
+		parentid int
+		name name
+	}
+}
 DOCTYPE "feature addFeatureRoot"
 {
 	feature
