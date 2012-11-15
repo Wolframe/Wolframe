@@ -1,0 +1,27 @@
+All commands executed in 'examples/demo/configurator'
+with wolframed running with examples/demo/configurator/wolframe.conf
+
+../../../clients/cmdline/wolframec -q request/pushCategoryHierarchy.xml
+# Insert the whole example category tree
+# client protocol "REQUEST" (no arguments) with this document as content
+
+../../../clients/cmdline/wolframec -d request/CategoryHierarchyRequest.xml
+# Get the whole category tree
+# Returns the whole tree
+# client "REQUEST" (no arguments) with this document as content
+
+../../../clients/cmdline/wolframec -q create -d request/createCategory.xml
+# Create a new category node in the tree
+# Returns the whole updated tree
+# client "REQUEST create" with this document as content (example)
+
+../../../clients/cmdline/wolframec -q edit -d request/editCategory.xml
+# Update a node in the category tree
+# Returns the whole updated tree
+# client "REQUEST edit" with this document as content (example)
+
+../../../clients/cmdline/wolframec -q delete -d request/deleteCategory.xml
+# Delete a node and all its sub categories in the category tree
+# Returns the whole updated tree
+# client "REQUEST delete" with this document as content (example)
+
