@@ -54,6 +54,9 @@ class FormWidget : public QWidget
 	public:
 		QString form( ) const;
 		
+		static QString readDynamicStringProperty( QObject *o, const char *name );
+		static void readDynamicStringProperties( QHash<QString, QString> *props, QObject *obj );
+		
 	public slots:
 		void setForm( const QString &_form );
 			
@@ -74,8 +77,6 @@ class FormWidget : public QWidget
 	private:
 		void initializeNormal( );
 		void initializeDesigner( );
-		QString readDynamicStringProperty( QObject *o, const char *name );
-		void readDynamicStringProperties( QHash<QString, QString> *props, QObject *obj );
 		void sendRequest( QHash<QString, QString> *props );
 	
 	signals:

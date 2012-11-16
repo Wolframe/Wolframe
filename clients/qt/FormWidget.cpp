@@ -292,6 +292,10 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 // not busy anymore
 	qApp->restoreOverrideCursor( );
 
+// reset the form now, this also loads the domains
+	m_dataHandler->resetFormData( m_ui );
+	m_dataHandler->loadFormDomains( m_form, m_ui );
+
 // check for 'initAction'
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
 	readDynamicStringProperties( props, m_ui );

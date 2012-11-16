@@ -43,6 +43,7 @@
 		bool m_initializedSsl;
 #endif
 		QString m_answer;
+		QStringList m_params;
 		QString m_command;
 
 	public:
@@ -64,9 +65,10 @@
 		void sendCommand( QString command, QStringList params, QString content );
 
 // high-level commands
+		void capa( );
 		void auth( );
 		void mech( QString mech );
-		void request( QString content );
+		void request( QString type, QString content );
 
 		Q_PROPERTY( QString m_host READ host WRITE setHost )
 		QString host( ) const { return m_host; }
@@ -115,10 +117,11 @@
 		void resultReceived( );
 
 // high-level commands
+		void capasReceived( QStringList cataList );
 		void mechsReceived( QStringList mechList );
 		void authOk( );
 		void authFailed( );
-		void answerReceived( QString content );
+		void answerReceived( QStringList params, QString content );
 
 // high-level commands
 	};

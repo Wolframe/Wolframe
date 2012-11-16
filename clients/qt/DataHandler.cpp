@@ -26,7 +26,7 @@
 #include <QFile>
 
 #include "FileChooser.hpp"
-
+#include "FormWidget.hpp"
 
 DataHandler::DataHandler( DataLoader *_dataLoader ) : m_dataLoader( _dataLoader )
 {
@@ -229,6 +229,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 		
 		// TODO: widgets can also have custom properties for the domain handling
 		QHash<QString, QString> *props = new QHash<QString, QString>( );
+		FormWidget::readDynamicStringProperties( props, widget );
 		props->insert( "action", "read" );
 		if( clazz == "QComboBox" ) {
 			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
@@ -255,6 +256,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 		QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
+							
 			if( xml.isStartElement( ) && xml.name( ) == "value" ) {
 				QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 				comboBox->addItem( text );
