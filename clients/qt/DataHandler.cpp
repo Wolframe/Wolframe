@@ -32,15 +32,24 @@ DataHandler::DataHandler( DataLoader *_dataLoader ) : m_dataLoader( _dataLoader 
 {
 }
 
-void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *data )
+void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *data, QHash<QString, QString> *props )
 {
 	QXmlStreamWriter xml( data );
 	xml.setAutoFormatting( true );
 	xml.setAutoFormattingIndent( 2 );
 	
 	xml.writeStartDocument( );
-	xml.writeStartElement( form_name );
-
+	if( props->contains( "rootelement" ) && props->contains( "doctype" ) ) {
+		xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" )
+			.arg( props->value( "rootelement" ) )
+			.arg( props->value( "doctype" ) ) );
+	}
+	if( props->contains( "rootelement" ) ) {
+		xml.writeStartElement( props->value( "rootelement" ) );
+	} else {
+		xml.writeStartElement( form_name );
+	}
+	
 	QList<QWidget *> widgets = form->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
 		QString clazz = widget->metaObject( )->className( ); 

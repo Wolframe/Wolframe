@@ -394,7 +394,8 @@ void WolframeClient::request( QString type, QString content )
 
 void WolframeClient::handleResult( )
 {
-	qDebug( ) << "handle result of command" << m_command << "\nparams:" << m_params << "\n:answer:" << m_answer;
+	qDebug( ) << "handle result of command" << m_command;
+	//<< "\nparams:" << m_params << "\n:answer:" << m_answer;
 	if( m_command == "CONNECT" ) {
 		// swallow greeting line from server after connect
 		emit connected( );

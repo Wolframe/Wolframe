@@ -69,8 +69,16 @@ QString NetworkDataLoader::mapAction( QString action )
 	return QString( );
 }
 
-void NetworkDataLoader::handleCreate( QString name, QByteArray data, QHash<QString, QString> *props )
+void NetworkDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, QString> *props )
 {
+	qDebug( ) << "network request:\n" << xml;
+	
+// the doctype has also a ".simpleform" which doesn't come back?
+	QString docType = props->value( "doctype" );
+	QStringList p = docType.split( "." );
+	m_map->insert( p[0], qMakePair( name, QString( ) ) );
+	 
+	m_wolframeClient->request( mapAction( props->value( "action" ) ), xml );
 }
 
 void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props )
@@ -102,7 +110,7 @@ void NetworkDataLoader::handleDomainDataLoad( QString formName, QString widgetNa
 	xml.writeEndElement( );
 	xml.writeEndDocument( );
 
-	qDebug( ) << "network request:\n" << data;
+	//qDebug( ) << "network request:\n" << data;
 	
 // the doctype has also a ".simpleform" which doesn't come back?
 	QStringList p = docType.split( "." );
@@ -118,7 +126,7 @@ void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 // hash and receive it by doctype
 	QString docType = params[1];
 
-	qDebug( ) << "OK: answer in network data loader, doctype:" << docType << ":\n"<< content;
+	//qDebug( ) << "OK: answer in network data loader, doctype:" << docType << ":\n"<< content;
 	
 	if( !m_map->contains( docType ) ) {
 		qDebug( ) << "ERROR: answer for unknown request of doctype" << docType;
@@ -131,7 +139,7 @@ void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 	
 	m_map->remove( docType );
 	
-	qDebug( ) << "ANSWER for form" << formName << "and widget" << widgetName;
+	//qDebug( ) << "ANSWER for form" << formName << "and widget" << widgetName;
 	
 	emit answer( formName, widgetName, content.toUtf8( ) );
 }

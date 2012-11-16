@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QFrame>
+#include <QList>
 
 FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent )
 	: QWidget( _parent ), m_mode( RunMode ), m_form( ),
@@ -44,7 +45,10 @@ void FormWidget::initializeDesigner( )
 void FormWidget::initializeNormal( )
 {
 // maps data between constructed widgets from .ui and the data loader
-	m_dataHandler = new DataHandler( m_dataLoader );	
+	m_dataHandler = new DataHandler( m_dataLoader );
+
+// the session to pass variables between forms
+	m_session = new QHash< QString, QString >( );
 
 	if( !m_layout ) {
 		m_layout = new QHBoxLayout( this );
@@ -76,10 +80,31 @@ void FormWidget::formListLoaded( QStringList forms )
 	m_forms = forms;
 }
 
+void FormWidget::storeToSession( QHash<QString, QString> *props )
+{
+	foreach( const QString key, props->keys( ) ) {
+		if( key.startsWith( "session." ) ) {
+			QStringList parts = key.split( "." );
+			m_session->insert( parts[1], props->value( key ) );
+		}
+	}
+	
+	qDebug( ) << "SESSION:" << *m_session;
+}
+
+void FormWidget::restoreFromSession( QHash<QString, QString> *props )
+{
+	foreach( const QString key, m_session->keys( ) ) {
+		props->insert( key, m_session->value( key ) );
+	}
+}
+
 void FormWidget::switchForm( QObject *object )
 {
 	WidgetProperties *widgetProps = qobject_cast<WidgetProperties *>( object );
 	QHash<QString, QString> *props = widgetProps->props( );
+
+	storeToSession( props );
 	
 // execute the action (eventually)
 	sendRequest( props );
@@ -95,6 +120,7 @@ FormWidget::~FormWidget( )
 {
 	if( m_ui ) delete m_ui;
 	if( m_dataHandler ) delete m_dataHandler;
+	if( m_session ) delete m_session;
 }
 
 void FormWidget::setFormLoader( FormLoader *_formLoader )
@@ -153,6 +179,7 @@ void FormWidget::loadForm( QString name )
 // indicate busy state
 	qApp->setOverrideCursor( Qt::BusyCursor );
 
+	m_previousForm = m_form;
 	m_form = name;
 
 	qDebug( ) << "Initiating form load for " << m_form;
@@ -232,6 +259,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	if( m_ui == 0 ) {
 // something went wrong loading or constructing the form
 		m_ui = oldUi;
+		m_form = m_previousForm;
 		emit error( tr( "Unable to create form %1, does it exist?" ).arg( name ) );
 		return;
 	}
@@ -299,6 +327,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 // check for 'initAction'
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
 	readDynamicStringProperties( props, m_ui );
+	restoreFromSession( props );
 	if( props->contains( "initAction" ) ) {
 		QString initAction = props->value( "initAction" );
 		props->insert( "action", initAction );
@@ -316,7 +345,7 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 
 // go trought the widgets of the form and construct the request XML
 	QByteArray xml;
-	m_dataHandler->writeFormData( m_form, m_ui, &xml );
+	m_dataHandler->writeFormData( m_form, m_ui, &xml, props );
 
 // send request		
 	m_dataLoader->request( m_form, QString( ), xml, props );

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>491</width>
+    <width>477</width>
     <height>318</height>
    </rect>
   </property>
@@ -18,9 +18,12 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>281</width>
+     <width>451</width>
      <height>241</height>
     </rect>
+   </property>
+   <property name="itemsExpandable">
+    <bool>true</bool>
    </property>
    <property name="doctype" stdset="0">
     <string notr="true">CategoryHierarchyRequest.simpleform</string>
@@ -34,20 +37,71 @@
     </property>
    </column>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>260</y>
-     <width>83</width>
-     <height>24</height>
+     <width>281</width>
+     <height>31</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Add</string>
-   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="add">
+      <property name="text">
+       <string>Add</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">add</string>
+      </property>
+      <property name="session.id" stdset="0">
+       <string>{category.id}</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="delete_2">
+      <property name="text">
+       <string>Delete</string>
+      </property>
+      <property name="doctype" stdset="0">
+       <string notr="true">Category.simpleform</string>
+      </property>
+      <property name="rootelement" stdset="0">
+       <string notr="true">category</string>
+      </property>
+      <property name="action" stdset="0">
+       <string notr="true">delete</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">init</string>
+      </property>
+      <property name="id" stdset="0">
+       <string>{category.id}</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="edit">
+      <property name="text">
+       <string>Edit</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">edit</string>
+      </property>
+      <property name="session.id" stdset="0">
+       <string>16</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>category</tabstop>
+  <tabstop>delete_2</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

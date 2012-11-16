@@ -63,6 +63,7 @@ class FormWidget : public QWidget
 	private:
 		FormWidgetMode m_mode;		// run mode of the widget
 		QString m_form;			// name of the form
+		QString m_previousForm;
 		QUiLoader *m_uiLoader;		// UI loader to user for loading designer XML files
 		FormLoader *m_formLoader;	// form loader (visible form)
 		DataLoader *m_dataLoader;	// load and saves data (data form)
@@ -73,11 +74,14 @@ class FormWidget : public QWidget
 		QSignalMapper *m_signalMapper;	// delegate for form push buttons pointing to forms
 		QStringList m_forms;		// names of all currently loaded forms
 		QLabel *m_text;			// placeholder of form name in designer mode
+		QHash<QString, QString> *m_session;
 		
 	private:
 		void initializeNormal( );
 		void initializeDesigner( );
 		void sendRequest( QHash<QString, QString> *props );
+		void storeToSession( QHash<QString, QString> *props );
+		void restoreFromSession( QHash<QString, QString> *props );
 	
 	signals:
 		void formLoaded( QString name );
