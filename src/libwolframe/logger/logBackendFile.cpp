@@ -56,9 +56,9 @@ LogfileBackend::~LogfileBackend( )
 	}
 }
 
-void LogfileBackend::setLevel( const LogLevel::Level level )
+void LogfileBackend::setLevel( const LogLevel::Level level_ )
 {
-	logLevel_ = level;
+	logLevel_ = level_;
 }
 
 void LogfileBackend::setFilename( const std::string filename )

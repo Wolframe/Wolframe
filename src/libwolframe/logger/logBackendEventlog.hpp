@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackendEventlog.hpp
 /// \brief header file for logging to the Windows event logger
@@ -46,36 +45,35 @@
 #include <windows.h>
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	class EventlogBackend
-	{
-	public:
-		EventlogBackend( );
+class EventlogBackend
+{
+public:
+	EventlogBackend( );
 
-		~EventlogBackend( );
+	~EventlogBackend( );
 
-		void setLevel( const LogLevel::Level level );
+	void setLevel( const LogLevel::Level level );
 
-		void setLog( const std::string log );
+	void setLog( const std::string log );
 
-		void setSource( const std::string source );
+	void setSource( const std::string source );
 
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
+	void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
-		void reopen( );
+	void reopen( );
 
-	private:
-		LogLevel::Level logLevel_;
-		HANDLE eventSource_;
-		std::string log_;
-		std::string source_;
-		PSID sid_;
+private:
+	LogLevel::Level logLevel_;
+	HANDLE eventSource_;
+	std::string log_;
+	std::string source_;
+	PSID sid_;
 
-		void calculateSid( );		
-	};
+	void calculateSid( );
+};
 
-	} // namespace log
-} // namespace _Wolframe
+} // namespace _Wolframe::log
 
 #endif // _LOG_BACKEND_EVENTLOG_HPP_INCLUDED

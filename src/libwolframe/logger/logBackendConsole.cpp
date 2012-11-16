@@ -30,14 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackendConsole.cpp
 /// \brief implementation of the console backend
 ///
 
-// TODO: why!!!? logLevel.hpp with << definition should be enough
-#include "logger-v1.hpp"
 #include "logger/logLevel.hpp"
 #include "logBackendConsole.hpp"
 
@@ -56,9 +53,9 @@ ConsoleLogBackend::~ConsoleLogBackend( )
 	// nothing to do here
 }
 
-void ConsoleLogBackend::setLevel( const LogLevel::Level level )
+void ConsoleLogBackend::setLevel(const LogLevel::Level level_ )
 {
-	logLevel_ = level;
+	logLevel_ = level_;
 }
 
 void ConsoleLogBackend::log( const LogComponent /* component */, const LogLevel::Level level, const std::string& msg )

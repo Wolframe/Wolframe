@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackendEventlog.cpp
 /// \brief implementation of logging to the Windows event logger

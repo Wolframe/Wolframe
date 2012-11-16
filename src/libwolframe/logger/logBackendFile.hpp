@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackendFile.hpp
 /// \brief header file for the logger which logs to a simple logfile
@@ -50,31 +49,31 @@
 #endif // defined( _WIN32 )
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	class LogfileBackend
-	{
-	public:
-		LogfileBackend( );
+class LogfileBackend
+{
+public:
+	LogfileBackend( );
 
-		~LogfileBackend( );
+	~LogfileBackend( );
 
-		void setLevel( const LogLevel::Level level );
+	void setLevel( const LogLevel::Level level_ );
 
-		void setFilename( const std::string filename );
+	void setFilename( const std::string filename );
 
-		void reopen( );
+	void reopen( );
 
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
+	void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
-	private:
-		LogLevel::Level logLevel_;
-		std::ofstream logFile_;
-		std::string filename_;
-		bool isOpen_;
-	};
+	LogLevel::Level level() const	{ return logLevel_; }
+private:
+	LogLevel::Level logLevel_;
+	std::ofstream logFile_;
+	std::string filename_;
+	bool isOpen_;
+};
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log
 
 #endif // _LOG_BACKEND_FILE_HPP_INCLUDED

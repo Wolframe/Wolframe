@@ -30,14 +30,11 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackendWinDebug.cpp
 /// \brief implementation of the Windows debugging log backend
 ///
 
-// TODO: why!!!? logLevel.hpp with << definition should be enough
-#include "logger-v1.hpp"
 #include "logger/logLevel.hpp"
 #include "logBackendWinDebug.hpp"
 
@@ -47,7 +44,7 @@
 #include <windows.h>
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
 WinDebugLogBackend::WinDebugLogBackend( )
 {
@@ -80,5 +77,4 @@ void WinDebugLogBackend::reopen( )
 	// nothing to do here
 }
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log

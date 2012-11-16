@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackendWinDebug.hpp
 /// \brief header file for the windows debug backend
@@ -43,26 +42,25 @@
 #include "logger/logComponent.hpp"
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	class WinDebugLogBackend
-	{
-	public:
-		WinDebugLogBackend( );
+class WinDebugLogBackend
+{
+public:
+	WinDebugLogBackend( );
 
-		~WinDebugLogBackend( );
+	~WinDebugLogBackend( );
 
-		void setLevel( const LogLevel::Level level );
+	void setLevel( const LogLevel::Level level );
 
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
+	void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
-		void reopen( );
-		
-	private:
-		LogLevel::Level	logLevel_;
-	};
+	void reopen( );
 
-	} // namespace log
-} // namespace _Wolframe
+private:
+	LogLevel::Level	logLevel_;
+};
+
+}} // namespace _Wolframe::log
 
 #endif // _LOG_BACKEND_WINDEBUG_HPP_INCLUDED

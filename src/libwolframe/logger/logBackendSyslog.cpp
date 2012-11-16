@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackendSyslog.cpp
 /// \brief implementation of logging to syslog
@@ -67,7 +66,7 @@
 #define _LOG_ALERT	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_ALERT )
 #define _LOG_FATAL	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( _Wolframe::log::LogLevel::LOGLEVEL_FATAL )
 
-#include <cstring> 
+#include <cstring>
 
 #include <errno.h>
 #if !defined( _WIN32 )
@@ -77,7 +76,7 @@
 #endif
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
 SyslogBackend::SyslogBackend( )
 {
@@ -201,5 +200,4 @@ void SyslogBackend::reopen( )
 	openlog( ident_.c_str( ), LOG_PID, facility_ );
 }
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log

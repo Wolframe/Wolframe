@@ -93,7 +93,6 @@ private:
 #endif // _WIN32
 };
 
-} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log
 
 #endif // _LOG_BACKEND_IMPL_HPP_INCLUDED

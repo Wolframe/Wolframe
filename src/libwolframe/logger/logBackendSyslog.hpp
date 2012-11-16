@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackendSyslog.hpp
 /// \brief header file for the logging to syslog
@@ -44,32 +43,31 @@
 #include "logger/logSyslogFacility.hpp"
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	class SyslogBackend
-	{
-	public:
-		SyslogBackend( );
+class SyslogBackend
+{
+public:
+	SyslogBackend( );
 
-		~SyslogBackend( );
+	~SyslogBackend( );
 
-		void setLevel( const LogLevel::Level level );
+	void setLevel( const LogLevel::Level level );
 
-		void setFacility( const SyslogFacility::Facility facility );
+	void setFacility( const SyslogFacility::Facility facility );
 
-		void setIdent( const std::string ident );
+	void setIdent( const std::string ident );
 
-		void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
+	void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
 
-		void reopen( );
+	void reopen( );
 
-	private:
-		LogLevel::Level logLevel_;
-		int facility_;
-		std::string ident_;
-	};
+private:
+	LogLevel::Level logLevel_;
+	int facility_;
+	std::string ident_;
+};
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log
 
 #endif // _LOG_BACKEND_SYSLOG_HPP_INCLUDED
