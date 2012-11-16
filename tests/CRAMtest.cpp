@@ -47,7 +47,7 @@ TEST( CRAM, Challenge )
 {
 	_Wolframe::RandomGenerator::instance( "" );
 
-	unsigned char* pwdHash = (unsigned char*)"1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6";
+	const unsigned char* pwdHash = (const unsigned char*)"1841bac2def7cf53a978f0414aa8d5c3e7c4618899709c84fedcdcd6";
 	_Wolframe::AAAA::CRAMchallenge	challenge;
 	std::cout << challenge.toBCD();
 	_Wolframe::AAAA::CRAMresponse	resp1( challenge, pwdHash, 224 / 8 );
