@@ -293,18 +293,24 @@ void WolframeClient::dataAvailable( )
 // OK has a message, one liner
 				} else if( strncmp( buf, "OK", 2 ) == 0 ) {
 					if( len > 3 ) {
-						m_answer = QString( QByteArray( buf+3, len-3 ) );
+						QString paramLine = QString( QByteArray( buf+3, len-3 ) );
+						m_params = paramLine.split( " " );
 					}
 					emit resultReceived( );
 				} else if( strncmp( buf, "MECHS", 5 ) == 0 ) {
 					if( len > 6 ) {
-						m_answer = QString( QByteArray( buf+6, len-6 ) );
+						QString paramLine = QString( QByteArray( buf+6, len-6 ) );
+						m_params = paramLine.split( " " );
 					}
 					emit resultReceived( );
 				} else if( strncmp( buf, "ANSWER", 6 ) == 0 ) {
-					emit resultReceived( );
-				} else if( buf[0] == '.' && buf[1] == '\n' ) {
 					//emit resultReceived( );
+					m_answer = "";
+				} else if( buf[0] == '.' && buf[1] == '\n' ) {
+					// do not read that
+				} else if( buf[0] == '.' && buf[1] == '.' && buf[2] == '\n' ) {
+					// escaped dot
+					m_answer.append( "." );
 				} else {
 					m_answer.append( buf );
 				}
@@ -354,6 +360,17 @@ void WolframeClient::sendCommand( QString command, QStringList params )
 void WolframeClient::sendCommand( QString command, QStringList params, QString content )
 {
 	sendCommand( command, params );
+	
+	QStringList lines = content.split( "\n" );
+	foreach( QString line, lines ) {
+		sendLine( line );
+	}
+	sendLine( "." );
+}
+
+void WolframeClient::capa( )
+{
+	sendCommand( "CAPA" );
 }
 
 void WolframeClient::auth( )
@@ -368,30 +385,33 @@ void WolframeClient::mech( QString _mech )
 	sendCommand( "MECH", params );
 }
 
-void WolframeClient::request( QString content )
+void WolframeClient::request( QString type, QString content )
 {
-	sendCommand( "REQUEST", QStringList( ), content );
+	QStringList params;
+	params << type;
+	sendCommand( "REQUEST", params, content );
 }
 
 void WolframeClient::handleResult( )
 {
-	qDebug( ) << "handle result" << m_command << m_answer;
+	qDebug( ) << "handle result of command" << m_command << "\nparams:" << m_params << "\n:answer:" << m_answer;
 	if( m_command == "CONNECT" ) {
 		// swallow greeting line from server after connect
 		emit connected( );
 	} else if( m_command == "QUIT" ) {
 		emit disconnected( );
 	} else if( m_command == "AUTH" ) {
-		QStringList mechList = m_answer.split( " \t", QString::SkipEmptyParts );
-		emit mechsReceived( mechList );
+		emit mechsReceived( m_params );
 	} else if( m_command == "MECH" ) {
-		if( m_answer == "authorization" ) {
+		if( m_params[0] == "authorization" ) {
 			emit authOk( );
 		} else {
 			emit authFailed( );
 		}
+	} else if( m_command == "CAPA" ) {
+		emit capasReceived( m_params );
 	} else if( m_command == "REQUEST" ) {
-		emit answerReceived( m_answer );
+		emit answerReceived( m_params, m_answer );
 	}
 }
 

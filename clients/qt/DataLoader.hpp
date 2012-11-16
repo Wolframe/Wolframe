@@ -6,6 +6,7 @@
 #define _DATA_LOADER_INCLUDED
 
 #include <QByteArray>
+#include <QStringList>
 #include <QString>
 #include <QObject>
 #include <QHash>
@@ -18,6 +19,11 @@ class DataLoader : public QObject
 		virtual ~DataLoader( ) {};
 		
 		virtual void request( QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props ) = 0;
+
+	// for NetworkDataLoader
+	public slots:
+		virtual void gotAnswer( QStringList params, QString content ) { }
+		virtual void gotError( QString error ) { }
 	
 	Q_SIGNALS:
 		void answer( QString formName, QString widgetName, QByteArray xml );
