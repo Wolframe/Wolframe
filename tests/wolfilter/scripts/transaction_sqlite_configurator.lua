@@ -2,12 +2,29 @@ local function normalizeName( name)
 	return name:gsub("[^%s]+", string.lower):gsub("[%-()]+", " "):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
 end
 
+local function content_value( v, itr)
+	if v then
+		return v
+	end
+	for v,t in itr do
+		if t then
+			return nil
+		end
+		if v then
+			return v
+		end
+		return nil
+	end
+end
+
 local function insert_itr( tablename, parentid, itr)
 	local id = 1
 	local name = ""
+	local nname = ""
 	for v,t in itr do
 		if (t == "name") then
-			local nname = normalizeName( v)
+			name = content_value( v, itr)
+			nname = normalizeName( name)
 			id = formfunction( "add" .. tablename)( {name=v, normalizedName=nname, parentid=parentid} ):table().ID
 		elseif (t == "node") then
 			insert_itr( tablename, id, scope( itr))
@@ -35,7 +52,7 @@ local function insert_tree_topnode( tablename, itr)
 		if (t == "parent") then
 			parentid = tonumber( v)
 		elseif (t == "name") then
-			name = v
+			name = content_value( v, itr)
 		elseif (t == "node") then
 			if name then
 				id = insert_topnode( tablename, name, parentid)
@@ -118,7 +135,7 @@ local function edit_node( tablename, itr)
 		if t == "id" then
 			id = v
 		elseif t ==  "name" then
-			name = v
+			name = content_value( v, itr)
 			nname = normalizeName( name)
 		end
 	end
@@ -144,7 +161,8 @@ local function create_node( tablename, itr)
 		elseif t == "parent" then
 			parentid = v
 		elseif t ==  "name" then
-			name = v
+			name = content_value( v, itr)
+			nname = normalizeName( name)
 		end
 	end
 	insert_topnode( tablename, name, parentid)
@@ -161,12 +179,12 @@ end
 
 function CategoryHierarchyRequest()
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	select_tree( "Category")
+	select_tree( "Category", input:get())
 end
 
 function FeatureHierarchyRequest()
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	select_tree( "Feature")
+	select_tree( "Feature", input:get())
 end
 
 function pushCategoryHierarchy()

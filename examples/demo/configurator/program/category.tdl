@@ -16,6 +16,7 @@ BEGIN
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parent, name, normalizedName, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
+--	FOREACH picture DO INSERT INTO CategoryPicture (categoryid,id,link) VALUES ($1, $(id), $(link));
 END
 
 --
