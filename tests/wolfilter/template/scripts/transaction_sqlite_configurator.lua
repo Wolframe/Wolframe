@@ -25,6 +25,10 @@ function run()
 			create_node( "Category", scope(itr))
 		elseif (t == "createFeature") then
 			create_node( "Feature", scope(itr))
+		elseif (t == "CategoryRequest") then
+			select_node( "Category", "category", scope(itr))
+		elseif (t == "FeatureRequest") then
+			select_node( "Feature", "feature", scope(itr))
 		end
 	end
 	output:closetag()

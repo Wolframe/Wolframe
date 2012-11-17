@@ -38,20 +38,26 @@ BEGIN
 END
 
 --
--- selectCategory       :Get the category
--- selectCategoryByName :Get the category by name
+-- selectCategory                 :Get the category
+-- selectCategoryByName           :Get the category by name
+-- selectCategoryByNormalizedName :Get the category by name
+-- selectCategoryList             :Get a list of categories
 --
-TRANSACTION selectCategory -- (/category/id)
+TRANSACTION selectCategory -- (id)
 BEGIN
-	FOREACH /category INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Category WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Category WHERE ID = $(id);
 END
-TRANSACTION selectCategoryByName -- (/category/name)
+TRANSACTION selectCategoryByName -- (name)
 BEGIN
-	FOREACH /category INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Category WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Category WHERE name = $(name);
 END
-TRANSACTION selectCategoryByNormalizedName -- (/category/normalizedName)
+TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
-	FOREACH /category INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Category WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Category WHERE normalizedName = $(normalizedName);
+END
+TRANSACTION selectCategorySet -- (/category/id)
+BEGIN
+	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName FROM Category WHERE ID = $(id);
 END
 
 --

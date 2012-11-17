@@ -78,6 +78,7 @@
 <deleteCategory><category id="22"/></deleteCategory>
 <deleteCategory><category id="25"/></deleteCategory>
 <createCategory><category id="7" name="Device from outer space" parent="1"/></createCategory>
+<CategoryRequest><category id="46"/></CategoryRequest>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
 </test>**config
 --input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
@@ -266,20 +267,26 @@ BEGIN
 END
 
 --
--- selectCategory       :Get the category
--- selectCategoryByName :Get the category by name
+-- selectCategory                 :Get the category
+-- selectCategoryByName           :Get the category by name
+-- selectCategoryByNormalizedName :Get the category by name
+-- selectCategoryList             :Get a list of categories
 --
-TRANSACTION selectCategory -- (/category/id)
+TRANSACTION selectCategory -- (id)
 BEGIN
-	FOREACH /category INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Category WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Category WHERE ID = $(id);
 END
-TRANSACTION selectCategoryByName -- (/category/name)
+TRANSACTION selectCategoryByName -- (name)
 BEGIN
-	FOREACH /category INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Category WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Category WHERE name = $(name);
 END
-TRANSACTION selectCategoryByNormalizedName -- (/category/normalizedName)
+TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
-	FOREACH /category INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Category WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Category WHERE normalizedName = $(normalizedName);
+END
+TRANSACTION selectCategorySet -- (/category/id)
+BEGIN
+	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName FROM Category WHERE ID = $(id);
 END
 
 --
@@ -314,7 +321,7 @@ BEGIN
 	DO UPDATE Feature SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Feature SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Feature (parent, name, normalizedName, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from Feature WHERE lft = $1;
+	INTO . DO NONEMPTY UNIQUE SELECT ID from Feature WHERE normalizedName = $(normalizedName);
 END
 
 --
@@ -329,7 +336,7 @@ BEGIN
 END
 
 --
--- updteFeature
+-- updateFeature
 --
 TRANSACTION updateFeature -- (id, name, normalizedName)
 BEGIN
@@ -337,20 +344,26 @@ BEGIN
 END
 
 --
--- selectFeature       :Get the feature
--- selectFeatureByName :Get the feature by name
+-- selectFeature                 :Get the feature
+-- selectFeatureByName           :Get the feature by name
+-- selectFeatureByNormalizedName :Get the feature by name
+-- selectFeatureList             :Get a list of features
 --
-TRANSACTION selectFeature -- (/feature/id)
+TRANSACTION selectFeature -- (id)
 BEGIN
-	FOREACH /feature INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Feature WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE ID = $(id);
 END
-TRANSACTION selectFeatureByName -- (/feature/name)
+TRANSACTION selectFeatureByName -- (name)
 BEGIN
-	FOREACH /feature INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Feature WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE name = $(name);
 END
-TRANSACTION selectFeatureByNormalizedName -- (/feature/normalizedName)
+TRANSACTION selectFeatureByNormalizedName -- (normalizedName)
 BEGIN
-	FOREACH /feature INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Feature WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE normalizedName = $(normalizedName);
+END
+TRANSACTION selectFeatureSet -- (/feature/id)
+BEGIN
+	FOREACH /feature INTO feature DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName FROM Feature WHERE ID = $(id);
 END
 
 --
@@ -439,9 +452,14 @@ local function print_tree( tree, nodeid, indent)
 	if (indent ~= "") then
 		output:print( "\n" .. indent)
 	end
-	output:opentag( "node")
-	output:print( tree[ nodeid].name, "name")
+	output:opentag( "tree" )
+	output:opentag( "item" )
 	output:print( nodeid, "id")
+	output:print( "\n" .. indent )
+	output:opentag( "category" )
+	output:print( tree[ nodeid ].name )
+	-- more attributes of category follow here, like description
+	output:closetag( )
 	local n = 0
 	for i,v in pairs( tree[ nodeid].children) do
 		print_tree( tree, v, indent .. "\t")
@@ -450,6 +468,7 @@ local function print_tree( tree, nodeid, indent)
 	if n > 0 then
 		output:print( "\n" .. indent)
 	end
+	output:closetag( )
 	output:closetag()
 end
 
@@ -459,6 +478,19 @@ local function select_tree( tablename, itr)
 		if t == "id" then
 			local id = tonumber( v)
 			print_tree( get_tree( tablename, id), id, "")
+		end
+	end
+end
+
+local function select_node( tablename, elementname, itr)
+	filter().empty = false
+	for v,t in itr do
+		if t == "id" then
+			output:opentag( elementname)
+			output:print( v, "id")
+			local r = formfunction( "select" .. tablename)( {id=v} )
+			output:print( r:get())
+			output:closetag()
 		end
 	end
 end
@@ -530,12 +562,18 @@ function pushFeatureHierarchy()
 	add_tree( "Feature", input:get())
 end
 
-function CategoryHierarchyRequest()
-	select_tree( "Category", input:get())
+function CategoryRequest()
+	output:as( "node SYSTEM 'Category.simpleform'")
+	select_node( "Category", "category", input:get())
 end
 
-function FeatureHierarchyRequest()
-	select_tree( "Feature", input:get())
+function FeatureRequest()
+	output:as( "node SYSTEM 'Feature.simpleform'")
+	select_node( "Feature", "feature", input:get())
+end
+
+function readCategory()
+	print_tree( get_tree( "Category", 1), 1, "")
 end
 
 function editCategory()
@@ -602,152 +640,274 @@ function run()
 			create_node( "Category", scope(itr))
 		elseif (t == "createFeature") then
 			create_node( "Feature", scope(itr))
+		elseif (t == "CategoryRequest") then
+			select_node( "Category", "category", scope(itr))
+		elseif (t == "FeatureRequest") then
+			select_node( "Feature", "feature", scope(itr))
 		end
 	end
 	output:closetag()
 end
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE result SYSTEM "test.simpleform"><result><node name="computer" id="1">
-	<node name="Minicomputer" id="2">
-		<node name="Superminicomputer" id="3"/>
-		<node name="Minicluster" id="4"/>
-		<node name="Server (Minicomputer)" id="5"/>
-		<node name="Workstation (Minicomputer)" id="6"/>
-	</node>
-	<node name="Microcomputer" id="7">
-		<node name="Tower PC" id="8"/>
-		<node name="Mid-Tower PC" id="9"/>
-		<node name="Mini-Tower PC" id="10"/>
-		<node name="Server (Microcomputer)" id="11"/>
-		<node name="Workstation (Microcomputer)" id="12"/>
-		<node name="Personal computer" id="13"/>
-		<node name="Desktop computer" id="14"/>
-		<node name="Home computer" id="15"/>
-	</node>
-	<node name="Mobile" id="16">
-		<node name="Desknote" id="17"/>
-		<node name="Laptop" id="18">
-			<node name="Notebook" id="19">
-				<node name="Subnotebook" id="20"/>
-			</node>
-			<node name="Tablet personal computer" id="21"/>
-			<node name="slabtop computer" id="22">
-				<node name="Word-processing keyboard" id="23"/>
-				<node name="TRS-80 Model 100" id="24"/>
-			</node>
-			<node name="Handheld computer" id="25">
-				<node name="Ultra-mobile personal computer" id="26"/>
-				<node name="Personal digital assistant" id="27">
-					<node name="HandheldPC" id="28"/>
-					<node name="Palmtop computer" id="29"/>
-					<node name="Pocket personal computer" id="30"/>
-				</node>
-				<node name="Electronic organizer" id="31"/>
-				<node name="Pocket computer" id="32"/>
-				<node name="Calculator" id="33">
-					<node name="Graphing calculator" id="34"/>
-					<node name="Scientific calculator" id="35"/>
-					<node name="Programmable calculator" id="36"/>
-					<node name="Financial Calculator" id="37"/>
-				</node>
-				<node name="Handheld game console" id="38"/>
-				<node name="Portable media player" id="39"/>
-				<node name="Portable data terminal" id="40"/>
-				<node name="Information appliance" id="41">
-					<node name="Smartphone" id="43"/>
-				</node>
-			</node>
-			<node name="Wearable computer" id="44"/>
-		</node>
-		<node name="Single board computer" id="45"/>
-		<node name="Wireless sensor network component" id="46"/>
-		<node name="Plug computer" id="47"/>
-		<node name="Microcontroller" id="48"/>
-		<node name="Smartdust" id="49"/>
-		<node name="Nanocomputer" id="50"/>
-	</node>
-</node><node name="Smartphone" id="43"/><node name="Calculator" id="33">
-	<node name="Scientific calculator" id="35"/>
-	<node name="Programmable calculator" id="36"/>
-	<node name="Financial Calculator" id="37"/>
-	<node name="Graphing calculator" id="34"/>
-</node><node name="Mobile" id="16">
-	<node name="Desknote" id="17"/>
-	<node name="Laptop" id="18">
-		<node name="Notebook" id="19">
-			<node name="Subnotebook" id="20"/>
-		</node>
-		<node name="Tablet personal computer" id="21"/>
-		<node name="slabtop computer" id="22">
-			<node name="Word-processing keyboard" id="23"/>
-			<node name="TRS-80 Model 100" id="24"/>
-		</node>
-		<node name="Handheld computer" id="25">
-			<node name="Ultra-mobile personal computer" id="26"/>
-			<node name="Personal digital assistant" id="27">
-				<node name="HandheldPC" id="28"/>
-				<node name="Palmtop computer" id="29"/>
-				<node name="Pocket personal computer" id="30"/>
-			</node>
-			<node name="Electronic organizer" id="31"/>
-			<node name="Pocket computer" id="32"/>
-			<node name="Calculator" id="33">
-				<node name="Graphing calculator" id="34"/>
-				<node name="Scientific calculator" id="35"/>
-				<node name="Programmable calculator" id="36"/>
-				<node name="Financial Calculator" id="37"/>
-			</node>
-			<node name="Handheld game console" id="38"/>
-			<node name="Portable media player" id="39"/>
-			<node name="Portable data terminal" id="40"/>
-			<node name="Information appliance" id="41">
-				<node name="Smartphone" id="43"/>
-			</node>
-		</node>
-		<node name="Wearable computer" id="44"/>
-	</node>
-	<node name="Single board computer" id="45"/>
-	<node name="Wireless sensor network component" id="46"/>
-	<node name="Plug computer" id="47"/>
-	<node name="Microcontroller" id="48"/>
-	<node name="Smartdust" id="49"/>
-	<node name="Nanocomputer" id="50"/>
-</node><node name="computer" id="1">
-	<node name="Minicomputer" id="2">
-		<node name="Superminicomputer" id="3"/>
-		<node name="Minicluster" id="4"/>
-		<node name="Server (Minicomputer)" id="5"/>
-		<node name="Workstation (Minicomputer)" id="6"/>
-	</node>
-	<node name="Microcomputer" id="7">
-		<node name="Tower PC" id="8"/>
-		<node name="Mid-Tower PC" id="9"/>
-		<node name="Mini-Tower PC" id="10"/>
-		<node name="Server (Microcomputer)" id="11"/>
-		<node name="Workstation (Microcomputer)" id="12"/>
-		<node name="Personal computer" id="13"/>
-		<node name="Desktop computer" id="14"/>
-		<node name="Home computer" id="15"/>
-	</node>
-	<node name="Mobile" id="16">
-		<node name="Desknote" id="17"/>
-		<node name="Laptop" id="18">
-			<node name="Notebook" id="19">
-				<node name="Subnotebook" id="20"/>
-			</node>
-			<node name="Tablet personal computer" id="21"/>
-			<node name="Wearable computer" id="44"/>
-		</node>
-		<node name="Smartdust" id="49"/>
-		<node name="Nanocomputer" id="50"/>
-		<node name="Single board computer" id="45"/>
-		<node name="Wireless network component" id="46"/>
-		<node name="Plug computer" id="47"/>
-		<node name="Microcontroller" id="48"/>
-	</node>
-	<node name="Device from outer space" id="51"/>
-</node></result>
+<!DOCTYPE result SYSTEM "test.simpleform"><result><tree><item id="1">
+<category>computer</category>
+	<tree><item id="2">
+	<category>Minicomputer</category>
+		<tree><item id="3">
+		<category>Superminicomputer</category></item></tree>
+		<tree><item id="4">
+		<category>Minicluster</category></item></tree>
+		<tree><item id="5">
+		<category>Server (Minicomputer)</category></item></tree>
+		<tree><item id="6">
+		<category>Workstation (Minicomputer)</category></item></tree>
+	</item></tree>
+	<tree><item id="7">
+	<category>Microcomputer</category>
+		<tree><item id="8">
+		<category>Tower PC</category></item></tree>
+		<tree><item id="9">
+		<category>Mid-Tower PC</category></item></tree>
+		<tree><item id="10">
+		<category>Mini-Tower PC</category></item></tree>
+		<tree><item id="11">
+		<category>Server (Microcomputer)</category></item></tree>
+		<tree><item id="12">
+		<category>Workstation (Microcomputer)</category></item></tree>
+		<tree><item id="13">
+		<category>Personal computer</category></item></tree>
+		<tree><item id="14">
+		<category>Desktop computer</category></item></tree>
+		<tree><item id="15">
+		<category>Home computer</category></item></tree>
+	</item></tree>
+	<tree><item id="16">
+	<category>Mobile</category>
+		<tree><item id="17">
+		<category>Desknote</category></item></tree>
+		<tree><item id="18">
+		<category>Laptop</category>
+			<tree><item id="19">
+			<category>Notebook</category>
+				<tree><item id="20">
+				<category>Subnotebook</category></item></tree>
+			</item></tree>
+			<tree><item id="21">
+			<category>Tablet personal computer</category></item></tree>
+			<tree><item id="22">
+			<category>slabtop computer</category>
+				<tree><item id="23">
+				<category>Word-processing keyboard</category></item></tree>
+				<tree><item id="24">
+				<category>TRS-80 Model 100</category></item></tree>
+			</item></tree>
+			<tree><item id="25">
+			<category>Handheld computer</category>
+				<tree><item id="26">
+				<category>Ultra-mobile personal computer</category></item></tree>
+				<tree><item id="27">
+				<category>Personal digital assistant</category>
+					<tree><item id="28">
+					<category>HandheldPC</category></item></tree>
+					<tree><item id="29">
+					<category>Palmtop computer</category></item></tree>
+					<tree><item id="30">
+					<category>Pocket personal computer</category></item></tree>
+				</item></tree>
+				<tree><item id="31">
+				<category>Electronic organizer</category></item></tree>
+				<tree><item id="32">
+				<category>Pocket computer</category></item></tree>
+				<tree><item id="33">
+				<category>Calculator</category>
+					<tree><item id="34">
+					<category>Graphing calculator</category></item></tree>
+					<tree><item id="35">
+					<category>Scientific calculator</category></item></tree>
+					<tree><item id="36">
+					<category>Programmable calculator</category></item></tree>
+					<tree><item id="37">
+					<category>Financial Calculator</category></item></tree>
+				</item></tree>
+				<tree><item id="38">
+				<category>Handheld game console</category></item></tree>
+				<tree><item id="39">
+				<category>Portable media player</category></item></tree>
+				<tree><item id="40">
+				<category>Portable data terminal</category></item></tree>
+				<tree><item id="41">
+				<category>Information appliance</category>
+					<tree><item id="43">
+					<category>Smartphone</category></item></tree>
+				</item></tree>
+			</item></tree>
+			<tree><item id="44">
+			<category>Wearable computer</category></item></tree>
+		</item></tree>
+		<tree><item id="45">
+		<category>Single board computer</category></item></tree>
+		<tree><item id="46">
+		<category>Wireless sensor network component</category></item></tree>
+		<tree><item id="47">
+		<category>Plug computer</category></item></tree>
+		<tree><item id="48">
+		<category>Microcontroller</category></item></tree>
+		<tree><item id="49">
+		<category>Smartdust</category></item></tree>
+		<tree><item id="50">
+		<category>Nanocomputer</category></item></tree>
+	</item></tree>
+</item></tree><tree><item id="43">
+<category>Smartphone</category></item></tree><tree><item id="33">
+<category>Calculator</category>
+	<tree><item id="35">
+	<category>Scientific calculator</category></item></tree>
+	<tree><item id="36">
+	<category>Programmable calculator</category></item></tree>
+	<tree><item id="37">
+	<category>Financial Calculator</category></item></tree>
+	<tree><item id="34">
+	<category>Graphing calculator</category></item></tree>
+</item></tree><tree><item id="16">
+<category>Mobile</category>
+	<tree><item id="17">
+	<category>Desknote</category></item></tree>
+	<tree><item id="18">
+	<category>Laptop</category>
+		<tree><item id="19">
+		<category>Notebook</category>
+			<tree><item id="20">
+			<category>Subnotebook</category></item></tree>
+		</item></tree>
+		<tree><item id="21">
+		<category>Tablet personal computer</category></item></tree>
+		<tree><item id="22">
+		<category>slabtop computer</category>
+			<tree><item id="23">
+			<category>Word-processing keyboard</category></item></tree>
+			<tree><item id="24">
+			<category>TRS-80 Model 100</category></item></tree>
+		</item></tree>
+		<tree><item id="25">
+		<category>Handheld computer</category>
+			<tree><item id="26">
+			<category>Ultra-mobile personal computer</category></item></tree>
+			<tree><item id="27">
+			<category>Personal digital assistant</category>
+				<tree><item id="28">
+				<category>HandheldPC</category></item></tree>
+				<tree><item id="29">
+				<category>Palmtop computer</category></item></tree>
+				<tree><item id="30">
+				<category>Pocket personal computer</category></item></tree>
+			</item></tree>
+			<tree><item id="31">
+			<category>Electronic organizer</category></item></tree>
+			<tree><item id="32">
+			<category>Pocket computer</category></item></tree>
+			<tree><item id="33">
+			<category>Calculator</category>
+				<tree><item id="34">
+				<category>Graphing calculator</category></item></tree>
+				<tree><item id="35">
+				<category>Scientific calculator</category></item></tree>
+				<tree><item id="36">
+				<category>Programmable calculator</category></item></tree>
+				<tree><item id="37">
+				<category>Financial Calculator</category></item></tree>
+			</item></tree>
+			<tree><item id="38">
+			<category>Handheld game console</category></item></tree>
+			<tree><item id="39">
+			<category>Portable media player</category></item></tree>
+			<tree><item id="40">
+			<category>Portable data terminal</category></item></tree>
+			<tree><item id="41">
+			<category>Information appliance</category>
+				<tree><item id="43">
+				<category>Smartphone</category></item></tree>
+			</item></tree>
+		</item></tree>
+		<tree><item id="44">
+		<category>Wearable computer</category></item></tree>
+	</item></tree>
+	<tree><item id="45">
+	<category>Single board computer</category></item></tree>
+	<tree><item id="46">
+	<category>Wireless sensor network component</category></item></tree>
+	<tree><item id="47">
+	<category>Plug computer</category></item></tree>
+	<tree><item id="48">
+	<category>Microcontroller</category></item></tree>
+	<tree><item id="49">
+	<category>Smartdust</category></item></tree>
+	<tree><item id="50">
+	<category>Nanocomputer</category></item></tree>
+</item></tree><category id="46"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName></category><tree><item id="1">
+<category>computer</category>
+	<tree><item id="2">
+	<category>Minicomputer</category>
+		<tree><item id="3">
+		<category>Superminicomputer</category></item></tree>
+		<tree><item id="4">
+		<category>Minicluster</category></item></tree>
+		<tree><item id="5">
+		<category>Server (Minicomputer)</category></item></tree>
+		<tree><item id="6">
+		<category>Workstation (Minicomputer)</category></item></tree>
+	</item></tree>
+	<tree><item id="7">
+	<category>Microcomputer</category>
+		<tree><item id="8">
+		<category>Tower PC</category></item></tree>
+		<tree><item id="9">
+		<category>Mid-Tower PC</category></item></tree>
+		<tree><item id="10">
+		<category>Mini-Tower PC</category></item></tree>
+		<tree><item id="11">
+		<category>Server (Microcomputer)</category></item></tree>
+		<tree><item id="12">
+		<category>Workstation (Microcomputer)</category></item></tree>
+		<tree><item id="13">
+		<category>Personal computer</category></item></tree>
+		<tree><item id="14">
+		<category>Desktop computer</category></item></tree>
+		<tree><item id="15">
+		<category>Home computer</category></item></tree>
+	</item></tree>
+	<tree><item id="16">
+	<category>Mobile</category>
+		<tree><item id="17">
+		<category>Desknote</category></item></tree>
+		<tree><item id="18">
+		<category>Laptop</category>
+			<tree><item id="19">
+			<category>Notebook</category>
+				<tree><item id="20">
+				<category>Subnotebook</category></item></tree>
+			</item></tree>
+			<tree><item id="21">
+			<category>Tablet personal computer</category></item></tree>
+			<tree><item id="44">
+			<category>Wearable computer</category></item></tree>
+		</item></tree>
+		<tree><item id="49">
+		<category>Smartdust</category></item></tree>
+		<tree><item id="50">
+		<category>Nanocomputer</category></item></tree>
+		<tree><item id="45">
+		<category>Single board computer</category></item></tree>
+		<tree><item id="46">
+		<category>Wireless network component</category></item></tree>
+		<tree><item id="47">
+		<category>Plug computer</category></item></tree>
+		<tree><item id="48">
+		<category>Microcontroller</category></item></tree>
+	</item></tree>
+	<tree><item id="51">
+	<category>Device from outer space</category></item></tree>
+</item></tree></result>
 Category:
 '1', NULL, 'computer', 'computer', '1', '58'
 '2', '1', 'Minicomputer', 'minicomputer', '2', '11'
