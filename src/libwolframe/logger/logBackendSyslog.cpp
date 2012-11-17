@@ -166,9 +166,9 @@ static int facilityToSyslogFacility( const SyslogFacility::Facility facility )
 	return LOG_DAEMON;
 }
 
-void SyslogBackend::setLevel( const LogLevel::Level level )
+void SyslogBackend::setLevel( const LogLevel::Level level_ )
 {
-	logLevel_ = level;
+	logLevel_ = level_;
 }
 
 void SyslogBackend::setFacility( const SyslogFacility::Facility facility )
@@ -183,14 +183,14 @@ void SyslogBackend::setIdent( const std::string ident )
 	reopen( );
 }
 
-void SyslogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
+void SyslogBackend::log( const LogComponent component, const LogLevel::Level level_, const std::string& msg )
 {
-	if ( level >= logLevel_ ) {
+	if ( level_ >= logLevel_ ) {
 		std::ostringstream os;
 		os	<< component.str( )
 			<< ( component == LogComponent::LogNone ? "" : " - " )
 			<< msg;
-		syslog( levelToSyslogLevel( level ), "%s", os.str( ).c_str( ) );
+		syslog( levelToSyslogLevel( level_ ), "%s", os.str( ).c_str( ) );
 	}
 }
 

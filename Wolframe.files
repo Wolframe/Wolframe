@@ -154,7 +154,6 @@ clients/qt/apps/test/data/form5_create.xml
 clients/qt/apps/test/data/form5_item.xml
 clients/qt/apps/test/data/form5_show.xml
 clients/qt/apps/test/data/form5_update.xml
-clients/qt/apps/test/data/form5.xml
 clients/qt/BUGS
 clients/qt/DataHandler.cpp
 clients/qt/DataHandler.hpp
@@ -334,7 +333,6 @@ examples/configurator/README.txt
 examples/configurator/schema.sql
 examples/demo/configurator/database/schema_sqlite.sql
 examples/demo/configurator/GNUmakefile
-examples/demo/configurator/program/configurator-aba.lua
 examples/demo/configurator/program/configurator.lua
 examples/demo/configurator/request/CategoryHierarchyRequest.xml
 examples/demo/configurator/request/CategoryHierarchyRootRequest.xml
@@ -349,8 +347,8 @@ examples/demo/configurator/request/FeatureHierarchyRequest.xml
 examples/demo/configurator/request/FeatureHierarchy.xml
 examples/demo/configurator/request/pushCategoryHierarchy.xml
 examples/demo/configurator/request/pushFeatureHierarchy.xml
+examples/demo/configurator/request/readCategory.xml
 examples/demo/configurator/request/README
-examples/demo/configurator/wolframe-aba.conf
 examples/demo/configurator/wolframe.conf
 examples/demo/first/database/tree_schema.sql
 examples/demo/first/program/tree.lua
