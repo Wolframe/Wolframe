@@ -153,17 +153,21 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			}
 		} else if( clazz == "FileChooser" ) {
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-			QString fileName = fileChooser->fileName( );
-			xml.writeStartElement( name );
-			xml.writeAttribute( "filename", fileName );
-			QFile file( fileName );
-			file.open( QFile::ReadOnly );
-			QByteArray fileContent = file.readAll( );
-			xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
-			QString encoded = QString( fileContent.toBase64( ) );
-			file.close( );	
-			xml.writeCharacters( encoded );
-			xml.writeEndElement( );
+			if( fileChooser ) {
+				QString fileName = fileChooser->fileName( );
+				xml.writeStartElement( name );
+				xml.writeAttribute( "filename", fileName );
+				QFile file( fileName );
+				file.open( QFile::ReadOnly );
+				QByteArray fileContent = file.readAll( );
+				xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
+				QString encoded = QString( fileContent.toBase64( ) );
+				file.close( );	
+				xml.writeCharacters( encoded );
+				xml.writeEndElement( );
+			} else {
+				qDebug( ) << "FATAL: Can't cast FileChooser!!";
+			}
 		}
 		
 		qDebug( ) << "Wrote " << clazz << name;
@@ -228,8 +232,21 @@ void DataHandler::resetFormData( QWidget *form )
 			QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 			treeWidget->clear( );
 		} else if( clazz == "FileChooser" ) {
+			qDebug( ) << "FileChooser in datahandler reset" << widget;
+			qDebug( ) << "FileChooser meta" << widget->metaObject( )->className( );
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-			fileChooser->setFileName( "" );
+			qDebug( ) << "FileChooser in datahandler reset" << fileChooser;
+			if( fileChooser ) {
+				fileChooser->setFileName( "" );
+			} else {
+				qDebug( ) << "FATAL: Can't cast FileChooser!!";
+			}
+		} else if( clazz == "QPushButton" ) {
+			// skip, ok, buttons can't be reset
+		} else if( clazz == "QWidget" ) {
+			// skip, generic widget, don't possibly know how to reset it
+		} else {
+			qDebug( ) << "Reset for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 		}
 		
 		qDebug( ) << "Reset " << clazz << name;
@@ -476,7 +493,11 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
 							QString fileName = attributes.value( "", "filename" ).toString( );
 							if( !fileName.isEmpty( ) ) {
-								fileChooser->setFileName( fileName );
+								if( fileChooser ) {
+									fileChooser->setFileName( fileName );
+								} else {
+									qDebug( ) << "FATAL: Can't cast FileChooser!!";
+								}
 							}
 						}
 					}

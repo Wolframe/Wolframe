@@ -17,7 +17,8 @@ FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoa
 	: QWidget( _parent ), m_mode( RunMode ), m_form( ),
 	  m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
 	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_dataHandler( 0 ),
-	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( )
+	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
+	  m_globals( 0 )
 {
 	initializeNormal( );	
 }
@@ -26,7 +27,8 @@ FormWidget::FormWidget( FormWidgetMode _mode, QWidget *_parent )
 	: QWidget( _parent ), m_mode( _mode ), m_form( ),
 	  m_uiLoader( 0 ), m_formLoader( 0 ), m_dataLoader( 0 ),
 	  m_ui( 0 ), m_dataHandler( 0 ),
-	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( )
+	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
+	  m_globals( 0 )
 {
 	initializeDesigner( );
 }

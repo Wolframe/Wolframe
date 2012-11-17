@@ -29,12 +29,13 @@ QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(QT_LDFLAGS)
 
+# QtUiTools.lib, QtUiToolsd.lib
 !IFNDEF DEBUG
 INCLUDE_LIBS = \
-	QtCore4.lib QtGui4.lib QtUiTools.lib QtDesigner4.lib
+	QtCore4.lib QtGui4.lib QtDesigner4.lib
 !ELSE
 INCLUDE_LIBS = \
-	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtDesignerd4.lib
+	QtCored4.lib QtGuid4.lib QtDesignerd4.lib
 !ENDIF
 
 MOC_FLAGS =
@@ -45,13 +46,14 @@ OBJS = \
 	..\FileChooser.obj \
 	..\moc_FileChooser.obj \
 	filechooser\FileChooserPlugin.obj \
-	filechooser\moc_FileChooserPlugin.obj \
-	formwidget\FormWidgetPlugin.obj \
-	formwidget\moc_FormWidgetPlugin.obj \
-	..\FormWidget.obj \
-	..\moc_FormWidget.obj \
-	..\DataHandler.obj \
-	..\moc_DataHandler.obj \
+	filechooser\moc_FileChooserPlugin.obj
+
+#	formwidget\FormWidgetPlugin.obj \
+#	formwidget\moc_FormWidgetPlugin.obj \
+#	..\FormWidget.obj \
+#	moc_FormWidget.obj \
+#	..\DataHandler.obj \
+#	moc_DataHandler.obj \
 
 DYNAMIC_MODULE = \
 	wolframewidgets.dll
@@ -65,8 +67,8 @@ local_all:
 moc_WolframeWidgets.cpp: WolframeWidgets.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -I"$(QT_DIR)\include\QtDesigner" WolframeWidgets.hpp -o moc_WolframeWidgets.cpp
 
-..\moc_FileChooser.cpp: ..\FileChooser.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\FileChooser.hpp -o ..\moc_FileChooser.cpp
+#..\moc_FileChooser.cpp: ..\FileChooser.hpp
+#	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\FileChooser.hpp -o ..\moc_FileChooser.cpp
 
 filechooser\moc_FileChooserPlugin.cpp: filechooser\FileChooserPlugin.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser -I"$(QT_DIR)\include\QtDesigner" filechooser\FileChooserPlugin.hpp -o filechooser\moc_FileChooserPlugin.cpp
@@ -74,11 +76,11 @@ filechooser\moc_FileChooserPlugin.cpp: filechooser\FileChooserPlugin.hpp
 formwidget\moc_FormWidgetPlugin.cpp: formwidget\FormWidgetPlugin.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Iformwidget -I"$(QT_DIR)\include\QtDesigner" formwidget\FormWidgetPlugin.hpp -o formwidget\moc_FormWidgetPlugin.cpp
 
-..\moc_FormWidget.cpp: ..\FormWidget.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\FormWidget.hpp -o ..\moc_FormWidget.cpp
+moc_FormWidget.cpp: ..\FormWidget.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\FormWidget.hpp -o moc_FormWidget.cpp
 
-..\moc_DataHandler.cpp: ..\DataHandler.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\DataHandler.hpp -o ..\moc_DataHandler.cpp
+moc_DataHandler.cpp: ..\DataHandler.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\DataHandler.hpp -o moc_DataHandler.cpp
 
 $(DYNAMIC_MODULE): $(OBJS)
 	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $?

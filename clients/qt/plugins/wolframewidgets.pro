@@ -22,13 +22,13 @@ build_all:!build_pass {
 SOURCES += \
 	WolframeWidgets.cpp \
 	filechooser/FileChooserPlugin.cpp \
-	../FileChooser.cpp \
-	formwidget/FormWidgetPlugin.cpp \
-	../FormWidget.cpp
+	../FileChooser.cpp
+#	formwidget/FormWidgetPlugin.cpp \
+#	../FormWidget.cpp
 
 HEADERS += \
 	WolframeWidgets.hpp \
 	filechooser/FileChooserPlugin.hpp \
 	../FileChooser.hpp
-	formwidget/FormWidgetPlugin.hpp \
-	FormWidget.hpp
+#	formwidget/FormWidgetPlugin.hpp \
+#	../FormWidget.hpp
