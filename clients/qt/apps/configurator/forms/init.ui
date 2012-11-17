@@ -36,6 +36,11 @@
      <string>category</string>
     </property>
    </column>
+   <column>
+    <property name="text">
+     <string>description</string>
+    </property>
+   </column>
   </widget>
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
