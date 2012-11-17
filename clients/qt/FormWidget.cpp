@@ -104,6 +104,11 @@ void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
 				if( m_globals->contains( globalKey ) ) {
 					props->insert( key, m_globals->value( globalKey ) );
 				}
+			} else {
+				QString evaluated = m_dataHandler->readFormVariable( refKey, m_ui );
+				if( !evaluated.isNull( ) ) {
+					props->insert( key, evaluated );
+				}
 			}
 		}
 		qDebug( ) << "GLOBALS SUBSTITUTE" << key << props->value( key );
@@ -115,8 +120,10 @@ void FormWidget::switchForm( QObject *object )
 	WidgetProperties *widgetProps = qobject_cast<WidgetProperties *>( object );
 	QHash<QString, QString> *props = widgetProps->props( );
 
+	restoreFromGlobals( props );
+
 	storeToGlobals( props );
-	
+
 // execute the action (eventually)
 	sendRequest( props );
 	

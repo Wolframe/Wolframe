@@ -287,7 +287,6 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 		for( int i = 0; i < header->columnCount( ); i++ ) {
 			QString headerText = header->data( i, Qt::DisplayRole ).toString( );
 			headers << headerText;
-			qDebug( ) << "header" << i << headerText;
 		}
 		QTreeWidgetItem *parent = treeWidget->invisibleRootItem( );
 		QTreeWidgetItem *item = treeWidget->invisibleRootItem( );
@@ -298,7 +297,15 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 					parent = item;
 				} else if( xml.name( ) == "item" ) {
 					item = new QTreeWidgetItem( parent );
+// attributes like id are mapped to user data
+					QXmlStreamAttributes attributes = xml.attributes( );
+					foreach( QXmlStreamAttribute attr, attributes ) {
+						QVariant v;
+						v.setValue( attr.value( ).toString( ) );
+						item->setData( 0, Qt::UserRole, v );
+					}
 				} else {
+// all element in the item are mapped to the columns
 					int col = headers.indexOf( xml.name( ).toString( ) );
 					if( col != -1 ) {
 						QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
@@ -457,5 +464,52 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 	if( xml.hasError( ) ) {
 		qDebug( ) << xml.errorString( );
 	}
+}
+
+// Note: this is over-simplistic and hard-coded. Should be a generic
+// property introspection language similar to the variable system
+// in QScript (Javascript), maybe later..
+QString DataHandler::readFormVariable( QString variable, QWidget *form )
+{
+	QStringList parts = variable.split( "." );
+	QString name;
+
+	qDebug( ) << "Evaluating variable" << variable;
+	
+// expecting a widget name as first argument
+	if( parts[0].isNull( ) ) {
+		qDebug( ) << "Expecting a expression of the form <widget>.<property";
+		return QString( );
+	}
+// expecting a property identifier as second argument
+	if( parts[1].isNull( ) ) {
+		qDebug( ) << "Expecting a property name in variable" << variable;
+		return QString( );
+	}
+	
+	QWidget *widget = qFindChild<QWidget *>( form, name );
+// no widget found with that name
+	if( !widget ) {
+		qDebug( ) << "Unkown widget" << name << "in variable" << variable;
+		return QString( );
+	}
+	
+// properties differ depending on the class of the widget	
+	QString clazz = widget->metaObject( )->className( );
+	if( clazz == "QTreeWidget" ) {
+		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
+
+// always return data of the selected item (assuming single select for now)
+// the ID is currently hard-coded in user data
+		QList<QTreeWidgetItem *> items = treeWidget->selectedItems( );
+		if( items.empty( ) ) return QString( );
+		return items[0]->data( 0, Qt::UserRole ).toString( );
+	} else {
+// non supported class
+		qDebug( ) << "Unsupported class" << clazz << "in variable" << variable;
+		return QString( );
+	}
+	
+	return QString( );
 }
 

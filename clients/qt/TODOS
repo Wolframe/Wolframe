@@ -1,22 +1,15 @@
 show-stoppers:
 - workflow for form
-  - what has to be communicated between forms? example: edit
-    existing item, add new item, show item data (example form5 in test)
-  - passing hidden parameters between forms (example ID of a
-    product to show)
   - action (CRUD) is a parameter to REQUEST <action>
-- protocol
-  - add action
-  - add doctype to data XML
-  - content handling by line
-  - base64
 - element operations
   - reorganize tree
     - add elements 
-    - move elements/subtrees
     - delete elements/subtrees
   
 musts:
+- element operations
+  - reorganize tree
+    - move elements/subtrees
 - protocol
   - network loader via protocol or use client library?
 - designer custom widgets

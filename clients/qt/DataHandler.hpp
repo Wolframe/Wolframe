@@ -23,6 +23,7 @@ class DataHandler : public QObject
 		void resetFormData( QWidget *form );
 		void loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data );
 		void loadFormDomains( QString name, QWidget *form );
+		QString readFormVariable( QString variable, QWidget *form );
 	
 	private:
 		DataLoader *m_dataLoader;
