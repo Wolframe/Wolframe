@@ -8,7 +8,8 @@
 #include <QFileDialog>
 
 FileChooser::FileChooser( SelectionMode _selectionMode, QWidget *_parent )
-	: QWidget( _parent ), m_selectionMode( _selectionMode )
+	: QWidget( _parent ), m_selectionMode( _selectionMode ),
+	  m_lineEdit( 0 ), m_button( 0 )
 {
 	initialize( );
 }
