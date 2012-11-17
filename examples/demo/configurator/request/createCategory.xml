@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE category SYSTEM 'Category.simpleform'>
-<category id="16" name="BlaBla Device"/>
+<category id="16">
+<name>BlaBla Device</name>
+<description>Gugu bbla</description>
+</category>

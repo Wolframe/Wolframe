@@ -462,27 +462,37 @@ end
 
 local function insert_itr( tablename, parentid, itr)
 	local id = 1
-	local name = ""
-	local nname = ""
+	local name = nil
+	local nname = nil
+	local description = nil
 	for v,t in itr do
 		if (t == "name") then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
-			id = formfunction( "add" .. tablename)( {name=v, normalizedName=nname, parentid=parentid} ):table().ID
+		elseif (t == "description") then
+			description = content_value( v, itr)
 		elseif (t == "node") then
+			if name then
+				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentid=parentid} ):table().ID
+				name = nil
+				description = nil
+			end
 			insert_itr( tablename, id, scope( itr))
 		end
+	end
+	if name then
+		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentid=parentid} ):table().ID
 	end
 	return id
 end
 
-local function insert_topnode( tablename, name, parentid)
+local function insert_topnode( tablename, name, description, parentid)
 	local nname = normalizeName( name)
 	if not parentid then
-		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name} )
+		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name, description=description} )
 		return 1
 	else
-		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, parentid=parentid} ):table().ID
+		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentid=parentid} ):table().ID
 		return id
 	end
 end
@@ -491,21 +501,25 @@ local function insert_tree_topnode( tablename, itr)
 	local parentid = nil
 	local id = 1
 	local name = nil
+	local description = nil
 	for v,t in itr do
 		if (t == "parent") then
 			parentid = tonumber( v)
 		elseif (t == "name") then
 			name = content_value( v, itr)
+		elseif (t == "description") then
+			description = content_value( v, itr)
 		elseif (t == "node") then
 			if name then
-				id = insert_topnode( tablename, name, parentid)
+				id = insert_topnode( tablename, name, description, parentid)
 				name = nil
+				description = nil
 			end
 			insert_itr( tablename, id, scope( itr))
 		end
 	end
 	if name then
-		insert_topnode( tablename, name, parentid)
+		insert_topnode( tablename, name, description, parentid)
 	end
 end
 
@@ -513,7 +527,7 @@ local function get_tree( tablename, parentid)
 	local t = formfunction( "selectSub" .. tablename)( {id=parentid} ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
-		table.insert( a, tonumber( v.ID), { name=v.name, parent=tonumber(v.parent), children = {} } )
+		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, parent=tonumber(v.parent), children = {} } )
 	end
 	for i,v in pairs( a) do
 		if i ~= parentid and v.parent then
@@ -530,11 +544,16 @@ local function print_tree( tree, nodeid, indent)
 	output:opentag( "tree" )
 	output:opentag( "item" )
 	output:print( nodeid, "id")
-	output:print( "\n" .. indent )
+	output:print( "\n" .. indent .. "\t")
 	output:opentag( "category" )
 	output:print( tree[ nodeid ].name )
-	-- more attributes of category follow here, like description
 	output:closetag( )
+	if tree[ nodeid ].description then
+		output:print( "\n" .. indent .. "\t")
+		output:opentag( "description" )
+		output:print( tree[ nodeid ].description )
+		output:closetag( )
+	end
 	local n = 0
 	for i,v in pairs( tree[ nodeid].children) do
 		print_tree( tree, v, indent .. "\t")
@@ -598,6 +617,7 @@ end
 local function create_node( tablename, itr)
 	local name = nil;
 	local parentid = nil;
+	local description = nil;
 	for v,t in itr do
 		if t == "id" then
 			parentid = v
@@ -606,9 +626,11 @@ local function create_node( tablename, itr)
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
+		elseif t ==  "description" then
+			description = content_value( v, itr)
 		end
 	end
-	insert_topnode( tablename, name, parentid)
+	insert_topnode( tablename, name, description, parentid)
 end
 
 local function add_tree( tablename, itr)
@@ -727,262 +749,262 @@ end
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE result SYSTEM "test.simpleform"><result><tree><item id="1">
-<category>computer</category>
+	<category>computer</category>
 	<tree><item id="2">
-	<category>Minicomputer</category>
+		<category>Minicomputer</category>
 		<tree><item id="3">
-		<category>Superminicomputer</category></item></tree>
+			<category>Superminicomputer</category></item></tree>
 		<tree><item id="4">
-		<category>Minicluster</category></item></tree>
+			<category>Minicluster</category></item></tree>
 		<tree><item id="5">
-		<category>Server (Minicomputer)</category></item></tree>
+			<category>Server (Minicomputer)</category></item></tree>
 		<tree><item id="6">
-		<category>Workstation (Minicomputer)</category></item></tree>
+			<category>Workstation (Minicomputer)</category></item></tree>
 	</item></tree>
 	<tree><item id="7">
-	<category>Microcomputer</category>
+		<category>Microcomputer</category>
 		<tree><item id="8">
-		<category>Tower PC</category></item></tree>
+			<category>Tower PC</category></item></tree>
 		<tree><item id="9">
-		<category>Mid-Tower PC</category></item></tree>
+			<category>Mid-Tower PC</category></item></tree>
 		<tree><item id="10">
-		<category>Mini-Tower PC</category></item></tree>
+			<category>Mini-Tower PC</category></item></tree>
 		<tree><item id="11">
-		<category>Server (Microcomputer)</category></item></tree>
+			<category>Server (Microcomputer)</category></item></tree>
 		<tree><item id="12">
-		<category>Workstation (Microcomputer)</category></item></tree>
+			<category>Workstation (Microcomputer)</category></item></tree>
 		<tree><item id="13">
-		<category>Personal computer</category></item></tree>
+			<category>Personal computer</category></item></tree>
 		<tree><item id="14">
-		<category>Desktop computer</category></item></tree>
+			<category>Desktop computer</category></item></tree>
 		<tree><item id="15">
-		<category>Home computer</category></item></tree>
+			<category>Home computer</category></item></tree>
 	</item></tree>
 	<tree><item id="16">
-	<category>Mobile</category>
+		<category>Mobile</category>
 		<tree><item id="17">
-		<category>Desknote</category></item></tree>
+			<category>Desknote</category></item></tree>
 		<tree><item id="18">
-		<category>Laptop</category>
+			<category>Laptop</category>
 			<tree><item id="19">
-			<category>Notebook</category>
+				<category>Notebook</category>
 				<tree><item id="20">
-				<category>Subnotebook</category></item></tree>
+					<category>Subnotebook</category></item></tree>
 			</item></tree>
 			<tree><item id="21">
-			<category>Tablet personal computer</category></item></tree>
+				<category>Tablet personal computer</category></item></tree>
 			<tree><item id="22">
-			<category>slabtop computer</category>
+				<category>slabtop computer</category>
 				<tree><item id="23">
-				<category>Word-processing keyboard</category></item></tree>
+					<category>Word-processing keyboard</category></item></tree>
 				<tree><item id="24">
-				<category>TRS-80 Model 100</category></item></tree>
+					<category>TRS-80 Model 100</category></item></tree>
 			</item></tree>
 			<tree><item id="25">
-			<category>Handheld computer</category>
+				<category>Handheld computer</category>
 				<tree><item id="26">
-				<category>Ultra-mobile personal computer</category></item></tree>
+					<category>Ultra-mobile personal computer</category></item></tree>
 				<tree><item id="27">
-				<category>Personal digital assistant</category>
+					<category>Personal digital assistant</category>
 					<tree><item id="28">
-					<category>HandheldPC</category></item></tree>
+						<category>HandheldPC</category></item></tree>
 					<tree><item id="29">
-					<category>Palmtop computer</category></item></tree>
+						<category>Palmtop computer</category></item></tree>
 					<tree><item id="30">
-					<category>Pocket personal computer</category></item></tree>
+						<category>Pocket personal computer</category></item></tree>
 				</item></tree>
 				<tree><item id="31">
-				<category>Electronic organizer</category></item></tree>
+					<category>Electronic organizer</category></item></tree>
 				<tree><item id="32">
-				<category>Pocket computer</category></item></tree>
+					<category>Pocket computer</category></item></tree>
 				<tree><item id="33">
-				<category>Calculator</category>
+					<category>Calculator</category>
 					<tree><item id="34">
-					<category>Graphing calculator</category></item></tree>
+						<category>Graphing calculator</category></item></tree>
 					<tree><item id="35">
-					<category>Scientific calculator</category></item></tree>
+						<category>Scientific calculator</category></item></tree>
 					<tree><item id="36">
-					<category>Programmable calculator</category></item></tree>
+						<category>Programmable calculator</category></item></tree>
 					<tree><item id="37">
-					<category>Financial Calculator</category></item></tree>
+						<category>Financial Calculator</category></item></tree>
 				</item></tree>
 				<tree><item id="38">
-				<category>Handheld game console</category></item></tree>
+					<category>Handheld game console</category></item></tree>
 				<tree><item id="39">
-				<category>Portable media player</category></item></tree>
+					<category>Portable media player</category></item></tree>
 				<tree><item id="40">
-				<category>Portable data terminal</category></item></tree>
+					<category>Portable data terminal</category></item></tree>
 				<tree><item id="41">
-				<category>Information appliance</category>
+					<category>Information appliance</category>
 					<tree><item id="43">
-					<category>Smartphone</category></item></tree>
+						<category>Smartphone</category></item></tree>
 				</item></tree>
 			</item></tree>
 			<tree><item id="44">
-			<category>Wearable computer</category></item></tree>
+				<category>Wearable computer</category></item></tree>
 		</item></tree>
 		<tree><item id="45">
-		<category>Single board computer</category></item></tree>
+			<category>Single board computer</category></item></tree>
 		<tree><item id="46">
-		<category>Wireless sensor network component</category></item></tree>
+			<category>Wireless sensor network component</category></item></tree>
 		<tree><item id="47">
-		<category>Plug computer</category></item></tree>
+			<category>Plug computer</category></item></tree>
 		<tree><item id="48">
-		<category>Microcontroller</category></item></tree>
+			<category>Microcontroller</category></item></tree>
 		<tree><item id="49">
-		<category>Smartdust</category></item></tree>
+			<category>Smartdust</category></item></tree>
 		<tree><item id="50">
-		<category>Nanocomputer</category></item></tree>
+			<category>Nanocomputer</category></item></tree>
 	</item></tree>
 </item></tree><tree><item id="43">
-<category>Smartphone</category></item></tree><tree><item id="33">
-<category>Calculator</category>
+	<category>Smartphone</category></item></tree><tree><item id="33">
+	<category>Calculator</category>
 	<tree><item id="35">
-	<category>Scientific calculator</category></item></tree>
+		<category>Scientific calculator</category></item></tree>
 	<tree><item id="36">
-	<category>Programmable calculator</category></item></tree>
+		<category>Programmable calculator</category></item></tree>
 	<tree><item id="37">
-	<category>Financial Calculator</category></item></tree>
+		<category>Financial Calculator</category></item></tree>
 	<tree><item id="34">
-	<category>Graphing calculator</category></item></tree>
+		<category>Graphing calculator</category></item></tree>
 </item></tree><tree><item id="16">
-<category>Mobile</category>
+	<category>Mobile</category>
 	<tree><item id="17">
-	<category>Desknote</category></item></tree>
+		<category>Desknote</category></item></tree>
 	<tree><item id="18">
-	<category>Laptop</category>
+		<category>Laptop</category>
 		<tree><item id="19">
-		<category>Notebook</category>
+			<category>Notebook</category>
 			<tree><item id="20">
-			<category>Subnotebook</category></item></tree>
+				<category>Subnotebook</category></item></tree>
 		</item></tree>
 		<tree><item id="21">
-		<category>Tablet personal computer</category></item></tree>
+			<category>Tablet personal computer</category></item></tree>
 		<tree><item id="22">
-		<category>slabtop computer</category>
+			<category>slabtop computer</category>
 			<tree><item id="23">
-			<category>Word-processing keyboard</category></item></tree>
+				<category>Word-processing keyboard</category></item></tree>
 			<tree><item id="24">
-			<category>TRS-80 Model 100</category></item></tree>
+				<category>TRS-80 Model 100</category></item></tree>
 		</item></tree>
 		<tree><item id="25">
-		<category>Handheld computer</category>
+			<category>Handheld computer</category>
 			<tree><item id="26">
-			<category>Ultra-mobile personal computer</category></item></tree>
+				<category>Ultra-mobile personal computer</category></item></tree>
 			<tree><item id="27">
-			<category>Personal digital assistant</category>
+				<category>Personal digital assistant</category>
 				<tree><item id="28">
-				<category>HandheldPC</category></item></tree>
+					<category>HandheldPC</category></item></tree>
 				<tree><item id="29">
-				<category>Palmtop computer</category></item></tree>
+					<category>Palmtop computer</category></item></tree>
 				<tree><item id="30">
-				<category>Pocket personal computer</category></item></tree>
+					<category>Pocket personal computer</category></item></tree>
 			</item></tree>
 			<tree><item id="31">
-			<category>Electronic organizer</category></item></tree>
+				<category>Electronic organizer</category></item></tree>
 			<tree><item id="32">
-			<category>Pocket computer</category></item></tree>
+				<category>Pocket computer</category></item></tree>
 			<tree><item id="33">
-			<category>Calculator</category>
+				<category>Calculator</category>
 				<tree><item id="34">
-				<category>Graphing calculator</category></item></tree>
+					<category>Graphing calculator</category></item></tree>
 				<tree><item id="35">
-				<category>Scientific calculator</category></item></tree>
+					<category>Scientific calculator</category></item></tree>
 				<tree><item id="36">
-				<category>Programmable calculator</category></item></tree>
+					<category>Programmable calculator</category></item></tree>
 				<tree><item id="37">
-				<category>Financial Calculator</category></item></tree>
+					<category>Financial Calculator</category></item></tree>
 			</item></tree>
 			<tree><item id="38">
-			<category>Handheld game console</category></item></tree>
+				<category>Handheld game console</category></item></tree>
 			<tree><item id="39">
-			<category>Portable media player</category></item></tree>
+				<category>Portable media player</category></item></tree>
 			<tree><item id="40">
-			<category>Portable data terminal</category></item></tree>
+				<category>Portable data terminal</category></item></tree>
 			<tree><item id="41">
-			<category>Information appliance</category>
+				<category>Information appliance</category>
 				<tree><item id="43">
-				<category>Smartphone</category></item></tree>
+					<category>Smartphone</category></item></tree>
 			</item></tree>
 		</item></tree>
 		<tree><item id="44">
-		<category>Wearable computer</category></item></tree>
+			<category>Wearable computer</category></item></tree>
 	</item></tree>
 	<tree><item id="45">
-	<category>Single board computer</category></item></tree>
+		<category>Single board computer</category></item></tree>
 	<tree><item id="46">
-	<category>Wireless sensor network component</category></item></tree>
+		<category>Wireless sensor network component</category></item></tree>
 	<tree><item id="47">
-	<category>Plug computer</category></item></tree>
+		<category>Plug computer</category></item></tree>
 	<tree><item id="48">
-	<category>Microcontroller</category></item></tree>
+		<category>Microcontroller</category></item></tree>
 	<tree><item id="49">
-	<category>Smartdust</category></item></tree>
+		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
-	<category>Nanocomputer</category></item></tree>
+		<category>Nanocomputer</category></item></tree>
 </item></tree><category id="46"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName></category><tree><item id="1">
-<category>computer</category>
+	<category>computer</category>
 	<tree><item id="2">
-	<category>Minicomputer</category>
+		<category>Minicomputer</category>
 		<tree><item id="3">
-		<category>Superminicomputer</category></item></tree>
+			<category>Superminicomputer</category></item></tree>
 		<tree><item id="4">
-		<category>Minicluster</category></item></tree>
+			<category>Minicluster</category></item></tree>
 		<tree><item id="5">
-		<category>Server (Minicomputer)</category></item></tree>
+			<category>Server (Minicomputer)</category></item></tree>
 		<tree><item id="6">
-		<category>Workstation (Minicomputer)</category></item></tree>
+			<category>Workstation (Minicomputer)</category></item></tree>
 	</item></tree>
 	<tree><item id="7">
-	<category>Microcomputer</category>
+		<category>Microcomputer</category>
 		<tree><item id="8">
-		<category>Tower PC</category></item></tree>
+			<category>Tower PC</category></item></tree>
 		<tree><item id="9">
-		<category>Mid-Tower PC</category></item></tree>
+			<category>Mid-Tower PC</category></item></tree>
 		<tree><item id="10">
-		<category>Mini-Tower PC</category></item></tree>
+			<category>Mini-Tower PC</category></item></tree>
 		<tree><item id="11">
-		<category>Server (Microcomputer)</category></item></tree>
+			<category>Server (Microcomputer)</category></item></tree>
 		<tree><item id="12">
-		<category>Workstation (Microcomputer)</category></item></tree>
+			<category>Workstation (Microcomputer)</category></item></tree>
 		<tree><item id="13">
-		<category>Personal computer</category></item></tree>
+			<category>Personal computer</category></item></tree>
 		<tree><item id="14">
-		<category>Desktop computer</category></item></tree>
+			<category>Desktop computer</category></item></tree>
 		<tree><item id="15">
-		<category>Home computer</category></item></tree>
+			<category>Home computer</category></item></tree>
 	</item></tree>
 	<tree><item id="16">
-	<category>Mobile</category>
+		<category>Mobile</category>
 		<tree><item id="17">
-		<category>Desknote</category></item></tree>
+			<category>Desknote</category></item></tree>
 		<tree><item id="18">
-		<category>Laptop</category>
+			<category>Laptop</category>
 			<tree><item id="19">
-			<category>Notebook</category>
+				<category>Notebook</category>
 				<tree><item id="20">
-				<category>Subnotebook</category></item></tree>
+					<category>Subnotebook</category></item></tree>
 			</item></tree>
 			<tree><item id="21">
-			<category>Tablet personal computer</category></item></tree>
+				<category>Tablet personal computer</category></item></tree>
 			<tree><item id="44">
-			<category>Wearable computer</category></item></tree>
+				<category>Wearable computer</category></item></tree>
 		</item></tree>
 		<tree><item id="49">
-		<category>Smartdust</category></item></tree>
+			<category>Smartdust</category></item></tree>
 		<tree><item id="50">
-		<category>Nanocomputer</category></item></tree>
+			<category>Nanocomputer</category></item></tree>
 		<tree><item id="45">
-		<category>Single board computer</category></item></tree>
+			<category>Single board computer</category></item></tree>
 		<tree><item id="46">
-		<category>Wireless network component</category></item></tree>
+			<category>Wireless network component</category></item></tree>
 		<tree><item id="47">
-		<category>Plug computer</category></item></tree>
+			<category>Plug computer</category></item></tree>
 		<tree><item id="48">
-		<category>Microcontroller</category></item></tree>
+			<category>Microcontroller</category></item></tree>
 	</item></tree>
 	<tree><item id="51">
-	<category>Device from outer space</category></item></tree>
+		<category>Device from outer space</category></item></tree>
 </item></tree></result>
 Picture:
 
