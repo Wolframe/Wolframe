@@ -52,16 +52,17 @@ public:
 
 	~SyslogBackend( );
 
-	void setLevel( const LogLevel::Level level );
+	void setLevel( const LogLevel::Level level_ );
 
 	void setFacility( const SyslogFacility::Facility facility );
 
 	void setIdent( const std::string ident );
 
-	void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
+	void log( const LogComponent component, const LogLevel::Level level_, const std::string& msg );
 
 	void reopen( );
 
+	LogLevel::Level level() const		{ return logLevel_; }
 private:
 	LogLevel::Level logLevel_;
 	int facility_;

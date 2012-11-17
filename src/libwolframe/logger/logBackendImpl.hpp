@@ -83,6 +83,7 @@ public:
 	void log( const LogComponent component, const LogLevel::Level level,
 		  const std::string& msg );
 
+	LogLevel::Level logLevel() const;
 private:
 	ConsoleLogBackend consoleLogger_;
 	LogfileBackend logfileLogger_;
