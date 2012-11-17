@@ -112,6 +112,9 @@
  </customwidgets>
  <tabstops>
   <tabstop>name</tabstop>
+  <tabstop>description</tabstop>
+  <tabstop>add</tabstop>
+  <tabstop>cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

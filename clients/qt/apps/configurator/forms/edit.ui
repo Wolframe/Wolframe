@@ -143,7 +143,10 @@
  </customwidgets>
  <tabstops>
   <tabstop>name</tabstop>
+  <tabstop>description</tabstop>
+  <tabstop>save</tabstop>
   <tabstop>reset</tabstop>
+  <tabstop>cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>
