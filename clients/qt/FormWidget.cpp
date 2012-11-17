@@ -98,7 +98,7 @@ void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
 		QString value = props->value( key );
 		if( value.startsWith( "{" ) && value.endsWith( "}" ) ) {
 			QString refKey = value.mid( 1, value.length( ) - 2 );
-			if( key.startsWith( "global." ) ) {
+			if( refKey.startsWith( "global." ) ) {
 				QStringList parts = refKey.split( "." );
 				QString globalKey = parts[1];
 				if( m_globals->contains( globalKey ) ) {

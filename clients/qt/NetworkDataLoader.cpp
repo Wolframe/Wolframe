@@ -83,6 +83,25 @@ void NetworkDataLoader::handleCreate( QString name, QByteArray xml, QHash<QStrin
 
 void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props )
 {
+	QString rootElement = props->value( "rootelement" );
+	QString docType = props->value( "doctype" );
+	QByteArray data;
+	QXmlStreamWriter xml( &data );
+	xml.setAutoFormatting( true );
+	xml.setAutoFormattingIndent( 2 );
+
+	xml.writeStartDocument( );
+	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
+	xml.writeStartElement( rootElement );
+	foreach( QString key, props->keys( ) ) {
+// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
+		if( key.startsWith( "_q_" ) ) continue;
+		xml.writeAttribute( key, props->value( key ) );
+	}
+	xml.writeEndElement( );
+	xml.writeEndDocument( );
+
+	qDebug( ) << "network request:\n" << data;
 }
 
 void NetworkDataLoader::handleUpdate( QString name, QByteArray data, QHash<QString, QString> *props )

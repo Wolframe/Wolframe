@@ -67,9 +67,13 @@ local function print_tree( tree, nodeid, indent)
 	if (indent ~= "") then
 		output:print( "\n" .. indent)
 	end
-	output:opentag( "node")
-	output:print( tree[ nodeid].name, "name")
+	output:opentag( "tree" )
+	output:opentag( "item" )
 	output:print( nodeid, "id")
+	output:print( "\n" .. indent )
+	output:opentag( "category" )
+	output:print( tree[ nodeid ].name )
+	output:closetag( )
 	local n = 0
 	for i,v in pairs( tree[ nodeid].children) do
 		print_tree( tree, v, indent .. "\t")
@@ -78,6 +82,7 @@ local function print_tree( tree, nodeid, indent)
 	if n > 0 then
 		output:print( "\n" .. indent)
 	end
+	output:closetag( )
 	output:closetag()
 end
 
