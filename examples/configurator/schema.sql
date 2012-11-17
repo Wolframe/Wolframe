@@ -143,7 +143,7 @@ CREATE TABLE Receipe	(
 	Comment		TEXT
 );
 
-CREATE TABLE ComponentPicture	(
+CREATE TABLE RecipePicture	(
 	receipeID	INT	REFERENCES Receipe( ID ),
 	pictureID	INT	REFERENCES Picture( ID )
 );

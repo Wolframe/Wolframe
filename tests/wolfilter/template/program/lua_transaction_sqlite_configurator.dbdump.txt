@@ -1,3 +1,8 @@
+Picture:
+
+sqlite_sequence:
+'Category', '51'
+
 Category:
 '1', NULL, 'computer', 'computer', '1', '58'
 '2', '1', 'Minicomputer', 'minicomputer', '2', '11'
@@ -29,14 +34,19 @@ Category:
 '50', '16', 'Nanocomputer', 'nanocomputer', '53', '54'
 '51', '1', 'Device from outer space', 'device from outer space', '56', '57'
 
-sqlite_sequence:
-'Category', '51'
+CategoryPicture:
 
 Feature:
 
+FeaturePicture:
+
 Manufacturer:
 
-Components:
+Component:
+
+ComponentHistory:
+
+ComponentPicture:
 
 CategRequires:
 
@@ -51,6 +61,8 @@ ComponentProvides:
 ComponentCheck:
 
 Receipe:
+
+RecipePicture:
 
 ReceipeContent:
 

@@ -88,10 +88,19 @@ uint=number:unsigned;
 float=number:float;
 **file: DBDATA
 
+-- The list of images used
+--
+CREATE TABLE Picture	(
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	caption		TEXT,
+	info		TEXT,
+	image		BYTEA
+);
+
 -- The categories tree
 --
 CREATE TABLE Category	(
-	ID INTEGER PRIMARY KEY AUTOINCREMENT,
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	parent		INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
@@ -100,36 +109,64 @@ CREATE TABLE Category	(
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
 
+CREATE TABLE CategoryPicture	(
+	categoryID	INT	REFERENCES Category( ID ),
+	pictureID	INT	REFERENCES Picture( ID )
+);
+
+
 -- The features tree
 --
 CREATE TABLE Feature	(
-	ID INTEGER PRIMARY KEY AUTOINCREMENT,
+	ID 		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	parent		INT	REFERENCES Feature( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
-	lft		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( lft > 0 ),
-	rgt		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( rgt > 1 ),
+	lft		INT	NOT NULL,
+	rgt		INT	NOT NULL,
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
+
+CREATE TABLE FeaturePicture	(
+	featureID	INT	REFERENCES Feature( ID ),
+	pictureID	INT	REFERENCES Picture( ID )
+);
+
 
 -- The list of manufacturers
 --
 CREATE TABLE Manufacturer	(
-	ID		SERIAL	PRIMARY KEY,
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	name		TEXT	NOT NULL,
-	normalizedName	TEXT	NOT NULL UNIQUE
+	normalizedName	TEXT	NOT NULL UNIQUE,
+	webPage		TEXT,
+	logo		INT	REFERENCES Picture( ID )
 );
 
 -- The list of components
 --
-CREATE TABLE Components	(
-	ID		SERIAL	PRIMARY KEY,
+CREATE TABLE Component	(
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	code		TEXT	NOT NULL UNIQUE,
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
 	category	INT	REFERENCES Category( ID ),
 	manufacturerID	INT	REFERENCES Manufacturer( ID ),
-	mfgCode		TEXT
+	mfgCode		TEXT,
+	webPage		TEXT,
+	price		NUMERIC( 10, 2 )
+);
+
+CREATE TABLE ComponentHistory	(
+	componentID	INT	REFERENCES Component( ID ),
+	price		NUMERIC( 10, 2 ),
+	priceDate	TIMESTAMP,
+	user		TEXT
+);
+
+CREATE TABLE ComponentPicture	(
+	componentID	INT	REFERENCES Component( ID ),
+	pictureID	INT	REFERENCES Picture( ID )
 );
 
 -- The list of features required by members of a category
@@ -186,13 +223,18 @@ CREATE TABLE ComponentCheck	(
 -- Receipes
 --
 CREATE TABLE Receipe	(
-	ID		SERIAL	PRIMARY KEY,
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
 	description	TEXT,
 	categoryID	INT	REFERENCES Category( ID ),
 	CreationDate	TIMESTAMP,
 	Comment		TEXT
+);
+
+CREATE TABLE RecipePicture	(
+	receipeID	INT	REFERENCES Receipe( ID ),
+	pictureID	INT	REFERENCES Picture( ID )
 );
 
 CREATE TABLE ReceipeContent	(
@@ -207,7 +249,7 @@ CREATE TABLE ReceipeContent	(
 -- Configuration
 --
 CREATE TABLE Configuration	(
-	ID		SERIAL	PRIMARY KEY,
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	categoryID	INT	REFERENCES Category( ID ),
 	name		TEXT,
 	description	TEXT,
@@ -216,7 +258,7 @@ CREATE TABLE Configuration	(
 
 CREATE TABLE ConfigComponent	(
 	configID	INT	REFERENCES Configuration( ID ),
-	componentID	INT	REFERENCES Components( ID ),
+	componentID	INT	REFERENCES Component( ID ),
 	quantity	INT
 );
 
@@ -244,6 +286,7 @@ BEGIN
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parent, name, normalizedName, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
+--	FOREACH picture DO INSERT INTO CategoryPicture (categoryid,id,link) VALUES ($1, $(id), $(link));
 END
 
 --
@@ -386,12 +429,29 @@ local function normalizeName( name)
 	return name:gsub("[^%s]+", string.lower):gsub("[%-()]+", " "):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
 end
 
+local function content_value( v, itr)
+	if v then
+		return v
+	end
+	for v,t in itr do
+		if t then
+			return nil
+		end
+		if v then
+			return v
+		end
+		return nil
+	end
+end
+
 local function insert_itr( tablename, parentid, itr)
 	local id = 1
 	local name = ""
+	local nname = ""
 	for v,t in itr do
 		if (t == "name") then
-			local nname = normalizeName( v)
+			name = content_value( v, itr)
+			nname = normalizeName( name)
 			id = formfunction( "add" .. tablename)( {name=v, normalizedName=nname, parentid=parentid} ):table().ID
 		elseif (t == "node") then
 			insert_itr( tablename, id, scope( itr))
@@ -419,7 +479,7 @@ local function insert_tree_topnode( tablename, itr)
 		if (t == "parent") then
 			parentid = tonumber( v)
 		elseif (t == "name") then
-			name = v
+			name = content_value( v, itr)
 		elseif (t == "node") then
 			if name then
 				id = insert_topnode( tablename, name, parentid)
@@ -502,7 +562,7 @@ local function edit_node( tablename, itr)
 		if t == "id" then
 			id = v
 		elseif t ==  "name" then
-			name = v
+			name = content_value( v, itr)
 			nname = normalizeName( name)
 		end
 	end
@@ -528,7 +588,8 @@ local function create_node( tablename, itr)
 		elseif t == "parent" then
 			parentid = v
 		elseif t ==  "name" then
-			name = v
+			name = content_value( v, itr)
+			nname = normalizeName( name)
 		end
 	end
 	insert_topnode( tablename, name, parentid)
@@ -545,12 +606,12 @@ end
 
 function CategoryHierarchyRequest()
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	select_tree( "Category")
+	select_tree( "Category", input:get())
 end
 
 function FeatureHierarchyRequest()
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	select_tree( "Feature")
+	select_tree( "Feature", input:get())
 end
 
 function pushCategoryHierarchy()
@@ -907,6 +968,11 @@ end
 	<tree><item id="51">
 	<category>Device from outer space</category></item></tree>
 </item></tree></result>
+Picture:
+
+sqlite_sequence:
+'Category', '51'
+
 Category:
 '1', NULL, 'computer', 'computer', '1', '58'
 '2', '1', 'Minicomputer', 'minicomputer', '2', '11'
@@ -938,14 +1004,19 @@ Category:
 '50', '16', 'Nanocomputer', 'nanocomputer', '53', '54'
 '51', '1', 'Device from outer space', 'device from outer space', '56', '57'
 
-sqlite_sequence:
-'Category', '51'
+CategoryPicture:
 
 Feature:
 
+FeaturePicture:
+
 Manufacturer:
 
-Components:
+Component:
+
+ComponentHistory:
+
+ComponentPicture:
 
 CategRequires:
 
@@ -960,6 +1031,8 @@ ComponentProvides:
 ComponentCheck:
 
 Receipe:
+
+RecipePicture:
 
 ReceipeContent:
 
