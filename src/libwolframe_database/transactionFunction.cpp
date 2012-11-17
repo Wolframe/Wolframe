@@ -561,6 +561,7 @@ Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap, std::s
 			{
 				resno.push_back( *ii);
 			}
+			if (*ii == '(') throw std::runtime_error( "unexpected token '(' - result reference $ + number expected");
 			if (resno.size() == 0 || resno.size() > 999) throw std::runtime_error( "illegal result reference (only numbers between 1 and 999 allowed)");
 			elem.m_tag = std::atoi( resno.c_str());
 			if (elem.m_tag == 0) throw std::runtime_error( "referencing result with index 0");
@@ -1119,6 +1120,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 		++ci; utils::gotoNextToken( ci, ce);
 
 		// Parse parameter list:
+		int brkcnt = 0;
 		std::vector<std::string> paramstr;
 		if (*ci == ')')
 		{
@@ -1130,10 +1132,21 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 			for (;;)
 			{
 				std::string pp;
-				while (ci < ce && *ci != ',' && *ci != ')')
+				while (ci < ce && *ci != ',')
 				{
-					pp.push_back( *ci);
-					++ci;
+					char hh = *ci++;
+					if (hh == '(') ++brkcnt;
+					if (hh == ')' && --brkcnt < 0)
+					{
+						--ci;
+						brkcnt = 0;
+						break;
+					}
+					pp.push_back( hh);
+				}
+				if (brkcnt > 0)
+				{
+					throw Error( elementName, eidx, "() brackets not balanced");
 				}
 				boost::trim( pp);
 				if (pp.empty())

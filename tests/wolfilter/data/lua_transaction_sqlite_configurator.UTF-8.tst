@@ -104,6 +104,7 @@ CREATE TABLE Category	(
 	parent		INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
+	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
 	CONSTRAINT order_check CHECK ( rgt > lft )
@@ -279,14 +280,23 @@ END
 --
 -- addCategory
 --
+OPERATION addCategoryPicture -- (categoryID,caption,info,image)
+BEGIN
+	DO INSERT INTO CategoryPicture (caption,info,image) VALUES ($(caption), $(info), $(image));
+	DO SELECT $1,last_insert_rowid() FROM Picture;
+	DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
+END
+
 TRANSACTION addCategory -- (parentid, name, normalizedName)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT rgt FROM Category WHERE ID = $(parentid);
 	DO UPDATE Category SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
-	DO INSERT INTO Category (parent, name, normalizedName, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $1, $1+1);
+	DO INSERT INTO Category (parent, name, normalizedName, description, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
---	FOREACH picture DO INSERT INTO CategoryPicture (categoryid,id,link) VALUES ($1, $(id), $(link));
+	FOREACH picture DO INSERT INTO CategoryPicture (caption,info,image) VALUES ($(caption), $(info), $(image));
+	FOREACH picture DO SELECT $1,last_insert_rowid() FROM Picture;
+	FOREACH picture DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
 END
 
 --
@@ -295,6 +305,7 @@ END
 TRANSACTION deleteCategory -- (id)
 BEGIN
 	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Category WHERE ID = $(id);
+	DO DELETE FROM CategoryPicture WHERE categoryID = $(id);
 	DO DELETE FROM Category WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Category SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE Category SET rgt = rgt-$3 WHERE rgt>$2;
@@ -305,7 +316,8 @@ END
 --
 TRANSACTION updateCategory -- (id, name, normalizedName)
 BEGIN
-	DO UPDATE Category SET name = $(name),normalizedName = $(normalizedName) WHERE ID = $(id);
+	DO UPDATE Category SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
+	FOREACH picture DO UPDATE CategoryPicture SET caption = $(caption), info = $(info), image = $(image) WHERE ID = $(id);
 END
 
 --
@@ -316,19 +328,22 @@ END
 --
 TRANSACTION selectCategory -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Category WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Category WHERE ID = $(id);
+	INTO picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
 END
 TRANSACTION selectCategoryByName -- (name)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Category WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Category WHERE name = $(name);
+	INTO picture DO SELECT pictureID AS id,caption,info,image FROM CategoryPicture,Category WHERE CategoryPicture.categoryID = Category.ID AND Category.ID = $1;
 END
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Category WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
+	INTO picture DO SELECT pictureID AS id,caption,info,image FROM CategoryPicture,Category WHERE CategoryPicture.categoryID = Category.ID AND Category.ID = $1;
 END
 TRANSACTION selectCategorySet -- (/category/id)
 BEGIN
-	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName FROM Category WHERE ID = $(id);
+	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Category WHERE ID = $(id);
 END
 
 --
@@ -974,35 +989,35 @@ sqlite_sequence:
 'Category', '51'
 
 Category:
-'1', NULL, 'computer', 'computer', '1', '58'
-'2', '1', 'Minicomputer', 'minicomputer', '2', '11'
-'3', '2', 'Superminicomputer', 'superminicomputer', '3', '4'
-'4', '2', 'Minicluster', 'minicluster', '5', '6'
-'5', '2', 'Server (Minicomputer)', 'server minicomputer', '7', '8'
-'6', '2', 'Workstation (Minicomputer)', 'workstation minicomputer', '9', '10'
-'7', '1', 'Microcomputer', 'microcomputer', '12', '29'
-'8', '7', 'Tower PC', 'tower pc', '13', '14'
-'9', '7', 'Mid-Tower PC', 'mid tower pc', '15', '16'
-'10', '7', 'Mini-Tower PC', 'mini tower pc', '17', '18'
-'11', '7', 'Server (Microcomputer)', 'server microcomputer', '19', '20'
-'12', '7', 'Workstation (Microcomputer)', 'workstation microcomputer', '21', '22'
-'13', '7', 'Personal computer', 'personal computer', '23', '24'
-'14', '7', 'Desktop computer', 'desktop computer', '25', '26'
-'15', '7', 'Home computer', 'home computer', '27', '28'
-'16', '1', 'Mobile', 'mobile', '30', '55'
-'17', '16', 'Desknote', 'desknote', '31', '32'
-'18', '16', 'Laptop', 'laptop', '33', '42'
-'19', '18', 'Notebook', 'notebook', '34', '37'
-'20', '19', 'Subnotebook', 'subnotebook', '35', '36'
-'21', '18', 'Tablet personal computer', 'tablet personal computer', '38', '39'
-'44', '18', 'Wearable computer', 'wearable computer', '40', '41'
-'45', '16', 'Single board computer', 'single board computer', '43', '44'
-'46', '16', 'Wireless network component', 'wireless network component', '45', '46'
-'47', '16', 'Plug computer', 'plug computer', '47', '48'
-'48', '16', 'Microcontroller', 'microcontroller', '49', '50'
-'49', '16', 'Smartdust', 'smartdust', '51', '52'
-'50', '16', 'Nanocomputer', 'nanocomputer', '53', '54'
-'51', '1', 'Device from outer space', 'device from outer space', '56', '57'
+'1', NULL, 'computer', 'computer', NULL, '1', '58'
+'2', '1', 'Minicomputer', 'minicomputer', NULL, '2', '11'
+'3', '2', 'Superminicomputer', 'superminicomputer', NULL, '3', '4'
+'4', '2', 'Minicluster', 'minicluster', NULL, '5', '6'
+'5', '2', 'Server (Minicomputer)', 'server minicomputer', NULL, '7', '8'
+'6', '2', 'Workstation (Minicomputer)', 'workstation minicomputer', NULL, '9', '10'
+'7', '1', 'Microcomputer', 'microcomputer', NULL, '12', '29'
+'8', '7', 'Tower PC', 'tower pc', NULL, '13', '14'
+'9', '7', 'Mid-Tower PC', 'mid tower pc', NULL, '15', '16'
+'10', '7', 'Mini-Tower PC', 'mini tower pc', NULL, '17', '18'
+'11', '7', 'Server (Microcomputer)', 'server microcomputer', NULL, '19', '20'
+'12', '7', 'Workstation (Microcomputer)', 'workstation microcomputer', NULL, '21', '22'
+'13', '7', 'Personal computer', 'personal computer', NULL, '23', '24'
+'14', '7', 'Desktop computer', 'desktop computer', NULL, '25', '26'
+'15', '7', 'Home computer', 'home computer', NULL, '27', '28'
+'16', '1', 'Mobile', 'mobile', NULL, '30', '55'
+'17', '16', 'Desknote', 'desknote', NULL, '31', '32'
+'18', '16', 'Laptop', 'laptop', NULL, '33', '42'
+'19', '18', 'Notebook', 'notebook', NULL, '34', '37'
+'20', '19', 'Subnotebook', 'subnotebook', NULL, '35', '36'
+'21', '18', 'Tablet personal computer', 'tablet personal computer', NULL, '38', '39'
+'44', '18', 'Wearable computer', 'wearable computer', NULL, '40', '41'
+'45', '16', 'Single board computer', 'single board computer', NULL, '43', '44'
+'46', '16', 'Wireless network component', 'wireless network component', NULL, '45', '46'
+'47', '16', 'Plug computer', 'plug computer', NULL, '47', '48'
+'48', '16', 'Microcontroller', 'microcontroller', NULL, '49', '50'
+'49', '16', 'Smartdust', 'smartdust', NULL, '51', '52'
+'50', '16', 'Nanocomputer', 'nanocomputer', NULL, '53', '54'
+'51', '1', 'Device from outer space', 'device from outer space', NULL, '56', '57'
 
 CategoryPicture:
 

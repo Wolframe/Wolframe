@@ -15,6 +15,7 @@ CREATE TABLE Category	(
 	parent		INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
+	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
 	CONSTRAINT order_check CHECK ( rgt > lft )

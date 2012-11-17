@@ -189,6 +189,7 @@ std::string TransactionProgram::parseCallStatement( std::string::const_iterator&
 {
 	std::string tok;
 	int st = 0; // parse state
+	int brkcnt = 0;
 	std::string::const_iterator fcallstart = si;
 	char ch = gotoNextToken( si, se);
 	while (st < 3 && (ch = parseNextToken( tok, si, se)) != 0)
@@ -212,16 +213,20 @@ std::string TransactionProgram::parseCallStatement( std::string::const_iterator&
 					throw std::runtime_error( std::string( "'(' expected in function call after function name (DO ..) instead of '") + ch + "'");
 				}
 				st = 2;
+				brkcnt = 1;
 				continue;
 			case 2:
 				if (ch == ')')
 				{
-					st = 3;
-					break;
+					if (--brkcnt == 0)
+					{
+						st = 3;
+						break;
+					}
 				}
 				else if (ch == '(')
 				{
-					throw std::runtime_error( "unexpected '('. unterminated function call (DO ..)");
+					++brkcnt;
 				}
 				continue;
 		}
