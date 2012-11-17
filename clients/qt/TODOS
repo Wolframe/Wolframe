@@ -7,16 +7,15 @@ show-stoppers:
     - delete elements/subtrees
   
 musts:
+- FormWidget:
+  - solve races between answer of last request and new form load in
+    'switchForm' (add state machine)
 - element operations
   - reorganize tree
     - move elements/subtrees
 - protocol
   - network loader via protocol or use client library?
 - designer custom widgets
-  - FormWidget:
-    - implement a form widget as placeholder for the real thing
-    - loads via a form/data loader?
-    - provide a preview of the form?
   - them in MainWindow:
     - the now case is FormWidget<init>
     - MDI or tabbed view
@@ -35,6 +34,10 @@ musts:
       - form init doesn't work when language is not en_US
     - QTreeWidget
       - localization
+      - keep state of expansion
+      - expandAll on load
+      - open and make an item visible (for instance the location of the
+        last add)
 - for completion and presentation of big data
   - QListView: with model for big data, on request
   - QTreeView: with model for big data, on request
@@ -42,6 +45,8 @@ musts:
 - default focus on a textfield (funny, designer has no way to do it?)
 
 nice to do:
+- FormWidget:
+  - provide a preview of the form?
 - work more on Android port
 - use QNetworkSession (for mobiles and roaming profiles)
 - designer mode

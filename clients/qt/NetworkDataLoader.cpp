@@ -112,8 +112,16 @@ void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props
 	m_wolframeClient->request( mapAction( props->value( "action" ) ), data );
 }
 
-void NetworkDataLoader::handleUpdate( QString name, QByteArray data, QHash<QString, QString> *props )
+void NetworkDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, QString> *props )
 {
+	qDebug( ) << "network request:\n" << xml;
+	
+// the doctype has also a ".simpleform" which doesn't come back?
+	QString docType = props->value( "doctype" );
+	QStringList p = docType.split( "." );
+	m_map->insert( p[0], qMakePair( name, QString( ) ) );
+	 
+	m_wolframeClient->request( mapAction( props->value( "action" ) ), xml );
 }
 
 void NetworkDataLoader::handleDelete( QString name, QHash<QString, QString> *props )

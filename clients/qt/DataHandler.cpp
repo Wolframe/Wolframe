@@ -46,6 +46,13 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	}
 	if( props->contains( "rootelement" ) ) {
 		xml.writeStartElement( props->value( "rootelement" ) );
+		foreach( QString key, props->keys( ) ) {
+	// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
+			if( key.startsWith( "_q_" ) ) continue;
+	// ignore our own actions
+			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
+			xml.writeAttribute( key, props->value( key ) );
+		}		
 	} else {
 		xml.writeStartElement( form_name );
 	}
@@ -136,6 +143,12 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 			QList<QTreeWidgetItem *> items = treeWidget->selectedItems( );
 			foreach( QTreeWidgetItem *item, items ) {
+				// hard-coded! should be key/value as user attributes!
+				QString id = item->data( 0, Qt::UserRole ).toString( );
+				if( !id.isNull( ) ) {
+					xml.writeAttribute( "id", id );
+				}
+//				xml.writeAttribute( key, props->value( key ) );
 				xml.writeTextElement( "", name, item->data( 0, Qt::DisplayRole ).toString( ) );
 			}
 		} else if( clazz == "FileChooser" ) {
