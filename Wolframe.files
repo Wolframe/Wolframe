@@ -337,6 +337,8 @@ examples/demo/configurator/program/configurator.lua
 examples/demo/configurator/request/CategoryHierarchyRequest.xml
 examples/demo/configurator/request/CategoryHierarchyRootRequest.xml
 examples/demo/configurator/request/CategoryHierarchy.xml
+examples/demo/configurator/request/CategoryRequest.xml
+examples/demo/configurator/request/Category.xml
 examples/demo/configurator/request/createCategory.xml
 examples/demo/configurator/request/createFeature.xml
 examples/demo/configurator/request/deleteCategory.xml
@@ -345,6 +347,8 @@ examples/demo/configurator/request/editCategory.xml
 examples/demo/configurator/request/editFeature.xml
 examples/demo/configurator/request/FeatureHierarchyRequest.xml
 examples/demo/configurator/request/FeatureHierarchy.xml
+examples/demo/configurator/request/FeatureRequest.xml
+examples/demo/configurator/request/Feature.xml
 examples/demo/configurator/request/pushCategoryHierarchy.xml
 examples/demo/configurator/request/pushFeatureHierarchy.xml
 examples/demo/configurator/request/readCategory.xml

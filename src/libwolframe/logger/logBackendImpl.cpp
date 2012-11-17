@@ -118,6 +118,7 @@ inline void LogBackend::LogBackendImpl::log( const LogComponent component,
 
 LogLevel::Level LogBackend::LogBackendImpl::minLogLevel() const
 {
+	using namespace std;
 	LogLevel::Level uLvl = min( consoleLogger_.level(),
 				    min( logfileLogger_.level(), syslogLogger_.level() ));
 #if defined( _WIN32 )
