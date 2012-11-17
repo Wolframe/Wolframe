@@ -58,10 +58,10 @@ void ConsoleLogBackend::setLevel(const LogLevel::Level level_ )
 	logLevel_ = level_;
 }
 
-void ConsoleLogBackend::log( const LogComponent /* component */, const LogLevel::Level level, const std::string& msg )
+void ConsoleLogBackend::log( const LogComponent /* component */, const LogLevel::Level _level, const std::string& msg )
 {
-	if ( level >= logLevel_ ) {
-		std::cerr << level << ": " << msg << std::endl;
+	if ( _level >= logLevel_ ) {
+		std::cerr << _level << ": " << msg << std::endl;
 		std::cerr.flush( );
 	}
 }

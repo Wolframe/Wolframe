@@ -20,7 +20,7 @@ endif
 
 run:
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe-aba.conf -f
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -d DATA -c wolframe-aba.conf -f
 
 check:
 	@echo "Running the Wolframe server..."

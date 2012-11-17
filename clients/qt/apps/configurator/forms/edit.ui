@@ -17,7 +17,7 @@
    <string>read</string>
   </property>
   <property name="id" stdset="0">
-   <string notr="true">{session.id}</string>
+   <string notr="true">{global.id}</string>
   </property>
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
@@ -41,13 +41,13 @@
        <string notr="true">Category.simpleform</string>
       </property>
       <property name="action" stdset="0">
-       <string>update</string>
+       <string notr="true">update</string>
       </property>
       <property name="form" stdset="0">
        <string notr="true">init</string>
       </property>
       <property name="id" stdset="0">
-       <string notr="true">{session.id}</string>
+       <string notr="true">{global.id}</string>
       </property>
      </widget>
     </item>
@@ -66,7 +66,7 @@
        <string notr="true">read</string>
       </property>
       <property name="id" stdset="0">
-       <string>{session.id}</string>
+       <string notr="true">{global.id}</string>
       </property>
      </widget>
     </item>

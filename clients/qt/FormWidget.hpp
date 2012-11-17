@@ -74,14 +74,14 @@ class FormWidget : public QWidget
 		QSignalMapper *m_signalMapper;	// delegate for form push buttons pointing to forms
 		QStringList m_forms;		// names of all currently loaded forms
 		QLabel *m_text;			// placeholder of form name in designer mode
-		QHash<QString, QString> *m_session;
+		QHash<QString, QString> *m_globals;
 		
 	private:
 		void initializeNormal( );
 		void initializeDesigner( );
 		void sendRequest( QHash<QString, QString> *props );
-		void storeToSession( QHash<QString, QString> *props );
-		void restoreFromSession( QHash<QString, QString> *props );
+		void storeToGlobals( QHash<QString, QString> *props );
+		void restoreFromGlobals( QHash<QString, QString> *props );
 	
 	signals:
 		void formLoaded( QString name );

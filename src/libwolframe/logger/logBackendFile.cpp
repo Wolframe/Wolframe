@@ -119,13 +119,13 @@ static inline std::string timestamp( void )
 #endif // !defined( _WIN32 )
 }
 
-void LogfileBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
+void LogfileBackend::log( const LogComponent component, const LogLevel::Level _level, const std::string& msg )
 {
-	if( level >= logLevel_ && isOpen_ ) {
+	if( _level >= logLevel_ && isOpen_ ) {
 		logFile_	<< timestamp( ) << " "
 				<< component.str( )
 				<< ( component == LogComponent::LogNone ? "" : " - " )
-				<< level << ": " << msg << std::endl;
+				<< _level << ": " << msg << std::endl;
 		logFile_.flush( );
 	}
 }

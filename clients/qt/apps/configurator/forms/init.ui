@@ -55,8 +55,8 @@
       <property name="form" stdset="0">
        <string notr="true">add</string>
       </property>
-      <property name="session.id" stdset="0">
-       <string>{category.id}</string>
+      <property name="global.id" stdset="0">
+       <string notr="true">{category.id}</string>
       </property>
      </widget>
     </item>
@@ -90,8 +90,8 @@
       <property name="form" stdset="0">
        <string notr="true">edit</string>
       </property>
-      <property name="session.id" stdset="0">
-       <string>16</string>
+      <property name="global.id" stdset="0">
+       <string notr="true">16</string>
       </property>
      </widget>
     </item>

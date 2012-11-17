@@ -35,13 +35,13 @@
        <string notr="true">Category.simpleform</string>
       </property>
       <property name="action" stdset="0">
-       <string>create</string>
+       <string notr="true">create</string>
       </property>
       <property name="form" stdset="0">
        <string notr="true">init</string>
       </property>
       <property name="id" stdset="0">
-       <string>{session.id}</string>
+       <string notr="true">{global.id}</string>
       </property>
      </widget>
     </item>

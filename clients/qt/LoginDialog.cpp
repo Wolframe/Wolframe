@@ -80,7 +80,11 @@ void LoginDialog::keyPressEvent( QKeyEvent *_event )
 			
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
-			if( m_mechs->hasFocus( ) ) {
+			if( m_host->hasFocus( ) ) {
+				m_port->setFocus( );
+			} else if( m_port->hasFocus( ) ) {
+				m_mechs->setFocus( );
+			} else if( m_mechs->hasFocus( ) ) {
 				m_username->setFocus( );
 			} else if( m_username->hasFocus( ) ) {
 				m_password->setFocus( );

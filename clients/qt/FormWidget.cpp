@@ -47,8 +47,8 @@ void FormWidget::initializeNormal( )
 // maps data between constructed widgets from .ui and the data loader
 	m_dataHandler = new DataHandler( m_dataLoader );
 
-// the session to pass variables between forms
-	m_session = new QHash< QString, QString >( );
+// the global map to pass variables between forms
+	m_globals = new QHash< QString, QString >( );
 
 	if( !m_layout ) {
 		m_layout = new QHBoxLayout( this );
@@ -80,22 +80,33 @@ void FormWidget::formListLoaded( QStringList forms )
 	m_forms = forms;
 }
 
-void FormWidget::storeToSession( QHash<QString, QString> *props )
+void FormWidget::storeToGlobals( QHash<QString, QString> *props )
 {
 	foreach( const QString key, props->keys( ) ) {
-		if( key.startsWith( "session." ) ) {
+		if( key.startsWith( "global." ) ) {
 			QStringList parts = key.split( "." );
-			m_session->insert( parts[1], props->value( key ) );
+			m_globals->insert( parts[1], props->value( key ) );
 		}
 	}
 	
-	qDebug( ) << "SESSION:" << *m_session;
+	qDebug( ) << "GLOBALS:" << *m_globals;
 }
 
-void FormWidget::restoreFromSession( QHash<QString, QString> *props )
+void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
 {
-	foreach( const QString key, m_session->keys( ) ) {
-		props->insert( key, m_session->value( key ) );
+	foreach( const QString key, props->keys( ) ) {
+		QString value = props->value( key );
+		if( value.startsWith( "{" ) && value.endsWith( "}" ) ) {
+			QString refKey = value.mid( 1, value.length( ) - 2 );
+			if( key.startsWith( "global." ) ) {
+				QStringList parts = refKey.split( "." );
+				QString globalKey = parts[1];
+				if( m_globals->contains( globalKey ) ) {
+					props->insert( key, m_globals->value( globalKey ) );
+				}
+			}
+		}
+		qDebug( ) << "GLOBALS SUBSTITUTE" << key << props->value( key );
 	}
 }
 
@@ -104,7 +115,7 @@ void FormWidget::switchForm( QObject *object )
 	WidgetProperties *widgetProps = qobject_cast<WidgetProperties *>( object );
 	QHash<QString, QString> *props = widgetProps->props( );
 
-	storeToSession( props );
+	storeToGlobals( props );
 	
 // execute the action (eventually)
 	sendRequest( props );
@@ -120,7 +131,7 @@ FormWidget::~FormWidget( )
 {
 	if( m_ui ) delete m_ui;
 	if( m_dataHandler ) delete m_dataHandler;
-	if( m_session ) delete m_session;
+	if( m_globals ) delete m_globals;
 }
 
 void FormWidget::setFormLoader( FormLoader *_formLoader )
@@ -327,7 +338,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 // check for 'initAction'
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
 	readDynamicStringProperties( props, m_ui );
-	restoreFromSession( props );
+	restoreFromGlobals( props );
 	if( props->contains( "initAction" ) ) {
 		QString initAction = props->value( "initAction" );
 		props->insert( "action", initAction );
