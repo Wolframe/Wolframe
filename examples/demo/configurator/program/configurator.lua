@@ -97,6 +97,19 @@ local function select_tree( tablename, itr)
 	end
 end
 
+local function select_node( tablename, elementname, itr)
+	filter().empty = false
+	for v,t in itr do
+		if t == "id" then
+			output:opentag( elementname)
+			output:print( v, "id")
+			local r = formfunction( "select" .. tablename)( {id=v} )
+			output:print( r:get())
+			output:closetag()
+		end
+	end
+end
+
 local function edit_node( tablename, itr)
 	local name = nil;
 	local nname = nil;
@@ -164,12 +177,14 @@ function pushFeatureHierarchy()
 	add_tree( "Feature", input:get())
 end
 
-function CategoryHierarchyRequest()
-	select_tree( "Category", input:get())
+function CategoryRequest()
+	output:as( "node SYSTEM 'Category.simpleform'")
+	select_node( "Category", "category", input:get())
 end
 
-function FeatureHierarchyRequest()
-	select_tree( "Feature", input:get())
+function FeatureRequest()
+	output:as( "node SYSTEM 'Feature.simpleform'")
+	select_node( "Feature", "feature", input:get())
 end
 
 function readCategory()

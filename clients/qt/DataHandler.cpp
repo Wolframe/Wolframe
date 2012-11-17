@@ -347,15 +347,23 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 	}
 }
 
-void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
+void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &data, QHash<QString, QString> *props )
 {
 	QXmlStreamReader xml( data );
 	QWidget *widget = 0;
 	bool inForm = false;
 	QString clazz;
+
+// search for root element (new) or form name (old)
+	QString name;
+	if( props->contains( "rootelement" ) ) {
+		name = props->value( "rootelement" );
+	} else {
+		name = formName;
+	}
 	
 	resetFormData( form );
-	loadFormDomains( name, form );
+	loadFormDomains( formName, form );
 	
 	while( !xml.atEnd( ) ) {
 		xml.readNext( );
@@ -467,7 +475,9 @@ void DataHandler::readFormData( QString name, QWidget *form, QByteArray &data )
 						} else if( clazz == "FileChooser" ) {
 							FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
 							QString fileName = attributes.value( "", "filename" ).toString( );
-							fileChooser->setFileName( fileName );
+							if( !fileName.isEmpty( ) ) {
+								fileChooser->setFileName( fileName );
+							}
 						}
 					}
 				}

@@ -67,9 +67,14 @@ local function print_tree( tree, nodeid, indent)
 	if (indent ~= "") then
 		output:print( "\n" .. indent)
 	end
-	output:opentag( "node")
-	output:print( tree[ nodeid].name, "name")
+	output:opentag( "tree" )
+	output:opentag( "item" )
 	output:print( nodeid, "id")
+	output:print( "\n" .. indent )
+	output:opentag( "category" )
+	output:print( tree[ nodeid ].name )
+	-- more attributes of category follow here, like description
+	output:closetag( )
 	local n = 0
 	for i,v in pairs( tree[ nodeid].children) do
 		print_tree( tree, v, indent .. "\t")
@@ -78,6 +83,7 @@ local function print_tree( tree, nodeid, indent)
 	if n > 0 then
 		output:print( "\n" .. indent)
 	end
+	output:closetag( )
 	output:closetag()
 end
 
@@ -87,6 +93,19 @@ local function select_tree( tablename, itr)
 		if t == "id" then
 			local id = tonumber( v)
 			print_tree( get_tree( tablename, id), id, "")
+		end
+	end
+end
+
+local function select_node( tablename, elementname, itr)
+	filter().empty = false
+	for v,t in itr do
+		if t == "id" then
+			output:opentag( elementname)
+			output:print( v, "id")
+			local r = formfunction( "select" .. tablename)( {id=v} )
+			output:print( r:get())
+			output:closetag()
 		end
 	end
 end
@@ -158,12 +177,18 @@ function pushFeatureHierarchy()
 	add_tree( "Feature", input:get())
 end
 
-function CategoryHierarchyRequest()
-	select_tree( "Category", input:get())
+function CategoryRequest()
+	output:as( "node SYSTEM 'Category.simpleform'")
+	select_node( "Category", "category", input:get())
 end
 
-function FeatureHierarchyRequest()
-	select_tree( "Feature", input:get())
+function FeatureRequest()
+	output:as( "node SYSTEM 'Feature.simpleform'")
+	select_node( "Feature", "feature", input:get())
+end
+
+function readCategory()
+	print_tree( get_tree( "Category", 1), 1, "")
 end
 
 function editCategory()
@@ -230,6 +255,10 @@ function run()
 			create_node( "Category", scope(itr))
 		elseif (t == "createFeature") then
 			create_node( "Feature", scope(itr))
+		elseif (t == "CategoryRequest") then
+			select_node( "Category", "category", scope(itr))
+		elseif (t == "FeatureRequest") then
+			select_node( "Feature", "feature", scope(itr))
 		end
 	end
 	output:closetag()

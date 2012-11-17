@@ -365,6 +365,9 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_form, m_ui, &xml, props );
 
+// HACK: m_props
+	m_props = props;
+	
 // send request		
 	m_dataLoader->request( m_form, QString( ), xml, props );
 }
@@ -382,7 +385,8 @@ void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml
 			qDebug( ) << "Answer is for local widget" << widgetName << "in form" << formName;
 			m_dataHandler->loadFormDomain( formName, widgetName, m_ui, xml );
 		} else {
-			m_dataHandler->readFormData( formName, m_ui, xml );	
+			// HACK: m_props
+			m_dataHandler->readFormData( formName, m_ui, xml, m_props );	
 		}
 	}
 }

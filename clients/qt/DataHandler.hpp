@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QString>
 #include <QByteArray>
+#include <QHash>
 
 #include "DataLoader.hpp"
 
@@ -18,7 +19,7 @@ class DataHandler : public QObject
 	public:
 		DataHandler( DataLoader *_dataLoader );
 		virtual ~DataHandler( ) {};
-		void readFormData( QString name, QWidget *form, QByteArray &data );
+		void readFormData( QString name, QWidget *form, QByteArray &data, QHash<QString, QString> *props );
 		void writeFormData( QString name, QWidget *form, QByteArray *data, QHash<QString, QString> *props );
 		void resetFormData( QWidget *form );
 		void loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data );

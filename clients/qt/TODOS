@@ -5,7 +5,14 @@ show-stoppers:
   - reorganize tree
     - add elements 
     - delete elements/subtrees
-  
+- Windows bugs
+  - logger
+  - FileChooser setFilename segfaults (on loadDomain)
+  - designer mode segfaults when loading plugin
+- WolframeClient:
+  - sequentualize requests (how?, queue?)
+- QFSFileEngine::open: No file name specified
+
 musts:
 - FormWidget:
   - solve races between answer of last request and new form load in
