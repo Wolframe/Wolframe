@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logComponent.hpp
 /// \brief Defines the components of the system

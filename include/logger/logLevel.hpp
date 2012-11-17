@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logLevel.hpp
 /// \brief Defines allowed log levels of the logger
@@ -42,10 +41,11 @@
 #include <string>
 #include <iosfwd>
 
-namespace _Wolframe {
-namespace log {
+namespace _Wolframe	{
+namespace log	{
 
-class LogLevel {
+class LogLevel
+{
 public:
 	enum Level	{
 		LOGLEVEL_DATA,		///< log everything, including data
@@ -63,7 +63,7 @@ public:
 	};
 
 	/// convert string to a loglevel
-	static Level strToLogLevel( const std::string str );
+	static Level strToLogLevel( const std::string& str );
 };
 
 
@@ -75,9 +75,10 @@ inline std::basic_ostream< CharT, TraitsT > &operator<< ( std::basic_ostream< Ch
 	static const CharT *const str[] = {
 		"DATA", "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING",
 		"ERROR", "SEVERE", "CRITICAL", "ALERT", "FATAL" };
-	if( static_cast< size_t >( l ) < ( sizeof( str ) / sizeof( *str ) ) ) {
+	if( static_cast< size_t >( l ) < ( sizeof( str ) / sizeof( *str ) ) )	{
 		s << str[l];
-	} else {
+	}
+	else	{
 		s << "Unknown enum used '" << static_cast< int >( l ) << "' as log level";
 	}
 	return s;

@@ -35,22 +35,22 @@
 /// \brief implementation of logging to the Windows event logger
 ///
 
+#include <tchar.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
 #include <ostream>
 #include <iostream>
 #include <sstream>
 
 #include "logBackendEventlog.hpp"
 
-#include <tchar.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 #include "wolframemsg.h"
 
 #include "logger-v1.hpp" // TODO: just for LOG_ macros, should not be like this!
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
 EventlogBackend::EventlogBackend( )
 {
@@ -79,25 +79,25 @@ EventlogBackend::~EventlogBackend( )
 	}
 }
 
-void EventlogBackend::setLevel( const LogLevel::Level level )
+void EventlogBackend::setLevel( const LogLevel::Level level_ )
 {
-	logLevel_ = level;
+	logLevel_ = level_;
 }
 
-void EventlogBackend::setLog( const std::string log )
+void EventlogBackend::setLog( const std::string& log )
 {
 	log_ = log;
 }
 
-void EventlogBackend::setSource( const std::string source )
+void EventlogBackend::setSource( const std::string& source )
 {
 	source_ = source;
 	reopen( );
 }
 
-static WORD levelToEventlogLevel( const LogLevel::Level level )
+static WORD levelToEventlogLevel( const LogLevel::Level lvl )
 {
-	switch( level )	{
+	switch( lvl )	{
 		case LogLevel::LOGLEVEL_DATA:
 		case LogLevel::LOGLEVEL_TRACE:
 		case LogLevel::LOGLEVEL_DEBUG:
@@ -151,16 +151,17 @@ static WORD logComponentToCategoryId( const LogComponent c )
 	};
 }
 
-void EventlogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
+void EventlogBackend::log( const LogComponent component, const LogLevel::Level level_,
+			   const std::string& msg )
 {
-	if ( level >= logLevel_ && eventSource_ ) {
+	if ( level_ >= logLevel_ && eventSource_ ) {
 		LPCSTR msg_arr[1];
 		msg_arr[0] = (LPSTR)msg.c_str( );
 		BOOL res = ReportEvent(
 			eventSource_,
-			levelToEventlogLevel( level ),
+			levelToEventlogLevel( level_ ),
 			logComponentToCategoryId( component ),
-			messageIdToEventlogId( level ),
+			messageIdToEventlogId( level_ ),
 			sid_, // SID of the user owning the process, not now, later..
 			1, // at the moment no strings to replace, just the message itself
 			0, // no binary data
@@ -259,5 +260,4 @@ void EventlogBackend::calculateSid( )
 	CloseHandle( tokenProcess );
 }
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log

@@ -35,13 +35,12 @@
 /// \brief implementation of the Windows debugging log backend
 ///
 
-#include "logger/logLevel.hpp"
-#include "logBackendWinDebug.hpp"
-
-#include <sstream>
-
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
+#include <sstream>
+
+#include "logger/logLevel.hpp"
+#include "logBackendWinDebug.hpp"
 
 namespace _Wolframe {
 namespace log {
@@ -58,16 +57,17 @@ WinDebugLogBackend::~WinDebugLogBackend( )
 	// nothing to do here
 }
 
-void WinDebugLogBackend::setLevel( const LogLevel::Level level )
+void WinDebugLogBackend::setLevel( const LogLevel::Level level_ )
 {
-	logLevel_ = level;
+	logLevel_ = level_;
 }
 
-void WinDebugLogBackend::log( const LogComponent /* component */, const LogLevel::Level level, const std::string& msg )
+void WinDebugLogBackend::log( const LogComponent /* component */, const LogLevel::Level level_,
+			      const std::string& msg )
 {
-	if ( level >= logLevel_ ) {
+	if ( level_ >= logLevel_ ) {
 		std::ostringstream oss;
-		oss << level << ": " << msg << "\r";
+		oss << level_ << ": " << msg << "\r";
 		OutputDebugString( oss.str( ).c_str( ) );
 	}
 }

@@ -51,9 +51,11 @@ public:
 
 	~WinDebugLogBackend( );
 
-	void setLevel( const LogLevel::Level level );
+	void setLevel( const LogLevel::Level level_ );
+	LogLevel::Level level() const		{ return logLevel_; }
 
-	void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
+	void log( const LogComponent component, const LogLevel::Level level_,
+		  const std::string& msg );
 
 	void reopen( );
 

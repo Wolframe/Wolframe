@@ -116,10 +116,14 @@ inline void LogBackend::LogBackendImpl::log( const LogComponent component,
 }
 
 
-LogLevel::Level LogBackend::LogBackendImpl::logLevel() const
+LogLevel::Level LogBackend::LogBackendImpl::minLogLevel() const
 {
-	return std::min( consoleLogger_.level(),
-			 std::min( logfileLogger_.level(), syslogLogger_.level() ) );
+	LogLevel::Level uLvl = min( consoleLogger_.level(),
+				    min( logfileLogger_.level(), syslogLogger_.level() ));
+#if defined( _WIN32 )
+	uLvl = min ( uLvl, min ( windebugLogger_.level(), eventlogLogger_.level() ));
+#endif // defined( _WIN32 )
+	return uLvl;
 }
 
 // Log backend PIMPL redirection
@@ -152,6 +156,6 @@ void LogBackend::setWinDebugLevel( const LogLevel::Level level ) { impl_->setWin
 
 void LogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
 								{ impl_->log( component, level, msg ); }
-LogLevel::Level LogBackend::logLevel() const			{ return impl_->logLevel(); }
+LogLevel::Level LogBackend::minLogLevel() const			{ return impl_->minLogLevel(); }
 
 }} // namespace _Wolframe::log
