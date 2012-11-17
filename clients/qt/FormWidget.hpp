@@ -75,6 +75,7 @@ class FormWidget : public QWidget
 		QStringList m_forms;		// names of all currently loaded forms
 		QLabel *m_text;			// placeholder of form name in designer mode
 		QHash<QString, QString> *m_globals;
+		QHash<QString, QString> *m_props; // HACK to communicate props between signal and slot
 		
 	private:
 		void initializeNormal( );
