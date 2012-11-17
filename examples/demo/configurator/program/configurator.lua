@@ -73,6 +73,7 @@ local function print_tree( tree, nodeid, indent)
 	output:print( "\n" .. indent )
 	output:opentag( "category" )
 	output:print( tree[ nodeid ].name )
+	-- more attributes of category follow here, like description
 	output:closetag( )
 	local n = 0
 	for i,v in pairs( tree[ nodeid].children) do
@@ -169,6 +170,10 @@ end
 
 function FeatureHierarchyRequest()
 	select_tree( "Feature", input:get())
+end
+
+function readCategory()
+	print_tree( get_tree( "Category", 1), 1, "")
 end
 
 function editCategory()

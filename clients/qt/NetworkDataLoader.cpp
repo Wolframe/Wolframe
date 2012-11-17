@@ -96,12 +96,20 @@ void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props
 	foreach( QString key, props->keys( ) ) {
 // skip _q_ dynamic properties, they are used by the Qt stylesheet engine
 		if( key.startsWith( "_q_" ) ) continue;
+// ignore our own actions
+		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
 		xml.writeAttribute( key, props->value( key ) );
 	}
 	xml.writeEndElement( );
 	xml.writeEndDocument( );
 
 	qDebug( ) << "network request:\n" << data;
+
+// the doctype has also a ".simpleform" which doesn't come back?
+	QStringList p = docType.split( "." );
+	m_map->insert( p[0], qMakePair( name, QString( ) ) );
+	 
+	m_wolframeClient->request( mapAction( props->value( "action" ) ), data );
 }
 
 void NetworkDataLoader::handleUpdate( QString name, QByteArray data, QHash<QString, QString> *props )
@@ -110,6 +118,33 @@ void NetworkDataLoader::handleUpdate( QString name, QByteArray data, QHash<QStri
 
 void NetworkDataLoader::handleDelete( QString name, QHash<QString, QString> *props )
 {
+	QString rootElement = props->value( "rootelement" );
+	QString docType = props->value( "doctype" );
+	QByteArray data;
+	QXmlStreamWriter xml( &data );
+	xml.setAutoFormatting( true );
+	xml.setAutoFormattingIndent( 2 );
+
+	xml.writeStartDocument( );
+	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
+	xml.writeStartElement( rootElement );
+	foreach( QString key, props->keys( ) ) {
+// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
+		if( key.startsWith( "_q_" ) ) continue;
+// ignore our own actions
+		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
+		xml.writeAttribute( key, props->value( key ) );
+	}
+	xml.writeEndElement( );
+	xml.writeEndDocument( );
+
+	qDebug( ) << "network request:\n" << data;
+
+// the doctype has also a ".simpleform" which doesn't come back?
+	QStringList p = docType.split( "." );
+	m_map->insert( p[0], qMakePair( name, QString( ) ) );
+	 
+	m_wolframeClient->request( mapAction( props->value( "action" ) ), data );
 }
 
 void NetworkDataLoader::handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> *props )

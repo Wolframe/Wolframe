@@ -185,7 +185,7 @@ void FormWidget::loadForm( QString name )
 {
 	if( !m_formLoader ) return;
 
-	if( name == m_form ) return;
+//	if( name == m_form ) return;
 	
 // indicate busy state
 	qApp->setOverrideCursor( Qt::BusyCursor );

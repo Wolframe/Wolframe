@@ -40,7 +40,7 @@ class FormWidget : public QWidget
 			RunMode,		// when running in qtclient
 			DesignerMode		// when running in designer
 		};
-
+		
 		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent = 0 );
 		FormWidget( FormWidgetMode _mode, QWidget *parent = 0 );
 		virtual ~FormWidget( );
