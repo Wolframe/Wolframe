@@ -54,13 +54,14 @@ public:
 
 	~EventlogBackend( );
 
-	void setLevel( const LogLevel::Level level );
+	void setLevel( const LogLevel::Level level_ );
+	LogLevel::Level level() const		{ return logLevel_; }
 
-	void setLog( const std::string log );
+	void setLog( const std::string& log );
 
-	void setSource( const std::string source );
+	void setSource( const std::string& source );
 
-	void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
+	void log( const LogComponent component, const LogLevel::Level level_, const std::string& msg );
 
 	void reopen( );
 
@@ -74,6 +75,6 @@ private:
 	void calculateSid( );
 };
 
-} // namespace _Wolframe::log
+}} // namespace _Wolframe::log
 
 #endif // _LOG_BACKEND_EVENTLOG_HPP_INCLUDED

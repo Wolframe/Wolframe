@@ -1,20 +1,18 @@
 show-stoppers:
-- workflow for form
-  - action (CRUD) is a parameter to REQUEST <action>
-- element operations
-  - reorganize tree
-    - add elements 
-    - delete elements/subtrees
-- Windows bugs
-  - logger
   - FileChooser setFilename segfaults (on loadDomain)
   - designer mode segfaults when loading plugin
 - WolframeClient:
   - sequentualize requests (how?, queue?)
-- QFSFileEngine::open: No file name specified
+- filechooser + picture viewer
 
 musts:
-- FormWidget:
+- Windows bugs
+  - logger
+- element operations
+  - reorganize tree
+    - add elements 
+    - delete elements/subtrees
+-- FormWidget:
   - solve races between answer of last request and new form load in
     'switchForm' (add state machine)
 - element operations
@@ -41,7 +39,7 @@ musts:
       - form init doesn't work when language is not en_US
     - QTreeWidget
       - localization
-      - keep state of expansion
+      - keep state of expansion and selection
       - expandAll on load
       - open and make an item visible (for instance the location of the
         last add)

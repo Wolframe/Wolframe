@@ -35,23 +35,24 @@
 /// \brief implementation of logging error
 ///
 
-#include "logger-v1.hpp"
-#include "logger/logError.hpp"
-#include "logBackendImpl.hpp"
-
-#include <stdexcept>
-#include <sstream>
-
 // for strerror, errno, FormatMessage, GetLastError
 #ifdef _WIN32
 #include <tchar.h>
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <strsafe.h>
+#pragma warning(disable : 4995)
 #else
 #include <errno.h>
 #include <cstring>
 #endif
+
+#include "logger-v1.hpp"
+#include "logger/logError.hpp"
+//#include "logBackendImpl.hpp"
+
+#include <stdexcept>
+#include <sstream>
 
 namespace _Wolframe {
 namespace log {

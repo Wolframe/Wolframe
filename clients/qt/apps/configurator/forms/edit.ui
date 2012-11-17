@@ -63,7 +63,7 @@
        <string>Reset</string>
       </property>
       <property name="doctype" stdset="0">
-       <string notr="true">Category.simpleform</string>
+       <string notr="true">CategoryRequest.simpleform</string>
       </property>
       <property name="rootelement" stdset="0">
        <string notr="true">category</string>

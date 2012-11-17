@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logError.hpp
 /// \brief Error markers for logger output stream

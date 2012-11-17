@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///
-// \file logLevel.cpp
+/// \file logLevel.cpp
 /// \brief Implementation of the log level
 ///
 
@@ -40,7 +40,7 @@
 namespace _Wolframe {
 namespace log {
 
-LogLevel::Level LogLevel::strToLogLevel( const std::string s )
+LogLevel::Level LogLevel::strToLogLevel( const std::string& s )
 {
 	if( s == "DATA" )		return LogLevel::LOGLEVEL_DATA;
 	else if( s == "TRACE" )		return LogLevel::LOGLEVEL_TRACE;
