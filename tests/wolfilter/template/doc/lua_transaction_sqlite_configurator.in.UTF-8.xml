@@ -73,5 +73,6 @@
 <deleteCategory><category id="22"/></deleteCategory>
 <deleteCategory><category id="25"/></deleteCategory>
 <createCategory><category id="7" name="Device from outer space" parent="1"/></createCategory>
+<CategoryRequest><category id="46"/></CategoryRequest>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
 </test>

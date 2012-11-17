@@ -15,7 +15,7 @@ BEGIN
 	DO UPDATE Feature SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Feature SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Feature (parent, name, normalizedName, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from Feature WHERE lft = $1;
+	INTO . DO NONEMPTY UNIQUE SELECT ID from Feature WHERE normalizedName = $(normalizedName);
 END
 
 --
@@ -30,7 +30,7 @@ BEGIN
 END
 
 --
--- updteFeature
+-- updateFeature
 --
 TRANSACTION updateFeature -- (id, name, normalizedName)
 BEGIN
@@ -38,20 +38,26 @@ BEGIN
 END
 
 --
--- selectFeature       :Get the feature
--- selectFeatureByName :Get the feature by name
+-- selectFeature                 :Get the feature
+-- selectFeatureByName           :Get the feature by name
+-- selectFeatureByNormalizedName :Get the feature by name
+-- selectFeatureList             :Get a list of features
 --
-TRANSACTION selectFeature -- (/feature/id)
+TRANSACTION selectFeature -- (id)
 BEGIN
-	FOREACH /feature INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Feature WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE ID = $(id);
 END
-TRANSACTION selectFeatureByName -- (/feature/name)
+TRANSACTION selectFeatureByName -- (name)
 BEGIN
-	FOREACH /feature INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Feature WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE name = $(name);
 END
-TRANSACTION selectFeatureByNormalizedName -- (/feature/normalizedName)
+TRANSACTION selectFeatureByNormalizedName -- (normalizedName)
 BEGIN
-	FOREACH /feature INTO . DO NONEMPTY UNIQUE SELECT ID,parent,name,normalizedName FROM Feature WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE normalizedName = $(normalizedName);
+END
+TRANSACTION selectFeatureSet -- (/feature/id)
+BEGIN
+	FOREACH /feature INTO feature DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName FROM Feature WHERE ID = $(id);
 END
 
 --
