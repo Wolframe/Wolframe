@@ -19,7 +19,6 @@ class QDESIGNER_WIDGET_EXPORT PictureChooser : public QWidget
 {
 	Q_OBJECT
 	Q_PROPERTY( QString fileName READ fileName WRITE setFileName )
-	Q_PROPERTY( QByteArray picture READ picture WRITE setPicture )
 		
 	public:
 		PictureChooser( QWidget *_parent = 0 );

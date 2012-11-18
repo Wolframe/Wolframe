@@ -1,12 +1,17 @@
 show-stoppers:
-- filechooser + picture viewer (QLabel with QPixmap)
-- WolframeClient:
-  - sequentualize requests (how?, queue?), eliminate
-    reces between actions and domain load
 - FormWidget:
   - solve races between answer of last request and new form load in
     'switchForm' (add state machine)
-
+  - WolframeClient:
+    - sequentualize requests (how?, queue?), eliminate
+      reces between actions and domain load
+- trees, remember state like:
+  - current viewport
+  - current selection
+  - state of expanded items
+  - sorting order of columns
+  - arrangement of columns (their width)
+  
 musts:
 - Linux, shared lib for custom widgets, similar to windows, for now
   it works on Linux, but for instance not on Solaris or Freebsd (PIC

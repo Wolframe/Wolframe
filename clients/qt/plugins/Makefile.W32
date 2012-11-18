@@ -19,6 +19,7 @@ INCLUDE_DIRS = \
 	/I. \
 	/I.. \
 	/Ifilechooser \
+	/Ipicturechooser \
 	/Iformwidget \
 	/I"$(QT_DIR)\include" \
 	/I"$(QT_DIR)\include\QtCore" \
@@ -50,7 +51,11 @@ OBJS = \
 	..\FileChooser.obj \
 	..\moc_FileChooser.obj \
 	filechooser\FileChooserPlugin.obj \
-	filechooser\moc_FileChooserPlugin.obj
+	filechooser\moc_FileChooserPlugin.obj \
+	..\PictureChooser.obj \
+	..\moc_PictureChooser.obj \
+	picturechooser\PictureChooserPlugin.obj \
+	picturechooser\moc_PictureChooserPlugin.obj
 
 #	formwidget\FormWidgetPlugin.obj \
 #	formwidget\moc_FormWidgetPlugin.obj \
@@ -76,6 +81,12 @@ moc_WolframeWidgets.cpp: WolframeWidgets.hpp
 
 filechooser\moc_FileChooserPlugin.cpp: filechooser\FileChooserPlugin.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser -I"$(QT_DIR)\include\QtDesigner" filechooser\FileChooserPlugin.hpp -o filechooser\moc_FileChooserPlugin.cpp
+
+..\moc_PictureChooser.cpp: ..\PictureChooser.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ipicturechooser ..\PictureChooser.hpp -o ..\moc_PictureChooser.cpp
+
+picturechooser\moc_PictureChooserPlugin.cpp: picturechooser\PictureChooserPlugin.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Iicturechooser -I"$(QT_DIR)\include\QtDesigner" picturechooser\PictureChooserPlugin.hpp -o picturechooser\moc_PictureChooserPlugin.cpp
 
 formwidget\moc_FormWidgetPlugin.cpp: formwidget\FormWidgetPlugin.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Iformwidget -I"$(QT_DIR)\include\QtDesigner" formwidget\FormWidgetPlugin.hpp -o formwidget\moc_FormWidgetPlugin.cpp
