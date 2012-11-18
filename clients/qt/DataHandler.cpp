@@ -24,6 +24,7 @@
 #include <QListWidget>
 #include <QTreeWidget>
 #include <QFile>
+#include <QTreeWidgetItemIterator>
 
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
@@ -292,7 +293,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 	}
 }
 
-void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data )
+void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data, QHash<QString, QString> *props )
 {
 	QWidget *widget = form->findChild<QWidget *>( widget_name );
 	QString clazz = widget->metaObject( )->className( ); 
@@ -363,6 +364,41 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 				} else if( xml.name( ) == "item" ) {
 					parent->addChild( item );
 				}
+			}
+		}
+
+// iterate again and check against saved tree state
+		if( props->contains( "state" ) ) {
+			qDebug( ) << "Restoring tree state for tree" << widget_name;
+			QTreeWidgetItemIterator it( treeWidget );
+			QStringList states = props->value( "state" ).split( "|", QString::SkipEmptyParts );
+			int statePos = 0;
+			QString state;
+			QString stateId;
+			if( statePos < states.count( ) ) {
+				state = states[statePos].left( 1 );
+				stateId = states[statePos].right( 1 );
+			}
+			while( *it ) {
+				QString id = (*it)->data( 0, Qt::UserRole ).toString( );
+				if( id == stateId ) {
+					if( state == "E" ) {
+						(*it)->setExpanded( true );
+						statePos++;
+						if( statePos < states.count( ) ) {
+							state = states[statePos].left( 1 );
+							stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
+						}
+					} else if( state == "S" ) {
+						(*it)->setSelected( true );
+						statePos++;
+						if( statePos < states.count( ) ) {
+							state = states[statePos].left( 1 );
+							stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
+						}
+					}
+				}
+				++it;
 			}
 		}
 	} else {
@@ -532,7 +568,6 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 QString DataHandler::readFormVariable( QString variable, QWidget *form )
 {
 	QStringList parts = variable.split( "." );
-	QString name;
 
 	qDebug( ) << "Evaluating variable" << variable;
 	
@@ -541,11 +576,14 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		qDebug( ) << "Expecting a expression of the form <widget>.<property";
 		return QString( );
 	}
+	QString name = parts[0];
+	
 // expecting a property identifier as second argument
 	if( parts[1].isNull( ) ) {
 		qDebug( ) << "Expecting a property name in variable" << variable;
 		return QString( );
 	}
+	QString property = parts[1];
 	
 	QWidget *widget = qFindChild<QWidget *>( form, name );
 // no widget found with that name
@@ -558,12 +596,31 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 	QString clazz = widget->metaObject( )->className( );
 	if( clazz == "QTreeWidget" ) {
 		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
-
-// always return data of the selected item (assuming single select for now)
-// the ID is currently hard-coded in user data
-		QList<QTreeWidgetItem *> items = treeWidget->selectedItems( );
-		if( items.empty( ) ) return QString( );
-		return items[0]->data( 0, Qt::UserRole ).toString( );
+		
+		if( property == "id" ) {
+	// always return data of the selected item (assuming single select for now)
+	// the ID is currently hard-coded in user data
+			QList<QTreeWidgetItem *> items = treeWidget->selectedItems( );
+			if( items.empty( ) ) return QString( );
+			return items[0]->data( 0, Qt::UserRole ).toString( );
+		} else if( property == "state" ) {
+			QTreeWidgetItemIterator it( treeWidget );
+			QString state = "";
+			while( *it ) {
+				if( (*it)->isExpanded( ) ) {
+					state.append( "E" );
+					state.append( (*it)->data( 0, Qt::UserRole ).toString( ) );
+					state.append( "|" );
+				}
+				if( (*it)->isSelected( ) ) {
+					state.append( "S" );
+					state.append( (*it)->data( 0, Qt::UserRole ).toString( ) );
+					state.append( "|" );
+				}
+				++it;
+			}
+			return state;
+		}
 	} else {
 // non supported class
 		qDebug( ) << "Unsupported class" << clazz << "in variable" << variable;

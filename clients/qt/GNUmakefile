@@ -231,5 +231,5 @@ buildi18n:
 	$(QT_LUPDATE) apps/test/forms/form4.ui -ts apps/test/i18n/form4.ro_RO.ts
 
 geany-ctags:
-	CFLAGS="$(ALL_CXXFLAGS) -I$(QT_INCLUDE_DIR)/QtDesigner -Iplugins/filechooser -Iplugins/formwidget" \
+	CFLAGS="$(ALL_CXXFLAGS) -I$(QT_INCLUDE_DIR)/QtDesigner -Iplugins/filechooser -Iplugins/picturechooser -Iplugins/formwidget" \
 		geany -g geany.c++.tags `find . -name '*.[ch]pp'`

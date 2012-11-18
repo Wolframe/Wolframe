@@ -31,6 +31,9 @@
    <property name="rootelement" stdset="0">
     <string>category</string>
    </property>
+   <property name="state" stdset="0">
+    <string notr="true">{global.categoryState}</string>
+   </property>
    <column>
     <property name="text">
      <string>category</string>
@@ -63,6 +66,9 @@
       <property name="global.id" stdset="0">
        <string notr="true">{category.id}</string>
       </property>
+      <property name="global.categoryState" stdset="0">
+       <string notr="true">{category.state}</string>
+      </property>
      </widget>
     </item>
     <item>
@@ -85,6 +91,9 @@
       <property name="id" stdset="0">
        <string>{category.id}</string>
       </property>
+      <property name="global.categoryState" stdset="0">
+       <string notr="true">{category.state}</string>
+      </property>
      </widget>
     </item>
     <item>
@@ -98,6 +107,9 @@
       <property name="global.id" stdset="0">
        <string notr="true">{category.id}</string>
       </property>
+      <property name="global.categoryState" stdset="0">
+       <string notr="true">{category.state}</string>
+      </property>
      </widget>
     </item>
     <item>
@@ -108,6 +120,9 @@
       <property name="form" stdset="0">
        <string notr="true">categories</string>
       </property>
+      <property name="global.categoryState" stdset="0">
+       <string notr="true">{category.state}</string>
+      </property>
      </widget>
     </item>
     <item>
@@ -117,6 +132,9 @@
       </property>
       <property name="form" stdset="0">
        <string notr="true">init</string>
+      </property>
+      <property name="global.categoryState" stdset="0">
+       <string notr="true">{category.state}</string>
       </property>
      </widget>
     </item>

@@ -22,7 +22,7 @@ class DataHandler : public QObject
 		void readFormData( QString name, QWidget *form, QByteArray &data, QHash<QString, QString> *props );
 		void writeFormData( QString name, QWidget *form, QByteArray *data, QHash<QString, QString> *props );
 		void resetFormData( QWidget *form );
-		void loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data );
+		void loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data, QHash<QString, QString> *props );
 		void loadFormDomains( QString name, QWidget *form );
 		QString readFormVariable( QString variable, QWidget *form );
 	

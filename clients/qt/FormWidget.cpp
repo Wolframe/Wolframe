@@ -340,14 +340,16 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 // not busy anymore
 	qApp->restoreOverrideCursor( );
 
+// create properties
+	QHash<QString, QString> *props = new QHash<QString, QString>( );
+	readDynamicStringProperties( props, m_ui );
+	restoreFromGlobals( props );
+
 // reset the form now, this also loads the domains
 	m_dataHandler->resetFormData( m_ui );
 	m_dataHandler->loadFormDomains( m_form, m_ui );
 
 // check for 'initAction'
-	QHash<QString, QString> *props = new QHash<QString, QString>( );
-	readDynamicStringProperties( props, m_ui );
-	restoreFromGlobals( props );
 	if( props->contains( "initAction" ) ) {
 		QString initAction = props->value( "initAction" );
 		props->insert( "action", initAction );
@@ -385,9 +387,17 @@ void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml
 	if( !xml.isEmpty( ) ) {
 		if( !widgetName.isEmpty( ) ) {
 			qDebug( ) << "Answer is for local widget" << widgetName << "in form" << formName;
-			m_dataHandler->loadFormDomain( formName, widgetName, m_ui, xml );
+
+// get properties if widget
+			QWidget *widget = m_ui->findChild<QWidget *>( widgetName );
+			QHash<QString, QString> *props = new QHash<QString, QString>( );
+			readDynamicStringProperties( props, widget );
+			restoreFromGlobals( props );
+
+// restore domains and state
+			m_dataHandler->loadFormDomain( formName, widgetName, m_ui, xml, props );
 		} else {
-			// HACK: m_props
+			// HACK: m_props are the properties of the form
 			m_dataHandler->readFormData( formName, m_ui, xml, m_props );	
 		}
 	}
