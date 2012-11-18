@@ -1,7 +1,4 @@
 show-stoppers:
-- Windows deployment
-- frontend:
-  - associating categories and features
 - FormWidget:
   - solve races between answer of last request and new form load in
     'switchForm' (add state machine)
@@ -16,6 +13,8 @@ show-stoppers:
   - arrangement of columns (their width)
   
 musts:
+- frontend:
+  - associating categories and features
 - Linux, shared lib for custom widgets, similar to windows, for now
   it works on Linux, but for instance not on Solaris or Freebsd (PIC
   mixing!)
