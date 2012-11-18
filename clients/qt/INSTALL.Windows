@@ -1,10 +1,8 @@
 Temporary Windows ZIP file install
 
-Use vc_redistx86.exe for "Microsoft c++ runtime vc 2010".
-Install it on the client machine.
-
 nmake xxx zip
 copy qtclient.zip to client machine, unpack there.
-start qtclient.exe -c configurator.conf
+
+start run.bat
 
 

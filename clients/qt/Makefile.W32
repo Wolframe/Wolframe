@@ -287,18 +287,24 @@ zip:
 	-rmdir C:\qtclient\apps\configurator\forms
 	-rmdir C:\qtclient\apps\configurator
 	-rmdir C:\qtclient\apps
+	-rmdir C:\qtclient\imageformats
+	-rmdir C:\qtclient\sqldrivers
 	-rmdir C:\qtclient
 	mkdir C:\qtclient
 	mkdir C:\qtclient\apps
 	mkdir C:\qtclient\apps\configurator
 	mkdir C:\qtclient\themes
 	mkdir C:\qtclient\i18n
+	mkdir C:\qtclient\imageformats
+	mkdir C:\qtclient\sqldrivers
 	copy qtclient.exe C:\qtclient
 	copy $(QT_DIR)\bin\QtCored4.dll C:\qtclient
 	copy $(QT_DIR)\bin\QtGuid4.dll C:\qtclient
 	copy $(QT_DIR)\bin\QtNetworkd4.dll C:\qtclient
 	copy $(QT_DIR)\bin\QtWebkitd4.dll C:\qtclient
 	copy $(QT_DIR)\bin\QtSqld4.dll C:\qtclient
+	copy $(QT_DIR)\plugins\sqldrivers\qsqlited4.dll C:\qtclient\sqldrivers
+	copy $(QT_DIR)\plugins\imageformats\*.dll C:\qtclient\imageformats
 	copy "$(OPENSSL_DIR)\bin\libeay32.dll" C:\qtclient
 	copy "$(OPENSSL_DIR)\bin\ssleay32.dll" C:\qtclient
 	copy plugins\wolframewidgets.dll C:\qtclient
@@ -306,5 +312,8 @@ zip:
 	xcopy /e i18n C:\qtclient\i18n
 	copy apps\configurator.conf C:\qtclient
 	xcopy /e apps\configurator C:\qtclient\apps\configurator
+	copy C:\windows\system32\msvcp100d.dll C:\qtclient
+	copy C:\windows\system32\msvcr100d.dll C:\qtclient
+	copy run.bat C:\qtclient
 	cscript /nologo zip.vbs %TEMP%\qtclient.zip C:\qtclient
 	move %TEMP%\qtclient.zip .
