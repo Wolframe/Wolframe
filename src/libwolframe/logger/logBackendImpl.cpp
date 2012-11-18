@@ -37,6 +37,8 @@
 
 #include "logBackendImpl.hpp"
 
+#include <algorithm>
+
 namespace _Wolframe {
 namespace log {
 
