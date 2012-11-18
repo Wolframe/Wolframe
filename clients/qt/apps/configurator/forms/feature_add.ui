@@ -6,24 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>391</width>
-    <height>435</height>
+    <width>393</width>
+    <height>424</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
-  </property>
-  <property name="initAction" stdset="0">
-   <string>read</string>
-  </property>
-  <property name="id" stdset="0">
-   <string notr="true">{global.id}</string>
-  </property>
-  <property name="doctype" stdset="0">
-   <string notr="true">CategoryRequest.simpleForm</string>
-  </property>
-  <property name="rootelement" stdset="0">
-   <string>category</string>
   </property>
   <widget class="QWidget" name="formLayoutWidget">
    <property name="geometry">
@@ -35,9 +23,6 @@
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
-    <property name="fieldGrowthPolicy">
-     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-    </property>
     <item row="0" column="0">
      <widget class="QLabel" name="label_name">
       <property name="text">
@@ -58,15 +43,15 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QPlainTextEdit" name="description"/>
-    </item>
     <item row="2" column="0">
      <widget class="QLabel" name="label">
       <property name="text">
        <string>Picture:</string>
       </property>
      </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPlainTextEdit" name="description"/>
     </item>
     <item row="2" column="1">
      <widget class="PictureChooser" name="picture">
@@ -80,51 +65,32 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_2">
+  <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>100</x>
      <y>380</y>
-     <width>371</width>
-     <height>41</height>
+     <width>201</width>
+     <height>31</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QPushButton" name="save">
+     <widget class="QPushButton" name="add">
       <property name="text">
-       <string>Save</string>
+       <string>Add</string>
       </property>
       <property name="rootelement" stdset="0">
-       <string notr="true">category</string>
+       <string notr="true">feature</string>
       </property>
       <property name="doctype" stdset="0">
-       <string notr="true">Category.simpleform</string>
+       <string notr="true">Feature.simpleform</string>
       </property>
       <property name="action" stdset="0">
-       <string notr="true">update</string>
+       <string notr="true">create</string>
       </property>
       <property name="form" stdset="0">
-       <string notr="true">init</string>
-      </property>
-      <property name="id" stdset="0">
-       <string notr="true">{global.id}</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="reset">
-      <property name="text">
-       <string>Reset</string>
-      </property>
-      <property name="doctype" stdset="0">
-       <string notr="true">CategoryRequest.simpleform</string>
-      </property>
-      <property name="rootelement" stdset="0">
-       <string notr="true">category</string>
-      </property>
-      <property name="action" stdset="0">
-       <string notr="true">read</string>
+       <string notr="true">features</string>
       </property>
       <property name="id" stdset="0">
        <string notr="true">{global.id}</string>
@@ -137,7 +103,7 @@
        <string>Cancel</string>
       </property>
       <property name="form" stdset="0">
-       <string notr="true">init</string>
+       <string notr="true">features</string>
       </property>
      </widget>
     </item>

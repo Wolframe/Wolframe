@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>477</width>
+    <height>318</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QTreeWidget" name="feature">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>451</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="itemsExpandable">
+    <bool>true</bool>
+   </property>
+   <property name="doctype" stdset="0">
+    <string notr="true">FeatureHierarchyRequest.simpleform</string>
+   </property>
+   <property name="rootelement" stdset="0">
+    <string>feature</string>
+   </property>
+   <column>
+    <property name="text">
+     <string>feature</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>description</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>260</y>
+     <width>403</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="add">
+      <property name="text">
+       <string>Add</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">feature_add</string>
+      </property>
+      <property name="global.id" stdset="0">
+       <string notr="true">{feature.id}</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="delete_2">
+      <property name="text">
+       <string>Delete</string>
+      </property>
+      <property name="doctype" stdset="0">
+       <string notr="true">Feature.simpleform</string>
+      </property>
+      <property name="rootelement" stdset="0">
+       <string notr="true">feature</string>
+      </property>
+      <property name="action" stdset="0">
+       <string notr="true">delete</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">features</string>
+      </property>
+      <property name="id" stdset="0">
+       <string>{feature.id}</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="edit">
+      <property name="text">
+       <string>Edit</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">feature_edit</string>
+      </property>
+      <property name="global.id" stdset="0">
+       <string notr="true">{feature.id}</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="reload">
+      <property name="text">
+       <string>Reload</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">features</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="reload_2">
+      <property name="text">
+       <string>Main Menu</string>
+      </property>
+      <property name="form" stdset="0">
+       <string notr="true">init</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>feature</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,4 +1,7 @@
 show-stoppers:
+- Windows deployment
+- frontend:
+  - associating categories and features
 - FormWidget:
   - solve races between answer of last request and new form load in
     'switchForm' (add state machine)

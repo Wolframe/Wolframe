@@ -90,7 +90,7 @@
        <string notr="true">create</string>
       </property>
       <property name="form" stdset="0">
-       <string notr="true">init</string>
+       <string notr="true">categories</string>
       </property>
       <property name="id" stdset="0">
        <string notr="true">{global.id}</string>
@@ -103,7 +103,7 @@
        <string>Cancel</string>
       </property>
       <property name="form" stdset="0">
-       <string notr="true">init</string>
+       <string notr="true">categories</string>
       </property>
      </widget>
     </item>
