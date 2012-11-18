@@ -13,6 +13,10 @@ find . -name '*.xsl' -type f -print >>/tmp/$$
 find . -name '*.lua' -type f -print >>/tmp/$$
 find . -name '*.rng' -type f -print >>/tmp/$$
 find . -name '*.sql' -type f -print >>/tmp/$$
+find . -name '*.netcat' -type f -print >>/tmp/$$
+find . -name '*.simpleform' -type f -print >>/tmp/$$
+find . -name '*.tdl' -type f -print >>/tmp/$$
+find . -name '*.normalize' -type f -print >>/tmp/$$
 find . -name '*.sh' -type f -print >>/tmp/$$
 find docs -name '*.ent' -type f -print >>/tmp/$$
 find tests -name '*.tst' -type f -print >>/tmp/$$

@@ -31,30 +31,30 @@ INSERT INTO Platform ( ID, parent, name, lft, rgt ) VALUES ( 7, 4, 'Mac OS', 12,
 -- Table of locales
 --
 CREATE TABLE Locale (
-	ID		TEXT	PRIMARY KEY,
+	shortName	TEXT	PRIMARY KEY,
 	ENname		TEXT,
 	localName	TEXT
 );
 
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'en', 'English', 'English' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'en-GB', 'English (United Kingdom)', 'English (United Kingdom)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'en-US', 'English (United States)', 'English (United States)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'fi', 'Finnish', 'suomi' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'fi-FI', 'Finnish (Finland)', 'suomi (Suomi)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'fr', 'French', 'français' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'fr-FR', 'French (France)', 'français (France)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'fr-CH', 'French (Switzerland)', 'français (Suisse)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'de', 'German', 'Deutsch' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'de-DE', 'German (Germany)', 'Deutsch (Deutschland)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'de-LI', 'German (Liechtenstein)', 'Deutsch (Liechtenstein)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'de-CH', 'German (Switzerland)', 'Deutsch (Schweiz)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'it', 'Italian', 'italiano' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'it-IT', 'Italian (Italy)', 'italiano (Italia)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'it-CH', 'Italian (Switzerland)', 'italiano (Svizzera)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'ro', 'Romanian', 'română' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'ro-RO', 'Romanian (Romania)', 'română (România)' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'rm', 'Romansh', 'Rumantsch' );
-INSERT INTO locale ( ID, ENname, localName ) VALUES ( 'rm-CH', 'Romansh (Switzerland)', 'Rumantsch (Svizra)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'en', 'English', 'English' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'en-GB', 'English (United Kingdom)', 'English (United Kingdom)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'en-US', 'English (United States)', 'English (United States)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'fi', 'Finnish', 'suomi' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'fi-FI', 'Finnish (Finland)', 'suomi (Suomi)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'fr', 'French', 'français' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'fr-FR', 'French (France)', 'français (France)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'fr-CH', 'French (Switzerland)', 'français (Suisse)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'de', 'German', 'Deutsch' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'de-DE', 'German (Germany)', 'Deutsch (Deutschland)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'de-LI', 'German (Liechtenstein)', 'Deutsch (Liechtenstein)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'de-CH', 'German (Switzerland)', 'Deutsch (Schweiz)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'it', 'Italian', 'italiano' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'it-IT', 'Italian (Italy)', 'italiano (Italia)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'it-CH', 'Italian (Switzerland)', 'italiano (Svizzera)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'ro', 'Romanian', 'română' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'ro-RO', 'Romanian (Romania)', 'română (România)' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'rm', 'Romansh', 'Rumantsch' );
+INSERT INTO locale ( shortName, ENname, localName ) VALUES ( 'rm-CH', 'Romansh (Switzerland)', 'Rumantsch (Svizra)' );
 
 
 CREATE TABLE UIobjectType (
@@ -74,7 +74,7 @@ CREATE TABLE UIobject (
 	ID		INTEGER	REFERENCES UIobjectName( ID ),
 	platformID	INTEGER	REFERENCES Platform( ID ),
 	typeID		INTEGER	REFERENCES UIobjectType( ID ),
-	locale		TEXT	REFERENCES locale( ID ),
+	locale		TEXT	REFERENCES locale( shortName ),
 	version		INTEGER,
 	body		TEXT
 );
@@ -110,8 +110,8 @@ CREATE TABLE Role (
 );
 
 CREATE TABLE AuthzMatrix (
-	role		INTEGER	REFERENCES Role( ID ),
-	authzName	INTEGER	REFERENCES AuthorizationName( ID ),
-	UNIQUE (role, authzName)
+	roleID		INTEGER	REFERENCES Role( ID ),
+	authzNameID	INTEGER	REFERENCES AuthorizationName( ID ),
+	UNIQUE (roleID, authzNameID)
 );
 
