@@ -270,3 +270,41 @@ buildi18n:
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form3.ui -ts apps\test\i18n\form3.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form4.ui -ts apps\test\i18n\form4.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form4.ui -ts apps\test\i18n\form4.ro_RO.ts
+
+#	del /s /q C:\qtclient
+
+zip:
+	-del qtclient.zip
+	-del /s /q C:\qtclient\*
+	-rmdir C:\qtclient\i18n
+	-rmdir C:\qtclient\themes\phone
+	-rmdir C:\qtclient\themes\windows
+	-rmdir C:\qtclient\themes
+	-rmdir C:\qtclient\apps\configurator\private
+	-rmdir C:\qtclient\apps\configurator\certs
+	-rmdir C:\qtclient\apps\configurator\data
+	-rmdir C:\qtclient\apps\configurator\i18n
+	-rmdir C:\qtclient\apps\configurator\forms
+	-rmdir C:\qtclient\apps\configurator
+	-rmdir C:\qtclient\apps
+	-rmdir C:\qtclient
+	mkdir C:\qtclient
+	mkdir C:\qtclient\apps
+	mkdir C:\qtclient\apps\configurator
+	mkdir C:\qtclient\themes
+	mkdir C:\qtclient\i18n
+	copy qtclient.exe C:\qtclient
+	copy $(QT_DIR)\bin\QtCored4.dll C:\qtclient
+	copy $(QT_DIR)\bin\QtGuid4.dll C:\qtclient
+	copy $(QT_DIR)\bin\QtNetworkd4.dll C:\qtclient
+	copy $(QT_DIR)\bin\QtWebkitd4.dll C:\qtclient
+	copy $(QT_DIR)\bin\QtSqld4.dll C:\qtclient
+	copy "$(OPENSSL_DIR)\bin\libeay32.dll" C:\qtclient
+	copy "$(OPENSSL_DIR)\bin\ssleay32.dll" C:\qtclient
+	copy plugins\wolframewidgets.dll C:\qtclient
+	xcopy /e themes C:\qtclient\themes
+	xcopy /e i18n C:\qtclient\i18n
+	copy apps\configurator.conf C:\qtclient
+	xcopy /e apps\configurator C:\qtclient\apps\configurator
+	cscript /nologo zip.vbs %TEMP%\qtclient.zip C:\qtclient
+	move %TEMP%\qtclient.zip .
