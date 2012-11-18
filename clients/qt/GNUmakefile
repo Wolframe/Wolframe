@@ -76,6 +76,8 @@ CPP_OBJS = \
 	moc_PreferencesDialog.o \
 	FileChooser.o \
 	moc_FileChooser.o \
+	PictureChooser.o \
+	moc_PictureChooser.o \
 	StorageWidget.o \
 	moc_StorageWidget.o \
 	ManageStorageDialog.o \
@@ -126,6 +128,9 @@ moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 
 moc_FileChooser.cpp: FileChooser.hpp
 	$(QT_MOC) $(MOC_FLAGS) FileChooser.hpp -o moc_FileChooser.cpp
+
+moc_PictureChooser.cpp: PictureChooser.hpp
+	$(QT_MOC) $(MOC_FLAGS) PictureChooser.hpp -o moc_PictureChooser.cpp
 
 moc_StorageWidget.cpp: StorageWidget.hpp
 	$(QT_MOC) $(MOC_FLAGS) StorageWidget.hpp -o moc_StorageWidget.cpp
@@ -204,6 +209,7 @@ local_test:
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
+	@-cp plugins/libwolframewidgets.so .
 	@LD_LIBRARY_PATH=$(QT_LIB_DIR) ./qtclient
 
 .PHONY: buildi18n

@@ -33,7 +33,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -93,6 +93,37 @@
        <widget class="FileChooser" name="file"/>
       </item>
      </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>Picture</string>
+    </attribute>
+    <widget class="QFrame" name="frame">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>311</width>
+       <height>221</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="PictureChooser" name="picture">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>291</width>
+        <height>201</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
@@ -211,6 +242,11 @@
    <class>FileChooser</class>
    <extends>QWidget</extends>
    <header>FileChooser.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>PictureChooser</class>
+   <extends>QWidget</extends>
+   <header>PictureChooser.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

@@ -26,6 +26,7 @@
 #include <QFile>
 
 #include "FileChooser.hpp"
+#include "PictureChooser.hpp"
 #include "FormWidget.hpp"
 
 DataHandler::DataHandler( DataLoader *_dataLoader ) : m_dataLoader( _dataLoader )
@@ -153,21 +154,33 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			}
 		} else if( clazz == "FileChooser" ) {
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-			if( fileChooser ) {
-				QString fileName = fileChooser->fileName( );
-				xml.writeStartElement( name );
-				xml.writeAttribute( "filename", fileName );
-				QFile file( fileName );
-				file.open( QFile::ReadOnly );
-				QByteArray fileContent = file.readAll( );
-				xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
-				QString encoded = QString( fileContent.toBase64( ) );
-				file.close( );	
-				xml.writeCharacters( encoded );
-				xml.writeEndElement( );
-			} else {
-				qDebug( ) << "FATAL: Can't cast FileChooser!!";
-			}
+			QString fileName = fileChooser->fileName( );
+			xml.writeStartElement( name );
+			xml.writeAttribute( "filename", fileName );
+			QFile file( fileName );
+			file.open( QFile::ReadOnly );
+			QByteArray fileContent = file.readAll( );
+			xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
+			QString encoded = QString( fileContent.toBase64( ) );
+			file.close( );	
+			xml.writeCharacters( encoded );
+			xml.writeEndElement( );
+		} else if( clazz == "PictureChooser" ) {
+			PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
+			QString fileName = pictureChooser->fileName( );
+			xml.writeStartElement( name );
+			xml.writeAttribute( "filename", fileName );
+			QByteArray fileContent = pictureChooser->picture( );
+			xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
+			QString encoded = QString( fileContent.toBase64( ) );
+			xml.writeCharacters( encoded );
+			xml.writeEndElement( );
+		} else if( clazz == "QPushButton" ) {
+			// skip, ok, buttons can't be reset
+		} else if( clazz == "QWidget" ) {
+			// skip, generic widget, don't possibly know how to reset it
+		} else {
+			qDebug( ) << "Write for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 		}
 		
 		qDebug( ) << "Wrote " << clazz << name;
@@ -232,15 +245,11 @@ void DataHandler::resetFormData( QWidget *form )
 			QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 			treeWidget->clear( );
 		} else if( clazz == "FileChooser" ) {
-			qDebug( ) << "FileChooser in datahandler reset" << widget;
-			qDebug( ) << "FileChooser meta" << widget->metaObject( )->className( );
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-			qDebug( ) << "FileChooser in datahandler reset" << fileChooser;
-			if( fileChooser ) {
-				fileChooser->setFileName( "" );
-			} else {
-				qDebug( ) << "FATAL: Can't cast FileChooser!!";
-			}
+			fileChooser->setFileName( "" );
+		} else if( clazz == "PictureChooser" ) {
+			PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
+			pictureChooser->setFileName( "" );
 		} else if( clazz == "QPushButton" ) {
 			// skip, ok, buttons can't be reset
 		} else if( clazz == "QWidget" ) {
@@ -490,15 +499,22 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 								}
 							}
 						} else if( clazz == "FileChooser" ) {
-							FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-							QString fileName = attributes.value( "", "filename" ).toString( );
-							if( !fileName.isEmpty( ) ) {
-								if( fileChooser ) {
-									fileChooser->setFileName( fileName );
-								} else {
-									qDebug( ) << "FATAL: Can't cast FileChooser!!";
-								}
-							}
+							// don't restore anything, this is an upload component only
+							//FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
+							//QString fileName = attributes.value( "", "filename" ).toString( );
+							//if( !fileName.isEmpty( ) ) {
+							//}
+						} else if( clazz == "PictureChooser" ) {
+							PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
+							QByteArray encoded = text.toAscii( );
+							QByteArray decoded = QByteArray::fromBase64( encoded );
+							pictureChooser->setPicture( decoded );
+						} else if( clazz == "QPushButton" ) {
+							// skip, ok, buttons can't be reset
+						} else if( clazz == "QWidget" ) {
+							// skip, generic widget, don't possibly know how to reset it
+						} else {
+							qDebug( ) << "Read for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 						}
 					}
 				}

@@ -31,6 +31,9 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 		QString fileName( ) const;
 		SelectionMode selectionMode( ) const;
 
+	signals:
+		void fileNameChanged( const QString _fileName );
+		
 	public slots:
 		void setFileName( const QString &_filename );
 		void setSelectionMode( const SelectionMode _mode );

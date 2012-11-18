@@ -6,22 +6,17 @@
 
 #include <QHBoxLayout>
 #include <QFileDialog>
-#include <QDebug>
 
 FileChooser::FileChooser( SelectionMode _selectionMode, QWidget *_parent )
 	: QWidget( _parent ), m_selectionMode( _selectionMode ),
 	  m_lineEdit( 0 ), m_button( 0 )
 {
-	qDebug( ) << "FileChooser" << this;
 	initialize( );
 }
 
 void FileChooser::initialize( )
-{
-	qDebug( ) << "FileChooser initialize" << this;
-	
+{	
 	QHBoxLayout *l = new QHBoxLayout( this );
-	l->setMargin( 0 );
 
 	m_lineEdit = new QLineEdit( this );
         l->addWidget( m_lineEdit );
@@ -39,6 +34,8 @@ void FileChooser::initialize( )
 void FileChooser::setFileName( const QString &_fileName )
 {
 	m_lineEdit->setText( _fileName );
+	
+	emit fileNameChanged( _fileName );
 }
 
 QString FileChooser::fileName( ) const
@@ -74,5 +71,6 @@ void FileChooser::chooseFile( )
 			
 	if( !f.isEmpty( ) ) {
 		m_lineEdit->setText( f );
+		emit fileNameChanged( f );
 	}
 }
