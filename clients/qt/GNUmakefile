@@ -15,6 +15,7 @@ INCLUDE_DIRS = \
 	-I$(QT_INCLUDE_DIR)/QtNetwork \
 	-I$(QT_INCLUDE_DIR)/QtGui \
 	-I$(QT_INCLUDE_DIR)/QtUiTools \
+	-I$(QT_INCLUDE_DIR)/QtDesigner \
 	-I$(QT_INCLUDE_DIR)/QtSql
 
 INCLUDE_LDFLAGS = \

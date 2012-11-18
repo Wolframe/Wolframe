@@ -1,21 +1,20 @@
 show-stoppers:
-  - FileChooser setFilename segfaults (on loadDomain)
-  - designer mode segfaults when loading plugin
+- filechooser + picture viewer (QLabel with QPixmap)
 - WolframeClient:
   - sequentualize requests (how?, queue?), eliminate
     reces between actions and domain load
-- filechooser + picture viewer
+- FormWidget:
+  - solve races between answer of last request and new form load in
+    'switchForm' (add state machine)
 
 musts:
-- Windows bugs
-  - logger
+- Linux, shared lib for custom widgets, similar to windows, for now
+  it works on Linux, but for instance not on Solaris or Freebsd (PIC
+  mixing!)
 - element operations
   - reorganize tree
     - add elements 
     - delete elements/subtrees
-- FormWidget:
-  - solve races between answer of last request and new form load in
-    'switchForm' (add state machine)
 - tab stop order for file choose, picture chooser
 - element operations
   - reorganize tree
