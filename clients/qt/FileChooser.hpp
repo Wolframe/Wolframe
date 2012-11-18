@@ -11,7 +11,9 @@
 #include <QLineEdit>
 #include <QPushButton>
 
-class FileChooser : public QWidget
+#include <QDesignerExportWidget>
+
+class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 {
 	Q_OBJECT
 	Q_ENUMS( SelectionMode )

@@ -7,7 +7,8 @@ SUBDIRS =
 INCLUDE_CXXFLAGS = \
 	/D_WIN32_WINNT=0x403 \
 	/DQT_PLUGIN /DQT_SHARED /DQT_DLL \
-	/DQDESIGNER_EXPORT_WIDGETS /DQT_THREAD_SUPPORT
+	/DQDESIGNER_EXPORT_WIDGETS \
+	/DQT_THREAD_SUPPORT
 
 !IFNDEF DEBUG
 INCLUDE_CXXFLAGS = \
@@ -38,6 +39,9 @@ INCLUDE_LIBS = \
 	QtCored4.lib QtGuid4.lib QtDesignerd4.lib
 !ENDIF
 
+#INCLUDE_LIBS = \
+#	$(INCLUDE_LIBS) ..\FileChooser.obj ..\moc_FileChooser.obj
+
 MOC_FLAGS =
 
 OBJS = \
@@ -67,8 +71,8 @@ local_all:
 moc_WolframeWidgets.cpp: WolframeWidgets.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -I"$(QT_DIR)\include\QtDesigner" WolframeWidgets.hpp -o moc_WolframeWidgets.cpp
 
-#..\moc_FileChooser.cpp: ..\FileChooser.hpp
-#	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\FileChooser.hpp -o ..\moc_FileChooser.cpp
+..\moc_FileChooser.cpp: ..\FileChooser.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\FileChooser.hpp -o ..\moc_FileChooser.cpp
 
 filechooser\moc_FileChooserPlugin.cpp: filechooser\FileChooserPlugin.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser -I"$(QT_DIR)\include\QtDesigner" filechooser\FileChooserPlugin.hpp -o filechooser\moc_FileChooserPlugin.cpp

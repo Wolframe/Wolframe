@@ -9,6 +9,8 @@
 
 #include <QtPlugin>
 
+#include <QDesignerExportWidget>
+
 WolframeWidgets::WolframeWidgets( QObject *_parent )
 	: QObject( _parent )
 {

@@ -1,6 +1,7 @@
 TOPDIR = ..\..
 
-SUBDIRS = plugins
+# do this manually, nmake is broken!
+#SUBDIRS = plugins
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -14,6 +15,7 @@ INCLUDE_DIRS = \
 	/I"$(QT_DIR)\include\QtCore" \
 	/I"$(QT_DIR)\include\QtGui" \
 	/I"$(QT_DIR)\include\QtUiTools" \
+	/I"$(QT_DIR)\include\QtDesigner" \
 	/I"$(QT_DIR)\include\QtNetwork" \
 	/I"$(QT_DIR)\include\QtSql"
 
@@ -28,6 +30,9 @@ INCLUDE_LIBS = \
 INCLUDE_LIBS = \
 	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtSqld4.lib
 !ENDIF
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) plugins\wolframewidgets.lib
 
 MOC_FLAGS =
 
@@ -83,12 +88,12 @@ OBJS = \
 	moc_Preferences.obj \
 	PreferencesDialog.obj \
 	moc_PreferencesDialog.obj \
-	FileChooser.obj \
-	moc_FileChooser.obj \
 	StorageWidget.obj \
 	moc_StorageWidget.obj \
 	ManageStorageDialog.obj \
 	moc_ManageStorageDialog.obj
+#	FileChooser.obj \
+#	moc_FileChooser.obj \
 
 CPP_BINS = \
 	qtclient.exe
@@ -166,7 +171,7 @@ apps\test\i18n\form4.ro_RO.qm: apps\test\i18n\form4.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form4.ro_RO.ts -qm apps\test\i18n\form4.ro_RO.qm
 
 
-local_all: $(I18NS)
+local_all: $(I18NS) $(CPP_BINS)
 
 qtclient.exe: qtclient.obj
 
@@ -206,8 +211,8 @@ moc_Preferences.cpp: Preferences.hpp
 moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
 
-moc_FileChooser.cpp: FileChooser.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FileChooser.hpp -o moc_FileChooser.cpp
+#moc_FileChooser.cpp: FileChooser.hpp
+#	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FileChooser.hpp -o moc_FileChooser.cpp
 
 moc_StorageWidget.cpp: StorageWidget.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. StorageWidget.hpp -o moc_StorageWidget.cpp
@@ -241,6 +246,7 @@ copy_prereq:
 	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
 	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" .
 !ENDIF
+	@-copy plugins\wolframewidgets.dll .
 
 run: local_all $(CPP_BINS) copy_prereq
 	@-echo @echo off > test.bat
