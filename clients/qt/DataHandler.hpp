@@ -11,6 +11,7 @@
 #include <QHash>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <QSet>
 
 #include "DataLoader.hpp"
 
@@ -29,7 +30,7 @@ class DataHandler : public QObject
 		QString readFormVariable( QString variable, QWidget *form );
 
 	private:
-		void writeWidgets( QWidget *_parent, QXmlStreamWriter &xml, QHash<QString, QString> *props );
+		void writeWidgets( QWidget *_parent, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *set );
 	
 	private:
 		DataLoader *m_dataLoader;

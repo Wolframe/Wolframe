@@ -23,6 +23,7 @@
 #include <QTreeWidget>
 #include <QFile>
 #include <QTreeWidgetItemIterator>
+#include <QSet>
 
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
@@ -34,6 +35,7 @@ DataHandler::DataHandler( DataLoader *_dataLoader ) : m_dataLoader( _dataLoader 
 
 void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *data, QHash<QString, QString> *props )
 {
+	QSet<QWidget *> seen;
 	QXmlStreamWriter xml( data );
 	xml.setAutoFormatting( true );
 	xml.setAutoFormattingIndent( 2 );
@@ -57,18 +59,22 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		xml.writeStartElement( form_name );
 	}
 	
-	writeWidgets( form, xml, props );
+	writeWidgets( form, xml, props, &seen );
 
 	xml.writeEndElement( );
 	xml.writeEndDocument( );
 }
 
-void DataHandler::writeWidgets( QWidget *_parent, QXmlStreamWriter &xml, QHash<QString, QString> *props )
+void DataHandler::writeWidgets( QWidget *_parent, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *seen )
 {
 	QList<QWidget *> widgets = _parent->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
 		QString clazz = widget->metaObject( )->className( ); 
 		QString name = widget->objectName( );
+
+// already dumped		
+		if( seen->contains( widget ) ) continue;
+		seen->insert( widget );
 		
 // ignore internal elements
 		if( name == "" || name.startsWith( "qt_" ) ||
@@ -163,7 +169,7 @@ void DataHandler::writeWidgets( QWidget *_parent, QXmlStreamWriter &xml, QHash<Q
 			QGroupBox *groupBox = qobject_cast<QGroupBox *>( widget );
 			QString boxName = groupBox->objectName( );
 			xml.writeStartElement( boxName );
-			writeWidgets( groupBox, xml, props );
+			writeWidgets( groupBox, xml, props, seen );
 			xml.writeEndElement( );
 		} else if( clazz == "FileChooser" ) {
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
