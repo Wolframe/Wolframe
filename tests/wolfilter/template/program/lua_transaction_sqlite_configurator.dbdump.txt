@@ -1,5 +1,5 @@
 Picture:
-'1', 'WNC caption', 'WNC info', 'WNC image'
+'1', 'WNC caption X', 'WNC info X', 'WNC image X'
 
 sqlite_sequence:
 'Category', '52'
@@ -36,7 +36,7 @@ Category:
 '49', '16', 'Smartdust', 'smartdust', NULL, '55', '56'
 '50', '16', 'Nanocomputer', 'nanocomputer', NULL, '57', '58'
 '51', '7', 'Device from outer space', 'device from outer space', NULL, '29', '30'
-'52', '46', 'WNC child', 'wnc child', NULL, '48', '49'
+'52', '46', 'WNC child Y', 'wnc child y', NULL, '48', '49'
 
 CategoryPicture:
 '52', '1'

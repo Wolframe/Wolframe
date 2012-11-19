@@ -34,6 +34,7 @@ END
 TRANSACTION deleteCategory -- (id)
 BEGIN
 	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Category WHERE ID = $(id);
+	DO DELETE FROM Picture WHERE ID IN (SELECT pictureID FROM CategoryPicture WHERE categoryID = $(id));
 	DO DELETE FROM CategoryPicture WHERE categoryID = $(id);
 	DO DELETE FROM Category WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Category SET lft = lft-$3 WHERE lft>$2;
@@ -43,10 +44,10 @@ END
 --
 -- updateCategory
 --
-TRANSACTION updateCategory -- (id, name, normalizedName)
+TRANSACTION updateCategory -- (id, name, normalizedName, picture/id, picture/caption, picture/info, picture/image)
 BEGIN
 	DO UPDATE Category SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
-	FOREACH picture DO UPDATE CategoryPicture SET caption = $(caption), info = $(info), image = $(image) WHERE ID = $(id);
+	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image) WHERE ID = $(id);
 END
 
 --

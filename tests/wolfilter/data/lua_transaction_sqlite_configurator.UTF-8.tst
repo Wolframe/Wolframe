@@ -82,6 +82,19 @@
 <picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
 </category>
 </createCategory>
+<editCategory>
+<category name="Device from outer space" id="51"></category>
+</editCategory>
+<editCategory>
+<category id="52">
+	<name>WNC child Y</name>
+	<picture id='1'>
+		<caption>WNC caption X</caption>
+		<info>WNC info X</info>
+		<image>WNC image X</image>
+	</picture>
+</category>
+</editCategory>
 <CategoryRequest><category id="52"/></CategoryRequest>
 <CategoryRequest><category id="46"/></CategoryRequest>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
@@ -366,6 +379,7 @@ END
 TRANSACTION deleteCategory -- (id)
 BEGIN
 	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Category WHERE ID = $(id);
+	DO DELETE FROM Picture WHERE ID IN (SELECT pictureID FROM CategoryPicture WHERE categoryID = $(id));
 	DO DELETE FROM CategoryPicture WHERE categoryID = $(id);
 	DO DELETE FROM Category WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Category SET lft = lft-$3 WHERE lft>$2;
@@ -375,10 +389,10 @@ END
 --
 -- updateCategory
 --
-TRANSACTION updateCategory -- (id, name, normalizedName)
+TRANSACTION updateCategory -- (id, name, normalizedName, picture/id, picture/caption, picture/info, picture/image)
 BEGIN
 	DO UPDATE Category SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
-	FOREACH picture DO UPDATE CategoryPicture SET caption = $(caption), info = $(info), image = $(image) WHERE ID = $(id);
+	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image) WHERE ID = $(id);
 END
 
 --
@@ -523,7 +537,7 @@ end
 local function picture_value( itr)
 	local picture = {}
 	for v,t in itr do
-		if (t == "caption" or t == "info" or t == "image") then
+		if (t == "id" or t == "caption" or t == "info" or t == "image") then
 			picture[ t] = content_value( v, itr)
 		end
 	end
@@ -683,9 +697,11 @@ local function edit_node( tablename, itr)
 			description = content_value( v, itr)
 		elseif t == "picture" then
 			picture = picture_value( scope(itr))
+			logger.printc( "PICTURE ", picture)
 		end
 	end
-	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id} )
+	logger.printc( "CALL update" .. tablename, {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
+	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 end
 
 local function delete_node( tablename, itr)

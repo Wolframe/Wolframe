@@ -78,6 +78,19 @@
 <picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
 </category>
 </createCategory>
+<editCategory>
+<category name="Device from outer space" id="51"></category>
+</editCategory>
+<editCategory>
+<category id="52">
+	<name>WNC child Y</name>
+	<picture id='1'>
+		<caption>WNC caption X</caption>
+		<info>WNC info X</info>
+		<image>WNC image X</image>
+	</picture>
+</category>
+</editCategory>
 <CategoryRequest><category id="52"/></CategoryRequest>
 <CategoryRequest><category id="46"/></CategoryRequest>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>

@@ -20,7 +20,7 @@ end
 local function picture_value( itr)
 	local picture = {}
 	for v,t in itr do
-		if (t == "caption" or t == "info" or t == "image") then
+		if (t == "id" or t == "caption" or t == "info" or t == "image") then
 			picture[ t] = content_value( v, itr)
 		end
 	end
@@ -182,7 +182,7 @@ local function edit_node( tablename, itr)
 			picture = picture_value( scope(itr))
 		end
 	end
-	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id} )
+	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 end
 
 local function delete_node( tablename, itr)
