@@ -874,8 +874,6 @@ fi
 %{_includedir}/wolframe/config/*.hpp
 %dir %{_includedir}/wolframe/ddl/
 %{_includedir}/wolframe/ddl/*.hpp
-%dir %{_includedir}/wolframe/ddl/compiler/
-%{_includedir}/wolframe/ddl/compiler/*.hpp
 %dir %{_includedir}/wolframe/logger/
 %{_includedir}/wolframe/logger/*.hpp
 %dir %{_includedir}/wolframe/utils/
