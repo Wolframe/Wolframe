@@ -180,10 +180,8 @@ local function edit_node( tablename, itr)
 			description = content_value( v, itr)
 		elseif t == "picture" then
 			picture = picture_value( scope(itr))
-			logger.printc( "PICTURE ", picture)
 		end
 	end
-	logger.printc( "CALL update" .. tablename, {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 end
 

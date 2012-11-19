@@ -698,10 +698,8 @@ local function edit_node( tablename, itr)
 			description = content_value( v, itr)
 		elseif t == "picture" then
 			picture = picture_value( scope(itr))
-			logger.printc( "PICTURE ", picture)
 		end
 	end
-	logger.printc( "CALL update" .. tablename, {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 end
 
@@ -1044,7 +1042,7 @@ end
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52"><id>52</id><parent>46</parent><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture></category><category id="46"><id>46</id><parent>16</parent><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
+</item></tree><category id="52"><id>52</id><parent>46</parent><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image></picture></category><category id="46"><id>46</id><parent>16</parent><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
 	<category>computer</category>
 	<tree><item id="2">
 		<category>Minicomputer</category>
@@ -1103,7 +1101,7 @@ end
 		<tree><item id="46">
 			<category>Wireless network component</category>
 			<tree><item id="52">
-				<category>WNC child</category></item></tree>
+				<category>WNC child Y</category></item></tree>
 		</item></tree>
 		<tree><item id="48">
 			<category>Microcontroller</category></item></tree>
@@ -1190,7 +1188,7 @@ end
 		<category>Space</category></item></tree>
 </item></tree></result>
 Picture:
-'1', 'WNC caption', 'WNC info', 'WNC image'
+'1', 'WNC caption X', 'WNC info X', 'WNC image X'
 
 sqlite_sequence:
 'Category', '52'
@@ -1227,7 +1225,7 @@ Category:
 '49', '16', 'Smartdust', 'smartdust', NULL, '55', '56'
 '50', '16', 'Nanocomputer', 'nanocomputer', NULL, '57', '58'
 '51', '7', 'Device from outer space', 'device from outer space', NULL, '29', '30'
-'52', '46', 'WNC child', 'wnc child', NULL, '48', '49'
+'52', '46', 'WNC child Y', 'wnc child y', NULL, '48', '49'
 
 CategoryPicture:
 '52', '1'
