@@ -389,7 +389,8 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 							state = states[statePos].left( 1 );
 							stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
 						}
-					} else if( state == "S" ) {
+					}
+					if( state == "S" ) {
 						(*it)->setSelected( true );
 						statePos++;
 						if( statePos < states.count( ) ) {
