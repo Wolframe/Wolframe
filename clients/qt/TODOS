@@ -4,15 +4,10 @@ show-stoppers:
     'switchForm' (add state machine)
   - WolframeClient:
     - sequentualize requests (how?, queue?), eliminate
-      reces between actions and domain load
-- trees, remember state like:
-  - current viewport
-  - current selection
-  - state of expanded items
-  - sorting order of columns
-  - arrangement of columns (their width)
+      races between actions and domain load
   
 musts:
+- problems with size of main window to follow size of form ui
 - frontend:
   - associating categories and features
 - Linux, shared lib for custom widgets, similar to windows, for now
@@ -47,7 +42,9 @@ musts:
       - form init doesn't work when language is not en_US
     - QTreeWidget
       - localization
-      - keep state of expansion and selection
+      - keep state of
+        - sorting order of columns
+        - header width
       - expandAll on load
       - open and make an item visible (for instance the location of the
         last add)

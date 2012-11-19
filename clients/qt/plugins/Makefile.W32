@@ -45,7 +45,7 @@ INCLUDE_LIBS = \
 
 MOC_FLAGS =
 
-OBJS = \
+CPP_OBJS = \
 	WolframeWidgets.obj \
 	moc_WolframeWidgets.obj \
 	..\FileChooser.obj \
@@ -67,7 +67,7 @@ OBJS = \
 DYNAMIC_MODULE = \
 	wolframewidgets.dll
 
-all: $(OBJS) $(DYNAMIC_MODULE)
+all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -97,8 +97,8 @@ moc_FormWidget.cpp: ..\FormWidget.hpp
 moc_DataHandler.cpp: ..\DataHandler.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\DataHandler.hpp -o moc_DataHandler.cpp
 
-$(DYNAMIC_MODULE): $(OBJS)
-	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $?
+$(DYNAMIC_MODULE): $(CPP_OBJS)
+	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $(CPP_OBJS)
 
 local_clean:
 	@-erase moc_*.cpp filechooser\moc_*.cpp formwidget\moc_*.cpp 2>NUL
