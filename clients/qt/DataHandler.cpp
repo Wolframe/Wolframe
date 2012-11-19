@@ -408,7 +408,6 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 				QTreeWidgetItemIterator it( treeWidget );
 				while( *it ) {
 					QString id = (*it)->data( 0, Qt::UserRole ).toString( );
-					qDebug( ) << "selecting" << id << state << stateId;
 					if( id == stateId ) {
 						if( state == "S" ) {
 							(*it)->setSelected( true );
