@@ -10,9 +10,9 @@ function run()
 		elseif (t == "pushFeatureHierarchy") then
 			add_tree( "Feature", scope(itr))
 		elseif (t == "CategoryHierarchyRequest") then
-			select_tree( "Category", scope(itr))
+			select_tree( "Category", "category", scope(itr))
 		elseif (t == "FeatureHierarchyRequest") then
-			select_tree( "Feature", scope(itr))
+			select_tree( "Feature", "feature", scope(itr))
 		elseif (t == "editCategory") then
 			edit_node( "Category", scope(itr))
 		elseif (t == "editFeature") then

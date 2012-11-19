@@ -628,7 +628,7 @@ local function get_tree( tablename, parentid)
 	return a
 end
 
-local function print_tree( tree, nodeid, indent)
+local function print_tree( tree, tagname, nodeid, indent)
 	if (indent ~= "") then
 		output:print( "\n" .. indent)
 	end
@@ -636,7 +636,7 @@ local function print_tree( tree, nodeid, indent)
 	output:opentag( "item" )
 	output:print( nodeid, "id")
 	output:print( "\n" .. indent .. "\t")
-	output:opentag( "category" )
+	output:opentag( tagname)
 	output:print( tree[ nodeid ].name )
 	output:closetag( )
 	if tree[ nodeid ].description then
@@ -647,7 +647,7 @@ local function print_tree( tree, nodeid, indent)
 	end
 	local n = 0
 	for i,v in pairs( tree[ nodeid].children) do
-		print_tree( tree, v, indent .. "\t")
+		print_tree( tree, tagname, v, indent .. "\t")
 		n = n + 1
 	end
 	if n > 0 then
@@ -657,12 +657,12 @@ local function print_tree( tree, nodeid, indent)
 	output:closetag()
 end
 
-local function select_tree( tablename, itr)
+local function select_tree( tablename, tagname, itr)
 	filter().empty = false
 	for v,t in itr do
 		if t == "id" then
 			local id = tonumber( v)
-			print_tree( get_tree( tablename, id), id, "")
+			print_tree( get_tree( tablename, id), tagname, id, "")
 		end
 	end
 end
@@ -744,12 +744,12 @@ end
 
 function CategoryHierarchyRequest()
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	select_tree( "Category", input:get())
+	select_tree( "Category", "category", input:get())
 end
 
 function FeatureHierarchyRequest()
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	select_tree( "Feature", input:get())
+	select_tree( "Feature", "feature", input:get())
 end
 
 function pushCategoryHierarchy()
@@ -771,43 +771,43 @@ function FeatureRequest()
 end
 
 function readCategory()
-	print_tree( get_tree( "Category", 1), 1, "")
+	print_tree( get_tree( "Category", 1), "category", 1, "")
 end
 
 function editCategory()
 	edit_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	print_tree( get_tree( "Category", 1), 1, "")
+	print_tree( get_tree( "Category", 1), "category", 1, "")
 end
 
 function editFeature()
 	edit_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	print_tree( get_tree( "Feature", 1), 1, "")
+	print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 function deleteCategory()
 	delete_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	print_tree( get_tree( "Category", 1), 1, "")
+	print_tree( get_tree( "Category", 1), "feature", 1, "")
 end
 
 function deleteFeature()
 	delete_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	print_tree( get_tree( "Feature", 1), 1, "")
+	print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 function createCategory()
 	create_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	print_tree( get_tree( "Category", 1), 1, "")
+	print_tree( get_tree( "Category", 1), "category", 1, "")
 end
 
 function createFeature()
 	create_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	print_tree( get_tree( "Feature", 1), 1, "")
+	print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 
@@ -823,9 +823,9 @@ function run()
 		elseif (t == "pushFeatureHierarchy") then
 			add_tree( "Feature", scope(itr))
 		elseif (t == "CategoryHierarchyRequest") then
-			select_tree( "Category", scope(itr))
+			select_tree( "Category", "category", scope(itr))
 		elseif (t == "FeatureHierarchyRequest") then
-			select_tree( "Feature", scope(itr))
+			select_tree( "Feature", "feature", scope(itr))
 		elseif (t == "editCategory") then
 			edit_node( "Category", scope(itr))
 		elseif (t == "editFeature") then
@@ -1109,83 +1109,83 @@ end
 			<category>Nanocomputer</category></item></tree>
 	</item></tree>
 </item></tree><tree><item id="1">
-	<category>feature</category>
+	<feature>feature</feature>
 	<tree><item id="2">
-		<category>Color</category>
+		<feature>Color</feature>
 		<tree><item id="3">
-			<category>green</category></item></tree>
+			<feature>green</feature></item></tree>
 		<tree><item id="4">
-			<category>blue</category></item></tree>
+			<feature>blue</feature></item></tree>
 		<tree><item id="5">
-			<category>gray</category></item></tree>
+			<feature>gray</feature></item></tree>
 		<tree><item id="6">
-			<category>red</category></item></tree>
+			<feature>red</feature></item></tree>
 	</item></tree>
 	<tree><item id="7">
-		<category>Size</category>
+		<feature>Size</feature>
 		<tree><item id="8">
-			<category>big</category></item></tree>
+			<feature>big</feature></item></tree>
 		<tree><item id="9">
-			<category>small</category></item></tree>
+			<feature>small</feature></item></tree>
 		<tree><item id="10">
-			<category>tiny</category></item></tree>
+			<feature>tiny</feature></item></tree>
 		<tree><item id="11">
-			<category>pocket size</category></item></tree>
+			<feature>pocket size</feature></item></tree>
 	</item></tree>
 	<tree><item id="12">
-		<category>Noise</category>
+		<feature>Noise</feature>
 		<tree><item id="13">
-			<category>loud</category></item></tree>
+			<feature>loud</feature></item></tree>
 		<tree><item id="14">
-			<category>silent</category></item></tree>
+			<feature>silent</feature></item></tree>
 	</item></tree>
 </item></tree><tree><item id="7">
-	<category>Size</category>
+	<feature>Size</feature>
 	<tree><item id="10">
-		<category>tiny</category></item></tree>
+		<feature>tiny</feature></item></tree>
 	<tree><item id="9">
-		<category>small</category></item></tree>
+		<feature>small</feature></item></tree>
 	<tree><item id="11">
-		<category>pocket size</category></item></tree>
+		<feature>pocket size</feature></item></tree>
 	<tree><item id="8">
-		<category>big</category></item></tree>
+		<feature>big</feature></item></tree>
 </item></tree><tree><item id="1">
-	<category>feature</category>
+	<feature>feature</feature>
 	<tree><item id="2">
-		<category>Color</category>
+		<feature>Color</feature>
 		<tree><item id="3">
-			<category>green</category></item></tree>
+			<feature>green</feature></item></tree>
 		<tree><item id="4">
-			<category>blue</category></item></tree>
+			<feature>blue</feature></item></tree>
 		<tree><item id="5">
-			<category>gray</category></item></tree>
+			<feature>gray</feature></item></tree>
 		<tree><item id="6">
-			<category>pink</category></item></tree>
+			<feature>pink</feature></item></tree>
 		<tree><item id="18">
-			<category>yellow</category></item></tree>
+			<feature>yellow</feature></item></tree>
 	</item></tree>
 	<tree><item id="7">
-		<category>Size</category>
+		<feature>Size</feature>
 		<tree><item id="8">
-			<category>big</category></item></tree>
+			<feature>big</feature></item></tree>
 		<tree><item id="9">
-			<category>small</category></item></tree>
+			<feature>small</feature></item></tree>
 		<tree><item id="10">
-			<category>tiny</category></item></tree>
+			<feature>tiny</feature></item></tree>
 		<tree><item id="11">
-			<category>pocket size</category></item></tree>
+			<feature>pocket size</feature></item></tree>
 	</item></tree>
 	<tree><item id="12">
-		<category>Noise</category>
+		<feature>Noise</feature>
 		<tree><item id="13">
-			<category>loud</category></item></tree>
+			<feature>loud</feature></item></tree>
 		<tree><item id="14">
-			<category>silent</category></item></tree>
+			<feature>silent</feature></item></tree>
 		<tree><item id="16">
-			<category>mumling</category></item></tree>
+			<feature>mumling</feature></item></tree>
 	</item></tree>
 	<tree><item id="17">
-		<category>Space</category></item></tree>
+		<feature>Space</feature></item></tree>
 </item></tree></result>
 Picture:
 '1', 'WNC caption X', 'WNC info X', 'WNC image X'

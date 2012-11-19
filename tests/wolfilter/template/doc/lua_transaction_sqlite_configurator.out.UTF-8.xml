@@ -260,81 +260,81 @@
 			<category>Nanocomputer</category></item></tree>
 	</item></tree>
 </item></tree><tree><item id="1">
-	<category>feature</category>
+	<feature>feature</feature>
 	<tree><item id="2">
-		<category>Color</category>
+		<feature>Color</feature>
 		<tree><item id="3">
-			<category>green</category></item></tree>
+			<feature>green</feature></item></tree>
 		<tree><item id="4">
-			<category>blue</category></item></tree>
+			<feature>blue</feature></item></tree>
 		<tree><item id="5">
-			<category>gray</category></item></tree>
+			<feature>gray</feature></item></tree>
 		<tree><item id="6">
-			<category>red</category></item></tree>
+			<feature>red</feature></item></tree>
 	</item></tree>
 	<tree><item id="7">
-		<category>Size</category>
+		<feature>Size</feature>
 		<tree><item id="8">
-			<category>big</category></item></tree>
+			<feature>big</feature></item></tree>
 		<tree><item id="9">
-			<category>small</category></item></tree>
+			<feature>small</feature></item></tree>
 		<tree><item id="10">
-			<category>tiny</category></item></tree>
+			<feature>tiny</feature></item></tree>
 		<tree><item id="11">
-			<category>pocket size</category></item></tree>
+			<feature>pocket size</feature></item></tree>
 	</item></tree>
 	<tree><item id="12">
-		<category>Noise</category>
+		<feature>Noise</feature>
 		<tree><item id="13">
-			<category>loud</category></item></tree>
+			<feature>loud</feature></item></tree>
 		<tree><item id="14">
-			<category>silent</category></item></tree>
+			<feature>silent</feature></item></tree>
 	</item></tree>
 </item></tree><tree><item id="7">
-	<category>Size</category>
+	<feature>Size</feature>
 	<tree><item id="10">
-		<category>tiny</category></item></tree>
+		<feature>tiny</feature></item></tree>
 	<tree><item id="9">
-		<category>small</category></item></tree>
+		<feature>small</feature></item></tree>
 	<tree><item id="11">
-		<category>pocket size</category></item></tree>
+		<feature>pocket size</feature></item></tree>
 	<tree><item id="8">
-		<category>big</category></item></tree>
+		<feature>big</feature></item></tree>
 </item></tree><tree><item id="1">
-	<category>feature</category>
+	<feature>feature</feature>
 	<tree><item id="2">
-		<category>Color</category>
+		<feature>Color</feature>
 		<tree><item id="3">
-			<category>green</category></item></tree>
+			<feature>green</feature></item></tree>
 		<tree><item id="4">
-			<category>blue</category></item></tree>
+			<feature>blue</feature></item></tree>
 		<tree><item id="5">
-			<category>gray</category></item></tree>
+			<feature>gray</feature></item></tree>
 		<tree><item id="6">
-			<category>pink</category></item></tree>
+			<feature>pink</feature></item></tree>
 		<tree><item id="18">
-			<category>yellow</category></item></tree>
+			<feature>yellow</feature></item></tree>
 	</item></tree>
 	<tree><item id="7">
-		<category>Size</category>
+		<feature>Size</feature>
 		<tree><item id="8">
-			<category>big</category></item></tree>
+			<feature>big</feature></item></tree>
 		<tree><item id="9">
-			<category>small</category></item></tree>
+			<feature>small</feature></item></tree>
 		<tree><item id="10">
-			<category>tiny</category></item></tree>
+			<feature>tiny</feature></item></tree>
 		<tree><item id="11">
-			<category>pocket size</category></item></tree>
+			<feature>pocket size</feature></item></tree>
 	</item></tree>
 	<tree><item id="12">
-		<category>Noise</category>
+		<feature>Noise</feature>
 		<tree><item id="13">
-			<category>loud</category></item></tree>
+			<feature>loud</feature></item></tree>
 		<tree><item id="14">
-			<category>silent</category></item></tree>
+			<feature>silent</feature></item></tree>
 		<tree><item id="16">
-			<category>mumling</category></item></tree>
+			<feature>mumling</feature></item></tree>
 	</item></tree>
 	<tree><item id="17">
-		<category>Space</category></item></tree>
+		<feature>Space</feature></item></tree>
 </item></tree></result>

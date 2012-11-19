@@ -110,7 +110,7 @@ local function get_tree( tablename, parentid)
 	return a
 end
 
-local function print_tree( tree, nodeid, indent)
+local function print_tree( tree, tagname, nodeid, indent)
 	if (indent ~= "") then
 		output:print( "\n" .. indent)
 	end
@@ -118,7 +118,7 @@ local function print_tree( tree, nodeid, indent)
 	output:opentag( "item" )
 	output:print( nodeid, "id")
 	output:print( "\n" .. indent .. "\t")
-	output:opentag( "category" )
+	output:opentag( tagname)
 	output:print( tree[ nodeid ].name )
 	output:closetag( )
 	if tree[ nodeid ].description then
@@ -129,7 +129,7 @@ local function print_tree( tree, nodeid, indent)
 	end
 	local n = 0
 	for i,v in pairs( tree[ nodeid].children) do
-		print_tree( tree, v, indent .. "\t")
+		print_tree( tree, tagname, v, indent .. "\t")
 		n = n + 1
 	end
 	if n > 0 then
@@ -139,12 +139,12 @@ local function print_tree( tree, nodeid, indent)
 	output:closetag()
 end
 
-local function select_tree( tablename, itr)
+local function select_tree( tablename, tagname, itr)
 	filter().empty = false
 	for v,t in itr do
 		if t == "id" then
 			local id = tonumber( v)
-			print_tree( get_tree( tablename, id), id, "")
+			print_tree( get_tree( tablename, id), tagname, id, "")
 		end
 	end
 end
@@ -226,12 +226,12 @@ end
 
 function CategoryHierarchyRequest()
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	select_tree( "Category", input:get())
+	select_tree( "Category", "category", input:get())
 end
 
 function FeatureHierarchyRequest()
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	select_tree( "Feature", input:get())
+	select_tree( "Feature", "feature", input:get())
 end
 
 function pushCategoryHierarchy()
@@ -253,43 +253,43 @@ function FeatureRequest()
 end
 
 function readCategory()
-	print_tree( get_tree( "Category", 1), 1, "")
+	print_tree( get_tree( "Category", 1), "category", 1, "")
 end
 
 function editCategory()
 	edit_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	print_tree( get_tree( "Category", 1), 1, "")
+	print_tree( get_tree( "Category", 1), "category", 1, "")
 end
 
 function editFeature()
 	edit_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	print_tree( get_tree( "Feature", 1), 1, "")
+	print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 function deleteCategory()
 	delete_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	print_tree( get_tree( "Category", 1), 1, "")
+	print_tree( get_tree( "Category", 1), "feature", 1, "")
 end
 
 function deleteFeature()
 	delete_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	print_tree( get_tree( "Feature", 1), 1, "")
+	print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 function createCategory()
 	create_node( "Category", input:get())
 	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	print_tree( get_tree( "Category", 1), 1, "")
+	print_tree( get_tree( "Category", 1), "category", 1, "")
 end
 
 function createFeature()
 	create_node( "Feature", input:get())
 	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	print_tree( get_tree( "Feature", 1), 1, "")
+	print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 
@@ -305,9 +305,9 @@ function run()
 		elseif (t == "pushFeatureHierarchy") then
 			add_tree( "Feature", scope(itr))
 		elseif (t == "CategoryHierarchyRequest") then
-			select_tree( "Category", scope(itr))
+			select_tree( "Category", "category", scope(itr))
 		elseif (t == "FeatureHierarchyRequest") then
-			select_tree( "Feature", scope(itr))
+			select_tree( "Feature", "feature", scope(itr))
 		elseif (t == "editCategory") then
 			edit_node( "Category", scope(itr))
 		elseif (t == "editFeature") then
