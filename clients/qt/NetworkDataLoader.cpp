@@ -188,7 +188,7 @@ void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 // hash and receive it by doctype
 	QString docType = params[1];
 
-	//qDebug( ) << "OK: answer in network data loader, doctype:" << docType << ":\n"<< content;
+	qDebug( ) << "OK: answer in network data loader, doctype:" << docType << ":\n"<< content;
 	
 	if( !m_map->contains( docType ) ) {
 		qDebug( ) << "ERROR: answer for unknown request of doctype" << docType;
@@ -201,7 +201,7 @@ void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 	
 	m_map->remove( docType );
 	
-	//qDebug( ) << "ANSWER for form" << formName << "and widget" << widgetName;
+	qDebug( ) << "ANSWER for form" << formName << "and widget" << widgetName;
 	
 	emit answer( formName, widgetName, content.toUtf8( ) );
 }

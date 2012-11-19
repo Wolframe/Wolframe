@@ -69,13 +69,78 @@
      </widget>
     </item>
     <item row="2" column="1">
-     <widget class="PictureChooser" name="picture">
+     <widget class="QGroupBox" name="picture">
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>200</height>
+        <height>220</height>
        </size>
       </property>
+      <property name="title">
+       <string/>
+      </property>
+      <widget class="PictureChooser" name="image">
+       <property name="geometry">
+        <rect>
+         <x>77</x>
+         <y>69</y>
+         <width>201</width>
+         <height>141</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_info">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>27</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Info:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="caption">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>40</y>
+         <width>211</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_caption">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>52</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Caption:</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="info">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>10</y>
+         <width>211</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>

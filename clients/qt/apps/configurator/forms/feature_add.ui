@@ -54,7 +54,7 @@
      <widget class="QPlainTextEdit" name="description"/>
     </item>
     <item row="2" column="1">
-     <widget class="PictureChooser" name="picture">
+     <widget class="PictureChooser" name="picture" native="true">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -92,8 +92,8 @@
       <property name="form" stdset="0">
        <string notr="true">features</string>
       </property>
-      <property name="id" stdset="0">
-       <string notr="true">{global.id}</string>
+      <property name="parent" stdset="0">
+       <string>{global.id}</string>
       </property>
      </widget>
     </item>

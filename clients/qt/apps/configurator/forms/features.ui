@@ -29,7 +29,10 @@
     <string notr="true">FeatureHierarchyRequest.simpleform</string>
    </property>
    <property name="rootelement" stdset="0">
-    <string>feature</string>
+    <string notr="true">feature</string>
+   </property>
+   <property name="state" stdset="0">
+    <string notr="true">{global.featureState}</string>
    </property>
    <attribute name="headerDefaultSectionSize">
     <number>200</number>
@@ -66,6 +69,9 @@
       <property name="global.id" stdset="0">
        <string notr="true">{feature.id}</string>
       </property>
+      <property name="global.featureState" stdset="0">
+       <string notr="true">{feature.state}</string>
+      </property>
      </widget>
     </item>
     <item>
@@ -88,6 +94,9 @@
       <property name="id" stdset="0">
        <string>{feature.id}</string>
       </property>
+      <property name="global.featureState" stdset="0">
+       <string notr="true">{feature.state}</string>
+      </property>
      </widget>
     </item>
     <item>
@@ -101,6 +110,9 @@
       <property name="global.id" stdset="0">
        <string notr="true">{feature.id}</string>
       </property>
+      <property name="global.featureState" stdset="0">
+       <string notr="true">{feature.state}</string>
+      </property>
      </widget>
     </item>
     <item>
@@ -111,6 +123,9 @@
       <property name="form" stdset="0">
        <string notr="true">features</string>
       </property>
+      <property name="global.featureState" stdset="0">
+       <string notr="true">{feature.state}</string>
+      </property>
      </widget>
     </item>
     <item>
@@ -120,6 +135,9 @@
       </property>
       <property name="form" stdset="0">
        <string notr="true">init</string>
+      </property>
+      <property name="global.featureState" stdset="0">
+       <string notr="true">{feature.state}</string>
       </property>
      </widget>
     </item>

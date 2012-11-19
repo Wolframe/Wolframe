@@ -9,6 +9,8 @@
 #include <QString>
 #include <QByteArray>
 #include <QHash>
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
 
 #include "DataLoader.hpp"
 
@@ -25,6 +27,9 @@ class DataHandler : public QObject
 		void loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data, QHash<QString, QString> *props );
 		void loadFormDomains( QString name, QWidget *form );
 		QString readFormVariable( QString variable, QWidget *form );
+
+	private:
+		void writeWidgets( QWidget *_parent, QXmlStreamWriter &xml, QHash<QString, QString> *props );
 	
 	private:
 		DataLoader *m_dataLoader;

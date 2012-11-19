@@ -4,8 +4,6 @@
 
 #include "DataHandler.hpp"
 
-#include <QXmlStreamReader>
-#include <QXmlStreamWriter>
 #include <QWidget>
 #include <QDebug>
 
@@ -59,7 +57,15 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		xml.writeStartElement( form_name );
 	}
 	
-	QList<QWidget *> widgets = form->findChildren<QWidget *>( );
+	writeWidgets( form, xml, props );
+
+	xml.writeEndElement( );
+	xml.writeEndDocument( );
+}
+
+void DataHandler::writeWidgets( QWidget *_parent, QXmlStreamWriter &xml, QHash<QString, QString> *props )
+{
+	QList<QWidget *> widgets = _parent->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
 		QString clazz = widget->metaObject( )->className( ); 
 		QString name = widget->objectName( );
@@ -153,6 +159,12 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 //				xml.writeAttribute( key, props->value( key ) );
 				xml.writeTextElement( "", name, item->data( 0, Qt::DisplayRole ).toString( ) );
 			}
+		} else if( clazz == "QGroupBox" ) {
+			QGroupBox *groupBox = qobject_cast<QGroupBox *>( widget );
+			QString boxName = groupBox->objectName( );
+			xml.writeStartElement( boxName );
+			writeWidgets( groupBox, xml, props );
+			xml.writeEndElement( );
 		} else if( clazz == "FileChooser" ) {
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
 			QString fileName = fileChooser->fileName( );
@@ -186,9 +198,6 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		
 		qDebug( ) << "Wrote " << clazz << name;
 	}
-	
-	xml.writeEndElement( );
-	xml.writeEndDocument( );
 }
 
 void DataHandler::resetFormData( QWidget *form )
@@ -462,6 +471,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 					widget = qFindChild<QWidget *>( form, xml.name( ).toString( ) );
 					if( widget ) {
 						clazz = widget->metaObject( )->className( ); 
+						if( clazz == "QGroupBox" ) continue;
 						QXmlStreamAttributes attributes = xml.attributes( );
 						QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 						if( clazz == "QLineEdit" ) {
