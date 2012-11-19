@@ -74,7 +74,7 @@ local function insert_tree_topnode( tablename, itr)
 	local description = nil
 	local picture = nil
 	for v,t in itr do
-		if (t == "parent") then
+		if (t == "parentID") then
 			parentID = tonumber( v)
 		elseif (t == "name") then
 			name = content_value( v, itr)
