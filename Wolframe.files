@@ -177,6 +177,7 @@ clients/qt/global.hpp
 clients/qt/GNUmakefile
 clients/qt/HistoryLineEdit.cpp
 clients/qt/HistoryLineEdit.hpp
+clients/qt/INSTALL.Windows
 clients/qt/LoadMode.hpp
 clients/qt/LoginDialog.cpp
 clients/qt/LoginDialog.hpp
@@ -351,6 +352,7 @@ examples/demo/configurator/request/CategoryHierarchyRootRequest.xml
 examples/demo/configurator/request/CategoryHierarchy.xml
 examples/demo/configurator/request/CategoryRequest.netcat
 examples/demo/configurator/request/CategoryRequest.xml
+examples/demo/configurator/request/CategoryWithPicture.xml
 examples/demo/configurator/request/Category.xml
 examples/demo/configurator/request/createCategory.xml
 examples/demo/configurator/request/createFeature.xml
@@ -1288,6 +1290,7 @@ tests/singletonTest.cpp
 tests/SSL/README.txt
 tests/stringNormalizationTest.cpp
 tests/temp/bcdnumber_calc.lua
+tests/temp/category.simpleform
 tests/temp/date_calc.lua
 tests/temp/DBIN.tdl
 tests/temp/DBPRG.tdl
@@ -1302,6 +1305,7 @@ tests/temp/echo_input_generator.lua
 tests/temp/echo_input_iterator.lua
 tests/temp/echo_input_table.lua
 tests/temp/employee_assignment_print.simpleform
+tests/temp/feature.simpleform
 tests/temp/formfunc_input_generator.lua
 tests/temp/formfunc_iterator.lua
 tests/temp/formfunc_table.lua
