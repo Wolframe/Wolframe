@@ -17,20 +17,33 @@ local function content_value( v, itr)
 	end
 end
 
+local function picture_value( itr)
+	local picture = {}
+	for v,t in itr do
+		if (t == "caption" or t == "info" or t == "image") then
+			picture[ t] = content_value( v, itr)
+		end
+	end
+	return picture
+end
+
 local function insert_itr( tablename, parentid, itr)
 	local id = 1
 	local name = nil
 	local nname = nil
 	local description = nil
+	local picture = nil
 	for v,t in itr do
 		if (t == "name") then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
 		elseif (t == "description") then
 			description = content_value( v, itr)
+		elseif (t == "picture") then
+			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
-				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentid=parentid} ):table().ID
+				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentid=parentid, picture=picture} ):table().ID
 				name = nil
 				description = nil
 			end
@@ -43,13 +56,13 @@ local function insert_itr( tablename, parentid, itr)
 	return id
 end
 
-local function insert_topnode( tablename, name, description, parentid)
+local function insert_topnode( tablename, name, description, picture, parentid)
 	local nname = normalizeName( name)
 	if not parentid then
-		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name, description=description} )
+		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name, description=description, picture=picture} )
 		return 1
 	else
-		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentid=parentid} ):table().ID
+		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentid=parentid, picture=picture} ):table().ID
 		return id
 	end
 end
@@ -59,6 +72,7 @@ local function insert_tree_topnode( tablename, itr)
 	local id = 1
 	local name = nil
 	local description = nil
+	local picture = nil
 	for v,t in itr do
 		if (t == "parent") then
 			parentid = tonumber( v)
@@ -66,9 +80,11 @@ local function insert_tree_topnode( tablename, itr)
 			name = content_value( v, itr)
 		elseif (t == "description") then
 			description = content_value( v, itr)
+		elseif (t == "picture") then
+			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
-				id = insert_topnode( tablename, name, description, parentid)
+				id = insert_topnode( tablename, name, description, picture, parentid)
 				name = nil
 				description = nil
 			end
@@ -76,7 +92,7 @@ local function insert_tree_topnode( tablename, itr)
 		end
 	end
 	if name then
-		insert_topnode( tablename, name, description, parentid)
+		insert_topnode( tablename, name, description, picture, parentid)
 	end
 end
 
@@ -84,7 +100,7 @@ local function get_tree( tablename, parentid)
 	local t = formfunction( "selectSub" .. tablename)( {id=parentid} ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
-		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, parent=tonumber(v.parent), children = {} } )
+		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, picture=v.picture, parent=tonumber(v.parent), children = {} } )
 	end
 	for i,v in pairs( a) do
 		if i ~= parentid and v.parent then
@@ -140,8 +156,10 @@ local function select_node( tablename, elementname, itr)
 			output:opentag( elementname)
 			output:print( v, "id")
 			local r = formfunction( "select" .. tablename)( {id=v} )
-			output:print( r:get())
-			output:closetag()
+			local f = form( "Category");
+			f:fill( r:get())
+			output:print( f:get())
+			output:closetag( )
 		end
 	end
 end
@@ -150,6 +168,7 @@ local function edit_node( tablename, itr)
 	local name = nil;
 	local nname = nil;
 	local description = nil;
+	local picture = nil;
 	local id = nil;
 	for v,t in itr do
 		if t == "id" then
@@ -157,8 +176,10 @@ local function edit_node( tablename, itr)
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
-		elseif t ==  "description" then
+		elseif t == "description" then
 			description = content_value( v, itr)
+		elseif t == "picture" then
+			picture = picture_value( scope(itr))
 		end
 	end
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id} )
@@ -178,19 +199,20 @@ local function create_node( tablename, itr)
 	local name = nil;
 	local parentid = nil;
 	local description = nil;
+	local picture = nil;
 	for v,t in itr do
-		if t == "id" then
-			parentid = v
-		elseif t == "parent" then
+		if t == "parent" then
 			parentid = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
 		elseif t ==  "description" then
 			description = content_value( v, itr)
+		elseif t ==  "picture" then
+			picture = picture_value( scope(itr))
 		end
 	end
-	insert_topnode( tablename, name, description, parentid)
+	insert_topnode( tablename, name, description, picture, parentid)
 end
 
 local function add_tree( tablename, itr)

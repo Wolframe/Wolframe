@@ -193,7 +193,7 @@
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="46"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName></category><tree><item id="1">
+</item></tree><category id="52"><id>52</id><parent>46</parent><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture></category><category id="46"><id>46</id><parent>16</parent><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
 	<category>computer</category>
 	<tree><item id="2">
 		<category>Minicomputer</category>
@@ -224,6 +224,8 @@
 			<category>Desktop computer</category></item></tree>
 		<tree><item id="15">
 			<category>Home computer</category></item></tree>
+		<tree><item id="51">
+			<category>Device from outer space</category></item></tree>
 	</item></tree>
 	<tree><item id="16">
 		<category>Mobile</category>
@@ -241,19 +243,98 @@
 			<tree><item id="44">
 				<category>Wearable computer</category></item></tree>
 		</item></tree>
-		<tree><item id="49">
-			<category>Smartdust</category></item></tree>
-		<tree><item id="50">
-			<category>Nanocomputer</category></item></tree>
 		<tree><item id="45">
 			<category>Single board computer</category></item></tree>
-		<tree><item id="46">
-			<category>Wireless network component</category></item></tree>
 		<tree><item id="47">
 			<category>Plug computer</category></item></tree>
+		<tree><item id="49">
+			<category>Smartdust</category></item></tree>
+		<tree><item id="46">
+			<category>Wireless network component</category>
+			<tree><item id="52">
+				<category>WNC child</category></item></tree>
+		</item></tree>
 		<tree><item id="48">
 			<category>Microcontroller</category></item></tree>
+		<tree><item id="50">
+			<category>Nanocomputer</category></item></tree>
 	</item></tree>
-	<tree><item id="51">
-		<category>Device from outer space</category></item></tree>
+</item></tree><tree><item id="1">
+	<category>feature</category>
+	<tree><item id="2">
+		<category>Color</category>
+		<tree><item id="3">
+			<category>green</category></item></tree>
+		<tree><item id="4">
+			<category>blue</category></item></tree>
+		<tree><item id="5">
+			<category>gray</category></item></tree>
+		<tree><item id="6">
+			<category>red</category></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<category>Size</category>
+		<tree><item id="8">
+			<category>big</category></item></tree>
+		<tree><item id="9">
+			<category>small</category></item></tree>
+		<tree><item id="10">
+			<category>tiny</category></item></tree>
+		<tree><item id="11">
+			<category>pocket size</category></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<category>Noise</category>
+		<tree><item id="13">
+			<category>loud</category></item></tree>
+		<tree><item id="14">
+			<category>silent</category></item></tree>
+	</item></tree>
+</item></tree><tree><item id="7">
+	<category>Size</category>
+	<tree><item id="10">
+		<category>tiny</category></item></tree>
+	<tree><item id="9">
+		<category>small</category></item></tree>
+	<tree><item id="11">
+		<category>pocket size</category></item></tree>
+	<tree><item id="8">
+		<category>big</category></item></tree>
+</item></tree><tree><item id="1">
+	<category>feature</category>
+	<tree><item id="2">
+		<category>Color</category>
+		<tree><item id="3">
+			<category>green</category></item></tree>
+		<tree><item id="4">
+			<category>blue</category></item></tree>
+		<tree><item id="5">
+			<category>gray</category></item></tree>
+		<tree><item id="6">
+			<category>pink</category></item></tree>
+		<tree><item id="18">
+			<category>yellow</category></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<category>Size</category>
+		<tree><item id="8">
+			<category>big</category></item></tree>
+		<tree><item id="9">
+			<category>small</category></item></tree>
+		<tree><item id="10">
+			<category>tiny</category></item></tree>
+		<tree><item id="11">
+			<category>pocket size</category></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<category>Noise</category>
+		<tree><item id="13">
+			<category>loud</category></item></tree>
+		<tree><item id="14">
+			<category>silent</category></item></tree>
+		<tree><item id="16">
+			<category>mumling</category></item></tree>
+	</item></tree>
+	<tree><item id="17">
+		<category>Space</category></item></tree>
 </item></tree></result>

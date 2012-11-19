@@ -1,67 +1,16 @@
+DOCTYPE "picture Picture"
+{
+	id @int
+	caption string
+	info string
+	image string
+}
 DOCTYPE "category Category"
 {
-	category
-	{
-		parentid int
-		name string
-	}
-}
-DOCTYPE "category addCategoryRoot"
-{
-	category
-	{
-		name string
-		normalizedName name
-	}
-}
-DOCTYPE "category addCategory"
-{
-	category
-	{
-		parentid int
-		name string
-		normalizedName name
-	}
-}
-DOCTYPE "category deleteCategory"
-{
-	category
-	{
-		id int
-	}
-}
-DOCTYPE "category selectCategory"
-{
-	category
-	{
-		id int
-	}
-}
-DOCTYPE "category selectCategoryByName"
-{
-	category
-	{
-		name string
-	}
-}
-DOCTYPE "category selectCategoryByNormalizedName"
-{
-	category
-	{
-		normalizedName name
-	}
-}
-DOCTYPE "category selectSubCategories"
-{
-	category
-	{
-		id int
-	}
-}
-DOCTYPE "category selectTopCategories"
-{
-	category
-	{
-		id int
-	}
+	id int
+	parent int
+	name string
+	normalizedName string
+	description string
+	picture Picture[]
 }

@@ -73,7 +73,7 @@ CREATE TABLE ComponentHistory	(
 	componentID	INT	REFERENCES Component( ID ),
 	price		NUMERIC( 10, 2 ),
 	priceDate	TIMESTAMP,
-	user		TEXT
+	username	TEXT
 );
 
 CREATE TABLE ComponentPicture	(

@@ -8,6 +8,11 @@ luascript=`echo $testname | sed 's/lua_//'`.lua
 opt="$opt --program=$luascript"
 ddltypeprg="simpleform.normalize"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
+opt="$opt --program category.simpleform"		# category forms
+opt="$opt --program feature.simpleform"			# feature forms
+modpath="../../src/modules/ddlcompiler/"		# module directory for ddl definitions relative from tests/temp
+mod="$modpath/simpleform/mod_ddlcompiler_simpleform"	# module to load
+opt="$opt --module $mod"
 modpath="../../src/modules/normalize/"			# module directory for normalizers relative from tests/temp
 mod="$modpath/number/mod_normalize_number"		# module to load
 opt="$opt --module $mod"
@@ -33,6 +38,10 @@ testdata="
 `cat program/$ddltypeprg`
 **file: DBDATA
 `cat $projectpath/database/schema_sqlite.sql`
+**file:category.simpleform
+`cat $projectpath/program/category.simpleform`
+**file:feature.simpleform
+`cat $projectpath/program/feature.simpleform`
 **file:DBPRG.tdl
 `cat $projectpath/program/category.tdl`
 `cat $projectpath/program/feature.tdl`

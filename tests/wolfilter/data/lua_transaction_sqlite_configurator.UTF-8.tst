@@ -76,11 +76,46 @@
 <editCategory><category id="46" name="Wireless network component"/></editCategory>
 <deleteCategory><category id="22"/></deleteCategory>
 <deleteCategory><category id="25"/></deleteCategory>
-<createCategory><category id="7" name="Device from outer space" parent="1"/></createCategory>
+<createCategory><category name="Device from outer space" parent="7"></category></createCategory>
+<createCategory>
+<category parent="46"><name>WNC child</name>
+<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
+</category>
+</createCategory>
+<CategoryRequest><category id="52"/></CategoryRequest>
 <CategoryRequest><category id="46"/></CategoryRequest>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
+<pushFeatureHierarchy>
+<node name="feature">
+	<node name="Color">
+		<node name="green"/>
+		<node name="blue"/>
+		<node name="gray"/>
+		<node name="red"/>
+	</node>
+	<node name="Size">
+		<node name="big"/>
+		<node name="small"/>
+		<node name="tiny"/>
+		<node name="pocket size"/>
+	</node>
+	<node name="Noise">
+		<node name="loud"/>
+		<node name="silent"/>
+		<node name="grumling"/>
+	</node>
+</node>
+</pushFeatureHierarchy>
+<deleteFeature><feature id="15"/></deleteFeature>
+<FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
+<FeatureHierarchyRequest><feature id="7"/></FeatureHierarchyRequest>
+<editFeature><feature id="6" name="pink"/></editFeature>
+<createFeature><feature name="mumling" parent="12"/></createFeature>
+<createFeature><feature name="Space" parent="1"/></createFeature>
+<createFeature><feature name="yellow" parent="2"/></createFeature>
+<FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
 </test>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
 **file:simpleform.normalize
 int=number:integer;
@@ -162,7 +197,7 @@ CREATE TABLE ComponentHistory	(
 	componentID	INT	REFERENCES Component( ID ),
 	price		NUMERIC( 10, 2 ),
 	priceDate	TIMESTAMP,
-	user		TEXT
+	username	TEXT
 );
 
 CREATE TABLE ComponentPicture	(
@@ -268,6 +303,32 @@ CREATE TABLE ComposedConfig	(
 	subConfigID	INT	REFERENCES Configuration( ID ),
 	quantity	INT
 );
+**file:category.simpleform
+DOCTYPE "picture Picture"
+{
+	id @int
+	caption string
+	info string
+	image string
+}
+DOCTYPE "category Category"
+{
+	id int
+	parent int
+	name string
+	normalizedName string
+	description string
+	picture Picture[]
+}
+**file:feature.simpleform
+DOCTYPE "feature Feature"
+{
+	feature
+	{
+		parentid int
+		name string
+	}
+}
 **file:DBPRG.tdl
 --
 -- addCategoryRoot
@@ -294,7 +355,7 @@ BEGIN
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parent, name, normalizedName, description, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
-	FOREACH picture DO INSERT INTO CategoryPicture (caption,info,image) VALUES ($(caption), $(info), $(image));
+	FOREACH picture DO INSERT INTO Picture (caption,info,image) VALUES ($(caption), $(info), $(image));
 	FOREACH picture DO SELECT $1,last_insert_rowid() FROM Picture;
 	FOREACH picture DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
 END
@@ -328,17 +389,17 @@ END
 --
 TRANSACTION selectCategory -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Category WHERE ID = $(id);
-	INTO picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parent,name,normalizedName,description FROM Category WHERE ID = $(id);
+	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
 END
 TRANSACTION selectCategoryByName -- (name)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Category WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parent,name,normalizedName,description FROM Category WHERE name = $(name);
 	INTO picture DO SELECT pictureID AS id,caption,info,image FROM CategoryPicture,Category WHERE CategoryPicture.categoryID = Category.ID AND Category.ID = $1;
 END
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parent,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
 	INTO picture DO SELECT pictureID AS id,caption,info,image FROM CategoryPicture,Category WHERE CategoryPicture.categoryID = Category.ID AND Category.ID = $1;
 END
 TRANSACTION selectCategorySet -- (/category/id)
@@ -351,7 +412,7 @@ END
 --
 TRANSACTION selectTopCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName,P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
@@ -359,7 +420,7 @@ END
 --
 TRANSACTION selectSubCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 --
 -- addFeatureRoot
@@ -424,17 +485,17 @@ BEGIN
 END
 
 --
--- selectTopFeatures       :Get the parents of a feature
+-- selectTopFeature       :Get the parents of a feature
 --
-TRANSACTION selectTopFeatures -- (id)
+TRANSACTION selectTopFeature -- (id)
 BEGIN
 	INTO /node DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
--- selectSubFeatures       :Get the sub features
+-- selectSubFeature       :Get the sub features
 --
-TRANSACTION selectSubFeatures -- (id)
+TRANSACTION selectSubFeature -- (id)
 BEGIN
 	INTO /node DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
@@ -459,20 +520,33 @@ local function content_value( v, itr)
 	end
 end
 
+local function picture_value( itr)
+	local picture = {}
+	for v,t in itr do
+		if (t == "caption" or t == "info" or t == "image") then
+			picture[ t] = content_value( v, itr)
+		end
+	end
+	return picture
+end
+
 local function insert_itr( tablename, parentid, itr)
 	local id = 1
 	local name = nil
 	local nname = nil
 	local description = nil
+	local picture = nil
 	for v,t in itr do
 		if (t == "name") then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
 		elseif (t == "description") then
 			description = content_value( v, itr)
+		elseif (t == "picture") then
+			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
-				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentid=parentid} ):table().ID
+				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentid=parentid, picture=picture} ):table().ID
 				name = nil
 				description = nil
 			end
@@ -485,13 +559,13 @@ local function insert_itr( tablename, parentid, itr)
 	return id
 end
 
-local function insert_topnode( tablename, name, description, parentid)
+local function insert_topnode( tablename, name, description, picture, parentid)
 	local nname = normalizeName( name)
 	if not parentid then
-		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name, description=description} )
+		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name, description=description, picture=picture} )
 		return 1
 	else
-		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentid=parentid} ):table().ID
+		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentid=parentid, picture=picture} ):table().ID
 		return id
 	end
 end
@@ -501,6 +575,7 @@ local function insert_tree_topnode( tablename, itr)
 	local id = 1
 	local name = nil
 	local description = nil
+	local picture = nil
 	for v,t in itr do
 		if (t == "parent") then
 			parentid = tonumber( v)
@@ -508,9 +583,11 @@ local function insert_tree_topnode( tablename, itr)
 			name = content_value( v, itr)
 		elseif (t == "description") then
 			description = content_value( v, itr)
+		elseif (t == "picture") then
+			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
-				id = insert_topnode( tablename, name, description, parentid)
+				id = insert_topnode( tablename, name, description, picture, parentid)
 				name = nil
 				description = nil
 			end
@@ -518,7 +595,7 @@ local function insert_tree_topnode( tablename, itr)
 		end
 	end
 	if name then
-		insert_topnode( tablename, name, description, parentid)
+		insert_topnode( tablename, name, description, picture, parentid)
 	end
 end
 
@@ -526,7 +603,7 @@ local function get_tree( tablename, parentid)
 	local t = formfunction( "selectSub" .. tablename)( {id=parentid} ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
-		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, parent=tonumber(v.parent), children = {} } )
+		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, picture=v.picture, parent=tonumber(v.parent), children = {} } )
 	end
 	for i,v in pairs( a) do
 		if i ~= parentid and v.parent then
@@ -582,8 +659,10 @@ local function select_node( tablename, elementname, itr)
 			output:opentag( elementname)
 			output:print( v, "id")
 			local r = formfunction( "select" .. tablename)( {id=v} )
-			output:print( r:get())
-			output:closetag()
+			local f = form( "Category");
+			f:fill( r:get())
+			output:print( f:get())
+			output:closetag( )
 		end
 	end
 end
@@ -591,6 +670,8 @@ end
 local function edit_node( tablename, itr)
 	local name = nil;
 	local nname = nil;
+	local description = nil;
+	local picture = nil;
 	local id = nil;
 	for v,t in itr do
 		if t == "id" then
@@ -598,9 +679,13 @@ local function edit_node( tablename, itr)
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
+		elseif t == "description" then
+			description = content_value( v, itr)
+		elseif t == "picture" then
+			picture = picture_value( scope(itr))
 		end
 	end
-	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, id=id} )
+	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id} )
 end
 
 local function delete_node( tablename, itr)
@@ -617,19 +702,20 @@ local function create_node( tablename, itr)
 	local name = nil;
 	local parentid = nil;
 	local description = nil;
+	local picture = nil;
 	for v,t in itr do
-		if t == "id" then
-			parentid = v
-		elseif t == "parent" then
+		if t == "parent" then
 			parentid = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
 		elseif t ==  "description" then
 			description = content_value( v, itr)
+		elseif t ==  "picture" then
+			picture = picture_value( scope(itr))
 		end
 	end
-	insert_topnode( tablename, name, description, parentid)
+	insert_topnode( tablename, name, description, picture, parentid)
 end
 
 local function add_tree( tablename, itr)
@@ -941,7 +1027,7 @@ end
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="46"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName></category><tree><item id="1">
+</item></tree><category id="52"><id>52</id><parent>46</parent><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture></category><category id="46"><id>46</id><parent>16</parent><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
 	<category>computer</category>
 	<tree><item id="2">
 		<category>Minicomputer</category>
@@ -972,6 +1058,8 @@ end
 			<category>Desktop computer</category></item></tree>
 		<tree><item id="15">
 			<category>Home computer</category></item></tree>
+		<tree><item id="51">
+			<category>Device from outer space</category></item></tree>
 	</item></tree>
 	<tree><item id="16">
 		<category>Mobile</category>
@@ -989,35 +1077,117 @@ end
 			<tree><item id="44">
 				<category>Wearable computer</category></item></tree>
 		</item></tree>
-		<tree><item id="49">
-			<category>Smartdust</category></item></tree>
-		<tree><item id="50">
-			<category>Nanocomputer</category></item></tree>
 		<tree><item id="45">
 			<category>Single board computer</category></item></tree>
-		<tree><item id="46">
-			<category>Wireless network component</category></item></tree>
 		<tree><item id="47">
 			<category>Plug computer</category></item></tree>
+		<tree><item id="49">
+			<category>Smartdust</category></item></tree>
+		<tree><item id="46">
+			<category>Wireless network component</category>
+			<tree><item id="52">
+				<category>WNC child</category></item></tree>
+		</item></tree>
 		<tree><item id="48">
 			<category>Microcontroller</category></item></tree>
+		<tree><item id="50">
+			<category>Nanocomputer</category></item></tree>
 	</item></tree>
-	<tree><item id="51">
-		<category>Device from outer space</category></item></tree>
+</item></tree><tree><item id="1">
+	<category>feature</category>
+	<tree><item id="2">
+		<category>Color</category>
+		<tree><item id="3">
+			<category>green</category></item></tree>
+		<tree><item id="4">
+			<category>blue</category></item></tree>
+		<tree><item id="5">
+			<category>gray</category></item></tree>
+		<tree><item id="6">
+			<category>red</category></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<category>Size</category>
+		<tree><item id="8">
+			<category>big</category></item></tree>
+		<tree><item id="9">
+			<category>small</category></item></tree>
+		<tree><item id="10">
+			<category>tiny</category></item></tree>
+		<tree><item id="11">
+			<category>pocket size</category></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<category>Noise</category>
+		<tree><item id="13">
+			<category>loud</category></item></tree>
+		<tree><item id="14">
+			<category>silent</category></item></tree>
+	</item></tree>
+</item></tree><tree><item id="7">
+	<category>Size</category>
+	<tree><item id="10">
+		<category>tiny</category></item></tree>
+	<tree><item id="9">
+		<category>small</category></item></tree>
+	<tree><item id="11">
+		<category>pocket size</category></item></tree>
+	<tree><item id="8">
+		<category>big</category></item></tree>
+</item></tree><tree><item id="1">
+	<category>feature</category>
+	<tree><item id="2">
+		<category>Color</category>
+		<tree><item id="3">
+			<category>green</category></item></tree>
+		<tree><item id="4">
+			<category>blue</category></item></tree>
+		<tree><item id="5">
+			<category>gray</category></item></tree>
+		<tree><item id="6">
+			<category>pink</category></item></tree>
+		<tree><item id="18">
+			<category>yellow</category></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<category>Size</category>
+		<tree><item id="8">
+			<category>big</category></item></tree>
+		<tree><item id="9">
+			<category>small</category></item></tree>
+		<tree><item id="10">
+			<category>tiny</category></item></tree>
+		<tree><item id="11">
+			<category>pocket size</category></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<category>Noise</category>
+		<tree><item id="13">
+			<category>loud</category></item></tree>
+		<tree><item id="14">
+			<category>silent</category></item></tree>
+		<tree><item id="16">
+			<category>mumling</category></item></tree>
+	</item></tree>
+	<tree><item id="17">
+		<category>Space</category></item></tree>
 </item></tree></result>
 Picture:
+'1', 'WNC caption', 'WNC info', 'WNC image'
 
 sqlite_sequence:
-'Category', '51'
+'Category', '52'
+'Picture', '1'
+'Feature', '18'
 
 Category:
-'1', NULL, 'computer', 'computer', NULL, '1', '58'
+'1', NULL, 'computer', 'computer', NULL, '1', '60'
 '2', '1', 'Minicomputer', 'minicomputer', NULL, '2', '11'
 '3', '2', 'Superminicomputer', 'superminicomputer', NULL, '3', '4'
 '4', '2', 'Minicluster', 'minicluster', NULL, '5', '6'
 '5', '2', 'Server (Minicomputer)', 'server minicomputer', NULL, '7', '8'
 '6', '2', 'Workstation (Minicomputer)', 'workstation minicomputer', NULL, '9', '10'
-'7', '1', 'Microcomputer', 'microcomputer', NULL, '12', '29'
+'7', '1', 'Microcomputer', 'microcomputer', NULL, '12', '31'
 '8', '7', 'Tower PC', 'tower pc', NULL, '13', '14'
 '9', '7', 'Mid-Tower PC', 'mid tower pc', NULL, '15', '16'
 '10', '7', 'Mini-Tower PC', 'mini tower pc', NULL, '17', '18'
@@ -1026,24 +1196,43 @@ Category:
 '13', '7', 'Personal computer', 'personal computer', NULL, '23', '24'
 '14', '7', 'Desktop computer', 'desktop computer', NULL, '25', '26'
 '15', '7', 'Home computer', 'home computer', NULL, '27', '28'
-'16', '1', 'Mobile', 'mobile', NULL, '30', '55'
-'17', '16', 'Desknote', 'desknote', NULL, '31', '32'
-'18', '16', 'Laptop', 'laptop', NULL, '33', '42'
-'19', '18', 'Notebook', 'notebook', NULL, '34', '37'
-'20', '19', 'Subnotebook', 'subnotebook', NULL, '35', '36'
-'21', '18', 'Tablet personal computer', 'tablet personal computer', NULL, '38', '39'
-'44', '18', 'Wearable computer', 'wearable computer', NULL, '40', '41'
-'45', '16', 'Single board computer', 'single board computer', NULL, '43', '44'
-'46', '16', 'Wireless network component', 'wireless network component', NULL, '45', '46'
-'47', '16', 'Plug computer', 'plug computer', NULL, '47', '48'
-'48', '16', 'Microcontroller', 'microcontroller', NULL, '49', '50'
-'49', '16', 'Smartdust', 'smartdust', NULL, '51', '52'
-'50', '16', 'Nanocomputer', 'nanocomputer', NULL, '53', '54'
-'51', '1', 'Device from outer space', 'device from outer space', NULL, '56', '57'
+'16', '1', 'Mobile', 'mobile', NULL, '32', '59'
+'17', '16', 'Desknote', 'desknote', NULL, '33', '34'
+'18', '16', 'Laptop', 'laptop', NULL, '35', '44'
+'19', '18', 'Notebook', 'notebook', NULL, '36', '39'
+'20', '19', 'Subnotebook', 'subnotebook', NULL, '37', '38'
+'21', '18', 'Tablet personal computer', 'tablet personal computer', NULL, '40', '41'
+'44', '18', 'Wearable computer', 'wearable computer', NULL, '42', '43'
+'45', '16', 'Single board computer', 'single board computer', NULL, '45', '46'
+'46', '16', 'Wireless network component', 'wireless network component', NULL, '47', '50'
+'47', '16', 'Plug computer', 'plug computer', NULL, '51', '52'
+'48', '16', 'Microcontroller', 'microcontroller', NULL, '53', '54'
+'49', '16', 'Smartdust', 'smartdust', NULL, '55', '56'
+'50', '16', 'Nanocomputer', 'nanocomputer', NULL, '57', '58'
+'51', '7', 'Device from outer space', 'device from outer space', NULL, '29', '30'
+'52', '46', 'WNC child', 'wnc child', NULL, '48', '49'
 
 CategoryPicture:
+'52', '1'
 
 Feature:
+'1', NULL, 'feature', 'feature', '1', '34'
+'2', '1', 'Color', 'color', '2', '13'
+'3', '2', 'green', 'green', '3', '4'
+'4', '2', 'blue', 'blue', '5', '6'
+'5', '2', 'gray', 'gray', '7', '8'
+'6', '2', 'pink', 'pink', '9', '10'
+'7', '1', 'Size', 'size', '14', '23'
+'8', '7', 'big', 'big', '15', '16'
+'9', '7', 'small', 'small', '17', '18'
+'10', '7', 'tiny', 'tiny', '19', '20'
+'11', '7', 'pocket size', 'pocket size', '21', '22'
+'12', '1', 'Noise', 'noise', '24', '31'
+'13', '12', 'loud', 'loud', '25', '26'
+'14', '12', 'silent', 'silent', '27', '28'
+'16', '12', 'mumling', 'mumling', '29', '30'
+'17', '1', 'Space', 'space', '32', '33'
+'18', '2', 'yellow', 'yellow', '11', '12'
 
 FeaturePicture:
 

@@ -72,7 +72,42 @@
 <editCategory><category id="46" name="Wireless network component"/></editCategory>
 <deleteCategory><category id="22"/></deleteCategory>
 <deleteCategory><category id="25"/></deleteCategory>
-<createCategory><category id="7" name="Device from outer space" parent="1"/></createCategory>
+<createCategory><category name="Device from outer space" parent="7"></category></createCategory>
+<createCategory>
+<category parent="46"><name>WNC child</name>
+<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
+</category>
+</createCategory>
+<CategoryRequest><category id="52"/></CategoryRequest>
 <CategoryRequest><category id="46"/></CategoryRequest>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
+<pushFeatureHierarchy>
+<node name="feature">
+	<node name="Color">
+		<node name="green"/>
+		<node name="blue"/>
+		<node name="gray"/>
+		<node name="red"/>
+	</node>
+	<node name="Size">
+		<node name="big"/>
+		<node name="small"/>
+		<node name="tiny"/>
+		<node name="pocket size"/>
+	</node>
+	<node name="Noise">
+		<node name="loud"/>
+		<node name="silent"/>
+		<node name="grumling"/>
+	</node>
+</node>
+</pushFeatureHierarchy>
+<deleteFeature><feature id="15"/></deleteFeature>
+<FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
+<FeatureHierarchyRequest><feature id="7"/></FeatureHierarchyRequest>
+<editFeature><feature id="6" name="pink"/></editFeature>
+<createFeature><feature name="mumling" parent="12"/></createFeature>
+<createFeature><feature name="Space" parent="1"/></createFeature>
+<createFeature><feature name="yellow" parent="2"/></createFeature>
+<FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
 </test>

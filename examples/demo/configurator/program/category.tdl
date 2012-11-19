@@ -23,7 +23,7 @@ BEGIN
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parent, name, normalizedName, description, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
-	FOREACH picture DO INSERT INTO CategoryPicture (caption,info,image) VALUES ($(caption), $(info), $(image));
+	FOREACH picture DO INSERT INTO Picture (caption,info,image) VALUES ($(caption), $(info), $(image));
 	FOREACH picture DO SELECT $1,last_insert_rowid() FROM Picture;
 	FOREACH picture DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
 END
@@ -57,17 +57,17 @@ END
 --
 TRANSACTION selectCategory -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Category WHERE ID = $(id);
-	INTO picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parent,name,normalizedName,description FROM Category WHERE ID = $(id);
+	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
 END
 TRANSACTION selectCategoryByName -- (name)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Category WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parent,name,normalizedName,description FROM Category WHERE name = $(name);
 	INTO picture DO SELECT pictureID AS id,caption,info,image FROM CategoryPicture,Category WHERE CategoryPicture.categoryID = Category.ID AND Category.ID = $1;
 END
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parent,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
 	INTO picture DO SELECT pictureID AS id,caption,info,image FROM CategoryPicture,Category WHERE CategoryPicture.categoryID = Category.ID AND Category.ID = $1;
 END
 TRANSACTION selectCategorySet -- (/category/id)
