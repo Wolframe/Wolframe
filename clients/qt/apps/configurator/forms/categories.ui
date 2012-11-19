@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>477</width>
+    <width>556</width>
     <height>318</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>451</width>
+     <width>531</width>
      <height>241</height>
     </rect>
    </property>
@@ -34,6 +34,9 @@
    <property name="state" stdset="0">
     <string notr="true">{global.categoryState}</string>
    </property>
+   <attribute name="headerDefaultSectionSize">
+    <number>200</number>
+   </attribute>
    <column>
     <property name="text">
      <string>category</string>
@@ -49,7 +52,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>260</y>
+     <y>280</y>
      <width>403</width>
      <height>31</height>
     </rect>
@@ -140,10 +143,85 @@
     </item>
    </layout>
   </widget>
+  <widget class="QRadioButton" name="radioButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>260</y>
+     <width>100</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>expand all</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_2">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>260</y>
+     <width>100</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>collapse all</string>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>category</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>radioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>category</receiver>
+   <slot>expandAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>270</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>62</x>
+     <y>234</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButton_2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>category</receiver>
+   <slot>collapseAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>146</x>
+     <y>265</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>146</x>
+     <y>227</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>category</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>edit</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>113</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>216</x>
+     <y>294</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -597,12 +597,15 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 	if( clazz == "QTreeWidget" ) {
 		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 		
+// always return data of the selected item (assuming single select for now)
+// the ID is currently hard-coded in user data
 		if( property == "id" ) {
-	// always return data of the selected item (assuming single select for now)
-	// the ID is currently hard-coded in user data
 			QList<QTreeWidgetItem *> items = treeWidget->selectedItems( );
 			if( items.empty( ) ) return QString( );
 			return items[0]->data( 0, Qt::UserRole ).toString( );
+// state is header sizes, expanded/collapse states, selection states, sorting order,
+// scroll position, etc.
+// all those get lost if we reload the form..
 		} else if( property == "state" ) {
 			QTreeWidgetItemIterator it( treeWidget );
 			QString state = "";
@@ -619,6 +622,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 				}
 				++it;
 			}
+
 			return state;
 		}
 	} else {
