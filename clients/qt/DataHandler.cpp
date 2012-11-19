@@ -377,7 +377,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 			QString stateId;
 			if( statePos < states.count( ) ) {
 				state = states[statePos].left( 1 );
-				stateId = states[statePos].right( 1 );
+				stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
 			}
 			while( *it ) {
 				QString id = (*it)->data( 0, Qt::UserRole ).toString( );
