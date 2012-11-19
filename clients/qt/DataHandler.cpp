@@ -370,38 +370,59 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 // iterate again and check against saved tree state
 		if( props->contains( "state" ) ) {
 			qDebug( ) << "Restoring tree state for tree" << widget_name;
-			QTreeWidgetItemIterator it( treeWidget );
 			QStringList states = props->value( "state" ).split( "|", QString::SkipEmptyParts );
-			int statePos = 0;
-			QString state;
-			QString stateId;
-			if( statePos < states.count( ) ) {
-				state = states[statePos].left( 1 );
-				stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
-			}
-			while( *it ) {
-				QString id = (*it)->data( 0, Qt::UserRole ).toString( );
-				if( id == stateId ) {
-					if( state == "E" ) {
-						(*it)->setExpanded( true );
-						statePos++;
-						if( statePos < states.count( ) ) {
-							state = states[statePos].left( 1 );
-							stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
-						}
-					}
-					if( state == "S" ) {
-						(*it)->setSelected( true );
-						statePos++;
-						if( statePos < states.count( ) ) {
-							state = states[statePos].left( 1 );
-							stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
-						}
-						// better than nothing, scroll to the position of the last selection (usually one)
-						treeWidget->scrollToItem( *it );
-					}
+// expand tree first, otherwise parents get selected if we select a non-expanded subtree!
+			{
+				int statePos = 0;
+				QString state;
+				QString stateId;
+				if( statePos < states.count( ) ) {
+					state = states[statePos].left( 1 );
+					stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
 				}
-				++it;
+				QTreeWidgetItemIterator it( treeWidget );
+				while( *it ) {
+					QString id = (*it)->data( 0, Qt::UserRole ).toString( );
+					if( id == stateId ) {
+						if( state == "E" ) {
+							(*it)->setExpanded( true );
+						}
+						statePos++;
+						if( statePos < states.count( ) ) {
+							state = states[statePos].left( 1 );
+							stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
+						}
+					}
+					++it;
+				}
+			}
+// twice, see above
+			{
+				int statePos = 0;
+				QString state;
+				QString stateId;
+				if( statePos < states.count( ) ) {
+					state = states[statePos].left( 1 );
+					stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
+				}
+				QTreeWidgetItemIterator it( treeWidget );
+				while( *it ) {
+					QString id = (*it)->data( 0, Qt::UserRole ).toString( );
+					qDebug( ) << "selecting" << id << state << stateId;
+					if( id == stateId ) {
+						if( state == "S" ) {
+							(*it)->setSelected( true );
+							// better than nothing, scroll to the position of the last selection (usually one)
+							treeWidget->scrollToItem( *it );
+						}
+						statePos++;
+						if( statePos < states.count( ) ) {
+							state = states[statePos].left( 1 );
+							stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
+						}
+					}
+					++it;
+				}
 			}
 		}
 	} else {
