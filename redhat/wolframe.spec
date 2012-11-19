@@ -967,8 +967,6 @@ fi
 %if !%{sles}
 %dir %{_bindir}
 %endif
-# will disappear
-%{_bindir}/wolfcli
 %if !%{sles}
 %dir %{_libdir}/wolframe/
 %endif
