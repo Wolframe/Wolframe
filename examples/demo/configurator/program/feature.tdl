@@ -3,18 +3,18 @@
 --
 TRANSACTION addFeatureRoot -- (name, normalizedName)
 BEGIN
-	DO INSERT INTO Feature (ID, parent, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
+	DO INSERT INTO Feature (ID, parentID, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
 END
 
 --
 -- addFeature
 --
-TRANSACTION addFeature -- (parentid, name, normalizedName)
+TRANSACTION addFeature -- (parentID, name, normalizedName)
 BEGIN
-	DO NONEMPTY UNIQUE SELECT rgt FROM Feature WHERE ID = $(parentid);
+	DO NONEMPTY UNIQUE SELECT rgt FROM Feature WHERE ID = $(parentID);
 	DO UPDATE Feature SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Feature SET lft = lft + 2 WHERE lft > $1;
-	DO INSERT INTO Feature (parent, name, normalizedName, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $1, $1+1);
+	DO INSERT INTO Feature (parentID, name, normalizedName, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Feature WHERE normalizedName = $(normalizedName);
 END
 
@@ -47,14 +47,18 @@ TRANSACTION selectFeature -- (id)
 BEGIN
 	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE ID = $(id);
 END
+
+-- This is not supposed to exist either
 TRANSACTION selectFeatureByName -- (name)
 BEGIN
 	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE name = $(name);
 END
+
 TRANSACTION selectFeatureByNormalizedName -- (normalizedName)
 BEGIN
 	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE normalizedName = $(normalizedName);
 END
+
 TRANSACTION selectFeatureSet -- (/feature/id)
 BEGIN
 	FOREACH /feature INTO feature DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName FROM Feature WHERE ID = $(id);
@@ -75,7 +79,4 @@ TRANSACTION selectSubFeature -- (id)
 BEGIN
 	INTO /node DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
-
-
-
 

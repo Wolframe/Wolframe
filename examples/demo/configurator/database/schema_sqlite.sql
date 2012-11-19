@@ -12,7 +12,7 @@ CREATE TABLE Picture	(
 --
 CREATE TABLE Category	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
-	parent		INT	REFERENCES Category( ID ),
+	parentID	INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
 	description	TEXT,
@@ -31,9 +31,10 @@ CREATE TABLE CategoryPicture	(
 --
 CREATE TABLE Feature	(
 	ID 		INTEGER	PRIMARY KEY AUTOINCREMENT,
-	parent		INT	REFERENCES Feature( ID ),
+	parentID	INT	REFERENCES Feature( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
+	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
 	CONSTRAINT order_check CHECK ( rgt > lft )
@@ -62,10 +63,11 @@ CREATE TABLE Component	(
 	code		TEXT	NOT NULL UNIQUE,
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
-	category	INT	REFERENCES Category( ID ),
+	categoryID	INT	REFERENCES Category( ID ),
 	manufacturerID	INT	REFERENCES Manufacturer( ID ),
 	mfgCode		TEXT,
 	webPage		TEXT,
+	description	TEXT,
 	price		NUMERIC( 10, 2 )
 );
 
@@ -84,52 +86,52 @@ CREATE TABLE ComponentPicture	(
 -- The list of features required by members of a category
 --
 CREATE TABLE CategRequires	(
-	Category	INT	REFERENCES Category( ID ),
-	Feature		INT	REFERENCES Feature( ID ),
-	MinQuantity	INT,
-	MaxQuantity	INT
+	categoryID	INT	REFERENCES Category( ID ),
+	featureID	INT	REFERENCES Feature( ID ),
+	minQuantity	INT,
+	maxQuantity	INT
 );
 
 -- The list of features provided by members of a category
 --
 CREATE TABLE CategProvides	(
-	Category	INT	REFERENCES Category( ID ),
-	Feature		INT	REFERENCES Feature( ID ),
-	MinQuantity	INT,
-	MaxQuantity	INT
+	categoryID	INT	REFERENCES Category( ID ),
+	featureID	INT	REFERENCES Feature( ID ),
+	minQuantity	INT,
+	maxQuantity	INT
 );
 
 -- The list of checks for members of a category
 --
 CREATE TABLE CategoryCheck	(
-	Category	INT	REFERENCES Category( ID ),
-	RuleName	TEXT	NOT NULL,
+	categoryID	INT	REFERENCES Category( ID ),
+	ruleName	TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE
 );
 
 -- The list of features required by a component
 --
 CREATE TABLE ComponentRequires	(
-	Category	INT	REFERENCES Category( ID ),
-	Feature		INT	REFERENCES Feature( ID ),
-	MinQuantity	INT,
-	MaxQuantity	INT
+	categoryID	INT	REFERENCES Category( ID ),
+	featureID	INT	REFERENCES Feature( ID ),
+	minQuantity	INT,
+	maxQuantity	INT
 );
 
 -- The list of features provided by a component
 --
 CREATE TABLE ComponentProvides	(
-	Category	INT	REFERENCES Category( ID ),
-	Feature		INT	REFERENCES Feature( ID ),
-	MinQuantity	INT,
-	MaxQuantity	INT
+	categoryID	INT	REFERENCES Category( ID ),
+	featureID	INT	REFERENCES Feature( ID ),
+	minQuantity	INT,
+	maxQuantity	INT
 );
 
 -- The list of checks for a component
 --
 CREATE TABLE ComponentCheck	(
-	Category	INT	REFERENCES Category( ID ),
-	RuleName	TEXT
+	categoryID	INT	REFERENCES Category( ID ),
+	ruleName	TEXT
 );
 
 -- Receipes
@@ -140,8 +142,8 @@ CREATE TABLE Receipe	(
 	normalizedName	TEXT	NOT NULL UNIQUE,
 	description	TEXT,
 	categoryID	INT	REFERENCES Category( ID ),
-	CreationDate	TIMESTAMP,
-	Comment		TEXT
+	creationDate	TIMESTAMP,
+	comment		TEXT
 );
 
 CREATE TABLE RecipePicture	(
@@ -152,9 +154,9 @@ CREATE TABLE RecipePicture	(
 CREATE TABLE ReceipeContent	(
 	receipeID	INT	REFERENCES Receipe( ID ),
 	categoryID	INT	REFERENCES Category( ID ),
-	MinQuantity	INT,
-	MaxQuantity	INT,
-	Comment		TEXT
+	minQuantity	INT,
+	maxQuantity	INT,
+	comment		TEXT
 );
 
 

@@ -5,6 +5,7 @@ DOCTYPE "picture Picture"
 	info string
 	image string
 }
+
 DOCTYPE "category Category"
 {
 	id int

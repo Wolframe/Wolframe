@@ -1,4 +1,4 @@
-﻿
+
 -- The list of images used
 --
 CREATE TABLE Picture	(
@@ -15,6 +15,7 @@ CREATE TABLE Category	(
 	parentID	INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
+	description	TEXT,
 	lft		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( lft > 0 ),
 	rgt		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( rgt > 1 ),
 	CONSTRAINT order_check CHECK ( rgt > lft )
@@ -33,6 +34,7 @@ CREATE TABLE Feature	(
 	parentID	INT	REFERENCES Feature( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
+	description	TEXT,
 	lft		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( lft > 0 ),
 	rgt		INT	NOT NULL UNIQUE DEFERRABLE CHECK ( rgt > 1 ),
 	CONSTRAINT order_check CHECK ( rgt > lft )
@@ -61,10 +63,11 @@ CREATE TABLE Component	(
 	code		TEXT	NOT NULL UNIQUE,
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
-	category	INT	REFERENCES Category( ID ),
+	categoryID	INT	REFERENCES Category( ID ),
 	manufacturerID	INT	REFERENCES Manufacturer( ID ),
 	mfgCode		TEXT,
 	webPage		TEXT,
+	description	TEXT,
 	price		NUMERIC( 10, 2 )
 );
 
@@ -92,8 +95,8 @@ CREATE TABLE CategRequires	(
 -- The list of features provided by members of a category
 --
 CREATE TABLE CategProvides	(
-	category	INT	REFERENCES Category( ID ),
-	feature		INT	REFERENCES Feature( ID ),
+	categoryID	INT	REFERENCES Category( ID ),
+	featureID	INT	REFERENCES Feature( ID ),
 	minQuantity	INT,
 	maxQuantity	INT
 );
