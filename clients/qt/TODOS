@@ -7,10 +7,6 @@ show-stoppers:
       reces between actions and domain load
 - trees, remember state like:
   - current viewport
-  - current selection
-  - state of expanded items
-  - sorting order of columns
-  - arrangement of columns (their width)
   
 musts:
 - frontend:
@@ -47,7 +43,9 @@ musts:
       - form init doesn't work when language is not en_US
     - QTreeWidget
       - localization
-      - keep state of expansion and selection
+      - keep state of
+        - sorting order of columns
+        - header width
       - expandAll on load
       - open and make an item visible (for instance the location of the
         last add)

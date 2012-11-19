@@ -396,6 +396,8 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 							state = states[statePos].left( 1 );
 							stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
 						}
+						// better than nothing, scroll to the position of the last selection (usually one)
+						treeWidget->scrollToItem( *it );
 					}
 				}
 				++it;
