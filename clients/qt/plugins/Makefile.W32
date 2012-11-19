@@ -98,7 +98,7 @@ moc_DataHandler.cpp: ..\DataHandler.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\DataHandler.hpp -o moc_DataHandler.cpp
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $(CPP_OBJS)
 
 local_clean:
 	@-erase moc_*.cpp filechooser\moc_*.cpp formwidget\moc_*.cpp 2>NUL
