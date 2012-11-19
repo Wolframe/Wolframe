@@ -100,11 +100,11 @@ local function get_tree( tablename, parentID)
 	local t = formfunction( "selectSub" .. tablename)( {id=parentID} ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
-		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, picture=v.picture, parent=tonumber(v.parent), children = {} } )
+		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, picture=v.picture, parentID=tonumber(v.parentID), children = {} } )
 	end
 	for i,v in pairs( a) do
-		if i ~= parentID and v.parent then
-			table.insert( a[ v.parent ].children, i )
+		if i ~= parentID and v.parentID then
+			table.insert( a[ v.parentID ].children, i )
 		end
 	end
 	return a
@@ -201,7 +201,7 @@ local function create_node( tablename, itr)
 	local description = nil;
 	local picture = nil;
 	for v,t in itr do
-		if t == "parent" then
+		if t == "parentID" then
 			parentID = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)

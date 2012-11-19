@@ -80,8 +80,8 @@
           <property name="form" stdset="0">
            <string notr="true">categories</string>
           </property>
-          <property name="parent" stdset="0">
-           <string>{global.id}</string>
+          <property name="parentID" stdset="0">
+           <string notr="true">{global.id}</string>
           </property>
          </widget>
         </item>

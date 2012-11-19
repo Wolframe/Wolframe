@@ -2,7 +2,7 @@ DOCTYPE "feature Feature"
 {
 	feature
 	{
-		parentid int
+		parentID int
 		name string
 	}
 }
