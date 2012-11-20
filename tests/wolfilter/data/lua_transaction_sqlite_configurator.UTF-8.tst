@@ -76,9 +76,14 @@
 <editCategory><category id="46" name="Wireless network component"/></editCategory>
 <deleteCategory><category id="22"/></deleteCategory>
 <deleteCategory><category id="25"/></deleteCategory>
-<createCategory><category name="Device from outer space" parent="7"></category></createCategory>
+<createCategory><category name="Device from outer space" parentID="7"></category></createCategory>
 <createCategory>
-<category parent="46"><name>WNC child</name>
+<category parentID="46"><name>WNC child</name>
+<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
+</category>
+</createCategory>
+<createCategory>
+<category parentID="46"><name>WNC child 2</name>
 <picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
 </category>
 </createCategory>
@@ -123,9 +128,9 @@
 <FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
 <FeatureHierarchyRequest><feature id="7"/></FeatureHierarchyRequest>
 <editFeature><feature id="6" name="pink"/></editFeature>
-<createFeature><feature name="mumling" parent="12"/></createFeature>
-<createFeature><feature name="Space" parent="1"/></createFeature>
-<createFeature><feature name="yellow" parent="2"/></createFeature>
+<createFeature><feature name="mumling" parentID="12"/></createFeature>
+<createFeature><feature name="Space" parentID="1"/></createFeature>
+<createFeature><feature name="yellow" parentID="2"/></createFeature>
 <FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
 </test>**config
 --input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
@@ -149,7 +154,7 @@ CREATE TABLE Picture	(
 --
 CREATE TABLE Category	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
-	parent		INT	REFERENCES Category( ID ),
+	parentID	INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
 	description	TEXT,
@@ -168,9 +173,10 @@ CREATE TABLE CategoryPicture	(
 --
 CREATE TABLE Feature	(
 	ID 		INTEGER	PRIMARY KEY AUTOINCREMENT,
-	parent		INT	REFERENCES Feature( ID ),
+	parentID	INT	REFERENCES Feature( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
+	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
 	CONSTRAINT order_check CHECK ( rgt > lft )
@@ -199,10 +205,11 @@ CREATE TABLE Component	(
 	code		TEXT	NOT NULL UNIQUE,
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
-	category	INT	REFERENCES Category( ID ),
+	categoryID	INT	REFERENCES Category( ID ),
 	manufacturerID	INT	REFERENCES Manufacturer( ID ),
 	mfgCode		TEXT,
 	webPage		TEXT,
+	description	TEXT,
 	price		NUMERIC( 10, 2 )
 );
 
@@ -221,52 +228,52 @@ CREATE TABLE ComponentPicture	(
 -- The list of features required by members of a category
 --
 CREATE TABLE CategRequires	(
-	Category	INT	REFERENCES Category( ID ),
-	Feature		INT	REFERENCES Feature( ID ),
-	MinQuantity	INT,
-	MaxQuantity	INT
+	categoryID	INT	REFERENCES Category( ID ),
+	featureID	INT	REFERENCES Feature( ID ),
+	minQuantity	INT,
+	maxQuantity	INT
 );
 
 -- The list of features provided by members of a category
 --
 CREATE TABLE CategProvides	(
-	Category	INT	REFERENCES Category( ID ),
-	Feature		INT	REFERENCES Feature( ID ),
-	MinQuantity	INT,
-	MaxQuantity	INT
+	categoryID	INT	REFERENCES Category( ID ),
+	featureID	INT	REFERENCES Feature( ID ),
+	minQuantity	INT,
+	maxQuantity	INT
 );
 
 -- The list of checks for members of a category
 --
 CREATE TABLE CategoryCheck	(
-	Category	INT	REFERENCES Category( ID ),
-	RuleName	TEXT	NOT NULL,
+	categoryID	INT	REFERENCES Category( ID ),
+	ruleName	TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE
 );
 
 -- The list of features required by a component
 --
 CREATE TABLE ComponentRequires	(
-	Category	INT	REFERENCES Category( ID ),
-	Feature		INT	REFERENCES Feature( ID ),
-	MinQuantity	INT,
-	MaxQuantity	INT
+	categoryID	INT	REFERENCES Category( ID ),
+	featureID	INT	REFERENCES Feature( ID ),
+	minQuantity	INT,
+	maxQuantity	INT
 );
 
 -- The list of features provided by a component
 --
 CREATE TABLE ComponentProvides	(
-	Category	INT	REFERENCES Category( ID ),
-	Feature		INT	REFERENCES Feature( ID ),
-	MinQuantity	INT,
-	MaxQuantity	INT
+	categoryID	INT	REFERENCES Category( ID ),
+	featureID	INT	REFERENCES Feature( ID ),
+	minQuantity	INT,
+	maxQuantity	INT
 );
 
 -- The list of checks for a component
 --
 CREATE TABLE ComponentCheck	(
-	Category	INT	REFERENCES Category( ID ),
-	RuleName	TEXT
+	categoryID	INT	REFERENCES Category( ID ),
+	ruleName	TEXT
 );
 
 -- Receipes
@@ -277,8 +284,8 @@ CREATE TABLE Receipe	(
 	normalizedName	TEXT	NOT NULL UNIQUE,
 	description	TEXT,
 	categoryID	INT	REFERENCES Category( ID ),
-	CreationDate	TIMESTAMP,
-	Comment		TEXT
+	creationDate	TIMESTAMP,
+	comment		TEXT
 );
 
 CREATE TABLE RecipePicture	(
@@ -289,9 +296,9 @@ CREATE TABLE RecipePicture	(
 CREATE TABLE ReceipeContent	(
 	receipeID	INT	REFERENCES Receipe( ID ),
 	categoryID	INT	REFERENCES Category( ID ),
-	MinQuantity	INT,
-	MaxQuantity	INT,
-	Comment		TEXT
+	minQuantity	INT,
+	maxQuantity	INT,
+	comment		TEXT
 );
 
 
@@ -324,10 +331,11 @@ DOCTYPE "picture Picture"
 	info string
 	image string
 }
+
 DOCTYPE "category Category"
 {
 	id int
-	parent int
+	parentID int
 	name string
 	normalizedName string
 	description string
@@ -338,8 +346,9 @@ DOCTYPE "feature Feature"
 {
 	feature
 	{
-		parentid int
+		parentID int
 		name string
+		description string
 	}
 }
 **file:DBPRG.tdl
@@ -348,28 +357,28 @@ DOCTYPE "feature Feature"
 --
 TRANSACTION addCategoryRoot -- (name, normalizedName)
 BEGIN
-	DO INSERT INTO Category (ID, parent, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
+	DO INSERT INTO Category (ID, parentID, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
 END
 
 --
 -- addCategory
 --
-OPERATION addCategoryPicture -- (categoryID,caption,info,image)
+OPERATION addCategoryPicture -- (categoryID, caption, info, image)
 BEGIN
-	DO INSERT INTO CategoryPicture (caption,info,image) VALUES ($(caption), $(info), $(image));
+	DO INSERT INTO CategoryPicture (caption, info, image) VALUES ($(caption), $(info), $(image));
 	DO SELECT $1,last_insert_rowid() FROM Picture;
-	DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
+	DO INSERT INTO CategoryPicture (categoryID, pictureID) VALUES ($1,$2);
 END
 
-TRANSACTION addCategory -- (parentid, name, normalizedName)
+TRANSACTION addCategory -- (parentID, name, normalizedName, description)
 BEGIN
-	DO NONEMPTY UNIQUE SELECT rgt FROM Category WHERE ID = $(parentid);
+	DO NONEMPTY UNIQUE SELECT rgt FROM Category WHERE ID = $(parentID);
 	DO UPDATE Category SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
-	DO INSERT INTO Category (parent, name, normalizedName, description, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $(description), $1, $1+1);
+	DO INSERT INTO Category (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
 	FOREACH picture DO INSERT INTO Picture (caption,info,image) VALUES ($(caption), $(info), $(image));
-	FOREACH picture DO SELECT $1,last_insert_rowid() FROM Picture;
+	FOREACH picture DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
 	FOREACH picture DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
 END
 
@@ -389,7 +398,7 @@ END
 --
 -- updateCategory
 --
-TRANSACTION updateCategory -- (id, name, normalizedName, picture/id, picture/caption, picture/info, picture/image)
+TRANSACTION updateCategory -- (id, name, normalizedName, description, picture/id, picture/caption, picture/info, picture/image)
 BEGIN
 	DO UPDATE Category SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
 	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image) WHERE ID = $(id);
@@ -403,19 +412,23 @@ END
 --
 TRANSACTION selectCategory -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parent,name,normalizedName,description FROM Category WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE ID = $(id);
 	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
 END
+
+-- This is not supposed to exist, that's why we have the normalized name
 TRANSACTION selectCategoryByName -- (name)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parent,name,normalizedName,description FROM Category WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE name = $(name);
 	INTO picture DO SELECT pictureID AS id,caption,info,image FROM CategoryPicture,Category WHERE CategoryPicture.categoryID = Category.ID AND Category.ID = $1;
 END
+
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parent,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
 	INTO picture DO SELECT pictureID AS id,caption,info,image FROM CategoryPicture,Category WHERE CategoryPicture.categoryID = Category.ID AND Category.ID = $1;
 END
+
 TRANSACTION selectCategorySet -- (/category/id)
 BEGIN
 	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Category WHERE ID = $(id);
@@ -426,7 +439,7 @@ END
 --
 TRANSACTION selectTopCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName,P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
@@ -434,25 +447,25 @@ END
 --
 TRANSACTION selectSubCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 --
 -- addFeatureRoot
 --
 TRANSACTION addFeatureRoot -- (name, normalizedName)
 BEGIN
-	DO INSERT INTO Feature (ID, parent, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
+	DO INSERT INTO Feature (ID, parentID, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
 END
 
 --
 -- addFeature
 --
-TRANSACTION addFeature -- (parentid, name, normalizedName)
+TRANSACTION addFeature -- (parentID, name, normalizedName, description)
 BEGIN
-	DO NONEMPTY UNIQUE SELECT rgt FROM Feature WHERE ID = $(parentid);
+	DO NONEMPTY UNIQUE SELECT rgt FROM Feature WHERE ID = $(parentID);
 	DO UPDATE Feature SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Feature SET lft = lft + 2 WHERE lft > $1;
-	DO INSERT INTO Feature (parent, name, normalizedName, lft, rgt) VALUES ($(parentid), $(name), $(normalizedName), $1, $1+1);
+	DO INSERT INTO Feature (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Feature WHERE normalizedName = $(normalizedName);
 END
 
@@ -470,9 +483,9 @@ END
 --
 -- updateFeature
 --
-TRANSACTION updateFeature -- (id, name, normalizedName)
+TRANSACTION updateFeature -- (id, name, normalizedName, description)
 BEGIN
-	DO UPDATE Feature SET name = $(name),normalizedName = $(normalizedName) WHERE ID = $(id);
+	DO UPDATE Feature SET name = $(name),normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
 END
 
 --
@@ -483,19 +496,23 @@ END
 --
 TRANSACTION selectFeature -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Feature WHERE ID = $(id);
 END
+
+-- This is not supposed to exist either
 TRANSACTION selectFeatureByName -- (name)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Feature WHERE name = $(name);
 END
+
 TRANSACTION selectFeatureByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName FROM Feature WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Feature WHERE normalizedName = $(normalizedName);
 END
+
 TRANSACTION selectFeatureSet -- (/feature/id)
 BEGIN
-	FOREACH /feature INTO feature DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName FROM Feature WHERE ID = $(id);
+	FOREACH /feature INTO feature DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Feature WHERE ID = $(id);
 END
 
 --
@@ -503,7 +520,7 @@ END
 --
 TRANSACTION selectTopFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parent,P2.name,P2.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM feature AS P1, feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
@@ -511,7 +528,7 @@ END
 --
 TRANSACTION selectSubFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parent,P1.name,P1.normalizedName FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 **outputfile:DBDUMP
 **file: transaction_sqlite_configurator.lua
@@ -544,7 +561,7 @@ local function picture_value( itr)
 	return picture
 end
 
-local function insert_itr( tablename, parentid, itr)
+local function insert_itr( tablename, parentID, itr)
 	local id = 1
 	local name = nil
 	local nname = nil
@@ -560,7 +577,7 @@ local function insert_itr( tablename, parentid, itr)
 			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
-				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentid=parentid, picture=picture} ):table().ID
+				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
 				name = nil
 				description = nil
 			end
@@ -568,31 +585,31 @@ local function insert_itr( tablename, parentid, itr)
 		end
 	end
 	if name then
-		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentid=parentid} ):table().ID
+		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID} ):table().ID
 	end
 	return id
 end
 
-local function insert_topnode( tablename, name, description, picture, parentid)
+local function insert_topnode( tablename, name, description, picture, parentID)
 	local nname = normalizeName( name)
-	if not parentid then
+	if not parentID then
 		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name, description=description, picture=picture} )
 		return 1
 	else
-		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentid=parentid, picture=picture} ):table().ID
+		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
 		return id
 	end
 end
 
 local function insert_tree_topnode( tablename, itr)
-	local parentid = nil
+	local parentID = nil
 	local id = 1
 	local name = nil
 	local description = nil
 	local picture = nil
 	for v,t in itr do
-		if (t == "parent") then
-			parentid = tonumber( v)
+		if (t == "parentID") then
+			parentID = tonumber( v)
 		elseif (t == "name") then
 			name = content_value( v, itr)
 		elseif (t == "description") then
@@ -601,7 +618,7 @@ local function insert_tree_topnode( tablename, itr)
 			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
-				id = insert_topnode( tablename, name, description, picture, parentid)
+				id = insert_topnode( tablename, name, description, picture, parentID)
 				name = nil
 				description = nil
 			end
@@ -609,19 +626,19 @@ local function insert_tree_topnode( tablename, itr)
 		end
 	end
 	if name then
-		insert_topnode( tablename, name, description, picture, parentid)
+		insert_topnode( tablename, name, description, picture, parentID)
 	end
 end
 
-local function get_tree( tablename, parentid)
-	local t = formfunction( "selectSub" .. tablename)( {id=parentid} ):table()["node"] or {}
+local function get_tree( tablename, parentID)
+	local t = formfunction( "selectSub" .. tablename)( {id=parentID} ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
-		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, picture=v.picture, parent=tonumber(v.parent), children = {} } )
+		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, picture=v.picture, parentID=tonumber(v.parentID), children = {} } )
 	end
 	for i,v in pairs( a) do
-		if i ~= parentid and v.parent then
-			table.insert( a[ v.parent ].children, i )
+		if i ~= parentID and v.parentID then
+			table.insert( a[ v.parentID ].children, i )
 		end
 	end
 	return a
@@ -714,12 +731,12 @@ end
 
 local function create_node( tablename, itr)
 	local name = nil;
-	local parentid = nil;
+	local parentID = nil;
 	local description = nil;
 	local picture = nil;
 	for v,t in itr do
-		if t == "parent" then
-			parentid = v
+		if t == "parentID" then
+			parentID = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
@@ -729,7 +746,7 @@ local function create_node( tablename, itr)
 			picture = picture_value( scope(itr))
 		end
 	end
-	insert_topnode( tablename, name, description, picture, parentid)
+	insert_topnode( tablename, name, description, picture, parentID)
 end
 
 local function add_tree( tablename, itr)
@@ -775,38 +792,26 @@ end
 
 function editCategory()
 	edit_node( "Category", input:get())
-	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	print_tree( get_tree( "Category", 1), "category", 1, "")
 end
 
 function editFeature()
 	edit_node( "Feature", input:get())
-	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 function deleteCategory()
 	delete_node( "Category", input:get())
-	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	print_tree( get_tree( "Category", 1), "feature", 1, "")
 end
 
 function deleteFeature()
 	delete_node( "Feature", input:get())
-	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 function createCategory()
 	create_node( "Category", input:get())
-	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	print_tree( get_tree( "Category", 1), "category", 1, "")
 end
 
 function createFeature()
 	create_node( "Feature", input:get())
-	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 
@@ -1041,7 +1046,7 @@ end
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52"><id>52</id><parent>46</parent><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image></picture></category><category id="46"><id>46</id><parent>16</parent><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
+</item></tree><category id="52"><id>52</id><parentID>46</parentID><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image></picture></category><category id="46"><id>46</id><parentID>16</parentID><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
 	<category>computer</category>
 	<tree><item id="2">
 		<category>Minicomputer</category>
@@ -1099,6 +1104,8 @@ end
 			<category>Smartdust</category></item></tree>
 		<tree><item id="46">
 			<category>Wireless network component</category>
+			<tree><item id="53">
+				<category>WNC child 2</category></item></tree>
 			<tree><item id="52">
 				<category>WNC child Y</category></item></tree>
 		</item></tree>
@@ -1188,14 +1195,15 @@ end
 </item></tree></result>
 Picture:
 '1', 'WNC caption X', 'WNC info X', 'WNC image X'
+'2', 'WNC caption', 'WNC info', 'WNC image'
 
 sqlite_sequence:
-'Category', '52'
-'Picture', '1'
+'Category', '53'
+'Picture', '2'
 'Feature', '18'
 
 Category:
-'1', NULL, 'computer', 'computer', NULL, '1', '60'
+'1', NULL, 'computer', 'computer', NULL, '1', '62'
 '2', '1', 'Minicomputer', 'minicomputer', NULL, '2', '11'
 '3', '2', 'Superminicomputer', 'superminicomputer', NULL, '3', '4'
 '4', '2', 'Minicluster', 'minicluster', NULL, '5', '6'
@@ -1210,7 +1218,7 @@ Category:
 '13', '7', 'Personal computer', 'personal computer', NULL, '23', '24'
 '14', '7', 'Desktop computer', 'desktop computer', NULL, '25', '26'
 '15', '7', 'Home computer', 'home computer', NULL, '27', '28'
-'16', '1', 'Mobile', 'mobile', NULL, '32', '59'
+'16', '1', 'Mobile', 'mobile', NULL, '32', '61'
 '17', '16', 'Desknote', 'desknote', NULL, '33', '34'
 '18', '16', 'Laptop', 'laptop', NULL, '35', '44'
 '19', '18', 'Notebook', 'notebook', NULL, '36', '39'
@@ -1218,35 +1226,37 @@ Category:
 '21', '18', 'Tablet personal computer', 'tablet personal computer', NULL, '40', '41'
 '44', '18', 'Wearable computer', 'wearable computer', NULL, '42', '43'
 '45', '16', 'Single board computer', 'single board computer', NULL, '45', '46'
-'46', '16', 'Wireless network component', 'wireless network component', NULL, '47', '50'
-'47', '16', 'Plug computer', 'plug computer', NULL, '51', '52'
-'48', '16', 'Microcontroller', 'microcontroller', NULL, '53', '54'
-'49', '16', 'Smartdust', 'smartdust', NULL, '55', '56'
-'50', '16', 'Nanocomputer', 'nanocomputer', NULL, '57', '58'
+'46', '16', 'Wireless network component', 'wireless network component', NULL, '47', '52'
+'47', '16', 'Plug computer', 'plug computer', NULL, '53', '54'
+'48', '16', 'Microcontroller', 'microcontroller', NULL, '55', '56'
+'49', '16', 'Smartdust', 'smartdust', NULL, '57', '58'
+'50', '16', 'Nanocomputer', 'nanocomputer', NULL, '59', '60'
 '51', '7', 'Device from outer space', 'device from outer space', NULL, '29', '30'
 '52', '46', 'WNC child Y', 'wnc child y', NULL, '48', '49'
+'53', '46', 'WNC child 2', 'wnc child 2', NULL, '50', '51'
 
 CategoryPicture:
 '52', '1'
+'53', '2'
 
 Feature:
-'1', NULL, 'feature', 'feature', '1', '34'
-'2', '1', 'Color', 'color', '2', '13'
-'3', '2', 'green', 'green', '3', '4'
-'4', '2', 'blue', 'blue', '5', '6'
-'5', '2', 'gray', 'gray', '7', '8'
-'6', '2', 'pink', 'pink', '9', '10'
-'7', '1', 'Size', 'size', '14', '23'
-'8', '7', 'big', 'big', '15', '16'
-'9', '7', 'small', 'small', '17', '18'
-'10', '7', 'tiny', 'tiny', '19', '20'
-'11', '7', 'pocket size', 'pocket size', '21', '22'
-'12', '1', 'Noise', 'noise', '24', '31'
-'13', '12', 'loud', 'loud', '25', '26'
-'14', '12', 'silent', 'silent', '27', '28'
-'16', '12', 'mumling', 'mumling', '29', '30'
-'17', '1', 'Space', 'space', '32', '33'
-'18', '2', 'yellow', 'yellow', '11', '12'
+'1', NULL, 'feature', 'feature', NULL, '1', '34'
+'2', '1', 'Color', 'color', NULL, '2', '13'
+'3', '2', 'green', 'green', NULL, '3', '4'
+'4', '2', 'blue', 'blue', NULL, '5', '6'
+'5', '2', 'gray', 'gray', NULL, '7', '8'
+'6', '2', 'pink', 'pink', NULL, '9', '10'
+'7', '1', 'Size', 'size', NULL, '14', '23'
+'8', '7', 'big', 'big', NULL, '15', '16'
+'9', '7', 'small', 'small', NULL, '17', '18'
+'10', '7', 'tiny', 'tiny', NULL, '19', '20'
+'11', '7', 'pocket size', 'pocket size', NULL, '21', '22'
+'12', '1', 'Noise', 'noise', NULL, '24', '31'
+'13', '12', 'loud', 'loud', NULL, '25', '26'
+'14', '12', 'silent', 'silent', NULL, '27', '28'
+'16', '12', 'mumling', 'mumling', NULL, '29', '30'
+'17', '1', 'Space', 'space', NULL, '32', '33'
+'18', '2', 'yellow', 'yellow', NULL, '11', '12'
 
 FeaturePicture:
 

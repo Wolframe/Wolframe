@@ -72,9 +72,14 @@
 <editCategory><category id="46" name="Wireless network component"/></editCategory>
 <deleteCategory><category id="22"/></deleteCategory>
 <deleteCategory><category id="25"/></deleteCategory>
-<createCategory><category name="Device from outer space" parent="7"></category></createCategory>
+<createCategory><category name="Device from outer space" parentID="7"></category></createCategory>
 <createCategory>
-<category parent="46"><name>WNC child</name>
+<category parentID="46"><name>WNC child</name>
+<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
+</category>
+</createCategory>
+<createCategory>
+<category parentID="46"><name>WNC child 2</name>
 <picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
 </category>
 </createCategory>
@@ -119,8 +124,8 @@
 <FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
 <FeatureHierarchyRequest><feature id="7"/></FeatureHierarchyRequest>
 <editFeature><feature id="6" name="pink"/></editFeature>
-<createFeature><feature name="mumling" parent="12"/></createFeature>
-<createFeature><feature name="Space" parent="1"/></createFeature>
-<createFeature><feature name="yellow" parent="2"/></createFeature>
+<createFeature><feature name="mumling" parentID="12"/></createFeature>
+<createFeature><feature name="Space" parentID="1"/></createFeature>
+<createFeature><feature name="yellow" parentID="2"/></createFeature>
 <FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
 </test>

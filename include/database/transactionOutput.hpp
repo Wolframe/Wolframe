@@ -61,11 +61,21 @@ public:
 		CommandResult( std::size_t functionidx_, std::size_t level_)
 			:m_functionidx(functionidx_)
 			,m_level(level_){}
+
 		CommandResult( const CommandResult& o)
 			:m_functionidx(o.m_functionidx)
 			,m_level(o.m_level)
 			,m_columnName(o.m_columnName)
 			,m_row(o.m_row){}
+
+		CommandResult& operator=( const CommandResult& o)
+		{
+			m_functionidx = o.m_functionidx;
+			m_level = o.m_level;
+			m_columnName = o.m_columnName;
+			m_row = o.m_row;
+			return *this;
+		}
 
 		std::vector<Row>::const_iterator begin() const		{return m_row.begin();}
 		std::vector<Row>::const_iterator end() const		{return m_row.end();}
@@ -91,6 +101,17 @@ public:
 		CommandResultBuilder( TransactionOutput* ref_, std::size_t functionidx_, std::size_t level_)
 			:CommandResult(functionidx_,level_)
 			,m_ref(ref_){}
+
+		CommandResultBuilder( const CommandResultBuilder& o)
+			:CommandResult(o)
+			,m_ref(o.m_ref){}
+
+		CommandResultBuilder& operator=( const CommandResultBuilder& o)
+		{
+			CommandResult::operator=(o);
+			m_ref = o.m_ref;
+			return *this;
+		}
 
 	public:
 		void addColumn( const std::string& name)		{m_columnName.push_back( name);}

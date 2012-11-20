@@ -310,7 +310,7 @@ public:
 
 	bool hasUniqueResult( std::size_t functionidx) const
 	{
-		return hasFlag( functionidx, NonEmptyResult);
+		return hasFlag( functionidx, UniqueResult);
 	}
 
 	void setNonemptyResult( std::size_t functionidx)

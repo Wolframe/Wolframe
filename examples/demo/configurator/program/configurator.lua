@@ -258,37 +258,25 @@ end
 
 function editCategory()
 	edit_node( "Category", input:get())
-	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	--print_tree( get_tree( "Category", 1), "category", 1, "")
 end
 
 function editFeature()
 	edit_node( "Feature", input:get())
-	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	--print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 function deleteCategory()
 	delete_node( "Category", input:get())
-	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	--print_tree( get_tree( "Category", 1), "feature", 1, "")
 end
 
 function deleteFeature()
 	delete_node( "Feature", input:get())
-	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	--print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 
 function createCategory()
 	create_node( "Category", input:get())
-	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
-	--print_tree( get_tree( "Category", 1), "category", 1, "")
 end
 
 function createFeature()
 	create_node( "Feature", input:get())
-	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
-	--print_tree( get_tree( "Feature", 1), "feature", 1, "")
 end
 

@@ -24,7 +24,7 @@ BEGIN
 	DO INSERT INTO Category (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
 	FOREACH picture DO INSERT INTO Picture (caption,info,image) VALUES ($(caption), $(info), $(image));
-	FOREACH picture DO SELECT $1,last_insert_rowid() FROM Picture;
+	FOREACH picture DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
 	FOREACH picture DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
 END
 

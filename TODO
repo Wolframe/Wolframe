@@ -16,7 +16,7 @@ ABa:
 PF:
 
 - configurator
-  - request with <command+args+doctype> as descriminator for scripts
+  - Change type of ID and parentID from 'int' to '@int' in category.simpleform
   - sqlite schemas, scripts
     - categories, features as trees
     - products

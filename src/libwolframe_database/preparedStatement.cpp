@@ -40,6 +40,14 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
+static int nofArguments( const TransactionInput::cmd_iterator& cmditr)
+{
+	int argidx;
+	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
+	for (argidx=1; ai != ae; ++ai,++argidx);
+	return argidx;
+}
+
 static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr, bool nonempty, bool unique)
 {
 	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
@@ -58,7 +66,11 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 				val = ai->value();
 				break;
 		}
-		if (!stmh->bind( argidx, val)) return false;
+		if (!stmh->bind( argidx, val))
+		{
+			const char* err = stmh->getLastError();
+			throw std::runtime_error( std::string( "error calling bind parameter:") + (err?err:" unknown error"));
+		}
 	}
 	if (!stmh->execute()) return false;
 
