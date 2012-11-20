@@ -806,6 +806,7 @@ fi
 %{_libdir}/wolframe/modules/mod_filter_blob.so
 
 %{_libdir}/wolframe/modules/mod_command_directmap.so
+%{_libdir}/wolframe/modules/mod_ddlcompiler_simpleform.so
 
 %if %{with_lua}
 %{_libdir}/wolframe/modules/mod_lua_bcdnumber.so
