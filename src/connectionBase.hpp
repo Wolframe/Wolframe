@@ -202,7 +202,8 @@ protected:
 			break;
 
 		default:
-			LOG_DEBUG << "Unknown error: " << e.value() << ", message: " << e.message();
+			LOG_DEBUG << "Unknown error: " << e.value() << "category: " << e.category().name()
+				  << ", message: " << e.message();
 			ns = ConnectionHandler::UNKNOWN_ERROR;
 			name = "UNKNOWN ERROR";
 			break;
