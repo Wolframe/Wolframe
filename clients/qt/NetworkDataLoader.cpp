@@ -69,16 +69,40 @@ QString NetworkDataLoader::mapAction( QString action )
 	return QString( );
 }
 
+QString NetworkDataLoader::mapDoctype( QString action, bool domain, QString docType )
+{
+// the doctype has also a ".simpleform" which doesn't come back?
+	QStringList p = docType.split( "." );
+	
+	if( action == "create" ) {
+		return QString( "create%1" ).arg( p[0] );
+	} else if( action == "read" ) {
+		if( domain ) {
+			return p[0];
+		} else {
+			return p[0];
+		}
+	} else if( action == "update" ) {
+		return QString( "edit%1" ).arg( p[0] );
+	} else if( action == "delete" ) {
+		return QString( "delete%1" ).arg( p[0] );
+	}
+	
+	return QString( );
+}
+
 void NetworkDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "network request:\n" << xml;
 	
-// the doctype has also a ".simpleform" which doesn't come back?
+// what doctype do we expect in the answer?
 	QString docType = props->value( "doctype" );
-	QStringList p = docType.split( "." );
-	m_map->insert( p[0], qMakePair( name, QString( ) ) );
-	 
-	m_wolframeClient->request( mapAction( props->value( "action" ) ), xml );
+	QString action = props->value( "action" );
+	m_map->insert( mapDoctype( action, false, docType ), qMakePair( name, QString( ) ) );
+
+	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
+	
+	m_wolframeClient->request( mapAction( action ), xml );
 }
 
 void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props )
@@ -105,23 +129,29 @@ void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props
 
 	qDebug( ) << "network request:\n" << data;
 
-// the doctype has also a ".simpleform" which doesn't come back?
-	QStringList p = docType.split( "." );
-	m_map->insert( p[0], qMakePair( name, QString( ) ) );
+// what doctype do we expect in the answer?
+	QString action = props->value( "action" );
+	m_map->insert( mapDoctype( action, false, docType ), qMakePair( name, QString( ) ) );
+
+	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
 	 
-	m_wolframeClient->request( mapAction( props->value( "action" ) ), data );
+	m_wolframeClient->request( mapAction( action ), data );
+
 }
 
 void NetworkDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "network request:\n" << xml;
 	
-// the doctype has also a ".simpleform" which doesn't come back?
 	QString docType = props->value( "doctype" );
-	QStringList p = docType.split( "." );
-	m_map->insert( p[0], qMakePair( name, QString( ) ) );
+
+// what doctype do we expect in the answer?
+	QString action = props->value( "action" );
+	m_map->insert( mapDoctype( action, false, docType ), qMakePair( name, QString( ) ) );
+
+	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
 	 
-	m_wolframeClient->request( mapAction( props->value( "action" ) ), xml );
+	m_wolframeClient->request( mapAction( action ), xml );
 }
 
 void NetworkDataLoader::handleDelete( QString name, QHash<QString, QString> *props )
@@ -148,11 +178,13 @@ void NetworkDataLoader::handleDelete( QString name, QHash<QString, QString> *pro
 
 	qDebug( ) << "network request:\n" << data;
 
-// the doctype has also a ".simpleform" which doesn't come back?
-	QStringList p = docType.split( "." );
-	m_map->insert( p[0], qMakePair( name, QString( ) ) );
+// what doctype do we expect in the answer?
+	QString action = props->value( "action" );
+	m_map->insert( mapDoctype( action, false, docType ), qMakePair( name, QString( ) ) );
+
+	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
 	 
-	m_wolframeClient->request( mapAction( props->value( "action" ) ), data );
+	m_wolframeClient->request( mapAction( action ), data );
 }
 
 void NetworkDataLoader::handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> *props )
@@ -174,11 +206,13 @@ void NetworkDataLoader::handleDomainDataLoad( QString formName, QString widgetNa
 
 	//qDebug( ) << "network request:\n" << data;
 	
-// the doctype has also a ".simpleform" which doesn't come back?
-	QStringList p = docType.split( "." );
-	m_map->insert( p[0], qMakePair( formName, widgetName ) );
+// what doctype do we expect in the answer?
+	QString action = props->value( "action" );
+	m_map->insert( mapDoctype( action, true, docType ), qMakePair( formName, widgetName ) );
+
+	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, true, docType );
 	 
-	m_wolframeClient->request( mapAction( props->value( "action" ) ), data );
+	m_wolframeClient->request( mapAction( action ), data );
 }
 
 void NetworkDataLoader::gotAnswer( QStringList params, QString content )
@@ -188,10 +222,10 @@ void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 // hash and receive it by doctype
 	QString docType = params[1];
 
-	qDebug( ) << "OK: answer in network data loader, doctype:" << docType << ":\n"<< content;
+	qDebug( ) << "OK: answer in network data loader, params:" << params << "\ncontent:\n" << content;
 	
 	if( !m_map->contains( docType ) ) {
-		qDebug( ) << "ERROR: answer for unknown request of doctype" << docType;
+		qDebug( ) << "ERROR: answer for unknown request of doctype" << docType << m_map;
 		return;
 	}
 	

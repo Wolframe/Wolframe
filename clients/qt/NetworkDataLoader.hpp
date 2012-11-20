@@ -29,6 +29,7 @@ class NetworkDataLoader : public DataLoader
 		void handleDelete( QString name, QHash<QString, QString> *props );
 		void handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> *props );
 		QString mapAction( QString action );
+		QString mapDoctype( QString action, bool domain, QString docType );
 		
 	public slots:
 		virtual void gotAnswer( QStringList params, QString content );

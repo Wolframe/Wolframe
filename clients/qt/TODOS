@@ -1,11 +1,3 @@
-show-stoppers:
-- FormWidget:
-  - solve races between answer of last request and new form load in
-    'switchForm' (add state machine)
-  - WolframeClient:
-    - sequentualize requests (how?, queue?), eliminate
-      races between actions and domain load
-  
 musts:
 - problems with size of main window to follow size of form ui
 - frontend:
