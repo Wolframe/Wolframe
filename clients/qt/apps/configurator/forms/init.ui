@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>523</width>
-    <height>366</height>
+    <width>536</width>
+    <height>414</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="form1">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>310</y>
+     <x>10</x>
+     <y>340</y>
      <width>141</width>
      <height>24</height>
     </rect>
@@ -38,8 +38,8 @@
   <widget class="QPushButton" name="form1_2">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>310</y>
+     <x>300</x>
+     <y>340</y>
      <width>121</width>
      <height>24</height>
     </rect>
@@ -111,7 +111,124 @@
     </property>
    </column>
   </widget>
+  <widget class="QRadioButton" name="radioButton_2">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>310</y>
+     <width>100</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>collapse all</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButton">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>310</y>
+     <width>100</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>expand all</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_3">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>310</y>
+     <width>100</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>collapse all</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>310</y>
+     <width>100</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>expand all</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>radioButton_4</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>category</receiver>
+   <slot>expandAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>18</x>
+     <y>318</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>33</x>
+     <y>257</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>feature</receiver>
+   <slot>expandAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>310</x>
+     <y>320</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>320</x>
+     <y>275</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButton_3</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>category</receiver>
+   <slot>collapseAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>130</x>
+     <y>316</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>130</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButton_2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>feature</receiver>
+   <slot>collapseAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>455</x>
+     <y>314</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>455</x>
+     <y>264</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
