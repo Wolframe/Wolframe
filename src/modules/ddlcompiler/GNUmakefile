@@ -1,10 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS =
-
--include $(TOPDIR)/makefiles/gmake/platform.mk
-
-SUBDIRS += simpleform
+SUBDIRS = simpleform
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
