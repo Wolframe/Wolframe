@@ -278,6 +278,7 @@ void WolframeClient::dataAvailable( )
 			while( m_socket->canReadLine( ) ) {
 				char buf[1024];
 				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
+				
 				if( len > 1 )
 					if( buf[len-1] == '\n' ) buf[len-1] = '\0';
 				if( len > 2 )
@@ -306,9 +307,9 @@ void WolframeClient::dataAvailable( )
 				} else if( strncmp( buf, "ANSWER", 6 ) == 0 ) {
 					//emit resultReceived( );
 					m_answer = "";
-				} else if( buf[0] == '.' && buf[1] == '\n' ) {
+				} else if( len > 0 && buf[0] == '.' && buf[1] == '\0' ) {
 					// do not read that
-				} else if( buf[0] == '.' && buf[1] == '.' && buf[2] == '\n' ) {
+				} else if( len > 1 && buf[0] == '.' && buf[1] == '.' && buf[2] == '\0' ) {
 					// escaped dot
 					m_answer.append( "." );
 				} else {

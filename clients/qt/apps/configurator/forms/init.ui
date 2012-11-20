@@ -28,6 +28,12 @@
    <property name="form" stdset="0">
     <string notr="true">categories</string>
    </property>
+   <property name="global.featureState" stdset="0">
+    <string notr="true">{feature.state}</string>
+   </property>
+   <property name="global.categoryState" stdset="0">
+    <string notr="true">{category.state}</string>
+   </property>
   </widget>
   <widget class="QPushButton" name="form1_2">
    <property name="geometry">
@@ -44,11 +50,17 @@
    <property name="form" stdset="0">
     <string notr="true">features</string>
    </property>
+   <property name="global.featureState" stdset="0">
+    <string notr="true">{feature.state}</string>
+   </property>
+   <property name="global.categoryState" stdset="0">
+    <string notr="true">{category.state}</string>
+   </property>
   </widget>
   <widget class="QTreeWidget" name="category">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>10</y>
      <width>211</width>
      <height>291</height>
@@ -62,6 +74,9 @@
    </property>
    <property name="rootelement" stdset="0">
     <string>category</string>
+   </property>
+   <property name="state" stdset="0">
+    <string notr="true">{global.categoryState}</string>
    </property>
    <column>
     <property name="text">
@@ -86,6 +101,9 @@
    </property>
    <property name="rootelement" stdset="0">
     <string>feature</string>
+   </property>
+   <property name="state" stdset="0">
+    <string>{global.featureState}</string>
    </property>
    <column>
     <property name="text">

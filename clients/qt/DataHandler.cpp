@@ -475,31 +475,37 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 			if( inForm ) {
 				if( xml.isStartElement( ) ) {
 					widget = qFindChild<QWidget *>( form, xml.name( ).toString( ) );
+					qDebug( ) << "Reading from XML for" << xml.name( ) << "into" << widget;
 					if( widget ) {
-						clazz = widget->metaObject( )->className( ); 
-						if( clazz == "QGroupBox" ) continue;
+						clazz = widget->metaObject( )->className( ); 						
 						QXmlStreamAttributes attributes = xml.attributes( );
-						QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 						if( clazz == "QLineEdit" ) {
 							QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							lineEdit->setText( text );
 						} else if( clazz == "QDateEdit" ) {
 							QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							dateEdit->setDate( QDate::fromString( text, Qt::ISODate ) );
 						} else if( clazz == "QTimeEdit" ) {
 							QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							timeEdit->setTime( QTime::fromString( text, Qt::ISODate ) );
 						} else if( clazz == "QDateTimeEdit" ) {
 							QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							dateTimeEdit->setDateTime( QDateTime::fromString( text, Qt::ISODate ) );
 						} else if( clazz == "QSpinBox" ) {
 							QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							spinBox->setValue( text.toInt( ) );
 						} else if( clazz == "QDoubleSpinBox" ) {
 							QDoubleSpinBox *doubleSpinBox = qobject_cast<QDoubleSpinBox *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							doubleSpinBox->setValue( text.toDouble( ) );
 						} else if( clazz == "QComboBox" ) {
 							QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							for( int idx = 0; idx < comboBox->count( ); idx++ ) {
 								if( comboBox->itemText( idx ) == text ) {
 									comboBox->setCurrentIndex( idx );
@@ -511,6 +517,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							QString clazzParent = parent->metaObject( )->className( ); 
 							if( clazzParent != "QGroupBox" ) {
 								QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
+								QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 								if( text == "true"  ) {
 									checkBox->setChecked( true );
 								} else {
@@ -522,6 +529,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							QString clazzParent = parent->metaObject( )->className( ); 
 							if( clazzParent != "QGroupBox" ) {
 								QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
+								QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 								if( text == "true"  ) {
 									radioButton->setChecked( true );
 								} else {
@@ -530,12 +538,15 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							}
 						} else if( clazz == "QSlider" ) {
 							QSlider *slider = qobject_cast<QSlider *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							slider->setValue( text.toInt( ) );
 						} else if( clazz == "QPlainTextEdit" ) {
 							QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							plainTextEdit->setPlainText( text );
 						} else if( clazz == "QTextEdit" ) {
 							QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							textEdit->setHtml( text );
 						} else if( clazz == "QGroupBox" ) {
 							QList<QWidget *> children = widget->findChildren<QWidget *>( );
@@ -545,24 +556,31 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 								if( subClazz == "QRadioButton" ) {
 									QRadioButton *radioButton = qobject_cast<QRadioButton *>( child );
 									QString subText = radioButton->text( );
+									QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 									qDebug( ) << "radio" << name << subText << subText << name << subName;
 									radioButton->setChecked( text.compare( subName ) == 0 );
 								} else if( subClazz == "QCheckBox" ) {
 									QCheckBox *checkBox = qobject_cast<QCheckBox *>( child );
 									QString subText = checkBox->text( );
+									QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 									qDebug( ) << "checkbox" << name << subText << subText << name << subName;
 									if( text.compare( subName ) == 0 ) {
 										checkBox->setChecked( true );
 									}
+								} else {
+									// don't read text element, otherwise the parser tells us
+									// "Expected character data.", a little bit annoying..
 								}
 							}								
 						} else if( clazz == "QListWidget" ) {
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
 							QList<QListWidgetItem *> items = listWidget->findItems( text, Qt::MatchExactly );
 							foreach( QListWidgetItem *item, items ) {
 								item->setSelected( true );
 							}
 						} else if( clazz == "QTreeWidget" ) {
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 							QList<QTreeWidgetItem *> items = treeWidget->findItems( text, Qt::MatchExactly | Qt::MatchRecursive, 0 );
 							foreach( QTreeWidgetItem *item, items ) {
@@ -575,12 +593,9 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							}
 						} else if( clazz == "FileChooser" ) {
 							// don't restore anything, this is an upload component only
-							//FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-							//QString fileName = attributes.value( "", "filename" ).toString( );
-							//if( !fileName.isEmpty( ) ) {
-							//}
 						} else if( clazz == "PictureChooser" ) {
 							PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							QByteArray encoded = text.toAscii( );
 							QByteArray decoded = QByteArray::fromBase64( encoded );
 							pictureChooser->setPicture( decoded );
