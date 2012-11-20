@@ -22,8 +22,8 @@ class DataLoader : public QObject
 
 	// for NetworkDataLoader
 	public slots:
-		virtual void gotAnswer( QStringList params, QString content ) { }
-		virtual void gotError( QString error ) { }
+		virtual void gotAnswer( QStringList /* params */, QString /* content */ ) { }
+		virtual void gotError( QString /* error */ ) { }
 	
 	Q_SIGNALS:
 		void answer( QString formName, QString widgetName, QByteArray xml );

@@ -65,9 +65,9 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	xml.writeEndDocument( );
 }
 
-void DataHandler::writeWidgets( QWidget *_parent, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *seen )
+void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *seen )
 {
-	QList<QWidget *> widgets = _parent->findChildren<QWidget *>( );
+	QList<QWidget *> widgets = _from->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
 		QString clazz = widget->metaObject( )->className( ); 
 		QString name = widget->objectName( );
@@ -296,7 +296,6 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 		FormWidget::readDynamicStringProperties( props, widget );
 		props->insert( "action", "read" );
 		if( clazz == "QComboBox" ) {
-			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
 			m_dataLoader->request( form_name, name, QByteArray( ), props );
 		} else if( clazz == "QListWidget" ) {
 			m_dataLoader->request( form_name, name, QByteArray( ), props );
@@ -343,15 +342,15 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 			QString headerText = header->data( i, Qt::DisplayRole ).toString( );
 			headers << headerText;
 		}
-		QTreeWidgetItem *parent = treeWidget->invisibleRootItem( );
+		QTreeWidgetItem *_parent = treeWidget->invisibleRootItem( );
 		QTreeWidgetItem *item = treeWidget->invisibleRootItem( );
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
 			if( xml.isStartElement( ) ) {
 				if( xml.name( ) == "tree" ) {
-					parent = item;
+					_parent = item;
 				} else if( xml.name( ) == "item" ) {
-					item = new QTreeWidgetItem( parent );
+					item = new QTreeWidgetItem( _parent );
 // attributes like id are mapped to user data
 					QXmlStreamAttributes attributes = xml.attributes( );
 					foreach( QXmlStreamAttribute attr, attributes ) {
@@ -369,15 +368,15 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 				}
 			} else if( xml.isEndElement( ) ) {
 				if( xml.name( ) == "tree" ) {
-					item = parent;
-					if( parent ) {
-						parent = parent->parent( );
-						if( !parent ) {
-							parent = treeWidget->invisibleRootItem( );
+					item = _parent;
+					if( _parent ) {
+						_parent = _parent->parent( );
+						if( !_parent ) {
+							_parent = treeWidget->invisibleRootItem( );
 						}
 					}
 				} else if( xml.name( ) == "item" ) {
-					parent->addChild( item );
+					_parent->addChild( item );
 				}
 			}
 		}
@@ -385,55 +384,39 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 // iterate again and check against saved tree state
 		if( props->contains( "state" ) ) {
 			qDebug( ) << "Restoring tree state for tree" << widget_name;
-			QStringList states = props->value( "state" ).split( "|", QString::SkipEmptyParts );
+			QStringList stateList = props->value( "state" ).split( "|", QString::SkipEmptyParts );
 // expand tree first, otherwise parents get selected if we select a non-expanded subtree!
 			{
-				int statePos = 0;
-				QString state;
-				QString stateId;
-				if( statePos < states.count( ) ) {
-					state = states[statePos].left( 1 );
-					stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
+				QSet<QString> states;
+				foreach( QString state, stateList ) {
+					if( state.left( 1 ) == "E" ) {
+						states.insert( state.mid( 1, state.length( ) - 1 ) );
+					}
 				}
 				QTreeWidgetItemIterator it( treeWidget );
 				while( *it ) {
 					QString id = (*it)->data( 0, Qt::UserRole ).toString( );
-					if( id == stateId ) {
-						if( state == "E" ) {
-							(*it)->setExpanded( true );
-						}
-						statePos++;
-						if( statePos < states.count( ) ) {
-							state = states[statePos].left( 1 );
-							stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
-						}
+					if( states.contains( id ) ) {
+						(*it)->setExpanded( true );
 					}
 					++it;
 				}
 			}
 // twice, see above
 			{
-				int statePos = 0;
-				QString state;
-				QString stateId;
-				if( statePos < states.count( ) ) {
-					state = states[statePos].left( 1 );
-					stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
+				QSet<QString> states;
+				foreach( QString state, stateList ) {
+					if( state.left( 1 ) == "S" ) {
+						states.insert( state.mid( 1, state.length( ) - 1 ) );
+					}
 				}
 				QTreeWidgetItemIterator it( treeWidget );
 				while( *it ) {
 					QString id = (*it)->data( 0, Qt::UserRole ).toString( );
-					if( id == stateId ) {
-						if( state == "S" ) {
-							(*it)->setSelected( true );
-							// better than nothing, scroll to the position of the last selection (usually one)
-							treeWidget->scrollToItem( *it );
-						}
-						statePos++;
-						if( statePos < states.count( ) ) {
-							state = states[statePos].left( 1 );
-							stateId = states[statePos].mid( 1, states[statePos].length( ) - 1 );
-						}
+					if( states.contains( id ) ) {
+						(*it)->setSelected( true );
+						// better than nothing, scroll to the position of the last selection (usually one)
+						treeWidget->scrollToItem( *it );
 					}
 					++it;
 				}
