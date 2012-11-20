@@ -208,6 +208,7 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 			break;
 
 		case Connected:
+		case Data:
 // connection closed by server as a reaction to QUIT command (should better be "client
 // goes first disconnection pattern" IMHO)
 			if( _error == QAbstractSocket::RemoteHostClosedError ) {
@@ -219,7 +220,6 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 			}
 			break;
 
-		case Data:
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in error!" ).arg( m_state ) );
 	}
@@ -257,6 +257,7 @@ void WolframeClient::privateDisconnected( )
 		case AboutToConnect:
 		case Disconnected:
 		case Connected:
+		case Data:
 			emit error( tr( "Got a disconnected Qt signal when already in disconnected state!" ) );
 			break;
 
@@ -265,7 +266,6 @@ void WolframeClient::privateDisconnected( )
 			m_state = Disconnected;
 			break;
 
-		case Data:
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in disconnected!" ).arg( m_state ) );
 	}
