@@ -219,6 +219,11 @@
  <tabstops>
   <tabstop>name</tabstop>
   <tabstop>description</tabstop>
+  <tabstop>info</tabstop>
+  <tabstop>caption</tabstop>
+  <tabstop>save</tabstop>
+  <tabstop>reset</tabstop>
+  <tabstop>cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>
