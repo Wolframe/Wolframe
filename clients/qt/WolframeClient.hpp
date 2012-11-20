@@ -13,10 +13,11 @@
 #include <QSslCertificate>
 #include <QList>
 #endif
+#include <QQueue>
+#include <QStringList>
 
-
-	class WolframeClient : public QObject
-	{
+class WolframeClient : public QObject
+{
 	Q_OBJECT
 
 	public:
@@ -24,7 +25,18 @@
 			Disconnected,
 			AboutToConnect,
 			Connected,
+			Data,
 			AboutToDisconnect
+		};
+
+		struct WolframeRequest
+		{
+			QString command;
+			QStringList params;
+			QString content;
+			
+			WolframeRequest( const QString &_command, const QStringList &_params, const QString &_content )
+				: command( _command ), params( _params ), content( _content ) { }
 		};
 
 	private:
@@ -45,6 +57,7 @@
 		QString m_answer;
 		QStringList m_params;
 		QString m_command;
+		QQueue<WolframeRequest> m_queue;	// queued commands
 
 	public:
 		WolframeClient( QString host = "localhost", unsigned short port = 7661,
@@ -63,6 +76,7 @@
 		void sendCommand( QString command );
 		void sendCommand( QString command, QStringList params );
 		void sendCommand( QString command, QStringList params, QString content );
+		void sendCommand( struct WolframeRequest );
 
 // high-level commands
 		void capa( );
@@ -122,8 +136,6 @@
 		void authOk( );
 		void authFailed( );
 		void answerReceived( QStringList params, QString content );
-
-// high-level commands
-	};
+};
 
 #endif // _Wolframe_CLIENT_HPP_INCLUDED

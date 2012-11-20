@@ -24,7 +24,8 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secur
 #ifdef WITH_SSL
 	m_initializedSsl( false ),
 #endif
-	m_command( "CONNECT" )
+	m_command( "CONNECT" ),
+	m_queue( )
 {
 #ifdef WITH_SSL
 	m_socket = new QSslSocket( this );
@@ -148,7 +149,8 @@ void WolframeClient::connect( )
 		case AboutToDisconnect:
 			emit error( tr( "Currently disconnected.. wait till you connect again" ) );
 			break;
-
+			
+		case Data:
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in connect!" ).arg( m_state ) );
 	}
@@ -176,6 +178,7 @@ void WolframeClient::disconnect( )
 			m_state = AboutToDisconnect;
 			break;
 
+		case Data:
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in disconnect!" ).arg( m_state ) );
 	}
@@ -216,6 +219,7 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 			}
 			break;
 
+		case Data:
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in error!" ).arg( m_state ) );
 	}
@@ -241,6 +245,7 @@ void WolframeClient::privateConnected( )
 			emit error( tr( "Got connected Qt signal when already disconnecting!" ) );
 			break;
 
+		case Data:
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in connected!" ).arg( m_state ) );
 	}
@@ -260,6 +265,7 @@ void WolframeClient::privateDisconnected( )
 			m_state = Disconnected;
 			break;
 
+		case Data:
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in disconnected!" ).arg( m_state ) );
 	}
@@ -275,6 +281,7 @@ void WolframeClient::dataAvailable( )
 
 		case AboutToDisconnect:
 		case Connected:
+		case Data:
 			while( m_socket->canReadLine( ) ) {
 				char buf[1024];
 				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
@@ -307,8 +314,10 @@ void WolframeClient::dataAvailable( )
 				} else if( strncmp( buf, "ANSWER", 6 ) == 0 ) {
 					//emit resultReceived( );
 					m_answer = "";
+// end of message marker
 				} else if( len > 0 && buf[0] == '.' && buf[1] == '\0' ) {
 					// do not read that
+// escaping of a single dot on a line
 				} else if( len > 1 && buf[0] == '.' && buf[1] == '.' && buf[2] == '\0' ) {
 					// escaped dot
 					m_answer.append( "." );
@@ -327,46 +336,80 @@ void WolframeClient::dataAvailable( )
 
 void WolframeClient::sendLine( QString line )
 {
-	m_socket->write( line.toAscii( ).append( "\n" ) );
-	m_socket->flush( );
-	emit lineSent( line );
+	switch( m_state ) {
+		case Connected:
+		case Data:
+			m_socket->write( line.toAscii( ).append( "\n" ) );
+			m_socket->flush( );
+			emit lineSent( line );
+			break;
+		
+		case AboutToConnect:
+		case AboutToDisconnect:
+		case Disconnected:
+		default:
+			emit error( tr( "ILLEGAL STATE %1 in dataAvailable!" ).arg( m_state ) );
+	}
 }
 
 // high-level
-void WolframeClient::sendCommand( QString command )
+
+void WolframeClient::sendCommand( QString command, QStringList params, QString content )
+{	
+	switch( m_state ) {
+		case Connected:
+			{
+			m_state = Data;
+			m_answer = "";
+			m_command = command;
+			m_hasErrors = false;
+
+// append params to command, send command line	
+			QString line;
+			line.append( command );
+			foreach( QString param, params ) {  
+				line.append( ' ' );
+				line.append( param );
+			}
+			sendLine( line );	
+
+// send content, and terminate it	
+			QStringList lines = content.split( "\n" );
+			foreach( line, lines ) {
+				sendLine( line );
+			}
+			sendLine( "." );
+			}
+			break;
+
+		case Data:
+			{
+				struct WolframeRequest r( command, params, content );
+				m_queue.enqueue( r );
+			}
+			break;
+			
+		case AboutToConnect:
+		case AboutToDisconnect:
+		case Disconnected:
+		default:
+			emit error( tr( "ILLEGAL STATE %1 in dataAvailable!" ).arg( m_state ) );
+	}
+}
+
+void WolframeClient::sendCommand( struct WolframeRequest r )
 {
-	m_answer = "";
-	m_command = command;
-	m_hasErrors = false;
-	sendLine( command );
+	sendCommand( r.command, r.params, r.content );
 }
 
 void WolframeClient::sendCommand( QString command, QStringList params )
 {
-	QString line;
-	
-	m_answer = "";
-	m_command = command;
-	m_hasErrors = false;
-	
-	line.append( command );
-	foreach( QString param, params ) {  
-		line.append( ' ' );
-		line.append( param );
-	}
-	
-	sendLine( line );	
+	sendCommand( command, params, QString( ) );
 }
 
-void WolframeClient::sendCommand( QString command, QStringList params, QString content )
+void WolframeClient::sendCommand( QString command )
 {
-	sendCommand( command, params );
-	
-	QStringList lines = content.split( "\n" );
-	foreach( QString line, lines ) {
-		sendLine( line );
-	}
-	sendLine( "." );
+	sendCommand( command, QStringList( ), QString( ) );
 }
 
 void WolframeClient::capa( )
@@ -395,6 +438,8 @@ void WolframeClient::request( QString type, QString content )
 
 void WolframeClient::handleResult( )
 {
+	m_state = Connected;
+	
 	qDebug( ) << "handle result of command" << m_command;
 	//<< "\nparams:" << m_params << "\n:answer:" << m_answer;
 	if( m_command == "CONNECT" ) {
@@ -414,6 +459,12 @@ void WolframeClient::handleResult( )
 		emit capasReceived( m_params );
 	} else if( m_command == "REQUEST" ) {
 		emit answerReceived( m_params, m_answer );
+	}
+
+// still command in the queue to execute
+	if( !m_queue.isEmpty( ) ) {
+		WolframeRequest request = m_queue.dequeue( );
+		sendCommand( request );
 	}
 }
 
