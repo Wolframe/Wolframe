@@ -35,7 +35,7 @@ test.bat
 *.bin
 *.RES
 simple_event_log.h
-*.rc
+wolframemsg.rc
 src/wolframed
 tests/testNamedRetVal
 tests/singletonTest

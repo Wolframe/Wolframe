@@ -22,7 +22,6 @@ clean: clean_recursive local_clean
 	-@erase *.obj 2>NUL
 	-@erase $(OBJS) 2>NUL
 	-@erase *.pdb 2>NUL
-	-@erase *.rc 2>NUL
 	-@erase *.res 2>NUL
 	-@erase MSG*.bin 2>NUL
 	-@erase *.dllobj 2>NUL

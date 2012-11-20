@@ -21,14 +21,15 @@ INCLUDE_DIRS = \
 
 QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
 INCLUDE_LDFLAGS = \
-	$(QT_LDFLAGS)
+	$(QT_LDFLAGS) \
+	/SUBSYSTEM:WINDOWS /MACHINE:x86
 
 !IFNDEF DEBUG
 INCLUDE_LIBS = \
-	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib QtSql4.lib
+	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib QtSql4.lib QtMain.lib
 !ELSE
 INCLUDE_LIBS = \
-	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtSqld4.lib
+	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtSqld4.lib QtMaind.lib
 !ENDIF
 
 INCLUDE_LIBS = \
@@ -219,6 +220,13 @@ moc_StorageWidget.cpp: StorageWidget.hpp
 
 moc_ManageStorageDialog.cpp: ManageStorageDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. ManageStorageDialog.hpp -o moc_ManageStorageDialog.cpp
+
+qtclient.res: qtclient.ico qtclient.rc
+	rc /foqtclient.res qtclient.rc
+	
+qtclient.exe: qtclient.res
+	$(CXX_LINK) $(LDFLAGS) $(LIBS) /out:$@ $(OBJS) $**
+	$(MT) -nologo -manifest $@.manifest -outputresource:$@;1
 
 local_clean:
 	@-erase moc_*.cpp 2>NUL
