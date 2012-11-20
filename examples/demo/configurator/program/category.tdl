@@ -16,7 +16,7 @@ BEGIN
 	DO INSERT INTO CategoryPicture (categoryID, pictureID) VALUES ($1,$2);
 END
 
-TRANSACTION addCategory -- (parentID, name, normalizedName)
+TRANSACTION addCategory -- (parentID, name, normalizedName, description)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT rgt FROM Category WHERE ID = $(parentID);
 	DO UPDATE Category SET rgt = rgt + 2 WHERE rgt >= $1;
@@ -44,7 +44,7 @@ END
 --
 -- updateCategory
 --
-TRANSACTION updateCategory -- (id, name, normalizedName, picture/id, picture/caption, picture/info, picture/image)
+TRANSACTION updateCategory -- (id, name, normalizedName, description, picture/id, picture/caption, picture/info, picture/image)
 BEGIN
 	DO UPDATE Category SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
 	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image) WHERE ID = $(id);

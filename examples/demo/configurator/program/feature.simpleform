@@ -4,5 +4,6 @@ DOCTYPE "feature Feature"
 	{
 		parentID int
 		name string
+		description string
 	}
 }
