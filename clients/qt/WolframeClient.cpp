@@ -162,7 +162,7 @@ void WolframeClient::disconnect( )
 
 	switch( m_state ) {
 		case Disconnected:
-			emit error( tr( "Got disconnected Qt signal when already in disconnected state!" ) );
+			// can happen, is ok, remain in disconneted state
 			break;
 
 		case AboutToConnect:
@@ -173,12 +173,12 @@ void WolframeClient::disconnect( )
 			m_state = Disconnected;
 			break;
 
+		case Data:
 		case Connected:
 			sendCommand( "QUIT" );
 			m_state = AboutToDisconnect;
 			break;
 
-		case Data:
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in disconnect!" ).arg( m_state ) );
 	}
@@ -254,13 +254,14 @@ void WolframeClient::privateConnected( )
 void WolframeClient::privateDisconnected( )
 {
 	switch( m_state ) {
-		case AboutToConnect:
 		case Disconnected:
-		case Connected:
-		case Data:
 			emit error( tr( "Got a disconnected Qt signal when already in disconnected state!" ) );
 			break;
 
+// abort brutally
+		case AboutToConnect:
+		case Connected:
+		case Data:
 		case AboutToDisconnect:
 			m_socket->close( );
 			m_state = Disconnected;
@@ -297,7 +298,7 @@ void WolframeClient::dataAvailable( )
 // ERR has a message, one liner
 				} else if( strncmp( buf, "ERR", 3 ) == 0 ) {
 					m_hasErrors = true;
-					emit error( tr( "Protocol error, received: %1." ).arg( buf + 3 ) );
+					emit error( tr( "Protocol error in command %1, received: %2." ).arg( m_command ).arg( buf + 3 ) );
 // OK has a message, one liner
 				} else if( strncmp( buf, "OK", 2 ) == 0 ) {
 					if( len > 3 ) {
@@ -373,15 +374,20 @@ void WolframeClient::sendCommand( QString command, QStringList params, QString c
 			}
 			sendLine( line );	
 
-// send content, and terminate it	
-			QStringList lines = content.split( "\n" );
-			foreach( line, lines ) {
-				sendLine( line );
+// send content, and terminate it
+// TODO: how to distinguuish between no content (AUTH) and empty content
+// (REQUEST)?
+			if( !content.isEmpty( ) ) {
+				QStringList lines = content.split( "\n" );
+				foreach( line, lines ) {
+					sendLine( line );
+				}
+				sendLine( "." );
 			}
-			sendLine( "." );
 			}
 			break;
 
+		case AboutToConnect:
 		case Data:
 			{
 				struct WolframeRequest r( command, params, content );
@@ -389,7 +395,6 @@ void WolframeClient::sendCommand( QString command, QStringList params, QString c
 			}
 			break;
 			
-		case AboutToConnect:
 		case AboutToDisconnect:
 		case Disconnected:
 		default:
@@ -440,7 +445,7 @@ void WolframeClient::handleResult( )
 {
 	m_state = Connected;
 	
-	qDebug( ) << "handle result of command" << m_command;
+	//qDebug( ) << "handle result of command" << m_command;
 	//<< "\nparams:" << m_params << "\n:answer:" << m_answer;
 	if( m_command == "CONNECT" ) {
 		// swallow greeting line from server after connect
@@ -461,10 +466,10 @@ void WolframeClient::handleResult( )
 		emit answerReceived( m_params, m_answer );
 	}
 
-// still command in the queue to execute
+// still commands in the queue to execute? then do so..
 	if( !m_queue.isEmpty( ) ) {
-		WolframeRequest request = m_queue.dequeue( );
-		sendCommand( request );
+		WolframeRequest r = m_queue.dequeue( );
+		sendCommand( r );
 	}
 }
 

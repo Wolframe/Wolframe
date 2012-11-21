@@ -393,7 +393,19 @@ void MainWindow::disconnected( )
 
 void MainWindow::wolframeError( QString error )
 {
-	qDebug( ) << error;
+ 	QMessageBox::information( this, tr( "Protocol error" ), error, QMessageBox::Ok );
+
+// fatal error, present the user a preferences dialog
+	if( !m_dataLoader || !m_formLoader ) {
+		PreferencesDialog prefs( m_languages, this );
+		if( prefs.exec( ) == QDialog::Accepted ) {
+			qDebug( ) << "Reloading application";
+			QApplication::instance( )->exit( RESTART_CODE );
+		} else {
+// fatal situation, terminate
+			QApplication::instance( )->exit( 0 );
+		}
+	}
 }
 
 void MainWindow::authenticationOk( )
