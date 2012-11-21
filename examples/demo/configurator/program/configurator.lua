@@ -7,13 +7,16 @@ local function content_value( v, itr)
 		return v
 	end
 	for v,t in itr do
-		if t then
-			return nil
+		logger.printc( "TAG ", t, " VALUE '", v, "'")
+		if t and v then
+		else
+			if t then
+				return nil
+			end
+			if v then
+				return v
+			end
 		end
-		if v then
-			return v
-		end
-		return nil
 	end
 end
 
@@ -62,6 +65,7 @@ local function insert_topnode( tablename, name, description, picture, parentID)
 		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name, description=description, picture=picture} )
 		return 1
 	else
+		logger.printc( "add" .. tablename, {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} )
 		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
 		return id
 	end

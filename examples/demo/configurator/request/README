@@ -11,11 +11,13 @@ with wolframed running with examples/demo/configurator/wolframe.conf
 # client "REQUEST" (no arguments) with this document as content
 
 ../../../clients/cmdline/wolframec -q create -d request/createCategory.xml
+../../../clients/cmdline/wolframec -q create -d request/createCategoryWithPicture.xml
 # Create a new category node in the tree
 # Returns the whole updated tree
 # client "REQUEST create" with this document as content (example)
 
 ../../../clients/cmdline/wolframec -q edit -d request/editCategory.xml
+../../../clients/cmdline/wolframec -q edit -d request/editCategoryWithPicture.xml
 # Update a node in the category tree
 # Returns the whole updated tree
 # client "REQUEST edit" with this document as content (example)
