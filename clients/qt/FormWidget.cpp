@@ -256,6 +256,13 @@ QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )
 	}
 }
 
+void FormWidget::writeDynamicStringProperty( QObject *o, const char *name, const QString &value )
+{
+	QVariant v( value );
+	o->setProperty( name, v );
+	qDebug( ) << "setting dynamic property" << name << ":" << value << "in" << o;
+}
+
 void FormWidget::readDynamicStringProperties( QHash<QString, QString> *props, QObject *o )
 {
 	foreach( QByteArray b, o->dynamicPropertyNames( ) ) {
