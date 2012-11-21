@@ -69,6 +69,9 @@ void PreferencesDialog::initialize( )
 	m_secure = new QCheckBox( this );
 	formLayout->addRow( tr( "&Secure:" ), m_secure );
 
+	m_checkSSL = new QCheckBox( this );
+	formLayout->addRow( tr( "&Check SSL:" ), m_checkSSL );
+	
 	m_clientCertFile = new FileChooser( FileChooser::SelectExistingFile, this );
 	formLayout->addRow( tr( "&Client Certificate:" ), m_clientCertFile );
 	
@@ -152,6 +155,7 @@ void PreferencesDialog::loadSettings( )
 	m_host->setText( prefs->host( ) );
 	m_port->setValue( prefs->port( ) );
 	m_secure->setChecked( prefs->secure( ) );
+	m_checkSSL->setChecked( prefs->checkSSL( ) );
 	m_clientCertFile->setFileName( prefs->clientCertFile( ) );
 	m_clientCertFile->setEnabled( prefs->secure( ) );
 	m_clientKeyFile->setFileName( prefs->clientKeyFile( ) );
@@ -225,6 +229,7 @@ void PreferencesDialog::apply( )
 	prefs->setHost( m_host->text( ) );
 	prefs->setPort( m_port->value( ) );
 	prefs->setSecure( m_secure->isChecked( ) );
+	prefs->setCheckSSL( m_checkSSL->isChecked( ) );
 	prefs->setClientCertFile( m_clientCertFile->fileName( ) );
 	prefs->setClientKeyFile( m_clientKeyFile->fileName( ) );
 	prefs->setCaCertFile( m_CACertFile->fileName( ) );
@@ -271,6 +276,7 @@ void PreferencesDialog::cancel( )
 void PreferencesDialog::toggleSecure( int /* state */ )
 {
 	bool secure = m_secure->isChecked( );
+	m_checkSSL->setEnabled( secure );
 	m_clientCertFile->setEnabled( secure );
 	m_clientKeyFile->setEnabled( secure );
 	m_CACertFile->setEnabled( secure );

@@ -56,6 +56,7 @@ void Preferences::loadSettings( )
 	m_host = s->value( "wolframe/host", "localhost" ).toString( );
 	m_port = s->value( "wolframe/port", 7661 ).toString( ).toUShort( );
 	m_secure = s->value( "wolframe/secure", false ).toBool( );
+	m_checkSSL = s->value( "wolframe/checkSSL", true ).toBool( );
 	m_clientCertFile = s->value( "wolframe/client-cert-file", "./certs/client.crt" ).toString( );
 	m_clientKeyFile = s->value( "wolframe/client-key-file", "./private/client.key" ) .toString( );
 	m_CACertFile = s->value( "wolframe/ca-cert-file", "./certs/CAclient.cert.pem" ).toString( );
@@ -79,6 +80,7 @@ void Preferences::storeSettings( )
 	s->setValue( "wolframe/host", m_host );
 	s->setValue( "wolframe/port", m_port );
 	s->setValue( "wolframe/secure", m_secure );
+	s->setValue( "wolframe/checkSSL", m_checkSSL );
 	s->setValue( "wolframe/client-cert-file", m_clientCertFile );
 	s->setValue( "wolframe/client-key-file", m_clientKeyFile );
 	s->setValue( "wolframe/ca-cert-file", m_CACertFile );

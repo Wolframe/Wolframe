@@ -43,6 +43,7 @@ class WolframeClient : public QObject
 		QString m_host;
 		unsigned short m_port;
 		bool m_secure;
+		bool m_checkSSL;
 		QString m_clientCertFile;	// filename of the client certfificate
 		QString m_clientKeyFile;	// filename of the client key file
 		QString m_CACertFile;		// filename of the CA certificate
@@ -61,7 +62,8 @@ class WolframeClient : public QObject
 
 	public:
 		WolframeClient( QString host = "localhost", unsigned short port = 7661,
-			bool secure = false, QString _clientCertFile = "./certs/client.crt",
+			bool secure = false, bool checkSSL = true,
+			QString _clientCertFile = "./certs/client.crt",
 			QString _clientKeyFile = "./private/client.key",
 			QString _CACertfile = "./certs/CAclient.cert.crt",
 			QWidget *_parent = 0 );

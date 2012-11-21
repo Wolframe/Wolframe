@@ -36,6 +36,7 @@
 		QLineEdit *m_host;
 		QSpinBox *m_port;
 		QCheckBox *m_secure;
+		QCheckBox *m_checkSSL;
 		FileChooser *m_clientCertFile;
 		FileChooser *m_clientKeyFile;
 		FileChooser *m_CACertFile;

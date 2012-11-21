@@ -46,6 +46,10 @@
 			bool secure( ) const { return m_secure; }
 			void setSecure( bool _secure ) { m_secure = _secure; }
 			
+			Q_PROPERTY( bool m_checkSSL READ checkSSL WRITE setCheckSSL )
+			bool checkSSL( ) const { return m_checkSSL; }
+			void setCheckSSL( bool _checkSSL ) { m_checkSSL = _checkSSL; }
+			
 			Q_PROPERTY( QString m_clientCertFile READ clientCertFile WRITE setClientCertFile )
 			QString clientCertFile( ) const { return m_clientCertFile; }
 			void setClientCertFile( QString _clientCertFile ) { m_clientCertFile = _clientCertFile; }
@@ -103,6 +107,7 @@
 			QString m_host;
 			unsigned short m_port;
 			bool m_secure;
+			bool m_checkSSL;
 			QString m_clientCertFile;
 			QString m_clientKeyFile;
 			QString m_CACertFile;

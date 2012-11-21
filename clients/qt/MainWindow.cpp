@@ -31,7 +31,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_cmdline( 0 ),
 	m_ui( 0 ), m_formWidget( 0 ), m_formLoader( 0 ), m_dataLoader( 0 ),
 	m_debugTerminal( 0 ), m_wolframeClient( 0 ), m_uiLoader( 0 ),
-	m_host( "localhost" ), m_port( 7661 ), m_secure( false ),
+	m_host( "localhost" ), m_port( 7661 ), m_secure( false ), m_checkSSL( true ),
 	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
 	m_CACertFile( "./certs/CAclient.cert.pem" ),
 	m_uiLoadMode( Network ), m_dataLoadMode( Network ), m_debug( false ),
@@ -72,6 +72,7 @@ void MainWindow::readSettings( )
 	m_host = prefs->host( );
 	m_port = prefs->port( );
 	m_secure = prefs->secure( );
+	m_checkSSL = prefs->checkSSL( );
 	m_clientCertFile = prefs->clientCertFile( );
 	m_clientKeyFile = prefs->clientKeyFile( );
 	m_CACertFile = prefs->caCertFile( );
@@ -230,7 +231,7 @@ void MainWindow::parseError( const QString &error )
 void MainWindow::initialize( )
 {
 // create a Wolframe protocol client
-	m_wolframeClient = new WolframeClient( m_host, m_port, m_secure, m_clientCertFile, m_clientKeyFile, m_CACertFile );
+	m_wolframeClient = new WolframeClient( m_host, m_port, m_secure, m_checkSSL, m_clientCertFile, m_clientKeyFile, m_CACertFile );
 
 // create debuging terminal
 	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );

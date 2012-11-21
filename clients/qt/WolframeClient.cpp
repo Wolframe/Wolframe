@@ -10,10 +10,11 @@
 #include <QList>
 
 
-WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secure, QString _clientCertFile, QString _clientKeyFile, QString _CACertfile, QWidget *_parent ) :
+WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secure, bool _checkSSL, QString _clientCertFile, QString _clientKeyFile, QString _CACertfile, QWidget *_parent ) :
 	m_host( _host ),
 	m_port( _port ),
 	m_secure( _secure ),
+	m_checkSSL( _checkSSL ),
 	m_clientCertFile( _clientCertFile ),
 	m_clientKeyFile( _clientKeyFile ),
 	m_CACertFile( _CACertfile ),	
@@ -97,22 +98,32 @@ QSslCertificate WolframeClient::getCertificate( QString filename )
 void WolframeClient::sslErrors( const QList<QSslError> &errors )
 {
 	m_hasErrors = true;
-	foreach( const QSslError &e, errors )
-		emit error( e.errorString( ) );
-
-	// ignore for now
-	reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
+	
+	if( m_checkSSL ) {
+		// ignore them, but warn user about errors
+		foreach( const QSslError &e, errors ) {
+			emit error( e.errorString( ) );
+		}
+		reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
+	} else {
+		reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
+	}
 }
 
 void WolframeClient::peerVerifyError( const QSslError &e )
 {
 	m_hasErrors = true;
-	emit error( e.errorString( ) );
+	
+	if( m_checkSSL ) {
+		emit error( e.errorString( ) );
+	}
 }
 
 void WolframeClient::encrypted( )
 {
-	emit error( m_hasErrors ? tr( "Channel is encrypted, but there were errors on the way." ) : tr( "Channel is encrypted now." ) );
+	if( m_checkSSL && m_hasErrors ) {
+		emit error( tr( "Channel is encrypted, but there were errors on the way." ) );
+	}
 }
 #endif
 
