@@ -34,6 +34,7 @@ makefiles/nmake/top.mk
 .Attic/appException.cpp
 .Attic/appException.hpp
 .Attic/argPassTest.cpp
+.Attic/boostSystemErrorCode.cpp
 .Attic/clientlib.h
 .Attic/clientlib_protocol.c
 .Attic/config/config_descriptionBase.cpp
@@ -177,7 +178,6 @@ clients/qt/global.hpp
 clients/qt/GNUmakefile
 clients/qt/HistoryLineEdit.cpp
 clients/qt/HistoryLineEdit.hpp
-clients/qt/INSTALL.Windows
 clients/qt/LoadMode.hpp
 clients/qt/LoginDialog.cpp
 clients/qt/LoginDialog.hpp

@@ -228,12 +228,12 @@ local function add_tree( tablename, itr)
 end
 
 function CategoryHierarchyRequest()
-	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	output:as( "tree SYSTEM 'CategoryHierarchy.simpleform'")
 	select_tree( "Category", "category", input:get())
 end
 
 function FeatureHierarchyRequest()
-	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	output:as( "tree SYSTEM 'FeatureHierarchy.simpleform'")
 	select_tree( "Feature", "feature", input:get())
 end
 
@@ -246,12 +246,12 @@ function pushFeatureHierarchy()
 end
 
 function CategoryRequest()
-	output:as( "node SYSTEM 'Category.simpleform'")
+	output:as( "category SYSTEM 'Category.simpleform'")
 	select_node( "Category", "category", input:get())
 end
 
 function FeatureRequest()
-	output:as( "node SYSTEM 'Feature.simpleform'")
+	output:as( "feature SYSTEM 'Feature.simpleform'")
 	select_node( "Feature", "feature", input:get())
 end
 

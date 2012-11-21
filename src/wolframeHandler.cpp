@@ -328,6 +328,11 @@ void wolframeConnection::signalOccured( NetworkSignal signal )
 			m_state = TERMINATING;
 			break;
 
+		case CONNECTION_RESET:
+			LOG_TRACE << "Processor received CONNECTION RESET (connection closed by peer)";
+			m_state = TERMINATING;
+			break;
+
 		case OPERATION_CANCELLED:
 			LOG_TRACE << "Processor received OPERATION CANCELED (should have been requested by us)";
 			m_state = TERMINATING;
