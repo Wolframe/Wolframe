@@ -90,6 +90,7 @@
 <editCategory>
 <category name="Device from outer space" id="51"></category>
 </editCategory>
+<CategoryRequest><category id="52"/></CategoryRequest>
 <editCategory>
 <category id="52">
 	<name>WNC child Y</name>
@@ -334,8 +335,8 @@ DOCTYPE "picture Picture"
 
 DOCTYPE "category Category"
 {
-	id int
-	parentID int
+	id @int
+	parentID @int
 	name string
 	normalizedName string
 	description string
@@ -688,7 +689,6 @@ local function select_node( tablename, elementname, itr)
 	for v,t in itr do
 		if t == "id" then
 			output:opentag( elementname)
-			output:print( v, "id")
 			local r = formfunction( "select" .. tablename)( {id=v} )
 			local f = form( "Category");
 			f:fill( r:get())
@@ -716,6 +716,7 @@ local function edit_node( tablename, itr)
 			picture = picture_value( scope(itr))
 		end
 	end
+	logger.printc( "update" .. tablename, {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 end
 
@@ -1046,7 +1047,7 @@ end
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52"><id>52</id><parentID>46</parentID><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image></picture></category><category id="46"><id>46</id><parentID>16</parentID><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
+</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
 	<category>computer</category>
 	<tree><item id="2">
 		<category>Minicomputer</category>

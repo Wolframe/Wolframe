@@ -86,6 +86,7 @@
 <editCategory>
 <category name="Device from outer space" id="51"></category>
 </editCategory>
+<CategoryRequest><category id="52"/></CategoryRequest>
 <editCategory>
 <category id="52">
 	<name>WNC child Y</name>

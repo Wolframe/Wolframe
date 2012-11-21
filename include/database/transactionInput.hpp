@@ -61,19 +61,23 @@ public:
 		};
 
 		Element(){}
-		Element( Type type_, std::size_t idx_)
+		Element( Type type_, std::size_t idx_, std::size_t size_)
 			:m_type( type_)
-			,m_idx(idx_){}
+			,m_idx(idx_)
+			,m_size(size_){}
 		Element( const Element& o)
 			:m_type(o.m_type)
-			,m_idx(o.m_idx){}
+			,m_idx(o.m_idx)
+			,m_size(o.m_size){}
 
 		Type type() const					{return m_type;}
 		std::size_t idx() const					{return m_idx;}
+		std::size_t size() const				{return m_size;}
 
 	private:
 		Type m_type;
 		std::size_t m_idx;
+		std::size_t m_size;
 	};
 
 	class Command
@@ -92,9 +96,9 @@ public:
 			,m_name(o.m_name)
 			,m_arg(o.m_arg){}
 
-		void bind( Element::Type type, std::size_t idx)
+		void bind( Element::Type type, std::size_t idx, std::size_t size)
 		{
-			m_arg.push_back( Element( type, idx));
+			m_arg.push_back( Element( type, idx, size));
 		}
 
 		std::size_t level() const				{return m_level;}
@@ -143,17 +147,20 @@ public:
 			Content()
 				:m_type(Element::String)
 				,m_value(0)
+				,m_size(0)
 				,m_ref(0){}
 
 			Content( const Content& o)
 				:m_type(o.m_type)
 				,m_value(o.m_value)
+				,m_size(o.m_size)
 				,m_ref(o.m_ref){}
 
-			void initString( const char* value_)
+			void initString( const char* value_, std::size_t size_)
 			{
 				m_type = Element::String;
 				m_value = value_;
+				m_size = size_;
 				m_ref = 0;
 			}
 
@@ -161,16 +168,19 @@ public:
 			{
 				m_type = Element::ResultColumn;
 				m_value = 0;
+				m_size = 0;
 				m_ref = ref_;
 			}
 
 			Element::Type type() const	{return m_type;}
 			const char* value() const	{return m_value;}
 			std::size_t ref() const		{return m_ref;}
+			std::size_t size() const	{return m_size;}
 
 		private:
 			Element::Type m_type;
 			const char* m_value;
+			std::size_t m_size;
 			std::size_t m_ref;
 		};
 
@@ -182,14 +192,14 @@ public:
 		{
 			if (m_itr == m_end)
 			{
-				m_content.initString( (const char*)0);
+				m_content.initString( (const char*)0, 0);
 			}
 			else
 			{
 				switch (m_itr->type())
 				{
 					case Element::String:
-						m_content.initString( m_ref->value( m_itr->idx()));
+						m_content.initString( m_ref->value( m_itr->idx()), m_itr->size());
 						break;
 					case Element::ResultColumn:
 						m_content.initResultColumn( m_itr->idx());
@@ -255,21 +265,12 @@ public:
 
 	const char* value( std::size_t idx) const			{return (idx)?(m_strings.c_str()+idx):0;}
 
-	std::size_t getValueIdx( const std::string& v)
-	{
-		if (v.empty()) return 1;
-		std::size_t rt = m_strings.size();
-		m_strings.append( v);
-		m_strings.push_back('\0');
-		return rt;
-	}
-
-	std::size_t getValueIdx( const char* v)
+	std::size_t getValueIdx( const char* v, std::size_t n)
 	{
 		if (!v) return 0;
-		if (!*v) return 1;
+		if (!*v || !n) return 1;
 		std::size_t rt = m_strings.size();
-		m_strings.append( v);
+		m_strings.append( std::string( v, n));
 		m_strings.push_back('\0');
 		return rt;
 	}
@@ -283,24 +284,24 @@ public:
 	}
 
 	///\brief Bind parameter value on current command statement
-	void bindCommandArgAsValue( const std::string value_)
+	void bindCommandArgAsValue( const char* value_, std::size_t size_)
 	{
 		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
-		m_cmd.back().bind( Element::String, getValueIdx( value_));
+		m_cmd.back().bind( Element::String, getValueIdx( value_, size_), size_);
 	}
 
 	///\brief Bind parameter value on current command statement
 	void bindCommandArgAsNull()
 	{
 		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
-		m_cmd.back().bind( Element::String, 0);
+		m_cmd.back().bind( Element::String, 0, 0);
 	}
 
 	///\brief Bind parameter value on current command statement
 	void bindCommandArgAsResultReference( std::size_t resultref)
 	{
 		if (m_cmd.empty()) throw std::logic_error( "bind called with no command defined");
-		m_cmd.back().bind( Element::ResultColumn, resultref);
+		m_cmd.back().bind( Element::ResultColumn, resultref, 0);
 	}
 
 	bool hasNonemptyResult( std::size_t functionidx) const

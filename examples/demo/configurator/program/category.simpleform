@@ -8,8 +8,8 @@ DOCTYPE "picture Picture"
 
 DOCTYPE "category Category"
 {
-	id int
-	parentID int
+	id @int
+	parentID @int
 	name string
 	normalizedName string
 	description string

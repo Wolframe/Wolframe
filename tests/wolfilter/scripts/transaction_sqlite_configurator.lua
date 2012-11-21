@@ -154,7 +154,6 @@ local function select_node( tablename, elementname, itr)
 	for v,t in itr do
 		if t == "id" then
 			output:opentag( elementname)
-			output:print( v, "id")
 			local r = formfunction( "select" .. tablename)( {id=v} )
 			local f = form( "Category");
 			f:fill( r:get())
@@ -182,6 +181,7 @@ local function edit_node( tablename, itr)
 			picture = picture_value( scope(itr))
 		end
 	end
+	logger.printc( "update" .. tablename, {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 end
 

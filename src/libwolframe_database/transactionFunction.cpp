@@ -124,7 +124,7 @@ public:
 	void next( const Node& nd, int tag, std::vector<Node>& rt) const;
 	void find( const Node& nd, int tag, std::vector<Node>& rt) const;
 	void up( const Node& nd, std::vector<Node>& rt) const;
-	const char* nodevalue( const Node& nd) const;
+	const std::pair<const char*,std::size_t> nodevalue( const Node& nd) const;
 
 	const std::string tostring() const;
 
@@ -515,9 +515,9 @@ TransactionFunctionInput::Structure::Node TransactionFunctionInput::Structure::r
 	return rt;
 }
 
-const char* TransactionFunctionInput::Structure::nodevalue( const Node& nd) const
+const std::pair<const char*,std::size_t> TransactionFunctionInput::Structure::nodevalue( const Node& nd) const
 {
-	const char* rt = 0;
+	std::pair<const char*,std::size_t> rt(0,0);
 	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
 	if (nn)
 	{
@@ -526,9 +526,9 @@ const char* TransactionFunctionInput::Structure::nodevalue( const Node& nd) cons
 		{
 			if (!cd[ii].m_tag)
 			{
-				if (rt) throw std::runtime_error( "node selected has more than one value");
+				if (rt.first) throw std::runtime_error( "node selected has more than one value");
 				std::size_t validx = cd[ii].valueidx();
-				if (validx) rt = &m_strmem[ validx];
+				if (validx) rt = std::pair<const char*,std::size_t>( &m_strmem[ validx], cd[ii].valuesize());
 			}
 		}
 	}
@@ -798,7 +798,7 @@ static void bindArguments( TransactionInput& ti, const FunctionCall& call, const
 		}
 		else if ((idx = pi->constantReference()) != 0)
 		{
-			ti.bindCommandArgAsValue( constants.c_str() + idx);
+			ti.bindCommandArgAsValue( constants.c_str() + idx, std::strlen(constants.c_str()));
 		}
 		else
 		{
@@ -815,10 +815,10 @@ static void bindArguments( TransactionInput& ti, const FunctionCall& call, const
 				{
 					if (*gs != *gi) throw std::runtime_error( "more than one node selected in db call argument");
 				}
-				const char* value = inputst->structure().nodevalue( *gs);
-				if (value)
+				std::pair<const char*,std::size_t> value = inputst->structure().nodevalue( *gs);
+				if (value.first)
 				{
-					ti.bindCommandArgAsValue( value);
+					ti.bindCommandArgAsValue( value.first, value.second);
 				}
 				else
 				{

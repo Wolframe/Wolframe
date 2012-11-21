@@ -154,7 +154,6 @@ local function select_node( tablename, elementname, itr)
 	for v,t in itr do
 		if t == "id" then
 			output:opentag( elementname)
-			output:print( v, "id")
 			local r = formfunction( "select" .. tablename)( {id=v} )
 			local f = form( "Category");
 			f:fill( r:get())
