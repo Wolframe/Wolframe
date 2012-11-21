@@ -28,6 +28,6 @@ cd $RPMBUILD/SPECS
 
 echo "Building started, check with 'tail -f $RPMBUILD/SPECS/log'."
 
-rpmbuild -ba --define 'rhel_version 630' wolframe.spec > log 2>&1
+rpmbuild -ba --define 'centos_version 630' wolframe.spec > log 2>&1
 
 echo "Build done."
