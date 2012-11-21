@@ -5,7 +5,7 @@ CREATE TABLE Picture	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	caption		TEXT,
 	info		TEXT,
-	image		BYTEA
+	image		TEXT
 );
 
 -- The categories tree
