@@ -186,23 +186,28 @@ protected:
 		std::string				name;
 
 		switch( e.value() )	{
-		case boost::asio::error::eof:
+		case boost::asio::error::eof :
 			ns = ConnectionHandler::END_OF_FILE;
 			name = "EOF";
 			break;
 
-		case boost::asio::error::operation_aborted:
+		case boost::asio::error::operation_aborted :
 			ns = ConnectionHandler::OPERATION_CANCELLED;
 			name = "OPERATION CANCELLED";
 			break;
 
-		case boost::asio::error::broken_pipe:
+		case boost::asio::error::broken_pipe :
 			ns = ConnectionHandler::BROKEN_PIPE;
 			name = "BROKEN PIPE";
 			break;
 
+		case boost::asio::error::connection_reset :
+			ns = ConnectionHandler::CONNECTION_RESET;
+			name = "CONNECTION RESET";
+			break;
+
 		default:
-			LOG_DEBUG << "Unknown error: " << e.value() << "category: " << e.category().name()
+			LOG_DEBUG << "Unknown error: " << e.value() << ", category: " << e.category().name()
 				  << ", message: " << e.message();
 			ns = ConnectionHandler::UNKNOWN_ERROR;
 			name = "UNKNOWN ERROR";
