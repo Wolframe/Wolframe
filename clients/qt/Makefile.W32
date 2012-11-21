@@ -318,10 +318,8 @@ zip:
 	copy plugins\wolframewidgets.dll C:\qtclient
 	xcopy /e themes C:\qtclient\themes
 	xcopy /e i18n C:\qtclient\i18n
-	copy apps\configurator.conf C:\qtclient
 	xcopy /e apps\configurator C:\qtclient\apps\configurator
 	copy C:\windows\system32\msvcp100d.dll C:\qtclient
 	copy C:\windows\system32\msvcr100d.dll C:\qtclient
-	copy run.bat C:\qtclient
 	cscript /nologo zip.vbs %TEMP%\qtclient.zip C:\qtclient
 	move %TEMP%\qtclient.zip .

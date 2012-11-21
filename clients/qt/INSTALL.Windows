@@ -1,8 +1,0 @@
-Temporary Windows ZIP file install
-
-nmake xxx zip
-copy qtclient.zip to client machine, unpack there.
-
-start run.bat
-
-
