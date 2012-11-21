@@ -169,6 +169,16 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 			QGroupBox *groupBox = qobject_cast<QGroupBox *>( widget );
 			QString boxName = groupBox->objectName( );
 			xml.writeStartElement( boxName );
+
+			// this is actually for all elements, get hidden properties and attach
+			// them again as XML attributes of the current element
+			QHash<QString, QString> p;
+			FormWidget::readDynamicStringProperties( &p, widget );
+			foreach( QString key, p.keys( ) ) {
+				// skip Qt internal ones
+				if( key.startsWith( "_q_" ) ) continue;
+				xml.writeAttribute( key, p.value( key ) );
+			}
 			writeWidgets( groupBox, xml, props, seen );
 			xml.writeEndElement( );
 		} else if( clazz == "FileChooser" ) {
@@ -268,6 +278,8 @@ void DataHandler::resetFormData( QWidget *form )
 			pictureChooser->setFileName( "" );
 		} else if( clazz == "QPushButton" ) {
 			// skip, ok, buttons can't be reset
+		} else if( clazz == "QGroupBox" ) {
+			// skip, ok, grouboxes can't be reset
 		} else if( clazz == "QWidget" ) {
 			// skip, generic widget, don't possibly know how to reset it
 		} else {
@@ -555,6 +567,13 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 									// "Expected character data.", a little bit annoying..
 								}
 							}								
+							// handle attributes (e.g. picture 'id') here, should be
+							// handled for all widget actually. Remember value in
+							// a dynamic property in the widget
+							QXmlStreamAttributes attributes = xml.attributes( );
+							foreach( QXmlStreamAttribute attr, attributes ) {
+								FormWidget::writeDynamicStringProperty( widget, attr.name( ).toString( ).toLatin1( ).data( ), attr.value( ).toString( ) );
+							}
 						} else if( clazz == "QListWidget" ) {
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							QListWidget *listWidget = qobject_cast<QListWidget *>( widget );

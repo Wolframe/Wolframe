@@ -55,6 +55,7 @@ class FormWidget : public QWidget
 		QString form( ) const;
 		
 		static QString readDynamicStringProperty( QObject *o, const char *name );
+		static void writeDynamicStringProperty( QObject *o, const char *name, const QString &value );
 		static void readDynamicStringProperties( QHash<QString, QString> *props, QObject *obj );
 		
 	public slots:
