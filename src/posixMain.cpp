@@ -181,6 +181,10 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			LOG_FATAL << gettext ( "no configuration file found !" );
 			return _Wolframe::ErrorCode::FAILURE;
 		}
+		if ( ! boost::filesystem::is_regular_file( configFile ))	{
+			LOG_FATAL << "'" << configFile << "' is not a regular file";
+			return _Wolframe::ErrorCode::FAILURE;
+		}
 
 		_Wolframe::module::ModulesDirectory modDir;
 		_Wolframe::config::ApplicationConfiguration conf;

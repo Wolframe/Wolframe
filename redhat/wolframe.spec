@@ -756,7 +756,7 @@ fi
 %{_sbindir}/wolframed
 %{_bindir}/wolfilter
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
-%config %attr(0755, root, root) %{_sysconfdir}/wolframe/wolframe.conf
+%config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
 
