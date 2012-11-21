@@ -63,7 +63,6 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	boost::asio::ip::tcp::endpoint endpoint;
 	try	{
 		boost::asio::ip::tcp::resolver resolver( m_IOservice );
-		// Aba: empty service fails on boost 1.42 with "Service not found"
 		boost::asio::ip::tcp::resolver::query query( host, "7661" );
 		endpoint = *resolver.resolve( query );
 	}
@@ -106,7 +105,7 @@ acceptor::~acceptor()
 void acceptor::handleAccept( const boost::system::error_code& e )
 {
 	if ( !e )	{
-		LOG_DEBUG << "Received new connection on " << m_identifier;
+		LOG_TRACE << "Received new connection on " << m_identifier;
 		m_newConnection->start();
 
 		ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( m_acceptor.local_endpoint().address().to_string(),

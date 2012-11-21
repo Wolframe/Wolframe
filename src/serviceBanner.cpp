@@ -75,7 +75,6 @@ static ServiceBanner::SignatureTokens strToToken( std::string& str )
 bool ServiceBanner::parse( const ConfigurationTree& pt, const std::string& node,
 			   const module::ModulesDirectory* /*modules*/ )
 {
-
 	if ( boost::algorithm::iequals( node, "ServerTokens" ))	{
 		bool tokensDefined = ( m_tokens != ServiceBanner::UNDEFINED );
 		std::string	val;
@@ -89,8 +88,9 @@ bool ServiceBanner::parse( const ConfigurationTree& pt, const std::string& node,
 		}
 	}
 	else if ( boost::algorithm::iequals( node, "ServerSignature" ))	{
+		bool isDefined = ( !m_serverSignature.empty());
 		if ( !Parser::getValue( logPrefix().c_str(), node.c_str(), pt.get_value<std::string>(),
-				       m_serverName, Parser::BoolDomain(), &m_serverNameDefined ))
+					m_serverSignature, &isDefined ))
 			return false;
 	}
 	else	{
@@ -136,7 +136,7 @@ void ServiceBanner::print( std::ostream& os, size_t /* indent */ ) const
 	default:		os << "NOT DEFINED !"; break;
 	}
 	os << std::endl;
-	os << "   Print service name: " << ( m_serverName ? "yes" : "no" ) << std::endl;
+	os << "   Print service name: " << ( m_serverSignature.empty() ? m_serverSignature : "(none)" ) << std::endl;
 }
 
 
@@ -164,8 +164,8 @@ std::string ServiceBanner::toString() const
 	case UNDEFINED:
 	default:		throw std::domain_error( "ServiceBanner: unknown ServerTokens value" );
 	}
-	if ( m_serverName )
-		banner = "GogoServer " + banner;
+	if ( ! m_serverSignature.empty() )
+		banner = m_serverSignature + banner;
 
 	return banner;
 }
