@@ -7,7 +7,6 @@ local function content_value( v, itr)
 		return v
 	end
 	for v,t in itr do
-		logger.printc( "TAG ", t, " VALUE '", v, "'")
 		if t and v then
 		else
 			if t then
@@ -185,6 +184,7 @@ local function edit_node( tablename, itr)
 			picture = picture_value( scope(itr))
 		end
 	end
+	logger.printc( "update" .. tablename, {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 end
 
