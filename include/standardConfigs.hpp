@@ -133,6 +133,7 @@ public:
 	std::string		user;
 	std::string		group;
 	std::string		pidFile;
+	std::string		serviceName;
 #endif
 #if defined( _WIN32 )
 	// Windows service configuration
@@ -177,7 +178,7 @@ public:
 
 	/// constructor
 	ServiceBanner() : ConfigurationBase( "Service Banner", NULL, "Service banner" ),
-		m_tokens( UNDEFINED ), m_serverName( false ), m_serverNameDefined( false )	{}
+		m_tokens( UNDEFINED )	{}
 	/// methods
 	std::string toString() const;
 
@@ -191,8 +192,7 @@ public:
 protected:
 	/// data members
 	SignatureTokens	m_tokens;
-	bool		m_serverName;
-	bool		m_serverNameDefined;
+	std::string	m_serverSignature;
 };
 
 } // namespace config

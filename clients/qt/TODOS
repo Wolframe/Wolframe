@@ -1,4 +1,8 @@
 musts:
+- SSL: allow to ignore certain error, most prominent ones are
+  - host mismatch
+  - self-signed certificate
+  - must be checkable in PreferencesDialog
 - problems with size of main window to follow size of form ui
 - frontend:
   - associating categories and features
