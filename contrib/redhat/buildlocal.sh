@@ -3,6 +3,9 @@
 VERSION=0.0.1
 RPMBUILD=$HOME/rpmbuild
 
+rm -rf $RPMBUILD/BUILDROOT $RPMBUILD/BUILD $RPMBUILD/RPMS/*/* \
+	$RPMBUILD/SRPMS/*
+
 rm -f wolframe-$VERSION.tar.gz
 rm -f $RPMBUILD/SOURCES/wolframe_$VERSION.tar.gz
 
