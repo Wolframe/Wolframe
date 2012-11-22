@@ -7,13 +7,15 @@ local function content_value( v, itr)
 		return v
 	end
 	for v,t in itr do
-		if t then
-			return nil
+		if t and v then
+		else
+			if t then
+				return nil
+			end
+			if v then
+				return v
+			end
 		end
-		if v then
-			return v
-		end
-		return nil
 	end
 end
 
@@ -181,7 +183,6 @@ local function edit_node( tablename, itr)
 			picture = picture_value( scope(itr))
 		end
 	end
-	logger.printc( "update" .. tablename, {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 end
 
@@ -225,12 +226,12 @@ local function add_tree( tablename, itr)
 end
 
 function CategoryHierarchyRequest()
-	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	output:as( "tree SYSTEM 'CategoryHierarchy.simpleform'")
 	select_tree( "Category", "category", input:get())
 end
 
 function FeatureHierarchyRequest()
-	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	output:as( "tree SYSTEM 'FeatureHierarchy.simpleform'")
 	select_tree( "Feature", "feature", input:get())
 end
 
@@ -243,12 +244,12 @@ function pushFeatureHierarchy()
 end
 
 function CategoryRequest()
-	output:as( "node SYSTEM 'Category.simpleform'")
+	output:as( "category SYSTEM 'Category.simpleform'")
 	select_node( "Category", "category", input:get())
 end
 
 function FeatureRequest()
-	output:as( "node SYSTEM 'Feature.simpleform'")
+	output:as( "feature SYSTEM 'Feature.simpleform'")
 	select_node( "Feature", "feature", input:get())
 end
 

@@ -64,7 +64,6 @@ local function insert_topnode( tablename, name, description, picture, parentID)
 		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name, description=description, picture=picture} )
 		return 1
 	else
-		logger.printc( "add" .. tablename, {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} )
 		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
 		return id
 	end
@@ -184,7 +183,6 @@ local function edit_node( tablename, itr)
 			picture = picture_value( scope(itr))
 		end
 	end
-	logger.printc( "update" .. tablename, {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 end
 

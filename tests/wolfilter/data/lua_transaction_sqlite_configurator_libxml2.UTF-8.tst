@@ -149,7 +149,7 @@ CREATE TABLE Picture	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	caption		TEXT,
 	info		TEXT,
-	image		BYTEA
+	image		TEXT
 );
 
 -- The categories tree
@@ -365,11 +365,11 @@ END
 --
 -- addCategory
 --
-OPERATION addCategoryPicture -- (categoryID, caption, info, image)
+OPERATION addCategoryPicture -- ($1=categoryID, caption, info, image)
 BEGIN
-	DO INSERT INTO CategoryPicture (caption, info, image) VALUES ($(caption), $(info), $(image));
-	DO SELECT $1,last_insert_rowid() FROM Picture;
-	DO INSERT INTO CategoryPicture (categoryID, pictureID) VALUES ($1,$2);
+	DO INSERT INTO Picture (caption,info,image) VALUES ($(caption), $(info), $(image));
+	DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
+	DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
 END
 
 TRANSACTION addCategory -- (parentID, name, normalizedName, description)
@@ -379,6 +379,7 @@ BEGIN
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
+--	FOREACH picture DO addCategoryPicture($1);
 	FOREACH picture DO INSERT INTO Picture (caption,info,image) VALUES ($(caption), $(info), $(image));
 	FOREACH picture DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
 	FOREACH picture DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
@@ -543,13 +544,15 @@ local function content_value( v, itr)
 		return v
 	end
 	for v,t in itr do
-		if t then
-			return nil
+		if t and v then
+		else
+			if t then
+				return nil
+			end
+			if v then
+				return v
+			end
 		end
-		if v then
-			return v
-		end
-		return nil
 	end
 end
 
@@ -717,7 +720,6 @@ local function edit_node( tablename, itr)
 			picture = picture_value( scope(itr))
 		end
 	end
-	logger.printc( "update" .. tablename, {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
 end
 
@@ -761,12 +763,12 @@ local function add_tree( tablename, itr)
 end
 
 function CategoryHierarchyRequest()
-	output:as( "node SYSTEM 'CategoryHierarchy.simpleform'")
+	output:as( "tree SYSTEM 'CategoryHierarchy.simpleform'")
 	select_tree( "Category", "category", input:get())
 end
 
 function FeatureHierarchyRequest()
-	output:as( "node SYSTEM 'FeatureHierarchy.simpleform'")
+	output:as( "tree SYSTEM 'FeatureHierarchy.simpleform'")
 	select_tree( "Feature", "feature", input:get())
 end
 
@@ -779,12 +781,12 @@ function pushFeatureHierarchy()
 end
 
 function CategoryRequest()
-	output:as( "node SYSTEM 'Category.simpleform'")
+	output:as( "category SYSTEM 'Category.simpleform'")
 	select_node( "Category", "category", input:get())
 end
 
 function FeatureRequest()
-	output:as( "node SYSTEM 'Feature.simpleform'")
+	output:as( "feature SYSTEM 'Feature.simpleform'")
 	select_node( "Feature", "feature", input:get())
 end
 
