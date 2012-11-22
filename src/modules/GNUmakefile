@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = database audit authentication authorization filter ddlcompiler normalize prnt cmdbind echoProcessor
+SUBDIRS = database audit authentication authorization filter ddlcompiler normalize prnt cmdbind functions
 ifeq ($(WITH_LUA),1)
 SUBDIRS += lua
 endif

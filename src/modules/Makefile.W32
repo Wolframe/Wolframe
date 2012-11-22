@@ -1,7 +1,7 @@
 TOPDIR = ..\..
 
-SUBDIRS = database audit authentication authorization filter ddlcompiler normalize prnt cmdbind
-# Aba: echoProcessor, temporarily disabled, doesn't build on windows
+SUBDIRS = database audit authentication authorization filter ddlcompiler normalize prnt cmdbind functions
+
 !IFDEF WITH_LUA
 SUBDIRS = $(SUBDIRS) lua
 !ENDIF

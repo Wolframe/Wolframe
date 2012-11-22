@@ -1,9 +1,5 @@
 TOPDIR = ..\..\..
 
-SUBDIRS =
-
-!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
-
 SUBDIRS = \
 	$(SUBDIRS) testPdfPrinter
 
@@ -11,6 +7,8 @@ SUBDIRS = \
 SUBDIRS = \
 	$(SUBDIRS) haruPdfPrinter
 !ENDIF
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

@@ -1,0 +1,24 @@
+TOPDIR = ..\..\..
+
+SUBDIRS =
+# SUBDIRS = graphix
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+SUBDIRS = \
+	$(SUBDIRS) testPdfPrinter
+
+!IFDEF WITH_LIBHPDF
+SUBDIRS = \
+	$(SUBDIRS) haruPdfPrinter
+!ENDIF
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+local_all:
+
+local_clean:
+
+local_distclean:
+
+local_test:

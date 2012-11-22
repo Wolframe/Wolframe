@@ -1,10 +1,8 @@
 TOPDIR = ../../..
 
-SUBDIRS =
+SUBDIRS += testPdfPrinter
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
-
-SUBDIRS += testPdfPrinter
 
 ifeq ($(WITH_LIBHPDF),1)
 SUBDIRS += haruPdfPrinter
