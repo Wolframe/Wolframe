@@ -10,7 +10,6 @@ unsorted:
 - initial look and feel, theme (windows 7, menu on right, why?) => test again
 - new picture picker
   - upload a set of images, keep them on the server
-    - file picker need multiple selection property
   - use them from a picklist (with images)
   
 musts:

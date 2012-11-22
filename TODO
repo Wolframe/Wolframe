@@ -3,6 +3,7 @@ MBa:
 
 ABa:
 daemon code:
+- build FreeImage wolframe-ish
 - On expection in main, remove pidfile
 - qtclient cont.
 - configurator
