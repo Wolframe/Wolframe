@@ -1,0 +1,8 @@
+original version is 3.15.4
+
+local changes and fixes:
+- Makefile has been renamed to 'Makefile.orig'.
+- 'GNUmakefile' and 'Makefile.w32' are added for the
+  Wolframe project.
+- Source/OpenEXR/IlmImf/ImfAutoArray.h:
+  added include for <string.h> for memset
