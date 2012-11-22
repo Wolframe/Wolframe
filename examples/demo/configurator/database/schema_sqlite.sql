@@ -1,3 +1,19 @@
+-- The tags tree
+--
+CREATE TABLE Tag	(
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	parentID	INT	REFERENCES Tag( ID ),
+	name		TEXT	NOT NULL,
+	normalizedName	TEXT	NOT NULL UNIQUE,
+	description	TEXT,
+	lft		INT	NOT NULL,
+	rgt		INT	NOT NULL,
+	CONSTRAINT order_check CHECK ( rgt > lft )
+);
+
+INSERT INTO Tag( parentID, name, normalizedName, description, lft, rgt )
+	VALUES ( NULL, '_ROOT_', '_ROOT_', 'Tags tree root', 1, 2 );
+
 
 -- The list of images used
 --
@@ -5,8 +21,18 @@ CREATE TABLE Picture	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	caption		TEXT,
 	info		TEXT,
-	image		TEXT
+	width		INT,
+	height		INT,
+	image		TEXT,
+	thumbnail	TEXT
 );
+
+CREATE TABLE PictureTag	(
+	pictureID	INT	REFERENCES Picture( ID ),
+	tagID		INT	REFERENCES Tag( ID ),
+	UNIQUE ( pictureID, tagID )
+);
+
 
 -- The categories tree
 --
@@ -21,9 +47,13 @@ CREATE TABLE Category	(
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
 
+INSERT INTO Category( parentID, name, normalizedName, description, lft, rgt )
+	VALUES ( NULL, '_ROOT_', '_ROOT_', 'Categories tree root', 1, 2 );
+
 CREATE TABLE CategoryPicture	(
 	categoryID	INT	REFERENCES Category( ID ),
-	pictureID	INT	REFERENCES Picture( ID )
+	pictureID	INT	REFERENCES Picture( ID ),
+	UNIQUE ( categoryID, pictureID )
 );
 
 
@@ -40,9 +70,13 @@ CREATE TABLE Feature	(
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
 
+INSERT INTO Feature( parentID, name, normalizedName, description, lft, rgt )
+	VALUES ( NULL, '_ROOT_', '_ROOT_', 'Features tree root', 1, 2 );
+
 CREATE TABLE FeaturePicture	(
 	featureID	INT	REFERENCES Feature( ID ),
-	pictureID	INT	REFERENCES Picture( ID )
+	pictureID	INT	REFERENCES Picture( ID ),
+	UNIQUE ( featureID, pictureID )
 );
 
 
@@ -71,7 +105,7 @@ CREATE TABLE Component	(
 	price		NUMERIC( 10, 2 )
 );
 
-CREATE TABLE ComponentHistory	(
+CREATE TABLE ComponentPriceHistory	(
 	componentID	INT	REFERENCES Component( ID ),
 	price		NUMERIC( 10, 2 ),
 	priceDate	TIMESTAMP,
@@ -80,7 +114,8 @@ CREATE TABLE ComponentHistory	(
 
 CREATE TABLE ComponentPicture	(
 	componentID	INT	REFERENCES Component( ID ),
-	pictureID	INT	REFERENCES Picture( ID )
+	pictureID	INT	REFERENCES Picture( ID ),
+	UNIQUE ( componentID, pictureID )
 );
 
 -- The list of features required by members of a category
@@ -89,7 +124,8 @@ CREATE TABLE CategRequires	(
 	categoryID	INT	REFERENCES Category( ID ),
 	featureID	INT	REFERENCES Feature( ID ),
 	minQuantity	INT,
-	maxQuantity	INT
+	maxQuantity	INT,
+	UNIQUE ( categoryID, featureID )
 );
 
 -- The list of features provided by members of a category
@@ -98,7 +134,8 @@ CREATE TABLE CategProvides	(
 	categoryID	INT	REFERENCES Category( ID ),
 	featureID	INT	REFERENCES Feature( ID ),
 	minQuantity	INT,
-	maxQuantity	INT
+	maxQuantity	INT,
+	UNIQUE ( categoryID, featureID )
 );
 
 -- The list of checks for members of a category
@@ -112,19 +149,21 @@ CREATE TABLE CategoryCheck	(
 -- The list of features required by a component
 --
 CREATE TABLE ComponentRequires	(
-	categoryID	INT	REFERENCES Category( ID ),
+	componentID	INT	REFERENCES Component( ID ),
 	featureID	INT	REFERENCES Feature( ID ),
 	minQuantity	INT,
-	maxQuantity	INT
+	maxQuantity	INT,
+	UNIQUE ( componentID, featureID )
 );
 
 -- The list of features provided by a component
 --
 CREATE TABLE ComponentProvides	(
-	categoryID	INT	REFERENCES Category( ID ),
+	componentID	INT	REFERENCES Component( ID ),
 	featureID	INT	REFERENCES Feature( ID ),
 	minQuantity	INT,
-	maxQuantity	INT
+	maxQuantity	INT,
+	UNIQUE ( componentID, featureID )
 );
 
 -- The list of checks for a component
@@ -148,7 +187,8 @@ CREATE TABLE Receipe	(
 
 CREATE TABLE RecipePicture	(
 	receipeID	INT	REFERENCES Receipe( ID ),
-	pictureID	INT	REFERENCES Picture( ID )
+	pictureID	INT	REFERENCES Picture( ID ),
+	UNIQUE ( receipeID, pictureID )
 );
 
 CREATE TABLE ReceipeContent	(
@@ -156,7 +196,8 @@ CREATE TABLE ReceipeContent	(
 	categoryID	INT	REFERENCES Category( ID ),
 	minQuantity	INT,
 	maxQuantity	INT,
-	comment		TEXT
+	comment		TEXT,
+	UNIQUE ( receipeID, categoryID )
 );
 
 
@@ -173,12 +214,14 @@ CREATE TABLE Configuration	(
 CREATE TABLE ConfigComponent	(
 	configID	INT	REFERENCES Configuration( ID ),
 	componentID	INT	REFERENCES Component( ID ),
-	quantity	INT
+	quantity	INT,
+	UNIQUE ( configID, componentID )
 );
 
 CREATE TABLE ComposedConfig	(
 	configID	INT	REFERENCES Configuration( ID ),
 	subConfigID	INT	REFERENCES Configuration( ID ),
-	quantity	INT
+	quantity	INT,
+	UNIQUE ( configID, subConfigID )
 );
 

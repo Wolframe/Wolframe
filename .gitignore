@@ -146,6 +146,7 @@ tests/unitLibraryTest
 *.qm
 sqlite3/sqlite3
 tests/boost-locale/boostLocaleTest
+tests/testArrayDoublingAllocator
 clients/qt/Makefile
 clients/qt/data.db
 geany.c++.tags
