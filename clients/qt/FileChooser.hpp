@@ -8,8 +8,11 @@
 #include <QObject>
 #include <QWidget>
 #include <QString>
+#include <QStringList>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QComboBox>
+#include <QStackedWidget>
 
 #include <QDesignerExportWidget>
 
@@ -17,40 +20,42 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 {
 	Q_OBJECT
 	Q_ENUMS( SelectionMode )
-	Q_PROPERTY( bool multipleSelection READ multipleSelection WRITE setMultipleSelection )
-	Q_PROPERTY( QString fileName READ fileName WRITE setFileName )
 	Q_PROPERTY( SelectionMode selectionMode READ selectionMode WRITE setSelectionMode )
 		
 	public:
 		enum SelectionMode {
 			SelectExistingFile,
+			SelectExistingFiles,
 			SelectExistingDir
 		};
 		
-		FileChooser( SelectionMode _selectionMode, bool _multipleSelection, QWidget *_parent = 0 );
+		FileChooser( SelectionMode _selectionMode, QWidget *_parent = 0 );
 		
-		bool multipleSelection( ) const;
 		QString fileName( ) const;
+		QStringList fileNames( ) const;
 		SelectionMode selectionMode( ) const;
 
 	signals:
 		void fileNameChanged( const QString _fileName );
+		void fileNamesChanged( const QStringList _fileNames );
 		
 	public slots:
-		void setMultipleSelection( const bool _multipleSelection );
 		void setFileName( const QString &_filename );
+		void setFileNames( const QStringList &_filenames );
 		void setSelectionMode( const SelectionMode _mode );
 	
 	private:
 		void initialize( );
+		void switchStack( );
 		
 	private slots:
 		void chooseFile( );
 		
 	private:
 		SelectionMode m_selectionMode;
-		bool m_multipleSelection;
+		QStackedWidget *m_stackedWidget;
 		QLineEdit *m_lineEdit;
+		QComboBox *m_comboBox;
 		QPushButton *m_button;	
 };
 
