@@ -17,6 +17,7 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 {
 	Q_OBJECT
 	Q_ENUMS( SelectionMode )
+	Q_PROPERTY( bool multipleSelection READ multipleSelection WRITE setMultipleSelection )
 	Q_PROPERTY( QString fileName READ fileName WRITE setFileName )
 	Q_PROPERTY( SelectionMode selectionMode READ selectionMode WRITE setSelectionMode )
 		
@@ -26,8 +27,9 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 			SelectExistingDir
 		};
 		
-		FileChooser( SelectionMode _selectionMode, QWidget *_parent = 0 );
+		FileChooser( SelectionMode _selectionMode, bool _multipleSelection, QWidget *_parent = 0 );
 		
+		bool multipleSelection( ) const;
 		QString fileName( ) const;
 		SelectionMode selectionMode( ) const;
 
@@ -35,6 +37,7 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 		void fileNameChanged( const QString _fileName );
 		
 	public slots:
+		void setMultipleSelection( const bool _multipleSelection );
 		void setFileName( const QString &_filename );
 		void setSelectionMode( const SelectionMode _mode );
 	
@@ -46,6 +49,7 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 		
 	private:
 		SelectionMode m_selectionMode;
+		bool m_multipleSelection;
 		QLineEdit *m_lineEdit;
 		QPushButton *m_button;	
 };

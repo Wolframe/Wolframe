@@ -283,7 +283,7 @@ void MainWindow::initialize( )
 // a Qt UI loader for the main theme window and also used by all form widgets
 	m_uiLoader = new QUiLoader( );
 	m_uiLoader->setLanguageChangeEnabled( true );
-//	m_uiLoader->addPluginPath( "plugins" );
+	m_uiLoader->addPluginPath( "plugins" );
 	m_uiLoader->addPluginPath( "." );
 	QStringList paths = m_uiLoader->pluginPaths( );
 	qDebug( ) << "Will load custom widget plugins from" << paths;

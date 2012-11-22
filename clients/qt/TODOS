@@ -8,7 +8,6 @@ unsorted:
   ERROR: answer for unknown request of doctype "CategoryHierarchyRequest" true 
   handle result of command "QUIT" 
 - initial look and feel, theme (windows 7, menu on right, why?) => test again
-- On expection in main, remove pidfile
 - new picture picker
   - upload a set of images, keep them on the server
     - file picker need multiple selection property

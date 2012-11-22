@@ -7,8 +7,8 @@
 #include <QHBoxLayout>
 #include <QFileDialog>
 
-FileChooser::FileChooser( SelectionMode _selectionMode, QWidget *_parent )
-	: QWidget( _parent ), m_selectionMode( _selectionMode ),
+FileChooser::FileChooser( SelectionMode _selectionMode, bool _multipleSelection, QWidget *_parent )
+	: QWidget( _parent ), m_selectionMode( _selectionMode ), m_multipleSelection( _multipleSelection ),
 	  m_lineEdit( 0 ), m_button( 0 )
 {
 	initialize( );
@@ -51,6 +51,16 @@ void FileChooser::setSelectionMode( const FileChooser::SelectionMode _mode )
 FileChooser::SelectionMode FileChooser::selectionMode( ) const
 {
 	return m_selectionMode;
+}
+
+void FileChooser::setMultipleSelection( const bool _multipleSelection )
+{
+	m_multipleSelection = _multipleSelection;
+}
+
+bool FileChooser::multipleSelection( ) const
+{
+	return m_multipleSelection;
 }
 
 void FileChooser::chooseFile( )

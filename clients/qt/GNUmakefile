@@ -21,10 +21,12 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
 	-L$(QT_LIB_DIR) \
-	$(QT_LDFLAGS)
+	$(QT_LDFLAGS) \
+	-Lplugins
 
 INCLUDE_LIBS = \
-	-lQtCore -lQtGui -lQtUiTools -lQtNetwork -lQtXml -lQtSql
+	-lQtCore -lQtGui -lQtUiTools -lQtNetwork -lQtXml -lQtSql \
+	-lwolframewidgets
 
 MOC_FLAGS = \
 	$(INCLUDE_DIRS)
@@ -74,10 +76,6 @@ CPP_OBJS = \
 	moc_Preferences.o \
 	PreferencesDialog.o \
 	moc_PreferencesDialog.o \
-	FileChooser.o \
-	moc_FileChooser.o \
-	PictureChooser.o \
-	moc_PictureChooser.o \
 	StorageWidget.o \
 	moc_StorageWidget.o \
 	ManageStorageDialog.o \
@@ -209,8 +207,7 @@ local_test:
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
-	@-cp plugins/libwolframewidgets.so .
-	@LD_LIBRARY_PATH=$(QT_LIB_DIR) ./qtclient
+	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient
 
 .PHONY: buildi18n
 buildi18n:

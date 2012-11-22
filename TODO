@@ -2,11 +2,15 @@ MBa:
 
 
 ABa:
+daemon code:
+- On expection in main, remove pidfile
 - qtclient cont.
-  - deployment is ZIP for client on Windows
 - configurator
   - caption + other info + file picker (image)
   - categories + features, trees with add/delete/edit
+  - file(s) upload
+  - image picker
+  - associatiting features and categories
 
 - makefiles
   - fix libchrono transitive dependency in boost in 1.50/1.51
