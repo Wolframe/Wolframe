@@ -1,4 +1,5 @@
 show stoppers:
+- associate features and categories
 
 unsorted:
 - OK: answer in network data loader, params: ("REQUEST", "CategoryHierarchyRequest") 
@@ -9,7 +10,8 @@ unsorted:
 - initial look and feel, theme (windows 7, menu on right, why?) => test again
 - On expection in main, remove pidfile
 - new picture picker
-  - upload a directory of images, keep them on the server
+  - upload a set of images, keep them on the server
+    - file picker need multiple selection property
   - use them from a picklist (with images)
   
 musts:
