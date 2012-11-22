@@ -184,16 +184,20 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 			xml.writeEndElement( );
 		} else if( clazz == "FileChooser" ) {
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-			QString fileName = fileChooser->fileName( );
+			QStringList fileNames = fileChooser->fileNames( );
 			xml.writeStartElement( name );
-			xml.writeAttribute( "filename", fileName );
-			QFile file( fileName );
-			file.open( QFile::ReadOnly );
-			QByteArray fileContent = file.readAll( );
-			xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
-			QString encoded = QString( fileContent.toBase64( ) );
-			file.close( );	
-			xml.writeCharacters( encoded );
+			foreach( QString fileName, fileNames ) {			
+				xml.writeStartElement( "file" );
+				xml.writeAttribute( "filename", fileName );
+				QFile file( fileName );
+				file.open( QFile::ReadOnly );
+				QByteArray fileContent = file.readAll( );
+				xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
+				QString encoded = QString( fileContent.toBase64( ) );
+				file.close( );	
+				xml.writeCharacters( encoded );
+				xml.writeEndElement( );
+			}
 			xml.writeEndElement( );
 		} else if( clazz == "PictureChooser" ) {
 			PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );

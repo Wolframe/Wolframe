@@ -71,7 +71,7 @@ QString FileChooserPlugin::whatsThis( ) const
 QWidget *FileChooserPlugin::createWidget( QWidget *_parent )
 {
 	// is overridden by property
-	return new FileChooser( FileChooser::SelectExistingFile, false, _parent );
+	return new FileChooser( FileChooser::SelectExistingFile, _parent );
 }
 
 void FileChooserPlugin::initialize( QDesignerFormEditorInterface* /* core */ )

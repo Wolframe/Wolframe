@@ -33,7 +33,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -82,6 +82,9 @@
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label_fileUpload">
         <property name="text">
@@ -90,11 +93,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="FileChooser" name="file">
-        <property name="multipleSelection">
-         <bool>false</bool>
-        </property>
-       </widget>
+       <widget class="FileChooser" name="file"/>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_files">
@@ -105,8 +104,22 @@
       </item>
       <item row="1" column="1">
        <widget class="FileChooser" name="files">
-        <property name="multipleSelection">
-         <bool>true</bool>
+        <property name="selectionMode">
+         <enum>FileChooser::SelectExistingFiles</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_directory">
+        <property name="text">
+         <string>Select a directory:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="FileChooser" name="directory">
+        <property name="selectionMode">
+         <enum>FileChooser::SelectExistingDir</enum>
         </property>
        </widget>
       </item>

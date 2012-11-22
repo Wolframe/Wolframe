@@ -25,7 +25,8 @@ void PictureChooser::initialize( )
 	m_label->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 	l->addWidget( m_label );
 
-	m_fileChooser = new FileChooser( FileChooser::SelectExistingFile, false, this );
+	m_fileChooser = new FileChooser( FileChooser::SelectExistingFile, this );
+	m_fileChooser->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
 	l->addWidget( m_fileChooser );
         	
 	connect( m_fileChooser, SIGNAL( fileNameChanged( QString ) ),
