@@ -99,26 +99,28 @@ QString FileChooser::fileName( ) const
 		case SelectExistingFiles:
 			return m_comboBox->itemText( m_comboBox->currentIndex( ) );
 	}
+
+	return QString( );
 }
 
 QStringList FileChooser::fileNames( ) const
 {
-	QStringList l;
+	QStringList files;
 	
 	switch( m_selectionMode ) {
 		case SelectExistingFile:
 		case SelectExistingDir:
-			l << m_lineEdit->text( );
+			files << m_lineEdit->text( );
 			break;
 			
 		case SelectExistingFiles:
 			for( int i = 0; i < m_comboBox->count( ); i++ ) {
-				l << m_comboBox->itemText( i );
+				files << m_comboBox->itemText( i );
 			}
 			break;
 	}
 	
-	return l;
+	return files;
 }
 
 void FileChooser::setSelectionMode( const FileChooser::SelectionMode _mode )
