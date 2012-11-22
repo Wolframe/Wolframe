@@ -1,7 +1,4 @@
 #include <QApplication>
-#ifdef _WIN32
-#include <QWindowsStyle>
-#endif
 
 #include "global.hpp"
 #include "MainWindow.hpp"
@@ -14,12 +11,11 @@ int main( int argc, char* argv[] ) {
 
 	int code;
 	do {
+#ifdef _WIN32
+		QApplication::setStyle( "windowsxp" );
+#endif
 		QApplication app( argc, argv );
 		MainWindow mainWindow;
-
-#ifdef _WIN32
-	app.setStyle( new QWindowsStyle( ) );
-#endif
 		
 #ifdef Q_OS_ANDROID
 		mainWindow.setOrientation( MainWindow::ScreenOrientationAuto );
