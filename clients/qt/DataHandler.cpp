@@ -158,12 +158,13 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 			QList<QTreeWidgetItem *> items = treeWidget->selectedItems( );
 			foreach( QTreeWidgetItem *item, items ) {
 				// hard-coded! should be key/value as user attributes!
+				xml.writeStartElement( "", name );
 				QString id = item->data( 0, Qt::UserRole ).toString( );
 				if( !id.isNull( ) ) {
 					xml.writeAttribute( "id", id );
 				}
-//				xml.writeAttribute( key, props->value( key ) );
-				xml.writeTextElement( "", name, item->data( 0, Qt::DisplayRole ).toString( ) );
+				xml.writeCharacters( item->data( 0, Qt::DisplayRole ).toString( ) );
+				xml.writeEndElement( );
 			}
 		} else if( clazz == "QGroupBox" ) {
 			QGroupBox *groupBox = qobject_cast<QGroupBox *>( widget );
