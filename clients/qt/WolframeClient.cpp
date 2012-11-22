@@ -8,7 +8,7 @@
 #include <QTcpSocket>
 #include <QFile>
 #include <QList>
-
+#include <QTimer>
 
 WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secure, bool _checkSSL, QString _clientCertFile, QString _clientKeyFile, QString _CACertfile, QWidget *_parent ) :
 	m_host( _host ),
@@ -33,6 +33,10 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secur
 #else
 	m_socket = new QTcpSocket( this );
 #endif
+	m_timeoutTimer = new QTimer( this );
+	
+	QObject::connect( m_timeoutTimer, SIGNAL( timeout( ) ),
+		this, SLOT( timeoutOccurred( ) ) );
 
 	QObject::connect( m_socket, SIGNAL( error( QAbstractSocket::SocketError ) ),
 		this, SLOT( error( QAbstractSocket::SocketError ) ) );
@@ -54,6 +58,15 @@ WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secur
 
 	QObject::connect( this, SIGNAL( resultReceived( ) ),
 		this, SLOT( handleResult( ) ) );
+}
+
+void WolframeClient::timeoutOccurred( )
+{
+	m_timeoutTimer->stop( );
+
+	if( m_socket->state( ) != QAbstractSocket::ConnectedState ) {
+		emit error( QAbstractSocket::SocketTimeoutError );
+	}
 }
 
 #ifdef WITH_SSL
@@ -146,6 +159,11 @@ void WolframeClient::connect( )
 			} else {
 				m_socket->connectToHost( m_host, m_port );
 			}
+			
+			if( m_timeout > 0 ) {
+				m_timeoutTimer->start( m_timeout );
+			}
+			
 			m_state = AboutToConnect;
 			break;
 
@@ -215,7 +233,8 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 // error during connection, usually server is not there, go back to disconnected state
 			m_socket->close( );
 			m_state = Disconnected;
-			emit error( m_socket->errorString( ) );
+			emit error( tr( "Timeout when connecting. Is the server up and running? (internal error: %1)" )
+				.arg( m_socket->errorString( ) ) );
 			break;
 
 		case Connected:

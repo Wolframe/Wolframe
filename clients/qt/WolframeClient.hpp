@@ -15,6 +15,7 @@
 #endif
 #include <QQueue>
 #include <QStringList>
+#include <QTimer>
 
 class WolframeClient : public QObject
 {
@@ -59,6 +60,7 @@ class WolframeClient : public QObject
 		QStringList m_params;
 		QString m_command;
 		QQueue<WolframeRequest> m_queue;	// queued commands
+		QTimer *m_timeoutTimer;
 
 	public:
 		WolframeClient( QString host = "localhost", unsigned short port = 7661,
@@ -105,6 +107,7 @@ class WolframeClient : public QObject
 #endif
 
 	private slots:
+		void timeoutOccurred( );
 		void error( QAbstractSocket::SocketError );
 #ifdef WITH_SSL
 		void initializeSsl( );
