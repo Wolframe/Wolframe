@@ -1,8 +1,4 @@
 - abort when in init.ui
-- global/qgloba.cpp, Line 2232
-- qt 4.8.1
-  ASSERT( d->inStartElement in file xml/qxmlstream.cpp, line 3409
-  writeattrbite without start tag
 - getting empty trees sometimes:
   <?xml version..
   
