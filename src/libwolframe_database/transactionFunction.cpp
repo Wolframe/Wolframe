@@ -517,7 +517,7 @@ TransactionFunctionInput::Structure::Node TransactionFunctionInput::Structure::r
 
 const std::pair<const char*,std::size_t> TransactionFunctionInput::Structure::nodevalue( const Node& nd) const
 {
-	std::pair<const char*,std::size_t> rt(0,0);
+	std::pair<const char*,std::size_t> rt((const char*)0,0);
 	std::size_t ii = 0, nn = nd.nofchild(), idx = nd.childidx();
 	if (nn)
 	{
