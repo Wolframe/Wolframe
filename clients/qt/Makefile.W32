@@ -93,8 +93,6 @@ OBJS = \
 	moc_StorageWidget.obj \
 	ManageStorageDialog.obj \
 	moc_ManageStorageDialog.obj
-#	FileChooser.obj \
-#	moc_FileChooser.obj \
 
 CPP_BINS = \
 	qtclient.exe
@@ -211,9 +209,6 @@ moc_Preferences.cpp: Preferences.hpp
 
 moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
-
-#moc_FileChooser.cpp: FileChooser.hpp
-#	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FileChooser.hpp -o moc_FileChooser.cpp
 
 moc_StorageWidget.cpp: StorageWidget.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. StorageWidget.hpp -o moc_StorageWidget.cpp

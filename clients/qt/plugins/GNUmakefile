@@ -38,16 +38,12 @@ CPP_OBJS = \
 	moc_WolframeWidgets.o \
 	../FileChooser.o \
 	../moc_FileChooser.o \
-	../PictureChooser.o \
-	../moc_PictureChooser.o \
 	filechooser/FileChooserPlugin.o \
 	filechooser/moc_FileChooserPlugin.o \
+	../PictureChooser.o \
+	../moc_PictureChooser.o \
 	picturechooser/PictureChooserPlugin.o \
-	picturechooser/moc_PictureChooserPlugin.o \
-	formwidget/FormWidgetPlugin.o \
-	formwidget/moc_FormWidgetPlugin.o \
-	../FormWidget.o \
-	../moc_FormWidget.o
+	picturechooser/moc_PictureChooserPlugin.o
 
 DYNAMIC_MODULE = libwolframewidgets.so
 
@@ -61,20 +57,17 @@ moc_WolframeWidgets.cpp: WolframeWidgets.hpp
 ../moc_FileChooser.cpp: ../FileChooser.hpp
 	$(QT_MOC) $(MOC_FLAGS) ../FileChooser.hpp -o ../moc_FileChooser.cpp
 
-../moc_PictureChooser.cpp: ../PictureChooser.hpp
-	$(QT_MOC) $(MOC_FLAGS) ../PictureChooser.hpp -o ../moc_PictureChooser.cpp
-
 filechooser/moc_FileChooserPlugin.cpp: filechooser/FileChooserPlugin.hpp
 	$(QT_MOC) $(MOC_FLAGS) filechooser/FileChooserPlugin.hpp -o filechooser/moc_FileChooserPlugin.cpp
+
+../moc_PictureChooser.cpp: ../PictureChooser.hpp
+	$(QT_MOC) $(MOC_FLAGS) ../PictureChooser.hpp -o ../moc_PictureChooser.cpp
 
 picturechooser/moc_PictureChooserPlugin.cpp: picturechooser/PictureChooserPlugin.hpp
 	$(QT_MOC) $(MOC_FLAGS) picturechooser/PictureChooserPlugin.hpp -o picturechooser/moc_PictureChooserPlugin.cpp
 
-formwidget/moc_FormWidgetPlugin.cpp: formwidget/FormWidgetPlugin.hpp
-	$(QT_MOC) $(MOC_FLAGS) formwidget/FormWidgetPlugin.hpp -o formwidget/moc_FormWidgetPlugin.cpp
-
 local_clean:
-	@-rm -f moc_*.cpp filechooser/moc_*.cpp formwidget/moc_*.cpp
+	@-rm -f moc_*.cpp filechooser/moc_*.cpp picturechooser/moc_*.cpp
 	@-rm -f Makefile
 
 local_distclean:

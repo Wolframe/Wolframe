@@ -31,7 +31,7 @@ QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
 INCLUDE_LDFLAGS = \
 	$(QT_LDFLAGS)
 
-# QtUiTools.lib, QtUiToolsd.lib
+# FormWidget will need: QtUiTools.lib, QtUiToolsd.lib
 !IFNDEF DEBUG
 INCLUDE_LIBS = \
 	QtCore4.lib QtGui4.lib QtDesigner4.lib
@@ -39,9 +39,6 @@ INCLUDE_LIBS = \
 INCLUDE_LIBS = \
 	QtCored4.lib QtGuid4.lib QtDesignerd4.lib
 !ENDIF
-
-#INCLUDE_LIBS = \
-#	$(INCLUDE_LIBS) ..\FileChooser.obj ..\moc_FileChooser.obj
 
 MOC_FLAGS =
 
@@ -56,13 +53,6 @@ CPP_OBJS = \
 	..\moc_PictureChooser.obj \
 	picturechooser\PictureChooserPlugin.obj \
 	picturechooser\moc_PictureChooserPlugin.obj
-
-#	formwidget\FormWidgetPlugin.obj \
-#	formwidget\moc_FormWidgetPlugin.obj \
-#	..\FormWidget.obj \
-#	moc_FormWidget.obj \
-#	..\DataHandler.obj \
-#	moc_DataHandler.obj \
 
 DYNAMIC_MODULE = \
 	wolframewidgets.dll
@@ -88,20 +78,11 @@ filechooser\moc_FileChooserPlugin.cpp: filechooser\FileChooserPlugin.hpp
 picturechooser\moc_PictureChooserPlugin.cpp: picturechooser\PictureChooserPlugin.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Iicturechooser -I"$(QT_DIR)\include\QtDesigner" picturechooser\PictureChooserPlugin.hpp -o picturechooser\moc_PictureChooserPlugin.cpp
 
-formwidget\moc_FormWidgetPlugin.cpp: formwidget\FormWidgetPlugin.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Iformwidget -I"$(QT_DIR)\include\QtDesigner" formwidget\FormWidgetPlugin.hpp -o formwidget\moc_FormWidgetPlugin.cpp
-
-moc_FormWidget.cpp: ..\FormWidget.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\FormWidget.hpp -o moc_FormWidget.cpp
-
-moc_DataHandler.cpp: ..\DataHandler.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. -Ifilechooser ..\DataHandler.hpp -o moc_DataHandler.cpp
-
 $(DYNAMIC_MODULE): $(CPP_OBJS)
 	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $(CPP_OBJS)
 
 local_clean:
-	@-erase moc_*.cpp filechooser\moc_*.cpp formwidget\moc_*.cpp 2>NUL
+	@-erase moc_*.cpp filechooser\moc_*.cpp picturechooser\moc_*.cpp 2>NUL
 	@-erase Makefile Makefile.Release Makefile.Debug 2>NUL
 	
 local_distclean:
