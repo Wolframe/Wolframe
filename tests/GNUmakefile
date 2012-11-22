@@ -143,6 +143,7 @@ TEST_CPP_BINS = \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
 	testWolfilter$(EXE) \
+	testArrayDoublingAllocator$(EXE) \
 	stringNormalizationTest$(EXE) \
 	unitLibraryTest$(EXE)
 
@@ -159,6 +160,7 @@ testProtocolLFdotEscaping$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwo
 configValueParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 configStructParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
+testArrayDoublingAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
 stringNormalizationTest$(EXE): $(TOPDIR)/src/libwolframe_functions/libwolframe_functions.a
 
 local_all:
@@ -213,6 +215,8 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./CRAMtest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./HMACtest
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testArrayDoublingAllocator
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./protocolArgumentParsing
 	@echo

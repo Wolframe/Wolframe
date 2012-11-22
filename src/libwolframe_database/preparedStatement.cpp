@@ -40,14 +40,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-static int nofArguments( const TransactionInput::cmd_iterator& cmditr)
-{
-	int argidx;
-	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
-	for (argidx=1; ai != ae; ++ai,++argidx);
-	return argidx;
-}
-
 static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr, bool nonempty, bool unique)
 {
 	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
@@ -195,7 +187,16 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 			{
 				output.addCommandResult( cmdres);
 			}
-			cmdres = TransactionOutput::CommandResultBuilder( &output, ci->functionidx(), ci->level());
+			switch (optype)
+			{
+				case DatabaseCall:
+					cmdres = TransactionOutput::CommandResultBuilder( &output, ci->functionidx(), ci->level());
+					break;
+				case PushArguments:
+					// ... push arguments makes the result ans the selection as arguments visible for one level higher (level + 1)
+					cmdres = TransactionOutput::CommandResultBuilder( &output, ci->functionidx(), ci->level()+1);
+					break;
+			}
 		}
 		TransactionInput::arg_iterator ai = ci->begin(), ae = ci->end();
 
@@ -223,7 +224,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 					{
 						//... no result, we have to jump over all function of the operation, not only the parameter passing
 						std::size_t level = ci->level();
-						for (++ci; ci != ce && (ci->level() > level || (ci->level() == level && ci->name().empty())); ++ci);
+						for (++ci; ci != ce && (ci->level() > level || (ci->level() == level && !ci->name().empty())); ++ci);
 						--ci;
 					}
 					break;

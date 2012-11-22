@@ -148,12 +148,13 @@ std::size_t ArrayDoublingAllocator::alloc( std::size_t nof)
 			if (m_pos + nof < m_pos) throw std::bad_alloc();
 			if (mm <= m_size) throw std::bad_alloc();
 		}
-		while (m_pos + nof < mm);
+		while (m_pos + nof > mm);
 
 		char* pp = (char*)std::realloc( m_ar, mm);
 		if (!pp) throw std::bad_alloc();
 		m_ar = pp;
 		std::memset( m_ar + m_size, 0, m_size * sizeof(char));
+		m_size = mm;
 	}
 	m_pos += nof;
 	return rt;
