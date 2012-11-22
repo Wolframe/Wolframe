@@ -1,14 +1,12 @@
+show stoppers:
+
 unsorted:
-forests, not trees
 - OK: answer in network data loader, params: ("REQUEST", "CategoryHierarchyRequest") 
   content:
   "<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE tree SYSTEM "CategoryHierarchy.simpleform"><tree><item id="1">     <category>Categorii</category>       <description>Categorii de obiecte din sistem</description></i" m></tree>
   ERROR: answer for unknown request of doctype "CategoryHierarchyRequest" true 
   handle result of command "QUIT" 
 - initial look and feel, theme (windows 7, menu on right, why?) => test again
-- fix error handling in protocol (now it gets stuck)
-- make sure preferences are always available, no matter how broken the
-  qtclient frontend is.
 - On expection in main, remove pidfile
 - new picture picker
   - upload a directory of images, keep them on the server

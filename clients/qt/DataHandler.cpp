@@ -356,12 +356,17 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 		}
 		QTreeWidgetItem *_parent = treeWidget->invisibleRootItem( );
 		QTreeWidgetItem *item = treeWidget->invisibleRootItem( );
+		bool first = true;
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
 			if( xml.isStartElement( ) ) {
 				if( xml.name( ) == "tree" ) {
 					_parent = item;
 				} else if( xml.name( ) == "item" ) {
+					if( first ) {
+						first = false;
+						continue;
+					}
 					item = new QTreeWidgetItem( _parent );
 // attributes like id are mapped to user data
 					QXmlStreamAttributes attributes = xml.attributes( );
