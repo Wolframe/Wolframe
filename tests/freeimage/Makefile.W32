@@ -1,0 +1,59 @@
+TOPDIR = ..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. \
+	/I$(TOPDIR)\gtest\include \
+	$(FREEIMAGE_INCLUDE_DIRS)
+
+# Note: libraries are picked automatically on Windows!
+INCLUDE_LDFLAGS = \
+	$(FREEIMAGE_LIB_DIRS)
+
+# Note: broken auto-linking in boost-locale!
+INCLUDE_LIBS = \
+	$(TOPDIR)\gtest\gtest-all.obj \
+	$(FREEIMAGE_LIBS)
+	
+TEST_CPP_BINS = \
+	freeimageTest.exe
+
+OBJS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+freeimageTest.exe: freeimageTest.obj
+
+local_all:
+
+local_clean:
+	@-erase test.bat 2>NUL
+
+local_distclean:
+
+	@-echo @echo off > test.bat
+!IFNDEF DEBUG
+	@-echo copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION).dll" . >> test.bat
+	@-echo copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION).dll" . >> test.bat
+!ELSE
+	@-echo copy "$(ICU_DIR)\bin\icuin$(ICU_LIB_VERSION)d.dll" . >> test.bat
+	@-echo copy "$(ICU_DIR)\bin\icuuc$(ICU_LIB_VERSION)d.dll" . >> test.bat
+!ENDIF
+
+
+local_test:
+	@-echo @echo off > test.bat
+!IFNDEF DEBUG
+	@-echo copy "$(FREEIMAGE_LIB_DIR)\freeimage.dll" . >> test.bat
+!ELSE
+	@-echo copy "$(FREEIMAGE_LIB_DIR)\freeimage.dll" . >> test.bat
+!ENDIF
+	@-echo freeimageTest >> test.bat
+	@-echo echo off >> test.bat
+	@-test.bat

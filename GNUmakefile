@@ -16,6 +16,10 @@ ifeq ($(WITH_LUA),1)
 SUBDIRS := lua $(SUBDIRS)
 endif
 
+ifeq ($(WITH_LOCAL_FREEIMAGE),1)
+SUBDIRS := freeimage $(SUBDIRS)
+endif
+
 ifeq ($(WITH_EXAMPLES),1)
 SUBDIRS += examples
 endif

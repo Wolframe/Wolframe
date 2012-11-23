@@ -204,6 +204,15 @@ ifeq ($(WITH_ICU),1)
 	@echo "ICU_LIB_DIRS: $(ICU_LIB_DIRS)"
 	@echo "ICU_LIBS: $(ICU_LIBS)"
 endif
+ifeq ($(WITH_FREEIMAGE),1)
+	@echo
+	@echo "building modules using FreeImage, for image manipulation"
+	@echo
+	@echo "FREEIMAGE_DIR: $(FREEIMAGE_DIR)"
+	@echo "FREEIMAGE_INCLUDE_DIRS: $(FREEIMAGE_INCLUDE_DIRS)"
+	@echo "FREEIMAGE_LIB_DIRS: $(FREEIMAGE_LIB_DIRS)"
+	@echo "FREEIMAGE_LIBS: $(FREEIMAGE_LIBS)"
+endif
 	@echo
 	@echo "Additional build options:"
 	@echo

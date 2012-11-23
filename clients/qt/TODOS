@@ -1,5 +1,6 @@
 show stoppers:
 - associate features and categories
+- picture handling
 
 unsorted:
 - OK: answer in network data loader, params: ("REQUEST", "CategoryHierarchyRequest") 
@@ -11,6 +12,15 @@ unsorted:
 - new picture picker
   - upload a set of images, keep them on the server
   - use them from a picklist (with images)
+- secure settings
+  - allow for separate ignorable things:
+    - self-signed certs
+    - validation of the host
+- root elemenent handling:
+ - hide
+ - when no selection, add element to root of tree
+   - needs default values when passing variables between forms:
+     {category.id:1}
   
 musts:
 - SSL: allow to ignore certain error, most prominent ones are
