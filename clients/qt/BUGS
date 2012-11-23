@@ -1,1 +1,3 @@
+ERROR: error calling function 'createCategory':[configurator]:24: error in function '<structure>:get()' (branched scope of iterator has not consumed all its input)
+
 
