@@ -57,23 +57,35 @@ PoolObject< sqlite3* >::PoolObject( ObjectPool< sqlite3* >& pool )
 namespace _Wolframe {
 namespace db {
 
-SQLiteDBunit::SQLiteDBunit(const std::string& id,
+SQLiteDBunit::SQLiteDBunit( const std::string& id,
 			    const std::string& filename, bool flag,
 			    unsigned short connections )
 	: m_ID( id ), m_filename( filename ), m_flag( flag )
 {
 	bool	checked = false;
+	int	dbFlags = SQLITE_OPEN_READWRITE;
+
+	if ( ! sqlite3_threadsafe() )	{
+		if ( connections != 1 )	{
+			LOG_WARNING << "SQLite database '" << id
+				    << "' has not been compiled without the SQLITE_THREADSAFE parameter."
+				    << " Using only 1 connection instead of " << connections << ".";
+			connections = 1;
+		}
+		else	{
+			dbFlags |= SQLITE_OPEN_NOMUTEX;
+//			dbFlags |= SQLITE_OPEN_FULLMUTEX;
+		}
+	}
 
 	for( int i = 0; i < connections; i++ ) {
 		sqlite3 *handle;
-		int res = sqlite3_open_v2( m_filename.c_str( ), &handle,
-					   SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX,
+		int res = sqlite3_open_v2( m_filename.c_str( ), &handle, dbFlags,
 #ifndef _WIN32
-					   "unix"
+					   "unix" );
 #else
-						NULL
+					   NULL );
 #endif
-					   );
 		if( res != SQLITE_OK )	{
 			MOD_LOG_ALERT << "Unable to open SQLite database '" << filename
 				      << "': " << sqlite3_errmsg( handle );
