@@ -2,7 +2,7 @@ TOPDIR = ..
 
 SUBDIRS =
 
-PACKAGE_NAME = FreeImage
+PACKAGE_NAME = wolframe
 PACKAGE_VERSION = 3.15.4
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk

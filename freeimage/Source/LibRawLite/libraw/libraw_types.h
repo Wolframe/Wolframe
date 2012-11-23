@@ -63,7 +63,9 @@ extern "C" {
 #elif defined(USE_LCMS2)
 #include <lcms2.h>
 #else
+#ifndef NO_LCMS
 #define NO_LCMS
+#endif
 #endif
 
 #include "libraw_const.h"

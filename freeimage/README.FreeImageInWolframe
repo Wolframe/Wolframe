@@ -7,6 +7,15 @@ local changes and fixes:
 - Source/OpenEXR/IlmImf/ImfAutoArray.h:
   added include for <string.h> for memset
 - Windows
-  - 'Source/FreeImage.h': added BUILD_SHARED wrapper to switch
-    /DFREEIMAGE_LIB for symbol tagging (so we can build static
+  - 'Source/librawlite/libraw/libraw_types.h': added a guard
+    against redefinition of NO_LCMS:
+    #ifndef NO_LCMS
+    #define NO_LCMS
+    #endif
+  - the Wolframe way of building libraries is to build dll
+    when BUILD_SHARED is defined, so the DLL visibility has
+    to be switched in 'Source/FreeImage.h': 
+    added BUILD_SHARED wrapper to define the macro
+    FREEIMAGE_LIB for symbol tagging (so we can build static
     and dynamic libraries in the same directory)
+    

@@ -104,6 +104,7 @@
 %define with_libxml2	1
 %define with_libxslt	1
 %define with_libhpdf	1
+%define with_freeimage	1
 %define with_examples	1
 
 # Qt is far too old on some platforms, we also don't want to build a local
@@ -315,6 +316,12 @@ BuildRequires: doxygen
 %define with_local_libhpdf 0
 %if %{with_libhpdf}
 %define with_local_libhpdf 1
+%endif
+
+# FreeImage, build or use local
+%define with_local_freeimage 0
+%if %{with_freeimage}
+%define with_local_freeimage 1
 %endif
 
 # postgres database module
@@ -613,6 +620,11 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
+%if %{with_local_freeimage}
+	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%else
+	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
+%endif
 	sysconfdir=/etc libdir=%{_libdir}
 
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
@@ -636,6 +648,11 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
+%if %{with_local_freeimage}
+	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%else
+	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
+%endif
 	sysconfdir=/etc libdir=%{_libdir}
 
 LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
@@ -660,6 +677,11 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
+%if %{with_local_freeimage}
+	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%else
+	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
+%endif
 	sysconfdir=/etc libdir=%{_libdir}
 
 cd docs; make doc-doxygen
@@ -691,6 +713,11 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_LIBXSLT=%{with_libxslt} \
 	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
+%if %{with_local_freeimage}
+	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%else
+	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
+%endif
 	sysconfdir=/etc libdir=%{_libdir}
 
 cd docs && make DESTDIR=$RPM_BUILD_ROOT install && cd ..
@@ -789,6 +816,11 @@ fi
 %{_libdir}/wolframe/liblua.so.5
 %endif
 
+%if %{with_local_freeimage}
+%{_libdir}/wolframe/libfreeimage.so.3.15.4
+%{_libdir}/wolframe/libfreeimage.so.3
+%endif
+
 %dir %{_libdir}/wolframe/modules
 
 %{_libdir}/wolframe/modules/mod_audit_textfile.so
@@ -858,6 +890,10 @@ fi
 %{_libdir}/wolframe/libhpdf.a
 %dir %{_includedir}/wolframe/libhpdf
 %{_includedir}/wolframe/libhpdf/*.h
+%endif
+%if %{with_local_freeimage}
+%{_libdir}/wolframe/libfreeimage.so
+%{_libdir}/wolframe/libfreeimage.a
 %endif
 %dir %{_includedir}/wolframe
 %{_includedir}/wolframe/*.hpp
@@ -960,6 +996,7 @@ fi
 %{_libdir}/wolframe/libhpdf.so.2.2.1
 %{_libdir}/wolframe/libhpdf.so.2
 %endif
+
 %endif
 
 %files client

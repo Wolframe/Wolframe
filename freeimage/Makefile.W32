@@ -4,9 +4,17 @@ SUBDIRS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
+# TODO: don't suppress warnings and report errors upstream,
+# try to fix, but there are many!
+# C4244: OpenEX/ImfConvert.cpp: half.h, conversions
+# C4722: IlmThread.cpp
+# C4305, C4804, C4309, C4146: libRawLite
 INCLUDE_CFLAGS = \
 	/D_WIN32_WINNT=0x504 \
-	/DNO_LCMS
+	/DBUILDING_FREEIMAGE_LIB /DFREEIMAGE_EXPORTS \
+	/DOPJ_STATIC /DLIBRAW_NODLL \
+	/DNO_LCMS /DWIN32 /wd4244 /wd4722 /wd4305 /wd4804 /wd4309 \
+	/wd4146
 
 INCLUDE_CXXFLAGS = \
 	$(INCLUDE_CFLAGS)
@@ -23,9 +31,6 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
-
-DYNAMIC_OBJS = \
-	xxx.dllobj
 
 OBJS = \
 	Source\FreeImage\BitmapAccess.obj \
@@ -330,11 +335,314 @@ OBJS = \
 	Source\LibOpenJPEG\thix_manager.obj \
 	Source\LibOpenJPEG\tpix_manager.obj
 
+DYNAMIC_OBJS = \
+	Source\FreeImage\BitmapAccess.dllobj \
+	Source\FreeImage\ColorLookup.dllobj \
+	Source\FreeImage\FreeImage.dllobj \
+	Source\FreeImage\FreeImageIO.dllobj \
+	Source\FreeImage\GetType.dllobj \
+	Source\FreeImage\MemoryIO.dllobj \
+	Source\FreeImage\PixelAccess.dllobj \
+	Source\FreeImage\J2KHelper.dllobj \
+	Source\FreeImage\MNGHelper.dllobj \
+	Source\FreeImage\Plugin.dllobj \
+	Source\FreeImage\PluginBMP.dllobj \
+	Source\FreeImage\PluginCUT.dllobj \
+	Source\FreeImage\PluginDDS.dllobj \
+	Source\FreeImage\PluginEXR.dllobj \
+	Source\FreeImage\PluginG3.dllobj \
+	Source\FreeImage\PluginGIF.dllobj \
+	Source\FreeImage\PluginHDR.dllobj \
+	Source\FreeImage\PluginICO.dllobj \
+	Source\FreeImage\PluginIFF.dllobj \
+	Source\FreeImage\PluginJ2K.dllobj \
+	Source\FreeImage\PluginJNG.dllobj \
+	Source\FreeImage\PluginJP2.dllobj \
+	Source\FreeImage\PluginJPEG.dllobj \
+	Source\FreeImage\PluginKOALA.dllobj \
+	Source\FreeImage\PluginMNG.dllobj \
+	Source\FreeImage\PluginPCD.dllobj \
+	Source\FreeImage\PluginPCX.dllobj \
+	Source\FreeImage\PluginPFM.dllobj \
+	Source\FreeImage\PluginPICT.dllobj \
+	Source\FreeImage\PluginPNG.dllobj \
+	Source\FreeImage\PluginPNM.dllobj \
+	Source\FreeImage\PluginPSD.dllobj \
+	Source\FreeImage\PluginRAS.dllobj \
+	Source\FreeImage\PluginRAW.dllobj \
+	Source\FreeImage\PluginSGI.dllobj \
+	Source\FreeImage\PluginTARGA.dllobj \
+	Source\FreeImage\PluginTIFF.dllobj \
+	Source\FreeImage\PluginWBMP.dllobj \
+	Source\FreeImage\PluginXBM.dllobj \
+	Source\FreeImage\PluginXPM.dllobj \
+	Source\FreeImage\PSDParser.dllobj \
+	Source\FreeImage\TIFFLogLuv.dllobj \
+	Source\FreeImage\Conversion.dllobj \
+	Source\FreeImage\Conversion16_555.dllobj \
+	Source\FreeImage\Conversion16_565.dllobj \
+	Source\FreeImage\Conversion24.dllobj \
+	Source\FreeImage\Conversion32.dllobj \
+	Source\FreeImage\Conversion4.dllobj \
+	Source\FreeImage\Conversion8.dllobj \
+	Source\FreeImage\ConversionFloat.dllobj \
+	Source\FreeImage\ConversionRGB16.dllobj \
+	Source\FreeImage\ConversionRGBF.dllobj \
+	Source\FreeImage\ConversionType.dllobj \
+	Source\FreeImage\ConversionUINT16.dllobj \
+	Source\FreeImage\Halftoning.dllobj \
+	Source\FreeImage\tmoColorConvert.dllobj \
+	Source\FreeImage\tmoDrago03.dllobj \
+	Source\FreeImage\tmoFattal02.dllobj \
+	Source\FreeImage\tmoReinhard05.dllobj \
+	Source\FreeImage\ToneMapping.dllobj \
+	Source\FreeImage\NNQuantizer.dllobj \
+	Source\FreeImage\WuQuantizer.dllobj \
+	Source\DeprecationManager\Deprecated.dllobj \
+	Source\DeprecationManager\DeprecationMgr.dllobj \
+	Source\FreeImage\CacheFile.dllobj \
+	Source\FreeImage\MultiPage.dllobj \
+	Source\FreeImage\ZLibInterface.dllobj \
+	Source\Metadata\Exif.dllobj \
+	Source\Metadata\FIRational.dllobj \
+	Source\Metadata\FreeImageTag.dllobj \
+	Source\Metadata\IPTC.dllobj \
+	Source\Metadata\TagConversion.dllobj \
+	Source\Metadata\TagLib.dllobj \
+	Source\Metadata\XTIFF.dllobj \
+	Source\FreeImageToolkit\Background.dllobj \
+	Source\FreeImageToolkit\BSplineRotate.dllobj \
+	Source\FreeImageToolkit\Channels.dllobj \
+	Source\FreeImageToolkit\ClassicRotate.dllobj \
+	Source\FreeImageToolkit\Colors.dllobj \
+	Source\FreeImageToolkit\CopyPaste.dllobj \
+	Source\FreeImageToolkit\Display.dllobj \
+	Source\FreeImageToolkit\Flip.dllobj \
+	Source\FreeImageToolkit\JPEGTransform.dllobj \
+	Source\FreeImageToolkit\MultigridPoissonSolver.dllobj \
+	Source\FreeImageToolkit\Rescale.dllobj \
+	Source\FreeImageToolkit\Resize.dllobj \
+	Source\OpenEXR\IlmImf\ImfAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfB44Compressor.dllobj \
+	Source\OpenEXR\IlmImf\ImfBoxAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfChannelList.dllobj \
+	Source\OpenEXR\IlmImf\ImfChannelListAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfChromaticities.dllobj \
+	Source\OpenEXR\IlmImf\ImfChromaticitiesAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfCompressionAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfCompressor.dllobj \
+	Source\OpenEXR\IlmImf\ImfConvert.dllobj \
+	Source\OpenEXR\IlmImf\ImfCRgbaFile.dllobj \
+	Source\OpenEXR\IlmImf\ImfDoubleAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfEnvmap.dllobj \
+	Source\OpenEXR\IlmImf\ImfEnvmapAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfFloatAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfFrameBuffer.dllobj \
+	Source\OpenEXR\IlmImf\ImfFramesPerSecond.dllobj \
+	Source\OpenEXR\IlmImf\ImfHeader.dllobj \
+	Source\OpenEXR\IlmImf\ImfHuf.dllobj \
+	Source\OpenEXR\IlmImf\ImfInputFile.dllobj \
+	Source\OpenEXR\IlmImf\ImfIntAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfIO.dllobj \
+	Source\OpenEXR\IlmImf\ImfKeyCode.dllobj \
+	Source\OpenEXR\IlmImf\ImfKeyCodeAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfLineOrderAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfLut.dllobj \
+	Source\OpenEXR\IlmImf\ImfMatrixAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfMisc.dllobj \
+	Source\OpenEXR\IlmImf\ImfOpaqueAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfOutputFile.dllobj \
+	Source\OpenEXR\IlmImf\ImfPizCompressor.dllobj \
+	Source\OpenEXR\IlmImf\ImfPreviewImage.dllobj \
+	Source\OpenEXR\IlmImf\ImfPreviewImageAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfPxr24Compressor.dllobj \
+	Source\OpenEXR\IlmImf\ImfRational.dllobj \
+	Source\OpenEXR\IlmImf\ImfRationalAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfRgbaFile.dllobj \
+	Source\OpenEXR\IlmImf\ImfRgbaYca.dllobj \
+	Source\OpenEXR\IlmImf\ImfRleCompressor.dllobj \
+	Source\OpenEXR\IlmImf\ImfScanLineInputFile.dllobj \
+	Source\OpenEXR\IlmImf\ImfStandardAttributes.dllobj \
+	Source\OpenEXR\IlmImf\ImfStdIO.dllobj \
+	Source\OpenEXR\IlmImf\ImfStringAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfStringVectorAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfTestFile.dllobj \
+	Source\OpenEXR\IlmImf\ImfThreading.dllobj \
+	Source\OpenEXR\IlmImf\ImfTileDescriptionAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfTiledInputFile.dllobj \
+	Source\OpenEXR\IlmImf\ImfTiledMisc.dllobj \
+	Source\OpenEXR\IlmImf\ImfTiledOutputFile.dllobj \
+	Source\OpenEXR\IlmImf\ImfTiledRgbaFile.dllobj \
+	Source\OpenEXR\IlmImf\ImfTileOffsets.dllobj \
+	Source\OpenEXR\IlmImf\ImfTimeCode.dllobj \
+	Source\OpenEXR\IlmImf\ImfTimeCodeAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfVecAttribute.dllobj \
+	Source\OpenEXR\IlmImf\ImfVersion.dllobj \
+	Source\OpenEXR\IlmImf\ImfWav.dllobj \
+	Source\OpenEXR\IlmImf\ImfZipCompressor.dllobj \
+	Source\OpenEXR\Imath\ImathBox.dllobj \
+	Source\OpenEXR\Imath\ImathColorAlgo.dllobj \
+	Source\OpenEXR\Imath\ImathFun.dllobj \
+	Source\OpenEXR\Imath\ImathMatrixAlgo.dllobj \
+	Source\OpenEXR\Imath\ImathRandom.dllobj \
+	Source\OpenEXR\Imath\ImathShear.dllobj \
+	Source\OpenEXR\Imath\ImathVec.dllobj \
+	Source\OpenEXR\Iex\IexBaseExc.dllobj \
+	Source\OpenEXR\Iex\IexThrowErrnoExc.dllobj \
+	Source\OpenEXR\Half\half.dllobj \
+	Source\OpenEXR\IlmThread\IlmThread.dllobj \
+	Source\OpenEXR\IlmThread\IlmThreadMutex.dllobj \
+	Source\OpenEXR\IlmThread\IlmThreadPool.dllobj \
+	Source\OpenEXR\IlmThread\IlmThreadSemaphore.dllobj \
+	Source\LibRawLite\internal\dcraw_common.dllobj \
+	Source\LibRawLite\internal\dcraw_fileio.dllobj \
+	Source\LibRawLite\internal\demosaic_packs.dllobj \
+	Source\LibRawLite\src\libraw_c_api.dllobj \
+	Source\LibRawLite\src\libraw_cxx.dllobj \
+	Source\LibRawLite\src\libraw_datastream.dllobj \
+	Source\FreeImage\FreeImageC.dllobj \
+	Source\LibJPEG\jaricom.dllobj \
+	Source\LibJPEG\jcapimin.dllobj \
+	Source\LibJPEG\jcapistd.dllobj \
+	Source\LibJPEG\jcarith.dllobj \
+	Source\LibJPEG\jccoefct.dllobj \
+	Source\LibJPEG\jccolor.dllobj \
+	Source\LibJPEG\jcdctmgr.dllobj \
+	Source\LibJPEG\jchuff.dllobj \
+	Source\LibJPEG\jcinit.dllobj \
+	Source\LibJPEG\jcmainct.dllobj \
+	Source\LibJPEG\jcmarker.dllobj \
+	Source\LibJPEG\jcmaster.dllobj \
+	Source\LibJPEG\jcomapi.dllobj \
+	Source\LibJPEG\jcparam.dllobj \
+	Source\LibJPEG\jcprepct.dllobj \
+	Source\LibJPEG\jcsample.dllobj \
+	Source\LibJPEG\jctrans.dllobj \
+	Source\LibJPEG\jdapimin.dllobj \
+	Source\LibJPEG\jdapistd.dllobj \
+	Source\LibJPEG\jdarith.dllobj \
+	Source\LibJPEG\jdatadst.dllobj \
+	Source\LibJPEG\jdatasrc.dllobj \
+	Source\LibJPEG\jdcoefct.dllobj \
+	Source\LibJPEG\jdcolor.dllobj \
+	Source\LibJPEG\jddctmgr.dllobj \
+	Source\LibJPEG\jdhuff.dllobj \
+	Source\LibJPEG\jdinput.dllobj \
+	Source\LibJPEG\jdmainct.dllobj \
+	Source\LibJPEG\jdmarker.dllobj \
+	Source\LibJPEG\jdmaster.dllobj \
+	Source\LibJPEG\jdmerge.dllobj \
+	Source\LibJPEG\jdpostct.dllobj \
+	Source\LibJPEG\jdsample.dllobj \
+	Source\LibJPEG\jdtrans.dllobj \
+	Source\LibJPEG\jerror.dllobj \
+	Source\LibJPEG\jfdctflt.dllobj \
+	Source\LibJPEG\jfdctfst.dllobj \
+	Source\LibJPEG\jfdctint.dllobj \
+	Source\LibJPEG\jidctflt.dllobj \
+	Source\LibJPEG\jidctfst.dllobj \
+	Source\LibJPEG\jidctint.dllobj \
+	Source\LibJPEG\jmemmgr.dllobj \
+	Source\LibJPEG\jmemnobs.dllobj \
+	Source\LibJPEG\jquant1.dllobj \
+	Source\LibJPEG\jquant2.dllobj \
+	Source\LibJPEG\jutils.dllobj \
+	Source\LibJPEG\transupp.dllobj \
+	Source\LibPNG\png.dllobj \
+	Source\LibPNG\pngerror.dllobj \
+	Source\LibPNG\pngget.dllobj \
+	Source\LibPNG\pngmem.dllobj \
+	Source\LibPNG\pngpread.dllobj \
+	Source\LibPNG\pngread.dllobj \
+	Source\LibPNG\pngrio.dllobj \
+	Source\LibPNG\pngrtran.dllobj \
+	Source\LibPNG\pngrutil.dllobj \
+	Source\LibPNG\pngset.dllobj \
+	Source\LibPNG\pngtrans.dllobj \
+	Source\LibPNG\pngwio.dllobj \
+	Source\LibPNG\pngwrite.dllobj \
+	Source\LibPNG\pngwtran.dllobj \
+	Source\LibPNG\pngwutil.dllobj \
+	Source\LibTIFF4\tif_aux.dllobj \
+	Source\LibTIFF4\tif_close.dllobj \
+	Source\LibTIFF4\tif_codec.dllobj \
+	Source\LibTIFF4\tif_color.dllobj \
+	Source\LibTIFF4\tif_compress.dllobj \
+	Source\LibTIFF4\tif_dir.dllobj \
+	Source\LibTIFF4\tif_dirinfo.dllobj \
+	Source\LibTIFF4\tif_dirread.dllobj \
+	Source\LibTIFF4\tif_dirwrite.dllobj \
+	Source\LibTIFF4\tif_dumpmode.dllobj \
+	Source\LibTIFF4\tif_error.dllobj \
+	Source\LibTIFF4\tif_extension.dllobj \
+	Source\LibTIFF4\tif_fax3.dllobj \
+	Source\LibTIFF4\tif_fax3sm.dllobj \
+	Source\LibTIFF4\tif_flush.dllobj \
+	Source\LibTIFF4\tif_getimage.dllobj \
+	Source\LibTIFF4\tif_jpeg.dllobj \
+	Source\LibTIFF4\tif_luv.dllobj \
+	Source\LibTIFF4\tif_lzma.dllobj \
+	Source\LibTIFF4\tif_lzw.dllobj \
+	Source\LibTIFF4\tif_next.dllobj \
+	Source\LibTIFF4\tif_ojpeg.dllobj \
+	Source\LibTIFF4\tif_open.dllobj \
+	Source\LibTIFF4\tif_packbits.dllobj \
+	Source\LibTIFF4\tif_pixarlog.dllobj \
+	Source\LibTIFF4\tif_predict.dllobj \
+	Source\LibTIFF4\tif_print.dllobj \
+	Source\LibTIFF4\tif_read.dllobj \
+	Source\LibTIFF4\tif_strip.dllobj \
+	Source\LibTIFF4\tif_swab.dllobj \
+	Source\LibTIFF4\tif_thunder.dllobj \
+	Source\LibTIFF4\tif_tile.dllobj \
+	Source\LibTIFF4\tif_version.dllobj \
+	Source\LibTIFF4\tif_warning.dllobj \
+	Source\LibTIFF4\tif_write.dllobj \
+	Source\LibTIFF4\tif_zip.dllobj \
+	Source\ZLib\adler32.dllobj \
+	Source\ZLib\compress.dllobj \
+	Source\ZLib\crc32.dllobj \
+	Source\ZLib\deflate.dllobj \
+	Source\ZLib\gzclose.dllobj \
+	Source\ZLib\gzlib.dllobj \
+	Source\ZLib\gzread.dllobj \
+	Source\ZLib\gzwrite.dllobj \
+	Source\ZLib\infback.dllobj \
+	Source\ZLib\inffast.dllobj \
+	Source\ZLib\inflate.dllobj \
+	Source\ZLib\inftrees.dllobj \
+	Source\ZLib\trees.dllobj \
+	Source\ZLib\uncompr.dllobj \
+	Source\ZLib\zutil.dllobj \
+	Source\LibOpenJPEG\bio.dllobj \
+	Source\LibOpenJPEG\cidx_manager.dllobj \
+	Source\LibOpenJPEG\cio.dllobj \
+	Source\LibOpenJPEG\dwt.dllobj \
+	Source\LibOpenJPEG\event.dllobj \
+	Source\LibOpenJPEG\image.dllobj \
+	Source\LibOpenJPEG\j2k.dllobj \
+	Source\LibOpenJPEG\j2k_lib.dllobj \
+	Source\LibOpenJPEG\jp2.dllobj \
+	Source\LibOpenJPEG\jpt.dllobj \
+	Source\LibOpenJPEG\mct.dllobj \
+	Source\LibOpenJPEG\mqc.dllobj \
+	Source\LibOpenJPEG\openjpeg.dllobj \
+	Source\LibOpenJPEG\phix_manager.dllobj \
+	Source\LibOpenJPEG\pi.dllobj \
+	Source\LibOpenJPEG\ppix_manager.dllobj \
+	Source\LibOpenJPEG\raw.dllobj \
+	Source\LibOpenJPEG\t1.dllobj \
+	Source\LibOpenJPEG\t2.dllobj \
+	Source\LibOpenJPEG\tcd.dllobj \
+	Source\LibOpenJPEG\tgt.dllobj \
+	Source\LibOpenJPEG\thix_manager.dllobj \
+	Source\LibOpenJPEG\tpix_manager.dllobj
+
 STATIC_LIB = \
 	freeimage_static.lib
 
 DYNAMIC_LIB = \
-	freeimage315.dll
+	freeimage3.dll
 
 LIBRARIES = \
 	$(STATIC_LIB) \
@@ -342,7 +650,7 @@ LIBRARIES = \
 		
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
-freeimage315.dll: $(DYNAMIC_OBJS)
+freeimage3.dll: $(DYNAMIC_OBJS)
 	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $?
 
 freeimage_static.lib: $(OBJS)

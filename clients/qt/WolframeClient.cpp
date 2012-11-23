@@ -74,10 +74,11 @@ void WolframeClient::initializeSsl( )
 {
 	if( m_initializedSsl ) return;
 
-	QList<QSslCertificate> certs;
+	QList<QSslCertificate> caCerts;
 // CA certificate to verify the client certificate
-	certs.append( getCertificate( m_CACertFile ) );
-	reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificates( certs );
+	QSslCertificate caCert = getCertificate( m_CACertFile );
+	caCerts.append( caCert );
+	reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificates( caCerts );
 // our local client certificate we present to the server
 	reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate(
 		getCertificate( m_clientCertFile ) );
@@ -110,24 +111,31 @@ QSslCertificate WolframeClient::getCertificate( QString filename )
 
 void WolframeClient::sslErrors( const QList<QSslError> &errors )
 {
-	m_hasErrors = true;
-	
 	if( m_checkSSL ) {
-		// ignore them, but warn user about errors
+
+// for all other errors warn user about it
 		foreach( const QSslError &e, errors ) {
+			if( e.error( ) == QSslError::SelfSignedCertificateInChain) continue;
+			if( e.error( ) == QSslError::HostNameMismatch) continue;
+			m_hasErrors = true;	
+			qDebug( ) << "SSL ERROR: " << e;
 			emit error( e.errorString( ) );
 		}
+// ignore them		
 		reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
 	} else {
+// ignore them silently
 		reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
 	}
 }
 
 void WolframeClient::peerVerifyError( const QSslError &e )
-{
-	m_hasErrors = true;
-	
+{	
 	if( m_checkSSL ) {
+		if( e.error( ) == QSslError::SelfSignedCertificateInChain ) return;
+		if( e.error( ) == QSslError::HostNameMismatch) return;
+		m_hasErrors = true;
+		qDebug( ) << "PEER VERIFY SSL ERROR: " << e;
 		emit error( e.errorString( ) );
 	}
 }
