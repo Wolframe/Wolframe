@@ -57,6 +57,11 @@ makefiles/nmake/top.mk
 .Attic/filter/tests/msxslt/testmsxslt.cpp
 .Attic/filter/tests/msxslt/test.xml
 .Attic/filter/xmllite_filter.hpp
+.Attic/functions/README
+.Attic/functions/strNormalization.cpp
+.Attic/functions/strNormalization.hpp
+.Attic/functions/strSimilarity.cpp
+.Attic/functions/strSimilarity.hpp
 .Attic/INSTALL.Unix
 .Attic/loadModule/cross.cpp
 .Attic/loadModule/fromPatrick/moduleLoader_dlfcn.cpp
@@ -1405,8 +1410,6 @@ include/UserInterface.hpp
 include/utils/doctype.hpp
 include/utils/getPassword.hpp
 include/utils/miscUtils.hpp
-include/utils/strNormalization.hpp
-include/utils/strSimilarity.hpp
 include/version.hpp
 INSTALL.Unix
 INSTALL.Windows
@@ -1637,11 +1640,6 @@ src/libwolframe_database/preparedStatement.cpp
 src/libwolframe_database/transactionFunction.cpp
 src/libwolframe_database/transactionOutput.cpp
 src/libwolframe_database/transactionProgram.cpp
-src/libwolframe_functions/GNUmakefile
-src/libwolframe_functions/Makefile.W32
-src/libwolframe_functions/README
-src/libwolframe_functions/strNormalization.cpp
-src/libwolframe_functions/strSimilarity.cpp
 src/libwolframe/getPassword.cpp
 src/libwolframe/globalRndGen.cpp
 src/libwolframe/GNUmakefile
@@ -2014,6 +2012,7 @@ tests/expect/testEcho.exp
 tests/expect/testPecho.exp
 tests/expect/wolframe.conf
 tests/freeimage/freeimageTest.cpp
+tests/freeimage/freeimageTestCpp.cpp
 tests/freeimage/GNUmakefile
 tests/freeimage/Makefile.W32
 tests/GNUmakefile
