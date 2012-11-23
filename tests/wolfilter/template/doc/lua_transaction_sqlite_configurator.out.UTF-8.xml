@@ -343,4 +343,86 @@
 	</item></tree>
 	<tree><item id="17">
 		<feature>Space</feature></item></tree>
+</item></tree><tree><item id="1">
+	<tag>_ROOT_</tag>
+	<description>Tags tree root</description>
+	<tree><item id="2">
+		<tag>Tag1</tag>
+		<tree><item id="3">
+			<tag>Tag1.1</tag></item></tree>
+		<tree><item id="4">
+			<tag>Tag1.2</tag></item></tree>
+		<tree><item id="5">
+			<tag>Tag1.3</tag></item></tree>
+		<tree><item id="6">
+			<tag>Tag1.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<tag>Tag2</tag>
+		<tree><item id="8">
+			<tag>Tag2.1</tag></item></tree>
+		<tree><item id="9">
+			<tag>Tag2.2</tag></item></tree>
+		<tree><item id="11">
+			<tag>Tag2.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<tag>Tag3</tag>
+		<tree><item id="13">
+			<tag>Tag3.1</tag></item></tree>
+		<tree><item id="14">
+			<tag>Tag3.2</tag></item></tree>
+		<tree><item id="15">
+			<tag>Tag3.3</tag></item></tree>
+		<tree><item id="16">
+			<tag>Tag3.4</tag></item></tree>
+	</item></tree>
+</item></tree><tree><item id="7">
+	<tag>Tag2</tag>
+	<tree><item id="9">
+		<tag>Tag2.2</tag></item></tree>
+	<tree><item id="8">
+		<tag>Tag2.1</tag></item></tree>
+	<tree><item id="11">
+		<tag>Tag2.4</tag></item></tree>
+</item></tree><tree><item id="1">
+	<tag>_ROOT_</tag>
+	<description>Tags tree root</description>
+	<tree><item id="2">
+		<tag>Tag1</tag>
+		<tree><item id="3">
+			<tag>Tag1.1</tag></item></tree>
+		<tree><item id="4">
+			<tag>Tag1.2</tag></item></tree>
+		<tree><item id="5">
+			<tag>Tag1.3</tag></item></tree>
+		<tree><item id="6">
+			<tag>Tag1.4x</tag></item></tree>
+		<tree><item id="19">
+			<tag>Tag1.5x</tag></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<tag>Tag2</tag>
+		<tree><item id="8">
+			<tag>Tag2.1</tag></item></tree>
+		<tree><item id="9">
+			<tag>Tag2.2</tag></item></tree>
+		<tree><item id="11">
+			<tag>Tag2.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<tag>Tag3</tag>
+		<tree><item id="13">
+			<tag>Tag3.1</tag></item></tree>
+		<tree><item id="14">
+			<tag>Tag3.2</tag></item></tree>
+		<tree><item id="15">
+			<tag>Tag3.3</tag></item></tree>
+		<tree><item id="16">
+			<tag>Tag3.4</tag></item></tree>
+		<tree><item id="17">
+			<tag>Tag3.5x</tag></item></tree>
+	</item></tree>
+	<tree><item id="18">
+		<tag>Tag5</tag></item></tree>
 </item></tree></result>

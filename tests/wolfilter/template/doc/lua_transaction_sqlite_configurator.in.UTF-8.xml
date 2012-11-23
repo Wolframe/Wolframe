@@ -125,4 +125,32 @@
 <createFeature><feature name="Space" parentID="1"/></createFeature>
 <createFeature><feature name="yellow" parentID="2"/></createFeature>
 <FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
+<pushTagHierarchy>
+	<node name="Tag1">
+		<node name="Tag1.1"/>
+		<node name="Tag1.2"/>
+		<node name="Tag1.3"/>
+		<node name="Tag1.4"/>
+	</node>
+	<node name="Tag2">
+		<node name="Tag2.1"/>
+		<node name="Tag2.2"/>
+		<node name="Tag2.3"/>
+		<node name="Tag2.4"/>
+	</node>
+	<node name="Tag3">
+		<node name="Tag3.1"/>
+		<node name="Tag3.2"/>
+		<node name="Tag3.3"/>
+		<node name="Tag3.4"/>
+	</node>
+</pushTagHierarchy>
+<deleteTag><tag id="10"/></deleteTag>
+<TagHierarchyRequest><tag id="1"/></TagHierarchyRequest>
+<TagHierarchyRequest><tag id="7"/></TagHierarchyRequest>
+<editTag><tag id="6" name="Tag1.4x"/></editTag>
+<createTag><tag name="Tag3.5x" parentID="12"/></createTag>
+<createTag><tag name="Tag5" parentID="1"/></createTag>
+<createTag><tag name="Tag1.5x" parentID="2"/></createTag>
+<TagHierarchyRequest><Tag id="1"/></TagHierarchyRequest>
 </test>

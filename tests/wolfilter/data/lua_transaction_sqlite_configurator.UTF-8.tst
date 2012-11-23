@@ -129,8 +129,36 @@
 <createFeature><feature name="Space" parentID="1"/></createFeature>
 <createFeature><feature name="yellow" parentID="2"/></createFeature>
 <FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
+<pushTagHierarchy>
+	<node name="Tag1">
+		<node name="Tag1.1"/>
+		<node name="Tag1.2"/>
+		<node name="Tag1.3"/>
+		<node name="Tag1.4"/>
+	</node>
+	<node name="Tag2">
+		<node name="Tag2.1"/>
+		<node name="Tag2.2"/>
+		<node name="Tag2.3"/>
+		<node name="Tag2.4"/>
+	</node>
+	<node name="Tag3">
+		<node name="Tag3.1"/>
+		<node name="Tag3.2"/>
+		<node name="Tag3.3"/>
+		<node name="Tag3.4"/>
+	</node>
+</pushTagHierarchy>
+<deleteTag><tag id="10"/></deleteTag>
+<TagHierarchyRequest><tag id="1"/></TagHierarchyRequest>
+<TagHierarchyRequest><tag id="7"/></TagHierarchyRequest>
+<editTag><tag id="6" name="Tag1.4x"/></editTag>
+<createTag><tag name="Tag3.5x" parentID="12"/></createTag>
+<createTag><tag name="Tag5" parentID="1"/></createTag>
+<createTag><tag name="Tag1.5x" parentID="2"/></createTag>
+<TagHierarchyRequest><Tag id="1"/></TagHierarchyRequest>
 </test>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
 **file:simpleform.normalize
 int=number:integer;
@@ -405,6 +433,27 @@ DOCTYPE "feature Feature"
 		}
 	}
 }
+**file:tag.simpleform
+DOCTYPE "tag Tag"
+{
+	tag
+	{
+		id @int
+		parentID @int
+		name string
+		description string
+		picture
+		{
+			id @int
+			caption string
+			info string
+			image string
+			thumbnail string
+			width int
+			height int
+		}
+	}
+}
 **file:DBPRG.tdl
 --
 -- addCategory
@@ -565,6 +614,79 @@ END
 TRANSACTION selectSubFeature -- (id)
 BEGIN
 	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+END
+--
+-- addTag
+--
+TRANSACTION addTag -- (parentID, name, normalizedName, description)
+BEGIN
+	DO NONEMPTY UNIQUE SELECT rgt FROM Tag WHERE ID = $(parentID);
+	DO UPDATE Tag SET rgt = rgt + 2 WHERE rgt >= $1;
+	DO UPDATE Tag SET lft = lft + 2 WHERE lft > $1;
+	DO INSERT INTO Tag (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
+	INTO . DO NONEMPTY UNIQUE SELECT ID from Tag WHERE normalizedName = $(normalizedName);
+END
+
+--
+-- deleteTag
+--
+TRANSACTION deleteTag -- (id)
+BEGIN
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Tag WHERE ID = $(id) AND ID != '1';
+	DO DELETE FROM Tag WHERE lft >= $1 AND lft <= $2;
+	DO UPDATE Tag SET lft = lft-$3 WHERE lft>$2;
+	DO UPDATE Tag SET rgt = rgt-$3 WHERE rgt>$2;
+END
+
+--
+-- updateTag
+--
+TRANSACTION updateTag -- (id, name, normalizedName, description)
+BEGIN
+	DO UPDATE Tag SET name = $(name),normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
+END
+
+--
+-- selectTag                 :Get the tag
+-- selectTagByName           :Get the tag by name
+-- selectTagByNormalizedName :Get the tag by name
+-- selectTagList             :Get a list of tags
+--
+TRANSACTION selectTag -- (id)
+BEGIN
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE ID = $(id);
+END
+
+-- This is not supposed to exist either
+TRANSACTION selectTagByName -- (name)
+BEGIN
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE name = $(name);
+END
+
+TRANSACTION selectTagByNormalizedName -- (normalizedName)
+BEGIN
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE normalizedName = $(normalizedName);
+END
+
+TRANSACTION selectTagSet -- (/tag/id)
+BEGIN
+	FOREACH /tag INTO Tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Tag WHERE ID = $(id);
+END
+
+--
+-- selectTopTag       :Get the parents of a tag
+--
+TRANSACTION selectTopTag -- (id)
+BEGIN
+	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+END
+
+--
+-- selectSubTag       :Get the sub tags
+--
+TRANSACTION selectSubTag -- (id)
+BEGIN
+	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 **outputfile:DBDUMP
 **file: transaction_sqlite_configurator.lua
@@ -889,26 +1011,38 @@ function run()
 			add_tree( "Category", scope(itr))
 		elseif (t == "pushFeatureHierarchy") then
 			add_tree( "Feature", scope(itr))
+		elseif (t == "pushTagHierarchy") then
+			add_tree( "Tag", scope(itr))
 		elseif (t == "CategoryHierarchyRequest") then
 			select_tree( "Category", "category", scope(itr))
 		elseif (t == "FeatureHierarchyRequest") then
 			select_tree( "Feature", "feature", scope(itr))
+		elseif (t == "TagHierarchyRequest") then
+			select_tree( "Tag", "tag", scope(itr))
 		elseif (t == "editCategory") then
 			edit_node( "Category", scope(itr))
 		elseif (t == "editFeature") then
 			edit_node( "Feature", scope(itr))
+		elseif (t == "editTag") then
+			edit_node( "Tag", scope(itr))
 		elseif (t == "deleteCategory") then
 			delete_node( "Category", scope(itr))
 		elseif (t == "deleteFeature") then
 			delete_node( "Feature", scope(itr))
+		elseif (t == "deleteTag") then
+			delete_node( "Tag", scope(itr))
 		elseif (t == "createCategory") then
 			create_node( "Category", scope(itr))
 		elseif (t == "createFeature") then
 			create_node( "Feature", scope(itr))
+		elseif (t == "createTag") then
+			create_node( "Tag", scope(itr))
 		elseif (t == "CategoryRequest") then
 			select_node( "Category", "category", scope(itr))
 		elseif (t == "FeatureRequest") then
 			select_node( "Feature", "feature", scope(itr))
+		elseif (t == "TagRequest") then
+			select_node( "Tag", "tag", scope(itr))
 		end
 	end
 	output:closetag()
@@ -1259,12 +1393,111 @@ end
 	</item></tree>
 	<tree><item id="17">
 		<feature>Space</feature></item></tree>
+</item></tree><tree><item id="1">
+	<tag>_ROOT_</tag>
+	<description>Tags tree root</description>
+	<tree><item id="2">
+		<tag>Tag1</tag>
+		<tree><item id="3">
+			<tag>Tag1.1</tag></item></tree>
+		<tree><item id="4">
+			<tag>Tag1.2</tag></item></tree>
+		<tree><item id="5">
+			<tag>Tag1.3</tag></item></tree>
+		<tree><item id="6">
+			<tag>Tag1.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<tag>Tag2</tag>
+		<tree><item id="8">
+			<tag>Tag2.1</tag></item></tree>
+		<tree><item id="9">
+			<tag>Tag2.2</tag></item></tree>
+		<tree><item id="11">
+			<tag>Tag2.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<tag>Tag3</tag>
+		<tree><item id="13">
+			<tag>Tag3.1</tag></item></tree>
+		<tree><item id="14">
+			<tag>Tag3.2</tag></item></tree>
+		<tree><item id="15">
+			<tag>Tag3.3</tag></item></tree>
+		<tree><item id="16">
+			<tag>Tag3.4</tag></item></tree>
+	</item></tree>
+</item></tree><tree><item id="7">
+	<tag>Tag2</tag>
+	<tree><item id="9">
+		<tag>Tag2.2</tag></item></tree>
+	<tree><item id="8">
+		<tag>Tag2.1</tag></item></tree>
+	<tree><item id="11">
+		<tag>Tag2.4</tag></item></tree>
+</item></tree><tree><item id="1">
+	<tag>_ROOT_</tag>
+	<description>Tags tree root</description>
+	<tree><item id="2">
+		<tag>Tag1</tag>
+		<tree><item id="3">
+			<tag>Tag1.1</tag></item></tree>
+		<tree><item id="4">
+			<tag>Tag1.2</tag></item></tree>
+		<tree><item id="5">
+			<tag>Tag1.3</tag></item></tree>
+		<tree><item id="6">
+			<tag>Tag1.4x</tag></item></tree>
+		<tree><item id="19">
+			<tag>Tag1.5x</tag></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<tag>Tag2</tag>
+		<tree><item id="8">
+			<tag>Tag2.1</tag></item></tree>
+		<tree><item id="9">
+			<tag>Tag2.2</tag></item></tree>
+		<tree><item id="11">
+			<tag>Tag2.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<tag>Tag3</tag>
+		<tree><item id="13">
+			<tag>Tag3.1</tag></item></tree>
+		<tree><item id="14">
+			<tag>Tag3.2</tag></item></tree>
+		<tree><item id="15">
+			<tag>Tag3.3</tag></item></tree>
+		<tree><item id="16">
+			<tag>Tag3.4</tag></item></tree>
+		<tree><item id="17">
+			<tag>Tag3.5x</tag></item></tree>
+	</item></tree>
+	<tree><item id="18">
+		<tag>Tag5</tag></item></tree>
 </item></tree></result>
 Tag:
-'1', NULL, '_ROOT_', '_ROOT_', 'Tags tree root', '1', '2'
+'1', NULL, '_ROOT_', '_ROOT_', 'Tags tree root', '1', '36'
+'2', '1', 'Tag1', 'tag1', NULL, '2', '13'
+'3', '2', 'Tag1.1', 'tag1.1', NULL, '3', '4'
+'4', '2', 'Tag1.2', 'tag1.2', NULL, '5', '6'
+'5', '2', 'Tag1.3', 'tag1.3', NULL, '7', '8'
+'6', '2', 'Tag1.4x', 'tag1.4x', NULL, '9', '10'
+'7', '1', 'Tag2', 'tag2', NULL, '14', '21'
+'8', '7', 'Tag2.1', 'tag2.1', NULL, '15', '16'
+'9', '7', 'Tag2.2', 'tag2.2', NULL, '17', '18'
+'11', '7', 'Tag2.4', 'tag2.4', NULL, '19', '20'
+'12', '1', 'Tag3', 'tag3', NULL, '22', '33'
+'13', '12', 'Tag3.1', 'tag3.1', NULL, '23', '24'
+'14', '12', 'Tag3.2', 'tag3.2', NULL, '25', '26'
+'15', '12', 'Tag3.3', 'tag3.3', NULL, '27', '28'
+'16', '12', 'Tag3.4', 'tag3.4', NULL, '29', '30'
+'17', '12', 'Tag3.5x', 'tag3.5x', NULL, '31', '32'
+'18', '1', 'Tag5', 'tag5', NULL, '34', '35'
+'19', '2', 'Tag1.5x', 'tag1.5x', NULL, '11', '12'
 
 sqlite_sequence:
-'Tag', '1'
+'Tag', '19'
 'Category', '53'
 'Feature', '18'
 'Picture', '2'
