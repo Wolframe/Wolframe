@@ -194,7 +194,7 @@
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
+</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption Z</caption><info>WNC info Z</info><image>WNC image Z</image><thumbnail>UUUUUUUUUUUUUUUU</thumbnail><width>123</width><height>27</height></picture></category><category id="54" parentID="46"><name>WNC child 3</name><normalizedName>wnc child 3</normalizedName><description></description><picture id="3"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail>TTTTTTTTTTTTTTTTTTTTT</thumbnail><width>13</width><height>56</height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
 	<category>_ROOT_</category>
 	<description>Categories tree root</description>
 	<tree><item id="2">
@@ -257,6 +257,8 @@
 				<category>WNC child 2</category></item></tree>
 			<tree><item id="52">
 				<category>WNC child Y</category></item></tree>
+			<tree><item id="54">
+				<category>WNC child 3</category></item></tree>
 		</item></tree>
 		<tree><item id="48">
 			<category>Microcontroller</category></item></tree>

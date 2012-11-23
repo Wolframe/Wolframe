@@ -81,6 +81,11 @@
 <picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
 </category>
 </createCategory>
+<createCategory>
+<category parentID="46"><name>WNC child 3</name>
+<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><width>13</width><height>56</height><thumbnail>TTTTTTTTTTTTTTTTTTTTT</thumbnail></picture>
+</category>
+</createCategory>
 <editCategory>
 <category name="Device from outer space" id="51"></category>
 </editCategory>
@@ -95,7 +100,21 @@
 	</picture>
 </category>
 </editCategory>
+<editCategory>
+<category id="52">
+	<name>WNC child Y</name>
+	<picture id='1'>
+		<caption>WNC caption Z</caption>
+		<info>WNC info Z</info>
+		<image>WNC image Z</image>
+		<width>123</width>
+		<height>27</height>
+		<thumbnail>UUUUUUUUUUUUUUUU</thumbnail>
+	</picture>
+</category>
+</editCategory>
 <CategoryRequest><category id="52"/></CategoryRequest>
+<CategoryRequest><category id="54"/></CategoryRequest>
 <CategoryRequest><category id="46"/></CategoryRequest>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
 <pushFeatureHierarchy>
