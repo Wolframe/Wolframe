@@ -35,6 +35,7 @@
 #include "database/preparedStatement.hpp"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <limits>
 
 using namespace _Wolframe;
@@ -140,6 +141,10 @@ static bool pushArguments( TransactionOutput::CommandResultBuilder& cmdres, cons
 				val = ai->value();
 				break;
 		}
+		std::ostringstream colname;
+		colname << "_" << argidx;
+		cmdres.addColumn( colname.str());
+
 		if (val)
 		{
 			cmdres.addValue( val);
@@ -187,16 +192,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 			{
 				output.addCommandResult( cmdres);
 			}
-			switch (optype)
-			{
-				case DatabaseCall:
-					cmdres = TransactionOutput::CommandResultBuilder( &output, ci->functionidx(), ci->level());
-					break;
-				case PushArguments:
-					// ... push arguments makes the result ans the selection as arguments visible for one level higher (level + 1)
-					cmdres = TransactionOutput::CommandResultBuilder( &output, ci->functionidx(), ci->level()+1);
-					break;
-			}
+			cmdres = TransactionOutput::CommandResultBuilder( &output, ci->functionidx(), ci->level());
 		}
 		TransactionInput::arg_iterator ai = ci->begin(), ae = ci->end();
 

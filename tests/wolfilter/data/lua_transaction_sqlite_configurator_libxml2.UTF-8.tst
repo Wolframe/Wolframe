@@ -410,7 +410,7 @@ DOCTYPE "feature Feature"
 --
 -- addCategory
 --
-OPERATION addCategoryPicture -- ($1=categoryID, caption, info, image)
+OPERATION addCategoryPicture -- ($1=categoryID)(caption, info, image)
 BEGIN
 	DO INSERT INTO Picture (caption,info,image) VALUES ($(caption), $(info), $(image));
 	DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
@@ -424,10 +424,7 @@ BEGIN
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
---	FOREACH picture DO addCategoryPicture($1);
-	FOREACH picture DO INSERT INTO Picture (caption,info,image) VALUES ($(caption), $(info), $(image));
-	FOREACH picture DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
-	FOREACH picture DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
+	FOREACH picture DO addCategoryPicture($1);
 END
 
 --
@@ -435,7 +432,7 @@ END
 --
 TRANSACTION deleteCategory -- (id)
 BEGIN
-	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Category WHERE ID = $(id);
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Category WHERE ID = $(id) AND ID != '1';
 	DO DELETE FROM Picture WHERE ID IN (SELECT pictureID FROM CategoryPicture WHERE categoryID = $(id));
 	DO DELETE FROM CategoryPicture WHERE categoryID = $(id);
 	DO DELETE FROM Category WHERE lft >= $1 AND lft <= $2;
@@ -514,7 +511,7 @@ END
 --
 TRANSACTION deleteFeature -- (id)
 BEGIN
-	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Feature WHERE ID = $(id);
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Feature WHERE ID = $(id) AND ID != '1';
 	DO DELETE FROM Feature WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Feature SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE Feature SET rgt = rgt-$3 WHERE rgt>$2;
@@ -766,6 +763,10 @@ local function delete_node( tablename, itr)
 		if t == "id" then
 			id = v
 		end
+	end
+	-- don't allow deletion of the root element
+	if id == "1" then
+		return
 	end
 	formfunction( "delete" .. tablename)( {id=id} )
 end

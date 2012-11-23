@@ -15,7 +15,7 @@ END
 --
 TRANSACTION deleteTag -- (id)
 BEGIN
-	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Tag WHERE ID = $(id);
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Tag WHERE ID = $(id) AND ID != '1';
 	DO DELETE FROM Tag WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Tag SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE Tag SET rgt = rgt-$3 WHERE rgt>$2;
