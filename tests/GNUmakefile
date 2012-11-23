@@ -148,8 +148,9 @@ TEST_CPP_BINS = \
 	testTimestamp$(EXE) \
 	testWolfilter$(EXE) \
 	testArrayDoublingAllocator$(EXE) \
-	stringNormalizationTest$(EXE) \
 	unitLibraryTest$(EXE)
+
+#	stringNormalizationTest$(EXE) \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -228,8 +229,8 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testProtocolLFdotEscaping
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
-	@echo
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./stringNormalizationTest
+#	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testWolfilter
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./unitLibraryTest

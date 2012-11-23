@@ -1230,6 +1230,8 @@ freeimage/Wrapper/FreeImage.NET/cpp/FreeImageIO/resource.h
 freeimage/Wrapper/FreeImage.NET/cpp/FreeImageIO/Stdafx.cpp
 freeimage/Wrapper/FreeImage.NET/cpp/FreeImageIO/Stdafx.h
 freeimage/Wrapper/FreeImagePlus/FreeImagePlus.h
+freeimage/Wrapper/FreeImagePlus/GNUmakefile
+freeimage/Wrapper/FreeImagePlus/Makefile.W32
 freeimage/Wrapper/FreeImagePlus/src/fipImage.cpp
 freeimage/Wrapper/FreeImagePlus/src/fipMemoryIO.cpp
 freeimage/Wrapper/FreeImagePlus/src/fipMetadataFind.cpp
@@ -1243,6 +1245,8 @@ freeimage/Wrapper/FreeImagePlus/test/fipTestMemIO.cpp
 freeimage/Wrapper/FreeImagePlus/test/fipTestMPage.cpp
 freeimage/Wrapper/FreeImagePlus/test/fipTestMPageMemory.cpp
 freeimage/Wrapper/FreeImagePlus/test/fipTestMPageStream.cpp
+freeimage/Wrapper/GNUmakefile
+freeimage/Wrapper/Makefile.W32
 .gitattributes
 .gitignore
 GNUmakefile
