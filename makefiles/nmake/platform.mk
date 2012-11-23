@@ -67,3 +67,5 @@ XSLTPROC = $(LIBXSLT_DIR)\bin\xsltproc.exe
 
 SQLITE3 = $(TOPDIR)\sqlite3\sqlite3
 
+# FreeImage (always embedded)
+#############################
