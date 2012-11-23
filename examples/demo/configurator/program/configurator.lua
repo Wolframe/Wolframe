@@ -193,6 +193,12 @@ local function delete_node( tablename, itr)
 			id = v
 		end
 	end
+	-- don't allow deletion of the root element
+	if id == "1" then
+		print( "NONO" )
+		return
+	end
+	print( "DELETING " .. id )
 	formfunction( "delete" .. tablename)( {id=id} )
 end
 
