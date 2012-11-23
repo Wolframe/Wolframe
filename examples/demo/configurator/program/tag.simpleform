@@ -1,6 +1,6 @@
-DOCTYPE "feature Feature"
+DOCTYPE "tag Tag"
 {
-	feature
+	tag
 	{
 		id @int
 		parentID @int

@@ -1,12 +1,4 @@
 --
--- addCategoryRoot
---
-TRANSACTION addCategoryRoot -- (name, normalizedName)
-BEGIN
-	DO INSERT INTO Category (ID, parentID, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
-END
-
---
 -- addCategory
 --
 OPERATION addCategoryPicture -- ($1=categoryID, caption, info, image)

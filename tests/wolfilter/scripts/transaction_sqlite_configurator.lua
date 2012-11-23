@@ -61,12 +61,10 @@ end
 local function insert_topnode( tablename, name, description, picture, parentID)
 	local nname = normalizeName( name)
 	if not parentID then
-		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name, description=description, picture=picture} )
-		return 1
-	else
-		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
-		return id
+		parentID = 1
 	end
+	local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
+	return id
 end
 
 local function insert_tree_topnode( tablename, itr)
@@ -117,27 +115,29 @@ local function print_tree( tree, tagname, nodeid, indent)
 		output:print( "\n" .. indent)
 	end
 	output:opentag( "tree" )
-	output:opentag( "item" )
-	output:print( nodeid, "id")
-	output:print( "\n" .. indent .. "\t")
-	output:opentag( tagname)
-	output:print( tree[ nodeid ].name )
-	output:closetag( )
-	if tree[ nodeid ].description then
+	if tree[ nodeid ] then
+		output:opentag( "item" )
+		output:print( nodeid, "id")
 		output:print( "\n" .. indent .. "\t")
-		output:opentag( "description" )
-		output:print( tree[ nodeid ].description )
+		output:opentag( tagname)
+		output:print( tree[ nodeid ].name )
+		output:closetag( )
+		if tree[ nodeid ].description then
+			output:print( "\n" .. indent .. "\t")
+			output:opentag( "description" )
+			output:print( tree[ nodeid ].description )
+			output:closetag( )
+		end
+		local n = 0
+		for i,v in pairs( tree[ nodeid].children) do
+			print_tree( tree, tagname, v, indent .. "\t")
+			n = n + 1
+		end
+		if n > 0 then
+			output:print( "\n" .. indent)
+		end
 		output:closetag( )
 	end
-	local n = 0
-	for i,v in pairs( tree[ nodeid].children) do
-		print_tree( tree, tagname, v, indent .. "\t")
-		n = n + 1
-	end
-	if n > 0 then
-		output:print( "\n" .. indent)
-	end
-	output:closetag( )
 	output:closetag()
 end
 
@@ -157,7 +157,7 @@ local function select_node( tablename, elementname, itr)
 		if t == "id" then
 			output:opentag( elementname)
 			local r = formfunction( "select" .. tablename)( {id=v} )
-			local f = form( "Category");
+			local f = form( tablename);
 			f:fill( r:get())
 			output:print( f:get())
 			output:closetag( )
@@ -235,12 +235,21 @@ function FeatureHierarchyRequest()
 	select_tree( "Feature", "feature", input:get())
 end
 
+function TagHierarchyRequest()
+	output:as( "tree SYSTEM 'TagHierarchy.simpleform'")
+	select_tree( "Tag", "tag", input:get())
+end
+
 function pushCategoryHierarchy()
 	add_tree( "Category", input:get())
 end
 
 function pushFeatureHierarchy()
 	add_tree( "Feature", input:get())
+end
+
+function pushTagHierarchy()
+	add_tree( "Tag", input:get())
 end
 
 function CategoryRequest()
@@ -253,8 +262,9 @@ function FeatureRequest()
 	select_node( "Feature", "feature", input:get())
 end
 
-function readCategory()
-	print_tree( get_tree( "Category", 1), "category", 1, "")
+function TagRequest()
+	output:as( "tag SYSTEM 'Tag.simpleform'")
+	select_node( "Tag", "tag", input:get())
 end
 
 function editCategory()
@@ -265,6 +275,10 @@ function editFeature()
 	edit_node( "Feature", input:get())
 end
 
+function editTag()
+	edit_node( "Tag", input:get())
+end
+
 function deleteCategory()
 	delete_node( "Category", input:get())
 end
@@ -273,12 +287,20 @@ function deleteFeature()
 	delete_node( "Feature", input:get())
 end
 
+function deleteTag()
+	delete_node( "Tag", input:get())
+end
+
 function createCategory()
 	create_node( "Category", input:get())
 end
 
 function createFeature()
 	create_node( "Feature", input:get())
+end
+
+function createTag()
+	create_node( "Tag", input:get())
 end
 
 

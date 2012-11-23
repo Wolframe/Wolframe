@@ -4,6 +4,9 @@ DOCTYPE "picture Picture"
 	caption string
 	info string
 	image string
+	thumbnail string
+	width int
+	height int
 }
 
 DOCTYPE "category Category"

@@ -6,7 +6,6 @@
 <!DOCTYPE test SYSTEM 'test.simpleform'>
 <test>
 <pushCategoryHierarchy>
-<node name="computer">
 	<node name="Minicomputer">
 		<node name="Superminicomputer"/>
 		<node name="Minicluster"/>
@@ -66,7 +65,6 @@
 		<node name="Smartdust"/>
 		<node name="Nanocomputer"/>
 	</node>
-</node>
 </pushCategoryHierarchy>
 <deleteCategory><category id="42"/></deleteCategory>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
@@ -105,7 +103,6 @@
 <CategoryRequest><category id="46"/></CategoryRequest>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
 <pushFeatureHierarchy>
-<node name="feature">
 	<node name="Color">
 		<node name="green"/>
 		<node name="blue"/>
@@ -123,7 +120,6 @@
 		<node name="silent"/>
 		<node name="grumling"/>
 	</node>
-</node>
 </pushFeatureHierarchy>
 <deleteFeature><feature id="15"/></deleteFeature>
 <FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
@@ -141,6 +137,22 @@ int=number:integer;
 uint=number:unsigned;
 float=number:float;
 **file: DBDATA
+-- The tags tree
+--
+CREATE TABLE Tag	(
+	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	parentID	INT	REFERENCES Tag( ID ),
+	name		TEXT	NOT NULL,
+	normalizedName	TEXT	NOT NULL UNIQUE,
+	description	TEXT,
+	lft		INT	NOT NULL,
+	rgt		INT	NOT NULL,
+	CONSTRAINT order_check CHECK ( rgt > lft )
+);
+
+INSERT INTO Tag( parentID, name, normalizedName, description, lft, rgt )
+	VALUES ( NULL, '_ROOT_', '_ROOT_', 'Tags tree root', 1, 2 );
+
 
 -- The list of images used
 --
@@ -148,8 +160,18 @@ CREATE TABLE Picture	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	caption		TEXT,
 	info		TEXT,
-	image		TEXT
+	width		INT,
+	height		INT,
+	image		TEXT,
+	thumbnail	TEXT
 );
+
+CREATE TABLE PictureTag	(
+	pictureID	INT	REFERENCES Picture( ID ),
+	tagID		INT	REFERENCES Tag( ID ),
+	UNIQUE ( pictureID, tagID )
+);
+
 
 -- The categories tree
 --
@@ -164,9 +186,13 @@ CREATE TABLE Category	(
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
 
+INSERT INTO Category( parentID, name, normalizedName, description, lft, rgt )
+	VALUES ( NULL, '_ROOT_', '_ROOT_', 'Categories tree root', 1, 2 );
+
 CREATE TABLE CategoryPicture	(
 	categoryID	INT	REFERENCES Category( ID ),
-	pictureID	INT	REFERENCES Picture( ID )
+	pictureID	INT	REFERENCES Picture( ID ),
+	UNIQUE ( categoryID, pictureID )
 );
 
 
@@ -183,9 +209,13 @@ CREATE TABLE Feature	(
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
 
+INSERT INTO Feature( parentID, name, normalizedName, description, lft, rgt )
+	VALUES ( NULL, '_ROOT_', '_ROOT_', 'Features tree root', 1, 2 );
+
 CREATE TABLE FeaturePicture	(
 	featureID	INT	REFERENCES Feature( ID ),
-	pictureID	INT	REFERENCES Picture( ID )
+	pictureID	INT	REFERENCES Picture( ID ),
+	UNIQUE ( featureID, pictureID )
 );
 
 
@@ -214,7 +244,7 @@ CREATE TABLE Component	(
 	price		NUMERIC( 10, 2 )
 );
 
-CREATE TABLE ComponentHistory	(
+CREATE TABLE ComponentPriceHistory	(
 	componentID	INT	REFERENCES Component( ID ),
 	price		NUMERIC( 10, 2 ),
 	priceDate	TIMESTAMP,
@@ -223,7 +253,8 @@ CREATE TABLE ComponentHistory	(
 
 CREATE TABLE ComponentPicture	(
 	componentID	INT	REFERENCES Component( ID ),
-	pictureID	INT	REFERENCES Picture( ID )
+	pictureID	INT	REFERENCES Picture( ID ),
+	UNIQUE ( componentID, pictureID )
 );
 
 -- The list of features required by members of a category
@@ -232,7 +263,8 @@ CREATE TABLE CategRequires	(
 	categoryID	INT	REFERENCES Category( ID ),
 	featureID	INT	REFERENCES Feature( ID ),
 	minQuantity	INT,
-	maxQuantity	INT
+	maxQuantity	INT,
+	UNIQUE ( categoryID, featureID )
 );
 
 -- The list of features provided by members of a category
@@ -241,7 +273,8 @@ CREATE TABLE CategProvides	(
 	categoryID	INT	REFERENCES Category( ID ),
 	featureID	INT	REFERENCES Feature( ID ),
 	minQuantity	INT,
-	maxQuantity	INT
+	maxQuantity	INT,
+	UNIQUE ( categoryID, featureID )
 );
 
 -- The list of checks for members of a category
@@ -255,19 +288,21 @@ CREATE TABLE CategoryCheck	(
 -- The list of features required by a component
 --
 CREATE TABLE ComponentRequires	(
-	categoryID	INT	REFERENCES Category( ID ),
+	componentID	INT	REFERENCES Component( ID ),
 	featureID	INT	REFERENCES Feature( ID ),
 	minQuantity	INT,
-	maxQuantity	INT
+	maxQuantity	INT,
+	UNIQUE ( componentID, featureID )
 );
 
 -- The list of features provided by a component
 --
 CREATE TABLE ComponentProvides	(
-	categoryID	INT	REFERENCES Category( ID ),
+	componentID	INT	REFERENCES Component( ID ),
 	featureID	INT	REFERENCES Feature( ID ),
 	minQuantity	INT,
-	maxQuantity	INT
+	maxQuantity	INT,
+	UNIQUE ( componentID, featureID )
 );
 
 -- The list of checks for a component
@@ -291,7 +326,8 @@ CREATE TABLE Receipe	(
 
 CREATE TABLE RecipePicture	(
 	receipeID	INT	REFERENCES Receipe( ID ),
-	pictureID	INT	REFERENCES Picture( ID )
+	pictureID	INT	REFERENCES Picture( ID ),
+	UNIQUE ( receipeID, pictureID )
 );
 
 CREATE TABLE ReceipeContent	(
@@ -299,7 +335,8 @@ CREATE TABLE ReceipeContent	(
 	categoryID	INT	REFERENCES Category( ID ),
 	minQuantity	INT,
 	maxQuantity	INT,
-	comment		TEXT
+	comment		TEXT,
+	UNIQUE ( receipeID, categoryID )
 );
 
 
@@ -316,13 +353,15 @@ CREATE TABLE Configuration	(
 CREATE TABLE ConfigComponent	(
 	configID	INT	REFERENCES Configuration( ID ),
 	componentID	INT	REFERENCES Component( ID ),
-	quantity	INT
+	quantity	INT,
+	UNIQUE ( configID, componentID )
 );
 
 CREATE TABLE ComposedConfig	(
 	configID	INT	REFERENCES Configuration( ID ),
 	subConfigID	INT	REFERENCES Configuration( ID ),
-	quantity	INT
+	quantity	INT,
+	UNIQUE ( configID, subConfigID )
 );
 **file:category.simpleform
 DOCTYPE "picture Picture"
@@ -331,6 +370,9 @@ DOCTYPE "picture Picture"
 	caption string
 	info string
 	image string
+	thumbnail string
+	width int
+	height int
 }
 
 DOCTYPE "category Category"
@@ -347,20 +389,23 @@ DOCTYPE "feature Feature"
 {
 	feature
 	{
-		parentID int
+		id @int
+		parentID @int
 		name string
 		description string
+		picture
+		{
+			id @int
+			caption string
+			info string
+			image string
+			thumbnail string
+			width int
+			height int
+		}
 	}
 }
 **file:DBPRG.tdl
---
--- addCategoryRoot
---
-TRANSACTION addCategoryRoot -- (name, normalizedName)
-BEGIN
-	DO INSERT INTO Category (ID, parentID, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
-END
-
 --
 -- addCategory
 --
@@ -451,14 +496,6 @@ TRANSACTION selectSubCategory -- (id)
 BEGIN
 	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
---
--- addFeatureRoot
---
-TRANSACTION addFeatureRoot -- (name, normalizedName)
-BEGIN
-	DO INSERT INTO Feature (ID, parentID, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
-END
-
 --
 -- addFeature
 --
@@ -597,12 +634,10 @@ end
 local function insert_topnode( tablename, name, description, picture, parentID)
 	local nname = normalizeName( name)
 	if not parentID then
-		formfunction( "add" .. tablename .. "Root")( {normalizedName=nname, name=name, description=description, picture=picture} )
-		return 1
-	else
-		local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
-		return id
+		parentID = 1
 	end
+	local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
+	return id
 end
 
 local function insert_tree_topnode( tablename, itr)
@@ -653,27 +688,29 @@ local function print_tree( tree, tagname, nodeid, indent)
 		output:print( "\n" .. indent)
 	end
 	output:opentag( "tree" )
-	output:opentag( "item" )
-	output:print( nodeid, "id")
-	output:print( "\n" .. indent .. "\t")
-	output:opentag( tagname)
-	output:print( tree[ nodeid ].name )
-	output:closetag( )
-	if tree[ nodeid ].description then
+	if tree[ nodeid ] then
+		output:opentag( "item" )
+		output:print( nodeid, "id")
 		output:print( "\n" .. indent .. "\t")
-		output:opentag( "description" )
-		output:print( tree[ nodeid ].description )
+		output:opentag( tagname)
+		output:print( tree[ nodeid ].name )
+		output:closetag( )
+		if tree[ nodeid ].description then
+			output:print( "\n" .. indent .. "\t")
+			output:opentag( "description" )
+			output:print( tree[ nodeid ].description )
+			output:closetag( )
+		end
+		local n = 0
+		for i,v in pairs( tree[ nodeid].children) do
+			print_tree( tree, tagname, v, indent .. "\t")
+			n = n + 1
+		end
+		if n > 0 then
+			output:print( "\n" .. indent)
+		end
 		output:closetag( )
 	end
-	local n = 0
-	for i,v in pairs( tree[ nodeid].children) do
-		print_tree( tree, tagname, v, indent .. "\t")
-		n = n + 1
-	end
-	if n > 0 then
-		output:print( "\n" .. indent)
-	end
-	output:closetag( )
 	output:closetag()
 end
 
@@ -693,7 +730,7 @@ local function select_node( tablename, elementname, itr)
 		if t == "id" then
 			output:opentag( elementname)
 			local r = formfunction( "select" .. tablename)( {id=v} )
-			local f = form( "Category");
+			local f = form( tablename);
 			f:fill( r:get())
 			output:print( f:get())
 			output:closetag( )
@@ -771,12 +808,21 @@ function FeatureHierarchyRequest()
 	select_tree( "Feature", "feature", input:get())
 end
 
+function TagHierarchyRequest()
+	output:as( "tree SYSTEM 'TagHierarchy.simpleform'")
+	select_tree( "Tag", "tag", input:get())
+end
+
 function pushCategoryHierarchy()
 	add_tree( "Category", input:get())
 end
 
 function pushFeatureHierarchy()
 	add_tree( "Feature", input:get())
+end
+
+function pushTagHierarchy()
+	add_tree( "Tag", input:get())
 end
 
 function CategoryRequest()
@@ -789,8 +835,9 @@ function FeatureRequest()
 	select_node( "Feature", "feature", input:get())
 end
 
-function readCategory()
-	print_tree( get_tree( "Category", 1), "category", 1, "")
+function TagRequest()
+	output:as( "tag SYSTEM 'Tag.simpleform'")
+	select_node( "Tag", "tag", input:get())
 end
 
 function editCategory()
@@ -801,6 +848,10 @@ function editFeature()
 	edit_node( "Feature", input:get())
 end
 
+function editTag()
+	edit_node( "Tag", input:get())
+end
+
 function deleteCategory()
 	delete_node( "Category", input:get())
 end
@@ -809,12 +860,20 @@ function deleteFeature()
 	delete_node( "Feature", input:get())
 end
 
+function deleteTag()
+	delete_node( "Tag", input:get())
+end
+
 function createCategory()
 	create_node( "Category", input:get())
 end
 
 function createFeature()
 	create_node( "Feature", input:get())
+end
+
+function createTag()
+	create_node( "Tag", input:get())
 end
 
 
@@ -856,7 +915,8 @@ end
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE result SYSTEM "test.simpleform"><result><tree><item id="1">
-	<category>computer</category>
+	<category>_ROOT_</category>
+	<description>Categories tree root</description>
 	<tree><item id="2">
 		<category>Minicomputer</category>
 		<tree><item id="3">
@@ -1049,8 +1109,9 @@ end
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
-	<category>computer</category>
+</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
+	<category>_ROOT_</category>
+	<description>Categories tree root</description>
 	<tree><item id="2">
 		<category>Minicomputer</category>
 		<tree><item id="3">
@@ -1118,7 +1179,8 @@ end
 			<category>Nanocomputer</category></item></tree>
 	</item></tree>
 </item></tree><tree><item id="1">
-	<feature>feature</feature>
+	<feature>_ROOT_</feature>
+	<description>Features tree root</description>
 	<tree><item id="2">
 		<feature>Color</feature>
 		<tree><item id="3">
@@ -1159,7 +1221,8 @@ end
 	<tree><item id="8">
 		<feature>big</feature></item></tree>
 </item></tree><tree><item id="1">
-	<feature>feature</feature>
+	<feature>_ROOT_</feature>
+	<description>Features tree root</description>
 	<tree><item id="2">
 		<feature>Color</feature>
 		<tree><item id="3">
@@ -1196,17 +1259,23 @@ end
 	<tree><item id="17">
 		<feature>Space</feature></item></tree>
 </item></tree></result>
-Picture:
-'1', 'WNC caption X', 'WNC info X', 'WNC image X'
-'2', 'WNC caption', 'WNC info', 'WNC image'
+Tag:
+'1', NULL, '_ROOT_', '_ROOT_', 'Tags tree root', '1', '2'
 
 sqlite_sequence:
+'Tag', '1'
 'Category', '53'
-'Picture', '2'
 'Feature', '18'
+'Picture', '2'
+
+Picture:
+'1', 'WNC caption X', 'WNC info X', NULL, NULL, 'WNC image X', NULL
+'2', 'WNC caption', 'WNC info', NULL, NULL, 'WNC image', NULL
+
+PictureTag:
 
 Category:
-'1', NULL, 'computer', 'computer', NULL, '1', '62'
+'1', NULL, '_ROOT_', '_ROOT_', 'Categories tree root', '1', '62'
 '2', '1', 'Minicomputer', 'minicomputer', NULL, '2', '11'
 '3', '2', 'Superminicomputer', 'superminicomputer', NULL, '3', '4'
 '4', '2', 'Minicluster', 'minicluster', NULL, '5', '6'
@@ -1243,7 +1312,7 @@ CategoryPicture:
 '53', '2'
 
 Feature:
-'1', NULL, 'feature', 'feature', NULL, '1', '34'
+'1', NULL, '_ROOT_', '_ROOT_', 'Features tree root', '1', '34'
 '2', '1', 'Color', 'color', NULL, '2', '13'
 '3', '2', 'green', 'green', NULL, '3', '4'
 '4', '2', 'blue', 'blue', NULL, '5', '6'
@@ -1267,7 +1336,7 @@ Manufacturer:
 
 Component:
 
-ComponentHistory:
+ComponentPriceHistory:
 
 ComponentPicture:
 

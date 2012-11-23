@@ -2,7 +2,6 @@
 <!DOCTYPE test SYSTEM 'test.simpleform'>
 <test>
 <pushCategoryHierarchy>
-<node name="computer">
 	<node name="Minicomputer">
 		<node name="Superminicomputer"/>
 		<node name="Minicluster"/>
@@ -62,7 +61,6 @@
 		<node name="Smartdust"/>
 		<node name="Nanocomputer"/>
 	</node>
-</node>
 </pushCategoryHierarchy>
 <deleteCategory><category id="42"/></deleteCategory>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
@@ -101,7 +99,6 @@
 <CategoryRequest><category id="46"/></CategoryRequest>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
 <pushFeatureHierarchy>
-<node name="feature">
 	<node name="Color">
 		<node name="green"/>
 		<node name="blue"/>
@@ -119,7 +116,6 @@
 		<node name="silent"/>
 		<node name="grumling"/>
 	</node>
-</node>
 </pushFeatureHierarchy>
 <deleteFeature><feature id="15"/></deleteFeature>
 <FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>

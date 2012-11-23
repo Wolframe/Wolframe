@@ -1,12 +1,4 @@
 --
--- addFeatureRoot
---
-TRANSACTION addFeatureRoot -- (name, normalizedName)
-BEGIN
-	DO INSERT INTO Feature (ID, parentID, name, normalizedName, lft, rgt) VALUES (1, NULL, $(name), $(normalizedName), 1, 2);
-END
-
---
 -- addFeature
 --
 TRANSACTION addFeature -- (parentID, name, normalizedName, description)

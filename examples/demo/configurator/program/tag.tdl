@@ -1,0 +1,74 @@
+--
+-- addTag
+--
+TRANSACTION addTag -- (parentID, name, normalizedName, description)
+BEGIN
+	DO NONEMPTY UNIQUE SELECT rgt FROM Tag WHERE ID = $(parentID);
+	DO UPDATE Tag SET rgt = rgt + 2 WHERE rgt >= $1;
+	DO UPDATE Tag SET lft = lft + 2 WHERE lft > $1;
+	DO INSERT INTO Tag (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
+	INTO . DO NONEMPTY UNIQUE SELECT ID from Tag WHERE normalizedName = $(normalizedName);
+END
+
+--
+-- deleteTag
+--
+TRANSACTION deleteTag -- (id)
+BEGIN
+	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Tag WHERE ID = $(id);
+	DO DELETE FROM Tag WHERE lft >= $1 AND lft <= $2;
+	DO UPDATE Tag SET lft = lft-$3 WHERE lft>$2;
+	DO UPDATE Tag SET rgt = rgt-$3 WHERE rgt>$2;
+END
+
+--
+-- updateTag
+--
+TRANSACTION updateTag -- (id, name, normalizedName, description)
+BEGIN
+	DO UPDATE Tag SET name = $(name),normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
+END
+
+--
+-- selectTag                 :Get the tag
+-- selectTagByName           :Get the tag by name
+-- selectTagByNormalizedName :Get the tag by name
+-- selectTagList             :Get a list of tags
+--
+TRANSACTION selectTag -- (id)
+BEGIN
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE ID = $(id);
+END
+
+-- This is not supposed to exist either
+TRANSACTION selectTagByName -- (name)
+BEGIN
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE name = $(name);
+END
+
+TRANSACTION selectTagByNormalizedName -- (normalizedName)
+BEGIN
+	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE normalizedName = $(normalizedName);
+END
+
+TRANSACTION selectTagSet -- (/tag/id)
+BEGIN
+	FOREACH /tag INTO Tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Tag WHERE ID = $(id);
+END
+
+--
+-- selectTopTag       :Get the parents of a tag
+--
+TRANSACTION selectTopTag -- (id)
+BEGIN
+	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+END
+
+--
+-- selectSubTag       :Get the sub tags
+--
+TRANSACTION selectSubTag -- (id)
+BEGIN
+	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+END
+

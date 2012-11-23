@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE result SYSTEM "test.simpleform"><result><tree><item id="1">
-	<category>computer</category>
+	<category>_ROOT_</category>
+	<description>Categories tree root</description>
 	<tree><item id="2">
 		<category>Minicomputer</category>
 		<tree><item id="3">
@@ -193,8 +194,9 @@
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
-	<category>computer</category>
+</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
+	<category>_ROOT_</category>
+	<description>Categories tree root</description>
 	<tree><item id="2">
 		<category>Minicomputer</category>
 		<tree><item id="3">
@@ -262,7 +264,8 @@
 			<category>Nanocomputer</category></item></tree>
 	</item></tree>
 </item></tree><tree><item id="1">
-	<feature>feature</feature>
+	<feature>_ROOT_</feature>
+	<description>Features tree root</description>
 	<tree><item id="2">
 		<feature>Color</feature>
 		<tree><item id="3">
@@ -303,7 +306,8 @@
 	<tree><item id="8">
 		<feature>big</feature></item></tree>
 </item></tree><tree><item id="1">
-	<feature>feature</feature>
+	<feature>_ROOT_</feature>
+	<description>Features tree root</description>
 	<tree><item id="2">
 		<feature>Color</feature>
 		<tree><item id="3">
