@@ -361,17 +361,17 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 		}
 		QTreeWidgetItem *_parent = treeWidget->invisibleRootItem( );
 		QTreeWidgetItem *item = treeWidget->invisibleRootItem( );
-		//~ bool first = true;
+		bool first = true;
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
 			if( xml.isStartElement( ) ) {
 				if( xml.name( ) == "tree" ) {
 					_parent = item;
 				} else if( xml.name( ) == "item" ) {
-					//~ if( first ) {
-						//~ first = false;
-						//~ continue;
-					//~ }
+					if( first ) {
+						first = false;
+						continue;
+					}
 					item = new QTreeWidgetItem( _parent );
 // attributes like id are mapped to user data
 					QXmlStreamAttributes attributes = xml.attributes( );
@@ -667,7 +667,10 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 // the ID is currently hard-coded in user data
 		if( property == "id" ) {
 			QList<QTreeWidgetItem *> items = treeWidget->selectedItems( );
-			if( items.empty( ) ) return QString( );
+			if( items.empty( ) ) {
+// nothing is selected, return the id of the root element, which is always 1
+				return QString( "1" );
+			}			
 			return items[0]->data( 0, Qt::UserRole ).toString( );
 // state is header sizes, expanded/collapse states, selection states, sorting order,
 // scroll position, etc.

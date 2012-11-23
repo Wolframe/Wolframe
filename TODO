@@ -4,7 +4,8 @@ MBa:
 ABa:
 daemon code:
 - build FreeImage wolframe-ish
-- On expection in main, remove pidfile
+- On expection in main, remove pidfile -> permission issue, need root
+  parent with signalling, see WolfBones, or maybe chown of pidfile?
 - qtclient cont.
 - configurator
   - caption + other info + file picker (image)
@@ -16,7 +17,7 @@ daemon code:
 - makefiles
   - fix libchrono transitive dependency in boost in 1.50/1.51
   - error checking after dependency generation, avoid funny mistakes
-  - parallel builds in lua and qtclient fail, lib, cmdline, wolfcli
+  - parallel builds in lua and qtclient fail, lib, cmdline
 
 PF:
 

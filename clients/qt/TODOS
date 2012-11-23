@@ -16,11 +16,6 @@ unsorted:
   - allow for separate ignorable things:
     - self-signed certs
     - validation of the host
-- root elemenent handling:
- - hide
- - when no selection, add element to root of tree
-   - needs default values when passing variables between forms:
-     {category.id:1}
   
 musts:
 - SSL: allow to ignore certain error, most prominent ones are
