@@ -16,18 +16,16 @@ clean_recursive:
 clean: clean_recursive local_clean
 	-@erase *.bak 2>NUL
 	-@erase *~ 2>NUL
-	-@erase *.d 2>NUL
 	-@erase *.exe 2>NUL
 	-@erase *.exe.manifest 2>NUL
-	-@erase *.obj 2>NUL
-	-@erase $(OBJS) 2>NUL
+	-@del /s *.obj >NUL 2>NUL
 	-@erase *.pdb 2>NUL
 	-@erase *.res 2>NUL
 	-@erase MSG*.bin 2>NUL
 	-@erase *.dllobj 2>NUL
 	-@erase *.dll 2>NUL
 	-@erase *.lib 2>NUL
-	-@erase $(DLL_OBJS) 2>NUL
+	-@del /s *.dllobj >NUL 2>NUL
 	-@erase *.exp 2>NUL
 	-@erase *.ilk 2>NUL
 	-@erase *.idb 2>NUL
