@@ -461,16 +461,6 @@ DOCTYPE "tag Tag"
 		parentID @int
 		name string
 		description string
-		picture
-		{
-			id @int
-			caption string
-			info string
-			image string
-			thumbnail string
-			width int
-			height int
-		}
 	}
 }
 **file:DBPRG.tdl
@@ -564,6 +554,13 @@ END
 --
 -- addFeature
 --
+OPERATION addFeaturePicture -- ($1=featureID)(caption, info, image, width, height, thumbnail)
+BEGIN
+	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
+	DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
+	DO INSERT INTO FeaturePicture (featureID,pictureID) VALUES ($1,$2);
+END
+
 TRANSACTION addFeature -- (parentID, name, normalizedName, description)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT rgt FROM Feature WHERE ID = $(parentID);
@@ -571,6 +568,7 @@ BEGIN
 	DO UPDATE Feature SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Feature (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Feature WHERE normalizedName = $(normalizedName);
+	FOREACH picture DO addFeaturePicture($1);
 END
 
 --
@@ -579,6 +577,8 @@ END
 TRANSACTION deleteFeature -- (id)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Feature WHERE ID = $(id) AND ID != '1';
+	DO DELETE FROM Picture WHERE ID IN (SELECT pictureID FROM FeaturePicture WHERE featureID = $(id));
+	DO DELETE FROM FeaturePicture WHERE featureID = $(id);
 	DO DELETE FROM Feature WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Feature SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE Feature SET rgt = rgt-$3 WHERE rgt>$2;
@@ -587,31 +587,35 @@ END
 --
 -- updateFeature
 --
-TRANSACTION updateFeature -- (id, name, normalizedName, description)
+TRANSACTION updateFeature -- (id, name, normalizedName, description, picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
 BEGIN
-	DO UPDATE Feature SET name = $(name),normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
+	DO UPDATE Feature SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
+	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image), width = $(width), height = $(height), thumbnail = $(thumbnail) WHERE ID = $(id);
 END
 
 --
 -- selectFeature                 :Get the feature
 -- selectFeatureByName           :Get the feature by name
 -- selectFeatureByNormalizedName :Get the feature by name
--- selectFeatureList             :Get a list of features
+-- selectFeatureList             :Get a list of categories
 --
 TRANSACTION selectFeature -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Feature WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE ID = $(id);
+	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $(id);
 END
 
--- This is not supposed to exist either
+-- This is not supposed to exist, that's why we have the normalized name
 TRANSACTION selectFeatureByName -- (name)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Feature WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE name = $(name);
+	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $1;
 END
 
 TRANSACTION selectFeatureByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Feature WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE normalizedName = $(normalizedName);
+	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $1;
 END
 
 TRANSACTION selectFeatureSet -- (/feature/id)
@@ -624,15 +628,15 @@ END
 --
 TRANSACTION selectTopFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM feature AS P1, feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
--- selectSubFeature       :Get the sub features
+-- selectSubFeature       :Get the feature
 --
 TRANSACTION selectSubFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 --
 -- addTag
@@ -662,34 +666,34 @@ END
 --
 TRANSACTION updateTag -- (id, name, normalizedName, description)
 BEGIN
-	DO UPDATE Tag SET name = $(name),normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
+	DO UPDATE Tag SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
 END
 
 --
 -- selectTag                 :Get the tag
 -- selectTagByName           :Get the tag by name
 -- selectTagByNormalizedName :Get the tag by name
--- selectTagList             :Get a list of tags
+-- selectTagList             :Get a list of categories
 --
 TRANSACTION selectTag -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE ID = $(id);
 END
 
--- This is not supposed to exist either
+-- This is not supposed to exist, that's why we have the normalized name
 TRANSACTION selectTagByName -- (name)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE name = $(name);
 END
 
 TRANSACTION selectTagByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE normalizedName = $(normalizedName);
 END
 
 TRANSACTION selectTagSet -- (/tag/id)
 BEGIN
-	FOREACH /tag INTO Tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Tag WHERE ID = $(id);
+	FOREACH /tag INTO tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Tag WHERE ID = $(id);
 END
 
 --
@@ -701,7 +705,7 @@ BEGIN
 END
 
 --
--- selectSubTag       :Get the sub tags
+-- selectSubTag       :Get the tag
 --
 TRANSACTION selectSubTag -- (id)
 BEGIN

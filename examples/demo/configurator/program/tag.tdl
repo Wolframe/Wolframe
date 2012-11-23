@@ -26,34 +26,34 @@ END
 --
 TRANSACTION updateTag -- (id, name, normalizedName, description)
 BEGIN
-	DO UPDATE Tag SET name = $(name),normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
+	DO UPDATE Tag SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
 END
 
 --
 -- selectTag                 :Get the tag
 -- selectTagByName           :Get the tag by name
 -- selectTagByNormalizedName :Get the tag by name
--- selectTagList             :Get a list of tags
+-- selectTagList             :Get a list of categories
 --
 TRANSACTION selectTag -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE ID = $(id);
 END
 
--- This is not supposed to exist either
+-- This is not supposed to exist, that's why we have the normalized name
 TRANSACTION selectTagByName -- (name)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE name = $(name);
 END
 
 TRANSACTION selectTagByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Tag WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE normalizedName = $(normalizedName);
 END
 
 TRANSACTION selectTagSet -- (/tag/id)
 BEGIN
-	FOREACH /tag INTO Tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Tag WHERE ID = $(id);
+	FOREACH /tag INTO tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Tag WHERE ID = $(id);
 END
 
 --
@@ -65,7 +65,7 @@ BEGIN
 END
 
 --
--- selectSubTag       :Get the sub tags
+-- selectSubTag       :Get the tag
 --
 TRANSACTION selectSubTag -- (id)
 BEGIN
