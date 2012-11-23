@@ -1,0 +1,59 @@
+TOPDIR = ..\..\..
+
+SUBDIRS =
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+INCLUDE_CXXFLAGS = \
+	/D_WIN32_WINNT=0x504
+
+INCLUDE_DIRS = \
+	/I. /I..\..\Source
+
+INCLUDE_LDFLAGS = \
+
+INCLUDE_LIBS = \
+
+OBJS = \
+	src\fipImage.obj \
+	src\fipMemoryIO.obj \
+	src\fipMetadataFind.obj \
+	src\fipMultiPage.obj \
+	src\fipTag.obj \
+	src\fipWinImage.obj \
+	src\FreeImagePlus.obj
+
+DYNAMIC_OBJS = \
+	src\fipImage.dllobj \
+	src\fipMemoryIO.dllobj \
+	src\fipMetadataFind.dllobj \
+	src\fipMultiPage.dllobj \
+	src\fipTag.dllobj \
+	src\fipWinImage.dllobj \
+	src\FreeImagePlus.dllobj
+
+STATIC_LIB = \
+	freeimageplus_static.lib
+
+DYNAMIC_LIB = \
+	freeimageplus3.dll
+
+LIBRARIES = \
+	$(STATIC_LIB) \
+	$(DYNAMIC_LIB)
+		
+!INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
+
+freeimageplus3.dll: $(DYNAMIC_OBJS)
+	$(LINK) /dll /out:$@ $(LDFLAGS) $(LIBS) $?
+
+freeimageplus_static.lib: $(OBJS)
+	$(LINK) /lib /out:$@ $(STATIC_LDFLAGS) $(LIBS) $?
+
+local_all: $(LIBRARIES)
+
+local_clean:
+
+local_distclean:
+
+local_test:

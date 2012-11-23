@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS =
+SUBDIRS = Wrapper
 
 PACKAGE_NAME = wolframe
 PACKAGE_VERSION = 3.15.4
