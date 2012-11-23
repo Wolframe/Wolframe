@@ -6,3 +6,7 @@ local changes and fixes:
   Wolframe project.
 - Source/OpenEXR/IlmImf/ImfAutoArray.h:
   added include for <string.h> for memset
+- Windows
+  - 'Source/FreeImage.h': added BUILD_SHARED wrapper to switch
+    /DFREEIMAGE_LIB for symbol tagging (so we can build static
+    and dynamic libraries in the same directory)

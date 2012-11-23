@@ -36,6 +36,12 @@
 
 #include <wchar.h>	// needed for UNICODE functions
 
+// Wolframe specific (the BUILD_SHARED flag is set for
+// DLL builds, not for static builds)
+#if !defined(BUILD_SHARED)
+#define FREEIMAGE_LIB
+#endif
+
 #if defined(FREEIMAGE_LIB)
 	#define DLL_API
 	#define DLL_CALLCONV
