@@ -12,16 +12,13 @@ unsorted:
 - new picture picker
   - upload a set of images, keep them on the server
   - use them from a picklist (with images)
-- secure settings
-  - allow for separate ignorable things:
-    - self-signed certs
-    - validation of the host
   
 musts:
 - SSL: allow to ignore certain error, most prominent ones are
-  - host mismatch
-  - self-signed certificate
-  - must be checkable in PreferencesDialog
+  - allow for separate ignorable things:
+    - self-signed certs with the CA which has been installed in the system
+    - validation of the host in the certificate
+  - for now there is a generic checkSSL
 - problems with size of main window to follow size of form ui
 - frontend:
   - associating categories and features
