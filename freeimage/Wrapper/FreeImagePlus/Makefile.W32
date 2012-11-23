@@ -5,7 +5,8 @@ SUBDIRS =
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
-	/D_WIN32_WINNT=0x504
+	/D_WIN32_WINNT=0x504 \
+	/DBUILDING_FREEIMAGE_LIB /DFIP_EXPORTS
 
 INCLUDE_DIRS = \
 	/I. /I..\..\Source
@@ -13,6 +14,8 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
+	user32.lib gdi32.lib \
+	..\..\freeimage3.lib
 
 OBJS = \
 	src\fipImage.obj \

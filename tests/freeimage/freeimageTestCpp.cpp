@@ -6,6 +6,10 @@
 
 #include <iostream>
 
+#ifdef _WIN32
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif
 #include "FreeImage.h"
 #include "FreeImagePlus.h"
 
