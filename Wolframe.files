@@ -346,6 +346,8 @@ examples/demo/configurator/program/configurator.lua
 examples/demo/configurator/program/configurator.normalize
 examples/demo/configurator/program/feature.simpleform
 examples/demo/configurator/program/feature.tdl
+examples/demo/configurator/program/tag.simpleform
+examples/demo/configurator/program/tag.tdl
 examples/demo/configurator/request/CategoryHierarchyRequest.netcat
 examples/demo/configurator/request/CategoryHierarchyRequest.xml
 examples/demo/configurator/request/CategoryHierarchyRootRequest.xml
