@@ -43,8 +43,11 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
 #include <string>
 #include <cassert>
+
+#include <boost/asio/ssl/error.hpp>
 
 #include "connectionHandler.hpp"
 #include "logger-v1.hpp"
@@ -206,12 +209,24 @@ protected:
 			name = "CONNECTION RESET";
 			break;
 
-		default:
+		default:	{
+			std::string err = e.message();
+			if ( e.category() == boost::asio::error::get_ssl_category() )	{
+				err = std::string( " (" )
+						+ boost::lexical_cast< std::string >( ERR_GET_LIB( e.value() ) ) + ", "
+						+ boost::lexical_cast< std::string >( ERR_GET_FUNC( e.value() ) )+ ", "
+						+ boost::lexical_cast< std::string >( ERR_GET_REASON( e.value() ) ) + ") ";
+				//ERR_PACK /* crypto/err/err.h */
+				char buf[ 128 ];
+				::ERR_error_string_n( e.value(), buf, sizeof( buf ) );
+				err += buf;
+			}
 			LOG_DEBUG << "Unknown error: " << e.value() << ", category: " << e.category().name()
-				  << ", message: " << e.message();
+				  << ", message: " << err;
 			ns = ConnectionHandler::UNKNOWN_ERROR;
 			name = "UNKNOWN ERROR";
 			break;
+			}
 		}
 		m_connHandler->signalOccured( ns );
 		LOG_DATA << "Signalled " << name << " to processor for connection to " << identifier();

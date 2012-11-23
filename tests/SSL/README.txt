@@ -11,6 +11,11 @@ Generate a certificate request (for wolframe):
 Sign a certificate (for wolframe):
   openssl ca -config openssl.cnf -policy policy_anything -out wolframed.crt \
              -infiles wolframed.req
+NOTE: If you want a certificate valid for multiple hostnames, IPs ...,
+create a file having subjectAltName=.... and sign the certificate 
+with -extfile filename. The openssl.cnf must have req_extensions = v3_req uncommented
+See http://www.openssl.org/docs/apps/x509v3_config.html#Subject_Alternative_Name_
+for more information.
 
 Delete the unnecessary files: xx.pem (xx means numeric), *.old *.req
 
