@@ -30,6 +30,11 @@ SUBDIRS = \
 	$(SUBDIRS) boost-locale
 !ENDIF
 
+!IFDEF WITH_FREEIMAGE
+SUBDIRS = \
+	$(SUBDIRS) freeimage
+!ENDIF
+
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 INCLUDE_CXXFLAGS = \
@@ -191,7 +196,6 @@ local_test:
 	@-echo HMACtest >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo testProtocolLFdotEscaping >> test.bat
-	@-echo testArrayDoublingAllocator >> test.bat
 	@-echo testWolfilter >> test.bat
 	@-echo stringNormalizationTest >> test.bat
 	@-echo unitLibraryTest >> test.bat
@@ -202,5 +206,6 @@ local_longtest:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo poolTest >> test.bat
+	@-echo testArrayDoublingAllocator >> test.bat
 	@-echo
 	@-test.bat

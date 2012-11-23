@@ -30,6 +30,10 @@ ifeq ($(WITH_ICU),1)
 SUBDIRS += boost-locale
 endif
 
+ifeq ($(WITH_FREEIMAGE),1)
+SUBDIRS += freeimage
+endif
+
 INCLUDE_CXXFLAGS = \
 
 INCLUDE_DIRS = \
@@ -216,8 +220,6 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./HMACtest
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testArrayDoublingAllocator
-	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./protocolArgumentParsing
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./configValueParser
@@ -233,12 +235,13 @@ ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./unitLibraryTest
 	@echo
 	@echo
-	@echo
 endif
 
 local_longtest: poolTest
 ifeq ($(RUN_TESTS),0)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./poolTest
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testArrayDoublingAllocator
 	@echo
 	@echo
 endif
