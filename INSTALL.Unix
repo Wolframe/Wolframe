@@ -19,6 +19,7 @@ Table of Contents
     Ubuntu 11.04
     Ubuntu 11.10
     Ubuntu 12.04 LTS
+    Ubuntu 12.10
     Debian 6.0
     OpenSuSE 11.4
     OpenSuSE 12.1
@@ -66,6 +67,10 @@ Prerequisites
   'zlib' and 'libpng' development libraries are needed
 - optionally (WITH_ICU): ICU 3.6 or later,
   needed for boost-locale with ICU backend
+- optionally (WITH_SYSTEM_FREEIMAGE): for image handling
+  using the system version of FreeImage, specify
+  WITH_LOCAL_FREEIMAGE=1 to use the supplied version in
+  the 'freeimage' subdirectory.
 
 Configuration of the build
 --------------------------
@@ -302,7 +307,7 @@ Ubuntu 11.10
 
 Required packages: libboost-dev (1.48), libboost-program-options-dev,
                    libboost-filesystem-dev, libboost-thread-dev,
-                   libboost-random-dev
+                   libboost-random-dev, libboost-locale-dev
 
 Optional packages: libssl-dev (1.0.0e), libqt4-dev (4.7.4),
                    libpam0g-dev (1.1.3), libsasl2-dev (2.1.24),
@@ -333,7 +338,7 @@ Ubuntu 12.04
 
 Required packages: libboost-dev (1.48), libboost-program-options-dev,
                    libboost-filesystem-dev, libboost-thread-dev,
-                   libboost-random-dev
+                   libboost-random-dev, libboost-locale-dev
 
 Optional packages: libssl-dev (1.0.1), libqt4-dev (4.8.1),
                    libpam0g-dev (1.1.3), libsasl2-dev (2.1.25),
@@ -342,6 +347,39 @@ Optional packages: libssl-dev (1.0.1), libqt4-dev (4.8.1),
                    libpng-dev (1.2.46)
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
+
+When rebuilding the SVG images of the documentation you also need 'dia'.
+
+For running non-gtest tests you need 'expect'.
+
+For running the Sasl AAAA tests you need 'sasl2-bin'.
+
+For running the Postgresql database tests you need 'postgresql-client'.
+
+For running the Sqlite3 database tests you need 'sqlite3'.
+
+For running some tests you need 'telnet' (0.17).
+
+For checking the validity of various XML files you need 'libxml2-utils' (for xmllint).
+
+Ubuntu 12.10
+------------
+
+Required packages: libboost-dev (1.49), libboost-program-options-dev,
+                   libboost-filesystem-dev, libboost-thread-dev,
+                   libboost-random-dev,  libboost-locale-dev
+
+Optional packages: libssl-dev (1.0.1c), libqt4-dev (4.8.3),
+                   libpam0g-dev (1.1.3), libsasl2-dev (2.1.25),
+                   libsqlite3-dev (3.7.13), libpq-dev (9.1.6),
+                   libxml2-dev (2.8.0), libxslt1-dev (1.1.26)
+                   libpng12-dev (1.2.49), libfreeimage-dev (3.15.1)
+
+Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+Use WITH_LOCAL_FREEIMAGE=1 for FreeImage support.
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
