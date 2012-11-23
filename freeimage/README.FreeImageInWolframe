@@ -18,4 +18,6 @@ local changes and fixes:
     added BUILD_SHARED wrapper to define the macro
     FREEIMAGE_LIB for symbol tagging (so we can build static
     and dynamic libraries in the same directory)
+  - dito in building freeimage plus wrapper:
+    'Source/Wrapper/FreeImagePlus/FreeImagePlus.h'
     

@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS =
+SUBDIRS = Wrapper
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
