@@ -24,12 +24,12 @@ PF:
 - configurator
   - sqlite schemas, scripts
     - products
-    - tag trees
+    - test tag trees
 - high prio
-  - transaction operations
   - UIForm loader in client and server
   - make postgres database run transactions
   - call normalizer from lua
+  - base64 normalizer
 
 - low prio
   - tagged request/answer in protocol

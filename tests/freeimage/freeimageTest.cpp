@@ -54,6 +54,7 @@ TEST_F( FreeImageFixture, VersionInfo )
 }
 
 #define TESTFILE "test.png"
+#define THUMB "thumb.png"
 
 TEST_F( FreeImageFixture, ImageInfo )
 {
@@ -76,7 +77,8 @@ TEST_F( FreeImageFixture, ImageInfo )
 // ok, let's load the file
 		image = FreeImage_Load( format, TESTFILE, 0 );
 	}
-	
+
+// get info about the image	
 	unsigned int width = FreeImage_GetWidth( image );
 	unsigned int height = FreeImage_GetHeight( image );
 	//std::cout << "size is " << width << " x " << height << std::endl;
@@ -86,6 +88,7 @@ TEST_F( FreeImageFixture, ImageInfo )
 // make thumbnail
 	FIBITMAP *thumb = FreeImage_MakeThumbnail( image, 50, true );
 
+// get info about the thumb
 	unsigned int widthThumb = FreeImage_GetWidth( thumb );
 	unsigned int heightThumb = FreeImage_GetHeight( thumb );
 	//std::cout << "size of thumb is " << widthThumb << " x " << heightThumb << std::endl;
@@ -93,7 +96,7 @@ TEST_F( FreeImageFixture, ImageInfo )
 	ASSERT_EQ( heightThumb, 50 );
 	
 // save image (for debugging mainly)
-	FreeImage_Save( FIF_PNG, thumb, "thumb.png", 0 );
+	FreeImage_Save( FIF_PNG, thumb, THUMB, 0 );
 	
 // Unload the bitmap
 	FreeImage_Unload( image );

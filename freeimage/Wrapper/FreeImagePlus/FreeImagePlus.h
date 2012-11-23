@@ -30,6 +30,14 @@
 
 // Compiler options ---------------------------------------------------------
 
+// Wolframe specific (the BUILD_SHARED flag is set for
+// DLL builds, not for static builds)
+#if defined(BUILDING_FREEIMAGE_LIB)
+#if !defined(BUILD_SHARED)
+#define FREEIMAGE_LIB
+#endif
+#endif
+
 #if defined(FREEIMAGE_LIB)
 	#define FIP_API
 	#define FIP_CALLCONV

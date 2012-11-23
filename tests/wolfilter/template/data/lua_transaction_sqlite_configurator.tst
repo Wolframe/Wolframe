@@ -10,6 +10,7 @@ ddltypeprg="simpleform.normalize"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
 opt="$opt --program category.simpleform"		# category forms
 opt="$opt --program feature.simpleform"			# feature forms
+opt="$opt --program tag.simpleform"			# tag forms
 modpath="../../src/modules/ddlcompiler/"		# module directory for ddl definitions relative from tests/temp
 mod="$modpath/simpleform/mod_ddlcompiler_simpleform"	# module to load
 opt="$opt --module $mod"
@@ -42,9 +43,12 @@ testdata="
 `cat $projectpath/program/category.simpleform`
 **file:feature.simpleform
 `cat $projectpath/program/feature.simpleform`
+**file:tag.simpleform
+`cat $projectpath/program/tag.simpleform`
 **file:DBPRG.tdl
 `cat $projectpath/program/category.tdl`
 `cat $projectpath/program/feature.tdl`
+`cat $projectpath/program/tag.tdl`
 **outputfile:DBDUMP"
 csetlist="UTF-8"
 . ./output_tst_all.sh

@@ -85,6 +85,11 @@
 <picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
 </category>
 </createCategory>
+<createCategory>
+<category parentID="46"><name>WNC child 3</name>
+<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><width>13</width><height>56</height><thumbnail>TTTTTTTTTTTTTTTTTTTTT</thumbnail></picture>
+</category>
+</createCategory>
 <editCategory>
 <category name="Device from outer space" id="51"></category>
 </editCategory>
@@ -99,7 +104,21 @@
 	</picture>
 </category>
 </editCategory>
+<editCategory>
+<category id="52">
+	<name>WNC child Y</name>
+	<picture id='1'>
+		<caption>WNC caption Z</caption>
+		<info>WNC info Z</info>
+		<image>WNC image Z</image>
+		<width>123</width>
+		<height>27</height>
+		<thumbnail>UUUUUUUUUUUUUUUU</thumbnail>
+	</picture>
+</category>
+</editCategory>
 <CategoryRequest><category id="52"/></CategoryRequest>
+<CategoryRequest><category id="54"/></CategoryRequest>
 <CategoryRequest><category id="46"/></CategoryRequest>
 <CategoryHierarchyRequest><category id="1"/></CategoryHierarchyRequest>
 <pushFeatureHierarchy>
@@ -129,8 +148,36 @@
 <createFeature><feature name="Space" parentID="1"/></createFeature>
 <createFeature><feature name="yellow" parentID="2"/></createFeature>
 <FeatureHierarchyRequest><feature id="1"/></FeatureHierarchyRequest>
+<pushTagHierarchy>
+	<node name="Tag1">
+		<node name="Tag1.1"/>
+		<node name="Tag1.2"/>
+		<node name="Tag1.3"/>
+		<node name="Tag1.4"/>
+	</node>
+	<node name="Tag2">
+		<node name="Tag2.1"/>
+		<node name="Tag2.2"/>
+		<node name="Tag2.3"/>
+		<node name="Tag2.4"/>
+	</node>
+	<node name="Tag3">
+		<node name="Tag3.1"/>
+		<node name="Tag3.2"/>
+		<node name="Tag3.3"/>
+		<node name="Tag3.4"/>
+	</node>
+</pushTagHierarchy>
+<deleteTag><tag id="10"/></deleteTag>
+<TagHierarchyRequest><tag id="1"/></TagHierarchyRequest>
+<TagHierarchyRequest><tag id="7"/></TagHierarchyRequest>
+<editTag><tag id="6" name="Tag1.4x"/></editTag>
+<createTag><tag name="Tag3.5x" parentID="12"/></createTag>
+<createTag><tag name="Tag5" parentID="1"/></createTag>
+<createTag><tag name="Tag1.5x" parentID="2"/></createTag>
+<TagHierarchyRequest><Tag id="1"/></TagHierarchyRequest>
 </test>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
 **file:simpleform.normalize
 int=number:integer;
@@ -405,13 +452,24 @@ DOCTYPE "feature Feature"
 		}
 	}
 }
+**file:tag.simpleform
+DOCTYPE "tag Tag"
+{
+	tag
+	{
+		id @int
+		parentID @int
+		name string
+		description string
+	}
+}
 **file:DBPRG.tdl
 --
 -- addCategory
 --
-OPERATION addCategoryPicture -- ($1=categoryID, caption, info, image)
+OPERATION addCategoryPicture -- ($1=categoryID)(caption, info, image, width, height, thumbnail)
 BEGIN
-	DO INSERT INTO Picture (caption,info,image) VALUES ($(caption), $(info), $(image));
+	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
 	DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
 	DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
 END
@@ -423,10 +481,7 @@ BEGIN
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
---	FOREACH picture DO addCategoryPicture($1);
-	FOREACH picture DO INSERT INTO Picture (caption,info,image) VALUES ($(caption), $(info), $(image));
-	FOREACH picture DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
-	FOREACH picture DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
+	FOREACH picture DO addCategoryPicture($1);
 END
 
 --
@@ -434,7 +489,7 @@ END
 --
 TRANSACTION deleteCategory -- (id)
 BEGIN
-	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Category WHERE ID = $(id);
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Category WHERE ID = $(id) AND ID != '1';
 	DO DELETE FROM Picture WHERE ID IN (SELECT pictureID FROM CategoryPicture WHERE categoryID = $(id));
 	DO DELETE FROM CategoryPicture WHERE categoryID = $(id);
 	DO DELETE FROM Category WHERE lft >= $1 AND lft <= $2;
@@ -445,10 +500,10 @@ END
 --
 -- updateCategory
 --
-TRANSACTION updateCategory -- (id, name, normalizedName, description, picture/id, picture/caption, picture/info, picture/image)
+TRANSACTION updateCategory -- (id, name, normalizedName, description, picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
 BEGIN
 	DO UPDATE Category SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
-	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image) WHERE ID = $(id);
+	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image), width = $(width), height = $(height), thumbnail = $(thumbnail) WHERE ID = $(id);
 END
 
 --
@@ -460,20 +515,20 @@ END
 TRANSACTION selectCategory -- (id)
 BEGIN
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE ID = $(id);
-	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
+	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
 END
 
 -- This is not supposed to exist, that's why we have the normalized name
 TRANSACTION selectCategoryByName -- (name)
 BEGIN
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE name = $(name);
-	INTO picture DO SELECT pictureID AS id,caption,info,image FROM CategoryPicture,Category WHERE CategoryPicture.categoryID = Category.ID AND Category.ID = $1;
+	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $1;
 END
 
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
-	INTO picture DO SELECT pictureID AS id,caption,info,image FROM CategoryPicture,Category WHERE CategoryPicture.categoryID = Category.ID AND Category.ID = $1;
+	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $1;
 END
 
 TRANSACTION selectCategorySet -- (/category/id)
@@ -499,6 +554,13 @@ END
 --
 -- addFeature
 --
+OPERATION addFeaturePicture -- ($1=featureID)(caption, info, image, width, height, thumbnail)
+BEGIN
+	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
+	DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
+	DO INSERT INTO FeaturePicture (featureID,pictureID) VALUES ($1,$2);
+END
+
 TRANSACTION addFeature -- (parentID, name, normalizedName, description)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT rgt FROM Feature WHERE ID = $(parentID);
@@ -506,6 +568,7 @@ BEGIN
 	DO UPDATE Feature SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Feature (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID from Feature WHERE normalizedName = $(normalizedName);
+	FOREACH picture DO addFeaturePicture($1);
 END
 
 --
@@ -513,7 +576,9 @@ END
 --
 TRANSACTION deleteFeature -- (id)
 BEGIN
-	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM Feature WHERE ID = $(id);
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Feature WHERE ID = $(id) AND ID != '1';
+	DO DELETE FROM Picture WHERE ID IN (SELECT pictureID FROM FeaturePicture WHERE featureID = $(id));
+	DO DELETE FROM FeaturePicture WHERE featureID = $(id);
 	DO DELETE FROM Feature WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Feature SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE Feature SET rgt = rgt-$3 WHERE rgt>$2;
@@ -522,31 +587,35 @@ END
 --
 -- updateFeature
 --
-TRANSACTION updateFeature -- (id, name, normalizedName, description)
+TRANSACTION updateFeature -- (id, name, normalizedName, description, picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
 BEGIN
-	DO UPDATE Feature SET name = $(name),normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
+	DO UPDATE Feature SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
+	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image), width = $(width), height = $(height), thumbnail = $(thumbnail) WHERE ID = $(id);
 END
 
 --
 -- selectFeature                 :Get the feature
 -- selectFeatureByName           :Get the feature by name
 -- selectFeatureByNormalizedName :Get the feature by name
--- selectFeatureList             :Get a list of features
+-- selectFeatureList             :Get a list of categories
 --
 TRANSACTION selectFeature -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Feature WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE ID = $(id);
+	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $(id);
 END
 
--- This is not supposed to exist either
+-- This is not supposed to exist, that's why we have the normalized name
 TRANSACTION selectFeatureByName -- (name)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Feature WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE name = $(name);
+	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $1;
 END
 
 TRANSACTION selectFeatureByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT name,normalizedName,description FROM Feature WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE normalizedName = $(normalizedName);
+	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $1;
 END
 
 TRANSACTION selectFeatureSet -- (/feature/id)
@@ -559,15 +628,88 @@ END
 --
 TRANSACTION selectTopFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM feature AS P1, feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
--- selectSubFeature       :Get the sub features
+-- selectSubFeature       :Get the feature
 --
 TRANSACTION selectSubFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM feature AS P1, feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+END
+--
+-- addTag
+--
+TRANSACTION addTag -- (parentID, name, normalizedName, description)
+BEGIN
+	DO NONEMPTY UNIQUE SELECT rgt FROM Tag WHERE ID = $(parentID);
+	DO UPDATE Tag SET rgt = rgt + 2 WHERE rgt >= $1;
+	DO UPDATE Tag SET lft = lft + 2 WHERE lft > $1;
+	DO INSERT INTO Tag (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
+	INTO . DO NONEMPTY UNIQUE SELECT ID from Tag WHERE normalizedName = $(normalizedName);
+END
+
+--
+-- deleteTag
+--
+TRANSACTION deleteTag -- (id)
+BEGIN
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Tag WHERE ID = $(id) AND ID != '1';
+	DO DELETE FROM Tag WHERE lft >= $1 AND lft <= $2;
+	DO UPDATE Tag SET lft = lft-$3 WHERE lft>$2;
+	DO UPDATE Tag SET rgt = rgt-$3 WHERE rgt>$2;
+END
+
+--
+-- updateTag
+--
+TRANSACTION updateTag -- (id, name, normalizedName, description)
+BEGIN
+	DO UPDATE Tag SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
+END
+
+--
+-- selectTag                 :Get the tag
+-- selectTagByName           :Get the tag by name
+-- selectTagByNormalizedName :Get the tag by name
+-- selectTagList             :Get a list of categories
+--
+TRANSACTION selectTag -- (id)
+BEGIN
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE ID = $(id);
+END
+
+-- This is not supposed to exist, that's why we have the normalized name
+TRANSACTION selectTagByName -- (name)
+BEGIN
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE name = $(name);
+END
+
+TRANSACTION selectTagByNormalizedName -- (normalizedName)
+BEGIN
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE normalizedName = $(normalizedName);
+END
+
+TRANSACTION selectTagSet -- (/tag/id)
+BEGIN
+	FOREACH /tag INTO tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Tag WHERE ID = $(id);
+END
+
+--
+-- selectTopTag       :Get the parents of a tag
+--
+TRANSACTION selectTopTag -- (id)
+BEGIN
+	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+END
+
+--
+-- selectSubTag       :Get the tag
+--
+TRANSACTION selectSubTag -- (id)
+BEGIN
+	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 **outputfile:DBDUMP
 **file: transaction_sqlite_configurator.lua
@@ -595,7 +737,7 @@ end
 local function picture_value( itr)
 	local picture = {}
 	for v,t in itr do
-		if (t == "id" or t == "caption" or t == "info" or t == "image") then
+		if (t == "id" or t == "caption" or t == "info" or t == "image" or t == "width" or t == "height" or t == "thumbnail") then
 			picture[ t] = content_value( v, itr)
 		end
 	end
@@ -766,6 +908,10 @@ local function delete_node( tablename, itr)
 			id = v
 		end
 	end
+	-- don't allow deletion of the root element
+	if id == "1" then
+		return
+	end
 	formfunction( "delete" .. tablename)( {id=id} )
 end
 
@@ -888,26 +1034,38 @@ function run()
 			add_tree( "Category", scope(itr))
 		elseif (t == "pushFeatureHierarchy") then
 			add_tree( "Feature", scope(itr))
+		elseif (t == "pushTagHierarchy") then
+			add_tree( "Tag", scope(itr))
 		elseif (t == "CategoryHierarchyRequest") then
 			select_tree( "Category", "category", scope(itr))
 		elseif (t == "FeatureHierarchyRequest") then
 			select_tree( "Feature", "feature", scope(itr))
+		elseif (t == "TagHierarchyRequest") then
+			select_tree( "Tag", "tag", scope(itr))
 		elseif (t == "editCategory") then
 			edit_node( "Category", scope(itr))
 		elseif (t == "editFeature") then
 			edit_node( "Feature", scope(itr))
+		elseif (t == "editTag") then
+			edit_node( "Tag", scope(itr))
 		elseif (t == "deleteCategory") then
 			delete_node( "Category", scope(itr))
 		elseif (t == "deleteFeature") then
 			delete_node( "Feature", scope(itr))
+		elseif (t == "deleteTag") then
+			delete_node( "Tag", scope(itr))
 		elseif (t == "createCategory") then
 			create_node( "Category", scope(itr))
 		elseif (t == "createFeature") then
 			create_node( "Feature", scope(itr))
+		elseif (t == "createTag") then
+			create_node( "Tag", scope(itr))
 		elseif (t == "CategoryRequest") then
 			select_node( "Category", "category", scope(itr))
 		elseif (t == "FeatureRequest") then
 			select_node( "Feature", "feature", scope(itr))
+		elseif (t == "TagRequest") then
+			select_node( "Tag", "tag", scope(itr))
 		end
 	end
 	output:closetag()
@@ -1109,7 +1267,7 @@ end
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
+</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption Z</caption><info>WNC info Z</info><image>WNC image Z</image><thumbnail>UUUUUUUUUUUUUUUU</thumbnail><width>123</width><height>27</height></picture></category><category id="54" parentID="46"><name>WNC child 3</name><normalizedName>wnc child 3</normalizedName><description></description><picture id="3"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail>TTTTTTTTTTTTTTTTTTTTT</thumbnail><width>13</width><height>56</height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
 	<category>_ROOT_</category>
 	<description>Categories tree root</description>
 	<tree><item id="2">
@@ -1172,6 +1330,8 @@ end
 				<category>WNC child 2</category></item></tree>
 			<tree><item id="52">
 				<category>WNC child Y</category></item></tree>
+			<tree><item id="54">
+				<category>WNC child 3</category></item></tree>
 		</item></tree>
 		<tree><item id="48">
 			<category>Microcontroller</category></item></tree>
@@ -1258,24 +1418,124 @@ end
 	</item></tree>
 	<tree><item id="17">
 		<feature>Space</feature></item></tree>
+</item></tree><tree><item id="1">
+	<tag>_ROOT_</tag>
+	<description>Tags tree root</description>
+	<tree><item id="2">
+		<tag>Tag1</tag>
+		<tree><item id="3">
+			<tag>Tag1.1</tag></item></tree>
+		<tree><item id="4">
+			<tag>Tag1.2</tag></item></tree>
+		<tree><item id="5">
+			<tag>Tag1.3</tag></item></tree>
+		<tree><item id="6">
+			<tag>Tag1.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<tag>Tag2</tag>
+		<tree><item id="8">
+			<tag>Tag2.1</tag></item></tree>
+		<tree><item id="9">
+			<tag>Tag2.2</tag></item></tree>
+		<tree><item id="11">
+			<tag>Tag2.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<tag>Tag3</tag>
+		<tree><item id="13">
+			<tag>Tag3.1</tag></item></tree>
+		<tree><item id="14">
+			<tag>Tag3.2</tag></item></tree>
+		<tree><item id="15">
+			<tag>Tag3.3</tag></item></tree>
+		<tree><item id="16">
+			<tag>Tag3.4</tag></item></tree>
+	</item></tree>
+</item></tree><tree><item id="7">
+	<tag>Tag2</tag>
+	<tree><item id="9">
+		<tag>Tag2.2</tag></item></tree>
+	<tree><item id="8">
+		<tag>Tag2.1</tag></item></tree>
+	<tree><item id="11">
+		<tag>Tag2.4</tag></item></tree>
+</item></tree><tree><item id="1">
+	<tag>_ROOT_</tag>
+	<description>Tags tree root</description>
+	<tree><item id="2">
+		<tag>Tag1</tag>
+		<tree><item id="3">
+			<tag>Tag1.1</tag></item></tree>
+		<tree><item id="4">
+			<tag>Tag1.2</tag></item></tree>
+		<tree><item id="5">
+			<tag>Tag1.3</tag></item></tree>
+		<tree><item id="6">
+			<tag>Tag1.4x</tag></item></tree>
+		<tree><item id="19">
+			<tag>Tag1.5x</tag></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<tag>Tag2</tag>
+		<tree><item id="8">
+			<tag>Tag2.1</tag></item></tree>
+		<tree><item id="9">
+			<tag>Tag2.2</tag></item></tree>
+		<tree><item id="11">
+			<tag>Tag2.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<tag>Tag3</tag>
+		<tree><item id="13">
+			<tag>Tag3.1</tag></item></tree>
+		<tree><item id="14">
+			<tag>Tag3.2</tag></item></tree>
+		<tree><item id="15">
+			<tag>Tag3.3</tag></item></tree>
+		<tree><item id="16">
+			<tag>Tag3.4</tag></item></tree>
+		<tree><item id="17">
+			<tag>Tag3.5x</tag></item></tree>
+	</item></tree>
+	<tree><item id="18">
+		<tag>Tag5</tag></item></tree>
 </item></tree></result>
 Tag:
-'1', NULL, '_ROOT_', '_ROOT_', 'Tags tree root', '1', '2'
+'1', NULL, '_ROOT_', '_ROOT_', 'Tags tree root', '1', '36'
+'2', '1', 'Tag1', 'tag1', NULL, '2', '13'
+'3', '2', 'Tag1.1', 'tag1.1', NULL, '3', '4'
+'4', '2', 'Tag1.2', 'tag1.2', NULL, '5', '6'
+'5', '2', 'Tag1.3', 'tag1.3', NULL, '7', '8'
+'6', '2', 'Tag1.4x', 'tag1.4x', NULL, '9', '10'
+'7', '1', 'Tag2', 'tag2', NULL, '14', '21'
+'8', '7', 'Tag2.1', 'tag2.1', NULL, '15', '16'
+'9', '7', 'Tag2.2', 'tag2.2', NULL, '17', '18'
+'11', '7', 'Tag2.4', 'tag2.4', NULL, '19', '20'
+'12', '1', 'Tag3', 'tag3', NULL, '22', '33'
+'13', '12', 'Tag3.1', 'tag3.1', NULL, '23', '24'
+'14', '12', 'Tag3.2', 'tag3.2', NULL, '25', '26'
+'15', '12', 'Tag3.3', 'tag3.3', NULL, '27', '28'
+'16', '12', 'Tag3.4', 'tag3.4', NULL, '29', '30'
+'17', '12', 'Tag3.5x', 'tag3.5x', NULL, '31', '32'
+'18', '1', 'Tag5', 'tag5', NULL, '34', '35'
+'19', '2', 'Tag1.5x', 'tag1.5x', NULL, '11', '12'
 
 sqlite_sequence:
-'Tag', '1'
-'Category', '53'
+'Tag', '19'
+'Category', '54'
 'Feature', '18'
-'Picture', '2'
+'Picture', '3'
 
 Picture:
-'1', 'WNC caption X', 'WNC info X', NULL, NULL, 'WNC image X', NULL
+'1', 'WNC caption Z', 'WNC info Z', '123', '27', 'WNC image Z', 'UUUUUUUUUUUUUUUU'
 '2', 'WNC caption', 'WNC info', NULL, NULL, 'WNC image', NULL
+'3', 'WNC caption', 'WNC info', '13', '56', 'WNC image', 'TTTTTTTTTTTTTTTTTTTTT'
 
 PictureTag:
 
 Category:
-'1', NULL, '_ROOT_', '_ROOT_', 'Categories tree root', '1', '62'
+'1', NULL, '_ROOT_', '_ROOT_', 'Categories tree root', '1', '64'
 '2', '1', 'Minicomputer', 'minicomputer', NULL, '2', '11'
 '3', '2', 'Superminicomputer', 'superminicomputer', NULL, '3', '4'
 '4', '2', 'Minicluster', 'minicluster', NULL, '5', '6'
@@ -1290,7 +1550,7 @@ Category:
 '13', '7', 'Personal computer', 'personal computer', NULL, '23', '24'
 '14', '7', 'Desktop computer', 'desktop computer', NULL, '25', '26'
 '15', '7', 'Home computer', 'home computer', NULL, '27', '28'
-'16', '1', 'Mobile', 'mobile', NULL, '32', '61'
+'16', '1', 'Mobile', 'mobile', NULL, '32', '63'
 '17', '16', 'Desknote', 'desknote', NULL, '33', '34'
 '18', '16', 'Laptop', 'laptop', NULL, '35', '44'
 '19', '18', 'Notebook', 'notebook', NULL, '36', '39'
@@ -1298,18 +1558,20 @@ Category:
 '21', '18', 'Tablet personal computer', 'tablet personal computer', NULL, '40', '41'
 '44', '18', 'Wearable computer', 'wearable computer', NULL, '42', '43'
 '45', '16', 'Single board computer', 'single board computer', NULL, '45', '46'
-'46', '16', 'Wireless network component', 'wireless network component', NULL, '47', '52'
-'47', '16', 'Plug computer', 'plug computer', NULL, '53', '54'
-'48', '16', 'Microcontroller', 'microcontroller', NULL, '55', '56'
-'49', '16', 'Smartdust', 'smartdust', NULL, '57', '58'
-'50', '16', 'Nanocomputer', 'nanocomputer', NULL, '59', '60'
+'46', '16', 'Wireless network component', 'wireless network component', NULL, '47', '54'
+'47', '16', 'Plug computer', 'plug computer', NULL, '55', '56'
+'48', '16', 'Microcontroller', 'microcontroller', NULL, '57', '58'
+'49', '16', 'Smartdust', 'smartdust', NULL, '59', '60'
+'50', '16', 'Nanocomputer', 'nanocomputer', NULL, '61', '62'
 '51', '7', 'Device from outer space', 'device from outer space', NULL, '29', '30'
 '52', '46', 'WNC child Y', 'wnc child y', NULL, '48', '49'
 '53', '46', 'WNC child 2', 'wnc child 2', NULL, '50', '51'
+'54', '46', 'WNC child 3', 'wnc child 3', NULL, '52', '53'
 
 CategoryPicture:
 '52', '1'
 '53', '2'
+'54', '3'
 
 Feature:
 '1', NULL, '_ROOT_', '_ROOT_', 'Features tree root', '1', '34'

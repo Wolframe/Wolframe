@@ -194,7 +194,7 @@
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption X</caption><info>WNC info X</info><image>WNC image X</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
+</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><description></description><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail></thumbnail><width></width><height></height></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><description></description><picture id="1"><caption>WNC caption Z</caption><info>WNC info Z</info><image>WNC image Z</image><thumbnail>UUUUUUUUUUUUUUUU</thumbnail><width>123</width><height>27</height></picture></category><category id="54" parentID="46"><name>WNC child 3</name><normalizedName>wnc child 3</normalizedName><description></description><picture id="3"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail>TTTTTTTTTTTTTTTTTTTTT</thumbnail><width>13</width><height>56</height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><description></description></category><tree><item id="1">
 	<category>_ROOT_</category>
 	<description>Categories tree root</description>
 	<tree><item id="2">
@@ -257,6 +257,8 @@
 				<category>WNC child 2</category></item></tree>
 			<tree><item id="52">
 				<category>WNC child Y</category></item></tree>
+			<tree><item id="54">
+				<category>WNC child 3</category></item></tree>
 		</item></tree>
 		<tree><item id="48">
 			<category>Microcontroller</category></item></tree>
@@ -343,4 +345,86 @@
 	</item></tree>
 	<tree><item id="17">
 		<feature>Space</feature></item></tree>
+</item></tree><tree><item id="1">
+	<tag>_ROOT_</tag>
+	<description>Tags tree root</description>
+	<tree><item id="2">
+		<tag>Tag1</tag>
+		<tree><item id="3">
+			<tag>Tag1.1</tag></item></tree>
+		<tree><item id="4">
+			<tag>Tag1.2</tag></item></tree>
+		<tree><item id="5">
+			<tag>Tag1.3</tag></item></tree>
+		<tree><item id="6">
+			<tag>Tag1.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<tag>Tag2</tag>
+		<tree><item id="8">
+			<tag>Tag2.1</tag></item></tree>
+		<tree><item id="9">
+			<tag>Tag2.2</tag></item></tree>
+		<tree><item id="11">
+			<tag>Tag2.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<tag>Tag3</tag>
+		<tree><item id="13">
+			<tag>Tag3.1</tag></item></tree>
+		<tree><item id="14">
+			<tag>Tag3.2</tag></item></tree>
+		<tree><item id="15">
+			<tag>Tag3.3</tag></item></tree>
+		<tree><item id="16">
+			<tag>Tag3.4</tag></item></tree>
+	</item></tree>
+</item></tree><tree><item id="7">
+	<tag>Tag2</tag>
+	<tree><item id="9">
+		<tag>Tag2.2</tag></item></tree>
+	<tree><item id="8">
+		<tag>Tag2.1</tag></item></tree>
+	<tree><item id="11">
+		<tag>Tag2.4</tag></item></tree>
+</item></tree><tree><item id="1">
+	<tag>_ROOT_</tag>
+	<description>Tags tree root</description>
+	<tree><item id="2">
+		<tag>Tag1</tag>
+		<tree><item id="3">
+			<tag>Tag1.1</tag></item></tree>
+		<tree><item id="4">
+			<tag>Tag1.2</tag></item></tree>
+		<tree><item id="5">
+			<tag>Tag1.3</tag></item></tree>
+		<tree><item id="6">
+			<tag>Tag1.4x</tag></item></tree>
+		<tree><item id="19">
+			<tag>Tag1.5x</tag></item></tree>
+	</item></tree>
+	<tree><item id="7">
+		<tag>Tag2</tag>
+		<tree><item id="8">
+			<tag>Tag2.1</tag></item></tree>
+		<tree><item id="9">
+			<tag>Tag2.2</tag></item></tree>
+		<tree><item id="11">
+			<tag>Tag2.4</tag></item></tree>
+	</item></tree>
+	<tree><item id="12">
+		<tag>Tag3</tag>
+		<tree><item id="13">
+			<tag>Tag3.1</tag></item></tree>
+		<tree><item id="14">
+			<tag>Tag3.2</tag></item></tree>
+		<tree><item id="15">
+			<tag>Tag3.3</tag></item></tree>
+		<tree><item id="16">
+			<tag>Tag3.4</tag></item></tree>
+		<tree><item id="17">
+			<tag>Tag3.5x</tag></item></tree>
+	</item></tree>
+	<tree><item id="18">
+		<tag>Tag5</tag></item></tree>
 </item></tree></result>

@@ -5,18 +5,13 @@
 #include "gtest/gtest.h"
 
 #include <iostream>
-#include <sstream>
 
+#ifdef _WIN32
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif
 #include "FreeImage.h"
-
-static void FreeImagePlusErrorHandler( FREE_IMAGE_FORMAT format, const char *message ) {
-	std::cerr << "\n*** ";
-	if(format != FIF_UNKNOWN) {
-		std::cerr << FreeImage_GetFormatFromFIF(format) << " Format\n";
-	}
-	std::cerr << message;
-	std::cerr << " ***\n";
-}
+#include "FreeImagePlus.h"
 
 // The fixture for testing class _Wolframe::module
 class FreeImagePlusFixture : public ::testing::Test
@@ -30,7 +25,6 @@ class FreeImagePlusFixture : public ::testing::Test
 #ifdef FREEIMAGE_LIB
 			FreeImage_Initialise( );
 #endif // FREEIMAGE_LIB
-			FreeImage_SetOutputMessage( FreeImagePlusErrorHandler );
 		}
 		
 		~FreeImagePlusFixture( )
@@ -42,49 +36,35 @@ class FreeImagePlusFixture : public ::testing::Test
 		}
 };
 
-TEST_F( FreeImagePlusFixture, VersionInfo )
-{
-	//std::cout << "FreeImage " << FreeImage_GetVersion( ) << "\n";
-	//std::cout << FreeImage_GetCopyrightMessage( ) << "\n\n";	
-
-	const char *version = FreeImage_GetVersion( );
-	std::ostringstream ss;
-	ss << FREEIMAGE_MAJOR_VERSION << "." << FREEIMAGE_MINOR_VERSION << "." << FREEIMAGE_RELEASE_SERIAL;
-	ASSERT_STREQ( version, ss.str( ).c_str( ) );
-}
-
 #define TESTFILE "test.png"
+#define THUMB "thumbcpp.png"
 
 TEST_F( FreeImagePlusFixture, ImageInfo )
 {
 // load the image
-	FREE_IMAGE_FORMAT format = FIF_UNKNOWN;
+	fipImage image;
+	image.load( TESTFILE, 0 );
 
-// check the file signature and deduce its format
-// (the second argument is currently not used by FreeImage)
-	format = FreeImage_GetFileType( TESTFILE, 0 );
-	if( format == FIF_UNKNOWN ) {
-// no signature ?
-// try to guess the file format from the file extension
-		format = FreeImage_GetFIFFromFilename( TESTFILE );
-	}
-	
-	FIBITMAP *image;
-	
-// check that the plugin has reading capabilities ...
-	if( ( format != FIF_UNKNOWN ) && FreeImage_FIFSupportsReading( format ) ) {
-// ok, let's load the file
-		image = FreeImage_Load( format, TESTFILE, 0 );
-	}
-	
-	unsigned int width = FreeImage_GetWidth( image );
-	unsigned int height = FreeImage_GetHeight( image );
-	//std::cout << "size is " << width << " x " << height << std::cout;
+// get info about the image
+	unsigned int width = image.getWidth( );
+	unsigned int height = image.getHeight( );
+	//std::cout << "size is " << width << " x " << height << std::endl;
 	ASSERT_EQ( width, 312 );
 	ASSERT_EQ( height, 312 );
 	
-// Unload the bitmap
-	FreeImage_Unload( image );
+// make thumbnail
+	fipImage thumb( image );
+	thumb.makeThumbnail( 50, true );
+
+// get info about the thumb
+	unsigned int widthThumb = thumb.getWidth( );
+	unsigned int heightThumb = thumb.getHeight( );
+	//std::cout << "size of thumb is " << widthThumb << " x " << heightThumb << std::endl;
+	ASSERT_EQ( widthThumb, 50 );
+	ASSERT_EQ( heightThumb, 50 );
+	
+// save image (for debugging mainly)
+	thumb.save( THUMB, 0 );
 }
 
 int main( int argc, char **argv )

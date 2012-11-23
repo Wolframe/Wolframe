@@ -22,7 +22,7 @@ end
 local function picture_value( itr)
 	local picture = {}
 	for v,t in itr do
-		if (t == "id" or t == "caption" or t == "info" or t == "image") then
+		if (t == "id" or t == "caption" or t == "info" or t == "image" or t == "width" or t == "height" or t == "thumbnail") then
 			picture[ t] = content_value( v, itr)
 		end
 	end

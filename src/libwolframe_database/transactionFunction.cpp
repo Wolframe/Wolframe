@@ -172,12 +172,12 @@ public:
 	};
 
 	Path(){}
-	Path( const std::string& src, TransactionFunction::TagTable* tagmap, std::string* strings);
+	Path( const std::string& src, TransactionFunction::TagTable* tagmap);
 	Path( const Path& o);
 	std::string tostring() const;
 
 	std::size_t resultReference() const;
-	std::size_t constantReference() const;
+	const char* constantReference() const;
 	void selectNodes( const TransactionFunctionInput::Structure& st, const TransactionFunctionInput::Structure::Node& nd, std::vector<TransactionFunctionInput::Structure::Node>& ar) const;
 
 	std::vector<Element>::const_iterator begin() const		{return m_path.begin();}
@@ -189,9 +189,12 @@ public:
 		std::vector<Element>::iterator pi = m_path.begin(), pe = m_path.end();
 		for (; pi != pe; ++pi)
 		{
-			std::map<int,int>::const_iterator re = rwtab.find( pi->m_tag);
-			if (re == rwtab.end()) throw std::logic_error( "rewrite table not complete");
-			pi->m_tag = re->second;
+			if (pi->m_type == Next || pi->m_type == Find)
+			{
+				std::map<int,int>::const_iterator re = rwtab.find( pi->m_tag);
+				if (re == rwtab.end()) throw std::logic_error( "rewrite table not complete");
+				pi->m_tag = re->second;
+			}
 		}
 	}
 
@@ -202,6 +205,7 @@ public:
 
 private:
 	std::vector<Element> m_path;
+	std::string m_constant;
 };
 
 class FunctionCall
@@ -241,7 +245,6 @@ struct TransactionFunction::Impl
 	std::vector<bool> m_elemunique;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
-	std::string m_strings;
 
 	Impl( const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap);
 	Impl( const Impl& o);
@@ -535,7 +538,7 @@ const std::pair<const char*,std::size_t> TransactionFunctionInput::Structure::no
 	return rt;
 }
 
-Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap, std::string* strings)
+Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap)
 {
 	Element elem;
 	std::string::const_iterator ii = pt.begin(), ee = pt.end();
@@ -546,9 +549,8 @@ Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap, std::s
 			std::string constant;
 			utils::parseNextToken( constant, ii, ee);
 			elem.m_type = Constant;
-			elem.m_tag = strings->size();
-			strings->append( constant);
-			strings->push_back( '\0');
+			elem.m_tag = 0;
+			m_constant.append( constant);
 			if (!m_path.empty()) throw std::runtime_error( "unexpected string constant in path");
 			if (utils::gotoNextToken( ii, ee)) throw std::runtime_error( "unexpected token after string constant argument");
 			m_path.push_back( elem);
@@ -639,18 +641,23 @@ Path::Path( const Path& o)
 
 std::size_t Path::resultReference() const
 {
-	if (m_path.size() && m_path[0].m_type == Result) return m_path[0].m_tag;
+	if (m_path.size() && m_path[0].m_type == Result)
+	{
+		return m_path[0].m_tag;
+	}
 	return 0;
 }
 
-std::size_t Path::constantReference() const
+const char* Path::constantReference() const
 {
-	if (m_path.size() && m_path[0].m_type == Constant) return m_path[0].m_tag;
+	if (m_path.size() && m_path[0].m_type == Constant) return m_constant.c_str();
 	return 0;
 }
 
 std::string Path::tostring() const
 {
+	if (constantReference()) return m_constant;
+
 	std::vector<Element>::const_iterator ii = m_path.begin(), ee = m_path.end();
 	std::ostringstream rt;
 	for (; ii != ee; ++ii)
@@ -784,7 +791,7 @@ bool TransactionFunctionInput::print( ElementType type, const Element& element)
 	return true;
 }
 
-static void bindArguments( TransactionInput& ti, const FunctionCall& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::Node& selectornode, const std::string& constants)
+static void bindArguments( TransactionInput& ti, const FunctionCall& call, const TransactionFunctionInput* inputst, const TransactionFunctionInput::Structure::Node& selectornode)
 {
 	typedef TransactionFunctionInput::Structure::Node Node;
 
@@ -792,13 +799,14 @@ static void bindArguments( TransactionInput& ti, const FunctionCall& call, const
 	for (std::size_t argidx=1; pi != pe; ++pi,++argidx)
 	{
 		std::size_t idx;
+		const char* cns;
 		if ((idx = pi->resultReference()) != 0)
 		{
 			ti.bindCommandArgAsResultReference( idx);
 		}
-		else if ((idx = pi->constantReference()) != 0)
+		else if ((cns = pi->constantReference()) != 0)
 		{
-			ti.bindCommandArgAsValue( constants.c_str() + idx, std::strlen(constants.c_str()));
+			ti.bindCommandArgAsValue( cns, std::strlen(cns));
 		}
 		else
 		{
@@ -845,29 +853,36 @@ static void getOperationInput( const TransactionFunctionInput* this_, Transactio
 		{
 			ci->selector().selectNodes( this_->structure(), *ni, nodearray);
 		}
-		// For each selected node do expand the function call arguments:
-		std::vector<Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
-		for (; vi != ve; ++vi)
+		std::vector<FunctionCall>::const_iterator ca = ci;
+		if (ci->level() > level)
 		{
-			if (ci->level() > level)
+			if (!ci->name().empty()) throw std::logic_error("passing arguments expected when calling OPERATION");
+			std::size_t nextfidx = fidx;
+			for (++ca; ca != ce; ++ca,++nextfidx)
 			{
-				if (!ci->name().empty()) throw std::logic_error("passing arguments expected when calling OPERATION");
-				rt.startCommand( fidx, ci->level(), ci->name());
-				bindArguments( rt, *ci, this_, *vi, this_->func()->impl().m_strings);
-
-				std::vector<FunctionCall>::const_iterator ca = ci;
-				for (++ca; ca != ce; ++ca)
-				{
-					if (ca->level() < level || (ca->level() == level && ca->name().empty())) break;
-				}
-				getOperationInput( this_, rt, fidx, ci->level(), ++ci, ca, nodearray);
-				ci = ca;
-				--ci;
+				if (ca->level() < level || (ca->level() == level && ca->name().empty())) break;
 			}
-			else
+			std::vector<Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
+			for (; vi != ve; ++vi)
 			{
 				rt.startCommand( fidx, ci->level(), ci->name());
-				bindArguments( rt, *ci, this_, *vi, this_->func()->impl().m_strings);
+				bindArguments( rt, *ci, this_, *vi);
+				std::vector<Node> opnodearray;
+				opnodearray.push_back( *vi);
+				getOperationInput( this_, rt, fidx+1, ci->level(), ci+1, ca, opnodearray);
+			}
+			ci = ca;
+			ci--;
+			fidx = nextfidx;
+		}
+		else
+		{
+			// For each selected node do expand the function call arguments:
+			std::vector<Node>::const_iterator vi=nodearray.begin(), ve=nodearray.end();
+			for (; vi != ve; ++vi)
+			{
+				rt.startCommand( fidx, ci->level(), ci->name());
+				bindArguments( rt, *ci, this_, *vi);
 			}
 		}
 	}
@@ -1089,7 +1104,6 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 {
 	typedef TransactionDescription::Error Error;
 	TransactionDescription::ElementName elementName = TransactionDescription::Call;
-	m_strings.push_back( '\0');
 
 	std::vector<std::size_t> functionidx;
 	std::vector<TransactionDescription>::const_iterator di = description.begin(), de = description.end();
@@ -1177,13 +1191,13 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 		try
 		{
 			elementName = TransactionDescription::Selector;
-			Path selector( di->selector, &m_tagmap, &m_strings);
+			Path selector( di->selector, &m_tagmap);
 			elementName = TransactionDescription::Call;
 			std::vector<Path> param;
 			std::vector<std::string>::const_iterator ai = paramstr.begin(), ae = paramstr.end();
 			for (; ai != ae; ++ai)
 			{
-				Path pp( *ai, &m_tagmap, &m_strings);
+				Path pp( *ai, &m_tagmap);
 				param.push_back( pp);
 			}
 			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( functionname);
@@ -1320,8 +1334,7 @@ TransactionFunction::Impl::Impl( const Impl& o)
 	:m_resultname(o.m_resultname)
 	,m_elemname(o.m_elemname)
 	,m_call(o.m_call)
-	,m_tagmap(o.m_tagmap)
-	,m_strings(o.m_strings){}
+	,m_tagmap(o.m_tagmap){}
 
 
 TransactionFunction::TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap)
