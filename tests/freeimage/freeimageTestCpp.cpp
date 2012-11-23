@@ -1,5 +1,5 @@
 //
-// testing FreeImage library
+// testing FreeImagePlus library (C++ wrapper)
 //
 
 #include "gtest/gtest.h"
@@ -9,7 +9,7 @@
 
 #include "FreeImage.h"
 
-static void FreeImageErrorHandler( FREE_IMAGE_FORMAT format, const char *message ) {
+static void FreeImagePlusErrorHandler( FREE_IMAGE_FORMAT format, const char *message ) {
 	std::cerr << "\n*** ";
 	if(format != FIF_UNKNOWN) {
 		std::cerr << FreeImage_GetFormatFromFIF(format) << " Format\n";
@@ -19,21 +19,21 @@ static void FreeImageErrorHandler( FREE_IMAGE_FORMAT format, const char *message
 }
 
 // The fixture for testing class _Wolframe::module
-class FreeImageFixture : public ::testing::Test
+class FreeImagePlusFixture : public ::testing::Test
 {
 	protected:
 
 	protected:
-		FreeImageFixture( )
+		FreeImagePlusFixture( )
 		{
 // call this ONLY when linking with FreeImage as a static library
 #ifdef FREEIMAGE_LIB
 			FreeImage_Initialise( );
 #endif // FREEIMAGE_LIB
-			FreeImage_SetOutputMessage( FreeImageErrorHandler );
+			FreeImage_SetOutputMessage( FreeImagePlusErrorHandler );
 		}
 		
-		~FreeImageFixture( )
+		~FreeImagePlusFixture( )
 		{
 // call this ONLY when linking with FreeImage as a static library
 #ifdef FREEIMAGE_LIB
@@ -42,7 +42,7 @@ class FreeImageFixture : public ::testing::Test
 		}
 };
 
-TEST_F( FreeImageFixture, VersionInfo )
+TEST_F( FreeImagePlusFixture, VersionInfo )
 {
 	//std::cout << "FreeImage " << FreeImage_GetVersion( ) << "\n";
 	//std::cout << FreeImage_GetCopyrightMessage( ) << "\n\n";	
@@ -55,7 +55,7 @@ TEST_F( FreeImageFixture, VersionInfo )
 
 #define TESTFILE "test.png"
 
-TEST_F( FreeImageFixture, ImageInfo )
+TEST_F( FreeImagePlusFixture, ImageInfo )
 {
 // load the image
 	FREE_IMAGE_FORMAT format = FIF_UNKNOWN;
@@ -79,21 +79,9 @@ TEST_F( FreeImageFixture, ImageInfo )
 	
 	unsigned int width = FreeImage_GetWidth( image );
 	unsigned int height = FreeImage_GetHeight( image );
-	//std::cout << "size is " << width << " x " << height << std::endl;
+	//std::cout << "size is " << width << " x " << height << std::cout;
 	ASSERT_EQ( width, 312 );
 	ASSERT_EQ( height, 312 );
-
-// make thumbnail
-	FIBITMAP *thumb = FreeImage_MakeThumbnail( image, 50, true );
-
-	unsigned int widthThumb = FreeImage_GetWidth( thumb );
-	unsigned int heightThumb = FreeImage_GetHeight( thumb );
-	//std::cout << "size of thumb is " << widthThumb << " x " << heightThumb << std::endl;
-	ASSERT_EQ( widthThumb, 50 );
-	ASSERT_EQ( heightThumb, 50 );
-	
-// save image (for debugging mainly)
-	FreeImage_Save( FIF_PNG, thumb, "thumb.png", 0 );
 	
 // Unload the bitmap
 	FreeImage_Unload( image );

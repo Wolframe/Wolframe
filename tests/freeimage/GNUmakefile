@@ -21,18 +21,21 @@ INCLUDE_LIBS = \
 TEST_OBJS =
 
 TEST_CPP_BINS = \
-	freeimageTest$(EXE)
+	freeimageTest$(EXE) \
+	freeimageTestCpp$(EXE)
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
 
 local_clean:
+	@-rm thumb.png
 
 local_distclean:
 
 local_test: $(TEST_CPP_BINS)
 ifeq ($(RUN_TESTS),1)
 	@LD_LIBRARY_PATH=$(FREEIMAGE_LIB_DIR) ./freeimageTest
+	@LD_LIBRARY_PATH=$(FREEIMAGE_LIB_DIR) ./freeimageTestCpp
 	@echo
 endif

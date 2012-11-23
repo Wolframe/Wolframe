@@ -22,18 +22,21 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\freeimage\freeimage3.lib
 	
 TEST_CPP_BINS = \
-	freeimageTest.exe
+	freeimageTest.exe \
+	freeimageTestCpp.exe
 
 OBJS =
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 freeimageTest.exe: freeimageTest.obj
+freeimageTestCpp.exe: freeimageTestCpp.obj
 
 local_all:
 
 local_clean:
 	@-erase test.bat 2>NUL
+	@-erase thumb.png 2>NUL
 
 local_distclean:
 
@@ -41,5 +44,6 @@ local_test:
 	@-echo @echo off > test.bat
 	@-echo copy "$(TOPDIR)\freeimage\freeimage3.dll" . >> test.bat
 	@-echo freeimageTest >> test.bat
+	@-echo freeimageTestCpp >> test.bat
 	@-echo echo off >> test.bat
 	@-test.bat

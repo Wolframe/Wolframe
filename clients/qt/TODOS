@@ -14,11 +14,6 @@ unsorted:
   - use them from a picklist (with images)
   
 musts:
-- SSL: allow to ignore certain error, most prominent ones are
-  - allow for separate ignorable things:
-    - self-signed certs with the CA which has been installed in the system
-    - validation of the host in the certificate
-  - for now there is a generic checkSSL
 - problems with size of main window to follow size of form ui
 - frontend:
   - associating categories and features
