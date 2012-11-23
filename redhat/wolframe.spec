@@ -816,6 +816,11 @@ fi
 %{_libdir}/wolframe/liblua.so.5
 %endif
 
+%if %{with_local_freeimage}
+%{_libdir}/wolframe/libfreeimage.so.3.15.4
+%{_libdir}/wolframe/libfreeimage.so.3
+%endif
+
 %dir %{_libdir}/wolframe/modules
 
 %{_libdir}/wolframe/modules/mod_audit_textfile.so
@@ -990,10 +995,6 @@ fi
 %if %{with_local_libhpdf}
 %{_libdir}/wolframe/libhpdf.so.2.2.1
 %{_libdir}/wolframe/libhpdf.so.2
-%endif
-%if %{with_local_freeimage}
-%{_libdir}/wolframe/libfreeimage.so.3.15.4
-%{_libdir}/wolframe/libfreeimage.so.3
 %endif
 
 %endif
