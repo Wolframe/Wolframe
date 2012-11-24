@@ -1,20 +1,18 @@
 DOCTYPE "feature Feature"
 {
-	feature
+	id @int
+	parentID @int
+	name string
+	normalizedName string
+	description string
+	picture
 	{
 		id @int
-		parentID @int
-		name string
-		description string
-		picture
-		{
-			id @int
-			caption string
-			info string
-			image string
-			thumbnail string
-			width int
-			height int
-		}
+		caption string
+		info string
+		image string
+		thumbnail string
+		width int
+		height int
 	}
 }

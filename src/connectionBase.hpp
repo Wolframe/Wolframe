@@ -47,7 +47,9 @@
 #include <string>
 #include <cassert>
 
+#ifdef WITH_SSL
 #include <boost/asio/ssl/error.hpp>
+#endif // WITH_SSL
 
 #include "connectionHandler.hpp"
 #include "logger-v1.hpp"
@@ -211,6 +213,7 @@ protected:
 
 		default:	{
 			std::string err = e.message();
+#ifdef WITH_SSL
 			if ( e.category() == boost::asio::error::get_ssl_category() )	{
 				err = std::string( " (" )
 						+ boost::lexical_cast< std::string >( ERR_GET_LIB( e.value() ) ) + ", "
@@ -221,6 +224,7 @@ protected:
 				::ERR_error_string_n( e.value(), buf, sizeof( buf ) );
 				err += buf;
 			}
+#endif // WITH_SSL
 			LOG_DEBUG << "Unknown error: " << e.value() << ", category: " << e.category().name()
 				  << ", message: " << err;
 			ns = ConnectionHandler::UNKNOWN_ERROR;

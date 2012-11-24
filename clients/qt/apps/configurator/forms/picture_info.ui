@@ -20,10 +20,10 @@
    <string notr="true">{global.id}</string>
   </property>
   <property name="doctype" stdset="0">
-   <string notr="true">CategoryRequest.simpleForm</string>
+   <string notr="true">{global.picture_doctype}</string>
   </property>
   <property name="rootelement" stdset="0">
-   <string>category</string>
+   <string>{global.picture_rootelement}</string>
   </property>
   <widget class="QWidget" name="horizontalLayoutWidget_2">
    <property name="geometry">
@@ -36,12 +36,25 @@
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
-     <widget class="QPushButton" name="cancel">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="close">
       <property name="text">
-       <string>Back</string>
+       <string>Close</string>
       </property>
       <property name="form" stdset="0">
-       <string notr="true">category_edit</string>
+       <string notr="true">{global.picture_back}</string>
       </property>
       <property name="id" stdset="0">
        <string>{global.id}</string>

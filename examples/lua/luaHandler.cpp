@@ -385,15 +385,19 @@ void luaConnection::signalOccured( NetworkSignal signal )
 				signal_s = "BROKEN_PIPE";
 				break;
 
+			case CONNECTION_RESET:
+				signal_s = "TERMINATING";
+				break;
+
 			case OPERATION_CANCELLED:
 				signal_s = "OPERATION_CANCELLED";
 				break;
-				
-                        case TIMEOUT:
-                        case TERMINATE:
-                                // handled above, keeping compiler silent here
-                                break;
-                        
+
+			case TIMEOUT:
+			case TERMINATE:
+				// handled above, keeping compiler silent here
+				break;
+
 			case UNKNOWN_ERROR:
 				signal_s = "UNKNOWN_ERROR";
 				break;

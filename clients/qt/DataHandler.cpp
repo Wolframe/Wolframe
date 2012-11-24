@@ -188,7 +188,8 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
 			QStringList fileNames = fileChooser->fileNames( );
 			xml.writeStartElement( name );
-			foreach( QString fileName, fileNames ) {			
+			foreach( QString fileName, fileNames ) {
+				if( fileName.isEmpty( ) ) continue;			
 				xml.writeStartElement( "file" );
 				xml.writeAttribute( "filename", fileName );
 				QFile file( fileName );
@@ -674,7 +675,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 	QWidget *widget = qFindChild<QWidget *>( form, name );
 // no widget found with that name
 	if( !widget ) {
-		qWarning( ) << "Unknown widget" << name << "in variable" << variable;
+		qWarning( ) << "Unknown widget" << name << "in variable" << variable << "of form" << form;
 		return QString( );
 	}
 	
