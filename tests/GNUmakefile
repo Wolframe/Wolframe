@@ -49,7 +49,6 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind \
-	-L$(TOPDIR)/src/libwolframe_functions \
 	-L$(TOPDIR)/src/libwolframe_prnt \
 	-L$(BOOST_LIB_DIR)
 
@@ -61,7 +60,6 @@ INCLUDE_LIBS = \
 	-lwolframe_serialize \
 	-lwolframe_database \
 	-lwolframe_langbind \
-	-lwolframe_functions \
 	-lwolframe_prnt \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_filesystem -lboost_system -lboost_program_options
