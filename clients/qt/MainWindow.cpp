@@ -367,6 +367,9 @@ void MainWindow::finishInitialize( )
 	
 // load initial form
 	loadForm( "init" );
+
+// hide myself, as the theme opens a second main window
+	hide( );
 }
 
 void MainWindow::connected( )
