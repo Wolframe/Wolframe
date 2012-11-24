@@ -74,7 +74,7 @@ TEST_F( FreeImagePlusFixture, ImageInfo )
 TEST_F( FreeImagePlusFixture, ImageFromMemory )
 {
 // load the file
-	std::ifstream ifs( TESTFILE );
+	std::ifstream ifs( TESTFILE, std::ios::in | std::ios::binary );
 	std::vector<char> raw( ( std::istreambuf_iterator<char>( ifs ) ),
 		( std::istreambuf_iterator<char>( ) ) );
 	//std::cout << raw.size( ) << std::endl;
@@ -103,7 +103,7 @@ TEST_F( FreeImagePlusFixture, ImageFromMemory )
 	BYTE *thumbData = NULL;
 	DWORD thumbSize = 0;
 	outIO.acquire( &thumbData, &thumbSize );
-	std::cout << "bytesize of image is " << thumbSize << std::endl;
+	//std::cout << "bytesize of image is " << thumbSize << std::endl;
 
 // output to file
 	std::ofstream ofs( COPYFILE );
