@@ -143,6 +143,11 @@ tests/database/SQLite3/sqliteUnit
 tests/database/SQLite3/test.db
 tests/database/SQLite3/garbage.db
 tests/unitLibraryTest
+tests/freeimage/freeimageTest
+tests/freeimage/freeimageTestCpp
+tests/freeimage/testmem.png
+tests/freeimage/thumb.png
+tests/freeimage/thumbcpp.png
 *.qm
 sqlite3/sqlite3
 tests/boost-locale/boostLocaleTest
@@ -150,4 +155,8 @@ tests/testArrayDoublingAllocator
 clients/qt/Makefile
 clients/qt/data.db
 geany.c++.tags
-freeimageTest
+clients/qtclient-build-desktop/
+examples/demo/configurator/database/configurator.db
+examples/demo/configurator/database/configurator.db-journal
+examples/demo/first/database/tree.db
+wolframed.sh

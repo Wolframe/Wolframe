@@ -1,9 +1,9 @@
 int= number: integEr( 10 );
-f_int= number :trim  ,numbeR:integer( 10);
+f_int= string :trim  ,numbeR:integer( 10);
 uint =number:uNsigned(10 );
-f_uint =number:trim, number:unsiGned( 10) ;
+f_uint =string:trim, number:unsiGned( 10) ;
 float = number:float(12,12);
-f_floAt = number:trim ,Number:float(12,12);
+f_floAt = string:trim ,Number:float(12,12);
 text_Ascii_de =  localeConv :latinword, ascii_de
 text_ascii_eu=localeconv :  latinword ,ascii_eu ;
 

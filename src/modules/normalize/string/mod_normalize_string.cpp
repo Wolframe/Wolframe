@@ -30,22 +30,40 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/number/trimNormalizeFunction.hpp
-///\brief Normalizer for triming ascii strings
-#ifndef _LANGBIND_TRIM_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_TRIM_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
-#include <string>
+///\file mod_normalize_string.cpp
+///\brief Module for string normalization and validating functions without using ICU
+#include "module/normalizeFunctionBuilder.hpp"
+#include "logger-v1.hpp"
+#include "stringNormalize.hpp"
 
-namespace _Wolframe {
-namespace langbind {
+_Wolframe::log::LogBackend* logBackendPtr;
 
-class TrimNormalizeFunction :public NormalizeFunction
+using namespace _Wolframe;
+using namespace _Wolframe::module;
+
+static void setModuleLogger( void* logger )
 {
-public:
-	TrimNormalizeFunction(){}
-	virtual std::string execute( const std::string& str) const;
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
+}
+
+static langbind::ResourceHandle stringResource;
+
+namespace {
+struct NormalizeProcessor
+{
+
+	static SimpleBuilder* constructor()
+	{
+		return new NormalizeFunctionBuilder( "StringNormalizer", "string", langbind::normalizeFunctions, langbind::createStringNormalizeFunction, &stringResource);
+	}
+};
+}//anonymous namespace
+
+enum {NofObjects=1};
+static createBuilderFunc objdef[ NofObjects] =
+{
+	NormalizeProcessor::constructor
 };
 
-}}
-#endif
+ModuleEntryPoint entryPoint( 0, "normalizers and validators numbers", setModuleLogger, 0, 0, NofObjects, objdef);
+

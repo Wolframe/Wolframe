@@ -30,28 +30,22 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/number/trimNormalizeFunction.cpp
-#include "trimNormalizeFunction.hpp"
+///\file trimNormalizeFunction.hpp
+///\brief Normalizer for triming ascii strings
+#ifndef _LANGBIND_TRIM_NORMALIZE_FUNCTION_HPP_INCLUDED
+#define _LANGBIND_TRIM_NORMALIZE_FUNCTION_HPP_INCLUDED
+#include "langbind/normalizeFunction.hpp"
+#include <string>
 
-using namespace _Wolframe;
-using namespace langbind;
+namespace _Wolframe {
+namespace langbind {
 
-std::string TrimNormalizeFunction::execute( const std::string& str) const
+class TrimNormalizeFunction :public NormalizeFunction
 {
-	std::string::const_iterator ii = str.begin(), ee = str.end();
-	while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
-	std::string::const_iterator ti = ii, te = ii;
-	for (; ii != ee; ++ii)
-	{
-		if ((unsigned char)*ii > 32) te = ii+1;
-	}
-	if (ti == str.begin() && te == str.end())
-	{
-		return str;
-	}
-	else
-	{
-		return std::string( ti, te);
-	}
-}
+public:
+	TrimNormalizeFunction(){}
+	virtual std::string execute( const std::string& str) const;
+};
 
+}}
+#endif

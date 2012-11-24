@@ -76,6 +76,7 @@ namespace luaname
 	static const char* FormFunctionClosure = "wolframe.FormFunctionClosure";
 	static const char* TransactionFunctionClosure = "wolframe.TransactionFunctionClosure";
 	static const char* Transaction = "wolframe.Transaction";
+	static const char* NormalizeFunction = "wolframe.NormalizeFunction";
 	static const char* PrintFunctionClosure = "wolframe.PrintFunctionClosure";
 	static const char* StructSerializer = "wolframe.StructSerializer";
 	static const char* ProcessorProvider = ":wolframe.ProcessorProvider";
@@ -100,6 +101,7 @@ template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname
 template <> const char* metaTableName<FormFunctionClosure>()		{return luaname::FormFunctionClosure;}
 template <> const char* metaTableName<TransactionFunctionClosure>()	{return luaname::TransactionFunctionClosure;}
 template <> const char* metaTableName<db::TransactionR>()		{return luaname::Transaction;}
+template <> const char* metaTableName<NormalizeFunction>()		{return luaname::NormalizeFunction;}
 template <> const char* metaTableName<PrintFunctionClosure>()		{return luaname::PrintFunctionClosure;}
 template <> const char* metaTableName<serialize::StructSerializer>()	{return luaname::StructSerializer;}
 template <> const char* metaTableName<proc::ProcessorProvider>()	{return luaname::ProcessorProvider;}
@@ -536,6 +538,31 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_typedinputfilterClosure_get)
 			return 2;
 	}
 	throw std::runtime_error( "illegal state when fetching next element");
+}
+
+LUA_FUNCTION_THROWS( "<normalizer>(..)", function_normalizer_call)
+{
+	check_parameters( ls, 0, 1, LUA_TSTRING);
+	NormalizeFunction* func = (NormalizeFunction*)lua_upvalueindex( 1);
+	std::size_t len;
+	const char* content = lua_tolstring( ls, 1, &len);
+	std::string rt = func->execute( std::string( content, len));
+	lua_pushlstring( ls, rt.c_str(), rt.size());
+	return 1;
+}
+
+LUA_FUNCTION_THROWS( "normalizer(..)", function_normalizer)
+{
+	check_parameters( ls, 0, 1, LUA_TSTRING);
+	const char* name = lua_tostring( ls, 1);
+	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+
+	const NormalizeFunction* func = ctx->normalizeFunction( name);
+	if (!func) throw std::runtime_error( std::string("normalizer '") + name + "' not defined");
+
+	lua_pushlightuserdata( ls, const_cast<NormalizeFunction*>(func));
+	lua_pushcclosure( ls, function_normalizer_call, 1);
+	return 1;
 }
 
 
@@ -2052,6 +2079,8 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			lua_setglobal( ls, "formfunction");
 			lua_pushcfunction( ls, &function_scope);
 			lua_setglobal( ls, "scope");
+			lua_pushcfunction( ls, &function_normalizer);
+			lua_setglobal( ls, "normalizer");
 		}
 		return true;
 	}

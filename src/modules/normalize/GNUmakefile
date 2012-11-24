@@ -1,6 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS = number
+SUBDIRS = number base64 string
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
