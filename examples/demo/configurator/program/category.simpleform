@@ -1,14 +1,3 @@
-DOCTYPE "picture Picture"
-{
-	id @int
-	caption string
-	info string
-	image string
-	thumbnail string
-	width int
-	height int
-}
-
 DOCTYPE "category Category"
 {
 	id @int
@@ -16,5 +5,14 @@ DOCTYPE "category Category"
 	name string
 	normalizedName string
 	description string
-	picture Picture[]
+	picture
+	{
+		id @int
+		caption string
+		info string
+		image string
+		thumbnail string
+		width int
+		height int
+	}
 }

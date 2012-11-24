@@ -85,7 +85,7 @@
          <x>77</x>
          <y>69</y>
          <width>201</width>
-         <height>141</height>
+         <height>131</height>
         </rect>
        </property>
        <property name="minimumSize">
@@ -139,6 +139,25 @@
          <width>211</width>
          <height>20</height>
         </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="reset_2">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>190</y>
+         <width>51</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Info</string>
+       </property>
+       <property name="id" stdset="0">
+        <string notr="true">{global.id}</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>picture_info</string>
        </property>
       </widget>
      </widget>
