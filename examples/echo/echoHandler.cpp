@@ -198,6 +198,11 @@ void echoConnection::signalOccured( NetworkSignal signal )
 			state_ = TERMINATING;
 			break;
 
+		case CONNECTION_RESET:
+			LOG_TRACE << "Processor received CONNECTION RESET (connection closed by peer)";
+			state_ = TERMINATING;
+			break;
+
 		case OPERATION_CANCELLED:
 			LOG_TRACE << "Processor received OPERATION_CANCELED (should have been requested by us)";
 			state_ = TERMINATING;
