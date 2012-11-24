@@ -49,7 +49,7 @@ static void setModuleLogger( void* logger )
 
 namespace {
 	
-struct graphix_func
+struct graphix_info_func
 {
 	static SimpleBuilder* constructor()
 	{
@@ -61,13 +61,26 @@ struct graphix_func
 	}
 };
 
+struct graphix_thumb_func
+{
+	static SimpleBuilder* constructor()
+	{
+		static const serialize::StructDescriptionBase* param = ImageThumb::getStructDescription( );
+		static const serialize::StructDescriptionBase* result = Image::getStructDescription( );
+		langbind::FormFunction func( imageThumb, param, result );
+
+		return new FormFunctionBuilder( "imageThumb", func);
+	}
+};
+
 } //anonymous namespace
 
-enum { NofObjects = 1 };
+enum { NofObjects = 2 };
 
 static createBuilderFunc objdef[NofObjects] =
 {
-	graphix_func::constructor
+	graphix_info_func::constructor,
+	graphix_thumb_func::constructor
 };
 
 ModuleEntryPoint entryPoint( 0, "graphic functions", setModuleLogger, 0, 0, NofObjects, objdef );

@@ -1,7 +1,13 @@
 TOPDIR = ..\..\..
 
 SUBDIRS =
-# SUBDIRS = graphix
+
+!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
+
+!IFDEF WITH_FREEIMAGE
+SUBDIRS = \
+	$(SUBDIRS) graphix
+!ENDIF
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

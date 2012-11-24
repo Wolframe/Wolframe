@@ -27,15 +27,15 @@ void SqliteFormLoader::initialize( )
 // check version of schema, create schema if necessary
 	Version v = getSchemaVersion( );
 	if( v.valid( ) ) {
-		qDebug( ) << "version of schema is " << v.toString( );
+		//qDebug( ) << "version of schema is " << v.toString( );
 	} else {
-		qDebug( ) << "No version info found in database, creating schema now";
+		//qDebug( ) << "No version info found in database, creating schema now";
 		QSqlDatabase db = QSqlDatabase::database( m_dbName );
 
 // schema creation		
 		QSqlQuery qs( db );
 		if( !qs.exec( "create table version( version text )" ) ) {
-			qDebug( ) << "error when creating version table: " << qs.lastError( ).text( );
+			qCritical( ) << "error when creating version table: " << qs.lastError( ).text( );
 			return;
 		}
 
@@ -43,21 +43,21 @@ void SqliteFormLoader::initialize( )
 		v = Version( VERSION_MAJOR, VERSION_MINOR );
 		q.bindValue( ":version", QVariant( v.toString( ) ) );
 		if( !q.exec( ) ) {
-			qDebug( ) << "error when inserting the version into the schema: " << qs.lastError( ).text( );
+			qCritical( ) << "error when inserting the version into the schema: " << qs.lastError( ).text( );
 		}
 
 		if( !qs.exec( "create table uiform( name text primary key, version text, source blob )" ) ) {
-			qDebug( ) << "error when creating uiform table: " << qs.lastError( ).text( );
+			qCritical( ) << "error when creating uiform table: " << qs.lastError( ).text( );
 			return;
 		}
 
 		if( !qs.exec( "create table uitranslation( form_name text, locale text, version text, source blob, binary blob, foreign key( form_name ) references form( name ) )" ) ) {
-			qDebug( ) << "error when creating uitranslation table: " << qs.lastError( ).text( );
+			qCritical( ) << "error when creating uitranslation table: " << qs.lastError( ).text( );
 			return;
 		}
 
 		if( !qs.exec( "create table uistylesheet( form_name text, version text, source blob, foreign key( form_name ) references form( name ) )" ) ) {
-			qDebug( ) << "error when creating uistylesheet table: " << qs.lastError( ).text( );
+			qCritical( ) << "error when creating uistylesheet table: " << qs.lastError( ).text( );
 			return;
 		}	
 	}
@@ -65,13 +65,13 @@ void SqliteFormLoader::initialize( )
 // compare versions of schema	
 	v = getSchemaVersion( );
 	if( !v.valid( ) ) {
-		qDebug( ) << "no version info after creating it, funny!";
+		qCritical( ) << "no version info after creating it, funny!";
 	}
 	if( v > Version( VERSION_MAJOR, VERSION_MINOR ) ) {
 		if( v.getMajor( ) == VERSION_MAJOR ) {
-			qDebug( ) << "Version " << v.toString( ) << " runs in backward compatibility mode";
+			qWarning( ) << "Version " << v.toString( ) << " runs in backward compatibility mode";
 		} else {
-			qDebug( ) << "Schema in database newer than the one in the code. Can't run!";
+			qCritical( ) << "Schema in database newer than the one in the code. Can't run!";
 		}
 	}
 }

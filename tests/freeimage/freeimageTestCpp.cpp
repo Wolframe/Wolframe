@@ -5,6 +5,8 @@
 #include "gtest/gtest.h"
 
 #include <iostream>
+#include <fstream>
+#include <string>
 
 #ifdef _WIN32
 #define WIN32_MEAN_AND_LEAN
@@ -65,6 +67,47 @@ TEST_F( FreeImagePlusFixture, ImageInfo )
 	
 // save image (for debugging mainly)
 	thumb.save( THUMB, 0 );
+}
+
+#define COPYFILE "testmem.png"
+
+TEST_F( FreeImagePlusFixture, ImageFromMemory )
+{
+// load the file
+	std::ifstream ifs( TESTFILE, std::ios::in | std::ios::binary );
+	std::vector<char> raw( ( std::istreambuf_iterator<char>( ifs ) ),
+		( std::istreambuf_iterator<char>( ) ) );
+	//std::cout << raw.size( ) << std::endl;
+		
+// open a memory handle
+	fipMemoryIO memIO( (BYTE *)&raw[0], raw.size( ) );
+
+// load image from buffer
+	fipImage image;
+	image.loadFromMemory( memIO );
+
+// output data of the image in memory
+	unsigned int width = image.getWidth( );
+	unsigned int height = image.getHeight( );
+	//std::cout << "size is " << width << " x " << height << std::endl;
+	ASSERT_EQ( width, 312 );
+	ASSERT_EQ( height, 312 );
+
+// create freeimage memory handle for result
+	fipMemoryIO outIO;
+
+// write image into the buffer
+	image.saveToMemory( FIF_PNG, outIO );
+	
+// output buffer to file, for debugging
+	BYTE *thumbData = NULL;
+	DWORD thumbSize = 0;
+	outIO.acquire( &thumbData, &thumbSize );
+	//std::cout << "bytesize of image is " << thumbSize << std::endl;
+
+// output to file
+	std::ofstream ofs( COPYFILE );
+	ofs.write( (const char *)thumbData, thumbSize );
 }
 
 int main( int argc, char **argv )

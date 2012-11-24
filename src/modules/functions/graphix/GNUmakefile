@@ -7,15 +7,21 @@ SUBDIRS =
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include -I$(TOPDIR)/src \
 	-I$(TOPDIR) \
-	-I$(BOOST_INCLUDE_DIR)
+	-I$(BOOST_INCLUDE_DIR) \
+	$(FREEIMAGE_INCLUDE_DIRS) \
+	$(FREEIMAGEPLUS_INCLUDE_DIRS)
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(TOPDIR)/src/libwolframe_serialize \
-	-L$(TOPDIR)/src/libwolframe
+	-L$(TOPDIR)/src/libwolframe \
+	$(FREEIMAGE_LIB_DIRS) \
+	$(FREEIMAGEPLUS_LIB_DIRS)
 
 INCLUDE_LIBS = \
-	-lwolframe_serialize
+	-lwolframe_serialize \
+	$(FREEIMAGE_LIBS) \
+	$(FREEIMAGEPLUS_LIBS)
 	
 DYNAMIC_MODULE = mod_graphix.so
 

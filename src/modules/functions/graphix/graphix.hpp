@@ -38,7 +38,6 @@
 #include <string>
 #include <vector>
 
-
 namespace _Wolframe {
 namespace graphix {
 
@@ -57,13 +56,28 @@ struct ImageInfo
 	static const serialize::StructDescriptionBase *getStructDescription( );
 };
 
-struct ImageImpl
+struct ImageThumb
 {
+	Image image;
+	int size;
+	
 	static const serialize::StructDescriptionBase *getStructDescription( );
-	static int get( ImageInfo &res, const Image &param );
+};
+
+class ImageImpl
+{
+	private:
+		static std::string decode( const std::string &data );
+		static std::string encode( const std::string &data );
+		
+	public:
+		static const serialize::StructDescriptionBase *getStructDescription( );
+		static int info( ImageInfo &res, const Image &param );
+		static int thumb( Image &res, const ImageThumb &param );
 };
 
 int imageInfo( void *res, const void *param );
+int imageThumb( void *res, const void *param );
 
 }}
 #endif

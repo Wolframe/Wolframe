@@ -24,6 +24,8 @@
 #include <QFile>
 #include <QTreeWidgetItemIterator>
 #include <QSet>
+#include <QLabel>
+#include <QPixmap>
 
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
@@ -214,10 +216,10 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 		} else if( clazz == "QWidget" ) {
 			// skip, generic widget, don't possibly know how to reset it
 		} else {
-			qDebug( ) << "Write for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
+			qWarning( ) << "Write for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 		}
 		
-		qDebug( ) << "Wrote " << clazz << name;
+		//qDebug( ) << "Wrote " << clazz << name;
 	}
 }
 
@@ -288,10 +290,10 @@ void DataHandler::resetFormData( QWidget *form )
 		} else if( clazz == "QWidget" ) {
 			// skip, generic widget, don't possibly know how to reset it
 		} else {
-			qDebug( ) << "Reset for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
+			qWarning( ) << "Reset for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 		}
 		
-		qDebug( ) << "Reset " << clazz << name;
+		//qDebug( ) << "Reset " << clazz << name;
 	}
 }
 
@@ -318,9 +320,12 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 			m_dataLoader->request( form_name, name, QByteArray( ), props );
 		} else if( clazz == "QTreeWidget" ) {
 			m_dataLoader->request( form_name, name, QByteArray( ), props );
+		} else {
+			// all other classes don't load domains, but we want to keep
+			// the calling code generic..
 		}
 		
-		qDebug( ) << "Domain load in " << clazz << name;
+		//qDebug( ) << "Domain load in " << clazz << name;
 	}
 }
 
@@ -329,7 +334,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 	QWidget *widget = form->findChild<QWidget *>( widget_name );
 	QString clazz = widget->metaObject( )->className( ); 
 
-	qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
+	//qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
 
 	QXmlStreamReader xml( data );
 	if( clazz == "QComboBox" ) {
@@ -405,7 +410,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 
 // iterate again and check against saved tree state
 		if( props->contains( "state" ) ) {
-			qDebug( ) << "Restoring tree state for tree" << widget_name;
+			//qDebug( ) << "Restoring tree state for tree" << widget_name;
 			QStringList stateList = props->value( "state" ).split( "|", QString::SkipEmptyParts );
 // expand tree first, otherwise parents get selected if we select a non-expanded subtree!
 			{
@@ -445,10 +450,10 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 			}
 		}
 	} else {
-		qDebug( ) << "Unknown domain for class " << clazz;
+		// all other classes don't have domain data
 	}
 	if( xml.hasError( ) ) {
-		qDebug( ) << xml.errorString( );
+		qCritical( ) << xml.errorString( );
 	}
 }
 
@@ -480,7 +485,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 			if( inForm ) {
 				if( xml.isStartElement( ) ) {
 					widget = qFindChild<QWidget *>( form, xml.name( ).toString( ) );
-					qDebug( ) << "Reading from XML for" << xml.name( ) << "into" << widget;
+					//qDebug( ) << "Reading from XML for" << xml.name( ) << "into" << widget;
 					if( widget ) {
 						clazz = widget->metaObject( )->className( ); 						
 						QXmlStreamAttributes attributes = xml.attributes( );
@@ -562,13 +567,13 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 									QRadioButton *radioButton = qobject_cast<QRadioButton *>( child );
 									QString subText = radioButton->text( );
 									QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
-									qDebug( ) << "radio" << name << subText << subText << name << subName;
+									//qDebug( ) << "radio" << name << subText << subText << name << subName;
 									radioButton->setChecked( text.compare( subName ) == 0 );
 								} else if( subClazz == "QCheckBox" ) {
 									QCheckBox *checkBox = qobject_cast<QCheckBox *>( child );
 									QString subText = checkBox->text( );
 									QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
-									qDebug( ) << "checkbox" << name << subText << subText << name << subName;
+									//qDebug( ) << "checkbox" << name << subText << subText << name << subName;
 									if( text.compare( subName ) == 0 ) {
 										checkBox->setChecked( true );
 									}
@@ -615,8 +620,23 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							// skip, ok, buttons can't be reset
 						} else if( clazz == "QWidget" ) {
 							// skip, generic widget, don't possibly know how to reset it
+						} else if( clazz == "QLabel" ) {
+							// labels can usually not be edited, at the moment we use them to show
+							// images only
+							QLabel *label = qobject_cast<QLabel *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
+							QByteArray encoded = text.toAscii( );
+							QByteArray decoded = QByteArray::fromBase64( encoded );
+							QPixmap p;
+							p.loadFromData( decoded );	
+							if( !p.isNull( ) ) {							
+								int w = std::min( label->width( ), p.width( ) );
+								int h = std::min( label->height( ), p.height( ) );							
+								label->setPixmap( p.scaled( QSize( w, h ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+								label->adjustSize( );
+							}
 						} else {
-							qDebug( ) << "Read for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
+							qWarning( ) << "Read for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 						}
 					}
 				}
@@ -624,7 +644,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 		}
 	}
 	if( xml.hasError( ) ) {
-		qDebug( ) << xml.errorString( );
+		qCritical( ) << xml.errorString( );
 	}
 }
 
@@ -635,18 +655,18 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 {
 	QStringList parts = variable.split( "." );
 
-	qDebug( ) << "Evaluating variable" << variable;
+	//qDebug( ) << "Evaluating variable" << variable;
 	
 // expecting a widget name as first argument
 	if( parts[0].isNull( ) ) {
-		qDebug( ) << "Expecting a expression of the form <widget>.<property";
+		qWarning( ) << "Expecting a expression of the form <widget>.<property";
 		return QString( );
 	}
 	QString name = parts[0];
 	
 // expecting a property identifier as second argument
 	if( parts[1].isNull( ) ) {
-		qDebug( ) << "Expecting a property name in variable" << variable;
+		qWarning( ) << "Expecting a property name in variable" << variable;
 		return QString( );
 	}
 	QString property = parts[1];
@@ -654,7 +674,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 	QWidget *widget = qFindChild<QWidget *>( form, name );
 // no widget found with that name
 	if( !widget ) {
-		qDebug( ) << "Unkown widget" << name << "in variable" << variable;
+		qWarning( ) << "Unknown widget" << name << "in variable" << variable;
 		return QString( );
 	}
 	
@@ -696,7 +716,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		}
 	} else {
 // non supported class
-		qDebug( ) << "Unsupported class" << clazz << "in variable" << variable;
+		qWarning( ) << "Unsupported class" << clazz << "in variable" << variable;
 		return QString( );
 	}
 	

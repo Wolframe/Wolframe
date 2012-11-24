@@ -37,6 +37,16 @@
 #include "graphix.hpp"
 #include <string>
 #include <vector>
+#include <sstream>
+
+#include "types/base64.hpp"	
+
+#ifdef _WIN32
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif
+#include "FreeImage.h"
+#include "FreeImagePlus.h"
 
 using namespace _Wolframe;
 using namespace graphix;
@@ -62,6 +72,16 @@ struct ImageInfoDescription : public serialize::StructDescription<ImageInfo>
 	}
 };
 
+struct ImageThumbDescription : public serialize::StructDescription<ImageThumb>
+{
+	ImageThumbDescription( )
+	{
+		( *this )
+		( "image", &ImageThumb::image )
+		( "size", &ImageThumb::size );
+	}
+};
+
 struct ImageImplDescription : public serialize::StructDescription<ImageImpl>
 {
 	ImageImplDescription( )
@@ -83,23 +103,105 @@ const serialize::StructDescriptionBase *ImageInfo::getStructDescription( )
 	return &rt;
 }
 
+const serialize::StructDescriptionBase *ImageThumb::getStructDescription( )
+{
+	static ImageThumbDescription rt;
+	return &rt;
+}
+
 const serialize::StructDescriptionBase *ImageImpl::getStructDescription( )
 {
 	static ImageImplDescription rt;
 	return &rt;
 }
 
-int ImageImpl::get( ImageInfo &res, const Image &param )
+std::string ImageImpl::decode( const std::string &data )
 {
-	(void)param.data;
-	res.width = 77;
-	res.height = 78;
+	base64::Decoder decoder;
+	std::istringstream i( data );
+	std::ostringstream o;
+	decoder.decode( i, o );
+	return o.str( );
+}
+
+std::string ImageImpl::encode( const std::string &data )
+{
+	base64::Encoder encoder;
+	std::istringstream i( data );
+	std::ostringstream o;
+	encoder.encode( i, o );
+	return o.str( );
+}
+
+int ImageImpl::info( ImageInfo &res, const Image &param )
+{
+// decode	
+	std::string raw;
+	raw = decode( param.data );
+
+// copy it into a buffer
+	std::vector<char> buf;
+	buf.assign( raw.begin( ), raw.end( ) );
+
+// create freeimage memory handle
+	fipMemoryIO memIO( (BYTE *)&buf[0], buf.size( ) );
+
+// load image from buffer
+	fipImage image;
+	image.loadFromMemory( memIO );
+
+// get info about the image
+	res.width = image.getWidth( );
+	res.height = image.getHeight( );
 	
 	return 0;
 }
 
-int _Wolframe::graphix::imageInfo( void* res, const void* param )
+int ImageImpl::thumb( Image &res, const ImageThumb &param )
 {
-	return ImageImpl::get( *(ImageInfo *)res, *(const Image *)param );
+// decode
+	std::string raw;
+	raw = decode( param.image.data );
+
+// copy it into a buffer
+	std::vector<char> buf;
+	buf.assign( raw.begin( ), raw.end( ) );
+
+// create freeimage memory handle
+	fipMemoryIO inIO( (BYTE *)&buf[0], buf.size( ) );
+
+// load image from buffer
+	fipImage image;
+	image.loadFromMemory( inIO );
+
+// make thumbnail
+	fipImage thumb( image );
+	thumb.makeThumbnail( param.size, true );
+
+// create freeimage memory handle for result
+	fipMemoryIO outIO;
+
+// write thumb into the buffer
+	thumb.saveToMemory( FIF_PNG, outIO );
+	
+// get buffer
+	BYTE *thumbData = NULL;
+	DWORD thumbSize = 0;
+	outIO.acquire( &thumbData, &thumbSize );
+	
+// encode
+	std::string rawRes( (char *)thumbData, thumbSize );
+	res.data = encode( rawRes );
+
+	return 0;
 }
 
+int _Wolframe::graphix::imageInfo( void *res, const void *param )
+{
+	return ImageImpl::info( *(ImageInfo *)res, *(const Image *)param );
+}
+
+int _Wolframe::graphix::imageThumb( void *res, const void *param )
+{
+	return ImageImpl::thumb( *(Image *)res, *(const ImageThumb *)param );
+}
