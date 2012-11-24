@@ -74,7 +74,7 @@ local_install:
 local_test: $(TEST_BINS)
 ifeq ($(RUN_TESTS),1)
 	mkdir -p tests/temp
-	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) tests/tprocHandlerTest$(EXE)
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) tests/tprocHandlerTest$(EXE)
 endif
 
 run: $(CPP_BINS)
