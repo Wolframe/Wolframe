@@ -1,7 +1,12 @@
 TOPDIR = ../../..
 
 SUBDIRS =
-# SUBDIRS = graphix
+
+-include $(TOPDIR)/makefiles/gmake/platform.mk
+
+ifeq ($(WITH_FREEIMAGE),1)
+SUBDIRS += graphix
+endif
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
