@@ -37,6 +37,16 @@
 #include "graphix.hpp"
 #include <string>
 #include <vector>
+#include <sstream>
+
+#include "types/base64.hpp"	
+
+#ifdef _WIN32
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#endif
+#include "FreeImage.h"
+#include "FreeImagePlus.h"
 
 using namespace _Wolframe;
 using namespace graphix;
@@ -89,11 +99,44 @@ const serialize::StructDescriptionBase *ImageImpl::getStructDescription( )
 	return &rt;
 }
 
+std::string ImageImpl::decode( const std::string &data )
+{
+	base64::Decoder decoder;
+	std::istringstream i( data );
+	std::ostringstream o;
+	decoder.decode( i, o );
+	return o.str( );
+}
+
+std::string ImageImpl::encode( const std::string &data )
+{
+	base64::Encoder encoder;
+	std::istringstream i( data );
+	std::ostringstream o;
+	encoder.encode( i, o );
+	return o.str( );
+}
+
 int ImageImpl::get( ImageInfo &res, const Image &param )
 {
-	(void)param.data;
-	res.width = 77;
-	res.height = 78;
+// decode	
+	std::string raw;
+	raw = decode( param.data );
+
+// copy it into a buffer
+	std::vector<char> buf;
+	buf.assign( raw.begin( ), raw.end( ) );
+
+// create freeimage memory handle
+	fipMemoryIO memIO( (BYTE *)&buf[0], buf.size( ) );
+
+// load image from buffer
+	fipImage image;
+	image.loadFromMemory( memIO );
+
+// get info about the image
+	res.width = image.getWidth( );
+	res.height = image.getHeight( );
 	
 	return 0;
 }
