@@ -217,6 +217,11 @@ void NetworkDataLoader::handleDomainDataLoad( QString formName, QString widgetNa
 
 void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 {
+	if( params.size( ) < 2 ) {
+		qCritical( ) << "ERROR: got an empty parameter list for a command, can't link it to form and widget!";
+		return;
+	}
+	
 // TODO: how can we tag requests in the protocol, so we actually get back the right
 // data??! Now we get 'REQUEST doctype', for now, push the form and widget into a
 // hash and receive it by doctype

@@ -319,7 +319,8 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 		} else if( clazz == "QTreeWidget" ) {
 			m_dataLoader->request( form_name, name, QByteArray( ), props );
 		} else {
-			qWarning( ) << "Domain load for unknown class" << clazz << "for widget" << name;
+			// all other classes don't load domains, but we want to keep
+			// the calling code generic..
 		}
 		
 		//qDebug( ) << "Domain load in " << clazz << name;
@@ -447,7 +448,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 			}
 		}
 	} else {
-		qWarning( ) << "Unknown domain for class " << clazz;
+		// all other classes don't have domain data
 	}
 	if( xml.hasError( ) ) {
 		qCritical( ) << xml.errorString( );
