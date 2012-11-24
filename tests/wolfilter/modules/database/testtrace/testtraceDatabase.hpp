@@ -114,7 +114,7 @@ public:
 		return this;
 	}
 
-	virtual Transaction* transaction( const std::string& /*name*/);
+	virtual Transaction* transaction( const std::string& /*name*/, bool connection = false );
 
 	const std::string* getProgram( const std::string& /*name*/ ) const
 						{ return NULL; }

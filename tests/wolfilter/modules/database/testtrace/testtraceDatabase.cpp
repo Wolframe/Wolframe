@@ -124,8 +124,10 @@ TesttraceDatabase::TesttraceDatabase( const std::string& id_, const std::string&
 	}
 }
 
-Transaction* TesttraceDatabase::transaction( const std::string& /*name*/ )
+Transaction* TesttraceDatabase::transaction(const std::string& /*name*/ , bool connection )
 {
+	if ( connection )	{
+	}
 	return new TesttraceTransaction( this, m_result);
 }
 

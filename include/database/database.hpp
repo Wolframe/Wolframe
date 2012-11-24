@@ -61,7 +61,7 @@ public:
 	virtual const std::string& ID() const = 0;
 
 	///\brief Get a database transaction object
-	virtual Transaction* transaction( const std::string& name ) = 0;
+	virtual Transaction* transaction( const std::string& name, bool connected = false ) = 0;
 
 	///\brief Get a user interface library
 	virtual const UI::UserInterfaceLibrary* UIlibrary() const

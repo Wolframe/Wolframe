@@ -105,8 +105,8 @@ public:
 
 	virtual const std::string& databaseID() const;
 
-	virtual void putInput( const TransactionInput& input_)		{m_input = input_;}
-	virtual const TransactionOutput& getResult() const		{return m_output;}
+	virtual void putInput( const TransactionInput& input_ )		{ m_input = input_; }
+	virtual const TransactionOutput& getResult() const		{ return m_output; }
 
 	virtual void execute();
 	virtual void begin();
@@ -115,7 +115,7 @@ public:
 	virtual void close();
 
 private:
-	void execute_statement( const char* statement);
+	void execute_statement( const char* statement );
 	void execute_with_autocommit();
 	void execute_transaction_operation();
 
@@ -149,7 +149,7 @@ public:
 
 	virtual const std::string* getProgram( const std::string& name) const;
 
-	Transaction* transaction( const std::string& name );
+	Transaction* transaction( const std::string& name, bool connected = false );
 
 	void closeTransaction( Transaction* t );
 private:

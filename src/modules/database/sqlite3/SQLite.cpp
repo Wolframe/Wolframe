@@ -185,8 +185,11 @@ const std::string* SQLiteDatabase::getProgram( const std::string& name) const
 	return m_unit->getProgram( name );
 }
 
-Transaction* SQLiteDatabase::transaction( const std::string& /*name*/ )
+Transaction* SQLiteDatabase::transaction(const std::string& /*name*/ , bool connected )
 {
+	if ( connected )	{
+
+	}
 	return new SQLiteTransaction( *this );
 }
 
@@ -211,12 +214,13 @@ const std::string& SQLiteTransaction::databaseID() const
 	return m_unit.ID();
 }
 
-void SQLiteTransaction::execute_statement( const char* stmstr)
+void SQLiteTransaction::execute_statement( const char* stmstr )
 {
 #ifdef LOWLEVEL_DEBUG
 	std::cerr << "CALL " << stmstr << std::endl;
 #endif
-	if (!m_conn.get()) throw std::runtime_error( "executing transaction statement without transaction context");
+	if ( !m_conn.get() )
+		throw std::runtime_error( "executing transaction statement without transaction context" );
 	bool success = true;
 	std::ostringstream msg;
 	sqlite3_stmt* inst = 0;
@@ -304,7 +308,7 @@ void SQLiteTransaction::execute_transaction_operation()
 
 void SQLiteTransaction::execute()
 {
-	if (m_conn.get())
+	if ( m_conn.get() )
 	{
 		execute_transaction_operation();
 	}
