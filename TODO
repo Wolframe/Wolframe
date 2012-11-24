@@ -3,14 +3,11 @@ MBa:
 
 ABa:
 daemon code:
-- build FreeImage wolframe-ish
 - On expection in main, remove pidfile -> permission issue, need root
   parent with signalling, see WolfBones, or maybe chown of pidfile?
 - qtclient cont.
 - configurator
-  - caption + other info + file picker (image)
   - categories + features, trees with add/delete/edit
-  - file(s) upload
   - image picker
   - associatiting features and categories
 

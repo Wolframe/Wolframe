@@ -91,7 +91,7 @@ void FormWidget::storeToGlobals( QHash<QString, QString> *props )
 		}
 	}
 	
-	qDebug( ) << "GLOBALS:" << *m_globals;
+	//qDebug( ) << "GLOBALS:" << *m_globals;
 }
 
 void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
@@ -113,7 +113,7 @@ void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
 				}
 			}
 		}
-		qDebug( ) << "GLOBALS SUBSTITUTE" << key << props->value( key );
+		//qDebug( ) << "GLOBALS SUBSTITUTE" << key << props->value( key );
 	}
 }
 
@@ -202,7 +202,7 @@ void FormWidget::loadForm( QString name )
 	m_previousForm = m_form;
 	m_form = name;
 
-	qDebug( ) << "Initiating form load for " << m_form;
+	//qDebug( ) << "Initiating form load for " << m_form;
 	
 	m_formLoader->initiateFormLoad( m_form );
 }	
@@ -214,22 +214,22 @@ void FormWidget::loadLanguage( QString language )
 
 	m_locale = QLocale( language );
 	
-	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
-		<< m_locale.name( );
+	//qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
+	//	<< m_locale.name( );
 		
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 }
 
 void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 {
-	qDebug( ) << "Form localization loaded for " << name
-		<< ", locale " << m_locale.name( )
-		<< ", size " << localization.length( );
+	//qDebug( ) << "Form localization loaded for " << name
+	//	<< ", locale " << m_locale.name( )
+	//	<< ", size " << localization.length( );
 
 // get list of all translators for this form and delete them
 	const QList<QTranslator *> oldTranslators( m_ui->findChildren<QTranslator *>( ) );
 	foreach( QTranslator *translator, oldTranslators ) {
-		qDebug( ) << "Removing old translator " << translator;
+		//qDebug( ) << "Removing old translator " << translator;
 		QCoreApplication::instance( )->removeTranslator( translator );
 	}
 	qDeleteAll( oldTranslators );
@@ -237,7 +237,7 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 // install translation files for this form
 	QTranslator *translator = new QTranslator( m_ui );
 	if( !translator->load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
-		qDebug( ) << "Error while loading translations for form " <<
+		qWarning( ) << "Error while loading translations for form " <<
 			name << " for locale " << m_locale.name( );
 	}
 	QCoreApplication::instance( )->installTranslator( translator );
@@ -260,7 +260,7 @@ void FormWidget::writeDynamicStringProperty( QObject *o, const char *name, const
 {
 	QVariant v( value );
 	o->setProperty( name, v );
-	qDebug( ) << "setting dynamic property" << name << ":" << value << "in" << o;
+	//qDebug( ) << "setting dynamic property" << name << ":" << value << "in" << o;
 }
 
 void FormWidget::readDynamicStringProperties( QHash<QString, QString> *props, QObject *o )
@@ -277,7 +277,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 // that's not us
 	if( name != m_form ) return;
 	
-	qDebug( ) << "Form " << name << " loaded";
+	//qDebug( ) << "Form " << name << " loaded";
 
 // read the form and construct it from the UI file
 	QWidget *oldUi = m_ui;
@@ -291,7 +291,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		return;
 	}
 	buf.close( );
-	qDebug( ) << "Constructed UI form XML for form" << name;
+	//qDebug( ) << "Constructed UI form XML for form" << name;
 
 // add new form to layout (which covers the whole widget)
 	m_layout->addWidget( m_ui );
@@ -305,12 +305,12 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	m_ui->show( );
 
 // set localization now
-	qDebug( ) << "Starting to load localization for form" << name;
+	//qDebug( ) << "Starting to load localization for form" << name;
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 
 // sub form widgets have to be propertly initialized with the data/form and
 // ui loaders and their signals have to be wired to our form widget
-	qDebug( ) << "Checking for subforms in form" << name << ", wire them as necessary";
+	//qDebug( ) << "Checking for subforms in form" << name << ", wire them as necessary";
 	QList<FormWidget *> subforms = m_ui->findChildren<FormWidget *>( );
 	foreach( FormWidget *subform, subforms ) {
 		subform->setFormLoader( m_formLoader );
@@ -322,7 +322,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 
 // connect actions and forms
 // connect push buttons with form names to loadForms
-	qDebug( ) << "Checking form" << name << "for dynamic properties 'form' and 'action'";
+	//qDebug( ) << "Checking form" << name << "for dynamic properties 'form' and 'action'";
 	QList<QWidget *> widgets = m_ui->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
 		QString clazz = widget->metaObject( )->className( ); 
@@ -332,7 +332,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 			QHash<QString, QString> *props = new QHash<QString, QString>( );
 			readDynamicStringProperties( props, widget );
 						
-			qDebug( ) << "connecting button" << _name << "to properties" << *props;
+			//qDebug( ) << "connecting button" << _name << "to properties" << *props;
 
 			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
 			
@@ -364,13 +364,13 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	}
 		
 // signal
-	qDebug( ) << "Done loading form" << name;
+	//qDebug( ) << "Done loading form" << name;
 	emit formLoaded( m_form );
 }
 
 void FormWidget::sendRequest( QHash<QString, QString> *props )
 {
-	qDebug( ) << "Handling reguest for form " << m_form << "[" << *props << "]";
+	//qDebug( ) << "Handling reguest for form " << m_form << "[" << *props << "]";
 
 // go trought the widgets of the form and construct the request XML
 	QByteArray xml;
@@ -388,12 +388,12 @@ void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml
 // that's not us
 	if( formName != m_form ) return;
 	
-	qDebug( ) << "Got answer for form" << formName;
+	//qDebug( ) << "Got answer for form" << formName;
 
 // do whatever we have to do with data to the widgets	
 	if( !xml.isEmpty( ) ) {
 		if( !widgetName.isEmpty( ) ) {
-			qDebug( ) << "Answer is for local widget" << widgetName << "in form" << formName;
+			//qDebug( ) << "Answer is for local widget" << widgetName << "in form" << formName;
 
 // get properties if widget
 			QWidget *widget = m_ui->findChild<QWidget *>( widgetName );

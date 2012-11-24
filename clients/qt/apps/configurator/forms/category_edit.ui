@@ -56,6 +56,9 @@
       <property name="text">
        <string>Description:</string>
       </property>
+      <property name="buddy">
+       <cstring>description</cstring>
+      </property>
      </widget>
     </item>
     <item row="1" column="1">
@@ -84,8 +87,8 @@
         <rect>
          <x>77</x>
          <y>69</y>
-         <width>201</width>
-         <height>141</height>
+         <width>191</width>
+         <height>131</height>
         </rect>
        </property>
        <property name="minimumSize">
@@ -106,6 +109,9 @@
        </property>
        <property name="text">
         <string>Info:</string>
+       </property>
+       <property name="buddy">
+        <cstring>info</cstring>
        </property>
       </widget>
       <widget class="QLineEdit" name="caption">
@@ -130,6 +136,9 @@
        <property name="text">
         <string>Caption:</string>
        </property>
+       <property name="buddy">
+        <cstring>caption</cstring>
+       </property>
       </widget>
       <widget class="QLineEdit" name="info">
        <property name="geometry">
@@ -139,6 +148,25 @@
          <width>211</width>
          <height>20</height>
         </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="reset_2">
+       <property name="geometry">
+        <rect>
+         <x>228</x>
+         <y>190</y>
+         <width>51</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Info</string>
+       </property>
+       <property name="id" stdset="0">
+        <string notr="true">{picture.id}</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>picture_info</string>
        </property>
       </widget>
      </widget>
