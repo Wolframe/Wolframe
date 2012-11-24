@@ -852,6 +852,8 @@ fi
 %endif
 
 %{_libdir}/wolframe/modules/mod_normalize_number.so
+%{_libdir}/wolframe/modules/mod_normalize_base64.so
+%{_libdir}/wolframe/modules/mod_normalize_string.so
 
 %if %{with_icu}
 %{_libdir}/wolframe/modules/mod_normalize_locale.so
