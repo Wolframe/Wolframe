@@ -24,6 +24,8 @@
 #include <QFile>
 #include <QTreeWidgetItemIterator>
 #include <QSet>
+#include <QLabel>
+#include <QPixmap>
 
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
@@ -618,6 +620,21 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							// skip, ok, buttons can't be reset
 						} else if( clazz == "QWidget" ) {
 							// skip, generic widget, don't possibly know how to reset it
+						} else if( clazz == "QLabel" ) {
+							// labels can usually not be edited, at the moment we use them to show
+							// images only
+							QLabel *label = qobject_cast<QLabel *>( widget );
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
+							QByteArray encoded = text.toAscii( );
+							QByteArray decoded = QByteArray::fromBase64( encoded );
+							QPixmap p;
+							p.loadFromData( decoded );	
+							if( !p.isNull( ) ) {							
+								int w = std::min( label->width( ), p.width( ) );
+								int h = std::min( label->height( ), p.height( ) );							
+								label->setPixmap( p.scaled( QSize( w, h ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+								label->adjustSize( );
+							}
 						} else {
 							qWarning( ) << "Read for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 						}
