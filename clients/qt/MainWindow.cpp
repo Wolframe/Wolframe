@@ -508,9 +508,8 @@ void MainWindow::loadTheme( QString theme )
 		oldUi->setParent( 0 );
 	}
 
-// attach form widget in the right place of the theme main window
-	QVBoxLayout *l = qFindChild<QVBoxLayout *>( m_ui, "mainAreaLayout" );
-	l->addWidget( m_formWidget );
+// make the form widget the central widget
+	( qobject_cast<QMainWindow *>( m_ui ) )->setCentralWidget( m_formWidget );
 
 // show the new gui
 	m_ui->show( );

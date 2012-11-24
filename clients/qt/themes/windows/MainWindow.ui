@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Test1MainWindow</class>
- <widget class="QWidget" name="Test1MainWindow">
+ <widget class="QMainWindow" name="Test1MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -92,20 +92,15 @@
     </rect>
    </property>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
+  <widget class="QWidget" name="formWidget" native="true">
    <property name="geometry">
     <rect>
      <x>9</x>
      <y>29</y>
-     <width>721</width>
-     <height>491</height>
+     <width>421</width>
+     <height>381</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="mainAreaLayout">
-    <property name="sizeConstraint">
-     <enum>QLayout::SetMaximumSize</enum>
-    </property>
-   </layout>
   </widget>
   <action name="actionOpen">
    <property name="icon">

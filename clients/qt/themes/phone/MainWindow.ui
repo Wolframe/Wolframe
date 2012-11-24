@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>exit</class>
- <widget class="QWidget" name="exit">
+ <widget class="QMainWindow" name="exit">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -87,17 +87,6 @@
      <height>21</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>60</y>
-     <width>341</width>
-     <height>381</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="mainAreaLayout"/>
   </widget>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
