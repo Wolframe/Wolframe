@@ -69,6 +69,8 @@ TEST_F( FreeImagePlusFixture, ImageInfo )
 	thumb.save( THUMB, 0 );
 }
 
+#define COPYFILE "testmem.png"
+
 TEST_F( FreeImagePlusFixture, ImageFromMemory )
 {
 // load the file
@@ -90,6 +92,22 @@ TEST_F( FreeImagePlusFixture, ImageFromMemory )
 	//std::cout << "size is " << width << " x " << height << std::endl;
 	ASSERT_EQ( width, 312 );
 	ASSERT_EQ( height, 312 );
+
+// create freeimage memory handle for result
+	fipMemoryIO outIO;
+
+// write image into the buffer
+	image.saveToMemory( FIF_PNG, outIO );
+	
+// output buffer to file, for debugging
+	BYTE *thumbData = NULL;
+	DWORD thumbSize = 0;
+	outIO.acquire( &thumbData, &thumbSize );
+	std::cout << "bytesize of image is " << thumbSize << std::endl;
+
+// output to file
+	std::ofstream ofs( COPYFILE );
+	ofs.write( (const char *)thumbData, thumbSize );
 }
 
 int main( int argc, char **argv )

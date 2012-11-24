@@ -72,6 +72,16 @@ struct ImageInfoDescription : public serialize::StructDescription<ImageInfo>
 	}
 };
 
+struct ImageThumbDescription : public serialize::StructDescription<ImageThumb>
+{
+	ImageThumbDescription( )
+	{
+		( *this )
+		( "image", &ImageThumb::image )
+		( "size", &ImageThumb::size );
+	}
+};
+
 struct ImageImplDescription : public serialize::StructDescription<ImageImpl>
 {
 	ImageImplDescription( )
@@ -90,6 +100,12 @@ const serialize::StructDescriptionBase *Image::getStructDescription( )
 const serialize::StructDescriptionBase *ImageInfo::getStructDescription( )
 {
 	static ImageInfoDescription rt;
+	return &rt;
+}
+
+const serialize::StructDescriptionBase *ImageThumb::getStructDescription( )
+{
+	static ImageThumbDescription rt;
 	return &rt;
 }
 
@@ -117,7 +133,7 @@ std::string ImageImpl::encode( const std::string &data )
 	return o.str( );
 }
 
-int ImageImpl::get( ImageInfo &res, const Image &param )
+int ImageImpl::info( ImageInfo &res, const Image &param )
 {
 // decode	
 	std::string raw;
@@ -141,8 +157,51 @@ int ImageImpl::get( ImageInfo &res, const Image &param )
 	return 0;
 }
 
-int _Wolframe::graphix::imageInfo( void* res, const void* param )
+int ImageImpl::thumb( Image &res, const ImageThumb &param )
 {
-	return ImageImpl::get( *(ImageInfo *)res, *(const Image *)param );
+// decode
+	std::string raw;
+	raw = decode( param.image.data );
+
+// copy it into a buffer
+	std::vector<char> buf;
+	buf.assign( raw.begin( ), raw.end( ) );
+
+// create freeimage memory handle
+	fipMemoryIO inIO( (BYTE *)&buf[0], buf.size( ) );
+
+// load image from buffer
+	fipImage image;
+	image.loadFromMemory( inIO );
+
+// make thumbnail
+	fipImage thumb( image );
+	thumb.makeThumbnail( param.size, true );
+
+// create freeimage memory handle for result
+	fipMemoryIO outIO;
+
+// write thumb into the buffer
+	thumb.saveToMemory( FIF_PNG, outIO );
+	
+// get buffer
+	BYTE *thumbData = NULL;
+	DWORD thumbSize = 0;
+	outIO.acquire( &thumbData, &thumbSize );
+	
+// encode
+	std::string rawRes( (char *)thumbData, thumbSize );
+	res.data = encode( rawRes );
+
+	return 0;
 }
 
+int _Wolframe::graphix::imageInfo( void *res, const void *param )
+{
+	return ImageImpl::info( *(ImageInfo *)res, *(const Image *)param );
+}
+
+int _Wolframe::graphix::imageThumb( void *res, const void *param )
+{
+	return ImageImpl::thumb( *(Image *)res, *(const ImageThumb *)param );
+}
