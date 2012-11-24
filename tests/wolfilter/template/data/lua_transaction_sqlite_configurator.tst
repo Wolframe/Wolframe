@@ -17,6 +17,8 @@ opt="$opt --module $mod"
 modpath="../../src/modules/normalize/"			# module directory for normalizers relative from tests/temp
 mod="$modpath/number/mod_normalize_number"		# module to load
 opt="$opt --module $mod"
+mod="$modpath/string/mod_normalize_string"		# module to load
+opt="$opt --module $mod"
 modpath="../../src/modules/cmdbind/directmap"		# module directory relative from tests/temp
 opt="$opt --module $modpath/mod_command_directmap"
 modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
@@ -26,9 +28,9 @@ opt="$opt --program=DBPRG.tdl"
 demopath=../../../examples/demo/configurator
 genscript=../scripts/$luascript
 projectpath=../../../examples/demo/configurator
-cat $projectpath/program/configurator.lua > $genscript
-echo >> $genscript
-cat scripts/$luascript >> $genscript
+# cat $projectpath/program/configurator.lua > $genscript
+# echo >> $genscript
+# cat scripts/$luascript >> $genscript
 testscripts="$luascript"
 testcmd="$opt run"					# command to execute by the test
 docin=$testname.in					# input document name

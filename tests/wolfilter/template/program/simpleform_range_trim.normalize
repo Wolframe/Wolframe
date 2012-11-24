@@ -1,4 +1,4 @@
-int=number:trim,integer(10);
-uint=number:trim,unsigned(10);
-float=number:trim,float(10,10);
+int=string:trim,number:integer(10);
+uint=string:trim,number:unsigned(10);
+float=string:trim,number:float(10,10);
 

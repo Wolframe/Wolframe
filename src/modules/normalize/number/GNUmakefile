@@ -18,7 +18,6 @@ INCLUDE_LIBS = \
 DYNAMIC_MODULE = mod_normalize_number.so
 
 CPP_OBJS = \
-	trimNormalizeFunction.o \
 	integerNormalizeFunction.o \
 	floatNormalizeFunction.o \
 	numberNormalize.o \

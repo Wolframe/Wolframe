@@ -25,7 +25,6 @@ DYNAMIC_MODULE = \
 	mod_normalize_number.dll
 
 CPP_OBJS = \
-	trimNormalizeFunction.obj \
 	integerNormalizeFunction.obj \
 	floatNormalizeFunction.obj \
 	numberNormalize.obj \

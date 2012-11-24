@@ -1,6 +1,6 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = number
+SUBDIRS = number base64 string
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 

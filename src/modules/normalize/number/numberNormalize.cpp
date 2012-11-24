@@ -33,7 +33,6 @@
 ///\file modules/normalize/number/numberNormalize.cpp
 ///\brief Implementation of normalization functions for simple ASCII numbers
 #include "numberNormalize.hpp"
-#include "trimNormalizeFunction.hpp"
 #include "integerNormalizeFunction.hpp"
 #include "floatNormalizeFunction.hpp"
 #include "utils/miscUtils.hpp"
@@ -98,11 +97,6 @@ NormalizeFunction* _Wolframe::langbind::createNumberNormalizeFunction( ResourceH
 	{
 		std::string::const_iterator ii = arg.begin(), ee = arg.end();
 		std::string type = boost::algorithm::to_lower_copy( name);
-		if (boost::algorithm::iequals( type, "trim"))
-		{
-			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
-			return new TrimNormalizeFunction();
-		}
 		if (boost::algorithm::iequals( type, "integer"))
 		{
 			std::size_t dim = std::numeric_limits<std::size_t>::max();
@@ -139,7 +133,6 @@ const std::vector<std::string>& _Wolframe::langbind::normalizeFunctions()
 	{
 		NormalizeFunctions()
 		{
-			push_back( "trim");
 			push_back( "integer");
 			push_back( "unsigned");
 			push_back( "float");
