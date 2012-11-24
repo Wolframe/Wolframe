@@ -127,8 +127,10 @@ void FormWidget::switchForm( QObject *object )
 	storeToGlobals( props );
 
 // execute the action (eventually)
-	sendRequest( props );
-	
+	if( props->contains( "action" ) ) {
+		sendRequest( props );
+	}
+		
 // switch form now, formLoaded will inform parent and others
 	if( props->contains( "form" ) ) {
 		QString nextForm = props->value( "form" );
