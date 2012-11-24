@@ -30,45 +30,41 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file src/modules/functions/graphix/mod_graphix.cpp
-///\brief Module for graphic functions with FreeImage
-#include "module/formfunctionBuilder.hpp"
-#include "logger-v1.hpp"
-#include "graphix.hpp"
+///\file src/modules/functions/graphix/graphix.hpp
+///\brief Interface for graphix functions
+#ifndef _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_HPP_INCLUDED
+#define _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_HPP_INCLUDED
+#include "serialize/struct/filtermapDescription.hpp"
+#include <string>
+#include <vector>
 
-_Wolframe::log::LogBackend* logBackendPtr;
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-using namespace _Wolframe::graphix;
+namespace _Wolframe {
+namespace graphix {
 
-static void setModuleLogger( void* logger )
+struct Image
 {
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger );
-}
+	std::string data;
 
-namespace {
-	
-struct graphix_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = Image::getStructDescription( );
-		static const serialize::StructDescriptionBase* result = ImageInfo::getStructDescription( );
-		langbind::FormFunction func( imageInfo, param, result );
-
-		return new FormFunctionBuilder( "imageInfo", func);
-	}
+	static const serialize::StructDescriptionBase *getStructDescription( );
 };
 
-} //anonymous namespace
-
-enum { NofObjects = 1 };
-
-static createBuilderFunc objdef[NofObjects] =
+struct ImageInfo
 {
-	graphix_func::constructor
+	int width;
+	int height;
+
+	static const serialize::StructDescriptionBase *getStructDescription( );
 };
 
-ModuleEntryPoint entryPoint( 0, "graphic functions", setModuleLogger, 0, 0, NofObjects, objdef );
+struct ImageImpl
+{
+	static const serialize::StructDescriptionBase *getStructDescription( );
+	static int get( ImageInfo &res, const Image &param );
+};
+
+int imageInfo( void *res, const void *param );
+
+}}
+#endif
 

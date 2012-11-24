@@ -11,35 +11,17 @@ INCLUDE_DIRS = \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe_langbind \
-	-L$(TOPDIR)/src/libwolframe_prnt \
+	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe
 
 INCLUDE_LIBS = \
-	-lwolframe \
-	-lwolframe_prnt
-
-# libhpdf
-INCLUDE_CXXFLAGS += \
-	-DWITH_LIBHPDF
-
-INCLUDE_DIRS += \
-	$(LIBHPDF_INCLUDE_DIRS)
-
-INCLUDE_LDFLAGS += \
-	$(LIBHPDF_LIB_DIRS)
-
-INCLUDE_LIBS += \
-	$(LIBHPDF_LIBS)
-
-
+	-lwolframe_serialize
+	
 DYNAMIC_MODULE = mod_graphix.so
 
-LIBHPDF_OBJS =
-
 CPP_OBJS = \
-	prnt_pdfPrinter_libhpdf.o \
-	prnt_pdfPrinterDocument_libhpdf.o \
-	mod_haru_pdf_printer.o
+	mod_graphix.o \
+	graphix.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

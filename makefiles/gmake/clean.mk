@@ -14,8 +14,6 @@
 .PHONY: clean_recursive clean local_clean
 
 clean_recursive:
-	@test -z "$(PRESUBDIRS)" || ( set -e; for d in $(PRESUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d clean || exit 1); done)
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d clean || exit 1); done)
 
@@ -43,8 +41,6 @@ endif
 .PHONY: distclean_recursive distclean local_distclean
 
 distclean_recursive:
-	@test -z "$(PRESUBDIRS)" || ( set -e; for d in $(PRESUBDIRS)""; do \
-	  (set -e; $(MAKE) -C $$d distclean || exit 1); done)
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d distclean || exit 1); done)
 

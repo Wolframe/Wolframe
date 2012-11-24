@@ -658,7 +658,11 @@ freeimage_static.lib: $(OBJS)
 
 local_all: $(LIBRARIES)
 
+# clean locally and recursively, the standard clean is a little
+# bit weak
 local_clean:
+	-@del /s *.obj >NUL 2>NUL
+	-@del /s *.dllobj >NUL 2>NUL
 
 local_distclean:
 

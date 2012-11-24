@@ -1,0 +1,4 @@
+LIBRARY mod_graphix
+
+EXPORTS
+entryPoint	@1

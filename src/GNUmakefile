@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = libwolframe libwolframe_serialize libwolframe_database libwolframe_langbind libwolframe_functions libwolframe_prnt modules
+SUBDIRS = libwolframe libwolframe_serialize libwolframe_database libwolframe_langbind libwolframe_prnt modules
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 

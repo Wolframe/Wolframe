@@ -30,45 +30,76 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file src/modules/functions/graphix/mod_graphix.cpp
-///\brief Module for graphic functions with FreeImage
-#include "module/formfunctionBuilder.hpp"
-#include "logger-v1.hpp"
-#include "graphix.hpp"
+///\file src/modules/functions/graphix/graphix.hpp
+///\brief Implementation of graphix functions
 
-_Wolframe::log::LogBackend* logBackendPtr;
+#include "serialize/struct/filtermapDescription.hpp"
+#include "graphix.hpp"
+#include <string>
+#include <vector>
 
 using namespace _Wolframe;
-using namespace _Wolframe::module;
-using namespace _Wolframe::graphix;
-
-static void setModuleLogger( void* logger )
-{
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger );
-}
+using namespace graphix;
 
 namespace {
-	
-struct graphix_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = Image::getStructDescription( );
-		static const serialize::StructDescriptionBase* result = ImageInfo::getStructDescription( );
-		langbind::FormFunction func( imageInfo, param, result );
 
-		return new FormFunctionBuilder( "imageInfo", func);
+struct ImageDescription : public serialize::StructDescription<Image>
+{
+	ImageDescription( )
+	{
+		( *this )
+		( "data", &Image::data );
 	}
 };
 
-} //anonymous namespace
-
-enum { NofObjects = 1 };
-
-static createBuilderFunc objdef[NofObjects] =
+struct ImageInfoDescription : public serialize::StructDescription<ImageInfo>
 {
-	graphix_func::constructor
+	ImageInfoDescription( )
+	{
+		( *this )
+		( "width", &ImageInfo::width )
+		( "height", &ImageInfo::height );
+	}
 };
 
-ModuleEntryPoint entryPoint( 0, "graphic functions", setModuleLogger, 0, 0, NofObjects, objdef );
+struct ImageImplDescription : public serialize::StructDescription<ImageImpl>
+{
+	ImageImplDescription( )
+	{
+	}
+};
+
+} // anonymous namespace
+
+const serialize::StructDescriptionBase *Image::getStructDescription( )
+{
+	static ImageDescription rt;
+	return &rt;
+}
+
+const serialize::StructDescriptionBase *ImageInfo::getStructDescription( )
+{
+	static ImageInfoDescription rt;
+	return &rt;
+}
+
+const serialize::StructDescriptionBase *ImageImpl::getStructDescription( )
+{
+	static ImageImplDescription rt;
+	return &rt;
+}
+
+int ImageImpl::get( ImageInfo &res, const Image &param )
+{
+	(void)param.data;
+	res.width = 77;
+	res.height = 78;
+	
+	return 0;
+}
+
+int _Wolframe::graphix::imageInfo( void* res, const void* param )
+{
+	return ImageImpl::get( *(ImageInfo *)res, *(const Image *)param );
+}
 
