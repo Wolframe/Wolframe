@@ -236,14 +236,16 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 	}
 	qDeleteAll( oldTranslators );
 	
-// install translation files for this form
-	QTranslator *translator = new QTranslator( m_ui );
-	if( !translator->load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
-		qWarning( ) << "Error while loading translations for form " <<
-			name << " for locale " << m_locale.name( );
+// install translation files for this form (not for en_US, as this is the master language)
+	if( m_locale.name( ) != "en_US" ) {
+		QTranslator *translator = new QTranslator( m_ui );
+		if( !translator->load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
+			qWarning( ) << "Error while loading translations for form " <<
+				name << " for locale " << m_locale.name( );
+		}
+		QCoreApplication::instance( )->installTranslator( translator );
 	}
-	QCoreApplication::instance( )->installTranslator( translator );
-
+	
 // not busy anymore
 	qApp->restoreOverrideCursor( );	
 }

@@ -612,20 +612,21 @@ void MainWindow::loadLanguage( QString language )
 // install new ones, first the ones of the theme, then the ones of the current form
 // all other forms will reinstall the correct language when called again
 	QTranslator *translator = new QTranslator( this );
+	if( language != "en_US" ) {
+		if( !translator->load( "qtclient." + language, "i18n" ) ) {
+			qCritical( ) << "Error while loading translations for qtclient " <<
+				m_currentTheme << " for locale " << language;
+		}
+		QCoreApplication::instance( )->installTranslator( translator );
+
+		translator = new QTranslator( this );
+		if( !translator->load( "MainWindow." + language, "themes/" + m_currentTheme ) ) {
+			qCritical( ) << "Error while loading translations for theme " <<
+				m_currentTheme << " for locale " << language;
+		}
+		QCoreApplication::instance( )->installTranslator( translator );
+	}
 	
-	if( !translator->load( "qtclient." + language, "i18n/" + m_currentTheme ) ) {
-		qCritical( ) << "Error while loading translations for qtclient " <<
-			m_currentTheme << " for locale " << language;
-	}
-	QCoreApplication::instance( )->installTranslator( translator );
-
-	translator = new QTranslator( this );
-	if( !translator->load( "MainWindow." + language, "themes/" + m_currentTheme ) ) {
-		qCritical( ) << "Error while loading translations for theme " <<
-			m_currentTheme << " for locale " << language;
-	}
-	QCoreApplication::instance( )->installTranslator( translator );
-
 // also set language of the form widget
 	m_formWidget->loadLanguage( language );
 	
