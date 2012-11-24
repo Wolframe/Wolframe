@@ -159,6 +159,15 @@
        <property name="form" stdset="0">
         <string>picture_info</string>
        </property>
+       <property name="global.picture_doctype" stdset="0">
+        <string notr="true">FeatureRequest.simpleForm</string>
+       </property>
+       <property name="global.picture_back" stdset="0">
+        <string notr="true">feature_edit</string>
+       </property>
+       <property name="global.picture_rootelement" stdset="0">
+        <string notr="true">feature</string>
+       </property>
       </widget>
      </widget>
     </item>

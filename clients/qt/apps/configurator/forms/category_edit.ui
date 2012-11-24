@@ -168,6 +168,15 @@
        <property name="form" stdset="0">
         <string>picture_info</string>
        </property>
+       <property name="global.picture_doctype" stdset="0">
+        <string notr="true">CategoryRequest.simpleForm</string>
+       </property>
+       <property name="global.picture_back" stdset="0">
+        <string notr="true">category_edit</string>
+       </property>
+       <property name="global.picture_rootelement" stdset="0">
+        <string notr="true">category</string>
+       </property>
       </widget>
      </widget>
     </item>
