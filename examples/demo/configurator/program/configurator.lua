@@ -179,6 +179,10 @@ local function edit_node( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			id = v
+			-- don't allow editing of the root element (fast hack)
+			if id == "1" then
+				return
+			end
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
@@ -198,7 +202,7 @@ local function delete_node( tablename, itr)
 			id = v
 		end
 	end
-	-- don't allow deletion of the root element
+	-- don't allow deletion of the root element (fast hack)
 	if id == "1" then
 		return
 	end
