@@ -30,40 +30,35 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file src/modules/functions/graphix/mod_graphix.cpp
-///\brief Module for graphic functions with FreeImage
-#include "module/formfunctionBuilder.hpp"
-#include "logger-v1.hpp"
+///\file src/modules/functions/graphix/graphix.hpp
+///\brief Interface for graphix functions
+#ifndef _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_HPP_INCLUDED
+#define _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_HPP_INCLUDED
+#include "serialize/struct/filtermapDescription.hpp"
+#include <string>
+#include <vector>
 
-_Wolframe::log::LogBackend* logBackendPtr;
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
+namespace _Wolframe {
+namespace graphix {
 
-static void setModuleLogger( void* logger )
+struct Image
 {
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
-
-namespace {
-struct graphix_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = AssignmentListDoc::getStructDescription();
-		static const serialize::StructDescriptionBase* result = AssignmentListDoc::getStructDescription();
-		langbind::FormFunction func( convertAssignmentListDoc, param, result);
-
-		return new FormFunctionBuilder( "graphix", func);
-	}
-};
-}//anonymous namespace
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	graphix_func::constructor
+	std::string data;
+	
+	static const serialize::StructDescriptionBase* getStructDescription( );
 };
 
-ModuleEntryPoint entryPoint( 0, "graphic functions", setModuleLogger, 0, 0, NofObjects, objdef);
+struct ImageInfo
+{
+	int width;
+	int height;
+
+	static const serialize::StructDescriptionBase* getStructDescription( );
+};
+
+int imageInfo( void* res, const void* param );
+
+}}
+#endif
 
