@@ -45,8 +45,8 @@ namespace graphix {
 struct Image
 {
 	std::string data;
-	
-	static const serialize::StructDescriptionBase* getStructDescription( );
+
+	static const serialize::StructDescriptionBase *getStructDescription( );
 };
 
 struct ImageInfo
@@ -54,10 +54,16 @@ struct ImageInfo
 	int width;
 	int height;
 
-	static const serialize::StructDescriptionBase* getStructDescription( );
+	static const serialize::StructDescriptionBase *getStructDescription( );
 };
 
-int imageInfo( void* res, const void* param );
+struct ImageImpl
+{
+	static const serialize::StructDescriptionBase *getStructDescription( );
+	static int get( ImageInfo &res, const Image &param );
+};
+
+int imageInfo( void *res, const void *param );
 
 }}
 #endif

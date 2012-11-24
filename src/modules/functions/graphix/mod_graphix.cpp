@@ -34,36 +34,41 @@
 ///\brief Module for graphic functions with FreeImage
 #include "module/formfunctionBuilder.hpp"
 #include "logger-v1.hpp"
+#include "graphix.hpp"
 
 _Wolframe::log::LogBackend* logBackendPtr;
 
 using namespace _Wolframe;
 using namespace _Wolframe::module;
+using namespace _Wolframe::graphix;
 
 static void setModuleLogger( void* logger )
 {
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
+	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger );
 }
 
 namespace {
+	
 struct graphix_func
 {
 	static SimpleBuilder* constructor()
 	{
-		static const serialize::StructDescriptionBase* param = AssignmentListDoc::getStructDescription();
-		static const serialize::StructDescriptionBase* result = AssignmentListDoc::getStructDescription();
-		langbind::FormFunction func( convertAssignmentListDoc, param, result);
+		static const serialize::StructDescriptionBase* param = Image::getStructDescription( );
+		static const serialize::StructDescriptionBase* result = ImageInfo::getStructDescription( );
+		langbind::FormFunction func( imageInfo, param, result );
 
-		return new FormFunctionBuilder( "graphix", func);
+		return new FormFunctionBuilder( "imageInfo", func);
 	}
 };
-}//anonymous namespace
 
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
+} //anonymous namespace
+
+enum { NofObjects = 1 };
+
+static createBuilderFunc objdef[NofObjects] =
 {
 	graphix_func::constructor
 };
 
-ModuleEntryPoint entryPoint( 0, "graphic functions", setModuleLogger, 0, 0, NofObjects, objdef);
+ModuleEntryPoint entryPoint( 0, "graphic functions", setModuleLogger, 0, 0, NofObjects, objdef );
 

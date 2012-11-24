@@ -39,134 +39,60 @@
 #include <vector>
 
 using namespace _Wolframe;
-using namespace test;
+using namespace graphix;
 
 namespace {
-struct TaskDescription :public serialize::StructDescription<Task>
+
+struct ImageDescription : public serialize::StructDescription<Image>
 {
-	TaskDescription()
+	ImageDescription( )
 	{
-		(*this)
-		("key", &Task::key)
-		("title", &Task::title)
-		("customernumber", &Task::customernumber);
+		( *this )
+		( "data", &Image::data )
 	}
 };
 
-struct EmployeeDescription :public serialize::StructDescription<Employee>
+struct ImageInfoDescription : public serialize::StructDescription<ImageInfo>
 {
-	EmployeeDescription()
+	ImageInfoDescription( )
 	{
-		(*this)
-		("firstname", &Employee::firstname)
-		("surname", &Employee::surname)
-		("phone", &Employee::phone);
+		( *this )
+		( "width", &ImageInfo::width )
+		( "height", &ImageInfo::height )
 	}
 };
 
-struct AssignmentDescription :public serialize::StructDescription<Assignment>
-{
-	AssignmentDescription()
-	{
-		(*this)
-		("issuedate", &Assignment::issuedate)
-		("employee", &Assignment::employee)
-		("task", &Assignment::task);
-	}
-};
+} // anonymous namespace
 
-struct AssignmentListDescription :public serialize::StructDescription<AssignmentList>
+const serialize::StructDescriptionBase *Image::getStructDescription( )
 {
-	AssignmentListDescription()
-	{
-		(*this)
-		("assignment", &AssignmentList::assignment);
-	}
-};
-
-struct AssignmentListDocDescription :public serialize::StructDescription<AssignmentListDoc>
-{
-	AssignmentListDocDescription()
-	{
-		(*this)
-		("assignmentlist", &AssignmentListDoc::assignmentlist);
-	}
-};
-}
-
-
-const serialize::StructDescriptionBase* Task::getStructDescription()
-{
-	static TaskDescription rt;
+	static ImageDescription rt;
 	return &rt;
 }
 
-const serialize::StructDescriptionBase* Employee::getStructDescription()
+const serialize::StructDescriptionBase *ImageInfo::getStructDescription( )
 {
-	static EmployeeDescription rt;
+	static ImageInfoDescription rt;
 	return &rt;
 }
 
-const serialize::StructDescriptionBase* Assignment::getStructDescription()
+const serialize::StructDescriptionBase *ImageImpl::getStructDescription( )
 {
-	static AssignmentDescription rt;
+	static ImageImplDescription rt;
 	return &rt;
 }
 
-const serialize::StructDescriptionBase* AssignmentList::getStructDescription()
+int ImageImpl::get( ImageInfo &res, const Image &param )
 {
-	static AssignmentListDescription rt;
-	return &rt;
-}
-
-const serialize::StructDescriptionBase* AssignmentListDoc::getStructDescription()
-{
-	static AssignmentListDocDescription rt;
-	return &rt;
-}
-
-static void convertString( std::string& res, const std::string& param)
-{
-	std::string::const_iterator itr=param.begin();
-	while (itr != param.end())
-	{
-		if (*itr >= '0' && *itr <= '9') res.push_back( '9'-*itr + '0');
-		else if (*itr >= 'a' && *itr <= 'z') {res.push_back( *itr); res.push_back( *itr);}
-		else if (*itr >= 'A' && *itr <= 'Z') {res.push_back( ::tolower(*itr));}
-		else if (*itr == ' ' || *itr == '-' || *itr == '_') {res.push_back( *itr);}
-		++itr;
-	}
-}
-
-int AssignmentListDoc::convert( AssignmentListDoc& res, const AssignmentListDoc& param)
-{
-	std::vector<Assignment>::const_iterator itr=param.assignmentlist.assignment.begin();
-	while (itr != param.assignmentlist.assignment.end())
-	{
-		Assignment aa;
-		convertString( aa.issuedate, itr->issuedate);
-		convertString( aa.employee.firstname, itr->employee.firstname);
-		convertString( aa.employee.surname, itr->employee.surname);
-		convertString( aa.employee.phone, itr->employee.phone);
-		std::vector<Task>::const_iterator taskitr=itr->task.begin();
-		while (taskitr != itr->task.end())
-		{
-			Task tt;
-			convertString( tt.title, taskitr->title);
-			convertString( tt.key, taskitr->key);
-			tt.customernumber = taskitr->customernumber + 1;
-			aa.task.push_back( tt);
-			++taskitr;
-		}
-		res.assignmentlist.assignment.push_back( aa);
-		++itr;
-	}
+	(void)param.data;
+	res.width = 77;
+	res.height = 78;
+	
 	return 0;
 }
 
-
-int _Wolframe::test::convertAssignmentListDoc( void* res, const void* param)
+int imageInfo( void* res, const void* param )
 {
-	return AssignmentListDoc::convert( *(AssignmentListDoc*)res, *(const AssignmentListDoc*) param);
+	return ImageImpl::get( *(ImageInfo *)res, *(const Image *)param );
 }
 
