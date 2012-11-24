@@ -48,7 +48,7 @@ struct ImageDescription : public serialize::StructDescription<Image>
 	ImageDescription( )
 	{
 		( *this )
-		( "data", &Image::data )
+		( "data", &Image::data );
 	}
 };
 
@@ -58,7 +58,14 @@ struct ImageInfoDescription : public serialize::StructDescription<ImageInfo>
 	{
 		( *this )
 		( "width", &ImageInfo::width )
-		( "height", &ImageInfo::height )
+		( "height", &ImageInfo::height );
+	}
+};
+
+struct ImageImplDescription : public serialize::StructDescription<ImageImpl>
+{
+	ImageImplDescription( )
+	{
 	}
 };
 
@@ -91,7 +98,7 @@ int ImageImpl::get( ImageInfo &res, const Image &param )
 	return 0;
 }
 
-int imageInfo( void* res, const void* param )
+int _Wolframe::graphix::imageInfo( void* res, const void* param )
 {
 	return ImageImpl::get( *(ImageInfo *)res, *(const Image *)param );
 }

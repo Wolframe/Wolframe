@@ -22,10 +22,16 @@ end
 local function picture_value( itr)
 	local picture = {}
 	for v,t in itr do
-		if (t == "id" or t == "caption" or t == "info" or t == "image" or t == "width" or t == "height" or t == "thumbnail") then
+		if (t == "id" or t == "caption" or t == "info" or t == "image") then
 			picture[ t] = content_value( v, itr)
 		end
 	end
+	info = formfunction( "imageInfo" )( { [ "data"] = picture["image"] } ):table( )
+	picture["width"] = info.width
+	picture["height"] = info.height
+	picture["thumbnail"] = ""
+	print( "width: " .. picture["width"] )
+	print( "height: " .. picture["height"] )
 	return picture
 end
 
