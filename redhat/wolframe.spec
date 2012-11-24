@@ -515,6 +515,18 @@ Requires: libpng
 Requires: zlib
 %endif
 
+%if %{with_freeimage}
+%package freeimage
+Summary: Wolframe image manipulation function module.
+Group: Application/Business
+
+%description freeimage
+Wolframe image manipulation function module implemented with
+the FreeImage library.
+
+Requires: %{name} >= %{version}-%{release}
+%endif
+
 %package client
 Summary: Wolframe client and command line tool
 Group: Application/Business
@@ -808,17 +820,10 @@ fi
 %{_libdir}/wolframe/libwolframe_langbind.so.0
 %{_libdir}/wolframe/libwolframe_prnt.so.0.0.0
 %{_libdir}/wolframe/libwolframe_prnt.so.0
-%{_libdir}/wolframe/libwolframe_functions.so.0.0.0
-%{_libdir}/wolframe/libwolframe_functions.so.0
 
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so.5.2.0
 %{_libdir}/wolframe/liblua.so.5
-%endif
-
-%if %{with_local_freeimage}
-%{_libdir}/wolframe/libfreeimage.so.3.15.4
-%{_libdir}/wolframe/libfreeimage.so.3
 %endif
 
 %dir %{_libdir}/wolframe/modules
@@ -874,8 +879,6 @@ fi
 %{_libdir}/wolframe/libwolframe_langbind.a
 %{_libdir}/wolframe/libwolframe_prnt.so
 %{_libdir}/wolframe/libwolframe_prnt.a
-%{_libdir}/wolframe/libwolframe_functions.so
-%{_libdir}/wolframe/libwolframe_functions.a
 %{_libdir}/wolframe/libwolframe_client.so
 %{_libdir}/wolframe/libwolframe_client.a
 %if %{with_lua}
@@ -894,6 +897,8 @@ fi
 %if %{with_local_freeimage}
 %{_libdir}/wolframe/libfreeimage.so
 %{_libdir}/wolframe/libfreeimage.a
+%{_libdir}/wolframe/libfreeimageplus.so
+%{_libdir}/wolframe/libfreeimageplus.a
 %endif
 %dir %{_includedir}/wolframe
 %{_includedir}/wolframe/*.hpp
@@ -995,6 +1000,20 @@ fi
 %if %{with_local_libhpdf}
 %{_libdir}/wolframe/libhpdf.so.2.2.1
 %{_libdir}/wolframe/libhpdf.so.2
+%endif
+
+%if %{with_freeimage}
+%files freeimage
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%dir %{_libdir}/wolframe/modules
+%{_libdir}/wolframe/modules/mod_graphix.so
+%if %{with_local_freeimage}
+%{_libdir}/wolframe/libfreeimage.so.3.15.4
+%{_libdir}/wolframe/libfreeimage.so.3
+%{_libdir}/wolframe/libfreeimageplus.so.3.15.4
+%{_libdir}/wolframe/libfreeimageplus.so.3
+%endif
 %endif
 
 %endif
