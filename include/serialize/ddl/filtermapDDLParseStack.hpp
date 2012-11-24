@@ -48,56 +48,21 @@ class FiltermapDDLParseState
 public:
 	FiltermapDDLParseState( const FiltermapDDLParseState& o)
 		:m_size(o.m_size)
-		,m_initar(0)
 		,m_elemidx(o.m_elemidx)
 		,m_value(o.m_value)
 		,m_name(o.m_name)
 		,m_stateidx(o.m_stateidx)
-		{
-			if (o.m_initar)
-			{
-				m_initar = (int*)std::calloc( m_size, sizeof(*m_initar));
-				std::memcpy( m_initar, o.m_initar, m_size*sizeof(*m_initar));
-			}
-		}
+		{}
 
 	FiltermapDDLParseState( const char* name_, ddl::StructType* v)
 		:m_size(0)
-		,m_initar(0)
 		,m_elemidx(0)
 		,m_value(v)
 		,m_name(name_)
 		,m_stateidx(0)
 		{}
 
-	~FiltermapDDLParseState()
-	{
-		if (m_initar) std::free( m_initar);
-	}
-
-	void initStructDef( std::size_t n)
-	{
-		if (!m_initar)
-		{
-			m_initar = (int*)std::calloc( m_size=n, sizeof(*m_initar));
-		}
-	}
-
-	void selectElement( std::size_t idx)
-	{
-		if (idx > m_size) throw std::logic_error( "ABW in intrusive filter map parser");
-		m_initar[ m_elemidx=idx] += 1;
-	}
-
-	int initCount() const
-	{
-		return m_initar?m_initar[ m_elemidx]:0;
-	}
-
-	int initCount( std::size_t idx) const
-	{
-		return m_initar?m_initar[ idx]:0;
-	}
+	~FiltermapDDLParseState(){}
 
 	ddl::StructType* value() const
 	{
@@ -121,7 +86,6 @@ public:
 
 private:
 	std::size_t m_size;
-	int* m_initar;
 	std::size_t m_elemidx;
 	ddl::StructType* m_value;
 	const char* m_name;

@@ -1,0 +1,47 @@
+<!-- Tutorial -->
+<sect1>
+<title>Writing Wolframe Transaction Definitions</title>
+	<sect2>
+		<title>Introduction</title>
+		<para>Wolframe transactions are defined as functions in a transactional context.
+			The begin and the commit or abort are done automatically at the beginning
+			or at the end of a transaction function respectively,
+			if not explicitely defined otherwise in the scripting language.
+			For the description of transactions wolframe provides the definition language introduce here.
+			A transaction takes a structure as input and returns a structure as output.
+			Input and output structure are accessed is the same way as form structures
+			or serialized as XML.
+			</para>
+		<para>
+			The transaction definition language defines a transaction as a sequence of database commands.
+			It adds some constructs to address input structure elements or database command results as arguments.
+			Each database command result can be declared as beeing part of the transaction result structure.
+			The language has no control structures and is therefore not a general purpose programming language.
+			It just offers some direct mapping of input to commands and from commands results to output.
+			For programming wolframe offers some scripting language bindings to use outside the transactional context.
+			</para>
+	</sect2>
+	<sect2>
+		<title></title>
+		<para>
+		</para>
+		<para>
+			Keywords in the transaction definition language
+			<simplelist type="horiz" columns="2">
+			<member>FOREACH</member><member>..</member>
+			<member>INTO</member><member>..</member>
+			<member>DO</member><member>..</member>
+			<member>UNIQUE</member><member>..</member>
+			<member>NONEMPTY</member><member>..</member>
+			</simplelist>
+			</para>
+		<para>
+			Substitutes in the transaction definition language
+			<simplelist type="horiz" columns="3">
+			<member>Element</member><member>Example</member><member>Description</member>
+			<member>$NNN</member><member>$1</member><member>Column of one row of last result. The command is executed for each row of the last result</member>
+			<member>$(path)</member><member>$(id)</member><member>Single element addressed by relative path from the FOREACH selection</member>
+			</simplelist>
+			</para>
+</sect1>
+

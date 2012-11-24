@@ -3,29 +3,31 @@
 <title>Writing Wolframe Form Definitions</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>Wolframe forms can be defined in different ways depending on the usage. They can be defined
-		in a module as hardwired structure. In this shape they are used as APIs for functions implemented
-		in modules.
+	<para>Wolframe form structures can be defined in different ways. They can be defined
+		in a module as native C++ structure. In this shape they are used in APIs
+		for built-in functions implemented in modules.
 	</para>
 	<para>
-		Forms can also be defined in a DDL (data definition language) that is used as glue between transactions
-		executed in the data tier and programs executed in the logic tier. It depends very much on the
-		application what DDL is best to use. Users may already have their data definitions
-		in a certain way defined. The form DDL can be defined in the way you want. Wolframe offers a
-		pluggin mechanism for DLL compilers and provides examples of such compilers. You configure the
-		DDL sources to load and the compiler to use.
+		Forms can also be defined in a DDL (Data Definition Language).
+		It depends very much on the application what DDL is best to use.
+		Users may already have their data definitions in a certain way defined.
+		The form DDL can be defined in the way you want. Wolframe offers a
+		pluggin mechanism for DLL compilers and provides examples of such compilers.
+		You configure the DDL sources to load and the compiler to use.
 	</para>
 	<para>
-		With the DDL form description we get a transformation of the form content
-		to a transactions procedure description and a transformation of the transaction function result back
-		into a form. This returned form content can then be inspected by the program in the logic tier.
-		These transformations are independent of the specific form and transaction function. This
-		means that such a transformation has to be written only once per backend and you can define
-		as many database queries and forms using it as you want.
+		With the DDL form description we get a deserialization of content
+		to a structure and a serialization for output. We get also a validation
+		and normalization procedure of content by assigning types to atomic form
+		elements that validate and normalize the data elements.
+		Most of the business transactions should be doable as input form
+		description, output form description and a transaction that maps
+		input to output without control flow aware programming.
 	</para>
 	<para>
-		All forms introduced here are equivalent in use for the programs. In Lua for example they can simply
-		be built from tables or from an input by applying a filter. See the Lua tutorial for details.
+		All forms introduced here are equivalent in use for the programs.
+		In Lua for example they can simply be built from tables or from
+		an input iterator. See the Lua tutorial for details.
 	</para>
 	</sect2>
 	<sect2>
@@ -34,22 +36,14 @@
 		As example of a form DDL we provide the "Simple Form DDL" as example. The format is based on the "INFO"-format
 		introduced by Marcin Kalicinski for the boost property tree library. We used this library to show an example
 		that is easy to understand and small enough.
-		The format uses key value pairs separated with spaces for atomic elements and curly brackets '{' '}' to describe structures. The key is the name of the element and the following value is the assembles the attributes of this element. The attributes are a data type and some operators that describe additional properties.
+		The format uses key value pairs separated with spaces for atomic elements and curly brackets '{' '}' to describe structures.
+		The key is the name of the element and the following value is the assembles the attributes of this element.
+		The attributes are a data type and some operators that describe additional properties.
 	</para>
 	<para>
-		The following data types are known in Simple Form DDL
-		<simplelist type="horiz" columns="2">
-		<member>double</member><member>double precision floating point</member>
-		<member>float</member><member>floating point</member>
-		<member>long</member><member>big integer</member>
-		<member>ulong</member><member>unsigned big integer</member>
-		<member>int</member><member>double</member>
-		<member>uint</member><member>unsigned integer</member>
-		<member>short</member><member>16 bit integer</member>
-		<member>ushort</member><member>unsigned 16 bit integer</member>
-		<member>char</member><member>1 byte character</member>
-		<member>string</member><member>string</member>
-		</simplelist>
+		There is only one predefined data type known in Simple Form DDL: "string".
+		All other data types are defined as sequence of 'normalizer' functions in a normalize definition file.
+		The 'normalizer' functions assigned to a type validate the value and transform it to its normalized form.
 	</para>
 	<para>
 		The following element attributes are known in Simple Form DDL
@@ -63,7 +57,7 @@
 	<para>
 		The following example shows a form defined in simple form DDL.
 		<programlisting language='text'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/ddl_simpleform_1.frm" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/customers.simpleform" parse="text" />
 		</programlisting>
 	</para>
 	</sect2>
@@ -71,12 +65,6 @@
 	<title>Define Forms in C++ as module function API</title>
 	<para>
 	</para>
-	</sect2>
-	<sect2>
-	<title>Define Transaction Procedure Description Writers as Filters</title>
-	</sect2>
-	<sect2>
-	<title>Define Transaction Result Description Readers as Filters</title>
 	</sect2>
 	<para></para>
 </sect1>

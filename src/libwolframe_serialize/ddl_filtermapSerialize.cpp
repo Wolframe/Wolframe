@@ -63,15 +63,20 @@ static std::string getElementPath( const FiltermapDDLSerializeStateStack& stk)
 
 static bool fetchAtom( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
 {
+	bool rt = false;
 	if (stk.back().state())
 	{
 		stk.pop_back();
 		return false;
 	}
-	const ddl::AtomicType* val = &stk.back().value()->value();
-	ctx.setElem( langbind::FilterBase::Value, langbind::TypedFilterBase::Element( val->value().c_str(), val->value().size()));
+	if (stk.back().value()->initialized())
+	{
+		const ddl::AtomicType* val = &stk.back().value()->value();
+		ctx.setElem( langbind::FilterBase::Value, langbind::TypedFilterBase::Element( val->value().c_str(), val->value().size()));
+		rt = true;
+	}
 	stk.back().state( 1);
-	return true;
+	return rt;
 }
 
 static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& stk)
@@ -82,13 +87,18 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 	if (idx < obj->nof_elements())
 	{
 		ddl::StructType::Map::const_iterator itr = obj->begin() + idx;
+		if (!itr->second.initialized())
+		{
+			stk.back().state( ++idx);
+			return false;
+		}
 		if (idx < obj->nof_attributes())
 		{
 			if (itr->first.empty())
 			{
 				throw SerializationErrorException( "error in structure definition: defined untagged value as attribute in structure", getElementPath( stk));
 			}
-			if (itr->second.contentType() != ddl::StructType::Atomic || itr->first.empty())
+			if (itr->second.contentType() != ddl::StructType::Atomic)
 			{
 				throw SerializationErrorException( "named atomic value expected for attribute", getElementPath( stk));
 			}

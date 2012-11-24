@@ -141,8 +141,6 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 	langbind::InputFilter::ElementType typ;
 	langbind::TypedFilterBase::Element element;
 
-	stk.back().initStructDef( st.nof_elements());
-
 	if (!inp.getNext( typ, element))
 	{
 		if (inp.state() != langbind::InputFilter::Error) return false;
@@ -166,11 +164,11 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 					throw SerializationErrorException( "attribute element expected for ", element.tostring(), getElementPath( stk));
 				}
 			}
-			if (itr->second.contentType() != ddl::StructType::Vector && stk.back().initCount( idx))
+			if (itr->second.contentType() != ddl::StructType::Vector && itr->second.initialized())
 			{
 				throw SerializationErrorException( "duplicate structure element definition", element.tostring(), getElementPath( stk));
 			}
-			stk.back().selectElement( idx);
+			itr->second.initialized(true);
 			stk.push_back( FiltermapDDLParseState( itr->first.c_str(), &itr->second));
 			if (itr->second.contentType() == ddl::StructType::Atomic)
 			{
@@ -198,7 +196,10 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			{
 				throw SerializationErrorException( "atomic element expected", element.tostring(), getElementPath( stk));
 			}
-			stk.back().selectElement( idx);
+			if (itr->second.initialized(true))
+			{
+				throw SerializationErrorException( "duplicate structure attribute definition", element.tostring(), getElementPath( stk));
+			}
 			stk.push_back( FiltermapDDLParseState( itr->first.c_str(), &itr->second));
 			stk.back().state( AttributeValueOpen);
 			return true;
@@ -244,7 +245,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			ddl::StructType::Map::iterator itr = st.begin(), end = st.end();
 			for (;itr != end; ++itr)
 			{
-				if (itr->second.mandatory() && stk.back().initCount( itr-st.begin()) == 0)
+				if (itr->second.mandatory() && !itr->second.initialized())
 				{
 					throw SerializationErrorException( "undefined mandatory structure element", itr->first, getElementPath( stk));
 				}

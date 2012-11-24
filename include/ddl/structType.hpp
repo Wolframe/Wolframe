@@ -75,7 +75,8 @@ public:
 	StructType( bool mandatory_=false)
 		:m_contentType( Struct)
 		,m_nof_attributes(0)
-		,m_mandatory(mandatory_){}
+		,m_mandatory(mandatory_)
+		,m_initialized(false){}
 
 	///\brief Copy constructor
 	///\param[in] o element to copy
@@ -84,7 +85,8 @@ public:
 		,m_value(o.m_value)
 		,m_elem(o.m_elem)
 		,m_nof_attributes(o.m_nof_attributes)
-		,m_mandatory(o.m_mandatory){}
+		,m_mandatory(o.m_mandatory)
+		,m_initialized(o.m_initialized){}
 
 	///\brief Copy constructor
 	///\param[in] a atomic element to create as structure element
@@ -93,7 +95,8 @@ public:
 		:m_contentType( Atomic)
 		,m_value(a)
 		,m_nof_attributes(0)
-		,m_mandatory(mandatory_){}
+		,m_mandatory(mandatory_)
+		,m_initialized(false){}
 
 	///\brief Assignement operator
 	///\param[in] o element to copy
@@ -104,6 +107,7 @@ public:
 		m_elem = o.m_elem;
 		m_nof_attributes = o.m_nof_attributes;
 		m_mandatory = o.m_mandatory;
+		m_initialized = o.m_initialized;
 		return *this;
 	}
 
@@ -235,6 +239,14 @@ public:
 	///\return true, if yes
 	bool mandatory() const				{return m_mandatory;}
 
+	///\brief Find out if the structure is initialized
+	///\return true, if yes
+	bool initialized() const			{return m_initialized;}
+
+	///\brief Mark the structure as initialized/non initialized
+	///\return true, if the element was initialized before
+	bool initialized( bool v=true)			{bool rt = m_initialized; m_initialized=v; return rt;}
+
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
 	///\remark Used for checking the preconditions mentioned as remark [precondition]
@@ -245,6 +257,7 @@ private:
 	Map m_elem;			//< map represented as array
 	std::size_t m_nof_attributes;	//< number of attributes (first N elements of the structure)
 	bool m_mandatory;		//< true, if the field is mandatory
+	bool m_initialized;		//< true, if the field has been initialized
 };
 
 
