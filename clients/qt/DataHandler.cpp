@@ -26,6 +26,7 @@
 #include <QSet>
 #include <QLabel>
 #include <QPixmap>
+#include <QTableWidget>
 
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
@@ -278,6 +279,9 @@ void DataHandler::resetFormData( QWidget *form )
 		} else if( clazz == "QTreeWidget" ) {
 			QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 			treeWidget->clear( );
+		} else if( clazz == "QTableWidget" ) {
+			QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
+			tableWidget->clearContents( );			
 		} else if( clazz == "FileChooser" ) {
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
 			fileChooser->setFileName( "" );
@@ -321,6 +325,8 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 			m_dataLoader->request( form_name, name, QByteArray( ), props );
 		} else if( clazz == "QTreeWidget" ) {
 			m_dataLoader->request( form_name, name, QByteArray( ), props );
+		} else if( clazz == "QTableWidget" ) {
+			m_dataLoader->request( form_name, name, QByteArray( ), props );
 		} else {
 			// all other classes don't load domains, but we want to keep
 			// the calling code generic..
@@ -355,6 +361,46 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 			if( xml.isStartElement( ) && xml.name( ) == "value" ) {
 				QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 				listWidget->addItem( text );
+			}
+		}
+	} else if( clazz == "QTableWidget" ) {
+		QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
+		QStringList headers;
+		for( int i = 0; i < tableWidget->columnCount( ); i++ ) {
+			QTableWidgetItem *item = tableWidget->horizontalHeaderItem( i );
+			QString headerText = item->data( Qt::DisplayRole ).toString( );
+			headers << headerText;		
+		}
+		int row = 0;
+		bool inData = false;
+		while( !xml.atEnd( ) ) {
+			xml.readNext( );
+			if( xml.isStartElement( ) ) {
+				if( xml.name( ) == widget_name ) {
+					inData = true;
+					tableWidget->insertRow( row );
+				} else if( inData ) {
+					int col = headers.indexOf( xml.name( ).toString( ) );
+					if( col != -1 ) {
+						QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
+						if( xml.name( ) == "thumbnail" ) {
+							QByteArray encoded = text.toAscii( );
+							QByteArray decoded = QByteArray::fromBase64( encoded );
+							QPixmap p;
+							p.loadFromData( decoded );
+							QTableWidgetItem *item = new QTableWidgetItem( QIcon( p ), QString( ) );								
+							tableWidget->setItem( row, col, item );
+						} else {
+							QTableWidgetItem *item = new QTableWidgetItem( text );
+							tableWidget->setItem( row, col, item );
+						}
+					}
+				}
+			} else if( xml.isEndElement( ) ) {
+				if( xml.name( ) == widget_name ) {
+					row++;
+					inData = false;
+				}
 			}
 		}
 	} else if( clazz == "QTreeWidget" ) {

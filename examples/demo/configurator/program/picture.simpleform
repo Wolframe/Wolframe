@@ -1,0 +1,10 @@
+DOCTYPE "picture Picture"
+{
+	id @int
+	caption string
+	info string
+	thumbnail string
+	width int
+	height int
+	size int
+}

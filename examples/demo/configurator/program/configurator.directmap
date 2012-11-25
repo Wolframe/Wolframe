@@ -8,3 +8,4 @@ selectSubFeature = selectSubFeature( xml );
 selectFeature = selectFeature( xml );
 selectFeatureByName = selectFeatureByName( xml );
 selectFeatureByNormalizedName = selectFeatureByNormalizedame( xml );
+selectPictureList = selectPictureList( xml );

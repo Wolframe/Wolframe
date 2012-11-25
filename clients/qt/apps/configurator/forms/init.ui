@@ -163,6 +163,28 @@
     <string>expand all</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="managePictures">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>380</y>
+     <width>121</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Manage Pictures</string>
+   </property>
+   <property name="form" stdset="0">
+    <string notr="true">pictures</string>
+   </property>
+   <property name="global.featureState" stdset="0">
+    <string notr="true">{feature.state}</string>
+   </property>
+   <property name="global.categoryState" stdset="0">
+    <string notr="true">{category.state}</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>
