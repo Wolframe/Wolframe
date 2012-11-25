@@ -1,6 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS += testPdfPrinter
+SUBDIRS = testPdfPrinter
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
