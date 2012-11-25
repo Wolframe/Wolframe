@@ -57,10 +57,9 @@ PoolObject< sqlite3* >::PoolObject( ObjectPool< sqlite3* >& pool )
 namespace _Wolframe {
 namespace db {
 
-SQLiteDBunit::SQLiteDBunit( const std::string& id,
-			    const std::string& filename, bool flag,
+SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			    unsigned short connections )
-	: m_ID( id ), m_filename( filename ), m_flag( flag )
+	: m_ID( id ), m_filename( filename )
 {
 	bool	checked = false;
 	int	dbFlags = SQLITE_OPEN_READWRITE;
@@ -73,6 +72,9 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id,
 			connections = 1;
 		}
 		else	{
+			if ( sqlite3_config( SQLITE_CONFIG_MULTITHREAD ) != SQLITE_OK )	{
+				throw std::runtime_error( "Unable to set SQLite in multithreaded mode" );
+			}
 			dbFlags |= SQLITE_OPEN_NOMUTEX;
 //			dbFlags |= SQLITE_OPEN_FULLMUTEX;
 		}
@@ -185,11 +187,8 @@ const std::string* SQLiteDatabase::getProgram( const std::string& name) const
 	return m_unit->getProgram( name );
 }
 
-Transaction* SQLiteDatabase::transaction(const std::string& /*name*/ , bool connected )
+Transaction* SQLiteDatabase::transaction( const std::string& /*name*/ )
 {
-	if ( connected )	{
-
-	}
 	return new SQLiteTransaction( *this );
 }
 
@@ -261,8 +260,8 @@ void SQLiteTransaction::execute_with_autocommit()
 {
 	try
 	{
-		PoolObject<sqlite3*> conn( m_unit.m_connPool);
-		PreparedStatementHandler_sqlite3 ph( *conn, m_unit.stmmap());
+		PoolObject<sqlite3*> conn( m_unit.m_connPool );
+		PreparedStatementHandler_sqlite3 ph( *conn, m_unit.stmmap() );
 		try
 		{
 			if (!ph.begin()
@@ -288,7 +287,7 @@ void SQLiteTransaction::execute_with_autocommit()
 
 void SQLiteTransaction::execute_transaction_operation()
 {
-	PreparedStatementHandler_sqlite3 ph( **m_conn.get(), m_unit.stmmap(), true);
+	PreparedStatementHandler_sqlite3 ph( **m_conn.get(), m_unit.stmmap(), true );
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))
@@ -320,7 +319,8 @@ void SQLiteTransaction::execute()
 
 void SQLiteTransaction::close()
 {
-	if (m_conn.get()) MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
+	if ( m_conn.get() )
+		MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
 	m_conn.reset();
 	m_db.closeTransaction( this );
 }

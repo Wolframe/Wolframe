@@ -71,8 +71,8 @@ public:
 	const std::string& dump_filename() const	{ return m_dump_filename; }
 
 private:
-	config::ConfigurationTree extractMyNodes( const config::ConfigurationTree& pt);
-	void setMyCanonicalPathes( const std::string& referencePath);
+	config::ConfigurationTree extractMyNodes( const config::ConfigurationTree& pt );
+	void setMyCanonicalPathes( const std::string& referencePath );
 	void dump_database();
 
 	std::string m_input_filename;
@@ -82,18 +82,18 @@ private:
 class PostgreSQLTestConstructor : public PostgreSQLconstructor
 {
 public:
-	PostgreSQLTestConstructor(){}
-	virtual ~PostgreSQLTestConstructor(){}
+	PostgreSQLTestConstructor()		{}
+	virtual ~PostgreSQLTestConstructor()	{}
 
 	virtual PostgreSQLdbUnit* object( const config::NamedConfiguration& conf )
 	{
 		const PostgreSQLTestConfig& cfg = dynamic_cast< const PostgreSQLTestConfig& >( conf );
 		createTestDatabase( cfg );
-		return PostgreSQLconstructor::object( conf);
+		return PostgreSQLconstructor::object( conf );
 	}
 
 private:
-	static void createTestDatabase( const PostgreSQLTestConfig& cfg_ );
+	static void createTestDatabase( const PostgreSQLTestConfig& cfg );
 };
 
 }} // _Wolframe::db

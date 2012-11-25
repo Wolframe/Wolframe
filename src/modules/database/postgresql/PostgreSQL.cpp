@@ -343,10 +343,8 @@ const std::string* PostgreSQLdatabase::getProgram( const std::string& name) cons
 	return m_unit->getProgram( name );
 }
 
-Transaction* PostgreSQLdatabase::transaction(const std::string& /*name*/ , bool connected )
+Transaction* PostgreSQLdatabase::transaction( const std::string& /*name*/ )
 {
-	if ( connected )	{
-	}
 	return new PostgreSQLtransaction( *this );
 }
 

@@ -61,7 +61,7 @@ static const char* SQLite_DB_CLASS_NAME = "SQLite";
 class SQLiteConfig : public config::NamedConfiguration
 {
 public:
-	const char* className() const		{ return SQLite_DB_CLASS_NAME; }
+	const char* className() const				{ return SQLite_DB_CLASS_NAME; }
 
 	SQLiteConfig( const char* name, const char* logParent, const char* logName );
 	~SQLiteConfig(){}
@@ -72,16 +72,14 @@ public:
 	void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
 
-	const std::string& ID() const				{return m_ID;}
-	const std::string& filename() const			{return m_filename;}
-	bool flag() const					{return m_flag;}
-	unsigned short connections() const			{return m_connections;}
-	const std::list< std::string > programFiles() const	{return m_programFiles;}
+	const std::string& ID() const				{ return m_ID; }
+	const std::string& filename() const			{ return m_filename; }
+	unsigned short connections() const			{ return m_connections; }
+	const std::list< std::string > programFiles() const	{ return m_programFiles; }
 
 private:
 	std::string	m_ID;
 	std::string	m_filename;
-	bool		m_flag;
 	unsigned short	m_connections;
 	std::list< std::string > m_programFiles;		//< list of program files
 };
@@ -118,7 +116,7 @@ private:
 	TransactionInput	m_input;	//< input data structure
 	TransactionOutput	m_output;	//< output data structure
 	typedef types::CountedReference<PoolObject<sqlite3*> > Connection;
-	Connection m_conn;			//< connection object from pool
+	Connection		m_conn;		//< connection object from pool
 };
 
 
@@ -184,7 +182,7 @@ public:
 	virtual void addProgram( const std::string& program );
 	virtual const std::string* getProgram( const std::string& name) const;
 
-	Transaction* transaction( const std::string& name, bool connected = false );
+	Transaction* transaction( const std::string& name );
 	void closeTransaction( Transaction* t );
 
 	///\brief Add a set of named statements to the sqlite program
@@ -207,8 +205,7 @@ class SQLiteDBunit : public DatabaseUnit
 {
 	friend class SQLiteTransaction;
 public:
-	SQLiteDBunit( const std::string& id,
-		      const std::string& filename, bool flag,
+	SQLiteDBunit( const std::string& id, const std::string& filename,
 		      unsigned short connections );
 	~SQLiteDBunit();
 
@@ -246,7 +243,6 @@ public:
 private:
 	const std::string	m_ID;
 	const std::string	m_filename;
-	bool			m_flag;
 	std::list< sqlite3* >	m_connections;		///< list of DB connections
 	ObjectPool< sqlite3* >	m_connPool;		///< pool of connections
 

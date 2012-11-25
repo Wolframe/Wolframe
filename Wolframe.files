@@ -2575,6 +2575,13 @@ tests/wolfilter/modules/employee_assignment_convert/employee_assignment_convert.
 tests/wolfilter/modules/employee_assignment_convert/GNUmakefile
 tests/wolfilter/modules/employee_assignment_convert/Makefile.W32
 tests/wolfilter/modules/employee_assignment_convert/mod_employee_assignment_convert.cpp
+tests/wolfilter/modules/functions/fakegraphix/GNUmakefile
+tests/wolfilter/modules/functions/fakegraphix/graphix.cpp
+tests/wolfilter/modules/functions/fakegraphix/graphix.hpp
+tests/wolfilter/modules/functions/fakegraphix/Makefile.W32
+tests/wolfilter/modules/functions/fakegraphix/mod_graphix.cpp
+tests/wolfilter/modules/functions/GNUmakefile
+tests/wolfilter/modules/functions/Makefile.W32
 tests/wolfilter/modules/GNUmakefile
 tests/wolfilter/modules/Makefile.W32
 tests/wolfilter/scripts/bcdnumber_calc.lua

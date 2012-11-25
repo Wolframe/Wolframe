@@ -71,10 +71,6 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_filename, &isDefined ))
 				retVal = false;
 		}
-		else if ( boost::algorithm::iequals( L1it->first, "flag" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_flag, Parser::BoolDomain() ))
-				retVal = false;
-		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_connections,
 						Parser::RangeDomain<unsigned short>( 0 ), &connDefined ))
@@ -100,9 +96,7 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 
 SQLiteConfig::SQLiteConfig( const char* name, const char* logParent, const char* logName )
 	: config::NamedConfiguration( name, logParent, logName )
-{
-	m_flag = false;
-}
+{}
 
 void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 {
@@ -112,7 +106,6 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 	if ( ! m_ID.empty() )
 		os << indStr << "   ID: " << m_ID << std::endl;
 	os << indStr << "   Filename: " << m_filename << std::endl;
-	os << indStr << "   Flags: " << (m_flag ? "True Flag" : "False Flag") << std::endl;
 	if ( m_programFiles.size() == 0 )
 		os << indStr << "   Program file: none" << std::endl;
 	else if ( m_programFiles.size() == 1 )

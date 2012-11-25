@@ -149,7 +149,7 @@ public:
 
 	virtual const std::string* getProgram( const std::string& name) const;
 
-	Transaction* transaction( const std::string& name, bool connected = false );
+	Transaction* transaction( const std::string& name );
 
 	void closeTransaction( Transaction* t );
 private:
