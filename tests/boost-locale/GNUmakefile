@@ -18,6 +18,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	$(TOPDIR)/gtest/gtest-all.o \
 	-lboost_locale$(BOOST_LIBRARY_TAG) \
+	-lboost_system -lboost_thread$(BOOST_LIBRARY_TAG) \
 	$(ICU_LIBS)
 
 TEST_OBJS =

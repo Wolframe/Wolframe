@@ -59,6 +59,12 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Wolframe printing module based on libhpdf/libharu.
  <insert long description, indented with spaces>
 
+Package: wolframe-freeimage
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe image manipulation function module.
+ <insert long description, indented with spaces>
+
 Package: wolframe-client
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}

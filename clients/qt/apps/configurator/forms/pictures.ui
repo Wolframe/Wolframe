@@ -6,45 +6,71 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>556</width>
-    <height>318</height>
+    <width>632</width>
+    <height>297</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QTreeWidget" name="category">
+  <widget class="QTableWidget" name="picture">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>531</width>
+     <width>611</width>
      <height>241</height>
     </rect>
    </property>
-   <property name="itemsExpandable">
+   <property name="showGrid">
+    <bool>false</bool>
+   </property>
+   <property name="gridStyle">
+    <enum>Qt::NoPen</enum>
+   </property>
+   <property name="sortingEnabled">
     <bool>true</bool>
    </property>
    <property name="doctype" stdset="0">
-    <string notr="true">CategoryHierarchyRequest.simpleform</string>
+    <string notr="true">PictureListRequest.simpleform</string>
    </property>
    <property name="rootelement" stdset="0">
-    <string>category</string>
+    <string notr="true">picture</string>
    </property>
-   <property name="state" stdset="0">
-    <string notr="true">{global.categoryState}</string>
-   </property>
-   <attribute name="headerDefaultSectionSize">
-    <number>200</number>
+   <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+    <bool>true</bool>
+   </attribute>
+   <attribute name="verticalHeaderStretchLastSection">
+    <bool>false</bool>
    </attribute>
    <column>
     <property name="text">
-     <string>category</string>
+     <string>thumbnail</string>
     </property>
    </column>
    <column>
     <property name="text">
-     <string>description</string>
+     <string>caption</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>info</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>width</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>height</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>size</string>
     </property>
    </column>
   </widget>
@@ -52,7 +78,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>280</y>
+     <y>260</y>
      <width>403</width>
      <height>31</height>
     </rect>
@@ -123,92 +149,14 @@
       <property name="form" stdset="0">
        <string notr="true">init</string>
       </property>
-      <property name="global.categoryState" stdset="0">
-       <string notr="true">{category.state}</string>
-      </property>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QRadioButton" name="radioButton">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>260</y>
-     <width>100</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>expand all</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radioButton_2">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>260</y>
-     <width>100</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>collapse all</string>
-   </property>
-  </widget>
  </widget>
  <tabstops>
-  <tabstop>category</tabstop>
+  <tabstop>picture</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>radioButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>category</receiver>
-   <slot>expandAll()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>66</x>
-     <y>270</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>62</x>
-     <y>234</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioButton_2</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>category</receiver>
-   <slot>collapseAll()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>146</x>
-     <y>265</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>146</x>
-     <y>227</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>category</sender>
-   <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>edit</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>299</x>
-     <y>113</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>216</x>
-     <y>294</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>exit</class>
- <widget class="QMainWindow" name="exit">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="mainwindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Wolframe Qt Client</string>
   </property>
   <property name="themeAuthor" stdset="0">
    <string>Andreas Baumann</string>

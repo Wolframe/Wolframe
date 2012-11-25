@@ -116,19 +116,6 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="reload">
-      <property name="text">
-       <string>Reload</string>
-      </property>
-      <property name="form" stdset="0">
-       <string notr="true">features</string>
-      </property>
-      <property name="global.featureState" stdset="0">
-       <string notr="true">{feature.state}</string>
-      </property>
-     </widget>
-    </item>
-    <item>
      <widget class="QPushButton" name="reload_2">
       <property name="text">
        <string>Main Menu</string>
@@ -177,7 +164,6 @@
   <tabstop>add</tabstop>
   <tabstop>delete_2</tabstop>
   <tabstop>edit</tabstop>
-  <tabstop>reload</tabstop>
   <tabstop>reload_2</tabstop>
  </tabstops>
  <resources/>

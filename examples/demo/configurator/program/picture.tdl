@@ -1,0 +1,4 @@
+TRANSACTION selectPictureList
+BEGIN
+	INTO . DO NONEMPTY SELECT ID AS id,thumbnail,caption,info,width,height,length(image) as size FROM Picture;
+END
