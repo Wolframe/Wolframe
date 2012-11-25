@@ -216,7 +216,7 @@ void MainWindow::optionFound( const QString &name, const QVariant &value )
 	}
 }
 
-void MainWindow::paramFound( const QString &name, const QVariant &value )
+void MainWindow::paramFound( const QString & /*name*/, const QVariant &/*value*/ )
 {
 	//qDebug( ) << "param" << name << "with" << value;
 }

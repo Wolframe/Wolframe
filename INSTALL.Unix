@@ -517,11 +517,14 @@ Required packages: boost and boost-libs
 Optional packages: openssl, qt, pam, libsasl,
                    sqlite, postgresql-libs,
                    libxml2, libxslt, libharu,
-                   icu
+                   icu, freeimage
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 'fop' (together with 'java-batik', 'java-commons-io', 'java-avalon-framework',
 'java-commons-logging', 'java-xmlgraphics-commons')
+
+FreeImage only contains the static version of libfreeimageplus. If you
+want the shared version, build with WITH_LOCAL_FREEIMAGE=1 instead.
 
 Change /etc/fop.conf and make sure it contains the line:
 CLASSPATH="$CLASSPATH:/usr/share/java/batik/xml-apis-ext.jar"
@@ -552,11 +555,15 @@ Required packages: boost-libs (1.45.0)
 Optional packages: qt4-gui (4.7.4), qt4-moc (4.7.4), qt4-network (4.7.4),
                    qt4-designer (4.7.4), cyrus-sasl (2.1.25_1),
                    sqlite3 (3.7.9), postgresql (9.1.2), libxml2 (2.7.8_1),
-                   libxslt (1.1.26_3), png (1.4.8), zlib (1.1.0)
+                   libxslt (1.1.26_3), png (1.4.8), zlib (1.1.0),
+                   icu (4.8.1.1)
 
 If you need boost with ICU support, compile your own boost from the
 ports tree. Change the 'Makefile' and add 'locale' to 'BOOST_LIBS'.
 See 'contrib/FreeBSD' for patches and the ports files.
+
+Use the local version of FreeImage, as libfreeimageplus is not build
+in the ports.
 
 You need 'gmake' (3.82).
 
