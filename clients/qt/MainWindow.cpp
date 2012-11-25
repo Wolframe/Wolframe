@@ -402,7 +402,7 @@ void MainWindow::wolframeError( QString error )
 		QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes ) {
 // fatal error, present the user a preferences dialog
 		if( !m_dataLoader || !m_formLoader ) {
-			PreferencesDialog prefs( m_languages, this );
+			PreferencesDialog prefs( m_languages, m_ui );
 			if( prefs.exec( ) == QDialog::Accepted ) {
 				//qDebug( ) << "Reloading application";
 				QApplication::instance( )->exit( RESTART_CODE );
@@ -705,7 +705,7 @@ void MainWindow::on_actionExit_triggered( )
 
 void MainWindow::on_actionPreferences_triggered( )
 {
-	PreferencesDialog prefs( m_languages, this );
+	PreferencesDialog prefs( m_languages, m_ui );
 	if( prefs.exec( ) == QDialog::Accepted ) {
 		//qDebug( ) << "Reloading application";
 		QApplication::instance( )->exit( RESTART_CODE );
@@ -720,8 +720,9 @@ void MainWindow::on_actionManageStorage_triggered( )
 
 void MainWindow::on_actionAbout_triggered( )
 {
-	QString info = QString( tr( "qtclient" ) );
-	QMessageBox::about( m_ui, tr( "qtclient" ), info );
+	QString info = QString(
+		tr( "Wolframe Qt client\n\nVersion %1\n(c) 2012 Wolframe Group" ).arg( WOLFRAME_VERSION ) );
+	QMessageBox::about( m_ui, tr( "About" ), info );
 }
 
 void MainWindow::on_actionAboutQt_triggered( )

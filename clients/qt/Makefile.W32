@@ -279,6 +279,7 @@ buildi18n:
 zip:
 	-del qtclient.zip
 	-del /s /q C:\qtclient\*
+	-rmdir C:\qtclient\images
 	-rmdir C:\qtclient\i18n
 	-rmdir C:\qtclient\themes\windows
 	-rmdir C:\qtclient\themes
@@ -293,6 +294,7 @@ zip:
 	-rmdir C:\qtclient\sqldrivers
 	-rmdir C:\qtclient
 	mkdir C:\qtclient
+	mkdir C:\qtclient\images
 	mkdir C:\qtclient\apps
 	mkdir C:\qtclient\apps\configurator
 	mkdir C:\qtclient\themes
@@ -311,6 +313,7 @@ zip:
 	copy "$(OPENSSL_DIR)\bin\libeay32.dll" C:\qtclient
 	copy "$(OPENSSL_DIR)\bin\ssleay32.dll" C:\qtclient
 	copy plugins\wolframewidgets.dll C:\qtclient
+	copy images\*.png C:\qtclient\images
 	xcopy /e themes\windows C:\qtclient\themes\windows
 	xcopy /e i18n C:\qtclient\i18n
 	xcopy /e apps\configurator C:\qtclient\apps\configurator

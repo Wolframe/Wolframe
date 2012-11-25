@@ -10,6 +10,7 @@ Table of Contents
   zlib
   libpng
   libhpdf
+  FreeImage
   Qt
   QCommandLine
 
@@ -113,6 +114,11 @@ libhpdf
   This software is provided 'as-is', without any express or implied warranty.
 
 See 'libhpdf/README'.
+
+FreeImage
+---------
+
+See 'freeimage/license-fi.txt' and 'freeimage/license-gplv3.txt'.
 
 Qt
 --

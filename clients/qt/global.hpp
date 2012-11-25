@@ -20,4 +20,6 @@
 
 #define SYSTEM_LANGUAGE "SYSTEM"
 
+#define WOLFRAME_VERSION "0.0.1"
+
 #endif // _GLOBAL_HPP_INCLUDED
