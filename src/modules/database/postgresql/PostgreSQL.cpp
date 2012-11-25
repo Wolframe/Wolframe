@@ -49,7 +49,6 @@ template<>
 PoolObject< PGconn* >::PoolObject( ObjectPool< PGconn* >& pool )
 	: m_pool( pool ), m_object( pool.get() )
 {
-	m_object = pool.get();
 	ConnStatusType stat = PQstatus( m_object );
 	if ( stat == CONNECTION_OK )
 		return;
@@ -87,7 +86,7 @@ static std::string escConnElement( std::string element )
 static std::string buildConnStr( const std::string& host, unsigned short port, const std::string& dbName,
 				 const std::string& user, const std::string& password,
 				 const std::string& sslMode, const std::string& sslCert, const std::string& sslKey,
-				 std::string& sslRootCert, std::string& sslCRL,
+				 const std::string& sslRootCert, const std::string& sslCRL,
 				 unsigned short connectTimeout )
 {
 	std::stringstream ss;

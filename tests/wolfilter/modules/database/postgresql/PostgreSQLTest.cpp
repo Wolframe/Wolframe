@@ -77,7 +77,7 @@ static std::string buildConnStr( const std::string& host, unsigned short port,
 	return ss.str();
 }
 
-static void createTestDatabase( const std::string& host, unsigned short port,
+static void createTestDatabase_( const std::string& host, unsigned short port,
 				const std::string& user, const std::string& password,
 				const std::string& dbName, const std::string& inputfile )
 {
@@ -106,7 +106,8 @@ static void createTestDatabase( const std::string& host, unsigned short port,
 		std::string query = "DROP TABLE " + *it;
 		PQclear( res );
 		res = PQexec( conn, query.c_str() );
-		if ( PQresultStatus( res ) != PGRES_TUPLES_OK )	{
+		ExecStatusType es = PQresultStatus(res);
+		if ( es != PGRES_TUPLES_OK && es != PGRES_COMMAND_OK)	{
 			std::string msg = std::string( "Failed to delete table " ) + *it
 					  + ": " + PQerrorMessage( conn );
 			PQfinish( conn );
@@ -117,7 +118,8 @@ static void createTestDatabase( const std::string& host, unsigned short port,
 	// Now create the test database
 	std::string dbsource = utils::readSourceFileContent( inputfile );
 	res = PQexec( conn, dbsource.c_str() );
-	if ( PQresultStatus( res ) != PGRES_TUPLES_OK )	{
+	ExecStatusType es = PQresultStatus( res );
+	if ( es != PGRES_TUPLES_OK && es != PGRES_COMMAND_OK)	{
 		std::string msg = std::string( "Failed to create PostgrSQL test database: " ) + PQerrorMessage( conn );
 		PQclear( res );
 		PQfinish( conn );
@@ -128,7 +130,7 @@ static void createTestDatabase( const std::string& host, unsigned short port,
 	PQfinish( conn );
 }
 
-static void dumpDatabase( const std::string& host, unsigned short port,
+static void dumpDatabase_( const std::string& host, unsigned short port,
 			  const std::string& user, const std::string& password,
 			  const std::string& dbName, const std::string& outputfile )
 {
@@ -137,6 +139,7 @@ static void dumpDatabase( const std::string& host, unsigned short port,
 		throw std::runtime_error( std::string( "failed to open file for database dump (" )
 					  + boost::lexical_cast<std::string>( errno ) + "), file '"
 					  + outputfile + "'");
+	boost::shared_ptr<FILE> file_closer( fh, fclose);
 
 	std::string connStr = buildConnStr( host, port, user, password, dbName );
 	PGconn* conn = PQconnectdb( connStr.c_str() );
@@ -160,7 +163,10 @@ static void dumpDatabase( const std::string& host, unsigned short port,
 	// Dump the tables
 	for ( std::list< std::string >::const_iterator it = tables.begin();
 							it != tables.end(); it++ )	{
-		std::string query = "SELECT * FROM " + *it;
+		std::string query;
+		std::string orderby = "";
+		int nFields;
+		query = std::string("select column_name from information_schema.columns where table_name = '") + *it + "' ORDER BY ORDINAL_POSITION";
 		PQclear( res );
 		res = PQexec( conn, query.c_str() );
 		if ( PQresultStatus( res ) != PGRES_TUPLES_OK )	{
@@ -171,7 +177,28 @@ static void dumpDatabase( const std::string& host, unsigned short port,
 		}
 
 		fprintf( fh, "%s:\n", it->c_str() );
-		int nFields = PQnfields( res );
+		for ( int i = 0; i < PQntuples( res ); i++ )
+		{
+			const char* rv = PQgetvalue( res, i, 0);
+			orderby.append( i ? ", ":" ORDER BY ");
+			orderby.append( "\"");
+			orderby.append( rv?rv:"");
+			orderby.append( "\"");
+			orderby.append( " ASC");
+			fprintf( fh, i ? ", %s" : "%s", rv?rv:"");
+		}
+		fprintf( fh, "\n" );
+
+		query = "SELECT * FROM " + *it + orderby;
+		PQclear( res );
+		res = PQexec( conn, query.c_str() );
+		if ( PQresultStatus( res ) != PGRES_TUPLES_OK )	{
+			std::string msg = std::string( "Failed to dump table " ) + *it
+					  + ": " + PQerrorMessage( conn );
+			PQfinish( conn );
+			throw std::runtime_error( msg );
+		}
+		nFields = PQnfields( res );
 		for ( int i = 0; i < PQntuples( res ); i++ )	{
 			for ( int j = 0; j < nFields; j++ )
 				fprintf( fh, j ? ", %s" : "%s", PQgetvalue( res, i, j ) );
@@ -185,6 +212,7 @@ static void dumpDatabase( const std::string& host, unsigned short port,
 
 void PostgreSQLTestConstructor::createTestDatabase( const PostgreSQLTestConfig& cfg )
 {
+	createTestDatabase_( cfg.host(), cfg.port(), cfg.user(), cfg.password(), cfg.dbName(), cfg.input_filename());
 }
 
 config::ConfigurationTree PostgreSQLTestConfig::extractMyNodes( const config::ConfigurationTree& pt )
@@ -213,6 +241,7 @@ void PostgreSQLTestConfig::setMyCanonicalPathes( const std::string& referencePat
 
 void PostgreSQLTestConfig::dump_database()
 {
+	dumpDatabase_( host(), port(), user(), password(), dbName(), m_dump_filename);
 }
 
 

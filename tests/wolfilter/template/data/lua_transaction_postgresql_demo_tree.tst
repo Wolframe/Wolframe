@@ -3,7 +3,7 @@ testname=`basename $0 ".tst"`				# name of the test
 opt=""
 modpath="../../src/modules"				# module directory relative from tests/temp
 opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
-luascript=`echo $testname | sed 's/lua_//' | sed 's/_sqlite//'`.lua
+luascript=`echo $testname | sed 's/lua_//' | sed 's/_postgresql//'`.lua
 opt="$opt --program=$luascript"
 ddltypeprg="simpleform.normalize"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
@@ -15,12 +15,12 @@ opt="$opt --module $mod"
 modpath="../../src/modules/cmdbind/directmap"		# module directory relative from tests/temp
 opt="$opt --module $modpath/mod_command_directmap"
 modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
-opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
-opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
+opt="$opt --module $modpath/postgresql/mod_db_postgresqltest"
+opt="$opt --database 'identifier=testdb,host=localhost,port=5432,database=wolframe,user=wolfusr,password=wolfpwd,dumpfile=DBDUMP,inputfile=DBDATA'"
 opt="$opt --program=DBPRG.tdl"
 testcmd="$opt run"					# command to execute by the test
 testscripts="$luascript"				# list of scripts of the test
-docname=`echo $testname | sed 's/_sqlite//'`
+docname=`echo $testname | sed 's/_postgresql//'`
 docin=$docname.in					# input document name
 docout=$docname.out					# output document name
 dumpout="program/$testname.dbdump.txt"			# resource dump to add to expected test output
@@ -28,7 +28,7 @@ testdata="
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
 **file: DBDATA
-`cat ../../../examples/demo/first/database/tree_schema_sqlite.sql`
+`cat ../../../examples/demo/first/database/tree_schema_postgresql.sql`
 **file:DBPRG.tdl
 `cat ../../../examples/demo/first/program/tree_transactions.tdl`
 **outputfile:DBDUMP"

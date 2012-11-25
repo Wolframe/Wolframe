@@ -55,7 +55,7 @@ namespace db {
 PostgreSQLconfig::PostgreSQLconfig( const char* cfgName, const char* logParent, const char* logName )
 	: config::NamedConfiguration( cfgName, logParent, logName )
 {
-	port = 0;
+	m_port = 0;
 	connections = 0;
 	acquireTimeout = 0;
 }
@@ -75,28 +75,28 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "host" ))	{
-			bool isDefined = ( !host.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, host, &isDefined ))
+			bool isDefined = ( !m_host.empty());
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_host, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "port" ))	{
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, port,
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_port,
 						Parser::RangeDomain<unsigned short>( 1 ), &portDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "database" ))	{
-			bool isDefined = ( !dbName.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, dbName, &isDefined ))
+			bool isDefined = ( !m_dbName.empty());
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_dbName, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "user" ))	{
-			bool isDefined = ( !user.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, user, &isDefined ))
+			bool isDefined = ( !m_user.empty());
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_user, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "password" ))	{
-			bool isDefined = ( !password.empty());
-			if ( !Parser::getValue( logPrefix().c_str(), *L1it, password, &isDefined ))
+			bool isDefined = ( !m_password.empty());
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_password, &isDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "sslMode" ))	{
@@ -242,13 +242,13 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 	os << indStr << sectionName() << ":" << std::endl;
 	if ( ! m_ID.empty() )
 		os << indStr << "   ID: " << m_ID << std::endl;
-	if ( host.empty())
+	if ( m_host.empty())
 		os << indStr << "   Database host: local unix domain socket" << std::endl;
 	else
-		os << indStr << "   Database host: " << host << ":" << port << std::endl;
-	os << indStr << "   Database name: " << (dbName.empty() ? "(not specified - server user default)" : dbName) << std::endl;
-	os << indStr << "   Database user: " << (user.empty() ? "(not specified - same as server user)" : user)
-	   << ", password: " << (password.empty() ? "(not specified - no password used)" : password) << std::endl;
+		os << indStr << "   Database host: " << m_host << ":" << m_port << std::endl;
+	os << indStr << "   Database name: " << (m_dbName.empty() ? "(not specified - server user default)" : m_dbName) << std::endl;
+	os << indStr << "   Database user: " << (m_user.empty() ? "(not specified - same as server user)" : m_user)
+	   << ", password: " << (m_password.empty() ? "(not specified - no password used)" : m_password) << std::endl;
 	if ( ! sslMode.empty())
 		os << indStr << "   Database connection SSL mode: " << sslMode << std::endl;
 	if ( ! sslCert.empty())	{

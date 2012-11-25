@@ -74,13 +74,20 @@ public:
 	virtual bool check() const;
 	virtual void print( std::ostream& os, size_t indent ) const;
 	void setCanonicalPathes( const std::string& referencePath );
+
+	const std::string& host() const		{return m_host;}
+	unsigned short port() const		{return m_port;}
+	const std::string& dbName() const	{return m_dbName;}
+	const std::string& user() const		{return m_user;}
+	const std::string& password() const	{return m_password;}
+
 private:
 	std::string	m_ID;			///< database identifier
-	std::string	host;			///< server host
-	unsigned short	port;			///< server port
-	std::string	dbName;			///< database name on server
-	std::string	user;			///< database user
-	std::string	password;		///< and password
+	std::string	m_host;			///< server host
+	unsigned short	m_port;			///< server port
+	std::string	m_dbName;		///< database name on server
+	std::string	m_user;			///< database user
+	std::string	m_password;		///< and password
 	std::string	sslMode;		///< SSL connection mode
 	std::string	sslCert;		///< client SSL certificate file
 	std::string	sslKey;			///< client SSL key file

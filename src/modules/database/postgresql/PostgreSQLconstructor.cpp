@@ -44,8 +44,8 @@ PostgreSQLdbUnit* PostgreSQLconstructor::object( const config::NamedConfiguratio
 {
 	const PostgreSQLconfig& cfg = dynamic_cast< const PostgreSQLconfig& >( conf );
 
-	PostgreSQLdbUnit* m_db = new PostgreSQLdbUnit( cfg.m_ID, cfg.host, cfg.port, cfg.dbName,
-						       cfg.user, cfg.password,
+	PostgreSQLdbUnit* m_db = new PostgreSQLdbUnit( cfg.m_ID, cfg.host(), cfg.port(), cfg.dbName(),
+						       cfg.user(), cfg.password(),
 						       cfg.sslMode, cfg.sslCert, cfg.sslKey,
 						       cfg.sslRootCert, cfg.sslCRL,
 						       cfg.connectTimeout,

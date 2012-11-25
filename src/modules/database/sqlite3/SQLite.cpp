@@ -48,8 +48,7 @@ namespace _Wolframe {
 template<>
 PoolObject< sqlite3* >::PoolObject( ObjectPool< sqlite3* >& pool )
 	: m_pool( pool ), m_object( pool.get() )
-{
-}
+{}
 
 } // namespace _Wolframe
 

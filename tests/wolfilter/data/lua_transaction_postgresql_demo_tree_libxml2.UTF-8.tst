@@ -1,7 +1,6 @@
 **
 **requires:LUA
 **requires:LIBXML2
-**requires:SQLITE3
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <transactions>
@@ -12,7 +11,7 @@
 <treeAddNode><parentid>3</parentid><name>Eddie</name></treeAddNode>
 <treeAddNode><parentid>3</parentid><name>Fred</name></treeAddNode>
 </transactions>**config
---input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_demo_tree.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
+--input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_demo_tree.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/postgresql/mod_db_postgresqltest --database 'identifier=testdb,host=localhost,port=5432,database=wolframe,user=wolfusr,password=wolfpwd,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
 **file:simpleform.normalize
 int=number:integer;
@@ -29,13 +28,14 @@ float=number:float;
 -- Joe Celko example from http://www.ibase.ru/devinfo/DBMSTrees/sqltrees.html
 
 CREATE TABLE tree (
- ID INTEGER PRIMARY KEY AUTOINCREMENT,
- parent INT REFERENCES tree( ID ),
+ "ID" SERIAL NOT NULL PRIMARY KEY,
+ parent INT REFERENCES tree( "ID" ),
  name TEXT,
- lft INT NOT NULL DEFERRABLE CHECK ( lft > 0 ),
- rgt INT NOT NULL DEFERRABLE CHECK ( rgt > 1 ),
+ lft INT NOT NULL CHECK ( lft > 0 ),
+ rgt INT NOT NULL CHECK ( rgt > 1 ),
  CONSTRAINT order_check CHECK ( rgt > lft )
 );
+ALTER SEQUENCE "tree_ID_seq" RESTART WITH 1;
 **file:DBPRG.tdl
 --
 -- treeAddRoot
@@ -232,14 +232,11 @@ end
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result>
 tree:
-'1', NULL, 'Albert', '1', '12'
-'2', '1', 'Bert', '2', '3'
-'3', '1', 'Chuck', '4', '11'
-'4', '3', 'Donna', '5', '6'
-'5', '3', 'Eddie', '7', '8'
-'6', '3', 'Fred', '9', '10'
-
-sqlite_sequence:
-'tree', '6'
-
+ID, parent, name, lft, rgt
+1, , Albert, 1, 12
+2, 1, Bert, 2, 3
+3, 1, Chuck, 4, 11
+4, 3, Donna, 5, 6
+5, 3, Eddie, 7, 8
+6, 3, Fred, 9, 10
 **end

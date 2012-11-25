@@ -50,32 +50,32 @@ void Statement::init( const std::string& stmstr)
 {
 	clear();
 	std::string::const_iterator si = stmstr.begin(), se = stmstr.end();
-	std::string chunk;
+	std::string::const_iterator chunkstart = si;
 	for (; si != se; ++si)
 	{
 		if (*si == '$')
 		{
-			if (!chunk.empty())
+			if (si > chunkstart)
 			{
-				m_data.push_back( Element( 0, chunk));
-				chunk.clear();
+				m_data.push_back( Element( 0, std::string( chunkstart, si)));
 			}
 			std::string idxstr;
 			for (++si; si != se && *si >= '0' && *si <= '9'; ++si)
 			{
 				idxstr.push_back( *si);
 			}
+			chunkstart = si;
 			if (idxstr.empty()) throw std::runtime_error( "only parameters referenced by index supported until now in database statements");
 			unsigned int idx = boost::lexical_cast<unsigned int>( idxstr);
 			if (idx == 0) throw std::runtime_error( "parameter index out of range");
 			if (idx > m_maxparam) m_maxparam = idx;
 			m_data.push_back( Element( idx, ""));
+			if (si == se) break;
 		}
 	}
-	if (!chunk.empty())
+	if (si > chunkstart)
 	{
-		m_data.push_back( Element( 0, chunk));
-		chunk.clear();
+		m_data.push_back( Element( 0, std::string( chunkstart, si)));
 	}
 }
 
