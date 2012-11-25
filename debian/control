@@ -7,7 +7,8 @@ Build-Depends: debhelper (>= 4.1.16),
  libboost-program-options1.48-dev, libboost-filesystem1.48-dev,
  libboost-locale1.48-dev, libboost-regex1.48-dev,
  libssl-dev, libqt4-dev, libpam-dev, libsasl2-dev,
- libsqlite3-dev, libpq-dev, libxml2-dev, zlib1g-dev, libpng-dev
+ libsqlite3-dev, libpq-dev, libxml2-dev, zlib1g-dev, libpng-dev,
+ libfreeimage-dev
 Standards-Version: 3.8.3
 Homepage: http://www.wolframe.net
 
@@ -57,6 +58,12 @@ Package: wolframe-libhpdf
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Wolframe printing module based on libhpdf/libharu.
+ <insert long description, indented with spaces>
+
+Package: wolframe-freeimage
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe image manipulation function module.
  <insert long description, indented with spaces>
 
 Package: wolframe-client
