@@ -21,6 +21,8 @@ mod="$modpath/string/mod_normalize_string"		# module to load
 opt="$opt --module $mod"
 modpath="../../src/modules/cmdbind/directmap"		# module directory relative from tests/temp
 opt="$opt --module $modpath/mod_command_directmap"
+modpath="../wolfilter/modules/functions"		# module directory relative from tests/temp
+opt="$opt --module $modpath/fakegraphix/mod_graphix"
 modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
 opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
 opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
@@ -28,9 +30,9 @@ opt="$opt --program=DBPRG.tdl"
 demopath=../../../examples/demo/configurator
 genscript=../scripts/$luascript
 projectpath=../../../examples/demo/configurator
-# cat $projectpath/program/configurator.lua > $genscript
-# echo >> $genscript
-# cat scripts/$luascript >> $genscript
+cat $projectpath/program/configurator.lua > $genscript
+echo >> $genscript
+cat scripts/$luascript >> $genscript
 testscripts="$luascript"
 testcmd="$opt run"					# command to execute by the test
 docin=$testname.in					# input document name

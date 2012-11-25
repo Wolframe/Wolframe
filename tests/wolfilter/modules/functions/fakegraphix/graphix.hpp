@@ -32,8 +32,8 @@
 ************************************************************************/
 ///\file src/modules/functions/graphix/graphix.hpp
 ///\brief Interface for graphix functions
-#ifndef _Wolframe_MODULE_FUNCTIONS_GRAPHIX_HPP_INCLUDED
-#define _Wolframe_MODULE_FUNCTIONS_GRAPHIX_HPP_INCLUDED
+#ifndef _Wolframe_TESTS_WOLFILTER_MODULE_FUNCTIONS_FAKE_GRAPHIX_HPP_INCLUDED
+#define _Wolframe_TESTS_WOLFILTER_MODULE_FUNCTIONS_FAKE_GRAPHIX_HPP_INCLUDED
 #include "serialize/struct/filtermapDescription.hpp"
 #include <string>
 #include <vector>

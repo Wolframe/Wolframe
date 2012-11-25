@@ -42,24 +42,18 @@ using namespace langbind;
 std::string Base64DecodeFunction::execute( const std::string& str) const
 {
 	base64::Decoder decoder;
-	int bufsize = str.size();
-	char* buf = new char[ str.size()];
-	boost::scoped_ptr<char> bufptr( buf);
-	int decodedSize = decoder.decode( str.c_str(), str.size(), buf, bufsize);
-	return std::string( buf, decodedSize);
+	std::istringstream i( str);
+	std::ostringstream o;
+	decoder.decode( i, o);
+	return o.str();
 }
 
 std::string Base64EncodeFunction::execute( const std::string& str) const
 {
-	std::string rt;
 	base64::Encoder encoder;
-	int bufsize = str.size() * 2;
-	char* buf = new char[ bufsize];
-	boost::scoped_ptr<char> bufptr( buf);
-	int encodedSize = encoder.encodeChunk( str.c_str(), str.size(), buf, bufsize);
-	rt.append( buf, encodedSize);
-	encodedSize = encoder.encodeEndChunk( buf, bufsize);
-	rt.append( buf, encodedSize);
-	return rt;
+	std::istringstream i( str);
+	std::ostringstream o;
+	encoder.encode( i, o);
+	return o.str();
 }
 

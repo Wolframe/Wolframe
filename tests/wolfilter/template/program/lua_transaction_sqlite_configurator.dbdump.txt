@@ -25,9 +25,9 @@ sqlite_sequence:
 'Picture', '3'
 
 Picture:
-'1', 'WNC caption Z', 'WNC info Z', '123', '27', 'WNC image Z', 'UUUUUUUUUUUUUUUU'
-'2', 'WNC caption', 'WNC info', NULL, NULL, 'WNC image', NULL
-'3', 'WNC caption', 'WNC info', '13', '56', 'WNC image', 'TTTTTTTTTTTTTTTTTTTTT'
+'1', 'WNC caption Z', 'WNC info Z', '11', '90', 'WNC image Z', 'WNC image Z'
+'2', 'WNC caption', 'WNC info', '9', '111', 'WNC image', 'WNC image'
+'3', 'WNC caption', 'WNC info', '9', '111', 'WNC image', 'WNC image'
 
 PictureTag:
 

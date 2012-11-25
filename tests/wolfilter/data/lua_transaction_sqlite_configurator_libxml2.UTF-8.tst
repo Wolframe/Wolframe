@@ -88,7 +88,7 @@
 </createCategory>
 <createCategory>
 <category parentID="46"><name>WNC child 3</name>
-<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><width>13</width><height>56</height><thumbnail>TTTTTTTTTTTTTTTTTTTTT</thumbnail></picture>
+<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
 </category>
 </createCategory>
 <editCategory>
@@ -112,9 +112,6 @@
 		<caption>WNC caption Z</caption>
 		<info>WNC info Z</info>
 		<image>WNC image Z</image>
-		<width>123</width>
-		<height>27</height>
-		<thumbnail>UUUUUUUUUUUUUUUU</thumbnail>
 	</picture>
 </category>
 </editCategory>
@@ -178,7 +175,7 @@
 <createTag><tag name="Tag1.5x" parentID="2"/></createTag>
 <TagHierarchyRequest><Tag id="1"/></TagHierarchyRequest>
 </test>**config
---input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
+--input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
 **file:simpleform.normalize
 int=number:integer;
@@ -412,17 +409,6 @@ CREATE TABLE ComposedConfig	(
 	UNIQUE ( configID, subConfigID )
 );
 **file:category.simpleform
-DOCTYPE "picture Picture"
-{
-	id @int
-	caption string
-	info string
-	image string
-	thumbnail string
-	width int
-	height int
-}
-
 DOCTYPE "category Category"
 {
 	id @int
@@ -430,27 +416,34 @@ DOCTYPE "category Category"
 	name string
 	normalizedName string
 	description string
-	picture Picture[]
+	picture
+	{
+		id @int
+		caption string
+		info string
+		image string
+		thumbnail string
+		width int
+		height int
+	}
 }
 **file:feature.simpleform
 DOCTYPE "feature Feature"
 {
-	feature
+	id @int
+	parentID @int
+	name string
+	normalizedName string
+	description string
+	picture
 	{
 		id @int
-		parentID @int
-		name string
-		description string
-		picture
-		{
-			id @int
-			caption string
-			info string
-			image string
-			thumbnail string
-			width int
-			height int
-		}
+		caption string
+		info string
+		image string
+		thumbnail string
+		width int
+		height int
 	}
 }
 **file:tag.simpleform
@@ -738,10 +731,15 @@ end
 local function picture_value( itr)
 	local picture = {}
 	for v,t in itr do
-		if (t == "id" or t == "caption" or t == "info" or t == "image" or t == "width" or t == "height" or t == "thumbnail") then
+		if (t == "id" or t == "caption" or t == "info" or t == "image") then
 			picture[ t] = content_value( v, itr)
 		end
 	end
+	info = formfunction( "imageInfo" )( { [ "data"] = picture["image"] } ):table( )
+	picture["width"] = info.width
+	picture["height"] = info.height
+	thumb = formfunction( "imageThumb" )( { [ "image" ] = { [ "data" ] = picture["image"] }, [ "size" ] = 50 } ):table( )
+	picture["thumbnail"] = thumb.data
 	return picture
 end
 
@@ -890,6 +888,10 @@ local function edit_node( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			id = v
+			-- don't allow editing of the root element (fast hack)
+			if id == "1" then
+				return
+			end
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
@@ -909,7 +911,7 @@ local function delete_node( tablename, itr)
 			id = v
 		end
 	end
-	-- don't allow deletion of the root element
+	-- don't allow deletion of the root element (fast hack)
 	if id == "1" then
 		return
 	end
@@ -1268,7 +1270,7 @@ end
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><picture id="1"><caption>WNC caption Z</caption><info>WNC info Z</info><image>WNC image Z</image><thumbnail>UUUUUUUUUUUUUUUU</thumbnail><width>123</width><height>27</height></picture></category><category id="54" parentID="46"><name>WNC child 3</name><normalizedName>wnc child 3</normalizedName><picture id="3"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail>TTTTTTTTTTTTTTTTTTTTT</thumbnail><width>13</width><height>56</height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName></category><tree><item id="1">
+</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail>WNC image</thumbnail><width>9</width><height>111</height></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><picture id="1"><caption>WNC caption Z</caption><info>WNC info Z</info><image>WNC image Z</image><thumbnail>WNC image Z</thumbnail><width>11</width><height>90</height></picture></category><category id="54" parentID="46"><name>WNC child 3</name><normalizedName>wnc child 3</normalizedName><picture id="3"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail>WNC image</thumbnail><width>9</width><height>111</height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName></category><tree><item id="1">
 	<category>_ROOT_</category>
 	<description>Categories tree root</description>
 	<tree><item id="2">
@@ -1529,9 +1531,9 @@ sqlite_sequence:
 'Picture', '3'
 
 Picture:
-'1', 'WNC caption Z', 'WNC info Z', '123', '27', 'WNC image Z', 'UUUUUUUUUUUUUUUU'
-'2', 'WNC caption', 'WNC info', NULL, NULL, 'WNC image', NULL
-'3', 'WNC caption', 'WNC info', '13', '56', 'WNC image', 'TTTTTTTTTTTTTTTTTTTTT'
+'1', 'WNC caption Z', 'WNC info Z', '11', '90', 'WNC image Z', 'WNC image Z'
+'2', 'WNC caption', 'WNC info', '9', '111', 'WNC image', 'WNC image'
+'3', 'WNC caption', 'WNC info', '9', '111', 'WNC image', 'WNC image'
 
 PictureTag:
 

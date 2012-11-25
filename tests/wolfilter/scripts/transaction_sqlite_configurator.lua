@@ -22,10 +22,15 @@ end
 local function picture_value( itr)
 	local picture = {}
 	for v,t in itr do
-		if (t == "id" or t == "caption" or t == "info" or t == "image" or t == "width" or t == "height" or t == "thumbnail") then
+		if (t == "id" or t == "caption" or t == "info" or t == "image") then
 			picture[ t] = content_value( v, itr)
 		end
 	end
+	info = formfunction( "imageInfo" )( { [ "data"] = picture["image"] } ):table( )
+	picture["width"] = info.width
+	picture["height"] = info.height
+	thumb = formfunction( "imageThumb" )( { [ "image" ] = { [ "data" ] = picture["image"] }, [ "size" ] = 50 } ):table( )
+	picture["thumbnail"] = thumb.data
 	return picture
 end
 
@@ -174,6 +179,10 @@ local function edit_node( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			id = v
+			-- don't allow editing of the root element (fast hack)
+			if id == "1" then
+				return
+			end
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
@@ -193,7 +202,7 @@ local function delete_node( tablename, itr)
 			id = v
 		end
 	end
-	-- don't allow deletion of the root element
+	-- don't allow deletion of the root element (fast hack)
 	if id == "1" then
 		return
 	end

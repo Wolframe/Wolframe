@@ -1,6 +1,8 @@
-TOPDIR = ../../..
+TOPDIR = ../../../..
 
-SUBDIRS = employee_assignment_convert database functions
+SUBDIRS = fakegraphix
+
+-include $(TOPDIR)/makefiles/gmake/platform.mk
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

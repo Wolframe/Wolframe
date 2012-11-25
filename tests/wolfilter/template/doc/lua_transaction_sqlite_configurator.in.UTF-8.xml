@@ -83,7 +83,7 @@
 </createCategory>
 <createCategory>
 <category parentID="46"><name>WNC child 3</name>
-<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><width>13</width><height>56</height><thumbnail>TTTTTTTTTTTTTTTTTTTTT</thumbnail></picture>
+<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
 </category>
 </createCategory>
 <editCategory>
@@ -107,9 +107,6 @@
 		<caption>WNC caption Z</caption>
 		<info>WNC info Z</info>
 		<image>WNC image Z</image>
-		<width>123</width>
-		<height>27</height>
-		<thumbnail>UUUUUUUUUUUUUUUU</thumbnail>
 	</picture>
 </category>
 </editCategory>
