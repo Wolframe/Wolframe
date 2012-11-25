@@ -13,30 +13,34 @@
 class BoostLocaleFixture : public ::testing::Test
 {
 	protected:
-		boost::locale::generator m_gen;
-
-	protected:
 		BoostLocaleFixture( )
 		{
-			m_gen.locale_cache_enabled( true );
-			boost::locale::generator gen;
-			
+			// Get global backend:
+			boost::locale::localization_backend_manager my = boost::locale::localization_backend_manager::global();
+
+			// select std backend as default:
+			my.select("icu");
+
+			// create a generator that uses this backend:
+			boost::locale::generator gen(my);
+
+			// set this backend globally:
+			boost::locale::localization_backend_manager::global(my);
+
 			// initialize a standard locale
-			std::locale loc = gen( "en_US.UTF-8" );
+			std::locale loc = boost::locale::generator().generate("");
 			std::locale::global( loc );
-			
-			// switch localization backend to ICU
-			boost::locale::localization_backend_manager manager =
-				boost::locale::localization_backend_manager::global( );
-			manager.select( "icu" );
 		}
 };
 
 TEST_F( BoostLocaleFixture, SimpleTest )
 {
-	const std::string input = "grüßen";
+//	const std::string input = "gr""\xC3\xBC""\xC3\x9F""en";		//Isolatin: grüßen
+//	std::string output = boost::locale::to_upper( input );
+//	const std::string must = "GR""\xC3\x9C""SSEN";			//Isolatin: GRÜSSEN (ICU converts #S to SS)
+	const std::string input = "gr""\xC3\xBC""bel";			//Isolatin: grübel
 	std::string output = boost::locale::to_upper( input );
-	const std::string must = "GRÜSSEN";
+	const std::string must = "GR""\xC3\x9C""BEL";			//Isolatin: GRÜBEL
 	EXPECT_EQ( output, must );
 }
 
