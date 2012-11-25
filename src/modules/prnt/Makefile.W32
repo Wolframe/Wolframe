@@ -1,14 +1,11 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = \
-	$(SUBDIRS) testPdfPrinter
+SUBDIRS = testPdfPrinter
 
 !IFDEF WITH_LIBHPDF
 SUBDIRS = \
 	$(SUBDIRS) haruPdfPrinter
 !ENDIF
-
-!INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
