@@ -305,17 +305,18 @@ For checking the validity of various XML files you need 'libxml2-utils' (for xml
 Ubuntu 11.10
 ------------
 
-Required packages: libboost-dev (1.48), libboost-program-options-dev,
-                   libboost-filesystem-dev, libboost-thread-dev,
-                   libboost-random-dev, libboost-locale-dev
-
 Optional packages: libssl-dev (1.0.0e), libqt4-dev (4.7.4),
                    libpam0g-dev (1.1.3), libsasl2-dev (2.1.24),
                    libsqlite3-dev (3.7.7), libpq-dev (9.1.3),
                    libxml2-dev (2.7.8), libxslt1-dev (1.1.26)
-                   libpng-dev (1.2.46)
+                   libpng-dev (1.2.46), libfreeimage-dev (3.13.1)
+               
+libboost-dev is 1.46, which is too old. Build your own boost version.
+Or take libboost1.48-dev from https://build.opensuse.org/package/show?package=boost1.48&project=home%3Aandreas_baumann
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+Use WITH_SYSTEM_FREEIMAGE=1 for image processing support.
 
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
 
@@ -537,16 +538,24 @@ Instructions for other Unixes
 FreeBSD 8.2
 -----------
 
-Required packages: boost-libs (1.45.0)
 Optional packages: qt4-gui (4.7.1), cyrus-sasl (2.1.23)
                    sqlite3 (3.7.4), postgresql (9.0.3), libxml2 (2.7.8),
                    png (1.4.8)
+
+Boost ist too old (1.45), compile your own version from the ports
+directory. See 'contrib/FreeBSD' for patches and the ports files.
+
+FreeImage doesn't build due to a bug in Gcc and big double number
+handling.
 
 You need 'gmake' (3.81_4).
 
 So far no PAM support.
 
 Use WITH_LOCAL_LIBHPDF=1 for PDF support.
+
+Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1,
+as libfreeimageplus is not build in the ports.
 
 FreeBSD 9.0
 -----------
@@ -562,8 +571,8 @@ If you need boost with ICU support, compile your own boost from the
 ports tree. Change the 'Makefile' and add 'locale' to 'BOOST_LIBS'.
 See 'contrib/FreeBSD' for patches and the ports files.
 
-Use the local version of FreeImage, as libfreeimageplus is not build
-in the ports.
+Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1,
+as libfreeimageplus is not build in the ports.
 
 You need 'gmake' (3.82).
 
