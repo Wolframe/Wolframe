@@ -4,7 +4,6 @@
 #include "global.hpp"
 #include "MainWindow.hpp"
 
-
 int main( int argc, char* argv[] ) {
 	QCoreApplication::setOrganizationName( ORGANIZATION_NAME );
 	QCoreApplication::setOrganizationDomain( ORGANIZATION_DOMAIN );
@@ -12,9 +11,6 @@ int main( int argc, char* argv[] ) {
 
 	int code;
 	do {
-#ifdef _WIN32
-		QApplication::setStyle( "windowsxp" );
-#endif
 		QApplication app( argc, argv );
 		app.setWindowIcon( QIcon( QString( "images/wolframe.png" ) ) );
 		MainWindow mainWindow;

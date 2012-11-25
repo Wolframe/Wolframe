@@ -714,7 +714,7 @@ void MainWindow::on_actionPreferences_triggered( )
 
 void MainWindow::on_actionManageStorage_triggered( )
 {
-	ManageStorageDialog d( this );
+	ManageStorageDialog d( m_ui );
 	d.exec( );
 }
 
