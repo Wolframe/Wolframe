@@ -13,149 +13,142 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QTreeWidget" name="category">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>531</width>
-     <height>241</height>
-    </rect>
-   </property>
-   <property name="itemsExpandable">
-    <bool>true</bool>
-   </property>
-   <property name="doctype" stdset="0">
-    <string notr="true">CategoryHierarchyRequest.simpleform</string>
-   </property>
-   <property name="rootelement" stdset="0">
-    <string>category</string>
-   </property>
-   <property name="state" stdset="0">
-    <string notr="true">{global.categoryState}</string>
-   </property>
-   <attribute name="headerDefaultSectionSize">
-    <number>200</number>
-   </attribute>
-   <column>
-    <property name="text">
-     <string>category</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>description</string>
-    </property>
-   </column>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>280</y>
-     <width>403</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QPushButton" name="add">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="4" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="add">
+       <property name="text">
+        <string>Add</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">category_add</string>
+       </property>
+       <property name="global.id" stdset="0">
+        <string notr="true">{category.id}</string>
+       </property>
+       <property name="global.categoryState" stdset="0">
+        <string notr="true">{category.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="delete_2">
+       <property name="text">
+        <string>Delete</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">Category.simpleform</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">category</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">delete</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">categories</string>
+       </property>
+       <property name="id" stdset="0">
+        <string>{category.id}</string>
+       </property>
+       <property name="global.categoryState" stdset="0">
+        <string notr="true">{category.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="edit">
+       <property name="text">
+        <string>Edit</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">category_edit</string>
+       </property>
+       <property name="global.id" stdset="0">
+        <string notr="true">{category.id}</string>
+       </property>
+       <property name="global.categoryState" stdset="0">
+        <string notr="true">{category.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="reload_2">
+       <property name="text">
+        <string>Main Menu</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">init</string>
+       </property>
+       <property name="global.categoryState" stdset="0">
+        <string notr="true">{category.state}</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QRadioButton" name="radioButton">
+       <property name="text">
+        <string>expand all</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_2">
+       <property name="text">
+        <string>collapse all</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QTreeWidget" name="category">
+     <property name="itemsExpandable">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string notr="true">CategoryHierarchyRequest.simpleform</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>category</string>
+     </property>
+     <property name="state" stdset="0">
+      <string notr="true">{global.categoryState}</string>
+     </property>
+     <attribute name="headerDefaultSectionSize">
+      <number>250</number>
+     </attribute>
+     <column>
       <property name="text">
-       <string>Add</string>
+       <string>category</string>
       </property>
-      <property name="form" stdset="0">
-       <string notr="true">category_add</string>
-      </property>
-      <property name="global.id" stdset="0">
-       <string notr="true">{category.id}</string>
-      </property>
-      <property name="global.categoryState" stdset="0">
-       <string notr="true">{category.state}</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="delete_2">
+     </column>
+     <column>
       <property name="text">
-       <string>Delete</string>
+       <string>description</string>
       </property>
-      <property name="doctype" stdset="0">
-       <string notr="true">Category.simpleform</string>
-      </property>
-      <property name="rootelement" stdset="0">
-       <string notr="true">category</string>
-      </property>
-      <property name="action" stdset="0">
-       <string notr="true">delete</string>
-      </property>
-      <property name="form" stdset="0">
-       <string notr="true">categories</string>
-      </property>
-      <property name="id" stdset="0">
-       <string>{category.id}</string>
-      </property>
-      <property name="global.categoryState" stdset="0">
-       <string notr="true">{category.state}</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="edit">
-      <property name="text">
-       <string>Edit</string>
-      </property>
-      <property name="form" stdset="0">
-       <string notr="true">category_edit</string>
-      </property>
-      <property name="global.id" stdset="0">
-       <string notr="true">{category.id}</string>
-      </property>
-      <property name="global.categoryState" stdset="0">
-       <string notr="true">{category.state}</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="reload_2">
-      <property name="text">
-       <string>Main Menu</string>
-      </property>
-      <property name="form" stdset="0">
-       <string notr="true">init</string>
-      </property>
-      <property name="global.categoryState" stdset="0">
-       <string notr="true">{category.state}</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QRadioButton" name="radioButton">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>260</y>
-     <width>100</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>expand all</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radioButton_2">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>260</y>
-     <width>100</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>collapse all</string>
-   </property>
-  </widget>
+     </column>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
  <tabstops>
   <tabstop>category</tabstop>

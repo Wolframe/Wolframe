@@ -6,46 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
-    <height>492</height>
+    <width>616</width>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="3">
-    <widget class="QPushButton" name="managePictures">
-     <property name="text">
-      <string>Manage Pictures</string>
-     </property>
-     <property name="form" stdset="0">
-      <string notr="true">pictures</string>
-     </property>
-     <property name="global.featureState" stdset="0">
-      <string notr="true">{feature.state}</string>
-     </property>
-     <property name="global.categoryState" stdset="0">
-      <string notr="true">{category.state}</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="form1">
-     <property name="text">
-      <string>Manage Categories</string>
-     </property>
-     <property name="form" stdset="0">
-      <string notr="true">categories</string>
-     </property>
-     <property name="global.featureState" stdset="0">
-      <string notr="true">{feature.state}</string>
-     </property>
-     <property name="global.categoryState" stdset="0">
-      <string notr="true">{category.state}</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QTreeWidget" name="category">
      <property name="itemsExpandable">
@@ -88,20 +56,6 @@
      </column>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QRadioButton" name="radioButton_4">
-     <property name="text">
-      <string>expand all</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QRadioButton" name="radioButton">
-     <property name="text">
-      <string>expand all</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="2">
     <widget class="QPushButton" name="form1_2">
      <property name="text">
@@ -118,15 +72,61 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
-    <widget class="QRadioButton" name="radioButton_2">
+   <item row="1" column="1">
+    <widget class="QRadioButton" name="radioButton_3">
      <property name="text">
       <string>collapse all</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QRadioButton" name="radioButton_3">
+   <item row="2" column="0">
+    <widget class="QPushButton" name="form1">
+     <property name="text">
+      <string>Manage Categories</string>
+     </property>
+     <property name="form" stdset="0">
+      <string notr="true">categories</string>
+     </property>
+     <property name="global.featureState" stdset="0">
+      <string notr="true">{feature.state}</string>
+     </property>
+     <property name="global.categoryState" stdset="0">
+      <string notr="true">{category.state}</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QRadioButton" name="radioButton_4">
+     <property name="text">
+      <string>expand all</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QPushButton" name="managePictures">
+     <property name="text">
+      <string>Manage Pictures</string>
+     </property>
+     <property name="form" stdset="0">
+      <string notr="true">pictures</string>
+     </property>
+     <property name="global.featureState" stdset="0">
+      <string notr="true">{feature.state}</string>
+     </property>
+     <property name="global.categoryState" stdset="0">
+      <string notr="true">{category.state}</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QRadioButton" name="radioButton">
+     <property name="text">
+      <string>expand all</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QRadioButton" name="radioButton_2">
      <property name="text">
       <string>collapse all</string>
      </property>
