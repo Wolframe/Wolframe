@@ -4,6 +4,10 @@ show stoppers:
 - actually design an interface
 
 musts:
+- save global state to settings and read it from there
+  - global.XXX variables
+  - last form
+- unselect trees
 - new picture picker
   - upload a set of images, keep them on the server
   - use them from a picklist (with images)

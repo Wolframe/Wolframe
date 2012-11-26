@@ -1,5 +1,6 @@
 ERROR: error in sqlite database transaction: SQLite error 5 (extended error code 5); message: 'database is locked' in statement 'SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $1'
 ERROR: error calling function 'CategoryHierarchyRequest':[configurator]:100: error in function '<formfunction>(..)' (transaction failed: SQLite error 5 (extended error code 5); message: 'database is locked' in statement 'SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETW)
+..and SQL is shortened..
 
 FreeBSD, some PNGs are not visible in qt client (PNG version?)
 

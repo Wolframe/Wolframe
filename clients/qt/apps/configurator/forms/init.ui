@@ -6,185 +6,133 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>536</width>
-    <height>414</height>
+    <width>574</width>
+    <height>492</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="form1">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>340</y>
-     <width>141</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Manage Categories</string>
-   </property>
-   <property name="form" stdset="0">
-    <string notr="true">categories</string>
-   </property>
-   <property name="global.featureState" stdset="0">
-    <string notr="true">{feature.state}</string>
-   </property>
-   <property name="global.categoryState" stdset="0">
-    <string notr="true">{category.state}</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="form1_2">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>340</y>
-     <width>121</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Manage Features</string>
-   </property>
-   <property name="form" stdset="0">
-    <string notr="true">features</string>
-   </property>
-   <property name="global.featureState" stdset="0">
-    <string notr="true">{feature.state}</string>
-   </property>
-   <property name="global.categoryState" stdset="0">
-    <string notr="true">{category.state}</string>
-   </property>
-  </widget>
-  <widget class="QTreeWidget" name="category">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>211</width>
-     <height>291</height>
-    </rect>
-   </property>
-   <property name="itemsExpandable">
-    <bool>true</bool>
-   </property>
-   <property name="doctype" stdset="0">
-    <string notr="true">CategoryHierarchyRequest.simpleform</string>
-   </property>
-   <property name="rootelement" stdset="0">
-    <string>category</string>
-   </property>
-   <property name="state" stdset="0">
-    <string notr="true">{global.categoryState}</string>
-   </property>
-   <column>
-    <property name="text">
-     <string>category</string>
-    </property>
-   </column>
-  </widget>
-  <widget class="QTreeWidget" name="feature">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>10</y>
-     <width>211</width>
-     <height>291</height>
-    </rect>
-   </property>
-   <property name="itemsExpandable">
-    <bool>true</bool>
-   </property>
-   <property name="doctype" stdset="0">
-    <string notr="true">FeatureHierarchyRequest.simpleform</string>
-   </property>
-   <property name="rootelement" stdset="0">
-    <string>feature</string>
-   </property>
-   <property name="state" stdset="0">
-    <string>{global.featureState}</string>
-   </property>
-   <column>
-    <property name="text">
-     <string>feature</string>
-    </property>
-   </column>
-  </widget>
-  <widget class="QRadioButton" name="radioButton_2">
-   <property name="geometry">
-    <rect>
-     <x>410</x>
-     <y>310</y>
-     <width>100</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>collapse all</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radioButton">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>310</y>
-     <width>100</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>expand all</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radioButton_3">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>310</y>
-     <width>100</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>collapse all</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radioButton_4">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>310</y>
-     <width>100</width>
-     <height>19</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>expand all</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="managePictures">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>380</y>
-     <width>121</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Manage Pictures</string>
-   </property>
-   <property name="form" stdset="0">
-    <string notr="true">pictures</string>
-   </property>
-   <property name="global.featureState" stdset="0">
-    <string notr="true">{feature.state}</string>
-   </property>
-   <property name="global.categoryState" stdset="0">
-    <string notr="true">{category.state}</string>
-   </property>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="3">
+    <widget class="QPushButton" name="managePictures">
+     <property name="text">
+      <string>Manage Pictures</string>
+     </property>
+     <property name="form" stdset="0">
+      <string notr="true">pictures</string>
+     </property>
+     <property name="global.featureState" stdset="0">
+      <string notr="true">{feature.state}</string>
+     </property>
+     <property name="global.categoryState" stdset="0">
+      <string notr="true">{category.state}</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="form1">
+     <property name="text">
+      <string>Manage Categories</string>
+     </property>
+     <property name="form" stdset="0">
+      <string notr="true">categories</string>
+     </property>
+     <property name="global.featureState" stdset="0">
+      <string notr="true">{feature.state}</string>
+     </property>
+     <property name="global.categoryState" stdset="0">
+      <string notr="true">{category.state}</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QTreeWidget" name="category">
+     <property name="itemsExpandable">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string notr="true">CategoryHierarchyRequest.simpleform</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>category</string>
+     </property>
+     <property name="state" stdset="0">
+      <string notr="true">{global.categoryState}</string>
+     </property>
+     <column>
+      <property name="text">
+       <string>category</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="2">
+    <widget class="QTreeWidget" name="feature">
+     <property name="itemsExpandable">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string notr="true">FeatureHierarchyRequest.simpleform</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>feature</string>
+     </property>
+     <property name="state" stdset="0">
+      <string>{global.featureState}</string>
+     </property>
+     <column>
+      <property name="text">
+       <string>feature</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QRadioButton" name="radioButton_4">
+     <property name="text">
+      <string>expand all</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QRadioButton" name="radioButton">
+     <property name="text">
+      <string>expand all</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="form1_2">
+     <property name="text">
+      <string>Manage Features</string>
+     </property>
+     <property name="form" stdset="0">
+      <string notr="true">features</string>
+     </property>
+     <property name="global.featureState" stdset="0">
+      <string notr="true">{feature.state}</string>
+     </property>
+     <property name="global.categoryState" stdset="0">
+      <string notr="true">{category.state}</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QRadioButton" name="radioButton_2">
+     <property name="text">
+      <string>collapse all</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QRadioButton" name="radioButton_3">
+     <property name="text">
+      <string>collapse all</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections>
