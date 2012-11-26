@@ -183,6 +183,13 @@ void SQLiteDatabase::loadProgram( const std::string& filename )
 	m_unit->loadProgram( filename );
 }
 
+void SQLiteDatabase::loadAllPrograms()
+{
+	if ( !m_unit )
+		throw std::runtime_error( "loadAllPrograms: SQLite database unit not initialized" );
+	m_unit->loadAllPrograms();
+}
+
 void SQLiteDatabase::addProgram( const std::string& program )
 {
 	if ( !m_unit )

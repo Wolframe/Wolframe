@@ -341,6 +341,13 @@ void PostgreSQLdatabase::loadProgram( const std::string& filename )
 	m_unit->loadProgram( filename );
 }
 
+void PostgreSQLdatabase::loadAllPrograms()
+{
+	if ( !m_unit )
+		throw std::runtime_error( "loadAllPrograms: PostgreSQL database unit not initialized" );
+	m_unit->loadAllPrograms();
+}
+
 void PostgreSQLdatabase::addProgram( const std::string& program )
 {
 	if ( !m_unit )
