@@ -600,7 +600,7 @@ cd ../%{name}-%{version}
 cd %{_builddir}/boost_%{boost_underscore_version}
 ./bootstrap.sh --prefix=/tmp/boost-%{boost_version} \
 	--with-libraries=thread,filesystem,system,program_options,date_time,regex,locale
-./bjam %{?_smp_mflags} install
+./bjam %{?_smp_mflags} -d1 install
 %endif
 
 %if %{build_libxml2}
