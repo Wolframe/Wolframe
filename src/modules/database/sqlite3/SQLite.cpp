@@ -57,8 +57,9 @@ namespace _Wolframe {
 namespace db {
 
 SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
-			    unsigned short connections )
-	: m_ID( id ), m_filename( filename )
+			    unsigned short connections,
+			    const std::list<std::string>& programFiles_)
+	: m_ID( id ), m_filename( filename ), m_programFiles(programFiles_)
 {
 	bool	checked = false;
 	int	dbFlags = SQLITE_OPEN_READWRITE;
@@ -139,8 +140,25 @@ void SQLiteDBunit::loadProgram( const std::string& filename )
 			      << "' does not exist (SQLite database '" << m_ID << "')";
 		return;
 	}
-	std::string dbsource = utils::readSourceFileContent( filename);
-	addProgram( dbsource);
+	try
+	{
+		addProgram( utils::readSourceFileContent( filename));
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string("error in program '") + utils::getFileStem(filename) + "':" + e.what());
+	}
+}
+
+void SQLiteDBunit::loadAllPrograms()
+{
+	std::list<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
+	for (; pi != pe; ++pi)
+	{
+		MOD_LOG_DEBUG << "Load Program '" << *pi << "' for SQLite database unit '" << m_ID << "'";
+		loadProgram( *pi);
+	}
+	MOD_LOG_DEBUG << "Programs for SQLite database unit '" << m_ID << "' loaded";
 }
 
 Database* SQLiteDBunit::database()

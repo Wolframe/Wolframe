@@ -156,9 +156,10 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 				    std::string sslRootCert, std::string sslCRL ,
 				    unsigned short connectTimeout,
 				    size_t connections, unsigned short acquireTimeout,
-				    unsigned statementTimeout )
+				    unsigned statementTimeout,
+				    const std::list<std::string>& programFiles_)
 	: m_ID( id ), m_noConnections( 0 ), m_connPool( acquireTimeout ),
-	  m_statementTimeout( statementTimeout )
+	  m_statementTimeout( statementTimeout ), m_programFiles(programFiles_)
 {
 	m_connStr = buildConnStr( host, port,  dbName, user, password,
 				  sslMode, sslCert, sslKey, sslRootCert, sslCRL,
@@ -295,8 +296,27 @@ void PostgreSQLdbUnit::loadProgram( const std::string& filename )
 			      << "' does not exist (PostgreSQL database '" << m_ID << "')";
 		return;
 	}
-	return;
+	try
+	{
+		addProgram( utils::readSourceFileContent( filename));
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string("error in program '") + utils::getFileStem(filename) + "':" + e.what());
+	}
 }
+
+void PostgreSQLdbUnit::loadAllPrograms()
+{
+	std::list<std::string>::const_iterator pi = m_programFiles.begin(), pe = m_programFiles.end();
+	for (; pi != pe; ++pi)
+	{
+		MOD_LOG_DEBUG << "Load Program '" << *pi << "' for PostgreSQL database unit '" << m_ID << "'";
+		loadProgram( *pi);
+	}
+	MOD_LOG_DEBUG << "Programs for PostgreSQL database unit '" << m_ID << "' loaded";
+}
+
 
 Database* PostgreSQLdbUnit::database()
 {

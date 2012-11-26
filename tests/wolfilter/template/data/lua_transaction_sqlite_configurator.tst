@@ -4,7 +4,7 @@ requestdoctype='addCategoryHierarchy'
 opt=""
 modpath="../../src/modules"				# module directory relative from tests/temp
 opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
-luascript=`echo $testname | sed 's/lua_//'`.lua
+luascript=`echo $testname | sed 's/lua_//' | sed 's/_sqlite//'`.lua
 opt="$opt --program=$luascript"
 ddltypeprg="simpleform.normalize"
 opt="$opt --program $ddltypeprg"			# normalization program for simpleform ddl types
@@ -35,8 +35,9 @@ echo >> $genscript
 cat scripts/$luascript >> $genscript
 testscripts="$luascript"
 testcmd="$opt run"					# command to execute by the test
-docin=$testname.in					# input document name
-docout=$testname.out					# output document name
+docname=`echo $testname | sed 's/_sqlite//'`
+docin=$docname.in					# input document name
+docout=$docname.out					# output document name
 dumpout="program/$testname.dbdump.txt"			# resource dump to add to expected test output
 testdata="
 **file:$ddltypeprg

@@ -50,7 +50,8 @@ PostgreSQLdbUnit* PostgreSQLconstructor::object( const config::NamedConfiguratio
 						       cfg.sslRootCert, cfg.sslCRL,
 						       cfg.connectTimeout,
 						       cfg.connections, cfg.acquireTimeout,
-						       cfg.statementTimeout );
+						       cfg.statementTimeout,
+						       cfg.programFiles());
 	MOD_LOG_TRACE << "PostgreSQL database unit for '" << cfg.m_ID << "' created";
 	return m_db;
 }

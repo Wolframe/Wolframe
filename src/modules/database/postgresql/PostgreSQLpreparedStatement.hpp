@@ -105,8 +105,6 @@ private:
 	bool executeInstruction( const char* stmstr, State newstate);
 
 private:
-	enum {MaxBindParameters=64};
-
 	State m_state;
 	PGconn* m_conn;
 	const types::keymap<std::string>* m_stmmap;

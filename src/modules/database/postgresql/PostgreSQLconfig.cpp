@@ -162,7 +162,7 @@ bool PostgreSQLconfig::parse( const config::ConfigurationTree& pt, const std::st
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, programFile ))
 				retVal = false;
 			else	{
-				programFiles.push_back( programFile );
+				m_programFiles.push_back( programFile );
 			}
 		}
 		else	{
@@ -225,8 +225,8 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 /*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute CRL filename '" << sslCRL
 				       << "' instead of '" << oldPath << "'";
 	}
-	for ( std::list< std::string >::iterator it = programFiles.begin();
-						it != programFiles.end(); it++ )	{
+	for ( std::list< std::string >::iterator it = m_programFiles.begin();
+						it != m_programFiles.end(); it++ )	{
 		std::string oldPath = *it;
 		*it = utils::getCanonicalPath( *it, refPath );
 		if ( oldPath != *it )
@@ -275,14 +275,14 @@ void PostgreSQLconfig::print( std::ostream& os, size_t indent ) const
 	else
 		os << indStr << "   Default statement execution timeout: " << statementTimeout << "ms" << std::endl;
 
-	if ( programFiles.size() == 0 )
+	if ( m_programFiles.size() == 0 )
 		os << indStr << "   Program file: none" << std::endl;
-	else if ( programFiles.size() == 1 )
-		os << indStr << "   Program file: " << programFiles.front() << std::endl;
+	else if ( m_programFiles.size() == 1 )
+		os << indStr << "   Program file: " << m_programFiles.front() << std::endl;
 	else	{
-		std::list< std::string >::const_iterator it = programFiles.begin();
+		std::list< std::string >::const_iterator it = m_programFiles.begin();
 		os << indStr << "   Program files: " << *it++ << std::endl;
-		while ( it != programFiles.end() )
+		while ( it != m_programFiles.end() )
 			os << indStr << "                  " << *it++ << std::endl;
 	}
 }

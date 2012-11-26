@@ -206,7 +206,8 @@ class SQLiteDBunit : public DatabaseUnit
 	friend class SQLiteTransaction;
 public:
 	SQLiteDBunit( const std::string& id, const std::string& filename,
-		      unsigned short connections );
+		      unsigned short connections,
+		      const std::list<std::string>& programFiles_);
 	~SQLiteDBunit();
 
 	const std::string& ID() const		{ return m_ID; }
@@ -215,7 +216,7 @@ public:
 
 	virtual void loadProgram( const std::string& filename );
 	/// MBa: to be defined after some more cleaning...
-	virtual void loadAllPrograms()		{}
+	virtual void loadAllPrograms();
 
 	virtual void addProgram( const std::string& program )
 						{ m_program.load( program ); }
@@ -248,6 +249,7 @@ private:
 
 	SQLiteProgram		m_program;		///< database programs
 	SQLiteDatabase		m_db;
+	std::list<std::string> m_programFiles;
 };
 
 //***  SQLite database constructor  *******************************************

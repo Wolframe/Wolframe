@@ -5,6 +5,7 @@ OPERATION addCategoryPicture -- ($1=categoryID)(caption, info, image, width, hei
 BEGIN
 	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
 	DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
+--	SELECT currval(pg_get_serial_sequence('users', 'id'));
 	DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
 END
 
@@ -14,7 +15,7 @@ BEGIN
 	DO UPDATE Category SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Category WHERE normalizedName = $(normalizedName);
 	FOREACH picture DO addCategoryPicture($1);
 END
 
@@ -51,14 +52,6 @@ BEGIN
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE ID = $(id);
 	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
 END
-
--- This is not supposed to exist, that's why we have the normalized name
-TRANSACTION selectCategoryByName -- (name)
-BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE name = $(name);
-	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $1;
-END
-
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
@@ -67,7 +60,7 @@ END
 
 TRANSACTION selectCategorySet -- (/category/id)
 BEGIN
-	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Category WHERE ID = $(id);
+	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS "ID",name,normalizedName,description FROM Category WHERE ID = $(id);
 END
 
 --
@@ -75,7 +68,7 @@ END
 --
 TRANSACTION selectTopCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID AS "ID",P2.parentID,P2.name,P2.normalizedName,P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
@@ -83,6 +76,6 @@ END
 --
 TRANSACTION selectSubCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID AS "ID",P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 

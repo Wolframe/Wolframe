@@ -42,6 +42,7 @@
 #include <limits>
 #include <stdexcept>
 #include <boost/shared_ptr.hpp>
+#include <boost/lexical_cast.hpp>
 #undef LOWLEVEL_DEBUG
 
 using namespace _Wolframe;
@@ -194,9 +195,15 @@ bool PreparedStatementHandler_postgres::bind( std::size_t idx, const char* value
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
 	}
-	if (idx == 0 || idx > MaxBindParameters)
+	if (idx == 0 || idx > m_statement.maxparam())
 	{
-		return errorStatus( std::string( "index of bind parameter out of range (required to be in range 1..64)"));
+		errorStatus( std::string( "index of parameter out of range (required to be in range 1..") + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
+		return 0;
+	}
+	if (idx == 0 || idx > m_statement.maxparam())
+	{
+		errorStatus( std::string( "index of bind parameter out of range (required to be in range 1..") + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
+		return 0;
 	}
 	if (value)
 	{
@@ -274,12 +281,9 @@ const char* PreparedStatementHandler_postgres::columnName( std::size_t idx)
 		errorStatus( "command result is empty");
 		return 0;
 	}
-	if (idx == 0 || idx > m_statement.maxparam())
-	{
-		errorStatus( std::string( "index of parameter out of range (required to be in range 1..64)"));
-		return 0;
-	}
-	return PQfname( m_lastresult, (int)idx-1);
+	const char* rt = PQfname( m_lastresult, (int)idx-1);
+	if (!rt) errorStatus( std::string( "index of column out of range (") + boost::lexical_cast<std::string>(idx) + ")");
+	return rt;
 }
 
 const char* PreparedStatementHandler_postgres::getLastError()
@@ -303,11 +307,6 @@ const char* PreparedStatementHandler_postgres::get( std::size_t idx)
 		return 0;
 	}
 	if (m_idx_row >= m_nof_rows) return 0;
-	if (idx == 0 || idx > m_statement.maxparam())
-	{
-		errorStatus( std::string( "index of parameter out of range (required to be in range 1..64)"));
-		return 0;
-	}
 	char* rt = PQgetvalue( m_lastresult, (int)m_idx_row, (int)idx-1);
 	if (!rt || rt[0] == '\0')
 	{

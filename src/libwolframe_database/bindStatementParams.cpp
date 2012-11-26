@@ -42,6 +42,7 @@ using namespace _Wolframe::db;
 void Statement::clear()
 {
 	m_maxparam = 0;
+	m_string.clear();
 	m_data.clear();
 	m_bind.clear();
 }
@@ -49,6 +50,7 @@ void Statement::clear()
 void Statement::init( const std::string& stmstr)
 {
 	clear();
+	m_string = stmstr;
 	std::string::const_iterator si = stmstr.begin(), se = stmstr.end();
 	std::string::const_iterator chunkstart = si;
 	for (; si != se; ++si)

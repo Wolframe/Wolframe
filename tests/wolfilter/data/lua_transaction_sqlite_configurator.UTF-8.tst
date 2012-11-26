@@ -174,7 +174,7 @@
 <createTag><tag name="Tag1.5x" parentID="2"/></createTag>
 <TagHierarchyRequest><Tag id="1"/></TagHierarchyRequest>
 </test>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
 **file:simpleform.normalize
 int=number:integer;
@@ -464,6 +464,7 @@ OPERATION addCategoryPicture -- ($1=categoryID)(caption, info, image, width, hei
 BEGIN
 	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
 	DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
+--	SELECT currval(pg_get_serial_sequence('users', 'id'));
 	DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
 END
 
@@ -473,7 +474,7 @@ BEGIN
 	DO UPDATE Category SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from Category WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Category WHERE normalizedName = $(normalizedName);
 	FOREACH picture DO addCategoryPicture($1);
 END
 
@@ -510,14 +511,6 @@ BEGIN
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE ID = $(id);
 	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
 END
-
--- This is not supposed to exist, that's why we have the normalized name
-TRANSACTION selectCategoryByName -- (name)
-BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE name = $(name);
-	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $1;
-END
-
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
@@ -526,7 +519,7 @@ END
 
 TRANSACTION selectCategorySet -- (/category/id)
 BEGIN
-	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Category WHERE ID = $(id);
+	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS "ID",name,normalizedName,description FROM Category WHERE ID = $(id);
 END
 
 --
@@ -534,7 +527,7 @@ END
 --
 TRANSACTION selectTopCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID AS "ID",P2.parentID,P2.name,P2.normalizedName,P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 
 --
@@ -542,7 +535,7 @@ END
 --
 TRANSACTION selectSubCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID AS "ID",P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 --
 -- addFeature
@@ -560,7 +553,7 @@ BEGIN
 	DO UPDATE Feature SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Feature SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Feature (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from Feature WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Feature WHERE normalizedName = $(normalizedName);
 	FOREACH picture DO addFeaturePicture($1);
 END
 
@@ -705,7 +698,7 @@ BEGIN
 	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 **outputfile:DBDUMP
-**file: transaction_sqlite_configurator.lua
+**file: transaction_configurator.lua
 local function normalizeName( name)
 	return name:gsub("[^%s]+", string.lower):gsub("[%-()]+", " "):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
 end
@@ -758,7 +751,9 @@ local function insert_itr( tablename, parentID, itr)
 			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
+--DEBUG				logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
+--DEBUG				logger.printc( "ID ", id)
 				name = nil
 				description = nil
 			end
@@ -766,7 +761,9 @@ local function insert_itr( tablename, parentID, itr)
 		end
 	end
 	if name then
-		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID} ):table().ID
+--DEBUG		logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
+		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
+--DEBUG		logger.printc( "ID ", id)
 	end
 	return id
 end
@@ -776,7 +773,9 @@ local function insert_topnode( tablename, name, description, picture, parentID)
 	if not parentID then
 		parentID = 1
 	end
+--DEBUG	logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 	local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
+--DEBUG	logger.printc( "ID ", id)
 	return id
 end
 
@@ -914,6 +913,7 @@ local function delete_node( tablename, itr)
 	if id == "1" then
 		return
 	end
+--DEBUG	logger.printc( "delete" .. tablename, {id=id} )
 	formfunction( "delete" .. tablename)( {id=id} )
 end
 

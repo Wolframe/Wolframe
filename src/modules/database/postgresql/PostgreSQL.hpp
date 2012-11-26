@@ -80,6 +80,7 @@ public:
 	const std::string& dbName() const	{return m_dbName;}
 	const std::string& user() const		{return m_user;}
 	const std::string& password() const	{return m_password;}
+	const std::list<std::string>& programFiles() const	{return m_programFiles;}
 
 private:
 	std::string	m_ID;			///< database identifier
@@ -97,7 +98,7 @@ private:
 	unsigned short	connections;		///< number of database connection (pool size)
 	unsigned short	acquireTimeout;		///< timeout when acquiring a connection from the pool
 	unsigned	statementTimeout;	///< default timeout when executin a statement
-	std::list< std::string > programFiles;	///< list of program files
+	std::list< std::string > m_programFiles;///< list of program files
 };
 
 
@@ -175,7 +176,8 @@ public:
 			  std::string sslRootCert, std::string sslCRL,
 			  unsigned short connectTimeout,
 			  size_t connections, unsigned short acquireTimeout,
-			  unsigned statementTimeout );
+			  unsigned statementTimeout,
+			  const std::list<std::string>& programFiles_);
 	~PostgreSQLdbUnit();
 
 	const std::string& ID() const		{ return m_ID; }
@@ -184,7 +186,7 @@ public:
 
 	virtual void loadProgram( const std::string& filename );
 	/// MBa: I have to think a bit how to handle this
-	virtual void loadAllPrograms()		{}
+	virtual void loadAllPrograms();
 
 
 	virtual void addProgram( const std::string& /*definition*/ ) {}
@@ -210,6 +212,7 @@ private:
 	unsigned		m_statementTimeout;	///< default statement execution timeout
 	PostgreSQLdatabase	m_db;			///< real database object
 	PostgreSQLprogram	m_program;
+	std::list<std::string>	m_programFiles;
 };
 
 

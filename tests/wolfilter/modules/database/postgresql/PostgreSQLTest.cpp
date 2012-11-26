@@ -103,7 +103,7 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 	// Drop the tables
 	for ( std::list< std::string >::const_iterator it = tables.begin();
 							it != tables.end(); it++ )	{
-		std::string query = "DROP TABLE " + *it;
+		std::string query = "DROP TABLE " + *it + " CASCADE";
 		PQclear( res );
 		res = PQexec( conn, query.c_str() );
 		ExecStatusType es = PQresultStatus(res);

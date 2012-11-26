@@ -61,6 +61,10 @@ public:
 	void bind( unsigned int idx, const std::string& arg);
 
 	std::string expanded() const;
+	const std::string& string() const
+	{
+		return m_string;
+	}
 
 	unsigned int maxparam() const
 	{
@@ -68,6 +72,7 @@ public:
 	}
 
 private:
+	std::string m_string;
 	typedef std::pair<unsigned int,std::string> Element;
 	std::vector<Element> m_data;
 	unsigned int m_maxparam;
