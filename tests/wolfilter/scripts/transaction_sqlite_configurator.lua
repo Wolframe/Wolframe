@@ -316,6 +316,18 @@ function createTag()
 	create_node( "Tag", input:get())
 end
 
+function PictureListRequest()
+	output:as( "list SYSTEM 'PictureList.simpleform'" )
+	filter().empty = false
+	local t = formfunction( "selectPictureList" )( {} ):table( )
+	output:opentag( "list" )
+	for k,v in pairs( t ) do
+		output:opentag( "picture" )
+		output:print( v )
+		output:closetag( )
+	end
+	output:closetag( )
+end
 
 
 function run()

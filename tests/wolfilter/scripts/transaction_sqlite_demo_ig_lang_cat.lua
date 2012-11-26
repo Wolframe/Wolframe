@@ -201,14 +201,12 @@ end
 function run()
 	filter().empty = false
 	output:opentag( "result")
-	transaction:begin( "insert")
 	local itr = input:get()
 	for v,t in itr do
 		if t == "class" then
 			insert_tree( idcnt, scope( itr))
 		end
 	end
-	transaction:commit()
 	print_tree( get_tree( 1), 1, "")
 	select_subtree( "italic")
 	select_subtree( "brythonic")
