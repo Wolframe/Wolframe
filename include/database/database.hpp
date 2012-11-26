@@ -71,6 +71,11 @@ public:
 	///\remark throws std::runtime_error with position info in case of error
 	virtual void loadProgram( const std::string& filename ) = 0;
 
+	///\brief Load the transaction programs for this database from all
+	//        the program files configured for it
+	///\remark throws std::runtime_error with position info in case of error
+	virtual void loadAllPrograms() = 0;
+
 	///\brief Add a database program to the list of transaction programs
 	///\remark throws std::runtime_error with position info in case of error
 	virtual void addProgram( const std::string& program) = 0;

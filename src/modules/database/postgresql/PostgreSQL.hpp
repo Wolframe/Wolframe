@@ -150,6 +150,7 @@ public:
 	const std::string& ID() const;
 
 	virtual void loadProgram( const std::string& filename );
+	virtual void loadAllPrograms();
 	virtual void addProgram( const std::string& program );
 
 	///\brief Add a set of named statements to the postgresql program

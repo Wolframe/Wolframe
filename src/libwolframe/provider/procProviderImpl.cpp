@@ -336,6 +336,8 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 			LOG_ALERT << "Processor database: database labeled '" << m_dbLabel << "' not found !";
 			return false;
 		}
+		// load all locally defined programs
+		m_db->loadAllPrograms();
 		// load database programs:
 		m_dbprogram.defineEmbeddedLanguageDescription( m_db->getLanguageDescription());
 		std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
