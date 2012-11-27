@@ -315,10 +315,10 @@ end
 function PictureListRequest( )
 	output:as( "list SYSTEM 'PictureList.simpleform'" )
 	filter().empty = false
-	local t = formfunction( "selectPictureList" )( {} ):table( )
-	output:opentag( "list" )
-	output:print( t )
-	output:closetag( )
+	local t = formfunction( "selectPictureList" )( {} )
+	local f = form( "Picture" );
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
 end
 
 function PictureRequest( )
@@ -335,3 +335,14 @@ function PictureRequest( )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
 end
+
+function editPicture( )
+	local picture = picture_value( input:get( ) )
+	formfunction( "updatePicture" )( { picture = picture } )
+end
+
+function createPicture( )
+	local picture = picture_value( input:get( ) )
+	formfunction( "addPicture" )( { picture = picture } )
+end
+

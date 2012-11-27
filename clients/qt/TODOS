@@ -11,6 +11,10 @@ show stoppers:
 - set focus in forms
 
 musts:
+- QTableWidget:
+  - implement state
+    - viewport position
+    - selected cells
 - QDialog instead of QWidget for forms
   - would allow to have default Enter and ESC behaviour
   - must be treated specially, as the form should NOT

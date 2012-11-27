@@ -208,6 +208,7 @@ void MainWindow::switchFound( const QString &name )
 		m_secure = true;
 	} else if( name == "debug" ) {
 		m_debug = true;
+		debug = true;
 	}
 }
 
