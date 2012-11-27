@@ -42,17 +42,6 @@
 #include "sqlite3.h"
 #undef LOWLEVEL_DEBUG
 
-/*****  SQLite specialized template for PoolObject constructor  *******/
-namespace _Wolframe {
-
-template<>
-PoolObject< sqlite3* >::PoolObject( ObjectPool< sqlite3* >& pool )
-	: m_pool( pool ), m_object( pool.get() )
-{}
-
-} // namespace _Wolframe
-
-
 namespace _Wolframe {
 namespace db {
 
