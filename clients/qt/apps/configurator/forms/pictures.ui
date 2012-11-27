@@ -151,11 +151,11 @@
        <property name="text">
         <string>Info</string>
        </property>
-       <property name="id" stdset="0">
-        <string notr="true">{picture.id}</string>
-       </property>
        <property name="form" stdset="0">
-        <string>picture_show</string>
+        <string notr="true">picture_show</string>
+       </property>
+       <property name="global.id" stdset="0">
+        <string notr="true">{picture.id}</string>
        </property>
       </widget>
      </item>
