@@ -1,4 +1,5 @@
 #include "PostgreSQLconfig.cpp"
 #include "PostgreSQLconstructor.cpp"
 #include "PostgreSQL.cpp"
+#include "PostgreSQLprogram.cpp"
 #include "PostgreSQLpreparedStatement.cpp"

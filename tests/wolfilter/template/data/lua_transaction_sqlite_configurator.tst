@@ -25,7 +25,7 @@ modpath="../wolfilter/modules/functions"		# module directory relative from tests
 opt="$opt --module $modpath/fakegraphix/mod_graphix"
 modpath="../wolfilter/modules/database"			# module directory relative from tests/temp
 opt="$opt --module $modpath/sqlite3/mod_db_sqlite3test"
-opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA'"
+opt="$opt --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA,program=program.sql'"
 opt="$opt --program=DBPRG.tdl"
 demopath=../../../examples/demo/configurator
 genscript=../scripts/$luascript
@@ -50,6 +50,8 @@ testdata="
 `cat $projectpath/program/feature.simpleform`
 **file:tag.simpleform
 `cat $projectpath/program/tag.simpleform`
+**file:program.sql
+`cat $projectpath/program/sqlite.sql`
 **file:DBPRG.tdl
 `cat $projectpath/program/category.tdl`
 `cat $projectpath/program/feature.tdl`

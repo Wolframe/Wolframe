@@ -17,15 +17,15 @@ daemon code:
   - parallel builds in lua and qtclient fail, lib, cmdline
 
 PF:
-
 - configurator
   - sqlite schemas, scripts
     - products
-    - test tag trees
 - high prio
   - UIForm loader in client and server
   - make postgres database run transactions
-
+  - solve INTO problem
+      - list of filter elements per instruction
+      - RESULT ROOT attribute in transaction/operation
 - low prio
   - authorize declaration in transaction
   - tagged request/answer in protocol

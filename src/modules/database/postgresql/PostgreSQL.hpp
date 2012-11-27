@@ -189,8 +189,9 @@ public:
 	/// MBa: I have to think a bit how to handle this
 	virtual void loadAllPrograms();
 
+	virtual void addProgram( const std::string& program )
+						{ m_program.load( program ); }
 
-	virtual void addProgram( const std::string& /*definition*/ ) {}
 	virtual const std::string* getProgram( const std::string& /*name*/ ) const
 						{ return NULL; }
 
@@ -204,6 +205,8 @@ public:
 	{
 		m_program.addStatements( stmmap_);
 	}
+
+	static void noticeProcessor( void* this_void, const char * message);
 
 private:
 	const std::string	m_ID;			///< database ID

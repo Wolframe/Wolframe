@@ -1,6 +1,6 @@
 **
 **requires:LUA
-**requires:SQLITE3
+**requires:LIBXML2
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE test SYSTEM 'test.simpleform'>
@@ -174,7 +174,7 @@
 <createTag><tag name="Tag1.5x" parentID="2"/></createTag>
 <TagHierarchyRequest><Tag id="1"/></TagHierarchyRequest>
 </test>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA,program=program.sql' --program=DBPRG.tdl run
+--input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/postgresql/mod_db_postgresqltest --database 'identifier=testdb,host=localhost,port=5432,database=wolframe,user=wolfusr,password=wolfpwd,dumpfile=DBDUMP,inputfile=DBDATA,program=program.sql' --program=DBPRG.tdl run
 
 **file:simpleform.normalize
 int=number:integer;
@@ -184,7 +184,7 @@ float=number:float;
 -- The tags tree
 --
 CREATE TABLE Tag	(
-	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	ID SERIAL NOT NULL PRIMARY KEY,
 	parentID	INT	REFERENCES Tag( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
@@ -193,6 +193,7 @@ CREATE TABLE Tag	(
 	rgt		INT	NOT NULL,
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
+ALTER SEQUENCE Tag_ID_seq RESTART WITH 1;
 
 INSERT INTO Tag( parentID, name, normalizedName, description, lft, rgt )
 	VALUES ( NULL, '_ROOT_', '_ROOT_', 'Tags tree root', 1, 2 );
@@ -201,7 +202,7 @@ INSERT INTO Tag( parentID, name, normalizedName, description, lft, rgt )
 -- The list of images used
 --
 CREATE TABLE Picture	(
-	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	ID SERIAL NOT NULL PRIMARY KEY,
 	caption		TEXT,
 	info		TEXT,
 	width		INT,
@@ -209,6 +210,7 @@ CREATE TABLE Picture	(
 	image		TEXT,
 	thumbnail	TEXT
 );
+ALTER SEQUENCE Picture_ID_seq RESTART WITH 1;
 
 CREATE TABLE PictureTag	(
 	pictureID	INT	REFERENCES Picture( ID ),
@@ -220,7 +222,7 @@ CREATE TABLE PictureTag	(
 -- The categories tree
 --
 CREATE TABLE Category	(
-	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	ID SERIAL NOT NULL PRIMARY KEY,
 	parentID	INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
@@ -229,6 +231,7 @@ CREATE TABLE Category	(
 	rgt		INT	NOT NULL,
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
+ALTER SEQUENCE Category_ID_seq RESTART WITH 1;
 
 INSERT INTO Category( parentID, name, normalizedName, description, lft, rgt )
 	VALUES ( NULL, '_ROOT_', '_ROOT_', 'Categories tree root', 1, 2 );
@@ -243,7 +246,7 @@ CREATE TABLE CategoryPicture	(
 -- The features tree
 --
 CREATE TABLE Feature	(
-	ID 		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	ID SERIAL NOT NULL PRIMARY KEY,
 	parentID	INT	REFERENCES Feature( ID ),
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
@@ -252,6 +255,7 @@ CREATE TABLE Feature	(
 	rgt		INT	NOT NULL,
 	CONSTRAINT order_check CHECK ( rgt > lft )
 );
+ALTER SEQUENCE Feature_ID_seq RESTART WITH 1;
 
 INSERT INTO Feature( parentID, name, normalizedName, description, lft, rgt )
 	VALUES ( NULL, '_ROOT_', '_ROOT_', 'Features tree root', 1, 2 );
@@ -266,17 +270,17 @@ CREATE TABLE FeaturePicture	(
 -- The list of manufacturers
 --
 CREATE TABLE Manufacturer	(
-	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
-	name		TEXT	NOT NULL,
+	ID SERIAL NOT NULL PRIMARY KEY,
+	name			TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
-	webPage		TEXT,
-	logo		INT	REFERENCES Picture( ID )
+	webPage			TEXT,
+	logo			INT	REFERENCES Picture( ID )
 );
 
 -- The list of components
 --
 CREATE TABLE Component	(
-	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	ID SERIAL NOT NULL PRIMARY KEY,
 	code		TEXT	NOT NULL UNIQUE,
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
@@ -359,7 +363,7 @@ CREATE TABLE ComponentCheck	(
 -- Receipes
 --
 CREATE TABLE Receipe	(
-	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	ID SERIAL NOT NULL PRIMARY KEY,
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
 	description	TEXT,
@@ -387,7 +391,7 @@ CREATE TABLE ReceipeContent	(
 -- Configuration
 --
 CREATE TABLE Configuration	(
-	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
+	ID SERIAL NOT NULL PRIMARY KEY,
 	categoryID	INT	REFERENCES Category( ID ),
 	name		TEXT,
 	description	TEXT,
@@ -457,7 +461,7 @@ DOCTYPE "tag Tag"
 **file:program.sql
 -- Select the last ID created in the Picture table
 -- PF:HACK: Because we have no variables, we have also to reserve a result for what we whould store in a 'variable'
-PREPARE getLastPictureID AS SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
+PREPARE getLastPictureID AS SELECT $1,currval( pg_get_serial_sequence( 'picture', 'id'));
 **file:DBPRG.tdl
 --
 -- addCategory
@@ -503,24 +507,23 @@ END
 
 --
 -- selectCategory                 :Get the category
--- selectCategoryByName           :Get the category by name
 -- selectCategoryByNormalizedName :Get the category by name
 -- selectCategoryList             :Get a list of categories
 --
 TRANSACTION selectCategory -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Category WHERE ID = $(id);
 	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
 END
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Category WHERE normalizedName = $(normalizedName);
 	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $1;
 END
 
 TRANSACTION selectCategorySet -- (/category/id)
 BEGIN
-	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS "ID",name,normalizedName,description FROM Category WHERE ID = $(id);
+	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS "ID",name,normalizedName AS "normalizedName",description FROM Category WHERE ID = $(id) ORDER BY ID;
 END
 
 --
@@ -528,7 +531,7 @@ END
 --
 TRANSACTION selectTopCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID AS "ID",P2.parentID,P2.name,P2.normalizedName,P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 
 --
@@ -536,7 +539,7 @@ END
 --
 TRANSACTION selectSubCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID AS "ID",P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 --
 -- addFeature
@@ -544,7 +547,7 @@ END
 OPERATION addFeaturePicture -- ($1=featureID)(caption, info, image, width, height, thumbnail)
 BEGIN
 	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
-	DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
+	DO NONEMPTY UNIQUE getLastPictureID($1);
 	DO INSERT INTO FeaturePicture (featureID,pictureID) VALUES ($1,$2);
 END
 
@@ -582,32 +585,24 @@ END
 
 --
 -- selectFeature                 :Get the feature
--- selectFeatureByName           :Get the feature by name
 -- selectFeatureByNormalizedName :Get the feature by name
 -- selectFeatureList             :Get a list of categories
 --
 TRANSACTION selectFeature -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Feature WHERE ID = $(id);
 	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $(id);
-END
-
--- This is not supposed to exist, that's why we have the normalized name
-TRANSACTION selectFeatureByName -- (name)
-BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE name = $(name);
-	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $1;
 END
 
 TRANSACTION selectFeatureByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Feature WHERE normalizedName = $(normalizedName);
 	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $1;
 END
 
 TRANSACTION selectFeatureSet -- (/feature/id)
 BEGIN
-	FOREACH /feature INTO feature DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Feature WHERE ID = $(id);
+	FOREACH /feature INTO feature DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName AS "normalizedName",description FROM Feature WHERE ID = $(id) ORDER BY ID;
 END
 
 --
@@ -615,7 +610,7 @@ END
 --
 TRANSACTION selectTopFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 
 --
@@ -623,7 +618,7 @@ END
 --
 TRANSACTION selectSubFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 --
 -- addTag
@@ -634,7 +629,7 @@ BEGIN
 	DO UPDATE Tag SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Tag SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Tag (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from Tag WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Tag WHERE normalizedName = $(normalizedName);
 END
 
 --
@@ -658,29 +653,22 @@ END
 
 --
 -- selectTag                 :Get the tag
--- selectTagByName           :Get the tag by name
 -- selectTagByNormalizedName :Get the tag by name
 -- selectTagList             :Get a list of categories
 --
 TRANSACTION selectTag -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE ID = $(id);
-END
-
--- This is not supposed to exist, that's why we have the normalized name
-TRANSACTION selectTagByName -- (name)
-BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Tag WHERE ID = $(id);
 END
 
 TRANSACTION selectTagByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Tag WHERE normalizedName = $(normalizedName);
 END
 
 TRANSACTION selectTagSet -- (/tag/id)
 BEGIN
-	FOREACH /tag INTO tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Tag WHERE ID = $(id);
+	FOREACH /tag INTO tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName AS "normalizedName",description FROM Tag WHERE ID = $(id) ORDER BY ID;
 END
 
 --
@@ -688,7 +676,7 @@ END
 --
 TRANSACTION selectTopTag -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 
 --
@@ -696,7 +684,7 @@ END
 --
 TRANSACTION selectSubTag -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 **outputfile:DBDUMP
 **file: transaction_configurator.lua
@@ -752,9 +740,7 @@ local function insert_itr( tablename, parentID, itr)
 			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
---DEBUG				logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG				logger.printc( "ID ", id)
 				name = nil
 				description = nil
 			end
@@ -762,9 +748,7 @@ local function insert_itr( tablename, parentID, itr)
 		end
 	end
 	if name then
---DEBUG		logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG		logger.printc( "ID ", id)
 	end
 	return id
 end
@@ -774,9 +758,7 @@ local function insert_topnode( tablename, name, description, picture, parentID)
 	if not parentID then
 		parentID = 1
 	end
---DEBUG	logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 	local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG	logger.printc( "ID ", id)
 	return id
 end
 
@@ -887,10 +869,6 @@ local function edit_node( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			id = v
-			-- don't allow editing of the root element (fast hack)
-			if id == "1" then
-				return
-			end
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
@@ -914,7 +892,6 @@ local function delete_node( tablename, itr)
 	if id == "1" then
 		return
 	end
---DEBUG	logger.printc( "delete" .. tablename, {id=id} )
 	formfunction( "delete" .. tablename)( {id=id} )
 end
 
@@ -1025,13 +1002,28 @@ function createTag()
 	create_node( "Tag", input:get())
 end
 
-function PictureListRequest()
+function PictureListRequest( )
 	output:as( "list SYSTEM 'PictureList.simpleform'" )
 	filter().empty = false
 	local t = formfunction( "selectPictureList" )( {} ):table( )
 	output:opentag( "list" )
 	output:print( t )
 	output:closetag( )
+end
+
+function PictureRequest( )
+	output:as( "picture SYSTEM 'Picture.simpleform'")
+	filter().empty = false
+	local id = nil;
+	for v,t in input:get( ) do
+		if t == "id" then
+			id = v
+		end
+	end
+	local t = formfunction( "selectPicture" )( { id = id } )
+	local f = form( "Picture" );
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
 end
 
 
@@ -1512,129 +1504,123 @@ end
 	<tree><item id="18">
 		<tag>Tag5</tag></item></tree>
 </item></tree></result>
-Tag:
-'1', NULL, '_ROOT_', '_ROOT_', 'Tags tree root', '1', '36'
-'2', '1', 'Tag1', 'tag1', NULL, '2', '13'
-'3', '2', 'Tag1.1', 'tag1.1', NULL, '3', '4'
-'4', '2', 'Tag1.2', 'tag1.2', NULL, '5', '6'
-'5', '2', 'Tag1.3', 'tag1.3', NULL, '7', '8'
-'6', '2', 'Tag1.4x', 'tag1.4x', NULL, '9', '10'
-'7', '1', 'Tag2', 'tag2', NULL, '14', '21'
-'8', '7', 'Tag2.1', 'tag2.1', NULL, '15', '16'
-'9', '7', 'Tag2.2', 'tag2.2', NULL, '17', '18'
-'11', '7', 'Tag2.4', 'tag2.4', NULL, '19', '20'
-'12', '1', 'Tag3', 'tag3', NULL, '22', '33'
-'13', '12', 'Tag3.1', 'tag3.1', NULL, '23', '24'
-'14', '12', 'Tag3.2', 'tag3.2', NULL, '25', '26'
-'15', '12', 'Tag3.3', 'tag3.3', NULL, '27', '28'
-'16', '12', 'Tag3.4', 'tag3.4', NULL, '29', '30'
-'17', '12', 'Tag3.5x', 'tag3.5x', NULL, '31', '32'
-'18', '1', 'Tag5', 'tag5', NULL, '34', '35'
-'19', '2', 'Tag1.5x', 'tag1.5x', NULL, '11', '12'
-
-sqlite_sequence:
-'Tag', '19'
-'Category', '54'
-'Feature', '18'
-'Picture', '3'
-
-Picture:
-'1', 'WNC caption Z', 'WNC info Z', '11', '90', 'WNC image Z', 'WNC image Z'
-'2', 'WNC caption', 'WNC info', '9', '111', 'WNC image', 'WNC image'
-'3', 'WNC caption', 'WNC info', '9', '111', 'WNC image', 'WNC image'
-
-PictureTag:
-
-Category:
-'1', NULL, '_ROOT_', '_ROOT_', 'Categories tree root', '1', '64'
-'2', '1', 'Minicomputer', 'minicomputer', NULL, '2', '11'
-'3', '2', 'Superminicomputer', 'superminicomputer', NULL, '3', '4'
-'4', '2', 'Minicluster', 'minicluster', NULL, '5', '6'
-'5', '2', 'Server (Minicomputer)', 'server minicomputer', NULL, '7', '8'
-'6', '2', 'Workstation (Minicomputer)', 'workstation minicomputer', NULL, '9', '10'
-'7', '1', 'Microcomputer', 'microcomputer', NULL, '12', '31'
-'8', '7', 'Tower PC', 'tower pc', NULL, '13', '14'
-'9', '7', 'Mid-Tower PC', 'mid tower pc', NULL, '15', '16'
-'10', '7', 'Mini-Tower PC', 'mini tower pc', NULL, '17', '18'
-'11', '7', 'Server (Microcomputer)', 'server microcomputer', NULL, '19', '20'
-'12', '7', 'Workstation (Microcomputer)', 'workstation microcomputer', NULL, '21', '22'
-'13', '7', 'Personal computer', 'personal computer', NULL, '23', '24'
-'14', '7', 'Desktop computer', 'desktop computer', NULL, '25', '26'
-'15', '7', 'Home computer', 'home computer', NULL, '27', '28'
-'16', '1', 'Mobile', 'mobile', NULL, '32', '63'
-'17', '16', 'Desknote', 'desknote', NULL, '33', '34'
-'18', '16', 'Laptop', 'laptop', NULL, '35', '44'
-'19', '18', 'Notebook', 'notebook', NULL, '36', '39'
-'20', '19', 'Subnotebook', 'subnotebook', NULL, '37', '38'
-'21', '18', 'Tablet personal computer', 'tablet personal computer', NULL, '40', '41'
-'44', '18', 'Wearable computer', 'wearable computer', NULL, '42', '43'
-'45', '16', 'Single board computer', 'single board computer', NULL, '45', '46'
-'46', '16', 'Wireless network component', 'wireless network component', NULL, '47', '54'
-'47', '16', 'Plug computer', 'plug computer', NULL, '55', '56'
-'48', '16', 'Microcontroller', 'microcontroller', NULL, '57', '58'
-'49', '16', 'Smartdust', 'smartdust', NULL, '59', '60'
-'50', '16', 'Nanocomputer', 'nanocomputer', NULL, '61', '62'
-'51', '7', 'Device from outer space', 'device from outer space', NULL, '29', '30'
-'52', '46', 'WNC child Y', 'wnc child y', NULL, '48', '49'
-'53', '46', 'WNC child 2', 'wnc child 2', NULL, '50', '51'
-'54', '46', 'WNC child 3', 'wnc child 3', NULL, '52', '53'
-
-CategoryPicture:
-'52', '1'
-'53', '2'
-'54', '3'
-
-Feature:
-'1', NULL, '_ROOT_', '_ROOT_', 'Features tree root', '1', '34'
-'2', '1', 'Color', 'color', NULL, '2', '13'
-'3', '2', 'green', 'green', NULL, '3', '4'
-'4', '2', 'blue', 'blue', NULL, '5', '6'
-'5', '2', 'gray', 'gray', NULL, '7', '8'
-'6', '2', 'pink', 'pink', NULL, '9', '10'
-'7', '1', 'Size', 'size', NULL, '14', '23'
-'8', '7', 'big', 'big', NULL, '15', '16'
-'9', '7', 'small', 'small', NULL, '17', '18'
-'10', '7', 'tiny', 'tiny', NULL, '19', '20'
-'11', '7', 'pocket size', 'pocket size', NULL, '21', '22'
-'12', '1', 'Noise', 'noise', NULL, '24', '31'
-'13', '12', 'loud', 'loud', NULL, '25', '26'
-'14', '12', 'silent', 'silent', NULL, '27', '28'
-'16', '12', 'mumling', 'mumling', NULL, '29', '30'
-'17', '1', 'Space', 'space', NULL, '32', '33'
-'18', '2', 'yellow', 'yellow', NULL, '11', '12'
-
-FeaturePicture:
-
-Manufacturer:
-
-Component:
-
-ComponentPriceHistory:
-
-ComponentPicture:
-
-CategRequires:
-
-CategProvides:
-
-CategoryCheck:
-
-ComponentRequires:
-
-ComponentProvides:
-
-ComponentCheck:
-
-Receipe:
-
-RecipePicture:
-
-ReceipeContent:
-
-Configuration:
-
-ConfigComponent:
-
-ComposedConfig:
-
+category:
+id, parentid, name, normalizedname, description, lft, rgt
+1, , _ROOT_, _ROOT_, Categories tree root, 1, 64
+2, 1, Minicomputer, minicomputer, , 2, 11
+3, 2, Superminicomputer, superminicomputer, , 3, 4
+4, 2, Minicluster, minicluster, , 5, 6
+5, 2, Server (Minicomputer), server minicomputer, , 7, 8
+6, 2, Workstation (Minicomputer), workstation minicomputer, , 9, 10
+7, 1, Microcomputer, microcomputer, , 12, 31
+8, 7, Tower PC, tower pc, , 13, 14
+9, 7, Mid-Tower PC, mid tower pc, , 15, 16
+10, 7, Mini-Tower PC, mini tower pc, , 17, 18
+11, 7, Server (Microcomputer), server microcomputer, , 19, 20
+12, 7, Workstation (Microcomputer), workstation microcomputer, , 21, 22
+13, 7, Personal computer, personal computer, , 23, 24
+14, 7, Desktop computer, desktop computer, , 25, 26
+15, 7, Home computer, home computer, , 27, 28
+16, 1, Mobile, mobile, , 32, 63
+17, 16, Desknote, desknote, , 33, 34
+18, 16, Laptop, laptop, , 35, 44
+19, 18, Notebook, notebook, , 36, 39
+20, 19, Subnotebook, subnotebook, , 37, 38
+21, 18, Tablet personal computer, tablet personal computer, , 40, 41
+44, 18, Wearable computer, wearable computer, , 42, 43
+45, 16, Single board computer, single board computer, , 45, 46
+46, 16, Wireless network component, wireless network component, , 47, 54
+47, 16, Plug computer, plug computer, , 55, 56
+48, 16, Microcontroller, microcontroller, , 57, 58
+49, 16, Smartdust, smartdust, , 59, 60
+50, 16, Nanocomputer, nanocomputer, , 61, 62
+51, 7, Device from outer space, device from outer space, , 29, 30
+52, 46, WNC child Y, wnc child y, , 48, 49
+53, 46, WNC child 2, wnc child 2, , 50, 51
+54, 46, WNC child 3, wnc child 3, , 52, 53
+categorycheck:
+categoryid, rulename, normalizedname
+categorypicture:
+categoryid, pictureid
+52, 1
+53, 2
+54, 3
+categprovides:
+categoryid, featureid, minquantity, maxquantity
+categrequires:
+categoryid, featureid, minquantity, maxquantity
+component:
+id, code, name, normalizedname, categoryid, manufacturerid, mfgcode, webpage, description, price
+componentcheck:
+categoryid, rulename
+componentpicture:
+componentid, pictureid
+componentpricehistory:
+componentid, price, pricedate, username
+componentprovides:
+componentid, featureid, minquantity, maxquantity
+componentrequires:
+componentid, featureid, minquantity, maxquantity
+composedconfig:
+configid, subconfigid, quantity
+configcomponent:
+configid, componentid, quantity
+configuration:
+id, categoryid, name, description, comment
+feature:
+id, parentid, name, normalizedname, description, lft, rgt
+1, , _ROOT_, _ROOT_, Features tree root, 1, 34
+2, 1, Color, color, , 2, 13
+3, 2, green, green, , 3, 4
+4, 2, blue, blue, , 5, 6
+5, 2, gray, gray, , 7, 8
+6, 2, pink, pink, , 9, 10
+7, 1, Size, size, , 14, 23
+8, 7, big, big, , 15, 16
+9, 7, small, small, , 17, 18
+10, 7, tiny, tiny, , 19, 20
+11, 7, pocket size, pocket size, , 21, 22
+12, 1, Noise, noise, , 24, 31
+13, 12, loud, loud, , 25, 26
+14, 12, silent, silent, , 27, 28
+16, 12, mumling, mumling, , 29, 30
+17, 1, Space, space, , 32, 33
+18, 2, yellow, yellow, , 11, 12
+featurepicture:
+featureid, pictureid
+manufacturer:
+id, name, normalizedname, webpage, logo
+picture:
+id, caption, info, width, height, image, thumbnail
+1, WNC caption Z, WNC info Z, 11, 90, WNC image Z, WNC image Z
+2, WNC caption, WNC info, 9, 111, WNC image, WNC image
+3, WNC caption, WNC info, 9, 111, WNC image, WNC image
+picturetag:
+pictureid, tagid
+receipe:
+id, name, normalizedname, description, categoryid, creationdate, comment
+receipecontent:
+receipeid, categoryid, minquantity, maxquantity, comment
+recipepicture:
+receipeid, pictureid
+tag:
+id, parentid, name, normalizedname, description, lft, rgt
+1, , _ROOT_, _ROOT_, Tags tree root, 1, 36
+2, 1, Tag1, tag1, , 2, 13
+3, 2, Tag1.1, tag1.1, , 3, 4
+4, 2, Tag1.2, tag1.2, , 5, 6
+5, 2, Tag1.3, tag1.3, , 7, 8
+6, 2, Tag1.4x, tag1.4x, , 9, 10
+7, 1, Tag2, tag2, , 14, 21
+8, 7, Tag2.1, tag2.1, , 15, 16
+9, 7, Tag2.2, tag2.2, , 17, 18
+11, 7, Tag2.4, tag2.4, , 19, 20
+12, 1, Tag3, tag3, , 22, 33
+13, 12, Tag3.1, tag3.1, , 23, 24
+14, 12, Tag3.2, tag3.2, , 25, 26
+15, 12, Tag3.3, tag3.3, , 27, 28
+16, 12, Tag3.4, tag3.4, , 29, 30
+17, 12, Tag3.5x, tag3.5x, , 31, 32
+18, 1, Tag5, tag5, , 34, 35
+19, 2, Tag1.5x, tag1.5x, , 11, 12
 **end

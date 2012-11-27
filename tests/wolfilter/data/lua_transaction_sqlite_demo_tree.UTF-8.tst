@@ -49,11 +49,11 @@ END
 --
 TRANSACTION treeAddNode -- (parentid, name)
 BEGIN
-	DO NONEMPTY UNIQUE SELECT rgt FROM tree WHERE "ID" = $(parentid);
+	DO NONEMPTY UNIQUE SELECT rgt FROM tree WHERE ID = $(parentid);
 	DO UPDATE tree SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE tree SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO tree (parent, name, lft, rgt) VALUES ($(parentid), $(name), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT "ID" from tree WHERE lft = $1;
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from tree WHERE lft = $1;
 END
 
 --
@@ -61,7 +61,7 @@ END
 --
 TRANSACTION treeDeleteSubtree -- (id)
 BEGIN
-	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM tree WHERE "ID" = $(id);
+	DO NONEMPTY SELECT lft,rgt,rgt-lft+1 AS width FROM tree WHERE ID = $(id);
 	DO DELETE FROM tree WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE tree SET lft = lft-$3 WHERE lft>$2;
 	DO UPDATE tree SET rgt = rgt-$3 WHERE rgt>$2;
@@ -73,11 +73,11 @@ END
 --
 TRANSACTION treeSelectNode -- (/node/id)
 BEGIN
-	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT "ID",parent,name FROM tree WHERE "ID" = $(id);
+	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID",parent,name FROM tree WHERE ID = $(id);
 END
 TRANSACTION treeSelectNodeByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT "ID",parent,name FROM tree WHERE name = $(name);
+	FOREACH /node INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID",parent,name FROM tree WHERE name = $(name);
 END
 
 --
@@ -86,11 +86,11 @@ END
 --
 TRANSACTION treeSelectNodeAndParents -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT "P2.ID","P2.name" FROM tree AS "P1", tree AS "P2" WHERE "P1.lft" BETWEEN "P2.lft" AND "P2.rgt" AND "P1.ID" = $(id);
+	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id);
 END
 TRANSACTION treeSelectNodeAndParentsByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT "P2.ID","P2.name" FROM tree AS "P1", tree AS "P2" WHERE "P1.lft" BETWEEN "P2.lft" AND "P2.rgt" AND "P1.name" = $(name);
+	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = $(name);
 END
 
 --
@@ -99,11 +99,11 @@ END
 --
 TRANSACTION treeSelectParents -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT "P2.ID","P2.name" FROM tree AS "P1", tree AS "P2" WHERE "P1.lft" > "P2.lft" AND "P1.lft" < "P2.rgt" AND "P1.ID" = $(id);
+	FOREACH /node INTO /node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
 END
 TRANSACTION treeSelectParentsByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT "P2.ID","P2.name" FROM tree AS "P1", tree AS "P2" WHERE "P1.lft" > "P2.lft" AND "P1.lft" < "P2.rgt" AND "P1.name" = $(name);
+	FOREACH /node INTO /node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = $(name);
 END
 
 --
@@ -112,11 +112,11 @@ END
 --
 TRANSACTION treeSelectNodeAndChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT "P1.ID","P1.parent","P1.name" FROM tree AS "P1", tree AS "P2" WHERE "P1.lft" BETWEEN "P2.lft" AND "P2.rgt" AND "P2.ID" = $(id);
+	FOREACH /node INTO /node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
 END
 TRANSACTION treeSelectNodeAndChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT "P1.ID","P1.parent","P1.name" FROM tree AS "P1", tree AS "P2" WHERE "P1.lft" BETWEEN "P2.lft" AND "P2.rgt" AND "P2.name" = $(name);
+	FOREACH /node INTO /node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
 END
 
 --
@@ -125,11 +125,11 @@ END
 --
 TRANSACTION treeSelectChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT "P1.ID","P1.name" FROM tree AS "P1", tree AS "P2" WHERE "P1.lft" > "P2.lft" AND "P1.lft" < "P2.rgt" AND "P2.ID" = $(id);
+	FOREACH /node INTO /node DO SELECT P1.ID AS "ID",P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
 END
 TRANSACTION treeSelectChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT "P1.ID","P1.name" FROM tree AS "P1", tree AS "P2" WHERE "P1.lft" > "P2.lft" AND "P1.lft" < "P2.rgt" AND "P2.name" = $(name);
+	FOREACH /node INTO /node DO SELECT P1.ID AS "ID",P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name);
 END
 
 
@@ -139,11 +139,11 @@ END
 TRANSACTION treeMoveNode -- (nodeid, newparentid)
 BEGIN
 	-- get parent boundaries
-	DO NONEMPTY UNIQUE SELECT lft,rgt FROM tree WHERE "ID" = $(newparentid);
+	DO NONEMPTY UNIQUE SELECT lft,rgt FROM tree WHERE ID = $(newparentid);
 
 	-- mark parent left and child width
 	-- verify constraint that new parent is not a child of the copied/moved node
-	DO NONEMPTY UNIQUE SELECT $1,rgt-lft AS width FROM tree WHERE "ID" = $(nodeid) AND NOT ($1 >= lft AND $2 < rgt);
+	DO NONEMPTY UNIQUE SELECT $1,rgt-lft AS width FROM tree WHERE ID = $(nodeid) AND NOT ($1 >= lft AND $2 < rgt);
 
 	-- get place for the move/copy in the destination node area
 	DO UPDATE tree SET rgt = rgt + $2 WHERE rgt >= $1;
@@ -156,18 +156,18 @@ BEGIN
 	-- $4 = lft node
 	-- $5 = rgt node
 	-- $6 = width node
-	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft AS width FROM tree WHERE "ID" = $(newparentid);
-	DO NONEMPTY UNIQUE SELECT $1,$2,$3,lft,rgt,rgt-lft AS width FROM tree WHERE "ID" = $(nodeid);
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(newparentid);
+	DO NONEMPTY UNIQUE SELECT $1,$2,$3,lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(nodeid);
 
 	-- make a copy of the node to move/copy as child of the destination node
 	DO INSERT INTO TREE
-		SELECT "P1.ID" AS "ID",
-			"P1.parent" AS parent,
-			"P1.lgt"-$4+$1 AS lgt,
-			"P1.rgt"-$5+$2 AS rgt,
-			"P1.name" AS name
-		FROM tree AS "P1", tree AS "P2"
-		WHERE "P1.lft" BETWEEN "P2.lft" AND "P2.rgt" AND "P2.ID" = $(nodeid);
+		SELECT P1.ID AS "ID",
+			P1.parent AS parent,
+			P1.lgt-$4+$1 AS lgt,
+			P1.rgt-$5+$2 AS rgt,
+			P1.name AS name
+		FROM tree AS P1, tree AS P2
+		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
 
 	-- delete the original node
 	DO DELETE FROM tree WHERE lft >= $4 AND lft <= $5;
@@ -182,11 +182,11 @@ END
 TRANSACTION treeCopyNode -- (nodeid, newparentid)
 BEGIN
 	-- get parent boundaries
-	DO NONEMPTY UNIQUE SELECT lft,rgt FROM tree WHERE "ID" = $(newparentid);
+	DO NONEMPTY UNIQUE SELECT lft,rgt FROM tree WHERE ID = $(newparentid);
 
 	-- mark parent left and child width
 	-- verify constraint that new parent is not a child of the copied/moved node
-	DO NONEMPTY UNIQUE SELECT $1,rgt-lft AS width FROM tree WHERE "ID" = $(nodeid) AND NOT ($1 >= lft AND $2 < rgt);
+	DO NONEMPTY UNIQUE SELECT $1,rgt-lft AS width FROM tree WHERE ID = $(nodeid) AND NOT ($1 >= lft AND $2 < rgt);
 
 	-- get place for the move/copy in the destination node area
 	DO UPDATE tree SET rgt = rgt + $2 WHERE rgt >= $1;
@@ -199,18 +199,18 @@ BEGIN
 	-- $4 = lft node
 	-- $5 = rgt node
 	-- $6 = width node
-	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft AS width FROM tree WHERE "ID" = $(newparentid);
-	DO NONEMPTY UNIQUE SELECT $1,$2,$3,lft,rgt,rgt-lft AS width FROM tree WHERE "ID" = $(nodeid);
+	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(newparentid);
+	DO NONEMPTY UNIQUE SELECT $1,$2,$3,lft,rgt,rgt-lft AS width FROM tree WHERE ID = $(nodeid);
 
 	-- make a copy of the node to move/copy as child of the destination node
 	DO INSERT INTO TREE
-		SELECT "P1.ID" AS "ID",
-			"P1.parent" AS parent,
-			"P1.lgt"-$4+$1 AS lgt,
-			"P1.rgt"-$5+$2 AS rgt,
-			"P1.name" AS name
-		FROM tree AS "P1", tree AS "P2"
-		WHERE "P1.lft" BETWEEN "P2.lft" AND "P2.rgt" AND "P2.ID" = $(nodeid);
+		SELECT P1.ID AS "ID",
+			P1.parent AS parent,
+			P1.lgt-$4+$1 AS lgt,
+			P1.rgt-$5+$2 AS rgt,
+			P1.name AS name
+		FROM tree AS P1, tree AS P2
+		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
 END
 **outputfile:DBDUMP
 **file: transaction_demo_tree.lua

@@ -50,9 +50,7 @@ local function insert_itr( tablename, parentID, itr)
 			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
---DEBUG				logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG				logger.printc( "ID ", id)
 				name = nil
 				description = nil
 			end
@@ -60,9 +58,7 @@ local function insert_itr( tablename, parentID, itr)
 		end
 	end
 	if name then
---DEBUG		logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG		logger.printc( "ID ", id)
 	end
 	return id
 end
@@ -72,9 +68,7 @@ local function insert_topnode( tablename, name, description, picture, parentID)
 	if not parentID then
 		parentID = 1
 	end
---DEBUG	logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 	local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG	logger.printc( "ID ", id)
 	return id
 end
 
@@ -185,10 +179,6 @@ local function edit_node( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			id = v
-			-- don't allow editing of the root element (fast hack)
-			if id == "1" then
-				return
-			end
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
@@ -212,7 +202,6 @@ local function delete_node( tablename, itr)
 	if id == "1" then
 		return
 	end
---DEBUG	logger.printc( "delete" .. tablename, {id=id} )
 	formfunction( "delete" .. tablename)( {id=id} )
 end
 
