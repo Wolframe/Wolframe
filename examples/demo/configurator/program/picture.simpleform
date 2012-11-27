@@ -1,12 +1,15 @@
 DOCTYPE "picture Picture"
 {
-	id @int
-	ID int
-	caption string
-	info string
-	thumbnail string
-	image string
-	width int
-	height int
-	size int
+	picture
+	{
+		id @int
+		ID int
+		caption string
+		info string
+		thumbnail string
+		image string
+		width int
+		height int
+		size int
+	}
 }
