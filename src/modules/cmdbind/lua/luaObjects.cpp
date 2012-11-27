@@ -542,8 +542,8 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_typedinputfilterClosure_get)
 
 LUA_FUNCTION_THROWS( "<normalizer>(..)", function_normalizer_call)
 {
+	NormalizeFunction* func = (NormalizeFunction*)lua_touserdata( ls, lua_upvalueindex( 1));
 	check_parameters( ls, 0, 1, LUA_TSTRING);
-	NormalizeFunction* func = (NormalizeFunction*)lua_upvalueindex( 1);
 	std::size_t len;
 	const char* content = lua_tolstring( ls, 1, &len);
 	std::string rt = func->execute( std::string( content, len));

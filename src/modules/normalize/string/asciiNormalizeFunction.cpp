@@ -32,14 +32,190 @@
 ************************************************************************/
 ///\file asciiNormalizeFunction.cpp
 #include "asciiNormalizeFunction.hpp"
+#include "textwolf/charset_utf8.hpp"
+#include "textwolf/istreamiterator.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace langbind;
 
-std::string AsciiNormalizeFunction::execute( const std::string& str) const
+static void substDia_europe( std::istream& input, std::ostream& output)
 {
-	static const char hex[] = "0123456789abcdef";
-	std::string::const_iterator ii = str.begin(), ee = str.end();
+	textwolf::charset::UTF8 utf8;
+	char buf[16];
+	unsigned int bufpos;
+	textwolf::IStreamIterator itr(input);
+	while (*itr)
+	{
+		bufpos = 0;
+		textwolf::UChar value = utf8.value( buf, bufpos, itr);
+
+		if (value < 0x7F)
+		{
+			output << (char)value;
+		}
+		else if (value >= 0xC0 && value <= 0xC5)
+		{
+			output << 'A';
+		}
+		else if (value == 0xC6)
+		{
+			output << "AE";
+		}
+		else if (value == 0xC7)
+		{
+			output << 'C';
+		}
+		else if (value >= 0xC8 && value <= 0xCB)
+		{
+			output << 'E';
+		}
+		else if (value >= 0xCC && value <= 0xCF)
+		{
+			output << 'I';
+		}
+		else if (value == 0xD0)//CAPITAL ETH
+		{
+			output << "TH";
+		}
+		else if (value == 0xD1)
+		{
+			output << 'N';
+		}
+		else if (value >= 0xD2 && value <= 0xD6)
+		{
+			output << 'O';
+		}
+		else if (value == 0xD7)
+		{
+			output << '*';
+		}
+		else if (value == 0xD8)
+		{
+			output << 'O';
+		}
+		else if (value >= 0xD9 && value <= 0xDC)
+		{
+			output << 'U';
+		}
+		else if (value == 0xDD)
+		{
+			output << 'Y';
+		}
+		else if (value == 0xDE)//CAPITAL THORN
+		{
+			output << "TH";
+		}
+		else if (value == 0xDF)
+		{
+			output << "ss";
+		}
+		else if (value >= 0xE0 && value <= 0xE5)
+		{
+			output << 'a';
+		}
+		else if (value == 0xE6)
+		{
+			output << "ae";
+		}
+		else if (value == 0xE7)
+		{
+			output << 'c';
+		}
+		else if (value >= 0xE8 && value <= 0xEB)
+		{
+			output << 'e';
+		}
+		else if (value >= 0xEC && value <= 0xEF)
+		{
+			output << 'i';
+		}
+		else if (value == 0xF0)//SMALL ETH
+		{
+			output << "th";
+		}
+		else if (value == 0xF1)
+		{
+			output << 'n';
+		}
+		else if (value >= 0xF2 && value <= 0xF6)
+		{
+			output << 'o';
+		}
+		else if (value == 0xF7)
+		{
+			output << '/';
+		}
+		else if (value == 0xF8)
+		{
+			output << 'o';
+		}
+		else if (value >= 0xF9 && value <= 0xFC)
+		{
+			output << 'u';
+		}
+		else if (value == 0xFD)
+		{
+			output << 'y';
+		}
+		else if (value == 0xFE)
+		{
+			output << "th";
+		}
+		else if (value == 0xFF)
+		{
+			output << 'y';
+		}
+		else if (value == 0x1E9E)
+		{
+			output << "SS";
+		}
+		//romanian characters above 0xFF:
+		else if (value == 0x102)
+		{
+			output << 'A';
+		}
+		else if (value == 0x103)
+		{
+			output << 'a';
+		}
+		else if (value == 0x218)
+		{
+			output << 'S';
+		}
+		else if (value == 0x219)
+		{
+			output << 's';
+		}
+		else if (value == 0x21A)
+		{
+			output << 'T';
+		}
+		else if (value == 0x21B)
+		{
+			output << 't';
+		}
+	}
+}
+
+std::string ConvDiaNormalizeFunction::execute( const std::string& str) const
+{
+	std::istringstream input( str);
+	std::ostringstream output;
+
+	substDia_europe( input, output);
+	return output.str();
+}
+
+static std::string nameString( const std::string& str)
+{
+	std::istringstream input( str);
+	std::ostringstream output;
+
+	substDia_europe( input, output);
+	std::string asciistr = output.str();
+	std::string::const_iterator ii = asciistr.begin(), ee = asciistr.end();
+
 	while (ii != ee && *ii <= 32 && *ii >= 0) ++ii;
 	std::string rt;
 	for (; ii != ee; ++ii)
@@ -47,15 +223,9 @@ std::string AsciiNormalizeFunction::execute( const std::string& str) const
 		if ((unsigned char)*ii > 32)
 		{
 			if (*ii >= '0' && *ii <= '9') rt.push_back( *ii);
-			if (*ii >= 'a' && *ii <= 'z') rt.push_back( std::toupper( *ii));
+			if (*ii >= 'a' && *ii <= 'z') rt.push_back( *ii);
 			if (*ii >= 'A' && *ii <= 'Z') rt.push_back( *ii);
-			else
-			{
-				unsigned char xx = (unsigned char)*ii;
-				rt.push_back( '#');
-				rt.push_back( hex[ xx/16]);
-				rt.push_back( hex[ xx%16]);
-			}
+			if (*ii == '_') rt.push_back( *ii);
 		}
 		else if (!rt.empty() && rt[rt.size()-1] != ' ')
 		{
@@ -67,5 +237,15 @@ std::string AsciiNormalizeFunction::execute( const std::string& str) const
 		rt.resize(rt.size()-1);
 	}
 	return rt;
+}
+
+std::string UppercaseNameNormalizeFunction::execute( const std::string& str) const
+{
+	return boost::to_upper_copy( nameString( str));
+}
+
+std::string LowercaseNameNormalizeFunction::execute( const std::string& str) const
+{
+	return boost::to_lower_copy( nameString( str));
 }
 

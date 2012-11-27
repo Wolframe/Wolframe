@@ -50,6 +50,8 @@ testdata="
 `cat $projectpath/program/feature.simpleform`
 **file:tag.simpleform
 `cat $projectpath/program/tag.simpleform`
+**file:simpleform.normalize
+`cat $projectpath/program/category.simpleform`
 **file:program.sql
 `cat $projectpath/program/postgres.sql`
 **file:DBPRG.tdl

@@ -32,74 +32,56 @@
 
 --------------------------------------------------------------------
 */
-///\file textwolf/cstringiterator.hpp
-///\brief textwolf iterator on strings
+///\file textwolf/istreamiterator.hpp
+///\brief textwolf iterator for std::istream
 
-#ifndef __TEXTWOLF_CSTRING_ITERATOR_HPP__
-#define __TEXTWOLF_CSTRING_ITERATOR_HPP__
-#include <cstring>
-#include <cstdlib>
+#ifndef __TEXTWOLF_ISTREAM_ITERATOR_HPP__
+#define __TEXTWOLF_ISTREAM_ITERATOR_HPP__
+#include <iostream>
 
 ///\namespace textwolf
 ///\brief Toplevel namespace of the library
 namespace textwolf {
 
 ///\class CStringIterator
-///\brief Input iterator on a constant string returning null characters after EOF as required by textwolf scanners
-class CStringIterator
+///\brief Input iterator on an STL input stream
+class IStreamIterator
 {
 public:
 	///\brief Default constructor
-	CStringIterator()
-		:m_src(0)
-		,m_size(0)
-		,m_pos(0){}
+	IStreamIterator(){}
 
 	///\brief Constructor
-	///\param [in] src string to iterate on
-	///\param [in] size number of char in the string to iterate on
-	CStringIterator( const char* src, unsigned int size)
-		:m_src(src)
-		,m_size(size)
-		,m_pos(0){}
+	///\param [in] input input to iterate on
+	IStreamIterator( std::istream& input)
+		:m_itr(input)
+	{
+		input.unsetf( std::ios::skipws);
+	}
 
 	///\brief Copy constructor
 	///\param [in] o iterator to copy
-	CStringIterator( const CStringIterator& o)
-		:m_src(o.m_src)
-		,m_size(o.m_size)
-		,m_pos(o.m_pos){}
+	IStreamIterator( const IStreamIterator& o)
+		:m_itr(o.m_itr)
+		,m_end(o.m_end){}
 
 	///\brief Element access
 	///\return current character
 	char operator* ()
 	{
-		return (m_pos < m_size)?m_src[m_pos]:0;
+		return (m_itr != m_end)?*m_itr:0;
 	}
 
-	///\brief Preincrement
-	CStringIterator& operator++()
+	///\brief Pre increment
+	IStreamIterator& operator++()
 	{
-		m_pos++;
+		++m_itr;
 		return *this;
 	}
 
-	///\brief Return current char position
-	unsigned int pos() const	{return m_pos;}
-
-	///\brief Set current char position
-	void pos( unsigned int i)	{m_pos=(i<m_size)?i:m_size;}
-
-	int operator - (const CStringIterator& o) const
-	{
-		if (m_src != o.m_src) return 0;
-		return (int)(m_pos - o.m_pos);
-	}
-
 private:
-	const char* m_src;
-	unsigned int m_size;
-	unsigned int m_pos;
+	std::istream_iterator<unsigned char> m_itr;
+	std::istream_iterator<unsigned char> m_end;
 };
 
 }//namespace
