@@ -5,5 +5,5 @@ END
 
 TRANSACTION selectPicture -- (/picture/id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID",image,caption,info,width,height FROM Picture WHERE ID = $(id);
+	INTO picture DO NONEMPTY UNIQUE SELECT ID AS "id",image,caption,info,width,height FROM Picture WHERE ID = $(id);
 END
