@@ -3,12 +3,17 @@ show stoppers:
 - picture handling:
   - upload images
   - tag them
-  - tag handling (add, delete, etc) in a tree
   - assign pictures:
     - present pictures in a list
     - search them by tag
+- recover after errors in protocol:
+  - example, duplicate normalizedName
 
 musts:
+- QDialog instead of QWidget for forms
+  - would allow to have default Enter and ESC behaviour
+  - must be treated specially, as the form should NOT
+    replace the UI currently being shown
 - associate features and categories
 - save global state to settings and read it from there
   - global.XXX variables

@@ -383,13 +383,20 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 					int col = headers.indexOf( xml.name( ).toString( ) );
 					if( col != -1 ) {
 						QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
+// HACK: hard-coded, don't have types in the XML (like 'binary, base64 encoded')
 						if( xml.name( ) == "thumbnail" ) {
 							QByteArray encoded = text.toAscii( );
 							QByteArray decoded = QByteArray::fromBase64( encoded );
-							QPixmap p;
-							p.loadFromData( decoded );
-							QTableWidgetItem *item = new QTableWidgetItem( QIcon( p ), QString( ) );								
-							tableWidget->setItem( row, col, item );
+
+							QPixmap pixmap;
+							pixmap.loadFromData( decoded );
+
+							QLabel *label = new QLabel( );
+							label->setPixmap( pixmap );
+// HACK: assume the thumbnail is small enough to fit
+							label->setFixedSize( pixmap.size( ) );
+
+							tableWidget->setCellWidget( row, col, label );
 						} else {
 							QTableWidgetItem *item = new QTableWidgetItem( text );
 							item->setFlags( item->flags( ) ^ Qt::ItemIsEditable );
@@ -404,6 +411,9 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 				}
 			}
 		}
+// HACK: make sure the thumbs are visible
+		tableWidget->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+		tableWidget->resizeColumnsToContents( );
 	} else if( clazz == "QTreeWidget" ) {
 		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 		QTreeWidgetItem *header = treeWidget->headerItem( );
