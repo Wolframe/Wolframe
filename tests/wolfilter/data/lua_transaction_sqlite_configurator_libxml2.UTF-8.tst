@@ -504,24 +504,23 @@ END
 
 --
 -- selectCategory                 :Get the category
--- selectCategoryByName           :Get the category by name
 -- selectCategoryByNormalizedName :Get the category by name
 -- selectCategoryList             :Get a list of categories
 --
 TRANSACTION selectCategory -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Category WHERE ID = $(id);
 	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
 END
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Category WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Category WHERE normalizedName = $(normalizedName);
 	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $1;
 END
 
 TRANSACTION selectCategorySet -- (/category/id)
 BEGIN
-	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS "ID",name,normalizedName,description FROM Category WHERE ID = $(id);
+	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS "ID",name,normalizedName AS "normalizedName",description FROM Category WHERE ID = $(id) ORDER BY ID;
 END
 
 --
@@ -529,7 +528,7 @@ END
 --
 TRANSACTION selectTopCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID AS "ID",P2.parentID,P2.name,P2.normalizedName,P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 
 --
@@ -537,7 +536,7 @@ END
 --
 TRANSACTION selectSubCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID AS "ID",P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 --
 -- addFeature
@@ -545,7 +544,7 @@ END
 OPERATION addFeaturePicture -- ($1=featureID)(caption, info, image, width, height, thumbnail)
 BEGIN
 	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
-	DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
+	DO NONEMPTY UNIQUE getLastPictureID($1);
 	DO INSERT INTO FeaturePicture (featureID,pictureID) VALUES ($1,$2);
 END
 
@@ -583,32 +582,24 @@ END
 
 --
 -- selectFeature                 :Get the feature
--- selectFeatureByName           :Get the feature by name
 -- selectFeatureByNormalizedName :Get the feature by name
 -- selectFeatureList             :Get a list of categories
 --
 TRANSACTION selectFeature -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE ID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Feature WHERE ID = $(id);
 	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $(id);
-END
-
--- This is not supposed to exist, that's why we have the normalized name
-TRANSACTION selectFeatureByName -- (name)
-BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE name = $(name);
-	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $1;
 END
 
 TRANSACTION selectFeatureByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Feature WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Feature WHERE normalizedName = $(normalizedName);
 	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $1;
 END
 
 TRANSACTION selectFeatureSet -- (/feature/id)
 BEGIN
-	FOREACH /feature INTO feature DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Feature WHERE ID = $(id);
+	FOREACH /feature INTO feature DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName AS "normalizedName",description FROM Feature WHERE ID = $(id) ORDER BY ID;
 END
 
 --
@@ -616,7 +607,7 @@ END
 --
 TRANSACTION selectTopFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 
 --
@@ -624,7 +615,7 @@ END
 --
 TRANSACTION selectSubFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 --
 -- addTag
@@ -635,7 +626,7 @@ BEGIN
 	DO UPDATE Tag SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Tag SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Tag (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from Tag WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Tag WHERE normalizedName = $(normalizedName);
 END
 
 --
@@ -659,29 +650,22 @@ END
 
 --
 -- selectTag                 :Get the tag
--- selectTagByName           :Get the tag by name
 -- selectTagByNormalizedName :Get the tag by name
 -- selectTagList             :Get a list of categories
 --
 TRANSACTION selectTag -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE ID = $(id);
-END
-
--- This is not supposed to exist, that's why we have the normalized name
-TRANSACTION selectTagByName -- (name)
-BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Tag WHERE ID = $(id);
 END
 
 TRANSACTION selectTagByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Tag WHERE normalizedName = $(normalizedName);
 END
 
 TRANSACTION selectTagSet -- (/tag/id)
 BEGIN
-	FOREACH /tag INTO tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Tag WHERE ID = $(id);
+	FOREACH /tag INTO tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName AS "normalizedName",description FROM Tag WHERE ID = $(id) ORDER BY ID;
 END
 
 --
@@ -689,7 +673,7 @@ END
 --
 TRANSACTION selectTopTag -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 
 --
@@ -697,7 +681,7 @@ END
 --
 TRANSACTION selectSubTag -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 **outputfile:DBDUMP
 **file: transaction_configurator.lua
@@ -753,9 +737,7 @@ local function insert_itr( tablename, parentID, itr)
 			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
---DEBUG				logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG				logger.printc( "ID ", id)
 				name = nil
 				description = nil
 			end
@@ -763,9 +745,7 @@ local function insert_itr( tablename, parentID, itr)
 		end
 	end
 	if name then
---DEBUG		logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG		logger.printc( "ID ", id)
 	end
 	return id
 end
@@ -775,9 +755,7 @@ local function insert_topnode( tablename, name, description, picture, parentID)
 	if not parentID then
 		parentID = 1
 	end
---DEBUG	logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 	local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG	logger.printc( "ID ", id)
 	return id
 end
 
@@ -888,10 +866,6 @@ local function edit_node( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			id = v
-			-- don't allow editing of the root element (fast hack)
-			if id == "1" then
-				return
-			end
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
@@ -915,7 +889,6 @@ local function delete_node( tablename, itr)
 	if id == "1" then
 		return
 	end
---DEBUG	logger.printc( "delete" .. tablename, {id=id} )
 	formfunction( "delete" .. tablename)( {id=id} )
 end
 
@@ -1026,14 +999,40 @@ function createTag()
 	create_node( "Tag", input:get())
 end
 
-function PictureListRequest()
+function PictureListRequest( )
 	output:as( "list SYSTEM 'PictureList.simpleform'" )
 	filter().empty = false
-	local t = formfunction( "selectPictureList" )( {} ):table( )
-	output:opentag( "list" )
-	output:print( t )
-	output:closetag( )
+	local t = formfunction( "selectPictureList" )( {} )
+	local f = form( "Picture" );
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
 end
+
+function PictureRequest( )
+	output:as( "picture SYSTEM 'Picture.simpleform'")
+	filter().empty = false
+	local id = nil;
+	for v,t in input:get( ) do
+		if t == "id" then
+			id = v
+		end
+	end
+	local t = formfunction( "selectPicture" )( { id = id } )
+	local f = form( "Picture" );
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function editPicture( )
+	local picture = picture_value( input:get( ) )
+	formfunction( "updatePicture" )( { picture = picture } )
+end
+
+function createPicture( )
+	local picture = picture_value( input:get( ) )
+	formfunction( "addPicture" )( { picture = picture } )
+end
+
 
 
 function run()
