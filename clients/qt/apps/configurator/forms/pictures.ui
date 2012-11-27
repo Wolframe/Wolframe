@@ -114,7 +114,7 @@
         <string notr="true">delete</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">categories</string>
+        <string notr="true">pictures</string>
        </property>
        <property name="id" stdset="0">
         <string>{picture.id}</string>

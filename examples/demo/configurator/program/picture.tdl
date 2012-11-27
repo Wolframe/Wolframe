@@ -17,3 +17,8 @@ TRANSACTION addPicture -- (picture/caption, picture/info, picture/image, picture
 BEGIN
 	FOREACH picture DO INSERT INTO Picture( caption, info, image, width, height, thumbnail ) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail) );
 END
+
+TRANSACTION deletePicture -- (id)
+BEGIN
+	DO DELETE FROM Picture WHERE ID = $(id);
+END
