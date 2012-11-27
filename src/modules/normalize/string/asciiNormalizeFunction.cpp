@@ -35,6 +35,7 @@
 #include "textwolf/charset_utf8.hpp"
 #include "textwolf/istreamiterator.hpp"
 #include <boost/algorithm/string.hpp>
+#include "utils/miscUtils.hpp"
 
 using namespace _Wolframe;
 using namespace langbind;
@@ -209,6 +210,7 @@ std::string ConvDiaNormalizeFunction::execute( const std::string& str) const
 
 static std::string nameString( const std::string& str)
 {
+	const utils::CharTable optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
 	std::istringstream input( str);
 	std::ostringstream output;
 
@@ -220,7 +222,7 @@ static std::string nameString( const std::string& str)
 	std::string rt;
 	for (; ii != ee; ++ii)
 	{
-		if ((unsigned char)*ii > 32)
+		if ((unsigned char)*ii > 32 && !optab[(unsigned char)*ii])
 		{
 			if (*ii >= '0' && *ii <= '9') rt.push_back( *ii);
 			if (*ii >= 'a' && *ii <= 'z') rt.push_back( *ii);

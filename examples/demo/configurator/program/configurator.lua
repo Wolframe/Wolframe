@@ -1,7 +1,3 @@
-local function normalizeName( name)
-	return name:gsub("[^%s]+", string.lower):gsub("[%-()]+", " "):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
-end
-
 local function content_value( v, itr)
 	if v then
 		return v
@@ -43,7 +39,7 @@ local function insert_itr( tablename, parentID, itr)
 	for v,t in itr do
 		if (t == "name") then
 			name = content_value( v, itr)
-			nname = normalizeName( name)
+			nname = normalizer("name")( name)
 		elseif (t == "description") then
 			description = content_value( v, itr)
 		elseif (t == "picture") then
@@ -64,7 +60,7 @@ local function insert_itr( tablename, parentID, itr)
 end
 
 local function insert_topnode( tablename, name, description, picture, parentID)
-	local nname = normalizeName( name)
+	local nname = normalizer("name")( name)
 	if not parentID then
 		parentID = 1
 	end
@@ -181,7 +177,7 @@ local function edit_node( tablename, itr)
 			id = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)
-			nname = normalizeName( name)
+			nname = normalizer("name")( name)
 		elseif t == "description" then
 			description = content_value( v, itr)
 		elseif t == "picture" then
@@ -215,7 +211,7 @@ local function create_node( tablename, itr)
 			parentID = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)
-			nname = normalizeName( name)
+			nname = normalizer("name")( name)
 		elseif t ==  "description" then
 			description = content_value( v, itr)
 		elseif t ==  "picture" then

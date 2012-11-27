@@ -173,12 +173,8 @@
 <createTag><tag name="Tag1.5x" parentID="2"/></createTag>
 <TagHierarchyRequest><Tag id="1"/></TagHierarchyRequest>
 </test>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/postgresql/mod_db_postgresqltest --database 'identifier=testdb,host=localhost,port=5432,database=wolframe,user=wolfusr,password=wolfpwd,dumpfile=DBDUMP,inputfile=DBDATA,program=program.sql' --program=DBPRG.tdl run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program configurator.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/postgresql/mod_db_postgresqltest --database 'identifier=testdb,host=localhost,port=5432,database=wolframe,user=wolfusr,password=wolfpwd,dumpfile=DBDUMP,inputfile=DBDATA,program=program.sql' --program=DBPRG.tdl run
 
-**file:simpleform.normalize
-int=number:integer;
-uint=number:unsigned;
-float=number:float;
 **file: DBDATA
 -- The tags tree
 --
@@ -457,6 +453,11 @@ DOCTYPE "tag Tag"
 	normalizedName string
 	description string
 }
+**file:configurator.normalize
+int=number:integer;
+uint=number:unsigned;
+float=number:float;
+name=string:lcname;
 **file:program.sql
 -- Select the last ID created in the Picture table
 -- PF:HACK: Because we have no variables, we have also to reserve a result for what we whould store in a 'variable'
@@ -687,10 +688,6 @@ BEGIN
 END
 **outputfile:DBDUMP
 **file: transaction_configurator.lua
-local function normalizeName( name)
-	return name:gsub("[^%s]+", string.lower):gsub("[%-()]+", " "):gsub("^%s+", ""):gsub("%s+$", ""):gsub("%s+", " ")
-end
-
 local function content_value( v, itr)
 	if v then
 		return v
@@ -732,7 +729,7 @@ local function insert_itr( tablename, parentID, itr)
 	for v,t in itr do
 		if (t == "name") then
 			name = content_value( v, itr)
-			nname = normalizeName( name)
+			nname = normalizer("name")( name)
 		elseif (t == "description") then
 			description = content_value( v, itr)
 		elseif (t == "picture") then
@@ -753,7 +750,7 @@ local function insert_itr( tablename, parentID, itr)
 end
 
 local function insert_topnode( tablename, name, description, picture, parentID)
-	local nname = normalizeName( name)
+	local nname = normalizer("name")( name)
 	if not parentID then
 		parentID = 1
 	end
@@ -870,7 +867,7 @@ local function edit_node( tablename, itr)
 			id = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)
-			nname = normalizeName( name)
+			nname = normalizer("name")( name)
 		elseif t == "description" then
 			description = content_value( v, itr)
 		elseif t == "picture" then
@@ -904,7 +901,7 @@ local function create_node( tablename, itr)
 			parentID = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)
-			nname = normalizeName( name)
+			nname = normalizer("name")( name)
 		elseif t ==  "description" then
 			description = content_value( v, itr)
 		elseif t ==  "picture" then
@@ -1020,9 +1017,12 @@ function PictureRequest( )
 		end
 	end
 	local t = formfunction( "selectPicture" )( { id = id } )
-	local f = form( "Picture" );
+	local f = form( "Picture" )
 	f:fill( t:get( ) )
+	-- hack again, can't get the right subtags in TDL..
+	output:opentag( "dummy" )
 	output:print( f:get( ) )
+	output:closetag( )
 end
 
 function editPicture( )
@@ -1626,20 +1626,20 @@ tag:
 id, parentid, name, normalizedname, description, lft, rgt
 1, , _ROOT_, _ROOT_, Tags tree root, 1, 36
 2, 1, Tag1, tag1, , 2, 13
-3, 2, Tag1.1, tag1.1, , 3, 4
-4, 2, Tag1.2, tag1.2, , 5, 6
-5, 2, Tag1.3, tag1.3, , 7, 8
-6, 2, Tag1.4x, tag1.4x, , 9, 10
+3, 2, Tag1.1, tag1 1, , 3, 4
+4, 2, Tag1.2, tag1 2, , 5, 6
+5, 2, Tag1.3, tag1 3, , 7, 8
+6, 2, Tag1.4x, tag1 4x, , 9, 10
 7, 1, Tag2, tag2, , 14, 21
-8, 7, Tag2.1, tag2.1, , 15, 16
-9, 7, Tag2.2, tag2.2, , 17, 18
-11, 7, Tag2.4, tag2.4, , 19, 20
+8, 7, Tag2.1, tag2 1, , 15, 16
+9, 7, Tag2.2, tag2 2, , 17, 18
+11, 7, Tag2.4, tag2 4, , 19, 20
 12, 1, Tag3, tag3, , 22, 33
-13, 12, Tag3.1, tag3.1, , 23, 24
-14, 12, Tag3.2, tag3.2, , 25, 26
-15, 12, Tag3.3, tag3.3, , 27, 28
-16, 12, Tag3.4, tag3.4, , 29, 30
-17, 12, Tag3.5x, tag3.5x, , 31, 32
+13, 12, Tag3.1, tag3 1, , 23, 24
+14, 12, Tag3.2, tag3 2, , 25, 26
+15, 12, Tag3.3, tag3 3, , 27, 28
+16, 12, Tag3.4, tag3 4, , 29, 30
+17, 12, Tag3.5x, tag3 5x, , 31, 32
 18, 1, Tag5, tag5, , 34, 35
-19, 2, Tag1.5x, tag1.5x, , 11, 12
+19, 2, Tag1.5x, tag1 5x, , 11, 12
 **end
