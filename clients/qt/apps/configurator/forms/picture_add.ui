@@ -115,27 +115,55 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QTreeWidget" name="tag">
-     <property name="selectionMode">
-      <enum>QAbstractItemView::MultiSelection</enum>
-     </property>
-     <property name="headerHidden">
+    <widget class="QGroupBox" name="tagwrap">
+     <property name="enabled">
       <bool>true</bool>
      </property>
-     <property name="expandsOnDoubleClick">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <property name="checkable">
       <bool>false</bool>
      </property>
-     <property name="doctype" stdset="0">
-      <string>TagHierarchyRequest.simpleform</string>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string>tag</string>
-     </property>
-     <column>
-      <property name="text">
+     <widget class="QTreeWidget" name="tag">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>311</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::MultiSelection</enum>
+      </property>
+      <property name="headerHidden">
+       <bool>true</bool>
+      </property>
+      <property name="expandsOnDoubleClick">
+       <bool>false</bool>
+      </property>
+      <property name="doctype" stdset="0">
+       <string>TagHierarchyRequest.simpleform</string>
+      </property>
+      <property name="rootelement" stdset="0">
        <string>tag</string>
       </property>
-     </column>
+      <column>
+       <property name="text">
+        <string>tag</string>
+       </property>
+      </column>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -150,7 +178,6 @@
  <tabstops>
   <tabstop>caption</tabstop>
   <tabstop>info</tabstop>
-  <tabstop>tag</tabstop>
   <tabstop>add</tabstop>
   <tabstop>cancel</tabstop>
  </tabstops>

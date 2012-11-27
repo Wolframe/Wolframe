@@ -11,6 +11,11 @@ DOCTYPE "picture Picture"
 		height int
 		size int
 		tags string
+		tagwrap []
+		{
+			id @int
+			tag string
+		}
 	}
 	
 	tagwrap []
