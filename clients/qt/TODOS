@@ -1,9 +1,15 @@
 show stoppers:
-- associate features and categories
-- add tags in interface
-- actually design an interface
+- tag handling
+- picture handling:
+  - upload images
+  - tag them
+  - tag handling (add, delete, etc) in a tree
+  - assign pictures:
+    - present pictures in a list
+    - search them by tag
 
 musts:
+- associate features and categories
 - save global state to settings and read it from there
   - global.XXX variables
   - last form

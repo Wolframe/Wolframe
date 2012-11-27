@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Manage Categories</string>
+   <string>Manage Tags</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="4" column="0">
@@ -22,13 +22,13 @@
         <string>Add</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">category_add</string>
+        <string notr="true">tag_add</string>
        </property>
        <property name="global.id" stdset="0">
-        <string notr="true">{category.id}</string>
+        <string notr="true">{tag.id}</string>
        </property>
-       <property name="global.categoryState" stdset="0">
-        <string notr="true">{category.state}</string>
+       <property name="global.tagState" stdset="0">
+        <string>{tag.state}</string>
        </property>
       </widget>
      </item>
@@ -38,22 +38,22 @@
         <string>Delete</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">Category.simpleform</string>
+        <string notr="true">Tag.simpleform</string>
        </property>
        <property name="rootelement" stdset="0">
-        <string notr="true">category</string>
+        <string notr="true">tag</string>
        </property>
        <property name="action" stdset="0">
         <string notr="true">delete</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">categories</string>
+        <string notr="true">tags</string>
        </property>
        <property name="id" stdset="0">
-        <string>{category.id}</string>
+        <string>{tag.id}</string>
        </property>
-       <property name="global.categoryState" stdset="0">
-        <string notr="true">{category.state}</string>
+       <property name="global.tagState" stdset="0">
+        <string>{tag.state}</string>
        </property>
       </widget>
      </item>
@@ -63,26 +63,26 @@
         <string>Edit</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">category_edit</string>
+        <string notr="true">tag_edit</string>
        </property>
        <property name="global.id" stdset="0">
-        <string notr="true">{category.id}</string>
+        <string notr="true">{tag.id}</string>
        </property>
-       <property name="global.categoryState" stdset="0">
-        <string notr="true">{category.state}</string>
+       <property name="global.tagState" stdset="0">
+        <string>{tag.state}</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="reload_2">
        <property name="text">
-        <string>Main Menu</string>
+        <string>Back to Picture List</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">init</string>
+        <string notr="true">pictures</string>
        </property>
-       <property name="global.categoryState" stdset="0">
-        <string notr="true">{category.state}</string>
+       <property name="global.tagState" stdset="0">
+        <string>{tag.state}</string>
        </property>
       </widget>
      </item>
@@ -107,25 +107,25 @@
     </layout>
    </item>
    <item row="0" column="0" colspan="2">
-    <widget class="QTreeWidget" name="category">
+    <widget class="QTreeWidget" name="tag">
      <property name="itemsExpandable">
       <bool>true</bool>
      </property>
      <property name="doctype" stdset="0">
-      <string notr="true">CategoryHierarchyRequest.simpleform</string>
+      <string notr="true">TagHierarchyRequest.simpleform</string>
      </property>
      <property name="rootelement" stdset="0">
-      <string>category</string>
+      <string>tag</string>
      </property>
      <property name="state" stdset="0">
-      <string notr="true">{global.categoryState}</string>
+      <string notr="true">{global.tagState}</string>
      </property>
      <attribute name="headerDefaultSectionSize">
       <number>250</number>
      </attribute>
      <column>
       <property name="text">
-       <string>category</string>
+       <string>tag</string>
       </property>
      </column>
      <column>
@@ -151,14 +151,14 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>category</tabstop>
+  <tabstop>tag</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
    <sender>radioButton</sender>
    <signal>toggled(bool)</signal>
-   <receiver>category</receiver>
+   <receiver>tag</receiver>
    <slot>expandAll()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -174,7 +174,7 @@
   <connection>
    <sender>radioButton_2</sender>
    <signal>toggled(bool)</signal>
-   <receiver>category</receiver>
+   <receiver>tag</receiver>
    <slot>collapseAll()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -188,7 +188,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>category</sender>
+   <sender>tag</sender>
    <signal>doubleClicked(QModelIndex)</signal>
    <receiver>edit</receiver>
    <slot>click()</slot>

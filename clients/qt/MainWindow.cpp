@@ -412,7 +412,7 @@ void MainWindow::disconnected( )
 
 void MainWindow::wolframeError( QString error )
 {
- 	if( QMessageBox::information( this, tr( "Protocol error, reconfigure now?" ),
+ 	if( QMessageBox::information( m_ui, tr( "Protocol error, reconfigure now?" ),
 		tr( "Protocol error: %1, reconfigure client now?" ).arg( error ),
 		QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes ) {
 // fatal error, present the user a preferences dialog

@@ -1,10 +1,8 @@
 DOCTYPE "tag Tag"
 {
-	tag
-	{
-		id @int
-		parentID @int
-		name string
-		description string
-	}
+	id @int
+	parentID @int
+	name string
+	normalizedName string
+	description string
 }

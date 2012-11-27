@@ -328,10 +328,6 @@ function PictureListRequest()
 	filter().empty = false
 	local t = formfunction( "selectPictureList" )( {} ):table( )
 	output:opentag( "list" )
-	for k,v in pairs( t ) do
-		output:opentag( "picture" )
-		output:print( v )
-		output:closetag( )
-	end
+	output:print( t )
 	output:closetag( )
 end
