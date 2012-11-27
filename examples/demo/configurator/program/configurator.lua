@@ -342,9 +342,7 @@ function PictureRequest( )
 		end
 	end
 	local t = formfunction( "selectPicture" )( { id = id } )
-	logger:print( "ERROR", t )
 	local f = form( "Picture" );
 	f:fill( t:get( ) )
-	logger:print( "ERROR", f )
 	output:print( f:get( ) )
 end
