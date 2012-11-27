@@ -197,5 +197,22 @@
   <tabstop>picture</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>picture</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>edit</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>163</x>
+     <y>101</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>207</x>
+     <y>277</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

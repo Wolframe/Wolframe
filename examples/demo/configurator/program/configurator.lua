@@ -346,3 +346,8 @@ function PictureRequest( )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
 end
+
+function editPicture( )
+	local picture = picture_value( input:get( ) )
+	formfunction( "updatePicture" )( { picture = picture } )
+end
