@@ -12,3 +12,8 @@ TRANSACTION updatePicture -- (picture/id, picture/caption, picture/info, picture
 BEGIN
 	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image), width = $(width), height = $(height), thumbnail = $(thumbnail) WHERE ID = $(id);
 END
+
+TRANSACTION addPicture -- (picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
+BEGIN
+	FOREACH picture DO INSERT INTO Picture( caption, info, image, width, height, thumbnail ) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail) );
+END

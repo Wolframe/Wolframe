@@ -351,3 +351,9 @@ function editPicture( )
 	local picture = picture_value( input:get( ) )
 	formfunction( "updatePicture" )( { picture = picture } )
 end
+
+function createPicture( )
+	local picture = picture_value( input:get( ) )
+	formfunction( "addPicture" )( { picture = picture } )
+end
+
