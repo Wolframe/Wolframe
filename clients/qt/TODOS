@@ -15,6 +15,7 @@ musts:
   - implement state
     - viewport position
     - selected cells
+    - new way of reseting the form (no domain erase and reload)
 - QDialog instead of QWidget for forms
   - would allow to have default Enter and ESC behaviour
   - must be treated specially, as the form should NOT

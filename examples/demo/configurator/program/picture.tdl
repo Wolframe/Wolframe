@@ -54,11 +54,3 @@ TRANSACTION deletePicture -- (id)
 BEGIN
 	DO DELETE FROM Picture WHERE ID = $(id);
 END
-
-TRANSACTION selectPictureTags -- (picture/id)
-BEGIN
-	FOREACH picture INTO . DO SELECT name FROM PictureTag, Picture, Tag
-		WHERE PictureTag.pictureID = Picture.ID
-		AND PictureTag.tagID = Tag.ID
-		AND Picture.ID = $(id);
-END

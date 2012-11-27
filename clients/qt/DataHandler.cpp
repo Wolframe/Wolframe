@@ -292,6 +292,7 @@ void DataHandler::resetFormData( QWidget *form )
 		} else if( clazz == "QTableWidget" ) {
 			QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
 			tableWidget->clearContents( );			
+			// TODO: reset differently, after implementing the state property!
 		} else if( clazz == "FileChooser" ) {
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
 			fileChooser->setFileName( "" );

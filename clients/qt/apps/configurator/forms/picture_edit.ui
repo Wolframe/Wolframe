@@ -190,6 +190,7 @@
  <tabstops>
   <tabstop>caption</tabstop>
   <tabstop>info</tabstop>
+  <tabstop>tag</tabstop>
   <tabstop>save</tabstop>
   <tabstop>reset</tabstop>
   <tabstop>cancel</tabstop>
