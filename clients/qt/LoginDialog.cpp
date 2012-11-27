@@ -130,7 +130,7 @@ void LoginDialog::showPreferences( )
 	PreferencesDialog prefs;
 	
 	if( prefs.exec( ) == QDialog::Accepted ) {
-		//qDebug( ) << "Reloading application";
+		qDebug( ) << "Reloading application";
 		QApplication::instance( )->exit( RESTART_CODE );
 	}
 }

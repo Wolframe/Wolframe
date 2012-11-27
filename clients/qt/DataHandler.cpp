@@ -221,7 +221,7 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 			qWarning( ) << "Write for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 		}
 		
-		//qDebug( ) << "Wrote " << clazz << name;
+		qDebug( ) << "Wrote " << clazz << name;
 	}
 }
 
@@ -298,7 +298,7 @@ void DataHandler::resetFormData( QWidget *form )
 			qWarning( ) << "Reset for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 		}
 		
-		//qDebug( ) << "Reset " << clazz << name;
+		qDebug( ) << "Reset " << clazz << name;
 	}
 }
 
@@ -332,7 +332,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 			// the calling code generic..
 		}
 		
-		//qDebug( ) << "Domain load in " << clazz << name;
+		qDebug( ) << "Domain load in " << clazz << name;
 	}
 }
 
@@ -341,7 +341,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 	QWidget *widget = form->findChild<QWidget *>( widget_name );
 	QString clazz = widget->metaObject( )->className( ); 
 
-	//qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
+	qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
 
 	QXmlStreamReader xml( data );
 	if( clazz == "QComboBox" ) {
@@ -392,6 +392,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 							tableWidget->setItem( row, col, item );
 						} else {
 							QTableWidgetItem *item = new QTableWidgetItem( text );
+							item->setFlags( item->flags( ) ^ Qt::ItemIsEditable );
 							tableWidget->setItem( row, col, item );
 						}
 					}
@@ -457,7 +458,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 
 // iterate again and check against saved tree state
 		if( props->contains( "state" ) ) {
-			//qDebug( ) << "Restoring tree state for tree" << widget_name;
+			qDebug( ) << "Restoring tree state for tree" << widget_name;
 			QStringList stateList = props->value( "state" ).split( "|", QString::SkipEmptyParts );
 // expand tree first, otherwise parents get selected if we select a non-expanded subtree!
 			{
@@ -532,7 +533,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 			if( inForm ) {
 				if( xml.isStartElement( ) ) {
 					widget = qFindChild<QWidget *>( form, xml.name( ).toString( ) );
-					//qDebug( ) << "Reading from XML for" << xml.name( ) << "into" << widget;
+					qDebug( ) << "Reading from XML for" << xml.name( ) << "into" << widget;
 					if( widget ) {
 						clazz = widget->metaObject( )->className( ); 						
 						QXmlStreamAttributes attributes = xml.attributes( );
@@ -614,13 +615,13 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 									QRadioButton *radioButton = qobject_cast<QRadioButton *>( child );
 									QString subText = radioButton->text( );
 									QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
-									//qDebug( ) << "radio" << name << subText << subText << name << subName;
+									qDebug( ) << "radio" << name << subText << subText << name << subName;
 									radioButton->setChecked( text.compare( subName ) == 0 );
 								} else if( subClazz == "QCheckBox" ) {
 									QCheckBox *checkBox = qobject_cast<QCheckBox *>( child );
 									QString subText = checkBox->text( );
 									QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
-									//qDebug( ) << "checkbox" << name << subText << subText << name << subName;
+									qDebug( ) << "checkbox" << name << subText << subText << name << subName;
 									if( text.compare( subName ) == 0 ) {
 										checkBox->setChecked( true );
 									}
@@ -702,7 +703,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 {
 	QStringList parts = variable.split( "." );
 
-	//qDebug( ) << "Evaluating variable" << variable;
+	qDebug( ) << "Evaluating variable" << variable;
 	
 // expecting a widget name as first argument
 	if( parts[0].isNull( ) ) {

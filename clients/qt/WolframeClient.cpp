@@ -118,7 +118,7 @@ void WolframeClient::sslErrors( const QList<QSslError> &errors )
 			if( e.error( ) == QSslError::SelfSignedCertificateInChain) continue;
 			if( e.error( ) == QSslError::HostNameMismatch) continue;
 			m_hasErrors = true;	
-			//qDebug( ) << "SSL ERROR: " << e;
+			qDebug( ) << "SSL ERROR: " << e;
 			emit error( e.errorString( ) );
 		}
 // ignore them		
@@ -135,7 +135,7 @@ void WolframeClient::peerVerifyError( const QSslError &e )
 		if( e.error( ) == QSslError::SelfSignedCertificateInChain ) return;
 		if( e.error( ) == QSslError::HostNameMismatch) return;
 		m_hasErrors = true;
-		//qDebug( ) << "PEER VERIFY SSL ERROR: " << e;
+		qDebug( ) << "PEER VERIFY SSL ERROR: " << e;
 		emit error( e.errorString( ) );
 	}
 }
@@ -483,7 +483,7 @@ void WolframeClient::handleResult( )
 {
 	m_state = Connected;
 	
-	//qDebug( ) << "handle result of command" << m_command;
+	qDebug( ) << "handle result of command" << m_command;
 	//<< "\nparams:" << m_params << "\n:answer:" << m_answer;
 	if( m_command == "CONNECT" ) {
 		// swallow greeting line from server after connect

@@ -66,6 +66,8 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	initialize( );
 }
 
+static bool debug = false;
+
 void MainWindow::readSettings( )
 {
 	Preferences *prefs = Preferences::instance( );
@@ -80,6 +82,7 @@ void MainWindow::readSettings( )
 	m_dataLoadMode = prefs->dataLoadMode( );
 	m_dbName = prefs->dbName( );
 	m_debug = prefs->debug( );
+	debug = m_debug;
 	m_uiFormsDir = prefs->uiFormsDir( );
 	m_uiFormTranslationsDir = prefs->uiFormTranslationsDir( );
 	m_dataLoaderDir = prefs->dataLoaderDir( );
@@ -96,12 +99,24 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 {
 	switch( type ) {
 		case QtDebugMsg:
+			if( debug ) {
+				if( debugTerminal ) {
+					debugTerminal->sendComment( msg );
+				}
+				fprintf( stderr, "%s\n", msg );
+			}
+			break;
+
 		case QtWarningMsg:
+			fprintf( stderr, "WARNING: %s\n", msg );
+			break;
+			
 		case QtCriticalMsg:
+			fprintf( stderr, "CRITICAL: %s\n", msg );
+			break;
+
 		case QtFatalMsg:
-			if( debugTerminal )
-				debugTerminal->sendComment( msg );
-			fprintf( stderr, "%s\n", msg );
+			fprintf( stderr, "FATAL: %s\n", msg );
 			break;
 			
 		default:
@@ -176,7 +191,7 @@ void MainWindow::parseArgs( )
 
 void MainWindow::switchFound( const QString &name )
 {
-	//qDebug( ) << "switch" << name;
+	qDebug( ) << "switch" << name;
 	if( name == "ui-local-file" ) {
 		m_uiLoadMode = LocalFile;
 	} else if( name == "ui-local-db" ) {
@@ -198,7 +213,7 @@ void MainWindow::switchFound( const QString &name )
 
 void MainWindow::optionFound( const QString &name, const QVariant &value )
 {
-	//qDebug( ) << "option" << name << "with" << value;
+	qDebug( ) << "option" << name << "with" << value;
 	if( name == "settings" ) {
 		m_settings = value.toString( );
 	} else if( name == "host" ) {
@@ -216,9 +231,9 @@ void MainWindow::optionFound( const QString &name, const QVariant &value )
 	}
 }
 
-void MainWindow::paramFound( const QString & /*name*/, const QVariant &/*value*/ )
+void MainWindow::paramFound( const QString &name, const QVariant &value )
 {
-	//qDebug( ) << "param" << name << "with" << value;
+	qDebug( ) << "param" << name << "with" << value;
 }
 
 void MainWindow::parseError( const QString &error )
@@ -241,7 +256,7 @@ void MainWindow::initialize( )
 	qInstallMsgHandler( &myMessageOutput );
 	if( m_debug ) m_debugTerminal->bringToFront( );
 #endif
-	//qDebug( ) << "Debug window initialized";
+	qDebug( ) << "Debug window initialized";
 
 // open local sqlite database
 	if( m_uiLoadMode == LocalDb || m_dataLoadMode == LocalDb ) {
@@ -286,7 +301,7 @@ void MainWindow::initialize( )
 	m_uiLoader->addPluginPath( "plugins" );
 	m_uiLoader->addPluginPath( "." );
 	QStringList paths = m_uiLoader->pluginPaths( );
-	//qDebug( ) << "Will load custom widget plugins from" << paths;
+	qDebug( ) << "Will load custom widget plugins from" << paths;
 	
 // for testing, load lists of available forms from the files system or
 // a local sqlite database, pass the form loader to the FormWidget
@@ -404,7 +419,7 @@ void MainWindow::wolframeError( QString error )
 		if( !m_dataLoader || !m_formLoader ) {
 			PreferencesDialog prefs( m_languages, m_ui );
 			if( prefs.exec( ) == QDialog::Accepted ) {
-				//qDebug( ) << "Reloading application";
+				qDebug( ) << "Reloading application";
 				QApplication::instance( )->exit( RESTART_CODE );
 			} else {
 // fatal situation, terminate
@@ -419,7 +434,7 @@ void MainWindow::authenticationOk( )
 	m_loginDialog->close( );
 	m_loginDialog->deleteLater( );
 	
-	//qDebug( ) << "authentication succeeded";
+	qDebug( ) << "authentication succeeded";
 
 // create network based form ...
 	if( m_uiLoadMode == Network ) {
@@ -439,7 +454,7 @@ void MainWindow::authenticationFailed( )
 	m_loginDialog->close( );
 	m_loginDialog->deleteLater( );
 
-	//qDebug( ) << "authentication failed";
+	qDebug( ) << "authentication failed";
 	
 	QApplication::instance( )->exit( RESTART_CODE );
 }
@@ -596,7 +611,7 @@ void MainWindow::languageSelected( QAction *action )
 
 void MainWindow::loadLanguage( QString language )
 {		
-	//qDebug( ) << "Switching interface language to " << language;
+	qDebug( ) << "Switching interface language to " << language;
 
 // get list of all translators currently floating around and delete them
 	const QList<QTranslator *> oldTranslators( findChildren<QTranslator *>( ) );
@@ -645,7 +660,7 @@ void MainWindow::themeSelected( QAction *action )
 void MainWindow::formSelected( QAction *action )
 {		
 	QString form = action->text( );
-	//qDebug( ) << "Form " << form << " selected (current form:" << m_currentForm << ")";
+	qDebug( ) << "Form " << form << " selected (current form:" << m_currentForm << ")";
 	if( form != m_currentForm )
 		loadForm( form );
 }
@@ -675,7 +690,7 @@ void MainWindow::formLoaded( QString name )
 
 void MainWindow::formError( QString error )
 {
-	//qDebug( ) << "Form error: " << error;
+	qDebug( ) << "Form error: " << error;
  	
 // not busy anymore
 	qApp->restoreOverrideCursor();
@@ -685,7 +700,7 @@ void MainWindow::formError( QString error )
 
 void MainWindow::on_actionRestart_triggered( )
 {
-	//qDebug( ) << "Restarting application";
+	qDebug( ) << "Restarting application";
 	QApplication::instance( )->exit( RESTART_CODE );
 }
 
@@ -707,7 +722,7 @@ void MainWindow::on_actionPreferences_triggered( )
 {
 	PreferencesDialog prefs( m_languages, m_ui );
 	if( prefs.exec( ) == QDialog::Accepted ) {
-		//qDebug( ) << "Reloading application";
+		qDebug( ) << "Reloading application";
 		QApplication::instance( )->exit( RESTART_CODE );
 	}
 }

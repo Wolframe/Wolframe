@@ -27,9 +27,9 @@ void SqliteFormLoader::initialize( )
 // check version of schema, create schema if necessary
 	Version v = getSchemaVersion( );
 	if( v.valid( ) ) {
-		//qDebug( ) << "version of schema is " << v.toString( );
+		qDebug( ) << "version of schema is " << v.toString( );
 	} else {
-		//qDebug( ) << "No version info found in database, creating schema now";
+		qDebug( ) << "No version info found in database, creating schema now";
 		QSqlDatabase db = QSqlDatabase::database( m_dbName );
 
 // schema creation		

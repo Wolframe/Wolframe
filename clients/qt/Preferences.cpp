@@ -41,10 +41,10 @@ QSettings *Preferences::createSettings( )
 	QSettings *s;
 	if( m_fileName.isNull( ) ) {
 		s = new QSettings( m_organization, m_application );
-		//qDebug( ) << "Using default settings file";
+		qDebug( ) << "Using default settings file";
 	} else {
 		s = new QSettings( m_fileName, QSettings::IniFormat );
-		//qDebug( ) << "Using file " << m_fileName << "as settings file";
+		qDebug( ) << "Using file " << m_fileName << "as settings file";
 	}
 	
 	return s;
