@@ -736,7 +736,10 @@ void MainWindow::on_actionManageStorage_triggered( )
 void MainWindow::on_actionAbout_triggered( )
 {
 	QString info = QString(
-		tr( "Wolframe Qt client\n\nVersion %1\n(c) 2012 Wolframe Group" ).arg( WOLFRAME_VERSION ) );
+		tr( "Wolframe Qt client\n\nVersion %1\n(c) 2012 Wolframe Group\n\nBuild: %2 %3" )
+			.arg( WOLFRAME_VERSION )
+			.arg( __DATE__ )
+			.arg( __TIME__ ) );
 	QMessageBox::about( m_ui, tr( "About" ), info );
 }
 
