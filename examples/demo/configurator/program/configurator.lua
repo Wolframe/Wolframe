@@ -323,11 +323,26 @@ function createTag()
 	create_node( "Tag", input:get())
 end
 
-function PictureListRequest()
+function PictureListRequest( )
 	output:as( "list SYSTEM 'PictureList.simpleform'" )
 	filter().empty = false
 	local t = formfunction( "selectPictureList" )( {} ):table( )
 	output:opentag( "list" )
 	output:print( t )
 	output:closetag( )
+end
+
+function PictureRequest( )
+	output:as( "picture SYSTEM 'Picture.simpleform'")
+	filter().empty = false
+	local id = nil;
+	for v,t in input:get( ) do
+		if t == "id" then
+			id = v
+		end
+	end
+	id = 1
+	local t = formfunction( "selectPicture" )( { id = id } ):table( )
+	output:print( t )
+	logger:print( "ERROR", t )
 end

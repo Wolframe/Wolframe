@@ -83,19 +83,19 @@
      <item>
       <widget class="QPushButton" name="add">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>Add</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">category_add</string>
+        <string notr="true">picture_add</string>
        </property>
        <property name="global.id" stdset="0">
-        <string notr="true">{category.id}</string>
+        <string notr="true">{picture.id}</string>
        </property>
-       <property name="global.categoryState" stdset="0">
-        <string notr="true">{category.state}</string>
+       <property name="global.pictureState" stdset="0">
+        <string>{picture.state}</string>
        </property>
       </widget>
      </item>
@@ -143,6 +143,19 @@
        </property>
        <property name="global.categoryState" stdset="0">
         <string notr="true">{category.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="reset_2">
+       <property name="text">
+        <string>Info</string>
+       </property>
+       <property name="id" stdset="0">
+        <string notr="true">{picture.id}</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>picture_show</string>
        </property>
       </widget>
      </item>

@@ -169,7 +169,7 @@
         <string>picture_info</string>
        </property>
        <property name="global.picture_doctype" stdset="0">
-        <string notr="true">CategoryRequest.simpleForm</string>
+        <string notr="true">CategoryRequest.simpleform</string>
        </property>
        <property name="global.picture_back" stdset="0">
         <string notr="true">category_edit</string>

@@ -680,18 +680,23 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							// skip, generic widget, don't possibly know how to reset it
 						} else if( clazz == "QLabel" ) {
 							// labels can usually not be edited, at the moment we use them to show
-							// images only
+							// images and text
 							QLabel *label = qobject_cast<QLabel *>( widget );
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
-							QByteArray encoded = text.toAscii( );
-							QByteArray decoded = QByteArray::fromBase64( encoded );
-							QPixmap p;
-							p.loadFromData( decoded );	
-							if( !p.isNull( ) ) {							
-								int w = std::min( label->width( ), p.width( ) );
-								int h = std::min( label->height( ), p.height( ) );							
-								label->setPixmap( p.scaled( QSize( w, h ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
-								label->adjustSize( );
+							if( xml.name( ) == "image" || xml.name( ) == "thumbnail" ) {
+// HACK: no types -> detect pictures by name							
+								QByteArray encoded = text.toAscii( );
+								QByteArray decoded = QByteArray::fromBase64( encoded );
+								QPixmap p;
+								p.loadFromData( decoded );	
+								if( !p.isNull( ) ) {							
+									int w = std::min( label->width( ), p.width( ) );
+									int h = std::min( label->height( ), p.height( ) );							
+									label->setPixmap( p.scaled( QSize( w, h ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
+									label->adjustSize( );
+								}
+							} else {
+								label->setText( text );
 							}
 						} else {
 							qWarning( ) << "Read for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
@@ -738,7 +743,23 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 	
 // properties differ depending on the class of the widget	
 	QString clazz = widget->metaObject( )->className( );
-	if( clazz == "QTreeWidget" ) {
+
+	if( clazz == "QTableWidget" ) {
+		QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
+// always return data of the selected row (assuming single select for now and
+// row select only)
+// the ID is currently hard-coded in user data
+		if( property == "id" ) {
+			QList<QTableWidgetItem *> items = tableWidget->selectedItems( );
+			if( items.empty( ) ) {
+// nothing is selected, return the id of the root element, which is always 1
+				return QString( "1" );
+			}
+// TODO:XXXX
+			return QString( "1" );
+//			return items[0]->data( 0, Qt::UserRole ).toString( );							
+		}
+	} else if( clazz == "QTreeWidget" ) {
 		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 		
 // always return data of the selected item (assuming single select for now)

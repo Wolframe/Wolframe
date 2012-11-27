@@ -8,6 +8,7 @@ show stoppers:
     - search them by tag
 - recover after errors in protocol:
   - example, duplicate normalizedName
+- set focus in forms
 
 musts:
 - QDialog instead of QWidget for forms
