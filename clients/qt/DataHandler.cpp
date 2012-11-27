@@ -275,10 +275,20 @@ void DataHandler::resetFormData( QWidget *form )
 			radioButton->setChecked( false );
 		} else if( clazz == "QListWidget" ) {
 			QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
-			listWidget->clear( );
+//			listWidget->clear( );
+			for( int i = 0; i < listWidget->count( ); i++ ) {
+				QListWidgetItem *item = listWidget->item( i );
+				item->setSelected( false );
+			}
 		} else if( clazz == "QTreeWidget" ) {
 			QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
-			treeWidget->clear( );
+//			treeWidget->clear( );
+			QTreeWidgetItemIterator it( treeWidget );
+			while( *it ) {
+				(*it)->setSelected( false );
+				(*it)->setExpanded( false );
+				it++;
+			}
 		} else if( clazz == "QTableWidget" ) {
 			QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
 			tableWidget->clearContents( );			
@@ -535,7 +545,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 {
 	QXmlStreamReader xml( data );
 	QWidget *widget = 0;
-	bool inForm = false;
+	bool inForm = true /* false */;
 	QString clazz;
 
 // search for root element (new) or form name (old)
@@ -547,14 +557,17 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 	}
 	
 	resetFormData( form );
-	loadFormDomains( formName, form );
+	//loadFormDomains( formName, form );
 	
 	while( !xml.atEnd( ) ) {
 		xml.readNext( );
 		if( xml.isStartElement( ) && xml.name( ) == name ) {
 			inForm = true;
 		} else if( xml.isEndElement( ) && xml.name( ) == name ) {
-			inForm = false;
+// HACK: in theory we should check for subforms, currently we can't prepare the
+// data in the layers below as we want, so we do an everywhere match (global namespace
+// for all widgets), which is quite dangerous!
+			//inForm = false;
 		} else {
 			if( inForm ) {
 				if( xml.isStartElement( ) ) {
@@ -673,7 +686,15 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 						} else if( clazz == "QTreeWidget" ) {
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
-							QList<QTreeWidgetItem *> items = treeWidget->findItems( text, Qt::MatchExactly | Qt::MatchRecursive, 0 );
+							QList<QTreeWidgetItem *> items = treeWidget->findItems( text, Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 0 );
+qDebug( ) << "XXX:" << xml.name( ).toString( ) << ":" << text << ":" << items;
+QTreeWidgetItemIterator it(treeWidget);
+while (*it) {
+  qDebug() << "XXX:IT" << (*it)->text(0); 
+  if ((*it)->text(0)== text)
+    qDebug( ) << "XXX: YES!";
+  ++it;
+}							
 							foreach( QTreeWidgetItem *item, items ) {
 								item->setSelected( true );
 								QTreeWidgetItem *parent = item->parent( );

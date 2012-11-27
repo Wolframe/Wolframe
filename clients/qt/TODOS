@@ -1,7 +1,5 @@
 show stoppers:
-- tag handling
 - picture handling:
-  - upload images
   - tag them
   - assign pictures:
     - present pictures in a list
@@ -9,8 +7,10 @@ show stoppers:
 - recover after errors in protocol:
   - example, duplicate normalizedName
 - set focus in forms
-
+  
 musts:
+- how to comminicate tags which are used by picture and 
+  they should not be deletable?
 - QTableWidget:
   - implement state
     - viewport position

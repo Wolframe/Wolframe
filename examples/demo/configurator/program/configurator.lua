@@ -331,9 +331,12 @@ function PictureRequest( )
 		end
 	end
 	local t = formfunction( "selectPicture" )( { id = id } )
-	local f = form( "Picture" );
+	local f = form( "Picture" )
 	f:fill( t:get( ) )
+	-- hack again, can't get the right subtags in TDL..
+	output:opentag( "dummy" )
 	output:print( f:get( ) )
+	output:closetag( )
 end
 
 function editPicture( )
