@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>dummy</class>
+ <widget class="QWidget" name="dummy">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>391</width>
-    <height>337</height>
+    <width>392</width>
+    <height>405</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,6 +26,9 @@
    <string>picture</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
    <item row="0" column="0">
     <widget class="QLabel" name="label_caption">
      <property name="text">
@@ -59,7 +62,55 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_tag">
+     <property name="text">
+      <string>Tags:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QTreeWidget" name="tag">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::MultiSelection</enum>
+     </property>
+     <property name="headerHidden">
+      <bool>true</bool>
+     </property>
+     <property name="expandsOnDoubleClick">
+      <bool>false</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string>TagHierarchyRequest.simpleform</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>tag</string>
+     </property>
+     <column>
+      <property name="text">
+       <string>tag</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_image">
+     <property name="text">
+      <string>Image:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="PictureChooser" name="image">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>200</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <spacer name="horizontalSpacer">
@@ -127,23 +178,6 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_image">
-     <property name="text">
-      <string>Image:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="PictureChooser" name="image">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>200</height>
-      </size>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -156,6 +190,7 @@
  <tabstops>
   <tabstop>caption</tabstop>
   <tabstop>info</tabstop>
+  <tabstop>tag</tabstop>
   <tabstop>save</tabstop>
   <tabstop>reset</tabstop>
   <tabstop>cancel</tabstop>

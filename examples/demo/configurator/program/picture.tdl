@@ -1,21 +1,53 @@
 TRANSACTION selectPictureList
 BEGIN
-	INTO list/picture DO NONEMPTY SELECT ID AS "id",thumbnail,caption,info,width,height,3*length(image)/4+2 as size FROM Picture;
+	INTO list/picture DO
+		SELECT Picture.ID AS "id", thumbnail, caption, info, width, height,
+			coalesce( group_concat( Tag.name, ', ' ), '' ) as tags,
+			3*length(image)/4+2 as size
+		FROM Picture
+		LEFT JOIN PictureTag
+		ON PictureTag.pictureID = Picture.ID
+		LEFT JOIN Tag
+		ON PictureTag.tagID = Tag.ID
+		GROUP BY Picture.ID;
 END
 
 TRANSACTION selectPicture -- (/picture/id)
 BEGIN
-	INTO picture DO NONEMPTY UNIQUE SELECT ID AS "id",image,caption,info,width,height,3*length(image)/4+2 as size FROM Picture WHERE ID = $(id);
+	INTO picture DO UNIQUE
+		SELECT Picture.ID AS "id", image, caption, info, width, height,
+			coalesce( group_concat( Tag.name, ', ' ), '' ) as tags,
+			3*length(image)/4+2 as size
+		FROM Picture
+		LEFT JOIN PictureTag
+		ON PictureTag.pictureID = Picture.ID
+		LEFT JOIN Tag
+		ON PictureTag.tagID = Tag.ID
+		WHERE Picture.ID = $(id);
+
+	-- HACK from here, see wrapper element in LUA code, no other solution found..
+	INTO tagwrap DO
+		select Tag.ID AS "id", name as tag
+		FROM Tag
+		LEFT JOIN PictureTag
+		ON PictureTag.tagID = Tag.ID
+		LEFT JOIN Picture
+		ON PictureTag.pictureID = Picture.ID
+		WHERE Picture.ID = $(id);		
 END
 
 TRANSACTION updatePicture -- (picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
 BEGIN
-	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image), width = $(width), height = $(height), thumbnail = $(thumbnail) WHERE ID = $(id);
+	FOREACH picture DO UPDATE Picture SET
+		caption = $(caption), info = $(info), image = $(image),
+		width = $(width), height = $(height), thumbnail = $(thumbnail)
+		WHERE ID = $(id);
 END
 
 TRANSACTION addPicture -- (picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
 BEGIN
-	FOREACH picture DO INSERT INTO Picture( caption, info, image, width, height, thumbnail ) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail) );
+	FOREACH picture DO INSERT INTO Picture( caption, info, image, width, height, thumbnail )
+		VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail) );
 END
 
 TRANSACTION deletePicture -- (id)

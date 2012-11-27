@@ -10,8 +10,15 @@ DOCTYPE "picture Picture"
 		width int
 		height int
 		size int
+		tags string
 	}
 	
+	tagwrap []
+	{
+		id @int
+		tag string
+	}
+
 	list
 	{
 		picture []
@@ -24,6 +31,7 @@ DOCTYPE "picture Picture"
 			width int
 			height int
 			size int
+			tags string
 		}
 	}
 }

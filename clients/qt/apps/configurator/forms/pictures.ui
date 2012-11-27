@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>631</width>
-    <height>297</height>
+    <width>530</width>
+    <height>321</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,17 +63,7 @@
      </column>
      <column>
       <property name="text">
-       <string>width</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>height</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>size</string>
+       <string>tags</string>
       </property>
      </column>
     </widget>
@@ -195,6 +185,12 @@
  </widget>
  <tabstops>
   <tabstop>picture</tabstop>
+  <tabstop>add</tabstop>
+  <tabstop>delete_2</tabstop>
+  <tabstop>edit</tabstop>
+  <tabstop>reset_2</tabstop>
+  <tabstop>form1</tabstop>
+  <tabstop>reload_2</tabstop>
  </tabstops>
  <resources/>
  <connections>

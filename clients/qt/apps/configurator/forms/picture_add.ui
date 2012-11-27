@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>388</width>
-    <height>347</height>
+    <height>399</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -107,6 +107,37 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_tags">
+     <property name="text">
+      <string>Tags</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QTreeWidget" name="tag">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::MultiSelection</enum>
+     </property>
+     <property name="headerHidden">
+      <bool>true</bool>
+     </property>
+     <property name="expandsOnDoubleClick">
+      <bool>false</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string>TagHierarchyRequest.simpleform</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>tag</string>
+     </property>
+     <column>
+      <property name="text">
+       <string>tag</string>
+      </property>
+     </column>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -117,8 +148,9 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>info</tabstop>
   <tabstop>caption</tabstop>
+  <tabstop>info</tabstop>
+  <tabstop>tag</tabstop>
   <tabstop>add</tabstop>
   <tabstop>cancel</tabstop>
  </tabstops>

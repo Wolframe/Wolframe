@@ -204,7 +204,7 @@ void NetworkDataLoader::handleDomainDataLoad( QString formName, QString widgetNa
 	xml.writeEndElement( );
 	xml.writeEndDocument( );
 
-	qDebug( ) << "network request:\n" << data;
+	qDebug( ) << "domain data load network request"<< formName << widgetName << ":\n" << data;
 	
 // what doctype do we expect in the answer?
 	QString action = props->value( "action" );
