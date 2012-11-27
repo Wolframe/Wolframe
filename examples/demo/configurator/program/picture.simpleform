@@ -10,6 +10,7 @@ DOCTYPE "picture Picture"
 		width int
 		height int
 		size int
+		tags string
 	}
 	
 	list
@@ -24,6 +25,7 @@ DOCTYPE "picture Picture"
 			width int
 			height int
 			size int
+			tags string
 		}
 	}
 }
