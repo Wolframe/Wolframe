@@ -11,4 +11,19 @@ DOCTYPE "picture Picture"
 		height int
 		size int
 	}
+	
+	list
+	{
+		picture []
+		{
+			id @int
+			caption string
+			info string
+			thumbnail string
+			image string
+			width int
+			height int
+			size int
+		}
+	}
 }

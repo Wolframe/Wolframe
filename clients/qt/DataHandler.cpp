@@ -373,12 +373,15 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 		}
 		int row = 0;
 		bool inData = false;
+		QXmlStreamAttributes attributes;
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
 			if( xml.isStartElement( ) ) {
 				if( xml.name( ) == widget_name ) {
 					inData = true;
 					tableWidget->insertRow( row );
+// HACK: map attributes of rows into cells, not happy with that one!					
+					attributes = xml.attributes( );
 				} else if( inData ) {
 					int col = headers.indexOf( xml.name( ).toString( ) );
 					if( col != -1 ) {
@@ -396,11 +399,22 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 // HACK: assume the thumbnail is small enough to fit
 							label->setFixedSize( pixmap.size( ) );
 
+							QTableWidgetItem *item = new QTableWidgetItem( QString( ) );
+							item->setFlags( item->flags( ) ^ Qt::ItemIsEditable );
+							tableWidget->setItem( row, col, item );
+							
 							tableWidget->setCellWidget( row, col, label );
 						} else {
 							QTableWidgetItem *item = new QTableWidgetItem( text );
 							item->setFlags( item->flags( ) ^ Qt::ItemIsEditable );
 							tableWidget->setItem( row, col, item );
+						}
+// attributes like id are mapped to cell user data
+						foreach( QXmlStreamAttribute attr, attributes ) {
+							QVariant v;
+							v.setValue( attr.value( ).toString( ) );
+							QTableWidgetItem *item = tableWidget->item( row, col );
+							item->setData( Qt::UserRole, v );
 						}
 					}
 				}
@@ -755,9 +769,12 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 // nothing is selected, return the id of the root element, which is always 1
 				return QString( "1" );
 			}
-// TODO:XXXX
-			return QString( "1" );
-//			return items[0]->data( 0, Qt::UserRole ).toString( );							
+			foreach( QTableWidgetItem *item, items ) {
+// HACK: return /picture@id, first user element, besser mapping can be found later
+				return item->data( Qt::UserRole ).toString( );
+			}
+		} else {
+			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in varaiable" << variable;
 		}
 	} else if( clazz == "QTreeWidget" ) {
 		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
@@ -792,6 +809,8 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 			}
 
 			return state;
+		} else {
+			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in varaiable" << variable;
 		}
 	} else {
 // non supported class

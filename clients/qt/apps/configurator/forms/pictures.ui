@@ -91,9 +91,6 @@
        <property name="form" stdset="0">
         <string notr="true">picture_add</string>
        </property>
-       <property name="global.id" stdset="0">
-        <string notr="true">{picture.id}</string>
-       </property>
        <property name="global.pictureState" stdset="0">
         <string>{picture.state}</string>
        </property>
@@ -102,16 +99,16 @@
      <item>
       <widget class="QPushButton" name="delete_2">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>Delete</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">Category.simpleform</string>
+        <string notr="true">Picture.simpleform</string>
        </property>
        <property name="rootelement" stdset="0">
-        <string notr="true">category</string>
+        <string notr="true">picture</string>
        </property>
        <property name="action" stdset="0">
         <string notr="true">delete</string>
@@ -120,29 +117,29 @@
         <string notr="true">categories</string>
        </property>
        <property name="id" stdset="0">
-        <string>{category.id}</string>
+        <string>{picture.id}</string>
        </property>
-       <property name="global.categoryState" stdset="0">
-        <string notr="true">{category.state}</string>
+       <property name="global.pictureState" stdset="0">
+        <string>{picture.state}</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="edit">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>Edit</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">category_edit</string>
+        <string notr="true">picture_edit</string>
        </property>
        <property name="global.id" stdset="0">
-        <string notr="true">{category.id}</string>
+        <string notr="true">{picture.id}</string>
        </property>
-       <property name="global.categoryState" stdset="0">
-        <string notr="true">{category.state}</string>
+       <property name="global.pictureState" stdset="0">
+        <string>{picture.state}</string>
        </property>
       </widget>
      </item>
