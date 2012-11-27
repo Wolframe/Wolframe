@@ -26,22 +26,26 @@ class BoostLocaleFixture : public ::testing::Test
 
 			// set this backend globally:
 			boost::locale::localization_backend_manager::global(my);
-
-			// initialize a standard locale
-			std::locale loc = boost::locale::generator().generate("");
-			std::locale::global( loc );
 		}
 };
 
-TEST_F( BoostLocaleFixture, SimpleTest )
+TEST_F( BoostLocaleFixture, SimpleTestLowerCase )
 {
-//	const std::string input = "gr""\xC3\xBC""\xC3\x9F""en";		//Isolatin: grüßen
-//	std::string output = boost::locale::to_upper( input );
-//	const std::string must = "GR""\xC3\x9C""SSEN";			//Isolatin: GRÜSSEN (ICU converts #S to SS)
-	const std::string input = "gr""\xC3\xBC""bel";			//Isolatin: grübel
-	std::string output = boost::locale::to_upper( input );
-	const std::string must = "GR""\xC3\x9C""BEL";			//Isolatin: GRÜBEL
-	EXPECT_EQ( output, must );
+	static const unsigned char input[] = { 'G','r', 0xC3, 0x9C, 0xC3, 0xBC, 'b', 'E', 'l', 0 };
+	static const unsigned char must[] = { 'g','r', 0xC3, 0xBC, 0xC3, 0xBC, 'b', 'e', 'l', 0 };
+
+	std::locale loc = boost::locale::generator()("");
+	std::string output = boost::locale::to_lower( std::string((const char*)input), loc);
+	EXPECT_EQ( output, std::string((const char*)must));
+}
+
+TEST_F( BoostLocaleFixture, SimpleTestUpperCase )
+{
+	static const unsigned char input[] = { 'G','r', 0xC3, 0x9C, 0xC3, 0xBC, 'b', 'E', 'l', 0 };
+	static const unsigned char must[] = { 'G','R', 0xC3, 0x9C, 0xC3, 0x9C, 'B', 'E', 'L', 0 };
+	std::locale loc = boost::locale::generator()("");
+	std::string output = boost::locale::to_upper( std::string((const char*)input), loc);
+	EXPECT_EQ( output, std::string((const char*)must));
 }
 
 int main( int argc, char **argv )

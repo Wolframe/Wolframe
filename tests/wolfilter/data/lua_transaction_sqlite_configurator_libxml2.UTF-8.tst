@@ -175,7 +175,7 @@
 <createTag><tag name="Tag1.5x" parentID="2"/></createTag>
 <TagHierarchyRequest><Tag id="1"/></TagHierarchyRequest>
 </test>**config
---input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
+--input-filter xml:libxml2 --output-filter xml:libxml2 --module ../../src/modules/filter/libxml2/mod_filter_libxml2  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program simpleform.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA,program=program.sql' --program=DBPRG.tdl run
 
 **file:simpleform.normalize
 int=number:integer;
@@ -449,14 +449,16 @@ DOCTYPE "feature Feature"
 **file:tag.simpleform
 DOCTYPE "tag Tag"
 {
-	tag
-	{
-		id @int
-		parentID @int
-		name string
-		description string
-	}
+	id @int
+	parentID @int
+	name string
+	normalizedName string
+	description string
 }
+**file:program.sql
+-- Select the last ID created in the Picture table
+-- PF:HACK: Because we have no variables, we have also to reserve a result for what we whould store in a 'variable'
+PREPARE getLastPictureID AS SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
 **file:DBPRG.tdl
 --
 -- addCategory
@@ -464,8 +466,7 @@ DOCTYPE "tag Tag"
 OPERATION addCategoryPicture -- ($1=categoryID)(caption, info, image, width, height, thumbnail)
 BEGIN
 	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
-	DO NONEMPTY UNIQUE SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
---	SELECT currval(pg_get_serial_sequence('users', 'id'));
+	DO NONEMPTY UNIQUE getLastPictureID($1);
 	DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
 END
 
@@ -1030,11 +1031,7 @@ function PictureListRequest()
 	filter().empty = false
 	local t = formfunction( "selectPictureList" )( {} ):table( )
 	output:opentag( "list" )
-	for k,v in pairs( t ) do
-		output:opentag( "picture" )
-		output:print( v )
-		output:closetag( )
-	end
+	output:print( t )
 	output:closetag( )
 end
 

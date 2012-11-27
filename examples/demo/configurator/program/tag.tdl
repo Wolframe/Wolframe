@@ -7,7 +7,7 @@ BEGIN
 	DO UPDATE Tag SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Tag SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Tag (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
-	INTO . DO NONEMPTY UNIQUE SELECT ID from Tag WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Tag WHERE normalizedName = $(normalizedName);
 END
 
 --
@@ -31,29 +31,22 @@ END
 
 --
 -- selectTag                 :Get the tag
--- selectTagByName           :Get the tag by name
 -- selectTagByNormalizedName :Get the tag by name
 -- selectTagList             :Get a list of categories
 --
 TRANSACTION selectTag -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE ID = $(id);
-END
-
--- This is not supposed to exist, that's why we have the normalized name
-TRANSACTION selectTagByName -- (name)
-BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE name = $(name);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Tag WHERE ID = $(id);
 END
 
 TRANSACTION selectTagByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID,name,normalizedName,description FROM Tag WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Tag WHERE normalizedName = $(normalizedName);
 END
 
 TRANSACTION selectTagSet -- (/tag/id)
 BEGIN
-	FOREACH /tag INTO tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName,description FROM Tag WHERE ID = $(id);
+	FOREACH /tag INTO tag DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName AS "normalizedName",description FROM Tag WHERE ID = $(id) ORDER BY ID;
 END
 
 --
@@ -61,7 +54,7 @@ END
 --
 TRANSACTION selectTopTag -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID,P2.parentID,P2.name,P2.normalizedName,P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	INTO /node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 
 --
@@ -69,6 +62,6 @@ END
 --
 TRANSACTION selectSubTag -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 

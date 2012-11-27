@@ -123,6 +123,40 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 	return ss.str();
 }
 
+void PostgreSQLdbUnit::noticeProcessor( void* this_void, const char * message)
+{
+	struct LogMsgMap :public std::map<std::string,_Wolframe::log::LogLevel::Level>
+	{
+		LogMsgMap()
+		{
+			typedef _Wolframe::log::LogLevel LV;
+			(*this)["WARNING"] = LV::LOGLEVEL_WARNING;
+			(*this)["ERROR"] = LV::LOGLEVEL_ERROR;
+			(*this)["FATAL"] = LV::LOGLEVEL_FATAL;
+			(*this)["PANIC"] = LV::LOGLEVEL_ALERT;
+			(*this)["NOTICE"] = LV::LOGLEVEL_NOTICE;
+			(*this)["DETAIL"] = LV::LOGLEVEL_INFO;
+			(*this)["INFO"] = LV::LOGLEVEL_INFO;
+			(*this)["DEBUG"] = LV::LOGLEVEL_DEBUG;
+			(*this)["LOG"] = LV::LOGLEVEL_TRACE;
+		}
+	};
+	static LogMsgMap logMsgMap;
+
+	PostgreSQLdbUnit* this_ = (PostgreSQLdbUnit*)this_void;
+	std::size_t ii=0;
+	for (; message[ii] && message[ii] != ':'; ++ii);
+	if (message[ii])
+	{
+		LogMsgMap::const_iterator li = logMsgMap.find( std::string( message, ii));
+		if (li != logMsgMap.end())
+		{
+			_Wolframe::log::Logger(logBackendPtr).Get( li->second) << "PostgreSQL database '" << ((this_)?this_->ID():"") << "': " << (message + ii + 1);
+			return;
+		}
+	}
+	LOG_ERROR << "Unknown log message type from PostgreSQL database '" << ((this_)?this_->ID():"") << "': " << message;
+}
 
 // This function also needs a lot of work
 PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
@@ -148,6 +182,8 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 		if ( conn == NULL )
 			MOD_LOG_ALERT << "Failed to connect to PostgreSQL database '" << m_ID << "'";
 		else	{
+			PQsetNoticeProcessor( conn, &noticeProcessor, this);
+
 			ConnStatusType stat = PQstatus( conn );
 			switch( stat )	{
 				case CONNECTION_OK:

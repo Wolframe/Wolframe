@@ -50,9 +50,7 @@ local function insert_itr( tablename, parentID, itr)
 			picture = picture_value( scope( itr))
 		elseif (t == "node") then
 			if name then
---DEBUG				logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG				logger.printc( "ID ", id)
 				name = nil
 				description = nil
 			end
@@ -60,9 +58,7 @@ local function insert_itr( tablename, parentID, itr)
 		end
 	end
 	if name then
---DEBUG		logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG		logger.printc( "ID ", id)
 	end
 	return id
 end
@@ -72,9 +68,7 @@ local function insert_topnode( tablename, name, description, picture, parentID)
 	if not parentID then
 		parentID = 1
 	end
---DEBUG	logger.printc( "add" .. tablename, {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} )
 	local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
---DEBUG	logger.printc( "ID ", id)
 	return id
 end
 
@@ -185,10 +179,6 @@ local function edit_node( tablename, itr)
 	for v,t in itr do
 		if t == "id" then
 			id = v
-			-- don't allow editing of the root element (fast hack)
-			if id == "1" then
-				return
-			end
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizeName( name)
@@ -212,7 +202,6 @@ local function delete_node( tablename, itr)
 	if id == "1" then
 		return
 	end
---DEBUG	logger.printc( "delete" .. tablename, {id=id} )
 	formfunction( "delete" .. tablename)( {id=id} )
 end
 
@@ -323,17 +312,28 @@ function createTag()
 	create_node( "Tag", input:get())
 end
 
-function PictureListRequest()
+function PictureListRequest( )
 	output:as( "list SYSTEM 'PictureList.simpleform'" )
 	filter().empty = false
 	local t = formfunction( "selectPictureList" )( {} ):table( )
 	output:opentag( "list" )
-	for k,v in pairs( t ) do
-		output:opentag( "picture" )
-		output:print( v )
-		output:closetag( )
-	end
+	output:print( t )
 	output:closetag( )
+end
+
+function PictureRequest( )
+	output:as( "picture SYSTEM 'Picture.simpleform'")
+	filter().empty = false
+	local id = nil;
+	for v,t in input:get( ) do
+		if t == "id" then
+			id = v
+		end
+	end
+	local t = formfunction( "selectPicture" )( { id = id } )
+	local f = form( "Picture" );
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
 end
 
 

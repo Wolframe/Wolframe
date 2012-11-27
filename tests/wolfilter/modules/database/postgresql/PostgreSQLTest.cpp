@@ -40,6 +40,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <algorithm>
 #include "libpq-fe.h"
 
 using namespace _Wolframe;
@@ -89,6 +90,8 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 		PQfinish( conn );
 		throw std::runtime_error( msg );
 	}
+	PQsetNoticeProcessor( conn, &PostgreSQLdbUnit::noticeProcessor, 0);
+
 	// Get a list of tables (in the public schema)
 	PGresult* res = PQexec( conn, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'" );
 	if ( PQresultStatus( res ) != PGRES_TUPLES_OK )	{
@@ -97,11 +100,11 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 		PQfinish( conn );
 		throw std::runtime_error( msg );
 	}
-	std::list< std::string > tables;
+	std::vector< std::string > tables;
 	for ( int i = 0; i < PQntuples( res ); i++ )
 		tables.push_back( PQgetvalue( res, i, 0 ));
 	// Drop the tables
-	for ( std::list< std::string >::const_iterator it = tables.begin();
+	for ( std::vector< std::string >::const_iterator it = tables.begin();
 							it != tables.end(); it++ )	{
 		std::string query = "DROP TABLE " + *it + " CASCADE";
 		PQclear( res );
@@ -157,11 +160,12 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 		PQfinish( conn );
 		throw std::runtime_error( msg );
 	}
-	std::list< std::string > tables;
+	std::vector< std::string > tables;
 	for ( int i = 0; i < PQntuples( res ); i++ )
 		tables.push_back( PQgetvalue( res, i, 0 ));
 	// Dump the tables
-	for ( std::list< std::string >::const_iterator it = tables.begin();
+	std::sort( tables.begin(), tables.end());
+	for ( std::vector< std::string >::const_iterator it = tables.begin();
 							it != tables.end(); it++ )	{
 		std::string query;
 		std::string orderby = "";
