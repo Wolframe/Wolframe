@@ -1035,6 +1035,15 @@ function createPicture( )
 	formfunction( "addPicture" )( { picture = picture } )
 end
 
+function deletePicture( )
+	local id = nil;
+	for v,t in input:get( ) do
+		if t == "id" then
+			id = v
+		end
+	end
+	formfunction( "deletePicture" )( { id = id } )
+end
 
 
 function run()
