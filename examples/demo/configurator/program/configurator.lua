@@ -22,6 +22,7 @@ local function picture_value( itr)
 			picture[ t] = content_value( v, itr)
 		end
 	end
+	logger:print( "ERROR", picture )
 	info = formfunction( "imageInfo" )( { [ "data"] = picture["image"] } ):table( )
 	picture["width"] = info.width
 	picture["height"] = info.height
