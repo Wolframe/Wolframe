@@ -43,13 +43,16 @@ BEGIN
 		width = $(width), height = $(height), thumbnail = $(thumbnail)
 		WHERE ID = $(id);
 	FOREACH picture DO DELETE FROM PictureTag WHERE pictureID = $(id);
-	FOREACH picture/tags DO INSERT INTO PictureTag( pictureID, tagID ) VALUES( $(/picture/id), $(id) );
+	-- /picture/id is always NULL?
+	FOREACH picture/tags DO INSERT INTO PictureTag( pictureID, tagID ) VALUES( $(../id), $(id) );
 END
 
 TRANSACTION addPicture -- (picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
 BEGIN
 	FOREACH picture DO INSERT INTO Picture( caption, info, image, width, height, thumbnail )
 		VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail) );
+	DO NONEMPTY UNIQUE getLastInsertedPictureID( );
+	FOREACH picture/tags DO INSERT INTO PictureTag( pictureID, tagID ) VALUES( $1, $(id) );
 END
 
 TRANSACTION deletePicture -- (id)
