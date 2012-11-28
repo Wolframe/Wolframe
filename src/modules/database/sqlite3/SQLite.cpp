@@ -45,6 +45,11 @@
 namespace _Wolframe {
 namespace db {
 
+extern "C" void profiling_callback(  void */*a*/, const char *b, sqlite3_uint64 c )
+{
+	LOG_DATA << b << " (time: " << c / 1000 << " ms)";
+}
+
 SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			    unsigned short connections,
 			    const std::list<std::string>& programFiles_)
@@ -101,6 +106,8 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 			m_connections.push_back( handle );
 			m_connPool.add( handle );
 		}
+		// enable tracing of commands
+		sqlite3_profile( handle, profiling_callback, NULL );
 	}
 	m_db.setUnit( this );
 
