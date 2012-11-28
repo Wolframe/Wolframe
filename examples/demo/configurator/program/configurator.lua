@@ -337,16 +337,20 @@ function PictureRequest( )
 end
 
 local function transform_picture( itr )
+	-- should be a form transformation, not funny lua code :-)
 	local picture = {}
 	picture["tags"] = {}
 	local tags = {}
-	local intags = false
+	local intag = false
+	local intagwrap = false
 	for v,t in itr do
-		if ( ( t == "id" or t == "caption" or t == "info" or t == "image" ) and not intags) then
+		if ( ( t == "id" or t == "caption" or t == "info" or t == "image" ) and not intagwrap and not intag) then
 			picture[ t] = content_value( v, itr)
 		elseif( t == "tagwrap" ) then
-			intags = true
-		elseif( t == "id" and intags ) then
+			intagwrap = true
+		elseif( t == "tag" ) then
+			intag = true
+		elseif( t == "id" and intag ) then
 			table.insert( picture["tags"], { ["id"] = v } )
 		end
 	end

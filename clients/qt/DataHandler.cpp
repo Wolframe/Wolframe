@@ -798,7 +798,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 				return item->data( Qt::UserRole ).toString( );
 			}
 		} else {
-			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in varaiable" << variable;
+			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
 		}
 	} else if( clazz == "QTreeWidget" ) {
 		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
@@ -834,7 +834,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 
 			return state;
 		} else {
-			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in varaiable" << variable;
+			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
 		}
 	} else {
 // non supported class
