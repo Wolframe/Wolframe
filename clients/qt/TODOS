@@ -9,6 +9,8 @@ show stoppers:
 - set focus in forms
   
 musts:
+- allow grouping into tags without a dummy groupbox or
+  similar widget around it, where to put the data then?
 - how to comminicate tags which are used by picture and 
   they should not be deletable?
 - QTableWidget:

@@ -1,8 +1,23 @@
 ERROR: error in sqlite database transaction: SQLite error 5 (extended error code 5); message: 'database is locked' in statement 'SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $1'
 ERROR: error calling function 'CategoryHierarchyRequest':[configurator]:100: error in function '<formfunction>(..)' (transaction failed: SQLite error 5 (extended error code 5); message: 'database is locked' in statement 'SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETW)
 ..and SQL is shortened..
+..db-layer concurrency issue..
 
 FreeBSD, some PNGs are not visible in qt client (PNG version?)
 
 Weak error message, what's the name of the function?
 ERROR: error calling function 'PictureListRequest':[configurator]:325: error in function 'formfunction(..)' (form function not found (is neither a module form function, nor a transaction function, nor a print function))
+
+TDL:
+How to access @id in <tag id="xx">?
+
+Form mapping:
+
+<picture id="1">
+  <tagwrap id="18">
+    <tag id="15">new computers</tag>
+    <tag id="18">white vegetables</tag>
+    <tag id="14">old computers</tag>
+  </tagwrap>
+
+result is id=14
