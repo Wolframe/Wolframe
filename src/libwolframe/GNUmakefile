@@ -77,6 +77,8 @@ OBJS = \
 	b64decode.o \
 	byte2hex.o \
 	sha2.o \
+	hmac_sha256.o \
+	PBKDF2.o \
 	md5.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

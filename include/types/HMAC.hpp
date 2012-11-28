@@ -38,13 +38,10 @@
 #define _HMAC_HPP_INCLUDED
 
 #include <string>
-
-#include "types/sha2.h"
+#include "HMAC.h"
 
 namespace _Wolframe {
 namespace AAAA {
-
-static const size_t HMAC_DIGEST_SIZE = SHA256_DIGEST_SIZE;
 
 /// Standard HMAC-SHA256 implementation
 class HMAC_SHA256
@@ -52,20 +49,25 @@ class HMAC_SHA256
 public:
 	HMAC_SHA256( const unsigned char* key, size_t keySize,
 		     const unsigned char* msg, size_t msgSize )
-					{ init( key, keySize, msg, msgSize ); }
+						{ hmac_sha256( key, keySize,
+							       msg, msgSize, m_HMAC ); }
 	HMAC_SHA256( const std::string& key, const std::string& message )
-					{ init( (const unsigned char*)key.data(), key.size(),
-						(const unsigned char*)message.data(), message.size()); }
+						{ hmac_sha256( (const unsigned char*)key.data(), key.size(),
+							       (const unsigned char*)message.data(), message.size(),
+							       m_HMAC ); }
 	HMAC_SHA256( const unsigned char* key, size_t keySize, const std::string& message )
-					{ init( key, keySize, (const unsigned char*)message.data(), message.size()); }
+						{ hmac_sha256( key, keySize,
+							       (const unsigned char*)message.data(), message.size(),
+							       m_HMAC ); }
 	HMAC_SHA256( const std::string& key, const unsigned char* msg, size_t msgSize )
-					{ init( (const unsigned char*)key.data(), key.size(), msg, msgSize ); }
+						{ hmac_sha256( (const unsigned char*)key.data(), key.size(),
+							       msg, msgSize, m_HMAC ); }
 
 	/// \note The string is a base64 representation of the value
 	HMAC_SHA256( const std::string& digest );
 
 	const unsigned char* hash() const			{ return m_HMAC; }
-	std::size_t size() const				{ return HMAC_DIGEST_SIZE; }
+	std::size_t size() const				{ return HMAC_SHA256_DIGEST_SIZE; }
 
 	/// Comparisson operators
 	bool operator == ( const HMAC_SHA256& rhs ) const;
@@ -82,10 +84,7 @@ public:
 	/// \note The string is without the base64 end padding
 	std::string toString() const;
 private:
-	void init( const unsigned char* key, size_t keyLen,
-		   const unsigned char* msg, size_t msgLen );
-
-	unsigned char	m_HMAC[ HMAC_DIGEST_SIZE ];
+	unsigned char	m_HMAC[ HMAC_SHA256_DIGEST_SIZE ];
 };
 
 }} // namespace _Wolframe::AAAA
