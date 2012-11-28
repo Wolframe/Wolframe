@@ -40,10 +40,24 @@
 namespace _Wolframe {
 namespace langbind {
 
-class AsciiNormalizeFunction :public NormalizeFunction
+class ConvDiaNormalizeFunction :public NormalizeFunction
 {
 public:
-	AsciiNormalizeFunction(){}
+	ConvDiaNormalizeFunction(){}
+	virtual std::string execute( const std::string& str) const;
+};
+
+class UppercaseNameNormalizeFunction :public NormalizeFunction
+{
+public:
+	UppercaseNameNormalizeFunction(){}
+	virtual std::string execute( const std::string& str) const;
+};
+
+class LowercaseNameNormalizeFunction :public NormalizeFunction
+{
+public:
+	LowercaseNameNormalizeFunction(){}
 	virtual std::string execute( const std::string& str) const;
 };
 

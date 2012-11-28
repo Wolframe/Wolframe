@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>512</width>
-    <height>413</height>
+    <height>428</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -189,6 +189,9 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

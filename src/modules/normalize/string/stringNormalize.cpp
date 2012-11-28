@@ -54,14 +54,24 @@ NormalizeFunction* _Wolframe::langbind::createStringNormalizeFunction( ResourceH
 			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
 			return new TrimNormalizeFunction();
 		}
-		else if (boost::algorithm::iequals( type, "ascii"))
+		else if (boost::algorithm::iequals( type, "convdia"))
 		{
 			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
-			return new AsciiNormalizeFunction();
+			return new ConvDiaNormalizeFunction();
+		}
+		else if (boost::algorithm::iequals( type, "ucname"))
+		{
+			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
+			return new UppercaseNameNormalizeFunction();
+		}
+		else if (boost::algorithm::iequals( type, "lcname"))
+		{
+			if (!arg.empty()) std::runtime_error( std::string( "no arguments expected for normalizer '") + name + "'");
+			return new LowercaseNameNormalizeFunction();
 		}
 		else
 		{
-			throw std::runtime_error( std::string( "unknown number type '") + name + "'");
+			throw std::runtime_error( std::string( "unknown string type '") + name + "'");
 		}
 	}
 	catch (const std::runtime_error& e)
@@ -78,7 +88,9 @@ const std::vector<std::string>& _Wolframe::langbind::normalizeFunctions()
 		NormalizeFunctions()
 		{
 			push_back( "trim");
-			push_back( "ascii");
+			push_back( "ucname");
+			push_back( "lcname");
+			push_back( "convdia");
 		}
 	};
 	static NormalizeFunctions rt;

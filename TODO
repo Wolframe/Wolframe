@@ -22,7 +22,6 @@ PF:
     - products
 - high prio
   - UIForm loader in client and server
-  - make postgres database run transactions
   - solve INTO problem
       - list of filter elements per instruction
       - RESULT ROOT attribute in transaction/operation

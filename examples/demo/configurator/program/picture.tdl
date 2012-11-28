@@ -24,6 +24,16 @@ BEGIN
 		LEFT JOIN Tag
 		ON PictureTag.tagID = Tag.ID
 		WHERE Picture.ID = $(id);
+
+	-- HACK from here, see wrapper element in LUA code, no other solution found..
+	INTO tagwrap DO
+		select Tag.ID AS "id", name as tag
+		FROM Tag
+		LEFT JOIN PictureTag
+		ON PictureTag.tagID = Tag.ID
+		LEFT JOIN Picture
+		ON PictureTag.pictureID = Picture.ID
+		WHERE Picture.ID = $(id);		
 END
 
 TRANSACTION updatePicture -- (picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
@@ -43,12 +53,4 @@ END
 TRANSACTION deletePicture -- (id)
 BEGIN
 	DO DELETE FROM Picture WHERE ID = $(id);
-END
-
-TRANSACTION selectPictureTags -- (picture/id)
-BEGIN
-	FOREACH picture INTO . DO SELECT name FROM PictureTag, Picture, Tag
-		WHERE PictureTag.pictureID = Picture.ID
-		AND PictureTag.tagID = Tag.ID
-		AND Picture.ID = $(id);
 END

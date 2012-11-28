@@ -185,6 +185,12 @@
  </widget>
  <tabstops>
   <tabstop>picture</tabstop>
+  <tabstop>add</tabstop>
+  <tabstop>delete_2</tabstop>
+  <tabstop>edit</tabstop>
+  <tabstop>reset_2</tabstop>
+  <tabstop>form1</tabstop>
+  <tabstop>reload_2</tabstop>
  </tabstops>
  <resources/>
  <connections>

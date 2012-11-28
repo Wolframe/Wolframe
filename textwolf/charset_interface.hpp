@@ -64,6 +64,7 @@ struct Encoder
 		{
 			buf.push_back( bb[ --ii]);
 		}
+		buf.push_back( ';');
 		buf.push_back( '\0');
 		return !buf.overflow();
 	}

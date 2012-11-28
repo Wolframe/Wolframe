@@ -152,7 +152,7 @@
 	<class name="tocharian" status="dead">
 	</class>
 </class>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_sqlite_demo_ig_lang_cat.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_demo_ig_lang_cat.lua --program simpleform.normalize --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA' --program=DBPRG.tdl run
 
 **file:simpleform.normalize
 int=number:integer;
@@ -354,7 +354,7 @@ BEGIN
 		WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(nodeid);
 END
 **outputfile:DBDUMP
-**file: transaction_sqlite_demo_ig_lang_cat.lua
+**file: transaction_demo_ig_lang_cat.lua
 idcnt = 0
 
 function insert_tree( parentid, itr)

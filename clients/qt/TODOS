@@ -1,7 +1,5 @@
 show stoppers:
-- tag handling
 - picture handling:
-  - upload images
   - tag them
   - assign pictures:
     - present pictures in a list
@@ -9,12 +7,15 @@ show stoppers:
 - recover after errors in protocol:
   - example, duplicate normalizedName
 - set focus in forms
-
+  
 musts:
+- how to comminicate tags which are used by picture and 
+  they should not be deletable?
 - QTableWidget:
   - implement state
     - viewport position
     - selected cells
+    - new way of reseting the form (no domain erase and reload)
 - QDialog instead of QWidget for forms
   - would allow to have default Enter and ESC behaviour
   - must be treated specially, as the form should NOT
