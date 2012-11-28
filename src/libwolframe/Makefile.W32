@@ -73,6 +73,7 @@ OBJS = \
 	b64encode.obj \
 	b64decode.obj \
 	byte2hex.obj \
+	sha1.obj \
 	sha2.obj \
 	hmac_sha256.obj \
 	PBKDF2.obj \

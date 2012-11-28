@@ -132,7 +132,7 @@ TEST_CPP_BINS = \
 	byte2hexTest$(EXE) \
 	base64Test$(EXE) \
 	base64Utility$(EXE) \
-	testSHA2$(EXE) \
+	testSHA$(EXE) \
 	testMD5$(EXE) \
 	CRAMtest$(EXE) \
 	HMACtest$(EXE) \
@@ -154,7 +154,7 @@ TEST_CPP_BINS = \
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 logTest$(EXE): $(TOPDIR)/src/libwolframe.a
-testSHA2$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
+testSHA$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 testMD5$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 byte2hexTest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
 CRAMtest$(EXE): $(TOPDIR)/src/libwolframe/libwolframe.a
@@ -205,7 +205,7 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./singletonTest
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testSHA2
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testSHA
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testMD5
 	@echo

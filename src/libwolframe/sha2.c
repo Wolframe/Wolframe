@@ -33,7 +33,7 @@
  * SUCH DAMAGE.
  */
 
-#if 0
+#if 1
 #define UNROLL_LOOPS /* Enable loops unrolling */
 #endif
 
@@ -332,13 +332,13 @@ static void sha256_transf( sha256_ctx *ctx, const unsigned char *data,
 	}
 }
 
-void sha256( const void *data, unsigned long size, unsigned char *hash )
+void sha256( const void *data, size_t size, unsigned char *digest )
 {
 	sha256_ctx ctx;
 
 	sha256_init( &ctx );
 	sha256_update( &ctx, data, size );
-	sha256_final( &ctx, hash );
+	sha256_final( &ctx, digest );
 }
 
 void sha256_init( sha256_ctx *ctx )
@@ -359,7 +359,7 @@ void sha256_init( sha256_ctx *ctx )
 	ctx->tot_len = 0;
 }
 
-void sha256_update( sha256_ctx *ctx, const void *data, unsigned long size )
+void sha256_update( sha256_ctx *ctx, const void *data, size_t size )
 {
 	unsigned int block_nb;
 	unsigned int new_len, rem_len, tmp_len;
@@ -392,7 +392,7 @@ void sha256_update( sha256_ctx *ctx, const void *data, unsigned long size )
 	ctx->tot_len += (block_nb + 1) << 6;
 }
 
-void sha256_final( sha256_ctx *ctx, unsigned char *hash )
+void sha256_final( sha256_ctx *ctx, unsigned char *digest )
 {
 	unsigned int block_nb;
 	unsigned int pm_len;
@@ -416,7 +416,7 @@ void sha256_final( sha256_ctx *ctx, unsigned char *hash )
 
 #ifndef UNROLL_LOOPS
 	for (i = 0 ; i < 8; i++) {
-		UNPACK32(ctx->h[i], &hash[i << 2]);
+		UNPACK32(ctx->h[i], &digest[i << 2]);
 	}
 #else
 	UNPACK32(ctx->h[0], &digest[ 0]);
@@ -429,6 +429,107 @@ void sha256_final( sha256_ctx *ctx, unsigned char *hash )
 	UNPACK32(ctx->h[7], &digest[28]);
 #endif /* !UNROLL_LOOPS */
 }
+
+
+/* SHA-224 functions */
+
+void sha224( const void *data, size_t size, unsigned char *hash )
+{
+	sha224_ctx ctx;
+
+	sha224_init(&ctx);
+	sha224_update(&ctx, data, size);
+	sha224_final(&ctx, hash);
+}
+
+void sha224_init( sha224_ctx *ctx )
+{
+#ifndef UNROLL_LOOPS
+	int i;
+	for (i = 0; i < 8; i++) {
+		ctx->h[i] = sha224_h0[i];
+	}
+#else
+	ctx->h[0] = sha224_h0[0]; ctx->h[1] = sha224_h0[1];
+	ctx->h[2] = sha224_h0[2]; ctx->h[3] = sha224_h0[3];
+	ctx->h[4] = sha224_h0[4]; ctx->h[5] = sha224_h0[5];
+	ctx->h[6] = sha224_h0[6]; ctx->h[7] = sha224_h0[7];
+#endif /* !UNROLL_LOOPS */
+
+	ctx->len = 0;
+	ctx->tot_len = 0;
+}
+
+void sha224_update( sha224_ctx *ctx, const void *data, size_t size )
+{
+	unsigned int block_nb;
+	unsigned int new_len, rem_len, tmp_len;
+	const unsigned char *shifted_message;
+
+	tmp_len = SHA224_BLOCK_SIZE - ctx->len;
+	rem_len = size < tmp_len ? size : tmp_len;
+
+	memcpy(&ctx->block[ctx->len], data, rem_len);
+
+	if (ctx->len + size < SHA224_BLOCK_SIZE) {
+		ctx->len += size;
+		return;
+	}
+
+	new_len = size - rem_len;
+	block_nb = new_len / SHA224_BLOCK_SIZE;
+
+	shifted_message = (const unsigned char *)data + rem_len;
+
+	sha256_transf(ctx, ctx->block, 1);
+	sha256_transf(ctx, shifted_message, block_nb);
+
+	rem_len = new_len % SHA224_BLOCK_SIZE;
+
+	memcpy(ctx->block, &shifted_message[block_nb << 6],
+	       rem_len);
+
+	ctx->len = rem_len;
+	ctx->tot_len += (block_nb + 1) << 6;
+}
+
+void sha224_final( sha224_ctx *ctx, unsigned char *digest )
+{
+	unsigned int block_nb;
+	unsigned int pm_len;
+	unsigned int len_b;
+
+#ifndef UNROLL_LOOPS
+	int i;
+#endif
+
+	block_nb = (1 + ((SHA224_BLOCK_SIZE - 9)
+			 < (ctx->len % SHA224_BLOCK_SIZE)));
+
+	len_b = (ctx->tot_len + ctx->len) << 3;
+	pm_len = block_nb << 6;
+
+	memset(ctx->block + ctx->len, 0, pm_len - ctx->len);
+	ctx->block[ctx->len] = 0x80;
+	UNPACK32(len_b, ctx->block + pm_len - 4);
+
+	sha256_transf(ctx, ctx->block, block_nb);
+
+#ifndef UNROLL_LOOPS
+	for (i = 0 ; i < 7; i++) {
+		UNPACK32(ctx->h[i], &digest[i << 2]);
+	}
+#else
+	UNPACK32(ctx->h[0], &digest[ 0]);
+	UNPACK32(ctx->h[1], &digest[ 4]);
+	UNPACK32(ctx->h[2], &digest[ 8]);
+	UNPACK32(ctx->h[3], &digest[12]);
+	UNPACK32(ctx->h[4], &digest[16]);
+	UNPACK32(ctx->h[5], &digest[20]);
+	UNPACK32(ctx->h[6], &digest[24]);
+#endif /* !UNROLL_LOOPS */
+}
+
 
 /* SHA-512 functions */
 
@@ -527,13 +628,13 @@ static void sha512_transf( sha512_ctx *ctx, const unsigned char *message,
 	}
 }
 
-void sha512( const void *data, unsigned long size, unsigned char *hash )
+void sha512( const void *data, size_t size, unsigned char *digest )
 {
 	sha512_ctx ctx;
 
-	sha512_init(&ctx);
-	sha512_update(&ctx, data, size);
-	sha512_final(&ctx, hash);
+	sha512_init( &ctx );
+	sha512_update( &ctx, data, size );
+	sha512_final( &ctx, digest );
 }
 
 void sha512_init( sha512_ctx *ctx )
@@ -554,7 +655,7 @@ void sha512_init( sha512_ctx *ctx )
 	ctx->tot_len = 0;
 }
 
-void sha512_update( sha512_ctx *ctx, const void *data, unsigned long size )
+void sha512_update( sha512_ctx *ctx, const void *data, size_t size )
 {
 	unsigned int block_nb;
 	unsigned int new_len, rem_len, tmp_len;
@@ -587,7 +688,7 @@ void sha512_update( sha512_ctx *ctx, const void *data, unsigned long size )
 	ctx->tot_len += (block_nb + 1) << 7;
 }
 
-void sha512_final( sha512_ctx *ctx, unsigned char *hash )
+void sha512_final( sha512_ctx *ctx, unsigned char *digest )
 {
 	unsigned int block_nb;
 	unsigned int pm_len;
@@ -611,7 +712,7 @@ void sha512_final( sha512_ctx *ctx, unsigned char *hash )
 
 #ifndef UNROLL_LOOPS
 	for (i = 0 ; i < 8; i++) {
-		UNPACK64(ctx->h[i], &hash[i << 3]);
+		UNPACK64(ctx->h[i], &digest[i << 3]);
 	}
 #else
 	UNPACK64(ctx->h[0], &digest[ 0]);
@@ -625,15 +726,16 @@ void sha512_final( sha512_ctx *ctx, unsigned char *hash )
 #endif /* !UNROLL_LOOPS */
 }
 
+
 /* SHA-384 functions */
 
-void sha384( const void *data, unsigned long size, unsigned char *hash )
+void sha384( const void *data, size_t size, unsigned char *digest )
 {
 	sha384_ctx ctx;
 
-	sha384_init(&ctx);
-	sha384_update(&ctx, data, size);
-	sha384_final(&ctx, hash);
+	sha384_init( &ctx );
+	sha384_update( &ctx, data, size );
+	sha384_final( &ctx, digest );
 }
 
 void sha384_init(sha384_ctx *ctx)
@@ -654,7 +756,7 @@ void sha384_init(sha384_ctx *ctx)
 	ctx->tot_len = 0;
 }
 
-void sha384_update( sha384_ctx *ctx, const void *data, unsigned long size )
+void sha384_update( sha384_ctx *ctx, const void *data, size_t size )
 {
 	unsigned int block_nb;
 	unsigned int new_len, rem_len, tmp_len;
@@ -687,7 +789,7 @@ void sha384_update( sha384_ctx *ctx, const void *data, unsigned long size )
 	ctx->tot_len += (block_nb + 1) << 7;
 }
 
-void sha384_final( sha384_ctx *ctx, unsigned char *hash )
+void sha384_final( sha384_ctx *ctx, unsigned char *digest )
 {
 	unsigned int block_nb;
 	unsigned int pm_len;
@@ -711,7 +813,7 @@ void sha384_final( sha384_ctx *ctx, unsigned char *hash )
 
 #ifndef UNROLL_LOOPS
 	for (i = 0 ; i < 6; i++) {
-		UNPACK64(ctx->h[i], &hash[i << 3]);
+		UNPACK64(ctx->h[i], &digest[i << 3]);
 	}
 #else
 	UNPACK64(ctx->h[0], &digest[ 0]);
@@ -722,104 +824,3 @@ void sha384_final( sha384_ctx *ctx, unsigned char *hash )
 	UNPACK64(ctx->h[5], &digest[40]);
 #endif /* !UNROLL_LOOPS */
 }
-
-/* SHA-224 functions */
-
-void sha224( const void *data, unsigned long size, unsigned char *hash )
-{
-	sha224_ctx ctx;
-
-	sha224_init(&ctx);
-	sha224_update(&ctx, data, size);
-	sha224_final(&ctx, hash);
-}
-
-void sha224_init( sha224_ctx *ctx )
-{
-#ifndef UNROLL_LOOPS
-	int i;
-	for (i = 0; i < 8; i++) {
-		ctx->h[i] = sha224_h0[i];
-	}
-#else
-	ctx->h[0] = sha224_h0[0]; ctx->h[1] = sha224_h0[1];
-	ctx->h[2] = sha224_h0[2]; ctx->h[3] = sha224_h0[3];
-	ctx->h[4] = sha224_h0[4]; ctx->h[5] = sha224_h0[5];
-	ctx->h[6] = sha224_h0[6]; ctx->h[7] = sha224_h0[7];
-#endif /* !UNROLL_LOOPS */
-
-	ctx->len = 0;
-	ctx->tot_len = 0;
-}
-
-void sha224_update( sha224_ctx *ctx, const void *data, unsigned long size )
-{
-	unsigned int block_nb;
-	unsigned int new_len, rem_len, tmp_len;
-	const unsigned char *shifted_message;
-
-	tmp_len = SHA224_BLOCK_SIZE - ctx->len;
-	rem_len = size < tmp_len ? size : tmp_len;
-
-	memcpy(&ctx->block[ctx->len], data, rem_len);
-
-	if (ctx->len + size < SHA224_BLOCK_SIZE) {
-		ctx->len += size;
-		return;
-	}
-
-	new_len = size - rem_len;
-	block_nb = new_len / SHA224_BLOCK_SIZE;
-
-	shifted_message = (const unsigned char *)data + rem_len;
-
-	sha256_transf(ctx, ctx->block, 1);
-	sha256_transf(ctx, shifted_message, block_nb);
-
-	rem_len = new_len % SHA224_BLOCK_SIZE;
-
-	memcpy(ctx->block, &shifted_message[block_nb << 6],
-	       rem_len);
-
-	ctx->len = rem_len;
-	ctx->tot_len += (block_nb + 1) << 6;
-}
-
-void sha224_final( sha224_ctx *ctx, unsigned char *hash )
-{
-	unsigned int block_nb;
-	unsigned int pm_len;
-	unsigned int len_b;
-
-#ifndef UNROLL_LOOPS
-	int i;
-#endif
-
-	block_nb = (1 + ((SHA224_BLOCK_SIZE - 9)
-			 < (ctx->len % SHA224_BLOCK_SIZE)));
-
-	len_b = (ctx->tot_len + ctx->len) << 3;
-	pm_len = block_nb << 6;
-
-	memset(ctx->block + ctx->len, 0, pm_len - ctx->len);
-	ctx->block[ctx->len] = 0x80;
-	UNPACK32(len_b, ctx->block + pm_len - 4);
-
-	sha256_transf(ctx, ctx->block, block_nb);
-
-#ifndef UNROLL_LOOPS
-	for (i = 0 ; i < 7; i++) {
-		UNPACK32(ctx->h[i], &hash[i << 2]);
-	}
-#else
-	UNPACK32(ctx->h[0], &digest[ 0]);
-	UNPACK32(ctx->h[1], &digest[ 4]);
-	UNPACK32(ctx->h[2], &digest[ 8]);
-	UNPACK32(ctx->h[3], &digest[12]);
-	UNPACK32(ctx->h[4], &digest[16]);
-	UNPACK32(ctx->h[5], &digest[20]);
-	UNPACK32(ctx->h[6], &digest[24]);
-#endif /* !UNROLL_LOOPS */
-}
-
-

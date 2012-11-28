@@ -44,13 +44,14 @@ tests/versionTest
 tests/logTest
 tests/threadLeakTest
 tests/counterTest
-tests/testSHA2
+tests/testSHA
 tests/testMD5
 tests/byte2hexTest
 tests/base64Test
 tests/base64Utility
 tests/CRAMtest
 tests/HMACtest
+tests/PBKDF2test
 tests/xmlselectHandlerTest
 tests/protocolArgumentParsing
 tests/poolTest

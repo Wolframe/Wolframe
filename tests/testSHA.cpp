@@ -31,12 +31,14 @@
 
 ************************************************************************/
 //
-// SHA2 unit tests
+// SHA-1 and SHA-2 unit tests
 //
 
 #include "gtest/gtest.h"
 #include <cstring>
 #include "types/sha2.h"
+#include "types/sha1.h"
+
 
 /* FIPS 180-2 Validation tests */
 
@@ -50,6 +52,51 @@ static const char message2b[] =	"abcdefghbcdefghicdefghijdefghijkefghij"
 				"nopqklmnopqrlmnopqrsmnopqrstnopqrstu";
 
 static const unsigned message3len = 1000000;
+
+/* SHA-1 */
+TEST( SHA1fixture, SHA1 )
+{
+	static const char *testVectors[3] = {
+				"A9993E364706816ABA3E25717850C26C9CD0D89D",
+				"84983E441C3BD26EBAAE4AA1F95129E5E54670F1",
+				"34AA973CD4C4DAA4F61EEB2BDBAD27316534016F"
+	};
+
+	unsigned char digest[ SHA1_DIGEST_SIZE ];
+	char output[ 2 * SHA1_DIGEST_SIZE + 1 ];
+	output[ 2 * SHA1_DIGEST_SIZE ] = '\0';
+
+	unsigned char digest2[ SHA1_DIGEST_SIZE ];
+	sha1_ctx ctx;
+	char output2[ 2 * SHA1_DIGEST_SIZE + 1 ];
+	output2[ 2 * SHA1_DIGEST_SIZE ] = '\0';
+
+	sha1((const unsigned char *)message1, strlen( message1 ), digest );
+	for ( int i = 0; i < SHA1_DIGEST_SIZE; i++ )
+		sprintf( output + 2 * i, "%02X", digest[i] );
+	EXPECT_STREQ( output, testVectors[0] );
+
+	sha1((const unsigned char *)message2a, strlen( message2a ), digest );
+	for ( int i = 0; i < SHA1_DIGEST_SIZE; i++ )
+		sprintf( output + 2 * i, "%02X", digest[i] );
+	EXPECT_STREQ( output, testVectors[1] );
+
+	unsigned char* message3 = (unsigned char *)malloc( message3len );
+	ASSERT_TRUE( message3 != NULL );
+	memset( message3, 'a', message3len );
+	sha1( message3, message3len, digest );
+	for ( int i = 0; i < SHA1_DIGEST_SIZE; i++ )
+		sprintf( output + 2 * i, "%02X", digest[i] );
+	EXPECT_STREQ( output, testVectors[2] );
+
+	sha1_init( &ctx );
+	sha1_update( &ctx, message3, message3len / 2 );
+	sha1_update( &ctx, message3 + message3len / 2, message3len - message3len / 2 );
+	sha1_final( &ctx, digest2 );
+	for ( int i = 0; i < SHA1_DIGEST_SIZE; i++ )
+		sprintf( output2 + 2 * i, "%02X", digest2[i] );
+	EXPECT_STREQ( output, output2 );
+}
 
 /* SHA-224 */
 TEST( SHA2fixture, SHA224 )
@@ -72,12 +119,12 @@ TEST( SHA2fixture, SHA224 )
 	sha224((const unsigned char *)message1, strlen( message1 ), digest );
 	for ( int i = 0; i < SHA224_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[0] );
+	EXPECT_STREQ( output, testVectors[0] );
 
 	sha224((const unsigned char *)message2a, strlen( message2a ), digest );
 	for ( int i = 0; i < SHA224_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[1] );
+	EXPECT_STREQ( output, testVectors[1] );
 
 	unsigned char* message3 = (unsigned char *)malloc( message3len );
 	ASSERT_TRUE( message3 != NULL );
@@ -85,7 +132,7 @@ TEST( SHA2fixture, SHA224 )
 	sha224( message3, message3len, digest );
 	for ( int i = 0; i < SHA224_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[2] );
+	EXPECT_STREQ( output, testVectors[2] );
 
 	sha224_init( &ctx );
 	sha224_update( &ctx, message3, message3len / 2 );
@@ -93,7 +140,7 @@ TEST( SHA2fixture, SHA224 )
 	sha224_final( &ctx, digest2 );
 	for ( int i = 0; i < SHA224_DIGEST_SIZE; i++ )
 		sprintf( output2 + 2 * i, "%02x", digest2[i] );
-	ASSERT_STREQ( output, output2 );
+	EXPECT_STREQ( output, output2 );
 }
 
 /* SHA-256 */
@@ -117,12 +164,12 @@ TEST( SHA2fixture, SHA256 )
 	sha256((const unsigned char *)message1, strlen( message1 ), digest );
 	for ( int i = 0; i < SHA256_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[0] );
+	EXPECT_STREQ( output, testVectors[0] );
 
 	sha256((const unsigned char *)message2a, strlen( message2a ), digest );
 	for ( int i = 0; i < SHA256_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[1] );
+	EXPECT_STREQ( output, testVectors[1] );
 
 	unsigned char* message3 = (unsigned char *)malloc( message3len );
 	ASSERT_TRUE( message3 != NULL );
@@ -130,7 +177,7 @@ TEST( SHA2fixture, SHA256 )
 	sha256( message3, message3len, digest );
 	for ( int i = 0; i < SHA256_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[2] );
+	EXPECT_STREQ( output, testVectors[2] );
 
 	sha256_init( &ctx );
 	sha256_update( &ctx, message3, message3len / 2 );
@@ -138,7 +185,7 @@ TEST( SHA2fixture, SHA256 )
 	sha256_final( &ctx, digest2 );
 	for ( int i = 0; i < SHA256_DIGEST_SIZE; i++ )
 		sprintf( output2 + 2 * i, "%02x", digest2[i] );
-	ASSERT_STREQ( output, output2 );
+	EXPECT_STREQ( output, output2 );
 }
 
 /* SHA-384 */
@@ -165,12 +212,12 @@ TEST( SHA2fixture, SHA384 )
 	sha384((const unsigned char *)message1, strlen( message1 ), digest );
 	for ( int i = 0; i < SHA384_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[0] );
+	EXPECT_STREQ( output, testVectors[0] );
 
 	sha384((const unsigned char *)message2b, strlen( message2b ), digest );
 	for ( int i = 0; i < SHA384_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[1] );
+	EXPECT_STREQ( output, testVectors[1] );
 
 	unsigned char* message3 = (unsigned char *)malloc( message3len );
 	ASSERT_TRUE( message3 != NULL );
@@ -178,7 +225,7 @@ TEST( SHA2fixture, SHA384 )
 	sha384( message3, message3len, digest );
 	for ( int i = 0; i < SHA384_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[2] );
+	EXPECT_STREQ( output, testVectors[2] );
 
 	sha384_init( &ctx );
 	sha384_update( &ctx, message3, message3len / 2 );
@@ -186,7 +233,7 @@ TEST( SHA2fixture, SHA384 )
 	sha384_final( &ctx, digest2 );
 	for ( int i = 0; i < SHA384_DIGEST_SIZE; i++ )
 		sprintf( output2 + 2 * i, "%02x", digest2[i] );
-	ASSERT_STREQ( output, output2 );
+	EXPECT_STREQ( output, output2 );
 }
 
 /* SHA-512 */
@@ -213,12 +260,12 @@ TEST( SHA2fixture, SHA512 )
 	sha512((const unsigned char *)message1, strlen( message1 ), digest );
 	for ( int i = 0; i < SHA512_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[0] );
+	EXPECT_STREQ( output, testVectors[0] );
 
 	sha512((const unsigned char *)message2b, strlen( message2b ), digest );
 	for ( int i = 0; i < SHA512_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[1] );
+	EXPECT_STREQ( output, testVectors[1] );
 
 	unsigned char* message3 = (unsigned char *)malloc( message3len );
 	ASSERT_TRUE( message3 != NULL );
@@ -226,7 +273,7 @@ TEST( SHA2fixture, SHA512 )
 	sha512( message3, message3len, digest );
 	for ( int i = 0; i < SHA512_DIGEST_SIZE; i++ )
 		sprintf( output + 2 * i, "%02x", digest[i] );
-	ASSERT_STREQ( output, testVectors[2] );
+	EXPECT_STREQ( output, testVectors[2] );
 
 	sha512_init( &ctx );
 	sha512_update( &ctx, message3, message3len / 2 );
@@ -234,7 +281,7 @@ TEST( SHA2fixture, SHA512 )
 	sha512_final( &ctx, digest2 );
 	for ( int i = 0; i < SHA512_DIGEST_SIZE; i++ )
 		sprintf( output2 + 2 * i, "%02x", digest2[i] );
-	ASSERT_STREQ( output, output2 );
+	EXPECT_STREQ( output, output2 );
 }
 
 int main( int argc, char **argv )
