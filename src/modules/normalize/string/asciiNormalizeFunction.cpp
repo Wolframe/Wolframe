@@ -180,19 +180,19 @@ static void substDia_europe( std::istream& input, std::ostream& output)
 		{
 			output << 'a';
 		}
-		else if (value == 0x218)
+		else if (value == 0x218 || value == 0x15F)
 		{
 			output << 'S';
 		}
-		else if (value == 0x219)
+		else if (value == 0x219 || value == 0x15E)
 		{
 			output << 's';
 		}
-		else if (value == 0x21A)
+		else if (value == 0x21A || value == 0x162)
 		{
 			output << 'T';
 		}
-		else if (value == 0x21B)
+		else if (value == 0x21B || value == 0x163)
 		{
 			output << 't';
 		}
