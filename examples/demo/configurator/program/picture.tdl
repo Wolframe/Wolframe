@@ -33,7 +33,7 @@ BEGIN
 		ON PictureTag.tagID = Tag.ID
 		LEFT JOIN Picture
 		ON PictureTag.pictureID = Picture.ID
-		WHERE Picture.ID = $(id);		
+		WHERE Picture.ID = $(id);	
 END
 
 TRANSACTION updatePicture -- (picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
@@ -43,8 +43,7 @@ BEGIN
 		width = $(width), height = $(height), thumbnail = $(thumbnail)
 		WHERE ID = $(id);
 	FOREACH picture DO DELETE FROM PictureTag WHERE pictureID = $(id);
-	-- /picture/id is always NULL?
-	FOREACH picture/tags DO INSERT INTO PictureTag( pictureID, tagID ) VALUES( $(../id), $(id) );
+	FOREACH picture/tags DO INSERT INTO PictureTag( pictureID, tagID ) VALUES( $(/picture/id), $(id) );
 END
 
 TRANSACTION addPicture -- (picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
