@@ -152,6 +152,7 @@ class Path
 public:
 	enum ElementType
 	{
+		Root,
 		Next,
 		Find,
 		Up,
@@ -161,7 +162,7 @@ public:
 
 	static const char* elementTypeName( ElementType i)
 	{
-		static const char* ar[] ={"Next","Find","Current","Up","Result","Constant"};
+		static const char* ar[] ={"Root","Next","Find","Current","Up","Result","Constant"};
 		return ar[(int)i];
 	}
 
@@ -572,6 +573,7 @@ Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap)
 		}
 		else if (*ii == '/')
 		{
+			bool isRoot = (ii == pt.begin());
 			++ii;
 			if (ii == ee) break;
 			if (*ii == '/')
@@ -581,7 +583,7 @@ Path::Path( const std::string& pt, TransactionFunction::TagTable* tagmap)
 			}
 			else
 			{
-				elem.m_type = Next;
+				elem.m_type = isRoot?Root:Next;
 			}
 		}
 		else
@@ -689,6 +691,10 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 
 				case Find:
 					st.find( *ni, si->m_tag, ar2);
+					break;
+
+				case Root:
+					st.next( st.root(), si->m_tag, ar2);
 					break;
 
 				case Next:

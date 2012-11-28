@@ -57,7 +57,7 @@ public:
 		:m_isVector(o.m_isVector)
 		,m_isAttribute(o.m_isAttribute)
 		,m_isForm(o.m_isForm)
-		,m_isSubForm(o.m_isSubForm)
+		,m_isFormReference(o.m_isFormReference)
 		,m_type(o.m_type)
 		,m_subform(o.m_subform)
 		,m_value(o.m_value){}
@@ -66,7 +66,7 @@ public:
 		:m_isVector(false)
 		,m_isAttribute(false)
 		,m_isForm(false)
-		,m_isSubForm(false)
+		,m_isFormReference(false)
 		,m_type(0)
 	{
 		enum State
@@ -178,7 +178,7 @@ public:
 		}
 	}
 
-	bool isSubForm() const			{return m_isSubForm;}
+	bool isFormReference() const		{return m_isFormReference;}
 	bool isVector() const			{return m_isVector;}
 	bool isAttribute() const		{return m_isAttribute;}
 	bool isForm() const			{return m_isForm;}
@@ -200,7 +200,7 @@ private:
 		}
 		else if ((fmi=formmap.find( typestr)) != formmap.end())
 		{
-			m_isSubForm = true;
+			m_isFormReference = true;
 			m_subform = fmi->second;
 		}
 		else
@@ -216,7 +216,7 @@ private:
 	bool m_isVector;
 	bool m_isAttribute;
 	bool m_isForm;
-	bool m_isSubForm;
+	bool m_isFormReference;
 	const NormalizeFunction* m_type;
 	StructType m_subform;
 	std::string m_value;
@@ -242,18 +242,37 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
 	{
-		if (!isIdentifier( itr->first))
+		std::string::const_iterator si = itr->first.begin(), se = itr->first.begin();
+		std::string first;
+		std::string second;
+		for (; si != se; ++si)
+		{
+			if (*si == '[' || *si == '(' || *si == '@') break;
+		}
+		if (si == se)
+		{
+			first = itr->first;
+			second = itr->second.data();
+		}
+		else
+		{
+			first = std::string( itr->first.begin(), si);
+			second = std::string( si, se);
+			second.push_back(' ');
+			second.append( itr->second.data());
+		}
+		if (!isIdentifier( first))
 		{
 			throw std::runtime_error( "Semantic error: Identifier expected as variable name");
 		}
-		if (itr->second.begin() == itr->second.end() && itr->second.data().size())
+		if (itr->second.begin() == itr->second.end() && second.size())
 		{
-			FRMAttribute fa( itr->second.data(), typemap, formmap);
+			FRMAttribute fa( second, typemap, formmap);
 			if (fa.isForm())
 			{
 				throw std::runtime_error( "Semantic error: illegal type specifier");
 			}
-			if (fa.isSubForm())
+			if (fa.isFormReference())
 			{
 				StructType val;
 				if (fa.isAttribute())
@@ -268,13 +287,13 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				{
 					val = fa.subform();
 				}
-				if (itr->first == "_")
+				if (first == "_")
 				{
 					result.defineContent( "", val);
 				}
 				else
 				{
-					result.defineContent( itr->first, val);
+					result.defineContent( first, val);
 				}
 			}
 			else
@@ -292,32 +311,32 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				}
 				if (fa.isAttribute())
 				{
-					if (itr->first == "_") throw std::runtime_error( "empty attribute name is illegal");
-					result.defineAttribute( itr->first, val);
+					if (first == "_") throw std::runtime_error( "empty attribute name is illegal");
+					result.defineAttribute( first, val);
 				}
 				else
 				{
-					if (itr->first == "_")
+					if (first == "_")
 					{
 						result.defineContent( "", val);
 					}
 					else
 					{
-						result.defineContent( itr->first, val);
+						result.defineContent( first, val);
 					}
 				}
 			}
 		}
 		else
 		{
-			if (itr->second.data().size())
+			if (!second.empty())
 			{
-				FRMAttribute fa( itr->second.data(), typemap, formmap);
+				FRMAttribute fa( second, typemap, formmap);
 				if (!fa.isForm())
 				{
 					throw std::runtime_error( "Semantic error: Atomic type declared as structure");
 				}
-				if (fa.isSubForm())
+				if (fa.isFormReference())
 				{
 					throw std::runtime_error( "Syntax error: Form reference declared as structure");
 				}
@@ -340,13 +359,13 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 					}
 					compile_ptree( itr->second, st, typemap, formmap);
 				}
-				result.defineContent( itr->first, st);
+				result.defineContent( first, st);
 			}
 			else
 			{
 				StructType st;
 				compile_ptree( itr->second, st, typemap, formmap);
-				result.defineContent( itr->first, st);
+				result.defineContent( first, st);
 			}
 		}
 	}

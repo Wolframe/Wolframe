@@ -11,14 +11,15 @@
 testcall
 **file:DBIN.tdl
 TRANSACTION testcall
-BEGIN FOREACH  //aa  DO  run(../aa);
+BEGIN FOREACH //aa DO run(../aa, /root/item/aa);
 END
 **outputfile:DBOUT
 **output
-run #1
+run #1#1
 
 start( 'run' );
 bind( 1, '1' );
+bind( 2, '1' );
 execute();
 nofColumns(); returns 0
 **end
