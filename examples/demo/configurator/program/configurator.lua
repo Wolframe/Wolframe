@@ -336,13 +336,35 @@ function PictureRequest( )
 	output:closetag( )
 end
 
+local function transform_picture( itr )
+	local picture = {}
+	picture["tags"] = {}
+	local tags = {}
+	local intags = false
+	for v,t in itr do
+		if ( ( t == "id" or t == "caption" or t == "info" or t == "image" ) and not intags) then
+			picture[ t] = content_value( v, itr)
+		elseif( t == "tagwrap" ) then
+			intags = true
+		elseif( t == "id" and intags ) then
+			table.insert( picture["tags"], { ["id"] = v } )
+		end
+	end
+	info = formfunction( "imageInfo" )( { [ "data"] = picture["image"] } ):table( )
+	picture["width"] = info.width
+	picture["height"] = info.height
+	thumb = formfunction( "imageThumb" )( { [ "image" ] = { [ "data" ] = picture["image"] }, [ "size" ] = 50 } ):table( )
+	picture["thumbnail"] = thumb.data
+	return picture
+end
+
 function editPicture( )
-	local picture = picture_value( input:get( ) )
+	local picture = transform_picture( input:get( ) )
 	formfunction( "updatePicture" )( { picture = picture } )
 end
 
 function createPicture( )
-	local picture = picture_value( input:get( ) )
+	local picture = transform_picture( input:get( ) )
 	formfunction( "addPicture" )( { picture = picture } )
 end
 
