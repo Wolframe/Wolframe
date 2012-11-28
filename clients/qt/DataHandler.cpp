@@ -156,6 +156,24 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 			foreach( QListWidgetItem *item, items ) {
 				xml.writeTextElement( "", name, item->data( Qt::DisplayRole ).toString( ) );
 			}
+		} else if( clazz == "QTableWidget" ) {
+			QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
+			QList<QTableWidgetItem *> items = tableWidget->selectedItems( );
+			QSet<QString> seen;
+			foreach( QTableWidgetItem *item, items ) {
+				// hard-coded! should be key/value as user attributes!
+				QString id = item->data( Qt::UserRole ).toString( );
+				if( !id.isNull( ) ) {
+					// HACK: only first row, otherwise we get duplicates
+					if( !seen.contains( id ) ) {
+						xml.writeStartElement( "", name );
+						xml.writeAttribute( "id", id );
+						xml.writeCharacters( item->data( Qt::UserRole ).toString( ) );
+						xml.writeEndElement( );
+						seen.insert( id );
+					}
+				}
+			}
 		} else if( clazz == "QTreeWidget" ) {
 			QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 			QList<QTreeWidgetItem *> items = treeWidget->selectedItems( );
@@ -291,8 +309,11 @@ void DataHandler::resetFormData( QWidget *form )
 			}
 		} else if( clazz == "QTableWidget" ) {
 			QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
-			tableWidget->clearContents( );			
-			// TODO: reset differently, after implementing the state property!
+//			tableWidget->clearContents( );			
+			QList<QTableWidgetItem *> items = tableWidget->selectedItems( );
+			foreach( QTableWidgetItem *item, items ) {
+				item->setSelected( false );
+			}
 		} else if( clazz == "FileChooser" ) {
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
 			fileChooser->setFileName( "" );
@@ -687,15 +708,8 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 						} else if( clazz == "QTreeWidget" ) {
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
+							// TODO: select by name (text in first field), for backwards compatibility, should be done by id
 							QList<QTreeWidgetItem *> items = treeWidget->findItems( text, Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 0 );
-qDebug( ) << "XXX:" << xml.name( ).toString( ) << ":" << text << ":" << items;
-QTreeWidgetItemIterator it(treeWidget);
-while (*it) {
-  qDebug() << "XXX:IT" << (*it)->text(0); 
-  if ((*it)->text(0)== text)
-    qDebug( ) << "XXX: YES!";
-  ++it;
-}							
 							foreach( QTreeWidgetItem *item, items ) {
 								item->setSelected( true );
 								QTreeWidgetItem *parent = item->parent( );
@@ -703,6 +717,15 @@ while (*it) {
 									parent->setExpanded( true );
 									parent = parent->parent( );
 								}
+							}
+						} else if( clazz == "QTableWidget" ) {
+							// TODO: select by user data, hard-coded for now, assuming id in userdata
+							QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
+							QString id = attributes.value( "", "id" ).toString( );
+							QAbstractItemModel *model = tableWidget->model( );
+							QModelIndexList matches = model->match( model->index( 0, 0 ), Qt::UserRole, id );
+							foreach( const QModelIndex &index, matches ) {
+								tableWidget->selectRow( index.row( ) );
 							}
 						} else if( clazz == "FileChooser" ) {
 							// don't restore anything, this is an upload component only

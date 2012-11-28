@@ -15,19 +15,12 @@ local function content_value( v, itr)
 	end
 end
 
-local function picture_value( itr)
-	local picture = {}
+local function picture_value( picture, itr )
 	for v,t in itr do
-		if (t == "id" or t == "caption" or t == "info" or t == "image") then
-			picture[ t] = content_value( v, itr)
+		if( t == "id") then
+			table.insert( picture, { ["id"] = v } )
 		end
 	end
-	logger:print( "ERROR", picture )
-	info = formfunction( "imageInfo" )( { [ "data"] = picture["image"] } ):table( )
-	picture["width"] = info.width
-	picture["height"] = info.height
-	thumb = formfunction( "imageThumb" )( { [ "image" ] = { [ "data" ] = picture["image"] }, [ "size" ] = 50 } ):table( )
-	picture["thumbnail"] = thumb.data
 	return picture
 end
 
@@ -36,7 +29,7 @@ local function insert_itr( tablename, parentID, itr)
 	local name = nil
 	local nname = nil
 	local description = nil
-	local picture = nil
+	local picture = { }
 	for v,t in itr do
 		if (t == "name") then
 			name = content_value( v, itr)
@@ -44,7 +37,7 @@ local function insert_itr( tablename, parentID, itr)
 		elseif (t == "description") then
 			description = content_value( v, itr)
 		elseif (t == "picture") then
-			picture = picture_value( scope( itr))
+			picture = picture_value( picture, scope( itr))
 		elseif (t == "node") then
 			if name then
 				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
@@ -74,7 +67,7 @@ local function insert_tree_topnode( tablename, itr)
 	local id = 1
 	local name = nil
 	local description = nil
-	local picture = nil
+	local picture = {}
 	for v,t in itr do
 		if (t == "parentID") then
 			parentID = tonumber( v)
@@ -83,7 +76,7 @@ local function insert_tree_topnode( tablename, itr)
 		elseif (t == "description") then
 			description = content_value( v, itr)
 		elseif (t == "picture") then
-			picture = picture_value( scope( itr))
+			picture = picture_value( picture, scope( itr))
 		elseif (t == "node") then
 			if name then
 				id = insert_topnode( tablename, name, description, picture, parentID)
@@ -171,10 +164,11 @@ local function edit_node( tablename, itr)
 	local name = nil;
 	local nname = nil;
 	local description = nil;
-	local picture = nil;
+	local picture = {};
+	local inpicture = false;
 	local id = nil;
 	for v,t in itr do
-		if t == "id" then
+		if( t == "id" and not inpicture ) then
 			id = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)
@@ -182,7 +176,8 @@ local function edit_node( tablename, itr)
 		elseif t == "description" then
 			description = content_value( v, itr)
 		elseif t == "picture" then
-			picture = picture_value( scope(itr))
+			picture = picture_value( picture, scope( itr))
+			inpicture = true
 		end
 	end
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
@@ -206,7 +201,7 @@ local function create_node( tablename, itr)
 	local name = nil;
 	local parentID = nil;
 	local description = nil;
-	local picture = nil;
+	local picture = {};
 	for v,t in itr do
 		if t == "parentID" then
 			parentID = v
@@ -216,7 +211,7 @@ local function create_node( tablename, itr)
 		elseif t ==  "description" then
 			description = content_value( v, itr)
 		elseif t ==  "picture" then
-			picture = picture_value( scope(itr))
+			picture = picture_value( picture, scope( itr))
 		end
 	end
 	insert_topnode( tablename, name, description, picture, parentID)

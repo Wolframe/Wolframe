@@ -9,6 +9,7 @@ show stoppers:
 - set focus in forms
   
 musts:
+- search by tags
 - use simpleforms instead of funny lua parsers (example
   picture parsers)
 - allow grouping into tags without a dummy groupbox or

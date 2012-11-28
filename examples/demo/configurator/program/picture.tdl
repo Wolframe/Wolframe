@@ -50,7 +50,7 @@ TRANSACTION addPicture -- (picture/caption, picture/info, picture/image, picture
 BEGIN
 	FOREACH picture DO INSERT INTO Picture( caption, info, image, width, height, thumbnail )
 		VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail) );
-	DO NONEMPTY UNIQUE getLastInsertedPictureID( );
+	DO NONEMPTY UNIQUE getLastPictureID( );
 	FOREACH picture/tags DO INSERT INTO PictureTag( pictureID, tagID ) VALUES( $1, $(id) );
 END
 

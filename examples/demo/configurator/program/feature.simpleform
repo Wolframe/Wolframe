@@ -5,14 +5,8 @@ DOCTYPE "feature Feature"
 	name string
 	normalizedName string
 	description string
-	picture
+	picture []
 	{
 		id @int
-		caption string
-		info string
-		image string
-		thumbnail string
-		width int
-		height int
 	}
 }

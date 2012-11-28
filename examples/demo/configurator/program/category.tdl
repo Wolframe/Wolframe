@@ -1,21 +1,14 @@
 --
 -- addCategory
 --
-OPERATION addCategoryPicture -- ($1=categoryID)(caption, info, image, width, height, thumbnail)
-BEGIN
-	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
-	DO NONEMPTY UNIQUE getLastPictureID($1);
-	DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
-END
-
-TRANSACTION addCategory -- (parentID, name, normalizedName, description)
+TRANSACTION addCategory -- (parentID, name, normalizedName, description, pictures/picture/id)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT rgt FROM Category WHERE ID = $(parentID);
 	DO UPDATE Category SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Category WHERE normalizedName = $(normalizedName);
-	FOREACH picture DO addCategoryPicture($1);
+	FOREACH picture DO INSERT INTO CategoryPicture( categoryID, pictureID ) VALUES( $1, $(id) );
 END
 
 --
@@ -24,7 +17,6 @@ END
 TRANSACTION deleteCategory -- (id)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Category WHERE ID = $(id) AND ID != '1';
-	DO DELETE FROM Picture WHERE ID IN (SELECT pictureID FROM CategoryPicture WHERE categoryID = $(id));
 	DO DELETE FROM CategoryPicture WHERE categoryID = $(id);
 	DO DELETE FROM Category WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Category SET lft = lft-$3 WHERE lft>$2;
@@ -34,10 +26,11 @@ END
 --
 -- updateCategory
 --
-TRANSACTION updateCategory -- (id, name, normalizedName, description, picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
+TRANSACTION updateCategory -- (id, name, normalizedName, description, pictures/picture/id)
 BEGIN
 	DO UPDATE Category SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
-	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image), width = $(width), height = $(height), thumbnail = $(thumbnail) WHERE ID = $(id);
+	DO DELETE FROM CategoryPicture WHERE categoryID = $(id);
+	FOREACH picture DO INSERT INTO CategoryPicture( categoryID, pictureID ) VALUES( $(/id), $(id) );
 END
 
 --
@@ -47,18 +40,32 @@ END
 --
 TRANSACTION selectCategory -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Category WHERE ID = $(id);
-	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID", name,
+		normalizedName AS "normalizedName",description
+		FROM Category WHERE ID = $(id);
+	INTO picture DO 
+		SELECT CategoryPicture.pictureID AS "id"
+			FROM CategoryPicture
+			WHERE CategoryPicture.categoryID = $(id);
 END
+
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Category WHERE normalizedName = $(normalizedName);
-	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $1;
+	INTO . DO NONEMPTY UNIQUE
+		SELECT ID AS id, parentID AS "parentID", name,
+			normalizedName AS "normalizedName",description FROM Category
+			WHERE normalizedName = $(normalizedName);
+	INTO picture DO
+		SELECT pictureID AS "id"
+			FROM CategoryPicture
+			WHERE CategoryPicture.categoryID = $1;
 END
 
 TRANSACTION selectCategorySet -- (/category/id)
 BEGIN
-	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS "ID",name,normalizedName AS "normalizedName",description FROM Category WHERE ID = $(id) ORDER BY ID;
+	FOREACH /category INTO category DO NONEMPTY UNIQUE
+		SELECT ID AS "ID", name, normalizedName AS "normalizedName", description
+			FROM Category WHERE ID = $(id) ORDER BY ID;
 END
 
 --
@@ -76,4 +83,3 @@ TRANSACTION selectSubCategory -- (id)
 BEGIN
 	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
-

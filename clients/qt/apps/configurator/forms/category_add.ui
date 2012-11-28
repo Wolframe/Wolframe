@@ -13,182 +13,151 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="formLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>371</width>
-     <height>455</height>
-    </rect>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
-   <layout class="QFormLayout" name="formLayout">
-    <property name="fieldGrowthPolicy">
-     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-    </property>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_name">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_name">
+     <property name="text">
+      <string>Name:</string>
+     </property>
+     <property name="buddy">
+      <cstring>name</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="name"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_description">
+     <property name="text">
+      <string>Description:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPlainTextEdit" name="description"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_picture">
+     <property name="text">
+      <string>Pictures:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QTableWidget" name="picture">
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::MultiSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="showGrid">
+      <bool>true</bool>
+     </property>
+     <property name="gridStyle">
+      <enum>Qt::DotLine</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string notr="true">PictureListRequest.simpleform</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string notr="true">picture</string>
+     </property>
+     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderStretchLastSection">
+      <bool>false</bool>
+     </attribute>
+     <column>
       <property name="text">
-       <string>Name:</string>
+       <string>thumbnail</string>
       </property>
-      <property name="buddy">
-       <cstring>name</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLineEdit" name="name"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_description">
+     </column>
+     <column>
       <property name="text">
-       <string>Description:</string>
+       <string>caption</string>
       </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QPlainTextEdit" name="description"/>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_picture">
+     </column>
+     <column>
       <property name="text">
-       <string>Picture:</string>
+       <string>info</string>
       </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <layout class="QFormLayout" name="formLayout_2">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </column>
+     <column>
+      <property name="text">
+       <string>tags</string>
       </property>
-      <item row="0" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QPushButton" name="add">
-          <property name="text">
-           <string>Add</string>
-          </property>
-          <property name="rootelement" stdset="0">
-           <string notr="true">category</string>
-          </property>
-          <property name="doctype" stdset="0">
-           <string notr="true">Category.simpleform</string>
-          </property>
-          <property name="action" stdset="0">
-           <string notr="true">create</string>
-          </property>
-          <property name="form" stdset="0">
-           <string notr="true">categories</string>
-          </property>
-          <property name="parentID" stdset="0">
-           <string notr="true">{global.id}</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="cancel">
-          <property name="text">
-           <string>Cancel</string>
-          </property>
-          <property name="form" stdset="0">
-           <string notr="true">categories</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </item>
-    <item row="2" column="1">
-     <widget class="QGroupBox" name="picture">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>220</height>
-       </size>
-      </property>
-      <property name="title">
-       <string/>
-      </property>
-      <widget class="PictureChooser" name="image">
-       <property name="geometry">
-        <rect>
-         <x>67</x>
-         <y>69</y>
-         <width>211</width>
-         <height>141</height>
-        </rect>
+     </column>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-       <property name="minimumSize">
+       <property name="sizeHint" stdset="0">
         <size>
-         <width>0</width>
-         <height>100</height>
+         <width>40</width>
+         <height>20</height>
         </size>
        </property>
-      </widget>
-      <widget class="QLabel" name="label_info">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>27</width>
-         <height>20</height>
-        </rect>
-       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="add">
        <property name="text">
-        <string>Info:</string>
+        <string>Add</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">category</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">Category.simpleform</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">create</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">categories</string>
+       </property>
+       <property name="parentID" stdset="0">
+        <string notr="true">{global.id}</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="caption">
-       <property name="geometry">
-        <rect>
-         <x>70</x>
-         <y>40</y>
-         <width>211</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_caption">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>40</y>
-         <width>52</width>
-         <height>20</height>
-        </rect>
-       </property>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancel">
        <property name="text">
-        <string>Caption:</string>
+        <string>Cancel</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">categories</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="info">
-       <property name="geometry">
-        <rect>
-         <x>70</x>
-         <y>10</y>
-         <width>211</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>PictureChooser</class>
-   <extends>QWidget</extends>
-   <header>PictureChooser.hpp</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>name</tabstop>
   <tabstop>description</tabstop>
-  <tabstop>info</tabstop>
-  <tabstop>caption</tabstop>
   <tabstop>add</tabstop>
   <tabstop>cancel</tabstop>
  </tabstops>
