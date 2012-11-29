@@ -2,7 +2,7 @@ TRANSACTION selectPictureList
 BEGIN
 	INTO list/picture DO
 		SELECT Picture.ID AS "id", thumbnail, caption, info, width, height,
-			coalesce( group_concat( Tag.name, ', ' ), '' ) as tags,
+			coalesce( group_concat( Tag.name ), '' ) as tags,
 			3*length(image)/4+2 as size
 		FROM Picture
 		LEFT JOIN PictureTag
@@ -16,7 +16,7 @@ TRANSACTION selectPicture -- (/picture/id)
 BEGIN
 	INTO picture DO UNIQUE
 		SELECT Picture.ID AS "id", image, caption, info, width, height,
-			coalesce( group_concat( Tag.name, ', ' ), '' ) as tags,
+			coalesce( group_concat( Tag.name ), '' ) as tags,
 			3*length(image)/4+2 as size
 		FROM Picture
 		LEFT JOIN PictureTag

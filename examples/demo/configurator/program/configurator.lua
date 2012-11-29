@@ -24,7 +24,6 @@ local function pictures_value( pictures, itr )
 			table.insert( pictures[ "picture" ], { ["id"] = v } )
 		end
 	end
-	logger:print( "ERROR", pictures )
 	return pictures
 end
 
