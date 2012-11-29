@@ -421,13 +421,16 @@ void MainWindow::disconnected( )
 
 void MainWindow::wolframeError( QString error )
 {
- 	if( QMessageBox::information( m_ui, tr( "Protocol error, reconfigure now?" ),
-		tr( "Protocol error: %1, reconfigure client now?" ).arg( error ),
-		QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes ) {
-// fatal error, present the user a preferences dialog
-		if( !m_dataLoader || !m_formLoader ) {
+// fatal error, present the user a choice whether to stop now or reconfigure
+// the system
+	if( !m_dataLoader || !m_formLoader ) {
+		if( QMessageBox::critical( m_ui, tr( "Protocol error, reconfigure now?" ),
+			tr( "Protocol error: %1, reconfigure client now?" ).arg( error ),
+			QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes ) {
+
 			PreferencesDialog prefs( m_languages, m_ui );
 			if( prefs.exec( ) == QDialog::Accepted ) {
+// reload and use new settings
 				qDebug( ) << "Reloading application";
 				QApplication::instance( )->exit( RESTART_CODE );
 			} else {
@@ -435,6 +438,9 @@ void MainWindow::wolframeError( QString error )
 				QApplication::instance( )->exit( 0 );
 			}
 		}
+	} else {
+// the error is normal way of life, so show only a normal error message in the statusbar
+		( qobject_cast<QMainWindow *>( m_ui ) )->statusBar( )->showMessage( error );
 	}
 }
 

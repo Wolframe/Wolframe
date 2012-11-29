@@ -1,7 +1,7 @@
-show stoppers:
+now:
 - picture list:
   - search by tag
-  - show where the pictures are being used
+  - avoid deletion of in=-use-pictures
 - recover after errors in protocol:
   - example, duplicate normalizedName
   - stop the "whiteout", especially seen after assigning pictures
