@@ -183,7 +183,7 @@ local function edit_node( tablename, itr)
 			pictures = pictures_value( pictures, scope( itr))
 		end
 	end
-	logger:print( "ERROR", id, ":", name, ":", nname, ":", pictures )
+	--logger:print( "ERROR", id, ":", name, ":", nname, ":", pictures )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, pictures=pictures} )
 end
 
