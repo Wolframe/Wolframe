@@ -254,6 +254,11 @@ void MainWindow::initialize( )
 	if( m_debug ) {
 		m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
 		debugTerminal = m_debugTerminal;
+
+// connect lines sent by anybody to the debug window
+		connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
+			m_debugTerminal, SLOT( sendLine( QString ) ) );
+
 		qDebug( ) << "Debug window initialized";
 	}
 
@@ -296,10 +301,6 @@ void MainWindow::initialize( )
 // catch error of network protocol
 	connect( m_wolframeClient, SIGNAL( error( QString ) ),
 		this, SLOT( wolframeError( QString ) ) );
-
-// connect lines sent by anybody to the debug window
-	connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
-		m_debugTerminal, SLOT( sendLine( QString ) ) );
 		
 // a Qt UI loader for the main theme window and also used by all form widgets
 	m_uiLoader = new QUiLoader( );
