@@ -20,7 +20,6 @@ local function pictures_value( pictures, itr )
 		pictures = { ["picture"] = { } }
 	end
 	for v,t in itr do
-		--logger:print( "ERROR", "INPICTURE", ":", v, ":", t, ":", id )
 		if( t == "id") then
 			table.insert( pictures[ "picture" ], { ["id"] = v } )
 		end
@@ -171,7 +170,6 @@ local function edit_node( tablename, itr)
 	local pictures = nil
 	local id = nil
 	for v,t in itr do
-		--logger:print( "ERROR", v, ":", t, ":", id )
 		if( t == "id" ) then
 			id = v
 		elseif t ==  "name" then
@@ -183,7 +181,6 @@ local function edit_node( tablename, itr)
 			pictures = pictures_value( pictures, scope( itr))
 		end
 	end
-	--logger:print( "ERROR", id, ":", name, ":", nname, ":", pictures )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, pictures=pictures} )
 end
 
@@ -343,7 +340,6 @@ local function transform_picture( itr )
 	local intagwrap = false
 	local inid = false;
 	for v,t in itr do
-		logger:print( "ERROR", v, ":", t, ":", picture["tags"] )
 		if( not v and t ) then
 			-- begin tag
 			if( t == "tagwrap" ) then
@@ -382,7 +378,6 @@ end
 
 function editPicture( )
 	local picture = transform_picture( input:get( ) )
-	logger:print( "ERROR", picture["tags"] )
 	formfunction( "updatePicture" )( { picture = picture } )
 end
 
