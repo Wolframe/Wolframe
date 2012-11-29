@@ -254,13 +254,15 @@ void MainWindow::initialize( )
 	if( m_debug ) {
 		m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
 		debugTerminal = m_debugTerminal;
+		qDebug( ) << "Debug window initialized";
+	}
+
+// install custom output handler
 #ifndef Q_OS_ANDROID
 // crashes somehow on Android, must investigate
 		qInstallMsgHandler( &myMessageOutput );
 		//if( m_debug ) m_debugTerminal->bringToFront( );
 #endif
-		qDebug( ) << "Debug window initialized";
-	}
 
 // open local sqlite database
 	if( m_uiLoadMode == LocalDb || m_dataLoadMode == LocalDb ) {
