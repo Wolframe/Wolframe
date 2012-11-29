@@ -1,7 +1,7 @@
 show stoppers:
 - picture list:
   - search by tag
-  - show where the pictures are bein used
+  - show where the pictures are being used
 - recover after errors in protocol:
   - example, duplicate normalizedName
   - stop the "whiteout", especially seen after assigning pictures

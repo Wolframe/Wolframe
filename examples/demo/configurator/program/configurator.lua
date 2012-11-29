@@ -168,32 +168,21 @@ local function edit_node( tablename, itr)
 	local nname = nil
 	local description = nil
 	local pictures = nil
-	local inpicture = false
 	local id = nil
 	for v,t in itr do
-		if( not v and t ) then
-			-- begin tag
-			if t ==  "name" then
-				name = content_value( v, itr)
-				nname = normalizer("name")( name)
-			elseif t == "description" then
-				description = content_value( v, itr)
-			elseif( t == "picture" ) then
-				inpicture = true
-				pictures = pictures_value( pictures, scope( itr))
-			end
-		elseif( v and t ) then
-			-- attribute
-			if( t == "id" and not inpicture ) then
-				id = v
-			end
-		else
-			-- end tag
-			if( inpicture ) then
-				inpicture = false
-			end
+		logger:print( "ERROR", v, ":", t, ":", id )
+		if( t == "id" ) then
+			id = v
+		elseif t ==  "name" then
+			name = content_value( v, itr)
+			nname = normalizer("name")( name)
+		elseif t == "description" then
+			description = content_value( v, itr)
+		elseif( t == "picture" ) then
+			pictures = pictures_value( pictures, scope( itr))
 		end
 	end
+	logger:print( "ERROR", id, ":", name, ":", nname, ":", pictures )
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, pictures=pictures} )
 end
 

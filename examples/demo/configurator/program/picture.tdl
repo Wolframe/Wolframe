@@ -18,12 +18,17 @@ BEGIN
 	INTO picture DO UNIQUE
 		SELECT Picture.ID AS "id", image, caption, info, width, height,
 			coalesce( group_concat( Tag.name ), '' ) as tags,
-			3*length(image)/4+2 as size
+			3*length(image)/4+2 as size,
+			Category.name as used_categories
 		FROM Picture
 		LEFT JOIN PictureTag
 		ON PictureTag.pictureID = Picture.ID
 		LEFT JOIN Tag
 		ON PictureTag.tagID = Tag.ID
+		LEFT JOIN CategoryPicture
+		ON CategoryPicture.pictureID = Picture.ID
+		LEFT JOIN Category
+		ON CategoryPicture.categoryID = Category.ID
 		WHERE Picture.ID = $(id)
 		GROUP BY Picture.ID, Picture.image, Picture.caption, Picture.info,
 			Picture.width, Picture.height;

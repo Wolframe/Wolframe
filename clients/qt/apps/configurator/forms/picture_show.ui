@@ -111,7 +111,7 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="1">
+   <item row="10" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -184,6 +184,20 @@
     <widget class="QLabel" name="tags">
      <property name="text">
       <string>tags</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_used">
+     <property name="text">
+      <string>Used in:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QLabel" name="used_categories">
+     <property name="text">
+      <string>TextLabel</string>
      </property>
     </widget>
    </item>
