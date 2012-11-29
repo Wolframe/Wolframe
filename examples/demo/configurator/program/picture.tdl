@@ -10,7 +10,7 @@ BEGIN
 		LEFT JOIN Tag
 		ON PictureTag.tagID = Tag.ID
 		GROUP BY Picture.ID, Picture.thumbnail, Picture.caption, Picture.info,
-			Picture.width, Picture.height;
+			Picture.width, Picture.height, Picture.image;
 END
 
 TRANSACTION selectPicture -- (/picture/id)
