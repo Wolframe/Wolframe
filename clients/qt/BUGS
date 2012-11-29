@@ -10,3 +10,15 @@ ERROR: error calling function 'PictureListRequest':[configurator]:325: error in 
 
 ERROR: error in sqlite database transaction: SQLite error 19 (extended error code 19); message: 'column normalizedName is not unique' in statement 'UPDATE Category SET name = $1, normalizedName = $2, description = $3 WHERE ID = $4'
 ERROR: error calling function 'editCategory':[configurator]:197: error in function '<formfunction>(..)' (transaction failed: SQLite error 19 (extended error code 19); message: 'column normalizedName is not unique' in statement 'UPDATE Category SET name = $1, normalizedName = $2, description = $3 WHERE ID = $4')
+=> libxml2 wrapper empty content not handled correctly
+
+empty desciption gets to "  "
+
+only one tag returned when using textwolf:
+  <tagwrap id="16">
+    <tag id="16">vegetables</tag>
+    <tag id="17">green vegetables</tag>
+    <tag id="18">white vegetables</tag>
+  </tagwrap>
+gets to ERROR: { 1={ id='16' } }
+

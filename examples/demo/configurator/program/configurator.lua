@@ -318,7 +318,7 @@ function PictureListRequest( )
 end
 
 function PictureRequest( )
-	output:as( "picture SYSTEM 'Picture.simpleform'")
+	output:as( "dummy SYSTEM 'Picture.simpleform'")
 	filter().empty = false
 	local id = nil;
 	for v,t in input:get( ) do
@@ -343,6 +343,7 @@ local function transform_picture( itr )
 	local intagwrap = false
 	local inid = false;
 	for v,t in itr do
+		logger:print( "ERROR", v, ":", t, ":", picture["tags"] )
 		if( not v and t ) then
 			-- begin tag
 			if( t == "tagwrap" ) then
@@ -381,7 +382,7 @@ end
 
 function editPicture( )
 	local picture = transform_picture( input:get( ) )
-	--logger:print( "ERROR", picture )
+	logger:print( "ERROR", picture["tags"] )
 	formfunction( "updatePicture" )( { picture = picture } )
 end
 
