@@ -171,16 +171,27 @@ local function edit_node( tablename, itr)
 	local inpicture = false
 	local id = nil
 	for v,t in itr do
-		if( t == "id" and not inpicture ) then
-			id = v
-		elseif t ==  "name" then
-			name = content_value( v, itr)
-			nname = normalizer("name")( name)
-		elseif t == "description" then
-			description = content_value( v, itr)
-		elseif t == "picture" then
-			pictures = pictures_value( pictures, scope( itr))
-			inpicture = true
+		if( not v and t ) then
+			-- begin tag
+			if t ==  "name" then
+				name = content_value( v, itr)
+				nname = normalizer("name")( name)
+			elseif t == "description" then
+				description = content_value( v, itr)
+			elseif( t == "picture" ) then
+				inpicture = true
+				pictures = pictures_value( pictures, scope( itr))
+			end
+		elseif( v and t ) then
+			-- attribute
+			if( t == "id" and not inpicture ) then
+				id = v
+			end
+		else
+			-- end tag
+			if( inpicture ) then
+				inpicture = false
+			end
 		end
 	end
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, pictures=pictures} )
@@ -342,7 +353,6 @@ local function transform_picture( itr )
 	local intagwrap = false
 	local inid = false;
 	for v,t in itr do
-		logger:print( "ERROR", v, ":", t, ":", intagwrap, ":", intag, ":", picture["tags"] )
 		if( not v and t ) then
 			-- begin tag
 			if( t == "tagwrap" ) then
