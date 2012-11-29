@@ -8,16 +8,9 @@ FreeBSD, some PNGs are not visible in qt client (PNG version?)
 Weak error message, what's the name of the function?
 ERROR: error calling function 'PictureListRequest':[configurator]:325: error in function 'formfunction(..)' (form function not found (is neither a module form function, nor a transaction function, nor a print function))
 
-TDL:
-How to access @id in <tag id="xx">?
-
-Form mapping:
-
-<picture id="1">
-  <tagwrap id="18">
-    <tag id="15">new computers</tag>
-    <tag id="18">white vegetables</tag>
-    <tag id="14">old computers</tag>
-  </tagwrap>
-
-result is id=14
+ERROR: error in postgres database transaction: PostgreSQL status PGRES_FATAL_ERROR; message: 'ERROR:  duplicate key value violates unique constraint "feature_normalizedname_key"
+DETAIL:  Key (normalizedname)=(red) already exists.
+'
+ERROR: error calling function 'editFeature':[configurator]:186: error in function '<formfunction>(..)' (transaction failed: PostgreSQL status PGRES_FATAL_ERROR; message: 'ERROR:  duplicate key value violates unique constraint "feature_normalizedname_key"
+DETAIL:  Key (normalizedname)=(red) already exists.
+')

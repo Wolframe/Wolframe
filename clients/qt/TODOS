@@ -9,7 +9,8 @@ show stoppers:
   - CRITICAL: "Premature end of document."
   - ILLEGAL STATE 4 in dataAvailable!
 - set focus in forms
-  
+- WARNING: QObject::connect: Cannot connect WolframeClient::lineSent( QString ) to (null)::sendLine( QString )
+
 musts:
 - improve group_concat to take a parameter as separator
 - use simpleforms instead of funny lua parsers (example
