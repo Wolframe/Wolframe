@@ -142,7 +142,7 @@
         <string>Info</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">picture_show</string>
+        <string notr="true">picture_info</string>
        </property>
        <property name="global.id" stdset="0">
         <string notr="true">{picture.id}</string>
