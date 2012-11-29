@@ -440,7 +440,7 @@ void MainWindow::wolframeError( QString error )
 		}
 	} else {
 // the error is normal way of life, so show only a normal error message in the statusbar
-		( qobject_cast<QMainWindow *>( m_ui ) )->statusBar( )->showMessage( error );
+		( qobject_cast<QMainWindow *>( m_ui ) )->statusBar( )->showMessage( error, 6000 );
 	}
 }
 

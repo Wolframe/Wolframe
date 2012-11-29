@@ -1,13 +1,12 @@
 now:
 - picture list:
   - search by tag
-  - avoid deletion of in=-use-pictures
-- recover after errors in protocol:
-  - example, duplicate normalizedName
-  - stop the "whiteout", especially seen after assigning pictures
-    (must be a protocol thing)
-  - CRITICAL: "Premature end of document."
-  - ILLEGAL STATE 4 in dataAvailable!
+  - avoid deletion of in-use-pictures
+- get sensible error message from business layer, not "lua call faled"
+- stop the "whiteout", especially seen after assigning pictures
+  (must be a protocol thing)
+- ILLEGAL STATE 4 in dataAvailable!
+- CRITICAL: "Premature end of document."
 - set focus in forms
 
 musts:

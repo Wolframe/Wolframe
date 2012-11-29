@@ -120,6 +120,8 @@ void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props
 	foreach( QString key, props->keys( ) ) {
 // skip _q_ dynamic properties, they are used by the Qt stylesheet engine
 		if( key.startsWith( "_q_" ) ) continue;
+// skip globals
+		if( key.startsWith( "global." ) ) continue;
 // ignore our own actions
 		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
 		xml.writeAttribute( key, props->value( key ) );
@@ -169,6 +171,8 @@ void NetworkDataLoader::handleDelete( QString name, QHash<QString, QString> *pro
 	foreach( QString key, props->keys( ) ) {
 // skip _q_ dynamic properties, they are used by the Qt stylesheet engine
 		if( key.startsWith( "_q_" ) ) continue;
+// skip globals
+		if( key.startsWith( "global." ) ) continue;
 // ignore our own actions
 		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
 		xml.writeAttribute( key, props->value( key ) );

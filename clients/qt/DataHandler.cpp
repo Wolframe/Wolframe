@@ -54,6 +54,8 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		foreach( QString key, props->keys( ) ) {
 	// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
 			if( key.startsWith( "_q_" ) ) continue;
+	// skip globals
+			if( key.startsWith( "global." ) ) continue;
 	// ignore our own actions
 			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
 			xml.writeAttribute( key, props->value( key ) );
@@ -199,6 +201,8 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 			foreach( QString key, p.keys( ) ) {
 				// skip Qt internal ones
 				if( key.startsWith( "_q_" ) ) continue;
+				// skip globals
+				if( key.startsWith( "global." ) ) continue;
 				xml.writeAttribute( key, p.value( key ) );
 			}
 			writeWidgets( groupBox, xml, props, seen );
