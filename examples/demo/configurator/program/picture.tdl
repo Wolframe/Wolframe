@@ -9,7 +9,8 @@ BEGIN
 		ON PictureTag.pictureID = Picture.ID
 		LEFT JOIN Tag
 		ON PictureTag.tagID = Tag.ID
-		GROUP BY Picture.ID;
+		GROUP BY Picture.ID, Picture.thumbnail, Picture.caption, Picture.info,
+			Picture.width, Picture.height;
 END
 
 TRANSACTION selectPicture -- (/picture/id)
@@ -24,7 +25,8 @@ BEGIN
 		LEFT JOIN Tag
 		ON PictureTag.tagID = Tag.ID
 		WHERE Picture.ID = $(id)
-		GROUP BY Picture.ID;
+		GROUP BY Picture.ID, Picture.image, Picture.caption, Picture.info,
+			Picture.width, Picture.height;
 
 	-- HACK from here, see wrapper element in LUA code, no other solution found..
 	INTO tagwrap DO
@@ -57,5 +59,6 @@ END
 
 TRANSACTION deletePicture -- (id)
 BEGIN
+	DO DELETE FROM PictureTag WHERE PictureID = $(id);
 	DO DELETE FROM Picture WHERE ID = $(id);
 END

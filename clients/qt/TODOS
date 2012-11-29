@@ -1,15 +1,16 @@
 show stoppers:
-- picture handling:
-  - tag them
-  - assign pictures:
-    - present pictures in a list
-    - search them by tag
+- picture list:
+  - search by tag
+  - show where the pictures are bein used
 - recover after errors in protocol:
   - example, duplicate normalizedName
+  - stop the "whiteout", especially seen after assigning pictures
+    (must be a protocol thing)
+  - CRITICAL: "Premature end of document."
 - set focus in forms
   
 musts:
-- search by tags
+- improve group_concat to take a parameter as separator
 - use simpleforms instead of funny lua parsers (example
   picture parsers)
 - allow grouping into tags without a dummy groupbox or
