@@ -19,7 +19,8 @@ BEGIN
 		SELECT Picture.ID AS "id", image, caption, info, width, height,
 			coalesce( group_concat( Tag.name ), '' ) as tags,
 			3*length(image)/4+2 as size,
-			Category.name as used_categories
+			coalesce( group_concat( distinct Category.name ), '' ) as used_categories,
+			coalesce( group_concat( distinct Feature.name ), '' ) as used_features
 		FROM Picture
 		LEFT JOIN PictureTag
 		ON PictureTag.pictureID = Picture.ID
@@ -29,6 +30,10 @@ BEGIN
 		ON CategoryPicture.pictureID = Picture.ID
 		LEFT JOIN Category
 		ON CategoryPicture.categoryID = Category.ID
+		LEFT JOIN FeaturePicture
+		ON FeaturePicture.pictureID = Picture.ID
+		LEFT JOIN Feature
+		ON FeaturePicture.featureID = Feature.ID
 		WHERE Picture.ID = $(id)
 		GROUP BY Picture.ID, Picture.image, Picture.caption, Picture.info,
 			Picture.width, Picture.height;

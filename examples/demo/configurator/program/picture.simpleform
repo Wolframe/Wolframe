@@ -12,6 +12,7 @@ DOCTYPE "picture Picture"
 		size int
 		tags string
 		used_categories string
+		used_features string
 		tagwrap
 		{
 			id @int

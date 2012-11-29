@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>512</width>
-    <height>428</height>
+    <height>448</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -111,7 +111,7 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="1">
+   <item row="12" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -187,17 +187,31 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="0">
+   <item row="10" column="0">
     <widget class="QLabel" name="label_used">
      <property name="text">
-      <string>Used in:</string>
+      <string>Used in categories:</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="1">
+   <item row="10" column="1">
     <widget class="QLabel" name="used_categories">
      <property name="text">
-      <string>TextLabel</string>
+      <string>used in categories</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <widget class="QLabel" name="used_features">
+     <property name="text">
+      <string>used in features</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="label_used_in_featuers">
+     <property name="text">
+      <string>Used in Features:</string>
      </property>
     </widget>
    </item>
