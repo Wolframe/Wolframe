@@ -357,7 +357,7 @@ local function transform_picture( itr )
 			elseif( t == "id" and intag and intagwrap ) then
 				table.insert( picture["tags"], { ["id"] = v } )
 			end
-		else
+		elseif( not v and not t ) then
 			-- end tag
 			if( inid ) then
 				inid = false
@@ -366,6 +366,8 @@ local function transform_picture( itr )
 			elseif( intagwrap ) then
 				intagwrap = false
 			end
+		else
+			-- dummy content
 		end
 	end
 	info = formfunction( "imageInfo" )( { [ "data"] = picture["image"] } ):table( )
