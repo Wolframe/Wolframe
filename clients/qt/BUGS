@@ -5,9 +5,6 @@ ERROR: error calling function 'CategoryHierarchyRequest':[configurator]:100: err
 
 FreeBSD, some PNGs are not visible in qt client (PNG version?)
 
-Weak error message, what's the name of the function?
-ERROR: error calling function 'PictureListRequest':[configurator]:325: error in function 'formfunction(..)' (form function not found (is neither a module form function, nor a transaction function, nor a print function))
-
 ERROR: error in sqlite database transaction: SQLite error 19 (extended error code 19); message: 'column normalizedName is not unique' in statement 'UPDATE Category SET name = $1, normalizedName = $2, description = $3 WHERE ID = $4'
 ERROR: error calling function 'editCategory':[configurator]:197: error in function '<formfunction>(..)' (transaction failed: SQLite error 19 (extended error code 19); message: 'column normalizedName is not unique' in statement 'UPDATE Category SET name = $1, normalizedName = $2, description = $3 WHERE ID = $4')
 => libxml2 wrapper empty content not handled correctly
