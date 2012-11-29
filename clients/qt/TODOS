@@ -7,6 +7,7 @@ show stoppers:
   - stop the "whiteout", especially seen after assigning pictures
     (must be a protocol thing)
   - CRITICAL: "Premature end of document."
+  - ILLEGAL STATE 4 in dataAvailable!
 - set focus in forms
   
 musts:

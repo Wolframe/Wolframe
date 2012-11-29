@@ -249,15 +249,18 @@ void MainWindow::initialize( )
 // create a Wolframe protocol client
 	m_wolframeClient = new WolframeClient( m_host, m_port, m_secure, m_checkSSL, m_clientCertFile, m_clientKeyFile, m_CACertFile );
 
-// create debuging terminal
-	m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
-	debugTerminal = m_debugTerminal;
+// create debuging terminal (only if debugging is enable per command line or in preferences! Don't
+// fill up the plain text widget with images!)
+	if( m_debug ) {
+		m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
+		debugTerminal = m_debugTerminal;
 #ifndef Q_OS_ANDROID
 // crashes somehow on Android, must investigate
-	qInstallMsgHandler( &myMessageOutput );
-	if( m_debug ) m_debugTerminal->bringToFront( );
+		qInstallMsgHandler( &myMessageOutput );
+		//if( m_debug ) m_debugTerminal->bringToFront( );
 #endif
-	qDebug( ) << "Debug window initialized";
+		qDebug( ) << "Debug window initialized";
+	}
 
 // open local sqlite database
 	if( m_uiLoadMode == LocalDb || m_dataLoadMode == LocalDb ) {
@@ -404,7 +407,9 @@ void MainWindow::connected( )
 void MainWindow::disconnected( )
 {
 	disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
-	m_debugTerminal->close( );
+	if( m_debugTerminal ) {
+		m_debugTerminal->close( );
+	}
 	m_debugTerminal = 0;
 	debugTerminal = 0;
 		
@@ -530,6 +535,13 @@ void MainWindow::loadTheme( QString theme )
 // make the form widget the central widget
 	( qobject_cast<QMainWindow *>( m_ui ) )->setCentralWidget( m_formWidget );
 
+// make debug action available
+	if( !m_debug ) {
+		QAction *action = m_ui->findChild<QAction *>( "actionDebugTerminal" );
+		if( action ) {
+			action->setEnabled( false );
+		}
+	}
 // show the new gui
 	m_ui->show( );
 
@@ -751,10 +763,12 @@ void MainWindow::on_actionAboutQt_triggered( )
 
 void MainWindow::on_actionDebugTerminal_triggered( bool checked )
 {
-	if( checked ) {
-		m_debugTerminal->bringToFront( );
-	} else {
-		m_debugTerminal->hide( );
+	if( m_debugTerminal ) {
+		if( checked ) {
+			m_debugTerminal->bringToFront( );
+		} else {
+			m_debugTerminal->hide( );
+		}
 	}
 }
 
