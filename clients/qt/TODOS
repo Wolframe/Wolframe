@@ -17,11 +17,9 @@ musts:
   similar widget around it, where to put the data then?
 - how to comminicate tags which are used by picture and 
   they should not be deletable?
-- QTableWidget:
-  - implement state
-    - viewport position
-    - selected cells
-    - new way of reseting the form (no domain erase and reload)
+- QTableWidget
+  - implement other selection modes (column, cells)
+  - remember states like sort order, column width, etc.
 - QDialog instead of QWidget for forms
   - would allow to have default Enter and ESC behaviour
   - must be treated specially, as the form should NOT
@@ -31,9 +29,6 @@ musts:
   - global.XXX variables
   - last form
 - unselect trees
-- new picture picker
-  - upload a set of images, keep them on the server
-  - use them from a picklist (with images)
 - problems with size of main window to follow size of form ui
 - frontend:
   - associating categories and features

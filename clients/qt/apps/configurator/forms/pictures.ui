@@ -43,6 +43,9 @@
      <property name="rootelement" stdset="0">
       <string notr="true">picture</string>
      </property>
+     <property name="state" stdset="0">
+      <string notr="true">{global.pictureState}</string>
+     </property>
      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
       <bool>true</bool>
      </attribute>
@@ -147,6 +150,9 @@
        <property name="global.id" stdset="0">
         <string notr="true">{picture.id}</string>
        </property>
+       <property name="global.pictureState" stdset="0">
+        <string>{picture.state}</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -157,6 +163,9 @@
        <property name="form" stdset="0">
         <string notr="true">tags</string>
        </property>
+       <property name="global.pictureState" stdset="0">
+        <string>{picture.state}</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -166,6 +175,9 @@
        </property>
        <property name="form" stdset="0">
         <string notr="true">init</string>
+       </property>
+       <property name="global.pictureState" stdset="0">
+        <string>{picture.state}</string>
        </property>
       </widget>
      </item>
