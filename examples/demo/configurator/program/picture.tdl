@@ -23,7 +23,8 @@ BEGIN
 		ON PictureTag.pictureID = Picture.ID
 		LEFT JOIN Tag
 		ON PictureTag.tagID = Tag.ID
-		WHERE Picture.ID = $(id);
+		WHERE Picture.ID = $(id)
+		GROUP BY Picture.ID;
 
 	-- HACK from here, see wrapper element in LUA code, no other solution found..
 	INTO tagwrap DO
@@ -33,7 +34,7 @@ BEGIN
 		ON PictureTag.tagID = Tag.ID
 		LEFT JOIN Picture
 		ON PictureTag.pictureID = Picture.ID
-		WHERE Picture.ID = $(id);	
+		WHERE Picture.ID = $(id);
 END
 
 TRANSACTION updatePicture -- (picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)

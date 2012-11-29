@@ -8,7 +8,7 @@ BEGIN
 	DO UPDATE Feature SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Feature (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Feature WHERE normalizedName = $(normalizedName);
-	FOREACH picture DO INSERT INTO FeaturePicture( featureID, pictureID ) VALUES( $1, $(id) );
+	FOREACH pictures/picture DO INSERT INTO FeaturePicture( featureID, pictureID ) VALUES( $1, $(id) );
 END
 
 --
@@ -30,7 +30,7 @@ TRANSACTION updateFeature -- (id, name, normalizedName, description, pictures/pi
 BEGIN
 	DO UPDATE Feature SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
 	DO DELETE FROM FeaturePicture WHERE featureID = $(id);
-	FOREACH picture DO INSERT INTO FeaturePicture( featureID, pictureID ) VALUES( $(/id), $(id) );
+	FOREACH pictures/picture DO INSERT INTO FeaturePicture( featureID, pictureID ) VALUES( $(/id), $(id) );
 END
 
 --

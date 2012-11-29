@@ -23,9 +23,13 @@ LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(FREEIMAGE_LIB_DIR):$(FREEIMAGEPLUS_LIB_
 endif
 
 
-run:
+run-sqlite:
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe.conf -f
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe-sqlite.conf -f
+
+run-postgres:
+	@echo "Running the Wolframe server..."
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe-postgres.conf -f
 
 check:
 	@echo "Running the Wolframe server..."

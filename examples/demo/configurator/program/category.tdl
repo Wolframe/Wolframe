@@ -8,7 +8,7 @@ BEGIN
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Category WHERE normalizedName = $(normalizedName);
-	FOREACH picture DO INSERT INTO CategoryPicture( categoryID, pictureID ) VALUES( $1, $(id) );
+	FOREACH pictures/picture DO INSERT INTO CategoryPicture( categoryID, pictureID ) VALUES( $1, $(id) );
 END
 
 --
@@ -30,7 +30,7 @@ TRANSACTION updateCategory -- (id, name, normalizedName, description, pictures/p
 BEGIN
 	DO UPDATE Category SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
 	DO DELETE FROM CategoryPicture WHERE categoryID = $(id);
-	FOREACH picture DO INSERT INTO CategoryPicture( categoryID, pictureID ) VALUES( $(/id), $(id) );
+	FOREACH pictures/picture DO INSERT INTO CategoryPicture( categoryID, pictureID ) VALUES( $(/id), $(id) );
 END
 
 --
