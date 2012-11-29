@@ -20,6 +20,7 @@ local function pictures_value( pictures, itr )
 		pictures = { ["picture"] = { } }
 	end
 	for v,t in itr do
+		--logger:print( "ERROR", "INPICTURE", ":", v, ":", t, ":", id )
 		if( t == "id") then
 			table.insert( pictures[ "picture" ], { ["id"] = v } )
 		end
@@ -170,7 +171,7 @@ local function edit_node( tablename, itr)
 	local pictures = nil
 	local id = nil
 	for v,t in itr do
-		logger:print( "ERROR", v, ":", t, ":", id )
+		--logger:print( "ERROR", v, ":", t, ":", id )
 		if( t == "id" ) then
 			id = v
 		elseif t ==  "name" then
