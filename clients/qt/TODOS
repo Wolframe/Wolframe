@@ -29,7 +29,6 @@ musts:
   - global.XXX variables
   - last form
 - unselect trees
-- problems with size of main window to follow size of form ui
 - frontend:
   - associating categories and features
 - Linux, shared lib for custom widgets, similar to windows, for now
@@ -37,12 +36,8 @@ musts:
   mixing!)
 - element operations
   - reorganize tree
-    - add elements 
-    - delete elements/subtrees
-- tab stop order for file choose, picture chooser
-- element operations
-  - reorganize tree
     - move elements/subtrees
+- tab stop order for file choose, picture chooser
 - protocol
   - network loader via protocol or use client library?
 - designer custom widgets
@@ -51,6 +46,7 @@ musts:
     - MDI or tabbed view
   - picture viewer
     - show 0 to N pictures, scrollable
+    - alternative to QTableWidget approach
 - localize forms:
   - Windows doesn't retranslate on the fly! Why?
   - Windows doesn't respect language on startup for form
