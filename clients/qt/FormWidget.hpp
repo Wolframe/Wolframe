@@ -41,7 +41,7 @@ class FormWidget : public QWidget
 			DesignerMode		// when running in designer
 		};
 		
-		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent = 0 );
+		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent = 0, bool _debug = false );
 		FormWidget( FormWidgetMode _mode, QWidget *parent = 0 );
 		virtual ~FormWidget( );
 		void loadForm( QString name );
@@ -77,6 +77,7 @@ class FormWidget : public QWidget
 		QLabel *m_text;			// placeholder of form name in designer mode
 		QHash<QString, QString> *m_globals;
 		QHash<QString, QString> *m_props; // HACK to communicate props between signal and slot
+		bool m_debug;
 		
 	private:
 		void initializeNormal( );

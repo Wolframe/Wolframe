@@ -8,9 +8,10 @@
 #include <QByteArray>
 #include <QXmlStreamWriter>
 
-NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient )
+NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient, bool _debug )
 	: m_wolframeClient( _wolframeClient ),
-	  m_map( new QHash<QString, QPair<QString, QString> >( ) )
+	  m_map( new QHash<QString, QPair<QString, QString> >( ) ),
+	  m_debug( _debug )
 {
 	connect( m_wolframeClient, SIGNAL( answerReceived( QStringList, QString ) ),
 		this, SLOT( gotAnswer( QStringList, QString ) ) );
@@ -111,8 +112,13 @@ void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props
 	QString docType = props->value( "doctype" );
 	QByteArray data;
 	QXmlStreamWriter xml( &data );
-	xml.setAutoFormatting( true );
-	xml.setAutoFormattingIndent( 2 );
+	
+	// pretty-printing only in debug mode (because of superfluous
+	// white spaces sent to server)
+	if( m_debug ) {
+		xml.setAutoFormatting( true );
+		xml.setAutoFormattingIndent( 2 );
+	}
 
 	xml.writeStartDocument( );
 	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
@@ -162,8 +168,13 @@ void NetworkDataLoader::handleDelete( QString name, QHash<QString, QString> *pro
 	QString docType = props->value( "doctype" );
 	QByteArray data;
 	QXmlStreamWriter xml( &data );
-	xml.setAutoFormatting( true );
-	xml.setAutoFormattingIndent( 2 );
+
+	// pretty-printing only in debug mode (because of superfluous
+	// white spaces sent to server)
+	if( m_debug ) {
+		xml.setAutoFormatting( true );
+		xml.setAutoFormattingIndent( 2 );
+	}
 
 	xml.writeStartDocument( );
 	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
@@ -197,8 +208,13 @@ void NetworkDataLoader::handleDomainDataLoad( QString formName, QString widgetNa
 	QString docType = props->value( "doctype" );
 	QByteArray data;
 	QXmlStreamWriter xml( &data );
-	xml.setAutoFormatting( true );
-	xml.setAutoFormattingIndent( 2 );
+
+	// pretty-printing only in debug mode (because of superfluous
+	// white spaces sent to server)
+	if( m_debug ) {
+		xml.setAutoFormatting( true );
+		xml.setAutoFormattingIndent( 2 );
+	}
 
 	xml.writeStartDocument( );
 	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );

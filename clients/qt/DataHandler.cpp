@@ -32,7 +32,8 @@
 #include "PictureChooser.hpp"
 #include "FormWidget.hpp"
 
-DataHandler::DataHandler( DataLoader *_dataLoader ) : m_dataLoader( _dataLoader )
+DataHandler::DataHandler( DataLoader *_dataLoader, bool _debug )
+	: m_dataLoader( _dataLoader ), m_debug( _debug )
 {
 }
 
@@ -40,8 +41,13 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 {
 	QSet<QWidget *> seen;
 	QXmlStreamWriter xml( data );
-	xml.setAutoFormatting( true );
-	xml.setAutoFormattingIndent( 2 );
+
+	// pretty-printing only in debug mode (because of superfluous
+	// white spaces sent to server)
+	if( m_debug ) {
+		xml.setAutoFormatting( true );
+		xml.setAutoFormattingIndent( 2 );
+	}
 	
 	xml.writeStartDocument( );
 	if( props->contains( "rootelement" ) && props->contains( "doctype" ) ) {

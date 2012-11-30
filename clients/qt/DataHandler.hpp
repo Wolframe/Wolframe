@@ -20,7 +20,7 @@ class DataHandler : public QObject
 	Q_OBJECT
 	
 	public:
-		DataHandler( DataLoader *_dataLoader );
+		DataHandler( DataLoader *_dataLoader, bool _debug = false );
 		virtual ~DataHandler( ) {};
 		void readFormData( QString name, QWidget *form, QByteArray &data, QHash<QString, QString> *props );
 		void writeFormData( QString name, QWidget *form, QByteArray *data, QHash<QString, QString> *props );
@@ -34,6 +34,7 @@ class DataHandler : public QObject
 	
 	private:
 		DataLoader *m_dataLoader;
+		bool m_debug;
 };
 
 #endif // _DATA_HANDLER_INCLUDED

@@ -17,7 +17,7 @@ class NetworkDataLoader : public DataLoader
 	// intentionally omitting Q_OBJECT here, is done in DataLoader!
 	
 	public:
-		NetworkDataLoader( WolframeClient *_wolframeClient );
+		NetworkDataLoader( WolframeClient *_wolframeClient, bool _debug = false );
 		virtual ~NetworkDataLoader( ) {};
 
 		virtual void request( QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props );
@@ -38,6 +38,7 @@ class NetworkDataLoader : public DataLoader
 	private:
 		WolframeClient *m_wolframeClient;
 		QScopedPointer<QHash<QString, QPair<QString, QString> > > m_map;
+		bool m_debug;
 };
 
 #endif // _NETWORK_DATA_LOADER_INCLUDED
