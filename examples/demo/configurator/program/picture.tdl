@@ -9,9 +9,9 @@ BEGIN
 		ON PictureTag.pictureID = Picture.ID
 		LEFT JOIN Tag
 		ON PictureTag.tagID = Tag.ID
+		WHERE coalesce( Tag.normalizedName, '' ) like $(search)
 		GROUP BY Picture.ID, Picture.thumbnail, Picture.caption, Picture.info,
-			Picture.width, Picture.height, Picture.image
-		HAVING coalesce( Tag.normalizedName, '' ) like $(search);
+			Picture.width, Picture.height, Picture.image;
 END
 
 TRANSACTION selectPicture -- (/picture/id)
