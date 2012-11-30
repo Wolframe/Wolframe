@@ -53,6 +53,8 @@ class FormWidget : public QWidget
 	
 	public:
 		QString form( ) const;
+
+		void restoreFromGlobals( QHash<QString, QString> *props );
 		
 		static QString readDynamicStringProperty( QObject *o, const char *name );
 		static void writeDynamicStringProperty( QObject *o, const char *name, const QString &value );
@@ -84,7 +86,6 @@ class FormWidget : public QWidget
 		void initializeDesigner( );
 		void sendRequest( QHash<QString, QString> *props );
 		void storeToGlobals( QHash<QString, QString> *props );
-		void restoreFromGlobals( QHash<QString, QString> *props );
 	
 	signals:
 		void formLoaded( QString name );

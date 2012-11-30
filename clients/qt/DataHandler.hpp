@@ -15,12 +15,14 @@
 
 #include "DataLoader.hpp"
 
+class FormWidget;
+
 class DataHandler : public QObject
 {
 	Q_OBJECT
 	
 	public:
-		DataHandler( DataLoader *_dataLoader, bool _debug = false );
+		DataHandler( DataLoader *_dataLoader, FormWidget *_formWidget, bool _debug = false );
 		virtual ~DataHandler( ) {};
 		void readFormData( QString name, QWidget *form, QByteArray &data, QHash<QString, QString> *props );
 		void writeFormData( QString name, QWidget *form, QByteArray *data, QHash<QString, QString> *props );
@@ -34,6 +36,7 @@ class DataHandler : public QObject
 	
 	private:
 		DataLoader *m_dataLoader;
+		FormWidget *m_formWidget;
 		bool m_debug;
 };
 

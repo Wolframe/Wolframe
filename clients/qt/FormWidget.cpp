@@ -47,7 +47,7 @@ void FormWidget::initializeDesigner( )
 void FormWidget::initializeNormal( )
 {
 // maps data between constructed widgets from .ui and the data loader
-	m_dataHandler = new DataHandler( m_dataLoader, m_debug );
+	m_dataHandler = new DataHandler( m_dataLoader, this, m_debug );
 
 // the global map to pass variables between forms
 	m_globals = new QHash< QString, QString >( );
@@ -105,6 +105,9 @@ void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
 				QString globalKey = parts[1];
 				if( m_globals->contains( globalKey ) ) {
 					props->insert( key, m_globals->value( globalKey ) );
+				} else {
+					// unknown value, map to empty
+					props->insert( key, "" );
 				}
 			} else {
 				QString evaluated = m_dataHandler->readFormVariable( refKey, m_ui );
@@ -245,7 +248,7 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 		}
 		QCoreApplication::instance( )->installTranslator( translator );
 	}
-	
+
 // not busy anymore
 	qApp->restoreOverrideCursor( );	
 }
@@ -366,6 +369,13 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		props->insert( "action", initAction );
 		sendRequest( props );
 	}
+	
+// TODO: later
+// emit the 'init' signal, we can glue slots in the designer to it, like 'setFocus'
+//	QMetaObject::invokeMethod( m_ui, "init" );
+// for this we have to register dynamic slots to m_ui, see
+// http://doc.qt.digia.com/qq/qq16-dynamicqobject.html
+	
 		
 // signal
 	qDebug( ) << "Done loading form" << name;

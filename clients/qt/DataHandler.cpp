@@ -32,8 +32,8 @@
 #include "PictureChooser.hpp"
 #include "FormWidget.hpp"
 
-DataHandler::DataHandler( DataLoader *_dataLoader, bool _debug )
-	: m_dataLoader( _dataLoader ), m_debug( _debug )
+DataHandler::DataHandler( DataLoader *_dataLoader, FormWidget *_formWidget, bool _debug )
+	: m_dataLoader( _dataLoader ), m_formWidget( _formWidget ), m_debug( _debug )
 {
 }
 
@@ -265,10 +265,19 @@ void DataHandler::resetFormData( QWidget *form )
 			!widget->isEnabled( ) ) {
 			continue;
 		}
+
+// get dynamic properties of the widget (used for 'initialFocus' and 'state' currently)
+		QHash<QString, QString> *props = new QHash<QString, QString>( );
+		FormWidget::readDynamicStringProperties( props, widget );
+		m_formWidget->restoreFromGlobals( props );
 		
 		if( clazz == "QLineEdit" ) {
+			qDebug( ) << "XXX:" << props;
 			QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
 			lineEdit->clear( );
+			if( props->contains( "state" ) ) {
+				lineEdit->setText( props->value( "state" ) );
+			}
 		} else if( clazz == "QDateEdit" ) {
 			//~ QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
 			// TODO
@@ -338,6 +347,12 @@ void DataHandler::resetFormData( QWidget *form )
 			// skip, generic widget, don't possibly know how to reset it
 		} else {
 			qWarning( ) << "Reset for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
+		}
+		
+		if( 	props->contains( "initialFocus" ) &&
+			props->value( "initialFocus" ) == "true" ) {
+			qDebug( ) << "Setting focus of widget" << name;
+			widget->setFocus( );
 		}
 		
 		qDebug( ) << "Reset " << clazz << name;
@@ -836,7 +851,16 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 // properties differ depending on the class of the widget	
 	QString clazz = widget->metaObject( )->className( );
 
-	if( clazz == "QTableWidget" ) {
+	if( clazz == "QLineEdit" ) {
+		QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
+		if( property == "text" ) {
+			return lineEdit->text( );
+		} else if( property == "state" ) {
+			return lineEdit->text( );
+		} else {
+			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
+		}
+	} else if( clazz == "QTableWidget" ) {
 		QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
 // always return data of the selected row (assuming single select for now and
 // row select only)
