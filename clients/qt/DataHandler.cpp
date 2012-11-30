@@ -54,6 +54,8 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		foreach( QString key, props->keys( ) ) {
 	// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
 			if( key.startsWith( "_q_" ) ) continue;
+	// skip globals
+			if( key.startsWith( "global." ) ) continue;
 	// ignore our own actions
 			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
 			xml.writeAttribute( key, props->value( key ) );
@@ -199,6 +201,8 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 			foreach( QString key, p.keys( ) ) {
 				// skip Qt internal ones
 				if( key.startsWith( "_q_" ) ) continue;
+				// skip globals
+				if( key.startsWith( "global." ) ) continue;
 				xml.writeAttribute( key, p.value( key ) );
 			}
 			writeWidgets( groupBox, xml, props, seen );
@@ -459,9 +463,30 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 				}
 			}
 		}
+
 // HACK: make sure the thumbs are visible
 		tableWidget->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 		tableWidget->resizeColumnsToContents( );
+
+// iterate again and check against saved table state
+		if( props->contains( "state" ) ) {
+			qDebug( ) << "Restoring table state for tree" << widget_name << props->value( "state" );
+			QStringList stateList = props->value( "state" ).split( "|", QString::SkipEmptyParts );
+			QSet<QString> states;
+			foreach( QString state, stateList ) {
+				if( state.left( 1 ) == "S" ) {
+					states.insert( state.mid( 1, state.length( ) - 1 ) );
+				}
+				for( int row = 0; row < tableWidget->rowCount( ); row++ ) {
+					QTableWidgetItem *item = tableWidget->item( row, 0 );
+					QString id = item->data( Qt::UserRole ).toString( );
+					if( states.contains( id ) ) {
+						tableWidget->selectRow( row );
+						// scrolls automatically to selected row
+					}
+				}
+			}
+		}
 	} else if( clazz == "QTreeWidget" ) {
 		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 		QTreeWidgetItem *header = treeWidget->headerItem( );
@@ -820,6 +845,27 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 // HACK: return /picture@id, first user element, besser mapping can be found later
 				return item->data( Qt::UserRole ).toString( );
 			}
+		} else if( property == "state" ) {
+			QList<QTableWidgetItem *> items = tableWidget->selectedItems( );
+			QString state = "";
+			QSet<QString> seen;
+			foreach( QTableWidgetItem *item, items ) {
+				// hard-coded! should be key/value as user attributes!
+				QString id = item->data( Qt::UserRole ).toString( );
+				if( !id.isNull( ) ) {
+					// HACK: only first row, otherwise we get duplicates
+					// TODO: currently we only have row selection, later
+					// remember all coordinates of the items
+					if( !seen.contains( id ) ) {
+						state.append( "S" );
+						state.append( item->data( Qt::UserRole ).toString( ) );
+						state.append( "|" );							
+						seen.insert( id );
+					}
+				}
+			}
+
+			return state;
 		} else {
 			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
 		}

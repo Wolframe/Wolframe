@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>392</width>
-    <height>405</height>
+    <height>484</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,14 +69,66 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="2" column="1">
+    <widget class="QGroupBox" name="tagwrap">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <widget class="QTreeWidget" name="tag">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>311</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::MultiSelection</enum>
+      </property>
+      <property name="headerHidden">
+       <bool>true</bool>
+      </property>
+      <property name="expandsOnDoubleClick">
+       <bool>false</bool>
+      </property>
+      <property name="doctype" stdset="0">
+       <string>TagHierarchyRequest.simpleform</string>
+      </property>
+      <property name="rootelement" stdset="0">
+       <string>tag</string>
+      </property>
+      <column>
+       <property name="text">
+        <string>tag</string>
+       </property>
+      </column>
+     </widget>
+    </widget>
+   </item>
+   <item row="5" column="0">
     <widget class="QLabel" name="label_image">
      <property name="text">
       <string>Image:</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="5" column="1">
     <widget class="PictureChooser" name="image">
      <property name="minimumSize">
       <size>
@@ -86,7 +138,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
+   <item row="8" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <spacer name="horizontalSpacer">
@@ -154,56 +206,32 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="1">
-    <widget class="QGroupBox" name="tagwrap">
-     <property name="enabled">
-      <bool>true</bool>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_used_in_categories">
+     <property name="text">
+      <string>Used in categories:</string>
      </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>100</height>
-      </size>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_used_in_features">
+     <property name="text">
+      <string>Used in features:</string>
      </property>
-     <property name="title">
-      <string/>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLabel" name="used_categories">
+     <property name="text">
+      <string>used in categories</string>
      </property>
-     <property name="flat">
-      <bool>true</bool>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="used_features">
+     <property name="text">
+      <string>used in features</string>
      </property>
-     <property name="checkable">
-      <bool>false</bool>
-     </property>
-     <widget class="QTreeWidget" name="tag">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>311</width>
-        <height>101</height>
-       </rect>
-      </property>
-      <property name="selectionMode">
-       <enum>QAbstractItemView::MultiSelection</enum>
-      </property>
-      <property name="headerHidden">
-       <bool>true</bool>
-      </property>
-      <property name="expandsOnDoubleClick">
-       <bool>false</bool>
-      </property>
-      <property name="doctype" stdset="0">
-       <string>TagHierarchyRequest.simpleform</string>
-      </property>
-      <property name="rootelement" stdset="0">
-       <string>tag</string>
-      </property>
-      <column>
-       <property name="text">
-        <string>tag</string>
-       </property>
-      </column>
-     </widget>
     </widget>
    </item>
   </layout>

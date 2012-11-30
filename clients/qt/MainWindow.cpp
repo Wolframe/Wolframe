@@ -254,6 +254,11 @@ void MainWindow::initialize( )
 	if( m_debug ) {
 		m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
 		debugTerminal = m_debugTerminal;
+
+// connect lines sent by anybody to the debug window
+		connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
+			m_debugTerminal, SLOT( sendLine( QString ) ) );
+
 		qDebug( ) << "Debug window initialized";
 	}
 
@@ -296,10 +301,6 @@ void MainWindow::initialize( )
 // catch error of network protocol
 	connect( m_wolframeClient, SIGNAL( error( QString ) ),
 		this, SLOT( wolframeError( QString ) ) );
-
-// connect lines sent by anybody to the debug window
-	connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
-		m_debugTerminal, SLOT( sendLine( QString ) ) );
 		
 // a Qt UI loader for the main theme window and also used by all form widgets
 	m_uiLoader = new QUiLoader( );
@@ -420,13 +421,16 @@ void MainWindow::disconnected( )
 
 void MainWindow::wolframeError( QString error )
 {
- 	if( QMessageBox::information( m_ui, tr( "Protocol error, reconfigure now?" ),
-		tr( "Protocol error: %1, reconfigure client now?" ).arg( error ),
-		QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes ) {
-// fatal error, present the user a preferences dialog
-		if( !m_dataLoader || !m_formLoader ) {
+// fatal error, present the user a choice whether to stop now or reconfigure
+// the system
+	if( !m_dataLoader || !m_formLoader ) {
+		if( QMessageBox::critical( m_ui, tr( "Protocol error, reconfigure now?" ),
+			tr( "Protocol error: %1, reconfigure client now?" ).arg( error ),
+			QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes ) {
+
 			PreferencesDialog prefs( m_languages, m_ui );
 			if( prefs.exec( ) == QDialog::Accepted ) {
+// reload and use new settings
 				qDebug( ) << "Reloading application";
 				QApplication::instance( )->exit( RESTART_CODE );
 			} else {
@@ -434,6 +438,9 @@ void MainWindow::wolframeError( QString error )
 				QApplication::instance( )->exit( 0 );
 			}
 		}
+	} else {
+// the error is normal way of life, so show only a normal error message in the statusbar
+		( qobject_cast<QMainWindow *>( m_ui ) )->statusBar( )->showMessage( error, 6000 );
 	}
 }
 

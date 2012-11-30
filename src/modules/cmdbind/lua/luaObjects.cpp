@@ -45,6 +45,7 @@ Project Wolframe.
 #include "logger-v1.hpp"
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <cstddef>
 #include <cstdarg>
@@ -1040,7 +1041,9 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 		lua_pushcclosure( ls, function_printfunction_call, 1);
 		return 1;
 	}
-	throw std::runtime_error( "form function not found (is neither a module form function, nor a transaction function, nor a print function)");
+	std::ostringstream s;
+	s << "form function '" << name << "' not found (is neither a module form function, nor a transaction function, nor a print function)";
+	throw std::runtime_error( s.str( ) );
 }
 
 static const char* userdata_tolstring( lua_State* ls, int index, std::size_t* len)
