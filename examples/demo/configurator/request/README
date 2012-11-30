@@ -32,6 +32,8 @@ with wolframed running with examples/demo/configurator/wolframe.conf
 All commands executed in 'examples/demo/configurator'
 with wolframed running with examples/demo/configurator/wolframe.conf
 
+../../../clients/cmdline/wolframec -d request/pushTagHierarchy.xml
+
 ../../../clients/cmdline/wolframec -d request/pushFeatureHierarchy.xml
 # Insert the whole example feature tree
 # client protocol "REQUEST" (no arguments) with this document as content
