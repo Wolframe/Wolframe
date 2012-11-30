@@ -102,6 +102,9 @@ wolframeConnection::wolframeConnection( const WolframeHandler& context,
 
 wolframeConnection::~wolframeConnection()
 {
+	LOG_DEBUG << "Connection from " << m_remoteEP->toString()
+		  << " to " << m_localEP->toString() << " closed";
+
 	if ( m_localEP )
 		delete m_localEP;
 	if ( m_remoteEP )
