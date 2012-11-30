@@ -20,7 +20,9 @@
 
 
 #include <string.h>
+#ifndef _WIN32
 #include <sys/param.h>
+#endif
 #include "types/sha1.h"
 
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
