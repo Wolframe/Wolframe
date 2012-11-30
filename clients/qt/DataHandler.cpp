@@ -375,6 +375,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 		// TODO: widgets can also have custom properties for the domain handling
 		QHash<QString, QString> *props = new QHash<QString, QString>( );
 		FormWidget::readDynamicStringProperties( props, widget );
+		m_formWidget->restoreFromGlobals( props );
 		props->insert( "action", "read" );
 		if( clazz == "QComboBox" ) {
 			m_dataLoader->request( form_name, name, QByteArray( ), props );

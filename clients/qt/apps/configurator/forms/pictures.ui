@@ -168,6 +168,9 @@
      <property name="state" stdset="0">
       <string notr="true">{global.pictureState}</string>
      </property>
+     <property name="search" stdset="0">
+      <string>{search.text}</string>
+     </property>
      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
       <bool>true</bool>
      </attribute>
@@ -210,6 +213,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Filter pictures by:</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLineEdit" name="search">

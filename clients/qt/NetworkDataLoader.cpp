@@ -219,6 +219,15 @@ void NetworkDataLoader::handleDomainDataLoad( QString formName, QString widgetNa
 	xml.writeStartDocument( );
 	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
 	xml.writeStartElement( rootElement );
+	foreach( QString key, props->keys( ) ) {
+// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
+		if( key.startsWith( "_q_" ) ) continue;
+// skip globals
+		if( key.startsWith( "global." ) ) continue;
+// ignore our own actions
+		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
+		xml.writeAttribute( key, props->value( key ) );
+	}
 // assuming the root element has always id 1
 	xml.writeAttribute( "id", "1" );
 	xml.writeEndElement( );
