@@ -314,6 +314,9 @@ function PictureListRequest( )
 			search = "%" .. normalizer( "name" )( v ) .. "%"
 		end
 	end
+	if search == nil then
+		search = "%%"
+	end
 	local t = formfunction( "selectPictureList" )( { search = search } )
 	local f = form( "Picture" );
 	f:fill( t:get( ) )

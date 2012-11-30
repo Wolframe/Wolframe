@@ -1,15 +1,15 @@
 now:
-- picture list:
-  - search by tag
-  - avoid deletion of in-use-pictures
-- get sensible error message from business layer, not "lua call faled"
+- adapt to changes in tdl files (INTO construct)
 - stop the "whiteout", especially seen after assigning pictures
   (must be a protocol thing)
 - ILLEGAL STATE 4 in dataAvailable!
 - CRITICAL: "Premature end of document."
-- set focus in forms
 
 musts:
+- get sensible error message from business layer, not "lua call faled"
+  - e.g. avoid deletion of in-use-pictures
+  - better even: provide conditions for buttons, so they can't be
+    pressed (button.state={something})
 - improve group_concat to take a parameter as separator
 - use simpleforms instead of funny lua parsers (example
   picture parsers)
