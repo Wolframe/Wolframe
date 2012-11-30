@@ -64,9 +64,7 @@ TEST( PBKDF2, TestVectors )
 	PBKDF2_HMAC_SHA1 test5( "saltSALTsaltSALTsaltSALTsaltSALTsalt", "passwordPASSWORDpassword", 25, 4096 );
 	PBKDF2_HMAC_SHA1 test5_0( test5.toString());
 
-	unsigned char	passwd[ 10 ] = "pass\0word";
-	unsigned char	salt[ 6 ] = "sa\0lt";
-	PBKDF2_HMAC_SHA1 test6( passwd, 9, salt, 5, 16, 4096 );
+	PBKDF2_HMAC_SHA1 test6( (const unsigned char*)"sa\0lt", 5, (const unsigned char*)"pass\0word", 9, 16, 4096 );
 	PBKDF2_HMAC_SHA1 test6_0( test6.toString());
 
 	EXPECT_STRCASEEQ( testVec1, test1.toBCD().c_str() );

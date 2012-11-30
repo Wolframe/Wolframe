@@ -51,6 +51,7 @@ extern "C" void profiling_callback(  void */*a*/, const char *b, sqlite3_uint64 
 }
 
 SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
+			    bool foreignKeys, bool profiling,
 			    unsigned short connections,
 			    const std::list<std::string>& programFiles_)
 	: m_ID( id ), m_filename( filename ), m_programFiles(programFiles_)
@@ -103,20 +104,22 @@ SQLiteDBunit::SQLiteDBunit( const std::string& id, const std::string& filename,
 					throw std::runtime_error( "Corrupt SQLite database" );
 				checked = true;
 			}
-			
+
 			// enable foreign keys
-			res = sqlite3_exec( handle, "PRAGMA foreign_keys=true", NULL, NULL, &err );
-			if( res != SQLITE_OK ) {
-				MOD_LOG_ALERT << "Unable to enforce integrity checks in '" << filename
-					      << "': " << err;
+			if ( foreignKeys )	{
+				res = sqlite3_exec( handle, "PRAGMA foreign_keys=true", NULL, NULL, &err );
+				if( res != SQLITE_OK ) {
+					MOD_LOG_ALERT << "Unable to enforce integrity checks in '" << filename
+						      << "': " << err;
+				}
+				if( err ) {
+					sqlite3_free( err );
+				}
 			}
-			if( err ) {
-				sqlite3_free( err );
-			}
-			
 			// enable tracing and profiling of commands
-			sqlite3_profile( handle, profiling_callback, NULL );
-			
+			if ( profiling )
+				sqlite3_profile( handle, profiling_callback, NULL );
+
 			m_connections.push_back( handle );
 			m_connPool.add( handle );
 		}
