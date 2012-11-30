@@ -433,13 +433,13 @@ void sha256_final( sha256_ctx *ctx, unsigned char *digest )
 
 /* SHA-224 functions */
 
-void sha224( const void *data, size_t size, unsigned char *hash )
+void sha224( const void *data, size_t size, unsigned char *digest )
 {
 	sha224_ctx ctx;
 
-	sha224_init(&ctx);
-	sha224_update(&ctx, data, size);
-	sha224_final(&ctx, hash);
+	sha224_init( &ctx );
+	sha224_update( &ctx, data, size );
+	sha224_final( &ctx, digest );
 }
 
 void sha224_init( sha224_ctx *ctx )
@@ -738,7 +738,7 @@ void sha384( const void *data, size_t size, unsigned char *digest )
 	sha384_final( &ctx, digest );
 }
 
-void sha384_init(sha384_ctx *ctx)
+void sha384_init( sha384_ctx *ctx )
 {
 #ifndef UNROLL_LOOPS
 	int i;
@@ -765,7 +765,7 @@ void sha384_update( sha384_ctx *ctx, const void *data, size_t size )
 	tmp_len = SHA384_BLOCK_SIZE - ctx->len;
 	rem_len = size < tmp_len ? size : tmp_len;
 
-	memcpy(&ctx->block[ctx->len], data, rem_len);
+	memcpy( &ctx->block[ctx->len], data, rem_len );
 
 	if (ctx->len + size < SHA384_BLOCK_SIZE) {
 		ctx->len += size;

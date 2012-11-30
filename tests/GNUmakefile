@@ -221,8 +221,6 @@ ifeq ($(RUN_TESTS),1)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./HMACtest
 	@echo
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./PBKDF2test
-	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./protocolArgumentParsing
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./configValueParser
@@ -245,6 +243,8 @@ ifeq ($(RUN_TESTS),0)
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./poolTest
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testArrayDoublingAllocator
+	@echo
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./PBKDF2test
 	@echo
 	@echo
 endif

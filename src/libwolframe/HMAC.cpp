@@ -47,17 +47,74 @@
 namespace _Wolframe {
 namespace AAAA {
 
-static const size_t HMAC_SHA256_BCD_SIZE = HMAC_SHA256_DIGEST_SIZE * 2 + 1;
-static const size_t HMAC_SHA256_BASE64_SIZE = (( HMAC_SHA256_DIGEST_SIZE - 1 ) / 3 ) * 4 + 5;
+static const size_t HMAC_SHA1_BCD_SIZE = HMAC_SHA1_HASH_SIZE * 2 + 1;
+static const size_t HMAC_SHA1_BASE64_SIZE = (( HMAC_SHA1_HASH_SIZE - 1 ) / 3 ) * 4 + 5;
 
-HMAC_SHA256::HMAC_SHA256( const std::string& digest )
+static const size_t HMAC_SHA256_BCD_SIZE = HMAC_SHA256_HASH_SIZE * 2 + 1;
+static const size_t HMAC_SHA256_BASE64_SIZE = (( HMAC_SHA256_HASH_SIZE - 1 ) / 3 ) * 4 + 5;
+
+//--- HMAC SHA-1 ------------------------------------------------------
+HMAC_SHA1::HMAC_SHA1( const std::string& str )
 {
-	memset( m_HMAC, 0, HMAC_SHA256_DIGEST_SIZE );
+	memset( m_HMAC, 0, HMAC_SHA1_HASH_SIZE );
 
 	int ret;
-	if (( ret = base64_decode( digest.data(), digest.size(),
-				   m_HMAC, HMAC_SHA256_DIGEST_SIZE )) < 0 )	{
-		std::string errMsg = "Cannot convert '" + digest + "' to a HMAC-SHA256";
+	if (( ret = base64_decode( str.data(), str.size(),
+				   m_HMAC, HMAC_SHA1_HASH_SIZE )) < 0 )	{
+		std::string errMsg = "Cannot convert '" + str + "' to a HMAC-SHA1";
+		throw std::runtime_error( errMsg );
+	}
+}
+
+
+std::string HMAC_SHA1::toBCD() const
+{
+	char	buffer[ HMAC_SHA1_BCD_SIZE ];
+
+	int len = byte2hex( m_HMAC, HMAC_SHA1_HASH_SIZE, buffer, HMAC_SHA1_BCD_SIZE );
+	assert( len == HMAC_SHA1_HASH_SIZE * 2 );
+
+	return std::string( buffer );
+}
+
+std::string HMAC_SHA1::toString() const
+{
+	char	buffer[ HMAC_SHA1_BASE64_SIZE ];
+
+	int len = base64::encode( m_HMAC, HMAC_SHA1_HASH_SIZE, buffer, HMAC_SHA1_BASE64_SIZE, 0 );
+	assert( len > 0 && len < (int)HMAC_SHA1_BASE64_SIZE );
+
+	while ( len > 0 && buffer[ len - 1 ] == '=' )
+		len--;
+	buffer[ len ] = 0;
+
+	return std::string( buffer );
+}
+
+bool HMAC_SHA1::operator == ( const HMAC_SHA1& rhs ) const
+{
+	return !memcmp( this->m_HMAC, rhs.m_HMAC, HMAC_SHA1_HASH_SIZE );
+}
+
+bool HMAC_SHA1::operator == ( const std::string& rhs ) const
+{
+	unsigned char	buffer[ HMAC_SHA1_HASH_SIZE ];
+
+	memset( buffer, 0, HMAC_SHA1_HASH_SIZE );
+	if ( base64_decode( rhs.data(), rhs.size(), buffer, HMAC_SHA1_HASH_SIZE ) < 0 )
+		return false;
+	return !memcmp( this->m_HMAC, buffer, HMAC_SHA1_HASH_SIZE );
+}
+
+//--- HMAC SHA-256 ----------------------------------------------------
+HMAC_SHA256::HMAC_SHA256( const std::string& str )
+{
+	memset( m_HMAC, 0, HMAC_SHA256_HASH_SIZE );
+
+	int ret;
+	if (( ret = base64_decode( str.data(), str.size(),
+				   m_HMAC, HMAC_SHA256_HASH_SIZE )) < 0 )	{
+		std::string errMsg = "Cannot convert '" + str + "' to a HMAC-SHA256";
 		throw std::runtime_error( errMsg );
 	}
 }
@@ -67,8 +124,8 @@ std::string HMAC_SHA256::toBCD() const
 {
 	char	buffer[ HMAC_SHA256_BCD_SIZE ];
 
-	int len = byte2hex( m_HMAC, HMAC_SHA256_DIGEST_SIZE, buffer, HMAC_SHA256_BCD_SIZE );
-	assert( len == HMAC_SHA256_DIGEST_SIZE * 2 );
+	int len = byte2hex( m_HMAC, HMAC_SHA256_HASH_SIZE, buffer, HMAC_SHA256_BCD_SIZE );
+	assert( len == HMAC_SHA256_HASH_SIZE * 2 );
 
 	return std::string( buffer );
 }
@@ -77,7 +134,7 @@ std::string HMAC_SHA256::toString() const
 {
 	char	buffer[ HMAC_SHA256_BASE64_SIZE ];
 
-	int len = base64::encode( m_HMAC, HMAC_SHA256_DIGEST_SIZE, buffer, HMAC_SHA256_BASE64_SIZE, 0 );
+	int len = base64::encode( m_HMAC, HMAC_SHA256_HASH_SIZE, buffer, HMAC_SHA256_BASE64_SIZE, 0 );
 	assert( len > 0 && len < (int)HMAC_SHA256_BASE64_SIZE );
 
 	while ( len > 0 && buffer[ len - 1 ] == '=' )
@@ -89,17 +146,17 @@ std::string HMAC_SHA256::toString() const
 
 bool HMAC_SHA256::operator == ( const HMAC_SHA256& rhs ) const
 {
-	return !memcmp( this->m_HMAC, rhs.m_HMAC, HMAC_SHA256_DIGEST_SIZE );
+	return !memcmp( this->m_HMAC, rhs.m_HMAC, HMAC_SHA256_HASH_SIZE );
 }
 
 bool HMAC_SHA256::operator == ( const std::string& rhs ) const
 {
-	unsigned char	buffer[ HMAC_SHA256_DIGEST_SIZE ];
+	unsigned char	buffer[ HMAC_SHA256_HASH_SIZE ];
 
-	memset( buffer, 0, HMAC_SHA256_DIGEST_SIZE );
-	if ( base64_decode( rhs.data(), rhs.size(), buffer, HMAC_SHA256_DIGEST_SIZE ) < 0 )
+	memset( buffer, 0, HMAC_SHA256_HASH_SIZE );
+	if ( base64_decode( rhs.data(), rhs.size(), buffer, HMAC_SHA256_HASH_SIZE ) < 0 )
 		return false;
-	return !memcmp( this->m_HMAC, buffer, HMAC_SHA256_DIGEST_SIZE );
+	return !memcmp( this->m_HMAC, buffer, HMAC_SHA256_HASH_SIZE );
 }
 
 }} // namespace _Wolframe::AAAA

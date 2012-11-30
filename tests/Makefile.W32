@@ -144,7 +144,7 @@ resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
 testBoostPath.exe: testBoostPath.obj
 singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
-testSHAxe: tttestSHA $(TOPDIR)\src\libwolframe\wolframe.lib
+testSHA.exe: tttestSHA $(TOPDIR)\src\libwolframe\wolframe.lib
 testMD5.exe: testMD5.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 byte2hexTest.exe: byte2hexTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Test.exe: base64Test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
@@ -196,7 +196,6 @@ local_test:
 	@-echo testTimestamp >> test.bat
 	@-echo CRAMtest >> test.bat
 	@-echo HMACtest >> test.bat
-	@-echo PBKDF2test >> test.bat
 	@-echo protocolArgumentParsing >> test.bat
 	@-echo testProtocolLFdotEscaping >> test.bat
 	@-echo testWolfilter >> test.bat
@@ -209,6 +208,7 @@ local_longtest:
 	@-echo @echo off > test.bat
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo poolTest >> test.bat
+	@-echo PBKDF2test >> test.bat
 	@-echo testArrayDoublingAllocator >> test.bat
 	@-echo
 	@-test.bat

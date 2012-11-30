@@ -23,43 +23,39 @@
 #include <sys/param.h>
 #include "types/sha1.h"
 
-
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
 
 /* blk0() and blk() perform the initial expand. */
 /* I got the idea of expanding during the round function from SSLeay */
 #if BYTE_ORDER == LITTLE_ENDIAN
-#define blk0(i) (block->l[i] = (rol(block->l[i],24)&0xFF00FF00) \
-	|(rol(block->l[i],8)&0x00FF00FF))
+#define blk0(i) (block.l[i] = (rol(block.l[i],24)&0xFF00FF00) \
+	|(rol(block.l[i],8)&0x00FF00FF))
 #else
-#define blk0(i) block->l[i]
+#define blk0(i) block.l[i]
 #endif
-#define blk(i) (block->l[i&15] = rol(block->l[(i+13)&15]^block->l[(i+8)&15] \
-	^block->l[(i+2)&15]^block->l[i&15],1))
+#define blk(i) (block.l[i&15] = rol(block.l[(i+13)&15]^block.l[(i+8)&15] \
+	^block.l[(i+2)&15]^block.l[i&15],1))
 
 /* (R0+R1), R2, R3, R4 are the different operations used in SHA1 */
-#define R0(v,w,x,y,z,i) z+=((w&(x^y))^y)+blk0(i)+0x5A827999+rol(v,5);w=rol(w,30);
-#define R1(v,w,x,y,z,i) z+=((w&(x^y))^y)+blk(i)+0x5A827999+rol(v,5);w=rol(w,30);
-#define R2(v,w,x,y,z,i) z+=(w^x^y)+blk(i)+0x6ED9EBA1+rol(v,5);w=rol(w,30);
-#define R3(v,w,x,y,z,i) z+=(((w|x)&y)|(w&x))+blk(i)+0x8F1BBCDC+rol(v,5);w=rol(w,30);
-#define R4(v,w,x,y,z,i) z+=(w^x^y)+blk(i)+0xCA62C1D6+rol(v,5);w=rol(w,30);
+#define R0(v,w,x,y,z,i) z += ((w&(x^y))^y)+blk0(i)+0x5A827999+rol(v,5);w=rol(w,30);
+#define R1(v,w,x,y,z,i) z += ((w&(x^y))^y)+blk(i)+0x5A827999+rol(v,5);w=rol(w,30);
+#define R2(v,w,x,y,z,i) z += (w^x^y)+blk(i)+0x6ED9EBA1+rol(v,5);w=rol(w,30);
+#define R3(v,w,x,y,z,i) z += (((w|x)&y)|(w&x))+blk(i)+0x8F1BBCDC+rol(v,5);w=rol(w,30);
+#define R4(v,w,x,y,z,i) z += (w^x^y)+blk(i)+0xCA62C1D6+rol(v,5);w=rol(w,30);
 
 /* Hash a single 512-bit block. This is the core of the algorithm. */
 
-static  void
-SHA1Transform( u_int32_t state[5], const unsigned char buffer[ SHA1_BLOCK_SIZE ] )
+static void SHA1Transform( uint32_t state[5], const unsigned char *buffer )
 {
-	u_int32_t a, b, c, d, e;
-	typedef union {
-		unsigned char c[ 64 ];
-		unsigned int l[ 16 ];
+	typedef union	{
+		unsigned char	c[ SHA1_BLOCK_SIZE ];
+		uint32_t	l[ SHA1_BLOCK_SIZE / 4 ];
 	} CHAR64LONG16;
-	CHAR64LONG16* block;
 
-	unsigned char workspace[ SHA1_BLOCK_SIZE ];
+	uint32_t	a, b, c, d, e;
+	CHAR64LONG16	block;
 
-	block = (CHAR64LONG16 *)workspace;
-	memcpy( block, buffer, SHA1_BLOCK_SIZE );
+	memcpy( block.c, buffer, SHA1_BLOCK_SIZE );
 
 	/* Copy context->state[] to working vars */
 	a = state[0];
@@ -118,24 +114,27 @@ void sha1_update( sha1_ctx *context, const void *data, size_t size )
 {
 	unsigned int i;
 	unsigned int j;
+	const unsigned char *dat;
 
-	j = (u_int32_t)((context->count >> 3) & 63);
-	context->count += (size << 3);
-	if ((j + size) > 63) {
-		bcopy(data, &context->buffer[j], (i = 64 - j));
-		SHA1Transform(context->state, context->buffer);
-		for ( ; i + 63 < size; i += 64) {
-			SHA1Transform(context->state, &data[i]);
+	dat = (const unsigned char*)data;
+
+	j = (uint32_t)(( context->count >> 3 ) & 63 );
+	context->count += ( size << 3 );
+	if (( j + size ) > 63 )	{
+		memcpy( &context->buffer[j], dat, ( i = 64 - j ) );
+		SHA1Transform( context->state, context->buffer );
+		for ( ; i + 63 < size; i += 64 )	{
+			SHA1Transform( context->state, &dat[i] );
 		}
 		j = 0;
 	}
 	else i = 0;
-	bcopy(&data[i], &context->buffer[j], size - i);
+	memcpy( &context->buffer[j], &dat[i], size - i );
 }
 
 
 /* Add padding and return the message digest. */
-sha1_final( sha1_ctx *context, unsigned char digest[ SHA1_DIGEST_SIZE ] )
+void sha1_final( sha1_ctx *context, unsigned char *digest )
 {
 	unsigned int	i;
 	unsigned char	finalcount[ 8 ];
@@ -144,9 +143,9 @@ sha1_final( sha1_ctx *context, unsigned char digest[ SHA1_DIGEST_SIZE ] )
 		finalcount[ i ] = (unsigned char)(( context->count >>
 						    (( 7 - ( i & 7 )) * 8 )) & 0xff );  /* Endian independent */
 	}
-	sha1_update( context, ( unsigned char *)"\200", 1 );
+	sha1_update( context, (const unsigned char *)"\200", 1 );
 	while (( context->count & 504 ) != 448 )	{
-		sha1_update( context, (unsigned char *)"\0", 1 );
+		sha1_update( context, (const unsigned char *)"\0", 1 );
 	}
 	sha1_update( context, finalcount, 8 );	/* Should cause a SHA1Transform() */
 
@@ -167,7 +166,7 @@ sha1_final( sha1_ctx *context, unsigned char digest[ SHA1_DIGEST_SIZE ] )
 }
 
 
-void sha1( const void *data, size_t size, unsigned char digest[ SHA1_DIGEST_SIZE ] )
+void sha1( const void *data, size_t size, unsigned char *digest )
 {
 	sha1_ctx ctx;
 

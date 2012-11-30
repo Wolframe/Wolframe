@@ -30,26 +30,48 @@
  Project Wolframe.
 
 ************************************************************************/
-/*
- *  Password-Based Key Derivation Function 2 (PKCS #5 v2.0).
- *  See RFC 2898 (http://tools.ietf.org/html/rfc2898)
- */
+///
+/// Standard HMAC-SHA1 implementation
+///
 
-#ifndef _PBKDF2_H_INCLUDED
-#define _PBKDF2_H_INCLUDED
+#include <string.h>
 
-#include <stddef.h>
+#include "types/HMAC.h"
+#include "types/sha1.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define HMAC_SHA1_BLOCK_SIZE	SHA1_BLOCK_SIZE
 
-int pbkdf2_hmac_sha1( const unsigned char *salt, size_t saltLen,
-		      const unsigned char *password, size_t pwdLen,
-		      size_t dkLen, unsigned int rounds, unsigned char *derivedKey );
+void hmac_sha1( const unsigned char *key, size_t keyLen,
+		const unsigned char *msg, size_t msgLen,
+		unsigned char hash[] )
+{
+	unsigned char	pad[ HMAC_SHA1_BLOCK_SIZE ];
+	unsigned char	normalizedKey[ HMAC_SHA1_BLOCK_SIZE ];
+	unsigned char	intermediateHash[ HMAC_SHA1_HASH_SIZE ];
+	size_t		i;
+	sha1_ctx	ctx;
 
-#ifdef __cplusplus
+	memset( normalizedKey, 0, HMAC_SHA1_BLOCK_SIZE );
+	if ( keyLen > HMAC_SHA1_BLOCK_SIZE )
+		sha1( key, keyLen, normalizedKey );
+	else	{
+		for ( i = 0; i < keyLen; i ++ )
+			normalizedKey[ i ] = key[ i ];
+	}
+
+	memset( pad, 0x36, HMAC_SHA1_BLOCK_SIZE );
+	for ( i = 0; i < HMAC_SHA1_BLOCK_SIZE; i ++ )
+		pad[ i ] ^= normalizedKey[ i ];
+	sha1_init( &ctx );
+	sha1_update( &ctx, pad, HMAC_SHA1_BLOCK_SIZE );
+	sha1_update( &ctx, msg, msgLen );
+	sha1_final( &ctx, intermediateHash );
+
+	memset( pad, 0x5c, HMAC_SHA1_BLOCK_SIZE );
+	for ( i = 0; i < HMAC_SHA1_BLOCK_SIZE; i ++ )
+		pad[ i ] ^= normalizedKey[ i ];
+	sha1_init( &ctx );
+	sha1_update( &ctx, pad, HMAC_SHA1_BLOCK_SIZE );
+	sha1_update( &ctx, intermediateHash, HMAC_SHA1_HASH_SIZE );
+	sha1_final( &ctx, hash );
 }
-#endif
-
-#endif // _PBKDF2_H_INCLUDED

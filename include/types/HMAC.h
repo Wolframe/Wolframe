@@ -31,23 +31,29 @@
 
 ************************************************************************/
 /*
- *  Standard HMAC-SHA256 implementation
+ *  Standard HMAC-SHA1 / HMAC-SHA256
  */
 
 #ifndef _HMAC_H_INCLUDED
 #define _HMAC_H_INCLUDED
 
+#include "types/sha1.h"
 #include "types/sha2.h"
 
-#define	HMAC_SHA256_DIGEST_SIZE		SHA256_DIGEST_SIZE
+#define	HMAC_SHA1_HASH_SIZE		SHA1_DIGEST_SIZE
+#define	HMAC_SHA256_HASH_SIZE		SHA256_DIGEST_SIZE
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+void hmac_sha1( const unsigned char* key, size_t keySize,
+		const unsigned char* msg, size_t msgSize,
+		unsigned char hash[] );
+
 void hmac_sha256( const unsigned char* key, size_t keySize,
 		  const unsigned char* msg, size_t msgSize,
-		  unsigned char digest[ HMAC_SHA256_DIGEST_SIZE ] );
+		  unsigned char hash[] );
 
 #ifdef __cplusplus
 }

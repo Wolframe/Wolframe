@@ -96,6 +96,8 @@ TEST( SHA1fixture, SHA1 )
 	for ( int i = 0; i < SHA1_DIGEST_SIZE; i++ )
 		sprintf( output2 + 2 * i, "%02X", digest2[i] );
 	EXPECT_STREQ( output, output2 );
+
+	free( message3 );
 }
 
 /* SHA-224 */
@@ -141,6 +143,8 @@ TEST( SHA2fixture, SHA224 )
 	for ( int i = 0; i < SHA224_DIGEST_SIZE; i++ )
 		sprintf( output2 + 2 * i, "%02x", digest2[i] );
 	EXPECT_STREQ( output, output2 );
+
+	free( message3 );
 }
 
 /* SHA-256 */
@@ -186,6 +190,8 @@ TEST( SHA2fixture, SHA256 )
 	for ( int i = 0; i < SHA256_DIGEST_SIZE; i++ )
 		sprintf( output2 + 2 * i, "%02x", digest2[i] );
 	EXPECT_STREQ( output, output2 );
+
+	free( message3 );
 }
 
 /* SHA-384 */
@@ -234,6 +240,8 @@ TEST( SHA2fixture, SHA384 )
 	for ( int i = 0; i < SHA384_DIGEST_SIZE; i++ )
 		sprintf( output2 + 2 * i, "%02x", digest2[i] );
 	EXPECT_STREQ( output, output2 );
+
+	free( message3 );
 }
 
 /* SHA-512 */
@@ -282,6 +290,8 @@ TEST( SHA2fixture, SHA512 )
 	for ( int i = 0; i < SHA512_DIGEST_SIZE; i++ )
 		sprintf( output2 + 2 * i, "%02x", digest2[i] );
 	EXPECT_STREQ( output, output2 );
+
+	free( message3 );
 }
 
 int main( int argc, char **argv )

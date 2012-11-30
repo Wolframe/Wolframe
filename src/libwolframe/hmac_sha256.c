@@ -42,24 +42,24 @@
 
 void hmac_sha256( const unsigned char *key, size_t keyLen,
 		  const unsigned char *msg, size_t msgLen,
-		  unsigned char digest[] )
+		  unsigned char hash[] )
 {
 	unsigned char	pad[ HMAC_SHA256_BLOCK_SIZE ];
 	unsigned char	normalizedKey[ HMAC_SHA256_BLOCK_SIZE ];
-	unsigned char	intermediateHash[ HMAC_SHA256_DIGEST_SIZE ];
-
+	unsigned char	intermediateHash[ HMAC_SHA256_HASH_SIZE ];
+	size_t		i;
 	sha256_ctx	ctx;
 
 	memset( normalizedKey, 0, HMAC_SHA256_BLOCK_SIZE );
 	if ( keyLen > HMAC_SHA256_BLOCK_SIZE )
 		sha256( key, keyLen, normalizedKey );
 	else	{
-		for ( size_t i = 0; i < keyLen; i ++ )
+		for ( i = 0; i < keyLen; i ++ )
 			normalizedKey[ i ] = key[ i ];
 	}
 
 	memset( pad, 0x36, HMAC_SHA256_BLOCK_SIZE );
-	for ( size_t i = 0; i < HMAC_SHA256_BLOCK_SIZE; i ++ )
+	for ( i = 0; i < HMAC_SHA256_BLOCK_SIZE; i ++ )
 		pad[ i ] ^= normalizedKey[ i ];
 	sha256_init( &ctx );
 	sha256_update( &ctx, pad, HMAC_SHA256_BLOCK_SIZE );
@@ -67,10 +67,10 @@ void hmac_sha256( const unsigned char *key, size_t keyLen,
 	sha256_final( &ctx, intermediateHash );
 
 	memset( pad, 0x5c, HMAC_SHA256_BLOCK_SIZE );
-	for ( size_t i = 0; i < HMAC_SHA256_BLOCK_SIZE; i ++ )
+	for ( i = 0; i < HMAC_SHA256_BLOCK_SIZE; i ++ )
 		pad[ i ] ^= normalizedKey[ i ];
 	sha256_init( &ctx );
 	sha256_update( &ctx, pad, HMAC_SHA256_BLOCK_SIZE );
-	sha256_update( &ctx, intermediateHash, HMAC_SHA256_DIGEST_SIZE );
-	sha256_final( &ctx, digest );
+	sha256_update( &ctx, intermediateHash, HMAC_SHA256_HASH_SIZE );
+	sha256_final( &ctx, hash );
 }
