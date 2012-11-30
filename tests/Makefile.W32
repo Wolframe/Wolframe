@@ -111,7 +111,7 @@ TEST_CPP_BINS = \
 	CRAMtest.exe \
 	HMACtest.exe \
 	PBKDF2test.exe \
-	testSHAxe \
+	testSHA.exe \
 	testMD5.exe \
 	poolTest.exe \
 	logTest.exe \
@@ -144,7 +144,7 @@ resolvePathTest.exe: resolvePathTest.obj $(TOPDIR)\src\wolframe.lib
 testBoostPath.exe: testBoostPath.obj
 singletonTest.exe: singletonTest.obj $(TOPDIR)\src\wolframe.lib
 poolTest.exe: poolTest.obj $(TOPDIR)\src\wolframe.lib
-testSHA.exe: tttestSHA $(TOPDIR)\src\libwolframe\wolframe.lib
+testSHA.exe: testSHA.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 testMD5.exe: testMD5.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 byte2hexTest.exe: byte2hexTest.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 base64Test.exe: base64Test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
