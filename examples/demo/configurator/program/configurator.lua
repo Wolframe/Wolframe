@@ -308,7 +308,13 @@ end
 function PictureListRequest( )
 	output:as( "list SYSTEM 'PictureList.simpleform'" )
 	filter().empty = false
-	local t = formfunction( "selectPictureList" )( {} )
+	local search = nil;
+	for v,t in input:get( ) do
+		if t == "search" then
+			search = "%" .. normalizer( "name" )( v ) .. "%"
+		end
+	end
+	local t = formfunction( "selectPictureList" )( { search = search } )
 	local f = form( "Picture" );
 	f:fill( t:get( ) )
 	output:print( f:get( ) )

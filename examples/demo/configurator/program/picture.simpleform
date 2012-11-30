@@ -13,7 +13,6 @@ DOCTYPE "picture Picture"
 		tags string
 		used_categories string
 		used_features string
-		search @string
 		tagwrap
 		{
 			id @int

@@ -10,7 +10,8 @@ BEGIN
 		LEFT JOIN Tag
 		ON PictureTag.tagID = Tag.ID
 		GROUP BY Picture.ID, Picture.thumbnail, Picture.caption, Picture.info,
-			Picture.width, Picture.height, Picture.image;
+			Picture.width, Picture.height, Picture.image
+		HAVING coalesce( Tag.normalizedName, '' ) like $(search);
 END
 
 TRANSACTION selectPicture -- (/picture/id)
