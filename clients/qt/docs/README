@@ -142,7 +142,42 @@ may also disappear completly and all data is contained in each UIForm
 Dynamic Properties
 ------------------
 
-They influence the behaviour of the generic client.
+They influence the behaviour of the generic client. All "propramming"
+is done by setting dynamic properties in main windows or widgets
 
 initialFocus	boolean, sets initial focus on widget
+action		one of 'create', 'delete', 'update' or 'read', will
+		disappear in the future and be replaced just with one
+		'request'
+		valid only in forms (for read mainly) and
+		in push buttons
+initAction	valid only in forms currently
 form		next form to show, currently only working on buttons
+doctype		the document of the XML to generate, when the user
+		generates an action on the element, 
+		e.g. 'CategoryHierarchyRequest.simpleform'
+		currently only working on buttons
+rootelement	the root element of the XML to generate, e.g. 'document'
+		currently only working on buttons
+state		some widgets support restoring the state, usually
+		from the global variables, e.g. state {global.widgetState}
+global.*	global variables, once stored, they are kept and
+		can be addressed as '{global.name}' everywhere else
+{x.y}		dereference a variable, e.g.
+		{widgetname.property}
+		{global.stored_variable}
+		
+		currently there exists the following properties for
+		the corresponding classes:
+
+		QEditLine	state	the text entered
+				text	the text entered
+		QListWidget	state	expanded 
+				id	the currently selected item
+					(single selection for now)
+		QTreeWidget	state	expanded states and selection
+				id	the currently selected item
+					(single selection for now)
+		*		*	any other property is added
+					as attribute to the request,
+					e.g. 'id', 'search' in configurator

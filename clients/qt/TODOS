@@ -6,6 +6,9 @@ now:
 - CRITICAL: "Premature end of document."
 
 musts:
+- push button state (disabled/enabled) based on a
+  condition like {picture.id>0}
+- PDF widget poppler qt4
 - get sensible error message from business layer, not "lua call faled"
   - e.g. avoid deletion of in-use-pictures
   - better even: provide conditions for buttons, so they can't be
@@ -70,7 +73,6 @@ musts:
   - QListView: with model for big data, on request
   - QTreeView: with model for big data, on request
 - file download, later, for reports, PDFs, etc.
-- default focus on a textfield (funny, designer has no way to do it?)
 
 nice to do:
 - FormWidget:
