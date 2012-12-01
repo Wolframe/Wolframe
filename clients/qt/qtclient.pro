@@ -2,7 +2,11 @@ TEMPLATE = app
 
 TARGET = qtclient
 
-CONFIG += thread qt debug uitools
+CONFIG += thread qt uitools designer
+
+DEFINES += QCOMMANDLINE_STATIC
+
+INCLUDEPATH += .
 
 # Add files and directories to ship with the application 
 # by adapting the examples below.
@@ -39,7 +43,6 @@ SOURCES += \
 	qtclient.cpp \
 	Preferences.cpp \
 	PreferencesDialog.cpp \
-	FileChooser.cpp \
 	StorageWidget.cpp \
 	ManageStorageDialog.cpp
 
@@ -63,7 +66,6 @@ HEADERS += \
 	Version.hpp \
 	Preferences.hpp \
 	PreferencesDialog.hpp \
-	FileChooser.hpp \
 	LoadMode.hpp \
 	StorageWidget.hpp \
 	ManageStorageDialog.hpp
