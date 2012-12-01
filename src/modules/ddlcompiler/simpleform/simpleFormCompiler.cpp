@@ -56,6 +56,8 @@ public:
 	FRMAttribute( const FRMAttribute& o)
 		:m_isVector(o.m_isVector)
 		,m_isAttribute(o.m_isAttribute)
+		,m_isOptional(o.m_isOptional)
+		,m_isMandatory(o.m_isMandatory)
 		,m_isForm(o.m_isForm)
 		,m_isFormReference(o.m_isFormReference)
 		,m_type(o.m_type)
@@ -65,6 +67,8 @@ public:
 	explicit FRMAttribute( const std::string& item, const TypeMap* typemap, const types::keymap<StructType>& formmap)
 		:m_isVector(false)
 		,m_isAttribute(false)
+		,m_isOptional(false)
+		,m_isMandatory(false)
 		,m_isForm(false)
 		,m_isFormReference(false)
 		,m_type(0)
@@ -90,8 +94,23 @@ public:
 				case ParseStart:
 					if (*ii == '@')
 					{
-						++ii;
+						if (m_isAttribute) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '@'");
 						m_isAttribute = true;
+						continue;
+					}
+					if (*ii == '*')
+					{
+						if (m_isMandatory) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '*'");
+						if (m_isOptional) throw std::runtime_error( "Syntax error in Simple Form: contradicting attributes '*' and '?' set");
+						m_isMandatory = true;
+						continue;
+					}
+					if (*ii == '?')
+					{
+						if (m_isOptional) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '?'");
+						if (m_isMandatory) throw std::runtime_error( "Syntax error in Simple Form: contradicting attributes '?' and '*' set");
+						m_isOptional = true;
+						continue;
 					}
 					st = ParseName;
 					/* no break here !*/
@@ -181,6 +200,8 @@ public:
 	bool isFormReference() const		{return m_isFormReference;}
 	bool isVector() const			{return m_isVector;}
 	bool isAttribute() const		{return m_isAttribute;}
+	bool isOptional() const			{return m_isOptional;}
+	bool isMandatory() const		{return m_isMandatory;}
 	bool isForm() const			{return m_isForm;}
 	const NormalizeFunction* type() const	{return m_type;}
 	const std::string& value() const	{return m_value;}
@@ -215,6 +236,8 @@ private:
 private:
 	bool m_isVector;
 	bool m_isAttribute;
+	bool m_isOptional;
+	bool m_isMandatory;
 	bool m_isForm;
 	bool m_isFormReference;
 	const NormalizeFunction* m_type;
@@ -287,6 +310,14 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				{
 					val = fa.subform();
 				}
+				if (fa.isOptional())
+				{
+					val.optional(true);
+				}
+				if (fa.isMandatory())
+				{
+					val.mandatory(true);
+				}
 				if (first == "_")
 				{
 					result.defineContent( "", val);
@@ -308,6 +339,14 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				else
 				{
 					val = at;
+				}
+				if (fa.isOptional())
+				{
+					val.optional(true);
+				}
+				if (fa.isMandatory())
+				{
+					val.mandatory(true);
 				}
 				if (fa.isAttribute())
 				{
@@ -358,6 +397,14 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 						throw std::runtime_error( "Semantic error: Form declared with default value");
 					}
 					compile_ptree( itr->second, st, typemap, formmap);
+				}
+				if (fa.isOptional())
+				{
+					st.optional(true);
+				}
+				if (fa.isMandatory())
+				{
+					st.mandatory(true);
 				}
 				result.defineContent( first, st);
 			}

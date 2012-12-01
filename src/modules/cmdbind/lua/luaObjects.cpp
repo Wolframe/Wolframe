@@ -667,7 +667,11 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 			const char* mode = lua_tostring( ls, 3);
 			if (std::strcmp( mode, "strict") == 0)
 			{
-				flags = serialize::Context::ValidateAttributes;
+				flags = (serialize::Context::Flags)((int)serialize::Context::ValidateAttributes|(int)serialize::Context::ValidateInitialization);
+			}
+			else if (std::strcmp( mode, "complete") == 0)
+			{
+				flags = serialize::Context::ValidateInitialization;
 			}
 			else
 			{

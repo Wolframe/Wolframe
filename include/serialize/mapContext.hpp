@@ -70,7 +70,8 @@ public:
 	{
 		None=0x00,
 		ValidateAttributes=0x01,
-		SerializeWithIndices=0x02
+		SerializeWithIndices=0x02,
+		ValidateInitialization=0x04
 	};
 	static bool getFlag( const char* name, Flags& flg);
 

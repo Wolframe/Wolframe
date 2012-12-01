@@ -364,6 +364,9 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						{
 							throw ERROR( si, "Cannot define AUTHORIZE in operation. Only allowed as TRANSACTION definition attribute");
 						}
+						ch = gotoNextToken( si, se);
+						if (ch != '(') throw ERROR( si, "Open bracket '(' expected after AUTHORIZE function call");
+						si++;
 						if (!parseNextToken( authorization_function, si, se))
 						{
 							throw ERROR( si, "unexpected end of description. function name expected after AUTHORIZE");
@@ -373,20 +376,20 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 							throw ERROR( si, "AUTHORIZE function name must not be empty");
 						}
 						ch = gotoNextToken( si, se);
-						if (ch == '(')
+						if (ch == ',')
 						{
 							++si;
 							if (!parseNextToken( authorization_resource, si, se))
 							{
 								throw ERROR( si, "unexpected end of description. resource name expected as argument of AUTHORIZE function call");
 							}
-							ch = gotoNextToken( si, se);
-							if (ch != ')')
-							{
-								throw ERROR( si, "Close bracket ')' expected after AUTHORIZE function call");
-							}
-							++si;
 						}
+						ch = gotoNextToken( si, se);
+						if (ch != ')')
+						{
+							throw ERROR( si, "Close bracket ')' expected after AUTHORIZE function defintion");
+						}
+						++si;
 					}
 					else
 					{

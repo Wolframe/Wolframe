@@ -249,6 +249,13 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 				{
 					throw SerializationErrorException( "undefined mandatory structure element", itr->first, getElementPath( stk));
 				}
+				if (ctx.flag( Context::ValidateInitialization))
+				{
+					if (!itr->second.optional() && !itr->second.initialized())
+					{
+						throw SerializationErrorException( "schema validation failed: undefined non optional structure element", itr->first, getElementPath( stk));
+					}
+				}
 			}
 			stk.pop_back();
 			return true;

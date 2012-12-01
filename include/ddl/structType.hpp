@@ -235,9 +235,15 @@ public:
 	///\return true, if yes
 	bool optional() const				{return (m_flags&(unsigned char)Optional);}
 
+	///\brief Mark the structure as optional/non optional
+	void optional( bool v)				{if (v)m_flags|=(unsigned char)Optional; else m_flags&=((unsigned char)0xFF-(unsigned char)Optional);}
+
 	///\brief Find out if the element in the structure is mandatory
 	///\return true, if yes
 	bool mandatory() const				{return (m_flags&(unsigned char)Mandatory);}
+
+	///\brief Mark the structure as optional/non optional
+	void mandatory( bool v)				{if (v)m_flags|=(unsigned char)Mandatory; else m_flags&=((unsigned char)0xFF-(unsigned char)Mandatory);}
 
 	///\brief Find out if the structure is initialized
 	///\return true, if yes
@@ -245,7 +251,7 @@ public:
 
 	///\brief Mark the structure as initialized/non initialized
 	///\return true, if the element was initialized before
-	bool initialized( bool v=true)			{bool rt = (m_flags&(unsigned char)Initialized); if (v)m_flags|=(unsigned char)Initialized; else m_flags&=((unsigned char)0xFF-(unsigned char)Initialized); return rt;}
+	bool initialized( bool v)			{bool rt = (m_flags&(unsigned char)Initialized); if (v)m_flags|=(unsigned char)Initialized; else m_flags&=((unsigned char)0xFF-(unsigned char)Initialized); return rt;}
 
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)

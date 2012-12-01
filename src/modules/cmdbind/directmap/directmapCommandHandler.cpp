@@ -139,7 +139,8 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				if (m_inputform_defined)
 				{
 					m_inputform_parser.reset( new serialize::DDLStructParser( &m_inputform));
-					m_inputform_parser->init( m_input, serialize::Context::ValidateAttributes);
+					serialize::Context::Flags flags = (serialize::Context::Flags)((int)serialize::Context::ValidateAttributes|(int)serialize::Context::ValidateInitialization);
+					m_inputform_parser->init( m_input, flags);
 					m_state = 2;
 					continue;
 				}
