@@ -56,6 +56,14 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 #BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib32
 #BOOST_LDFLAGS = /LIBPATH:$(BOOST_DIR)\lib64
 
+# ICU (icu4c)
+#############
+
+ICU_DIR = C:\Cygwin\home\Andreas Baumann\icu-49.1.2-win64-release
+
+# the library version (how the DLLs are tagged)
+ICU_LIB_VERSION = 49
+
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 
@@ -110,10 +118,7 @@ EXPECT = $(TCL_DIR)\bin\tclsh.exe
 # used for deployment only!
 #########################
 
-# @office
 WIX_DIR = C:\Program Files (x86)\Windows Installer XML v3.5
-# @home PIII
-#WIX_DIR = C:\Program Files\Windows Installer XML v3.5
 
 #WIX_LIBS = dutil_2008.lib wcautil_2008.lib
 WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
@@ -121,6 +126,10 @@ WIX_LIBS = dutil_2008_x64.lib wcautil_2008_x64.lib
 # architecture of resulting msi
 #WIX_ARCH = x86
 WIX_ARCH = x64
+
+#PGDLL_LIBRARIES=1
+
+#PGDLL_WITHOUT_MAJOR_VERSION=1
 
 # define for 64 bit, undefine for 32 bit
 WIN64=1
@@ -140,3 +149,8 @@ DOXYGEN = C:\Program Files\Doxygen\doxygen.exe
 
 HHC_LOCATION = C:\Program Files (x86)\HTML Help Workshop\hhc.exe
 
+# CCacche
+#########
+
+#CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+#CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
