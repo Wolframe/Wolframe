@@ -476,6 +476,8 @@ DOCTYPE "picture Picture"
 		height int
 		size int
 		tags string
+		used_categories string
+		used_features string
 		tagwrap
 		{
 			id @int
@@ -767,6 +769,7 @@ BEGIN
 		ON PictureTag.pictureID = Picture.ID
 		LEFT JOIN Tag
 		ON PictureTag.tagID = Tag.ID
+		WHERE coalesce( Tag.normalizedName, '' ) like $(search)
 		GROUP BY Picture.ID, Picture.thumbnail, Picture.caption, Picture.info,
 			Picture.width, Picture.height, Picture.image;
 END
@@ -776,12 +779,22 @@ BEGIN
 	INTO picture DO UNIQUE
 		SELECT Picture.ID AS "id", image, caption, info, width, height,
 			coalesce( group_concat( Tag.name ), '' ) as tags,
-			3*length(image)/4+2 as size
+			3*length(image)/4+2 as size,
+			coalesce( group_concat( distinct Category.name ), '' ) as used_categories,
+			coalesce( group_concat( distinct Feature.name ), '' ) as used_features
 		FROM Picture
 		LEFT JOIN PictureTag
 		ON PictureTag.pictureID = Picture.ID
 		LEFT JOIN Tag
 		ON PictureTag.tagID = Tag.ID
+		LEFT JOIN CategoryPicture
+		ON CategoryPicture.pictureID = Picture.ID
+		LEFT JOIN Category
+		ON CategoryPicture.categoryID = Category.ID
+		LEFT JOIN FeaturePicture
+		ON FeaturePicture.pictureID = Picture.ID
+		LEFT JOIN Feature
+		ON FeaturePicture.featureID = Feature.ID
 		WHERE Picture.ID = $(id)
 		GROUP BY Picture.ID, Picture.image, Picture.caption, Picture.info,
 			Picture.width, Picture.height;
@@ -992,19 +1005,17 @@ local function edit_node( tablename, itr)
 	local nname = nil
 	local description = nil
 	local pictures = nil
-	local inpicture = false
 	local id = nil
 	for v,t in itr do
-		if( t == "id" and not inpicture ) then
+		if( t == "id" ) then
 			id = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)
 			nname = normalizer("name")( name)
 		elseif t == "description" then
 			description = content_value( v, itr)
-		elseif t == "picture" then
+		elseif( t == "picture" ) then
 			pictures = pictures_value( pictures, scope( itr))
-			inpicture = true
 		end
 	end
 	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, pictures=pictures} )
@@ -1131,14 +1142,23 @@ end
 function PictureListRequest( )
 	output:as( "list SYSTEM 'PictureList.simpleform'" )
 	filter().empty = false
-	local t = formfunction( "selectPictureList" )( {} )
+	local search = nil;
+	for v,t in input:get( ) do
+		if t == "search" then
+			search = "%" .. normalizer( "name" )( v ) .. "%"
+		end
+	end
+	if search == nil then
+		search = "%%"
+	end
+	local t = formfunction( "selectPictureList" )( { search = search } )
 	local f = form( "Picture" );
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
 end
 
 function PictureRequest( )
-	output:as( "picture SYSTEM 'Picture.simpleform'")
+	output:as( "dummy SYSTEM 'Picture.simpleform'")
 	filter().empty = false
 	local id = nil;
 	for v,t in input:get( ) do
@@ -1159,18 +1179,38 @@ local function transform_picture( itr )
 	-- should be a form transformation, not lua code :-)
 	local picture = {}
 	picture["tags"] = {}
-	local tags = {}
 	local intag = false
 	local intagwrap = false
+	local inid = false;
 	for v,t in itr do
-		if ( ( t == "id" or t == "caption" or t == "info" or t == "image" ) and not intagwrap and not intag) then
-			picture[ t] = content_value( v, itr)
-		elseif( t == "tagwrap" ) then
-			intagwrap = true
-		elseif( t == "tag" ) then
-			intag = true
-		elseif( t == "id" and intag ) then
-			table.insert( picture["tags"], { ["id"] = v } )
+		if( not v and t ) then
+			-- begin tag
+			if( t == "tagwrap" ) then
+				intagwrap = true
+			elseif( t == "tag" ) then
+				intag = true
+			elseif( t == "caption" or t == "info" or t == "image" ) then
+				picture[ t] = content_value( v, itr)
+			end
+		elseif( v and t ) then
+			-- attribute
+			inid = true
+			if ( ( t == "id" ) and not intagwrap and not intag ) then
+				picture[ t] = content_value( v, itr )
+			elseif( t == "id" and intag and intagwrap ) then
+				table.insert( picture["tags"], { ["id"] = v } )
+			end
+		elseif( not v and not t ) then
+			-- end tag
+			if( inid ) then
+				inid = false
+			elseif( intag and intagwrap ) then
+				intag = false
+			elseif( intagwrap ) then
+				intagwrap = false
+			end
+		else
+			-- dummy content
 		end
 	end
 	info = formfunction( "imageInfo" )( { [ "data"] = picture["image"] } ):table( )
@@ -1221,8 +1261,6 @@ function run()
 	output:opentag("result")
 	local itr = input:get()
 	for v,t in itr do
-		logger.printc( "MAIN tag='", t, "' value='", v, "'")
-
 		if (t == "pushCategoryHierarchy") then
 			add_tree( "Category", scope(itr))
 		elseif (t == "pushFeatureHierarchy") then

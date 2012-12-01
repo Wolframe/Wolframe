@@ -1,7 +1,8 @@
 PREPARE get_task AS SELECT * FROM task WHERE id=? ORDER BY id ASC;
 
 TRANSACTION test_transaction
+RESULT INTO doc
 BEGIN
-	INTO doc/task FOREACH //task DO get_task( id);
+	INTO task FOREACH //task DO get_task( id);
 END
 

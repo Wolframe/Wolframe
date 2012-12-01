@@ -75,8 +75,7 @@ public:
 	StructType( bool mandatory_=false)
 		:m_contentType( Struct)
 		,m_nof_attributes(0)
-		,m_mandatory(mandatory_)
-		,m_initialized(false){}
+		,m_flags(mandatory_?Mandatory:NoFlag){}
 
 	///\brief Copy constructor
 	///\param[in] o element to copy
@@ -85,8 +84,7 @@ public:
 		,m_value(o.m_value)
 		,m_elem(o.m_elem)
 		,m_nof_attributes(o.m_nof_attributes)
-		,m_mandatory(o.m_mandatory)
-		,m_initialized(o.m_initialized){}
+		,m_flags(o.m_flags){}
 
 	///\brief Copy constructor
 	///\param[in] a atomic element to create as structure element
@@ -95,8 +93,7 @@ public:
 		:m_contentType( Atomic)
 		,m_value(a)
 		,m_nof_attributes(0)
-		,m_mandatory(mandatory_)
-		,m_initialized(false){}
+		,m_flags(mandatory_?Mandatory:NoFlag){}
 
 	///\brief Assignement operator
 	///\param[in] o element to copy
@@ -106,8 +103,7 @@ public:
 		m_value = o.m_value;
 		m_elem = o.m_elem;
 		m_nof_attributes = o.m_nof_attributes;
-		m_mandatory = o.m_mandatory;
-		m_initialized = o.m_initialized;
+		m_flags = o.m_flags;
 		return *this;
 	}
 
@@ -235,17 +231,21 @@ public:
 	///\return the number of elements or 0 in case of an atomic value
 	std::size_t nof_elements() const;
 
+	///\brief Find out if the element in the structure is optional
+	///\return true, if yes
+	bool optional() const				{return (m_flags&(unsigned char)Optional);}
+
 	///\brief Find out if the element in the structure is mandatory
 	///\return true, if yes
-	bool mandatory() const				{return m_mandatory;}
+	bool mandatory() const				{return (m_flags&(unsigned char)Mandatory);}
 
 	///\brief Find out if the structure is initialized
 	///\return true, if yes
-	bool initialized() const			{return m_initialized;}
+	bool initialized() const			{return (m_flags&(unsigned char)Initialized);}
 
 	///\brief Mark the structure as initialized/non initialized
 	///\return true, if the element was initialized before
-	bool initialized( bool v=true)			{bool rt = m_initialized; m_initialized=v; return rt;}
+	bool initialized( bool v=true)			{bool rt = (m_flags&(unsigned char)Initialized); if (v)m_flags|=(unsigned char)Initialized; else m_flags&=((unsigned char)0xFF-(unsigned char)Initialized); return rt;}
 
 private:
 	///\brief Assert a type precondition of this. (throws an logic_error exception on failure)
@@ -256,8 +256,14 @@ private:
 	AtomicType m_value;		//< value, if the value is atomic
 	Map m_elem;			//< map represented as array
 	std::size_t m_nof_attributes;	//< number of attributes (first N elements of the structure)
-	bool m_mandatory;		//< true, if the field is mandatory
-	bool m_initialized;		//< true, if the field has been initialized
+	enum Flags
+	{
+		NoFlag=0x0,		//< no flag set
+		Mandatory=0x1,		//< the field is mandatory
+		Optional=0x2,		//< the field is optional
+		Initialized=0x4		//< the field is initialized
+	};
+	unsigned char m_flags;
 };
 
 
