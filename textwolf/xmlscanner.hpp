@@ -333,7 +333,7 @@ public:
 			[ PITAG    ](Questm,PITAGEND).other(PITAG)
 			[ PITAGEND ](Gt,CONTENT).miss(ErrExpectedTagEnd)
 			[ XTAGEND  ](Gt,XTAGEOLN)(EndOfLine)(Cntrl)(Space).miss(ErrExpectedTagEnd)
-			[ XTAGEOLN ](EndOfLine,XTAGDONE)(Cntrl)(Space).miss(ErrExpectedEndOfLine)
+			[ XTAGEOLN ](EndOfLine,XTAGDONE)(Cntrl)(Space).fallback(XTAGDONE)
 			[ XTAGDONE ].action(Return,HeaderEnd).fallback(CONTENT)
 			[ XTAGAISK ](EndOfLine)(Cntrl)(Space)(Questm,XTAGEND).fallback(XTAGANAM)
 			[ XTAGANAM ].action(ReturnIdentifier,HeaderAttribName)(EndOfLine,Cntrl,Space,XTAGAESK)(Equal,XTAGAVSK).miss(ErrExpectedEqual)
