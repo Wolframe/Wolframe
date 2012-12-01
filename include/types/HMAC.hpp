@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///
-/// Standard HMAC-SHA256 implementation
+/// Standard HMAC-SHA256 C++ interface
 ///
 
 #ifndef _HMAC_HPP_INCLUDED
@@ -43,31 +43,76 @@
 namespace _Wolframe {
 namespace AAAA {
 
-/// Standard HMAC-SHA256 implementation
+/// Standard HMAC-SHA1 object
+class HMAC_SHA1
+{
+public:
+	HMAC_SHA1( const unsigned char* key, size_t keySize,
+		   const unsigned char* msg, size_t msgSize )
+					{ hmac_sha1( key, keySize,
+						     msg, msgSize, m_HMAC ); }
+	HMAC_SHA1( const std::string& key, const std::string& message )
+					{ hmac_sha1( (const unsigned char*)key.data(), key.size(),
+						     (const unsigned char*)message.data(), message.size(),
+						     m_HMAC ); }
+	HMAC_SHA1( const unsigned char* key, size_t keySize, const std::string& message )
+					{ hmac_sha1( key, keySize,
+						     (const unsigned char*)message.data(), message.size(),
+						     m_HMAC ); }
+	HMAC_SHA1( const std::string& key, const unsigned char* msg, size_t msgSize )
+					{ hmac_sha1( (const unsigned char*)key.data(), key.size(),
+						     msg, msgSize, m_HMAC ); }
+
+	/// \note The string is a base64 representation of the value
+	HMAC_SHA1( const std::string& str );
+
+	const unsigned char* hash() const			{ return m_HMAC; }
+	std::size_t size() const				{ return HMAC_SHA1_HASH_SIZE; }
+
+	/// Comparisson operators
+	bool operator == ( const HMAC_SHA1& rhs ) const;
+	bool operator != ( const HMAC_SHA1& rhs ) const	{ return !( *this == rhs ); }
+
+	/// Comparisson operators
+	/// \note The string is a base64 representation of the value
+	bool operator == ( const std::string& rhs ) const;
+	bool operator != ( const std::string& rhs ) const	{ return !( *this == rhs ); }
+
+	/// BCD string representation of the HMAC value.
+	std::string toBCD() const;
+	/// Base64 string representation of the HMAC value.
+	/// \note The string is without the base64 end padding
+	std::string toString() const;
+private:
+	unsigned char	m_HMAC[ HMAC_SHA1_HASH_SIZE ];
+};
+
+
+/// Standard HMAC-SHA256 object
 class HMAC_SHA256
 {
 public:
 	HMAC_SHA256( const unsigned char* key, size_t keySize,
 		     const unsigned char* msg, size_t msgSize )
-						{ hmac_sha256( key, keySize,
-							       msg, msgSize, m_HMAC ); }
+					{ hmac_sha256( key, keySize,
+						       msg, msgSize, m_HMAC ); }
 	HMAC_SHA256( const std::string& key, const std::string& message )
-						{ hmac_sha256( (const unsigned char*)key.data(), key.size(),
-							       (const unsigned char*)message.data(), message.size(),
-							       m_HMAC ); }
+					{ hmac_sha256( (const unsigned char*)key.data(), key.size(),
+						       (const unsigned char*)message.data(), message.size(),
+						       m_HMAC ); }
 	HMAC_SHA256( const unsigned char* key, size_t keySize, const std::string& message )
-						{ hmac_sha256( key, keySize,
-							       (const unsigned char*)message.data(), message.size(),
-							       m_HMAC ); }
+					{ hmac_sha256( key, keySize,
+						       (const unsigned char*)message.data(), message.size(),
+						       m_HMAC ); }
 	HMAC_SHA256( const std::string& key, const unsigned char* msg, size_t msgSize )
-						{ hmac_sha256( (const unsigned char*)key.data(), key.size(),
-							       msg, msgSize, m_HMAC ); }
+					{ hmac_sha256( (const unsigned char*)key.data(), key.size(),
+						       msg, msgSize, m_HMAC ); }
 
 	/// \note The string is a base64 representation of the value
-	HMAC_SHA256( const std::string& digest );
+	HMAC_SHA256( const std::string& str );
 
 	const unsigned char* hash() const			{ return m_HMAC; }
-	std::size_t size() const				{ return HMAC_SHA256_DIGEST_SIZE; }
+	std::size_t size() const				{ return HMAC_SHA256_HASH_SIZE; }
 
 	/// Comparisson operators
 	bool operator == ( const HMAC_SHA256& rhs ) const;
@@ -84,7 +129,7 @@ public:
 	/// \note The string is without the base64 end padding
 	std::string toString() const;
 private:
-	unsigned char	m_HMAC[ HMAC_SHA256_DIGEST_SIZE ];
+	unsigned char	m_HMAC[ HMAC_SHA256_HASH_SIZE ];
 };
 
 }} // namespace _Wolframe::AAAA

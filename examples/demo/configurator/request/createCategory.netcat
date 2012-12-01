@@ -1,12 +1,11 @@
+AUTH
+MECH NONE
+REQUEST create
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE category SYSTEM 'Category.simpleform'>
 <category id="16">
-<name>Gugus</name>
+<name>BlaBla Device</name>
 <description>Gugu bbla</description>
-<normalizedName>bla</normalizedName>
-<picture id="1">
-<caption>Gugus caption</caption>
-<info>Gugus info</info>
-<image>Gugus image</image>
-</picture>
 </category>
+.
+CAPA

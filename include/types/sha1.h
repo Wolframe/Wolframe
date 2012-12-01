@@ -22,6 +22,7 @@
 #define _SHA1_H_INCLUDED
 
 #include <stddef.h>
+#include <stdint.h>
 
 #define SHA1_DIGEST_SIZE	( 160 / 8 )
 #define SHA1_BLOCK_SIZE		( 512 / 8 )
@@ -31,15 +32,15 @@ extern "C" {
 #endif
 
 typedef struct	{
-	unsigned int	state[ 5 ];
+	uint32_t	state[ 5 ];
 	size_t		count;
 	unsigned char	buffer[ SHA1_BLOCK_SIZE ];
 } sha1_ctx;
 
 void sha1_init( sha1_ctx *ctx );
 void sha1_update( sha1_ctx *ctx, const void *data, size_t size );
-void sha1_final( sha1_ctx *ctx, unsigned char digest[ SHA1_DIGEST_SIZE ] );
-void sha1( const void *data, size_t size, unsigned char digest[ SHA1_DIGEST_SIZE ] );
+void sha1_final( sha1_ctx *ctx, unsigned char *digest );
+void sha1( const void *data, size_t size, unsigned char *digest );
 
 #ifdef __cplusplus
 }

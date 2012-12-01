@@ -1,16 +1,15 @@
-show stoppers:
-- picture list:
-  - search by tag
-  - show where the pictures are bein used
-- recover after errors in protocol:
-  - example, duplicate normalizedName
-  - stop the "whiteout", especially seen after assigning pictures
-    (must be a protocol thing)
-  - CRITICAL: "Premature end of document."
-  - ILLEGAL STATE 4 in dataAvailable!
-- set focus in forms
-  
+now:
+- adapt to changes in tdl files (INTO construct)
+- stop the "whiteout", especially seen after assigning pictures
+  (must be a protocol thing)
+- ILLEGAL STATE 4 in dataAvailable!
+- CRITICAL: "Premature end of document."
+
 musts:
+- get sensible error message from business layer, not "lua call faled"
+  - e.g. avoid deletion of in-use-pictures
+  - better even: provide conditions for buttons, so they can't be
+    pressed (button.state={something})
 - improve group_concat to take a parameter as separator
 - use simpleforms instead of funny lua parsers (example
   picture parsers)
@@ -18,11 +17,9 @@ musts:
   similar widget around it, where to put the data then?
 - how to comminicate tags which are used by picture and 
   they should not be deletable?
-- QTableWidget:
-  - implement state
-    - viewport position
-    - selected cells
-    - new way of reseting the form (no domain erase and reload)
+- QTableWidget
+  - implement other selection modes (column, cells)
+  - remember states like sort order, column width, etc.
 - QDialog instead of QWidget for forms
   - would allow to have default Enter and ESC behaviour
   - must be treated specially, as the form should NOT
@@ -32,10 +29,6 @@ musts:
   - global.XXX variables
   - last form
 - unselect trees
-- new picture picker
-  - upload a set of images, keep them on the server
-  - use them from a picklist (with images)
-- problems with size of main window to follow size of form ui
 - frontend:
   - associating categories and features
 - Linux, shared lib for custom widgets, similar to windows, for now
@@ -43,12 +36,8 @@ musts:
   mixing!)
 - element operations
   - reorganize tree
-    - add elements 
-    - delete elements/subtrees
-- tab stop order for file choose, picture chooser
-- element operations
-  - reorganize tree
     - move elements/subtrees
+- tab stop order for file choose, picture chooser
 - protocol
   - network loader via protocol or use client library?
 - designer custom widgets
@@ -57,6 +46,7 @@ musts:
     - MDI or tabbed view
   - picture viewer
     - show 0 to N pictures, scrollable
+    - alternative to QTableWidget approach
 - localize forms:
   - Windows doesn't retranslate on the fly! Why?
   - Windows doesn't respect language on startup for form

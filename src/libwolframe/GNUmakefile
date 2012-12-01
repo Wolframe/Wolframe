@@ -70,6 +70,7 @@ CPP_OBJS = \
 	password.o \
 	globalRndGen.o \
 	HMAC.o \
+	PBKDF2.o \
 	CRAM.o
 
 OBJS = \
@@ -78,8 +79,9 @@ OBJS = \
 	byte2hex.o \
 	sha1.o \
 	sha2.o \
+	hmac_sha1.o \
 	hmac_sha256.o \
-	PBKDF2.o \
+	pbkdf2_hmac_sha1.o \
 	md5.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk

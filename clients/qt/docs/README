@@ -139,3 +139,10 @@ a stylesheet and some translations. Can be seen as a special form. They
 may also disappear completly and all data is contained in each UIForm
 (makes the loading process a little bit more tricky).
 
+Dynamic Properties
+------------------
+
+They influence the behaviour of the generic client.
+
+initialFocus	boolean, sets initial focus on widget
+form		next form to show, currently only working on buttons

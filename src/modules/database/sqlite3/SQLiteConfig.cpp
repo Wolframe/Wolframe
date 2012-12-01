@@ -53,6 +53,8 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 			  const module::ModulesDirectory* /*modules*/ )
 {
 	using namespace _Wolframe::config;
+	bool fkDefined = false;
+	bool profilingDefined = false;
 	bool connDefined = false;
 	bool retVal = true;
 
@@ -69,6 +71,16 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 			  boost::algorithm::iequals( L1it->first, "filename" ))	{
 			bool isDefined = ( !m_filename.empty() );
 			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_filename, &isDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "foreignKeys" ))	{
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_foreignKeys,
+						Parser::BoolDomain(), &fkDefined ))
+				retVal = false;
+		}
+		else if ( boost::algorithm::iequals( L1it->first, "profiling" ))	{
+			if ( !Parser::getValue( logPrefix().c_str(), *L1it, m_profiling,
+						Parser::BoolDomain(), &profilingDefined ))
 				retVal = false;
 		}
 		else if ( boost::algorithm::iequals( L1it->first, "connections" ))	{
@@ -91,6 +103,10 @@ bool SQLiteConfig::parse( const config::ConfigurationTree& pt, const std::string
 	}
 	if ( ! connDefined )
 		m_connections = DEFAULT_SQLITE_CONNECTIONS;
+	if ( ! fkDefined )
+		m_foreignKeys = true;
+	if ( ! profilingDefined )
+		m_profiling = false;
 	return retVal;
 }
 
@@ -106,7 +122,9 @@ void SQLiteConfig::print( std::ostream& os, size_t indent ) const
 	if ( ! m_ID.empty() )
 		os << indStr << "   ID: " << m_ID << std::endl;
 	os << indStr << "   Filename: " << m_filename << std::endl;
-	if ( m_programFiles.size() == 0 )
+	os << indStr << "      Referential integrity: " << (m_foreignKeys ? "enabled" : "disabled") << std::endl;
+	os << indStr << "      Profiling: " << (m_profiling ? "enabled" : "disabled") << std::endl;
+	if ( m_programFiles.empty() )
 		os << indStr << "   Program file: none" << std::endl;
 	else if ( m_programFiles.size() == 1 )
 		os << indStr << "   Program file: " << m_programFiles.front() << std::endl;

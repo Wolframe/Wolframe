@@ -30,25 +30,48 @@
  Project Wolframe.
 
 ************************************************************************/
-//
-// SQLite constructor
-//
+///
+/// Standard HMAC-SHA1 implementation
+///
 
-#include "SQLite.hpp"
-#include "logger-v1.hpp"
+#include <string.h>
 
-namespace _Wolframe {
-namespace db {
+#include "types/HMAC.h"
+#include "types/sha1.h"
 
-SQLiteDBunit* SQLiteConstructor::object( const config::NamedConfiguration& conf )
+#define HMAC_SHA1_BLOCK_SIZE	SHA1_BLOCK_SIZE
+
+void hmac_sha1( const unsigned char *key, size_t keyLen,
+		const unsigned char *msg, size_t msgLen,
+		unsigned char hash[] )
 {
-	const SQLiteConfig& cfg = dynamic_cast< const SQLiteConfig& >( conf );
+	unsigned char	pad[ HMAC_SHA1_BLOCK_SIZE ];
+	unsigned char	normalizedKey[ HMAC_SHA1_BLOCK_SIZE ];
+	unsigned char	intermediateHash[ HMAC_SHA1_HASH_SIZE ];
+	size_t		i;
+	sha1_ctx	ctx;
 
-	SQLiteDBunit* m_db = new SQLiteDBunit( cfg.ID(), cfg.filename(),
-					       cfg.foreignKeys(), cfg.profiling(),
-					       cfg.connections(), cfg.programFiles());
-	MOD_LOG_TRACE << "SQLite database unit for '" << cfg.ID() << "' created";
-	return m_db;
+	memset( normalizedKey, 0, HMAC_SHA1_BLOCK_SIZE );
+	if ( keyLen > HMAC_SHA1_BLOCK_SIZE )
+		sha1( key, keyLen, normalizedKey );
+	else	{
+		for ( i = 0; i < keyLen; i ++ )
+			normalizedKey[ i ] = key[ i ];
+	}
+
+	memset( pad, 0x36, HMAC_SHA1_BLOCK_SIZE );
+	for ( i = 0; i < HMAC_SHA1_BLOCK_SIZE; i ++ )
+		pad[ i ] ^= normalizedKey[ i ];
+	sha1_init( &ctx );
+	sha1_update( &ctx, pad, HMAC_SHA1_BLOCK_SIZE );
+	sha1_update( &ctx, msg, msgLen );
+	sha1_final( &ctx, intermediateHash );
+
+	memset( pad, 0x5c, HMAC_SHA1_BLOCK_SIZE );
+	for ( i = 0; i < HMAC_SHA1_BLOCK_SIZE; i ++ )
+		pad[ i ] ^= normalizedKey[ i ];
+	sha1_init( &ctx );
+	sha1_update( &ctx, pad, HMAC_SHA1_BLOCK_SIZE );
+	sha1_update( &ctx, intermediateHash, HMAC_SHA1_HASH_SIZE );
+	sha1_final( &ctx, hash );
 }
-
-}} // namespace _Wolframe::db

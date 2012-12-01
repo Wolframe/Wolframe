@@ -35,23 +35,24 @@
  *  See RFC 2898 (http://tools.ietf.org/html/rfc2898)
  */
 
-#include "types/PBKDF2.h"
-#include "types/HMAC.h"
-
 #include <string.h>
 #include <limits.h>
 #include <stdlib.h>
 
-int pbkdf2( const unsigned char *salt, size_t saltLen,
-	    const unsigned char *password, size_t pwdLen,
-	    unsigned char *derivedKey, size_t dkLen, unsigned int rounds )
+#include "types/HMAC.h"
+#include "types/PBKDF2.h"
+
+int pbkdf2_hmac_sha1( const unsigned char *salt, size_t saltLen,
+		      const unsigned char *password, size_t pwdLen,
+		      size_t dkLen, unsigned int rounds,
+		      unsigned char *derivedKey )
 {
 	unsigned char *asalt;
-	unsigned char obuf[ HMAC_SHA256_DIGEST_SIZE ];
-	unsigned char d1[ HMAC_SHA256_DIGEST_SIZE ], d2[ HMAC_SHA256_DIGEST_SIZE ];
+	unsigned char obuf[ HMAC_SHA1_HASH_SIZE ];
+	unsigned char d1[ HMAC_SHA1_HASH_SIZE ], d2[ HMAC_SHA1_HASH_SIZE ];
 	unsigned int i, j;
 	unsigned int count;
-	size_t r;
+	size_t range;
 
 	if ( rounds < 1 || dkLen == 0 )
 		return -1;
@@ -67,20 +68,20 @@ int pbkdf2( const unsigned char *salt, size_t saltLen,
 		asalt[ saltLen + 1 ] = ( count >> 16 ) & 0xff;
 		asalt[ saltLen + 2 ] = ( count >> 8 ) & 0xff;
 		asalt[ saltLen + 3 ] = count & 0xff;
-		hmac_sha256( asalt, saltLen + 4, password, pwdLen, d1 );
+		hmac_sha1( password, pwdLen, asalt, saltLen + 4, d1 );
 		memcpy( obuf, d1, sizeof( obuf ));
 
 		for ( i = 1; i < rounds; i++ ) {
-			hmac_sha256( d1, sizeof( d1 ), password, pwdLen, d2 );
+			hmac_sha1( password, pwdLen, d1, sizeof( d1 ), d2 );
 			memcpy( d1, d2, sizeof( d1 ));
 			for ( j = 0; j < sizeof( obuf ); j++ )
 				obuf[ j ] ^= d1[ j ];
 		}
 
-		r = dkLen < HMAC_SHA256_DIGEST_SIZE ? dkLen : HMAC_SHA256_DIGEST_SIZE;
-		memcpy( derivedKey, obuf, r );
-		derivedKey += r;
-		dkLen -= r;
+		range = dkLen < HMAC_SHA1_HASH_SIZE ? dkLen : HMAC_SHA1_HASH_SIZE;
+		memcpy( derivedKey, obuf, range );
+		derivedKey += range;
+		dkLen -= range;
 	};
 	memset( asalt, 0, saltLen + 4 );
 	free( asalt );

@@ -32,7 +32,8 @@
 #include "PictureChooser.hpp"
 #include "FormWidget.hpp"
 
-DataHandler::DataHandler( DataLoader *_dataLoader ) : m_dataLoader( _dataLoader )
+DataHandler::DataHandler( DataLoader *_dataLoader, FormWidget *_formWidget, bool _debug )
+	: m_dataLoader( _dataLoader ), m_formWidget( _formWidget ), m_debug( _debug )
 {
 }
 
@@ -40,8 +41,13 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 {
 	QSet<QWidget *> seen;
 	QXmlStreamWriter xml( data );
-	xml.setAutoFormatting( true );
-	xml.setAutoFormattingIndent( 2 );
+
+	// pretty-printing only in debug mode (because of superfluous
+	// white spaces sent to server)
+	if( m_debug ) {
+		xml.setAutoFormatting( true );
+		xml.setAutoFormattingIndent( 2 );
+	}
 	
 	xml.writeStartDocument( );
 	if( props->contains( "rootelement" ) && props->contains( "doctype" ) ) {
@@ -54,6 +60,8 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		foreach( QString key, props->keys( ) ) {
 	// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
 			if( key.startsWith( "_q_" ) ) continue;
+	// skip globals
+			if( key.startsWith( "global." ) ) continue;
 	// ignore our own actions
 			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
 			xml.writeAttribute( key, props->value( key ) );
@@ -199,6 +207,8 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 			foreach( QString key, p.keys( ) ) {
 				// skip Qt internal ones
 				if( key.startsWith( "_q_" ) ) continue;
+				// skip globals
+				if( key.startsWith( "global." ) ) continue;
 				xml.writeAttribute( key, p.value( key ) );
 			}
 			writeWidgets( groupBox, xml, props, seen );
@@ -255,10 +265,19 @@ void DataHandler::resetFormData( QWidget *form )
 			!widget->isEnabled( ) ) {
 			continue;
 		}
+
+// get dynamic properties of the widget (used for 'initialFocus' and 'state' currently)
+		QHash<QString, QString> *props = new QHash<QString, QString>( );
+		FormWidget::readDynamicStringProperties( props, widget );
+		m_formWidget->restoreFromGlobals( props );
 		
 		if( clazz == "QLineEdit" ) {
+			qDebug( ) << "XXX:" << props;
 			QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
 			lineEdit->clear( );
+			if( props->contains( "state" ) ) {
+				lineEdit->setText( props->value( "state" ) );
+			}
 		} else if( clazz == "QDateEdit" ) {
 			//~ QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
 			// TODO
@@ -330,6 +349,12 @@ void DataHandler::resetFormData( QWidget *form )
 			qWarning( ) << "Reset for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 		}
 		
+		if( 	props->contains( "initialFocus" ) &&
+			props->value( "initialFocus" ) == "true" ) {
+			qDebug( ) << "Setting focus of widget" << name;
+			widget->setFocus( );
+		}
+		
 		qDebug( ) << "Reset " << clazz << name;
 	}
 }
@@ -350,6 +375,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 		// TODO: widgets can also have custom properties for the domain handling
 		QHash<QString, QString> *props = new QHash<QString, QString>( );
 		FormWidget::readDynamicStringProperties( props, widget );
+		m_formWidget->restoreFromGlobals( props );
 		props->insert( "action", "read" );
 		if( clazz == "QComboBox" ) {
 			m_dataLoader->request( form_name, name, QByteArray( ), props );
@@ -459,9 +485,30 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 				}
 			}
 		}
+
 // HACK: make sure the thumbs are visible
 		tableWidget->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 		tableWidget->resizeColumnsToContents( );
+
+// iterate again and check against saved table state
+		if( props->contains( "state" ) ) {
+			qDebug( ) << "Restoring table state for tree" << widget_name << props->value( "state" );
+			QStringList stateList = props->value( "state" ).split( "|", QString::SkipEmptyParts );
+			QSet<QString> states;
+			foreach( QString state, stateList ) {
+				if( state.left( 1 ) == "S" ) {
+					states.insert( state.mid( 1, state.length( ) - 1 ) );
+				}
+				for( int row = 0; row < tableWidget->rowCount( ); row++ ) {
+					QTableWidgetItem *item = tableWidget->item( row, 0 );
+					QString id = item->data( Qt::UserRole ).toString( );
+					if( states.contains( id ) ) {
+						tableWidget->selectRow( row );
+						// scrolls automatically to selected row
+					}
+				}
+			}
+		}
 	} else if( clazz == "QTreeWidget" ) {
 		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
 		QTreeWidgetItem *header = treeWidget->headerItem( );
@@ -805,7 +852,16 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 // properties differ depending on the class of the widget	
 	QString clazz = widget->metaObject( )->className( );
 
-	if( clazz == "QTableWidget" ) {
+	if( clazz == "QLineEdit" ) {
+		QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
+		if( property == "text" ) {
+			return lineEdit->text( );
+		} else if( property == "state" ) {
+			return lineEdit->text( );
+		} else {
+			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
+		}
+	} else if( clazz == "QTableWidget" ) {
 		QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
 // always return data of the selected row (assuming single select for now and
 // row select only)
@@ -820,6 +876,27 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 // HACK: return /picture@id, first user element, besser mapping can be found later
 				return item->data( Qt::UserRole ).toString( );
 			}
+		} else if( property == "state" ) {
+			QList<QTableWidgetItem *> items = tableWidget->selectedItems( );
+			QString state = "";
+			QSet<QString> seen;
+			foreach( QTableWidgetItem *item, items ) {
+				// hard-coded! should be key/value as user attributes!
+				QString id = item->data( Qt::UserRole ).toString( );
+				if( !id.isNull( ) ) {
+					// HACK: only first row, otherwise we get duplicates
+					// TODO: currently we only have row selection, later
+					// remember all coordinates of the items
+					if( !seen.contains( id ) ) {
+						state.append( "S" );
+						state.append( item->data( Qt::UserRole ).toString( ) );
+						state.append( "|" );							
+						seen.insert( id );
+					}
+				}
+			}
+
+			return state;
 		} else {
 			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
 		}

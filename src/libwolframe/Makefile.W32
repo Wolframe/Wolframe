@@ -67,6 +67,7 @@ CPP_OBJS = \
 	password.obj \
 	globalRndGen.obj \
 	HMAC.obj \
+	PBKDF2.obj \
 	CRAM.obj
 
 OBJS = \
@@ -75,8 +76,9 @@ OBJS = \
 	byte2hex.obj \
 	sha1.obj \
 	sha2.obj \
+	hmac_sha1.obj \
 	hmac_sha256.obj \
-	PBKDF2.obj \
+	pbkdf2_hmac_sha1.obj \
 	md5.obj
 
 all: $(OBJS) $(CPP_OBJS) $(LIBRARIES)

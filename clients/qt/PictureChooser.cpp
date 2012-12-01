@@ -31,6 +31,10 @@ void PictureChooser::initialize( )
         	
 	connect( m_fileChooser, SIGNAL( fileNameChanged( QString ) ),
 		this, SLOT( updatePicture( QString ) ) );
+
+// focus goes to file chooser, not to the label with image
+	setFocusProxy( m_fileChooser );
+	setFocusPolicy( Qt::StrongFocus );
 }
 
 void PictureChooser::updatePicture( QString _fileName )

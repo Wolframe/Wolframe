@@ -44,9 +44,9 @@
 extern "C" {
 #endif
 
-int pbkdf2( const unsigned char *salt, size_t saltLen,
-	    const unsigned char *password, size_t pwdLen,
-	    unsigned char *derivedKey, size_t dkLen, unsigned int rounds );
+int pbkdf2_hmac_sha1( const unsigned char *salt, size_t saltLen,
+		      const unsigned char *password, size_t pwdLen,
+		      size_t dkLen, unsigned int rounds, unsigned char *derivedKey );
 
 #ifdef __cplusplus
 }
