@@ -152,6 +152,8 @@
  </widget>
  <tabstops>
   <tabstop>feature</tabstop>
+  <tabstop>radioButton</tabstop>
+  <tabstop>radioButton_2</tabstop>
   <tabstop>add</tabstop>
   <tabstop>delete_2</tabstop>
   <tabstop>edit</tabstop>

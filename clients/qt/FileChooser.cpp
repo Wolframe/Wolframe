@@ -35,6 +35,7 @@ void FileChooser::initialize( )
 	
 // focus goes to line edit, not to the browser button
 	setFocusProxy( m_lineEdit );
+	setFocusPolicy( Qt::StrongFocus );
 
 // show the right element
 	switchStack( );

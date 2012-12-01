@@ -152,6 +152,12 @@
  </widget>
  <tabstops>
   <tabstop>category</tabstop>
+  <tabstop>radioButton</tabstop>
+  <tabstop>radioButton_2</tabstop>
+  <tabstop>add</tabstop>
+  <tabstop>delete_2</tabstop>
+  <tabstop>edit</tabstop>
+  <tabstop>reload_2</tabstop>
  </tabstops>
  <resources/>
  <connections>

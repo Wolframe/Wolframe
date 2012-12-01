@@ -134,6 +134,17 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>category</tabstop>
+  <tabstop>radioButton_4</tabstop>
+  <tabstop>radioButton_3</tabstop>
+  <tabstop>feature</tabstop>
+  <tabstop>radioButton</tabstop>
+  <tabstop>radioButton_2</tabstop>
+  <tabstop>form1</tabstop>
+  <tabstop>form1_2</tabstop>
+  <tabstop>managePictures</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
