@@ -25,11 +25,14 @@ sqlite_sequence:
 'Picture', '3'
 
 Picture:
-'1', 'WNC caption Z', 'WNC info Z', '11', '90', 'WNC image Z', 'WNC image Z'
-'2', 'WNC caption', 'WNC info', '9', '111', 'WNC image', 'WNC image'
-'3', 'WNC caption', 'WNC info', '9', '111', 'WNC image', 'WNC image'
+'1', 'WNC caption X', 'WNC info X', '11', '90', 'WNC image X', 'WNC image X'
+'2', 'WNC caption X', 'WNC info X', '11', '90', 'WNC image X', 'WNC image X'
+'3', 'WNC caption Z', 'WNC info Z', '11', '90', 'WNC image Z', 'WNC image Z'
 
 PictureTag:
+'2', NULL
+'3', NULL
+'1', NULL
 
 Category:
 '1', NULL, '_ROOT_', '_ROOT_', 'Categories tree root', '1', '64'
@@ -66,9 +69,9 @@ Category:
 '54', '46', 'WNC child 3', 'wnc child 3', NULL, '52', '53'
 
 CategoryPicture:
-'52', '1'
-'53', '2'
-'54', '3'
+'53', '1'
+'54', '1'
+'52', '3'
 
 Feature:
 '1', NULL, '_ROOT_', '_ROOT_', 'Features tree root', '1', '34'

@@ -238,6 +238,7 @@ RETURNS text AS $$
 END
 $$ IMMUTABLE LANGUAGE SQL;
 
+DROP AGGREGATE IF EXISTS group_concat(text);
 CREATE AGGREGATE group_concat (
 	BASETYPE = text,
 	SFUNC = _group_concat,

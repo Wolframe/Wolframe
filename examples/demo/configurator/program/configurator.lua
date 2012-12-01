@@ -193,10 +193,6 @@ local function delete_node( tablename, itr)
 			id = v
 		end
 	end
-	-- don't allow deletion of the root element (fast hack)
-	if id == "1" then
-		return
-	end
 	formfunction( "delete" .. tablename)( {id=id} )
 end
 
@@ -228,6 +224,7 @@ local function add_tree( tablename, itr)
 		end
 	end
 end
+
 
 function CategoryHierarchyRequest()
 	output:as( "tree SYSTEM 'CategoryHierarchy.simpleform'")
@@ -335,7 +332,7 @@ function PictureRequest( )
 end
 
 local function transform_picture( itr )
-	-- should be a form transformation, not funny lua code :-)
+	-- should be a form transformation, not lua code :-)
 	local picture = {}
 	picture["tags"] = {}
 	local tags = {}
@@ -360,22 +357,35 @@ local function transform_picture( itr )
 	return picture
 end
 
-function editPicture( )
-	local picture = transform_picture( input:get( ) )
-	formfunction( "updatePicture" )( { picture = picture } )
-end
-
-function createPicture( )
-	local picture = transform_picture( input:get( ) )
-	formfunction( "addPicture" )( { picture = picture } )
-end
-
-function deletePicture( )
+local function delete_picture( itr)
 	local id = nil;
-	for v,t in input:get( ) do
+	for v,t in itr do
 		if t == "id" then
 			id = v
 		end
 	end
 	formfunction( "deletePicture" )( { id = id } )
 end
+
+local function update_picture( itr)
+	local picture = transform_picture( itr)
+	formfunction( "updatePicture" )( { picture = picture } )
+end
+
+local function create_picture( itr)
+	local picture = transform_picture( itr)
+	formfunction( "addPicture" )( { picture = picture } )
+end
+
+function editPicture( )
+	update_picture( input:get())
+end
+
+function createPicture( )
+	create_picture( input:get())
+end
+
+function deletePicture( )
+	delete_picture( input:get())
+end
+

@@ -11,8 +11,9 @@
 testcall
 **file:DBIN.tdl
 TRANSACTION testcall
+RESULT INTO doc
 BEGIN
-	INTO doc/address DO run( /aa, /bb, /cc);
+	INTO address DO run( /aa, /bb, /cc);
 END
 **file: DBRES
 #id name street#1 hugo "bahnhofstrasse 15"#2 miriam "zum gemsweg 3"#3 sara "tannensteig 12"

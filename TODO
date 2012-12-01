@@ -21,12 +21,17 @@ PF:
   - sqlite schemas, scripts
     - products
 - high prio
+  - Bug in textwolf filter in handling missing newline after header
+  - Bug in libxml filter in handling <tag/>
+  - Bug in transaction content value references
+  - Optional attribute in DDL and validate non optional elements to be initialized in "strict" mode
   - UIForm loader in client and server
   - solve INTO problem
       - list of filter elements per instruction
       - RESULT ROOT attribute in transaction/operation
 - low prio
-  - authorize declaration in transaction
+  - AUTHORIZE different syntax: AUTHORIZE ( function, resource )
+  - make scope(itr) in lua more tolerant (delegate also attribute parsing)
   - tagged request/answer in protocol
   - TODOs in libwolframe_database (doTransaction)
   - bignum tests (only bigint tested until now)

@@ -30,43 +30,49 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for executing programs in the language bindings
-///\file langbind/program.hpp
+///\brief Interface for describing the authorization procedure for a transaction or command to execute
+///\file langbind/authorization.hpp
 //
-#ifndef _LANGBIND_PROGRAM_HPP_INCLUDED
-#define _LANGBIND_PROGRAM_HPP_INCLUDED
-#include "config/programBase.hpp"
-#include "langbind/typedfilter.hpp"
+#ifndef _LANGBIND_AUTHORIZATION_HPP_INCLUDED
+#define _LANGBIND_AUTHORIZATION_HPP_INCLUDED
+#include <string>
 
 namespace _Wolframe {
 namespace langbind {
 
-struct FunctionClosure
+///\class Authorization
+///\brief Structure describing the authorization procedure for a transaction or command to execute
+class Authorization
 {
-	virtual ~FunctionClosure();
+public:
+	///\brief Default constructor
+	Authorization(){}
+	///\brief Copy constructor
+	Authorization( const Authorization& o)
+		:m_function(o.m_function)
+		,m_resource(o.m_resource){}
+	///\brief Constructor
+	Authorization( const std::string& f, const std::string& r)
+		:m_function(f)
+		,m_resource(r){}
 
-	///\brief Calls the function with the input from the input filter specified
-	///\return true when completed
-	virtual bool call()=0;
+	///\brief Get function name
+	const std::string& function() const;
+	///\brief Get resource name
+	const std::string& resource() const;
 
-	///\brief Initialization of call context for a new call
-	///\param[in] i call input
-	virtual void init( const TypedInputFilterR& i)=0;
+	///\brief Set function and resource name
+	void init( const std::string& f, const std::string& r)
+	{
+		m_function = f;
+		m_resource = r;
+	}
 
-	///\brief Get the iterator for the function result
-	virtual const TypedInputFilterR& result() const=0;
+private:
+	std::string m_function;
+	std::string m_resource;
 };
 
-struct Program
-{
-	virtual ~Program(){}
 
-	virtual bool is_mine( const std::string& filename) const=0;
-	virtual void loadProgram( const std::string& filename)=0;
-
-	virtual FunctionClosure* createClosure() const=0;
-};
-
-}} //namespace
+}}//namespace
 #endif
-

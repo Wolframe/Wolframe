@@ -12,8 +12,9 @@ run = test_transaction( xml);
 #id task start end#31 'hula hop' '19:14:38 1/4/2012' '20:01:12 1/4/2012'#32 'hula hip' '11:31:01 1/3/2012' '12:07:55 1/3/2012'#33 'hula hup' '11:31:01 1/3/2012' '12:07:55 1/3/2012'
 **file:DBIN.tdl
 TRANSACTION test_transaction
+RESULT INTO doc
 BEGIN
-	INTO doc/task FOREACH //task DO run( title);
+	INTO task FOREACH //task DO run( title);
 END
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

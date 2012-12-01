@@ -10,10 +10,10 @@
 --program=DBIN.tdl
 testcall
 **file:DBIN.tdl
-TRANSACTION testcall BEGIN
+TRANSACTION testcall RESULT INTO result BEGIN
 	FOREACH //aa DO run(.);
-	FOREACH //aa INTO result/person DO call(. , $1 ) ;
-	FOREACH //aa INTO result/age DO get ( .,$1 ,$2 ,$3);
+	FOREACH //aa INTO person DO call(. , $1 ) ;
+	FOREACH //aa INTO age DO get ( .,$1 ,$2 ,$3);
 END
 **file: DBRES
 #res#1#2

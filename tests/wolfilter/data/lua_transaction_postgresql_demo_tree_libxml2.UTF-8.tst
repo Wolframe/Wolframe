@@ -87,11 +87,11 @@ END
 --
 TRANSACTION treeSelectNodeAndParents -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id);
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 TRANSACTION treeSelectNodeAndParentsByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID,P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = $(name);
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P1.name = $(name) ORDER BY P2.ID;
 END
 
 --
@@ -100,11 +100,11 @@ END
 --
 TRANSACTION treeSelectParents -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id);
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 TRANSACTION treeSelectParentsByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = $(name);
+	FOREACH /node INTO node DO SELECT P2.ID AS "ID",P2.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.name = $(name) ORDER BY P2.ID;
 END
 
 --
@@ -113,11 +113,11 @@ END
 --
 TRANSACTION treeSelectNodeAndChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id);
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 TRANSACTION treeSelectNodeAndChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name);
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.parent,P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.name = $(name) ORDER BY P1.ID;
 END
 
 --
@@ -126,11 +126,11 @@ END
 --
 TRANSACTION treeSelectChildren -- (/node/id)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P1.ID AS "ID",P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id);
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 TRANSACTION treeSelectChildrenByName -- (/node/name)
 BEGIN
-	FOREACH /node INTO /node DO SELECT P1.ID AS "ID",P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name);
+	FOREACH /node INTO node DO SELECT P1.ID AS "ID",P1.name FROM tree AS P1, tree AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P2.name = $(name) ORDER BY P1.ID;
 END
 
 
@@ -233,10 +233,10 @@ end
 <result>ID { '2' } ID { '3' } ID { '4' } ID { '5' } ID { '6' } </result>
 tree:
 id, parent, name, lft, rgt
-1, , Albert, 1, 12
-2, 1, Bert, 2, 3
-3, 1, Chuck, 4, 11
-4, 3, Donna, 5, 6
-5, 3, Eddie, 7, 8
-6, 3, Fred, 9, 10
+'1', NULL, 'Albert', '1', '12'
+'2', '1', 'Bert', '2', '3'
+'3', '1', 'Chuck', '4', '11'
+'4', '3', 'Donna', '5', '6'
+'5', '3', 'Eddie', '7', '8'
+'6', '3', 'Fred', '9', '10'
 **end

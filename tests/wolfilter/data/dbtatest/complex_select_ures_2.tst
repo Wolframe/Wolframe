@@ -10,10 +10,12 @@
 --program=DBIN.tdl
 testcall
 **file:DBIN.tdl
-TRANSACTION testcall BEGIN
+TRANSACTION testcall
+RESULT INTO da
+BEGIN
 	FOREACH /doc/item/aa DO run(. ,../bb ) ;
-	INTO da/da DO get($1);
-	FOREACH //bb INTO da/do DO run( $1 );
+	INTO da DO get($1);
+	FOREACH //bb INTO do DO run( $1 );
 END
 **file: DBRES
 #res#1

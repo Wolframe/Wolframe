@@ -39,6 +39,7 @@
 #include "filter/typedfilter.hpp"
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
+#include "langbind/authorization.hpp"
 #include <string>
 #include <vector>
 #include <map>
@@ -48,13 +49,19 @@
 namespace _Wolframe {
 namespace db {
 
+///\class TransactionFunction
+///\brief Forward Declaration
 class TransactionFunction;
 
+///\class TransactionFunctionOutput
+///\brief Output structure of transaction for language bindings
 class TransactionFunctionOutput
 	:public langbind::TypedInputFilter
 {
 public:
-	TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const std::vector<bool>& resunique_, const db::TransactionOutput& data_);
+	class ResultStruct;
+
+	TransactionFunctionOutput( const ResultStruct& resultstruct_, const db::TransactionOutput& data_);
 	virtual ~TransactionFunctionOutput();
 
 	virtual bool getNext( ElementType& type, TypedFilterBase::Element& element);
@@ -65,7 +72,8 @@ private:
 	Impl* m_impl;
 };
 
-
+///\class TransactionFunctionInput
+///\brief Input structure of transaction for language bindings
 class TransactionFunctionInput
 	:public langbind::TypedOutputFilter
 {
@@ -111,7 +119,8 @@ struct TransactionDescription
 	void clear()
 	{
 		selector.clear();
-		call.clear();
+		call.first.clear();
+		call.second.clear();
 		output.clear();
 		nonempty = false;
 		unique = false;
@@ -137,20 +146,24 @@ struct TransactionDescription
 	};
 
 	std::string selector;
-	std::string call;
+	typedef std::vector<std::string> ParamList;
+	std::pair<std::string,ParamList> call;
 	std::string output;
 	bool nonempty;
 	bool unique;
 };
 
-class TransactionFunction;
+///\class TransactionFunctionR
+///\brief Reference to transaction function
 typedef types::CountedReference<TransactionFunction> TransactionFunctionR;
 
+///\class TransactionFunction
+///\brief Transaction function definition
 class TransactionFunction
 {
 public:
 	TransactionFunction( const TransactionFunction& o);
-	TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap);
+	TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& authorization_);
 	virtual ~TransactionFunction();
 
 	virtual TransactionFunctionInput* getInput() const;
@@ -168,15 +181,21 @@ public:
 		return *m_impl;
 	}
 
+	const langbind::Authorization& authorization() const
+	{
+		return m_authorization;
+	}
+
 private:
 	std::string m_name;
+	langbind::Authorization m_authorization;
 	Impl* m_impl;
 };
 
 ///\brief Creates a database transaction function from its description source
 ///\param[in] name name of  the transaction
 ///\param[in] description transaction description source
-TransactionFunction* createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap);
+TransactionFunction* createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& auth);
 
 }}//namespace
 #endif

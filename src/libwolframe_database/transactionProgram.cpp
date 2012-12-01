@@ -72,6 +72,24 @@ static std::size_t lineCount( std::string::const_iterator si, std::string::const
 
 const utils::CharTable TransactionProgram::m_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
 
+static bool isAlphaNumeric( char ch)
+{
+	if (ch >= '0' && ch <= '9') return true;
+	if (ch >= 'A' && ch <= 'Z') return true;
+	if (ch >= 'a' && ch <= 'z') return true;
+	if (ch == '_') return true;
+	return false;
+}
+
+static bool checkResultIdentifier( const std::string& id)
+{
+	if (id == ".") return true;
+	std::string::const_iterator ii = id.begin(), ie = id.end();
+	while (ii != ie && isAlphaNumeric( *ii)) ++ii;
+	return (ii == ie);
+}
+
+
 void TransactionProgram::loadfile( const std::string& filename, std::string& dbsource)
 {
 	try
@@ -124,12 +142,12 @@ char TransactionProgram::parseNextToken( std::string& tok, std::string::const_it
 	return utils::parseNextToken( tok, si, se, m_optab);
 }
 
-std::string TransactionProgram::parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose)
+std::pair<std::string,std::vector<std::string> > TransactionProgram::parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose)
 {
+	std::pair<std::string,std::vector<std::string> > rt;
 	std::string stm;
 	std::string dbstm = m_langdescr->parseEmbeddedStatement( osi, ose);
 	std::string::const_iterator start = dbstm.begin(), si = dbstm.begin(), se = dbstm.end();
-	std::vector< std::string > arg;
 	std::string tok;
 
 	char ch = utils::parseNextToken( tok, si, se, m_optab);
@@ -148,90 +166,105 @@ std::string TransactionProgram::parseEmbeddedStatement( const std::string& funcn
 				for (; ch && ch != ')'; ch=utils::parseNextToken( tok, si, se, m_optab));
 				if (ch == ')')
 				{
-					arg.push_back( std::string( argstart, si-1));
+					rt.second.push_back( std::string( argstart, si-1));
 					start = si;
-					stm.append( m_langdescr->stm_argument_reference( arg.size()));
+					stm.append( m_langdescr->stm_argument_reference( rt.second.size()));
 				}
 			}
 			else if (ch >= '0' && ch <= '9')
 			{
 				std::string::const_iterator argstart = si;
 				for (; si!=se && *si>= '0' && *si<= '9'; ++si);
-				arg.push_back( std::string("$") + std::string( argstart, si));
+				rt.second.push_back( std::string("$") + std::string( argstart, si));
 				start = si;
-				stm.append( m_langdescr->stm_argument_reference( arg.size()));
+				stm.append( m_langdescr->stm_argument_reference( rt.second.size()));
 			}
 		}
 	}
 	stm.append( start, si);
 
-	std::string stmname;
-	stmname.append( "__");
-	stmname.append( funcname);
-	stmname.append( "_");
-	stmname.append( boost::lexical_cast<std::string>( index));
-	m_embeddedStatementMap.insert( stmname, stm);
-
-	std::string functioncall;
-	functioncall.append( stmname);
-	functioncall.append( "(");
-	std::vector<std::string>::const_iterator ai = arg.begin(), ae = arg.end();
-	for (; ai != ae; ++ai)
-	{
-		if (ai != arg.begin()) functioncall.append( ",");
-		functioncall.append( *ai);
-	}
-	functioncall.append( ")");
-	return functioncall;
+	rt.first.append( "__");
+	rt.first.append( funcname);
+	rt.first.append( "_");
+	rt.first.append( boost::lexical_cast<std::string>( index));
+	m_embeddedStatementMap.insert( rt.first, stm);
+	return rt;
 }
 
-std::string TransactionProgram::parseCallStatement( std::string::const_iterator& si, std::string::const_iterator se) const
+std::pair<std::string,std::vector<std::string> > TransactionProgram::parseCallStatement( std::string::const_iterator& ci, std::string::const_iterator ce) const
 {
+	std::pair<std::string,std::vector<std::string> > rt;
 	std::string tok;
-	int st = 0; // parse state
 	int brkcnt = 0;
-	std::string::const_iterator fcallstart = si;
-	char ch = gotoNextToken( si, se);
-	while (st < 3 && (ch = parseNextToken( tok, si, se)) != 0)
+
+	if (!utils::gotoNextToken( ci, ce))
 	{
-		if (!ch)
+		throw std::runtime_error( "unexpected end of transaction description. Function call expected");
+	}
+	while (ci < ce && isAlphaNumeric( *ci))
+	{
+		rt.first.push_back( *ci);
+		++ci;
+	}
+	if (rt.first.empty())
+	{
+		throw std::runtime_error( "identifier expected for name of function");
+	}
+	utils::gotoNextToken( ci, ce);
+	if (*ci != '(')
+	{
+		throw std::runtime_error( "'(' expected after function name");
+	}
+	++ci; utils::gotoNextToken( ci, ce);
+
+	// Parse parameter list:
+	if (*ci == ')')
+	{
+		// ... empty parameter list
+		++ci;
+	}
+	else
+	{
+		for (;;)
 		{
-			throw std::runtime_error( "unexpected end of description. unterminated function call (DO ..)");
-		}
-		switch (st)
-		{
-			case 0:
-				if (m_optab[ch] || ch == '\'' || ch == '\"')
+			std::string pp;
+			while (ci < ce && *ci != ',')
+			{
+				char hh = *ci++;
+				if (hh == '(') ++brkcnt;
+				if (hh == ')' && --brkcnt < 0)
 				{
-					throw std::runtime_error( std::string( "function call identifier expected after DO instead of operator or string '") + ch + "'");
+					--ci;
+					brkcnt = 0;
+					break;
 				}
-				st = 1;
+				pp.push_back( hh);
+			}
+			if (brkcnt > 0)
+			{
+				throw std::runtime_error( "() brackets not balanced");
+			}
+			boost::trim( pp);
+			if (pp.empty())
+			{
+				throw std::runtime_error( "empty element in parameter list");
+			}
+			rt.second.push_back( pp);
+
+			utils::gotoNextToken( ci, ce);
+			if (*ci == ')')
+			{
+				++ci;
+				break;
+			}
+			else if (*ci == ',')
+			{
+				++ci; utils::gotoNextToken( ci, ce);
 				continue;
-			case 1:
-				if (ch != '(')
-				{
-					throw std::runtime_error( std::string( "'(' expected in function call after function name (DO ..) instead of '") + ch + "'");
-				}
-				st = 2;
-				brkcnt = 1;
-				continue;
-			case 2:
-				if (ch == ')')
-				{
-					if (--brkcnt == 0)
-					{
-						st = 3;
-						break;
-					}
-				}
-				else if (ch == '(')
-				{
-					++brkcnt;
-				}
-				continue;
+			}
 		}
 	}
-	return std::string( fcallstart, si);
+	return rt;
 }
 
 namespace {
@@ -240,12 +273,13 @@ struct Operation
 	Operation( const std::string& name_, std::string::const_iterator start_, bool isTransaction_)
 		:name(name_),start(start_),isTransaction(isTransaction_),embstm_index(0){}
 	Operation( const Operation& o)
-		:name(o.name),start(o.start),isTransaction(o.isTransaction),descar(o.descar),callstartar(o.callstartar),embstm_index(o.embstm_index){}
+		:name(o.name),start(o.start),isTransaction(o.isTransaction),descar(o.descar),resultname(o.resultname),callstartar(o.callstartar),embstm_index(o.embstm_index){}
 
 	std::string name;
 	std::string::const_iterator start;
 	bool isTransaction;
 	std::vector<TransactionDescription> descar;
+	std::string resultname;
 	std::vector<std::string::const_iterator> callstartar;
 	int embstm_index;
 };
@@ -261,6 +295,8 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 	Operation* curop = 0;
 	std::vector<Operation> operationar;
 	types::keymap<TransactionFunctionR> operationmap;
+	std::string authorization_function;
+	std::string authorization_resource;
 
 	config::PositionalErrorMessageBase ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
@@ -303,7 +339,60 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 				TransactionDescription desc;
 				unsigned int mask = 0;
 
-				ch = parseNextToken( tok, si, se);
+				while (parseNextToken( tok, si, se))
+				{
+					if (boost::algorithm::iequals( tok, "RESULT"))
+					{
+						if (!parseNextToken( tok, si, se)
+						||  !boost::algorithm::iequals( tok, "INTO"))
+						{
+							throw ERROR( si, "INTO expected after RESULT");
+						}
+						if (0==(ch = parseNextToken( curop->resultname, si, se)))
+						{
+							throw ERROR( si, "unexpected end of description. name of result tag expected after RESULT INTO");
+						}
+						if (ch == '.') curop->resultname.push_back(ch);
+						if (!checkResultIdentifier( curop->resultname))
+						{
+							throw ERROR( si, "identifier expected after RESULT INTO");
+						}
+					}
+					else if (boost::algorithm::iequals( tok, "AUTHORIZE"))
+					{
+						if (isTransaction)
+						{
+							throw ERROR( si, "Cannot define AUTHORIZE in operation. Only allowed as TRANSACTION definition attribute");
+						}
+						if (!parseNextToken( authorization_function, si, se))
+						{
+							throw ERROR( si, "unexpected end of description. function name expected after AUTHORIZE");
+						}
+						if (authorization_function.empty())
+						{
+							throw ERROR( si, "AUTHORIZE function name must not be empty");
+						}
+						ch = gotoNextToken( si, se);
+						if (ch == '(')
+						{
+							++si;
+							if (!parseNextToken( authorization_resource, si, se))
+							{
+								throw ERROR( si, "unexpected end of description. resource name expected as argument of AUTHORIZE function call");
+							}
+							ch = gotoNextToken( si, se);
+							if (ch != ')')
+							{
+								throw ERROR( si, "Close bracket ')' expected after AUTHORIZE function call");
+							}
+							++si;
+						}
+					}
+					else
+					{
+						break;
+					}
+				}
 				if (!boost::algorithm::iequals( tok, "BEGIN"))
 				{
 					throw ERROR( si, "BEGIN (transaction) expected");
@@ -354,8 +443,14 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						}
 						mask |= (1 << (unsigned)TransactionDescription::Output);
 
-						ch = utils::parseNextToken( desc.output, si, se, utils::emptyCharTable(), utils::anyCharTable());
+						ch = parseNextToken( desc.output, si, se);
 						if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after INTO");
+						if (ch == '.') desc.output.push_back(ch);
+
+						if (!checkResultIdentifier( desc.output))
+						{
+							throw ERROR( si, "identifier expected after RESULT INTO");
+						}
 					}
 					else if (boost::algorithm::iequals( tok, "DO"))
 					{
@@ -389,11 +484,11 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						}
 						if (m_langdescr->isEmbeddedStatement( si, se))
 						{
-							desc.call.append( parseEmbeddedStatement( transactionName, curop->embstm_index++, si, se));
+							desc.call = parseEmbeddedStatement( transactionName, curop->embstm_index++, si, se);
 						}
 						else
 						{
-							desc.call.append( parseCallStatement( si, se));
+							desc.call = parseCallStatement( si, se);
 						}
 					}
 					else
@@ -422,13 +517,18 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 	{
 		try
 		{
+			langbind::Authorization auth;
 			if (oi->isTransaction)
 			{
-				m_functionmap[ oi->name] = TransactionFunctionR( createTransactionFunction( oi->name, oi->descar, operationmap));
+				if (!authorization_function.empty())
+				{
+					auth = langbind::Authorization( authorization_function, authorization_resource);
+				}
+				m_functionmap[ oi->name] = TransactionFunctionR( createTransactionFunction( oi->name, oi->descar, oi->resultname, operationmap, auth));
 			}
 			else
 			{
-				operationmap[ oi->name] = TransactionFunctionR( createTransactionFunction( oi->name, oi->descar, operationmap));
+				operationmap[ oi->name] = TransactionFunctionR( createTransactionFunction( oi->name, oi->descar, oi->resultname, operationmap, auth));
 			}
 		}
 		catch (const TransactionDescription::Error& err)

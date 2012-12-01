@@ -21,7 +21,8 @@ testdata="
 #name#job4
 **file:DBIN.tdl
 TRANSACTION test_transaction
+RESULT INTO doc
 BEGIN
-	INTO doc/title FOREACH //task DO run( title);
+	INTO title FOREACH //task DO run( title);
 END"
 . ./output_tst_all.sh

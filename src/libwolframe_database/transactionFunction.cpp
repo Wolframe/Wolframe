@@ -239,15 +239,215 @@ private:
 	std::size_t m_level;
 };
 
+class ResultElement
+{
+public:
+	enum Type {OpenTag,CloseTag,Value,FunctionStart,FunctionEnd,IndexStart,IndexEnd,OperationStart,OperationEnd};
+	static const char* typeName( Type i)
+	{
+		static const char* ar[] = {"OpenTag","CloseTag","Value","FunctionStart","FunctionEnd","IndexStart","IndexEnd","OperationStart","OperationEnd"};
+		return ar[ (int)i];
+	}
+
+	ResultElement()
+		:m_type(CloseTag),m_idx(0){}
+	ResultElement( Type type_, std::size_t idx_)
+		:m_type(type_),m_idx(idx_){}
+	ResultElement( const ResultElement& o)
+		:m_type(o.m_type),m_idx(o.m_idx){}
+
+	Type type() const		{return m_type;}
+	std::size_t idx() const		{return m_idx;}
+
+private:
+	Type m_type;
+	std::size_t m_idx;
+};
+
+class TransactionFunctionOutput::ResultStruct
+{
+public:
+	ResultStruct()
+	{
+		m_strings.push_back( '\0');
+	}
+	ResultStruct( const ResultStruct& o)
+		:m_ar(o.m_ar),m_strings(o.m_strings){}
+
+	struct ContentElement
+	{
+		const char* value;
+		ResultElement::Type type;
+		std::size_t idx;
+
+		ContentElement()
+			:value(0),type(ResultElement::CloseTag),idx(0){}
+		ContentElement( const ContentElement& o)
+			:value(o.value),type(o.type),idx(o.idx){}
+	};
+
+	class const_iterator
+	{
+	public:
+		explicit const_iterator( const ResultStruct* struct_=0)
+			:m_struct(struct_)
+		{
+			if (m_struct)
+			{
+				m_itr = m_struct->m_ar.begin();
+				init();
+			}
+		}
+		const_iterator( const const_iterator& o)
+			:m_content(o.m_content)
+			,m_itr(o.m_itr)
+			,m_struct(o.m_struct){}
+
+		bool operator==(const const_iterator& o) const
+		{
+			if (!o.m_struct)
+			{
+				if (!m_struct) return true;
+				if (m_itr == m_struct->m_ar.end()) return true;
+			}
+			else if (!m_struct)
+			{
+				if (!o.m_struct) return true;
+				if (o.m_itr == o.m_struct->m_ar.end()) return true;
+			}
+			else if (m_struct == o.m_struct && m_itr == o.m_itr)
+			{
+				return true;
+			}
+			return false;
+		}
+		bool operator!=(const const_iterator& o) const
+		{
+			return !operator==(o);
+		}
+
+		const_iterator& operator++()	{if (m_struct) {++m_itr; init();} return *this;}
+		const_iterator operator++(int)	{const_iterator rt=*this; ++(*this); return rt;}
+
+		const ContentElement* operator->() const
+		{
+			return &m_content;
+		}
+
+		const ContentElement& operator*() const
+		{
+			return m_content;
+		}
+
+	private:
+		void init()
+		{
+			if (m_itr != m_struct->m_ar.end())
+			{
+				m_content.value = (m_itr->type() == ResultElement::Value)?0:(m_itr->idx()==0?0:m_struct->m_strings.c_str()+m_itr->idx());
+				m_content.idx = m_itr->idx();
+				m_content.type = m_itr->type();
+			}
+			else
+			{
+				m_content.value = 0;
+				m_content.idx = 0;
+				m_content.type = ResultElement::CloseTag;
+			}
+		}
+
+	private:
+		ContentElement m_content;
+		std::vector<ResultElement>::const_iterator m_itr;
+		const ResultStruct* m_struct;
+	};
+
+public:
+	const_iterator begin() const
+	{
+		return const_iterator(this);
+	}
+
+	const_iterator end() const
+	{
+		return const_iterator();
+	}
+
+	void openTag( const std::string& name)
+	{
+		m_ar.push_back( ResultElement( ResultElement::OpenTag, m_strings.size()));
+		m_strings.append( name);
+		m_strings.push_back( '\0');
+	}
+
+	void closeTag()
+	{
+		m_ar.push_back( ResultElement( ResultElement::CloseTag, 0));
+	}
+
+	void addValueReference( std::size_t functionidx)
+	{
+		m_ar.push_back( ResultElement( ResultElement::Value, functionidx));
+	}
+
+	void addMark( ResultElement::Type mrk, std::size_t functionidx)
+	{
+		m_ar.push_back( ResultElement( mrk, functionidx));
+	}
+
+	void addEmbeddedResult( const ResultStruct& o, std::size_t functionidx)
+	{
+		const_iterator ri = o.begin(), re = o.end();
+		for (; ri != re; ++ri)
+		{
+			switch (ri->type)
+			{
+				case ResultElement::Value:
+					addValueReference( functionidx + ri->idx);
+					break;
+				case ResultElement::OpenTag:
+					openTag( ri->value);
+					break;
+				case ResultElement::CloseTag:
+					closeTag();
+					break;
+				case ResultElement::FunctionStart:
+				case ResultElement::FunctionEnd:
+				case ResultElement::IndexStart:
+				case ResultElement::IndexEnd:
+				case ResultElement::OperationStart:
+				case ResultElement::OperationEnd:
+					addMark( ri->type, functionidx + ri->idx);
+					break;
+			}
+		}
+	}
+
+	std::string tostring() const
+	{
+		std::ostringstream rt;
+		const_iterator ri = begin(), re = end();
+		for (; ri != re; ++ri)
+		{
+			rt << ResultElement::typeName(ri->type) << " " << ri->idx<< " '" << (ri->value?ri->value:"") << "'" << std::endl;
+		}
+		return rt.str();
+	}
+
+private:
+	std::vector<ResultElement> m_ar;
+	std::string m_strings;
+};
+
+
 struct TransactionFunction::Impl
 {
-	std::string m_resultname;
-	std::vector<std::string> m_elemname;
+	TransactionFunctionOutput::ResultStruct m_resultstruct;
 	std::vector<bool> m_elemunique;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
 
-	Impl( const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap);
+	Impl( const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap);
 	Impl( const Impl& o);
 };
 
@@ -739,23 +939,6 @@ bool FunctionCall::hasResultReference() const
 	return false;
 }
 
-static bool isAlphaNumeric( char ch)
-{
-	if (ch >= '0' && ch <= '9') return true;
-	if (ch >= 'A' && ch <= 'Z') return true;
-	if (ch >= 'a' && ch <= 'z') return true;
-	if (ch == '_') return true;
-	return false;
-}
-
-static bool checkResultIdentifier( const std::string& id)
-{
-	if (id == ".") return true;
-	std::string::const_iterator ii = id.begin(), ie = id.end();
-	while (ii != ie && isAlphaNumeric( *ii)) ++ii;
-	return (ii == ie);
-}
-
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* func_)
 	:m_structure( new Structure( func_->tagmap()))
 	,m_func(func_)
@@ -907,188 +1090,233 @@ TransactionInput TransactionFunctionInput::get() const
 
 struct TransactionFunctionOutput::Impl
 {
-	int m_state;
-	int m_rowidx;
-	int m_residx;
+	int m_valuestate;
 	int m_colidx;
 	int m_colend;
-	std::string m_rootname;
-	std::vector<std::string> m_resname;
-	std::vector<bool> m_resunique;
+	ResultStruct m_resultstruct;
+	ResultStruct::const_iterator m_structitr;
+	ResultStruct::const_iterator m_structend;
+
+	struct StackElement
+	{
+		ResultElement::Type m_type;
+		std::size_t m_cnt;
+		ResultStruct::const_iterator m_structitr;
+
+		StackElement( ResultElement::Type type_, ResultStruct::const_iterator structitr_)
+			:m_type(type_),m_cnt(0),m_structitr(structitr_){}
+		StackElement( const StackElement& o)
+			:m_type(o.m_type),m_cnt(o.m_cnt),m_structitr(o.m_structitr){}
+	};
+	std::vector<StackElement> m_stack;
 	db::TransactionOutput::result_iterator m_resitr;
 	db::TransactionOutput::result_iterator m_resend;
 	db::TransactionOutput::row_iterator m_rowitr;
 	db::TransactionOutput::row_iterator m_rowend;
 	db::TransactionOutput m_data;
 
-	Impl( const std::string& rootname_, const std::vector<std::string>& resname_, const std::vector<bool>& resunique_, const db::TransactionOutput& data_)
-		:m_state(0)
-		,m_rowidx(0)
-		,m_residx(0)
+	Impl( const ResultStruct& resultstruct_, const db::TransactionOutput& data_)
+		:m_valuestate(0)
 		,m_colidx(0)
 		,m_colend(0)
-		,m_rootname(rootname_)
-		,m_resname(resname_)
-		,m_resunique(resunique_)
-		,m_data(data_){}
+		,m_resultstruct(resultstruct_)
+		,m_data(data_)
+	{
+		resetIterator();
+	}
 
 	void resetIterator()
 	{
-		m_state = 0;
-	}
-
-	bool hasResultName( std::size_t functionidx)
-	{
-		return (m_resname[ functionidx].size() != 1 || m_resname[ functionidx][0] != '.');
+		m_valuestate = 0;
+		m_structitr = m_resultstruct.begin();
+		m_structend = m_resultstruct.end();
+		m_resitr = m_data.begin();
+		m_resend = m_data.end();
 	}
 
 	bool getNext( ElementType& type, TypedFilterBase::Element& element, bool doSerializeWithIndices)
 	{
-		for (;;) switch (m_state)
+		while (m_structitr != m_structend)
 		{
-			case 0:
-				m_resitr = m_data.begin();
-				m_residx = 1;
-				m_resend = m_data.end();
-				m_state = 1;
-				if (!m_rootname.empty())
+			if (!doSerializeWithIndices)
+			{
+				if (m_structitr->type == ResultElement::IndexStart || m_structitr->type == ResultElement::IndexEnd)
 				{
-					type = TypedInputFilter::OpenTag;
-					element = m_rootname;
-					return true;
+					++m_structitr;
+					continue;
 				}
-				/* no break here !*/
-			case 1:
-				if (m_resitr == m_resend)
-				{
-					// close tag marking end of data:
+			}
+			switch (m_structitr->type)
+			{
+				case ResultElement::OpenTag:
+					type = TypedInputFilter::OpenTag;
+					element = TypedFilterBase::Element( m_structitr->value);
+					++m_structitr;
+					return true;
+
+				case ResultElement::CloseTag:
 					type = TypedInputFilter::CloseTag;
-					element = TypedInputFilter::Element();
+					element = TypedFilterBase::Element();
+					++m_structitr;
 					return true;
-				}
-				if (m_resname[ m_resitr->functionidx()].empty())
-				{
-					// result is not part of output:
-					++m_resitr;
-					++m_residx;
+
+				case ResultElement::OperationStart:
+					m_stack.push_back( StackElement( ResultElement::OperationEnd, m_structitr));
+					++m_structitr;
 					continue;
-				}
-				m_rowitr = m_resitr->begin();
-				m_rowend = m_resitr->end();
-				m_rowidx = 0;
-				m_colidx = 0;
-				m_colend = m_resitr->nofColumns();
-				m_state = 2;
-				if (doSerializeWithIndices
-				&&  hasResultName( m_resitr->functionidx()))
-				{
-					// open array tag:
-					type = TypedInputFilter::OpenTag;
-					element = m_resname[ m_resitr->functionidx()];
-					return true;
-				}
-				/* no break here !*/
-			case 2:
-				m_colidx = 0;
-				if (m_rowitr == m_rowend)
-				{
-					if (doSerializeWithIndices
-					&&  !m_resunique[ m_resitr->functionidx()]
-					&&  hasResultName( m_resitr->functionidx()))
+
+				case ResultElement::FunctionStart:
+					if (m_resitr == m_resend || m_resitr->functionidx() > m_structitr->idx)
 					{
-						// close array tag:
-						type = TypedInputFilter::CloseTag;
-						element = TypedInputFilter::Element();
-						// next result:
-						++m_resitr;
-						++m_residx;
-						m_state = 1;
-						return true;
-					}
-					else
-					{
-						// next result:
-						++m_resitr;
-						++m_residx;
-						m_state = 1;
+						for (++m_structitr; m_structitr != m_structend && m_structitr->type != ResultElement::FunctionEnd; ++m_structitr);
+						if (m_structitr == m_structend) throw std::logic_error("illegal stack in transaction result iterator");
+						++m_structitr;
 						continue;
 					}
-				}
-				m_state = 3;
-				if (doSerializeWithIndices)
-				{
-					// tag is array (element) index
-					if (!m_resunique[ m_resitr->functionidx()])
+					else if (m_resitr->functionidx() < m_structitr->idx)
 					{
-						// ... we set it only for non unique results
+						++m_resitr;
+						continue;
+					}
+					m_stack.push_back( StackElement( ResultElement::FunctionEnd, m_structitr));
+					++m_structitr;
+					m_rowitr = m_resitr->begin();
+					m_rowend = m_resitr->end();
+					m_colidx = 0;
+					m_colend = m_resitr->nofColumns();
+					continue;
+
+				case ResultElement::IndexStart:
+					m_stack.push_back( StackElement( ResultElement::IndexEnd, m_structitr));
+					++m_structitr;
+					type = TypedInputFilter::OpenTag;
+					element = TypedInputFilter::Element( (unsigned int)++m_stack.back().m_cnt);
+					return true;
+
+				case ResultElement::IndexEnd:
+					if (m_valuestate == 0)
+					{
+						m_valuestate = 1;
+						type = TypedInputFilter::CloseTag;
+						element = TypedInputFilter::Element();
+						return true;
+					}
+					m_valuestate = 0;
+					if (m_stack.back().m_type != m_structitr->type)
+					{
+						throw std::logic_error( "illegal state in transaction result construction");
+					}
+					if (m_resitr != m_resend && m_resitr->functionidx() <= m_stack.back().m_structitr->idx)
+					{
+						m_structitr = m_stack.back().m_structitr;
 						type = TypedInputFilter::OpenTag;
-						element = TypedInputFilter::Element( m_rowidx+1);
+						element = TypedInputFilter::Element( (unsigned int)++m_stack.back().m_cnt);
+						++m_structitr;
 						return true;
 					}
 					else
 					{
-						continue;
+						m_stack.pop_back();
 					}
-				}
-				else if (hasResultName( m_resitr->functionidx()))
-				{
-					// tag is result (element) name
-					type = TypedInputFilter::OpenTag;
-					element = m_resname[ m_resitr->functionidx()];
-					return true;
-				}
-				/* no break here !*/
-			case 3:
-				if (m_colidx == m_colend)
-				{
-					++m_rowitr;
-					++m_rowidx;
-					m_state = 2;
+					++m_structitr;
 					continue;
-				}
-				if ((*m_rowitr)[ m_colidx])
-				{
-					m_state = 4;
-					type = TypedInputFilter::OpenTag;
-					element = m_resitr->columnName( m_colidx);
-					return true;
-				}
-				else
-				{
-					m_state = 6;
-					++m_colidx;
-					continue;
-				}
-			case 4:
-				m_state = 5;
-				type = TypedInputFilter::Value;
-				element = (*m_rowitr)[ m_colidx];
-				return true;
-			case 5:
-				m_state = 6;
-				type = TypedInputFilter::CloseTag;
-				element = TypedInputFilter::Element();
-				++m_colidx;
-				return true;
-			case 6:
-				m_state = 3;
-				if (m_colidx == m_colend)
-				{
-					if (doSerializeWithIndices
-					||  hasResultName( m_resitr->functionidx()))
+
+				case ResultElement::OperationEnd:
+				case ResultElement::FunctionEnd:
+					if (m_stack.back().m_type != m_structitr->type)
 					{
-						type = TypedInputFilter::CloseTag;
-						element = TypedInputFilter::Element();
+						throw std::logic_error( "illegal state in transaction result construction");
+					}
+					if (m_resitr != m_resend && m_resitr->functionidx() <= m_stack.back().m_structitr->idx)
+					{
+						m_structitr = m_stack.back().m_structitr;
+					}
+					else
+					{
+						m_stack.pop_back();
+					}
+					++m_structitr;
+					continue;
+
+				case ResultElement::Value:
+					if (m_valuestate == 0)
+					{
+						if (m_rowitr == m_rowend)
+						{
+							++m_structitr;
+							++m_resitr;
+							if (m_resitr != m_resend)
+							{
+								m_rowitr = m_resitr->begin();
+								m_rowend = m_resitr->end();
+								m_colidx = 0;
+								m_colend = m_resitr->nofColumns();
+							}
+							continue;
+						}
+						if (m_colidx == m_colend)
+						{
+							++m_structitr;
+							++m_rowitr;
+							if (m_rowitr == m_rowend)
+							{
+								++m_resitr;
+								if (m_resitr != m_resend)
+								{
+									m_rowitr = m_resitr->begin();
+									m_rowend = m_resitr->end();
+									m_colidx = 0;
+									m_colend = m_resitr->nofColumns();
+								}
+							}
+							else
+							{
+								m_colidx = 0;
+							}
+							continue;
+						}
+						if (!(*m_rowitr)[ m_colidx])
+						{
+							++m_colidx;
+							continue;
+						}
+						type = TypedInputFilter::OpenTag;
+						element = m_resitr->columnName( m_colidx);
+						m_valuestate = 1;
 						return true;
 					}
-				}
-				continue;
+					if (m_valuestate == 1)
+					{
+						type = TypedInputFilter::Value;
+						element = (*m_rowitr)[ m_colidx];
+						m_valuestate = 2;
+						return true;
+					}
+					if (m_valuestate == 2)
+					{
+						type = TypedInputFilter::CloseTag;
+						element = TypedFilterBase::Element();
+						m_valuestate = 0;
+						++m_colidx;
+						return true;
+					}
+					throw std::logic_error( "illegal state (transaction result iterator)");
+			}
 		}
+		if (!m_stack.empty())
+		{
+			throw std::logic_error( "illegal state (stack not empty after iterating transaction result)");
+		}
+		type = TypedInputFilter::CloseTag;
+		element = TypedFilterBase::Element();
+		return true;
 	}
 };
 
-TransactionFunctionOutput::TransactionFunctionOutput( const std::string& rootname_, const std::vector<std::string>& resname_, const std::vector<bool>& resunique_, const db::TransactionOutput& data_)
-	:m_impl( new Impl( rootname_, resname_, resunique_, data_)){}
+
+TransactionFunctionOutput::TransactionFunctionOutput( const ResultStruct& resultstruct_, const db::TransactionOutput& data_)
+	:m_impl( new Impl( resultstruct_, data_))
+{}
 
 TransactionFunctionOutput::~TransactionFunctionOutput()
 {
@@ -1106,122 +1334,64 @@ void TransactionFunctionOutput::resetIterator()
 	m_impl->resetIterator();
 }
 
-TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap)
+TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap)
 {
 	typedef TransactionDescription::Error Error;
 	TransactionDescription::ElementName elementName = TransactionDescription::Call;
 
-	std::vector<std::size_t> functionidx;
+	if (!resultname.empty())
+	{
+		m_resultstruct.openTag( resultname);
+	}
 	std::vector<TransactionDescription>::const_iterator di = description.begin(), de = description.end();
 	for (; di != de; ++di)
 	{
-		m_elemunique.push_back( di->unique);
 		elementName = TransactionDescription::Call;
 		std::size_t eidx = di - description.begin();
-		// Parse the function call
-		std::string::const_iterator ci = di->call.begin(), ce = di->call.end();
-		utils::gotoNextToken( ci, ce);
-
-		std::string functionname;
-		while (ci < ce && isAlphaNumeric( *ci))
-		{
-			functionname.push_back( *ci);
-			++ci;
-		}
-		if (functionname.empty())
-		{
-			throw Error( elementName, eidx, "identifier expected for name of function");
-		}
-		utils::gotoNextToken( ci, ce);
-		if (*ci != '(')
-		{
-			throw Error( elementName, eidx, "'(' expected after function name");
-		}
-		++ci; utils::gotoNextToken( ci, ce);
-
-		// Parse parameter list:
-		int brkcnt = 0;
-		std::vector<std::string> paramstr;
-		if (*ci == ')')
-		{
-			// ... empty parameter list
-			++ci;
-		}
-		else
-		{
-			for (;;)
-			{
-				std::string pp;
-				while (ci < ce && *ci != ',')
-				{
-					char hh = *ci++;
-					if (hh == '(') ++brkcnt;
-					if (hh == ')' && --brkcnt < 0)
-					{
-						--ci;
-						brkcnt = 0;
-						break;
-					}
-					pp.push_back( hh);
-				}
-				if (brkcnt > 0)
-				{
-					throw Error( elementName, eidx, "() brackets not balanced");
-				}
-				boost::trim( pp);
-				if (pp.empty())
-				{
-					throw Error( elementName, eidx, "empty element in parameter list");
-				}
-				paramstr.push_back( pp);
-
-				utils::gotoNextToken( ci, ce);
-				if (*ci == ')')
-				{
-					++ci;
-					break;
-				}
-				else if (*ci == ',')
-				{
-					++ci; utils::gotoNextToken( ci, ce);
-					continue;
-				}
-			}
-		}
-		if (utils::gotoNextToken( ci, ce))
-		{
-			throw Error( elementName, eidx, "unexpected token after function call");
-		}
 
 		// Build Function call object for parsed function:
 		try
 		{
 			elementName = TransactionDescription::Selector;
 			Path selector( di->selector, &m_tagmap);
+			if (selector.resultReference())
+			{
+				throw Error( elementName, eidx, "undefined: result variable reference in selector");
+			}
+			if (selector.constantReference())
+			{
+				throw Error( elementName, eidx, "undefined: constant as selector");
+			}
 			elementName = TransactionDescription::Call;
 			std::vector<Path> param;
-			std::vector<std::string>::const_iterator ai = paramstr.begin(), ae = paramstr.end();
+			std::vector<std::string>::const_iterator ai = di->call.second.begin(), ae = di->call.second.end();
 			for (; ai != ae; ++ai)
 			{
 				Path pp( *ai, &m_tagmap);
 				param.push_back( pp);
 			}
-			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( functionname);
+			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( di->call.first);
 			if (fui == functionmap.end())
 			{
-				FunctionCall cc( di->output, functionname, selector, param, di->nonempty, di->unique, 1);
+				FunctionCall cc( di->output, di->call.first, selector, param, di->nonempty, di->unique, 1);
+				if (!di->output.empty())
+				{
+					m_resultstruct.addMark( ResultElement::FunctionStart, m_call.size());
+					bool hasOutput = (di->output != ".");
+					if (hasOutput) m_resultstruct.openTag( di->output);
+					if (!di->unique) m_resultstruct.addMark( ResultElement::IndexStart, m_call.size());
+					m_resultstruct.addValueReference( m_call.size());
+					if (!di->unique) m_resultstruct.addMark( ResultElement::IndexEnd, m_call.size());
+					if (hasOutput) m_resultstruct.closeTag();
+					m_resultstruct.addMark( ResultElement::FunctionEnd, m_call.size());
+				}
 				m_call.push_back( cc);
-				functionidx.push_back( eidx);
 			}
 			else
 			{
 				Impl* func = fui->second->m_impl;
 				std::map<int,int> rwtab = m_tagmap.insert( func->m_tagmap);
 
-				if (di->output.size())
-				{
-					throw Error( elementName, eidx, "INTO not supported for call of OPERATION");
-				}
 				if (di->nonempty)
 				{
 					throw Error( elementName, eidx, "NONEMTY not supported for call of OPERATION");
@@ -1230,23 +1400,20 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 				{
 					throw Error( elementName, eidx, "UNIQUE not supported for call of OPERATION");
 				}
-				FunctionCall paramstk( "", "", selector, param, false, false, 2);
+				if (!di->output.empty())
+				{
+					m_resultstruct.addMark( ResultElement::OperationStart, m_call.size());
+					bool hasOutput = (di->output != ".");
+					if (hasOutput) m_resultstruct.openTag( di->output);
+					m_resultstruct.addEmbeddedResult( func->m_resultstruct, m_call.size());
+					if (hasOutput) m_resultstruct.closeTag();
+				}
+				FunctionCall paramstk( "", "", selector, param, false, false, 1 + 1/*level*/);
 				m_call.push_back( paramstk);
-				functionidx.push_back( eidx);
 
 				std::vector<FunctionCall>::const_iterator fsi = func->m_call.begin(), fse = func->m_call.end();
 				for (; fsi != fse; ++fsi)
 				{
-					std::string resultname;
-					if (!fsi->resultname().empty())
-					{
-						if (!func->m_resultname.empty())
-						{
-							resultname.append( func->m_resultname);
-						}
-						resultname.append( "/");
-						resultname.append( fsi->resultname());
-					}
 					Path fselector = fsi->selector();
 					fselector.rewrite( rwtab);
 					std::vector<Path> fparam = fsi->arg();
@@ -1254,7 +1421,10 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 					for (; fai != fae; ++fai) fai->rewrite( rwtab);
 					FunctionCall cc( resultname, fsi->name(), fselector, fparam, false, false, fsi->level() + 1);
 					m_call.push_back( cc);
-					functionidx.push_back( eidx);
+				}
+				if (!di->output.empty())
+				{
+					m_resultstruct.addMark( ResultElement::OperationEnd, m_call.size());
 				}
 			}
 		}
@@ -1263,92 +1433,26 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 			throw Error( elementName, eidx, e.what());
 		}
 	}
-
-	// calculating common result name prefix:
-	elementName = TransactionDescription::Output;
-	std::vector<FunctionCall>::iterator ci = m_call.begin(), ce = m_call.end();
-	m_resultname.clear();
-	ci = m_call.begin(), ce = m_call.end();
-	for (; ci != ce; ++ci)
+	if (!resultname.empty())
 	{
-		std::size_t eidx = functionidx[ci - m_call.begin()];
-		std::string prefix;
-		const char* pp = std::strchr( ci->resultname().c_str(), '/');
-		if (pp)
-		{
-			prefix.append( ci->resultname().c_str(), pp-ci->resultname().c_str());
-			if (std::strchr( pp+1, '/'))
-			{
-				throw Error( elementName, eidx, "illegal result prefix. Only one '/' allowed");
-			}
-			if (m_resultname.empty())
-			{
-				m_resultname = prefix;
-				ci->resultname( pp+1);
-			}
-			else if (m_resultname == prefix)
-			{
-				ci->resultname( pp+1);
-			}
-			else
-			{
-				throw Error( elementName, eidx, "no common result prefix");
-			}
-		}
-		if (m_resultname == ".")
-		{
-			m_resultname = "";
-		}
-		if (!checkResultIdentifier( ci->resultname()) || !checkResultIdentifier( m_resultname))
-		{
-			throw Error( elementName, eidx, "'.' or identifier or two identifiers separated by a '/' expected for output");
-		}
-	}
-
-	// checking the program
-	elementName = TransactionDescription::Selector;
-	ci = m_call.begin(), ce = m_call.end();
-	for (; ci != ce; ++ci)
-	{
-		std::size_t eidx = functionidx[ci - m_call.begin()];
-		if (ci->selector().resultReference())
-		{
-			throw Error( elementName, eidx, "undefined: result variable reference in selector");
-		}
-		if (ci->selector().constantReference())
-		{
-			throw Error( elementName, eidx, "undefined: constant as selector");
-		}
-	}
-	elementName = TransactionDescription::Output;
-	ci = m_call.begin();
-	if (ci != ce)
-	{
-		if (ci->hasResultReference())
-		{
-			throw Error( elementName, 0, "result variable reference in first command leads to an empty result");
-		}
-	}
-	ci = m_call.begin(), ce = m_call.end();
-	for (; ci != ce; ++ci)
-	{
-		m_elemname.push_back( ci->resultname());
+		m_resultstruct.closeTag();
 	}
 }
 
 TransactionFunction::Impl::Impl( const Impl& o)
-	:m_resultname(o.m_resultname)
-	,m_elemname(o.m_elemname)
+	:m_resultstruct(o.m_resultstruct)
 	,m_call(o.m_call)
 	,m_tagmap(o.m_tagmap){}
 
 
-TransactionFunction::TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap)
+TransactionFunction::TransactionFunction( const std::string& name_, const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& authorization_)
 	:m_name(name_)
-	,m_impl( new Impl( description, functionmap)){}
+	,m_authorization(authorization_)
+	,m_impl( new Impl( description, resultname, functionmap)){}
 
 TransactionFunction::TransactionFunction( const TransactionFunction& o)
 	:m_name(o.m_name)
+	,m_authorization(o.m_authorization)
 	,m_impl( new Impl( *o.m_impl)){}
 
 TransactionFunction::~TransactionFunction()
@@ -1368,12 +1472,12 @@ TransactionFunctionInput* TransactionFunction::getInput() const
 
 TransactionFunctionOutput* TransactionFunction::getOutput( const db::TransactionOutput& o) const
 {
-	return new TransactionFunctionOutput( m_impl->m_resultname, m_impl->m_elemname, m_impl->m_elemunique, o);
+	return new TransactionFunctionOutput( m_impl->m_resultstruct, o);
 }
 
-TransactionFunction* _Wolframe::db::createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description, const types::keymap<TransactionFunctionR>& functionmap)
+TransactionFunction* _Wolframe::db::createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& auth)
 {
-	return new TransactionFunction( name, description, functionmap);
+	return new TransactionFunction( name, description, resultname, functionmap, auth);
 }
 
 

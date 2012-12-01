@@ -75,43 +75,47 @@
 <deleteCategory><category id="22"/></deleteCategory>
 <deleteCategory><category id="25"/></deleteCategory>
 <createCategory><category name="Device from outer space" parentID="7"></category></createCategory>
-<createCategory>
-<category parentID="46"><name>WNC child</name>
-<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
-</category>
-</createCategory>
-<createCategory>
-<category parentID="46"><name>WNC child 2</name>
-<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
-</category>
-</createCategory>
-<createCategory>
-<category parentID="46"><name>WNC child 3</name>
-<picture><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image></picture>
-</category>
-</createCategory>
-<editCategory>
-<category name="Device from outer space" id="51"></category>
-</editCategory>
+<createPicture>
+<picture>
+	<caption>WNC caption</caption><info>WNC info</info><image>WNC image</image>
+</picture>
+</createPicture>
+<createCategory><category parentID="46"><name>WNC child</name><pictures><picture id="1"/></pictures></category></createCategory>
+<createCategory><category parentID="46"><name>WNC child 2</name><pictures><picture id="1"/></pictures></category></createCategory>
+<createCategory><category parentID="46"><name>WNC child 3</name><pictures><picture id="1"/></pictures></category></createCategory>
+<editCategory><category name="Device from outer space" id="51"></category></editCategory>
 <CategoryRequest><category id="52"/></CategoryRequest>
+<createPicture>
+<picture>
+	<caption>WNC caption X</caption>
+	<info>WNC info X</info>
+	<image>WNC image X</image>
+</picture>
+</createPicture>
+<createPicture>
+<picture>
+	<caption>WNC caption Z</caption>
+	<info>WNC info Z</info>
+	<image>WNC image Z</image>
+</picture>
+</createPicture>
 <editCategory>
 <category id="52">
 	<name>WNC child Y</name>
-	<picture id='1'>
-		<caption>WNC caption X</caption>
-		<info>WNC info X</info>
-		<image>WNC image X</image>
-	</picture>
+	<pictures><picture id='2'/></pictures>
 </category>
 </editCategory>
+<editPicture>
+<picture id="1">
+	<caption>WNC caption X</caption>
+	<info>WNC info X</info>
+	<image>WNC image X</image>
+</picture>
+</editPicture>
 <editCategory>
 <category id="52">
 	<name>WNC child Y</name>
-	<picture id='1'>
-		<caption>WNC caption Z</caption>
-		<info>WNC info Z</info>
-		<image>WNC image Z</image>
-	</picture>
+	<pictures><picture id='3'/></pictures>
 </category>
 </editCategory>
 <CategoryRequest><category id="52"/></CategoryRequest>
@@ -174,7 +178,7 @@
 <createTag><tag name="Tag1.5x" parentID="2"/></createTag>
 <TagHierarchyRequest><Tag id="1"/></TagHierarchyRequest>
 </test>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program configurator.normalize --program category.simpleform --program feature.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA,program=program.sql' --program=DBPRG.tdl run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program configurator.normalize --program category.simpleform --program feature.simpleform --program picture.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA,program=program.sql' --program=DBPRG.tdl run
 
 **file: DBDATA
 -- The tags tree
@@ -411,15 +415,9 @@ DOCTYPE "category Category"
 	name string
 	normalizedName string
 	description string
-	picture
+	picture []
 	{
 		id @int
-		caption string
-		info string
-		image string
-		thumbnail string
-		width int
-		height int
 	}
 }
 **file:feature.simpleform
@@ -430,15 +428,9 @@ DOCTYPE "feature Feature"
 	name string
 	normalizedName string
 	description string
-	picture
+	picture []
 	{
 		id @int
-		caption string
-		info string
-		image string
-		thumbnail string
-		width int
-		height int
 	}
 }
 **file:tag.simpleform
@@ -450,34 +442,74 @@ DOCTYPE "tag Tag"
 	normalizedName string
 	description string
 }
+**file:picture.simpleform
+DOCTYPE "picture Picture"
+{
+	picture
+	{
+		id @int
+		caption string
+		info string
+		thumbnail string
+		image string
+		width int
+		height int
+		size int
+		tags string
+		tagwrap
+		{
+			id @int
+			tag []
+			{
+				id @int
+			}
+		}
+	}
+	
+	tagwrap []
+	{
+		id @int
+		tag string
+	}
+
+	list
+	{
+		picture []
+		{
+			id @int
+			caption string
+			info string
+			thumbnail string
+			image string
+			width int
+			height int
+			size int
+			tags string
+		}
+	}
+}
 **file:configurator.normalize
 int=number:integer;
 uint=number:unsigned;
 float=number:float;
 name=string:lcname;
 **file:program.sql
--- Select the last ID created in the Picture table
--- PF:HACK: Because we have no variables, we have also to reserve a result for what we whould store in a 'variable'
-PREPARE getLastPictureID AS SELECT DISTINCT $1,last_insert_rowid() FROM Picture;
+PREPARE getLastCategoryID AS SELECT DISTINCT last_insert_rowid() FROM Category;
+PREPARE getLastFeatureID AS SELECT DISTINCT last_insert_rowid() FROM Feature;
+PREPARE getLastTagID AS SELECT DISTINCT last_insert_rowid() FROM Tag;
+PREPARE getLastPictureID AS SELECT DISTINCT last_insert_rowid( ) FROM Picture;
 **file:DBPRG.tdl
 --
 -- addCategory
 --
-OPERATION addCategoryPicture -- ($1=categoryID)(caption, info, image, width, height, thumbnail)
-BEGIN
-	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
-	DO NONEMPTY UNIQUE getLastPictureID($1);
-	DO INSERT INTO CategoryPicture (categoryID,pictureID) VALUES ($1,$2);
-END
-
-TRANSACTION addCategory -- (parentID, name, normalizedName, description)
+TRANSACTION addCategory -- (parentID, name, normalizedName, description, pictures/picture/id)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT rgt FROM Category WHERE ID = $(parentID);
 	DO UPDATE Category SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Category SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Category (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Category WHERE normalizedName = $(normalizedName);
-	FOREACH picture DO addCategoryPicture($1);
+	FOREACH pictures/picture DO INSERT INTO CategoryPicture( categoryID, pictureID ) VALUES( $1, $(id) );
 END
 
 --
@@ -486,7 +518,6 @@ END
 TRANSACTION deleteCategory -- (id)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Category WHERE ID = $(id) AND ID != '1';
-	DO DELETE FROM Picture WHERE ID IN (SELECT pictureID FROM CategoryPicture WHERE categoryID = $(id));
 	DO DELETE FROM CategoryPicture WHERE categoryID = $(id);
 	DO DELETE FROM Category WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Category SET lft = lft-$3 WHERE lft>$2;
@@ -496,10 +527,11 @@ END
 --
 -- updateCategory
 --
-TRANSACTION updateCategory -- (id, name, normalizedName, description, picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
+TRANSACTION updateCategory -- (id, name, normalizedName, description, pictures/picture/id)
 BEGIN
 	DO UPDATE Category SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
-	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image), width = $(width), height = $(height), thumbnail = $(thumbnail) WHERE ID = $(id);
+	DO DELETE FROM CategoryPicture WHERE categoryID = $(id);
+	FOREACH pictures/picture DO INSERT INTO CategoryPicture( categoryID, pictureID ) VALUES( $(/id), $(id) );
 END
 
 --
@@ -509,18 +541,32 @@ END
 --
 TRANSACTION selectCategory -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Category WHERE ID = $(id);
-	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $(id);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID", name,
+		normalizedName AS "normalizedName",description
+		FROM Category WHERE ID = $(id);
+	INTO picture DO 
+		SELECT CategoryPicture.pictureID AS "id"
+			FROM CategoryPicture
+			WHERE CategoryPicture.categoryID = $(id);
 END
+
 TRANSACTION selectCategoryByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Category WHERE normalizedName = $(normalizedName);
-	INTO /picture DO SELECT CategoryPicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM CategoryPicture,Picture WHERE CategoryPicture.pictureID = Picture.ID AND CategoryPicture.categoryID = $1;
+	INTO . DO NONEMPTY UNIQUE
+		SELECT ID AS id, parentID AS "parentID", name,
+			normalizedName AS "normalizedName",description FROM Category
+			WHERE normalizedName = $(normalizedName);
+	INTO picture DO
+		SELECT pictureID AS "id"
+			FROM CategoryPicture
+			WHERE CategoryPicture.categoryID = $1;
 END
 
 TRANSACTION selectCategorySet -- (/category/id)
 BEGIN
-	FOREACH /category INTO category DO NONEMPTY UNIQUE SELECT ID AS "ID",name,normalizedName AS "normalizedName",description FROM Category WHERE ID = $(id) ORDER BY ID;
+	FOREACH /category INTO category DO NONEMPTY UNIQUE
+		SELECT ID AS "ID", name, normalizedName AS "normalizedName", description
+			FROM Category WHERE ID = $(id) ORDER BY ID;
 END
 
 --
@@ -528,7 +574,7 @@ END
 --
 TRANSACTION selectTopCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
+	INTO node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM category AS P1, category AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 
 --
@@ -536,26 +582,19 @@ END
 --
 TRANSACTION selectSubCategory -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
+	INTO node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 --
 -- addFeature
 --
-OPERATION addFeaturePicture -- ($1=featureID)(caption, info, image, width, height, thumbnail)
-BEGIN
-	DO INSERT INTO Picture (caption,info,image,width,height,thumbnail) VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail));
-	DO NONEMPTY UNIQUE getLastPictureID($1);
-	DO INSERT INTO FeaturePicture (featureID,pictureID) VALUES ($1,$2);
-END
-
-TRANSACTION addFeature -- (parentID, name, normalizedName, description)
+TRANSACTION addFeature -- (parentID, name, normalizedName, description, pictures/picture/id)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT rgt FROM Feature WHERE ID = $(parentID);
 	DO UPDATE Feature SET rgt = rgt + 2 WHERE rgt >= $1;
 	DO UPDATE Feature SET lft = lft + 2 WHERE lft > $1;
 	DO INSERT INTO Feature (parentID, name, normalizedName, description, lft, rgt) VALUES ($(parentID), $(name), $(normalizedName), $(description), $1, $1+1);
 	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Feature WHERE normalizedName = $(normalizedName);
-	FOREACH picture DO addFeaturePicture($1);
+	FOREACH pictures/picture DO INSERT INTO FeaturePicture( featureID, pictureID ) VALUES( $1, $(id) );
 END
 
 --
@@ -564,7 +603,6 @@ END
 TRANSACTION deleteFeature -- (id)
 BEGIN
 	DO NONEMPTY UNIQUE SELECT lft,rgt,rgt-lft+1 AS width FROM Feature WHERE ID = $(id) AND ID != '1';
-	DO DELETE FROM Picture WHERE ID IN (SELECT pictureID FROM FeaturePicture WHERE featureID = $(id));
 	DO DELETE FROM FeaturePicture WHERE featureID = $(id);
 	DO DELETE FROM Feature WHERE lft >= $1 AND lft <= $2;
 	DO UPDATE Feature SET lft = lft-$3 WHERE lft>$2;
@@ -574,10 +612,11 @@ END
 --
 -- updateFeature
 --
-TRANSACTION updateFeature -- (id, name, normalizedName, description, picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
+TRANSACTION updateFeature -- (id, name, normalizedName, description, pictures/picture/id)
 BEGIN
 	DO UPDATE Feature SET name = $(name), normalizedName = $(normalizedName), description = $(description) WHERE ID = $(id);
-	FOREACH picture DO UPDATE Picture SET caption = $(caption), info = $(info), image = $(image), width = $(width), height = $(height), thumbnail = $(thumbnail) WHERE ID = $(id);
+	DO DELETE FROM FeaturePicture WHERE featureID = $(id);
+	FOREACH pictures/picture DO INSERT INTO FeaturePicture( featureID, pictureID ) VALUES( $(/id), $(id) );
 END
 
 --
@@ -587,19 +626,32 @@ END
 --
 TRANSACTION selectFeature -- (id)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Feature WHERE ID = $(id);
-	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $(id);
+	INTO . DO NONEMPTY UNIQUE
+		SELECT ID AS id, parentID AS "parentID", name,
+			normalizedName AS "normalizedName", description
+			FROM Feature WHERE ID = $(id);
+	INTO picture DO
+		SELECT pictureID AS "id"
+			FROM FeaturePicture
+			WHERE FeaturePicture.featureID = $(id);
 END
 
 TRANSACTION selectFeatureByNormalizedName -- (normalizedName)
 BEGIN
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS id,parentID AS "parentID",name,normalizedName AS "normalizedName",description FROM Feature WHERE normalizedName = $(normalizedName);
-	INTO /picture DO SELECT FeaturePicture.pictureID AS id,Picture.caption,Picture.info,Picture.image,Picture.width,Picture.height,Picture.thumbnail FROM FeaturePicture,Picture WHERE FeaturePicture.pictureID = Picture.ID AND FeaturePicture.featureID = $1;
+	INTO . DO NONEMPTY UNIQUE
+		SELECT ID AS id, parentID AS "parentID", name,
+			normalizedName AS "normalizedName", description
+			FROM Feature WHERE normalizedName = $(normalizedName);
+	INTO picture DO SELECT pictureID AS id
+		FROM FeaturePicture
+		WHERE FeaturePicture.featureID = $1;
 END
 
 TRANSACTION selectFeatureSet -- (/feature/id)
 BEGIN
-	FOREACH /feature INTO feature DO NONEMPTY UNIQUE SELECT ID AS id,name,normalizedName AS "normalizedName",description FROM Feature WHERE ID = $(id) ORDER BY ID;
+	FOREACH /feature INTO feature DO NONEMPTY UNIQUE
+		SELECT ID AS id, name, normalizedName AS "normalizedName", description
+			FROM Feature WHERE ID = $(id) ORDER BY ID;
 END
 
 --
@@ -607,7 +659,7 @@ END
 --
 TRANSACTION selectTopFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
+	INTO node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 
 --
@@ -615,7 +667,7 @@ END
 --
 TRANSACTION selectSubFeature -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
+	INTO node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM Feature AS P1, Feature AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
 END
 --
 -- addTag
@@ -673,7 +725,7 @@ END
 --
 TRANSACTION selectTopTag -- (id)
 BEGIN
-	INTO /node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
+	INTO node DO SELECT P2.ID AS "ID",P2.parentID AS "parentID",P2.name,P2.normalizedName AS "normalizedName",P2.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft > P2.lft AND P1.lft < P2.rgt AND P1.ID = $(id) ORDER BY P2.ID;
 END
 
 --
@@ -681,7 +733,72 @@ END
 --
 TRANSACTION selectSubTag -- (id)
 BEGIN
-	INTO /node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
+	INTO node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
+END
+TRANSACTION selectPictureList
+RESULT INTO list
+BEGIN
+	INTO picture DO
+		SELECT Picture.ID AS "id", thumbnail, caption, info, width, height,
+			coalesce( group_concat( Tag.name ), '' ) as tags,
+			3*length(image)/4+2 as size
+		FROM Picture
+		LEFT JOIN PictureTag
+		ON PictureTag.pictureID = Picture.ID
+		LEFT JOIN Tag
+		ON PictureTag.tagID = Tag.ID
+		GROUP BY Picture.ID, Picture.thumbnail, Picture.caption, Picture.info,
+			Picture.width, Picture.height, Picture.image;
+END
+
+TRANSACTION selectPicture -- (/picture/id)
+BEGIN
+	INTO picture DO UNIQUE
+		SELECT Picture.ID AS "id", image, caption, info, width, height,
+			coalesce( group_concat( Tag.name ), '' ) as tags,
+			3*length(image)/4+2 as size
+		FROM Picture
+		LEFT JOIN PictureTag
+		ON PictureTag.pictureID = Picture.ID
+		LEFT JOIN Tag
+		ON PictureTag.tagID = Tag.ID
+		WHERE Picture.ID = $(id)
+		GROUP BY Picture.ID, Picture.image, Picture.caption, Picture.info,
+			Picture.width, Picture.height;
+
+	-- HACK from here, see wrapper element in LUA code, no other solution found..
+	INTO tagwrap DO
+		select Tag.ID AS "id", name as tag
+		FROM Tag
+		LEFT JOIN PictureTag
+		ON PictureTag.tagID = Tag.ID
+		LEFT JOIN Picture
+		ON PictureTag.pictureID = Picture.ID
+		WHERE Picture.ID = $(id);
+END
+
+TRANSACTION updatePicture -- (picture/id, picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
+BEGIN
+	FOREACH picture DO UPDATE Picture SET
+		caption = $(caption), info = $(info), image = $(image),
+		width = $(width), height = $(height), thumbnail = $(thumbnail)
+		WHERE ID = $(id);
+	FOREACH picture DO DELETE FROM PictureTag WHERE pictureID = $(id);
+	FOREACH picture/tags DO INSERT INTO PictureTag( pictureID, tagID ) VALUES( $(/picture/id), $(id) );
+END
+
+TRANSACTION addPicture -- (picture/caption, picture/info, picture/image, picture/width, picture/height, picture/thumbnail)
+BEGIN
+	FOREACH picture DO INSERT INTO Picture( caption, info, image, width, height, thumbnail )
+		VALUES ($(caption), $(info), $(image), $(width), $(height), $(thumbnail) );
+	DO NONEMPTY UNIQUE getLastPictureID( );
+	FOREACH picture/tags DO INSERT INTO PictureTag( pictureID, tagID ) VALUES( $1, $(id) );
+END
+
+TRANSACTION deletePicture -- (id)
+BEGIN
+	DO DELETE FROM PictureTag WHERE PictureID = $(id);
+	DO DELETE FROM Picture WHERE ID = $(id);
 END
 **outputfile:DBDUMP
 **file: transaction_configurator.lua
@@ -702,19 +819,16 @@ local function content_value( v, itr)
 	end
 end
 
-local function picture_value( itr)
-	local picture = {}
+local function pictures_value( pictures, itr )
+	if pictures == nil then
+		pictures = { ["picture"] = { } }
+	end
 	for v,t in itr do
-		if (t == "id" or t == "caption" or t == "info" or t == "image") then
-			picture[ t] = content_value( v, itr)
+		if( t == "id") then
+			table.insert( pictures[ "picture" ], { ["id"] = v } )
 		end
 	end
-	info = formfunction( "imageInfo" )( { [ "data"] = picture["image"] } ):table( )
-	picture["width"] = info.width
-	picture["height"] = info.height
-	thumb = formfunction( "imageThumb" )( { [ "image" ] = { [ "data" ] = picture["image"] }, [ "size" ] = 50 } ):table( )
-	picture["thumbnail"] = thumb.data
-	return picture
+	return pictures
 end
 
 local function insert_itr( tablename, parentID, itr)
@@ -722,7 +836,7 @@ local function insert_itr( tablename, parentID, itr)
 	local name = nil
 	local nname = nil
 	local description = nil
-	local picture = nil
+	local pictures = nil
 	for v,t in itr do
 		if (t == "name") then
 			name = content_value( v, itr)
@@ -730,10 +844,10 @@ local function insert_itr( tablename, parentID, itr)
 		elseif (t == "description") then
 			description = content_value( v, itr)
 		elseif (t == "picture") then
-			picture = picture_value( scope( itr))
+			pictures = pictures_value( pictures, scope( itr))
 		elseif (t == "node") then
 			if name then
-				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
+				id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, pictures=pictures} ):table().ID
 				name = nil
 				description = nil
 			end
@@ -741,17 +855,17 @@ local function insert_itr( tablename, parentID, itr)
 		end
 	end
 	if name then
-		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, picture=picture} ):table().ID
+		id = formfunction( "add" .. tablename)( {name=name, normalizedName=nname, description=description, parentID=parentID, pictures=pictures} ):table().ID
 	end
 	return id
 end
 
-local function insert_topnode( tablename, name, description, picture, parentID)
+local function insert_topnode( tablename, name, description, pictures, parentID)
 	local nname = normalizer("name")( name)
 	if not parentID then
 		parentID = 1
 	end
-	local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, picture=picture} ):table().ID
+	local id = formfunction( "add" .. tablename)( {normalizedName=nname, name=name, description=description, parentID=parentID, pictures=pictures} ):table().ID
 	return id
 end
 
@@ -760,7 +874,7 @@ local function insert_tree_topnode( tablename, itr)
 	local id = 1
 	local name = nil
 	local description = nil
-	local picture = nil
+	local pictures = nil
 	for v,t in itr do
 		if (t == "parentID") then
 			parentID = tonumber( v)
@@ -769,10 +883,10 @@ local function insert_tree_topnode( tablename, itr)
 		elseif (t == "description") then
 			description = content_value( v, itr)
 		elseif (t == "picture") then
-			picture = picture_value( scope( itr))
+			pictures = pictures_value( pictures, scope( itr))
 		elseif (t == "node") then
 			if name then
-				id = insert_topnode( tablename, name, description, picture, parentID)
+				id = insert_topnode( tablename, name, description, pictures, parentID)
 				name = nil
 				description = nil
 			end
@@ -780,7 +894,7 @@ local function insert_tree_topnode( tablename, itr)
 		end
 	end
 	if name then
-		insert_topnode( tablename, name, description, picture, parentID)
+		insert_topnode( tablename, name, description, pictures, parentID)
 	end
 end
 
@@ -788,7 +902,7 @@ local function get_tree( tablename, parentID)
 	local t = formfunction( "selectSub" .. tablename)( {id=parentID} ):table()["node"] or {}
 	local a = {}
 	for i,v in pairs( t) do
-		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, picture=v.picture, parentID=tonumber(v.parentID), children = {} } )
+		table.insert( a, tonumber( v.ID), { name=v.name, description=v.description, pictures=v.pictures, parentID=tonumber(v.parentID), children = {} } )
 	end
 	for i,v in pairs( a) do
 		if i ~= parentID and v.parentID then
@@ -854,13 +968,14 @@ local function select_node( tablename, elementname, itr)
 end
 
 local function edit_node( tablename, itr)
-	local name = nil;
-	local nname = nil;
-	local description = nil;
-	local picture = nil;
-	local id = nil;
+	local name = nil
+	local nname = nil
+	local description = nil
+	local pictures = nil
+	local inpicture = false
+	local id = nil
 	for v,t in itr do
-		if t == "id" then
+		if( t == "id" and not inpicture ) then
 			id = v
 		elseif t ==  "name" then
 			name = content_value( v, itr)
@@ -868,10 +983,11 @@ local function edit_node( tablename, itr)
 		elseif t == "description" then
 			description = content_value( v, itr)
 		elseif t == "picture" then
-			picture = picture_value( scope(itr))
+			pictures = pictures_value( pictures, scope( itr))
+			inpicture = true
 		end
 	end
-	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, picture=picture} )
+	formfunction( "update" .. tablename)( {normalizedName=nname, name=name, description=description, id=id, pictures=pictures} )
 end
 
 local function delete_node( tablename, itr)
@@ -881,18 +997,14 @@ local function delete_node( tablename, itr)
 			id = v
 		end
 	end
-	-- don't allow deletion of the root element (fast hack)
-	if id == "1" then
-		return
-	end
 	formfunction( "delete" .. tablename)( {id=id} )
 end
 
 local function create_node( tablename, itr)
-	local name = nil;
-	local parentID = nil;
-	local description = nil;
-	local picture = nil;
+	local name = nil
+	local parentID = nil
+	local description = nil
+	local pictures = nil
 	for v,t in itr do
 		if t == "parentID" then
 			parentID = v
@@ -902,10 +1014,10 @@ local function create_node( tablename, itr)
 		elseif t ==  "description" then
 			description = content_value( v, itr)
 		elseif t ==  "picture" then
-			picture = picture_value( scope(itr))
+			pictures = pictures_value( pictures, scope( itr))
 		end
 	end
-	insert_topnode( tablename, name, description, picture, parentID)
+	insert_topnode( tablename, name, description, pictures, parentID)
 end
 
 local function add_tree( tablename, itr)
@@ -916,6 +1028,7 @@ local function add_tree( tablename, itr)
 		end
 	end
 end
+
 
 function CategoryHierarchyRequest()
 	output:as( "tree SYSTEM 'CategoryHierarchy.simpleform'")
@@ -1022,25 +1135,64 @@ function PictureRequest( )
 	output:closetag( )
 end
 
-function editPicture( )
-	local picture = picture_value( input:get( ) )
-	formfunction( "updatePicture" )( { picture = picture } )
+local function transform_picture( itr )
+	-- should be a form transformation, not lua code :-)
+	local picture = {}
+	picture["tags"] = {}
+	local tags = {}
+	local intag = false
+	local intagwrap = false
+	for v,t in itr do
+		if ( ( t == "id" or t == "caption" or t == "info" or t == "image" ) and not intagwrap and not intag) then
+			picture[ t] = content_value( v, itr)
+		elseif( t == "tagwrap" ) then
+			intagwrap = true
+		elseif( t == "tag" ) then
+			intag = true
+		elseif( t == "id" and intag ) then
+			table.insert( picture["tags"], { ["id"] = v } )
+		end
+	end
+	info = formfunction( "imageInfo" )( { [ "data"] = picture["image"] } ):table( )
+	picture["width"] = info.width
+	picture["height"] = info.height
+	thumb = formfunction( "imageThumb" )( { [ "image" ] = { [ "data" ] = picture["image"] }, [ "size" ] = 50 } ):table( )
+	picture["thumbnail"] = thumb.data
+	return picture
 end
 
-function createPicture( )
-	local picture = picture_value( input:get( ) )
-	formfunction( "addPicture" )( { picture = picture } )
-end
-
-function deletePicture( )
+local function delete_picture( itr)
 	local id = nil;
-	for v,t in input:get( ) do
+	for v,t in itr do
 		if t == "id" then
 			id = v
 		end
 	end
 	formfunction( "deletePicture" )( { id = id } )
 end
+
+local function update_picture( itr)
+	local picture = transform_picture( itr)
+	formfunction( "updatePicture" )( { picture = picture } )
+end
+
+local function create_picture( itr)
+	local picture = transform_picture( itr)
+	formfunction( "addPicture" )( { picture = picture } )
+end
+
+function editPicture( )
+	update_picture( input:get())
+end
+
+function createPicture( )
+	create_picture( input:get())
+end
+
+function deletePicture( )
+	delete_picture( input:get())
+end
+
 
 
 function run()
@@ -1049,6 +1201,8 @@ function run()
 	output:opentag("result")
 	local itr = input:get()
 	for v,t in itr do
+		logger.printc( "MAIN tag='", t, "' value='", v, "'")
+
 		if (t == "pushCategoryHierarchy") then
 			add_tree( "Category", scope(itr))
 		elseif (t == "pushFeatureHierarchy") then
@@ -1085,6 +1239,12 @@ function run()
 			select_node( "Feature", "feature", scope(itr))
 		elseif (t == "TagRequest") then
 			select_node( "Tag", "tag", scope(itr))
+		elseif (t == "createPicture") then
+			create_picture(scope(itr))
+		elseif (t == "editPicture") then
+			update_picture(scope(itr))
+		elseif (t == "deletePicture") then
+			delete_picture( scope(itr))
 		end
 	end
 	output:closetag()
@@ -1286,7 +1446,7 @@ end
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><picture id="1"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail>WNC image</thumbnail><width>9</width><height>111</height></picture></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><picture id="1"><caption>WNC caption Z</caption><info>WNC info Z</info><image>WNC image Z</image><thumbnail>WNC image Z</thumbnail><width>11</width><height>90</height></picture></category><category id="54" parentID="46"><name>WNC child 3</name><normalizedName>wnc child 3</normalizedName><picture id="3"><caption>WNC caption</caption><info>WNC info</info><image>WNC image</image><thumbnail>WNC image</thumbnail><width>9</width><height>111</height></picture></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName></category><tree><item id="1">
+</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><picture id="1"/></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><picture id="3"/></category><category id="54" parentID="46"><name>WNC child 3</name><normalizedName>wnc child 3</normalizedName><picture id="1"/></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><picture/></category><tree><item id="1">
 	<category>_ROOT_</category>
 	<description>Categories tree root</description>
 	<tree><item id="2">
@@ -1547,11 +1707,14 @@ sqlite_sequence:
 'Picture', '3'
 
 Picture:
-'1', 'WNC caption Z', 'WNC info Z', '11', '90', 'WNC image Z', 'WNC image Z'
-'2', 'WNC caption', 'WNC info', '9', '111', 'WNC image', 'WNC image'
-'3', 'WNC caption', 'WNC info', '9', '111', 'WNC image', 'WNC image'
+'1', 'WNC caption X', 'WNC info X', '11', '90', 'WNC image X', 'WNC image X'
+'2', 'WNC caption X', 'WNC info X', '11', '90', 'WNC image X', 'WNC image X'
+'3', 'WNC caption Z', 'WNC info Z', '11', '90', 'WNC image Z', 'WNC image Z'
 
 PictureTag:
+'2', NULL
+'3', NULL
+'1', NULL
 
 Category:
 '1', NULL, '_ROOT_', '_ROOT_', 'Categories tree root', '1', '64'
@@ -1588,9 +1751,9 @@ Category:
 '54', '46', 'WNC child 3', 'wnc child 3', NULL, '52', '53'
 
 CategoryPicture:
-'52', '1'
-'53', '2'
-'54', '3'
+'53', '1'
+'54', '1'
+'52', '3'
 
 Feature:
 '1', NULL, '_ROOT_', '_ROOT_', 'Features tree root', '1', '34'

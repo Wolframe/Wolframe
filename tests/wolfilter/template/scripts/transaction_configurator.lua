@@ -41,6 +41,12 @@ function run()
 			select_node( "Feature", "feature", scope(itr))
 		elseif (t == "TagRequest") then
 			select_node( "Tag", "tag", scope(itr))
+		elseif (t == "createPicture") then
+			create_picture(scope(itr))
+		elseif (t == "editPicture") then
+			update_picture(scope(itr))
+		elseif (t == "deletePicture") then
+			delete_picture( scope(itr))
 		end
 	end
 	output:closetag()

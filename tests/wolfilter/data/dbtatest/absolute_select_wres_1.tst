@@ -11,8 +11,9 @@
 testcall
 **file:DBIN.tdl
 TRANSACTION testcall
+RESULT INTO result
 BEGIN
-	INTO result DO run( /aa);
+	INTO . DO run( /aa);
 END
 **file: DBRES
 #id#1

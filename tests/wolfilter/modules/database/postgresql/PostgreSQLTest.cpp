@@ -205,7 +205,18 @@ static void dumpDatabase_( const std::string& host, unsigned short port,
 		nFields = PQnfields( res );
 		for ( int i = 0; i < PQntuples( res ); i++ )	{
 			for ( int j = 0; j < nFields; j++ )
-				fprintf( fh, j ? ", %s" : "%s", PQgetvalue( res, i, j ) );
+			{
+				std::string value;
+				if (PQgetisnull( res, i, j))
+				{
+					value = "NULL";
+				}
+				else
+				{
+					value = std::string("'") + PQgetvalue( res, i, j) + "'";
+				}
+				fprintf( fh, j ? ", %s" : "%s", value.c_str());
+			}
 			fprintf( fh, "\n" );
 		}
 	}

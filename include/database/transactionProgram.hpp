@@ -99,9 +99,11 @@ private:
 	///\brief Parse the next token ignoring comments
 	char parseNextToken( std::string& tok, std::string::const_iterator& si, std::string::const_iterator se) const;
 	///\brief Parse embedded database statement in language defined with 'defineEmbeddedLanguageDescription(const LanguageDescription*)'
-	std::string parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& si, std::string::const_iterator se);
+	std::pair<std::string,std::vector<std::string> >
+		parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& si, std::string::const_iterator se);
 	///\brief Parse statement of the form [identifier '(' arg { ',' arg } ')']
-	std::string parseCallStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
+	std::pair<std::string,std::vector<std::string> >
+		parseCallStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
 
 private:
 	static const utils::CharTable m_optab;
