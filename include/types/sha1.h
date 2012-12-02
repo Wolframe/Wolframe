@@ -22,8 +22,10 @@
 #define _SHA1_H_INCLUDED
 
 #include <stddef.h>
+#ifdef _WIN32
 #if _MSC_VER < 1600
 typedef unsigned __int32 uint32_t;
+#endif
 #else
 #include <stdint.h>
 #endif
