@@ -76,7 +76,7 @@ config:
 	@echo
 	@echo "Operating system: $(PLATFORM), $(OS_MAJOR_VERSION).$(OS_MINOR_VERSION)"
 	@echo "Architecture: $(ARCH)"
-	@echo "System library directory: $(LIBDIR)"
+	@echo "System library directory: $(SYSTEM_LIBDIR)"
 ifeq "$(PLATFORM)" "LINUX"
 	@echo "Linux distribution: $(LINUX_DIST) $(LINUX_REV)"
 endif

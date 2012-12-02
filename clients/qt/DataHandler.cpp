@@ -329,9 +329,12 @@ void DataHandler::resetFormData( QWidget *form )
 		} else if( clazz == "QTableWidget" ) {
 			QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
 //			tableWidget->clearContents( );			
-			QList<QTableWidgetItem *> items = tableWidget->selectedItems( );
-			foreach( QTableWidgetItem *item, items ) {
-				item->setSelected( false );
+			for( int row = 0; row < tableWidget->rowCount( ); row++ ) {
+				for( int col = 0; col < tableWidget->columnCount( ); col++ ) {
+					QTableWidgetItem *item = tableWidget->item( row, col );
+					qDebug( ) << "XXX:" << row << col << item;
+					if( item ) item->setSelected( false );
+				}
 			}
 		} else if( clazz == "FileChooser" ) {
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
@@ -769,10 +772,13 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							// TODO: select by user data, hard-coded for now, assuming id in userdata
 							QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
 							QString id = attributes.value( "", "id" ).toString( );
-							QAbstractItemModel *model = tableWidget->model( );
-							QModelIndexList matches = model->match( model->index( 0, 0 ), Qt::UserRole, id );
-							foreach( const QModelIndex &index, matches ) {
-								tableWidget->selectRow( index.row( ) );
+							if( !id.isEmpty( ) ) {
+								QAbstractItemModel *model = tableWidget->model( );
+								QModelIndexList matches = model->match( model->index( 0, 0 ), Qt::UserRole, id );
+								foreach( const QModelIndex &index, matches ) {
+									qDebug( ) << "XXX: Selecting row by match" << index.row( ) << "id:" << id;
+									tableWidget->selectRow( index.row( ) );
+								}
 							}
 						} else if( clazz == "FileChooser" ) {
 							// don't restore anything, this is an upload component only

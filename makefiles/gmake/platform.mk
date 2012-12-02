@@ -725,10 +725,10 @@ endif
 
 # RHEL 6
 ifeq "$(LINUX_REV)" "6"
-QT_DIR ?= /usr/lib/qt4
+QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
-QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_BIN_DIR ?= $(SYSTEM_LIBDIR)/qt4/bin
 QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
