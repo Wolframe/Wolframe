@@ -22,7 +22,11 @@
 #define _SHA1_H_INCLUDED
 
 #include <stddef.h>
+#ifdef _MSC_VER
+typedef unsigned __int32 uint32_t;
+#else
 #include <stdint.h>
+#endif
 
 #define SHA1_DIGEST_SIZE	( 160 / 8 )
 #define SHA1_BLOCK_SIZE		( 512 / 8 )

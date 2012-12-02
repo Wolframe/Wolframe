@@ -60,9 +60,11 @@ BOOST_LDFLAGS = /LIBPATH:"$(BOOST_DIR)\lib"
 #############
 
 ICU_DIR = C:\Cygwin\home\Andreas Baumann\icu-49.1.2-win64-release
+ICU_DIR = C:\Cygwin\home\Andreas\icu-4.4.2-win64-release
 
 # the library version (how the DLLs are tagged)
-ICU_LIB_VERSION = 49
+#ICU_LIB_VERSION = 49
+ICU_LIB_VERSION =
 
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
