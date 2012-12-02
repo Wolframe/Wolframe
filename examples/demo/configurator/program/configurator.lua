@@ -1,18 +1,11 @@
-local function content_value( v, itr)
-	if v then
-		return v
-	end
+local function content_value( itr)
+	local rt = nil
 	for v,t in itr do
-		if t and v then
-		else
-			if t then
-				return nil
-			end
-			if v then
-				return v
-			end
+		if v and not t then
+			rt = v
 		end
 	end
+	return rt
 end
 
 local function pictures_value( pictures, itr )
@@ -35,10 +28,18 @@ local function insert_itr( tablename, parentID, itr)
 	local pictures = nil
 	for v,t in itr do
 		if (t == "name") then
-			name = content_value( v, itr)
+			if v then
+				name = v
+			else
+				name = content_value( scope(itr))
+			end
 			nname = normalizer("name")( name)
 		elseif (t == "description") then
-			description = content_value( v, itr)
+			if v then
+				description = v
+			else
+				description = content_value( scope(itr))
+			end
 		elseif (t == "picture") then
 			pictures = pictures_value( pictures, scope( itr))
 		elseif (t == "node") then
@@ -75,9 +76,17 @@ local function insert_tree_topnode( tablename, itr)
 		if (t == "parentID") then
 			parentID = tonumber( v)
 		elseif (t == "name") then
-			name = content_value( v, itr)
+			if v then
+				name = v
+			else
+				name = content_value( scope(itr))
+			end
 		elseif (t == "description") then
-			description = content_value( v, itr)
+			if v then
+				description = v
+			else
+				description = content_value( scope(itr))
+			end
 		elseif (t == "picture") then
 			pictures = pictures_value( pictures, scope( itr))
 		elseif (t == "node") then
@@ -155,7 +164,7 @@ local function select_node( tablename, elementname, itr)
 		if t == "id" then
 			output:opentag( elementname)
 			local r = formfunction( "select" .. tablename)( {id=v} )
-			local f = form( tablename);
+			local f = form( tablename)
 			f:fill( r:get())
 			output:print( f:get())
 			output:closetag( )
@@ -173,10 +182,18 @@ local function edit_node( tablename, itr)
 		if( t == "id" ) then
 			id = v
 		elseif t ==  "name" then
-			name = content_value( v, itr)
+			if v then
+				name = v
+			else
+				name = content_value( scope(itr))
+			end
 			nname = normalizer("name")( name)
 		elseif t == "description" then
-			description = content_value( v, itr)
+			if v then
+				description = v
+			else
+				description = content_value( scope(itr))
+			end
 		elseif( t == "picture" ) then
 			pictures = pictures_value( pictures, scope( itr))
 		end
@@ -185,7 +202,7 @@ local function edit_node( tablename, itr)
 end
 
 local function delete_node( tablename, itr)
-	local id = nil;
+	local id = nil
 	for v,t in itr do
 		if t == "id" then
 			id = v
@@ -203,10 +220,18 @@ local function create_node( tablename, itr)
 		if t == "parentID" then
 			parentID = v
 		elseif t ==  "name" then
-			name = content_value( v, itr)
+			if v then
+				name = v
+			else
+				name = content_value( scope(itr))
+			end
 			nname = normalizer("name")( name)
 		elseif t ==  "description" then
-			description = content_value( v, itr)
+			if v then
+				description = v
+			else
+				description = content_value( scope(itr))
+			end
 		elseif t ==  "picture" then
 			pictures = pictures_value( pictures, scope( itr))
 		end
@@ -305,7 +330,7 @@ end
 function PictureListRequest( )
 	output:as( "list SYSTEM 'PictureList.simpleform'" )
 	filter().empty = false
-	local search = nil;
+	local search = nil
 	for v,t in input:get( ) do
 		if t == "search" then
 			search = "%" .. normalizer( "name" )( v ) .. "%"
@@ -315,7 +340,7 @@ function PictureListRequest( )
 		search = "%%"
 	end
 	local t = formfunction( "selectPictureList" )( { search = search } )
-	local f = form( "Picture" );
+	local f = form( "Picture" )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
 end
@@ -323,7 +348,7 @@ end
 function PictureRequest( )
 	output:as( "dummy SYSTEM 'Picture.simpleform'")
 	filter().empty = false
-	local id = nil;
+	local id = nil
 	for v,t in input:get( ) do
 		if t == "id" then
 			id = v
@@ -344,7 +369,7 @@ local function transform_picture( itr )
 	picture["tags"] = {}
 	local intag = false
 	local intagwrap = false
-	local inid = false;
+	local inid = false
 	for v,t in itr do
 		if( not v and t ) then
 			-- begin tag
@@ -353,13 +378,13 @@ local function transform_picture( itr )
 			elseif( t == "tag" ) then
 				intag = true
 			elseif( t == "caption" or t == "info" or t == "image" ) then
-				picture[ t] = content_value( v, itr)
+				picture[ t] = content_value( scope( itr))
 			end
 		elseif( v and t ) then
 			-- attribute
 			inid = true
 			if ( ( t == "id" ) and not intagwrap and not intag ) then
-				picture[ t] = content_value( v, itr )
+				picture[ t] = v
 			elseif( t == "id" and intag and intagwrap ) then
 				table.insert( picture["tags"], { ["id"] = v } )
 			end
@@ -385,7 +410,7 @@ local function transform_picture( itr )
 end
 
 local function delete_picture( itr)
-	local id = nil;
+	local id = nil
 	for v,t in itr do
 		if t == "id" then
 			id = v
