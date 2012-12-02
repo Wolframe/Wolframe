@@ -157,6 +157,26 @@ static bool pushArguments( TransactionOutput::CommandResultBuilder& cmdres, cons
 	return true;
 }
 
+static TransactionInput::cmd_iterator endOfOperation( TransactionInput::cmd_iterator ci, TransactionInput::cmd_iterator ce)
+{
+	std::size_t level = ci->level();
+	for (++ci; ci != ce && (ci->level() > level || (ci->level() == level && !ci->name().empty())); ++ci);
+	return ci;
+}
+
+namespace {
+struct OperationLoop
+{
+	TransactionOutput::row_iterator wi,we;
+	TransactionInput::cmd_iterator ci,ce;
+
+	OperationLoop( TransactionInput::cmd_iterator ci_, TransactionInput::cmd_iterator ce_, TransactionOutput::row_iterator wi_, TransactionOutput::row_iterator we_)
+		:wi(wi_),we(we_),ci(ci_),ce(ce_){}
+	OperationLoop( const OperationLoop& o)
+		:wi(o.wi),we(o.we),ci(o.ci),ce(o.ce){}
+};
+}//namespace
+
 bool PreparedStatementHandler::doTransaction( const TransactionInput& input, TransactionOutput& output)
 {
 	enum OperationType
@@ -167,10 +187,27 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 	OperationType optype = DatabaseCall;
 	std::size_t null_functionidx = std::numeric_limits<std::size_t>::max();
 	TransactionOutput::CommandResultBuilder cmdres( &output, null_functionidx, 0);
+	std::vector<OperationLoop> loopstk;
 
 	TransactionInput::cmd_iterator ci = input.begin(), ce = input.end();
 	for (; ci != ce; ++ci)
 	{
+		if (!loopstk.empty())
+		{
+			if (ci == loopstk.back().ce)
+			{
+				if (loopstk.back().wi != loopstk.back().we)
+				{
+					ci = loopstk.back().ci;
+					if (!pushArguments( cmdres, loopstk.back().wi, ci)) return false;
+					++loopstk.back().wi;
+				}
+				else
+				{
+					loopstk.pop_back();
+				}
+			}
+		}
 		if (ci->name().empty())
 		{
 			optype = PushArguments;
@@ -204,6 +241,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 			switch (optype)
 			{
 				case PushArguments:
+					// start of an operation: execution of a instruction block
 					ri = output.last( ci->level()-1);
 					if (ri != output.end())
 					{
@@ -211,18 +249,13 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 						if (wi != we)
 						{
 							if (!pushArguments( cmdres, wi, ci)) return false;
-							++wi;
-							if (wi != we) throw std::runtime_error( "more than one result element referenced for OPERATION call");
-							///< PF:TODO: Implement stack with loop iterators (result_iterator, jump address :cmd_iterator)
+							loopstk.push_back( OperationLoop( ci, endOfOperation( ci, ce), ++wi, we));
+							break;
 						}
 					}
-					else
-					{
-						//... no result, we have to jump over all function of the operation, not only the parameter passing
-						std::size_t level = ci->level();
-						for (++ci; ci != ce && (ci->level() > level || (ci->level() == level && !ci->name().empty())); ++ci);
-						--ci;
-					}
+					//... no result, so we have to skip all operation steps, not only the parameter passing
+					ci = endOfOperation( ci, ce);
+					--ci; //... decrement for loop increment compensate
 					break;
 
 				case DatabaseCall:

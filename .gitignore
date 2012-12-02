@@ -149,7 +149,6 @@ tests/freeimage/freeimageTestCpp
 tests/freeimage/testmem.png
 tests/freeimage/thumb.png
 tests/freeimage/thumbcpp.png
-tests/testSHA2
 *.qm
 sqlite3/sqlite3
 tests/boost-locale/boostLocaleTest
