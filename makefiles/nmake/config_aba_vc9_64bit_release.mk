@@ -66,6 +66,10 @@ ICU_DIR = C:\Cygwin\home\Andreas\icu-4.4.2-win64-release
 #ICU_LIB_VERSION = 49
 ICU_LIB_VERSION =
 
+# TODO: probe!
+#ICU_LIB_DIR = $(ICU_DIR)\lib
+ICU_LIB_DIR = $(ICU_DIR)\lib64
+
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 
@@ -154,5 +158,5 @@ HHC_LOCATION = C:\Program Files (x86)\HTML Help Workshop\hhc.exe
 # CCacche
 #########
 
-#CC="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
-#CXX="C:\cygwin\home\Andreas Baumann\ccache.exe" "C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\cl.exe"
+CC="C:\cygwin\home\Andreas\ccache.exe" "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\cl.exe"
+CXX="C:\cygwin\home\Andreas\ccache.exe" "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\cl.exe"

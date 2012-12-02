@@ -29,7 +29,7 @@ OPENSSL_LIBS = libeay32.lib ssleay32.lib
 
 !IFDEF WITH_ICU
 
-ICU_LDFLAGS = /LIBPATH:"$(ICU_DIR)\lib"
+ICU_LDFLAGS = /LIBPATH:"$(ICU_LIB_DIR)"
 
 !IFNDEF DEBUG
 ICU_LIBS = icuin.lib icuuc.lib
