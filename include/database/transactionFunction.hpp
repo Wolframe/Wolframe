@@ -126,21 +126,14 @@ struct TransactionDescription
 		unique = false;
 	}
 
-	enum ElementName
-	{
-		Selector,Call,Output
-	};
-
 	///\class Error
 	///\brief Error thrown by createTransactionFunction( const proc::ProcessorProvider*,const std::vector<>&);
 	struct Error
 	{
-		Error( ElementName elemname_, std::size_t elemidx_, const std::string& msg_)
-			:elemname(elemname_)
-			,elemidx(elemidx_)
+		Error( std::size_t elemidx_, const std::string& msg_)
+			:elemidx(elemidx_)
 			,msg(msg_){}
 
-		ElementName elemname;
 		std::size_t elemidx;
 		std::string msg;
 	};

@@ -1337,7 +1337,6 @@ void TransactionFunctionOutput::resetIterator()
 TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap)
 {
 	typedef TransactionDescription::Error Error;
-	TransactionDescription::ElementName elementName = TransactionDescription::Call;
 
 	if (!resultname.empty())
 	{
@@ -1346,23 +1345,20 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 	std::vector<TransactionDescription>::const_iterator di = description.begin(), de = description.end();
 	for (; di != de; ++di)
 	{
-		elementName = TransactionDescription::Call;
 		std::size_t eidx = di - description.begin();
 
 		// Build Function call object for parsed function:
 		try
 		{
-			elementName = TransactionDescription::Selector;
 			Path selector( di->selector, &m_tagmap);
 			if (selector.resultReference())
 			{
-				throw Error( elementName, eidx, "undefined: result variable reference in selector");
+				throw Error( eidx, "undefined: result variable reference in selector");
 			}
 			if (selector.constantReference())
 			{
-				throw Error( elementName, eidx, "undefined: constant as selector");
+				throw Error( eidx, "undefined: constant as selector");
 			}
-			elementName = TransactionDescription::Call;
 			std::vector<Path> param;
 			std::vector<std::string>::const_iterator ai = di->call.second.begin(), ae = di->call.second.end();
 			for (; ai != ae; ++ai)
@@ -1394,11 +1390,11 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 
 				if (di->nonempty)
 				{
-					throw Error( elementName, eidx, "NONEMTY not supported for call of OPERATION");
+					throw Error( eidx, "NONEMTY not supported for call of OPERATION");
 				}
 				if (di->unique)
 				{
-					throw Error( elementName, eidx, "UNIQUE not supported for call of OPERATION");
+					throw Error( eidx, "UNIQUE not supported for call of OPERATION");
 				}
 				if (!di->output.empty())
 				{
@@ -1430,7 +1426,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 		}
 		catch (const std::runtime_error& e)
 		{
-			throw Error( elementName, eidx, e.what());
+			throw Error( eidx, e.what());
 		}
 	}
 	if (!resultname.empty())

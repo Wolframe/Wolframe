@@ -276,6 +276,7 @@ struct Operation
 		:name(o.name),start(o.start),isTransaction(o.isTransaction),descar(o.descar),resultname(o.resultname),callstartar(o.callstartar),embstm_index(o.embstm_index){}
 
 	std::string name;
+	langbind::Authorization authorization;
 	std::string::const_iterator start;
 	bool isTransaction;
 	std::vector<TransactionDescription> descar;
@@ -292,11 +293,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 	std::string::const_iterator si = source.begin(), se = source.end();
 	std::string::const_iterator tokstart;
 	std::string::const_iterator dbi = source.begin();
-	Operation* curop = 0;
-	std::vector<Operation> operationar;
 	types::keymap<TransactionFunctionR> operationmap;
-	std::string authorization_function;
-	std::string authorization_resource;
 
 	config::PositionalErrorMessageBase ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
@@ -331,8 +328,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 				if (!ch) throw ERROR( si, MSG << "unexpected end of transaction definition (transaction name expected)");
 				if (m_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
 
-				operationar.push_back( Operation( transactionName, dbe, isTransaction));
-				curop = &operationar.back();
+				Operation operation( transactionName, dbe, isTransaction);
 
 				dbsource.append( std::string( dbi, dbe));
 				dbi = dbe;
@@ -348,18 +344,21 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						{
 							throw ERROR( si, "INTO expected after RESULT");
 						}
-						if (0==(ch = parseNextToken( curop->resultname, si, se)))
+						if (0==(ch = parseNextToken( operation.resultname, si, se)))
 						{
 							throw ERROR( si, "unexpected end of description. name of result tag expected after RESULT INTO");
 						}
-						if (ch == '.') curop->resultname.push_back(ch);
-						if (!checkResultIdentifier( curop->resultname))
+						if (ch == '.') operation.resultname.push_back(ch);
+						if (!checkResultIdentifier( operation.resultname))
 						{
 							throw ERROR( si, "identifier expected after RESULT INTO");
 						}
 					}
 					else if (boost::algorithm::iequals( tok, "AUTHORIZE"))
 					{
+						std::string authfunction;
+						std::string authresource;
+
 						if (isTransaction)
 						{
 							throw ERROR( si, "Cannot define AUTHORIZE in operation. Only allowed as TRANSACTION definition attribute");
@@ -367,11 +366,11 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						ch = gotoNextToken( si, se);
 						if (ch != '(') throw ERROR( si, "Open bracket '(' expected after AUTHORIZE function call");
 						si++;
-						if (!parseNextToken( authorization_function, si, se))
+						if (!parseNextToken( authfunction, si, se))
 						{
 							throw ERROR( si, "unexpected end of description. function name expected after AUTHORIZE");
 						}
-						if (authorization_function.empty())
+						if (authfunction.empty())
 						{
 							throw ERROR( si, "AUTHORIZE function name must not be empty");
 						}
@@ -379,7 +378,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						if (ch == ',')
 						{
 							++si;
-							if (!parseNextToken( authorization_resource, si, se))
+							if (!parseNextToken( authresource, si, se))
 							{
 								throw ERROR( si, "unexpected end of description. resource name expected as argument of AUTHORIZE function call");
 							}
@@ -390,6 +389,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 							throw ERROR( si, "Close bracket ')' expected after AUTHORIZE function defintion");
 						}
 						++si;
+						operation.authorization.init( authfunction, authresource);
 					}
 					else
 					{
@@ -402,15 +402,15 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 				}
 				while ((ch = parseNextToken( tok, si, se)) != 0)
 				{
-					while (curop->callstartar.size() <= curop->descar.size())
+					while (operation.callstartar.size() <= operation.descar.size())
 					{
-						curop->callstartar.push_back( si);
+						operation.callstartar.push_back( si);
 					}
 					if (ch == ';')
 					{
 						if (mask)
 						{
-							curop->descar.push_back( desc);
+							operation.descar.push_back( desc);
 							desc.clear();
 							mask = 0;
 						}
@@ -425,26 +425,45 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 					}
 					else if (boost::algorithm::iequals( tok, "END"))
 					{
+						try
+						{
+							if (operation.isTransaction)
+							{
+								m_functionmap[ operation.name] = TransactionFunctionR( createTransactionFunction( operation.name, operation.descar, operation.resultname, operationmap, operation.authorization));
+							}
+							else
+							{
+								operationmap[ operation.name] = TransactionFunctionR( createTransactionFunction( operation.name, operation.descar, operation.resultname, operationmap, operation.authorization));
+							}
+						}
+						catch (const TransactionDescription::Error& err)
+						{
+							throw ERROR( operation.callstartar[ err.elemidx], MSG << "error in definition of transaction: " << err.msg);
+						}
+						catch (const std::runtime_error& err)
+						{
+							throw ERROR( operation.start, MSG << "error in definition of transaction: " << err.what());
+						}
 						break;
 					}
 					else if (boost::algorithm::iequals( tok, "FOREACH"))
 					{
-						if (0 != (mask & (1 << (unsigned)TransactionDescription::Selector)))
+						if (0 != (mask & 0x1))
 						{
 							throw ERROR( si, "selector (FOREACH ..) specified twice in a transaction description");
 						}
-						mask |= (1 << (unsigned)TransactionDescription::Selector);
+						mask |= 0x1;
 
 						ch = utils::parseNextToken( desc.selector, si, se, utils::emptyCharTable(), utils::anyCharTable());
 						if (!ch) throw ERROR( si, "unexpected end of description. sector path expected after FOREACH");
 					}
 					else if (boost::algorithm::iequals( tok, "INTO"))
 					{
-						if (0 != (mask & (1 << (unsigned)TransactionDescription::Output)))
+						if (0 != (mask & 0x2))
 						{
 							throw ERROR( si, "function result (INTO ..) specified twice in a transaction description");
 						}
-						mask |= (1 << (unsigned)TransactionDescription::Output);
+						mask |= 0x2;
 
 						ch = parseNextToken( desc.output, si, se);
 						if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after INTO");
@@ -457,11 +476,11 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 					}
 					else if (boost::algorithm::iequals( tok, "DO"))
 					{
-						if (0 != (mask & (1 << (unsigned)TransactionDescription::Call)))
+						if (0 != (mask & 0x4))
 						{
 							throw ERROR( si, "function call (DO ..) specified twice in a transaction description");
 						}
-						mask |= (1 << (unsigned)TransactionDescription::Call);
+						mask |= 0x4;
 
 						std::string::const_iterator oi = si;
 						while (parseNextToken( tok, oi, se))
@@ -487,7 +506,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						}
 						if (m_langdescr->isEmbeddedStatement( si, se))
 						{
-							desc.call = parseEmbeddedStatement( transactionName, curop->embstm_index++, si, se);
+							desc.call = parseEmbeddedStatement( transactionName, operation.embstm_index++, si, se);
 						}
 						else
 						{
@@ -514,48 +533,6 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 		throw ERROR( si, e.what());
 	}
 	dbsource.append( std::string( dbi, source.end()));
-
-	std::vector<Operation>::const_iterator oi = operationar.begin(), oe = operationar.end();
-	for (; oi != oe; ++oi)
-	{
-		try
-		{
-			langbind::Authorization auth;
-			if (oi->isTransaction)
-			{
-				if (!authorization_function.empty())
-				{
-					auth = langbind::Authorization( authorization_function, authorization_resource);
-				}
-				m_functionmap[ oi->name] = TransactionFunctionR( createTransactionFunction( oi->name, oi->descar, oi->resultname, operationmap, auth));
-			}
-			else
-			{
-				operationmap[ oi->name] = TransactionFunctionR( createTransactionFunction( oi->name, oi->descar, oi->resultname, operationmap, auth));
-			}
-		}
-		catch (const TransactionDescription::Error& err)
-		{
-			std::string errlocation;
-			switch (err.elemname)
-			{
-				case TransactionDescription::Selector:
-					errlocation = "in selector expression (FOREACH ..)";
-				break;
-				case TransactionDescription::Output:
-					errlocation = "in transaction ouput (INTO ..)";
-				break;
-				case TransactionDescription::Call:
-					errlocation = "in transaction call (DO ..)";
-				break;
-			}
-			throw ERROR( oi->callstartar[ err.elemidx], MSG << "error in definition of transaction '" << oi->name << "' " << errlocation << ": "<< err.msg);
-		}
-		catch (const std::runtime_error& err)
-		{
-			throw ERROR( oi->start, MSG << "error in definition of transaction '" << oi->name << "': " << err.what());
-		}
-	}
 }
 
 const TransactionFunction* TransactionProgram::function( const std::string& name) const

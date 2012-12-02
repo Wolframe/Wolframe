@@ -25,7 +25,6 @@ PF:
 
 - low prio
   - cmdline client: test with SSL
-  - TODOs in libwolframe_database (doTransaction)
   - bignum tests (only bigint tested until now)
   - XSLT filter + tests
   - Printing with HPDF
