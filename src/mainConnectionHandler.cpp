@@ -245,7 +245,14 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		std::ostringstream msg;
 		msg << "failed to retrieve document type (" << error << ")";
 		cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
-		out << "ANSWER" << endl();
+		if (m_commandtag.empty())
+		{
+			out << "ANSWER" << endl();
+		}
+		else
+		{
+			out << "ANSWER " << '&' << m_commandtag << endl();
+		}
 		if (redirectConsumedInput( chnd, delegate_ch, out))
 		{
 			delegateProcessing<&CommandHandler::endErrDocumentType>( delegate_ch);
@@ -265,7 +272,14 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		std::ostringstream msg;
 		msg << "no command handler for '" << m_command << "'";
 		execch = (cmdbind::CommandHandler*)new cmdbind::DiscardInputCommandHandlerEscDLF( msg.str());
-		out << "ANSWER" << endl();
+		if (m_commandtag.empty())
+		{
+			out << "ANSWER" << endl();
+		}
+		else
+		{
+			out << "ANSWER " << '&' << m_commandtag << endl();
+		}
 		if (redirectConsumedInput( chnd, execch, out))
 		{
 			delegateProcessing<&CommandHandler::endErrDocumentType>( execch);
@@ -279,7 +293,14 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 	{
 		execch->passParameters( m_command, 0, 0);
 		execch->setProcProvider( m_provider);
-		out << "ANSWER" << endl();
+		if (m_commandtag.empty())
+		{
+			out << "ANSWER" << endl();
+		}
+		else
+		{
+			out << "ANSWER " << '&' << m_commandtag << endl();
+		}
 		if (redirectConsumedInput( chnd, execch, out))
 		{
 			delegateProcessing<&CommandHandler::endRequest>( execch);
@@ -299,16 +320,33 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 int CommandHandler::doRequest( int argc, const char** argv, std::ostream& out)
 {
 	m_command.clear();
+	m_commandtag.clear();
 	if (argc)
 	{
-		if (argc > 1)
+		bool has_commandtag = false;
+		bool has_command = false;
+		for (int ii=0; ii<argc; ++ii)
 		{
-			out << "ERR to many arguments" << endl();
-			return stateidx();
-		}
-		else
-		{
-			m_command = argv[0];
+			if (argv[ii][0] == '&')
+			{
+				if (has_commandtag)
+				{
+					out << "ERR more than one command tag" << endl();
+					return stateidx();
+				}
+				has_commandtag = true;
+				m_commandtag.append( argv[ii]+1);
+			}
+			else
+			{
+				if (has_command)
+				{
+					out << "ERR to many arguments" << endl();
+					return stateidx();
+				}
+				has_command = true;
+				m_command.append( argv[ii]);
+			}
 		}
 	}
 	CommandHandler* ch = (CommandHandler*)new cmdbind::DoctypeFilterCommandHandler();

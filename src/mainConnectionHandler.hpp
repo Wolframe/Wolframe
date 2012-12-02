@@ -77,6 +77,7 @@ private:
 private:
 	AuthMechanisms m_authMechanisms;
 	std::string m_command;
+	std::string m_commandtag;
 	std::vector<std::string> m_authtickets;
 };
 

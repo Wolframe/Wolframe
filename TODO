@@ -21,12 +21,10 @@ PF:
   - sqlite schemas, scripts
     - products
 - high prio
-  - Bug in libxml filter in handling <tag/>
   - UIForm loader in client and server
 
 - low prio
-  - make scope(itr) in lua more tolerant (delegate also attribute parsing)
-  - tagged request/answer in protocol
+  - cmdline client: test with SSL
   - TODOs in libwolframe_database (doTransaction)
   - bignum tests (only bigint tested until now)
   - XSLT filter + tests
