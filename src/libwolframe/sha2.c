@@ -215,6 +215,7 @@ uint64 sha512_k[80] =	{
 	0x5fcb6fab3ad6faecULL, 0x6c44198c4a475817ULL
 };
 
+
 /* SHA-256 functions */
 
 static void sha256_transf( sha256_ctx *ctx, const unsigned char *data,

@@ -46,7 +46,6 @@
 #define R4(v,w,x,y,z,i) z += (w^x^y)+blk(i)+0xCA62C1D6+rol(v,5);w=rol(w,30);
 
 /* Hash a single 512-bit block. This is the core of the algorithm. */
-
 static void SHA1Transform( uint32_t state[5], const unsigned char *buffer )
 {
 	typedef union	{
@@ -104,11 +103,11 @@ void sha1_init(sha1_ctx *context)
 {
 	/* SHA1 initialization constants */
 	context->count = 0;
-	context->state[0] = 0x67452301;
-	context->state[1] = 0xEFCDAB89;
-	context->state[2] = 0x98BADCFE;
-	context->state[3] = 0x10325476;
-	context->state[4] = 0xC3D2E1F0;
+	context->state[ 0 ] = 0x67452301;
+	context->state[ 1 ] = 0xEFCDAB89;
+	context->state[ 2 ] = 0x98BADCFE;
+	context->state[ 3 ] = 0x10325476;
+	context->state[ 4 ] = 0xC3D2E1F0;
 }
 
 /* Run your data through this. */

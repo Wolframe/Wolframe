@@ -209,6 +209,7 @@ private:
 class SQLiteDBunit : public DatabaseUnit
 {
 	friend class SQLiteTransaction;
+	friend class SQLiteUIlibrary;
 public:
 	SQLiteDBunit( const std::string& id, const std::string& filename,
 		      bool foreignKeys, bool profiling,
