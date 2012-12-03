@@ -178,6 +178,7 @@ protected:
 				socket().lowest_layer().close();
 			}
 			unregister();
+			LOG_DEBUG << "Connection to " << identifier() << " closed";
 		}
 			break;
 		}

@@ -48,10 +48,10 @@ Version::Version()
 {}
 
 Version::Version( unsigned long version )
-	: m_major( version / 1000000lu ),
-	  m_minor(( version % 1000000lu ) / 10000 ),
-	  m_revision( ( version % 10000lu ) / 100 ), m_hasRevision( true ),
-	  m_build( version % 100 ), m_hasBuild( true )
+	: m_major( version / 10000000lu ),
+	  m_minor(( version % 10000000lu ) / 100000 ),
+	  m_revision( ( version % 100000lu ) / 1000 ), m_hasRevision( true ),
+	  m_build( version % 1000 ), m_hasBuild( true )
 {}
 
 Version::Version( unsigned short M, unsigned short m )
@@ -95,6 +95,11 @@ bool Version::operator > ( const Version &other ) const
 	return false;
 }
 
+bool Version::isCompatible( const Version &other ) const
+{
+	if ( m_major != other.m_major )		return false;
+	if ( m_minor > other.m_minor )		return false;
+}
 
 std::string Version::toString() const
 {
@@ -154,7 +159,7 @@ unsigned long Version::toNumber() const
 
 	if ( m_hasBuild )	{
 		bld = m_build;
-		while( bld > 100 )
+		while( bld > 1000 )
 			bld /= 10;
 	}
 
@@ -172,7 +177,7 @@ unsigned long Version::toNumber() const
 	while( mjr > 100 )
 		mjr /= 10;
 
-	return bld + rev * 100 + mnr * 10000 + mjr * 1000000;
+	return bld + rev * 1000 + mnr * 100000 + mjr * 10000000;
 }
 
 } // namespace _Wolframe

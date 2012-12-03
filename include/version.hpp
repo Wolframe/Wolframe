@@ -76,6 +76,10 @@ public:
 	bool operator <  ( const Version &other ) const	{ return  ( other > *this ); }
 	bool operator <= ( const Version &other ) const	{ return !( *this > other ); }
 
+	/// Test if the other version is compatible with this version
+	/// using the usual OSS versioning schemas
+	bool isCompatible( const Version &other ) const;
+
 	/// \brief Print the version in 'major.minor.revision.build' format.
 	std::string toString() const;
 
