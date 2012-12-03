@@ -1,7 +1,7 @@
 now:
-- adapt to changes in tdl files (INTO construct)
 - stop the "whiteout", especially seen after assigning pictures
-  (must be a protocol thing)
+  (must be a protocol thing), happens mainly on Windows 7/8, not
+  on Linux/Windows XP
 - ILLEGAL STATE 4 in dataAvailable!
 - CRITICAL: "Premature end of document."
 
