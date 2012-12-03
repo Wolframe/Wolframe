@@ -62,12 +62,19 @@ CREATE TABLE UIobjectType (
 	typeName	TEXT
 );
 
+INSERT INTO UIobjectType ( typeName ) VALUES ( 'Menu' );
+INSERT INTO UIobjectType ( typeName ) VALUES ( 'Form' );
+
 
 CREATE TABLE UIobjectName (
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	ENname		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE
 );
+
+INSERT INTO UIobjectName ( ENname, normalizedName ) VALUES ( 'Pictures Management', 'PICTURES MANAGEMENT' );
+INSERT INTO UIobjectName ( ENname, normalizedName ) VALUES ( 'Categories Management', 'CATEGORIES MANAGEMENT' );
+INSERT INTO UIobjectName ( ENname, normalizedName ) VALUES ( 'Features Management', 'FEATURES MANAGEMENT' );
 
 
 CREATE TABLE UIobject (
@@ -79,6 +86,8 @@ CREATE TABLE UIobject (
 	body		TEXT
 );
 
+INSERT INTO UIobject ( ID, platformID, typeID, locale, version, body )
+	VALUES ( 1, 1, 1, 'en', 10000000, 'bla bla' );
 
 -- Authentication
 --
