@@ -83,6 +83,7 @@ $(DYNAMIC_MODULE): $(CPP_OBJS)
 
 local_clean:
 	@-erase moc_*.cpp filechooser\moc_*.cpp picturechooser\moc_*.cpp 2>NUL
+	@-erase filechooser\*.obj picturechooser\*.obj 2>NUL
 	@-erase Makefile Makefile.Release Makefile.Debug 2>NUL
 	
 local_distclean:
