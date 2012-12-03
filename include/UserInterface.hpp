@@ -52,6 +52,7 @@ public:
 	class Info
 	{
 	public:
+		Info(){}
 		Info( const Info& o)
 			: m_type( o.m_type ), m_platform( o.m_platform ),
 			  m_name( o.m_name ), m_culture( o.m_culture ),
@@ -79,6 +80,7 @@ public:
 	};
 
 	/// Constructor
+	InterfaceObject(){}
 	InterfaceObject( const InterfaceObject& o)
 		: m_info( o.m_info ),
 		  m_body ( o.m_body ){}

@@ -177,7 +177,7 @@ int InterfaceCommandHandler::doDescription( int argc, const char** argv, std::os
 {
 	//DESCRIPTION platform culture type name version
 	UI::InterfaceObject obj;
-	if (!initInterfaceObject( &obj, argc, argv, out)) return stateidx();
+	if (!initInterfaceObject( obj, argc, argv, out)) return stateidx();
 	out << "DESCRIPTION" << endl();
 	out << protocol::escapeStringDLF( obj.info().description());
 	out << "OK" << endl();
@@ -188,14 +188,14 @@ int InterfaceCommandHandler::doBody( int argc, const char** argv, std::ostream& 
 {
 	//BODY platform culture type name version
 	UI::InterfaceObject obj;
-	if (!initInterfaceObject( &obj, argc, argv, out)) return stateidx();
+	if (!initInterfaceObject( obj, argc, argv, out)) return stateidx();
 	out << "DESCRIPTION" << endl();
 	out << protocol::escapeStringDLF( obj.body());
 	out << "OK" << endl();
 	return stateidx();
 }
 
-int InterfaceCommandHandler::doDone( int argc, const char** argv, std::ostream& out)
+int InterfaceCommandHandler::doDone( int argc, const char**, std::ostream& out)
 {
 	if (argc > 0)
 	{
