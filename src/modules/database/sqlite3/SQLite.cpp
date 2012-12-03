@@ -366,11 +366,84 @@ SQLiteUIlibrary::SQLiteUIlibrary( const SQLiteDatabase &database )
 	: m_unit( database.dbUnit() )
 {}
 
-const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::infos( const std::string& /*platform*/,
-								     const std::string& /*role*/,
-								     const std::string& /*culture*/ ) const
+const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::infos( const std::string& platform,
+								     const std::string& role,
+								     const std::string& culture ) const
 {
 	std::list< UI::InterfaceObject::Info >	objs;
+
+	bool condition = false;
+	PoolObject< sqlite3* > conn( m_unit.m_connPool );
+	sqlite3_stmt* ppStmt = NULL;
+	std::ostringstream errMsg;
+	bool success = true;
+
+	std::string query = "SELECT platform.name, locale, typeName "
+			"FROM UIobject JOIN Platform ON Platform.ID = UIobject.platformID "
+			"JOIN UIobjectType ON UIobject.typeID=UIobjectType.ID";
+
+	std::string cond = " WHERE ";
+	if ( ! platform.empty() )	{
+		cond += "upper( Platform.name ) = "
+				+ boost::algorithm::to_upper_copy( platform );
+		condition = true;
+	}
+
+	if ( ! role.empty() )	{
+		if ( condition )
+			cond += "AND upper( Platform.name ) = "
+					+ boost::algorithm::to_upper_copy( platform );
+		else	{
+			cond += "";
+			condition = true;
+		}
+	}
+
+	if ( ! culture.empty() )	{
+		if ( condition )
+			cond += "AND upper( culture ) = "
+					+ boost::algorithm::to_upper_copy( culture );
+		else	{
+			cond += "upper( culture ) = "
+					+ boost::algorithm::to_upper_copy( culture );
+			condition = true;
+		}
+	}
+
+	if ( condition )
+		query += cond;
+	int rc = sqlite3_prepare_v2( *conn, query.c_str(), -1, &ppStmt, NULL );
+	if ( rc != SQLITE_OK )	{
+		const char* str = sqlite3_errmsg( *conn );
+		int errcode = sqlite3_errcode( *conn );
+		errMsg << "SQLite error " << errcode << ": " << str;
+		success = false;
+	}
+	else	{
+		assert ( ppStmt != NULL );
+		while ( success )	{
+			rc = sqlite3_step( ppStmt );
+			if ( rc == SQLITE_ROW )	{
+				const unsigned char* text;
+				text = sqlite3_column_text ( ppStmt, 0 );
+				std::cout << text << ", ";
+//				UI::InterfaceObject::Info info();
+//				objs.push_back( info );
+			}
+			else if ( rc == SQLITE_DONE )
+				break;
+			else	{
+				const char* str = sqlite3_errmsg( *conn );
+				int errcode = sqlite3_errcode( *conn );
+				errMsg << "SQLite error " << errcode << ": " << str;
+				success = false;
+			}
+		}
+	}
+	sqlite3_finalize( ppStmt );
+	if ( !success )
+		throw std::runtime_error( errMsg.str() );
+
 	return objs;
 }
 
