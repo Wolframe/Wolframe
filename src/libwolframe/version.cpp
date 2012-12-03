@@ -109,15 +109,13 @@ Version::Version( const char* version, const char* format)
 	{
 		if (!format[fi])
 		{}
-		else if (format[fi] == '%' && format[fi+1] == '%|')
+		else if (format[fi] == '%' && format[fi+1] == '|')
 		{}
 		else
 		{
 			throw std::runtime_error( "version string syntax error");
 		}
 	}
-
-INIT_VERSION:
 	if (cnt[0] && cnt[1])
 	{
 		if (cnt[2])
