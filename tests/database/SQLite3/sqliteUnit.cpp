@@ -60,6 +60,7 @@ TEST_F( SQLiteModuleFixture, UserInterface )
 
 	std::list< InterfaceObject::Info > objs = lib->infos( "", "", "" );
 	EXPECT_TRUE( objs.empty() );
+	delete lib;
 }
 
 int main( int argc, char **argv )
