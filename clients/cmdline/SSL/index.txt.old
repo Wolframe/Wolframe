@@ -1,0 +1,12 @@
+V	110319104813Z		01	unknown	/C=XY/ST=Smerpland/L=Smerpville/O=Smerp Corp./OU=Smerp Testing/CN=SMERP Server/emailAddress=server@smerp.xy
+V	110403232729Z		02	unknown	/C=XY/ST=ClientLand/L=ClientVille/O=Client Group Ltd./OU=Client Dept./CN=client.clientland.xy/emailAddress=client@clientland.xy
+V	110403234509Z		03	unknown	/C=XY/ST=Smerpland/L=Smerponia/O=SMERP Clients A.G./OU=Client Dept./CN=client.smerp.xy/emailAddress=client@smerp.xy
+V	110404002940Z		04	unknown	/C=XY/ST=Smerpland/L=Smerpdorf/O=Smerp Corp./OU=Smerp Servers/CN=SMERP Server with password/emailAddress=smerpdpwd@smerp.xy
+V	120301000440Z		05	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Server/emailAddress=server@wolframe.net
+V	120301000705Z		06	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Server (password protected)/emailAddress=server@wolframe.net
+V	120301000934Z		07	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Client/emailAddress=client@wolframe.net
+V	120301002419Z		08	unknown	/C=YZ/ST=Client Empire/L=Client City/O=Client Inc./OU=Client Users Group/CN=Ordinary Client/emailAddress=ordinary@client.yz
+V	131016145833Z		09	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Client/emailAddress=client@wolframe.net
+V	131016150157Z		0A	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Server/emailAddress=server@wolframe.net
+V	131016150833Z		0B	unknown	/C=XY/ST=Wolfland/L=Wolfville/O=Wolf Pack Ltd/OU=Dinowolves Group/CN=Wolframe Server (password protected)/emailAddress=server-pwd@wolframe.net
+V	131016151725Z		0C	unknown	/C=YZ/ST=Client Empire/L=Client City/O=Client Inc./OU=Client Users Group/CN=Ordinary Client/emailAddress=ordinary@client.yz

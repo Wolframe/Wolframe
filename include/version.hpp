@@ -53,6 +53,16 @@ private:
 public:
 	/// Empty Version constructor.
 	Version();
+	///\brief Parse a version string
+	///\param[in] version the version string to parse
+	///\param[in] format the format string of the version:
+	//	%M = Major version
+	//	%m = Minor version
+	//	%r = revision
+	//	%b = build number
+	//	%% = %
+	//	%| = Accepted end of version string (if the version string ends here, the input is accepted. If not parsing is continued with the rest of the format string as pattern)
+	explicit Version( const char* version, const char* format="%M.%m%|.%r%|.%b");
 	Version( unsigned long version );
 	Version( unsigned short M, unsigned short m );
 	Version( unsigned short M, unsigned short m, unsigned short r );

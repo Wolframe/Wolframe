@@ -30,25 +30,36 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file authCommandHandler.hpp
-///\brief Interface to AUTH command handler
-#ifndef _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
-#define _Wolframe_AUTH_COMMAND_HANDLER_HPP_INCLUDED
+///\file interfaceCommandHandler.hpp
+///\brief Interface to INTERFACE command handler (sub statemachine)
+#ifndef _Wolframe_INTERFACE_COMMAND_HANDLER_HPP_INCLUDED
+#define _Wolframe_INTERFACE_COMMAND_HANDLER_HPP_INCLUDED
 #include "cmdbind/lineCommandHandler.hpp"
+#include "UserInterface.hpp"
+#include <list>
+#include <string>
 
 namespace _Wolframe {
-namespace cmdbind {
+namespace proc {
 
-class AuthCommandHandler :public cmdbind::LineCommandHandlerTemplate<AuthCommandHandler>
+class InterfaceCommandHandler :public cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>
 {
 public:
-	AuthCommandHandler();
-	virtual ~AuthCommandHandler(){}
+	typedef cmdbind::LineCommandHandlerTemplate<CommandHandler> Parent;
+	InterfaceCommandHandler();
+	virtual ~InterfaceCommandHandler(){}
 
-	const std::string& ticket() const	{return m_ticket;}
+public:
+	int doCapabilities( int argc, const char** argv, std::ostream& out);
+	int doVersion( int argc, const char** argv, std::ostream& out);
+	int doInfo( int argc, const char** argv, std::ostream& out);
+	int doDescription( int argc, const char** argv, std::ostream& out);
+	int doBody( int argc, const char** argv, std::ostream& out);
+	int doDone( int argc, const char** argv, std::ostream& out);
 
 private:
-	std::string m_ticket;
+	bool initInterfaceObject( UI::InterfaceObject& obj, int argc, const char** argv, std::ostream& out);
+	std::list<std::string> m_roles;
 };
 
 }}//namespace

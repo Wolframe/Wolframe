@@ -54,6 +54,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	wolframedCommandLine.obj \
 	wolfilterCommandLine.obj \
 	mainConnectionHandler.obj \
+	interfaceCommandHandler.obj \
 	loadModules.obj \
 	serviceConfig.obj \
 	serviceBanner.obj \
