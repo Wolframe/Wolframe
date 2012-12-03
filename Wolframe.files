@@ -106,6 +106,7 @@ clients/cmdline/GNUmakefile
 clients/cmdline/Makefile.W32
 clients/cmdline/options.cpp
 clients/cmdline/options.hpp
+clients/cmdline/SSL/genkeys.sh
 clients/cmdline/utils.cpp
 clients/cmdline/utils.hpp
 clients/cmdline/wolframec.cpp
@@ -1645,6 +1646,8 @@ src/connection.hpp
 src/exceptionBase.hpp
 src/GNUmakefile
 src/handlerConfig.hpp
+src/interfaceCommandHandler.cpp
+src/interfaceCommandHandler.hpp
 src/langbind_iostreamfilter.cpp
 src/libwolframe/b64decode.c
 src/libwolframe/b64encode.c

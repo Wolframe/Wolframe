@@ -131,28 +131,27 @@ public:
 	~SQLiteUIlibrary()			{}
 
 	virtual const std::list< UI::InterfaceObject::Info > infos( const std::string& platform,
-							       const std::string& role,
-							       const std::string& culture ) const;
+								    const std::string& role,
+								    const std::string& culture ) const;
 	virtual const std::list< UI::InterfaceObject::Info > infos( const std::string& platform,
-							       const std::list< std::string >& roles,
-							       const std::string& culture ) const;
+								    const std::list< std::string >& roles,
+								    const std::string& culture ) const;
 
 	virtual const std::list< UI::InterfaceObject::Info > versions( const std::string& platform,
-								  const std::string& name,
-								  const std::string& culture ) const;
+								       const std::string& name,
+								       const std::string& culture ) const;
 
 	virtual const UI::InterfaceObject object( const std::string& platform,
-				       const std::string& name,
-				       const std::string& culture ) const;
+						  const std::string& name,
+						  const std::string& culture ) const;
 	virtual const UI::InterfaceObject object( const std::string& platform,
-				       const std::string& name, const Version& version,
-				       const std::string& culture ) const;
+						  const std::string& name, const Version& version,
+						  const std::string& culture ) const;
 	virtual const UI::InterfaceObject object( const UI::InterfaceObject::Info& info ) const;
 
 	virtual void addObject( const UI::InterfaceObject& newObject ) const;
 
 	virtual bool deleteObject( const UI::InterfaceObject::Info& info ) const;
-
 
 	virtual void close()			{ delete this; }
 private:
