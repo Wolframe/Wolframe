@@ -157,7 +157,7 @@ bool InterfaceCommandHandler::initInterfaceObject( UI::InterfaceObject& obj, int
 	}
 	const char* platform = argv[0];
 	const char* culture = argv[1];
-	const char* type = argv[2];
+	//[+]const char* type = argv[2];
 	const char* name = argv[3];
 	const char* versionstr = (argc == 4)?0:argv[4];
 	const UI::UserInterfaceLibrary* uilib = m_provider->UIlibrary();
