@@ -31,7 +31,7 @@
 
 ************************************************************************/
 ///
-/// \file UserInterface.hpp
+// \file UserInterface.hpp
 ///
 
 #ifndef _USER_INTERFACE_HPP_INCLUDED
@@ -52,8 +52,12 @@ public:
 	class Info
 	{
 	public:
+		Info( const Info& o)
+			: m_type( o.m_type ), m_platform( o.m_platform ),
+			  m_name( o.m_name ), m_culture( o.m_culture ),
+			  m_version( o.m_version ), m_description( o.m_description )	{}
 		Info( const std::string& type_, const std::string& platform_,
-		      const std::string& name_, const std::string& culture_,
+		const std::string& name_, const std::string& culture_,
 		      unsigned long version_, const std::string& description_ )
 			: m_type( type_ ), m_platform( platform_ ),
 			  m_name( name_ ), m_culture( culture_ ),
@@ -75,6 +79,9 @@ public:
 	};
 
 	/// Constructor
+	InterfaceObject( const InterfaceObject& o)
+		: m_info( o.m_info ),
+		  m_body ( o.m_body ){}
 	InterfaceObject( const std::string& type_, const std::string& platform_,
 			 const std::string& name_, const std::string& culture_,
 			 unsigned long version_, const std::string& description_,
@@ -97,59 +104,59 @@ class UserInterfaceLibrary
 public:
 	virtual ~UserInterfaceLibrary()	{}
 
-	/// \brief Get a list of all object infos, latest versions
-	/// \param platform	the platform for which to get the object info
-	/// \param role		a role for which to get the object infos
-	/// \param culture	the culture for which to get the object info
-	/// \note  use an epmty string, "*" or "all" to get the object info
+	// \brief Get a list of all object infos, latest versions
+	// \param platform	the platform for which to get the object info
+	// \param role		a role for which to get the object infos
+	// \param culture	the culture for which to get the object info
+	// \note  use an epmty string, "*" or "all" to get the object info
 	///        for all platforms, roles, cultures ...
 	virtual const std::list< InterfaceObject::Info > infos( const std::string& platform,
 								const std::string& role,
 								const std::string& culture ) const = 0;
 
-	/// \brief Get a list of all object infos, latest versions
-	/// \param platform	the platform for which to get the object info
-	/// \param roles	a list of roles for which to get the object infos
-	/// \param culture	the culture for which to get the object info
+	// \brief Get a list of all object infos, latest versions
+	// \param platform	the platform for which to get the object info
+	// \param roles	a list of roles for which to get the object infos
+	// \param culture	the culture for which to get the object info
 	virtual const std::list< InterfaceObject::Info > infos( const std::string& platform,
 								const std::list< std::string >& roles,
 								const std::string& culture ) const = 0;
 
-	/// \brief Get a list of object infos for all the versions of a object
-	/// \param platform	the platform for which to get the object info
-	/// \param name		the name of the object
-	/// \param culture	the culture for which to get the object info
+	// \brief Get a list of object infos for all the versions of a object
+	// \param platform	the platform for which to get the object info
+	// \param name		the name of the object
+	// \param culture	the culture for which to get the object info
 	virtual const std::list< InterfaceObject::Info > versions( const std::string& platform,
 								   const std::string& name,
 								   const std::string& culture ) const = 0;
 
-	/// \brief Get the object
-	/// \param platform	the platform for which to get the object info
-	/// \param name		the name of the object
-	/// \param culture	the culture for which to get the object info
+	// \brief Get the object
+	// \param platform	the platform for which to get the object info
+	// \param name		the name of the object
+	// \param culture	the culture for which to get the object info
 	virtual const InterfaceObject object( const std::string& platform,
 					      const std::string& name,
 					      const std::string& culture ) const = 0;
 
-	/// \brief Get the object
-	/// \param platform	the platform for which to get the object info
-	/// \param name		the name of the object
-	/// \param version	the version of the object
-	/// \param culture	the culture for which to get the object info
+	// \brief Get the object
+	// \param platform	the platform for which to get the object info
+	// \param name		the name of the object
+	// \param version	the version of the object
+	// \param culture	the culture for which to get the object info
 	virtual const InterfaceObject object( const std::string& platform,
 					      const std::string& name, const Version& version,
 					      const std::string& culture ) const = 0;
 
-	/// \brief Get the object
-	/// \param info		the object info
+	// \brief Get the object
+	// \param info		the object info
 	virtual const InterfaceObject object( const InterfaceObject::Info& info ) const = 0;
 
-	/// \brief Add an object
-	/// \param object	the object to add
+	// \brief Add an object
+	// \param object	the object to add
 	virtual void addObject( const InterfaceObject& newObject ) const = 0;
 
-	/// \brief Delete an object
-	/// \param info		the object info
+	// \brief Delete an object
+	// \param info		the object info
 	virtual bool deleteObject( const InterfaceObject::Info& info ) const = 0;
 
 	virtual void close()		{}

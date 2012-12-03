@@ -35,6 +35,8 @@
 
 #include <string>
 #include <sstream>
+#include <limits>
+#include <stdexcept>
 #include "version.hpp"
 
 namespace _Wolframe {
@@ -46,6 +48,96 @@ Version::Version()
 	  m_revision( 0 ), m_hasRevision( false ),
 	  m_build( 0 ), m_hasBuild( false )
 {}
+
+Version::Version( const char* version, const char* format)
+	: m_major( 0 ), m_minor( 0 ),
+	  m_revision( 0 ), m_hasRevision( false ),
+	  m_build( 0 ), m_hasBuild( false )
+{
+	enum {NofElements=4};
+	std::size_t vi=0,ai=0,fi=0;
+	unsigned int ar[NofElements] = {0,0,0,0};
+	unsigned int cnt[ NofElements] = {0,0,0,0};
+	enum State {Parse,Shift};
+	State state = Shift;
+
+	for (; version[vi] && ai < NofElements && ar[ai] < std::numeric_limits<unsigned short>::max(); ++vi)
+	{
+		switch (state)
+		{
+			case Shift:
+				if (format[fi] == '%')
+				{
+					++fi;
+					if (format[fi] != '%')
+					{
+						switch (format[fi])
+						{
+							case '|': continue;
+							case 'M': ai = 0; break;
+							case 'm': ai = 1; break;
+							case 'r': ai = 2; break;
+							case 'b': ai = 3; break;
+							default: throw std::runtime_error( "format string syntax error");
+						}
+						if (cnt[ai]) throw std::runtime_error( "duplicate entry in format string");
+						cnt[ai] = 1;
+						state = Parse;
+						continue;
+					}
+				}
+				if (format[fi] != version[vi]) throw std::runtime_error( "version string syntax error");
+				break;
+
+			case Parse:
+				if (version[vi] >= '0' && version[vi] <= '9')
+				{
+					ar[ai] = ar[ai] * 10 + (version[vi] - '0');
+					++cnt[ai];
+				}
+				else
+				{
+					if (cnt[ai] == 1) throw std::runtime_error( "empty element in version string");
+					state = Shift;
+					--vi;
+					break;
+				}
+			break;
+		}
+	}
+	if (version[vi])
+	{
+		if (!format[fi])
+		{}
+		else if (format[fi] == '%' && format[fi+1] == '%|')
+		{}
+		else
+		{
+			throw std::runtime_error( "version string syntax error");
+		}
+	}
+
+INIT_VERSION:
+	if (cnt[0] && cnt[1])
+	{
+		if (cnt[2])
+		{
+			if (cnt[3])
+			{
+				m_build = ar[3];
+				m_hasBuild = true;
+			}
+			m_revision = ar[2];
+			m_hasRevision = true;
+		}
+		m_major = ar[0];
+		m_minor = ar[1];
+	}
+	else
+	{
+		throw std::runtime_error( "version string not complete");
+	}
+}
 
 Version::Version( unsigned long version )
 	: m_major( version / 1000000lu ),
