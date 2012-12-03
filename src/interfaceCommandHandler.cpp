@@ -168,7 +168,7 @@ bool InterfaceCommandHandler::initInterfaceObject( UI::InterfaceObject& obj, int
 	}
 	else
 	{
-		obj = object( platform, name, culture );
+		obj = uilib->object( platform, name, culture );
 	}
 	return true;
 }

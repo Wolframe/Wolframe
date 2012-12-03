@@ -57,8 +57,8 @@ public:
 			  m_name( o.m_name ), m_culture( o.m_culture ),
 			  m_version( o.m_version ), m_description( o.m_description )	{}
 		Info( const std::string& type_, const std::string& platform_,
-		const std::string& name_, const std::string& culture_,
-		      unsigned long version_, const std::string& description_ )
+			const std::string& name_, const std::string& culture_,
+			unsigned long version_, const std::string& description_ )
 			: m_type( type_ ), m_platform( platform_ ),
 			  m_name( name_ ), m_culture( culture_ ),
 			  m_version( version_ ), m_description( description_ )	{}
@@ -70,12 +70,12 @@ public:
 		const Version& version() const		{ return m_version; }
 		const std::string& description() const	{ return m_description; }
 	private:
-		const std::string	m_type;		///< the type of the object
-		const std::string	m_platform;	///< platform for the object
-		const std::string	m_name;		///< the name of the object
-		const std::string	m_culture;	///< the culture of the object
-		const Version		m_version;	///< the version of the object
-		const std::string	m_description;	///< the description of the object
+		std::string	m_type;		///< the type of the object
+		std::string	m_platform;	///< platform for the object
+		std::string	m_name;		///< the name of the object
+		std::string	m_culture;	///< the culture of the object
+		Version		m_version;	///< the version of the object
+		std::string	m_description;	///< the description of the object
 	};
 
 	/// Constructor
@@ -92,8 +92,8 @@ public:
 	const Info& info() const			{ return m_info; }
 	const std::string& body() const			{ return m_body; }
 private:
-	const Info		m_info;			///< info for the object
-	const std::string	m_body;			///< the body of the object
+	Info		m_info;			///< info for the object
+	std::string	m_body;			///< the body of the object
 };
 
 
