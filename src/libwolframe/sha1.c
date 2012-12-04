@@ -21,6 +21,18 @@
 
 #include <string.h>
 #ifndef _WIN32
+#endif
+#ifdef SUNOS
+#include <sys/isa_defs.h>
+#define LITLE_ENDIAN 1234
+#define BIG_ENDIAN 4321
+#ifdef _LITTLE_ENDIAN
+#define BYTE_ORDER LITLE_ENDIAN
+#endif 
+#ifdef _BIG_ENDIAN
+#define BYTE_ORDER BIG_ENDIAN
+#endif
+#else
 #include <sys/param.h>
 #endif
 #include "types/sha1.h"
