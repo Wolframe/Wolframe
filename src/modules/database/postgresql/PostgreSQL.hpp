@@ -136,6 +136,15 @@ private:
 	Connection m_conn;			//< connection object from pool
 };
 
+struct PostgreSQLLanguageDescription : public LanguageDescription
+{
+	virtual std::string stm_argument_reference( int index)
+	{
+		std::ostringstream rt;
+		rt << "$" << index;
+		return rt.str( );	
+	}
+};
 
 class PostgreSQLdatabase : public Database
 {
@@ -152,15 +161,20 @@ public:
 	virtual void loadProgram( const std::string& filename );
 	virtual void loadAllPrograms();
 	virtual void addProgram( const std::string& program );
+	virtual const std::string* getProgram( const std::string& name) const;
+
+	Transaction* transaction( const std::string& name );
+	void closeTransaction( Transaction* t );
 
 	///\brief Add a set of named statements to the postgresql program
 	virtual void addStatements( const types::keymap<std::string>& stmmap_);
 
-	virtual const std::string* getProgram( const std::string& name) const;
+	virtual const LanguageDescription* getLanguageDescription( ) const
+	{
+		static PostgreSQLLanguageDescription langdescr;
+		return &langdescr;
+	}
 
-	Transaction* transaction( const std::string& name );
-
-	void closeTransaction( Transaction* t );
 private:
 	PostgreSQLdbUnit*	m_unit;		///< parent database unit
 };
