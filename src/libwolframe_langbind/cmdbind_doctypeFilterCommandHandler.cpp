@@ -153,7 +153,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						else
 						{
 							m_itembuf.push_back( inp[ii]);
-							if (inp[ii] == '\n' || m_itembuf.size() > 128)
+							if (m_itembuf.size() > 128)
 							{
 								throw_error( "XML header not terminated");
 							}

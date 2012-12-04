@@ -67,12 +67,21 @@ protected:
 		sprintf( verStr1, "%d.%d.%d", Major_, Minor_, Revision_ );
 		sprintf( verStr2, "%d.%d", Major_, Minor_ );
 		sprintf( verStr3, "This is version %d . %d . %d . %u %% /", Major_, Minor_, Revision_, Build_ );
+
+		char pverStr1[ 128];
+		sprintf( pverStr1, "%d.%d.%d", Major_, Minor_, 0);
+
+		pver0 = Version( verStr0);
+		pver1 = Version( pverStr1);
+		pver2 = Version( verStr2);
+		pver3 = Version( verStr3, "This is version %M . %m . %r . %b %% /");
 	}
 
 	// Objects declared here can be used by all tests in the test case.
 	unsigned short		Major_, Minor_, Revision_;
 	unsigned		Build_;
 	Version	ver0, ver1, ver2, ver3;
+	Version	pver0, pver1, pver2, pver3;
 	char			verStr0[MAX_STRING];
 	char			verStr1[MAX_STRING];
 	char			verStr2[MAX_STRING];
@@ -120,6 +129,14 @@ TEST_F( VersionFixture, Printing )	{
 	EXPECT_STREQ( ver0.toString( "%M.%m.%r" ).c_str(), verStr1 );
 	EXPECT_STREQ( ver0.toString( "%M.%m" ).c_str(), verStr2 );
 	EXPECT_STREQ( ver0.toString( "This is version %M . %m . %r . %b %% %/" ).c_str(), verStr3 );
+}
+
+// Tests the Version parsing
+TEST_F( VersionFixture, Parsing )	{
+	EXPECT_TRUE( pver0 == ver0 );
+	EXPECT_TRUE( pver1 == ver1 );
+	EXPECT_TRUE( pver2 == ver2 );
+	EXPECT_TRUE( pver3 == ver3 );
 }
 
 // Tests the Version compatibility

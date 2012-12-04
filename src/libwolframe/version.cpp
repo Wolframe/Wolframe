@@ -61,7 +61,7 @@ Version::Version( const char* version, const char* format)
 	enum State {Parse,Shift};
 	State state = Shift;
 
-	for (; version[vi] && ai < NofElements && ar[ai] < std::numeric_limits<unsigned short>::max(); ++vi)
+	while (version[vi] && ai < NofElements && ar[ai] < std::numeric_limits<unsigned short>::max())
 	{
 		switch (state)
 		{
@@ -73,11 +73,11 @@ Version::Version( const char* version, const char* format)
 					{
 						switch (format[fi])
 						{
-							case '|': continue;
-							case 'M': ai = 0; break;
-							case 'm': ai = 1; break;
-							case 'r': ai = 2; break;
-							case 'b': ai = 3; break;
+							case '|': ++fi; continue;
+							case 'M': ai = 0; ++fi; break;
+							case 'm': ai = 1; ++fi; break;
+							case 'r': ai = 2; ++fi; break;
+							case 'b': ai = 3; ++fi; break;
 							default: throw std::runtime_error( "format string syntax error");
 						}
 						if (cnt[ai]) throw std::runtime_error( "duplicate entry in format string");
@@ -87,6 +87,8 @@ Version::Version( const char* version, const char* format)
 					}
 				}
 				if (format[fi] != version[vi]) throw std::runtime_error( "version string syntax error");
+				++fi;
+				++vi;
 				break;
 
 			case Parse:
@@ -94,12 +96,12 @@ Version::Version( const char* version, const char* format)
 				{
 					ar[ai] = ar[ai] * 10 + (version[vi] - '0');
 					++cnt[ai];
+					++vi;
 				}
 				else
 				{
 					if (cnt[ai] == 1) throw std::runtime_error( "empty element in version string");
 					state = Shift;
-					--vi;
 					break;
 				}
 			break;
