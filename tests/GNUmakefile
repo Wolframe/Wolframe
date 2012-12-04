@@ -248,3 +248,6 @@ ifeq ($(RUN_TESTS),0)
 	@echo
 	@echo
 endif
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

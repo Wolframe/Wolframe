@@ -39,7 +39,7 @@ extern "C" {
 
 typedef struct	{
 	uint32_t	state[ 5 ];
-	size_t		count;
+	uint64_t	count;
 	unsigned char	buffer[ SHA1_BLOCK_SIZE ];
 } sha1_ctx;
 
