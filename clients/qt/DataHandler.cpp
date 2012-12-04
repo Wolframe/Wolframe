@@ -272,7 +272,6 @@ void DataHandler::resetFormData( QWidget *form )
 		m_formWidget->restoreFromGlobals( props );
 		
 		if( clazz == "QLineEdit" ) {
-			qDebug( ) << "XXX:" << props;
 			QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
 			lineEdit->clear( );
 			if( props->contains( "state" ) ) {
@@ -332,7 +331,6 @@ void DataHandler::resetFormData( QWidget *form )
 			for( int row = 0; row < tableWidget->rowCount( ); row++ ) {
 				for( int col = 0; col < tableWidget->columnCount( ); col++ ) {
 					QTableWidgetItem *item = tableWidget->item( row, col );
-					qDebug( ) << "XXX:" << row << col << item;
 					if( item ) item->setSelected( false );
 				}
 			}
@@ -777,7 +775,6 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 								QAbstractItemModel *model = tableWidget->model( );
 								QModelIndexList matches = model->match( model->index( 0, 0 ), Qt::UserRole, id );
 								foreach( const QModelIndex &index, matches ) {
-									qDebug( ) << "XXX: Selecting row by match" << index.row( ) << "id:" << id;
 									tableWidget->selectRow( index.row( ) );
 								}
 							}

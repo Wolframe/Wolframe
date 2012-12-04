@@ -1,7 +1,12 @@
 now:
 - stop the "whiteout", especially seen after assigning pictures
   (must be a protocol thing), happens mainly on Windows 7/8, not
-  on Linux/Windows XP
+  on Linux/Windows XPL:
+  on FreeBSD: REQUEST, still in Data state, so the protocol misses
+  the end somehow, the last m_answer contains a category tree (so
+  it's a domain read), the tree stops in the middle: <tree><item id="45">,
+  requests get stuffed into the queue, nothing gets ever executed,
+  second time with printqstring m_answer (QString)0x7bae258 (length=0): ""
 - ILLEGAL STATE 4 in dataAvailable!
 - CRITICAL: "Premature end of document."
 
