@@ -189,6 +189,7 @@ bool Version::isCompatible( const Version &other ) const
 {
 	if ( m_major != other.m_major )		return false;
 	if ( m_minor > other.m_minor )		return false;
+	return true;
 }
 
 std::string Version::toString() const
