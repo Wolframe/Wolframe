@@ -10,6 +10,13 @@ PACKAGE_VERSION = 3.15.4
 INCLUDE_CXXFLAGS = \
 	-DNO_LCMS
 
+INCLUDE_CFLAGS = \
+	$(INCLUDE_CXXFLAGS)
+
+ifeq "$(PLATFORM)" "SUNOS"
+INCLUDE_CFLAGS += -D_XOPEN_SOURCE=600
+endif
+
 INCLUDE_DIRS = \
 	-I. -ISource -ISource/Metadata -ISource/FreeImageToolkit \
 	-ISource/LibJPEG -ISource/LibPNG -ISource/LibTIFF4 \

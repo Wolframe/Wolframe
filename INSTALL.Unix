@@ -573,6 +573,10 @@ See 'contrib/FreeBSD' for patches and the ports files.
 
 Use the local version of FreeImage with WITH_LOCAL_FREEIMAGE=1,
 as libfreeimageplus is not build in the ports.
+FreeImage builds only on 64-bit because of some ill defined constants.
+
+Qt misses some I18N programs on 32-bit, so you can't build the qtclient
+there (WITH_QT=1).
 
 You need 'gmake' (3.82).
 
@@ -681,6 +685,7 @@ OPENSSL_DIR=/opt/csw PGSQL_DIR=/opt/csw/postgresql \
 	WITH_EXPECT=1 WITH_SSL=1 WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
 	WITH_LIBXSLT=1 WITH_LOCAL_SQLITE3=1 WITH_LOCAL_SQLITE1=1 \
 	WITH_PAM=1 WITH_SASL=1 WITH_LOCAL_LIBHPDF=1 \
-	WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2
+	WITH_ICU=1 ICU_DIR=/opt/csw/icu4c-49.1.2 \
+	WITH_LOCAL_FREEIMAGE=1 \
 	gmake \
 		CC=gcc CXX=g++ CFLAGS=-mcpu=v9 CXXFLAGS=-mcpu=v9
