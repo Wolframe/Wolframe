@@ -9,6 +9,7 @@ now:
   second time with printqstring m_answer (QString)0x7bae258 (length=0): ""
 - ILLEGAL STATE 4 in dataAvailable!
 - CRITICAL: "Premature end of document."
+- package version switching
 
 musts:
 - push button state (disabled/enabled) based on a
