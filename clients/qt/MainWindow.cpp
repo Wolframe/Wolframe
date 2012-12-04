@@ -518,6 +518,9 @@ void MainWindow::loadTheme( QString theme )
 	file.open( QFile::ReadOnly );
 	m_ui = m_uiLoader->load( &file, this );
 	file.close( );
+	if( !m_ui ) {
+		return;
+	}
 
 // set stylesheet of the application (has impact on the whole application)
 	QFile qss( themesFolder + QLatin1String( "MainWindow.qss" ) );
@@ -542,7 +545,12 @@ void MainWindow::loadTheme( QString theme )
 	}
 
 // make the form widget the central widget
-	( qobject_cast<QMainWindow *>( m_ui ) )->setCentralWidget( m_formWidget );
+	if( m_ui && m_formWidget ) {
+		QMainWindow *mainWindow = qobject_cast<QMainWindow *>( m_ui );
+		if( mainWindow ) {
+			mainWindow->setCentralWidget( m_formWidget );
+		}
+	}
 
 // make debug action available
 	if( !m_debug ) {

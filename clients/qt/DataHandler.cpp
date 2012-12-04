@@ -504,6 +504,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 				}
 				for( int row = 0; row < tableWidget->rowCount( ); row++ ) {
 					QTableWidgetItem *item = tableWidget->item( row, 0 );
+					if( !item ) continue;
 					QString id = item->data( Qt::UserRole ).toString( );
 					if( states.contains( id ) ) {
 						tableWidget->selectRow( row );
