@@ -383,7 +383,7 @@ TEST( Base64, RandomData )
 		ddata1.write(( const char *)decoded, decodeResult );
 		ddata1.close();
 #endif
-		EXPECT_EQ( dataSize, decodeResult );
+		EXPECT_EQ( dataSize, (size_t)decodeResult );
 		EXPECT_EQ( 0, memcmp( data, decoded, dataSize ));
 		EXPECT_EQ( decoded[ dataSize ], 0x5a );
 

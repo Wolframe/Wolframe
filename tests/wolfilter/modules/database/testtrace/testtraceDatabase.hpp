@@ -93,7 +93,8 @@ class TesttraceDatabase
 public:
 	TesttraceDatabase( const std::string& id_, const std::string& resultfilename_, const std::string& outfilename_, unsigned short, bool);
 	TesttraceDatabase( const TesttraceDatabase& o)
-		:m_id(o.m_id)
+		:Database(), DatabaseUnit()
+		,m_id(o.m_id)
 		,m_outfilename(o.m_outfilename)
 		,m_result(o.m_result){}
 

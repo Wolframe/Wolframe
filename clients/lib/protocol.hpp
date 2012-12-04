@@ -128,7 +128,7 @@ public:
 	virtual Operation nextop();
 
 private:
-	Protocol( const Protocol&){}	//non copyable
+	Protocol( const Protocol&) : ConnectionHandler() {}	//non copyable
 
 	///\class Impl
 	///\brief PIMPL for internal protocol handler data structure

@@ -54,7 +54,7 @@ TEST( ArrayDoublingAllocator, tests )
 	for (ii=0; size[ii]; ++ii)
 	{
 		char* ptr = (char*)mem.base() + pp[ii];
-		for (std::size_t kk=0; kk<size[ii]; ++kk)
+		for (int kk=0; kk<size[ii]; ++kk)
 		{
 			ASSERT_EQ (ptr[kk], ('A' + ii));
 		}

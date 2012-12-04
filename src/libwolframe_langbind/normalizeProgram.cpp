@@ -91,7 +91,7 @@ class CombinedNormalizeFunction :public NormalizeFunction
 public:
 	CombinedNormalizeFunction(){}
 	CombinedNormalizeFunction( const CombinedNormalizeFunction& o)
-		:m_steps(o.m_steps){}
+		:NormalizeFunction(), m_steps(o.m_steps){}
 
 	void define( const NormalizeFunctionR& f)
 	{

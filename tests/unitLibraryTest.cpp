@@ -70,11 +70,11 @@ public:
 
 // Tests the ObjectPool get & release
 TEST_F( FunctionLibraryFixture, Add_Retrieve )	{
-	for ( int i = 0; i < libSize; i++ )	{
+	for ( size_t i = 0; i < libSize; i++ )	{
 		bool ret = library.addFunction( i, boost::lexical_cast<std::string>( i ) );
 		ASSERT_TRUE( ret );
 	}
-	for ( int i = 0; i < libSize; i++ )	{
+	for ( size_t i = 0; i < libSize; i++ )	{
 		const int* ret = library.function( boost::lexical_cast<std::string>( i ) );
 		ASSERT_NE( (const int*)0, ret );
 		ASSERT_EQ( *ret, i );

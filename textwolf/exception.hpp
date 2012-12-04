@@ -70,10 +70,10 @@ struct exception	:public std::exception
 	///\brief Constructor
 	///\return exception object
 	exception (Cause p_cause) throw()
-			:cause(p_cause) {}
+			:std::exception( ), cause(p_cause) {}
 	///\brief Copy constructor
 	exception (const exception& orig) throw()
-			:cause(orig.cause) {}
+			:std::exception( ), cause(orig.cause) {}
 	///\brief Destructor
 	virtual ~exception() throw() {}
 

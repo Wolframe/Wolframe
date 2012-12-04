@@ -66,7 +66,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	initialize( );
 }
 
-static bool debug = false;
+static bool _debug = false;
 
 void MainWindow::readSettings( )
 {
@@ -82,7 +82,7 @@ void MainWindow::readSettings( )
 	m_dataLoadMode = prefs->dataLoadMode( );
 	m_dbName = prefs->dbName( );
 	m_debug = prefs->debug( );
-	debug = m_debug;
+	_debug = m_debug;
 	m_uiFormsDir = prefs->uiFormsDir( );
 	m_uiFormTranslationsDir = prefs->uiFormTranslationsDir( );
 	m_dataLoaderDir = prefs->dataLoaderDir( );
@@ -99,7 +99,7 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 {
 	switch( type ) {
 		case QtDebugMsg:
-			if( debug ) {
+			if( _debug ) {
 				if( debugTerminal ) {
 					debugTerminal->sendComment( msg );
 				}
@@ -208,7 +208,7 @@ void MainWindow::switchFound( const QString &name )
 		m_secure = true;
 	} else if( name == "debug" ) {
 		m_debug = true;
-		debug = true;
+		_debug = true;
 	}
 }
 
