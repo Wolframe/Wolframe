@@ -21,8 +21,22 @@
 
 #include <string.h>
 #ifndef _WIN32
+
+#ifdef SUNOS
+#include <sys/isa_defs.h>
+#define LITLE_ENDIAN 1234
+#define BIG_ENDIAN 4321
+#ifdef _LITTLE_ENDIAN
+#define BYTE_ORDER LITLE_ENDIAN
+#endif /* _LITTLE_ENDIAN */
+#ifdef _BIG_ENDIAN
+#define BYTE_ORDER BIG_ENDIAN
+#endif /* _BIG_ENDIAN */
+#else /* SUNOS */
 #include <sys/param.h>
-#endif
+#endif /* SUNOS */
+#endif /* _WIN32 */
+
 #include "types/sha1.h"
 
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
