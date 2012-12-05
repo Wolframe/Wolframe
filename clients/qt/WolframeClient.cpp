@@ -376,10 +376,16 @@ void WolframeClient::dataAvailable( )
 
 void WolframeClient::sendLine( QString line )
 {
+	qint64 res;
+	
 	switch( m_state ) {
 		case Connected:
 		case Data:
-			m_socket->write( line.toAscii( ).append( "\n" ) );
+			res = m_socket->write( line.toAscii( ).append( "\n" ) );
+			if( res < 0 ) {
+				emit error( "Got -1 after write to socket" );
+				break;
+			}				
 			m_socket->flush( );
 			emit lineSent( line );
 			break;
