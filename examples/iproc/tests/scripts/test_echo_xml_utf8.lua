@@ -6,8 +6,9 @@ function run( )
 	-- parsing and echoing the content as defined
 	input:as( inpf)
 	output:as( outf)
-
+logger.printc( "BLA");
 	for c,t in input:get() do
+logger.printc( "ITR ", c, " ", t);
 		output:print( c, t)
 	end
 end

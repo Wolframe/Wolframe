@@ -207,18 +207,48 @@ int main( int argc, char **argv )
 	g_gtest_ARGC = 1;
 	g_gtest_ARGV[0] = argv[0];
 	g_testdir = boost::filesystem::system_complete( argv[0]).parent_path();
+	int tracelevel = 0;
+	int argstart = 1;
 
-	if (argc > 2)
+	if (argc == 2 && (std::strcmp( argv[1], "-h") == 0 || std::strcmp( argv[1], "--help") == 0))
+	{
+		std::cout << "Usage " << argv[0] << " [OPTION] [<test name substring>]" << std::endl;
+		std::cout << "Description:" << std::endl;
+		std::cout << "\tRun wolfilter with a test description loaded from a \"*.tst\" file" << std::endl;
+		std::cout << "\t-h:" << " Print usage" << std::endl;
+		std::cout << "\t-t:" << " Raise verbosity level (-t,-tt,-ttt,..)" << std::endl;
+		return 0;
+	}
+	if (argc >= argstart+1)
+	{
+		if (argv[argstart][0] == '-' && argv[argstart][1] == 't')
+		{
+			tracelevel = 1;
+			while (argv[argstart][tracelevel+1] == 't') ++tracelevel;
+			if (argv[argstart][tracelevel+1])
+			{
+				std::cerr << "unknown option " << argv[argstart][tracelevel+1] << std::endl;
+			}
+			argstart += 1;
+
+		}
+	}
+	if (argc == argstart+1)
+	{
+		selectedTestName = argv[argstart];
+	}
+	else if (argc > argstart+1)
 	{
 		std::cerr << "too many arguments passed to " << argv[0] << std::endl;
-		return 1;
-	}
-	else if (argc == 2)
-	{
-		selectedTestName = argv[1];
 	}
 	::testing::InitGoogleTest( &g_gtest_ARGC, g_gtest_ARGV );
-	_Wolframe::log::LogBackend::instance().setConsoleLevel( _Wolframe::log::LogLevel::LOGLEVEL_WARNING );
+	_Wolframe::log::LogLevel::Level loglevel = _Wolframe::log::LogLevel::LOGLEVEL_WARNING;
+	if (tracelevel >= 1) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_INFO;
+	if (tracelevel >= 2) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DEBUG;
+	if (tracelevel >= 3) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_TRACE;
+	if (tracelevel >= 4) loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA;
+
+	_Wolframe::log::LogBackend::instance().setConsoleLevel( loglevel);
 	return RUN_ALL_TESTS();
 }
 

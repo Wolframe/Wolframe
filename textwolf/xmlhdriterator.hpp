@@ -123,7 +123,7 @@ public:
 				case Src:
 					if (ch)
 					{
-						if (ch == '\n')
+						if (ch == '>')
 						{
 							skip();
 							m_state = Rest;
@@ -145,7 +145,7 @@ public:
 						--m_cnt0;
 					}
 					m_state = End;
-					return '\n';
+					return '>';
 
 				case End:
 					return 0;

@@ -443,7 +443,8 @@ public:
 					}
 					else
 					{
-						throw std::runtime_error( "missing DOCTYPE declaration in a non standalone xml document");
+						m_state = ParseSource;
+						m_doctype_state = 0;
 					}
 					/* no break here */
 				case ParseSource:

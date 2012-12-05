@@ -276,7 +276,7 @@ public:
 	///\brief Enumeration of states of the XML scanner state machine
 	enum STMState
 	{
-		START, STARTTAG, XTAG, PITAG, PITAGEND, XTAGEND, XTAGEOLN, XTAGDONE, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE,
+		START, STARTTAG, XTAG, PITAG, PITAGEND, XTAGEND, XTAGDONE, XTAGAISK, XTAGANAM, XTAGAESK, XTAGAVSK, XTAGAVID, XTAGAVSQ, XTAGAVDQ, XTAGAVQE,
 		CONTENT, TOKEN, SEEKTOK, XMLTAG, OPENTAG, CLOSETAG, TAGCLSK, TAGAISK, TAGANAM, TAGAESK, TAGAVSK, TAGAVID, TAGAVSQ, TAGAVDQ, TAGAVQE,
 		TAGCLIM, ENTITYSL, ENTITY, ENTITYE, ENTITYID, ENTITYSQ, ENTITYDQ, ENTITYLC, CDATA, CDATA1, CDATA2, CDATA3, EXIT
 	};
@@ -286,11 +286,11 @@ public:
 	///\return the state as string
 	static const char* getStateString( STMState s)
 	{
-		enum Constant {NofStates=44};
+		enum Constant {NofStates=43};
 		static const char* sState[NofStates]
 		= {
 			"START", "STARTTAG", "XTAG", "PITAG", "PITAGEND",
-			"XTAGEND", "XTAGEOLN", "XTAGDONE", "XTAGAISK", "XTAGANAM",
+			"XTAGEND", "XTAGDONE", "XTAGAISK", "XTAGANAM",
 			"XTAGAESK", "XTAGAVSK", "XTAGAVID", "XTAGAVSQ", "XTAGAVDQ",
 			"XTAGAVQE", "CONTENT", "TOKEN", "SEEKTOK", "XMLTAG",
 			"OPENTAG", "CLOSETAG", "TAGCLSK", "TAGAISK", "TAGANAM",
@@ -328,12 +328,11 @@ public:
 		{
 			(*this)
 			[ START    ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,STARTTAG).miss(ErrExpectedOpenTag)
-			[ STARTTAG ](EndOfLine)(Cntrl)(Space)(Questm,XTAG )(Exclam,ENTITYSL).fallback(OPENTAG)
+			[ STARTTAG ](EndOfLine)(Cntrl)(Space)(Questm,XTAG)(Exclam,ENTITYSL).fallback(OPENTAG)
 			[ XTAG     ].action(ExpectIdentifierXML)(EndOfLine,Cntrl,Space,XTAGAISK)(Questm,XTAGEND).miss(ErrExpectedXMLTag)
 			[ PITAG    ](Questm,PITAGEND).other(PITAG)
 			[ PITAGEND ](Gt,CONTENT).miss(ErrExpectedTagEnd)
-			[ XTAGEND  ](Gt,XTAGEOLN)(EndOfLine)(Cntrl)(Space).miss(ErrExpectedTagEnd)
-			[ XTAGEOLN ](EndOfLine,XTAGDONE)(Cntrl)(Space).fallback(XTAGDONE)
+			[ XTAGEND  ](Gt,XTAGDONE)(EndOfLine)(Cntrl)(Space).miss(ErrExpectedTagEnd)
 			[ XTAGDONE ].action(Return,HeaderEnd).fallback(CONTENT)
 			[ XTAGAISK ](EndOfLine)(Cntrl)(Space)(Questm,XTAGEND).fallback(XTAGANAM)
 			[ XTAGANAM ].action(ReturnIdentifier,HeaderAttribName)(EndOfLine,Cntrl,Space,XTAGAESK)(Equal,XTAGAVSK).miss(ErrExpectedEqual)
@@ -357,7 +356,7 @@ public:
 			}
 			(*this)
 			[ SEEKTOK  ](EndOfText,EXIT)(EndOfLine)(Cntrl)(Space)(Lt,XMLTAG).fallback(TOKEN)
-			[ XMLTAG   ](EndOfLine)(Cntrl)(Space)(Questm,PITAG)(Slash,CLOSETAG).fallback(OPENTAG)
+			[ XMLTAG   ](EndOfLine)(Cntrl)(Space)(Questm,PITAG)(Exclam,ENTITYSL)(Slash,CLOSETAG).fallback(OPENTAG)
 			[ OPENTAG  ].action(ReturnIdentifier,OpenTag)(EndOfLine,Cntrl,Space,TAGAISK)(Slash,TAGCLIM)(Gt,CONTENT).miss(ErrExpectedTagAttribute)
 			[ CLOSETAG ].action(ReturnIdentifier,CloseTag)(EndOfLine,Cntrl,Space,TAGCLSK)(Gt,CONTENT).miss(ErrExpectedTagEnd)
 			[ TAGCLSK  ](EndOfLine)(Cntrl)(Space)(Gt,CONTENT).miss(ErrExpectedTagEnd)
