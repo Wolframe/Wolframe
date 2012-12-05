@@ -324,6 +324,14 @@ void WolframeClient::dataAvailable( )
 			while( m_socket->canReadLine( ) ) {
 				char buf[1024];
 				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
+				if( len < 0 ) {
+					qCritical( ) << "Error when reading line!!";
+					break;
+				}
+				if( len >= 1024 ) {
+					qCritical( ) << "Long line!!";
+					break;
+				}
 				
 				if( len > 1 )
 					if( buf[len-1] == '\n' ) buf[len-1] = '\0';
