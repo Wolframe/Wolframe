@@ -383,9 +383,12 @@ void WolframeClient::sendLine( QString line )
 		case Data:
 			res = m_socket->write( line.toAscii( ).append( "\n" ) );
 			if( res < 0 ) {
-				emit error( "Got -1 after write to socket" );
+				qCritical( ) << "Write error!!";
 				break;
-			}				
+			} else if( res != line.toAscii( ).length( ) + 1 ) {
+				qCritical( ) << "Partial write!" << res << line.toAscii( ).length( );
+				break;
+			}		
 			m_socket->flush( );
 			emit lineSent( line );
 			break;
