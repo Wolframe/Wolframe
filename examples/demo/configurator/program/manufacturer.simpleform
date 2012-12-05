@@ -1,0 +1,28 @@
+DOCTYPE "manufacturer Manufacturer"
+{
+	manufacturer
+	{
+		id @int
+		form @string
+		name string
+		normalizedName string
+		webPage string
+		picture
+		{
+			id @int
+			_ string
+		}
+		_ string
+	}
+		
+	list
+	{
+		manufacturer []
+		{
+			id @int
+			name string
+			webPage string
+			thumbnail string
+		}
+	}
+}
