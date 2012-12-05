@@ -113,7 +113,7 @@ int InterfaceCommandHandler::doInfo( int argc, const char** argv, std::ostream& 
 	std::list<UI::InterfaceObject::Info> selection;
 	if (versionstr)
 	{
-		std::list<UI::InterfaceObject::Info> inf = uilib->infos( platform, m_roles, culture);
+		std::list<UI::InterfaceObject::Info> inf = uilib->interface( platform, m_roles, culture);
 		std::list<UI::InterfaceObject::Info>::const_iterator ni = inf.begin(), ne = inf.end();
 		Version version( versionstr);
 		for (; ni != ne; ++ni)
@@ -131,7 +131,7 @@ int InterfaceCommandHandler::doInfo( int argc, const char** argv, std::ostream& 
 	}
 	else
 	{
-		selection = uilib->infos( platform, m_roles, culture);
+		selection = uilib->interface( platform, m_roles, culture);
 	}
 	std::list<UI::InterfaceObject::Info>::const_iterator ni = selection.begin(), ne = selection.end();
 	for (; ni != ne; ++ni)
@@ -160,16 +160,10 @@ bool InterfaceCommandHandler::initInterfaceObject( UI::InterfaceObject& obj, int
 	//[+]const char* type = argv[2];
 	const char* name = argv[3];
 	const char* versionstr = (argc == 4)?0:argv[4];
+	Version version( versionstr );
 	const UI::UserInterfaceLibrary* uilib = m_provider->UIlibrary();
-	if (versionstr)
-	{
-		Version version( versionstr);
-		obj = uilib->object( platform, name, version, culture);
-	}
-	else
-	{
-		obj = uilib->object( platform, name, culture );
-	}
+	UI::InterfaceObject::Info info( "", platform, name, culture, version.toNumber(), "" );
+	obj = uilib->object( info );
 	return true;
 }
 

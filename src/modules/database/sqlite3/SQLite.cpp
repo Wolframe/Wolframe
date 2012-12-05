@@ -366,9 +366,21 @@ SQLiteUIlibrary::SQLiteUIlibrary( const SQLiteDatabase &database )
 	: m_unit( database.dbUnit() )
 {}
 
-const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::infos( const std::string& platform,
-								     const std::string& role,
-								     const std::string& culture ) const
+
+const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::interface( const std::string& platform,
+									 const std::string& role,
+									 const std::string& culture,
+									 const std::string& tag ) const
+{
+	std::list< std::string > roles;
+	roles.push_back( role );
+	return interface( platform, roles, culture, tag );
+}
+
+const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::interface( const std::string& platform,
+									 const std::list< std::string >& roles,
+									 const std::string& culture,
+									 const std::string& /*tag*/ ) const
 {
 	std::list< UI::InterfaceObject::Info >	objs;
 
@@ -389,7 +401,7 @@ const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::infos( const std::
 		condition = true;
 	}
 
-	if ( ! role.empty() )	{
+	if ( ! roles.empty() )	{
 		if ( condition )
 			cond += "AND upper( Platform.name ) = "
 					+ boost::algorithm::to_upper_copy( platform );
@@ -445,39 +457,6 @@ const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::infos( const std::
 		throw std::runtime_error( errMsg.str() );
 
 	return objs;
-}
-
-const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::infos( const std::string& /*platform*/,
-								     const std::list< std::string >& /*roles*/,
-								     const std::string& /*culture*/ ) const
-{
-	std::list< UI::InterfaceObject::Info >	objs;
-	return objs;
-}
-
-const std::list< UI::InterfaceObject::Info > SQLiteUIlibrary::versions( const std::string& /*platform*/,
-									const std::string& /*name*/,
-									const std::string& /*culture*/ ) const
-{
-	std::list< UI::InterfaceObject::Info >	objs;
-	return objs;
-}
-
-const UI::InterfaceObject SQLiteUIlibrary::object( const std::string& /*platform*/, const std::string& /*name*/,
-						   const std::string& /*culture*/ ) const
-{
-	UI::InterfaceObject	obj( "FORM", "Linux", "dummy test", "mo_MO", 01000000,
-				     "Dummy form for now", "" );
-	return obj;
-}
-
-const UI::InterfaceObject SQLiteUIlibrary::object( const std::string& /*platform*/,
-						   const std::string& /*name*/, const Version& /*version*/,
-						   const std::string& /*culture*/ ) const
-{
-	UI::InterfaceObject	obj( "FORM", "Linux", "dummy test", "mo_MO", 01000000,
-				     "Dummy form for now", "" );
-	return obj;
 }
 
 const UI::InterfaceObject SQLiteUIlibrary::object( const UI::InterfaceObject::Info& /*info*/ ) const

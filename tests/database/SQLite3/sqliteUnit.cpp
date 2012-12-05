@@ -51,14 +51,14 @@ TEST_F( SQLiteModuleFixture, OpenGarbage )
 }
 
 
-TEST_F( SQLiteModuleFixture, UserInterface )
+TEST_F( SQLiteModuleFixture, DISABLED_UserInterface )
 {
 	SQLiteDBunit dbUnit( "testDB", "test.db", true, false, 3, std::list<std::string>());
 
 	Database* db = dbUnit.database();
 	const UserInterfaceLibrary* lib = db->UIlibrary();
 
-	std::list< InterfaceObject::Info > objs = lib->infos( "", "", "" );
+	std::list< InterfaceObject::Info > objs = lib->interface( "", "", "" );
 	EXPECT_TRUE( objs.empty() );
 	delete lib;
 }
