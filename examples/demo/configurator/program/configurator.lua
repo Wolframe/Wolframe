@@ -357,6 +357,13 @@ function deleteManufacturer( )
 	formfunction( "deleteManufacturer" )( { id = id } )
 end
 
+function editManufacturer( )
+	local manufacturer = input:table( )
+	logger:print( "ERROR", manufacturer )
+--	local picture = transform_picture( itr)
+--	formfunction( "updatePicture" )( { picture = picture } )
+end
+
 function ManufacturerRequest( )
 	output:as( "manufacturer SYSTEM 'Manufacturer.simpleform'")
 	filter().empty = false
