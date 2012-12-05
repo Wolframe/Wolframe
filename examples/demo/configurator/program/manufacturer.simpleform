@@ -9,6 +9,7 @@ DOCTYPE "manufacturer Manufacturer"
 		picture
 		{
 			id @int
+			image string
 		}
 	}
 }
