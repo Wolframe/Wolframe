@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>391</width>
+    <height>435</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="initAction" stdset="0">
+   <string>read</string>
+  </property>
+  <property name="id" stdset="0">
+   <string notr="true">{global.id}</string>
+  </property>
+  <property name="doctype" stdset="0">
+   <string notr="true">CategoryRequest.simpleForm</string>
+  </property>
+  <property name="rootelement" stdset="0">
+   <string>category</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_name">
+     <property name="text">
+      <string>Name:</string>
+     </property>
+     <property name="buddy">
+      <cstring>name</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="name">
+     <property name="initialFocus" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_description">
+     <property name="text">
+      <string>Description:</string>
+     </property>
+     <property name="buddy">
+      <cstring>description</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPlainTextEdit" name="description"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Pictures:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QTableWidget" name="picture">
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::MultiSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="showGrid">
+      <bool>true</bool>
+     </property>
+     <property name="gridStyle">
+      <enum>Qt::DotLine</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string notr="true">PictureListRequest.simpleform</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string notr="true">picture</string>
+     </property>
+     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderStretchLastSection">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>thumbnail</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>caption</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>info</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>tags</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="save">
+       <property name="text">
+        <string>Save</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">category</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">Category.simpleform</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">update</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">categories</string>
+       </property>
+       <property name="id" stdset="0">
+        <string notr="true">{global.id}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="reset">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">CategoryRequest.simpleform</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">category</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">read</string>
+       </property>
+       <property name="id" stdset="0">
+        <string notr="true">{global.id}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">categories</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>name</tabstop>
+  <tabstop>description</tabstop>
+  <tabstop>picture</tabstop>
+  <tabstop>save</tabstop>
+  <tabstop>reset</tabstop>
+  <tabstop>cancel</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

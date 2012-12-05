@@ -3,7 +3,11 @@ ERROR: error calling function 'CategoryHierarchyRequest':[configurator]:100: err
 ..and SQL is shortened..
 ..db-layer concurrency issue..
 
+---
+
 FreeBSD, some PNGs are not visible in qt client (PNG version?)
+
+---
 
 textwolf:
 - removing pretty-print in client leads to
@@ -11,12 +15,16 @@ textwolf:
   XML is <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE category SYSTEM 'CategoryHierarchyRequest.simpleform'><category id="1"/>
   (missing DOCTYPE in non standalone XML document)  
 
+---
+
 FreeBSD 9
 ERROR: error calling function 'editCategory':[configurator]:190: error in func
 So t == 'name' and v == nil, the parser returns '' or nil for empty values?
 
 Got data in state 0 (while using tcpdump?), when using a FreeBSD client, sound
 data races. also getting connect acks before switching the state in W
+
+---
 
 white-out:
 OK REQUEST editPicture
@@ -27,3 +35,58 @@ REQUEST
 ANSWER
 ... nothing happens, either server blocks while delivering or client
 stops reading, but client is in 'Data' mode and tcpdump shows no traffic.
+
+---
+
+	local t = formfunction( "addPicture" )( { manufacturer = f:table( ) } )
+	local t = formfunction( "addPicture" )( { manufacturer = f.table( ) } )
+
+reaction of textwolf filter is quite weird:
+ERROR: error calling function 'createManufacturer':[configurator]:342: error in function 'form:fill()' (parsed untagged value, but no untagged value is defined for this structure (
+  ) at /manufacturer)
+switching to libxml2 helped:
+ERROR: error calling function 'createManufacturer':[configurator]:343: 'form' (metatable 'wolframe.Form') needs self parameter (form:table() instead of form.table())
+
+now I get (which is clearer):
+ERROR: error calling function 'createManufacturer':[configurator]:342: error in function 'form:fill()' (parsed untagged value, but no untagged value is defined for this structure (4) at /manufacturer/picture)
+
+ERROR: error calling function 'createManufacturer':[configurator]:342: error in function 'input:table()' (parsed untagged value, but no untagged value is defined for this structure (3) at /manufacturer/picture)
+
+-> picture is just swallowed in input::get()
+
+---
+
+hangs in
+
+#0  0xb77b9424 in __kernel_vsyscall ()
+#1  0xb70157fb in pthread_cond_wait@@GLIBC_2.3.2 ()
+   from /usr/lib/libpthread.so.0
+#2  0xb743bdfc in boost::thread::join() ()
+   from /usr/lib/libboost_thread.so.1.50.0
+#3  0x082641b4 in _Wolframe_posixMain (argc=4, argv=0xbfbec564)
+    at posixMain.cpp:341
+#4  0x0826579f in main (argc=4, argv=0xbfbec564) at wolframed.cpp:55
+
+on shutdown after an errornous form request ( {} in deleteManufacturer)
+
+--
+
+list { manufacturer { 1 { id='3'name { 'Intel' } webPage { 'xxx' }  }  }  } 
+-> funny output, can't this be more Lua-like?
+
+--
+
+function f
+	logger:print( "ERROR", input:table( ) )
+	local x = input:table( );
+	print( "ERROR", "HERE" )
+end
+
+ERROR: { manufacturer={ form='manufacturers' name='y' webPage='y' } }
+
+HERE never appears, server hangs
+libxml2 filter
+textwolf:
+ERROR: error calling function 'createManufacturer':[configurator]:341: error in function 'input:table()' (parsed untagged value, but no untagged value is defined for this structure (
+
+no matter where I put '_ string'. the picture tag is never parsed

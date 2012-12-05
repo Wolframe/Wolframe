@@ -1,0 +1,20 @@
+TRANSACTION selectManufacturerList
+RESULT INTO list
+BEGIN
+	INTO manufacturer DO
+		SELECT Manufacturer.ID AS "id", name, webPage, thumbnail
+		FROM Manufacturer
+		LEFT JOIN Picture
+		ON Manufacturer.logo = Picture.ID;
+END
+
+TRANSACTION addManufacturer
+BEGIN
+	DO INSERT INTO Manufacturer( name, normalizedName, webPage, logo )
+		VALUES ( $(name), $(normalizedName), $(webPage), $(logo) );
+END
+
+TRANSACTION deleteManufacturer
+BEGIN
+	DO DELETE FROM Manufacturer WHERE ID = $(id);
+END
