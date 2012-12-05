@@ -63,8 +63,6 @@ struct TransportLayerSSL
 
 		ctx.set_options( boost::asio::ssl::context::default_workarounds
 			| boost::asio::ssl::context::no_sslv2 );
-		ctx.set_verify_mode( boost::asio::ssl::context::verify_peer
-			| boost::asio::ssl::context::verify_fail_if_no_peer_cert );
 
 		ctx.load_verify_file( config.m_CA_cert_file);
 		ctx.use_certificate_file( config.m_client_cert_file, boost::asio::ssl::context::pem, ec);
@@ -81,6 +79,9 @@ struct TransportLayerSSL
 			msg << "client key illegal or in wrong format (expecting PEM): " << ec.message( ) << " (" << ec.value( ) << ")";
 			throw std::runtime_error( msg.str());
 		}
+
+		ctx.set_verify_mode( boost::asio::ssl::context::verify_peer
+			| boost::asio::ssl::context::verify_peer );
 		return new socket_type( io_service, ctx);
 	}
 };

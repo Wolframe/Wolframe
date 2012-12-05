@@ -65,7 +65,7 @@ run:
 	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./wolframec 127.0.0.1 7661
 
 runssl:
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./wolframec -S --CA-cert-file=certs/CAclient.cert.pem \
-		--client-cert-file=certs/client.crt \
-		--client-cert-key=private/client.key \
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./wolframec -S --CA-cert-file=../../tests/SSL/CAchain.pem \
+		--client-cert-file=../../tests/SSL/client.crt \
+		--client-cert-key=../../tests/SSL/client.key \
 		127.0.0.1 7961
