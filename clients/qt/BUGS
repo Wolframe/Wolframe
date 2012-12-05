@@ -17,3 +17,13 @@ So t == 'name' and v == nil, the parser returns '' or nil for empty values?
 
 Got data in state 0 (while using tcpdump?), when using a FreeBSD client, sound
 data races. also getting connect acks before switching the state in W
+
+white-out:
+OK REQUEST editPicture
+REQUEST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE picture SYSTEM 'PictureListRequest.simpleform'>
+<picture search="" state="S40|" id="1"/>
+ANSWER
+... nothing happens, either server blocks while delivering or client
+stops reading, but client is in 'Data' mode and tcpdump shows no traffic.

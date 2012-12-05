@@ -167,7 +167,7 @@ global.*	global variables, once stored, they are kept and
 		{widgetname.property}
 		{global.stored_variable}
 		
-		currently there exists the following properties for
+		currently there exist the following properties for
 		the corresponding classes:
 
 		QEditLine	state	the text entered
@@ -180,4 +180,7 @@ global.*	global variables, once stored, they are kept and
 					(single selection for now)
 		*		*	any other property is added
 					as attribute to the request,
-					e.g. 'id', 'search' in configurator
+					e.g. 'id', 'search' in configurator,
+					those are business layer specific, i.e.
+					the client only sends them
+					
