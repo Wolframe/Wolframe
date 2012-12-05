@@ -357,6 +357,21 @@ function deleteManufacturer( )
 	formfunction( "deleteManufacturer" )( { id = id } )
 end
 
+function ManufacturerRequest( )
+	output:as( "manufacturer SYSTEM 'Manufacturer.simpleform'")
+	filter().empty = false
+	local id = nil
+	for v,t in input:get( ) do
+		if t == "id" then
+			id = v
+		end
+	end
+	local t = formfunction( "selectManufacturer" )( { id = id } )
+	local f = form( "Manufacturer" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
 -- pictures
 
 function PictureListRequest( )
