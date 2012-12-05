@@ -2,10 +2,12 @@ selectTopCategory = selectTopCategory( xml );
 selectSubCategory = selectSubCategory( xml );
 selectCategory = selectCategory( xml );
 selectCategoryByName = selectCategoryByName( xml );
-selectCategoryByNormalizedName = selectCategoryByNormalizedame( xml );
+selectCategoryByNormalizedName = selectCategoryByNormalizedName( xml );
 selectTopFeature = selectTopFeature( xml );
 selectSubFeature = selectSubFeature( xml );
 selectFeature = selectFeature( xml );
 selectFeatureByName = selectFeatureByName( xml );
-selectFeatureByNormalizedName = selectFeatureByNormalizedame( xml );
+selectFeatureByNormalizedName = selectFeatureByNormalizedName( xml );
 selectPictureList = selectPictureList( xml );
+selectManufacturerList = selectManufacturerList( xml );
+
