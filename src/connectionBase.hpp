@@ -71,11 +71,10 @@ public:
 		m_timer( IOservice )
 	{
 		assert( handler != NULL );
-		m_connHandler = handler;
 		m_readBuffer = NULL;
 	}
 
-	~ConnectionBase()
+	virtual ~ConnectionBase()
 	{
 		delete m_connHandler;
 	}
