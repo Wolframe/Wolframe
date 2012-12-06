@@ -1,3 +1,11 @@
+local function create_manufacturer(itr)
+	local manufacturerform = form("Manufacturer");
+	manufacturerform:fill(itr)
+	local manufacturer = manufacturerform:table()["manufacturer"]
+	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	manufacturer["logo"] = manufacturer["picture"]["id"]
+	formfunction( "addManufacturer" )( manufacturer )
+end
 
 function run()
 	filter().empty = false

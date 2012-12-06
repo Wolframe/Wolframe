@@ -26,9 +26,14 @@ PF:
 
 - bugs
   - scope(itr) passed to form does not consume all input
+     (check if form could not consume final close and check if the
+      implementation does not onyl respect the top level tag as side effect)
+  - tostring,table,get are not copying their iterated object (missing TypedInputFilter::copy())
+
 - low prio
   - cmdline client: test with SSL (MBA)
-  - forms with SELF recursion
+  - Lua: make form:fill() also return the form filled so that assigning and filling can be chained
+  - test forms with SELF recursion
   - programs with interface (cleanup ProcProvider)
   - documentation (tutorial)
   - bignum tests (only bigint tested until now)
