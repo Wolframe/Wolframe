@@ -17,6 +17,19 @@
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_code">
+     <property name="text">
+      <string>Code:</string>
+     </property>
+     <property name="buddy">
+      <cstring>code</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="code"/>
+   </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_name">
      <property name="text">
@@ -31,6 +44,58 @@
     <widget class="QLineEdit" name="name">
      <property name="initialFocus" stdset="0">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_category">
+     <property name="text">
+      <string>Category:</string>
+     </property>
+     <property name="buddy">
+      <cstring>category</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QTreeWidget" name="category">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::MultiSelection</enum>
+     </property>
+     <property name="headerHidden">
+      <bool>false</bool>
+     </property>
+     <property name="expandsOnDoubleClick">
+      <bool>false</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string>CategoryHierarchyRequest.simpleform</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>category</string>
+     </property>
+     <attribute name="headerDefaultSectionSize">
+      <number>200</number>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>category</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>description</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_manufacturer">
+     <property name="text">
+      <string>Manufacturer</string>
+     </property>
+     <property name="buddy">
+      <cstring>manufacturer</cstring>
      </property>
     </widget>
    </item>
@@ -81,7 +146,33 @@
      </column>
     </widget>
    </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_mfgCode">
+     <property name="text">
+      <string>mfgCode:</string>
+     </property>
+     <property name="buddy">
+      <cstring>mfgCode</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="mfgCode"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_description">
+     <property name="text">
+      <string>Webpage:</string>
+     </property>
+     <property name="buddy">
+      <cstring>webPage</cstring>
+     </property>
+    </widget>
+   </item>
    <item row="5" column="1">
+    <widget class="QLineEdit" name="webPage"/>
+   </item>
+   <item row="9" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -102,16 +193,16 @@
         <string>Add</string>
        </property>
        <property name="rootelement" stdset="0">
-        <string notr="true">manufacturer</string>
+        <string notr="true">component</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">Manufacturer.simpleform</string>
+        <string notr="true">Component.simpleform</string>
        </property>
        <property name="action" stdset="0">
         <string notr="true">create</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">manufacturers</string>
+        <string notr="true">components</string>
        </property>
       </widget>
      </item>
@@ -121,75 +212,46 @@
         <string>Cancel</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">manufacturers</string>
+        <string notr="true">components</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_code">
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_description_2">
      <property name="text">
-      <string>Code:</string>
+      <string>Description:</string>
+     </property>
+     <property name="buddy">
+      <cstring>description</cstring>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="code"/>
+   <item row="7" column="1">
+    <widget class="QTextEdit" name="description"/>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_manufacturer">
+   <item row="8" column="1">
+    <widget class="QLineEdit" name="price"/>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_price">
      <property name="text">
-      <string>Manufacturer</string>
+      <string>Price:</string>
      </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QLineEdit" name="webPage"/>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_description">
-     <property name="text">
-      <string>Webpage:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_category">
-     <property name="text">
-      <string>Category:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QTreeWidget" name="category">
-     <property name="selectionMode">
-      <enum>QAbstractItemView::MultiSelection</enum>
-     </property>
-     <property name="headerHidden">
-      <bool>true</bool>
-     </property>
-     <property name="expandsOnDoubleClick">
-      <bool>false</bool>
-     </property>
-     <property name="doctype" stdset="0">
-      <string>CategoryHierarchyRequest.simpleform</string>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string>category</string>
-     </property>
-     <column>
-      <property name="text">
-       <string>tag</string>
-      </property>
-     </column>
     </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
+  <tabstop>code</tabstop>
   <tabstop>name</tabstop>
+  <tabstop>category</tabstop>
   <tabstop>manufacturer</tabstop>
+  <tabstop>mfgCode</tabstop>
+  <tabstop>webPage</tabstop>
+  <tabstop>description</tabstop>
+  <tabstop>price</tabstop>
   <tabstop>add</tabstop>
   <tabstop>cancel</tabstop>
  </tabstops>
