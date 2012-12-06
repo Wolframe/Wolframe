@@ -1,0 +1,7 @@
+DOCTYPE "manufacturer ManufacturerRequest"
+{
+	manufacturer
+	{
+		id @int
+	}
+}

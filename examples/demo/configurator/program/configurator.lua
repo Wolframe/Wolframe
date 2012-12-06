@@ -351,39 +351,32 @@ end
 
 function createManufacturer( )
 	local manufacturer = input:table( )["manufacturer"]
-	manufacturer["logo"] = manufacturer["picture"]["id"]
-	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	if manufacturer["picture"]["id"] then
+		manufacturer["logo"] = manufacturer["picture"]["id"]
+	end
+	if manufacturer["name"] then
+		manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	end
 	formfunction( "addManufacturer" )( manufacturer )
 end
 
 function editManufacturer( )
 	local manufacturer = input:table( )["manufacturer"]
-	manufacturer["logo"] = manufacturer["picture"]["id"]
-	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	if manufacturer["picture"]["id"] then
+		manufacturer["logo"] = manufacturer["picture"]["id"]
+	end
+	if manufacturer["name"] then
+		manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	end
 	formfunction( "updateManufacturer" )( manufacturer )
 end
 
 function deleteManufacturer( )
-	filter().empty = false
-	local id = nil
-	for v,t in input:get( ) do
-		if t == "id" then
-			id = v
-		end
-	end
-	formfunction( "deleteManufacturer" )( { id = id } )
+	formfunction( "deleteManufacturer" )( { id = input:table( )["manufacturer"]["id"] } )
 end
 
 function ManufacturerRequest( )
-	output:as( "manufacturer SYSTEM 'Manufacturer.simpleform'")
-	filter().empty = false
-	local id = nil
-	for v,t in input:get( ) do
-		if t == "id" then
-			id = v
-		end
-	end
-	local t = formfunction( "selectManufacturer" )( { id = id } )
+	local t = formfunction( "selectManufacturer" )( { id = input:table( )["manufacturer"]["id"] } )
 	local f = form( "Manufacturer" )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
