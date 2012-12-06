@@ -11,6 +11,10 @@ now:
 - CRITICAL: "Premature end of document."
 - package version switching
 
+- last used directory in File/PictureChooser
+- search dialogs using tags to easier find categories and features
+- diacritical characters get lost
+
 musts:
 - push button state (disabled/enabled) based on a
   condition like {picture.id>0}
