@@ -271,7 +271,7 @@ void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 	
 	qDebug( ) << "ANSWER for form" << formName << "and widget" << widgetName;
 	
-	emit answer( formName, widgetName, content.toUtf8( ) );
+	emit answer( formName, widgetName, content.toAscii( ) );
 }
 
 void NetworkDataLoader::gotError( QString error )
