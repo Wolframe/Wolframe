@@ -181,7 +181,7 @@
         <string notr="true">{global.id}</string>
        </property>
        <property name="global.lastPictureDir" stdset="0">
-        <string>{picture.state}</string>
+        <string>{image.state}</string>
        </property>
       </widget>
      </item>

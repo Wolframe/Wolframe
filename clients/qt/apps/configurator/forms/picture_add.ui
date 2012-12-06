@@ -60,7 +60,7 @@
         <string notr="true">pictures</string>
        </property>
        <property name="global.lastPictureDir" stdset="0">
-        <string notr="true">{picture.state}</string>
+        <string notr="true">{image.state}</string>
        </property>
       </widget>
      </item>
