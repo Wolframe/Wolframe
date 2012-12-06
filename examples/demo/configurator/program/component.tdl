@@ -5,7 +5,7 @@ BEGIN
 		SELECT Component.ID AS "id", code, Component.name AS "name",
 			Category.name AS "categoryName", 
 			Manufacturer.name AS "manufacturerName",
-			mfgCode, Component.webPage, Component.description, price
+			mfgCode AS "mfgCode", Component.webPage AS "webPage", Component.description, price
 		FROM Component, Category, Manufacturer
 		WHERE Component.categoryID = Category.ID
 		AND Component.manufacturerID = Manufacturer.ID;
@@ -36,11 +36,11 @@ RESULT INTO component
 BEGIN
 	INTO . DO
 		SELECT Component.ID AS "id", code, name,
-			mfgCode, webPage, description, price
+			mfgCode AS "mfgCode", webPage AS "webPage", description, price
 			FROM Component
 			WHERE Component.ID = $(id);
 	INTO category DO
-		SELECT categoryID AS "id", Category.name AS ""
+		SELECT categoryID AS "id", Category.name AS "_"
 			FROM Component, Category
 			WHERE Component.ID = $(id)
 			AND Component.CategoryID = Category.ID;
