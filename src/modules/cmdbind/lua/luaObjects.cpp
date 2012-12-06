@@ -774,6 +774,9 @@ LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_struct_tostring)
 	serialize::StructSerializer* obj = LuaObject<serialize::StructSerializer>::getSelf( ls, "<structure>", "__tostring");
 	check_parameters( ls, 1, 0);
 
+	LuaObject<serialize::StructSerializer>::push_luastack( ls, *obj);
+	obj = (serialize::StructSerializer*) lua_touserdata( ls, -1);
+
 	ToStringFilter* flt = new ToStringFilter;
 	TypedOutputFilterR out( flt);
 	obj->init( out, serialize::Context::SerializeWithIndices);
@@ -836,8 +839,8 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_struct_get)
 LUA_FUNCTION_THROWS( "<structure>:__tostring()", function_typedinputfilter_tostring)
 {
 	TypedInputFilterR* obj = LuaObject<TypedInputFilterR>::getSelf( ls, "<structure>", "__tostring");
-	if (obj->get()) (*obj)->resetIterator();
 	check_parameters( ls, 1, 0);
+	if (obj->get()) (*obj)->resetIterator();
 
 	ToStringFilter* flt = new ToStringFilter();
 	TypedOutputFilterR out( flt);
