@@ -7,11 +7,11 @@ DOCTYPE "component Component"
 		code string
 		name string
 		category {
-			ID @int
+			id @int
 			_ string
 		}
-		macufacturer {
-			ID @int
+		manufacturer {
+			id @int
 			_ string
 		}
 		mfgCode string

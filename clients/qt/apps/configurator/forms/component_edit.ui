@@ -13,6 +13,18 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="initAction" stdset="0">
+   <string notr="true">read</string>
+  </property>
+  <property name="id" stdset="0">
+   <string notr="true">{global.id}</string>
+  </property>
+  <property name="doctype" stdset="0">
+   <string notr="true">ComponentRequest.simpleForm</string>
+  </property>
+  <property name="rootelement" stdset="0">
+   <string notr="true">component</string>
+  </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
@@ -188,9 +200,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="add">
+      <widget class="QPushButton" name="save">
        <property name="text">
-        <string>Add</string>
+        <string>Save</string>
        </property>
        <property name="rootelement" stdset="0">
         <string notr="true">component</string>
@@ -199,10 +211,32 @@
         <string notr="true">Component.simpleform</string>
        </property>
        <property name="action" stdset="0">
-        <string notr="true">create</string>
+        <string notr="true">update</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">components</string>
+       </property>
+       <property name="id" stdset="0">
+        <string notr="true">{global.id}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="reset">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">ComponentRequest.simpleform</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">component</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">read</string>
+       </property>
+       <property name="id" stdset="0">
+        <string notr="true">{global.id}</string>
        </property>
       </widget>
      </item>
@@ -249,7 +283,8 @@
   <tabstop>webPage</tabstop>
   <tabstop>description</tabstop>
   <tabstop>price</tabstop>
-  <tabstop>add</tabstop>
+  <tabstop>save</tabstop>
+  <tabstop>reset</tabstop>
   <tabstop>cancel</tabstop>
  </tabstops>
  <resources/>

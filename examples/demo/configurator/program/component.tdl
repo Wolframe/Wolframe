@@ -35,8 +35,17 @@ TRANSACTION selectComponent
 RESULT INTO component
 BEGIN
 	INTO . DO
-		SELECT Component.ID AS "id", code, name, categoryID,
-		manufacturerID, mfgCode, webPage, description, price
-		FROM Component
-		WHERE Component.ID = $(id);
+		SELECT Component.ID AS "id", code, name,
+			mfgCode, webPage, description, price
+			FROM Component
+			WHERE Component.ID = $(id);
+	INTO category DO
+		SELECT categoryID AS "id", Category.name AS ""
+			FROM Component, Category
+			WHERE Component.ID = $(id)
+			AND Component.CategoryID = Category.ID;
+	INTO manufacturer DO
+		SELECT manufacturerID AS "id"
+			FROM Component
+			WHERE Component.ID = $(id);
 END
