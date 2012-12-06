@@ -2,7 +2,7 @@ TRANSACTION selectManufacturerList
 RESULT INTO list
 BEGIN
 	INTO manufacturer DO
-		SELECT Manufacturer.ID AS "id", name, webPage, thumbnail
+		SELECT Manufacturer.ID AS "id", name, webPage AS "webPage", thumbnail
 		FROM Manufacturer
 		LEFT JOIN Picture
 		ON Manufacturer.logo = Picture.ID;
@@ -29,7 +29,7 @@ TRANSACTION selectManufacturer
 RESULT INTO manufacturer
 BEGIN
 	INTO . DO
-		SELECT Manufacturer.ID AS "id", name, webPage
+		SELECT Manufacturer.ID AS "id", name, webPage AS "webPage"
 		FROM Manufacturer
 		WHERE Manufacturer.ID = $(id);
 	INTO picture DO
