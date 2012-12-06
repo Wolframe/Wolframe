@@ -339,7 +339,11 @@ void DataHandler::resetFormData( QWidget *form )
 			fileChooser->setFileName( "" );
 		} else if( clazz == "PictureChooser" ) {
 			PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
-			pictureChooser->setFileName( "" );
+			if( props->contains( "state" ) ) {
+				pictureChooser->setFileName( props->value( "state" ) );
+			} else {
+				pictureChooser->setFileName( "" );
+			}
 		} else if( clazz == "QPushButton" ) {
 			// skip, ok, buttons can't be reset
 		} else if( clazz == "QGroupBox" ) {
@@ -862,6 +866,13 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 			return lineEdit->text( );
 		} else if( property == "state" ) {
 			return lineEdit->text( );
+		} else {
+			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
+		}
+	} else if( clazz == "PictureChooser" ) {
+		PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
+		if( property == "state" ) {
+			return pictureChooser->fileName( );
 		} else {
 			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
 		}

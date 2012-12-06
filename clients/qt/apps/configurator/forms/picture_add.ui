@@ -59,6 +59,9 @@
        <property name="form" stdset="0">
         <string notr="true">pictures</string>
        </property>
+       <property name="global.lastPictureDir" stdset="0">
+        <string notr="true">{picture.state}</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -101,6 +104,9 @@
        <width>0</width>
        <height>150</height>
       </size>
+     </property>
+     <property name="state" stdset="0">
+      <string notr="true">{global.lastPictureDir}</string>
      </property>
     </widget>
    </item>

@@ -140,6 +140,9 @@
        <height>150</height>
       </size>
      </property>
+     <property name="state" stdset="0">
+      <string notr="true">{global.lastPictureDir}</string>
+     </property>
     </widget>
    </item>
    <item row="8" column="0" colspan="2">
@@ -176,6 +179,9 @@
        </property>
        <property name="id" stdset="0">
         <string notr="true">{global.id}</string>
+       </property>
+       <property name="global.lastPictureDir" stdset="0">
+        <string>{picture.state}</string>
        </property>
       </widget>
      </item>
