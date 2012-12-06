@@ -350,12 +350,17 @@ function create_manufacturer(itr)
 end
 
 function createManufacturer( )
-	local x = input:table( );
-	logger:print( "ERROR", x )
---	local manufacturer = input:table( )["manufacturer"]
---	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
---	manufacturer["logo"] = manufacturer["picture"]["id"]
---	formfunction( "addManufacturer" )( manufacturer )
+	local manufacturer = input:table( )["manufacturer"]
+	manufacturer["logo"] = manufacturer["picture"]["id"]
+	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	formfunction( "addManufacturer" )( manufacturer )
+end
+
+function editManufacturer( )
+	local manufacturer = input:table( )["manufacturer"]
+	manufacturer["logo"] = manufacturer["picture"]["id"]
+	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	formfunction( "updateManufacturer" )( manufacturer )
 end
 
 function deleteManufacturer( )
@@ -367,13 +372,6 @@ function deleteManufacturer( )
 		end
 	end
 	formfunction( "deleteManufacturer" )( { id = id } )
-end
-
-function editManufacturer( )
-	local manufacturer = input:table( )
-	logger:print( "ERROR", manufacturer )
---	local picture = transform_picture( itr)
---	formfunction( "updatePicture" )( { picture = picture } )
 end
 
 function ManufacturerRequest( )

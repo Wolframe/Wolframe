@@ -10,6 +10,7 @@ DOCTYPE "manufacturer Manufacturer"
 		{
 			id @int
 			image string
+			_ string
 		}
 	}
 }

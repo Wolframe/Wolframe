@@ -159,6 +159,7 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>manufacturer</tabstop>
   <tabstop>add</tabstop>
   <tabstop>delete_2</tabstop>
   <tabstop>edit</tabstop>
