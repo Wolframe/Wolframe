@@ -1,0 +1,22 @@
+DOCTYPE "component Component"
+{
+	component
+	{
+		id @int
+		form @string
+		code string
+		name string
+		category {
+			ID @int
+			_ string
+		}
+		macufacturer {
+			ID @int
+			_ string
+		}
+		mfgCode string
+		webPage string
+		description string
+		price float
+	}
+}

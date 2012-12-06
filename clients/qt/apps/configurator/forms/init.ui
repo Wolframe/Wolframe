@@ -14,6 +14,22 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="1">
+    <widget class="QPushButton" name="form1_3">
+     <property name="text">
+      <string>Manage Manufacturers</string>
+     </property>
+     <property name="form" stdset="0">
+      <string notr="true">manufacturers</string>
+     </property>
+     <property name="global.featureState" stdset="0">
+      <string notr="true">{feature.state}</string>
+     </property>
+     <property name="global.categoryState" stdset="0">
+      <string notr="true">{category.state}</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QTreeWidget" name="category">
      <property name="itemsExpandable">
@@ -132,13 +148,13 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="form1_3">
+   <item row="3" column="0">
+    <widget class="QPushButton" name="form1_4">
      <property name="text">
-      <string>Manage Manufacturers</string>
+      <string>Manage Components</string>
      </property>
      <property name="form" stdset="0">
-      <string notr="true">manufacturers</string>
+      <string notr="true">components</string>
      </property>
      <property name="global.featureState" stdset="0">
       <string notr="true">{feature.state}</string>

@@ -351,7 +351,7 @@ end
 
 function createManufacturer( )
 	local manufacturer = input:table( )["manufacturer"]
-	if manufacturer["picture"]["id"] then
+	if manufacturer["picture"] then
 		manufacturer["logo"] = manufacturer["picture"]["id"]
 	end
 	if manufacturer["name"] then
@@ -362,7 +362,7 @@ end
 
 function editManufacturer( )
 	local manufacturer = input:table( )["manufacturer"]
-	if manufacturer["picture"]["id"] then
+	if manufacturer["picture"] then
 		manufacturer["logo"] = manufacturer["picture"]["id"]
 	end
 	if manufacturer["name"] then
@@ -378,6 +378,55 @@ end
 function ManufacturerRequest( )
 	local t = formfunction( "selectManufacturer" )( { id = input:table( )["manufacturer"]["id"] } )
 	local f = form( "Manufacturer" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+-- components
+
+function ComponentListRequest( )
+	output:as( "list SYSTEM 'componentList.simpleform'" )
+	local t = formfunction( "selectComponentList" )( {} )
+	local f = form( "ComponentList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function createComponent( )
+	local component = input:table( )["component"]
+	if component["category"] then
+		component["categoryID"] = component["category"]["id"]
+	end
+	if component["manufacturer"] then
+		component["manufacturerID"] = component["manufacturer"]["id"]
+	end
+	if component["name"] then
+		component["normalizedName"] = normalizer( "name" )( component["name"] )
+	end
+	formfunction( "addComponent" )( component )
+end
+
+function editComponent( )
+	local component = input:table( )["component"]
+	if component["category"] then
+		component["categoryID"] = component["category"]["id"]
+	end
+	if component["manufacturer"] then
+		component["manufacturerID"] = component["manufacturer"]["id"]
+	end
+	if component["name"] then
+		component["normalizedName"] = normalizer( "name" )( component["name"] )
+	end
+	formfunction( "updateComponent" )( component )
+end
+
+function deleteComponent( )
+	formfunction( "deleteComponent" )( { id = input:table( )["component"]["id"] } )
+end
+
+function ComponentRequest( )
+	local t = formfunction( "selectComponent" )( { id = input:table( )["component"]["id"] } )
+	local f = form( "Component" )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
 end
