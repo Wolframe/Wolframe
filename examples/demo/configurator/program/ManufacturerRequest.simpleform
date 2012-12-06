@@ -3,5 +3,15 @@ DOCTYPE "manufacturer ManufacturerRequest"
 	manufacturer
 	{
 		id @int
+		form @string
+		name string
+		webpage string
+		webPage string
+		picture
+		{
+			id @int
+			image string
+			_ string
+		}
 	}
 }

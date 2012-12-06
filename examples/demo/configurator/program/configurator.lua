@@ -351,7 +351,7 @@ end
 
 function createManufacturer( )
 	local manufacturer = input:table( )["manufacturer"]
-	if manufacturer["picture"]["id"] then
+	if manufacturer["picture"] then
 		manufacturer["logo"] = manufacturer["picture"]["id"]
 	end
 	if manufacturer["name"] then
@@ -362,7 +362,7 @@ end
 
 function editManufacturer( )
 	local manufacturer = input:table( )["manufacturer"]
-	if manufacturer["picture"]["id"] then
+	if manufacturer["picture"] then
 		manufacturer["logo"] = manufacturer["picture"]["id"]
 	end
 	if manufacturer["name"] then
