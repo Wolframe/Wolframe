@@ -1,6 +1,0 @@
-ATX PS/2 	standard ATX PSU	150mm (W) x 86mm (H) x 140mm+ (D)
-ATX PS/3		150mm (W) x 86mm (H) x 100 - 139mm (D)
-SFX		125mm (W) x 51.5mm (H) x 100mm+ (D)
-Flex ATX		81.5mm (W) x 40.5mm (H) x 150mm+ (D)
-TFX		85mm (W) x 65mm (H) x 175mm+- (D)
-PS/2 mini redundant	hot-swap capability	150mm (W) x 85mm (H) x 200mm+- (D)

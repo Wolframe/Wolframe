@@ -4,11 +4,12 @@ CREATE TABLE Tag	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	parentID	INT	REFERENCES Tag( ID ),
 	name		TEXT	NOT NULL,
-	normalizedName	TEXT	NOT NULL UNIQUE,
+	normalizedName	TEXT	NOT NULL,
 	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
-	CONSTRAINT order_check CHECK ( rgt > lft )
+	CONSTRAINT order_check CHECK ( rgt > lft ),
+	CONSTRAINT tag_normalizedName_check UNIQUE( normalizedName, parentID )
 );
 
 INSERT INTO Tag( parentID, name, normalizedName, description, lft, rgt )
@@ -40,11 +41,12 @@ CREATE TABLE Category	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	parentID	INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
-	normalizedName	TEXT	NOT NULL UNIQUE,
+	normalizedName	TEXT	NOT NULL,
 	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
-	CONSTRAINT order_check CHECK ( rgt > lft )
+	CONSTRAINT order_check CHECK ( rgt > lft ),
+	CONSTRAINT category_normalizedName_check UNIQUE( normalizedName, parentID )
 );
 
 INSERT INTO Category( parentID, name, normalizedName, description, lft, rgt )
@@ -63,11 +65,12 @@ CREATE TABLE Feature	(
 	ID 		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	parentID	INT	REFERENCES Feature( ID ),
 	name		TEXT	NOT NULL,
-	normalizedName	TEXT	NOT NULL UNIQUE,
+	normalizedName	TEXT	NOT NULL,
 	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
-	CONSTRAINT order_check CHECK ( rgt > lft )
+	CONSTRAINT order_check CHECK ( rgt > lft ),
+	CONSTRAINT feature_normalizedName_check UNIQUE( normalizedName, parentID )
 );
 
 INSERT INTO Feature( parentID, name, normalizedName, description, lft, rgt )

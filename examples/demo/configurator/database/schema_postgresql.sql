@@ -4,11 +4,12 @@ CREATE TABLE Tag	(
 	ID SERIAL NOT NULL PRIMARY KEY,
 	parentID	INT	REFERENCES Tag( ID ),
 	name		TEXT	NOT NULL,
-	normalizedName	TEXT	NOT NULL UNIQUE,
+	normalizedName	TEXT	NOT NULL,
 	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
-	CONSTRAINT order_check CHECK ( rgt > lft )
+	CONSTRAINT order_check CHECK ( rgt > lft ),
+	CONSTRAINT tag_normalizedName_check UNIQUE( normalizedName, parentID )
 );
 ALTER SEQUENCE Tag_ID_seq RESTART WITH 1;
 
@@ -42,11 +43,12 @@ CREATE TABLE Category	(
 	ID SERIAL NOT NULL PRIMARY KEY,
 	parentID	INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
-	normalizedName	TEXT	NOT NULL UNIQUE,
+	normalizedName	TEXT	NOT NULL,
 	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
-	CONSTRAINT order_check CHECK ( rgt > lft )
+	CONSTRAINT order_check CHECK ( rgt > lft ),
+	CONSTRAINT category_normalizedName_check UNIQUE( normalizedName, parentID )
 );
 ALTER SEQUENCE Category_ID_seq RESTART WITH 1;
 
@@ -66,11 +68,12 @@ CREATE TABLE Feature	(
 	ID SERIAL NOT NULL PRIMARY KEY,
 	parentID	INT	REFERENCES Feature( ID ),
 	name		TEXT	NOT NULL,
-	normalizedName	TEXT	NOT NULL UNIQUE,
+	normalizedName	TEXT	NOT NULL,
 	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
-	CONSTRAINT order_check CHECK ( rgt > lft )
+	CONSTRAINT order_check CHECK ( rgt > lft ),
+	CONSTRAINT feature_normalizedName_check UNIQUE( normalizedName, parentID )
 );
 ALTER SEQUENCE Feature_ID_seq RESTART WITH 1;
 
