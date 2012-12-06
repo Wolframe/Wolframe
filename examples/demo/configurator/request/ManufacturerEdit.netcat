@@ -1,12 +1,12 @@
 AUTH
 MECH NONE
-REQUEST create
+REQUEST edit
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE manufacturer SYSTEM 'Manufacturer.simpleform'>
-<manufacturer form="manufacturers" id="8">
-  <name>A</name>
+<manufacturer form="manufacturers" id="3">
+  <name>B</name>
   <picture id="45">45</picture>
-  <webPage>http://aa.com/</webPage>
+  <webPage>http://bb.com/</webPage>
 </manufacturer>
 .
 CAPA

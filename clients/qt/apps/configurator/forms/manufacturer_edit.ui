@@ -192,6 +192,7 @@
  </widget>
  <tabstops>
   <tabstop>name</tabstop>
+  <tabstop>webPage</tabstop>
   <tabstop>picture</tabstop>
   <tabstop>save</tabstop>
   <tabstop>reset</tabstop>

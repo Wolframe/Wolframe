@@ -87,6 +87,3 @@ ERROR: { manufacturer={ form='manufacturers' name='y' webPage='y' } }
 HERE never appears, server hangs
 libxml2 filter
 textwolf:
-ERROR: error calling function 'createManufacturer':[configurator]:341: error in function 'input:table()' (parsed untagged value, but no untagged value is defined for this structure (
-
-no matter where I put '_ string'. the picture tag is never parsed

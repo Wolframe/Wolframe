@@ -177,9 +177,9 @@ CREATE TABLE ComponentCheck	(
 	ruleName	TEXT
 );
 
--- Receipes
+-- Recipes
 --
-CREATE TABLE Receipe	(
+CREATE TABLE Recipe	(
 	ID SERIAL NOT NULL PRIMARY KEY,
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
@@ -190,18 +190,18 @@ CREATE TABLE Receipe	(
 );
 
 CREATE TABLE RecipePicture	(
-	receipeID	INT	REFERENCES Receipe( ID ),
+	recipeID	INT	REFERENCES Recipe( ID ),
 	pictureID	INT	REFERENCES Picture( ID ),
-	UNIQUE ( receipeID, pictureID )
+	UNIQUE ( recipeID, pictureID )
 );
 
-CREATE TABLE ReceipeContent	(
-	receipeID	INT	REFERENCES Receipe( ID ),
+CREATE TABLE RecipeContent	(
+	recipeID	INT	REFERENCES Recipe( ID ),
 	categoryID	INT	REFERENCES Category( ID ),
 	minQuantity	INT,
 	maxQuantity	INT,
 	comment		TEXT,
-	UNIQUE ( receipeID, categoryID )
+	UNIQUE ( recipeID, categoryID )
 );
 
 

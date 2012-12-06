@@ -350,42 +350,33 @@ function create_manufacturer(itr)
 end
 
 function createManufacturer( )
-	local x = input:table( );
-	logger:print( "ERROR", x )
---	local manufacturer = input:table( )["manufacturer"]
---	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
---	manufacturer["logo"] = manufacturer["picture"]["id"]
---	formfunction( "addManufacturer" )( manufacturer )
-end
-
-function deleteManufacturer( )
-	filter().empty = false
-	local id = nil
-	for v,t in input:get( ) do
-		if t == "id" then
-			id = v
-		end
+	local manufacturer = input:table( )["manufacturer"]
+	if manufacturer["picture"] then
+		manufacturer["logo"] = manufacturer["picture"]["id"]
 	end
-	formfunction( "deleteManufacturer" )( { id = id } )
+	if manufacturer["name"] then
+		manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	end
+	formfunction( "addManufacturer" )( manufacturer )
 end
 
 function editManufacturer( )
-	local manufacturer = input:table( )
-	logger:print( "ERROR", manufacturer )
---	local picture = transform_picture( itr)
---	formfunction( "updatePicture" )( { picture = picture } )
+	local manufacturer = input:table( )["manufacturer"]
+	if manufacturer["picture"] then
+		manufacturer["logo"] = manufacturer["picture"]["id"]
+	end
+	if manufacturer["name"] then
+		manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	end
+	formfunction( "updateManufacturer" )( manufacturer )
+end
+
+function deleteManufacturer( )
+	formfunction( "deleteManufacturer" )( { id = input:table( )["manufacturer"]["id"] } )
 end
 
 function ManufacturerRequest( )
-	output:as( "manufacturer SYSTEM 'Manufacturer.simpleform'")
-	filter().empty = false
-	local id = nil
-	for v,t in input:get( ) do
-		if t == "id" then
-			id = v
-		end
-	end
-	local t = formfunction( "selectManufacturer" )( { id = id } )
+	local t = formfunction( "selectManufacturer" )( { id = input:table( )["manufacturer"]["id"] } )
 	local f = form( "Manufacturer" )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )

@@ -1,10 +1,11 @@
-DOCTYPE "manufacturer Manufacturer"
+DOCTYPE "manufacturer ManufacturerRequest"
 {
 	manufacturer
 	{
 		id @int
 		form @string
 		name string
+		webpage string
 		webPage string
 		picture
 		{
