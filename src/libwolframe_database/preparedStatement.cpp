@@ -75,7 +75,21 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 			for (si=0; si != se; ++si)
 			{
 				const char* colname = stmh->columnName( si+1);
-				cmdres.addColumn( colname?colname:"");
+				if (colname)
+				{
+					if (colname[0] == '_' && colname[1] == '\0')
+					{
+						cmdres.addColumn( "");
+					}
+					else
+					{
+						cmdres.addColumn( colname);
+					}
+				}
+				else
+				{
+					cmdres.addColumn( "");
+				}
 			}
 		}
 		if (stmh->hasResult())
