@@ -1,0 +1,8 @@
+AUTH
+MECH NONE
+REQUEST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE component SYSTEM 'ComponentRequest.simpleform'>
+<component id="8"/>
+.
+CAPA

@@ -1,0 +1,7 @@
+DOCTYPE "component ComponentRequest"
+{
+	component
+	{
+		id @int
+	}
+}

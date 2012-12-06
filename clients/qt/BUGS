@@ -87,3 +87,11 @@ ERROR: { manufacturer={ form='manufacturers' name='y' webPage='y' } }
 HERE never appears, server hangs
 libxml2 filter
 textwolf:
+
+--
+
+AS "_" instead of AS ""
+
+ERROR: error calling function 'ComponentRequest':[configurator]:416: error in function
+'<formfunction>(..)' (transaction failed: PostgreSQL status PGRES_FATAL_ERROR; 
+message: 'ERROR:  zero-length delimited identifier at or near """"
