@@ -46,6 +46,19 @@ Project Wolframe.
 namespace _Wolframe {
 namespace ddl {
 
+class StructType;
+class IndirectionConstructor;
+
+typedef types::CountedReference<IndirectionConstructor> IndirectionConstructorR;
+
+class IndirectionConstructor
+{
+public:
+	virtual ~IndirectionConstructor(){}
+	virtual StructType* create( const IndirectionConstructorR& self) const=0;
+};
+
+
 ///\class StructType
 ///\brief generic type for DDL language binding
 class StructType
@@ -60,7 +73,8 @@ public:
 	{
 		Atomic,		//< atomic type
 		Vector,		//< vector of StructType elements (that are Atomic or Struct)
-		Struct		//< structure type
+		Struct,		//< structure type
+		Indirection	//< type defined as indirection (for recursive structures)
 	};
 
 	///\brief Get the content type of this
@@ -84,6 +98,7 @@ public:
 		,m_value(o.m_value)
 		,m_elem(o.m_elem)
 		,m_nof_attributes(o.m_nof_attributes)
+		,m_indirection(o.m_indirection)
 		,m_flags(o.m_flags){}
 
 	///\brief Copy constructor
@@ -103,6 +118,7 @@ public:
 		m_value = o.m_value;
 		m_elem = o.m_elem;
 		m_nof_attributes = o.m_nof_attributes;
+		m_indirection = o.m_indirection;
 		m_flags = o.m_flags;
 		return *this;
 	}
@@ -194,6 +210,11 @@ public:
 	///\param[in] tp Atomic value equivalent to define
 	void defineAsAtomic( const AtomicType& tp);
 
+	///\brief Define this to an indirection type 'ref'
+	///\remark [precondition] this must not be initialized by other means yet
+	///\param[in] ref pointer for inderection
+	void defineAsIndirection( const IndirectionConstructorR ref);
+
 	///\brief Add a new element (copy of prototype) to this as a vector of elements (ContentType Vector)
 	///\remark [precondition] this must be of type (ContentType) Vector
 	void push();
@@ -213,6 +234,17 @@ public:
 	///\brief Access the prototype element of a vector of elements (ContentType Vector)
 	///\remark [precondition] this must be of type (ContentType) Vector
 	const StructType& prototype() const;
+
+	///\brief Expand a structure from its indirection
+	void expandIndirection();
+
+	///\brief Access the indirection pointer element
+	///\remark [precondition] this must be of type (ContentType) Indirection
+	IndirectionConstructorR& indirection();
+
+	///\brief Access the indirection pointer element
+	///\remark [precondition] this must be of type (ContentType) Indirection
+	const IndirectionConstructorR& indirection() const;
 
 	///\brief Get the number of attributes of a struct
 	///\remark returns 0 this is not of type (ContentType) Struct
@@ -258,10 +290,12 @@ private:
 	///\remark Used for checking the preconditions mentioned as remark [precondition]
 	void REQUIRE( ContentType t) const;
 
-	ContentType m_contentType;	//< type of the element
-	AtomicType m_value;		//< value, if the value is atomic
-	Map m_elem;			//< map represented as array
-	std::size_t m_nof_attributes;	//< number of attributes (first N elements of the structure)
+	ContentType m_contentType;		//< type of the element
+	AtomicType m_value;			//< value, if the value is atomic
+	Map m_elem;				//< map represented as array
+	std::size_t m_nof_attributes;		//< number of attributes (first N elements of the structure)
+	IndirectionConstructorR m_indirection;	//< constructor for recursive structures
+
 	enum Flags
 	{
 		NoFlag=0x0,		//< no flag set
@@ -272,6 +306,18 @@ private:
 	unsigned char m_flags;
 };
 
+class StructIndirectionConstructor :public IndirectionConstructor
+{
+public:
+	StructIndirectionConstructor( const StructType& prototype_)
+		:m_prototype(prototype_){}
+
+	virtual StructType* create( const IndirectionConstructorR& self) const;
+
+private:
+	static void substituteSelf( StructType* st, const IndirectionConstructorR& self);
+	StructType m_prototype;
+};
 
 class Form
 	:public StructType

@@ -1164,6 +1164,51 @@ function createTag()
 	create_node( "Tag", input:get())
 end
 
+-- manufacturers
+
+function ManufacturerListRequest( )
+	output:as( "list SYSTEM 'ManufacturerList.simpleform'" )
+	local t = formfunction( "selectManufacturerList" )( {} )
+	local f = form( "Manufacturer" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function create_manufacturer(itr)
+	local manufacturerform = form("Manufacturer");
+	manufacturerform:fill(itr)
+	logger.printc( "Manufacturer ", manufacturerform)
+	local manufacturer = manufacturerform:table()["manufacturer"]
+	logger.printc( "manufacturerform:table()[manufacturer] ", manufacturer)
+	logger.printc( "manufacturerform:table() ", manufacturerform:table())
+	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	manufacturer["logo"] = manufacturer["picture"]["id"]
+	formfunction( "addManufacturer" )( manufacturer )
+end
+
+function createManufacturer( )
+	logger:print( "ERROR", input:table( ) )
+	local x = input:table( );
+	print( "ERROR", "HERE" )
+--	local manufacturer = input:table( )["manufacturer"]
+--	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+--	manufacturer["logo"] = manufacturer["picture"]["id"]
+--	formfunction( "addManufacturer" )( manufacturer )
+end
+
+function deleteManufacturer( )
+	filter().empty = false
+	local id = nil
+	for v,t in input:get( ) do
+		if t == "id" then
+			id = v
+		end
+	end
+	formfunction( "deleteManufacturer" )( { id = id } )
+end
+
+-- pictures
+
 function PictureListRequest( )
 	output:as( "list SYSTEM 'PictureList.simpleform'" )
 	filter().empty = false
@@ -1328,6 +1373,8 @@ function run()
 			update_picture(scope(itr))
 		elseif (t == "deletePicture") then
 			delete_picture( scope(itr))
+		elseif (t == "createManufacturer") then
+			create_manufacturer( scope(itr))
 		end
 	end
 	output:closetag()

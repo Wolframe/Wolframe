@@ -47,6 +47,8 @@ function run()
 			update_picture(scope(itr))
 		elseif (t == "deletePicture") then
 			delete_picture( scope(itr))
+		elseif (t == "createManufacturer") then
+			create_manufacturer( scope(itr))
 		end
 	end
 	output:closetag()

@@ -125,7 +125,8 @@ public:
 	explicit LuaTableOutputFilter( lua_State* ls)
 		:LuaExceptionHandlerScope(ls)
 		,m_ls(ls)
-		,m_type(OpenTag){}
+		,m_type(OpenTag)
+		,m_hasElement(false){}
 
 	///\brief Copy constructor
 	///\param[in] o lua output filter to copy
@@ -134,6 +135,7 @@ public:
 		,LuaExceptionHandlerScope(o)
 		,m_ls(o.m_ls)
 		,m_type(o.m_type)
+		,m_hasElement(o.m_hasElement)
 		,m_statestk(o.m_statestk)
 	{
 		if (m_statestk.size() > 0) throw std::runtime_error( "copy of lua output filter not allowed in this state");
@@ -154,6 +156,7 @@ private:
 private:
 	lua_State* m_ls;
 	ElementType m_type;
+	bool m_hasElement;
 
 	enum ContentType
 	{

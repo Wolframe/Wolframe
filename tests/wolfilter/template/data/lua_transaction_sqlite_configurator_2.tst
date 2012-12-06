@@ -4,7 +4,7 @@ requestdoctype='addCategoryHierarchy'
 opt=""
 modpath="../../src/modules"				# module directory relative from tests/temp
 opt="$opt --module $modpath/cmdbind/lua/mod_command_lua"
-luascript=`echo $testname | sed 's/lua_//' | sed 's/_sqlite//'`.lua
+luascript="transaction_configurator.lua"
 opt="$opt --program=$luascript"
 opt="$opt --program configurator.normalize"		# normalization program for simpleform ddl types
 opt="$opt --program category.simpleform"		# category forms

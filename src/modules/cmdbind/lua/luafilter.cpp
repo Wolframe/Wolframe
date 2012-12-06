@@ -273,6 +273,55 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 	return false;
 }
 
+#if 0
+static void stacktrace( lua_State* ls, int size)
+{
+	int ii;
+	std::string img[2];
+	for (ii=size; ii>=1; --ii)
+	{
+		img[0].append( lua_typename( ls, lua_type( ls, -ii)));
+		img[0].append("/");
+		img[0].append(getDescription( ls, -ii));
+		img[0].append("|");
+	}
+	for (ii=size; ii>=1; --ii)
+	{
+		std::cerr << "STK [" << -ii << "]: " << lua_typename( ls, lua_type( ls, -ii)) << "=" <<  getDescription( ls, -ii) << std::endl;
+	}
+	for (ii=size; ii>=1; --ii)
+	{
+		img[1].append( lua_typename( ls, lua_type( ls, -ii)));
+		img[1].append("/");
+		img[1].append(getDescription( ls, -ii));
+		img[1].append("|");
+	}
+	if (img[0] != img[1]) throw std::runtime_error( std::string( "diff img '") + img[0] + "' '" + img[1] + "'");
+}
+struct StackTrace
+{
+	StackTrace( lua_State* ls)
+		:m_ls(ls){}
+	~StackTrace()
+	{
+		stacktrace( m_ls, 4);
+	}
+
+private:
+	lua_State* m_ls;
+};
+#else
+static void stacktrace( lua_State*, int){}
+struct StackTrace
+{
+	StackTrace( lua_State* ls)
+		:m_ls(ls){}
+	~StackTrace(){}
+
+private:
+	lua_State* m_ls;
+};
+#endif
 
 bool LuaTableOutputFilter::pushValue( const Element& element)
 {
@@ -393,6 +442,7 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 		setState( OutputFilter::Error, "lua stack overflow");
 		return false;
 	}
+	StackTrace stackTrace( m_ls);
 	if (m_statestk.size() == 0)
 	{
 		m_statestk.push_back( Struct);
@@ -402,6 +452,7 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 	switch (type)
 	{
 		case OpenTag:
+			m_hasElement = false;
 			switch (m_type)
 			{
 				case Attribute:
@@ -416,6 +467,7 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 			break;
 
 		case Attribute:
+			m_hasElement = true;
 			switch (m_type)
 			{
 				case Attribute:
@@ -430,6 +482,7 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 			break;
 
 		case Value:
+			m_hasElement = true;
 			switch (m_type)
 			{
 				case Attribute:
@@ -455,9 +508,12 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 					return false;
 				case OpenTag:
 					m_type = type;
-					// ... table empty. remove it
-					lua_pop( m_ls, 2);
-					return true;
+					if (!m_hasElement)
+					{
+						lua_pop( m_ls, 2);
+						return true;
+					}
+					/*no break here!*/
 				case Value:
 				case CloseTag:
 					m_type = type;

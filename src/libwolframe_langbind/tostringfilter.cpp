@@ -82,7 +82,7 @@ bool ToStringFilter::print( ElementType type, const Element& element)
 			}
 			else
 			{
-				m_content.append( " } ");
+				m_content.append( "} ");
 			}
 			m_lasttype = type;
 		return true;
@@ -96,7 +96,7 @@ bool ToStringFilter::print( ElementType type, const Element& element)
 			{
 				m_content.append( "='");
 				m_content.append( substquot( element.tostring()));
-				m_content.append( "'");
+				m_content.append( "' ");
 				m_lasttype = OpenTag;
 			}
 			else
@@ -104,7 +104,7 @@ bool ToStringFilter::print( ElementType type, const Element& element)
 				m_content.append( m_indent);
 				m_content.append( "'");
 				m_content.append( substquot( element.tostring()));
-				m_content.append( "'");
+				m_content.append( "' ");
 				m_lasttype = type;
 			}
 		return true;

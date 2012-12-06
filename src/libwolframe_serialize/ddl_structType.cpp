@@ -45,6 +45,7 @@ void StructType::REQUIRE( ContentType t) const
 		{
 			case Vector: throw std::logic_error( "not defined as vector");
 			case Struct: throw std::logic_error( "not defined as structure");
+			case Indirection: throw std::logic_error( "not defined as indirection");
 			case Atomic: throw std::logic_error( "not defined as atomic");
 		}
 	}
@@ -162,6 +163,14 @@ void StructType::defineAsAtomic( const AtomicType& tp)
 	m_contentType = Atomic;
 }
 
+void StructType::defineAsIndirection( const IndirectionConstructorR ref)
+{
+	if (m_contentType == Vector) throw std::logic_error( "element already defined as vector");
+	if (m_elem.size()) throw std::logic_error( "element already initialized as non empty structure. cannot redefine type anymore");
+	m_indirection = ref;
+	m_contentType = Indirection;
+}
+
 void StructType::push()
 {
 	REQUIRE(Vector);
@@ -205,6 +214,58 @@ void StructType::clear()
 	m_value.clear();
 	m_elem.clear();
 	m_nof_attributes = 0;
+}
+
+void StructIndirectionConstructor::substituteSelf( StructType* st, const IndirectionConstructorR& self)
+{
+	switch (st->contentType())
+	{
+		case StructType::Atomic:
+			break;
+		case StructType::Vector:
+			substituteSelf( &st->prototype(), self);
+			/* no break here! */
+		case StructType::Struct:
+		{
+			StructType::Map::iterator ii = st->begin(),ee=st->end();
+			for (; ii != ee; ++ii)
+			{
+				substituteSelf( &ii->second, self);
+			}
+			break;
+		}
+		case StructType::Indirection:
+			if (!st->indirection().get())
+			{
+				st->indirection() = self;
+			}
+	}
+}
+
+StructType* StructIndirectionConstructor::create( const IndirectionConstructorR& self) const
+{
+	types::CountedReference<StructType> rt( new StructType( m_prototype));
+	substituteSelf( rt.get(), self);
+	return rt.reference();
+}
+
+IndirectionConstructorR& StructType::indirection()
+{
+	REQUIRE(Indirection);
+	return m_indirection;
+}
+
+const IndirectionConstructorR& StructType::indirection() const
+{
+	REQUIRE(Indirection);
+	return m_indirection;
+}
+
+void StructType::expandIndirection()
+{
+	REQUIRE(Indirection);
+	types::CountedReference<StructType> st( m_indirection->create( m_indirection));
+	*this = *st.get();
 }
 
 void StructType::print( std::ostream& out, size_t level) const
@@ -265,6 +326,8 @@ void StructType::print( std::ostream& out, size_t level) const
 			}
 			break;
 		}
+		case Indirection:
+			out << "[indirection]" << std::endl;
 	}
 }
 
@@ -273,7 +336,7 @@ void Form::print( std::ostream& out, size_t level) const
 	std::string indent( level, '\t');
 	if (doctype())
 	{
-		out << indent << "!DOCTYPE \"" << doctype() << "\"" << std::endl;
+		out << indent << "DOCTYPE \"" << doctype() << "\"" << std::endl;
 	}
 	StructType::print( out, level);
 }

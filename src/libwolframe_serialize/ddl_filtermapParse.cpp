@@ -226,6 +226,9 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 				case ddl::StructType::Struct:
 					throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
 
+				case ddl::StructType::Indirection:
+					throw SerializationErrorException( "atomic element or vector of atomic elements expected for untagged value in structure", element.tostring(), getElementPath( stk));
+
 				case ddl::StructType::Vector:
 					if (itr->second.prototype().contentType() == ddl::StructType::Atomic)
 					{
@@ -285,6 +288,15 @@ static bool parseObject( langbind::TypedInputFilter& inp, Context& ctx, std::vec
 		case ddl::StructType::Struct:
 		{
 			return parseStruct( *stk.back().value(), inp, ctx, stk);
+		}
+		case ddl::StructType::Indirection:
+		{
+			stk.back().value()->expandIndirection();
+			if (stk.back().value()->contentType() == ddl::StructType::Indirection)
+			{
+				throw SerializationErrorException( "indirection expanding to inderection", getElementPath( stk));
+			}
+			return parseObject( inp, ctx, stk);
 		}
 	}
 	throw SerializationErrorException( "illegal state in parse DDL form object", getElementPath( stk));

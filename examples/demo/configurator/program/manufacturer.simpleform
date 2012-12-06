@@ -14,7 +14,7 @@ DOCTYPE "manufacturer Manufacturer"
 		}
 		_ string
 	}
-		
+
 	list
 	{
 		manufacturer []

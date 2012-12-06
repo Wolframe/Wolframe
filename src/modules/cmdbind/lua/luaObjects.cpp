@@ -615,7 +615,7 @@ LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 	std::string content;
 	if ((*form)->doctype())
 	{
-		content = "!DOCTYPE \"";
+		content = "DOCTYPE \"";
 		content.append( (*form)->doctype());
 		content.append( "\"\n");
 	}
@@ -1647,7 +1647,7 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 			else if (outputIsTable)
 			{
 				// document is standalone
-				TypedInputFilterR inp( new TypingInputFilter( input->inputfilter()));
+				TypedInputFilterR inp( new TypingInputFilter( input->getIterator()));
 				TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
 				LuaObject<RedirectFilterClosure>::push_luastack( ls, RedirectFilterClosure( inp, outp));
 				RedirectFilterClosure* obj = LuaObject<RedirectFilterClosure>::get( ls, -1);

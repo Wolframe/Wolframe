@@ -337,6 +337,18 @@ function ManufacturerListRequest( )
 	output:print( f:get( ) )
 end
 
+function create_manufacturer(itr)
+	local manufacturerform = form("Manufacturer");
+	manufacturerform:fill(itr)
+	logger.printc( "Manufacturer ", manufacturerform)
+	local manufacturer = manufacturerform:table()["manufacturer"]
+	logger.printc( "manufacturerform:table()[manufacturer] ", manufacturer)
+	logger.printc( "manufacturerform:table() ", manufacturerform:table())
+	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	manufacturer["logo"] = manufacturer["picture"]["id"]
+	formfunction( "addManufacturer" )( manufacturer )
+end
+
 function createManufacturer( )
 	logger:print( "ERROR", input:table( ) )
 	local x = input:table( );

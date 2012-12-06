@@ -211,6 +211,10 @@ static bool fetchObject( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 			{
 				return fetchStruct( ctx, stk);
 			}
+			case ddl::StructType::Indirection:
+			{
+				return false;
+			}
 		}
 	}
 	return false;

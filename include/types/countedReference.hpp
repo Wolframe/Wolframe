@@ -120,7 +120,12 @@ public:
 	{
 		return *m_ref->m_ptr;
 	}
-	
+
+	OBJ* reference()
+	{
+		++m_ref->m_cnt;
+		return m_ref->m_ptr;
+	}
 private:
 	Pointer* m_ref;
 };

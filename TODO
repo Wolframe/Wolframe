@@ -22,9 +22,15 @@ PF:
     - products
 - high prio
   - UIForm loader in client and server
+  - remove smart ptr from database (sqlite)
 
+- bugs
+  - scope(itr) passed to form does not consume all input
 - low prio
-  - cmdline client: test with SSL
+  - cmdline client: test with SSL (MBA)
+  - forms with SELF recursion
+  - programs with interface (cleanup ProcProvider)
+  - documentation (tutorial)
   - bignum tests (only bigint tested until now)
   - XSLT filter + tests
   - Printing with HPDF

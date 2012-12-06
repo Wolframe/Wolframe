@@ -60,17 +60,19 @@ public:
 		,m_isMandatory(o.m_isMandatory)
 		,m_isForm(o.m_isForm)
 		,m_isFormReference(o.m_isFormReference)
+		,m_isSelfReference(o.m_isSelfReference)
 		,m_type(o.m_type)
 		,m_subform(o.m_subform)
 		,m_value(o.m_value){}
 
-	explicit FRMAttribute( const std::string& item, const TypeMap* typemap, const types::keymap<StructType>& formmap)
+	explicit FRMAttribute( const std::string& item, const TypeMap* typemap, const types::keymap<StructType>& formmap, const std::string& selfname)
 		:m_isVector(false)
 		,m_isAttribute(false)
 		,m_isOptional(false)
 		,m_isMandatory(false)
 		,m_isForm(false)
 		,m_isFormReference(false)
+		,m_isSelfReference(false)
 		,m_type(0)
 	{
 		enum State
@@ -120,7 +122,7 @@ public:
 						vv.push_back( *ii);
 						continue;
 					}
-					parseType( vv, typemap, formmap);
+					parseType( vv, typemap, formmap, selfname);
 					st = ParseEndName;
 					/* no break here !*/
 				case ParseEndName:
@@ -189,7 +191,7 @@ public:
 		}
 		if (st == ParseName)
 		{
-			parseType( vv, typemap, formmap);
+			parseType( vv, typemap, formmap, selfname);
 		}
 		else if (st != ParseEnd)
 		{
@@ -198,6 +200,7 @@ public:
 	}
 
 	bool isFormReference() const		{return m_isFormReference;}
+	bool isSelfReference() const		{return m_isSelfReference;}
 	bool isVector() const			{return m_isVector;}
 	bool isAttribute() const		{return m_isAttribute;}
 	bool isOptional() const			{return m_isOptional;}
@@ -208,7 +211,7 @@ public:
 	const StructType& subform() const	{return m_subform;}
 
 private:
-	void parseType( const std::string& typestr, const TypeMap* typemap, const types::keymap<StructType>& formmap)
+	void parseType( const std::string& typestr, const TypeMap* typemap, const types::keymap<StructType>& formmap, const std::string& selfname)
 	{
 		types::keymap<StructType>::const_iterator fmi;
 		if (typestr.size() == 0)
@@ -224,13 +227,16 @@ private:
 			m_isFormReference = true;
 			m_subform = fmi->second;
 		}
+		else if (0!=(m_type = typemap->getType( typestr)))
+		{
+		}
+		else if (boost::algorithm::iequals( typestr, selfname))
+		{
+			m_isSelfReference = true;
+		}
 		else
 		{
-			m_type = typemap->getType( typestr);
-			if (!m_type)
-			{
-				throw std::runtime_error( (std::string( "unknown type: '") += typestr) += "'");
-			}
+			throw std::runtime_error( (std::string( "unknown type: '") += typestr) += "'");
 		}
 	}
 private:
@@ -240,6 +246,7 @@ private:
 	bool m_isMandatory;
 	bool m_isForm;
 	bool m_isFormReference;
+	bool m_isSelfReference;
 	const NormalizeFunction* m_type;
 	StructType m_subform;
 	std::string m_value;
@@ -260,7 +267,7 @@ static bool isIdentifier( const std::string& name)
 	return (ii==ee);
 }
 
-static void compile_ptree( const boost::property_tree::ptree& pt, StructType& result, const TypeMap* typemap, const types::keymap<StructType>& formmap)
+static void compile_ptree( const boost::property_tree::ptree& pt, StructType& result, const TypeMap* typemap, const types::keymap<StructType>& formmap, const std::string& selfname)
 {
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
 	for (;itr != end; ++itr)
@@ -290,7 +297,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 		}
 		if (itr->second.begin() == itr->second.end() && second.size())
 		{
-			FRMAttribute fa( second, typemap, formmap);
+			FRMAttribute fa( second, typemap, formmap, selfname);
 			if (fa.isForm())
 			{
 				throw std::runtime_error( "Semantic error: illegal type specifier");
@@ -321,6 +328,41 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				if (first == "_")
 				{
 					result.defineContent( "", val);
+				}
+				else
+				{
+					result.defineContent( first, val);
+				}
+			}
+			else if (fa.isSelfReference())
+			{
+				IndirectionConstructorR ind;
+				StructType val;
+				if (fa.isAttribute())
+				{
+					throw std::runtime_error( "Syntax error: Form declared as attribute");
+				}
+				if (fa.isVector())
+				{
+					StructType elem;
+					elem.defineAsIndirection( ind);
+					val.defineAsVector( elem);
+				}
+				else
+				{
+					val.defineAsIndirection( ind);
+				}
+				if (fa.isOptional())
+				{
+					throw std::runtime_error( "Syntax error: Self references are always optional");
+				}
+				if (fa.isMandatory())
+				{
+					throw std::runtime_error( "Syntax error: Self references are never mandatory");
+				}
+				if (first == "_")
+				{
+					throw std::runtime_error( "Syntax error: Self references are never untagged content elements");
 				}
 				else
 				{
@@ -370,7 +412,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 		{
 			if (!second.empty())
 			{
-				FRMAttribute fa( second, typemap, formmap);
+				FRMAttribute fa( second, typemap, formmap, selfname);
 				if (!fa.isForm())
 				{
 					throw std::runtime_error( "Semantic error: Atomic type declared as structure");
@@ -378,6 +420,10 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				if (fa.isFormReference())
 				{
 					throw std::runtime_error( "Syntax error: Form reference declared as structure");
+				}
+				else if (fa.isSelfReference())
+				{
+					throw std::runtime_error( "Syntax error: Form self indirection declared as structure");
 				}
 				if (fa.isAttribute())
 				{
@@ -387,7 +433,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				if (fa.isVector())
 				{
 					StructType prototype;
-					compile_ptree( itr->second, prototype, typemap, formmap);
+					compile_ptree( itr->second, prototype, typemap, formmap, selfname);
 					st.defineAsVector( prototype);
 				}
 				else
@@ -396,7 +442,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 					{
 						throw std::runtime_error( "Semantic error: Form declared with default value");
 					}
-					compile_ptree( itr->second, st, typemap, formmap);
+					compile_ptree( itr->second, st, typemap, formmap, selfname);
 				}
 				if (fa.isOptional())
 				{
@@ -411,7 +457,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 			else
 			{
 				StructType st;
-				compile_ptree( itr->second, st, typemap, formmap);
+				compile_ptree( itr->second, st, typemap, formmap, selfname);
 				result.defineContent( first, st);
 			}
 		}
@@ -428,7 +474,7 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 	{
 		// ... single form
 		Form form;
-		compile_ptree( pt, form, typemap, formmap);
+		compile_ptree( pt, form, typemap, formmap, "");
 		result.push_back( form);
 	}
 	else
@@ -439,16 +485,16 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 			if (boost::algorithm::iequals( itr->first, "DOCTYPE"))
 			{
 				form.defineDoctype( itr->second.data());
-				compile_ptree( itr->second, form, typemap, formmap);
 				std::string doctypeid = utils::getIdFromDoctype( form.doctype());
+				compile_ptree( itr->second, form, typemap, formmap, doctypeid);
 				formmap.insert( doctypeid, form);
 				result.push_back( form);
 			}
 			else if (boost::algorithm::iequals( itr->first, "FORM"))
 			{
 				if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after FORM");
-				form.defineDoctype( std::string( "_ \"") + itr->second.data() + "\"");
-				compile_ptree( itr->second, form, typemap, formmap);
+				form.defineDoctype( std::string( "_ \"") + itr->second.data() + ".simpleform\"");
+				compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
 				std::string doctypeid = utils::getIdFromDoctype( form.doctype());
 				formmap.insert( doctypeid, form);
 				result.push_back( form);

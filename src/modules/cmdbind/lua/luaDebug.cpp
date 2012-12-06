@@ -45,101 +45,44 @@ extern "C" {
 #include "lua.h"
 }
 
-static void hash_string( lua_State* ls, int index, std::size_t& val)
+static void iterate_and_print(lua_State *L, int index, std::string indent)
 {
-	static boost::hash<std::string> ht;
-	val = (val >> 31) ^ (val << 1) ^ ht( std::string( lua_tostring( ls, index)));
-}
-
-static void hash_number( lua_State* ls, int index, std::size_t& val)
-{
-	static boost::hash<double> ht;
-	val = (val >> 31) ^ (val << 1) ^ ht( lua_tonumber( ls, index));
-}
-
-static void hash_type( lua_State* ls, int index, std::size_t& val)
-{
-	static boost::hash<int> ht;
-	val = (val >> 31) ^ (val << 1) ^ ht( lua_type( ls, index));
-}
-
-static void hash_userdata( lua_State* ls, int index, std::size_t& val)
-{
-	static boost::hash<uintptr_t> ht;
-	val = (val >> 31) ^ (val << 1) ^ ht( (uintptr_t)lua_touserdata( ls, index));
-}
-
-
-static std::size_t tablehash( lua_State* ls, int index, int depth=1)
-{
-	std::size_t rt = 16777551;
-	lua_pushvalue( ls, index);
-	lua_pushnil( ls);
-	while (lua_next( ls, -2) != 0)
-	{
-		hash_type( ls, -2, rt);
-		hash_type( ls, -1, rt);
-
-		switch (lua_type( ls, -2))
-		{
-			case LUA_TSTRING:
-				hash_string( ls, -2, rt);
-				break;
-
-			case LUA_TNUMBER:
-				hash_number( ls, -2, rt);
-				break;
-
-			case LUA_TUSERDATA:
-			case LUA_TLIGHTUSERDATA:
-				hash_userdata( ls, -2, rt);
-				break;
-		}
-		switch (lua_type( ls, -1))
-		{
-			case LUA_TSTRING:
-				hash_string( ls, -1, rt);
-				break;
-
-			case LUA_TNUMBER:
-				hash_number( ls, -1, rt);
-				break;
-
-			case LUA_TUSERDATA:
-			case LUA_TLIGHTUSERDATA:
-				hash_userdata( ls, -1, rt);
-				break;
-
-			case LUA_TTABLE:
-				if (depth > 0 && lua_isnumber( ls, -2))
-				{
-					rt = (rt >> 31) ^ (rt << 1) ^ tablehash( ls, -1, 0);
-				}
-		}
-		lua_pop( ls, 1);
+    // Push another reference to the table on top of the stack (so we know
+    // where it is, and this function can work for negative, positive and
+    // pseudo indices
+    lua_pushvalue(L, index);
+    // stack now contains: -1 => table
+    lua_pushnil(L);
+    // stack now contains: -1 => nil; -2 => table
+    while (lua_next(L, -2))
+    {
+        // stack now contains: -1 => value; -2 => key; -3 => table
+        // copy the key so that lua_tostring does not modify the original
+        lua_pushvalue(L, -2);
+        // stack now contains: -1 => key; -2 => value; -3 => key; -4 => table
+        const char *key = lua_tostring(L, -1);
+        if (lua_istable( L, -2))
+        {
+		std::cout << indent << (key?key:"*") << ":" << std::endl;
+		iterate_and_print( L, -2, indent + "   ");
 	}
-	lua_pop( ls, 1);
-	return rt;
-}
-
-static bool enter( lua_State* ls, int index, std::vector<std::size_t>& stk)
-{
-	std::size_t hh = tablehash( ls, index);
-	std::vector<std::size_t>::const_iterator itr = stk.begin(), end = stk.end();
-	for (; itr != end; ++itr)
+	else
 	{
-		if (*itr == hh) return false;
+		const char *value = lua_tostring(L, -2);
+		std::cout << indent << (key?key:"*") << " " << (value?value:"*") << std::endl;
 	}
-	stk.push_back( hh);
-	return true;
+        // pop value + copy of key, leaving original key
+        lua_pop(L, 2);
+        // stack now contains: -1 => key; -2 => table
+    }
+    // stack now contains: -1 => table (when lua_next returns 0 it pops the key
+    // but does not push anything.)
+    // Pop table
+    lua_pop(L, 1);
+    // Stack is now the same as it was on entry to this function
 }
 
-static void leave( std::vector<std::size_t>& stk)
-{
-	stk.pop_back();
-}
-
-static void getDescription_( lua_State *ls, int index, std::string& rt, std::vector<std::size_t>& stk)
+static void getDescription_( lua_State *ls, int index, std::string& rt)
 {
 	int type = lua_type( ls, index);
 	switch (type)
@@ -149,19 +92,19 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, std::vec
 			break;
 
 		case LUA_TUSERDATA:
+			rt.append( "userdata");
 			lua_pushvalue( ls, index);		///...STK: udata
 			lua_getmetatable( ls, -1);		///...STK: udata mt
 			lua_pushliteral( ls, "__tostring");	///...STK: udata mt __tostring
 			lua_rawget( ls, -2);			///...STK: udata mt mt[__tostring]
 			if (lua_isnil( ls, -1))
 			{
-				rt.append( "userdata ");
-				getDescription_( ls, -2, rt, stk);
 				lua_pop( ls, 3);		///... STK:
 			}
 			else
 			{
-				lua_pushvalue( ls, index);	///... STK: udata mt mt[__tostring] udata
+				rt.append( " ");
+				lua_pushvalue( ls, -3);		///... STK: udata mt mt[__tostring] udata
 				lua_call( ls, 1, 1);		///... STK: udata mt str
 				rt.append( lua_tostring( ls, -1));
 				lua_pop( ls, 3);		///... STK:
@@ -193,28 +136,28 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, std::vec
 			{
 				throw std::runtime_error( "lua stack overflow");
 			}
-			if (enter( ls, index, stk))
+			iterate_and_print( ls, index, " ");
+
+			rt.append( "{ ");
+			lua_pushvalue( ls, index);
+			lua_pushnil( ls);
+			while (lua_next( ls, -2))
 			{
-				rt.append( "{ ");
-				lua_pushvalue( ls, index);
-				lua_pushnil( ls);
-				while (lua_next( ls, -2) != 0)
+				lua_pushvalue( ls, -2);
+				const char *key = lua_tostring( ls, -1);
+
+				if (key && std::memcmp( key, "__", 2) != 0)
 				{
-					getDescription_( ls, -2, rt, stk);
-					bool istable = (lua_type( ls, -1) == LUA_TTABLE);
+					rt.append( key);
+					bool istable = (lua_type( ls, -2) == LUA_TTABLE);
 					rt.append( istable?"=":"='");
-					getDescription_( ls, -1, rt, stk);
+					getDescription_( ls, -2, rt);
 					rt.append( istable?" ":"' ");
-					lua_pop( ls, 1);
 				}
-				lua_pop( ls, 1);
-				rt.append( "}");
-				leave( stk);
+				lua_pop( ls, 2);
 			}
-			else
-			{
-				rt.append( "{...}");
-			}
+			lua_pop( ls, 1);
+			rt.append( "}");
 			break;
 
 		default:
@@ -225,8 +168,7 @@ static void getDescription_( lua_State *ls, int index, std::string& rt, std::vec
 std::string _Wolframe::langbind::getDescription( lua_State *ls, int index)
 {
 	std::string rt;
-	std::vector<std::size_t> stk;
-	getDescription_( ls, index, rt, stk);
+	getDescription_( ls, index, rt);
 	return rt;
 }
 
@@ -236,8 +178,7 @@ bool _Wolframe::langbind::getDescription( lua_State *ls, int index, std::string&
 	{
 		LuaExceptionHandlerScope exceptionHandler( ls);
 		{
-			std::vector<std::size_t> stk;
-			getDescription_( ls, index, ret, stk);
+			getDescription_( ls, index, ret);
 		}
 		return true;
 	}

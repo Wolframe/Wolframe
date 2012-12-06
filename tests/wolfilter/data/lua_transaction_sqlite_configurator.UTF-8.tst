@@ -178,7 +178,7 @@
 <createTag><tag name="Tag1.5x" parentID="2"/></createTag>
 <TagHierarchyRequest><Tag id="1"/></TagHierarchyRequest>
 </test>**config
---input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program configurator.normalize --program category.simpleform --program feature.simpleform --program picture.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA,program=program.sql' --program=DBPRG.tdl run
+--input-filter xml:textwolf --output-filter xml:textwolf --module ../../src/modules/filter/textwolf/mod_filter_textwolf  --module ../../src/modules/cmdbind/lua/mod_command_lua --program=transaction_configurator.lua --program configurator.normalize --program category.simpleform --program feature.simpleform --program manufacturer.simpleform --program picture.simpleform --program tag.simpleform --module ../../src/modules/ddlcompiler//simpleform/mod_ddlcompiler_simpleform --module ../../src/modules/normalize//number/mod_normalize_number --module ../../src/modules/normalize//string/mod_normalize_string --module ../../src/modules/cmdbind/directmap/mod_command_directmap --module ../wolfilter/modules/functions/fakegraphix/mod_graphix --module ../wolfilter/modules/database/sqlite3/mod_db_sqlite3test --database 'identifier=testdb,file=test.db,dumpfile=DBDUMP,inputfile=DBDATA,program=program.sql' --program=DBPRG.tdl run
 
 **file: DBDATA
 -- The tags tree
@@ -441,6 +441,35 @@ DOCTYPE "tag Tag"
 	name string
 	normalizedName string
 	description string
+}
+**file:manufacturer.simpleform
+DOCTYPE "manufacturer Manufacturer"
+{
+	manufacturer
+	{
+		id @int
+		form @string
+		name string
+		normalizedName string
+		webPage string
+		picture
+		{
+			id @int
+			_ string
+		}
+		_ string
+	}
+
+	list
+	{
+		manufacturer []
+		{
+			id @int
+			name string
+			webPage string
+			thumbnail string
+		}
+	}
 }
 **file:picture.simpleform
 DOCTYPE "picture Picture"
@@ -736,6 +765,26 @@ END
 TRANSACTION selectSubTag -- (id)
 BEGIN
 	INTO node DO SELECT P1.ID AS "ID",P1.parentID AS "parentID",P1.name,P1.normalizedName AS "normalizedName",P1.description FROM Tag AS P1, Tag AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $(id) ORDER BY P1.ID;
+END
+TRANSACTION selectManufacturerList
+RESULT INTO list
+BEGIN
+	INTO manufacturer DO
+		SELECT Manufacturer.ID AS "id", name, webPage, thumbnail
+		FROM Manufacturer
+		LEFT JOIN Picture
+		ON Manufacturer.logo = Picture.ID;
+END
+
+TRANSACTION addManufacturer
+BEGIN
+	DO INSERT INTO Manufacturer( name, normalizedName, webPage, logo )
+		VALUES ( $(name), $(normalizedName), $(webPage), $(logo) );
+END
+
+TRANSACTION deleteManufacturer
+BEGIN
+	DO DELETE FROM Manufacturer WHERE ID = $(id);
 END
 TRANSACTION selectPictureList
 RESULT INTO list
@@ -1144,6 +1193,51 @@ function createTag()
 	create_node( "Tag", input:get())
 end
 
+-- manufacturers
+
+function ManufacturerListRequest( )
+	output:as( "list SYSTEM 'ManufacturerList.simpleform'" )
+	local t = formfunction( "selectManufacturerList" )( {} )
+	local f = form( "Manufacturer" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function create_manufacturer(itr)
+	local manufacturerform = form("Manufacturer");
+	manufacturerform:fill(itr)
+	logger.printc( "Manufacturer ", manufacturerform)
+	local manufacturer = manufacturerform:table()["manufacturer"]
+	logger.printc( "manufacturerform:table()[manufacturer] ", manufacturer)
+	logger.printc( "manufacturerform:table() ", manufacturerform:table())
+	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	manufacturer["logo"] = manufacturer["picture"]["id"]
+	formfunction( "addManufacturer" )( manufacturer )
+end
+
+function createManufacturer( )
+	logger:print( "ERROR", input:table( ) )
+	local x = input:table( );
+	print( "ERROR", "HERE" )
+--	local manufacturer = input:table( )["manufacturer"]
+--	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+--	manufacturer["logo"] = manufacturer["picture"]["id"]
+--	formfunction( "addManufacturer" )( manufacturer )
+end
+
+function deleteManufacturer( )
+	filter().empty = false
+	local id = nil
+	for v,t in input:get( ) do
+		if t == "id" then
+			id = v
+		end
+	end
+	formfunction( "deleteManufacturer" )( { id = id } )
+end
+
+-- pictures
+
 function PictureListRequest( )
 	output:as( "list SYSTEM 'PictureList.simpleform'" )
 	filter().empty = false
@@ -1308,6 +1402,8 @@ function run()
 			update_picture(scope(itr))
 		elseif (t == "deletePicture") then
 			delete_picture( scope(itr))
+		elseif (t == "createManufacturer") then
+			create_manufacturer( scope(itr))
 		end
 	end
 	output:closetag()

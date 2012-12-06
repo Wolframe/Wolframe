@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE test SYSTEM 'test.simpleform'>
+<test>
+<createManufacturer>
+<manufacturer form="manufacturers">
+<name>y</name>
+<picture id="3">3</picture>
+<webPage>y</webPage>
+</manufacturer>
+</createManufacturer>
+</test>
