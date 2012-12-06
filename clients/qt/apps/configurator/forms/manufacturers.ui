@@ -165,5 +165,22 @@
   <tabstop>reload_2</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>manufacturer</sender>
+   <signal>cellDoubleClicked(int,int)</signal>
+   <receiver>edit</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>194</x>
+     <y>197</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>207</x>
+     <y>294</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

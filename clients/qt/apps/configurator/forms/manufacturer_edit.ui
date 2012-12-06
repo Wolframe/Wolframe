@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>391</width>
-    <height>435</height>
+    <width>342</width>
+    <height>294</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,10 +20,10 @@
    <string notr="true">{global.id}</string>
   </property>
   <property name="doctype" stdset="0">
-   <string notr="true">CategoryRequest.simpleForm</string>
+   <string notr="true">ManufacturerRequest.simpleForm</string>
   </property>
   <property name="rootelement" stdset="0">
-   <string>category</string>
+   <string>manufacturer</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
@@ -49,20 +49,14 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label_description">
      <property name="text">
-      <string>Description:</string>
-     </property>
-     <property name="buddy">
-      <cstring>description</cstring>
+      <string>Webpage:</string>
      </property>
     </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPlainTextEdit" name="description"/>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Pictures:</string>
+      <string>Logo:</string>
      </property>
     </widget>
    </item>
@@ -75,7 +69,7 @@
       <bool>true</bool>
      </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::MultiSelection</enum>
+      <enum>QAbstractItemView::SingleSelection</enum>
      </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
@@ -144,16 +138,16 @@
         <string>Save</string>
        </property>
        <property name="rootelement" stdset="0">
-        <string notr="true">category</string>
+        <string notr="true">manufacturer</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">Category.simpleform</string>
+        <string notr="true">Manufacturer.simpleform</string>
        </property>
        <property name="action" stdset="0">
         <string notr="true">update</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">categories</string>
+        <string notr="true">manufacturers</string>
        </property>
        <property name="id" stdset="0">
         <string notr="true">{global.id}</string>
@@ -166,10 +160,10 @@
         <string>Reset</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">CategoryRequest.simpleform</string>
+        <string notr="true">ManufacturerRequest.simpleform</string>
        </property>
        <property name="rootelement" stdset="0">
-        <string notr="true">category</string>
+        <string notr="true">manufacturer</string>
        </property>
        <property name="action" stdset="0">
         <string notr="true">read</string>
@@ -185,17 +179,19 @@
         <string>Cancel</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">categories</string>
+        <string notr="true">manufacturers</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="webPage"/>
+   </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>name</tabstop>
-  <tabstop>description</tabstop>
   <tabstop>picture</tabstop>
   <tabstop>save</tabstop>
   <tabstop>reset</tabstop>

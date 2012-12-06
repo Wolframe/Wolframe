@@ -18,3 +18,18 @@ TRANSACTION deleteManufacturer
 BEGIN
 	DO DELETE FROM Manufacturer WHERE ID = $(id);
 END
+
+TRANSACTION selectManufacturer
+RESULT INTO manufacturer
+BEGIN
+	INTO . DO
+		SELECT Manufacturer.ID AS "id", name, webPage
+		FROM Manufacturer
+		WHERE Manufacturer.ID = $(id);
+	INTO picture DO
+		SELECT Picture.ID AS "id", image
+		FROM Manufacturer
+		LEFT JOIN Picture
+		ON Manufacturer.logo = Picture.ID
+		WHERE Manufacturer.ID = $(id);
+END

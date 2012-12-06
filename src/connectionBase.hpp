@@ -215,10 +215,10 @@ protected:
 			std::string err = e.message();
 #ifdef WITH_SSL
 			if ( e.category() == boost::asio::error::get_ssl_category() )	{
-				err = std::string( " (" )
+				err = std::string( "(" )
 						+ boost::lexical_cast< std::string >( ERR_GET_LIB( e.value() ) ) + ", "
 						+ boost::lexical_cast< std::string >( ERR_GET_FUNC( e.value() ) )+ ", "
-						+ boost::lexical_cast< std::string >( ERR_GET_REASON( e.value() ) ) + ") ";
+						+ boost::lexical_cast< std::string >( ERR_GET_REASON( e.value() ) ) + ")";
 				//ERR_PACK /* crypto/err/err.h */
 				char buf[ 128 ];
 				::ERR_error_string_n( e.value(), buf, sizeof( buf ) );

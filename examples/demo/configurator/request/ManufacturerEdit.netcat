@@ -1,0 +1,12 @@
+AUTH
+MECH NONE
+REQUEST create
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE manufacturer SYSTEM 'Manufacturer.simpleform'>
+<manufacturer form="manufacturers" id="8">
+  <name>A</name>
+  <picture id="45">45</picture>
+  <webPage>http://aa.com/</webPage>
+</manufacturer>
+.
+CAPA

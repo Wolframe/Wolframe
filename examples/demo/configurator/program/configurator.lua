@@ -330,9 +330,9 @@ end
 -- manufacturers
 
 function ManufacturerListRequest( )
-	output:as( "list SYSTEM 'ManufacturerList.simpleform'" )
+	output:as( "list SYSTEM 'manufacturerList.simpleform'" )
 	local t = formfunction( "selectManufacturerList" )( {} )
-	local f = form( "Manufacturer" )
+	local f = form( "ManufacturerList" )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
 end
@@ -350,9 +350,8 @@ function create_manufacturer(itr)
 end
 
 function createManufacturer( )
-	logger:print( "ERROR", input:table( ) )
 	local x = input:table( );
-	print( "ERROR", "HERE" )
+	logger:print( "ERROR", x )
 --	local manufacturer = input:table( )["manufacturer"]
 --	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
 --	manufacturer["logo"] = manufacturer["picture"]["id"]
@@ -368,6 +367,28 @@ function deleteManufacturer( )
 		end
 	end
 	formfunction( "deleteManufacturer" )( { id = id } )
+end
+
+function editManufacturer( )
+	local manufacturer = input:table( )
+	logger:print( "ERROR", manufacturer )
+--	local picture = transform_picture( itr)
+--	formfunction( "updatePicture" )( { picture = picture } )
+end
+
+function ManufacturerRequest( )
+	output:as( "manufacturer SYSTEM 'Manufacturer.simpleform'")
+	filter().empty = false
+	local id = nil
+	for v,t in input:get( ) do
+		if t == "id" then
+			id = v
+		end
+	end
+	local t = formfunction( "selectManufacturer" )( { id = id } )
+	local f = form( "Manufacturer" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
 end
 
 -- pictures

@@ -324,6 +324,14 @@ void WolframeClient::dataAvailable( )
 			while( m_socket->canReadLine( ) ) {
 				char buf[1024];
 				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
+				if( len < 0 ) {
+					qCritical( ) << "Error when reading line!!";
+					break;
+				}
+				if( len >= 1024 ) {
+					qCritical( ) << "Long line!!";
+					break;
+				}
 				
 				if( len > 1 )
 					if( buf[len-1] == '\n' ) buf[len-1] = '\0';
@@ -376,10 +384,19 @@ void WolframeClient::dataAvailable( )
 
 void WolframeClient::sendLine( QString line )
 {
+	qint64 res;
+	
 	switch( m_state ) {
 		case Connected:
 		case Data:
-			m_socket->write( line.toAscii( ).append( "\n" ) );
+			res = m_socket->write( line.toAscii( ).append( "\n" ) );
+			if( res < 0 ) {
+				qCritical( ) << "Write error!!";
+				break;
+			} else if( res != line.toAscii( ).length( ) + 1 ) {
+				qCritical( ) << "Partial write!" << res << line.toAscii( ).length( );
+				break;
+			}		
 			m_socket->flush( );
 			emit lineSent( line );
 			break;
