@@ -32,6 +32,7 @@ PF:
 
 - low prio
   - cmdline client: test with SSL (MBA)
+  - Lua: make form:fill() also return the form filled so that assigning and filling can be chained
   - test forms with SELF recursion
   - programs with interface (cleanup ProcProvider)
   - documentation (tutorial)
