@@ -358,7 +358,7 @@ void MainWindow::initialize( )
 void MainWindow::finishInitialize( )
 {
 // create delegate widget for form handling (one for now), in theory may are possible
-	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
+	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, true /* m_debug */ );
 	
 // link the form loader for form loader notifications needed by the main window
 // (list of forms for form menu, list of language for language picker)
@@ -458,7 +458,7 @@ void MainWindow::authenticationOk( )
 	
 // ...and data loaders
 	if( m_dataLoadMode == Network ) {
-		m_dataLoader = new NetworkDataLoader( m_wolframeClient, m_debug );
+		m_dataLoader = new NetworkDataLoader( m_wolframeClient, true /* m_debug */ );
 	}
 
 	finishInitialize( );

@@ -9,6 +9,11 @@ FreeBSD, some PNGs are not visible in qt client (PNG version?)
 
 ---
 
+textwolf and one liners (no pretty print) lead to "white-outs"
+
+--
+
+
 FreeBSD 9
 ERROR: error calling function 'editCategory':[configurator]:190: error in func
 So t == 'name' and v == nil, the parser returns '' or nil for empty values?
