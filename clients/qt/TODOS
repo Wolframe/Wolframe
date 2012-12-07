@@ -12,7 +12,7 @@ now:
 - package version switching
 
 - titles for file chooser and directory chooser (preferences dialog)
-- last used directory in File/PictureChooser
+- last used directory in File/PictureChooser, not last used file
 - search dialogs using tags to easier find categories and features
 - diacritical characters get lost
 - search with flag (with children)
