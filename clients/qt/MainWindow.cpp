@@ -126,15 +126,30 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 
 MainWindow::~MainWindow( )
 {
-	if( m_formWidget ) delete m_formWidget;
+	if( m_formWidget ) {
+		delete m_formWidget;
+		m_formWidget = 0;
+	}
 	if( m_debugTerminal ) {
 		delete m_debugTerminal;
 		debugTerminal = 0;
 	}
-	if( m_wolframeClient ) delete m_wolframeClient;
-	if( m_formLoader ) delete m_formLoader;
-	if( m_dataLoader ) delete m_dataLoader;
-	if( m_uiLoader ) delete m_uiLoader;
+	if( m_wolframeClient ) {
+		delete m_wolframeClient;
+		m_wolframeClient = 0;
+	}
+	if( m_formLoader ) {
+		delete m_formLoader;
+		m_formLoader = 0;
+	}
+	if( m_dataLoader ) {
+		delete m_dataLoader;
+		m_dataLoader = 0;
+	}
+	if( m_uiLoader ) {
+		delete m_uiLoader;
+		m_uiLoader = 0;
+	}
 
 	{
 		QSqlDatabase db = QSqlDatabase::database( SESSION_NAME );
@@ -390,8 +405,8 @@ void MainWindow::finishInitialize( )
 // load initial form
 	loadForm( "init" );
 
-// hide myself, as the theme opens a second main window
-	hide( );
+// lower myself, as the theme opens a second main window
+	lower( );
 }
 
 void MainWindow::connected( )
@@ -560,10 +575,19 @@ void MainWindow::loadTheme( QString theme )
 		}
 	}
 // show the new gui
+	m_ui->setParent( 0 );
 	m_ui->show( );
+	m_ui->raise( );
+	m_ui->activateWindow( );
+	lower( );
 
 // wire standard actions in the menu by name (on_<object>_<signal>)
 	QMetaObject::connectSlotsByName( this );
+
+// catch the destroyed signal, so we can close the empty main window too
+	connect( m_ui, SIGNAL( destroyed( QObject * ) ),
+		this, SLOT( muiDestroyed( QObject * ) ) );
+	m_ui->setAttribute( Qt::WA_DeleteOnClose, true );
 	
 // remember current theme
 	m_currentTheme = theme;
@@ -837,4 +861,13 @@ void MainWindow::showExpanded( )
 #endif
 }
 
+void MainWindow::closeEvent( QCloseEvent *event )
+{
+	event->accept( );
+	m_ui->close( );
+}
 
+void MainWindow::muiDestroyed( QObject *obj )
+{
+	close( );
+}

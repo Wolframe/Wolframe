@@ -139,7 +139,7 @@
    <item row="3" column="0">
     <widget class="QTableWidget" name="picture">
      <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarAsNeeded</enum>
      </property>
      <property name="alternatingRowColors">
       <bool>true</bool>

@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QtUiTools>
 #include <QCommandLine>	
+#include <QCloseEvent>
 
 #include "FormLoader.hpp"
 #include "DebugTerminal.hpp"
@@ -36,6 +37,9 @@
 		void setOrientation( ScreenOrientation orientation );
 		void showExpanded( );
 	
+	protected:
+		virtual void closeEvent( QCloseEvent *event );
+		
 	private:
 		QCommandLine *m_cmdline;	// command line parser	
 		QWidget *m_ui;			// main window from theme
@@ -110,7 +114,10 @@
 		void on_actionManageStorage_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
-		void on_actionDebugTerminal_triggered( bool checked );       
+		void on_actionDebugTerminal_triggered( bool checked );     
+	
+// internal slots
+		void muiDestroyed( QObject *obj );
 	};
 
 #endif // _MAIN_WINDOW_HPP_INCLUDED

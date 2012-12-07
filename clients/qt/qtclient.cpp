@@ -13,13 +13,13 @@ int main( int argc, char* argv[] ) {
 	do {
 		QApplication app( argc, argv );
 		app.setWindowIcon( QIcon( QString( "images/wolframe.png" ) ) );
-		MainWindow mainWindow;
+		MainWindow *mainWindow = new MainWindow( );
 		
 #ifdef Q_OS_ANDROID
-		mainWindow.setOrientation( MainWindow::ScreenOrientationAuto );
-		mainWindow.showExpanded( );
+		mainWindow->setOrientation( MainWindow::ScreenOrientationAuto );
+		mainWindow->showExpanded( );
 #else
-		mainWindow.show( );
+		mainWindow->show( );
 #endif
 		code = app.exec( );
 	} while( code == RESTART_CODE );
