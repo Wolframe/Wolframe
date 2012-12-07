@@ -9,14 +9,6 @@ FreeBSD, some PNGs are not visible in qt client (PNG version?)
 
 ---
 
-textwolf:
-- removing pretty-print in client leads to
-  ERROR: error calling function 'CategoryHierarchyRequest':[configurator]:144: error in function '<structure>:get()' (textwolf: syntax error in XML)
-  XML is <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE category SYSTEM 'CategoryHierarchyRequest.simpleform'><category id="1"/>
-  (missing DOCTYPE in non standalone XML document)  
-
----
-
 FreeBSD 9
 ERROR: error calling function 'editCategory':[configurator]:190: error in func
 So t == 'name' and v == nil, the parser returns '' or nil for empty values?
