@@ -394,8 +394,12 @@ void PostgreSQLdatabase::closeTransaction( Transaction *t )
 
 /*****  PostgreSQL transaction  ***************************************/
 PostgreSQLtransaction::PostgreSQLtransaction( PostgreSQLdatabase& database )
-	: m_db( database ), m_unit( database.dbUnit() )
+	: m_db( database ), m_unit( database.dbUnit() ), m_conn( 0)
+{}
+
+PostgreSQLtransaction::~PostgreSQLtransaction()
 {
+	if (m_conn) delete m_conn;
 }
 
 const std::string& PostgreSQLtransaction::databaseID() const
@@ -405,7 +409,7 @@ const std::string& PostgreSQLtransaction::databaseID() const
 
 void PostgreSQLtransaction::execute_statement( const char* statement)
 {
-	if (!m_conn.get()) throw std::runtime_error( "executing transaction statement without transaction context");
+	if (!m_conn) throw std::runtime_error( "executing transaction statement without transaction context");
 	std::ostringstream msg;
 	bool success = true;
 	PGresult* res = PQexec( **m_conn, statement);
@@ -423,20 +427,23 @@ void PostgreSQLtransaction::execute_statement( const char* statement)
 
 void PostgreSQLtransaction::begin()
 {
-	m_conn.reset( new PoolObject<PGconn*>( m_unit.m_connPool));
+	if (m_conn) delete m_conn;
+	m_conn = new PoolObject<PGconn*>( m_unit.m_connPool);
 	execute_statement( "BEGIN;");
 }
 
 void PostgreSQLtransaction::commit()
 {
 	execute_statement( "COMMIT;");
-	m_conn.reset();
+	delete m_conn;
+	m_conn = 0;
 }
 
 void PostgreSQLtransaction::rollback()
 {
 	execute_statement( "ROLLBACK;");
-	m_conn.reset();
+	delete m_conn;
+	m_conn = 0;
 }
 
 void PostgreSQLtransaction::execute_with_autocommit()
@@ -470,7 +477,7 @@ void PostgreSQLtransaction::execute_with_autocommit()
 
 void PostgreSQLtransaction::execute_transaction_operation()
 {
-	PreparedStatementHandler_postgres ph( **m_conn.get(), m_unit.stmmap(), true);
+	PreparedStatementHandler_postgres ph( **m_conn, m_unit.stmmap(), true);
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))
@@ -489,7 +496,7 @@ void PostgreSQLtransaction::execute_transaction_operation()
 
 void PostgreSQLtransaction::execute()
 {
-	if (m_conn.get())
+	if (m_conn)
 	{
 		execute_transaction_operation();
 	}
@@ -501,8 +508,9 @@ void PostgreSQLtransaction::execute()
 
 void PostgreSQLtransaction::close()
 {
-	if (m_conn.get()) MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
-	m_conn.reset();
+	if (m_conn) MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
+	delete m_conn;
+	m_conn = 0;
 	m_db.closeTransaction( this );
 }
 

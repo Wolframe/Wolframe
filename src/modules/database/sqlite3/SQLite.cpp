@@ -240,8 +240,13 @@ const UI::UserInterfaceLibrary* SQLiteDatabase::UIlibrary() const
 
 /*****  SQLite transaction  *******************************************/
 SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database )
-	: m_db( database ), m_unit( database.dbUnit() )
+	: m_db( database ), m_unit( database.dbUnit() ), m_conn(0)
 {}
+
+SQLiteTransaction::~SQLiteTransaction()
+{
+	if (m_conn) delete m_conn;
+}
 
 const std::string& SQLiteTransaction::databaseID() const
 {
@@ -253,7 +258,7 @@ void SQLiteTransaction::execute_statement( const char* stmstr )
 #ifdef LOWLEVEL_DEBUG
 	std::cerr << "CALL " << stmstr << std::endl;
 #endif
-	if ( !m_conn.get() )
+	if (!m_conn)
 		throw std::runtime_error( "executing transaction statement without transaction context" );
 	bool success = true;
 	std::ostringstream msg;
@@ -275,20 +280,23 @@ void SQLiteTransaction::execute_statement( const char* stmstr )
 
 void SQLiteTransaction::begin()
 {
-	m_conn.reset( new PoolObject<sqlite3*>( m_unit.m_connPool));
+	if (m_conn) delete m_conn;
+	m_conn = new PoolObject<sqlite3*>( m_unit.m_connPool);
 	execute_statement( "BEGIN TRANSACTION;");
 }
 
 void SQLiteTransaction::commit()
 {
 	execute_statement( "COMMIT TRANSACTION;");
-	m_conn.reset();
+	delete m_conn;
+	m_conn = 0;
 }
 
 void SQLiteTransaction::rollback()
 {
 	execute_statement( "ROLLBACK TRANSACTION;");
-	m_conn.reset();
+	delete m_conn;
+	m_conn = 0;
 }
 
 void SQLiteTransaction::execute_with_autocommit()
@@ -322,7 +330,7 @@ void SQLiteTransaction::execute_with_autocommit()
 
 void SQLiteTransaction::execute_transaction_operation()
 {
-	PreparedStatementHandler_sqlite3 ph( **m_conn.get(), m_unit.stmmap(), true );
+	PreparedStatementHandler_sqlite3 ph( **m_conn, m_unit.stmmap(), true );
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))
@@ -335,14 +343,15 @@ void SQLiteTransaction::execute_transaction_operation()
 	{
 		MOD_LOG_ERROR << "error in sqlite database transaction operation: " << e.what();
 		ph.rollback();
-		m_conn.reset();
+		delete m_conn;
+		m_conn = 0;
 		throw std::runtime_error( std::string("transaction operation failed: ") + e.what());
 	}
 }
 
 void SQLiteTransaction::execute()
 {
-	if ( m_conn.get() )
+	if ( m_conn )
 	{
 		execute_transaction_operation();
 	}
@@ -354,9 +363,10 @@ void SQLiteTransaction::execute()
 
 void SQLiteTransaction::close()
 {
-	if ( m_conn.get() )
+	if ( m_conn )
 		MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
-	m_conn.reset();
+	delete m_conn;
+	m_conn = 0;
 	m_db.closeTransaction( this );
 }
 

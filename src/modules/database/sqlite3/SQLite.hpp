@@ -96,7 +96,7 @@ class SQLiteTransaction : public Transaction
 {
 public:
 	SQLiteTransaction( SQLiteDatabase& database );
-	 ~SQLiteTransaction()			{}
+	 ~SQLiteTransaction();
 
 	virtual const std::string& databaseID() const;
 
@@ -119,8 +119,7 @@ private:
 	SQLiteDBunit&		m_unit;		//< parent database unit
 	TransactionInput	m_input;	//< input data structure
 	TransactionOutput	m_output;	//< output data structure
-	typedef types::CountedReference<PoolObject<sqlite3*> > Connection;
-	Connection		m_conn;		//< connection object from pool
+	PoolObject<sqlite3*>* m_conn;		//< connection object from pool
 };
 
 

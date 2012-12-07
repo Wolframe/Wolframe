@@ -45,7 +45,6 @@
 #include "config/configurationBase.hpp"
 #include "constructor.hpp"
 #include "objectPool.hpp"
-#include "types/countedReference.hpp"
 
 #ifdef _WIN32
 #pragma warning(disable:4250)
@@ -109,7 +108,7 @@ class PostgreSQLtransaction : public Transaction
 {
 public:
 	PostgreSQLtransaction( PostgreSQLdatabase& database );
-	 ~PostgreSQLtransaction()		{}
+	 ~PostgreSQLtransaction();
 
 	virtual const std::string& databaseID() const;
 
@@ -132,8 +131,7 @@ private:
 	PostgreSQLdbUnit&	m_unit;		//< parent database unit
 	TransactionInput	m_input;	//< input data structure
 	TransactionOutput	m_output;	//< output data structure
-	typedef types::CountedReference<PoolObject<PGconn*> > Connection;
-	Connection m_conn;			//< connection object from pool
+	PoolObject<PGconn*>* m_conn;		//< reference to connection object from pool
 };
 
 struct PostgreSQLLanguageDescription : public LanguageDescription
