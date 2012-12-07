@@ -187,11 +187,12 @@ CREATE TABLE Tag	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	parentID	INT	REFERENCES Tag( ID ),
 	name		TEXT	NOT NULL,
-	normalizedName	TEXT	NOT NULL UNIQUE,
+	normalizedName	TEXT	NOT NULL,
 	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
-	CONSTRAINT order_check CHECK ( rgt > lft )
+	CONSTRAINT order_check CHECK ( rgt > lft ),
+	CONSTRAINT tag_normalizedName_check UNIQUE( normalizedName, parentID )
 );
 
 INSERT INTO Tag( parentID, name, normalizedName, description, lft, rgt )
@@ -223,11 +224,12 @@ CREATE TABLE Category	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	parentID	INT	REFERENCES Category( ID ),
 	name		TEXT	NOT NULL,
-	normalizedName	TEXT	NOT NULL UNIQUE,
+	normalizedName	TEXT	NOT NULL,
 	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
-	CONSTRAINT order_check CHECK ( rgt > lft )
+	CONSTRAINT order_check CHECK ( rgt > lft ),
+	CONSTRAINT category_normalizedName_check UNIQUE( normalizedName, parentID )
 );
 
 INSERT INTO Category( parentID, name, normalizedName, description, lft, rgt )
@@ -246,11 +248,12 @@ CREATE TABLE Feature	(
 	ID 		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	parentID	INT	REFERENCES Feature( ID ),
 	name		TEXT	NOT NULL,
-	normalizedName	TEXT	NOT NULL UNIQUE,
+	normalizedName	TEXT	NOT NULL,
 	description	TEXT,
 	lft		INT	NOT NULL,
 	rgt		INT	NOT NULL,
-	CONSTRAINT order_check CHECK ( rgt > lft )
+	CONSTRAINT order_check CHECK ( rgt > lft ),
+	CONSTRAINT feature_normalizedName_check UNIQUE( normalizedName, parentID )
 );
 
 INSERT INTO Feature( parentID, name, normalizedName, description, lft, rgt )
@@ -356,9 +359,9 @@ CREATE TABLE ComponentCheck	(
 	ruleName	TEXT
 );
 
--- Receipes
+-- Recipes
 --
-CREATE TABLE Receipe	(
+CREATE TABLE Recipe	(
 	ID		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	name		TEXT	NOT NULL,
 	normalizedName	TEXT	NOT NULL UNIQUE,
@@ -369,18 +372,18 @@ CREATE TABLE Receipe	(
 );
 
 CREATE TABLE RecipePicture	(
-	receipeID	INT	REFERENCES Receipe( ID ),
+	recipeID	INT	REFERENCES Recipe( ID ),
 	pictureID	INT	REFERENCES Picture( ID ),
-	UNIQUE ( receipeID, pictureID )
+	UNIQUE ( recipeID, pictureID )
 );
 
-CREATE TABLE ReceipeContent	(
-	receipeID	INT	REFERENCES Receipe( ID ),
+CREATE TABLE RecipeContent	(
+	recipeID	INT	REFERENCES Recipe( ID ),
 	categoryID	INT	REFERENCES Category( ID ),
 	minQuantity	INT,
 	maxQuantity	INT,
 	comment		TEXT,
-	UNIQUE ( receipeID, categoryID )
+	UNIQUE ( recipeID, categoryID )
 );
 
 
@@ -450,24 +453,12 @@ DOCTYPE "manufacturer Manufacturer"
 		id @int
 		form @string
 		name string
-		normalizedName string
 		webPage string
 		picture
 		{
 			id @int
+			image string
 			_ string
-		}
-		_ string
-	}
-
-	list
-	{
-		manufacturer []
-		{
-			id @int
-			name string
-			webPage string
-			thumbnail string
 		}
 	}
 }
@@ -770,7 +761,7 @@ TRANSACTION selectManufacturerList
 RESULT INTO list
 BEGIN
 	INTO manufacturer DO
-		SELECT Manufacturer.ID AS "id", name, webPage, thumbnail
+		SELECT Manufacturer.ID AS "id", name, webPage AS "webPage", thumbnail
 		FROM Manufacturer
 		LEFT JOIN Picture
 		ON Manufacturer.logo = Picture.ID;
@@ -782,9 +773,30 @@ BEGIN
 		VALUES ( $(name), $(normalizedName), $(webPage), $(logo) );
 END
 
+TRANSACTION updateManufacturer
+BEGIN
+	DO UPDATE Manufacturer SET name=$(name), normalizedName=$(normalizedName), webPage=$(webPage), logo=$(logo)
+		WHERE ID=$(id);
+END
+
 TRANSACTION deleteManufacturer
 BEGIN
 	DO DELETE FROM Manufacturer WHERE ID = $(id);
+END
+
+TRANSACTION selectManufacturer
+RESULT INTO manufacturer
+BEGIN
+	INTO . DO
+		SELECT Manufacturer.ID AS "id", name, webPage AS "webPage"
+		FROM Manufacturer
+		WHERE Manufacturer.ID = $(id);
+	INTO picture DO
+		SELECT Picture.ID AS "id", image
+		FROM Manufacturer
+		LEFT JOIN Picture
+		ON Manufacturer.logo = Picture.ID
+		WHERE Manufacturer.ID = $(id);
 END
 TRANSACTION selectPictureList
 RESULT INTO list
@@ -1196,44 +1208,93 @@ end
 -- manufacturers
 
 function ManufacturerListRequest( )
-	output:as( "list SYSTEM 'ManufacturerList.simpleform'" )
+	output:as( "list SYSTEM 'manufacturerList.simpleform'" )
 	local t = formfunction( "selectManufacturerList" )( {} )
+	local f = form( "ManufacturerList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function createManufacturer( )
+	local manufacturer = input:table( )["manufacturer"]
+	if manufacturer["picture"] then
+		manufacturer["logo"] = manufacturer["picture"]["id"]
+	end
+	if manufacturer["name"] then
+		manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	end
+	formfunction( "addManufacturer" )( manufacturer )
+end
+
+function editManufacturer( )
+	local manufacturer = input:table( )["manufacturer"]
+	if manufacturer["picture"] then
+		manufacturer["logo"] = manufacturer["picture"]["id"]
+	end
+	if manufacturer["name"] then
+		manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	end
+	formfunction( "updateManufacturer" )( manufacturer )
+end
+
+function deleteManufacturer( )
+	formfunction( "deleteManufacturer" )( { id = input:table( )["manufacturer"]["id"] } )
+end
+
+function ManufacturerRequest( )
+	local t = formfunction( "selectManufacturer" )( { id = input:table( )["manufacturer"]["id"] } )
 	local f = form( "Manufacturer" )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
 end
 
-function create_manufacturer(itr)
-	local manufacturerform = form("Manufacturer");
-	manufacturerform:fill(itr)
-	logger.printc( "Manufacturer ", manufacturerform)
-	local manufacturer = manufacturerform:table()["manufacturer"]
-	logger.printc( "manufacturerform:table()[manufacturer] ", manufacturer)
-	logger.printc( "manufacturerform:table() ", manufacturerform:table())
-	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
-	manufacturer["logo"] = manufacturer["picture"]["id"]
-	formfunction( "addManufacturer" )( manufacturer )
+-- components
+
+function ComponentListRequest( )
+	output:as( "list SYSTEM 'componentList.simpleform'" )
+	local t = formfunction( "selectComponentList" )( {} )
+	local f = form( "ComponentList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
 end
 
-function createManufacturer( )
-	logger:print( "ERROR", input:table( ) )
-	local x = input:table( );
-	print( "ERROR", "HERE" )
---	local manufacturer = input:table( )["manufacturer"]
---	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
---	manufacturer["logo"] = manufacturer["picture"]["id"]
---	formfunction( "addManufacturer" )( manufacturer )
-end
-
-function deleteManufacturer( )
-	filter().empty = false
-	local id = nil
-	for v,t in input:get( ) do
-		if t == "id" then
-			id = v
-		end
+function createComponent( )
+	local component = input:table( )["component"]
+	if component["category"] then
+		component["categoryID"] = component["category"]["id"]
 	end
-	formfunction( "deleteManufacturer" )( { id = id } )
+	if component["manufacturer"] then
+		component["manufacturerID"] = component["manufacturer"]["id"]
+	end
+	if component["name"] then
+		component["normalizedName"] = normalizer( "name" )( component["name"] )
+	end
+	formfunction( "addComponent" )( component )
+end
+
+function editComponent( )
+	local component = input:table( )["component"]
+	if component["category"] then
+		component["categoryID"] = component["category"]["id"]
+	end
+	if component["manufacturer"] then
+		component["manufacturerID"] = component["manufacturer"]["id"]
+	end
+	if component["name"] then
+		component["normalizedName"] = normalizer( "name" )( component["name"] )
+	end
+	formfunction( "updateComponent" )( component )
+end
+
+function deleteComponent( )
+	formfunction( "deleteComponent" )( { id = input:table( )["component"]["id"] } )
+end
+
+function ComponentRequest( )
+	local t = formfunction( "selectComponent" )( { id = input:table( )["component"]["id"] } )
+	local f = form( "Component" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
 end
 
 -- pictures
@@ -1353,6 +1414,14 @@ function deletePicture( )
 end
 
 
+local function create_manufacturer(itr)
+	local manufacturerform = form("Manufacturer");
+	manufacturerform:fill(itr)
+	local manufacturer = manufacturerform:table()["manufacturer"]
+	manufacturer["normalizedName"] = normalizer( "name" )( manufacturer["name"] )
+	manufacturer["logo"] = manufacturer["picture"]["id"]
+	formfunction( "addManufacturer" )( manufacturer )
+end
 
 function run()
 	filter().empty = false
@@ -1955,11 +2024,11 @@ ComponentProvides:
 
 ComponentCheck:
 
-Receipe:
+Recipe:
 
 RecipePicture:
 
-ReceipeContent:
+RecipeContent:
 
 Configuration:
 

@@ -50,14 +50,11 @@ InputFilterClosure::ItemType InputFilterClosure::fetch( lua_State* ls)
 	std::size_t elementsize;
 	InputFilter::ElementType elemtype;
 
-	if (!m_inputfilter.get())
+	if (!m_inputfilter.get() || m_taglevel < 0)
 	{
 		return EndOfData;
 	}
-	if (m_activeid.get() && *m_activeid != m_id)
-	{
-		throw std::runtime_error( "branched scope of iterator has not consumed all its input");
-	}
+
 AGAIN:
 	if (!m_inputfilter->getNext( elemtype, element, elementsize))
 	{
@@ -79,10 +76,10 @@ AGAIN:
 		switch (elemtype)
 		{
 			case InputFilter::OpenTag:
-				m_taglevel += 1;
 				lua_pushboolean( ls, 0);
 				push_element( ls, element, elementsize);
 				m_type = elemtype;
+				++m_taglevel;
 				return Data;
 
 			case InputFilter::Value:
@@ -108,22 +105,15 @@ AGAIN:
 				goto AGAIN;
 
 			 case InputFilter::CloseTag:
-				m_type = elemtype;
 				if (m_taglevel == 0)
 				{
-					if (m_activeid.get())
-					{
-						*m_activeid = m_id-1;
-					}
 					return EndOfData;
 				}
-				else
-				{
-					lua_pushboolean( ls, 0);
-					lua_pushboolean( ls, 0);
-					m_taglevel -= 1;
-					return Data;
-				}
+				m_type = elemtype;
+				--m_taglevel;
+				lua_pushboolean( ls, 0);
+				lua_pushboolean( ls, 0);
+				return Data;
 		}
 	}
 	throw std::runtime_error( "illegal state in generator function - typed fetch");
@@ -161,14 +151,11 @@ TypedInputFilterClosure::ItemType TypedInputFilterClosure::fetch( lua_State* ls)
 	InputFilter::ElementType elemtype;
 	TypedInputFilter::Element element;
 
-	if (!m_inputfilter.get())
+	if (!m_inputfilter.get() || m_taglevel < 0)
 	{
 		return EndOfData;
 	}
-	if (m_activeid.get() && *m_activeid != m_id)
-	{
-		throw std::runtime_error( "branched scope of iterator has not consumed all its input");
-	}
+
 AGAIN:
 	if (!m_inputfilter->getNext( elemtype, element))
 	{
@@ -190,10 +177,10 @@ AGAIN:
 		switch (elemtype)
 		{
 			case InputFilter::OpenTag:
-				m_taglevel += 1;
 				lua_pushboolean( ls, 0);
 				push_element( ls, element);
 				m_type = elemtype;
+				++m_taglevel;
 				return Data;
 
 			case InputFilter::Value:
@@ -218,56 +205,19 @@ AGAIN:
 				goto AGAIN;
 
 			 case InputFilter::CloseTag:
-				m_type = elemtype;
 				if (m_taglevel == 0)
 				{
-					if (m_activeid.get())
-					{
-						*m_activeid = m_id-1;
-					}
+					--m_taglevel;
 					return EndOfData;
 				}
-				else
-				{
-					lua_pushboolean( ls, 0);
-					lua_pushboolean( ls, 0);
-					m_taglevel -= 1;
-					return Data;
-				}
+				m_type = elemtype;
+				--m_taglevel;
+				lua_pushboolean( ls, 0);
+				lua_pushboolean( ls, 0);
+				return Data;
 		}
 	}
 	throw std::runtime_error( "illegal state in generator function - typed fetch");
-}
-
-
-InputFilterClosure InputFilterClosure::scope()
-{
-	if (m_taglevel == 0 || !isValidAsScope()) throw std::runtime_error( "illegal iterator state for branching a scope of it");
-	m_taglevel -= 1;
-	if (!m_activeid.get())
-	{
-		m_activeid.reset( new std::size_t(m_id+1));
-	}
-	else
-	{
-		*m_activeid = m_id + 1;
-	}
-	return InputFilterClosure( m_inputfilter, m_activeid);
-}
-
-TypedInputFilterClosure TypedInputFilterClosure::scope()
-{
-	if (m_taglevel == 0 || !isValidAsScope()) throw std::runtime_error( "illegal iterator state for branching a scope of it");
-	m_taglevel -= 1;
-	if (!m_activeid.get())
-	{
-		m_activeid.reset( new std::size_t(m_id+1));
-	}
-	else
-	{
-		*m_activeid = m_id + 1;
-	}
-	return TypedInputFilterClosure( m_inputfilter, m_activeid);
 }
 
 

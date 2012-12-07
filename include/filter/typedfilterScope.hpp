@@ -29,54 +29,69 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter/tostringfilter.hpp
-///\brief Interface for tostring methods in language bindings
+///\file filter/typedfilterScope.hpp
+///\brief Interface to scope of typed filter
 
-#ifndef _Wolframe_FILTER_TOSTRING_FILTER_INTERFACE_HPP_INCLUDED
-#define _Wolframe_FILTER_TOSTRING_FILTER_INTERFACE_HPP_INCLUDED
+#ifndef _Wolframe_FILTER_TYPEDFILTER_SCOPE_HPP_INCLUDED
+#define _Wolframe_FILTER_TYPEDFILTER_SCOPE_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include <string>
+#include "filter/inputfilter.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-///\class ToStringFilter
-///\brief Output filter for tostring methods in language bindings
-class ToStringFilter :public TypedOutputFilter
+///\class TypedInputFilterScope
+///\brief TypedInputFilter that stops fetching elements after the creation tag level has been left
+class TypedInputFilterScope :public TypedInputFilter
 {
 public:
 	///\brief Constructor
-	explicit ToStringFilter( const std::string indentstr_="")
-		:m_lasttype(FilterBase::OpenTag)
-		,m_indentstr(indentstr_) {}
+	TypedInputFilterScope()
+		:m_taglevel(0){}
+
+	explicit TypedInputFilterScope( const TypedInputFilterR& i)
+		:m_inputfilter(i)
+		,m_taglevel(1)
+	{
+		TypedInputFilterScope* prev = dynamic_cast<TypedInputFilterScope*>(i.get());
+		if (prev) m_inputfilter = prev->inputfilter();
+	}
 
 	///\brief Copy constructor
-	///\param[in] o typed output filter to copy
-	ToStringFilter( const ToStringFilter& o)
-		:TypedOutputFilter(o)
-		,m_content(o.m_content)
-		,m_lasttype(o.m_lasttype)
-		,m_indent(o.m_indent)
-		,m_indentstr(o.m_indentstr){}
+	///\param[in] o typed output filter scope to copy
+	TypedInputFilterScope( const TypedInputFilterScope& o)
+		:TypedInputFilter(o)
+		,m_inputfilter(o.m_inputfilter)
+		,m_taglevel(o.m_taglevel){}
+
 	///\brief Destructor
-	virtual ~ToStringFilter(){}
+	virtual ~TypedInputFilterScope(){}
 
 	///\brief Get a self copy
 	///\return allocated pointer to copy of this
-	virtual TypedOutputFilter* copy() const		{return new ToStringFilter(*this);}
+	virtual TypedInputFilter* copy() const
+	{
+		return new TypedInputFilterScope(*this);
+	}
 
-	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
-	virtual bool print( ElementType type, const Element& element);
+	///\brief Get next element
+	///\param [out] type element type parsed
+	///\param [out] element reference to element returned
+	///\return true, if success, false, if not.
+	///\remark Check the state when false is returned
+	virtual bool getNext( TypedInputFilter::ElementType& type, TypedInputFilter::Element& element);
 
-	///\brief Get the content
-	const std::string& content() const		{return m_content;}
+	///\brief Set the iterator to the start (if implemented)
+	virtual void resetIterator();
+
+	const TypedInputFilterR& inputfilter()		{return m_inputfilter;}
 
 private:
-	std::string m_content;				//< content string
-	FilterBase::ElementType m_lasttype;		//< last parsed element type
-	std::string m_indent;				//< indent array
-	std::string m_indentstr;			//< indentiation string
+	TypedInputFilterR m_inputfilter;
+	int m_taglevel;
 };
 
 }}//namespace
 #endif
+
+

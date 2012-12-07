@@ -56,6 +56,10 @@ public:
 	///\brief Destructor
 	virtual ~TypingInputFilter(){}
 
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedInputFilter* copy() const		{return new TypingInputFilter(*this);}
+
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
 	virtual bool getNext( ElementType& type, Element& element);
 
@@ -80,6 +84,10 @@ public:
 
 	///\brief Destructor
 	virtual ~TypingOutputFilter(){}
+
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedOutputFilter* copy() const		{return new TypingOutputFilter(*this);}
 
 	///\brief Implementation of TypedOutputFilter::print( ElementType,const Element&)
 	virtual bool print( ElementType type, const Element& element);

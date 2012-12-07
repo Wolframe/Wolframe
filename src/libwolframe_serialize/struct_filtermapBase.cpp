@@ -137,6 +137,18 @@ void StructSerializer::init( const langbind::TypedOutputFilterR& out, Context::F
 	m_out = out;
 }
 
+void StructSerializer::reset()
+{
+	m_ctx.clear();
+	m_stk.clear();
+	m_stk.push_back( FiltermapSerializeState( 0, m_descr->fetch(), m_ptr));
+}
+
+langbind::TypedInputFilter* StructSerializer::copy() const
+{
+	return new StructSerializer(*this);
+}
+
 std::string StructSerializer::getElementPath( const FiltermapSerializeStateStack& stk)
 {
 	std::string rt;
@@ -198,6 +210,12 @@ public:
 	OneElementTypedInputFilter( const std::string& value)
 		:m_value(value)
 		,m_consumed(false){}
+	OneElementTypedInputFilter( const OneElementTypedInputFilter& o)
+		:langbind::TypedInputFilter(o)
+		,m_value(o.m_value)
+		,m_consumed(o.m_consumed){}
+
+	virtual TypedInputFilter* copy() const	{return new OneElementTypedInputFilter(*this);}
 
 	virtual bool getNext( ElementType& type, Element& element)
 	{

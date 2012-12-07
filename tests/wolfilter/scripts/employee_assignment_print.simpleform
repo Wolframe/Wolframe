@@ -1,3 +1,10 @@
+Form Employee
+{
+	firstname string
+	surname string
+	phone string
+}
+
 DOCTYPE "assignmentlist 'http://www.wolframe.org/example-doc/employee_assignment_print.dtd'"
 {
 	assignmentlist
@@ -10,12 +17,7 @@ DOCTYPE "assignmentlist 'http://www.wolframe.org/example-doc/employee_assignment
 				key string
 				customernumber int
 			}
-			employee
-			{
-				firstname string
-				surname string
-				phone string
-			}
+			employee Employee
 			issuedate string
 		}
 	}

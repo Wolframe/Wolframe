@@ -60,9 +60,15 @@ class TransactionFunctionOutput
 {
 public:
 	class ResultStruct;
+	typedef types::CountedReference<ResultStruct> ResultStructR;
 
-	TransactionFunctionOutput( const ResultStruct& resultstruct_, const db::TransactionOutput& data_);
+	TransactionFunctionOutput( const ResultStructR& resultstruct_, const db::TransactionOutput& data_);
+	TransactionFunctionOutput( const TransactionFunctionOutput& o);
 	virtual ~TransactionFunctionOutput();
+
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedInputFilter* copy() const		{return new TransactionFunctionOutput(*this);}
 
 	virtual bool getNext( ElementType& type, TypedFilterBase::Element& element);
 	virtual void resetIterator();
@@ -79,17 +85,22 @@ class TransactionFunctionInput
 {
 public:
 	class Structure;
+	typedef types::CountedReference<Structure> StructureR;
 
 	explicit TransactionFunctionInput( const TransactionFunction* func_);
 	TransactionFunctionInput( const TransactionFunctionInput& o);
 	virtual ~TransactionFunctionInput();
+
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedOutputFilter* copy() const		{return new TransactionFunctionInput(*this);}
 
 	virtual bool print( ElementType type, const Element& element);
 	virtual TransactionInput get() const;
 
 	const Structure& structure() const
 	{
-		return *m_structure;
+		return *m_structure.get();
 	}
 	const TransactionFunction* func() const
 	{
@@ -97,7 +108,7 @@ public:
 	}
 
 private:
-	Structure* m_structure;
+	StructureR m_structure;
 	const TransactionFunction* m_func;
 	langbind::TypedInputFilter::ElementType m_lasttype;
 };

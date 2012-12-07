@@ -35,6 +35,8 @@ CPP_OBJS = \
 	appObjects.o \
 	null_filter.o \
 	typingfilter.o \
+	typedfilterScope.o \
+	inputfilterScope.o \
 	tostringfilter.o \
 	ptreefilter.o \
 	formLibrary.o \

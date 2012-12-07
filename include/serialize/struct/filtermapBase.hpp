@@ -221,8 +221,13 @@ public:
 	static std::string getElementPath( const FiltermapSerializeStateStack& stk);
 
 	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
+	void reset();
 
 	bool call();
+
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual langbind::TypedInputFilter* copy() const;
 
 	///\brief Implements langbind::TypedInputFilter::getNext(langbind::FilterBase::ElementType&,langbind::TypedFilterBase::Element&)
 	virtual bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);

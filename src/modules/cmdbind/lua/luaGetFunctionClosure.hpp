@@ -34,6 +34,8 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_LUA_GET_FUNCTION_CLOSURE_HPP_INCLUDED
 #define _Wolframe_langbind_LUA_GET_FUNCTION_CLOSURE_HPP_INCLUDED
 #include "langbind/appObjects.hpp"
+#include "filter/inputfilterScope.hpp"
+#include "filter/typedfilterScope.hpp"
 #include "types/countedReference.hpp"
 #include <boost/shared_ptr.hpp>
 
@@ -67,44 +69,35 @@ public:
 	explicit InputFilterClosure( const InputFilterR& ig)
 		:m_inputfilter(ig)
 		,m_type(InputFilter::OpenTag)
-		,m_taglevel(0)
-		,m_id(0)
-		{}
-
-	InputFilterClosure( const InputFilterR& ig, const types::CountedReference<std::size_t>& a)
-		:m_inputfilter(ig)
-		,m_type(InputFilter::OpenTag)
-		,m_taglevel(0)
-		,m_id(a.get()?(*a):0)
-		,m_activeid(a)
-		{}
+		,m_taglevel(0){}
 
 	InputFilterClosure( const InputFilterClosure& o)
 		:m_inputfilter(o.m_inputfilter)
 		,m_type(o.m_type)
 		,m_attrbuf(o.m_attrbuf)
-		,m_taglevel(o.m_taglevel)
-		,m_id(o.m_id)
-		,m_activeid(o.m_activeid){}
+		,m_taglevel(o.m_taglevel){}
 
 	///\brief Get the next pair of elements on the lua stack if possible
 	ItemType fetch( lua_State* ls);
 
-	const InputFilterR& inputfilter() const		{return m_inputfilter;}
+	const InputFilterR& inputfilter() const			{return m_inputfilter;}
 
 	///\brief Find out if we can use the function in this state as argument of a function
 	///\return true, if yes
-	bool isValidAsScope() const			{return (m_type==InputFilter::OpenTag && (!m_activeid.get() || *m_activeid == m_id));}
+	bool isValidAsScope() const				{return (m_type==InputFilter::OpenTag);}
 
-	InputFilterClosure scope();
+	InputFilterClosure scope()
+	{
+		if (m_taglevel < 0) return InputFilterClosure( InputFilterR( new InputFilterScope()));
+		--m_taglevel; //consumed by returned scope
+		return InputFilterClosure( InputFilterR( new InputFilterScope( inputfilter())));
+	}
 
 private:
 	InputFilterR m_inputfilter;				//< rerefence to input with filter
 	InputFilter::ElementType m_type;			//< current state (last value type parsed)
 	std::string m_attrbuf;					//< buffer for attribute name
-	std::size_t m_taglevel;					//< current level in tag hierarchy
-	std::size_t m_id;					//< id for checking valid access (scope)
-	types::CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
+	int m_taglevel;						//< tag level
 };
 
 
@@ -127,47 +120,36 @@ public:
 	explicit TypedInputFilterClosure( const TypedInputFilterR& i)
 		:m_inputfilter(i)
 		,m_type(InputFilter::OpenTag)
-		,m_taglevel(0)
-		,m_id(0)
-		{}
-
-	///\brief Constructor
-	///\param[in] i input filter reference
-	explicit TypedInputFilterClosure( const TypedInputFilterR& i, const types::CountedReference<std::size_t>& a)
-		:m_inputfilter(i)
-		,m_type(InputFilter::OpenTag)
-		,m_taglevel(0)
-		,m_id(a.get()?(*a):0)
-		,m_activeid(a)
-		{}
+		,m_taglevel(0){}
 
 	TypedInputFilterClosure( const TypedInputFilterClosure& o)
 		:m_inputfilter(o.m_inputfilter)
 		,m_type(o.m_type)
 		,m_attrbuf(o.m_attrbuf)
-		,m_taglevel(o.m_taglevel)
-		,m_id(o.m_id)
-		,m_activeid(o.m_activeid){}
+		,m_taglevel(o.m_taglevel){}
 
 	///\brief Get the next pair of elements on the lua stack if possible
 	///\return state returned
 	ItemType fetch( lua_State* ls);
 
-	const TypedInputFilterR& inputfilter() const	{return m_inputfilter;}
+	const TypedInputFilterR& inputfilter() const		{return m_inputfilter;}
 
 	///\brief Find out if we can use the function in this state as argument of a function
 	///\return true, if yes
-	bool isValidAsScope() const			{return (m_type==InputFilter::OpenTag && (!m_activeid.get() || *m_activeid == m_id));}
+	bool isValidAsScope() const				{return (m_type==InputFilter::OpenTag);}
 
-	TypedInputFilterClosure scope();
+	TypedInputFilterClosure scope()
+	{
+		if (m_taglevel < 0) return TypedInputFilterClosure( TypedInputFilterR( new TypedInputFilterScope()));
+		--m_taglevel; //consumed by returned scope
+		return TypedInputFilterClosure( TypedInputFilterR( new TypedInputFilterScope( inputfilter())));
+	}
 
 private:
 	TypedInputFilterR m_inputfilter;			//< rerefence to input with filter
 	InputFilter::ElementType m_type;			//< current state (last value type parsed)
 	std::string m_attrbuf;					//< buffer for attribute name
-	std::size_t m_taglevel;					//< current level in tag hierarchy
-	std::size_t m_id;					//< id for checking valid access
-	types::CountedReference<std::size_t> m_activeid;	//< id of current active scope iterator
+	int m_taglevel;						//< tag level
 };
 
 }}//namespace

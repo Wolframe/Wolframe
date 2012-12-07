@@ -34,6 +34,7 @@
 ///\file database/transactionOutput.hpp
 #ifndef _DATABASE_TRANSACTION_OUTPUT_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_OUTPUT_HPP_INCLUDED
+#include "types/countedReference.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -50,7 +51,6 @@ public:
 		:m_result(o.m_result)
 		,m_strings(o.m_strings){}
 
-	class CommandResultBuilder;
 
 	class CommandResult
 	{
@@ -77,17 +77,21 @@ public:
 			return *this;
 		}
 
-		std::vector<Row>::const_iterator begin() const		{return m_row.begin();}
-		std::vector<Row>::const_iterator end() const		{return m_row.end();}
+		std::vector<Row>::const_iterator begin() const			{return m_row.begin();}
+		std::vector<Row>::const_iterator end() const			{return m_row.end();}
 
-		std::size_t functionidx() const				{return m_functionidx;}
-		std::size_t level() const				{return m_level;}
-		std::size_t nofColumns() const				{return m_columnName.size();}
-		const std::string& columnName( std::size_t i) const	{return m_columnName[i];}
+		std::size_t functionidx() const					{return m_functionidx;}
+		std::size_t level() const					{return m_level;}
+		std::size_t nofColumns() const					{return m_columnName.size();}
+		const std::string& columnName( std::size_t i) const		{return m_columnName[i];}
+
+	public://interface for constructing the result:
+		void addColumn( const std::string& name)			{m_columnName.push_back( name);}
+		void openRow()							{m_row.push_back( CommandResult::Row());}
+		void addValue( TransactionOutput* r, const std::string& v)	{m_row.back().push_back( r->getValueIdx( v));}
+		void addNull()							{m_row.back().push_back( 0);}
 
 	private:
-		friend class TransactionOutput;
-		friend class CommandResultBuilder;
 		std::size_t m_functionidx;
 		std::size_t m_level;
 		std::vector<std::string> m_columnName;
@@ -113,11 +117,7 @@ public:
 			return *this;
 		}
 
-	public:
-		void addColumn( const std::string& name)		{m_columnName.push_back( name);}
-		void openRow()						{m_row.push_back( CommandResult::Row());}
-		void addValue( const std::string& value_)		{m_row.back().push_back( m_ref->getValueIdx( value_));}
-		void addNull()						{m_row.back().push_back( 0);}
+		void addValue( const std::string& value_)		{CommandResult::addValue( m_ref, value_);}
 
 	private:
 		TransactionOutput* m_ref;
@@ -225,19 +225,20 @@ public:
 
 	std::string tostring() const;
 
-public:
-	// interface for constructing the result:
+public:// interface for constructing the result:
 	void openCommandResult( std::size_t functionidx, std::size_t level)	{m_result.push_back( CommandResult( functionidx, level));}
 	void addCommandResult( const CommandResult& r)				{m_result.push_back( r);}
-	void addColumn( const std::string& name)				{m_result.back().m_columnName.push_back( name);}
-	void openRow()								{m_result.back().m_row.push_back( CommandResult::Row());}
-	void addValue( const std::string& value_)				{m_result.back().m_row.back().push_back( getValueIdx( value_));}
-	void addNull()								{m_result.back().m_row.back().push_back( 0);}
+	void addColumn( const std::string& name)				{m_result.back().addColumn( name);}
+	void openRow()								{m_result.back().openRow();}
+	void addValue( const std::string& value_)				{m_result.back().addValue( this, value_);}
+	void addNull()								{m_result.back().addNull();}
 
 private:
 	std::vector<CommandResult> m_result;
 	std::string m_strings;
 };
+
+typedef types::CountedReference<TransactionOutput> TransactionOutputR;
 
 }}
 #endif

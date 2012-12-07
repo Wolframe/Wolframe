@@ -132,11 +132,6 @@ private:
 		bool empty() const			{return m_size==0;}
 	};
 
-	Array<Scope> scopestk;		//< stack of scopes opened
-	Array<unsigned int> follows;	//< indices of tokens active in all descendant scopes
-	Array<int> triggers;		//< triggered elements
-	Array<Token> tokens;		//< list of waiting tokens
-
 	///\class Context
 	///\brief State variables without stacks of the automaton
 	struct Context
@@ -162,6 +157,11 @@ private:
 			scope_iter = scope.range.tokenidx_from;
 		}
 	};
+
+	Array<Scope> scopestk;		//< stack of scopes opened
+	Array<unsigned int> follows;	//< indices of tokens active in all descendant scopes
+	Array<int> triggers;		//< triggered elements
+	Array<Token> tokens;		//< list of waiting tokens
 	Context context;		//< state variables without stacks of the automaton
 
 	///\brief Activate a state by index

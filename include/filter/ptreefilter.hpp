@@ -65,6 +65,10 @@ public:
 	///\brief Destructor
 	virtual ~PropertyTreeInputFilter(){}
 
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedInputFilter* copy() const		{return new PropertyTreeInputFilter(*this);}
+
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
 	virtual bool getNext( ElementType& type, Element& element);
 
@@ -90,6 +94,10 @@ public:
 
 	///\brief Destructor
 	virtual ~PropertyTreeOutputFilter(){}
+
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedOutputFilter* copy() const			{return new PropertyTreeOutputFilter(*this);}
 
 	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
 	virtual bool print( ElementType type, const Element& element);

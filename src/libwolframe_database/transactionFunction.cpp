@@ -442,8 +442,7 @@ private:
 
 struct TransactionFunction::Impl
 {
-	TransactionFunctionOutput::ResultStruct m_resultstruct;
-	std::vector<bool> m_elemunique;
+	TransactionFunctionOutput::ResultStructR m_resultstruct;
 	std::vector<FunctionCall> m_call;
 	TagTable m_tagmap;
 
@@ -944,14 +943,11 @@ TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* f
 	,m_func(func_)
 	,m_lasttype( langbind::TypedInputFilter::Value){}
 
-TransactionFunctionInput::~TransactionFunctionInput()
-{
-	delete m_structure;
-}
+TransactionFunctionInput::~TransactionFunctionInput(){}
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunctionInput& o)
 	:langbind::TypedOutputFilter(o)
-	,m_structure( new Structure( *o.m_structure))
+	,m_structure( o.m_structure)
 	,m_func(o.m_func)
 	,m_lasttype(o.m_lasttype){}
 
@@ -1090,13 +1086,6 @@ TransactionInput TransactionFunctionInput::get() const
 
 struct TransactionFunctionOutput::Impl
 {
-	int m_valuestate;
-	int m_colidx;
-	int m_colend;
-	ResultStruct m_resultstruct;
-	ResultStruct::const_iterator m_structitr;
-	ResultStruct::const_iterator m_structend;
-
 	struct StackElement
 	{
 		ResultElement::Type m_type;
@@ -1108,14 +1097,21 @@ struct TransactionFunctionOutput::Impl
 		StackElement( const StackElement& o)
 			:m_type(o.m_type),m_cnt(o.m_cnt),m_structitr(o.m_structitr){}
 	};
+
+	int m_valuestate;
+	int m_colidx;
+	int m_colend;
+	ResultStructR m_resultstruct;
+	ResultStruct::const_iterator m_structitr;
+	ResultStruct::const_iterator m_structend;
 	std::vector<StackElement> m_stack;
 	db::TransactionOutput::result_iterator m_resitr;
 	db::TransactionOutput::result_iterator m_resend;
 	db::TransactionOutput::row_iterator m_rowitr;
 	db::TransactionOutput::row_iterator m_rowend;
-	db::TransactionOutput m_data;
+	db::TransactionOutputR m_data;
 
-	Impl( const ResultStruct& resultstruct_, const db::TransactionOutput& data_)
+	Impl( const ResultStructR& resultstruct_, const db::TransactionOutputR& data_)
 		:m_valuestate(0)
 		,m_colidx(0)
 		,m_colend(0)
@@ -1125,13 +1121,31 @@ struct TransactionFunctionOutput::Impl
 		resetIterator();
 	}
 
+	Impl( const Impl& o)
+		:m_valuestate(o.m_valuestate)
+		,m_colidx(o.m_colidx)
+		,m_colend(o.m_colend)
+		,m_resultstruct(o.m_resultstruct)
+		,m_structitr(o.m_structitr)
+		,m_structend(o.m_structend)
+		,m_stack(o.m_stack)
+		,m_resitr(o.m_resitr)
+		,m_resend(o.m_resend)
+		,m_rowitr(o.m_rowitr)
+		,m_rowend(o.m_rowend)
+		,m_data(o.m_data)
+	{}
+
 	void resetIterator()
 	{
 		m_valuestate = 0;
-		m_structitr = m_resultstruct.begin();
-		m_structend = m_resultstruct.end();
-		m_resitr = m_data.begin();
-		m_resend = m_data.end();
+		m_colidx = 0;
+		m_colend = 0;
+		m_structitr = m_resultstruct->begin();
+		m_structend = m_resultstruct->end();
+		m_stack.clear();
+		m_resitr = m_data->begin();
+		m_resend = m_data->end();
 	}
 
 	bool getNext( ElementType& type, TypedFilterBase::Element& element, bool doSerializeWithIndices)
@@ -1314,8 +1328,13 @@ struct TransactionFunctionOutput::Impl
 };
 
 
-TransactionFunctionOutput::TransactionFunctionOutput( const ResultStruct& resultstruct_, const db::TransactionOutput& data_)
-	:m_impl( new Impl( resultstruct_, data_))
+TransactionFunctionOutput::TransactionFunctionOutput( const ResultStructR& resultstruct_, const db::TransactionOutput& data_)
+	:m_impl( new Impl( resultstruct_, db::TransactionOutputR( new db::TransactionOutput( data_))))
+{}
+
+TransactionFunctionOutput::TransactionFunctionOutput( const TransactionFunctionOutput& o)
+	:langbind::TypedInputFilter(o)
+	,m_impl( new Impl( *o.m_impl))
 {}
 
 TransactionFunctionOutput::~TransactionFunctionOutput()
@@ -1335,12 +1354,13 @@ void TransactionFunctionOutput::resetIterator()
 }
 
 TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap)
+	:m_resultstruct( new TransactionFunctionOutput::ResultStruct())
 {
 	typedef TransactionDescription::Error Error;
 
 	if (!resultname.empty())
 	{
-		m_resultstruct.openTag( resultname);
+		m_resultstruct->openTag( resultname);
 	}
 	std::vector<TransactionDescription>::const_iterator di = description.begin(), de = description.end();
 	for (; di != de; ++di)
@@ -1372,14 +1392,14 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 				FunctionCall cc( di->output, di->call.first, selector, param, di->nonempty, di->unique, 1);
 				if (!di->output.empty())
 				{
-					m_resultstruct.addMark( ResultElement::FunctionStart, m_call.size());
+					m_resultstruct->addMark( ResultElement::FunctionStart, m_call.size());
 					bool hasOutput = (di->output != ".");
-					if (hasOutput) m_resultstruct.openTag( di->output);
-					if (!di->unique) m_resultstruct.addMark( ResultElement::IndexStart, m_call.size());
-					m_resultstruct.addValueReference( m_call.size());
-					if (!di->unique) m_resultstruct.addMark( ResultElement::IndexEnd, m_call.size());
-					if (hasOutput) m_resultstruct.closeTag();
-					m_resultstruct.addMark( ResultElement::FunctionEnd, m_call.size());
+					if (hasOutput) m_resultstruct->openTag( di->output);
+					if (!di->unique) m_resultstruct->addMark( ResultElement::IndexStart, m_call.size());
+					m_resultstruct->addValueReference( m_call.size());
+					if (!di->unique) m_resultstruct->addMark( ResultElement::IndexEnd, m_call.size());
+					if (hasOutput) m_resultstruct->closeTag();
+					m_resultstruct->addMark( ResultElement::FunctionEnd, m_call.size());
 				}
 				m_call.push_back( cc);
 			}
@@ -1398,11 +1418,11 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 				}
 				if (!di->output.empty())
 				{
-					m_resultstruct.addMark( ResultElement::OperationStart, m_call.size());
+					m_resultstruct->addMark( ResultElement::OperationStart, m_call.size());
 					bool hasOutput = (di->output != ".");
-					if (hasOutput) m_resultstruct.openTag( di->output);
-					m_resultstruct.addEmbeddedResult( func->m_resultstruct, m_call.size());
-					if (hasOutput) m_resultstruct.closeTag();
+					if (hasOutput) m_resultstruct->openTag( di->output);
+					m_resultstruct->addEmbeddedResult( *func->m_resultstruct, m_call.size());
+					if (hasOutput) m_resultstruct->closeTag();
 				}
 				FunctionCall paramstk( "", "", selector, param, false, false, 1 + 1/*level*/);
 				m_call.push_back( paramstk);
@@ -1420,7 +1440,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 				}
 				if (!di->output.empty())
 				{
-					m_resultstruct.addMark( ResultElement::OperationEnd, m_call.size());
+					m_resultstruct->addMark( ResultElement::OperationEnd, m_call.size());
 				}
 			}
 		}
@@ -1431,7 +1451,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 	}
 	if (!resultname.empty())
 	{
-		m_resultstruct.closeTag();
+		m_resultstruct->closeTag();
 	}
 }
 

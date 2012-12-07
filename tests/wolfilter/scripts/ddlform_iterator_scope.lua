@@ -6,32 +6,8 @@ function print_tree( itr)
 end
 
 function run_employee( itr)
-	for v,t in itr do
-		if t == "firstname" then
-			if not v then
-				output:opentag( t)
-				print_tree( scope(itr))
-			else
-				output:print( v,t)
-			end
-		elseif t == "phone" then
-			if not v then
-				output:opentag( t)
-				print_tree( scope(itr))
-			else
-				output:print( v,t)
-			end
-		elseif t == "surname" then
-			if not v then
-				output:opentag( t)
-				print_tree( scope(itr))
-			else
-				output:print( v,t)
-			end
-		else
-			error( "unknown element " .. t .. " " .. v)
-		end
-	end
+	local employee = form("Employee"):fill( itr)
+	output:print( employee:get())
 end
 
 function run_task( itr)
@@ -58,7 +34,7 @@ function run_task( itr)
 				output:print( v,t)
 			end
 		else
-			error( "unknown element " .. t .. " " .. v)
+			error( "unknown element " .. tostring(t) .. " " .. tostring(v))
 		end
 	end
 end
@@ -81,7 +57,7 @@ function run_assignment( itr)
 			run_employee( scope( itr))
 			output:closetag()
 		else
-			error( "unknown element " .. t .. " " .. v)
+			error( "unknown element " .. tostring(t) .. " " .. tostring(v))
 		end
 	end
 end
@@ -93,7 +69,7 @@ function run_assignmentlist( itr)
 			run_assignment( scope( itr))
 			output:closetag()
 		else
-			error( "unknown element " .. t .. " " .. v)
+			error( "unknown element " .. tostring(t) .. " " .. tostring(v))
 		end
 	end
 end
@@ -108,7 +84,7 @@ function run()
 			run_assignmentlist( scope( itr))
 			output:closetag()
 		else
-			error( "unknown element " .. t .. " " .. v)
+			error( "unknown element " .. tostring(t) .. " " .. tostring(v))
 		end
 	end
 end

@@ -28,6 +28,8 @@ CPP_OBJS = \
 	tostringfilter.obj \
 	ptreefilter.obj \
 	typingfilter.obj \
+	typedfilterScope.obj \
+	inputfilterScope.obj \
 	null_filter.obj \
 	formLibrary.obj \
 	normalizeProgram.obj \

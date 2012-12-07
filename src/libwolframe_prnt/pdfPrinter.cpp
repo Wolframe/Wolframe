@@ -181,7 +181,19 @@ public:
 		,m_selectState(&func->parser())
 		,m_lasttype( langbind::TypedFilterBase::OpenTag){}
 
+	PrintInput( const PrintInput& o)
+		:langbind::TypedOutputFilter(o)
+		,m_document(o.m_document)
+		,m_variableScope(o.m_variableScope)
+		,m_func(o.m_func)
+		,m_selectState(o.m_selectState)
+		,m_lasttype(o.m_lasttype){}
+
 	virtual ~PrintInput(){}
+
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedOutputFilter* copy() const		{return new PrintInput(*this);}
 
 	virtual bool print( langbind::TypedFilterBase::ElementType type, const langbind::TypedFilterBase::Element& element)
 	{

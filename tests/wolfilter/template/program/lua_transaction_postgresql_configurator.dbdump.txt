@@ -94,12 +94,12 @@ pictureid, tagid
 '1', NULL
 '2', NULL
 '3', NULL
-receipe:
+recipe:
 id, name, normalizedname, description, categoryid, creationdate, comment
-receipecontent:
-receipeid, categoryid, minquantity, maxquantity, comment
+recipecontent:
+recipeid, categoryid, minquantity, maxquantity, comment
 recipepicture:
-receipeid, pictureid
+recipeid, pictureid
 tag:
 id, parentid, name, normalizedname, description, lft, rgt
 '1', NULL, '_ROOT_', '_ROOT_', 'Tags tree root', '1', '36'

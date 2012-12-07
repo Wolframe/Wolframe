@@ -69,8 +69,8 @@ public:
 	///\brief Destructor
 	virtual ~InputFilter(){}
 
-	///\brief self copy
-	///\return copy of this
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
 	virtual InputFilter* copy() const=0;
 
 	///\brief Declare the next input chunk to the filter

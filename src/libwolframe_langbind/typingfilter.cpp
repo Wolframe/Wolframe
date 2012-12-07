@@ -29,7 +29,7 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file filter_typingfilter.cpp
+///\file typingfilter.cpp
 ///\brief Implementation of filters that wrap untyped to typed input filters
 #include "filter/typingfilter.hpp"
 #include <boost/lexical_cast.hpp>

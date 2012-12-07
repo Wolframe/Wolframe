@@ -66,6 +66,10 @@ public:
 	///\brief Destructor
 	virtual ~TypedInputFilter(){}
 
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedInputFilter* copy() const=0;
+
 	///\brief Get next element
 	///\param [out] type element type parsed
 	///\param [out] element reference to element returned
@@ -88,16 +92,16 @@ public:
 	enum Flags
 	{
 		None=0x00,
-		SerializeWithIndices=0x01				//< do serialization with array index elements, if implemented
+		SerializeWithIndices=0x01		//< do serialization with array index elements, if implemented
 	};
 
-	bool flag( Flags f) const					{return ((int)f & (int)m_flags) == (int)f;}
-	void setFlags( Flags f)						{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff;}
-	void resetFlags()						{m_flags = None;}
+	bool flag( Flags f) const			{return ((int)f & (int)m_flags) == (int)f;}
+	void setFlags( Flags f)				{int ff=(int)m_flags | (int)f; m_flags=(Flags)ff;}
+	void resetFlags()				{m_flags = None;}
 
 private:
 	State m_state;					//< state
-	Flags m_flags;
+	Flags m_flags;					//< flags
 };
 
 ///\typedef TypedInputFilterR
@@ -123,6 +127,10 @@ public:
 		,m_state(o.m_state){}
 	///\brief Destructor
 	virtual ~TypedOutputFilter(){}
+
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedOutputFilter* copy() const=0;
 
 	///\brief Get next element
 	///\param [out] type element type parsed

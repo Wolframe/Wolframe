@@ -34,6 +34,7 @@
 ///\file database/transactionInput.hpp
 #ifndef _DATABASE_TRANSACTION_INPUT_HPP_INCLUDED
 #define _DATABASE_TRANSACTION_INPUT_HPP_INCLUDED
+#include "types/countedReference.hpp"
 #include <string>
 #include <vector>
 #include <stdexcept>
@@ -351,6 +352,7 @@ private:
 	std::vector<Flags> m_flags;
 };
 
+typedef types::CountedReference<TransactionInput> TransactionInputR;
 
 }}
 #endif

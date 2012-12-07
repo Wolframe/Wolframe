@@ -65,11 +65,18 @@ public:
 		:TypedInputFilter(o)
 		,LuaExceptionHandlerScope(o)
 		,m_ls(o.m_ls)
-		,m_stk(o.m_stk){}
+		,m_stk(o.m_stk)
+	{
+		if (m_stk.size() > 0) throw std::runtime_error( "copy of lua input filter not allowed in this state");
+	}
 
 	///\brief Destructor
 	///\remark Leaves the iterated table as top element (-1) on the lua stack
 	virtual ~LuaTableInputFilter(){}
+
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedInputFilter* copy() const		{return new LuaTableInputFilter(*this);}
 
 	///\brief Implementation of TypedInputFilter::getNext(ElementType&,Element&)
 	///\remark Expects the table to iterate as top element (-1) on the lua stack when called the first time
@@ -144,6 +151,10 @@ public:
 	///\brief Destructor
 	virtual ~LuaTableOutputFilter(){}
 
+	///\brief Get a self copy
+	///\return allocated pointer to copy of this
+	virtual TypedOutputFilter* copy() const		{return new LuaTableOutputFilter(*this);}
+
 	///\brief Implementation of TypedOutputFilter::print(ElementType,const Element&)
 	virtual bool print( ElementType type, const Element& element);
 
@@ -154,16 +165,16 @@ private:
 	bool closeAttribute( const Element& element);
 
 private:
-	lua_State* m_ls;
-	ElementType m_type;
-	bool m_hasElement;
-
 	enum ContentType
 	{
 		Atomic,
 		Struct,
 		Vector
 	};
+
+	lua_State* m_ls;
+	ElementType m_type;
+	bool m_hasElement;
 	std::vector<ContentType> m_statestk;
 };
 

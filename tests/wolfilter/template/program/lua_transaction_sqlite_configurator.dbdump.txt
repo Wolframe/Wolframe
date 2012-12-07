@@ -114,11 +114,11 @@ ComponentProvides:
 
 ComponentCheck:
 
-Receipe:
+Recipe:
 
 RecipePicture:
 
-ReceipeContent:
+RecipeContent:
 
 Configuration:
 
