@@ -6,6 +6,7 @@
 
 #include <QHBoxLayout>
 #include <QFileDialog>
+#include <QFileInfo>
 
 FileChooser::FileChooser( SelectionMode _selectionMode, QWidget *_parent )
 	: QWidget( _parent ), m_selectionMode( _selectionMode ),
@@ -139,11 +140,12 @@ void FileChooser::chooseFile( )
 {
 	QStringList files;
 	QString f;
+	QFileInfo finfo( m_lineEdit->text( ) );
 	
 	switch( m_selectionMode ) {
 		case SelectExistingFile:
 			f = QFileDialog::getOpenFileName( this, tr( "Choose a file" ),
-				m_lineEdit->text( ), QString::null /* filter */ );
+				finfo.dir( ).absolutePath( ), QString::null /* filter */ );
 			break;
 		
 		case SelectExistingFiles:

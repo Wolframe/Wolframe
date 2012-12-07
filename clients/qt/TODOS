@@ -12,11 +12,12 @@ now:
 - package version switching
 
 - titles for file chooser and directory chooser (preferences dialog)
-- last used directory in File/PictureChooser, not last used file
 - search dialogs using tags to easier find categories and features
-- diacritical characters get lost
 - search with flag (with children)
 - open info box (modal) in feature/category/component edit and add
+- last used directory in File/PictureChooser
+- program icon disappears on Windows taskbar (due to the main window
+  and replace with a main window trick)
 
 musts:
 - push button state (disabled/enabled) based on a
