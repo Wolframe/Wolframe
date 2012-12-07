@@ -20,17 +20,15 @@ PF:
 - configurator
   - sqlite schemas, scripts
     - products
+
 - high prio
   - UIForm loader in client and server
-  - remove smart ptr from database (sqlite)
-
-- bugs
+  - documentation (tutorial)
 
 - low prio
   - cmdline client: test with SSL (MBA)
   - test forms with SELF recursion
   - programs with interface (cleanup ProcProvider)
-  - documentation (tutorial)
   - bignum tests (only bigint tested until now)
   - XSLT filter + tests
   - Printing with HPDF
