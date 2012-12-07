@@ -39,6 +39,7 @@
 	
 	protected:
 		virtual void closeEvent( QCloseEvent *event );
+		virtual void changeEvent( QEvent *event );
 		
 	private:
 		QCommandLine *m_cmdline;	// command line parser	
