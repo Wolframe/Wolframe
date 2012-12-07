@@ -11,7 +11,6 @@ now:
 - CRITICAL: "Premature end of document."
 - package version switching
 
-- titles for file chooser and directory chooser (preferences dialog)
 - search dialogs using tags to easier find categories and features
 - search with flag (with children)
 - open info box (modal) in feature/category/component edit and add

@@ -72,25 +72,32 @@ void PreferencesDialog::initialize( )
 	m_checkSSL = new QCheckBox( this );
 	formLayout->addRow( tr( "&Check SSL:" ), m_checkSSL );
 	
-	m_clientCertFile = new FileChooser( FileChooser::SelectExistingFile, this );
+	m_clientCertFile = new FileChooser( FileChooser::SelectExistingFile,
+		tr( "Select a file as client certificate" ), this );
 	formLayout->addRow( tr( "&Client Certificate:" ), m_clientCertFile );
 	
-	m_clientKeyFile = new FileChooser( FileChooser::SelectExistingFile, this );
+	m_clientKeyFile = new FileChooser( FileChooser::SelectExistingFile,
+		tr( "Select a file as client key" ), this );
 	formLayout->addRow( tr( "Client &Key:" ), m_clientKeyFile );
 	
-	m_CACertFile = new FileChooser( FileChooser::SelectExistingFile, this );
+	m_CACertFile = new FileChooser( FileChooser::SelectExistingFile,
+		tr( "Select a file as certificate authority key" ), this );
 	formLayout->addRow( tr( "C&A file:" ), m_CACertFile );
 		
-	m_dbName = new FileChooser( FileChooser::SelectExistingFile, this );
+	m_dbName = new FileChooser( FileChooser::SelectExistingFile,
+		tr( "Select a file where to store a local sqlite database" ), this );
 	formLayout->addRow( tr( "&Db file:" ), m_dbName );
 
-	m_uiFormsDir = new FileChooser( FileChooser::SelectExistingDir, this );
+	m_uiFormsDir = new FileChooser( FileChooser::SelectExistingDir,
+		tr( "Select a directory holding UI forms" ), this );
 	formLayout->addRow( tr( "Form dir:" ), m_uiFormsDir );
 
-	m_uiFormTranslationsDir = new FileChooser( FileChooser::SelectExistingDir, this );
+	m_uiFormTranslationsDir = new FileChooser( FileChooser::SelectExistingDir,
+		tr( "Select a directory holding UI form translations" ), this );
 	formLayout->addRow( tr( "I18N dir:" ), m_uiFormTranslationsDir );
 
-	m_dataLoaderDir = new FileChooser( FileChooser::SelectExistingDir, this );
+	m_dataLoaderDir = new FileChooser( FileChooser::SelectExistingDir,
+		tr( "Select a directory which contains local XML data" ), this );
 	formLayout->addRow( tr( "Data dir:" ), m_dataLoaderDir );
 
 	m_debug = new QCheckBox( this );

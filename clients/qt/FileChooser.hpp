@@ -30,6 +30,7 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 		};
 		
 		FileChooser( SelectionMode _selectionMode, QWidget *_parent = 0 );
+		FileChooser( SelectionMode _selectionMode, const QString title, QWidget *_parent = 0 );
 		
 		QString fileName( ) const;
 		QStringList fileNames( ) const;
@@ -53,6 +54,7 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 		
 	private:
 		SelectionMode m_selectionMode;
+		QString m_title;
 		QStackedWidget *m_stackedWidget;
 		QLineEdit *m_lineEdit;
 		QComboBox *m_comboBox;

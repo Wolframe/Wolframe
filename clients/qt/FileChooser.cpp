@@ -10,7 +10,16 @@
 
 FileChooser::FileChooser( SelectionMode _selectionMode, QWidget *_parent )
 	: QWidget( _parent ), m_selectionMode( _selectionMode ),
-	  m_lineEdit( 0 ), m_comboBox( 0 ), m_button( 0 )
+	  m_title( ), m_lineEdit( 0 ), m_comboBox( 0 ),
+	  m_button( 0 )
+{
+	initialize( );
+}
+
+FileChooser::FileChooser( SelectionMode _selectionMode, const QString _title, QWidget *_parent )
+	: QWidget( _parent ), m_selectionMode( _selectionMode ),
+	  m_title( _title ), m_lineEdit( 0 ), m_comboBox( 0 ),
+	  m_button( 0 )
 {
 	initialize( );
 }
@@ -144,17 +153,20 @@ void FileChooser::chooseFile( )
 	
 	switch( m_selectionMode ) {
 		case SelectExistingFile:
-			f = QFileDialog::getOpenFileName( this, tr( "Choose a file" ),
+			f = QFileDialog::getOpenFileName( this,
+				m_title.isEmpty( ) ? tr( "Choose a file" ) : m_title,
 				finfo.dir( ).absolutePath( ), QString::null /* filter */ );
 			break;
 		
 		case SelectExistingFiles:
-			files = QFileDialog::getOpenFileNames( this, tr( "Choose files" ),
+			files = QFileDialog::getOpenFileNames( this,
+				m_title.isEmpty( ) ? tr( "Choose files" ) : m_title,
 				m_lineEdit->text( ), QString::null /* filter */ );
 			break;
 		
 		case SelectExistingDir:
-			f = QFileDialog::getExistingDirectory( this, tr( "Choose a directory" ),
+			f = QFileDialog::getExistingDirectory( this,
+				m_title.isEmpty( ) ? tr( "Choose a directory" ) : m_title,
 				m_lineEdit->text( ), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks );
 			break;
 	}
