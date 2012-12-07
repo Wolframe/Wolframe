@@ -575,11 +575,10 @@ void MainWindow::loadTheme( QString theme )
 		}
 	}
 // show the new gui
-	m_ui->setParent( 0 );
-	m_ui->show( );
+	lower( );
 	m_ui->raise( );
 	m_ui->activateWindow( );
-	lower( );
+	m_ui->show( );
 
 // wire standard actions in the menu by name (on_<object>_<signal>)
 	QMetaObject::connectSlotsByName( this );
