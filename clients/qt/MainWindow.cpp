@@ -406,7 +406,6 @@ void MainWindow::finishInitialize( )
 	loadForm( "init" );
 
 // lower myself, as the theme opens a second main window
-	lower( );
 	setMinimumSize( 0, 0 );
 	setFixedSize( 200, 200 );
 	adjustSize( );
@@ -581,7 +580,6 @@ void MainWindow::loadTheme( QString theme )
 	m_ui->raise( );
 	m_ui->activateWindow( );
 	m_ui->show( );
-	lower( );
 	 	
 // wire standard actions in the menu by name (on_<object>_<signal>)
 	QMetaObject::connectSlotsByName( this );
@@ -589,7 +587,7 @@ void MainWindow::loadTheme( QString theme )
 // catch the destroyed signal, so we can close the empty main window too
 	connect( m_ui, SIGNAL( destroyed( QObject * ) ),
 		this, SLOT( muiDestroyed( QObject * ) ) );
-	//m_ui->setAttribute( Qt::WA_DeleteOnClose, true );
+	m_ui->setAttribute( Qt::WA_DeleteOnClose, true );
 	
 // remember current theme
 	m_currentTheme = theme;
