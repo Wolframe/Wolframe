@@ -615,22 +615,9 @@ LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 		}
 	}
 	std::string content;
-	const char* doctype = (*form)->doctype();
-	if (doctype)
-	{
-		if (doctype[0] == '_' && doctype[1] == ' ')
-		{
-			content.append( "FORM ");
-			content.append( doctype+2);
-			content.append( "\n");
-		}
-		else
-		{
-			content.append( "DOCTYPE \"");
-			content.append( doctype);
-			content.append( "\"\n");
-		}
-	}
+	content.append( "FORM ");
+	content.append( (*form)->name());
+	content.append( "\n");
 	content.append( flt->content());
 
 	LuaExceptionHandlerScope escope(ls);
@@ -646,12 +633,14 @@ LUA_FUNCTION_THROWS( "form:doctype()", function_form_doctype)
 	ddl::FormR* form = LuaObject<ddl::FormR>::getSelf( ls, "form", "doctype");
 	check_parameters( ls, 1, 0);
 
-	const char* doctype = (*form)->doctype();
+	const char* xmlroot = (*form)->xmlRoot();
 	LuaExceptionHandlerScope escope(ls);
 	{
-		if (doctype)
+		if (xmlroot)
 		{
-			lua_pushstring( ls, doctype);
+			const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
+			std::string xmlDoctype = ctx->xmlDoctypeString( (*form)->name(), (*form)->ddlname(), xmlroot);
+			lua_pushlstring( ls, xmlDoctype.c_str(), xmlDoctype.size());
 		}
 		else
 		{

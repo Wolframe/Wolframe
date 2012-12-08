@@ -1,4 +1,4 @@
-DOCTYPE "tag Tag"
+FORM Tag
 {
 	id @int
 	parentID @int

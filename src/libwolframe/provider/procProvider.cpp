@@ -253,6 +253,11 @@ const db::TransactionFunction* ProcessorProvider::transactionFunction( const std
 	return m_impl->transactionFunction( name);
 }
 
+std::string ProcessorProvider::xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const
+{
+	return m_impl->xmlDoctypeString( formname, ddlname, xmlroot);
+}
+
 const UI::UserInterfaceLibrary* ProcessorProvider::UIlibrary() const
 {
 	return m_impl->UIlibrary();

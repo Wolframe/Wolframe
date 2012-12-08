@@ -1,4 +1,4 @@
-DOCTYPE "products productList"
+FORM productList
 {
 	products
 	{
@@ -11,7 +11,7 @@ DOCTYPE "products productList"
 		}
 	}
 }
-DOCTYPE "node treeAddNode"
+FORM treeAddNode
 {
 	node
 	{
@@ -19,7 +19,7 @@ DOCTYPE "node treeAddNode"
 		name name
 	}
 }
-DOCTYPE "node treeDeleteSubtree"
+FORM treeDeleteSubtree
 {
 	node
 	{
@@ -27,21 +27,21 @@ DOCTYPE "node treeDeleteSubtree"
 	}
 }
 
-DOCTYPE "node treeSelectChildrenByName"
+FORM treeSelectChildrenByName
 {
 	node
 	{
 		name string
 	}
 }
-DOCTYPE "node treeSelectChildren"
+FORM treeSelectChildren
 {
 	node
 	{
 		id int
 	}
 }
-DOCTYPE "node treeSelectParents"
+FORM treeSelectParents
 {
 	node
 	{

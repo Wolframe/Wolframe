@@ -2,7 +2,7 @@
 **requires:DISABLED
 **input
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<!DOCTYPE invoice SYSTEM 'http://www.wolframe.org/example-doc/typed_invoice.dtd'>
+<!DOCTYPE invoice SYSTEM 'typed_invoice.simpleform'>
 <invoice>
 <order>
 <number>INS03-62</number>
@@ -68,7 +68,7 @@ f_floAt = string:trim ,Number:float(12,12);
 text_Ascii_de =  localeConv :latinword, ascii_de
 text_ascii_eu=localeconv :  latinword ,ascii_eu ;
 **file: typed_invoice.simpleform
-DOCTYPE "invoice 'http://www.wolframe.org/example-doc/typed_invoice.dtd'"
+FORM typed_invoice
 {
 	invoice
 	{

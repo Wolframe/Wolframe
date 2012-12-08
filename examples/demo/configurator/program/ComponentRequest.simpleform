@@ -1,4 +1,4 @@
-DOCTYPE "component ComponentRequest"
+FORM ComponentRequest
 {
 	component
 	{

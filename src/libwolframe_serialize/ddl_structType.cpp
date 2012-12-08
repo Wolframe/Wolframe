@@ -334,10 +334,7 @@ void StructType::print( std::ostream& out, size_t level) const
 void Form::print( std::ostream& out, size_t level) const
 {
 	std::string indent( level, '\t');
-	if (doctype())
-	{
-		out << indent << "DOCTYPE \"" << doctype() << "\"" << std::endl;
-	}
+	out << indent << "FORM " << m_name << std::endl;
 	StructType::print( out, level);
 }
 

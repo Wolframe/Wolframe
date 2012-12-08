@@ -21,7 +21,7 @@ BEGIN
 	INTO task FOREACH //task DO run( title);
 END
 **file: map_cmdhnd_transaction_outputform.simpleform
-DOCTYPE "doc 'http://www.wolframe.org/example-doc/map_cmdhnd_transaction_outputform.dtd'"
+FORM map_cmdhnd_transaction_outputform
 {
 	doc
 	{
@@ -36,5 +36,5 @@ DOCTYPE "doc 'http://www.wolframe.org/example-doc/map_cmdhnd_transaction_outputf
 }
 **output
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE doc SYSTEM "http://www.wolframe.org/example-doc/map_cmdhnd_transaction_outputform.dtd"><doc><task><task>bla bla</task><start>12:04:19 1/3/2012</start><end>12:41:34 1/3/2012</end><id>11</id></task><task><task>bli blu</task><start>07:14:23 1/3/2012</start><end>08:01:51 1/3/2012</end><id>12</id></task><task><task>gardening</task><start>09:24:28 1/3/2012</start><end>11:11:07 1/3/2012</end><id>21</id></task><task><task>helo</task><start>11:31:01 1/3/2012</start><end>12:07:55 1/3/2012</end><id>22</id></task><task><task>hula hop</task><start>19:14:38 1/4/2012</start><end>20:01:12 1/4/2012</end><id>31</id></task><task><task>hula hip</task><start>11:31:01 1/3/2012</start><end>12:07:55 1/3/2012</end><id>32</id></task><task><task>hula hup</task><start>11:31:01 1/3/2012</start><end>12:07:55 1/3/2012</end><id>33</id></task></doc>
+<!DOCTYPE doc SYSTEM "map_cmdhnd_transaction_outputform.simpleform"><doc><task><task>bla bla</task><start>12:04:19 1/3/2012</start><end>12:41:34 1/3/2012</end><id>11</id></task><task><task>bli blu</task><start>07:14:23 1/3/2012</start><end>08:01:51 1/3/2012</end><id>12</id></task><task><task>gardening</task><start>09:24:28 1/3/2012</start><end>11:11:07 1/3/2012</end><id>21</id></task><task><task>helo</task><start>11:31:01 1/3/2012</start><end>12:07:55 1/3/2012</end><id>22</id></task><task><task>hula hop</task><start>19:14:38 1/4/2012</start><end>20:01:12 1/4/2012</end><id>31</id></task><task><task>hula hip</task><start>11:31:01 1/3/2012</start><end>12:07:55 1/3/2012</end><id>32</id></task><task><task>hula hup</task><start>11:31:01 1/3/2012</start><end>12:07:55 1/3/2012</end><id>33</id></task></doc>
 **end

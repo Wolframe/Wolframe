@@ -1,4 +1,4 @@
-DOCTYPE "feature Feature"
+FORM Feature
 {
 	id @int
 	parentID @int

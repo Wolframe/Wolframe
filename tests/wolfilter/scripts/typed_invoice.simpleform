@@ -1,4 +1,4 @@
-DOCTYPE "invoice 'http://www.wolframe.org/example-doc/typed_invoice.dtd'"
+FORM typed_invoice
 {
 	invoice
 	{

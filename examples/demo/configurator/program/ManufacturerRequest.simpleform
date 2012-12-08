@@ -1,4 +1,4 @@
-DOCTYPE "manufacturer ManufacturerRequest"
+FORM ManufacturerRequest
 {
 	manufacturer
 	{

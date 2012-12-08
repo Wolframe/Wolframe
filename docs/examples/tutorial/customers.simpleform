@@ -1,12 +1,13 @@
 ; Wolframe tutorial part 2
 
-DOCTYPE "customer Customer"
-customer
+FORM Customer
 {
-        ID @int                            ; Internal customer id
-        name string                        ; Name of the customer
-        canonical_Name string              ; Customer name in canonical form
-        country string                     ; Country
-        locality string                    ; Locality
+        customer
+        {
+                ID @int                            ; Internal customer id
+                name string                        ; Name of the customer
+                canonical_Name string              ; Customer name in canonical form
+                country string                     ; Country
+                locality string                    ; Locality
+        }
 }
-

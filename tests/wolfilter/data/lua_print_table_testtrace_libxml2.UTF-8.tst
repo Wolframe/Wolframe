@@ -3,7 +3,7 @@
 **requires:LIBXML2
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE invoice SYSTEM 'http://www.wolframe.org/example-doc/invoice.dtd'>
+<!DOCTYPE invoice SYSTEM 'invoice.simpleform'>
 <invoice>
 <order>
 <number>INS03-62</number>
@@ -124,7 +124,7 @@ function run()
 end
 
 **file: invoice.simpleform
-DOCTYPE "invoice 'http://www.wolframe.org/example-doc/invoice.dtd'"
+FORM invoice
 {
 	invoice
 	{

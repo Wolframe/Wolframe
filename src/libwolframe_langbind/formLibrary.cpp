@@ -71,15 +71,11 @@ void FormLibrary::loadProgram( const std::string& filename)
 		{
 			ddl::FormR form( new ddl::Form( *fi));
 			std::string name;
-			if (fi->doctype())
+			if (form->name().empty())
 			{
-				name = utils::getIdFromDoctype( fi->doctype());
+				form->defineName( utils::getFileStem( filename));
 			}
-			else
-			{
-				name = utils::getFileStem( filename);
-			}
-			insert( name, form);
+			insert( form->name(), form);
 		}
 	}
 	catch (const config::PositionalErrorException& e)

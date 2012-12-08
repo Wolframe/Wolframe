@@ -411,7 +411,7 @@ CREATE TABLE ComposedConfig	(
 	UNIQUE ( configID, subConfigID )
 );
 **file:category.simpleform
-DOCTYPE "category Category"
+FORM Category
 {
 	id @int
 	parentID @int
@@ -424,7 +424,7 @@ DOCTYPE "category Category"
 	}
 }
 **file:feature.simpleform
-DOCTYPE "feature Feature"
+FORM Feature
 {
 	id @int
 	parentID @int
@@ -437,7 +437,7 @@ DOCTYPE "feature Feature"
 	}
 }
 **file:tag.simpleform
-DOCTYPE "tag Tag"
+FORM Tag
 {
 	id @int
 	parentID @int
@@ -446,7 +446,7 @@ DOCTYPE "tag Tag"
 	description string
 }
 **file:manufacturer.simpleform
-DOCTYPE "manufacturer Manufacturer"
+FORM Manufacturer
 {
 	manufacturer
 	{
@@ -463,7 +463,7 @@ DOCTYPE "manufacturer Manufacturer"
 	}
 }
 **file:picture.simpleform
-DOCTYPE "picture Picture"
+FORM Picture
 {
 	picture
 	{

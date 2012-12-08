@@ -468,12 +468,10 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 {
 	types::keymap<StructType> formmap;
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
-	if (itr != end
-	&&  !boost::algorithm::iequals( itr->first, "DOCTYPE")
-	&&  !boost::algorithm::iequals( itr->first, "FORM"))
+	if (itr != end && !boost::algorithm::iequals( itr->first, "FORM"))
 	{
 		// ... single form
-		Form form;
+		Form form( "simpleform");
 		compile_ptree( pt, form, typemap, formmap, "");
 		result.push_back( form);
 	}
@@ -481,27 +479,19 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 	{
 		for (;itr != end; ++itr)
 		{
-			Form form;
-			if (boost::algorithm::iequals( itr->first, "DOCTYPE"))
-			{
-				form.defineDoctype( itr->second.data());
-				std::string doctypeid = utils::getIdFromDoctype( form.doctype());
-				compile_ptree( itr->second, form, typemap, formmap, doctypeid);
-				formmap.insert( doctypeid, form);
-				result.push_back( form);
-			}
-			else if (boost::algorithm::iequals( itr->first, "FORM"))
+			if (boost::algorithm::iequals( itr->first, "FORM"))
 			{
 				if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after FORM");
-				form.defineDoctype( std::string( "_ \"") + itr->second.data() + ".simpleform\"");
+
+				Form form( "simpleform");
+				form.defineName( itr->second.data());
 				compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
-				std::string doctypeid = utils::getIdFromDoctype( form.doctype());
-				formmap.insert( doctypeid, form);
+				formmap.insert( form.name(), form);
 				result.push_back( form);
 			}
 			else
 			{
-				throw std::runtime_error( "DOCTYPE or FORM expected as top level node");
+				throw std::runtime_error( "FORM expected as top level node");
 			}
 		}
 	}

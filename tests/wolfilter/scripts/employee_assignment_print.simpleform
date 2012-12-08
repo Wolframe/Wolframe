@@ -1,11 +1,11 @@
-Form Employee
+FORM Employee
 {
 	firstname string
 	surname string
 	phone string
 }
 
-DOCTYPE "assignmentlist 'http://www.wolframe.org/example-doc/employee_assignment_print.dtd'"
+FORM employee_assignment_print
 {
 	assignmentlist
 	{

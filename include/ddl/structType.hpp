@@ -325,41 +325,58 @@ class Form
 public:
 	///\brief Constructor
 	Form(){}
+	///\brief Constructor
+	explicit Form( const std::string& ddlname_)
+		:m_ddlname(ddlname_){}
+	///\brief Constructor
+	explicit Form( const char* ddlname_)
+		:m_ddlname(ddlname_){}
 	///\brief Copy constructor
 	Form( const StructType& o)
 		:StructType(o){}
 	///\brief Copy constructor
 	Form( const Form& o)
 		:StructType(o)
-		,m_doctype(o.m_doctype){}
+		,m_name(o.m_name)
+		,m_ddlname(o.m_ddlname){}
 
 	///\brief Assignement operator
 	///\param[in] o object to copy
 	Form& operator= ( const Form& o)
 	{
 		StructType::operator=( o);
-		m_doctype = o.m_doctype;
+		m_name = o.m_name;
+		m_ddlname = o.m_ddlname;
 		return *this;
 	}
 
-	///\brief Get the document type definition string for this form
-	///\return the document type definition string or 0 if not defined
-	const char* doctype() const
+	const char* xmlRoot() const
 	{
-		return m_doctype.empty()?0:m_doctype.c_str();
+		return (contentType() == Struct && nof_elements() == 1 && !m_name.empty())?begin()->first.c_str():0;
 	}
 
-	///\brief Define the document type definition string for this form
-	///\param[in] doctype_ Document type definition string
-	void defineDoctype( const std::string& doctype_)
+	const std::string& name() const
 	{
-		m_doctype = doctype_;
+		return m_name;
+	}
+
+	const std::string& ddlname() const
+	{
+		return m_ddlname;
+	}
+
+	///\brief Define the name for this form
+	///\param[in] name_ name of this form
+	void defineName( const std::string& name_)
+	{
+		m_name = name_;
 	}
 
 	void print( std::ostream& out, size_t level=0) const;
 
 private:
-	std::string m_doctype;
+	std::string m_name;
+	std::string m_ddlname;
 };
 
 typedef types::CountedReference<Form> FormR;

@@ -117,9 +117,11 @@ void DirectmapCommandHandler::initcall()
 	{
 		m_outputfilter = filter->outputfilter();
 	}
-	if (m_outputform.doctype())
+	const char* xmlroot = m_outputform.xmlRoot();
+	if (xmlroot)
 	{
-		m_outputfilter->setDocType( m_outputform.doctype());
+		std::string xmlDoctype = m_provider->xmlDoctypeString( m_outputform.name(), m_outputform.ddlname(), xmlroot);
+		m_outputfilter->setDocType( xmlDoctype);
 	}
 	m_input.reset( new langbind::TypingInputFilter( m_inputfilter));
 	m_output.reset( new langbind::TypingOutputFilter( m_outputfilter));

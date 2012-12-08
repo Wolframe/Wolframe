@@ -451,4 +451,11 @@ const db::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transa
 	return m_dbprogram.function( name );
 }
 
+std::string ProcessorProvider::ProcessorProvider_Impl::xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const
+{
+	std::ostringstream rt;
+	rt << xmlroot << " SYSTEM \"" << formname << "." << ddlname << "\"";
+	return rt.str();
+}
+
 }} // namespace _Wolframe::proc

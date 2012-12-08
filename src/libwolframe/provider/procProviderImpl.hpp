@@ -74,6 +74,7 @@ public:
 	const ddl::Form* form( const std::string& name ) const;
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
+	std::string xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const;
 
 	const UI::UserInterfaceLibrary* UIlibrary() const;
 

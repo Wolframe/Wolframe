@@ -1,4 +1,4 @@
-DOCTYPE "category Category"
+FORM Category
 {
 	id @int
 	parentID @int

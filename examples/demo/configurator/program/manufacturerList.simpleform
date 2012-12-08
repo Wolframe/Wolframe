@@ -1,4 +1,4 @@
-DOCTYPE "list ManufacturerList"
+FORM ManufacturerList
 {
 	list
 	{
