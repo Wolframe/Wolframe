@@ -399,6 +399,11 @@ void MainWindow::finishInitialize( )
 	loadTheme( QString( QLatin1String( "windows" ) ) );
 #endif
 
+// TODO: move to file form loader
+	if( !QResource::registerResource( "./apps/configurator/resources/configurator.rcc") ) {
+		qWarning( ) << "Unable to open resource file";
+	}
+
 // load language resources, repaints the whole interface if necessary
 	loadLanguage( m_currentLanguage );
 	

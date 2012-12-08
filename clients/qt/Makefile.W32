@@ -118,7 +118,10 @@ I18NS = \
 	apps\test\i18n\form3.ro_RO.qm \
 	apps\test\i18n\form4.de_CH.qm \
 	apps\test\i18n\form4.ro_RO.qm
-	
+
+RESOURCES = \
+	apps\configurator\resources\configurator.rcc
+
 i18n\qtclient.de_CH.qm: i18n\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\qtclient.de_CH.ts -qm i18n\qtclient.de_CH.qm
 
@@ -169,8 +172,10 @@ apps\test\i18n\form4.de_CH.qm: apps\test\i18n\form4.de_CH.ts
 apps\test\i18n\form4.ro_RO.qm: apps\test\i18n\form4.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe apps\test\i18n\form4.ro_RO.ts -qm apps\test\i18n\form4.ro_RO.qm
 
-
-local_all: $(I18NS) $(CPP_BINS)
+apps\configurator\resources\configurator.rcc: apps\configurator\resources\configurator.qrc
+	$(QT_DIR)\bin\rcc.exe -binary apps\configurator\resources\configurator.qrc -o apps\configurator\resources\configurator.rcc
+	
+local_all: $(I18NS) $(RESOURCES) $(CPP_BINS)
 
 qtclient.exe: qtclient.obj
 
@@ -288,6 +293,7 @@ zip:
 	-rmdir C:\qtclient\apps\configurator\data
 	-rmdir C:\qtclient\apps\configurator\i18n
 	-rmdir C:\qtclient\apps\configurator\forms
+	-rmdir C:\qtclient\apps\configurator\resources
 	-rmdir C:\qtclient\apps\configurator
 	-rmdir C:\qtclient\apps
 	-rmdir C:\qtclient\imageformats

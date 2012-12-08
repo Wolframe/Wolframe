@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>512</width>
-    <height>448</height>
+    <height>512</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,20 +30,51 @@
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
    <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../resources/configurator.qrc">:/images/picture.png</pixmap>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
     <widget class="QLabel" name="label_description">
      <property name="text">
       <string>Caption:</string>
      </property>
     </widget>
    </item>
+   <item row="2" column="1">
+    <widget class="QLabel" name="caption">
+     <property name="text">
+      <string>caption</string>
+     </property>
+    </widget>
+   </item>
    <item row="4" column="0">
+    <widget class="QLabel" name="tabel_tags">
+     <property name="text">
+      <string>Tags:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="tags">
+     <property name="text">
+      <string>tags</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
     <widget class="QLabel" name="label_dimensions">
      <property name="text">
       <string>Dimensions:</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="5" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -86,13 +117,27 @@
     </layout>
    </item>
    <item row="7" column="0">
+    <widget class="QLabel" name="label_size">
+     <property name="text">
+      <string>Size</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLabel" name="size">
+     <property name="text">
+      <string>size</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
     <widget class="QLabel" name="label_image">
      <property name="text">
       <string>Image:</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
+   <item row="8" column="1">
     <widget class="QLabel" name="image">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -111,7 +156,49 @@
      </property>
     </widget>
    </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_name">
+     <property name="text">
+      <string>Info:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QLabel" name="info">
+     <property name="text">
+      <string>info</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="label_used">
+     <property name="text">
+      <string>Used in categories:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <widget class="QLabel" name="used_categories">
+     <property name="text">
+      <string>used in categories</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="label_used_in_featuers">
+     <property name="text">
+      <string>Used in Features:</string>
+     </property>
+    </widget>
+   </item>
    <item row="12" column="1">
+    <widget class="QLabel" name="used_features">
+     <property name="text">
+      <string>used in features</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -138,80 +225,10 @@
      </item>
     </layout>
    </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_name">
-     <property name="text">
-      <string>Info:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <widget class="QLabel" name="info">
-     <property name="text">
-      <string>info</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
-    <widget class="QLabel" name="caption">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>caption</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_size">
-     <property name="text">
-      <string>Size</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="QLabel" name="size">
-     <property name="text">
-      <string>size</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="tabel_tags">
-     <property name="text">
-      <string>Tags:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLabel" name="tags">
-     <property name="text">
-      <string>tags</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0">
-    <widget class="QLabel" name="label_used">
-     <property name="text">
-      <string>Used in categories:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="1">
-    <widget class="QLabel" name="used_categories">
-     <property name="text">
-      <string>used in categories</string>
-     </property>
-    </widget>
-   </item>
-   <item row="11" column="1">
-    <widget class="QLabel" name="used_features">
-     <property name="text">
-      <string>used in features</string>
-     </property>
-    </widget>
-   </item>
-   <item row="11" column="0">
-    <widget class="QLabel" name="label_used_in_featuers">
-     <property name="text">
-      <string>Used in Features:</string>
+      <string>Picture information</string>
      </property>
     </widget>
    </item>
@@ -220,6 +237,8 @@
  <tabstops>
   <tabstop>close</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/configurator.qrc"/>
+ </resources>
  <connections/>
 </ui>

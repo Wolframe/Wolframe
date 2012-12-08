@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>402</width>
-    <height>440</height>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
-   <item row="0" column="0">
+   <item row="1" column="0">
     <widget class="QLabel" name="label_caption">
      <property name="text">
       <string>Caption</string>
@@ -39,14 +39,14 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
+   <item row="1" column="1">
     <widget class="QLineEdit" name="caption">
      <property name="initialFocus" stdset="0">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="label_info">
      <property name="text">
       <string>Info:</string>
@@ -56,7 +56,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="2" column="1">
     <widget class="QPlainTextEdit" name="info">
      <property name="maximumSize">
       <size>
@@ -66,14 +66,14 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="label_tag">
      <property name="text">
       <string>Tags:</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="3" column="1">
     <widget class="QGroupBox" name="tagwrap">
      <property name="enabled">
       <bool>true</bool>
@@ -125,14 +125,14 @@
      </widget>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="label_image">
      <property name="text">
       <string>Image:</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="6" column="1">
     <widget class="PictureChooser" name="image">
      <property name="minimumSize">
       <size>
@@ -145,7 +145,7 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="0" colspan="2">
+   <item row="9" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <spacer name="horizontalSpacer">
@@ -216,31 +216,48 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="label_used_in_categories">
      <property name="text">
       <string>Used in categories:</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="5" column="0">
     <widget class="QLabel" name="label_used_in_features">
      <property name="text">
       <string>Used in features:</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="4" column="1">
     <widget class="QLabel" name="used_categories">
      <property name="text">
       <string>used in categories</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="5" column="1">
     <widget class="QLabel" name="used_features">
      <property name="text">
       <string>used in features</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../resources/configurator.qrc">:/images/picture_edit.png</pixmap>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Edit picture..</string>
      </property>
     </widget>
    </item>
@@ -262,6 +279,8 @@
   <tabstop>reset</tabstop>
   <tabstop>cancel</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/configurator.qrc"/>
+ </resources>
  <connections/>
 </ui>

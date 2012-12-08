@@ -157,6 +157,9 @@ THEMES = \
 %.qm : %.ts
 	$(QT_LRELEASE) $< -qm $@
 
+%.rcc : %.qrc
+	$(QT_RCC) -binary $< -o $@
+
 I18NS = \
 	i18n/qtclient.de_CH.qm \
 	i18n/qtclient.ro_RO.qm \
@@ -175,13 +178,17 @@ I18NS = \
 	apps/test/i18n/form4.de_CH.qm \
 	apps/test/i18n/form4.ro_RO.qm
 
+RESOURCES = \
+	apps/configurator/resources/configurator.rcc
+
 I18NS_TS = $(I18NS:.qm=.ts)
 
-local_all: $(I18NS)
+local_all: $(I18NS) $(RESOURCES)
 
 local_clean:
 	@-rm -f moc_*.cpp
 	@-rm -f $(I18NS)
+	@-rm -f $(RESOURCES)
 	@-rm -f geany.c++.tags
 	@-rm -f Makefile
 

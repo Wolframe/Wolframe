@@ -100,6 +100,10 @@
        <property name="text">
         <string>Manage Tags</string>
        </property>
+       <property name="icon">
+        <iconset resource="../resources/configurator.qrc">
+         <normaloff>:/images/tag_blue.png</normaloff>:/images/tag_blue.png</iconset>
+       </property>
        <property name="form" stdset="0">
         <string notr="true">tags</string>
        </property>
@@ -202,6 +206,16 @@
    <item row="0" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../resources/configurator.qrc">:/images/picture.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -259,7 +273,9 @@
   <tabstop>form1</tabstop>
   <tabstop>reload_2</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/configurator.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>picture</sender>

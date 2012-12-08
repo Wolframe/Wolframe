@@ -14,7 +14,67 @@
    <string>Manage Tags</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="0">
+   <item row="3" column="1">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QRadioButton" name="radioButton">
+       <property name="text">
+        <string>expand all</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_2">
+       <property name="text">
+        <string>collapse all</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QTreeWidget" name="tag">
+     <property name="itemsExpandable">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string notr="true">TagHierarchyRequest.simpleform</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>tag</string>
+     </property>
+     <property name="state" stdset="0">
+      <string notr="true">{global.tagState}</string>
+     </property>
+     <attribute name="headerDefaultSectionSize">
+      <number>250</number>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>tag</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>description</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="6" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="add">
@@ -89,64 +149,31 @@
     </layout>
    </item>
    <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QRadioButton" name="radioButton">
+      <widget class="QLabel" name="label">
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
        <property name="text">
-        <string>expand all</string>
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../resources/configurator.qrc">:/images/tag_blue.png</pixmap>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="radioButton_2">
+      <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>collapse all</string>
+        <string>Manage tags</string>
        </property>
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QTreeWidget" name="tag">
-     <property name="itemsExpandable">
-      <bool>true</bool>
-     </property>
-     <property name="doctype" stdset="0">
-      <string notr="true">TagHierarchyRequest.simpleform</string>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string>tag</string>
-     </property>
-     <property name="state" stdset="0">
-      <string notr="true">{global.tagState}</string>
-     </property>
-     <attribute name="headerDefaultSectionSize">
-      <number>250</number>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>tag</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>description</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
@@ -159,7 +186,9 @@
   <tabstop>edit</tabstop>
   <tabstop>reload_2</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/configurator.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>radioButton</sender>
