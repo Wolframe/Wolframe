@@ -12,5 +12,6 @@ FORM Manufacturer
 			image string
 			_ string
 		}
+		search string
 	}
 }

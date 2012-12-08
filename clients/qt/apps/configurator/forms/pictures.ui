@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>565</width>
-    <height>440</height>
+    <height>274</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -235,9 +235,6 @@
       <widget class="QPushButton" name="searchButton">
        <property name="text">
         <string>Search..</string>
-       </property>
-       <property name="global.pictureState" stdset="0">
-        <string notr="true">{picture.state}</string>
        </property>
        <property name="global.searchState" stdset="0">
         <string notr="true">{search.state}</string>
