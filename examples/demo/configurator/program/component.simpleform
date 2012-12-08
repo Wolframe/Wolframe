@@ -18,5 +18,11 @@ FORM Component
 		webPage string
 		description string
 		price float
+		picture []
+		{
+			id @int
+			_ string
+		}
+		search
 	}
 }

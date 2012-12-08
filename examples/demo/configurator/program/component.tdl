@@ -15,19 +15,24 @@ TRANSACTION addComponent
 BEGIN
 	DO INSERT INTO Component( code, name, normalizedName, categoryID, manufacturerID, mfgCode, webPage, description, price )
 		VALUES ( $(code), $(name), $(normalizedName), $(categoryID), $(manufacturerID), $(mfgCode), $(webPage), $(description), $(price) );
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Compinent WHERE normalizedName = $(normalizedName);
+	FOREACH picture DO INSERT INTO ComponentPicture( componentID, pictureID ) VALUES( $1, $(id) );
 END
 
 TRANSACTION updateComponent
 BEGIN
+	DO DELETE FROM ComponentPicture WHERE componentID = $(id);
 	DO UPDATE Component SET code=$(code), name=$(name), normalizedName=$(normalizedName),
 		categoryID=$(categoryID), manufacturerID=$(manufacturerID),
 		mfgCode=$(mfgCode), webPage=$(webPage), description=$(description),
 		price=$(price)
 		WHERE ID=$(id);
+	FOREACH picture DO INSERT INTO ComponentPicture( componentID, pictureID ) VALUES( $(/id), $(id) );
 END
 
 TRANSACTION deleteComponent
 BEGIN
+	DO DELETE FROM ComponentPicture WHERE componentID = $(id);
 	DO DELETE FROM Component WHERE ID = $(id);
 END
 
@@ -48,4 +53,8 @@ BEGIN
 		SELECT manufacturerID AS "id"
 			FROM Component
 			WHERE Component.ID = $(id);
+	INTO picture DO
+		SELECT ComponentPicture.pictureID AS "id"
+			FROM ComponentPicture
+			WHERE ComponentPicture.componentID = $(id);
 END

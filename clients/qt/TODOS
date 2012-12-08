@@ -11,11 +11,11 @@ now:
 - CRITICAL: "Premature end of document."
 - package version switching
 
-- search dialogs using tags to easier find categories and features
 - search with flag (with children)
 - open info box (modal) in feature/category/component edit and add
 
 musts:
+- scroll to selected element in a single-selection list
 - push button state (disabled/enabled) based on a
   condition like {picture.id>0}
 - PDF widget poppler qt4
