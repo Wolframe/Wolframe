@@ -23,6 +23,7 @@ PF:
 
 - high prio
   - UIForm loader in client and server
+  - change definition of doctype (table). pass string or table or filter to output:as
   - documentation (tutorial)
 
 - low prio
