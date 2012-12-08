@@ -236,14 +236,14 @@
        <property name="text">
         <string>Search..</string>
        </property>
-       <property name="form" stdset="0">
-        <string notr="true">pictures</string>
-       </property>
        <property name="global.pictureState" stdset="0">
         <string notr="true">{picture.state}</string>
        </property>
        <property name="global.searchState" stdset="0">
         <string notr="true">{search.state}</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">picture.reload</string>
        </property>
       </widget>
      </item>

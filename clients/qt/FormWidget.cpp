@@ -133,7 +133,7 @@ void FormWidget::switchForm( QObject *object )
 	if( props->contains( "action" ) ) {
 		sendRequest( props );
 	}
-		
+	
 // switch form now, formLoaded will inform parent and others
 	if( props->contains( "form" ) ) {
 		QString nextForm = props->value( "form" );
@@ -392,9 +392,45 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 
 // HACK: m_props
 	m_props = props;
-	
-// send request		
-	m_dataLoader->request( m_form, QString( ), xml, props );
+
+	QString action = props->value( "action" );
+	if( !action.isEmpty( ) && action.contains( "." ) ) {
+		QStringList parts = action.split( "." );
+
+		if( parts[0].isNull( ) ) {
+			qWarning( ) << "Expecting a action of the form <widget>.<action>";
+			return;
+		}
+		QString name = parts[0];
+		
+		// expecting a property identifier as second argument
+		if( parts[1].isNull( ) ) {
+			qWarning( ) << "Expecting a function name in action" << action;
+			return;
+		}
+		QString function = parts[1];
+		
+		QWidget *widget = qFindChild<QWidget *>( m_ui, name );
+		// no widget found with that name
+		if( !widget ) {
+			qWarning( ) << "Unknown widget" << name << "in action" << action << "of form" << m_form;
+			return;
+		}
+		
+		// we only support reload of domains in other widgets currently
+		if( function != "reload" ) {
+			qWarning( ) << "Unsupported action function" << function << "in widget" << name;
+			return;
+		}
+
+		m_dataHandler->clearFormData( m_ui, name );
+		m_dataHandler->resetFormData( m_ui, name );
+		m_dataHandler->loadFormDomains( m_form, m_ui, name );
+
+	} else {
+		// send regular request	for the form
+		m_dataLoader->request( m_form, QString( ), xml, props );
+	}
 }
 
 void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml )

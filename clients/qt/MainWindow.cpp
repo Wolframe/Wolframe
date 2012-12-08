@@ -861,18 +861,14 @@ void MainWindow::showExpanded( )
 #endif
 }
 
-void MainWindow::closeEvent( QCloseEvent *event )
+void MainWindow::closeEvent( QCloseEvent *e )
 {
-	event->accept( );
+	e->accept( );
 	m_ui->close( );
 }
 
 void MainWindow::muiDestroyed( QObject *obj )
 {
 	close( );
-}
-
-void MainWindow::changeEvent( QEvent *event )
-{
 }
 

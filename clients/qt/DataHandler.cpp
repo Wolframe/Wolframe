@@ -253,12 +253,197 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 	}
 }
 
+void DataHandler::clearFormData( QWidget *form, QString name )
+{
+	QWidget *widget = form->findChild<QWidget *>( name );
+
+	clearFormData( form, widget, name );
+}
+
+void DataHandler::clearFormData( QWidget *form, QWidget *widget, QString name )
+{
+	QString clazz = widget->metaObject( )->className( );
+	
+	if( clazz == "QLineEdit" ) {
+		QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
+		lineEdit->clear( );
+	} else if( clazz == "QDateEdit" ) {
+		//~ QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
+		// TODO
+	} else if( clazz == "QTimeEdit" ) {
+		//~ QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>( widget );
+		// TODO
+	} else if( clazz == "QDateTimeEdit" ) {
+		//~ QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
+	} else if( clazz == "QComboBox" ) {
+		QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
+		comboBox->clear( );
+	} else if( clazz == "QSpinBox" ) {
+		//~ QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
+		// TODO
+	} else if( clazz == "QDoubleSpinBox" ) {
+		//~ QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( widget );
+		// TODO
+	} else if( clazz == "QSlider" ) {
+		//~ QSlider *slider = qobject_cast<QSlider *>( widget );
+		// TODO
+	} else if( clazz == "QPlainTextEdit" ) {
+		QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget );
+		plainTextEdit->clear( );
+	} else if( clazz == "QTextEdit" ) {
+		QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
+		textEdit->clear( );
+	} else if( clazz == "QCheckBox" ) {
+		QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
+		checkBox->setChecked( false );
+	} else if( clazz == "QRadioButton" ) {
+		QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
+		radioButton->setChecked( false );
+	} else if( clazz == "QListWidget" ) {
+		QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+		listWidget->clear( );
+	} else if( clazz == "QTreeWidget" ) {
+		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
+		treeWidget->clear( );
+	} else if( clazz == "QTableWidget" ) {
+		QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
+		tableWidget->clearContents( );		
+		for( int i = tableWidget->rowCount( ) - 1; i >= 0; i-- ) {
+			tableWidget->removeRow( i );
+		}
+	} else if( clazz == "FileChooser" ) {
+		FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
+		fileChooser->setFileName( "" );
+	} else if( clazz == "PictureChooser" ) {
+		PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
+		pictureChooser->setFileName( "" );
+	} else if( clazz == "QPushButton" ) {
+		// skip, ok, buttons can't be reset
+	} else if( clazz == "QGroupBox" ) {
+		// skip, ok, grouboxes can't be reset
+	} else if( clazz == "QWidget" ) {
+		// skip, generic widget, don't possibly know how to reset it
+	} else {
+		qWarning( ) << "Clear for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
+	}
+	
+	qDebug( ) << "Clearing " << clazz << name;
+}
+
+void DataHandler::resetFormData( QWidget *form, QString name )
+{
+	QWidget *widget = form->findChild<QWidget *>( name );
+	
+	resetFormData( form, widget, name );
+}
+
+void DataHandler::resetFormData( QWidget *form, QWidget *widget, QString name )
+{
+	QString clazz = widget->metaObject( )->className( );
+
+// get dynamic properties of the widget (used for 'initialFocus' and 'state' currently)
+	QHash<QString, QString> *props = new QHash<QString, QString>( );
+	FormWidget::readDynamicStringProperties( props, widget );
+	m_formWidget->restoreFromGlobals( props );
+	
+	if( clazz == "QLineEdit" ) {
+		QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
+		lineEdit->clear( );
+		if( props->contains( "state" ) ) {
+			lineEdit->setText( props->value( "state" ) );
+		}
+	} else if( clazz == "QDateEdit" ) {
+		//~ QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
+		// TODO
+	} else if( clazz == "QTimeEdit" ) {
+		//~ QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>( widget );
+		// TODO
+	} else if( clazz == "QDateTimeEdit" ) {
+		//~ QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
+	} else if( clazz == "QComboBox" ) {
+		QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
+		comboBox->clear( );
+	} else if( clazz == "QSpinBox" ) {
+		//~ QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
+		// TODO
+	} else if( clazz == "QDoubleSpinBox" ) {
+		//~ QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( widget );
+		// TODO
+	} else if( clazz == "QSlider" ) {
+		//~ QSlider *slider = qobject_cast<QSlider *>( widget );
+		// TODO
+	} else if( clazz == "QPlainTextEdit" ) {
+		QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget );
+		plainTextEdit->clear( );
+	} else if( clazz == "QTextEdit" ) {
+		QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
+		textEdit->clear( );
+	} else if( clazz == "QCheckBox" ) {
+		QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
+		checkBox->setChecked( false );
+	} else if( clazz == "QRadioButton" ) {
+		QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
+		radioButton->setChecked( false );
+	} else if( clazz == "QListWidget" ) {
+		QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
+//			listWidget->clear( );
+		for( int i = 0; i < listWidget->count( ); i++ ) {
+			QListWidgetItem *item = listWidget->item( i );
+			item->setSelected( false );
+		}
+	} else if( clazz == "QTreeWidget" ) {
+		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
+//			treeWidget->clear( );
+		QTreeWidgetItemIterator it( treeWidget );
+		while( *it ) {
+			(*it)->setSelected( false );
+			(*it)->setExpanded( false );
+			it++;
+		}
+	} else if( clazz == "QTableWidget" ) {
+		QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
+//			tableWidget->clearContents( );			
+		for( int row = 0; row < tableWidget->rowCount( ); row++ ) {
+			for( int col = 0; col < tableWidget->columnCount( ); col++ ) {
+				QTableWidgetItem *item = tableWidget->item( row, col );
+				if( item ) item->setSelected( false );
+			}
+		}
+	} else if( clazz == "FileChooser" ) {
+		FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
+		fileChooser->setFileName( "" );
+	} else if( clazz == "PictureChooser" ) {
+		PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
+		if( props->contains( "state" ) ) {
+			pictureChooser->setFileName( props->value( "state" ) );
+		} else {
+			pictureChooser->setFileName( "" );
+		}
+	} else if( clazz == "QPushButton" ) {
+		// skip, ok, buttons can't be reset
+	} else if( clazz == "QGroupBox" ) {
+		// skip, ok, grouboxes can't be reset
+	} else if( clazz == "QWidget" ) {
+		// skip, generic widget, don't possibly know how to reset it
+	} else {
+		qWarning( ) << "Reset for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
+	}
+	
+	if( 	props->contains( "initialFocus" ) &&
+		props->value( "initialFocus" ) == "true" ) {
+		qDebug( ) << "Setting focus of widget" << name;
+		widget->setFocus( );
+	}
+	
+	qDebug( ) << "Reset " << clazz << name;
+}
+
 void DataHandler::resetFormData( QWidget *form )
 {
 	QList<QWidget *> widgets = form->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
-		QString clazz = widget->metaObject( )->className( ); 
 		QString name = widget->objectName( );
+		QString clazz = widget->metaObject( )->className( );
 // ignore internal elements
 		if( name == "" || name.startsWith( "qt_" ) ||
 			clazz == "QLabel" ||
@@ -266,102 +451,40 @@ void DataHandler::resetFormData( QWidget *form )
 			continue;
 		}
 
-// get dynamic properties of the widget (used for 'initialFocus' and 'state' currently)
-		QHash<QString, QString> *props = new QHash<QString, QString>( );
-		FormWidget::readDynamicStringProperties( props, widget );
-		m_formWidget->restoreFromGlobals( props );
-		
-		if( clazz == "QLineEdit" ) {
-			QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
-			lineEdit->clear( );
-			if( props->contains( "state" ) ) {
-				lineEdit->setText( props->value( "state" ) );
-			}
-		} else if( clazz == "QDateEdit" ) {
-			//~ QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget );
-			// TODO
-		} else if( clazz == "QTimeEdit" ) {
-			//~ QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>( widget );
-			// TODO
-		} else if( clazz == "QDateTimeEdit" ) {
-			//~ QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
-		} else if( clazz == "QComboBox" ) {
-			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
-			comboBox->clear( );
-		} else if( clazz == "QSpinBox" ) {
-			//~ QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
-			// TODO
-		} else if( clazz == "QDoubleSpinBox" ) {
-			//~ QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( widget );
-			// TODO
-		} else if( clazz == "QSlider" ) {
-			//~ QSlider *slider = qobject_cast<QSlider *>( widget );
-			// TODO
-		} else if( clazz == "QPlainTextEdit" ) {
-			QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget );
-			plainTextEdit->clear( );
-		} else if( clazz == "QTextEdit" ) {
-			QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
-			textEdit->clear( );
-		} else if( clazz == "QCheckBox" ) {
-			QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
-			checkBox->setChecked( false );
-		} else if( clazz == "QRadioButton" ) {
-			QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
-			radioButton->setChecked( false );
-		} else if( clazz == "QListWidget" ) {
-			QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
-//			listWidget->clear( );
-			for( int i = 0; i < listWidget->count( ); i++ ) {
-				QListWidgetItem *item = listWidget->item( i );
-				item->setSelected( false );
-			}
-		} else if( clazz == "QTreeWidget" ) {
-			QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
-//			treeWidget->clear( );
-			QTreeWidgetItemIterator it( treeWidget );
-			while( *it ) {
-				(*it)->setSelected( false );
-				(*it)->setExpanded( false );
-				it++;
-			}
-		} else if( clazz == "QTableWidget" ) {
-			QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
-//			tableWidget->clearContents( );			
-			for( int row = 0; row < tableWidget->rowCount( ); row++ ) {
-				for( int col = 0; col < tableWidget->columnCount( ); col++ ) {
-					QTableWidgetItem *item = tableWidget->item( row, col );
-					if( item ) item->setSelected( false );
-				}
-			}
-		} else if( clazz == "FileChooser" ) {
-			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
-			fileChooser->setFileName( "" );
-		} else if( clazz == "PictureChooser" ) {
-			PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
-			if( props->contains( "state" ) ) {
-				pictureChooser->setFileName( props->value( "state" ) );
-			} else {
-				pictureChooser->setFileName( "" );
-			}
-		} else if( clazz == "QPushButton" ) {
-			// skip, ok, buttons can't be reset
-		} else if( clazz == "QGroupBox" ) {
-			// skip, ok, grouboxes can't be reset
-		} else if( clazz == "QWidget" ) {
-			// skip, generic widget, don't possibly know how to reset it
-		} else {
-			qWarning( ) << "Reset for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
-		}
-		
-		if( 	props->contains( "initialFocus" ) &&
-			props->value( "initialFocus" ) == "true" ) {
-			qDebug( ) << "Setting focus of widget" << name;
-			widget->setFocus( );
-		}
-		
-		qDebug( ) << "Reset " << clazz << name;
+		resetFormData( form, widget, name );
 	}
+}
+
+void DataHandler::loadFormDomains( QString form_name, QWidget *form, QString name )
+{
+	QWidget *widget = form->findChild<QWidget *>( name );
+	
+	loadFormDomains( form_name, form, widget, name );
+}
+
+void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *widget, QString name )
+{
+	QString clazz = widget->metaObject( )->className( ); 
+	
+	// TODO: widgets can also have custom properties for the domain handling
+	QHash<QString, QString> *props = new QHash<QString, QString>( );
+	FormWidget::readDynamicStringProperties( props, widget );
+	m_formWidget->restoreFromGlobals( props );
+	props->insert( "action", "read" );
+	if( clazz == "QComboBox" ) {
+		m_dataLoader->request( form_name, name, QByteArray( ), props );
+	} else if( clazz == "QListWidget" ) {
+		m_dataLoader->request( form_name, name, QByteArray( ), props );
+	} else if( clazz == "QTreeWidget" ) {
+		m_dataLoader->request( form_name, name, QByteArray( ), props );
+	} else if( clazz == "QTableWidget" ) {
+		m_dataLoader->request( form_name, name, QByteArray( ), props );
+	} else {
+		// all other classes don't load domains, but we want to keep
+		// the calling code generic..
+	}
+	
+	qDebug( ) << "Domain load in " << clazz << name;
 }
 
 void DataHandler::loadFormDomains( QString form_name, QWidget *form )
@@ -377,25 +500,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 			continue;
 		}
 		
-		// TODO: widgets can also have custom properties for the domain handling
-		QHash<QString, QString> *props = new QHash<QString, QString>( );
-		FormWidget::readDynamicStringProperties( props, widget );
-		m_formWidget->restoreFromGlobals( props );
-		props->insert( "action", "read" );
-		if( clazz == "QComboBox" ) {
-			m_dataLoader->request( form_name, name, QByteArray( ), props );
-		} else if( clazz == "QListWidget" ) {
-			m_dataLoader->request( form_name, name, QByteArray( ), props );
-		} else if( clazz == "QTreeWidget" ) {
-			m_dataLoader->request( form_name, name, QByteArray( ), props );
-		} else if( clazz == "QTableWidget" ) {
-			m_dataLoader->request( form_name, name, QByteArray( ), props );
-		} else {
-			// all other classes don't load domains, but we want to keep
-			// the calling code generic..
-		}
-		
-		qDebug( ) << "Domain load in " << clazz << name;
+		loadFormDomains( form_name, form, widget, name );
 	}
 }
 
@@ -838,7 +943,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 	
 // expecting a widget name as first argument
 	if( parts[0].isNull( ) ) {
-		qWarning( ) << "Expecting a expression of the form <widget>.<property";
+		qWarning( ) << "Expecting a expression of the form <widget>.<property>";
 		return QString( );
 	}
 	QString name = parts[0];

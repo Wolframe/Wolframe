@@ -14,12 +14,6 @@ now:
 - search dialogs using tags to easier find categories and features
 - search with flag (with children)
 - open info box (modal) in feature/category/component edit and add
-- last used directory in File/PictureChooser
-- program icon disappears on Windows taskbar (due to the main window
-  and replace with a main window trick)
-- horizontal scrollbar, if needed on QTableWidget.
-
-TanukiHash
 
 musts:
 - push button state (disabled/enabled) based on a

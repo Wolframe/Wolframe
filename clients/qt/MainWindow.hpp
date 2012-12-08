@@ -38,8 +38,7 @@
 		void showExpanded( );
 	
 	protected:
-		virtual void closeEvent( QCloseEvent *event );
-		virtual void changeEvent( QEvent *event );
+		virtual void closeEvent( QCloseEvent *e );
 		
 	private:
 		QCommandLine *m_cmdline;	// command line parser	
