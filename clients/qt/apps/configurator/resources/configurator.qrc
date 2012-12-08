@@ -1,0 +1,21 @@
+<RCC>
+  <qresource prefix="images">
+    <file>folder_add.png</file>
+    <file>folder_edit.png</file>
+    <file>folders.png</file>
+    <file>brick_add.png</file>
+    <file>brick_edit.png</file>
+    <file>picture_add.png</file>
+    <file>picture_edit.png</file>
+    <file>picture.png</file>
+    <file>building_add.png</file>
+    <file>building_edit.png</file>
+    <file>tag_blue_add.png</file>
+    <file>tag_blue_edit.png</file>
+    <file>building.png</file>
+    <file>color_swatches.png</file>
+    <file>bricks.png</file>
+    <file>folders_explorer.png</file>
+    <file>tag_blue.png</file>
+  </qresource>
+</RCC>
