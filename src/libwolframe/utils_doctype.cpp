@@ -90,3 +90,25 @@ std::string _Wolframe::utils::getIdFromDoctype( const std::string& doctype)
 	}
 }
 
+std::string getDoctypeFromIds( const char* d_root, const char* d_public, const char* d_system)
+{
+	std::string rt;
+	if (!d_root) throw std::runtime_error( "no XML doctype root defined");
+	rt.append( d_root);
+	if (d_public)
+	{
+		rt.append( " PUBLIC \"");
+		rt.append( d_public);
+		rt.append( "\" ");
+		if (!d_system) std::runtime_error( "doctype public is defined but no doctype system");
+		rt.append( " SYSTEM \"");
+		rt.append( d_system);
+		rt.append( "\" ");
+	} else if (d_system)
+	{
+		rt.append( " SYSTEM \"");
+		rt.append( d_system);
+		rt.append( "\" ");
+	}
+	return rt;
+}
