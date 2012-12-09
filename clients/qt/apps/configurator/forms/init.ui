@@ -207,6 +207,10 @@
      <property name="text">
       <string>Manage Features</string>
      </property>
+     <property name="icon">
+      <iconset resource="../resources/configurator.qrc">
+       <normaloff>:/images/chart_organisation.png</normaloff>:/images/chart_organisation.png</iconset>
+     </property>
      <property name="form" stdset="0">
       <string notr="true">features</string>
      </property>

@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="images">
+    <file>chart_organisation_add.png</file>
+    <file>chart_organisation_edit.png</file>
+    <file>chart_organisation.png</file>
     <file>folder_add.png</file>
     <file>folder_edit.png</file>
     <file>folders.png</file>
@@ -15,7 +18,6 @@
     <file>building.png</file>
     <file>color_swatches.png</file>
     <file>bricks.png</file>
-    <file>folders_explorer.png</file>
     <file>tag_blue.png</file>
   </qresource>
 </RCC>
