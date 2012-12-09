@@ -89,6 +89,7 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 		
 // ignore internal elements
 		if( name == "" || name.startsWith( "qt_" ) ||
+			name.startsWith( "ignore_" ) ||
 			clazz == "QLabel" ||
 			!widget->isEnabled( ) ) {
 			continue;

@@ -1,0 +1,9 @@
+FORM CategoryFeatureRequest
+{
+	CategoryFeature
+	{
+		form @string
+		category_id @int
+		feature_id @int
+	}
+}

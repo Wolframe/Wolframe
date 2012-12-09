@@ -19,6 +19,10 @@ now:
 - search with flag (with children)
 
 musts:
+- rewrite categories, so that joins to picutes, requires/provides, tags,
+  etc. are possible trhough the lua layer
+- optimal size on qtreewidget to fit items (needed for linking categories
+  and features linking view)
 - tabbed preferences dialog, like thunderbird (in security, form management,
   etc.)
 - eliminate empty row when empty result (e.g. picture search)
