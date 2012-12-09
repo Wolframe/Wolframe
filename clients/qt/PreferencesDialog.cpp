@@ -95,6 +95,10 @@ void PreferencesDialog::initialize( )
 	m_uiFormTranslationsDir = new FileChooser( FileChooser::SelectExistingDir,
 		tr( "Select a directory holding UI form translations" ), this );
 	formLayout->addRow( tr( "I18N dir:" ), m_uiFormTranslationsDir );
+	
+	m_uiFormResourcesDir = new FileChooser( FileChooser::SelectExistingDir,
+		tr( "Select a directory holding UI form resources" ), this );
+	formLayout->addRow( tr( "Resources dir:" ), m_uiFormResourcesDir );
 
 	m_dataLoaderDir = new FileChooser( FileChooser::SelectExistingDir,
 		tr( "Select a directory which contains local XML data" ), this );
@@ -178,12 +182,14 @@ void PreferencesDialog::loadSettings( )
 	m_dbName->setEnabled( false );
 	m_uiFormsDir->setEnabled( false );
 	m_uiFormTranslationsDir->setEnabled( false );
+	m_uiFormResourcesDir->setEnabled( false );
 	m_dataLoaderDir->setEnabled( false );
 	switch( prefs->uiLoadMode( ) ) {
 		case Preferences::LocalFile:			
 			m_uiLoadModeLocalFile->setChecked( true );
 			m_uiFormsDir->setEnabled( true );
 			m_uiFormTranslationsDir->setEnabled( true );
+			m_uiFormResourcesDir->setEnabled( true );
 			break;
 
 		case Preferences::LocalDb:
@@ -214,6 +220,7 @@ void PreferencesDialog::loadSettings( )
 	m_debug->setChecked( prefs->debug( ) );
 	m_uiFormsDir->setFileName( prefs->uiFormsDir( ) );
 	m_uiFormTranslationsDir->setFileName( prefs->uiFormTranslationsDir( ) );
+	m_uiFormResourcesDir->setFileName( prefs->uiFormResourcesDir( ) );
 	m_dataLoaderDir->setFileName( prefs->dataLoaderDir( ) );		
 	if( !m_languages.empty( ) ) {
 		QString lang = prefs->locale( );
@@ -258,6 +265,7 @@ void PreferencesDialog::apply( )
 	prefs->setDebug( m_debug->isChecked( ) );
 	prefs->setUiFormsDir( m_uiFormsDir->fileName( ) );
 	prefs->setUiFormTranslationsDir( m_uiFormTranslationsDir->fileName( ) );
+	prefs->setUiFormResourcesDir( m_uiFormResourcesDir->fileName( ) );
 	prefs->setDataLoaderDir( m_dataLoaderDir->fileName( ) );
 	if( !m_languages.empty( ) ) {
 		if( m_systemLanguage->isChecked( ) ) {
@@ -300,6 +308,7 @@ void PreferencesDialog::toggleLoadMode( bool /* checked */ )
 	m_CACertFile->setEnabled( ( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) ) && m_secure->isChecked( ) );
 	m_uiFormsDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );
 	m_uiFormTranslationsDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );
+	m_uiFormResourcesDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );
 	m_dataLoaderDir->setEnabled( m_dataLoadModeLocalFile->isChecked( ) );
 }
 

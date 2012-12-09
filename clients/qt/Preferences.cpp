@@ -69,6 +69,7 @@ void Preferences::loadSettings( )
 	m_debug = s->value( "wolframe/debug", false ).toBool( );
 	m_uiFormsDir = s->value( "wolframe/uiFormDir", DEFAULT_UI_FORMS_DIR ).toString( );
 	m_uiFormTranslationsDir = s->value( "wolframe/uiFormTranslationsDir", DEFAULT_UI_FORM_TRANSLATIONS_DIR ).toString( );
+	m_uiFormResourcesDir = s->value( "wolframe/uiFormResourcesDir", DEFAULT_UI_FORM_RESOURCES_DIR ).toString( );
 	m_dataLoaderDir = s->value( "wolframe/dataLoaderDir", DEFAULT_DATA_LOADER_DIR ).toString( );
 	m_locale = s->value( "wolframe/locale", DEFAULT_LOCALE ).toString( );
 	delete s;
@@ -93,6 +94,7 @@ void Preferences::storeSettings( )
 	s->setValue( "wolframe/debug", m_debug );
 	s->setValue( "wolframe/uiFormDir", m_uiFormsDir );
 	s->setValue( "wolframe/uiFormTranslationsDir", m_uiFormTranslationsDir );
+	s->setValue( "wolframe/uiFormResourcesDir", m_uiFormResourcesDir );
 	s->setValue( "wolframe/dataLoaderDir", m_dataLoaderDir );
 	s->setValue( "wolframe/locale", m_locale );
 	delete s;

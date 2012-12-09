@@ -7,13 +7,35 @@
 
 #include <QDir>
 #include <QFile>
+#include <QResource>
 
 #include <QDebug>
 
 
-FileFormLoader::FileFormLoader( QString formDir, QString localeDir )
-	: m_formDir( formDir ), m_localeDir( localeDir ) 
+FileFormLoader::FileFormLoader( QString formDir, QString localeDir, QString resourcesDir )
+	: m_formDir( formDir ), m_localeDir( localeDir ), m_resourcesDir( resourcesDir )
 {
+	initialize( );
+}
+
+void FileFormLoader::initialize( )
+{
+	// register all resources in the resources form dir to the application
+	QDir resourcesDir( m_resourcesDir );
+	QStringList nameFilters;
+	nameFilters << "*.rcc";
+	resourcesDir.setNameFilters( nameFilters );
+	QStringList resources = resourcesDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name );
+	foreach( QString resource, resources ) {
+		QString filename;
+		filename.append( m_resourcesDir );
+		filename.append( "/" );
+		filename.append( resource );
+		qDebug( ) << "Loading resource file" << filename;
+		if( !QResource::registerResource( filename ) ) {
+			qWarning( ) << "Unable to open resource file" << filename;
+		}
+	}
 }
 
 void FileFormLoader::initiateListLoad( )

@@ -44,6 +44,7 @@
 		FileChooser *m_dbName;
 		FileChooser *m_uiFormsDir;
 		FileChooser *m_uiFormTranslationsDir;
+		FileChooser *m_uiFormResourcesDir;
 		FileChooser *m_dataLoaderDir;
 		QCheckBox *m_debug;
 		QComboBox *m_locale;

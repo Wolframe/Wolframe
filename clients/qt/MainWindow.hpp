@@ -67,6 +67,7 @@
 		QString m_settings;		// file to read settings from
 		QString m_uiFormsDir;		// for FileFormLoader (forms dir)
 		QString m_uiFormTranslationsDir; // for FileFormLoader (i18n dir)
+		QString m_uiFormResourcesDir;	// for FileFormLoader (resources dir)
 		QString m_dataLoaderDir;	// for FileDataLoader (data dir)
 		QStringList m_languages;	// available interface translations
 		QString m_language;		// the current language of the interface

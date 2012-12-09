@@ -12,6 +12,8 @@
 #define DEFAULT_SQLITE_FILENAME "./apps/test/data.db"
 #define DEFAULT_UI_FORMS_DIR "./apps/test/forms"
 #define DEFAULT_UI_FORM_TRANSLATIONS_DIR "./apps/test/i18n"
+#define DEFAULT_UI_FORM_RESOURCES_DIR "./apps/test/resources"
+
 #define DEFAULT_DATA_LOADER_DIR "./apps/test/data"
 
 #define RESTART_CODE 1000

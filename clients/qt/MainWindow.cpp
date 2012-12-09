@@ -38,6 +38,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_loginDialog( 0 ), m_dbName( DEFAULT_SQLITE_FILENAME ), m_settings( ),
 	m_uiFormsDir( DEFAULT_UI_FORMS_DIR ),
 	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
+	m_uiFormResourcesDir( DEFAULT_UI_FORM_RESOURCES_DIR ),
 	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR ),
 	m_languages( ), m_language( )
 {
@@ -85,6 +86,7 @@ void MainWindow::readSettings( )
 	_debug = m_debug;
 	m_uiFormsDir = prefs->uiFormsDir( );
 	m_uiFormTranslationsDir = prefs->uiFormTranslationsDir( );
+	m_uiFormResourcesDir = prefs->uiFormResourcesDir( );
 	m_dataLoaderDir = prefs->dataLoaderDir( );
 	if( prefs->locale( ) == SYSTEM_LANGUAGE ) {
 		m_language = QLocale::system( ).name( );
@@ -329,7 +331,7 @@ void MainWindow::initialize( )
 // a local sqlite database, pass the form loader to the FormWidget
 	switch( m_uiLoadMode ) {
 		case LocalFile:
-			m_formLoader = new FileFormLoader( m_uiFormsDir, m_uiFormTranslationsDir );
+			m_formLoader = new FileFormLoader( m_uiFormsDir, m_uiFormTranslationsDir, m_uiFormResourcesDir );
 			break;
 		
 		case LocalDb:
@@ -398,11 +400,6 @@ void MainWindow::finishInitialize( )
 #else
 	loadTheme( QString( QLatin1String( "windows" ) ) );
 #endif
-
-// TODO: move to file form loader
-	if( !QResource::registerResource( "./apps/configurator/resources/configurator.rcc") ) {
-		qWarning( ) << "Unable to open resource file";
-	}
 
 // load language resources, repaints the whole interface if necessary
 	loadLanguage( m_currentLanguage );

@@ -7,14 +7,23 @@ now:
   it's a domain read), the tree stops in the middle: <tree><item id="45">,
   requests get stuffed into the queue, nothing gets ever executed,
   second time with printqstring m_answer (QString)0x7bae258 (length=0): ""
+  - can be provoked by using non-debug XML sending and textwolf XML filter
+    on Windows XP, so it is a failed signal for a partial line, must add
+    a state like DataLeft (Data gets DataReading or so)
 - ILLEGAL STATE 4 in dataAvailable!
 - CRITICAL: "Premature end of document."
 - package version switching
 
+- open info box (modal) in feature/category/component edit and add to
+  show picture information
 - search with flag (with children)
-- open info box (modal) in feature/category/component edit and add
 
 musts:
+- tabbed preferences dialog, like thunderbird (in security, form management,
+  etc.)
+- eliminate empty row when empty result (e.g. picture search)
+- show pictures in tree view
+- show titles of forms somewhere in the qtclient
 - scroll to selected element in a single-selection list
 - push button state (disabled/enabled) based on a
   condition like {picture.id>0}
