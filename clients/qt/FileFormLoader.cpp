@@ -25,13 +25,10 @@ void FileFormLoader::initialize( )
 	QStringList nameFilters;
 	nameFilters << "*.rcc";
 	resourcesDir.setNameFilters( nameFilters );
-	QStringList resources = resourcesDir.entryList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name );
-	foreach( QString resource, resources ) {
-		QString filename;
-		filename.append( m_resourcesDir );
-		filename.append( "/" );
-		filename.append( resource );
-		qDebug( ) << "Loading resource file" << filename;
+	QFileInfoList resources = resourcesDir.entryInfoList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name );
+	foreach( QFileInfo resource, resources ) {
+		QString filename = resource.filePath( );
+		qWarning( ) << "Loading resource file" << filename;
 		if( !QResource::registerResource( filename ) ) {
 			qWarning( ) << "Unable to open resource file" << filename;
 		}
