@@ -40,6 +40,7 @@ namespace utils {
 
 ///\brief Gets the Wolframe document type id extracted from an XML document type definition
 std::string getIdFromDoctype( const std::string& doctype);
+std::string getDoctypeFromIds( const char* d_root, const char* d_public, const char* d_system);
 
 }}
 #endif
