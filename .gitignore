@@ -161,3 +161,4 @@ examples/demo/configurator/database/configurator.db
 examples/demo/configurator/database/configurator.db-journal
 examples/demo/first/database/tree.db
 wolframed.sh
+*.rcc

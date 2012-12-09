@@ -28,7 +28,7 @@ void FileFormLoader::initialize( )
 	QFileInfoList resources = resourcesDir.entryInfoList( QDir::Files | QDir::NoDotAndDotDot, QDir::Name );
 	foreach( QFileInfo resource, resources ) {
 		QString filename = resource.filePath( );
-		qWarning( ) << "Loading resource file" << filename;
+		qDebug( ) << "Loading resource file" << filename;
 		if( !QResource::registerResource( filename ) ) {
 			qWarning( ) << "Unable to open resource file" << filename;
 		}
