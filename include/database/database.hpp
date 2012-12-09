@@ -131,13 +131,11 @@ public:
 	///\brief add a database program to the list of transaction programs
 	///\remark throws std::runtime_error with position info in case of error
 	virtual void addProgram( const std::string& program ) = 0;
+
 	virtual void addStatements( const types::keymap<std::string>& stmmap)
 	{
 		if (!stmmap.empty()) throw std::runtime_error( "embedded statements not defined for this database");
 	}
-
-	///\brief get a database transaction program from the list of transaction programs
-	virtual const std::string* getProgram( const std::string& name ) const = 0;
 };
 
 }} // namespace _Wolframe::db
