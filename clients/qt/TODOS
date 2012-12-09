@@ -19,6 +19,8 @@ now:
 - search with flag (with children)
 
 musts:
+- tags picked from a list and added (needs events)
+- linking of categories and features
 - rewrite categories, so that joins to picutes, requires/provides, tags,
   etc. are possible trhough the lua layer
 - optimal size on qtreewidget to fit items (needed for linking categories
