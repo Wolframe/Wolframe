@@ -1,1 +1,1 @@
-Customer = SelectCustomerList( xml );
+Customer = SelectCustomerList( xml ) : CustomerList;
