@@ -46,20 +46,7 @@
 #define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
-#ifdef _WIN32
-#pragma warning(disable:4996)	//... for boost usage in splitString
-#endif
-static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
-{
-	res.clear();
-	std::vector<std::string> imm;
-	boost::split( imm, inp, boost::is_any_of(splitchrs));
-	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
-	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
-}
-#ifdef _WIN32
-#pragma warning(enable:4996)
-#endif
+static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs);
 
 using namespace _Wolframe;
 using namespace wtest;
@@ -357,3 +344,14 @@ TestDescription::TestDescription( const std::string& pt, const char* argv0)
 	}
 }
 
+#ifdef _WIN32
+#pragma warning(disable:4996)	//... for boost usage in splitString
+#endif
+static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
+{
+	res.clear();
+	std::vector<std::string> imm;
+	boost::split( imm, inp, boost::is_any_of(splitchrs));
+	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
+	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
+}
