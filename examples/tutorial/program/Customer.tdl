@@ -1,0 +1,7 @@
+TRANSACTION SelectCustomerList
+RESULT INTO list
+BEGIN
+	INTO customer DO
+		SELECT id, name, address
+		FROM Customer;
+END

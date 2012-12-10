@@ -26,7 +26,6 @@ PF:
   - UIForm loader in client and server
   - change definition of doctype (table). pass string or table or filter to output:as
   - documentation (tutorial)
-  - split tests to execute postgres tests only when database is running (decided in makefile)
 
 - low prio
   - cmdline client: test with SSL (look at boost asio SSL client example with socket)

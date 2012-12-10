@@ -45,7 +45,7 @@
 namespace _Wolframe {
 namespace db {
 
-extern "C" void profiling_callback(  void */*a*/, const char *b, sqlite3_uint64 c )
+extern "C" void profiling_callback(  void * /*a*/, const char *b, sqlite3_uint64 c )
 {
 	LOG_DATA << b << " (time: " << c / 1000 << " ms)";
 }

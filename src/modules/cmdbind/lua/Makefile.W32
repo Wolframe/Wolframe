@@ -12,6 +12,7 @@ INCLUDE_DIRS = \
 	/I$(TOPDIR)\include \
 	/I$(TOPDIR)\src \
 	/I$(TOPDIR)\lua\src \
+	/I$(TOPDIR) \
 	/I"$(BOOST_INCLUDE_DIR)"
 
 INCLUDE_LDFLAGS = \

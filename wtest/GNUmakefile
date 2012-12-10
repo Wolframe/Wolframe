@@ -14,8 +14,6 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)/src/libwolframe.a \
-	$(TOPDIR)/src/libwolframe/libwolframe.a \
 	-lboost_filesystem -lboost_system
 
 # openssl
@@ -64,12 +62,20 @@ endif
 ifeq ($(WITH_PGSQL),1)
 INCLUDE_CXXFLAGS += \
 	-DWITH_PGSQL
+INCLUDE_DIRS += \
+	$(PGSQL_INCLUDE_DIRS)
+INCLUDE_LIBS += \
+	$(PGSQL_LIBS)
 endif
 
-MY_STATIC_LIB = \
-	wolftest.a
+STATIC_LIB = libwolftest.a
 
-MY_STATIC_LIB_OBJS = \
+DYNAMIC_LIB = libwolftest.so
+DYNAMIC_LIB_MAJOR = 0
+DYNAMIC_LIB_MINOR = 0
+DYNAMIC_LIB_PATCH = 0
+
+STATIC_LIB_OBJS = \
 	testDescription.o \
 	testModules.o
 
@@ -82,13 +88,9 @@ CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-local_all: $(MY_STATIC_LIB)
-
-$(MY_STATIC_LIB): $(MY_STATIC_LIB_OBJS)
-	ar rcs $(MY_STATIC_LIB) $(MY_STATIC_LIB_OBJS)
+local_all: $(STATIC_LIB) $(DYNAMIC_LIB)
 
 local_clean:
-	@rm -f $(MY_STATIC_LIB)
 
 local_distclean:
 

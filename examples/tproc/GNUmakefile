@@ -17,6 +17,7 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind \
+	-L$(TOPDIR)/wtest \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
@@ -28,8 +29,8 @@ INCLUDE_LIBS = \
 	-lwolframe_serialize \
 	-lwolframe_database \
 	-lwolframe_langbind \
+	-lwolftest \
 	$(TOPDIR)/gtest/gtest-all.o \
-	$(TOPDIR)/wtest/wolftest.a \
 	$(LIBS_DL)
 
 
@@ -56,7 +57,7 @@ TEST_BINS = \
 CPP_BINS = \
 	tprocd$(EXE)
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR)"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR):$(TOPDIR)/wtest"
 
 tprocd$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 

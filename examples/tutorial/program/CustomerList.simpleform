@@ -1,0 +1,12 @@
+FORM CustomerList
+{
+	list
+	{
+		customer []
+		{
+			id @int
+			name string
+			address string
+		}
+	}
+}

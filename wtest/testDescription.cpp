@@ -40,11 +40,37 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-
+#if WITH_PGSQL
+#include <libpq-fe.h>
+#endif
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
+
+static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs);
 
 using namespace _Wolframe;
 using namespace wtest;
+
+static bool check_PGSQL_RUNNING()
+{
+	static bool rt = false;
+#if WITH_PGSQL
+	if (rt) return true;
+	static const char *connstr = "host='localhost' user='wolfusr' password='wolfpwd' dbname='wolframe'";
+	PGconn* conn = PQconnectdb( connstr);
+	if (conn)
+	{
+		ConnStatusType stat = PQstatus( conn);
+		if (stat == CONNECTION_OK)
+		{
+			rt = true;
+		}
+	}
+	PQfinish( conn );
+#endif
+	return rt;
+}
+
 
 static const char* check_flag( const std::string& flag)
 {
@@ -53,7 +79,7 @@ if (boost::starts_with( flag, "DISABLED "))
 {
 	unsigned int nargs=0;
 	std::vector<std::string> platforms;
-	utils::splitString( platforms, flag, "\n\t\r ");
+	splitString( platforms, flag, "\n\t\r ");
 	std::vector<std::string>::const_iterator ii = platforms.begin(),ee = platforms.end();
 	for (++ii; ii != ee; ++ii)
 	{
@@ -119,6 +145,8 @@ if (boost::starts_with( flag, "DISABLED "))
 #endif
 #if !(WITH_PGSQL)
 	if (boost::iequals( flag, "PGSQL")) return "WITH_PGSQL=1 ";
+#else
+	if (boost::iequals( flag, "PGSQL") && !check_PGSQL_RUNNING()) return "RUNNING Postgresql Database ";
 #endif
 #if !(WITH_LIBXML2)
 	if (boost::iequals( flag, "LIBXML2")) return "WITH_LIBXML2=1 ";
@@ -316,3 +344,14 @@ TestDescription::TestDescription( const std::string& pt, const char* argv0)
 	}
 }
 
+#ifdef _WIN32
+#pragma warning(disable:4996)	//... for boost usage in splitString
+#endif
+static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
+{
+	res.clear();
+	std::vector<std::string> imm;
+	boost::split( imm, inp, boost::is_any_of(splitchrs));
+	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
+	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
+}
