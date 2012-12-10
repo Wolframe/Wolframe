@@ -200,38 +200,44 @@ void PostgreSQLconfig::setCanonicalPathes( const std::string& refPath )
 	if ( ! sslCert.empty() )	{
 		std::string oldPath = sslCert;
 		sslCert = utils::getCanonicalPath( sslCert, refPath);
-		if ( oldPath != sslCert )
+/* Aba: avoid "suggest explicit braces to avoid ambiguous ‘else’ [-Wparentheses]" */
+		if ( oldPath != sslCert ) {
 /*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute SSL certificate filename '" << sslCert
 				       << "' instead of '" << oldPath << "'";
+		}
 	}
 	if ( ! sslKey.empty() )	{
 		std::string oldPath = sslKey;
 		sslKey = utils::getCanonicalPath( sslKey, refPath );
-		if ( oldPath != sslKey )
+		if ( oldPath != sslKey ) {
 /*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute SSL key filename '" << sslKey
 				       << "' instead of '" << oldPath << "'";
+		}
 	}
 	if ( ! sslRootCert.empty() )	{
 		std::string oldPath = sslRootCert;
 		sslRootCert = utils::getCanonicalPath( sslRootCert, refPath );
-		if ( oldPath != sslRootCert )
+		if ( oldPath != sslRootCert ) {
 /*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute CA certificate filename '" << sslRootCert
 				       << "' instead of '" << oldPath << "'";
+		}
 	}
 	if ( ! sslCRL.empty() )	{
 		std::string oldPath = sslCRL;
 		sslCRL = utils::getCanonicalPath( sslCRL, refPath );
-		if ( oldPath != sslCRL )
+		if ( oldPath != sslCRL ) {
 /*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute CRL filename '" << sslCRL
 				       << "' instead of '" << oldPath << "'";
+		}
 	}
 	for ( std::list< std::string >::iterator it = m_programFiles.begin();
 						it != m_programFiles.end(); it++ )	{
 		std::string oldPath = *it;
 		*it = utils::getCanonicalPath( *it, refPath );
-		if ( oldPath != *it )
+		if ( oldPath != *it ) {
 /*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
 				       << "' instead of '" << oldPath << "'";
+		}
 	}
 }
 

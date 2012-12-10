@@ -508,7 +508,9 @@ void PostgreSQLtransaction::execute()
 
 void PostgreSQLtransaction::close()
 {
-	if (m_conn) MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
+	if (m_conn) {
+		MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
+	}
 	delete m_conn;
 	m_conn = 0;
 	m_db.closeTransaction( this );
