@@ -1,0 +1,10 @@
+FORM Customer
+{
+	customer
+	{
+		id @int
+		form @string
+		name string
+		address string
+	}
+}
