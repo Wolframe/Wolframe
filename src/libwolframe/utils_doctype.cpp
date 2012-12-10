@@ -35,8 +35,8 @@ Project Wolframe.
 #include "utils/miscUtils.hpp"
 #include <stdexcept>
 
-using namespace _Wolframe;
-using namespace _Wolframe::utils;
+namespace _Wolframe {
+namespace utils {
 
 std::string _Wolframe::utils::getIdFromDoctype( const std::string& doctype)
 {
@@ -112,3 +112,5 @@ std::string _Wolframe::utils::getDoctypeFromIds( const char* d_root, const char*
 	}
 	return rt;
 }
+
+}}
