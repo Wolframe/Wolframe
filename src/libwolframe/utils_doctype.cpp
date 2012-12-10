@@ -35,10 +35,10 @@ Project Wolframe.
 #include "utils/miscUtils.hpp"
 #include <stdexcept>
 
-using namespace _Wolframe;
-using namespace _Wolframe::utils;
+namespace _Wolframe {
+namespace utils {
 
-std::string _Wolframe::utils::getIdFromDoctype( const std::string& doctype)
+std::string getIdFromDoctype( const std::string& doctype)
 {
 	std::string rootid;
 	std::string publicid;
@@ -90,7 +90,7 @@ std::string _Wolframe::utils::getIdFromDoctype( const std::string& doctype)
 	}
 }
 
-std::string _Wolframe::utils::getDoctypeFromIds( const char* d_root, const char* d_public, const char* d_system)
+std::string getDoctypeFromIds( const char* d_root, const char* d_public, const char* d_system)
 {
 	std::string rt;
 	if (!d_root) throw std::runtime_error( "no XML doctype root defined");
@@ -112,3 +112,5 @@ std::string _Wolframe::utils::getDoctypeFromIds( const char* d_root, const char*
 	}
 	return rt;
 }
+
+}}
