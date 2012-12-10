@@ -24,17 +24,18 @@ INCLUDE_LIBS = \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
-	mod_graphix.dll
+	mod_employee_assignment_convert.dll
 
 CPP_OBJS = \
-	mod_graphix.obj
+	employee_assignment_convert.obj \
+	mod_employee_assignment_convert.obj
 
 all: $(DYNAMIC_MODULE)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
 $(DYNAMIC_MODULE): $(CPP_OBJS)
-	$(LINK) /dll /def:mod_graphix.def /out:$@ $(LDFLAGS) $(LIBS) $?
+	$(LINK) /dll /def:EmployeeAssignmentConvert.def /out:$@ $(LDFLAGS) $(LIBS) $?
 
 local_all:
 
