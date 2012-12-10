@@ -90,7 +90,7 @@ std::string _Wolframe::utils::getIdFromDoctype( const std::string& doctype)
 	}
 }
 
-std::string getDoctypeFromIds( const char* d_root, const char* d_public, const char* d_system)
+std::string _Wolframe::utils::getDoctypeFromIds( const char* d_root, const char* d_public, const char* d_system)
 {
 	std::string rt;
 	if (!d_root) throw std::runtime_error( "no XML doctype root defined");
