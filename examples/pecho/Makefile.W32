@@ -21,7 +21,7 @@ INCLUDE_LDFLAGS = \
 INCLUDE_LIBS = \
 	Advapi32.lib \
 	$(TOPDIR)\gtest\gtest-all.obj \
-	$(TOPDIR)\wtest\wolftest.lib \
+	$(TOPDIR)\wtest\wtest.lib \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
 	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
