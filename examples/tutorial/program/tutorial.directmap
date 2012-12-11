@@ -1,5 +1,5 @@
-CustomerListRequest = SelectCustomerList( xml ) : CustomerList;
-Customer = SelectCustomer( xml ) : Customer;
-createCustomer = CreateCustomer( xml );
-editCustomer = UpdateCustomer( xml );
-deleteCustomer = DeleteCustomer( xml );
+CustomerList = SelectCustomerList( xml : CustomerSearch ) : CustomerList;
+Customer = SelectCustomer( xml : CustomerSearch ) : Customer;
+createCustomer = CreateCustomer( xml : Customer );
+editCustomer = UpdateCustomer( xml : Customer );
+deleteCustomer = DeleteCustomer( xml : CustomerSearch );

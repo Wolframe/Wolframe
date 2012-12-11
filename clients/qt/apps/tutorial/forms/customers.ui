@@ -23,7 +23,7 @@
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
      <property name="doctype" stdset="0">
-      <string>CustomerListRequest</string>
+      <string>CustomerList</string>
      </property>
      <property name="rootelement" stdset="0">
       <string>customer</string>

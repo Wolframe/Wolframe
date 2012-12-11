@@ -1,0 +1,8 @@
+FORM CustomerSearch
+{
+	customer
+	{
+		id @int
+		form ?@string
+	}
+}
