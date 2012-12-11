@@ -5,9 +5,10 @@
 2. Notes for a customer
 	a) Attributes: what, when
 	b) Operations: add, delete, update, view
+	c) foreign key customer
 
 3. Activities
 	a) Attributes: name, starttime, endtime
 	b) Operations: add, delete, update, view, reports
-
+	c) foreign key customer
 

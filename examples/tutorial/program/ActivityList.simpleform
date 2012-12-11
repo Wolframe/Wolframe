@@ -1,0 +1,15 @@
+; should be 'activity Activity[]' and not a redefinition of an already existing form
+
+FORM ActivityList
+{
+	list
+	{
+		activity []
+		{
+			id @int
+			name string
+			starttime string
+			endtime string
+		}
+	}
+}

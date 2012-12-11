@@ -1,0 +1,34 @@
+TRANSACTION SelectActivityList
+RESULT INTO list
+BEGIN
+	INTO activity DO
+		SELECT id, name, starttime, endtime
+		FROM Activity
+		WHERE name like '%' || lower( $(activity/search) ) || '%';
+END
+
+TRANSACTION SelectActivity
+RESULT INTO activity
+BEGIN
+	INTO . DO SELECT id, name, starttime, endtime
+		FROM Activity
+		WHERE id = $(activity/id);
+END
+
+TRANSACTION CreateActivity
+BEGIN
+	DO INSERT INTO Activity( name, starttime, endtime )
+		VALUES( $(activity/name), $(activity/starttime), $(activity/endtime) );
+END
+
+TRANSACTION UpdateActivity
+BEGIN
+	DO UPDATE Activity SET name = $(activity/name), starttime = $(activity/starttime),
+		endtime = $(activity/endtime)
+		WHERE id = $(activity/id);
+END
+
+TRANSACTION DeleteActivity
+BEGIN
+	DO DELETE FROM Activity WHERE id = $(activity/id);
+END
