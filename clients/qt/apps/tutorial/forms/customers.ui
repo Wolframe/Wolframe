@@ -14,7 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="1" column="0">
     <widget class="QTableWidget" name="customer">
      <property name="selectionMode">
       <enum>QAbstractItemView::SingleSelection</enum>
@@ -34,6 +34,9 @@
      <property name="state" stdset="0">
       <string>{global.customerState}</string>
      </property>
+     <property name="search" stdset="0">
+      <string>{search.text}</string>
+     </property>
      <column>
       <property name="text">
        <string>name</string>
@@ -46,7 +49,7 @@
      </column>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pushButton">
@@ -127,8 +130,57 @@
      </item>
     </layout>
    </item>
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="search">
+       <property name="initialFocus" stdset="0">
+        <bool>true</bool>
+       </property>
+       <property name="state" stdset="0">
+        <string>{global.searchState}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="filterButton">
+       <property name="text">
+        <string>Filter..</string>
+       </property>
+       <property name="action" stdset="0">
+        <string>customer.reload</string>
+       </property>
+       <property name="global.searchState" stdset="0">
+        <string>{search.state}</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>search</tabstop>
+  <tabstop>filterButton</tabstop>
+  <tabstop>customer</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_3</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton_4</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -144,6 +196,22 @@
     <hint type="destinationlabel">
      <x>137</x>
      <y>230</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>search</sender>
+   <signal>returnPressed()</signal>
+   <receiver>filterButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>178</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>274</x>
+     <y>23</y>
     </hint>
    </hints>
   </connection>
