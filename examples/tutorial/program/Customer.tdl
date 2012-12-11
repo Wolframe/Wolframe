@@ -22,11 +22,13 @@ END
 
 TRANSACTION UpdateCustomer
 BEGIN
+	-- returns empty: customer/id should be an attribute, is empty
 	DO UPDATE Customer SET name = $(customer/name), address = $(customer/address)
 		WHERE id = $(customer/id);
 END
 
 TRANSACTION DeleteCustomer
 BEGIN
+	-- returns empty: customer/id should be an attribute, is empty
 	DO DELETE FROM Customer WHERE id = $(customer/id);
 END

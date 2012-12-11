@@ -2,7 +2,7 @@ FORM CustomerSearch
 {
 	customer
 	{
-		id @int
+		id *@int
 		form ?@string
 	}
 }
