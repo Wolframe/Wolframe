@@ -8,6 +8,7 @@ FORM Note
 		when string
 		customer {
 			id @int
+			_ ?string
 		}
 	}
 }
