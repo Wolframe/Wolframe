@@ -34,12 +34,24 @@
 ///\file directmapProgram.cpp
 #include "directmapProgram.hpp"
 #include "utils/miscUtils.hpp"
+#include "logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
+
+std::string DirectmapCommandDescription::tostring() const
+{
+	std::ostringstream rt;
+	rt << "call='" << call << "'";
+	rt << ", filter='" << filter << "'";
+	rt << ", input form='" << inputform << "'";
+	rt << ", output form='" << outputform << "'";
+	return rt.str();
+}
+
 
 bool DirectmapProgram::is_mine( const std::string& filename) const
 {
@@ -155,6 +167,7 @@ void DirectmapProgram::addProgram( const std::string& source)
 				throw ERROR( si, MSG << "';' expected instead of identifier or string");
 			}
 			++si;
+			LOG_TRACE << "Loading direct map function " << prgname << " as " << cmd_descr.tostring();
 			Parent::insert( prgname, cmd_descr);
 		}
 	}

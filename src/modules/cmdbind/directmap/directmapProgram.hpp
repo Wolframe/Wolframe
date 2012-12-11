@@ -53,6 +53,8 @@ struct DirectmapCommandDescription
 	std::string filter;						//< name of the input/ouput filter
 	std::string inputform;						//< name of the input form
 	std::string outputform;						//< name of the output form
+
+	std::string tostring() const;
 };
 
 ///\class DirectmapProgram

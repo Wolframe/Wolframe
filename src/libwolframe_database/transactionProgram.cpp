@@ -34,6 +34,7 @@
 ///\file transactionProgram.cpp
 #include "database/transactionProgram.hpp"
 #include "utils/miscUtils.hpp"
+#include "logger-v1.hpp"
 #include "config/programBase.hpp"
 #include <boost/algorithm/string.hpp>
 
@@ -429,6 +430,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						{
 							if (operation.isTransaction)
 							{
+								LOG_TRACE << "Registering transaction definition '" << operation.name << "'";
 								m_functionmap[ operation.name] = TransactionFunctionR( createTransactionFunction( operation.name, operation.descar, operation.resultname, operationmap, operation.authorization));
 							}
 							else

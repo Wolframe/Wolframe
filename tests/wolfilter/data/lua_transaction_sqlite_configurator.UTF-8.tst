@@ -460,6 +460,7 @@ FORM Manufacturer
 			image string
 			_ string
 		}
+		search string
 	}
 }
 **file:picture.simpleform
@@ -1293,6 +1294,29 @@ end
 function ComponentRequest( )
 	local t = formfunction( "selectComponent" )( { id = input:table( )["component"]["id"] } )
 	local f = form( "Component" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+-- category/features associations
+
+function createCategoryFeature( )
+	local categoryFeature = input:table( )["CategoryFeature"]
+	formfunction( "addCategoryFeature" )( categoryFeature )
+end
+
+function editCategoryFeature( )
+	local categoryFeature = input:table( )["CategoryFeature"]
+	formfunction( "deleteCategoryFeature" )( categoryFeature )
+end
+
+function CategoryFeatureRequest( )
+	local categoryFeature = input:table( )["CategoryFeature"]
+	local t = formfunction( "selectCategoryFeature" )( {
+		category_id = categoryFeature["category_id"],
+		feature_id = categoryFeature["feature_id"]
+	} )
+	local f = form( "CategoryFeature" )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
 end
