@@ -65,7 +65,9 @@ void WolframeClient::timeoutOccurred( )
 	m_timeoutTimer->stop( );
 
 	if( m_socket->state( ) != QAbstractSocket::ConnectedState ) {
-		emit error( QAbstractSocket::SocketTimeoutError );
+		if( !m_hasErrors ) {
+			emit error( QAbstractSocket::SocketTimeoutError );
+		}
 	}
 }
 

@@ -32,6 +32,15 @@
      <property name="global.categoryState" stdset="0">
       <string notr="true">{category.state}</string>
      </property>
+     <property name="global.pictureState" stdset="0">
+      <string notr="true">{picture.state}</string>
+     </property>
+     <property name="global.manufacturerState" stdset="0">
+      <string notr="true">{manufacturer.state}</string>
+     </property>
+     <property name="global.componentState" stdset="0">
+      <string notr="true">{component.state}</string>
+     </property>
     </widget>
    </item>
    <item row="8" column="0">
@@ -170,6 +179,15 @@
      <property name="global.categoryState" stdset="0">
       <string notr="true">{category.state}</string>
      </property>
+     <property name="global.pictureState" stdset="0">
+      <string notr="true">{picture.state}</string>
+     </property>
+     <property name="global.manufacturerState" stdset="0">
+      <string notr="true">{manufacturer.state}</string>
+     </property>
+     <property name="global.componentState" stdset="0">
+      <string notr="true">{component.state}</string>
+     </property>
     </widget>
    </item>
    <item row="4" column="3" colspan="2">
@@ -221,6 +239,15 @@
      <property name="global.categoryState" stdset="0">
       <string notr="true">{category.state}</string>
      </property>
+     <property name="global.pictureState" stdset="0">
+      <string notr="true">{picture.state}</string>
+     </property>
+     <property name="global.manufacturerState" stdset="0">
+      <string notr="true">{manufacturer.state}</string>
+     </property>
+     <property name="global.componentState" stdset="0">
+      <string notr="true">{component.state}</string>
+     </property>
     </widget>
    </item>
    <item row="8" column="4">
@@ -250,6 +277,15 @@
        <property name="global.categoryState" stdset="0">
         <string notr="true">{category.state}</string>
        </property>
+     <property name="global.pictureState" stdset="0">
+      <string notr="true">{picture.state}</string>
+     </property>
+     <property name="global.manufacturerState" stdset="0">
+      <string notr="true">{manufacturer.state}</string>
+     </property>
+     <property name="global.componentState" stdset="0">
+      <string notr="true">{component.state}</string>
+     </property>
       </widget>
      </item>
     </layout>
@@ -272,6 +308,15 @@
      <property name="global.categoryState" stdset="0">
       <string notr="true">{category.state}</string>
      </property>
+     <property name="global.pictureState" stdset="0">
+      <string notr="true">{picture.state}</string>
+     </property>
+     <property name="global.manufacturerState" stdset="0">
+      <string notr="true">{manufacturer.state}</string>
+     </property>
+     <property name="global.componentState" stdset="0">
+      <string notr="true">{component.state}</string>
+     </property>
     </widget>
    </item>
    <item row="3" column="3">
@@ -291,6 +336,15 @@
      </property>
      <property name="global.categoryState" stdset="0">
       <string notr="true">{category.state}</string>
+     </property>
+     <property name="global.pictureState" stdset="0">
+      <string notr="true">{picture.state}</string>
+     </property>
+     <property name="global.manufacturerState" stdset="0">
+      <string notr="true">{manufacturer.state}</string>
+     </property>
+     <property name="global.componentState" stdset="0">
+      <string notr="true">{component.state}</string>
      </property>
     </widget>
    </item>

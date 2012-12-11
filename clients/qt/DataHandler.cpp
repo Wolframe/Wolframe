@@ -27,6 +27,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QTableWidget>
+#include <QHeaderView>
 
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
@@ -609,6 +610,18 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 			foreach( QString state, stateList ) {
 				if( state.left( 1 ) == "S" ) {
 					states.insert( state.mid( 1, state.length( ) - 1 ) );
+				} else if( state.left( 1 ) == "R" ) {
+					int sortBy = state.mid( 1, state.length( ) - 2 ).toInt( );
+					Qt::SortOrder sortOrder;
+					if( state.right( 1 ) == "A" ) {
+						sortOrder = Qt::AscendingOrder;
+					} else if( state.right( 1 ) == "D" ) {
+						sortOrder = Qt::DescendingOrder;
+					}
+					if( sortBy > 0 ) {
+						tableWidget->horizontalHeader( )->setSortIndicator( sortBy, sortOrder );	
+					}
+					continue;
 				}
 				for( int row = 0; row < tableWidget->rowCount( ); row++ ) {
 					QTableWidgetItem *item = tableWidget->item( row, 0 );
@@ -998,6 +1011,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 				return item->data( Qt::UserRole ).toString( );
 			}
 		} else if( property == "state" ) {
+			// remeber current selection (at the moment this is row only!)
 			QList<QTableWidgetItem *> items = tableWidget->selectedItems( );
 			QString state = "";
 			QSet<QString> seen;
@@ -1015,6 +1029,16 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 						seen.insert( id );
 					}
 				}
+			}
+			
+			// remember sorting order
+			state.append( "R" );
+			state.append( QString::number( tableWidget->horizontalHeader( )->sortIndicatorSection( ) ) );
+			Qt::SortOrder order = tableWidget->horizontalHeader( )->sortIndicatorOrder( );
+			if( order == Qt::AscendingOrder ) {
+				state.append( "A" );
+			} else if( order == Qt::DescendingOrder ) {
+				state.append( "D" );
 			}
 
 			return state;
