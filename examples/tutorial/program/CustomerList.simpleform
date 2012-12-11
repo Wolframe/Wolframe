@@ -1,0 +1,15 @@
+; should be 'customer Customer[]' and not a redefinition of an already existing form
+
+FORM CustomerList
+{
+	list
+	{
+		customer []
+		{
+			id @int
+			form @string
+			name string
+			address string
+		}
+	}
+}
