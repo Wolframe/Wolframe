@@ -57,7 +57,7 @@
         <string>create</string>
        </property>
        <property name="doctype" stdset="0">
-        <string>CustomerAdd</string>
+        <string>Customer</string>
        </property>
        <property name="rootelement" stdset="0">
         <string>customer</string>

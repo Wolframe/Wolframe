@@ -17,7 +17,7 @@
    <string>read</string>
   </property>
   <property name="doctype" stdset="0">
-   <string>CustomerRead</string>
+   <string>Customer</string>
   </property>
   <property name="rootelement" stdset="0">
    <string>customer</string>
@@ -69,7 +69,7 @@
         <string>update</string>
        </property>
        <property name="doctype" stdset="0">
-        <string>CustomerEdit</string>
+        <string>Customer</string>
        </property>
        <property name="rootelement" stdset="0">
         <string>customer</string>
@@ -80,6 +80,18 @@
       <widget class="QPushButton" name="pushButton_3">
        <property name="text">
         <string>Reset</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string>Customer</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string>customer</string>
+       </property>
+       <property name="action" stdset="0">
+        <string>read</string>
+       </property>
+       <property name="id" stdset="0">
+        <string>{global.id}</string>
        </property>
       </widget>
      </item>

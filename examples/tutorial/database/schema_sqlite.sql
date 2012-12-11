@@ -3,9 +3,7 @@
 CREATE TABLE Customer (
 	id		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	name		TEXT	NOT NULL,
-	normalized_name	TEXT	NOT NULL,
-	address		TEXT,
-	CONSTRAINT Customer_normalized_name_check UNIQUE( normalized_name )
+	address		TEXT
 );
 
 -- Notes about customers

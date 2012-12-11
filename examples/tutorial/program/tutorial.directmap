@@ -1,4 +1,4 @@
-Customer = SelectCustomerList( xml ) : CustomerList;
-CustomerRead = SelectCustomer( xml ) : Customer;
-CustomerAdd = InsertCustomer( xml );
-CustomerEdit = UpdateCustomer( xmls );
+CustomerListRequest = SelectCustomerList( xml ) : CustomerList;
+Customer = SelectCustomer( xml ) : Customer;
+createCustomer = CreateCustomer( xml );
+updateCustomer = UpdateCustomer( xml );

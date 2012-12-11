@@ -5,3 +5,18 @@ BEGIN
 		SELECT id, name, address
 		FROM Customer;
 END
+
+TRANSACTION SelectCustomer
+RESULT INTO customer
+BEGIN
+	DO
+		SELECT id, name, address
+		FROM Customer
+		WHERE id = $(customer/id);
+END
+
+TRANSACTION CreateCustomer
+BEGIN
+	DO INSERT INTO Customer( name, address )
+		VALUES( $(customer/name), $(customer/address) );
+END
