@@ -69,7 +69,7 @@
         <string>update</string>
        </property>
        <property name="doctype" stdset="0">
-        <string>CustomerUpdate</string>
+        <string>CustomerEdit</string>
        </property>
        <property name="rootelement" stdset="0">
         <string>customer</string>
