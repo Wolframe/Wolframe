@@ -1,4 +1,4 @@
 CustomerListRequest = SelectCustomerList( xml ) : CustomerList;
 Customer = SelectCustomer( xml ) : Customer;
 createCustomer = CreateCustomer( xml );
-updateCustomer = UpdateCustomer( xml );
+editCustomer = UpdateCustomer( xml );

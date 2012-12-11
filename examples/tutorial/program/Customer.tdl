@@ -9,8 +9,7 @@ END
 TRANSACTION SelectCustomer
 RESULT INTO customer
 BEGIN
-	DO
-		SELECT id, name, address
+	DO SELECT id, name, address
 		FROM Customer
 		WHERE id = $(customer/id);
 END
@@ -19,4 +18,10 @@ TRANSACTION CreateCustomer
 BEGIN
 	DO INSERT INTO Customer( name, address )
 		VALUES( $(customer/name), $(customer/address) );
+END
+
+TRANSACTION UpdateCustomer
+BEGIN
+	DO UPDATE Customer SET name = $(customer/name), address = $(customer/address)
+		WHERE id = $(customer/id);
 END
