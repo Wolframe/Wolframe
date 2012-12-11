@@ -6,35 +6,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>521</width>
-    <height>432</height>
+    <width>486</width>
+    <height>258</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QTableWidget" name="tableWidget">
-     <property name="doctype" stdset="0">
-      <string>Customer</string>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string>customer</string>
-     </property>
-     <column>
-      <property name="text">
-       <string>name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>address</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-  </layout>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>78</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Customers</string>
+   </property>
+   <property name="form" stdset="0">
+    <string>customers</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

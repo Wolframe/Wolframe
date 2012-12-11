@@ -8,3 +8,26 @@ FORM Customer
 		address string
 	}
 }
+
+FORM CustomerList
+{
+	list
+	{
+		customer Customer[]
+	}
+}
+
+FORM CustomerRead
+{
+	customer Customer
+}
+
+FORM CustomerUpdate
+{
+	customer Customer
+}
+
+FORM CustomerAdd
+{
+	customer Customer
+}
