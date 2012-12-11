@@ -189,7 +189,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				if (m_outputform_defined)
 				{
 					serialize::DDLStructParser formparser( &m_outputform);
-					formparser.init( m_functionclosure->result(), serialize::Context::ValidateAttributes);
+					formparser.init( m_functionclosure->result(), serialize::Context::None);
 					if (!formparser.call())
 					{
 						throw std::logic_error( "output form serialization not complete");
