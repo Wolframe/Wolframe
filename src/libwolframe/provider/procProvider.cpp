@@ -184,9 +184,10 @@ void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 						it != m_programFiles.end(); it++ )	{
 		std::string oldPath = *it;
 		*it = utils::getCanonicalPath( *it, refPath );
-		if ( oldPath != *it )
+		if ( oldPath != *it )	{
 /*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using program absolute filename '" << *it
 				   << "' instead of '" << oldPath << "'";
+		}
 	}
 }
 

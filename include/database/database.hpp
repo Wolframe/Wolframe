@@ -86,9 +86,6 @@ public:
 		if (!stmmap.empty()) throw std::runtime_error( "embedded statements not defined for this database");
 	}
 
-	///\brief Get a database transaction program from the list of transaction programs
-	virtual const std::string* getProgram( const std::string& name ) const = 0;
-
 	virtual const LanguageDescription* getLanguageDescription() const
 	{
 		static LanguageDescription langdescr;

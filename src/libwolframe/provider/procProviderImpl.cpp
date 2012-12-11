@@ -431,8 +431,9 @@ const UI::UserInterfaceLibrary* ProcessorProvider::ProcessorProvider_Impl::UIlib
 
 db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase() const
 {
-	if ( ! m_db )
+	if ( ! m_db )	{
 		LOG_ALERT << "No database defined for the processor provider";
+	}
 	return m_db;
 }
 

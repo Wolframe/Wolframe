@@ -178,7 +178,6 @@ public:
 	virtual void loadProgram( const std::string& filename );
 	virtual void loadAllPrograms();
 	virtual void addProgram( const std::string& program );
-	virtual const std::string* getProgram( const std::string& name) const;
 
 	Transaction* transaction( const std::string& name );
 	void closeTransaction( Transaction* t );

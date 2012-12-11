@@ -76,9 +76,10 @@ void SaslAuthConfig::setCanonicalPathes( const std::string& refPath )
 	if ( ! m_confPath.empty() )	{
 		std::string oldPath = m_confPath;
 		m_confPath = utils::getCanonicalPath( m_confPath, refPath );
-		if ( oldPath != m_confPath )
+		if ( oldPath != m_confPath )	{
 /*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute for SASL configuration filename '"
 				   << m_confPath << "' instead of '" << oldPath << "'";
+		}
 	}
 }
 

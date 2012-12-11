@@ -483,6 +483,7 @@ examples/tutorial/GNUmakefile
 examples/tutorial/Makefile.W32
 examples/tutorial/program/Activity.simpleform
 examples/tutorial/program/Activity.tdl
+examples/tutorial/program/CustomerList.simpleform
 examples/tutorial/program/Customer.simpleform
 examples/tutorial/program/Customer.tdl
 examples/tutorial/program/Note.simpleform

@@ -226,9 +226,10 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 							std::string oldPath = modFile;
 							assert( ! modFile.empty() );
 							modFile = utils::getCanonicalPath( modFile, configFile );
-							if ( oldPath != modFile)
+							if ( oldPath != modFile)	{
 /*MBa ?!?*/							LOG_NOTICE << MODULE_SECTION_MSG << "using absolute filename '" << modFile
 									   << "' instead of '" << oldPath << "'";
+							}
 							// check for duplicates
 							bool isDuplicate = false;
 							for ( std::list< std::string >::const_iterator Vit = m_modFiles.begin();
