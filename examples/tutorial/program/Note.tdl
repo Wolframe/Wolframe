@@ -10,8 +10,7 @@ END
 TRANSACTION SelectNote
 RESULT INTO note
 BEGIN
-	-- returns empty: customer/id should be an attribute, is empty
-	DO SELECT id, what, "when"
+	INTO . DO SELECT id, what, "when"
 		FROM Note
 		WHERE id = $(note/id);
 END

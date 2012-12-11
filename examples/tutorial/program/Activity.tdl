@@ -10,8 +10,7 @@ END
 TRANSACTION SelectActivity
 RESULT INTO activity
 BEGIN
-	-- returns empty: activity/id should be an attribute, is empty
-	DO SELECT id, name, starttime, endtime
+	INTO . DO SELECT id, name, starttime, endtime
 		FROM Activity
 		WHERE id = $(activity/id);
 END
