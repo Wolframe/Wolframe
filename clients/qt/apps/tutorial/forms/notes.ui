@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>364</width>
+    <height>242</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QTableWidget" name="note">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string>NoteList</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>note</string>
+     </property>
+     <property name="state" stdset="0">
+      <string>{global.noteState}</string>
+     </property>
+     <property name="search" stdset="0">
+      <string>{search.text}</string>
+     </property>
+     <column>
+      <property name="text">
+       <string>what</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>when</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Add</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>note_add</string>
+       </property>
+       <property name="global.noteState" stdset="0">
+        <string>{note.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_3">
+       <property name="text">
+        <string>Edit</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>note_edit</string>
+       </property>
+       <property name="global.id" stdset="0">
+        <string>{note.id}</string>
+       </property>
+       <property name="global.noteState" stdset="0">
+        <string>{note.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Delete</string>
+       </property>
+       <property name="id" stdset="0">
+        <string>{note.id}</string>
+       </property>
+       <property name="action" stdset="0">
+        <string>delete</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string>Note</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string>note</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>notes</string>
+       </property>
+       <property name="global.noteState" stdset="0">
+        <string>{note.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_4">
+       <property name="text">
+        <string>Main</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>init</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="search">
+       <property name="initialFocus" stdset="0">
+        <bool>true</bool>
+       </property>
+       <property name="state" stdset="0">
+        <string>{global.searchState}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="filterButton">
+       <property name="text">
+        <string>Filter..</string>
+       </property>
+       <property name="action" stdset="0">
+        <string>note.reload</string>
+       </property>
+       <property name="global.searchState" stdset="0">
+        <string>{search.state}</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>search</tabstop>
+  <tabstop>filterButton</tabstop>
+  <tabstop>note</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_3</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton_4</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>note</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>pushButton_3</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>114</x>
+     <y>106</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>137</x>
+     <y>230</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>search</sender>
+   <signal>returnPressed()</signal>
+   <receiver>filterButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>178</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>274</x>
+     <y>23</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
