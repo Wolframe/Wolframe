@@ -10,7 +10,6 @@ END
 TRANSACTION SelectCustomer
 RESULT INTO customer
 BEGIN
-	-- returns empty: customer/id should be an attribute, is empty
 	INTO . DO SELECT id, name, address
 		FROM Customer
 		WHERE id = $(customer/id);
