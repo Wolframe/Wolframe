@@ -79,8 +79,8 @@ static std::string buildConnStr( const std::string& host, unsigned short port,
 }
 
 static void createTestDatabase_( const std::string& host, unsigned short port,
-				const std::string& user, const std::string& password,
-				const std::string& dbName, const std::string& inputfile )
+				 const std::string& user, const std::string& password,
+				 const std::string& dbName, const std::string& inputfile )
 {
 	std::string connStr = buildConnStr( host, port, user, password, dbName );
 	PGconn* conn = PQconnectdb( connStr.c_str() );

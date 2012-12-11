@@ -215,13 +215,6 @@ void SQLiteDatabase::addStatements( const types::keymap<std::string>& stmmap_)
 	m_unit->addStatements( stmmap_);
 }
 
-const std::string* SQLiteDatabase::getProgram( const std::string& name) const
-{
-	if ( !m_unit )
-		throw std::runtime_error( "getProgram: SQLite database unit not initialized" );
-	return m_unit->getProgram( name );
-}
-
 Transaction* SQLiteDatabase::transaction( const std::string& /*name*/ )
 {
 	return new SQLiteTransaction( *this );
@@ -363,8 +356,9 @@ void SQLiteTransaction::execute()
 
 void SQLiteTransaction::close()
 {
-	if ( m_conn )
+	if ( m_conn )	{
 		MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
+	}
 	delete m_conn;
 	m_conn = 0;
 	m_db.closeTransaction( this );

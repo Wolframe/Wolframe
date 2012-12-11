@@ -324,9 +324,10 @@ void LoggerConfiguration::setCanonicalPathes( const std::string& refPath )
 	if ( ! logFile.empty() )	{
 		std::string oldPath = logFile;
 		logFile = utils::getCanonicalPath( logFile, refPath );
-		if ( oldPath != logFile )
+		if ( oldPath != logFile )	{
 /*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute filename '" << logFile
 				   << "' instead of '" << oldPath << "'";
+		}
 	}
 }
 

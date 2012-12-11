@@ -117,9 +117,6 @@ public:
 
 	virtual Transaction* transaction( const std::string& /*name*/ );
 
-	const std::string* getProgram( const std::string& /*name*/ ) const
-						{ return NULL; }
-
 	virtual void addProgram( const std::string& source);
 	virtual void loadProgram( const std::string& filename);
 	virtual void loadAllPrograms(){}

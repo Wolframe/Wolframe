@@ -153,7 +153,7 @@ bool LineCommandHandler::redirectInput( void* data, std::size_t datasize, cmdbin
 			continue;
 		case cmdbind::CommandHandler::CLOSE:
 			error = toh->lastError();
-			if (error) LOG_ERROR << "error redirect input: " << error;
+			if (error) { LOG_ERROR << "error redirect input: " << error; }
 			return false;
 	}
 }

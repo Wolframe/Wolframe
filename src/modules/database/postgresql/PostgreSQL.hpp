@@ -134,15 +134,17 @@ private:
 	PoolObject<PGconn*>* m_conn;		//< reference to connection object from pool
 };
 
+
 struct PostgreSQLLanguageDescription : public LanguageDescription
 {
 	virtual std::string stm_argument_reference( int index)
 	{
 		std::ostringstream rt;
 		rt << "$" << index;
-		return rt.str( );	
+		return rt.str( );
 	}
 };
+
 
 class PostgreSQLdatabase : public Database
 {
@@ -159,7 +161,6 @@ public:
 	virtual void loadProgram( const std::string& filename );
 	virtual void loadAllPrograms();
 	virtual void addProgram( const std::string& program );
-	virtual const std::string* getProgram( const std::string& name) const;
 
 	Transaction* transaction( const std::string& name );
 	void closeTransaction( Transaction* t );
@@ -203,9 +204,6 @@ public:
 
 	virtual void addProgram( const std::string& program )
 						{ m_program.load( program ); }
-
-	virtual const std::string* getProgram( const std::string& /*name*/ ) const
-						{ return NULL; }
 
 	const types::keymap<std::string>* stmmap() const
 	{

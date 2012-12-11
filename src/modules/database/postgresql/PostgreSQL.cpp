@@ -375,13 +375,6 @@ void PostgreSQLdatabase::addStatements( const types::keymap<std::string>& stmmap
 	m_unit->addStatements( stmmap_);
 }
 
-const std::string* PostgreSQLdatabase::getProgram( const std::string& name) const
-{
-	if ( !m_unit )
-		throw std::runtime_error( "getProgram: PostgreSQL database unit not initialized" );
-	return m_unit->getProgram( name );
-}
-
 Transaction* PostgreSQLdatabase::transaction( const std::string& /*name*/ )
 {
 	return new PostgreSQLtransaction( *this );

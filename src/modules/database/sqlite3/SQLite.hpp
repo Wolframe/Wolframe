@@ -150,6 +150,7 @@ private:
 	SQLiteDBunit&		m_unit;		///< parent database unit
 };
 
+
 struct SQLiteLanguageDescription :public LanguageDescription
 {
 	///\brief String used for declaring a reference to an argument by index (starting with 1).
@@ -160,6 +161,7 @@ struct SQLiteLanguageDescription :public LanguageDescription
 		return rt.str();
 	}
 };
+
 
 class SQLiteDatabase : public Database
 {
@@ -176,7 +178,6 @@ public:
 	virtual void loadProgram( const std::string& filename );
 	virtual void loadAllPrograms();
 	virtual void addProgram( const std::string& program );
-	virtual const std::string* getProgram( const std::string& name) const;
 
 	Transaction* transaction( const std::string& name );
 	void closeTransaction( Transaction* t );
@@ -225,14 +226,6 @@ public:
 		m_program.addStatements( stmmap_);
 	}
 
-	virtual const std::string* getProgram( const std::string& name) const
-	{
-		const types::keymap<std::string>* mm = m_program.statementmap();
-		if (!mm) return 0;
-		types::keymap<std::string>::const_iterator mi = mm->find( name);
-		if (mi == mm->end()) return 0;
-		return &mi->second;
-	}
 
 	const types::keymap<std::string>* stmmap() const
 	{

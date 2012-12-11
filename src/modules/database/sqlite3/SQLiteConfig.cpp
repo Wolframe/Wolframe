@@ -150,17 +150,19 @@ void SQLiteConfig::setCanonicalPathes( const std::string& refPath )
 	if ( ! m_filename.empty() )	{
 		std::string oldPath = m_filename;
 		m_filename = utils::getCanonicalPath( m_filename, refPath);
-		if ( oldPath != m_filename )
+		if ( oldPath != m_filename )	{
 /*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute database filename '" << m_filename
 				       << "' instead of '" << oldPath << "'";
+		}
 	}
 	for ( std::list< std::string >::iterator it = m_programFiles.begin();
 						it != m_programFiles.end(); it++ )	{
 		std::string oldPath = *it;
 		*it = utils::getCanonicalPath( *it, refPath );
-		if ( oldPath != *it )
+		if ( oldPath != *it )	{
 /*MBa ?!?*/		MOD_LOG_NOTICE << logPrefix() << "Using absolute program filename '" << *it
 				       << "' instead of '" << oldPath << "'";
+		}
 	}
 }
 

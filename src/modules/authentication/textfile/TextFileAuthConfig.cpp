@@ -101,9 +101,10 @@ void TextFileAuthConfig::setCanonicalPathes( const std::string& refPath )
 	if ( ! m_file.empty() )	{
 		std::string oldPath = m_file;
 		m_file = utils::getCanonicalPath( m_file, refPath );
-		if ( oldPath != m_file )
+		if ( oldPath != m_file )	{
 /*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute filename '" << m_file
 				   << "' instead of '" << oldPath << "' for the password file";
+		}
 	}
 }
 

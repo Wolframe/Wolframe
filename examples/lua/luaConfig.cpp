@@ -183,9 +183,10 @@ void LuaConfiguration::setCanonicalPathes( const std::string& refPath )
 	if ( ! script.empty() )	{
 		std::string oldPath = script;
 		script = utils::getCanonicalPath( script, refPath );
-		if ( oldPath != script )
+		if ( oldPath != script )	{
 /*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using script absolute filename '" << script
 				   << "' instead of '" << oldPath << "'";
+		}
 	}
 }
 

@@ -179,9 +179,10 @@ void ServiceConfiguration::setCanonicalPathes( const std::string& refPath )
 	if ( ! pidFile.empty() )	{
 		std::string oldPath = pidFile;
 		pidFile = utils::getCanonicalPath( pidFile, refPath );
-		if ( oldPath != pidFile )
+		if ( oldPath != pidFile )	{
 /*MBa ?!?*/		LOG_NOTICE << logPrefix() << "Using absolute pid filename '" << pidFile
 				   << "' instead of '" << oldPath << "'";
+		}
 	}
 }
 
