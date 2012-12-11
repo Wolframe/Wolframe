@@ -45,6 +45,13 @@ INCLUDE_LIBS = \
 
 !ENDIF
 
+# Postgresql
+!IFDEF WITH_PGSQL
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(PGSQL_DIR)\lib\libpq.lib"
+
+!ENDIF
 
 OBJS = \
 	appProperties.obj \
