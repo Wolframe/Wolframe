@@ -78,6 +78,9 @@
        <property name="rootelement" stdset="0">
         <string>customer</string>
        </property>
+       <property name="id" stdset="0">
+        <string>{global.id}</string>
+       </property>
       </widget>
      </item>
      <item>

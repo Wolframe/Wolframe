@@ -24,7 +24,6 @@ END
 
 TRANSACTION UpdateCustomer
 BEGIN
-	-- does nothing, customer/id empty?
 	DO UPDATE Customer SET name = $(customer/name), address = $(customer/address)
 		WHERE id = $(customer/id);
 END
