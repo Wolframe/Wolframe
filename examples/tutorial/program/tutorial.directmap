@@ -2,3 +2,4 @@ CustomerListRequest = SelectCustomerList( xml ) : CustomerList;
 Customer = SelectCustomer( xml ) : Customer;
 createCustomer = CreateCustomer( xml );
 editCustomer = UpdateCustomer( xml );
+deleteCustomer = DeleteCustomer( xml );

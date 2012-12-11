@@ -73,6 +73,15 @@
        <property name="id" stdset="0">
         <string>{customer.id}</string>
        </property>
+       <property name="action" stdset="0">
+        <string>delete</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string>Customer</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string>customer</string>
+       </property>
       </widget>
      </item>
      <item>
