@@ -64,6 +64,10 @@ ICU_DIR = C:\Cygwin\home\Andreas Baumann\icu-49.1.2-win32-debug
 # the library version (how the DLLs are tagged)
 ICU_LIB_VERSION = 49
 
+# TODO: probe!
+ICU_LIB_DIR = $(ICU_DIR)\lib
+#ICU_LIB_DIR = $(ICU_DIR)\lib64
+
 # OpenSSL (http://www.slproweb.com/products/Win32OpenSSL.html)
 ##############################################################
 

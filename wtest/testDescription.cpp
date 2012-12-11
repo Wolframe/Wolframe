@@ -32,6 +32,13 @@
 ************************************************************************/
 ///\file testDescription.cpp
 ///\brief Implements a test description loaded from a file
+
+//... for boost usage in splitString
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable:4996)
+#endif
+
 #include "testDescription.hpp"
 #include "utils/miscUtils.hpp"
 #include <boost/algorithm/string.hpp>
@@ -344,9 +351,6 @@ TestDescription::TestDescription( const std::string& pt, const char* argv0)
 	}
 }
 
-#ifdef _WIN32
-#pragma warning(disable:4996)	//... for boost usage in splitString
-#endif
 static void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchrs)
 {
 	res.clear();
@@ -355,3 +359,6 @@ static void splitString( std::vector<std::string>& res, const std::string& inp, 
 	std::vector<std::string>::const_iterator vi=imm.begin(), ve=imm.end();
 	for (; vi != ve; ++vi) if (!vi->empty()) res.push_back( *vi);
 }
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
