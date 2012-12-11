@@ -2,8 +2,10 @@ TRANSACTION SelectNoteList
 RESULT INTO list
 BEGIN
 	INTO note DO
-		SELECT id, what, "when"
+		SELECT Note.id, what, "when", Customer.name as "customer"
 		FROM Note
+		LEFT JOIN Customer
+		ON Customer.id = Note.customer_id
 		WHERE what like '%' || lower( $(note/search) ) || '%';
 END
 
@@ -13,7 +15,7 @@ BEGIN
 	INTO . DO SELECT id, what, "when"
 		FROM Note
 		WHERE id = $(note/id);
-	INTO customer DO SELECT Customer.id AS "id"
+	INTO customer DO SELECT Customer.id
 		FROM Customer, Note
 		WHERE Customer.id = Note.customer_id
 		AND Note.id = $(note/id);
