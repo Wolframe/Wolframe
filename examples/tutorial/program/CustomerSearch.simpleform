@@ -4,5 +4,6 @@ FORM CustomerSearch
 	{
 		id *@int
 		form ?@string
+		state ?@string
 	}
 }

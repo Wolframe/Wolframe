@@ -22,11 +22,17 @@
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
      <property name="doctype" stdset="0">
       <string>CustomerList</string>
      </property>
      <property name="rootelement" stdset="0">
       <string>customer</string>
+     </property>
+     <property name="state" stdset="0">
+      <string>{global.customerState}</string>
      </property>
      <column>
       <property name="text">
@@ -50,6 +56,9 @@
        <property name="form" stdset="0">
         <string>customer_add</string>
        </property>
+       <property name="global.customerState" stdset="0">
+        <string>{customer.state}</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -62,6 +71,9 @@
        </property>
        <property name="global.id" stdset="0">
         <string>{customer.id}</string>
+       </property>
+       <property name="global.customerState" stdset="0">
+        <string>{customer.state}</string>
        </property>
       </widget>
      </item>
@@ -81,6 +93,12 @@
        </property>
        <property name="rootelement" stdset="0">
         <string>customer</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>customers</string>
+       </property>
+       <property name="global.customerState" stdset="0">
+        <string>{customer.state}</string>
        </property>
       </widget>
      </item>

@@ -618,7 +618,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 					} else if( state.right( 1 ) == "D" ) {
 						sortOrder = Qt::DescendingOrder;
 					}
-					if( sortBy > 0 ) {
+					if( sortBy >= 0 ) {
 						tableWidget->horizontalHeader( )->setSortIndicator( sortBy, sortOrder );	
 					}
 					continue;
