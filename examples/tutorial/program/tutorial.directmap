@@ -3,3 +3,16 @@ Customer = SelectCustomer( xml : CustomerSearch ) : Customer;
 createCustomer = CreateCustomer( xml : Customer );
 editCustomer = UpdateCustomer( xml : Customer );
 deleteCustomer = DeleteCustomer( xml : CustomerSearch );
+
+NoteList = SelectNoteList( xml : NoteSearch ) : NoteList;
+Note = SelectNote( xml : NoteSearch ) : Note;
+createNote = CreateNote( xml : Note );
+editNote = UpdateNote( xml : Note );
+deleteNote = DeleteNote( xml : NoteSearch );
+
+ActivityList = SelectActivityList( xml : ActivitySearch ) : ActivityList;
+Activity = SelectActivity( xml : ActivitySearch ) : Activity;
+createActivity = CreateActivity( xml : Activity );
+editActivity = UpdateActivity( xml : Activity );
+deleteActivity = DeleteActivity( xml : ActivitySearch );
+

@@ -1,0 +1,10 @@
+FORM NoteSearch
+{
+	note
+	{
+		id ?@int
+		form ?@string
+		state ?@string
+		search ?@string
+	}
+}

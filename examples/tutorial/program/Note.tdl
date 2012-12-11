@@ -1,0 +1,34 @@
+TRANSACTION SelectNoteList
+RESULT INTO list
+BEGIN
+	INTO note DO
+		SELECT id, what, "when"
+		FROM Note
+		WHERE what like '%' || lower( $(note/search) ) || '%';
+END
+
+TRANSACTION SelectNote
+RESULT INTO note
+BEGIN
+	-- returns empty: customer/id should be an attribute, is empty
+	DO SELECT id, what, "when"
+		FROM Note
+		WHERE id = $(note/id);
+END
+
+TRANSACTION CreateNote
+BEGIN
+	DO INSERT INTO Note( what, "when" )
+		VALUES( $(note/what), $(note/when) );
+END
+
+TRANSACTION UpdateNote
+BEGIN
+	DO UPDATE Note SET what = $(note/what), "when" = $(note/when)
+		WHERE id = $(note/id);
+END
+
+TRANSACTION DeleteNote
+BEGIN
+	DO DELETE FROM Note WHERE id = $(note/id);
+END
