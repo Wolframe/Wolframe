@@ -9,6 +9,7 @@ END
 TRANSACTION SelectCustomer
 RESULT INTO customer
 BEGIN
+	-- returns empty: customer/id should be an attribute, is empty
 	DO SELECT id, name, address
 		FROM Customer
 		WHERE id = $(customer/id);
@@ -29,6 +30,5 @@ END
 
 TRANSACTION DeleteCustomer
 BEGIN
-	-- returns empty: customer/id should be an attribute, is empty
 	DO DELETE FROM Customer WHERE id = $(customer/id);
 END
