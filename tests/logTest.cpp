@@ -18,32 +18,52 @@ using namespace _Wolframe::log;
 // The fixture for testing class _Wolframe::log
 class LoggingFixture : public ::testing::Test
 {
-	protected:
-		LogBackend& logBack;
-		
-	protected:
-		LoggingFixture( ) :
-			logBack( LogBackend::instance( ) ) 
-		{
-			// in order not to spoil the output of gtest :-)
-			logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
+protected:
+	LogBackend& logBack;
 
-			logBack.setLogfileLevel( LogLevel::LOGLEVEL_DATA );
-			logBack.setLogfileName( "logTest.log" );
-			logBack.setSyslogLevel( LogLevel::LOGLEVEL_DATA );
-			logBack.setSyslogFacility( SyslogFacility::WOLFRAME_SYSLOG_FACILITY_USER );
-			logBack.setSyslogIdent( "logTest" );			
+protected:
+	LoggingFixture( ) :
+		logBack( LogBackend::instance( ) )
+	{
+		// in order not to spoil the output of gtest :-)
+		logBack.setConsoleLevel( LogLevel::LOGLEVEL_UNDEFINED );
+
+		logBack.setLogfileLevel( LogLevel::LOGLEVEL_DATA );
+		logBack.setLogfileName( "logTest.log" );
+		logBack.setSyslogLevel( LogLevel::LOGLEVEL_DATA );
+		logBack.setSyslogFacility( SyslogFacility::WOLFRAME_SYSLOG_FACILITY_USER );
+		logBack.setSyslogIdent( "logTest" );
 #if defined( _WIN32 )
-// mmh? they disappeared
-//			logBack.setSyslogHost( "localhost" );
-//			logBack.setSyslogPort( 514 );
-			logBack.setWinDebugLevel( LogLevel::LOGLEVEL_DATA );
-			logBack.setEventlogLevel( LogLevel::LOGLEVEL_DATA );
-			logBack.setEventlogSource( "wolframe" );
-			logBack.setEventlogLog( "Application" );
+		// mmh? they disappeared
+		//			logBack.setSyslogHost( "localhost" );
+		//			logBack.setSyslogPort( 514 );
+		logBack.setWinDebugLevel( LogLevel::LOGLEVEL_DATA );
+		logBack.setEventlogLevel( LogLevel::LOGLEVEL_DATA );
+		logBack.setEventlogSource( "wolframe" );
+		logBack.setEventlogLog( "Application" );
 #endif // defined( _WIN32 )
-		}
+	}
 };
+
+
+// test classes for log behavior
+// testA throws logic_error when the constructor is called
+class testA	{
+public:
+	testA()	{ throw std::logic_error( "testA constructor called" ); }
+	friend std::ostream& operator << ( std::ostream& o, const testA& )
+		{ o << "ouput testA class"; return o; }
+};
+
+// testB throws runtime_error when the << operator is called
+class testB	{
+public:
+	testB()	{ std::cerr << "testB constructor called"; }
+
+	friend std::ostream& operator << ( std::ostream& o, const testB& )
+		{  throw std::runtime_error( "testB << operator called" ); }
+};
+
 
 TEST_F( LoggingFixture, LogMacrosWithoutComponent )
 {
@@ -105,6 +125,22 @@ TEST_F( LoggingFixture, LogSystemErrorMarkersWin )
 	}
 }
 #endif
+
+
+TEST_F( LoggingFixture, LogLevelData )
+{
+	EXPECT_THROW( LOG_FATAL << testA(), std::logic_error );
+	EXPECT_THROW( LOG_ALERT <<  testA(), std::logic_error );
+	EXPECT_THROW( LOG_CRITICAL <<  testA(), std::logic_error );
+	EXPECT_THROW( LOG_SEVERE <<  testA(), std::logic_error );
+	EXPECT_THROW( LOG_ERROR <<  testA(), std::logic_error );
+	EXPECT_THROW( LOG_WARNING <<  testA(), std::logic_error );
+	EXPECT_THROW( LOG_NOTICE <<  testA(), std::logic_error );
+	EXPECT_THROW( LOG_INFO <<  testA(), std::logic_error );
+	EXPECT_THROW( LOG_DEBUG <<  testA(), std::logic_error );
+	EXPECT_THROW( LOG_TRACE <<  testA(), std::logic_error );
+	EXPECT_THROW( LOG_DATA <<  testA(), std::logic_error );
+}
 
 int main( int argc, char **argv )
 {
