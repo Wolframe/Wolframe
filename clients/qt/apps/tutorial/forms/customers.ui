@@ -103,6 +103,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton_4">
+       <property name="text">
+        <string>Main</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>init</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
