@@ -14,46 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QTableWidget" name="note">
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="sortingEnabled">
-      <bool>true</bool>
-     </property>
-     <property name="doctype" stdset="0">
-      <string>NoteList</string>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string>note</string>
-     </property>
-     <property name="state" stdset="0">
-      <string>{global.noteState}</string>
-     </property>
-     <property name="search" stdset="0">
-      <string>{search.text}</string>
-     </property>
-     <column>
-      <property name="text">
-       <string>what</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>when</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>customer</string>
-      </property>
-     </column>
-    </widget>
-   </item>
    <item row="2" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -154,14 +114,48 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLineEdit" name="search">
-       <property name="initialFocus" stdset="0">
-        <bool>true</bool>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
        </property>
-       <property name="state" stdset="0">
-        <string>{global.searchState}</string>
-       </property>
-      </widget>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_customer">
+         <property name="text">
+          <string>Customer:</string>
+         </property>
+         <property name="buddy">
+          <cstring>searchCustomer</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="searchCustomer">
+         <property name="state" stdset="0">
+          <string>{global.searchCustomerState}</string>
+         </property>
+         <property name="initialFocus" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+         <property name="buddy">
+          <cstring>searchNote</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="searchNote">
+         <property name="state" stdset="0">
+          <string>{global.searchNoteState}</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <widget class="QPushButton" name="filterButton">
@@ -171,17 +165,64 @@
        <property name="action" stdset="0">
         <string>note.reload</string>
        </property>
-       <property name="global.searchState" stdset="0">
-        <string>{search.state}</string>
+       <property name="global.searchCustomerState" stdset="0">
+        <string>{searchCustomer.state}</string>
+       </property>
+       <property name="global.searchNoteState" stdset="0">
+        <string>{searchNote.state}</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
+   <item row="1" column="0">
+    <widget class="QTableWidget" name="note">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string>NoteList</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>note</string>
+     </property>
+     <property name="state" stdset="0">
+      <string>{global.noteState}</string>
+     </property>
+     <property name="searchNote" stdset="0">
+      <string>{searchNote.text}</string>
+     </property>
+     <property name="searchCustomer" stdset="0">
+      <string>{searchCustomer.text}</string>
+     </property>
+     <column>
+      <property name="text">
+       <string>what</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>when</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>customer</string>
+      </property>
+     </column>
+    </widget>
+   </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>search</tabstop>
+  <tabstop>searchCustomer</tabstop>
+  <tabstop>searchNote</tabstop>
   <tabstop>filterButton</tabstop>
   <tabstop>note</tabstop>
   <tabstop>pushButton</tabstop>
@@ -208,18 +249,34 @@
    </hints>
   </connection>
   <connection>
-   <sender>search</sender>
+   <sender>searchNote</sender>
    <signal>returnPressed()</signal>
    <receiver>filterButton</receiver>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>178</x>
-     <y>20</y>
+     <x>195</x>
+     <y>45</y>
     </hint>
     <hint type="destinationlabel">
      <x>353</x>
      <y>33</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>searchCustomer</sender>
+   <signal>returnPressed()</signal>
+   <receiver>filterButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>204</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>336</x>
+     <y>31</y>
     </hint>
    </hints>
   </connection>

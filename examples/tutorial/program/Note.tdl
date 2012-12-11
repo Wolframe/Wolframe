@@ -6,7 +6,8 @@ BEGIN
 		FROM Note
 		LEFT JOIN Customer
 		ON Customer.id = Note.customer_id
-		WHERE what like '%' || lower( $(note/search) ) || '%';
+		WHERE what like '%' || lower( $(note/searchNote) ) || '%'
+		AND Customer.name like '%' || lower( $(note/searchCustomer) ) || '%';
 END
 
 TRANSACTION SelectNote
