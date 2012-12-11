@@ -83,6 +83,14 @@ INCLUDE_LIBS = \
 	$(INCLUDE_LIBS) "$(LIBXML2_DIR)\lib\libxml2.lib"
 !ENDIF
 
+# Postgresql
+!IFDEF WITH_PGSQL
+
+INCLUDE_LIBS = \
+	$(INCLUDE_LIBS) "$(PGSQL_DIR)\lib\libpq.lib"
+
+!ENDIF
+
 # libhpdf
 !IFDEF WITH_LIBHPDF
 INCLUDE_CXXFLAGS = \
