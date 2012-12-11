@@ -6,5 +6,8 @@ FORM Note
 		form ?@string
 		what string
 		when string
+		customer {
+			id @int
+		}
 	}
 }

@@ -4,14 +4,14 @@ BEGIN
 	INTO customer DO
 		SELECT id, name, address
 		FROM Customer
-		WHERE name like '%' || lower( $(customer/search) ) || '%';
+		WHERE name like '%' || lower( coalesce( $(customer/search), '' ) ) || '%';
 END
 
 TRANSACTION SelectCustomer
 RESULT INTO customer
 BEGIN
 	-- returns empty: customer/id should be an attribute, is empty
-	DO SELECT id, name, address
+	INTO . DO SELECT id, name, address
 		FROM Customer
 		WHERE id = $(customer/id);
 END

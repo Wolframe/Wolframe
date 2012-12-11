@@ -118,6 +118,9 @@
        <property name="form" stdset="0">
         <string>init</string>
        </property>
+       <property name="global.activityState" stdset="0">
+        <string>{activity.state}</string>
+       </property>
       </widget>
      </item>
      <item>

@@ -11,7 +11,8 @@ CREATE TABLE Customer (
 CREATE TABLE Note (
 	id		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	what		TEXT,
-	"when"		TEXT
+	"when"		TEXT,
+	customer_id	INT	REFERENCES Customer( ID )
 );
 
 -- Activities
@@ -20,5 +21,6 @@ CREATE TABLE Activity (
 	id		INTEGER PRIMARY KEY AUTOINCREMENT,
 	name		TEXT,
 	starttime	TEXT,
-	endtime		TEXT
+	endtime		TEXT,
+	customer_id	INT	REFERENCES Customer( ID )
 );

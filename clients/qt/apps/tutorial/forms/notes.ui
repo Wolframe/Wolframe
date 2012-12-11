@@ -113,6 +113,9 @@
        <property name="form" stdset="0">
         <string>init</string>
        </property>
+       <property name="global.noteState" stdset="0">
+        <string>{note.state}</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -210,8 +213,8 @@
      <y>20</y>
     </hint>
     <hint type="destinationlabel">
-     <x>274</x>
-     <y>23</y>
+     <x>353</x>
+     <y>33</y>
     </hint>
    </hints>
   </connection>

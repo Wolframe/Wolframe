@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>283</width>
-    <height>102</height>
+    <width>352</width>
+    <height>163</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,7 +44,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="3" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pushButton">
@@ -92,6 +92,33 @@
    </item>
    <item row="1" column="1">
     <widget class="QLineEdit" name="when"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_customer">
+     <property name="text">
+      <string>Customer:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QTableWidget" name="customer">
+     <property name="doctype" stdset="0">
+      <string>CustomerList</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>customer</string>
+     </property>
+     <column>
+      <property name="text">
+       <string>name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>address</string>
+      </property>
+     </column>
+    </widget>
    </item>
   </layout>
  </widget>
