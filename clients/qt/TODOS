@@ -1,8 +1,3 @@
-ASAP:
-- tutorial
-  - eliminate empty table effect
-  - some presentation?
-  
 now:
 - stop the "whiteout", especially seen after assigning pictures
   (must be a protocol thing), happens mainly on Windows 7/8, not
@@ -17,31 +12,27 @@ now:
     a state like DataLeft (Data gets DataReading or so)
 - ILLEGAL STATE 4 in dataAvailable!
 - CRITICAL: "Premature end of document."
-- package version switching
 
 - open info box (modal) in feature/category/component edit and add to
   show picture information
 - search with flag (with children)
   
 musts:
-- avoid table empty rows if not all attributes are set, the problem are
-  answers with just one root element
+- QTableWidget sometimes swallows thumbnails, why? sorting and search collide.
 - tags picked from a list and added (needs events)
 - linking of categories and features
-- rewrite categories, so that joins to picutes, requires/provides, tags,
+- rewrite categories, so that joins to pictures, requires/provides, tags,
   etc. are possible trhough the lua layer
 - optimal size on qtreewidget to fit items (needed for linking categories
   and features linking view)
 - tabbed preferences dialog, like thunderbird (in security, form management,
   etc.)
-- eliminate empty row when empty result (e.g. picture search)
 - show pictures in tree view
 - show titles of forms somewhere in the qtclient
 - scroll to selected element in a single-selection list
 - push button state (disabled/enabled) based on a
   condition like {picture.id>0}
-- PDF widget poppler qt4
-- get sensible error message from business layer, not "lua call faled"
+- get sensible error message from business layer, not "lua call failed"
   - e.g. avoid deletion of in-use-pictures
   - better even: provide conditions for buttons, so they can't be
     pressed (button.state={something})
@@ -54,25 +45,18 @@ musts:
   they should not be deletable?
 - QTableWidget
   - implement other selection modes (column, cells)
-  - remember states like sort order, column width, etc.
+  - remember states like column width, etc.
 - QDialog instead of QWidget for forms
   - would allow to have default Enter and ESC behaviour
   - must be treated specially, as the form should NOT
     replace the UI currently being shown
-- associate features and categories
 - save global state to settings and read it from there
   - global.XXX variables
   - last form
 - unselect trees
-- frontend:
-  - associating categories and features
-- Linux, shared lib for custom widgets, similar to windows, for now
-  it works on Linux, but for instance not on Solaris or Freebsd (PIC
-  mixing!)
 - element operations
   - reorganize tree
     - move elements/subtrees
-- tab stop order for file choose, picture chooser
 - protocol
   - network loader via protocol or use client library?
 - designer custom widgets
@@ -105,6 +89,7 @@ musts:
   - QListView: with model for big data, on request
   - QTreeView: with model for big data, on request
 - file download, later, for reports, PDFs, etc.
+  - PDF widget poppler qt4 for previews
 
 nice to do:
 - FormWidget:
@@ -147,5 +132,3 @@ nice to do:
   - 1:n relations (pick a foreign reference to another
     object), domains (e.g. pick a city in a list of possibilities)
   - grid views
-- QIODevice for data loader and handler instead of a fixed byte
-  array in the signal (otherwise the debug window gets complicated)

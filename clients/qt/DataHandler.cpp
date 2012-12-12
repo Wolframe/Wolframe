@@ -541,6 +541,10 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 			QString headerText = item->data( Qt::DisplayRole ).toString( );
 			headers << headerText;		
 		}
+
+		// switch off sorting for now, otherwise filling with setItem fails!
+		tableWidget->horizontalHeader( )->setSortIndicator( -1, Qt::AscendingOrder );	
+		
 		int row = 0;
 		bool inData = false;
 		bool hasData = false;
