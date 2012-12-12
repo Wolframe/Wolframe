@@ -64,7 +64,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	// skip globals
 			if( key.startsWith( "global." ) ) continue;
 	// ignore our own actions
-			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
+			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
 			xml.writeAttribute( key, props->value( key ) );
 		}		
 	} else {

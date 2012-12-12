@@ -1,8 +1,5 @@
 ASAP:
 - tutorial
-  - remove funny form parameters
-    - form ?@string 
-    - state ?@string
   - eliminate empty table effect
   - some presentation?
   

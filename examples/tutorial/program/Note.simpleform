@@ -3,7 +3,6 @@ FORM Note
 	note
 	{
 		id ?@int
-		form ?@string
 		what string
 		when string
 		customer {
