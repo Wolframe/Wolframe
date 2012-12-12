@@ -1,11 +1,11 @@
 ASAP:
 - tutorial
-  - activity finish
   - remove funny form parameters
     - form ?@string 
     - state ?@string
   - eliminate empty table effect
-
+  - some presentation?
+  
 now:
 - stop the "whiteout", especially seen after assigning pictures
   (must be a protocol thing), happens mainly on Windows 7/8, not
