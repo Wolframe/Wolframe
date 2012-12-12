@@ -7,5 +7,9 @@ FORM Activity
 		name string
 		starttime string
 		endtime string
+		customer {
+			id @int
+			_ ?string
+		}
 	}
 }

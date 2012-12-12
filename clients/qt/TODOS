@@ -1,3 +1,11 @@
+ASAP:
+- tutorial
+  - activity finish
+  - remove funny form parameters
+    - form ?@string 
+    - state ?@string
+  - eliminate empty table effect
+
 now:
 - stop the "whiteout", especially seen after assigning pictures
   (must be a protocol thing), happens mainly on Windows 7/8, not
@@ -17,8 +25,7 @@ now:
 - open info box (modal) in feature/category/component edit and add to
   show picture information
 - search with flag (with children)
-- form ?@string
-- state ?@string
+  
 musts:
 - avoid table empty rows if not all attributes are set, the problem are
   answers with just one root element
