@@ -18,7 +18,6 @@ now:
 - search with flag (with children)
   
 musts:
-- QTableWidget sometimes swallows thumbnails, why? sorting and search collide.
 - tags picked from a list and added (needs events)
 - linking of categories and features
 - rewrite categories, so that joins to pictures, requires/provides, tags,
