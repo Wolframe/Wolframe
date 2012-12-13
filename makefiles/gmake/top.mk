@@ -110,6 +110,8 @@ ifeq ($(WITH_QT),1)
 	@echo "QT_BIN_DIR: $(QT_BIN_DIR)"
 	@echo "QT_MOC: $(QT_MOC)"
 	@echo "QT_LRELEASE: $(QT_LRELEASE)"
+	@echo "QT_LUPDATE: $(QT_LUPDATE)"
+	@echo "QT_RCC: $(QT_RCC)"
 endif
 ifeq ($(WITH_PAM),1)
 	@echo
