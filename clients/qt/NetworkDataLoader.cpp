@@ -129,7 +129,7 @@ void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props
 // skip globals
 		if( key.startsWith( "global." ) ) continue;
 // ignore our own actions
-		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
+		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
 		xml.writeAttribute( key, props->value( key ) );
 	}
 	xml.writeEndElement( );
@@ -185,7 +185,7 @@ void NetworkDataLoader::handleDelete( QString name, QHash<QString, QString> *pro
 // skip globals
 		if( key.startsWith( "global." ) ) continue;
 // ignore our own actions
-		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
+		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
 		xml.writeAttribute( key, props->value( key ) );
 	}
 	xml.writeEndElement( );
@@ -225,7 +225,7 @@ void NetworkDataLoader::handleDomainDataLoad( QString formName, QString widgetNa
 // skip globals
 		if( key.startsWith( "global." ) ) continue;
 // ignore our own actions
-		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
+		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
 		xml.writeAttribute( key, props->value( key ) );
 	}
 // assuming the root element has always id 1

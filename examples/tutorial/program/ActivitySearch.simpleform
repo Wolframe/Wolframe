@@ -3,7 +3,6 @@ FORM ActivitySearch
 	activity
 	{
 		id ?@int
-		form ?@string
 		state ?@string
 		search ?@string
 	}

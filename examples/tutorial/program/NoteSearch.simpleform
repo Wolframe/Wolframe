@@ -3,8 +3,7 @@ FORM NoteSearch
 	note
 	{
 		id ?@int
-		form ?@string
-		state ?@string
-		search ?@string
+		searchCustomer ?@string
+		searchNote ?@string
 	}
 }

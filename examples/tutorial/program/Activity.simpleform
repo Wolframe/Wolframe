@@ -3,9 +3,12 @@ FORM Activity
 	activity
 	{
 		id ?@int
-		form ?@string
 		name string
 		starttime string
 		endtime string
+		customer {
+			id @int
+			_ ?string
+		}
 	}
 }

@@ -64,7 +64,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	// skip globals
 			if( key.startsWith( "global." ) ) continue;
 	// ignore our own actions
-			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" ) continue;
+			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
 			xml.writeAttribute( key, props->value( key ) );
 		}		
 	} else {
@@ -541,14 +541,20 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 			QString headerText = item->data( Qt::DisplayRole ).toString( );
 			headers << headerText;		
 		}
+
+		// switch off sorting for now, otherwise filling with setItem fails!
+		tableWidget->horizontalHeader( )->setSortIndicator( -1, Qt::AscendingOrder );	
+		
 		int row = 0;
 		bool inData = false;
+		bool hasData = false;
 		QXmlStreamAttributes attributes;
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
 			if( xml.isStartElement( ) ) {
 				if( xml.name( ) == widget_name ) {
 					inData = true;
+					hasData = false;
 					tableWidget->insertRow( row );
 // HACK: set height of rows to thumbnail heigth					
 					tableWidget->setRowHeight( row, 50 );
@@ -588,11 +594,18 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 							QTableWidgetItem *item = tableWidget->item( row, col );
 							item->setData( Qt::UserRole, v );
 						}
+						
+						hasData = true;
 					}
 				}
 			} else if( xml.isEndElement( ) ) {
 				if( xml.name( ) == widget_name ) {
-					row++;
+					if( hasData ) {
+						row++;
+					} else {
+						tableWidget->removeRow( row );
+					}
+					hasData = false;
 					inData = false;
 				}
 			}
