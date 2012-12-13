@@ -68,16 +68,7 @@ INCLUDE_LIBS += \
 	$(PGSQL_LIBS)
 endif
 
-STATIC_LIB = libwolftest.a
-
-DYNAMIC_LIB = libwolftest.so
-DYNAMIC_LIB_MAJOR = 0
-DYNAMIC_LIB_MINOR = 0
-DYNAMIC_LIB_PATCH = 0
-
-STATIC_LIB_OBJS = \
-	testDescription.o \
-	testModules.o
+NOINST_STATIC_LIB = libwolftest.a
 
 CPP_OBJS = \
 	testDescription.o \
@@ -88,7 +79,7 @@ CPP_BINS = \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
-local_all: $(STATIC_LIB) $(DYNAMIC_LIB)
+local_all:
 
 local_clean:
 

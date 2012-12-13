@@ -44,6 +44,16 @@ INCLUDE_LIBS += \
 	$(OPENSSL_LIBS)
 endif
 
+# postgres
+ifeq ($(WITH_PGSQL),1)
+INCLUDE_CXXFLAGS += \
+	-DWITH_PGSQL
+INCLUDE_DIRS += \
+	$(PGSQL_INCLUDE_DIRS)
+INCLUDE_LIBS += \
+	$(PGSQL_LIBS)
+endif
+
 OBJS = \
 	appProperties.o \
 	appConfigDefinition.o \

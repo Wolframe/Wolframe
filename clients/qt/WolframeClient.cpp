@@ -65,9 +65,8 @@ void WolframeClient::timeoutOccurred( )
 	m_timeoutTimer->stop( );
 
 	if( m_socket->state( ) != QAbstractSocket::ConnectedState ) {
-		if( !m_hasErrors ) {
-			emit error( QAbstractSocket::SocketTimeoutError );
-		}
+		emit error( QAbstractSocket::SocketTimeoutError );
+		m_hasErrors = true;
 	}
 }
 
@@ -201,7 +200,9 @@ void WolframeClient::disconnect( )
 
 	switch( m_state ) {
 		case Disconnected:
-			// can happen, is ok, remain in disconneted state
+			// can happen, is ok, remain in disconneted state and reemit signal
+			// in case the client relies on the signal
+			emit disconnected( );
 			break;
 
 		case AboutToConnect:
@@ -235,7 +236,9 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 				m_state = Disconnected;
 				emit error( tr( "Connection closed by server." ) );
 			} else {
-				emit error( m_socket->errorString( ) );
+				if( !m_hasErrors ) {
+					emit error( m_socket->errorString( ) );
+				}
 			}
 			break;
 
@@ -250,7 +253,8 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 		case Connected:
 		case Data:
 // connection closed by server as a reaction to QUIT command (should better be "client
-// goes first disconnection pattern" IMHO)
+// goes first disconnection pattern" IMHO), can also happen, if the server closes the
+// connection (e.g. shutdown)
 			if( _error == QAbstractSocket::RemoteHostClosedError ) {
 				m_socket->close( );
 				m_state = Disconnected;
@@ -269,7 +273,8 @@ void WolframeClient::privateConnected( )
 {
 	switch( m_state ) {
 		case Disconnected:
-			emit error( tr( "Got a connect Qt signal when not starting a new connection!" ) );
+// this is also funny, but again a race, switch directly to Connected state
+			m_state = Connected;
 			break;
 
 		case AboutToConnect:
@@ -317,7 +322,8 @@ void WolframeClient::dataAvailable( )
 	switch( m_state ) {
 		case Disconnected:
 		case AboutToConnect:
-			emit error( tr( "Invalid state, got data while in state %1?" ).arg( m_state ) );
+			// early answer, this is a race (we send to fast without waiting for answers),
+			// this is no problem, we don't consume anything and should get called again
 			break;
 
 		case AboutToDisconnect:
