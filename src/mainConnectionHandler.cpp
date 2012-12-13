@@ -287,6 +287,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		else
 		{
 			out << "ERR " << msg.str() << endl();
+			delete execch;
 		}
 	}
 	else
@@ -305,13 +306,17 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		{
 			delegateProcessing<&CommandHandler::endRequest>( execch);
 		}
-		else if (execch->lastError())
-		{
-			out << "ERR REQUEST " << m_command << " " << execch->lastError() << endl();
-		}
 		else
 		{
-			out << "OK REQUEST " << m_command << endl();
+			if (execch->lastError())
+			{
+				out << "ERR REQUEST " << m_command << " " << execch->lastError() << endl();
+			}
+			else
+			{
+				out << "OK REQUEST " << m_command << endl();
+			}
+			delete execch;
 		}
 	}
 	return stateidx();
