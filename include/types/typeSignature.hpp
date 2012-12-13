@@ -45,7 +45,7 @@ namespace types {
 ///\brief Signature of a type for pointer constraint check
 class TypeSignature
 {
-	static unsigned int getStmp( unsigned int objid_) {return 2654435761*(objid_+123);}
+	static unsigned int getStmp( unsigned int objid_) {return 2654435761U*(objid_+123);}
 public:
 	TypeSignature( const char* objname_, unsigned int objid_)
 		:m_objid(objid_)
