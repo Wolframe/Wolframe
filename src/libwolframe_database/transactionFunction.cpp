@@ -939,14 +939,16 @@ bool FunctionCall::hasResultReference() const
 }
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunction* func_)
-	:m_structure( new Structure( func_->tagmap()))
+	:types::TypeSignature("database::TransactionFunctionInput", __LINE__)
+	,m_structure( new Structure( func_->tagmap()))
 	,m_func(func_)
 	,m_lasttype( langbind::TypedInputFilter::Value){}
 
 TransactionFunctionInput::~TransactionFunctionInput(){}
 
 TransactionFunctionInput::TransactionFunctionInput( const TransactionFunctionInput& o)
-	:langbind::TypedOutputFilter(o)
+	:types::TypeSignature("database::TransactionFunctionInput", __LINE__)
+	,langbind::TypedOutputFilter(o)
 	,m_structure( o.m_structure)
 	,m_func(o.m_func)
 	,m_lasttype(o.m_lasttype){}
@@ -1329,11 +1331,13 @@ struct TransactionFunctionOutput::Impl
 
 
 TransactionFunctionOutput::TransactionFunctionOutput( const ResultStructR& resultstruct_, const db::TransactionOutput& data_)
-	:m_impl( new Impl( resultstruct_, db::TransactionOutputR( new db::TransactionOutput( data_))))
+	:types::TypeSignature("database::TransactionFunctionOutput", __LINE__)
+	,m_impl( new Impl( resultstruct_, db::TransactionOutputR( new db::TransactionOutput( data_))))
 {}
 
 TransactionFunctionOutput::TransactionFunctionOutput( const TransactionFunctionOutput& o)
-	:langbind::TypedInputFilter(o)
+	:types::TypeSignature("database::TransactionFunctionOutput", __LINE__)
+	,langbind::TypedInputFilter(o)
 	,m_impl( new Impl( *o.m_impl))
 {}
 

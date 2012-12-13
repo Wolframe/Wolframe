@@ -43,7 +43,7 @@ Project Wolframe.
 #include "filter/tostringfilter.hpp"
 #include "ddl/structTypeBuild.hpp"
 #include "utils/miscUtils.hpp"
-#include "utils/doctype.hpp"
+#include "types/doctype.hpp"
 #include "logger-v1.hpp"
 #include <fstream>
 #include <iostream>
@@ -628,24 +628,14 @@ LUA_FUNCTION_THROWS( "form:__tostring()", function_form_tostring)
 }
 
 
-LUA_FUNCTION_THROWS( "form:doctype()", function_form_doctype)
+LUA_FUNCTION_THROWS( "form:name()", function_form_name)
 {
 	ddl::FormR* form = LuaObject<ddl::FormR>::getSelf( ls, "form", "doctype");
 	check_parameters( ls, 1, 0);
 
-	const char* xmlroot = (*form)->xmlRoot();
 	LuaExceptionHandlerScope escope(ls);
 	{
-		if (xmlroot)
-		{
-			const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-			std::string xmlDoctype = ctx->xmlDoctypeString( (*form)->name(), (*form)->ddlname(), xmlroot);
-			lua_pushlstring( ls, xmlDoctype.c_str(), xmlDoctype.size());
-		}
-		else
-		{
-			lua_pushnil( ls);
-		}
+		lua_pushlstring( ls, (*form)->name().c_str(), (*form)->name().size());
 		return 1;
 	}
 }
@@ -1401,6 +1391,66 @@ LUA_FUNCTION_THROWS( "input:as(..)", function_input_as)
 }
 
 
+LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
+{
+	Input* input;
+	int ctx;
+	if (lua_getctx( ls, &ctx) != LUA_YIELD)
+	{
+		input = LuaObject<Input>::getSelf( ls, "input", "doctype");
+		check_parameters( ls, 1, 0);
+	}
+	else
+	{
+		input = (Input*)lua_touserdata( ls, -1);
+		lua_pop( ls, 1);
+	}
+	if (!input->inputfilter().get())
+	{
+		lua_pushnil( ls);
+		return 1;
+	}
+	{
+		std::string doctypestr;
+		if (input->inputfilter()->getDocType( doctypestr))
+		{
+			LuaExceptionHandlerScope escope(ls);
+			{
+				if (doctypestr.size())
+				{
+					types::DocType doctype( doctypestr);
+					lua_newtable( ls);
+					if (doctype.rootid)
+					{
+						lua_pushstring( ls, doctype.rootid);
+						lua_setfield( ls, -2, "root");
+					}
+					if (doctype.publicid)
+					{
+						lua_pushstring( ls, doctype.publicid);
+						lua_setfield( ls, -2, "public");
+					}
+					if (doctype.systemid)
+					{
+						lua_pushstring( ls, doctype.systemid);
+						lua_setfield( ls, -2, "system");
+					}
+					return 1;
+				}
+				else
+				{
+					lua_pushnil( ls);
+					return 1;
+				}
+			}
+		}
+	}
+	lua_pushlightuserdata( ls, input);
+	lua_yieldk( ls, 0, 1, function_input_doctype);
+	return 0;
+}
+
+
 LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 {
 	Input* input;
@@ -1426,7 +1476,7 @@ LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 		{
 			LuaExceptionHandlerScope escope(ls);
 			{
-				std::string doctypeid( utils::getIdFromDoctype( doctype));
+				std::string doctypeid( types::getIdFromDoctype( doctype));
 				if (doctypeid.size())
 				{
 					lua_pushlstring( ls, doctypeid.c_str(), doctypeid.size());
@@ -1441,49 +1491,6 @@ LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 	}
 	lua_pushlightuserdata( ls, input);
 	lua_yieldk( ls, 0, 1, function_input_doctypeid);
-	return 0;
-}
-
-
-LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
-{
-	Input* input;
-	int ctx;
-	if (lua_getctx( ls, &ctx) != LUA_YIELD)
-	{
-		input = LuaObject<Input>::getSelf( ls, "input", "doctype");
-		check_parameters( ls, 1, 0);
-	}
-	else
-	{
-		input = (Input*)lua_touserdata( ls, -1);
-		lua_pop( ls, 1);
-	}
-	if (!input->inputfilter().get())
-	{
-		lua_pushnil( ls);
-		return 1;
-	}
-	{
-		std::string doctype;
-		if (input->inputfilter()->getDocType( doctype))
-		{
-			LuaExceptionHandlerScope escope(ls);
-			{
-				if (doctype.size())
-				{
-					lua_pushlstring( ls, doctype.c_str(), doctype.size());
-				}
-				else
-				{
-					lua_pushnil( ls);
-				}
-				return 1;
-			}
-		}
-	}
-	lua_pushlightuserdata( ls, input);
-	lua_yieldk( ls, 0, 1, function_input_doctype);
 	return 0;
 }
 
@@ -1506,15 +1513,19 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 	{
 		if (lua_type( ls, ii) == LUA_TSTRING)
 		{
-			if (!doctype.empty()) std::runtime_error( "doctype specified twice");
-			const char* ds = lua_tostring( ls, ii);
-			if (!ds) std::runtime_error( "doctype is not convertible to a string");
-			doctype = ds;
+			const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
+			const char* doctype_form = lua_tostring( ls, ii);
+			const ddl::Form* form = gtc->form( doctype_form);
+			if (!form) throw std::runtime_error( std::string("string argument is not referring to a form defined: '") + doctype_form + "'");
+			const char* doctype_root = form->xmlRoot();
+			if (!doctype_root) throw std::runtime_error( "string argument is referring to a form without xml root element defined");
+			std::string ddlname = form->ddlname();
+			doctype = gtc->xmlDoctypeString( form->name(), ddlname, doctype_root);
 		}
 		else if (lua_type( ls, ii) == LUA_TTABLE)
 		{
 			const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
-			if (!doctype.empty()) std::runtime_error( "doctype specified twice");
+			if (!doctype.empty()) throw std::runtime_error( "doctype specified twice");
 			const char* doctype_system = 0;
 			const char* doctype_public = 0;
 			const char* doctype_root = 0;
@@ -1523,36 +1534,36 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 			if (!lua_isnil( ls, -1))
 			{
 				doctype_system = lua_tostring( ls, -1);
-				if (!doctype_system) std::runtime_error( "doctype['system'] is not convertible to a string");
+				if (!doctype_system) throw std::runtime_error( "in table argument doctype: doctype['system'] is not convertible to a string");
 			}
 			lua_getfield( ls, ii, "public");
 			if (!lua_isnil( ls, -1))
 			{
 				doctype_public = lua_tostring( ls, -1);
-				if (!doctype_public) std::runtime_error( "doctype['public'] is not convertible to a string");
+				if (!doctype_public) throw std::runtime_error( "in table argument doctype: doctype['public'] is not convertible to a string");
 			}
 			lua_getfield( ls, ii, "root");
 			if (!lua_isnil( ls, -1))
 			{
 				doctype_root = lua_tostring( ls, -1);
-				if (!doctype_public) std::runtime_error( "doctype['root'] is not convertible to a string");
+				if (!doctype_root) throw std::runtime_error( "in table argument doctype: doctype['root'] is not convertible to a string");
 			}
 			lua_getfield( ls, ii, "form");
 			if (!lua_isnil( ls, -1))
 			{
 				doctype_form = lua_tostring( ls, -1);
-				if (!doctype_form) std::runtime_error( "doctype['form'] is not convertible to a string");
+				if (!doctype_form) throw std::runtime_error( "in table argument doctype: doctype['form'] is not convertible to a string");
 			}
 			if (doctype_root)
 			{
-				doctype.append( utils::getDoctypeFromIds( doctype_root, doctype_public, doctype_system));
+				doctype.append( types::DocType( doctype_root, doctype_public, doctype_system).tostring());
 			}
 			else if (doctype_form)
 			{
 				const ddl::Form* form = gtc->form( doctype_form);
-				if (!form) std::runtime_error( std::string("doctype['form'] is not referring to a form defined: '") + doctype_form + "'");
+				if (!form) throw std::runtime_error( std::string("doctype['form'] is not referring to a form defined: '") + doctype_form + "'");
 				doctype_root = form->xmlRoot();
-				if (!doctype_root) std::runtime_error( "doctype['form'] is referring to a form without xml root element defined");
+				if (!doctype_root) throw std::runtime_error( "doctype['form'] is referring to a form without xml root element defined");
 				std::string ddlname = form->ddlname();
 				doctype = gtc->xmlDoctypeString( form->name(), ddlname, doctype_root);
 			}
@@ -1563,7 +1574,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 		}
 		else if (lua_type( ls, ii) == LUA_TUSERDATA)
 		{
-			if (filter) std::runtime_error( "filter specified twice");
+			if (filter) throw std::runtime_error( "filter specified twice");
 			filter = LuaObject<Filter>::get( ls, ii);
 			if (!filter) throw std::runtime_error( "filter object expected as first argument");
 		}
@@ -1689,7 +1700,7 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 		{
 			if (doctype.size())
 			{
-				std::string doctypeid( utils::getIdFromDoctype( doctype));
+				std::string doctypeid( types::getIdFromDoctype( doctype));
 				const proc::ProcessorProvider* gtc = getProcessorProvider( ls);
 				const ddl::Form* st = gtc->form( doctypeid);
 				if (!st) throw std::runtime_error( std::string("form not defined for document type '") + doctypeid + "'");
@@ -1900,7 +1911,7 @@ static const luaL_Reg struct_methodtable[ 4] =
 
 static const luaL_Reg form_methodtable[ 6] =
 {
-	{"doctype",&function_form_doctype},
+	{"name",&function_form_name},
 	{"table",&function_form_table},
 	{"get",&function_form_get},
 	{"fill",&function_form_fill},

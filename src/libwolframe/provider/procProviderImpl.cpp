@@ -36,8 +36,7 @@
 
 #include "processor/procProvider.hpp"
 #include "procProviderImpl.hpp"
-#include "utils/doctype.hpp"
-
+#include "types/doctype.hpp"
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "logger-v1.hpp"

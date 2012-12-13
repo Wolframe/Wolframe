@@ -46,7 +46,8 @@ namespace serialize {
 class DDLStructSerializer :public langbind::TypedInputFilter
 {
 public:
-	DDLStructSerializer(){}
+	DDLStructSerializer()
+		:types::TypeSignature("serialize::DDLStructSerializer", __LINE__){}
 	explicit DDLStructSerializer( const ddl::StructType* st);
 
 	DDLStructSerializer( const DDLStructSerializer& o);

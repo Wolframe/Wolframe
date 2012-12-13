@@ -38,6 +38,7 @@ Project Wolframe.
 #include "database/transactionFunction.hpp"
 #include "prnt/printFunction.hpp"
 #include "processor/procProvider.hpp"
+#include "types/typeSignature.hpp"
 #include "ddl/structType.hpp"
 #include "ddl/compilerInterface.hpp"
 #include "serialize/struct/filtermapBase.hpp"
@@ -63,22 +64,26 @@ struct Logger
 ///\class Output
 ///\brief Output as seen from scripting language binding
 class Output
+	:public virtual types::TypeSignature
 {
 public:
 	///\brief Constructor
 	Output()
-		:m_state(0)
+		:types::TypeSignature("langbind::Output", __LINE__)
+		,m_state(0)
 		,m_called(false){}
 	///\brief Copy constructor
 	///\param[in] o copied item
 	Output( const Output& o)
-		:m_outputfilter(o.m_outputfilter)
+		:types::TypeSignature(o)
+		,m_outputfilter(o.m_outputfilter)
 		,m_state(o.m_state)
 		,m_called(o.m_called){}
 	///\brief Constructor by output filter
 	///\param[in] flt output filter reference
 	Output( const OutputFilterR& flt)
-		:m_outputfilter(flt)
+		:types::TypeSignature("langbind::Output", __LINE__)
+		,m_outputfilter(flt)
 		,m_state(0)
 		,m_called(false){}
 	///\brief Destructor
@@ -107,22 +112,26 @@ private:
 ///\class Input
 ///\brief input as seen from the application processor program
 class Input
+	:public virtual types::TypeSignature
 {
 public:
 	///\brief Constructor
 	Input()
-		:m_used(false){}
+		:types::TypeSignature("langbind::Input", __LINE__)
+		,m_used(false){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
 	Input( const Input& o)
-		:m_used(o.m_used)
+		:types::TypeSignature(o)
+		,m_used(o.m_used)
 		,m_inputfilter(o.m_inputfilter){}
 
 	///\brief Constructor by input filter
 	///\param[in] flt input filter reference
 	explicit Input( const InputFilterR& flt)
-		:m_used(false)
+		:types::TypeSignature("langbind::Input", __LINE__)
+		,m_used(false)
 		,m_inputfilter(flt){}
 
 	///\brief Destructor
@@ -132,27 +141,32 @@ public:
 	InputFilterR& inputfilter()			{return m_inputfilter;}
 
 	InputFilterR& getIterator();
+
 private:
 	bool m_used;					//< only one iterator can be created from input. This is the guard for checking this.
 	InputFilterR m_inputfilter;			//< input is defined by the associated input filter
 };
 
 class DDLFormParser
-	:public serialize::DDLStructParser
+	:public virtual types::TypeSignature
+	,public serialize::DDLStructParser
 {
 public:
 	explicit DDLFormParser( const ddl::FormR& form_)
-		:DDLStructParser(form_.get())
+		:types::TypeSignature("langbind::DDLFormParser", __LINE__)
+		,DDLStructParser(form_.get())
 		,m_form(form_){}
 
 	DDLFormParser( const DDLFormParser& o)
-		:DDLStructParser(o)
+		:types::TypeSignature(o)
+		,DDLStructParser(o)
 		,m_form(o.m_form){}
 
 	virtual ~DDLFormParser(){}
 
 	DDLFormParser& operator=( const DDLFormParser& o)
 	{
+		types::TypeSignature::operator=( o);
 		DDLStructParser::operator=( o);
 		m_form = o.m_form;
 		return *this;
@@ -165,21 +179,27 @@ private:
 };
 
 class DDLFormSerializer
-	:public serialize::DDLStructSerializer
+	:public virtual types::TypeSignature
+	,public serialize::DDLStructSerializer
 {
 public:
-	DDLFormSerializer(){}
+	DDLFormSerializer()
+		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__){}
+
 	explicit DDLFormSerializer( const ddl::FormR& form_)
-		:DDLStructSerializer(form_.get())
+		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__)
+		,DDLStructSerializer(form_.get())
 		,m_form(form_){}
 
 	DDLFormSerializer( const DDLFormSerializer& o)
-		:DDLStructSerializer(o)
+		:types::TypeSignature(o)
+		,DDLStructSerializer(o)
 		,m_form(o.m_form){}
 	virtual ~DDLFormSerializer(){}
 
 	DDLFormSerializer& operator =( const DDLFormSerializer& o)
 	{
+		types::TypeSignature::operator=( o);
 		DDLStructSerializer::operator=( o);
 		m_form = o.m_form;
 		return *this;
@@ -193,6 +213,7 @@ private:
 
 ///\class RedirectFilterClosure
 class RedirectFilterClosure
+	:public virtual types::TypeSignature
 {
 public:
 	RedirectFilterClosure();
@@ -221,6 +242,7 @@ private:
 };
 
 class ApiFormData
+	:public virtual types::TypeSignature
 {
 public:
 	ApiFormData( const serialize::StructDescriptionBase* descr);
@@ -237,6 +259,7 @@ private:
 ///\class FormFunctionClosure
 ///\brief Closure with calling state of called FormFunction
 class FormFunctionClosure
+	:public virtual types::TypeSignature
 {
 public:
 	///\brief Constructor
@@ -269,6 +292,7 @@ private:
 ///\class TransactionFunctionClosure
 ///\brief Closure with calling state of called TransactionFunction
 class TransactionFunctionClosure
+	:public virtual types::TypeSignature
 {
 public:
 	///\brief Constructor
@@ -306,6 +330,7 @@ private:
 ///\class PrintFunctionClosure
 ///\brief Closure with calling state of called PrintFunction
 class PrintFunctionClosure
+	:public virtual types::TypeSignature
 {
 public:
 	///\brief Constructor

@@ -129,7 +129,8 @@ private:
 struct InputFilterImpl :public InputFilter
 {
 	InputFilterImpl( const types::CountedReference<std::string>& e)
-		:m_node(0)
+		:types::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
+		,m_node(0)
 		,m_value(0)
 		,m_prop(0)
 		,m_propvalues(0)
@@ -138,7 +139,8 @@ struct InputFilterImpl :public InputFilter
 		,m_encoding(e){}
 
 	InputFilterImpl( const InputFilterImpl& o)
-		:InputFilter(o)
+		:types::TypeSignature("langbind::InputFilterImpl (libxml2)", __LINE__)
+		,InputFilter(o)
 		,m_doc(o.m_doc)
 		,m_node(o.m_node)
 		,m_value(o.m_value)
@@ -414,13 +416,15 @@ class OutputFilterImpl :public OutputFilter
 {
 public:
 	OutputFilterImpl( const types::CountedReference<std::string>& enc)
-		:m_encoding(enc)
+		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+		,m_encoding(enc)
 		,m_nofroot(0)
 		,m_taglevel(0)
 		,m_elemitr(0){}
 
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:OutputFilter(o)
+		:types::TypeSignature("langbind::OutputFilterImpl (libxml2)", __LINE__)
+		,OutputFilter(o)
 		,m_encoding(o.m_encoding)
 		,m_doc(o.m_doc)
 		,m_nofroot(o.m_nofroot)

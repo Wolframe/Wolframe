@@ -47,13 +47,17 @@ struct DocType
 	const char* systemid;
 
 	DocType();
-	DocType( const std::string& value);
+	DocType( const char* r, const char* p, const char* s)
+		:rootid(r),publicid(p),systemid(s){}
+	explicit DocType( const std::string& value);
 	~DocType(){}
 
 	std::string tostring() const;
 private:
 	boost::shared_ptr<void> mem;
 };
+
+std::string getIdFromDoctype( const std::string& doctype);
 
 }}//namespace
 #endif

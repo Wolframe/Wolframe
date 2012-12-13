@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file types_doctype.cpp
 ///\brief ADT for XML document type definition handling
 #include "types/doctype.hpp"
+#include "utils/miscUtils.hpp"
 #include <cstring>
 #include <stdexcept>
 
@@ -163,4 +164,55 @@ std::string DocType::tostring() const
 	return rt;
 }
 
+std::string _Wolframe::types::getIdFromDoctype( const std::string& doctype)
+{
+	std::string rootid;
+	std::string publicid;
+	std::string systemid;
+	std::string::const_iterator itr=doctype.begin(), end=doctype.end();
+
+	if (utils::parseNextToken( rootid, itr, end))
+	{
+		if (utils::parseNextToken( publicid, itr, end))
+		{
+			if (publicid == "PUBLIC")
+			{
+				if (!utils::parseNextToken( publicid, itr, end)
+				||  !utils::parseNextToken( systemid, itr, end))
+				{
+					throw std::runtime_error( "illegal doctype definition (public id)");
+				}
+				return utils::getFileStem( systemid);
+			}
+			else if (publicid == "SYSTEM")
+			{
+				if (!utils::parseNextToken( systemid, itr, end))
+				{
+					throw std::runtime_error( "illegal doctype definition (system id)");
+				}
+				return utils::getFileStem( systemid);
+			}
+			else if (utils::parseNextToken( systemid, itr, end))
+			{
+				if (itr != end)
+				{
+					throw std::runtime_error( "illegal doctype definition (not terminated)");
+				}
+				return utils::getFileStem( systemid);
+			}
+			else
+			{
+				return utils::getFileStem( publicid);
+			}
+		}
+		else
+		{
+			return rootid;
+		}
+	}
+	else
+	{
+		return "";
+	}
+}
 

@@ -48,9 +48,11 @@ namespace langbind {
 class TypedFilterBase :public FilterBase
 {
 public:
-	TypedFilterBase(){}
+	TypedFilterBase()
+		:types::TypeSignature("langbind::TypedFilterBase", __LINE__){}
 	TypedFilterBase( const TypedFilterBase& o)
-		:FilterBase(o){}
+		:types::TypeSignature(o)
+		,FilterBase(o){}
 
 	///\class Element
 	///\brief Element of the filter

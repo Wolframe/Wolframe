@@ -47,7 +47,8 @@ class PropertyTreeInputFilter :public TypedInputFilter
 public:
 	///\brief Constructor
 	PropertyTreeInputFilter( const boost::property_tree::ptree& pt)
-		:m_state(0)
+		:types::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
+		,m_state(0)
 	{
 		State st;
 		st.itr = pt.begin();
@@ -58,7 +59,8 @@ public:
 	///\brief Copy constructor
 	///\param[in] o input filter to copy
 	PropertyTreeInputFilter( const PropertyTreeInputFilter& o)
-		:TypedInputFilter(o)
+		:types::TypeSignature("langbind::PropertyTreeInputFilter", __LINE__)
+		,TypedInputFilter(o)
 		,m_stk(o.m_stk)
 		,m_state(o.m_state){}
 

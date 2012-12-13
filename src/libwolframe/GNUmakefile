@@ -65,7 +65,6 @@ CPP_OBJS = \
 	resolvePath.o \
 	stringUtils.o \
 	parseUtils.o \
-	utils_doctype.o \
 	types_allocators.o \
 	password.o \
 	globalRndGen.o \

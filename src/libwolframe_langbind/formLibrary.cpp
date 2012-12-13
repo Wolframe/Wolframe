@@ -34,7 +34,7 @@
 ///\file formLibrary.cpp
 #include "langbind/formLibrary.hpp"
 #include "utils/miscUtils.hpp"
-#include "utils/doctype.hpp"
+#include "types/doctype.hpp"
 #include "config/programBase.hpp"
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>

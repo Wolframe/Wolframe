@@ -34,7 +34,7 @@
 
 #include "cmdbind/doctypeFilterCommandHandler.hpp"
 #include "logger-v1.hpp"
-#include "utils/doctype.hpp"
+#include "types/doctype.hpp"
 #include <cstring>
 
 using namespace _Wolframe;
@@ -232,7 +232,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						}
 						else if (inp[ii] == '>')
 						{
-							m_doctypeid = utils::getIdFromDoctype( m_doctype);
+							m_doctypeid = types::getIdFromDoctype( m_doctype);
 							setState( Done);
 						}
 						else
