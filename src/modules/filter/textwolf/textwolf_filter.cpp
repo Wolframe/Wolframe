@@ -272,12 +272,20 @@ private:
 			for (;;) switch (m_parser.state())
 			{
 				case XMLParser::ParseHeader:
-					m_parser.getNext( ee, eesize);
+					if (m_parser.getNext( ee, eesize) == textwolf::XMLScannerBase::ErrorOccurred)
+					{
+						setState( Error, ee);
+						return false;
+					}
 					if (m_parser.isStandalone()) return true;
 					continue;
 
 				case XMLParser::ParseDoctype:
-					m_parser.getNext( ee, eesize);
+					if (m_parser.getNext( ee, eesize) == textwolf::XMLScannerBase::ErrorOccurred)
+					{
+						setState( Error, ee);
+						return false;
+					}
 					continue;
 
 				case XMLParser::ParseSource:

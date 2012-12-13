@@ -406,7 +406,7 @@ public:
 							}
 							else
 							{
-								elemptr = "error in xml <!DOCTYPE definition";
+								elemptr = "error in xml <!DOCTYPE definition: SYSTEM or PUBLIC expected";
 								elemsize = std::strlen( elemptr);
 								elemtype = XMLScannerBase::ErrorOccurred;
 								break;

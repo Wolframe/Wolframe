@@ -1411,10 +1411,10 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 		return 1;
 	}
 	{
-		std::string doctypestr;
-		if (input->inputfilter()->getDocType( doctypestr))
+		LuaExceptionHandlerScope escope(ls);
 		{
-			LuaExceptionHandlerScope escope(ls);
+			std::string doctypestr;
+			if (input->inputfilter()->getDocType( doctypestr))
 			{
 				if (doctypestr.size())
 				{
@@ -1442,6 +1442,13 @@ LUA_FUNCTION_THROWS( "input:doctype()", function_input_doctype)
 					lua_pushnil( ls);
 					return 1;
 				}
+			}
+			else
+			{
+				std::string msg( "error parsing DOCTYPE: ");
+				const char* err = input->inputfilter()->getError();
+				msg.append( err?err:"unknown");
+				throw std::runtime_error(msg);
 			}
 		}
 	}
@@ -1487,6 +1494,13 @@ LUA_FUNCTION_THROWS( "input:doctypeid()", function_input_doctypeid)
 				}
 				return 1;
 			}
+		}
+		else
+		{
+			std::string msg( "error parsing DOCTYPE: ");
+			const char* err = input->inputfilter()->getError();
+			msg.append( err?err:"unknown");
+			throw std::runtime_error(msg);
 		}
 	}
 	lua_pushlightuserdata( ls, input);
@@ -1736,6 +1750,13 @@ static lua_CFunction get_input_struct_closure( lua_State* ls, Input* input, bool
 			{
 				return &function_input_table_nil;
 			}
+		}
+		else
+		{
+			std::string msg( "error parsing DOCTYPE: ");
+			const char* err = input->inputfilter()->getError();
+			msg.append( err?err:"unknown");
+			throw std::runtime_error(msg);
 		}
 	}
 	else

@@ -1,0 +1,38 @@
+FORM insertNumber
+{
+	doc
+	{
+		numbr int
+		mul int
+		dup int
+		trip int
+	}
+}
+
+FORM updateNumber
+{
+	doc
+	{
+		numbr int
+		mul int
+		dup int
+		trip int
+	}
+}
+
+FORM deleteNumber
+{
+	doc
+	{
+		numbr int
+	}
+}
+
+FORM selectNumber
+{
+	doc
+	{
+		numbr int
+	}
+}
+

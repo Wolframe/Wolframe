@@ -194,7 +194,7 @@ private:
 	{
 		std::ostringstream msg;
 		msg << errmsg << ": " << ec.message() << " (" << ec.value() << ")";
-		notify( Connection::Event::FAILED, ec.message().c_str());
+		notify( Connection::Event::FAILED, msg.str().c_str());
 	}
 
 	void handle_connect( const boost::system::error_code &ec, boost::asio::ip::tcp::resolver::iterator)
@@ -227,6 +227,7 @@ private:
 		// for TransportLayerSSL we do the handshake
 		m_deadline_timer->expires_from_now( boost::posix_time::seconds( m_config.m_connect_timeout));
 		m_socket->async_handshake( boost::asio::ssl::stream_base::client, boost::bind(&ConnectionImpl::handle_handshake, this, _1));
+		notify( Connection::Event::STATE, "handshake");
 	}
 #endif
 	void handshake()
@@ -248,7 +249,6 @@ private:
 			m_state = Connection::READY;
 			notify( Connection::Event::READY);
 			conn_read();
-			post_operation();
 		}
 	}
 
@@ -302,7 +302,6 @@ private:
 		else
 		{
 			m_connectionHandler->pushData( m_buffer, bytes_transferred);
-			conn_read();
 			post_operation();
 		}
 	}
