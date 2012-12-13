@@ -47,7 +47,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-#if WITH_PGSQL
+#ifdef WITH_PGSQL
 #include <libpq-fe.h>
 #endif
 #define BOOST_FILESYSTEM_VERSION 3
@@ -61,7 +61,7 @@ using namespace wtest;
 static bool check_PGSQL_RUNNING()
 {
 	static bool rt = false;
-#if WITH_PGSQL
+#ifdef WITH_PGSQL
 	if (rt) return true;
 	static const char *connstr = "host='localhost' user='wolfusr' password='wolfpwd' dbname='wolframe'";
 	PGconn* conn = PQconnectdb( connstr);

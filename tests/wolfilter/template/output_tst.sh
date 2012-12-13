@@ -36,7 +36,7 @@ fi
 if [ `echo $testname | grep -c '_sqlite'` != "0" ]; then
 	echo '**requires:SQLITE3' >> $output
 fi
-if [ `echo $testname | grep -c '_pgsql'` != "0" ]; then
+if [ `echo $testname | grep -c '_postgresql'` != "0" ]; then
 	echo '**requires:PGSQL' >> $output
 fi
 if [ x"$disabled" = x"1" ]; then

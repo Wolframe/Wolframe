@@ -31,7 +31,7 @@ Project Wolframe.
 ************************************************************************/
 #include "directmapCommandHandler.hpp"
 #include "serialize/struct/filtermapBase.hpp"
-#include "utils/doctype.hpp"
+#include "types/doctype.hpp"
 #include "langbind/appObjects.hpp"
 #include "filter/typingfilter.hpp"
 #include "logger-v1.hpp"
@@ -152,7 +152,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 					if (m_inputfilter->getDocType( doctype) && !doctype.empty())
 					{
 						// if no input form is defined we check for the input document type and set the form on our own:
-						std::string doctypeid( utils::getIdFromDoctype( doctype));
+						std::string doctypeid( types::getIdFromDoctype( doctype));
 						const ddl::Form* df = m_provider->form( doctypeid);
 						if (!df) throw std::runtime_error( std::string( "input form '") + doctypeid + "' is not defined (document type '" + doctypeid + "')");
 

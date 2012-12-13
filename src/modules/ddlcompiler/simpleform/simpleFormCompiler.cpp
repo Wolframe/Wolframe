@@ -34,7 +34,7 @@ Project Wolframe.
 
 #include "simpleFormCompiler.hpp"
 #include "types/keymap.hpp"
-#include "utils/doctype.hpp"
+#include "types/doctype.hpp"
 #include <string>
 #include <vector>
 #include <cstring>
@@ -100,7 +100,7 @@ public:
 						m_isAttribute = true;
 						continue;
 					}
-					if (*ii == '*')
+					if (*ii == '!')
 					{
 						if (m_isMandatory) throw std::runtime_error( "Syntax error in Simple Form: duplicate attribute '*'");
 						if (m_isOptional) throw std::runtime_error( "Syntax error in Simple Form: contradicting attributes '*' and '?' set");

@@ -62,7 +62,8 @@ public:
 	///\brief Copy constructor
 	///\param[in] o lua table input filter to copy
 	LuaTableInputFilter( const LuaTableInputFilter& o)
-		:TypedInputFilter(o)
+		:types::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
+		,TypedInputFilter(o)
 		,LuaExceptionHandlerScope(o)
 		,m_ls(o.m_ls)
 		,m_stk(o.m_stk)
@@ -130,7 +131,8 @@ public:
 	///\brief Constructor
 	///\remark Expects that the lua stack is not modified by anyone but this class in the lifetime after the first call of LuaTableOutputFilter::print(ElementType,const Element&)
 	explicit LuaTableOutputFilter( lua_State* ls)
-		:LuaExceptionHandlerScope(ls)
+		:types::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
+		,LuaExceptionHandlerScope(ls)
 		,m_ls(ls)
 		,m_type(OpenTag)
 		,m_hasElement(false){}
@@ -138,7 +140,8 @@ public:
 	///\brief Copy constructor
 	///\param[in] o lua output filter to copy
 	LuaTableOutputFilter( const LuaTableOutputFilter& o)
-		:TypedOutputFilter(o)
+		:types::TypeSignature("langbind::LuaTableOutputFilter", __LINE__)
+		,TypedOutputFilter(o)
 		,LuaExceptionHandlerScope(o)
 		,m_ls(o.m_ls)
 		,m_type(o.m_type)

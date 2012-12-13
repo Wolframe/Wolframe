@@ -1,6 +1,7 @@
 **
 **requires:LUA
 **requires:LIBXML2
+**requires:PGSQL
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE test SYSTEM 'test.simpleform'>
@@ -1090,17 +1091,17 @@ end
 
 
 function CategoryHierarchyRequest()
-	output:as( "tree SYSTEM 'CategoryHierarchy.simpleform'")
+	output:as( {root='tree', system='CategoryHierarchy.simpleform'})
 	select_tree( "Category", "category", input:get())
 end
 
 function FeatureHierarchyRequest()
-	output:as( "tree SYSTEM 'FeatureHierarchy.simpleform'")
+	output:as( {root='tree', system='FeatureHierarchy.simpleform'})
 	select_tree( "Feature", "feature", input:get())
 end
 
 function TagHierarchyRequest()
-	output:as( "tree SYSTEM 'TagHierarchy.simpleform'")
+	output:as( {root='tree', system='TagHierarchy.simpleform'})
 	select_tree( "Tag", "tag", input:get())
 end
 
@@ -1117,17 +1118,17 @@ function pushTagHierarchy()
 end
 
 function CategoryRequest()
-	output:as( "category SYSTEM 'Category.simpleform'")
+	output:as( {root='category', system='Category.simpleform'})
 	select_node( "Category", "category", input:get())
 end
 
 function FeatureRequest()
-	output:as( "feature SYSTEM 'Feature.simpleform'")
+	output:as( {root='feature', system='Feature.simpleform'})
 	select_node( "Feature", "feature", input:get())
 end
 
 function TagRequest()
-	output:as( "tag SYSTEM 'Tag.simpleform'")
+	output:as( {root='tag', system='Tag.simpleform'})
 	select_node( "Tag", "tag", input:get())
 end
 
@@ -1170,7 +1171,7 @@ end
 -- manufacturers
 
 function ManufacturerListRequest( )
-	output:as( "list SYSTEM 'manufacturerList.simpleform'" )
+	output:as( {root='list', system='manufacturerList.simpleform'})
 	local t = formfunction( "selectManufacturerList" )( {} )
 	local f = form( "ManufacturerList" )
 	f:fill( t:get( ) )
@@ -1213,7 +1214,7 @@ end
 -- components
 
 function ComponentListRequest( )
-	output:as( "list SYSTEM 'componentList.simpleform'" )
+	output:as( {root='list', system='componentList.simpleform'})
 	local t = formfunction( "selectComponentList" )( {} )
 	local f = form( "ComponentList" )
 	f:fill( t:get( ) )
@@ -1285,7 +1286,7 @@ end
 -- pictures
 
 function PictureListRequest( )
-	output:as( "list SYSTEM 'PictureList.simpleform'" )
+	output:as( {root='list', system='PictureList.simpleform'})
 	filter().empty = false
 	local search = nil
 	for v,t in input:get( ) do
@@ -1303,7 +1304,7 @@ function PictureListRequest( )
 end
 
 function PictureRequest( )
-	output:as( "dummy SYSTEM 'Picture.simpleform'")
+	output:as( {root='dummy', system='Picture.simpleform'})
 	filter().empty = false
 	local id = nil
 	for v,t in input:get( ) do
@@ -1410,7 +1411,7 @@ end
 
 function run()
 	filter().empty = false
-	output:as( "result SYSTEM 'test.simpleform'")
+	output:as( {root='result', system='test.simpleform'})
 	output:opentag("result")
 	local itr = input:get()
 	for v,t in itr do

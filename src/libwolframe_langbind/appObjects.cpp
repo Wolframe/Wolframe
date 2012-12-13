@@ -58,12 +58,14 @@ InputFilterR& Input::getIterator()
 }
 
 RedirectFilterClosure::RedirectFilterClosure()
-	:m_state(0)
+	:types::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
+	,m_state(0)
 	,m_taglevel(0)
 	,m_elemtype(InputFilter::Value){}
 
 RedirectFilterClosure::RedirectFilterClosure( const TypedInputFilterR& i, const TypedOutputFilterR& o)
-	:m_state(0)
+	:types::TypeSignature("langbind::RedirectFilterClosure", __LINE__)
+	,m_state(0)
 	,m_taglevel(0)
 	,m_inputfilter(i)
 	,m_outputfilter(o)
@@ -71,7 +73,8 @@ RedirectFilterClosure::RedirectFilterClosure( const TypedInputFilterR& i, const 
 	{}
 
 RedirectFilterClosure::RedirectFilterClosure( const RedirectFilterClosure& o)
-	:m_state(o.m_state)
+	:types::TypeSignature(o)
+	,m_state(o.m_state)
 	,m_taglevel(o.m_taglevel)
 	,m_inputfilter(o.m_inputfilter)
 	,m_outputfilter(o.m_outputfilter)
@@ -151,7 +154,8 @@ bool RedirectFilterClosure::call()
 
 
 ApiFormData::ApiFormData( const serialize::StructDescriptionBase* descr_)
-	:m_descr(descr_)
+	:types::TypeSignature("langbind::ApiFormData", __LINE__)
+	,m_descr(descr_)
 	,m_data(std::calloc( descr_->size(), 1), std::free)
 {
 	void* ptr = m_data.get();
@@ -172,7 +176,8 @@ ApiFormData::~ApiFormData()
 
 
 FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
-	:m_func(f)
+	:types::TypeSignature("langbind::FormFunctionClosure", __LINE__)
+	,m_func(f)
 	,m_state(0)
 	,m_param_data(f.api_param())
 	,m_result_data(f.api_result())
@@ -180,7 +185,8 @@ FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
 	,m_parser(m_param_data.data(),m_param_data.descr()){}
 
 FormFunctionClosure::FormFunctionClosure( const FormFunctionClosure& o)
-	:m_func(o.m_func)
+	:types::TypeSignature(o)
+	,m_func(o.m_func)
 	,m_state(0)
 	,m_param_data(o.m_param_data)
 	,m_result_data(o.m_result_data)
@@ -217,7 +223,8 @@ bool FormFunctionClosure::call()
 
 
 TransactionFunctionClosure::TransactionFunctionClosure( const proc::ProcessorProvider* p, const db::TransactionFunction* f, const db::TransactionR& t)
-	:m_provider(p)
+	:types::TypeSignature("langbind::TransactionFunctionClosure", __LINE__)
+	,m_provider(p)
 	,m_func(f)
 	,m_state(0)
 	,m_inputstructptr(f->getInput())
@@ -227,7 +234,8 @@ TransactionFunctionClosure::TransactionFunctionClosure( const proc::ProcessorPro
 }
 
 TransactionFunctionClosure::TransactionFunctionClosure( const TransactionFunctionClosure& o)
-	:m_provider(o.m_provider)
+	:types::TypeSignature(o)
+	,m_provider(o.m_provider)
 	,m_func(o.m_func)
 	,m_state(o.m_state)
 	,m_input(o.m_input)
@@ -273,12 +281,14 @@ void TransactionFunctionClosure::init( const TypedInputFilterR& i)
 
 
 PrintFunctionClosure::PrintFunctionClosure( const prnt::PrintFunction* f)
-	:m_func(f)
+	:types::TypeSignature("langbind::PrintFunctionClosure", __LINE__)
+	,m_func(f)
 	,m_state(0)
 	,m_inputstruct(f->getInput()){}
 
 PrintFunctionClosure::PrintFunctionClosure( const PrintFunctionClosure& o)
-	:m_func(o.m_func)
+	:types::TypeSignature(o)
+	,m_func(o.m_func)
 	,m_state(o.m_state)
 	,m_input(o.m_input)
 	,m_inputstruct(o.m_inputstruct)

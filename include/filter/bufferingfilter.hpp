@@ -47,10 +47,12 @@ class BufferingInputFilter :public InputFilter
 {
 public:
 	BufferingInputFilter( InputFilter* ref)
-		:m_ref(ref->copy()),m_end(false){}
+		:types::TypeSignature("langbind::BufferingInputFilter", __LINE__)
+		,m_ref(ref->copy()),m_end(false){}
 
 	BufferingInputFilter( const BufferingInputFilter& o)
-		:InputFilter(o)
+		:types::TypeSignature(o)
+		,InputFilter(o)
 		,m_ref(o.m_ref->copy())
 		,m_end(o.m_end){}
 

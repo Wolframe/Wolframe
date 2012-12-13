@@ -1,6 +1,7 @@
 **
 **requires:LUA
 **requires:LIBXML2
+**requires:PGSQL
 **input
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <transactions>

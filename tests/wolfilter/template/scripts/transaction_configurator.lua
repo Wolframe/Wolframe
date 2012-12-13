@@ -9,7 +9,7 @@ end
 
 function run()
 	filter().empty = false
-	output:as( "result SYSTEM 'test.simpleform'")
+	output:as( {root='result', system='test.simpleform'})
 	output:opentag("result")
 	local itr = input:get()
 	for v,t in itr do

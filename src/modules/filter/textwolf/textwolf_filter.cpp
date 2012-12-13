@@ -74,7 +74,8 @@ struct InputFilterImpl:public InputFilter
 
 	///\brief Constructor
 	InputFilterImpl( const XMLFilterAttributes& attr)
-		:m_attributes(attr)
+		:types::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
+		,m_attributes(attr)
 		,m_parser( attr)
 		,m_src(0)
 		,m_srcsize(0)
@@ -83,7 +84,8 @@ struct InputFilterImpl:public InputFilter
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	InputFilterImpl( const InputFilterImpl& o)
-		:InputFilter( o)
+		:types::TypeSignature("langbind::InputFilterImpl (textwolf)", __LINE__)
+		,InputFilter( o)
 		,m_attributes( o.m_attributes)
 		,m_parser( o.m_parser)
 		,m_src(o.m_src)
@@ -313,14 +315,16 @@ struct OutputFilterImpl :public OutputFilter
 	///\brief Constructor
 	///\param [in] bufsize (optional) size of internal buffer to use (for the tag hierarchy stack)
 	OutputFilterImpl( const XMLFilterAttributes& attr)
-		:m_elemitr(0)
+		:types::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
+		,m_elemitr(0)
 		,m_attributes(attr)
 		,m_printer(attr){}
 
 	///\brief Copy constructor
 	///\param [in] o output filter to copy
 	OutputFilterImpl( const OutputFilterImpl& o)
-		:OutputFilter(o)
+		:types::TypeSignature("langbind::OutputFilterImpl (textwolf)", __LINE__)
+		,OutputFilter(o)
 		,m_elembuf(o.m_elembuf)
 		,m_elemitr(o.m_elemitr)
 		,m_attributes(o.m_attributes)

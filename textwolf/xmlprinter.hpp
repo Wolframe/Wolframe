@@ -252,9 +252,9 @@ private:
 				}
 				else
 				{
-					printToBuffer( "<!DOCTYPE \"", 11, buf);
+					printToBuffer( "<!DOCTYPE ", 11, buf);
 					printToBuffer( rootid, std::strlen( rootid), buf);
-					printToBuffer( "\">", 2, buf);
+					printToBuffer( ">", 2, buf);
 				}
 			}
 		}

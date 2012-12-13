@@ -41,7 +41,7 @@
 #include "config/ConfigurationTree.hpp"
 #include "serialize/structOptionParser.hpp"
 #include "utils/miscUtils.hpp"
-#include "utils/doctype.hpp"
+#include "types/doctype.hpp"
 #include "config/structSerialize.hpp"
 #include "logger-v1.hpp"
 #include <boost/program_options.hpp>
@@ -53,6 +53,13 @@
 
 using namespace _Wolframe;
 using namespace _Wolframe::config;
+
+static bool checkNumber( const char* src)
+{
+	int ii;
+	for (ii=0; src[ii] >= '0' && src[ii] <= '9'; ++ii);
+	return src[ii]==0;
+}
 
 static std::string configurationTree_tostring( const boost::property_tree::ptree& pt)
 {
@@ -307,14 +314,20 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	bp = std::strchr( m_inputfilter.c_str(), '/');
 	if (bp)
 	{
-		m_inbufsize = (std::size_t)atoi( bp+1);
-		m_inputfilter.resize( bp-m_inputfilter.c_str());
+		if (checkNumber(bp+1))
+		{
+			m_inbufsize = (std::size_t)atoi( bp+1);
+			m_inputfilter.resize( bp-m_inputfilter.c_str());
+		}
 	}
 	bp = std::strchr( m_outputfilter.c_str(), '/');
 	if (bp)
 	{
-		m_outbufsize = (std::size_t)atoi( bp+1);
-		m_outputfilter.resize( bp-m_outputfilter.c_str());
+		if (checkNumber(bp+1))
+		{
+			m_outbufsize = (std::size_t)atoi( bp+1);
+			m_outputfilter.resize( bp-m_outputfilter.c_str());
+		}
 	}
 
 	std::ostringstream dd;

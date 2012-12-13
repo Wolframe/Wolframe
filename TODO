@@ -24,7 +24,6 @@ PF:
 - high prio
   - input:table() hangs in function_input_table (lua_touserdata)
   - UIForm loader in client and server
-  - change definition of doctype (table). pass string or table or filter to output:as
   - documentation (tutorial)
 
 - low prio
@@ -32,7 +31,6 @@ PF:
        -- openssl s_server -accept 7961 -cert tests/SSL/wolframed.crt -key tests/SSL/wolframed.key -state
   - test forms with SELF recursion
   - programs with interface (cleanup ProcProvider)
-  - bad error message for wolfilter --filter src/modules/filter/textwolf/mod_filter_textwolf (instead of --module ...)
   - Auditing extensions for Transactions
   - bignum tests (only bigint tested until now)
   - XSLT filter + tests

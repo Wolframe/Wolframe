@@ -176,13 +176,15 @@ class PrintInput :public langbind::TypedOutputFilter
 {
 public:
 	PrintInput( const HaruPdfPrintFunction::Impl* func)
-		:m_document( func->createDocument())
+		:types::TypeSignature("langbind::TypedOutputFilter (pdfPrinter)", __LINE__)
+		,m_document( func->createDocument())
 		,m_func(func)
 		,m_selectState(&func->parser())
 		,m_lasttype( langbind::TypedFilterBase::OpenTag){}
 
 	PrintInput( const PrintInput& o)
-		:langbind::TypedOutputFilter(o)
+		:types::TypeSignature("langbind::TypedOutputFilter (pdfPrinter)", __LINE__)
+		,langbind::TypedOutputFilter(o)
 		,m_document(o.m_document)
 		,m_variableScope(o.m_variableScope)
 		,m_func(o.m_func)

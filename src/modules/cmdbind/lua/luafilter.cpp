@@ -75,7 +75,8 @@ static bool getElementValue( lua_State* ls, int idx, TypedInputFilter::Element& 
 }
 
 LuaTableInputFilter::LuaTableInputFilter( lua_State* ls)
-	:LuaExceptionHandlerScope(ls)
+	:types::TypeSignature("langbind::LuaTableInputFilter", __LINE__)
+	,LuaExceptionHandlerScope(ls)
 	,m_ls(ls)
 {
 	FetchState fs;
