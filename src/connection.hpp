@@ -45,7 +45,6 @@
 #include <list>
 #include "connectionBase.hpp"
 #include "connectionHandler.hpp"
-#include "types/atomicCounter.hpp"
 #include <boost/thread/mutex.hpp>
 
 namespace _Wolframe {

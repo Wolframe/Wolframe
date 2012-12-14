@@ -2,8 +2,12 @@ FORM CategoryFeature
 {
 	CategoryFeature
 	{
-		form @string
 		category
+		{
+			id @int
+			_ string
+		}
+		CategoryFeature
 		{
 			id @int
 			_ string
@@ -17,5 +21,7 @@ FORM CategoryFeature
 		max_requires int
 		min_provides int
 		max_provides int
+		category_id @int
+		feature_id @int
 	}
 }

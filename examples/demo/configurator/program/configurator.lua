@@ -426,7 +426,7 @@ function createCategoryFeature( )
 	formfunction( "addCategoryFeature" )( categoryFeature )
 end
 
-function editCategoryFeature( )
+function deleteCategoryFeature( )
 	local categoryFeature = input:table( )["CategoryFeature"]
 	formfunction( "deleteCategoryFeature" )( categoryFeature )
 end
@@ -438,6 +438,16 @@ function CategoryFeatureRequest( )
 		feature_id = categoryFeature["feature_id"]
 	} )
 	local f = form( "CategoryFeature" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function CategoryFeatureListRequest( )
+	local categoryFeature = input:table( )["CategoryFeature"]
+	local t = formfunction( "selectCategoryFeatureList" )( {
+		category_id = categoryFeature["category_id"]
+	} )
+	local f = form( "CategoryFeatureList" )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
 end
