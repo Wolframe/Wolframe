@@ -442,6 +442,16 @@ function CategoryFeatureRequest( )
 	output:print( f:get( ) )
 end
 
+function CategoryFeatureListRequest( )
+	local categoryFeature = input:table( )["CategoryFeature"]
+	local t = formfunction( "selectCategoryFeatureList" )( {
+		category_id = categoryFeature["category_id"]
+	} )
+	local f = form( "CategoryFeatureList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
 -- pictures
 
 function PictureListRequest( )

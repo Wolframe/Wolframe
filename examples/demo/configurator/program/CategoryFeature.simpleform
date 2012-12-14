@@ -2,8 +2,12 @@ FORM CategoryFeature
 {
 	CategoryFeature
 	{
-		form @string
 		category
+		{
+			id @int
+			_ string
+		}
+		CategoryFeature
 		{
 			id @int
 			_ string

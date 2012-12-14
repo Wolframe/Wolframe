@@ -6,146 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>538</width>
-    <height>387</height>
+    <width>621</width>
+    <height>411</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Manage Categories</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
-    <layout class="QGridLayout" name="gridLayout_2">
-     <item row="0" column="1">
-      <widget class="QTreeWidget" name="feature">
-       <property name="itemsExpandable">
-        <bool>true</bool>
-       </property>
-       <property name="doctype" stdset="0">
-        <string notr="true">FeatureHierarchyRequest.simpleform</string>
-       </property>
-       <property name="rootelement" stdset="0">
-        <string notr="true">feature</string>
-       </property>
-       <property name="state" stdset="0">
-        <string notr="true">{global.featureState}</string>
-       </property>
-       <column>
-        <property name="text">
-         <string>feature</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>description</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>requires_min</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>requires_max</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>provides_min</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>provides_max</string>
-        </property>
-       </column>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QTreeWidget" name="category">
-       <property name="itemsExpandable">
-        <bool>true</bool>
-       </property>
-       <property name="doctype" stdset="0">
-        <string notr="true">CategoryHierarchyRequest.simpleform</string>
-       </property>
-       <property name="rootelement" stdset="0">
-        <string>category</string>
-       </property>
-       <property name="state" stdset="0">
-        <string notr="true">{global.categoryState}</string>
-       </property>
-       <column>
-        <property name="text">
-         <string>category</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>description</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>requires_min</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>requires_max</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>provides_min</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>provides_max</string>
-        </property>
-       </column>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QRadioButton" name="ignore_expand_cats">
-         <property name="text">
-          <string>expand all</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="ignore_collapse_cats">
-         <property name="text">
-          <string>collapse all</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="1" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QRadioButton" name="ignore_expand_feats">
-         <property name="text">
-          <string>expand all</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="ignore_collapse_feats">
-         <property name="text">
-          <string>collapse all</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
    <item row="5" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -159,14 +27,11 @@
        <property name="global.categoryState" stdset="0">
         <string notr="true">{category.state}</string>
        </property>
-       <property name="global.featureState" stdset="0">
-        <string notr="true">{feature.state}</string>
-       </property>
        <property name="global.category_id" stdset="0">
         <string>{category.id}</string>
        </property>
-       <property name="global.feature_id" stdset="0">
-        <string>{feature.id}</string>
+       <property name="global.CategoryFeatureState" stdset="0">
+        <string>{CategoryFeature.state}</string>
        </property>
       </widget>
      </item>
@@ -187,11 +52,11 @@
        <property name="rootelement" stdset="0">
         <string notr="true">CategoryFeature</string>
        </property>
-       <property name="global.featureState" stdset="0">
-        <string notr="true">{feature.state}</string>
-       </property>
        <property name="action" stdset="0">
         <string notr="true">update</string>
+       </property>
+       <property name="global.CategoryFeatureState" stdset="0">
+        <string>{CategoryFeature.state}</string>
        </property>
       </widget>
      </item>
@@ -206,8 +71,8 @@
        <property name="global.categoryState" stdset="0">
         <string notr="true">{category.state}</string>
        </property>
-       <property name="global.featureState" stdset="0">
-        <string notr="true">{feature.state}</string>
+       <property name="global.CategoryFeatureState" stdset="0">
+        <string>{CategoryFeature.state}</string>
        </property>
       </widget>
      </item>
@@ -285,15 +150,140 @@
      </item>
     </layout>
    </item>
+   <item row="2" column="0">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="1" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QRadioButton" name="ignore_expand_cats">
+         <property name="text">
+          <string>expand all</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="ignore_collapse_cats">
+         <property name="text">
+          <string>collapse all</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="2">
+      <widget class="QTableWidget" name="CategoryFeature">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SingleSelection</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+       <property name="doctype" stdset="0">
+        <string>CategoryFeatureListRequest.simpleform</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string>CategoryFeature</string>
+       </property>
+       <property name="state" stdset="0">
+        <string>{global.CategoryFeatureState}</string>
+       </property>
+       <property name="category_id" stdset="0">
+        <string>{category.id}</string>
+       </property>
+       <column>
+        <property name="text">
+         <string>name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>min_requires</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>max_requires</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>min_provides</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>max_provides</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QTreeWidget" name="category">
+       <property name="itemsExpandable">
+        <bool>true</bool>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">CategoryHierarchyRequest.simpleform</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string>category</string>
+       </property>
+       <property name="state" stdset="0">
+        <string notr="true">{global.categoryState}</string>
+       </property>
+       <attribute name="headerDefaultSectionSize">
+        <number>200</number>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>category</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>description</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>Show</string>
+         </property>
+         <property name="action" stdset="0">
+          <string>CategoryFeature.reload</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>category</tabstop>
   <tabstop>ignore_expand_cats</tabstop>
   <tabstop>ignore_collapse_cats</tabstop>
-  <tabstop>feature</tabstop>
-  <tabstop>ignore_expand_feats</tabstop>
-  <tabstop>ignore_collapse_feats</tabstop>
   <tabstop>add</tabstop>
   <tabstop>reload_2</tabstop>
  </tabstops>
@@ -308,8 +298,8 @@
    <slot>expandAll()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>44</x>
-     <y>343</y>
+     <x>55</x>
+     <y>365</y>
     </hint>
     <hint type="destinationlabel">
      <x>47</x>
@@ -324,8 +314,8 @@
    <slot>collapseAll()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>264</x>
-     <y>343</y>
+     <x>306</x>
+     <y>365</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
@@ -334,34 +324,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>ignore_expand_feats</sender>
-   <signal>clicked()</signal>
-   <receiver>feature</receiver>
-   <slot>expandAll()</slot>
+   <sender>category</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>pushButton</receiver>
+   <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>396</x>
-     <y>343</y>
+     <x>117</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>305</x>
-     <y>172</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ignore_collapse_feats</sender>
-   <signal>clicked()</signal>
-   <receiver>feature</receiver>
-   <slot>collapseAll()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>526</x>
-     <y>343</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>446</x>
-     <y>172</y>
+     <x>437</x>
+     <y>359</y>
     </hint>
    </hints>
   </connection>
