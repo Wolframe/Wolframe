@@ -46,6 +46,7 @@
 #include "connectionBase.hpp"
 #include "connectionHandler.hpp"
 #include "types/atomicCounter.hpp"
+#include <boost/thread/mutex.hpp>
 
 namespace _Wolframe {
 namespace net {
@@ -95,15 +96,17 @@ public:
 		m_globalList.addList( this );
 	}
 
-	std::size_t size()	{ return m_connList.size(); }
+	std::size_t size()	{ return m_size; }
 
-	void push( T conn )	{ m_connList.push_back( conn ); }
+	void push( T conn )	{ boost::mutex::scoped_lock lock(m_mutex); ++m_size; m_connList.push_back( conn ); }
 
-	void remove( T conn )	{ m_connList.remove( conn ); }
+	void remove( T conn )	{ boost::mutex::scoped_lock lock(m_mutex); --m_size; m_connList.remove( conn ); }
 
 	T pop()	{
+		boost::mutex::scoped_lock lock(m_mutex);
 		if ( m_connList.empty())
 			return T();
+		--m_size;
 		T conn = m_connList.front();
 		m_connList.pop_front();
 		return conn;
@@ -111,19 +114,21 @@ public:
 
 	bool isFull()	{
 		if ( m_maxConn > 0 )	{
-			LOG_DATA << "Connections on socket: " << m_connList.size() << " of maximum " << m_maxConn;
-			return(( m_connList.size() >= m_maxConn ) || m_globalList.isFull() );
+			LOG_DATA << "Connections on socket: " << m_size << " of maximum " << m_maxConn;
+			return(( m_size >= m_maxConn ) || m_globalList.isFull() );
 		}
 		else	{
-			LOG_DATA << "Connections on socket: " << m_connList.size() << ", no maximum limit";
+			LOG_DATA << "Connections on socket: " << m_size << ", no maximum limit";
 			return( m_globalList.isFull() );
 		}
 	}
 
 private:
 	std::list< T >		m_connList;
+	unsigned		m_size;
 	unsigned		m_maxConn;
 	GlobalConnectionList&	m_globalList;
+	boost::mutex		m_mutex;
 };
 
 

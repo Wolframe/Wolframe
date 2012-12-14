@@ -13,7 +13,3 @@ Example:
 	foreach ff in `ls request/insert/*`; do wolframec -d $ff; done && \
 	foreach ff in `ls request/select/*`; do wolframec -d $ff; done
 
-
-
-
-
