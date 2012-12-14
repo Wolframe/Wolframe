@@ -63,6 +63,28 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+       <property name="action" stdset="0">
+        <string>read</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string>CategoryFeatureRequest.simpleform</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string>CategoryFeature</string>
+       </property>
+       <property name="category_id" stdset="0">
+        <string>{global.category_id}</string>
+       </property>
+       <property name="feature_id" stdset="0">
+        <string>{global.feature_id}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="cancel">
        <property name="text">
         <string>Cancel</string>
@@ -293,6 +315,19 @@
        <item>
         <widget class="QSpinBox" name="max_requires"/>
        </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </item>
      <item row="2" column="0">
@@ -329,6 +364,19 @@
        </item>
        <item>
         <widget class="QSpinBox" name="max_provides"/>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
