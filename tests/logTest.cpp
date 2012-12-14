@@ -74,7 +74,7 @@ class testB	{
 public:
 //	testB()	{ std::cerr << "testB constructor called"; }
 
-	friend std::ostream& operator << ( std::ostream& o, const testB& )
+	friend std::ostream& operator << ( std::ostream&, const testB& )
 		{  throw std::runtime_error( "testB << operator called" ); }
 };
 
