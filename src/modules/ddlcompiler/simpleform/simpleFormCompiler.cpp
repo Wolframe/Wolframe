@@ -489,6 +489,15 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 				formmap.insert( form.name(), form);
 				result.push_back( form);
 			}
+			else if (boost::algorithm::iequals( itr->first, "STRUCT"))
+			{
+				if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after FORM");
+
+				Form form( "simpleform");
+				form.defineName( itr->second.data());
+				compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
+				formmap.insert( form.name(), form);
+			}
 			else
 			{
 				throw std::runtime_error( "FORM expected as top level node");
