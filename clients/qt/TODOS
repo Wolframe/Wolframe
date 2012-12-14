@@ -18,6 +18,8 @@ now:
 - search with flag (with children)
   
 musts:
+- delete needs manual set parameters, update and add use XML from widgets,
+  slightly assymetrical maybe?
 - tags picked from a list and added (needs events)
 - linking of categories and features
 - rewrite categories, so that joins to pictures, requires/provides, tags,

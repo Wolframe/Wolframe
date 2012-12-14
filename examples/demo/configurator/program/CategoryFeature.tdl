@@ -56,6 +56,6 @@ END
 
 TRANSACTION deleteCategoryFeature
 BEGIN
-	DO DELETE FROM CategRequires WHERE categoryID = $(category/id) AND featureID=$(CategoryFeature/id);
-	DO DELETE FROM CategProvides WHERE categoryID = $(category/id) AND featureID=$(CategoryFeature/id);
+	DO DELETE FROM CategRequires WHERE categoryID = $(category_id) AND featureID=$(feature_id);
+	DO DELETE FROM CategProvides WHERE categoryID = $(category_id) AND featureID=$(feature_id);
 END

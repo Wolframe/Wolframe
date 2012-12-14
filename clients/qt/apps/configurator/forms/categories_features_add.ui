@@ -13,9 +13,6 @@
   <property name="windowTitle">
    <string>Manage Categories</string>
   </property>
-  <property name="initAction" stdset="0">
-   <string>read</string>
-  </property>
   <property name="doctype" stdset="0">
    <string>CategoryFeatureRequest.simpleform</string>
   </property>
@@ -34,7 +31,7 @@
      <item>
       <widget class="QPushButton" name="link">
        <property name="text">
-        <string>Link</string>
+        <string>Add</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">categories_features</string>
@@ -186,6 +183,9 @@
        <property name="state" stdset="0">
         <string notr="true">{global.featureState}</string>
        </property>
+       <attribute name="headerDefaultSectionSize">
+        <number>200</number>
+       </attribute>
        <column>
         <property name="text">
          <string>feature</string>
@@ -194,16 +194,6 @@
        <column>
         <property name="text">
          <string>description</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>requires</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>provides</string>
         </property>
        </column>
       </widget>
@@ -222,6 +212,9 @@
        <property name="state" stdset="0">
         <string notr="true">{global.categoryState}</string>
        </property>
+       <attribute name="headerDefaultSectionSize">
+        <number>200</number>
+       </attribute>
        <column>
         <property name="text">
          <string>category</string>
@@ -230,16 +223,6 @@
        <column>
         <property name="text">
          <string>description</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>requires</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>provides</string>
         </property>
        </column>
       </widget>

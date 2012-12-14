@@ -426,7 +426,7 @@ function createCategoryFeature( )
 	formfunction( "addCategoryFeature" )( categoryFeature )
 end
 
-function editCategoryFeature( )
+function deleteCategoryFeature( )
 	local categoryFeature = input:table( )["CategoryFeature"]
 	formfunction( "deleteCategoryFeature" )( categoryFeature )
 end

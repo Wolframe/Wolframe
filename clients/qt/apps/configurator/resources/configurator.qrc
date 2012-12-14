@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="images">
+    <file>link_edit.png</file>
     <file>link_add.png</file>
     <file>link.png</file>
     <file>chart_organisation_add.png</file>
