@@ -48,18 +48,18 @@ namespace _Wolframe {
 namespace net	{
 
 server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandler )
-	: threadPoolSize_( conf->threads ),
-	  IOservice_(),
-	  globalList_( conf->maxConnections )
+	: m_threadPoolSize( conf->threads ),
+	  m_IOservice(),
+	  m_globalList( conf->maxConnections )
 {
 	int i = 0;
 	for ( std::list<ServerTCPendpoint>::const_iterator it = conf->address.begin();
 	      it != conf->address.end(); it++ )	{
-		acceptor* acptr = new acceptor( IOservice_,
+		acceptor* acptr = new acceptor( m_IOservice,
 						it->host(), it->port(), it->maxConnections(),
-						globalList_,
+						m_globalList,
 						serverHandler );
-		acceptor_.push_back( acptr );
+		m_acceptors.push_back( acptr );
 		i++;
 	}
 	LOG_DEBUG << i << " network acceptor(s) created.";
@@ -67,14 +67,14 @@ server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandl
 	i = 0;
 	for ( std::list<ServerSSLendpoint>::const_iterator it = conf->SSLaddress.begin();
 	      it != conf->SSLaddress.end(); it++ )	{
-		SSLacceptor* acptr = new SSLacceptor( IOservice_,
+		SSLacceptor* acptr = new SSLacceptor( m_IOservice,
 						      it->certificate(), it->key(),
 						      it->verifyClientCert(),
 						      it->CAchain(), it->CAdirectory(),
 						      it->host(), it->port(), it->maxConnections(),
-						      globalList_,
+						      m_globalList,
 						      serverHandler );
-		SSLacceptor_.push_back( acptr );
+		m_SSLacceptors.push_back( acptr );
 		i++;
 	}
 	LOG_DEBUG << i << " network SSL acceptor(s) created.";
@@ -88,14 +88,14 @@ server::~server()
 	LOG_TRACE << "Server destructor called";
 
 	std::size_t	i = 0;
-	for ( std::list< acceptor* >::iterator it = acceptor_.begin();
-	      it != acceptor_.end(); it++, i++ )
+	for ( std::list< acceptor* >::iterator it = m_acceptors.begin();
+	      it != m_acceptors.end(); it++, i++ )
 		delete *it;
 	LOG_TRACE << i << " acceptor(s) deleted";
 #ifdef WITH_SSL
 	i = 0;
-	for ( std::list< SSLacceptor* >::iterator it = SSLacceptor_.begin();
-	      it != SSLacceptor_.end(); it++, i++ )
+	for ( std::list< SSLacceptor* >::iterator it = m_SSLacceptors.begin();
+	      it != m_SSLacceptors.end(); it++, i++ )
 		delete *it;
 	LOG_TRACE << i << " SSL acceptor(s) deleted";
 #endif // WITH_SSL
@@ -108,8 +108,8 @@ void server::run()
 	std::vector< boost::shared_ptr<boost::thread> >	threads;
 	std::size_t					i;
 
-	for ( i = 0; i < threadPoolSize_; i++ )	{
-		boost::shared_ptr<boost::thread> thread( new boost::thread( boost::bind( &boost::asio::io_service::run, &IOservice_ )));
+	for ( i = 0; i < m_threadPoolSize; i++ )	{
+		boost::shared_ptr<boost::thread> thread( new boost::thread( boost::bind( &boost::asio::io_service::run, &m_IOservice )));
 		threads.push_back( thread );
 	}
 	LOG_TRACE << i << " network server thread(s) started";
@@ -119,7 +119,7 @@ void server::run()
 		threads[i]->join();
 
 	// Reset io_services.
-	IOservice_.reset();
+	m_IOservice.reset();
 }
 
 /// Stop the server i.e. notify acceptors to stop
@@ -128,14 +128,14 @@ void server::stop()
 	LOG_DEBUG << "Network server received a shutdown request";
 
 	std::size_t	i = 0;
-	for ( std::list< acceptor* >::iterator it = acceptor_.begin();
-	      it != acceptor_.end(); it++, i++ )
+	for ( std::list< acceptor* >::iterator it = m_acceptors.begin();
+	      it != m_acceptors.end(); it++, i++ )
 		(*it)->stop();
 	LOG_DEBUG << i << " acceptor(s) signaled to stop";
 #ifdef WITH_SSL
 	i = 0;
-	for ( std::list< SSLacceptor* >::iterator it = SSLacceptor_.begin();
-	      it != SSLacceptor_.end(); it++, i++ )
+	for ( std::list< SSLacceptor* >::iterator it = m_SSLacceptors.begin();
+	      it != m_SSLacceptors.end(); it++, i++ )
 		(*it)->stop();
 	LOG_DEBUG << i << " SSL acceptor(s) signaled to stop";
 #endif // WITH_SSL
@@ -146,7 +146,7 @@ void server::stop()
 void server::abort()
 {
 	LOG_DEBUG << "Network server received an abort request";
-	IOservice_.stop();
+	m_IOservice.stop();
 }
 
 }} // namespace _Wolframe::net

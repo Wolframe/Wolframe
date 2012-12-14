@@ -19,7 +19,7 @@ TRANSACTION selectPicture -- (/picture/id)
 BEGIN
 	INTO picture DO UNIQUE
 		SELECT Picture.ID AS "id", image, caption, info, width, height,
-			coalesce( group_concat( Tag.name ), '' ) as tags,
+			coalesce( group_concat( distinct Tag.name ), '' ) as tags,
 			3*length(image)/4+2 as size,
 			coalesce( group_concat( distinct Category.name ), '' ) as used_categories,
 			coalesce( group_concat( distinct Feature.name ), '' ) as used_features
