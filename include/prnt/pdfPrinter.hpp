@@ -48,6 +48,7 @@ class HaruPdfPrintFunction :public PrintFunction
 public:
 	///\brief Constructor
 	///\param[in] description Source of the document print description
+	///\param[in] createDocument Function to create a document
 	HaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument);
 	///\brief Destructor
 	virtual ~HaruPdfPrintFunction();
@@ -64,7 +65,9 @@ private:
 	Impl* m_impl;		//< hidden implementation (PIMPL)
 };
 
+///\brief Create a print function from a description
 ///\param[in] description print description source
+///\param[in] createDocument Function to create a document
 PrintFunction* createHaruPdfPrintFunction( const std::string& description, CreateDocumentFunc createDocument);
 
 }}//namespace

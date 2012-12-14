@@ -87,6 +87,7 @@ public:
 	///\brief Get next element
 	///\param [out] type element type parsed
 	///\param [out] element reference to element returned
+	///\param [out] elementsize size of element returned in bytes
 	///\return true, if success, false, if not.
 	///\remark Check the state when false is returned
 	virtual bool getNext( ElementType& type, const void*& element, std::size_t& elementsize);

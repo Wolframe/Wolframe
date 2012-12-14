@@ -227,6 +227,7 @@ public:
 
 	///\brief Initialization of call context for a new call
 	///\param[in] i call input
+	///\param[in] o call output
 	void init( const TypedInputFilterR& i, const TypedOutputFilterR& o);
 
 	const TypedInputFilterR& inputfilter() const		{return m_inputfilter;}
@@ -276,6 +277,7 @@ public:
 
 	///\brief Initialization of call context for a new call
 	///\param[in] i call input
+	///\param[in] flags serialization flags depending on context (directmap "strict",lua relaxed)
 	void init( const TypedInputFilterR& i, serialize::Context::Flags flags);
 
 	const serialize::StructSerializer& result() const		{return m_result;}
@@ -296,7 +298,9 @@ class TransactionFunctionClosure
 {
 public:
 	///\brief Constructor
+	///\param[in] provider_ processor provider to allocate transaction object
 	///\param[in] f function called
+	///\param[in] t transaction context, if provided by caller
 	TransactionFunctionClosure( const proc::ProcessorProvider* provider_, const db::TransactionFunction* f, const db::TransactionR& t=db::TransactionR());
 
 	///\brief Copy constructor

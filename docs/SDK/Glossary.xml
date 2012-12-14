@@ -7,20 +7,18 @@
 		Application Building Manual
 	</para>
 
-<glossdiv><title>E</title>
+<glossdiv><title>External glossary</title>
 
-	<glossentry id="xml"><glossterm>Extensible Markup Language</glossterm>
-		<acronym>XML</acronym>
-		<abbrev>ISO 8879:1986</abbrev>
+	<glossentry id="DDL"><glossterm>Data Definition Language</glossterm>
+		<acronym>DDL</acronym>
 		<glossdef>
-			<para>Some reasonable definition here. BTW, this just an example.</para>
-			<glossseealso otherterm="xml">loop to XML</glossseealso>
+			<para>A domain specific language for describing data structures</para>
 		</glossdef>
 	</glossentry>
 
 </glossdiv>
 
-<glossdiv><title>Our glossary</title>
+<glossdiv><title>Wolframe glossary</title>
 
 	<glossentry><glossterm>Connection Handler</glossterm>
 		<glossdef>
@@ -42,19 +40,25 @@
 	</glossentry>
 	<glossentry><glossterm>Network Output</glossterm>
 		<glossdef>
-			<para>Data passed back  through the channel to the networking framework from the connection handler as output of processing.
-			</para>
-		</glossdef>
-	</glossentry>
-	<glossentry><glossterm>Transaction</glossterm>
-		<glossdef>
-			<para>A transaction is a call of a database or another function involving resources. A transaction either fails completely or succeeds a whole and is object of auditing seen as part of the transaction. It has an object as input and returns an object or an error as result. Transaction functions are loaded by the system at startup and have a unique name.
+			<para>Data passed back through the channel to the networking framework from the connection handler as output of processing.
 			</para>
 		</glossdef>
 	</glossentry>
 	<glossentry><glossterm>Program</glossterm>
 		<glossdef>
-			<para>A program is executed by a command handler. It works with data input, data output and transaction execution as only interfaces to the system. Exceptions, signals and events are handled by the processor in the background without showing up the the program. A program in this context is sequential.
+			<para>A set of named units of description of processing or data in a source file. The source file is loaded and interpreted at server startup. It exports some unique symbols to address single units in a program library. All units in this library are usable in any context of the logic tier.
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry><glossterm>Transaction</glossterm>
+		<glossdef>
+			<para>A transaction is a call of a database defined in a transaction program. A transaction either fails completely or succeeds a whole and is object of auditing seen as part of the transaction. It has an object as input and returns an object or an error as result.
+			</para>
+		</glossdef>
+	</glossentry>
+	<glossentry><glossterm>Processor program</glossterm>
+		<glossdef>
+			<para>A program that is executed by a command handler. It works with data input, data output and transaction execution as only interfaces to the system. Exceptions, signals and events are handled by the processor in the background without showing up the the program. A program in this context is sequential.
 			</para>
 		</glossdef>
 	</glossentry>
@@ -72,7 +76,7 @@
 	</glossentry>
 	<glossentry><glossterm>Form</glossterm>
 		<glossdef>
-			<para>A form is a hierarchical description of typed data. Forms are used to create objects from a data structure representation in the program and to map them back. In Lua for example forms are used to create transaction input from Lua tables and to map the transaction output back to its representation as lua table. Forms are loaded by the system at startup and have a unique name.
+			<para>A form is a hierarchical description of typed data. Forms are used to create objects from a data structure representation in the program and to map them back. In Lua for example forms are used to create transaction input from Lua tables and to map the transaction output back to its representation as lua table. Forms are defined in programs written in a DDL (Data Definition Language).
 			</para>
 		</glossdef>
 	</glossentry>
@@ -110,11 +114,11 @@
 	<glossentry id="EoD"><glossterm>End Of Data (EoD)</glossterm>
 		<abbrev>EoD</abbrev>
 		<glossdef>
-			<para>Marks the end of the data to be processed by a processor. End of data is marked with CR LF dot ('.') CR LF or LF dot LF. For passing lines with a dot ('.') at the start of a content line, the client has to escape an LF dot in the content with LF dot dot.
+			<para>Marks the end of the data to be processed by a processor. End of data is marked with CR LF dot ('.') CR LF or LF dot LF. For passing lines with a dot ('.') at the start of a content line, the client has to escape an LF dot in the content with LF dot dot. This escaping applies also to the result returned to the client. So client has to unescape LF dot sequences by replacing them by a LF.
 			</para>
 		</glossdef>
 	</glossentry>
-	<glossentry id="EoM"><glossterm>End Of Message</glossterm>
+	<glossentry id="EoM"><glossterm>End Of Message (EoM)</glossterm>
 		<abbrev>EoM</abbrev>
 		<glossdef>
 			<para>Marks the end of a network input message. End of message is handled by the processor without showing up to the processor program (yield execution).

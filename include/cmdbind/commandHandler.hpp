@@ -108,7 +108,7 @@ public:
 	}
 
 	///\brief Pass the reference to the processor provider to the command handler
-	///\param[in] the reference to the processor provider
+	///\param[in] p the reference to the processor provider
 	void setProcProvider( const proc::ProcessorProvider* p)
 	{
 		m_provider = p;

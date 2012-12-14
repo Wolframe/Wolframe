@@ -148,7 +148,8 @@ protected:
 	///\remark The command cmd_ must exist, though it may fail
 	///\param[in] cmd_ command of the current state to execute
 	///\param[in] argc_ number of arguments to pass to the command
-	///\param[in] argc_ the arguments to pass to the command
+	///\param[in] argv_ the arguments to pass to the command
+	///\param[out] out stream for protocol output of the command
 	int runCommand( const char* cmd_, int argc_, const char** argv_, std::ostream& out);
 
 

@@ -1,13 +1,11 @@
 <!-- Tutorials -->
 <chapter>
-<title>Tutorials</title>
-<para>Wolframe offers several ways to write the data transformation programs of the 2nd tier.
-	In this chapter these ways to write programs are introduced in a tutorial. Most of the interfaces
-	and terms are common to the language bindings of Wolframe and described in the glossary.
+<title>Programs for the logic tier</title>
+<para>This chapter introduces the programs of the logic tier.
 </para>
-	&SDKtutorialProgramLua;
+	&SDKtutorialTransactions;
 	&SDKtutorialForms;
-	&SDKtutorialConfiguration;
+	&SDKtutorialProgramLua;
 </chapter>
 
 

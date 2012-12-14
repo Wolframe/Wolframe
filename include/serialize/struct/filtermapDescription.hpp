@@ -58,7 +58,7 @@ struct StructDescription :public StructDescriptionBase
 
 	///\brief Operator to build the structure description element by element
 	///\tparam Element element type
-	///\param[in] name name of the element
+	///\param[in] tag name of the element
 	///\param[in] eptr pointer to member of the element
 	template <typename Element>
 	StructDescription& operator()( const char* tag, Element Structure::*eptr)

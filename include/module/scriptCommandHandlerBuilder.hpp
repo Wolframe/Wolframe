@@ -121,6 +121,9 @@ public:
 		,m_classname(classname_){}
 	virtual ~ScriptCommandHandlerConfig(){}
 
+	///\brief Parse the configuration
+	///\param[in] pt configuration tree
+	///\param[in] modules module directory
 	virtual bool parse( const config::ConfigurationTree& pt, const std::string&, const module::ModulesDirectory* modules)
 	{
 		m_modules = modules;
@@ -156,6 +159,8 @@ public:
 		return true;
 	}
 
+	///\brief Set canonical path for files referenced as relative path in configuration
+	///\param[in] referencePath reference path
 	virtual void setCanonicalPathes( const std::string& referencePath)
 	{
 		std::vector<std::string>::iterator pi = m_programfiles.begin(), pe = m_programfiles.end();

@@ -1,47 +1,237 @@
 <!-- Tutorial -->
 <sect1>
-<title>Writing Wolframe Transaction Definitions</title>
+<title>Defining Database Transactions</title>
 	<sect2>
 		<title>Introduction</title>
 		<para>Wolframe transactions are defined as functions in a transactional context.
-			The begin and the commit or abort are done automatically at the beginning
+			The begin and the commit or abort are done automatically at the begin
 			or at the end of a transaction function respectively,
 			if not explicitely defined otherwise in the scripting language.
-			For the description of transactions wolframe provides the definition language introduce here.
+			For the description of transactions <code>Wolframe</code> provides the definition language introduce here.
 			A transaction takes a structure as input and returns a structure as output.
-			Input and output structure are accessed is the same way as form structures
-			or serialized as XML.
-			</para>
+		</para>
 		<para>
-			The transaction definition language defines a transaction as a sequence of database commands.
+			The transaction definition language defines a transaction as a sequence of database operations.
+			A database operation is either a single database instruction (SELECT,UPDATE,etc.) or a name reference to
+			a prepared statement or a block of operations delared with OPERATION.
 			It adds some constructs to address input structure elements or database command results as arguments.
 			Each database command result can be declared as beeing part of the transaction result structure.
 			The language has no control structures and is therefore not a general purpose programming language.
 			It just offers some direct mapping of input to commands and from commands results to output.
-			For programming wolframe offers some scripting language bindings to use outside the transactional context.
-			</para>
+			For programming <code>Wolframe</code> offers some scripting language bindings to use outside the transactional context.
+		</para>
 	</sect2>
 	<sect2>
-		<title></title>
-		<para>
+		<title>First example</title>
+		<para>This example selects a key from a table and uses it for a list inserts
+		<programlisting language='sql'>
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/first_example.tdl" parse="text" />
+		</programlisting>
 		</para>
+	</sect2>
+	<sect2>
+		<title>Description of keywords</title>
 		<para>
-			Keywords in the transaction definition language
 			<simplelist type="horiz" columns="2">
-			<member>FOREACH</member><member>..</member>
-			<member>INTO</member><member>..</member>
-			<member>DO</member><member>..</member>
-			<member>UNIQUE</member><member>..</member>
-			<member>NONEMPTY</member><member>..</member>
+			<member>TRANSACTION</member><member>Defines a block of statements as transaction.</member>
+			<member>OPERATION</member><member>Defines a block of statements as single operation.</member>
+			<member>BEGIN</member><member>Marks the start of an execution block defined as TRANSACTION or OPERATION. Execution blocks cannot be nested</member>
+			<member>END</member><member>Marks the end of an execution block.</member>
+			<member>RESULT INTO</member><member>Followed by a tag defining an outer tag in the result of the execution block.</member>
+			<member>AUTHORIZE</member><member>Followed by a pair of identifiers in '(' ')' brackets, separated by a comma. Defines the method to call for granting authorization to the caller of this transaction.</member>
+			<member>FOREACH</member><member>Followed by a selection path. Defines a selection in nodes of the input. The operation is executed for each member of the selection. All relative path expressions in the operation arguments have the path of the selected element of the operation as base.</member>
+			<member>INTO</member><member>Followed by an identifier that declares the result tag for each result element of this operation</member>
+			<member>DO</member><member>Starts the operation declaration. It is followed by an embedded SQL command terminated with ';' or by an operation call</member>
+			<member>UNIQUE</member><member>constraint on operation result: Result must be unique, if it exists</member>
+			<member>NONEMPTY</member><member>constraint on operation result: Result must not be empty</member>
 			</simplelist>
-			</para>
+		</para>
+	</sect2>
+	<sect2>
+		<title>Substitutes in operations</title>
 		<para>
-			Substitutes in the transaction definition language
+			Substitutes in the SQL statements and argument lists of named operations of the transaction definition language
 			<simplelist type="horiz" columns="3">
 			<member>Element</member><member>Example</member><member>Description</member>
 			<member>$NNN</member><member>$1</member><member>Column of one row of last result. The command is executed for each row of the last result</member>
-			<member>$(path)</member><member>$(id)</member><member>Single element addressed by relative path from the FOREACH selection</member>
+			<member>$(path)</member><member>$(persone/id)</member><member>Single element addressed by relative path from the FOREACH selection</member>
 			</simplelist>
-			</para>
+		</para>
+	</sect2>
+	<sect2>
+		<title>EBNF of the transaction definition language</title>
+		<productionset>
+		<title>Transaction definitions</title>
+
+		<production id="Identifier">
+		<lhs>Identifier</lhs>
+		<rhs>
+			( ['A'-'Z'] | ['a'-'z'] | ['0'-'9'] | '_' ) +
+		</rhs>
+		</production>
+
+		<production id="Number">
+		<lhs>Number</lhs>
+		<rhs>
+			( ['0'-'9'] ) +
+		</rhs>
+		</production>
+
+		<production id="Selection">
+		<lhs>Selection</lhs>
+		<rhs>
+			(
+				( '/' | '//' | )
+				( Identifier | '..' )
+				( <nonterminal def="#Selection">Selection</nonterminal> | )
+			)
+		</rhs>
+		</production>
+
+		<production id="Destination">
+		<lhs>Destination</lhs>
+		<rhs>
+			'INTO'
+			<nonterminal def="#Identifier">Identifier</nonterminal>
+		</rhs>
+		</production>
+
+		<production id="Foreach">
+		<lhs>Foreach</lhs>
+		<rhs>
+			'FOREACH'
+			<nonterminal def="#Selection">Selection</nonterminal>
+		</rhs>
+		</production>
+
+		<production id="EmbeddedOp">
+		<lhs>EmbeddedOp</lhs>
+		<rhs>
+			SQLStatement
+		</rhs>
+		</production>
+
+		<production id="Argument">
+		<lhs>Argument</lhs>
+		<rhs>
+			'$'
+			( <nonterminal def="#Number">Number</nonterminal>
+			| '(' <nonterminal def="#Selection">Selection</nonterminal> ')'
+			)
+		</rhs>
+		</production>
+
+		<production id="ArgumentLst">
+		<lhs>ArgumentLst</lhs>
+		<rhs>
+			( <nonterminal def="#Argument">Argument</nonterminal> ','
+			  <nonterminal def="#ArgumentLst">ArgumentLst</nonterminal>
+			|
+			  <nonterminal def="#Argument">Argument</nonterminal>
+			)
+		</rhs>
+		</production>
+
+		<production id="NamedOp">
+		<lhs>NamedOp</lhs>
+		<rhs>
+			<nonterminal def="#Identifier">Identifier</nonterminal>
+			'('
+				( <nonterminal def="#ArgumentLst">ArgumentLst</nonterminal> | )
+			')'
+		</rhs>
+		</production>
+
+		<production id="Action">
+		<lhs>Action</lhs>
+		<rhs>
+			'DO'
+				(
+					<nonterminal def="#EmbeddedOp">EmbeddedOp</nonterminal>
+				|	<nonterminal def="#NamedOp">NamedOp</nonterminal>
+				)
+		</rhs>
+		</production>
+
+		<production id="Statement">
+		<lhs>Statement</lhs>
+		<rhs>
+			( <nonterminal def="#Destination">Destination</nonterminal> | )
+			( <nonterminal def="#Foreach">Foreach</nonterminal> | )
+			<nonterminal def="#Action">Action</nonterminal>
+			';'
+		</rhs>
+		</production>
+
+		<production id="StatementLst">
+		<lhs>StatementLst</lhs>
+		<rhs>
+			( <nonterminal def="#Statement">Statement</nonterminal>
+			|  <nonterminal def="#Statement">Statement</nonterminal>
+			   <nonterminal def="#StatementLst">StatementLst</nonterminal>
+			)
+		</rhs>
+		</production>
+
+		<production id="OpBody">
+		<lhs>OpBody</lhs>
+		<rhs>
+			'BEGIN'
+			<nonterminal def="#StatementLst">StatementLst</nonterminal>
+			'END'
+		</rhs>
+		</production>
+
+		<production id="Operation">
+		<lhs>Operation</lhs>
+		<rhs>
+			'OPERATION' <nonterminal def="#Identifier">Identifier</nonterminal>
+			( 'RESULT' 'INTO' <nonterminal def="#Identifier">Identifier</nonterminal> | )
+			<nonterminal def="#OpBody">OpBody</nonterminal>
+		</rhs>
+		</production>
+
+		<production id="Transaction">
+		<lhs>Transaction</lhs>
+		<rhs>
+			'TRANSACTION' <nonterminal def="#Identifier">Identifier</nonterminal>
+			( 'RESULT' 'INTO' <nonterminal def="#Identifier">Identifier</nonterminal>
+			| 'AUTHORIZE' '(' <nonterminal def="#Identifier">Identifier</nonterminal> ','
+					<nonterminal def="#Identifier">Identifier</nonterminal> ')'
+			| )
+			<nonterminal def="#OpBody">OpBody</nonterminal>
+		</rhs>
+		</production>
+
+		<production id="Program">
+		<lhs>Program</lhs>
+		<rhs>
+			(
+			  <nonterminal def="#Transaction">Transaction</nonterminal>
+			| <nonterminal def="#Operation">Operation</nonterminal>
+			)
+			(
+			  <nonterminal def="#Program">Program</nonterminal>
+			| )
+		</rhs>
+		</production>
+
+		<productionrecap linkend="Identifier"/>
+		<productionrecap linkend="Number"/>
+		<productionrecap linkend="Selection"/>
+		<productionrecap linkend="Argument"/>
+		<productionrecap linkend="ArgumentLst"/>
+		<productionrecap linkend="EmbeddedOp"/>
+		<productionrecap linkend="NamedOp"/>
+		<productionrecap linkend="Destination"/>
+		<productionrecap linkend="Foreach"/>
+		<productionrecap linkend="Action"/>
+		<productionrecap linkend="Statement"/>
+		<productionrecap linkend="StatementLst"/>
+		<productionrecap linkend="OpBody"/>
+		<productionrecap linkend="Operation"/>
+		<productionrecap linkend="Transaction"/>
+		</productionset>
+	</sect2>
 </sect1>
 

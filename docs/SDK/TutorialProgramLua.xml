@@ -7,32 +7,30 @@
 		at PUC-Rio in Brazil by Roberto Ierusalimschy, Waldemar Celes and Luiz Henrique de Figueiredo
 		(see http://www.lua.org/authors.html). A tutorial for the use of Lua is not provided here.
 		For an introduction into programming with Lua see http://www.lua.org. The official manual also available as book
-		is very good. Wolframe introduces some Lua interface to access input and output and to do transactions.
-		The Lua Application Layer doesn't deal with protocol or encryption issues. The program gets just a filter
-		on the input to process, a filter as the output interface for data content to return to the client and an interface
-		to call transaction functions (for example to store and retrieve data from database) or other functions
-		(for example to to print content as PDF). In the following sections we describe this interfaces.
+		is very good. Wolframe introduces some Lua interfaces to access input and output and to do transactions.
+		The Lua application layer doesn't have to deal with protocol or encryption issues.
 	</para>
 	</sect2>
 	<sect2>
 	<title>Filter</title>
-	<para>The application input and output can be of different kind. This depends on the sort of
-		application and the client using the service. For different input and output Wolframe provides
+	<para>The application input and output can be of different kind.
+		For different input and output Wolframe provides
 		filters. The system provides a global function
 			<code>filter( )</code>
 		with the name of the filter as string as parameter. If you for example want to process data
-		as XML you need to get a filter by calling
+		as XML with 'libxml2' and libxml is not loaded as primary XML filter on your system,
+		then you need to get a filter by calling
 			<code>filter( "XML:libxml2" )</code>
 		The object returned by this function call can be attached to input or output. It uses the
-		library libxml2 for parsing the XML. You can have different filters for input and output,
-		but only one at a time.
+		library libxml2 for parsing the XML. The default filter attached to input and output is
+		"XML" that refers to the first filter module of category "XML" listed in the configuration of modules to load.
 	</para>
 	</sect2>
 	<sect2>
 	<title>Input</title>
 	<para>Input is a accessed over a global variable input. This object has the following methods:
 			<code>input:as( f )</code>
-		attaches a filter f to the input. Subsequent calls of get() will apply this filter f to get the input elements to process.
+		attaches a filter f to the input.
 			<code>input:get( )</code>
 		returns an iterator on the input that fetches one or two values per step depending on the filter. Unstructured input
 		fetches one value, the input element. Structured input fetches the element content as first value

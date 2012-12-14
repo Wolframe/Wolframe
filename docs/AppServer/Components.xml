@@ -14,23 +14,6 @@
 
 	<sect1>
 		<title>Database</title>
-		<sect2>
-			<title>Database Scripts</title>
-			<code>
-				ON ERROR ROLLBACK
-				BEGIN TRANSACTION;
-				SELECT gogo, momo FROM ootable WHERE fofo = $input.ooff;
-				LOOP ON RESULT $result
-					$output.momo = $result.momo
-					$output.gogo = $result.gogo + 1
-				END LOOP
-				LOOP ON $input.rows
-					INSERT INTO ggzz( aa, bb, cc )
-						VALUES ( $input.rows.aa, $input.rows.bb, $input.rows.cc );
-				END LOOP
-				END TRANSACTION;
-			</code>
-		</sect2>
 		<para></para>
 	</sect1>
 

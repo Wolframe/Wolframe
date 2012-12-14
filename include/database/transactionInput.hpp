@@ -278,6 +278,8 @@ public:
 
 public:
 	///\brief Start new command statement
+	///\param[in] functionidx index of the function in the list of calls in the transaction definition (starting with 0)
+	///\param[in] level in the hierarchy of operations to determine begin and end of an operation (starting with 1, incremented by one for the scope a sub operation)
 	///\param[in] stmname name of prepared statement
 	void startCommand( std::size_t functionidx, std::size_t level, const std::string& stmname)
 	{

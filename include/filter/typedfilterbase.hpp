@@ -118,21 +118,23 @@ public:
 		///\brief Typed filter element type
 		enum Type
 		{
-			bool_,double_,int_,uint_,string_
+			bool_,double_,int_,uint_,string_,blob_
 		};
-		///\enum String
+		///\struct String
 		///\brief POD data type for string as part of an union
 		struct String
 		{
 			std::size_t size;
 			const char* ptr;
 		};
+		///\struct Blob
+		///\brief POD data type for blob as part of an union
 		struct Blob
 		{
 			std::size_t size;
 			const void* ptr;
 		};
-		///\enum Value
+		///\union Value
 		///\brief Different incarnations of values depending of the elements type
 		union Value
 		{
@@ -151,6 +153,7 @@ public:
 			switch (type)
 			{
 				case string_: return std::string( value.string_.ptr, value.string_.size);
+				case blob_: return std::string( value.blob_.ptr, value.blob_.size);
 				case bool_: return value.bool_?"true":"false";
 				case double_: return boost::lexical_cast<std::string>( value.double_);
 				case int_: return boost::lexical_cast<std::string>( value.int_);

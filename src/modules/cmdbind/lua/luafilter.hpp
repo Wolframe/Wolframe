@@ -50,7 +50,7 @@ extern "C" {
 namespace _Wolframe {
 namespace langbind {
 
-///\class class LuaTableInputFilter
+///\class LuaTableInputFilter
 ///\brief Lua table as typed input filter
 class LuaTableInputFilter :public TypedInputFilter, public LuaExceptionHandlerScope
 {
@@ -123,7 +123,7 @@ private:
 };
 
 
-///\class class LuaTableOutputFilter
+///\class LuaTableOutputFilter
 ///\brief Lua table as typed output filter
 class LuaTableOutputFilter :public TypedOutputFilter, public LuaExceptionHandlerScope
 {

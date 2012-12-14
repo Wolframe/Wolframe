@@ -108,7 +108,6 @@ public:
 
 	///\brief Set type of the document.
 	///\remark For some types of filters (non buffering) the type has to be set before the first print
-	///\param [in] doctype the document type string
 	virtual void setDocType( const std::string& /*doctype*/)
 	{
 		throw std::runtime_error("document type can not be set for this type of filter");
@@ -133,8 +132,7 @@ public:
 	void setState( State s, const char* msg=0)	{m_state=s; setError(msg);}
 
 	///\brief Assigns the output filter state of another output filter
-	///\param [in] s new state
-	///\param [in] msg (optional) error to set
+	///\param [in] o the output filter to get the state from
 	void assignState( const OutputFilter& o)
 	{
 		m_state = o.m_state;

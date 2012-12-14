@@ -199,6 +199,9 @@ private:
 ///\brief Creates a database transaction function from its description source
 ///\param[in] name name of  the transaction
 ///\param[in] description transaction description source
+///\param[in] resultname name of the result (RESULT INTO definition)
+///\param[in] functionmap map op operations in the module context that can be referenced
+///\param[in] auth authorization definition structure for this function
 TransactionFunction* createTransactionFunction( const std::string& name, const std::vector<TransactionDescription>& description, const std::string& resultname, const types::keymap<TransactionFunctionR>& functionmap, const langbind::Authorization& auth);
 
 }}//namespace

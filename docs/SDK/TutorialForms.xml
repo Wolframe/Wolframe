@@ -1,10 +1,9 @@
 <!-- Tutorial -->
 <sect1>
-<title>Writing Wolframe Form Definitions</title>
+<title>Defining Forms</title>
 	<sect2>
 	<title>Introduction</title>
-	<para>Wolframe form structures can be defined in different ways. They can be defined
-		in a module as native C++ structure. In this shape they are used in APIs
+	<para>Forms can be defined in a module as native C++ structure. In this shape they are used in APIs
 		for built-in functions implemented in modules.
 	</para>
 	<para>
@@ -22,12 +21,10 @@
 		elements that validate and normalize the data elements.
 		Most of the business transactions should be doable as input form
 		description, output form description and a transaction that maps
-		input to output without control flow aware programming.
+		input to output without control flow aware programming (direct map).
 	</para>
 	<para>
 		All forms introduced here are equivalent in use for the programs.
-		In Lua for example they can simply be built from tables or from
-		an input iterator. See the Lua tutorial for details.
 	</para>
 	</sect2>
 	<sect2>

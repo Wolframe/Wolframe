@@ -64,7 +64,7 @@ std::string getCanonicalPath( const std::string& path, const std::string& refpat
 
 ///\brief Get the parent path of 'path' (skipping /./ as parent path unlike boost::filesystem does)
 ///\param[in] path the path to get the parent path from
-///\param[in] level how many level (1 = parent, 2 = granparent, etc.)
+///\param[in] levels how many level (1 = parent, 2 = granparent, etc.)
 ///\return the parent path
 std::string getParentPath( const std::string& path, unsigned int levels=1);
 
@@ -73,11 +73,13 @@ bool fileExists( const std::string& path);
 
 
 ///\brief Split the string, ingoring empty parts of the result (susequent split characters treated as one)
+///\param[out] res result of the split
 ///\param[in] inp string to split
 ///\param[in] splitchr set of characters to split with (each of them is one separating character)
 void splitString( std::vector<std::string>& res, const std::string& inp, const char* splitchr);
 
 ///\brief Split the string, ingoring empty parts of the result (susequent split characters treated as one)
+///\param[out] res result of the split
 ///\param[in] begin begin input iterator
 ///\param[in] end end input iterator
 ///\param[in] splitchr set of characters to split with (each of them is one separating character)

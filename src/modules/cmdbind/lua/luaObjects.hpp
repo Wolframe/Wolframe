@@ -100,6 +100,7 @@ class LuaScriptInstance
 {
 public:
 	///\brief Constructor
+	///\param[in] script script executed by this instance
 	///\param[in] modulemap_ map of modules that can be loaded
 	LuaScriptInstance( const LuaScript* script, const LuaModuleMap* modulemap_);
 	~LuaScriptInstance();

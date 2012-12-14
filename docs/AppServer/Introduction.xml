@@ -3,51 +3,46 @@
 	<title>Introduction</title>
 
 	<sect1>
-		<title>Overview</title>
-		<para><code>Wolframe</code> is nice software.
+		<title>Architecture</title>
+		<para><code>Wolframe</code> is a 3-tier application server.
 		</para>
-
-		<itemizedlist>
-			<listitem><para>wolfs,</para></listitem>
-			<listitem><para>cats,</para></listitem>
-		</itemizedlist>
-
 		<figure>
-			<title>Overview - Dia</title>
-			<mediaobject>
-				<imageobject>
-					<imagedata fileref="images/overview.svg" format="SVG"
-						scalefit="1" width="100%" contentdepth="100%"/>
-				</imageobject>
-				<caption><para><!-- Image Description --></para></caption>
-			</mediaobject>
-		</figure>
-
-		<para></para>
-        </sect1>
-
-	<sect1>
-		<title>Overview again</title>
-		<para><code>Wolframe</code> is 3-tier.
-		</para>
-
-		<itemizedlist>
-			<listitem><para>wolfs,</para></listitem>
-			<listitem><para>cats,</para></listitem>
-		</itemizedlist>
-
-		<figure>
-			<title>Overview - original</title>
+			<title>Overview</title>
 			<mediaobject>
 				<imageobject>
 					<imagedata fileref="images/3-tier.svg" format="SVG"
 						scalefit="1" width="100%" contentdepth="100%"/>
 				</imageobject>
-				<caption><para>3-tier architecture</para></caption>
+				<caption><para></para></caption>
 			</mediaobject>
 		</figure>
-
 		<para></para>
-        </sect1>
+		<sect2>
+		<title>Presentation tier</title>
+		<para>The presentation tier of <code>Wolframe</code> is implemented as thin client.
+			It maps the presentation of the application from the request answers it gets from the server.
+			Also the data describing this mapping is loaded from the server when connecting to it.
+			So the whole application is driven by the server.
+			A special use case are user interface designers that upload the presentation data for other users
+			to the server.</para>
+		</sect2>
+		<sect2>
+		<title>Logic tier</title>
+			<para>The logic tier of <code>Wolframe</code> describes the transformation of input of the presentation tier to a set of instructions
+			for the data tier. It also describes the transformation of the output of the data tier to a result structure returned back to the presentation tier.
+			The logic tier support scripting languages and direct mapping. <code>Wolframe</code> introduces three concepts as fundamental building blocks of the logic tier:
+				<itemizedlist>
+					<listitem><para>Filters: Filters are transforming serialized input data (XML,CSV,etc.) to a unified serialization of hierarchical structured data and to serialize any form of processed data for output. Filters are implemented as loadable modules (e.g. XML filter based on libxml2) or as scripts (XSL filter script for rewriting the input)</para></listitem>
+					<listitem><para>Forms: Forms a data structures defined in a data definition language (DDL) or as structures in C++ as loadable modules. Forms are used to validate and normalize input (XML validation, token normalization) and as API for functions loaded from modules written in C++.</para></listitem>
+					<listitem><para>Functions: Functions delegate processing to the data tier (transactions) or serve as unified gateways to integrate with other environments (e.g. .NET). Functions have a unique name and are called with a structure as argument and a structure as result. Where and in what context they are executed has no influence on their semantics.</para></listitem>
+				</itemizedlist>
+			You find a detailed description of the Logic tier and how to use it in the SDK manual.
+			</para>
+		</sect2>
+		<sect2>
+		<title>Data tier</title>
+			<para>The data tier of <code>Wolframe</code> defines some stateless functions for calling transactions.</para>
+		</sect2>
+	</sect1>
 </chapter>
 

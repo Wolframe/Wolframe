@@ -35,21 +35,28 @@
 //
 
 #include <string>
+#if !defined(_WIN32)
+#include <unistd.h>
+#include <libintl.h>
+#else // defined(_WIN32)
+#include <tchar.h>
+#define WIN32_MEAN_AND_LEAN
+#include <windows.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <cstdio>
+#endif // defined(_WIN32)
 
 namespace _Wolframe {
 namespace AAAA {
 
 #if !defined(_WIN32)
-
-#include <unistd.h>
-#include <libintl.h>
-
-	std::string getLogin( )
+	std::string _Wolframe::AAAA::getLogin( )
 	{
 		return getlogin( );
 	}
 
-	std::string getPassword()
+	std::string _Wolframe::AAAA::getPassword()
 	{
 		char	*pass;
 
@@ -59,15 +66,7 @@ namespace AAAA {
 	}
 
 #else // defined(_WIN32)
-
-#include <tchar.h>
-#define WIN32_MEAN_AND_LEAN
-#include <windows.h>
-#include <stdlib.h>
-#include <conio.h>
-#include <cstdio>
-
-	std::string getLogin( )
+	std::string _Wolframe::AAAA::getLogin( )
 	{
 		TCHAR login[256];
 		DWORD len = 254;
@@ -75,7 +74,7 @@ namespace AAAA {
 		return std::string( login );
 	}
 
-	std::string getPassword()
+	std::string _Wolframe::AAAA::getPassword()
 	{
 		std::string pass = "";
 
@@ -90,7 +89,6 @@ namespace AAAA {
 
 		return pass;
 	}
-
 #endif // defined(_WIN32)
 
 }} // namespace _Wolframe::AAAA
