@@ -73,16 +73,16 @@ public:
 
 private:
 	/// The number of threads that will call io_service::run().
-	std::size_t		threadPoolSize_;
+	std::size_t		m_threadPoolSize;
 
 	/// The io_service used to perform asynchronous operations.
-	boost::asio::io_service	IOservice_;
+	boost::asio::io_service	m_IOservice;
 	/// The list(s) of connection acceptors.
-	std::list<acceptor*>	acceptor_;
+	std::list<acceptor*>	m_acceptors;
 #ifdef WITH_SSL
-	std::list<SSLacceptor*>	SSLacceptor_;
+	std::list<SSLacceptor*>	m_SSLacceptors;
 #endif // WITH_SSL
-	GlobalConnectionList	globalList_;
+	GlobalConnectionList	m_globalList;
 };
 
 }} // namespace _Wolframe::net

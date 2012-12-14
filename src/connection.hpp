@@ -45,7 +45,7 @@
 #include <list>
 #include "connectionBase.hpp"
 #include "connectionHandler.hpp"
-#include "types/atomicCounter.hpp"
+//#include "types/atomicCounter.hpp"
 
 namespace _Wolframe {
 namespace net {
@@ -93,17 +93,22 @@ public:
 	{
 		m_maxConn = maxConnections;
 		m_globalList.addList( this );
+		m_size = 0;
 	}
 
-	std::size_t size()	{ return m_connList.size(); }
+	std::size_t size()	{ return m_size; }
 
-	void push( T conn )	{ m_connList.push_back( conn ); }
+	void push( T conn )	{ boost::mutex::scoped_lock lock( m_mutex );
+				  ++m_size; m_connList.push_back( conn ); }
 
-	void remove( T conn )	{ m_connList.remove( conn ); }
+	void remove( T conn )	{ boost::mutex::scoped_lock lock( m_mutex );
+				  --m_size; m_connList.remove( conn ); }
 
 	T pop()	{
-		if ( m_connList.empty())
+		boost::mutex::scoped_lock lock( m_mutex );
+		if ( m_connList.empty() )
 			return T();
+		--m_size;
 		T conn = m_connList.front();
 		m_connList.pop_front();
 		return conn;
@@ -122,8 +127,10 @@ public:
 
 private:
 	std::list< T >		m_connList;
+	unsigned		m_size;
 	unsigned		m_maxConn;
 	GlobalConnectionList&	m_globalList;
+	boost::mutex		m_mutex;
 };
 
 
