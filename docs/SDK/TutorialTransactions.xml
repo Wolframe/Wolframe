@@ -3,7 +3,7 @@
 <title>Defining Database Transactions</title>
 	<sect2>
 		<title>Introduction</title>
-		<para>Wolframe transactions are defined as functions in a transactional context.
+		<para><code>Wolframe</code> transactions are defined as functions in a transactional context.
 			The begin and the commit or abort are done automatically at the begin
 			or at the end of a transaction function respectively,
 			if not explicitely defined otherwise in the scripting language.
@@ -60,24 +60,25 @@
 	</sect2>
 	<sect2>
 		<title>EBNF of the transaction definition language</title>
-		<productionset>
-		<title>Transaction definitions</title>
 
-		<production id="Identifier">
+		<productionset>
+		<title>Tokens</title>
+
+		<production xml:id="Identifier">
 		<lhs>Identifier</lhs>
 		<rhs>
 			( ['A'-'Z'] | ['a'-'z'] | ['0'-'9'] | '_' ) +
 		</rhs>
 		</production>
 
-		<production id="Number">
+		<production xml:id="Number">
 		<lhs>Number</lhs>
 		<rhs>
 			( ['0'-'9'] ) +
 		</rhs>
 		</production>
 
-		<production id="Selection">
+		<production xml:id="Selection">
 		<lhs>Selection</lhs>
 		<rhs>
 			(
@@ -88,30 +89,7 @@
 		</rhs>
 		</production>
 
-		<production id="Destination">
-		<lhs>Destination</lhs>
-		<rhs>
-			'INTO'
-			<nonterminal def="#Identifier">Identifier</nonterminal>
-		</rhs>
-		</production>
-
-		<production id="Foreach">
-		<lhs>Foreach</lhs>
-		<rhs>
-			'FOREACH'
-			<nonterminal def="#Selection">Selection</nonterminal>
-		</rhs>
-		</production>
-
-		<production id="EmbeddedOp">
-		<lhs>EmbeddedOp</lhs>
-		<rhs>
-			SQLStatement
-		</rhs>
-		</production>
-
-		<production id="Argument">
+		<production xml:id="Argument">
 		<lhs>Argument</lhs>
 		<rhs>
 			'$'
@@ -120,8 +98,35 @@
 			)
 		</rhs>
 		</production>
+		</productionset>
 
-		<production id="ArgumentLst">
+		<productionset>
+		<title>Statements</title>
+
+		<production xml:id="Destination">
+		<lhs>Destination</lhs>
+		<rhs>
+			'INTO'
+			<nonterminal def="#Identifier">Identifier</nonterminal>
+		</rhs>
+		</production>
+
+		<production xml:id="Foreach">
+		<lhs>Foreach</lhs>
+		<rhs>
+			'FOREACH'
+			<nonterminal def="#Selection">Selection</nonterminal>
+		</rhs>
+		</production>
+
+		<production xml:id="EmbeddedOp">
+		<lhs>EmbeddedOp</lhs>
+		<rhs>
+			SQLStatement
+		</rhs>
+		</production>
+
+		<production xml:id="ArgumentLst">
 		<lhs>ArgumentLst</lhs>
 		<rhs>
 			( <nonterminal def="#Argument">Argument</nonterminal> ','
@@ -132,7 +137,7 @@
 		</rhs>
 		</production>
 
-		<production id="NamedOp">
+		<production xml:id="NamedOp">
 		<lhs>NamedOp</lhs>
 		<rhs>
 			<nonterminal def="#Identifier">Identifier</nonterminal>
@@ -142,7 +147,7 @@
 		</rhs>
 		</production>
 
-		<production id="Action">
+		<production xml:id="Action">
 		<lhs>Action</lhs>
 		<rhs>
 			'DO'
@@ -153,7 +158,7 @@
 		</rhs>
 		</production>
 
-		<production id="Statement">
+		<production xml:id="Statement">
 		<lhs>Statement</lhs>
 		<rhs>
 			( <nonterminal def="#Destination">Destination</nonterminal> | )
@@ -162,8 +167,12 @@
 			';'
 		</rhs>
 		</production>
+		</productionset>
 
-		<production id="StatementLst">
+		<productionset>
+		<title>Transactions</title>
+
+		<production xml:id="StatementLst">
 		<lhs>StatementLst</lhs>
 		<rhs>
 			( <nonterminal def="#Statement">Statement</nonterminal>
@@ -173,7 +182,7 @@
 		</rhs>
 		</production>
 
-		<production id="OpBody">
+		<production xml:id="OpBody">
 		<lhs>OpBody</lhs>
 		<rhs>
 			'BEGIN'
@@ -182,7 +191,7 @@
 		</rhs>
 		</production>
 
-		<production id="Operation">
+		<production xml:id="Operation">
 		<lhs>Operation</lhs>
 		<rhs>
 			'OPERATION' <nonterminal def="#Identifier">Identifier</nonterminal>
@@ -191,7 +200,7 @@
 		</rhs>
 		</production>
 
-		<production id="Transaction">
+		<production xml:id="Transaction">
 		<lhs>Transaction</lhs>
 		<rhs>
 			'TRANSACTION' <nonterminal def="#Identifier">Identifier</nonterminal>
@@ -203,7 +212,7 @@
 		</rhs>
 		</production>
 
-		<production id="Program">
+		<production xml:id="Program">
 		<lhs>Program</lhs>
 		<rhs>
 			(
@@ -216,21 +225,7 @@
 		</rhs>
 		</production>
 
-		<productionrecap linkend="Identifier"/>
-		<productionrecap linkend="Number"/>
-		<productionrecap linkend="Selection"/>
-		<productionrecap linkend="Argument"/>
-		<productionrecap linkend="ArgumentLst"/>
-		<productionrecap linkend="EmbeddedOp"/>
-		<productionrecap linkend="NamedOp"/>
-		<productionrecap linkend="Destination"/>
-		<productionrecap linkend="Foreach"/>
-		<productionrecap linkend="Action"/>
-		<productionrecap linkend="Statement"/>
-		<productionrecap linkend="StatementLst"/>
-		<productionrecap linkend="OpBody"/>
-		<productionrecap linkend="Operation"/>
-		<productionrecap linkend="Transaction"/>
+
 		</productionset>
 	</sect2>
 </sect1>

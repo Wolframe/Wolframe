@@ -48,12 +48,12 @@
 #endif // defined(_WIN32)
 
 #if !defined(_WIN32)
-	std::string getLogin( )
+	std::string _Wolframe::AAAA::getLogin( )
 	{
 		return getlogin( );
 	}
 
-	std::string getPassword()
+	std::string _Wolframe::AAAA::getPassword()
 	{
 		char	*pass;
 
@@ -63,7 +63,7 @@
 	}
 
 #else // defined(_WIN32)
-	std::string getLogin( )
+	std::string _Wolframe::AAAA::getLogin( )
 	{
 		TCHAR login[256];
 		DWORD len = 254;
@@ -71,7 +71,7 @@
 		return std::string( login );
 	}
 
-	std::string getPassword()
+	std::string _Wolframe::AAAA::getPassword()
 	{
 		std::string pass = "";
 

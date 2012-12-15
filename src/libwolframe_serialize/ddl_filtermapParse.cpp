@@ -83,6 +83,9 @@ static void setAtomValue( ddl::AtomicType& val, const langbind::TypedFilterBase:
 		case langbind::TypedFilterBase::Element::string_:
 			val.set( std::string( element.value.string_.ptr, element.value.string_.size));
 			break;
+		case langbind::TypedFilterBase::Element::blob_:
+			val.set( std::string( element.value.blob_.ptr, element.value.blob_.size));
+			break;
 	}
 }
 

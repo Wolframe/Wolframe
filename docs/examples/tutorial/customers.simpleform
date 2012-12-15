@@ -1,13 +1,12 @@
-; Wolframe tutorial part 2
 
 FORM Customer
 {
-        customer
-        {
-                ID @int                            ; Internal customer id
-                name string                        ; Name of the customer
-                canonical_Name string              ; Customer name in canonical form
-                country string                     ; Country
-                locality string                    ; Locality
-        }
+   customer
+   {
+       ID !@int                  ; Internal customer id (mandatory)
+       name string               ; Name of the customer
+       canonical_Name string     ; Customer name in canonical form
+       country string            ; Country
+       locality ?string          ; Locality (optional)
+   }
 }

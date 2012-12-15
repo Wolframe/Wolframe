@@ -22,7 +22,8 @@ PF:
   - documentation (tutorial)
   - more stress tests
   - UIForm loader in client and server
-  - Transactions: Warning for ununsed results
+  - Transactions: Warning for unused results
+  - Transactions: DO ENUMERATE SELECT : For forcing array indices in result
 
 - low prio
   - test forms with SELF recursion

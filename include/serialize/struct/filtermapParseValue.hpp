@@ -115,6 +115,11 @@ static bool parseValue_( ValueType& val, const ParseValueType::string_&, const l
 				val.clear();
 				val.append( element.value.string_.ptr, element.value.string_.size);
 				return true;
+
+			case langbind::TypedInputFilter::Element::blob_:
+				val.clear();
+				val.append( element.value.blob_.ptr, element.value.blob_.size);
+				return true;
 		}
 	}
 	catch (const boost::bad_lexical_cast&)
@@ -189,6 +194,10 @@ static bool parseValue_( ValueType& val, const ParseValueType::arithmetic_&, con
 
 			case langbind::TypedInputFilter::Element::string_:
 				val = boost::lexical_cast<ValueType>( std::string( element.value.string_.ptr, element.value.string_.size));
+				return true;
+
+			case langbind::TypedInputFilter::Element::blob_:
+				val = boost::lexical_cast<ValueType>( std::string( element.value.blob_.ptr, element.value.blob_.size));
 				return true;
 		}
 	}
