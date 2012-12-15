@@ -47,9 +47,6 @@
 #include <cstdio>
 #endif // defined(_WIN32)
 
-namespace _Wolframe {
-namespace AAAA {
-
 #if !defined(_WIN32)
 	std::string _Wolframe::AAAA::getLogin( )
 	{
@@ -91,4 +88,3 @@ namespace AAAA {
 	}
 #endif // defined(_WIN32)
 
-}} // namespace _Wolframe::AAAA
