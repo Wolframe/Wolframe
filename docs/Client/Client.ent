@@ -1,0 +1,10 @@
+<!-- Wolframe Application Server documentation -->
+
+<!ENTITY ClientPreface			SYSTEM "Preface.xml">
+
+<!ENTITY ClientIntroduction		SYSTEM "Introduction.xml">
+
+<!ENTITY Clients			SYSTEM "Clients.xml">
+
+<!ENTITY ClientQt			SYSTEM "Qt.xml">
+<!ENTITY ClientCLI			SYSTEM "CLI.xml">

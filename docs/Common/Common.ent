@@ -1,3 +1,5 @@
 <!-- Wolframe Manual common parts -->
 
 <!ENTITY GPLlicense			SYSTEM "gpl.dbk">
+
+<!ENTITY WolframeLegalNotice		SYSTEM "WolframeLegalNotice.xml">

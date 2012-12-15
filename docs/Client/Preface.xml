@@ -1,0 +1,7 @@
+<!-- preface -->
+
+<preface>
+	<title>Foreword</title>
+	<para>This is the Wolframe Clients book.</para>
+	<para>It describes various clients which connect to the Wolframe Application server.</para>
+</preface>
