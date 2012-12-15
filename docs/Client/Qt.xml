@@ -1,16 +1,50 @@
-UIForm
-------
+<!-- Qt Client -->
+<sect1>
+	<title>Qt client</title>
+	<sect2>
+	<title>Architecture</title>
+	<para>
+		The Qt client is a thin client which executes XML requests
+		via the Wolframe protocol and presents XML answers. It shows
+		a set of forms using standard Qt widgets. Qt is currently
+		available on
+		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/index.html">http://doc.qt.digia.com/qt/index.html</link>.
+	</para>
+	</sect2>
+	
+	<sect2>
+	<title>Artifacts</title>
+	<sect3>
+		<title>UI forms</title>
+		<para>
+			The qtclient renders UI forms dynamically, this means no
+			code generation is involved. The UI files follow the schema
+			'qt-ui-4.7.xsd', as documented in
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/designer-ui-file-format.html">http://doc.qt.digia.com/qt/designer-ui-file-format.html</link>.
+			The UI files have the extension <emphasis>.ui</emphasis>
+		</para>
+		
+		<para>
+			UI files can be generated with the Qt designer, see
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/designer-manual.html">http://qt-project.org/doc/qt-4.8/designer-manual.html</link>.
+		</para>
+	</sect3>
+	
+	<sect3>
+		<title>UI form translations</title>
+		<para>
+			Currently using the Qt translation format, version 2.0 for form translations.
+			Those are the files with extension <emphasis>.ts</emphasis>. The clients needs
+			the files in compiled form as files with the extesion <emphasis>.qm</emphasis>.
+		</para>
+	</sect3>
+	
+	</sect2>
+</sect1>
 
-Contains the XML for rendering the Form, it's exactly the
-thing I can load into Qt 'designer'
-The schema is in 'qt-ui-4.7.xsd'.
-
-Currently those are the files in 'forms'.
-
-Should be cashed on the client.
+	<!--
 
 UIFormTranslation
------------------
 
 language: de_CH, en_US, etc.
 
@@ -28,7 +62,6 @@ productive at runtime to translate the forms.
 Should be cashed on the client.
 
 UIStylesheet
-------------
 
 A Qt stylesheet similar to CSS in HTML influencing the look-and-feel
 of the form widgets. Syntax check not really possible (maybe with
@@ -47,7 +80,6 @@ theme UI loading may form UIs..
 Should be cashed on the client.
 
 Domain data
------------
 
 Currently the *.xml files in the 'data' directory. Per form and widget
 there is a XML file containing the pickable values.
@@ -101,9 +133,8 @@ Items in a tree can have a tuple of (key,value) at the moment
 Should not be cached on the client.
 
 Current data
-------------
 
-<?xml version="1.0" encoding="UTF-8"?>
+<xml version="1.0" encoding="UTF-8"?>
 <form1>
   <first>Jon</first>
   <last>Doe</last>
@@ -129,7 +160,6 @@ ids in the nodes in the tree.
 Must not be cached on the client.
 
 Theme
------
 
 Currently those are the files in 'themes/XXX'. They just contain an
 empty main window and some menu hooks.
@@ -140,7 +170,6 @@ may also disappear completly and all data is contained in each UIForm
 (makes the loading process a little bit more tricky).
 
 Dynamic Properties
-------------------
 
 They influence the behaviour of the generic client. All "propramming"
 is done by setting dynamic properties in main windows or widgets
@@ -184,3 +213,5 @@ global.*	global variables, once stored, they are kept and
 					those are business layer specific, i.e.
 					the client only sends them
 					
+-->	
+	
