@@ -197,7 +197,7 @@ static bool parseValue_( ValueType& val, const ParseValueType::arithmetic_&, con
 				return true;
 
 			case langbind::TypedInputFilter::Element::blob_:
-				val = boost::lexical_cast<ValueType>( std::string( element.value.blob_.ptr, element.value.blob_.size));
+				val = boost::lexical_cast<ValueType>( std::string( (const char*)element.value.blob_.ptr, element.value.blob_.size));
 				return true;
 		}
 	}
