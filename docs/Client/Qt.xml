@@ -6,19 +6,23 @@
 	<para>
 		The Qt client is a thin client which executes XML requests
 		via the Wolframe protocol and presents XML answers. It shows
-		a set of forms using standard Qt widgets. Qt is currently
-		available on
+		a set of forms using standard Qt widgets. It is cross-platform.
+		Qt is currently available on
 		<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/index.html">http://doc.qt.digia.com/qt/index.html</link>.
 	</para>
 	</sect2>
 	
 	<sect2>
 	<title>Artifacts</title>
+	<para>
+		The qtclient renders user interface forms dynamically, this means no
+		code generation or compilation is involved when creating user interfaces
+		for Wolframe.
+	</para>
 	<sect3>
 		<title>UI forms</title>
 		<para>
-			The qtclient renders UI forms dynamically, this means no
-			code generation is involved. The UI files follow the schema
+			The UI files follow the schema
 			'qt-ui-4.7.xsd', as documented in
 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/designer-ui-file-format.html">http://doc.qt.digia.com/qt/designer-ui-file-format.html</link>.
 			The UI files have the extension <emphasis>.ui</emphasis>
@@ -33,61 +37,90 @@
 	<sect3>
 		<title>UI form translations</title>
 		<para>
-			Currently using the Qt translation format, version 2.0 for form translations.
-			Those are the files with extension <emphasis>.ts</emphasis>. The clients needs
-			the files in compiled form as files with the extesion <emphasis>.qm</emphasis>.
+			Currently using the Qt translation format, version 2.0 for form translations
+			as described in
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/linguist-ts-file-format.html">http://doc.qt.digia.com/qt/linguist-ts-file-format.html</link>.
+			Those are the files with extension <emphasis>.ts</emphasis>.
+		</para>
+		<para>
+			The translation files can get merged and generated with the <emphasis>lupdate</emphasis>
+			tool, then translated with the <emphasis>Qt linguist</emphasis>.
+		</para>
+		<para>
+			The client needs the files in compiled form as files with the extesion
+			<emphasis>.qm</emphasis>. The <emphasis>lupdate</emphasis> tool is taking
+			care of that.
+		</para>
+		<para>
+			Read more on translations in
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/linguist-manual.html">http://doc.qt.digia.com/qt/linguist-manual.html</link>.
 		</para>
 	</sect3>
 	
+	<sect3>
+		<title>Themes</title>
+		<para>
+			Themes consist of a top-level UI-file (a <classname>QMainWindow</classname>).
+			The central widget should be empty (that's where the forms are shown). The menu contains
+			some hooks, where the qtclient will add menus.
+		</para>
+		<para>
+			Also a theme has translation files for the menu entries.
+		</para>
+	</sect3>
+	
+	<sect3>
+		<title>Qt stylesheets</title>
+		<para>
+			A Qt stylesheet is similar to a CSS in HTML. It influences the
+			look-and-feel of the form widgets. 
+			The format is described in
+			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/stylesheet-syntax.html">http://qt-project.org/doc/qt-4.8/stylesheet-syntax.html</link>.			
+			The files have usually the extension <emphasis>.qss</emphasis>.
+		</para>
+	</sect3>
+	
+	</sect2>
+	
+	<sect2>
+		<title>"Programming" the interface</title>
+		<para>
+			Programming means we annotate the XML of th UI form files with
+			some extra properties. They steer the following things:
+			<itemizedlist>
+				<listitem>
+				<para>
+					On which events to replace the current form with a new form,
+					e. g. clicking the <emphasis>Edit</emphasis> button should load
+					the form called <emphasis>edit_item</emphasis>.
+				</para>
+				</listitem>
+				<listitem>
+				<para>
+					When and how requests to the Wolframe server should be sent
+					and how the results should be interpreted when adding data
+					to the widgets, e.g. executing a <emphasis>save item request</emphasis>
+					with all the data in the text fields of the form added to the request
+					XML.
+				</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+		
+		<sect3>
+			<title>Mapping XML data</title>
+			<para>
+				Every widget in the Qt class hierarchy has a default way, how data
+				is serialized into the request XML and how it is deserialized from
+				the answer XML. For instance a <classname>QLineEdit</classname>
+			</para>
+		</sect3>
 	</sect2>
 </sect1>
 
 	<!--
 
-UIFormTranslation
-
-language: de_CH, en_US, etc.
-
-source:
-
-Currently using the Qt translation format, version 2.0
-(files with extentions .ts in directory 'i18n').
-Could also be gettext PO files and others.
-
-binary:
-
-Lookup tables similar to gettext MO files. Those are used
-productive at runtime to translate the forms.
-
-Should be cashed on the client.
-
-UIStylesheet
-
-A Qt stylesheet similar to CSS in HTML influencing the look-and-feel
-of the form widgets. Syntax check not really possible (maybe with
-a QSS-loader and interpreter program?). The format is plain text ASCII.
-
-Currently in the 'themes/XXX/' directory as '*.qss' files.
-
-The Qt designer currently doesn't load and apply external stylesheets, only 
-manual local style changes to widgets are possible.
-
-Can also be embedded as a top-level form property 'styleSheet' directly into
-the form, but then we get an DRY-problem! So this is just an option for 
-rendering/designing as a transitional format! Unless of couse we use one
-theme UI loading may form UIs..
-
-Should be cashed on the client.
-
 Domain data
-
-Currently the *.xml files in the 'data' directory. Per form and widget
-there is a XML file containing the pickable values.
-
-Could be embedded in the UI, but translations get complicated this way.
-
-Could be big, so paging and partial model updates could be an issue
-(think a million cities and a completion widget).
 
 Domain data gets choosen based on the current interface language.
 
@@ -158,16 +191,6 @@ language-independent keys in the values of the domain or the
 ids in the nodes in the tree.
 
 Must not be cached on the client.
-
-Theme
-
-Currently those are the files in 'themes/XXX'. They just contain an
-empty main window and some menu hooks.
-
-Are not a class per se. They are a form (with a menu and statusbar) and
-a stylesheet and some translations. Can be seen as a special form. They
-may also disappear completly and all data is contained in each UIForm
-(makes the loading process a little bit more tricky).
 
 Dynamic Properties
 

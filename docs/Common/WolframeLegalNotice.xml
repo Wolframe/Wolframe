@@ -1,4 +1,5 @@
-<title>Commercial Usage</title>
+ <formalpara>
+	<title>Commercial Usage</title>
 
 <para>
     Licensees holding valid Project Wolframe Commercial licenses may
@@ -8,8 +9,10 @@
     in a written agreement between the licensee and Project Wolframe.
 </para>
 
+</formalpara>
 
-<title>GNU General Public License Usage</title>
+<formalpara>
+	<title>GNU General Public License Usage</title>
 
 <para>
     Alternatively, you can redistribute this file and/or modify it
@@ -35,3 +38,5 @@
     If you have questions regarding the use of this file, please contact
     Project Wolframe.
 </para>
+
+</formalpara>

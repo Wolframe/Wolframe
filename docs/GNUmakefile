@@ -17,15 +17,19 @@ XSLT_MAN = \
 XSLT_HTML = \
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
+	--stringparam toc.section.depth 3 \
 	output-html.xsl
 
 XSLT_PDF = \
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
+	--stringparam toc.section.depth 3 \
 	output-pdf.xsl
 
 XSLT_EPUB = \
 	$(XSLTPROC) --nonet --xinclude \
+	--stringparam draft.mode yes \
+	--stringparam toc.section.depth 3 \
 	output-epub.xsl
 
 local_all:
@@ -67,6 +71,7 @@ epub: WolfBook.epub
 html/index.html: WolfBook.xml
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
+	--stringparam toc.section.depth 3 \
 	-o $@ output-html-chunked.xsl WolfBook.xml
 
 %.epub: %.xml
