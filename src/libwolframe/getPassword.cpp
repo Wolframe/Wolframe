@@ -33,7 +33,7 @@
 //
 // getPassword.cpp
 //
-
+#include "utils/getPassword.hpp"
 #include <string>
 #if !defined(_WIN32)
 #include <unistd.h>
