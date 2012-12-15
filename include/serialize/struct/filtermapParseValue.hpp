@@ -118,7 +118,7 @@ static bool parseValue_( ValueType& val, const ParseValueType::string_&, const l
 
 			case langbind::TypedInputFilter::Element::blob_:
 				val.clear();
-				val.append( element.value.blob_.ptr, element.value.blob_.size);
+				val.append( (const char*)element.value.blob_.ptr, element.value.blob_.size);
 				return true;
 		}
 	}
