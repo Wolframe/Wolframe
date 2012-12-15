@@ -51,12 +51,12 @@ namespace _Wolframe {
 namespace AAAA {
 
 #if !defined(_WIN32)
-	std::string _Wolframe::AAAA::getLogin( )
+	std::string getLogin( )
 	{
 		return getlogin( );
 	}
 
-	std::string _Wolframe::AAAA::getPassword()
+	std::string getPassword()
 	{
 		char	*pass;
 
@@ -66,7 +66,7 @@ namespace AAAA {
 	}
 
 #else // defined(_WIN32)
-	std::string _Wolframe::AAAA::getLogin( )
+	std::string getLogin( )
 	{
 		TCHAR login[256];
 		DWORD len = 254;
@@ -74,7 +74,7 @@ namespace AAAA {
 		return std::string( login );
 	}
 
-	std::string _Wolframe::AAAA::getPassword()
+	std::string getPassword()
 	{
 		std::string pass = "";
 

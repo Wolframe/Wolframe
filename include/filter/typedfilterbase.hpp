@@ -153,7 +153,7 @@ public:
 			switch (type)
 			{
 				case string_: return std::string( value.string_.ptr, value.string_.size);
-				case blob_: return std::string( value.blob_.ptr, value.blob_.size);
+				case blob_: return std::string( (const char *)value.blob_.ptr, value.blob_.size);
 				case bool_: return value.bool_?"true":"false";
 				case double_: return boost::lexical_cast<std::string>( value.double_);
 				case int_: return boost::lexical_cast<std::string>( value.int_);
