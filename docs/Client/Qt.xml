@@ -234,6 +234,9 @@
 				</simplelist>
 			</para>
 			
+			<sect4>
+				<title>action property</title>
+				
 			<para>
 				The <code>action</code> parameter can currently only be attached to a <classname>QPushButton</classname>
 				and denotes the action to be taken, when the user presses that button.
@@ -285,12 +288,22 @@
 				the user to enter a customer ID but instead pass the variable around, see global variables.
 			</para>
 			
+			</sect4>
+			
+			<sect4>
+				<title>initAction property</title>
+			
 			<para>
 				The <code>initAction</code> property does exactly the same thing as <code>action</code>, but not when
 				the user clicks a button, but when the form gets first loaded. This is handy to load the form with
 				some initial values, so it's mainly used together with the <code>read</code> value.
 			</para>
 			
+			</sect4>
+			
+			<sect4>
+				<title>domain reads</title>
+				
 			<para>
 				There is a special kind of request which happens in parallel to the form/button requests, and this
 				automatically when loading the form. Large sets of values could be stored in the UI form itself, but
@@ -338,9 +351,166 @@
 				</programlisting>
 				
 				The business layer would apply a <code>LIKE</code> to filter the data. but the client doesn't care about that.				
-			</para>		
+			</para>	
+			
+			</sect4>
+			
+			<sect4>
+				<title>reload domain data</title>
+
+				
+			<para>
+				The value of the <code>action</code> property can contain the name of a widget, a dot followed by the
+				keyword <code>reload</code>, e.g. <code>city.reload</code>. This causes the widget to reload its domain
+				data without changing the status of the form. This is handy to implement adhoc searching and filtering.			
+			</para>
+			
+			<para>
+				In the following form there are three widgets:
+
+				<simplelist type="horiz" columns="2">
+				<member>search</member><member>A text field containing a search pattern.</member>
+				<member>city</member><member>A list which shows filtered cities (and has a domain load attached as described above).</member>
+				<member>searchButton</member><member>A push button which has a <code>city.reload</code> action attached.</member>
+				</simplelist>
+
+				When clicking the search button the list of cities (and only the list of cities!) gets reloaded from
+				the Wolframe server.
+
+				<screenshot>
+					<screeninfo>A searchable list with domain reload</screeninfo>
+					<mediaobject>
+						<imageobject> 
+							<imagedata fileref="examples/clients/domain_reload.png" format="PNG"/>
+						</imageobject> 
+					</mediaobject>
+				</screenshot>
+
+				We can also play with Qt signals, to make the list change when the user changes the filter:
+				
+				<screenshot>
+					<screeninfo>Signals of the searchable list with domain reload</screeninfo>
+					<mediaobject>
+						<imageobject> 
+							<imagedata fileref="examples/clients/domain_reload_signals.png" format="PNG"/>
+						</imageobject> 
+					</mediaobject>
+				</screenshot>
+
+			</para>
+
+			</sect4>
+				
 		</sect3>
 		
+		<sect3>
+			<title>States and properties of widgets</title>
+			
+			<para>
+				We can make widgets read and set properties so that they
+				communicate values without the server noticing. Currently
+				this is:
+
+				<itemizedlist>
+				<para><code>initialFocus</code>:
+				This is a thing which got forgotten in the Qt design.
+				We can set a boolean value to one widget in a form which should
+				get the initial keyboard focus.
+				</para>
+				
+				<para><code>state</code>:
+				The state of widget. Many widgets don't have any state, but
+				for instance a <classname>QListWidget</classname> has a current
+				selection. Complicated widgets like <classname>QTableWidget</classname>
+				or <classname>QTreeWidget</classname> have a whole load of states
+				like the current selection (which can be multiple items), the sorting
+				of the data, which tree branches are currently expanded or collapsed, etc.
+				</para>
+
+				</itemizedlist>
+			</para>
+		</sect3>
+		
+		<sect3>
+			<title>Widget properties as dynamic property values</title>
+			
+			<para>
+				Dynamic properties can have either fixed values as in <code>property = constant_string</code>
+				or they can reference properties of widgets like <code>property = {variable expression}</code>.
+			</para>
+			
+			<para>
+				The expression can reference widgets and their properties. Every Qt class has
+				its very own set of properties it understands. We make a few examples here.
+				A detailed list of properties per Qt class is avaiable in a separate chapter.
+				
+				<itemizedlist>
+				<para><classname>QLineEdit</classname>, <code>{widget.text}</code>:
+				Returns the currently visible text in the widget with name <code>widget</code>.
+				</para>
+				</itemizedlist>
+
+				<itemizedlist>
+				<para><classname>QTreeWidget</classname>, <code>{widget.id}</code>:
+				Returns the currently selected tree element (it's internal id).
+				</para>
+				</itemizedlist>
+												
+			</para>
+			
+		</sect3>
+
+		<sect3>			
+			<title>Global variables</title>
+			
+			<para>
+				If we switch the form, all states and data of the form widgets get lost.
+				If we want to propagate some values from one form to another or if we
+				want to keep the state of some widgets, we have to store those in a
+				"global widget". This is a widget with name <code>global</code>.
+			</para>
+			
+			<para>
+				For instance we can have a list of customers with their ids, if
+				the user chooses one and presses edit, we propagate the value of
+				the currently selected item to the next form as <code>global.id</code>:
+
+				<screenshot>
+					<screeninfo>A list of customers with global.id</screeninfo>
+					<mediaobject>
+						<imageobject> 
+							<imagedata fileref="examples/clients/customers.png" format="PNG"/>
+						</imageobject> 
+					</mediaobject>
+				</screenshot>
+				
+				The "edit customer" form can then use this value in an <code>initAction</code>
+				property attached to the whole form in order
+				to read the values of the customer to be edited:
+				
+				<screenshot>
+					<screeninfo>global.id in edit form</screeninfo>
+					<mediaobject>
+						<imageobject> 
+							<imagedata fileref="examples/clients/customer_edit_initaction.png" format="PNG"/>
+						</imageobject> 
+					</mediaobject>
+				</screenshot>
+				
+				We also add it to the "Save" button, so the XML request for the update
+				operation gets the id attribute attached to the root element:
+				
+				<screenshot>
+					<screeninfo>A searchable list with domain reload</screeninfo>
+					<mediaobject>
+						<imageobject> 
+							<imagedata fileref="examples/clients/customer_edit_save.png" format="PNG"/>
+						</imageobject> 
+					</mediaobject>
+				</screenshot>
+								
+			</para>
+		</sect3>
 		
 		<sect3>
 			<title>Properties and mapping per Qt class</title>
@@ -348,8 +518,73 @@
 		<sect4>
 			<title>QLineEdit</title>
 			<para>
+			
+				<sect5>
+					<title>properties</title>
+					<itemizedlist>
+					<para><code>text</code>:
+					Returns the currently visible text.
+					</para>
+					<para><code>state</code>:
+					Returns the currently visible text (same as <code>text</code>).
+					</para>
+				</itemizedlist>
+				
+				</sect5>
+					
 			</para>
 		</sect4>
+
+		<sect4>
+			<title>QTableWidget</title>
+			<para>
+
+				<sect5>
+					<title>properties</title>
+
+					<itemizedlist>
+
+					<para><code>id</code>:
+						The attribute id of the first XML element in the table row which the
+						user selected. Supports only single selection for now.
+					</para>
+					
+					<para><code>state</code>:
+					Selection and sorting order and column.
+					Supports only single selection for now.
+					</para>
+
+				</itemizedlist>
+				
+				</sect5>
+				
+			</para>
+		</sect4>
+
+		<sect4>
+			<title>QTreeWidget</title>
+			<para>
+
+				<sect5>
+					<title>properties</title>
+					<itemizedlist>
+
+					<para><code>id</code>:
+						The attribute id of the first XML element in the node which the
+						user selected. Supports only single selection for now.
+					</para>
+					
+					<para><code>state</code>:
+					expanded/collapsed subtrees and selection in a internal string represenation.
+					Supports only single selection for now.
+					</para>
+
+				</itemizedlist>
+				
+				</sect5>
+			</para>
+		</sect4>
+
 		</sect3>
 		
 		<sect3>
@@ -387,6 +622,17 @@
 							describes what gets sent down in the XML request.
 						</entry>
 					</row>
+
+					<row>
+						<entry>action</entry>
+						<entry>String</entry>
+						<entry><classname>QPushButton</classname></entry>
+						<entry>
+							special value <code>widget.reload</code>, causes
+							the widget with that name to reload its domain data.
+						</entry>
+					</row>
+
 					<row>
 						<entry>initAction</entry>
 						<entry>String</entry>
@@ -435,16 +681,40 @@
 							of the root element)
 						</entry>
 					</row>
-						
+					<row>
+						<entry>initialFocus</entry>
+						<entry>Bool</entry>
+						<entry>all widgets with can take a focus</entry>
+						<entry>
+							The element should take focus when the form is loaded.
+						</entry>
+					</row>
+					<row>
+						<entry>state</entry>
+						<entry>String</entry>
+						<entry>all widgets which have a state, e.g. not push buttons</entry>
+						<entry>
+							some widgets support restoring the state, usually
+							from the global variables, e.g. state {global.widgetState}
+						</entry>
+					</row>											
+
+					<row>
+						<entry>global.XXXX</entry>
+						<entry>String</entry>
+						<entry>Usually on buttons with switch the form</entry>
+						<entry>
+							Stores something into the global varable XXXX.
+							This value can be reference in all forms from now 
+							on.
+						</entry>
+					</row>											
 				</tbody>
 				</tgroup>
 			</table>			
 
 		</sect3>
 		
-		<sect3>			
-			<title>Global variables</title>
-		</sect3>
 	</sect2>
 </sect1>
 
@@ -503,47 +773,10 @@ language-independent keys in the values of the domain or the
 ids in the nodes in the tree.
 
 Dynamic Properties
-
-They influence the behaviour of the generic client. All "propramming"
-is done by setting dynamic properties in main windows or widgets
-
-<widget>.reload	executes the domain request in another widget, example
-		search with filter reloads domain, completion
-
-doctype		the document of the XML to generate, when the user
-		generates an action on the element, 
-		e.g. 'CategoryHierarchyRequest.simpleform'
-		currently only working on buttons
-rootelement	the root element of the XML to generate, e.g. 'document'
-		currently only working on buttons
-
-initialFocus	boolean, sets initial focus on widget
-state		some widgets support restoring the state, usually
-		from the global variables, e.g. state {global.widgetState}
 		
 global.*	global variables, once stored, they are kept and
 		can be addressed as '{global.name}' everywhere else
-		
-{x.y}		dereference a variable, e.g.
-		{widgetname.property}
-		{global.stored_variable}
-		
-		currently there exist the following properties for
-		the corresponding classes:
 
-		QEditLine	state	the text entered
-				text	the text entered
-		QListWidget	state	expanded 
-				id	the currently selected item
-					(single selection for now)
-		QTreeWidget	state	expanded states and selection
-				id	the currently selected item
-					(single selection for now)
-		*		*	any other property is added
-					as attribute to the request,
-					e.g. 'id', 'search' in configurator,
-					those are business layer specific, i.e.
-					the client only sends them
 					
 -->	
 	

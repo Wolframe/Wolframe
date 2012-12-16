@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>417</width>
+    <height>205</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Customer</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QTreeWidget" name="customer">
+     <property name="rootIsDecorated">
+      <bool>false</bool>
+     </property>
+     <property name="itemsExpandable">
+      <bool>false</bool>
+     </property>
+     <attribute name="headerDefaultSectionSize">
+      <number>110</number>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>address</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>city</string>
+      </property>
+     </column>
+     <item>
+      <property name="text">
+       <string>John Smith</string>
+      </property>
+      <property name="text">
+       <string>Blue Police Box</string>
+      </property>
+      <property name="text">
+       <string>London</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Martha Jones</string>
+      </property>
+      <property name="text">
+       <string>London</string>
+      </property>
+      <property name="text">
+       <string>London</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rose Taylor</string>
+      </property>
+      <property name="text">
+       <string>Parallel Universe</string>
+      </property>
+      <property name="text">
+       <string>Other London</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="edit">
+       <property name="text">
+        <string>Edit</string>
+       </property>
+       <property name="form" stdset="0">
+        <string>customer_edit</string>
+       </property>
+       <property name="global.id" stdset="0">
+        <string>{customer.id}</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

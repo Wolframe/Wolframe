@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>262</width>
+    <height>175</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Customer</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <item row="0" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="search">
+       <property name="text">
+        <string>L*</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="searchButton">
+       <property name="text">
+        <string>Search..</string>
+       </property>
+       <property name="action" stdset="0">
+        <string>city.reload</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="1">
+    <widget class="QListWidget" name="city">
+     <property name="selectionRectVisible">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string>CityListRequest</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>city</string>
+     </property>
+     <property name="search" stdset="0">
+      <string>{search.text}</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>Lima</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lagos</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lahore</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>London</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Los Angeles</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lucknow</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lanzhou</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ludhiana</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lusaka</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>León</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Luoyang</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>search</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>searchButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>207</x>
+     <y>22</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
