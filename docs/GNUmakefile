@@ -24,6 +24,7 @@ XSLT_PDF = \
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
 	--stringparam toc.section.depth 4 \
+	--stringparam fop1.extensions 1 \
 	output-pdf.xsl
 
 XSLT_EPUB = \
