@@ -112,8 +112,77 @@
 			<para>
 				Every widget in the Qt class hierarchy has a default way, how data
 				is serialized into the request XML and how it is deserialized from
-				the answer XML. For instance a <classname>QLineEdit</classname>
+				the answer XML. For instance a <classname>QLineEdit</classname> 
+				element of the form will output its currently inputed text to the
+				XML or set it from there:
 			</para>
+			
+			<screenshot>
+				<screeninfo>Simple Qt data input form</screeninfo>
+				<mediaobject>
+					<imageobject> 
+						<imagedata fileref="examples/clients/simple_form.png" format="PNG"/>
+					</imageobject> 
+				</mediaobject>
+			</screenshot>
+
+			<programlisting language='xml'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.xml" parse="text" />
+			</programlisting>
+			
+			<para>
+				Some elements are more complicated than that, they present the user
+				a list of options or items to pick from, e.g. a list of cities.
+			</para>
+			
+			<screenshot>
+				<screeninfo>More complex Qt data input form</screeninfo>
+				<mediaobject>
+					<imageobject> 
+						<imagedata fileref="examples/clients/complex_form.png" format="PNG"/>
+					</imageobject> 
+				</mediaobject>
+			</screenshot>
+			
+			<para>
+				When the form is saved, the currently selected element is written into
+				the resulting XML:
+			</para>
+
+			<programlisting language='xml'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form.xml" parse="text" />
+			</programlisting>
+
+			<para>
+				In this case the widget can load its own domain data as a separate
+				XML request.
+			</para>
+
+			<programlisting language='xml'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form_domain_extract.xml" parse="text" />
+			</programlisting>
+
+			<para>
+				Per default the name of the widget will be matched against the XML
+				element with the same name.
+			</para>
+			<para>
+				Per default the root element of the XML request is the name of the
+				form. This can be overloaded with the dynamic property <code>rootelement</code>.
+			</para>
+			<para>
+				Widgets like <classname>QTreeWidget</classname> and 
+				<classname>QTableWidget</classname> have a substructure, there
+				the names of headers serve as name for the tags when serializing
+				or deserializing the XML.
+			</para>
+		</sect3>
+		
+		<sect3>
+		</sect3>
+		
+		<sect3>			
+			<title>Global variabled</title>
 		</sect3>
 	</sect2>
 </sect1>
@@ -123,21 +192,6 @@
 Domain data
 
 Domain data gets choosen based on the current interface language.
-
-Simple schema:
-
-<domain>
-   <form>form1</form>
-   <widget>widget1</widget>
-   <language>de_CH</language>
-   <values>
-      <value id="language_independent_key">translated value</value>
-      ...
-   </values>
-</domain>
-
-widget1 is for instance a drop down selection (single select) or
-a list multi-selection.
 
 The tree are encoded as in:
 
@@ -163,6 +217,8 @@ The tree are encoded as in:
 Items in a tree can have a tuple of (key,value) at the moment
 (correspond to the columns in the tree view).
 
+Missing here: table, make a list of every widget and how it is mapped
+
 Should not be cached on the client.
 
 Current data
@@ -180,17 +236,10 @@ Current data
   </vegetable>
 </form1>
 
-The top-level tag corresponds to the UIform name.
-
-The name of the tags correspond to the name of the widgets in the
-UIform.
-
 Values are the contents of the UI fields (e.g. text field).
 For lists, drop-downs and groups of checkboxes those are the
 language-independent keys in the values of the domain or the
 ids in the nodes in the tree.
-
-Must not be cached on the client.
 
 Dynamic Properties
 

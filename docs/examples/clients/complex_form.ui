@@ -1,0 +1,1746 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>262</width>
+    <height>175</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Customer</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_name">
+     <property name="text">
+      <string>Name:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="name">
+     <property name="text">
+      <string>John Smith</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_address">
+     <property name="text">
+      <string>Address:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="address">
+     <property name="text">
+      <string>Blue Police Box</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_city">
+     <property name="text">
+      <string>City:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QListWidget" name="listWidget">
+     <property name="selectionRectVisible">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Mumbai (Bombay)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Karachi</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Delhi</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Shanghai</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Moscow</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>São Paulo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Seoul</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Istanbul</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Mexico City</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jakarta</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>New York 3</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tokyo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lima</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Beijing</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Cairo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tehran</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>London</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Santa Fé de Bogotá</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lagos</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hong Kong 1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rhein-Ruhr North 7</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bangkok</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lahore</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Dhaka</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rio de Janeiro</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Baghdad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Riyadh</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bangalore</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Wuhan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tianjin</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Toronto</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Chongqing</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Santiago</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Calcutta</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Singapore</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kinshasa</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Chennai (Madras)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Saint Petersburg</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Shenyang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Guangzhou</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Los Angeles 2</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ahmadabad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sydney</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Pusan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rhein-Main 4</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Alexandria</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jidda</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hyderabad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ankara</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Yokohama</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Montréal</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Casablanca</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ho Chi Minh City</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Berlin</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rhein-Ruhr Middle 6</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Melbourne</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Pyongyang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kabul</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rhein-Ruhr South 8</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Pune (Poona)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Yangon</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Medellín</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Omdurman</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Surat</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Madrid</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Abidjan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Xian</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Chicago</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nanjing</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kanpur</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kano</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Harbin</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Buenos Aires</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Addis Ababa</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>East Rand (Ekurhuleni)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Surabaja</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jaipur</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nairobi</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Salvador</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Inch'on</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Taegu</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kiev</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bekasi</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Chengdu</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Osaka-Kobe</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Al-Jizah</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Taipei</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Dar es Salaam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rome</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lucknow</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Cali</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Quezon City</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Luanda</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Changchun</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Izmir</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Cali</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Faisalabad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Cape Town</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Belo Horizonte</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ibadan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fortaleza</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Aleppo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Dalian</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nagpur</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Havana</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Taškent</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bandung</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nagoya</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Brasília</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jinan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Guayaquil</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Vancouver</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Chittagong</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Mashhad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Paris</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Qingdao</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Durban</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Taiyuan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Medan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Houston</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Medellin</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jiulong</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Agadir</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Dakar</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>de Morelos</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Zhengzhou</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kaesong</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Douala</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Baku</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bucharest</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Santo Domingo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Indore</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Caracas</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hai Phong</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Barranquilla</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sapporo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rabat</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Shangqiu</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kunming</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Maracaibo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Si Racha</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hamburg</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rawalpindi</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Khartoum</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Budapest</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Al-Khartum Bahri</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Curitiba</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Minsk</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Zibo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Shijiazhuang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Xiantao</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Warsaw</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Damascus</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Guadalajara</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lanzhou</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Accra</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hangzhou</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Yaoundé</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Antananarivo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Patna</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bhopal</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Palembang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rhein-Neckar 5</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Changsha</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tangerang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Manaus</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Beirut</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Metro Manila</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Yulin, Guangxi</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ludhiana</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Vienna</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Esfahan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Semarang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kaohsiung</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Algiers</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Quito</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kobe</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Thana</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Harare</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Recife</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kharkov</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Depok</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Samut Prakan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kyoto</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Philadelphia</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tijuana</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Mecca</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Barcelona</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nanchang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Johannesburg</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Taejon</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ciudad Juárez</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kwangju</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Novosibirsk</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Caloocan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Agra</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Urumqi</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Phoenix-Mesa</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sana'a</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Vadodara</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Guiyang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Puebla</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tabriz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Conakry</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Belém</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Barranquilla</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fukuoka-Kitakyushu</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kuala Lumpur</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Multan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Pôrto Alegre</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Santa Cruz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bursa</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tangshan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Montevideo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Perth</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hyderabad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Gujranwala</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Valencia</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lusaka</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Córdoba</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nizhni Novgorod</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>La Matanza</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ekaterinburg</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jilin</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Al-Madinah</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fuzhou, Fujian</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nashik</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Anshan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Pimpri-Chinchwad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Dubai</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Abadan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bamako</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>San Diego</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kampala</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kawasaki</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kaduna</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kalyan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hefei</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>San Antonio</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fushun</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Port-au-Prince</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Munich</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Shenzhen</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Xuzhou</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Meerut</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Dallas-Fort Worth</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fès</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Baotou</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Milan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jamshedpur</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bogor</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Shiraz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Adana</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Faridabad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hanoi</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Santa Cruz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Karaj</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Amman</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nezahualcóyotl</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ad-Dammam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Peshawar</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Guarulhos</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tripoli</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Varanasi (Benares)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Mosul</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Wuxi</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kuwait City</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Goiânia</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>León</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Zapopan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Handan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Glasgow</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ghaziabad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Samara</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Suzhou, Jiangsu</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Prague</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Omsk</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Hiroshima</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Qiqihar</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Luoyang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Belgrade</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Yantai</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kazan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Monterrey</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ottawa</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nampho</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Suwon</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Amritsar</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rajkot</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Basra</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ujung Pandang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Shantou</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Mogadishu</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nanning</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Adelaide</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sofia</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Brazzaville</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Datong</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Pretoria</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Almaty</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Chelyabinsk</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Rostov-on-Don</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Yerevan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Soweto</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Allahabad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Maputo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Goyang</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Visakhapatnam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Dnepropetrovsk</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Victoria</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Nanchong</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Zigong</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Benin City</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>T'aichung</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ahvaz</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ufa</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sendai</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Jabalpur</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Tbilisi</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Qom</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Calgary</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Haora</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Odessa</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Aurangabad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Seongnam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Shubra al-Khaymah</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Volgograd</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Donetsk</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Campinas</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Gaziantep</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ulsan</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sholapur</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Kitakyushu</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ouagadougou</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Perm</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sao Luis</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
