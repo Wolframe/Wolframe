@@ -520,15 +520,12 @@ Optional packages: openssl, qt, pam, libsasl,
                    libxml2, libxslt, libharu,
                    icu, freeimage
 
-For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'.
-'fop' (together with 'java-batik', 'java-commons-io', 'java-avalon-framework',
-'java-commons-logging', 'java-xmlgraphics-commons')
-
 FreeImage only contains the static version of libfreeimageplus. If you
-want the shared version, build with WITH_LOCAL_FREEIMAGE=1 instead.
+want the shared version, build with WITH_LOCAL_FREEIMAGE=1 instead. The
+static version works fine though.
 
-Change /etc/fop.conf and make sure it contains the line:
-CLASSPATH="$CLASSPATH:/usr/share/java/batik/xml-apis-ext.jar"
+For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'
+and 'fop'.
 
 When rebuilding the SVG images of the documentation you also need 'dia'.
 
