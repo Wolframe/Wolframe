@@ -50,7 +50,7 @@ doc-pdf: WolfBook.pdf
 .PHONY: depend
 depend:
 
-epub: WolfBook.epub
+doc-epub: WolfBook.epub
 	mkdir OEBPS/images
 	cp images/draft.png images/*.svg OEBPS/images
 	echo "application/epub+zip" > mimetype
