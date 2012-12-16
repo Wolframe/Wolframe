@@ -11,8 +11,9 @@ QUIT
 **file:example_2.lua
 
 function run( )
-        input:as( filter( "line", "UTF-8"))
-        output:as( filter( "line", "UTF-8"))
+        local f = filter( "line", "UTF-8")
+        input:as( f)
+        output:as( f)
         for c in input:get() do
                 output:print( c)
         end

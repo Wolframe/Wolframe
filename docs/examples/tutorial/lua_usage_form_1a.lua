@@ -1,3 +1,3 @@
 
 bcf = form( "employee" )
-bc = bcf( {surname='Hans', name='Muster', company='Wolframe'} )
+bcf:fill( {surname='Hans', name='Muster', company='Wolframe'} )

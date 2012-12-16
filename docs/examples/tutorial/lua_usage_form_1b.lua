@@ -1,2 +1,2 @@
 
-bc = form( "employee", true )( {company='Wolframe'} )
+bc = form( "employee" ):fill( {company='Wolframe'}, "strict" )

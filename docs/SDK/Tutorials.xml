@@ -1,10 +1,11 @@
 <!-- Tutorials -->
 <chapter>
-<title>Programs for the logic tier</title>
+<title>Programs for the Logic Tier</title>
 <para>This chapter introduces the programs of the logic tier.
 </para>
 	&SDKtutorialTransactions;
 	&SDKtutorialForms;
+	&SDKtutorialFormDataTypes;
 	&SDKtutorialProgramLua;
 </chapter>
 

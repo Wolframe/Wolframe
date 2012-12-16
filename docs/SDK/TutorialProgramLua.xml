@@ -1,18 +1,18 @@
 <!-- Tutorial -->
 <sect1>
-<title>Writing Wolframe Programs in Lua</title>
+<title>Defining Programs in Lua</title>
 	<sect2>
 	<title>Introduction</title>
 	<para>You can write programs for the logic tier of Wolframe with Lua. Lua is a scripting language designed, implemented, and maintained
 		at PUC-Rio in Brazil by Roberto Ierusalimschy, Waldemar Celes and Luiz Henrique de Figueiredo
-		(see http://www.lua.org/authors.html). A tutorial for the use of Lua is not provided here.
+		(see http://www.lua.org/authors.html). A description of Lua is not provided here.
 		For an introduction into programming with Lua see http://www.lua.org. The official manual also available as book
-		is very good. Wolframe introduces some Lua interfaces to access input and output and to do transactions.
+		is very good. Wolframe introduces some Lua interfaces to access input and output and to execute functions.
 		The Lua application layer doesn't have to deal with protocol or encryption issues.
 	</para>
 	</sect2>
 	<sect2>
-	<title>Filter</title>
+	<title>Filters</title>
 	<para>The application input and output can be of different kind.
 		For different input and output Wolframe provides
 		filters. The system provides a global function
@@ -32,9 +32,19 @@
 			<code>input:as( f )</code>
 		attaches a filter f to the input.
 			<code>input:get( )</code>
-		returns an iterator on the input that fetches one or two values per step depending on the filter. Unstructured input
-		fetches one value, the input element. Structured input fetches the element content as first value
-		and the attribute or tag as second value. If one of them is not available, then a boolean false is
+		returns an iterator on the input that fetches one or two values per step depending on the filter.
+			<code>input:table( )</code>
+		returns the input structure as lua table. If the document has a document type, the document is validated
+		by the associated data form. If the document is standalone, then the returned table may not have the structure
+		expected because without schema there is no mean to distinguish between a single element array and a unique element.
+		</para>
+
+		<sect3>
+		<title>Input iterators</title>
+		<para>
+		The iterator closure returned by <code>input:get()</code> has the following properties:
+		Unstructured input fetches one value, the input element. Structured input fetches the element
+		content as first value and the attribute or tag as second value. If one of them is not available, then a boolean false is
 		retured in its place. An XML tag for example is returned as false;tagname. An attribute,
 		value pair is returned as value;name.
 		A content element is returned as value;false or value;nil, depending on the filter type.
@@ -44,77 +54,99 @@
 		returned at the end of the data or, if the iteration started in a subsection of the
 		content, as the last tag of context the iteration has started closes. The later
 		construct is used for delegating the processing of subsections.
-	</para>
+		</para>
+		</sect3>
 	</sect2>
 	<sect2>
 	<title>Output</title>
-	<para>Output is a accessed over a global variable output. This object has the following methods:
-			<code>output:as(f)</code>
-		attaches a filter f to the output. Subsequent calls of print() will apply this filter f to print the
-		output elements returned as content to the client.
+	<para>Output is a accessed by a global variable output. This object has the following methods:
+			<code>output:as( arg)</code>
+		In case of arg beeing a string or a table it defines the document type of the output.
+		In case of arg beeing a filter it attaches this filter to the output.
+		Subsequent calls of <code>output:print()</code> will apply this filter <code>arg</code> to print
+		the output elements returned as content to the client.
 			<code>output:print(c,t)</code>
 		or
-			<code>output:print(c)</code>
-		prints an element to the output. Omitting t, means that an untagged content element is printed.
-		The same happens when you call print with nil or false as second parameter t. With c passed
-		as nil or false with t, you print a open tag or close tag, depending on t. t is a tag name for
-		open tag and nil or false for a close previous tag. With c,t as non nil or false values you
+			<code>output:print(c)</code>.
+		prints an element to the output. The print function is defined symmetrically to the input iterator.
+		This means that the loop
+			<code>
+			for c,t in input:get() do
+				output:print(c,t)
+			end
+			</code>
+		echoes the input.
+		Omitting the second argument <code>t</code> means that an untagged content element is printed.
+		The same happens when you call print with <code>nil</code> or <code>false</code> as second parameter <code>t</code>. With <code>c</code> passed
+		as <code>nil</code> or <code>false</code> with <code>t</code>, you print a open tag or close tag, depending on <code>t</code>. <code>t</code> is a tag name for
+		open tag and <code>nil</code> or <code>false</code> for a close previous tag. With c,t as non <code>nil</code> or <code>false</code> values you
 		print an attribute value assignement.
 	</para>
-	<para>
-		For convenience there are also the functions
+	<para>For convenience there are also the functions
 			<code>output:opentag(t)</code> - equivalent to <code>output:print(false,t)</code>,
 			<code>output:closetag(t)</code> - equivalent to <code>output:print(false,false)</code>
 		defined. When explicitely defining an XML structure output in Lua these functions are more readable.
 	</para>
 	</sect2>
 	<sect2>
-	<title>Form</title>
-	<para>Input and and output of transactions are objects built by an object description. In Wolframe
-		this description of an object is called a form. A form is an ordered array of typed variables
-		and subforms. Forms are defined in modules or interpreted from a source (any DDL like DDT,XSD,etc.).
-		It depends on the user what type of form description and translator to use. Forms are
-		loaded at startup and have a unique name.
-		The system provides a global function
+	<title>Forms</title>
+	<para>The <code>Wolframe</code> Lua layer provides a global function
 			<code>form( )</code>
-		with the name of the form as string as parameter. If you for example have a form configured
-		called "employee" and you want to create a employee object from a Lua table, you by call
+		with the name of the form as string as parameter. It returns an empty data form with the
+		structure of the form with the global name in the argument string.
+		If you for example have a form configured called "employee" and you want to create a
+		employee object from a Lua table, you call
 			<programlisting language='lua'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_usage_form_1a.lua" parse="text" />
 			</programlisting>
-		The first line creates a function for checking a table with the form and to map it to form data.
-		The second line calls the function and returns the form data for a valid table or nil for an invalid table.
+		The first line creates the data form object.
+		The second line fills the data into the data form object.
+		</para>
+		<para>
 
-		The function <code>form</code> has a second optional boolean parameter. Passing true as
-		second parameter enforces an abort of the program by exception, if the validation
-		of the form fails. The following example call of <code>bcf</code> will terminate the script with
-		error because some elements of the form are missing:
+		The form method <code>fill</code> takes a second optional parameter. Passing "strict" as
+		second parameter enforces a strict validation of the input against the form, meaning that
+		attributes are checked to be attributes and non optional elements are checked to be initialized.
+		Passing "complete" as second parameter forces non optional elements to be checked for initialization
+		but does not distinguish between attributes and content values. "relaxed" is the default and
+		checks only the existence of fill values in the form.
+		</para>
+		<para>
+
+		The following example call of <code>fill</code> will raise an error because some elements
+		of the form are missing in the input:
 			<programlisting language='lua'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_usage_form_1b.lua" parse="text" />
 			</programlisting>
-		Calling the function <code>form</code> with one parameter or false as second parameter returns
-		a function that can be used to check some data properties. This helps to reduce the variety of
-		form descriptions.
 
-		The mapping function of a form works in both directions. If you pass a table to it,
-		it returns the form data. If you pass form data to it, it returns a Lua table created out of it.
-	</para>
+		</para>
+		<para>
+		To access the data in a form there are two form methods available. <code>get()</code> returns an iterator on the form data similar
+		to the iterator on input. Same as for input there is a method <code>table()</code> that returns the form data as lua table.
+		</para>
 	</sect2>
 	<sect2>
-	<title>Transaction</title>
+	<title>Functions</title>
 	<para>
-		Transactions in a Wolframe Lua program are functions taking a list of form data objects as
-		input and returning a list of form data objects as output. Transaction functions are loaded
-		at startup and have a unique name. The system provides a global function
-			<code>transaction( )</code>
-		with the name of the transaction as parameter. If you for example have a transaction configured
-		called "insertEmployee" and you want to call it with the 'employee' object defined above as
-		input and returning an Id as ouput, you do
+		For calling transactions or built-in functions loaded as modules the lua layer defines the
+		concept of functions. The function <code>formfunction</code> with the name of the function
+		as argument returns a lua function. This function takes a table or an iterator as argument
+		and returns a data form structure. The data in the returned form data structure can be
+		accessed as explained in the form section above with <code>get()</code> and <code>table()</code>.
+		</para>
+		<para>
+		If you for example have a transaction called "insertEmployee" defined in a transaction description program
+		file declared in the configuration called "insertEmployee" and you want to call it with the 'employee'
+		object defined above as input, you do
 			<programlisting language='lua'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_usage_transaction_1.lua" parse="text" />
 			</programlisting>
-		The first line creates the input form, the second the output form, the third does the insert into
-		the database operation and the 4th line prints it as string to the output.
+
+		</para>
+		<para>
+		The first line creates the function called "insertEmployee" as lua function.
+		The second calls the transaction, the third creates a lua table out of the result
+		and the fourth selects and prints the "id" element in the table.
 	</para>
 	</sect2>
 	<sect2>
@@ -169,11 +201,7 @@
 		<title>Example 5: Load XML into a table</title>
 		<para>
 			This example procedure load the content of the XML document into a table and prints the
-			elements 'name' and 'country'. The reading of the input into a table gets very complicated
-			without meta description of the document. We suggest here to use forms generated
-			from the document schema DDL (dtd, xml schema, etc.) to map an XML into a table.
-			The example prints the output directly from the table. It is using the
-			more convenient and in this example more readable opentag/closetag methods of output.
+			elements 'name' and 'country'.
 		<programlisting language='lua'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/lua_script_5.lua" parse="text" />
 		</programlisting>
