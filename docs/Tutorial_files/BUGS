@@ -17,3 +17,6 @@
   Escape character is '^]'.
   Server is busy. Please try again later.
   Connection closed by foreign host.
+- themes/windows directory is requires and the files, maybe a
+  builtin compiled standard theme is an idea?
+  
