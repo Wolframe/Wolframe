@@ -1042,6 +1042,10 @@ fi
 %endif
 %{_bindir}/qtclient
 %endif
+%if !%{sles}
+%dir %{_libdir}/wolframe/
+%endif
+%{_libdir}/wolframe/libwolframewidgets.so
 
 %changelog
 * Sun Aug 29 2011 Andreas Baumann <abaumann@yahoo.com> 0.0.1-0.2
