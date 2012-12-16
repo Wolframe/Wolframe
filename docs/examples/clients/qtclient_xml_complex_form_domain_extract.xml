@@ -1,7 +1,10 @@
 
-  <city>Tokyo</city>
-  <city>Lima</city>
-  <city>Beijing</city>
-  <city>Cairo</city>
-  <city>Tehran</city>
-  <city>London</city>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<city>
+  <value>Tokyo</value>
+  <value>Lima</value>
+  <value>Beijing</value>
+  <value>Cairo</value>
+  <value>Tehran</value>
+  <value>London</value>
+</city>

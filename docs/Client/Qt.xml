@@ -155,9 +155,18 @@
 
 			<para>
 				In this case the widget can load its own domain data as a separate
-				XML request.
+				XML request:
 			</para>
 
+			<programlisting language='xml'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form_domain_request.xml" parse="text" />
+			</programlisting>
+
+			<para>
+				The answer contains all possible values in the domain, in our case
+				a list of all cities:
+			</para>
+			
 			<programlisting language='xml'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_complex_form_domain_extract.xml" parse="text" />
 			</programlisting>

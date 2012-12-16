@@ -1,336 +1,341 @@
-  <city>Mumbai (Bombay)</city>
-  <city>Karachi</city>
-  <city>Delhi</city>
-  <city>Shanghai</city>
-  <city>Moscow</city>
-  <city>São Paulo</city>
-  <city>Seoul</city>
-  <city>Istanbul</city>
-  <city>Mexico City</city>
-  <city>Jakarta</city>
-  <city>New York 3</city>
-  <city>Tokyo</city>
-  <city>Lima</city>
-  <city>Beijing</city>
-  <city>Cairo</city>
-  <city>Tehran</city>
-  <city>London</city>
-  <city>Santa Fé de Bogotá</city>
-  <city>Lagos</city>
-  <city>Hong Kong 1</city>
-  <city>Rhein-Ruhr North 7</city>
-  <city>Bangkok</city>
-  <city>Lahore</city>
-  <city>Dhaka</city>
-  <city>Rio de Janeiro</city>
-  <city>Baghdad</city>
-  <city>Riyadh</city>
-  <city>Bangalore</city>
-  <city>Wuhan</city>
-  <city>Tianjin</city>
-  <city>Toronto</city>
-  <city>Chongqing</city>
-  <city>Santiago</city>
-  <city>Calcutta</city>
-  <city>Singapore</city>
-  <city>Kinshasa</city>
-  <city>Chennai (Madras)</city>
-  <city>Saint Petersburg</city>
-  <city>Shenyang</city>
-  <city>Guangzhou</city>
-  <city>Los Angeles 2</city>
-  <city>Ahmadabad</city>
-  <city>Sydney</city>
-  <city>Pusan</city>
-  <city>Rhein-Main 4</city>
-  <city>Alexandria</city>
-  <city>Jidda</city>
-  <city>Hyderabad</city>
-  <city>Ankara</city>
-  <city>Yokohama</city>
-  <city>Montréal</city>
-  <city>Casablanca</city>
-  <city>Ho Chi Minh City</city>
-  <city>Berlin</city>
-  <city>Rhein-Ruhr Middle 6</city>
-  <city>Melbourne</city>
-  <city>Pyongyang</city>
-  <city>Kabul</city>
-  <city>Rhein-Ruhr South 8</city>
-  <city>Pune (Poona)</city>
-  <city>Yangon</city>
-  <city>Medellín</city>
-  <city>Omdurman</city>
-  <city>Surat</city>
-  <city>Madrid</city>
-  <city>Abidjan</city>
-  <city>Xian</city>
-  <city>Chicago</city>
-  <city>Nanjing</city>
-  <city>Kanpur</city>
-  <city>Kano</city>
-  <city>Harbin</city>
-  <city>Buenos Aires</city>
-  <city>Addis Ababa</city>
-  <city>East Rand (Ekurhuleni)</city>
-  <city>Surabaja</city>
-  <city>Jaipur</city>
-  <city>Nairobi</city>
-  <city>Salvador</city>
-  <city>Inch'on</city>
-  <city>Taegu</city>
-  <city>Kiev</city>
-  <city>Bekasi</city>
-  <city>Chengdu</city>
-  <city>Osaka-Kobe</city>
-  <city>Al-Jizah</city>
-  <city>Taipei</city>
-  <city>Dar es Salaam</city>
-  <city>Rome</city>
-  <city>Lucknow</city>
-  <city>Cali</city>
-  <city>Quezon City</city>
-  <city>Luanda</city>
-  <city>Changchun</city>
-  <city>Izmir</city>
-  <city>Cali</city>
-  <city>Faisalabad</city>
-  <city>Cape Town</city>
-  <city>Belo Horizonte</city>
-  <city>Ibadan</city>
-  <city>Fortaleza</city>
-  <city>Aleppo</city>
-  <city>Dalian</city>
-  <city>Nagpur</city>
-  <city>Havana</city>
-  <city>Taškent</city>
-  <city>Bandung</city>
-  <city>Nagoya</city>
-  <city>Brasília</city>
-  <city>Jinan</city>
-  <city>Guayaquil</city>
-  <city>Vancouver</city>
-  <city>Chittagong</city>
-  <city>Mashhad</city>
-  <city>Paris</city>
-  <city>Qingdao</city>
-  <city>Durban</city>
-  <city>Taiyuan</city>
-  <city>Medan</city>
-  <city>Houston</city>
-  <city>Medellin</city>
-  <city>Jiulong</city>
-  <city>Agadir</city>
-  <city>Dakar</city>
-  <city>de Morelos</city>
-  <city>Zhengzhou</city>
-  <city>Kaesong</city>
-  <city>Douala</city>
-  <city>Baku</city>
-  <city>Bucharest</city>
-  <city>Santo Domingo</city>
-  <city>Indore</city>
-  <city>Caracas</city>
-  <city>Hai Phong</city>
-  <city>Barranquilla</city>
-  <city>Sapporo</city>
-  <city>Rabat</city>
-  <city>Shangqiu</city>
-  <city>Kunming</city>
-  <city>Maracaibo</city>
-  <city>Si Racha</city>
-  <city>Hamburg</city>
-  <city>Rawalpindi</city>
-  <city>Khartoum</city>
-  <city>Budapest</city>
-  <city>Al-Khartum Bahri</city>
-  <city>Curitiba</city>
-  <city>Minsk</city>
-  <city>Zibo</city>
-  <city>Shijiazhuang</city>
-  <city>Xiantao</city>
-  <city>Warsaw</city>
-  <city>Damascus</city>
-  <city>Guadalajara</city>
-  <city>Lanzhou</city>
-  <city>Accra</city>
-  <city>Hangzhou</city>
-  <city>Yaoundé</city>
-  <city>Antananarivo</city>
-  <city>Patna</city>
-  <city>Bhopal</city>
-  <city>Palembang</city>
-  <city>Rhein-Neckar 5</city>
-  <city>Changsha</city>
-  <city>Tangerang</city>
-  <city>Manaus</city>
-  <city>Beirut</city>
-  <city>Metro Manila</city>
-  <city>Yulin, Guangxi</city>
-  <city>Ludhiana</city>
-  <city>Vienna</city>
-  <city>Esfahan</city>
-  <city>Semarang</city>
-  <city>Kaohsiung</city>
-  <city>Algiers</city>
-  <city>Quito</city>
-  <city>Kobe</city>
-  <city>Thana</city>
-  <city>Harare</city>
-  <city>Recife</city>
-  <city>Kharkov</city>
-  <city>Depok</city>
-  <city>Samut Prakan</city>
-  <city>Kyoto</city>
-  <city>Philadelphia</city>
-  <city>Tijuana</city>
-  <city>Mecca</city>
-  <city>Barcelona</city>
-  <city>Nanchang</city>
-  <city>Johannesburg</city>
-  <city>Taejon</city>
-  <city>Ciudad Juárez</city>
-  <city>Kwangju</city>
-  <city>Novosibirsk</city>
-  <city>Caloocan</city>
-  <city>Agra</city>
-  <city>Urumqi</city>
-  <city>Phoenix-Mesa</city>
-  <city>Sana'a</city>
-  <city>Vadodara</city>
-  <city>Guiyang</city>
-  <city>Puebla</city>
-  <city>Tabriz</city>
-  <city>Conakry</city>
-  <city>Belém</city>
-  <city>Barranquilla</city>
-  <city>Fukuoka-Kitakyushu</city>
-  <city>Kuala Lumpur</city>
-  <city>Multan</city>
-  <city>Pôrto Alegre</city>
-  <city>Santa Cruz</city>
-  <city>Bursa</city>
-  <city>Tangshan</city>
-  <city>Montevideo</city>
-  <city>Perth</city>
-  <city>Hyderabad</city>
-  <city>Gujranwala</city>
-  <city>Valencia</city>
-  <city>Lusaka</city>
-  <city>Córdoba</city>
-  <city>Nizhni Novgorod</city>
-  <city>La Matanza</city>
-  <city>Ekaterinburg</city>
-  <city>Jilin</city>
-  <city>Al-Madinah</city>
-  <city>Fuzhou, Fujian</city>
-  <city>Nashik</city>
-  <city>Anshan</city>
-  <city>Pimpri-Chinchwad</city>
-  <city>Dubai</city>
-  <city>Abadan</city>
-  <city>Bamako</city>
-  <city>San Diego</city>
-  <city>Kampala</city>
-  <city>Kawasaki</city>
-  <city>Kaduna</city>
-  <city>Kalyan</city>
-  <city>Hefei</city>
-  <city>San Antonio</city>
-  <city>Fushun</city>
-  <city>Port-au-Prince</city>
-  <city>Munich</city>
-  <city>Shenzhen</city>
-  <city>Xuzhou</city>
-  <city>Meerut</city>
-  <city>Dallas-Fort Worth</city>
-  <city>Fès</city>
-  <city>Baotou</city>
-  <city>Milan</city>
-  <city>Jamshedpur</city>
-  <city>Bogor</city>
-  <city>Shiraz</city>
-  <city>Adana</city>
-  <city>Faridabad</city>
-  <city>Hanoi</city>
-  <city>Santa Cruz</city>
-  <city>Karaj</city>
-  <city>Amman</city>
-  <city>Nezahualcóyotl</city>
-  <city>Ad-Dammam</city>
-  <city>Peshawar</city>
-  <city>Guarulhos</city>
-  <city>Tripoli</city>
-  <city>Varanasi (Benares)</city>
-  <city>Mosul</city>
-  <city>Wuxi</city>
-  <city>Kuwait City</city>
-  <city>Goiânia</city>
-  <city>León</city>
-  <city>Zapopan</city>
-  <city>Handan</city>
-  <city>Glasgow</city>
-  <city>Ghaziabad</city>
-  <city>Samara</city>
-  <city>Suzhou, Jiangsu</city>
-  <city>Prague</city>
-  <city>Omsk</city>
-  <city>Hiroshima</city>
-  <city>Qiqihar</city>
-  <city>Luoyang</city>
-  <city>Belgrade</city>
-  <city>Yantai</city>
-  <city>Kazan</city>
-  <city>Monterrey</city>
-  <city>Ottawa</city>
-  <city>Nampho</city>
-  <city>Suwon</city>
-  <city>Amritsar</city>
-  <city>Rajkot</city>
-  <city>Basra</city>
-  <city>Ujung Pandang</city>
-  <city>Shantou</city>
-  <city>Mogadishu</city>
-  <city>Nanning</city>
-  <city>Adelaide</city>
-  <city>Sofia</city>
-  <city>Brazzaville</city>
-  <city>Datong</city>
-  <city>Pretoria</city>
-  <city>Almaty</city>
-  <city>Chelyabinsk</city>
-  <city>Rostov-on-Don</city>
-  <city>Yerevan</city>
-  <city>Soweto</city>
-  <city>Allahabad</city>
-  <city>Maputo</city>
-  <city>Goyang</city>
-  <city>Visakhapatnam</city>
-  <city>Dnepropetrovsk</city>
-  <city>Victoria</city>
-  <city>Nanchong</city>
-  <city>Zigong</city>
-  <city>Benin City</city>
-  <city>T'aichung</city>
-  <city>Ahvaz</city>
-  <city>Ufa</city>
-  <city>Sendai</city>
-  <city>Jabalpur</city>
-  <city>Tbilisi</city>
-  <city>Qom</city>
-  <city>Calgary</city>
-  <city>Haora</city>
-  <city>Odessa</city>
-  <city>Aurangabad</city>
-  <city>Seongnam</city>
-  <city>Shubra al-Khaymah</city>
-  <city>Volgograd</city>
-  <city>Donetsk</city>
-  <city>Campinas</city>
-  <city>Gaziantep</city>
-  <city>Ulsan</city>
-  <city>Sholapur</city>
-  <city>Kitakyushu</city>
-  <city>Ouagadougou</city>
-  <city>Perm</city>
-  <city>Sao Luis</city>
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<city>
+  <value>Mumbai (Bombay)</value>
+  <value>Karachi</value>
+  <value>Delhi</value>
+  <value>Shanghai</value>
+  <value>Moscow</value>
+  <value>São Paulo</value>
+  <value>Seoul</value>
+  <value>Istanbul</value>
+  <value>Mexico City</value>
+  <value>Jakarta</value>
+  <value>New York 3</value>
+  <value>Tokyo</value>
+  <value>Lima</value>
+  <value>Beijing</value>
+  <value>Cairo</value>
+  <value>Tehran</value>
+  <value>London</value>
+  <value>Santa Fé de Bogotá</value>
+  <value>Lagos</value>
+  <value>Hong Kong 1</value>
+  <value>Rhein-Ruhr North 7</value>
+  <value>Bangkok</value>
+  <value>Lahore</value>
+  <value>Dhaka</value>
+  <value>Rio de Janeiro</value>
+  <value>Baghdad</value>
+  <value>Riyadh</value>
+  <value>Bangalore</value>
+  <value>Wuhan</value>
+  <value>Tianjin</value>
+  <value>Toronto</value>
+  <value>Chongqing</value>
+  <value>Santiago</value>
+  <value>Calcutta</value>
+  <value>Singapore</value>
+  <value>Kinshasa</value>
+  <value>Chennai (Madras)</value>
+  <value>Saint Petersburg</value>
+  <value>Shenyang</value>
+  <value>Guangzhou</value>
+  <value>Los Angeles 2</value>
+  <value>Ahmadabad</value>
+  <value>Sydney</value>
+  <value>Pusan</value>
+  <value>Rhein-Main 4</value>
+  <value>Alexandria</value>
+  <value>Jidda</value>
+  <value>Hyderabad</value>
+  <value>Ankara</value>
+  <value>Yokohama</value>
+  <value>Montréal</value>
+  <value>Casablanca</value>
+  <value>Ho Chi Minh City</value>
+  <value>Berlin</value>
+  <value>Rhein-Ruhr Middle 6</value>
+  <value>Melbourne</value>
+  <value>Pyongyang</value>
+  <value>Kabul</value>
+  <value>Rhein-Ruhr South 8</value>
+  <value>Pune (Poona)</value>
+  <value>Yangon</value>
+  <value>Medellín</value>
+  <value>Omdurman</value>
+  <value>Surat</value>
+  <value>Madrid</value>
+  <value>Abidjan</value>
+  <value>Xian</value>
+  <value>Chicago</value>
+  <value>Nanjing</value>
+  <value>Kanpur</value>
+  <value>Kano</value>
+  <value>Harbin</value>
+  <value>Buenos Aires</value>
+  <value>Addis Ababa</value>
+  <value>East Rand (Ekurhuleni)</value>
+  <value>Surabaja</value>
+  <value>Jaipur</value>
+  <value>Nairobi</value>
+  <value>Salvador</value>
+  <value>Inch'on</value>
+  <value>Taegu</value>
+  <value>Kiev</value>
+  <value>Bekasi</value>
+  <value>Chengdu</value>
+  <value>Osaka-Kobe</value>
+  <value>Al-Jizah</value>
+  <value>Taipei</value>
+  <value>Dar es Salaam</value>
+  <value>Rome</value>
+  <value>Lucknow</value>
+  <value>Cali</value>
+  <value>Quezon City</value>
+  <value>Luanda</value>
+  <value>Changchun</value>
+  <value>Izmir</value>
+  <value>Cali</value>
+  <value>Faisalabad</value>
+  <value>Cape Town</value>
+  <value>Belo Horizonte</value>
+  <value>Ibadan</value>
+  <value>Fortaleza</value>
+  <value>Aleppo</value>
+  <value>Dalian</value>
+  <value>Nagpur</value>
+  <value>Havana</value>
+  <value>Taškent</value>
+  <value>Bandung</value>
+  <value>Nagoya</value>
+  <value>Brasília</value>
+  <value>Jinan</value>
+  <value>Guayaquil</value>
+  <value>Vancouver</value>
+  <value>Chittagong</value>
+  <value>Mashhad</value>
+  <value>Paris</value>
+  <value>Qingdao</value>
+  <value>Durban</value>
+  <value>Taiyuan</value>
+  <value>Medan</value>
+  <value>Houston</value>
+  <value>Medellin</value>
+  <value>Jiulong</value>
+  <value>Agadir</value>
+  <value>Dakar</value>
+  <value>de Morelos</value>
+  <value>Zhengzhou</value>
+  <value>Kaesong</value>
+  <value>Douala</value>
+  <value>Baku</value>
+  <value>Bucharest</value>
+  <value>Santo Domingo</value>
+  <value>Indore</value>
+  <value>Caracas</value>
+  <value>Hai Phong</value>
+  <value>Barranquilla</value>
+  <value>Sapporo</value>
+  <value>Rabat</value>
+  <value>Shangqiu</value>
+  <value>Kunming</value>
+  <value>Maracaibo</value>
+  <value>Si Racha</value>
+  <value>Hamburg</value>
+  <value>Rawalpindi</value>
+  <value>Khartoum</value>
+  <value>Budapest</value>
+  <value>Al-Khartum Bahri</value>
+  <value>Curitiba</value>
+  <value>Minsk</value>
+  <value>Zibo</value>
+  <value>Shijiazhuang</value>
+  <value>Xiantao</value>
+  <value>Warsaw</value>
+  <value>Damascus</value>
+  <value>Guadalajara</value>
+  <value>Lanzhou</value>
+  <value>Accra</value>
+  <value>Hangzhou</value>
+  <value>Yaoundé</value>
+  <value>Antananarivo</value>
+  <value>Patna</value>
+  <value>Bhopal</value>
+  <value>Palembang</value>
+  <value>Rhein-Neckar 5</value>
+  <value>Changsha</value>
+  <value>Tangerang</value>
+  <value>Manaus</value>
+  <value>Beirut</value>
+  <value>Metro Manila</value>
+  <value>Yulin, Guangxi</value>
+  <value>Ludhiana</value>
+  <value>Vienna</value>
+  <value>Esfahan</value>
+  <value>Semarang</value>
+  <value>Kaohsiung</value>
+  <value>Algiers</value>
+  <value>Quito</value>
+  <value>Kobe</value>
+  <value>Thana</value>
+  <value>Harare</value>
+  <value>Recife</value>
+  <value>Kharkov</value>
+  <value>Depok</value>
+  <value>Samut Prakan</value>
+  <value>Kyoto</value>
+  <value>Philadelphia</value>
+  <value>Tijuana</value>
+  <value>Mecca</value>
+  <value>Barcelona</value>
+  <value>Nanchang</value>
+  <value>Johannesburg</value>
+  <value>Taejon</value>
+  <value>Ciudad Juárez</value>
+  <value>Kwangju</value>
+  <value>Novosibirsk</value>
+  <value>Caloocan</value>
+  <value>Agra</value>
+  <value>Urumqi</value>
+  <value>Phoenix-Mesa</value>
+  <value>Sana'a</value>
+  <value>Vadodara</value>
+  <value>Guiyang</value>
+  <value>Puebla</value>
+  <value>Tabriz</value>
+  <value>Conakry</value>
+  <value>Belém</value>
+  <value>Barranquilla</value>
+  <value>Fukuoka-Kitakyushu</value>
+  <value>Kuala Lumpur</value>
+  <value>Multan</value>
+  <value>Pôrto Alegre</value>
+  <value>Santa Cruz</value>
+  <value>Bursa</value>
+  <value>Tangshan</value>
+  <value>Montevideo</value>
+  <value>Perth</value>
+  <value>Hyderabad</value>
+  <value>Gujranwala</value>
+  <value>Valencia</value>
+  <value>Lusaka</value>
+  <value>Córdoba</value>
+  <value>Nizhni Novgorod</value>
+  <value>La Matanza</value>
+  <value>Ekaterinburg</value>
+  <value>Jilin</value>
+  <value>Al-Madinah</value>
+  <value>Fuzhou, Fujian</value>
+  <value>Nashik</value>
+  <value>Anshan</value>
+  <value>Pimpri-Chinchwad</value>
+  <value>Dubai</value>
+  <value>Abadan</value>
+  <value>Bamako</value>
+  <value>San Diego</value>
+  <value>Kampala</value>
+  <value>Kawasaki</value>
+  <value>Kaduna</value>
+  <value>Kalyan</value>
+  <value>Hefei</value>
+  <value>San Antonio</value>
+  <value>Fushun</value>
+  <value>Port-au-Prince</value>
+  <value>Munich</value>
+  <value>Shenzhen</value>
+  <value>Xuzhou</value>
+  <value>Meerut</value>
+  <value>Dallas-Fort Worth</value>
+  <value>Fès</value>
+  <value>Baotou</value>
+  <value>Milan</value>
+  <value>Jamshedpur</value>
+  <value>Bogor</value>
+  <value>Shiraz</value>
+  <value>Adana</value>
+  <value>Faridabad</value>
+  <value>Hanoi</value>
+  <value>Santa Cruz</value>
+  <value>Karaj</value>
+  <value>Amman</value>
+  <value>Nezahualcóyotl</value>
+  <value>Ad-Dammam</value>
+  <value>Peshawar</value>
+  <value>Guarulhos</value>
+  <value>Tripoli</value>
+  <value>Varanasi (Benares)</value>
+  <value>Mosul</value>
+  <value>Wuxi</value>
+  <value>Kuwait City</value>
+  <value>Goiânia</value>
+  <value>León</value>
+  <value>Zapopan</value>
+  <value>Handan</value>
+  <value>Glasgow</value>
+  <value>Ghaziabad</value>
+  <value>Samara</value>
+  <value>Suzhou, Jiangsu</value>
+  <value>Prague</value>
+  <value>Omsk</value>
+  <value>Hiroshima</value>
+  <value>Qiqihar</value>
+  <value>Luoyang</value>
+  <value>Belgrade</value>
+  <value>Yantai</value>
+  <value>Kazan</value>
+  <value>Monterrey</value>
+  <value>Ottawa</value>
+  <value>Nampho</value>
+  <value>Suwon</value>
+  <value>Amritsar</value>
+  <value>Rajkot</value>
+  <value>Basra</value>
+  <value>Ujung Pandang</value>
+  <value>Shantou</value>
+  <value>Mogadishu</value>
+  <value>Nanning</value>
+  <value>Adelaide</value>
+  <value>Sofia</value>
+  <value>Brazzaville</value>
+  <value>Datong</value>
+  <value>Pretoria</value>
+  <value>Almaty</value>
+  <value>Chelyabinsk</value>
+  <value>Rostov-on-Don</value>
+  <value>Yerevan</value>
+  <value>Soweto</value>
+  <value>Allahabad</value>
+  <value>Maputo</value>
+  <value>Goyang</value>
+  <value>Visakhapatnam</value>
+  <value>Dnepropetrovsk</value>
+  <value>Victoria</value>
+  <value>Nanchong</value>
+  <value>Zigong</value>
+  <value>Benin City</value>
+  <value>T'aichung</value>
+  <value>Ahvaz</value>
+  <value>Ufa</value>
+  <value>Sendai</value>
+  <value>Jabalpur</value>
+  <value>Tbilisi</value>
+  <value>Qom</value>
+  <value>Calgary</value>
+  <value>Haora</value>
+  <value>Odessa</value>
+  <value>Aurangabad</value>
+  <value>Seongnam</value>
+  <value>Shubra al-Khaymah</value>
+  <value>Volgograd</value>
+  <value>Donetsk</value>
+  <value>Campinas</value>
+  <value>Gaziantep</value>
+  <value>Ulsan</value>
+  <value>Sholapur</value>
+  <value>Kitakyushu</value>
+  <value>Ouagadougou</value>
+  <value>Perm</value>
+  <value>Sao Luis</value>
+</city>
+
