@@ -1,0 +1,4 @@
+
+InsertCustomer = insertCustomer( xml :Customer);
+SelectCustomer = selectCustomer( xml ) :Customer;
+

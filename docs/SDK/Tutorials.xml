@@ -6,6 +6,7 @@
 	&SDKtutorialTransactions;
 	&SDKtutorialForms;
 	&SDKtutorialFormDataTypes;
+	&SDKtutorialDirectmap;
 	&SDKtutorialProgramLua;
 </chapter>
 

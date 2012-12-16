@@ -1,0 +1,108 @@
+<sect1>
+<title>Defining Programs with Direct Map</title>
+	<sect2>
+	<title>Introduction</title>
+	<para>You can write programs for the logic tier of Wolframe as so called direct map instructions.
+		Direct map means that you call a transaction or built-in function directly with the
+		input structure that is created from the input deserialization by a filter.
+		The result of a direct map is the serialization of the function output.
+	</para>
+	<para>Direct map commands are specified in a program source file with the extension .directmap
+		and the file is specified as processor program in the configuration.
+	</para>
+	</sect2>
+
+	<sect2>
+	<title>Example</title>
+	<para>The following example defines two commands. The first one links a document type "InsertCustomer" to
+		a global transaction "insertCustomer". The input is deserialized by the filter "xml", the default
+		XML filter and validated with the data form "Customer". The result is not mapped through a form but returned
+		as it is. The second example command links a document type "SelectCustomer" to
+		a global transaction "selectCustomer". The input is not validated
+		and the transaction output if serialized with help of the form "Customer".
+	</para>
+	<para>
+		<programlisting language='text'>
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/first_example.directmap" parse="text" />
+		</programlisting>
+	</para>
+	</sect2>
+
+	<sect2>
+	<title>Language Description</title>
+	<para>
+		The direct map commands are assignments to names identifying the document type (XML DOCTYPE declaration).
+		If not spezified in the command argument this name identyfies also the form used for input validation.
+		After the '=' follows a function call declation with a command identifier followed by a single argument
+		in '(' ')' brackets. The argument is an identifier naming the inputfilter optionally followed by ':' and
+		an identifier specifying the name of the Input form used for validation.
+		After the closing function call bracket ')' follows optionally a name of the data form used
+		to validate and serialize the function call output.
+	</para>
+	</sect2>
+
+	<sect2>
+	<title>Syntax as EBNF</title>
+	<para>
+		<productionset>
+		<title>Tokens</title>
+
+		<production xml:id="dmIdentifier" continuation='restarts'>
+		<lhs>Identifier</lhs>
+		<rhs>
+			( ['A'-'Z'] | ['a'-'z'] | ['0'-'9'] | '_' ) +
+		</rhs>
+		</production>
+
+		<production xml:id="dmFilter">
+		<lhs>Filter</lhs>
+		<rhs>
+			<nonterminal def="#dmIdentifier">Identifier</nonterminal>
+		</rhs>
+		</production>
+
+		<production xml:id="dmFunction">
+		<lhs>Function</lhs>
+		<rhs>
+			<nonterminal def="#dmIdentifier">Identifier</nonterminal>
+		</rhs>
+		</production>
+
+		<production xml:id="dmForm">
+		<lhs>Form</lhs>
+		<rhs>
+			<nonterminal def="#dmIdentifier">Identifier</nonterminal>
+		</rhs>
+		</production>
+		</productionset>
+
+		<productionset>
+		<title>Declarations</title>
+
+		<production xml:id="dmCall">
+		<lhs>Call</lhs>
+		<rhs>
+			<nonterminal def="#dmIdentifier">Identifier</nonterminal>
+			'='
+			<nonterminal def="#dmFunction">Function</nonterminal>
+			'('
+				<nonterminal def="#dmFilter">Filter</nonterminal>
+				(
+					':' <nonterminal def="#dmForm">Form</nonterminal>
+				|
+				)
+			')'
+			(
+				':' <nonterminal def="#dmForm">Form</nonterminal>
+			|
+			)
+		</rhs>
+		</production>
+
+		</productionset>
+
+	</para>
+	</sect2>
+	<para></para>
+</sect1>
+

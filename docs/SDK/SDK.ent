@@ -8,6 +8,7 @@
 <!ENTITY SDKtutorialForms		SYSTEM "TutorialForms.xml">
 <!ENTITY SDKtutorialFormDataTypes	SYSTEM "TutorialFormDataTypes.xml">
 <!ENTITY SDKtutorialTransactions	SYSTEM "TutorialTransactions.xml">
+<!ENTITY SDKtutorialDirectmap		SYSTEM "TutorialDirectmap.xml">
 <!ENTITY SDKtutorialProgramLua		SYSTEM "TutorialProgramLua.xml">
 <!ENTITY SDKtutorialConfiguration	SYSTEM "TutorialConfiguration.xml">
 
