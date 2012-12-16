@@ -55,12 +55,14 @@
 
 		&AppPreface;
 		&AppIntroduction;
+		<!-- PF: Temporarily excluded (only TODOs - nothing finished)
 		&AppGettingStarted;
 		&AppComplexServer;
 		&AppCompleteServer;
 		&AppComponents;
 		&AppSecurity;
 		&AppAppendix;
+		-->
 		&AppGlossary;
 
 		<index>
@@ -114,8 +116,10 @@
 			</legalnotice>
 		</bookinfo>
 
+		<!-- PF: Temporarily excluded (only TODOs - nothing finished)
 		&SDKpreface;
 		&SDKintroduction;
+		-->
 		&SDKtutorials;
 		&SDKappendix;
 		&SDKglossary;
