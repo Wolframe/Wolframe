@@ -6,7 +6,7 @@ function process_content( itr)
 end
 
 function run( )
-        f = filter( "XML:libxml2")
+        local f = filter( "XML:libxml2")
         input:as(f)
         output:as(f)
         i = input:get()

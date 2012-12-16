@@ -664,6 +664,10 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 			{
 				flags = serialize::Context::ValidateInitialization;
 			}
+			else if (std::strcmp( mode, "relaxed") == 0)
+			{
+				flags = serialize::Context::None;
+			}
 			else
 			{
 				throw std::runtime_error( "2nd argument does not specify a mode of validating input (e.g. \"strict\")");

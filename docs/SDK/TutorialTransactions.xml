@@ -23,7 +23,7 @@
 	</sect2>
 	<sect2>
 		<title>First example</title>
-		<para>This example selects a key from a table and uses it for a list inserts
+		<para>This example selects a key from a table and uses it for a list inserts. The substitute "$1" refers to the first column of the "SELECT id FROM UserTable .." query result. The substitute "$(name)" refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name beeing unique per item and item describing a set of items).
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/first_example.tdl" parse="text" />
 		</programlisting>

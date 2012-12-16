@@ -34,7 +34,7 @@
 ///\brief Interface wolfilter test plugin function
 #ifndef _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_HPP_INCLUDED
 #define _Wolframe_TESTS_WOLFILTER_employee_assignment_convert_HPP_INCLUDED
-#include "serialize/struct/filtermapDescription.hpp"
+#include "serialize/struct/filtermapBase.hpp"
 #include <string>
 #include <vector>
 
