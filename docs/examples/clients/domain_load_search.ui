@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>262</width>
+    <height>175</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Customer</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_name">
+     <property name="text">
+      <string>Name:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="name">
+     <property name="text">
+      <string>John Smith</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_address">
+     <property name="text">
+      <string>Address:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="address">
+     <property name="text">
+      <string>Blue Police Box</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QListWidget" name="listWidget">
+     <property name="selectionRectVisible">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string>CityListRequest</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string>city</string>
+     </property>
+     <property name="search" stdset="0">
+      <string>{search.text}</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>Lima</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lagos</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lahore</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>London</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Los Angeles</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lucknow</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lanzhou</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Ludhiana</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Lusaka</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>León</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Luoyang</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="search">
+     <property name="text">
+      <string>L*</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_city">
+     <property name="text">
+      <string>City:</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

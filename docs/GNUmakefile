@@ -17,19 +17,19 @@ XSLT_MAN = \
 XSLT_HTML = \
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
-	--stringparam toc.section.depth 3 \
+	--stringparam toc.section.depth 4 \
 	output-html.xsl
 
 XSLT_PDF = \
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
-	--stringparam toc.section.depth 3 \
+	--stringparam toc.section.depth 4 \
 	output-pdf.xsl
 
 XSLT_EPUB = \
 	$(XSLTPROC) --nonet --xinclude \
 	--stringparam draft.mode yes \
-	--stringparam toc.section.depth 3 \
+	--stringparam toc.section.depth 4 \
 	output-epub.xsl
 
 local_all:

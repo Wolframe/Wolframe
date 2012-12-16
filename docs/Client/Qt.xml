@@ -186,12 +186,264 @@
 				or deserializing the XML.
 			</para>
 		</sect3>
+
+		<sect3>
+			<title>Switching UI forms</title>
+			<para>
+				A UI form contains a set of widgets, the dynamic property
+				<code>form</code> contains the name of a widget (without
+				extension <emphasis>.ui</emphasis>) to load. Currently only
+				clicking a <classname>QPushButton</classname> can have an
+				<code>form</code> property.
+			</para>
+			
+			<para>
+				In the Qt designer you have to attach the <code>form</code>
+				dynamic property of type <code>string</code> to the corresponding
+				widget of type <classname>QPushButton</classname>:
+				
+				<screenshot>
+					<screeninfo>Attach form dynamic property to a push button</screeninfo>
+					<mediaobject>
+						<imageobject> 
+							<imagedata fileref="examples/clients/action_on_pushbutton.png" format="PNG"/>
+						</imageobject> 
+					</mediaobject>
+				</screenshot>
+
+			</para>
+			
+			<para>
+				Before loading the next form the client terminates all current
+				requests, for instance a save request of the form data.
+			</para>
+		</sect3>
 		
 		<sect3>
+			<title>Composing XML requests</title>
+			<para>
+				There are four dynamic properties which influence the way the
+				XML request is put together:
+				<simplelist type="horiz" columns="2">
+				<member>action</member><member>Defines the kind of the request being generated when a widget is executed.
+				Is one of <code>create</code>, <code>update</code>, <code>delete</code> or <code>read</code>.</member>
+				<member>initAction</member><member>Defines the kind of the request which should be executed when the form is loaded.
+				It has the same values as <code>action</code>, but usually one <code>read</code> makes sense.</member>
+				<member>doctype</member><member>The document type of the XML request, usually references a form in one of the Data Definition Languages (for input validation).</member>
+				<member>rootelement</member><member>The root element of the XML document being sent, default is the name of the form.</member>
+				</simplelist>
+			</para>
+			
+			<para>
+				The <code>action</code> parameter can currently only be attached to a <classname>QPushButton</classname>
+				and denotes the action to be taken, when the user presses that button.
+			</para>
+			
+			<para>
+				The <code>create</code> and <code>update</code> actions create a XML request with all the data composed
+				from the widgets, as explained earlier:
+
+				<screenshot>
+					<screeninfo>Attach form dynamic property to a push button</screeninfo>
+					<mediaobject>
+						<imageobject> 
+							<imagedata fileref="examples/clients/action_add.png" format="PNG"/>
+						</imageobject> 
+					</mediaobject>
+				</screenshot>
+			
+				The form above would produce the following XML when the <emphasis>Add</emphasis> button is pressed:
+
+				<programlisting language='xml'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form.xml" parse="text" />
+				</programlisting>
+				
+			</para>
+			
+			<para>
+				The <code>delete</code> and <code>read</code> actions take only explicit parameters which are
+				encoded as attributes of the root element:
+
+				<screenshot>
+					<screeninfo>A push button with deletes a customer</screeninfo>
+					<mediaobject>
+						<imageobject> 
+							<imagedata fileref="examples/clients/action_delete.png" format="PNG"/>
+						</imageobject> 
+					</mediaobject>
+				</screenshot>
+				
+				The form above reads the <code>text</code> property of the widget with name <code>id</code>
+				(in this case <code>77</code>) and adds it as <code>id</code> property:
+
+				<programlisting language='xml'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/qtclient_xml_simple_form_delete.xml" parse="text" />
+				</programlisting>
+				
+				The <code>delete</code> is not part of the XML, put part of the protocol. We also see that we can evaluate
+				expressions in the value of a dynamic property as in <code>{id.text}</code>. Usually we would not ask
+				the user to enter a customer ID but instead pass the variable around, see global variables.
+			</para>
+			
+			<para>
+				The <code>initAction</code> property does exactly the same thing as <code>action</code>, but not when
+				the user clicks a button, but when the form gets first loaded. This is handy to load the form with
+				some initial values, so it's mainly used together with the <code>read</code> value.
+			</para>
+			
+			<para>
+				There is a special kind of request which happens in parallel to the form/button requests, and this
+				automatically when loading the form. Large sets of values could be stored in the UI form itself, but
+				as domains are actually linked to the data and business layer they should also always be loaded from
+				there. The following widgets execute a domain load request: 
+				<simplelist type="inline">
+					<member><classname>QComboBox</classname></member>
+					<member><classname>QListWidget</classname></member>
+					<member><classname>QTreeWidget</classname></member>
+					<member><classname>QTableWidget</classname></member>
+				</simplelist>.
+			</para>	
+			
+			<para>
+				In the following form the properties <code>doctype</code>, <code>rootelement</code>
+				make sure that the list of cities is always loaded when the form is loaded. The
+				action is an implied <code>read</code>:
+
+				<screenshot>
+					<screeninfo>A push button with deletes a customer</screeninfo>
+					<mediaobject>
+						<imageobject> 
+							<imagedata fileref="examples/clients/domain_load.png" format="PNG"/>
+						</imageobject> 
+					</mediaobject>
+				</screenshot>
+
+				Additional parameters (like a search restriction) can be attached:
+
+				<screenshot>
+					<screeninfo>A push button with deletes a customer</screeninfo>
+					<mediaobject>
+						<imageobject> 
+							<imagedata fileref="examples/clients/domain_load_search.png" format="PNG"/>
+						</imageobject> 
+					</mediaobject>
+				</screenshot>
+				
+				The text field above the list is called <code>search</code>. The dynamic property <code>search</code>
+				is set to the text value of the <code>search</code> widget. The resulting XML domain request would
+				look like:
+
+				<programlisting language='xml'>
+				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/domain_load_search.xml" parse="text" />
+				</programlisting>
+				
+				The business layer would apply a <code>LIKE</code> to filter the data. but the client doesn't care about that.				
+			</para>		
+		</sect3>
+		
+		
+		<sect3>
+			<title>Properties and mapping per Qt class</title>
+
+		<sect4>
+			<title>QLineEdit</title>
+			<para>
+			</para>
+		</sect4>
+		</sect3>
+		
+		<sect3>
+			<title>Inventory of all supported dynamic properties</title>
+			<para>
+				The following table shows all supported dynamic properties
+				and a short description what they are good for:
+			</para>
+
+			<table frame="all">
+				<title>Dynamic properties</title>
+				<tgroup cols="3" align="char" charoff="50" char=".">
+				<thead>
+					<row>
+						<entry>Property</entry>	
+						<entry>Type</entry>
+						<entry>Qt widgets</entry>
+						<entry>Purpose</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>form</entry>
+						<entry>String</entry>
+						<entry><classname>QPushButton</classname></entry>
+						<entry>next form to load</entry>
+					</row>
+					<row>
+						<entry>action</entry>
+						<entry>String</entry>
+						<entry><classname>QPushButton</classname></entry>
+						<entry>
+							one of <code>create</code>, <code>delete</code>,
+							<code>update</code> or <code>read</code>,
+							describes what gets sent down in the XML request.
+						</entry>
+					</row>
+					<row>
+						<entry>initAction</entry>
+						<entry>String</entry>
+						<entry>main form widget</entry>
+						<entry>
+							one of <code>create</code>, <code>delete</code>,
+							<code>update</code> or <code>read</code>,
+							describes what gets sent down in the XML request
+							when the form is loaded.
+						</entry>
+					</row>
+					<row>
+						<entry>doctype</entry>
+						<entry>String</entry>
+						<entry>
+							<simplelist type="inline">
+							<member>main form widget</member>
+							<member><classname>QPushButton</classname></member>
+							<member><classname>QComboBox</classname></member>
+							<member><classname>QListWidget</classname></member>
+							<member><classname>QTreeWidget</classname></member>
+							<member><classname>QTableWidget</classname></member>
+							</simplelist>	
+						</entry>
+						<entry>
+							the document attached to the generated XML (in the DOCTYPE
+							section)
+						</entry>
+					</row>
+					<row>
+						<entry>rootelement</entry>
+						<entry>String</entry>
+						<entry>
+							<simplelist type="inline">
+							<member>main form widget</member>
+							<member><classname>QPushButton</classname></member>
+							<member><classname>QComboBox</classname></member>
+							<member><classname>QListWidget</classname></member>
+							<member><classname>QTreeWidget</classname></member>
+							<member><classname>QTableWidget</classname></member>
+							</simplelist>	
+						</entry>
+						<entry>
+							the root element of the generated XML request (the
+							root element declaration in DOCTYPE and the name
+							of the root element)
+						</entry>
+					</row>
+						
+				</tbody>
+				</tgroup>
+			</table>			
+
 		</sect3>
 		
 		<sect3>			
-			<title>Global variabled</title>
+			<title>Global variables</title>
 		</sect3>
 	</sect2>
 </sect1>
@@ -255,24 +507,23 @@ Dynamic Properties
 They influence the behaviour of the generic client. All "propramming"
 is done by setting dynamic properties in main windows or widgets
 
-initialFocus	boolean, sets initial focus on widget
-action		one of 'create', 'delete', 'update' or 'read', will
-		disappear in the future and be replaced just with one
-		'request'
-		valid only in forms (for read mainly) and
-		in push buttons
-initAction	valid only in forms currently
-form		next form to show, currently only working on buttons
+<widget>.reload	executes the domain request in another widget, example
+		search with filter reloads domain, completion
+
 doctype		the document of the XML to generate, when the user
 		generates an action on the element, 
 		e.g. 'CategoryHierarchyRequest.simpleform'
 		currently only working on buttons
 rootelement	the root element of the XML to generate, e.g. 'document'
 		currently only working on buttons
+
+initialFocus	boolean, sets initial focus on widget
 state		some widgets support restoring the state, usually
 		from the global variables, e.g. state {global.widgetState}
+		
 global.*	global variables, once stored, they are kept and
 		can be addressed as '{global.name}' everywhere else
+		
 {x.y}		dereference a variable, e.g.
 		{widgetname.property}
 		{global.stored_variable}
