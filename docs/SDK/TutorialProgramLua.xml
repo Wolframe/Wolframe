@@ -316,12 +316,11 @@
 		</para>
 		<table frame="all" width="100%">
 			<title>Output</title>
-			<tgroup cols="4">
+			<tgroup cols="3">
 			<thead>
 				<row>
 					<entry>Method Name</entry>
 					<entry>Arguments</entry>
-					<entry>Returns</entry>
 					<entry>Description</entry>
 				</row>
 			</thead>
@@ -330,42 +329,36 @@
 				<row>
 					<entry>print</entry>
 					<entry>pair value,tag</entry>
-					<entry></entry>
 					<entry>Prints one element to the output.
 					</entry>
 				</row>
 				<row>
 					<entry>opentag</entry>
 					<entry>tagname</entry>
-					<entry></entry>
 					<entry>Synonym for print( false, tagname )
 					</entry>
 				</row>
 				<row>
 					<entry>closetag</entry>
 					<entry>tag name</entry>
-					<entry></entry>
 					<entry>Synonym for print( false, false )
 					</entry>
 				</row>
 				<row>
 					<entry>as</entry>
 					<entry>filter</entry>
-					<entry></entry>
 					<entry>Attaches a filter to output.
 					</entry>
 				</row>
 				<row>
 					<entry>as</entry>
 					<entry>string (formname)</entry>
-					<entry></entry>
 					<entry>Attaches the document type of the form with name formname to the output.
 					</entry>
 				</row>
 				<row>
 					<entry>as</entry>
 					<entry>table (doctype)</entry>
-					<entry></entry>
 					<entry>Attaches the document type defined in the structure doctype (*).
 					</entry>
 				</row>
@@ -549,7 +542,7 @@
 				<row>
 					<entry>scope</entry>
 					<entry>iterator (*)</entry>
-					<entry>Returns an iterator until the end of the current tag (*)</entry>
+					<entry>Returns an iterator to iterate till the end of the current tag (*)</entry>
 				</row>
 			</tbody>
 			</tgroup>
@@ -557,7 +550,7 @@
 		<para>
 			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe lua object 'get()' method.
 			The iterator of a defined scope must be consumed completely before consuming anything of the parent iterator.
-			Otherwise it may lead to unexpected results.
+			Otherwise it may lead to unexpected results because they share some part of the iterator state.
 		</para>
 	</sect2>
 
