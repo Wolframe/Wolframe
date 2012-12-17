@@ -185,13 +185,15 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 			PQsetNoticeProcessor( conn, &noticeProcessor, this);
 
 			ConnStatusType stat = PQstatus( conn );
+			std::string err = PQerrorMessage( conn );
+			while ( !err.empty() && ( err[ err.size() - 1 ] == '\r' ||  err[ err.size() - 1 ] == '\n' ))
+				err.erase( err.size() - 1 );
 			switch( stat )	{
 				case CONNECTION_OK:
 					MOD_LOG_TRACE << "PostgreSQL database '" << m_ID << "' constructor: connection "
 						      << i << " connected OK.";
 					break;
-				case CONNECTION_BAD:	{
-					std::string err = PQerrorMessage( conn );
+				case CONNECTION_BAD:
 					if ( err.compare( 0, 6, "FATAL:" ) == 0 )	{
 						MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' (connection "
 							      << i << ") error: '" << err << "'";
@@ -200,40 +202,39 @@ PostgreSQLdbUnit::PostgreSQLdbUnit(const std::string& id,
 					MOD_LOG_WARNING << "PostgreSQL database '" << m_ID << "' connection "
 							<< i << " error: '" << err << "'";
 					break;
-				}
 				case CONNECTION_STARTED:
 					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection STARTED: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection STARTED: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_STARTED in synchronous connection" );
 					break;
 				case CONNECTION_MADE:
 					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection MADE: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection MADE: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_MADE in synchronous connection" );
 					break;
 				case CONNECTION_AWAITING_RESPONSE:
 					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection AWAITING RESPONSE: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection AWAITING RESPONSE: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_AWAITING_RESPONSE in synchronous connection" );
 					break;
 				case CONNECTION_AUTH_OK:
 					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection AUTH OK: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection AUTH OK: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_AUTH_OK in synchronous connection" );
 					break;
 				case CONNECTION_SSL_STARTUP:
 					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection SSL start: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection SSL start: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_SSL_STARTUP in synchronous connection" );
 					break;
 				case CONNECTION_SETENV:
 					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection SETENV: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection SETENV: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_SETENV in synchronous connection" );
 					break;
 				case CONNECTION_NEEDED:
 					MOD_LOG_ALERT << "PostgreSQL database '" << m_ID << "' constructor: connection "
-						      << i << " connection NEEDED: '" << PQerrorMessage( conn ) << "'";
+						      << i << " connection NEEDED: '" << err << "'";
 					throw std::range_error( "PostgreSQL database: CONNECTION_NEEDED in synchronous connection" );
 					break;
 			}
