@@ -137,3 +137,61 @@ loaded initial form (which is again empty).
 
 Step 4:
 
+We want to store the customer data in a sqlite database, so we have to
+prepare the server:
+
+LoadModules {
+	module /usr/lib/wolframe/modules/mod_db_sqlite3.so
+}
+
+This loads the database driver for Sqlite3. Now we also have to create
+a database and populate the following schema:
+
+CREATE TABLE Customer (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        name            TEXT    NOT NULL,
+        address         TEXT
+);
+
+Store this into schema.sql. Then execute:
+
+sqlite3 tutorial.db < schema.sql
+
+Now we have to tell server to use this sqlite database file:
+
+database {
+	SQLite {
+		identifier	sqlitedb
+		file		tutorial.db
+		foreignKeys	yes
+	}
+}
+
+When we restart the server we see:
+
+DEBUG: SQLite database unit 'sqlitedb' created with 3 connections to file 'tutorial.db'
+
+Now we want to use some XML filters to send/receive XML over the protocol,
+so we have to add the following module to tutorial.conf:
+
+LoadModules {
+	..
+	module /usr/lib/wolframe/modules/mod_filter_textwolf.so
+}
+
+In order to see which modules are currently loaded in the wolframed we can
+use:
+
+wolframed -p -c tutorial.conf
+
+
+We see:
+
+..
+Module files to load:
+   /usr/lib/wolframe/modules/mod_db_sqlite3.so
+   /usr/lib/wolframe/modules/mod_filter_textwolf.so
+..
+
+which looks ok.
+
