@@ -19,4 +19,7 @@
   Connection closed by foreign host.
 - themes/windows directory is requires and the files, maybe a
   builtin compiled standard theme is an idea?
-  
+- can't use directmap without simpleform
+  CustomerList = SelectCustomerList( xml );
+  ERROR: Error calling procedure: input form 'CustomerList' is not defined (document type 'CustomerList')
+

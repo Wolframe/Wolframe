@@ -177,6 +177,7 @@ so we have to add the following module to tutorial.conf:
 LoadModules {
 	..
 	module /usr/lib/wolframe/modules/mod_filter_textwolf.so
+	..
 }
 
 In order to see which modules are currently loaded in the wolframed we can
@@ -194,4 +195,52 @@ Module files to load:
 ..
 
 which looks ok.
+
+For mapping the requests to programs we need the directmap module. First
+add to tutorial.conf:
+
+LoadModules {
+	..
+	module /usr/lib/wolframe/modules/mod_command_directmap.so
+	..
+}
+
+and 
+
+Processor {
+	database sqlitedb
+	cmdhandler {
+		directmap {
+			program tutorial.directmap
+		}
+	}
+}
+
+Now we have to a file 'tutorial.directmap'. This file maps
+the requests to the corresponding transaction definitions:
+
+CustomerList = SelectCustomerList( xml );
+
+This means that we map the 'CustomerList' request which gives us a list
+of customers to the TDL transaction 'SelectCustomerList'. This also means
+we need to configure the TDL program in the server:
+
+Processor {
+	program Customer.tdl
+}
+
+The 'Customer.tdl' file contains the database transaction we want to execute.
+We also specify that we want the result to be a 'list' which contains
+'customer' tags with the data per customer:
+
+TRANSACTION SelectCustomerList
+RESULT INTO list
+BEGIN
+	INTO customer DO SELECT * from Customer;
+END
+
+We restart the server.
+
+Now we create a telnet request, which contains basic authentication and
+a request for the list of customers:
 
