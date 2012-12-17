@@ -121,7 +121,9 @@
 		&SDKintroduction;
 		-->
 		&SDKtutorials;
+		<!-- PF: Temporarily excluded (only TODOs - nothing finished)
 		&SDKappendix;
+		-->
 		&SDKglossary;
 
 		<index>

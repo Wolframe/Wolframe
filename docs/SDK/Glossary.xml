@@ -52,7 +52,8 @@
 	</glossentry>
 	<glossentry><glossterm>Transaction</glossterm>
 		<glossdef>
-			<para>A transaction is a call of a database defined in a transaction program. A transaction either fails completely or succeeds a whole and is object of auditing seen as part of the transaction. It has an object as input and returns an object or an error as result.
+			<para>A transaction is a call of a database defined in a transaction program. A transaction either fails completely or succeeds a whole. Auditing is seen as part of the transaction. Transactions have an object as input and returns an object or an error as result.
+				Authorization tags that are checked against the user privileges of the connection can be attached to transactions.
 			</para>
 		</glossdef>
 	</glossentry>
@@ -76,7 +77,7 @@
 	</glossentry>
 	<glossentry><glossterm>Form</glossterm>
 		<glossdef>
-			<para>A form is a hierarchical description of typed data. Forms are used to create objects from a data structure representation in the program and to map them back. In Lua for example forms are used to create transaction input from Lua tables and to map the transaction output back to its representation as lua table. Forms are defined in programs written in a DDL (Data Definition Language).
+			<para>A form is a hierarchical description of typed data. Forms are used to create objects from a serialization and to validate input. Forms are defined in programs written in a DDL (Data Definition Language) or as declared as part of a build-in function API.
 			</para>
 		</glossdef>
 	</glossentry>

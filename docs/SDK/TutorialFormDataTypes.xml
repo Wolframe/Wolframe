@@ -31,7 +31,7 @@
 	<para>The declaration of a type starts with an identifier followed by an assignment operator '='
 		and a comma separated sequence of ':' separated identifier tuples, defining the name
 		of the normalization module (1st) and the name of the function (2nd).
-		The type declaration is closed with a smicolon ';'.</para>
+		The type declaration is closed with a semicolon ';'.</para>
 
 		<productionset>
 		<title>Tokens</title>
@@ -58,8 +58,11 @@
 		<production xml:id="normNormalizeCall">
 		<lhs>Call</lhs>
 		<rhs>
-			( <nonterminal def="#normNamespace">Namespace</nonterminal>
-			  <nonterminal def="#normIdentifier">Identifier</nonterminal>
+			(
+			  (
+			    <nonterminal def="#normNamespace">Namespace</nonterminal>
+			    <nonterminal def="#normIdentifier">Identifier</nonterminal>
+			  )
 			|
 			  <nonterminal def="#normIdentifier">Identifier</nonterminal>
 			)
@@ -69,9 +72,12 @@
 		<production xml:id="normNormalizeSeq">
 		<lhs>CallSeq</lhs>
 		<rhs>
-			( <nonterminal def="#normNormalizeCall">Call</nonterminal>
-			  ','
-			  <nonterminal def="#normNormalizeSeq">CallSeq</nonterminal>
+			(
+			  (
+			    <nonterminal def="#normNormalizeCall">Call</nonterminal>
+			    ','
+			    <nonterminal def="#normNormalizeSeq">CallSeq</nonterminal>
+			  )
 			|
 			  <nonterminal def="#normNormalizeCall">Call</nonterminal>
 			)
@@ -91,10 +97,13 @@
 		<production xml:id="normProgram">
 		<lhs>Program</lhs>
 		<rhs>
-			  <nonterminal def="#normTypedef">Typedef</nonterminal>
 			(
-			  <nonterminal def="#normProgram">Program</nonterminal>
+			  (
+			    <nonterminal def="#normTypedef">Typedef</nonterminal>
+			    <nonterminal def="#normProgram">Program</nonterminal>
+			  )
 			|
+			  <nonterminal def="#normTypedef">Typedef</nonterminal>
 			)
 		</rhs>
 		</production>
