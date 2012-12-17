@@ -86,7 +86,7 @@
 	<sect2>
 		<title>"Programming" the interface</title>
 		<para>
-			Programming means we annotate the XML of th UI form files with
+			Programming means we annotate the XML of the UI form files with
 			some extra properties. They steer the following things:
 			<itemizedlist>
 				<listitem>

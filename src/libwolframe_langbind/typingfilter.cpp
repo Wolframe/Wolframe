@@ -88,6 +88,10 @@ bool TypingOutputFilter::print( ElementType type, const Element& element)
 			case TypedOutputFilter::Element::string_:
 				rt = m_outputfilter->print( type, element.value.string_.ptr, element.value.string_.size);
 				break;
+
+			case TypedOutputFilter::Element::blob_:
+				rt = m_outputfilter->print( type, (const char*)element.value.blob_.ptr, element.value.blob_.size);
+				break;
 		}
 		setState( m_outputfilter->state(), m_outputfilter->getError());
 	}
