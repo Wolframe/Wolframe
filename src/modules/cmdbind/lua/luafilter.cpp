@@ -294,6 +294,10 @@ bool LuaTableOutputFilter::pushValue( const Element& element)
 			lua_pushlstring( m_ls, element.value.string_.ptr, element.value.string_.size);
 			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			return true;
+		case Element::blob_:
+			lua_pushlstring( m_ls, (const char*)element.value.blob_.ptr, element.value.blob_.size);
+			lua_tostring( m_ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			return true;
 	}
 	setState( OutputFilter::Error, "illegal value type of element");
 	return false;

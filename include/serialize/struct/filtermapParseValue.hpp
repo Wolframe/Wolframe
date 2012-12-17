@@ -149,6 +149,9 @@ static bool parseValue_( ValueType& val, const ParseValueType::bool_&, const lan
 			case langbind::TypedInputFilter::Element::uint_:
 				return getBool( val, boost::numeric_cast<ValueType>( element.value.uint_));
 
+			case langbind::TypedInputFilter::Element::blob_:
+				return false;
+
 			case langbind::TypedInputFilter::Element::string_:
 				if (element.value.string_.size == 4 && std::memcmp( element.value.string_.ptr, "true", 4) == 0)
 				{
@@ -197,8 +200,7 @@ static bool parseValue_( ValueType& val, const ParseValueType::arithmetic_&, con
 				return true;
 
 			case langbind::TypedInputFilter::Element::blob_:
-				val = boost::lexical_cast<ValueType>( std::string( (const char*)element.value.blob_.ptr, element.value.blob_.size));
-				return true;
+				return false;
 		}
 	}
 	catch (const boost::bad_lexical_cast&)

@@ -140,6 +140,10 @@ static void push_element( lua_State* ls, const TypedInputFilter::Element& elemen
 			lua_pushlstring( ls, element.value.string_.ptr, element.value.string_.size);
 			lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
 			break;
+		case TypedInputFilter::Element::blob_:
+			lua_pushlstring( ls, (const char*)element.value.blob_.ptr, element.value.blob_.size);
+			lua_tostring( ls, -1); //PF:BUGFIX lua 5.1.4 needs this one
+			break;
 		default:
 			lua_pushnil( ls);
 			break;
