@@ -335,6 +335,8 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 			LOG_ALERT << "Processor database: database labeled '" << m_dbLabel << "' not found !";
 			return false;
 		}
+		types::keymap<std::string> embeddedStatementMap;
+
 		// load all locally defined programs
 		m_db->loadAllPrograms();
 		// load database programs:
@@ -347,7 +349,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 				try
 				{
 					std::string dbsrc;
-					m_dbprogram.loadfile( *pi, dbsrc);
+					m_dbprogram.loadfile( *pi, dbsrc, embeddedStatementMap);
 					m_db->addProgram( dbsrc);
 				}
 				catch (const std::runtime_error& err)
@@ -357,7 +359,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 				}
 			}
 		}
-		m_db->addStatements( m_dbprogram.embeddedStatementMap());
+		m_db->addStatements( embeddedStatementMap);
 	}
 	return rt;
 }

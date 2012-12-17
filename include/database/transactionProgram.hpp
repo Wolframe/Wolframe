@@ -59,7 +59,6 @@ public:
 	///\brief Copy constructor
 	TransactionProgram( const TransactionProgram& o)
 		:m_functionmap(o.m_functionmap)
-		,m_embeddedStatementMap(o.m_embeddedStatementMap)
 		,m_langdescr(o.m_langdescr){}
 
 	///\brief Destructor
@@ -77,21 +76,16 @@ public:
 	///\param[in] source source for database with included transaction definitions to parse
 	///\param[out] dbsource source for database without transaction definitions
 	///\remark Throws Program::Error exception
-	void load( const std::string& source, std::string& dbsource);
+	void load( const std::string& source, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap);
 
 	///\brief Load transaction program source
 	///\param[in] filename file with source for database with included transaction definitions to parse
 	///\param[out] dbsource source for database without transaction definitions
 	///\remark Throws std::runtime_error exception with positional error and filename
-	void loadfile( const std::string& filename, std::string& dbsource);
+	void loadfile( const std::string& filename, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap);
 
 	///\brief Get a loaded function by name
 	const TransactionFunction* function( const std::string& name) const;
-
-	const types::keymap<std::string>& embeddedStatementMap() const
-	{
-		return m_embeddedStatementMap;
-	}
 
 private:
 	///\brief Goto the next token ignoring comments
@@ -100,7 +94,7 @@ private:
 	char parseNextToken( std::string& tok, std::string::const_iterator& si, std::string::const_iterator se) const;
 	///\brief Parse embedded database statement in language defined with 'defineEmbeddedLanguageDescription(const LanguageDescription*)'
 	std::pair<std::string,std::vector<std::string> >
-		parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& si, std::string::const_iterator se);
+		parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& si, std::string::const_iterator se, types::keymap<std::string>& embeddedStatementMap);
 	///\brief Parse statement of the form [identifier '(' arg { ',' arg } ')']
 	std::pair<std::string,std::vector<std::string> >
 		parseCallStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
@@ -108,7 +102,6 @@ private:
 private:
 	static const utils::CharTable m_optab;
 	types::keymap<TransactionFunctionR> m_functionmap;
-	types::keymap<std::string> m_embeddedStatementMap;
 	const LanguageDescription* m_langdescr;
 };
 

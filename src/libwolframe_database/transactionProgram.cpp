@@ -91,11 +91,11 @@ static bool checkResultIdentifier( const std::string& id)
 }
 
 
-void TransactionProgram::loadfile( const std::string& filename, std::string& dbsource)
+void TransactionProgram::loadfile( const std::string& filename, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
 {
 	try
 	{
-		load( utils::readSourceFileContent( filename), dbsource);
+		load( utils::readSourceFileContent( filename), dbsource, embeddedStatementMap);
 	}
 	catch (const config::PositionalErrorException& e)
 	{
@@ -143,7 +143,7 @@ char TransactionProgram::parseNextToken( std::string& tok, std::string::const_it
 	return utils::parseNextToken( tok, si, se, m_optab);
 }
 
-std::pair<std::string,std::vector<std::string> > TransactionProgram::parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose)
+std::pair<std::string,std::vector<std::string> > TransactionProgram::parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose, types::keymap<std::string>& embeddedStatementMap)
 {
 	std::pair<std::string,std::vector<std::string> > rt;
 	std::string stm;
@@ -188,7 +188,7 @@ std::pair<std::string,std::vector<std::string> > TransactionProgram::parseEmbedd
 	rt.first.append( funcname);
 	rt.first.append( "_");
 	rt.first.append( boost::lexical_cast<std::string>( index));
-	m_embeddedStatementMap.insert( rt.first, stm);
+	embeddedStatementMap.insert( rt.first, stm);
 	return rt;
 }
 
@@ -287,7 +287,7 @@ struct Operation
 };
 }// anonymous namespace
 
-void TransactionProgram::load( const std::string& source, std::string& dbsource)
+void TransactionProgram::load( const std::string& source, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
 {
 	char ch;
 	std::string tok;
@@ -508,7 +508,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource)
 						}
 						if (m_langdescr->isEmbeddedStatement( si, se))
 						{
-							desc.call = parseEmbeddedStatement( transactionName, operation.embstm_index++, si, se);
+							desc.call = parseEmbeddedStatement( transactionName, operation.embstm_index++, si, se, embeddedStatementMap);
 						}
 						else
 						{

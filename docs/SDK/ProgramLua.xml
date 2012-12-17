@@ -370,6 +370,33 @@
 		</para>
 
 		<table frame="all" width="100%">
+			<title>Filter object member variables and flags</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Member Name</entry>
+					<entry>Restriction</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>tokenize</entry>
+					<entry>XML filters only</entry>
+					<entry>Flag: Set to true => elements are tokenized by whitespaces, false (default W3C) no tokenization</entry>
+				</row>
+				<row>
+					<entry>empty</entry>
+					<entry>XML filters only</entry>
+					<entry>Flag: Set to false => filter out whitespace only elements, true (default W3C) all elements returned</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+
+
+		<table frame="all" width="100%">
 			<title>Data forms declared by DDL</title>
 			<tgroup cols="4">
 			<thead>
@@ -409,8 +436,8 @@
 				</row>
 				<row>
 					<entry>fill</entry>
-					<entry>lua table or iterator (*), (optional "strict", "complete" or "relaxed")</entry>
-					<entry></entry>
+					<entry>lua table or iterator (*), optional validation mode (**)</entry>
+					<entry>the filled form (for concatenation)</entry>
 					<entry>Validates input and fills the input data into the form.</entry>
 				</row>
 			</tbody>
@@ -418,6 +445,9 @@
 		</table>
 		<para>
 			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe lua object 'get()' method.
+		</para>
+		<para>
+			(**) "strict" (full validation), "complete" (only check for all non optional elements initialization) or "relaxed" (no validation except matching of input to elements)
 		</para>
 
 		<table frame="all" width="100%">
@@ -542,14 +572,16 @@
 				<row>
 					<entry>scope</entry>
 					<entry>iterator (*)</entry>
-					<entry>Returns an iterator to iterate till the end of the current tag (*)</entry>
+					<entry>Returns an iterator to iterate till the end of the current tag (**)</entry>
 				</row>
 			</tbody>
 			</tgroup>
 		</table>
 		<para>
 			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe lua object 'get()' method.
-			The iterator of a defined scope must be consumed completely before consuming anything of the parent iterator.
+		</para>
+		<para>
+			(**) The iterator of a defined scope must be consumed completely before consuming anything of the parent iterator.
 			Otherwise it may lead to unexpected results because they share some part of the iterator state.
 		</para>
 	</sect2>

@@ -1,9 +1,7 @@
 
 function run()
         f = filter( "XML:textwolf")
-        -- A W3C conform XML parser returns by default also tokens containing only spaces.
-        -- The following line tells the input filter to ignore elements consisting only of
-        -- spaces and control characters:
+        -- filter out tokens containing only spaces:
         f.empty = false
         input:as( f)
         output:as( f)

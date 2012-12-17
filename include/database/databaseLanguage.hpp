@@ -63,6 +63,7 @@ struct LanguageDescription
 	virtual bool isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const;
 
 	virtual std::string parseEmbeddedStatement( std::string::const_iterator& si, std::string::const_iterator se) const;
+	virtual bool statementHasResult( const std::string& stm) const;
 };
 
 }} // namespace _Wolframe::db
