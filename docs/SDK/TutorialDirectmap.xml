@@ -15,10 +15,10 @@
 	<sect2>
 	<title>Example</title>
 	<para>The following example defines two commands. The first one links a document type "InsertCustomer" to
-		a global transaction "insertCustomer". The input is deserialized by the filter "xml", the default
+		a global transaction "doInsertCustomer". The input is deserialized by the filter <code>xml</code>, the default
 		XML filter and validated with the data form "Customer". The result is not mapped through a form but returned
 		as it is. The second example command links a document type "SelectCustomer" to
-		a global transaction "selectCustomer". The input is not validated
+		a global transaction "doSelectCustomer". The input is not validated
 		and the transaction output if serialized with help of the form "Customer".
 	</para>
 	<para>
@@ -88,13 +88,27 @@
 			'('
 				<nonterminal def="#dmFilter">Filter</nonterminal>
 				(
-					':' <nonterminal def="#dmForm">Form</nonterminal>
+					( ':' <nonterminal def="#dmForm">Form</nonterminal> )
 				|
 				)
 			')'
 			(
-				':' <nonterminal def="#dmForm">Form</nonterminal>
+				( ':' <nonterminal def="#dmForm">Form</nonterminal> )
 			|
+			)
+		</rhs>
+		</production>
+
+		<production xml:id="dmProgram">
+		<lhs>Program</lhs>
+		<rhs>
+			(
+			  (
+			    <nonterminal def="#dmCall">Call</nonterminal>
+			    <nonterminal def="#dmProgram">Program</nonterminal>
+			  )
+			|
+			  <nonterminal def="#dmCall">Call</nonterminal>
 			)
 		</rhs>
 		</production>

@@ -11,6 +11,14 @@
 	</para>
 	</sect2>
 	<sect2>
+	<title>Declaring Processor Commands</title>
+	<para>For Lua you do not have to declare anything besides the Lua script. If you configure a Lua
+		script as program, all global functions declared in this script are declared as processor
+		commands in Wolframe. For avoiding name conflicts you should declare private functions
+		of the script as <code>local</code>.
+	</para>
+	</sect2>
+	<sect2>
 	<title>Filters</title>
 	<para>The application input and output can be of different kind.
 		For different input and output Wolframe provides
@@ -36,25 +44,65 @@
 		returns the input structure as lua table. If the document has a document type, the document is validated
 		by the associated data form. If the document is standalone, then the returned table may not have the structure
 		expected because without schema there is no mean to distinguish between a single element array and a unique element.
-		</para>
+	</para>
+	<para>
+		For Lua users the input processing via a table would be the most straightforward. An example
+		program could look like the this:
+			<programlisting language='lua'>
+			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/input_table.lua" parse="text" />
+			</programlisting>
 
-		<sect3>
-		<title>Input iterators</title>
-		<para>
-		The iterator closure returned by <code>input:get()</code> has the following properties:
-		Unstructured input fetches one value, the input element. Structured input fetches the element
-		content as first value and the attribute or tag as second value. If one of them is not available, then a boolean false is
-		retured in its place. An XML tag for example is returned as false;tagname. An attribute,
-		value pair is returned as value;name.
-		A content element is returned as value;false or value;nil, depending on the filter type.
-		A close tag is returned as a pair of boolean false values (false;false).
-		The reason for using false, instead of nil, is the special treatment of nil in a Lua for loop.
-		Nil is always terminating the iteration in Lua, no matter what follows this nil. Nil is
-		returned at the end of the data or, if the iteration started in a subsection of the
-		content, as the last tag of context the iteration has started closes. The later
-		construct is used for delegating the processing of subsections.
-		</para>
-		</sect3>
+	</para>
+	</sect2>
+	<sect2>
+	<title>Iterators</title>
+	<para>
+	The iterator closure returned by <code>input:get()</code> has the following properties:
+	Unstructured input fetches one value, the input element. Structured input fetches one
+	pair of elements per iteration: the element content as first value and the attribute or
+	tag as second value. The interpretation of the values follows the following schema:
+		<table frame="all" width="100%">
+			<title>Iterator element (pair)</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Value   (1st element)</entry>
+					<entry>Tag     (2nd element)</entry>
+					<entry>Interpretation</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry><code>false</code></entry>
+					<entry>string</entry>
+					<entry>open tag with name [Tag]</entry>
+				</row>
+				<row>
+					<entry><code>false</code></entry>
+					<entry><code>false</code> or <code>nil</code></entry>
+					<entry>close last opened tag</entry>
+				</row>
+				<row>
+					<entry>string</entry>
+					<entry>string</entry>
+					<entry>declaration of attribute [Tag] with value [Value]</entry>
+				</row>
+				<row>
+					<entry>string</entry>
+					<entry><code>false</code> or <code>nil</code></entry>
+					<entry>content element value [Value]</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+
+	The reason for using <code>false</code>, instead of <code>nil</code>, is the special treatment of <code>nil</code> in a Lua for loop.
+	<code>nil</code> is always terminating the iteration in Lua, no matter what follows this <code>nil</code>.
+	<code>nil</code> is returned at the end of the data or, if the iteration started in a
+	subsection of the content, as the last tag of context the iteration has started closes.
+	The later construct is used for delegating the processing of subsections (iterator scope).
+	</para>
 	</sect2>
 	<sect2>
 	<title>Output</title>
@@ -69,11 +117,11 @@
 			<code>output:print(c)</code>.
 		prints an element to the output. The print function is defined symmetrically to the input iterator.
 		This means that the loop
-			<code>
-			for c,t in input:get() do
-				output:print(c,t)
-			end
-			</code>
+		        <programlisting language='lua'>
+		        for c,t in input:get() do
+		                output:print(c,t)
+		        end
+		        </programlisting>
 		echoes the input.
 		Omitting the second argument <code>t</code> means that an untagged content element is printed.
 		The same happens when you call print with <code>nil</code> or <code>false</code> as second parameter <code>t</code>. With <code>c</code> passed
@@ -208,6 +256,311 @@
 		</sect3>
 	</sect2>
 	<para></para>
+
+
+	<sect2>
+	<title>List of Lua Objects</title>
+	<para>This is a list of all objects and functions declared by Wolframe:</para>
+		<table frame="all" width="100%">
+			<title>Input</title>
+			<tgroup cols="4">
+			<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Returns</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>get</entry>
+					<entry></entry>
+					<entry>iterator</entry>
+					<entry>Returns an iterator on the input elements (*)
+					</entry>
+				</row>
+				<row>
+					<entry>table</entry>
+					<entry></entry>
+					<entry>lua table</entry>
+					<entry>Returns the input structure as lua table and validates non standalone documents with the associated form.
+					</entry>
+				</row>
+				<row>
+					<entry>as</entry>
+					<entry>filter</entry>
+					<entry></entry>
+					<entry>Attaches a filter to input.
+					</entry>
+				</row>
+				<row>
+					<entry>doctype</entry>
+					<entry></entry>
+					<entry>lua table</entry>
+					<entry>Returns the input document type as structure
+					</entry>
+				</row>
+				<row>
+					<entry>doctypeid</entry>
+					<entry></entry>
+					<entry>string</entry>
+					<entry>Returns the name of the form associated with the input document type.
+					</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		<para>(*) Can only be called once. Only one of input:table(), input:get() can be called.
+		</para>
+		<table frame="all" width="100%">
+			<title>Output</title>
+			<tgroup cols="4">
+			<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Returns</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>print</entry>
+					<entry>pair value,tag</entry>
+					<entry></entry>
+					<entry>Prints one element to the output.
+					</entry>
+				</row>
+				<row>
+					<entry>opentag</entry>
+					<entry>tagname</entry>
+					<entry></entry>
+					<entry>Synonym for print( false, tagname )
+					</entry>
+				</row>
+				<row>
+					<entry>closetag</entry>
+					<entry>tag name</entry>
+					<entry></entry>
+					<entry>Synonym for print( false, false )
+					</entry>
+				</row>
+				<row>
+					<entry>as</entry>
+					<entry>filter</entry>
+					<entry></entry>
+					<entry>Attaches a filter to output.
+					</entry>
+				</row>
+				<row>
+					<entry>as</entry>
+					<entry>string (formname)</entry>
+					<entry></entry>
+					<entry>Attaches the document type of the form with name formname to the output.
+					</entry>
+				</row>
+				<row>
+					<entry>as</entry>
+					<entry>table (doctype)</entry>
+					<entry></entry>
+					<entry>Attaches the document type defined in the structure doctype (*).
+					</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		<para>
+			(*) The interpretation depends on filter attached to output. For XML the structure defines the elements 'root' (root element in XML !DOCTYPE declaration), 'public' (PUBLIC element in XML !DOCTYPE declaration), 'system' (SYSTEM element in XML !DOCTYPE declaration).
+		</para>
+
+		<table frame="all" width="100%">
+			<title>Data forms declared by DDL</title>
+			<tgroup cols="4">
+			<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Returns</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>get</entry>
+					<entry></entry>
+					<entry>iterator (*)</entry>
+					<entry>Returns an iterator on the form elements</entry>
+				</row>
+				<row>
+					<entry>table</entry>
+					<entry></entry>
+					<entry>lua table</entry>
+					<entry>Returns the contents of the data form as lua table</entry>
+				</row>
+				<row>
+					<entry>__tostring</entry>
+					<entry></entry>
+					<entry>string</entry>
+					<entry>String representation of form for debugging</entry>
+				</row>
+				<row>
+					<entry>name</entry>
+					<entry></entry>
+					<entry>string</entry>
+					<entry>Returns the global name of the form.
+					</entry>
+				</row>
+				<row>
+					<entry>fill</entry>
+					<entry>lua table or iterator (*), (optional "strict", "complete" or "relaxed")</entry>
+					<entry></entry>
+					<entry>Validates input and fills the input data into the form.</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		<para>
+			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe lua object 'get()' method.
+		</para>
+
+		<table frame="all" width="100%">
+			<title>Data forms returned by functions</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Returns</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>get</entry>
+					<entry>iterator (*)</entry>
+					<entry>Returns an iterator on the form elements</entry>
+				</row>
+				<row>
+					<entry>table</entry>
+					<entry>lua table</entry>
+					<entry>Returns the contents of the data form as lua table</entry>
+				</row>
+				<row>
+					<entry>__tostring</entry>
+					<entry>string</entry>
+					<entry>String representation of form for debugging</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		<para>
+			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe lua object 'get()' method.
+		</para>
+
+		<table frame="all" width="100%">
+			<title>Global Transaction Context</title>
+			<tgroup cols="2">
+			<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>transaction.begin</entry>
+					<entry>Starts a transaction</entry>
+				</row>
+				<row>
+					<entry>transaction.commit</entry>
+					<entry>Commit of a transaction</entry>
+				</row>
+				<row>
+					<entry>transaction.rollback</entry>
+					<entry>Rollback of a transaction</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+
+		<table frame="all" width="100%">
+			<title>Logger functions</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Method Name</entry>
+					<entry>Arguments</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>logger.printc</entry>
+					<entry>arbitrary list of arguments</entry>
+					<entry>Print arguments to standard console output</entry>
+				</row>
+				<row>
+					<entry>logger.print</entry>
+					<entry>loglevel (string) plus arbitrary list of arguments</entry>
+					<entry>log argument list with defined log level</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+
+		<table frame="all" width="100%">
+			<title>Global functions</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Function Name</entry>
+					<entry>Arguments</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>filter</entry>
+					<entry>name of filter, argument of filter</entry>
+					<entry>Returns a filter object defined by the parameters</entry>
+				</row>
+				<row>
+					<entry>form</entry>
+					<entry>name of form (string)</entry>
+					<entry>Returns an empty data form object of the given type</entry>
+				</row>
+				<row>
+					<entry>formfunction</entry>
+					<entry>name of function (string)</entry>
+					<entry>Returns a lua function to execute the Wolframe function specified by name</entry>
+				</row>
+				<row>
+					<entry>normalizer</entry>
+					<entry>type name</entry>
+					<entry>Returns a lua function for normalizing values of the type specified (as used in forms)</entry>
+				</row>
+				<row>
+					<entry>scope</entry>
+					<entry>iterator (*)</entry>
+					<entry>Returns an iterator until the end of the current tag (*)</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+		<para>
+			(*) With iterator we mean an iterator as introduced in previous sections, returned by a Wolframe lua object 'get()' method.
+			The iterator of a defined scope must be consumed completely before consuming anything of the parent iterator.
+			Otherwise it may lead to unexpected results.
+		</para>
+	</sect2>
+
 </sect1>
 <beginpage/>
 

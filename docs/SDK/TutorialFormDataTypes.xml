@@ -58,8 +58,11 @@
 		<production xml:id="normNormalizeCall">
 		<lhs>Call</lhs>
 		<rhs>
-			( <nonterminal def="#normNamespace">Namespace</nonterminal>
-			  <nonterminal def="#normIdentifier">Identifier</nonterminal>
+			(
+			  (
+			    <nonterminal def="#normNamespace">Namespace</nonterminal>
+			    <nonterminal def="#normIdentifier">Identifier</nonterminal>
+			  )
 			|
 			  <nonterminal def="#normIdentifier">Identifier</nonterminal>
 			)
@@ -69,9 +72,12 @@
 		<production xml:id="normNormalizeSeq">
 		<lhs>CallSeq</lhs>
 		<rhs>
-			( <nonterminal def="#normNormalizeCall">Call</nonterminal>
-			  ','
-			  <nonterminal def="#normNormalizeSeq">CallSeq</nonterminal>
+			(
+			  (
+			    <nonterminal def="#normNormalizeCall">Call</nonterminal>
+			    ','
+			    <nonterminal def="#normNormalizeSeq">CallSeq</nonterminal>
+			  )
 			|
 			  <nonterminal def="#normNormalizeCall">Call</nonterminal>
 			)
@@ -91,10 +97,13 @@
 		<production xml:id="normProgram">
 		<lhs>Program</lhs>
 		<rhs>
-			  <nonterminal def="#normTypedef">Typedef</nonterminal>
 			(
-			  <nonterminal def="#normProgram">Program</nonterminal>
+			  (
+			    <nonterminal def="#normTypedef">Typedef</nonterminal>
+			    <nonterminal def="#normProgram">Program</nonterminal>
+			  )
 			|
+			  <nonterminal def="#normTypedef">Typedef</nonterminal>
 			)
 		</rhs>
 		</production>

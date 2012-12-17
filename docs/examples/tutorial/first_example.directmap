@@ -1,4 +1,4 @@
 
-InsertCustomer = insertCustomer( xml :Customer);
-SelectCustomer = selectCustomer( xml ) :Customer;
+InsertCustomer = doInsertCustomer( xml :Customer);
+SelectCustomer = doSelectCustomer( xml ) :Customer;
 

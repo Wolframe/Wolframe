@@ -23,7 +23,7 @@
 	</sect2>
 	<sect2>
 		<title>First example</title>
-		<para>This example selects a key from a table and uses it for a list inserts. The substitute "$1" refers to the first column of the "SELECT id FROM UserTable .." query result. The substitute "$(name)" refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name beeing unique per item and item describing a set of items).
+		<para>This example selects a key from a table and uses it for a list inserts. The substitute "$1" refers to the first column of the "SELECT id FROM UserTable .." query result. The substitute "$(name)" in the first statement refers to the toplevel tag 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name beeing unique per item and item describing a set of items).
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/first_example.tdl" parse="text" />
 		</programlisting>
@@ -40,7 +40,7 @@
 			<member>RESULT INTO</member><member>Followed by a tag defining an outer tag in the result of the execution block.</member>
 			<member>AUTHORIZE</member><member>Followed by a pair of identifiers in '(' ')' brackets, separated by a comma. Defines the method to call for granting authorization to the caller of this transaction.</member>
 			<member>FOREACH</member><member>Followed by a selection path. Defines a selection in nodes of the input. The operation is executed for each member of the selection. All relative path expressions in the operation arguments have the path of the selected element of the operation as base.</member>
-			<member>INTO</member><member>Followed by an identifier that declares the result tag for each result element of this operation</member>
+			<member>INTO</member><member>(outside embedded SQL statement) Followed by an identifier that declares the result tag for each result element of this operation</member>
 			<member>DO</member><member>Starts the operation declaration. It is followed by an embedded SQL command terminated with ';' or by an operation call</member>
 			<member>UNIQUE</member><member>constraint on operation result: Result must be unique, if it exists</member>
 			<member>NONEMPTY</member><member>constraint on operation result: Result must not be empty</member>
@@ -54,7 +54,7 @@
 			<simplelist type="horiz" columns="3">
 			<member>Element</member><member>Example</member><member>Description</member>
 			<member>$NNN</member><member>$1</member><member>Column of one row of last result. The command is executed for each row of the last result</member>
-			<member>$(path)</member><member>$(persone/id)</member><member>Single element addressed by relative path from the FOREACH selection</member>
+			<member>$(path)</member><member>$(persone/id)</member><member>Single element addressed by relative path from the current selection</member>
 			</simplelist>
 		</para>
 	</sect2>
