@@ -1,0 +1,139 @@
+Requirements
+
+You need the following packages:
+- wolframe_0.0.1-1_amd64.deb: the Wolframe server
+- wolframe-sqlite3_0.0.1-1_amd64.deb: the Sqlite3 database driver module
+- wolframe-client_0.0.1-1_amd64.deb: contains the Qt frontend
+
+Sample application
+
+We want to manage a list of customers with name and address and provide
+the usual operations:
+- list all customers
+- create new customers
+- edit existing customers
+- view customer entries
+- delete customers
+- search for customers
+
+Basic directory layout
+
+We don't use the normal directory layout as it requires root rights to
+install.
+
+Instead we create two directories, one for server data and one for
+client data:
+
+mkdir ~/tutorial
+mkdir ~/tutorial/server
+mkdir ~/tutorial/client
+
+Basic configuration
+
+Step 1:
+
+We have to set up the wolframed daemon with a running configuration file:
+
+cd ~/tutorial/server
+
+We create the central confuguration file of the server 'tutorial.conf':
+
+(file:step1/server/tutorial.conf)
+
+We can start the server now in the shell foreground with:
+
+/usr/sbin/wolframed -f -c tutorial.conf
+
+NOTICE: Starting server
+DEBUG: Random generator initialized. Using device '/dev/urandom'
+DEBUG: AAAA database references resolved
+INFO: Accepting connections on ::1:7661
+DEBUG: 1 network acceptor(s) created.
+DEBUG: 0 network SSL acceptor(s) created.
+
+The server is up and listening to port 7661
+
+If we use a telnet to connect to the server with
+
+telnet localhost 7661
+
+we get:
+
+Access denied.
+
+The server tells us:
+
+DEBUG: Connection from ::1:52134 to localhost:7661 not authorized
+DEBUG: Connection to ::1:52134 closed
+
+Step 2:
+
+So we have to add a dummy authorization to the server configuration
+which accepts all connections (not very secure, but for now good enough):
+
+; dummy authorization
+AAAA {
+	Authorization {
+		default allow
+	}
+}
+
+If we start the server now, the telnet shows us
+
+Escape character is '^]'.
+Wolframe version 0.0.5 OS
+OK
+
+Enter 'quit' <Enter> now and we get back to the shell:
+
+quit
+BYE
+Connection closed by foreign host.
+
+Step 3:
+
+Now that we have ensured that basic connectivity to the Wolframe server
+is available, we can configure the basics for the Qt client:
+
+We copy the windows theme files MainWindow.ui and MainWindow.qss to
+~/tutorial/client/themes/windows
+
+We create a client configuration file ~/tutorial/client/client.conf with:
+
+[wolframe]
+host=localhost
+port=7661
+secure=false
+checkSSL=true
+client-cert-file=./certs/client.crt
+client-key-file=./private/client.key
+ca-cert-file=./certs/CAclient.cert.pem
+uiloadmode=LocalFile
+dataloadmode=Network
+dbname=./apps/test/data.db
+debug=false
+uiFormDir=.
+uiFormTranslationsDir=.
+uiFormResourcesDir=.
+dataLoaderDir=.
+locale=en_US
+
+now when we start the client with:
+
+qtclient -s tutorial.conf -d
+
+We get a login screen were we just hit "Login".
+
+We get an empty window, we can go to "Help", "Debug Terminal". Also
+here we can test the protocol as in a telnet client.
+
+type "QUIT" <Enter> in the debug window or exit the Qt application over
+the menu.
+
+We start now the Qt designer and create an empty QWidget form named
+'~/tutorial/client/init.ui' and save it. If we start the server now
+we see the same empty window again, but this time it's the dynamically
+loaded initial form (which is again empty).
+
+Step 4:
+
