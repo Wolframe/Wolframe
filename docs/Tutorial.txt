@@ -266,9 +266,9 @@ FORM CustomerListRequest
 }
 
 Now we create a telnet request, which contains basic authentication and
-a request for the list of customers 'CustomerList.netcat':
+a request for the list of customers 'CustomerListRequest.netcat':
 
-cat > CustomerList.netcat
+cat > CustomerListRequest.netcat
 AUTH
 MECH NONE
 REQUEST
@@ -281,7 +281,7 @@ Ctrl-D
 
 This we can execute with:
 
-netcat -v --wait=2 127.0.0.1 7661 < CustomerList.netcat
+netcat -v --wait=2 127.0.0.1 7661 < CustomerListRequest.netcat
 
 and we get:
 
