@@ -3,6 +3,7 @@ Requirements
 You need the following packages:
 - wolframe_0.0.1-1_amd64.deb: the Wolframe server
 - wolframe-sqlite3_0.0.1-1_amd64.deb: the Sqlite3 database driver module
+- wolframe-libxml2_0.0.1-1_amd64.deb: contains XML filter based on libxml2
 - wolframe-client_0.0.1-1_amd64.deb: contains the Qt frontend
 
 Sample application
@@ -51,7 +52,8 @@ INFO: Accepting connections on ::1:7661
 DEBUG: 1 network acceptor(s) created.
 DEBUG: 0 network SSL acceptor(s) created.
 
-The server is up and listening to port 7661
+The server is up and listening to port 7661. The server can be stopped
+anytime by pressing 'Ctrl-C'.
 
 If we use a telnet to connect to the server with
 
@@ -176,7 +178,7 @@ so we have to add the following module to tutorial.conf:
 
 LoadModules {
 	..
-	module /usr/lib/wolframe/modules/mod_filter_textwolf.so
+	module /usr/lib/wolframe/modules/mod_filter_libxml2.so
 	..
 }
 
@@ -191,7 +193,7 @@ We see:
 ..
 Module files to load:
    /usr/lib/wolframe/modules/mod_db_sqlite3.so
-   /usr/lib/wolframe/modules/mod_filter_textwolf.so
+   /usr/lib/wolframe/modules/mod_filter_libxml2.so
 ..
 
 which looks ok.
@@ -219,9 +221,9 @@ Processor {
 Now we have to a file 'tutorial.directmap'. This file maps
 the requests to the corresponding transaction definitions:
 
-CustomerList = SelectCustomerList( xml );
+CustomerListRequest = SelectCustomerList( xml );
 
-This means that we map the 'CustomerList' request which gives us a list
+This means that we map the 'CustomerListRequest' request which gives us a list
 of customers to the TDL transaction 'SelectCustomerList'. This also means
 we need to configure the TDL program in the server:
 
@@ -239,8 +241,74 @@ BEGIN
 	INTO customer DO SELECT * from Customer;
 END
 
-We restart the server.
+We also need a validator for the input when the client sends a 'CustomerListRequest'.
+we install the simple form DDL compilter in 'tutorial.conf' and register the
+simpleform program to the list of programs:
+
+LoadModules {
+	..
+	module /usr/lib/wolframe/modules/mod_ddlcompiler_simpleform.so
+}
+
+Program {
+	..
+	program CustomerListRequest.simpleform	
+	..
+}
+
+and we add a simple form file 'CustomerListRequest.simpleform', for now we
+can leave it empty but for the root element:
+
+FORM CustomerListRequest
+{
+	customer {
+	}
+}
 
 Now we create a telnet request, which contains basic authentication and
-a request for the list of customers:
+a request for the list of customers 'CustomerList.netcat':
+
+cat > CustomerList.netcat
+AUTH
+MECH NONE
+REQUEST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE customer SYSTEM 'CustomerListRequest'>
+<customer/>
+.
+QUIT
+Ctrl-D
+
+This we can execute with:
+
+netcat -v --wait=2 127.0.0.1 7661 < CustomerList.netcat
+
+and we get:
+
+Wolframe version 0.0.5 OS
+OK
+MECHS NONE
+OK authorization
+ANSWER
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<list><customer/></list>
+
+.
+OK REQUEST CustomerListRequest
+
+We got an empty list of customers. So we have successfully configured
+the server for our first command.
+
+Let's also add some demo data now:
+
+cat > data.sql
+insert into customer(name,address) values('Dr Who','Blue Police Box');
+insert into customer(name,address) values('John Smith','The Wheel in Space');
+Ctrl-D
+
+sqlite3 tutorial.db < data.sql
+
+We can move now to the qtclient to make our first request visible.
+
+Step 5
 
