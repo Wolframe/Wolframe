@@ -30,43 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_employee_assignment_convert.cpp
-///\brief Module for testing form functions
-#include "module/builtInFunctionBuilder.hpp"
-#include "employee_assignment_convert.hpp"
-#include "logger-v1.hpp"
+///\brief Interface for programs loaded by the processor provider
+///\file prgbind/program.hpp
 
-_Wolframe::log::LogBackend* logBackendPtr;
+#ifndef _PRGBIND_PROGRAM_HPP_INCLUDED
+#define _PRGBIND_PROGRAM_HPP_INCLUDED
+#include "types/countedReference.hpp"
+#include <string>
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-using namespace _Wolframe::test;
+namespace _Wolframe {
+namespace proc {
+	class ProcessorProvider;
+}}
 
-static void setModuleLogger( void* logger )
+namespace _Wolframe {
+namespace prgbind {
+
+struct Program
 {
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
+	virtual ~Program(){}
 
-namespace {
-struct employee_assingment_convert_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = AssignmentListDoc::getStructDescription();
-		static const serialize::StructDescriptionBase* result = AssignmentListDoc::getStructDescription();
-		langbind::BuiltInFunction func( convertAssignmentListDoc, param, result);
-
-		return new BuiltInFunctionBuilder( "employee_assignment_convert", func);
-	}
-};
-}
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	employee_assingment_convert_func::constructor
+	virtual bool is_mine( const std::string& filename) const=0;
+	virtual void loadProgram( proc::ProcessorProvider& provider, const std::string& filename)=0;
 };
 
-ModuleEntryPoint entryPoint( 0, "test form function", setModuleLogger, 0, 0, NofObjects, objdef);
+typedef types::CountedReference<Program> ProgramR;
 
+}}//namespace
+#endif
 

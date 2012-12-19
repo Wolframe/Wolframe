@@ -30,43 +30,21 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_employee_assignment_convert.cpp
-///\brief Module for testing form functions
-#include "module/builtInFunctionBuilder.hpp"
-#include "employee_assignment_convert.hpp"
-#include "logger-v1.hpp"
+///\brief Implements the list of all initially defined program types
+///\file predefinedProgramTypes.cpp
 
-_Wolframe::log::LogBackend* logBackendPtr;
+#include "prgbind/predefinedProgramTypes.hpp"
+#include "prgbind/transactionProgram.hpp"
+#include "prgbind/program.hpp"
 
 using namespace _Wolframe;
-using namespace _Wolframe::module;
-using namespace _Wolframe::test;
+using namespace _Wolframe::prgbind;
 
-static void setModuleLogger( void* logger )
+std::vector<ProgramR> _Wolframe::prgbind::getPredefinedProgramTypes()
 {
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
+	std::vector<ProgramR> rt;
+	rt.push_back( ProgramR( new TransactionDefinitionProgram()));
+	return rt;
 }
-
-namespace {
-struct employee_assingment_convert_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = AssignmentListDoc::getStructDescription();
-		static const serialize::StructDescriptionBase* result = AssignmentListDoc::getStructDescription();
-		langbind::BuiltInFunction func( convertAssignmentListDoc, param, result);
-
-		return new BuiltInFunctionBuilder( "employee_assignment_convert", func);
-	}
-};
-}
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	employee_assingment_convert_func::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "test form function", setModuleLogger, 0, 0, NofObjects, objdef);
 
 

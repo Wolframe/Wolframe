@@ -76,13 +76,16 @@ public:
 	///\param[in] source source for database with included transaction definitions to parse
 	///\param[out] dbsource source for database without transaction definitions
 	///\remark Throws Program::Error exception
-	void load( const std::string& source, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap);
+	std::vector<std::pair<std::string,TransactionFunctionR> >
+		load( const std::string& source, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap);
 
 	///\brief Load transaction program source
 	///\param[in] filename file with source for database with included transaction definitions to parse
 	///\param[out] dbsource source for database without transaction definitions
+	///\return return the new defined functions
 	///\remark Throws std::runtime_error exception with positional error and filename
-	void loadfile( const std::string& filename, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap);
+	std::vector<std::pair<std::string,TransactionFunctionR> >
+		loadfile( const std::string& filename, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap);
 
 	///\brief Get a loaded function by name
 	const TransactionFunction* function( const std::string& name) const;

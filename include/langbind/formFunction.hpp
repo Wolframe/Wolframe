@@ -30,43 +30,52 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_employee_assignment_convert.cpp
-///\brief Module for testing form functions
-#include "module/builtInFunctionBuilder.hpp"
-#include "employee_assignment_convert.hpp"
-#include "logger-v1.hpp"
+///\brief Interface for executing functions with structure input/output in the language bindings
+///\file langbind/formFunction.hpp
 
-_Wolframe::log::LogBackend* logBackendPtr;
+#ifndef _LANGBIND_FORM_FUNCTION_HPP_INCLUDED
+#define _LANGBIND_FORM_FUNCTION_HPP_INCLUDED
+#include "filter/typedfilter.hpp"
+#include "types/countedReference.hpp"
+#include "serialize/mapContext.hpp"
+#include <string>
 
-using namespace _Wolframe;
-using namespace _Wolframe::module;
-using namespace _Wolframe::test;
+namespace _Wolframe {
+namespace proc {
+	class ProcessorProvider;
+}}
 
-static void setModuleLogger( void* logger )
+namespace _Wolframe {
+namespace langbind {
+
+struct FormFunctionClosure
 {
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
-}
+	virtual ~FormFunctionClosure(){}
 
-namespace {
-struct employee_assingment_convert_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = AssignmentListDoc::getStructDescription();
-		static const serialize::StructDescriptionBase* result = AssignmentListDoc::getStructDescription();
-		langbind::BuiltInFunction func( convertAssignmentListDoc, param, result);
+	///\brief Calls the function with the input from the input filter specified
+	///\return true when completed
+	virtual bool call()=0;
 
-		return new BuiltInFunctionBuilder( "employee_assignment_convert", func);
-	}
+	///\brief Initialization of call context for a new call
+	///\param[in] p processor provider
+	///\param[in] i call input
+	///\param[in] f serialization flags depending on context (directmap "strict",lua relaxed)
+	virtual void init( const proc::ProcessorProvider* p, const TypedInputFilterR& i, serialize::Context::Flags f)=0;
+
+	///\brief Get the iterator for the function result
+	virtual const TypedInputFilterR& result() const=0;
 };
-}
 
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
+typedef types::CountedReference<FormFunctionClosure> FormFunctionClosureR;
+
+struct FormFunction
 {
-	employee_assingment_convert_func::constructor
+	virtual ~FormFunction(){}
+	virtual FormFunctionClosure* createClosure() const=0;
 };
 
-ModuleEntryPoint entryPoint( 0, "test form function", setModuleLogger, 0, 0, NofObjects, objdef);
+typedef types::CountedReference<FormFunction> FormFunctionR;
 
+}}//namespace
+#endif
 

@@ -29,31 +29,31 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/appObjects.hpp
-///\brief Interface to the form function system object for processor language bindings
-#ifndef _Wolframe_langbind_APP_FORM_FUNCTION_HPP_INCLUDED
-#define _Wolframe_langbind_APP_FORM_FUNCTION_HPP_INCLUDED
+///\file langbind/appBuiltInFunction.hpp
+///\brief Interface to the built-in function for processor language bindings
+#ifndef _Wolframe_langbind_APP_BUILT_IN_FUNCTION_HPP_INCLUDED
+#define _Wolframe_langbind_APP_BUILT_IN_FUNCTION_HPP_INCLUDED
 #include "serialize/struct/filtermapBase.hpp"
 
 namespace _Wolframe {
 namespace langbind {
 
-///\class FormFunction
-///\brief Function of language bindings implemented in C++ with a form defined with a serialization description as argument and as result
-class FormFunction
+///\class BuiltInFunction
+///\brief Function of language bindings implemented in C++ with a form as argument and as result. The forms are defined by a serialization description.
+class BuiltInFunction
 {
 public:
 	typedef int (Function)( void* res, const void* param);
 
 	///\brief Default constructor
-	FormFunction()
+	BuiltInFunction()
 		:m_function(0)
 		,m_api_param(0)
 		,m_api_result(0){}
 
 	///\brief Copy constructor
 	///\param[in] o copied item
-	FormFunction( const FormFunction& o)
+	BuiltInFunction( const BuiltInFunction& o)
 		:m_function(o.m_function)
 		,m_api_param(o.m_api_param)
 		,m_api_result(o.m_api_result){}
@@ -62,7 +62,7 @@ public:
 	///\param[in] f function to call
 	///\param[in] p part of the api describing the input
 	///\param[in] r part of the api describing the function result
-	FormFunction( Function f, const serialize::StructDescriptionBase* p, const serialize::StructDescriptionBase* r)
+	BuiltInFunction( Function f, const serialize::StructDescriptionBase* p, const serialize::StructDescriptionBase* r)
 		:m_function(f)
 		,m_api_param(p)
 		,m_api_result(r){}
@@ -87,7 +87,7 @@ private:
 	const serialize::StructDescriptionBase* m_api_result;		//< api result description
 };
 
-typedef types::CountedReference<FormFunction> FormFunctionR;
+typedef types::CountedReference<BuiltInFunction> BuiltInFunctionR;
 
 }}//namespace
 #endif

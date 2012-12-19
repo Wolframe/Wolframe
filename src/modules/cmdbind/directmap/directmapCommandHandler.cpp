@@ -180,8 +180,8 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				m_state = 3;
 				/* no break here ! */
 			case 3:
-				m_functionclosure.reset( new TransactionFunctionClosure( m_provider, m_function));
-				m_functionclosure->init( m_input);
+				m_functionclosure.reset( new TransactionFunctionClosure( m_function));
+				m_functionclosure->init( m_provider, m_input);
 				m_state = 4;
 				/* no break here ! */
 			case 4:

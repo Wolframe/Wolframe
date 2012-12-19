@@ -175,8 +175,8 @@ ApiFormData::~ApiFormData()
 }
 
 
-FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
-	:types::TypeSignature("langbind::FormFunctionClosure", __LINE__)
+BuiltInFunctionClosure::BuiltInFunctionClosure( const BuiltInFunction& f)
+	:types::TypeSignature("langbind::BuiltInFunctionClosure", __LINE__)
 	,m_func(f)
 	,m_state(0)
 	,m_param_data(f.api_param())
@@ -184,7 +184,7 @@ FormFunctionClosure::FormFunctionClosure( const FormFunction& f)
 	,m_result(m_result_data.data(),m_result_data.descr())
 	,m_parser(m_param_data.data(),m_param_data.descr()){}
 
-FormFunctionClosure::FormFunctionClosure( const FormFunctionClosure& o)
+BuiltInFunctionClosure::BuiltInFunctionClosure( const BuiltInFunctionClosure& o)
 	:types::TypeSignature(o)
 	,m_func(o.m_func)
 	,m_state(0)
@@ -194,12 +194,12 @@ FormFunctionClosure::FormFunctionClosure( const FormFunctionClosure& o)
 	,m_parser(o.m_parser)
 	{}
 
-void FormFunctionClosure::init( const TypedInputFilterR& i, serialize::Context::Flags flags)
+void BuiltInFunctionClosure::init( const TypedInputFilterR& i, serialize::Context::Flags flags)
 {
 	m_parser.init(i,flags);
 }
 
-bool FormFunctionClosure::call()
+bool BuiltInFunctionClosure::call()
 {
 	void* param_struct = m_param_data.get();
 	void* result_struct = m_result_data.get();
@@ -222,9 +222,9 @@ bool FormFunctionClosure::call()
 }
 
 
-TransactionFunctionClosure::TransactionFunctionClosure( const proc::ProcessorProvider* p, const db::TransactionFunction* f, const db::TransactionR& t)
+TransactionFunctionClosure::TransactionFunctionClosure( const db::TransactionFunction* f, const db::TransactionR& t)
 	:types::TypeSignature("langbind::TransactionFunctionClosure", __LINE__)
-	,m_provider(p)
+	,m_provider(0)
 	,m_func(f)
 	,m_state(0)
 	,m_inputstructptr(f->getInput())
@@ -272,8 +272,9 @@ bool TransactionFunctionClosure::call()
 	}
 }
 
-void TransactionFunctionClosure::init( const TypedInputFilterR& i)
+void TransactionFunctionClosure::init( const proc::ProcessorProvider* provider_, const TypedInputFilterR& i)
 {
+	m_provider = provider_;
 	m_inputstruct.reset( m_inputstructptr = m_func->getInput());
 	m_input.init( i, m_inputstruct);
 	m_state = 1;

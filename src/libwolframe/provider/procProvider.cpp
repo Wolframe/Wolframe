@@ -194,10 +194,11 @@ void ProcProviderConfig::setCanonicalPathes( const std::string& refPath )
 
 //**** Processor Provider PIMPL *********************************************
 ProcessorProvider::ProcessorProvider( const ProcProviderConfig* conf,
-				      const module::ModulesDirectory* modules )
+				      const module::ModulesDirectory* modules,
+				      const std::vector<prgbind::ProgramR>& programTypes_)
 	: m_impl(0)
 {
-	m_impl = new ProcessorProvider_Impl( conf, modules );
+	m_impl = new ProcessorProvider_Impl( conf, modules, programTypes_);
 }
 
 ProcessorProvider::~ProcessorProvider()
@@ -215,7 +216,7 @@ langbind::Filter* ProcessorProvider::filter( const std::string& name, const std:
 	return m_impl->filter( name, arg );
 }
 
-langbind::FormFunction* ProcessorProvider::formfunction( const std::string& name) const
+langbind::BuiltInFunction* ProcessorProvider::formfunction( const std::string& name) const
 {
 	return m_impl->formfunction( name );
 }
@@ -272,6 +273,11 @@ db::Database* ProcessorProvider::transactionDatabase() const
 db::Transaction* ProcessorProvider::transaction( const std::string& name ) const
 {
 	return m_impl->transaction( name );
+}
+
+void ProcessorProvider::defineFunction( const std::string& name, langbind::FormFunctionR func)
+{
+	m_impl->defineFunction( name, func);
 }
 
 }} // namespace _Wolframe::proc

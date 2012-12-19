@@ -41,7 +41,7 @@
 #include "database/DBprovider.hpp"
 #include "database/transactionFunction.hpp"
 #include "filter/filter.hpp"
-#include "langbind/appFormFunction.hpp"
+#include "langbind/appBuiltInFunction.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
@@ -49,6 +49,8 @@
 #include "ddl/compilerInterface.hpp"
 #include "prnt/printFunction.hpp"
 #include "langbind/normalizeFunction.hpp"
+#include "langbind/formFunction.hpp"
+#include "prgbind/program.hpp"
 
 namespace _Wolframe {
 namespace proc {
@@ -80,12 +82,14 @@ private:
 	std::list< std::string >			m_programFiles;
 };
 
+
 /// Processor provider
 class ProcessorProvider : private boost::noncopyable
 {
 public:
 	ProcessorProvider( const ProcProviderConfig* conf,
-			   const module::ModulesDirectory* modules );
+			   const module::ModulesDirectory* modules,
+			   const std::vector<prgbind::ProgramR>& programTypes_);
 	~ProcessorProvider();
 
 	bool resolveDB( const db::DatabaseProvider& db );
@@ -94,22 +98,22 @@ public:
 	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command) const;
 
 	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
-	langbind::FormFunction* formfunction( const std::string& name) const;
-
 	const ddl::Form* form( const std::string& name ) const;
-	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
+
+	langbind::BuiltInFunction* formfunction( const std::string& name) const;
+	const prnt::PrintFunction* printFunction( const std::string& name) const;
+	const db::TransactionFunction* transactionFunction( const std::string& name) const;
+
 	std::string xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const;
 
 	db::Database* transactionDatabase() const;
 
-	///\ Just and interface at the moment
+	///\brief Just and interface at the moment
 	const UI::UserInterfaceLibrary* UIlibrary() const;
 
-	/// return a database transaction object for the given name
+	///\brief return a database transaction object for the given name
 	db::Transaction* transaction( const std::string& name ) const;
-
-	const db::TransactionFunction* transactionFunction( const std::string& name) const;
 
 	///\Get the list of UI-forms
 	///\return map name -> uiform xml without header
@@ -118,6 +122,8 @@ public:
 		/// make it just compile
 		return std::map<std::string,std::string>();
 	}
+
+	void defineFunction( const std::string& name, langbind::FormFunctionR func);
 
 private:
 	class ProcessorProvider_Impl;

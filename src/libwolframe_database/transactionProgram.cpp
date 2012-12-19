@@ -91,11 +91,11 @@ static bool checkResultIdentifier( const std::string& id)
 }
 
 
-void TransactionProgram::loadfile( const std::string& filename, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
+std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::loadfile( const std::string& filename, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
 {
 	try
 	{
-		load( utils::readSourceFileContent( filename), dbsource, embeddedStatementMap);
+		return load( utils::readSourceFileContent( filename), dbsource, embeddedStatementMap);
 	}
 	catch (const config::PositionalErrorException& e)
 	{
@@ -287,8 +287,9 @@ struct Operation
 };
 }// anonymous namespace
 
-void TransactionProgram::load( const std::string& source, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
+std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::load( const std::string& source, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
 {
+	std::vector<std::pair<std::string,TransactionFunctionR> > rt;
 	char ch;
 	std::string tok;
 	std::string::const_iterator si = source.begin(), se = source.end();
@@ -431,7 +432,9 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource,
 							if (operation.isTransaction)
 							{
 								LOG_TRACE << "Registering transaction definition '" << operation.name << "'";
-								m_functionmap[ operation.name] = TransactionFunctionR( createTransactionFunction( operation.name, operation.descar, operation.resultname, operationmap, operation.authorization));
+								TransactionFunctionR ff( createTransactionFunction( operation.name, operation.descar, operation.resultname, operationmap, operation.authorization));
+								m_functionmap[ operation.name] = ff;
+								rt.push_back( std::pair<std::string,TransactionFunctionR>( operation.name, ff));
 							}
 							else
 							{
@@ -535,6 +538,7 @@ void TransactionProgram::load( const std::string& source, std::string& dbsource,
 		throw ERROR( si, e.what());
 	}
 	dbsource.append( std::string( dbi, source.end()));
+	return rt;
 }
 
 const TransactionFunction* TransactionProgram::function( const std::string& name) const
