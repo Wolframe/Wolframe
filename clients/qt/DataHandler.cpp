@@ -658,12 +658,15 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 		QTreeWidgetItem *_parent = treeWidget->invisibleRootItem( );
 		QTreeWidgetItem *item = treeWidget->invisibleRootItem( );
 		bool first = true;
+		bool isTree = false;
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
 			if( xml.isStartElement( ) ) {
 				if( xml.name( ) == "tree" ) {
+					isTree = true;
 					_parent = item;
 				} else if( xml.name( ) == "item" ) {
+					isTree = true;
 					if( first ) {
 						first = false;
 						continue;
@@ -675,6 +678,18 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 						QVariant v;
 						v.setValue( attr.value( ).toString( ) );
 						item->setData( 0, Qt::UserRole, v );
+					}
+				} else if( xml.name( ) == widget_name ) {
+// did we see 'tree' or 'item' before? if not, we are in multi-column and not in tree mode
+// in list mode we have to generate the item now
+					if( !isTree ) {
+						item = new QTreeWidgetItem( _parent );
+					} else {
+						int col = headers.indexOf( xml.name( ).toString( ) );
+						if( col != -1 ) {
+							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
+							item->setText( col, text );
+						}
 					}
 				} else {
 // all element in the item are mapped to the columns
@@ -695,6 +710,10 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 					}
 				} else if( xml.name( ) == "item" ) {
 					_parent->addChild( item );
+				} else if( xml.name( ) == widget_name ) {
+					if( !isTree ) {
+						_parent->addChild( item );
+					}
 				}
 			}
 		}
