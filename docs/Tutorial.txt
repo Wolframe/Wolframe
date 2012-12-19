@@ -588,3 +588,7 @@ customer in the list we get:
 (file:step6_customer_show_working.png)
 
 So we successfully read the data of a customer into a form.
+
+Step 7 - Create new customers
+------
+
