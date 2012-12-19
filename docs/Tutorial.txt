@@ -31,7 +31,8 @@ mkdir ~/tutorial/client
 
 Basic configuration
 
-Step 1:
+Step 1 - Basic connectivity
+------
 
 We have to set up the wolframed daemon with a running configuration file:
 
@@ -68,7 +69,8 @@ The server tells us:
 DEBUG: Connection from ::1:52134 to localhost:7661 not authorized
 DEBUG: Connection to ::1:52134 closed
 
-Step 2:
+Step 2 - AAAA
+------
 
 So we have to add a dummy authorization to the server configuration
 which accepts all connections (not very secure, but for now good enough):
@@ -92,7 +94,8 @@ quit
 BYE
 Connection closed by foreign host.
 
-Step 3:
+Step 3 - The whole chain working
+------
 
 Now that we have ensured that basic connectivity to the Wolframe server
 is available, we can configure the basics for the Qt client:
@@ -137,7 +140,8 @@ We start now the Qt designer and create an empty QWidget form named
 we see the same empty window again, but this time it's the dynamically
 loaded initial form (which is again empty).
 
-Step 4:
+Step 4 - Implement server side customer list
+------
 
 We want to store the customer data in a sqlite database, so we have to
 prepare the server:
@@ -310,7 +314,8 @@ sqlite3 tutorial.db < data.sql
 
 We can move now to the qtclient to make our first request visible.
 
-Step 5
+Step 5 - Implement client side customer list
+------
 
 It's time now to get something visual working, so we start to add a first
 simple interface to our qtclient.
@@ -374,4 +379,7 @@ FORM CustomerListRequest
 If we restart the server and run qtclient again we get the desired result:
 
 (file:step5_customers_list.png)
+
+Step 6
+------
 
