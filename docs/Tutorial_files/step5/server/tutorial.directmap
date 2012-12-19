@@ -1,0 +1,1 @@
+CustomerListRequest = SelectCustomerList( xml );
