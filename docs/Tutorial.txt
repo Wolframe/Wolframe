@@ -328,7 +328,8 @@ When we reexecute the netcat command we see:
   </customer>
 </list>
 
-So, the data is now tra
+So, the data is now correctly retrieved from the database.
+
 We can move now to the qtclient to make our first request visible.
 
 Step 5 - Implement client side customer list
@@ -411,6 +412,12 @@ Let's start by adding a button in 'customers.ui' called 'Show':
 (file:step6_customers_edit_button.png)
 
 We add dynamic properties, one is the 'form' which we set to 'customer_show'.
+
+We also add some signals for the double click on the customer list to
+click the "Show" button:
+
+(file:step6_customers_signals.png)
+
 We want the currently selected customer to be accessible in the customer_show.ui
 form, so we have to remember the current selection of the QTreeWidget named 'customer'
 as global variable 'id'. We add a dynamic property with the name 'global.id' and
@@ -432,9 +439,152 @@ by simply adding a 'form' action with the value 'customers':
 
 (file:step6_customer_show_back_button.png)
 
-If we start the qtclient and select a customer and press show we will
+If we start the qtclient and select a customer and press 'Show' we will
 notice that the whole "Show Customer" form is empty, even the id. What's
 wrong? Well, the widgets in qtclient have the default behaviour of using
 'id' attributes attached to the colums of a list for instance. We must
 make sure, the server is mapping us the XML correctly with 'id' attribute
 and not 'id' as element.
+
+This is the moment we go back to the server and start output form validation.
+We add a 'CustomerList.simpleform' form which describes the result of the 'CustomerListRequest'
+more precise and especially declares the 'id' as mandatory attribute of the customer:
+
+FORM CustomerList
+{
+	list
+	{
+		customer []
+		{
+			id !@int
+			name string
+			address string
+		}
+	}
+}
+
+We have to declare output form validation in the 'CustomerListRequest'
+in 'tutorial.directmap' as well:
+
+CustomerListRequest = SelectCustomerList( xml ) : CustomerList;
+
+and we have to include the program in 'tutorial.conf' of the server:
+
+Program {
+	..
+	program CustomerList.simpleform	
+	..
+}
+
+Checking with:
+
+netcat -v --wait=2 127.0.0.1 7661 < CustomerListRequest.netcat
+
+we get now:
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE list SYSTEM "CustomerList.simpleform">
+<list>
+  <customer id="1">
+    <name>Dr Who</name>
+    <address>Blue Police Box</address>
+  </customer>
+  <customer id="2">
+    <name>John Smith</name>
+    <address>The Wheel in Space</address>
+  </customer>
+</list>
+
+So, that looks ok.
+
+Now also the qtlient shows the id of the customer, when the user double
+clicks the customer in the list.
+
+The 'name' and the 'address' fields are still empty. We could of course
+use global variables again to propagate the values between forms, but
+if the form gets more complex, this is not a good idea.
+
+We start to use the 'initAction' property on the 'customer_show.ui' form
+as follows: we want it to execute a read with a document type 'CustomerRequest'
+which searches for a single customer by customer id:
+
+(file:step6_customer_show_initaction.png)
+
+We see, that we use the value of 'global.id' again and add it to the 'initAction'
+request as attribute 'id' (we can use the qtclient with -d to see the communication
+on the wire):
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE customer SYSTEM 'CustomerRequest'>
+<customer id="2"/>
+
+We also get in the client:
+
+CRITICAL: ERROR: error in network data loader "Protocol error in command REQUEST, received:  no command handler for 'CustomerRequest'." 
+
+and in the server:
+
+ERROR: error redirect input: no command handler for 'CustomerRequest'
+
+We see, that the request is sent to the server, but we didn't define the
+necessary things in the server yet. So we add another map:
+
+CustomerRequest = SelectCustomer( xml ) : Customer;
+
+to 'tutorial.directmap'.
+
+We define a new file 'CustomerRequest.simpleform' which contains the
+validation of the customer request (for now, this looks exactly like
+the request for the list of customers, but we may want to change that
+later):
+
+FORM CustomerRequest
+{
+	customer {
+		id ?@string
+	}
+}
+
+We register the form in 'tutorial.conf':
+
+Program {
+	..
+	program CustomerRequest.simpleform
+	..
+}
+
+And of course we have to define a transaction function 'SelectCustomer'
+in 'Customer.tdl':
+
+TRANSACTION SelectCustomer
+RESULT INTO customer
+BEGIN
+	INTO . DO SELECT * from Customer WHERE id=$(customer/id);
+END
+
+We also have to define how the result should be mapped, so:
+
+Program {
+	..
+	program Customer.simpleform
+	..
+}
+
+and 'Customer.sumpleform':
+
+FORM Customer
+{
+	customer
+	{
+		id !@string
+		name string
+		address string
+	}
+}
+
+Now if we restart client and server and we click on the second
+customer in the list we get:
+
+(file:step6_customer_show_working.png)
+
+So we successfully read the data of a customer into a form.

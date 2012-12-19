@@ -70,5 +70,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>customer</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>pushButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>69</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>285</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
