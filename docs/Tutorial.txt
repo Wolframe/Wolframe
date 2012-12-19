@@ -312,6 +312,23 @@ Ctrl-D
 
 sqlite3 tutorial.db < data.sql
 
+When we reexecute the netcat command we see:
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<list>
+  <customer>
+    <id>1</id>
+    <name>Dr Who</name>
+    <address>Blue Police Box</address>
+  </customer>
+  <customer>
+    <id>2</id>
+    <name>John Smith</name>
+    <address>The Wheel in Space</address>
+  </customer>
+</list>
+
+So, the data is now tra
 We can move now to the qtclient to make our first request visible.
 
 Step 5 - Implement client side customer list
@@ -347,8 +364,11 @@ for the whole form. We change the name of the widget to 'customer':
 
 (file: step5_customer_treewidget_and_name.png)
 
-We disable the 'rootIsDecorated' tick and we change the columns of the list
-(by double clicking into the widget data area):
+We also disable the 'rootIsDecorated' tick (we have a list, not a tree of customers).
+We also set 'selectionMode' to 'SingleSelection' and 'selectionBehaviour'
+to 'selectRows' to get the default expected behaviour of a list.
+
+Now we change the columns of the list (by double clicking into the widget data area):
 
 (file: step5_customer_column_names.png)
 
@@ -380,6 +400,41 @@ If we restart the server and run qtclient again we get the desired result:
 
 (file:step5_customers_list.png)
 
-Step 6
+Step 6 - Show Customer
 ------
 
+As next step we want to show how data is communicated between the forms
+by implementing a simple "show me customer data" use case.
+
+Let's start by adding a button in 'customers.ui' called 'Show':
+
+(file:step6_customers_edit_button.png)
+
+We add dynamic properties, one is the 'form' which we set to 'customer_show'.
+We want the currently selected customer to be accessible in the customer_show.ui
+form, so we have to remember the current selection of the QTreeWidget named 'customer'
+as global variable 'id'. We add a dynamic property with the name 'global.id' and
+the value '{customer.id}':
+
+(file:step6_customers_edit_button_props.png)
+
+Now of course we have to create a new form called 'customer_show.ui'. We
+choose a form layout and add two fields with labels 'Name:' and 'Address:'
+and each of them having a QLineEdit widget. The names of the widgets
+should be 'name' and 'address' in order to match the future read request
+from the server. Temporarily we also add an 'id' field which shows us
+the current value of 'global.id':
+
+(file:step6_customer_show_id.png)
+
+Finally we also need a button which brings us back to the customer list
+by simply adding a 'form' action with the value 'customers':
+
+(file:step6_customer_show_back_button.png)
+
+If we start the qtclient and select a customer and press show we will
+notice that the whole "Show Customer" form is empty, even the id. What's
+wrong? Well, the widgets in qtclient have the default behaviour of using
+'id' attributes attached to the colums of a list for instance. We must
+make sure, the server is mapping us the XML correctly with 'id' attribute
+and not 'id' as element.

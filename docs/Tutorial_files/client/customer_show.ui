@@ -6,38 +6,52 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>210</width>
+    <height>122</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
    <item row="0" column="0">
-    <widget class="QTreeWidget" name="customer">
-     <property name="rootIsDecorated">
-      <bool>false</bool>
+    <widget class="QLabel" name="label_name">
+     <property name="text">
+      <string>Name:</string>
      </property>
-     <property name="doctype" stdset="0">
-      <string>CustomerListRequest</string>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string>customer</string>
-     </property>
-     <column>
-      <property name="text">
-       <string>name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>address</string>
-      </property>
-     </column>
     </widget>
    </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="name"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_address">
+     <property name="text">
+      <string>Address:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="address"/>
+   </item>
    <item row="2" column="0">
+    <widget class="QLabel" name="label_id">
+     <property name="text">
+      <string>ID:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="id">
+     <property name="state" stdset="0">
+      <string>{global.id}</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -55,13 +69,10 @@
      <item>
       <widget class="QPushButton" name="pushButton">
        <property name="text">
-        <string>Show</string>
+        <string>Back</string>
        </property>
        <property name="form" stdset="0">
-        <string>customer_show</string>
-       </property>
-       <property name="global.id" stdset="0">
-        <string>{customer.id}</string>
+        <string>customers</string>
        </property>
       </widget>
      </item>
