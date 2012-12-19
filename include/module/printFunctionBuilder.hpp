@@ -73,6 +73,8 @@ private:
 	prnt::CreatePrintFunction m_createFunc;
 };
 
+typedef boost::shared_ptr<module::PrintFunctionConstructor> PrintFunctionConstructorR;
+
 class PrintFunctionBuilder :public SimpleBuilder
 {
 public:

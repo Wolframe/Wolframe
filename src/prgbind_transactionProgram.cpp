@@ -46,7 +46,7 @@ class TransactionFunctionClosure
 {
 public:
 	TransactionFunctionClosure( const db::TransactionFunction* f)
-		:types::TypeSignature("progbind::TransactionFunctionClosure", __LINE__)
+		:types::TypeSignature("prgbind::TransactionFunctionClosure", __LINE__)
 		,langbind::TransactionFunctionClosure(f){}
 
 	virtual bool call()

@@ -684,6 +684,13 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 // in list mode we have to generate the item now
 					if( !isTree ) {
 						item = new QTreeWidgetItem( _parent );
+// attributes like id are mapped to user data
+						QXmlStreamAttributes attributes = xml.attributes( );
+						foreach( QXmlStreamAttribute attr, attributes ) {
+							QVariant v;
+							v.setValue( attr.value( ).toString( ) );
+							item->setData( 0, Qt::UserRole, v );
+						}
 					} else {
 						int col = headers.indexOf( xml.name( ).toString( ) );
 						if( col != -1 ) {
