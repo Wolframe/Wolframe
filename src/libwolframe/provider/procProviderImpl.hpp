@@ -42,13 +42,14 @@
 #include "database/DBprovider.hpp"
 #include "module/filterBuilder.hpp"
 #include "module/ddlcompilerBuilder.hpp"
-#include "module/formfunctionBuilder.hpp"
+#include "module/builtInFunctionBuilder.hpp"
 #include "module/ddlcompilerBuilder.hpp"
 #include "module/printFunctionBuilder.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
 #include "langbind/normalizeProgram.hpp"
 #include "database/transactionProgram.hpp"
+#include "langbind/formFunction.hpp"
 #include "langbind/formLibrary.hpp"
 #include "langbind/printProgram.hpp"
 #include <list>
@@ -61,7 +62,8 @@ class ProcessorProvider::ProcessorProvider_Impl
 {
 public:
 	ProcessorProvider_Impl( const ProcProviderConfig* conf,
-				const module::ModulesDirectory* modules );
+				const module::ModulesDirectory* modules,
+				const std::vector<prgbind::ProgramR>& programTypes_);
 	~ProcessorProvider_Impl();
 
 	bool resolveDB( const db::DatabaseProvider& db );
@@ -70,7 +72,7 @@ public:
 	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command ) const;
 
 	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
-	langbind::FormFunction* formfunction( const std::string& name ) const;
+	langbind::BuiltInFunction* formfunction( const std::string& name ) const;
 	const ddl::Form* form( const std::string& name ) const;
 	const prnt::PrintFunction* printFunction( const std::string& name) const;
 	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
@@ -81,6 +83,11 @@ public:
 	db::Database* transactionDatabase() const;
 	db::Transaction* transaction( const std::string& name ) const;
 	const db::TransactionFunction* transactionFunction( const std::string& name ) const;
+
+	void defineFunction( const std::string& name, langbind::FormFunctionR func)
+	{
+		m_formFunctionLibrary.insert( name, func);
+	}
 
 private:
 	class DDLTypeMap;
@@ -97,8 +104,8 @@ private:
 	std::list< module::FilterConstructor* >	m_filter;
 	std::map< std::string, const module::FilterConstructor* >	m_filterMap;
 
-	std::list< module::FormFunctionConstructor* >	m_formfunction;
-	std::map< std::string, const module::FormFunctionConstructor* >	m_formfunctionMap;
+	std::list< module::BuiltInFunctionConstructor* >	m_formfunction;
+	std::map< std::string, const module::BuiltInFunctionConstructor* >	m_formfunctionMap;
 
 	std::list< std::string >	m_programfiles;
 	db::TransactionProgram	m_dbprogram;
@@ -106,6 +113,9 @@ private:
 	ddl::TypeMapR	m_formtypemap;
 	langbind::FormLibrary	m_formlibrary;
 	langbind::PrintProgram	m_printprogram;
+
+	types::keymap<langbind::FormFunctionR> m_formFunctionLibrary;
+	std::vector<prgbind::ProgramR> m_programTypes;
 };
 
 }} // namespace _Wolframe::proc

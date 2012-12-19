@@ -76,7 +76,7 @@ namespace luaname
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
 	static const char* TypedInputFilterR = "wolframe.TypedInputFilterR";
 	static const char* TypedInputFilterClosure = "wolframe.TypedInputFilterClosure";
-	static const char* FormFunctionClosure = "wolframe.FormFunctionClosure";
+	static const char* BuiltInFunctionClosure = "wolframe.BuiltInFunctionClosure";
 	static const char* TransactionFunctionClosure = "wolframe.TransactionFunctionClosure";
 	static const char* Transaction = "wolframe.Transaction";
 	static const char* NormalizeFunction = "wolframe.NormalizeFunction";
@@ -101,7 +101,7 @@ template <> const char* metaTableName<DDLFormSerializer>()		{return luaname::DDL
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
 template <> const char* metaTableName<TypedInputFilterR>()		{return luaname::TypedInputFilterR;}
 template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
-template <> const char* metaTableName<FormFunctionClosure>()		{return luaname::FormFunctionClosure;}
+template <> const char* metaTableName<BuiltInFunctionClosure>()		{return luaname::BuiltInFunctionClosure;}
 template <> const char* metaTableName<TransactionFunctionClosure>()	{return luaname::TransactionFunctionClosure;}
 template <> const char* metaTableName<db::TransactionR>()		{return luaname::Transaction;}
 template <> const char* metaTableName<NormalizeFunction>()		{return luaname::NormalizeFunction;}
@@ -917,7 +917,7 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_typedinputfilter_get)
 
 LUA_FUNCTION_THROWS( "<formfunction>(..)", function_formfunction_call)
 {
-	FormFunctionClosure* closure = LuaObject<FormFunctionClosure>::get( ls, lua_upvalueindex( 1));
+	BuiltInFunctionClosure* closure = LuaObject<BuiltInFunctionClosure>::get( ls, lua_upvalueindex( 1));
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
@@ -953,7 +953,7 @@ LUA_FUNCTION_THROWS( "<formfunction>(..)", function_transactionfunction_call)
 		else
 		{
 			TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
-			closure->init( inp);
+			closure->init( getProcessorProvider( ls), inp);
 		}
 		lua_pushvalue( ls, 1);		//... iterator argument (table, generator function, etc.)
 	}
@@ -1032,10 +1032,10 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 
 	const char* name = lua_tostring( ls, 1);
 	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-	FormFunctionR ff( ctx->formfunction( name));
+	BuiltInFunctionR ff( ctx->formfunction( name));
 	if (ff.get())
 	{
-		LuaObject<FormFunctionClosure>::push_luastack( ls, FormFunctionClosure( *ff));
+		LuaObject<BuiltInFunctionClosure>::push_luastack( ls, BuiltInFunctionClosure( *ff));
 		lua_pushcclosure( ls, function_formfunction_call, 1);
 		return 1;
 	}
@@ -1043,7 +1043,7 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 	if (tf)
 	{
 		db::TransactionR* transaction = LuaObject<db::TransactionR>::getGlobal( ls, "transaction");
-		LuaObject<TransactionFunctionClosure>::push_luastack( ls, TransactionFunctionClosure( ctx, tf, (transaction && transaction->get())?*transaction:db::TransactionR()));
+		LuaObject<TransactionFunctionClosure>::push_luastack( ls, TransactionFunctionClosure( tf, (transaction && transaction->get())?*transaction:db::TransactionR()));
 		lua_pushcclosure( ls, function_transactionfunction_call, 1);
 		return 1;
 	}
@@ -2173,7 +2173,7 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<TypedInputFilterR>::createMetatable( ls, 0, 0, typedinputfilter_methodtable);
 			LuaObject<TypedInputFilterClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<FormFunctionClosure>::createMetatable( ls, 0, 0, 0);
+			LuaObject<BuiltInFunctionClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<TransactionFunctionClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<PrintFunctionClosure>::createMetatable( ls, 0, 0, 0);
 			setGlobalSingletonPointer<const proc::ProcessorProvider>( ls, provider_);

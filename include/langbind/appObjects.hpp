@@ -34,7 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
-#include "langbind/appFormFunction.hpp"
+#include "langbind/appBuiltInFunction.hpp"
 #include "database/transactionFunction.hpp"
 #include "prnt/printFunction.hpp"
 #include "processor/procProvider.hpp"
@@ -257,19 +257,19 @@ private:
 	boost::shared_ptr<void> m_data;
 };
 
-///\class FormFunctionClosure
-///\brief Closure with calling state of called FormFunction
-class FormFunctionClosure
+///\class BuiltInFunctionClosure
+///\brief Closure with calling state of called BuiltInFunction
+class BuiltInFunctionClosure
 	:public virtual types::TypeSignature
 {
 public:
 	///\brief Constructor
 	///\param[in] f function called
-	FormFunctionClosure( const FormFunction& f);
+	BuiltInFunctionClosure( const BuiltInFunction& f);
 
 	///\brief Copy constructor
 	///\param[in] o copied item
-	FormFunctionClosure( const FormFunctionClosure& o);
+	BuiltInFunctionClosure( const BuiltInFunctionClosure& o);
 
 	///\brief Calls the form function with the input from the input filter specified
 	///\return true when completed
@@ -283,7 +283,7 @@ public:
 	const serialize::StructSerializer& result() const		{return m_result;}
 
 private:
-	FormFunction m_func;
+	BuiltInFunction m_func;
 	int m_state;
 	ApiFormData m_param_data;
 	ApiFormData m_result_data;
@@ -301,7 +301,7 @@ public:
 	///\param[in] provider_ processor provider to allocate transaction object
 	///\param[in] f function called
 	///\param[in] t transaction context, if provided by caller
-	TransactionFunctionClosure( const proc::ProcessorProvider* provider_, const db::TransactionFunction* f, const db::TransactionR& t=db::TransactionR());
+	TransactionFunctionClosure( const db::TransactionFunction* f, const db::TransactionR& t=db::TransactionR());
 
 	///\brief Copy constructor
 	///\param[in] o copied item
@@ -313,7 +313,7 @@ public:
 
 	///\brief Initialization of call context for a new call
 	///\param[in] i call input
-	void init( const TypedInputFilterR& i);
+	void init( const proc::ProcessorProvider* provider_, const TypedInputFilterR& i);
 
 	const TypedInputFilterR& result() const
 	{

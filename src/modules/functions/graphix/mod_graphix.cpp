@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file src/modules/functions/graphix/mod_graphix.cpp
+///\file mod_graphix.cpp
 ///\brief Module for graphic functions with FreeImage
-#include "module/formfunctionBuilder.hpp"
+#include "module/builtInFunctionBuilder.hpp"
 #include "logger-v1.hpp"
 #include "graphix.hpp"
 
@@ -55,9 +55,9 @@ struct graphix_info_func
 	{
 		static const serialize::StructDescriptionBase* param = Image::getStructDescription( );
 		static const serialize::StructDescriptionBase* result = ImageInfo::getStructDescription( );
-		langbind::FormFunction func( imageInfo, param, result );
+		langbind::BuiltInFunction func( imageInfo, param, result );
 
-		return new FormFunctionBuilder( "imageInfo", func);
+		return new BuiltInFunctionBuilder( "imageInfo", func);
 	}
 };
 
@@ -67,9 +67,9 @@ struct graphix_thumb_func
 	{
 		static const serialize::StructDescriptionBase* param = ImageThumb::getStructDescription( );
 		static const serialize::StructDescriptionBase* result = Image::getStructDescription( );
-		langbind::FormFunction func( imageThumb, param, result );
+		langbind::BuiltInFunction func( imageThumb, param, result );
 
-		return new FormFunctionBuilder( "imageThumb", func);
+		return new BuiltInFunctionBuilder( "imageThumb", func);
 	}
 };
 

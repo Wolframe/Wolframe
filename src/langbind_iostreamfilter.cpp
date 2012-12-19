@@ -308,13 +308,13 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 		}
 	}
 	{
-		FormFunctionR func( provider->formfunction( proc));
+		BuiltInFunctionR func( provider->formfunction( proc));
 		if (func.get())
 		{
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
-			FormFunctionClosure closure( *func);
+			BuiltInFunctionClosure closure( *func);
 			closure.init( inp, serialize::Context::ValidateAttributes);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
@@ -359,8 +359,8 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
-			TransactionFunctionClosure closure( provider, func);
-			closure.init( inp);
+			TransactionFunctionClosure closure( func);
+			closure.init( provider, inp);
 
 			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 

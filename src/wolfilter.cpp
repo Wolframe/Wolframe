@@ -37,6 +37,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include "langbind/iostreamfilter.hpp"
+#include "prgbind/predefinedProgramTypes.hpp"
 #include "wolfilterCommandLine.hpp"
 #include "moduleInterface.hpp"
 #include "processor/procProvider.hpp"
@@ -73,7 +74,7 @@ int main( int argc, char **argv )
 
 		// Load the modules, scripts, etc. defined in the command line into the global context:
 		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
-		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory());
+		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), prgbind::getPredefinedProgramTypes());
 		processorProvider.resolveDB( databaseProvider);
 
 		// Call the function to execute

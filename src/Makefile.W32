@@ -59,6 +59,7 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceConfig.obj \
 	serviceBanner.obj \
 	appConfig.obj \
+	predefinedProgramTypes.obj \
 	langbind_iostreamfilter.obj \
 	acceptor.obj \
 	connection.obj \

@@ -30,43 +30,18 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file mod_employee_assignment_convert.cpp
-///\brief Module for testing form functions
-#include "module/builtInFunctionBuilder.hpp"
-#include "employee_assignment_convert.hpp"
-#include "logger-v1.hpp"
+///\brief Interface for declaring built-in functions in the global context of the processor provider
+///\file prgbind_builtInFunction.cpp
 
-_Wolframe::log::LogBackend* logBackendPtr;
+#include "prgbind/builtInFunction.hpp"
 
 using namespace _Wolframe;
-using namespace _Wolframe::module;
-using namespace _Wolframe::test;
+using namespace _Wolframe::prgbind;
 
-static void setModuleLogger( void* logger )
+void _Wolframe::prgbind::loadBuiltInFunction( proc::ProcessorProvider& provider, const std::string& name, const langbind::BuiltInFunction* func)
 {
-	logBackendPtr = reinterpret_cast< _Wolframe::log::LogBackend*>( logger);
 }
 
-namespace {
-struct employee_assingment_convert_func
-{
-	static SimpleBuilder* constructor()
-	{
-		static const serialize::StructDescriptionBase* param = AssignmentListDoc::getStructDescription();
-		static const serialize::StructDescriptionBase* result = AssignmentListDoc::getStructDescription();
-		langbind::BuiltInFunction func( convertAssignmentListDoc, param, result);
 
-		return new BuiltInFunctionBuilder( "employee_assignment_convert", func);
-	}
-};
-}
-
-enum {NofObjects=1};
-static createBuilderFunc objdef[ NofObjects] =
-{
-	employee_assingment_convert_func::constructor
-};
-
-ModuleEntryPoint entryPoint( 0, "test form function", setModuleLogger, 0, 0, NofObjects, objdef);
 
 

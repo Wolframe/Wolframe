@@ -53,7 +53,9 @@ namespace proc {
 
 //**** Processor Provider PIMPL Implementation ******************************
 ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf,
-								   const module::ModulesDirectory* modules )
+								   const module::ModulesDirectory* modules,
+								   const std::vector<prgbind::ProgramR>& programTypes_)
+	:m_programTypes(programTypes_)
 {
 	m_db = NULL;
 	if ( !conf->m_dbLabel.empty())
@@ -167,7 +169,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 			case ObjectConstructorBase::FORM_FUNCTION_OBJECT:
 			{	// object is a form function
-				module::FormFunctionConstructor* ffo = dynamic_cast< module::FormFunctionConstructor* >((*it)->constructor());
+				module::BuiltInFunctionConstructor* ffo = dynamic_cast< module::BuiltInFunctionConstructor* >((*it)->constructor());
 				if ( ffo == NULL )	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
 						  << "'' is not a form function";
@@ -176,7 +178,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					std::string name = ffo->objectClassName();
 					boost::algorithm::to_upper( name);
-					std::map< std::string, const module::FormFunctionConstructor* >::const_iterator itr = m_formfunctionMap.find( name );
+					std::map< std::string, const module::BuiltInFunctionConstructor* >::const_iterator itr = m_formfunctionMap.find( name );
 					if ( itr != m_formfunctionMap.end() )	{
 						LOG_FATAL << "Duplicate form function name '" << name << "'";
 						throw std::runtime_error( "Duplicate form function name" );
@@ -280,7 +282,7 @@ ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
 							it != m_filter.end(); it++ )
 		delete *it;
 
-	for ( std::list< module::FormFunctionConstructor* >::iterator it = m_formfunction.begin();
+	for ( std::list< module::BuiltInFunctionConstructor* >::iterator it = m_formfunction.begin();
 							it != m_formfunction.end(); it++ )
 		delete *it;
 }
@@ -374,10 +376,10 @@ langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::
 		return fltr->second->object( arg);
 }
 
-langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formfunction( const std::string& name ) const
+langbind::BuiltInFunction* ProcessorProvider::ProcessorProvider_Impl::formfunction( const std::string& name ) const
 {
 	std::string formfunctionName = boost::algorithm::to_upper_copy( name);
-	std::map< std::string, const module::FormFunctionConstructor* >::const_iterator ffo = m_formfunctionMap.find( formfunctionName );
+	std::map< std::string, const module::BuiltInFunctionConstructor* >::const_iterator ffo = m_formfunctionMap.find( formfunctionName );
 	if ( ffo == m_formfunctionMap.end() )
 		return NULL;
 	else

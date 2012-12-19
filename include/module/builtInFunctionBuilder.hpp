@@ -29,25 +29,25 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file module/formfunctionBuilder.hpp
-///\brief Interface template for object builder of form functions
-#ifndef _Wolframe_MODULE_FORMFUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_FORMFUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "langbind/appFormFunction.hpp"
+///\file module/builtInFunctionBuilder.hpp
+///\brief Interface template for object builder of built-in functions
+#ifndef _Wolframe_MODULE_BUILT_IN_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#define _Wolframe_MODULE_BUILT_IN_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
+#include "langbind/appBuiltInFunction.hpp"
 #include "moduleInterface.hpp"
 #include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-class FormFunctionConstructor :public SimpleObjectConstructor< langbind::FormFunction >
+class BuiltInFunctionConstructor :public SimpleObjectConstructor< langbind::BuiltInFunction >
 {
 public:
-	FormFunctionConstructor( const char* name_, const langbind::FormFunction& func_)
+	BuiltInFunctionConstructor( const char* name_, const langbind::BuiltInFunction& func_)
 		: m_name(name_)
 		, m_func(func_) {}
 
-	virtual ~FormFunctionConstructor(){}
+	virtual ~BuiltInFunctionConstructor(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
@@ -57,24 +57,24 @@ public:
 	{
 		return m_name.c_str();
 	}
-	virtual langbind::FormFunction* object() const
+	virtual langbind::BuiltInFunction* object() const
 	{
-		return new langbind::FormFunction( m_func);
+		return new langbind::BuiltInFunction( m_func);
 	}
 
 private:
 	const std::string m_name;
-	const langbind::FormFunction m_func;
+	const langbind::BuiltInFunction m_func;
 };
 
-class FormFunctionBuilder :public SimpleBuilder
+class BuiltInFunctionBuilder :public SimpleBuilder
 {
 public:
-	FormFunctionBuilder( const char* name_, const langbind::FormFunction& func_)
+	BuiltInFunctionBuilder( const char* name_, const langbind::BuiltInFunction& func_)
 		:SimpleBuilder( name_)
 		,m_func(func_){}
 
-	virtual ~FormFunctionBuilder(){}
+	virtual ~BuiltInFunctionBuilder(){}
 
 	virtual ObjectConstructorBase::ObjectType objectType() const
 	{
@@ -82,10 +82,10 @@ public:
 	}
 	virtual ObjectConstructorBase* constructor()
 	{
-		return new FormFunctionConstructor( m_className, m_func);
+		return new BuiltInFunctionConstructor( m_className, m_func);
 	}
 private:
-	const langbind::FormFunction m_func;
+	const langbind::BuiltInFunction m_func;
 };
 
 }}//namespace

@@ -51,6 +51,8 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceConfig.o \
 	serviceBanner.o \
 	appConfig.o \
+	prgbind_transactionProgram.o \
+	predefinedProgramTypes.o \
 	langbind_iostreamfilter.o \
 	acceptor.o \
 	serverEndpoint.o \

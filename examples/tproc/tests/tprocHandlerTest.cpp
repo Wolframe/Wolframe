@@ -40,6 +40,7 @@
 #include "handlerConfig.hpp"
 #include "testDescription.hpp"
 #include "moduleDirectory.hpp"
+#include "prgbind/predefinedProgramTypes.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "langbind/appObjects.hpp"
 #include "processor/procProvider.hpp"
@@ -72,7 +73,7 @@ static boost::filesystem::path g_referencePath;
 
 static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const proc::ProcProviderConfig* cfg)
 {
-	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg, g_modulesDirectory));
+	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg, g_modulesDirectory, prgbind::getPredefinedProgramTypes()));
 	return rt;
 }
 

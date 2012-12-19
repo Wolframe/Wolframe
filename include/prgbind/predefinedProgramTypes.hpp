@@ -30,42 +30,19 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for executing programs in the language bindings
-///\file langbind/program.hpp
-//
-#ifndef _LANGBIND_PROGRAM_HPP_INCLUDED
-#define _LANGBIND_PROGRAM_HPP_INCLUDED
-#include "config/programBase.hpp"
-#include "langbind/typedfilter.hpp"
+///\brief Defines the list of all initially defined program types
+///\file predefinedProgramTypes.hpp
+
+#ifndef _PRGBIND_PREDEFINED_PROGRAM_TYPES_HPP_INCLUDED
+#define _PRGBIND_PREDEFINED_PROGRAM_TYPES_HPP_INCLUDED
+#include "processor/procProvider.hpp"
+#include "types/countedReference.hpp"
+#include <string>
 
 namespace _Wolframe {
-namespace langbind {
+namespace prgbind {
 
-struct FunctionClosure
-{
-	virtual ~FunctionClosure();
-
-	///\brief Calls the function with the input from the input filter specified
-	///\return true when completed
-	virtual bool call()=0;
-
-	///\brief Initialization of call context for a new call
-	///\param[in] i call input
-	virtual void init( const TypedInputFilterR& i)=0;
-
-	///\brief Get the iterator for the function result
-	virtual const TypedInputFilterR& result() const=0;
-};
-
-struct Program
-{
-	virtual ~Program(){}
-
-	virtual bool is_mine( const std::string& filename) const=0;
-	virtual void loadProgram( const std::string& filename)=0;
-
-	virtual FunctionClosure* createClosure() const=0;
-};
+std::vector<ProgramR> getPredefinedProgramTypes();
 
 }} //namespace
 #endif
