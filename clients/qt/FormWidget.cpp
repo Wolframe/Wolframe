@@ -113,6 +113,9 @@ void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
 				QString evaluated = m_dataHandler->readFormVariable( refKey, m_ui );
 				if( !evaluated.isNull( ) ) {
 					props->insert( key, evaluated );
+				} else {
+					// unknown value, map to empty
+					props->insert( key, "" );
 				}
 			}
 		}
