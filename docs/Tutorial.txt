@@ -254,7 +254,7 @@ LoadModules {
 	module /usr/lib/wolframe/modules/mod_ddlcompiler_simpleform.so
 }
 
-Program {
+Processor {
 	..
 	program CustomerListRequest.simpleform	
 	..
@@ -470,7 +470,7 @@ CustomerListRequest = SelectCustomerList( xml ) : CustomerList;
 
 and we have to include the program in 'tutorial.conf' of the server:
 
-Program {
+Processor {
 	..
 	program CustomerList.simpleform	
 	..
@@ -547,7 +547,7 @@ FORM CustomerRequest
 
 We register the form in 'tutorial.conf':
 
-Program {
+Processor {
 	..
 	program CustomerRequest.simpleform
 	..
@@ -562,9 +562,13 @@ BEGIN
 	INTO . DO SELECT * from Customer WHERE id=$(customer/id);
 END
 
+The '$(customer/id)' refers to the ID we pass down for the customer record
+to retrieve. The 'RESULT INTO customer' makes sure the result will again
+be in a table with 'customer' as root element.
+
 We also have to define how the result should be mapped, so:
 
-Program {
+Processor {
 	..
 	program Customer.simpleform
 	..
@@ -589,6 +593,70 @@ customer in the list we get:
 
 So we successfully read the data of a customer into a form.
 
-Step 7 - Create new customers
+Step 7 - Editing customer
 ------
 
+We change the show customer use case slightly, so that we can also
+edit the customer in the customer_show.ui form.
+
+Let's first make a copy of 'customer_show.ui' and name it 'customer_edit.ui'.
+
+As before we add first a "Edit" button to the 'customers.ui' with 'forms'
+set to 'customer_edit' and 'global.id' set to '{customer.id}':
+
+(file:step7_customers_edit_button.png)
+
+We change the form 'customer_edit.ui' and remove the line with 'ID' as we
+don't need it anymore and because nobody should be able to edit the id of
+a customer and change it! We also add another button and label it 'Save',
+this button get the properties 'form' set to 'customers', 'action' set to
+'update', 'doctype' to 'CustomerUpdate', 'rootelement' to 'customer' and
+'id' to '{global.id}':
+
+(file:step7_customer_edit.png)
+
+The other fields will be sent along automatically in the 'CustomerUpdate' XML request:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE customer SYSTEM 'CustomerUpdate'>
+<customer id="2">
+  <name>John Smith</name>
+  <address>The Wheel in Space</address>
+</customer>
+
+Similar to to the "show customer" case we add now a new map:
+
+editCustomerUpdate = UpdateCustomer( xml );
+
+We also add a simple form 'CustomerUpdate.simpleform' which looks very similar
+to the 'Customer.simpleform':
+
+FORM CustomerUpdate
+{
+	customer
+	{
+		id !@string
+		name string
+		address string
+	}
+}
+
+add it to 'tutorial.conf':
+
+Processor {
+	...
+	program CustomerUpdate.simpleform
+	...
+}
+
+finally we write the transaction function 'CustomerUpdate' in 'Customer.tdl':
+
+TRANSACTION UpdateCustomer
+BEGIN
+	DO UPDATE Customer SET name=$(customer/name), address=$(customer/address)
+		WHERE id=$(customer/id);
+END
+
+Note, that this time the database transaction doesn't return a result.
+
+Restart server and client and start to edit the customers.
