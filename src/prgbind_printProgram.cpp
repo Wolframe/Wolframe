@@ -30,18 +30,83 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for declaring built-in functions in the global context of the processor provider
-///\file prgbind_builtInFunction.cpp
+///\brief Implementation of printing programs
+///\file prgbind_printProgram.cpp
 
-#include "prgbind/builtInFunction.hpp"
+#include "prgbind/printProgram.hpp"
+#include "langbind/appObjects.hpp"
+#include "filter/singlefilter.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
-void _Wolframe::prgbind::loadBuiltInFunction( proc::ProcessorProvider& provider, const std::string& name, const langbind::BuiltInFunction* func)
+class PrintFunctionClosure
+	:public langbind::FormFunctionClosure
+	,public langbind::PrintFunctionClosure
 {
+public:
+	PrintFunctionClosure( const prnt::PrintFunction* f)
+		:types::TypeSignature("prgbind::PrintFunctionClosure", __LINE__)
+		,langbind::PrintFunctionClosure(f){}
+
+	virtual bool call()
+	{
+		return langbind::PrintFunctionClosure::call();
+	}
+
+	virtual void init( const proc::ProcessorProvider*, const langbind::TypedInputFilterR& i, serialize::Context::Flags)
+	{
+		langbind::PrintFunctionClosure::init(i);
+	}
+
+	virtual const langbind::TypedInputFilterR& result() const
+	{
+		return langbind::TypedInputFilterR( new langbind::SingleElementInputFilter( langbind::TypedFilter::Element( langbind::TransactionFunctionClosure::result())));
+	}
+};
+
+class PrintFunction
+	:public langbind::FormFunction
+{
+public:
+	PrintFunction( const db::PrintFunctionR& f)
+		:m_impl(f){}
+
+	virtual PrintFunctionClosure* createClosure() const
+	{
+		return new PrintFunctionClosure( m_impl.get());
+	}
+
+private:
+	const proc::ProcessorProvider* m_provider;
+	prnt::PrintFunctionR m_impl;
+};
+
+
+
+PrintProgram::PrintProgram( const std::string& name_, const module::PrintFunctionConstructorR& contructor_)
+	:m_name(name_)
+	,m_contructor(contructor_){}
+
+PrintProgram::~PrintProgram(){}
+
+bool PrintProgram::is_mine( const std::string& filename) const
+{
+	std::string ext = utils::getFileExtension( filename);
+	if (ext.empty()) return false;
+	return boost::iequals( m_name, ext.c_str()+1);
 }
 
-
+void PrintProgram::loadProgram( proc::ProcessorProvider& provider, const std::string& filename)
+{
+	prnt::PrintFunctionR function( ci->second->object( utils::readSourceFileContent( filename)));
+	std::string name = function->name();
+	if (name.empty())
+	{
+		name = utils::getFileStem( filename);
+	}
+	provider.defineFunction( name, langbind::FormFunctionR( new PrintFunction( function)));
+}
 
 
