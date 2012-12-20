@@ -46,7 +46,10 @@ class DDLProgram
 	:public Program
 {
 public:
-	DDLProgram( const ddl::DDLCompilerR& constructor_);
+	DDLProgram( const ddl::DDLCompilerR& constructor_)
+		:Program( Form)
+		,m_constructor(constructor_){}
+
 	virtual ~DDLProgram(){}
 
 	virtual bool is_mine( const std::string& filename) const;

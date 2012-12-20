@@ -86,6 +86,7 @@ public:
 	~ProcessorProvider();
 
 	bool resolveDB( const db::DatabaseProvider& db );
+	bool loadPrograms();
 
 	cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
 	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command) const;

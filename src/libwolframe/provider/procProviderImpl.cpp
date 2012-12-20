@@ -160,6 +160,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				}
 				else	{
 					ddl::DDLCompilerR constructor( ffo->object());
+					m_programs->defineFormDDL( constructor);
 					m_formlibrary.addConstructor( constructor);
 					delete ffo;
 					LOG_TRACE << "'" << constructor->ddlname() << "' DDL compiler registered";
@@ -205,6 +206,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					m_normalizeFunctionConstructorMap.insert( std::string(constructor->domain()), constructor);
+					m_programs->defineNormalizeFunctionConstructor( constructor);
 					LOG_TRACE << "'" << constructor->objectClassName() << "' normalize function constructor for domain " << constructor->domain() << " registered";
 				}
 				break;
@@ -222,6 +224,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else
 				{
 					m_printprogram.addConstructor( constructor);
+					m_programs->definePrintLayoutType( constructor);
 					LOG_TRACE << "'" << constructor->programFileType() << "' print layout description compiler registered";
 				}
 				break;
@@ -266,11 +269,6 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				throw std::logic_error( "Object is not a valid simple object. See log." );
 		}
 	}
-	// Load the programs except database programs:
-	if (!loadPrograms())
-	{
-		throw std::logic_error( "Not all programs could be loaded. See log." );
-	}
 }
 
 
@@ -307,6 +305,16 @@ private:
 bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 {
 	bool rt = true;
+	try
+	{
+		m_programs->loadPrograms( transactionDatabase( true), m_programfiles);
+	}
+	catch (const std::runtime_error& e)
+	{
+		LOG_ERROR << "failed to load programs: " << e.what();
+		return false;
+	}
+
 	std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
 	for (; pi != pe; ++pi)
 	{
@@ -400,8 +408,7 @@ const prnt::PrintFunction* ProcessorProvider::ProcessorProvider_Impl::printFunct
 
 const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name ) const
 {
-	//[+]return m_programs.getNormalizeFunction( name);
-	return m_normprogram.get( name);
+	return m_programs->getNormalizeFunction( name);
 }
 
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command) const
@@ -435,9 +442,9 @@ const UI::UserInterfaceLibrary* ProcessorProvider::ProcessorProvider_Impl::UIlib
 	}
 }
 
-db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase() const
+db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase( bool suppressAlert) const
 {
-	if ( ! m_db )	{
+	if ( ! m_db && !suppressAlert )	{
 		LOG_ALERT << "No database defined for the processor provider";
 	}
 	return m_db;

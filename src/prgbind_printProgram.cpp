@@ -86,10 +86,6 @@ private:
 };
 
 
-
-PrintProgram::PrintProgram( const module::PrintFunctionConstructorR& constructor_)
-	:m_constructor(constructor_){}
-
 bool PrintProgram::is_mine( const std::string& filename) const
 {
 	std::string ext = utils::getFileExtension( filename);

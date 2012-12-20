@@ -366,6 +366,12 @@ WolframeHandler::WolframeHandler( const HandlerConfiguration* conf,
 		throw( std::invalid_argument( "WolframeHandler processor: unresolved database reference" ));
 	}
 	LOG_TRACE << "Processor group database reference resolved";
+
+	if (!m_proc.loadPrograms())
+	{
+		LOG_FATAL << "Not all programs could be loaded";
+		throw std::runtime_error( "Not all programs could be loaded" );
+	}
 }
 
 WolframeHandler::~WolframeHandler()

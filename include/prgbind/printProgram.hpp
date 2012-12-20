@@ -46,7 +46,10 @@ class PrintProgram
 	:public Program
 {
 public:
-	PrintProgram( const module::PrintFunctionConstructorR& constructor_);
+	PrintProgram( const module::PrintFunctionConstructorR& constructor_)
+		:Program( Function)
+		,m_constructor(constructor_){}
+
 	virtual ~PrintProgram(){}
 
 	virtual bool is_mine( const std::string& filename) const;

@@ -76,7 +76,15 @@ int main( int argc, char **argv )
 		db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
 		prgbind::ProgramLibrary programLibrary;
 		proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &programLibrary);
-		processorProvider.resolveDB( databaseProvider);
+
+		if (!processorProvider.resolveDB( databaseProvider))
+		{
+			throw std::runtime_error( "Transaction database could not be resolved. See log." );
+		}
+		if (!processorProvider.loadPrograms())
+		{
+			throw std::runtime_error( "Not all programs could be loaded. See log." );
+		}
 
 		// Call the function to execute
 		if (cmdline.inputfile().size())

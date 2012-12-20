@@ -153,8 +153,14 @@ TEST_F( WolfilterTest, tests)
 			db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
 			prgbind::ProgramLibrary prglib;
 			proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &prglib);
-			processorProvider.resolveDB( databaseProvider);
-
+			if (!processorProvider.resolveDB( databaseProvider))
+			{
+				throw std::runtime_error( "Transaction database could not be resolved. See log." );
+			}
+			if (!processorProvider.loadPrograms())
+			{
+				throw std::runtime_error( "Not all programs could be loaded. See log." );
+			}
 			std::istringstream in( td.input, std::ios::in | std::ios::binary);
 			std::ostringstream out( std::ios::out | std::ios::binary);
 
