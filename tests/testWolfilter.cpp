@@ -35,7 +35,7 @@
 #include "langbind/iostreamfilter.hpp"
 #include "logger-v1.hpp"
 #include "wolfilterCommandLine.hpp"
-#include "prgbind/predefinedProgramTypes.hpp"
+#include "prgbind/programLibrary.hpp"
 #include "gtest/gtest.h"
 #include "testDescription.hpp"
 #include "moduleInterface.hpp"
@@ -151,7 +151,8 @@ TEST_F( WolfilterTest, tests)
 			if (cmdline.inputfile().size()) std::cerr << "ignored option --inputfile" << std::endl;
 
 			db::DatabaseProvider databaseProvider( &cmdline.dbProviderConfig(), &cmdline.modulesDirectory());
-			proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), prgbind::getPredefinedProgramTypes());
+			prgbind::ProgramLibrary prglib;
+			proc::ProcessorProvider processorProvider( &cmdline.procProviderConfig(), &cmdline.modulesDirectory(), &prglib);
 			processorProvider.resolveDB( databaseProvider);
 
 			std::istringstream in( td.input, std::ios::in | std::ios::binary);

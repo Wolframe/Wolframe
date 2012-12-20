@@ -41,23 +41,17 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-void NormalizeProgram::addConstructor( const NormalizeFunctionConstructorR& constructor)
-{
-	std::string domain = constructor->domain();
-	m_constructormap.insert( domain, constructor);
-}
-
 bool NormalizeProgram::is_mine( const std::string& filename) const
 {
 	std::string ext( utils::getFileExtension( filename));
 	return (boost::iequals( ext, ".normalize"));
 }
 
-void NormalizeProgram::loadProgram( const std::string& filename)
+std::vector<std::pair<std::string,NormalizeFunctionR> > NormalizeProgram::loadfile( const std::string& filename, const types::keymap<NormalizeFunctionConstructorR>& constructormap)
 {
 	try
 	{
-		addProgram( utils::readSourceFileContent( filename));
+		return load( utils::readSourceFileContent( filename), constructormap);
 	}
 	catch (const config::PositionalErrorException& e)
 	{
@@ -69,11 +63,11 @@ void NormalizeProgram::loadProgram( const std::string& filename)
 	}
 }
 
-NormalizeFunction* NormalizeProgram::createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg)
+NormalizeFunction* NormalizeProgram::createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg, const types::keymap<NormalizeFunctionConstructorR>& constructormap)
 {
 	if (domain.empty()) throw std::runtime_error( "namespace of function not defined");
-	types::keymap<NormalizeFunctionConstructorR>::const_iterator bi = m_constructormap.find( domain);
-	if (bi == m_constructormap.end()) throw std::runtime_error( std::string("no constructor for namespace '") + domain + "' defined");
+	types::keymap<NormalizeFunctionConstructorR>::const_iterator bi = constructormap.find( domain);
+	if (bi == constructormap.end()) throw std::runtime_error( std::string("no constructor for namespace '") + domain + "' defined");
 	try
 	{
 		NormalizeFunction* rt = bi->second->object( name, arg);
@@ -124,8 +118,9 @@ private:
 };
 
 
-void NormalizeProgram::addProgram( const std::string& source)
+std::vector<std::pair<std::string,NormalizeFunctionR> > NormalizeProgram::load( const std::string& source, const types::keymap<NormalizeFunctionConstructorR>& constructormap)
 {
+	std::vector<std::pair<std::string,NormalizeFunctionR> > rt;
 	config::PositionalErrorMessageBase ERROR(source);
 	config::PositionalErrorMessageBase::Message MSG;
 	static const utils::CharTable optab( "=;)(,");
@@ -182,7 +177,7 @@ void NormalizeProgram::addProgram( const std::string& source)
 					case '\0': throw ERROR( si, "unexpected end of program");
 					case ',':
 					case ';':
-						funcdef.define( NormalizeFunctionR( createBaseFunction( domain, funcname, "")));
+						funcdef.define( NormalizeFunctionR( createBaseFunction( domain, funcname, "", constructormap)));
 						++si;
 						continue;
 					case '(':
@@ -193,7 +188,7 @@ void NormalizeProgram::addProgram( const std::string& source)
 							if (ch == '(') throw ERROR( si, "nested expressions, bracket not closed");
 							if (ch == ';') throw ERROR( si, "unexpected end of expression, bracket not closed");
 						}
-						funcdef.define( NormalizeFunctionR( createBaseFunction( domain, funcname, std::string( argstart, si-1))));
+						funcdef.define( NormalizeFunctionR( createBaseFunction( domain, funcname, std::string( argstart, si-1), constructormap)));
 						ch = utils::gotoNextToken( si, se);
 						if (ch == ';' || ch == ',')
 						{
@@ -209,12 +204,16 @@ void NormalizeProgram::addProgram( const std::string& source)
 			if (funcdef.nofSteps() == 1)
 			{
 				types::keymap<NormalizeFunctionR>::operator[]( prgname) = funcdef[ 0];
+				rt.push_back( std::pair<std::string,NormalizeFunctionR>( prgname, funcdef[0]));
 			}
 			else
 			{
-				types::keymap<NormalizeFunctionR>::operator[]( prgname) = NormalizeFunctionR( new CombinedNormalizeFunction( funcdef));
+				NormalizeFunctionR func( new CombinedNormalizeFunction( funcdef));
+				types::keymap<NormalizeFunctionR>::operator[]( prgname) = func;
+				rt.push_back( std::pair<std::string,NormalizeFunctionR>( prgname, func));
 			}
 		}
+		return rt;
 	}
 	catch (const config::PositionalErrorException& e)
 	{

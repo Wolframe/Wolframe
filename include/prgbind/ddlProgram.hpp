@@ -30,30 +30,33 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for loading programs in the transaction definition language
-///\file prgbind/transactionProgram.hpp
+///\brief Interface for loading programs written in a DDL to describe forms
+///\file prgbind/ddlProgram.hpp
 
-#ifndef _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
-#define _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
+#ifndef _PRGBIND_DDL_PROGRAM_HPP_INCLUDED
+#define _PRGBIND_DDL_PROGRAM_HPP_INCLUDED
 #include "prgbind/program.hpp"
-#include "database/transactionProgram.hpp"
+#include "ddl/compilerInterface.hpp"
 #include <string>
 
 namespace _Wolframe {
 namespace prgbind {
 
-class TransactionDefinitionProgram
+class DDLProgram
 	:public Program
-	,public db::TransactionProgram
 {
 public:
-	TransactionDefinitionProgram(){}
-	virtual ~TransactionDefinitionProgram(){}
+	DDLProgram( const ddl::DDLCompilerR& constructor_);
+	virtual ~DDLProgram(){}
 
 	virtual bool is_mine( const std::string& filename) const;
 	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
+
+private:
+	ddl::DDLCompilerR m_constructor;
 };
 
 }}//namespace
 #endif
+
 

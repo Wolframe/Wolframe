@@ -54,8 +54,8 @@ namespace proc {
 //**** Processor Provider PIMPL Implementation ******************************
 ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcProviderConfig* conf,
 								   const module::ModulesDirectory* modules,
-								   const std::vector<prgbind::ProgramR>& programTypes_)
-	:m_programTypes(programTypes_)
+								   prgbind::ProgramLibrary* programs_)
+	:m_programs(programs_)
 {
 	m_db = NULL;
 	if ( !conf->m_dbLabel.empty())
@@ -185,7 +185,9 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					}
 					m_formfunction.push_back( ffo );
 					m_formfunctionMap[ name ] = ffo;
-
+					langbind::BuiltInFunction* func = ffo->object();
+					m_programs->defineBuiltInFunction( name, *func);
+					delete func;
 					LOG_TRACE << "'" << name << "' form function registered";
 				}
 				break;
@@ -202,7 +204,7 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				}
 				else
 				{
-					m_normprogram.addConstructor( constructor);
+					m_normalizeFunctionConstructorMap.insert( std::string(constructor->domain()), constructor);
 					LOG_TRACE << "'" << constructor->objectClassName() << "' normalize function constructor for domain " << constructor->domain() << " registered";
 				}
 				break;
@@ -308,7 +310,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 	std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
 	for (; pi != pe; ++pi)
 	{
-		if (m_normprogram.is_mine( *pi)) m_normprogram.loadProgram( *pi);
+		if (m_normprogram.is_mine( *pi)) m_normprogram.loadfile( *pi, m_normalizeFunctionConstructorMap);
 	}
 	m_formtypemap.reset( new DDLTypeMap( this));
 	m_formlibrary.setTypeMap( m_formtypemap);
@@ -398,6 +400,7 @@ const prnt::PrintFunction* ProcessorProvider::ProcessorProvider_Impl::printFunct
 
 const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name ) const
 {
+	//[+]return m_programs.getNormalizeFunction( name);
 	return m_normprogram.get( name);
 }
 

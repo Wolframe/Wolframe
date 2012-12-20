@@ -30,20 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Defines the list of all initially defined program types
-///\file predefinedProgramTypes.hpp
+///\brief Implementation of loading programs for token normalization
+///\file prgbind_normalizeProgram.cpp
 
-#ifndef _PRGBIND_PREDEFINED_PROGRAM_TYPES_HPP_INCLUDED
-#define _PRGBIND_PREDEFINED_PROGRAM_TYPES_HPP_INCLUDED
-#include "processor/procProvider.hpp"
-#include "types/countedReference.hpp"
+#include "prgbind/normalizeProgram.hpp"
+#include "langbind/normalizeProgram.hpp"
 #include <string>
 
-namespace _Wolframe {
-namespace prgbind {
+using namespace _Wolframe;
+using namespace _Wolframe::prgbind;
 
-std::vector<ProgramR> getPredefinedProgramTypes();
+bool NormalizeProgram::is_mine( const std::string& filename) const
+{
+	return boost::algorithm::to_lower_copy( utils::getFileExtension( filename)) == ".normalize";
+}
 
-}} //namespace
-#endif
+void NormalizeProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)
+{
+	langbind::NormalizeProgram program;
+	std::vector<std::pair<std::string,langbind::NormalizeFunctionR> > funclist
+		= program.loadfile( filename, library.normalizeFunctionConstructorMap());
+	std::vector<std::pair<std::string,langbind::NormalizeFunctionR> >::const_iterator ni = funclist.begin(), ne = funclist.end();
+	for (; ni != ne; ++ni)
+	{
+		library.defineNormalizeFunction( ni->first, ni->second);
+	}
+}
+
+
 

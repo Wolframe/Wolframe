@@ -63,7 +63,7 @@ class ProcessorProvider::ProcessorProvider_Impl
 public:
 	ProcessorProvider_Impl( const ProcProviderConfig* conf,
 				const module::ModulesDirectory* modules,
-				const std::vector<prgbind::ProgramR>& programTypes_);
+				prgbind::ProgramLibrary* programs_);
 	~ProcessorProvider_Impl();
 
 	bool resolveDB( const db::DatabaseProvider& db );
@@ -88,6 +88,14 @@ public:
 	{
 		m_formFunctionLibrary.insert( name, func);
 	}
+	void defineForm( const std::string& name, const ddl::Form& f)
+	{
+		m_formLibrary.insert( name, f);
+	}
+	const ddl::TypeMap* formtypemap() const
+	{
+		return m_formtypemap.get();
+	}
 
 private:
 	class DDLTypeMap;
@@ -110,12 +118,14 @@ private:
 	std::list< std::string >	m_programfiles;
 	db::TransactionProgram	m_dbprogram;
 	langbind::NormalizeProgram	m_normprogram;
-	ddl::TypeMapR	m_formtypemap;
+	ddl::TypeMapR		m_formtypemap;
 	langbind::FormLibrary	m_formlibrary;
 	langbind::PrintProgram	m_printprogram;
 
+	types::keymap<langbind::NormalizeFunctionConstructorR> m_normalizeFunctionConstructorMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionLibrary;
-	std::vector<prgbind::ProgramR> m_programTypes;
+	prgbind::ProgramLibrary* m_programs;
+	types::keymap<ddl::Form> m_formLibrary;
 };
 
 }} // namespace _Wolframe::proc

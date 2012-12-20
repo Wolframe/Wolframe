@@ -52,7 +52,10 @@ LOCAL_STATIC_LIB_OBJS = \
 	serviceBanner.o \
 	appConfig.o \
 	prgbind_transactionProgram.o \
-	predefinedProgramTypes.o \
+	prgbind_printProgram.o \
+	prgbind_normalizeProgram.o \
+	prgbind_ddlProgram.o \
+	prgbind_programLibrary.o \
 	langbind_iostreamfilter.o \
 	acceptor.o \
 	serverEndpoint.o \

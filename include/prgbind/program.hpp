@@ -36,22 +36,21 @@
 #ifndef _PRGBIND_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_PROGRAM_HPP_INCLUDED
 #include "types/countedReference.hpp"
+#include "database/database.hpp"
 #include <string>
 
 namespace _Wolframe {
-namespace proc {
-	class ProcessorProvider;
-}}
-
-namespace _Wolframe {
 namespace prgbind {
+
+///\brief Forward declaration
+class ProgramLibrary;
 
 struct Program
 {
 	virtual ~Program(){}
 
 	virtual bool is_mine( const std::string& filename) const=0;
-	virtual void loadProgram( proc::ProcessorProvider& provider, const std::string& filename)=0;
+	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename)=0;
 };
 
 typedef types::CountedReference<Program> ProgramR;

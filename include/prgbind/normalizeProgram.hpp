@@ -30,25 +30,25 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for loading programs in the transaction definition language
-///\file prgbind/transactionProgram.hpp
+///\brief Interface for loading programs for token normalization
+///\file prgbind/normalizeProgram.hpp
 
-#ifndef _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
-#define _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
+#ifndef _PRGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED
+#define _PRGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED
 #include "prgbind/program.hpp"
-#include "database/transactionProgram.hpp"
+#include "prgbind/programLibrary.hpp"
+#include "langbind/normalizeProgram.hpp"
 #include <string>
 
 namespace _Wolframe {
 namespace prgbind {
 
-class TransactionDefinitionProgram
+class NormalizeProgram
 	:public Program
-	,public db::TransactionProgram
 {
 public:
-	TransactionDefinitionProgram(){}
-	virtual ~TransactionDefinitionProgram(){}
+	NormalizeProgram(){}
+	virtual ~NormalizeProgram(){}
 
 	virtual bool is_mine( const std::string& filename) const;
 	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);

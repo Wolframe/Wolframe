@@ -52,15 +52,16 @@ public:
 
 	NormalizeProgram(){}
 	NormalizeProgram( const NormalizeProgram& o)
-		:Parent(o)
-		,m_constructormap(o.m_constructormap){}
+		:Parent(o){}
 	~NormalizeProgram(){}
 
-	void addConstructor( const NormalizeFunctionConstructorR& c);
-
 	bool is_mine( const std::string& filename) const;
-	void addProgram( const std::string& source);
-	void loadProgram( const std::string& filename);
+
+	std::vector<std::pair<std::string,NormalizeFunctionR> >
+		load( const std::string& source, const types::keymap<NormalizeFunctionConstructorR>& constructormap);
+
+	std::vector<std::pair<std::string,NormalizeFunctionR> >
+		loadfile( const std::string& filename, const types::keymap<NormalizeFunctionConstructorR>& constructormap);
 
 	const NormalizeFunction* get( const std::string& name) const
 	{
@@ -69,8 +70,7 @@ public:
 	}
 
 private:
-	NormalizeFunction* createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg);
-	types::keymap<NormalizeFunctionConstructorR> m_constructormap;
+	NormalizeFunction* createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg, const types::keymap<NormalizeFunctionConstructorR>& constructormap);
 };
 
 }}

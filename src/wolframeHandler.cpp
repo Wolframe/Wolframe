@@ -35,7 +35,7 @@
 //
 
 #include "wolframeHandler.hpp"
-#include "prgbind/predefinedProgramTypes.hpp"
+#include "prgbind/programLibrary.hpp"
 #include "logger-v1.hpp"
 #include "standardConfigs.hpp"
 #include "handlerConfig.hpp"
@@ -353,7 +353,7 @@ WolframeHandler::WolframeHandler( const HandlerConfiguration* conf,
 	: m_banner( conf->bannerCfg->toString() ),
 	  m_db( conf->databaseCfg, modules ),
 	  m_aaaa( conf->aaaaCfg, modules ),
-	  m_proc( conf->procCfg, modules, prgbind::getPredefinedProgramTypes())
+	  m_proc( conf->procCfg, modules, &m_prglib)
 {
 	LOG_TRACE << "Global context: banner: <" << m_banner << ">";
 	if ( ! m_aaaa.resolveDB( m_db ) )	{

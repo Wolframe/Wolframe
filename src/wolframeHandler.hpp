@@ -62,6 +62,7 @@ private:
 	const std::string		m_banner;
 	db::DatabaseProvider		m_db;
 	AAAA::AAAAprovider		m_aaaa;
+	prgbind::ProgramLibrary		m_prglib;
 	proc::ProcessorProvider		m_proc;
 };
 

@@ -31,12 +31,12 @@
 
 ************************************************************************/
 ///\brief Interface for loading programs for printing
-///\file prgbind/transactionProgram.hpp
+///\file prgbind/printProgram.hpp
 
 #ifndef _PRGBIND_PRINT_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_PRINT_PROGRAM_HPP_INCLUDED
 #include "prgbind/program.hpp"
-#include "database/printProgram.hpp"
+#include "langbind/printProgram.hpp"
 #include <string>
 
 namespace _Wolframe {
@@ -44,18 +44,16 @@ namespace prgbind {
 
 class PrintProgram
 	:public Program
-	,public prnt::PrintProgram
 {
 public:
-	PrintProgram( const std::string& name_, const module::PrintFunctionConstructorR& contructor_);
+	PrintProgram( const module::PrintFunctionConstructorR& constructor_);
 	virtual ~PrintProgram(){}
 
 	virtual bool is_mine( const std::string& filename) const;
-	virtual void loadProgram( proc::ProcessorProvider& provider, const std::string& filename);
+	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
 
 private:
-	std::string m_name;
-	module::PrintFunctionConstructorR m_contructor;
+	module::PrintFunctionConstructorR m_constructor;
 };
 
 }}//namespace

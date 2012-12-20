@@ -37,7 +37,7 @@
 #include "appConfig.hpp"
 #include "handlerConfig.hpp"
 #include "moduleDirectory.hpp"
-#include "prgbind/predefinedProgramTypes.hpp"
+#include "prgbind/programLibrary.hpp"
 #include "config/ConfigurationTree.hpp"
 #include "processor/procProvider.hpp"
 #include "testHandlerTemplates.hpp"
@@ -58,6 +58,7 @@ using namespace _Wolframe::iproc;
 
 static module::ModulesDirectory* g_modulesDirectory;
 static boost::filesystem::path g_referencePath;
+static prgbind::ProgramLibrary g_prglib;
 
 static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const boost::filesystem::path& script)
 {
@@ -108,7 +109,7 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 
 static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const boost::shared_ptr<proc::ProcProviderConfig>& cfg)
 {
-	boost::shared_ptr<proc::ProcessorProvider> rt( new proc::ProcessorProvider( cfg.get(), g_modulesDirectory, prgbind::getPredefinedProgramTypes()));
+	boost::shared_ptr<proc::ProcessorProvider> rt( new proc::ProcessorProvider( cfg.get(), g_modulesDirectory, &g_prglib));
 	return rt;
 }
 

@@ -63,7 +63,7 @@ struct FormFunctionClosure
 	virtual void init( const proc::ProcessorProvider* p, const TypedInputFilterR& i, serialize::Context::Flags f)=0;
 
 	///\brief Get the iterator for the function result
-	virtual const TypedInputFilterR& result() const=0;
+	virtual TypedInputFilterR result() const=0;
 };
 
 typedef types::CountedReference<FormFunctionClosure> FormFunctionClosureR;

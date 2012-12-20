@@ -29,105 +29,77 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-#ifndef _Wolframe_COUNTED_REFERENCE_HPP_INCLUDED
-#define _Wolframe_COUNTED_REFERENCE_HPP_INCLUDED
-///\file types/countedReference.hpp
-///\brief Multiple references to an object that is freed with its last reference.
-///\remark The reference template introduced here should be replaced by an appropriate boost smart pointer. The existence of this module is due easier injection of tracing and debugging aspects
+#ifndef _Wolframe_UNIQUE_REFERENCE_HPP_INCLUDED
+#define _Wolframe_UNIQUE_REFERENCE_HPP_INCLUDED
+///\file types/uniqueReference.hpp
+///\brief Unique reference to an object that is freed by the destructor.
 
 #include <cstddef>
 
 namespace _Wolframe {
 namespace types {
 
-///\class CountedReference
-///\brief Reference to an object that is freed when not referenced anymore.
-///\remark Substitutable by 'shared_ptr'
+///\class UniqueReference
+///\brief Unique reference to an object that is freed by the destructor.
+///\remark Substitutable by a 'unique_ptr' when it will exist as announced by the standard
 ///\tparam OBJ
 template <class OBJ>
-class CountedReference
+class UniqueReference
 {
 public:
-	struct Pointer
-	{
-		OBJ* m_ptr;
-		int m_cnt;
-	};
-	
-	CountedReference( const CountedReference& o)
+	///\brief Move constructor
+	UniqueReference( const UniqueReference&& o)
 		:m_ref(o.m_ref)
-	{
-		m_ref->m_cnt++;
-	}
+	{}
 
-	explicit CountedReference( OBJ* ptr)
-		:m_ref( new Pointer())
-	{
-		m_ref->m_cnt = 1;
-		m_ref->m_ptr = ptr;
-	}
+	explicit UniqueReference( OBJ* ptr)
+		:m_ref(ptr)
+	{}
 
-	CountedReference()
-		:m_ref( new Pointer())
-	{
-		m_ref->m_cnt = 1;
-		m_ref->m_ptr = 0;
-	}
+	UniqueReference()
+		:m_ref(0)
+	{}
 
-	~CountedReference()
+	~UniqueReference()
 	{
-		if (--m_ref->m_cnt == 0)
+		if (m_ref)
 		{
-			if (m_ref->m_ptr) delete m_ref->m_ptr;
 			delete m_ref;
 		}
 	}
 	
-	CountedReference& operator =( const CountedReference& o)
+	const OBJ* get() const
 	{
-		if (--m_ref->m_cnt == 0)
-		{
-			if (m_ref->m_ptr) delete m_ref->m_ptr;
-			delete m_ref;
-		}
-		m_ref = o.m_ref;
-		m_ref->m_cnt++;
-		return *this;
+		return m_ref;
 	}
 
-	OBJ* get() const
+	OBJ* get()
 	{
-		return m_ref->m_ptr;
+		return m_ref;
 	}
-	
+
 	void reset( OBJ* ptr=0)
 	{
-		if (m_ref->m_ptr && m_ref->m_ptr != ptr) delete m_ref->m_ptr;
-		m_ref->m_ptr = ptr; 
-	}
-	
-	int cnt() const
-	{
-		return m_ref->m_cnt;
+		if (m_ref) delete m_ref;
+		m_ref = ptr;
 	}
 	
 	OBJ* operator -> () const
 	{
-		return m_ref->m_ptr;
+		return m_ref;
 	}
 	
 	OBJ& operator *() const
 	{
-		return *m_ref->m_ptr;
+		return *m_ref;
 	}
 
-	OBJ* reference()
-	{
-		++m_ref->m_cnt;
-		return m_ref->m_ptr;
-	}
 private:
-	Pointer* m_ref;
+	UniqueReference& operator =( const UniqueReference&){} //non copyable
+	UniqueReference( const UniqueReference&){} //non copyable
+
+private:
+	OBJ* m_ref;
 };
 
 }}//namespace

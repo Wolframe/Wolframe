@@ -29,10 +29,10 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file langbind/appBuiltInFunction.hpp
+///\file langbind/builtInFunction.hpp
 ///\brief Interface to the built-in function for processor language bindings
-#ifndef _Wolframe_langbind_APP_BUILT_IN_FUNCTION_HPP_INCLUDED
-#define _Wolframe_langbind_APP_BUILT_IN_FUNCTION_HPP_INCLUDED
+#ifndef _Wolframe_langbind_BUILT_IN_FUNCTION_HPP_INCLUDED
+#define _Wolframe_langbind_BUILT_IN_FUNCTION_HPP_INCLUDED
 #include "serialize/struct/filtermapBase.hpp"
 
 namespace _Wolframe {

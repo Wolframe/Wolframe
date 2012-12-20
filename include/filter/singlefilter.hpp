@@ -40,7 +40,7 @@ namespace langbind {
 
 ///\class SingleElementInputFilter
 ///\brief Input filter returning one content element only
-class SingleElementInputFilter :public SingleElementInputFilter
+class SingleElementInputFilter :public TypedInputFilter
 {
 public:
 	///\brief Constructor

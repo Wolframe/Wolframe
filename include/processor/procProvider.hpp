@@ -39,18 +39,11 @@
 
 #include <boost/noncopyable.hpp>
 #include "database/DBprovider.hpp"
-#include "database/transactionFunction.hpp"
-#include "filter/filter.hpp"
-#include "langbind/appBuiltInFunction.hpp"
 #include "cmdbind/commandHandler.hpp"
 #include "cmdbind/ioFilterCommandHandler.hpp"
 #include "cmdbind/lineCommandHandler.hpp"
 #include "cmdbind/authCommandHandler.hpp"
-#include "ddl/compilerInterface.hpp"
-#include "prnt/printFunction.hpp"
-#include "langbind/normalizeFunction.hpp"
-#include "langbind/formFunction.hpp"
-#include "prgbind/program.hpp"
+#include "prgbind/programLibrary.hpp"
 
 namespace _Wolframe {
 namespace proc {
@@ -89,7 +82,7 @@ class ProcessorProvider : private boost::noncopyable
 public:
 	ProcessorProvider( const ProcProviderConfig* conf,
 			   const module::ModulesDirectory* modules,
-			   const std::vector<prgbind::ProgramR>& programTypes_);
+			   prgbind::ProgramLibrary* programs_);
 	~ProcessorProvider();
 
 	bool resolveDB( const db::DatabaseProvider& db );
@@ -124,6 +117,8 @@ public:
 	}
 
 	void defineFunction( const std::string& name, langbind::FormFunctionR func);
+	void defineForm( const std::string& name, const ddl::Form& f);
+	const ddl::TypeMap* formtypemap() const;
 
 private:
 	class ProcessorProvider_Impl;

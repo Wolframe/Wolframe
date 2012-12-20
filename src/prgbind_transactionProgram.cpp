@@ -34,6 +34,7 @@
 ///\file prgbind_transactionProgram.cpp
 
 #include "prgbind/transactionProgram.hpp"
+#include "utils/miscUtils.hpp"
 #include "database/transactionProgram.hpp"
 #include "langbind/appObjects.hpp"
 
@@ -59,7 +60,7 @@ public:
 		langbind::TransactionFunctionClosure::init(p,i);
 	}
 
-	virtual const langbind::TypedInputFilterR& result() const
+	virtual langbind::TypedInputFilterR result() const
 	{
 		return langbind::TransactionFunctionClosure::result();
 	}
@@ -89,24 +90,22 @@ bool TransactionDefinitionProgram::is_mine( const std::string& filename) const
 	return db::TransactionProgram::is_mine( filename);
 }
 
-void TransactionDefinitionProgram::loadProgram( proc::ProcessorProvider& provider, const std::string& filename)
+void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename)
 {
 	std::string dbsource;
 	types::keymap<std::string> embeddedStatementMap;
 	std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
 		= db::TransactionProgram::loadfile( filename, dbsource, embeddedStatementMap);
 
-	db::Database* database = provider.transactionDatabase();
-	if (!database) throw std::runtime_error( std::string( "loading transaction definition program '") + filename + "' but no transaction database defined");
 	try
 	{
-		database->addProgram( dbsource);
-		database->addStatements( embeddedStatementMap);
+		transactionDB->addProgram( dbsource);
+		transactionDB->addStatements( embeddedStatementMap);
 		std::vector<std::pair<std::string,db::TransactionFunctionR> >::const_iterator fi = funclist.begin(), fe = funclist.end();
 		for (; fi != fe; ++fi)
 		{
 			langbind::FormFunctionR func( new TransactionFunction( fi->second));
-			provider.defineFunction( fi->first, func);
+			library.defineFormFunction( fi->first, func);
 		}
 	}
 	catch (const std::runtime_error& e)

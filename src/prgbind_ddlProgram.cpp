@@ -30,21 +30,36 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implements the list of all initially defined program types
-///\file predefinedProgramTypes.cpp
+///\brief Implementation of programs for definition of forms in a DDL
+///\file prgbind_ddlProgram.cpp
 
-#include "prgbind/predefinedProgramTypes.hpp"
-#include "prgbind/transactionProgram.hpp"
-#include "prgbind/program.hpp"
+#include "prgbind/ddlProgram.hpp"
+#include "prgbind/programLibrary.hpp"
+#include "utils/miscUtils.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
-std::vector<ProgramR> _Wolframe::prgbind::getPredefinedProgramTypes()
+DDLProgram::DDLProgram( const ddl::DDLCompilerR& constructor_)
+	:m_constructor(constructor_){}
+
+bool DDLProgram::is_mine( const std::string& filename) const
 {
-	std::vector<ProgramR> rt;
-	rt.push_back( ProgramR( new TransactionDefinitionProgram()));
-	return rt;
+	std::string ext = utils::getFileExtension( filename);
+	if (ext.empty()) return false;
+	return boost::iequals( m_constructor->ddlname(), ext.c_str()+1);
+}
+
+void DDLProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)
+{
+	const ddl::TypeMap* typemap = library.formtypemap();
+	std::vector<ddl::Form> forms = m_constructor->compile( utils::readSourceFileContent( filename), typemap);
+	std::vector<ddl::Form>::const_iterator fi = forms.begin(), fe = forms.end();
+	for (; fi != fe; ++fi)
+	{
+		library.defineForm( fi->ddlname(), *fi);
+	}
 }
 
 

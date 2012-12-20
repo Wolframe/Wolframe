@@ -33,7 +33,7 @@ Project Wolframe.
 ///\brief Interface template for object builder of built-in functions
 #ifndef _Wolframe_MODULE_BUILT_IN_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #define _Wolframe_MODULE_BUILT_IN_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#include "langbind/appBuiltInFunction.hpp"
+#include "langbind/builtInFunction.hpp"
 #include "moduleInterface.hpp"
 #include "constructor.hpp"
 

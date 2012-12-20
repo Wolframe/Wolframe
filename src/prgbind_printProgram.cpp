@@ -35,6 +35,7 @@
 
 #include "prgbind/printProgram.hpp"
 #include "langbind/appObjects.hpp"
+#include "utils/miscUtils.hpp"
 #include "filter/singlefilter.hpp"
 #include <boost/algorithm/string.hpp>
 
@@ -60,9 +61,10 @@ public:
 		langbind::PrintFunctionClosure::init(i);
 	}
 
-	virtual const langbind::TypedInputFilterR& result() const
+	virtual langbind::TypedInputFilterR result() const
 	{
-		return langbind::TypedInputFilterR( new langbind::SingleElementInputFilter( langbind::TypedFilter::Element( langbind::TransactionFunctionClosure::result())));
+		langbind::TypedInputFilter::Element elem( langbind::PrintFunctionClosure::result());
+		return langbind::TypedInputFilterR( new langbind::SingleElementInputFilter( elem));
 	}
 };
 
@@ -70,7 +72,7 @@ class PrintFunction
 	:public langbind::FormFunction
 {
 public:
-	PrintFunction( const db::PrintFunctionR& f)
+	PrintFunction( const prnt::PrintFunctionR& f)
 		:m_impl(f){}
 
 	virtual PrintFunctionClosure* createClosure() const
@@ -85,28 +87,25 @@ private:
 
 
 
-PrintProgram::PrintProgram( const std::string& name_, const module::PrintFunctionConstructorR& contructor_)
-	:m_name(name_)
-	,m_contructor(contructor_){}
-
-PrintProgram::~PrintProgram(){}
+PrintProgram::PrintProgram( const module::PrintFunctionConstructorR& constructor_)
+	:m_constructor(constructor_){}
 
 bool PrintProgram::is_mine( const std::string& filename) const
 {
 	std::string ext = utils::getFileExtension( filename);
 	if (ext.empty()) return false;
-	return boost::iequals( m_name, ext.c_str()+1);
+	return boost::iequals( ext.c_str()+1, m_constructor->name());
 }
 
-void PrintProgram::loadProgram( proc::ProcessorProvider& provider, const std::string& filename)
+void PrintProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)
 {
-	prnt::PrintFunctionR function( ci->second->object( utils::readSourceFileContent( filename)));
+	prnt::PrintFunctionR function( m_constructor->object( utils::readSourceFileContent( filename)));
 	std::string name = function->name();
 	if (name.empty())
 	{
 		name = utils::getFileStem( filename);
 	}
-	provider.defineFunction( name, langbind::FormFunctionR( new PrintFunction( function)));
+	library.defineFormFunction( name, langbind::FormFunctionR( new PrintFunction( function)));
 }
 
 

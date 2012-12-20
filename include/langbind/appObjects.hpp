@@ -34,7 +34,7 @@ Project Wolframe.
 #ifndef _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #define _Wolframe_langbind_APP_OBJECTS_HPP_INCLUDED
 #include "filter/filter.hpp"
-#include "langbind/appBuiltInFunction.hpp"
+#include "langbind/builtInFunction.hpp"
 #include "database/transactionFunction.hpp"
 #include "prnt/printFunction.hpp"
 #include "processor/procProvider.hpp"
@@ -353,7 +353,7 @@ public:
 	///\param[in] i call input
 	void init( const TypedInputFilterR& i);
 
-	std::string result() const			{return m_result;}
+	const std::string& result() const		{return m_result;}
 
 private:
 	const prnt::PrintFunction* m_func;		//< function to execute

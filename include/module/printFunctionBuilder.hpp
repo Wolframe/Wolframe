@@ -66,6 +66,10 @@ public:
 	{
 		return m_createFunc( layout_source);
 	}
+	const std::string& name() const
+	{
+		return m_name;
+	}
 
 private:
 	std::string m_classname;
@@ -92,6 +96,10 @@ public:
 	virtual ObjectConstructorBase* constructor()
 	{
 		return new PrintFunctionConstructor( m_className, m_name, m_createFunc);
+	}
+	const char* name() const
+	{
+		return m_name;
 	}
 
 private:
