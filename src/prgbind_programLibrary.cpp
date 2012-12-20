@@ -129,9 +129,9 @@ private:
 };
 
 
-
-struct ProgramLibrary::Impl
+class ProgramLibrary::Impl
 {
+public:
 	types::keymap<langbind::NormalizeFunctionConstructorR> m_normalizeFunctionConstructorMap;
 	types::keymap<langbind::NormalizeFunctionR> m_normalizeFunctionMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
