@@ -211,6 +211,11 @@ bool ProcessorProvider::resolveDB( const db::DatabaseProvider& db )
 	return m_impl->resolveDB( db );
 }
 
+bool ProcessorProvider::loadPrograms()
+{
+	return m_impl->loadPrograms();
+}
+
 langbind::Filter* ProcessorProvider::filter( const std::string& name, const std::string& arg ) const
 {
 	return m_impl->filter( name, arg );

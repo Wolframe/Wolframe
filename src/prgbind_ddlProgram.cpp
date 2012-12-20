@@ -41,8 +41,6 @@
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
 
-DDLProgram::DDLProgram( const ddl::DDLCompilerR& constructor_)
-	:m_constructor(constructor_){}
 
 bool DDLProgram::is_mine( const std::string& filename) const
 {
@@ -58,7 +56,7 @@ void DDLProgram::loadProgram( ProgramLibrary& library, db::Database*, const std:
 	std::vector<ddl::Form>::const_iterator fi = forms.begin(), fe = forms.end();
 	for (; fi != fe; ++fi)
 	{
-		library.defineForm( fi->ddlname(), *fi);
+		library.defineForm( fi->name(), *fi);
 	}
 }
 

@@ -47,7 +47,9 @@ class TransactionDefinitionProgram
 	,public db::TransactionProgram
 {
 public:
-	TransactionDefinitionProgram(){}
+	TransactionDefinitionProgram()
+		:Program( Function){}
+
 	virtual ~TransactionDefinitionProgram(){}
 
 	virtual bool is_mine( const std::string& filename) const;

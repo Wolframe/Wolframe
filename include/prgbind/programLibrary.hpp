@@ -36,18 +36,22 @@
 #ifndef _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
 #define _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
 #include "filter/filter.hpp"
+#include "database/database.hpp"
 #include "langbind/builtInFunction.hpp"
 #include "ddl/compilerInterface.hpp"
+#include "module/printFunctionBuilder.hpp"
+#include "prnt/printFunction.hpp"
 #include "langbind/normalizeFunction.hpp"
 #include "prgbind/program.hpp"
 /*[-]*/#include "prgbind/transactionProgram.hpp"
 /*[-]*/#include "prgbind/program.hpp"
 /*[-]*/#include "database/transactionFunction.hpp"
-/*[-]*/#include "prnt/printFunction.hpp"
 /*[-]*/#include "langbind/normalizeProgram.hpp"
 /*[-]*/#include "module/normalizeFunctionBuilder.hpp"
 /*[-]*/#include "langbind/formFunction.hpp"
 #include <string>
+#include <list>
+
 
 namespace _Wolframe {
 namespace prgbind {
@@ -62,13 +66,18 @@ public:
 	virtual void defineBuiltInFunction( const std::string& name, const langbind::BuiltInFunction& f);
 	virtual void defineFormFunction( const std::string& name, langbind::FormFunctionR f);
 	virtual void defineForm( const std::string& name, const ddl::Form& f);
+	virtual void defineNormalizeFunctionConstructor( const langbind::NormalizeFunctionConstructorR& f);
 	virtual void defineNormalizeFunction( const std::string& name, const langbind::NormalizeFunctionR& f) const;
+	virtual void defineFormDDL( const ddl::DDLCompilerR& constructor_);
+	virtual void definePrintLayoutType( const module::PrintFunctionConstructorR& constructor_);
 
 	virtual const ddl::TypeMap* formtypemap() const;
 	virtual const types::keymap<langbind::NormalizeFunctionConstructorR>& normalizeFunctionConstructorMap() const;
 
 	virtual const langbind::FormFunction* getFormFunction( const std::string& name) const;
 	virtual const langbind::NormalizeFunction* getNormalizeFunction( const std::string& name) const;
+
+	virtual void loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames);
 
 private:
 	class Impl;

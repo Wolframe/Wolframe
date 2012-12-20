@@ -94,6 +94,8 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 {
 	std::string dbsource;
 	types::keymap<std::string> embeddedStatementMap;
+	defineEmbeddedLanguageDescription( transactionDB->getLanguageDescription());
+
 	std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
 		= db::TransactionProgram::loadfile( filename, dbsource, embeddedStatementMap);
 

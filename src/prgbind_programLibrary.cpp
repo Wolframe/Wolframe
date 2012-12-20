@@ -34,14 +34,19 @@
 ///\file programLibrary.cpp
 
 #include "prgbind/programLibrary.hpp"
-#include "prgbind/transactionProgram.hpp"
 #include "prgbind/program.hpp"
+#include "prgbind/transactionProgram.hpp"
+#include "prgbind/ddlProgram.hpp"
+#include "prgbind/printProgram.hpp"
+#include "prgbind/normalizeProgram.hpp"
 #include "database/transactionFunction.hpp"
 #include "prnt/printFunction.hpp"
 #include "langbind/normalizeProgram.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
 #include "langbind/formFunction.hpp"
 #include "langbind/appObjects.hpp"
+#include "logger-v1.hpp"
+#include <algorithm>
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
@@ -130,18 +135,19 @@ private:
 
 
 class ProgramLibrary::Impl
+	:public ddl::TypeMap
 {
 public:
 	types::keymap<langbind::NormalizeFunctionConstructorR> m_normalizeFunctionConstructorMap;
 	types::keymap<langbind::NormalizeFunctionR> m_normalizeFunctionMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
 	types::keymap<ddl::Form> m_formMap;
-	ddl::TypeMapR m_formTypeMap;
 	std::vector<ProgramR> m_programTypes;
 
 	Impl()
 	{
 		m_programTypes.push_back( ProgramR( new TransactionDefinitionProgram()));
+		m_programTypes.push_back( ProgramR( new NormalizeProgram()));
 	}
 
 	Impl( const Impl& o)
@@ -167,9 +173,21 @@ public:
 		m_formMap.insert( name, f);
 	}
 
-	const ddl::TypeMap* formtypemap() const
+	void defineFormDDL( const ddl::DDLCompilerR& constructor_)
 	{
-		return m_formTypeMap.get();
+		DDLProgram* prg = new DDLProgram( constructor_);
+		m_programTypes.push_back( ProgramR( prg));
+	}
+
+	void definePrintLayoutType( const module::PrintFunctionConstructorR& constructor_)
+	{
+		PrintProgram* prg = new PrintProgram( constructor_);
+		m_programTypes.push_back( ProgramR( prg));
+	}
+
+	void defineNormalizeFunctionConstructor( const langbind::NormalizeFunctionConstructorR& f)
+	{
+		m_normalizeFunctionConstructorMap.insert( std::string(f->domain()), f);
 	}
 
 	const langbind::FormFunction* getFormFunction( const std::string& name) const
@@ -184,6 +202,47 @@ public:
 		types::keymap<langbind::NormalizeFunctionR>::const_iterator fi = m_normalizeFunctionMap.find( name);
 		if (fi == m_normalizeFunctionMap.end()) return 0;
 		return fi->second.get();
+	}
+
+	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
+	{
+		return getNormalizeFunction( name);
+	}
+
+	static bool programOrderAsc( std::pair<Program*, std::string> const& a, std::pair<Program*, std::string> const& b)
+	{
+		return ((int)a.first->category()) < ((int)b.first->category());
+	}
+
+	void loadPrograms( ProgramLibrary& library, db::Database* transactionDB, const std::list<std::string>& filenames)
+	{
+		std::vector< std::pair<Program*, std::string> > typed_filenames;
+
+		std::list<std::string>::const_iterator fi = filenames.begin(), fe = filenames.end();
+		for (; fi != fe; ++fi)
+		{
+			std::vector<ProgramR>::const_iterator pi = m_programTypes.begin(), pe = m_programTypes.end();
+			for (; pi != pe; ++pi)
+			{
+				if ((*pi)->is_mine( *fi))
+				{
+					typed_filenames.push_back( std::pair<Program*, std::string>(pi->get(), *fi));
+					break;
+				}
+			}
+			if (pi == pe)
+			{
+				throw std::runtime_error( std::string("unknown type of program '") + *fi + "'");
+			}
+		}
+		std::sort( typed_filenames.begin(), typed_filenames.end(), programOrderAsc);
+
+		std::vector< std::pair<Program*, std::string> >::const_iterator ti = typed_filenames.begin(), te = typed_filenames.end();
+		for (; ti != te; ++ti)
+		{
+			LOG_TRACE << "Loading program '" << ti->second << "'";
+			ti->first->loadProgram( library, transactionDB, ti->second);
+		}
 	}
 };
 
@@ -210,6 +269,11 @@ void ProgramLibrary::defineFormFunction( const std::string& name, langbind::Form
 	m_impl->defineFormFunction( name, f);
 }
 
+void ProgramLibrary::defineNormalizeFunctionConstructor( const langbind::NormalizeFunctionConstructorR& f)
+{
+	m_impl->defineNormalizeFunctionConstructor( f);
+}
+
 void ProgramLibrary::defineNormalizeFunction( const std::string& name, const langbind::NormalizeFunctionR& f) const
 {
 	m_impl->defineNormalizeFunction( name, f);
@@ -220,9 +284,19 @@ void ProgramLibrary::defineForm( const std::string& name, const ddl::Form& f)
 	m_impl->defineForm( name, f);
 }
 
+void ProgramLibrary::defineFormDDL( const ddl::DDLCompilerR& constructor_)
+{
+	m_impl->defineFormDDL( constructor_);
+}
+
+void ProgramLibrary::definePrintLayoutType( const module::PrintFunctionConstructorR& constructor_)
+{
+	m_impl->definePrintLayoutType( constructor_);
+}
+
 const ddl::TypeMap* ProgramLibrary::formtypemap() const
 {
-	return m_impl->formtypemap();
+	return m_impl;
 }
 
 const types::keymap<langbind::NormalizeFunctionConstructorR>& ProgramLibrary::normalizeFunctionConstructorMap() const
@@ -238,5 +312,10 @@ const langbind::FormFunction* ProgramLibrary::getFormFunction( const std::string
 const langbind::NormalizeFunction* ProgramLibrary::getNormalizeFunction( const std::string& name) const
 {
 	return m_impl->getNormalizeFunction( name);
+}
+
+void ProgramLibrary::loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames)
+{
+	m_impl->loadPrograms( *this, transactionDB, filenames);
 }
 

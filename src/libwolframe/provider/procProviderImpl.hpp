@@ -80,7 +80,7 @@ public:
 
 	const UI::UserInterfaceLibrary* UIlibrary() const;
 
-	db::Database* transactionDatabase() const;
+	db::Database* transactionDatabase( bool suppressAlert=false) const;
 	db::Transaction* transaction( const std::string& name ) const;
 	const db::TransactionFunction* transactionFunction( const std::string& name ) const;
 
@@ -97,9 +97,10 @@ public:
 		return m_formtypemap.get();
 	}
 
+	bool loadPrograms();
+
 private:
 	class DDLTypeMap;
-	bool loadPrograms();
 
 private:
 	std::string					m_dbLabel;

@@ -45,12 +45,32 @@ namespace prgbind {
 ///\brief Forward declaration
 class ProgramLibrary;
 
+///\class Program
+///\brief Interface for programs of a program library
 struct Program
 {
+	///\enum Category
+	///\brief Category of the program. Determines ascending load order (dependencies)
+	enum Category
+	{
+		Core=10,
+		FormType=20,
+		Form=30,
+		Function=40
+	};
+
+	explicit Program( Category category_)
+		:m_category(category_){}
+
 	virtual ~Program(){}
 
 	virtual bool is_mine( const std::string& filename) const=0;
 	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename)=0;
+
+	Category category() const		{return m_category;}
+
+private:
+	Category m_category;
 };
 
 typedef types::CountedReference<Program> ProgramR;

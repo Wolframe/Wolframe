@@ -47,7 +47,9 @@ class NormalizeProgram
 	:public Program
 {
 public:
-	NormalizeProgram(){}
+	NormalizeProgram()
+		:Program( FormType){}
+
 	virtual ~NormalizeProgram(){}
 
 	virtual bool is_mine( const std::string& filename) const;
