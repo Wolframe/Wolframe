@@ -660,3 +660,130 @@ END
 Note, that this time the database transaction doesn't return a result.
 
 Restart server and client and start to edit the customers.
+
+Step 8 - Add a new customer
+------
+
+We also want to add new customers to the list. The "add customer" case
+is very similar to the "edit customer" case.
+
+Let's copy the 'customer_edit.ui' to 'customer_add.ui'. We remove the
+'initAction' and the other dynamic properties from the form itself as
+we don't want to read anything when creating a new customer. But of course
+we could execute here a "Get new customer initial data" request too which
+initializes certain values.
+
+We change the "Save" button and rename it to "Add". We also change the
+documenttype there from "CustomerUpdate" to 'CustomerCreate' and we remove
+the 'id' property (as this one is automatically choosen by the sequence
+in the database). We also have to chaqnge the 'action' from 'update' to
+'create':
+
+(file:step8_customer_add.png)
+
+We also introduce a new element here, the 'initalFocus' property. We
+set it on the 'name' QLineWidget, so that it gets the initial keyboard
+focus when the form is loaded:
+
+(file:step8_customer_add_name_initial_focus.png)
+
+In the 'customers.ui' form we have to add a 'Add' button which has one
+property 'form' with value 'customer_add':
+
+(file:step8_customers_add_button.png)
+
+Now for the server side. We add a new mapping for customer creation
+in 'tutorial.directmap':
+
+editCustomerUpdate = UpdateCustomer( xml );
+createCustomerCreate = CreateCustomer( xml );
+
+We also have to add the simple form 'CustomerCreate.simpleform':
+
+FORM CustomerCreate
+{
+	customer
+	{
+		name string
+		address string
+	}
+}
+
+This is the same as 'CustomerUpdate.simpleform' with the exception that
+we don't accept an 'id' attribute to be passed to the server.
+
+We register this form in 'tutorial.conf':
+
+Processor {
+	..
+	program CustomerCreate.simpleform
+	..
+}
+
+Last we add a 'CreateCustomer' transaction function:
+
+TRANSACTION CreateCustomer
+BEGIN
+	DO INSERT INTO Customer( name, address )
+		VALUES( $(customer/name), $(customer/address) );
+END
+
+When we restart the server and client we see the following request
+being passed to the wolframe server:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE customer SYSTEM 'CustomerCreate'>
+<customer>
+  <name>New Customer</name>
+  <address>New Location</address>
+</customer>
+
+Step 9 - Delete a customer
+------
+
+We want to get rid of customers. For this we have to change little
+in the 'custorms.ui' form: a button "Delete" with takes the following properties:
+"action" set to "delete", "doctype" set to "CustomerDelete",
+"rootelement" to "customer", "form" to "customers" (this is the simplest
+way to reload the list of customers after the deletion) and "id" to
+"{customer.id}":
+
+(file:step9_customers_delete_button.png)
+
+We add another map for the 'deleteCustomerDelete' request in 'tutorial.directmap':
+
+deleteCustomerDelete = DeleteCustomer( xml );
+
+A new 'CustomerDelete.simpleform' which allows us only the specify an 'id'
+attribute of the customer to delete:
+
+FORM CustomerDelete
+{
+	customer {
+		id !@string
+	}
+}
+
+and in 'tutorial.conf':
+
+Processor {
+	..
+	program CustomerDelete.simpleform
+	..
+}
+
+Finally follows the implementation of the delete transaction
+in 'Customer.tdl':
+
+TRANSACTION DeleteCustomer
+BEGIN
+	DO DELETE FROM Customer WHERE id=$(customer/id);
+END
+
+Executing the request we see in the qtclient debug output:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE customer SYSTEM 'CustomerDelete'>
+<customer id="3"/>
+
+Seems ok, customer gone. :-)
