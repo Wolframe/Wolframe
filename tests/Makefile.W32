@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SUBDIRS = modules database AAAA
+SUBDIRS = modules database AAAA wolfilter
 
 # all broken on windows due to working telnet
 #!IFDEF WITH_EXPECT
