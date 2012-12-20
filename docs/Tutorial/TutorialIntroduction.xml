@@ -1,0 +1,110 @@
+<!-- Introduction -->
+<chapter>
+	<title>Introduction</title>
+
+	<sect1>
+		<title>Introduction to the Wolframe tutorial</title>
+	
+	<sect2>
+		<title>Requirements</title>
+		
+		<para>
+			You need the following packages:
+			<itemizedlist>
+				<listitem>
+				<para>
+					wolframe_0.0.1-1_amd64.deb: the Wolframe server
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					wolframe-sqlite3_0.0.1-1_amd64.deb: the Sqlite3 database driver module				
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					wolframe-libxml2_0.0.1-1_amd64.deb: contains XML filter based on libxml2
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					wolframe-client_0.0.1-1_amd64.deb: contains the Qt frontend
+				</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</sect2>
+	
+	<sect2>
+		<title>Sample application</title>
+		
+		<para>
+			We want to manage a list of customers with name and address and provide
+			the usual operations:
+			<itemizedlist>
+				<listitem>
+				<para>
+					list all customers
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					create new customers
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					edit existing customers
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					view customer entries
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					delete customers
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					search for customers
+				</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</sect2>
+
+	<sect2>
+		<title>Basic directory layout</title>
+		
+		<para>
+			We don't use the normal directory layout as it requires root rights to
+			install.
+		</para>
+
+		<para>
+			Instead we create two directories, one for server data and one for
+			client data:
+		        <programlisting language='shell'>
+	mkdir ~/tutorial
+	mkdir ~/tutorial/server
+	mkdir ~/tutorial/client
+			</programlisting>
+		</para>
+		
+	</sect2>
+
+	</sect1>
+
+</chapter>
+

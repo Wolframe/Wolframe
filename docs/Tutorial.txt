@@ -29,8 +29,6 @@ mkdir ~/tutorial
 mkdir ~/tutorial/server
 mkdir ~/tutorial/client
 
-Basic configuration
-
 Step 1 - Basic connectivity
 ------
 

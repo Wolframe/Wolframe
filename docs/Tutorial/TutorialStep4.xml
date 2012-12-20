@@ -1,0 +1,231 @@
+<!-- step 4 -->
+
+<sect1>
+	<title>Step 4 - Implement server side customer list</title>	
+
+	<para>
+		We want to store the customer data in a sqlite database, so we have to
+		prepare the server:
+		<programlisting language='shell'>
+	LoadModules {
+		module /usr/lib/wolframe/modules/mod_db_sqlite3.so
+	}
+		</programlisting>
+	</para>
+	
+	<para>
+		This loads the database driver for Sqlite3. Now we also have to create
+		a database and populate the following schema:
+
+		<programlisting language='shell'>
+	CREATE TABLE Customer (
+		id              INTEGER PRIMARY KEY AUTOINCREMENT,
+		name            TEXT    NOT NULL,
+		address         TEXT
+	);
+		</programlisting>
+	</para>
+	
+	<para>
+		Store this into schema.sql. Then execute:
+
+		<programlisting language='shell'>
+	sqlite3 tutorial.db &lt; schema.sql
+		</programlisting>
+	</para>
+
+	<para>
+		Now we have to tell server to use this sqlite database file:
+
+		<programlisting language='shell'>
+	database {
+		SQLite {
+			identifier	sqlitedb
+			file		tutorial.db
+			foreignKeys	yes
+		}
+	}
+		</programlisting>
+	
+	</para>
+	
+	<para>
+		When we restart the server we see:
+
+		<programlisting language='shell'>
+	DEBUG: SQLite database unit 'sqlitedb' created with 3 connections to file 'tutorial.db'
+		</programlisting>
+	</para>
+	
+	<para>
+		Now we want to use some XML filters to send/receive XML over the protocol,
+		so we have to add the following module to tutorial.conf:
+
+		<programlisting language='shell'>
+	LoadModules {
+		..
+		module /usr/lib/wolframe/modules/mod_filter_libxml2.so
+		..
+	}
+		</programlisting>
+	</para>
+
+	<para>
+		In order to see which modules are currently loaded in the wolframed we can
+		use:
+
+		<programlisting language='shell'>
+	wolframed -p -c tutorial.conf
+		</programlisting>
+	</para>
+
+	<para>
+		We see:
+
+		<programlisting language='shell'>
+	..
+	Module files to load:
+ 	  /usr/lib/wolframe/modules/mod_db_sqlite3.so
+	  /usr/lib/wolframe/modules/mod_filter_libxml2.so
+	..
+		</programlisting>
+		which looks ok.
+	</para>
+	
+	<para>
+		For mapping the requests to programs we need the directmap module. First
+		add to tutorial.conf:
+
+		<programlisting language='shell'>
+	LoadModules {
+		..
+		module /usr/lib/wolframe/modules/mod_command_directmap.so
+		..
+	}
+		</programlisting>
+		and 
+		<programlisting language='shell'>
+	Processor {
+		database sqlitedb
+		cmdhandler {
+			directmap {
+				program tutorial.directmap
+			}
+		}
+	}
+		</programlisting>
+	</para>
+
+	<para>
+		Now we have to a file <filename>tutorial.directmap</filename>.
+		This file maps the requests to the corresponding transaction definitions:
+
+		<programlisting language='shell'>
+	CustomerListRequest = SelectCustomerList( xml );
+		</programlisting>
+
+		This means that we map the 'CustomerListRequest' request which gives us a list
+		of customers to the TDL transaction 'SelectCustomerList'. This also means
+		we need to configure the TDL program in the server:
+
+		<programlisting language='shell'>
+	Processor {
+		program Customer.tdl
+	}
+		</programlisting>
+
+		The <filename>Customer.tdl</filename> file contains the database transaction we want to execute.
+		We also specify that we want the result to be a 'list' which contains
+		'customer' tags with the data per customer:
+
+		<programlisting language='shell'>
+	TRANSACTION SelectCustomerList
+	RESULT INTO list
+	BEGIN
+		INTO customer DO SELECT * from Customer;
+	END
+		</programlisting>
+
+	We also need a validator for the input when the client sends a 'CustomerListRequest'.
+	we install the simple form DDL compilter in 'tutorial.conf' and register the
+	simpleform program to the list of programs:
+
+		<programlisting language='shell'>
+	LoadModules {
+		..
+		module /usr/lib/wolframe/modules/mod_ddlcompiler_simpleform.so
+	}
+
+	Processor {
+		..
+		program CustomerListRequest.simpleform	
+		..
+	}
+		</programlisting>
+
+	and we add a simple form file 'CustomerListRequest.simpleform', for now we
+	can leave it empty but for the root element:
+
+		<programlisting language='shell'>
+	FORM CustomerListRequest
+	{
+		customer {
+		}
+	}
+		</programlisting>
+	</para>
+	
+	<para>
+		Now we create a telnet request, which contains basic authentication and
+		a request for the list of customers 'CustomerListRequest.netcat':
+
+		<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerListRequest.netcat" parse="text" />
+		</programlisting>
+
+		This we can execute with:
+
+		<programlisting language='shell'>
+	netcat -v --wait=2 127.0.0.1 7661 &lt; CustomerListRequest.netcat
+		</programlisting>
+
+		and we get:
+
+		<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerListAnswer.netcat" parse="text" />
+		</programlisting>
+	</para>
+	
+	<para>
+		We got an empty list of customers. So we have successfully configured
+		the server for our first command.
+	</para>
+	
+	<para>
+		Let's also add some demo data now:
+
+		<programlisting language='shell'>
+	cat > data.sql
+	insert into customer(name,address) values('Dr Who','Blue Police Box');
+	insert into customer(name,address) values('John Smith','The Wheel in Space');
+	Ctrl-D
+
+	sqlite3 tutorial.db &lt; data.sql
+		</programlisting>
+	</para>
+
+	<para>
+		When we reexecute the netcat command we see:
+
+		<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerList.xml" parse="text" />
+		</programlisting>
+
+		So, the data is now correctly retrieved from the database.
+	</para>
+		
+	<para>
+		We can move now to the qtclient to make our first request visible.
+
+	</para>
+</sect1>

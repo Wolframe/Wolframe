@@ -42,11 +42,11 @@ man: wolframed.8 wolframe.conf.5
 doc-doxygen:
 	cd $(TOPDIR); doxygen docs/doxygen.conf
 
-doc-html: WolfBook.html
+doc-html: WolfBook.html Tutorial.html
 
 doc-html-chunked: html/index.html
 
-doc-pdf: WolfBook.pdf
+doc-pdf: WolfBook.pdf Tutorial.pdf
 
 .PHONY: depend
 depend:
@@ -84,8 +84,11 @@ wolframed.8: wolframed-man.xml
 wolframe.conf.5: wolframe.conf-man.xml
 	$(XSLT_MAN) $<
 
+Tutorial.html: Tutorial.xml
+
 local_clean:
 	-rm -rf doxygen/* WolfBook.html WolfBook.fop WolfBook.pdf WolfBook.epub
+	-rm -f Tutorial.html Tutorial.pdf
 	-rm -rf html/*
 
 local_distclean:
