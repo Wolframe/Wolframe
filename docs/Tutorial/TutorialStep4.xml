@@ -94,7 +94,7 @@
 	
 	<para>
 		For mapping the requests to programs we need the directmap module. First
-		add to tutorial.conf:
+		add to <filename>tutorial.conf</filename>:
 
 		<programlisting language='shell'>
 	LoadModules {
@@ -147,8 +147,8 @@
 		</programlisting>
 
 	We also need a validator for the input when the client sends a 'CustomerListRequest'.
-	we install the simple form DDL compilter in 'tutorial.conf' and register the
-	simpleform program to the list of programs:
+	we install the simple form DDL compilter in <filename>tutorial.conf</filename> and
+	register the simpleform program to the list of programs:
 
 		<programlisting language='shell'>
 	LoadModules {
@@ -163,8 +163,8 @@
 	}
 		</programlisting>
 
-	and we add a simple form file 'CustomerListRequest.simpleform', for now we
-	can leave it empty but for the root element:
+	and we add a simple form file <filename>CustomerListRequest.simpleform</filename>,
+	for now we can leave it empty but for the root element:
 
 		<programlisting language='shell'>
 	FORM CustomerListRequest
@@ -177,7 +177,8 @@
 	
 	<para>
 		Now we create a telnet request, which contains basic authentication and
-		a request for the list of customers 'CustomerListRequest.netcat':
+		a request for the list of customers, called
+		<filename>CustomerListRequest.netcat</filename>:
 
 		<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerListRequest.netcat" parse="text" />
