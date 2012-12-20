@@ -21,9 +21,3 @@ BEGIN
 	DO INSERT INTO Customer( name, address )
 		VALUES( $(customer/name), $(customer/address) );
 END
-
-TRANSACTION DeleteCustomer
-BEGIN
-	DO DELETE FROM Customer WHERE id=$(customer/id);
-END
-
