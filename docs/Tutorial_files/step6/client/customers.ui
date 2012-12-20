@@ -53,19 +53,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="editButton">
-       <property name="text">
-        <string>Edit</string>
-       </property>
-       <property name="form" stdset="0">
-        <string>customer_edit</string>
-       </property>
-       <property name="global.id" stdset="0">
-        <string>{customer.id}</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="pushButton">
        <property name="text">
         <string>Show</string>

@@ -9,9 +9,3 @@ RESULT INTO customer
 BEGIN
 	INTO . DO SELECT * from Customer WHERE id=$(customer/id);
 END
-
-TRANSACTION UpdateCustomer
-BEGIN
-	DO UPDATE Customer SET name=$(customer/name), address=$(customer/address)
-		WHERE id=$(customer/id);
-END
