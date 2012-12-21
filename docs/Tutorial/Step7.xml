@@ -3,66 +3,101 @@
 <sect1>
 	<title>Step 7 - Editing customer</title>	
 
-We change the show customer use case slightly, so that we can also
-edit the customer in the customer_show.ui form.
+	<para>
+		We change the show customer use case slightly, so that we can also
+		edit the customer in the <filename>customer_show.ui</filename> form.
+	</para>
 
-Let's first make a copy of 'customer_show.ui' and name it 'customer_edit.ui'.
+	<para>
+		Let's first make a copy of <filename>customer_show.ui</filename>
+		and name it <filename>customer_edit.ui</filename>.
+	</para>
+	
+	<para>
+		As before we add first a "Edit" button to the
+		<filename>customers.ui</filename> with 'forms'
+		set to 'customer_edit' and 'global.id' set to '{customer.id}':
+	</para>
 
-As before we add first a "Edit" button to the 'customers.ui' with 'forms'
-set to 'customer_edit' and 'global.id' set to '{customer.id}':
+	<screenshot>
+		<screeninfo>Step 7 customers edit button</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step7_customers_edit_button.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step7_customers_edit_button.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject> 
+		</mediaobject>
+	</screenshot>
 
-(file:step7_customers_edit_button.png)
+	<para>
+		We change the form <filename>customer_edit.ui</filename>
+		and remove the line with 'ID' as we don't need it anymore
+		and because nobody should be able to edit the id of
+		a customer and change it! We also add another button and label it 'Save',
+		this button get the properties 'form' set to 'customers', 'action' set to
+		'update', 'doctype' to 'CustomerUpdate', 'rootelement' to 'customer' and
+		'id' to '{global.id}':
+	</para>
 
-We change the form 'customer_edit.ui' and remove the line with 'ID' as we
-don't need it anymore and because nobody should be able to edit the id of
-a customer and change it! We also add another button and label it 'Save',
-this button get the properties 'form' set to 'customers', 'action' set to
-'update', 'doctype' to 'CustomerUpdate', 'rootelement' to 'customer' and
-'id' to '{global.id}':
-
-(file:step7_customer_edit.png)
-
-The other fields will be sent along automatically in the 'CustomerUpdate' XML request:
+	<screenshot>
+		<screeninfo>Step 7 customers edit form</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step7_customer_edit.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step7_customer_edit.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject> 
+		</mediaobject>
+	</screenshot>
+	
+		The other fields will be sent along automatically in the 'CustomerUpdate' XML request:
 
 	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerUpdate.xml" parse="text" />
 	</programlisting>
 
-Similar to to the "show customer" case we add now a new map:
+		Similar to to the "show customer" case we add now a new map:
 
-editCustomerUpdate = UpdateCustomer( xml );
+	<programlisting language='xml'>
+	editCustomerUpdate = UpdateCustomer( xml );
+	</programlisting>
+	
+		We also add a simple form <filename>CustomerUpdate.simpleform</filename>
+		which looks very similar to the <filename>Customer.simpleform</filename>:
 
-We also add a simple form 'CustomerUpdate.simpleform' which looks very similar
-to the 'Customer.simpleform':
+	<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerUpdate.simpleform" parse="text" />
+	</programlisting>
 
-FORM CustomerUpdate
-{
-	customer
-	{
-		id !@string
-		name string
-		address string
+		add it to <filename>tutorial.conf</filename>:
+
+	<programlisting language='shell'>
+	Processor {
+		...
+		program CustomerUpdate.simpleform
+		...
 	}
-}
+	</programlisting>
+	
+		finally we write the transaction function 'CustomerUpdate' in
+		<filename>Customer.tdl</filename>:
 
-add it to 'tutorial.conf':
-
-Processor {
-	...
-	program CustomerUpdate.simpleform
-	...
-}
-
-finally we write the transaction function 'CustomerUpdate' in 'Customer.tdl':
-
-TRANSACTION UpdateCustomer
-BEGIN
-	DO UPDATE Customer SET name=$(customer/name), address=$(customer/address)
-		WHERE id=$(customer/id);
-END
-
-Note, that this time the database transaction doesn't return a result.
-
-Restart server and client and start to edit the customers.
-
+	<programlisting language='sql'>
+	TRANSACTION UpdateCustomer
+	BEGIN
+		DO UPDATE Customer SET name=$(customer/name), address=$(customer/address)
+			WHERE id=$(customer/id);
+	END
+	</programlisting>
+	
+	<para>
+		Note, that this time the database transaction doesn't return a result.
+	</para>
+	
+	<para>
+		Restart server and client and start to edit the customers.
+	</para>
 </sect1>

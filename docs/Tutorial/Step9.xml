@@ -3,51 +3,69 @@
 <sect1>
 	<title>Step 9 - Delete a customer</title>	
 
-We want to get rid of customers. For this we have to change little
-in the 'custorms.ui' form: a button "Delete" with takes the following properties:
-"action" set to "delete", "doctype" set to "CustomerDelete",
-"rootelement" to "customer", "form" to "customers" (this is the simplest
-way to reload the list of customers after the deletion) and "id" to
-"{customer.id}":
+	<para>
+		We want to get rid of customers. For this we have to change little
+		in the <filename>custorms.ui</filename> form: a button "Delete" with
+		takes the following properties:
+		"action" set to "delete", "doctype" set to "CustomerDelete",
+		"rootelement" to "customer", "form" to "customers" (this is the simplest
+		way to reload the list of customers after the deletion) and "id" to
+		"{customer.id}":
+	</para>
 
-(file:step9_customers_delete_button.png)
+	<screenshot>
+		<screeninfo>Step 9 customers, delete button</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step9_customers_delete_button.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step9_customers_delete_button.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject> 
+		</mediaobject>
+	</screenshot>
 
-We add another map for the 'deleteCustomerDelete' request in 'tutorial.directmap':
+	<para>
+		We add another map for the 'deleteCustomerDelete' request in <filename>tutorial.directmap</filename>:
 
-deleteCustomerDelete = DeleteCustomer( xml );
+	<programlisting language='shell'>
+	deleteCustomerDelete = DeleteCustomer( xml );
+	</programlisting>
+	
+		A new <filename>CustomerDelete.simpleform</filename> which allows us only the specify an 'id'
+		attribute of the customer to delete:
 
-A new 'CustomerDelete.simpleform' which allows us only the specify an 'id'
-attribute of the customer to delete:
+	<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerDelete.simpleform" parse="text" />
+	</programlisting>
 
-FORM CustomerDelete
-{
-	customer {
-		id !@string
+		and in <filename>tutorial.conf</filename>:
+
+	<programlisting language='shell'>
+	Processor {
+		..
+		program CustomerDelete.simpleform
+		..
 	}
-}
+	</programlisting>
+	
+		Finally follows the implementation of the delete transaction
+		in <filename>Customer.tdl</filename>:
 
-and in 'tutorial.conf':
-
-Processor {
-	..
-	program CustomerDelete.simpleform
-	..
-}
-
-Finally follows the implementation of the delete transaction
-in 'Customer.tdl':
-
-TRANSACTION DeleteCustomer
-BEGIN
-	DO DELETE FROM Customer WHERE id=$(customer/id);
-END
-
-Executing the request we see in the qtclient debug output:
+	<programlisting language='sql'>
+	TRANSACTION DeleteCustomer
+	BEGIN
+		DO DELETE FROM Customer WHERE id=$(customer/id);
+	END
+	</programlisting>
+	
+		Executing the request we see in the qtclient debug output:
 
 	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerDelete.xml" parse="text" />
 	</programlisting>
 
-Seems ok, customer gone. :-)
+		Seems ok, customer gone. :-)
+	</para>
 
 </sect1>

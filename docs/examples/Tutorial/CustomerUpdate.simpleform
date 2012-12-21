@@ -1,0 +1,9 @@
+	FORM CustomerUpdate
+	{
+		customer
+		{
+			id !@string
+			name string
+			address string
+		}
+	}

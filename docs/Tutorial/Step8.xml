@@ -3,75 +3,122 @@
 <sect1>
 	<title>Step 8 - Add a new customer</title>	
 
-We also want to add new customers to the list. The "add customer" case
-is very similar to the "edit customer" case.
+	<para>
+		We also want to add new customers to the list. The "add customer" case
+		is very similar to the "edit customer" case.
+	</para>
+	
+	<para>
+		Let's copy the <filename>customer_edit.ui</filename> to
+		<filename>customer_add.ui</filename>. We remove the
+		'initAction' and the other dynamic properties from the form itself as
+		we don't want to read anything when creating a new customer. But of course
+		we could execute here a "Get new customer initial data" request too which
+		initializes certain values.
+	</para>
+	
+	<para>
+		We change the "Save" button and rename it to "Add". We also change the
+		documenttype there from "CustomerUpdate" to 'CustomerCreate' and we remove
+		the 'id' property (as this one is automatically choosen by the sequence
+		in the database). We also have to change the 'action' from 'update' to
+		'create':
+	</para>
 
-Let's copy the 'customer_edit.ui' to 'customer_add.ui'. We remove the
-'initAction' and the other dynamic properties from the form itself as
-we don't want to read anything when creating a new customer. But of course
-we could execute here a "Get new customer initial data" request too which
-initializes certain values.
+	<screenshot>
+		<screeninfo>Step 8 Customer add form</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step8_customer_add.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step8_customer_add.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject> 
+		</mediaobject>
+	</screenshot>
 
-We change the "Save" button and rename it to "Add". We also change the
-documenttype there from "CustomerUpdate" to 'CustomerCreate' and we remove
-the 'id' property (as this one is automatically choosen by the sequence
-in the database). We also have to chaqnge the 'action' from 'update' to
-'create':
+	<para>
+		We also introduce a new element here, the 'initalFocus' property. We
+		set it on the 'name' <classname>QLineWidget</classname>, so that it
+		gets the initial keyboard focus when the form is loaded:
+	</para>
+	
+	<screenshot>
+		<screeninfo>Step 8 Customer add form, initial focus</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step8_customer_add_name_initial_focus.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step8_customer_add_name_initial_focus.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject> 
+		</mediaobject>
+	</screenshot>
 
-(file:step8_customer_add.png)
+	<para>
+		In the <filename>customers.ui</filename> form we have to add a 'Add' button which has one
+		property 'form' with value 'customer_add':
+	</para>
 
-We also introduce a new element here, the 'initalFocus' property. We
-set it on the 'name' QLineWidget, so that it gets the initial keyboard
-focus when the form is loaded:
+	<screenshot>
+		<screeninfo>Step 8 customers add button</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step8_customers_add_button.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step8_customers_add_button.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject> 
+		</mediaobject>
+	</screenshot>
 
-(file:step8_customer_add_name_initial_focus.png)
+	<para>
+		Now for the server side. We add a new mapping for customer creation
+		in <filename>tutorial.directmap</filename>:
 
-In the 'customers.ui' form we have to add a 'Add' button which has one
-property 'form' with value 'customer_add':
+	<programlisting language='shell'>
+	editCustomerUpdate = UpdateCustomer( xml );
+	createCustomerCreate = CreateCustomer( xml );
+	</programlisting>
+	
+		We also have to add the simple form <filename>CustomerCreate.simpleform</filename>:
 
-(file:step8_customers_add_button.png)
+	<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerCreate.simpleform" parse="text" />
+	</programlisting>
 
-Now for the server side. We add a new mapping for customer creation
-in 'tutorial.directmap':
+		This is the same as <filename>CustomerUpdate.simpleform</filename> with the exception that
+		we don't accept an 'id' attribute to be passed to the server.
+	</para>
 
-editCustomerUpdate = UpdateCustomer( xml );
-createCustomerCreate = CreateCustomer( xml );
+	<para>
+		We register this form in <filename>tutorial.conf</filename>:
 
-We also have to add the simple form 'CustomerCreate.simpleform':
-
-FORM CustomerCreate
-{
-	customer
-	{
-		name string
-		address string
+	<programlisting language='shell'>
+	Processor {
+		..
+		program CustomerCreate.simpleform
+		..
 	}
-}
+	</programlisting>
+	
+		Last we add a 'CreateCustomer' transaction function:
 
-This is the same as 'CustomerUpdate.simpleform' with the exception that
-we don't accept an 'id' attribute to be passed to the server.
-
-We register this form in 'tutorial.conf':
-
-Processor {
-	..
-	program CustomerCreate.simpleform
-	..
-}
-
-Last we add a 'CreateCustomer' transaction function:
-
-TRANSACTION CreateCustomer
-BEGIN
-	DO INSERT INTO Customer( name, address )
-		VALUES( $(customer/name), $(customer/address) );
-END
-
-When we restart the server and client we see the following request
-being passed to the wolframe server:
+	<programlisting language='sql'>
+	TRANSACTION CreateCustomer
+	BEGIN
+		DO INSERT INTO Customer( name, address )
+			VALUES( $(customer/name), $(customer/address) );
+	END
+	</programlisting>
+	
+		When we restart the server and client we see the following request
+		being passed to the wolframe server:
 
 	<programlisting language='xml'>
 <xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerCreate.xml" parse="text" />
 	</programlisting>
 
+	</para>
+	
 </sect1>
