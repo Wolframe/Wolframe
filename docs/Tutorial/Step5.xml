@@ -61,51 +61,115 @@
 		</mediaobject>
 	</screenshot>
 
-This means we have to define a new form called 'customers.ui', which will
-show the list of customers, for now we leave it empty. When we start the
-qtclient again and press the "Customer List" button again, we see that
-qtclient again and press the "Customer List" button again, we see that
-the form gets changed to "customer.ui" (empty).
+	<para>
+		This means we have to define a new form called
+		<filename>customers.ui</filename>, which will
+		show the list of customers, for now we leave it empty. When we start the
+		qtclient again and press the "Customer List" button again, we see that
+		qtclient again and press the "Customer List" button again, we see that
+		the form gets changed to the "customer" form (empty).
+	</para>
 
-We add now a QTreeWidget item to the customer.ui form and choose a grid layout
-for the whole form. We change the name of the widget to 'customer':
+	<para>
+		We add now a <classname>QTreeWidget</classname> item to the
+		<filename>customer.ui</filename> form and choose a grid layout
+		for the whole form. We change the name of the widget to 'customer':
+	</para>
 
-(file: step5_customer_treewidget_and_name.png)
+	<screenshot>
+		<screeninfo>Step 5 customer form with tree widget and name</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step5_customer_treewidget_and_name.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step5_customer_treewidget_and_name.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject>
+		</mediaobject>
+	</screenshot>
 
-We also disable the 'rootIsDecorated' tick (we have a list, not a tree of customers).
-We also set 'selectionMode' to 'SingleSelection' and 'selectionBehaviour'
-to 'selectRows' to get the default expected behaviour of a list.
+	<para>
+		We also disable the 'rootIsDecorated' tick (we have a list, not a tree of customers).
+		We also set 'selectionMode' to 'SingleSelection' and 'selectionBehaviour'
+		to 'selectRows' to get the default expected behaviour of a list.
+	</para>
+	
+	<para>
+		Now we change the columns of the list (by double clicking into the widget data area):
+	</para>
+	
+	<screenshot>
+		<screeninfo>Step 5 customer form with tree widget and columns names</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step5_customer_column_names.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step5_customer_column_names.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject>
+		</mediaobject>
+	</screenshot>
 
-Now we change the columns of the list (by double clicking into the widget data area):
+	<para>
+		Now we add the 'doctype' and 'rootelement' dynamic properties to the
+		customer list widget, so that it loads the domain when the form is loaded.
+		The request to send is the 'CustomerListRequest' with root element 'customer'
+		we have configured before in the server:
+	</para>
 
-(file: step5_customer_column_names.png)
+	<screenshot>
+		<screeninfo>Step 5 customer form, doctype and root element</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step5_customer_doctype_rootelement.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step5_customer_doctype_rootelement.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject>
+		</mediaobject>
+	</screenshot>
+	
+	<para>
+		When we start the qtclient, we get a funny error message:
+	</para>
 
-Now we add the 'doctype' and 'rootelement' dynamic properties to the
-customer list widget, so that it loads the domain when the form is loaded.
-The request to send is the 'CustomerListRequest' with root element 'customer'
-we have configured before in the server:
+	<programlisting language='shell'>
+	Error calling procedure: unknown attribute  (id) at /customer
+	</programlisting>
 
-(file:step5_customer_doctype_rootelement.png)
- 
-When we start the qtclient, we get a funny error message:
-
-Error calling procedure: unknown attribute  (id) at /customer
-
-This means we have to configure the id attribute in the server in the simpleform.
-The qtclient adds a id automatically to the customer tag in the request.
-
-We declare the customer to have an optional 'id' attribute in
-'CustomerListRequest.simpleform':
-
-FORM CustomerListRequest
-{
-	customer {
-		id ?@string
+	<para>
+		This means we have to configure the id attribute in the server in the simpleform.
+		The qtclient adds a id automatically to the customer tag in the request.
+	</para>
+	
+	<para>
+		We declare the customer to have an optional 'id' attribute in
+		'CustomerListRequest.simpleform':
+	</para>
+	
+	<programlisting language='shell'>
+	FORM CustomerListRequest
+	{
+		customer {
+			id ?@string
+		}
 	}
-}
+	</programlisting>
+	
+	<para>
+		If we restart the server and run qtclient again we get the desired result:
+	</para>
 
-If we restart the server and run qtclient again we get the desired result:
-
-(file:step5_customers_list.png)
+	<screenshot>
+		<screeninfo>Step 5 customer list</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step5_customers_list.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step5_customers_list.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject>
+		</mediaobject>
+	</screenshot>
 
 </sect1>
