@@ -1,0 +1,89 @@
+<!-- step 5 -->
+
+<sect1>
+	<title>Step 5 - Implement client side customer list</title>	
+
+	<para>
+		It's time now to get something visual working, so we start to add a first
+		simple interface to our qtclient.
+	</para>
+	
+	<para>
+		For this we need the 'Qt designer'. We open the file 
+		<filename>~/tutorial/client/init.ui</filename> again
+		draw a single button with the text "Customer List":
+	</para>
+
+	<screenshot>
+		<screeninfo>Step 5 customer button</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="examples/clients/simple_form.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="examples/clients/simple_form.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject> 
+		</mediaobject>
+	</screenshot>
+	
+(file: step5_customer_button.png)
+
+We add a dynamic property 'form' of type String to this button, which has
+the value 'customers':
+
+(file: step5_customer_button_form_property.png)
+
+When we save the form and start the qtclient, we get (after logging in) the
+first page with the "Customer List" button. Pressing it gives the error
+message:
+
+(file: step5_customer_button_pressed_error.png)
+
+This means we have to define a new form called 'customers.ui', which will
+show the list of customers, for now we leave it empty. When we start the
+qtclient again and press the "Customer List" button again, we see that
+qtclient again and press the "Customer List" button again, we see that
+the form gets changed to "customer.ui" (empty).
+
+We add now a QTreeWidget item to the customer.ui form and choose a grid layout
+for the whole form. We change the name of the widget to 'customer':
+
+(file: step5_customer_treewidget_and_name.png)
+
+We also disable the 'rootIsDecorated' tick (we have a list, not a tree of customers).
+We also set 'selectionMode' to 'SingleSelection' and 'selectionBehaviour'
+to 'selectRows' to get the default expected behaviour of a list.
+
+Now we change the columns of the list (by double clicking into the widget data area):
+
+(file: step5_customer_column_names.png)
+
+Now we add the 'doctype' and 'rootelement' dynamic properties to the
+customer list widget, so that it loads the domain when the form is loaded.
+The request to send is the 'CustomerListRequest' with root element 'customer'
+we have configured before in the server:
+
+(file:step5_customer_doctype_rootelement.png)
+ 
+When we start the qtclient, we get a funny error message:
+
+Error calling procedure: unknown attribute  (id) at /customer
+
+This means we have to configure the id attribute in the server in the simpleform.
+The qtclient adds a id automatically to the customer tag in the request.
+
+We declare the customer to have an optional 'id' attribute in
+'CustomerListRequest.simpleform':
+
+FORM CustomerListRequest
+{
+	customer {
+		id ?@string
+	}
+}
+
+If we restart the server and run qtclient again we get the desired result:
+
+(file:step5_customers_list.png)
+
+</sect1>

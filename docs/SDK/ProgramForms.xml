@@ -60,7 +60,7 @@
 	<para>
 		The following example shows a form defined in simple form DDL.
 		<programlisting language='text'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/customers.simpleform" parse="text" />
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/customers.simpleform" parse="text" />
 		</programlisting>
 	</para>
 	</sect2>
@@ -75,13 +75,13 @@
 		<para>Header file "customers.hpp": Declare the structure and the serialization description of the structure.
 		Structures may contain structures with ther own serialization description.</para>
 		<programlisting language='text'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/customers.hpp" parse="text" />
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/customers.hpp" parse="text" />
 		</programlisting>
 		</sect3>
 		<sect3>
 		<para>Source file "customers.cpp". Declare 'ID' as attribute and name, canonical_Name, country, locality as tags. The '--' operator marks the end of attributes section and the start of content section.</para>
 		<programlisting language='text'>
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/customers.cpp" parse="text" />
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/customers.cpp" parse="text" />
 		</programlisting>
 		</sect3>
 	</para>
