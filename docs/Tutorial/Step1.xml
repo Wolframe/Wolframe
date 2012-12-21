@@ -1,0 +1,99 @@
+<!-- step1 -->
+
+<sect1>
+	<title>Step 1 - Basic connectivity</title>	
+
+	<para>
+		We have to set up the wolframed daemon with a running configuration file:
+		<programlisting language='shell'>
+	cd ~/tutorial/server
+		</programlisting>
+	</para>
+	
+	<para>
+		We create the central confuguration file of the server <filename>tutorial.conf</filename>:
+
+		<programlisting language='shell'>
+	; we install a verbose default logger to the shell
+	logging	{
+		stderr	{
+			level DEBUG
+		}
+	}
+
+	; one connection, one thread is enough
+	listen	{
+		maxConnections 1
+		threads 1
+		socket	{
+			address		*
+			port		7661
+			maxConnections	1
+		}
+	}
+
+	; the server wont start without it
+	ServerTokens OS
+		</programlisting>
+	</para>
+		
+	<para>
+		We can start the server now in the shell foreground with:
+
+		<programlisting language='shell'>
+	/usr/sbin/wolframed -f -c tutorial.conf
+		</programlisting>
+	</para>
+	
+	<para>
+		We see the following output of the server in the shell:
+		
+		<programlisting language='shell'>
+	NOTICE: Starting server
+	DEBUG: Random generator initialized. Using device '/dev/urandom'
+	DEBUG: AAAA database references resolved
+	INFO: Accepting connections on ::1:7661
+	DEBUG: 1 network acceptor(s) created.
+	DEBUG: 0 network SSL acceptor(s) created.
+		</programlisting>
+
+	</para>
+	
+	<para>
+		The server is up and listening to port 7661. The server can be stopped
+		anytime by pressing
+		<keycombo>
+			<keycap>Ctrl</keycap>
+			<keycap>C</keycap>
+		</keycombo>.
+	</para>
+	
+	<para>
+		If we use a telnet to connect to the server with:
+
+		<programlisting language='shell'>
+	telnet localhost 7661
+		</programlisting>
+	</para>
+
+	<para>
+		we get:
+
+		<programlisting language='shell'>
+	Access denied.
+		</programlisting>
+	</para>
+	
+	<para>
+		The server tells us:
+
+		<programlisting language='shell'>
+	DEBUG: Connection from ::1:52134 to localhost:7661 not authorized
+	DEBUG: Connection to ::1:52134 closed
+		</programlisting>
+	</para>
+	
+	<para>
+		So we have to configure some basic authorization first.
+	</para>
+</sect1>

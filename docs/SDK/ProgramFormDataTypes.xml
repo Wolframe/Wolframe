@@ -21,7 +21,7 @@
 	</para>
 	<para>
 		<programlisting language='text'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/example_1.normalize" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/example_1.normalize" parse="text" />
 		</programlisting>
 	</para>
 	</sect2>

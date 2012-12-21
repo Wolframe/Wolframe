@@ -23,7 +23,7 @@
 	</para>
 	<para>
 		<programlisting language='text'>
-		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/tutorial/first_example.directmap" parse="text" />
+		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/first_example.directmap" parse="text" />
 		</programlisting>
 	</para>
 	</sect2>

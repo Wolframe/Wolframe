@@ -122,10 +122,10 @@
 				<screeninfo>Simple Qt data input form</screeninfo>
 				<mediaobject>
 					<imageobject role="html"> 
-						<imagedata fileref="examples/clients/simple_form.png" format="PNG"/>
+						<imagedata fileref="images/clients/simple_form.png" format="PNG"/>
 					</imageobject> 
 					<imageobject role="fo"> 
-						<imagedata fileref="examples/clients/simple_form.png" format="PNG" width="100%" scalefit="1"/>
+						<imagedata fileref="images/clients/simple_form.png" format="PNG" width="100%" scalefit="1"/>
 					</imageobject> 
 				</mediaobject>
 			</screenshot>
@@ -143,10 +143,10 @@
 				<screeninfo>More complex Qt data input form</screeninfo>
 				<mediaobject>
 					<imageobject role="html"> 
-						<imagedata fileref="examples/clients/complex_form.png" format="PNG"/>
+						<imagedata fileref="images/clients/complex_form.png" format="PNG"/>
 					</imageobject> 
 					<imageobject role="fo"> 
-						<imagedata fileref="examples/clients/complex_form.png" format="PNG" width="100%" scalefit="1"/>
+						<imagedata fileref="images/clients/complex_form.png" format="PNG" width="100%" scalefit="1"/>
 					</imageobject> 
 				</mediaobject>
 			</screenshot>
@@ -213,10 +213,10 @@
 					<screeninfo>Attach form dynamic property to a push button</screeninfo>
 					<mediaobject>
 						<imageobject role="html"> 
-							<imagedata fileref="examples/clients/action_on_pushbutton.png" format="PNG"/>
+							<imagedata fileref="images/clients/action_on_pushbutton.png" format="PNG"/>
 						</imageobject> 
 						<imageobject role="fo"> 
-							<imagedata fileref="examples/clients/action_on_pushbutton.png" format="PNG" width="100%" scalefit="1"/>
+							<imagedata fileref="images/clients/action_on_pushbutton.png" format="PNG" width="100%" scalefit="1"/>
 						</imageobject> 
 					</mediaobject>
 				</screenshot>
@@ -260,10 +260,10 @@
 					<screeninfo>Attach form dynamic property to a push button</screeninfo>
 					<mediaobject>
 						<imageobject role="html"> 
-							<imagedata fileref="examples/clients/action_add.png" format="PNG"/>
+							<imagedata fileref="images/clients/action_add.png" format="PNG"/>
 						</imageobject> 
 						<imageobject role="fo"> 
-							<imagedata fileref="examples/clients/action_add.png" format="PNG" width="100%" scalefit="1"/>
+							<imagedata fileref="images/clients/action_add.png" format="PNG" width="100%" scalefit="1"/>
 						</imageobject> 
 					</mediaobject>
 				</screenshot>
@@ -284,10 +284,10 @@
 					<screeninfo>A push button with deletes a customer</screeninfo>
 					<mediaobject>
 						<imageobject role="html"> 
-							<imagedata fileref="examples/clients/action_delete.png" format="PNG"/>
+							<imagedata fileref="images/clients/action_delete.png" format="PNG"/>
 						</imageobject> 
 						<imageobject role="fo"> 
-							<imagedata fileref="examples/clients/action_delete.png" format="PNG" width="100%" scalefit="1"/>
+							<imagedata fileref="images/clients/action_delete.png" format="PNG" width="100%" scalefit="1"/>
 						</imageobject> 
 					</mediaobject>
 				</screenshot>
@@ -342,10 +342,10 @@
 					<screeninfo>A push button with deletes a customer</screeninfo>
 					<mediaobject>
 						<imageobject role="html"> 
-							<imagedata fileref="examples/clients/domain_load.png" format="PNG"/>
+							<imagedata fileref="images/clients/domain_load.png" format="PNG"/>
 						</imageobject> 
 						<imageobject role="fo"> 
-							<imagedata fileref="examples/clients/domain_load.png" format="PNG" width="100%" scalefit="1"/>
+							<imagedata fileref="images/clients/domain_load.png" format="PNG" width="100%" scalefit="1"/>
 						</imageobject> 
 					</mediaobject>
 				</screenshot>
@@ -356,10 +356,10 @@
 					<screeninfo>A push button with deletes a customer</screeninfo>
 					<mediaobject>
 						<imageobject role="html"> 
-							<imagedata fileref="examples/clients/domain_load_search.png" format="PNG"/>
+							<imagedata fileref="images/clients/domain_load_search.png" format="PNG"/>
 						</imageobject> 
 						<imageobject role="fo"> 
-							<imagedata fileref="examples/clients/domain_load_search.png" format="PNG" width="100%" scalefit="1"/>
+							<imagedata fileref="images/clients/domain_load_search.png" format="PNG" width="100%" scalefit="1"/>
 						</imageobject> 
 					</mediaobject>
 				</screenshot>
@@ -403,10 +403,10 @@
 					<screeninfo>A searchable list with domain reload</screeninfo>
 					<mediaobject>
 						<imageobject role="html"> 
-							<imagedata fileref="examples/clients/domain_reload.png" format="PNG"/>
+							<imagedata fileref="images/clients/domain_reload.png" format="PNG"/>
 						</imageobject> 
 						<imageobject role="fo"> 
-							<imagedata fileref="examples/clients/domain_reload.png" format="PNG" width="100%" scalefit="1"/>
+							<imagedata fileref="images/clients/domain_reload.png" format="PNG" width="100%" scalefit="1"/>
 						</imageobject> 
 					</mediaobject>
 				</screenshot>
@@ -417,10 +417,10 @@
 					<screeninfo>Signals of the searchable list with domain reload</screeninfo>
 					<mediaobject>
 						<imageobject role="html"> 
-							<imagedata fileref="examples/clients/domain_reload_signals.png" format="PNG"/>
+							<imagedata fileref="images/clients/domain_reload_signals.png" format="PNG"/>
 						</imageobject> 
 						<imageobject role="fo"> 
-							<imagedata fileref="examples/clients/domain_reload_signals.png" format="PNG" width="100%" scalefit="1"/>
+							<imagedata fileref="images/clients/domain_reload_signals.png" format="PNG" width="100%" scalefit="1"/>
 						</imageobject> 
 					</mediaobject>
 				</screenshot>
@@ -512,10 +512,10 @@
 					<screeninfo>A list of customers with global.id</screeninfo>
 					<mediaobject>
 						<imageobject role="html"> 
-							<imagedata fileref="examples/clients/customers.png" format="PNG"/>
+							<imagedata fileref="images/clients/customers.png" format="PNG"/>
 						</imageobject> 
 						<imageobject role="fo"> 
-							<imagedata fileref="examples/clients/customers.png" format="PNG" width="100%" scalefit="1"/>
+							<imagedata fileref="images/clients/customers.png" format="PNG" width="100%" scalefit="1"/>
 						</imageobject> 
 					</mediaobject>
 				</screenshot>
@@ -528,10 +528,10 @@
 					<screeninfo>global.id in edit form</screeninfo>
 					<mediaobject>
 						<imageobject role="html"> 
-							<imagedata fileref="examples/clients/customer_edit_initaction.png" format="PNG"/>
+							<imagedata fileref="images/clients/customer_edit_initaction.png" format="PNG"/>
 						</imageobject> 
 						<imageobject role="fo"> 
-							<imagedata fileref="examples/clients/customer_edit_initaction.png" format="PNG" width="100%" scalefit="1"/>
+							<imagedata fileref="images/clients/customer_edit_initaction.png" format="PNG" width="100%" scalefit="1"/>
 						</imageobject> 
 					</mediaobject>
 				</screenshot>
@@ -543,10 +543,10 @@
 					<screeninfo>A searchable list with domain reload</screeninfo>
 					<mediaobject>
 						<imageobject role="html"> 
-							<imagedata fileref="examples/clients/customer_edit_save.png" format="PNG"/>
+							<imagedata fileref="images/clients/customer_edit_save.png" format="PNG"/>
 						</imageobject> 
 						<imageobject role="fo"> 
-							<imagedata fileref="examples/clients/customer_edit_save.png" format="PNG" width="100%" scalefit="1"/>
+							<imagedata fileref="images/clients/customer_edit_save.png" format="PNG" width="100%" scalefit="1"/>
 						</imageobject> 
 					</mediaobject>
 				</screenshot>

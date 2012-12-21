@@ -1,0 +1,25 @@
+<!-- Wolframe Tutorial -->
+
+<!ENTITY TutorialPreface		SYSTEM "Preface.xml">
+
+<!ENTITY TutorialIntroduction		SYSTEM "Introduction.xml">
+
+<!ENTITY TutorialSteps			SYSTEM "Steps.xml">
+
+<!ENTITY TutorialStep1			SYSTEM "Step1.xml">
+
+<!ENTITY TutorialStep2			SYSTEM "Step2.xml">
+
+<!ENTITY TutorialStep3			SYSTEM "Step3.xml">
+
+<!ENTITY TutorialStep4			SYSTEM "Step4.xml">
+
+<!ENTITY TutorialStep5			SYSTEM "Step5.xml">
+
+<!ENTITY TutorialStep6			SYSTEM "Step6.xml">
+
+<!ENTITY TutorialStep7			SYSTEM "Step7.xml">
+
+<!ENTITY TutorialStep8			SYSTEM "Step8.xml">
+
+<!ENTITY TutorialStep9			SYSTEM "Step9.xml">

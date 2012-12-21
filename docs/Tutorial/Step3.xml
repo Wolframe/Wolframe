@@ -1,0 +1,71 @@
+<!-- step 3 -->
+
+<sect1>
+	<title>Step 3 - Get the whole chain working</title>	
+
+	<para>
+		Now that we have ensured that basic connectivity to the Wolframe server
+		is available, we can configure the basics for the Qt client.
+	</para>
+	
+	<para>
+		We copy the windows theme files <filename>MainWindow.ui</filename> and
+		<filename>MainWindow.qss</filename> to
+		<filename>~/tutorial/client/themes/windows</filename>.
+	</para>
+	
+	<para>
+		We create a client configuration file <filename>~/tutorial/client/client.conf</filename>
+		containing:
+		<programlisting language='shell'>
+	[wolframe]
+	host=localhost
+	port=7661
+	secure=false
+	checkSSL=true
+	client-cert-file=./certs/client.crt
+	client-key-file=./private/client.key
+	ca-cert-file=./certs/CAclient.cert.pem
+	uiloadmode=LocalFile
+	dataloadmode=Network
+	dbname=./apps/test/data.db
+	debug=false
+	uiFormDir=.
+	uiFormTranslationsDir=.
+	uiFormResourcesDir=.
+	dataLoaderDir=.
+	locale=en_US
+		</programlisting>
+	</para>
+	
+	<para>
+		Mow when we start the client with:
+
+		<programlisting language='shell'>
+	qtclient -s tutorial.conf -d
+		</programlisting>
+	</para>
+	
+	<para>
+		We get a login screen were we just hit the "Login" button.
+	</para>
+
+	<para>
+		We get an empty window, we can go to "Help", "Debug Terminal". Also
+		here we can test the protocol as in a telnet client.
+	</para>
+	
+	<para>
+		Type <userinput>quit</userinput>, then <keycap>Enter</keycap>
+		in the debug window or exit the Qt application over the menu.
+	</para>
+	
+	<para>
+		We start now the Qt designer and create an empty QWidget form named
+		<filename>~/tutorial/client/init.ui</filename> and save it.
+		If we start the server now we see the same empty window again,
+		but this time it's the dynamically loaded initial form
+		(which is again empty).
+	</para>
+</sect1>
+

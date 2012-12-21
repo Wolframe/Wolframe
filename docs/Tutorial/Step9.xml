@@ -1,0 +1,53 @@
+<!-- step 9 -->
+
+<sect1>
+	<title>Step 9 - Delete a customer</title>	
+
+We want to get rid of customers. For this we have to change little
+in the 'custorms.ui' form: a button "Delete" with takes the following properties:
+"action" set to "delete", "doctype" set to "CustomerDelete",
+"rootelement" to "customer", "form" to "customers" (this is the simplest
+way to reload the list of customers after the deletion) and "id" to
+"{customer.id}":
+
+(file:step9_customers_delete_button.png)
+
+We add another map for the 'deleteCustomerDelete' request in 'tutorial.directmap':
+
+deleteCustomerDelete = DeleteCustomer( xml );
+
+A new 'CustomerDelete.simpleform' which allows us only the specify an 'id'
+attribute of the customer to delete:
+
+FORM CustomerDelete
+{
+	customer {
+		id !@string
+	}
+}
+
+and in 'tutorial.conf':
+
+Processor {
+	..
+	program CustomerDelete.simpleform
+	..
+}
+
+Finally follows the implementation of the delete transaction
+in 'Customer.tdl':
+
+TRANSACTION DeleteCustomer
+BEGIN
+	DO DELETE FROM Customer WHERE id=$(customer/id);
+END
+
+Executing the request we see in the qtclient debug output:
+
+	<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerDelete.xml" parse="text" />
+	</programlisting>
+
+Seems ok, customer gone. :-)
+
+</sect1>
