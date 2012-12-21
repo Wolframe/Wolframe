@@ -66,6 +66,10 @@ public:
 	{
 		return m_createFunc();
 	}
+	const std::string& name() const
+	{
+		return m_name;
+	}
 
 private:
 	std::string m_classname;
@@ -91,6 +95,11 @@ public:
 	{
 		return new DDLCompilerConstructor( m_className, m_name, m_createFunc);
 	}
+	const char* name() const
+	{
+		return m_name;
+	}
+
 private:
 	const char* m_name;
 	ddl::CreateDDLCompilerFunc m_createFunc;

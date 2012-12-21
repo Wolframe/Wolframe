@@ -82,10 +82,10 @@ void DirectmapCommandHandler::initcall()
 	{
 		filtername = m_cmd->filter;
 	}
-	m_function = m_provider->transactionFunction( m_cmd->call);
+	m_function = m_provider->formFunction( m_cmd->call);
 	if (!m_function)
 	{
-		throw std::runtime_error( std::string( "transaction function not defined '") + m_cmd->call + "'");
+		throw std::runtime_error( std::string( "function not defined '") + m_cmd->call + "'");
 	}
 	types::CountedReference<langbind::Filter> filter( m_provider->filter( filtername, ""));
 	if (!filter.get())
@@ -180,7 +180,7 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				m_state = 3;
 				/* no break here ! */
 			case 3:
-				m_functionclosure.reset( new TransactionFunctionClosure( m_function));
+				m_functionclosure.reset( m_function->createClosure());
 				m_functionclosure->init( m_provider, m_input);
 				m_state = 4;
 				/* no break here ! */

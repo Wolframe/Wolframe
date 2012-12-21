@@ -91,14 +91,6 @@ public:
 	cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
 	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command) const;
 
-	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
-	const ddl::Form* form( const std::string& name ) const;
-	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
-
-	langbind::BuiltInFunction* formfunction( const std::string& name) const;
-	const prnt::PrintFunction* printFunction( const std::string& name) const;
-	const db::TransactionFunction* transactionFunction( const std::string& name) const;
-
 	std::string xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const;
 
 	db::Database* transactionDatabase() const;
@@ -117,9 +109,10 @@ public:
 		return std::map<std::string,std::string>();
 	}
 
-	void defineFunction( const std::string& name, langbind::FormFunctionR func);
-	void defineForm( const std::string& name, const ddl::Form& f);
-	const ddl::TypeMap* formtypemap() const;
+	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
+	const langbind::FormFunction* formFunction( const std::string& name) const;
+	const ddl::Form* form( const std::string& name) const;
+	langbind::Filter* filter( const std::string& name, const std::string& arg) const;
 
 private:
 	class ProcessorProvider_Impl;

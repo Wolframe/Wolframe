@@ -216,16 +216,6 @@ bool ProcessorProvider::loadPrograms()
 	return m_impl->loadPrograms();
 }
 
-langbind::Filter* ProcessorProvider::filter( const std::string& name, const std::string& arg ) const
-{
-	return m_impl->filter( name, arg );
-}
-
-langbind::BuiltInFunction* ProcessorProvider::formfunction( const std::string& name) const
-{
-	return m_impl->formfunction( name );
-}
-
 cmdbind::CommandHandler* ProcessorProvider::cmdhandler( const std::string& name ) const
 {
 	cmdbind::CommandHandler* rt = m_impl->cmdhandler( name );
@@ -238,26 +228,6 @@ cmdbind::IOFilterCommandHandler* ProcessorProvider::iofilterhandler( const std::
 	cmdbind::IOFilterCommandHandler* rt = m_impl->iofilterhandler( name );
 	if (rt) rt->setProcProvider( this);
 	return rt;
-}
-
-const ddl::Form* ProcessorProvider::form( const std::string& name) const
-{
-	return m_impl->form( name);
-}
-
-const prnt::PrintFunction* ProcessorProvider::printFunction( const std::string& name) const
-{
-	return m_impl->printFunction( name);
-}
-
-const langbind::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const
-{
-	return m_impl->normalizeFunction( name );
-}
-
-const db::TransactionFunction* ProcessorProvider::transactionFunction( const std::string& name) const
-{
-	return m_impl->transactionFunction( name);
 }
 
 std::string ProcessorProvider::xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const
@@ -280,19 +250,24 @@ db::Transaction* ProcessorProvider::transaction( const std::string& name ) const
 	return m_impl->transaction( name );
 }
 
-void ProcessorProvider::defineFunction( const std::string& name, langbind::FormFunctionR func)
+const langbind::NormalizeFunction* ProcessorProvider::normalizeFunction( const std::string& name) const
 {
-	m_impl->defineFunction( name, func);
+	return m_impl->normalizeFunction( name);
 }
 
-void ProcessorProvider::defineForm( const std::string& name, const ddl::Form& f)
+const langbind::FormFunction* ProcessorProvider::formFunction( const std::string& name) const
 {
-	m_impl->defineForm( name, f);
+	return m_impl->formFunction( name);
 }
 
-const ddl::TypeMap* ProcessorProvider::formtypemap() const
+const ddl::Form* ProcessorProvider::form( const std::string& name) const
 {
-	return m_impl->formtypemap();
+	return m_impl->form( name);
+}
+
+langbind::Filter* ProcessorProvider::filter( const std::string& name, const std::string& arg) const
+{
+	return m_impl->filter( name, arg);
 }
 
 }} // namespace _Wolframe::proc

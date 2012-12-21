@@ -40,18 +40,8 @@
 #include "processor/procProvider.hpp"
 #include "database/database.hpp"
 #include "database/DBprovider.hpp"
-#include "module/filterBuilder.hpp"
-#include "module/ddlcompilerBuilder.hpp"
-#include "module/builtInFunctionBuilder.hpp"
-#include "module/ddlcompilerBuilder.hpp"
-#include "module/printFunctionBuilder.hpp"
-#include "module/normalizeFunctionBuilder.hpp"
 #include "cmdbind/commandHandlerUnit.hpp"
-#include "langbind/normalizeProgram.hpp"
-#include "database/transactionProgram.hpp"
-#include "langbind/formFunction.hpp"
-#include "langbind/formLibrary.hpp"
-#include "langbind/printProgram.hpp"
+#include "prgbind/programLibrary.hpp"
 #include <list>
 #include <map>
 
@@ -71,62 +61,30 @@ public:
 	cmdbind::CommandHandler* cmdhandler( const std::string& command) const;
 	cmdbind::IOFilterCommandHandler* iofilterhandler( const std::string& command ) const;
 
-	langbind::Filter* filter( const std::string& name, const std::string& arg ) const;
-	langbind::BuiltInFunction* formfunction( const std::string& name ) const;
-	const ddl::Form* form( const std::string& name ) const;
-	const prnt::PrintFunction* printFunction( const std::string& name) const;
-	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
 	std::string xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const;
 
 	const UI::UserInterfaceLibrary* UIlibrary() const;
 
 	db::Database* transactionDatabase( bool suppressAlert=false) const;
 	db::Transaction* transaction( const std::string& name ) const;
-	const db::TransactionFunction* transactionFunction( const std::string& name ) const;
 
-	void defineFunction( const std::string& name, langbind::FormFunctionR func)
-	{
-		m_formFunctionLibrary.insert( name, func);
-	}
-	void defineForm( const std::string& name, const ddl::Form& f)
-	{
-		m_formLibrary.insert( name, f);
-	}
-	const ddl::TypeMap* formtypemap() const
-	{
-		return m_formtypemap.get();
-	}
+	const langbind::NormalizeFunction* normalizeFunction( const std::string& name) const;
+	const langbind::FormFunction* formFunction( const std::string& name) const;
+	const ddl::Form* form( const std::string& name) const;
+	langbind::Filter* filter( const std::string& name, const std::string& arg) const;
 
 	bool loadPrograms();
-
-private:
-	class DDLTypeMap;
 
 private:
 	std::string					m_dbLabel;
 	db::Database*					m_db;
 
-	std::list< cmdbind::CommandHandlerConstructor* >	m_cmd;
+	std::list<cmdbind::CommandHandlerConstructor*>	m_cmd;
 	typedef std::map< std::string, std::pair<cmdbind::CommandHandlerConstructor*, config::NamedConfiguration*> > CmdMap;
 	CmdMap	m_cmdMap;
 
-	std::list< module::FilterConstructor* >	m_filter;
-	std::map< std::string, const module::FilterConstructor* >	m_filterMap;
-
-	std::list< module::BuiltInFunctionConstructor* >	m_formfunction;
-	std::map< std::string, const module::BuiltInFunctionConstructor* >	m_formfunctionMap;
-
-	std::list< std::string >	m_programfiles;
-	db::TransactionProgram	m_dbprogram;
-	langbind::NormalizeProgram	m_normprogram;
-	ddl::TypeMapR		m_formtypemap;
-	langbind::FormLibrary	m_formlibrary;
-	langbind::PrintProgram	m_printprogram;
-
-	types::keymap<langbind::NormalizeFunctionConstructorR> m_normalizeFunctionConstructorMap;
-	types::keymap<langbind::FormFunctionR> m_formFunctionLibrary;
+	std::list<std::string> m_programfiles;
 	prgbind::ProgramLibrary* m_programs;
-	types::keymap<ddl::Form> m_formLibrary;
 };
 
 }} // namespace _Wolframe::proc

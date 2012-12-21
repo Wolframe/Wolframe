@@ -79,6 +79,7 @@ private:
 
 typedef boost::shared_ptr<module::PrintFunctionConstructor> PrintFunctionConstructorR;
 
+
 class PrintFunctionBuilder :public SimpleBuilder
 {
 public:

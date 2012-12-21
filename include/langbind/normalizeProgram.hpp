@@ -42,8 +42,6 @@
 namespace _Wolframe {
 namespace langbind {
 
-typedef boost::shared_ptr<module::NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
-
 class NormalizeProgram
 	:public types::keymap<NormalizeFunctionR>
 {
@@ -58,10 +56,10 @@ public:
 	bool is_mine( const std::string& filename) const;
 
 	std::vector<std::pair<std::string,NormalizeFunctionR> >
-		load( const std::string& source, const types::keymap<NormalizeFunctionConstructorR>& constructormap);
+		load( const std::string& source, const types::keymap<module::NormalizeFunctionConstructorR>& constructormap);
 
 	std::vector<std::pair<std::string,NormalizeFunctionR> >
-		loadfile( const std::string& filename, const types::keymap<NormalizeFunctionConstructorR>& constructormap);
+		loadfile( const std::string& filename, const types::keymap<module::NormalizeFunctionConstructorR>& constructormap);
 
 	const NormalizeFunction* get( const std::string& name) const
 	{
@@ -70,7 +68,7 @@ public:
 	}
 
 private:
-	NormalizeFunction* createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg, const types::keymap<NormalizeFunctionConstructorR>& constructormap);
+	NormalizeFunction* createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg, const types::keymap<module::NormalizeFunctionConstructorR>& constructormap);
 };
 
 }}

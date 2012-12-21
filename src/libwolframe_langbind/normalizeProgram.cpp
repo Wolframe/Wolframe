@@ -47,7 +47,7 @@ bool NormalizeProgram::is_mine( const std::string& filename) const
 	return (boost::iequals( ext, ".normalize"));
 }
 
-std::vector<std::pair<std::string,NormalizeFunctionR> > NormalizeProgram::loadfile( const std::string& filename, const types::keymap<NormalizeFunctionConstructorR>& constructormap)
+std::vector<std::pair<std::string,NormalizeFunctionR> > NormalizeProgram::loadfile( const std::string& filename, const types::keymap<module::NormalizeFunctionConstructorR>& constructormap)
 {
 	try
 	{
@@ -63,10 +63,10 @@ std::vector<std::pair<std::string,NormalizeFunctionR> > NormalizeProgram::loadfi
 	}
 }
 
-NormalizeFunction* NormalizeProgram::createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg, const types::keymap<NormalizeFunctionConstructorR>& constructormap)
+NormalizeFunction* NormalizeProgram::createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg, const types::keymap<module::NormalizeFunctionConstructorR>& constructormap)
 {
 	if (domain.empty()) throw std::runtime_error( "namespace of function not defined");
-	types::keymap<NormalizeFunctionConstructorR>::const_iterator bi = constructormap.find( domain);
+	types::keymap<module::NormalizeFunctionConstructorR>::const_iterator bi = constructormap.find( domain);
 	if (bi == constructormap.end()) throw std::runtime_error( std::string("no constructor for namespace '") + domain + "' defined");
 	try
 	{
@@ -118,7 +118,7 @@ private:
 };
 
 
-std::vector<std::pair<std::string,NormalizeFunctionR> > NormalizeProgram::load( const std::string& source, const types::keymap<NormalizeFunctionConstructorR>& constructormap)
+std::vector<std::pair<std::string,NormalizeFunctionR> > NormalizeProgram::load( const std::string& source, const types::keymap<module::NormalizeFunctionConstructorR>& constructormap)
 {
 	std::vector<std::pair<std::string,NormalizeFunctionR> > rt;
 	config::PositionalErrorMessageBase ERROR(source);

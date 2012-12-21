@@ -138,7 +138,7 @@ class ProgramLibrary::Impl
 	:public ddl::TypeMap
 {
 public:
-	types::keymap<langbind::NormalizeFunctionConstructorR> m_normalizeFunctionConstructorMap;
+	types::keymap<module::NormalizeFunctionConstructorR> m_normalizeFunctionConstructorMap;
 	types::keymap<langbind::NormalizeFunctionR> m_normalizeFunctionMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
 	types::keymap<module::FilterConstructorR> m_filterMap;
@@ -186,7 +186,7 @@ public:
 		m_programTypes.push_back( ProgramR( prg));
 	}
 
-	void defineNormalizeFunctionConstructor( const langbind::NormalizeFunctionConstructorR& f)
+	void defineNormalizeFunctionConstructor( const module::NormalizeFunctionConstructorR& f)
 	{
 		m_normalizeFunctionConstructorMap.insert( std::string(f->domain()), f);
 	}
@@ -202,6 +202,13 @@ public:
 				m_filterMap.insert( f->category(), f);
 			}
 		}
+	}
+
+	const ddl::Form* getForm( const std::string& name) const
+	{
+		types::keymap<ddl::Form>::const_iterator fi = m_formMap.find( name);
+		if (fi == m_formMap.end()) return 0;
+		return &fi->second;
 	}
 
 	const langbind::FormFunction* getFormFunction( const std::string& name) const
@@ -223,7 +230,7 @@ public:
 		return getNormalizeFunction( name);
 	}
 
-	langbind::Filter* createFilter( const std::string& name, const std::string& arg ) const
+	langbind::Filter* createFilter( const std::string& name, const std::string& arg) const
 	{
 		types::keymap<module::FilterConstructorR>::const_iterator fi = m_filterMap.find( name);
 		return (fi == m_filterMap.end())?0:fi->second->object( arg);
@@ -295,7 +302,7 @@ void ProgramLibrary::defineFormFunction( const std::string& name, langbind::Form
 	m_impl->defineFormFunction( name, f);
 }
 
-void ProgramLibrary::defineNormalizeFunctionConstructor( const langbind::NormalizeFunctionConstructorR& f)
+void ProgramLibrary::defineNormalizeFunctionConstructor( const module::NormalizeFunctionConstructorR& f)
 {
 	m_impl->defineNormalizeFunctionConstructor( f);
 }
@@ -330,7 +337,7 @@ const ddl::TypeMap* ProgramLibrary::formtypemap() const
 	return m_impl;
 }
 
-const types::keymap<langbind::NormalizeFunctionConstructorR>& ProgramLibrary::normalizeFunctionConstructorMap() const
+const types::keymap<module::NormalizeFunctionConstructorR>& ProgramLibrary::normalizeFunctionConstructorMap() const
 {
 	return m_impl->m_normalizeFunctionConstructorMap;
 }
@@ -338,6 +345,11 @@ const types::keymap<langbind::NormalizeFunctionConstructorR>& ProgramLibrary::no
 const langbind::FormFunction* ProgramLibrary::getFormFunction( const std::string& name) const
 {
 	return m_impl->getFormFunction( name);
+}
+
+const ddl::Form* ProgramLibrary::getForm( const std::string& name) const
+{
+	return m_impl->getForm( name);
 }
 
 const langbind::NormalizeFunction* ProgramLibrary::getNormalizeFunction( const std::string& name) const

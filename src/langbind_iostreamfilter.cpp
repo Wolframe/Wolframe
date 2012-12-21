@@ -34,6 +34,7 @@
 ///\brief Implementation of a kind of pipe (istream|ostream) through wolframe mappings like filters, forms, functions
 #include "langbind/iostreamfilter.hpp"
 #include "langbind/appObjects.hpp"
+#include "langbind/formFunction.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/typingfilter.hpp"
@@ -308,20 +309,18 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 		}
 	}
 	{
-		BuiltInFunctionR func( provider->formfunction( proc));
-		if (func.get())
+		const FormFunction* func = provider->formFunction( proc);
+		if (func)
 		{
 			flt.inputfilter()->setValue( "empty", "false");
 			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
 			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
-			BuiltInFunctionClosure closure( *func);
-			closure.init( inp, serialize::Context::ValidateAttributes);
+			FormFunctionClosureR closure( func->createClosure());
+			closure->init( provider, inp, serialize::Context::ValidateAttributes);
 
-			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
+			while (!closure->call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
-			serialize::StructSerializer res = closure.result();
-			res.init( outp);
-
+			RedirectFilterClosure res( closure->result(), outp);
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
@@ -348,45 +347,6 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
 
 			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-			checkUnconsumedInput( is, *flt.inputfilter());
-			return;
-		}
-	}
-	{
-		const db::TransactionFunction* func = provider->transactionFunction( proc);
-		if (func)
-		{
-			flt.inputfilter()->setValue( "empty", "false");
-			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
-			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
-			TransactionFunctionClosure closure( func);
-			closure.init( provider, inp);
-
-			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
-
-			RedirectFilterClosure res( closure.result(), outp);
-			while (!res.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
-
-			writeOutput( buf.outbuf, buf.outsize, os, *flt.outputfilter());
-			checkUnconsumedInput( is, *flt.inputfilter());
-			return;
-		}
-	}
-	{
-		const prnt::PrintFunction* func = provider->printFunction( proc);
-		if (func)
-		{
-			flt.inputfilter()->setValue( "empty", "false");
-			TypedInputFilterR inp( new TypingInputFilter( flt.inputfilter()));
-			TypedOutputFilterR outp( new TypingOutputFilter( flt.outputfilter()));
-			PrintFunctionClosure closure( func);
-			closure.init( inp);
-
-			while (!closure.call()) processIO( buf, flt.inputfilter().get(), flt.outputfilter().get(), is, os);
-
-			std::string result = closure.result();
-			os.write( result.c_str(), result.size());
-
 			checkUnconsumedInput( is, *flt.inputfilter());
 			return;
 		}

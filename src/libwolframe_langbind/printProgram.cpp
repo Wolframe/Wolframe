@@ -41,7 +41,7 @@
 using namespace _Wolframe;
 using namespace _Wolframe::langbind;
 
-void PrintProgram::addConstructor( const PrintFunctionConstructorR& constructor)
+void PrintProgram::addConstructor( const module::PrintFunctionConstructorR& constructor)
 {
 	std::string domain = constructor->programFileType();
 	m_constructormap.insert( domain, constructor);
@@ -51,7 +51,7 @@ bool PrintProgram::is_mine( const std::string& filename) const
 {
 	std::string ext = utils::getFileExtension( filename);
 	if (ext.empty()) return false;
-	types::keymap<PrintFunctionConstructorR>::const_iterator ci = m_constructormap.find( std::string( ext.c_str()+1));
+	types::keymap<module::PrintFunctionConstructorR>::const_iterator ci = m_constructormap.find( std::string( ext.c_str()+1));
 	return (ci != m_constructormap.end());
 }
 
@@ -61,7 +61,7 @@ void PrintProgram::loadProgram( const std::string& filename)
 	{
 		std::string ext = utils::getFileExtension( filename);
 		if (ext.empty()) std::runtime_error( std::string( "unknown print layout type for file '") + filename + "'");
-		types::keymap<PrintFunctionConstructorR>::const_iterator ci = m_constructormap.find( std::string( ext.c_str()+1));
+		types::keymap<module::PrintFunctionConstructorR>::const_iterator ci = m_constructormap.find( std::string( ext.c_str()+1));
 		if (ci == m_constructormap.end()) throw std::runtime_error( std::string( "unknown print layout type for file '") + filename + "'");
 		prnt::PrintFunctionR function( ci->second->object( utils::readSourceFileContent( filename)));
 		std::string name = function->name();

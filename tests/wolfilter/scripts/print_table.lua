@@ -6,6 +6,6 @@ function run()
 	output:as( filter( "blob"))
 	t = input:table()
 	f = formfunction( "print_invoice")
-	output:print( f( t))
+	output:print( f( t):table())
 end
 

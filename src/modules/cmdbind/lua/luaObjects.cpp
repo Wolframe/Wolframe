@@ -76,11 +76,9 @@ namespace luaname
 	static const char* InputFilterClosure = "wolframe.InputFilterClosure";
 	static const char* TypedInputFilterR = "wolframe.TypedInputFilterR";
 	static const char* TypedInputFilterClosure = "wolframe.TypedInputFilterClosure";
-	static const char* BuiltInFunctionClosure = "wolframe.BuiltInFunctionClosure";
-	static const char* TransactionFunctionClosure = "wolframe.TransactionFunctionClosure";
+	static const char* FormFunctionClosureR = "wolframe.FormFunctionClosureR";
 	static const char* Transaction = "wolframe.Transaction";
 	static const char* NormalizeFunction = "wolframe.NormalizeFunction";
-	static const char* PrintFunctionClosure = "wolframe.PrintFunctionClosure";
 	static const char* StructSerializer = "wolframe.StructSerializer";
 	static const char* ProcessorProvider = ":wolframe.ProcessorProvider";
 	static const char* LuaModuleMap = ":wolframe.LuaModuleMap";
@@ -101,11 +99,9 @@ template <> const char* metaTableName<DDLFormSerializer>()		{return luaname::DDL
 template <> const char* metaTableName<InputFilterClosure>()		{return luaname::InputFilterClosure;}
 template <> const char* metaTableName<TypedInputFilterR>()		{return luaname::TypedInputFilterR;}
 template <> const char* metaTableName<TypedInputFilterClosure>()	{return luaname::TypedInputFilterClosure;}
-template <> const char* metaTableName<BuiltInFunctionClosure>()		{return luaname::BuiltInFunctionClosure;}
-template <> const char* metaTableName<TransactionFunctionClosure>()	{return luaname::TransactionFunctionClosure;}
+template <> const char* metaTableName<FormFunctionClosureR>()		{return luaname::FormFunctionClosureR;}
 template <> const char* metaTableName<db::TransactionR>()		{return luaname::Transaction;}
 template <> const char* metaTableName<NormalizeFunction>()		{return luaname::NormalizeFunction;}
-template <> const char* metaTableName<PrintFunctionClosure>()		{return luaname::PrintFunctionClosure;}
 template <> const char* metaTableName<serialize::StructSerializer>()	{return luaname::StructSerializer;}
 template <> const char* metaTableName<proc::ProcessorProvider>()	{return luaname::ProcessorProvider;}
 template <> const char* metaTableName<langbind::LuaModuleMap>()		{return luaname::LuaModuleMap;}
@@ -917,7 +913,7 @@ LUA_FUNCTION_THROWS( "<structure>:get()", function_typedinputfilter_get)
 
 LUA_FUNCTION_THROWS( "<formfunction>(..)", function_formfunction_call)
 {
-	BuiltInFunctionClosure* closure = LuaObject<BuiltInFunctionClosure>::get( ls, lua_upvalueindex( 1));
+	FormFunctionClosureR* closure = LuaObject<FormFunctionClosureR>::get( ls, lua_upvalueindex( 1));
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
@@ -928,69 +924,15 @@ LUA_FUNCTION_THROWS( "<formfunction>(..)", function_formfunction_call)
 		else
 		{
 			TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
-			closure->init( inp, serialize::Context::None);
+			(*closure)->init( getProcessorProvider( ls), inp, serialize::Context::None);
 		}
 		lua_pushvalue( ls, 1);		//... iterator argument (table, generator function, etc.)
 	}
-	if (!closure->call())
+	if (!(*closure)->call())
 	{
 		lua_yieldk( ls, 0, 1, function_formfunction_call);
 	}
-	LuaObject<serialize::StructSerializer>::push_luastack( ls, closure->result());
-	return 1;
-}
-
-LUA_FUNCTION_THROWS( "<formfunction>(..)", function_transactionfunction_call)
-{
-	TransactionFunctionClosure* closure = LuaObject<TransactionFunctionClosure>::get( ls, lua_upvalueindex( 1));
-	int ctx;
-	if (lua_getctx( ls, &ctx) != LUA_YIELD)
-	{
-		if (lua_gettop( ls) != 1)
-		{
-			throw std::runtime_error( "one argument expected");
-		}
-		else
-		{
-			TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
-			closure->init( getProcessorProvider( ls), inp);
-		}
-		lua_pushvalue( ls, 1);		//... iterator argument (table, generator function, etc.)
-	}
-	if (!closure->call())
-	{
-		lua_yieldk( ls, 0, 1, function_transactionfunction_call);
-	}
-	LuaObject<TypedInputFilterR>::push_luastack( ls, closure->result());
-	return 1;
-}
-
-LUA_FUNCTION_THROWS( "<formfunction>(..)", function_printfunction_call)
-{
-	PrintFunctionClosure* closure = LuaObject<PrintFunctionClosure>::get( ls, lua_upvalueindex( 1));
-	int ctx;
-	if (lua_getctx( ls, &ctx) != LUA_YIELD)
-	{
-		if (lua_gettop( ls) != 1)
-		{
-			throw std::runtime_error( "one argument expected");
-		}
-		else
-		{
-			TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 1);
-			closure->init( inp);
-		}
-		lua_pushvalue( ls, 1);		//... iterator argument (table, generator function, etc.)
-	}
-	if (!closure->call())
-	{
-		lua_yieldk( ls, 0, 1, function_printfunction_call);
-	}
-	std::string result = closure->result();
-	{
-		LuaExceptionHandlerScope escope(ls);
-		lua_pushlstring( ls, result.c_str(), result.size());
-	}
+	LuaObject<TypedInputFilterR>::push_luastack( ls, (*closure)->result());
 	return 1;
 }
 
@@ -1032,31 +974,14 @@ LUA_FUNCTION_THROWS( "formfunction(..)", function_formfunction)
 
 	const char* name = lua_tostring( ls, 1);
 	const proc::ProcessorProvider* ctx = getProcessorProvider( ls);
-	BuiltInFunctionR ff( ctx->formfunction( name));
-	if (ff.get())
+	const FormFunction* ff = ctx->formFunction( name);
+	if (ff)
 	{
-		LuaObject<BuiltInFunctionClosure>::push_luastack( ls, BuiltInFunctionClosure( *ff));
+		LuaObject<FormFunctionClosureR>::push_luastack( ls, FormFunctionClosureR( ff->createClosure()));
 		lua_pushcclosure( ls, function_formfunction_call, 1);
 		return 1;
 	}
-	const db::TransactionFunction* tf = ctx->transactionFunction( name);
-	if (tf)
-	{
-		db::TransactionR* transaction = LuaObject<db::TransactionR>::getGlobal( ls, "transaction");
-		LuaObject<TransactionFunctionClosure>::push_luastack( ls, TransactionFunctionClosure( tf, (transaction && transaction->get())?*transaction:db::TransactionR()));
-		lua_pushcclosure( ls, function_transactionfunction_call, 1);
-		return 1;
-	}
-	const prnt::PrintFunction* pf = ctx->printFunction( name);
-	if (pf)
-	{
-		LuaObject<PrintFunctionClosure>::push_luastack( ls, PrintFunctionClosure( pf));
-		lua_pushcclosure( ls, function_printfunction_call, 1);
-		return 1;
-	}
-	std::ostringstream s;
-	s << "form function '" << name << "' not found (is neither a module form function, nor a transaction function, nor a print function)";
-	throw std::runtime_error( s.str( ) );
+	throw std::runtime_error( std::string( "form function '") + name + "' not found");
 }
 
 static const char* userdata_tolstring( lua_State* ls, int index, std::size_t* len)
@@ -2173,9 +2098,7 @@ bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input&
 			LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
 			LuaObject<TypedInputFilterR>::createMetatable( ls, 0, 0, typedinputfilter_methodtable);
 			LuaObject<TypedInputFilterClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<BuiltInFunctionClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<TransactionFunctionClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<PrintFunctionClosure>::createMetatable( ls, 0, 0, 0);
+			LuaObject<FormFunctionClosureR>::createMetatable( ls, 0, 0, 0);
 			setGlobalSingletonPointer<const proc::ProcessorProvider>( ls, provider_);
 			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
 			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);

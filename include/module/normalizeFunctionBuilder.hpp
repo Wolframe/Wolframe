@@ -35,6 +35,7 @@ Project Wolframe.
 #define _Wolframe_MODULE_NORMALIZE_FUNCTION_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "langbind/normalizeFunction.hpp"
 #include "moduleInterface.hpp"
+#include "types/countedReference.hpp"
 #include "constructor.hpp"
 
 namespace _Wolframe {
@@ -84,6 +85,9 @@ private:
 	langbind::CreateNormalizeFunction m_createFunc;
 	langbind::GetNormalizeFunctions m_getNormalizeFunctions;
 };
+
+typedef types::CountedReference<NormalizeFunctionConstructor> NormalizeFunctionConstructorR;
+
 
 class NormalizeFunctionBuilder :public SimpleBuilder
 {

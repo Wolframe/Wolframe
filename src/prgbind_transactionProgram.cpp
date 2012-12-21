@@ -94,15 +94,20 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 {
 	std::string dbsource;
 	types::keymap<std::string> embeddedStatementMap;
-	defineEmbeddedLanguageDescription( transactionDB->getLanguageDescription());
-
+	if (transactionDB)
+	{
+		defineEmbeddedLanguageDescription( transactionDB->getLanguageDescription());
+	}
 	std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
 		= db::TransactionProgram::loadfile( filename, dbsource, embeddedStatementMap);
 
 	try
 	{
-		transactionDB->addProgram( dbsource);
-		transactionDB->addStatements( embeddedStatementMap);
+		if (transactionDB)
+		{
+			transactionDB->addProgram( dbsource);
+			transactionDB->addStatements( embeddedStatementMap);
+		}
 		std::vector<std::pair<std::string,db::TransactionFunctionR> >::const_iterator fi = funclist.begin(), fe = funclist.end();
 		for (; fi != fe; ++fi)
 		{

@@ -36,6 +36,10 @@
 
 #include "processor/procProvider.hpp"
 #include "procProviderImpl.hpp"
+#include "module/ddlcompilerBuilder.hpp"
+#include "module/builtInFunctionBuilder.hpp"
+#include "module/normalizeFunctionBuilder.hpp"
+#include "module/printFunctionBuilder.hpp"
 #include "types/doctype.hpp"
 #include "config/valueParser.hpp"
 #include "config/ConfigurationTree.hpp"
@@ -118,8 +122,8 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 								it != modules->objectsEnd(); it++ )	{
 		switch( it->objectType() )	{
 			case ObjectConstructorBase::FILTER_OBJECT:	{	// object is a filter
-				module::FilterConstructor* fltr = dynamic_cast< module::FilterConstructor* >((*it)->constructor());
-				if ( fltr == NULL )	{
+				module::FilterConstructorR fltr( dynamic_cast< module::FilterConstructor* >((*it)->constructor()));
+				if ( fltr.get() == NULL )	{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
 						  << "'' is not a filter";
 					throw std::logic_error( "Object is not a filter. See log." );
@@ -127,8 +131,13 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				else	{
 					try
 					{
-						m_programs->defineFilterConstructor( module::FilterConstructorR( fltr));
-						LOG_TRACE << "'" << fltr->name() << "' (" << fltr->objectClassName() << ") filter registered";
+						std::string comment;
+						if (!fltr->category().empty() && !m_programs->existsFilter( fltr->category()))
+						{
+							comment = std::string( " as default '") + fltr->category() + "' filter";
+						}
+						m_programs->defineFilterConstructor( fltr);
+						LOG_TRACE << "registered filter '" << fltr->name() << "' (" << fltr->objectClassName() << ") " << comment;
 					}
 					catch (const std::runtime_error& e)
 					{
@@ -146,12 +155,18 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 						  << "'' is not a DDL compiler";
 					throw std::logic_error( "Object is not a form function. See log." );
 				}
-				else	{
-					ddl::DDLCompilerR constructor( ffo->object());
-					m_programs->defineFormDDL( constructor);
-					m_formlibrary.addConstructor( constructor);
+				else {
+					try
+					{
+						ddl::DDLCompilerR constructor( ffo->object());
+						m_programs->defineFormDDL( constructor);
+						LOG_TRACE << "registered '" << constructor->ddlname() << "' DDL compiler";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading DDL compiler '" << ffo->name() << "':" << e.what();
+					}
 					delete ffo;
-					LOG_TRACE << "'" << constructor->ddlname() << "' DDL compiler registered";
 				}
 				break;
 			}
@@ -165,26 +180,25 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					throw std::logic_error( "Object is not a form function. See log." );
 				}
 				else	{
-					std::string name = ffo->objectClassName();
-					boost::algorithm::to_upper( name);
-					std::map< std::string, const module::BuiltInFunctionConstructor* >::const_iterator itr = m_formfunctionMap.find( name );
-					if ( itr != m_formfunctionMap.end() )	{
-						LOG_FATAL << "Duplicate form function name '" << name << "'";
-						throw std::runtime_error( "Duplicate form function name" );
+					try
+					{
+						std::string name = ffo->objectClassName();
+						langbind::BuiltInFunctionR func( ffo->object());
+						m_programs->defineBuiltInFunction( name, *func);
+						LOG_TRACE << "registered '" << name << "' built-in form function ";
 					}
-					m_formfunction.push_back( ffo );
-					m_formfunctionMap[ name ] = ffo;
-					langbind::BuiltInFunction* func = ffo->object();
-					m_programs->defineBuiltInFunction( name, *func);
-					delete func;
-					LOG_TRACE << "'" << name << "' form function registered";
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading form function object '" << ffo->objectClassName() << "':" << e.what();
+					}
+					delete ffo;
 				}
 				break;
 			}
 
 			case ObjectConstructorBase::NORMALIZE_FUNCTION_OBJECT:
 			{	// object is a normalize function constructor
-				langbind::NormalizeFunctionConstructorR constructor( dynamic_cast< module::NormalizeFunctionConstructor* >((*it)->constructor()));
+				module::NormalizeFunctionConstructorR constructor( dynamic_cast< module::NormalizeFunctionConstructor* >((*it)->constructor()));
 				if ( !constructor.get() )
 				{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
@@ -193,16 +207,21 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				}
 				else
 				{
-					m_normalizeFunctionConstructorMap.insert( std::string(constructor->domain()), constructor);
-					m_programs->defineNormalizeFunctionConstructor( constructor);
-					LOG_TRACE << "'" << constructor->objectClassName() << "' normalize function constructor for domain " << constructor->domain() << " registered";
+					try {
+						m_programs->defineNormalizeFunctionConstructor( constructor);
+						LOG_TRACE << "registered '" << constructor->objectClassName() << "' normalize function constructor for domain '" << constructor->domain() << "'";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading normalize function object '" << constructor->domain() << "':" << e.what();
+					}
 				}
 				break;
 			}
 
 			case ObjectConstructorBase::PRINT_FUNCTION_OBJECT:
 			{	// object is a print function compiler
-				langbind::PrintFunctionConstructorR constructor( dynamic_cast< module::PrintFunctionConstructor* >((*it)->constructor()));
+				module::PrintFunctionConstructorR constructor( dynamic_cast< module::PrintFunctionConstructor* >((*it)->constructor()));
 				if (!constructor.get())
 				{
 					LOG_ALERT << "Wolframe Processor Provider: '" << (*it)->objectClassName()
@@ -211,9 +230,14 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 				}
 				else
 				{
-					m_printprogram.addConstructor( constructor);
-					m_programs->definePrintLayoutType( constructor);
-					LOG_TRACE << "'" << constructor->programFileType() << "' print layout description compiler registered";
+					try {
+						m_programs->definePrintLayoutType( constructor);
+						LOG_TRACE << "'" << constructor->programFileType() << "' print layout description compiler registered";
+					}
+					catch (const std::runtime_error& e)
+					{
+						LOG_FATAL << "Error loading normalize function object '" << constructor->name() << "':" << e.what();
+					}
 				}
 				break;
 			}
@@ -261,65 +285,24 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 
 
 ProcessorProvider::ProcessorProvider_Impl::~ProcessorProvider_Impl()
-{
-	for ( std::list< cmdbind::CommandHandlerConstructor* >::iterator it = m_cmd.begin();
-							it != m_cmd.end(); it++ )
-		delete *it;
-
-	for ( std::list< module::FilterConstructor* >::iterator it = m_filter.begin();
-							it != m_filter.end(); it++ )
-		delete *it;
-
-	for ( std::list< module::BuiltInFunctionConstructor* >::iterator it = m_formfunction.begin();
-							it != m_formfunction.end(); it++ )
-		delete *it;
-}
-
-class ProcessorProvider::ProcessorProvider_Impl::DDLTypeMap :public ddl::TypeMap
-{
-public:
-	explicit DDLTypeMap( const ProcessorProvider::ProcessorProvider_Impl* pp)
-		:m_provider( pp){}
-
-	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
-	{
-		return m_provider->normalizeFunction( name);
-	}
-
-private:
-	const ProcessorProvider::ProcessorProvider_Impl* m_provider;
-};
+{}
 
 bool ProcessorProvider::ProcessorProvider_Impl::loadPrograms()
 {
-	bool rt = true;
 	try
 	{
+		// load all locally defined programs of the database:
+		if (m_db) m_db->loadAllPrograms();
+
+		// load all globally defined programs:
 		m_programs->loadPrograms( transactionDatabase( true), m_programfiles);
+		return true;
 	}
 	catch (const std::runtime_error& e)
 	{
 		LOG_ERROR << "failed to load programs: " << e.what();
 		return false;
 	}
-
-	std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
-	for (; pi != pe; ++pi)
-	{
-		if (m_normprogram.is_mine( *pi)) m_normprogram.loadfile( *pi, m_normalizeFunctionConstructorMap);
-	}
-	m_formtypemap.reset( new DDLTypeMap( this));
-	m_formlibrary.setTypeMap( m_formtypemap);
-
-	for(pi = m_programfiles.begin(); pi != pe; ++pi)
-	{
-		if (m_formlibrary.is_mine( *pi)) m_formlibrary.loadProgram( *pi);
-	}
-	for(pi = m_programfiles.begin(); pi != pe; ++pi)
-	{
-		if (m_printprogram.is_mine( *pi)) m_printprogram.loadProgram( *pi);
-	}
-	return rt;
 }
 
 
@@ -335,63 +318,28 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 			LOG_ALERT << "Processor database: database labeled '" << m_dbLabel << "' not found !";
 			return false;
 		}
-		types::keymap<std::string> embeddedStatementMap;
-
-		// load all locally defined programs
-		m_db->loadAllPrograms();
-		// load database programs:
-		m_dbprogram.defineEmbeddedLanguageDescription( m_db->getLanguageDescription());
-		std::list< std::string >::const_iterator pi = m_programfiles.begin(), pe = m_programfiles.end();
-		for (; pi != pe; ++pi)
-		{
-			if (m_dbprogram.is_mine( *pi))
-			{
-				try
-				{
-					std::string dbsrc;
-					m_dbprogram.loadfile( *pi, dbsrc, embeddedStatementMap);
-					m_db->addProgram( dbsrc);
-				}
-				catch (const std::runtime_error& err)
-				{
-					LOG_ERROR << "failed to load transaction program '" << *pi << "': " << err.what();
-					rt = false;
-				}
-			}
-		}
-		m_db->addStatements( embeddedStatementMap);
 	}
 	return rt;
 }
 
-langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg ) const
-{
-	return m_programs->createFilter( name, arg);
-}
-
-langbind::BuiltInFunction* ProcessorProvider::ProcessorProvider_Impl::formfunction( const std::string& name ) const
-{
-	std::string formfunctionName = boost::algorithm::to_upper_copy( name);
-	std::map< std::string, const module::BuiltInFunctionConstructor* >::const_iterator ffo = m_formfunctionMap.find( formfunctionName );
-	if ( ffo == m_formfunctionMap.end() )
-		return NULL;
-	else
-		return ffo->second->object();
-}
-
-const ddl::Form* ProcessorProvider::ProcessorProvider_Impl::form( const std::string& name ) const
-{
-	return m_formlibrary.get( name);
-}
-
-const prnt::PrintFunction* ProcessorProvider::ProcessorProvider_Impl::printFunction( const std::string& name ) const
-{
-	return m_printprogram.get( name);
-}
-
-const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name ) const
+const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::normalizeFunction( const std::string& name) const
 {
 	return m_programs->getNormalizeFunction( name);
+}
+
+const langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formFunction( const std::string& name) const
+{
+	return m_programs->getFormFunction( name);
+}
+
+const ddl::Form* ProcessorProvider::ProcessorProvider_Impl::form( const std::string& name) const
+{
+	return m_programs->getForm( name);
+}
+
+langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg) const
+{
+	return m_programs->createFilter( name, arg);
 }
 
 cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( const std::string& command) const
@@ -443,11 +391,6 @@ db::Transaction* ProcessorProvider::ProcessorProvider_Impl::transaction( const s
 	}
 }
 
-const db::TransactionFunction* ProcessorProvider::ProcessorProvider_Impl::transactionFunction( const std::string& name ) const
-{
-	return m_dbprogram.function( name );
-}
-
 std::string ProcessorProvider::ProcessorProvider_Impl::xmlDoctypeString( const std::string& formname, const std::string& ddlname, const std::string& xmlroot) const
 {
 	std::ostringstream rt;
@@ -456,3 +399,4 @@ std::string ProcessorProvider::ProcessorProvider_Impl::xmlDoctypeString( const s
 }
 
 }} // namespace _Wolframe::proc
+

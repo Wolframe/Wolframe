@@ -41,8 +41,6 @@
 namespace _Wolframe {
 namespace langbind {
 
-typedef boost::shared_ptr<module::PrintFunctionConstructor> PrintFunctionConstructorR;
-
 class PrintProgram
 	:public types::keymap<prnt::PrintFunctionR>
 {
@@ -55,7 +53,7 @@ public:
 		,m_constructormap(o.m_constructormap){}
 	~PrintProgram(){}
 
-	void addConstructor( const PrintFunctionConstructorR& c);
+	void addConstructor( const module::PrintFunctionConstructorR& c);
 
 	bool is_mine( const std::string& filename) const;
 	void loadProgram( const std::string& filename);
@@ -67,7 +65,7 @@ public:
 	}
 
 private:
-	types::keymap<PrintFunctionConstructorR> m_constructormap;
+	types::keymap<module::PrintFunctionConstructorR> m_constructormap;
 };
 
 }}

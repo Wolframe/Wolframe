@@ -31,7 +31,6 @@ CPP_OBJS = \
 	typedfilterScope.obj \
 	inputfilterScope.obj \
 	null_filter.obj \
-	formLibrary.obj \
 	normalizeProgram.obj \
 	printProgram.obj \
 	cmdbind_lineCommandHandler.obj \

@@ -60,7 +60,7 @@ struct FormFunctionClosure
 	///\param[in] p processor provider
 	///\param[in] i call input
 	///\param[in] f serialization flags depending on context (directmap "strict",lua relaxed)
-	virtual void init( const proc::ProcessorProvider* p, const TypedInputFilterR& i, serialize::Context::Flags f)=0;
+	virtual void init( const proc::ProcessorProvider* p, const TypedInputFilterR& i, serialize::Context::Flags f=serialize::Context::None)=0;
 
 	///\brief Get the iterator for the function result
 	virtual TypedInputFilterR result() const=0;
