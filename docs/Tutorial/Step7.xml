@@ -1,0 +1,68 @@
+<!-- step 7 -->
+
+<sect1>
+	<title>Step 7 - Editing customer</title>	
+
+We change the show customer use case slightly, so that we can also
+edit the customer in the customer_show.ui form.
+
+Let's first make a copy of 'customer_show.ui' and name it 'customer_edit.ui'.
+
+As before we add first a "Edit" button to the 'customers.ui' with 'forms'
+set to 'customer_edit' and 'global.id' set to '{customer.id}':
+
+(file:step7_customers_edit_button.png)
+
+We change the form 'customer_edit.ui' and remove the line with 'ID' as we
+don't need it anymore and because nobody should be able to edit the id of
+a customer and change it! We also add another button and label it 'Save',
+this button get the properties 'form' set to 'customers', 'action' set to
+'update', 'doctype' to 'CustomerUpdate', 'rootelement' to 'customer' and
+'id' to '{global.id}':
+
+(file:step7_customer_edit.png)
+
+The other fields will be sent along automatically in the 'CustomerUpdate' XML request:
+
+	<programlisting language='xml'>
+<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/Tutorial/CustomerUpdate.xml" parse="text" />
+	</programlisting>
+
+Similar to to the "show customer" case we add now a new map:
+
+editCustomerUpdate = UpdateCustomer( xml );
+
+We also add a simple form 'CustomerUpdate.simpleform' which looks very similar
+to the 'Customer.simpleform':
+
+FORM CustomerUpdate
+{
+	customer
+	{
+		id !@string
+		name string
+		address string
+	}
+}
+
+add it to 'tutorial.conf':
+
+Processor {
+	...
+	program CustomerUpdate.simpleform
+	...
+}
+
+finally we write the transaction function 'CustomerUpdate' in 'Customer.tdl':
+
+TRANSACTION UpdateCustomer
+BEGIN
+	DO UPDATE Customer SET name=$(customer/name), address=$(customer/address)
+		WHERE id=$(customer/id);
+END
+
+Note, that this time the database transaction doesn't return a result.
+
+Restart server and client and start to edit the customers.
+
+</sect1>

@@ -1,0 +1,9 @@
+	FORM Customer
+	{
+		customer
+		{
+			id !@string
+			name string
+			address string
+		}
+	}

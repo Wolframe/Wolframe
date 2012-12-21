@@ -1,0 +1,6 @@
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE customer SYSTEM 'CustomerUpdate'>
+	<customer id="2">
+	  <name>John Smith</name>
+	  <address>The Wheel in Space</address>
+	</customer>
