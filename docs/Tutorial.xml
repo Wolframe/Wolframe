@@ -51,8 +51,5 @@
 		&TutorialIntroduction;
 		&TutorialSteps;
 		
-		<index>
-			<title>Index</title>
-		</index>
 	</book>
 </set>
