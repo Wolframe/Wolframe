@@ -821,7 +821,7 @@ TRANSACTION selectPicture -- (/picture/id)
 BEGIN
 	INTO picture DO UNIQUE
 		SELECT Picture.ID AS "id", image, caption, info, width, height,
-			coalesce( group_concat( Tag.name ), '' ) as tags,
+			coalesce( group_concat( distinct Tag.name ), '' ) as tags,
 			3*length(image)/4+2 as size,
 			coalesce( group_concat( distinct Category.name ), '' ) as used_categories,
 			coalesce( group_concat( distinct Feature.name ), '' ) as used_features
@@ -1306,7 +1306,7 @@ function createCategoryFeature( )
 	formfunction( "addCategoryFeature" )( categoryFeature )
 end
 
-function editCategoryFeature( )
+function deleteCategoryFeature( )
 	local categoryFeature = input:table( )["CategoryFeature"]
 	formfunction( "deleteCategoryFeature" )( categoryFeature )
 end
@@ -1318,6 +1318,16 @@ function CategoryFeatureRequest( )
 		feature_id = categoryFeature["feature_id"]
 	} )
 	local f = form( "CategoryFeature" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function CategoryFeatureListRequest( )
+	local categoryFeature = input:table( )["CategoryFeature"]
+	local t = formfunction( "selectCategoryFeatureList" )( {
+		category_id = categoryFeature["category_id"]
+	} )
+	local f = form( "CategoryFeatureList" )
 	f:fill( t:get( ) )
 	output:print( f:get( ) )
 end
@@ -1699,7 +1709,7 @@ end
 		<category>Smartdust</category></item></tree>
 	<tree><item id="50">
 		<category>Nanocomputer</category></item></tree>
-</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><picture id="1"/></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><picture id="3"/></category><category id="54" parentID="46"><name>WNC child 3</name><normalizedName>wnc child 3</normalizedName><picture id="1"/></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName><picture/></category><tree><item id="1">
+</item></tree><category id="52" parentID="46"><name>WNC child</name><normalizedName>wnc child</normalizedName><picture id="1"/></category><category id="52" parentID="46"><name>WNC child Y</name><normalizedName>wnc child y</normalizedName><picture id="3"/></category><category id="54" parentID="46"><name>WNC child 3</name><normalizedName>wnc child 3</normalizedName><picture id="1"/></category><category id="46" parentID="16"><name>Wireless network component</name><normalizedName>wireless network component</normalizedName></category><tree><item id="1">
 	<category>_ROOT_</category>
 	<description>Categories tree root</description>
 	<tree><item id="2">

@@ -327,7 +327,10 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				}
 				if (first == "_")
 				{
-					result.defineContent( "", val);
+					if (fa.isVector()) throw std::runtime_error( "Semantic error: try to inherit from an array ('[]')");
+					if (fa.isOptional()) throw std::runtime_error( "Semantic error: optional ('?') declaration for inherited structure");
+					if (fa.isMandatory()) throw std::runtime_error( "Semantic error: mandatory ('!') declaration for inherited structure");
+					result.inheritContent( val);
 				}
 				else
 				{
@@ -362,7 +365,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				}
 				if (first == "_")
 				{
-					throw std::runtime_error( "Syntax error: Self references are never untagged content elements");
+					throw std::runtime_error( "Syntax error: Self reference declared as untagged content element");
 				}
 				else
 				{
@@ -410,6 +413,7 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 		}
 		else
 		{
+			//...  Embedded substructure definition
 			if (!second.empty())
 			{
 				FRMAttribute fa( second, typemap, formmap, selfname);
@@ -438,10 +442,6 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				}
 				else
 				{
-					if (fa.isForm())
-					{
-						throw std::runtime_error( "Semantic error: Form declared with default value");
-					}
 					compile_ptree( itr->second, st, typemap, formmap, selfname);
 				}
 				if (fa.isOptional())
@@ -452,7 +452,14 @@ static void compile_ptree( const boost::property_tree::ptree& pt, StructType& re
 				{
 					st.mandatory(true);
 				}
-				result.defineContent( first, st);
+				if (first == "_")
+				{
+					throw std::runtime_error( "Syntax error: Embedded substructure declared as untagged content element");
+				}
+				else
+				{
+					result.defineContent( first, st);
+				}
 			}
 			else
 			{

@@ -125,27 +125,15 @@ ProcessorProvider::ProcessorProvider_Impl::ProcessorProvider_Impl( const ProcPro
 					throw std::logic_error( "Object is not a filter. See log." );
 				}
 				else	{
-					std::string name = boost::algorithm::to_upper_copy( fltr->name());
-					std::string category = boost::algorithm::to_upper_copy( fltr->category());
-
-					std::map < std::string, const module::FilterConstructor* >::const_iterator fltrItr = m_filterMap.find( name);
-					if ( fltrItr != m_filterMap.end())
+					try
 					{
-						LOG_FATAL << "Duplicate filter name '" << name << "'";
-						throw std::runtime_error( "Duplicate filter name" );
+						m_programs->defineFilterConstructor( module::FilterConstructorR( fltr));
+						LOG_TRACE << "'" << fltr->name() << "' (" << fltr->objectClassName() << ") filter registered";
 					}
-					m_filter.push_back( fltr );
-					m_filterMap[ name ] = fltr;
-					if (!category.empty())
+					catch (const std::runtime_error& e)
 					{
-						fltrItr = m_filterMap.find( category);
-						if (fltrItr == m_filterMap.end())
-						{
-							m_filterMap[ category ] = fltr;
-							LOG_TRACE << "'" << fltr->name() << "' as default '" << category << "'filter registered";
-						}
+						LOG_ERROR << "error loading filter object module: " << e.what();
 					}
-					LOG_TRACE << "'" << fltr->name() << "' (" << fltr->objectClassName() << ") filter registered";
 				}
 				break;
 			}
@@ -378,12 +366,7 @@ bool ProcessorProvider::ProcessorProvider_Impl::resolveDB( const db::DatabasePro
 
 langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg ) const
 {
-	std::string filterName = boost::algorithm::to_upper_copy( name);
-	std::map< std::string, const module::FilterConstructor* >::const_iterator fltr = m_filterMap.find( filterName );
-	if ( fltr == m_filterMap.end() )
-		return NULL;
-	else
-		return fltr->second->object( arg);
+	return m_programs->createFilter( name, arg);
 }
 
 langbind::BuiltInFunction* ProcessorProvider::ProcessorProvider_Impl::formfunction( const std::string& name ) const

@@ -1189,7 +1189,7 @@ struct TransactionFunctionOutput::Impl
 						++m_structitr;
 						continue;
 					}
-					else if (m_resitr->functionidx() < m_structitr->idx)
+					else if (m_resitr->functionidx() < m_structitr->idx || m_resitr->begin() == m_resitr->end())
 					{
 						++m_resitr;
 						continue;

@@ -32,15 +32,16 @@ Project Wolframe.
 ///\file module/filterBuilder.hpp
 ///\brief Interface template for object builder of filters
 #ifndef _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
-#define _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDEDd
+#define _Wolframe_MODULE_FILTER_OBJECT_BUILDER_TEMPLATE_HPP_INCLUDED
 #include "filter/filter.hpp"
 #include "moduleInterface.hpp"
+#include "types/countedReference.hpp"
 #include "constructor.hpp"
 
 namespace _Wolframe {
 namespace module {
 
-class FilterConstructor :public SimpleObjectConstructor< langbind::Filter >
+class FilterConstructor :public SimpleObjectConstructor<langbind::Filter>
 {
 public:
 	FilterConstructor( const std::string& name_, const std::string& category_, langbind::CreateFilterPtrFunc filterFunc_ )
@@ -77,6 +78,9 @@ private:
 	const std::string m_arg;
 	langbind::CreateFilterPtrFunc m_function;
 };
+
+typedef types::CountedReference<FilterConstructor> FilterConstructorR;
+
 
 class FilterBuilder :public SimpleBuilder
 {

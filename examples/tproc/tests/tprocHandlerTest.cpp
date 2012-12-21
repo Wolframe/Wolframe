@@ -70,11 +70,10 @@ static boost::filesystem::path g_testdir;
 
 static module::ModulesDirectory* g_modulesDirectory = 0;
 static boost::filesystem::path g_referencePath;
-static prgbind::ProgramLibrary g_prglib;
 
-static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const proc::ProcProviderConfig* cfg)
+static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const proc::ProcProviderConfig* cfg, prgbind::ProgramLibrary* prglib)
 {
-	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg, g_modulesDirectory, &g_prglib));
+	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg, g_modulesDirectory, prglib));
 	return rt;
 }
 
@@ -134,7 +133,7 @@ public:
 	{
 		m_config->setBuffers( ib + EoDBufferSize, ob + MinOutBufferSize);
 		m_connection = new tproc::Connection( ep, m_config);
-		m_provider = getProcProvider( m_config->providerConfig());
+		m_provider = getProcProvider( m_config->providerConfig(), &m_prglib);
 		m_connection->setProcessorProvider( m_provider.get());
 	}
 
@@ -157,6 +156,7 @@ private:
 	net::LocalTCPendpoint ep;
 	tproc::Connection* m_connection;
 	boost::shared_ptr<proc::ProcessorProvider> m_provider;
+	prgbind::ProgramLibrary m_prglib;
 	TestConfiguration* m_config;
 	std::string m_input;
 	std::string m_output;

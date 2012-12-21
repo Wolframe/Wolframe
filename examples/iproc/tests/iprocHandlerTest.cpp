@@ -62,7 +62,6 @@ static boost::filesystem::path g_testdir;
 
 static module::ModulesDirectory* g_modulesDirectory;
 static boost::filesystem::path g_referencePath;
-static prgbind::ProgramLibrary g_prglib;
 
 static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const std::string& script)
 {
@@ -110,9 +109,9 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 	return rt;
 }
 
-static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const boost::shared_ptr<proc::ProcProviderConfig>& cfg)
+static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const boost::shared_ptr<proc::ProcProviderConfig>& cfg, prgbind::ProgramLibrary* prglib)
 {
-	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg.get(), g_modulesDirectory, &g_prglib));
+	boost::shared_ptr<proc::ProcessorProvider>  rt( new proc::ProcessorProvider( cfg.get(), g_modulesDirectory, prglib));
 	return rt;
 }
 
@@ -153,9 +152,15 @@ public:
 		return m_providerConfig;
 	}
 
+	prgbind::ProgramLibrary* prglib()
+	{
+		return &m_prglib;
+	}
+
 private:
 	config::ApplicationConfiguration m_appConfig;
 	boost::shared_ptr<proc::ProcProviderConfig> m_providerConfig;
+	prgbind::ProgramLibrary m_prglib;
 };
 
 static const char* getRandomAsciiString( unsigned int maxStringSize=4096)
@@ -275,10 +280,14 @@ protected:
 			TestDescription().outputBufferSize + EscBufferSize)
 		{}
 
+	~IProcHandlerTest()
+	{
+	}
+
 	virtual void SetUp()
 	{
 		TestDescription test;
-		m_provider = getProcProvider( m_config.providerConfig());
+		m_provider = getProcProvider( m_config.providerConfig(), m_config.prglib());
 		m_connection.reset( new iproc::Connection( ep, &m_config));
 		m_connection->setProcessorProvider( m_provider.get());
 

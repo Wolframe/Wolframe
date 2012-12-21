@@ -79,6 +79,7 @@ examples/pecho/pechod
 examples/pecho/tests/pechoHandlerTest
 examples/iproc/iprocd
 examples/tproc/tprocd
+examples/tutorial/doc/tutorial.odp
 tests/expect/primary.db
 clients/qt/qtclient
 clients/cmdline/wolframec

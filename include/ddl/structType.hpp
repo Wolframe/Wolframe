@@ -185,6 +185,12 @@ public:
 	///\param[in] val value of the element defined as member of this
 	void defineContent( const std::string& name, const StructType& val);
 
+	///\brief Include the content elements of a structure (inherit)
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\remark [precondition] val must be of type (ContentType) Struct
+	///\param[in] val value of the element to include in this
+	void inheritContent( const StructType& val);
+
 	///\brief Define an attribute of a structure
 	///\remark [precondition] this must be of type (ContentType) Struct
 	///\remark [precondition] val must be of type atomic

@@ -141,6 +141,7 @@ public:
 	types::keymap<langbind::NormalizeFunctionConstructorR> m_normalizeFunctionConstructorMap;
 	types::keymap<langbind::NormalizeFunctionR> m_normalizeFunctionMap;
 	types::keymap<langbind::FormFunctionR> m_formFunctionMap;
+	types::keymap<module::FilterConstructorR> m_filterMap;
 	types::keymap<ddl::Form> m_formMap;
 	std::vector<ProgramR> m_programTypes;
 
@@ -173,21 +174,34 @@ public:
 		m_formMap.insert( name, f);
 	}
 
-	void defineFormDDL( const ddl::DDLCompilerR& constructor_)
+	void defineFormDDL( const ddl::DDLCompilerR& c)
 	{
-		DDLProgram* prg = new DDLProgram( constructor_);
+		DDLProgram* prg = new DDLProgram( c);
 		m_programTypes.push_back( ProgramR( prg));
 	}
 
-	void definePrintLayoutType( const module::PrintFunctionConstructorR& constructor_)
+	void definePrintLayoutType( const module::PrintFunctionConstructorR& f)
 	{
-		PrintProgram* prg = new PrintProgram( constructor_);
+		PrintProgram* prg = new PrintProgram( f);
 		m_programTypes.push_back( ProgramR( prg));
 	}
 
 	void defineNormalizeFunctionConstructor( const langbind::NormalizeFunctionConstructorR& f)
 	{
 		m_normalizeFunctionConstructorMap.insert( std::string(f->domain()), f);
+	}
+
+	void defineFilterConstructor( const module::FilterConstructorR& f)
+	{
+		m_filterMap.insert( f->name(), f);
+		if (!f->category().empty())
+		{
+			types::keymap<module::FilterConstructorR>::const_iterator fi = m_filterMap.find( f->category());
+			if (fi == m_filterMap.end())
+			{
+				m_filterMap.insert( f->category(), f);
+			}
+		}
 	}
 
 	const langbind::FormFunction* getFormFunction( const std::string& name) const
@@ -204,9 +218,21 @@ public:
 		return fi->second.get();
 	}
 
-	virtual const ddl::NormalizeFunction* getType( const std::string& name) const
+	const ddl::NormalizeFunction* getType( const std::string& name) const
 	{
 		return getNormalizeFunction( name);
+	}
+
+	langbind::Filter* createFilter( const std::string& name, const std::string& arg ) const
+	{
+		types::keymap<module::FilterConstructorR>::const_iterator fi = m_filterMap.find( name);
+		return (fi == m_filterMap.end())?0:fi->second->object( arg);
+	}
+
+	bool existsFilter( const std::string& name) const
+	{
+		types::keymap<module::FilterConstructorR>::const_iterator fi = m_filterMap.find( name);
+		return (fi != m_filterMap.end());
 	}
 
 	static bool programOrderAsc( std::pair<Program*, std::string> const& a, std::pair<Program*, std::string> const& b)
@@ -284,14 +310,19 @@ void ProgramLibrary::defineForm( const std::string& name, const ddl::Form& f)
 	m_impl->defineForm( name, f);
 }
 
-void ProgramLibrary::defineFormDDL( const ddl::DDLCompilerR& constructor_)
+void ProgramLibrary::defineFormDDL( const ddl::DDLCompilerR& c)
 {
-	m_impl->defineFormDDL( constructor_);
+	m_impl->defineFormDDL( c);
 }
 
-void ProgramLibrary::definePrintLayoutType( const module::PrintFunctionConstructorR& constructor_)
+void ProgramLibrary::definePrintLayoutType( const module::PrintFunctionConstructorR& f)
 {
-	m_impl->definePrintLayoutType( constructor_);
+	m_impl->definePrintLayoutType( f);
+}
+
+void ProgramLibrary::defineFilterConstructor( const module::FilterConstructorR& f)
+{
+	return m_impl->defineFilterConstructor( f);
 }
 
 const ddl::TypeMap* ProgramLibrary::formtypemap() const
@@ -312,6 +343,16 @@ const langbind::FormFunction* ProgramLibrary::getFormFunction( const std::string
 const langbind::NormalizeFunction* ProgramLibrary::getNormalizeFunction( const std::string& name) const
 {
 	return m_impl->getNormalizeFunction( name);
+}
+
+langbind::Filter* ProgramLibrary::createFilter( const std::string& name, const std::string& arg) const
+{
+	return m_impl->createFilter( name, arg);
+}
+
+bool ProgramLibrary::existsFilter( const std::string& name) const
+{
+	return m_impl->existsFilter( name);
 }
 
 void ProgramLibrary::loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames)

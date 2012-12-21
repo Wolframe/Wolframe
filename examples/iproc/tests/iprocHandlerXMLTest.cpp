@@ -58,7 +58,6 @@ using namespace _Wolframe::iproc;
 
 static module::ModulesDirectory* g_modulesDirectory;
 static boost::filesystem::path g_referencePath;
-static prgbind::ProgramLibrary g_prglib;
 
 static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const boost::filesystem::path& script)
 {
@@ -107,9 +106,9 @@ static boost::shared_ptr<proc::ProcProviderConfig> getProcProviderConfig( const 
 	return rt;
 }
 
-static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const boost::shared_ptr<proc::ProcProviderConfig>& cfg)
+static boost::shared_ptr<proc::ProcessorProvider> getProcProvider( const boost::shared_ptr<proc::ProcProviderConfig>& cfg, prgbind::ProgramLibrary* prglib)
 {
-	boost::shared_ptr<proc::ProcessorProvider> rt( new proc::ProcessorProvider( cfg.get(), g_modulesDirectory, &g_prglib));
+	boost::shared_ptr<proc::ProcessorProvider> rt( new proc::ProcessorProvider( cfg.get(), g_modulesDirectory, prglib));
 	return rt;
 }
 
@@ -253,10 +252,11 @@ TEST_F( IProcHandlerXMLTest, tests)
 			std::string testoutput;
 			boost::filesystem::path scriptpath = g_testdir / "scripts" / testDescriptions[ti].scriptfile;
 
+			prgbind::ProgramLibrary prglib;
 			IProcTestConfiguration config( scriptpath, ib[ii]+EoDBufferSize, ob[oo]);
 
 			boost::shared_ptr<proc::ProcessorProvider>
-				provider = getProcProvider( config.providerConfig());
+				provider = getProcProvider( config.providerConfig(), &prglib);
 
 			iproc::Connection connection( ep, &config);
 			connection.setProcessorProvider( provider.get());

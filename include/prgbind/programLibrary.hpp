@@ -36,11 +36,12 @@
 #ifndef _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
 #define _PRGBIND_PROGRAM_LIBRARY_HPP_INCLUDED
 #include "filter/filter.hpp"
+#include "module/filterBuilder.hpp"
 #include "database/database.hpp"
 #include "langbind/builtInFunction.hpp"
 #include "ddl/compilerInterface.hpp"
-#include "module/printFunctionBuilder.hpp"
 #include "prnt/printFunction.hpp"
+#include "module/printFunctionBuilder.hpp"
 #include "langbind/normalizeFunction.hpp"
 #include "prgbind/program.hpp"
 /*[-]*/#include "prgbind/transactionProgram.hpp"
@@ -68,14 +69,17 @@ public:
 	virtual void defineForm( const std::string& name, const ddl::Form& f);
 	virtual void defineNormalizeFunctionConstructor( const langbind::NormalizeFunctionConstructorR& f);
 	virtual void defineNormalizeFunction( const std::string& name, const langbind::NormalizeFunctionR& f) const;
-	virtual void defineFormDDL( const ddl::DDLCompilerR& constructor_);
-	virtual void definePrintLayoutType( const module::PrintFunctionConstructorR& constructor_);
+	virtual void defineFormDDL( const ddl::DDLCompilerR& c);
+	virtual void definePrintLayoutType( const module::PrintFunctionConstructorR& f);
+	virtual void defineFilterConstructor( const module::FilterConstructorR& f);
 
 	virtual const ddl::TypeMap* formtypemap() const;
 	virtual const types::keymap<langbind::NormalizeFunctionConstructorR>& normalizeFunctionConstructorMap() const;
 
 	virtual const langbind::FormFunction* getFormFunction( const std::string& name) const;
 	virtual const langbind::NormalizeFunction* getNormalizeFunction( const std::string& name) const;
+	virtual langbind::Filter* createFilter( const std::string& name, const std::string& arg ) const;
+	virtual bool existsFilter( const std::string& name) const;
 
 	virtual void loadPrograms( db::Database* transactionDB, const std::list<std::string>& filenames);
 
