@@ -18,26 +18,48 @@
 		<screeninfo>Step 5 customer button</screeninfo>
 		<mediaobject>
 			<imageobject role="html"> 
-				<imagedata fileref="examples/clients/simple_form.png" format="PNG"/>
+				<imagedata fileref="images/Tutorial/step5_customer_button.png" format="PNG"/>
 			</imageobject> 
 			<imageobject role="fo"> 
-				<imagedata fileref="examples/clients/simple_form.png" format="PNG" width="100%" scalefit="1"/>
+				<imagedata fileref="images/Tutorial/step5_customer_button.png" format="PNG" width="100%" scalefit="1"/>
 			</imageobject> 
 		</mediaobject>
 	</screenshot>
 	
-(file: step5_customer_button.png)
+	<para>
+		We add a dynamic property 'form' of type String to this button, which has
+		the value 'customers':
+	</para>
 
-We add a dynamic property 'form' of type String to this button, which has
-the value 'customers':
-
-(file: step5_customer_button_form_property.png)
-
-When we save the form and start the qtclient, we get (after logging in) the
-first page with the "Customer List" button. Pressing it gives the error
-message:
-
-(file: step5_customer_button_pressed_error.png)
+	<screenshot>
+		<screeninfo>Step 5 customer button properties</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step5_customer_button_form_property.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step5_customer_button_form_property.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject> 
+		</mediaobject>
+	</screenshot>
+	
+	<para>
+		When we save the form and start the qtclient, we get (after logging in) the
+		first page with the "Customer List" button. Pressing it gives the error
+		message:
+	</para>
+	
+	<screenshot>
+		<screeninfo>Step 5 customer button generates an error message</screeninfo>
+		<mediaobject>
+			<imageobject role="html"> 
+				<imagedata fileref="images/Tutorial/step5_customer_button_pressed_error.png" format="PNG"/>
+			</imageobject> 
+			<imageobject role="fo"> 
+				<imagedata fileref="images/Tutorial/step5_customer_button_pressed_error.png" format="PNG" width="100%" scalefit="1"/>
+			</imageobject> 
+		</mediaobject>
+	</screenshot>
 
 This means we have to define a new form called 'customers.ui', which will
 show the list of customers, for now we leave it empty. When we start the
