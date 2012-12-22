@@ -547,14 +547,12 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 		
 		int row = 0;
 		bool inData = false;
-		bool hasData = false;
 		QXmlStreamAttributes attributes;
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
 			if( xml.isStartElement( ) ) {
 				if( xml.name( ) == widget_name ) {
 					inData = true;
-					hasData = false;
 					tableWidget->insertRow( row );
 // HACK: set height of rows to thumbnail heigth					
 					tableWidget->setRowHeight( row, 50 );
@@ -594,18 +592,11 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 							QTableWidgetItem *item = tableWidget->item( row, col );
 							item->setData( Qt::UserRole, v );
 						}
-						
-						hasData = true;
 					}
 				}
 			} else if( xml.isEndElement( ) ) {
 				if( xml.name( ) == widget_name ) {
-					if( hasData ) {
-						row++;
-					} else {
-						tableWidget->removeRow( row );
-					}
-					hasData = false;
+					row++;
 					inData = false;
 				}
 			}
@@ -770,7 +761,10 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 		// all other classes don't have domain data
 	}
 	if( xml.hasError( ) ) {
-		qCritical( ) << xml.errorString( );
+		qCritical( ) << xml.errorString( )
+			<< "at line " << xml.lineNumber( ) << ", column " << xml.columnNumber( )
+			<< "(error type " << xml.error( ) << ")";
+		qCritical( ) << "XML was:\n" << data;
 	}
 }
 
@@ -981,7 +975,10 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 		}
 	}
 	if( xml.hasError( ) ) {
-		qCritical( ) << xml.errorString( );
+		qCritical( ) << xml.errorString( )
+			<< "at line " << xml.lineNumber( ) << ", column " << xml.columnNumber( )
+			<< "(error type " << xml.error( ) << ")";
+		qCritical( ) << "XML was:\n" << data;
 	}
 }
 
