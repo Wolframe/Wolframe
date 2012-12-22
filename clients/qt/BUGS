@@ -1,38 +1,15 @@
-../../../clients/cmdline/wolframec -d request/pushTagHierarchy.xml
+-- in features mainly:
 
-runs with textwolf, results in
-
-noname.xml:7: parser error : Extra content at the end of the document
-<node name="vegetables">
-^
-ERROR: error calling function 'pushTagHierarchy':[configurator]:244: error in function '<structure>:get()' (Extra content at the end of the document
-)
-ERROR: Error calling procedure: lua call failed
-ERROR: error redirect input: lua call failed
-noname.xml:9: parser error : Extra content at the end of the document
-<node name="Microcomputer">
-^
-ERROR: error calling function 'pushCategoryHierarchy':[configurator]:244: error in function '<structure>:get()' (Extra content at the end of the document
-)
-ERROR: Error calling procedure: lua call failed
-ERROR: error redirect input: lua call failed
-
-with libxml2 filter
+CRITICAL: "Premature end of document." 
+- either empty (completly)
+- or cut, last part missing
+=> very critical!
 
 ---
-
-ERROR: error in sqlite database transaction: SQLite error 5 (extended error code 5); message: 'database is locked' in statement 'SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $1'
-ERROR: error calling function 'CategoryHierarchyRequest':[configurator]:100: error in function '<formfunction>(..)' (transaction failed: SQLite error 5 (extended error code 5); message: 'database is locked' in statement 'SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETW)
-..and SQL is shortened..
-..db-layer concurrency issue..
-
----
+white-out:
 
 textwolf and one liners (no pretty print) lead to "white-outs"
 
---
-
-white-out:
 OK REQUEST editPicture
 REQUEST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -41,3 +18,10 @@ REQUEST
 ANSWER
 ... nothing happens, either server blocks while delivering or client
 stops reading, but client is in 'Data' mode and tcpdump shows no traffic.
+
+--
+ 
+ERROR: error in sqlite database transaction: SQLite error 5 (extended error code 5); message: 'database is locked' in statement 'SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETWEEN P2.lft AND P2.rgt AND P2.ID = $1'
+ERROR: error calling function 'CategoryHierarchyRequest':[configurator]:100: error in function '<formfunction>(..)' (transaction failed: SQLite error 5 (extended error code 5); message: 'database is locked' in statement 'SELECT P1.ID,P1.parentID,P1.name,P1.normalizedName,P1.description FROM category AS P1, category AS P2 WHERE P1.lft BETW)
+..and SQL is shortened..
+..db-layer concurrency issue..
