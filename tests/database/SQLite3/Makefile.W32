@@ -20,15 +20,13 @@ INCLUDE_LDFLAGS = \
 
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
-	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
 	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
-	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	$(TOPDIR)\gtest\gtest-all.obj \
-	$(TOPDIR)\src\modules\database\sqlite3\SQLite.obj \
-	$(TOPDIR)\src\modules\database\sqlite3\SQLitePreparedStatement.obj \
-	$(TOPDIR)\src\modules\database\sqlite3\SQLiteProgram.obj \
 	$(TOPDIR)\sqlite3\sqlite3.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
+
+TEST_CPP_OBJS = \
+	sqliteModuleFiles.obj
 
 TEST_CPP_BINS = \
 	sqliteUnit.exe

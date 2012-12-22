@@ -15,25 +15,19 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_serialize \
-	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(TOPDIR)/src/libwolframe_database \
 	$(SQLITE3_LIB_DIRS)
 
 INCLUDE_LIBS = \
-	$(TOPDIR)/src/modules/database/sqlite3/SQLite.o \
-	$(TOPDIR)/src/modules/database/sqlite3/SQLitePreparedStatement.o \
-	$(TOPDIR)/src/modules/database/sqlite3/SQLiteProgram.o \
 	-lwolframe \
-	-lwolframe_serialize \
-	-lwolframe_langbind \
 	-lwolframe_database \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(SQLITE3_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
 	-lboost_system -lboost_filesystem
 
-CPP_OBJS =
+CPP_OBJS = \
+	sqliteModuleFiles.o
 
 TEST_CPP_BINS = \
 	sqliteUnit$(EXE)

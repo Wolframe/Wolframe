@@ -10,7 +10,6 @@ INCLUDE_DIRS = \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \
-	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(TOPDIR)/src/libwolframe_prnt \
 	-L$(TOPDIR)/src/libwolframe
 
