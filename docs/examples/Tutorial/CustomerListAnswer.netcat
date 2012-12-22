@@ -4,7 +4,7 @@
 	OK authorization
 	ANSWER
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-	<list><customer/></list>
+	<list/>
 
 	.
 	OK REQUEST CustomerListRequest
