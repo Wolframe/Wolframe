@@ -41,7 +41,7 @@
 #include "prgbind/normalizeProgram.hpp"
 #include "database/transactionFunction.hpp"
 #include "prnt/printFunction.hpp"
-#include "langbind/normalizeProgram.hpp"
+#include "langbind/normalizeFunction.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
 #include "langbind/formFunction.hpp"
 #include "langbind/appObjects.hpp"

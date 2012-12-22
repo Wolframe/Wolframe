@@ -44,7 +44,6 @@
 #include "module/printFunctionBuilder.hpp"
 #include "langbind/normalizeFunction.hpp"
 #include "prgbind/program.hpp"
-#include "langbind/normalizeProgram.hpp"
 #include "module/normalizeFunctionBuilder.hpp"
 #include "langbind/formFunction.hpp"
 #include <string>
