@@ -336,15 +336,25 @@ void WolframeClient::dataAvailable( )
 					qCritical( ) << "Error when reading line!!";
 					break;
 				}
-				if( len >= 1024 ) {
-					qCritical( ) << "Long line!!";
-					break;
-				}
 				
-				if( len > 1 )
-					if( buf[len-1] == '\n' ) buf[len-1] = '\0';
-				if( len > 2 )
-					if( buf[len-2] == '\r' ) buf[len-2] = '\0';
+				bool lineSeen = true;
+				if( len > 1 ) {
+					if( buf[len-1] == '\n' ) {
+						buf[len-1] = '\0';
+						lineSeen = true;
+					}
+				}
+				if( len > 2 ) {
+					if( buf[len-2] == '\r' ) {
+						buf[len-2] = '\0';
+						lineSeen = true;
+					}
+				}
+// short buffer, no complete line read
+				if( !lineSeen ) {
+					m_answer.append( buf );
+					continue;
+				}
 // protocol answer
 				if( strncmp( buf, "BYE", 3 ) == 0 ) {
 // BYE has no additional data, one liner
