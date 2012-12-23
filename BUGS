@@ -3,7 +3,7 @@
 - what is a minimal server config? Either I get errors or the server
   silently doesn't start! This is not user-friendly..
   => first action is always to add a logging section (to stderr)
-- why is 'ServerTokens' required?
+
 - Connection 1: on timeout we loose connection from the pool!
   telnet localhost 7661
   Trying ::1...
@@ -19,5 +19,8 @@
   Escape character is '^]'.
   Server is busy. Please try again later.
   Connection closed by foreign host.
+  MBa: the problem is that a connection is removed twice from the list in case of a timeout.
+  Have to fix that, quick hack for now.
+
 - themes/windows directory is requires and the files, maybe a
   builtin compiled standard theme is an idea?

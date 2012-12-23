@@ -93,41 +93,44 @@ public:
 	{
 		m_maxConn = maxConnections;
 		m_globalList.addList( this );
-		m_size = 0;
 	}
 
-	std::size_t size()	{ return m_size; }
+	std::size_t size()	{ return m_connList.size(); }
 
 	void push( T conn )	{ boost::mutex::scoped_lock lock( m_mutex );
-				  ++m_size; m_connList.push_back( conn ); }
+				  m_connList.push_back( conn );
+				  LOG_DATA << "PUSH - Connections on socket: " << m_connList.size() << " of maximum " << m_maxConn << ", " << conn->toString();
+				}
 
 	void remove( T conn )	{ boost::mutex::scoped_lock lock( m_mutex );
-				  --m_size; m_connList.remove( conn ); }
+				  m_connList.remove( conn );
+				  LOG_DATA << "REMOVE - Connections on socket: " << m_connList.size() << " of maximum " << m_maxConn << ", " << conn->toString();
+				}
 
 	T pop()	{
 		boost::mutex::scoped_lock lock( m_mutex );
+		LOG_DATA << "POP - Connections on socket: " << m_connList.size() << " of maximum " << m_maxConn;
 		if ( m_connList.empty() )
 			return T();
-		--m_size;
 		T conn = m_connList.front();
 		m_connList.pop_front();
+		LOG_DATA << "POP - Connection " << conn->toString();
 		return conn;
 	}
 
 	bool isFull()	{
 		if ( m_maxConn > 0 )	{
-			LOG_DATA << "Connections on socket: " << m_size << " of maximum " << m_maxConn;
-			return(( m_size >= m_maxConn ) || m_globalList.isFull() );
+			LOG_DATA << "Connections on socket: " << m_connList.size() << " of maximum " << m_maxConn;
+			return(( m_connList.size() >= m_maxConn ) || m_globalList.isFull() );
 		}
 		else	{
-			LOG_DATA << "Connections on socket: " << m_size << ", no maximum limit";
+			LOG_DATA << "Connections on socket: " << m_connList.size() << ", no maximum limit";
 			return( m_globalList.isFull() );
 		}
 	}
 
 private:
 	std::list< T >		m_connList;
-	unsigned		m_size;
 	unsigned		m_maxConn;
 	GlobalConnectionList&	m_globalList;
 	boost::mutex		m_mutex;
@@ -155,6 +158,8 @@ public:
 	void unregister()	{
 		m_connList.remove( boost::static_pointer_cast<connection>( shared_from_this()) );
 	}
+
+	std::string toString() const;
 
 private:
 	/// Socket for the connection.
@@ -191,6 +196,8 @@ public:
 	void unregister()	{
 		m_connList.remove( boost::static_pointer_cast<SSLconnection>( shared_from_this()) );
 	}
+
+	std::string toString() const;
 
 private:
 	/// Handle the SSL handshake

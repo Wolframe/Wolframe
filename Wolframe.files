@@ -1536,13 +1536,11 @@ include/langbind/appObjects.hpp
 include/langbind/authorization.hpp
 include/langbind/builtInFunction.hpp
 include/langbind/formFunction.hpp
-include/langbind/formLibrary.hpp
 include/langbind/iostreamfilter.hpp
 include/langbind/luaArithmeticType.hpp
 include/langbind/luaCppCall.hpp
 include/langbind/luaException.hpp
 include/langbind/normalizeFunction.hpp
-include/langbind/normalizeProgram.hpp
 include/langbind/printProgram.hpp
 include/logger/logBackend.hpp
 include/logger/logComponent.hpp
@@ -1868,11 +1866,9 @@ src/libwolframe_langbind/cmdbind_doctypeFilterCommandHandler.cpp
 src/libwolframe_langbind/cmdbind_execCommandHandler.cpp
 src/libwolframe_langbind/cmdbind_ioFilterCommandHandlerEscDLF.cpp
 src/libwolframe_langbind/cmdbind_lineCommandHandler.cpp
-src/libwolframe_langbind/formLibrary.cpp
 src/libwolframe_langbind/GNUmakefile
 src/libwolframe_langbind/inputfilterScope.cpp
 src/libwolframe_langbind/Makefile.W32
-src/libwolframe_langbind/normalizeProgram.cpp
 src/libwolframe_langbind/null_filter.cpp
 src/libwolframe_langbind/printProgram.cpp
 src/libwolframe_langbind/protocol_ioblocks.cpp
@@ -2248,6 +2244,7 @@ tests/database/PostgreSQL/README.txt
 tests/database/PostgreSQL/testDB.sql
 tests/database/SQLite3/GNUmakefile
 tests/database/SQLite3/Makefile.W32
+tests/database/SQLite3/sqliteModuleFiles.cpp
 tests/database/SQLite3/sqliteUnit.cpp
 tests/database/SQLite3/testDB.sql
 tests/expect/GNUmakefile

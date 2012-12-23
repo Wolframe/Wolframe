@@ -168,6 +168,7 @@ std::string ServiceBanner::toString() const
 		case NONE:
 			break;
 		case UNDEFINED:
+			LOG_INFO << "Undefined ServerTokens, using ProductOnly";
 			banner = "Wolframe";
 			break;
 		default:

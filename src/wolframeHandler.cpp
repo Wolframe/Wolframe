@@ -136,7 +136,8 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		case net::ConnectionEndpoint::TCP:	{
 			const net::RemoteTCPendpoint& rmt = dynamic_cast< const net::RemoteTCPendpoint& >( remote );
 			m_remoteEP = new net::RemoteTCPendpoint( rmt );
-			LOG_TRACE << "Peer set to " << m_remoteEP->toString() << ", connected at " << m_remoteEP->connectionTime();
+			LOG_TRACE << "Peer set to " << m_remoteEP->toString() << ", connected at "
+				  << boost::posix_time::from_time_t( m_remoteEP->connectionTime());
 			break;
 		}
 
