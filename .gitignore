@@ -91,9 +91,12 @@ tests/db/sdsqliteTest
 tests/db/sqlite3ppTest
 lua/src/lua
 lua/src/luac
+docs/Tutorial.epub
+docs/Tutorial.html
+docs/Tutorial.pdf
+docs/WolfBook.epub
 docs/WolfBook.html
 docs/WolfBook.pdf
-docs/WolfBook.epub
 docs/doxygen/
 clients/wt/wtclient
 src/primary.db
@@ -160,5 +163,7 @@ clients/qtclient-build-desktop/
 examples/demo/configurator/database/configurator.db
 examples/demo/configurator/database/configurator.db-journal
 examples/demo/first/database/tree.db
+examples/demo/stress/database/stress.db
+examples/tutorial/database/sqlite.db
 wolframed.sh
 *.rcc

@@ -15,13 +15,10 @@ INCLUDE_CXXFLAGS += \
 
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_langbind \
-	-L$(TOPDIR)/src/libwolframe_serialize \
 	$(LIBXML2_LIB_DIRS) \
 	-L$(BOOST_LIB_DIR)
 
 INCLUDE_LIBS = \
-	-lwolframe_langbind \
 	$(LIBXML2_LIBS)
 
 DYNAMIC_MODULE = mod_filter_libxml2.so

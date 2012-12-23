@@ -21,5 +21,3 @@
   Connection closed by foreign host.
 - themes/windows directory is requires and the files, maybe a
   builtin compiled standard theme is an idea?
-- an empty list of results is not the same as a list with one empty tag:
-  <list><customer/></list>

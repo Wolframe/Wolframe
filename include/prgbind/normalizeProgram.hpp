@@ -37,7 +37,6 @@
 #define _PRGBIND_NORMALIZE_PROGRAM_HPP_INCLUDED
 #include "prgbind/program.hpp"
 #include "prgbind/programLibrary.hpp"
-#include "langbind/normalizeProgram.hpp"
 #include <string>
 
 namespace _Wolframe {

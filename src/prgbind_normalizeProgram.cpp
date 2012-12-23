@@ -34,11 +34,173 @@
 ///\file prgbind_normalizeProgram.cpp
 
 #include "prgbind/normalizeProgram.hpp"
-#include "langbind/normalizeProgram.hpp"
+#include "langbind/normalizeFunction.hpp"
+#include "utils/miscUtils.hpp"
+#include "config/programBase.hpp"
 #include <string>
 
 using namespace _Wolframe;
 using namespace _Wolframe::prgbind;
+
+static langbind::NormalizeFunction* createBaseFunction( const std::string& domain, const std::string& name, const std::string& arg, const types::keymap<module::NormalizeFunctionConstructorR>& constructormap)
+{
+	if (domain.empty()) throw std::runtime_error( "namespace of function not defined");
+	types::keymap<module::NormalizeFunctionConstructorR>::const_iterator bi = constructormap.find( domain);
+	if (bi == constructormap.end()) throw std::runtime_error( std::string("no constructor for namespace '") + domain + "' defined");
+	try
+	{
+		langbind::NormalizeFunction* rt = bi->second->object( name, arg);
+		if (!rt) throw std::runtime_error( std::string("could not find normalize function '") + domain + ":" + name + "(" + arg + ")'");
+		return rt;
+	}
+	catch (const std::runtime_error& err)
+	{
+		throw std::runtime_error( std::string("could not build normalize function '") + domain + ":" + name + "(" + arg + ")' :" + err.what());
+	}
+}
+
+class CombinedNormalizeFunction :public langbind::NormalizeFunction
+{
+public:
+	CombinedNormalizeFunction(){}
+	CombinedNormalizeFunction( const CombinedNormalizeFunction& o)
+		:langbind::NormalizeFunction(), m_steps(o.m_steps){}
+
+	void define( const langbind::NormalizeFunctionR& f)
+	{
+		m_steps.push_back(f);
+	}
+	virtual std::string execute( const std::string& i) const
+	{
+		if (m_steps.empty()) return i;
+		std::vector<langbind::NormalizeFunctionR>::const_iterator fi = m_steps.begin(), fe = m_steps.end();
+		std::string rt = (*fi++)->execute( i);
+		for (; fi != fe; ++fi)
+		{
+			rt = (*fi)->execute( rt);
+		}
+		return rt;
+	}
+
+	std::size_t nofSteps() const
+	{
+		return m_steps.size();
+	}
+
+	const langbind::NormalizeFunctionR& operator[]( std::size_t i) const
+	{
+		return m_steps[i];
+	}
+
+private:
+	std::vector<langbind::NormalizeFunctionR> m_steps;
+};
+
+
+static std::vector<std::pair<std::string,langbind::NormalizeFunctionR> > loadSource( const std::string& source, const types::keymap<module::NormalizeFunctionConstructorR>& constructormap)
+{
+	std::vector<std::pair<std::string,langbind::NormalizeFunctionR> > rt;
+	config::PositionalErrorMessageBase ERROR(source);
+	config::PositionalErrorMessageBase::Message MSG;
+	static const utils::CharTable optab( "=;)(,");
+	std::string prgname,tok,funcname;
+	std::string::const_iterator argstart;
+	std::string::const_iterator si = source.begin(), se = source.end();
+	char ch;
+
+	try
+	{
+		while ((ch = utils::gotoNextToken( si, se)) != 0)
+		{
+			CombinedNormalizeFunction funcdef;
+			std::string domain;
+
+			switch ((ch=utils::parseNextToken( prgname, si, se, optab)))
+			{
+				case ';': throw ERROR( si, "empty statement");
+				case '\'':
+				case '\"': throw ERROR( si, "identifier expected instead of string at start of statement");
+				default:
+					if (optab[ ch]) throw ERROR( si, "identifier expected at start of statement");
+			}
+			switch ((ch=utils::parseNextToken( tok, si, se, optab)))
+			{
+				case '\0': throw ERROR( si, "unexpected end of program");
+				case '=': break;
+				default:
+					if (optab[ ch]) throw ERROR( si, MSG << "'=' expected instead of '" << ch << "'");
+					throw ERROR( si, MSG << "'=' expected instead of '" << tok << "'");
+			}
+			while (ch != ';')
+			{
+				switch ((ch=utils::parseNextToken( funcname, si, se, optab)))
+				{
+					case '\0': throw ERROR( si, "unexpected end of program");
+					default:
+						if (optab[ ch]) throw ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
+				}
+				if ((':' == utils::gotoNextToken( si, se)))
+				{
+					domain = funcname;
+					funcname.clear();
+					++si;
+					switch ((ch=utils::parseNextToken( funcname, si, se, optab)))
+					{
+						case '\0': throw ERROR( si, "unexpected end of program");
+						default:
+							if (optab[ ch]) throw ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
+					}
+				}
+				switch ((ch=utils::gotoNextToken( si, se)))
+				{
+					case '\0': throw ERROR( si, "unexpected end of program");
+					case ',':
+					case ';':
+						funcdef.define( langbind::NormalizeFunctionR( createBaseFunction( domain, funcname, "", constructormap)));
+						++si;
+						continue;
+					case '(':
+						argstart = ++si;
+						while ((ch=utils::parseNextToken( tok, si, se, optab)) != ')')
+						{
+							if (ch == '\0') throw ERROR( si, "unexpected end of program");
+							if (ch == '(') throw ERROR( si, "nested expressions, bracket not closed");
+							if (ch == ';') throw ERROR( si, "unexpected end of expression, bracket not closed");
+						}
+						funcdef.define( langbind::NormalizeFunctionR( createBaseFunction( domain, funcname, std::string( argstart, si-1), constructormap)));
+						ch = utils::gotoNextToken( si, se);
+						if (ch == ';' || ch == ',')
+						{
+							++si;
+							continue;
+						}
+						if (!ch) throw ERROR( si, "unexpected end of program");
+						throw ERROR( si, "unexpected token at end of expression");
+					default:
+						throw ERROR( si, MSG << "separator ',' or ';' expected or function arguments in '(' ')' brackets instead of '" << ch << "'");
+				}
+			}
+			if (funcdef.nofSteps() == 1)
+			{
+				rt.push_back( std::pair<std::string,langbind::NormalizeFunctionR>( prgname, funcdef[0]));
+			}
+			else
+			{
+				langbind::NormalizeFunctionR func( new CombinedNormalizeFunction( funcdef));
+				rt.push_back( std::pair<std::string,langbind::NormalizeFunctionR>( prgname, func));
+			}
+		}
+		return rt;
+	}
+	catch (const config::PositionalErrorException& e)
+	{
+		throw e;
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw ERROR( si, e.what());
+	}
+}
 
 bool NormalizeProgram::is_mine( const std::string& filename) const
 {
@@ -47,13 +209,24 @@ bool NormalizeProgram::is_mine( const std::string& filename) const
 
 void NormalizeProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)
 {
-	langbind::NormalizeProgram program;
-	std::vector<std::pair<std::string,langbind::NormalizeFunctionR> > funclist
-		= program.loadfile( filename, library.normalizeFunctionConstructorMap());
-	std::vector<std::pair<std::string,langbind::NormalizeFunctionR> >::const_iterator ni = funclist.begin(), ne = funclist.end();
-	for (; ni != ne; ++ni)
+	try
 	{
-		library.defineNormalizeFunction( ni->first, ni->second);
+		std::vector<std::pair<std::string,langbind::NormalizeFunctionR> > funclist
+			= loadSource( utils::readSourceFileContent( filename), library.normalizeFunctionConstructorMap());
+
+		std::vector<std::pair<std::string,langbind::NormalizeFunctionR> >::const_iterator ni = funclist.begin(), ne = funclist.end();
+		for (; ni != ne; ++ni)
+		{
+			library.defineNormalizeFunction( ni->first, ni->second);
+		}
+	}
+	catch (const config::PositionalErrorException& e)
+	{
+		throw config::PositionalErrorException( filename, e);
+	}
+	catch (const std::runtime_error& err)
+	{
+		throw std::runtime_error( std::string( "error in normalize program file '") + filename + "' :" + err.what());
 	}
 }
 

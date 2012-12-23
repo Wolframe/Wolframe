@@ -14,16 +14,12 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	-L$(BOOST_LIB_DIR) \
 	-L$(TOPDIR)/src/libwolframe \
-	-L$(TOPDIR)/src/libwolframe_serialize \
 	-L$(TOPDIR)/src/libwolframe_database \
-	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS = \
 	-lwolframe \
-	-lwolframe_serialize \
 	-lwolframe_database \
-	-lwolframe_langbind \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(PGSQL_LIBS) \
 	-lboost_thread$(BOOST_LIBRARY_TAG) \
