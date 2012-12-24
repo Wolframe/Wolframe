@@ -63,8 +63,8 @@ void Preferences::loadSettings( )
 	const QMetaObject &mo = Preferences::staticMetaObject;
 	int idx = mo.indexOfEnumerator( "LoadMode" );
 	QMetaEnum metaEnum = mo.enumerator( idx );
-	m_uiLoadMode = static_cast< LoadMode >( metaEnum.keyToValue( s->value( "wolframe/uiloadmode", "Network" ).toString( ).toStdString( ).c_str( ) ) );
-	m_dataLoadMode = static_cast< LoadMode >( metaEnum.keyToValue( s->value( "wolframe/dataloadmode", "Network" ).toString( ).toStdString( ).c_str( ) ) );
+	m_uiLoadMode = static_cast< LoadMode >( metaEnum.keyToValue( s->value( "wolframe/uiloadmode", DEFAULT_UILOADMODE_STRING ).toString( ).toStdString( ).c_str( ) ) );
+	m_dataLoadMode = static_cast< LoadMode >( metaEnum.keyToValue( s->value( "wolframe/dataloadmode", DEFAULT_DATALOADMODE_STRING ).toString( ).toStdString( ).c_str( ) ) );
 	m_dbName = s->value( "wolframe/dbname", DEFAULT_SQLITE_FILENAME ).toString( );
 	m_debug = s->value( "wolframe/debug", false ).toBool( );
 	m_uiFormsDir = s->value( "wolframe/uiFormDir", DEFAULT_UI_FORMS_DIR ).toString( );

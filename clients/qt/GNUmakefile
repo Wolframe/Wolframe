@@ -79,7 +79,8 @@ CPP_OBJS = \
 	StorageWidget.o \
 	moc_StorageWidget.o \
 	ManageStorageDialog.o \
-	moc_ManageStorageDialog.o
+	moc_ManageStorageDialog.o \
+	moc_DefaultMainWindow.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -136,6 +137,14 @@ moc_StorageWidget.cpp: StorageWidget.hpp
 moc_ManageStorageDialog.cpp: ManageStorageDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) ManageStorageDialog.hpp -o moc_ManageStorageDialog.cpp
 
+moc_DefaultMainWindow.cpp: DefaultMainWindow.hpp
+	$(QT_MOC) $(MOC_FLAGS) DefaultMainWindow.hpp -o moc_DefaultMainWindow.cpp
+
+MainWindowUi.hpp: themes/windows/MainWindow.ui
+	uic -o MainWindowUi.hpp themes/windows/MainWindow.ui
+
+MainWindow.hpp: MainWindowUi.hpp
+
 FORMS = \
 	apps/test/forms/form1.ui \
 	apps/test/forms/form2.ui \
@@ -191,6 +200,7 @@ local_clean:
 	@-rm -f $(RESOURCES)
 	@-rm -f geany.c++.tags
 	@-rm -f Makefile
+	@-rm -f MainWindowUi.cpp
 
 local_distclean:
 
