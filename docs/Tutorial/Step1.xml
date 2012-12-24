@@ -31,9 +31,6 @@
 			maxConnections	1
 		}
 	}
-
-	; the server wont start without it
-	ServerTokens OS
 		</programlisting>
 	</para>
 		

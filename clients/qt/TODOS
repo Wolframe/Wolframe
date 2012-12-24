@@ -18,6 +18,8 @@ now:
 - search with flag (with children)
   
 musts:
+- themes/windows directory is requires and the files, maybe a
+  builtin compiled standard theme is an idea?
 - delete needs manual set parameters, update and add use XML from widgets,
   slightly assymetrical maybe?
 - tags picked from a list and added (needs events)
