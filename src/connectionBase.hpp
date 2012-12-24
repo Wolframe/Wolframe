@@ -126,60 +126,64 @@ protected:
 		NetworkOperation netOp = m_connHandler->nextOperation();
 		switch ( netOp.operation() )	{
 
-		case NetworkOperation::READ:	{
-			LOG_TRACE << "Next operation: READ " << netOp.size() << " bytes from " << identifier();
-			if ( netOp.buffer() == NULL )	{
-				LOG_FATAL << "Attempt to READ from " << identifier() << " to a NULL data block";
-				abort();		// here should be a system exception
+			case NetworkOperation::READ:	{
+				LOG_TRACE << "Next operation: READ " << netOp.size() << " bytes from " << identifier();
+				if ( netOp.buffer() == NULL )	{
+					LOG_FATAL << "Attempt to READ from " << identifier() << " to a NULL data block";
+					abort();		// here should be a system exception
+				}
+				if ( netOp.size() == 0 )	{
+					LOG_FATAL << "Attempt to READ 0 bytes data block from " << identifier();
+					abort();		// here should be a system exception
+				}
+				if ( netOp.timeout() > 0 )
+					setTimeout( netOp.timeout());
+				m_readBuffer = netOp.buffer();
+				socket().async_read_some( boost::asio::buffer( m_readBuffer, netOp.size() ),
+							  m_strand.wrap( boost::bind( &ConnectionBase::handleRead,
+										      this->shared_from_this(),
+										      boost::asio::placeholders::error,
+										      boost::asio::placeholders::bytes_transferred )));
 			}
-			if ( netOp.size() == 0 )	{
-				LOG_FATAL << "Attempt to READ 0 bytes data block from " << identifier();
-				abort();		// here should be a system exception
-			}
-			if ( netOp.timeout() > 0 )
-				setTimeout( netOp.timeout());
-			m_readBuffer = netOp.buffer();
-			socket().async_read_some( boost::asio::buffer( m_readBuffer, netOp.size() ),
-						  m_strand.wrap( boost::bind( &ConnectionBase::handleRead,
-									      this->shared_from_this(),
-									      boost::asio::placeholders::error,
-									      boost::asio::placeholders::bytes_transferred )));
-		}
-			break;
+				break;
 
-		case NetworkOperation::WRITE:	{
-			LOG_TRACE << "Next operation: WRITE " << netOp.size() << " bytes to " << identifier();
-			if ( netOp.data() == NULL )	{
-				LOG_FATAL << "Attempt to WRITE a NULL data block to " << identifier();
-				abort();		// here should be a system exception
+			case NetworkOperation::WRITE:	{
+				LOG_TRACE << "Next operation: WRITE " << netOp.size() << " bytes to " << identifier();
+				if ( netOp.data() == NULL )	{
+					LOG_FATAL << "Attempt to WRITE a NULL data block to " << identifier();
+					abort();		// here should be a system exception
+				}
+				if ( netOp.size() == 0 )	{
+					LOG_FATAL << "Attempt to WRITE a 0 bytes data block to " << identifier();
+					abort();		// here should be a system exception
+				}
+				if ( netOp.timeout() > 0 )
+					setTimeout( netOp.timeout());
+				boost::asio::async_write( socket(),
+							  boost::asio::buffer( netOp.data(), netOp.size() ),
+							  m_strand.wrap( boost::bind( &ConnectionBase::handleWrite,
+										      this->shared_from_this(),
+										      boost::asio::placeholders::error )));
 			}
-			if ( netOp.size() == 0 )	{
-				LOG_FATAL << "Attempt to WRITE a 0 bytes data block to " << identifier();
-				abort();		// here should be a system exception
-			}
-			if ( netOp.timeout() > 0 )
-				setTimeout( netOp.timeout());
-			boost::asio::async_write( socket(),
-						  boost::asio::buffer( netOp.data(), netOp.size() ),
-						  m_strand.wrap( boost::bind( &ConnectionBase::handleWrite,
-									      this->shared_from_this(),
-									      boost::asio::placeholders::error )));
-		}
-			break;
+				break;
 
-		case NetworkOperation::CLOSE:	{
-			LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
-			// Initiate graceful connection closure.
-			setTimeout( 0 );
-			if ( socket().lowest_layer().is_open() )	{
-				boost::system::error_code ignored_ec;
-				socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
-				socket().lowest_layer().close();
+			case NetworkOperation::CLOSE:	{
+				LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
+				// Initiate graceful connection closure.
+				setTimeout( 0 );
+				if ( socket().lowest_layer().is_open() )	{
+					boost::system::error_code ignored_ec;
+					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+					socket().lowest_layer().close();
+				}
+				unregister();
+				LOG_DEBUG << "Connection to " << identifier() << " closed";
+				break;
 			}
-			unregister();
-			LOG_DEBUG << "Connection to " << identifier() << " closed";
-		}
-			break;
+
+			case NetworkOperation::NOOP:
+				LOG_TRACE << "Next operation: NOOP on connection to " << identifier();
+				break;
 		}
 	}
 

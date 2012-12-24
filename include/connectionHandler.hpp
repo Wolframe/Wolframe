@@ -58,7 +58,8 @@ protected:
 	enum Operation	{
 		READ,
 		WRITE,
-		CLOSE
+		CLOSE,
+		NOOP
 	};
 
 	explicit NetworkOperation( Operation op, void* d = NULL, std::size_t s = 0,
@@ -112,6 +113,12 @@ public:
 	CloseConnection() : NetworkOperation( CLOSE )	{}
 };
 
+/// Network operation: no operation
+class NoOp : public NetworkOperation
+{
+public:
+	NoOp() : NetworkOperation( NOOP )	{}
+};
 
 /// The common handler for the connection status.
 class ConnectionHandler

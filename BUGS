@@ -20,7 +20,8 @@
   Server is busy. Please try again later.
   Connection closed by foreign host.
   MBa: the problem is that a connection is removed twice from the list in case of a timeout.
-  Have to fix that, quick hack for now.
+  Have to fix that, improved quick hack for now.
+  Timeout doesn't work reliable though.
 
 - themes/windows directory is requires and the files, maybe a
   builtin compiled standard theme is an idea?
