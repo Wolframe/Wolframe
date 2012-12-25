@@ -98,6 +98,7 @@ bool ServiceBanner::parse( const ConfigurationTree& pt, const std::string& node,
 			  << node << "'";
 		return false;
 	}
+
 	return true;
 }
 
@@ -144,25 +145,34 @@ std::string ServiceBanner::toString() const
 {
 	std::string	banner;
 
+	if ( m_tokens == UNDEFINED )	{
+
+	}
+
 	switch ( m_tokens )	{
-	case PRODUCT_NAME:
-		banner = "Wolframe";
-		break;
-	case VERSION_MAJOR:
-		banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M" );
-		break;
-	case VERSION_MINOR:
-		banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m" );
-		break;
-	case VERSION_REVISION:
-		banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m.%r" );
-		break;
-	case PRODUCT_OS:
-		banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m.%r" ) + " OS";
-		break;
-	case NONE:		break;
-	case UNDEFINED:
-	default:		throw std::domain_error( "ServiceBanner: unknown ServerTokens value" );
+		case PRODUCT_NAME:
+			banner = "Wolframe";
+			break;
+		case VERSION_MAJOR:
+			banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M" );
+			break;
+		case VERSION_MINOR:
+			banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m" );
+			break;
+		case VERSION_REVISION:
+			banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m.%r" );
+			break;
+		case PRODUCT_OS:
+			banner = "Wolframe " + _Wolframe::ApplicationSingleton::instance().version().toString( "version %M.%m.%r" ) + " OS";
+			break;
+		case NONE:
+			break;
+		case UNDEFINED:
+			LOG_INFO << "Undefined ServerTokens, using ProductOnly";
+			banner = "Wolframe";
+			break;
+		default:
+			throw std::domain_error( "ServiceBanner: unknown ServerTokens value" );
 	}
 	if ( ! m_serverSignature.empty() )
 		banner = m_serverSignature + banner;

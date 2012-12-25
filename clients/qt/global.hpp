@@ -9,12 +9,12 @@
 #define ORGANIZATION_DOMAIN "wolframe.org"
 #define APPLICATION_NAME "qtclient"
 
-#define DEFAULT_SQLITE_FILENAME "./apps/test/data.db"
-#define DEFAULT_UI_FORMS_DIR "./apps/test/forms"
-#define DEFAULT_UI_FORM_TRANSLATIONS_DIR "./apps/test/i18n"
-#define DEFAULT_UI_FORM_RESOURCES_DIR "./apps/test/resources"
+#define DEFAULT_SQLITE_FILENAME "./data.db"
+#define DEFAULT_UI_FORMS_DIR "."
+#define DEFAULT_UI_FORM_TRANSLATIONS_DIR "."
+#define DEFAULT_UI_FORM_RESOURCES_DIR "."
 
-#define DEFAULT_DATA_LOADER_DIR "./apps/test/data"
+#define DEFAULT_DATA_LOADER_DIR "."
 
 #define RESTART_CODE 1000
 
@@ -23,5 +23,12 @@
 #define SYSTEM_LANGUAGE "SYSTEM"
 
 #define WOLFRAME_VERSION "0.0.1"
+
+#define SESSION_NAME "qtclient-db"
+
+#define DEFAULT_UILOADMODE LocalFile
+#define DEFAULT_DATALOADMODE Network
+#define DEFAULT_UILOADMODE_STRING "LocalFile"
+#define DEFAULT_DATALOADMODE_STRING "Network"
 
 #endif // _GLOBAL_HPP_INCLUDED

@@ -13,6 +13,7 @@
 #include "PreferencesDialog.hpp"
 #include "ManageStorageDialog.hpp"
 #include "global.hpp"
+#include "DefaultMainWindow.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -34,13 +35,13 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_host( "localhost" ), m_port( 7661 ), m_secure( false ), m_checkSSL( true ),
 	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
 	m_CACertFile( "./certs/CAclient.cert.pem" ),
-	m_uiLoadMode( Network ), m_dataLoadMode( Network ), m_debug( false ),
+	m_uiLoadMode( DEFAULT_UILOADMODE ), m_dataLoadMode( DEFAULT_DATALOADMODE ), m_debug( false ),
 	m_loginDialog( 0 ), m_dbName( DEFAULT_SQLITE_FILENAME ), m_settings( ),
 	m_uiFormsDir( DEFAULT_UI_FORMS_DIR ),
 	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
 	m_uiFormResourcesDir( DEFAULT_UI_FORM_RESOURCES_DIR ),
 	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR ),
-	m_languages( ), m_language( )
+	m_languages( ), m_language( ), m_defaultMainWindow( false )
 {
 // read arguments for the '-s <setting file>' parameter
 #ifndef Q_OS_ANDROID
@@ -408,9 +409,12 @@ void MainWindow::finishInitialize( )
 	loadForm( "init" );
 
 // lower myself, as the theme opens a second main window
-	setMinimumSize( 0, 0 );
-	setFixedSize( 200, 200 );
-	adjustSize( );
+// (unless we are in the default window case)
+	if( !m_defaultMainWindow ) {
+		setMinimumSize( 0, 0 );
+		setFixedSize( 200, 200 );
+		adjustSize( );
+	}
 }
 
 void MainWindow::connected( )
@@ -534,20 +538,34 @@ void MainWindow::loadTheme( QString theme )
 // load the main window (which is empty) and provides basic functions like
 // theme switching, login, exit, about, etc. (to start unauthenticated)
 	QFile file( themesFolder + QLatin1String( "MainWindow.ui" ) );
-	file.open( QFile::ReadOnly );
-	m_ui = m_uiLoader->load( &file, this );
-	file.close( );
-	if( !m_ui ) {
-		return;
+	if( !file.exists( ) ) {
+// no file exists, so lets use the internal uic version of the windows theme
+		m_ui = new DefaultMainWindow( this );
+		m_defaultMainWindow = true;
+	} else {
+		file.open( QFile::ReadOnly );
+		m_ui = m_uiLoader->load( &file, this );
+		file.close( );
+		if( !m_ui ) {
+			return;
+		}
+		m_defaultMainWindow = false;
 	}
 
 // set stylesheet of the application (has impact on the whole application)
-	QFile qss( themesFolder + QLatin1String( "MainWindow.qss" ) );
+	QFile baseQss( themesFolder + QLatin1String( "MainWindow.qss" ) );
 #ifdef Q_OS_ANDROID
-	qApp->setStyleSheet( QFileInfo( qss ).filePath( ) );
+	QString qssFile = QFileInfo( baseQss ).filePath( );
 #else
-	qApp->setStyleSheet( QLatin1String( "file:///" ) + QFileInfo( qss ).absoluteFilePath( ) );
+	QString qssFilePath = QLatin1String( "file:///" ) + QFileInfo( baseQss ).absoluteFilePath( );
 #endif
+	QFile qss( qssFilePath );
+	if( qss.exists( ) ) {
+		qApp->setStyleSheet( qssFilePath );
+		qDebug( ) << "Setting stylesheet to" << qssFilePath;
+	} else {
+		qDebug( ) << "No stylesheet file found at " << qssFilePath;
+	}
 	
 // copy over the location of the old window to the new one
 // also copy over the current form, don't destroy the old ui,
@@ -869,7 +887,7 @@ void MainWindow::closeEvent( QCloseEvent *e )
 	m_ui->close( );
 }
 
-void MainWindow::muiDestroyed( QObject *obj )
+void MainWindow::muiDestroyed( QObject * /* obj */ )
 {
 	close( );
 }

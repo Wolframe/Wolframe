@@ -38,3 +38,6 @@ check:
 print:
 	@echo "Running the Wolframe server..."
 	@@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe.conf -p
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

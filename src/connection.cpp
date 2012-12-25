@@ -74,11 +74,11 @@ bool GlobalConnectionList::isFull()
 	boost::mutex::scoped_lock lock( m_mutex);
 
 	for ( std::list< SocketConnectionList< connection_ptr >* >::iterator it = m_connList.begin();
-	      it != m_connList.end(); it++ )
+									it != m_connList.end(); it++ )
 		conns += (*it)->size();
 #ifdef WITH_SSL
 	for ( std::list< SocketConnectionList< SSLconnection_ptr >* >::iterator it = m_SSLconnList.begin();
-	      it != m_SSLconnList.end(); it++ )
+									it != m_SSLconnList.end(); it++ )
 		conns += (*it)->size();
 #endif // WITH_SSL
 	if ( m_maxConn > 0 )	{
@@ -131,6 +131,23 @@ void connection::start()
 							   socket().remote_endpoint().port()));
 		nextOperation();
 	}
+}
+
+
+std::string connection::toString() const
+{
+	std::string str;
+
+	boost::system::error_code ec;
+	boost::asio::ip::tcp::endpoint ep = m_socket.remote_endpoint( ec );
+	if ( !ec )	{
+		str = ep.address().to_string()  + ":" + boost::lexical_cast< std::string >( ep.port() );
+		str += "->";
+	}
+	ep = m_socket.local_endpoint( ec );
+	if ( !ec )
+		str += ep.address().to_string() + ":" + boost::lexical_cast< std::string >( ep.port() );
+	return str;
 }
 
 
@@ -203,6 +220,23 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 		boost::system::error_code ignored_ec;
 		socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 	}
+}
+
+
+std::string SSLconnection::toString() const
+{
+	std::string str;
+
+	boost::system::error_code ec;
+	boost::asio::ip::tcp::endpoint ep = m_SSLsocket.lowest_layer().remote_endpoint( ec );
+	if ( !ec )	{
+		str = ep.address().to_string() + ":" + boost::lexical_cast< std::string >( ep.port() );
+		str += "->";
+	}
+	ep = m_SSLsocket.lowest_layer().local_endpoint( ec );
+	if ( !ec )
+		str += ep.address().to_string() + ":" + boost::lexical_cast< std::string >( ep.port() );
+	return str;
 }
 
 #endif // WITH_SSL

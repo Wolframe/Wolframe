@@ -167,3 +167,5 @@ examples/demo/stress/database/stress.db
 examples/tutorial/database/sqlite.db
 wolframed.sh
 *.rcc
+*.gcno
+*.gcda

@@ -136,7 +136,8 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 		case net::ConnectionEndpoint::TCP:	{
 			const net::RemoteTCPendpoint& rmt = dynamic_cast< const net::RemoteTCPendpoint& >( remote );
 			m_remoteEP = new net::RemoteTCPendpoint( rmt );
-			LOG_TRACE << "Peer set to " << m_remoteEP->toString() << ", connected at " << m_remoteEP->connectionTime();
+			LOG_TRACE << "Peer set to " << m_remoteEP->toString() << ", connected at "
+				  << boost::posix_time::from_time_t( m_remoteEP->connectionTime());
 			break;
 		}
 
@@ -184,111 +185,115 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 /// Handle a request and produce a reply.
 const net::NetworkOperation wolframeConnection::nextOperation()
 {
-	for (;;)
-	{
-	LOG_TRACE << "STATE wolframeConnection handler " << stateName( m_state);
-	switch( m_state )	{
-		case NEW_CONNECTION:	{
-			m_state = SEND_HELLO;
-			if ( ! m_globalCtx.banner().empty() )
-				m_outMsg = m_globalCtx.banner() + "\nOK\n";
-			else
-				m_outMsg = "OK\n";
-			return net::NetworkOperation( net::SendString( m_outMsg ));
-		}
-
-		case SEND_HELLO:	{
-			m_state = COMMAND_HANDLER;
-			m_cmdHandler.putInput(m_readBuf.charptr(), m_readBuf.pos());
-//DEPRECATED: old state machine:	m_state = READ_INPUT;
-			return net::NetworkOperation( net::ReadData( m_readBuf.ptr(), m_readBuf.size(), 30 ));
-		}
-
-		case READ_INPUT:
-			m_dataStart = m_readBuf.charptr();
-			if ( !strncmp( "quit", m_dataStart, 4 ))	{
-				m_state = TERMINATING;
-				return net::NetworkOperation( net::SendString( "Bye\n" ));
+	for ( ;; )	{
+		LOG_TRACE << "STATE wolframeConnection handler " << stateName( m_state );
+		switch( m_state )	{
+			case NEW_CONNECTION:	{
+				m_state = SEND_HELLO;
+				if ( ! m_globalCtx.banner().empty() )
+					m_outMsg = m_globalCtx.banner() + "\nOK\n";
+				else
+					m_outMsg = "OK\n";
+				return net::NetworkOperation( net::SendString( m_outMsg ));
 			}
-			else	{
-				char *s = m_dataStart;
-				for ( std::size_t i = 0; i < m_dataSize; i++ )	{
-					if ( *s == '\n' )	{
-						s++;
-						m_outMsg = std::string( m_dataStart, s - m_dataStart );
-						m_dataSize -= s - m_dataStart;
-						m_dataStart = s;
-						m_state = OUTPUT_MSG;
-						return net::NetworkOperation( net::SendString( m_outMsg ));
-					}
-					s++;
-				}
-				// If we got here, no \n was found, we need to read more
-				// or close the connection if the buffer is full
-				if ( m_dataSize >= m_readBuf.size() )	{
+
+			case SEND_HELLO:	{
+				m_state = COMMAND_HANDLER;
+				m_cmdHandler.putInput(m_readBuf.charptr(), m_readBuf.pos());
+				//DEPRECATED: old state machine:	m_state = READ_INPUT;
+				return net::NetworkOperation( net::ReadData( m_readBuf.ptr(), m_readBuf.size(), 30 ));
+			}
+
+			case READ_INPUT:
+				m_dataStart = m_readBuf.charptr();
+				if ( !strncmp( "quit", m_dataStart, 4 ))	{
 					m_state = TERMINATING;
-					return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
+					return net::NetworkOperation( net::SendString( "Bye\n" ));
+				}
+				else	{
+					char *s = m_dataStart;
+					for ( std::size_t i = 0; i < m_dataSize; i++ )	{
+						if ( *s == '\n' )	{
+							s++;
+							m_outMsg = std::string( m_dataStart, s - m_dataStart );
+							m_dataSize -= s - m_dataStart;
+							m_dataStart = s;
+							m_state = OUTPUT_MSG;
+							return net::NetworkOperation( net::SendString( m_outMsg ));
+						}
+						s++;
+					}
+					// If we got here, no \n was found, we need to read more
+					// or close the connection if the buffer is full
+					if ( m_dataSize >= m_readBuf.size() )	{
+						m_state = TERMINATING;
+						return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
+					}
+				}
+				LOG_ALERT << "Internal: Processor in illegal state << (" << (int)__LINE__ << ")";
+				return net::NetworkOperation( net::CloseConnection() );
+
+			case OUTPUT_MSG:
+				memmove( m_readBuf.ptr(), m_dataStart, m_dataSize );
+				m_state = READ_INPUT;
+				// Aba: Windows: wolframeHandler.cpp(194) : error C2036: 'void *' : unknown size,
+				// fixed temporarily with an ugly cast. Please check.
+				return net::NetworkOperation( net::ReadData( (char *)m_readBuf.ptr() + m_dataSize,
+									     m_readBuf.size() - m_dataSize,
+									     30 ));
+			case TIMEOUT_OCCURED:	{
+				m_state = TERMINATING;
+				return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
+			}
+
+			case SIGNALLED:	{
+				if ( m_state == TERMINATING )	{
+					return net::NetworkOperation( net::NoOp() );
+				}
+				else	{
+					m_state = TERMINATING;
+					return net::NetworkOperation( net::SendString( "Server is shutting down. :P\n" ));
 				}
 			}
-			LOG_ALERT << "Internal: Processor in illegal state << (" << (int)__LINE__ << ")";
-			return net::NetworkOperation( net::CloseConnection() );
 
-		case OUTPUT_MSG:
-			memmove( m_readBuf.ptr(), m_dataStart, m_dataSize );
-			m_state = READ_INPUT;
-			// Aba: Windows: wolframeHandler.cpp(194) : error C2036: 'void *' : unknown size,
-			// fixed temporarily with an ugly cast. Please check.
-			return net::NetworkOperation( net::ReadData( (char *)m_readBuf.ptr() + m_dataSize,
-								     m_readBuf.size() - m_dataSize,
-								     30 ));
-		case TIMEOUT_OCCURED:	{
-			m_state = TERMINATING;
-			return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
-		}
-
-		case SIGNALLED:	{
-			m_state = TERMINATING;
-			return net::NetworkOperation( net::SendString( "Server is shutting down. :P\n" ));
-		}
-
-		case FORBIDDEN:	{
-			m_state = TERMINATING;
-			return net::NetworkOperation( net::SendString( "Access denied.\n" ));
-		}
-
-		case TERMINATING:	{
-			m_state = FINISHED;
-			return net::NetworkOperation( net::CloseConnection() );
-		}
-
-		case FINISHED:
-			LOG_DEBUG << "Processor in FINISHED state";
-			return net::NetworkOperation( net::CloseConnection() );
-
-		case COMMAND_HANDLER:	{
-			void* inpp;
-			std::size_t inppsize;
-			const void* outpp;
-			std::size_t outppsize;
-			switch(m_cmdHandler.nextOperation())
-			{
-				case cmdbind::CommandHandler::READ:
-					m_cmdHandler.getInputBlock( inpp, inppsize);
-					return net::ReadData( inpp, inppsize);
-
-				case cmdbind::CommandHandler::WRITE:
-					m_cmdHandler.getOutput( outpp, outppsize);
-					return net::SendData( outpp, outppsize);
-
-				case cmdbind::CommandHandler::CLOSE:
-					m_state = FINISHED;
-					return net::NetworkOperation( net::CloseConnection());
+			case FORBIDDEN:	{
+				m_state = TERMINATING;
+				return net::NetworkOperation( net::SendString( "Access denied.\n" ));
 			}
-		}
-		default:
-			LOG_ALERT << "Internal: Processor in illegal state << (" << (int)__LINE__ << ")";
-			return net::NetworkOperation( net::CloseConnection() );
-	} /* switch( m_state ) */
+
+			case TERMINATING:	{
+				m_state = FINISHED;
+				return net::NetworkOperation( net::CloseConnection() );
+			}
+
+			case FINISHED:
+				LOG_DEBUG << "Processor in FINISHED state";
+//				return net::NetworkOperation( net::CloseConnection() );
+				return net::NetworkOperation( net::NoOp() );
+
+			case COMMAND_HANDLER:	{
+				void* inpp;
+				std::size_t inppsize;
+				const void* outpp;
+				std::size_t outppsize;
+				switch( m_cmdHandler.nextOperation() )	{
+					case cmdbind::CommandHandler::READ:
+						m_cmdHandler.getInputBlock( inpp, inppsize);
+						return net::ReadData( inpp, inppsize);
+
+					case cmdbind::CommandHandler::WRITE:
+						m_cmdHandler.getOutput( outpp, outppsize);
+						return net::SendData( outpp, outppsize);
+
+					case cmdbind::CommandHandler::CLOSE:
+						m_state = FINISHED;
+						return net::NetworkOperation( net::CloseConnection());
+				}
+			}
+			default:
+				LOG_ALERT << "Internal: Processor in illegal state << (" << (int)__LINE__ << ")";
+				return net::NetworkOperation( net::CloseConnection() );
+		} /* switch( m_state ) */
 	} /* for (;;) */
 }
 
@@ -310,38 +315,45 @@ void wolframeConnection::signalOccured( NetworkSignal signal )
 {
 	switch( signal )	{
 		case TERMINATE:
-			m_state = SIGNALLED;
 			LOG_TRACE << "Processor received termination signal";
+			if ( m_state != TERMINATING && m_state != FINISHED )
+				m_state = SIGNALLED;
 			break;
 
 		case TIMEOUT:
-			m_state = TIMEOUT_OCCURED;
 			LOG_TRACE << "Processor received timeout signal";
+			if ( m_state != TERMINATING && m_state != FINISHED )
+				m_state = TIMEOUT_OCCURED;
 			break;
 
 		case END_OF_FILE:
 			LOG_TRACE << "Processor received EOF (read on closed connection)";
-			m_state = TERMINATING;
+			if ( m_state != TERMINATING && m_state != FINISHED )
+				m_state = TERMINATING;
 			break;
 
 		case BROKEN_PIPE:
 			LOG_TRACE << "Processor received BROKEN PIPE (write on closed connection)";
-			m_state = TERMINATING;
+			if ( m_state != TERMINATING && m_state != FINISHED )
+				m_state = TERMINATING;
 			break;
 
 		case CONNECTION_RESET:
 			LOG_TRACE << "Processor received CONNECTION RESET (connection closed by peer)";
-			m_state = TERMINATING;
+			if ( m_state != TERMINATING && m_state != FINISHED )
+				m_state = TERMINATING;
 			break;
 
 		case OPERATION_CANCELLED:
 			LOG_TRACE << "Processor received OPERATION CANCELED (should have been requested by us)";
-			m_state = TERMINATING;
+			if ( m_state != TERMINATING && m_state != FINISHED )
+				m_state = TERMINATING;
 			break;
 
 		case UNKNOWN_ERROR:
 			LOG_TRACE << "Processor received an UNKNOWN error from the framework";
-			m_state = TERMINATING;
+			if ( m_state != TERMINATING && m_state != FINISHED )
+				m_state = TERMINATING;
 			break;
 	}
 }

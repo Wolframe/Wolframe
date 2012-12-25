@@ -10,15 +10,13 @@
 #include <QCommandLine>	
 #include <QCloseEvent>
 
+#include "global.hpp"
 #include "FormLoader.hpp"
 #include "DebugTerminal.hpp"
 #include "WolframeClient.hpp"
 #include "FormWidget.hpp"
 #include "LoginDialog.hpp"
 #include "LoadMode.hpp"
-
-#define SESSION_NAME "qtclient-db"
-
 
 	class MainWindow : public QWidget
 	{
@@ -71,6 +69,7 @@
 		QString m_dataLoaderDir;	// for FileDataLoader (data dir)
 		QStringList m_languages;	// available interface translations
 		QString m_language;		// the current language of the interface
+		bool m_defaultMainWindow;
 		
 	public slots:
 		void readSettings( );
