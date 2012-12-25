@@ -19,7 +19,7 @@
 	
 	<para>
 		We change the "Save" button and rename it to "Add". We also change the
-		documenttype there from "CustomerUpdate" to 'CustomerCreate' and we remove
+		attribute 'doctype' there from 'CustomerUpdate' to 'CustomerCreate' and we remove
 		the 'id' property (as this one is automatically choosen by the sequence
 		in the database). We also have to change the 'action' from 'update' to
 		'create':
