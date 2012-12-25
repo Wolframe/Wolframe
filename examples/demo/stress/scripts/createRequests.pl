@@ -3,7 +3,8 @@
 sub createDoc
 {
 	my ($doctype, $name, %map) = @_;
-	open (MYFILE, '>request/' . "$name" . '.xml');
+	my $filename = 'request/' . "$name" . '.xml';
+	open (MYFILE, ">$filename") or die "failed to open file $filename for writing";
 
 	if (($doctype) && ($doctype ne ""))
 	{
@@ -47,9 +48,9 @@ sub createUpdateDocument
 
 sub createSelectDocument
 {
-	my ($number) = @_;
-	my %doc = ( "numbr" => "$number" );
-	createDoc( "selectNumber", "select/$number", %doc );
+	my ($id) = @_;
+	my %doc = ( "id" => "$id" );
+	createDoc( "selectNumber", "select/$id", %doc );
 }
 
 sub createDeleteDocument
@@ -59,7 +60,7 @@ sub createDeleteDocument
 	createDoc( "deleteNumber", "delete/$number", %doc );
 }
 
-for ($count = 1; $count <= 10000; $count++)
+for ($count = 1; $count <= 1000; $count++)
 {
 	createInsertDocument( $count);
 	createUpdateDocument( $count);

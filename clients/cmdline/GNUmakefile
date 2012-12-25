@@ -9,6 +9,7 @@ INCLUDE_CXXFLAGS =
 INCLUDE_DIRS = \
 	-I. \
 	-I$(TOPDIR)/clients/lib \
+	-I$(TOPDIR) \
 	-I$(BOOST_INCLUDE_DIR)
 
 INCLUDE_LDFLAGS = \

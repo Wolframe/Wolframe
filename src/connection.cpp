@@ -54,6 +54,7 @@ static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
 
 void GlobalConnectionList::addList( SocketConnectionList< connection_ptr >* lst )
 {
+	boost::mutex::scoped_lock lock( m_mutex);
 	m_connList.push_back( lst );
 	LOG_DATA << "Added unencrypted connection list, " << m_connList.size() << " list(s) for unencrypted connections";
 }
@@ -61,6 +62,7 @@ void GlobalConnectionList::addList( SocketConnectionList< connection_ptr >* lst 
 #ifdef WITH_SSL
 void GlobalConnectionList::addList( SocketConnectionList< SSLconnection_ptr >* lst )
 {
+	boost::mutex::scoped_lock lock( m_mutex);
 	m_SSLconnList.push_back( lst );
 	LOG_DATA << "Added SSL connection list, " << m_SSLconnList.size() << " list(s) for SSL connections";
 }
@@ -69,6 +71,7 @@ void GlobalConnectionList::addList( SocketConnectionList< SSLconnection_ptr >* l
 bool GlobalConnectionList::isFull()
 {
 	std::size_t conns = 0;
+	boost::mutex::scoped_lock lock( m_mutex);
 
 	for ( std::list< SocketConnectionList< connection_ptr >* >::iterator it = m_connList.begin();
 	      it != m_connList.end(); it++ )

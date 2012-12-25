@@ -34,6 +34,8 @@
 #include "options.hpp"
 #include "utils.hpp"
 #include "session.hpp"
+#include "textwolf/xmlscanner.hpp"
+#include "textwolf/charset_utf8.hpp"
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -126,8 +128,38 @@ public:
 		}
 	}
 
+	static void checkValidXML( const char* data, std::size_t datasize)
+	{
+		std::string str( data, datasize);
+		typedef textwolf::XMLScanner<char*,textwolf::charset::UTF8,textwolf::charset::UTF8,std::string> MyXMLScanner;
+		char* xmlitr = const_cast<char*>( str.c_str());
+
+		std::cout << "XML:" << str << std::endl;
+		MyXMLScanner xs( xmlitr);
+		MyXMLScanner::iterator itr,end;
+		int taglevel = 0;
+
+		for (itr=xs.begin(),end=xs.end(); itr!=end; itr++)
+		{
+			if (itr->type() == MyXMLScanner::ErrorOccurred) throw std::runtime_error( itr->content());
+			if (itr->type() == MyXMLScanner::OpenTag) ++taglevel;
+			if (itr->type() == MyXMLScanner::CloseTag) --taglevel;
+		}
+		if (taglevel != 0) throw std::runtime_error( "tags not balanced");
+	}
+
 	virtual void answer( const char* data, std::size_t datasize)
 	{
+		try
+		{
+			checkValidXML( data, datasize);
+		}
+		catch (const std::runtime_error& e)
+		{
+			std::cerr << "Error " << e.what() << std::endl;
+			std::cerr << "SLEEPING ..." << std::endl;
+			boost::this_thread::sleep( boost::posix_time::seconds( 10));
+		}
 		if (m_outputfile.empty())
 		{
 			std::cout << std::string( data, datasize);

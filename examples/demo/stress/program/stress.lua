@@ -15,6 +15,7 @@ function selectNumber()
 	filter().empty = false
 	local inp = input:table()
 	local res = formfunction("selectNumber")(inp)
+	output:print( res:table())
 end
 
 function deleteNumber()

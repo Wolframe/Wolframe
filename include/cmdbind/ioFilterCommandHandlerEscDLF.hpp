@@ -98,6 +98,8 @@ private:
 	State m_state;					//< processing state machine state
 	const void* m_writedata;			//< bytes to write next (WRITE)
 	std::size_t m_writedatasize;			//< number of bytes to write next (WRITE)
+	unsigned int m_writedata_chksum;		//< check sum to verify write
+	unsigned int m_writedata_chkpos;		//< check position to verify write
 
 	protocol::InputBlock m_input;			//< input buffer
 	protocol::OutputBlock m_output;			//< output buffer

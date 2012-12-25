@@ -24,7 +24,7 @@ END
 --
 TRANSACTION selectNumber
 BEGIN
-	FOREACH /doc INTO doc DO SELECT numbr,mul,dup,trip FROM Number WHERE numbr=$(numbr);
+	FOREACH /doc INTO doc DO SELECT numbr,mul,dup,trip FROM Number WHERE id=$(id);
 END
 
 

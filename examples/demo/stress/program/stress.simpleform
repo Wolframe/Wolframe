@@ -32,7 +32,7 @@ FORM selectNumber
 {
 	doc
 	{
-		numbr int
+		id int
 	}
 }
 

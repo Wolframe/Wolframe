@@ -7,9 +7,13 @@ Run the script scripts/createRequests.pl (without arguments) to create the test 
 Example:
 	sqlite3 -init database/schema_sqlite.sql
 
-
-3) Run parallel tests:
+3) Start server:
 Example:
-	foreach ff in `ls request/insert/*`; do wolframec -d $ff; done && \
-	foreach ff in `ls request/select/*`; do wolframec -d $ff; done
+	./wolframed.sh
+
+
+4) Run parallel tests:
+Example:
+	for ff in `ls request/insert/*`; do ../../../clients/cmdline/wolframec -d $ff; done && \
+	for ff in `ls request/select/*`; do ../../../clients/cmdline/wolframec -d $ff; done
 

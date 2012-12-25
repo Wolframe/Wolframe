@@ -45,6 +45,8 @@ IOFilterCommandHandlerEscDLF::IOFilterCommandHandlerEscDLF()
 	:m_state(Processing)
 	,m_writedata(0)
 	,m_writedatasize(0)
+	,m_writedata_chksum(0)
+	,m_writedata_chkpos(0)
 	,m_itrpos(0)
 {
 	langbind::Filter flt = createNullFilter( "", "");
@@ -78,6 +80,10 @@ void IOFilterCommandHandlerEscDLF::getFilterOutputWriteData()
 	OutputFilter* flt = m_outputfilter.get();
 	m_writedata = m_output.ptr();
 	m_writedatasize = flt->getPosition()+m_output.pos();
+
+	langbind::OutputFilter::calculateCheckSum( m_writedata_chksum, 0, (const char*)m_writedata, m_writedatasize);
+	m_writedata_chkpos += m_writedatasize;
+
 	m_escapeBuffer.process( m_output.charptr(), m_output.size(), m_writedatasize);
 	m_output.setPos(0);
 	flt->setOutputBuffer( m_output.ptr(), m_output.size());
@@ -121,6 +127,14 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 				}
 				if (m_input.gotEoD())
 				{
+					if (m_writedata_chkpos != m_outputfilter->chkpos())
+					{
+						throw std::runtime_error( "output byte sum check failed");
+					}
+					if (m_writedata_chksum != m_outputfilter->chksum())
+					{
+						throw std::runtime_error( "output checksum check failed");
+					}
 					m_outputfilter.reset(0);
 					m_writedata = "\r\n.\r\n";
 					m_writedatasize = std::strlen("\r\n.\r\n");

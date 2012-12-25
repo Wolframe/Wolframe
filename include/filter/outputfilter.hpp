@@ -38,6 +38,7 @@ Project Wolframe.
 #include "filter/filterbase.hpp"
 #include <string>
 #include <cstring>
+#define WOLFRAME_OUTPUT_WITH_CHECKSUM
 
 namespace _Wolframe {
 namespace langbind {
@@ -62,7 +63,12 @@ public:
 		,m_state(Open)
 		,m_buf(0)
 		,m_size(0)
-		,m_pos(0){}
+		,m_pos(0)
+#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
+		,m_chksum(0)
+		,m_chkpos(0)
+#endif
+	{}
 
 	///\brief Copy constructor
 	///\param[in] o output filter to copy
@@ -72,7 +78,12 @@ public:
 		,m_state(o.m_state)
 		,m_buf(o.m_buf)
 		,m_size(o.m_size)
-		,m_pos(o.m_pos){}
+		,m_pos(o.m_pos)
+#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
+		,m_chksum(o.m_chksum)
+		,m_chkpos(o.m_chkpos)
+#endif
+		{}
 
 	///\brief Destructor
 	virtual ~OutputFilter(){}
@@ -141,12 +152,44 @@ public:
 		m_pos = o.m_pos;
 	}
 
+#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
+	unsigned int chksum() const
+	{
+		return m_chksum;
+	}
+	unsigned int chkpos() const
+	{
+		return m_chkpos;
+	}
+	static void calculateCheckSum( unsigned int& chksum_, std::size_t pos_, const char* buf_, std::size_t bufsize_)
+	{
+		std::size_t ii = 0;
+		for (; ii < bufsize_; ++ii) chksum_ += ((unsigned char)buf_[ pos_+ii] + 1U);
+//		chksum_ += bufsize_;
+	}
+#else
+	static void calculateCheckSum( unsigned int&, std::size_t, const char* , std::size_t ){}
+
+	unsigned int chksum() const
+	{
+		return 0;
+	}
+	unsigned int chkpos() const
+	{
+		return 0;
+	}
+#endif
+
 protected:
 	std::size_t write( const void* dt, std::size_t dtsize)
 	{
 		std::size_t nn = m_size - m_pos;
 		if (nn > dtsize) nn = dtsize;
 		std::memcpy( m_buf+m_pos, dt, nn);
+#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
+		calculateCheckSum( m_chksum, m_pos, m_buf, nn);
+		m_chkpos += nn;
+#endif
 		m_pos += nn;
 		return nn;
 	}
@@ -155,6 +198,10 @@ private:
 	char* m_buf;				//< buffer base pointer
 	std::size_t m_size;			//< buffer size in bytes
 	std::size_t m_pos;			//< write byte position
+#ifdef WOLFRAME_OUTPUT_WITH_CHECKSUM
+	unsigned int m_chksum;			//< check sum for error detection
+	unsigned int m_chkpos;			//< check bytes written for error detection
+#endif
 };
 
 ///\typedef OutputFilterR
