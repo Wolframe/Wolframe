@@ -144,7 +144,7 @@
 		Checking with:
 
 	<programlisting language='shell'>
-	netcat -v --wait=2 127.0.0.1 7661 &lt; CustomerListRequest.netcat
+	netcat -v --wait=2 localhost 7661 &lt; CustomerListRequest.netcat
 	</programlisting>
 	
 		we get now:

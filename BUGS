@@ -1,2 +1,0 @@
-- minimal config is a config with 2 config elements?! weird..
-  => check for XML first, use some simple validating parser (Patrick has one)
