@@ -297,7 +297,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 // something went wrong loading or constructing the form
 		m_ui = oldUi;
 		m_form = m_previousForm;
-		emit error( tr( "Unable to create form %1, does it exist?" ).arg( name ) );
+		emit error( tr( "Unable to load form '%1', does it exist?" ).arg( name ) );
 		return;
 	}
 	buf.close( );
