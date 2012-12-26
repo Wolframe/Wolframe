@@ -27,7 +27,7 @@
 	</para>
 	
 	<para>
-		Store this into schema.sql. Then execute:
+		Store this into <filename>schema.sql</filename>. Then execute:
 
 		<programlisting language='shell'>
 	sqlite3 tutorial.db &lt; schema.sql
@@ -187,7 +187,7 @@
 		This we can execute with:
 
 		<programlisting language='shell'>
-	netcat -v --wait=2 127.0.0.1 7661 &lt; CustomerListRequest.netcat
+	netcat -v --wait=2 localhost 7661 &lt; CustomerListRequest.netcat
 		</programlisting>
 
 		and we get:

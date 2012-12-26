@@ -65,8 +65,7 @@
 		This means we have to define a new form called
 		<filename>customers.ui</filename>, which will
 		show the list of customers, for now we leave it empty. When we start the
-		qtclient again and press the "Customer List" button again, we see that
-		qtclient again and press the "Customer List" button again, we see that
+		qtclient and press the "Customer List" button again, we see that
 		the form gets changed to the "customer" form (empty).
 	</para>
 
@@ -139,12 +138,12 @@
 
 	<para>
 		This means we have to configure the id attribute in the server in the simpleform.
-		The qtclient adds a id automatically to the customer tag in the request.
+		The qtclient adds an id automatically to the customer tag in the request.
 	</para>
 	
 	<para>
 		We declare the customer to have an optional 'id' attribute in
-		'CustomerListRequest.simpleform':
+		<filename>CustomerListRequest.simpleform</filename>:
 	</para>
 	
 	<programlisting language='shell'>

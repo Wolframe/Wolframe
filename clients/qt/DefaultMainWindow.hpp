@@ -14,12 +14,12 @@ class DefaultMainWindow : public QMainWindow
 	Q_OBJECT
 
 	private:
-		Ui::MainWindowUi *m_ui;
+		Ui::MainWindow *m_ui;
 
 	public:
 		DefaultMainWindow( QWidget *_parent = 0 )
 		{
-			m_ui = new Ui::MainWindowUi( );
+			m_ui = new Ui::MainWindow( );
 			m_ui->setupUi( this );
 			setParent( _parent );
 		}

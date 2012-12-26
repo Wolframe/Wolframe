@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindowUi</class>
- <widget class="QMainWindow" name="mainwindow">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>734</width>
-    <height>524</height>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,24 +19,14 @@
   <property name="themeBaseStyle" stdset="0">
    <string>plastique</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>2</width>
-     <height>2</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout"/>
-  </widget>
+  <widget class="QWidget" name="formWidget"/>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>312</width>
-     <height>18</height>
+     <width>734</width>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -82,26 +72,7 @@
    <addaction name="menuLanguages"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>3</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QWidget" name="formWidget" native="true">
-   <property name="geometry">
-    <rect>
-     <x>9</x>
-     <y>29</y>
-     <width>421</width>
-     <height>381</height>
-    </rect>
-   </property>
-  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
    <property name="icon">
     <iconset>

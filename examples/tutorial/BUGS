@@ -1,0 +1,10 @@
+- minimal config is a config with 2 config elements?! weird..
+  => check for XML first, use some simple validating parser (Patrick has one)
+- inconsistent nameing of configuration parameters (lowercase, uppercase,
+  camelcase, etc.)
+  - Processor, database
+- existence of files is not checked, e.g.
+  - directmap, program directive
+  - on the other hand simpleforms are checked
+- syntax in files not checked on startup, only on first execution:
+  lua, directmap
