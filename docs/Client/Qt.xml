@@ -38,17 +38,17 @@
 	<sect3>
 		<title>UI form translations</title>
 		<para>
-			Currently using the Qt translation format, version 2.0 for form translations
+			The Qt client uses the Qt translation format, version 2.0 for form translations
 			as described in
 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/linguist-ts-file-format.html">http://doc.qt.digia.com/qt/linguist-ts-file-format.html</link>.
 			Those are the files with extension <emphasis>.ts</emphasis>.
 		</para>
 		<para>
 			The translation files can get merged and generated with the <emphasis>lupdate</emphasis>
-			tool, then translated with the <emphasis>Qt linguist</emphasis>.
+			tool, then translated with the <emphasis>Qt Linguist</emphasis>.
 		</para>
 		<para>
-			The client needs the files in compiled form as files with the extesion
+			The Qt client needs the files in compiled form as files with the extesion
 			<emphasis>.qm</emphasis>. The <emphasis>lupdate</emphasis> tool is taking
 			care of that.
 		</para>
@@ -87,7 +87,7 @@
 		<title>"Programming" the interface</title>
 		<para>
 			Programming means we annotate the XML of the UI form files with
-			some extra properties. They steer the following things:
+			some extra properties. They control the following things:
 			<itemizedlist>
 				<listitem>
 				<para>
@@ -111,10 +111,10 @@
 		<sect3>
 			<title>Mapping XML data</title>
 			<para>
-				Every widget in the Qt class hierarchy has a default way, how data
+				Every widget in the Qt class hierarchy has a default way how data
 				is serialized into the request XML and how it is deserialized from
 				the answer XML. For instance a <classname>QLineEdit</classname> 
-				element of the form will output its currently inputed text to the
+				element of the form will output its currently visible text to the
 				XML or set it from there:
 			</para>
 			
@@ -135,12 +135,12 @@
 			</programlisting>
 			
 			<para>
-				Some elements are more complicated than that, they present the user
-				a list of options or items to pick from, e.g. a list of cities.
+				Some elements are more complicated than that: they present the user
+				a list of options or items the user to pick from, e.g. a list of cities.
 			</para>
 			
 			<screenshot>
-				<screeninfo>More complex Qt data input form</screeninfo>
+				<screeninfo>More complex Qt data input form with city list to pick from</screeninfo>
 				<mediaobject>
 					<imageobject role="html"> 
 						<imagedata fileref="images/clients/complex_form.png" format="PNG"/>
@@ -200,13 +200,14 @@
 				A UI form contains a set of widgets, the dynamic property
 				<code>form</code> contains the name of a widget (without
 				extension <emphasis>.ui</emphasis>) to load. Currently only
-				clicking a <classname>QPushButton</classname> can have an
-				<code>form</code> property.
+				a <classname>QPushButton</classname> can have a
+				<code>form</code> property which loads the given form when
+				the user clicks the button.
 			</para>
 			
 			<para>
-				In the Qt designer you have to attach the <code>form</code>
-				dynamic property of type <code>string</code> to the corresponding
+				In the Qt designer you have to attach a dynamic property
+				named <code>form</code>	of type <code>string</code> to the corresponding
 				widget of type <classname>QPushButton</classname>:
 				
 				<screenshot>
@@ -238,8 +239,8 @@
 				<member>action</member><member>Defines the kind of the request being generated when a widget is executed.
 				Is one of <code>create</code>, <code>update</code>, <code>delete</code> or <code>read</code>.</member>
 				<member>initAction</member><member>Defines the kind of the request which should be executed when the form is loaded.
-				It has the same values as <code>action</code>, but usually one <code>read</code> makes sense.</member>
-				<member>doctype</member><member>The document type of the XML request, usually references a form in one of the Data Definition Languages (for input validation).</member>
+				It has the same values as <code>action</code>, but usually only <code>read</code> makes sense.</member>
+				<member>doctype</member><member>The document type of the XML request, usually it references a form in one of the Data Definition Languages (for input validation).</member>
 				<member>rootelement</member><member>The root element of the XML document being sent, default is the name of the form.</member>
 				</simplelist>
 			</para>
@@ -249,7 +250,7 @@
 				
 			<para>
 				The <code>action</code> parameter can currently only be attached to a <classname>QPushButton</classname>
-				and denotes the action to be taken, when the user presses that button.
+				and denotes the action to be taken when the user presses the button.
 			</para>
 			
 			<para>
@@ -323,7 +324,7 @@
 			<para>
 				There is a special kind of request which happens in parallel to the form/button requests, and this
 				automatically when loading the form. Large sets of values could be stored in the UI form itself, but
-				as domains are actually linked to the data and business layer they should also always be loaded from
+				as domains are actually linked to the data and business layer they should be loaded always from
 				there. The following widgets execute a domain load request: 
 				<simplelist type="inline">
 					<member><classname>QComboBox</classname></member>
