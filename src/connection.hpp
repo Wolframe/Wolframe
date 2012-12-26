@@ -89,48 +89,65 @@ class SocketConnectionList
 {
 public:
 	SocketConnectionList( unsigned maxConnections, GlobalConnectionList& globalList )
-		: m_globalList( globalList )
+		: m_connListSize( 0 )
+		, m_globalList( globalList )
 	{
 		m_maxConn = maxConnections;
 		m_globalList.addList( this );
 	}
 
-	std::size_t size()	{ return m_connList.size(); }
+	std::size_t size()	{ return m_connListSize; }
 
-	void push( T conn )	{ boost::mutex::scoped_lock lock( m_mutex );
-				  m_connList.push_back( conn );
-				  LOG_DATA << "PUSH - Connections on socket: " << m_connList.size() << " of maximum " << m_maxConn << ", " << conn->toString();
-				}
+	void push( T conn )
+	{
+		{
+			boost::mutex::scoped_lock lock( m_mutex );
+			m_connList.push_back( conn );
+			++m_connListSize;
+		}
+		LOG_DATA << "PUSH - Connections on socket: " << m_connListSize << " of maximum " << m_maxConn << ", " << conn->toString();
+	}
 
-	void remove( T conn )	{ boost::mutex::scoped_lock lock( m_mutex );
-				  m_connList.remove( conn );
-				  LOG_DATA << "REMOVE - Connections on socket: " << m_connList.size() << " of maximum " << m_maxConn << ", " << conn->toString();
-				}
+	void remove( T conn )
+	{
+		{
+			boost::mutex::scoped_lock lock( m_mutex );
+			m_connList.remove( conn );
+			--m_connListSize;
+		}
+		LOG_DATA << "REMOVE - Connections on socket: " << m_connListSize << " of maximum " << m_maxConn << ", " << conn->toString();
+	}
 
-	T pop()	{
-		boost::mutex::scoped_lock lock( m_mutex );
-		LOG_DATA << "POP - Connections on socket: " << m_connList.size() << " of maximum " << m_maxConn;
-		if ( m_connList.empty() )
-			return T();
-		T conn = m_connList.front();
-		m_connList.pop_front();
+	T pop()
+	{
+		T conn;
+		LOG_DATA << "POP - Connections on socket: " << m_connListSize << " of maximum " << m_maxConn;
+		{
+			boost::mutex::scoped_lock lock( m_mutex );
+			if ( m_connList.empty() )
+				return T();
+			conn = m_connList.front();
+			m_connList.pop_front();
+			--m_connListSize;
+		}
 		LOG_DATA << "POP - Connection " << conn->toString();
 		return conn;
 	}
 
 	bool isFull()	{
 		if ( m_maxConn > 0 )	{
-			LOG_DATA << "Connections on socket: " << m_connList.size() << " of maximum " << m_maxConn;
-			return(( m_connList.size() >= m_maxConn ) || m_globalList.isFull() );
+			LOG_DATA << "Connections on socket: " << m_connListSize << " of maximum " << m_maxConn;
+			return(( m_connListSize >= m_maxConn ) || m_globalList.isFull() );
 		}
 		else	{
-			LOG_DATA << "Connections on socket: " << m_connList.size() << ", no maximum limit";
+			LOG_DATA << "Connections on socket: " << m_connListSize << ", no maximum limit";
 			return( m_globalList.isFull() );
 		}
 	}
 
 private:
 	std::list< T >		m_connList;
+	std::size_t		m_connListSize;
 	unsigned		m_maxConn;
 	GlobalConnectionList&	m_globalList;
 	boost::mutex		m_mutex;
