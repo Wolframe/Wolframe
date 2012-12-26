@@ -36,13 +36,14 @@ Project Wolframe.
 ///\remark The reference template introduced here should be replaced by an appropriate boost smart pointer. The existence of this module is due easier injection of tracing and debugging aspects
 
 #include <cstddef>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace types {
 
 ///\class CountedReference
 ///\brief Reference to an object that is freed when not referenced anymore.
-///\remark Substitutable by 'shared_ptr'
+///\remark Designed to be substitutable by 'shared_ptr' except that the reset function that is different (BUG)
 ///\tparam OBJ
 template <class OBJ>
 class CountedReference
@@ -121,11 +122,6 @@ public:
 		return *m_ref->m_ptr;
 	}
 
-	OBJ* reference()
-	{
-		++m_ref->m_cnt;
-		return m_ref->m_ptr;
-	}
 private:
 	Pointer* m_ref;
 };

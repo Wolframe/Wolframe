@@ -135,7 +135,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 					{
 						throw std::runtime_error( "output checksum check failed");
 					}
-					m_outputfilter.reset(0);
+					m_outputfilter.reset();
 					m_writedata = "\r\n.\r\n";
 					m_writedatasize = std::strlen("\r\n.\r\n");
 					m_state = Terminated;

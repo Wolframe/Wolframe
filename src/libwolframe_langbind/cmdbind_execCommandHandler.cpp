@@ -330,7 +330,7 @@ CommandHandler::Operation ExecCommandHandler::nextOperation()
 							m_itr = m_input.at( pos);
 							m_end = m_input.end();
 							err = m_cmdhandler.get()->lastError();
-							m_cmdhandler.reset(0);
+							m_cmdhandler.reset();
 							m_state = EnterCommand;
 							if (err)
 							{

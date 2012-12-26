@@ -288,7 +288,7 @@ const net::NetworkOperation Connection::nextOperation()
 							m_end = m_input.end();
 
 							err = m_cmdhandler.get()->lastError();
-							m_cmdhandler.reset(0);
+							m_cmdhandler.reset();
 							m_state = EnterCommand;
 							if (err)
 							{

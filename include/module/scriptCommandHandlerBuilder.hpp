@@ -141,7 +141,7 @@ public:
 					if (setDefaultFilter( filtername)) continue;
 				}
 				// required configuration parameters:
-				if (boost::iequals( pi->first, "program"))
+				else if (boost::iequals( pi->first, "program"))
 				{
 					m_programfiles.push_back( pi->second.get_value<std::string>());
 				}

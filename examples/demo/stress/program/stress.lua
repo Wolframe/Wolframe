@@ -14,13 +14,15 @@ end
 function selectNumber()
 	filter().empty = false
 	local inp = input:table()
-	local res = formfunction("selectNumber")(inp)
-	output:print( res:table())
+--	local res = formfunction("selectNumber")(inp)
+--	output:print( res:table())
+	logger.printc( inp)
+	output:print( inp)
 end
 
 function deleteNumber()
 	filter().empty = false
 	local inp = input:table()
-	local res = formfunction("selectNumber")(inp)
+	local res = formfunction("deleteNumber")(inp)
 end
 

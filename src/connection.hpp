@@ -81,7 +81,6 @@ private:
 	std::list< SocketConnectionList< SSLconnection_ptr >* >	m_SSLconnList;
 #endif // WITH_SSL
 	unsigned						m_maxConn;
-	boost::mutex						m_mutex;
 };
 
 

@@ -257,9 +257,17 @@ void StructIndirectionConstructor::substituteSelf( StructType* st, const Indirec
 
 StructType* StructIndirectionConstructor::create( const IndirectionConstructorR& self) const
 {
-	types::CountedReference<StructType> rt( new StructType( m_prototype));
-	substituteSelf( rt.get(), self);
-	return rt.reference();
+	StructType* rt = new StructType( m_prototype);
+	try
+	{
+		substituteSelf( rt, self);
+	}
+	catch (const std::exception& e)
+	{
+		delete rt;
+		throw e;
+	}
+	return rt;
 }
 
 IndirectionConstructorR& StructType::indirection()
