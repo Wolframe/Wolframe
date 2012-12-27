@@ -14,7 +14,7 @@
 			A database operation is either a single database instruction (SELECT,UPDATE,etc.) or a name reference to
 			a prepared statement or a block of operations delared with OPERATION.
 			It adds some constructs to address input structure elements or database command results as arguments.
-			Each database command result can be declared as beeing part of the transaction result structure.
+			Each database command result can be declared as being part of the transaction result structure.
 			The language has no control structures and is therefore not a general purpose programming language.
 			It just offers some direct mapping of input to commands and from commands results to output.
 			For programming <code>Wolframe</code> offers some scripting language bindings to use outside the transactional context.
@@ -22,7 +22,7 @@
 	</sect2>
 	<sect2>
 		<title>First example</title>
-		<para>This example selects a key from a table and uses it for a list inserts. The substitute "$1" refers to the first column of the "SELECT id FROM UserTable .." query result. The substitute "$(name)" in the first statement refers to the toplevel tag 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name beeing unique per item and item describing a set of items).
+		<para>This example selects a key from a table and uses it for an insert into a list. The substitute "$1" refers to the first column of the "SELECT id FROM UserTable .." query result. The substitute "$(name)" in the first statement refers to the toplevel tag 'name' of the input. In the second statement it refers to the "name" element of the "item" selection in the query, e.g. for each element with the path "/item/name" (name beeing unique per item and item describing a set of items).
 		<programlisting language='sql'>
 		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/first_example.tdl" parse="text" />
 		</programlisting>

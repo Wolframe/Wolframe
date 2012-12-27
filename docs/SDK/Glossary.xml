@@ -52,14 +52,14 @@
 	</glossentry>
 	<glossentry><glossterm>Transaction</glossterm>
 		<glossdef>
-			<para>A transaction is a call of a database defined in a transaction program. A transaction either fails completely or succeeds a whole. Auditing is seen as part of the transaction. Transactions have an object as input and returns an object or an error as result.
+			<para>A transaction is a call of a database defined in a transaction program. A transaction either fails completely or succeeds as whole. Auditing is seen as part of the transaction. Transactions have an object as input and return an object or an error as result.
 				Authorization tags that are checked against the user privileges of the connection can be attached to transactions.
 			</para>
 		</glossdef>
 	</glossentry>
 	<glossentry><glossterm>Processor program</glossterm>
 		<glossdef>
-			<para>A program that is executed by a command handler. It works with data input, data output and transaction execution as only interfaces to the system. Exceptions, signals and events are handled by the processor in the background without showing up the the program. A program in this context is sequential.
+			<para>A program that is executed by a command handler. It works with data input, data output and transaction execution as the only interfaces to the system. Exceptions, signals and events are handled by the processor in the background without showing them to the program. A program in this context is sequential.
 			</para>
 		</glossdef>
 	</glossentry>
