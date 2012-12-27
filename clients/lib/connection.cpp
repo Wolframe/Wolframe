@@ -99,7 +99,7 @@ struct TransportLayerPlain
 };
 
 
-struct Connection::Impl
+struct Connection::Impl :public boost::enable_shared_from_this<Connection::Impl>
 {
 	Impl() :m_state(INIT){}
 	virtual ~Impl(){}

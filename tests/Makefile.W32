@@ -135,6 +135,7 @@ TEST_CPP_BINS = \
 	unitLibraryTest.exe
 
 #	stringNormalizationTest.exe \
+# DISABLED (only for memory corruption checks):	testTestAllocator.exe \
 
 
 OBJS = \
@@ -163,6 +164,7 @@ PBKDF2test.exe: PBKDF2test.obj $(TOPDIR)\src\libwolframe\wolframe.lib
 logTest.exe: logTest.obj $(TOPDIR)\src\wolframe.lib
 protocolArgumentParsing.exe: protocolArgumentParsing.obj $(TOPDIR)\src\wolframe.lib
 testArrayDoublingAllocator.exe: testArrayDoublingAllocator.obj $(TOPDIR)\src\wolframe.lib
+testTestAllocator.exe: testTestAllocator.obj $(TOPDIR)\src\wolframe.lib
 configStructParser.exe: configStructParser.obj $(TOPDIR)\src\wolframe.lib
 configValueParser.exe: configValueParser.obj $(TOPDIR)\src\wolframe.lib
 testProtocolLFdotEscaping.exe: testProtocolLFdotEscaping.obj $(TOPDIR)\src\wolframe.lib
@@ -190,6 +192,8 @@ local_test:
 	@-echo mkdir temp
 	@-echo testNamedRetVal >> test.bat
 	@-echo testVirtualInheritance >> test.bat
+	@-echo testArrayDoublingAllocator >> test.bat
+# DISABLED (only for memory corruption checks):	@-echo testTestAllocator >> test.bat
 	@-echo logTest >> test.bat
 	@-echo versionTest >> test.bat
 	@-echo counterTest >> test.bat
@@ -217,6 +221,4 @@ local_longtest:
 	@-echo PATH=%PATH%;$(BOOST_DIR)\Lib >> test.bat
 	@-echo poolTest >> test.bat
 	@-echo PBKDF2test >> test.bat
-	@-echo testArrayDoublingAllocator >> test.bat
-	@-echo
 	@-test.bat

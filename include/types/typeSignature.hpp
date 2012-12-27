@@ -33,6 +33,7 @@ Project Wolframe.
 #define _Wolframe_TYPE_SIGNATURE_HPP_INCLUDED
 ///\file types/typeSignature.hpp
 ///\brief Signature for structures to detect memory problems
+#include "types/malloc.hpp"
 #include <cstddef>
 #include <cstring>
 #include <stdexcept>
@@ -40,6 +41,21 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace types {
+
+struct ProtectedMem
+{
+	void* operator new( std::size_t size)
+	{
+		void* rt = types::malloc( size);
+		if (!rt) throw std::bad_alloc();
+		return rt;
+	}
+
+	void operator delete(void* ptr)
+	{
+		types::free( ptr);
+	}
+};
 
 ///\class TypeSignature
 ///\brief Signature of a type for pointer constraint check
