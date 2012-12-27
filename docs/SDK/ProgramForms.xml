@@ -10,12 +10,12 @@
 		It depends very much on the application what DDL is best to use.
 		Users may already have their data definitions in a certain way defined.
 		The form DDL can be defined in the way you want. Wolframe offers a
-		pluggin mechanism for DLL compilers and provides examples of such compilers.
+		plugin mechanism for DDL compilers and provides examples of such compilers.
 		You configure the DDL sources to load and the compiler to use.
 	</para>
 	<para>
-		With the DDL form description we get a deserialization of content
-		to a structure and a serialization for output. We get also a validation
+		With the DDL form description we get a deserialization of some content
+		into a structure and a serialization for the output. We get also a validation
 		and normalization procedure of content by assigning types to atomic form
 		elements that validate and normalize the data elements.
 		Most of the business transactions should be doable as input form
@@ -37,7 +37,7 @@
 		The attributes are a data type and some operators that describe additional properties.
 	</para>
 	<para>
-		Each form declaration starts with a keyword 'FORM' or 'STRUCT'. The difference between 'FORM' and 'STRUCT' is that the later is used for declaration that are only referenced inside the same file as sub structure reference,
+		Each form declaration starts with a keyword 'FORM' or 'STRUCT'. The difference between 'FORM' and 'STRUCT' is that the later is used for declarations that are only referenced inside the same file as sub structure reference,
 		while 'FORM' declares a structure to be exported as global form declaration.
 		After this header follows the structure declaration inside curly brackets '{' '}'.
 	</para>

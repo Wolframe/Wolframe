@@ -25,7 +25,7 @@
 		filters. The system provides a global function
 			<code>filter( )</code>
 		with the name of the filter as string as parameter. If you for example want to process data
-		as XML with 'libxml2' and libxml is not loaded as primary XML filter on your system,
+		as XML with 'libxml2' and libxml2 is not loaded as primary XML filter on your system,
 		then you need to get a filter by calling
 			<code>filter( "XML:libxml2" )</code>
 		The object returned by this function call can be attached to input or output. It uses the
@@ -41,13 +41,13 @@
 			<code>input:get( )</code>
 		returns an iterator on the input that fetches one or two values per step depending on the filter.
 			<code>input:table( )</code>
-		returns the input structure as lua table. If the document has a document type, the document is validated
-		by the associated data form. If the document is standalone, then the returned table may not have the structure
-		expected because without schema there is no mean to distinguish between a single element array and a unique element.
+		returns the input structure as a lua table. If the document has a document type, the document is validated
+		by the associated data form. If the document is standalone, then the returned table may not have the expected
+		structure because without schema there is no mean to distinguish between a single element array and a unique element.
 	</para>
 	<para>
-		For Lua users the input processing via a table would be the most straightforward. An example
-		program could look like the this:
+		For Lua users processing the input via a table would be the most straightforward way of processing. An example
+		program could look like this:
 			<programlisting language='lua'>
 			<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/input_table.lua" parse="text" />
 			</programlisting>
@@ -108,8 +108,8 @@
 	<title>Output</title>
 	<para>Output is a accessed by a global variable output. This object has the following methods:
 			<code>output:as( arg)</code>
-		In case of arg beeing a string or a table it defines the document type of the output.
-		In case of arg beeing a filter it attaches this filter to the output.
+		In case of arg being a string or a table it defines the document type of the output.
+		In case of arg being a filter it attaches this filter to the output.
 		Subsequent calls of <code>output:print()</code> will apply this filter <code>arg</code> to print
 		the output elements returned as content to the client.
 			<code>output:print(c,t)</code>
@@ -217,7 +217,7 @@
 		<sect3>
 		<title>Example 3: An XML echo program</title>
 		<para>This is a program echoing input as XML using textwolf as filter.
-			Filters are objects that are processing the data of the objects they are attached.
+			Filters are objects that are processing the data of the objects they are attached to.
 			For this they store the current state of processing and an iterator on the data they process.
 			When you attach the same filter object to input and output, then the output filter
 			will share some information like the character set encoding of the input. So if you want to
@@ -238,7 +238,7 @@
 		<sect3>
 		<title>Example 4: An XML echo program</title>
 		<para>This example does the same as example3 but treats the content of the tag "content" in
-			an own procedure.
+			its own procedure.
 		<programlisting language='lua'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_4.lua" parse="text" />
 		</programlisting>
@@ -247,7 +247,7 @@
 		<sect3>
 		<title>Example 5: Load XML into a table</title>
 		<para>
-			This example procedure load the content of the XML document into a table and prints the
+			This example procedure loads the contents of the XML document into a table and prints the
 			elements 'name' and 'country'.
 		<programlisting language='lua'>
 		<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/SDKTutorial/lua_script_5.lua" parse="text" />

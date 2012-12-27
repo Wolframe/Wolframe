@@ -322,8 +322,8 @@
 				<title>domain reads</title>
 				
 			<para>
-				There is a special kind of request which happens in parallel to the form/button requests, and this
-				automatically when loading the form. Large sets of values could be stored in the UI form itself, but
+				There is a special kind of request which happens automatically in parallel to the form/button requests
+				when loading the form. Large sets of values could be stored in the UI form itself, but
 				as domains are actually linked to the data and business layer they should be loaded always from
 				there. The following widgets execute a domain load request: 
 				<simplelist type="inline">
@@ -373,7 +373,7 @@
 				<xi:include  xmlns:xi="http://www.w3.org/2001/XInclude" href="examples/clients/domain_load_search.xml" parse="text" />
 				</programlisting>
 				
-				The business layer would apply a <code>LIKE</code> to filter the data. but the client doesn't care about that.				
+				The business layer would apply a <code>LIKE</code> to filter the data. but the client doesn't care.				
 			</para>	
 			
 			</sect4>
@@ -438,7 +438,7 @@
 			<para>
 				We can make widgets read and set properties so that they
 				communicate values without the server noticing. Currently
-				this is:
+				those are:
 
 				<itemizedlist>
 				<listitem>
@@ -537,7 +537,7 @@
 					</mediaobject>
 				</screenshot>
 				
-				We also add it to the "Save" button, so the XML request for the update
+				We also add it to the "Save" button, so that the XML request for the update
 				operation gets the id attribute attached to the root element:
 				
 				<screenshot>
@@ -571,13 +571,13 @@
 					
 					<listitem>
 					<para><code>text</code>:
-					Returns the currently visible text.
+					Returns the currently visible text (read-only).
 					</para>
 					</listitem>
 					
 					<listitem>
 					<para><code>state</code>:
-					Returns the currently visible text (same as <code>text</code>).
+					Returns the currently visible text (same as <code>text</code>, but read-writeable).
 					</para>
 					</listitem>
 					
@@ -604,14 +604,14 @@
 					<listitem>
 					<para><code>id</code>:
 						The attribute id of the first XML element in the table row which the
-						user selected. Supports only single selection for now.
+						user selected. Supports only single selection for now. (read-only)
 					</para>
 					</listitem>
 					
 					<listitem>
 					<para><code>state</code>:
 					Selection and sorting order and column.
-					Supports only single selection for now.
+					Supports only single selection for now. (read-write)
 					</para>
 					</listitem>
 
@@ -637,14 +637,14 @@
 					<listitem>
 					<para><code>id</code>:
 						The attribute id of the first XML element in the node which the
-						user selected. Supports only single selection for now.
+						user selected. Supports only single selection for now. (read-only)
 					</para>
 					</listitem>
 					
 					<listitem>
 					<para><code>state</code>:
 					expanded/collapsed subtrees and selection in a internal string represenation.
-					Supports only single selection for now.
+					Supports only single selection for now. (read-write)
 					</para>
 					</listitem>
 
@@ -693,7 +693,7 @@
 						<entry>
 							one of <code>create</code>, <code>delete</code>,
 							<code>update</code> or <code>read</code>,
-							describes what gets sent down in the XML request.
+							controls what gets sent along in the XML request.
 						</entry>
 					</row>
 
@@ -714,7 +714,7 @@
 						<entry>
 							one of <code>create</code>, <code>delete</code>,
 							<code>update</code> or <code>read</code>,
-							describes what gets sent down in the XML request
+							controls what gets sent along in the XML request
 							when the form is loaded.
 						</entry>
 					</row>

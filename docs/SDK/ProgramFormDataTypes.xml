@@ -7,7 +7,7 @@
 		defined in files with the extension ".normalize" and defined as programs in the configuration.
 	</para>
 	<para>
-		A .normalize file contains assignements of type names to sequences of normalization
+		A .normalize file contains assignments of type names to sequences of normalization
 		function calls. Each normalization step validates the input as string and transforms it
 		to another string. The following normalization step takes the output of the previous one
 		as input.
