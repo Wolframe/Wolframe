@@ -42,7 +42,6 @@
 #include "utils/miscUtils.hpp"
 #include "processor/procProvider.hpp"
 #include "prnt/pdfPrinter.hpp"
-
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/thread/thread.hpp>

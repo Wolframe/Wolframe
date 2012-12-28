@@ -47,6 +47,7 @@ namespace db {
 
 struct LanguageDescription
 {
+	LanguageDescription(){}
 	virtual ~LanguageDescription(){}
 
 	///\brief Operator marking the start of an end of line comment.

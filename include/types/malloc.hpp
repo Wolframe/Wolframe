@@ -30,29 +30,18 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for loading programs in the transaction definition language
-///\file prgbind/transactionProgram.hpp
-
-#ifndef _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
-#define _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
-#include "prgbind/program.hpp"
-#include <string>
+///\brief Alternative malloc that checks for memory corruption
+///\file types/malloc.hpp
+#ifndef _WOLFRAME_MALLOC_HPP_INCLUDED
+#define _WOLFRAME_MALLOC_HPP_INCLUDED
+#include <cstddef>
+#include <stdexcept>
 
 namespace _Wolframe {
-namespace prgbind {
+namespace types {
 
-class TransactionDefinitionProgram
-	:public Program
-{
-public:
-	TransactionDefinitionProgram()
-		:Program( Function){}
-
-	virtual ~TransactionDefinitionProgram(){}
-
-	virtual bool is_mine( const std::string& filename) const;
-	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
-};
+void* malloc( std::size_t size);
+void free( void* ptr);
 
 }}//namespace
 #endif

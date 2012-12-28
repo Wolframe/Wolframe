@@ -24,7 +24,7 @@ LIBRARIES = \
 CPP_OBJS = \
 	transactionOutput.obj \
 	transactionFunction.obj \
-	transactionProgram.obj \
+	loadTransactionProgram.obj \
 	databaseLanguage.obj \
 	preparedStatement.obj \
 	bindStatementParams.obj

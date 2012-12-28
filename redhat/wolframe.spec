@@ -939,6 +939,8 @@ fi
 %{_includedir}/wolframe/AAAA/*.hpp
 %dir %{_includedir}/wolframe/module/
 %{_includedir}/wolframe/module/*.hpp
+%dir %{_includedir}/wolframe/prgbind/
+%{_includedir}/wolframe/prgbind/*.hpp
 
 %if %{with_pgsql}
 %files postgresql
@@ -1041,11 +1043,11 @@ fi
 %dir %{_bindir}
 %endif
 %{_bindir}/qtclient
-%endif
 %if !%{sles}
 %dir %{_libdir}/wolframe/
 %endif
 %{_libdir}/wolframe/libwolframewidgets.so
+%endif
 
 %changelog
 * Sun Aug 29 2011 Andreas Baumann <abaumann@yahoo.com> 0.0.1-0.2

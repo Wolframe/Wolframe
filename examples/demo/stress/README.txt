@@ -11,9 +11,12 @@ Example:
 Example:
 	./wolframed.sh
 
+4) Insert the data:
+	for ff in `ls request/insert/*`; do ../../../clients/cmdline/wolframec -d $ff; done
 
-4) Run parallel tests:
+5) Run parallel tests from different shells:
 Example:
-	for ff in `ls request/insert/*`; do ../../../clients/cmdline/wolframec -d $ff; done && \
-	for ff in `ls request/select/*`; do ../../../clients/cmdline/wolframec -d $ff; done
+shell 1>	for ff in `ls request/select/*`; do ../../../clients/cmdline/wolframec -d $ff; done
+shell 2>	for ff in `ls request/select/*`; do ../../../clients/cmdline/wolframec -d $ff; done
+shell 3>	for ff in `ls request/select/*`; do ../../../clients/cmdline/wolframec -d $ff; done
 

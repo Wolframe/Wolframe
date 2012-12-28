@@ -135,6 +135,7 @@ TEST_CPP_BINS = \
 	testMethodMemberPointerTemplate$(EXE) \
 	testNamedRetVal$(EXE) \
 	testVirtualInheritance$(EXE) \
+	testArrayDoublingAllocator$(EXE) \
 	versionTest$(EXE) \
 	counterTest$(EXE) \
 	resolvePathTest$(EXE) \
@@ -157,10 +158,10 @@ TEST_CPP_BINS = \
 	testRand$(EXE) \
 	testTimestamp$(EXE) \
 	testWolfilter$(EXE) \
-	testArrayDoublingAllocator$(EXE) \
 	unitLibraryTest$(EXE)
 
 #	stringNormalizationTest$(EXE) \
+# DISABLED (only for memory corruption checks)	testTestAllocator$(EXE) \
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
@@ -177,6 +178,7 @@ configValueParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/l
 configStructParser$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testWolfilter$(EXE): $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 testArrayDoublingAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
+testTestAllocator$(EXE): $(TOPDIR)/src/libwolframe.a
 stringNormalizationTest$(EXE): $(TOPDIR)/src/libwolframe_functions/libwolframe_functions.a
 
 local_all:
@@ -255,6 +257,9 @@ ifeq ($(RUN_TESTS),0)
 	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testArrayDoublingAllocator
 	@echo
+# DISABLED (only for memory corruption checks):
+#	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./testTestAllocator
+#	@echo
 	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./PBKDF2test
 	@echo
 	@echo

@@ -30,30 +30,32 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for loading programs in the transaction definition language
-///\file prgbind/transactionProgram.hpp
+///\file testTestAllocator.cpp
+///\brief test program for Array Doubling Allocator (types/allocators.hpp)
 
-#ifndef _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
-#define _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
-#include "prgbind/program.hpp"
-#include <string>
+#include "gtest/gtest.h"
+#include "types/malloc.hpp"
 
-namespace _Wolframe {
-namespace prgbind {
+using namespace _Wolframe;
 
-class TransactionDefinitionProgram
-	:public Program
+TEST( TestAllocator, tests )
 {
-public:
-	TransactionDefinitionProgram()
-		:Program( Function){}
+	static int size[] = {12,45,4566,2324,123,1234,21134,6,7,18435,3549,31932,12345,31424,0};
+	void* pp[32];
+	std::size_t ii;
+	for (ii=0; size[ii]; ++ii)
+	{
+		pp[ii] = types::malloc( size[ii]);
+	}
+	for (ii=0; size[ii]; ++ii)
+	{
+		types::free( pp[ii]);
+	}
+	SUCCEED();
+}
 
-	virtual ~TransactionDefinitionProgram(){}
-
-	virtual bool is_mine( const std::string& filename) const;
-	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
-};
-
-}}//namespace
-#endif
-
+int main( int argc, char **argv )
+{
+	::testing::InitGoogleTest( &argc, argv );
+	return RUN_ALL_TESTS( );
+}
