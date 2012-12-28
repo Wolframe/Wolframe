@@ -30,29 +30,26 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Interface for loading programs in the transaction definition language
-///\file prgbind/transactionProgram.hpp
-
-#ifndef _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
-#define _PRGBIND_TRANSACTION_DEFINITION_PROGRAM_HPP_INCLUDED
-#include "prgbind/program.hpp"
+///\brief Loading function for transaction definition programs
+///\file database/loadTransactionProgram.hpp
+#ifndef _DATABASE_LOAD_TRANSACTION_PROGRAM_HPP_INCLUDED
+#define _DATABASE_LOAD_TRANSACTION_PROGRAM_HPP_INCLUDED
+#include "types/countedReference.hpp"
+#include "types/keymap.hpp"
+#include "database/transactionFunction.hpp"
+#include "database/databaseLanguage.hpp"
+#include "utils/miscUtils.hpp"
 #include <string>
+#include <map>
+#include <cstdlib>
+#include <stdexcept>
 
 namespace _Wolframe {
-namespace prgbind {
+namespace db {
 
-class TransactionDefinitionProgram
-	:public Program
-{
-public:
-	TransactionDefinitionProgram()
-		:Program( Function){}
+std::vector<std::pair<std::string,TransactionFunctionR> >
+	loadTransactionProgramFile( const std::string& filename, const LanguageDescription* langdescr, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap);
 
-	virtual ~TransactionDefinitionProgram(){}
-
-	virtual bool is_mine( const std::string& filename) const;
-	virtual void loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename);
-};
 
 }}//namespace
 #endif

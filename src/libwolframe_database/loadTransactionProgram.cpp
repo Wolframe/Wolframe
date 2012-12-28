@@ -30,9 +30,9 @@
  Project Wolframe.
 
 ************************************************************************/
-///\brief Implemention of programs for the database
-///\file transactionProgram.cpp
-#include "database/transactionProgram.hpp"
+///\brief Loading function for transaction definition programs
+///\file loadTransactionProgram.cpp
+#include "database/loadTransactionProgram.hpp"
 #include "utils/miscUtils.hpp"
 #include "logger-v1.hpp"
 #include "config/programBase.hpp"
@@ -71,7 +71,7 @@ static std::size_t lineCount( std::string::const_iterator si, std::string::const
 	return rt;
 }
 
-const utils::CharTable TransactionProgram::m_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
+static const utils::CharTable g_optab( ";:-,.=)(<>[]{}/&%*|+-#?!$");
 
 static bool isAlphaNumeric( char ch)
 {
@@ -90,27 +90,9 @@ static bool checkResultIdentifier( const std::string& id)
 	return (ii == ie);
 }
 
-
-std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::loadfile( const std::string& filename, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
+static char gotoNextToken( const LanguageDescription* langdescr, std::string::const_iterator& si, const std::string::const_iterator se)
 {
-	try
-	{
-		return load( utils::readSourceFileContent( filename), dbsource, embeddedStatementMap);
-	}
-	catch (const config::PositionalErrorException& e)
-	{
-		throw config::PositionalErrorException( filename, e);
-	}
-}
-
-bool TransactionProgram::is_mine( const std::string& filename) const
-{
-	return boost::algorithm::to_lower_copy( utils::getFileExtension( filename)) == ".tdl";
-}
-
-char TransactionProgram::gotoNextToken( std::string::const_iterator& si, const std::string::const_iterator se) const
-{
-	const char* commentopr = m_langdescr->eoln_commentopr();
+	const char* commentopr = langdescr->eoln_commentopr();
 	char ch;
 	while ((ch = utils::gotoNextToken( si, se)) != 0)
 	{
@@ -136,23 +118,24 @@ char TransactionProgram::gotoNextToken( std::string::const_iterator& si, const s
 	return ch;
 }
 
-char TransactionProgram::parseNextToken( std::string& tok, std::string::const_iterator& si, std::string::const_iterator se) const
+static char parseNextToken( const LanguageDescription* langdescr, std::string& tok, std::string::const_iterator& si, std::string::const_iterator se)
 {
-	char ch = gotoNextToken( si, se);
+	char ch = gotoNextToken( langdescr, si, se);
 	if (!ch) return 0;
-	return utils::parseNextToken( tok, si, se, m_optab);
+	return utils::parseNextToken( tok, si, se, g_optab);
 }
 
-std::pair<std::string,std::vector<std::string> > TransactionProgram::parseEmbeddedStatement( const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose, types::keymap<std::string>& embeddedStatementMap)
+static std::pair<std::string,std::vector<std::string> >
+	parseEmbeddedStatement( const LanguageDescription* langdescr, const std::string& funcname, int index, std::string::const_iterator& osi, std::string::const_iterator ose, types::keymap<std::string>& embeddedStatementMap)
 {
 	std::pair<std::string,std::vector<std::string> > rt;
 	std::string stm;
-	std::string dbstm = m_langdescr->parseEmbeddedStatement( osi, ose);
+	std::string dbstm = langdescr->parseEmbeddedStatement( osi, ose);
 	std::string::const_iterator start = dbstm.begin(), si = dbstm.begin(), se = dbstm.end();
 	std::string tok;
 
-	char ch = utils::parseNextToken( tok, si, se, m_optab);
-	for (; si != se && ch; ch = utils::parseNextToken( tok, si, se, m_optab))
+	char ch = utils::parseNextToken( tok, si, se, g_optab);
+	for (; si != se && ch; ch = utils::parseNextToken( tok, si, se, g_optab))
 	{
 		if (ch == '$')
 		{
@@ -163,13 +146,13 @@ std::pair<std::string,std::vector<std::string> > TransactionProgram::parseEmbedd
 			{
 				++si;
 				std::string::const_iterator argstart = si;
-				ch = utils::parseNextToken( tok, si, se, m_optab);
-				for (; ch && ch != ')'; ch=utils::parseNextToken( tok, si, se, m_optab));
+				ch = utils::parseNextToken( tok, si, se, g_optab);
+				for (; ch && ch != ')'; ch=utils::parseNextToken( tok, si, se, g_optab));
 				if (ch == ')')
 				{
 					rt.second.push_back( std::string( argstart, si-1));
 					start = si;
-					stm.append( m_langdescr->stm_argument_reference( rt.second.size()));
+					stm.append( langdescr->stm_argument_reference( rt.second.size()));
 				}
 			}
 			else if (ch >= '0' && ch <= '9')
@@ -178,7 +161,7 @@ std::pair<std::string,std::vector<std::string> > TransactionProgram::parseEmbedd
 				for (; si!=se && *si>= '0' && *si<= '9'; ++si);
 				rt.second.push_back( std::string("$") + std::string( argstart, si));
 				start = si;
-				stm.append( m_langdescr->stm_argument_reference( rt.second.size()));
+				stm.append( langdescr->stm_argument_reference( rt.second.size()));
 			}
 		}
 	}
@@ -192,7 +175,8 @@ std::pair<std::string,std::vector<std::string> > TransactionProgram::parseEmbedd
 	return rt;
 }
 
-std::pair<std::string,std::vector<std::string> > TransactionProgram::parseCallStatement( std::string::const_iterator& ci, std::string::const_iterator ce) const
+static std::pair<std::string,std::vector<std::string> >
+	parseCallStatement( std::string::const_iterator& ci, std::string::const_iterator ce)
 {
 	std::pair<std::string,std::vector<std::string> > rt;
 	std::string tok;
@@ -287,7 +271,8 @@ struct Operation
 };
 }// anonymous namespace
 
-std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::load( const std::string& source, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
+static std::vector<std::pair<std::string,TransactionFunctionR> >
+	load( const std::string& source, const LanguageDescription* langdescr, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
 {
 	std::vector<std::pair<std::string,TransactionFunctionR> > rt;
 	char ch;
@@ -302,13 +287,13 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 
 	dbsource.clear();
 
-	if (!m_langdescr) throw std::logic_error( "no database language description defined");
+	if (!langdescr) throw std::logic_error( "no database language description defined");
 	try
 	{
-		while ((ch = gotoNextToken( si, se)) != 0)
+		while ((ch = gotoNextToken( langdescr, si, se)) != 0)
 		{
 			tokstart = si;
-			ch = parseNextToken( tok, si, se);
+			ch = parseNextToken( langdescr, tok, si, se);
 			bool enterDefinition = false;
 			bool isTransaction = false;
 			if (boost::algorithm::iequals( tok, "TRANSACTION") && isLineStart( tokstart, source))
@@ -326,9 +311,9 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 				std::string::const_iterator dbe = lineStart( tokstart, source);
 				std::string transactionName;
 
-				ch = parseNextToken( transactionName, si, se);
+				ch = parseNextToken( langdescr, transactionName, si, se);
 				if (!ch) throw ERROR( si, MSG << "unexpected end of transaction definition (transaction name expected)");
-				if (m_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
+				if (g_optab[ ch]) throw ERROR( si, MSG << "identifier (transaction name) expected instead of '" << ch << "'");
 
 				Operation operation( transactionName, dbe, isTransaction);
 
@@ -337,16 +322,16 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 				TransactionDescription desc;
 				unsigned int mask = 0;
 
-				while (parseNextToken( tok, si, se))
+				while (parseNextToken( langdescr, tok, si, se))
 				{
 					if (boost::algorithm::iequals( tok, "RESULT"))
 					{
-						if (!parseNextToken( tok, si, se)
+						if (!parseNextToken( langdescr, tok, si, se)
 						||  !boost::algorithm::iequals( tok, "INTO"))
 						{
 							throw ERROR( si, "INTO expected after RESULT");
 						}
-						if (0==(ch = parseNextToken( operation.resultname, si, se)))
+						if (0==(ch = parseNextToken( langdescr, operation.resultname, si, se)))
 						{
 							throw ERROR( si, "unexpected end of description. name of result tag expected after RESULT INTO");
 						}
@@ -365,10 +350,10 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 						{
 							throw ERROR( si, "Cannot define AUTHORIZE in operation. Only allowed as TRANSACTION definition attribute");
 						}
-						ch = gotoNextToken( si, se);
+						ch = gotoNextToken( langdescr, si, se);
 						if (ch != '(') throw ERROR( si, "Open bracket '(' expected after AUTHORIZE function call");
 						si++;
-						if (!parseNextToken( authfunction, si, se))
+						if (!parseNextToken( langdescr, authfunction, si, se))
 						{
 							throw ERROR( si, "unexpected end of description. function name expected after AUTHORIZE");
 						}
@@ -376,16 +361,16 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 						{
 							throw ERROR( si, "AUTHORIZE function name must not be empty");
 						}
-						ch = gotoNextToken( si, se);
+						ch = gotoNextToken( langdescr, si, se);
 						if (ch == ',')
 						{
 							++si;
-							if (!parseNextToken( authresource, si, se))
+							if (!parseNextToken( langdescr, authresource, si, se))
 							{
 								throw ERROR( si, "unexpected end of description. resource name expected as argument of AUTHORIZE function call");
 							}
 						}
-						ch = gotoNextToken( si, se);
+						ch = gotoNextToken( langdescr, si, se);
 						if (ch != ')')
 						{
 							throw ERROR( si, "Close bracket ')' expected after AUTHORIZE function defintion");
@@ -402,7 +387,7 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 				{
 					throw ERROR( si, "BEGIN (transaction) expected");
 				}
-				while ((ch = parseNextToken( tok, si, se)) != 0)
+				while ((ch = parseNextToken( langdescr, tok, si, se)) != 0)
 				{
 					while (operation.callstartar.size() <= operation.descar.size())
 					{
@@ -417,7 +402,7 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 							mask = 0;
 						}
 					}
-					else if (m_optab[ch])
+					else if (g_optab[ch])
 					{
 						throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of operator '" << ch << "'");
 					}
@@ -433,7 +418,6 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 							{
 								LOG_TRACE << "Registering transaction definition '" << operation.name << "'";
 								TransactionFunctionR ff( createTransactionFunction( operation.name, operation.descar, operation.resultname, operationmap, operation.authorization));
-								m_functionmap[ operation.name] = ff;
 								rt.push_back( std::pair<std::string,TransactionFunctionR>( operation.name, ff));
 							}
 							else
@@ -470,7 +454,7 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 						}
 						mask |= 0x2;
 
-						ch = parseNextToken( desc.output, si, se);
+						ch = parseNextToken( langdescr, desc.output, si, se);
 						if (!ch) throw ERROR( si, "unexpected end of description. result tag path expected after INTO");
 						if (ch == '.') desc.output.push_back(ch);
 
@@ -488,7 +472,7 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 						mask |= 0x4;
 
 						std::string::const_iterator oi = si;
-						while (parseNextToken( tok, oi, se))
+						while (parseNextToken( langdescr, tok, oi, se))
 						{
 							if (boost::algorithm::iequals( tok, "NONEMPTY"))
 							{
@@ -505,13 +489,13 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 								break;
 							}
 						}
-						if (!gotoNextToken( si, se))
+						if (!gotoNextToken( langdescr, si, se))
 						{
 							throw ERROR( si, "unexpected end of transaction description after DO");
 						}
-						if (m_langdescr->isEmbeddedStatement( si, se))
+						if (langdescr->isEmbeddedStatement( si, se))
 						{
-							desc.call = parseEmbeddedStatement( transactionName, operation.embstm_index++, si, se, embeddedStatementMap);
+							desc.call = parseEmbeddedStatement( langdescr, transactionName, operation.embstm_index++, si, se, embeddedStatementMap);
 						}
 						else
 						{
@@ -541,11 +525,18 @@ std::vector<std::pair<std::string,TransactionFunctionR> > TransactionProgram::lo
 	return rt;
 }
 
-const TransactionFunction* TransactionProgram::function( const std::string& name) const
+
+std::vector<std::pair<std::string,TransactionFunctionR> >
+	_Wolframe::db::loadTransactionProgramFile( const std::string& filename, const LanguageDescription* langdescr, std::string& dbsource, types::keymap<std::string>& embeddedStatementMap)
 {
-	types::keymap<TransactionFunctionR>::const_iterator fi = m_functionmap.find( name);
-	if (fi == m_functionmap.end()) return 0;
-	return fi->second.get();
+	try
+	{
+		return load( utils::readSourceFileContent( filename), langdescr, dbsource, embeddedStatementMap);
+	}
+	catch (const config::PositionalErrorException& e)
+	{
+		throw config::PositionalErrorException( filename, e);
+	}
 }
 
 

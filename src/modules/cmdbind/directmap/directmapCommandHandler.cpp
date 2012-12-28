@@ -154,12 +154,18 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						// if no input form is defined we check for the input document type and set the form on our own:
 						std::string doctypeid( types::getIdFromDoctype( doctype));
 						const ddl::Form* df = m_provider->form( doctypeid);
-						if (!df) throw std::runtime_error( std::string( "input form '") + doctypeid + "' is not defined (document type '" + doctypeid + "')");
-
-						m_inputform = *df;
-						m_inputform_parser.reset( new serialize::DDLStructParser( &m_inputform));
-						m_inputform_parser->init( m_input, serialize::Context::ValidateAttributes);
-						m_state = 2;
+						if (df)
+						{
+							m_inputform = *df;
+							m_inputform_parser.reset( new serialize::DDLStructParser( &m_inputform));
+							m_inputform_parser->init( m_input, serialize::Context::ValidateAttributes);
+							m_state = 2;
+						}
+						else
+						{
+							LOG_WARNING << "input form '" << doctypeid << "' is not defined (document type '" << doctypeid << "'). Treating document as standalone";
+							m_state = 3;
+						}
 						continue;
 					}
 					else

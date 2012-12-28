@@ -35,7 +35,7 @@
 
 #include "prgbind/transactionProgram.hpp"
 #include "utils/miscUtils.hpp"
-#include "database/transactionProgram.hpp"
+#include "database/loadTransactionProgram.hpp"
 #include "langbind/appObjects.hpp"
 
 using namespace _Wolframe;
@@ -87,19 +87,18 @@ private:
 
 bool TransactionDefinitionProgram::is_mine( const std::string& filename) const
 {
-	return db::TransactionProgram::is_mine( filename);
+	return boost::algorithm::to_lower_copy( utils::getFileExtension( filename)) == ".tdl";
 }
 
 void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Database* transactionDB, const std::string& filename)
 {
 	std::string dbsource;
 	types::keymap<std::string> embeddedStatementMap;
-	if (transactionDB)
-	{
-		defineEmbeddedLanguageDescription( transactionDB->getLanguageDescription());
-	}
+	static const db::LanguageDescription defaultLanguageDescr;
+	const db::LanguageDescription* languageDescr = (transactionDB)?transactionDB->getLanguageDescription():&defaultLanguageDescr;
+
 	std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
-		= db::TransactionProgram::loadfile( filename, dbsource, embeddedStatementMap);
+		= db::loadTransactionProgramFile( filename, languageDescr, dbsource, embeddedStatementMap);
 
 	try
 	{
