@@ -70,8 +70,10 @@ public:
 	}
 
 	void addList( SocketConnectionList< connection_ptr >* lst );
+	void removeList( SocketConnectionList< connection_ptr >* lst );
 #ifdef WITH_SSL
 	void addList( SocketConnectionList< SSLconnection_ptr >* lst );
+	void removeList( SocketConnectionList< SSLconnection_ptr >* lst );
 #endif // WITH_SSL
 	bool isFull();
 
@@ -81,6 +83,7 @@ private:
 	std::list< SocketConnectionList< SSLconnection_ptr >* >	m_SSLconnList;
 #endif // WITH_SSL
 	unsigned						m_maxConn;
+	boost::mutex						m_mutex;
 };
 
 
@@ -89,11 +92,15 @@ class SocketConnectionList
 {
 public:
 	SocketConnectionList( unsigned maxConnections, GlobalConnectionList& globalList )
-		: m_connListSize( 0 )
-		, m_globalList( globalList )
+		: m_connListSize( 0 ), m_globalList( globalList )
 	{
 		m_maxConn = maxConnections;
 		m_globalList.addList( this );
+	}
+
+	~SocketConnectionList()
+	{
+		m_globalList.removeList( this );
 	}
 
 	std::size_t size()	{ return m_connListSize; }

@@ -89,13 +89,13 @@ server::~server()
 
 	std::size_t	i = 0;
 	for ( std::list< acceptor* >::iterator it = m_acceptors.begin();
-	      it != m_acceptors.end(); it++, i++ )
+						it != m_acceptors.end(); it++, i++ )
 		delete *it;
 	LOG_TRACE << i << " acceptor(s) deleted";
 #ifdef WITH_SSL
 	i = 0;
 	for ( std::list< SSLacceptor* >::iterator it = m_SSLacceptors.begin();
-	      it != m_SSLacceptors.end(); it++, i++ )
+						it != m_SSLacceptors.end(); it++, i++ )
 		delete *it;
 	LOG_TRACE << i << " SSL acceptor(s) deleted";
 #endif // WITH_SSL

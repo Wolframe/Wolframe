@@ -51,39 +51,63 @@ namespace net {
 
 static const char* REFUSE_MSG = "Server is busy. Please try again later.\n";
 
-
 void GlobalConnectionList::addList( SocketConnectionList< connection_ptr >* lst )
 {
-	m_connList.push_back( lst );
+	{
+		boost::mutex::scoped_lock lock( m_mutex );
+		m_connList.push_back( lst );
+	}
 	LOG_DATA << "Added unencrypted connection list, " << m_connList.size() << " list(s) for unencrypted connections";
+}
+
+void GlobalConnectionList::removeList( SocketConnectionList< connection_ptr >* lst )
+{
+	{
+		boost::mutex::scoped_lock lock( m_mutex );
+		m_connList.remove( lst );
+	}
+	LOG_DATA << "Removed unencrypted connection list, " << m_connList.size() << " list(s) for unencrypted connections";
 }
 
 #ifdef WITH_SSL
 void GlobalConnectionList::addList( SocketConnectionList< SSLconnection_ptr >* lst )
 {
-	m_SSLconnList.push_back( lst );
+	{
+		boost::mutex::scoped_lock lock( m_mutex );
+		m_SSLconnList.push_back( lst );
+	}
 	LOG_DATA << "Added SSL connection list, " << m_SSLconnList.size() << " list(s) for SSL connections";
+}
+
+void GlobalConnectionList::removeList( SocketConnectionList< SSLconnection_ptr >* lst )
+{
+	{
+		boost::mutex::scoped_lock lock( m_mutex );
+		m_SSLconnList.remove( lst );
+	}
+	LOG_DATA << "Removed SSL connection list, " << m_SSLconnList.size() << " list(s) for SSL connections";
 }
 #endif // WITH_SSL
 
 bool GlobalConnectionList::isFull()
 {
-	std::size_t conns = 0;
-
-	for ( std::list< SocketConnectionList< connection_ptr >* >::iterator it = m_connList.begin();
-									it != m_connList.end(); it++ )
-		conns += (*it)->size();
-#ifdef WITH_SSL
-	for ( std::list< SocketConnectionList< SSLconnection_ptr >* >::iterator it = m_SSLconnList.begin();
-									it != m_SSLconnList.end(); it++ )
-		conns += (*it)->size();
-#endif // WITH_SSL
 	if ( m_maxConn > 0 )	{
+		std::size_t conns = 0;
+		boost::mutex::scoped_lock lock( m_mutex );
+
+		for ( std::list< SocketConnectionList< connection_ptr >* >::iterator it = m_connList.begin();
+										it != m_connList.end(); it++ )
+			conns += (*it)->size();
+#ifdef WITH_SSL
+		for ( std::list< SocketConnectionList< SSLconnection_ptr >* >::iterator it = m_SSLconnList.begin();
+										it != m_SSLconnList.end(); it++ )
+			conns += (*it)->size();
+#endif // WITH_SSL
 		LOG_DATA << "Global number of connections: " << conns << " of maximum " << m_maxConn;
 		return( conns >= m_maxConn );
 	}
 	else	{
-		LOG_DATA << "Global number of connections: " << conns << ", no maximum limit";
+		LOG_DATA << "Global number of connections unlimited, not checked";
 		return( false );
 	}
 }
