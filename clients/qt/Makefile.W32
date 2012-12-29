@@ -92,7 +92,8 @@ OBJS = \
 	StorageWidget.obj \
 	moc_StorageWidget.obj \
 	ManageStorageDialog.obj \
-	moc_ManageStorageDialog.obj
+	moc_ManageStorageDialog.obj \
+	moc_DefaultMainWindow.obj	
 
 CPP_BINS = \
 	qtclient.exe
@@ -221,6 +222,14 @@ moc_StorageWidget.cpp: StorageWidget.hpp
 moc_ManageStorageDialog.cpp: ManageStorageDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. ManageStorageDialog.hpp -o moc_ManageStorageDialog.cpp
 
+moc_DefaultMainWindow.cpp: DefaultMainWindow.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. DefaultMainWindow.hpp -o moc_DefaultMainWindow.cpp
+
+MainWindowUi.hpp: themes/windows/MainWindow.ui
+	$(QT_DIR)\bin\uic -o MainWindowUi.hpp themes\windows\MainWindow.ui
+
+MainWindow.hpp: MainWindowUi.hpp
+
 qtclient.res: qtclient.ico qtclient.rc
 	rc /foqtclient.res qtclient.rc
 	
@@ -231,6 +240,7 @@ qtclient.exe: qtclient.res
 local_clean:
 	@-erase moc_*.cpp 2>NUL
 	@-erase $(I18NS) 2>NUL
+	@-erase MainWindowUi.cpp 2>NUL
 
 local_distclean:
 
