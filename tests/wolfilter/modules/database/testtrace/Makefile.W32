@@ -16,8 +16,13 @@ INCLUDE_DIRS = \
 INCLUDE_LDFLAGS = \
 	$(BOOST_LDFLAGS)
 
+# Aba: wolframe_serialize and wolframe_langbind are still needed,
+# getting link errors otherwise..
 INCLUDE_LIBS = \
 	$(TOPDIR)\src\libwolframe\wolframe.lib \
+	$(TOPDIR)\src\libwolframe_database\wolframe_database.lib \
+	$(TOPDIR)\src\libwolframe_serialize\wolframe_serialize.lib \
+	$(TOPDIR)\src\libwolframe_langbind\wolframe_langbind.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
 DYNAMIC_MODULE = \
