@@ -3,5 +3,3 @@
 - inconsistent nameing of configuration parameters (lowercase, uppercase,
   camelcase, etc.)
   - Processor, database
-- syntax in files not checked on startup, only on first execution:
-  directmap
