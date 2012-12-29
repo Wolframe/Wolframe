@@ -561,10 +561,10 @@ FreeBSD 9.0
 
 Required packages: boost-libs (1.45.0)
 Optional packages: qt4-gui (4.7.4), qt4-moc (4.7.4), qt4-network (4.7.4),
-                   qt4-designer (4.7.4), qt4-rcc (4.7.4), cyrus-sasl (2.1.25_1),
-                   sqlite3 (3.7.9), postgresql (9.1.2), libxml2 (2.7.8_1),
-                   libxslt (1.1.26_3), png (1.4.8), zlib (1.1.0),
-                   icu (4.8.1.1)
+                   qt4-designer (4.7.4), qt4-rcc (4.7.4), qt4-uic (4.7.4),
+                   cyrus-sasl (2.1.25_1), sqlite3 (3.7.9), postgresql (9.1.2),
+                   libxml2 (2.7.8_1), libxslt (1.1.26_3), png (1.4.8), 
+                   zlib (1.1.0), icu (4.8.1.1)
 
 If you need boost with ICU support, compile your own boost from the
 ports tree. Change the 'Makefile' and add 'locale' to 'BOOST_LIBS'.

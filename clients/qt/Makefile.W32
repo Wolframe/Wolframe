@@ -228,7 +228,7 @@ moc_DefaultMainWindow.cpp: DefaultMainWindow.hpp
 MainWindowUi.hpp: themes/windows/MainWindow.ui
 	$(QT_DIR)\bin\uic -o MainWindowUi.hpp themes\windows\MainWindow.ui
 
-MainWindow.hpp: MainWindowUi.hpp
+DefaultMainWindow.hpp: MainWindowUi.hpp
 
 qtclient.res: qtclient.ico qtclient.rc
 	rc /foqtclient.res qtclient.rc
