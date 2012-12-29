@@ -3,8 +3,5 @@
 - inconsistent nameing of configuration parameters (lowercase, uppercase,
   camelcase, etc.)
   - Processor, database
-- existence of files is not checked, e.g.
-  - directmap, program directive
-  - on the other hand simpleforms are checked
 - syntax in files not checked on startup, only on first execution:
-  lua, directmap
+  directmap
