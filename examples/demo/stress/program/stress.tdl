@@ -17,7 +17,7 @@ END
 --
 TRANSACTION deleteNumber
 BEGIN
-	FORACH /doc DO DELETE FROM Number WHERE numbr=$(numbr);
+	FOREACH /doc DO DELETE FROM Number WHERE numbr=$(numbr);
 END
 --
 -- selectNumber
