@@ -672,6 +672,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -684,6 +685,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -711,6 +713,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -724,6 +727,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -737,6 +741,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -755,6 +760,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -767,6 +773,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -779,6 +786,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -791,6 +799,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -803,6 +812,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -821,6 +831,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -836,6 +847,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 endif
@@ -851,6 +863,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -863,6 +876,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -875,6 +889,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -887,6 +902,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
 QT_LDFLAGS =
 endif
 
@@ -910,6 +926,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc-qt4
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic-qt4
 QT_LDFLAGS =
 endif
 endif
@@ -928,6 +945,7 @@ QT_MOC ?= $(QT_BIN_DIR)/moc-qt4
 QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
 QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
 QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic-qt4
 QT_LDFLAGS =
 endif
 endif

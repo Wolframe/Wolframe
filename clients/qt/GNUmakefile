@@ -141,9 +141,9 @@ moc_DefaultMainWindow.cpp: DefaultMainWindow.hpp
 	$(QT_MOC) $(MOC_FLAGS) DefaultMainWindow.hpp -o moc_DefaultMainWindow.cpp
 
 MainWindowUi.hpp: themes/windows/MainWindow.ui
-	uic -o MainWindowUi.hpp themes/windows/MainWindow.ui
+	$(QT_UIC) -o MainWindowUi.hpp themes/windows/MainWindow.ui
 
-MainWindow.hpp: MainWindowUi.hpp
+DefaultMainWindow.hpp: MainWindowUi.hpp
 
 FORMS = \
 	apps/test/forms/form1.ui \
@@ -200,7 +200,7 @@ local_clean:
 	@-rm -f $(RESOURCES)
 	@-rm -f geany.c++.tags
 	@-rm -f Makefile
-	@-rm -f MainWindowUi.cpp
+	@-rm -f MainWindowUi.hpp
 
 local_distclean:
 
