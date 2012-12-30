@@ -1,5 +1,7 @@
 1.1.2:
 .. toplevel tag 'name' of the input. 
+[FIXED]
+
 1.1.3:
 declares the result tag for each result
 
@@ -13,6 +15,7 @@ declares the result tag for each result
 The key is the name of the element and the following value is the assembles the attributes of this element.
 
 => ?
+[FIXED]
 
 ---
 
@@ -26,8 +29,10 @@ mixing DDL, transaction chapters (AppServer) and SDK parts
 
 description of 'as' is maybe no longer true?
 
+[WONTFIX] (it's true)
 ---
 
 Glossary
 
 The creator creates a command handler to execute a command.
+[FIXED]

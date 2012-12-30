@@ -36,7 +36,7 @@
 #ifndef _PRGBIND_PRINT_PROGRAM_HPP_INCLUDED
 #define _PRGBIND_PRINT_PROGRAM_HPP_INCLUDED
 #include "prgbind/program.hpp"
-#include "langbind/printProgram.hpp"
+#include "module/printFunctionBuilder.hpp"
 #include <string>
 
 namespace _Wolframe {

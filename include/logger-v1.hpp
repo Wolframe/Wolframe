@@ -43,6 +43,7 @@
 #include "logger/logError.hpp"
 #include "logger/logComponent.hpp"
 #include "logger/logBackend.hpp"
+#include "logger/logObject.hpp"
 
 #include <sstream>
 
@@ -85,7 +86,7 @@ private:
 
 /// template functions for logging, default is we search for the << operator
 /// and log with this one..
-template<typename T>
+template <typename T>
 Logger& operator<<( Logger& logger, T t )
 {
 	logger.os_ << t;

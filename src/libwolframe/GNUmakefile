@@ -32,6 +32,7 @@ LOGGER_OBJS = \
 	logger/logSyslogFacility.o \
 	logger/logComponent.o \
 	logger/logError.o \
+	logger/logObject.o \
 	logger/logBackendConsole.o \
 	logger/logBackendFile.o \
 	logger/logBackendSyslog.o \

@@ -33,8 +33,8 @@
 		introduced by Marcin Kalicinski for the boost property tree library. We used this library to show an example
 		that is easy to understand and small enough.
 		The format uses key value pairs separated with spaces for atomic elements and curly brackets '{' '}' to describe structures.
-		The key is the name of the element and the following value is the assembles the attributes of this element.
-		The attributes are a data type and some operators that describe additional properties.
+		The key represents the name of the element and the value represents the type of the element.
+		The type is defined by a typename and some operators that describe additional properties.
 	</para>
 	<para>
 		Each form declaration starts with a keyword 'FORM' or 'STRUCT'. The difference between 'FORM' and 'STRUCT' is that the later is used for declarations that are only referenced inside the same file as sub structure reference,
@@ -56,6 +56,12 @@
 		<member>[]</member><member>without data type</member><member>Expresses this element is an array of structures and that the structure defined describes the prototype (initialization) element of the array.</member>
 		<member>(..)</member><member>postfix of data type</member><member>Expresses that '..' (represents any valid value not containing brackets) is the default initialization value of this element.</member>
 		</simplelist>
+	</para>
+	<para>
+		Using a single underscore as typename ('_') means that element is embedded into the structure
+		without beeing referencable by name. In case of an atomic value it means that value represents the
+		content value of the structure. In case of a substructure it means that the stucture inherits
+		the embedded elements of the substructure.
 	</para>
 	<para>
 		The following example shows a form defined in simple form DDL.

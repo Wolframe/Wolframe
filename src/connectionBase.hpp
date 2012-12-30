@@ -119,7 +119,7 @@ protected:
 	/// The timer for timeouts.
 	boost::asio::deadline_timer	m_timer;
 
-
+public:
 	/// Connection base state machine
 	void nextOperation()
 	{
@@ -187,7 +187,7 @@ protected:
 		}
 	}
 
-
+protected:
 	/// Translate network error to processor error
 	void signalError( const boost::system::error_code& e )
 	{

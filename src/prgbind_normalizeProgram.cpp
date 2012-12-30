@@ -222,7 +222,7 @@ void NormalizeProgram::loadProgram( ProgramLibrary& library, db::Database*, cons
 	}
 	catch (const config::PositionalErrorException& e)
 	{
-		throw config::PositionalErrorException( filename, e);
+		throw config::PositionalFileErrorException( filename, e);
 	}
 	catch (const std::runtime_error& err)
 	{

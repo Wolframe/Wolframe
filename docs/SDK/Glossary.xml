@@ -28,7 +28,7 @@
 	</glossentry>
 	<glossentry><glossterm>Command Handler</glossterm>
 		<glossdef>
-			<para>Interface for delegating processing in a hierarchical way. A command handler is created by a connection handler or another command handler. The creator creates a command handler to execute a command. During this command execution the input/output of the connection is entirely handled by the command handler. After command execution the control gets back to the creator of the command handler. Command Handlers are used to build the communication protocol processing as hierarchical state machine.
+			<para>Interface for delegating processing of client protocol commands in a hierarchical way. A command handler is created by a connection handler or another command handler. During command execution the input/output of the connection is entirely handled by the command handler. Command Handlers are used to build the communication protocol processing as hierarchical state machine.
 			</para>
 		</glossdef>
 	</glossentry>

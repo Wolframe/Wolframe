@@ -36,6 +36,7 @@
 #ifndef _CONFIG_PROGRAM_BASE_HPP_INCLUDED
 #define _CONFIG_PROGRAM_BASE_HPP_INCLUDED
 #include "utils/miscUtils.hpp"
+#include "logger/logObject.hpp"
 #include <string>
 #include <cstdlib>
 #include <stdexcept>
@@ -48,6 +49,7 @@ namespace _Wolframe {
 namespace config {
 
 struct LineInfo
+	:public log::LogObject
 {
 	LineInfo( const LineInfo& o)
 		:line(o.line),col(o.col){}
@@ -60,15 +62,79 @@ struct LineInfo
 
 	unsigned int line;
 	unsigned int col;
+
+	static const log::LogObjectDescriptionBase* getLogObjectDescription()
+	{
+		struct Description :public log::LogObjectDescription<LineInfo>
+		{
+			Description():log::LogObjectDescription<LineInfo>( "on line $1 column $2"){(*this)(&LineInfo::line)(&LineInfo::col);}
+		};
+		static Description rt;
+		return &rt;
+	}
 };
 
-
-struct PositionalErrorException :public std::runtime_error
+struct PositionalError
+	:public log::LogObject
 {
-	PositionalErrorException( const LineInfo& pos, const std::string& msg)
-		:std::runtime_error( std::string( "error on line ") + boost::lexical_cast<std::string>(pos.line) + " column " + boost::lexical_cast<std::string>(pos.col) + ":" + msg){}
-	PositionalErrorException( const std::string& filename, const PositionalErrorException& e)
-		:std::runtime_error( std::string( "error in file '") + filename + "' " + (e.what() + std::strlen("error "))){}
+	PositionalError( const PositionalError& o)
+		:line(o.line),col(o.col),msg(o.msg){}
+	PositionalError( const LineInfo& o, const std::string& msg_)
+		:line(o.line),col(o.col),msg(msg_){}
+
+	unsigned int line;
+	unsigned int col;
+	std::string msg;
+
+	static const log::LogObjectDescriptionBase* getLogObjectDescription()
+	{
+		struct Description :public log::LogObjectDescription<PositionalError>
+		{
+			Description():log::LogObjectDescription<PositionalError>( "error on line $1 column $2: $3"){(*this)(&PositionalError::line)(&PositionalError::col)(&PositionalError::msg);}
+		};
+		static Description rt;
+		return &rt;
+	}
+};
+
+struct PositionalFileError
+	:public log::LogObject
+{
+	PositionalFileError( const PositionalFileError& o)
+		:line(o.line),col(o.col),msg(o.msg),filename(o.filename){}
+	PositionalFileError( const PositionalError& o, const std::string& filename_)
+		:line(o.line),col(o.col),msg(o.msg),filename(filename_){}
+	PositionalFileError( const LineInfo& o, const std::string& msg_, const std::string& filename_)
+		:line(o.line),col(o.col),msg(msg_),filename(filename_){}
+
+	unsigned int line;
+	unsigned int col;
+	std::string msg;
+	std::string filename;
+
+	static const log::LogObjectDescriptionBase* getLogObjectDescription()
+	{
+		struct Description :public log::LogObjectDescription<PositionalFileError>
+		{
+			Description():log::LogObjectDescription<PositionalFileError>( "error in file $4 on line $1 column $2: $3"){(*this)(&PositionalFileError::line)(&PositionalFileError::col)(&PositionalFileError::msg)(&PositionalFileError::filename);}
+		};
+		static Description rt;
+		return &rt;
+	}
+};
+
+struct PositionalErrorException
+	:public log::Exception<std::runtime_error,PositionalError>
+{
+	PositionalErrorException( const LineInfo& pos_, const std::string& msg_)
+		:log::Exception<std::runtime_error,PositionalError>(pos_,msg_){}
+};
+
+struct PositionalFileErrorException
+	:public log::Exception<std::runtime_error,PositionalFileError>
+{
+	PositionalFileErrorException( const std::string& filename_, const PositionalErrorException& pe)
+		:log::Exception<std::runtime_error,PositionalFileError>(pe,filename_){}
 };
 
 class PositionalErrorMessageBase

@@ -67,7 +67,7 @@ void DirectmapProgram::loadProgram( const std::string& filename)
 	}
 	catch (const config::PositionalErrorException& e)
 	{
-		throw config::PositionalErrorException( filename, e);
+		throw config::PositionalFileErrorException( filename, e);
 	}
 	catch (const std::runtime_error& err)
 	{
