@@ -39,7 +39,6 @@
 #define _LOG_BACKEND_WINDEBUG_HPP_INCLUDED
 
 #include "logger/logLevel.hpp"
-#include "logger/logComponent.hpp"
 
 namespace _Wolframe {
 namespace log {
@@ -54,8 +53,7 @@ public:
 	void setLevel( const LogLevel::Level level_ );
 	LogLevel::Level level() const		{ return logLevel_; }
 
-	void log( const LogComponent component, const LogLevel::Level level_,
-		  const std::string& msg );
+	void log( const LogLevel::Level level_, const std::string& msg );
 
 	void reopen( );
 

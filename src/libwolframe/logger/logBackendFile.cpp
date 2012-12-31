@@ -81,8 +81,7 @@ void LogfileBackend::reopen( )
 		isOpen_ = true;
 	} catch( const std::ofstream::failure& ) {
 		isOpen_ = false;
-		LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
-				<< "Can't open logfile '" << filename_ << "'";
+		LOG_CRITICAL	<< "Can't open logfile '" << filename_ << "'";
 		// TODO: e.what() displays "basic_ios::clear" always, how to get
 		// decent error messages here? I fear the C++ standard doesn't
 		// help here..
@@ -119,12 +118,10 @@ static inline std::string timestamp( void )
 #endif // !defined( _WIN32 )
 }
 
-void LogfileBackend::log( const LogComponent component, const LogLevel::Level _level, const std::string& msg )
+void LogfileBackend::log( const LogLevel::Level _level, const std::string& msg )
 {
 	if( _level >= logLevel_ && isOpen_ ) {
 		logFile_	<< timestamp( ) << " "
-				<< component.str( )
-				<< ( component == LogComponent::LogNone ? "" : " - " )
 				<< _level << ": " << msg << std::endl;
 		logFile_.flush( );
 	}

@@ -30,7 +30,6 @@ DYNAMIC_LIB_PATCH = 0
 LOGGER_OBJS = \
 	logger/logLevel.o \
 	logger/logSyslogFacility.o \
-	logger/logComponent.o \
 	logger/logError.o \
 	logger/logObject.o \
 	logger/logBackendConsole.o \

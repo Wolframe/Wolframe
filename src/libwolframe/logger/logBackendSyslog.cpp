@@ -183,13 +183,11 @@ void SyslogBackend::setIdent( const std::string ident )
 	reopen( );
 }
 
-void SyslogBackend::log( const LogComponent component, const LogLevel::Level level_, const std::string& msg )
+void SyslogBackend::log( const LogLevel::Level level_, const std::string& msg )
 {
 	if ( level_ >= logLevel_ ) {
 		std::ostringstream os;
-		os	<< component.str( )
-			<< ( component == LogComponent::LogNone ? "" : " - " )
-			<< msg;
+		os << msg;
 		syslog( levelToSyslogLevel( level_ ), "%s", os.str( ).c_str( ) );
 	}
 }

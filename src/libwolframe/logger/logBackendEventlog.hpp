@@ -39,7 +39,6 @@
 #define _LOG_BACKEND_EVENTLOG_HPP_INCLUDED
 
 #include "logger/logLevel.hpp"
-#include "logger/logComponent.hpp"
 
 #define WIN32_MEAN_AND_LEAN
 #define NOMINMAX
@@ -62,7 +61,7 @@ public:
 
 	void setSource( const std::string& source );
 
-	void log( const LogComponent component, const LogLevel::Level level_, const std::string& msg );
+	void log( const LogLevel::Level level_, const std::string& msg );
 
 	void reopen( );
 

@@ -24,7 +24,6 @@ LIBRARIES = \
 LOGGER_OBJS = \
 	logger\logLevel.obj \
 	logger\logSyslogFacility.obj \
-	logger\logComponent.obj \
 	logger\logError.obj \
 	logger\logObject.obj \
 	logger\logBackendConsole.obj \
