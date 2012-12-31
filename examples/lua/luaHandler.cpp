@@ -79,7 +79,6 @@ static int lua_log( lua_State *_l )
 
 	_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get(
 				_Wolframe::log::LogLevel::strToLogLevel( logLevel ) )
-		<< _Wolframe::log::LogComponent::LogLua
 		<< os.str( );
 
 	lua_pop( _l, n );
