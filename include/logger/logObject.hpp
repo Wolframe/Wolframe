@@ -42,8 +42,7 @@ Project Wolframe.
 #include <boost/detail/select_type.hpp>
 #include <boost/type_traits/function_traits.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/asio.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/function.hpp>
 
 namespace _Wolframe {
 namespace log {
@@ -130,6 +129,7 @@ struct has_getLogObjectDescription_method
 	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
 };
 
+
 struct LogString
 {
 	template <typename T>
@@ -142,30 +142,12 @@ struct LogString
 	}
 	template <typename T>
 	static typename boost::enable_if_c<
-		boost::is_arithmetic<T>::value || boost::is_same<std::string,T>::value
+		boost::has_left_shift<std::ostream,T>::value
 		,std::string>::type
 	get( const T& t)
 	{
-		return boost::lexical_cast<std::string>(t);
-	}
-
-	static std::string get( const char* t)
-	{
-		return std::string(t);
-	}
-
-	template <typename T>
-	static std::string get( const boost::asio::ip::basic_endpoint<T>& e)
-	{
 		std::ostringstream rt;
-		rt << e;
-		return rt.str();
-	}
-
-	static std::string get( const boost::posix_time::ptime& e)
-	{
-		std::ostringstream rt;
-		rt << e;
+		rt << t;
 		return rt.str();
 	}
 };
