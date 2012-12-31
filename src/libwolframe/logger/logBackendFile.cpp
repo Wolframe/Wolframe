@@ -39,6 +39,11 @@
 #include "logger-v1.hpp"
 #include "logBackendFile.hpp"
 
+#if defined( _WIN32 )
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif // defined( _WIN32 )
+
 namespace _Wolframe {
 	namespace log {
 

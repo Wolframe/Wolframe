@@ -62,9 +62,7 @@ void WinDebugLogBackend::setLevel( const LogLevel::Level level_ )
 	logLevel_ = level_;
 }
 
-void WinDebugLogBackend::log( const LogLevel::Level level_,
-void WinDebugLogBackend::log( const LogLevel::Level level_,
-			      const std::string& msg )
+void WinDebugLogBackend::log( const LogLevel::Level level_, const std::string& msg )
 {
 	if ( level_ >= logLevel_ ) {
 		std::ostringstream oss;
