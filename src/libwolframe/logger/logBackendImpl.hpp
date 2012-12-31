@@ -80,8 +80,7 @@ public:
 	void setWinDebugLevel( const LogLevel::Level level );
 #endif // defined( _WIN32 )
 
-	void log( const LogComponent component, const LogLevel::Level level,
-		  const std::string& msg );
+	void log( const LogLevel::Level level, const std::string& msg );
 
 	LogLevel::Level minLogLevel() const;
 private:

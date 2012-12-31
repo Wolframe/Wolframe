@@ -39,6 +39,11 @@
 #include "logger-v1.hpp"
 #include "logBackendFile.hpp"
 
+#if defined( _WIN32 )
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif // defined( _WIN32 )
+
 namespace _Wolframe {
 	namespace log {
 
@@ -81,8 +86,7 @@ void LogfileBackend::reopen( )
 		isOpen_ = true;
 	} catch( const std::ofstream::failure& ) {
 		isOpen_ = false;
-		LOG_CRITICAL	<< _Wolframe::log::LogComponent::LogLogging
-				<< "Can't open logfile '" << filename_ << "'";
+		LOG_CRITICAL	<< "Can't open logfile '" << filename_ << "'";
 		// TODO: e.what() displays "basic_ios::clear" always, how to get
 		// decent error messages here? I fear the C++ standard doesn't
 		// help here..
@@ -119,12 +123,10 @@ static inline std::string timestamp( void )
 #endif // !defined( _WIN32 )
 }
 
-void LogfileBackend::log( const LogComponent component, const LogLevel::Level _level, const std::string& msg )
+void LogfileBackend::log( const LogLevel::Level _level, const std::string& msg )
 {
 	if( _level >= logLevel_ && isOpen_ ) {
 		logFile_	<< timestamp( ) << " "
-				<< component.str( )
-				<< ( component == LogComponent::LogNone ? "" : " - " )
 				<< _level << ": " << msg << std::endl;
 		logFile_.flush( );
 	}

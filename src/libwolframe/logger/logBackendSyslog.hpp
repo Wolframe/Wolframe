@@ -39,7 +39,6 @@
 #define _LOG_BACKEND_SYSLOG_HPP_INCLUDED
 
 #include "logger/logLevel.hpp"
-#include "logger/logComponent.hpp"
 #include "logger/logSyslogFacility.hpp"
 
 namespace _Wolframe {
@@ -58,7 +57,7 @@ public:
 
 	void setIdent( const std::string ident );
 
-	void log( const LogComponent component, const LogLevel::Level level_, const std::string& msg );
+	void log( const LogLevel::Level level_, const std::string& msg );
 
 	void reopen( );
 

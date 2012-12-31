@@ -105,15 +105,14 @@ void LogBackend::LogBackendImpl::setWinDebugLevel( const LogLevel::Level level )
 
 #endif // defined( _WIN32 )
 
-inline void LogBackend::LogBackendImpl::log( const LogComponent component,
-					     const LogLevel::Level level, const std::string& msg )
+inline void LogBackend::LogBackendImpl::log( const LogLevel::Level level, const std::string& msg )
 {
-	consoleLogger_.log( component, level, msg );
-	logfileLogger_.log( component, level, msg );
-	syslogLogger_.log( component, level, msg );
+	consoleLogger_.log( level, msg );
+	logfileLogger_.log( level, msg );
+	syslogLogger_.log( level, msg );
 #if defined( _WIN32 )
-	windebugLogger_.log( component, level, msg );
-	eventlogLogger_.log( component, level, msg );
+	windebugLogger_.log( level, msg );
+	eventlogLogger_.log( level, msg );
 #endif // defined( _WIN32 )
 }
 
@@ -157,8 +156,8 @@ void LogBackend::setWinDebugLevel( const LogLevel::Level level ) { impl_->setWin
 
 #endif // defined( _WIN32 )
 
-void LogBackend::log( const LogComponent component, const LogLevel::Level level, const std::string& msg )
-								{ impl_->log( component, level, msg ); }
+void LogBackend::log( const LogLevel::Level level, const std::string& msg )
+								{ impl_->log( level, msg ); }
 LogLevel::Level LogBackend::minLogLevel() const			{ return impl_->minLogLevel(); }
 
 }} // namespace _Wolframe::log

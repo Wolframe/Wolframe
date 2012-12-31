@@ -1779,7 +1779,6 @@ LUA_FUNCTION_THROWS( "logger.print(..)", function_logger_print)
 	else
 	{
 		_Wolframe::log::Logger( _Wolframe::log::LogBackend::instance() ).Get( lv )
-			<< _Wolframe::log::LogComponent::LogLua
 			<< logmsg;
 	}
 	return 0;

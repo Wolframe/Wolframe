@@ -79,7 +79,7 @@ public:
 };
 
 
-TEST_F( LoggingFixture, LogMacrosWithoutComponent )
+TEST_F( LoggingFixture, LogMacros )
 {
 	LOG_FATAL	<< "fatal error";
 	LOG_ALERT	<< "alert";
@@ -92,21 +92,6 @@ TEST_F( LoggingFixture, LogMacrosWithoutComponent )
 	LOG_DEBUG	<< "debug message";
 	LOG_TRACE	<< "debug message with tracing";
 	LOG_DATA	<< "debug message with tracing and data";
-}
-
-TEST_F( LoggingFixture, LogMacrosWithComponent )
-{
-	LOG_FATAL	<< LogComponent::LogLogging << "fatal error";
-	LOG_ALERT	<< LogComponent::LogLogging << "alert";
-	LOG_CRITICAL	<< LogComponent::LogLogging << "critical error";
-	LOG_SEVERE	<< LogComponent::LogLogging << "severe error";
-	LOG_ERROR	<< LogComponent::LogLogging << "an error";
-	LOG_WARNING	<< LogComponent::LogLogging << "a warning";
-	LOG_NOTICE	<< LogComponent::LogLogging << "a notice";
-	LOG_INFO 	<< LogComponent::LogLogging << "an info";
-	LOG_DEBUG	<< LogComponent::LogLogging << "debug message";
-	LOG_TRACE	<< LogComponent::LogLogging << "debug message with tracing";
-	LOG_DATA	<< LogComponent::LogLogging << "debug message with tracing and data";
 }
 
 TEST_F( LoggingFixture, LogStandardValues )

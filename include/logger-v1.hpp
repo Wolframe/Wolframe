@@ -41,7 +41,6 @@
 #include "logger/logLevel.hpp"
 #include "logger/logSyslogFacility.hpp"
 #include "logger/logError.hpp"
-#include "logger/logComponent.hpp"
 #include "logger/logBackend.hpp"
 #include "logger/logObject.hpp"
 
@@ -58,17 +57,15 @@ public:
 	Logger( LogBackend* backend ) :	logBk_( *backend )	{}
 
 	~Logger( )	{
-		logBk_.log( component_, msgLevel_, os_.str( ) );
+		logBk_.log( msgLevel_, os_.str( ) );
 	}
 
 	inline Logger& Get( LogLevel::Level level )	{
-		component_ = LogComponent::LogNone;
 		msgLevel_ = level;
 		return *this;
 	}
 
 	template<typename T> friend Logger& operator<<( Logger& logger, T thing );
-	friend Logger& operator<<( Logger& logger, LogComponent c );
 	friend Logger& operator<<( Logger& logger, LogError e );
 
 protected:
@@ -77,7 +74,6 @@ protected:
 private:
 	LogBackend&	logBk_;
 	LogLevel::Level	msgLevel_;
-	LogComponent	component_;
 
 	Logger( );
 	Logger( const Logger& );

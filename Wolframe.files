@@ -1543,7 +1543,6 @@ include/langbind/luaException.hpp
 include/langbind/normalizeFunction.hpp
 include/langbind/printProgram.hpp
 include/logger/logBackend.hpp
-include/logger/logComponent.hpp
 include/logger/logError.hpp
 include/logger/logLevel.hpp
 include/logger/logSyslogFacility.hpp
@@ -1888,7 +1887,6 @@ src/libwolframe/logger/logBackendSyslog.cpp
 src/libwolframe/logger/logBackendSyslog.hpp
 src/libwolframe/logger/logBackendWinDebug.cpp
 src/libwolframe/logger/logBackendWinDebug.hpp
-src/libwolframe/logger/logComponent.cpp
 src/libwolframe/logger/logError.cpp
 src/libwolframe/logger/loggerConfig.cpp
 src/libwolframe/logger/logLevel.cpp

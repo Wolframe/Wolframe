@@ -43,12 +43,6 @@
 
 #include <fstream>
 
-#if defined( _WIN32 )
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
-#endif // defined( _WIN32 )
-
 namespace _Wolframe {
 namespace log {
 
@@ -65,7 +59,7 @@ public:
 
 	void reopen( );
 
-	void log( const LogComponent component, const LogLevel::Level level, const std::string& msg );
+	void log( const LogLevel::Level level, const std::string& msg );
 
 	LogLevel::Level level() const	{ return logLevel_; }
 private:

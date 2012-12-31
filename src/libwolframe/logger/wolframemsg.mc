@@ -21,30 +21,6 @@ Language = English
 None
 .
 
-MessageId = 2
-SymbolicName = WOLFRAME_CATEGORY_LOGGING
-Language = English
-Logging
-.
-
-MessageId = 3
-SymbolicName = WOLFRAME_CATEGORY_NETWORK
-Language = English
-Network
-.
-
-MessageId = 4
-SymbolicName = WOLFRAME_CATEGORY_AUTH
-Language = English
-Auth
-.
-
-MessageId = 5
-SymbolicName = WOLFRAME_CATEGORY_LUA
-Language = English
-Lua
-.
-
 ;// event log severity levels (severity bits)
 SeverityNames = ( 
 	Success		= 0x0	: STATUS_SEVERITY_SUCCESS
