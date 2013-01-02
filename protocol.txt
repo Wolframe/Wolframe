@@ -30,6 +30,11 @@
 		<= .
 		<= OK/ERR ...
 
+# In INTERFACE (admin only), create a new interface item (content = body):
+=> PUSH platform culture type name version
+=> (content)
+=> .
+		<= OK/ERR ...
 
 
 

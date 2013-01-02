@@ -171,7 +171,7 @@ int InterfaceCommandHandler::doBody( int argc, const char** argv, std::ostream& 
 	//BODY platform culture type name version
 	UI::InterfaceObject obj;
 	if (!initInterfaceObject( obj, argc, argv, out)) return stateidx();
-	out << "DESCRIPTION" << endl();
+	out << "BODY" << endl();
 	out << protocol::escapeStringDLF( obj.body());
 	out << "OK" << endl();
 	return stateidx();
