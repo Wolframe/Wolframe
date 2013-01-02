@@ -32,6 +32,7 @@
 ************************************************************************/
 ///\file interfaceCommandHandler.cpp
 #include "interfaceCommandHandler.hpp"
+#include "cmdbind/contentBufferCommandHandlerEscDLF.hpp"
 #include "logger-v1.hpp"
 #include "processor/procProvider.hpp"
 #include <stdexcept>
@@ -42,7 +43,8 @@ using namespace _Wolframe::proc;
 
 enum State
 {
-	Process
+	User,
+	Admin
 };
 
 struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandler>
@@ -50,7 +52,14 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandle
 	STM()
 	{
 		(*this)
-			[Process]
+			[User]
+				.cmd< &InterfaceCommandHandler::doInfo >( "INFO")
+				.cmd< &InterfaceCommandHandler::doDescription >( "DESCRIPTION")
+				.cmd< &InterfaceCommandHandler::doBody >( "BODY")
+				.cmd< &InterfaceCommandHandler::doDone >( "DONE")
+				.cmd< &InterfaceCommandHandler::doCapabilities >( "CAPABILITIES")
+			[Admin]
+				.cmd< &InterfaceCommandHandler::doPush >( "PUSH")
 				.cmd< &InterfaceCommandHandler::doInfo >( "INFO")
 				.cmd< &InterfaceCommandHandler::doDescription >( "DESCRIPTION")
 				.cmd< &InterfaceCommandHandler::doBody >( "BODY")
@@ -74,8 +83,8 @@ static unsigned long getNumber( const char* aa)
 
 }
 
-InterfaceCommandHandler::InterfaceCommandHandler( const std::list<std::string>& roles_)
-	:cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>( &stm )
+InterfaceCommandHandler::InterfaceCommandHandler( const std::list<std::string>& roles_, bool adminInterface_)
+	:cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>( &stm, (std::size_t)(adminInterface_?User:Admin))
 	,m_roles(roles_)
 {}
 
@@ -179,6 +188,58 @@ int InterfaceCommandHandler::doDone( int argc, const char**, std::ostream& out)
 	return -1;
 }
 
+int InterfaceCommandHandler::endPush( cmdbind::CommandHandler* ch, std::ostream& out)
+{
+	cmdbind::ContentBufferCommandHandlerEscDLF* chnd = dynamic_cast<cmdbind::ContentBufferCommandHandlerEscDLF*>( ch);
+	cmdbind::CommandHandlerR chr( chnd);
+	std::string content = chnd->content();
+	const char* error = ch->lastError();
+	if (error)
+	{
+		out << "ERR PUSH " << error << endl();
+		return stateidx();
+	}
+	try
+	{
+		Version version( m_argbuf[4].c_str());
+		UI::InterfaceObject obj( m_argbuf[2]/*type*/, m_argbuf[0]/*platform*/,
+					m_argbuf[3]/*name*/, m_argbuf[1]/*culture*/,
+					version.toNumber(), ""/*description*/, chnd->content()/*body*/);
+
+		const UI::UserInterfaceLibrary* uilib = m_provider->UIlibrary();
+		uilib->addObject( obj);
+		out << "OK PUSH" << endl();
+	}
+	catch (const std::runtime_error& e)
+	{
+		out << "ERR PUSH failed" << endl();
+		LOG_ERROR << "Error pushing user interface object: " << e.what();
+	}
+	return stateidx();
+}
+
+int InterfaceCommandHandler::doPush( int argc, const char** argv, std::ostream& out)
+{
+	//PUSH platform culture type name version
+	if (argc < 5)
+	{
+		out << "ERR PUSH too few arguments" << endl();
+		return stateidx();
+	}
+	if (argc > 5)
+	{
+		out << "ERR PUSH too many arguments" << endl();
+		return stateidx();
+	}
+	m_argbuf.clear();
+	for (int ii=0; ii<argc; ++ii)
+	{
+		m_argbuf.push_back( argv[ii]);
+	}
+	cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::ContentBufferCommandHandlerEscDLF();
+	delegateProcessing<&InterfaceCommandHandler::endPush>( delegate_ch);
+	return stateidx();
+}
 
 
 

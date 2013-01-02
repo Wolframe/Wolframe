@@ -1,0 +1,35 @@
+# Switch to INTERFACE sub protocol:
+=> INTERFACE
+
+# Leave the INTERFACE sub protocol:
+=> DONE
+		<= DONE INTERFACE
+
+# In INTERFACE, get the capabilities:
+=> CAPABILITIES
+		<= OK INFO DESCRIPTION BODY CAPABILITIES
+
+# In INTERFACE, get the list of available items:
+=> INFO platform culture [tag]
+		<= INFO platform culture type name version
+		<= INFO platform culture type name version
+		<= ...
+		<= OK/ERR
+
+# In INTERFACE, get the description text for a specific interface item (from the INFO list):
+=> DESCRIPTION platform culture type name version
+		<= DESCRIPTION
+		<= (content)
+		<= .
+		<= OK/ERR ...
+
+# In INTERFACE, get the body for a specific interface item (from the INFO list):
+=> BODY platform culture type name version
+		<= BODY
+		<= (content)
+		<= .
+		<= OK/ERR ...
+
+
+
+

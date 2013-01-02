@@ -102,7 +102,7 @@ class LineCommandHandler :public CommandHandler
 {
 public:
 	///\brief Constructor
-	explicit LineCommandHandler( const LineCommandHandlerSTM* stm_);
+	explicit LineCommandHandler( const LineCommandHandlerSTM* stm_, std::size_t stateidx_=0);
 	///\brief Destructor
 	virtual ~LineCommandHandler();
 
@@ -219,8 +219,8 @@ template <class LineCommandHandlerImpl>
 struct LineCommandHandlerTemplate :public LineCommandHandler
 {
 	///\brief Constructor
-	explicit LineCommandHandlerTemplate( const LineCommandHandlerSTM* stm_)
-		:LineCommandHandler( stm_){}
+	explicit LineCommandHandlerTemplate( const LineCommandHandlerSTM* stm_, std::size_t stateidx_=0)
+		:LineCommandHandler( stm_,stateidx_){}
 
 	///\brief Destructor
 	virtual ~LineCommandHandlerTemplate(){}

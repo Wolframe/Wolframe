@@ -38,8 +38,8 @@ using namespace _Wolframe;
 using namespace _Wolframe::cmdbind;
 using namespace _Wolframe::protocol;
 
-LineCommandHandler::LineCommandHandler( const LineCommandHandlerSTM* stm_)
-	:m_delegateHandler(0),m_delegateHandlerEnd(0),m_stm(stm_),m_argBuffer(&m_buffer),m_cmdstateidx(Init),m_stateidx(0),m_cmdidx(-1),m_resultstate(-1),m_resultitr(0)
+LineCommandHandler::LineCommandHandler( const LineCommandHandlerSTM* stm_, std::size_t stateidx_)
+	:m_delegateHandler(0),m_delegateHandlerEnd(0),m_stm(stm_),m_argBuffer(&m_buffer),m_cmdstateidx(Init),m_stateidx(stateidx_),m_cmdidx(-1),m_resultstate(-1),m_resultitr(0)
 {
 	m_itr = m_input.begin();
 	m_end = m_input.end();
