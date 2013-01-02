@@ -130,6 +130,10 @@ Version::Version( const char* version, const char* format)
 			m_revision = ar[2];
 			m_hasRevision = true;
 		}
+		else if (cnt[3])
+		{
+			throw std::runtime_error( "version string not complete: Has build number but no revision");
+		}
 		m_major = ar[0];
 		m_minor = ar[1];
 	}
@@ -164,6 +168,21 @@ Version::Version( unsigned short M, unsigned short m, unsigned short r, unsigned
 	  m_build( b ), m_hasBuild( true )
 {}
 
+Version Version::upperbound( const Version& o)
+{
+	Version rt(o);
+	if (!m_hasRevision)
+	{
+		m_revision = std::numeric_limits<unsigned short>::max();
+		m_hasRevision = true;
+	}
+	if (!m_hasBuild)
+	{
+		m_build = std::numeric_limits<unsigned>::max();
+		m_hasBuild = true;
+	}
+	return rt;
+}
 
 bool Version::operator == ( const Version &other ) const
 {

@@ -46,7 +46,7 @@ class InterfaceCommandHandler :public cmdbind::LineCommandHandlerTemplate<Interf
 {
 public:
 	typedef cmdbind::LineCommandHandlerTemplate<CommandHandler> Parent;
-	InterfaceCommandHandler();
+	explicit InterfaceCommandHandler( const std::list<std::string>& roles_);
 	virtual ~InterfaceCommandHandler(){}
 
 public:

@@ -90,23 +90,21 @@ private:
 	enum FSMstate	{
 		NEW_CONNECTION,			///<
 		SEND_HELLO,			///<
-		READ_INPUT,			///<
-		OUTPUT_MSG,			///<
+		COMMAND_HANDLER,		//< redirecting to sub state machine of command handler
 		TIMEOUT_OCCURED,		///<
 		SIGNALLED,			///<
 		FORBIDDEN,			///<
 		TERMINATING,			///<
-		FINISHED,			///<
-		COMMAND_HANDLER			///< in main command handler
+		FINISHED			///<
 	};
 
 	///\brief Returns the state as string for logging etc.
 	///\param [in] state state to get as string
 	static const char* stateName( FSMstate state )
 	{
-		const char* names[] = { "NEW", "HELLO SENT", "READ INPUT", "OUTPUT MESSAGE",
+		const char* names[] = { "NEW", "HELLO SENT", "COMMAND_HANDLER",
 					"TIMEOUT", "SIGNALLED", "FORBIDDEN", "TERMINATE",
-					"FINISHED", "COMMAND_HANDLER" };
+					"FINISHED" };
 		return names[ state ];
 	}
 

@@ -51,7 +51,6 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandle
 	{
 		(*this)
 			[Process]
-				.cmd< &InterfaceCommandHandler::doVersion >( "VERSION")
 				.cmd< &InterfaceCommandHandler::doInfo >( "INFO")
 				.cmd< &InterfaceCommandHandler::doDescription >( "DESCRIPTION")
 				.cmd< &InterfaceCommandHandler::doBody >( "BODY")
@@ -62,11 +61,23 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandle
 };
 static STM stm;
 
-InterfaceCommandHandler::InterfaceCommandHandler()
-	:cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>( &stm )
+static unsigned long getNumber( const char* aa)
 {
-	m_roles.push_back( "std");	//... to be defined by authorization
+	unsigned long result = 0;
+	for (int ii=0; aa[ii] <= '9' && aa[0] >= '0'; ++ii)
+	{
+		unsigned long xx = result * 10 + aa[0] - '0';
+		if (xx < result) throw std::runtime_error( "number out of range");
+		result = xx;
+	}
+	return result;
+
 }
+
+InterfaceCommandHandler::InterfaceCommandHandler( const std::list<std::string>& roles_)
+	:cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>( &stm )
+	,m_roles(roles_)
+{}
 
 int InterfaceCommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
 {
@@ -82,20 +93,9 @@ int InterfaceCommandHandler::doCapabilities( int argc, const char**, std::ostrea
 	}
 }
 
-int InterfaceCommandHandler::doVersion( int argc, const char**, std::ostream& out)
-{
-	if (argc != 0)
-	{
-		out << "ERR unexpected arguments" << endl();
-		return stateidx();
-	}
-	out << "OK" << endl();
-	return stateidx();
-}
-
 int InterfaceCommandHandler::doInfo( int argc, const char** argv, std::ostream& out)
 {
-	//INFO platform culture version
+	//INFO platform culture tag
 	if (argc > 3)
 	{
 		out << "ERR too many arguments" << endl();
@@ -108,31 +108,10 @@ int InterfaceCommandHandler::doInfo( int argc, const char** argv, std::ostream& 
 	}
 	const char* platform = argv[0];
 	const char* culture = argv[1];
-	const char* versionstr = (argc == 2)?0:argv[2];
+	const char* tag = (argc == 2)?"":argv[2];
 	const UI::UserInterfaceLibrary* uilib = m_provider->UIlibrary();
-	std::list<UI::InterfaceObject::Info> selection;
-	if (versionstr)
-	{
-		std::list<UI::InterfaceObject::Info> inf = uilib->interface( platform, m_roles, culture);
-		std::list<UI::InterfaceObject::Info>::const_iterator ni = inf.begin(), ne = inf.end();
-		Version version( versionstr);
-		for (; ni != ne; ++ni)
-		{
-			if (ni->version() == version)
-			{
-				//PF:NOTE: equality comparison is wrong here.
-				//Need to compare accepted version boundaries.
-				//These are derived from how specific the searched
-				//version is: e.g. "3.1" matches "3.1.3" but not "3.2",
-				//"3.1.3" matches "3.1.3.5" but not "3.1.4"
-				selection.push_back( *ni);
-			}
-		}
-	}
-	else
-	{
-		selection = uilib->interface( platform, m_roles, culture);
-	}
+	std::list<UI::InterfaceObject::Info> selection = uilib->interface( platform, m_roles, culture, tag);
+
 	std::list<UI::InterfaceObject::Info>::const_iterator ni = selection.begin(), ne = selection.end();
 	for (; ni != ne; ++ni)
 	{
@@ -157,12 +136,12 @@ bool InterfaceCommandHandler::initInterfaceObject( UI::InterfaceObject& obj, int
 	}
 	const char* platform = argv[0];
 	const char* culture = argv[1];
-	//[+]const char* type = argv[2];
+	const char* type = argv[2];
 	const char* name = argv[3];
 	const char* versionstr = (argc == 4)?0:argv[4];
 	Version version( versionstr );
 	const UI::UserInterfaceLibrary* uilib = m_provider->UIlibrary();
-	UI::InterfaceObject::Info info( "", platform, name, culture, version.toNumber(), "" );
+	UI::InterfaceObject::Info info( type, platform, name, culture, version.toNumber(), "" );
 	obj = uilib->object( info );
 	return true;
 }

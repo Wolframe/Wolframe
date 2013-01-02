@@ -34,6 +34,7 @@
 #include "mainConnectionHandler.hpp"
 #include "cmdbind/discardInputCommandHandlerEscDLF.hpp"
 #include "cmdbind/authCommandHandler.hpp"
+#include "interfaceCommandHandler.hpp"
 #include "handlerConfig.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
@@ -75,19 +76,6 @@ static STM stm;
 
 CommandHandler::CommandHandler()
 	:cmdbind::LineCommandHandlerTemplate<CommandHandler>( &stm ){}
-
-static unsigned long getNumber( const char* aa)
-{
-	unsigned long result = 0;
-	for (int ii=0; aa[ii] <= '9' && aa[0] >= '0'; ++ii)
-	{
-		unsigned long xx = result * 10 + aa[0] - '0';
-		if (xx < result) throw std::runtime_error( "number out of range");
-		result = xx;
-	}
-	return result;
-
-}
 
 int CommandHandler::doCapabilities( int argc, const char**, std::ostream& out)
 {
@@ -178,26 +166,23 @@ int CommandHandler::doMech( int argc, const char** argv, std::ostream& out)
 	return stateidx();
 }
 
-int CommandHandler::doInterface( int argc, const char** argv, std::ostream& out)
+int CommandHandler::endInterface( cmdbind::CommandHandler* ch, std::ostream&)
 {
-	int min_version = 0;
-	int version = 0;
-	if (argc == 1)
-	{
+	delete ch;
+	int rt = stateidx();
+	return rt;
+}
 
-		min_version = getNumber( argv[0]);
-	}
-	typedef std::map<std::string,std::string> UIForms;
-	UIForms uiforms = m_provider->uiforms( m_authtickets.back(), min_version, version);
-	UIForms::const_iterator fi = uiforms.begin(), fe = uiforms.end();
-	out << "INTERFACE " << version << endl();
-	for (; fi != fe; ++fi)
+int CommandHandler::doInterface( int argc, const char**, std::ostream& out)
+{
+	if (argc != 0)
 	{
-		out << "UIFORM " << fi->first << endl();
-		out << protocol::escapeStringDLF( fi->second);
-		out << endl() << "." << endl();
+		out << "ERR INTERFACE unexpected arguments" << endl();
+		return stateidx();
 	}
-	out << "OK" << endl();
+	cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new InterfaceCommandHandler( roles());
+	out << "OK INTERFACE enter commands" << endl();
+	delegateProcessing<&CommandHandler::endInterface>( delegate_ch);
 	return stateidx();
 }
 
@@ -260,6 +245,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		else
 		{
 			out << "ERR doctype detection " << error << endl();
+			delete delegate_ch;
 		}
 	}
 	if (!doctype.empty())

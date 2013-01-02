@@ -73,6 +73,12 @@ public:
 
 private:
 	bool redirectConsumedInput( cmdbind::DoctypeFilterCommandHandler* fromh, cmdbind::CommandHandler* toh, std::ostream& out);
+	std::list<std::string> roles() const
+	{
+		std::list<std::string> rt;
+		rt.push_back( "std");		//TODO: To be extracted from m_authtickets
+		return rt;
+	}
 
 private:
 	AuthMechanisms m_authMechanisms;

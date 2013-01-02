@@ -199,48 +199,10 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 			case SEND_HELLO:	{
 				m_state = COMMAND_HANDLER;
-				m_cmdHandler.putInput(m_readBuf.charptr(), m_readBuf.pos());
-				//DEPRECATED: old state machine:	m_state = READ_INPUT;
+				m_cmdHandler.putInput( m_readBuf.charptr(), m_readBuf.pos());
 				return net::NetworkOperation( net::ReadData( m_readBuf.ptr(), m_readBuf.size(), 30 ));
 			}
 
-			case READ_INPUT:
-				m_dataStart = m_readBuf.charptr();
-				if ( !strncmp( "quit", m_dataStart, 4 ))	{
-					m_state = TERMINATING;
-					return net::NetworkOperation( net::SendString( "Bye\n" ));
-				}
-				else	{
-					char *s = m_dataStart;
-					for ( std::size_t i = 0; i < m_dataSize; i++ )	{
-						if ( *s == '\n' )	{
-							s++;
-							m_outMsg = std::string( m_dataStart, s - m_dataStart );
-							m_dataSize -= s - m_dataStart;
-							m_dataStart = s;
-							m_state = OUTPUT_MSG;
-							return net::NetworkOperation( net::SendString( m_outMsg ));
-						}
-						s++;
-					}
-					// If we got here, no \n was found, we need to read more
-					// or close the connection if the buffer is full
-					if ( m_dataSize >= m_readBuf.size() )	{
-						m_state = TERMINATING;
-						return net::NetworkOperation( net::SendString( "Line too long. Bye.\n" ));
-					}
-				}
-				LOG_ALERT << "Internal: Processor in illegal state << (" << (int)__LINE__ << ")";
-				return net::NetworkOperation( net::CloseConnection() );
-
-			case OUTPUT_MSG:
-				memmove( m_readBuf.ptr(), m_dataStart, m_dataSize );
-				m_state = READ_INPUT;
-				// Aba: Windows: wolframeHandler.cpp(194) : error C2036: 'void *' : unknown size,
-				// fixed temporarily with an ugly cast. Please check.
-				return net::NetworkOperation( net::ReadData( (char *)m_readBuf.ptr() + m_dataSize,
-									     m_readBuf.size() - m_dataSize,
-									     30 ));
 			case TIMEOUT_OCCURED:	{
 				m_state = TERMINATING;
 				return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
@@ -268,7 +230,6 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 			case FINISHED:
 				LOG_DEBUG << "Processor in FINISHED state";
-//				return net::NetworkOperation( net::CloseConnection() );
 				return net::NetworkOperation( net::NoOp() );
 
 			case COMMAND_HANDLER:	{

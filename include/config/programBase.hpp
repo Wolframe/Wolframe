@@ -49,7 +49,6 @@ namespace _Wolframe {
 namespace config {
 
 struct LineInfo
-	:public log::LogObject
 {
 	LineInfo( const LineInfo& o)
 		:line(o.line),col(o.col){}
@@ -75,7 +74,6 @@ struct LineInfo
 };
 
 struct PositionalError
-	:public log::LogObject
 {
 	PositionalError( const PositionalError& o)
 		:line(o.line),col(o.col),msg(o.msg){}
@@ -98,7 +96,6 @@ struct PositionalError
 };
 
 struct PositionalFileError
-	:public log::LogObject
 {
 	PositionalFileError( const PositionalFileError& o)
 		:line(o.line),col(o.col),msg(o.msg),filename(o.filename){}
