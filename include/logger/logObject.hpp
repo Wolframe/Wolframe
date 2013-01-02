@@ -97,7 +97,7 @@ public:
 		{
 			static std::string exec( const void* elem)
 			{
-				return boost::lexical_cast<std::string>( *(Element*)(elem));
+				return boost::lexical_cast<std::string>( *(const Element*)(elem));
 			}
 		};
 		substitute( ++m_idx, &Method::exec, (std::size_t)&(((LogObject*)0)->*eptr));
