@@ -193,6 +193,26 @@ int InterfaceCommandHandler::endPush( cmdbind::CommandHandler* ch, std::ostream&
 	cmdbind::ContentBufferCommandHandlerEscDLF* chnd = dynamic_cast<cmdbind::ContentBufferCommandHandlerEscDLF*>( ch);
 	cmdbind::CommandHandlerR chr( chnd);
 	std::string content = chnd->content();
+	std::string description;
+	if (boost::istarts_with( content, "DESCRIPTION\n"))
+	{
+		std::string::const_iterator start = content.begin()+(std::strlen("DESCRIPTION\n")-1);
+		std::string::const_iterator ci = start, ce = content.end();
+		for (; ci != ce; ++ci)
+		{
+			if (*ci == '\n')
+			{
+				std::string::const_iterator aa = ci;
+				++ci;
+				if (ci != ce && *ci == '\r') ++ci;
+				if (ci != ce && *ci == '\n')
+				{
+					description = std::string( start+1, aa);
+					content = std::string( ci, ce);
+				}
+			}
+		}
+	}
 	const char* error = ch->lastError();
 	if (error)
 	{
@@ -204,7 +224,7 @@ int InterfaceCommandHandler::endPush( cmdbind::CommandHandler* ch, std::ostream&
 		Version version( m_argbuf[4].c_str());
 		UI::InterfaceObject obj( m_argbuf[2]/*type*/, m_argbuf[0]/*platform*/,
 					m_argbuf[3]/*name*/, m_argbuf[1]/*culture*/,
-					version.toNumber(), ""/*description*/, chnd->content()/*body*/);
+					version.toNumber(), description, chnd->content()/*body*/);
 
 		const UI::UserInterfaceLibrary* uilib = m_provider->UIlibrary();
 		uilib->addObject( obj);
