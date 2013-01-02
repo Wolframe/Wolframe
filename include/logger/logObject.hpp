@@ -163,26 +163,34 @@ public:
 	template <typename A1>
 	Exception( const A1& a1)
 		:LogObjectT(a1)
-		,StdExceptionClass( LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this)))
-		{}
+		,StdExceptionClass("")
+		{
+			StdExceptionClass::operator=(StdExceptionClass(LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this))));
+		}
 
 	template <typename A1, typename A2>
 	Exception( const A1& a1, const A2& a2)
 		:LogObjectT(a1,a2)
-		,StdExceptionClass( LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this)))
-		{}
+		,StdExceptionClass("")
+		{
+			StdExceptionClass::operator=(StdExceptionClass(LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this))));
+		}
 
 	template <typename A1, typename A2, typename A3>
 	Exception( const A1& a1, const A2& a2, const A3& a3)
 		:LogObjectT(a1,a2,a3)
-		,StdExceptionClass( LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this)))
-		{}
+		,StdExceptionClass("")
+		{
+			StdExceptionClass::operator=(StdExceptionClass(LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this))));
+		}
 
 	template <typename A1, typename A2, typename A3, typename A4>
 	Exception( const A1& a1, const A2& a2, const A3& a3, const A4& a4)
 		:LogObjectT(a1,a2,a3,a4)
-		,StdExceptionClass( LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this)))
-		{}
+		,StdExceptionClass("")
+		{
+			StdExceptionClass::operator=(StdExceptionClass(LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this))));
+		}
 };
 
 
