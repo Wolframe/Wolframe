@@ -68,13 +68,6 @@ void IOFilterCommandHandlerEscDLF::setOutputBuffer( void* buf, std::size_t size,
 	if (m_outputfilter.get()) m_outputfilter->setOutputBuffer( (char*)buf+pos, size-pos);
 }
 
-enum
-{
-	ErrInternal=-1,
-	ErrProcessing=-2,
-	ErrResources=-3
-};
-
 void IOFilterCommandHandlerEscDLF::getFilterOutputWriteData()
 {
 	OutputFilter* flt = m_outputfilter.get();

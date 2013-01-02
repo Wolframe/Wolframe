@@ -30,29 +30,26 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file cmdbind/ioFilterCommandHandlerEscDLF.hpp
-#ifndef _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
-#define _Wolframe_cmdbind_IOFILTER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
+///\file cmdbind/contentBufferCommandHandlerEscDLF.hpp
+#ifndef _Wolframe_cmdbind_CONTENT_BUFFER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
+#define _Wolframe_cmdbind_CONTENT_BUFFER_COMMAND_HANDLER_ESC_DOT_LF_HPP_INCLUDED
 #include "protocol/ioblocks.hpp"
-#include "filter/filter.hpp"
-#include "cmdbind/ioFilterCommandHandler.hpp"
-#include "connectionHandler.hpp"
+#include "cmdbind/commandHandler.hpp"
+#include <string>
 
 namespace _Wolframe {
 namespace cmdbind {
 
-///\class IOFilterCommandHandlerEscDLF
-///\brief Command handler processing filter input/output with end of content marked as Dot ('.') LF or Dot CR LF
-///\remark Dot ('.') on start of lines are escaped with Dot Dot LF
-class IOFilterCommandHandlerEscDLF :public IOFilterCommandHandler
+///\class ContentBufferCommandHandlerEscDLF
+class ContentBufferCommandHandlerEscDLF :public CommandHandler
 {
 public:
-	typedef IOFilterCommandHandler Parent;
+	typedef CommandHandler Parent;
 
 	///\brief Constructor
-	IOFilterCommandHandlerEscDLF();
+	ContentBufferCommandHandlerEscDLF();
 	///\brief Destructor
-	virtual ~IOFilterCommandHandlerEscDLF();
+	virtual ~ContentBufferCommandHandlerEscDLF();
 
 	///\brief See Parent::setInputBuffer(void*,std::size_t,std::size_t,std::size_t)
 	virtual void setInputBuffer( void* buf, std::size_t allocsize);
@@ -75,39 +72,30 @@ public:
 	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
-	///\param[out] err error code in case of error
-	///\return CallResult status of the filter input for the state machine of this command handler
-	virtual CallResult call( const char*& err)=0;
+	const std::string& content() const
+	{
+		return m_content;
+	}
 
 private:
 	enum State
 	{
 		Processing,
-		FlushingOutput,
-		DiscardInput,
 		Terminated
 	};
 	static const char* stateName( State st)
 	{
-		static const char* ar[] = {"Processing","FlushingOutput","DiscardInput","Terminated"};
+		static const char* ar[] = {"Processing","Terminated"};
 		return ar[ (int)st];
 	}
 
 	protocol::EscapeBuffer m_escapeBuffer;
-
 	State m_state;					//< processing state machine state
-	const void* m_writedata;			//< bytes to write next (WRITE)
-	std::size_t m_writedatasize;			//< number of bytes to write next (WRITE)
-	unsigned int m_writedata_chksum;		//< check sum to verify write
-	unsigned int m_writedata_chkpos;		//< check position to verify write
-
+	std::string m_content;
 	protocol::InputBlock m_input;			//< input buffer
 	protocol::OutputBlock m_output;			//< output buffer
 	protocol::InputBlock::iterator m_eoD;		//< input end of data marker
 	std::size_t m_itrpos;				//< read start position in buffer for the command handler
-
-private:
-	void getFilterOutputWriteData();
 };
 }}
 #endif
