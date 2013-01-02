@@ -35,6 +35,12 @@
 => (content)
 => .
 		<= OK/ERR ...
-
-
+OR
+=> PUSH platform culture type name version
+=> DESCRIPTION
+=> (content)
+=> CRLF
+=> (content)
+=> .
+		<= OK/ERR ...
 
