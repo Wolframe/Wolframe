@@ -44,7 +44,8 @@ using namespace _Wolframe::proc;
 enum State
 {
 	User,
-	Admin
+	Admin,
+	AdminPush
 };
 
 struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandler>
@@ -65,6 +66,11 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandle
 				.cmd< &InterfaceCommandHandler::doBody >( "BODY")
 				.cmd< &InterfaceCommandHandler::doDone >( "DONE")
 				.cmd< &InterfaceCommandHandler::doCapabilities >( "CAPABILITIES")
+			[AdminPush]
+				.cmd< &InterfaceCommandHandler::doPushDescription >( "DESCRIPTION")
+				.cmd< &InterfaceCommandHandler::doPushBody >( "BODY")
+				.cmd< &InterfaceCommandHandler::doDonePush >( "DONE")
+				.cmd< &InterfaceCommandHandler::doAbortPush >( "ABORT")
 		;
 	}
 };
@@ -188,56 +194,6 @@ int InterfaceCommandHandler::doDone( int argc, const char**, std::ostream& out)
 	return -1;
 }
 
-int InterfaceCommandHandler::endPush( cmdbind::CommandHandler* ch, std::ostream& out)
-{
-	cmdbind::ContentBufferCommandHandlerEscDLF* chnd = dynamic_cast<cmdbind::ContentBufferCommandHandlerEscDLF*>( ch);
-	cmdbind::CommandHandlerR chr( chnd);
-	std::string content = chnd->content();
-	std::string description;
-	if (boost::istarts_with( content, "DESCRIPTION\n"))
-	{
-		std::string::const_iterator start = content.begin()+(std::strlen("DESCRIPTION\n")-1);
-		std::string::const_iterator ci = start, ce = content.end();
-		for (; ci != ce; ++ci)
-		{
-			if (*ci == '\n')
-			{
-				std::string::const_iterator aa = ci;
-				++ci;
-				if (ci != ce && *ci == '\r') ++ci;
-				if (ci != ce && *ci == '\n')
-				{
-					description = std::string( start+1, aa);
-					content = std::string( ci, ce);
-				}
-			}
-		}
-	}
-	const char* error = ch->lastError();
-	if (error)
-	{
-		out << "ERR PUSH " << error << endl();
-		return stateidx();
-	}
-	try
-	{
-		Version version( m_argbuf[4].c_str());
-		UI::InterfaceObject obj( m_argbuf[2]/*type*/, m_argbuf[0]/*platform*/,
-					m_argbuf[3]/*name*/, m_argbuf[1]/*culture*/,
-					version.toNumber(), description, chnd->content()/*body*/);
-
-		const UI::UserInterfaceLibrary* uilib = m_provider->UIlibrary();
-		uilib->addObject( obj);
-		out << "OK PUSH" << endl();
-	}
-	catch (const std::runtime_error& e)
-	{
-		out << "ERR PUSH failed" << endl();
-		LOG_ERROR << "Error pushing user interface object: " << e.what();
-	}
-	return stateidx();
-}
-
 int InterfaceCommandHandler::doPush( int argc, const char** argv, std::ostream& out)
 {
 	//PUSH platform culture type name version
@@ -256,9 +212,100 @@ int InterfaceCommandHandler::doPush( int argc, const char** argv, std::ostream& 
 	{
 		m_argbuf.push_back( argv[ii]);
 	}
-	cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::ContentBufferCommandHandlerEscDLF();
-	delegateProcessing<&InterfaceCommandHandler::endPush>( delegate_ch);
+	m_attributes.clear();
+	return AdminPush;
+}
+
+int InterfaceCommandHandler::endPushAttribute( cmdbind::CommandHandler* ch, std::ostream& out)
+{
+	cmdbind::ContentBufferCommandHandlerEscDLF* chnd = dynamic_cast<cmdbind::ContentBufferCommandHandlerEscDLF*>( ch);
+	cmdbind::CommandHandlerR chr( chnd);
+	const char* error = chnd->lastError();
+	if (error)
+	{
+		out << "ERR " << m_attributes.back().first << " (PUSH) " << error << endl();
+		return Admin;
+	}
+	m_attributes.back().second = chnd->content();
 	return stateidx();
+}
+
+int InterfaceCommandHandler::doPushDescription( int argc, const char**, std::ostream& out)
+{
+	if (argc > 0)
+	{
+		out << "DESCRIPTION (PUSH) no arguments expected" << endl();
+		return stateidx();
+	}
+	m_attributes.push_back( std::pair< std::string, std::string>( "DESCRIPTION", ""));
+
+	cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::ContentBufferCommandHandlerEscDLF();
+	delegateProcessing<&InterfaceCommandHandler::endPushAttribute>( delegate_ch);
+	return stateidx();
+}
+
+int InterfaceCommandHandler::doPushBody( int argc, const char**, std::ostream& out)
+{
+	if (argc > 0)
+	{
+		out << "BODY (PUSH) no arguments expected" << endl();
+		return stateidx();
+	}
+	m_attributes.push_back( std::pair< std::string, std::string>( "BODY", ""));
+
+	cmdbind::CommandHandler* delegate_ch = (cmdbind::CommandHandler*)new cmdbind::ContentBufferCommandHandlerEscDLF();
+	delegateProcessing<&InterfaceCommandHandler::endPushAttribute>( delegate_ch);
+	return stateidx();
+}
+
+int InterfaceCommandHandler::doAbortPush( int argc, const char**, std::ostream& out)
+{
+	//ABORT (PUSH)
+	if (argc > 0)
+	{
+		out << "ERR ABORT (PUSH) no arguments expected" << endl();
+		return stateidx();
+	}
+	out << "OK ABORT (PUSH)" << endl();
+	return stateidx();
+}
+
+int InterfaceCommandHandler::doDonePush( int argc, const char**, std::ostream& out)
+{
+	//DONE (PUSH)
+	if (argc > 0)
+	{
+		out << "ERR DONE (PUSH) no arguments expected" << endl();
+		return stateidx();
+	}
+	const std::string* description = 0;
+	const std::string* body = 0;
+
+	std::vector< std::pair< std::string, std::string> >::const_iterator ai = m_attributes.begin(), ae = m_attributes.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->first == "DESCRIPTION") description = &ai->second;
+		else if (ai->first == "BODY") body = &ai->second;
+	}
+	try
+	{
+		Version version( m_argbuf[4].c_str());
+		UI::InterfaceObject obj( m_argbuf[2]/*type*/, m_argbuf[0]/*platform*/,
+					m_argbuf[3]/*name*/, m_argbuf[1]/*culture*/,
+					version.toNumber(),
+					description?*description:std::string(),
+					body?*body:std::string());
+
+		const UI::UserInterfaceLibrary* uilib = m_provider->UIlibrary();
+		uilib->addObject( obj);
+		out << "OK PUSH" << endl();
+	}
+	catch (const std::runtime_error& e)
+	{
+		out << "ERR PUSH failed" << endl();
+		LOG_ERROR << "Error pushing user interface object: " << e.what();
+	}
+	return Admin;
 }
 
 
