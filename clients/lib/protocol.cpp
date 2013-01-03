@@ -316,9 +316,6 @@ struct ProtocolState
 		START,
 		AUTH,
 		AUTH_WAIT,
-		INTERFACE,
-		LOAD_UIFORM,
-		LOAD_UIFORM_DATA,
 		SESSION,
 		SESSION_QUIT,
 		SESSION_REQUEST,
@@ -336,9 +333,6 @@ struct ProtocolState
 			"START",
 			"AUTH",
 			"AUTH_WAIT",
-			"INTERFACE",
-			"LOAD_UIFORM",
-			"LOAD_UIFORM_DATA",
 			"SESSION",
 			"SESSION_QUIT",
 			"SESSION_REQUEST",
@@ -600,12 +594,8 @@ public:
 				if (isequal( arg.ptr[0], "OK"))
 				{
 					notifyState( "authorized");
-					state( ProtocolState::INTERFACE);
-					std::ostringstream il;
-					il << "INTERFACE " << m_config.uiform_minindex << "\r\n";
-					m_statearg.reset();
-					m_statearg.append( il.str());
-					return OP_WRITE( m_statearg.ptr(), m_statearg.size());
+					state( ProtocolState::SESSION);
+					continue;
 				}
 				else if (isequal( arg.ptr[0], "ERR"))
 				{
@@ -620,86 +610,6 @@ public:
 					state( ProtocolState::CLOSED);
 					return OP_CLOSE();
 				}
-
-			case ProtocolState::INTERFACE:
-				if (!getLine( &line, dataptr(), &di.pos, datasize()))
-				{
-					return OP_READ();
-				}
-				getLineSplit_space( arg, line, 2);
-				if (!arg.size) continue;
-				if (isequal( arg.ptr[0], "INTERFACE"))
-				{
-					notifyAttribute( "interface", arg.ptr[1]);
-					state( ProtocolState::LOAD_UIFORM);
-					continue;
-				}
-				else if (isequal( arg.ptr[0], "ERR"))
-				{
-					msg = (arg.size == 1)?"interface retrieval failed":arg.ptr[1];
-					notifyError( msg);
-					state( ProtocolState::CLOSED);
-					return OP_CLOSE();
-				}
-				else
-				{
-					notifyError( "protocol error in INTERFACE reply");
-					state( ProtocolState::CLOSED);
-					return OP_CLOSE();
-				}
-
-			case ProtocolState::LOAD_UIFORM:
-				if (!getLine( &line, dataptr(), &di.pos, datasize()))
-				{
-					return OP_READ();
-				}
-				getLineSplit_space( arg, line, 2);
-				if (!arg.size) continue;
-				if (isequal( arg.ptr[0], "UIFORM"))
-				{
-					if (arg.size == 1)
-					{
-						notifyError( "UIFORM missing argument");
-						state( ProtocolState::CLOSED);
-						return OP_CLOSE();
-					}
-					else
-					{
-						const char* formid = arg.ptr[1];
-						m_statearg.reset( formid, strlen( formid)+1);
-						m_docbuffer.reset();
-						state( ProtocolState::LOAD_UIFORM_DATA);
-						continue;
-					}
-				}
-				else if (isequal( arg.ptr[0], "OK"))
-				{
-					notifyState( "session");
-					state( ProtocolState::SESSION);
-					continue;
-				}
-				else if (isequal( arg.ptr[0], "ERR"))
-				{
-					msg = (arg.size == 1)?"unspecified error instead of UIFORM":arg.ptr[1];
-					notifyError( msg);
-					state( ProtocolState::CLOSED);
-					return OP_CLOSE();
-				}
-				else
-				{
-					notifyError( "protocol error in INTERFACE reply (UIFORM,OK expected)");
-					state( ProtocolState::CLOSED);
-					return OP_CLOSE();
-				}
-
-			case ProtocolState::LOAD_UIFORM_DATA:
-				if (!getContentUnescaped( &m_docbuffer, dataptr(), &di.pos, datasize()))
-				{
-					return OP_READ();
-				}
-				notifyUIForm();
-				state( ProtocolState::LOAD_UIFORM);
-				continue;
 
 			case ProtocolState::SESSION:
 			{

@@ -716,6 +716,11 @@ LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 		lua_pushlightuserdata( ls, result);
 		lua_yieldk( ls, 0, 1, function_form_table);
 	}
+	if (lua_type( ls, -1) == LUA_TUSERDATA)
+	{
+		//... if LuaTableOutputFilter::print is never called then no object is left on the stack
+		lua_newtable( ls);
+	}
 	return 1;
 }
 
@@ -814,6 +819,11 @@ LUA_FUNCTION_THROWS( "<structure>:table()", function_struct_table)
 		lua_pushlightuserdata( ls, obj);
 		lua_yieldk( ls, 0, 1, function_struct_table);
 	}
+	if (lua_type( ls, -1) == LUA_TUSERDATA)
+	{
+		//... if LuaTableOutputFilter::print is never called then no object is left on the stack
+		lua_newtable( ls);
+	}
 	return 1;
 }
 
@@ -888,6 +898,11 @@ LUA_FUNCTION_THROWS( "<structure>:table()", function_typedinputfilter_table)
 	{
 		lua_pushlightuserdata( ls, closure);
 		lua_yieldk( ls, 0, 1, function_typedinputfilter_table);
+	}
+	if (lua_type( ls, -1) == LUA_TUSERDATA)
+	{
+		//... if LuaTableOutputFilter::print is never called then no object is left on the stack
+		lua_newtable( ls);
 	}
 	return 1;
 }
@@ -1597,7 +1612,13 @@ LUA_FUNCTION_THROWS( "input:table()", function_input_table_DDLFormParser)
 		result->init( outp, serialize::Context::SerializeWithIndices);
 		lua_pushlightuserdata( ls, result);
 	}
-	return function_input_table_DDLFormSerializer(ls);
+	function_input_table_DDLFormSerializer(ls);
+	if (lua_type( ls, -1) == LUA_TUSERDATA)
+	{
+		//... if LuaTableOutputFilter::print is never called then no object is left on the stack
+		lua_newtable( ls);
+	}
+	return 1;
 }
 
 LUA_FUNCTION_THROWS( "input:form()", function_input_form_DDLFormParser)
@@ -1623,6 +1644,11 @@ LUA_FUNCTION_THROWS( "input:table()", function_input_table_RedirectFilterClosure
 	{
 		lua_pushlightuserdata( ls, obj);
 		lua_yieldk( ls, 0, 1, function_input_table_RedirectFilterClosure);
+	}
+	if (lua_type( ls, -1) == LUA_TUSERDATA)
+	{
+		//... if LuaTableOutputFilter::print is never called then no object is left on the stack
+		lua_newtable( ls);
 	}
 	return 1;
 }
