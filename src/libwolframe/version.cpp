@@ -168,22 +168,6 @@ Version::Version( unsigned short M, unsigned short m, unsigned short r, unsigned
 	  m_build( b ), m_hasBuild( true )
 {}
 
-Version Version::upperbound( const Version& o)
-{
-	Version rt(o);
-	if (!m_hasRevision)
-	{
-		m_revision = std::numeric_limits<unsigned short>::max();
-		m_hasRevision = true;
-	}
-	if (!m_hasBuild)
-	{
-		m_build = std::numeric_limits<unsigned>::max();
-		m_hasBuild = true;
-	}
-	return rt;
-}
-
 bool Version::operator == ( const Version &other ) const
 {
 	if ( m_major != other.m_major )		return false;
