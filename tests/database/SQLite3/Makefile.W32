@@ -25,13 +25,13 @@ INCLUDE_LIBS = \
 	$(TOPDIR)\sqlite3\sqlite3.lib \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
-TEST_CPP_OBJS = \
+CPP_OBJS = \
 	sqliteModuleFiles.obj
 
-TEST_CPP_BINS = \
+CPP_BINS = \
 	sqliteUnit.exe
 
-sqliteUnit.exe: sqliteUnit.obj
+sqliteUnit.exe: sqliteUnit.obj sqliteModuleFiles.obj
 
 all: $(OBJS) $(CPP_BINS)
 

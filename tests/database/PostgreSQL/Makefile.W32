@@ -25,7 +25,7 @@ INCLUDE_LIBS = \
 	"$(PGSQL_DIR)\lib\libpq.lib" \
 	kernel32.lib advapi32.lib Ws2_32.lib
 
-OBJS = \
+CPP_OBJS = \
 	PostgreSQLModuleFiles.obj
 
 CPP_BINS = \
