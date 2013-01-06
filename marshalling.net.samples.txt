@@ -706,8 +706,10 @@ http://www.roblocher.com/whitepapers/oletypes.aspx
 DESCRIPTION:
 About COM Datatypes: SAVEARRAY,VARIANT,etc..
 
-
-
+URL:
+http://msdn.microsoft.com/en-us/library/bb676070.aspx
+DESCRIPTION:
+Tlbexp Helper Functions (Unmanaged API Reference)
 
 
 
