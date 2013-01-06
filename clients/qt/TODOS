@@ -10,8 +10,13 @@ now:
   - can be provoked by using non-debug XML sending and textwolf XML filter
     on Windows XP, so it is a failed signal for a partial line, must add
     a state like DataLeft (Data gets DataReading or so)
+- More bugs on FreeBSD with textwolf filter:
+  - ERROR: error calling function 'CategoryFeatureListRequest':[configurator]:446: error in function 'input:table()' (parsed untagged value, but no untagged value is defined for this structure (
+  - _ string after the CategoryFeature tag in simpleform solves the problem, but feels wrong!
+  - <CategoryFeature category_id="1" id="1"/> but
+     <category id="1"/> works, rest the same?!
+ 
 - ILLEGAL STATE 4 in dataAvailable!
-- CRITICAL: "Premature end of document."
 
 - open info box (modal) in feature/category/component edit and add to
   show picture information
