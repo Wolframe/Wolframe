@@ -212,12 +212,12 @@ using namespace mscorlib;
 //   and print the result too.
 //
 //   PARAMETERS:
-//   * pszVersion - The desired DOTNETFX version, in the format ¡°vX.X.XXXXX¡±. 
-//     The parameter must not be NULL. It¡¯s important to note that this 
+//   * pszVersion - The desired DOTNETFX version, in the format. 
+//     The parameter must not be NULL. Its important to note that this 
 //     parameter should match exactly the directory names for each version of
 //     the framework, under C:\Windows\Microsoft.NET\Framework[64]. The 
 //     current possible values are "v1.0.3705", "v1.1.4322", "v2.0.50727" and 
-//     "v4.0.30319". Also, note that the ¡°v¡± prefix is mandatory.
+//     "v4.0.30319". Also, note that the prefix is mandatory.
 //   * pszAssemblyName - The display name of the assembly to be loaded, such 
 //     as "CSClassLibrary". The ".DLL" file extension is not appended.
 //   * pszClassName - The name of the Type that defines the method to invoke.
@@ -356,7 +356,7 @@ HRESULT RuntimeHostV4Demo1(PCWSTR pszVersion, PCWSTR pszAssemblyName,
 
     // Load the .NET assembly.
     wprintf(L"Load the assembly %s\n", pszAssemblyName);
-    hr = spDefaultAppDomain->Load_2(bstrAssemblyName, &spAssembly);
+    hr = spDefaultAppDomain->(bstrAssemblyName, &spAssembly);
     if (FAILED(hr))
     {
         wprintf(L"Failed to load the assembly w/hr 0x%08lx\n", hr);
@@ -366,7 +366,7 @@ HRESULT RuntimeHostV4Demo1(PCWSTR pszVersion, PCWSTR pszAssemblyName,
     // Get the Type of CSSimpleObject.
     hr = spAssembly->GetType_2(bstrClassName, &spType);
     if (FAILED(hr))
-    {
+    {Load_2
         wprintf(L"Failed to get the Type interface w/hr 0x%08lx\n", hr);
         goto Cleanup;
     }
@@ -492,13 +492,13 @@ Cleanup:
 //   the class and print the result.
 //
 //   PARAMETERS:
-//   * pszVersion - The desired DOTNETFX version, in the format ¡°vX.X.XXXXX¡±. 
-//     The parameter must not be NULL. It¡¯s important to note that this 
+//   * pszVersion - The desired DOTNETFX version, in the format . 
+//     The parameter must not be NULL. Its important to note that this 
 //     parameter should match exactly the directory names for each version of
 //     the framework, under C:\Windows\Microsoft.NET\Framework[64]. Because 
 //     the ICLRRuntimeHost interface does not support the .NET v1.x runtimes, 
 //     the current possible values of the parameter are "v2.0.50727" and 
-//     "v4.0.30319". Also, note that the ¡°v¡± prefix is mandatory.
+//     "v4.0.30319". Also, note that the  prefix is mandatory.
 //   * pszAssemblyPath - The path to the Assembly to be loaded.
 //   * pszClassName - The name of the Type that defines the method to invoke.
 //
@@ -640,6 +640,11 @@ Cleanup:
 
 -----------------------------------------------------------------------------------------------------
 URL:
+http://msdn.microsoft.com/en-us/magazine/cc163567.aspx
+DESCRIPTION:
+CLR Hosting APIs
+
+URL:
 http://msdn.microsoft.com/en-us/library/windows/desktop/ms221039(v=vs.85).aspx
 DESCRIPTION:
 IRecordInfo interface (Automation)
@@ -653,4 +658,56 @@ URL:
 http://msdn.microsoft.com/en-us/library/windows/desktop/ms221378(v=vs.85).aspx
 DESCRIPTION:
 IRecordInfo PutField Method
+
+URL:
+https://github.com/patthoyts/optcl
+DESCRIPTION:
+Project implementing OLE/COM support for Tcl/tk
+EXAMPLE:
+https://github.com/patthoyts/optcl/blob/master/optcl/word.tcl
+
+URL:
+http://msdn.microsoft.com/en-us/library/aa913233.aspx
+DESCRIPTION:
+Automation Structures
+
+URL:
+http://social.msdn.microsoft.com/Forums/en-US/vcgeneral/thread/a80fc5b8-6f78-4ce7-9497-e2d5a2d3bcf4
+DESCRIPTION:
+Get data from SAVEARRAY
+
+URL:
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa367061%28v=vs.85%29.aspx
+DESCRIPTION:
+Interface Definition Language (extract form definitions Windows)
+
+URL:
+http://code.msdn.microsoft.com/windowsdesktop/CppHostCLR-e6581ee0
+DESCRIPTION:
+Another version of the example above of hosting CLR and call .NET (GetStringLength etc..)
+
+URL:
+http://limbioliong.wordpress.com/2011/09/25/using-a-vt_record-variant-in-managed-code-part-1/
+DESCRIPTION:
+Passing VT_RECORD from unmanaged code to managed code and back
+
+URL:
+http://www.codeproject.com/Articles/42319/Using-NET-Classes-Modules-from-Native-C
+DESCRIPTION:
+Using NET Classes Modules from Native C++
+
+URL:
+http://cxxreflect.seaplusplus.com/
+DESCRIPTION:
+CxxReflect library
+
+URL:
+http://www.roblocher.com/whitepapers/oletypes.aspx
+DESCRIPTION:
+About COM Datatypes: SAVEARRAY,VARIANT,etc..
+
+
+
+
+
 
