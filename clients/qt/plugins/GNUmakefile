@@ -77,7 +77,7 @@ local_install:
 	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(DESTDIR)$(libdir)/wolframe
 
 local_uninstall:
-	-rm $(DESTDIR)$(libdir)/wolframe/modules/$(DYNAMIC_MODULE)
-	-rmdir $(DESTDIR)$(libdir)/wolframe/modules
+	-rm $(DESTDIR)$(libdir)/wolframe/$(DYNAMIC_MODULE)
+	-rmdir $(DESTDIR)$(libdir)/wolframe
 
 local_test:

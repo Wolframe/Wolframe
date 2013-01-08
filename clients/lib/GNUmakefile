@@ -46,6 +46,12 @@ CPP_OBJS = \
 	protocol.o \
 	session.o
 
+DIST_HEADERS = \
+	connection.hpp \
+	exportable.hpp \
+	protocol.hpp \
+	session.hpp
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 local_all:
@@ -55,5 +61,12 @@ local_clean:
 local_distclean:
 
 local_install:
+	$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)/wolframe/libclient
+	$(INSTALL) -m 644 $(DIST_HEADERS) $(DESTDIR)$(includedir)/wolframe/libclient
+
+local_uninstall:
+	-rm -rf $(DESTDIR)$(includedir)/wolframe/libclient/*
+	-rmdir $(DESTDIR)$(includedir)/wolframe/libclient
+	-rmdir $(DESTDIR)$(includedir)/wolframe
 
 local_test:

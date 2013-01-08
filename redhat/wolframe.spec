@@ -527,12 +527,9 @@ the FreeImage library.
 Requires: %{name} >= %{version}-%{release}
 %endif
 
-%package client
-Summary: Wolframe client and command line tool
+%package libclient
+Summary: Wolframe C++ client library
 Group: Application/Business
-
-%description client
-Wolframe command line tool and client library.
 
 %if !%{build_boost}
 BuildRequires: boost-devel
@@ -556,6 +553,16 @@ Requires: libboost-system1_48_0 >= 1.48.0
 %if %{with_ssl}
 Requires: openssl >= 0.9.7
 %endif
+
+%package libclient-devel
+Summary: Developement header files and libraries for the Wolframe C++ client library
+Group: Application/Business
+Requires: %{name}-libclient >= %{version}-%{release}
+
+%package client
+Summary: Wolframe client command line tool
+Group: Application/Business
+Requires: %{name}-libclient >= %{version}-%{release}
 
 %if %{with_qt}
 %package qtclient
@@ -881,8 +888,6 @@ fi
 %{_libdir}/wolframe/libwolframe_langbind.a
 %{_libdir}/wolframe/libwolframe_prnt.so
 %{_libdir}/wolframe/libwolframe_prnt.a
-%{_libdir}/wolframe/libwolframe_client.so
-%{_libdir}/wolframe/libwolframe_client.a
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so
 %{_libdir}/wolframe/liblua.a
@@ -1022,7 +1027,7 @@ fi
 
 %endif
 
-%files client
+%files libclient
 %defattr( -, root, root )
 # funny, why?!
 %if !%{sles}
@@ -1033,6 +1038,21 @@ fi
 %endif
 %{_libdir}/wolframe/libwolframe_client.so.0.0.0
 %{_libdir}/wolframe/libwolframe_client.so.0
+
+%files libclient-devel
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%{_libdir}/wolframe/libwolframe_client.so
+%{_libdir}/wolframe/libwolframe_client.a
+%dir %{_includedir}/wolframe/libclient
+%{_includedir}/wolframe/libclient/*.hpp
+
+%files client
+%defattr( -, root, root )
+# funny, why?!
+%if !%{sles}
+%dir %{_bindir}
+%endif
 %{_bindir}/wolframec
 
 %if %{with_qt}
