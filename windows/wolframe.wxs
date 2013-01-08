@@ -98,6 +98,12 @@ Project Wolframe.
 								<File Id="qtclient.exe" Name="qtclient.exe" DiskId="1" Source="..\clients\qt\qtclient.exe"/>
 							</Component>
 							<?endif?>
+							
+							<?ifdef var.with_qt?>
+							<Component Id="WolframeWidgets" Guid="{9dcd5fa4-62cd-40ed-a970-5f5df11b43cc}">
+								<File Id="qtwolframewidgets.dll" Name="wolframewidgets.dll" DiskId="1" Source="..\clients\qt\plugins\wolframewidgets.dll"/>
+							</Component>
+							<?endif?>
 
 							<?ifdef var.with_qt?>
 							<Component Id="QtDlls" Guid="{75155ec8-6ff0-435d-adb5-53207761a9ae}">
@@ -562,6 +568,7 @@ Project Wolframe.
 				</Feature>
 				<Feature Id="QtClient" Title="Qt Client" Description="A Qt client to access the Wolframe server." Level="1000">
 					<ComponentRef Id="WolframeQtClient"/>
+					<ComponentRef Id="WolframeWidgets"/>
 					<ComponentRef Id="QtDlls"/>
 				</Feature>
 			</Feature>
