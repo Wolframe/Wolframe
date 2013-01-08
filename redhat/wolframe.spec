@@ -531,6 +531,9 @@ Requires: %{name} >= %{version}-%{release}
 Summary: Wolframe C++ client library
 Group: Application/Business
 
+%description libclient
+Wolframe client library for C++ (implemented using boost libraries).
+
 %if !%{build_boost}
 BuildRequires: boost-devel
 %if %{rhel} || %{centos} || %{fedora}
@@ -559,10 +562,16 @@ Summary: Developement header files and libraries for the Wolframe C++ client lib
 Group: Application/Business
 Requires: %{name}-libclient >= %{version}-%{release}
 
+%description libclient-devel
+Development files for the Wolframe client library for C++ (implemented using boost libraries).
+
 %package client
 Summary: Wolframe client command line tool
 Group: Application/Business
 Requires: %{name}-libclient >= %{version}-%{release}
+
+%description client
+Command line client to access the Wolframe server.
 
 %if %{with_qt}
 %package qtclient
