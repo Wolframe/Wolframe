@@ -14,7 +14,6 @@ daemon code:
 - makefiles
   - fix libchrono transitive dependency in boost in 1.50/1.51
   - error checking after dependency generation, avoid funny mistakes
-  - parallel builds in lua and qtclient fail, lib, cmdline
 
 
 PF:
