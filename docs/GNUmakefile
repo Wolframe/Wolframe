@@ -99,9 +99,9 @@ local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/man/man5
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/man/man8
 	$(INSTALL) -m 0644 wolframe.conf.5 $(DESTDIR)$(datadir)/man/man5
-	gzip $(DESTDIR)$(datadir)/man/man5/wolframe.conf.5
+	gzip -f $(DESTDIR)$(datadir)/man/man5/wolframe.conf.5
 	$(INSTALL) -m 0644 wolframed.8 $(DESTDIR)$(datadir)/man/man8
-	gzip $(DESTDIR)$(datadir)/man/man8/wolframed.8
+	gzip -f $(DESTDIR)$(datadir)/man/man8/wolframed.8
 
 local_uninstall:
 	@-rm -rf $(DESTDIR)$(datadir)/doc/wolframe/html
