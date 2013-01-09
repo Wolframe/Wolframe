@@ -575,7 +575,7 @@ Command line client to access the Wolframe server.
 
 %if %{with_qt}
 %package qtclient
-Summary: Wolframe client
+Summary: Wolframe Qt frontend
 Group: Application/Business
 
 %if %{rhel} || %{centos} || %{fedora}

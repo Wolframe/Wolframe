@@ -15,63 +15,72 @@ Package: wolframe
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Wolframe Daemon
- <insert long description, indented with spaces>
+ The Wolframe server and server utilities.
 
 Package: wolframe-sqlite3
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Sqlite3 database bindings
- <insert long description, indented with spaces>
+ The Wolframe database module for Sqlite3.
 
 Package: wolframe-postgresql
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Postgresql database bindings
- <insert long description, indented with spaces>
+ The Wolframe database module for Postgresql (libpq).
 
 Package: wolframe-pam
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: PAM authentication bindings
- <insert long description, indented with spaces>
+ The Wolframe authentication module for PAM.
 
 Package: wolframe-sasl
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: SASL authentication bindings
- <insert long description, indented with spaces>
+ The Wolframe authentication module using Cyrus SASL.
 
 Package: wolframe-libxml2
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: The Wolframe XML parsing module using libxml2.
- <insert long description, indented with spaces>
+ The Wolframe XML parsing module using libxml2.
 
 Package: wolframe-libxslt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: The Wolframe filter module using libxslt.
- <insert long description, indented with spaces>
+ The Wolframe filter module using libxslt.
 
 Package: wolframe-libhpdf
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Wolframe printing module based on libhpdf/libharu.
- <insert long description, indented with spaces>
+ Wolframe printing module based on libhpdf/libharu.
 
 Package: wolframe-freeimage
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Wolframe image manipulation function module.
- <insert long description, indented with spaces>
+ Wolframe image manipulation function module implemented with
+ the FreeImage library.
 
 Package: wolframe-client
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Qt client for Wolframe
- <insert long description, indented with spaces>
+Description: Wolframe client command line tool.
+ Command line client to access the Wolframe server.
+
+Package: wolframe-qtclient
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe Qt frontend
+ Qt client for the Wolframe server.
 
 Package: wolframe-doc
 Architecture: all
-Description: documentation for Wolframe
- <insert long description, indented with spaces>
+Description: Documentation for Wolframe
+ The HTML and PDF WolfBook, tutorial and doxygen API documentation
+ of the Wolframe system.
+ 
