@@ -125,6 +125,8 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_PGSQL
 INCLUDE_DIRS += \
 	$(PGSQL_INCLUDE_DIRS)
+INCLUDE_LDFLAGS += \
+	$(PGSQL_LIB_DIRS)
 INCLUDE_LIBS += \
 	$(PGSQL_LIBS)
 endif
@@ -191,7 +193,15 @@ local_clean:
 
 local_distclean:
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_functions:$(TOPDIR)/src/libwolframe_prnt:$(TOPDIR)/src/libwolframe_database:$(LIBXML2_LIB_DIR):$(TOPDIR)/wtest"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/src/libwolframe_functions:$(TOPDIR)/src/libwolframe_prnt:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/wtest"
+
+ifeq ($(WITH_PGSQL),1)
+LD_LIBRARY_PATH:= "$(LD_LIBRARY_PATH):$(PGSQL_LIB_DIR)"
+endif
+
+ifeq ($(WITH_LIBXML2),1)
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBXML2_LIB_DIR)"
+endif
 
 ifeq ($(WITH_LIBHPDF),1)
 LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBHPDF_LIB_DIR)"
