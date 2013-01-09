@@ -66,6 +66,12 @@ Description: Wolframe image manipulation function module.
  Wolframe image manipulation function module implemented with
  the FreeImage library.
 
+Package: wolframe-libclient
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe C++ client library
+ Wolframe client library for C++ (implemented using boost libraries).
+
 Package: wolframe-client
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
