@@ -32,7 +32,7 @@ mirrors, etc., Xubuntu version loads them directly from the mirrors))
 
 # local build with ccache
 cd home:andreas_baumann/Wolframe
-osc build -ccache wolframe.spec
+osc build --ccache wolframe.spec
 
 # boost backport
 - debhelper is older on OSC ((>= 4.1.16))
