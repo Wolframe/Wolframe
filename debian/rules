@@ -181,7 +181,7 @@ install: build
 		cd ../..
 
 	# Qt client package
-	cd clients/qtclient; $(MAKE) install $(WOLFRAME_PARAMS) \
+	cd clients/qt; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-qtclient; \
 		cd ../..
 
