@@ -814,9 +814,13 @@ fi
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
+%if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man5
+%endif
 %{_mandir}/man5/wolframe.conf.5.gz
+%if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man8
+%endif
 %{_mandir}/man8/wolframed.8.gz
 
 %if %{build_boost}
