@@ -627,7 +627,7 @@ make install
 %endif
 
 cd %{_builddir}/%{name}-%{version}
-LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make help \
 	RELEASE=1 \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -655,7 +655,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
-LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make config \
 	RELEASE=1 \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -683,7 +683,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
-LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make all \
 	%{?_smp_mflags} \
 	RELEASE=1 \
 %if %{build_boost}
@@ -1079,7 +1079,7 @@ fi
 %if !%{sles}
 %dir %{_libdir}/wolframe/
 %endif
-%{_libdir}/wolframe/libwolframewidgets.so
+%{_libdir}/wolframe/plugins/libwolframewidgets.so
 %endif
 
 %changelog
