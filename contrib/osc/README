@@ -27,12 +27,14 @@ osc build xUbuntu_11.04 i586 wolframe.dsc
 abort, use getlocal.pl on the .osc/_buildinfo* file, copy it back
 prepare the /var/tmp/osbuild-packagecache package cache (from CDs,
 mirrors, etc., Xubuntu version loads them directly from the mirrors))
+# careful:
+- local builds need perl-dom-xml and binutis (ar!)
 
 # set use_keyring=0 in the general secion of ~/.oscrc !!
 
 # local build with ccache
 cd home:andreas_baumann/Wolframe
-osc build -ccache wolframe.spec
+osc build --ccache wolframe.spec
 
 # boost backport
 - debhelper is older on OSC ((>= 4.1.16))
@@ -40,3 +42,5 @@ osc build -ccache wolframe.spec
 - debian/rules:
   - boost_libs: only the ones needed by Wolframe! no python especially
   - remove all shell code doing something with python or mpi
+
+
