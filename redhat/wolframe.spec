@@ -815,9 +815,9 @@ fi
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
 %dir %attr(0755, root, root) %{_mandir}/man5
-%{_madir}/man5/wolframe.conf.5.gz
+%{_mandir}/man5/wolframe.conf.5.gz
 %dir %attr(0755, root, root) %{_mandir}/man8
-%{_madir}/man8/wolframed.8.gz
+%{_mandir}/man8/wolframed.8.gz
 
 %if %{build_boost}
 %{_libdir}/wolframe/libboost_program_options.so.%{boost_version}
