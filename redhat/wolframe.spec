@@ -1076,9 +1076,7 @@ fi
 %dir %{_bindir}
 %endif
 %{_bindir}/qtclient
-%if !%{sles}
 %dir %{_libdir}/wolframe/plugins/
-%endif
 %{_libdir}/wolframe/plugins/libwolframewidgets.so
 %endif
 
