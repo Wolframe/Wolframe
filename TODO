@@ -18,6 +18,13 @@ daemon code:
 - polish deployment
   - template configuration wolframed.conf
   - generate and install manpages, finish text
+  - debian builds always against 1.48 boost, this should only be the
+    case for older Debian/Ubuntu systems (needs a split in OSC dsc
+    files)
+  - local deployed boost libaries (1.48) for Debian and old Ubuntu have
+    to be bundled with wolframe-libclient too.
+  - Debian: add -dev packages, but how to do this nicely having just
+    one rule file and one 'make install'?
     
 PF:
 - high prio
