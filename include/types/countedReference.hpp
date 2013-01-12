@@ -42,8 +42,7 @@ namespace _Wolframe {
 namespace types {
 
 ///\class CountedReference
-///\brief Reference to an object that is freed when not referenced anymore.
-///\remark Designed to be substitutable by 'shared_ptr' except that the reset function that is different (BUG)
+///\brief Multiple shared reference to an object with ownership.
 ///\tparam OBJ
 template <class OBJ>
 class CountedReference
@@ -52,47 +51,27 @@ public:
 	struct Pointer
 	{
 		OBJ* m_ptr;
-		int m_cnt;
-	};
-	
-	CountedReference( const CountedReference& o)
-		:m_ref(o.m_ref)
-	{
-		m_ref->m_cnt++;
-	}
 
-	explicit CountedReference( OBJ* ptr)
-		:m_ref( new Pointer())
-	{
-		m_ref->m_cnt = 1;
-		m_ref->m_ptr = ptr;
-	}
-
-	CountedReference()
-		:m_ref( new Pointer())
-	{
-		m_ref->m_cnt = 1;
-		m_ref->m_ptr = 0;
-	}
-
-	~CountedReference()
-	{
-		if (--m_ref->m_cnt == 0)
+		explicit Pointer( OBJ* ptr_=0)
+			:m_ptr(ptr_){}
+		~Pointer()
 		{
-			if (m_ref->m_ptr) delete m_ref->m_ptr;
-			delete m_ref;
+			if (m_ptr) delete m_ptr;
 		}
-	}
-	
+	};
+
+	CountedReference( const CountedReference& o)
+		:m_ref(o.m_ref){}
+
+	explicit CountedReference( OBJ* ptr=0)
+		:m_ref(boost::shared_ptr<Pointer>( new Pointer( ptr))){}
+
+	virtual ~CountedReference()
+	{}
+
 	CountedReference& operator =( const CountedReference& o)
 	{
-		if (--m_ref->m_cnt == 0)
-		{
-			if (m_ref->m_ptr) delete m_ref->m_ptr;
-			delete m_ref;
-		}
 		m_ref = o.m_ref;
-		m_ref->m_cnt++;
 		return *this;
 	}
 
@@ -100,30 +79,25 @@ public:
 	{
 		return m_ref->m_ptr;
 	}
-	
+
 	void reset( OBJ* ptr=0)
 	{
 		if (m_ref->m_ptr && m_ref->m_ptr != ptr) delete m_ref->m_ptr;
-		m_ref->m_ptr = ptr; 
+		m_ref->m_ptr = ptr;
 	}
-	
-	int cnt() const
-	{
-		return m_ref->m_cnt;
-	}
-	
+
 	OBJ* operator -> () const
 	{
 		return m_ref->m_ptr;
 	}
-	
+
 	OBJ& operator *() const
 	{
 		return *m_ref->m_ptr;
 	}
 
 private:
-	Pointer* m_ref;
+	boost::shared_ptr<Pointer> m_ref;
 };
 
 }}//namespace
