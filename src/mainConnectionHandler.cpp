@@ -247,6 +247,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 			out << "ERR doctype detection " << error << endl();
 			delete delegate_ch;
 		}
+		return stateidx();
 	}
 	if (!doctype.empty())
 	{
@@ -275,6 +276,7 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 			out << "ERR " << msg.str() << endl();
 			delete execch;
 		}
+		return stateidx();
 	}
 	else
 	{
@@ -304,8 +306,8 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 			}
 			delete execch;
 		}
+		return stateidx();
 	}
-	return stateidx();
 }
 
 int CommandHandler::doRequest( int argc, const char** argv, std::ostream& out)

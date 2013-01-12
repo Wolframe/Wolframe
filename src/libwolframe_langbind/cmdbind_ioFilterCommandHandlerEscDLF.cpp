@@ -206,6 +206,10 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 void IOFilterCommandHandlerEscDLF::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	std::size_t startidx = (const char*)begin - m_input.charptr();
+	if (bytesTransferred + startidx > m_input.size())
+	{
+		throw std::logic_error( "illegal input range passed to IOFilterCommandHandlerEscDLF");
+	}
 	m_input.setPos( bytesTransferred + startidx);
 	if (m_itrpos != 0)
 	{

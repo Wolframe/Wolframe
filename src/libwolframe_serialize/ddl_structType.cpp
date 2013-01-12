@@ -176,7 +176,7 @@ void StructType::defineAsAtomic( const AtomicType& tp)
 	m_contentType = Atomic;
 }
 
-void StructType::defineAsIndirection( const IndirectionConstructorR ref)
+void StructType::defineAsIndirection( const IndirectionConstructorR& ref)
 {
 	if (m_contentType == Vector) throw std::logic_error( "element already defined as vector");
 	if (m_elem.size()) throw std::logic_error( "element already initialized as non empty structure. cannot redefine type anymore");
