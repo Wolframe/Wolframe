@@ -145,6 +145,8 @@ MainWindowUi.hpp: themes/windows/MainWindow.ui
 
 DefaultMainWindow.hpp: MainWindowUi.hpp
 
+qtclient$(EXE): $(CPP_OBJS) qtclient.o
+
 FORMS = \
 	apps/test/forms/form1.ui \
 	apps/test/forms/form2.ui \

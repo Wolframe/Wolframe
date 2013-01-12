@@ -14,9 +14,18 @@ daemon code:
 - makefiles
   - fix libchrono transitive dependency in boost in 1.50/1.51
   - error checking after dependency generation, avoid funny mistakes
-  - parallel builds in lua and qtclient fail, lib, cmdline
 
-
+- polish deployment
+  - template configuration wolframed.conf
+  - generate and install manpages, finish text
+  - debian builds always against 1.48 boost, this should only be the
+    case for older Debian/Ubuntu systems (needs a split in OSC dsc
+    files)
+  - local deployed boost libaries (1.48) for Debian and old Ubuntu have
+    to be bundled with wolframe-libclient too.
+  - Debian: add -dev packages, but how to do this nicely having just
+    one rule file and one 'make install'?
+    
 PF:
 - high prio
   - UIForm loader in client and server

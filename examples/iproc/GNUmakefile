@@ -33,8 +33,15 @@ INCLUDE_LIBS = \
 	$(TOPDIR)/gtest/gtest-all.o \
 	$(LIBS_DL)
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR):$(TOPDIR)/wtest"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(TOPDIR)/wtest"
 
+ifeq ($(WITH_PGSQL),1)
+LD_LIBRARY_PATH:= "$(LD_LIBRARY_PATH):$(PGSQL_LIB_DIR)"
+endif
+
+ifeq ($(WITH_LIBXML2),1)
+LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(LIBXML2_LIB_DIR)"
+endif
 
 # openssl
 
@@ -54,6 +61,8 @@ INCLUDE_CXXFLAGS += \
 	-DWITH_PGSQL
 INCLUDE_DIRS += \
 	$(PGSQL_INCLUDE_DIRS)
+INCLUDE_LDFLAGS += \
+	$(PGSQL_LIB_DIRS)
 INCLUDE_LIBS += \
 	$(PGSQL_LIBS)
 endif

@@ -37,7 +37,7 @@ build-stamp:
 	# Add here commands to compile the package.
 	$(MAKE) help
 	$(MAKE) $(WOLFRAME_PARAMS) config
-	$(MAKE) LDFLAGS=-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe \
+	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
 		$(WOLFRAME_PARAMS) all
 	cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc-doxygen; cd ..
 
@@ -170,10 +170,20 @@ install: build
 		cp /usr/lib/$$i /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe; \
 	done
 
-	# client package
-	cd clients; $(MAKE) install $(WOLFRAME_PARAMS) \
+	# client library package
+	cd clients/lib; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libclient; \
+		cd ../..
+	
+	# command line tool package
+	cd clients/cmdline; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-client; \
-		cd ..
+		cd ../..
+
+	# Qt client package
+	cd clients/qt; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-qtclient; \
+		cd ../..
 
 	# documentation package
 	cd docs; $(MAKE) install $(WOLFRAME_PARAMS) \

@@ -527,12 +527,12 @@ the FreeImage library.
 Requires: %{name} >= %{version}-%{release}
 %endif
 
-%package client
-Summary: Wolframe client and command line tool
+%package libclient
+Summary: Wolframe C++ client library
 Group: Application/Business
 
-%description client
-Wolframe command line tool and client library.
+%description libclient
+Wolframe client library for C++ (implemented using boost libraries).
 
 %if !%{build_boost}
 BuildRequires: boost-devel
@@ -557,9 +557,25 @@ Requires: libboost-system1_48_0 >= 1.48.0
 Requires: openssl >= 0.9.7
 %endif
 
+%package libclient-devel
+Summary: Developement header files and libraries for the Wolframe C++ client library
+Group: Application/Business
+Requires: %{name}-libclient >= %{version}-%{release}
+
+%description libclient-devel
+Development files for the Wolframe client library for C++ (implemented using boost libraries).
+
+%package client
+Summary: Wolframe client command line tool
+Group: Application/Business
+Requires: %{name}-libclient >= %{version}-%{release}
+
+%description client
+Command line client to access the Wolframe server.
+
 %if %{with_qt}
 %package qtclient
-Summary: Wolframe client
+Summary: Wolframe Qt frontend
 Group: Application/Business
 
 %if %{rhel} || %{centos} || %{fedora}
@@ -611,7 +627,7 @@ make install
 %endif
 
 cd %{_builddir}/%{name}-%{version}
-LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make help \
 	RELEASE=1 \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -639,7 +655,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make help \
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
-LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make config \
 	RELEASE=1 \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
@@ -667,7 +683,7 @@ LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make config \
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
-LDFLAGS=-Wl,-rpath=%{_libdir}/wolframe make all \
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make all \
 	%{?_smp_mflags} \
 	RELEASE=1 \
 %if %{build_boost}
@@ -798,6 +814,14 @@ fi
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
+%if !%{sles}
+%dir %attr(0755, root, root) %{_mandir}/man5
+%endif
+%{_mandir}/man5/wolframe.conf.5.gz
+%if !%{sles}
+%dir %attr(0755, root, root) %{_mandir}/man8
+%endif
+%{_mandir}/man8/wolframed.8.gz
 
 %if %{build_boost}
 %{_libdir}/wolframe/libboost_program_options.so.%{boost_version}
@@ -881,8 +905,6 @@ fi
 %{_libdir}/wolframe/libwolframe_langbind.a
 %{_libdir}/wolframe/libwolframe_prnt.so
 %{_libdir}/wolframe/libwolframe_prnt.a
-%{_libdir}/wolframe/libwolframe_client.so
-%{_libdir}/wolframe/libwolframe_client.a
 %if %{with_lua}
 %{_libdir}/wolframe/liblua.so
 %{_libdir}/wolframe/liblua.a
@@ -1022,7 +1044,7 @@ fi
 
 %endif
 
-%files client
+%files libclient
 %defattr( -, root, root )
 # funny, why?!
 %if !%{sles}
@@ -1033,6 +1055,21 @@ fi
 %endif
 %{_libdir}/wolframe/libwolframe_client.so.0.0.0
 %{_libdir}/wolframe/libwolframe_client.so.0
+
+%files libclient-devel
+%defattr( -, root, root )
+%dir %{_libdir}/wolframe
+%{_libdir}/wolframe/libwolframe_client.so
+%{_libdir}/wolframe/libwolframe_client.a
+%dir %{_includedir}/wolframe/libclient
+%{_includedir}/wolframe/libclient/*.hpp
+
+%files client
+%defattr( -, root, root )
+# funny, why?!
+%if !%{sles}
+%dir %{_bindir}
+%endif
 %{_bindir}/wolframec
 
 %if %{with_qt}
@@ -1043,10 +1080,8 @@ fi
 %dir %{_bindir}
 %endif
 %{_bindir}/qtclient
-%if !%{sles}
-%dir %{_libdir}/wolframe/
-%endif
-%{_libdir}/wolframe/libwolframewidgets.so
+%dir %{_libdir}/wolframe/plugins/
+%{_libdir}/wolframe/plugins/libwolframewidgets.so
 %endif
 
 %changelog
