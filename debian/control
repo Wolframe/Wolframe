@@ -17,6 +17,12 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Wolframe Daemon
  The Wolframe server and server utilities.
 
+Package: wolframe-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Wolframe Development
+ The Wolframe server SDK development files and static libraries.
+
 Package: wolframe-sqlite3
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}

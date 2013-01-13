@@ -22,7 +22,11 @@ daemon code:
     case for older Debian/Ubuntu systems (needs a split in OSC dsc
     files)
   - local deployed boost libaries (1.48) for Debian and old Ubuntu have
-    to be bundled with wolframe-libclient too.
+    to be bundled with wolframe-libclient too. They must be in a common
+    dependency like 'wolframe-boost-rt'
+  - /usr/lib/x86_64-linux-gnu is a possible module loading place
+  - apache-like LoadModules, support for 'wolframe.d/libxml2.conf'
+    and 'include wolframe.d/*.conf'
   - Debian: add -dev packages, but how to do this nicely having just
     one rule file and one 'make install'?
     

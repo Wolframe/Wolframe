@@ -84,7 +84,7 @@ install: build
 		cd ../../../..
 
 	# remove documentation in main package
-	cd doc; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+	cd docs; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
 
