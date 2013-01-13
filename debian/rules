@@ -27,7 +27,7 @@ DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
-	WOLFRAME_PARAMS += -j$(NUMJOBS)
+	PARALLEL_BUILD = -j$(NUMJOBS)
 endif
 
 build: build-stamp
@@ -38,7 +38,9 @@ build-stamp:
 	$(MAKE) help
 	$(MAKE) $(WOLFRAME_PARAMS) config
 	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
-		$(WOLFRAME_PARAMS) all
+		$(WOLFRAME_PARAMS) depend
+	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
+		$(WOLFRAME_PARAMS) $(PARALLEL_BUILD) all
 	cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc-doxygen; cd ..
 
 	# --- end custom part for compiling

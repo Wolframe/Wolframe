@@ -683,6 +683,34 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 %endif
 	sysconfdir=/etc libdir=%{_libdir}
 
+LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make depend \
+	RELEASE=1 \
+%if %{build_boost}
+	BOOST_DIR=/tmp/boost-%{boost_version} \
+	%{boost_library_tag} \
+%endif
+%if %{build_libxml2}
+	LIBXML2_DIR=/tmp/libxml2-%{libxml2_version} \
+%endif
+%if %{build_sqlite}
+	WITH_LOCAL_SQLITE3=%{build_sqlite} \
+%else
+	WITH_SYSTEM_SQLITE3=1 \
+%endif
+	WITH_SSL=%{with_ssl} \
+	WITH_LUA=%{with_lua} WITH_PAM=%{with_pam} \
+	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
+	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
+	WITH_LIBXSLT=%{with_libxslt} \
+	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
+%if %{with_local_freeimage}
+	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%else
+	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
+%endif
+	sysconfdir=/etc libdir=%{_libdir}
+
 LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make all \
 	%{?_smp_mflags} \
 	RELEASE=1 \

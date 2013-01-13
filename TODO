@@ -17,19 +17,22 @@ daemon code:
 
 - polish deployment
   - template configuration wolframed.conf
-  - generate and install manpages, finish text
   - debian builds always against 1.48 boost, this should only be the
     case for older Debian/Ubuntu systems (needs a split in OSC dsc
     files)
   - local deployed boost libaries (1.48) for Debian and old Ubuntu have
     to be bundled with wolframe-libclient too. They must be in a common
     dependency like 'wolframe-boost-rt'
-  - /usr/lib/x86_64-linux-gnu is a possible module loading place
+  - /usr/lib/x86_64-linux-gnu is a possible module loading place,
+    so is /usr/lib32, /usr/lib64, etc. inject as MODULEPATH to build
+    process and to module loading code 
   - apache-like LoadModules, support for 'wolframe.d/libxml2.conf'
     and 'include wolframe.d/*.conf'
-  - Debian: add -dev packages, but how to do this nicely having just
-    one rule file and one 'make install'?
-    
+  - systemd instead of init scripts for Fedora and Archlinux
+
+- documentation
+  - man pages
+
 PF:
 - high prio
   - UIForm loader in client and server
