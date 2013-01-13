@@ -83,7 +83,13 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
 
-	# Qt client depends on X11/Qt, so it deserves it's own package
+	# remove documentation in main package
+	cd doc; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ..
+
+	# the client libraries, the cli deserve their own package,
+	# the Qt client depends on X11/Qt, so it deserves it's own package
 	cd clients; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
@@ -156,7 +162,6 @@ install: build
 
 	# copy local versions of shared libraries of boost for platforms missing a decent
 	# version of boost
-	# TODO: lib, lib64, lib32
 	mkdir -p /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
 	for i in \
 		libboost_program_options.so.$(BOOST_VERSION) \
@@ -189,6 +194,20 @@ install: build
 	cd docs; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-doc; \
 		cd ..
+	# man pages belong to the main package, lib is a bug in Makefile, but
+	# no easy solvable!
+	rm -rf /usr/src/packages/BUILD/debian/wolframe-doc/usr/share/man
+	rm -rf /usr/src/packages/BUILD/debian/wolframe-doc/usr/lib
+	
+	# move things in the main package to a development package
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-dev/usr
+	mv -f /usr/src/packages/BUILD/debian/wolframe/usr/include \
+		/usr/src/packages/BUILD/debian/wolframe-dev/usr/.
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-dev/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
+	mv -f /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/*.so \
+		/usr/src/packages/BUILD/debian/wolframe-dev/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
+	mv -f /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/*.a \
+		/usr/src/packages/BUILD/debian/wolframe-dev/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
 	
 	# --- end custom part for installing
 
