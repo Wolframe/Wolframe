@@ -125,7 +125,6 @@ public:
 	{
 		NetworkOperation netOp = m_connHandler->nextOperation();
 		switch ( netOp.operation() )	{
-
 			case NetworkOperation::READ:	{
 				LOG_TRACE << "Next operation: READ " << netOp.size() << " bytes from " << identifier();
 				if ( netOp.buffer() == NULL )	{
