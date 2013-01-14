@@ -122,7 +122,7 @@ bool _Wolframe::module::LoadModules( ModulesDirectory& modDir, const std::list< 
 		LOG_TRACE << "Loading module '" << *it << "'";
 #if !defined(_WIN32)	// POSIX module loader
 		void* hndl;
-		if (utils::getFileExtension( *it).empty())	{
+		if ( utils::getFileExtension( *it).empty() )	{
 			std::string path = *it + ".so";
 			hndl = dlopen( path.c_str(), RTLD_LAZY );
 		}
