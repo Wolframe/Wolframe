@@ -100,7 +100,7 @@ OBJS = \
 CPP_BINS = \
 	qtclient.exe
 
-all: $(OBJS) $(CPP_BINS)
+all: MainWindowUi.hpp $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -230,7 +230,7 @@ moc_FormChooseDialog.cpp: FormChooseDialog.hpp
 moc_DefaultMainWindow.cpp: DefaultMainWindow.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. DefaultMainWindow.hpp -o moc_DefaultMainWindow.cpp
 
-MainWindowUi.hpp: themes/windows/MainWindow.ui
+MainWindowUi.hpp: themes\windows\MainWindow.ui
 	$(QT_DIR)\bin\uic -o MainWindowUi.hpp themes\windows\MainWindow.ui
 
 DefaultMainWindow.hpp: MainWindowUi.hpp
@@ -245,7 +245,7 @@ qtclient.exe: qtclient.res
 local_clean:
 	@-erase moc_*.cpp 2>NUL
 	@-erase $(I18NS) 2>NUL
-	@-erase MainWindowUi.cpp 2>NUL
+	@-erase MainWindowUi.hpp 2>NUL
 
 local_distclean:
 
