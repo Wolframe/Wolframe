@@ -1,4 +1,4 @@
-//
+	//
 // MainWindow.cpp
 //
 
@@ -14,6 +14,7 @@
 #include "ManageStorageDialog.hpp"
 #include "global.hpp"
 #include "DefaultMainWindow.hpp"
+#include "FormChooseDialog.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -41,7 +42,8 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
 	m_uiFormResourcesDir( DEFAULT_UI_FORM_RESOURCES_DIR ),
 	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR ),
-	m_languages( ), m_language( ), m_defaultMainWindow( false )
+	m_languages( ), m_language( ), m_defaultMainWindow( false ),
+	m_loadThemes( false )
 {
 // read arguments for the '-s <setting file>' parameter
 #ifndef Q_OS_ANDROID
@@ -182,6 +184,7 @@ void MainWindow::parseArgs( )
 		{ QCommandLine::Option, 'k', "client-key-file", "client key file (default: ./private/client.key)", QCommandLine::Optional },
 		{ QCommandLine::Option, 'C', "CA-cert-file", "certificate file containing the CA (default: ./certs/CAclient.cert.pem)", QCommandLine::Optional },
 		{ QCommandLine::Option, 'D', "db-file", "Sqlite3 file for local storage", QCommandLine::Optional },
+		{ QCommandLine::Switch, 't', "no-loadable-themes", "don't use loadable themes", QCommandLine::Optional },
 		QCOMMANDLINE_CONFIG_ENTRY_END
 	};
 
@@ -227,6 +230,8 @@ void MainWindow::switchFound( const QString &name )
 	} else if( name == "debug" ) {
 		m_debug = true;
 		_debug = true;
+	} else if( name == "no-loadable-themes" ) {
+		m_loadThemes = false;
 	}
 }
 
@@ -535,36 +540,44 @@ void MainWindow::loadTheme( QString theme )
 // remember current user interface
 	QWidget *oldUi = m_ui;
 
+	if( m_loadThemes ) {
 // load the main window (which is empty) and provides basic functions like
 // theme switching, login, exit, about, etc. (to start unauthenticated)
-	QFile file( themesFolder + QLatin1String( "MainWindow.ui" ) );
-	if( !file.exists( ) ) {
+		QFile file( themesFolder + QLatin1String( "MainWindow.ui" ) );
+		if( !file.exists( ) ) {
 // no file exists, so lets use the internal uic version of the windows theme
+			m_ui = new DefaultMainWindow( this );
+			m_defaultMainWindow = true;
+		} else {
+			file.open( QFile::ReadOnly );
+			m_ui = m_uiLoader->load( &file, this );
+			file.close( );
+			if( !m_ui ) {
+				return;
+			}
+			m_defaultMainWindow = false;
+		}
+	} else {
+// forced ignoring of theme loading
 		m_ui = new DefaultMainWindow( this );
 		m_defaultMainWindow = true;
-	} else {
-		file.open( QFile::ReadOnly );
-		m_ui = m_uiLoader->load( &file, this );
-		file.close( );
-		if( !m_ui ) {
-			return;
-		}
-		m_defaultMainWindow = false;
 	}
 
 // set stylesheet of the application (has impact on the whole application)
-	QFile baseQss( themesFolder + QLatin1String( "MainWindow.qss" ) );
+	if( m_loadThemes ) {
+		QFile baseQss( themesFolder + QLatin1String( "MainWindow.qss" ) );
 #ifdef Q_OS_ANDROID
-	QString qssFile = QFileInfo( baseQss ).filePath( );
+		QString qssFile = QFileInfo( baseQss ).filePath( );
 #else
-	QString qssFilePath = QLatin1String( "file:///" ) + QFileInfo( baseQss ).absoluteFilePath( );
+		QString qssFilePath = QLatin1String( "file:///" ) + QFileInfo( baseQss ).absoluteFilePath( );
 #endif
-	QFile qss( qssFilePath );
-	if( qss.exists( ) ) {
-		qApp->setStyleSheet( qssFilePath );
-		qDebug( ) << "Setting stylesheet to" << qssFilePath;
-	} else {
-		qDebug( ) << "No stylesheet file found at " << qssFilePath;
+		QFile qss( qssFilePath );
+		if( qss.exists( ) ) {
+			qApp->setStyleSheet( qssFilePath );
+			qDebug( ) << "Setting stylesheet to" << qssFilePath;
+		} else {
+			qDebug( ) << "No stylesheet file found at " << qssFilePath;
+		}
 	}
 	
 // copy over the location of the old window to the new one
@@ -585,7 +598,20 @@ void MainWindow::loadTheme( QString theme )
 	if( m_ui && m_formWidget ) {
 		QMainWindow *mainWindow = qobject_cast<QMainWindow *>( m_ui );
 		if( mainWindow ) {
-			mainWindow->setCentralWidget( m_formWidget );
+			m_mdiArea = m_ui->findChild<QMdiArea *>( "centralWidget" );
+			if( m_mdiArea ) {
+				m_mdiArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+				m_mdiArea->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+				QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( m_formWidget, Qt::FramelessWindowHint );
+				mdiSubWindow->setWindowState( Qt::WindowMaximized );
+				mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
+				mdiSubWindow->setWindowTitle( "[init]" );
+				m_mdiArea->tileSubWindows( );
+				mdiSubWindow->showMaximized( );
+			} else {
+				// missing a MDI aera, so add just one form widget as main entry widget
+				mainWindow->setCentralWidget( m_formWidget );
+			}
 		}
 	}
 
@@ -596,6 +622,7 @@ void MainWindow::loadTheme( QString theme )
 			action->setEnabled( false );
 		}
 	}
+	
 // show the new gui
 	m_ui->raise( );
 	m_ui->activateWindow( );
@@ -613,7 +640,9 @@ void MainWindow::loadTheme( QString theme )
 	m_currentTheme = theme;
 
 // load all themes possible to pick and mark the current one
-	populateThemesMenu( );
+	if( m_loadThemes ) {
+		populateThemesMenu( );
+	}
 
 // now that we have a menu where we can add things, we start the form list loading
 	m_formLoader->initiateListLoad( );
@@ -658,19 +687,23 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 
 void MainWindow::formListLoaded( QStringList forms )
 {
+	m_forms = forms;
+	
 // contruct a menu which shows and wires them in the menu
 	QMenu *formsMenu = qFindChild<QMenu *>( m_ui, "menuForms" );
-	formsMenu->clear( );
-	QActionGroup *formGroup = new QActionGroup( formsMenu );
-	formGroup->setExclusive( true );
-	foreach( QString form, forms ) {
-		QAction *action = new QAction( form, formGroup );
-		action->setCheckable( true );
-		formGroup->addAction( action );
-		if( form == m_currentForm ) action->setChecked( true );
+	if( formsMenu ) {
+		formsMenu->clear( );
+		QActionGroup *formGroup = new QActionGroup( formsMenu );
+		formGroup->setExclusive( true );
+		foreach( QString form, forms ) {
+			QAction *action = new QAction( form, formGroup );
+			action->setCheckable( true );
+			formGroup->addAction( action );
+			if( form == m_currentForm ) action->setChecked( true );
+		}
+		formsMenu->addActions( formGroup->actions( ) );
+		connect( formGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( formSelected( QAction * ) ) );
 	}
-	formsMenu->addActions( formGroup->actions( ) );
-	connect( formGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( formSelected( QAction * ) ) );
 	
 // not busy anymore
 	qApp->restoreOverrideCursor();
@@ -756,9 +789,11 @@ void MainWindow::formLoaded( QString name )
 
 // make sure the correct action is checked in the menu of forms
 	QMenu *formsMenu = qFindChild<QMenu *>( m_ui, "menuForms" );
-	QList<QAction *> _actions = formsMenu->findChildren<QAction *>( );
-	foreach( QAction *action, _actions ) {
-		if( action->text( ) == name ) action->setChecked( true );
+	if( formsMenu ) {
+		QList<QAction *> _actions = formsMenu->findChildren<QAction *>( );
+		foreach( QAction *action, _actions ) {
+			if( action->text( ) == name ) action->setChecked( true );
+		}
 	}
 }
 
@@ -830,6 +865,35 @@ void MainWindow::on_actionDebugTerminal_triggered( bool checked )
 		} else {
 			m_debugTerminal->hide( );
 		}
+	}
+}
+
+void MainWindow::on_actionOpenForm_triggered( )
+{
+	FormChooseDialog d( m_forms, m_ui );
+	if( d.exec( ) == QDialog::Accepted ) {
+		QString form = d.form( );
+		loadForm( form );
+	}
+}
+
+void MainWindow::on_actionOpenFormNewWindow_triggered( )
+{
+	FormChooseDialog d( m_forms, m_ui );
+	if( d.exec( ) == QDialog::Accepted ) {
+		FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
+		connect( formWidget, SIGNAL( formLoaded( QString ) ),
+			this, SLOT( formLoaded( QString ) ) );
+		connect( formWidget, SIGNAL( error( QString ) ),
+			this, SLOT( formError( QString ) ) );
+			
+		QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( formWidget );
+		mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
+
+		QString form = d.form( );
+		mdiSubWindow->setWindowTitle( form );
+		formWidget->show( );
+		formWidget->loadForm( form );
 	}
 }
 

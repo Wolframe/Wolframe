@@ -93,6 +93,8 @@ OBJS = \
 	moc_StorageWidget.obj \
 	ManageStorageDialog.obj \
 	moc_ManageStorageDialog.obj \
+	FormChooseDialog.obj \
+	moc_FormChooseDialog.obj \
 	moc_DefaultMainWindow.obj	
 
 CPP_BINS = \
@@ -222,6 +224,9 @@ moc_StorageWidget.cpp: StorageWidget.hpp
 moc_ManageStorageDialog.cpp: ManageStorageDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. ManageStorageDialog.hpp -o moc_ManageStorageDialog.cpp
 
+moc_FormChooseDialog.cpp: FormChooseDialog.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
+	
 moc_DefaultMainWindow.cpp: DefaultMainWindow.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. DefaultMainWindow.hpp -o moc_DefaultMainWindow.cpp
 
@@ -289,8 +294,7 @@ buildi18n:
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form4.ui -ts apps\test\i18n\form4.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form4.ui -ts apps\test\i18n\form4.ro_RO.ts
 
-#	del /s /q C:\qtclient
-
+# TODO: should go to Wix deployment and UI loading mechanism (for apps dir)
 zip:
 	-del qtclient.zip
 	-del /s /q C:\qtclient\*

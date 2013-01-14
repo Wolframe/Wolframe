@@ -9,6 +9,7 @@
 #include <QtUiTools>
 #include <QCommandLine>	
 #include <QCloseEvent>
+#include <QMdiArea>
 
 #include "global.hpp"
 #include "FormLoader.hpp"
@@ -70,6 +71,9 @@
 		QStringList m_languages;	// available interface translations
 		QString m_language;		// the current language of the interface
 		bool m_defaultMainWindow;
+		bool m_loadThemes;
+		QMdiArea *m_mdiArea;		// pointer to MDI workspace in the main window
+		QStringList m_forms;		// list of available forms
 		
 	public slots:
 		void readSettings( );
@@ -114,7 +118,9 @@
 		void on_actionManageStorage_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
-		void on_actionDebugTerminal_triggered( bool checked );     
+		void on_actionDebugTerminal_triggered( bool checked );  
+		void on_actionOpenForm_triggered( );
+		void on_actionOpenFormNewWindow_triggered( );
 	
 // internal slots
 		void muiDestroyed( QObject *obj );

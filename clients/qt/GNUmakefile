@@ -80,6 +80,8 @@ CPP_OBJS = \
 	moc_StorageWidget.o \
 	ManageStorageDialog.o \
 	moc_ManageStorageDialog.o \
+	FormChooseDialog.o \
+	moc_FormChooseDialog.o \
 	moc_DefaultMainWindow.o
 
 CPP_BINS = \
@@ -136,6 +138,9 @@ moc_StorageWidget.cpp: StorageWidget.hpp
 
 moc_ManageStorageDialog.cpp: ManageStorageDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) ManageStorageDialog.hpp -o moc_ManageStorageDialog.cpp
+	
+moc_FormChooseDialog.cpp: FormChooseDialog.hpp
+	$(QT_MOC) $(MOC_FLAGS) FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
 
 moc_DefaultMainWindow.cpp: DefaultMainWindow.hpp
 	$(QT_MOC) $(MOC_FLAGS) DefaultMainWindow.hpp -o moc_DefaultMainWindow.cpp
