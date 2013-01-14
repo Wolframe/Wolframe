@@ -1,11 +1,12 @@
 Stress test of wolframed with cmdline client:
 
 1) Create test document collection:
+Create the requests directories (mkdir -p request/{insert,update,select,delete}) if necessary
 Run the script scripts/createRequests.pl (without arguments) to create the test documents in request/insert, request/update, request/select, request/delete
 
 2) Create test database:
 Example:
-	sqlite3 -init database/schema_sqlite.sql
+	sqlite3 -init database/schema_sqlite.sql database/stress.db
 
 3) Start server:
 Example:

@@ -1,17 +1,11 @@
 --
--- Generic tree implementation for SQL databases
--- (Modified Preorder Tree Traversal)
+-- PostgreSQL schema for stress tests
 --
--- Note: the parent restriction assumes that references accept NULL
--- Note: if DEFERRED does not work on UNIQUE constraints then the
---       UNIQUE constraint must be dropped
--- Joe Celko example from http://www.ibase.ru/devinfo/DBMSTrees/sqltrees.html
 
 CREATE TABLE Number (
- id SERIAL NOT NULL PRIMARY KEY,
- mul INTEGER,
- numbr INTEGER,
- dup INTEGER,
- trip INTEGER
+    id		SERIAL NOT NULL PRIMARY KEY,
+    mul		INTEGER,
+    numbr	INTEGER,
+    dup		INTEGER,
+    trip	INTEGER
 );
-
