@@ -247,5 +247,3 @@ void IOFilterCommandHandlerEscDLF::getDataLeft( const void*& begin, std::size_t&
 	begin = (const void*)(m_input.charptr() + pos);
 	nofBytes = m_input.pos() - pos;
 }
-
-
