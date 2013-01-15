@@ -711,5 +711,8 @@ http://msdn.microsoft.com/en-us/library/bb676070.aspx
 DESCRIPTION:
 Tlbexp Helper Functions (Unmanaged API Reference)
 
-
+URL:
+http://jumbloid.blogspot.ch/2009/12/making-net-dll-com-visible.html
+DESCRIPTION:
+Tutorial: making net dll com visible
 

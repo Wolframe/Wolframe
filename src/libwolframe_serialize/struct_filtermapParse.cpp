@@ -195,6 +195,7 @@ bool _Wolframe::serialize::parseObjectStruct( const StructDescriptionBase* descr
 			StructDescriptionBase::Map::const_iterator itr = descr->find( "");
 			if (itr == descr->end())
 			{
+				if (element.emptycontent()) return true;
 				throw SerializationErrorException( "structure instead of value expected or definition of untagged value in structure must be available", element.tostring(), StructParser::getElementPath( stk));
 			}
 			std::size_t idx = itr - descr->begin();

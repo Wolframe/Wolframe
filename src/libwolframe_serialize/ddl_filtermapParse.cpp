@@ -213,6 +213,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			ddl::StructType::Map::iterator itr = st.find( "");
 			if (itr == st.end())
 			{
+				if (element.emptycontent()) return true;
 				throw SerializationErrorException( "parsed untagged value, but no untagged value is defined for this structure", element.tostring(), getElementPath( stk));
 			}
 			std::size_t idx = itr - st.begin();
