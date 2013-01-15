@@ -49,7 +49,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 #ifndef Q_OS_ANDROID
 	parseArgs( );
 #endif
-	
+
 // settings override built-in defaults
 	if( !m_settings.isNull( ) ) {
 		Preferences::setFileName( m_settings );
@@ -61,7 +61,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	} else {
 		readSettings( );
 	}
-	
+
 // command line options override settings
 #ifndef Q_OS_ANDROID
 	parseArgs( );
@@ -115,7 +115,7 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 		case QtWarningMsg:
 			fprintf( stderr, "WARNING: %s\n", msg );
 			break;
-			
+
 		case QtCriticalMsg:
 			fprintf( stderr, "CRITICAL: %s\n", msg );
 			break;
@@ -123,7 +123,7 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 		case QtFatalMsg:
 			fprintf( stderr, "FATAL: %s\n", msg );
 			break;
-			
+
 		default:
 			break;
 	}
@@ -161,7 +161,7 @@ MainWindow::~MainWindow( )
 		db.rollback( );
 		db.close( );
 	}
-	QSqlDatabase::removeDatabase( SESSION_NAME ); 	
+	QSqlDatabase::removeDatabase( SESSION_NAME );
 }
 
 void MainWindow::parseArgs( )
@@ -206,7 +206,7 @@ void MainWindow::parseArgs( )
 		connect( m_cmdline, SIGNAL( parseError( const QString & ) ),
 			this, SLOT( parseError( const QString & ) ) );
 	}
-	
+
 	m_cmdline->parse( );
 }
 
@@ -302,7 +302,7 @@ void MainWindow::initialize( )
 			QMessageBox::warning( this, "qtclient", msg );
 			QCoreApplication::quit( );
 		}
-		
+
 		QSqlQuery q( "select 1 from sqlite_master", db );
 		if( !q.exec( ) ) {
 			QString msg = tr( "Unable to query the Sqlite database file '%1', most likely not a database." ).
@@ -320,11 +320,11 @@ void MainWindow::initialize( )
 			QCoreApplication::quit( );
 		}
 	}
-			
+
 // catch error of network protocol
 	connect( m_wolframeClient, SIGNAL( error( QString ) ),
 		this, SLOT( wolframeError( QString ) ) );
-		
+
 // a Qt UI loader for the main theme window and also used by all form widgets
 	m_uiLoader = new QUiLoader( );
 	m_uiLoader->setLanguageChangeEnabled( true );
@@ -332,33 +332,33 @@ void MainWindow::initialize( )
 	m_uiLoader->addPluginPath( "." );
 	QStringList paths = m_uiLoader->pluginPaths( );
 	qDebug( ) << "Will load custom widget plugins from" << paths;
-	
+
 // for testing, load lists of available forms from the files system or
 // a local sqlite database, pass the form loader to the FormWidget
 	switch( m_uiLoadMode ) {
 		case LocalFile:
 			m_formLoader = new FileFormLoader( m_uiFormsDir, m_uiFormTranslationsDir, m_uiFormResourcesDir );
 			break;
-		
+
 		case LocalDb:
 			m_formLoader = new SqliteFormLoader( SESSION_NAME );
 			break;
-			
+
 		case Network:
 			// skip, delay
 			break;
 	}
-			
+
 // ..same for the data loader
 	switch( m_dataLoadMode ) {
 		case LocalFile:
 			m_dataLoader = new FileDataLoader( m_dataLoaderDir );
 			break;
-		
+
 		case LocalDb:
 			m_dataLoader = new SqliteDataLoader( SESSION_NAME );
 			break;
-			
+
 		case Network:
 			// skip, delay
 			break;
@@ -374,7 +374,7 @@ void MainWindow::initialize( )
 		m_wolframeClient->connect( );
 		return;
 	}
-	
+
 	finishInitialize( );
 }
 
@@ -382,7 +382,7 @@ void MainWindow::finishInitialize( )
 {
 // create delegate widget for form handling (one for now), in theory may are possible
 	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
-	
+
 // link the form loader for form loader notifications needed by the main window
 // (list of forms for form menu, list of language for language picker)
 	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
@@ -396,7 +396,7 @@ void MainWindow::finishInitialize( )
 // errors in the form widget
 	connect( m_formWidget, SIGNAL( error( QString ) ),
 		this, SLOT( formError( QString ) ) );
-		
+
 // set default language to the system language
 	m_currentLanguage = m_language;
 
@@ -409,7 +409,7 @@ void MainWindow::finishInitialize( )
 
 // load language resources, repaints the whole interface if necessary
 	loadLanguage( m_currentLanguage );
-	
+
 // load initial form
 	loadForm( "init" );
 
@@ -425,15 +425,15 @@ void MainWindow::finishInitialize( )
 void MainWindow::connected( )
 {
 	m_loginDialog = new LoginDialog( m_wolframeClient, this );
-	
+
 	connect( m_loginDialog, SIGNAL( authenticationOk( ) ),
 		this, SLOT( authenticationOk( ) ) );
-		
+
 	connect( m_loginDialog, SIGNAL( authenticationFailed( ) ),
 		this, SLOT( authenticationFailed( ) ) );
-		
+
 	m_loginDialog->show( );
-}	
+}
 
 void MainWindow::disconnected( )
 {
@@ -443,7 +443,7 @@ void MainWindow::disconnected( )
 	}
 	m_debugTerminal = 0;
 	debugTerminal = 0;
-		
+
 	close( );
 }
 
@@ -476,14 +476,14 @@ void MainWindow::authenticationOk( )
 {
 	m_loginDialog->close( );
 	m_loginDialog->deleteLater( );
-	
+
 	qDebug( ) << "authentication succeeded";
 
 // create network based form ...
 	if( m_uiLoadMode == Network ) {
 		m_formLoader = new NetworkFormLoader( m_wolframeClient );
 	}
-	
+
 // ...and data loaders
 	if( m_dataLoadMode == Network ) {
 		m_dataLoader = new NetworkDataLoader( m_wolframeClient, m_debug );
@@ -498,7 +498,7 @@ void MainWindow::authenticationFailed( )
 	m_loginDialog->deleteLater( );
 
 	qDebug( ) << "authentication failed";
-	
+
 	QApplication::instance( )->exit( RESTART_CODE );
 }
 
@@ -579,10 +579,10 @@ void MainWindow::loadTheme( QString theme )
 			qDebug( ) << "No stylesheet file found at " << qssFilePath;
 		}
 	}
-	
+
 // copy over the location of the old window to the new one
 // also copy over the current form, don't destroy the old ui,
-// events could be outstanding (deleteLater marks the widget 
+// events could be outstanding (deleteLater marks the widget
 // for deletion, will be deleted when returning into the event
 // loop), also set a new empty parent for the old theme, otherwise
 // autowiring rewires the first widget it finds (which can be
@@ -622,12 +622,12 @@ void MainWindow::loadTheme( QString theme )
 			action->setEnabled( false );
 		}
 	}
-	
+
 // show the new gui
 	m_ui->raise( );
 	m_ui->activateWindow( );
 	m_ui->show( );
-	 	
+
 // wire standard actions in the menu by name (on_<object>_<signal>)
 	QMetaObject::connectSlotsByName( this );
 
@@ -635,7 +635,7 @@ void MainWindow::loadTheme( QString theme )
 	connect( m_ui, SIGNAL( destroyed( QObject * ) ),
 		this, SLOT( muiDestroyed( QObject * ) ) );
 	m_ui->setAttribute( Qt::WA_DeleteOnClose, true );
-	
+
 // remember current theme
 	m_currentTheme = theme;
 
@@ -649,7 +649,7 @@ void MainWindow::loadTheme( QString theme )
 
 // load language codes for language picker
 	loadLanguages( );
-	
+
 // not busy anymore
 	qApp->restoreOverrideCursor( );
 
@@ -667,7 +667,7 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 {
 // remember languages for preferences dialog
 	m_languages = languages;
-	
+
 // construct a menu showing all languages
 	QMenu *languageMenu = qFindChild<QMenu *>( m_ui, "menuLanguages" );
 	languageMenu->clear( );
@@ -679,7 +679,7 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 		action->setCheckable( true );
 		action->setData( QVariant( language ) );
 		languageGroup->addAction( action );
-		if( language == m_currentLanguage ) action->setChecked( true );		
+		if( language == m_currentLanguage ) action->setChecked( true );
 	}
 	languageMenu->addActions( languageGroup->actions( ) );
 	connect( languageGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( languageSelected( QAction * ) ) );
@@ -688,7 +688,7 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 void MainWindow::formListLoaded( QStringList forms )
 {
 	m_forms = forms;
-	
+
 // contruct a menu which shows and wires them in the menu
 	QMenu *formsMenu = qFindChild<QMenu *>( m_ui, "menuForms" );
 	if( formsMenu ) {
@@ -704,7 +704,7 @@ void MainWindow::formListLoaded( QStringList forms )
 		formsMenu->addActions( formGroup->actions( ) );
 		connect( formGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( formSelected( QAction * ) ) );
 	}
-	
+
 // not busy anymore
 	qApp->restoreOverrideCursor();
 }
@@ -717,7 +717,7 @@ void MainWindow::languageSelected( QAction *action )
 }
 
 void MainWindow::loadLanguage( QString language )
-{		
+{
 	qDebug( ) << "Switching interface language to " << language;
 
 // get list of all translators currently floating around and delete them
@@ -750,10 +750,10 @@ void MainWindow::loadLanguage( QString language )
 		}
 		QCoreApplication::instance( )->installTranslator( translator );
 	}
-	
+
 // also set language of the form widget
 	m_formWidget->loadLanguage( language );
-	
+
 	m_currentLanguage = language;
 }
 
@@ -765,7 +765,7 @@ void MainWindow::themeSelected( QAction *action )
 }
 
 void MainWindow::formSelected( QAction *action )
-{		
+{
 	QString form = action->text( );
 	qDebug( ) << "Form " << form << " selected (current form:" << m_currentForm << ")";
 	if( form != m_currentForm )
@@ -775,14 +775,14 @@ void MainWindow::formSelected( QAction *action )
 void MainWindow::loadForm( QString name )
 {
 // delegate form loading to form widget
-	m_formWidget->loadForm( name );	
+	m_formWidget->loadForm( name );
 }
 
 void MainWindow::formLoaded( QString name )
 {
 // remember the name of the current form
 	m_currentForm = name;
-	
+
 // also set language of the form widget,
 // but wait till the form got loaded, otherwise we get races!
 	m_formWidget->loadLanguage( m_currentLanguage );
@@ -800,7 +800,7 @@ void MainWindow::formLoaded( QString name )
 void MainWindow::formError( QString error )
 {
 	qDebug( ) << "Form error: " << error;
- 	
+
 // not busy anymore
 	qApp->restoreOverrideCursor();
 
@@ -814,15 +814,15 @@ void MainWindow::on_actionRestart_triggered( )
 }
 
 void MainWindow::on_actionExit_triggered( )
-{	
+{
 	if( m_uiLoadMode == Network || m_dataLoadMode == Network ) {
 		m_wolframeClient->disconnect( );
 	} else {
-// terminate brutally in local mode	
+// terminate brutally in local mode
 		disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
 		m_debugTerminal = 0;
 		debugTerminal = 0;
-		
+
 		close( );
 	}
 }
@@ -845,7 +845,7 @@ void MainWindow::on_actionManageStorage_triggered( )
 void MainWindow::on_actionAbout_triggered( )
 {
 	QString info = QString(
-		tr( "Wolframe Qt client\n\nVersion %1\n(c) 2012 Wolframe Group\n\nBuild: %2 %3" )
+		tr( "Wolframe Qt client\n\nVersion %1\n(c) 2012, 2013 Wolframe Group\n\nBuild: %2 %3" )
 			.arg( WOLFRAME_VERSION )
 			.arg( __DATE__ )
 			.arg( __TIME__ ) );
@@ -886,7 +886,7 @@ void MainWindow::on_actionOpenFormNewWindow_triggered( )
 			this, SLOT( formLoaded( QString ) ) );
 		connect( formWidget, SIGNAL( error( QString ) ),
 			this, SLOT( formError( QString ) ) );
-			
+
 		QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( formWidget );
 		mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
 
@@ -919,7 +919,7 @@ void MainWindow::setOrientation( ScreenOrientation orientation )
 		case ScreenOrientationLockPortrait:
 			attribute = Qt::WA_LockPortraitOrientation;
 			break;
-			
+
 		case ScreenOrientationLockLandscape:
 			attribute = Qt::WA_LockLandscapeOrientation;
 			break;
@@ -930,7 +930,7 @@ void MainWindow::setOrientation( ScreenOrientation orientation )
 			break;
 #endif // QT_VERSION < 0x040702
 	}
-	
+
 	setAttribute( attribute, true );
 }
 

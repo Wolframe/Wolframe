@@ -183,6 +183,8 @@ clients/qt/FileDataLoader.cpp
 clients/qt/FileDataLoader.hpp
 clients/qt/FileFormLoader.cpp
 clients/qt/FileFormLoader.hpp
+clients/qt/FormChooseDialog.cpp
+clients/qt/FormChooseDialog.hpp
 clients/qt/FormLoader.cpp
 clients/qt/FormLoader.hpp
 clients/qt/FormWidget.cpp
