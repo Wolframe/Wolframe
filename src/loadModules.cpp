@@ -113,7 +113,8 @@ private:
 static LocalGarbageCollector	handleList;
 
 
-bool _Wolframe::module::LoadModules( ModulesDirectory& modDir, const std::list< std::string >& modFiles )
+bool _Wolframe::module::LoadModules( ModulesDirectory& modDir,
+				     const std::list< std::string >& modFiles, const std::string & /*modFolder*/ )
 {
 	bool retVal = true;
 

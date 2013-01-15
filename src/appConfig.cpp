@@ -245,6 +245,11 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 								m_modFiles.push_back( modFile );
 						}
 					}
+					else if ( boost::algorithm::iequals( L2it->first, "directory" ))	{
+						bool isDefined = ( ! m_modFolder.empty());
+						if ( ! config::Parser::getValue( MODULE_SECTION_MSG, *L2it, m_modFolder, &isDefined ))
+							retVal = false;
+					}
 					else	{
 						LOG_WARNING << MODULE_SECTION_MSG << " unknown configuration option: '"
 							    << L2it->first << "'";
@@ -355,6 +360,7 @@ void ApplicationConfiguration::print( std::ostream& os ) const
 #endif
 	// modules
 	if ( ! m_modFiles.empty() )	{
+		os << "Default module directory: " << (m_modFolder.empty() ? "(none)" : m_modFolder) << std::endl;
 		os << "Module files to load:" << std::endl;
 		for ( std::list< std::string >::const_iterator it = m_modFiles.begin();
 								it != m_modFiles.end(); it++ )
