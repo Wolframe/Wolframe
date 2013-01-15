@@ -30,8 +30,10 @@ install_recursive:
 
 install: install_recursive local_install install_po
 	@test -d "$(DESTDIR)$(libdir)/$(PACKAGE_NAME)" || mkdir -p "$(DESTDIR)$(libdir)/$(PACKAGE_NAME)"
+	@test -z "$(STATIC_LIB)" || echo "$(INSTALL) -m 644 $(STATIC_LIB) $(DESTDIR)$(libdir)/$(PACKAGE_NAME)/"
 	@test -z "$(STATIC_LIB)" || ( \
 		$(INSTALL) -m 644 $(STATIC_LIB) $(DESTDIR)$(libdir)/$(PACKAGE_NAME)/$(STATIC_LIB) )
+	@test -z "$(DYNAMIC_LIB)" || echo "$(INSTALL) -m 755 $(DYNAMIC_LIB) $(DESTDIR)$(libdir)/$(PACKAGE_NAME)/"
 	@test -z "$(DYNAMIC_LIB)" || ( \
 		$(INSTALL) -m 755 $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) \
 			$(DESTDIR)$(libdir)/$(PACKAGE_NAME)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) )
@@ -51,6 +53,7 @@ uninstall_recursive:
 	  (set -e; $(MAKE) -C $$d uninstall || exit 1); done)
 
 uninstall: uninstall_recursive local_uninstall uninstall_po
+	@test -z "$(DYNAMIC_LIB)" || echo "rm $(DESTDIR)$(libdir)/$(PACKAGE_NAME)/$(DYNAMIC_LIB)*"
 	@test -z "$(DYNAMIC_LIB)" || ( \
 		test ! -f "$(DESTDIR)$(libdir)/$(PACKAGE_NAME)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)" || \
 			rm "$(DESTDIR)$(libdir)/$(PACKAGE_NAME)/$(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH)" )
@@ -60,5 +63,6 @@ uninstall: uninstall_recursive local_uninstall uninstall_po
 	@test -z "$(DYNAMIC_LIB)" || ( \
 		test ! -h "$(DESTDIR)$(libdir)/$(PACKAGE_NAME)/$(DYNAMIC_LIB)" || \
 			rm "$(DESTDIR)$(libdir)/$(PACKAGE_NAME)/$(DYNAMIC_LIB)" )
+	@test -z "$(STATIC_LIB)" || echo "rm $(DESTDIR)$(libdir)/$(PACKAGE_NAME)/$(STATIC_LIB)"
 	@test -z "$(STATIC_LIB)" || ( \
 		test ! -f "$(DESTDIR)$(libdir)/$(PACKAGE_NAME)/$(STATIC_LIB)" || rm "$(DESTDIR)$(libdir)/$(PACKAGE_NAME)/$(STATIC_LIB)" )

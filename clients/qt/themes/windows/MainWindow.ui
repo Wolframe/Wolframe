@@ -13,13 +13,29 @@
   <property name="windowTitle">
    <string>Wolframe Qt Client</string>
   </property>
+  <property name="documentMode">
+   <bool>true</bool>
+  </property>
   <property name="themeAuthor" stdset="0">
    <string>Andreas Baumann</string>
   </property>
   <property name="themeBaseStyle" stdset="0">
    <string>plastique</string>
   </property>
-  <widget class="QWidget" name="formWidget"/>
+  <widget class="QMdiArea" name="centralWidget">
+   <property name="viewMode">
+    <enum>QMdiArea::TabbedView</enum>
+   </property>
+   <property name="documentMode">
+    <bool>true</bool>
+   </property>
+   <property name="tabsClosable">
+    <bool>true</bool>
+   </property>
+   <property name="tabsMovable">
+    <bool>true</bool>
+   </property>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -33,6 +49,8 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionOpenFormNewWindow"/>
+    <addaction name="actionOpenForm"/>
     <addaction name="separator"/>
     <addaction name="actionManageStorage"/>
     <addaction name="separator"/>
@@ -40,11 +58,6 @@
     <addaction name="separator"/>
     <addaction name="actionRestart"/>
     <addaction name="actionExit"/>
-   </widget>
-   <widget class="QMenu" name="menuForms">
-    <property name="title">
-     <string>F&amp;orms</string>
-    </property>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -56,19 +69,12 @@
     <addaction name="separator"/>
     <addaction name="actionDebugTerminal"/>
    </widget>
-   <widget class="QMenu" name="menuThemes">
-    <property name="title">
-     <string>Th&amp;emes</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuLanguages">
     <property name="title">
      <string>&amp;Language</string>
     </property>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuForms"/>
-   <addaction name="menuThemes"/>
    <addaction name="menuLanguages"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -135,6 +141,16 @@
   <action name="actionRestart">
    <property name="text">
     <string>&amp;Restart</string>
+   </property>
+  </action>
+  <action name="actionOpenForm">
+   <property name="text">
+    <string>&amp;Open form..</string>
+   </property>
+  </action>
+  <action name="actionOpenFormNewWindow">
+   <property name="text">
+    <string>Open form in &amp;new window..</string>
    </property>
   </action>
  </widget>

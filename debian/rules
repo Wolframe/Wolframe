@@ -27,7 +27,7 @@ DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
-	WOLFRAME_PARAMS += -j$(NUMJOBS)
+	PARALLEL_BUILD = -j$(NUMJOBS)
 endif
 
 build: build-stamp
@@ -37,8 +37,10 @@ build-stamp:
 	# Add here commands to compile the package.
 	$(MAKE) help
 	$(MAKE) $(WOLFRAME_PARAMS) config
-	$(MAKE) LDFLAGS=-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe \
-		$(WOLFRAME_PARAMS) all
+	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
+		$(WOLFRAME_PARAMS) depend
+	$(MAKE) LDFLAGS="-Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/plugins" \
+		$(WOLFRAME_PARAMS) $(PARALLEL_BUILD) all
 	cd docs; $(MAKE) $(WOLFRAME_PARAMS) doc-doxygen; cd ..
 
 	# --- end custom part for compiling
@@ -83,7 +85,13 @@ install: build
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ../../../..
 
-	# Qt client depends on X11/Qt, so it deserves it's own package
+	# remove documentation in main package
+	cd docs; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
+		cd ..
+
+	# the client libraries, the cli deserve their own package,
+	# the Qt client depends on X11/Qt, so it deserves it's own package
 	cd clients; $(MAKE) uninstall $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe; \
 		cd ..
@@ -156,7 +164,6 @@ install: build
 
 	# copy local versions of shared libraries of boost for platforms missing a decent
 	# version of boost
-	# TODO: lib, lib64, lib32
 	mkdir -p /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
 	for i in \
 		libboost_program_options.so.$(BOOST_VERSION) \
@@ -170,15 +177,39 @@ install: build
 		cp /usr/lib/$$i /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe; \
 	done
 
-	# client package
-	cd clients; $(MAKE) install $(WOLFRAME_PARAMS) \
+	# client library package
+	cd clients/lib; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-libclient; \
+		cd ../..
+	
+	# command line tool package
+	cd clients/cmdline; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-client; \
-		cd ..
+		cd ../..
+
+	# Qt client package
+	cd clients/qt; $(MAKE) install $(WOLFRAME_PARAMS) \
+		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-qtclient; \
+		cd ../..
 
 	# documentation package
 	cd docs; $(MAKE) install $(WOLFRAME_PARAMS) \
 		DESTDIR=/usr/src/packages/BUILD/debian/wolframe-doc; \
 		cd ..
+	# man pages belong to the main package, lib is a bug in Makefile, but
+	# no easy solvable!
+	rm -rf /usr/src/packages/BUILD/debian/wolframe-doc/usr/share/man
+	rm -rf /usr/src/packages/BUILD/debian/wolframe-doc/usr/lib
+	
+	# move things in the main package to a development package
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-dev/usr
+	mv -f /usr/src/packages/BUILD/debian/wolframe/usr/include \
+		/usr/src/packages/BUILD/debian/wolframe-dev/usr/.
+	mkdir -p /usr/src/packages/BUILD/debian/wolframe-dev/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
+	mv -f /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/*.so \
+		/usr/src/packages/BUILD/debian/wolframe-dev/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
+	mv -f /usr/src/packages/BUILD/debian/wolframe/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe/*.a \
+		/usr/src/packages/BUILD/debian/wolframe-dev/usr/lib/$(DEB_HOST_MULTIARCH)/wolframe
 	
 	# --- end custom part for installing
 

@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011, 2012 Project Wolframe.
+ Copyright (C) 2011 - 2013 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -38,30 +38,34 @@
 #ifndef _LOG_BACKEND_CONSOLE_HPP_INCLUDED
 #define _LOG_BACKEND_CONSOLE_HPP_INCLUDED
 
+#include <boost/thread/mutex.hpp>
+
 #include "logger/logLevel.hpp"
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
-	class ConsoleLogBackend
-	{
-	public:
-		ConsoleLogBackend( );
+// *MBa*
+// Note: the mutex solution might be temporary, we shoul do some performance tests here
+class ConsoleLogBackend
+{
+public:
+	ConsoleLogBackend( );
 
-		~ConsoleLogBackend( );
+	~ConsoleLogBackend( );
 
-		void setLevel( const LogLevel::Level level_ );
+	void setLevel( const LogLevel::Level level_ );
 
-		void log( const LogLevel::Level level, const std::string& msg );
+	void log( const LogLevel::Level level_, const std::string& msg );
 
-		void reopen( );
+	void reopen( );
 
-		LogLevel::Level level() const	{ return logLevel_; }
-	private:
-		LogLevel::Level	logLevel_;
-	};
+	LogLevel::Level level() const	{ return m_logLevel; }
+private:
+	LogLevel::Level	m_logLevel;
+	boost::mutex	m_mutex;
+};
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log
 
 #endif // _LOG_BACKEND_CONSOLE_HPP_INCLUDED

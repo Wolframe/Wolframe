@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011, 2012 Project Wolframe.
+ Copyright (C) 2011 - 2013 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -111,6 +111,7 @@ public:
 			boost::mutex::scoped_lock lock( m_mutex );
 			m_connList.push_back( conn );
 			++m_connListSize;
+			assert( m_connListSize == m_connList.size() );
 		}
 		LOG_DATA << "PUSH - Connections on socket: " << m_connListSize << " of maximum " << m_maxConn << ", " << conn->toString();
 	}
@@ -121,6 +122,7 @@ public:
 			boost::mutex::scoped_lock lock( m_mutex );
 			m_connList.remove( conn );
 			--m_connListSize;
+			assert( m_connListSize == m_connList.size() );
 		}
 		LOG_DATA << "REMOVE - Connections on socket: " << m_connListSize << " of maximum " << m_maxConn << ", " << conn->toString();
 	}
@@ -136,6 +138,7 @@ public:
 			conn = m_connList.front();
 			m_connList.pop_front();
 			--m_connListSize;
+			assert( m_connListSize == m_connList.size() );
 		}
 		LOG_DATA << "POP - Connection " << conn->toString();
 		return conn;

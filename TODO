@@ -15,6 +15,23 @@ daemon code:
   - fix libchrono transitive dependency in boost in 1.50/1.51
   - error checking after dependency generation, avoid funny mistakes
 
+- polish deployment
+  - template configuration wolframed.conf
+  - debian builds always against 1.48 boost, this should only be the
+    case for older Debian/Ubuntu systems (needs a split in OSC dsc
+    files)
+  - local deployed boost libaries (1.48) for Debian and old Ubuntu have
+    to be bundled with wolframe-libclient too. They must be in a common
+    dependency like 'wolframe-boost-rt'
+  - /usr/lib/x86_64-linux-gnu is a possible module loading place,
+    so is /usr/lib32, /usr/lib64, etc. inject as MODULEPATH to build
+    process and to module loading code 
+  - apache-like LoadModules, support for 'wolframe.d/libxml2.conf'
+    and 'include wolframe.d/*.conf'
+  - systemd instead of init scripts for Fedora and Archlinux
+
+- documentation
+  - man pages
 
 PF:
 - high prio

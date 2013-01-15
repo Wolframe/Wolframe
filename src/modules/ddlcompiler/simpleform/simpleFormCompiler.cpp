@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011, 2012 Project Wolframe.
+Copyright (C) 2011 - 2013 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -493,6 +493,8 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 				Form form( "simpleform");
 				form.defineName( itr->second.data());
 				compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
+				IndirectionConstructorR selfref( new StructIndirectionConstructor(form));
+				StructIndirectionConstructor::substituteSelf( &form, selfref);
 				formmap.insert( form.name(), form);
 				result.push_back( form);
 			}
@@ -503,6 +505,8 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 				Form form( "simpleform");
 				form.defineName( itr->second.data());
 				compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
+				IndirectionConstructorR selfref( new StructIndirectionConstructor(form));
+				StructIndirectionConstructor::substituteSelf( &form, selfref);
 				formmap.insert( form.name(), form);
 			}
 			else

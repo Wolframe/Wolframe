@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011, 2012 Project Wolframe.
+Copyright (C) 2011 - 2013 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -176,7 +176,7 @@ void StructType::defineAsAtomic( const AtomicType& tp)
 	m_contentType = Atomic;
 }
 
-void StructType::defineAsIndirection( const IndirectionConstructorR ref)
+void StructType::defineAsIndirection( const IndirectionConstructorR& ref)
 {
 	if (m_contentType == Vector) throw std::logic_error( "element already defined as vector");
 	if (m_elem.size()) throw std::logic_error( "element already initialized as non empty structure. cannot redefine type anymore");

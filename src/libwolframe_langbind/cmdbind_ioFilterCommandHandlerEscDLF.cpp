@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011, 2012 Project Wolframe.
+ Copyright (C) 2011 - 2013 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -206,6 +206,10 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 void IOFilterCommandHandlerEscDLF::putInput( const void *begin, std::size_t bytesTransferred)
 {
 	std::size_t startidx = (const char*)begin - m_input.charptr();
+	if (bytesTransferred + startidx > m_input.size())
+	{
+		throw std::logic_error( "illegal input range passed to IOFilterCommandHandlerEscDLF");
+	}
 	m_input.setPos( bytesTransferred + startidx);
 	if (m_itrpos != 0)
 	{
@@ -243,5 +247,3 @@ void IOFilterCommandHandlerEscDLF::getDataLeft( const void*& begin, std::size_t&
 	begin = (const void*)(m_input.charptr() + pos);
 	nofBytes = m_input.pos() - pos;
 }
-
-

@@ -9,7 +9,8 @@ INCLUDE_CXXFLAGS =
 INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe \
 	-L$(TOPDIR)/src/libwolframe_database \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_DIRS = \
 	-I. -I$(TOPDIR)/include \

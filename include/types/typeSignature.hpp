@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011, 2012 Project Wolframe.
+Copyright (C) 2011 - 2013 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -41,21 +41,6 @@ Project Wolframe.
 
 namespace _Wolframe {
 namespace types {
-
-struct ProtectedMem
-{
-	void* operator new( std::size_t size)
-	{
-		void* rt = types::malloc( size);
-		if (!rt) throw std::bad_alloc();
-		return rt;
-	}
-
-	void operator delete(void* ptr)
-	{
-		types::free( ptr);
-	}
-};
 
 ///\class TypeSignature
 ///\brief Signature of a type for pointer constraint check

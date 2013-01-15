@@ -15,14 +15,19 @@ now:
   - _ string after the CategoryFeature tag in simpleform solves the problem, but feels wrong!
   - <CategoryFeature category_id="1" id="1"/> but
      <category id="1"/> works, rest the same?!
- 
 - ILLEGAL STATE 4 in dataAvailable!
+- MDI interface
+  - have many forms in parallel
+  - reload forms from other forms
+- ERROR: error in sqlite database transaction: missing result for command (NONEMPTY) __selectFeature_0
+  ERROR: error calling function 'FeatureRequest':[configurator]:166: error in function '<formfunction>(..)' (transaction failed: missing result for command (NONEMPTY) __selectFeature_0)
+  ERROR: Error calling procedure: lua call failed
+  ERROR: error in execution of REQUEST FeatureRequest:lua call failed
 
+musts:
 - open info box (modal) in feature/category/component edit and add to
   show picture information
 - search with flag (with children)
-  
-musts:
 - delete needs manual set parameters, update and add use XML from widgets,
   slightly assymetrical maybe?
 - tags picked from a list and added (needs events)

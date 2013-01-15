@@ -1,7 +1,15 @@
-various contributions
+various development tools:
 
 create_qtcreator_files.sh	- create *.files for qtcreator
 valgrind-suppressions		- known problems when testing
 				  with valgrind memcheck/leakcheck
+				  
+build systems:
+
 osc				- OpenSuse Build Service specific stuff
 ArchLinux                       - PKGBUILD for builds on ArchLinux
+redhat                          - local build script for RHEL
+
+FreeBSD                         - FreeBSD ports and patches
+Solaris                         - Solaris ports and patches
+Windows                         - Windows patches

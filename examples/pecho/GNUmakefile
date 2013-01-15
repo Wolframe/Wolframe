@@ -18,7 +18,8 @@ INCLUDE_LDFLAGS = \
 	-L$(TOPDIR)/src/libwolframe_database \
 	-L$(TOPDIR)/src/libwolframe_langbind \
 	-L$(TOPDIR)/wtest \
-	-L$(BOOST_LIB_DIR)
+	-L$(BOOST_LIB_DIR) \
+	-L$(PGSQL_LIB_DIR)
 
 INCLUDE_LIBS = \
 	$(TOPDIR)/src/libwolframe.a \
@@ -69,7 +70,7 @@ CPP_BINS = \
 TEST_BINS += \
 	tests/pechoHandlerTest$(EXE)
 
-LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR):$(TOPDIR)/wtest"
+LD_LIBRARY_PATH = "$(BOOST_LIB_DIR):$(TOPDIR)/src/libwolframe:$(TOPDIR)/src/libwolframe_serialize:$(TOPDIR)/src/libwolframe_database:$(TOPDIR)/src/libwolframe_langbind:$(LIBXML2_LIB_DIR):$(PGSQL_LIB_DIR):$(TOPDIR)/wtest"
 
 pechod$(EXE): $(TOPDIR)/src/posixMain.o $(TOPDIR)/src/libwolframe.a $(TOPDIR)/src/libwolframe/libwolframe.a
 

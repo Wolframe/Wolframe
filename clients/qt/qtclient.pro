@@ -46,7 +46,8 @@ SOURCES += \
 	Preferences.cpp \
 	PreferencesDialog.cpp \
 	StorageWidget.cpp \
-	ManageStorageDialog.cpp
+	ManageStorageDialog.cpp \
+	FormChooseDialog.cpp
 
 HEADERS += \
 	DataHandler.hpp \
@@ -70,7 +71,8 @@ HEADERS += \
 	PreferencesDialog.hpp \
 	LoadMode.hpp \
 	StorageWidget.hpp \
-	ManageStorageDialog.hpp
+	ManageStorageDialog.hpp \
+	FormChooseDialog.hpp
 
 FORMS +=
 

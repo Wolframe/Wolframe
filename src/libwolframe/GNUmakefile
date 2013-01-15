@@ -72,8 +72,6 @@ CPP_OBJS = \
 	PBKDF2.o \
 	CRAM.o
 
-# DISABLED (only for testing): 	malloc.o \
-
 OBJS = \
 	b64encode.o \
 	b64decode.o \

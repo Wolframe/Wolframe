@@ -1,5 +1,5 @@
 /************************************************************************
-Copyright (C) 2011, 2012 Project Wolframe.
+Copyright (C) 2011 - 2013 Project Wolframe.
 All rights reserved.
 
 This file is part of Project Wolframe.
@@ -83,6 +83,8 @@ public:
 	{
 		return m_contentType;
 	}
+
+	virtual ~StructType(){}
 
 	///\brief Constructor
 	///\param[in] mandatory_ the element is mandatory in the structure it is part of
@@ -219,7 +221,7 @@ public:
 	///\brief Define this to an indirection type 'ref'
 	///\remark [precondition] this must not be initialized by other means yet
 	///\param[in] ref pointer for inderection
-	void defineAsIndirection( const IndirectionConstructorR ref);
+	void defineAsIndirection( const IndirectionConstructorR& ref);
 
 	///\brief Add a new element (copy of prototype) to this as a vector of elements (ContentType Vector)
 	///\remark [precondition] this must be of type (ContentType) Vector
@@ -320,8 +322,8 @@ public:
 
 	virtual StructType* create( const IndirectionConstructorR& self) const;
 
-private:
 	static void substituteSelf( StructType* st, const IndirectionConstructorR& self);
+private:
 	StructType m_prototype;
 };
 
@@ -329,8 +331,10 @@ class Form
 	:public StructType
 {
 public:
-	///\brief Constructor
+	///\brief Default constructor
 	Form(){}
+	///\brief Destructor
+	virtual ~Form(){}
 	///\brief Constructor
 	explicit Form( const std::string& ddlname_)
 		:m_ddlname(ddlname_){}

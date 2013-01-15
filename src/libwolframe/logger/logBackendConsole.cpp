@@ -1,6 +1,6 @@
 /************************************************************************
 
- Copyright (C) 2011, 2012 Project Wolframe.
+ Copyright (C) 2011 - 2013 Project Wolframe.
  All rights reserved.
 
  This file is part of Project Wolframe.
@@ -41,11 +41,11 @@
 #include <iostream>
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
 ConsoleLogBackend::ConsoleLogBackend( )
 {
-	logLevel_ = LogLevel::LOGLEVEL_ERROR;
+	m_logLevel = LogLevel::LOGLEVEL_ERROR;
 }
 
 ConsoleLogBackend::~ConsoleLogBackend( )
@@ -53,15 +53,16 @@ ConsoleLogBackend::~ConsoleLogBackend( )
 	// nothing to do here
 }
 
-void ConsoleLogBackend::setLevel(const LogLevel::Level level_ )
+void ConsoleLogBackend::setLevel( const LogLevel::Level level_ )
 {
-	logLevel_ = level_;
+	m_logLevel = level_;
 }
 
-void ConsoleLogBackend::log( const LogLevel::Level _level, const std::string& msg )
+void ConsoleLogBackend::log( const LogLevel::Level level_, const std::string& msg )
 {
-	if ( _level >= logLevel_ ) {
-		std::cerr << _level << ": " << msg << std::endl;
+	if ( level_ >= m_logLevel )	{
+		boost::mutex::scoped_lock lock( m_mutex );
+		std::cerr << level_ << ": " << msg << std::endl;
 		std::cerr.flush( );
 	}
 }
@@ -71,5 +72,4 @@ void ConsoleLogBackend::reopen( )
 	// nothing to do here
 }
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log
