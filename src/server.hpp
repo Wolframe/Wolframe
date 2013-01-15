@@ -107,9 +107,9 @@ private:
 	io_service_pool		m_IOservicePool;
 
 	/// The list(s) of connection acceptors.
-	std::list<acceptor*>	m_acceptors;
+	std::list< acceptor* >	m_acceptors;
 #ifdef WITH_SSL
-	std::list<SSLacceptor*>	m_SSLacceptors;
+	std::list< SSLacceptor* > m_SSLacceptors;
 #endif // WITH_SSL
 	GlobalConnectionList	m_globalList;
 };

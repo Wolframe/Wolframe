@@ -70,31 +70,31 @@ namespace net	{
 				   bool verify, const std::string& CAdir, const std::string& CAchainFile )
 			: LocalSSLendpoint( Host, Port ), m_identifier( Identifier ), m_maxConn( maxConn )
 		{
-			cert_ = Certificate;
-			key_ = Key;
-			verify_ = verify;
-			CAdir_ = CAdir;
-			CAchain_ = CAchainFile;
+			m_cert = Certificate;
+			m_key = Key;
+			m_verify = verify;
+			m_CAdir = CAdir;
+			m_CAchain = CAchainFile;
 		}
 
 		unsigned short maxConnections() const	{ return m_maxConn; }
 		const std::string& identifier() const	{ return m_identifier; }
-		const std::string& certificate() const	{ return cert_; }
-		const std::string& key() const		{ return key_; }
-		const std::string& CAdirectory() const	{ return CAdir_; }
-		const std::string& CAchain() const	{ return CAchain_; }
-		bool verifyClientCert() const		{ return verify_; }
+		const std::string& certificate() const	{ return m_cert; }
+		const std::string& key() const		{ return m_key; }
+		const std::string& CAdirectory() const	{ return m_CAdir; }
+		const std::string& CAchain() const	{ return m_CAchain; }
+		bool verifyClientCert() const		{ return m_verify; }
 
 		void setAbsolutePath( const std::string& referencePath );
 
 	private:
 		const std::string	m_identifier;
 		const unsigned short	m_maxConn;
-		std::string		cert_;
-		std::string		key_;
-		std::string		CAdir_;
-		std::string		CAchain_;
-		bool			verify_;
+		std::string		m_cert;
+		std::string		m_key;
+		std::string		m_CAdir;
+		std::string		m_CAchain;
+		bool			m_verify;
 	};
 #endif // WITH_SSL
 

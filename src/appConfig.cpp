@@ -237,7 +237,6 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 								if ( boost::algorithm::iequals( *Vit, modFile ))	{
 									LOG_WARNING << MODULE_SECTION_MSG << "duplicate module file: '"
 										    << modFile << "'. Ignoring the second request.";
-//									retVal = false;
 									isDuplicate = true;
 								}
 							}
@@ -257,7 +256,7 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 				}
 			}
 		}
-		LOG_TRACE << "Configuration : parsing modules list finished " << (retVal ? "OK" : "with errors");
+		LOG_TRACE << "Configuration: parsing modules list finished " << (retVal ? "OK" : "with errors");
 
 		return retVal;
 	}

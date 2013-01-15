@@ -51,35 +51,35 @@ namespace net	{
 /// set SSL files path to absolute pathes
 void ServerSSLendpoint::setAbsolutePath( const std::string& refPath )
 {
-	if ( ! cert_.empty() )	{
-		std::string oldPath = cert_;
-		cert_ = utils::getCanonicalPath( cert_, refPath );
-		if ( oldPath != cert_ )	{
-/*MBa ?!?*/		LOG_NOTICE << "Using absolute SSL certificate filename '" << cert_
+	if ( ! m_cert.empty() )	{
+		std::string oldPath = m_cert;
+		m_cert = utils::getCanonicalPath( m_cert, refPath );
+		if ( oldPath != m_cert )	{
+/*MBa ?!?*/		LOG_NOTICE << "Using absolute SSL certificate filename '" << m_cert
 				   << "' instead of '" << oldPath << "'";
 		}
 	}
-	if ( ! key_.empty() )	{
-		std::string oldPath = key_;
-		key_ = utils::getCanonicalPath( key_, refPath );
-		if ( oldPath != key_ )	{
-/*MBa ?!?*/		LOG_NOTICE << "Using absolute SSL key filename '" << key_
+	if ( ! m_key.empty() )	{
+		std::string oldPath = m_key;
+		m_key = utils::getCanonicalPath( m_key, refPath );
+		if ( oldPath != m_key )	{
+/*MBa ?!?*/		LOG_NOTICE << "Using absolute SSL key filename '" << m_key
 				   << "' instead of '" << oldPath << "'";
 		}
 	}
-	if ( ! CAdir_.empty() )	{
-		std::string oldPath = CAdir_;
-		CAdir_ = utils::getCanonicalPath( CAdir_, refPath );
-		if ( oldPath != CAdir_ )	{
-/*MBa ?!?*/		LOG_NOTICE << "Using absolute CA directory '" << CAdir_
+	if ( ! m_CAdir.empty() )	{
+		std::string oldPath = m_CAdir;
+		m_CAdir = utils::getCanonicalPath( m_CAdir, refPath );
+		if ( oldPath != m_CAdir )	{
+/*MBa ?!?*/		LOG_NOTICE << "Using absolute CA directory '" << m_CAdir
 				   << "' instead of '" << oldPath << "'";
 		}
 	}
-	if ( ! CAchain_.empty() )	{
-		std::string oldPath = CAchain_;
-		CAchain_ = utils::getCanonicalPath( CAchain_, refPath );
-		if ( oldPath != CAchain_ )	{
-/*MBa ?!?*/		LOG_NOTICE << "Using absolute CA chain filename '" << CAchain_
+	if ( ! m_CAchain.empty() )	{
+		std::string oldPath = m_CAchain;
+		m_CAchain = utils::getCanonicalPath( m_CAchain, refPath );
+		if ( oldPath != m_CAchain )	{
+/*MBa ?!?*/		LOG_NOTICE << "Using absolute CA chain filename '" << m_CAchain
 				   << "' instead of '" << oldPath << "'";
 		}
 	}
