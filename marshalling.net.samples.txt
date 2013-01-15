@@ -711,5 +711,30 @@ http://msdn.microsoft.com/en-us/library/bb676070.aspx
 DESCRIPTION:
 Tlbexp Helper Functions (Unmanaged API Reference)
 
+URL:
+http://jumbloid.blogspot.ch/2009/12/making-net-dll-com-visible.html
+DESCRIPTION:
+Tutorial: making net dll com visible
+
+URL:
+http://www.codeproject.com/Articles/12741/Tlbexp-exe-and-Regasm-exe-NET-FrameWork-Tools-Seri
+DESCRIPTION:
+About regasm and tlbexp
+
+URL:
+http://www.codeproject.com/Articles/13601/COM-in-plain-C
+DESCRIPTION:
+Jeff Glatt: COM in plain C
+
+URL:
+https://sites.google.com/site/jozsefbekes/Home/windows-programming/com-basics
+DESCRIPTION:
+Jozsef Bekes: COM basics
+
+URL:
+http://social.msdn.microsoft.com/forums/en-US/csharpgeneral/thread/7313191a-10db-4a16-9cdd-de9fb80b378a/
+DESCRIPTION:
+COM interface inheritance for binding to .NET
+
 
 

@@ -167,6 +167,16 @@ public:
 			return (type == string_ && value.string_.size == 0);
 		}
 
+		bool emptycontent() const
+		{
+			if (type != string_) return false;
+			for (std::size_t ii=0; ii<value.string_.size; ++ii)
+			{
+				if ((unsigned char)value.string_.ptr[ii] > 32) return false;
+			}
+			return true;
+		}
+
 		void clear()
 		{
 			type = string_;
