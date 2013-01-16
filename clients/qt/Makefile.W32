@@ -288,7 +288,6 @@ zip:
 	-rmdir C:\qtclient\apps\configurator
 	-rmdir C:\qtclient\apps
 	-rmdir C:\qtclient\imageformats
-	-rmdir C:\qtclient\sqldrivers
 	-rmdir C:\qtclient
 	mkdir C:\qtclient
 	mkdir C:\qtclient\images
@@ -298,7 +297,6 @@ zip:
 	mkdir C:\qtclient\themes\windows
 	mkdir C:\qtclient\i18n
 	mkdir C:\qtclient\imageformats
-	mkdir C:\qtclient\sqldrivers
 	copy qtclient.exe C:\qtclient
 	copy $(QT_DIR)\bin\QtCored4.dll C:\qtclient
 	copy $(QT_DIR)\bin\QtGuid4.dll C:\qtclient
