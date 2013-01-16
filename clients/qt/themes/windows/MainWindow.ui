@@ -52,8 +52,6 @@
     <addaction name="actionOpenFormNewWindow"/>
     <addaction name="actionOpenForm"/>
     <addaction name="separator"/>
-    <addaction name="actionManageStorage"/>
-    <addaction name="separator"/>
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionRestart"/>

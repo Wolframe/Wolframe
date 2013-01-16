@@ -20,7 +20,6 @@ INCLUDE_DIRS = \
 	/I.. \
 	/Ifilechooser \
 	/Ipicturechooser \
-	/Iformwidget \
 	/I"$(QT_DIR)\include" \
 	/I"$(QT_DIR)\include\QtCore" \
 	/I"$(QT_DIR)\include\QtGui" \

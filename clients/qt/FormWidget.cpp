@@ -204,9 +204,6 @@ void FormWidget::loadForm( QString name )
 
 //	if( name == m_form ) return;
 	
-// indicate busy state
-	qApp->setOverrideCursor( Qt::BusyCursor );
-
 	m_previousForm = m_form;
 	m_form = name;
 
@@ -217,9 +214,6 @@ void FormWidget::loadForm( QString name )
 
 void FormWidget::loadLanguage( QString language )
 {
-// indicate busy state
-	qApp->setOverrideCursor( Qt::BusyCursor );
-
 	m_locale = QLocale( language );
 	
 	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "

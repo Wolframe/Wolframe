@@ -7,8 +7,7 @@
 
 enum LoadMode {
 	Network,
-	LocalFile,
-	LocalDb
+	LocalFile
 };
 
 #endif // _LOADMODE_HPP

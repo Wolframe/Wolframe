@@ -36,11 +36,9 @@ void PreferencesDialog::initialize( )
 
 	QGroupBox *groupBox1 = new QGroupBox( );
 	m_uiLoadModeLocalFile = new QRadioButton( tr( "Local &file" ) );
-	m_uiLoadModeLocalDatabase = new QRadioButton( tr( "Local &database" ) );
 	m_uiLoadModeNetwork = new QRadioButton( tr( "&Network" ) );
 	QVBoxLayout *vbox1 = new QVBoxLayout( );
 	vbox1->addWidget( m_uiLoadModeLocalFile );
-	vbox1->addWidget( m_uiLoadModeLocalDatabase );
 	vbox1->addWidget( m_uiLoadModeNetwork );
 	vbox1->addStretch( 1 );
 	groupBox1->setLayout( vbox1 );
@@ -48,11 +46,9 @@ void PreferencesDialog::initialize( )
 
 	QGroupBox *groupBox2 = new QGroupBox( );
 	m_dataLoadModeLocalFile = new QRadioButton( tr( "Local &file" ) );
-	m_dataLoadModeLocalDatabase = new QRadioButton( tr( "Local &database" ) );
 	m_dataLoadModeNetwork = new QRadioButton( tr( "&Network" ) );
 	QVBoxLayout *vbox2 = new QVBoxLayout( );
 	vbox2->addWidget( m_dataLoadModeLocalFile );
-	vbox2->addWidget( m_dataLoadModeLocalDatabase );
 	vbox2->addWidget( m_dataLoadModeNetwork );
 	vbox2->addStretch( 1 );
 	groupBox2->setLayout( vbox2 );
@@ -84,10 +80,6 @@ void PreferencesDialog::initialize( )
 		tr( "Select a file as certificate authority key" ), this );
 	formLayout->addRow( tr( "C&A file:" ), m_CACertFile );
 		
-	m_dbName = new FileChooser( FileChooser::SelectExistingFile,
-		tr( "Select a file where to store a local sqlite database" ), this );
-	formLayout->addRow( tr( "&Db file:" ), m_dbName );
-
 	m_uiFormsDir = new FileChooser( FileChooser::SelectExistingDir,
 		tr( "Select a directory holding UI forms" ), this );
 	formLayout->addRow( tr( "Form dir:" ), m_uiFormsDir );
@@ -137,18 +129,12 @@ void PreferencesDialog::initialize( )
 	connect( m_uiLoadModeLocalFile, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 		
-	connect( m_uiLoadModeLocalDatabase, SIGNAL( toggled( bool ) ),
-		this, SLOT( toggleLoadMode( bool ) ) );
-
 	connect( m_uiLoadModeNetwork, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 
 	connect( m_dataLoadModeLocalFile, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 		
-	connect( m_dataLoadModeLocalDatabase, SIGNAL( toggled( bool ) ),
-		this, SLOT( toggleLoadMode( bool ) ) );
-
 	connect( m_dataLoadModeNetwork, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 		
@@ -174,12 +160,9 @@ void PreferencesDialog::loadSettings( )
 	m_CACertFile->setFileName( prefs->caCertFile( ) );
 	m_CACertFile->setEnabled( prefs->secure( ) );
 	m_uiLoadModeLocalFile->setChecked( false );
-	m_uiLoadModeLocalDatabase->setChecked( false );
 	m_uiLoadModeNetwork->setChecked( false );
 	m_dataLoadModeLocalFile->setChecked( false );
-	m_dataLoadModeLocalDatabase->setChecked( false );
 	m_dataLoadModeNetwork->setChecked( false );
-	m_dbName->setEnabled( false );
 	m_uiFormsDir->setEnabled( false );
 	m_uiFormTranslationsDir->setEnabled( false );
 	m_uiFormResourcesDir->setEnabled( false );
@@ -192,11 +175,6 @@ void PreferencesDialog::loadSettings( )
 			m_uiFormResourcesDir->setEnabled( true );
 			break;
 
-		case Preferences::LocalDb:
-			m_uiLoadModeLocalDatabase->setChecked( true );
-			m_dbName->setEnabled( true );
-			break;
-
 		case Preferences::Network:
 			m_uiLoadModeNetwork->setChecked( true );
 			break;
@@ -207,16 +185,10 @@ void PreferencesDialog::loadSettings( )
 			m_dataLoaderDir->setEnabled( true );
 			break;
 
-		case Preferences::LocalDb:
-			m_dataLoadModeLocalDatabase->setChecked( true );
-			m_dbName->setEnabled( true );
-			break;
-
 		case Preferences::Network:
 			m_dataLoadModeNetwork->setChecked( true );
 			break;
 	}
-	m_dbName->setFileName( prefs->dbName( ) );
 	m_debug->setChecked( prefs->debug( ) );
 	m_uiFormsDir->setFileName( prefs->uiFormsDir( ) );
 	m_uiFormTranslationsDir->setFileName( prefs->uiFormTranslationsDir( ) );
@@ -249,19 +221,14 @@ void PreferencesDialog::apply( )
 	prefs->setCaCertFile( m_CACertFile->fileName( ) );
 	if( m_uiLoadModeLocalFile->isChecked( ) ) {
 		prefs->setUiLoadMode( Preferences::LocalFile );
-	} else if( m_uiLoadModeLocalDatabase->isChecked( ) ) {
-		prefs->setUiLoadMode( Preferences::LocalDb );
 	} else if( m_uiLoadModeNetwork->isChecked( ) ) {
 		prefs->setUiLoadMode( Preferences::Network );
 	}
 	if( m_dataLoadModeLocalFile->isChecked( ) ) {
 		prefs->setDataLoadMode( Preferences::LocalFile );
-	} else if( m_dataLoadModeLocalDatabase->isChecked( ) ) {
-		prefs->setDataLoadMode( Preferences::LocalDb );
 	} else if( m_dataLoadModeNetwork->isChecked( ) ) {
 		prefs->setDataLoadMode( Preferences::Network );
 	}
-	prefs->setDbName( m_dbName->fileName( ) );
 	prefs->setDebug( m_debug->isChecked( ) );
 	prefs->setUiFormsDir( m_uiFormsDir->fileName( ) );
 	prefs->setUiFormTranslationsDir( m_uiFormTranslationsDir->fileName( ) );
@@ -299,7 +266,6 @@ void PreferencesDialog::toggleSecure( int /* state */ )
 
 void PreferencesDialog::toggleLoadMode( bool /* checked */ )
 {
-	m_dbName->setEnabled( m_uiLoadModeLocalDatabase->isChecked( ) || m_dataLoadModeLocalDatabase->isChecked( ) );
 	m_host->setEnabled( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) );
 	m_port->setEnabled( m_uiLoadModeNetwork->isChecked( ) | m_dataLoadModeNetwork->isChecked( ) );
 	m_secure->setEnabled( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) );

@@ -15,9 +15,8 @@ INCLUDE_DIRS = \
 	-I$(QT_INCLUDE_DIR)/QtNetwork \
 	-I$(QT_INCLUDE_DIR)/QtGui \
 	-I$(QT_INCLUDE_DIR)/QtUiTools \
-	-I$(QT_INCLUDE_DIR)/QtDesigner \
-	-I$(QT_INCLUDE_DIR)/QtSql
-
+	-I$(QT_INCLUDE_DIR)/QtDesigner
+	
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
 	-L$(QT_LIB_DIR) \
@@ -25,7 +24,7 @@ INCLUDE_LDFLAGS = \
 	-Lplugins
 
 INCLUDE_LIBS = \
-	-lQtCore -lQtGui -lQtUiTools -lQtNetwork -lQtXml -lQtSql \
+	-lQtCore -lQtGui -lQtUiTools -lQtNetwork -lQtXml \
 	-lwolframewidgets
 
 MOC_FLAGS = \
@@ -70,19 +69,14 @@ CPP_OBJS = \
 	moc_qcommandline.o \
 	LoginDialog.o \
 	moc_LoginDialog.o \
-	SqliteFormLoader.o \
-	SqliteDataLoader.o \
 	Preferences.o \
 	moc_Preferences.o \
 	PreferencesDialog.o \
 	moc_PreferencesDialog.o \
 	StorageWidget.o \
 	moc_StorageWidget.o \
-	ManageStorageDialog.o \
-	moc_ManageStorageDialog.o \
 	FormChooseDialog.o \
-	moc_FormChooseDialog.o \
-	moc_DefaultMainWindow.o
+	moc_FormChooseDialog.o
 
 CPP_BINS = \
 	qtclient$(EXE)
@@ -135,20 +129,15 @@ moc_PictureChooser.cpp: PictureChooser.hpp
 
 moc_StorageWidget.cpp: StorageWidget.hpp
 	$(QT_MOC) $(MOC_FLAGS) StorageWidget.hpp -o moc_StorageWidget.cpp
-
-moc_ManageStorageDialog.cpp: ManageStorageDialog.hpp
-	$(QT_MOC) $(MOC_FLAGS) ManageStorageDialog.hpp -o moc_ManageStorageDialog.cpp
 	
 moc_FormChooseDialog.cpp: FormChooseDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
 
-moc_DefaultMainWindow.cpp: DefaultMainWindow.hpp
-	$(QT_MOC) $(MOC_FLAGS) DefaultMainWindow.hpp -o moc_DefaultMainWindow.cpp
-
 MainWindowUi.hpp: themes/windows/MainWindow.ui
 	$(QT_UIC) -o MainWindowUi.hpp themes/windows/MainWindow.ui
 
-DefaultMainWindow.hpp: MainWindowUi.hpp
+MainWindow.hpp: MainWindowUi.hpp
+qtclient.cpp: MainWindow.hpp
 
 qtclient$(EXE): $(CPP_OBJS) qtclient.o
 
@@ -167,7 +156,6 @@ DATA = \
 	apps/test/data/domain_form4_vegetable.xml
 	
 THEMES = \
-	themes/phone/MainWindow.ui \
 	themes/windows/MainWindow.ui
 
 %.qm : %.ts
@@ -181,8 +169,6 @@ I18NS = \
 	i18n/qtclient.ro_RO.qm \
 	themes/windows/MainWindow.de_CH.qm \
 	themes/windows/MainWindow.ro_RO.qm \
-	themes/phone/MainWindow.de_CH.qm \
-	themes/phone/MainWindow.ro_RO.qm \
 	apps/test/i18n/init.de_CH.qm \
 	apps/test/i18n/init.ro_RO.qm \
 	apps/test/i18n/form1.de_CH.qm \
@@ -231,15 +217,13 @@ local_test:
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
-	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient
+	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient -s apps/test.conf
 
 .PHONY: buildi18n
 buildi18n:
 	$(QT_LUPDATE) -extensions hpp,cpp . -ts i18n/qtclient.de_CH.ts
 	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/MainWindow.de_CH.ts
 	$(QT_LUPDATE) themes/windows/MainWindow.ui -ts themes/windows/MainWindow.ro_RO.ts
-	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/MainWindow.de_CH.ts
-	$(QT_LUPDATE) themes/phone/MainWindow.ui -ts themes/phone/MainWindow.ro_RO.ts
 	$(QT_LUPDATE) apps/test/forms/init.ui -ts apps/test/i18n/init.de_CH.ts
 	$(QT_LUPDATE) apps/test/forms/init.ui -ts apps/test/i18n/init.ro_RO.ts
 	$(QT_LUPDATE) apps/test/forms/form1.ui -ts apps/test/i18n/form1.de_CH.ts

@@ -16,8 +16,7 @@ INCLUDE_DIRS = \
 	/I"$(QT_DIR)\include\QtGui" \
 	/I"$(QT_DIR)\include\QtUiTools" \
 	/I"$(QT_DIR)\include\QtDesigner" \
-	/I"$(QT_DIR)\include\QtNetwork" \
-	/I"$(QT_DIR)\include\QtSql"
+	/I"$(QT_DIR)\include\QtNetwork"
 
 QT_LDFLAGS = /LIBPATH:"$(QT_DIR)\lib"
 INCLUDE_LDFLAGS = \
@@ -26,10 +25,10 @@ INCLUDE_LDFLAGS = \
 
 !IFNDEF DEBUG
 INCLUDE_LIBS = \
-	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib QtSql4.lib QtMain.lib
+	QtCore4.lib QtGui4.lib QtUiTools.lib QtNetwork4.lib QtMain.lib
 !ELSE
 INCLUDE_LIBS = \
-	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtSqld4.lib QtMaind.lib
+	QtCored4.lib QtGuid4.lib QtUiToolsd.lib QtNetworkd4.lib QtMaind.lib
 !ENDIF
 
 INCLUDE_LIBS = \
@@ -83,20 +82,15 @@ OBJS = \
 	moc_qcommandline.obj \
 	LoginDialog.obj \
 	moc_LoginDialog.obj \
-	SqliteFormLoader.obj \
-	SqliteDataLoader.obj \
 	Preferences.obj \
 	moc_Preferences.obj \
 	PreferencesDialog.obj \
 	moc_PreferencesDialog.obj \
 	StorageWidget.obj \
 	moc_StorageWidget.obj \
-	ManageStorageDialog.obj \
-	moc_ManageStorageDialog.obj \
 	FormChooseDialog.obj \
-	moc_FormChooseDialog.obj \
-	moc_DefaultMainWindow.obj	
-
+	moc_FormChooseDialog.obj
+	
 CPP_BINS = \
 	qtclient.exe
 
@@ -109,8 +103,6 @@ I18NS = \
 	i18n\qtclient.ro_RO.qm \
 	themes\windows\MainWindow.de_CH.qm \
 	themes\windows\MainWindow.ro_RO.qm \
-	themes\phone\MainWindow.de_CH.qm \
-	themes\phone\MainWindow.ro_RO.qm \
 	apps\test\i18n\init.de_CH.qm \
 	apps\test\i18n\init.ro_RO.qm \
 	apps\test\i18n\form1.de_CH.qm \
@@ -137,12 +129,6 @@ themes\windows\MainWindow.de_CH.qm: themes\windows\MainWindow.de_CH.ts
 
 themes\windows\MainWindow.ro_RO.qm: themes\windows\MainWindow.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe themes\windows\MainWindow.ro_RO.ts -qm themes\windows\MainWindow.ro_RO.qm
-
-themes\phone\MainWindow.de_CH.qm: themes\phone\MainWindow.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe themes\phone\MainWindow.de_CH.ts -qm themes\phone\MainWindow.de_CH.qm
-
-themes\phone\MainWindow.ro_RO.qm: themes\phone\MainWindow.ro_RO.ts
-	$(QT_DIR)\bin\lrelease.exe themes\phone\MainWindow.ro_RO.ts -qm themes\phone\MainWindow.ro_RO.qm
 
 
 apps\test\i18n\init.de_CH.qm: apps\test\i18n\init.de_CH.ts
@@ -221,19 +207,14 @@ moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 moc_StorageWidget.cpp: StorageWidget.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. StorageWidget.hpp -o moc_StorageWidget.cpp
 
-moc_ManageStorageDialog.cpp: ManageStorageDialog.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. ManageStorageDialog.hpp -o moc_ManageStorageDialog.cpp
-
 moc_FormChooseDialog.cpp: FormChooseDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
 	
-moc_DefaultMainWindow.cpp: DefaultMainWindow.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. DefaultMainWindow.hpp -o moc_DefaultMainWindow.cpp
-
 MainWindowUi.hpp: themes\windows\MainWindow.ui
 	$(QT_DIR)\bin\uic -o MainWindowUi.hpp themes\windows\MainWindow.ui
 
-DefaultMainWindow.hpp: MainWindowUi.hpp
+MainWindow.hpp: MainWindowUi.hpp
+qtclient.cpp: MainWindow.hpp
 
 qtclient.res: qtclient.ico qtclient.rc
 	rc /foqtclient.res qtclient.rc
@@ -257,13 +238,11 @@ copy_prereq:
 	@-copy $(QT_DIR)\bin\QtGui4.dll .
 	@-copy $(QT_DIR)\bin\QtNetwork4.dll .
 	@-copy $(QT_DIR)\bin\QtWebkit4.dll .
-	@-copy $(QT_DIR)\bin\QtSql4.dll .
 !ELSE
 	@-copy $(QT_DIR)\bin\QtCored4.dll .
 	@-copy $(QT_DIR)\bin\QtGuid4.dll .
 	@-copy $(QT_DIR)\bin\QtNetworkd4.dll .
 	@-copy $(QT_DIR)\bin\QtWebkitd4.dll .
-	@-copy $(QT_DIR)\bin\QtSqld4.dll .
 !ENDIF
 !IFDEF WITH_SSL
 	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" .
@@ -281,8 +260,6 @@ buildi18n:
 	$(QT_DIR)\bin\lupdate.exe) -extensions hpp,cpp . -ts i18n\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.ro_RO.ts
-	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.de_CH.ts
-	$(QT_DIR)\bin\lupdate.exe themes\phone\MainWindow.ui -ts themes\phone\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\init.ui -ts apps\test\i18n\init.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\init.ui -ts apps\test\i18n\init.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form1.ui -ts apps\test\i18n\form1.de_CH.ts
@@ -327,8 +304,6 @@ zip:
 	copy $(QT_DIR)\bin\QtGuid4.dll C:\qtclient
 	copy $(QT_DIR)\bin\QtNetworkd4.dll C:\qtclient
 	copy $(QT_DIR)\bin\QtWebkitd4.dll C:\qtclient
-	copy $(QT_DIR)\bin\QtSqld4.dll C:\qtclient
-	copy $(QT_DIR)\plugins\sqldrivers\qsqlited4.dll C:\qtclient\sqldrivers
 	copy $(QT_DIR)\plugins\imageformats\*.dll C:\qtclient\imageformats
 	copy "$(OPENSSL_DIR)\bin\libeay32.dll" C:\qtclient
 	copy "$(OPENSSL_DIR)\bin\ssleay32.dll" C:\qtclient

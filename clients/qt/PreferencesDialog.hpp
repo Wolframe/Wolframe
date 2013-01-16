@@ -28,10 +28,8 @@
 	
 	private:
 		QRadioButton *m_uiLoadModeLocalFile;
-		QRadioButton *m_uiLoadModeLocalDatabase;
 		QRadioButton *m_uiLoadModeNetwork;
 		QRadioButton *m_dataLoadModeLocalFile;
-		QRadioButton *m_dataLoadModeLocalDatabase;
 		QRadioButton *m_dataLoadModeNetwork;
 		QLineEdit *m_host;
 		QSpinBox *m_port;
@@ -41,7 +39,6 @@
 		FileChooser *m_clientKeyFile;
 		FileChooser *m_CACertFile;
 		QDialogButtonBox* m_buttons;
-		FileChooser *m_dbName;
 		FileChooser *m_uiFormsDir;
 		FileChooser *m_uiFormTranslationsDir;
 		FileChooser *m_uiFormResourcesDir;

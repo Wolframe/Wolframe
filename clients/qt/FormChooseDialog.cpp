@@ -3,12 +3,9 @@
 //
 
 #include "FormChooseDialog.hpp"
-#include "Preferences.hpp"
-#include "PreferencesDialog.hpp"
 
 #include <QFormLayout>
 #include <QApplication>
-
 
 FormChooseDialog::FormChooseDialog( const QStringList _formNames, QWidget *_parent ) :
 	QDialog( _parent ), m_formNames( _formNames )
@@ -22,9 +19,13 @@ void FormChooseDialog::initialize( )
 {
 	QFormLayout *formLayout = new QFormLayout( );
 	
-	m_forms = new QComboBox( this );
+	m_forms = new QListWidget( this );
 	formLayout->addRow( tr( "&Available forms:" ), m_forms );
+	m_forms->setSelectionMode( QAbstractItemView::SingleSelection );
 	m_forms->addItems( m_formNames );
+	
+	connect( m_forms, SIGNAL( itemDoubleClicked( QListWidgetItem * ) ),
+		this, SLOT( ok( ) ) );
 	
 	m_buttons = new QDialogButtonBox( this );
 	m_buttons->addButton( QDialogButtonBox::Ok );
@@ -62,7 +63,9 @@ void FormChooseDialog::keyPressEvent( QKeyEvent *_event )
 
 void FormChooseDialog::ok( )
 {
-	m_form = m_forms->itemText( m_forms->currentIndex( ) );
+	QList<QListWidgetItem *> items = m_forms->selectedItems( );
+	m_form = items.at( 0 )->text( );
+	
 	accept( );
 }
 
