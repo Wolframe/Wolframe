@@ -222,14 +222,6 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 							retVal = false;
 						}
 						else	{
-							// resolv relative path
-							std::string oldPath = modFile;
-							assert( ! modFile.empty() );
-							modFile = utils::getCanonicalPath( modFile, configFile );
-							if ( oldPath != modFile)	{
-/*MBa ?!?*/							LOG_NOTICE << MODULE_SECTION_MSG << "using absolute filename '" << modFile
-									   << "' instead of '" << oldPath << "'";
-							}
 							// check for duplicates
 							bool isDuplicate = false;
 							for ( std::list< std::string >::const_iterator Vit = m_modFiles.begin();
@@ -252,6 +244,35 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 					else	{
 						LOG_WARNING << MODULE_SECTION_MSG << " unknown configuration option: '"
 							    << L2it->first << "'";
+					}
+				}
+			}
+
+			// resolv relative pathes
+			if ( ! m_modFolder.empty() )	{
+				std::string basePath = m_modFolder;
+				boost::filesystem::path bp( basePath );
+				if ( !bp.is_absolute() )	{
+					basePath = utils::getCanonicalPath( basePath, configFile );
+/*MBa - maybe WARNING ? */		LOG_NOTICE << MODULE_SECTION_MSG << "using absolute directory path '" << basePath
+						   << "' instead of '" << m_modFolder << "'";
+				}
+				for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
+									Pit != m_modFiles.end(); Pit++ )	{
+					*Pit = utils::getCanonicalPath( *Pit, basePath );
+					assert( ! Pit->empty() );
+				}
+
+			}
+			else	{
+				for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
+									Pit != m_modFiles.end(); Pit++ )	{
+					std::string oldPath = *Pit;
+					*Pit = utils::getCanonicalPath( *Pit, configFile );
+					assert( ! Pit->empty() );
+					if ( oldPath != *Pit )	{
+						LOG_NOTICE << MODULE_SECTION_MSG << "using absolute filename '" << *Pit
+							   << "' instead of '" << oldPath << "'";
 					}
 				}
 			}
