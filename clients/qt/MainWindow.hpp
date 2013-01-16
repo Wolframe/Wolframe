@@ -74,6 +74,7 @@
 		bool m_loadThemes;
 		QMdiArea *m_mdiArea;		// pointer to MDI workspace in the main window
 		QStringList m_forms;		// list of available forms
+		bool m_mdi;
 		
 	public slots:
 		void readSettings( );

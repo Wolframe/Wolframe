@@ -19,6 +19,15 @@ now:
 - MDI interface
   - have many forms in parallel
   - reload forms from other forms
+  - MDI or one window mode (switch and preference)
+  - some wiring trouble in datahandler:
+    CRITICAL: ERROR: answer for unknown request of doctype "xxx": most likely the
+    formwidgets share the same datahandler and the signals are missed, its list and hierarchy
+    requests, so it's the domain filler.
+    It happens only if the same form is picked as already shown in another window
+    => not implementable without tagging in the protocol! map of doctype in protocol back
+    is not possible, we must be able to encode window id, widget id and map it to a tag in
+    the protocol
 - ERROR: error in sqlite database transaction: missing result for command (NONEMPTY) __selectFeature_0
   ERROR: error calling function 'FeatureRequest':[configurator]:166: error in function '<formfunction>(..)' (transaction failed: missing result for command (NONEMPTY) __selectFeature_0)
   ERROR: Error calling procedure: lua call failed

@@ -43,7 +43,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QWidget( _parent ),
 	m_uiFormResourcesDir( DEFAULT_UI_FORM_RESOURCES_DIR ),
 	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR ),
 	m_languages( ), m_language( ), m_defaultMainWindow( false ),
-	m_loadThemes( false )
+	m_loadThemes( false ), m_mdi( false )
 {
 // read arguments for the '-s <setting file>' parameter
 #ifndef Q_OS_ANDROID
@@ -184,7 +184,8 @@ void MainWindow::parseArgs( )
 		{ QCommandLine::Option, 'k', "client-key-file", "client key file (default: ./private/client.key)", QCommandLine::Optional },
 		{ QCommandLine::Option, 'C', "CA-cert-file", "certificate file containing the CA (default: ./certs/CAclient.cert.pem)", QCommandLine::Optional },
 		{ QCommandLine::Option, 'D', "db-file", "Sqlite3 file for local storage", QCommandLine::Optional },
-		{ QCommandLine::Switch, 't', "no-loadable-themes", "don't use loadable themes", QCommandLine::Optional },
+		{ QCommandLine::Switch, 't', "loadable-themes", "use loadable themes", QCommandLine::Optional },
+		{ QCommandLine::Switch, 'm', "mdi", "MDI interface instead of one main window", QCommandLine::Optional },
 		QCOMMANDLINE_CONFIG_ENTRY_END
 	};
 
@@ -230,8 +231,10 @@ void MainWindow::switchFound( const QString &name )
 	} else if( name == "debug" ) {
 		m_debug = true;
 		_debug = true;
-	} else if( name == "no-loadable-themes" ) {
-		m_loadThemes = false;
+	} else if( name == "loadable-themes" ) {
+		m_loadThemes = true;
+	} else if( name == "mdi" ) {
+		m_mdi = true;
 	}
 }
 
@@ -598,18 +601,22 @@ void MainWindow::loadTheme( QString theme )
 	if( m_ui && m_formWidget ) {
 		QMainWindow *mainWindow = qobject_cast<QMainWindow *>( m_ui );
 		if( mainWindow ) {
-			m_mdiArea = m_ui->findChild<QMdiArea *>( "centralWidget" );
-			if( m_mdiArea ) {
-				m_mdiArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-				m_mdiArea->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-				QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( m_formWidget, Qt::FramelessWindowHint );
-				mdiSubWindow->setWindowState( Qt::WindowMaximized );
-				mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
-				mdiSubWindow->setWindowTitle( "[init]" );
-				m_mdiArea->tileSubWindows( );
-				mdiSubWindow->showMaximized( );
+			if( m_mdi ) {
+				m_mdiArea = m_ui->findChild<QMdiArea *>( "centralWidget" );
+				if( m_mdiArea ) {
+					m_mdiArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+					m_mdiArea->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+					QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( m_formWidget, Qt::FramelessWindowHint );
+					mdiSubWindow->setWindowState( Qt::WindowMaximized );
+					mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
+					mdiSubWindow->setWindowTitle( "[init]" );
+					m_mdiArea->tileSubWindows( );
+					mdiSubWindow->showMaximized( );
+				} else {
+					// missing a MDI aera, so add just one form widget as main entry widget
+					mainWindow->setCentralWidget( m_formWidget );
+				}
 			} else {
-				// missing a MDI aera, so add just one form widget as main entry widget
 				mainWindow->setCentralWidget( m_formWidget );
 			}
 		}
@@ -623,6 +630,12 @@ void MainWindow::loadTheme( QString theme )
 		}
 	}
 
+// enable open forms in new window in MDI mode
+	QAction *action = m_ui->findChild<QAction *>( "actionOpenFormNewWindow" );
+	if( action ) {
+		action->setEnabled( m_mdi );
+	}
+	
 // show the new gui
 	m_ui->raise( );
 	m_ui->activateWindow( );
