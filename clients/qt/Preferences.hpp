@@ -15,9 +15,8 @@
 #define DEFAULT_DOMAIN "wolframe"
 #define DEFAULT_APP "qtclient"
 
-
-	class Preferences : public QObject
-	{
+class Preferences : public QObject
+{
 		Q_OBJECT
 		Q_ENUMS( LoadMode )
 		
@@ -93,6 +92,10 @@
 			Q_PROPERTY( QString locale READ locale WRITE setLocale )
 			QString locale( ) const { return m_locale; }
 			void setLocale( QString _locale ) { m_locale = _locale; }
+
+			Q_PROPERTY( bool mdi READ mdi WRITE setMdi )
+			bool mdi( ) const { return m_mdi; }
+			void setMdi( bool _mdi ) { m_mdi = _mdi; }
 			
 		private:
 			QSettings *createSettings( );
@@ -119,7 +122,7 @@
 			QString m_uiFormResourcesDir;
 			QString m_dataLoaderDir;
 			QString m_locale;
-	};
-	
+			bool m_mdi;
+};	
 
 #endif // _PREFERENCES_HPP_INCLUDED

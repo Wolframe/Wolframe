@@ -114,6 +114,9 @@ void PreferencesDialog::initialize( )
 		}
 		formLayout->addRow( tr( "&Locale:" ), m_locale );		
 	}
+
+	m_mdi = new QCheckBox( this );
+	formLayout->addRow( tr( "&MDI mode:" ), m_mdi );
 	
 	m_buttons = new QDialogButtonBox( this );
 	m_buttons->addButton( QDialogButtonBox::Ok );
@@ -206,6 +209,7 @@ void PreferencesDialog::loadSettings( )
 			}
 		}
 	}
+	m_mdi->setChecked( prefs->mdi( ) );
 }
 
 void PreferencesDialog::apply( )
@@ -242,6 +246,7 @@ void PreferencesDialog::apply( )
 			prefs->setLocale( lang );
 		}
 	}
+	prefs->setMdi( m_mdi->isChecked( ) );
 	
 	prefs->storeSettings( );
 

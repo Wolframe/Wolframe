@@ -86,6 +86,7 @@ void MainWindow::readSettings( )
 	} else {
 		m_language = prefs->locale( );
 	}
+	m_mdi = prefs->mdi( );
 }
 
 static DebugTerminal *debugTerminal = 0;

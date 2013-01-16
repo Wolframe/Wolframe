@@ -47,6 +47,7 @@
 		QComboBox *m_locale;
 		QCheckBox *m_systemLanguage;
 		QStringList m_languages;
+		QCheckBox *m_mdi;
 	
 	signals:
 		void prefsChanged( );

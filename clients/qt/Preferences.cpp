@@ -71,6 +71,7 @@ void Preferences::loadSettings( )
 	m_uiFormResourcesDir = s->value( "wolframe/uiFormResourcesDir", DEFAULT_UI_FORM_RESOURCES_DIR ).toString( );
 	m_dataLoaderDir = s->value( "wolframe/dataLoaderDir", DEFAULT_DATA_LOADER_DIR ).toString( );
 	m_locale = s->value( "wolframe/locale", DEFAULT_LOCALE ).toString( );
+	m_mdi = s->value( "wolframe/mdi", false ).toBool( );
 	delete s;
 }
 
@@ -95,6 +96,7 @@ void Preferences::storeSettings( )
 	s->setValue( "wolframe/uiFormResourcesDir", m_uiFormResourcesDir );
 	s->setValue( "wolframe/dataLoaderDir", m_dataLoaderDir );
 	s->setValue( "wolframe/locale", m_locale );
+	s->setValue( "wolframe/mdi", m_mdi );
 	delete s;
 }
 
