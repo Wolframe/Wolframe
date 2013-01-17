@@ -101,8 +101,6 @@ all: MainWindowUi.hpp $(OBJS) $(CPP_BINS)
 I18NS = \
 	i18n\qtclient.de_CH.qm \
 	i18n\qtclient.ro_RO.qm \
-	i18n\MainWindow.de_CH.qm \
-	i18n\MainWindow.ro_RO.qm \
 	apps\test\i18n\init.de_CH.qm \
 	apps\test\i18n\init.ro_RO.qm \
 	apps\test\i18n\form1.de_CH.qm \
@@ -122,13 +120,6 @@ i18n\qtclient.de_CH.qm: i18n\qtclient.de_CH.ts
 
 i18n\qtclient.ro_RO.qm: i18n\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\qtclient.ro_RO.ts -qm i18n\qtclient.ro_RO.qm
-
-
-i18n\MainWindow.de_CH.qm: i18n\MainWindow.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe i18n\MainWindow.de_CH.ts -qm i18n\MainWindow.de_CH.qm
-
-i18n\MainWindow.ro_RO.qm: i18n\MainWindow.ro_RO.ts
-	$(QT_DIR)\bin\lrelease.exe i18n\MainWindow.ro_RO.ts -qm i18n\MainWindow.ro_RO.qm
 
 
 apps\test\i18n\init.de_CH.qm: apps\test\i18n\init.de_CH.ts

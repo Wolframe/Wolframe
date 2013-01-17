@@ -132,8 +132,6 @@ nice to do:
   on states of other widgets, best example is a checked group
   box for a bunch of settings, see preferences dialog)
 - add authentication dialog
-- language picker must show the union of all languages of all forms
-  and the languages/translations in themes
 - action/form switchForm:
   - need a small state machine for handling the sequence [{action}] <form>
     correctly with error handling

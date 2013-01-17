@@ -38,7 +38,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_languages( ), m_language( ), m_mdi( false )
 {
 // setup designer UI
-	setupUi( this );
+	m_ui.setupUi( this );
 	
 // read arguments for the '-s <setting file>' parameter
 	parseArgs( );
@@ -335,6 +335,7 @@ void MainWindow::finishInitialize( )
 // set default language to the system language
 	m_currentLanguage = m_language;
 
+// create central widget, either as MDI area or as one form widget
 	if( m_mdi ) {
 		m_mdiArea = findChild<QMdiArea *>( "centralWidget" );
 		if( m_mdiArea ) {
@@ -465,21 +466,43 @@ void MainWindow::authenticationFailed( )
 
 void MainWindow::loadLanguages( )
 {
-// get the list of available languages
+// get the list of available languages in the forms
 	m_formLoader->initiateGetLanguageCodes( );
 }
 
 void MainWindow::languageCodesLoaded( QStringList languages )
 {
+	QStringList languageCodes;
+	languageCodes.push_back( DEFAULT_LOCALE ); // default locale, always around
+	
+// read list of supported languages based on the qtclient translations
+	QDir translationDir( "i18n" );
+	translationDir.setFilter( QDir::Files | QDir::NoDotAndDotDot );
+	translationDir.setSorting( QDir::Name );
+	QStringList filters;
+	filters << "*.qm";
+	translationDir.setNameFilters( filters );
+	QStringList localeFiles = translationDir.entryList( );
+	QMutableStringListIterator it( localeFiles );
+	while( it.hasNext( ) ) {
+		it.next( );
+		QStringList parts = it.value( ).split( "." );
+		languageCodes.push_back( parts[1] );		
+	}
+	
+// add the ones supported in forms
+	languageCodes.append( languages );
+	languageCodes.removeDuplicates( );		
+
 // remember languages for preferences dialog
-	m_languages = languages;
+	m_languages = languageCodes;
 
 // construct a menu showing all languages
 	QMenu *languageMenu = qFindChild<QMenu *>( this, "menuLanguages" );
 	languageMenu->clear( );
 	QActionGroup *languageGroup = new QActionGroup( languageMenu );
 	languageGroup->setExclusive( true );
-	foreach( QString language, languages ) {
+	foreach( QString language, m_languages ) {
 		QLocale myLocale( language );
 		QAction *action = new QAction( myLocale.languageToString( myLocale.language( ) ) + " (" + language + ")", languageGroup );
 		action->setCheckable( true );
@@ -503,47 +526,52 @@ void MainWindow::languageSelected( QAction *action )
 		loadLanguage( language );
 }
 
+void MainWindow::switchTranslator( QTranslator &translator, const QString &filename, const QString &i18n )
+{
+	qApp->removeTranslator( &translator );
+	
+	if( translator.load( filename, i18n ) ) {
+		qApp->installTranslator( &translator );
+	} else {
+		qWarning( ) << "Error while loading translations for" << filename << "from directory" << i18n;
+	}
+}
+
 void MainWindow::loadLanguage( QString language )
 {
 	qDebug( ) << "Switching interface language to " << language;
 
-// get list of all translators currently floating around and delete them
-	const QList<QTranslator *> oldTranslators( findChildren<QTranslator *>( ) );
-	foreach( QTranslator *translator, oldTranslators ) {
-		QCoreApplication::instance( )->removeTranslator( translator );
-	}
-	qDeleteAll( oldTranslators );
-
-// this it the default language, bail out as no translations are necessary
-	if( language == DEFAULT_LOCALE ) {
-		m_currentLanguage = language;
-		return;
-	}
-
-// install new ones, first the ones of the theme, then the ones of the current form
-// all other forms will reinstall the correct language when called again
-	QTranslator *translator = new QTranslator( this );
-	if( language != "en_US" ) {
-		if( !translator->load( "qtclient." + language, "i18n" ) ) {
-			qCritical( ) << "Error while loading translations for qtclient for locale " << language;
-		}
-		QCoreApplication::instance( )->installTranslator( translator );
-
-		translator = new QTranslator( this );
-		if( !translator->load( "MainWindow." + language, "i18n" ) ) {
-			qCritical( ) << "Error while loading translations for locale " << language;
-		}
-		QCoreApplication::instance( )->installTranslator( translator );
-	}
-	
-// retranslate myself
-	retranslateUi( this );
-
+// change language on global level
+	switchTranslator( m_translatorApp, QString( "qtclient.%1.qm" ).arg( language ), "i18n" );
+	switchTranslator( m_translatorQt, QString( "qt_%1.qm" ).arg( language ), "/usr/share/qt/translations/" );
+        
 // also set language of the form widget
 	if( m_formWidget )
 		m_formWidget->loadLanguage( language );
 
 	m_currentLanguage = language;
+}
+
+void MainWindow::changeEvent( QEvent* _event )
+{
+	if( _event ) {
+		switch( _event->type( ) ) {
+			
+			case QEvent::LanguageChange:
+				m_ui.retranslateUi( this );
+				break;
+
+			case QEvent::LocaleChange:
+			{
+				QString locale = QLocale::system( ).name( );
+				locale.truncate( locale.lastIndexOf( '_' ) );
+				loadLanguage( locale );
+			}
+			break;
+		}
+	}
+
+	QMainWindow::changeEvent( _event );
 }
 
 void MainWindow::loadForm( QString name )

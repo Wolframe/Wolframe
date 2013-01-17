@@ -167,8 +167,6 @@ THEMES = \
 I18NS = \
 	i18n/qtclient.de_CH.qm \
 	i18n/qtclient.ro_RO.qm \
-	i18n/MainWindow.de_CH.qm \
-	i18n/MainWindow.ro_RO.qm \
 	apps/test/i18n/init.de_CH.qm \
 	apps/test/i18n/init.ro_RO.qm \
 	apps/test/i18n/form1.de_CH.qm \
@@ -221,9 +219,8 @@ run: local_all $(CPP_BINS)
 
 .PHONY: buildi18n
 buildi18n:
-	$(QT_LUPDATE) -extensions hpp,cpp . -ts i18n/qtclient.de_CH.ts
-	$(QT_LUPDATE) i18n/MainWindow.ui -ts i18n/MainWindow.de_CH.ts
-	$(QT_LUPDATE) i18n/MainWindow.ui -ts i18n/MainWindow.ro_RO.ts
+	$(QT_LUPDATE) -extensions hpp,cpp,ui . -ts i18n/qtclient.de_CH.ts
+	$(QT_LUPDATE) -extensions hpp,cpp,ui . -ts i18n/qtclient.ro_RO.ts
 	$(QT_LUPDATE) apps/test/forms/init.ui -ts apps/test/i18n/init.de_CH.ts
 	$(QT_LUPDATE) apps/test/forms/init.ui -ts apps/test/i18n/init.ro_RO.ts
 	$(QT_LUPDATE) apps/test/forms/form1.ui -ts apps/test/i18n/form1.de_CH.ts

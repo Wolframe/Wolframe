@@ -10,6 +10,8 @@
 #include <QMdiArea>
 #include <QMainWindow>
 #include <QtUiTools>
+#include <QTranslator>
+#include <QEvent>
 
 #include "global.hpp"
 #include "FormLoader.hpp"
@@ -20,7 +22,7 @@
 #include "LoadMode.hpp"
 #include "MainWindowUi.hpp"
 
-class MainWindow : public QMainWindow, Ui::MainWindow
+class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
@@ -29,6 +31,9 @@ class MainWindow : public QMainWindow, Ui::MainWindow
 		virtual ~MainWindow( );		
 			
 	private:
+		Ui::MainWindow m_ui;		// ui definition from designer
+		QTranslator m_translatorApp;	// contains the translations for this application
+		QTranslator m_translatorQt; 	// contains the translations for qt
 		QCommandLine *m_cmdline;	// command line parser	
 		FormWidget *m_formWidget;	// current active form
 		QUiLoader *m_uiLoader;		// the UI loader for all forms
@@ -67,6 +72,12 @@ class MainWindow : public QMainWindow, Ui::MainWindow
 		void loadLanguages( );
 		void loadForm( QString formName );
 		void loadLanguage( QString language );
+		
+	protected:
+		void changeEvent( QEvent *_event );
+	
+	private:
+		void switchTranslator( QTranslator &translator, const QString &filename, const QString &i18n );
 
 	private slots:
 // slots for command line parsing

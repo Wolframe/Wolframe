@@ -245,9 +245,6 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 		}
 		QCoreApplication::instance( )->installTranslator( translator );
 	}
-
-// not busy anymore
-	qApp->restoreOverrideCursor( );	
 }
 
 QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )
@@ -347,9 +344,6 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 			m_signalMapper->setMapping( pushButton, widgetProps );
 		}
 	}
-
-// not busy anymore
-	qApp->restoreOverrideCursor( );
 
 // create properties
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
