@@ -530,11 +530,14 @@ void MainWindow::loadLanguage( QString language )
 		QCoreApplication::instance( )->installTranslator( translator );
 
 		translator = new QTranslator( this );
-		if( !translator->load( "MainWindow." + language, "themes/windows" ) ) {
+		if( !translator->load( "MainWindow." + language, "i18n" ) ) {
 			qCritical( ) << "Error while loading translations for locale " << language;
 		}
 		QCoreApplication::instance( )->installTranslator( translator );
 	}
+	
+// retranslate myself
+	retranslateUi( this );
 
 // also set language of the form widget
 	if( m_formWidget )
