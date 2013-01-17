@@ -171,13 +171,9 @@ public:
 				LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
 				// Initiate graceful connection closure.
 				setTimeout( 0 );
-				if ( socket().lowest_layer().is_open() )	{
-					boost::system::error_code ignored_ec;
-					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
-					socket().lowest_layer().close();
-				}
 				unregister();
-				LOG_DEBUG << "Connection to " << identifier() << " closed";
+				m_strand.post( boost::bind( &ConnectionBase::handleShutdown,
+							    this->shared_from_this() ));
 				break;
 			}
 
@@ -319,6 +315,22 @@ protected:
 		nextOperation();
 	}
 	// handleSignal function end
+
+	/// Handle connection shutdown
+	void handleShutdown()
+	{
+		setTimeout( 0 );
+		if ( socket().lowest_layer().is_open() )	{
+			boost::system::error_code ignored_ec;
+			socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+			socket().lowest_layer().close();
+			LOG_DEBUG << "Connection to " << identifier() << " closed";
+		}
+		else	{
+			LOG_DEBUG << "Connection to " << identifier() << " already closed";
+		}
+	}
+	// handleShutdown function end
 };
 
 }} // namespace _Wolframe::net

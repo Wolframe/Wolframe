@@ -49,7 +49,8 @@ namespace net	{
 
 server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandler )
 	: m_threadPoolSize( conf->threads ),
-	  m_IOservicePool( conf->threads ),
+	  m_IOservicePool( 1 ),
+//	  m_IOservicePool( conf->threads ),
 	  m_globalList( conf->maxConnections )
 {
 	int i = 0;
