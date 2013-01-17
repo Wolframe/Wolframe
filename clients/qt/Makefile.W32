@@ -101,8 +101,8 @@ all: MainWindowUi.hpp $(OBJS) $(CPP_BINS)
 I18NS = \
 	i18n\qtclient.de_CH.qm \
 	i18n\qtclient.ro_RO.qm \
-	themes\windows\MainWindow.de_CH.qm \
-	themes\windows\MainWindow.ro_RO.qm \
+	i18n\MainWindow.de_CH.qm \
+	i18n\MainWindow.ro_RO.qm \
 	apps\test\i18n\init.de_CH.qm \
 	apps\test\i18n\init.ro_RO.qm \
 	apps\test\i18n\form1.de_CH.qm \
@@ -124,11 +124,11 @@ i18n\qtclient.ro_RO.qm: i18n\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\qtclient.ro_RO.ts -qm i18n\qtclient.ro_RO.qm
 
 
-themes\windows\MainWindow.de_CH.qm: themes\windows\MainWindow.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe themes\windows\MainWindow.de_CH.ts -qm themes\windows\MainWindow.de_CH.qm
+i18n\MainWindow.de_CH.qm: i18n\MainWindow.de_CH.ts
+	$(QT_DIR)\bin\lrelease.exe i18n\MainWindow.de_CH.ts -qm i18n\MainWindow.de_CH.qm
 
-themes\windows\MainWindow.ro_RO.qm: themes\windows\MainWindow.ro_RO.ts
-	$(QT_DIR)\bin\lrelease.exe themes\windows\MainWindow.ro_RO.ts -qm themes\windows\MainWindow.ro_RO.qm
+i18n\MainWindow.ro_RO.qm: i18n\MainWindow.ro_RO.ts
+	$(QT_DIR)\bin\lrelease.exe i18n\MainWindow.ro_RO.ts -qm i18n\MainWindow.ro_RO.qm
 
 
 apps\test\i18n\init.de_CH.qm: apps\test\i18n\init.de_CH.ts
@@ -210,8 +210,8 @@ moc_StorageWidget.cpp: StorageWidget.hpp
 moc_FormChooseDialog.cpp: FormChooseDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
 	
-MainWindowUi.hpp: themes\windows\MainWindow.ui
-	$(QT_DIR)\bin\uic -o MainWindowUi.hpp themes\windows\MainWindow.ui
+MainWindowUi.hpp: MainWindow.ui
+	$(QT_DIR)\bin\uic -o MainWindowUi.hpp MainWindow.ui
 
 MainWindow.hpp: MainWindowUi.hpp
 qtclient.cpp: MainWindow.hpp
@@ -258,8 +258,8 @@ run: local_all $(CPP_BINS) copy_prereq
 
 buildi18n:
 	$(QT_DIR)\bin\lupdate.exe) -extensions hpp,cpp . -ts i18n\qtclient.de_CH.ts
-	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.de_CH.ts
-	$(QT_DIR)\bin\lupdate.exe themes\windows\MainWindow.ui -ts themes\windows\qtclient.ro_RO.ts
+	$(QT_DIR)\bin\lupdate.exe i18n\MainWindow.ui -ts i18n\qtclient.de_CH.ts
+	$(QT_DIR)\bin\lupdate.exe i18n\MainWindow.ui -ts i18n\qtclient.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\init.ui -ts apps\test\i18n\init.de_CH.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\init.ui -ts apps\test\i18n\init.ro_RO.ts
 	$(QT_DIR)\bin\lupdate.exe apps\test\forms\form1.ui -ts apps\test\i18n\form1.de_CH.ts
@@ -277,8 +277,6 @@ zip:
 	-del /s /q C:\qtclient\*
 	-rmdir C:\qtclient\images
 	-rmdir C:\qtclient\i18n
-	-rmdir C:\qtclient\themes\windows
-	-rmdir C:\qtclient\themes
 	-rmdir C:\qtclient\apps\configurator\private
 	-rmdir C:\qtclient\apps\configurator\certs
 	-rmdir C:\qtclient\apps\configurator\data
@@ -293,8 +291,6 @@ zip:
 	mkdir C:\qtclient\images
 	mkdir C:\qtclient\apps
 	mkdir C:\qtclient\apps\configurator
-	mkdir C:\qtclient\themes
-	mkdir C:\qtclient\themes\windows
 	mkdir C:\qtclient\i18n
 	mkdir C:\qtclient\imageformats
 	copy qtclient.exe C:\qtclient
@@ -307,7 +303,6 @@ zip:
 	copy "$(OPENSSL_DIR)\bin\ssleay32.dll" C:\qtclient
 	copy plugins\wolframewidgets.dll C:\qtclient
 	copy images\*.png C:\qtclient\images
-	xcopy /e themes\windows C:\qtclient\themes\windows
 	xcopy /e i18n C:\qtclient\i18n
 	xcopy /e apps\configurator C:\qtclient\apps\configurator
 	copy C:\windows\system32\msvcp100d.dll C:\qtclient
