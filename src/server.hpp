@@ -51,33 +51,6 @@
 namespace _Wolframe {
 namespace net	{
 
-class io_service_pool
-	:private boost::noncopyable
-{
-public:
-	explicit io_service_pool( std::size_t pool_size)
-		:m_io_service_cnt(0)
-	{
-		if (pool_size == 0) throw std::logic_error( "illegal size of io service pool");
-		for (std::size_t ii=0; ii<pool_size; ++ii)
-		{
-			m_io_services.push_back( io_service_ptr( new boost::asio::io_service()));
-		}
-	}
-
-	boost::asio::io_service& get()
-	{
-		return *m_io_services[ m_io_service_cnt++ % m_io_services.size()];
-	}
-private:
-	typedef boost::shared_ptr<boost::asio::io_service> io_service_ptr;
-	//[PF:NOTE] No mutex here because it is only important that every thread picks one io service
-	//		and not if two thread share an io service.
-	std::vector<io_service_ptr> m_io_services;	//< array of io services
-	std::size_t m_io_service_cnt;			//< next element to pick with get
-};
-
-
 class server: private boost::noncopyable
 {
 	/// public interface
@@ -101,10 +74,8 @@ private:
 	/// The number of threads that will call io_service::run().
 	std::size_t		m_threadPoolSize;
 
-	///[PF:NOTE] Changed IO Service to a pool of objects with the intention that every thread
-	//		gets only one IO service to fetch events from.
 	/// The io_service(s) used to perform asynchronous operations.
-	io_service_pool		m_IOservicePool;
+	boost::asio::io_service	m_IOservice;
 
 	/// The list(s) of connection acceptors.
 	std::list< acceptor* >	m_acceptors;
