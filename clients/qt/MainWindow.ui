@@ -145,10 +145,16 @@
    <property name="text">
     <string>&amp;Open form..</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionOpenFormNewWindow">
    <property name="text">
     <string>Open form in &amp;new window..</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
  </widget>

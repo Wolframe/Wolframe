@@ -420,7 +420,7 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 
 	} else {
 		// send regular request	for the form
-		m_dataLoader->request( m_form, QString( ), xml, props );
+		m_dataLoader->request( QString::number( (int)winId( ) ), m_form, QString( ), xml, props );
 	}
 }
 

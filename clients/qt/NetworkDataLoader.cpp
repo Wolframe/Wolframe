@@ -19,8 +19,10 @@ NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient, bool _deb
 		this, SLOT( gotError( QString ) ) );
 }
 
-void NetworkDataLoader::request( QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props )
+void NetworkDataLoader::request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props )
 {
+	qDebug( ) << "NETWORK REQUEST" << windowName << formName << widgetName;
+	
 	if( !props->contains( "doctype" ) ) {
 		qCritical( ) << "FATAL: request impossible without 'doctype' for form " << formName << " and widget " << widgetName;
 		return;
@@ -38,19 +40,19 @@ void NetworkDataLoader::request( QString formName, QString widgetName, QByteArra
 
 	QString action = props->value( "action" );
 	if( action == "create" ) {
-		handleCreate( formName, xml, props );
+		handleCreate( windowName, formName, xml, props );
 	} else if( action == "read" ) {
 		if( widgetName.isEmpty( ) ) {
-			handleRead( formName, props );
+			handleRead( windowName, formName, props );
 		} else {
-			handleDomainDataLoad( formName, widgetName, props );
+			handleDomainDataLoad( windowName, formName, widgetName, props );
 		}
 	} else if( action == "update" ) {
-		handleUpdate( formName, xml, props );
+		handleUpdate( windowName, formName, xml, props );
 	} else if( action == "delete" ) {
-		handleDelete( formName, props );
+		handleDelete( windowName, formName, props );
 	} else {
-		qCritical( ) << "ERROR: unknown action for for form " << formName << " and widget " << widgetName;
+		qCritical( ) << "ERROR: unknown action for window" << windowName << "for form " << formName << " and widget " << widgetName;
 		return;
 	}	
 }
@@ -92,7 +94,7 @@ QString NetworkDataLoader::mapDoctype( QString action, bool domain, QString docT
 	return QString( );
 }
 
-void NetworkDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, QString> *props )
+void NetworkDataLoader::handleCreate( QString windowName, QString name, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "network request:\n" << xml;
 	
@@ -106,15 +108,15 @@ void NetworkDataLoader::handleCreate( QString name, QByteArray xml, QHash<QStrin
 	m_wolframeClient->request( mapAction( action ), xml );
 }
 
-void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props )
+void NetworkDataLoader::handleRead( QString windowName, QString name, QHash<QString, QString> *props )
 {
 	QString rootElement = props->value( "rootelement" );
 	QString docType = props->value( "doctype" );
 	QByteArray data;
 	QXmlStreamWriter xml( &data );
 	
-	// pretty-printing only in debug mode (because of superfluous
-	// white spaces sent to server)
+// pretty-printing only in debug mode (because of superfluous
+// white spaces sent to server)
 	if( m_debug ) {
 		xml.setAutoFormatting( true );
 		xml.setAutoFormattingIndent( 2 );
@@ -147,7 +149,7 @@ void NetworkDataLoader::handleRead( QString name, QHash<QString, QString> *props
 
 }
 
-void NetworkDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, QString> *props )
+void NetworkDataLoader::handleUpdate( QString windowName, QString name, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "network request:\n" << xml;
 	
@@ -162,15 +164,15 @@ void NetworkDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QStrin
 	m_wolframeClient->request( mapAction( action ), xml );
 }
 
-void NetworkDataLoader::handleDelete( QString name, QHash<QString, QString> *props )
+void NetworkDataLoader::handleDelete( QString windowName, QString name, QHash<QString, QString> *props )
 {
 	QString rootElement = props->value( "rootelement" );
 	QString docType = props->value( "doctype" );
 	QByteArray data;
 	QXmlStreamWriter xml( &data );
 
-	// pretty-printing only in debug mode (because of superfluous
-	// white spaces sent to server)
+// pretty-printing only in debug mode (because of superfluous
+// white spaces sent to server)
 	if( m_debug ) {
 		xml.setAutoFormatting( true );
 		xml.setAutoFormattingIndent( 2 );
@@ -202,15 +204,15 @@ void NetworkDataLoader::handleDelete( QString name, QHash<QString, QString> *pro
 	m_wolframeClient->request( mapAction( action ), data );
 }
 
-void NetworkDataLoader::handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> *props )
+void NetworkDataLoader::handleDomainDataLoad( QString windowName, QString formName, QString widgetName, QHash<QString, QString> *props )
 {
 	QString rootElement = props->value( "rootelement" );
 	QString docType = props->value( "doctype" );
 	QByteArray data;
 	QXmlStreamWriter xml( &data );
 
-	// pretty-printing only in debug mode (because of superfluous
-	// white spaces sent to server)
+// pretty-printing only in debug mode (because of superfluous
+// white spaces sent to server)
 	if( m_debug ) {
 		xml.setAutoFormatting( true );
 		xml.setAutoFormattingIndent( 2 );

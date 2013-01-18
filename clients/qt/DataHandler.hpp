@@ -29,7 +29,7 @@ class DataHandler : public QObject
 		void resetFormData( QWidget *form );
 		void resetFormData( QWidget *form, QString name );
 		void clearFormData( QWidget *form, QString name );
-		void clearFormData( QWidget *form, QWidget *widget, QString name );
+		void clearWidgetData( QWidget *widget, QString name );
 		void loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data, QHash<QString, QString> *props );
 		void loadFormDomains( QString name, QWidget *form );
 		void loadFormDomains( QString form_name, QWidget *form, QString name );
@@ -37,7 +37,7 @@ class DataHandler : public QObject
 
 	private:
 		void writeWidgets( QWidget *_parent, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *set );
-		void resetFormData( QWidget *form, QWidget *widget, QString name );
+		void resetWidgetData( QWidget *widget, QString name );
 		void loadFormDomains( QString form_name, QWidget *form, QWidget *widget, QString name );
 	
 	private:

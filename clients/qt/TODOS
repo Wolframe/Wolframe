@@ -77,9 +77,6 @@ musts:
   - picture viewer
     - show 0 to N pictures, scrollable
     - alternative to QTableWidget approach
-- localize forms:
-  - Windows doesn't retranslate on the fly! Why?
-  - Windows doesn't respect language on startup for form
 - localize data:
   - lists and trees need id and translations.
   - where to store the translations? server side, same as domains,

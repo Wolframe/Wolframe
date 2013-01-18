@@ -514,11 +514,6 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 	connect( languageGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( languageSelected( QAction * ) ) );
 }
 
-void MainWindow::formListLoaded( QStringList forms )
-{
-	m_forms = forms;
-}
-
 void MainWindow::languageSelected( QAction *action )
 {
 	QString language = action->data( ).toString( );
@@ -572,6 +567,11 @@ void MainWindow::changeEvent( QEvent* _event )
 	}
 
 	QMainWindow::changeEvent( _event );
+}
+
+void MainWindow::formListLoaded( QStringList forms )
+{
+	m_forms = forms;
 }
 
 void MainWindow::loadForm( QString name )

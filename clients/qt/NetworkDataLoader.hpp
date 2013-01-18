@@ -20,14 +20,14 @@ class NetworkDataLoader : public DataLoader
 		NetworkDataLoader( WolframeClient *_wolframeClient, bool _debug = false );
 		virtual ~NetworkDataLoader( ) {};
 
-		virtual void request( QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props );
+		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props );
 
 	private:
-		void handleCreate( QString name, QByteArray data, QHash<QString, QString> *props );
-		void handleRead( QString name, QHash<QString, QString> *props );
-		void handleUpdate( QString name, QByteArray data, QHash<QString, QString> *props );
-		void handleDelete( QString name, QHash<QString, QString> *props );
-		void handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> *props );
+		void handleCreate( QString windowName, QString name, QByteArray data, QHash<QString, QString> *props );
+		void handleRead( QString windowName, QString name, QHash<QString, QString> *props );
+		void handleUpdate( QString windowName, QString name, QByteArray data, QHash<QString, QString> *props );
+		void handleDelete( QString windowName, QString name, QHash<QString, QString> *props );
+		void handleDomainDataLoad( QString windowName, QString formName, QString widgetName, QHash<QString, QString> *props );
 		QString mapAction( QString action );
 		QString mapDoctype( QString action, bool domain, QString docType );
 		
