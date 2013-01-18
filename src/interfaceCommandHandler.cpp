@@ -76,21 +76,6 @@ struct STM :public cmdbind::LineCommandHandlerSTMTemplate<InterfaceCommandHandle
 };
 static STM stm;
 
-// *MBa*
-// Commented out as it is not used for now and the compiler complains
-//
-//static unsigned long getNumber( const char* aa)
-//{
-//	unsigned long result = 0;
-//	for (int ii=0; aa[ii] <= '9' && aa[0] >= '0'; ++ii)
-//	{
-//		unsigned long xx = result * 10 + aa[0] - '0';
-//		if (xx < result) throw std::runtime_error( "number out of range");
-//		result = xx;
-//	}
-//	return result;
-//}
-
 InterfaceCommandHandler::InterfaceCommandHandler( const std::list<std::string>& roles_, bool adminInterface_)
 	:cmdbind::LineCommandHandlerTemplate<InterfaceCommandHandler>( &stm, (std::size_t)(adminInterface_?User:Admin))
 	,m_roles(roles_)
