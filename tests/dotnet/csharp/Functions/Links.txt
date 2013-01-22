@@ -31,6 +31,7 @@ Articles:
 	* COM interface inheritance for binding to .NET: http://social.msdn.microsoft.com/forums/en-US/csharpgeneral/thread/7313191a-10db-4a16-9cdd-de9fb80b378a/
 		NOTE: This article points also out the interface only export from .NET to COM interop
 	* Registration free COM/.NET interop: http://blogs.msdn.com/b/junfeng/archive/2006/05/17/registration-free-com-net-interop.aspx
+	* Continuous Integration with Visual C++ and COM: http://martinfowler.com/articles/ciWithCom.html
 
 Code Examples:
 	* Passing Parameters from native C++ to .NET:  http://blogs.msdn.com/b/gpalem/archive/2007/06/18/having-hard-time-marshalling-parameters-from-c-to-net.aspx?Redirected=true

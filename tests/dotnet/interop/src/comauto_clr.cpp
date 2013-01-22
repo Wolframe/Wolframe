@@ -5,7 +5,8 @@
 #pragma comment(lib,"MSCorEE.lib") 
 #import "mscorlib.tlb" raw_interfaces_only \
 high_property_prefixes("_get","_put","_putref") \
-rename("ReportEvent",  "InteropServices_ReportEvent")
+rename("ReportEvent",  "InteropServices_ReportEvent") \
+rename("value",  "InteropServices_value")
 
 using namespace mscorlib;
 
