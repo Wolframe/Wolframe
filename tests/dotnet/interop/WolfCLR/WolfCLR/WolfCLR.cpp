@@ -11,8 +11,8 @@ int _tmain( int argc, _TCHAR* argv[])
 {
 	try
 	{
-		//comauto::TypeLib typelib( "C:\\Users\\patrick\\Projects\\Wolframe\\Functions.tlb");
-		//typelib.print( std::cout);
+		comauto::TypeLib typelib( "C:\\Users\\patrick\\Projects\\Wolframe\\Functions.tlb");
+		typelib.print( std::cout);
 		comauto::CommonLanguageRuntime clr;
 		std::wstring asmname( L"C:\\Users\\patrick\\Documents\\Visual Studio 2010\\Projects\\Functions\\Functions\\bin\\Release\\Functions.dll");
 		std::wstring classname( L"Functions");
