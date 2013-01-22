@@ -3,13 +3,17 @@ Tutorials:
 	* COM Interop:  http://msdn.microsoft.com/en-us/library/aa645736(v=vs.71).aspx
 		NOTE: Read this first and use the glossaries as references
 
-Glossaries:
+Glossary and Microsoft Documentation:
 	* MSDN (COM): http://msdn.microsoft.com/en-us/library/windows/desktop/hh309494(v=vs.85).aspx
 	* MSDN (COM Automation): http://msdn.microsoft.com/en-us/library/windows/desktop/ms221375(v=vs.85).aspx
 	* MSDN (COM Interop VARIANT - The Unified Datatype for APIs): http://msdn.microsoft.com/en-us/library/ms221627(v=vs.85).aspx
 	* MSDN (COM Interface Defintions and Type Libraries): http://msdn.microsoft.com/en-us/library/windows/desktop/aa367061%28v=vs.85%29.aspx
 	* MSDN ATL helpers (smart pointers etc.): http://msdn.microsoft.com/en-us/library/awt7k7f5(v=vs.80).aspx
 		NOTE: Careful about dependencies. We have to check if we can link against ATL or not
+	* MSDN About #import: http://msdn.microsoft.com/en-us/library/8etzzkb6%28VS.71%29.aspx
+	* MSDN Error Codes: http://blogs.msdn.com/b/eldar/archive/2007/04/03/a-lot-of-hresult-codes.aspx
+	* GAC: http://en.wikipedia.org/wiki/Global_Assembly_Cache
+
 Books:
 	* Inside COM+: http://www.thrysoee.dk/InsideCOM+
 		NOTE: Chapter Creating a TypeLibrary: http://www.thrysoee.dk/InsideCOM+/ch09b.htm 

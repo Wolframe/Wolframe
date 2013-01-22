@@ -7,20 +7,20 @@
 #include "comauto_clr.hpp"
 #include <iostream>
 
-int _tmain( int argc, _TCHAR* argv[])
+int main( int argc, const char* argv[])
 {
 	try
 	{
-		comauto::TypeLib typelib( "C:\\Users\\patrick\\Projects\\Wolframe\\Functions.tlb");
+		WRAP( ::CoInitializeEx( NULL, COINIT_MULTITHREADED))
+		std::string path( "C:\\Users\\patrick\\Projects\\Wolframe\\tests\\dotnet\\csharp\\Functions\\bin\\Release\\");
+		comauto::TypeLib typelib( path + "Functions.tlb");
 		typelib.print( std::cout);
 		comauto::CommonLanguageRuntime clr;
-		std::wstring asmname( L"C:\\Users\\patrick\\Documents\\Visual Studio 2010\\Projects\\Functions\\Functions\\bin\\Release\\Functions.dll");
-		std::wstring classname( L"Functions");
-		std::wstring methodname( L"Add");
+
 		std::vector<VARIANT> param;
 		param.push_back( comauto::createVariantType( (int)13));
 		param.push_back( comauto::createVariantType( (int)2));
-		VARIANT RESULT = clr.call( asmname, classname, methodname, param);
+		VARIANT RESULT = clr.call( path + "Functions.dll", "Functions", "Add", param);
 	}
 	catch (const std::exception& e)
 	{

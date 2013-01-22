@@ -158,6 +158,7 @@ You are welcome to add support for CParameters class to accept more types. For s
 
 URL:
 https://cfx.svn.codeplex.com/svn/Visual%20Studio%202010/CppHostCLR/RuntimeHostV4.cpp
+http://blogs.msdn.com/b/gpalem/archive/2007/06/18/having-hard-time-marshalling-parameters-from-c-to-net.aspx?Redirected=true
 
 CODE:
 /****************************** Module Header ******************************\
@@ -356,7 +357,7 @@ HRESULT RuntimeHostV4Demo1(PCWSTR pszVersion, PCWSTR pszAssemblyName,
 
     // Load the .NET assembly.
     wprintf(L"Load the assembly %s\n", pszAssemblyName);
-    hr = spDefaultAppDomain->(bstrAssemblyName, &spAssembly);
+    hr = spDefaultAppDomain->Load_2(bstrAssemblyName, &spAssembly);
     if (FAILED(hr))
     {
         wprintf(L"Failed to load the assembly w/hr 0x%08lx\n", hr);
@@ -637,104 +638,4 @@ Cleanup:
 
     return hr;
 }
-
------------------------------------------------------------------------------------------------------
-URL:
-http://msdn.microsoft.com/en-us/magazine/cc163567.aspx
-DESCRIPTION:
-CLR Hosting APIs
-
-URL:
-http://msdn.microsoft.com/en-us/library/windows/desktop/ms221039(v=vs.85).aspx
-DESCRIPTION:
-IRecordInfo interface (Automation)
-
-URL:
-http://msdn.microsoft.com/en-us/library/e305240e-9e11-4006-98cc-26f4932d2118(VS.85)
-DESCRIPTION:
-VARIANT structure
-
-URL:
-http://msdn.microsoft.com/en-us/library/windows/desktop/ms221378(v=vs.85).aspx
-DESCRIPTION:
-IRecordInfo PutField Method
-
-URL:
-https://github.com/patthoyts/optcl
-DESCRIPTION:
-Project implementing OLE/COM support for Tcl/tk
-EXAMPLE:
-https://github.com/patthoyts/optcl/blob/master/optcl/word.tcl
-
-URL:
-http://msdn.microsoft.com/en-us/library/aa913233.aspx
-DESCRIPTION:
-Automation Structures
-
-URL:
-http://social.msdn.microsoft.com/Forums/en-US/vcgeneral/thread/a80fc5b8-6f78-4ce7-9497-e2d5a2d3bcf4
-DESCRIPTION:
-Get data from SAVEARRAY
-
-URL:
-http://msdn.microsoft.com/en-us/library/windows/desktop/aa367061%28v=vs.85%29.aspx
-DESCRIPTION:
-Interface Definition Language (extract form definitions Windows)
-
-URL:
-http://code.msdn.microsoft.com/windowsdesktop/CppHostCLR-e6581ee0
-DESCRIPTION:
-Another version of the example above of hosting CLR and call .NET (GetStringLength etc..)
-
-URL:
-http://limbioliong.wordpress.com/2011/09/25/using-a-vt_record-variant-in-managed-code-part-1/
-DESCRIPTION:
-Passing VT_RECORD from unmanaged code to managed code and back
-
-URL:
-http://www.codeproject.com/Articles/42319/Using-NET-Classes-Modules-from-Native-C
-DESCRIPTION:
-Using NET Classes Modules from Native C++
-
-URL:
-http://cxxreflect.seaplusplus.com/
-DESCRIPTION:
-CxxReflect library
-
-URL:
-http://www.roblocher.com/whitepapers/oletypes.aspx
-DESCRIPTION:
-About COM Datatypes: SAVEARRAY,VARIANT,etc..
-
-URL:
-http://msdn.microsoft.com/en-us/library/bb676070.aspx
-DESCRIPTION:
-Tlbexp Helper Functions (Unmanaged API Reference)
-
-URL:
-http://jumbloid.blogspot.ch/2009/12/making-net-dll-com-visible.html
-DESCRIPTION:
-Tutorial: making net dll com visible
-
-URL:
-http://www.codeproject.com/Articles/12741/Tlbexp-exe-and-Regasm-exe-NET-FrameWork-Tools-Seri
-DESCRIPTION:
-About regasm and tlbexp
-
-URL:
-http://www.codeproject.com/Articles/13601/COM-in-plain-C
-DESCRIPTION:
-Jeff Glatt: COM in plain C
-
-URL:
-https://sites.google.com/site/jozsefbekes/Home/windows-programming/com-basics
-DESCRIPTION:
-Jozsef Bekes: COM basics
-
-URL:
-http://social.msdn.microsoft.com/forums/en-US/csharpgeneral/thread/7313191a-10db-4a16-9cdd-de9fb80b378a/
-DESCRIPTION:
-COM interface inheritance for binding to .NET
-
-
 

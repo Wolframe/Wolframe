@@ -91,4 +91,8 @@ VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, con
 	}
 }
 
+VARIANT comauto::CommonLanguageRuntime::call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, std::vector<VARIANT> args)
+{
+	return call( comauto::utf16string( assembly_utf8_), comauto::utf16string( class_utf8_), comauto::utf16string( method_utf8_), args);
+}
 
