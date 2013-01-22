@@ -64,8 +64,8 @@ class ConnectionBase : public boost::enable_shared_from_this< ConnectionBase< so
 {
 public:
 	/// Construct a connection with the given io_service.
-	explicit ConnectionBase( boost::asio::io_service& IOservice,
-				 ConnectionHandler* handler ) :
+	explicit ConnectionBase( boost::asio::io_service& IOservice, ConnectionHandler* handler ) :
+		m_IDnumber( 0 ),
 		m_strand( IOservice ),
 		m_connHandler( handler ),
 		m_timer( IOservice )
@@ -104,10 +104,11 @@ public:
 	const std::string& identifier()			{ return m_ID; }
 
 protected:
+	const unsigned long		m_IDnumber;
 	/// Connection identification string (i.e. remote endpoint)
 	std::string			m_ID;
 
-	/// Strand to ensure the connection's handlers are not called concurrently.
+	///< Strand to ensure the connection's handlers are not called concurrently.
 	boost::asio::io_service::strand	m_strand;
 
 	/// Pointer to the read buffer
@@ -143,8 +144,8 @@ public:
 										      this->shared_from_this(),
 										      boost::asio::placeholders::error,
 										      boost::asio::placeholders::bytes_transferred )));
-			}
 				break;
+			}
 
 			case NetworkOperation::WRITE:	{
 				LOG_TRACE << "Next operation: WRITE " << netOp.size() << " bytes to " << identifier();
@@ -163,20 +164,16 @@ public:
 							  m_strand.wrap( boost::bind( &ConnectionBase::handleWrite,
 										      this->shared_from_this(),
 										      boost::asio::placeholders::error )));
-			}
 				break;
+			}
 
 			case NetworkOperation::CLOSE:	{
 				LOG_TRACE << "Next operation: CLOSE connection to " << identifier();
 				// Initiate graceful connection closure.
 				setTimeout( 0 );
-				if ( socket().lowest_layer().is_open() )	{
-					boost::system::error_code ignored_ec;
-					socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
-					socket().lowest_layer().close();
-				}
 				unregister();
-				LOG_DEBUG << "Connection to " << identifier() << " closed";
+				m_strand.post( boost::bind( &ConnectionBase::handleShutdown,
+							    this->shared_from_this() ));
 				break;
 			}
 
@@ -318,6 +315,22 @@ protected:
 		nextOperation();
 	}
 	// handleSignal function end
+
+	/// Handle connection shutdown
+	void handleShutdown()
+	{
+		setTimeout( 0 );
+		if ( socket().lowest_layer().is_open() )	{
+			boost::system::error_code ignored_ec;
+			socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
+			socket().lowest_layer().close();
+			LOG_DEBUG << "Connection to " << identifier() << " closed";
+		}
+		else	{
+			LOG_DEBUG << "Connection to " << identifier() << " already closed";
+		}
+	}
+	// handleShutdown function end
 };
 
 }} // namespace _Wolframe::net

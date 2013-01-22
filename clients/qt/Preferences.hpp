@@ -15,9 +15,8 @@
 #define DEFAULT_DOMAIN "wolframe"
 #define DEFAULT_APP "qtclient"
 
-
-	class Preferences : public QObject
-	{
+class Preferences : public QObject
+{
 		Q_OBJECT
 		Q_ENUMS( LoadMode )
 		
@@ -69,11 +68,7 @@
 			Q_PROPERTY( LoadMode dataLoadMode READ dataLoadMode WRITE setDataLoadMode )
 			LoadMode dataLoadMode( ) const { return m_dataLoadMode; }
 			void setDataLoadMode( LoadMode _dataLoadMode ) { m_dataLoadMode = _dataLoadMode; }
-			
-			Q_PROPERTY( QString m_dbName READ dbName WRITE setDbName )
-			QString dbName( ) const { return m_dbName; }
-			void setDbName( QString _dbName ) { m_dbName = _dbName; }
-			
+						
 			Q_PROPERTY( bool debug READ debug WRITE setDebug )
 			bool debug( ) const { return m_debug; }
 			void setDebug( bool _debug ) { m_debug = _debug; }
@@ -97,6 +92,10 @@
 			Q_PROPERTY( QString locale READ locale WRITE setLocale )
 			QString locale( ) const { return m_locale; }
 			void setLocale( QString _locale ) { m_locale = _locale; }
+
+			Q_PROPERTY( bool mdi READ mdi WRITE setMdi )
+			bool mdi( ) const { return m_mdi; }
+			void setMdi( bool _mdi ) { m_mdi = _mdi; }
 			
 		private:
 			QSettings *createSettings( );
@@ -117,14 +116,13 @@
 			QString m_CACertFile;
 			LoadMode m_uiLoadMode;
 			LoadMode m_dataLoadMode;
-			QString m_dbName;
 			bool m_debug;
 			QString m_uiFormsDir;
 			QString m_uiFormTranslationsDir;
 			QString m_uiFormResourcesDir;
 			QString m_dataLoaderDir;
 			QString m_locale;
-	};
-	
+			bool m_mdi;
+};	
 
 #endif // _PREFERENCES_HPP_INCLUDED

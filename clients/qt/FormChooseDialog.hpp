@@ -8,7 +8,7 @@
 #include <QDialog>
 #include <QPushButton>
 #include <QDialogButtonBox>
-#include <QComboBox>
+#include <QListWidget>
 #include <QStringList>
 #include <QKeyEvent>
 
@@ -20,7 +20,7 @@ class FormChooseDialog : public QDialog
 		FormChooseDialog( const QStringList _formNames, QWidget *_parent = 0 );
 	
 	private:
-		QComboBox *m_forms;
+		QListWidget *m_forms;
 		QDialogButtonBox* m_buttons;
 		QStringList m_formNames;
 		QString m_form;

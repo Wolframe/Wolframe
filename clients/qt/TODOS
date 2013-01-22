@@ -10,19 +10,19 @@ now:
   - can be provoked by using non-debug XML sending and textwolf XML filter
     on Windows XP, so it is a failed signal for a partial line, must add
     a state like DataLeft (Data gets DataReading or so)
-- [PF:FIXED] More bugs on FreeBSD with textwolf filter:
-  - ERROR: error calling function 'CategoryFeatureListRequest':[configurator]:446: error in function 'input:table()' (parsed untagged value, but no untagged value is defined for this structure (
-  - _ string after the CategoryFeature tag in simpleform solves the problem, but feels wrong!
-  - <CategoryFeature category_id="1" id="1"/> but
-     <category id="1"/> works, rest the same?!
 - ILLEGAL STATE 4 in dataAvailable!
 - MDI interface
-  - have many forms in parallel
+  - open forms via click on button
+  - close forms on click on button
   - reload forms from other forms
-- ERROR: error in sqlite database transaction: missing result for command (NONEMPTY) __selectFeature_0
-  ERROR: error calling function 'FeatureRequest':[configurator]:166: error in function '<formfunction>(..)' (transaction failed: missing result for command (NONEMPTY) __selectFeature_0)
-  ERROR: Error calling procedure: lua call failed
-  ERROR: error in execution of REQUEST FeatureRequest:lua call failed
+  - some wiring trouble in datahandler:
+    CRITICAL: ERROR: answer for unknown request of doctype "xxx": most likely the
+    formwidgets share the same datahandler and the signals are missed, its list and hierarchy
+    requests, so it's the domain filler.
+    It happens only if the same form is picked as already shown in another window
+    => not implementable without tagging in the protocol! map of doctype in protocol back
+    is not possible, we must be able to encode window id, widget id and map it to a tag in
+    the protocol
 
 musts:
 - open info box (modal) in feature/category/component edit and add to
@@ -77,9 +77,6 @@ musts:
   - picture viewer
     - show 0 to N pictures, scrollable
     - alternative to QTableWidget approach
-- localize forms:
-  - Windows doesn't retranslate on the fly! Why?
-  - Windows doesn't respect language on startup for form
 - localize data:
   - lists and trees need id and translations.
   - where to store the translations? server side, same as domains,
@@ -131,10 +128,7 @@ nice to do:
 - states (enable/disabled, read/write or read/only) can depend
   on states of other widgets, best example is a checked group
   box for a bunch of settings, see preferences dialog)
-- stop flickering in hour glas
 - add authentication dialog
-- language picker must show the union of all languages of all forms
-  and the languages/translations in themes
 - action/form switchForm:
   - need a small state machine for handling the sequence [{action}] <form>
     correctly with error handling

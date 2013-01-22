@@ -49,13 +49,12 @@ namespace net	{
 
 server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandler )
 	: m_threadPoolSize( conf->threads ),
-	  m_IOservicePool( conf->threads ),
 	  m_globalList( conf->maxConnections )
 {
 	int i = 0;
 	for ( std::list<ServerTCPendpoint>::const_iterator it = conf->address.begin();
 	      it != conf->address.end(); it++ )	{
-		acceptor* acptr = new acceptor( m_IOservicePool.get(),
+		acceptor* acptr = new acceptor( m_IOservice,
 						it->host(), it->port(), it->maxConnections(),
 						m_globalList,
 						serverHandler );
@@ -67,7 +66,7 @@ server::server( const Configuration* conf, _Wolframe::ServerHandler& serverHandl
 	i = 0;
 	for ( std::list<ServerSSLendpoint>::const_iterator it = conf->SSLaddress.begin();
 	      it != conf->SSLaddress.end(); it++ )	{
-		SSLacceptor* acptr = new SSLacceptor( m_IOservicePool.get(),
+		SSLacceptor* acptr = new SSLacceptor( m_IOservice,
 						      it->certificate(), it->key(),
 						      it->verifyClientCert(),
 						      it->CAchain(), it->CAdirectory(),
@@ -109,7 +108,7 @@ void server::run()
 	std::size_t					i;
 
 	for ( i = 0; i < m_threadPoolSize; i++ )	{
-		boost::shared_ptr<boost::thread> thread( new boost::thread( boost::bind( &boost::asio::io_service::run, &m_IOservicePool.get())));
+		boost::shared_ptr<boost::thread> thread( new boost::thread( boost::bind( &boost::asio::io_service::run, &m_IOservice ) ));
 		threads.push_back( thread );
 	}
 	LOG_TRACE << i << " network server thread(s) started";
@@ -119,9 +118,7 @@ void server::run()
 		threads[i]->join();
 
 	// Reset io_services.
-	for ( i = 0; i < m_threadPoolSize; i++ )	{
-		m_IOservicePool.get().reset();
-	}
+	m_IOservice.reset();
 }
 
 /// Stop the server i.e. notify acceptors to stop
@@ -149,9 +146,7 @@ void server::abort()
 {
 	LOG_DEBUG << "Network server received an abort request";
 	// Reset io_services.
-	for ( std::size_t i = 0; i < m_threadPoolSize; i++ )	{
-		m_IOservicePool.get().reset();
-	}
+	m_IOservice.reset();
 }
 
 }} // namespace _Wolframe::net

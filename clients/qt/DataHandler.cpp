@@ -169,18 +169,18 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 		} else if( clazz == "QTableWidget" ) {
 			QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
 			QList<QTableWidgetItem *> items = tableWidget->selectedItems( );
-			QSet<QString> seen;
+			QSet<QString> itemSeen;
 			foreach( QTableWidgetItem *item, items ) {
 				// hard-coded! should be key/value as user attributes!
 				QString id = item->data( Qt::UserRole ).toString( );
 				if( !id.isNull( ) ) {
 					// HACK: only first row, otherwise we get duplicates
-					if( !seen.contains( id ) ) {
+					if( !itemSeen.contains( id ) ) {
 						xml.writeStartElement( "", name );
 						xml.writeAttribute( "id", id );
 						xml.writeCharacters( item->data( Qt::UserRole ).toString( ) );
 						xml.writeEndElement( );
-						seen.insert( id );
+						itemSeen.insert( id );
 					}
 				}
 			}
@@ -258,11 +258,12 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 void DataHandler::clearFormData( QWidget *form, QString name )
 {
 	QWidget *widget = form->findChild<QWidget *>( name );
-
-	clearFormData( form, widget, name );
+	
+	if( widget )
+		clearWidgetData( widget, name );
 }
 
-void DataHandler::clearFormData( QWidget *form, QWidget *widget, QString name )
+void DataHandler::clearWidgetData( QWidget *widget, QString name )
 {
 	QString clazz = widget->metaObject( )->className( );
 	
@@ -336,10 +337,11 @@ void DataHandler::resetFormData( QWidget *form, QString name )
 {
 	QWidget *widget = form->findChild<QWidget *>( name );
 	
-	resetFormData( form, widget, name );
+	if( widget )
+		resetWidgetData( widget, name );
 }
 
-void DataHandler::resetFormData( QWidget *form, QWidget *widget, QString name )
+void DataHandler::resetWidgetData( QWidget *widget, QString name )
 {
 	QString clazz = widget->metaObject( )->className( );
 
@@ -453,7 +455,7 @@ void DataHandler::resetFormData( QWidget *form )
 			continue;
 		}
 
-		resetFormData( form, widget, name );
+		resetWidgetData( widget, name );
 	}
 }
 
@@ -473,14 +475,15 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *wi
 	FormWidget::readDynamicStringProperties( props, widget );
 	m_formWidget->restoreFromGlobals( props );
 	props->insert( "action", "read" );
+	QString window_name = QString::number( (int)m_formWidget->winId( ) );
 	if( clazz == "QComboBox" ) {
-		m_dataLoader->request( form_name, name, QByteArray( ), props );
+		m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
 	} else if( clazz == "QListWidget" ) {
-		m_dataLoader->request( form_name, name, QByteArray( ), props );
+		m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
 	} else if( clazz == "QTreeWidget" ) {
-		m_dataLoader->request( form_name, name, QByteArray( ), props );
+		m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
 	} else if( clazz == "QTableWidget" ) {
-		m_dataLoader->request( form_name, name, QByteArray( ), props );
+		m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
 	} else {
 		// all other classes don't load domains, but we want to keep
 		// the calling code generic..

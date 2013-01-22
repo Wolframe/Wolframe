@@ -12,9 +12,9 @@ FileDataLoader::FileDataLoader( QString dir ) : m_dir( dir )
 {
 }
 
-void FileDataLoader::request( QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props )
+void FileDataLoader::request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props )
 {
-	qDebug( ) << "Request" << formName << widgetName << *props;
+	qDebug( ) << "Request" << windowName << formName << widgetName << *props;
 	
 // nothing to do	
 	if( !props->contains( "action" ) ) {

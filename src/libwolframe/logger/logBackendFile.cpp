@@ -30,7 +30,6 @@
  Project Wolframe.
 
 ************************************************************************/
-
 ///
 /// \file logBackend.cpp
 /// \brief implementation of the logger which logs to a simple logfile
@@ -45,48 +44,48 @@
 #endif // defined( _WIN32 )
 
 namespace _Wolframe {
-	namespace log {
+namespace log {
 
 LogfileBackend::LogfileBackend( )
 {
-	logLevel_ = LogLevel::LOGLEVEL_UNDEFINED;
-	isOpen_ = false;
+	m_logLevel = LogLevel::LOGLEVEL_UNDEFINED;
+	m_isOpen = false;
 	// we can't open the logfile here, wait for setFilename
 }
 
 LogfileBackend::~LogfileBackend( )
 {
-	if( isOpen_ ) {
-		logFile_.close( );
+	if( m_isOpen ) {
+		m_logFile.close( );
 	}
 }
 
 void LogfileBackend::setLevel( const LogLevel::Level level_ )
 {
-	logLevel_ = level_;
+	m_logLevel = level_;
 }
 
 void LogfileBackend::setFilename( const std::string filename )
 {
-	filename_ = filename;
+	m_filename = filename;
 	reopen( );
 }
 
 void LogfileBackend::reopen( )
 {
-	if( isOpen_ ) {
-		logFile_.close( );
-		isOpen_ = false;
+	if( m_isOpen ) {
+		m_logFile.close( );
+		m_isOpen = false;
 	}
 
-	logFile_.exceptions( logFile_.badbit | logFile_.failbit );
+	m_logFile.exceptions( m_logFile.badbit | m_logFile.failbit );
 
 	try {
-		logFile_.open( filename_.c_str( ), std::ios_base::app );
-		isOpen_ = true;
+		m_logFile.open( m_filename.c_str( ), std::ios_base::app );
+		m_isOpen = true;
 	} catch( const std::ofstream::failure& ) {
-		isOpen_ = false;
-		LOG_CRITICAL	<< "Can't open logfile '" << filename_ << "'";
+		m_isOpen = false;
+		LOG_CRITICAL	<< "Can't open logfile '" << m_filename << "'";
 		// TODO: e.what() displays "basic_ios::clear" always, how to get
 		// decent error messages here? I fear the C++ standard doesn't
 		// help here..
@@ -125,12 +124,11 @@ static inline std::string timestamp( void )
 
 void LogfileBackend::log( const LogLevel::Level _level, const std::string& msg )
 {
-	if( _level >= logLevel_ && isOpen_ ) {
-		logFile_	<< timestamp( ) << " "
+	if( _level >= m_logLevel && m_isOpen ) {
+		m_logFile	<< timestamp( ) << " "
 				<< _level << ": " << msg << std::endl;
-		logFile_.flush( );
+		m_logFile.flush( );
 	}
 }
 
-	} // namespace log
-} // namespace _Wolframe
+}} // namespace _Wolframe::log

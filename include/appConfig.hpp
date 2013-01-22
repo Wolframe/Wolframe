@@ -85,8 +85,9 @@ public:
 	static ConfigFileType fileType( const char *filename, ConfigFileType type );
 
 	bool parseModules( const char *filename, ConfigFileType type );
-	std::list<std::string>& moduleList()
+	const std::list< std::string >& moduleList() const
 						{ return m_modFiles; }
+	const std::string& moduleFolder() const	{ return m_modFolder; }
 
 	void addModules( const module::ModulesDirectory* modules )
 						{ m_modDir = modules; }
@@ -107,7 +108,8 @@ private:
 	ConfigFileType				m_type;
 	std::vector< ConfigurationBase* >	m_conf;
 	std::map< std::string, std::size_t >	m_section;
-	std::list<std::string>			m_modFiles;
+	std::string				m_modFolder;
+	std::list< std::string >		m_modFiles;
 
 	const module::ModulesDirectory*		m_modDir;
 public:

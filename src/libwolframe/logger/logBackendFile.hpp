@@ -61,12 +61,12 @@ public:
 
 	void log( const LogLevel::Level level, const std::string& msg );
 
-	LogLevel::Level level() const	{ return logLevel_; }
+	LogLevel::Level level() const	{ return m_logLevel; }
 private:
-	LogLevel::Level logLevel_;
-	std::ofstream logFile_;
-	std::string filename_;
-	bool isOpen_;
+	LogLevel::Level	m_logLevel;
+	std::ofstream	m_logFile;
+	std::string	m_filename;
+	bool		m_isOpen;
 };
 
 }} // namespace _Wolframe::log

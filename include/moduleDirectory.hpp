@@ -106,7 +106,8 @@ private:
 };
 
 
-bool LoadModules( ModulesDirectory& modDir, const std::list< std::string >& modFiles );
+bool LoadModules( ModulesDirectory& modDir, const std::list< std::string >& modFiles,
+		  const std::string& modFolder = "" );
 
 
 }} // namespace _Wolframe::module

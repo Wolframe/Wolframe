@@ -204,9 +204,6 @@ void FormWidget::loadForm( QString name )
 
 //	if( name == m_form ) return;
 	
-// indicate busy state
-	qApp->setOverrideCursor( Qt::BusyCursor );
-
 	m_previousForm = m_form;
 	m_form = name;
 
@@ -217,9 +214,6 @@ void FormWidget::loadForm( QString name )
 
 void FormWidget::loadLanguage( QString language )
 {
-// indicate busy state
-	qApp->setOverrideCursor( Qt::BusyCursor );
-
 	m_locale = QLocale( language );
 	
 	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
@@ -251,9 +245,6 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 		}
 		QCoreApplication::instance( )->installTranslator( translator );
 	}
-
-// not busy anymore
-	qApp->restoreOverrideCursor( );	
 }
 
 QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )
@@ -354,9 +345,6 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		}
 	}
 
-// not busy anymore
-	qApp->restoreOverrideCursor( );
-
 // create properties
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
 	readDynamicStringProperties( props, m_ui );
@@ -432,7 +420,7 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 
 	} else {
 		// send regular request	for the form
-		m_dataLoader->request( m_form, QString( ), xml, props );
+		m_dataLoader->request( QString::number( (int)winId( ) ), m_form, QString( ), xml, props );
 	}
 }
 

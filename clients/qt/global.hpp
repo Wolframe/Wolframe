@@ -9,7 +9,6 @@
 #define ORGANIZATION_DOMAIN "wolframe.org"
 #define APPLICATION_NAME "qtclient"
 
-#define DEFAULT_SQLITE_FILENAME "./data.db"
 #define DEFAULT_UI_FORMS_DIR "."
 #define DEFAULT_UI_FORM_TRANSLATIONS_DIR "."
 #define DEFAULT_UI_FORM_RESOURCES_DIR "."
@@ -23,8 +22,6 @@
 #define SYSTEM_LANGUAGE "SYSTEM"
 
 #define WOLFRAME_VERSION "0.0.1"
-
-#define SESSION_NAME "qtclient-db"
 
 #define DEFAULT_UILOADMODE LocalFile
 #define DEFAULT_DATALOADMODE Network

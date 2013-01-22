@@ -29,6 +29,8 @@ daemon code:
   - apache-like LoadModules, support for 'wolframe.d/libxml2.conf'
     and 'include wolframe.d/*.conf'
   - systemd instead of init scripts for Fedora and Archlinux
+  - wolframe depends on libicu48, this is wrong as boost-localization
+    should layer the functionality and icu is only a backend
 
 - documentation
   - man pages

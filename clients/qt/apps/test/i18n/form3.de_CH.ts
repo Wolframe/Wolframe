@@ -9,55 +9,60 @@
         <translation>Wolframe Client Formular 3</translation>
     </message>
     <message>
-        <location filename="../forms/form3.ui" line="26"/>
+        <location filename="../forms/form3.ui" line="17"/>
+        <source>read</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../forms/form3.ui" line="29"/>
         <source>Favorite Vegetable:</source>
         <translation>Lieblingsgemüse:</translation>
     </message>
     <message>
-        <location filename="../forms/form3.ui" line="38"/>
-        <location filename="../forms/form3.ui" line="90"/>
+        <location filename="../forms/form3.ui" line="41"/>
+        <location filename="../forms/form3.ui" line="93"/>
         <source>Pumpkin</source>
         <translation>Kürbis</translation>
     </message>
     <message>
-        <location filename="../forms/form3.ui" line="51"/>
-        <location filename="../forms/form3.ui" line="103"/>
+        <location filename="../forms/form3.ui" line="54"/>
+        <location filename="../forms/form3.ui" line="106"/>
         <source>Cucumber</source>
         <translation>Gurken</translation>
     </message>
     <message>
-        <location filename="../forms/form3.ui" line="64"/>
-        <location filename="../forms/form3.ui" line="116"/>
+        <location filename="../forms/form3.ui" line="67"/>
+        <location filename="../forms/form3.ui" line="119"/>
         <source>Carot</source>
         <translation>Karotten</translation>
     </message>
     <message>
-        <location filename="../forms/form3.ui" line="78"/>
+        <location filename="../forms/form3.ui" line="81"/>
         <source>Vegetables:</source>
         <translation>Gemüse:</translation>
     </message>
     <message>
-        <location filename="../forms/form3.ui" line="130"/>
+        <location filename="../forms/form3.ui" line="133"/>
         <source>senseless</source>
         <translation>sinnlos</translation>
     </message>
     <message>
-        <location filename="../forms/form3.ui" line="143"/>
+        <location filename="../forms/form3.ui" line="146"/>
         <source>Vegetarian</source>
         <translation type="unfinished">Vegetarier</translation>
     </message>
     <message>
-        <location filename="../forms/form3.ui" line="159"/>
+        <location filename="../forms/form3.ui" line="162"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="../forms/form3.ui" line="178"/>
+        <location filename="../forms/form3.ui" line="181"/>
         <source>Reset</source>
         <translation>Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../forms/form3.ui" line="188"/>
+        <location filename="../forms/form3.ui" line="191"/>
         <source>Cancel</source>
         <translation>Abbruch</translation>
     </message>

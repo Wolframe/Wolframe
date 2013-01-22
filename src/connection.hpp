@@ -170,7 +170,7 @@ class connection : public ConnectionBase< boost::asio::ip::tcp::socket >
 public:
 	/// Construct a connection with the given io_service.
 	explicit connection( boost::asio::io_service& IOservice,
-			     SocketConnectionList<connection_ptr>& connList,
+			     SocketConnectionList< connection_ptr >& connList,
 			     ConnectionHandler *handler );
 
 	~connection();
@@ -193,7 +193,7 @@ private:
 	boost::asio::ip::tcp::socket		m_socket;
 
 	/// List of connections to which it belongs
-	SocketConnectionList<connection_ptr>&	m_connList;
+	SocketConnectionList< connection_ptr >&	m_connList;
 };
 
 
@@ -208,7 +208,7 @@ public:
 	/// Construct a connection with the given io_service and SSL conetext.
 	explicit SSLconnection( boost::asio::io_service& IOservice,
 				boost::asio::ssl::context& SSLcontext,
-				SocketConnectionList<SSLconnection_ptr>& connList,
+				SocketConnectionList< SSLconnection_ptr >& connList,
 				ConnectionHandler *handler );
 
 	~SSLconnection();
@@ -221,7 +221,7 @@ public:
 
 	/// Unregister the connection from the list of active connections
 	void unregister()	{
-		m_connList.remove( boost::static_pointer_cast<SSLconnection>( shared_from_this()) );
+		m_connList.remove( boost::static_pointer_cast< SSLconnection >( shared_from_this()) );
 	}
 
 	std::string toString() const;
@@ -234,7 +234,7 @@ private:
 	ssl_socket				m_SSLsocket;
 
 	/// List of connections to which it belongs
-	SocketConnectionList<SSLconnection_ptr>& m_connList;
+	SocketConnectionList< SSLconnection_ptr >& m_connList;
 };
 
 #endif // WITH_SSL

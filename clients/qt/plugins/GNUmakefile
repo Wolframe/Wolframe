@@ -15,7 +15,6 @@ INCLUDE_DIRS = \
 	-I.. \
 	-Ifilechooser \
 	-Ipicturechooser \
-	-Iformwidget \
 	-I$(QT_INCLUDE_DIR) \
 	-I$(QT_INCLUDE_DIR)/QtCore \
 	-I$(QT_INCLUDE_DIR)/QtGui \
@@ -67,7 +66,7 @@ picturechooser/moc_PictureChooserPlugin.cpp: picturechooser/PictureChooserPlugin
 	$(QT_MOC) $(MOC_FLAGS) picturechooser/PictureChooserPlugin.hpp -o picturechooser/moc_PictureChooserPlugin.cpp
 
 local_clean:
-	@-rm -f moc_*.cpp filechooser/moc_*.cpp picturechooser/moc_*.cpp formwidget/moc_*.cpp
+	@-rm -f moc_*.cpp filechooser/moc_*.cpp picturechooser/moc_*.cpp
 	@-rm -f Makefile
 
 local_distclean:
