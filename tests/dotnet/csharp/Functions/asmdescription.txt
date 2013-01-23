@@ -1,0 +1,7 @@
+Microsoft (R) .NET Global Assembly Cache Utility.  Version 3.5.30729.1
+Copyright (c) Microsoft Corporation.  All rights reserved.
+
+The Global Assembly Cache contains the following assemblies:
+  Functions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL
+
+Number of items = 1

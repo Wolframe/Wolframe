@@ -16,11 +16,11 @@ namespace comauto {
 class CommonLanguageRuntime
 {
 public:
-	explicit CommonLanguageRuntime();
+	explicit CommonLanguageRuntime( const std::string& version);
 	virtual ~CommonLanguageRuntime();
 
-	VARIANT call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, std::vector<VARIANT> args);
-	VARIANT call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, std::vector<VARIANT> args);
+	VARIANT call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, LONG argc, const VARIANT* argv);
+	VARIANT call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, LONG argc, const VARIANT* argv);
 
 private:
     ICLRMetaHost *m_metahost;

@@ -13,14 +13,13 @@ int main( int argc, const char* argv[])
 	{
 		WRAP( ::CoInitializeEx( NULL, COINIT_MULTITHREADED))
 		std::string path( "C:\\Users\\patrick\\Projects\\Wolframe\\tests\\dotnet\\csharp\\Functions\\bin\\Release\\");
+		std::string assembly( "Functions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
 		comauto::TypeLib typelib( path + "Functions.tlb");
 		typelib.print( std::cout);
-		comauto::CommonLanguageRuntime clr;
+		comauto::CommonLanguageRuntime clr( "v4.0.30319");
 
-		std::vector<VARIANT> param;
-		param.push_back( comauto::createVariantType( (int)13));
-		param.push_back( comauto::createVariantType( (int)2));
-		VARIANT RESULT = clr.call( path + "Functions.dll", "Functions", "Add", param);
+		VARIANT param[ 2] = {comauto::createVariantType( (int)13), comauto::createVariantType( (int)2)};
+		VARIANT RESULT = clr.call( assembly, "Functions", "Add", 2, param);
 	}
 	catch (const std::exception& e)
 	{

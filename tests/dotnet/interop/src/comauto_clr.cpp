@@ -18,10 +18,11 @@ comauto::CommonLanguageRuntime::~CommonLanguageRuntime()
     if (m_runtimehost) m_runtimehost->Release();
 }
 
-comauto::CommonLanguageRuntime::CommonLanguageRuntime()
+comauto::CommonLanguageRuntime::CommonLanguageRuntime( const std::string& version)
 	:m_metahost(0),m_runtimeinfo(0),m_runtimehost(0)
 {
-	PCWSTR clrversion = L"v4.0.30319";
+	std::wstring version_w( version.begin(), version.end());
+	PCWSTR clrversion = version_w.c_str();
 	try
 	{
 		WRAP( ::CLRCreateInstance( CLSID_CLRMetaHost, IID_PPV_ARGS( &m_metahost)))
@@ -45,7 +46,7 @@ comauto::CommonLanguageRuntime::CommonLanguageRuntime()
 	}
 }
 
-VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, std::vector<VARIANT> args)
+VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, LONG argc, const VARIANT* argv)
 {
     SAFEARRAY* methodArgs = NULL;
 	 IUnknownPtr spAppDomainThunk = NULL; 
@@ -68,15 +69,14 @@ VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, con
 		variant_t vtReturnVal; 
 		WRAP( spAssembly->CreateInstance(bstrClassName, &vtObject))
 
-		methodArgs = SafeArrayCreateVector(VT_VARIANT, 0, 1);
-		LONG aidx = 0;
-		std::vector<VARIANT>::const_iterator ai = args.begin(), ae = args.end();
-		for (; ai != ae; ++ai,++aidx)
+		methodArgs = ::SafeArrayCreateVector( VT_VARIANT, 0, argc);
+		for (LONG aidx=0; aidx != argc; ++aidx)
 		{
-			WRAP( ::SafeArrayPutElement( methodArgs, &aidx, &ae))
+			VARIANT vt = argv[aidx];
+			WRAP( ::SafeArrayPutElement( methodArgs, &aidx, &vt))
 		}
 
-		BindingFlags bindingFlags = static_cast<BindingFlags>( BindingFlags_InvokeMethod | BindingFlags_Static | BindingFlags_Public);
+		BindingFlags bindingFlags = static_cast<BindingFlags>( BindingFlags_InvokeMethod | BindingFlags_Instance | BindingFlags_Public);
 		WRAP( spType->InvokeMember_3( bstrMethodName, bindingFlags, NULL, vtObject, methodArgs, &vtReturnVal))
 
 		return vtReturnVal;
@@ -91,8 +91,8 @@ VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, con
 	}
 }
 
-VARIANT comauto::CommonLanguageRuntime::call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, std::vector<VARIANT> args)
+VARIANT comauto::CommonLanguageRuntime::call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, LONG argc, const VARIANT* argv)
 {
-	return call( comauto::utf16string( assembly_utf8_), comauto::utf16string( class_utf8_), comauto::utf16string( method_utf8_), args);
+	return call( comauto::utf16string( assembly_utf8_), comauto::utf16string( class_utf8_), comauto::utf16string( method_utf8_), argc, argv);
 }
 

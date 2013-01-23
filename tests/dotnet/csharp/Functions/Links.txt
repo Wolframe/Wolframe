@@ -1,45 +1,45 @@
 ﻿
 Tutorials:
-	* COM Interop:  http://msdn.microsoft.com/en-us/library/aa645736(v=vs.71).aspx
+	[T1] COM Interop:  http://msdn.microsoft.com/en-us/library/aa645736(v=vs.71).aspx
 		NOTE: Read this first and use the glossaries as references
 
 Glossary and Microsoft Documentation:
-	* MSDN (COM): http://msdn.microsoft.com/en-us/library/windows/desktop/hh309494(v=vs.85).aspx
-	* MSDN (COM Automation): http://msdn.microsoft.com/en-us/library/windows/desktop/ms221375(v=vs.85).aspx
-	* MSDN (COM Interop VARIANT - The Unified Datatype for APIs): http://msdn.microsoft.com/en-us/library/ms221627(v=vs.85).aspx
-	* MSDN (COM Interface Defintions and Type Libraries): http://msdn.microsoft.com/en-us/library/windows/desktop/aa367061%28v=vs.85%29.aspx
-	* MSDN ATL helpers (smart pointers etc.): http://msdn.microsoft.com/en-us/library/awt7k7f5(v=vs.80).aspx
+	[D01] MSDN (COM): http://msdn.microsoft.com/en-us/library/windows/desktop/hh309494(v=vs.85).aspx
+	[D02] MSDN (COM Automation): http://msdn.microsoft.com/en-us/library/windows/desktop/ms221375(v=vs.85).aspx
+	[D03] MSDN (COM Interop VARIANT - The Unified Datatype for APIs): http://msdn.microsoft.com/en-us/library/ms221627(v=vs.85).aspx
+	[D04] MSDN (COM Interface Defintions and Type Libraries): http://msdn.microsoft.com/en-us/library/windows/desktop/aa367061%28v=vs.85%29.aspx
+	[D05] MSDN ATL helpers (smart pointers etc.): http://msdn.microsoft.com/en-us/library/awt7k7f5(v=vs.80).aspx
 		NOTE: Careful about dependencies. We have to check if we can link against ATL or not
-	* MSDN About #import: http://msdn.microsoft.com/en-us/library/8etzzkb6%28VS.71%29.aspx
-	* MSDN Error Codes: http://blogs.msdn.com/b/eldar/archive/2007/04/03/a-lot-of-hresult-codes.aspx
-	* GAC: http://en.wikipedia.org/wiki/Global_Assembly_Cache
+	[D06] MSDN About #import: http://msdn.microsoft.com/en-us/library/8etzzkb6%28VS.71%29.aspx
+	[D07] MSDN Error Codes: http://blogs.msdn.com/b/eldar/archive/2007/04/03/a-lot-of-hresult-codes.aspx
+	[D08] GAC: http://en.wikipedia.org/wiki/Global_Assembly_Cache
 
 Books:
-	* Inside COM+: http://www.thrysoee.dk/InsideCOM+
+	[B01] Inside COM+: http://www.thrysoee.dk/InsideCOM+
 		NOTE: Chapter Creating a TypeLibrary: http://www.thrysoee.dk/InsideCOM+/ch09b.htm 
 
 Articles:
-	* CLR Hosting APIs (MSDN Magazine) http://msdn.microsoft.com/en-us/magazine/cc163567.aspx
-	* Using NET Classes Modules from Native C++: http://www.codeproject.com/Articles/42319/Using-NET-Classes-Modules-from-Native-C
-	* Jeff Glatt: COM in plain C: http://www.codeproject.com/Articles/13601/COM-in-plain-C
+	[A01] CLR Hosting APIs (MSDN Magazine) http://msdn.microsoft.com/en-us/magazine/cc163567.aspx
+	[A02] Using NET Classes Modules from Native C++: http://www.codeproject.com/Articles/42319/Using-NET-Classes-Modules-from-Native-C
+	[A03] Jeff Glatt: COM in plain C: http://www.codeproject.com/Articles/13601/COM-in-plain-C
 		NOTE: This article explains COM from the other side. How it is built internally. Nice article ! 
-	* Jozsef Bekes: COM basics: https://sites.google.com/site/jozsefbekes/Home/windows-programming/com-basics
-	* Inspecting COM Objects with Reflection: http://msdn.microsoft.com/en-us/magazine/dd347981.aspx
+	[A04] Jozsef Bekes: COM basics: https://sites.google.com/site/jozsefbekes/Home/windows-programming/com-basics
+	[A05] Inspecting COM Objects with Reflection: http://msdn.microsoft.com/en-us/magazine/dd347981.aspx
 		NOTE: Nice diagramms of the type relations
-	* About regasm and tlbexp: http://www.codeproject.com/Articles/12741/Tlbexp-exe-and-Regasm-exe-NET-FrameWork-Tools-Seri
+	[A06] About regasm and tlbexp: http://www.codeproject.com/Articles/12741/Tlbexp-exe-and-Regasm-exe-NET-FrameWork-Tools-Seri
 		NOTE: regasm has to be called with administrator privileges
-	* tlbexp helper functions: http://msdn.microsoft.com/en-us/library/bb676070.aspx
+	[A07] tlbexp helper functions: http://msdn.microsoft.com/en-us/library/bb676070.aspx
 		NOTE: If we could understand this API we might be able load programs defined as assembly references. Till now we have to reference the type library.
-	* Making net dll com visible: http://jumbloid.blogspot.ch/2009/12/making-net-dll-com-visible.html
+	[A08] Making net dll com visible: http://jumbloid.blogspot.ch/2009/12/making-net-dll-com-visible.html
 		NOTE: The information about the topic is wide spread around. From here I got the hint to declare interfaces for every method exported. Pure class members are not visible.
-	* COM interface inheritance for binding to .NET: http://social.msdn.microsoft.com/forums/en-US/csharpgeneral/thread/7313191a-10db-4a16-9cdd-de9fb80b378a/
+	[A09] COM interface inheritance for binding to .NET: http://social.msdn.microsoft.com/forums/en-US/csharpgeneral/thread/7313191a-10db-4a16-9cdd-de9fb80b378a/
 		NOTE: This article points also out the interface only export from .NET to COM interop
-	* Registration free COM/.NET interop: http://blogs.msdn.com/b/junfeng/archive/2006/05/17/registration-free-com-net-interop.aspx
-	* Continuous Integration with Visual C++ and COM: http://martinfowler.com/articles/ciWithCom.html
+	[A10] Registration free COM/.NET interop: http://blogs.msdn.com/b/junfeng/archive/2006/05/17/registration-free-com-net-interop.aspx
+	[A11] Continuous Integration with Visual C++ and COM: http://martinfowler.com/articles/ciWithCom.html
 
 Code Examples:
-	* Passing Parameters from native C++ to .NET:  http://blogs.msdn.com/b/gpalem/archive/2007/06/18/having-hard-time-marshalling-parameters-from-c-to-net.aspx?Redirected=true
-	* Project implementing OLE/COM support for Tcl/tk: https://github.com/patthoyts/optcl
-	* Example calling .NET from native C++ via CLR: http://code.msdn.microsoft.com/windowsdesktop/CppHostCLR-e6581ee0
+	[C01] Passing Parameters from native C++ to .NET:  http://blogs.msdn.com/b/gpalem/archive/2007/06/18/having-hard-time-marshalling-parameters-from-c-to-net.aspx?Redirected=true
+	[C02] Project implementing OLE/COM support for Tcl/tk: https://github.com/patthoyts/optcl
+	[C03] Example calling .NET from native C++ via CLR: http://code.msdn.microsoft.com/windowsdesktop/CppHostCLR-e6581ee0
 
 
