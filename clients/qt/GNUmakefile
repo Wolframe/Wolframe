@@ -22,7 +22,7 @@ INCLUDE_LDFLAGS = \
 	-L$(QT_LIB_DIR) \
 	$(QT_LDFLAGS) \
 	-Lplugins
-
+	
 INCLUDE_LIBS = \
 	-lQtCore -lQtGui -lQtUiTools -lQtNetwork -lQtXml \
 	-lwolframewidgets
@@ -76,8 +76,9 @@ CPP_OBJS = \
 	StorageWidget.o \
 	moc_StorageWidget.o \
 	FormChooseDialog.o \
-	moc_FormChooseDialog.o
-
+	moc_FormChooseDialog.o \
+	qtclientRes.o
+		
 CPP_BINS = \
 	qtclient$(EXE)
 
@@ -139,7 +140,7 @@ MainWindowUi.hpp: MainWindow.ui
 MainWindow.hpp: MainWindowUi.hpp
 qtclient.cpp: MainWindow.hpp
 
-qtclient$(EXE): $(CPP_OBJS) qtclient.o
+qtclient$(EXE): $(CPP_OBJS) qtclientRes.o qtclient.o
 
 FORMS = \
 	apps/test/forms/form1.ui \
@@ -163,6 +164,9 @@ THEMES = \
 
 %.rcc : %.qrc
 	$(QT_RCC) -binary $< -o $@
+	
+qtclientRes.cpp: qtclient.qrc
+	$(QT_RCC) -name qtclient $< -o $@
 
 I18NS = \
 	i18n/qtclient.de_CH.qm \
@@ -192,6 +196,7 @@ local_clean:
 	@-rm -f geany.c++.tags
 	@-rm -f Makefile
 	@-rm -f MainWindowUi.hpp
+	@-rm -f qtclientRes.cpp
 
 local_distclean:
 

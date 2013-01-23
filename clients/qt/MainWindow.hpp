@@ -114,6 +114,7 @@ class MainWindow : public QMainWindow
 		void on_actionDebugTerminal_triggered( bool checked );  
 		void on_actionOpenForm_triggered( );
 		void on_actionOpenFormNewWindow_triggered( );	
+		void on_actionReloadWindow( );
 };
 
 #endif // _MAIN_WINDOW_HPP_INCLUDED

@@ -345,12 +345,27 @@ void MainWindow::finishInitialize( )
 				this, SLOT( subWindowChanged( QMdiSubWindow * ) ) );
 				
 			QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( m_formWidget, Qt::FramelessWindowHint );
-			mdiSubWindow->setWindowState( Qt::WindowMaximized );
-			mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
-			m_mdiArea->tileSubWindows( );
-			mdiSubWindow->showMaximized( );
+//			mdiSubWindow->setWindowState( Qt::WindowMaximized );
+//			mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
+//			m_mdiArea->tileSubWindows( );
+//			mdiSubWindow->showMaximized( );
+			mdiSubWindow->show( );
+			
+			// connect some MDI specific signals to menu
+			QAction *action = findChild<QAction *>( "actionTile" );
+			if( action ) {
+				action->setEnabled( true );
+				connect( action, SIGNAL( triggered( ) ),
+					m_mdiArea, SLOT( tileSubWindows( ) ) );
+			}
+			action = findChild<QAction *>( "actionCascade" );
+			if( action ) {
+				action->setEnabled( true );
+				connect( action, SIGNAL( triggered( ) ),
+					m_mdiArea, SLOT( cascadeSubWindows( ) ) );
+			}
 		} else {
-			// missing a MDI aera, so add just one form widget as main entry widget
+			// missing a MDI araa, so add just one form widget as main entry widget
 			setCentralWidget( m_formWidget );
 		}
 	} else {
@@ -695,5 +710,9 @@ void MainWindow::subWindowChanged( QMdiSubWindow *w )
 	}
 
 	m_formWidget = qobject_cast<FormWidget *>( w->widget( ) );
+}
+
+void MainWindow::on_actionReloadWindow( )
+{
 }
 
