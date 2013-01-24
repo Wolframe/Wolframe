@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Manage Categories</string>
+   <string>Edit a category/feature link</string>
   </property>
   <property name="initAction" stdset="0">
    <string>read</string>

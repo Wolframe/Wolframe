@@ -301,6 +301,8 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 
 // add new form to layout (which covers the whole widget)
 	m_layout->addWidget( m_ui );
+	
+	setWindowTitle( m_ui->windowTitle( ) );
 
 	if( oldUi ) {
 		m_ui->move( oldUi->pos( ) );

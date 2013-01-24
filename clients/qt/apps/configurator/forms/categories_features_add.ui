@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Manage Categories</string>
+   <string>Add a category/feature link</string>
   </property>
   <property name="doctype" stdset="0">
    <string>CategoryFeatureRequest.simpleform</string>

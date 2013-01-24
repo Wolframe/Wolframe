@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Edit Customer</string>
   </property>
   <property name="initAction" stdset="0">
    <string>read</string>

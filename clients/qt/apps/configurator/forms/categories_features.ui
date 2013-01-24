@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Manage Categories</string>
+   <string>Link categories and features</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="5" column="0">

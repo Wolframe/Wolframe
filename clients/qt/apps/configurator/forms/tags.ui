@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Manage Tags</string>
+   <string>Picture tags</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="1">

@@ -615,10 +615,10 @@ void MainWindow::formLoaded( QString name )
 	if( m_mdi ) {
 		QMdiSubWindow *mdiSubWindow = m_mdiArea->activeSubWindow( );
 		if( mdiSubWindow ) {
-			mdiSubWindow->setWindowTitle( name );
+			mdiSubWindow->setWindowTitle( m_formWidget->windowTitle( ) );
 		}
 	} else {
-		setWindowTitle( tr( "Wolframe Qt Client - %1" ).arg( name ) );
+		setWindowTitle( tr( "Wolframe Qt Client - %1" ).arg( m_formWidget->windowTitle( ) ) );
 	}
 }
 
