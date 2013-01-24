@@ -36,15 +36,15 @@
      <height>19</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="menuConnection">
     <property name="title">
      <string>&amp;Connection</string>
     </property>
     <addaction name="separator"/>
-    <addaction name="action_Login"/>
-    <addaction name="action_logout"/>
+    <addaction name="actionLogin"/>
+    <addaction name="actionLogout"/>
     <addaction name="separator"/>
-    <addaction name="action_Manage_Servers"/>
+    <addaction name="actionManageServers"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -64,7 +64,7 @@
     <addaction name="separator"/>
     <addaction name="actionDebugTerminal"/>
    </widget>
-   <widget class="QMenu" name="menu_Edit">
+   <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>&amp;Edit</string>
     </property>
@@ -78,7 +78,7 @@
     <addaction name="separator"/>
     <addaction name="actionSelectAll"/>
    </widget>
-   <widget class="QMenu" name="menu_Window">
+   <widget class="QMenu" name="menuWindow">
     <property name="title">
      <string>&amp;Window</string>
     </property>
@@ -92,19 +92,19 @@
     <addaction name="actionTile"/>
     <addaction name="actionCascade"/>
     <addaction name="separator"/>
-    <addaction name="actionNext"/>
-    <addaction name="actionPrevious"/>
+    <addaction name="actionNextWindow"/>
+    <addaction name="actionPreviousWindow"/>
    </widget>
-   <widget class="QMenu" name="menu_File">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="action_Print"/>
+    <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionRestart"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menu_Settings">
+   <widget class="QMenu" name="menuSettings">
     <property name="title">
      <string>&amp;Settings</string>
     </property>
@@ -117,15 +117,28 @@
     <addaction name="actionPreferences"/>
     <addaction name="menuLanguages"/>
    </widget>
-   <addaction name="menu_File"/>
    <addaction name="menuFile"/>
-   <addaction name="menu_Edit"/>
-   <addaction name="menu_Settings"/>
-   <addaction name="menu_Window"/>
+   <addaction name="menuConnection"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuSettings"/>
+   <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QToolBar" name="toolBarConnection">
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLogin"/>
+   <addaction name="actionLogout"/>
+  </widget>
+  <widget class="QToolBar" name="toolBarEdit">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -145,13 +158,10 @@
    <addaction name="actionPaste"/>
    <addaction name="actionDelete"/>
    <addaction name="separator"/>
-   <addaction name="actionReloadWindow"/>
-   <addaction name="actionNext"/>
-   <addaction name="actionPrevious"/>
   </widget>
-  <widget class="QToolBar" name="toolBar_2">
+  <widget class="QToolBar" name="toolBarWindow">
    <property name="windowTitle">
-    <string>toolBar_2</string>
+    <string>toolBar</string>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -159,6 +169,9 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionReloadWindow"/>
+   <addaction name="actionPreviousWindow"/>
+   <addaction name="actionNextWindow"/>
   </widget>
   <action name="actionOpen">
    <property name="icon">
@@ -181,7 +194,7 @@
     <string>&amp;Exit</string>
    </property>
    <property name="toolTip">
-    <string>Exit</string>
+    <string>Exit the Wolframe client</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+X</string>
@@ -219,6 +232,9 @@
    <property name="text">
     <string>&amp;Preferences</string>
    </property>
+   <property name="toolTip">
+    <string>Configure application preferences</string>
+   </property>
   </action>
   <action name="actionManageStorage">
    <property name="text">
@@ -228,6 +244,9 @@
   <action name="actionRestart">
    <property name="text">
     <string>&amp;Restart</string>
+   </property>
+   <property name="toolTip">
+    <string>Restart the Wolframe client</string>
    </property>
   </action>
   <action name="actionOpenForm">
@@ -296,6 +315,9 @@
    <property name="text">
     <string>&amp;Reload Window</string>
    </property>
+   <property name="toolTip">
+    <string>Reload the active window</string>
+   </property>
    <property name="shortcut">
     <string>F5</string>
    </property>
@@ -307,6 +329,9 @@
    <property name="text">
     <string>&amp;Close</string>
    </property>
+   <property name="toolTip">
+    <string>Close the active window</string>
+   </property>
   </action>
   <action name="actionCloseAll">
    <property name="enabled">
@@ -314,6 +339,9 @@
    </property>
    <property name="text">
     <string>Close &amp;all</string>
+   </property>
+   <property name="toolTip">
+    <string>Close all the windows</string>
    </property>
   </action>
   <action name="actionTile">
@@ -323,6 +351,9 @@
    <property name="text">
     <string>&amp;Tile</string>
    </property>
+   <property name="toolTip">
+    <string>Tile the windows</string>
+   </property>
   </action>
   <action name="actionCascade">
    <property name="enabled">
@@ -331,8 +362,11 @@
    <property name="text">
     <string>&amp;Cascade</string>
    </property>
+   <property name="toolTip">
+    <string>Cascade the windows</string>
+   </property>
   </action>
-  <action name="actionNext">
+  <action name="actionNextWindow">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -350,7 +384,7 @@
     <string>Ctrl+Tab</string>
    </property>
   </action>
-  <action name="actionPrevious">
+  <action name="actionPreviousWindow">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -490,29 +524,59 @@
     <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="action_Login">
+  <action name="actionLogin">
+   <property name="icon">
+    <iconset resource="qtclient.qrc">
+     <normaloff>:/images/login.png</normaloff>:/images/login.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Login</string>
    </property>
+   <property name="toolTip">
+    <string>Login to a Wolframe server</string>
+   </property>
   </action>
-  <action name="action_logout">
+  <action name="actionLogout">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="qtclient.qrc">
+     <normaloff>:/images/logout.png</normaloff>:/images/logout.png</iconset>
+   </property>
    <property name="text">
     <string>L&amp;ogout</string>
    </property>
+   <property name="toolTip">
+    <string>Logout from the Wolframe server</string>
+   </property>
   </action>
-  <action name="action_Print">
+  <action name="actionPrint">
+   <property name="icon">
+    <iconset resource="qtclient.qrc">
+     <normaloff>:/images/print.png</normaloff>:/images/print.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Print</string>
    </property>
+   <property name="toolTip">
+    <string>Print current document</string>
+   </property>
   </action>
-  <action name="action_Manage_Servers">
+  <action name="actionManageServers">
    <property name="text">
     <string>&amp;Manage servers...</string>
+   </property>
+   <property name="toolTip">
+    <string>Manage the list of Wolframe servers</string>
    </property>
   </action>
   <action name="actionTest">
    <property name="text">
     <string>&amp;English</string>
+   </property>
+   <property name="iconText">
+    <string>English</string>
    </property>
   </action>
  </widget>

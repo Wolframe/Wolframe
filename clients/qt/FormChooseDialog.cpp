@@ -44,11 +44,7 @@ void FormChooseDialog::initialize( )
 
 void FormChooseDialog::keyPressEvent( QKeyEvent *_event )
 {
-	switch( _event->key( ) ) {
-		case Qt::Key_Escape:
-			_event->ignore( );
-			break;
-			
+	switch( _event->key( ) ) {			
 		case Qt::Key_Enter:
 		case Qt::Key_Return:
 			if( m_forms->hasFocus( ) ) {

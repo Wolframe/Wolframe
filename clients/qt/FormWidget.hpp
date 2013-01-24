@@ -16,6 +16,7 @@
 #include <QSignalMapper>
 #include <QLabel>
 #include <QHash>
+#include <QCloseEvent>
 
 class WidgetProperties : public QObject
 {
@@ -91,6 +92,10 @@ class FormWidget : public QWidget
 	signals:
 		void formLoaded( QString name );
 		void error( QString error );
+		void closed( );
+	
+	protected:
+		void closeEvent( QCloseEvent *e );
 
 	private slots:
 		void formLoaded( QString name, QByteArray form );

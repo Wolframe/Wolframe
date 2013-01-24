@@ -455,3 +455,9 @@ void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml
 		}
 	}
 }
+
+void FormWidget::closeEvent( QCloseEvent *e )
+{
+	emit closed( );
+	e->accept( );
+}

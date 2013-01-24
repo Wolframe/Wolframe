@@ -23,6 +23,10 @@ now:
     => not implementable without tagging in the protocol! map of doctype in protocol back
     is not possible, we must be able to encode window id, widget id and map it to a tag in
     the protocol
+  - resizing doesn't work on load of window
+- integrate from qWolfClient
+  - connection handling
+  - rewrite login/logout (simplify, not so asynchronous as now)
 
 musts:
 - open info box (modal) in feature/category/component edit and add to

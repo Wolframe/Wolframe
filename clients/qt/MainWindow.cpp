@@ -122,9 +122,13 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 
 MainWindow::~MainWindow( )
 {
-	if( m_formWidget ) {
-		delete m_formWidget;
-		m_formWidget = 0;
+	if( m_mdi ) {
+		m_mdiArea->closeAllSubWindows( );
+	} else {
+		if( m_formWidget ) {
+			delete m_formWidget;
+			m_formWidget = 0;
+		}
 	}
 	if( m_debugTerminal ) {
 		delete m_debugTerminal;
@@ -315,22 +319,12 @@ void MainWindow::initialize( )
 
 void MainWindow::finishInitialize( )
 {
-// create delegate widget for form handling (one for now), in theory may are possible
-	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
-
 // link the form loader for form loader notifications needed by the main window
 // (list of forms for form menu, list of language for language picker)
 	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
 		this, SLOT( languageCodesLoaded( QStringList ) ) );
 	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
 		this, SLOT( formListLoaded( QStringList ) ) );
-
-// get notified if the form widget changes a form
-	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
-		this, SLOT( formLoaded( QString ) ) );
-// errors in the form widget
-	connect( m_formWidget, SIGNAL( error( QString ) ),
-		this, SLOT( formError( QString ) ) );
 
 // set default language to the system language
 	m_currentLanguage = m_language;
@@ -339,19 +333,13 @@ void MainWindow::finishInitialize( )
 	if( m_mdi ) {
 		m_mdiArea = findChild<QMdiArea *>( "centralWidget" );
 		if( m_mdiArea ) {
-			m_mdiArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAsNeeded );
-			m_mdiArea->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded );
+// attach mdi area to some specific signals
+			m_mdiArea->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+			m_mdiArea->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 			connect( m_mdiArea, SIGNAL( subWindowActivated( QMdiSubWindow * ) ),
 				this, SLOT( subWindowChanged( QMdiSubWindow * ) ) );
-				
-			QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( m_formWidget, Qt::FramelessWindowHint );
-//			mdiSubWindow->setWindowState( Qt::WindowMaximized );
-//			mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
-//			m_mdiArea->tileSubWindows( );
-//			mdiSubWindow->showMaximized( );
-			mdiSubWindow->show( );
-			
-			// connect some MDI specific signals to menu
+							
+// connect some MDI specific signals to menu and toolbar
 			QAction *action = findChild<QAction *>( "actionTile" );
 			if( action ) {
 				action->setEnabled( true );
@@ -364,27 +352,44 @@ void MainWindow::finishInitialize( )
 				connect( action, SIGNAL( triggered( ) ),
 					m_mdiArea, SLOT( cascadeSubWindows( ) ) );
 			}
+
+// default is tiling (TODO: remeber position, forms and sizes of open windows)
+			m_mdiArea->tileSubWindows( );
+
+// create initial sub window (TODO: remeber position, forms and sizes of open windows)
+			CreateMdiSubWindow( "init" );
 		} else {
-			// missing a MDI araa, so add just one form widget as main entry widget
+// missing a MDI araa, so add just one form widget as main entry widget
+			m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
+
+			connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+				this, SLOT( formLoaded( QString ) ) );
+			connect( m_formWidget, SIGNAL( error( QString ) ),
+				this, SLOT( formError( QString ) ) );
+
 			setCentralWidget( m_formWidget );
+			m_mdi = false;
 		}
 	} else {
+// non-MDI mode, open one form
+		m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
+
+		connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+			this, SLOT( formLoaded( QString ) ) );
+		connect( m_formWidget, SIGNAL( error( QString ) ),
+			this, SLOT( formError( QString ) ) );
+		
 		setCentralWidget( m_formWidget );
 	}
 
 // make debug action available
-	if( !m_debug ) {
-		QAction *action = findChild<QAction *>( "actionDebugTerminal" );
-		if( action ) {
-			action->setEnabled( false );
-		}
-	}
+	activateAction( "actionDebugTerminal", m_debug );
+
+// update menus and toolbars
+	updateMenusAndToolbars( );
 
 // enable open forms in new window in MDI mode
-	QAction *action = findChild<QAction *>( "actionOpenFormNewWindow" );
-	if( action ) {
-		action->setEnabled( m_mdi );
-	}
+	activateAction( "actionOpenFormNewWindow", m_mdi );
 
 // now that we have a menu where we can add things, we start the form list loading
 	m_formLoader->initiateListLoad( );
@@ -691,23 +696,34 @@ void MainWindow::on_actionOpenForm_triggered( )
 	}
 }
 
+void MainWindow::CreateMdiSubWindow( const QString form )
+{
+	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
+
+	connect( formWidget, SIGNAL( formLoaded( QString ) ),
+		this, SLOT( formLoaded( QString ) ) );
+	connect( formWidget, SIGNAL( error( QString ) ),
+		this, SLOT( formError( QString ) ) );
+	connect( formWidget,SIGNAL( destroyed( ) ),
+		this, SLOT( updateMenusAndToolbars( ) ) );
+
+	QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( formWidget );
+	mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
+
+	formWidget->show( );
+	loadForm( form );
+
+	mdiSubWindow->resize( mdiSubWindow->sizeHint( ) );
+}
+
 void MainWindow::on_actionOpenFormNewWindow_triggered( )
 {
 	FormChooseDialog d( m_forms, this );
 	if( d.exec( ) == QDialog::Accepted ) {
-		FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
-		connect( formWidget, SIGNAL( formLoaded( QString ) ),
-			this, SLOT( formLoaded( QString ) ) );
-		connect( formWidget, SIGNAL( error( QString ) ),
-			this, SLOT( formError( QString ) ) );
-
-		QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( formWidget );
-		mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
-
-		QString form = d.form( );
-		formWidget->show( );
-		loadForm( form );
+		CreateMdiSubWindow( d.form( ) );
 	}
+
+	updateMenusAndToolbars( );
 }
 
 void MainWindow::subWindowChanged( QMdiSubWindow *w )
@@ -724,3 +740,56 @@ void MainWindow::on_actionReloadWindow_triggered( )
 	m_formWidget->reload( );
 }
 
+void MainWindow::on_actionNextWindow_triggered( )
+{
+	if( m_mdi )
+		m_mdiArea->activateNextSubWindow( );
+}
+
+void MainWindow::on_actionPreviousWindow_triggered( )
+{
+	if( m_mdi )
+		m_mdiArea->activatePreviousSubWindow( );
+}
+
+void MainWindow::on_actionClose_triggered( )
+{
+	if( m_mdi )
+		m_mdiArea->closeActiveSubWindow( );
+
+	updateMenusAndToolbars( );
+}
+
+void MainWindow::on_actionCloseAll_triggered( )
+{
+	if( m_mdi )
+		m_mdiArea->closeAllSubWindows( );
+
+	updateMenusAndToolbars( );
+}
+
+int MainWindow::nofSubWindows( ) const
+{
+	QList<QMdiSubWindow *> list = m_mdiArea->subWindowList( );
+	return list.count( );
+}
+
+void MainWindow::activateAction( const QString name, bool enabled )
+{
+	QAction *action = findChild<QAction *>( name );
+	if( action ) {
+		action->setEnabled( enabled );
+	}
+}
+
+void MainWindow::updateMenusAndToolbars( )
+{
+	if( m_mdi ) {
+		activateAction( "actionClose", nofSubWindows( ) > 0 );
+		activateAction( "actionCloseAll", nofSubWindows( ) > 0 );
+		activateAction( "actionNextWindow", nofSubWindows( ) > 1 );
+		activateAction( "actionPreviousWindow", nofSubWindows( ) > 1 );
+		activateAction( "actionTile", nofSubWindows( ) > 0 );
+		activateAction( "actionCascade", nofSubWindows( ) > 0 );		
+	}
+}

@@ -78,6 +78,9 @@ class MainWindow : public QMainWindow
 	
 	private:
 		void switchTranslator( QTranslator &translator, const QString &filename, const QString &i18n );
+		void CreateMdiSubWindow( const QString form );
+		int nofSubWindows( ) const;
+		void activateAction( const QString name, bool enabled );
 
 	private slots:
 // slots for command line parsing
@@ -104,6 +107,7 @@ class MainWindow : public QMainWindow
 		
 // MDI slots
 		void subWindowChanged( QMdiSubWindow *w );
+		void updateMenusAndToolbars( );
 
 // auto-wired slots for the menu
 		void on_actionRestart_triggered( );
@@ -115,6 +119,10 @@ class MainWindow : public QMainWindow
 		void on_actionOpenForm_triggered( );
 		void on_actionOpenFormNewWindow_triggered( );	
 		void on_actionReloadWindow_triggered( );
+		void on_actionNextWindow_triggered( );
+		void on_actionPreviousWindow_triggered( );
+		void on_actionClose_triggered( );
+		void on_actionCloseAll_triggered( );
 };
 
 #endif // _MAIN_WINDOW_HPP_INCLUDED
