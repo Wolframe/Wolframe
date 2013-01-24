@@ -35,7 +35,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
 	m_uiFormResourcesDir( DEFAULT_UI_FORM_RESOURCES_DIR ),
 	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR ),
-	m_languages( ), m_language( ), m_mdi( false )
+	m_languages( ), m_language( ), m_mdiArea( 0 ), m_mdi( false )
 {
 // setup designer UI
 	m_ui.setupUi( this );
@@ -123,7 +123,8 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 MainWindow::~MainWindow( )
 {
 	if( m_mdi ) {
-		m_mdiArea->closeAllSubWindows( );
+		if( m_mdiArea )
+			m_mdiArea->closeAllSubWindows( );
 	} else {
 		if( m_formWidget ) {
 			delete m_formWidget;
