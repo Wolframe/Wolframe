@@ -14,7 +14,7 @@ int main( int argc, char* argv[] ) {
 		Q_INIT_RESOURCE( qtclient );
 		
 		QApplication app( argc, argv );
-		app.setWindowIcon( QIcon( QString( ":/images/wolfClient.png" ) ) );
+		app.setWindowIcon( QIcon( QString( ":/images/wolframe.png" ) ) );
 		MainWindow mainWindow;		
 		mainWindow.show( );
 		code = app.exec( );

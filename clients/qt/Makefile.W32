@@ -89,7 +89,8 @@ OBJS = \
 	StorageWidget.obj \
 	moc_StorageWidget.obj \
 	FormChooseDialog.obj \
-	moc_FormChooseDialog.obj
+	moc_FormChooseDialog.obj \
+	qtclientRes.obj
 	
 CPP_BINS = \
 	qtclient.exe
@@ -209,6 +210,9 @@ qtclient.cpp: MainWindow.hpp
 
 qtclient.res: qtclient.ico qtclient.rc
 	rc /foqtclient.res qtclient.rc
+
+qtclientRes.cpp: qtclient.qrc
+	$(QT_DIR)\bin\rcc -name qtclient qtclient.qrc -o qtclientRes.cpp
 	
 qtclient.exe: qtclient.res
 	$(CXX_LINK) $(LDFLAGS) $(LIBS) /out:$@ $(OBJS) $**
@@ -217,6 +221,7 @@ qtclient.exe: qtclient.res
 local_clean:
 	@-erase moc_*.cpp 2>NUL
 	@-erase $(I18NS) 2>NUL
+	@-erase qtclient.res 2>NUL
 	@-erase MainWindowUi.hpp 2>NUL
 
 local_distclean:

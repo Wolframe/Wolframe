@@ -654,12 +654,16 @@ void MainWindow::on_actionPreferences_triggered( )
 
 void MainWindow::on_actionAbout_triggered( )
 {
+	QMessageBox aboutBox( this );
+	aboutBox.setParent( this );
 	QString info = QString(
 		tr( "Wolframe Qt client\n\nVersion %1\n(c) 2012, 2013 Wolframe Group\n\nBuild: %2 %3" )
 			.arg( WOLFRAME_VERSION )
 			.arg( __DATE__ )
 			.arg( __TIME__ ) );
-	QMessageBox::about( this, tr( "About" ), info );
+	aboutBox.setText( info );
+	aboutBox.setIconPixmap( QPixmap( QString( ":/images/wolfClient.png" ) ) );
+	aboutBox.exec( );
 }
 
 void MainWindow::on_actionAboutQt_triggered( )
