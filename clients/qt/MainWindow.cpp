@@ -512,8 +512,11 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 // remember languages for preferences dialog
 	m_languages = languageCodes;
 
-// construct a menu showing all languages
+// does the menu exist?
 	QMenu *languageMenu = qFindChild<QMenu *>( this, "menuLanguages" );
+	if( !languageMenu ) return;
+	
+// construct a menu showing all languages
 	languageMenu->clear( );
 	QActionGroup *languageGroup = new QActionGroup( languageMenu );
 	languageGroup->setExclusive( true );
@@ -712,7 +715,8 @@ void MainWindow::subWindowChanged( QMdiSubWindow *w )
 	m_formWidget = qobject_cast<FormWidget *>( w->widget( ) );
 }
 
-void MainWindow::on_actionReloadWindow( )
+void MainWindow::on_actionReloadWindow_triggered( )
 {
+	m_formWidget->reload( );
 }
 

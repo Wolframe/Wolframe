@@ -62,6 +62,7 @@ class FormWidget : public QWidget
 		
 	public slots:
 		void setForm( const QString &_form );
+		void reload( );
 			
 	private:
 		FormWidgetMode m_mode;		// run mode of the widget

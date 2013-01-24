@@ -144,6 +144,11 @@ void FormWidget::switchForm( QObject *object )
 	}
 }
 
+void FormWidget::reload( )
+{
+	loadForm( m_form );
+}
+
 FormWidget::~FormWidget( )
 {
 	if( m_ui ) delete m_ui;
