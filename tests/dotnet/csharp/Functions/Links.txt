@@ -13,6 +13,7 @@ Glossary and Microsoft Documentation:
 	[D06] MSDN About #import: http://msdn.microsoft.com/en-us/library/8etzzkb6%28VS.71%29.aspx
 	[D07] MSDN Error Codes: http://blogs.msdn.com/b/eldar/archive/2007/04/03/a-lot-of-hresult-codes.aspx
 	[D08] GAC: http://en.wikipedia.org/wiki/Global_Assembly_Cache
+	[D09] QueryInterface definition by macros: http://msdn.microsoft.com/en-us/library/6bwekse3(v=vs.80).aspx
 
 Books:
 	[B01] Inside COM+: http://www.thrysoee.dk/InsideCOM+
