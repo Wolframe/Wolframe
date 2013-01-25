@@ -77,7 +77,7 @@ CPP_OBJS = \
 	moc_StorageWidget.o \
 	FormChooseDialog.o \
 	moc_FormChooseDialog.o \
-	qtclientRes.o \
+	qrc_qtclient.o \
 	connection.o \
 	manageServersDialog.o \
 	moc_manageServersDialog.o \
@@ -166,7 +166,7 @@ serverDefinitionDialog.cpp: ui_serverDefinitionDialog.hpp
 MainWindow.hpp: $(UIS)
 qtclient.cpp: ui_MainWindow.hpp
 
-qtclient$(EXE): $(CPP_OBJS) qtclientRes.o qtclient.o
+qtclient$(EXE): $(CPP_OBJS) qrc_qtclient.o qtclient.o
 
 FORMS = \
 	apps/test/forms/form1.ui \
@@ -191,7 +191,7 @@ THEMES = \
 %.rcc : %.qrc
 	$(QT_RCC) -binary $< -o $@
 	
-qtclientRes.cpp: qtclient.qrc
+qrc_qtclient.cpp: qtclient.qrc
 	$(QT_RCC) -name qtclient $< -o $@
 
 I18NS = \
@@ -222,7 +222,7 @@ local_clean:
 	@-rm -f geany.c++.tags
 	@-rm -f Makefile
 	@-rm -f $(UIS)
-	@-rm -f qtclientRes.cpp
+	@-rm -f qrc_qtclient.cpp
 
 local_distclean:
 
