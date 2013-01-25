@@ -160,8 +160,8 @@ UIS = \
 	ui_manageServersDialog.h \
 	ui_serverDefinitionDialog.h
 
-serverDefinitionDialog.cpp: ui_serverDefinitionDialog.hpp
-serverDefinitionDialog.cpp: ui_serverDefinitionDialog.hpp
+serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
+serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
 
 MainWindow.hpp: $(UIS)
 qtclient.cpp: ui_MainWindow.hpp

@@ -90,10 +90,13 @@ OBJS = \
 	moc_StorageWidget.obj \
 	FormChooseDialog.obj \
 	moc_FormChooseDialog.obj \
-	qtclientRes.obj \
+	qrc_qtclient.obj \
 	connection.obj \
 	manageServersDialog.obj \
-	serverDefinitionDialog.obj
+	moc_manageServersDialog.obj \
+	serverDefinitionDialog.obj \
+	moc_serverDefinitionDialog.obj \
+	settings.obj
 	
 CPP_BINS = \
 	qtclient.exe
@@ -204,18 +207,38 @@ moc_StorageWidget.cpp: StorageWidget.hpp
 
 moc_FormChooseDialog.cpp: FormChooseDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
-	
-MainWindowUi.hpp: MainWindow.ui
-	$(QT_DIR)\bin\uic -o MainWindowUi.hpp MainWindow.ui
 
-MainWindow.hpp: MainWindowUi.hpp
-qtclient.cpp: MainWindow.hpp
+moc_manageServersDialog.cpp: manageServersDialog.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) manageServersDialog.hpp -o moc_manageServersDialog.cpp
+
+moc_serverDefinitionDialog.cpp: serverDefinitionDialog.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) serverDefinitionDialog.hpp -o moc_serverDefinitionDialog.cpp
+
+ui_MainWindow.hpp: MainWindow.ui
+	$(QT_DIR)\bin\uic -o ui_MainWindow.hpp MainWindow.ui
+
+ui_manageServersDialog.h: manageServersDialog.ui
+	$(QT_DIR)\bin\uic -o ui_manageServersDialog.h manageServersDialog.ui
+
+ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
+	$(QT_DIR)\bin\uic -o ui_serverDefinitionDialog.h serverDefinitionDialog.ui
+
+serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
+serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
+
+UIS = \
+	ui_MainWindow.hpp \
+	ui_manageServersDialog.h \
+	ui_serverDefinitionDialog.h
+
+MainWindow.hpp: $(UIS)
+qtclient.cpp: ui_MainWindow.hpp MainWindow.hpp
 
 qtclient.res: qtclient.ico qtclient.rc
 	rc /foqtclient.res qtclient.rc
 
-qtclientRes.cpp: qtclient.qrc
-	$(QT_DIR)\bin\rcc -name qtclient qtclient.qrc -o qtclientRes.cpp
+qrc_qtclient.cpp: qtclient.qrc
+	$(QT_DIR)\bin\rcc -name qtclient qtclient.qrc -o qrc_qtclient.cpp
 	
 qtclient.exe: qtclient.res
 	$(CXX_LINK) $(LDFLAGS) $(LIBS) /out:$@ $(OBJS) $**
