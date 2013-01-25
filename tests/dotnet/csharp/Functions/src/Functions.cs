@@ -27,7 +27,7 @@ public struct User
 public interface FunctionInterface
 {
     [ComVisible(true)]
-    int Sub( int i, int j);
+    int Sub(int i, int j);
     [ComVisible(true)]
     int Add(int i, int j);
     [ComVisible(true)]
@@ -40,28 +40,21 @@ public class Functions : FunctionInterface
 {
     public Functions()
     {
-            //default constructor needed for COM
+        //default constructor needed for COM
     }
 
-    public int Add( int i, int j)
+    public int Add(int i, int j)
     {
         return i + j;
     }
-    public int Sub( int i, int j)
+    public int Sub(int i, int j)
     {
         return i - j;
     }
-    public User StoreUser( User usr)
+    public User StoreUser(User usr)
     {
         usr.id += 1;
         return usr;
     }
-    public int Mul(int i, int j)
-    {
-        return i * j;
-    }
 }
-
-
-
 

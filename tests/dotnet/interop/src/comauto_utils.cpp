@@ -1,5 +1,22 @@
 #include "comauto_utils.hpp"
+#include <iostream>
+#include <sstream>
 
+bool comauto::isCOMInterfaceMethod( const std::string& name)
+{
+	if (std::strcmp( name.c_str(), "AddRef") == 0) return true;
+	if (std::strcmp( name.c_str(), "Release") == 0) return true;
+	if (std::strcmp( name.c_str(), "GetTypeInfo") == 0) return true;
+	if (std::strcmp( name.c_str(), "GetTypeInfoCount") == 0) return true;
+	if (std::strcmp( name.c_str(), "GetIDsOfNames") == 0) return true;
+	if (std::strcmp( name.c_str(), "Invoke") == 0) return true;
+	if (std::strcmp( name.c_str(), "QueryInterface") == 0) return true;
+	if (std::strcmp( name.c_str(), "ToString") == 0) return true;
+	if (std::strcmp( name.c_str(), "Equals") == 0) return true;
+	if (std::strcmp( name.c_str(), "GetType") == 0) return true;
+	if (std::strcmp( name.c_str(), "GetHashCode") == 0) return true;
+	return false;
+}
 std::string comauto::asciistr( BSTR str)
 {
 	std::wstring wsStr( str, SysStringLen( str));
@@ -68,6 +85,113 @@ std::wstring comauto::tostring( const _com_error& err)
 		rt.append( err.ErrorMessage());
 	}
 	return rt;
+}
+
+std::string comauto::typestr( ITypeInfo* typeinfo, TYPEDESC* ed)
+{
+	std::string rt;
+	VARTYPE vt = ed->vt;
+	if ((vt & VT_BYREF) == VT_BYREF)
+	{
+		rt.append( "-> ");
+		vt -= VT_BYREF;
+	}
+	if ((vt & VT_ARRAY) == VT_ARRAY)
+	{
+		rt.append( "[] ");
+		vt -= VT_ARRAY;
+	}
+	if ((vt & VT_VECTOR) == VT_VECTOR)
+	{
+		rt.append( "[] ");
+		vt -= VT_VECTOR;
+	}
+	if (vt == VT_PTR)
+	{
+		rt.append( "^");
+		rt.append( typestr( typeinfo, ed->lptdesc));
+		return rt;
+	}
+	if (vt == VT_SAFEARRAY)
+	{
+		rt.append( "[] ");
+		rt.append( typestr( typeinfo, ed->lptdesc));
+		return rt;
+	}
+	if (vt == VT_USERDEFINED)
+	{
+		ITypeInfo* rectypeinfo;
+		TYPEATTR *recattr;
+		WRAP( typeinfo->GetRefTypeInfo( ed->hreftype, &rectypeinfo))
+		rt.append( "{");
+		rt.append( structstring( rectypeinfo));
+		WRAP( rectypeinfo->GetTypeAttr( &recattr))
+		if (recattr->typekind != TKIND_RECORD) throw std::runtime_error("Can only handle VT_USERDEFINED type of kind VT_RECORD (a structure with no methods)");
+		rt.append( "}");
+		rectypeinfo->Release();
+		return rt;
+	}
+	switch (vt)
+	{
+		case VT_EMPTY:	rt.append( "VT_EMPTY"); break;
+		case VT_VOID:	rt.append( "VT_VOID"); break;
+		case VT_NULL:	rt.append( "VT_NULL"); break;
+		case VT_INT:	rt.append( "VT_INT"); break;
+		case VT_I1:		rt.append( "VT_I1"); break;
+		case VT_I2:		rt.append( "VT_I2"); break;
+		case VT_I4:		rt.append( "VT_I4"); break;
+		case VT_UINT:	rt.append( "VT_UINT"); break;
+		case VT_UI1:	rt.append( "VT_UI1"); break;
+		case VT_UI2:	rt.append( "VT_UI2"); break;
+		case VT_UI4:	rt.append( "VT_UI4"); break;
+		case VT_R4:		rt.append( "VT_R4"); break;
+		case VT_R8:		rt.append( "VT_R8"); break;
+		case VT_CY:		rt.append( "VT_CY"); break;
+		case VT_DATE:	rt.append( "VT_DATE"); break;
+		case VT_BSTR:	rt.append( "VT_BSTR"); break;
+		case VT_DISPATCH:rt.append( "VT_DISPATCH"); break;
+		case VT_ERROR:	rt.append( "VT_ERROR"); break;
+		case VT_BOOL:	rt.append( "VT_BOOL"); break;
+		case VT_VARIANT:rt.append( "VT_VARIANT"); break;
+		case VT_DECIMAL:rt.append( "VT_DECIMAL"); break;
+		case VT_RECORD:	rt.append( "VT_RECORD"); break;
+		case VT_UNKNOWN:rt.append( "VT_UNKNOWN"); break;
+		case VT_HRESULT:rt.append( "VT_HRESULT"); break;
+		case VT_CARRAY:	rt.append( "VT_CARRAY"); break;
+		case VT_LPSTR:	rt.append( "VT_LPSTR"); break;
+		case VT_LPWSTR:	rt.append( "VT_LPWSTR"); break;
+		case VT_BLOB:	rt.append( "VT_BLOB"); break;
+		case VT_STREAM:	rt.append( "VT_STREAM"); break;
+		case VT_STORAGE:	rt.append( "VT_STORAGE"); break;
+		case VT_STREAMED_OBJECT:rt.append( "VT_STREAMED_OBJECT"); break;
+		case VT_STORED_OBJECT:rt.append( "VT_STORED_OBJECT"); break;
+		case VT_BLOB_OBJECT:rt.append( "VT_BLOB_OBJECT"); break;
+		case VT_CF:		rt.append( "VT_CF"); break;
+		case VT_CLSID:	rt.append( "VT_CLSID"); break;
+		default:		rt.append( "[Unknown]"); break;
+	}
+	return rt;
+}
+
+std::string comauto::structstring( ITypeInfo* typeinfo)
+{
+	std::ostringstream out;
+	TYPEATTR* typeattr;
+	WRAP( typeinfo->GetTypeAttr( &typeattr));
+	for (unsigned short ii = 0; ii < typeattr->cVars; ++ii)
+	{
+		VARDESC* var;
+		WRAP( typeinfo->GetVarDesc( ii, &var))
+		BSTR varname;
+		UINT nn;
+		WRAP( typeinfo->GetNames( var->memid, &varname, 1, &nn))
+		ELEMDESC ed = var->elemdescVar;
+		if (ii > 0) out << ";";
+		out << comauto::asciistr(varname) << ":" << typestr( typeinfo, &ed.tdesc);
+		typeinfo->ReleaseVarDesc( var);
+		::SysFreeString( varname);
+	}
+	return out.str();
 }
 
 VARIANT comauto::createVariantType( bool val)

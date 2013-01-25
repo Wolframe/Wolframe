@@ -16,7 +16,10 @@ std::wstring utf16string( const std::string& utf8str);
 std::string utf8string( const std::wstring& utf16str);
 std::wstring tostring( VARIANT* v);
 std::wstring tostring( const _com_error& err);
+std::string typestr( ITypeInfo* typeinfo, TYPEDESC* ed);
+std::string structstring( ITypeInfo* typeinfo);
 
+bool isCOMInterfaceMethod( const std::string& name);
 
 VARIANT createVariantType( bool val);
 VARIANT createVariantType( int val);
