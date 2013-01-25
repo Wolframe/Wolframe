@@ -20,15 +20,26 @@ now:
     formwidgets share the same datahandler and the signals are missed, its list and hierarchy
     requests, so it's the domain filler.
     It happens only if the same form is picked as already shown in another window
-    => not implementable without tagging in the protocol! map of doctype in protocol back
-    is not possible, we must be able to encode window id, widget id and map it to a tag in
-    the protocol
+    => happens also with only one window?!
 - integrate from qWolfClient
   - connection handling
   - rewrite login/logout (simplify, not so asynchronous as now)
 
 musts:
+- configurator specific:
+  - use simpleforms instead of funny lua parsers (example
+    picture parsers)
+  - rewrite categories, so that joins to pictures, requires/provides, tags,
+    etc. are possible trhough the lua layer
 - titles of windows instead of names for formchoosedialog
+- translations
+  - window names and form widget titles must be translated dynamically
+  - the FormChooserList needs localized titles of all possible forms
+    (maybe custom menus which would be added would be better? or a
+    tree view in the dialog and a tree menu in the menubar?)
+- check how to implement "check for updates" and actually do the update.
+  Example: https://github.com/pypt/fervor
+  Check also how to get around MSI problems
 - open info box (modal) in feature/category/component edit and add to
   show picture information
 - search with flag (with children)
@@ -36,14 +47,11 @@ musts:
   slightly assymetrical maybe?
 - tags picked from a list and added (needs events)
 - linking of categories and features
-- rewrite categories, so that joins to pictures, requires/provides, tags,
-  etc. are possible trhough the lua layer
 - optimal size on qtreewidget to fit items (needed for linking categories
   and features linking view)
 - tabbed preferences dialog, like thunderbird (in security, form management,
   etc.)
 - show pictures in tree view
-- show titles of forms somewhere in the qtclient
 - scroll to selected element in a single-selection list
 - push button state (disabled/enabled) based on a
   condition like {picture.id>0}
@@ -52,8 +60,7 @@ musts:
   - better even: provide conditions for buttons, so they can't be
     pressed (button.state={something})
 - improve group_concat to take a parameter as separator
-- use simpleforms instead of funny lua parsers (example
-  picture parsers)
+
 - allow grouping into tags without a dummy groupbox or
   similar widget around it, where to put the data then?
 - how to comminicate tags which are used by picture and 
@@ -104,6 +111,8 @@ musts:
   - PDF widget poppler qt4 for previews
 
 nice to do:
+- MDI windows should get icons of the forms, especially
+  nice for a iconized/shaded view of the MDI sub windows
 - FormWidget:
   - provide a preview of the form?
 - work more on Android port
@@ -141,3 +150,6 @@ nice to do:
   - 1:n relations (pick a foreign reference to another
     object), domains (e.g. pick a city in a list of possibilities)
   - grid views
+- check how to implement "check for updates" and actually do the update.
+  Example: https://github.com/pypt/fervor
+  Check also how to get around MSI problems

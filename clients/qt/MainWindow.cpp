@@ -35,7 +35,8 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
 	m_uiFormResourcesDir( DEFAULT_UI_FORM_RESOURCES_DIR ),
 	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR ),
-	m_languages( ), m_language( ), m_mdiArea( 0 ), m_mdi( false )
+	m_languages( ), m_language( ), m_mdiArea( 0 ), m_mdi( false ),
+	m_subWinGroup( 0 )
 {
 // setup designer UI
 	m_ui.setupUi( this );
@@ -615,11 +616,39 @@ void MainWindow::formLoaded( QString name )
 	if( m_mdi ) {
 		QMdiSubWindow *mdiSubWindow = m_mdiArea->activeSubWindow( );
 		if( mdiSubWindow ) {
-			mdiSubWindow->setWindowTitle( m_formWidget->windowTitle( ) );
+			QString title = m_formWidget->windowTitle( );
+			mdiSubWindow->setWindowTitle( title );
+			QAction *action = m_revSubWinMap.value( mdiSubWindow );
+			if( action ) {
+				int idx = action->data( ).toInt( );
+				QString text = composeWindowListTitle( idx, title );
+				action->setText( text );
+			}
 		}
 	} else {
 		setWindowTitle( tr( "Wolframe Qt Client - %1" ).arg( m_formWidget->windowTitle( ) ) );
 	}
+}
+
+QString MainWindow::composeWindowListTitle( const int idx, const QString title )
+{
+	QString text;
+	
+	if( idx < 10 ) {
+		text = tr( "&%1 %2" ).arg( idx ).arg( title );
+	} else {
+		text = tr( "%1 %2" ).arg( idx ).arg( title );
+	}
+	
+	return text;
+}			
+
+void MainWindow::updateWindowMenu( )
+{
+	QMdiSubWindow *mdiSubWindow = m_mdiArea->activeSubWindow( );
+	QAction *action = m_revSubWinMap.value( mdiSubWindow );
+	if( action )
+		action->setChecked( true );
 }
 
 void MainWindow::formError( QString error )
@@ -727,13 +756,19 @@ void MainWindow::on_actionOpenFormNewWindow_triggered( )
 	updateMenusAndToolbars( );
 }
 
+void MainWindow::subWindowSelected( QAction *action )
+{
+	QMdiSubWindow *w = m_subWinMap.value( action );
+	m_mdiArea->setActiveSubWindow( w );
+}
+
 void MainWindow::subWindowChanged( QMdiSubWindow *w )
 {
-	if( !w ) {
-		return;
-	}
+	if( !w ) return;
 
 	m_formWidget = qobject_cast<FormWidget *>( w->widget( ) );
+
+	updateWindowMenu( );
 }
 
 void MainWindow::on_actionReloadWindow_triggered( )
@@ -743,28 +778,28 @@ void MainWindow::on_actionReloadWindow_triggered( )
 
 void MainWindow::on_actionNextWindow_triggered( )
 {
-	if( m_mdi )
-		m_mdiArea->activateNextSubWindow( );
+	m_mdiArea->activateNextSubWindow( );
+
+	updateWindowMenu( );
 }
 
 void MainWindow::on_actionPreviousWindow_triggered( )
 {
-	if( m_mdi )
-		m_mdiArea->activatePreviousSubWindow( );
+	m_mdiArea->activatePreviousSubWindow( );
+	
+	updateWindowMenu( );
 }
 
 void MainWindow::on_actionClose_triggered( )
 {
-	if( m_mdi )
-		m_mdiArea->closeActiveSubWindow( );
+	m_mdiArea->closeActiveSubWindow( );
 
 	updateMenusAndToolbars( );
 }
 
 void MainWindow::on_actionCloseAll_triggered( )
 {
-	if( m_mdi )
-		m_mdiArea->closeAllSubWindows( );
+	m_mdiArea->closeAllSubWindows( );
 
 	updateMenusAndToolbars( );
 }
@@ -786,11 +821,55 @@ void MainWindow::activateAction( const QString name, bool enabled )
 void MainWindow::updateMenusAndToolbars( )
 {
 	if( m_mdi ) {
+// enable/disable menu/toolbar items depending on the number of subwindows
 		activateAction( "actionClose", nofSubWindows( ) > 0 );
 		activateAction( "actionCloseAll", nofSubWindows( ) > 0 );
 		activateAction( "actionNextWindow", nofSubWindows( ) > 1 );
 		activateAction( "actionPreviousWindow", nofSubWindows( ) > 1 );
 		activateAction( "actionTile", nofSubWindows( ) > 0 );
 		activateAction( "actionCascade", nofSubWindows( ) > 0 );		
+
+// recreate the subwindow menu and mark the currently selected submenu
+		QMenu *windowMenu = qFindChild<QMenu *>( this, "menuWindow" );
+		if( windowMenu ) {
+			m_subWinMap.clear( );
+			m_revSubWinMap.clear( );
+			
+			if( m_subWinGroup ) {
+				foreach( QAction *action, m_subWinGroup->actions( ) ) {
+					m_subWinGroup->removeAction( action );
+					delete action;
+				}
+			}
+			
+			m_subWinGroup = new QActionGroup( windowMenu );
+			m_subWinGroup->setExclusive( true );
+			QAction *action = new QAction( "", m_subWinGroup );
+			action->setSeparator( true );
+			m_subWinGroup->addAction( action );
+			int idx = 1;
+			foreach( QMdiSubWindow *w, m_mdiArea->subWindowList( ) ) {
+				// TODO: translation is tricky here: the form widget has
+				// a QTranslator class and can call translate on it using
+				// the translation resource of the corresponding form!
+				// see QString QTranslator::translate ( const char * context, const char * sourceText, const char * disambiguation, int n ) const
+				QString title = w->windowTitle( );
+				QString text = composeWindowListTitle( idx, title );
+				action = new QAction( text, m_subWinGroup );
+				action->setCheckable( true );
+				action->setData( QVariant( idx ) );
+				m_subWinGroup->addAction( action );
+				if( w == m_mdiArea->activeSubWindow( ) ) {
+					action->setChecked( true );
+				}
+				m_subWinMap.insert( action, w );
+				m_revSubWinMap.insert( w, action );
+				idx++;
+			}
+			windowMenu->addActions( m_subWinGroup->actions( ) );
+			
+			connect( m_subWinGroup, SIGNAL( triggered( QAction * ) ),
+				this, SLOT( subWindowSelected( QAction * ) ) );
+		}
 	}
 }

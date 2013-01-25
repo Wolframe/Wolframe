@@ -7,11 +7,14 @@
 
 #include <QCommandLine>	
 #include <QCloseEvent>
-#include <QMdiArea>
 #include <QMainWindow>
 #include <QtUiTools>
 #include <QTranslator>
 #include <QEvent>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QMap>
+#include <QAction>
 
 #include "global.hpp"
 #include "FormLoader.hpp"
@@ -63,6 +66,9 @@ class MainWindow : public QMainWindow
 		QMdiArea *m_mdiArea;		// pointer to MDI workspace in the main window
 		QStringList m_forms;		// list of available forms
 		bool m_mdi;
+		QActionGroup *m_subWinGroup;	// group holding list of currently opened MDI subwindows
+		QMap<QAction *, QMdiSubWindow *> m_subWinMap; // maps actions to MDI subwindows
+		QMap<QMdiSubWindow *, QAction *> m_revSubWinMap; // reverse map (the above is actually a bimap)
 		
 	public slots:
 		void readSettings( );
@@ -81,6 +87,7 @@ class MainWindow : public QMainWindow
 		void CreateMdiSubWindow( const QString form );
 		int nofSubWindows( ) const;
 		void activateAction( const QString name, bool enabled );
+		QString composeWindowListTitle( const int idx, const QString title );
 
 	private slots:
 // slots for command line parsing
@@ -106,8 +113,10 @@ class MainWindow : public QMainWindow
 		void formError( QString error );
 		
 // MDI slots
+		void subWindowSelected( QAction *action );
 		void subWindowChanged( QMdiSubWindow *w );
 		void updateMenusAndToolbars( );
+		void updateWindowMenu( );
 
 // auto-wired slots for the menu
 		void on_actionRestart_triggered( );
