@@ -77,7 +77,13 @@ CPP_OBJS = \
 	moc_StorageWidget.o \
 	FormChooseDialog.o \
 	moc_FormChooseDialog.o \
-	qtclientRes.o
+	qtclientRes.o \
+	connection.o \
+	manageServersDialog.o \
+	moc_manageServersDialog.o \
+	serverDefinitionDialog.o \
+	moc_serverDefinitionDialog.o \
+	settings.o
 		
 CPP_BINS = \
 	qtclient$(EXE)
@@ -134,11 +140,31 @@ moc_StorageWidget.cpp: StorageWidget.hpp
 moc_FormChooseDialog.cpp: FormChooseDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
 
-MainWindowUi.hpp: MainWindow.ui
-	$(QT_UIC) -o MainWindowUi.hpp MainWindow.ui
+moc_manageServersDialog.cpp: manageServersDialog.hpp
+	$(QT_MOC) $(MOC_FLAGS) manageServersDialog.hpp -o moc_manageServersDialog.cpp
 
-MainWindow.hpp: MainWindowUi.hpp
-qtclient.cpp: MainWindow.hpp
+moc_serverDefinitionDialog.cpp: serverDefinitionDialog.hpp
+	$(QT_MOC) $(MOC_FLAGS) serverDefinitionDialog.hpp -o moc_serverDefinitionDialog.cpp
+
+ui_MainWindow.hpp: MainWindow.ui
+	$(QT_UIC) -o ui_MainWindow.hpp MainWindow.ui
+
+ui_manageServersDialog.h: manageServersDialog.ui
+	$(QT_UIC) -o ui_manageServersDialog.h manageServersDialog.ui
+
+ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
+	$(QT_UIC) -o ui_serverDefinitionDialog.h serverDefinitionDialog.ui
+
+UIS = \
+	ui_MainWindow.hpp \
+	ui_manageServersDialog.h \
+	ui_serverDefinitionDialog.h
+
+serverDefinitionDialog.cpp: ui_serverDefinitionDialog.hpp
+serverDefinitionDialog.cpp: ui_serverDefinitionDialog.hpp
+
+MainWindow.hpp: $(UIS)
+qtclient.cpp: ui_MainWindow.hpp
 
 qtclient$(EXE): $(CPP_OBJS) qtclientRes.o qtclient.o
 
@@ -195,7 +221,7 @@ local_clean:
 	@-rm -f $(RESOURCES)
 	@-rm -f geany.c++.tags
 	@-rm -f Makefile
-	@-rm -f MainWindowUi.hpp
+	@-rm -f $(UIS)
 	@-rm -f qtclientRes.cpp
 
 local_distclean:

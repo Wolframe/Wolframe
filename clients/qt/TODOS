@@ -22,8 +22,11 @@ now:
     It happens only if the same form is picked as already shown in another window
     => happens also with only one window?!
 - integrate from qWolfClient
-  - connection handling
   - rewrite login/logout (simplify, not so asynchronous as now)
+  - use connection data from new connections
+  - join settings and preferences (Qt init files)
+  - implement the "Test Connection"
+  - use "Connection" instead of "Server" in login dialog
 
 musts:
 - configurator specific:

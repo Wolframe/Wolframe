@@ -11,6 +11,7 @@
 #include "PreferencesDialog.hpp"
 #include "global.hpp"
 #include "FormChooseDialog.hpp"
+#include "manageServersDialog.hpp"
 
 #include <QtGui>
 #include <QBuffer>
@@ -88,6 +89,10 @@ void MainWindow::readSettings( )
 		m_language = prefs->locale( );
 	}
 	m_mdi = prefs->mdi( );
+
+	settings.read( "Wolframe", "Wolframe Client" );
+	move( settings.mainWindowPos );
+	resize( settings.mainWindowSize );
 }
 
 static DebugTerminal *debugTerminal = 0;
@@ -678,6 +683,14 @@ void MainWindow::on_actionExit_triggered( )
 	}
 }
 
+void MainWindow::closeEvent( QCloseEvent *e )
+{
+	settings.mainWindowPos = pos( );
+	settings.mainWindowSize = size( );
+	settings.write( "Wolframe", "Wolframe Client" );
+	e->accept( );
+}
+
 void MainWindow::on_actionPreferences_triggered( )
 {
 	PreferencesDialog prefs( m_languages, this );
@@ -873,3 +886,12 @@ void MainWindow::updateMenusAndToolbars( )
 		}
 	}
 }
+
+void MainWindow::on_actionManageServers_triggered( )
+{
+	ManageServersDialog* serversDlg = new ManageServersDialog( settings.connectionParams );
+	serversDlg->exec( );
+
+	delete serversDlg;
+}
+

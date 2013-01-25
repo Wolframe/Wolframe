@@ -15,6 +15,7 @@
 #include <QMdiSubWindow>
 #include <QMap>
 #include <QAction>
+#include <QCloseEvent>
 
 #include "global.hpp"
 #include "FormLoader.hpp"
@@ -23,7 +24,8 @@
 #include "FormWidget.hpp"
 #include "LoginDialog.hpp"
 #include "LoadMode.hpp"
-#include "MainWindowUi.hpp"
+#include "ui_MainWindow.hpp"
+#include "settings.hpp"
 
 class MainWindow : public QMainWindow
 {
@@ -69,6 +71,7 @@ class MainWindow : public QMainWindow
 		QActionGroup *m_subWinGroup;	// group holding list of currently opened MDI subwindows
 		QMap<QAction *, QMdiSubWindow *> m_subWinMap; // maps actions to MDI subwindows
 		QMap<QMdiSubWindow *, QAction *> m_revSubWinMap; // reverse map (the above is actually a bimap)
+		ApplicationSettings settings;	// Application settings
 		
 	public slots:
 		void readSettings( );
@@ -81,6 +84,7 @@ class MainWindow : public QMainWindow
 		
 	protected:
 		void changeEvent( QEvent *_event );
+		void closeEvent( QCloseEvent *e );
 	
 	private:
 		void switchTranslator( QTranslator &translator, const QString &filename, const QString &i18n );
@@ -132,6 +136,7 @@ class MainWindow : public QMainWindow
 		void on_actionPreviousWindow_triggered( );
 		void on_actionClose_triggered( );
 		void on_actionCloseAll_triggered( );
+		void on_actionManageServers_triggered( );
 };
 
 #endif // _MAIN_WINDOW_HPP_INCLUDED

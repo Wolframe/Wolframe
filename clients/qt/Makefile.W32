@@ -90,7 +90,10 @@ OBJS = \
 	moc_StorageWidget.obj \
 	FormChooseDialog.obj \
 	moc_FormChooseDialog.obj \
-	qtclientRes.obj
+	qtclientRes.obj \
+	connection.obj \
+	manageServersDialog.obj \
+	serverDefinitionDialog.obj
 	
 CPP_BINS = \
 	qtclient.exe
