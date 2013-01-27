@@ -2,6 +2,8 @@
 #include <iostream>
 #include <sstream>
 
+using namespace _Wolframe;
+
 bool comauto::isCOMInterfaceMethod( const std::string& name)
 {
 	if (std::strcmp( name.c_str(), "AddRef") == 0) return true;

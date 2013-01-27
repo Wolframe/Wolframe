@@ -7,6 +7,7 @@
 #include <atlbase.h>
 #include <atlcom.h>
 
+namespace _Wolframe {
 namespace comauto {
 
 class Record
@@ -25,5 +26,5 @@ private:
 	bool m_allocated;
 };
 
-} //namespace
+}} //namespace
 #endif

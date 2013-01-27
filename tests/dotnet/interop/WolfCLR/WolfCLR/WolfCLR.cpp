@@ -7,6 +7,8 @@
 #include "comauto_clr.hpp"
 #include <iostream>
 
+using namespace _Wolframe;
+
 int main( int argc, const char* argv[])
 {
 	try
@@ -18,6 +20,12 @@ int main( int argc, const char* argv[])
 		typelib.print( std::cout);
 		comauto::CommonLanguageRuntime clr( "v4.0.30319");
 
+		std::vector<comauto::FunctionR> funcs = typelib.loadFunctions( &clr, assembly);
+		std::vector<comauto::FunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
+		for (; fi != fe; ++fi)
+		{
+			std::cout << "FUNCTION " << (*fi)->assemblyname() << " " << (*fi)->classname() << "::" << (*fi)->methodname() << "[" << (*fi)->nofParameter() << "]" << std::endl;
+		}
 		VARIANT param[ 2] = {comauto::createVariantType( (int)13), comauto::createVariantType( (int)2)};
 		VARIANT RESULT = clr.call( assembly, "Functions", "Add", 2, param);
 	}

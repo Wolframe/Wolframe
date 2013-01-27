@@ -7,8 +7,8 @@
 #include <atlctl.h>
 #include <windef.h>
 
-namespace comauto
-{
+namespace _Wolframe {
+namespace comauto {
 
 class RecordInfo
 	:public CComObjectRoot
@@ -50,7 +50,7 @@ private:
 	TYPEATTR* m_typeattr;
 };
 
-}//namespace
+}}//namespace
 #endif
 
 

@@ -8,6 +8,7 @@ high_property_prefixes("_get","_put","_putref") \
 rename("ReportEvent",  "InteropServices_ReportEvent") \
 rename("value",  "InteropServices_value")
 
+using namespace _Wolframe;
 using namespace mscorlib;
 
 comauto::CommonLanguageRuntime::~CommonLanguageRuntime()

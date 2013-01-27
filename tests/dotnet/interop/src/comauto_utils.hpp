@@ -8,6 +8,7 @@
 #include <atlbase.h>
 #include <atlcom.h>
 
+namespace _Wolframe {
 namespace comauto {
 
 std::string asciistr( BSTR str);
@@ -44,5 +45,5 @@ VARIANT createVariantType( const std::wstring& val);
 		throw std::runtime_error( std::string("Error calling ") + callname + ": '" + comauto::asciistr(error.ErrorMessage()) + "'");\
 	}}
 
-}
+}}
 #endif

@@ -1,5 +1,7 @@
 #include "comauto_type.hpp"
 
+using namespace _Wolframe;
+
 comauto::Type::Type( ITypeInfo* typeinfo_)
 	:m_typeinfo(typeinfo_),m_typeattr(0)
 {

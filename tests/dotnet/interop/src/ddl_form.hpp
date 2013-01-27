@@ -1,10 +1,13 @@
 #ifndef _Wolframe_DDL_FORM_HPP_INCLUDED
 #define _Wolframe_DDL_FORM_HPP_INCLUDED
 #include <string>
+#include <vector>
 #include <map>
 #include <wchar.h>
+#include "filter/typedfilter.hpp"
 
-namespace ddl {
+namespace _Wolframe {
+namespace langbind {
 
 class Form
 {
@@ -18,9 +21,10 @@ public:
 	Form(){}
 
 	Form& operator()( const std::string& name, const Form& value);
-	const std::string& operator*();
-	const std::string& value();
+	const std::string& operator*() const;
+	const std::string& value() const;
 	const wchar_t* wcvalue() const;
+	langbind::TypedInputFilterR get() const;
 
 	const Form& operator[]( const std::string& name) const;
 	Form& operator[]( const std::string& name);
@@ -38,5 +42,35 @@ private:
 	std::string m_value;
 };
 
-}//namespace
+
+class FormInputFilter
+	:public langbind::TypedInputFilter
+{
+public:
+	FormInputFilter( const Form& form)
+		:types::TypeSignature("langbind::FormInputFilter", __LINE__)
+		,m_tagstate(0)
+	{
+		m_stk.push_back( StackElem( form.begin(), form.begin()));
+	}
+
+	FormInputFilter( const FormInputFilter& o)
+		:types::TypeSignature("langbind::FormInputFilter", __LINE__)
+		,langbind::TypedInputFilter(o)
+		,m_stk(o.m_stk)
+		,m_tagstate(o.m_tagstate){}
+
+	virtual ~FormInputFilter(){}
+
+	virtual FormInputFilter* copy() const	{return new FormInputFilter(*this);}
+
+	virtual bool getNext( ElementType& type, Element& element);
+
+private:
+	typedef std::pair<Form::Map::const_iterator,Form::Map::const_iterator> StackElem;
+	std::vector<StackElem> m_stk;
+	int m_tagstate;
+};
+
+}}//namespace
 #endif

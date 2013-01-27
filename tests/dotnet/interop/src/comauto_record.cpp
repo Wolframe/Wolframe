@@ -1,6 +1,8 @@
 #include "comauto_record.hpp"
 #include "comauto_utils.hpp"
 
+using namespace _Wolframe;
+
 comauto::Record::Record( ITypeInfo* typeinfo_, PVOID data_)
 	:m_typeinfo(typeinfo_),m_typeattr(0),m_data(data_),m_allocated(data_==0)
 {

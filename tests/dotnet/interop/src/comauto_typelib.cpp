@@ -1,6 +1,7 @@
 #include "comauto_typelib.hpp"
 #include "comauto_utils.hpp"
 #include "comauto_record.hpp"
+#include "comauto_function.hpp"
 #include "ddl_form.hpp"
 #include <iostream>
 #include <sstream>
@@ -11,6 +12,8 @@
 #include <comdef.h>
 #include <atlbase.h>
 #include <atlcom.h>
+
+using namespace _Wolframe;
 
 comauto::TypeLib::TypeLib( const std::string& file)
 	:m_typelib(0)
@@ -33,14 +36,6 @@ comauto::TypeLib::~TypeLib()
 	if (m_typelib) m_typelib->Release();
 }
 
-void comauto::TypeLib::defineFunction( ITypeInfo* typeinfo, const std::string& classname, unsigned short fidx)
-{
-	FunctionR func( new Function( typeinfo, classname, fidx));
-	std::string funcid( func->classname() + "." + func->methodname());
-	if (m_funcmap.find( funcid) != m_funcmap.end()) throw std::runtime_error( std::string("duplicate definition of function '") + funcid + "'");
-	m_funcmap[ funcid] = func;
-}
-
 static IRecordInfo* getRecordInfo( ITypeInfo *typeinfo)
 {
 	IRecordInfo* rt = 0;
@@ -49,47 +44,7 @@ static IRecordInfo* getRecordInfo( ITypeInfo *typeinfo)
 	return rt;
 }
 
-static VARIANT getComObj( const ddl::Form& form, ITypeInfo *typeinfo, TYPEDESC *typedesc)
-{
-	VARIANT rt;
-	if (form.empty())
-	{
-		VariantClear(&rt);
-		if (typedesc->vt != VT_BSTR)
-		{
-			WRAP( ::VariantChangeType( &rt, &rt, 0, typedesc->vt))
-		}
-		return rt;
-	}
-	else if (form.atomic())
-	{
-		rt.vt = VT_BSTR;
-		rt.bstrVal = ::SysAllocString( form.wcvalue());
-		if (typedesc->vt != VT_BSTR)
-		{
-			WRAP( ::VariantChangeType( &rt, &rt, 0, typedesc->vt))
-		}
-		return rt;
-	}
-	else if (typedesc->vt == VT_USERDEFINED)
-	{
-		ITypeInfo* rectypeinfo;
-		//IRecordInfo* recinfo;
-		TYPEATTR *recattr;
-		WRAP( typeinfo->GetRefTypeInfo( typedesc->hreftype, &rectypeinfo))
-		WRAP( rectypeinfo->GetTypeAttr( &recattr))
-		if (recattr->typekind != TKIND_RECORD) throw std::runtime_error("Can only handle VT_USERDEFINED type of kind VT_RECORD (a POD structure with no methods)");
-		rt.vt = VT_RECORD;
-		rt.pvRecord = 0;
-		typeinfo->ReleaseTypeAttr( recattr);
-	}
-	else
-	{
-		throw std::runtime_error("Can only handle atomic type or VT_USERDEFINED type of kind VT_RECORD (a POD structure with no methods)");
-	}
-}
-
-// forward declaration for printAttributes(const char*,ITypeInfo*,TYPEATTR*,int) and printDispatchTypeInfo(ITypeInfo*,int)
+// forward declaration for printAttributes(const char*,ITypeInfo*,TYPEATTR*,int)
 static void printItem( std::ostream& out, ITypeInfo* typeinfo, int indentcnt=0);
 
 static void printVar( std::ostream& out, ITypeInfo* typeinfo, VARDESC* var, int indentcnt=0)
@@ -113,20 +68,16 @@ static void printAttributes( std::ostream& out, const char* title, ITypeInfo* ty
 
 		for (ii = 0; ii < typeattr->cImplTypes; ++ii)
 		{
-			// interface
-			BSTR interfaceName;
 			HREFTYPE hreftype;
 			ITypeInfo* classtypeinfo;
 			WRAP( typeinfo->GetRefTypeOfImplType( ii, &hreftype))
 			WRAP( typeinfo->GetRefTypeInfo( hreftype, &classtypeinfo))
-			WRAP( classtypeinfo->GetDocumentation( MEMBERID_NIL, &interfaceName, NULL, NULL, NULL))
 			printItem( out, classtypeinfo, indentcnt+1);
 			classtypeinfo->Release();
 		}
 		for (ii = 0; ii < typeattr->cFuncs; ++ii)
 		{
-			// function
-			comauto::Function func( typeinfo, "", ii);
+			comauto::Function func( 0, typeinfo, "", "", ii);
 			if (!comauto::isCOMInterfaceMethod( func.methodname()))
 			{
 				out << std::string( indentcnt+1, '\t');
@@ -135,7 +86,6 @@ static void printAttributes( std::ostream& out, const char* title, ITypeInfo* ty
 		}
 		for (ii = 0; ii < typeattr->cVars; ++ii)
 		{
-			// variable
 			VARDESC* var;
 			WRAP( typeinfo->GetVarDesc( ii, &var))
 			printVar( out, typeinfo, var, indentcnt+1);
@@ -145,32 +95,8 @@ static void printAttributes( std::ostream& out, const char* title, ITypeInfo* ty
 	::SysFreeString( name);
 }
 
-static void printDispatchTypeInfo( std::ostream& out, ITypeInfo* typeinfo, int indentcnt=0)
-{
-	HREFTYPE hreftype_dispatch;
-	ITypeInfo* dispatchtypeinfo;
-	HRESULT hr = typeinfo->GetRefTypeOfImplType( -1, &hreftype_dispatch);
-	if (hr == TYPE_E_ELEMENTNOTFOUND) return;
-	if (hr != S_OK) throw std::logic_error( "invalid system call to GetRefTypeOfImplType");
-	WRAP( typeinfo->GetRefTypeInfo( hreftype_dispatch, &dispatchtypeinfo))
-	printItem( out, dispatchtypeinfo, indentcnt+1);
-	dispatchtypeinfo->Release();
-}
-
 static void printItem( std::ostream& out, ITypeInfo* typeinfo, int indentcnt)
 {
-	IRecordInfo* recinfo = 0;
-	try
-	{
-		WRAP( ::GetRecordInfoFromTypeInfo( typeinfo, &recinfo))
-		if (recinfo)
-		{
-			std::cout << "+++++++++++++++++++++++++++++++HALLY GALLY++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-		}
-	}
-	catch (...)
-	{
-	}
 	std::string indent( indentcnt, '\t');
 	TYPEATTR* typeattr;
 	WRAP( typeinfo->GetTypeAttr( &typeattr))
@@ -200,7 +126,6 @@ static void printItem( std::ostream& out, ITypeInfo* typeinfo, int indentcnt)
 		case TKIND_DISPATCH:
 		{
 			printAttributes( out, "DISPATCH", typeinfo, typeattr, indentcnt);
-			//printDispatchTypeInfo( typeinfo, indentcnt);
 			break;
 		}
 		case TKIND_ALIAS:
@@ -219,9 +144,7 @@ static void printItem( std::ostream& out, ITypeInfo* typeinfo, int indentcnt)
 		}
 		case TKIND_COCLASS:
 		{
-			WRAP( ::GetRecordInfoFromTypeInfo( typeinfo, &recinfo))
 			printAttributes( out, "COCLASS", typeinfo, typeattr, indentcnt);
-			//printDispatchTypeInfo( typeinfo, indentcnt);
 			break;
 		}
 	}
@@ -243,5 +166,69 @@ static void printItem( std::ostream& out, ITypeLib* typelib, int indentcnt=0)
 void comauto::TypeLib::print( std::ostream& out) const
 {
 	printItem( out, m_typelib);
+}
+
+static void findFunctions( ITypeInfo* typeinfo, std::vector<comauto::FunctionR>& funcs, comauto::CommonLanguageRuntime* clr, const std::string& assemblyname, const std::string& classname)
+{
+	TYPEATTR* typeattr;
+	unsigned short ii;
+	WRAP( typeinfo->GetTypeAttr( &typeattr))
+	if ((typeattr->typekind == TKIND_DISPATCH || typeattr->typekind == TKIND_RECORD) && classname.empty())
+	{
+		return; //no follow on toplevel interface or POD data structure declaration
+	}
+	if (typeattr->cFuncs)
+	{
+		if (classname.empty())
+		{
+			throw std::runtime_error( "functions found outside class context");
+		}
+		for (ii = 0; ii < typeattr->cFuncs; ++ii)
+		{
+			comauto::FunctionR func( new comauto::Function( clr, typeinfo, assemblyname, classname, ii));
+			if (!comauto::isCOMInterfaceMethod( func->methodname()))
+			{
+				funcs.push_back( func);
+			}
+		}
+	}
+	std::string subclassname( classname);
+	if (typeattr->typekind == TKIND_COCLASS)
+	{
+		if (!classname.empty()) throw std::runtime_error( "nested class definitions not supported");
+		BSTR name;
+		WRAP( typeinfo->GetDocumentation( MEMBERID_NIL, &name, NULL, NULL, NULL))
+		if (subclassname != "IUnknown")
+		{
+			subclassname.clear();
+			subclassname.append( comauto::asciistr(name));
+		}
+		::SysFreeString( name);
+	}
+	for (ii = 0; ii < typeattr->cImplTypes; ++ii)
+	{
+		HREFTYPE hreftype;
+		ITypeInfo* classtypeinfo;
+		WRAP( typeinfo->GetRefTypeOfImplType( ii, &hreftype))
+		WRAP( typeinfo->GetRefTypeInfo( hreftype, &classtypeinfo))
+		findFunctions( classtypeinfo, funcs, clr, assemblyname, subclassname);
+		classtypeinfo->Release();
+	}
+	typeinfo->ReleaseTypeAttr( typeattr);
+}
+
+
+std::vector<comauto::FunctionR> comauto::TypeLib::loadFunctions( comauto::CommonLanguageRuntime* clr, const std::string& assemblyname)
+{
+	std::vector<comauto::FunctionR> rt;
+	ITypeInfo* typeinfo;
+
+	for (UINT ii = 0; ii < m_typelib->GetTypeInfoCount(); ++ii)
+	{
+		WRAP( m_typelib->GetTypeInfo( ii, &typeinfo))
+		findFunctions( typeinfo, rt, clr, assemblyname, "");
+		typeinfo->Release();
+	}
+	return rt;
 }
 

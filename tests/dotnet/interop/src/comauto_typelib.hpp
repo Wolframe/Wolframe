@@ -13,6 +13,7 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
+namespace _Wolframe {
 namespace comauto {
 
 class TypeLib
@@ -22,14 +23,12 @@ public:
 	virtual ~TypeLib();
 	void print( std::ostream& out) const;
 
-private:
-	void defineFunction( ITypeInfo* typeinfo, const std::string& classname, unsigned short fidx);
+	std::vector<comauto::FunctionR> comauto::TypeLib::loadFunctions( comauto::CommonLanguageRuntime* clr, const std::string& assemblyname);
 
+private:
 	ITypeLib* m_typelib;
-	std::map<std::string,FunctionR> m_funcmap;
-	std::map<std::string,TypeR> m_typemap;
 };
 
-} //namespace
+}} //namespace
 #endif
 

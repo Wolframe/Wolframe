@@ -11,6 +11,7 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
+namespace _Wolframe {
 namespace comauto {
 
 class Type
@@ -26,6 +27,6 @@ private:
 
 typedef boost::shared_ptr<Type> TypeR;
 
-} //namespace
+}} //namespace
 #endif
 

@@ -6,6 +6,8 @@
 
 #define RETURN_ON_ERROR(RV,CALL) {if ((RV = (CALL)) != S_OK) return RV;}
 
+using namespace _Wolframe;
+
 comauto::RecordInfo::~RecordInfo()
 {
 	if (m_typeattr) m_typeinfo->ReleaseTypeAttr( m_typeattr);
@@ -376,8 +378,7 @@ HRESULT comauto::RecordInfo::GetFieldNames( ULONG* pcNames, BSTR* rgBstrNames)
 	return S_OK;
 }
 
-BOOL comauto::Re
-	cordInfo::IsMatchingType( IRecordInfo *pRecordInfo)
+BOOL comauto::RecordInfo::IsMatchingType( IRecordInfo *pRecordInfo)
 {
 	BOOL rt = TRUE;
 	ITypeInfo* otypeinfo = 0;

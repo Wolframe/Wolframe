@@ -10,6 +10,7 @@
 #include <atlcom.h>
 #include <metahost.h>
 
+namespace _Wolframe {
 namespace comauto {
 
 ///\remark This object cann only be created and destroyed once (because runtime host cannot be created again in the same process after a stop)
@@ -28,5 +29,5 @@ private:
     ICorRuntimeHost *m_runtimehost;
 };
 
-} //namespace
+}} //namespace
 #endif
