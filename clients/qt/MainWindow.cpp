@@ -395,6 +395,9 @@ void MainWindow::finishInitialize( )
 // update menus and toolbars
 	updateMenusAndToolbars( );
 
+// update shortcuts to standard ones
+	updateActionShortcuts( );
+	
 // enable open forms in new window in MDI mode
 	activateAction( "actionOpenFormNewWindow", m_mdi );
 
@@ -895,3 +898,62 @@ void MainWindow::on_actionManageServers_triggered( )
 	delete serversDlg;
 }
 
+QKeySequence::StandardKey MainWindow::defaultKeySequenceFromString( const QString s )
+{
+	if( s == "QKeySequence::NextChild" ) {
+		return QKeySequence::NextChild;
+	} else if( s == "QKeySequence::PreviousChild" ) {
+		return QKeySequence::PreviousChild;
+	} else if( s == "QKeySequence::Print" ) {
+		return QKeySequence::Print;
+	} else if( s == "QKeySequence::Quit" ) {
+		return QKeySequence::Quit;
+	} else if( s == "QKeySequence::Undo" ) {
+		return QKeySequence::Undo;
+	} else if( s == "QKeySequence::Redo" ) {
+		return QKeySequence::Redo;
+	} else if( s == "QKeySequence::Cut" ) {
+		return QKeySequence::Cut;
+	} else if( s == "QKeySequence::Copy" ) {
+		return QKeySequence::Copy;
+	} else if( s == "QKeySequence::Paste" ) {
+		return QKeySequence::Paste;
+	} else if( s == "QKeySequence::Delete" ) {
+		return QKeySequence::Delete;
+	} else if( s == "QKeySequence::SelectAll" ) {
+		return QKeySequence::SelectAll;
+	} else if( s == "QKeySequence::Refresh" ) {
+		return QKeySequence::Refresh;
+	} else if( s == "QKeySequence::Open" ) {
+		return QKeySequence::Open;
+	} else if( s == "QKeySequence::New" ) {
+		return QKeySequence::New;
+	} else if( s == "QKeySequence::Close" ) {
+		return QKeySequence::Close;
+	} else if( s == "QKeySequence::Preferences" ) {
+		return QKeySequence::Preferences;
+	} else if( s == "QKeySequence::HelpContents" ) {
+		return QKeySequence::HelpContents;
+	} else {
+		return QKeySequence::UnknownKey;
+	}
+}
+
+void MainWindow::updateActionShortcuts( )
+{
+	foreach( QAction *action, findChildren<QAction *>( ) ) {
+		QString s = FormWidget::readDynamicStringProperty( action, "defaultShortcut" );
+		if( !s.isEmpty( ) ) {
+			QKeySequence::StandardKey shortcut = defaultKeySequenceFromString( s );
+			if( shortcut != QKeySequence::UnknownKey ) {
+				QKeySequence seq( shortcut );
+				if( !seq.isEmpty( ) ) {
+					action->setShortcuts( defaultKeySequenceFromString( s ) );
+					qDebug( ) << "ACTION" << action << "gets default shortcut" << s;
+				} else {
+					qDebug( ) << "ACTION" << action << "keeps shortcuts from ui resource" << action->shortcuts( );
+				}
+			}
+		}
+	}
+}

@@ -40,7 +40,6 @@
     <property name="title">
      <string>&amp;Connection</string>
     </property>
-    <addaction name="separator"/>
     <addaction name="actionLogin"/>
     <addaction name="actionLogout"/>
     <addaction name="separator"/>
@@ -83,8 +82,6 @@
      <string>&amp;Window</string>
     </property>
     <addaction name="actionReloadWindow"/>
-    <addaction name="actionOpenForm"/>
-    <addaction name="actionOpenFormNewWindow"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
     <addaction name="actionCloseAll"/>
@@ -99,6 +96,9 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionOpenFormNewWindow"/>
+    <addaction name="actionOpenForm"/>
+    <addaction name="separator"/>
     <addaction name="actionPrint"/>
     <addaction name="separator"/>
     <addaction name="actionRestart"/>
@@ -176,7 +176,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset>
-     <normaloff>open.png</normaloff>open.png</iconset>
+     <normaloff>../../../../../../../home/abaumann/.designer/backup/open.png</normaloff>../../../../../../../home/abaumann/.designer/backup/open.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Open</string>
@@ -197,7 +197,10 @@
     <string>Exit the Wolframe client</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+X</string>
+    <string>Ctrl+Q</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Quit</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -235,6 +238,9 @@
    <property name="toolTip">
     <string>Configure application preferences</string>
    </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Preferences</string>
+   </property>
   </action>
   <action name="actionManageStorage">
    <property name="text">
@@ -256,8 +262,8 @@
    <property name="text">
     <string>&amp;Open form..</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
+   <property name="defaultShortcut" stdset="0">
+    <string>QKeySequence::Open</string>
    </property>
   </action>
   <action name="actionOpenFormNewWindow">
@@ -267,13 +273,16 @@
    <property name="text">
     <string>Open form in &amp;new window..</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
+   <property name="defaultShortcut" stdset="0">
+    <string>QKeySequence::New</string>
    </property>
   </action>
   <action name="actionContents">
    <property name="text">
     <string>Contents</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::HelpContents</string>
    </property>
   </action>
   <action name="actionIndex">
@@ -284,9 +293,6 @@
   <action name="actionContextHelp">
    <property name="text">
     <string>Context Help</string>
-   </property>
-   <property name="shortcut">
-    <string>F1</string>
    </property>
   </action>
   <action name="actionTechnical_Support">
@@ -318,8 +324,8 @@
    <property name="toolTip">
     <string>Reload the active window</string>
    </property>
-   <property name="shortcut">
-    <string>F5</string>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Refresh</string>
    </property>
   </action>
   <action name="actionClose">
@@ -331,6 +337,12 @@
    </property>
    <property name="toolTip">
     <string>Close the active window</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Close</string>
    </property>
   </action>
   <action name="actionCloseAll">
@@ -380,8 +392,8 @@
    <property name="toolTip">
     <string>Move the focus to the next window</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Tab</string>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::NextChild</string>
    </property>
   </action>
   <action name="actionPreviousWindow">
@@ -398,8 +410,8 @@
    <property name="toolTip">
     <string>Move the focus to the previous window</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+Backtab</string>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::PreviousChild</string>
    </property>
   </action>
   <action name="actionUndo">
@@ -416,8 +428,8 @@
    <property name="toolTip">
     <string>Undo the last action</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Z</string>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Undo</string>
    </property>
   </action>
   <action name="actionRedo">
@@ -434,8 +446,8 @@
    <property name="toolTip">
     <string>Redo the last undo</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Y</string>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Redo</string>
    </property>
   </action>
   <action name="actionCut">
@@ -452,8 +464,8 @@
    <property name="toolTip">
     <string>Cut the current selection's contents to the clipboard</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+X</string>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Cut</string>
    </property>
   </action>
   <action name="actionPaste">
@@ -470,8 +482,8 @@
    <property name="toolTip">
     <string>Paste the clipboard's contents into the current selection</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+V</string>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Paste</string>
    </property>
   </action>
   <action name="actionDelete">
@@ -488,8 +500,8 @@
    <property name="toolTip">
     <string>Delete the current selection's contents</string>
    </property>
-   <property name="shortcut">
-    <string>Del</string>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Delete</string>
    </property>
   </action>
   <action name="actionSelectAll">
@@ -502,8 +514,8 @@
    <property name="toolTip">
     <string>Select all items in the current window</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+A</string>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::SelectAll</string>
    </property>
   </action>
   <action name="actionCopy">
@@ -520,8 +532,8 @@
    <property name="toolTip">
     <string>Copy the current selection's contents to the clipboard</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+C</string>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Copy</string>
    </property>
   </action>
   <action name="actionLogin">
@@ -562,6 +574,9 @@
    <property name="toolTip">
     <string>Print current document</string>
    </property>
+   <property name="defaultShortcut" stdset="0">
+    <string notr="true">QKeySequence::Print</string>
+   </property>
   </action>
   <action name="actionManageServers">
    <property name="text">
@@ -577,6 +592,14 @@
    </property>
    <property name="iconText">
     <string>English</string>
+   </property>
+  </action>
+  <action name="action_Close_form">
+   <property name="text">
+    <string>&amp;Close form</string>
+   </property>
+   <property name="defaultShortcut" stdset="0">
+    <string>QKeySequence::Close</string>
    </property>
   </action>
  </widget>

@@ -92,6 +92,8 @@ class MainWindow : public QMainWindow
 		int nofSubWindows( ) const;
 		void activateAction( const QString name, bool enabled );
 		QString composeWindowListTitle( const int idx, const QString title );
+		QKeySequence::StandardKey defaultKeySequenceFromString( const QString s );
+		void updateActionShortcuts( );
 
 	private slots:
 // slots for command line parsing

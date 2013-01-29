@@ -21,6 +21,7 @@ now:
     requests, so it's the domain filler.
     It happens only if the same form is picked as already shown in another window
     => happens also with only one window?!
+  - store position and status of all subwindows
 - integrate from qWolfClient
   - rewrite login/logout (simplify, not so asynchronous as now)
   - use connection data from new connections

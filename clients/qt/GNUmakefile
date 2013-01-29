@@ -182,9 +182,6 @@ DATA = \
 	apps/test/data/form4.xml \
 	apps/test/data/domain_form4_vegetable.xml
 	
-THEMES = \
-	MainWindow.ui
-
 %.qm : %.ts
 	$(QT_LRELEASE) $< -qm $@
 
@@ -235,14 +232,6 @@ local_uninstall:
 	-rmdir $(DESTDIR)$(bindir)
 
 local_test:
-	@echo "Testing validity of themes.."
-	@for i in $(THEMES); do xmllint --noout --schema schemas/qt-ui-4.7.xsd $$i; done
-	@echo "Testing validity of forms.."
-	@for i in $(FORMS); do xmllint --noout --schema schemas/qt-ui-4.7.xsd $$i; done
-	@echo "Testing validity of XML data.."
-	@echo "Testing validity of form translation sources.."
-	@for i in $(I18NS_TS); do xmllint --noout -dtdvalid schemas/qt-ts-2.0.dtd $$i && echo "$$i validates"; done
-	@for i in $(DATA); do xmllint --noout $$i && echo "$$i validates"; done
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
