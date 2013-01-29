@@ -101,7 +101,12 @@ OBJS = \
 CPP_BINS = \
 	qtclient.exe
 
-all: MainWindowUi.hpp $(OBJS) $(CPP_BINS)
+UIS = \
+	ui_MainWindow.hpp \
+	ui_manageServersDialog.h \
+	ui_serverDefinitionDialog.h
+
+all: $(UIS) $(OBJS) $(CPP_BINS)
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 
@@ -226,11 +231,6 @@ ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
 serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
 
-UIS = \
-	ui_MainWindow.hpp \
-	ui_manageServersDialog.h \
-	ui_serverDefinitionDialog.h
-
 MainWindow.hpp: $(UIS)
 qtclient.cpp: ui_MainWindow.hpp MainWindow.hpp
 
@@ -248,7 +248,7 @@ local_clean:
 	@-erase moc_*.cpp 2>NUL
 	@-erase $(I18NS) 2>NUL
 	@-erase qtclient.res 2>NUL
-	@-erase MainWindowUi.hpp 2>NUL
+	@-erase $(UIS) 2>NUL
 
 local_distclean:
 
