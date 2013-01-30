@@ -67,8 +67,6 @@ CPP_OBJS = \
 	moc_FormWidget.o \
 	qcommandline.o \
 	moc_qcommandline.o \
-	LoginDialog.o \
-	moc_LoginDialog.o \
 	Preferences.o \
 	moc_Preferences.o \
 	PreferencesDialog.o \
@@ -83,7 +81,9 @@ CPP_OBJS = \
 	moc_manageServersDialog.o \
 	serverDefinitionDialog.o \
 	moc_serverDefinitionDialog.o \
-	settings.o
+	settings.o \
+	loginDialog.o \
+	moc_loginDialog.o
 		
 CPP_BINS = \
 	qtclient$(EXE)
@@ -116,9 +116,6 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormWidget.hpp -o moc_FormWidget.cpp
 
-moc_LoginDialog.cpp: LoginDialog.hpp
-	$(QT_MOC) $(MOC_FLAGS) LoginDialog.hpp -o moc_LoginDialog.cpp
-
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_MOC) $(MOC_FLAGS) qcommandline.h -o moc_qcommandline.cpp
 
@@ -146,8 +143,11 @@ moc_manageServersDialog.cpp: manageServersDialog.hpp
 moc_serverDefinitionDialog.cpp: serverDefinitionDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) serverDefinitionDialog.hpp -o moc_serverDefinitionDialog.cpp
 
-ui_MainWindow.hpp: MainWindow.ui
-	$(QT_UIC) -o ui_MainWindow.hpp MainWindow.ui
+moc_loginDialog.cpp: loginDialog.hpp
+	$(QT_MOC) $(MOC_FLAGS) loginDialog.hpp -o moc_loginDialog.cpp
+
+ui_MainWindow.h: MainWindow.ui
+	$(QT_UIC) -o ui_MainWindow.h MainWindow.ui
 
 ui_manageServersDialog.h: manageServersDialog.ui
 	$(QT_UIC) -o ui_manageServersDialog.h manageServersDialog.ui
@@ -155,16 +155,20 @@ ui_manageServersDialog.h: manageServersDialog.ui
 ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 	$(QT_UIC) -o ui_serverDefinitionDialog.h serverDefinitionDialog.ui
 
+ui_loginDialog.h: loginDialog.ui
+	$(QT_UIC) -o ui_loginDialog.h loginDialog.ui
+	
 UIS = \
-	ui_MainWindow.hpp \
+	ui_MainWindow.h \
 	ui_manageServersDialog.h \
-	ui_serverDefinitionDialog.h
+	ui_serverDefinitionDialog.h \
+	ui_loginDialog.h
 
-serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
-serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
-
-MainWindow.hpp: $(UIS)
-qtclient.cpp: ui_MainWindow.hpp
+qtclient.d: ui_MainWindow.h
+MainWindow.d: ui_MainWindow.h
+manageServersDialog.d: ui_manageServersDialog.h
+serverDefinitionDialog.d: ui_serverDefinitionDialog.h
+loginDialog.d: ui_loginDialog.h
 
 qtclient$(EXE): $(CPP_OBJS) qrc_qtclient.o qtclient.o
 

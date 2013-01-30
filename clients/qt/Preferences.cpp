@@ -66,6 +66,7 @@ void Preferences::loadSettings( )
 	m_uiLoadMode = static_cast< LoadMode >( metaEnum.keyToValue( s->value( "wolframe/uiloadmode", DEFAULT_UILOADMODE_STRING ).toString( ).toStdString( ).c_str( ) ) );
 	m_dataLoadMode = static_cast< LoadMode >( metaEnum.keyToValue( s->value( "wolframe/dataloadmode", DEFAULT_DATALOADMODE_STRING ).toString( ).toStdString( ).c_str( ) ) );
 	m_debug = s->value( "wolframe/debug", false ).toBool( );
+	m_developer = s->value( "wolframe/developer", false ).toBool( );
 	m_uiFormsDir = s->value( "wolframe/uiFormDir", DEFAULT_UI_FORMS_DIR ).toString( );
 	m_uiFormTranslationsDir = s->value( "wolframe/uiFormTranslationsDir", DEFAULT_UI_FORM_TRANSLATIONS_DIR ).toString( );
 	m_uiFormResourcesDir = s->value( "wolframe/uiFormResourcesDir", DEFAULT_UI_FORM_RESOURCES_DIR ).toString( );
@@ -91,6 +92,7 @@ void Preferences::storeSettings( )
 	s->setValue( "wolframe/uiloadmode", metaEnum.valueToKey( m_uiLoadMode ) );
 	s->setValue( "wolframe/dataloadmode", metaEnum.valueToKey( m_dataLoadMode ) );
 	s->setValue( "wolframe/debug", m_debug );
+	s->setValue( "wolframe/developer", m_developer );
 	s->setValue( "wolframe/uiFormDir", m_uiFormsDir );
 	s->setValue( "wolframe/uiFormTranslationsDir", m_uiFormTranslationsDir );
 	s->setValue( "wolframe/uiFormResourcesDir", m_uiFormResourcesDir );

@@ -73,6 +73,10 @@ class Preferences : public QObject
 			bool debug( ) const { return m_debug; }
 			void setDebug( bool _debug ) { m_debug = _debug; }
 
+			Q_PROPERTY( bool developer READ developer WRITE setDeveloper )
+			bool developer( ) const { return m_developer; }
+			void setDeveloper( bool _developer ) { m_developer = _developer; }
+
 			Q_PROPERTY( QString uiFormsDir READ uiFormsDir WRITE setUiFormsDir )
 			QString uiFormsDir( ) const { return m_uiFormsDir; }
 			void setUiFormsDir( QString _uiFormsDir ) { m_uiFormsDir = _uiFormsDir; }
@@ -117,6 +121,7 @@ class Preferences : public QObject
 			LoadMode m_uiLoadMode;
 			LoadMode m_dataLoadMode;
 			bool m_debug;
+			bool m_developer;
 			QString m_uiFormsDir;
 			QString m_uiFormTranslationsDir;
 			QString m_uiFormResourcesDir;

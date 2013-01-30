@@ -44,6 +44,7 @@
 		FileChooser *m_uiFormResourcesDir;
 		FileChooser *m_dataLoaderDir;
 		QCheckBox *m_debug;
+		QCheckBox *m_developer;
 		QComboBox *m_locale;
 		QCheckBox *m_systemLanguage;
 		QStringList m_languages;

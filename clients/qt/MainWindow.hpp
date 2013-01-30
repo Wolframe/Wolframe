@@ -6,7 +6,6 @@
 #define _MAIN_WINDOW_HPP_INCLUDED
 
 #include <QCommandLine>	
-#include <QCloseEvent>
 #include <QMainWindow>
 #include <QtUiTools>
 #include <QTranslator>
@@ -22,9 +21,9 @@
 #include "DebugTerminal.hpp"
 #include "WolframeClient.hpp"
 #include "FormWidget.hpp"
-#include "LoginDialog.hpp"
+#include "loginDialog.hpp"
 #include "LoadMode.hpp"
-#include "ui_MainWindow.hpp"
+#include "ui_MainWindow.h"
 #include "settings.hpp"
 
 class MainWindow : public QMainWindow
@@ -57,6 +56,7 @@ class MainWindow : public QMainWindow
 		LoadMode m_uiLoadMode;		// how to load UI forms and data
 		LoadMode m_dataLoadMode;	// how to load data domains
 		bool m_debug;			// show debug windows from the beginning
+		bool m_developer;		// show developer backdors
 		LoginDialog *m_loginDialog;	// the login dialog
 		QString m_settings;		// file to read settings from
 		QString m_uiFormsDir;		// for FileFormLoader (forms dir)
@@ -77,7 +77,6 @@ class MainWindow : public QMainWindow
 		void readSettings( );
 		void parseArgs( );
 		void initialize( );
-		void finishInitialize( );
 		void loadLanguages( );
 		void loadForm( QString formName );
 		void loadLanguage( QString language );
@@ -94,6 +93,7 @@ class MainWindow : public QMainWindow
 		QString composeWindowListTitle( const int idx, const QString title );
 		QKeySequence::StandardKey defaultKeySequenceFromString( const QString s );
 		void updateActionShortcuts( );
+		void addDeveloperMenu( );
 
 	private slots:
 // slots for command line parsing
@@ -106,8 +106,9 @@ class MainWindow : public QMainWindow
 		void wolframeError( QString error );
 		void connected( );
 		void disconnected( );
-		void authenticationOk( );
-		void authenticationFailed( );
+		void mechsReceived( QStringList mechs );
+		void authOk( );
+		void authFailed( );
 
 // menu slots
 		void languageSelected( QAction *action );
@@ -121,8 +122,11 @@ class MainWindow : public QMainWindow
 // MDI slots
 		void subWindowSelected( QAction *action );
 		void subWindowChanged( QMdiSubWindow *w );
-		void updateMenusAndToolbars( );
+		void updateMdiMenusAndToolbars( );
 		void updateWindowMenu( );
+
+// generic updating of status in menus and toolbars
+		void updateMenusAndToolbars( );
 
 // auto-wired slots for the menu
 		void on_actionRestart_triggered( );
@@ -138,6 +142,8 @@ class MainWindow : public QMainWindow
 		void on_actionPreviousWindow_triggered( );
 		void on_actionClose_triggered( );
 		void on_actionCloseAll_triggered( );
+		void on_actionLogin_triggered( );
+		void on_actionLogout_triggered( );
 		void on_actionManageServers_triggered( );
 };
 

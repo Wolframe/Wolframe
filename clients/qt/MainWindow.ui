@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -60,8 +63,6 @@
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAboutQt"/>
-    <addaction name="separator"/>
-    <addaction name="actionDebugTerminal"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -176,7 +177,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../../../../home/abaumann/.designer/backup/open.png</normaloff>../../../../../../../home/abaumann/.designer/backup/open.png</iconset>
+     <normaloff>../../../../../../../../../../home/abaumann/.designer/backup/open.png</normaloff>../../../../../../../../../../home/abaumann/.designer/backup/open.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Open</string>
@@ -199,6 +200,9 @@
    <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
+   </property>
    <property name="defaultShortcut" stdset="0">
     <string notr="true">QKeySequence::Quit</string>
    </property>
@@ -207,10 +211,16 @@
    <property name="text">
     <string>&amp;About Wolframe Client</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
+   </property>
   </action>
   <action name="actionAboutQt">
    <property name="text">
     <string>About &amp;Qt</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
    </property>
   </action>
   <action name="actionDebugTerminal">
@@ -238,6 +248,9 @@
    <property name="toolTip">
     <string>Configure application preferences</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::PreferencesRole</enum>
+   </property>
    <property name="defaultShortcut" stdset="0">
     <string notr="true">QKeySequence::Preferences</string>
    </property>
@@ -257,7 +270,7 @@
   </action>
   <action name="actionOpenForm">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>&amp;Open form..</string>
@@ -280,6 +293,9 @@
   <action name="actionContents">
    <property name="text">
     <string>Contents</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
    <property name="defaultShortcut" stdset="0">
     <string notr="true">QKeySequence::HelpContents</string>
@@ -323,6 +339,9 @@
    </property>
    <property name="toolTip">
     <string>Reload the active window</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
    <property name="defaultShortcut" stdset="0">
     <string notr="true">QKeySequence::Refresh</string>

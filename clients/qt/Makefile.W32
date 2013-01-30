@@ -80,8 +80,6 @@ OBJS = \
 	moc_FormWidget.obj \
 	qcommandline.obj \
 	moc_qcommandline.obj \
-	LoginDialog.obj \
-	moc_LoginDialog.obj \
 	Preferences.obj \
 	moc_Preferences.obj \
 	PreferencesDialog.obj \
@@ -96,15 +94,18 @@ OBJS = \
 	moc_manageServersDialog.obj \
 	serverDefinitionDialog.obj \
 	moc_serverDefinitionDialog.obj \
-	settings.obj
+	settings.obj \
+	loginDialog.obj \
+	moc_loginDialog.obj
 	
 CPP_BINS = \
 	qtclient.exe
 
 UIS = \
-	ui_MainWindow.hpp \
+	ui_MainWindow.h \
 	ui_manageServersDialog.h \
-	ui_serverDefinitionDialog.h
+	ui_serverDefinitionDialog.h \
+	ui_loginDialog.h
 
 all: $(UIS) $(OBJS) $(CPP_BINS)
 
@@ -195,9 +196,6 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormWidget.hpp -o moc_FormWidget.cpp
 
-moc_LoginDialog.cpp: LoginDialog.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. LoginDialog.hpp -o moc_LoginDialog.cpp
-
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. qcommandline.h -o moc_qcommandline.cpp
 
@@ -219,8 +217,11 @@ moc_manageServersDialog.cpp: manageServersDialog.hpp
 moc_serverDefinitionDialog.cpp: serverDefinitionDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) serverDefinitionDialog.hpp -o moc_serverDefinitionDialog.cpp
 
-ui_MainWindow.hpp: MainWindow.ui
-	$(QT_DIR)\bin\uic -o ui_MainWindow.hpp MainWindow.ui
+moc_loginDialog.cpp: loginDialog.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) loginDialog.hpp -o moc_loginDialog.cpp
+
+ui_MainWindow.h: MainWindow.ui
+	$(QT_DIR)\bin\uic -o ui_MainWindow.h MainWindow.ui
 
 ui_manageServersDialog.h: manageServersDialog.ui
 	$(QT_DIR)\bin\uic -o ui_manageServersDialog.h manageServersDialog.ui
@@ -228,11 +229,15 @@ ui_manageServersDialog.h: manageServersDialog.ui
 ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 	$(QT_DIR)\bin\uic -o ui_serverDefinitionDialog.h serverDefinitionDialog.ui
 
+ui_loginDialog.h: loginDialog.ui
+	$(QT_DIR)\bin\uic -o ui_loginDialog.h loginDialog.ui
+
+manageServersDialog.cpp: ui_manageServersDialog.h
 serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
-serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
+loginDialog.cpp: ui_loginDialog.h
+qtclient.cpp: ui_MainWindow.h MainWindow.hpp
 
 MainWindow.hpp: $(UIS)
-qtclient.cpp: ui_MainWindow.hpp MainWindow.hpp
 
 qtclient.res: qtclient.ico qtclient.rc
 	rc /foqtclient.res qtclient.rc

@@ -30,7 +30,8 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_host( "localhost" ), m_port( 7661 ), m_secure( false ), m_checkSSL( true ),
 	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
 	m_CACertFile( "./certs/CAclient.cert.pem" ),
-	m_uiLoadMode( DEFAULT_UILOADMODE ), m_dataLoadMode( DEFAULT_DATALOADMODE ), m_debug( false ),
+	m_uiLoadMode( DEFAULT_UILOADMODE ), m_dataLoadMode( DEFAULT_DATALOADMODE ),
+	m_debug( false ), m_developer( false ),
 	m_loginDialog( 0 ), m_settings( ),
 	m_uiFormsDir( DEFAULT_UI_FORMS_DIR ),
 	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
@@ -79,6 +80,7 @@ void MainWindow::readSettings( )
 	m_dataLoadMode = prefs->dataLoadMode( );
 	m_debug = prefs->debug( );
 	_debug = m_debug;
+	m_developer = prefs->developer( );
 	m_uiFormsDir = prefs->uiFormsDir( );
 	m_uiFormTranslationsDir = prefs->uiFormTranslationsDir( );
 	m_uiFormResourcesDir = prefs->uiFormResourcesDir( );
@@ -91,8 +93,6 @@ void MainWindow::readSettings( )
 	m_mdi = prefs->mdi( );
 
 	settings.read( "Wolframe", "Wolframe Client" );
-	move( settings.mainWindowPos );
-	resize( settings.mainWindowSize );
 }
 
 static DebugTerminal *debugTerminal = 0;
@@ -159,24 +159,13 @@ MainWindow::~MainWindow( )
 	}
 }
 
+// --- command line argument handling
+
 void MainWindow::parseArgs( )
 {
 	const struct QCommandLineConfigEntry conf[] =
 	{
 		{ QCommandLine::Option, 's', "settings", "Use settings from this file", QCommandLine::Optional },
-		{ QCommandLine::Option, 'H', "host", "Wolframe host", QCommandLine::Optional },
-		{ QCommandLine::Option, 'p', "port", "Wolframe port", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'S', "secure", "connect securely via SSL", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'f', "ui-local-file", "Run with local form loader (in filesystem)", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'n', "ui-network", "Run with network storage for forms", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'F', "data-local-file", "Run with local form loader (in filesystem)", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'N', "data-network", "Run with network storage for data", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'd', "debug", "Enable debug window when starting", QCommandLine::Optional },
-		{ QCommandLine::Option, 'v', "verbose", "verbose level", QCommandLine::Optional },
-		{ QCommandLine::Option, 'c', "client-cert-file", "client certificate to present to the server (default: ./certs/client.crt)", QCommandLine::Optional },
-		{ QCommandLine::Option, 'k', "client-key-file", "client key file (default: ./private/client.key)", QCommandLine::Optional },
-		{ QCommandLine::Option, 'C', "CA-cert-file", "certificate file containing the CA (default: ./certs/CAclient.cert.pem)", QCommandLine::Optional },
-		{ QCommandLine::Switch, 'm', "mdi", "MDI interface instead of one main window", QCommandLine::Optional },
 		QCOMMANDLINE_CONFIG_ENTRY_END
 	};
 
@@ -205,22 +194,6 @@ void MainWindow::parseArgs( )
 void MainWindow::switchFound( const QString &name )
 {
 	qDebug( ) << "switch" << name;
-	if( name == "ui-local-file" ) {
-		m_uiLoadMode = LocalFile;
-	} else if( name == "ui-network" ) {
-		m_uiLoadMode = Network;
-	} else if( name == "data-local-file" ) {
-		m_dataLoadMode = LocalFile;
-	} else if( name == "data-network" ) {
-		m_dataLoadMode = Network;
-	} else if( name == "secure" ) {
-		m_secure = true;
-	} else if( name == "debug" ) {
-		m_debug = true;
-		_debug = true;
-	} else if( name == "mdi" ) {
-		m_mdi = true;
-	}
 }
 
 void MainWindow::optionFound( const QString &name, const QVariant &value )
@@ -228,16 +201,6 @@ void MainWindow::optionFound( const QString &name, const QVariant &value )
 	qDebug( ) << "option" << name << "with" << value;
 	if( name == "settings" ) {
 		m_settings = value.toString( );
-	} else if( name == "host" ) {
-		m_host = value.toString( );
-	} else if( name == "port" ) {
-		m_port = value.toString( ).toUShort( );
-	} else if( name == "client-cert-file" ) {
-		m_clientCertFile = value.toString( );
-	} else if( name == "client-key-file" ) {
-		m_clientKeyFile = value.toString( );
-	} else if( name == "CA-cert-file" ) {
-		m_CACertFile = value.toString( );
 	}
 }
 
@@ -253,31 +216,27 @@ void MainWindow::parseError( const QString &error )
 	QCoreApplication::quit( );
 }
 
+// -- initialization
+
 void MainWindow::initialize( )
 {	
-// create a Wolframe protocol client
-	m_wolframeClient = new WolframeClient( m_host, m_port, m_secure, m_checkSSL, m_clientCertFile, m_clientKeyFile, m_CACertFile );
-
-// create debuging terminal (only if debugging is enable per command line or in preferences! Don't
-// fill up the plain text widget with images!)
-	if( m_debug ) {
-		m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
-		debugTerminal = m_debugTerminal;
-
-// connect lines sent by anybody to the debug window
-		connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
-			m_debugTerminal, SLOT( sendLine( QString ) ) );
-
-		qDebug( ) << "Debug window initialized";
-	}
+//~ // create debuging terminal (only if debugging is enable per command line or in preferences! Don't
+//~ // fill up the plain text widget with images!)
+	//~ if( m_debug ) {
+		//~ m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
+		//~ debugTerminal = m_debugTerminal;
+//~ 
+//~ // connect lines sent by anybody to the debug window
+		//~ connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
+			//~ m_debugTerminal, SLOT( sendLine( QString ) ) );
+//~ 
+		//~ qDebug( ) << "Debug window initialized";
+	//~ }
 
 // install custom output handler
 	qInstallMsgHandler( &myMessageOutput );
-	//if( m_debug ) m_debugTerminal->bringToFront( );
-
-// catch error of network protocol
-	connect( m_wolframeClient, SIGNAL( error( QString ) ),
-		this, SLOT( wolframeError( QString ) ) );
+	//~ //if( m_debug ) m_debugTerminal->bringToFront( );
+//~ 
 
 // a Qt UI loader for the main theme window and also used by all form widgets
 	m_uiLoader = new QUiLoader( );
@@ -306,26 +265,10 @@ void MainWindow::initialize( )
 			break;
 
 		case Network:
-			// skip, delay
+			// skip, delay, needs a working connection for this
 			break;
 	}
 
-// end of what we can do in network mode, initiate connect here and bail out
-// connect the wolframe client to protocols, authenticate
-	if( m_uiLoadMode == Network || m_dataLoadMode == Network ) {
-		connect( m_wolframeClient, SIGNAL( connected( ) ),
-			this, SLOT( connected( ) ) );
-		connect( m_wolframeClient, SIGNAL( disconnected( ) ),
-			this, SLOT( disconnected( ) ) );
-		m_wolframeClient->connect( );
-		return;
-	}
-
-	finishInitialize( );
-}
-
-void MainWindow::finishInitialize( )
-{
 // link the form loader for form loader notifications needed by the main window
 // (list of forms for form menu, list of language for language picker)
 	connect( m_formLoader, SIGNAL( languageCodesLoaded( QStringList ) ),
@@ -362,45 +305,23 @@ void MainWindow::finishInitialize( )
 
 // default is tiling (TODO: remeber position, forms and sizes of open windows)
 			m_mdiArea->tileSubWindows( );
-
-// create initial sub window (TODO: remeber position, forms and sizes of open windows)
-			CreateMdiSubWindow( "init" );
 		} else {
-// missing a MDI araa, so add just one form widget as main entry widget
-			m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
-
-			connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
-				this, SLOT( formLoaded( QString ) ) );
-			connect( m_formWidget, SIGNAL( error( QString ) ),
-				this, SLOT( formError( QString ) ) );
-
-			setCentralWidget( m_formWidget );
+// missing a MDI area, so we disable the m_mdi flag
 			m_mdi = false;
 		}
-	} else {
-// non-MDI mode, open one form
-		m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
-
-		connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
-			this, SLOT( formLoaded( QString ) ) );
-		connect( m_formWidget, SIGNAL( error( QString ) ),
-			this, SLOT( formError( QString ) ) );
-		
-		setCentralWidget( m_formWidget );
 	}
 
-// make debug action available
-	activateAction( "actionDebugTerminal", m_debug );
+// add the menu entries for the developer mode
+	if( m_developer ) {
+		addDeveloperMenu( );
+	}
 
 // update menus and toolbars
 	updateMenusAndToolbars( );
 
 // update shortcuts to standard ones
 	updateActionShortcuts( );
-	
-// enable open forms in new window in MDI mode
-	activateAction( "actionOpenFormNewWindow", m_mdi );
-
+			
 // now that we have a menu where we can add things, we start the form list loading
 	m_formLoader->initiateListLoad( );
 
@@ -410,65 +331,127 @@ void MainWindow::finishInitialize( )
 // load language resources, repaints the whole interface if necessary
 	loadLanguage( m_currentLanguage );
 
-// load initial form
-	loadForm( "init" );
+//~ // load initial form
+	//~ loadForm( "init" );
+
+// restore main window position and size
+	move( settings.mainWindowPos );
+	resize( settings.mainWindowSize );
+	
+}
+
+void MainWindow::activateAction( const QString name, bool enabled )
+{
+	QAction *action = findChild<QAction *>( name );
+	if( action ) {
+		action->setEnabled( enabled );
+	}
+}
+
+QKeySequence::StandardKey MainWindow::defaultKeySequenceFromString( const QString s )
+{
+	if( s == "QKeySequence::NextChild" ) {
+		return QKeySequence::NextChild;
+	} else if( s == "QKeySequence::PreviousChild" ) {
+		return QKeySequence::PreviousChild;
+	} else if( s == "QKeySequence::Print" ) {
+		return QKeySequence::Print;
+	} else if( s == "QKeySequence::Quit" ) {
+		return QKeySequence::Quit;
+	} else if( s == "QKeySequence::Undo" ) {
+		return QKeySequence::Undo;
+	} else if( s == "QKeySequence::Redo" ) {
+		return QKeySequence::Redo;
+	} else if( s == "QKeySequence::Cut" ) {
+		return QKeySequence::Cut;
+	} else if( s == "QKeySequence::Copy" ) {
+		return QKeySequence::Copy;
+	} else if( s == "QKeySequence::Paste" ) {
+		return QKeySequence::Paste;
+	} else if( s == "QKeySequence::Delete" ) {
+		return QKeySequence::Delete;
+	} else if( s == "QKeySequence::SelectAll" ) {
+		return QKeySequence::SelectAll;
+	} else if( s == "QKeySequence::Refresh" ) {
+		return QKeySequence::Refresh;
+	} else if( s == "QKeySequence::Open" ) {
+		return QKeySequence::Open;
+	} else if( s == "QKeySequence::New" ) {
+		return QKeySequence::New;
+	} else if( s == "QKeySequence::Close" ) {
+		return QKeySequence::Close;
+	} else if( s == "QKeySequence::Preferences" ) {
+		return QKeySequence::Preferences;
+	} else if( s == "QKeySequence::HelpContents" ) {
+		return QKeySequence::HelpContents;
+	} else {
+		return QKeySequence::UnknownKey;
+	}
+}
+
+void MainWindow::updateActionShortcuts( )
+{
+	foreach( QAction *action, findChildren<QAction *>( ) ) {
+		QString s = FormWidget::readDynamicStringProperty( action, "defaultShortcut" );
+		if( !s.isEmpty( ) ) {
+			QKeySequence::StandardKey shortcut = defaultKeySequenceFromString( s );
+			if( shortcut != QKeySequence::UnknownKey ) {
+				QKeySequence seq( shortcut );
+				if( !seq.isEmpty( ) ) {
+					action->setShortcuts( defaultKeySequenceFromString( s ) );
+					qDebug( ) << "ACTION" << action << "gets default shortcut" << s;
+				} else {
+					qDebug( ) << "ACTION" << action << "keeps shortcuts from ui resource" << action->shortcuts( );
+				}
+			}
+		}
+	}
 }
 
 void MainWindow::connected( )
 {
-	m_loginDialog = new LoginDialog( m_wolframeClient, this );
+	m_wolframeClient->auth( );		
+}
 
-	connect( m_loginDialog, SIGNAL( authenticationOk( ) ),
-		this, SLOT( authenticationOk( ) ) );
-
-	connect( m_loginDialog, SIGNAL( authenticationFailed( ) ),
-		this, SLOT( authenticationFailed( ) ) );
-
-	m_loginDialog->show( );
+void MainWindow::mechsReceived( QStringList mechs )
+{
+	m_wolframeClient->mech( "NONE" );
 }
 
 void MainWindow::disconnected( )
 {
-	disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
-	if( m_debugTerminal ) {
-		m_debugTerminal->close( );
+	m_wolframeClient->deleteLater( );
+	m_wolframeClient = 0;
+		
+	if( m_uiLoadMode == Network ) {
+		delete m_uiLoader;
+		m_uiLoader = 0;
 	}
-	m_debugTerminal = 0;
-	debugTerminal = 0;
-
-	close( );
+	
+	if( m_dataLoadMode == Network ) {
+		delete m_dataLoader;
+		m_dataLoader = 0;
+	}
+	
+	updateMenusAndToolbars( );
+	
+	//~ disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+	//~ if( m_debugTerminal ) {
+		//~ m_debugTerminal->close( );
+	//~ }
+	//~ m_debugTerminal = 0;
+	//~ debugTerminal = 0;
+//~ 
+	//~ close( );
 }
 
 void MainWindow::wolframeError( QString error )
 {
-// fatal error, present the user a choice whether to stop now or reconfigure
-// the system
-	if( !m_dataLoader || !m_formLoader ) {
-		if( QMessageBox::critical( this, tr( "Protocol error, reconfigure now?" ),
-			tr( "Protocol error: %1, reconfigure client now?" ).arg( error ),
-			QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes ) {
-
-			PreferencesDialog prefs( m_languages, this );
-			if( prefs.exec( ) == QDialog::Accepted ) {
-// reload and use new settings
-				qDebug( ) << "Reloading application";
-				QApplication::instance( )->exit( RESTART_CODE );
-			} else {
-// fatal situation, terminate
-				QApplication::instance( )->exit( 0 );
-			}
-		}
-	} else {
-// the error is normal way of life, so show only a normal error message in the statusbar
-		statusBar( )->showMessage( error, 6000 );
-	}
+	statusBar( )->showMessage( error, 6000 );
 }
 
-void MainWindow::authenticationOk( )
+void MainWindow::authOk( )
 {
-	m_loginDialog->close( );
-	m_loginDialog->deleteLater( );
-
 	qDebug( ) << "authentication succeeded";
 
 // create network based form ...
@@ -481,17 +464,30 @@ void MainWindow::authenticationOk( )
 		m_dataLoader = new NetworkDataLoader( m_wolframeClient, m_debug );
 	}
 
-	finishInitialize( );
+// load initial form, TODO: load forms and position of windows from settings,
+// of none there, load init form in a MDI subwindow or directly
+	if( m_mdi ) {
+		CreateMdiSubWindow( "init" );
+	} else {
+		m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
+
+		connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+			this, SLOT( formLoaded( QString ) ) );
+		connect( m_formWidget, SIGNAL( error( QString ) ),
+			this, SLOT( formError( QString ) ) );
+		
+		setCentralWidget( m_formWidget );
+		
+		loadForm( "init" );
+	}	
+
+// update status of menus and toolbars
+ 	updateMenusAndToolbars( );
 }
 
-void MainWindow::authenticationFailed( )
+void MainWindow::authFailed( )
 {
-	m_loginDialog->close( );
-	m_loginDialog->deleteLater( );
-
 	qDebug( ) << "authentication failed";
-
-	QApplication::instance( )->exit( RESTART_CODE );
 }
 
 void MainWindow::loadLanguages( )
@@ -674,16 +670,17 @@ void MainWindow::on_actionRestart_triggered( )
 
 void MainWindow::on_actionExit_triggered( )
 {
-	if( m_uiLoadMode == Network || m_dataLoadMode == Network ) {
-		m_wolframeClient->disconnect( );
-	} else {
-// terminate brutally in local mode
-		disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
-		m_debugTerminal = 0;
-		debugTerminal = 0;
-
-		close( );
-	}
+	close( );
+	//~ if( m_uiLoadMode == Network || m_dataLoadMode == Network ) {
+		//~ m_wolframeClient->disconnect( );
+	//~ } else {
+//~ // terminate brutally in local mode
+		//~ disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+		//~ m_debugTerminal = 0;
+		//~ debugTerminal = 0;
+//~ 
+		//~ close( );
+	//~ }
 }
 
 void MainWindow::closeEvent( QCloseEvent *e )
@@ -722,16 +719,7 @@ void MainWindow::on_actionAboutQt_triggered( )
 	QMessageBox::aboutQt( this, tr( "qtclient" ) );
 }
 
-void MainWindow::on_actionDebugTerminal_triggered( bool checked )
-{
-	if( m_debugTerminal ) {
-		if( checked ) {
-			m_debugTerminal->bringToFront( );
-		} else {
-			m_debugTerminal->hide( );
-		}
-	}
-}
+// -- form handling
 
 void MainWindow::on_actionOpenForm_triggered( )
 {
@@ -741,6 +729,13 @@ void MainWindow::on_actionOpenForm_triggered( )
 		loadForm( form );
 	}
 }
+
+void MainWindow::on_actionReloadWindow_triggered( )
+{
+	m_formWidget->reload( );
+}
+
+// -- MDI mode
 
 void MainWindow::CreateMdiSubWindow( const QString form )
 {
@@ -762,16 +757,6 @@ void MainWindow::CreateMdiSubWindow( const QString form )
 	mdiSubWindow->resize( mdiSubWindow->sizeHint( ) );
 }
 
-void MainWindow::on_actionOpenFormNewWindow_triggered( )
-{
-	FormChooseDialog d( m_forms, this );
-	if( d.exec( ) == QDialog::Accepted ) {
-		CreateMdiSubWindow( d.form( ) );
-	}
-
-	updateMenusAndToolbars( );
-}
-
 void MainWindow::subWindowSelected( QAction *action )
 {
 	QMdiSubWindow *w = m_subWinMap.value( action );
@@ -787,9 +772,14 @@ void MainWindow::subWindowChanged( QMdiSubWindow *w )
 	updateWindowMenu( );
 }
 
-void MainWindow::on_actionReloadWindow_triggered( )
+void MainWindow::on_actionOpenFormNewWindow_triggered( )
 {
-	m_formWidget->reload( );
+	FormChooseDialog d( m_forms, this );
+	if( d.exec( ) == QDialog::Accepted ) {
+		CreateMdiSubWindow( d.form( ) );
+	}
+
+	updateMenusAndToolbars( );
 }
 
 void MainWindow::on_actionNextWindow_triggered( )
@@ -826,68 +816,142 @@ int MainWindow::nofSubWindows( ) const
 	return list.count( );
 }
 
-void MainWindow::activateAction( const QString name, bool enabled )
+void MainWindow::updateMdiMenusAndToolbars( )
 {
-	QAction *action = findChild<QAction *>( name );
-	if( action ) {
-		action->setEnabled( enabled );
+// present new form menu entry if logged in
+	activateAction( "actionOpenFormNewWindow", m_wolframeClient );
+
+// enable/disable menu/toolbar items depending on the number of subwindows
+	activateAction( "actionClose", nofSubWindows( ) > 0 );
+	activateAction( "actionCloseAll", nofSubWindows( ) > 0 );
+	activateAction( "actionNextWindow", nofSubWindows( ) > 1 );
+	activateAction( "actionPreviousWindow", nofSubWindows( ) > 1 );
+	activateAction( "actionTile", nofSubWindows( ) > 0 );
+	activateAction( "actionCascade", nofSubWindows( ) > 0 );		
+
+// recreate the subwindow menu and mark the currently selected submenu
+	QMenu *windowMenu = qFindChild<QMenu *>( this, "menuWindow" );
+	if( windowMenu ) {
+		m_subWinMap.clear( );
+		m_revSubWinMap.clear( );
+		
+		if( m_subWinGroup ) {
+			foreach( QAction *action, m_subWinGroup->actions( ) ) {
+				m_subWinGroup->removeAction( action );
+				delete action;
+			}
+		}
+		
+		m_subWinGroup = new QActionGroup( windowMenu );
+		m_subWinGroup->setExclusive( true );
+		QAction *action = new QAction( "", m_subWinGroup );
+		action->setSeparator( true );
+		m_subWinGroup->addAction( action );
+		int idx = 1;
+		foreach( QMdiSubWindow *w, m_mdiArea->subWindowList( ) ) {
+			// TODO: translation is tricky here: the form widget has
+			// a QTranslator class and can call translate on it using
+			// the translation resource of the corresponding form!
+			// see QString QTranslator::translate ( const char * context, const char * sourceText, const char * disambiguation, int n ) const
+			QString title = w->windowTitle( );
+			QString text = composeWindowListTitle( idx, title );
+			action = new QAction( text, m_subWinGroup );
+			action->setCheckable( true );
+			action->setData( QVariant( idx ) );
+			m_subWinGroup->addAction( action );
+			if( w == m_mdiArea->activeSubWindow( ) ) {
+				action->setChecked( true );
+			}
+			m_subWinMap.insert( action, w );
+			m_revSubWinMap.insert( w, action );
+			idx++;
+		}
+		windowMenu->addActions( m_subWinGroup->actions( ) );
+		
+		connect( m_subWinGroup, SIGNAL( triggered( QAction * ) ),
+			this, SLOT( subWindowSelected( QAction * ) ) );
 	}
 }
 
 void MainWindow::updateMenusAndToolbars( )
 {
+// logged in or logged out?
+	activateAction( "actionOpenForm", m_wolframeClient );
+	activateAction( "actionLogin", !m_wolframeClient );
+	activateAction( "actionLogout", m_wolframeClient );
+	
+// MDI menus and toolbars
 	if( m_mdi ) {
-// enable/disable menu/toolbar items depending on the number of subwindows
-		activateAction( "actionClose", nofSubWindows( ) > 0 );
-		activateAction( "actionCloseAll", nofSubWindows( ) > 0 );
-		activateAction( "actionNextWindow", nofSubWindows( ) > 1 );
-		activateAction( "actionPreviousWindow", nofSubWindows( ) > 1 );
-		activateAction( "actionTile", nofSubWindows( ) > 0 );
-		activateAction( "actionCascade", nofSubWindows( ) > 0 );		
-
-// recreate the subwindow menu and mark the currently selected submenu
-		QMenu *windowMenu = qFindChild<QMenu *>( this, "menuWindow" );
-		if( windowMenu ) {
-			m_subWinMap.clear( );
-			m_revSubWinMap.clear( );
-			
-			if( m_subWinGroup ) {
-				foreach( QAction *action, m_subWinGroup->actions( ) ) {
-					m_subWinGroup->removeAction( action );
-					delete action;
-				}
-			}
-			
-			m_subWinGroup = new QActionGroup( windowMenu );
-			m_subWinGroup->setExclusive( true );
-			QAction *action = new QAction( "", m_subWinGroup );
-			action->setSeparator( true );
-			m_subWinGroup->addAction( action );
-			int idx = 1;
-			foreach( QMdiSubWindow *w, m_mdiArea->subWindowList( ) ) {
-				// TODO: translation is tricky here: the form widget has
-				// a QTranslator class and can call translate on it using
-				// the translation resource of the corresponding form!
-				// see QString QTranslator::translate ( const char * context, const char * sourceText, const char * disambiguation, int n ) const
-				QString title = w->windowTitle( );
-				QString text = composeWindowListTitle( idx, title );
-				action = new QAction( text, m_subWinGroup );
-				action->setCheckable( true );
-				action->setData( QVariant( idx ) );
-				m_subWinGroup->addAction( action );
-				if( w == m_mdiArea->activeSubWindow( ) ) {
-					action->setChecked( true );
-				}
-				m_subWinMap.insert( action, w );
-				m_revSubWinMap.insert( w, action );
-				idx++;
-			}
-			windowMenu->addActions( m_subWinGroup->actions( ) );
-			
-			connect( m_subWinGroup, SIGNAL( triggered( QAction * ) ),
-				this, SLOT( subWindowSelected( QAction * ) ) );
-		}
+		updateMdiMenusAndToolbars( );
 	}
+}
+
+// -- logins/logouts/connections
+
+void MainWindow::on_actionLogin_triggered( )
+{
+	QString	username;
+//	QString	password;
+	QString	connName;
+
+	if ( settings.saveUsername )	{
+		username = settings.lastUsername;
+		connName = settings.lastConnection;
+	}
+
+	LoginDialog* loginDlg = new LoginDialog( username, connName,
+						 settings.connectionParams );
+	if( loginDlg->exec( ) == QDialog::Accepted ) {
+		if( settings.saveUsername ) {
+			settings.lastUsername = loginDlg->username( );
+			settings.lastConnection = loginDlg->selectedConnection( ).name;
+		}
+		// TODO: rewrite WolframeClient interface, replace memebers
+		ConnectionParameters selectedConnection = loginDlg->selectedConnection( );
+		m_host = selectedConnection.host;
+		m_port = selectedConnection.port;
+		m_secure = selectedConnection.SSL;
+		// TODO: find other mapping here
+		m_checkSSL = true /* selectedConnection.SSLverify */;
+		m_clientCertFile = selectedConnection.SSLcertificate;
+		m_clientKeyFile = selectedConnection.SSLkey;
+		m_CACertFile = selectedConnection.SSLCAbundle;
+		// TODO: map rest of parameters
+
+// create a Wolframe protocol client
+		m_wolframeClient = new WolframeClient( m_host, m_port, m_secure, m_checkSSL, m_clientCertFile, m_clientKeyFile, m_CACertFile );
+
+// catch signals from the network layer
+		connect( m_wolframeClient, SIGNAL( error( QString ) ),
+			this, SLOT( wolframeError( QString ) ) );
+                connect( m_wolframeClient, SIGNAL( connected( ) ),
+                        this, SLOT( connected( ) ) );
+                connect( m_wolframeClient, SIGNAL( disconnected( ) ),
+                        this, SLOT( disconnected( ) ) );
+		connect( m_wolframeClient, SIGNAL( mechsReceived( QStringList ) ),
+			this, SLOT( mechsReceived( QStringList ) ) );
+		connect( m_wolframeClient, SIGNAL( authOk( ) ),
+			this, SLOT( authOk( ) ) );
+		connect( m_wolframeClient, SIGNAL( authFailed( ) ),
+			this, SLOT( authFailed( ) ) );
+
+// initiate connect
+                m_wolframeClient->connect( );
+	}
+	
+	delete loginDlg;
+}
+
+void MainWindow::on_actionLogout_triggered( )
+{
+	if( m_mdi ) {
+		m_mdiArea->closeAllSubWindows( );
+	} else {
+		delete m_formWidget;
+		m_formWidget = 0;
+	}
+		
+	m_wolframeClient->disconnect( );
 }
 
 void MainWindow::on_actionManageServers_triggered( )
@@ -898,62 +962,28 @@ void MainWindow::on_actionManageServers_triggered( )
 	delete serversDlg;
 }
 
-QKeySequence::StandardKey MainWindow::defaultKeySequenceFromString( const QString s )
+// -- developer stuff
+
+void MainWindow::addDeveloperMenu( )
 {
-	if( s == "QKeySequence::NextChild" ) {
-		return QKeySequence::NextChild;
-	} else if( s == "QKeySequence::PreviousChild" ) {
-		return QKeySequence::PreviousChild;
-	} else if( s == "QKeySequence::Print" ) {
-		return QKeySequence::Print;
-	} else if( s == "QKeySequence::Quit" ) {
-		return QKeySequence::Quit;
-	} else if( s == "QKeySequence::Undo" ) {
-		return QKeySequence::Undo;
-	} else if( s == "QKeySequence::Redo" ) {
-		return QKeySequence::Redo;
-	} else if( s == "QKeySequence::Cut" ) {
-		return QKeySequence::Cut;
-	} else if( s == "QKeySequence::Copy" ) {
-		return QKeySequence::Copy;
-	} else if( s == "QKeySequence::Paste" ) {
-		return QKeySequence::Paste;
-	} else if( s == "QKeySequence::Delete" ) {
-		return QKeySequence::Delete;
-	} else if( s == "QKeySequence::SelectAll" ) {
-		return QKeySequence::SelectAll;
-	} else if( s == "QKeySequence::Refresh" ) {
-		return QKeySequence::Refresh;
-	} else if( s == "QKeySequence::Open" ) {
-		return QKeySequence::Open;
-	} else if( s == "QKeySequence::New" ) {
-		return QKeySequence::New;
-	} else if( s == "QKeySequence::Close" ) {
-		return QKeySequence::Close;
-	} else if( s == "QKeySequence::Preferences" ) {
-		return QKeySequence::Preferences;
-	} else if( s == "QKeySequence::HelpContents" ) {
-		return QKeySequence::HelpContents;
-	} else {
-		return QKeySequence::UnknownKey;
-	}
+	QAction *debugTerminalAction = new QAction( tr( "&Debug Terminal" ), this );
+	debugTerminalAction->setToolTip( tr( "Show protocol in a debug terminal" ) );
+	debugTerminalAction->setCheckable( true );
+	connect( debugTerminalAction, SIGNAL( triggered( bool ) ),
+		this, SLOT( on_actionDebugTerminal_triggered( bool ) ) );
+// only debug and developer mode enable the debug window, is far too slow!
+	debugTerminalAction->setEnabled( m_debug );
+	QMenu *developerMenu = menuBar( )->addMenu( tr( "&Developer" ) );
+	developerMenu->addAction( debugTerminalAction );
 }
 
-void MainWindow::updateActionShortcuts( )
+void MainWindow::on_actionDebugTerminal_triggered( bool checked )
 {
-	foreach( QAction *action, findChildren<QAction *>( ) ) {
-		QString s = FormWidget::readDynamicStringProperty( action, "defaultShortcut" );
-		if( !s.isEmpty( ) ) {
-			QKeySequence::StandardKey shortcut = defaultKeySequenceFromString( s );
-			if( shortcut != QKeySequence::UnknownKey ) {
-				QKeySequence seq( shortcut );
-				if( !seq.isEmpty( ) ) {
-					action->setShortcuts( defaultKeySequenceFromString( s ) );
-					qDebug( ) << "ACTION" << action << "gets default shortcut" << s;
-				} else {
-					qDebug( ) << "ACTION" << action << "keeps shortcuts from ui resource" << action->shortcuts( );
-				}
-			}
+	if( m_debugTerminal ) {
+		if( checked ) {
+			m_debugTerminal->bringToFront( );
+		} else {
+			m_debugTerminal->hide( );
 		}
 	}
 }

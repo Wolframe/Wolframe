@@ -525,6 +525,8 @@ void WolframeClient::handleResult( )
 		// swallow greeting line from server after connect
 		emit connected( );
 	} else if( m_command == "QUIT" ) {
+		// forget outstanding commands after QUIT!
+		m_queue.clear( );
 		emit disconnected( );
 	} else if( m_command == "AUTH" ) {
 		emit mechsReceived( m_params );

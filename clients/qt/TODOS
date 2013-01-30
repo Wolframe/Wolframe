@@ -23,11 +23,9 @@ now:
     => happens also with only one window?!
   - store position and status of all subwindows
 - integrate from qWolfClient
-  - rewrite login/logout (simplify, not so asynchronous as now)
-  - use connection data from new connections
-  - join settings and preferences (Qt init files)
-  - implement the "Test Connection"
-  - use "Connection" instead of "Server" in login dialog
+  - join settings and preferences (Qt ini files)
+  - implement the "Test Connection", needs passing a WolframeClient inside the dialog
+  - rewrite WolfClient to use ConnectionParameters
 
 musts:
 - configurator specific:

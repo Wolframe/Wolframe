@@ -99,6 +99,9 @@ void PreferencesDialog::initialize( )
 	m_debug = new QCheckBox( this );
 	formLayout->addRow( tr( "&Debug:" ), m_debug );
 
+	m_developer = new QCheckBox( this );
+	formLayout->addRow( tr( "D&eveloper:" ), m_developer );
+
 	if( !m_languages.empty( ) ) {
 		m_systemLanguage = new QCheckBox( this );
 		formLayout->addRow( tr( "&Use system language:" ), m_systemLanguage );
@@ -193,6 +196,7 @@ void PreferencesDialog::loadSettings( )
 			break;
 	}
 	m_debug->setChecked( prefs->debug( ) );
+	m_developer->setChecked( prefs->developer( ) );
 	m_uiFormsDir->setFileName( prefs->uiFormsDir( ) );
 	m_uiFormTranslationsDir->setFileName( prefs->uiFormTranslationsDir( ) );
 	m_uiFormResourcesDir->setFileName( prefs->uiFormResourcesDir( ) );
@@ -234,6 +238,7 @@ void PreferencesDialog::apply( )
 		prefs->setDataLoadMode( Preferences::Network );
 	}
 	prefs->setDebug( m_debug->isChecked( ) );
+	prefs->setDeveloper( m_developer->isChecked( ) );
 	prefs->setUiFormsDir( m_uiFormsDir->fileName( ) );
 	prefs->setUiFormTranslationsDir( m_uiFormTranslationsDir->fileName( ) );
 	prefs->setUiFormResourcesDir( m_uiFormResourcesDir->fileName( ) );
