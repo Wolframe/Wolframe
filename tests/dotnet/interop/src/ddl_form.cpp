@@ -106,35 +106,43 @@ static TypedFilterBase::Element getElement( const std::string& val)
 
 bool FormInputFilter::getNext( ElementType& type, Element& element)
 {
-	if (!m_stk.empty() && m_stk.back().first == m_stk.back().second)
+AGAIN:
+	if (m_stk.empty()) return false;
+	if (m_stk.back().itr == m_stk.back().end)
 	{
 		m_stk.pop_back();
-		if (m_stk.empty()) return false;
-		type = FilterBase::CloseTag;
-		element = getElement( m_stk.back().first->first);
-		return true;
+		goto AGAIN;
 	}
-	if (m_tagstate == 0)
+	switch (m_stk.back().state)
 	{
-		type = FilterBase::OpenTag;
-		element = getElement( m_stk.back().first->first);
-		m_tagstate = 1;
-		return true;
-	}
-	else
-	{
-		m_tagstate = 0;
-		if (m_stk.back().first->second.atomic())
-		{
-			type = FilterBase::Value;
-			element = getElement( m_stk.back().first->second.value());
+		case OpenTagState:
+			type = FilterBase::OpenTag;
+			element = getElement( m_stk.back().itr->first);
+			m_stk.back().state = ValueState;
 			return true;
-		}
-		else
-		{
-			m_stk.push_back( StackElem( m_stk.back().first->second.begin(), m_stk.back().first->second.end()));
-			return getNext( type, element);
-		}
+
+		case CloseTagState:
+			type = FilterBase::CloseTag;
+			element = Element();
+			++m_stk.back().itr;
+			m_stk.back().state = OpenTagState;
+			return true;
+
+		case ValueState:
+			type = FilterBase::Value;
+			if (m_stk.back().itr->second.atomic())
+			{
+				element = getElement( m_stk.back().itr->second.value());
+				m_stk.back().state = CloseTagState;
+				return true;
+			}
+			else
+			{
+				m_stk.back().state = CloseTagState;
+				m_stk.push_back( StackElem( m_stk.back().itr->second.begin(), m_stk.back().itr->second.end()));
+				goto AGAIN;
+			}
 	}
+	throw std::runtime_error( "illegal state in 'FormInputFilter::getNext'");
 }
 

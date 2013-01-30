@@ -49,21 +49,19 @@ static void printItem( std::ostream& out, ITypeInfo* typeinfo, int indentcnt=0);
 
 static void printVar( std::ostream& out, ITypeInfo* typeinfo, VARDESC* var, int indentcnt=0)
 {
-	BSTR varname;
-	UINT nn;
-	WRAP( typeinfo->GetNames( var->memid, &varname, 1, &nn))
-	ELEMDESC ed = var->elemdescVar;
-	out << std::string(indentcnt,'\t') << "VAR " << comauto::asciistr(varname) << " :" << comauto::typestr( typeinfo, &ed.tdesc) << std::endl;
-	::SysFreeString( varname);
+	std::string name = comauto::variablename( typeinfo, var);
+	std::string type = comauto::variabletype( typeinfo, var);
+	out << std::string(indentcnt,'\t') << "VAR " << name << " :" << type << std::endl;
 }
 
 static void printAttributes( std::ostream& out, const char* title, ITypeInfo* typeinfo, TYPEATTR* typeattr, int indentcnt=0)
 {
 	BSTR name;
 	WRAP( typeinfo->GetDocumentation( MEMBERID_NIL, &name, NULL, NULL, NULL))
-	if (comauto::asciistr(name) != "IUnknown")
+	std::string namestr( comauto::utf8string(name));
+	if (namestr != "IUnknown")
 	{
-		out << std::string( indentcnt, '\t') << title << " " << comauto::asciistr(name) << std::endl;
+		out << std::string( indentcnt, '\t') << title << " " << namestr << std::endl;
 		unsigned short ii;
 
 		for (ii = 0; ii < typeattr->cImplTypes; ++ii)
@@ -201,7 +199,7 @@ static void findFunctions( ITypeInfo* typeinfo, std::vector<comauto::FunctionR>&
 		if (subclassname != "IUnknown")
 		{
 			subclassname.clear();
-			subclassname.append( comauto::asciistr(name));
+			subclassname.append( comauto::utf8string(name));
 		}
 		::SysFreeString( name);
 	}

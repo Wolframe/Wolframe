@@ -6,6 +6,8 @@
 #include <atlcom.h>
 #include <atlctl.h>
 #include <windef.h>
+#include <map>
+#include <boost/shared_ptr.hpp>
 
 namespace _Wolframe {
 namespace comauto {
@@ -19,8 +21,8 @@ public:
 	virtual ~RecordInfo();
 
 	// Implementation of the IUnknown interface:
-	virtual ULONG STDMETHODCALLTYPE AddRef()  {return InternalAddRef();}
-	virtual ULONG STDMETHODCALLTYPE Release()  {return InternalRelease();}
+	virtual ULONG STDMETHODCALLTYPE AddRef()		{return InternalAddRef();}
+	virtual ULONG STDMETHODCALLTYPE Release()		{return InternalRelease();}
 	virtual HRESULT STDMETHODCALLTYPE QueryInterface( REFIID riid, LPVOID* ppvObj);
 
 	// Implementation of the IRecordInfo interface:
@@ -41,14 +43,32 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE RecordCreateCopy( PVOID pvSource, PVOID* ppvDest);
 	virtual HRESULT STDMETHODCALLTYPE RecordDestroy( PVOID pvRecord);
 
+	const ITypeInfo* typeinfo() const	{return m_typeinfo;}
+	const TYPEATTR* typeattr() const	{return m_typeattr;}
+
+	struct VariableDescriptor
+	{
+		VARTYPE type;
+		std::size_t ofs;
+		int varnum;
+	};
+	bool getVariableDescriptor( const std::string& name, VariableDescriptor& descr) const;
+
 private:
 	enum InitType {ClearInit,CopyInit,DefaultConstructor,DefaultConstructorZero,CopyConstructor,Destructor};
 	HRESULT RecordFill( PVOID pvNew, InitType initType, PVOID pvOld=0);
+	void initDescr();
 
 private:
 	ITypeInfo* m_typeinfo;
 	TYPEATTR* m_typeattr;
+	typedef std::map<std::string,VariableDescriptor> VariableDescriptorMap;
+	VariableDescriptorMap m_descrmap;
 };
+
+typedef boost::shared_ptr<RecordInfo> RecordInfoR;
+
+std::map<std::size_t,RecordInfoR> getRecordInfoMap( ITypeInfo* typeinfo);
 
 }}//namespace
 #endif

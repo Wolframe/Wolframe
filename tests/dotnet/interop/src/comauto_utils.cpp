@@ -21,7 +21,7 @@ bool comauto::isCOMInterfaceMethod( const std::string& name)
 }
 std::string comauto::asciistr( BSTR str)
 {
-	std::wstring wsStr( str, SysStringLen( str));
+	std::wstring wsStr( str, ::SysStringLen( str));
 	return std::string( wsStr.begin(), wsStr.end());
 }
 
@@ -31,26 +31,44 @@ std::string comauto::asciistr( const TCHAR* str)
 	return std::string( wsStr.begin(), wsStr.end());
 }
 
-std::wstring comauto::utf16string( const std::string& utf8str)
+std::wstring comauto::utf16string( const char* utf8ptr, std::size_t utf8size)
 {
 	std::wstring rt;
-	int len = ::MultiByteToWideChar( CP_UTF8, 0, utf8str.c_str(), utf8str.size(), NULL, 0);
+	int len = ::MultiByteToWideChar( CP_UTF8, 0, utf8ptr, utf8size, NULL, 0);
 	if (len>1)
 	{
 		rt.resize( len);
-		::MultiByteToWideChar( CP_UTF8, 0, utf8str.c_str(), utf8str.size(), (LPWSTR)(void*)rt.c_str(), len);
+		::MultiByteToWideChar( CP_UTF8, 0, utf8ptr, utf8size, (LPWSTR)(void*)rt.c_str(), len);
    }
    return rt;
+}
+
+std::wstring comauto::utf16string( const std::string& utf8str)
+{
+	return comauto::utf16string( utf8str.c_str(), utf8str.size());
 }
 
 std::string comauto::utf8string( const std::wstring& utf16str)
 {
 	std::string rt;
 	int len = ::WideCharToMultiByte( CP_UTF8, 0, utf16str.c_str(), utf16str.size(), NULL, 0, NULL, NULL);
-	if (len>1)
+	if (len>0)
 	{
 		rt.resize( len);
 		::WideCharToMultiByte( CP_UTF8, 0, utf16str.c_str(), utf16str.size(), (LPSTR)(void*)rt.c_str(), len, NULL, NULL);
+   }
+   return rt;
+}
+
+std::string comauto::utf8string( const BSTR& str)
+{
+	std::string rt;
+	int strl = ::SysStringLen( str);
+	int len = ::WideCharToMultiByte( CP_UTF8, 0, str, strl, NULL, 0, NULL, NULL);
+	if (len>0)
+	{
+		rt.resize( len);
+		::WideCharToMultiByte( CP_UTF8, 0, str, strl, (LPSTR)(void*)rt.c_str(), len, NULL, NULL);
    }
    return rt;
 }
@@ -89,7 +107,52 @@ std::wstring comauto::tostring( const _com_error& err)
 	return rt;
 }
 
-std::string comauto::typestr( ITypeInfo* typeinfo, TYPEDESC* ed)
+std::string comauto::typestr( VARTYPE vt)
+{
+	std::string rt;
+	switch (vt)
+	{
+		case VT_EMPTY:	rt.append( "VT_EMPTY"); break;
+		case VT_VOID:	rt.append( "VT_VOID"); break;
+		case VT_NULL:	rt.append( "VT_NULL"); break;
+		case VT_INT:	rt.append( "VT_INT"); break;
+		case VT_I1:		rt.append( "VT_I1"); break;
+		case VT_I2:		rt.append( "VT_I2"); break;
+		case VT_I4:		rt.append( "VT_I4"); break;
+		case VT_UINT:	rt.append( "VT_UINT"); break;
+		case VT_UI1:	rt.append( "VT_UI1"); break;
+		case VT_UI2:	rt.append( "VT_UI2"); break;
+		case VT_UI4:	rt.append( "VT_UI4"); break;
+		case VT_R4:		rt.append( "VT_R4"); break;
+		case VT_R8:		rt.append( "VT_R8"); break;
+		case VT_CY:		rt.append( "VT_CY"); break;
+		case VT_DATE:	rt.append( "VT_DATE"); break;
+		case VT_BSTR:	rt.append( "VT_BSTR"); break;
+		case VT_DISPATCH:rt.append( "VT_DISPATCH"); break;
+		case VT_ERROR:	rt.append( "VT_ERROR"); break;
+		case VT_BOOL:	rt.append( "VT_BOOL"); break;
+		case VT_VARIANT:rt.append( "VT_VARIANT"); break;
+		case VT_DECIMAL:rt.append( "VT_DECIMAL"); break;
+		case VT_RECORD:	rt.append( "VT_RECORD"); break;
+		case VT_UNKNOWN:rt.append( "VT_UNKNOWN"); break;
+		case VT_HRESULT:rt.append( "VT_HRESULT"); break;
+		case VT_CARRAY:	rt.append( "VT_CARRAY"); break;
+		case VT_LPSTR:	rt.append( "VT_LPSTR"); break;
+		case VT_LPWSTR:	rt.append( "VT_LPWSTR"); break;
+		case VT_BLOB:	rt.append( "VT_BLOB"); break;
+		case VT_STREAM:	rt.append( "VT_STREAM"); break;
+		case VT_STORAGE:	rt.append( "VT_STORAGE"); break;
+		case VT_STREAMED_OBJECT:rt.append( "VT_STREAMED_OBJECT"); break;
+		case VT_STORED_OBJECT:rt.append( "VT_STORED_OBJECT"); break;
+		case VT_BLOB_OBJECT:rt.append( "VT_BLOB_OBJECT"); break;
+		case VT_CF:		rt.append( "VT_CF"); break;
+		case VT_CLSID:	rt.append( "VT_CLSID"); break;
+		default:		rt.append( "[Unknown]"); break;
+	}
+	return rt;
+}
+
+std::string comauto::typestr( ITypeInfo* typeinfo, const TYPEDESC* ed)
 {
 	std::string rt;
 	VARTYPE vt = ed->vt;
@@ -133,45 +196,7 @@ std::string comauto::typestr( ITypeInfo* typeinfo, TYPEDESC* ed)
 		rectypeinfo->Release();
 		return rt;
 	}
-	switch (vt)
-	{
-		case VT_EMPTY:	rt.append( "VT_EMPTY"); break;
-		case VT_VOID:	rt.append( "VT_VOID"); break;
-		case VT_NULL:	rt.append( "VT_NULL"); break;
-		case VT_INT:	rt.append( "VT_INT"); break;
-		case VT_I1:		rt.append( "VT_I1"); break;
-		case VT_I2:		rt.append( "VT_I2"); break;
-		case VT_I4:		rt.append( "VT_I4"); break;
-		case VT_UINT:	rt.append( "VT_UINT"); break;
-		case VT_UI1:	rt.append( "VT_UI1"); break;
-		case VT_UI2:	rt.append( "VT_UI2"); break;
-		case VT_UI4:	rt.append( "VT_UI4"); break;
-		case VT_R4:		rt.append( "VT_R4"); break;
-		case VT_R8:		rt.append( "VT_R8"); break;
-		case VT_CY:		rt.append( "VT_CY"); break;
-		case VT_DATE:	rt.append( "VT_DATE"); break;
-		case VT_BSTR:	rt.append( "VT_BSTR"); break;
-		case VT_DISPATCH:rt.append( "VT_DISPATCH"); break;
-		case VT_ERROR:	rt.append( "VT_ERROR"); break;
-		case VT_BOOL:	rt.append( "VT_BOOL"); break;
-		case VT_VARIANT:rt.append( "VT_VARIANT"); break;
-		case VT_DECIMAL:rt.append( "VT_DECIMAL"); break;
-		case VT_RECORD:	rt.append( "VT_RECORD"); break;
-		case VT_UNKNOWN:rt.append( "VT_UNKNOWN"); break;
-		case VT_HRESULT:rt.append( "VT_HRESULT"); break;
-		case VT_CARRAY:	rt.append( "VT_CARRAY"); break;
-		case VT_LPSTR:	rt.append( "VT_LPSTR"); break;
-		case VT_LPWSTR:	rt.append( "VT_LPWSTR"); break;
-		case VT_BLOB:	rt.append( "VT_BLOB"); break;
-		case VT_STREAM:	rt.append( "VT_STREAM"); break;
-		case VT_STORAGE:	rt.append( "VT_STORAGE"); break;
-		case VT_STREAMED_OBJECT:rt.append( "VT_STREAMED_OBJECT"); break;
-		case VT_STORED_OBJECT:rt.append( "VT_STORED_OBJECT"); break;
-		case VT_BLOB_OBJECT:rt.append( "VT_BLOB_OBJECT"); break;
-		case VT_CF:		rt.append( "VT_CF"); break;
-		case VT_CLSID:	rt.append( "VT_CLSID"); break;
-		default:		rt.append( "[Unknown]"); break;
-	}
+	rt.append( comauto::typestr( vt));
 	return rt;
 }
 
@@ -189,7 +214,7 @@ std::string comauto::structstring( ITypeInfo* typeinfo)
 		WRAP( typeinfo->GetNames( var->memid, &varname, 1, &nn))
 		ELEMDESC ed = var->elemdescVar;
 		if (ii > 0) out << ";";
-		out << comauto::asciistr(varname) << ":" << typestr( typeinfo, &ed.tdesc);
+		out << comauto::utf8string(varname) << ":" << typestr( typeinfo, &ed.tdesc);
 		typeinfo->ReleaseVarDesc( var);
 		::SysFreeString( varname);
 	}
@@ -317,7 +342,6 @@ VARIANT comauto::createVariantType( unsigned short val)
 	return rt;
 }
 
-
 VARIANT comauto::createVariantType( long val)
 {
 	VARIANT rt;
@@ -359,13 +383,88 @@ VARIANT comauto::createVariantType( const std::wstring& val)
 	return rt;
 }
 
-VARIANT comauto::createVariantType( const std::string& val)
+VARIANT comauto::createVariantType( const char* val, std::size_t valsize)
 {
     VARIANT rt;
 	rt.vt = VT_BSTR;
-	std::wstring wstr( comauto::utf16string( val));
+	std::wstring wstr( comauto::utf16string( val, valsize));
     rt.bstrVal = ::SysAllocString( bstr_t( wstr.c_str()));
 	if (rt.bstrVal == NULL) throw std::bad_alloc();
 	return rt;
 }
 
+VARIANT comauto::createVariantType( const std::string& val)
+{
+	return comauto::createVariantType( val.c_str(), val.size());
+}
+
+unsigned char comauto::sizeofAtomicType( int vt)
+{
+	struct AtomicTypes
+	{
+		unsigned char ar[80];
+		AtomicTypes()
+		{
+			std::memset( ar, 0, sizeof(ar));
+			ar[ VT_I2] = 2;
+			ar[ VT_I4] = 4;
+			ar[ VT_R4] = 4;
+			ar[ VT_R8] = 8;
+			ar[ VT_CY] = sizeof(CY);
+			ar[ VT_DATE] = sizeof(DATE);
+			ar[ VT_BOOL] = sizeof(BOOL);
+			ar[ VT_DECIMAL] = sizeof(DECIMAL);
+			ar[ VT_I1] = 1;
+			ar[ VT_UI1] = 1;
+			ar[ VT_UI2] = 2;
+			ar[ VT_UI4] = 4;
+			ar[ VT_I8] = 8;
+			ar[ VT_UI8] = 8;
+			ar[ VT_INT] = sizeof(int);
+			ar[ VT_UINT] = sizeof(unsigned int);
+			ar[ VT_HRESULT] = sizeof(HRESULT);
+		}
+
+		char operator[]( int i) const
+		{
+			if (i >= 0 && i <= sizeof(ar)) return ar[i];
+			return 0;
+		}
+	};
+	static AtomicTypes at;
+	return at[vt];
+}
+
+bool comauto::isAtomicType( int vt)
+{
+	return comauto::sizeofAtomicType(vt)!=0;
+}
+
+void* comauto::arithmeticTypeAddress( VARIANT* val)
+{
+	return (void*)((char*)val + 4*sizeof(short));
+}
+
+const void* comauto::arithmeticTypeAddress( const VARIANT* val)
+{
+	return (const void*)((const char*)val + 4*sizeof(short));
+}
+
+std::string comauto::variablename( ITypeInfo* typeinfo, VARDESC* vardesc)
+{
+	std::string rt;
+	BSTR vv;
+	UINT nn;
+	WRAP( typeinfo->GetNames( vardesc->memid, &vv, 1, &nn))
+	rt = comauto::utf8string(vv);
+	::SysFreeString( vv);
+	return rt;
+}
+
+std::string comauto::variabletype( ITypeInfo* typeinfo, VARDESC* vardesc)
+{
+	std::string rt;
+	ELEMDESC ed = vardesc->elemdescVar;
+	rt = comauto::typestr( typeinfo, &ed.tdesc);
+	return rt;
+}

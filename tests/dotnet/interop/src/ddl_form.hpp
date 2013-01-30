@@ -49,16 +49,14 @@ class FormInputFilter
 public:
 	FormInputFilter( const Form& form)
 		:types::TypeSignature("langbind::FormInputFilter", __LINE__)
-		,m_tagstate(0)
 	{
-		m_stk.push_back( StackElem( form.begin(), form.begin()));
+		m_stk.push_back( StackElem( form.begin(), form.end()));
 	}
 
 	FormInputFilter( const FormInputFilter& o)
 		:types::TypeSignature("langbind::FormInputFilter", __LINE__)
 		,langbind::TypedInputFilter(o)
-		,m_stk(o.m_stk)
-		,m_tagstate(o.m_tagstate){}
+		,m_stk(o.m_stk){}
 
 	virtual ~FormInputFilter(){}
 
@@ -67,9 +65,22 @@ public:
 	virtual bool getNext( ElementType& type, Element& element);
 
 private:
-	typedef std::pair<Form::Map::const_iterator,Form::Map::const_iterator> StackElem;
+	enum TagState
+	{
+		OpenTagState,
+		CloseTagState,
+		ValueState
+	};
+
+	struct StackElem
+	{ 
+		Form::Map::const_iterator itr;
+		Form::Map::const_iterator end;
+		TagState state;
+		StackElem( const Form::Map::const_iterator& itr_, const Form::Map::const_iterator& end_)
+			:itr(itr_),end(end_),state(OpenTagState){}
+	};
 	std::vector<StackElem> m_stk;
-	int m_tagstate;
 };
 
 }}//namespace

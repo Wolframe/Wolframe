@@ -22,7 +22,8 @@ comauto::RecordInfo::RecordInfo( ITypeInfo* typeinfo_)
 	{
 		m_typeinfo->ReleaseTypeAttr( m_typeattr);
 	}
-	WRAP( m_typeinfo->AddRef())
+	m_typeinfo->AddRef();
+	initDescr();
 }
 
 HRESULT comauto::RecordInfo::QueryInterface( REFIID  riid, LPVOID* ppvObj)
@@ -37,43 +38,6 @@ HRESULT comauto::RecordInfo::QueryInterface( REFIID  riid, LPVOID* ppvObj)
         return S_OK;
     }
     return E_NOINTERFACE;
-}
-
-static char sizeofAtomicType( int tp)
-{
-	struct AtomicTypes
-	{
-		char ar[80];
-		AtomicTypes()
-		{
-			std::memset( ar, 0, sizeof(ar));
-			ar[ VT_I2] = 2;
-			ar[ VT_I4] = 4;
-			ar[ VT_R4] = 4;
-			ar[ VT_R8] = 8;
-			ar[ VT_CY] = sizeof(CY);
-			ar[ VT_DATE] = sizeof(DATE);
-			ar[ VT_BOOL] = sizeof(BOOL);
-			ar[ VT_DECIMAL] = sizeof(DECIMAL);
-			ar[ VT_I1] = 1;
-			ar[ VT_UI1] = 1;
-			ar[ VT_UI2] = 2;
-			ar[ VT_UI4] = 4;
-			ar[ VT_I8] = 8;
-			ar[ VT_UI8] = 8;
-			ar[ VT_INT] = sizeof(int);
-			ar[ VT_UINT] = sizeof(unsigned int);
-			ar[ VT_HRESULT] = sizeof(HRESULT);
-		}
-
-		char operator[]( int i) const
-		{
-			if (i >= 0 && i <= sizeof(ar)) return (ar[i] != 0);
-			return 0;
-		}
-	};
-	static AtomicTypes at;
-	return at[tp];
 }
 
 HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitType initType, PVOID pvOld)
@@ -212,8 +176,7 @@ HRESULT comauto::RecordInfo::GetSize( ULONG* pcbSize)
 
 HRESULT comauto::RecordInfo::GetTypeInfo( ITypeInfo** ppTypeInfo)
 {
-	HRESULT hr;
-	RETURN_ON_ERROR( hr, m_typeinfo->AddRef());
+	m_typeinfo->AddRef();
 	*ppTypeInfo = m_typeinfo;
 	return S_OK;
 }
@@ -315,7 +278,7 @@ HRESULT comauto::RecordInfo::PutFieldNoCopy( ULONG wFlags, PVOID pvData, LPCOLES
 	char elemsize = sizeofAtomicType( bindptr.lpvardesc->elemdescVar.tdesc.vt);
 	if (elemsize)
 	{
-		std::memcpy( field, &pvarField->llVal, elemsize);  //... atomic type copy by value
+		std::memcpy( field, comauto::arithmeticTypeAddress( pvarField), elemsize);  //... atomic type copy by value
 	}
 	else if ((bindptr.lpvardesc->elemdescVar.tdesc.vt & VT_ARRAY) != 0)
 	{
@@ -475,5 +438,86 @@ HRESULT comauto::RecordInfo::RecordDestroy( PVOID pvRecord)
 	return S_OK;
 }
 
+static void getRecordInfoMap( std::map<std::size_t,comauto::RecordInfoR>& rimap, ITypeInfo* typeinfo, std::size_t ofs)
+{
+	TYPEATTR* typeattr = 0;
+	VARDESC* vd = 0;
+	try
+	{
+		WRAP( typeinfo->GetTypeAttr( &typeattr))
+		for (WORD iv = 0; iv < typeattr->cVars; ++iv)
+		{
+			WRAP( typeinfo->GetVarDesc( iv, &vd))
 
+			if (vd->elemdescVar.tdesc.vt == VT_USERDEFINED)
+			{
+				CComPtr<ITypeInfo> rectypeinfo;
+				WRAP( typeinfo->GetRefTypeInfo( vd->elemdescVar.tdesc.hreftype, &rectypeinfo))
 
+				rimap[ ofs + vd->oInst] = comauto::RecordInfoR( new comauto::RecordInfo( rectypeinfo));
+				getRecordInfoMap( rimap, rectypeinfo, ofs + vd->oInst);
+			}
+			typeinfo->ReleaseVarDesc( vd);
+			vd = 0;
+		}
+		typeinfo->ReleaseTypeAttr( typeattr);
+		typeattr = 0;
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (vd) typeinfo->ReleaseVarDesc( vd);
+		if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
+		throw e;
+	}
+}
+
+std::map<std::size_t,comauto::RecordInfoR> comauto::getRecordInfoMap( ITypeInfo* typeinfo)
+{
+	std::map<std::size_t,comauto::RecordInfoR> rt;
+	rt[0] = RecordInfoR( new RecordInfo( typeinfo));
+	getRecordInfoMap( rt, typeinfo, 0);
+	return rt;
+}
+
+bool comauto::RecordInfo::getVariableDescriptor( const std::string& name, VariableDescriptor& descr) const
+{
+	VariableDescriptorMap::const_iterator di = m_descrmap.find( name);
+	if (di == m_descrmap.end()) return false;
+	descr.type = di->second.type;
+	descr.ofs = di->second.ofs;
+	descr.varnum = di->second.varnum;
+	return true;
+}
+
+void comauto::RecordInfo::initDescr()
+{
+	VARDESC* vd = 0;
+	BSTR name = 0;
+	try
+	{
+		VariableDescriptor descr;
+
+		for (WORD iv = 0; iv < m_typeattr->cVars; ++iv)
+		{
+			WRAP( m_typeinfo->GetVarDesc( iv, &vd))
+			descr.ofs = vd->oInst;
+			descr.type = vd->elemdescVar.tdesc.vt;
+			descr.varnum = iv;
+			UINT nn;
+			WRAP( (hr=m_typeinfo->GetNames( vd->memid, &name, 1, &nn)))
+			std::string id( comauto::utf8string( name));
+			::SysFreeString( name);
+			name = 0;
+			m_typeinfo->ReleaseVarDesc( vd);
+			vd = 0;
+
+			m_descrmap[ id] = descr;
+		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (name) ::SysFreeString( name);
+		if (vd) m_typeinfo->ReleaseVarDesc( vd);
+		throw e;
+	}
+}

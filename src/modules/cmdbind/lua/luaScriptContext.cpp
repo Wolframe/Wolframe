@@ -58,7 +58,8 @@ void LuaScriptContext::load( const std::vector<std::string>& prgfiles_, const mo
 			const char* className = mi->objectClassName();
 			if (module::LuaExtensionBuilder::classNameMatches( className))
 			{
-				module::LuaExtensionConstructor* co = dynamic_cast< module::LuaExtensionConstructor* >((*mi)->constructor());
+				//PF:HACK: Dangerous exchange of dynamic_cast by reinterpret_cast for the time being. It should at least work on all platforms
+				module::LuaExtensionConstructor* co = reinterpret_cast< module::LuaExtensionConstructor* >((*mi)->constructor());
 				if (!co) throw std::runtime_error( "Language extension module has Lua extension module identifier but is not of this class");
 				modulemap.defineLuaModule( co->moduleName(), LuaModule( co->moduleName(), co->object()));
 				m_objects.push_back( co);
