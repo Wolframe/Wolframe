@@ -17,7 +17,7 @@
    <string>Manage Connections</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="qWolfClient.qrc">
+   <iconset resource="qtclient.qrc">
     <normaloff>:/images/world-setup.png</normaloff>:/images/world-setup.png</iconset>
   </property>
   <property name="modal">
@@ -128,7 +128,7 @@
   <tabstop>delConnBttn</tabstop>
  </tabstops>
  <resources>
-  <include location="qWolfClient.qrc"/>
+  <include location="qtclient.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -160,6 +160,22 @@
     <hint type="destinationlabel">
      <x>204</x>
      <y>134</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>connectionList</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>editConBttn</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>145</x>
+     <y>123</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>270</x>
+     <y>174</y>
     </hint>
    </hints>
   </connection>

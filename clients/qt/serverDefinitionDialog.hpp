@@ -5,6 +5,7 @@
 #include <QAbstractButton>
 
 #include "connection.hpp"
+#include "WolframeClient.hpp"
 
 namespace Ui {
 class ServerDefinitionDialog;
@@ -30,6 +31,9 @@ private slots:
 	void updateButtons();
 
 	void testConnection();
+	void error( QString error );
+	void connected( );
+	void disconnected( );
 
 private:
 	void buildParams( ConnectionParameters& params );
@@ -38,6 +42,8 @@ private:
 	Ui::ServerDefinitionDialog	*ui;
 	ConnectionParameters&		m_params;
 	QString				m_currentDir;
+	WolframeClient *m_client;
+
 };
 
 #endif // _SERVER_DEFINITION_DIALOG_HPP_INCLUDED
