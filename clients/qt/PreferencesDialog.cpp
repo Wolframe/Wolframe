@@ -3,7 +3,6 @@
 //
 
 #include "PreferencesDialog.hpp"
-#include "Preferences.hpp"
 #include "LoadMode.hpp"
 #include "global.hpp"
 
@@ -12,16 +11,8 @@
 #include <QRadioButton>
 #include <QVBoxLayout>
 
-
-PreferencesDialog::PreferencesDialog( QWidget *_parent )
-	: QDialog( _parent ), m_languages( )
-{
-	initialize( );
-	loadSettings( );
-}
-
-PreferencesDialog::PreferencesDialog( QStringList _languages, QWidget *_parent )
-	: QDialog( _parent ), m_languages( _languages )
+PreferencesDialog::PreferencesDialog( ApplicationSettings &_settings, QStringList _languages, QWidget *_parent )
+	: QDialog( _parent ), m_settings( _settings ), m_languages( _languages )
 {
 	initialize( );
 	loadSettings( );
@@ -123,9 +114,7 @@ void PreferencesDialog::initialize( )
 }
 
 void PreferencesDialog::loadSettings( )
-{
-	Preferences *prefs = Preferences::instance( );
-	
+{	
 	m_uiLoadModeLocalFile->setChecked( false );
 	m_uiLoadModeNetwork->setChecked( false );
 	m_dataLoadModeLocalFile->setChecked( false );
@@ -134,80 +123,82 @@ void PreferencesDialog::loadSettings( )
 	m_uiFormTranslationsDir->setEnabled( false );
 	m_uiFormResourcesDir->setEnabled( false );
 	m_dataLoaderDir->setEnabled( false );
-	switch( prefs->uiLoadMode( ) ) {
-		case Preferences::LocalFile:			
+	switch( m_settings.uiLoadMode ) {
+		case LocalFile:			
 			m_uiLoadModeLocalFile->setChecked( true );
 			m_uiFormsDir->setEnabled( true );
 			m_uiFormTranslationsDir->setEnabled( true );
 			m_uiFormResourcesDir->setEnabled( true );
 			break;
 
-		case Preferences::Network:
+		case Network:
 			m_uiLoadModeNetwork->setChecked( true );
 			break;
+		
+		case Unknown:
+			break;
 	}
-	switch( prefs->dataLoadMode( ) ) {
-		case Preferences::LocalFile:			
+	switch( m_settings.dataLoadMode ) {
+		case LocalFile:			
 			m_dataLoadModeLocalFile->setChecked( true );
 			m_dataLoaderDir->setEnabled( true );
 			break;
 
-		case Preferences::Network:
+		case Network:
 			m_dataLoadModeNetwork->setChecked( true );
 			break;
+
+		case Unknown:
+			break;
 	}
-	m_debug->setChecked( prefs->debug( ) );
-	m_developer->setChecked( prefs->developer( ) );
-	m_uiFormsDir->setFileName( prefs->uiFormsDir( ) );
-	m_uiFormTranslationsDir->setFileName( prefs->uiFormTranslationsDir( ) );
-	m_uiFormResourcesDir->setFileName( prefs->uiFormResourcesDir( ) );
-	m_dataLoaderDir->setFileName( prefs->dataLoaderDir( ) );		
+	m_debug->setChecked( m_settings.debug );
+	m_developer->setChecked( m_settings.developEnabled );
+	m_uiFormsDir->setFileName( m_settings.uiFormsDir );
+	m_uiFormTranslationsDir->setFileName( m_settings.uiFormTranslationsDir );
+	m_uiFormResourcesDir->setFileName( m_settings.uiFormResourcesDir );
+	m_dataLoaderDir->setFileName( m_settings.dataLoaderDir );
 	if( !m_languages.empty( ) ) {
-		QString lang = prefs->locale( );
+		QString lang = m_settings.locale;
 		if( lang == SYSTEM_LANGUAGE ) {
 			m_systemLanguage->setChecked( true );
 		} else {
 			m_systemLanguage->setChecked( false );
-			int idx = m_locale->findData( prefs->locale( ) );
+			int idx = m_locale->findData( m_settings.locale );
 			if( idx != -1 ) {
 				m_locale->setCurrentIndex( idx );
 			}
 		}
 	}
-	m_mdi->setChecked( prefs->mdi( ) );
+	m_mdi->setChecked( m_settings.mdi );
 }
 
 void PreferencesDialog::apply( )
 {
-	Preferences *prefs = Preferences::instance( );
-	
 	if( m_uiLoadModeLocalFile->isChecked( ) ) {
-		prefs->setUiLoadMode( Preferences::LocalFile );
+		m_settings.uiLoadMode = LocalFile;
 	} else if( m_uiLoadModeNetwork->isChecked( ) ) {
-		prefs->setUiLoadMode( Preferences::Network );
+		m_settings.uiLoadMode = Network;
 	}
 	if( m_dataLoadModeLocalFile->isChecked( ) ) {
-		prefs->setDataLoadMode( Preferences::LocalFile );
+		m_settings.dataLoadMode = LocalFile;
 	} else if( m_dataLoadModeNetwork->isChecked( ) ) {
-		prefs->setDataLoadMode( Preferences::Network );
+		m_settings.dataLoadMode = Network;
 	}
-	prefs->setDebug( m_debug->isChecked( ) );
-	prefs->setDeveloper( m_developer->isChecked( ) );
-	prefs->setUiFormsDir( m_uiFormsDir->fileName( ) );
-	prefs->setUiFormTranslationsDir( m_uiFormTranslationsDir->fileName( ) );
-	prefs->setUiFormResourcesDir( m_uiFormResourcesDir->fileName( ) );
-	prefs->setDataLoaderDir( m_dataLoaderDir->fileName( ) );
+	m_settings.debug = m_debug->isChecked( );
+	m_settings.developEnabled = m_developer->isChecked( );
+	m_settings.uiFormsDir = m_uiFormsDir->fileName( );
+	m_settings.uiFormTranslationsDir = m_uiFormTranslationsDir->fileName( );
+	m_settings.uiFormResourcesDir = m_uiFormResourcesDir->fileName( );
+	m_settings.dataLoaderDir = m_dataLoaderDir->fileName( );
 	if( !m_languages.empty( ) ) {
 		if( m_systemLanguage->isChecked( ) ) {
-			prefs->setLocale( SYSTEM_LANGUAGE );
+			m_settings.locale = SYSTEM_LANGUAGE;
 		} else {
 			QString lang = m_locale->itemData( m_locale->currentIndex( ) ).toString( );
-			prefs->setLocale( lang );
+			m_settings.locale = lang;
 		}
 	}
-	prefs->setMdi( m_mdi->isChecked( ) );
-	
-	prefs->storeSettings( );
+	m_settings.mdi = m_mdi->isChecked( );
 
 	emit prefsChanged( );
 	

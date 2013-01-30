@@ -15,6 +15,8 @@
 #include <QRadioButton>
 #include <QComboBox>
 
+#include "settings.hpp"
+
 #include "FileChooser.hpp"
 
 
@@ -23,10 +25,10 @@ class PreferencesDialog : public QDialog
 	Q_OBJECT
 		
 	public:
-		PreferencesDialog( QWidget *_parent = 0 );
-		PreferencesDialog( QStringList _languages, QWidget *_parent = 0 );
+		PreferencesDialog( ApplicationSettings &settings, QStringList _languages, QWidget *_parent = 0 );
 	
 	private:
+		ApplicationSettings &m_settings;
 		QRadioButton *m_uiLoadModeLocalFile;
 		QRadioButton *m_uiLoadModeNetwork;
 		QRadioButton *m_dataLoadModeLocalFile;

@@ -45,21 +45,12 @@ class MainWindow : public QMainWindow
 		DataLoader *m_dataLoader;	// load and saves data (data form)
 		WolframeClient *m_wolframeClient; // the client protocol class
 		QString m_currentLanguage;	// code of the current interface language
-		LoadMode m_uiLoadMode;		// how to load UI forms and data
-		LoadMode m_dataLoadMode;	// how to load data domains
-		bool m_debug;			// show debug windows from the beginning
-		bool m_developer;		// show developer backdors
 		LoginDialog *m_loginDialog;	// the login dialog
 		QString m_settings;		// file to read settings from
-		QString m_uiFormsDir;		// for FileFormLoader (forms dir)
-		QString m_uiFormTranslationsDir; // for FileFormLoader (i18n dir)
-		QString m_uiFormResourcesDir;	// for FileFormLoader (resources dir)
-		QString m_dataLoaderDir;	// for FileDataLoader (data dir)
 		QStringList m_languages;	// available interface translations
 		QString m_language;		// the current language of the interface
 		QMdiArea *m_mdiArea;		// pointer to MDI workspace in the main window
 		QStringList m_forms;		// list of available forms
-		bool m_mdi;
 		QActionGroup *m_subWinGroup;	// group holding list of currently opened MDI subwindows
 		QMap<QAction *, QMdiSubWindow *> m_subWinMap; // maps actions to MDI subwindows
 		QMap<QMdiSubWindow *, QAction *> m_revSubWinMap; // reverse map (the above is actually a bimap)

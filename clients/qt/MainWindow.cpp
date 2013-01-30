@@ -7,7 +7,7 @@
 #include "FileDataLoader.hpp"
 #include "NetworkFormLoader.hpp"
 #include "NetworkDataLoader.hpp"
-#include "Preferences.hpp"
+#include "settings.hpp"
 #include "PreferencesDialog.hpp"
 #include "global.hpp"
 #include "FormChooseDialog.hpp"
@@ -27,14 +27,8 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_cmdline( 0 ),
 	m_formWidget( 0 ), m_uiLoader( 0 ), m_formLoader( 0 ),
 	m_dataLoader( 0 ), m_wolframeClient( 0 ),
-	m_uiLoadMode( DEFAULT_UILOADMODE ), m_dataLoadMode( DEFAULT_DATALOADMODE ),
-	m_debug( false ), m_developer( false ),
 	m_loginDialog( 0 ), m_settings( ),
-	m_uiFormsDir( DEFAULT_UI_FORMS_DIR ),
-	m_uiFormTranslationsDir( DEFAULT_UI_FORM_TRANSLATIONS_DIR ),
-	m_uiFormResourcesDir( DEFAULT_UI_FORM_RESOURCES_DIR ),
-	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR ),
-	m_languages( ), m_language( ), m_mdiArea( 0 ), m_mdi( false ),
+	m_languages( ), m_language( ), m_mdiArea( 0 ),
 	m_subWinGroup( 0 ),
 	m_terminating( false )
 {
@@ -45,16 +39,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	parseArgs( );
 
 // settings override built-in defaults
-	if( !m_settings.isNull( ) ) {
-		Preferences::setFileName( m_settings );
-	}
-	if( !Preferences::instance( )->exists( ) ) {
-		PreferencesDialog d( this );
-		d.exec( );
-		readSettings( );
-	} else {
-		readSettings( );
-	}
+	readSettings( );
 
 // command line options override settings
 	parseArgs( );
@@ -66,24 +51,21 @@ static bool _debug = false;
 
 void MainWindow::readSettings( )
 {
-	Preferences *prefs = Preferences::instance( );
-	m_uiLoadMode = prefs->uiLoadMode( );
-	m_dataLoadMode = prefs->dataLoadMode( );
-	m_debug = prefs->debug( );
-	_debug = m_debug;
-	m_developer = prefs->developer( );
-	m_uiFormsDir = prefs->uiFormsDir( );
-	m_uiFormTranslationsDir = prefs->uiFormTranslationsDir( );
-	m_uiFormResourcesDir = prefs->uiFormResourcesDir( );
-	m_dataLoaderDir = prefs->dataLoaderDir( );
-	if( prefs->locale( ) == SYSTEM_LANGUAGE ) {
+	if( m_settings.isNull( ) ) {
+// read from standard config location (.config/Wolframe or registry)
+		settings.read( ORGANIZATION_NAME, APPLICATION_NAME );
+	} else {
+// read from configuration file given as '-s xxx.conf' on the command line
+		settings.read( m_settings );
+	}
+	
+	_debug = settings.debug;
+	
+	if( settings.locale == SYSTEM_LANGUAGE ) {
 		m_language = QLocale::system( ).name( );
 	} else {
-		m_language = prefs->locale( );
+		m_language = settings.locale;
 	}
-	m_mdi = prefs->mdi( );
-
-	settings.read( "Wolframe", "Wolframe Client" );
 }
 
 static void myMessageOutput( QtMsgType type, const char *msg )
@@ -114,7 +96,7 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 
 MainWindow::~MainWindow( )
 {
-	if( m_mdi ) {
+	if( settings.mdi ) {
 		if( m_mdiArea )
 			m_mdiArea->closeAllSubWindows( );
 	} else {
@@ -215,24 +197,30 @@ void MainWindow::initialize( )
 
 // for testing, load lists of available forms from the files system or
 // a local sqlite database, pass the form loader to the FormWidget
-	switch( m_uiLoadMode ) {
+	switch( settings.uiLoadMode ) {
 		case LocalFile:
-			m_formLoader = new FileFormLoader( m_uiFormsDir, m_uiFormTranslationsDir, m_uiFormResourcesDir );
+			m_formLoader = new FileFormLoader( settings.uiFormsDir, settings.uiFormTranslationsDir, settings.uiFormResourcesDir );
 			break;
 
 		case Network:
 			// skip, delay
 			break;
+		
+		case Unknown:
+			break;
 	}
 
 // ..same for the data loader
-	switch( m_dataLoadMode ) {
+	switch( settings.dataLoadMode ) {
 		case LocalFile:
-			m_dataLoader = new FileDataLoader( m_dataLoaderDir );
+			m_dataLoader = new FileDataLoader( settings.dataLoaderDir );
 			break;
 
 		case Network:
 			// skip, delay, needs a working connection for this
+			break;
+
+		case Unknown:
 			break;
 	}
 
@@ -247,7 +235,7 @@ void MainWindow::initialize( )
 	m_currentLanguage = m_language;
 
 // create central widget, either as MDI area or as one form widget
-	if( m_mdi ) {
+	if( settings.mdi ) {
 		m_mdiArea = findChild<QMdiArea *>( "centralWidget" );
 		if( m_mdiArea ) {
 // attach mdi area to some specific signals
@@ -274,12 +262,12 @@ void MainWindow::initialize( )
 			m_mdiArea->tileSubWindows( );
 		} else {
 // missing a MDI area, so we disable the m_mdi flag
-			m_mdi = false;
+			settings.mdi = false;
 		}
 	}
 
 // add the menu entries for the developer mode
-	if( m_developer ) {
+	if( settings.developEnabled ) {
 		addDeveloperMenu( );
 	}
 
@@ -376,7 +364,7 @@ void MainWindow::connected( )
 	m_wolframeClient->auth( );		
 }
 
-void MainWindow::mechsReceived( QStringList mechs )
+void MainWindow::mechsReceived( QStringList /* mechs */ )
 {
 	m_wolframeClient->mech( "NONE" );
 }
@@ -386,12 +374,12 @@ void MainWindow::disconnected( )
 	m_wolframeClient->deleteLater( );
 	m_wolframeClient = 0;
 		
-	if( m_uiLoadMode == Network ) {
+	if( settings.uiLoadMode == Network ) {
 		delete m_uiLoader;
 		m_uiLoader = 0;
 	}
 	
-	if( m_dataLoadMode == Network ) {
+	if( settings.dataLoadMode == Network ) {
 		delete m_dataLoader;
 		m_dataLoader = 0;
 	}
@@ -413,21 +401,21 @@ void MainWindow::authOk( )
 	qDebug( ) << "authentication succeeded";
 
 // create network based form ...
-	if( m_uiLoadMode == Network ) {
+	if( settings.uiLoadMode == Network ) {
 		m_formLoader = new NetworkFormLoader( m_wolframeClient );
 	}
 
 // ...and data loaders
-	if( m_dataLoadMode == Network ) {
-		m_dataLoader = new NetworkDataLoader( m_wolframeClient, m_debug );
+	if( settings.dataLoadMode == Network ) {
+		m_dataLoader = new NetworkDataLoader( m_wolframeClient, settings.debug );
 	}
 
 // load initial form, TODO: load forms and position of windows from settings,
 // of none there, load init form in a MDI subwindow or directly
-	if( m_mdi ) {
+	if( settings.mdi ) {
 		CreateMdiSubWindow( "init" );
 	} else {
-		m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
+		m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
 
 		connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
 			this, SLOT( formLoaded( QString ) ) );
@@ -575,7 +563,7 @@ void MainWindow::formLoaded( QString name )
 	m_formWidget->loadLanguage( m_currentLanguage );
 	
 // in MDI mode update the title of the sub window, otherwise update window title
-	if( m_mdi ) {
+	if( settings.mdi ) {
 		QMdiSubWindow *mdiSubWindow = m_mdiArea->activeSubWindow( );
 		if( mdiSubWindow ) {
 			QString title = m_formWidget->windowTitle( );
@@ -631,8 +619,12 @@ void MainWindow::on_actionExit_triggered( )
 {
 	m_terminating = true;
 
-	if( m_uiLoadMode == Network || m_dataLoadMode == Network ) {
-		m_wolframeClient->disconnect( );
+	if( settings.uiLoadMode == Network || settings.dataLoadMode == Network ) {
+		if( m_wolframeClient ) {
+			m_wolframeClient->disconnect( );
+		} else {
+			close( );
+		}
 	} else {
 // terminate brutally in local mode
 		disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
@@ -644,7 +636,12 @@ void MainWindow::storeSettings( )
 {
 	settings.mainWindowPos = pos( );
 	settings.mainWindowSize = size( );
-	settings.write( "Wolframe", "Wolframe Client" );
+	
+	if( m_settings.isEmpty( ) ) {
+		settings.write( ORGANIZATION_NAME, APPLICATION_NAME );
+	} else {
+		settings.write( m_settings );
+	}
 }
 
 void MainWindow::closeEvent( QCloseEvent *e )
@@ -656,7 +653,7 @@ void MainWindow::closeEvent( QCloseEvent *e )
 
 void MainWindow::on_actionPreferences_triggered( )
 {
-	PreferencesDialog prefs( m_languages, this );
+	PreferencesDialog prefs( settings, m_languages, this );
 	if( prefs.exec( ) == QDialog::Accepted ) {
 		qDebug( ) << "Reloading application";
 		storeSettings( );
@@ -703,7 +700,7 @@ void MainWindow::on_actionReloadWindow_triggered( )
 
 void MainWindow::CreateMdiSubWindow( const QString form )
 {
-	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, m_debug );
+	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
 
 	connect( formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
@@ -784,6 +781,7 @@ void MainWindow::updateMdiMenusAndToolbars( )
 {
 // present new form menu entry if logged in
 	activateAction( "actionOpenFormNewWindow", m_wolframeClient );
+	activateAction( "actionOpenForm", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
 
 // enable/disable menu/toolbar items depending on the number of subwindows
 	activateAction( "actionClose", nofSubWindows( ) > 0 );
@@ -845,7 +843,7 @@ void MainWindow::updateMenusAndToolbars( )
 	activateAction( "actionLogout", m_wolframeClient );
 	
 // MDI menus and toolbars
-	if( m_mdi ) {
+	if( settings.mdi ) {
 		updateMdiMenusAndToolbars( );
 	}
 }
@@ -876,14 +874,6 @@ void MainWindow::on_actionLogin_triggered( )
 		m_selectedConnection = loginDlg->selectedConnection( );
 		m_wolframeClient = new WolframeClient( m_selectedConnection );
 
-		//~ m_host = selectedConnection.host;
-		//~ m_port = selectedConnection.port;
-		//~ // TODO: find other mapping here
-		//~ m_checkSSL = true /* selectedConnection.SSLverify */;
-		//~ // TODO: map rest of parameters
-
-		//~ m_wolframeClient = new WolframeClient( m_host, m_port, m_secure, m_checkSSL, m_clientCertFile, m_clientKeyFile, m_CACertFile );
-
 // catch signals from the network layer
 		connect( m_wolframeClient, SIGNAL( error( QString ) ),
 			this, SLOT( wolframeError( QString ) ) );
@@ -907,7 +897,7 @@ void MainWindow::on_actionLogin_triggered( )
 
 void MainWindow::on_actionLogout_triggered( )
 {
-	if( m_mdi ) {
+	if( settings.mdi ) {
 		m_mdiArea->closeAllSubWindows( );
 	} else {
 		delete m_formWidget;

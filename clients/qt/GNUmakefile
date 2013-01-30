@@ -63,8 +63,6 @@ CPP_OBJS = \
 	moc_FormWidget.o \
 	qcommandline.o \
 	moc_qcommandline.o \
-	Preferences.o \
-	moc_Preferences.o \
 	PreferencesDialog.o \
 	moc_PreferencesDialog.o \
 	FormChooseDialog.o \
@@ -77,7 +75,8 @@ CPP_OBJS = \
 	moc_serverDefinitionDialog.o \
 	settings.o \
 	loginDialog.o \
-	moc_loginDialog.o
+	moc_loginDialog.o \
+	LoadMode.o
 		
 CPP_BINS = \
 	qtclient$(EXE)
@@ -106,9 +105,6 @@ moc_FormWidget.cpp: FormWidget.hpp
 
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_MOC) $(MOC_FLAGS) qcommandline.h -o moc_qcommandline.cpp
-
-moc_Preferences.cpp: Preferences.hpp
-	$(QT_MOC) $(MOC_FLAGS) Preferences.hpp -o moc_Preferences.cpp
 
 moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) PreferencesDialog.hpp -o moc_PreferencesDialog.cpp

@@ -1,5 +1,4 @@
-#include <QSettings>
-
+#include "global.hpp"
 #include "settings.hpp"
 
 // default values for application settings
@@ -15,10 +14,22 @@ ApplicationSettings::ApplicationSettings()
 	developEnabled = false;			// development menu disabled
 }
 
+void ApplicationSettings::write( const QString &fileName )
+{
+	QSettings settings( fileName, QSettings::IniFormat );
+
+	write( settings );
+}
+
 void ApplicationSettings::write( const QString& organization, const QString& application )
 {
 	QSettings settings( organization, application );
+	
+	write( settings );
+}
 
+void ApplicationSettings::write( QSettings &settings )
+{
 	settings.setValue( "position", mainWindowPos );
 	settings.setValue( "size", mainWindowSize );
 	settings.setValue( "developer", developEnabled );
@@ -51,12 +62,34 @@ void ApplicationSettings::write( const QString& organization, const QString& app
 		settings.setValue( "timeout", connectionParams[ i ].timeout );
 	}
 	settings.endArray();
+	
+	settings.setValue( "mdi", mdi );
+	settings.setValue( "debug", debug );
+	settings.setValue( "locale", locale );
+	settings.setValue( "uiLoadMode", LoadModeToStr( uiLoadMode ) );
+	settings.setValue( "dataLoadMode", LoadModeToStr( dataLoadMode ) );
+	settings.setValue( "uiFormsDir", uiFormsDir );
+	settings.setValue( "uiFormTranslationsDir", uiFormTranslationsDir );
+	settings.setValue( "uiFormResourcesDir", uiFormResourcesDir );
+	settings.setValue( "dataLoaderDir", dataLoaderDir );
+}
+
+void ApplicationSettings::read( const QString &fileName )
+{
+	QSettings settings( fileName, QSettings::IniFormat );
+	
+	read( settings );
 }
 
 void ApplicationSettings::read( const QString& organization, const QString& application )
 {
 	QSettings settings( organization, application );
+	
+	read( settings );
+}
 
+void ApplicationSettings::read( QSettings &settings )
+{
 	mainWindowPos = settings.value( "position", QPoint( 200, 200 ) ).toPoint();
 	mainWindowSize = settings.value( "size", QSize( 400, 400 ) ).toSize();
 	developEnabled = settings.value( "developer", false ).toBool();
@@ -86,4 +119,14 @@ void ApplicationSettings::read( const QString& organization, const QString& appl
 		connectionParams.append( params );
 	}
 	settings.endArray();
+
+	mdi = settings.value( "mdi", false ).toBool( );
+	debug = settings.value( "debug", false ).toBool( );
+	locale = settings.value( "locale", SYSTEM_LANGUAGE ).toString( );
+	uiLoadMode = LoadModeFromStr( settings.value( "uiLoadMode", LoadModeToStr( DEFAULT_UILOADMODE ) ).toString( ) );
+	dataLoadMode = LoadModeFromStr( settings.value( "dataLoadMode", LoadModeToStr( DEFAULT_DATALOADMODE ) ).toString( ) );
+	uiFormsDir = settings.value( "uiFormsDir", DEFAULT_UI_FORMS_DIR ).toString( );
+	uiFormTranslationsDir = settings.value( "uiFormTranslationsDir", DEFAULT_UI_FORM_TRANSLATIONS_DIR ).toString( );
+	uiFormResourcesDir = settings.value( "uiFormResourcesDir", DEFAULT_UI_FORM_RESOURCES_DIR ).toString( );
+	dataLoaderDir = settings.value( "dataLoaderDir", DEFAULT_DATA_LOADER_DIR ).toString( );
 }
