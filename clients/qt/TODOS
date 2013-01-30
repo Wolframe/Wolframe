@@ -24,8 +24,8 @@ now:
   - store position and status of all subwindows
 - integrate from qWolfClient
   - join settings and preferences (Qt ini files)
+  - implement new preferences dialog
   - implement the "Test Connection", needs passing a WolframeClient inside the dialog
-  - rewrite WolfClient to use ConnectionParameters
 
 musts:
 - configurator specific:

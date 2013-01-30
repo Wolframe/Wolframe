@@ -57,10 +57,6 @@ CPP_OBJS = \
 	NetworkDataLoader.o \
 	DataHandler.o \
 	moc_DataHandler.o \
-	DebugTerminal.o \
-	moc_DebugTerminal.o \
-	HistoryLineEdit.o \
-	moc_HistoryLineEdit.o \
 	WolframeClient.o \
 	moc_WolframeClient.o \
 	FormWidget.o \
@@ -71,8 +67,6 @@ CPP_OBJS = \
 	moc_Preferences.o \
 	PreferencesDialog.o \
 	moc_PreferencesDialog.o \
-	StorageWidget.o \
-	moc_StorageWidget.o \
 	FormChooseDialog.o \
 	moc_FormChooseDialog.o \
 	qrc_qtclient.o \
@@ -94,12 +88,6 @@ local_all:
 
 moc_MainWindow.cpp: MainWindow.hpp
 	$(QT_MOC) $(MOC_FLAGS) MainWindow.hpp -o moc_MainWindow.cpp
-
-moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
-	$(QT_MOC) $(MOC_FLAGS) HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
-
-moc_DebugTerminal.cpp: DebugTerminal.hpp
-	$(QT_MOC) $(MOC_FLAGS) DebugTerminal.hpp -o moc_DebugTerminal.cpp
 
 moc_FormLoader.cpp: FormLoader.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormLoader.hpp -o moc_FormLoader.cpp
@@ -131,9 +119,6 @@ moc_FileChooser.cpp: FileChooser.hpp
 moc_PictureChooser.cpp: PictureChooser.hpp
 	$(QT_MOC) $(MOC_FLAGS) PictureChooser.hpp -o moc_PictureChooser.cpp
 
-moc_StorageWidget.cpp: StorageWidget.hpp
-	$(QT_MOC) $(MOC_FLAGS) StorageWidget.hpp -o moc_StorageWidget.cpp
-	
 moc_FormChooseDialog.cpp: FormChooseDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
 

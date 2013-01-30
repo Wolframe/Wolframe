@@ -18,8 +18,8 @@
 #include "FileChooser.hpp"
 
 
-	class PreferencesDialog : public QDialog
-	{
+class PreferencesDialog : public QDialog
+{
 	Q_OBJECT
 		
 	public:
@@ -31,13 +31,6 @@
 		QRadioButton *m_uiLoadModeNetwork;
 		QRadioButton *m_dataLoadModeLocalFile;
 		QRadioButton *m_dataLoadModeNetwork;
-		QLineEdit *m_host;
-		QSpinBox *m_port;
-		QCheckBox *m_secure;
-		QCheckBox *m_checkSSL;
-		FileChooser *m_clientCertFile;
-		FileChooser *m_clientKeyFile;
-		FileChooser *m_CACertFile;
 		QDialogButtonBox* m_buttons;
 		FileChooser *m_uiFormsDir;
 		FileChooser *m_uiFormTranslationsDir;
@@ -58,12 +51,11 @@
 		void loadSettings( );
 		
 	private slots:
-		void toggleSecure( int state );
 		void toggleLoadMode( bool checked );
 		void toggleSystemLanguage( int state );
 		void apply( );
 		void cancel( );
-	};
+};
 
 
 #endif // _PREFERENCES_DIALOG_HPP_INCLUDED

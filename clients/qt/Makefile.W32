@@ -70,10 +70,6 @@ OBJS = \
 	NetworkDataLoader.obj \
 	DataHandler.obj \
 	moc_DataHandler.obj \
-	DebugTerminal.obj \
-	moc_DebugTerminal.obj \
-	HistoryLineEdit.obj \
-	moc_HistoryLineEdit.obj \
 	WolframeClient.obj \
 	moc_WolframeClient.obj \
 	FormWidget.obj \
@@ -84,8 +80,6 @@ OBJS = \
 	moc_Preferences.obj \
 	PreferencesDialog.obj \
 	moc_PreferencesDialog.obj \
-	StorageWidget.obj \
-	moc_StorageWidget.obj \
 	FormChooseDialog.obj \
 	moc_FormChooseDialog.obj \
 	qrc_qtclient.obj \
@@ -175,12 +169,6 @@ qtclient.exe: qtclient.obj
 moc_MainWindow.cpp: MainWindow.hpp
 	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. MainWindow.hpp -o moc_MainWindow.cpp
 
-moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
-
-moc_DebugTerminal.cpp: DebugTerminal.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
-
 moc_FormLoader.cpp: FormLoader.hpp
 	$(QT_DIR)\bin\moc.exe $(MOC_FLAGS) -I. FormLoader.hpp -o moc_FormLoader.cpp
 
@@ -204,9 +192,6 @@ moc_Preferences.cpp: Preferences.hpp
 
 moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
-
-moc_StorageWidget.cpp: StorageWidget.hpp
-	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. StorageWidget.hpp -o moc_StorageWidget.cpp
 
 moc_FormChooseDialog.cpp: FormChooseDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. FormChooseDialog.hpp -o moc_FormChooseDialog.cpp

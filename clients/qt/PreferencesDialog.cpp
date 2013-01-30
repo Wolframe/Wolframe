@@ -54,32 +54,6 @@ void PreferencesDialog::initialize( )
 	groupBox2->setLayout( vbox2 );
 	formLayout->addRow( tr( "&Data load mode:" ), groupBox2 );
 
-	m_host = new QLineEdit( this );
-	formLayout->addRow( tr( "&Host:" ), m_host );
-	m_host->setFocus( );
-
-	m_port = new QSpinBox( this );
-	m_port->setRange( 1024, 49151 );
-	formLayout->addRow( tr( "&Port:" ), m_port );
-
-	m_secure = new QCheckBox( this );
-	formLayout->addRow( tr( "&Secure:" ), m_secure );
-
-	m_checkSSL = new QCheckBox( this );
-	formLayout->addRow( tr( "&Check SSL:" ), m_checkSSL );
-	
-	m_clientCertFile = new FileChooser( FileChooser::SelectExistingFile,
-		tr( "Select a file as client certificate" ), this );
-	formLayout->addRow( tr( "&Client Certificate:" ), m_clientCertFile );
-	
-	m_clientKeyFile = new FileChooser( FileChooser::SelectExistingFile,
-		tr( "Select a file as client key" ), this );
-	formLayout->addRow( tr( "Client &Key:" ), m_clientKeyFile );
-	
-	m_CACertFile = new FileChooser( FileChooser::SelectExistingFile,
-		tr( "Select a file as certificate authority key" ), this );
-	formLayout->addRow( tr( "C&A file:" ), m_CACertFile );
-		
 	m_uiFormsDir = new FileChooser( FileChooser::SelectExistingDir,
 		tr( "Select a directory holding UI forms" ), this );
 	formLayout->addRow( tr( "Form dir:" ), m_uiFormsDir );
@@ -128,10 +102,7 @@ void PreferencesDialog::initialize( )
 	m_buttons->button( QDialogButtonBox::Cancel )->setText( tr( "Cancel" ) );
 	formLayout->addRow( m_buttons );
 	setLayout( formLayout );
-	
-	connect( m_secure, SIGNAL( stateChanged( int ) ),
-		this, SLOT( toggleSecure( int ) ) );
-	
+		
 	connect( m_uiLoadModeLocalFile, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 		
@@ -155,16 +126,6 @@ void PreferencesDialog::loadSettings( )
 {
 	Preferences *prefs = Preferences::instance( );
 	
-	m_host->setText( prefs->host( ) );
-	m_port->setValue( prefs->port( ) );
-	m_secure->setChecked( prefs->secure( ) );
-	m_checkSSL->setChecked( prefs->checkSSL( ) );
-	m_clientCertFile->setFileName( prefs->clientCertFile( ) );
-	m_clientCertFile->setEnabled( prefs->secure( ) );
-	m_clientKeyFile->setFileName( prefs->clientKeyFile( ) );
-	m_clientKeyFile->setEnabled( prefs->secure( ) );
-	m_CACertFile->setFileName( prefs->caCertFile( ) );
-	m_CACertFile->setEnabled( prefs->secure( ) );
 	m_uiLoadModeLocalFile->setChecked( false );
 	m_uiLoadModeNetwork->setChecked( false );
 	m_dataLoadModeLocalFile->setChecked( false );
@@ -220,13 +181,6 @@ void PreferencesDialog::apply( )
 {
 	Preferences *prefs = Preferences::instance( );
 	
-	prefs->setHost( m_host->text( ) );
-	prefs->setPort( m_port->value( ) );
-	prefs->setSecure( m_secure->isChecked( ) );
-	prefs->setCheckSSL( m_checkSSL->isChecked( ) );
-	prefs->setClientCertFile( m_clientCertFile->fileName( ) );
-	prefs->setClientKeyFile( m_clientKeyFile->fileName( ) );
-	prefs->setCaCertFile( m_CACertFile->fileName( ) );
 	if( m_uiLoadModeLocalFile->isChecked( ) ) {
 		prefs->setUiLoadMode( Preferences::LocalFile );
 	} else if( m_uiLoadModeNetwork->isChecked( ) ) {
@@ -265,23 +219,8 @@ void PreferencesDialog::cancel( )
 	close( );
 }
 
-void PreferencesDialog::toggleSecure( int /* state */ )
-{
-	bool secure = m_secure->isChecked( );
-	m_checkSSL->setEnabled( secure );
-	m_clientCertFile->setEnabled( secure );
-	m_clientKeyFile->setEnabled( secure );
-	m_CACertFile->setEnabled( secure );
-}
-
 void PreferencesDialog::toggleLoadMode( bool /* checked */ )
 {
-	m_host->setEnabled( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) );
-	m_port->setEnabled( m_uiLoadModeNetwork->isChecked( ) | m_dataLoadModeNetwork->isChecked( ) );
-	m_secure->setEnabled( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) );
-	m_clientCertFile->setEnabled( ( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) ) && m_secure->isChecked( ) );
-	m_clientKeyFile->setEnabled( ( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) ) && m_secure->isChecked( ) );
-	m_CACertFile->setEnabled( ( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) ) && m_secure->isChecked( ) );
 	m_uiFormsDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );
 	m_uiFormTranslationsDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );
 	m_uiFormResourcesDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );

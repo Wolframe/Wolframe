@@ -10,16 +10,9 @@
 #include <QList>
 #include <QTimer>
 
-WolframeClient::WolframeClient( QString _host, unsigned short _port, bool _secure, bool _checkSSL, QString _clientCertFile, QString _clientKeyFile, QString _CACertfile, QWidget *_parent ) :
-	m_host( _host ),
-	m_port( _port ),
-	m_secure( _secure ),
-	m_checkSSL( _checkSSL ),
-	m_clientCertFile( _clientCertFile ),
-	m_clientKeyFile( _clientKeyFile ),
-	m_CACertFile( _CACertfile ),	
+WolframeClient::WolframeClient( const ConnectionParameters _connParams,	QWidget *_parent )
+	: m_connParams( _connParams ),
 	m_state( Disconnected ),
-	m_timeout( 4000 ),
 	m_parent( _parent ),
 	m_hasErrors( false ),
 #ifdef WITH_SSL
@@ -75,17 +68,22 @@ void WolframeClient::initializeSsl( )
 {
 	if( m_initializedSsl ) return;
 
-	QList<QSslCertificate> caCerts;
 // CA certificate to verify the client certificate
-	QSslCertificate caCert = getCertificate( m_CACertFile );
-	caCerts.append( caCert );
-	reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificates( caCerts );
+	if( m_connParams.SSLverify ) {
+		QList<QSslCertificate> caCerts;
+		QSslCertificate caCert = getCertificate( m_connParams.SSLCAbundle );
+		caCerts.append( caCert );
+		reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificates( caCerts );
+	}
+	
+	if( m_connParams.clientCertificate ) {
 // our local client certificate we present to the server
-	reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate(
-		getCertificate( m_clientCertFile ) );
+		reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate(
+			getCertificate( m_connParams.SSLcertificate ) );
 // the key for using the client certificate
-	reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( m_clientKeyFile );
-
+		reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( m_connParams.SSLkey );
+	}
+	
 	m_initializedSsl = true;
 }
 
@@ -112,38 +110,31 @@ QSslCertificate WolframeClient::getCertificate( QString filename )
 
 void WolframeClient::sslErrors( const QList<QSslError> &errors )
 {
-	if( m_checkSSL ) {
-
 // for all other errors warn user about it
-		foreach( const QSslError &e, errors ) {
-			if( e.error( ) == QSslError::SelfSignedCertificateInChain) continue;
-			if( e.error( ) == QSslError::HostNameMismatch) continue;
-			m_hasErrors = true;	
-			qDebug( ) << "SSL ERROR: " << e;
-			emit error( e.errorString( ) );
-		}
-// ignore them		
-		reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
-	} else {
-// ignore them silently
-		reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
+	foreach( const QSslError &e, errors ) {
+		if( e.error( ) == QSslError::SelfSignedCertificateInChain) continue;
+		if( e.error( ) == QSslError::HostNameMismatch) continue;
+		m_hasErrors = true;	
+		qDebug( ) << "SSL ERROR: " << e;
+		emit error( e.errorString( ) );
 	}
+
+// ignore them		
+	reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
 }
 
 void WolframeClient::peerVerifyError( const QSslError &e )
 {	
-	if( m_checkSSL ) {
-		if( e.error( ) == QSslError::SelfSignedCertificateInChain ) return;
-		if( e.error( ) == QSslError::HostNameMismatch) return;
-		m_hasErrors = true;
-		qDebug( ) << "PEER VERIFY SSL ERROR: " << e;
-		emit error( e.errorString( ) );
-	}
+	if( e.error( ) == QSslError::SelfSignedCertificateInChain ) return;
+	if( e.error( ) == QSslError::HostNameMismatch) return;
+	m_hasErrors = true;
+	qDebug( ) << "PEER VERIFY SSL ERROR: " << e;
+	emit error( e.errorString( ) );
 }
 
 void WolframeClient::encrypted( )
 {
-	if( m_checkSSL && m_hasErrors ) {
+	if( m_hasErrors ) {
 		emit error( tr( "Channel is encrypted, but there were errors on the way." ) );
 	}
 }
@@ -158,19 +149,19 @@ void WolframeClient::connect( )
 {
 	switch( m_state ) {
 		case Disconnected:
-			if( m_secure ) {
+			if( m_connParams.SSL ) {
 #ifdef WITH_SSL
 				initializeSsl( );
-				reinterpret_cast<QSslSocket *>( m_socket )->connectToHostEncrypted( m_host, m_port );
+				reinterpret_cast<QSslSocket *>( m_socket )->connectToHostEncrypted( m_connParams.host, m_connParams.port );
 #else
-				m_socket->connectToHost( m_host, m_port );
+				m_socket->connectToHost( m_connParams.host, m_connParams.port );
 #endif
 			} else {
-				m_socket->connectToHost( m_host, m_port );
+				m_socket->connectToHost( m_connParams.host, m_connParams.port );
 			}
 			
-			if( m_timeout > 0 ) {
-				m_timeoutTimer->start( m_timeout );
+			if( m_connParams.timeout > 0 ) {
+				m_timeoutTimer->start( m_connParams.timeout * 1000 );
 			}
 			
 			m_state = AboutToConnect;

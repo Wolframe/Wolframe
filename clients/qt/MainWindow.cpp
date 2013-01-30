@@ -26,10 +26,7 @@
 MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_cmdline( 0 ),
 	m_formWidget( 0 ), m_uiLoader( 0 ), m_formLoader( 0 ),
-	m_dataLoader( 0 ), m_debugTerminal( 0 ), m_wolframeClient( 0 ),
-	m_host( "localhost" ), m_port( 7661 ), m_secure( false ), m_checkSSL( true ),
-	m_clientCertFile( "./certs/client.crt" ), m_clientKeyFile( "./private/client.key" ),
-	m_CACertFile( "./certs/CAclient.cert.pem" ),
+	m_dataLoader( 0 ), m_wolframeClient( 0 ),
 	m_uiLoadMode( DEFAULT_UILOADMODE ), m_dataLoadMode( DEFAULT_DATALOADMODE ),
 	m_debug( false ), m_developer( false ),
 	m_loginDialog( 0 ), m_settings( ),
@@ -38,7 +35,8 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_uiFormResourcesDir( DEFAULT_UI_FORM_RESOURCES_DIR ),
 	m_dataLoaderDir( DEFAULT_DATA_LOADER_DIR ),
 	m_languages( ), m_language( ), m_mdiArea( 0 ), m_mdi( false ),
-	m_subWinGroup( 0 )
+	m_subWinGroup( 0 ),
+	m_terminating( false )
 {
 // setup designer UI
 	m_ui.setupUi( this );
@@ -69,13 +67,6 @@ static bool _debug = false;
 void MainWindow::readSettings( )
 {
 	Preferences *prefs = Preferences::instance( );
-	m_host = prefs->host( );
-	m_port = prefs->port( );
-	m_secure = prefs->secure( );
-	m_checkSSL = prefs->checkSSL( );
-	m_clientCertFile = prefs->clientCertFile( );
-	m_clientKeyFile = prefs->clientKeyFile( );
-	m_CACertFile = prefs->caCertFile( );
 	m_uiLoadMode = prefs->uiLoadMode( );
 	m_dataLoadMode = prefs->dataLoadMode( );
 	m_debug = prefs->debug( );
@@ -95,16 +86,11 @@ void MainWindow::readSettings( )
 	settings.read( "Wolframe", "Wolframe Client" );
 }
 
-static DebugTerminal *debugTerminal = 0;
-
 static void myMessageOutput( QtMsgType type, const char *msg )
 {
 	switch( type ) {
 		case QtDebugMsg:
 			if( _debug ) {
-				if( debugTerminal ) {
-					debugTerminal->sendComment( msg );
-				}
 				fprintf( stderr, "%s\n", msg );
 			}
 			break;
@@ -136,10 +122,6 @@ MainWindow::~MainWindow( )
 			delete m_formWidget;
 			m_formWidget = 0;
 		}
-	}
-	if( m_debugTerminal ) {
-		delete m_debugTerminal;
-		debugTerminal = 0;
 	}
 	if( m_wolframeClient ) {
 		delete m_wolframeClient;
@@ -220,23 +202,8 @@ void MainWindow::parseError( const QString &error )
 
 void MainWindow::initialize( )
 {	
-//~ // create debuging terminal (only if debugging is enable per command line or in preferences! Don't
-//~ // fill up the plain text widget with images!)
-	//~ if( m_debug ) {
-		//~ m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
-		//~ debugTerminal = m_debugTerminal;
-//~ 
-//~ // connect lines sent by anybody to the debug window
-		//~ connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
-			//~ m_debugTerminal, SLOT( sendLine( QString ) ) );
-//~ 
-		//~ qDebug( ) << "Debug window initialized";
-	//~ }
-
-// install custom output handler
+// install custom output handler (mainly for Unix debugging)
 	qInstallMsgHandler( &myMessageOutput );
-	//~ //if( m_debug ) m_debugTerminal->bringToFront( );
-//~ 
 
 // a Qt UI loader for the main theme window and also used by all form widgets
 	m_uiLoader = new QUiLoader( );
@@ -331,13 +298,9 @@ void MainWindow::initialize( )
 // load language resources, repaints the whole interface if necessary
 	loadLanguage( m_currentLanguage );
 
-//~ // load initial form
-	//~ loadForm( "init" );
-
 // restore main window position and size
 	move( settings.mainWindowPos );
-	resize( settings.mainWindowSize );
-	
+	resize( settings.mainWindowSize );	
 }
 
 void MainWindow::activateAction( const QString name, bool enabled )
@@ -435,14 +398,9 @@ void MainWindow::disconnected( )
 	
 	updateMenusAndToolbars( );
 	
-	//~ disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
-	//~ if( m_debugTerminal ) {
-		//~ m_debugTerminal->close( );
-	//~ }
-	//~ m_debugTerminal = 0;
-	//~ debugTerminal = 0;
-//~ 
-	//~ close( );
+	if( m_terminating ) {
+		close( );
+	}
 }
 
 void MainWindow::wolframeError( QString error )
@@ -665,29 +623,34 @@ void MainWindow::formError( QString error )
 void MainWindow::on_actionRestart_triggered( )
 {
 	qDebug( ) << "Restarting application";
+	close( );
 	QApplication::instance( )->exit( RESTART_CODE );
 }
 
 void MainWindow::on_actionExit_triggered( )
 {
-	close( );
-	//~ if( m_uiLoadMode == Network || m_dataLoadMode == Network ) {
-		//~ m_wolframeClient->disconnect( );
-	//~ } else {
-//~ // terminate brutally in local mode
-		//~ disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
-		//~ m_debugTerminal = 0;
-		//~ debugTerminal = 0;
-//~ 
-		//~ close( );
-	//~ }
+	m_terminating = true;
+
+	if( m_uiLoadMode == Network || m_dataLoadMode == Network ) {
+		m_wolframeClient->disconnect( );
+	} else {
+// terminate brutally in local mode
+		disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+		close( );
+	}
 }
 
-void MainWindow::closeEvent( QCloseEvent *e )
+void MainWindow::storeSettings( )
 {
 	settings.mainWindowPos = pos( );
 	settings.mainWindowSize = size( );
 	settings.write( "Wolframe", "Wolframe Client" );
+}
+
+void MainWindow::closeEvent( QCloseEvent *e )
+{
+	storeSettings( );
+	
 	e->accept( );
 }
 
@@ -696,6 +659,7 @@ void MainWindow::on_actionPreferences_triggered( )
 	PreferencesDialog prefs( m_languages, this );
 	if( prefs.exec( ) == QDialog::Accepted ) {
 		qDebug( ) << "Reloading application";
+		storeSettings( );
 		QApplication::instance( )->exit( RESTART_CODE );
 	}
 }
@@ -902,24 +866,23 @@ void MainWindow::on_actionLogin_triggered( )
 	LoginDialog* loginDlg = new LoginDialog( username, connName,
 						 settings.connectionParams );
 	if( loginDlg->exec( ) == QDialog::Accepted ) {
+// optionally remember old login data		
 		if( settings.saveUsername ) {
 			settings.lastUsername = loginDlg->username( );
 			settings.lastConnection = loginDlg->selectedConnection( ).name;
 		}
-		// TODO: rewrite WolframeClient interface, replace memebers
-		ConnectionParameters selectedConnection = loginDlg->selectedConnection( );
-		m_host = selectedConnection.host;
-		m_port = selectedConnection.port;
-		m_secure = selectedConnection.SSL;
-		// TODO: find other mapping here
-		m_checkSSL = true /* selectedConnection.SSLverify */;
-		m_clientCertFile = selectedConnection.SSLcertificate;
-		m_clientKeyFile = selectedConnection.SSLkey;
-		m_CACertFile = selectedConnection.SSLCAbundle;
-		// TODO: map rest of parameters
 
 // create a Wolframe protocol client
-		m_wolframeClient = new WolframeClient( m_host, m_port, m_secure, m_checkSSL, m_clientCertFile, m_clientKeyFile, m_CACertFile );
+		m_selectedConnection = loginDlg->selectedConnection( );
+		m_wolframeClient = new WolframeClient( m_selectedConnection );
+
+		//~ m_host = selectedConnection.host;
+		//~ m_port = selectedConnection.port;
+		//~ // TODO: find other mapping here
+		//~ m_checkSSL = true /* selectedConnection.SSLverify */;
+		//~ // TODO: map rest of parameters
+
+		//~ m_wolframeClient = new WolframeClient( m_host, m_port, m_secure, m_checkSSL, m_clientCertFile, m_clientKeyFile, m_CACertFile );
 
 // catch signals from the network layer
 		connect( m_wolframeClient, SIGNAL( error( QString ) ),
@@ -966,24 +929,5 @@ void MainWindow::on_actionManageServers_triggered( )
 
 void MainWindow::addDeveloperMenu( )
 {
-	QAction *debugTerminalAction = new QAction( tr( "&Debug Terminal" ), this );
-	debugTerminalAction->setToolTip( tr( "Show protocol in a debug terminal" ) );
-	debugTerminalAction->setCheckable( true );
-	connect( debugTerminalAction, SIGNAL( triggered( bool ) ),
-		this, SLOT( on_actionDebugTerminal_triggered( bool ) ) );
-// only debug and developer mode enable the debug window, is far too slow!
-	debugTerminalAction->setEnabled( m_debug );
-	QMenu *developerMenu = menuBar( )->addMenu( tr( "&Developer" ) );
-	developerMenu->addAction( debugTerminalAction );
-}
-
-void MainWindow::on_actionDebugTerminal_triggered( bool checked )
-{
-	if( m_debugTerminal ) {
-		if( checked ) {
-			m_debugTerminal->bringToFront( );
-		} else {
-			m_debugTerminal->hide( );
-		}
-	}
+	/* QMenu *developerMenu = */ menuBar( )->addMenu( tr( "&Developer" ) );
 }

@@ -18,13 +18,13 @@
 
 #include "global.hpp"
 #include "FormLoader.hpp"
-#include "DebugTerminal.hpp"
 #include "WolframeClient.hpp"
 #include "FormWidget.hpp"
 #include "loginDialog.hpp"
 #include "LoadMode.hpp"
 #include "ui_MainWindow.h"
 #include "settings.hpp"
+#include "connection.hpp"
 
 class MainWindow : public QMainWindow
 {
@@ -43,16 +43,8 @@ class MainWindow : public QMainWindow
 		QUiLoader *m_uiLoader;		// the UI loader for all forms
 		FormLoader *m_formLoader;	// form loader (visible form)
 		DataLoader *m_dataLoader;	// load and saves data (data form)
-		DebugTerminal *m_debugTerminal;	// protocol debug terminal (interactive)
 		WolframeClient *m_wolframeClient; // the client protocol class
 		QString m_currentLanguage;	// code of the current interface language
-		QString m_host;			// wolframe server port to use
-		unsigned short m_port;		// wolframe port to use
-		bool m_secure;			// use SSL for wolframe protocol
-		bool m_checkSSL;		// verify SSL connection
-		QString m_clientCertFile;	// filename of the client certfificate
-		QString m_clientKeyFile;	// filename of the client key file
-		QString m_CACertFile;		// filename of the CA certificate
 		LoadMode m_uiLoadMode;		// how to load UI forms and data
 		LoadMode m_dataLoadMode;	// how to load data domains
 		bool m_debug;			// show debug windows from the beginning
@@ -72,6 +64,8 @@ class MainWindow : public QMainWindow
 		QMap<QAction *, QMdiSubWindow *> m_subWinMap; // maps actions to MDI subwindows
 		QMap<QMdiSubWindow *, QAction *> m_revSubWinMap; // reverse map (the above is actually a bimap)
 		ApplicationSettings settings;	// Application settings
+		ConnectionParameters m_selectedConnection; // lastly selected connection
+		bool m_terminating;
 		
 	public slots:
 		void readSettings( );
@@ -94,6 +88,7 @@ class MainWindow : public QMainWindow
 		QKeySequence::StandardKey defaultKeySequenceFromString( const QString s );
 		void updateActionShortcuts( );
 		void addDeveloperMenu( );
+		void storeSettings( );
 
 	private slots:
 // slots for command line parsing
@@ -134,7 +129,6 @@ class MainWindow : public QMainWindow
 		void on_actionPreferences_triggered( );
 		void on_actionAbout_triggered( );
 		void on_actionAboutQt_triggered( );
-		void on_actionDebugTerminal_triggered( bool checked );  
 		void on_actionOpenForm_triggered( );
 		void on_actionOpenFormNewWindow_triggered( );	
 		void on_actionReloadWindow_triggered( );
