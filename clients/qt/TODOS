@@ -109,6 +109,11 @@ musts:
   - QTreeView: with model for big data, on request
 
 nice to do:
+- file only mode
+  - make it work again
+    - login/logout? not really
+- readd developer tools
+  - debug terminal
 - MDI windows should get icons of the forms, especially
   nice for a iconized/shaded view of the MDI sub windows
 - file download, later, for reports, PDFs, etc.

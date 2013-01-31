@@ -78,6 +78,10 @@ class WolframeClient : public QObject
 		void mech( QString mech );
 		void request( QString type, QString content );
 
+// inquire status
+		bool isConnected( ) const;
+		bool isEncrypted( ) const;
+
 	private slots:
 		void timeoutOccurred( );
 		void error( QAbstractSocket::SocketError );

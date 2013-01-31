@@ -271,14 +271,14 @@ void MainWindow::initialize( )
 		addDeveloperMenu( );
 	}
 
-// update menus and toolbars
-	updateMenusAndToolbars( );
-
 // update shortcuts to standard ones
 	updateActionShortcuts( );
 	
 // add connection and encryption state indicators to status bar
 	addStatusBarIndicators( );
+
+// update menus and toolbars
+	updateMenusAndToolbars( );
 			
 // now that we have a menu where we can add things, we start the form list loading
 	m_formLoader->initiateListLoad( );
@@ -406,14 +406,6 @@ void MainWindow::disconnected( )
 		m_dataLoader = 0;
 	}
 
-	m_statusBarConn->setPixmap( QPixmap( ":/images/16x16/disconnected.png" ) );
-	m_statusBarConn->setToolTip( tr( "Status: offline" ) );
-	m_statusBarConn->setEnabled( false );
-	
-	m_statusBarSSL->setPixmap( QPixmap( ":/images/16x16/unencrypted.png" ) );
-	m_statusBarSSL->setToolTip( tr( "Encryption: N/A" ) );
-	m_statusBarSSL->setEnabled( false );	
-	
 	updateMenusAndToolbars( );
 
 	statusBar( )->showMessage( tr( "Terminated" ) );
@@ -426,6 +418,8 @@ void MainWindow::disconnected( )
 void MainWindow::wolframeError( QString error )
 {
 	statusBar( )->showMessage( error, 6000 );
+	
+	updateMenusAndToolbars( );
 }
 
 void MainWindow::authOk( )
@@ -433,20 +427,6 @@ void MainWindow::authOk( )
 	qDebug( ) << "authentication succeeded";
 
 	statusBar( )->showMessage( tr( "Ready" ) );
-
-	m_statusBarConn->setPixmap( QPixmap( ":/images/16x16/connected.png" ) );
-	m_statusBarConn->setToolTip( tr( "Status: online" ) );
-	m_statusBarConn->setEnabled( true );
-	
-	if( m_selectedConnection.SSL ) {
-		m_statusBarSSL->setPixmap( QPixmap( ":/images/16x16/encrypted.png" ) );
-		m_statusBarSSL->setToolTip( tr( "Encrypted" ) );
-		m_statusBarSSL->setEnabled( true );
-	} else {
-		m_statusBarSSL->setPixmap( QPixmap( ":/images/16x16/unencrypted.png" ) );
-		m_statusBarSSL->setToolTip( tr( "Encryption: N/A" ) );
-		m_statusBarSSL->setEnabled( false );	
-	}
 	
 // create network based form ...
 	if( settings.uiLoadMode == Network ) {
@@ -885,11 +865,33 @@ void MainWindow::updateMdiMenusAndToolbars( )
 
 void MainWindow::updateMenusAndToolbars( )
 {
+// connection status
+	if( m_wolframeClient && m_wolframeClient->isConnected( ) ) {
+		m_statusBarConn->setPixmap( QPixmap( ":/images/16x16/connected.png" ) );
+		m_statusBarConn->setToolTip( tr( "Status: online" ) );
+		m_statusBarConn->setEnabled( true );
+	} else {
+		m_statusBarConn->setPixmap( QPixmap( ":/images/16x16/disconnected.png" ) );
+		m_statusBarConn->setToolTip( tr( "Status: offline" ) );
+		m_statusBarConn->setEnabled( false );
+	}
+	if( m_wolframeClient && m_wolframeClient->isEncrypted( ) ) {
+		m_statusBarSSL->setPixmap( QPixmap( ":/images/16x16/encrypted.png" ) );
+		m_statusBarSSL->setToolTip( tr( "Encrypted" ) );
+		m_statusBarSSL->setEnabled( true );
+	} else {
+		m_statusBarSSL->setPixmap( QPixmap( ":/images/16x16/unencrypted.png" ) );
+		m_statusBarSSL->setToolTip( tr( "Encryption: N/A" ) );
+		m_statusBarSSL->setEnabled( false );	
+	}
+	
 // logged in or logged out?
-	activateAction( "actionOpenForm", m_wolframeClient );
-	activateAction( "actionLogin", !m_wolframeClient );
-	activateAction( "actionLogout", m_wolframeClient );
-
+	activateAction( "actionOpenForm", m_wolframeClient && m_wolframeClient->isConnected( ) );
+	if( settings.uiLoadMode == Network || settings.dataLoadMode == Network ) {
+		activateAction( "actionLogin", !m_wolframeClient || !m_wolframeClient->isConnected( ) );
+		activateAction( "actionLogout", m_wolframeClient && m_wolframeClient->isConnected( ) );
+	}
+	
 // MDI menus and toolbars
 	if( settings.mdi ) {
 		updateMdiMenusAndToolbars( );

@@ -56,10 +56,10 @@
     <addaction name="actionIndex"/>
     <addaction name="actionContextHelp"/>
     <addaction name="separator"/>
-    <addaction name="actionTechnical_Support"/>
-    <addaction name="actionReport_Bug"/>
+    <addaction name="actionTechnicalSupport"/>
+    <addaction name="actionReportBug"/>
     <addaction name="separator"/>
-    <addaction name="actionCheck_for_Updates"/>
+    <addaction name="actionCheckForUpdates"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAboutQt"/>
@@ -311,24 +311,24 @@
     <string>Context Help</string>
    </property>
   </action>
-  <action name="actionTechnical_Support">
+  <action name="actionTechnicalSupport">
    <property name="text">
     <string>Technical Support</string>
    </property>
   </action>
-  <action name="actionReport_Bug">
+  <action name="actionReportBug">
    <property name="text">
     <string>Report Bug...</string>
    </property>
   </action>
-  <action name="actionCheck_for_Updates">
+  <action name="actionCheckForUpdates">
    <property name="text">
     <string>Check for Updates...</string>
    </property>
   </action>
   <action name="actionReloadWindow">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="qtclient.qrc">
@@ -556,6 +556,9 @@
    </property>
   </action>
   <action name="actionLogin">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="qtclient.qrc">
      <normaloff>:/images/login.png</normaloff>:/images/login.png</iconset>

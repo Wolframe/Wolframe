@@ -540,3 +540,13 @@ void WolframeClient::handleResult( )
 	}
 }
 
+bool WolframeClient::isConnected( ) const
+{
+	return( m_state == Connected || m_state == Data );
+}
+
+bool WolframeClient::isEncrypted( ) const
+{
+	// TODO: needs improvement! Are verifications and certs ok?
+	return( isConnected( ) && m_connParams.SSL );
+}
