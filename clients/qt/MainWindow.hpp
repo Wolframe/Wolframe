@@ -57,6 +57,8 @@ class MainWindow : public QMainWindow
 		ApplicationSettings settings;	// Application settings
 		ConnectionParameters m_selectedConnection; // lastly selected connection
 		bool m_terminating;
+		QLabel *m_statusBarConn;
+		QLabel *m_statusBarSSL;
 		
 	public slots:
 		void readSettings( );
@@ -79,6 +81,7 @@ class MainWindow : public QMainWindow
 		QKeySequence::StandardKey defaultKeySequenceFromString( const QString s );
 		void updateActionShortcuts( );
 		void addDeveloperMenu( );
+		void addStatusBarIndicators( );
 		void storeSettings( );
 
 	private slots:

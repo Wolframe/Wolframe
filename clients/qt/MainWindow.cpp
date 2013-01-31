@@ -276,6 +276,9 @@ void MainWindow::initialize( )
 
 // update shortcuts to standard ones
 	updateActionShortcuts( );
+	
+// add connection and encryption state indicators to status bar
+	addStatusBarIndicators( );
 			
 // now that we have a menu where we can add things, we start the form list loading
 	m_formLoader->initiateListLoad( );
@@ -359,6 +362,25 @@ void MainWindow::updateActionShortcuts( )
 	}
 }
 
+void MainWindow::addStatusBarIndicators( )
+{
+	m_statusBarConn = new QLabel( this );
+	m_statusBarConn->setFrameStyle( QFrame::Panel | QFrame::Sunken );
+	statusBar( )->addPermanentWidget( m_statusBarConn );
+	m_statusBarConn->setPixmap( QPixmap( ":/images/16x16/disconnected.png" ) );
+	m_statusBarConn->setToolTip( tr( "Status: offline" ) );
+	m_statusBarConn->setEnabled( false );
+
+	m_statusBarSSL = new QLabel( this );
+	m_statusBarSSL->setFrameStyle( QFrame::Panel | QFrame::Sunken );
+	statusBar( )->addPermanentWidget( m_statusBarSSL );
+	m_statusBarSSL->setPixmap( QPixmap( ":/images/16x16/unencrypted.png" ) );
+	m_statusBarSSL->setToolTip( tr( "Encryption: N/A" ) );
+	m_statusBarSSL->setEnabled( false );
+}
+
+// --- handling protocol changes (connection states and errors)
+
 void MainWindow::connected( )
 {
 	m_wolframeClient->auth( );		
@@ -383,8 +405,18 @@ void MainWindow::disconnected( )
 		delete m_dataLoader;
 		m_dataLoader = 0;
 	}
+
+	m_statusBarConn->setPixmap( QPixmap( ":/images/16x16/disconnected.png" ) );
+	m_statusBarConn->setToolTip( tr( "Status: offline" ) );
+	m_statusBarConn->setEnabled( false );
+	
+	m_statusBarSSL->setPixmap( QPixmap( ":/images/16x16/unencrypted.png" ) );
+	m_statusBarSSL->setToolTip( tr( "Encryption: N/A" ) );
+	m_statusBarSSL->setEnabled( false );	
 	
 	updateMenusAndToolbars( );
+
+	statusBar( )->showMessage( tr( "Terminated" ) );
 	
 	if( m_terminating ) {
 		close( );
@@ -400,6 +432,22 @@ void MainWindow::authOk( )
 {
 	qDebug( ) << "authentication succeeded";
 
+	statusBar( )->showMessage( tr( "Ready" ) );
+
+	m_statusBarConn->setPixmap( QPixmap( ":/images/16x16/connected.png" ) );
+	m_statusBarConn->setToolTip( tr( "Status: online" ) );
+	m_statusBarConn->setEnabled( true );
+	
+	if( m_selectedConnection.SSL ) {
+		m_statusBarSSL->setPixmap( QPixmap( ":/images/16x16/encrypted.png" ) );
+		m_statusBarSSL->setToolTip( tr( "Encrypted" ) );
+		m_statusBarSSL->setEnabled( true );
+	} else {
+		m_statusBarSSL->setPixmap( QPixmap( ":/images/16x16/unencrypted.png" ) );
+		m_statusBarSSL->setToolTip( tr( "Encryption: N/A" ) );
+		m_statusBarSSL->setEnabled( false );	
+	}
+	
 // create network based form ...
 	if( settings.uiLoadMode == Network ) {
 		m_formLoader = new NetworkFormLoader( m_wolframeClient );
@@ -841,7 +889,7 @@ void MainWindow::updateMenusAndToolbars( )
 	activateAction( "actionOpenForm", m_wolframeClient );
 	activateAction( "actionLogin", !m_wolframeClient );
 	activateAction( "actionLogout", m_wolframeClient );
-	
+
 // MDI menus and toolbars
 	if( settings.mdi ) {
 		updateMdiMenusAndToolbars( );
