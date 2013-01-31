@@ -45,6 +45,7 @@ public:
 
 	const ITypeInfo* typeinfo() const	{return m_typeinfo;}
 	const TYPEATTR* typeattr() const	{return m_typeattr;}
+	PVOID createRecord();
 
 	struct VariableDescriptor
 	{
@@ -56,7 +57,12 @@ public:
 
 private:
 	enum InitType {ClearInit,CopyInit,DefaultConstructor,DefaultConstructorZero,CopyConstructor,Destructor};
-	HRESULT RecordFill( PVOID pvNew, InitType initType, PVOID pvOld=0);
+	static const char* initTypeName( InitType it)
+	{
+		static const char* ar[] = {"ClearInit","CopyInit","DefaultConstructor","DefaultConstructorZero","CopyConstructor","Destructor"}; 
+		return ar[(int)it];
+	}
+	HRESULT RecordFill( PVOID pvNew, InitType initType, bool doThrow, PVOID pvOld=0);
 	void initDescr();
 
 private:
@@ -68,7 +74,11 @@ private:
 
 typedef boost::shared_ptr<RecordInfo> RecordInfoR;
 
-std::map<std::size_t,RecordInfoR> getRecordInfoMap( ITypeInfo* typeinfo);
+typedef unsigned int RecordInfoKey;
+unsigned int recordInfoKey( unsigned int depht_, unsigned int ofs_);
+
+typedef std::map<RecordInfoKey,RecordInfoR> RecordInfoMap;
+RecordInfoMap getRecordInfoMap( ITypeInfo* typeinfo);
 
 }}//namespace
 #endif

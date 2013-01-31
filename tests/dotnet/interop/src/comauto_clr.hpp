@@ -20,8 +20,8 @@ public:
 	explicit CommonLanguageRuntime( const std::string& version);
 	virtual ~CommonLanguageRuntime();
 
-	VARIANT call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, LONG argc, const VARIANT* argv);
-	VARIANT call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, LONG argc, const VARIANT* argv);
+	VARIANT call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, LONG argc, const VARIANT* argv) const;
+	VARIANT call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, LONG argc, const VARIANT* argv) const;
 
 private:
     ICLRMetaHost *m_metahost;

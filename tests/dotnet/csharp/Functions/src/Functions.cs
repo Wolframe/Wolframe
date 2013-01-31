@@ -5,16 +5,22 @@ using System.Text;
 using System.Runtime.InteropServices;
 
 [ComVisible(true)]
-[System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
+[Guid("755efe8f-f125-494c-89a2-cf3cb03a0c8c")]
+public struct IdPair
+{
+    public int a;
+    public int b;
+};
+
+[ComVisible(true)]
 [Guid("390E047F-36FD-4F23-8CE8-3A4C24B33AD3")]
 public struct Address
 {
     public string street;
-    public string coutry;
+    public string country;
 };
 
 [ComVisible(true)]
-[System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
 [Guid("50085256-73D2-443E-B22B-9BB1BBAAFCDD")]
 public struct User
 {
@@ -27,11 +33,15 @@ public struct User
 public interface FunctionInterface
 {
     [ComVisible(true)]
-    int Sub(int i, int j);
+    int Sub( int i, int j);
     [ComVisible(true)]
-    int Add(int i, int j);
+    int Add( int i, int j);
     [ComVisible(true)]
-    User StoreUser(User usr);
+    User StoreUser( User usr);
+    [ComVisible(true)]
+    int MapAddress( Address adr);
+    [ComVisible(true)]
+    int AddIdPair( IdPair p);
 }
 
 [ComVisible(true)]
@@ -43,18 +53,26 @@ public class Functions : FunctionInterface
         //default constructor needed for COM
     }
 
-    public int Add(int i, int j)
+    public int Add( int i, int j)
     {
         return i + j;
     }
-    public int Sub(int i, int j)
+    public int Sub( int i, int j)
     {
         return i - j;
     }
-    public User StoreUser(User usr)
+    public User StoreUser( User usr)
     {
         usr.id += 1;
         return usr;
+    }
+    public int MapAddress( Address adr)
+    {
+        return adr.country.Length;
+    }
+    public int AddIdPair( IdPair p)
+    {
+        return p.a + p.b;
     }
 }
 

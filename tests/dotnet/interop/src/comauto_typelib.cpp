@@ -1,6 +1,5 @@
 #include "comauto_typelib.hpp"
 #include "comauto_utils.hpp"
-#include "comauto_record.hpp"
 #include "comauto_function.hpp"
 #include "ddl_form.hpp"
 #include <iostream>
@@ -34,14 +33,6 @@ comauto::TypeLib::TypeLib( const std::string& file)
 comauto::TypeLib::~TypeLib()
 {
 	if (m_typelib) m_typelib->Release();
-}
-
-static IRecordInfo* getRecordInfo( ITypeInfo *typeinfo)
-{
-	IRecordInfo* rt = 0;
-	CComObject<IRecordInfo> *crt = NULL;
-	CComPtr<IRecordInfo> ptmpri;
-	return rt;
 }
 
 // forward declaration for printAttributes(const char*,ITypeInfo*,TYPEATTR*,int)
@@ -156,7 +147,7 @@ static void printItem( std::ostream& out, ITypeLib* typelib, int indentcnt=0)
 	for (UINT ii = 0; ii < typelib->GetTypeInfoCount(); ++ii)
 	{
 		WRAP( typelib->GetTypeInfo( ii, &typeinfo))
-		printItem( out, typeinfo);
+		printItem( out, typeinfo, indentcnt);
 		typeinfo->Release();
 	}
 }

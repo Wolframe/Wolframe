@@ -53,7 +53,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\interop\src;..\..\..\interop\src;..\..\..\..\..\include;C:\boost\boost_1_51</AdditionalIncludeDirectories>
@@ -98,9 +98,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\comauto_clr.hpp" />
     <ClInclude Include="..\..\src\comauto_function.hpp" />
-    <ClInclude Include="..\..\src\comauto_record.hpp" />
     <ClInclude Include="..\..\src\comauto_recordinfo.hpp" />
-    <ClInclude Include="..\..\src\comauto_type.hpp" />
     <ClInclude Include="..\..\src\comauto_typelib.hpp" />
     <ClInclude Include="..\..\src\comauto_utils.hpp" />
     <ClInclude Include="..\..\src\ddl_form.hpp" />
@@ -110,9 +108,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\comauto_clr.cpp" />
     <ClCompile Include="..\..\src\comauto_function.cpp" />
-    <ClCompile Include="..\..\src\comauto_record.cpp" />
     <ClCompile Include="..\..\src\comauto_recordinfo.cpp" />
-    <ClCompile Include="..\..\src\comauto_type.cpp" />
     <ClCompile Include="..\..\src\comauto_typelib.cpp" />
     <ClCompile Include="..\..\src\comauto_utils.cpp" />
     <ClCompile Include="..\..\src\ddl_form.cpp" />

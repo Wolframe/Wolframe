@@ -15,6 +15,9 @@ Glossary and Microsoft Documentation:
 	[D08] GAC: http://en.wikipedia.org/wiki/Global_Assembly_Cache
 	[D09] QueryInterface definition by macros: http://msdn.microsoft.com/en-us/library/6bwekse3(v=vs.80).aspx
 
+MSDN Bugreports:
+	[B01] BUG: COM Interop: No Built-in Support VARIANT of Type VT_RECORD: http://support.microsoft.com/kb/309329
+
 Books:
 	[B01] Inside COM+: http://www.thrysoee.dk/InsideCOM+
 		NOTE: Chapter Creating a TypeLibrary: http://www.thrysoee.dk/InsideCOM+/ch09b.htm 

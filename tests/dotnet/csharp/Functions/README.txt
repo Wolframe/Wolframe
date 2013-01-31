@@ -9,6 +9,8 @@ The file with the extension TLB is created in the current directory. This file c
 Inspect a TLB:
 Call \Program Files\Microsoft SDKs\Windows\v7.1\Bin\OleView.exe or use the Wolframe interop test program WolfCLR in tests/interop/
 
+Register the Assembly in the GAC:
+Call "\Program Files\Microsoft SDKs\Windows\v7.1\Bin\gacutil.exe"  /if <assemblypath>
 
 Documentation about COM/.NET interop is gathered in Links.txt
 

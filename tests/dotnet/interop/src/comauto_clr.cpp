@@ -47,7 +47,7 @@ comauto::CommonLanguageRuntime::CommonLanguageRuntime( const std::string& versio
 	}
 }
 
-VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, LONG argc, const VARIANT* argv)
+VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, LONG argc, const VARIANT* argv) const
 {
     SAFEARRAY* methodArgs = NULL;
 	 IUnknownPtr spAppDomainThunk = NULL; 
@@ -70,13 +70,21 @@ VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, con
 		variant_t vtReturnVal; 
 		WRAP( spAssembly->CreateInstance(bstrClassName, &vtObject))
 
-		methodArgs = ::SafeArrayCreateVector( VT_VARIANT, 0, argc);
+		if (argc == 12 && (argv[0].vt == VT_USERDEFINED || argv[0].vt == VT_RECORD) && argv[0].pRecInfo)
+		{
+			methodArgs = SafeArrayCreateVectorEx( VT_RECORD, 0, 1, argv[0].pRecInfo);
+		}
+		else
+		{
+			methodArgs = ::SafeArrayCreateVector( VT_VARIANT, 0, argc);
+		}
+		if (!methodArgs) throw std::bad_alloc();
 		for (LONG aidx=0; aidx != argc; ++aidx)
 		{
-			VARIANT vt = argv[aidx];
-			WRAP( ::SafeArrayPutElement( methodArgs, &aidx, &vt))
+			VARIANT arg = argv[aidx];
+			if (arg.vt == VT_USERDEFINED) arg.vt = VT_RECORD;
+			WRAP( ::SafeArrayPutElement( methodArgs, &aidx, &arg))
 		}
-
 		BindingFlags bindingFlags = static_cast<BindingFlags>( BindingFlags_InvokeMethod | BindingFlags_Instance | BindingFlags_Public);
 		WRAP( spType->InvokeMember_3( bstrMethodName, bindingFlags, NULL, vtObject, methodArgs, &vtReturnVal))
 
@@ -84,7 +92,7 @@ VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, con
 	}
 	catch (const std::runtime_error& e)
 	{
-		if (methodArgs) SafeArrayDestroy(methodArgs);
+		if (methodArgs) ::SafeArrayDestroy(methodArgs);
 		if (spType) spType->Release();
 		if (spAssembly) spAssembly->Release();
 		if (spDefaultAppDomain) spDefaultAppDomain->Release();
@@ -92,7 +100,7 @@ VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, con
 	}
 }
 
-VARIANT comauto::CommonLanguageRuntime::call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, LONG argc, const VARIANT* argv)
+VARIANT comauto::CommonLanguageRuntime::call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, LONG argc, const VARIANT* argv) const
 {
 	return call( comauto::utf16string( assembly_utf8_), comauto::utf16string( class_utf8_), comauto::utf16string( method_utf8_), argc, argv);
 }

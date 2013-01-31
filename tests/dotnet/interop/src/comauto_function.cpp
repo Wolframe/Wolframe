@@ -7,6 +7,65 @@
 
 using namespace _Wolframe;
 
+namespace
+{
+class FunctionResult
+	:public langbind::TypedInputFilter
+{
+public:
+	explicit FunctionResult( const CComPtr<ITypeInfo>& typeinfo)
+		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
+	{
+		m_stk.push_back( StackElem( Init, typeinfo, 0));
+	}
+	FunctionResult( const FunctionResult& o)
+		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
+		,m_stk(o.m_stk)
+		,m_elembuf(o.m_elembuf)
+	{
+		m_data.vt = VT_EMPTY;
+		WRAP( ::VariantCopy( &m_data, &o.m_data))
+	}
+	virtual ~FunctionResult()
+	{
+		::VariantClear( &m_data);
+	}
+
+	virtual TypedInputFilter* copy() const
+	{
+		return new FunctionResult( *this);
+	}
+
+	virtual bool getNext( ElementType& type, Element& element);
+	VARIANT* data()		{return &m_data;}
+
+private:
+	enum State
+	{
+		Init,
+		VarOpen,
+		VarValue,
+		VarClose
+	};
+	struct StackElem
+	{
+		State state;
+		CComPtr<ITypeInfo> typeinfo;
+		TYPEATTR* typeattr;
+		VARDESC* vardesc;
+		std::size_t ofs;
+		unsigned short idx;
+
+		StackElem( const StackElem& o);
+		StackElem( State state_, CComPtr<ITypeInfo> typeinfo_, std::size_t ofs_);
+		~StackElem();
+	};
+	std::vector<StackElem> m_stk;
+	std::string m_elembuf;
+	VARIANT m_data;
+};
+}//anonymous namespace
+
 comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx)
 	:m_clr(clr_)
 	,m_typeinfo(typeinfo_)
@@ -43,7 +102,8 @@ comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, ITypeInfo* ty
 		{
 			CComPtr<ITypeInfo> rectypeinfo;
 			WRAP( m_typeinfo->GetRefTypeInfo( td->hreftype, &rectypeinfo))
-			m_parameterlist.push_back( Parameter( comauto::utf8string( local.pnames[ii]), td, comauto::getRecordInfoMap( rectypeinfo)));
+			Parameter param( comauto::utf8string( local.pnames[ii]), td, comauto::getRecordInfoMap( rectypeinfo));
+			m_parameterlist.push_back( param);
 		}
 		else
 		{
@@ -101,7 +161,10 @@ comauto::FunctionClosure::FunctionClosure( const Function* func_)
 		:m_provider(0)
 		,m_func(func_)
 		,m_flags(serialize::Context::None)
-		,m_parameter(0){}
+		,m_parameter(0)
+		,m_paramvalue(0)
+		,m_paramidx(0xFFFF)
+		,m_recdepht(0){}
 
 comauto::FunctionClosure::~FunctionClosure()
 {
@@ -110,7 +173,7 @@ comauto::FunctionClosure::~FunctionClosure()
 		std::size_t pi = 0, pe = m_func->nofParameter();
 		for (; pi != pe; ++pi)
 		{
-			if (m_parameter[pi].vt == VT_USERDEFINED)
+			if (m_parameter[pi].vt == VT_USERDEFINED || m_parameter[pi].vt == VT_RECORD)
 			{
 				IRecordInfo* recinfo = m_parameter[pi].pRecInfo;
 				if (recinfo)
@@ -148,19 +211,21 @@ VARIANT* comauto::FunctionClosure::initParameter( std::size_t eidx, VARIANT* val
 	{
 		if ((param->typedesc->vt & VT_ARRAY) == VT_ARRAY || (param->typedesc->vt & VT_VECTOR) == VT_VECTOR)
 		{
-			//.... create new Array element here
+			//.... create new array element here
 			throw std::runtime_error( "no support for arrays implemented yet");
 		}
 		throw std::runtime_error( std::string( "duplicate parameter '") + param->name + "'");
 	}
 	else
 	{
-		if (param->typedesc->vt == VT_USERDEFINED)
+		if (param->typedesc->vt == VT_USERDEFINED || param->typedesc->vt == VT_RECORD)
 		{
 			if (!recinfo) throw std::logic_error( "structure expected");
 			val->vt = param->typedesc->vt;
 			val->pRecInfo = const_cast<IRecordInfo*>(recinfo);
 			val->pvRecord = val->pRecInfo->RecordCreate();
+/*[-]*/std::cout << "DEBUG record created at 0x0" << std::hex << (uintptr_t)val->pvRecord << std::dec << std::endl;
+			if (!val->pvRecord) throw std::logic_error( "failed to create record data structure");
 			return val;
 		}
 		else if (param->typedesc->vt == VT_BSTR)
@@ -168,6 +233,13 @@ VARIANT* comauto::FunctionClosure::initParameter( std::size_t eidx, VARIANT* val
 			if (recinfo) throw std::logic_error( "string instead of structure expected");
 			val->vt = param->typedesc->vt;
 			val->bstrVal = NULL;
+			return val;
+		}
+		else if (param->typedesc->vt == VT_LPSTR || param->typedesc->vt == VT_LPWSTR)
+		{
+			if (recinfo) throw std::logic_error( "string instead of structure expected");
+			val->vt = param->typedesc->vt;
+			val->pcVal = NULL;
 			return val;
 		}
 		else if (comauto::isAtomicType(param->typedesc->vt))
@@ -188,16 +260,7 @@ void comauto::FunctionClosure::assignValue( VARIANT* dstrec, std::size_t ofs, VA
 	elemval.vt = VT_EMPTY;
 	try
 	{
-		switch (elem.type)
-		{
-			case langbind::TypedFilterBase::Element::bool_:		elemval = comauto::createVariantType( elem.value.bool_); break;
-			case langbind::TypedFilterBase::Element::double_:	elemval = comauto::createVariantType( elem.value.double_); break;
-			case langbind::TypedFilterBase::Element::int_:		elemval = comauto::createVariantType( elem.value.int_); break;
-			case langbind::TypedFilterBase::Element::uint_:		elemval = comauto::createVariantType( elem.value.uint_); break;
-			case langbind::TypedFilterBase::Element::string_:	elemval = comauto::createVariantType( elem.value.string_.ptr, elem.value.string_.size); break;
-			case langbind::TypedFilterBase::Element::blob_:		elemval = comauto::createVariantType( (const char*)elem.value.blob_.ptr, elem.value.blob_.size); break;
-		}
-		WRAP( ::VariantChangeType( &elemval, &elemval, VARIANT_NOVALUEPROP, dsttype))
+		elemval = comauto::createVariantType( elem, dsttype);
 		if (comauto::isAtomicType( dstrec->vt))
 		{
 			if (ofs) throw std::logic_error( "illegal operation (offset into atomic type)");
@@ -205,16 +268,10 @@ void comauto::FunctionClosure::assignValue( VARIANT* dstrec, std::size_t ofs, VA
 		}
 		else if (dstrec->vt == VT_USERDEFINED || dstrec->vt == VT_RECORD) 
 		{
+			if (!dstrec->pvRecord) throw std::logic_error( "illegal data structure for this operation (pvRecord not defined)");
 			PVOID field = (PVOID)((char*)dstrec->pvRecord + ofs);
-			if (dsttype == VT_BSTR)
-			{
-				if (*((BSTR*)field) != NULL) ::SysFreeString( *((BSTR*)field));
-				*((BSTR*)field) = ::SysAllocString( elemval.bstrVal);
-			}
-			else
-			{
-				::memcpy( field, comauto::arithmeticTypeAddress( &elemval), comauto::sizeofAtomicType( dsttype));
-			}
+/*[-]*/std::cout << "DEBUG copy element (value '" << elem.tostring() << "' to 0x0" << std::hex << (uintptr_t)dstrec->pvRecord << " at ofs 0x0" << ofs << std::dec << std::endl;
+			copyVariantType( dsttype, field, elem);
 		}
 		else
 		{
@@ -258,15 +315,28 @@ bool comauto::FunctionClosure::call()
 							}
 							else if (elemvalue.type == langbind::TypedFilterBase::Element::string_)
 							{
-								m_paramidx = m_func->getParameterIndex( std::string( elemvalue.value.string_.ptr, elemvalue.value.string_.size));
+								std::string paramname( elemvalue.value.string_.ptr, elemvalue.value.string_.size);
+								m_paramidx = m_func->getParameterIndex( paramname);
+/*[-]*/std::cout << "DEBUG select parameter " << paramname << std::endl;
 							}
 							else
 							{
 								throw std::runtime_error( "unexpected node type (function parameter name or index expected)");
 							}
 							const Function::Parameter* param = m_func->getParameter( m_paramidx);
-							State followstate = (elemtype==langbind::InputFilter::Attribute)?MapAttrParam:MapParam;
-							const RecordInfo* recinfo = param->recinfomap.empty()?0:param->recinfomap.at(0).get();
+							m_recdepht = 0;
+							const RecordInfo* recinfo = param->recinfomap.empty()?0:param->recinfomap.at(recordInfoKey(0,0)).get();
+							State followstate;
+							if (elemtype==langbind::InputFilter::Attribute)
+							{
+								followstate = MapAttrParam;
+								if (recinfo) throw std::runtime_error( "unexpected attribute selects sub structure in record");
+							}
+							else
+							{
+								followstate = MapParam;
+								if (recinfo) m_recdepht++;
+							}
 							m_paramvalue = initParameter( m_paramidx, &m_parameter[ m_paramidx], recinfo);
 							m_selectedtype = m_paramvalue->vt;
 							m_statestack.push( StateStackElem( followstate, recinfo));
@@ -295,28 +365,43 @@ bool comauto::FunctionClosure::call()
 							if (m_statestack.top().m_state == MapAttrParam) throw std::runtime_error( "unexpected attribute name (attribute value expected)");
 
 							if (!recinfo) throw std::runtime_error( std::string( "atomic value expected instead of identifier '") + name + "'");
+/*[-]*/std::cout << "DEBUG select variable " << name << std::endl;
 							if (!recinfo->getVariableDescriptor( name, descr)) throw std::runtime_error( std::string( "structure element not defined '") + name + "'");
 							m_selectedtype = descr.type;
-							State followstate = (elemtype==langbind::InputFilter::Attribute)?MapAttrParam:MapParam;
 							std::size_t absofs = m_statestack.top().m_ofs + descr.ofs;
 							const Function::Parameter* param = m_func->getParameter( m_paramidx);
-							const RecordInfo* followrecinfo = param->recinfomap.at( absofs).get();
+
+							RecordInfoMap::const_iterator ri = param->recinfomap.find( comauto::recordInfoKey( m_recdepht, absofs));
+							const RecordInfo* followrecinfo = (ri == param->recinfomap.end())?0:ri->second.get();
+
+							State followstate;
+							if (elemtype==langbind::InputFilter::Attribute)
+							{
+								followstate = MapAttrParam;
+								if (followrecinfo) throw std::runtime_error( "unexpected attribute selects sub structure in record");
+							}
+							else
+							{
+								followstate = MapParam;
+								if (followrecinfo) m_recdepht++;
+							}
 							m_statestack.push( StateStackElem( followstate, followrecinfo, absofs, descr.varnum));
 							break;
 						}
 
 						case langbind::InputFilter::CloseTag:
 							if (state == MapAttrParam) throw std::runtime_error( "unexpected close tag (attribute value expected)");
+							if (m_statestack.top().m_recinfo) --m_recdepht;
 							m_statestack.pop();
 							break;
 
 						case langbind::InputFilter::Value:
 						{
 							const RecordInfo* recinfo = m_statestack.top().m_recinfo;
-
 							if (!recinfo)
 							{
-								assignValue( m_paramvalue, 0, m_selectedtype, elemvalue);
+								std::size_t ofs = m_statestack.top().m_ofs;
+								assignValue( m_paramvalue, ofs, m_selectedtype, elemvalue);
 								break;
 							}
 							else if (state == MapParam)
@@ -327,13 +412,15 @@ bool comauto::FunctionClosure::call()
 								m_selectedtype = descr.type;
 								std::size_t absofs = m_statestack.top().m_ofs + descr.ofs;
 								const Function::Parameter* param = m_func->getParameter( m_paramidx);
-								const RecordInfo* followrecinfo = param->recinfomap.at(absofs).get();
+								RecordInfoMap::const_iterator ri = param->recinfomap.find( comauto::recordInfoKey( m_recdepht, absofs));
+								const RecordInfo* followrecinfo = (ri == param->recinfomap.end())?0:ri->second.get();
 								if (followrecinfo) throw std::runtime_error( std::string( "structure element for content '_' is not defined as an atomic type"));
 								m_statestack.push( StateStackElem( MapAttrParam, 0, absofs, descr.varnum));
 							}
 							std::size_t ofs = m_statestack.top().m_ofs;
 							if (!comauto::isAtomicType( m_selectedtype)) throw std::runtime_error( "atomic value assigned to non atomic type");
 							assignValue( m_paramvalue, ofs, m_selectedtype, elemvalue);
+							if (m_statestack.top().m_recinfo) --m_recdepht;
 							m_statestack.pop();
 						}
 					}
@@ -391,7 +478,7 @@ std::string comauto::FunctionClosure::StateStack::variablepath() const
 		{
 			sn = si;
 			++sn;
-			if (sn->m_variableidx > 0)
+			if (sn != se && sn->m_variableidx > 0)
 			{
 				VARDESC* var;
 				ITypeInfo* typeinfo = const_cast<ITypeInfo*>( si->m_recinfo->typeinfo());
@@ -438,7 +525,7 @@ std::string comauto::FunctionClosure::errorMessage( const std::string& msg) cons
 }
 
 
-comauto::FunctionResult::StackElem::StackElem( const StackElem& o)
+FunctionResult::StackElem::StackElem( const StackElem& o)
 	:state(o.state),typeinfo(o.typeinfo),typeattr(0),vardesc(0),ofs(o.ofs),idx(o.idx)
 {
 	if (typeinfo)
@@ -451,13 +538,13 @@ comauto::FunctionResult::StackElem::StackElem( const StackElem& o)
 	}
 }
 
-comauto::FunctionResult::StackElem::StackElem( State state_, CComPtr<ITypeInfo> typeinfo_, std::size_t ofs_)
-	:state(state_),typeinfo(typeinfo_),typeattr(0),ofs(ofs_),idx(0)
+FunctionResult::StackElem::StackElem( State state_, CComPtr<ITypeInfo> typeinfo_, std::size_t ofs_)
+	:state(state_),typeinfo(typeinfo_),typeattr(0),vardesc(0),ofs(ofs_),idx(0)
 {
 	if (typeinfo) WRAP( typeinfo->GetTypeAttr( &typeattr))
 }
 
-comauto::FunctionResult::StackElem::~StackElem()
+FunctionResult::StackElem::~StackElem()
 {
 	if (typeinfo)
 	{
@@ -466,64 +553,7 @@ comauto::FunctionResult::StackElem::~StackElem()
 	}
 }
 
-static comauto::FunctionResult::Element getAtomicElement( VARTYPE vt, const void* ref, std::string& elembuf)
-{
-	typedef comauto::FunctionResult::Element Element;
-	Element element;
-	switch (vt)
-	{
-		case VT_I1:  element.type = Element::int_; element.value.int_ = *(const SHORT*)ref; break;
-		case VT_I2:  element.type = Element::int_; element.value.int_ = *(const SHORT*)ref; break;
-		case VT_I4:  element.type = Element::int_; element.value.int_ = *(const LONG*)ref; break;
-		case VT_I8:  element.type = Element::int_; element.value.int_ = boost::lexical_cast<int>(*(const LONGLONG*)ref); break;
-		case VT_INT: element.type = Element::int_; element.value.int_ = *(const INT*)ref; break;
-		case VT_UI1:  element.type = Element::uint_; element.value.uint_ = *(const USHORT*)ref; break;
-		case VT_UI2:  element.type = Element::uint_; element.value.uint_ = *(const USHORT*)ref; break;
-		case VT_UI4:  element.type = Element::uint_; element.value.uint_ = *(const ULONG*)ref; break;
-		case VT_UI8:  element.type = Element::uint_; element.value.uint_ = boost::lexical_cast<unsigned int>(*(const ULONGLONG*)ref); break;
-		case VT_UINT: element.type = Element::uint_; element.value.uint_ = *(const UINT*)ref; break;
-		case VT_R4:  element.type = Element::double_; element.value.double_ = *(const FLOAT*)ref; break;
-		case VT_R8:  element.type = Element::double_; element.value.double_ = *(const DOUBLE*)ref; break;
-		case VT_BOOL: element.type = Element::bool_; element.value.bool_ = *(const VARIANT_BOOL*)ref != VARIANT_FALSE; break;
-		case VT_BSTR: 
-			element.type = Element::string_; 
-			elembuf = comauto::utf8string( *(const BSTR*)ref);
-			element.type = Element::string_;
-			element.value.string_.ptr = elembuf.c_str();
-			element.value.string_.size = elembuf.size();
-		default:
-		{
-			VARIANT elemorig;
-			VARIANT elemcopy;
-			try
-			{
-				elemorig.byref = const_cast<void*>(ref);
-				elemorig.vt = vt | VT_BYREF;
-				WRAP( ::VariantCopyInd( &elemcopy, &elemorig))
-				WRAP( ::VariantChangeType( &elemcopy, &elemcopy, VARIANT_NOVALUEPROP, VT_BSTR))
-				element.type = Element::string_; 
-				elembuf = comauto::utf8string( elemcopy.bstrVal);
-				element.type = Element::string_;
-				element.value.string_.ptr = elembuf.c_str();
-				element.value.string_.size = elembuf.size();
-			}
-			catch (const std::runtime_error& e)
-			{
-				::VariantClear( &elemorig);
-				::VariantClear( &elemcopy);
-				throw e;
-			}
-		}
-	}
-	return element;
-}
-
-static comauto::FunctionResult::Element getAtomicElement( const VARIANT& val, std::string& elembuf)
-{
-	return getAtomicElement( val.vt, comauto::arithmeticTypeAddress( &val), elembuf);
-}
-
-bool comauto::FunctionResult::getNext( ElementType& type, Element& element)
+bool FunctionResult::getNext( ElementType& type, Element& element)
 {
 AGAIN:
 	if (m_stk.empty()) return false;
@@ -533,14 +563,14 @@ AGAIN:
 		case Init:
 			if (comauto::isAtomicType( m_data.vt ))
 			{
-				element = getAtomicElement( m_data, m_elembuf);
+				element = comauto::getAtomicElement( m_data, m_elembuf);
 				type = Value;
 				m_stk.pop_back();
 				return true;
 			}
 			else if (m_data.vt == VT_BSTR)
 			{
-				element = getAtomicElement( m_data.vt, (char*)m_data.bstrVal, m_elembuf);
+				element = comauto::getAtomicElement( m_data.vt, (char*)m_data.bstrVal, m_elembuf);
 				type = Value;
 				m_stk.pop_back();
 				return true;
@@ -576,7 +606,7 @@ AGAIN:
 			VARTYPE vt = vardesc->elemdescVar.tdesc.vt;
 			if (comauto::isAtomicType( vt) || vt == VT_BSTR)
 			{
-				element = getAtomicElement( vt, (char*)m_data.pvRecord + m_stk.back().ofs, m_elembuf);
+				element = comauto::getAtomicElement( vt, (char*)m_data.pvRecord + m_stk.back().ofs, m_elembuf);
 				type = Value;
 				m_stk.back().state = VarClose;
 				return true;

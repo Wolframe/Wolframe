@@ -1,5 +1,6 @@
 #ifndef _Wolframe_COM_AUTOMATION_UTILS_INCLUDED
 #define _Wolframe_COM_AUTOMATION_UTILS_INCLUDED
+#include "filter/typedfilter.hpp"
 #include <cstring>
 #include <string>
 #include <stdexcept>
@@ -11,11 +12,16 @@
 namespace _Wolframe {
 namespace comauto {
 
+void* allocMem( std::size_t size);
+void freeMem( void* ptr);
+
 std::string asciistr( BSTR str);
 std::string asciistr( const TCHAR* str);
 std::wstring utf16string( const std::string& utf8str);
 std::wstring utf16string( const char* utf8ptr, std::size_t utf8size);
 std::string utf8string( const std::wstring& utf16str);
+std::string utf8string( LPCSTR str);
+std::string utf8string( LPCWSTR str);
 std::string utf8string( const BSTR& str);
 std::wstring tostring( VARIANT* v);
 std::wstring tostring( const _com_error& err);
@@ -37,13 +43,19 @@ VARIANT createVariantType( unsigned long val);
 VARIANT createVariantType( float val);
 VARIANT createVariantType( double val);
 VARIANT createVariantType( const std::string& val);
-VARIANT createVariantType( const char* val, std::size_t valsize);
+VARIANT createVariantType( const char* val, std::size_t valsize, VARTYPE stringtype=VT_BSTR);
 VARIANT createVariantType( const std::wstring& val);
+VARIANT createVariantType( const langbind::TypedInputFilter::Element& val);
+VARIANT createVariantType( const langbind::TypedInputFilter::Element& val, VARTYPE dsttype);
+void copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::TypedInputFilter::Element& val);
 
 unsigned char sizeofAtomicType( int vt);
 bool isAtomicType( int vt);
 const void* arithmeticTypeAddress( const VARIANT* val);
 void* arithmeticTypeAddress( VARIANT* val);
+
+langbind::TypedInputFilter::Element getAtomicElement( VARTYPE vt, const void* ref, std::string& elembuf);
+langbind::TypedInputFilter::Element getAtomicElement( const VARIANT& val, std::string& elembuf);
 
 #define WRAP(SYSCALL){\
 	static const char* call = "" #SYSCALL;\

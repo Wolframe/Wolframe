@@ -1,8 +1,8 @@
 #include "comauto_recordinfo.hpp"
-#include "comauto_record.hpp"
-#include "comauto_type.hpp"
 #include "comauto_utils.hpp"
 #include <cstring>
+#include <limits>
+#pragma warning(disable:4996)
 
 #define RETURN_ON_ERROR(RV,CALL) {if ((RV = (CALL)) != S_OK) return RV;}
 
@@ -10,6 +10,8 @@ using namespace _Wolframe;
 
 comauto::RecordInfo::~RecordInfo()
 {
+/*[-]*/std::cerr << "CALL comauto::RecordInfo::~RecordInfo()" << std::endl;
+
 	if (m_typeattr) m_typeinfo->ReleaseTypeAttr( m_typeattr);
 	m_typeinfo->Release();
 }
@@ -17,6 +19,7 @@ comauto::RecordInfo::~RecordInfo()
 comauto::RecordInfo::RecordInfo( ITypeInfo* typeinfo_)
 	:m_typeinfo(typeinfo_),m_typeattr(0)
 {
+/*[-]*/std::cerr << "CALL comauto::RecordInfo::RecordInfo( " << std::hex << "0x0" << (uintptr_t)typeinfo_ << ")" << std::dec << std::endl;
 	WRAP( m_typeinfo->GetTypeAttr( &m_typeattr))
 	if (m_typeattr->typekind != TKIND_RECORD)
 	{
@@ -28,6 +31,7 @@ comauto::RecordInfo::RecordInfo( ITypeInfo* typeinfo_)
 
 HRESULT comauto::RecordInfo::QueryInterface( REFIID  riid, LPVOID* ppvObj)
 {
+/*[-]*/std::cerr << "CALL comauto::RecordInfo::QueryInterface( " << std::hex << "0x0" << (uintptr_t)ppvObj << ")" << std::dec << std::endl;
     if (!ppvObj) return E_INVALIDARG;
     *ppvObj = NULL;
 
@@ -40,8 +44,9 @@ HRESULT comauto::RecordInfo::QueryInterface( REFIID  riid, LPVOID* ppvObj)
     return E_NOINTERFACE;
 }
 
-HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitType initType, PVOID pvOld)
+HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitType initType, bool doThrow, PVOID pvOld)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::RecordFill(" << initTypeName(initType) << ": " << std::hex << (uintptr_t)pvNew << ", " << (uintptr_t)pvOld << ")" << std::dec << std::endl;
 	HRESULT hr;
 	ITypeInfo* rectypeinfo = 0;
 	if (initType == DefaultConstructorZero)
@@ -66,7 +71,7 @@ HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitT
 			{
 				RETURN_ON_ERROR( hr, m_typeinfo->GetRefTypeInfo( vd->elemdescVar.tdesc.hreftype, &rectypeinfo))
 				comauto::RecordInfo rec( rectypeinfo);
-				WRAP( rec.RecordFill( nfield, initType, pvOld))
+				WRAP( rec.RecordFill( nfield, initType, doThrow, pvOld))
 				rectypeinfo->Release();
 				rectypeinfo = 0;
 			}
@@ -76,27 +81,110 @@ HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitT
 				{
 					case ClearInit:
 						if (*((BSTR*)nfield) != NULL) ::SysFreeString( *((BSTR*)nfield));
+						/*no break here!*/
+					case DefaultConstructor:
 						*((BSTR*)nfield) = ::SysAllocString( L"");
 						break;
 
 					case CopyInit:
 						if (*((BSTR*)nfield) != NULL) ::SysFreeString( *((BSTR*)nfield));
-						*((BSTR*)nfield) = ::SysAllocString( *((BSTR*)ofield));
-						break;
-
-					case DefaultConstructor:
-						*((BSTR*)nfield) = ::SysAllocString( L"");
+						/*no break here!*/
+					case CopyConstructor:
+						if (*((BSTR*)ofield))
+						{
+							*((BSTR*)nfield) = ::SysAllocString( *((BSTR*)ofield));
+						}
+						else
+						{
+							*((BSTR*)nfield) = NULL;
+						}
 						break;
 
 					case DefaultConstructorZero:
 						throw std::logic_error( "should not pass here !");
 
-					case CopyConstructor:
-						*((BSTR*)nfield) = ::SysAllocString( *((BSTR*)ofield));
+					case Destructor:
+						if (*((BSTR*)nfield) != NULL)
+						{
+							::SysFreeString( *((BSTR*)nfield));
+							*(BSTR*)nfield = NULL;
+						}
+						break;
+				}
+			}
+			else if (vd->elemdescVar.tdesc.vt == VT_LPWSTR)
+			{
+				switch (initType)
+				{
+					case ClearInit:
+						if (*((LPWSTR*)nfield) != NULL) comauto::freeMem( *((LPWSTR*)nfield));
+					case DefaultConstructor:
+						*((LPWSTR*)nfield) = NULL;
 						break;
 
+					case CopyInit:
+						if (*((LPWSTR*)nfield) != NULL) comauto::freeMem( *((LPWSTR*)nfield));
+					case CopyConstructor:
+						if (*(LPWSTR*)ofield)
+						{
+							*((LPWSTR*)nfield) = (LPWSTR)comauto::allocMem( 2*wcslen(*(LPWSTR*)ofield) + sizeof(wchar_t));
+							if (*((LPWSTR*)nfield) == NULL) throw std::bad_alloc();
+							::wcscpy( *((LPWSTR*)nfield), *((LPWSTR*)ofield));
+						}
+						else
+						{
+							*((LPWSTR*)nfield) = NULL;
+						}
+						break;
+
+					case DefaultConstructorZero:
+						throw std::logic_error( "should not pass here !");
+
 					case Destructor:
-						if (*((BSTR*)nfield) != NULL) ::SysFreeString( *((BSTR*)nfield));
+						if (*((LPWSTR*)nfield) != NULL)
+						{
+							comauto::freeMem( *((LPWSTR*)nfield));
+							*((LPWSTR*)nfield) = NULL;
+						}
+						break;
+				}
+			}
+			else if (vd->elemdescVar.tdesc.vt == VT_LPSTR)
+			{
+/*[-]*/char* cstr = pvOld?*((LPSTR*)ofield):"(NULL)";
+/*[-]*/std::cout << "DEBUG init (RecordFill) " << comauto::typestr(vd->elemdescVar.tdesc.vt) <<  " at 0x0" << std::hex << (uintptr_t)nfield << std::dec << " with '" << (cstr?cstr:"(-> NULL)") << "'" << std::endl;
+				switch (initType)
+				{
+					case ClearInit:
+						if (*((LPSTR*)nfield) != NULL) comauto::freeMem( *((LPSTR*)nfield));
+					case DefaultConstructor:
+						*((LPSTR*)nfield) = NULL;
+						break;
+
+					case CopyInit:
+						if (*((LPSTR*)nfield) != NULL) comauto::freeMem( *((LPSTR*)nfield));
+					case CopyConstructor:
+						if (*(LPSTR*)ofield)
+						{
+							*((LPSTR*)nfield) = (LPSTR)comauto::allocMem( strlen(*(LPSTR*)ofield) + sizeof(char));
+							if (*((LPSTR*)nfield) == NULL) throw std::bad_alloc();
+							::strcpy( *((LPSTR*)nfield), *((LPSTR*)ofield));
+						}
+						else
+						{
+							*((LPSTR*)nfield) = NULL;
+						}
+						break;
+
+					case DefaultConstructorZero:
+						throw std::logic_error( "should not pass here !");
+
+					case Destructor:
+						if (*((LPSTR*)nfield) != NULL)
+						{
+							comauto::freeMem( *((LPSTR*)nfield));
+							*((LPSTR*)nfield) = NULL;
+						}
 						break;
 				}
 			}
@@ -126,34 +214,49 @@ HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitT
 		}
 		return S_OK;
 	}
-	catch (...)
+	catch (const std::runtime_error& e)
 	{
 		if (rectypeinfo)
 		{
 				rectypeinfo->Release();
 				rectypeinfo = 0;
 		}
+		if (doThrow) throw e;
+		return E_INVALIDARG;
+	}
+	catch (const std::logic_error& e)
+	{
+		if (rectypeinfo)
+		{
+				rectypeinfo->Release();
+				rectypeinfo = 0;
+		}
+		if (doThrow) throw e;
 		return E_INVALIDARG;
 	}
 }
 
 HRESULT comauto::RecordInfo::RecordInit( PVOID pvNew)
 {
-	return comauto::RecordInfo::RecordFill( pvNew, DefaultConstructorZero);
+/*[-]*/std::cerr << "comauto::RecordInfo::RecordInit(..)" << std::endl;
+	return comauto::RecordInfo::RecordFill( pvNew, DefaultConstructorZero, false);
 }
 
 HRESULT comauto::RecordInfo::RecordClear( PVOID pvExisting)
 {
-	return comauto::RecordInfo::RecordFill( pvExisting, ClearInit);
+/*[-]*/std::cerr << "comauto::RecordInfo::RecordClear(..)" << std::endl;
+	return comauto::RecordInfo::RecordFill( pvExisting, ClearInit, false);
 }
 
 HRESULT comauto::RecordInfo::RecordCopy( PVOID pvExisting, PVOID pvNew)
 {
-	return comauto::RecordInfo::RecordFill( pvExisting, CopyInit, pvNew);
+/*[-]*/std::cerr << "comauto::RecordInfo::RecordCopy(..)" << std::endl;
+	return comauto::RecordInfo::RecordFill( pvNew, CopyInit, false, pvExisting);
 }
 
 HRESULT comauto::RecordInfo::GetGuid( GUID* pguid)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::GetGuid(..)" << std::endl;
 	if (!m_typeattr) return E_INVALIDARG;
 	*pguid = m_typeattr->guid;
 	return S_OK;
@@ -161,6 +264,7 @@ HRESULT comauto::RecordInfo::GetGuid( GUID* pguid)
 
 HRESULT comauto::RecordInfo::GetName( BSTR* pbstrName)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::GetName(..)" << std::endl;
 	HRESULT hr;
 	if (!pbstrName) return E_INVALIDARG;
 	RETURN_ON_ERROR( hr, m_typeinfo->GetDocumentation(-1, pbstrName, NULL, NULL, NULL));
@@ -169,6 +273,7 @@ HRESULT comauto::RecordInfo::GetName( BSTR* pbstrName)
 
 HRESULT comauto::RecordInfo::GetSize( ULONG* pcbSize)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::GetSize(..)" << std::endl;
 	if (!pcbSize) return E_INVALIDARG;
 	*pcbSize = m_typeattr->cbSizeInstance;
 	return S_OK;
@@ -176,6 +281,7 @@ HRESULT comauto::RecordInfo::GetSize( ULONG* pcbSize)
 
 HRESULT comauto::RecordInfo::GetTypeInfo( ITypeInfo** ppTypeInfo)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::GetTypeInfo(..)" << std::endl;
 	m_typeinfo->AddRef();
 	*ppTypeInfo = m_typeinfo;
 	return S_OK;
@@ -183,6 +289,7 @@ HRESULT comauto::RecordInfo::GetTypeInfo( ITypeInfo** ppTypeInfo)
 
 HRESULT comauto::RecordInfo::GetField( PVOID pvData, LPCOLESTR szFieldName, VARIANT* pvarField)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::GetField(..)" << std::endl;
 	HRESULT hr = S_OK;
 
 	VARIANT refvarField;
@@ -199,6 +306,7 @@ HRESULT comauto::RecordInfo::GetField( PVOID pvData, LPCOLESTR szFieldName, VARI
 
 HRESULT comauto::RecordInfo::GetFieldNoCopy( PVOID pvData, LPCOLESTR szFieldName, VARIANT* pvarField, PVOID* ppvDataCArray)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::GetFieldNoCopy(..)" << std::endl;
 	HRESULT hr = S_OK;
 	CComPtr<ITypeComp> typecomp;
 	CComPtr<ITypeInfo> elemtypeinfo;
@@ -243,6 +351,7 @@ HRESULT comauto::RecordInfo::GetFieldNoCopy( PVOID pvData, LPCOLESTR szFieldName
 
 HRESULT comauto::RecordInfo::PutField( ULONG wFlags, PVOID pvData, LPCOLESTR szFieldName, VARIANT* pvarField)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::PutField(..)" << std::endl;
 	HRESULT hr = S_OK;
 
 	//copy parameter to put:
@@ -253,8 +362,9 @@ HRESULT comauto::RecordInfo::PutField( ULONG wFlags, PVOID pvData, LPCOLESTR szF
 	return PutFieldNoCopy( wFlags, pvData, szFieldName, &varCopy);
 }
 
-HRESULT comauto::RecordInfo::PutFieldNoCopy( ULONG wFlags, PVOID pvData, LPCOLESTR szFieldName, VARIANT* pvarField)
+HRESULT comauto::RecordInfo::PutFieldNoCopy( ULONG, PVOID pvData, LPCOLESTR szFieldName, VARIANT* pvarField)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::PutFieldNoCopy(..)" << std::endl;
 	HRESULT hr = S_OK;
 	CComPtr<ITypeComp> typecomp;
 	CComPtr<ITypeInfo> elemtypeinfo;
@@ -272,7 +382,7 @@ HRESULT comauto::RecordInfo::PutFieldNoCopy( ULONG wFlags, PVOID pvData, LPCOLES
 	if (pvarField->vt != bindptr.lpvardesc->elemdescVar.tdesc.vt)
 	{
 		//... element to set if of different type -> convert it first to the type of the member to set:
-		RETURN_ON_ERROR( hr, ::VariantChangeType( pvarField, pvarField, NULL, bindptr.lpvardesc->elemdescVar.tdesc.vt));
+		RETURN_ON_ERROR( hr, ::VariantChangeType( pvarField, pvarField, 0, bindptr.lpvardesc->elemdescVar.tdesc.vt));
 	}
 
 	char elemsize = sizeofAtomicType( bindptr.lpvardesc->elemdescVar.tdesc.vt);
@@ -292,6 +402,14 @@ HRESULT comauto::RecordInfo::PutFieldNoCopy( ULONG wFlags, PVOID pvData, LPCOLES
 				*((BSTR*)field) = pvarField->bstrVal;
 				break;
 
+			case VT_LPWSTR:
+				*((LPWSTR*)field) = (LPWSTR)(void*)pvarField->pcVal;
+				break;
+
+			case VT_LPSTR:
+				*((LPSTR*)field) = pvarField->pcVal;
+				break;
+
 			case VT_USERDEFINED:
 				*((PVOID*)field) = pvarField->pvRecord;
 				break;
@@ -305,6 +423,7 @@ HRESULT comauto::RecordInfo::PutFieldNoCopy( ULONG wFlags, PVOID pvData, LPCOLES
 
 HRESULT comauto::RecordInfo::GetFieldNames( ULONG* pcNames, BSTR* rgBstrNames)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::GetFieldNames(..)" << std::endl;
 	HRESULT hr = S_OK;
 
 	*pcNames = m_typeattr->cVars;
@@ -343,6 +462,7 @@ HRESULT comauto::RecordInfo::GetFieldNames( ULONG* pcNames, BSTR* rgBstrNames)
 
 BOOL comauto::RecordInfo::IsMatchingType( IRecordInfo *pRecordInfo)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::IsMatchingType(..)" << std::endl;
 	BOOL rt = TRUE;
 	ITypeInfo* otypeinfo = 0;
 	ITypeInfo* rectypeinfo = 0;
@@ -402,15 +522,34 @@ Cleanup:
 	return rt;
 }
 
+PVOID comauto::RecordInfo::createRecord()
+{
+/*[-]*/std::cerr << "comauto::RecordInfo::createRecord(..)" << std::endl;
+	PVOID rt = 0;
+	try
+	{
+		rt = comauto::allocMem( m_typeattr->cbSizeInstance);
+		if (rt == NULL) throw std::bad_alloc();
+		comauto::RecordInfo::RecordFill( rt, DefaultConstructorZero, true);
+		return rt;
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (rt) comauto::freeMem( rt);
+		throw e;
+	}
+}
+
 PVOID comauto::RecordInfo::RecordCreate()
 {
-	PVOID rt = ::CoTaskMemAlloc( m_typeattr->cbSizeInstance);
+/*[-]*/std::cerr << "comauto::RecordInfo::RecordCreate(..)" << std::endl;
+	PVOID rt = comauto::allocMem( m_typeattr->cbSizeInstance);
 	if (rt == NULL) return NULL;
 
 	HRESULT hr = RecordInit( rt);
 	if (hr != S_OK)
 	{
-		::CoTaskMemFree( rt);
+		comauto::freeMem( rt);
 		rt = NULL;
 	}
 	return rt;
@@ -418,11 +557,12 @@ PVOID comauto::RecordInfo::RecordCreate()
 
 HRESULT comauto::RecordInfo::RecordCreateCopy( PVOID pvSource, PVOID* ppvDest)
 {
+/*[-]*/std::cerr << "comauto::RecordInfo::RecordCreateCopy(..)" << std::endl;
 	if (!ppvDest) return E_INVALIDARG;
-	*ppvDest = ::CoTaskMemAlloc( m_typeattr->cbSizeInstance);
+	*ppvDest = comauto::allocMem( m_typeattr->cbSizeInstance);
 	if (!*ppvDest) return E_OUTOFMEMORY;
 
-	HRESULT hr = comauto::RecordInfo::RecordFill( pvSource, CopyConstructor, *ppvDest);
+	HRESULT hr = comauto::RecordInfo::RecordFill( pvSource, CopyConstructor, false, *ppvDest);
 	if (hr != S_OK)
 	{
 		RecordDestroy( *ppvDest);
@@ -433,15 +573,18 @@ HRESULT comauto::RecordInfo::RecordCreateCopy( PVOID pvSource, PVOID* ppvDest)
 
 HRESULT comauto::RecordInfo::RecordDestroy( PVOID pvRecord)
 {
-	comauto::RecordInfo::RecordFill( pvRecord, Destructor, 0);
-	::CoTaskMemFree( pvRecord);
+/*[-]*/std::cerr << "comauto::RecordInfo::RecordDestroy(..)" << std::endl;
+	comauto::RecordInfo::RecordFill( pvRecord, Destructor, false, 0);
+	comauto::freeMem( pvRecord);
 	return S_OK;
 }
 
-static void getRecordInfoMap( std::map<std::size_t,comauto::RecordInfoR>& rimap, ITypeInfo* typeinfo, std::size_t ofs)
+static void getRecordInfoMap( unsigned short depht, std::map<comauto::RecordInfoKey,comauto::RecordInfoR>& rimap, ITypeInfo* typeinfo, std::size_t ofs)
 {
+/*[-]*/std::cerr << "getRecordInfoMap(..)" << std::endl;
 	TYPEATTR* typeattr = 0;
 	VARDESC* vd = 0;
+	ITypeInfo* rectypeinfo = 0;
 	try
 	{
 		WRAP( typeinfo->GetTypeAttr( &typeattr))
@@ -451,11 +594,14 @@ static void getRecordInfoMap( std::map<std::size_t,comauto::RecordInfoR>& rimap,
 
 			if (vd->elemdescVar.tdesc.vt == VT_USERDEFINED)
 			{
-				CComPtr<ITypeInfo> rectypeinfo;
 				WRAP( typeinfo->GetRefTypeInfo( vd->elemdescVar.tdesc.hreftype, &rectypeinfo))
+				comauto::RecordInfoR rc( new comauto::RecordInfo( rectypeinfo));
+				rimap[ comauto::recordInfoKey( depht, ofs + vd->oInst)] = rc;
+				if (depht >= 0xFFFF) throw std::runtime_error( "record info structure too complex");
+				getRecordInfoMap( depht+1, rimap, rectypeinfo, ofs + vd->oInst);
 
-				rimap[ ofs + vd->oInst] = comauto::RecordInfoR( new comauto::RecordInfo( rectypeinfo));
-				getRecordInfoMap( rimap, rectypeinfo, ofs + vd->oInst);
+				rectypeinfo->Release();
+				rectypeinfo = 0;
 			}
 			typeinfo->ReleaseVarDesc( vd);
 			vd = 0;
@@ -467,15 +613,24 @@ static void getRecordInfoMap( std::map<std::size_t,comauto::RecordInfoR>& rimap,
 	{
 		if (vd) typeinfo->ReleaseVarDesc( vd);
 		if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
+		if (rectypeinfo) rectypeinfo->Release();
 		throw e;
 	}
 }
 
-std::map<std::size_t,comauto::RecordInfoR> comauto::getRecordInfoMap( ITypeInfo* typeinfo)
+unsigned int comauto::recordInfoKey( unsigned int depht_, unsigned int ofs_)
 {
-	std::map<std::size_t,comauto::RecordInfoR> rt;
-	rt[0] = RecordInfoR( new RecordInfo( typeinfo));
-	getRecordInfoMap( rt, typeinfo, 0);
+	if ((depht_|ofs_) > 0xFFFF) throw std::runtime_error( "record info key out of range");
+	return ((ofs_<<16)+depht_);
+}
+
+comauto::RecordInfoMap comauto::getRecordInfoMap( ITypeInfo* typeinfo)
+{
+	RecordInfoMap rt;
+	RecordInfo* baserecinfo = new RecordInfo( typeinfo);
+	rt[recordInfoKey(0,0)] = RecordInfoR( baserecinfo );
+	if (baserecinfo->typeattr()->cbSizeInstance > 0xFFFF) throw std::runtime_error( "structure size too big for record info structure");
+	getRecordInfoMap( 1, rt, typeinfo, 0);
 	return rt;
 }
 

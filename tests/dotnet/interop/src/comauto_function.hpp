@@ -20,63 +20,6 @@ namespace comauto {
 class Function;
 class CommonLanguageRuntime;
 
-class FunctionResult
-	:public langbind::TypedInputFilter
-{
-public:
-	explicit FunctionResult( const CComPtr<ITypeInfo>& typeinfo)
-		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
-	{
-		m_stk.push_back( StackElem( Init, typeinfo, 0));
-	}
-	FunctionResult( const FunctionResult& o)
-		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
-		,m_stk(o.m_stk)
-		,m_elembuf(o.m_elembuf)
-	{
-		m_data.vt = VT_EMPTY;
-		WRAP( ::VariantCopy( &m_data, &o.m_data))
-	}
-	virtual ~FunctionResult()
-	{
-		::VariantClear( &m_data);
-	}
-
-	virtual TypedInputFilter* copy() const
-	{
-		return new FunctionResult( *this);
-	}
-
-	virtual bool getNext( ElementType& type, Element& element);
-	VARIANT* data()		{return &m_data;}
-
-private:
-	enum State
-	{
-		Init,
-		VarOpen,
-		VarValue,
-		VarClose
-	};
-	struct StackElem
-	{
-		State state;
-		CComPtr<ITypeInfo> typeinfo;
-		TYPEATTR* typeattr;
-		VARDESC* vardesc;
-		std::size_t ofs;
-		unsigned short idx;
-
-		StackElem( const StackElem& o);
-		StackElem( State state_, CComPtr<ITypeInfo> typeinfo_, std::size_t ofs_);
-		~StackElem();
-	};
-	std::vector<StackElem> m_stk;
-	std::string m_elembuf;
-	VARIANT m_data;
-};
-
-
 class FunctionClosure
 	:public langbind::FormFunctionClosure
 {
@@ -139,6 +82,7 @@ private:
 		StateStackElem& top()				{return m_impl.back();}
 		const StateStackElem& top()	const	{return m_impl.back();}
 		bool empty() const					{return m_impl.empty();}
+		std::size_t size() const			{return m_impl.size();}
 		void clear()						{while (!empty()) pop();}
 		std::string variablepath() const;
 
@@ -157,6 +101,7 @@ private:
 	VARIANT* m_paramvalue;							//< currently selected parameter value to initialize
 	std::size_t m_paramidx;							//< currently selected parameter of the function [0,1,.. n-1]
 	VARTYPE m_selectedtype;							//< currently selected variable type, determines intialization of an atomic type in the structure by value
+	unsigned int m_recdepht;						//< depht in tree (used for RecordInfoMap key - RecordInfoKey)
 };
 
 
@@ -164,8 +109,6 @@ class Function
 	:public langbind::FormFunction
 {
 public:
-	typedef std::map<std::size_t,comauto::RecordInfoR> RecordInfoMap;
-
 	struct Parameter
 	{
 		std::string name;
@@ -175,7 +118,7 @@ public:
 		Parameter( const Parameter& o)
 			:name(o.name),typedesc(o.typedesc),recinfomap(o.recinfomap){}
 		Parameter( const std::string& name_, const TYPEDESC* typedesc_, const RecordInfoMap& recinfomap_)
-			:name(name_),typedesc(typedesc_),recinfomap(recinfomap){}
+			:name(name_),typedesc(typedesc_),recinfomap(recinfomap_){}
 		Parameter( const std::string& name_, const TYPEDESC* typedesc_)
 			:name(name_),typedesc(typedesc_){}
 	};
@@ -185,7 +128,7 @@ public:
 		ReturnType( const ReturnType& o)
 			:typedesc(o.typedesc),typeinfo(o.typeinfo){}
 		ReturnType( const TYPEDESC* typedesc_, const CComPtr<ITypeInfo>& typeinfo_)
-			:typedesc(typedesc_),typeinfo(typeinfo){}
+			:typedesc(typedesc_),typeinfo(typeinfo_){}
 		explicit ReturnType( const TYPEDESC* typedesc_=0)
 			:typedesc(typedesc_){}
 
