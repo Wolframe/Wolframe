@@ -21,6 +21,7 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 	Q_OBJECT
 	Q_ENUMS( SelectionMode )
 	Q_PROPERTY( SelectionMode selectionMode READ selectionMode WRITE setSelectionMode )
+	Q_PROPERTY( QString title READ title WRITE setTitle )
 		
 	public:
 		enum SelectionMode {
@@ -29,12 +30,14 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 			SelectExistingDir
 		};
 		
+		FileChooser( QWidget *_parent = 0 );
 		FileChooser( SelectionMode _selectionMode, QWidget *_parent = 0 );
 		FileChooser( SelectionMode _selectionMode, const QString title, QWidget *_parent = 0 );
 		
 		QString fileName( ) const;
 		QStringList fileNames( ) const;
 		SelectionMode selectionMode( ) const;
+		QString title( ) const;
 
 	signals:
 		void fileNameChanged( const QString _fileName );
@@ -44,6 +47,7 @@ class QDESIGNER_WIDGET_EXPORT FileChooser : public QWidget
 		void setFileName( const QString &_filename );
 		void setFileNames( const QStringList &_filenames );
 		void setSelectionMode( const SelectionMode _mode );
+		void setTitle( const QString &_title );
 	
 	private:
 		void initialize( );

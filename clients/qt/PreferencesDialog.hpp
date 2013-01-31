@@ -6,21 +6,30 @@
 #define _PREFERENCES_DIALOG_HPP_INCLUDED
 
 #include <QDialog>
-#include <QStringList>
-#include <QPushButton>
-#include <QDialogButtonBox>
-#include <QLineEdit>
-#include <QSpinBox>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QComboBox>
 
 #include "settings.hpp"
 
-#include "FileChooser.hpp"
+#include "ui_PreferencesDialog.h"
+#include "ui_PreferencesDialogDeveloper.h"
+#include "ui_PreferencesDialogInterface.h"
 
+class PreferencesDialogInterface : public QWidget, public Ui::PreferencesDialogInterface
+{
+	Q_OBJECT
+	
+	public:
+		PreferencesDialogInterface( QWidget *_parent = 0 );
+};
 
-class PreferencesDialog : public QDialog
+class PreferencesDialogDeveloper : public QWidget, public Ui::PreferencesDialogDeveloper
+{
+	Q_OBJECT
+	
+	public:
+		PreferencesDialogDeveloper( QWidget *_parent = 0 );
+};
+
+class PreferencesDialog : public QDialog, public Ui::PreferencesDialog
 {
 	Q_OBJECT
 		
@@ -29,24 +38,9 @@ class PreferencesDialog : public QDialog
 	
 	private:
 		ApplicationSettings &m_settings;
-		QRadioButton *m_uiLoadModeLocalFile;
-		QRadioButton *m_uiLoadModeNetwork;
-		QRadioButton *m_dataLoadModeLocalFile;
-		QRadioButton *m_dataLoadModeNetwork;
-		QDialogButtonBox* m_buttons;
-		FileChooser *m_uiFormsDir;
-		FileChooser *m_uiFormTranslationsDir;
-		FileChooser *m_uiFormResourcesDir;
-		FileChooser *m_dataLoaderDir;
-		QCheckBox *m_debug;
-		QCheckBox *m_developer;
-		QComboBox *m_locale;
-		QCheckBox *m_systemLanguage;
 		QStringList m_languages;
-		QCheckBox *m_mdi;
-	
-	signals:
-		void prefsChanged( );
+		PreferencesDialogInterface *m_interface;
+		PreferencesDialogDeveloper *m_developer;
 		
 	private:
 		void initialize( );
@@ -54,7 +48,7 @@ class PreferencesDialog : public QDialog
 		
 	private slots:
 		void toggleLoadMode( bool checked );
-		void toggleSystemLanguage( int state );
+		void toggleLocale( bool checked );
 		void apply( );
 		void cancel( );
 };

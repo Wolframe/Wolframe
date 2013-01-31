@@ -22,5 +22,7 @@
         <file>images/refresh.png</file>
         <file>images/world.png</file>
         <file>images/world-setup.png</file>
+        <file>images/development.png</file>
+        <file>images/interface.png</file>
     </qresource>
 </RCC>

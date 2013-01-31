@@ -8,6 +8,14 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
+FileChooser::FileChooser( QWidget *_parent )
+	: QWidget( _parent ), m_selectionMode( SelectExistingFile ),
+	  m_title( ), m_lineEdit( 0 ), m_comboBox( 0 ),
+	  m_button( 0 )
+{
+	initialize( );
+}
+
 FileChooser::FileChooser( SelectionMode _selectionMode, QWidget *_parent )
 	: QWidget( _parent ), m_selectionMode( _selectionMode ),
 	  m_title( ), m_lineEdit( 0 ), m_comboBox( 0 ),
@@ -143,6 +151,16 @@ void FileChooser::setSelectionMode( const FileChooser::SelectionMode _mode )
 FileChooser::SelectionMode FileChooser::selectionMode( ) const
 {
 	return m_selectionMode;
+}
+
+QString FileChooser::title( ) const
+{
+	return m_title;
+}
+
+void FileChooser::setTitle( const QString &_title )
+{
+	m_title = _title;
 }
 
 void FileChooser::chooseFile( )

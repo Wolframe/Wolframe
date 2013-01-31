@@ -894,6 +894,15 @@ void MainWindow::updateMenusAndToolbars( )
 	if( settings.mdi ) {
 		updateMdiMenusAndToolbars( );
 	}
+
+// edit menu (TODO: this is provisoric)
+	activateAction( "actionUndo", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
+	activateAction( "actionRedo", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
+	activateAction( "actionCut", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
+	activateAction( "actionCopy", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
+	activateAction( "actionPaste", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
+	activateAction( "actionDelete", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
+	activateAction( "actionSelectAll", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );	
 }
 
 // -- logins/logouts/connections

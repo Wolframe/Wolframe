@@ -23,7 +23,6 @@ now:
     => happens also with only one window?!
   - store position and status (i.e. loaded form) of all subwindows
 - integrate from qWolfClient
-  - implement new preferences dialog
 
 musts:
 - configurator specific:

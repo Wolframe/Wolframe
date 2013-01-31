@@ -138,18 +138,32 @@ ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 
 ui_loginDialog.h: loginDialog.ui
 	$(QT_UIC) -o ui_loginDialog.h loginDialog.ui
+
+ui_PreferencesDialog.h: PreferencesDialog.ui
+	$(QT_UIC) -o ui_PreferencesDialog.h PreferencesDialog.ui
+
+ui_PreferencesDialogDeveloper.h: PreferencesDialogDeveloper.ui
+	$(QT_UIC) -o ui_PreferencesDialogDeveloper.h PreferencesDialogDeveloper.ui
+	
+ui_PreferencesDialogInterface.h: PreferencesDialogInterface.ui
+	$(QT_UIC) -o ui_PreferencesDialogInterface.h PreferencesDialogInterface.ui
 	
 UIS = \
 	ui_MainWindow.h \
 	ui_manageServersDialog.h \
 	ui_serverDefinitionDialog.h \
-	ui_loginDialog.h
+	ui_loginDialog.h \
+	ui_PreferencesDialog.h \
+	ui_PreferencesDialogDeveloper.h \
+	ui_PreferencesDialogInterface.h
 
 qtclient.d: ui_MainWindow.h
 MainWindow.d: ui_MainWindow.h
 manageServersDialog.d: ui_manageServersDialog.h
 serverDefinitionDialog.d: ui_serverDefinitionDialog.h
 loginDialog.d: ui_loginDialog.h
+moc_PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h
+PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h
 
 qtclient$(EXE): $(CPP_OBJS) qrc_qtclient.o qtclient.o
 

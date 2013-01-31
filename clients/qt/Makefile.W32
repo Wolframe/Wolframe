@@ -98,7 +98,10 @@ UIS = \
 	ui_MainWindow.h \
 	ui_manageServersDialog.h \
 	ui_serverDefinitionDialog.h \
-	ui_loginDialog.h
+	ui_loginDialog.h \
+	ui_PreferencesDialog.h \
+	ui_PreferencesDialogDeveloper.h \
+	ui_PreferencesDialogInterface.h
 
 all: $(UIS) $(OBJS) $(CPP_BINS)
 
@@ -213,9 +216,19 @@ ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 ui_loginDialog.h: loginDialog.ui
 	$(QT_DIR)\bin\uic -o ui_loginDialog.h loginDialog.ui
 
+ui_PreferencesDialog.h: PreferencesDialog.ui
+	$(QT_DIR)\bin\uic -o ui_PreferencesDialog.h PreferencesDialog.ui
+
+ui_PreferencesDialogDeveloper.h: PreferencesDialogDeveloper.ui
+	$(QT_DIR)\bin\uic -o ui_PreferencesDialogDeveloper.h PreferencesDialogDeveloper.ui
+
+ui_PreferencesDialogInterface.h: PreferencesDialogInterface.ui
+	$(QT_DIR)\bin\uic -o ui_PreferencesDialogInterface.h PreferencesDialogInterface.ui
+
 manageServersDialog.cpp: ui_manageServersDialog.h
 serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
 loginDialog.cpp: ui_loginDialog.h
+PreferencesDialog.cpp: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h
 qtclient.cpp: ui_MainWindow.h MainWindow.hpp
 
 MainWindow.hpp: $(UIS)
