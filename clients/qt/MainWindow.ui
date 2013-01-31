@@ -2,12 +2,15 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>734</width>
-    <height>400</height>
+    <width>607</width>
+    <height>395</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +35,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>734</width>
+     <width>607</width>
      <height>19</height>
     </rect>
    </property>
@@ -53,15 +56,13 @@
     <addaction name="actionIndex"/>
     <addaction name="actionContextHelp"/>
     <addaction name="separator"/>
-    <addaction name="actionTechnical_Support"/>
-    <addaction name="actionReport_Bug"/>
+    <addaction name="actionTechnicalSupport"/>
+    <addaction name="actionReportBug"/>
     <addaction name="separator"/>
-    <addaction name="actionCheck_for_Updates"/>
+    <addaction name="actionCheckForUpdates"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAboutQt"/>
-    <addaction name="separator"/>
-    <addaction name="actionDebugTerminal"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -176,7 +177,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../../../../home/abaumann/.designer/backup/open.png</normaloff>../../../../../../../home/abaumann/.designer/backup/open.png</iconset>
+     <normaloff>../../../../../../../../../../home/abaumann/.designer/backup/open.png</normaloff>../../../../../../../../../../home/abaumann/.designer/backup/open.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Open</string>
@@ -199,6 +200,9 @@
    <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
+   </property>
    <property name="defaultShortcut" stdset="0">
     <string notr="true">QKeySequence::Quit</string>
    </property>
@@ -207,10 +211,16 @@
    <property name="text">
     <string>&amp;About Wolframe Client</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
+   </property>
   </action>
   <action name="actionAboutQt">
    <property name="text">
     <string>About &amp;Qt</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
    </property>
   </action>
   <action name="actionDebugTerminal">
@@ -238,6 +248,9 @@
    <property name="toolTip">
     <string>Configure application preferences</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::PreferencesRole</enum>
+   </property>
    <property name="defaultShortcut" stdset="0">
     <string notr="true">QKeySequence::Preferences</string>
    </property>
@@ -257,7 +270,7 @@
   </action>
   <action name="actionOpenForm">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>&amp;Open form..</string>
@@ -281,6 +294,9 @@
    <property name="text">
     <string>Contents</string>
    </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
    <property name="defaultShortcut" stdset="0">
     <string notr="true">QKeySequence::HelpContents</string>
    </property>
@@ -295,24 +311,24 @@
     <string>Context Help</string>
    </property>
   </action>
-  <action name="actionTechnical_Support">
+  <action name="actionTechnicalSupport">
    <property name="text">
     <string>Technical Support</string>
    </property>
   </action>
-  <action name="actionReport_Bug">
+  <action name="actionReportBug">
    <property name="text">
     <string>Report Bug...</string>
    </property>
   </action>
-  <action name="actionCheck_for_Updates">
+  <action name="actionCheckForUpdates">
    <property name="text">
     <string>Check for Updates...</string>
    </property>
   </action>
   <action name="actionReloadWindow">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="qtclient.qrc">
@@ -323,6 +339,9 @@
    </property>
    <property name="toolTip">
     <string>Reload the active window</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
    <property name="defaultShortcut" stdset="0">
     <string notr="true">QKeySequence::Refresh</string>
@@ -537,6 +556,9 @@
    </property>
   </action>
   <action name="actionLogin">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="qtclient.qrc">
      <normaloff>:/images/login.png</normaloff>:/images/login.png</iconset>

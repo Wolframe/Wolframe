@@ -6,6 +6,7 @@
 #include "ui_serverDefinitionDialog.h"
 
 #include "connection.hpp"
+#include "WolframeClient.hpp"
 
 ServerDefinitionDialog::ServerDefinitionDialog( ConnectionParameters& params, QWidget *parent ) :
 	QDialog( parent ), ui( new Ui::ServerDefinitionDialog ), m_params( params )
@@ -245,6 +246,35 @@ void ServerDefinitionDialog::testConnection()
 		QMessageBox::critical( this, tr( "Parameters error"), error );
 		return;
 	}
-		QMessageBox::information( this, tr( "Test Connection" ),
-					  tr( "This function is not implemented yet" ));
+
+	ConnectionParameters testParms;
+	buildParams( testParms );
+
+	m_client = new WolframeClient( testParms );
+
+	connect( m_client, SIGNAL( error( QString ) ),
+		this, SLOT( error( QString ) ) );
+	connect( m_client, SIGNAL( connected( ) ),
+		this, SLOT( connected( ) ) );
+	connect( m_client, SIGNAL( disconnected( ) ),
+		this, SLOT( disconnected( ) ) );
+		
+	m_client->connect( );
+}
+
+void ServerDefinitionDialog::error( QString error )
+{
+	QMessageBox::critical( this, tr( "Connection error"), error );
+	m_client->deleteLater( );
+}
+
+void ServerDefinitionDialog::connected( )
+{
+	QMessageBox::information( this, tr( "Testing connection"), "Connection successful" );
+	m_client->disconnect( );
+}
+
+void ServerDefinitionDialog::disconnected( )
+{
+	m_client->deleteLater( );
 }

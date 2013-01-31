@@ -3,7 +3,6 @@
 //
 
 #include "PreferencesDialog.hpp"
-#include "Preferences.hpp"
 #include "LoadMode.hpp"
 #include "global.hpp"
 
@@ -12,16 +11,20 @@
 #include <QRadioButton>
 #include <QVBoxLayout>
 
-
-PreferencesDialog::PreferencesDialog( QWidget *_parent )
-	: QDialog( _parent ), m_languages( )
+PreferencesDialogInterface::PreferencesDialogInterface( QWidget *_parent )
+	: QWidget( _parent )
 {
-	initialize( );
-	loadSettings( );
+	setupUi( this );
 }
 
-PreferencesDialog::PreferencesDialog( QStringList _languages, QWidget *_parent )
-	: QDialog( _parent ), m_languages( _languages )
+PreferencesDialogDeveloper::PreferencesDialogDeveloper( QWidget *_parent )
+	: QWidget( _parent )
+{
+	setupUi( this );
+}
+
+PreferencesDialog::PreferencesDialog( ApplicationSettings &_settings, QStringList _languages, QWidget *_parent )
+	: QDialog( _parent ), m_settings( _settings ), m_languages( _languages )
 {
 	initialize( );
 	loadSettings( );
@@ -29,230 +32,223 @@ PreferencesDialog::PreferencesDialog( QStringList _languages, QWidget *_parent )
 
 void PreferencesDialog::initialize( )
 {
-	setWindowTitle( tr( "Preferences" ) );
-	setModal( true );
+	setupUi( this );
 	
-	QFormLayout *formLayout = new QFormLayout( );
+	m_interface = new PreferencesDialogInterface( this );
+	m_developer = new PreferencesDialogDeveloper( this );
 
-	QGroupBox *groupBox1 = new QGroupBox( );
-	m_uiLoadModeLocalFile = new QRadioButton( tr( "Local &file" ) );
-	m_uiLoadModeNetwork = new QRadioButton( tr( "&Network" ) );
-	QVBoxLayout *vbox1 = new QVBoxLayout( );
-	vbox1->addWidget( m_uiLoadModeLocalFile );
-	vbox1->addWidget( m_uiLoadModeNetwork );
-	vbox1->addStretch( 1 );
-	groupBox1->setLayout( vbox1 );
-	formLayout->addRow( tr( "&UI load mode:" ), groupBox1 );
+	stackedWidget->addWidget( m_interface );
+	stackedWidget->addWidget( m_developer );
+	stackedWidget->setCurrentIndex( 0 );
 
-	QGroupBox *groupBox2 = new QGroupBox( );
-	m_dataLoadModeLocalFile = new QRadioButton( tr( "Local &file" ) );
-	m_dataLoadModeNetwork = new QRadioButton( tr( "&Network" ) );
-	QVBoxLayout *vbox2 = new QVBoxLayout( );
-	vbox2->addWidget( m_dataLoadModeLocalFile );
-	vbox2->addWidget( m_dataLoadModeNetwork );
-	vbox2->addStretch( 1 );
-	groupBox2->setLayout( vbox2 );
-	formLayout->addRow( tr( "&Data load mode:" ), groupBox2 );
-
-	m_host = new QLineEdit( this );
-	formLayout->addRow( tr( "&Host:" ), m_host );
-	m_host->setFocus( );
-
-	m_port = new QSpinBox( this );
-	m_port->setRange( 1024, 49151 );
-	formLayout->addRow( tr( "&Port:" ), m_port );
-
-	m_secure = new QCheckBox( this );
-	formLayout->addRow( tr( "&Secure:" ), m_secure );
-
-	m_checkSSL = new QCheckBox( this );
-	formLayout->addRow( tr( "&Check SSL:" ), m_checkSSL );
+	listWidget->addItem( new QListWidgetItem( QIcon( QString( ":/images/interface.png") ),
+		tr( "Interface" ), listWidget ) );
+	listWidget->addItem( new QListWidgetItem( QIcon( QString( ":/images/development.png") ),
+		tr( "Developer" ), listWidget ) );
+	listWidget->setCurrentRow( 0 );
 	
-	m_clientCertFile = new FileChooser( FileChooser::SelectExistingFile,
-		tr( "Select a file as client certificate" ), this );
-	formLayout->addRow( tr( "&Client Certificate:" ), m_clientCertFile );
-	
-	m_clientKeyFile = new FileChooser( FileChooser::SelectExistingFile,
-		tr( "Select a file as client key" ), this );
-	formLayout->addRow( tr( "Client &Key:" ), m_clientKeyFile );
-	
-	m_CACertFile = new FileChooser( FileChooser::SelectExistingFile,
-		tr( "Select a file as certificate authority key" ), this );
-	formLayout->addRow( tr( "C&A file:" ), m_CACertFile );
+	connect( buttonBox->button( QDialogButtonBox::Save ), SIGNAL( clicked( ) ),
+		this, SLOT( apply( ) ) );
 		
-	m_uiFormsDir = new FileChooser( FileChooser::SelectExistingDir,
-		tr( "Select a directory holding UI forms" ), this );
-	formLayout->addRow( tr( "Form dir:" ), m_uiFormsDir );
+	connect( buttonBox->button( QDialogButtonBox::Cancel ), SIGNAL( clicked( ) ),
+		this, SLOT( cancel( ) ) );	
 
-	m_uiFormTranslationsDir = new FileChooser( FileChooser::SelectExistingDir,
-		tr( "Select a directory holding UI form translations" ), this );
-	formLayout->addRow( tr( "I18N dir:" ), m_uiFormTranslationsDir );
+	connect( buttonBox->button( QDialogButtonBox::RestoreDefaults ), SIGNAL( clicked( ) ),
+		this, SLOT( restoreDefaults( ) ) );	
 	
-	m_uiFormResourcesDir = new FileChooser( FileChooser::SelectExistingDir,
-		tr( "Select a directory holding UI form resources" ), this );
-	formLayout->addRow( tr( "Resources dir:" ), m_uiFormResourcesDir );
-
-	m_dataLoaderDir = new FileChooser( FileChooser::SelectExistingDir,
-		tr( "Select a directory which contains local XML data" ), this );
-	formLayout->addRow( tr( "Data dir:" ), m_dataLoaderDir );
-
-	m_debug = new QCheckBox( this );
-	formLayout->addRow( tr( "&Debug:" ), m_debug );
-
+	// interface
+	
 	if( !m_languages.empty( ) ) {
-		m_systemLanguage = new QCheckBox( this );
-		formLayout->addRow( tr( "&Use system language:" ), m_systemLanguage );
+		connect( m_interface->systemLocale, SIGNAL( toggled( bool ) ),
+			this, SLOT( toggleLocale( bool ) ) );
+		connect( m_interface->manualLocale, SIGNAL( toggled( bool ) ),
+			this, SLOT( toggleLocale( bool ) ) );
 
-		connect( m_systemLanguage, SIGNAL( stateChanged( int ) ),
-			this, SLOT( toggleSystemLanguage( int ) ) );
-		
-		m_locale = new QComboBox( this );
 		foreach( QString language, m_languages ) {
 			QLocale myLocale( language );
 			QString printableLanguage = myLocale.languageToString( myLocale.language( ) ) + " (" + language + ")";
-			m_locale->addItem( printableLanguage, language );
+			m_interface->locales->addItem( printableLanguage, language );
 		}
-		formLayout->addRow( tr( "&Locale:" ), m_locale );		
 	}
-
-	m_mdi = new QCheckBox( this );
-	formLayout->addRow( tr( "&MDI mode:" ), m_mdi );
 	
-	m_buttons = new QDialogButtonBox( this );
-	m_buttons->addButton( QDialogButtonBox::Ok );
-	m_buttons->addButton( QDialogButtonBox::Cancel );
-	m_buttons->button( QDialogButtonBox::Ok )->setText( tr( "Apply" ) );
-	m_buttons->button( QDialogButtonBox::Cancel )->setText( tr( "Cancel" ) );
-	formLayout->addRow( m_buttons );
-	setLayout( formLayout );
+	// developer
 	
-	connect( m_secure, SIGNAL( stateChanged( int ) ),
-		this, SLOT( toggleSecure( int ) ) );
-	
-	connect( m_uiLoadModeLocalFile, SIGNAL( toggled( bool ) ),
+	connect( m_developer->uiLoadModeLocalFile, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 		
-	connect( m_uiLoadModeNetwork, SIGNAL( toggled( bool ) ),
+	connect( m_developer->uiLoadModeNetwork, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 
-	connect( m_dataLoadModeLocalFile, SIGNAL( toggled( bool ) ),
+	connect( m_developer->dataLoadModeLocalFile, SIGNAL( toggled( bool ) ),
 		this, SLOT( toggleLoadMode( bool ) ) );
 		
-	connect( m_dataLoadModeNetwork, SIGNAL( toggled( bool ) ),
-		this, SLOT( toggleLoadMode( bool ) ) );
-		
-	connect( m_buttons->button( QDialogButtonBox::Ok ), SIGNAL( clicked( ) ),
-		this, SLOT( apply( ) ) );
-		
-	connect( m_buttons->button( QDialogButtonBox::Cancel ), SIGNAL( clicked( ) ),
-		this, SLOT( cancel( ) ) );	
+	connect( m_developer->dataLoadModeNetwork, SIGNAL( toggled( bool ) ),
+		this, SLOT( toggleLoadMode( bool ) ) );	
 }
 
 void PreferencesDialog::loadSettings( )
-{
-	Preferences *prefs = Preferences::instance( );
-	
-	m_host->setText( prefs->host( ) );
-	m_port->setValue( prefs->port( ) );
-	m_secure->setChecked( prefs->secure( ) );
-	m_checkSSL->setChecked( prefs->checkSSL( ) );
-	m_clientCertFile->setFileName( prefs->clientCertFile( ) );
-	m_clientCertFile->setEnabled( prefs->secure( ) );
-	m_clientKeyFile->setFileName( prefs->clientKeyFile( ) );
-	m_clientKeyFile->setEnabled( prefs->secure( ) );
-	m_CACertFile->setFileName( prefs->caCertFile( ) );
-	m_CACertFile->setEnabled( prefs->secure( ) );
-	m_uiLoadModeLocalFile->setChecked( false );
-	m_uiLoadModeNetwork->setChecked( false );
-	m_dataLoadModeLocalFile->setChecked( false );
-	m_dataLoadModeNetwork->setChecked( false );
-	m_uiFormsDir->setEnabled( false );
-	m_uiFormTranslationsDir->setEnabled( false );
-	m_uiFormResourcesDir->setEnabled( false );
-	m_dataLoaderDir->setEnabled( false );
-	switch( prefs->uiLoadMode( ) ) {
-		case Preferences::LocalFile:			
-			m_uiLoadModeLocalFile->setChecked( true );
-			m_uiFormsDir->setEnabled( true );
-			m_uiFormTranslationsDir->setEnabled( true );
-			m_uiFormResourcesDir->setEnabled( true );
-			break;
+{	
+	// interface
 
-		case Preferences::Network:
-			m_uiLoadModeNetwork->setChecked( true );
-			break;
-	}
-	switch( prefs->dataLoadMode( ) ) {
-		case Preferences::LocalFile:			
-			m_dataLoadModeLocalFile->setChecked( true );
-			m_dataLoaderDir->setEnabled( true );
-			break;
+	m_interface->mdi->setChecked( m_settings.mdi );
 
-		case Preferences::Network:
-			m_dataLoadModeNetwork->setChecked( true );
-			break;
-	}
-	m_debug->setChecked( prefs->debug( ) );
-	m_uiFormsDir->setFileName( prefs->uiFormsDir( ) );
-	m_uiFormTranslationsDir->setFileName( prefs->uiFormTranslationsDir( ) );
-	m_uiFormResourcesDir->setFileName( prefs->uiFormResourcesDir( ) );
-	m_dataLoaderDir->setFileName( prefs->dataLoaderDir( ) );		
 	if( !m_languages.empty( ) ) {
-		QString lang = prefs->locale( );
+		QString lang = m_settings.locale;
 		if( lang == SYSTEM_LANGUAGE ) {
-			m_systemLanguage->setChecked( true );
+			m_interface->systemLocale->setChecked( true );
+			m_interface->manualLocale->setChecked( false );
 		} else {
-			m_systemLanguage->setChecked( false );
-			int idx = m_locale->findData( prefs->locale( ) );
+			m_interface->systemLocale->setChecked( false );
+			m_interface->manualLocale->setChecked( true );
+			int idx = m_interface->locales->findData( m_settings.locale );
 			if( idx != -1 ) {
-				m_locale->setCurrentIndex( idx );
+				m_interface->locales->setCurrentIndex( idx );
 			}
 		}
 	}
-	m_mdi->setChecked( prefs->mdi( ) );
+	
+	// developer
+	
+	m_developer->uiLoadModeLocalFile->setChecked( false );
+	m_developer->uiLoadModeNetwork->setChecked( false );
+	m_developer->dataLoadModeLocalFile->setChecked( false );
+	m_developer->dataLoadModeNetwork->setChecked( false );
+	m_developer->uiFormsDir->setEnabled( false );
+	m_developer->uiFormTranslationsDir->setEnabled( false );
+	m_developer->uiFormResourcesDir->setEnabled( false );
+	m_developer->dataLoaderDir->setEnabled( false );
+	switch( m_settings.uiLoadMode ) {
+		case LocalFile:			
+			m_developer->uiLoadModeLocalFile->setChecked( true );
+			m_developer->uiFormsDir->setEnabled( true );
+			m_developer->uiFormTranslationsDir->setEnabled( true );
+			m_developer->uiFormResourcesDir->setEnabled( true );
+			break;
+
+		case Network:
+			m_developer->uiLoadModeNetwork->setChecked( true );
+			break;
+		
+		case Unknown:
+			break;
+	}
+	switch( m_settings.dataLoadMode ) {
+		case LocalFile:			
+			m_developer->dataLoadModeLocalFile->setChecked( true );
+			m_developer->dataLoaderDir->setEnabled( true );
+			break;
+
+		case Network:
+			m_developer->dataLoadModeNetwork->setChecked( true );
+			break;
+
+		case Unknown:
+			break;
+	}
+	
+	m_developer->debug->setChecked( m_settings.debug );
+	m_developer->developer->setChecked( m_settings.developEnabled );
+	
+	m_developer->uiFormsDir->setFileName( m_settings.uiFormsDir );
+	m_developer->uiFormTranslationsDir->setFileName( m_settings.uiFormTranslationsDir );
+	m_developer->uiFormResourcesDir->setFileName( m_settings.uiFormResourcesDir );
+	m_developer->dataLoaderDir->setFileName( m_settings.dataLoaderDir );
 }
 
 void PreferencesDialog::apply( )
 {
-	Preferences *prefs = Preferences::instance( );
-	
-	prefs->setHost( m_host->text( ) );
-	prefs->setPort( m_port->value( ) );
-	prefs->setSecure( m_secure->isChecked( ) );
-	prefs->setCheckSSL( m_checkSSL->isChecked( ) );
-	prefs->setClientCertFile( m_clientCertFile->fileName( ) );
-	prefs->setClientKeyFile( m_clientKeyFile->fileName( ) );
-	prefs->setCaCertFile( m_CACertFile->fileName( ) );
-	if( m_uiLoadModeLocalFile->isChecked( ) ) {
-		prefs->setUiLoadMode( Preferences::LocalFile );
-	} else if( m_uiLoadModeNetwork->isChecked( ) ) {
-		prefs->setUiLoadMode( Preferences::Network );
-	}
-	if( m_dataLoadModeLocalFile->isChecked( ) ) {
-		prefs->setDataLoadMode( Preferences::LocalFile );
-	} else if( m_dataLoadModeNetwork->isChecked( ) ) {
-		prefs->setDataLoadMode( Preferences::Network );
-	}
-	prefs->setDebug( m_debug->isChecked( ) );
-	prefs->setUiFormsDir( m_uiFormsDir->fileName( ) );
-	prefs->setUiFormTranslationsDir( m_uiFormTranslationsDir->fileName( ) );
-	prefs->setUiFormResourcesDir( m_uiFormResourcesDir->fileName( ) );
-	prefs->setDataLoaderDir( m_dataLoaderDir->fileName( ) );
+	// interface
+
+	m_settings.mdi = m_interface->mdi->isChecked( );
+
 	if( !m_languages.empty( ) ) {
-		if( m_systemLanguage->isChecked( ) ) {
-			prefs->setLocale( SYSTEM_LANGUAGE );
+		if( m_interface->systemLocale->isChecked( ) ) {
+			m_settings.locale = SYSTEM_LANGUAGE;
 		} else {
-			QString lang = m_locale->itemData( m_locale->currentIndex( ) ).toString( );
-			prefs->setLocale( lang );
+			QString lang = m_interface->locales->itemData( m_interface->locales->currentIndex( ) ).toString( );
+			m_settings.locale = lang;
 		}
 	}
-	prefs->setMdi( m_mdi->isChecked( ) );
 	
-	prefs->storeSettings( );
-
-	emit prefsChanged( );
+	// developer
+	
+	if( m_developer->uiLoadModeLocalFile->isChecked( ) ) {
+		m_settings.uiLoadMode = LocalFile;
+	} else if( m_developer->uiLoadModeNetwork->isChecked( ) ) {
+		m_settings.uiLoadMode = Network;
+	}
+	if( m_developer->dataLoadModeLocalFile->isChecked( ) ) {
+		m_settings.dataLoadMode = LocalFile;
+	} else if( m_developer->dataLoadModeNetwork->isChecked( ) ) {
+		m_settings.dataLoadMode = Network;
+	}
+	m_settings.debug = m_developer->debug->isChecked( );
+	m_settings.developEnabled = m_developer->developer->isChecked( );
+	m_settings.uiFormsDir = m_developer->uiFormsDir->fileName( );
+	m_settings.uiFormTranslationsDir = m_developer->uiFormTranslationsDir->fileName( );
+	m_settings.uiFormResourcesDir = m_developer->uiFormResourcesDir->fileName( );
+	m_settings.dataLoaderDir = m_developer->dataLoaderDir->fileName( );
 	
 	accept( );	
+}
+
+void PreferencesDialog::restoreDefaults( )
+{
+	// interface
+
+	m_interface->mdi->setChecked( DEFAULT_MDI );
+
+	m_interface->systemLocale->setChecked( false );
+	m_interface->manualLocale->setChecked( true );
+	int idx = m_interface->locales->findData( DEFAULT_LOCALE );
+	if( idx != -1 ) {
+		m_interface->locales->setCurrentIndex( idx );
+	}
+
+	// developer
+
+	m_developer->uiLoadModeLocalFile->setChecked( false );
+	m_developer->uiLoadModeNetwork->setChecked( false );
+	m_developer->dataLoadModeLocalFile->setChecked( false );
+	m_developer->dataLoadModeNetwork->setChecked( false );
+	m_developer->uiFormsDir->setEnabled( false );
+	m_developer->uiFormTranslationsDir->setEnabled( false );
+	m_developer->uiFormResourcesDir->setEnabled( false );
+	m_developer->dataLoaderDir->setEnabled( false );
+	switch( DEFAULT_UILOADMODE ) {
+		case LocalFile:			
+			m_developer->uiLoadModeLocalFile->setChecked( true );
+			m_developer->uiFormsDir->setEnabled( true );
+			m_developer->uiFormTranslationsDir->setEnabled( true );
+			m_developer->uiFormResourcesDir->setEnabled( true );
+			break;
+
+		case Network:
+			m_developer->uiLoadModeNetwork->setChecked( true );
+			break;
+		
+		case Unknown:
+			break;
+	}
+	switch( DEFAULT_DATALOADMODE ) {
+		case LocalFile:			
+			m_developer->dataLoadModeLocalFile->setChecked( true );
+			m_developer->dataLoaderDir->setEnabled( true );
+			break;
+
+		case Network:
+			m_developer->dataLoadModeNetwork->setChecked( true );
+			break;
+
+		case Unknown:
+			break;
+	}
+	m_developer->debug->setChecked( false );
+	m_developer->developer->setChecked( false );
+	m_developer->uiFormsDir->setFileName( DEFAULT_UI_FORMS_DIR );
+	m_developer->uiFormTranslationsDir->setFileName( DEFAULT_UI_FORM_TRANSLATIONS_DIR );
+	m_developer->uiFormResourcesDir->setFileName( DEFAULT_UI_FORM_RESOURCES_DIR );
+	m_developer->dataLoaderDir->setFileName( DEFAULT_DATA_LOADER_DIR );
 }
 
 void PreferencesDialog::cancel( )
@@ -260,31 +256,15 @@ void PreferencesDialog::cancel( )
 	close( );
 }
 
-void PreferencesDialog::toggleSecure( int /* state */ )
-{
-	bool secure = m_secure->isChecked( );
-	m_checkSSL->setEnabled( secure );
-	m_clientCertFile->setEnabled( secure );
-	m_clientKeyFile->setEnabled( secure );
-	m_CACertFile->setEnabled( secure );
-}
-
 void PreferencesDialog::toggleLoadMode( bool /* checked */ )
 {
-	m_host->setEnabled( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) );
-	m_port->setEnabled( m_uiLoadModeNetwork->isChecked( ) | m_dataLoadModeNetwork->isChecked( ) );
-	m_secure->setEnabled( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) );
-	m_clientCertFile->setEnabled( ( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) ) && m_secure->isChecked( ) );
-	m_clientKeyFile->setEnabled( ( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) ) && m_secure->isChecked( ) );
-	m_CACertFile->setEnabled( ( m_uiLoadModeNetwork->isChecked( ) || m_dataLoadModeNetwork->isChecked( ) ) && m_secure->isChecked( ) );
-	m_uiFormsDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );
-	m_uiFormTranslationsDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );
-	m_uiFormResourcesDir->setEnabled( m_uiLoadModeLocalFile->isChecked( ) );
-	m_dataLoaderDir->setEnabled( m_dataLoadModeLocalFile->isChecked( ) );
+	m_developer->uiFormsDir->setEnabled( m_developer->uiLoadModeLocalFile->isChecked( ) );
+	m_developer->uiFormTranslationsDir->setEnabled( m_developer->uiLoadModeLocalFile->isChecked( ) );
+	m_developer->uiFormResourcesDir->setEnabled( m_developer->uiLoadModeLocalFile->isChecked( ) );
+	m_developer->dataLoaderDir->setEnabled( m_developer->dataLoadModeLocalFile->isChecked( ) );
 }
 
-void PreferencesDialog::toggleSystemLanguage( int /* state */ )
+void PreferencesDialog::toggleLocale( bool /* checked */ )
 {
-	m_locale->setEnabled( !( m_systemLanguage->isChecked( ) ) );
+	m_interface->locales->setEnabled( m_interface->manualLocale->isChecked( ) );
 }
-

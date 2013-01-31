@@ -57,24 +57,14 @@ CPP_OBJS = \
 	NetworkDataLoader.o \
 	DataHandler.o \
 	moc_DataHandler.o \
-	DebugTerminal.o \
-	moc_DebugTerminal.o \
-	HistoryLineEdit.o \
-	moc_HistoryLineEdit.o \
 	WolframeClient.o \
 	moc_WolframeClient.o \
 	FormWidget.o \
 	moc_FormWidget.o \
 	qcommandline.o \
 	moc_qcommandline.o \
-	LoginDialog.o \
-	moc_LoginDialog.o \
-	Preferences.o \
-	moc_Preferences.o \
 	PreferencesDialog.o \
 	moc_PreferencesDialog.o \
-	StorageWidget.o \
-	moc_StorageWidget.o \
 	FormChooseDialog.o \
 	moc_FormChooseDialog.o \
 	qrc_qtclient.o \
@@ -83,7 +73,10 @@ CPP_OBJS = \
 	moc_manageServersDialog.o \
 	serverDefinitionDialog.o \
 	moc_serverDefinitionDialog.o \
-	settings.o
+	settings.o \
+	loginDialog.o \
+	moc_loginDialog.o \
+	LoadMode.o
 		
 CPP_BINS = \
 	qtclient$(EXE)
@@ -94,12 +87,6 @@ local_all:
 
 moc_MainWindow.cpp: MainWindow.hpp
 	$(QT_MOC) $(MOC_FLAGS) MainWindow.hpp -o moc_MainWindow.cpp
-
-moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
-	$(QT_MOC) $(MOC_FLAGS) HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
-
-moc_DebugTerminal.cpp: DebugTerminal.hpp
-	$(QT_MOC) $(MOC_FLAGS) DebugTerminal.hpp -o moc_DebugTerminal.cpp
 
 moc_FormLoader.cpp: FormLoader.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormLoader.hpp -o moc_FormLoader.cpp
@@ -116,14 +103,8 @@ moc_WolframeClient.cpp: WolframeClient.hpp
 moc_FormWidget.cpp: FormWidget.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormWidget.hpp -o moc_FormWidget.cpp
 
-moc_LoginDialog.cpp: LoginDialog.hpp
-	$(QT_MOC) $(MOC_FLAGS) LoginDialog.hpp -o moc_LoginDialog.cpp
-
 moc_qcommandline.cpp: qcommandline.h
 	$(QT_MOC) $(MOC_FLAGS) qcommandline.h -o moc_qcommandline.cpp
-
-moc_Preferences.cpp: Preferences.hpp
-	$(QT_MOC) $(MOC_FLAGS) Preferences.hpp -o moc_Preferences.cpp
 
 moc_PreferencesDialog.cpp: PreferencesDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) PreferencesDialog.hpp -o moc_PreferencesDialog.cpp
@@ -134,9 +115,6 @@ moc_FileChooser.cpp: FileChooser.hpp
 moc_PictureChooser.cpp: PictureChooser.hpp
 	$(QT_MOC) $(MOC_FLAGS) PictureChooser.hpp -o moc_PictureChooser.cpp
 
-moc_StorageWidget.cpp: StorageWidget.hpp
-	$(QT_MOC) $(MOC_FLAGS) StorageWidget.hpp -o moc_StorageWidget.cpp
-	
 moc_FormChooseDialog.cpp: FormChooseDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) FormChooseDialog.hpp -o moc_FormChooseDialog.cpp
 
@@ -146,8 +124,11 @@ moc_manageServersDialog.cpp: manageServersDialog.hpp
 moc_serverDefinitionDialog.cpp: serverDefinitionDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) serverDefinitionDialog.hpp -o moc_serverDefinitionDialog.cpp
 
-ui_MainWindow.hpp: MainWindow.ui
-	$(QT_UIC) -o ui_MainWindow.hpp MainWindow.ui
+moc_loginDialog.cpp: loginDialog.hpp
+	$(QT_MOC) $(MOC_FLAGS) loginDialog.hpp -o moc_loginDialog.cpp
+
+ui_MainWindow.h: MainWindow.ui
+	$(QT_UIC) -o ui_MainWindow.h MainWindow.ui
 
 ui_manageServersDialog.h: manageServersDialog.ui
 	$(QT_UIC) -o ui_manageServersDialog.h manageServersDialog.ui
@@ -155,16 +136,34 @@ ui_manageServersDialog.h: manageServersDialog.ui
 ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 	$(QT_UIC) -o ui_serverDefinitionDialog.h serverDefinitionDialog.ui
 
+ui_loginDialog.h: loginDialog.ui
+	$(QT_UIC) -o ui_loginDialog.h loginDialog.ui
+
+ui_PreferencesDialog.h: PreferencesDialog.ui
+	$(QT_UIC) -o ui_PreferencesDialog.h PreferencesDialog.ui
+
+ui_PreferencesDialogDeveloper.h: PreferencesDialogDeveloper.ui
+	$(QT_UIC) -o ui_PreferencesDialogDeveloper.h PreferencesDialogDeveloper.ui
+	
+ui_PreferencesDialogInterface.h: PreferencesDialogInterface.ui
+	$(QT_UIC) -o ui_PreferencesDialogInterface.h PreferencesDialogInterface.ui
+	
 UIS = \
-	ui_MainWindow.hpp \
+	ui_MainWindow.h \
 	ui_manageServersDialog.h \
-	ui_serverDefinitionDialog.h
+	ui_serverDefinitionDialog.h \
+	ui_loginDialog.h \
+	ui_PreferencesDialog.h \
+	ui_PreferencesDialogDeveloper.h \
+	ui_PreferencesDialogInterface.h
 
-serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
-serverDefinitionDialog.cpp: ui_serverDefinitionDialog.h
-
-MainWindow.hpp: $(UIS)
-qtclient.cpp: ui_MainWindow.hpp
+qtclient.d: ui_MainWindow.h
+MainWindow.d: ui_MainWindow.h
+manageServersDialog.d: ui_manageServersDialog.h
+serverDefinitionDialog.d: ui_serverDefinitionDialog.h
+loginDialog.d: ui_loginDialog.h
+moc_PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h
+PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h
 
 qtclient$(EXE): $(CPP_OBJS) qrc_qtclient.o qtclient.o
 
