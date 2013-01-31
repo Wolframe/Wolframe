@@ -26,4 +26,6 @@
 #define DEFAULT_UILOADMODE LocalFile
 #define DEFAULT_DATALOADMODE Network
 
+#define DEFAULT_MDI false
+
 #endif // _GLOBAL_HPP_INCLUDED

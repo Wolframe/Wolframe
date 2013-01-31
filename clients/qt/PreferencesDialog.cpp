@@ -52,6 +52,9 @@ void PreferencesDialog::initialize( )
 		
 	connect( buttonBox->button( QDialogButtonBox::Cancel ), SIGNAL( clicked( ) ),
 		this, SLOT( cancel( ) ) );	
+
+	connect( buttonBox->button( QDialogButtonBox::RestoreDefaults ), SIGNAL( clicked( ) ),
+		this, SLOT( restoreDefaults( ) ) );	
 	
 	// interface
 	
@@ -187,6 +190,65 @@ void PreferencesDialog::apply( )
 	m_settings.dataLoaderDir = m_developer->dataLoaderDir->fileName( );
 	
 	accept( );	
+}
+
+void PreferencesDialog::restoreDefaults( )
+{
+	// interface
+
+	m_interface->mdi->setChecked( DEFAULT_MDI );
+
+	m_interface->systemLocale->setChecked( false );
+	m_interface->manualLocale->setChecked( true );
+	int idx = m_interface->locales->findData( DEFAULT_LOCALE );
+	if( idx != -1 ) {
+		m_interface->locales->setCurrentIndex( idx );
+	}
+
+	// developer
+
+	m_developer->uiLoadModeLocalFile->setChecked( false );
+	m_developer->uiLoadModeNetwork->setChecked( false );
+	m_developer->dataLoadModeLocalFile->setChecked( false );
+	m_developer->dataLoadModeNetwork->setChecked( false );
+	m_developer->uiFormsDir->setEnabled( false );
+	m_developer->uiFormTranslationsDir->setEnabled( false );
+	m_developer->uiFormResourcesDir->setEnabled( false );
+	m_developer->dataLoaderDir->setEnabled( false );
+	switch( DEFAULT_UILOADMODE ) {
+		case LocalFile:			
+			m_developer->uiLoadModeLocalFile->setChecked( true );
+			m_developer->uiFormsDir->setEnabled( true );
+			m_developer->uiFormTranslationsDir->setEnabled( true );
+			m_developer->uiFormResourcesDir->setEnabled( true );
+			break;
+
+		case Network:
+			m_developer->uiLoadModeNetwork->setChecked( true );
+			break;
+		
+		case Unknown:
+			break;
+	}
+	switch( DEFAULT_DATALOADMODE ) {
+		case LocalFile:			
+			m_developer->dataLoadModeLocalFile->setChecked( true );
+			m_developer->dataLoaderDir->setEnabled( true );
+			break;
+
+		case Network:
+			m_developer->dataLoadModeNetwork->setChecked( true );
+			break;
+
+		case Unknown:
+			break;
+	}
+	m_developer->debug->setChecked( false );
+	m_developer->developer->setChecked( false );
+	m_developer->uiFormsDir->setFileName( DEFAULT_UI_FORMS_DIR );
+	m_developer->uiFormTranslationsDir->setFileName( DEFAULT_UI_FORM_TRANSLATIONS_DIR );
+	m_developer->uiFormResourcesDir->setFileName( DEFAULT_UI_FORM_RESOURCES_DIR );
+	m_developer->dataLoaderDir->setFileName( DEFAULT_DATA_LOADER_DIR );
 }
 
 void PreferencesDialog::cancel( )

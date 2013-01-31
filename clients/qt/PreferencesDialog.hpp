@@ -49,6 +49,7 @@ class PreferencesDialog : public QDialog, public Ui::PreferencesDialog
 	private slots:
 		void toggleLoadMode( bool checked );
 		void toggleLocale( bool checked );
+		void restoreDefaults( );
 		void apply( );
 		void cancel( );
 };
