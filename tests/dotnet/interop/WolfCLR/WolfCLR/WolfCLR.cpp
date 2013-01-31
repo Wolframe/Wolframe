@@ -89,8 +89,8 @@ int main( int , const char**)
 			std::cout << "FUNCTION " << (*fi)->assemblyname() << " " << (*fi)->classname() << "::" << (*fi)->methodname() << "[" << (*fi)->nofParameter() << "]" << std::endl;
 			funcmap[ (*fi)->classname() + "." + (*fi)->methodname()] = *fi;
 		}
-//		test_atomic_param_clr_call( clr, assembly);
-//		test_atomic_param_fun_call( funcmap);
+		test_atomic_param_clr_call( clr, assembly);
+		test_atomic_param_fun_call( funcmap);
 		test_struct_param_fun_call( funcmap);
 	}
 	catch (const std::exception& e)

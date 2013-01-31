@@ -2,6 +2,8 @@
 #define _Wolframe_COM_AUTOMATION_UTILS_INCLUDED
 #include "filter/typedfilter.hpp"
 #include <cstring>
+#include <sstream>
+#include <iostream>
 #include <string>
 #include <stdexcept>
 #include <oaidl.h>
@@ -65,7 +67,8 @@ langbind::TypedInputFilter::Element getAtomicElement( const VARIANT& val, std::s
 		const char* endcallname = strchr( call, '(');\
 		std::string callname( call, endcallname?(endcallname-call):strlen(call));\
 		_com_error error(hr);\
-		throw std::runtime_error( std::string("Error calling ") + callname + ": '" + comauto::utf8string(error.ErrorMessage()) + "'");\
+		std::ostringstream errcode; errcode << std::hex << "0x" << hr; \
+		throw std::runtime_error( std::string("Error calling ") + callname + ": '" + comauto::utf8string(error.ErrorMessage()) + "' [" + errcode.str() + "]");\
 	}}
 
 }}
