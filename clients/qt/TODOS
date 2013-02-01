@@ -25,8 +25,6 @@ now:
 - integrate from qWolfClient
 
 musts:
-- fileChooser plugin:
-  - missing title (uic code gerenated?)
 - configurator specific:
   - use simpleforms instead of funny lua parsers (example
     picture parsers)
