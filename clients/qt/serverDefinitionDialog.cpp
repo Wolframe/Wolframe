@@ -247,6 +247,8 @@ void ServerDefinitionDialog::testConnection()
 		return;
 	}
 
+	ui->testBttn->setEnabled( false );
+
 	ConnectionParameters testParms;
 	buildParams( testParms );
 
@@ -265,16 +267,20 @@ void ServerDefinitionDialog::testConnection()
 void ServerDefinitionDialog::error( QString error )
 {
 	QMessageBox::critical( this, tr( "Connection error"), error );
+	ui->testBttn->setEnabled( true );
 	m_client->deleteLater( );
 }
 
 void ServerDefinitionDialog::connected( )
 {
+	disconnect( m_client, SIGNAL( error( QString ) ), 0, 0 );
 	QMessageBox::information( this, tr( "Testing connection"), "Connection successful" );
+	ui->testBttn->setEnabled( true );
 	m_client->disconnect( );
 }
 
 void ServerDefinitionDialog::disconnected( )
 {
+	ui->testBttn->setEnabled( true );
 	m_client->deleteLater( );
 }
