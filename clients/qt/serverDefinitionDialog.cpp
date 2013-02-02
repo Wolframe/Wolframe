@@ -3,13 +3,17 @@
 #include <QCloseEvent>
 
 #include "serverDefinitionDialog.hpp"
+#ifdef WITH_SSL
 #include "ui_serverDefinitionDialog.h"
+#else
+#include "ui_serverDefinitionDialogNoSSL.h"
+#endif
 
 #include "connection.hpp"
 #include "WolframeClient.hpp"
 
-ServerDefinitionDialog::ServerDefinitionDialog( ConnectionParameters& params, QWidget *parent ) :
-	QDialog( parent ), ui( new Ui::ServerDefinitionDialog ), m_params( params )
+ServerDefinitionDialog::ServerDefinitionDialog( ConnectionParameters& params, QWidget *_parent ) :
+	QDialog( _parent ), ui( new Ui::ServerDefinitionDialog ), m_params( params )
 {
 	ui->setupUi( this );
 	if ( !params.isEmpty() )	{
@@ -23,6 +27,7 @@ ServerDefinitionDialog::ServerDefinitionDialog( ConnectionParameters& params, QW
 	else
 		ui->portSpinBox->setValue( params.port );
 
+#ifdef WITH_SSL
 	if ( params.SSL )	{
 		ui->SSLcheck->setChecked( true );
 		if ( params.clientCertificate )	{
@@ -52,22 +57,27 @@ ServerDefinitionDialog::ServerDefinitionDialog( ConnectionParameters& params, QW
 		ui->SSLverifyCheck->setChecked( false );
 		ui->CAbundleEdit->setText( "" );
 	}
+#endif
 
 	if ( params.timeout == 0 )
 		ui->timeoutSpinBox->setValue( 15 );
 	else
 		ui->timeoutSpinBox->setValue( params.timeout );
 
+#ifdef WITH_SSL
 	connect( ui->certFileBttn, SIGNAL( clicked() ), this, SLOT( selectCertFile() ));
 	connect( ui->keyFileBttn, SIGNAL( clicked() ), this, SLOT( selectKeyFile() ));
 	connect( ui->CAbundleFileBttn, SIGNAL( clicked() ), this, SLOT( selectCAbundleFile() ));
 	connect( ui->SSLcheck, SIGNAL( clicked() ), this, SLOT( SSLtoggle() ));
 	connect( ui->clientCertCheck, SIGNAL( clicked() ), this, SLOT( updateSSLfields() ));
 	connect( ui->SSLverifyCheck, SIGNAL( clicked() ), this, SLOT( updateSSLfields() ));
+#endif
 	connect( ui->testBttn, SIGNAL( clicked() ), this, SLOT( testConnection() ));
 	connect( ui->nameEdit, SIGNAL( textChanged( QString )), this, SLOT( updateButtons() ));
 	connect( ui->hostEdit, SIGNAL( textChanged( QString )), this, SLOT( updateButtons() ));
+#ifdef WITH_SSL
 	updateSSLfields();
+#endif
 	updateButtons();
 }
 
@@ -78,6 +88,7 @@ ServerDefinitionDialog::~ServerDefinitionDialog()
 
 void ServerDefinitionDialog::updateSSLfields()
 {
+#ifdef WITH_SSL
 	if ( ui->SSLcheck->isChecked() )	{
 		ui->clientCertCheck->setEnabled( true );
 		if ( ui->clientCertCheck->isChecked() )	{
@@ -121,6 +132,7 @@ void ServerDefinitionDialog::updateSSLfields()
 		ui->CAbundleEdit->setEnabled( false );
 		ui->CAbundleFileBttn->setEnabled( false );
 	}
+#endif
 }
 
 void ServerDefinitionDialog::updateButtons()
@@ -144,6 +156,7 @@ void ServerDefinitionDialog::buildParams( ConnectionParameters& params )
 	params.host = ui->hostEdit->text().simplified();
 	params.port = ui->portSpinBox->value();
 	params.timeout = ui->timeoutSpinBox->value();
+#ifdef WITH_SSL
 	if ( ui->SSLcheck->isChecked() )	{
 		params.SSL = true ;
 		if ( ui->clientCertCheck->isChecked() )	{
@@ -173,15 +186,23 @@ void ServerDefinitionDialog::buildParams( ConnectionParameters& params )
 		params.SSLverify = false;
 		params.SSLCAbundle.clear();
 	}
+#else
+	params.SSL = false ;
+	params.clientCertificate = false;
+	params.SSLcertificate.clear();
+	params.SSLkey.clear();
+	params.SSLverify = false;
+	params.SSLCAbundle.clear();
+#endif
 }
 
 void ServerDefinitionDialog::done( int retCode )
 {
 	if ( retCode == QDialog::Accepted )	{
 		buildParams( m_params );
-		QString	error;
-		if ( ! m_params.check( error ))
-			QMessageBox::critical( this, tr( "Parameters error"), error );
+		QString	_error;
+		if ( ! m_params.check( _error ))
+			QMessageBox::critical( this, tr( "Parameters error"), _error );
 		else
 			QDialog::done( retCode );
 	}
@@ -192,6 +213,7 @@ void ServerDefinitionDialog::done( int retCode )
 
 void ServerDefinitionDialog::SSLtoggle()
 {
+#ifdef WITH_SSL
 	if ( ui->SSLcheck->isChecked() )	{
 		if ( ui->portSpinBox->value() == 7661 )
 			ui->portSpinBox->setValue( 7961 );
@@ -201,11 +223,13 @@ void ServerDefinitionDialog::SSLtoggle()
 			ui->portSpinBox->setValue( 7661 );
 	}
 	updateSSLfields();
+#endif
 }
 
 
 void ServerDefinitionDialog::selectCertFile()
 {
+#ifdef WITH_SSL
 	QString fileName = QFileDialog::getOpenFileName( this, "Select SSL certificate",
 							 m_currentDir, "Certificate files (*.crt *.cert *.pem);;All files (*.*)" );
 	if ( !fileName.isEmpty() )	{
@@ -213,10 +237,12 @@ void ServerDefinitionDialog::selectCertFile()
 		m_currentDir = dir.absolutePath();
 		ui->certEdit->setText( fileName );
 	}
+#endif
 }
 
 void ServerDefinitionDialog::selectKeyFile()
 {
+#ifdef WITH_SSL
 	QString fileName = QFileDialog::getOpenFileName( this, "Select SSL key",
 							 m_currentDir, "Key files (*.key *.pem);;All files (*.*)" );
 	if ( !fileName.isEmpty() )	{
@@ -224,10 +250,12 @@ void ServerDefinitionDialog::selectKeyFile()
 		m_currentDir = dir.absolutePath();
 		ui->keyEdit->setText( fileName );
 	}
+#endif
 }
 
 void ServerDefinitionDialog::selectCAbundleFile()
 {
+#ifdef WITH_SSL
 	QString fileName = QFileDialog::getOpenFileName( this, "Select SSL CA bundle",
 							 m_currentDir, "CA bundle files (*.crt *.cert *.pem);;All files (*.*)" );
 	if ( !fileName.isEmpty() )	{
@@ -235,6 +263,7 @@ void ServerDefinitionDialog::selectCAbundleFile()
 		m_currentDir = dir.absolutePath();
 		ui->CAbundleEdit->setText( fileName );
 	}
+#endif
 }
 
 
