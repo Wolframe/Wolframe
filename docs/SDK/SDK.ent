@@ -10,6 +10,7 @@
 <!ENTITY SDKprogramTransactions		SYSTEM "ProgramTransactions.xml">
 <!ENTITY SDKprogramDirectmap		SYSTEM "ProgramDirectmap.xml">
 <!ENTITY SDKprogramLua			SYSTEM "ProgramLua.xml">
+<!ENTITY SDKmodelTypedFilter	SYSTEM "ModelTypedFilter.xml">
 
 <!ENTITY SDKappendix			SYSTEM "Appendix.xml">
 

@@ -54,18 +54,19 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Func
 	langbind::Form pair;
 	langbind::Form param;
 	pair
-		( "a", langbind::Form("56"))
-		( "b", langbind::Form("19"));
+		( "a", langbind::Form( "56"))
+		( "b", langbind::Form( "19"));
 	place
-		( "street", langbind::Form("vogelsangstrasse 5 8006 Zurich"))
-		( "country", langbind::Form("switzerland"));
+		( "street", langbind::Form( "Vogelsangstrasse 5 8006 Zurich"))
+		( "country", langbind::Form( "Switzerland"));
 	user
-		( "id", langbind::Form("123"))
-		( "name", langbind::Form("hans muster"))
+		( "id", langbind::Form( "123"))
+		( "name", langbind::Form( "Hans Muster"))
 		( "place", place);
 	param
-		( "p", pair);
-	test_function_call( funcmap, "Functions.AddIdPair", param, "RESULT STRUCT FUN CALL:");
+		( "country", langbind::Form( "Germany"))
+		( "street", langbind::Form( "Ottoweg 4 10115 Berlin"));
+	test_function_call( funcmap, "Functions.GetAddress_p", param, "RESULT STRUCT FUN CALL:");
 };
 
 
@@ -75,7 +76,7 @@ int main( int , const char**)
 	{
 		WRAP( ::CoInitializeEx( NULL, COINIT_MULTITHREADED))
 		std::string path( "C:\\Users\\patrick\\Projects\\Wolframe\\tests\\dotnet\\csharp\\Functions\\bin\\Release\\");
-		std::string assembly( "Functions, Version=1.0.0.3, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
+		std::string assembly( "Functions, Version=1.0.0.8, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
 		comauto::TypeLib typelib( path + "Functions.tlb");
 		typelib.print( std::cout);
 		comauto::CommonLanguageRuntime clr( "v4.0.30319");

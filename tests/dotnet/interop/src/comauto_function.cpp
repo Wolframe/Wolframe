@@ -13,22 +13,28 @@ class FunctionResult
 	:public langbind::TypedInputFilter
 {
 public:
-	explicit FunctionResult( const CComPtr<ITypeInfo>& typeinfo)
+	FunctionResult( const CComPtr<ITypeInfo>& typeinfo, const VARIANT& data_)
 		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
 	{
+		std::memset( &m_data, 0, sizeof(m_data));
+		m_data.vt = VT_EMPTY;
+		WRAP( comauto::wrapVariantCopy( &m_data, &data_))
 		m_stk.push_back( StackElem( Init, typeinfo, 0));
 	}
+
 	FunctionResult( const FunctionResult& o)
 		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
 		,m_stk(o.m_stk)
 		,m_elembuf(o.m_elembuf)
 	{
+		std::memset( &m_data, 0, sizeof(m_data));
 		m_data.vt = VT_EMPTY;
-		WRAP( ::VariantCopy( &m_data, &o.m_data))
+		WRAP( comauto::wrapVariantCopy( &m_data, &o.m_data))
 	}
+
 	virtual ~FunctionResult()
 	{
-		::VariantClear( &m_data);
+		comauto::wrapVariantClear( &m_data);
 	}
 
 	virtual TypedInputFilter* copy() const
@@ -37,7 +43,7 @@ public:
 	}
 
 	virtual bool getNext( ElementType& type, Element& element);
-	VARIANT* data()		{return &m_data;}
+	const VARIANT* data() const		{return &m_data;}
 
 private:
 	enum State
@@ -65,6 +71,7 @@ private:
 	VARIANT m_data;
 };
 }//anonymous namespace
+
 
 comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx)
 	:m_clr(clr_)
@@ -228,21 +235,14 @@ VARIANT* comauto::FunctionClosure::initParameter( std::size_t eidx, VARIANT* val
 			if (!val->pvRecord) throw std::logic_error( "failed to create record data structure");
 			return val;
 		}
-		else if (param->typedesc->vt == VT_BSTR)
+		else if (comauto::isStringType( param->typedesc->vt))
 		{
 			if (recinfo) throw std::logic_error( "string instead of structure expected");
+			std::memset( val, 0, sizeof( VARIANT));
 			val->vt = param->typedesc->vt;
-			val->bstrVal = NULL;
 			return val;
 		}
-		else if (param->typedesc->vt == VT_LPSTR || param->typedesc->vt == VT_LPWSTR)
-		{
-			if (recinfo) throw std::logic_error( "string instead of structure expected");
-			val->vt = param->typedesc->vt;
-			val->pcVal = NULL;
-			return val;
-		}
-		else if (comauto::isAtomicType(param->typedesc->vt))
+		else if (comauto::isAtomicType( param->typedesc->vt))
 		{
 			if (recinfo) throw std::logic_error( "atomic type instead of structure expected");
 			val->vt = param->typedesc->vt;
@@ -261,10 +261,10 @@ void comauto::FunctionClosure::assignValue( VARIANT* dstrec, std::size_t ofs, VA
 	try
 	{
 		elemval = comauto::createVariantType( elem, dsttype);
-		if (comauto::isAtomicType( dstrec->vt))
+		if (comauto::isAtomicType( dstrec->vt) || comauto::isStringType( dstrec->vt))
 		{
 			if (ofs) throw std::logic_error( "illegal operation (offset into atomic type)");
-			::VariantCopy( dstrec, &elemval);
+			comauto::wrapVariantCopy( dstrec, &elemval);
 		}
 		else if (dstrec->vt == VT_USERDEFINED || dstrec->vt == VT_RECORD) 
 		{
@@ -280,7 +280,7 @@ void comauto::FunctionClosure::assignValue( VARIANT* dstrec, std::size_t ofs, VA
 	}
 	catch (const std::runtime_error& e)
 	{
-		::VariantClear( &elemval);
+		comauto::wrapVariantClear( &elemval);
 		throw e;
 	}
 }
@@ -451,10 +451,8 @@ bool comauto::FunctionClosure::call()
 				}
 			}
 		}
-		FunctionResult* resptr;
-		m_result.reset( resptr = new FunctionResult( m_func->getReturnType()->typeinfo));
-
-		*resptr->data() = m_func->clr()->call( m_func->assemblyname(), m_func->classname(), m_func->methodname(), m_func->nofParameter(), m_parameter);
+		VARIANT resdata = m_func->clr()->call( m_func->assemblyname(), m_func->classname(), m_func->methodname(), m_func->nofParameter(), m_parameter);
+		m_result.reset( new FunctionResult( m_func->getReturnType()->typeinfo, resdata));
 		return true;
 	}
 	catch (const std::runtime_error& e)
@@ -558,39 +556,34 @@ bool FunctionResult::getNext( ElementType& type, Element& element)
 AGAIN:
 	if (m_stk.empty()) return false;
 	State state = m_stk.back().state;
+	StackElem& cur = m_stk.back();	//< REMARK: 'cur' only valid till next m_stk.push_back()/pop_back(). Check that push/pop return or goto AGAIN !
 	switch (state)
 	{
 		case Init:
-			if (comauto::isAtomicType( m_data.vt ))
+			if (comauto::isAtomicType( m_data.vt) || comauto::isStringType( m_data.vt))
 			{
 				element = comauto::getAtomicElement( m_data, m_elembuf);
 				type = Value;
 				m_stk.pop_back();
 				return true;
 			}
-			else if (m_data.vt == VT_BSTR)
-			{
-				element = comauto::getAtomicElement( m_data.vt, (char*)m_data.bstrVal, m_elembuf);
-				type = Value;
-				m_stk.pop_back();
-				return true;
-			}
-			else if (!m_stk.back().typeinfo)
+			else if (!cur.typeinfo)
 			{
 				throw std::runtime_error( std::string( "cannot convert result type '") + comauto::typestr( m_data.vt)  + "'");
 			}
-			m_stk.back().state = VarOpen;
+			cur.state = VarOpen;
 			/*no break here!*/
 
 		case VarOpen:
-			if (!m_stk.back().typeinfo) throw std::logic_error( "illegal state in comauto::FunctionResult::getNext");
+		{
+			if (!cur.typeinfo) throw std::logic_error( "illegal state in comauto::FunctionResult::getNext");
 
-			if (m_stk.back().idx < m_stk.back().typeattr->cVars)
+			if (cur.idx < cur.typeattr->cVars)
 			{
-				m_stk.back().typeinfo->GetVarDesc( m_stk.back().idx, &m_stk.back().vardesc);
-				element = Element( comauto::variablename( m_stk.back().typeinfo, m_stk.back().vardesc));
+				cur.typeinfo->GetVarDesc( cur.idx, &cur.vardesc);
+				element = Element( m_elembuf = comauto::variablename( cur.typeinfo, cur.vardesc));
 				type = OpenTag;
-				m_stk.back().state = VarValue;
+				cur.state = VarValue;
 				return true;
 			}
 			else
@@ -599,24 +592,24 @@ AGAIN:
 				goto AGAIN;
 			}
 			break;
-
+		}
 		case VarValue:
 		{
-			VARDESC* vardesc = m_stk.back().vardesc;
+			VARDESC* vardesc = cur.vardesc;
 			VARTYPE vt = vardesc->elemdescVar.tdesc.vt;
-			if (comauto::isAtomicType( vt) || vt == VT_BSTR)
+			if (comauto::isAtomicType( vt) || comauto::isStringType( vt))
 			{
-				element = comauto::getAtomicElement( vt, (char*)m_data.pvRecord + m_stk.back().ofs, m_elembuf);
+				element = comauto::getAtomicElement( vt, (char*)m_data.pvRecord + cur.ofs + vardesc->oInst, m_elembuf);
 				type = Value;
-				m_stk.back().state = VarClose;
+				cur.state = VarClose;
 				return true;
 			}
 			else if (vt == VT_USERDEFINED)
 			{
 				CComPtr<ITypeInfo> rectypeinfo;
-				WRAP( m_stk.back().typeinfo->GetRefTypeInfo( vardesc->elemdescVar.tdesc.hreftype, &rectypeinfo))
-				std::size_t recofs = m_stk.back().ofs + vardesc->oInst;
-				m_stk.back().state = VarClose;
+				WRAP( cur.typeinfo->GetRefTypeInfo( vardesc->elemdescVar.tdesc.hreftype, &rectypeinfo))
+				std::size_t recofs = cur.ofs + vardesc->oInst;
+				cur.state = VarClose;
 				m_stk.push_back( StackElem( VarOpen, rectypeinfo, recofs));
 				goto AGAIN;
 			}
@@ -624,10 +617,10 @@ AGAIN:
 		}
 		case VarClose:
 		{
-			m_stk.back().typeinfo->ReleaseVarDesc( m_stk.back().vardesc);
-			m_stk.back().vardesc = 0;
-			m_stk.back().idx++;
-			m_stk.back().state = VarOpen;
+			cur.typeinfo->ReleaseVarDesc( cur.vardesc);
+			cur.vardesc = 0;
+			cur.idx++;
+			cur.state = VarOpen;
 			element = Element();
 			type = CloseTag;
 			return true;

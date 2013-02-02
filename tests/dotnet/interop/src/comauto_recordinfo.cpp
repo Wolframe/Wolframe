@@ -96,7 +96,7 @@ HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitT
 						}
 						else
 						{
-							*((BSTR*)nfield) = NULL;
+							*((BSTR*)nfield) = ::SysAllocString( L"");
 						}
 						break;
 
@@ -125,16 +125,7 @@ HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitT
 					case CopyInit:
 						if (*((LPWSTR*)nfield) != NULL) comauto::freeMem( *((LPWSTR*)nfield));
 					case CopyConstructor:
-						if (*(LPWSTR*)ofield)
-						{
-							*((LPWSTR*)nfield) = (LPWSTR)comauto::allocMem( 2*wcslen(*(LPWSTR*)ofield) + sizeof(wchar_t));
-							if (*((LPWSTR*)nfield) == NULL) throw std::bad_alloc();
-							::wcscpy( *((LPWSTR*)nfield), *((LPWSTR*)ofield));
-						}
-						else
-						{
-							*((LPWSTR*)nfield) = NULL;
-						}
+						*((LPWSTR*)nfield) = comauto::createLPWSTR( *(LPWSTR*)ofield);
 						break;
 
 					case DefaultConstructorZero:
@@ -164,16 +155,7 @@ HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitT
 					case CopyInit:
 						if (*((LPSTR*)nfield) != NULL) comauto::freeMem( *((LPSTR*)nfield));
 					case CopyConstructor:
-						if (*(LPSTR*)ofield)
-						{
-							*((LPSTR*)nfield) = (LPSTR)comauto::allocMem( strlen(*(LPSTR*)ofield) + sizeof(char));
-							if (*((LPSTR*)nfield) == NULL) throw std::bad_alloc();
-							::strcpy( *((LPSTR*)nfield), *((LPSTR*)ofield));
-						}
-						else
-						{
-							*((LPSTR*)nfield) = NULL;
-						}
+						*((LPSTR*)nfield) = comauto::createLPSTR( *(LPSTR*)ofield);
 						break;
 
 					case DefaultConstructorZero:
@@ -299,8 +281,8 @@ HRESULT comauto::RecordInfo::GetField( PVOID pvData, LPCOLESTR szFieldName, VARI
 	RETURN_ON_ERROR( hr, GetFieldNoCopy( pvData, szFieldName, &refvarField, &field));
 
 	//copy element value referenced (resolve VT_BYREF | VT_XXX -> VT_XXX):
-	::VariantClear( pvarField);
-	hr = ::VariantCopyInd( pvarField, &refvarField);
+	comauto::wrapVariantClear( pvarField);
+	hr = comauto::wrapVariantCopyInd( pvarField, &refvarField);
 	return hr;
 }
 
@@ -334,7 +316,7 @@ HRESULT comauto::RecordInfo::GetFieldNoCopy( PVOID pvData, LPCOLESTR szFieldName
 		CComPtr<IRecordInfo> elemrecinfo( new comauto::RecordInfo( refelemtypeinfo));
 
 		//inititialize structure value reference to return:
-		RETURN_ON_ERROR( hr, ::VariantClear( pvarField));
+		RETURN_ON_ERROR( hr, comauto::wrapVariantClear( pvarField));
 		RETURN_ON_ERROR( hr, elemrecinfo.CopyTo( &pvarField->pRecInfo));
 		pvarField->pvRecord = field;
 		pvarField->vt = VT_RECORD;
@@ -342,7 +324,7 @@ HRESULT comauto::RecordInfo::GetFieldNoCopy( PVOID pvData, LPCOLESTR szFieldName
 	else
 	{
 		//... inititialize atomic value reference to return:
-		RETURN_ON_ERROR( hr, ::VariantClear( pvarField));
+		RETURN_ON_ERROR( hr, comauto::wrapVariantClear( pvarField));
 		pvarField->byref = field;
 		pvarField->vt = bindptr.lpvardesc->elemdescVar.tdesc.vt | VT_BYREF;
 	}
@@ -357,7 +339,7 @@ HRESULT comauto::RecordInfo::PutField( ULONG wFlags, PVOID pvData, LPCOLESTR szF
 	//copy parameter to put:
 	VARIANT varCopy;
 	::VariantInit( &varCopy);
-	RETURN_ON_ERROR( hr, ::VariantCopy( &varCopy, pvarField));
+	RETURN_ON_ERROR( hr, comauto::wrapVariantCopy( &varCopy, pvarField));
 
 	return PutFieldNoCopy( wFlags, pvData, szFieldName, &varCopy);
 }
@@ -382,7 +364,7 @@ HRESULT comauto::RecordInfo::PutFieldNoCopy( ULONG, PVOID pvData, LPCOLESTR szFi
 	if (pvarField->vt != bindptr.lpvardesc->elemdescVar.tdesc.vt)
 	{
 		//... element to set if of different type -> convert it first to the type of the member to set:
-		RETURN_ON_ERROR( hr, ::VariantChangeType( pvarField, pvarField, 0, bindptr.lpvardesc->elemdescVar.tdesc.vt));
+		RETURN_ON_ERROR( hr, comauto::wrapVariantChangeType( pvarField, pvarField, 0, bindptr.lpvardesc->elemdescVar.tdesc.vt));
 	}
 
 	char elemsize = sizeofAtomicType( bindptr.lpvardesc->elemdescVar.tdesc.vt);

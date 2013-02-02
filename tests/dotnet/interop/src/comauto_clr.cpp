@@ -49,55 +49,57 @@ comauto::CommonLanguageRuntime::CommonLanguageRuntime( const std::string& versio
 
 VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, LONG argc, const VARIANT* argv) const
 {
-    SAFEARRAY* methodArgs = NULL;
-	 IUnknownPtr spAppDomainThunk = NULL; 
-	_AppDomainPtr spDefaultAppDomain = NULL; 
-	_AssemblyPtr spAssembly = NULL; 
-	_TypePtr spType = NULL; 
-	try
+	struct Local
 	{
-		// The static method in the .NET class to invoke.
-		bstr_t bstrAssemblyName( assembly_.c_str()); 
-		bstr_t bstrClassName( class_.c_str()); 
-		bstr_t bstrMethodName( method_.c_str()); 
+		Local() {::memset( this, 0, sizeof( *this)); vtReturnVal.vt = VT_EMPTY;}
+		~Local()
+		{
+			comauto::wrapVariantClear( &vtReturnVal);
+			if (methodArgs) ::SafeArrayDestroy(methodArgs);
+			if (spType) spType->Release();
+			if (spAssembly) spAssembly->Release();
+			if (spDefaultAppDomain) spDefaultAppDomain->Release();
+		}
+		VARIANT vtReturnVal; 
+		SAFEARRAY* methodArgs;
+		 IUnknownPtr spAppDomainThunk; 
+		_AppDomainPtr spDefaultAppDomain; 
+		_AssemblyPtr spAssembly; 
+		_TypePtr spType;
+
+		VARIANT getReturnVal()
+		{
+			VARIANT rt = vtReturnVal;
+			vtReturnVal.vt = VT_EMPTY;
+			return rt;
+		}
+	};
+	Local local;
+
+	// The static method in the .NET class to invoke.
+	bstr_t bstrAssemblyName( assembly_.c_str()); 
+	bstr_t bstrClassName( class_.c_str()); 
+	bstr_t bstrMethodName( method_.c_str()); 
  
-		WRAP( m_runtimehost->GetDefaultDomain( &spAppDomainThunk))
-		WRAP( spAppDomainThunk->QueryInterface( IID_PPV_ARGS( &spDefaultAppDomain)))
-		WRAP( spDefaultAppDomain->Load_2( bstrAssemblyName, &spAssembly))
-		WRAP( spAssembly->GetType_2( bstrClassName, &spType))
+	WRAP( m_runtimehost->GetDefaultDomain( &local.spAppDomainThunk))
+	WRAP( local.spAppDomainThunk->QueryInterface( IID_PPV_ARGS( &local.spDefaultAppDomain)))
+	WRAP( local.spDefaultAppDomain->Load_2( bstrAssemblyName, &local.spAssembly))
+	WRAP( local.spAssembly->GetType_2( bstrClassName, &local.spType))
 
-		variant_t vtObject;
-		variant_t vtReturnVal; 
-		WRAP( spAssembly->CreateInstance(bstrClassName, &vtObject))
+	variant_t vtObject;
+	WRAP( local.spAssembly->CreateInstance( bstrClassName, &vtObject))
 
-		if (argc == 12 && (argv[0].vt == VT_USERDEFINED || argv[0].vt == VT_RECORD) && argv[0].pRecInfo)
-		{
-			methodArgs = SafeArrayCreateVectorEx( VT_RECORD, 0, 1, argv[0].pRecInfo);
-		}
-		else
-		{
-			methodArgs = ::SafeArrayCreateVector( VT_VARIANT, 0, argc);
-		}
-		if (!methodArgs) throw std::bad_alloc();
-		for (LONG aidx=0; aidx != argc; ++aidx)
-		{
-			VARIANT arg = argv[aidx];
-			if (arg.vt == VT_USERDEFINED) arg.vt = VT_RECORD;
-			WRAP( ::SafeArrayPutElement( methodArgs, &aidx, &arg))
-		}
-		BindingFlags bindingFlags = static_cast<BindingFlags>( BindingFlags_InvokeMethod | BindingFlags_Instance | BindingFlags_Public);
-		WRAP( spType->InvokeMember_3( bstrMethodName, bindingFlags, NULL, vtObject, methodArgs, &vtReturnVal))
+	local.methodArgs = ::SafeArrayCreateVector( VT_VARIANT, 0, argc);
 
-		return vtReturnVal;
-	}
-	catch (const std::runtime_error& e)
+	if (!local.methodArgs) throw std::bad_alloc();
+	for (LONG aidx=0; aidx != argc; ++aidx)
 	{
-		if (methodArgs) ::SafeArrayDestroy(methodArgs);
-		if (spType) spType->Release();
-		if (spAssembly) spAssembly->Release();
-		if (spDefaultAppDomain) spDefaultAppDomain->Release();
-		throw e;
+		WRAP( ::SafeArrayPutElement( local.methodArgs, &aidx, const_cast<VARIANT*>(&argv[aidx])))
 	}
+	BindingFlags bindingFlags = static_cast<BindingFlags>( BindingFlags_InvokeMethod | BindingFlags_Instance | BindingFlags_Public);
+	WRAP( local.spType->InvokeMember_3( bstrMethodName, bindingFlags, NULL, vtObject, local.methodArgs, &local.vtReturnVal))
+
+	return local.getReturnVal();
 }
 
 VARIANT comauto::CommonLanguageRuntime::call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, LONG argc, const VARIANT* argv) const

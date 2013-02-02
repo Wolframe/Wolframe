@@ -17,13 +17,17 @@ namespace comauto {
 void* allocMem( std::size_t size);
 void freeMem( void* ptr);
 
-std::string asciistr( BSTR str);
-std::string asciistr( const TCHAR* str);
 std::wstring utf16string( const std::string& utf8str);
 std::wstring utf16string( const char* utf8ptr, std::size_t utf8size);
 std::string utf8string( const std::wstring& utf16str);
 std::string utf8string( LPCSTR str);
 std::string utf8string( LPCWSTR str);
+char* createLPSTR( const std::string& str);
+char* createLPSTR( LPCSTR str);
+wchar_t* createLPWSTR( const std::wstring& str);
+wchar_t* createLPWSTR( LPCWSTR str);
+BSTR createBSTR( LPCSTR str);
+BSTR createBSTR( LPCWSTR str);
 std::string utf8string( const BSTR& str);
 std::wstring tostring( VARIANT* v);
 std::wstring tostring( const _com_error& err);
@@ -50,9 +54,14 @@ VARIANT createVariantType( const std::wstring& val);
 VARIANT createVariantType( const langbind::TypedInputFilter::Element& val);
 VARIANT createVariantType( const langbind::TypedInputFilter::Element& val, VARTYPE dsttype);
 void copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::TypedInputFilter::Element& val);
+HRESULT wrapVariantCopy( VARIANT* pvargDest, const VARIANT* pvargSrc);
+HRESULT wrapVariantCopyInd( VARIANT* pvargDest, const VARIANT* pvargSrc);
+HRESULT wrapVariantClear( VARIANT* pvarg);
+HRESULT wrapVariantChangeType( VARIANT* pvargDest, const VARIANT* pvargSrc, unsigned short wFlags, VARTYPE vt);
 
 unsigned char sizeofAtomicType( int vt);
 bool isAtomicType( int vt);
+bool isStringType( int vt);
 const void* arithmeticTypeAddress( const VARIANT* val);
 void* arithmeticTypeAddress( VARIANT* val);
 

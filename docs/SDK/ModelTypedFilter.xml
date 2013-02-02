@@ -1,0 +1,47 @@
+<sect1>
+<title>Representation of Structures in Wolframe</title>
+	<sect2>
+	<title>Typed Filters</title>
+	<para>
+		A structure in Wolframe is described as serialization of it's equivalent as tree (more precisely forest) with depht first left order traversal. The equivalent of a tree is a tree with leaf nodes representing the atomic values of the structure and non leaf nodes representing sub structures labeled by the non leaf node value. 
+		The serialization is a sequence of (element type, element value) tuples with 3 origin element types for describing such a structure. For having a model that is able to cover at least XML there is a 4th element 'Attribute'.
+	</para>
+	<para>
+		<table frame="all" width="60%">
+			<title>Serialization Element Types</title>
+			<tgroup cols="3">
+			<thead>
+				<row>
+					<entry>Element Type</entry>
+					<entry>Description</entry>
+				</row>
+			</thead>
+
+			<tbody>
+				<row>
+					<entry>Open</entry>
+					<entry>Opens a sub node (node label = element value)</entry>
+				</row>
+				<row>
+					<entry>Close</entry>
+					<entry>Closes the currently open sub node (no node value)</entry>
+				</row>
+				<row>
+					<entry>Value</entry>
+					<entry>Atomic value (leaf node, value = element value)</entry>
+				</row>
+				<row>
+					<entry>Attribute</entry>
+					<entry>For rewriting origin sequences of (Open,Value,Close) as  (Attribute,Value) under the precondition that they follow an 'Open' element or an element rewritten as (Attribute,Value) tuple.</entry>
+				</row>
+			</tbody>
+			</tgroup>
+		</table>
+	</para>
+	<para>Element values are typed (represented as union of atomic types: int,double,[char*,size_t], etc.. ).
+	</para>
+	</sect2>
+	<para></para>
+</sect1>
+<beginpage/>
+

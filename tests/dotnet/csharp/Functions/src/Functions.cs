@@ -42,6 +42,12 @@ public interface FunctionInterface
     int MapAddress( Address adr);
     [ComVisible(true)]
     int AddIdPair( IdPair p);
+    [ComVisible(true)]
+    IdPair GetIdPair( int a);
+    [ComVisible(true)]
+    Address GetAddress_p( [MarshalAs(UnmanagedType.LPStr)] string street, [MarshalAs(UnmanagedType.LPStr)] string country);
+    [ComVisible(true)]
+    User GetUser_p( int id, [MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string street, [MarshalAs(UnmanagedType.LPStr)] string country);
 }
 
 [ComVisible(true)]
@@ -73,6 +79,29 @@ public class Functions : FunctionInterface
     public int AddIdPair( IdPair p)
     {
         return p.a + p.b;
+    }
+    public IdPair GetIdPair( int a)
+    {
+        IdPair rt;
+        rt.a = a + 1;
+        rt.b = a - 1;
+        return rt;
+    }
+    public Address GetAddress_p( [MarshalAs(UnmanagedType.LPStr)] string street, [MarshalAs(UnmanagedType.LPStr)] string country)
+    {
+        Address rt;
+        rt.street = street;
+        rt.country = country;
+        return rt;
+    }
+    public User GetUser_p( int id, [MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string street, [MarshalAs(UnmanagedType.LPStr)] string country)
+    {
+        User rt;
+        rt.id = id;
+        rt.name = name;
+        rt.place.street = street;
+        rt.place.country = country;
+        return rt;
     }
 }
 

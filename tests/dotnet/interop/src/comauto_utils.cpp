@@ -1,8 +1,18 @@
 #include "comauto_utils.hpp"
 #include <iostream>
 #include <sstream>
+#pragma warning(disable:4996)
 
 using namespace _Wolframe;
+
+#ifndef V_LPSTR
+static const char*& V_LPSTR( const VARIANT* v){ return *(const char**)comauto::arithmeticTypeAddress(v); }
+static char*& V_LPSTR( VARIANT* v){ return *(char**)comauto::arithmeticTypeAddress(v); }
+#endif
+#ifndef V_LPWSTR
+static const wchar_t*& V_LPWSTR( const VARIANT* v){ return *(const wchar_t**)comauto::arithmeticTypeAddress(v); }
+static wchar_t*& V_LPWSTR( VARIANT* v){ return *(wchar_t**)comauto::arithmeticTypeAddress(v); }
+#endif
 
 void* comauto::allocMem( std::size_t size)
 {
@@ -28,17 +38,6 @@ bool comauto::isCOMInterfaceMethod( const std::string& name)
 	if (std::strcmp( name.c_str(), "GetType") == 0) return true;
 	if (std::strcmp( name.c_str(), "GetHashCode") == 0) return true;
 	return false;
-}
-std::string comauto::asciistr( BSTR str)
-{
-	std::wstring wsStr( str, ::SysStringLen( str));
-	return std::string( wsStr.begin(), wsStr.end());
-}
-
-std::string comauto::asciistr( const TCHAR* str)
-{
-	std::wstring wsStr( str);
-	return std::string( wsStr.begin(), wsStr.end());
 }
 
 std::wstring comauto::utf16string( const char* utf8ptr, std::size_t utf8size)
@@ -96,16 +95,62 @@ std::string comauto::utf8string( const BSTR& str)
    return rt;
 }
 
+char* comauto::createLPSTR( const std::string& str)
+{
+	LPSTR rt;
+	rt = (LPSTR)comauto::allocMem( str.size() + sizeof(char));
+	if (rt == NULL) throw std::bad_alloc();
+	::strcpy( rt, str.c_str());
+	return rt;
+}
+
+char* comauto::createLPSTR( LPCSTR str)
+{
+	if (!str) return NULL;
+	char* rt = (char*)comauto::allocMem( std::strlen(str) + sizeof(char));
+	if (rt == NULL) throw std::bad_alloc();
+	::strcpy( rt, str);
+	return rt;
+}
+
+wchar_t* comauto::createLPWSTR( const std::wstring& str)
+{
+	wchar_t* rt = (wchar_t*)comauto::allocMem( (str.size()+1) * sizeof(wchar_t));
+	if (rt == NULL) throw std::bad_alloc();
+	::wcscpy( rt, str.c_str());
+	return rt;
+}
+
+wchar_t* comauto::createLPWSTR( const wchar_t* str)
+{
+	if (!str) return NULL;
+	wchar_t* rt = (wchar_t*)comauto::allocMem( (std::wcslen( str)+1) * sizeof(wchar_t));
+	if (rt == NULL) throw std::bad_alloc();
+	::wcscpy( rt, str);
+	return rt;
+}
+
+BSTR comauto::createBSTR( LPCSTR str)
+{
+	std::wstring wstr = str?comauto::utf16string( str):L"";
+	return ::SysAllocStringLen( wstr.c_str(), wstr.size());
+}
+
+BSTR comauto::createBSTR( LPCWSTR str)
+{
+	return ::SysAllocString( str?str:L"");
+}
+
 std::wstring comauto::tostring( VARIANT* v)
 {
 	VARIANT vcp;
-	WRAP( ::VariantCopy( &vcp, v))
+	WRAP( comauto::wrapVariantCopy( &vcp, v))
 	if (v->vt != VT_BSTR)
 	{
-		WRAP( ::VariantChangeType( &vcp, &vcp, 0, VT_BSTR))
+		WRAP( comauto::wrapVariantChangeType( &vcp, &vcp, 0, VT_BSTR))
 	}
 	std::wstring rt( vcp.bstrVal, ::SysStringLen( vcp.bstrVal));
-	WRAP( ::VariantClear( &vcp))
+	WRAP( comauto::wrapVariantClear( &vcp))
 	return rt;
 }
 
@@ -479,10 +524,194 @@ VARIANT comauto::createVariantType( const langbind::TypedInputFilter::Element& v
 	}
 	if (rt.vt != dsttype)
 	{
-		WRAP( ::VariantChangeType( &rt, &rt, 0, dsttype))
+		WRAP( comauto::wrapVariantChangeType( &rt, &rt, 0, dsttype))
 	}
 	return rt;
 }
+
+HRESULT comauto::wrapVariantCopy( VARIANT* pvargDest, const VARIANT* pvargSrc)
+{
+	std::size_t size;
+
+	switch (pvargSrc->vt)
+	{
+		case VT_LPSTR:
+			comauto::wrapVariantClear( pvargDest);
+			size = std::strlen(V_LPSTR( pvargSrc)) + 1;
+		    V_LPSTR( pvargDest) = (LPSTR)comauto::allocMem( size);
+			if (V_LPSTR( pvargDest) == NULL) throw std::bad_alloc();
+			::memcpy( V_LPSTR( pvargDest), V_LPSTR( pvargSrc), size);
+			return S_OK;
+
+		case VT_LPWSTR:
+			comauto::wrapVariantClear( pvargDest);
+			size = std::wcslen( V_LPWSTR( pvargSrc))+sizeof(wchar_t);
+		    V_LPWSTR( pvargDest) = (LPWSTR)comauto::allocMem( size);
+			if (V_LPWSTR( pvargDest) == NULL) throw std::bad_alloc();
+			::memcpy( V_LPWSTR( pvargDest), V_LPWSTR( pvargSrc), size);
+			return S_OK;
+
+		default:
+			return ::VariantCopy( pvargDest, pvargSrc);
+	}
+}
+
+HRESULT comauto::wrapVariantClear( VARIANT* pvarg)
+{
+	switch (pvarg->vt)
+	{
+		case VT_LPSTR:
+		    if (V_LPSTR( pvarg) != NULL) comauto::freeMem( V_LPSTR( pvarg));
+			V_LPSTR( pvarg) = NULL;
+			pvarg->vt = VT_EMPTY;
+			return S_OK;
+
+		case VT_LPWSTR:
+		    if (V_LPWSTR( pvarg) != NULL) comauto::freeMem( V_LPWSTR( pvarg));
+			V_LPWSTR( pvarg) = NULL;
+			pvarg->vt = VT_EMPTY;
+			return S_OK;
+
+		default:
+			return ::VariantClear( pvarg);
+	}
+}
+
+HRESULT comauto::wrapVariantChangeType( VARIANT* pvargDest, const VARIANT* pvargSrc, unsigned short wFlags, VARTYPE vt)
+{
+	enum Conversion
+	{
+		C_COPY,
+		C_LPSTR_LPWSTR,
+		C_LPWSTR_LPSTR,
+		C_BSTR_LPWSTR,
+		C_BSTR_LPSTR,
+		C_LPSTR_BSTR,
+		C_LPWSTR_BSTR,
+		C_OTHER
+	};
+	Conversion conversion = C_OTHER;
+	switch (vt)
+	{
+		case VT_LPSTR:
+			switch (pvargSrc->vt)
+			{
+				case VT_LPSTR:		conversion = C_COPY; break;
+				case VT_LPWSTR:		conversion = C_LPSTR_LPWSTR; break;
+				default:			conversion = C_LPSTR_BSTR; break;
+			}
+		case VT_LPWSTR:
+			switch (pvargSrc->vt)
+			{
+				case VT_LPSTR:		conversion = C_LPWSTR_LPSTR; break;
+				case VT_LPWSTR:		conversion = C_COPY; break;
+				default:			conversion = C_LPWSTR_BSTR; break;
+			}
+		default:
+			switch (pvargSrc->vt)
+			{
+				case VT_LPSTR:		conversion = C_BSTR_LPSTR; break;
+				case VT_LPWSTR:		conversion = C_BSTR_LPWSTR; break;
+				default:			conversion = C_OTHER; break;
+			}
+	}
+	switch (conversion)
+	{
+		case C_COPY:
+			if (pvargDest != pvargSrc)
+			{
+				comauto::wrapVariantClear( pvargDest);
+				comauto::wrapVariantCopy( pvargDest, pvargSrc);
+			}
+			break;
+		case C_LPSTR_LPWSTR:
+		{
+			LPSTR dest = comauto::createLPSTR( comauto::utf8string( V_LPWSTR( pvargSrc)));
+			comauto::wrapVariantClear( pvargDest);
+			V_LPSTR( pvargDest) = dest;
+			pvargDest->vt = VT_LPSTR;
+			break;
+		}
+		case C_LPWSTR_LPSTR:
+		{
+			LPWSTR dest = comauto::createLPWSTR( comauto::utf16string( V_LPSTR( pvargSrc)));
+			comauto::wrapVariantClear( pvargDest);
+			V_LPWSTR( pvargDest) = dest;
+			pvargDest->vt = VT_LPWSTR;
+			break;
+		}
+		case C_BSTR_LPWSTR:
+		{
+			BSTR dest = comauto::createBSTR( V_LPWSTR( pvargSrc));
+			comauto::wrapVariantClear( pvargDest);
+			V_BSTR( pvargDest) = dest;
+			pvargDest->vt = VT_BSTR;
+			break;
+		}
+		case C_BSTR_LPSTR:
+		{
+			BSTR dest = comauto::createBSTR( V_LPSTR( pvargSrc));
+			comauto::wrapVariantClear( pvargDest);
+			V_BSTR( pvargDest) = dest;
+			pvargDest->vt = VT_BSTR;
+			break;
+		}
+		case C_LPSTR_BSTR:
+		{
+			LPSTR dest = comauto::createLPSTR( comauto::utf8string( V_BSTR( pvargSrc)));
+			comauto::wrapVariantClear( pvargDest);
+			V_LPSTR( pvargDest) = dest;
+			pvargDest->vt = VT_LPSTR;
+			break;
+		}
+		case C_LPWSTR_BSTR:
+		{
+			if (pvargDest != pvargSrc)
+			{
+				comauto::wrapVariantClear( pvargDest);
+				pvargDest->vt = VT_LPWSTR;
+				V_LPWSTR(pvargDest) = comauto::createLPWSTR( V_LPWSTR( pvargSrc));
+			}
+			else
+			{
+				pvargDest->vt = VT_LPWSTR;
+				V_LPWSTR(pvargDest) = (LPWSTR)V_BSTR(pvargDest);
+			}
+			break;
+		}
+		case C_OTHER:
+			break;
+	}
+	if (vt != pvargDest->vt)
+	{
+		return ::VariantChangeType( pvargDest, pvargDest, wFlags, vt);
+	}
+	return S_OK;
+}
+
+HRESULT comauto::wrapVariantCopyInd( VARIANT* pvargDest, const VARIANT* pvargSrc)
+{
+	if ((pvargSrc->vt & VT_BYREF) == VT_BYREF)
+	{
+		VARTYPE vt = pvargSrc->vt - VT_BYREF;
+		VARIANT vargSrc;
+		vargSrc.vt = VT_EMPTY;
+
+		switch (vt)
+		{
+			case VT_LPSTR:
+				V_LPSTR( &vargSrc) = (LPSTR)pvargSrc->byref;
+				return comauto::wrapVariantCopy( pvargDest, &vargSrc);
+			case VT_LPWSTR:
+				V_LPWSTR( &vargSrc) = (LPWSTR)pvargSrc->byref;
+				return comauto::wrapVariantCopy( pvargDest, &vargSrc);
+			default:
+				return ::VariantCopyInd( pvargDest, pvargSrc);
+		}
+	}
+	return ::VariantCopyInd( pvargDest, pvargSrc);
+}
+
 
 void comauto::copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::TypedInputFilter::Element& val)
 {
@@ -499,7 +728,7 @@ void comauto::copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::
 		VARIANT dstcp = comauto::createVariantType( val, dsttype);
 /*[-]*/std::cout << "DEBUG init (copyVariantType) " << comauto::typestr(dsttype) <<  " at 0x0" << std::hex << (uintptr_t)dstfield << " with '" << (dstcp.pcVal?(LPSTR)dstcp.pcVal:"[NULL]") << "'" << std::dec << std::endl;
 		if (*((LPSTR*)dstfield) != NULL) comauto::freeMem( *((LPSTR*)dstfield));
-		*((LPSTR*)dstfield) = (LPSTR)dstcp.pcVal;
+		*((LPSTR*)dstfield) = V_LPSTR(&dstcp);
 		dstcp.vt = VT_EMPTY;
 	}
 	else if (dsttype == VT_LPWSTR)
@@ -507,7 +736,7 @@ void comauto::copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::
 /*[-]*/std::cout << "DEBUG init (copyVariantType) " << comauto::typestr(dsttype) << " at 0x0" << std::hex << (uintptr_t)dstfield << std::dec << std::endl;
 		VARIANT dstcp = comauto::createVariantType( val, dsttype);
 		if (*((LPWSTR*)dstfield) != NULL) comauto::freeMem( *((LPWSTR*)dstfield));
-		*((LPWSTR*)dstfield) = (LPWSTR)dstcp.pcVal;
+		*((LPWSTR*)dstfield) = V_LPWSTR(&dstcp);
 		dstcp.vt = VT_EMPTY;
 	}
 	else if (comauto::isAtomicType( dsttype))
@@ -562,6 +791,11 @@ unsigned char comauto::sizeofAtomicType( int vt)
 bool comauto::isAtomicType( int vt)
 {
 	return comauto::sizeofAtomicType(vt)!=0;
+}
+
+bool comauto::isStringType( int vt)
+{
+	return vt == VT_BSTR || vt == VT_LPSTR || vt == VT_LPWSTR;
 }
 
 void* comauto::arithmeticTypeAddress( VARIANT* val)
@@ -623,14 +857,14 @@ langbind::TypedInputFilter::Element comauto::getAtomicElement( VARTYPE vt, const
 			{
 				elemorig.byref = const_cast<void*>(ref);
 				elemorig.vt = vt | VT_BYREF;
-				WRAP( ::VariantCopyInd( &elemcopy, &elemorig))
-				WRAP( ::VariantChangeType( &elemcopy, &elemcopy, 0, VT_BSTR))
+				WRAP( comauto::wrapVariantCopyInd( &elemcopy, &elemorig))
+				WRAP( comauto::wrapVariantChangeType( &elemcopy, &elemcopy, 0, VT_BSTR))
 				element = Element( elembuf = comauto::utf8string( elemcopy.bstrVal));
 			}
 			catch (const std::runtime_error& e)
 			{
-				::VariantClear( &elemorig);
-				::VariantClear( &elemcopy);
+				comauto::wrapVariantClear( &elemorig);
+				comauto::wrapVariantClear( &elemcopy);
 				throw e;
 			}
 		}
