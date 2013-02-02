@@ -24,5 +24,6 @@
         <file>images/world-setup.png</file>
         <file>images/development.png</file>
         <file>images/interface.png</file>
+        <file>images/debug.png</file>
     </qresource>
 </RCC>

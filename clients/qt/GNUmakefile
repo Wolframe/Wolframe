@@ -42,6 +42,7 @@ INCLUDE_LIBS += \
 
 MOC_FLAGS += \
 	-DWITH_SSL
+	
 endif
 
 CPP_OBJS = \
@@ -76,7 +77,11 @@ CPP_OBJS = \
 	settings.o \
 	loginDialog.o \
 	moc_loginDialog.o \
-	LoadMode.o
+	LoadMode.o \
+	DebugTerminal.o \
+	moc_DebugTerminal.o \
+	HistoryLineEdit.o \
+	moc_HistoryLineEdit.o
 		
 CPP_BINS = \
 	qtclient$(EXE)
@@ -127,14 +132,25 @@ moc_serverDefinitionDialog.cpp: serverDefinitionDialog.hpp
 moc_loginDialog.cpp: loginDialog.hpp
 	$(QT_MOC) $(MOC_FLAGS) loginDialog.hpp -o moc_loginDialog.cpp
 
+moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
+	$(QT_MOC) $(MOC_FLAGS) HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
+
+moc_DebugTerminal.cpp: DebugTerminal.hpp
+	$(QT_MOC) $(MOC_FLAGS) DebugTerminal.hpp -o moc_DebugTerminal.cpp
+
 ui_MainWindow.h: MainWindow.ui
 	$(QT_UIC) -o ui_MainWindow.h MainWindow.ui
 
 ui_manageServersDialog.h: manageServersDialog.ui
 	$(QT_UIC) -o ui_manageServersDialog.h manageServersDialog.ui
 
+ifeq ($(WITH_SSL),1)
 ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 	$(QT_UIC) -o ui_serverDefinitionDialog.h serverDefinitionDialog.ui
+else
+ui_serverDefinitionDialogNoSSL.h: serverDefinitionDialogNoSSL.ui
+	$(QT_UIC) -o ui_serverDefinitionDialogNoSSL.h serverDefinitionDialogNoSSL.ui
+endif
 
 ui_loginDialog.h: loginDialog.ui
 	$(QT_UIC) -o ui_loginDialog.h loginDialog.ui
@@ -151,16 +167,27 @@ ui_PreferencesDialogInterface.h: PreferencesDialogInterface.ui
 UIS = \
 	ui_MainWindow.h \
 	ui_manageServersDialog.h \
-	ui_serverDefinitionDialog.h \
 	ui_loginDialog.h \
 	ui_PreferencesDialog.h \
 	ui_PreferencesDialogDeveloper.h \
 	ui_PreferencesDialogInterface.h
 
+ifeq ($(WITH_SSL),1)
+UIS += \
+	ui_serverDefinitionDialog.h
+else
+UIS += \
+	ui_serverDefinitionDialogNoSSL.h
+endif
+	
 qtclient.d: ui_MainWindow.h
 MainWindow.d: ui_MainWindow.h
 manageServersDialog.d: ui_manageServersDialog.h
+ifeq ($(WITH_SSL),1)
 serverDefinitionDialog.d: ui_serverDefinitionDialog.h
+else
+serverDefinitionDialog.d: ui_serverDefinitionDialogNoSSL.h
+endif
 loginDialog.d: ui_loginDialog.h
 moc_PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h
 PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_PreferencesDialogInterface.h

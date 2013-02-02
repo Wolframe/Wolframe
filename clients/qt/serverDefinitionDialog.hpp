@@ -16,7 +16,7 @@ class ServerDefinitionDialog : public QDialog
 	Q_OBJECT
 
 public:
-	explicit ServerDefinitionDialog( ConnectionParameters& params, QWidget *parent = 0 );
+	explicit ServerDefinitionDialog( ConnectionParameters& params, QWidget *_parent = 0 );
 	~ServerDefinitionDialog();
 
 private slots:

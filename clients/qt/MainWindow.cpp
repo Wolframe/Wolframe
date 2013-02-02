@@ -30,7 +30,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_loginDialog( 0 ), m_settings( ),
 	m_languages( ), m_language( ), m_mdiArea( 0 ),
 	m_subWinGroup( 0 ),
-	m_terminating( false )
+	m_terminating( false ), m_debugTerminal( 0 ), debugTerminalAction( 0 )
 {
 // setup designer UI
 	m_ui.setupUi( this );
@@ -48,6 +48,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 }
 
 static bool _debug = false;
+static DebugTerminal *_debugTerminal = 0;
 
 void MainWindow::readSettings( )
 {
@@ -73,6 +74,9 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 	switch( type ) {
 		case QtDebugMsg:
 			if( _debug ) {
+				if( _debugTerminal ) {
+					_debugTerminal->sendComment( msg );
+				}
 				fprintf( stderr, "%s\n", msg );
 			}
 			break;
@@ -108,6 +112,10 @@ MainWindow::~MainWindow( )
 	if( m_wolframeClient ) {
 		delete m_wolframeClient;
 		m_wolframeClient = 0;
+	}
+	if( m_debugTerminal ) {
+		delete m_debugTerminal;
+		m_debugTerminal = 0;
 	}
 	if( m_formLoader ) {
 		delete m_formLoader;
@@ -266,6 +274,15 @@ void MainWindow::initialize( )
 		}
 	}
 
+// in local file UI and data mode we can load the form right away
+	if( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) {
+		if( settings.mdi ) {
+			CreateMdiSubWindow( "init" );
+		} else {
+			CreateFormWidget( "init" );
+		}
+	}
+
 // add the menu entries for the developer mode
 	if( settings.developEnabled ) {
 		addDeveloperMenu( );
@@ -292,6 +309,20 @@ void MainWindow::initialize( )
 // restore main window position and size
 	move( settings.mainWindowPos );
 	resize( settings.mainWindowSize );	
+}
+
+void MainWindow::CreateFormWidget( const QString &name )
+{
+	m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
+
+	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+		this, SLOT( formLoaded( QString ) ) );
+	connect( m_formWidget, SIGNAL( error( QString ) ),
+		this, SLOT( formError( QString ) ) );
+		
+	setCentralWidget( m_formWidget );
+		
+	loadForm( name );
 }
 
 void MainWindow::activateAction( const QString name, bool enabled )
@@ -395,7 +426,14 @@ void MainWindow::disconnected( )
 {
 	m_wolframeClient->deleteLater( );
 	m_wolframeClient = 0;
-		
+
+	if( m_debugTerminal ) {
+		debugTerminalAction->setChecked( false );
+		m_debugTerminal->deleteLater( );
+		_debugTerminal = 0;
+		m_debugTerminal = 0;
+	}
+	
 	if( settings.uiLoadMode == Network ) {
 		delete m_uiLoader;
 		m_uiLoader = 0;
@@ -443,16 +481,7 @@ void MainWindow::authOk( )
 	if( settings.mdi ) {
 		CreateMdiSubWindow( "init" );
 	} else {
-		m_formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
-
-		connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
-			this, SLOT( formLoaded( QString ) ) );
-		connect( m_formWidget, SIGNAL( error( QString ) ),
-			this, SLOT( formError( QString ) ) );
-		
-		setCentralWidget( m_formWidget );
-		
-		loadForm( "init" );
+		CreateFormWidget( "init" );
 	}	
 
 // update status of menus and toolbars
@@ -726,7 +755,7 @@ void MainWindow::on_actionReloadWindow_triggered( )
 
 // -- MDI mode
 
-void MainWindow::CreateMdiSubWindow( const QString form )
+void MainWindow::CreateMdiSubWindow( const QString &form )
 {
 	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
 
@@ -808,8 +837,9 @@ int MainWindow::nofSubWindows( ) const
 void MainWindow::updateMdiMenusAndToolbars( )
 {
 // present new form menu entry if logged in
-	activateAction( "actionOpenFormNewWindow", m_wolframeClient );
-	activateAction( "actionOpenForm", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
+	activateAction( "actionOpenFormNewWindow",
+		( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) ||
+		m_wolframeClient );
 
 // enable/disable menu/toolbar items depending on the number of subwindows
 	activateAction( "actionClose", nofSubWindows( ) > 0 );
@@ -886,7 +916,9 @@ void MainWindow::updateMenusAndToolbars( )
 	}
 	
 // logged in or logged out?
-	activateAction( "actionOpenForm", m_wolframeClient && m_wolframeClient->isConnected( ) );
+	activateAction( "actionOpenForm", 
+		( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) ||
+		( m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) ) );
 	if( settings.uiLoadMode == Network || settings.dataLoadMode == Network ) {
 		activateAction( "actionLogin", !m_wolframeClient || !m_wolframeClient->isConnected( ) );
 		activateAction( "actionLogout", m_wolframeClient && m_wolframeClient->isConnected( ) );
@@ -905,6 +937,9 @@ void MainWindow::updateMenusAndToolbars( )
 	activateAction( "actionPaste", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
 	activateAction( "actionDelete", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
 	activateAction( "actionSelectAll", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );	
+
+// developer menu: debug terminal
+	debugTerminalAction->setEnabled( m_debugTerminal );
 }
 
 // -- logins/logouts/connections
@@ -932,6 +967,15 @@ void MainWindow::on_actionLogin_triggered( )
 // create a Wolframe protocol client
 		m_selectedConnection = loginDlg->selectedConnection( );
 		m_wolframeClient = new WolframeClient( m_selectedConnection );
+
+// create a debug terminal and attach it to the protocol client
+	if( settings.debug ) {
+		m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
+		_debugTerminal = m_debugTerminal;
+		connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
+			m_debugTerminal, SLOT( sendLine( QString ) ) );
+		qDebug( ) << "Debug window initialized";
+	}
 
 // catch signals from the network layer
 		connect( m_wolframeClient, SIGNAL( error( QString ) ),
@@ -976,7 +1020,30 @@ void MainWindow::on_actionManageServers_triggered( )
 
 // -- developer stuff
 
+void MainWindow::showDebugTerminal( bool checked )
+{
+	if( m_debugTerminal ) {
+		if( checked ) {
+			m_debugTerminal->bringToFront( );
+		} else {
+			m_debugTerminal->hide( );
+		}
+	}
+}
+
 void MainWindow::addDeveloperMenu( )
 {
-	/* QMenu *developerMenu = */ menuBar( )->addMenu( tr( "&Developer" ) );
+	QMenu *developerMenu = menuBar( )->addMenu( tr( "&Developer" ) );
+
+	debugTerminalAction = new QAction( QIcon( ":/images/debug.png" ), tr( "&Debugging Terminal..." ), this );
+	debugTerminalAction->setStatusTip( tr( "Open debug terminal showing the Wolframe protocol" ));
+	debugTerminalAction->setCheckable( true );
+	debugTerminalAction->setShortcut( QKeySequence( "Ctrl+Alt+D" ) );
+	developerMenu->addAction( debugTerminalAction );
+	
+	QToolBar *developerToolBar = addToolBar( tr( "Developer" ));
+	developerToolBar->addAction( debugTerminalAction );
+
+	connect( debugTerminalAction, SIGNAL( toggled( bool ) ), this,
+		SLOT( showDebugTerminal( bool ) ) );
 }

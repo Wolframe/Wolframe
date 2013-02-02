@@ -89,7 +89,11 @@ OBJS = \
 	settings.obj \
 	loginDialog.obj \
 	moc_loginDialog.obj \
-	LoadMode.obj
+	LoadMode.obj \
+	DebugTerminal.obj \
+	moc_DebugTerminal.obj \
+	HistoryLineEdit.obj \
+	moc_HistoryLineEdit.obj
 	
 CPP_BINS = \
 	qtclient.exe
@@ -97,11 +101,18 @@ CPP_BINS = \
 UIS = \
 	ui_MainWindow.h \
 	ui_manageServersDialog.h \
-	ui_serverDefinitionDialog.h \
 	ui_loginDialog.h \
 	ui_PreferencesDialog.h \
 	ui_PreferencesDialogDeveloper.h \
 	ui_PreferencesDialogInterface.h
+
+!IFDEF WITH_SSL
+UIS = $(UIS) \
+	ui_serverDefinitionDialog.h
+!ELSE
+UIS = $(UIS) \
+	ui_serverDefinitionDialogNoSSL.h
+!ENDIF
 
 all: $(UIS) $(OBJS) $(CPP_BINS)
 
@@ -204,14 +215,25 @@ moc_serverDefinitionDialog.cpp: serverDefinitionDialog.hpp
 moc_loginDialog.cpp: loginDialog.hpp
 	$(QT_DIR)\bin\moc $(MOC_FLAGS) loginDialog.hpp -o moc_loginDialog.cpp
 
+moc_HistoryLineEdit.cpp: HistoryLineEdit.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. HistoryLineEdit.hpp -o moc_HistoryLineEdit.cpp
+
+moc_DebugTerminal.cpp: DebugTerminal.hpp
+	$(QT_DIR)\bin\moc $(MOC_FLAGS) -I. DebugTerminal.hpp -o moc_DebugTerminal.cpp
+
 ui_MainWindow.h: MainWindow.ui
 	$(QT_DIR)\bin\uic -o ui_MainWindow.h MainWindow.ui
 
 ui_manageServersDialog.h: manageServersDialog.ui
 	$(QT_DIR)\bin\uic -o ui_manageServersDialog.h manageServersDialog.ui
 
+!IFDEF WITH_SSL
 ui_serverDefinitionDialog.h: serverDefinitionDialog.ui
 	$(QT_DIR)\bin\uic -o ui_serverDefinitionDialog.h serverDefinitionDialog.ui
+!ELSE
+ui_serverDefinitionDialogNoSSL.h: serverDefinitionDialogNoSSL.ui
+	$(QT_DIR)\bin\uic -o ui_serverDefinitionDialogNoSSL.h serverDefinitionDialogNoSSL.ui
+!ENDIF
 
 ui_loginDialog.h: loginDialog.ui
 	$(QT_DIR)\bin\uic -o ui_loginDialog.h loginDialog.ui

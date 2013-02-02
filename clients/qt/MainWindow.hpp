@@ -25,6 +25,7 @@
 #include "ui_MainWindow.h"
 #include "settings.hpp"
 #include "connection.hpp"
+#include "DebugTerminal.hpp"
 
 class MainWindow : public QMainWindow
 {
@@ -59,6 +60,8 @@ class MainWindow : public QMainWindow
 		bool m_terminating;
 		QLabel *m_statusBarConn;
 		QLabel *m_statusBarSSL;
+		DebugTerminal *m_debugTerminal;
+		QAction *debugTerminalAction;	
 		
 	public slots:
 		void readSettings( );
@@ -74,15 +77,16 @@ class MainWindow : public QMainWindow
 	
 	private:
 		void switchTranslator( QTranslator &translator, const QString &filename, const QString &i18n );
-		void CreateMdiSubWindow( const QString form );
+		void CreateFormWidget( const QString &name );
+		void CreateMdiSubWindow( const QString &form );
 		int nofSubWindows( ) const;
 		void activateAction( const QString name, bool enabled );
 		QString composeWindowListTitle( const int idx, const QString title );
 		QKeySequence::StandardKey defaultKeySequenceFromString( const QString s );
 		void updateActionShortcuts( );
-		void addDeveloperMenu( );
 		void addStatusBarIndicators( );
 		void storeSettings( );
+		void addDeveloperMenu( );
 
 	private slots:
 // slots for command line parsing
@@ -113,6 +117,9 @@ class MainWindow : public QMainWindow
 		void subWindowChanged( QMdiSubWindow *w );
 		void updateMdiMenusAndToolbars( );
 		void updateWindowMenu( );
+
+// developer slots
+		void showDebugTerminal( bool checked );
 
 // generic updating of status in menus and toolbars
 		void updateMenusAndToolbars( );
