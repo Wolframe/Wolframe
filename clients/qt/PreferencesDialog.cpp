@@ -107,6 +107,9 @@ void PreferencesDialog::loadSettings( )
 		}
 	}
 	
+	m_interface->rememberLogin->setChecked( m_settings.saveUsername );
+	m_interface->saveRestoreState->setChecked( m_settings.saveRestoreState );
+	
 	// developer
 	
 	m_developer->uiLoadModeLocalFile->setChecked( false );
@@ -170,6 +173,10 @@ void PreferencesDialog::apply( )
 		}
 	}
 	
+	m_settings.saveUsername = m_interface->rememberLogin->isChecked( );
+	m_settings.saveRestoreState = m_interface->saveRestoreState->isChecked( );
+	m_interface->saveRestoreState->setChecked( false );
+	
 	// developer
 	
 	if( m_developer->uiLoadModeLocalFile->isChecked( ) ) {
@@ -204,6 +211,9 @@ void PreferencesDialog::restoreDefaults( )
 	if( idx != -1 ) {
 		m_interface->locales->setCurrentIndex( idx );
 	}
+
+	m_interface->rememberLogin->setChecked( false );
+	m_interface->saveRestoreState->setChecked( false );
 
 	// developer
 
