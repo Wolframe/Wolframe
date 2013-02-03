@@ -939,7 +939,8 @@ void MainWindow::updateMenusAndToolbars( )
 	activateAction( "actionSelectAll", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );	
 
 // developer menu: debug terminal
-	debugTerminalAction->setEnabled( m_debugTerminal );
+	if( debugTerminalAction )
+		debugTerminalAction->setEnabled( m_debugTerminal );
 }
 
 // -- logins/logouts/connections
