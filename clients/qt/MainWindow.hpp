@@ -61,7 +61,7 @@ class MainWindow : public QMainWindow
 		QLabel *m_statusBarConn;
 		QLabel *m_statusBarSSL;
 		DebugTerminal *m_debugTerminal;
-		QAction *debugTerminalAction;	
+		QAction *m_debugTerminalAction;	
 		
 	public slots:
 		void readSettings( );
@@ -120,6 +120,7 @@ class MainWindow : public QMainWindow
 
 // developer slots
 		void showDebugTerminal( bool checked );
+		void removeDebugToggle( );
 
 // generic updating of status in menus and toolbars
 		void updateMenusAndToolbars( );
