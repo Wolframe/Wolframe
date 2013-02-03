@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>505</width>
-    <height>281</height>
+    <width>465</width>
+    <height>317</height>
    </rect>
   </property>
   <layout class="QGridLayout">
@@ -35,14 +35,10 @@
      <property name="title">
       <string>Interface Preferences</string>
      </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="mdi">
-        <property name="text">
-         <string>MDI interface</string>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="0">
        <widget class="QGroupBox" name="groupBox">
         <property name="title">
@@ -59,7 +55,7 @@
          <item row="1" column="0">
           <widget class="QRadioButton" name="manualLocale">
            <property name="text">
-            <string>Manually set locale to:</string>
+            <string>&amp;Manually set locale to:</string>
            </property>
           </widget>
          </item>
@@ -79,6 +75,27 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="mdi">
+        <property name="text">
+         <string>&amp;MDI interface</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="rememberLogin">
+        <property name="text">
+         <string>&amp;Remeber login</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="saveRestoreState">
+        <property name="text">
+         <string>S&amp;ave and restore state of windows</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -89,6 +106,8 @@
   <tabstop>systemLocale</tabstop>
   <tabstop>manualLocale</tabstop>
   <tabstop>locales</tabstop>
+  <tabstop>rememberLogin</tabstop>
+  <tabstop>saveRestoreState</tabstop>
  </tabstops>
  <resources/>
  <connections/>

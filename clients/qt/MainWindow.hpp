@@ -78,7 +78,7 @@ class MainWindow : public QMainWindow
 	private:
 		void switchTranslator( QTranslator &translator, const QString &filename, const QString &i18n );
 		void CreateFormWidget( const QString &name );
-		void CreateMdiSubWindow( const QString &form );
+		QMdiSubWindow *CreateMdiSubWindow( const QString &form );
 		int nofSubWindows( ) const;
 		void activateAction( const QString name, bool enabled );
 		QString composeWindowListTitle( const int idx, const QString title );

@@ -278,7 +278,7 @@ void MainWindow::initialize( )
 // in local file UI and data mode we can load the form right away
 	if( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) {
 		if( settings.mdi ) {
-			CreateMdiSubWindow( "init" );
+			(void)CreateMdiSubWindow( "init" );
 		} else {
 			CreateFormWidget( "init" );
 		}
@@ -310,6 +310,14 @@ void MainWindow::initialize( )
 // restore main window position and size
 	move( settings.mainWindowPos );
 	resize( settings.mainWindowSize );	
+
+// restore subwindow position states
+	if( settings.mdi ) {
+		// TODO
+	} else {
+		// ignore position and size as they are fixed anyway
+	}
+
 }
 
 void MainWindow::CreateFormWidget( const QString &name )
@@ -480,9 +488,23 @@ void MainWindow::authOk( )
 // load initial form, TODO: load forms and position of windows from settings,
 // of none there, load init form in a MDI subwindow or directly
 	if( settings.mdi ) {
-		CreateMdiSubWindow( "init" );
+		if( settings.saveRestoreState ) {
+			for( int i = 0; i < settings.states.size( ); i++ ) {
+				WinState state = settings.states[i];
+				QMdiSubWindow *w = CreateMdiSubWindow( state.form );
+				w->move( state.position );
+				w->resize( state.size );
+			}
+		} else {
+			(void)CreateMdiSubWindow( "init" );
+		}
 	} else {
-		CreateFormWidget( "init" );
+		if( settings.saveRestoreState && settings.states.size( ) > 0 ) {
+			WinState state = settings.states[0];
+			CreateFormWidget( state.form );
+		} else {
+			CreateFormWidget( "init" );
+		}
 	}	
 
 // update status of menus and toolbars
@@ -692,8 +714,33 @@ void MainWindow::on_actionExit_triggered( )
 
 void MainWindow::storeSettings( )
 {
+// save our own size and position
 	settings.mainWindowPos = pos( );
 	settings.mainWindowSize = size( );
+
+// save position/size and state of subwindows (if wished)	
+	if( settings.saveRestoreState ) {
+		settings.states.clear( );
+		if( settings.mdi ) {
+			foreach( QMdiSubWindow *w, m_mdiArea->subWindowList( ) ) {
+				WinState state;
+				FormWidget *f = qobject_cast<FormWidget *>( w->widget( ) );
+				state.form = f->form( );
+				state.position = w->pos( );
+				state.size = w->size( );
+				settings.states.append( state );
+			}
+		} else {
+			settings.states.clear( );
+			if( m_formWidget ) {
+				WinState state;
+				state.form = m_formWidget->form( );
+				state.position = m_formWidget->pos( );
+				state.size = m_formWidget->size( );
+				settings.states.append( state );
+			}
+		}
+	}
 	
 	if( m_settings.isEmpty( ) ) {
 		settings.write( ORGANIZATION_NAME, APPLICATION_NAME );
@@ -756,7 +803,7 @@ void MainWindow::on_actionReloadWindow_triggered( )
 
 // -- MDI mode
 
-void MainWindow::CreateMdiSubWindow( const QString &form )
+QMdiSubWindow *MainWindow::CreateMdiSubWindow( const QString &form )
 {
 	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
 
@@ -774,6 +821,8 @@ void MainWindow::CreateMdiSubWindow( const QString &form )
 	loadForm( form );
 
 	mdiSubWindow->resize( mdiSubWindow->sizeHint( ) );
+	
+	return mdiSubWindow;
 }
 
 void MainWindow::subWindowSelected( QAction *action )
@@ -795,7 +844,7 @@ void MainWindow::on_actionOpenFormNewWindow_triggered( )
 {
 	FormChooseDialog d( m_forms, this );
 	if( d.exec( ) == QDialog::Accepted ) {
-		CreateMdiSubWindow( d.form( ) );
+		(void)CreateMdiSubWindow( d.form( ) );
 	}
 
 	updateMenusAndToolbars( );
@@ -1005,6 +1054,8 @@ void MainWindow::on_actionLogin_triggered( )
 
 void MainWindow::on_actionLogout_triggered( )
 {
+	storeSettings( );
+
 	if( settings.mdi ) {
 		m_mdiArea->closeAllSubWindows( );
 	} else {

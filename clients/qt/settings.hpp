@@ -10,6 +10,13 @@
 #include "connection.hpp"
 #include "LoadMode.hpp"
 
+struct WinState
+{
+	QString form;				///< last visible form
+	QPoint position;			///< last position (for MDI)
+	QSize size;				///< last size (for MDI)
+};
+
 struct ApplicationSettings
 {
 	QPoint		mainWindowPos;		///< main window position
@@ -23,15 +30,18 @@ struct ApplicationSettings
 
 	QVector< ConnectionParameters >	connectionParams; ///< defined connections parameters
 
-	bool mdi;
-	bool debug;
-	QString locale;
-	LoadMode uiLoadMode;
-	LoadMode dataLoadMode;
-	QString uiFormsDir;
-	QString uiFormTranslationsDir;
-	QString uiFormResourcesDir;
-	QString dataLoaderDir;
+	bool mdi;				///< MDI mode with many forms
+	bool debug;				///< debug output
+	QString locale;				///< startup locale
+	LoadMode uiLoadMode;			///< developer UI file load mode or network mode
+	LoadMode dataLoadMode;			///< data forms to network or local stubs in XML files
+	QString uiFormsDir;			///< UI forms
+	QString uiFormTranslationsDir;		///< QM files (translations)
+	QString uiFormResourcesDir;		///< resources (e.g. pictures)
+	QString dataLoaderDir;			///< XML demo data simulating data forms
+
+	bool saveRestoreState;
+	QVector<WinState> states;		///< states of subwindow(s)
 
 public:
 	ApplicationSettings();
