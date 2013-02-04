@@ -90,15 +90,15 @@ public:
 	LocalEndpoint( const std::string& Host, unsigned short Port )
 		: ConnectionEndpoint( Host, Port )
 	{
-		m_connectionTime = time( NULL );
+		m_creationTime = time( NULL );
 	}
 
 	virtual ConnectionType type() const = 0;
 	EndPoint endpoint() const			{ return LOCAL_ENDPOINT; }
-	time_t connectionTime() const			{ return m_connectionTime; }
+	time_t creationTime() const			{ return m_creationTime; }
 
 private:
-	time_t	m_connectionTime;
+	time_t	m_creationTime;
 };
 
 /// local unencrypted endpoint

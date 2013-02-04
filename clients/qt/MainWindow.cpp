@@ -712,11 +712,13 @@ void MainWindow::on_actionExit_triggered( )
 	}
 }
 
-void MainWindow::storeSettings( )
+void MainWindow::storeStateAndPositions( )
 {
 // save our own size and position
-	settings.mainWindowPos = pos( );
-	settings.mainWindowSize = size( );
+	if( settings.saveRestoreState ) {
+		settings.mainWindowPos = pos( );
+		settings.mainWindowSize = size( );
+	}
 
 // save position/size and state of subwindows (if wished)	
 	if( settings.saveRestoreState ) {
@@ -741,7 +743,10 @@ void MainWindow::storeSettings( )
 			}
 		}
 	}
-	
+}
+
+void MainWindow::storeSettings( )
+{
 	if( m_settings.isEmpty( ) ) {
 		settings.write( ORGANIZATION_NAME, APPLICATION_NAME );
 	} else {
@@ -1020,7 +1025,7 @@ void MainWindow::on_actionLogin_triggered( )
 		m_wolframeClient = new WolframeClient( m_selectedConnection );
 
 // create a debug terminal and attach it to the protocol client
-	if( settings.debug ) {
+	if( settings.debug && settings.developEnabled ) {
 		m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
 		m_debugTerminal->setAttribute( Qt::WA_DeleteOnClose );
 		_debugTerminal = m_debugTerminal;
@@ -1054,6 +1059,7 @@ void MainWindow::on_actionLogin_triggered( )
 
 void MainWindow::on_actionLogout_triggered( )
 {
+	storeStateAndPositions( );
 	storeSettings( );
 
 	if( settings.mdi ) {
