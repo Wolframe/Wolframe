@@ -66,7 +66,7 @@ struct ConnectInfo : public Information
 	ConnectInfo( const net::LocalEndpoint& lcl, const net::RemoteEndpoint& rmt )
 		: local( lcl ), remote( rmt )	{}
 
-	Information::Type type() const	{ return CONNECTION; }
+	Information::Type type() const		{ return CONNECTION; }
 };
 
 }} // namespace _Wolframe::AAAA
