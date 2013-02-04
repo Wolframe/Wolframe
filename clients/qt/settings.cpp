@@ -72,6 +72,16 @@ void ApplicationSettings::write( QSettings &settings )
 	settings.setValue( "uiFormTranslationsDir", uiFormTranslationsDir );
 	settings.setValue( "uiFormResourcesDir", uiFormResourcesDir );
 	settings.setValue( "dataLoaderDir", dataLoaderDir );
+
+	settings.setValue( "keepState", saveRestoreState );
+	settings.beginWriteArray( "WindowStates" );
+	for( int i = 0; i < states.size( ); i++ ) {
+		settings.setArrayIndex( i );
+		settings.setValue( "form", states[i].form );
+		settings.setValue( "position", states[i].position );
+		settings.setValue( "size", states[i].size );
+	}
+	settings.endArray();
 }
 
 void ApplicationSettings::read( const QString &fileName )
@@ -129,4 +139,18 @@ void ApplicationSettings::read( QSettings &settings )
 	uiFormTranslationsDir = settings.value( "uiFormTranslationsDir", DEFAULT_UI_FORM_TRANSLATIONS_DIR ).toString( );
 	uiFormResourcesDir = settings.value( "uiFormResourcesDir", DEFAULT_UI_FORM_RESOURCES_DIR ).toString( );
 	dataLoaderDir = settings.value( "dataLoaderDir", DEFAULT_DATA_LOADER_DIR ).toString( );
+
+	saveRestoreState = settings.value( "keepState", false ).toBool( );
+	size = settings.beginReadArray( "WindowStates" );
+	for ( int i = 0; i < size; ++i )	{
+		settings.setArrayIndex( i );
+		
+		WinState state;
+		state.form = settings.value( "form" ).toString( );
+		state.position = settings.value( "position", QPoint( 0, 0 ) ).toPoint( );
+		state.size = settings.value( "size",QSize( 350, 350 ) ).toSize( );
+		
+		states.append( state );
+	}
+	settings.endArray( );
 }

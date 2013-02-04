@@ -61,7 +61,7 @@ class MainWindow : public QMainWindow
 		QLabel *m_statusBarConn;
 		QLabel *m_statusBarSSL;
 		DebugTerminal *m_debugTerminal;
-		QAction *debugTerminalAction;	
+		QAction *m_debugTerminalAction;	
 		
 	public slots:
 		void readSettings( );
@@ -78,7 +78,7 @@ class MainWindow : public QMainWindow
 	private:
 		void switchTranslator( QTranslator &translator, const QString &filename, const QString &i18n );
 		void CreateFormWidget( const QString &name );
-		void CreateMdiSubWindow( const QString &form );
+		QMdiSubWindow *CreateMdiSubWindow( const QString &form );
 		int nofSubWindows( ) const;
 		void activateAction( const QString name, bool enabled );
 		QString composeWindowListTitle( const int idx, const QString title );
@@ -120,6 +120,7 @@ class MainWindow : public QMainWindow
 
 // developer slots
 		void showDebugTerminal( bool checked );
+		void removeDebugToggle( );
 
 // generic updating of status in menus and toolbars
 		void updateMenusAndToolbars( );

@@ -30,7 +30,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_loginDialog( 0 ), m_settings( ),
 	m_languages( ), m_language( ), m_mdiArea( 0 ),
 	m_subWinGroup( 0 ),
-	m_terminating( false ), m_debugTerminal( 0 ), debugTerminalAction( 0 )
+	m_terminating( false ), m_debugTerminal( 0 ), m_debugTerminalAction( 0 )
 {
 // setup designer UI
 	m_ui.setupUi( this );
@@ -116,6 +116,7 @@ MainWindow::~MainWindow( )
 	if( m_debugTerminal ) {
 		delete m_debugTerminal;
 		m_debugTerminal = 0;
+		_debugTerminal = 0;
 	}
 	if( m_formLoader ) {
 		delete m_formLoader;
@@ -277,7 +278,7 @@ void MainWindow::initialize( )
 // in local file UI and data mode we can load the form right away
 	if( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) {
 		if( settings.mdi ) {
-			CreateMdiSubWindow( "init" );
+			(void)CreateMdiSubWindow( "init" );
 		} else {
 			CreateFormWidget( "init" );
 		}
@@ -309,6 +310,14 @@ void MainWindow::initialize( )
 // restore main window position and size
 	move( settings.mainWindowPos );
 	resize( settings.mainWindowSize );	
+
+// restore subwindow position states
+	if( settings.mdi ) {
+		// TODO
+	} else {
+		// ignore position and size as they are fixed anyway
+	}
+
 }
 
 void MainWindow::CreateFormWidget( const QString &name )
@@ -428,10 +437,10 @@ void MainWindow::disconnected( )
 	m_wolframeClient = 0;
 
 	if( m_debugTerminal ) {
-		debugTerminalAction->setChecked( false );
+		m_debugTerminalAction->setChecked( false );
 		m_debugTerminal->deleteLater( );
-		_debugTerminal = 0;
 		m_debugTerminal = 0;
+		_debugTerminal = 0;
 	}
 	
 	if( settings.uiLoadMode == Network ) {
@@ -479,9 +488,23 @@ void MainWindow::authOk( )
 // load initial form, TODO: load forms and position of windows from settings,
 // of none there, load init form in a MDI subwindow or directly
 	if( settings.mdi ) {
-		CreateMdiSubWindow( "init" );
+		if( settings.saveRestoreState ) {
+			for( int i = 0; i < settings.states.size( ); i++ ) {
+				WinState state = settings.states[i];
+				QMdiSubWindow *w = CreateMdiSubWindow( state.form );
+				w->move( state.position );
+				w->resize( state.size );
+			}
+		} else {
+			(void)CreateMdiSubWindow( "init" );
+		}
 	} else {
-		CreateFormWidget( "init" );
+		if( settings.saveRestoreState && settings.states.size( ) > 0 ) {
+			WinState state = settings.states[0];
+			CreateFormWidget( state.form );
+		} else {
+			CreateFormWidget( "init" );
+		}
 	}	
 
 // update status of menus and toolbars
@@ -691,8 +714,33 @@ void MainWindow::on_actionExit_triggered( )
 
 void MainWindow::storeSettings( )
 {
+// save our own size and position
 	settings.mainWindowPos = pos( );
 	settings.mainWindowSize = size( );
+
+// save position/size and state of subwindows (if wished)	
+	if( settings.saveRestoreState ) {
+		settings.states.clear( );
+		if( settings.mdi ) {
+			foreach( QMdiSubWindow *w, m_mdiArea->subWindowList( ) ) {
+				WinState state;
+				FormWidget *f = qobject_cast<FormWidget *>( w->widget( ) );
+				state.form = f->form( );
+				state.position = w->pos( );
+				state.size = w->size( );
+				settings.states.append( state );
+			}
+		} else {
+			settings.states.clear( );
+			if( m_formWidget ) {
+				WinState state;
+				state.form = m_formWidget->form( );
+				state.position = m_formWidget->pos( );
+				state.size = m_formWidget->size( );
+				settings.states.append( state );
+			}
+		}
+	}
 	
 	if( m_settings.isEmpty( ) ) {
 		settings.write( ORGANIZATION_NAME, APPLICATION_NAME );
@@ -755,7 +803,7 @@ void MainWindow::on_actionReloadWindow_triggered( )
 
 // -- MDI mode
 
-void MainWindow::CreateMdiSubWindow( const QString &form )
+QMdiSubWindow *MainWindow::CreateMdiSubWindow( const QString &form )
 {
 	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, this, settings.debug );
 
@@ -773,6 +821,8 @@ void MainWindow::CreateMdiSubWindow( const QString &form )
 	loadForm( form );
 
 	mdiSubWindow->resize( mdiSubWindow->sizeHint( ) );
+	
+	return mdiSubWindow;
 }
 
 void MainWindow::subWindowSelected( QAction *action )
@@ -794,7 +844,7 @@ void MainWindow::on_actionOpenFormNewWindow_triggered( )
 {
 	FormChooseDialog d( m_forms, this );
 	if( d.exec( ) == QDialog::Accepted ) {
-		CreateMdiSubWindow( d.form( ) );
+		(void)CreateMdiSubWindow( d.form( ) );
 	}
 
 	updateMenusAndToolbars( );
@@ -939,7 +989,8 @@ void MainWindow::updateMenusAndToolbars( )
 	activateAction( "actionSelectAll", m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );	
 
 // developer menu: debug terminal
-	debugTerminalAction->setEnabled( m_debugTerminal );
+	if( m_debugTerminalAction )
+		m_debugTerminalAction->setEnabled( m_debugTerminal );
 }
 
 // -- logins/logouts/connections
@@ -971,9 +1022,12 @@ void MainWindow::on_actionLogin_triggered( )
 // create a debug terminal and attach it to the protocol client
 	if( settings.debug ) {
 		m_debugTerminal = new DebugTerminal( m_wolframeClient, this );
+		m_debugTerminal->setAttribute( Qt::WA_DeleteOnClose );
 		_debugTerminal = m_debugTerminal;
 		connect( m_wolframeClient, SIGNAL( lineSent( QString ) ),
 			m_debugTerminal, SLOT( sendLine( QString ) ) );
+		connect( m_debugTerminal,SIGNAL( destroyed( ) ),
+			this, SLOT( removeDebugToggle( ) ) );
 		qDebug( ) << "Debug window initialized";
 	}
 
@@ -1000,6 +1054,8 @@ void MainWindow::on_actionLogin_triggered( )
 
 void MainWindow::on_actionLogout_triggered( )
 {
+	storeSettings( );
+
 	if( settings.mdi ) {
 		m_mdiArea->closeAllSubWindows( );
 	} else {
@@ -1031,19 +1087,25 @@ void MainWindow::showDebugTerminal( bool checked )
 	}
 }
 
+void MainWindow::removeDebugToggle( )
+{
+	m_debugTerminalAction->setChecked( false );
+	_debugTerminal = 0;
+}
+
 void MainWindow::addDeveloperMenu( )
 {
 	QMenu *developerMenu = menuBar( )->addMenu( tr( "&Developer" ) );
 
-	debugTerminalAction = new QAction( QIcon( ":/images/debug.png" ), tr( "&Debugging Terminal..." ), this );
-	debugTerminalAction->setStatusTip( tr( "Open debug terminal showing the Wolframe protocol" ));
-	debugTerminalAction->setCheckable( true );
-	debugTerminalAction->setShortcut( QKeySequence( "Ctrl+Alt+D" ) );
-	developerMenu->addAction( debugTerminalAction );
+	m_debugTerminalAction = new QAction( QIcon( ":/images/debug.png" ), tr( "&Debugging Terminal..." ), this );
+	m_debugTerminalAction->setStatusTip( tr( "Open debug terminal showing the Wolframe protocol" ));
+	m_debugTerminalAction->setCheckable( true );
+	m_debugTerminalAction->setShortcut( QKeySequence( "Ctrl+Alt+D" ) );
+	developerMenu->addAction( m_debugTerminalAction );
 	
 	QToolBar *developerToolBar = addToolBar( tr( "Developer" ));
-	developerToolBar->addAction( debugTerminalAction );
+	developerToolBar->addAction( m_debugTerminalAction );
 
-	connect( debugTerminalAction, SIGNAL( toggled( bool ) ), this,
+	connect( m_debugTerminalAction, SIGNAL( toggled( bool ) ), this,
 		SLOT( showDebugTerminal( bool ) ) );
 }
