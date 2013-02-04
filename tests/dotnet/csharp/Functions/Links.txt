@@ -14,7 +14,8 @@ Glossary and Microsoft Documentation:
 	[D07] MSDN Error Codes: http://blogs.msdn.com/b/eldar/archive/2007/04/03/a-lot-of-hresult-codes.aspx
 	[D08] GAC: http://en.wikipedia.org/wiki/Global_Assembly_Cache
 	[D09] QueryInterface definition by macros: http://msdn.microsoft.com/en-us/library/6bwekse3(v=vs.80).aspx
-	[D10] COM/ATL FAQ (HOWTO: Use structs in Automation-compatible interfaces): http://vcfaq.mvps.org/com/4.htm 
+	[D10] COM/ATL FAQ (HOWTO: Use structs in Automation-compatible interfaces): http://vcfaq.mvps.org/com/4.htm
+	[D11] Marshalling Details (COM): http://msdn.microsoft.com/en-us/library/windows/desktop/ms692621(v=vs.85).aspx 
 MSDN Bugreports:
 	[B01] BUG: COM Interop: No Built-in Support VARIANT of Type VT_RECORD: http://support.microsoft.com/kb/309329
 

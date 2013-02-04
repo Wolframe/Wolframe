@@ -31,11 +31,13 @@ BSTR createBSTR( LPCWSTR str);
 std::string utf8string( const BSTR& str);
 std::wstring tostring( VARIANT* v);
 std::wstring tostring( const _com_error& err);
+std::string tostring( const EXCEPINFO& einfo);
 std::string typestr( VARTYPE vt);
 std::string typestr( const ITypeInfo* typeinfo, const TYPEDESC* ed);
 std::string typestr( const ITypeInfo* typeinfo);
 std::string structstring( const ITypeInfo* typeinfo);
 std::string variablename( const ITypeInfo* typeinfo, VARDESC* vardesc);
+std::wstring variablename_utf16( const ITypeInfo* typeinfo, VARDESC* vardesc);
 std::string variabletype( const ITypeInfo* typeinfo, VARDESC* vardesc);
 
 bool isCOMInterfaceMethod( const std::string& name);

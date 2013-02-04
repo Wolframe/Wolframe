@@ -8,24 +8,24 @@ using System.Runtime.InteropServices;
 [Guid("755efe8f-f125-494c-89a2-cf3cb03a0c8c")]
 public struct IdPair
 {
-    public int a;
-    public int b;
+    [MarshalAs(UnmanagedType.I4)] public int a;
+    [MarshalAs(UnmanagedType.I4)] public int b;
 };
 
 [ComVisible(true)]
 [Guid("390E047F-36FD-4F23-8CE8-3A4C24B33AD3")]
 public struct Address
 {
-    public string street;
-    public string country;
+    [MarshalAs(UnmanagedType.BStr)] public string street;
+    [MarshalAs(UnmanagedType.BStr)] public string country;
 };
 
 [ComVisible(true)]
 [Guid("50085256-73D2-443E-B22B-9BB1BBAAFCDD")]
 public struct User
 {
-    public int id;
-    public string name;
+    [MarshalAs(UnmanagedType.I4)] public int id;
+    [MarshalAs(UnmanagedType.BStr)] public string name;
     public Address place;
 };
 

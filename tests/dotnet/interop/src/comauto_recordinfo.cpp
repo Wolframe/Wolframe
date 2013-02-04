@@ -10,8 +10,6 @@ using namespace _Wolframe;
 
 comauto::RecordInfo::~RecordInfo()
 {
-/*[-]*/std::cerr << "CALL comauto::RecordInfo::~RecordInfo()" << std::endl;
-
 	if (m_typeattr) m_typeinfo->ReleaseTypeAttr( m_typeattr);
 	m_typeinfo->Release();
 }
@@ -19,7 +17,6 @@ comauto::RecordInfo::~RecordInfo()
 comauto::RecordInfo::RecordInfo( ITypeInfo* typeinfo_)
 	:m_typeinfo(typeinfo_),m_typeattr(0)
 {
-/*[-]*/std::cerr << "CALL comauto::RecordInfo::RecordInfo( " << std::hex << "0x0" << (uintptr_t)typeinfo_ << ")" << std::dec << std::endl;
 	WRAP( m_typeinfo->GetTypeAttr( &m_typeattr))
 	if (m_typeattr->typekind != TKIND_RECORD)
 	{
@@ -31,7 +28,6 @@ comauto::RecordInfo::RecordInfo( ITypeInfo* typeinfo_)
 
 HRESULT comauto::RecordInfo::QueryInterface( REFIID  riid, LPVOID* ppvObj)
 {
-/*[-]*/std::cerr << "CALL comauto::RecordInfo::QueryInterface( " << std::hex << "0x0" << (uintptr_t)ppvObj << ")" << std::dec << std::endl;
     if (!ppvObj) return E_INVALIDARG;
     *ppvObj = NULL;
 
@@ -46,7 +42,6 @@ HRESULT comauto::RecordInfo::QueryInterface( REFIID  riid, LPVOID* ppvObj)
 
 HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitType initType, bool doThrow, PVOID pvOld)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::RecordFill(" << initTypeName(initType) << ": " << std::hex << (uintptr_t)pvNew << ", " << (uintptr_t)pvOld << ")" << std::dec << std::endl;
 	HRESULT hr;
 	ITypeInfo* rectypeinfo = 0;
 	if (initType == DefaultConstructorZero)
@@ -142,8 +137,6 @@ HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitT
 			}
 			else if (vd->elemdescVar.tdesc.vt == VT_LPSTR)
 			{
-/*[-]*/char* cstr = pvOld?*((LPSTR*)ofield):"(NULL)";
-/*[-]*/std::cout << "DEBUG init (RecordFill) " << comauto::typestr(vd->elemdescVar.tdesc.vt) <<  " at 0x0" << std::hex << (uintptr_t)nfield << std::dec << " with '" << (cstr?cstr:"(-> NULL)") << "'" << std::endl;
 				switch (initType)
 				{
 					case ClearInit:
@@ -220,25 +213,21 @@ HRESULT comauto::RecordInfo::RecordFill( PVOID pvNew, comauto::RecordInfo::InitT
 
 HRESULT comauto::RecordInfo::RecordInit( PVOID pvNew)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::RecordInit(..)" << std::endl;
 	return comauto::RecordInfo::RecordFill( pvNew, DefaultConstructorZero, false);
 }
 
 HRESULT comauto::RecordInfo::RecordClear( PVOID pvExisting)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::RecordClear(..)" << std::endl;
 	return comauto::RecordInfo::RecordFill( pvExisting, ClearInit, false);
 }
 
 HRESULT comauto::RecordInfo::RecordCopy( PVOID pvExisting, PVOID pvNew)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::RecordCopy(..)" << std::endl;
 	return comauto::RecordInfo::RecordFill( pvNew, CopyInit, false, pvExisting);
 }
 
 HRESULT comauto::RecordInfo::GetGuid( GUID* pguid)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::GetGuid(..)" << std::endl;
 	if (!m_typeattr) return E_INVALIDARG;
 	*pguid = m_typeattr->guid;
 	return S_OK;
@@ -246,7 +235,6 @@ HRESULT comauto::RecordInfo::GetGuid( GUID* pguid)
 
 HRESULT comauto::RecordInfo::GetName( BSTR* pbstrName)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::GetName(..)" << std::endl;
 	HRESULT hr;
 	if (!pbstrName) return E_INVALIDARG;
 	RETURN_ON_ERROR( hr, m_typeinfo->GetDocumentation( MEMBERID_NIL, pbstrName, NULL, NULL, NULL));
@@ -255,7 +243,6 @@ HRESULT comauto::RecordInfo::GetName( BSTR* pbstrName)
 
 HRESULT comauto::RecordInfo::GetSize( ULONG* pcbSize)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::GetSize(..)" << std::endl;
 	if (!pcbSize) return E_INVALIDARG;
 	*pcbSize = m_typeattr->cbSizeInstance;
 	return S_OK;
@@ -263,7 +250,6 @@ HRESULT comauto::RecordInfo::GetSize( ULONG* pcbSize)
 
 HRESULT comauto::RecordInfo::GetTypeInfo( ITypeInfo** ppTypeInfo)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::GetTypeInfo(..)" << std::endl;
 	m_typeinfo->AddRef();
 	*ppTypeInfo = m_typeinfo;
 	return S_OK;
@@ -271,7 +257,6 @@ HRESULT comauto::RecordInfo::GetTypeInfo( ITypeInfo** ppTypeInfo)
 
 HRESULT comauto::RecordInfo::GetField( PVOID pvData, LPCOLESTR szFieldName, VARIANT* pvarField)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::GetField(..)" << std::endl;
 	HRESULT hr = S_OK;
 
 	VARIANT refvarField;
@@ -288,7 +273,6 @@ HRESULT comauto::RecordInfo::GetField( PVOID pvData, LPCOLESTR szFieldName, VARI
 
 HRESULT comauto::RecordInfo::GetFieldNoCopy( PVOID pvData, LPCOLESTR szFieldName, VARIANT* pvarField, PVOID* ppvDataCArray)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::GetFieldNoCopy(..)" << std::endl;
 	HRESULT hr = S_OK;
 	CComPtr<ITypeComp> typecomp;
 	CComPtr<ITypeInfo> elemtypeinfo;
@@ -333,7 +317,6 @@ HRESULT comauto::RecordInfo::GetFieldNoCopy( PVOID pvData, LPCOLESTR szFieldName
 
 HRESULT comauto::RecordInfo::PutField( ULONG wFlags, PVOID pvData, LPCOLESTR szFieldName, VARIANT* pvarField)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::PutField(..)" << std::endl;
 	HRESULT hr = S_OK;
 
 	//copy parameter to put:
@@ -346,7 +329,6 @@ HRESULT comauto::RecordInfo::PutField( ULONG wFlags, PVOID pvData, LPCOLESTR szF
 
 HRESULT comauto::RecordInfo::PutFieldNoCopy( ULONG, PVOID pvData, LPCOLESTR szFieldName, VARIANT* pvarField)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::PutFieldNoCopy(..)" << std::endl;
 	HRESULT hr = S_OK;
 	CComPtr<ITypeComp> typecomp;
 	CComPtr<ITypeInfo> elemtypeinfo;
@@ -405,7 +387,6 @@ HRESULT comauto::RecordInfo::PutFieldNoCopy( ULONG, PVOID pvData, LPCOLESTR szFi
 
 HRESULT comauto::RecordInfo::GetFieldNames( ULONG* pcNames, BSTR* rgBstrNames)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::GetFieldNames(..)" << std::endl;
 	HRESULT hr = S_OK;
 
 	*pcNames = m_typeattr->cVars;
@@ -444,7 +425,6 @@ HRESULT comauto::RecordInfo::GetFieldNames( ULONG* pcNames, BSTR* rgBstrNames)
 
 BOOL comauto::RecordInfo::IsMatchingType( IRecordInfo *pRecordInfo)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::IsMatchingType(..)" << std::endl;
 	BOOL rt = TRUE;
 	ITypeInfo* otypeinfo = 0;
 	ITypeInfo* rectypeinfo = 0;
@@ -539,7 +519,6 @@ Cleanup:
 
 PVOID comauto::RecordInfo::createRecord()
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::createRecord(..)" << std::endl;
 	PVOID rt = 0;
 	try
 	{
@@ -557,7 +536,6 @@ PVOID comauto::RecordInfo::createRecord()
 
 PVOID comauto::RecordInfo::RecordCreate()
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::RecordCreate(..)" << std::endl;
 	PVOID rt = comauto::allocMem( m_typeattr->cbSizeInstance);
 	if (rt == NULL) return NULL;
 
@@ -572,7 +550,6 @@ PVOID comauto::RecordInfo::RecordCreate()
 
 HRESULT comauto::RecordInfo::RecordCreateCopy( PVOID pvSource, PVOID* ppvDest)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::RecordCreateCopy(..)" << std::endl;
 	if (!ppvDest) return E_INVALIDARG;
 	*ppvDest = comauto::allocMem( m_typeattr->cbSizeInstance);
 	if (!*ppvDest) return E_OUTOFMEMORY;
@@ -588,65 +565,9 @@ HRESULT comauto::RecordInfo::RecordCreateCopy( PVOID pvSource, PVOID* ppvDest)
 
 HRESULT comauto::RecordInfo::RecordDestroy( PVOID pvRecord)
 {
-/*[-]*/std::cerr << "comauto::RecordInfo::RecordDestroy(..)" << std::endl;
 	comauto::RecordInfo::RecordFill( pvRecord, Destructor, false, 0);
 	comauto::freeMem( pvRecord);
 	return S_OK;
-}
-
-static void getRecordInfoMap( unsigned short depht, std::map<comauto::RecordInfoKey,comauto::RecordInfoR>& rimap, ITypeInfo* typeinfo, std::size_t ofs)
-{
-/*[-]*/std::cerr << "getRecordInfoMap(..)" << std::endl;
-	TYPEATTR* typeattr = 0;
-	VARDESC* vd = 0;
-	ITypeInfo* rectypeinfo = 0;
-	try
-	{
-		WRAP( typeinfo->GetTypeAttr( &typeattr))
-		for (WORD iv = 0; iv < typeattr->cVars; ++iv)
-		{
-			WRAP( typeinfo->GetVarDesc( iv, &vd))
-
-			if (vd->elemdescVar.tdesc.vt == VT_USERDEFINED)
-			{
-				WRAP( typeinfo->GetRefTypeInfo( vd->elemdescVar.tdesc.hreftype, &rectypeinfo))
-				comauto::RecordInfoR rc( new comauto::RecordInfo( rectypeinfo));
-				rimap[ comauto::recordInfoKey( depht, ofs + vd->oInst)] = rc;
-				if (depht >= 0xFFFF) throw std::runtime_error( "record info structure too complex");
-				getRecordInfoMap( depht+1, rimap, rectypeinfo, ofs + vd->oInst);
-
-				rectypeinfo->Release();
-				rectypeinfo = 0;
-			}
-			typeinfo->ReleaseVarDesc( vd);
-			vd = 0;
-		}
-		typeinfo->ReleaseTypeAttr( typeattr);
-		typeattr = 0;
-	}
-	catch (const std::runtime_error& e)
-	{
-		if (vd) typeinfo->ReleaseVarDesc( vd);
-		if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
-		if (rectypeinfo) rectypeinfo->Release();
-		throw e;
-	}
-}
-
-unsigned int comauto::recordInfoKey( unsigned int depht_, unsigned int ofs_)
-{
-	if ((depht_|ofs_) > 0xFFFF) throw std::runtime_error( "record info key out of range");
-	return ((ofs_<<16)+depht_);
-}
-
-comauto::RecordInfoMap comauto::getRecordInfoMap( ITypeInfo* typeinfo)
-{
-	RecordInfoMap rt;
-	RecordInfo* baserecinfo = new RecordInfo( typeinfo);
-	rt[recordInfoKey(0,0)] = RecordInfoR( baserecinfo );
-	if (baserecinfo->typeattr()->cbSizeInstance > 0xFFFF) throw std::runtime_error( "structure size too big for record info structure");
-	getRecordInfoMap( 1, rt, typeinfo, 0);
-	return rt;
 }
 
 bool comauto::RecordInfo::getVariableDescriptor( const std::string& name, VariableDescriptor& descr) const

@@ -20,6 +20,7 @@ public:
 	explicit TypeLib( const std::string& file);
 	virtual ~TypeLib();
 	void print( std::ostream& out) const;
+	void printvalue( std::ostream& out, const std::string& name, const VARIANT& val, const ITypeInfo* typeinfo, std::size_t indentcnt=0) const;
 
 	const IRecordInfo* getRecordInfo( const ITypeInfo* typeinfo) const;
 
@@ -47,7 +48,8 @@ public:
 			std::string key;
 			std::map<std::string,int> keymap;
 
-			explicit StackElem( ITypeInfo* typeinfo_=0, const IRecordInfo* recinfo_=0);
+			StackElem( ITypeInfo* typeinfo_, const IRecordInfo* recinfo_, VARTYPE vt);
+			StackElem();
 			StackElem( const StackElem& o);
 			~StackElem();
 		};

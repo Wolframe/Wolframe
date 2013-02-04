@@ -157,13 +157,6 @@ std::vector<comauto::FunctionR> comauto::loadFunctions( const comauto::TypeLib* 
 }
 
 
-/*[-]*/const VARIANT* comauto::getFunctionResultVariant( const langbind::TypedInputFilter* res)
-/*[-]*/{
-/*[-]*/		const FunctionResult* resp = dynamic_cast<const FunctionResult*>(res);
-/*[-]*/		return resp->data();
-/*[-]*/}
-
-
 comauto::Function::Parameter::Parameter( const Parameter& o)
 	:name(o.name),typedesc(o.typedesc),typeinfo(o.typeinfo)
 {
@@ -255,7 +248,7 @@ comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, const comauto
 	{
 		if (local.rectypeinfo) local.rectypeinfo->Release();
 		local.rectypeinfo = 0;
-		WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( m_returntype.typedesc->hreftype, &local.rectypeinfo))
+		WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( m_funcdesc->elemdescFunc.tdesc.hreftype, &local.rectypeinfo))
 		m_returntype = ReturnType( &m_funcdesc->elemdescFunc.tdesc, local.rectypeinfo);
 	}
 	else
@@ -354,9 +347,10 @@ AGAIN:
 
 		if (m_paramclosure.get())
 		{
-			VARIANT result;
-			result.vt = VT_EMPTY;
-			if (!m_paramclosure->call( result))
+			//... we are in a parameter initilization
+			VARIANT paramvalue;
+			paramvalue.vt = VT_EMPTY;
+			if (!m_paramclosure->call( paramvalue))
 			{
 				if (m_input->state() == langbind::InputFilter::Open) throw std::runtime_error( "unexpected end of input");
 				return false;
@@ -364,72 +358,70 @@ AGAIN:
 			const Function::Parameter* paramdescr = m_func->getParameter( m_paramidx);
 			if ((m_param[ m_paramidx].vt & VT_ARRAY) == VT_ARRAY) throw std::runtime_error( std::string("array types as parameter not implemented yet ('") + paramdescr->name + "')");
 			if (m_param[ m_paramidx].vt != VT_EMPTY) throw std::runtime_error( std::string("duplicate definition of parameter '") + paramdescr->name + "'");
-			m_param[ m_paramidx] = result;
+			m_param[ m_paramidx] = paramvalue;
 			m_paramidx = null_paramidx;
+			m_paramclosure.reset();
 		}
-		else 
+		while (m_input->getNext( elemtype, elemvalue))
 		{
-			while (m_input->getNext( elemtype, elemvalue))
+			switch (elemtype)
 			{
-				switch (elemtype)
+				case langbind::InputFilter::Attribute:
+				case langbind::InputFilter::OpenTag:
 				{
-					case langbind::InputFilter::Attribute:
-					case langbind::InputFilter::OpenTag:
+					if (elemvalue.type == langbind::TypedFilterBase::Element::int_)
 					{
-						if (elemvalue.type == langbind::TypedFilterBase::Element::int_)
-						{
-							if (elemvalue.value.int_ < 0 || (std::size_t)elemvalue.value.int_ >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
-							m_paramidx = (std::size_t)elemvalue.value.int_;
-						}
-						else if (elemvalue.type == langbind::TypedFilterBase::Element::uint_)
-						{
-							if ((std::size_t)elemvalue.value.uint_ >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
-							m_paramidx = (std::size_t)elemvalue.value.uint_;
-						}
-						else if (elemvalue.type == langbind::TypedFilterBase::Element::string_)
-						{
-							std::string paramname( elemvalue.value.string_.ptr, elemvalue.value.string_.size);
-							m_paramidx = m_func->getParameterIndex( paramname);
-						}
-						else
-						{
-							throw std::runtime_error( "unexpected node type (function parameter name or index expected)");
-						}
-						const Function::Parameter* param = m_func->getParameter( m_paramidx);
-
-						if (elemtype==langbind::InputFilter::Attribute)
-						{
-							if (param->typeinfo)
-							{
-								throw std::runtime_error( "atomic parameter expected if passed as attribute");
-							}
-							else
-							{
-								m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typedesc->vt, true));
-							}
-						}
-						else
-						{
-							if (param->typeinfo)
-							{
-								m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typeinfo));
-							}
-							else
-							{
-								m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typedesc->vt, false));
-							}
-						}
-						goto AGAIN;
+						if (elemvalue.value.int_ < 0 || (std::size_t)elemvalue.value.int_ >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
+						m_paramidx = (std::size_t)elemvalue.value.int_;
 					}
-					case langbind::InputFilter::CloseTag:
-						throw std::runtime_error( "unexpected close tag (tags not balanced)");
-						break;
+					else if (elemvalue.type == langbind::TypedFilterBase::Element::uint_)
+					{
+						if ((std::size_t)elemvalue.value.uint_ >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
+						m_paramidx = (std::size_t)elemvalue.value.uint_;
+					}
+					else if (elemvalue.type == langbind::TypedFilterBase::Element::string_)
+					{
+						std::string paramname( elemvalue.value.string_.ptr, elemvalue.value.string_.size);
+						m_paramidx = m_func->getParameterIndex( paramname);
+					}
+					else
+					{
+						throw std::runtime_error( "unexpected node type (function parameter name or index expected)");
+					}
+					const Function::Parameter* param = m_func->getParameter( m_paramidx);
 
-					case langbind::InputFilter::Value:
-						throw std::runtime_error( "unexpected content token (expected a parameter name or index)");
+					if (elemtype==langbind::InputFilter::Attribute)
+					{
+						if (param->typeinfo)
+						{
+							throw std::runtime_error( "atomic parameter expected if passed as attribute");
+						}
+						else
+						{
+							m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typedesc->vt, true));
+						}
+					}
+					else
+					{
+						if (param->typeinfo)
+						{
+							m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typeinfo));
+						}
+						else
+						{
+							m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typedesc->vt, false));
+						}
+					}
+					goto AGAIN;
 				}
-				break;
+				case langbind::InputFilter::CloseTag:
+					throw std::runtime_error( "unexpected close tag (tags not balanced)");
+					break;
+
+				case langbind::InputFilter::Value:
+					throw std::runtime_error( "unexpected content token (expected a parameter name or index)");
 			}
+			break;
 		}
 		switch (m_input->state())
 		{

@@ -190,6 +190,68 @@ void comauto::TypeLib::print( std::ostream& out) const
 	printItem( out, this);
 }
 
+void comauto::TypeLib::printvalue( std::ostream& out, const std::string& name, const VARIANT& val, const ITypeInfo* typeinfo, std::size_t indentcnt) const
+{
+	VARIANT elem;
+	elem.vt = VT_EMPTY;
+	VARDESC* vardesc = 0;
+	TYPEATTR* typeattr = 0;
+	ITypeInfo* rectypeinfo = 0;
+	try
+	{
+		if (typeinfo && val.pRecInfo && val.pvRecord)
+		{
+			out << std::string(indentcnt,'\t') << name << " {" << std::endl;
+
+			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr))
+			UINT ii=0, nn=typeattr->cVars;
+			for (; ii < nn; ++ii)
+			{
+				WRAP( const_cast<ITypeInfo*>(typeinfo)->GetVarDesc( ii, &vardesc))
+				std::wstring recname( comauto::variablename_utf16( typeinfo, vardesc));
+				val.pRecInfo->GetField( val.pvRecord, recname.c_str(), &elem);
+
+				if (vardesc->elemdescVar.tdesc.vt == VT_USERDEFINED)
+				{
+					WRAP( elem.pRecInfo->GetTypeInfo( &rectypeinfo))
+					printvalue( out, comauto::utf8string(recname), elem, rectypeinfo, indentcnt+1);
+					rectypeinfo->Release();
+					rectypeinfo = 0;
+				}
+				else
+				{
+					printvalue( out, comauto::utf8string(recname), elem, 0, indentcnt+1);
+				}
+				if (elem.vt != VT_EMPTY)
+				{
+					comauto::wrapVariantClear( &elem);
+					elem.vt = VT_EMPTY;
+				}
+				const_cast<ITypeInfo*>(typeinfo)->ReleaseVarDesc( vardesc);
+				vardesc = 0;
+			}
+			out << std::string(indentcnt,'\t') << "}" << std::endl;
+		}
+		else if (comauto::isAtomicType(val.vt) || comauto::isStringType(val.vt))
+		{
+			std::string elembuf;
+			out << std::string(indentcnt,'\t') << name << " : " << comauto::typestr(val.vt) << " '" << comauto::getAtomicElement( val, elembuf).tostring() << "'" << std::endl;
+		}
+		else
+		{
+			throw std::runtime_error( "print not implemented for this type value");
+		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (elem.vt != VT_EMPTY) comauto::wrapVariantClear( &elem);
+		if (vardesc) const_cast<ITypeInfo*>(typeinfo)->ReleaseVarDesc( vardesc);
+		if (rectypeinfo) rectypeinfo->Release();
+		if (typeattr) const_cast<ITypeInfo*>(typeinfo)->ReleaseTypeAttr( typeattr);
+		throw e;
+	}
+}
+
 const IRecordInfo* comauto::TypeLib::getRecordInfo( const ITypeInfo* typeinfo) const
 {
 	LCID lcid_US = 0x0409;
@@ -219,31 +281,43 @@ const IRecordInfo* comauto::TypeLib::getRecordInfo( const ITypeInfo* typeinfo) c
 	return rt;
 }
 
-comauto::TypeLib::AssignmentClosure::StackElem::StackElem( ITypeInfo* typeinfo_, const IRecordInfo* recinfo_)
+comauto::TypeLib::AssignmentClosure::StackElem::StackElem( ITypeInfo* typeinfo_, const IRecordInfo* recinfo_, VARTYPE vt)
 	:typeinfo(typeinfo_),typeattr(0),recinfo(recinfo_)
 {
+	if (!typeinfo) throw std::logic_error( "illegal state in AssignmentClosure::StackElem");
+	VARDESC* vardesc = NULL;
 	value.vt = VT_EMPTY;
-	if (typeinfo)
+	try
 	{
-		if (typeattr->typekind == TKIND_RECORD && !recinfo) throw std::logic_error( "using typeinfo of structure without recordinfo");
 		WRAP( typeinfo->GetTypeAttr( &typeattr))
+		if (typeattr->typekind == TKIND_RECORD && !recinfo)
+		{
+			throw std::logic_error( "using typeinfo of structure without recordinfo");
+		}
 		for (UINT ii=0; ii<typeattr->cVars; ++ii)
 		{
-			VARDESC* vardesc = NULL;
-			try
-			{
-				WRAP( typeinfo->GetVarDesc( ii, &vardesc))
-				keymap[ comauto::variablename( typeinfo, vardesc)] = ii; 
-			}
-			catch (const std::runtime_error& e)
-			{
-
-				if (vardesc) typeinfo->ReleaseVarDesc( vardesc);
-				throw e;
-			}
+			WRAP( typeinfo->GetVarDesc( ii, &vardesc))
+			keymap[ comauto::variablename( typeinfo, vardesc)] = ii; 
+			typeinfo->ReleaseVarDesc( vardesc);
+			vardesc = 0;
 		}
+		value.pRecInfo = const_cast<IRecordInfo*>(recinfo);
+		value.pvRecord = value.pRecInfo->RecordCreate();
+		value.vt = vt;
 		typeinfo->AddRef();
 	}
+	catch (const std::runtime_error& e)
+	{
+		if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
+		if (vardesc) typeinfo->ReleaseVarDesc( vardesc);
+		throw e;
+	}
+}
+
+comauto::TypeLib::AssignmentClosure::StackElem::StackElem()
+	:typeinfo(0),typeattr(0),recinfo(0)
+{
+	value.vt = VT_EMPTY;
 }
 
 comauto::TypeLib::AssignmentClosure::StackElem::StackElem( const StackElem& o)
@@ -287,7 +361,6 @@ bool comauto::TypeLib::AssignmentClosure::call( VARIANT& output)
 {
 	VARIANT value;
 	value.vt = VT_EMPTY;
-	VARDESC* vardesc = 0;
 	ITypeInfo* rectypeinfo = 0;
 	if (m_stk.empty()) return true;
 	langbind::TypedFilterBase::ElementType elemtype;
@@ -313,12 +386,17 @@ AGAIN:
 						cur.key.clear();
 						throw std::runtime_error( std::string( "undefined element '") + elemvalue.tostring() + "'");
 					}
+					VARDESC* vardesc;
 					WRAP( cur.typeinfo->GetVarDesc( ki->second, &vardesc))
-					if (vardesc->elemdescVar.tdesc.vt == VT_USERDEFINED)
+					VARTYPE elemvartype = vardesc->elemdescVar.tdesc.vt;
+					HREFTYPE elemhreftype = vardesc->elemdescVar.tdesc.hreftype;
+					cur.typeinfo->ReleaseVarDesc( vardesc);
+
+					if (elemvartype == VT_USERDEFINED)
 					{
-						WRAP( cur.typeinfo->GetRefTypeInfo( vardesc->elemdescVar.tdesc.hreftype, &rectypeinfo))
+						WRAP( cur.typeinfo->GetRefTypeInfo( elemhreftype, &rectypeinfo))
 						const IRecordInfo* recinfo = m_typelib->getRecordInfo( rectypeinfo);
-						m_stk.push_back( StackElem( rectypeinfo, recinfo));
+						m_stk.push_back( StackElem( rectypeinfo, recinfo, VT_RECORD));
 						rectypeinfo->Release();
 						rectypeinfo = 0;
 					}
@@ -326,8 +404,6 @@ AGAIN:
 					{
 						m_stk.push_back( StackElem());
 					}
-					m_stk.back().typeinfo->ReleaseVarDesc( vardesc);
-					vardesc = 0;
 					break;
 				}
 				case langbind::TypedFilterBase::CloseTag:
@@ -347,7 +423,7 @@ AGAIN:
 					}
 					StackElem& cur = m_stk.back();
 					std::wstring kk( comauto::utf16string( cur.key));
-					WRAP( cur.value.pRecInfo->PutField( INVOKE_PROPERTYPUTREF, cur.value.pvRecord, kk.c_str(), &value));
+					WRAP( cur.value.pRecInfo->PutField( INVOKE_PROPERTYPUT, cur.value.pvRecord, kk.c_str(), &value));
 					comauto::wrapVariantClear( &value);
 					cur.key.clear();
 					break;
@@ -368,7 +444,7 @@ AGAIN:
 						value = comauto::createVariantType( elemvalue);
 						if (cur.value.vt != VT_RECORD || cur.value.pvRecord == 0 || cur.value.pRecInfo == 0) throw std::runtime_error( "illegal state (structure element context expected)"); 
 						std::wstring kk( comauto::utf16string( cur.key));
-						WRAP( cur.value.pRecInfo->PutField( INVOKE_PROPERTYPUTREF, cur.value.pvRecord, kk.c_str(), &value));
+						WRAP( cur.value.pRecInfo->PutField( INVOKE_PROPERTYPUT, cur.value.pvRecord, kk.c_str(), &value));
 						comauto::wrapVariantClear( &value);
 						cur.key.clear();
 					}
@@ -409,7 +485,6 @@ AGAIN:
 	{
 		comauto::wrapVariantClear( &value);
 		if (rectypeinfo) rectypeinfo->Release();
-		if (vardesc) m_stk.back().typeinfo->ReleaseVarDesc( vardesc);
 		throw e;
 	}
 }
@@ -428,6 +503,6 @@ comauto::TypeLib::AssignmentClosure::AssignmentClosure( const TypeLib* typelib_,
 	:m_typelib(const_cast<TypeLib*>(typelib_)),m_typeinfo( const_cast<ITypeInfo*>(typeinfo_)),m_input(input_),m_outtype(VT_USERDEFINED),m_single(false)
 {
 	const IRecordInfo* recinfo = m_typelib->getRecordInfo( m_typeinfo);
-	m_stk.push_back( StackElem( m_typeinfo, recinfo));
+	m_stk.push_back( StackElem( m_typeinfo, recinfo, VT_RECORD));
 }
 

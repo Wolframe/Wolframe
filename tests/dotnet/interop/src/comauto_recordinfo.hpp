@@ -74,12 +74,6 @@ private:
 
 typedef boost::shared_ptr<RecordInfo> RecordInfoR;
 
-typedef unsigned int RecordInfoKey;
-unsigned int recordInfoKey( unsigned int depht_, unsigned int ofs_);
-
-typedef std::map<RecordInfoKey,RecordInfoR> RecordInfoMap;
-RecordInfoMap getRecordInfoMap( ITypeInfo* typeinfo);
-
 }}//namespace
 #endif
 

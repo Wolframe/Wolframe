@@ -41,35 +41,6 @@ static void test_function_call( const std::map<std::string,comauto::FunctionR>& 
 	}
 }
 
-static void test_function_call_seq( const comauto::CommonLanguageRuntime& clr, const std::map<std::string,comauto::FunctionR>& funcmap, const char* nameX, const char* nameY, const langbind::Form& param, const char* title)
-{
-	std::map<std::string,comauto::FunctionR>::const_iterator xi = funcmap.find( nameX);
-	if (xi == funcmap.end()) throw std::runtime_error( std::string("function not defined: '") + nameX + "'");
-	std::map<std::string,comauto::FunctionR>::const_iterator yi = funcmap.find( nameY);
-	if (yi == funcmap.end()) throw std::runtime_error( std::string("function not defined: '") + nameY + "'");
-
-	langbind::FormFunctionClosure* closureX = xi->second ->createClosure();
-	closureX->init( 0, param.get());
-	if (!closureX->call()) throw std::runtime_error( std::string("function call failed: '") + nameX + "'");
-
-	langbind::TypedInputFilterR funcresX = closureX->result();
-	langbind::TypedFilterBase::ElementType elemtype;
-	langbind::TypedFilterBase::Element elem;
-
-	std::cout << std::endl << title << std::endl;
-	while (funcresX->getNext( elemtype, elem))
-	{
-		std::cout << langbind::TypedFilterBase::elementTypeName( elemtype) << " '" << elem.tostring() << "'" << std::endl;
-	}
-
-	std::string assembly( "Functions, Version=1.0.0.8, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
-	const VARIANT* vfuncres2 = comauto::getFunctionResultVariant( funcresX.get());
-	VARIANT result = clr.call( assembly, "Functions", nameY, 1, vfuncres2);
-	std::string buf;
-	elem = comauto::getAtomicElement( result, buf);
-	std::cout << elem.tostring() << std::endl;
-}
-
 static void test_atomic_param_fun_call( const std::map<std::string,comauto::FunctionR>& funcmap)
 {
 	langbind::Form param;
@@ -82,7 +53,9 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Func
 	langbind::Form user;
 	langbind::Form place;
 	langbind::Form pair;
-	langbind::Form param;
+	langbind::Form param_AddIdPair;
+	langbind::Form param_GetUser_p;
+	langbind::Form param_GetAddress_p;
 	pair
 		( "a", langbind::Form( "51"))
 		( "b", langbind::Form( "3"))
@@ -96,19 +69,21 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Func
 		( "name", langbind::Form( "Hans Muster"))
 		( "place", place)
 		;
-	param
+	param_AddIdPair
 		( "p", pair)
 		;
-	test_function_call( funcmap, "Functions.AddIdPair", param, "RESULT STRUCT FUN CALL:");
-};
-
-static void test_struct_param_fun_call_seq( const comauto::CommonLanguageRuntime& clr, const std::map<std::string,comauto::FunctionR>& funcmap)
-{
-	langbind::Form param;
-	param
-		( "a", langbind::Form( "23"))
+	param_GetUser_p
+		( "id", langbind::Form( "123"))
+		( "name", langbind::Form( "Hans Muster"))
+		( "street", langbind::Form( "Vogelsangstrasse 5 8006 Zurich"))
+		( "country", langbind::Form( "Switzerland"))
 		;
-	test_function_call_seq( clr, funcmap, "Functions.GetIdPair", "Functions.AddIdPair", param, "RESULT STRUCT FUN CALL:");
+	param_GetAddress_p
+		( "street", langbind::Form( "Vogelsangstrasse 5 8006 Zurich"))
+		( "country", langbind::Form( "Switzerland"))
+		;
+	test_function_call( funcmap, "Functions.AddIdPair", param_AddIdPair, "RESULT STRUCT FUN CALL:");
+	test_function_call( funcmap, "Functions.GetAddress_p", param_GetAddress_p, "RESULT STRUCT FUN CALL:");
 };
 
 
@@ -127,15 +102,20 @@ int main( int , const char**)
 		std::vector<comauto::FunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
 		std::map<std::string,comauto::FunctionR> funcmap;
 
+		std::string asmname;
 		for (; fi != fe; ++fi)
 		{
-			std::cout << "FUNCTION " << (*fi)->assemblyname() << " " << (*fi)->classname() << "::" << (*fi)->methodname() << "[" << (*fi)->nofParameter() << "]" << std::endl;
+			if (asmname != (*fi)->assemblyname())
+			{
+				asmname = (*fi)->assemblyname();
+				std::cout << "ASSEMBLY " << asmname << std::endl;
+			}
+			std::cout << "FUNCTION " << (*fi)->classname() << "." << (*fi)->methodname() << "[" << (*fi)->nofParameter() << "]" << std::endl;
 			funcmap[ (*fi)->classname() + "." + (*fi)->methodname()] = *fi;
 		}
 		test_atomic_param_clr_call( clr, assembly);
 		test_atomic_param_fun_call( funcmap);
 		test_struct_param_fun_call( funcmap);
-		test_struct_param_fun_call_seq( clr, funcmap);
 	}
 	catch (const std::exception& e)
 	{

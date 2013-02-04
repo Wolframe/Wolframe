@@ -171,6 +171,13 @@ std::wstring comauto::tostring( const _com_error& err)
 	return rt;
 }
 
+std::string comauto::tostring( const EXCEPINFO& einfo)
+{
+	std::ostringstream rt;
+	rt << "[" << std::hex << einfo.wCode << "/" << einfo.scode << "]: " << std::dec << comauto::utf8string( einfo.bstrDescription);
+	return rt.str();
+}
+
 std::string comauto::typestr( VARTYPE vt)
 {
 	std::string rt;
@@ -747,7 +754,6 @@ void comauto::copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::
 {
 	if (dsttype == VT_BSTR)
 	{
-/*[-]*/std::cout << "DEBUG init (copyVariantType) " << comauto::typestr(dsttype) <<  " at 0x0" << std::hex << (uintptr_t)dstfield << std::dec << std::endl;
 		VARIANT dstcp = comauto::createVariantType( val, dsttype);
 		if (*((BSTR*)dstfield) != NULL) ::SysFreeString( *((BSTR*)dstfield));
 		*((BSTR*)dstfield) = dstcp.bstrVal;
@@ -756,14 +762,12 @@ void comauto::copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::
 	else if (dsttype == VT_LPSTR)
 	{
 		VARIANT dstcp = comauto::createVariantType( val, dsttype);
-/*[-]*/std::cout << "DEBUG init (copyVariantType) " << comauto::typestr(dsttype) <<  " at 0x0" << std::hex << (uintptr_t)dstfield << " with '" << (dstcp.pcVal?(LPSTR)dstcp.pcVal:"[NULL]") << "'" << std::dec << std::endl;
 		if (*((LPSTR*)dstfield) != NULL) comauto::freeMem( *((LPSTR*)dstfield));
 		*((LPSTR*)dstfield) = V_LPSTR(&dstcp);
 		dstcp.vt = VT_EMPTY;
 	}
 	else if (dsttype == VT_LPWSTR)
 	{
-/*[-]*/std::cout << "DEBUG init (copyVariantType) " << comauto::typestr(dsttype) << " at 0x0" << std::hex << (uintptr_t)dstfield << std::dec << std::endl;
 		VARIANT dstcp = comauto::createVariantType( val, dsttype);
 		if (*((LPWSTR*)dstfield) != NULL) comauto::freeMem( *((LPWSTR*)dstfield));
 		*((LPWSTR*)dstfield) = V_LPWSTR(&dstcp);
@@ -771,7 +775,6 @@ void comauto::copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::
 	}
 	else if (comauto::isAtomicType( dsttype))
 	{
-/*[-]*/std::cout << "DEBUG init (copyVariantType) " << comauto::typestr(dsttype) <<  " at 0x0" << std::hex << (uintptr_t)dstfield << std::dec << std::endl;
 		VARIANT dstcp = comauto::createVariantType( val, dsttype);
 		::memcpy( dstfield, comauto::arithmeticTypeAddress( &dstcp), comauto::sizeofAtomicType( dsttype));
 	}
@@ -845,6 +848,17 @@ std::string comauto::variablename( const ITypeInfo* typeinfo, VARDESC* vardesc)
 	UINT nn;
 	WRAP( const_cast<ITypeInfo*>(typeinfo)->GetNames( vardesc->memid, &vv, 1, &nn))
 	rt = comauto::utf8string(vv);
+	::SysFreeString( vv);
+	return rt;
+}
+
+std::wstring comauto::variablename_utf16( const ITypeInfo* typeinfo, VARDESC* vardesc)
+{
+	std::wstring rt;
+	BSTR vv;
+	UINT nn;
+	WRAP( const_cast<ITypeInfo*>(typeinfo)->GetNames( vardesc->memid, &vv, 1, &nn))
+	rt = std::wstring(vv?vv:L"");
 	::SysFreeString( vv);
 	return rt;
 }

@@ -21,7 +21,6 @@ namespace comauto {
 class Function;
 class CommonLanguageRuntime;
 
-/*[-]*/const VARIANT* getFunctionResultVariant( const langbind::TypedInputFilter* res);
 
 class FunctionClosure
 	:public langbind::FormFunctionClosure

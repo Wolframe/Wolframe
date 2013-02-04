@@ -47,21 +47,21 @@ comauto::CommonLanguageRuntime::CommonLanguageRuntime( const std::string& versio
 	}
 }
 
-VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, LONG argc, const VARIANT* argv) const
+VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, const std::wstring& class_, const std::wstring& method_, LONG argc, const VARIANT* argv, LCID lcid) const
 {
 	struct Local
 	{
-		Local() {::memset( this, 0, sizeof( *this)); vtReturnVal.vt = VT_EMPTY;}
+		Local() {::memset( this, 0, sizeof( *this)); varResult.vt = VT_EMPTY;}
 		~Local()
 		{
-			comauto::wrapVariantClear( &vtReturnVal);
-			if (methodArgs) ::SafeArrayDestroy(methodArgs);
+			comauto::wrapVariantClear( &varResult);
 			if (spType) spType->Release();
 			if (spAssembly) spAssembly->Release();
 			if (spDefaultAppDomain) spDefaultAppDomain->Release();
 		}
-		VARIANT vtReturnVal; 
-		SAFEARRAY* methodArgs;
+		EXCEPINFO excepInfo;
+		VARIANT varResult; 
+		DISPPARAMS dispParams;
 		 IUnknownPtr spAppDomainThunk; 
 		_AppDomainPtr spDefaultAppDomain; 
 		_AssemblyPtr spAssembly; 
@@ -69,14 +69,14 @@ VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, con
 
 		VARIANT getReturnVal()
 		{
-			VARIANT rt = vtReturnVal;
-			vtReturnVal.vt = VT_EMPTY;
+			VARIANT rt = varResult;
+			varResult.vt = VT_EMPTY;
 			return rt;
 		}
 	};
 	Local local;
 
-	// The static method in the .NET class to invoke.
+	// The identifiers of the method in the .NET class to invoke:
 	bstr_t bstrAssemblyName( assembly_.c_str()); 
 	bstr_t bstrClassName( class_.c_str()); 
 	bstr_t bstrMethodName( method_.c_str()); 
@@ -86,24 +86,47 @@ VARIANT comauto::CommonLanguageRuntime::call( const std::wstring& assembly_, con
 	WRAP( local.spDefaultAppDomain->Load_2( bstrAssemblyName, &local.spAssembly))
 	WRAP( local.spAssembly->GetType_2( bstrClassName, &local.spType))
 
+	// Create an instance of the object to invoke the method:
 	variant_t vtObject;
 	WRAP( local.spAssembly->CreateInstance( bstrClassName, &vtObject))
 
-	local.methodArgs = ::SafeArrayCreateVector( VT_VARIANT, 0, argc);
+	// Initialize the method arguments structure:
+	local.dispParams.cNamedArgs = 0;
+	local.dispParams.cArgs = argc;
+	local.dispParams.rgvarg = const_cast<VARIANT*>(argv);
 
-	if (!local.methodArgs) throw std::bad_alloc();
-	for (LONG aidx=0; aidx != argc; ++aidx)
+	// Get the method invoker interface (IDispatch):
+	IDispatch* dispatch = NULL;
+	WRAP( vtObject.punkVal->QueryInterface( IID_IDispatch, (void**)&dispatch))
+
+	// Get the method handle:
+	DISPID gDispId = 0;
+	LPOLESTR bstrMethodName_ = bstrMethodName;
+	WRAP( dispatch->GetIDsOfNames( IID_NULL, &bstrMethodName_, 1, lcid, &gDispId))
+
+    // Call that method:
+	UINT puArgErr;
+	HRESULT hr = dispatch->Invoke( gDispId, IID_NULL, lcid, DISPATCH_METHOD, &local.dispParams, &local.varResult, &local.excepInfo, &puArgErr);
+	if (hr != S_OK)
 	{
-		WRAP( ::SafeArrayPutElement( local.methodArgs, &aidx, const_cast<VARIANT*>(&argv[aidx])))
+		std::string methodname = comauto::utf8string(class_) + "." + comauto::utf8string(method_);
+		if (hr == DISP_E_EXCEPTION)
+		{
+			throw std::runtime_error( std::string("Error calling ") + methodname + " " + comauto::tostring( local.excepInfo));
+		}
+		else
+		{
+			_com_error error(hr);
+			std::ostringstream errcode; 
+			errcode << std::hex << " [0x" << hr << "]";
+			throw std::runtime_error( std::string("Error calling ") + methodname + ": '" + comauto::utf8string(error.ErrorMessage()) + errcode.str());
+		}
 	}
-	BindingFlags bindingFlags = static_cast<BindingFlags>( BindingFlags_InvokeMethod | BindingFlags_Instance | BindingFlags_Public);
-	WRAP( local.spType->InvokeMember_3( bstrMethodName, bindingFlags, NULL, vtObject, local.methodArgs, &local.vtReturnVal))
-
 	return local.getReturnVal();
 }
 
-VARIANT comauto::CommonLanguageRuntime::call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, LONG argc, const VARIANT* argv) const
+VARIANT comauto::CommonLanguageRuntime::call( const std::string& assembly_utf8_, const std::string& class_utf8_, const std::string& method_utf8_, LONG argc, const VARIANT* argv, LCID lcid) const
 {
-	return call( comauto::utf16string( assembly_utf8_), comauto::utf16string( class_utf8_), comauto::utf16string( method_utf8_), argc, argv);
+	return call( comauto::utf16string( assembly_utf8_), comauto::utf16string( class_utf8_), comauto::utf16string( method_utf8_), argc, argv, lcid);
 }
 
