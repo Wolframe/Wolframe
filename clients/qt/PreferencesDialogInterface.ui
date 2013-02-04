@@ -85,14 +85,14 @@
       <item row="4" column="0">
        <widget class="QCheckBox" name="rememberLogin">
         <property name="text">
-         <string>&amp;Remeber login</string>
+         <string>&amp;Remember login (server and username, not credentials)</string>
         </property>
        </widget>
       </item>
       <item row="5" column="0">
        <widget class="QCheckBox" name="saveRestoreState">
         <property name="text">
-         <string>S&amp;ave and restore state of windows</string>
+         <string>S&amp;ave and restore state, position and size of (sub)windows</string>
         </property>
        </widget>
       </item>
