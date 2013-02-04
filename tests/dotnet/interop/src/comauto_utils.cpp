@@ -5,14 +5,10 @@
 
 using namespace _Wolframe;
 
-#ifndef V_LPSTR
-static const char*& V_LPSTR( const VARIANT* v){ return *(const char**)comauto::arithmeticTypeAddress(v); }
-static char*& V_LPSTR( VARIANT* v){ return *(char**)comauto::arithmeticTypeAddress(v); }
-#endif
-#ifndef V_LPWSTR
-static const wchar_t*& V_LPWSTR( const VARIANT* v){ return *(const wchar_t**)comauto::arithmeticTypeAddress(v); }
-static wchar_t*& V_LPWSTR( VARIANT* v){ return *(wchar_t**)comauto::arithmeticTypeAddress(v); }
-#endif
+const char*& comauto::impl_V_LPSTR( const VARIANT* v)		{ return *(const char**)comauto::arithmeticTypeAddress(v); }
+char*& comauto::impl_V_LPSTR( VARIANT* v)					{ return *(char**)comauto::arithmeticTypeAddress(v); }
+const wchar_t*& comauto::impl_V_LPWSTR( const VARIANT* v)	{ return *(const wchar_t**)comauto::arithmeticTypeAddress(v); }
+wchar_t*& comauto::impl_V_LPWSTR( VARIANT* v)				{ return *(wchar_t**)comauto::arithmeticTypeAddress(v); }
 
 void* comauto::allocMem( std::size_t size)
 {
@@ -220,7 +216,7 @@ std::string comauto::typestr( VARTYPE vt)
 	return rt;
 }
 
-std::string comauto::typestr( ITypeInfo* typeinfo, const TYPEDESC* ed)
+std::string comauto::typestr( const ITypeInfo* typeinfo, const TYPEDESC* ed)
 {
 	std::string rt;
 	VARTYPE vt = ed->vt;
@@ -253,14 +249,24 @@ std::string comauto::typestr( ITypeInfo* typeinfo, const TYPEDESC* ed)
 	}
 	if (vt == VT_USERDEFINED)
 	{
-		ITypeInfo* rectypeinfo;
-		TYPEATTR *recattr;
-		WRAP( typeinfo->GetRefTypeInfo( ed->hreftype, &rectypeinfo))
-		rt.append( "{");
-		rt.append( structstring( rectypeinfo));
-		WRAP( rectypeinfo->GetTypeAttr( &recattr))
-		if (recattr->typekind != TKIND_RECORD) throw std::runtime_error("Can only handle VT_USERDEFINED type of kind VT_RECORD (a structure with no methods)");
-		rt.append( "}");
+		ITypeInfo* rectypeinfo = 0;
+		TYPEATTR *recattr = 0;
+		try
+		{
+			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetRefTypeInfo( ed->hreftype, &rectypeinfo))
+			rt.append( "{");
+			rt.append( structstring( rectypeinfo));
+			WRAP( rectypeinfo->GetTypeAttr( &recattr))
+			if (recattr->typekind != TKIND_RECORD) throw std::runtime_error("Can only handle VT_USERDEFINED type of kind VT_RECORD (a structure with no methods)");
+			rt.append( "}");
+		}
+		catch (const std::runtime_error& e)
+		{
+			if (rectypeinfo && recattr) rectypeinfo->ReleaseTypeAttr( recattr);
+			if (rectypeinfo) rectypeinfo->Release();
+			throw e;
+		}
+		rectypeinfo->ReleaseTypeAttr( recattr);
 		rectypeinfo->Release();
 		return rt;
 	}
@@ -268,25 +274,49 @@ std::string comauto::typestr( ITypeInfo* typeinfo, const TYPEDESC* ed)
 	return rt;
 }
 
-std::string comauto::structstring( ITypeInfo* typeinfo)
+std::string comauto::typestr( const ITypeInfo* typeinfo)
 {
+	CComBSTR typeName;
+	WRAP( const_cast<ITypeInfo*>(typeinfo)->GetDocumentation( MEMBERID_NIL, &typeName, NULL, NULL, NULL ))
+	std::string rt( comauto::utf8string( typeName));
+	::SysFreeString( typeName);
+	return rt;
+}
+
+std::string comauto::structstring( const ITypeInfo* typeinfo)
+{
+	VARDESC* var = 0;
+	TYPEATTR* typeattr = 0;
+	BSTR varname = NULL;
 	std::ostringstream out;
-	TYPEATTR* typeattr;
-	WRAP( typeinfo->GetTypeAttr( &typeattr));
-	for (unsigned short ii = 0; ii < typeattr->cVars; ++ii)
+
+	try
 	{
-		VARDESC* var;
-		WRAP( typeinfo->GetVarDesc( ii, &var))
-		BSTR varname;
-		UINT nn;
-		WRAP( typeinfo->GetNames( var->memid, &varname, 1, &nn))
-		ELEMDESC ed = var->elemdescVar;
-		if (ii > 0) out << ";";
-		out << comauto::utf8string(varname) << ":" << typestr( typeinfo, &ed.tdesc);
-		typeinfo->ReleaseVarDesc( var);
-		::SysFreeString( varname);
+		WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr));
+		for (unsigned short ii = 0; ii < typeattr->cVars; ++ii)
+		{
+			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetVarDesc( ii, &var))
+			BSTR varname;
+			UINT nn;
+			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetNames( var->memid, &varname, 1, &nn))
+			ELEMDESC ed = var->elemdescVar;
+			if (ii > 0) out << ";";
+			out << comauto::utf8string(varname) << ":" << typestr( typeinfo, &ed.tdesc);
+			const_cast<ITypeInfo*>(typeinfo)->ReleaseVarDesc( var);
+			var = 0;
+			::SysFreeString( varname);
+			varname = NULL;
+		}
+		const_cast<ITypeInfo*>(typeinfo)->ReleaseTypeAttr( typeattr);
+		return out.str();
 	}
-	return out.str();
+	catch (const std::runtime_error& e)
+	{
+		if (var) const_cast<ITypeInfo*>(typeinfo)->ReleaseVarDesc( var);
+		if (varname) ::SysFreeString( varname);
+		if (typeattr) const_cast<ITypeInfo*>(typeinfo)->ReleaseTypeAttr( typeattr);
+		throw e;
+	}
 }
 
 VARIANT comauto::createVariantType( bool val)
@@ -808,18 +838,18 @@ const void* comauto::arithmeticTypeAddress( const VARIANT* val)
 	return (const void*)((const char*)val + 4*sizeof(short));
 }
 
-std::string comauto::variablename( ITypeInfo* typeinfo, VARDESC* vardesc)
+std::string comauto::variablename( const ITypeInfo* typeinfo, VARDESC* vardesc)
 {
 	std::string rt;
 	BSTR vv;
 	UINT nn;
-	WRAP( typeinfo->GetNames( vardesc->memid, &vv, 1, &nn))
+	WRAP( const_cast<ITypeInfo*>(typeinfo)->GetNames( vardesc->memid, &vv, 1, &nn))
 	rt = comauto::utf8string(vv);
 	::SysFreeString( vv);
 	return rt;
 }
 
-std::string comauto::variabletype( ITypeInfo* typeinfo, VARDESC* vardesc)
+std::string comauto::variabletype( const ITypeInfo* typeinfo, VARDESC* vardesc)
 {
 	std::string rt;
 	ELEMDESC ed = vardesc->elemdescVar;

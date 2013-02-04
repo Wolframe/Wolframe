@@ -45,9 +45,9 @@ public interface FunctionInterface
     [ComVisible(true)]
     IdPair GetIdPair( int a);
     [ComVisible(true)]
-    Address GetAddress_p( [MarshalAs(UnmanagedType.LPStr)] string street, [MarshalAs(UnmanagedType.LPStr)] string country);
+    Address GetAddress_p( string street, string country);
     [ComVisible(true)]
-    User GetUser_p( int id, [MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string street, [MarshalAs(UnmanagedType.LPStr)] string country);
+    User GetUser_p( int id, string name, string street, string country);
 }
 
 [ComVisible(true)]
@@ -87,14 +87,15 @@ public class Functions : FunctionInterface
         rt.b = a - 1;
         return rt;
     }
-    public Address GetAddress_p( [MarshalAs(UnmanagedType.LPStr)] string street, [MarshalAs(UnmanagedType.LPStr)] string country)
+    //[+] public Address GetAddress_p( [MarshalAs(UnmanagedType.LPStr)] string street, [MarshalAs(UnmanagedType.LPStr)] string country)
+    public Address GetAddress_p( string street, string country)
     {
         Address rt;
         rt.street = street;
         rt.country = country;
         return rt;
     }
-    public User GetUser_p( int id, [MarshalAs(UnmanagedType.LPStr)] string name, [MarshalAs(UnmanagedType.LPStr)] string street, [MarshalAs(UnmanagedType.LPStr)] string country)
+    public User GetUser_p( int id, string name, string street, string country)
     {
         User rt;
         rt.id = id;

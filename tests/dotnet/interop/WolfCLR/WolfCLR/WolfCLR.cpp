@@ -4,6 +4,7 @@
 #include "comauto_utils.hpp"
 #include "comauto_typelib.hpp"
 #include "comauto_clr.hpp"
+#include "comauto_function.hpp"
 #include "ddl_form.hpp"
 #include <iostream>
 
@@ -40,6 +41,35 @@ static void test_function_call( const std::map<std::string,comauto::FunctionR>& 
 	}
 }
 
+static void test_function_call_seq( const comauto::CommonLanguageRuntime& clr, const std::map<std::string,comauto::FunctionR>& funcmap, const char* nameX, const char* nameY, const langbind::Form& param, const char* title)
+{
+	std::map<std::string,comauto::FunctionR>::const_iterator xi = funcmap.find( nameX);
+	if (xi == funcmap.end()) throw std::runtime_error( std::string("function not defined: '") + nameX + "'");
+	std::map<std::string,comauto::FunctionR>::const_iterator yi = funcmap.find( nameY);
+	if (yi == funcmap.end()) throw std::runtime_error( std::string("function not defined: '") + nameY + "'");
+
+	langbind::FormFunctionClosure* closureX = xi->second ->createClosure();
+	closureX->init( 0, param.get());
+	if (!closureX->call()) throw std::runtime_error( std::string("function call failed: '") + nameX + "'");
+
+	langbind::TypedInputFilterR funcresX = closureX->result();
+	langbind::TypedFilterBase::ElementType elemtype;
+	langbind::TypedFilterBase::Element elem;
+
+	std::cout << std::endl << title << std::endl;
+	while (funcresX->getNext( elemtype, elem))
+	{
+		std::cout << langbind::TypedFilterBase::elementTypeName( elemtype) << " '" << elem.tostring() << "'" << std::endl;
+	}
+
+	std::string assembly( "Functions, Version=1.0.0.8, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
+	const VARIANT* vfuncres2 = comauto::getFunctionResultVariant( funcresX.get());
+	VARIANT result = clr.call( assembly, "Functions", nameY, 1, vfuncres2);
+	std::string buf;
+	elem = comauto::getAtomicElement( result, buf);
+	std::cout << elem.tostring() << std::endl;
+}
+
 static void test_atomic_param_fun_call( const std::map<std::string,comauto::FunctionR>& funcmap)
 {
 	langbind::Form param;
@@ -54,19 +84,31 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Func
 	langbind::Form pair;
 	langbind::Form param;
 	pair
-		( "a", langbind::Form( "56"))
-		( "b", langbind::Form( "19"));
+		( "a", langbind::Form( "51"))
+		( "b", langbind::Form( "3"))
+		;
 	place
 		( "street", langbind::Form( "Vogelsangstrasse 5 8006 Zurich"))
-		( "country", langbind::Form( "Switzerland"));
+		( "country", langbind::Form( "Switzerland"))
+		;
 	user
 		( "id", langbind::Form( "123"))
 		( "name", langbind::Form( "Hans Muster"))
-		( "place", place);
+		( "place", place)
+		;
 	param
-		( "country", langbind::Form( "Germany"))
-		( "street", langbind::Form( "Ottoweg 4 10115 Berlin"));
-	test_function_call( funcmap, "Functions.GetAddress_p", param, "RESULT STRUCT FUN CALL:");
+		( "p", pair)
+		;
+	test_function_call( funcmap, "Functions.AddIdPair", param, "RESULT STRUCT FUN CALL:");
+};
+
+static void test_struct_param_fun_call_seq( const comauto::CommonLanguageRuntime& clr, const std::map<std::string,comauto::FunctionR>& funcmap)
+{
+	langbind::Form param;
+	param
+		( "a", langbind::Form( "23"))
+		;
+	test_function_call_seq( clr, funcmap, "Functions.GetIdPair", "Functions.AddIdPair", param, "RESULT STRUCT FUN CALL:");
 };
 
 
@@ -81,7 +123,7 @@ int main( int , const char**)
 		typelib.print( std::cout);
 		comauto::CommonLanguageRuntime clr( "v4.0.30319");
 
-		std::vector<comauto::FunctionR> funcs = typelib.loadFunctions( &clr, assembly);
+		std::vector<comauto::FunctionR> funcs = comauto::loadFunctions( &typelib, &clr, assembly);
 		std::vector<comauto::FunctionR>::const_iterator fi = funcs.begin(), fe = funcs.end();
 		std::map<std::string,comauto::FunctionR> funcmap;
 
@@ -93,6 +135,7 @@ int main( int , const char**)
 		test_atomic_param_clr_call( clr, assembly);
 		test_atomic_param_fun_call( funcmap);
 		test_struct_param_fun_call( funcmap);
+		test_struct_param_fun_call_seq( clr, funcmap);
 	}
 	catch (const std::exception& e)
 	{

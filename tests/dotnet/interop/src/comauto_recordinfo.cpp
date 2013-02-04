@@ -249,7 +249,7 @@ HRESULT comauto::RecordInfo::GetName( BSTR* pbstrName)
 /*[-]*/std::cerr << "comauto::RecordInfo::GetName(..)" << std::endl;
 	HRESULT hr;
 	if (!pbstrName) return E_INVALIDARG;
-	RETURN_ON_ERROR( hr, m_typeinfo->GetDocumentation(-1, pbstrName, NULL, NULL, NULL));
+	RETURN_ON_ERROR( hr, m_typeinfo->GetDocumentation( MEMBERID_NIL, pbstrName, NULL, NULL, NULL));
 	return S_OK;
 }
 
@@ -385,11 +385,11 @@ HRESULT comauto::RecordInfo::PutFieldNoCopy( ULONG, PVOID pvData, LPCOLESTR szFi
 				break;
 
 			case VT_LPWSTR:
-				*((LPWSTR*)field) = (LPWSTR)(void*)pvarField->pcVal;
+				*((LPWSTR*)field) = V_LPWSTR( pvarField);
 				break;
 
 			case VT_LPSTR:
-				*((LPSTR*)field) = pvarField->pcVal;
+				*((LPSTR*)field) = V_LPSTR( pvarField);
 				break;
 
 			case VT_USERDEFINED:
@@ -463,28 +463,61 @@ BOOL comauto::RecordInfo::IsMatchingType( IRecordInfo *pRecordInfo)
 		unsigned short ii;
 		for (ii = 0; ii < m_typeattr->cVars; ++ii)
 		{
-			if (vd) m_typeinfo->ReleaseVarDesc( vd);
+			if (vd)
+			{
+				m_typeinfo->ReleaseVarDesc( vd);
+				vd = NULL;
+			}
 			WRAP( m_typeinfo->GetVarDesc( ii, &vd))
-			if (ovd) otypeinfo->ReleaseVarDesc( ovd);
+			if (ovd)
+			{
+				otypeinfo->ReleaseVarDesc( ovd);
+				ovd = NULL;
+			}
 			WRAP( otypeinfo->GetVarDesc( ii, &ovd))
-			if (vd->elemdescVar.tdesc.vt != ovd->elemdescVar.tdesc.vt || vd->oInst != ovd->oInst) {rt=FALSE; goto Cleanup;}
+
+			if (vd->elemdescVar.tdesc.vt != ovd->elemdescVar.tdesc.vt || vd->oInst != ovd->oInst)
+			{
+				rt=FALSE; goto Cleanup;
+			}
 			UINT nn;
-			if (varname) ::SysFreeString( varname);
+			if (varname)
+			{
+				::SysFreeString( varname); varname = NULL;
+			}
 			WRAP( m_typeinfo->GetNames( vd->memid, &varname, 1, &nn))
-			if (ovarname) ::SysFreeString( ovarname);
+			if (ovarname)
+			{
+				::SysFreeString( ovarname); ovarname = NULL;
+			}
 			WRAP( otypeinfo->GetNames( ovd->memid, &ovarname, 1, &nn))
-			if (wcscmp( varname, ovarname) != 0) {rt=FALSE; goto Cleanup;}
+
+			if (wcscmp( varname, ovarname) != 0)
+			{
+				rt=FALSE; goto Cleanup;
+			}
 
 			if (vd->elemdescVar.tdesc.vt == VT_USERDEFINED)
 			{
-				if (rectypeinfo) rectypeinfo->Release();
+				if (rectypeinfo)
+				{
+					rectypeinfo->Release();
+					rectypeinfo = 0;
+				}
 				WRAP( m_typeinfo->GetRefTypeInfo( vd->elemdescVar.tdesc.hreftype, &rectypeinfo))
-				if (orectypeinfo) orectypeinfo->Release();
+				if (orectypeinfo)
+				{
+					orectypeinfo->Release();
+					orectypeinfo = NULL;
+				}
 				WRAP( m_typeinfo->GetRefTypeInfo( ovd->elemdescVar.tdesc.hreftype, &orectypeinfo))
 
 				comauto::RecordInfo rec( rectypeinfo);
 				comauto::RecordInfo orec( orectypeinfo);
-				if (rec.IsMatchingType( &orec) == FALSE) {rt=FALSE; goto Cleanup;}
+				if (rec.IsMatchingType( &orec) == FALSE)
+				{
+					rt=FALSE; goto Cleanup;
+				}
 			}
 		}
 	}

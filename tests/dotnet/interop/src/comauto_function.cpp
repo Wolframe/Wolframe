@@ -13,13 +13,13 @@ class FunctionResult
 	:public langbind::TypedInputFilter
 {
 public:
-	FunctionResult( const CComPtr<ITypeInfo>& typeinfo, const VARIANT& data_)
+	FunctionResult( const ITypeInfo* typeinfo, const VARIANT& data_)
 		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
 	{
 		std::memset( &m_data, 0, sizeof(m_data));
 		m_data.vt = VT_EMPTY;
 		WRAP( comauto::wrapVariantCopy( &m_data, &data_))
-		m_stk.push_back( StackElem( Init, typeinfo, 0));
+		m_stk.push_back( StackElem( Init, const_cast<ITypeInfo*>(typeinfo), 0));
 	}
 
 	FunctionResult( const FunctionResult& o)
@@ -56,14 +56,14 @@ private:
 	struct StackElem
 	{
 		State state;
-		CComPtr<ITypeInfo> typeinfo;
+		ITypeInfo* typeinfo;
 		TYPEATTR* typeattr;
 		VARDESC* vardesc;
 		std::size_t ofs;
 		unsigned short idx;
 
 		StackElem( const StackElem& o);
-		StackElem( State state_, CComPtr<ITypeInfo> typeinfo_, std::size_t ofs_);
+		StackElem( State state_, ITypeInfo* typeinfo_, std::size_t ofs_);
 		~StackElem();
 	};
 	std::vector<StackElem> m_stk;
@@ -73,20 +73,152 @@ private:
 }//anonymous namespace
 
 
-comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx)
+static void findFunctions( const comauto::TypeLib* typelib, const ITypeInfo* typeinfo, std::vector<comauto::FunctionR>& funcs, comauto::CommonLanguageRuntime* clr, const std::string& assemblyname, const std::string& classname)
+{
+	TYPEATTR* typeattr = 0;
+	ITypeInfo* classtypeinfo = 0;
+	try
+	{
+		unsigned short ii;
+		WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr))
+		if ((typeattr->typekind == TKIND_DISPATCH || typeattr->typekind == TKIND_RECORD) && classname.empty())
+		{
+			return; //no follow on toplevel interface or POD data structure declaration
+		}
+		if (typeattr->cFuncs)
+		{
+			if (classname.empty())
+			{
+				throw std::runtime_error( "functions found outside class context");
+			}
+			for (ii = 0; ii < typeattr->cFuncs; ++ii)
+			{
+				comauto::FunctionR func( new comauto::Function( clr, typelib, typeinfo, assemblyname, classname, ii));
+				if (!comauto::isCOMInterfaceMethod( func->methodname()))
+				{
+					funcs.push_back( func);
+				}
+			}
+		}
+		std::string subclassname( classname);
+		if (typeattr->typekind == TKIND_COCLASS)
+		{
+			if (!classname.empty()) throw std::runtime_error( "nested class definitions not supported");
+			if (subclassname != "IUnknown")
+			{
+				subclassname.clear();
+				subclassname.append( comauto::typestr( typeinfo));
+			}
+		}
+		for (ii = 0; ii < typeattr->cImplTypes; ++ii)
+		{
+			HREFTYPE hreftype;
+			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetRefTypeOfImplType( ii, &hreftype))
+			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetRefTypeInfo( hreftype, &classtypeinfo))
+			findFunctions( typelib, classtypeinfo, funcs, clr, assemblyname, subclassname);
+			classtypeinfo->Release();
+			classtypeinfo = 0;
+		}
+		const_cast<ITypeInfo*>(typeinfo)->ReleaseTypeAttr( typeattr);
+		typeattr = 0;
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (typeattr) const_cast<ITypeInfo*>(typeinfo)->ReleaseTypeAttr( typeattr);
+		if (classtypeinfo) classtypeinfo->Release();
+		throw e;
+	}
+}
+
+std::vector<comauto::FunctionR> comauto::loadFunctions( const comauto::TypeLib* typelib, comauto::CommonLanguageRuntime* clr, const std::string& assemblyname)
+{
+	std::vector<comauto::FunctionR> rt;
+	ITypeInfo* typeinfo = 0;
+	try
+	{
+		ITypeLib* tl = const_cast<ITypeLib*>( typelib->typelib());
+		UINT ii = 0, nn = tl->GetTypeInfoCount();
+
+		for (; ii < nn; ++ii)
+		{
+			WRAP( tl->GetTypeInfo( ii, &typeinfo))
+			typelib->getRecordInfo( typeinfo);
+			findFunctions( typelib, typeinfo, rt, clr, assemblyname, "");
+			typeinfo->Release();
+			typeinfo = 0;
+		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (typeinfo) typeinfo->Release();
+		throw e;
+	}
+	return rt;
+}
+
+
+/*[-]*/const VARIANT* comauto::getFunctionResultVariant( const langbind::TypedInputFilter* res)
+/*[-]*/{
+/*[-]*/		const FunctionResult* resp = dynamic_cast<const FunctionResult*>(res);
+/*[-]*/		return resp->data();
+/*[-]*/}
+
+
+comauto::Function::Parameter::Parameter( const Parameter& o)
+	:name(o.name),typedesc(o.typedesc),typeinfo(o.typeinfo)
+{
+	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->AddRef();
+}
+
+comauto::Function::Parameter::Parameter( const std::string& name_, const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_)
+	:name(name_),typedesc(typedesc_),typeinfo(typeinfo_)
+{
+	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->AddRef();
+}
+
+comauto::Function::Parameter::~Parameter()
+{
+	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->Release();
+}
+
+comauto::Function::ReturnType::ReturnType( const ReturnType& o)
+	:typedesc(o.typedesc),typeinfo(o.typeinfo)
+{
+	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->AddRef();
+}
+
+comauto::Function::ReturnType::ReturnType( const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_)
+	:typedesc(typedesc_),typeinfo(typeinfo_)
+{
+	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->AddRef();
+}
+
+comauto::Function::ReturnType::ReturnType( const TYPEDESC* typedesc_)
+	:typedesc(typedesc_),typeinfo(0){}
+
+comauto::Function::ReturnType::~ReturnType()
+{
+	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->Release();
+}
+
+
+comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx)
 	:m_clr(clr_)
+	,m_typelib(typelib_)
 	,m_typeinfo(typeinfo_)
 	,m_funcdesc(0)
 	,m_assemblyname(assemblyname_)
 	,m_classname(classname_)
 {
-	WRAP( m_typeinfo->GetFuncDesc( fidx, &m_funcdesc))
+	if (m_typeinfo) const_cast<ITypeInfo*>(m_typeinfo)->AddRef();
+	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetFuncDesc( fidx, &m_funcdesc))
 	struct Local	//exception safe memory allocation of local variables
 	{
 		BSTR* pnames;
 		UINT size;
+		ITypeInfo* rectypeinfo;
 
-		Local()	:pnames(0){}
+		Local()	:pnames(0),rectypeinfo(0){}
 		~Local()
 		{
 			if (pnames)
@@ -94,12 +226,13 @@ comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, ITypeInfo* ty
 				for (UINT ii=0; ii<size; ++ii) if (pnames[ii]) ::SysFreeString( pnames[ii]);
 				delete [] pnames;
 			}
+			if (rectypeinfo) rectypeinfo->Release();
 		}
 	};
 	Local local;
 	local.pnames = new BSTR[ local.size = m_funcdesc->cParams+1];
 	UINT ii,nn;
-	WRAP( m_typeinfo->GetNames( m_funcdesc->memid, local.pnames, m_funcdesc->cParams+1, &nn))
+	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetNames( m_funcdesc->memid, local.pnames, m_funcdesc->cParams+1, &nn))
 
 	m_methodname = comauto::utf8string( local.pnames[0]);
 	for (ii=1; ii<nn; ++ii)
@@ -107,26 +240,37 @@ comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, ITypeInfo* ty
 		const TYPEDESC* td = &m_funcdesc->lprgelemdescParam[ii-1].tdesc;
 		if (td->vt == VT_USERDEFINED)
 		{
-			CComPtr<ITypeInfo> rectypeinfo;
-			WRAP( m_typeinfo->GetRefTypeInfo( td->hreftype, &rectypeinfo))
-			Parameter param( comauto::utf8string( local.pnames[ii]), td, comauto::getRecordInfoMap( rectypeinfo));
+			if (local.rectypeinfo) local.rectypeinfo->Release();
+			local.rectypeinfo = 0;
+			WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->hreftype, &local.rectypeinfo))
+			Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo);
 			m_parameterlist.push_back( param);
 		}
 		else
 		{
-			m_parameterlist.push_back( Parameter( comauto::utf8string( local.pnames[ii]), td));
+			m_parameterlist.push_back( Parameter( comauto::utf8string( local.pnames[ii]), td, 0));
 		}
 	}
-	m_returntype.typedesc = &m_funcdesc->elemdescFunc.tdesc;
-	if (m_returntype.typedesc->vt == VT_USERDEFINED)
+	if (m_funcdesc->elemdescFunc.tdesc.vt == VT_USERDEFINED)
 	{
-		WRAP( m_typeinfo->GetRefTypeInfo( m_returntype.typedesc->hreftype, &m_returntype.typeinfo))
+		if (local.rectypeinfo) local.rectypeinfo->Release();
+		local.rectypeinfo = 0;
+		WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( m_returntype.typedesc->hreftype, &local.rectypeinfo))
+		m_returntype = ReturnType( &m_funcdesc->elemdescFunc.tdesc, local.rectypeinfo);
+	}
+	else
+	{
+		m_returntype = ReturnType( &m_funcdesc->elemdescFunc.tdesc);
 	}
 }
 
 comauto::Function::~Function()
 {
-	m_typeinfo->ReleaseFuncDesc( m_funcdesc);
+	if (m_typeinfo)
+	{
+		const_cast<ITypeInfo*>(m_typeinfo)->ReleaseFuncDesc( m_funcdesc);
+		const_cast<ITypeInfo*>(m_typeinfo)->Release();
+	}
 }
 
 void comauto::Function::print( std::ostream& out) const
@@ -143,7 +287,7 @@ void comauto::Function::print( std::ostream& out) const
 	for (; pi != pe; ++pi)
 	{
 		if (pi != m_parameterlist.begin()) out << ", ";
-		out << pi->name << " :" << comauto::typestr( m_typeinfo, pi->typedesc);
+		out << pi->name << " :" << comauto::typestr( m_typeinfo, const_cast<TYPEDESC*>(pi->typedesc));
 	}
 	out << " ) :" << comauto::typestr( m_typeinfo, m_returntype.typedesc) << std::endl;
 }
@@ -168,28 +312,19 @@ comauto::FunctionClosure::FunctionClosure( const Function* func_)
 		:m_provider(0)
 		,m_func(func_)
 		,m_flags(serialize::Context::None)
-		,m_parameter(0)
-		,m_paramvalue(0)
-		,m_paramidx(0xFFFF)
-		,m_recdepht(0){}
+		,m_param(0)
+		,m_paramidx(null_paramidx){}
 
 comauto::FunctionClosure::~FunctionClosure()
 {
-	if (m_parameter)
+	if (m_param)
 	{
 		std::size_t pi = 0, pe = m_func->nofParameter();
 		for (; pi != pe; ++pi)
 		{
-			if (m_parameter[pi].vt == VT_USERDEFINED || m_parameter[pi].vt == VT_RECORD)
-			{
-				IRecordInfo* recinfo = m_parameter[pi].pRecInfo;
-				if (recinfo)
-				{
-					recinfo->RecordDestroy( m_parameter[pi].pvRecord);
-				}
-			}
+			comauto::wrapVariantClear( &m_param[pi]);
 		}
-		delete [] m_parameter;
+		delete [] m_param;
 	}
 }
 
@@ -199,232 +334,101 @@ void comauto::FunctionClosure::init( const proc::ProcessorProvider* p, const lan
 	m_input = i;
 	m_flags = f;
 	std::size_t ii = 0,nn = m_func->nofParameter();
-	if (m_parameter) delete [] m_parameter;
-	m_parameter = 0;	//... because of exception safety (new VARIANT[] might fail)
-	m_parameter = new VARIANT[ m_func->nofParameter()];
+	if (m_param) delete [] m_param;
+	m_param = 0;	//... because of exception safety (new VARIANT[] might fail)
+	m_param = new VARIANT[ m_func->nofParameter()];
 	for (; ii < nn; ++ii)
 	{
-		m_parameter[ii].vt = VT_EMPTY;
+		m_param[ii].vt = VT_EMPTY;
 	}
-	m_statestack.clear();
-	m_statestack.push( StateStackElem( CheckParam, 0));
-}
-
-VARIANT* comauto::FunctionClosure::initParameter( std::size_t eidx, VARIANT* val, const IRecordInfo* recinfo) const
-{
-	const Function::Parameter* param = m_func->getParameter( eidx);
-
-	if (m_parameter[ eidx].vt != VT_EMPTY)
-	{
-		if ((param->typedesc->vt & VT_ARRAY) == VT_ARRAY || (param->typedesc->vt & VT_VECTOR) == VT_VECTOR)
-		{
-			//.... create new array element here
-			throw std::runtime_error( "no support for arrays implemented yet");
-		}
-		throw std::runtime_error( std::string( "duplicate parameter '") + param->name + "'");
-	}
-	else
-	{
-		if (param->typedesc->vt == VT_USERDEFINED || param->typedesc->vt == VT_RECORD)
-		{
-			if (!recinfo) throw std::logic_error( "structure expected");
-			val->vt = param->typedesc->vt;
-			val->pRecInfo = const_cast<IRecordInfo*>(recinfo);
-			val->pvRecord = val->pRecInfo->RecordCreate();
-/*[-]*/std::cout << "DEBUG record created at 0x0" << std::hex << (uintptr_t)val->pvRecord << std::dec << std::endl;
-			if (!val->pvRecord) throw std::logic_error( "failed to create record data structure");
-			return val;
-		}
-		else if (comauto::isStringType( param->typedesc->vt))
-		{
-			if (recinfo) throw std::logic_error( "string instead of structure expected");
-			std::memset( val, 0, sizeof( VARIANT));
-			val->vt = param->typedesc->vt;
-			return val;
-		}
-		else if (comauto::isAtomicType( param->typedesc->vt))
-		{
-			if (recinfo) throw std::logic_error( "atomic type instead of structure expected");
-			val->vt = param->typedesc->vt;
-			std::size_t vtsize = comauto::sizeofAtomicType( val->vt);
-			::memset( comauto::arithmeticTypeAddress(val), 0, vtsize);
-			return val;
-		}
-	}
-	throw std::runtime_error( std::string( "unable to handle type of parameter '") + param->name + "'");
-}
-
-void comauto::FunctionClosure::assignValue( VARIANT* dstrec, std::size_t ofs, VARTYPE dsttype, const langbind::TypedFilterBase::Element& elem)
-{
-	VARIANT elemval;
-	elemval.vt = VT_EMPTY;
-	try
-	{
-		elemval = comauto::createVariantType( elem, dsttype);
-		if (comauto::isAtomicType( dstrec->vt) || comauto::isStringType( dstrec->vt))
-		{
-			if (ofs) throw std::logic_error( "illegal operation (offset into atomic type)");
-			comauto::wrapVariantCopy( dstrec, &elemval);
-		}
-		else if (dstrec->vt == VT_USERDEFINED || dstrec->vt == VT_RECORD) 
-		{
-			if (!dstrec->pvRecord) throw std::logic_error( "illegal data structure for this operation (pvRecord not defined)");
-			PVOID field = (PVOID)((char*)dstrec->pvRecord + ofs);
-/*[-]*/std::cout << "DEBUG copy element (value '" << elem.tostring() << "' to 0x0" << std::hex << (uintptr_t)dstrec->pvRecord << " at ofs 0x0" << ofs << std::dec << std::endl;
-			copyVariantType( dsttype, field, elem);
-		}
-		else
-		{
-			throw std::runtime_error( std::string("cannot handle this structure type: ") + comauto::typestr( dstrec->vt));
-		}
-	}
-	catch (const std::runtime_error& e)
-	{
-		comauto::wrapVariantClear( &elemval);
-		throw e;
-	}
+	m_paramidx = 0;
 }
 
 bool comauto::FunctionClosure::call()
 {
+AGAIN:
 	try
 	{
 		langbind::TypedFilterBase::ElementType elemtype;
 		langbind::TypedFilterBase::Element elemvalue;
 
-		while (!m_statestack.empty() && m_input->getNext( elemtype, elemvalue))
+		if (m_paramclosure.get())
 		{
-			State state = m_statestack.top().m_state;
-			switch (state)
+			VARIANT result;
+			result.vt = VT_EMPTY;
+			if (!m_paramclosure->call( result))
 			{
-				case CheckParam:
-					switch (elemtype)
+				if (m_input->state() == langbind::InputFilter::Open) throw std::runtime_error( "unexpected end of input");
+				return false;
+			}
+			const Function::Parameter* paramdescr = m_func->getParameter( m_paramidx);
+			if ((m_param[ m_paramidx].vt & VT_ARRAY) == VT_ARRAY) throw std::runtime_error( std::string("array types as parameter not implemented yet ('") + paramdescr->name + "')");
+			if (m_param[ m_paramidx].vt != VT_EMPTY) throw std::runtime_error( std::string("duplicate definition of parameter '") + paramdescr->name + "'");
+			m_param[ m_paramidx] = result;
+			m_paramidx = null_paramidx;
+		}
+		else 
+		{
+			while (m_input->getNext( elemtype, elemvalue))
+			{
+				switch (elemtype)
+				{
+					case langbind::InputFilter::Attribute:
+					case langbind::InputFilter::OpenTag:
 					{
-						case langbind::InputFilter::Attribute:
-						case langbind::InputFilter::OpenTag:
+						if (elemvalue.type == langbind::TypedFilterBase::Element::int_)
 						{
-							if (elemvalue.type == langbind::TypedFilterBase::Element::int_)
-							{
-								if (elemvalue.value.int_ < 0 || (std::size_t)elemvalue.value.int_ >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
-								m_paramidx = (std::size_t)elemvalue.value.int_;
-							}
-							else if (elemvalue.type == langbind::TypedFilterBase::Element::uint_)
-							{
-								if ((std::size_t)elemvalue.value.uint_ >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
-								m_paramidx = (std::size_t)elemvalue.value.uint_;
-							}
-							else if (elemvalue.type == langbind::TypedFilterBase::Element::string_)
-							{
-								std::string paramname( elemvalue.value.string_.ptr, elemvalue.value.string_.size);
-								m_paramidx = m_func->getParameterIndex( paramname);
-/*[-]*/std::cout << "DEBUG select parameter " << paramname << std::endl;
-							}
-							else
-							{
-								throw std::runtime_error( "unexpected node type (function parameter name or index expected)");
-							}
-							const Function::Parameter* param = m_func->getParameter( m_paramidx);
-							m_recdepht = 0;
-							const RecordInfo* recinfo = param->recinfomap.empty()?0:param->recinfomap.at(recordInfoKey(0,0)).get();
-							State followstate;
-							if (elemtype==langbind::InputFilter::Attribute)
-							{
-								followstate = MapAttrParam;
-								if (recinfo) throw std::runtime_error( "unexpected attribute selects sub structure in record");
-							}
-							else
-							{
-								followstate = MapParam;
-								if (recinfo) m_recdepht++;
-							}
-							m_paramvalue = initParameter( m_paramidx, &m_parameter[ m_paramidx], recinfo);
-							m_selectedtype = m_paramvalue->vt;
-							m_statestack.push( StateStackElem( followstate, recinfo));
-							break;
+							if (elemvalue.value.int_ < 0 || (std::size_t)elemvalue.value.int_ >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
+							m_paramidx = (std::size_t)elemvalue.value.int_;
 						}
-						case langbind::InputFilter::CloseTag:
-							m_statestack.pop();
-							break;
+						else if (elemvalue.type == langbind::TypedFilterBase::Element::uint_)
+						{
+							if ((std::size_t)elemvalue.value.uint_ >= m_func->nofParameter()) throw std::runtime_error( "function parameter index out of range");
+							m_paramidx = (std::size_t)elemvalue.value.uint_;
+						}
+						else if (elemvalue.type == langbind::TypedFilterBase::Element::string_)
+						{
+							std::string paramname( elemvalue.value.string_.ptr, elemvalue.value.string_.size);
+							m_paramidx = m_func->getParameterIndex( paramname);
+						}
+						else
+						{
+							throw std::runtime_error( "unexpected node type (function parameter name or index expected)");
+						}
+						const Function::Parameter* param = m_func->getParameter( m_paramidx);
 
-						case langbind::InputFilter::Value:
-							throw std::runtime_error( "unexpected content token (open element expected specifying the parameter by name or index)");
+						if (elemtype==langbind::InputFilter::Attribute)
+						{
+							if (param->typeinfo)
+							{
+								throw std::runtime_error( "atomic parameter expected if passed as attribute");
+							}
+							else
+							{
+								m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typedesc->vt, true));
+							}
+						}
+						else
+						{
+							if (param->typeinfo)
+							{
+								m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typeinfo));
+							}
+							else
+							{
+								m_paramclosure.reset( new TypeLib::AssignmentClosure( m_func->typelib(), m_input, param->typedesc->vt, false));
+							}
+						}
+						goto AGAIN;
 					}
-					break;
+					case langbind::InputFilter::CloseTag:
+						throw std::runtime_error( "unexpected close tag (tags not balanced)");
+						break;
 
-				case MapAttrParam:
-				case MapParam:
-					switch (elemtype)
-					{
-						case langbind::InputFilter::OpenTag:
-						case langbind::InputFilter::Attribute:
-						{
-							const RecordInfo* recinfo = m_statestack.top().m_recinfo;
-							std::string name( elemvalue.tostring());
-							comauto::RecordInfo::VariableDescriptor descr;
-
-							if (m_statestack.top().m_state == MapAttrParam) throw std::runtime_error( "unexpected attribute name (attribute value expected)");
-
-							if (!recinfo) throw std::runtime_error( std::string( "atomic value expected instead of identifier '") + name + "'");
-/*[-]*/std::cout << "DEBUG select variable " << name << std::endl;
-							if (!recinfo->getVariableDescriptor( name, descr)) throw std::runtime_error( std::string( "structure element not defined '") + name + "'");
-							m_selectedtype = descr.type;
-							std::size_t absofs = m_statestack.top().m_ofs + descr.ofs;
-							const Function::Parameter* param = m_func->getParameter( m_paramidx);
-
-							RecordInfoMap::const_iterator ri = param->recinfomap.find( comauto::recordInfoKey( m_recdepht, absofs));
-							const RecordInfo* followrecinfo = (ri == param->recinfomap.end())?0:ri->second.get();
-
-							State followstate;
-							if (elemtype==langbind::InputFilter::Attribute)
-							{
-								followstate = MapAttrParam;
-								if (followrecinfo) throw std::runtime_error( "unexpected attribute selects sub structure in record");
-							}
-							else
-							{
-								followstate = MapParam;
-								if (followrecinfo) m_recdepht++;
-							}
-							m_statestack.push( StateStackElem( followstate, followrecinfo, absofs, descr.varnum));
-							break;
-						}
-
-						case langbind::InputFilter::CloseTag:
-							if (state == MapAttrParam) throw std::runtime_error( "unexpected close tag (attribute value expected)");
-							if (m_statestack.top().m_recinfo) --m_recdepht;
-							m_statestack.pop();
-							break;
-
-						case langbind::InputFilter::Value:
-						{
-							const RecordInfo* recinfo = m_statestack.top().m_recinfo;
-							if (!recinfo)
-							{
-								std::size_t ofs = m_statestack.top().m_ofs;
-								assignValue( m_paramvalue, ofs, m_selectedtype, elemvalue);
-								break;
-							}
-							else if (state == MapParam)
-							{
-								/// ... implicit select content variable '_'
-								comauto::RecordInfo::VariableDescriptor descr;
-								if (!recinfo->getVariableDescriptor( "_", descr)) throw std::runtime_error( std::string( "structure element for content '_' selected but not defined"));
-								m_selectedtype = descr.type;
-								std::size_t absofs = m_statestack.top().m_ofs + descr.ofs;
-								const Function::Parameter* param = m_func->getParameter( m_paramidx);
-								RecordInfoMap::const_iterator ri = param->recinfomap.find( comauto::recordInfoKey( m_recdepht, absofs));
-								const RecordInfo* followrecinfo = (ri == param->recinfomap.end())?0:ri->second.get();
-								if (followrecinfo) throw std::runtime_error( std::string( "structure element for content '_' is not defined as an atomic type"));
-								m_statestack.push( StateStackElem( MapAttrParam, 0, absofs, descr.varnum));
-							}
-							std::size_t ofs = m_statestack.top().m_ofs;
-							if (!comauto::isAtomicType( m_selectedtype)) throw std::runtime_error( "atomic value assigned to non atomic type");
-							assignValue( m_paramvalue, ofs, m_selectedtype, elemvalue);
-							if (m_statestack.top().m_recinfo) --m_recdepht;
-							m_statestack.pop();
-						}
-					}
-					break;
+					case langbind::InputFilter::Value:
+						throw std::runtime_error( "unexpected content token (expected a parameter name or index)");
+				}
+				break;
 			}
 		}
 		switch (m_input->state())
@@ -437,27 +441,52 @@ bool comauto::FunctionClosure::call()
 		{
 			// ... don't know yet what to do here, because attributes are not defined for .NET functions ...
 		}
-		if ((m_flags & serialize::Context::ValidateInitialization) != 0)
+		std::size_t ii = 0,nn = m_func->nofParameter();
+		for (; ii < nn; ++ii)
 		{
-			std::size_t ii = 0,nn = m_func->nofParameter();
-			for (; ii < nn; ++ii)
+			if (m_param[ii].vt == VT_EMPTY)
 			{
-				if (m_parameter[ii].vt == VT_EMPTY)
-				{
-					const Function::Parameter* param = m_func->getParameter( ii);
-					if ((param->typedesc->vt & VT_ARRAY) == VT_ARRAY || (param->typedesc->vt & VT_VECTOR) == VT_VECTOR) continue;
+				const Function::Parameter* param = m_func->getParameter( ii);
+				if ((param->typedesc->vt & VT_ARRAY) == VT_ARRAY || (param->typedesc->vt & VT_VECTOR) == VT_VECTOR) continue;
 
+				if ((m_flags & serialize::Context::ValidateInitialization) != 0)
+				{
 					throw std::runtime_error( std::string( "missing parameter '") + param->name + "'");
+				}
+				else if (comauto::isAtomicType( param->typedesc->vt))
+				{
+					m_param[ii] = comauto::createVariantType( langbind::TypedInputFilter::Element(), param->typedesc->vt);
+				}
+				else if (param->typeinfo)
+				{
+					const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
+					if (!recinfo) throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed (record info unknown)");
+					m_param[ii].pvRecord = const_cast<IRecordInfo*>(recinfo)->RecordCreate();
+					m_param[ii].pRecInfo = const_cast<IRecordInfo*>(recinfo);
+					m_param[ii].vt = param->typedesc->vt;
+				}
+				else
+				{
+					throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed");
 				}
 			}
 		}
-		VARIANT resdata = m_func->clr()->call( m_func->assemblyname(), m_func->classname(), m_func->methodname(), m_func->nofParameter(), m_parameter);
+		VARIANT resdata = m_func->clr()->call( m_func->assemblyname(), m_func->classname(), m_func->methodname(), m_func->nofParameter(), m_param);
 		m_result.reset( new FunctionResult( m_func->getReturnType()->typeinfo, resdata));
 		return true;
 	}
 	catch (const std::runtime_error& e)
 	{
-		throw std::runtime_error( errorMessage( e.what()));
+		std::string funcname = m_func->classname() + "." +  m_func->methodname();
+		if (m_paramclosure.get())
+		{
+			const Function::Parameter* paramdescr = m_func->getParameter( m_paramidx);
+			throw std::runtime_error( std::string("error calling function '") + funcname + " in parameter '" + paramdescr->name + "' (" + m_paramclosure->variablepath() + "): " + e.what());
+		}
+		else
+		{
+			throw std::runtime_error( std::string("error calling function '") + funcname + "': " + e.what());
+		}
 	}
 }
 
@@ -466,68 +495,12 @@ langbind::TypedInputFilterR comauto::FunctionClosure::result() const
 	return m_result;
 }
 
-std::string comauto::FunctionClosure::StateStack::variablepath() const
-{
-	std::string rt;
-	std::vector<StateStackElem>::const_iterator si = m_impl.begin(), sn, se = m_impl.end();
-	for (; si != se; ++si)
-	{
-		if (si->m_recinfo)
-		{
-			sn = si;
-			++sn;
-			if (sn != se && sn->m_variableidx > 0)
-			{
-				VARDESC* var;
-				ITypeInfo* typeinfo = const_cast<ITypeInfo*>( si->m_recinfo->typeinfo());
-				WRAP( typeinfo->GetVarDesc( sn->m_variableidx, &var))
-				if (!rt.empty()) rt.push_back( '.');
-				rt.append( comauto::variablename( typeinfo, var));
-				typeinfo->ReleaseVarDesc( var);
-			}
-		}
-	}
-	return rt;
-}
-
-std::string comauto::FunctionClosure::errorMessage( const std::string& msg) const
-{
-	std::ostringstream rt;
-	if (m_statestack.empty())
-	{
-		rt << "error";
-	}
-	else
-	{
-		switch (m_statestack.top().m_state)
-		{
-			case CheckParam:
-				rt << "error mapping parameters";
-				break;
-			case MapParam:
-			case MapAttrParam:
-			{
-				const comauto::Function::Parameter* param = m_func->getParameter( m_paramidx);
-				std::string vp = m_statestack.variablepath();
-
-				rt << "error mapping parameter '" << param->name << "'";
-				if (!vp.empty())
-				{
-					rt << " (" << param->name << "." << vp << ")";
-				}
-			}
-		}
-	}
-	rt << " calling function '" << m_func->classname() << "." << m_func->methodname() << "': " << msg;
-	return rt.str();
-}
-
-
 FunctionResult::StackElem::StackElem( const StackElem& o)
 	:state(o.state),typeinfo(o.typeinfo),typeattr(0),vardesc(0),ofs(o.ofs),idx(o.idx)
 {
 	if (typeinfo)
 	{
+		typeinfo->AddRef();
 		WRAP( typeinfo->GetTypeAttr( &typeattr))
 		if (o.vardesc)
 		{
@@ -536,10 +509,14 @@ FunctionResult::StackElem::StackElem( const StackElem& o)
 	}
 }
 
-FunctionResult::StackElem::StackElem( State state_, CComPtr<ITypeInfo> typeinfo_, std::size_t ofs_)
+FunctionResult::StackElem::StackElem( State state_, ITypeInfo* typeinfo_, std::size_t ofs_)
 	:state(state_),typeinfo(typeinfo_),typeattr(0),vardesc(0),ofs(ofs_),idx(0)
 {
-	if (typeinfo) WRAP( typeinfo->GetTypeAttr( &typeattr))
+	if (typeinfo)
+	{
+		typeinfo->AddRef();
+		WRAP( typeinfo->GetTypeAttr( &typeattr))
+	}
 }
 
 FunctionResult::StackElem::~StackElem()
@@ -548,6 +525,7 @@ FunctionResult::StackElem::~StackElem()
 	{
 		if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
 		if (vardesc) typeinfo->ReleaseVarDesc( vardesc);
+		typeinfo->Release();
 	}
 }
 

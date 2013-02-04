@@ -32,10 +32,11 @@ std::string utf8string( const BSTR& str);
 std::wstring tostring( VARIANT* v);
 std::wstring tostring( const _com_error& err);
 std::string typestr( VARTYPE vt);
-std::string typestr( ITypeInfo* typeinfo, const TYPEDESC* ed);
-std::string structstring( ITypeInfo* typeinfo);
-std::string variablename( ITypeInfo* typeinfo, VARDESC* vardesc);
-std::string variabletype( ITypeInfo* typeinfo, VARDESC* vardesc);
+std::string typestr( const ITypeInfo* typeinfo, const TYPEDESC* ed);
+std::string typestr( const ITypeInfo* typeinfo);
+std::string structstring( const ITypeInfo* typeinfo);
+std::string variablename( const ITypeInfo* typeinfo, VARDESC* vardesc);
+std::string variabletype( const ITypeInfo* typeinfo, VARDESC* vardesc);
 
 bool isCOMInterfaceMethod( const std::string& name);
 
@@ -79,6 +80,18 @@ langbind::TypedInputFilter::Element getAtomicElement( const VARIANT& val, std::s
 		std::ostringstream errcode; errcode << std::hex << "0x" << hr; \
 		throw std::runtime_error( std::string("Error calling ") + callname + ": '" + comauto::utf8string(error.ErrorMessage()) + "' [" + errcode.str() + "]");\
 	}}
+
+const char*& impl_V_LPSTR( const VARIANT* v);
+char*& impl_V_LPSTR( VARIANT* v);
+const wchar_t*& impl_V_LPWSTR( const VARIANT* v);
+wchar_t*& impl_V_LPWSTR( VARIANT* v);
+
+#ifndef V_LPSTR
+#define V_LPSTR(V) comauto::impl_V_LPSTR(V)
+#endif
+#ifndef V_LPWSTR
+#define V_LPWSTR(V) comauto::impl_V_LPWSTR(V)
+#endif
 
 }}
 #endif

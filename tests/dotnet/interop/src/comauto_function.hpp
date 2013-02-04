@@ -2,6 +2,7 @@
 #define _Wolframe_COM_AUTOMATION_FUNCTION_HPP_INCLUDED
 #include "comauto_utils.hpp"
 #include "comauto_recordinfo.hpp"
+#include "comauto_typelib.hpp"
 #include "filter/typedfilter.hpp"
 #include "langbind/formFunction.hpp"
 #include <oaidl.h>
@@ -20,6 +21,8 @@ namespace comauto {
 class Function;
 class CommonLanguageRuntime;
 
+/*[-]*/const VARIANT* getFunctionResultVariant( const langbind::TypedInputFilter* res);
+
 class FunctionClosure
 	:public langbind::FormFunctionClosure
 {
@@ -34,74 +37,18 @@ public:
 	virtual langbind::TypedInputFilterR result() const;
 
 private:
-	VARIANT* initParameter( std::size_t eidx, VARIANT* val, const IRecordInfo* recinfo) const;
 	std::string errorMessage( const std::string& msg) const;
-	void assignValue( VARIANT* dstrec, std::size_t ofs, VARTYPE dsttype, const langbind::TypedFilterBase::Element& elem);
 
 private:
-	enum State
-	{
-		CheckParam,
-		MapParam,
-		MapAttrParam
-	};
-
-	///\class StateStackElem
-	///\brief Element of stack for parameter initialization statemachine
-	struct StateStackElem
-	{
-		State m_state;
-		const RecordInfo* m_recinfo;
-		int m_variableidx;
-		std::size_t m_ofs;
-
-		StateStackElem( State state_, const RecordInfo* recinfo_, std::size_t ofs_=0, int variableidx_=-1)
-			:m_state(state_)
-			,m_recinfo(recinfo_)
-			,m_variableidx(variableidx_)
-			,m_ofs(ofs_){}
-
-		StateStackElem( const StateStackElem& o)
-			:m_state(o.m_state)
-			,m_recinfo(o.m_recinfo)
-			,m_variableidx(o.m_variableidx)
-			,m_ofs(o.m_ofs){}
-
-		~StateStackElem(){}
-	};
-
-	///\class StateStack
-	///\brief Stack for parameter initialization statemachine
-	class StateStack
-	{
-	public:
-		StateStack(){}
-		~StateStack()						{clear();}
-		void push( const StateStackElem& e)	{m_impl.push_back( e);}
-		void pop()							{m_impl.pop_back();}
-		StateStackElem& top()				{return m_impl.back();}
-		const StateStackElem& top()	const	{return m_impl.back();}
-		bool empty() const					{return m_impl.empty();}
-		std::size_t size() const			{return m_impl.size();}
-		void clear()						{while (!empty()) pop();}
-		std::string variablepath() const;
-
-	private:
-		std::vector<StateStackElem> m_impl;
-	};
-
-private:
-	const proc::ProcessorProvider* m_provider;		//< processor provider reference for function called
-	const Function* m_func;							//< function to call
-	langbind::TypedInputFilterR m_input;			//< input parameters
-	serialize::Context::Flags m_flags;				//< flag passed by called to stear validation strictness
-	VARIANT* m_parameter;							//< array of function parameters to initialize
-	langbind::TypedInputFilterR m_result;			//< reference to result of the function call
-	StateStack m_statestack;						//< stack of parameter initialization state machine
-	VARIANT* m_paramvalue;							//< currently selected parameter value to initialize
-	std::size_t m_paramidx;							//< currently selected parameter of the function [0,1,.. n-1]
-	VARTYPE m_selectedtype;							//< currently selected variable type, determines intialization of an atomic type in the structure by value
-	unsigned int m_recdepht;						//< depht in tree (used for RecordInfoMap key - RecordInfoKey)
+	const proc::ProcessorProvider* m_provider;						//< processor provider reference for function called
+	const Function* m_func;											//< function to call
+	langbind::TypedInputFilterR m_input;							//< input parameters
+	serialize::Context::Flags m_flags;								//< flag passed by called to stear validation strictness
+	VARIANT* m_param;												//< array of function parameters to initialize
+	enum {null_paramidx=0xFFFF};
+	std::size_t m_paramidx;											//< currently selected parameter of the function [0,1,.. n-1]
+	boost::shared_ptr<TypeLib::AssignmentClosure> m_paramclosure;	//< closure for current parameter assignment
+	langbind::TypedInputFilterR m_result;							//< reference to result of the function call
 };
 
 
@@ -111,33 +58,28 @@ class Function
 public:
 	struct Parameter
 	{
+		Parameter( const Parameter& o);
+		Parameter( const std::string& name_, const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_);
+		~Parameter();
+
 		std::string name;
 		const TYPEDESC* typedesc;
-		RecordInfoMap recinfomap;
-
-		Parameter( const Parameter& o)
-			:name(o.name),typedesc(o.typedesc),recinfomap(o.recinfomap){}
-		Parameter( const std::string& name_, const TYPEDESC* typedesc_, const RecordInfoMap& recinfomap_)
-			:name(name_),typedesc(typedesc_),recinfomap(recinfomap_){}
-		Parameter( const std::string& name_, const TYPEDESC* typedesc_)
-			:name(name_),typedesc(typedesc_){}
+		const ITypeInfo* typeinfo;
 	};
 
 	struct ReturnType
 	{
-		ReturnType( const ReturnType& o)
-			:typedesc(o.typedesc),typeinfo(o.typeinfo){}
-		ReturnType( const TYPEDESC* typedesc_, const CComPtr<ITypeInfo>& typeinfo_)
-			:typedesc(typedesc_),typeinfo(typeinfo_){}
-		explicit ReturnType( const TYPEDESC* typedesc_=0)
-			:typedesc(typedesc_){}
+		ReturnType( const ReturnType& o);
+		ReturnType( const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_);
+		explicit ReturnType( const TYPEDESC* typedesc_=0);
+		~ReturnType();
 
 		const TYPEDESC* typedesc;
-		CComPtr<ITypeInfo> typeinfo;
+		const ITypeInfo* typeinfo;
 	};
 
 public:
-	Function( comauto::CommonLanguageRuntime* clr_, ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx);
+	Function( comauto::CommonLanguageRuntime* clr_, const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, const std::string& assemblyname_, const std::string& classname_, unsigned short fidx);
 	virtual ~Function();
 
 	const std::string& assemblyname() const								{return m_assemblyname;}
@@ -147,7 +89,8 @@ public:
 	std::size_t getParameterIndex( const std::string& name) const;
 	const Parameter* getParameter( std::size_t idx) const;
 	comauto::CommonLanguageRuntime* clr() const							{return m_clr;}
-	ITypeInfo* typeinfo() const											{return m_typeinfo;}
+	const comauto::TypeLib* typelib() const								{return m_typelib;}
+	const ITypeInfo* typeinfo() const									{return m_typeinfo;}
 	const ReturnType* getReturnType() const								{return &m_returntype;}
 
 	void print( std::ostream& out) const;
@@ -155,7 +98,8 @@ public:
 
 private:
 	comauto::CommonLanguageRuntime* m_clr;
-	ITypeInfo* m_typeinfo;
+	const comauto::TypeLib* m_typelib;
+	const ITypeInfo* m_typeinfo;
 	FUNCDESC* m_funcdesc;
 	std::string m_assemblyname;
 	std::string m_classname;
@@ -165,6 +109,8 @@ private:
 };
 
 typedef boost::shared_ptr<Function> FunctionR;
+
+std::vector<comauto::FunctionR> loadFunctions( const comauto::TypeLib* typelib, comauto::CommonLanguageRuntime* clr, const std::string& assemblyname);
 
 }} //namespace
 #endif
