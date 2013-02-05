@@ -26,6 +26,9 @@ all:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d all || exit 1); done)
 
+# intentionally here, as we want 'all' to be the default target
+-include makefiles/gmake/install.mk
+
 .PHONY: clean
 clean:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
@@ -79,6 +82,11 @@ config:
 	@echo "System library directory: $(SYSTEM_LIBDIR)"
 ifeq "$(PLATFORM)" "LINUX"
 	@echo "Linux distribution: $(LINUX_DIST) $(LINUX_REV)"
+endif
+ifeq ($(RELEASE),1)
+	@echo "Building release version"
+else
+	@echo "Building debug version"
 endif
 	@echo "C++ Compiler: $(COMPILER)"
 	@echo "Optimization flags: $(OPTFLAGS)"
@@ -225,6 +233,20 @@ ifeq ($(WITH_LOCAL_FREEIMAGE),1)
 endif
 endif
 	@echo
+	@echo "Installation directories"
+	@echo
+	@echo "DESTDIR: $(DESTDIR)"
+	@echo "prefix: $(prefix)"
+	@echo "execdir: $(execdir)"
+	@echo "bindir: $(bindir)"
+	@echo "sbindir: $(sbindir)"
+	@echo "libdir: $(libdir)"
+	@echo "sysconfdir: $(sysconfdir)"
+	@echo "includedir: $(includedir)"
+	@echo "datadir: $(datadir)"
+	@echo "localedir: $(localedir)"
+	@echo "moduleloaddir: $(moduleloaddir)"
+	@echo
 	@echo "Additional build options:"
 	@echo
 ifeq ($(ENABLE_NLS),0)
@@ -234,6 +256,9 @@ else
 endif
 ifeq ($(RUN_TESTS),0)
 	@echo "Will not execute any tests"
+endif
+ifeq ($(WITH_EXPECT),1)
+	@echo "Will execute expect tests"
 endif
 	@echo
 

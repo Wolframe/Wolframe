@@ -22,6 +22,9 @@ includedir=$(execdir)/include
 datadir=$(execdir)/share
 localedir=$(datadir)/locale
 
+# Wolframe specific directories
+moduleloaddir=$(libdir)/wolframe/modules
+
 .PHONY: install_recursive install local_install
 
 install_recursive:

@@ -80,7 +80,11 @@ CPP_BINS = \
 	wolframed$(EXE) \
 	wolfilter$(EXE)
 
+
 -include $(TOPDIR)/makefiles/gmake/sub.mk
+
+# set default module load directory for configuration option 'directory' in 'LoadModules'
+INCLUDE_CXXFLAGS += -DDEFAULT_MODULE_LOAD_DIR=$(moduleloaddir)
 
 modules: libwolframe libwolframe_serialize libwolframe_langbind libwolframe_prnt
 libwolframe_serialize: libwolframe
