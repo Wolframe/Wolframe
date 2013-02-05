@@ -138,7 +138,7 @@ void MainWindow::parseArgs( )
 {
 	const struct QCommandLineConfigEntry conf[] =
 	{
-		{ QCommandLine::Option, 's', "settings", "Use settings from this file", QCommandLine::Optional },
+		{ QCommandLine::Option, 'c', "configuration", "Use configuration from this file (default .config/Wolframe/Wolframe Client.conf)", QCommandLine::Optional },
 		QCOMMANDLINE_CONFIG_ENTRY_END
 	};
 
@@ -172,7 +172,7 @@ void MainWindow::switchFound( const QString &name )
 void MainWindow::optionFound( const QString &name, const QVariant &value )
 {
 	qDebug( ) << "option" << name << "with" << value;
-	if( name == "settings" ) {
+	if( name == "configuration" ) {
 		m_settings = value.toString( );
 	}
 }
