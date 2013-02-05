@@ -9,6 +9,7 @@
 # - target: all targets
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
+-include $(TOPDIR)/makefiles/gmake/install_dirs.mk
 
 .PHONY: all $(SUBDIRS) local_all
 all: local_all
