@@ -23,6 +23,8 @@ now:
     => happens also with only one window?!
 
 musts:
+- ask for restart of the client when changing to developer mode
+- more segfaults, not quite sure when
 - integrate from qWolfClient
   - help system?
 - configurator specific:

@@ -801,7 +801,7 @@ void MainWindow::on_actionOpenForm_triggered( )
 	}
 }
 
-void MainWindow::on_actionReloadWindow_triggered( )
+void MainWindow::on_actionReload_triggered( )
 {
 	m_formWidget->reload( );
 }
@@ -902,7 +902,7 @@ void MainWindow::updateMdiMenusAndToolbars( )
 	activateAction( "actionNextWindow", nofSubWindows( ) > 1 );
 	activateAction( "actionPreviousWindow", nofSubWindows( ) > 1 );
 	activateAction( "actionTile", nofSubWindows( ) > 0 );
-	activateAction( "actionCascade", nofSubWindows( ) > 0 );		
+	activateAction( "actionCascade", nofSubWindows( ) > 0 );
 
 // recreate the subwindow menu and mark the currently selected submenu
 	QMenu *windowMenu = qFindChild<QMenu *>( this, "menuWindow" );
@@ -974,6 +974,10 @@ void MainWindow::updateMenusAndToolbars( )
 	activateAction( "actionOpenForm", 
 		( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) ||
 		( m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) ) );
+	activateAction( "actionReload",	
+		( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) ||
+		( m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) ) );
+		
 	if( settings.uiLoadMode == Network || settings.dataLoadMode == Network ) {
 		activateAction( "actionLogin", !m_wolframeClient || !m_wolframeClient->isConnected( ) );
 		activateAction( "actionLogout", m_wolframeClient && m_wolframeClient->isConnected( ) );

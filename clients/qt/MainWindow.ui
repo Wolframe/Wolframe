@@ -82,7 +82,7 @@
     <property name="title">
      <string>&amp;Window</string>
     </property>
-    <addaction name="actionReloadWindow"/>
+    <addaction name="actionReload"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
     <addaction name="actionCloseAll"/>
@@ -170,7 +170,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionReloadWindow"/>
+   <addaction name="actionReload"/>
    <addaction name="actionPreviousWindow"/>
    <addaction name="actionNextWindow"/>
   </widget>
@@ -326,7 +326,7 @@
     <string>Check for Updates...</string>
    </property>
   </action>
-  <action name="actionReloadWindow">
+  <action name="actionReload">
    <property name="enabled">
     <bool>false</bool>
    </property>

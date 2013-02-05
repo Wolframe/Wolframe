@@ -134,7 +134,7 @@ class MainWindow : public QMainWindow
 		void on_actionAboutQt_triggered( );
 		void on_actionOpenForm_triggered( );
 		void on_actionOpenFormNewWindow_triggered( );	
-		void on_actionReloadWindow_triggered( );
+		void on_actionReload_triggered( );
 		void on_actionNextWindow_triggered( );
 		void on_actionPreviousWindow_triggered( );
 		void on_actionClose_triggered( );
