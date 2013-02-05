@@ -21,30 +21,38 @@ now:
     requests, so it's the domain filler.
     It happens only if the same form is picked as already shown in another window
     => happens also with only one window?!
+  - resizing issues: example view picture when picture list window is quite small
 
 musts:
-- ask for restart of the client when changing to developer mode
-- more segfaults, not quite sure when
+- file UI and data mode
+  - form not shown in file UI load mode
+  - resizing issues
+  - window/MDI window states not saved
+- multi-language support
+  - language switch in MDI case (not only m_formWidget!)
+  - window names and form widget titles must be translated dynamically
 - integrate from qWolfClient
-  - help system?
+  - help system, context sensitive help, HTMLish
 - configurator specific:
   - use simpleforms instead of funny lua parsers (example
     picture parsers)
+  - redo, use inheritance in forms
   - rewrite categories, so that joins to pictures, requires/provides, tags,
     etc. are possible through the lua layer
-- titles of windows instead of names for formchoosedialog
-- translations
-  - window names and form widget titles must be translated dynamically
+  - linking of categories and features
+- FormChooseDialog
+  - titles of windows instead of filenames of forms
+  - structure? icons? menu?
   - the FormChooserList needs localized titles of all possible forms
     (maybe custom menus which would be added would be better? or a
     tree view in the dialog and a tree menu in the menubar?)
+- ask for restart of the client when changing to developer mode
 - open info box (modal) in feature/category/component edit and add to
   show picture information
 - search with flag (with children)
 - delete needs manual set parameters, update and add use XML from widgets,
   slightly assymetrical maybe?
 - tags picked from a list and added (needs events)
-- linking of categories and features
 - optimal size on qtreewidget to fit items (needed for linking categories
   and features linking view)
 - tabbed preferences dialog, like thunderbird (in security, form management,
@@ -77,10 +85,7 @@ musts:
     - move elements/subtrees
 - protocol
   - network loader via protocol or use client library?
-- designer custom widgets
-  - them in MainWindow:
-    - the now case is FormWidget<init>
-    - MDI or tabbed view
+- custom widgets for designer
   - picture viewer
     - show 0 to N pictures, scrollable
     - alternative to QTableWidget approach
@@ -105,8 +110,6 @@ musts:
   - QTreeView: with model for big data, on request
 
 nice to do:
-- MDI windows should get icons of the forms, especially
-  nice for a iconized/shaded view of the MDI sub windows
 - file download, later, for reports, PDFs, etc.
   - PDF widget poppler qt4 for previews
 - designer mode

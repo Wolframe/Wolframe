@@ -232,6 +232,7 @@ I18NS = \
 	apps/test/i18n/form4.ro_RO.qm
 
 RESOURCES = \
+	apps/test/resources/test.rcc \
 	apps/configurator/resources/configurator.rcc
 
 I18NS_TS = $(I18NS:.qm=.ts)
@@ -261,7 +262,7 @@ local_test:
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
-	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient -s apps/test.conf
+	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient -c apps/test.conf
 
 .PHONY: buildi18n
 buildi18n:

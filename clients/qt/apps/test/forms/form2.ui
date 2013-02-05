@@ -20,6 +20,10 @@
   <property name="windowTitle">
    <string>Wolframe client form 2</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resources/test.qrc">
+    <normaloff>:/images/carrot.png</normaloff>:/images/carrot.png</iconset>
+  </property>
   <property name="initAction" stdset="0">
    <string>read</string>
   </property>
@@ -286,6 +290,8 @@
   <tabstop>tabWidget</tabstop>
   <tabstop>text</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/test.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -54,6 +54,7 @@ class FormWidget : public QWidget
 	
 	public:
 		QString form( ) const;
+		QIcon getWindowIcon( ) const;
 
 		void restoreFromGlobals( QHash<QString, QString> *props );
 		

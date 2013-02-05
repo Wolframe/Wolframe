@@ -203,6 +203,11 @@ QString FormWidget::form( ) const
 	return m_form;
 }
 
+QIcon FormWidget::getWindowIcon( ) const
+{
+	return m_ui->windowIcon( );
+}	
+
 void FormWidget::loadForm( QString name )
 {
 	if( !m_formLoader ) return;

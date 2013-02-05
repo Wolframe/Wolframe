@@ -648,6 +648,18 @@ void MainWindow::formLoaded( QString name )
 		if( mdiSubWindow ) {
 			QString title = m_formWidget->windowTitle( );
 			mdiSubWindow->setWindowTitle( title );
+
+			QIcon icon = m_formWidget->getWindowIcon( );
+			if( !icon.isNull( ) ) {
+				qDebug( ) << "Setting window icon" << m_formWidget;
+				mdiSubWindow->setWindowIcon( icon );
+			} else {
+				qDebug( ) << "Setting application icon";
+				mdiSubWindow->setWindowIcon( windowIcon( ) );
+			}
+			
+			m_mdiArea->update( );
+			
 			QAction *action = m_revSubWinMap.value( mdiSubWindow );
 			if( action ) {
 				int idx = action->data( ).toInt( );
@@ -707,7 +719,8 @@ void MainWindow::on_actionExit_triggered( )
 		}
 	} else {
 // terminate brutally in local mode
-		disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+		if( m_wolframeClient )
+			disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
 		close( );
 	}
 }
@@ -972,8 +985,9 @@ void MainWindow::updateMenusAndToolbars( )
 	
 // logged in or logged out?
 	activateAction( "actionOpenForm", 
-		( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) ||
-		( m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) ) );
+		( ( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile )
+		|| m_wolframeClient )
+		&& ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
 	activateAction( "actionReload",	
 		( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) ||
 		( m_wolframeClient && ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) ) );
