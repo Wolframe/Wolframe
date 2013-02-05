@@ -8,23 +8,6 @@
 # - target: install
 # - target: uninstall
 
-# default values
-DESTDIR=
-prefix=/usr
-
-# standard directories following FHS
-execdir=$(prefix)
-bindir=$(execdir)/bin
-sbindir=$(execdir)/sbin
-libdir=$(execdir)/$(LIBDIR)
-sysconfdir=$(execdir)/etc
-includedir=$(execdir)/include
-datadir=$(execdir)/share
-localedir=$(datadir)/locale
-
-# Wolframe specific directories
-moduleloaddir=$(libdir)/wolframe/modules
-
 .PHONY: install_recursive install local_install
 
 install_recursive:

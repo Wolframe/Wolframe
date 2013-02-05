@@ -20,14 +20,12 @@
 
 -include makefiles/gmake/platform.mk
 -include makefiles/gmake/compiler.mk
+-include makefiles/gmake/install_dirs.mk
 
 .PHONY: all
 all:
 	@test -z "$(SUBDIRS)" || ( set -e; for d in $(SUBDIRS)""; do \
 	  (set -e; $(MAKE) -C $$d all || exit 1); done)
-
-# intentionally here, as we want 'all' to be the default target
--include makefiles/gmake/install.mk
 
 .PHONY: clean
 clean:

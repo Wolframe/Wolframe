@@ -10,6 +10,7 @@
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 -include $(TOPDIR)/makefiles/gmake/compiler.mk
+-include $(TOPDIR)/makefiles/gmake/install_dirs.mk
 
 .PHONY: all subdirs $(SUBDIRS) local_all
 all: subdirs depend $(BINS) $(CPP_BINS) $(STATIC_LIB) $(NOINST_STATIC_LIB) $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR).$(DYNAMIC_LIB_MINOR).$(DYNAMIC_LIB_PATCH) $(DYNAMIC_LIB).$(DYNAMIC_LIB_MAJOR) $(DYNAMIC_LIB) $(DYNAMIC_MODULE) local_all all_po
