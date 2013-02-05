@@ -39,6 +39,8 @@ public interface FunctionInterface
     [ComVisible(true)]
     User StoreUser( User usr);
     [ComVisible(true)]
+    User[] StoreUsers(User[] usr);
+    [ComVisible(true)]
     int MapAddress( Address adr);
     [ComVisible(true)]
     int AddIdPair( IdPair p);
@@ -67,12 +69,26 @@ public class Functions : FunctionInterface
     {
         return i - j;
     }
-    public User StoreUser( User usr)
+    public User StoreUser(User usr)
     {
         usr.id += 1;
+        usr.name = usr.name.ToLower();
+        usr.place.street = usr.place.street.ToUpper();
+        usr.place.country = usr.place.country.ToUpper();
         return usr;
     }
-    public int MapAddress( Address adr)
+    public User[] StoreUsers(User[] usr)
+    {
+        for (int ii = 0; ii < usr.Length; ++ii)
+        {
+            usr[ii].id += 1;
+            usr[ii].name = usr[ii].name.ToLower();
+            usr[ii].place.street = usr[ii].place.street.ToUpper();
+            usr[ii].place.country = usr[ii].place.country.ToUpper();
+        }
+        return usr;
+    }
+    public int MapAddress(Address adr)
     {
         return adr.country.Length;
     }
