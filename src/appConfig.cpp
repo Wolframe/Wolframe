@@ -54,7 +54,8 @@
 #include <ostream>
 #include <stdexcept>
 
-#define STRINGIFY(x)	#x
+#define DO_STRINGIFY(x)	#x
+#define STRINGIFY(x)	DO_STRINGIFY(x)
 
 
 using namespace _Wolframe::utils;
@@ -249,42 +250,47 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 							    << L2it->first << "'";
 					}
 				}
-			}
-
-			// resolv relative pathes
-			if ( ! m_modFolder.empty() )	{
-				std::string basePath = m_modFolder;
-				boost::filesystem::path bp( basePath );
-				if ( !bp.is_absolute() )	{
+				// resolv relative pathes
+				if ( ! m_modFolder.empty() )	{
+					std::string basePath = m_modFolder;
+					boost::filesystem::path bp( basePath );
+					if ( !bp.is_absolute() )	{
 #if defined( DEFAULT_MODULE_LOAD_DIR )
-					basePath = utils::getCanonicalPath( basePath, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
+						basePath = utils::getCanonicalPath( basePath, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
+						LOG_DEBUG << MODULE_SECTION_MSG << "using directory '" << basePath << "' for modules";
 #else
-					basePath = utils::getCanonicalPath( basePath, configFile );
-/*MBa - maybe WARNING ? */		LOG_NOTICE << MODULE_SECTION_MSG << "using absolute directory path '" << basePath
-						   << "' instead of '" << m_modFolder << "'";
+						basePath = utils::getCanonicalPath( basePath, configFile );
+/*MBa - maybe WARNING ? */			LOG_NOTICE << MODULE_SECTION_MSG << "using absolute directory path '" << basePath
+							   << "' for modules, instead of '" << m_modFolder << "'";
 #endif
-				}
-				for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
-									Pit != m_modFiles.end(); Pit++ )	{
-					*Pit = utils::getCanonicalPath( *Pit, basePath );
-					assert( ! Pit->empty() );
-				}
-
-			}
-			else	{
-				for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
-									Pit != m_modFiles.end(); Pit++ )	{
-					std::string oldPath = *Pit;
-#if defined( DEFAULT_MODULE_LOAD_DIR )
-					*Pit = utils::getCanonicalPath( *Pit, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
-#else
-					*Pit = utils::getCanonicalPath( *Pit, configFile );
-					assert( ! Pit->empty() );
-					if ( oldPath != *Pit )	{
-						LOG_NOTICE << MODULE_SECTION_MSG << "using absolute filename '" << *Pit
-							   << "' instead of '" << oldPath << "'";
 					}
+					for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
+										Pit != m_modFiles.end(); Pit++ )	{
+						LOG_ERROR << MODULE_SECTION_MSG << "GG1            file '" << *Pit << "'";
+						LOG_ERROR << MODULE_SECTION_MSG << "GG1            path '" << basePath << "'";
+						LOG_ERROR << MODULE_SECTION_MSG << "GG1            defined '" << STRINGIFY( DEFAULT_MODULE_LOAD_DIR ) << "'";
+
+						*Pit = utils::getCanonicalPath( *Pit, basePath );
+						assert( ! Pit->empty() );
+						LOG_TRACE << MODULE_SECTION_MSG << "GG1 added module file '" << *Pit << "'";
+					}
+				}
+				else	{
+					for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
+										Pit != m_modFiles.end(); Pit++ )	{
+						std::string oldPath = *Pit;
+#if defined( DEFAULT_MODULE_LOAD_DIR )
+						*Pit = utils::getCanonicalPath( *Pit, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
+#else
+						*Pit = utils::getCanonicalPath( *Pit, configFile );
+						assert( ! Pit->empty() );
+						if ( oldPath != *Pit )	{
+							LOG_NOTICE << MODULE_SECTION_MSG << "using absolute filename '" << *Pit
+								   << "' for modules, instead of '" << oldPath << "'";
+						}
 #endif
+						LOG_TRACE << MODULE_SECTION_MSG << "GG2 added module file '" << *Pit << "'";
+					}
 				}
 			}
 		}
@@ -368,7 +374,7 @@ void ApplicationConfiguration::finalize( const CmdLineConfig& cmdLine )
 	serviceCfg->override( cmdLine.user, cmdLine.group, cmdLine.pidFile );
 #endif
 	for( std::size_t i = 0; i <  m_conf.size(); i++ )
-		m_conf[i]->setCanonicalPathes( configFile );
+		m_conf[i]->setCanonicalPathes( boost::filesystem::path( configFile ).branch_path().string() );
 }
 
 void ApplicationConfiguration::finalize()
@@ -376,7 +382,7 @@ void ApplicationConfiguration::finalize()
 	foreground = true;
 	for( std::size_t i = 0; i <  m_conf.size(); i++ )
 	{
-		m_conf[i]->setCanonicalPathes( configFile );
+		m_conf[i]->setCanonicalPathes( boost::filesystem::path( configFile ).branch_path().string() );
 	}
 }
 

@@ -57,10 +57,10 @@ std::string getFileExtension( const std::string& path);
 std::string getFileStem( const std::string& path);
 
 ///\brief Get the path 'path' relative to 'refpath' if it is not absolute
-///\param[in] path relative part of the path or a bsolute path
+///\param[in] path relative part of the path or absolute path
 ///\param[in] refpath absolute part of the path if 'path' is relative
 ///\return the canonical path
-std::string getCanonicalPath( const std::string& path, const std::string& refpath);
+std::string getCanonicalPath( const std::string& path, const std::string& refPath );
 
 ///\brief Get the parent path of 'path' (skipping /./ as parent path unlike boost::filesystem does)
 ///\param[in] path the path to get the parent path from

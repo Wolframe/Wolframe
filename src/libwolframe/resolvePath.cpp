@@ -86,17 +86,14 @@ std::string _Wolframe::utils::getFileStem( const std::string& path)
 	return rt;
 }
 
-std::string _Wolframe::utils::getCanonicalPath( const std::string& path, const std::string& refpath)
+std::string _Wolframe::utils::getCanonicalPath( const std::string& path, const std::string& refPath )
 {
-	boost::filesystem::path pt( path);
-	if (pt.is_absolute())
-	{
+	boost::filesystem::path pt( path );
+	if ( pt.is_absolute() )
 		return resolvePath( pt.string() );
-	}
 	else
-	{
-		return resolvePath( boost::filesystem::absolute( pt, boost::filesystem::path( refpath).branch_path()).string() );
-	}
+		return resolvePath( boost::filesystem::absolute( pt,
+								 boost::filesystem::path( refPath ) ).string() );
 }
 
 bool _Wolframe::utils::fileExists( const std::string& path)
