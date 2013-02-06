@@ -140,6 +140,7 @@ BSTR comauto::createBSTR( LPCWSTR str)
 std::wstring comauto::tostring( VARIANT* v)
 {
 	VARIANT vcp;
+	vcp.vt = VT_EMPTY;
 	WRAP( comauto::wrapVariantCopy( &vcp, v))
 	if (v->vt != VT_BSTR)
 	{
@@ -223,10 +224,10 @@ std::string comauto::typestr( VARTYPE vt)
 	return rt;
 }
 
-std::string comauto::typestr( const ITypeInfo* typeinfo, const TYPEDESC* ed)
+std::string comauto::typestr( const ITypeInfo* typeinfo, const TYPEDESC* typedesc)
 {
 	std::string rt;
-	VARTYPE vt = ed->vt;
+	VARTYPE vt = typedesc->vt;
 	if ((vt & VT_BYREF) == VT_BYREF)
 	{
 		rt.append( "-> ");
@@ -236,6 +237,10 @@ std::string comauto::typestr( const ITypeInfo* typeinfo, const TYPEDESC* ed)
 	{
 		rt.append( "[] ");
 		vt -= VT_ARRAY;
+		if (comauto::isAtomicType(vt))
+		{
+			std::cout << "++++++++++++++++++++++++++++++++++++ HALLY GALLY +++++++++++++++++++++++" << std::endl;
+		}
 	}
 	if ((vt & VT_VECTOR) == VT_VECTOR)
 	{
@@ -245,13 +250,13 @@ std::string comauto::typestr( const ITypeInfo* typeinfo, const TYPEDESC* ed)
 	if (vt == VT_PTR)
 	{
 		rt.append( "^");
-		rt.append( typestr( typeinfo, ed->lptdesc));
+		rt.append( typestr( typeinfo, typedesc->lptdesc));
 		return rt;
 	}
 	if (vt == VT_SAFEARRAY)
 	{
 		rt.append( "[] ");
-		rt.append( typestr( typeinfo, ed->lptdesc));
+		rt.append( typestr( typeinfo, typedesc->lptdesc));
 		return rt;
 	}
 	if (vt == VT_USERDEFINED)
@@ -260,7 +265,7 @@ std::string comauto::typestr( const ITypeInfo* typeinfo, const TYPEDESC* ed)
 		TYPEATTR *recattr = 0;
 		try
 		{
-			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetRefTypeInfo( ed->hreftype, &rectypeinfo))
+			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetRefTypeInfo( typedesc->hreftype, &rectypeinfo))
 			rt.append( "{");
 			rt.append( structstring( rectypeinfo));
 			WRAP( rectypeinfo->GetTypeAttr( &recattr))
@@ -284,7 +289,7 @@ std::string comauto::typestr( const ITypeInfo* typeinfo, const TYPEDESC* ed)
 std::string comauto::typestr( const ITypeInfo* typeinfo)
 {
 	CComBSTR typeName;
-	WRAP( const_cast<ITypeInfo*>(typeinfo)->GetDocumentation( MEMBERID_NIL, &typeName, NULL, NULL, NULL ))
+	WRAP( const_cast<ITypeInfo*>(typeinfo)->GetDocumentation( MEMBERID_NIL, &typeName, NULL, NULL, NULL))
 	std::string rt( comauto::utf8string( typeName));
 	::SysFreeString( typeName);
 	return rt;
@@ -565,6 +570,51 @@ VARIANT comauto::createVariantType( const langbind::TypedInputFilter::Element& v
 	}
 	return rt;
 }
+
+VARIANT comauto::createVariantArray( VARTYPE vt, const std::vector<VARIANT>& ar)
+{
+	VARIANT rt;
+	SAFEARRAY* pa = NULL;
+	try
+	{
+		LONG ii,nn;
+		SAFEARRAYBOUND bd;
+		bd.cElements = ar.size();
+		bd.lLbound = 0;
+
+		if (comauto::isAtomicType( vt) || comauto::isStringType( vt))
+		{
+			pa = ::SafeArrayCreate( vt, 1, &bd);
+			if (!pa) throw std::bad_alloc();
+
+			for (ii=0,nn=ar.size(); ii<nn; ++ii)
+			{
+				if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
+				WRAP( ::SafeArrayPutElement( pa, &ii, const_cast<void*>(comauto::arithmeticTypeAddress( &ar[ii]))))
+			}
+		}
+		else if (vt == VT_VARIANT)
+		{
+			pa = ::SafeArrayCreate( vt, 1, &bd);
+			if (!pa) throw std::bad_alloc();
+
+			for (ii=0,nn=ar.size(); ii<nn; ++ii)
+			{
+				if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
+				WRAP( ::SafeArrayPutElement( pa, &ii, const_cast<VARIANT*>(&ar[ii])))
+			}
+		}
+		rt.vt = VT_ARRAY | vt;
+		rt.parray = pa;
+		return rt;
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (pa) ::SafeArrayDestroy( pa);
+		throw e;
+	}
+}
+
 
 HRESULT comauto::wrapVariantCopy( VARIANT* pvargDest, const VARIANT* pvargSrc)
 {

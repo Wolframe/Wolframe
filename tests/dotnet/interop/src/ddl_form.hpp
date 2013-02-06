@@ -51,11 +51,11 @@ public:
 	Vector::iterator arraybegin()				{return m_ar.begin();}
 	Vector::iterator arrayend()					{return m_ar.end();}
 
-	bool isAtomic() const				{return m_type == Atomic;}
-	bool isArray() const				{return m_type == Array;}
-	bool isStruct() const				{return m_type == Struct;}
-	std::size_t size() const			{return (m_type == Atomic)?m_value.size():((m_type == Array)?m_ar.size():m_map.size());}
-	bool empty() const					{return m_type == Struct && m_map.empty();}
+	bool isAtomic() const						{return m_type == Atomic;}
+	bool isArray() const						{return m_type == Array;}
+	bool isStruct() const						{return m_type == Struct;}
+	std::size_t size() const					{return (m_type == Atomic)?m_value.size():((m_type == Array)?m_ar.size():m_map.size());}
+	bool empty() const							{return m_type == Struct && m_map.empty();}
 
 private:
 	Type m_type;
@@ -97,11 +97,11 @@ private:
 		TagState state;
 
 		StackElem( const StackElem& o)
-			:type(o.type),aitr(o.aitr),aend(o.aend),sitr(o.sitr),send(o.send),ptr(o.ptr),state(o.state){}
+			:type(o.type),atag(o.atag),aitr(o.aitr),aend(o.aend),sitr(o.sitr),send(o.send),ptr(o.ptr),state(o.state){}
 		StackElem( const Form::Map::const_iterator& itr_, const Form::Map::const_iterator& end_)
 			:type(Form::Struct),sitr(itr_),send(end_),ptr(0),state(OpenTagState){}
 		StackElem( const std::string& atag_, const Form::Vector::const_iterator& itr_, const Form::Vector::const_iterator& end_)
-			:type(Form::Array),atag(atag_),aitr(itr_),aend(end_),ptr(0),state(OpenTagState){}
+			:type(Form::Array),atag(atag_),aitr(itr_),aend(end_),ptr(0),state(ValueState){}
 		StackElem( const std::string* ptr_)
 			:type(Form::Atomic),ptr(ptr_),state(ValueState){}
 

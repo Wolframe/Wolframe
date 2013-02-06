@@ -36,9 +36,6 @@ public:
 	virtual langbind::TypedInputFilterR result() const;
 
 private:
-	std::string errorMessage( const std::string& msg) const;
-
-private:
 	const proc::ProcessorProvider* m_provider;						//< processor provider reference for function called
 	const Function* m_func;											//< function to call
 	langbind::TypedInputFilterR m_input;							//< input parameters
@@ -46,7 +43,10 @@ private:
 	VARIANT* m_param;												//< array of function parameters to initialize
 	enum {null_paramidx=0xFFFF};
 	std::size_t m_paramidx;											//< currently selected parameter of the function [0,1,.. n-1]
-	boost::shared_ptr<TypeLib::AssignmentClosure> m_paramclosure;	//< closure for current parameter assignment
+	TypeLib::AssignmentClosureR m_paramclosure;						//< closure for current parameter assignment
+	std::vector<VARIANT> m_paramarray;								//< temporary buffer for parameters passed as array
+	const IRecordInfo* m_paramarray_recinfo;						//< record info for the buffered array parameters
+	std::size_t m_paramarray_idx;
 	langbind::TypedInputFilterR m_result;							//< reference to result of the function call
 };
 
@@ -57,11 +57,14 @@ class Function
 public:
 	struct Parameter
 	{
+		enum AddrMode {Value,Safearray};
+
 		Parameter( const Parameter& o);
-		Parameter( const std::string& name_, const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_);
+		Parameter( const std::string& name_, const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_, AddrMode addrMode_);
 		~Parameter();
 
 		std::string name;
+		AddrMode addrMode;
 		const TYPEDESC* typedesc;
 		const ITypeInfo* typeinfo;
 	};

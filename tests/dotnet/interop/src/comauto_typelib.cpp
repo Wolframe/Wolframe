@@ -378,7 +378,7 @@ AGAIN:
 					StackElem& cur = m_stk.back();
 					if (!cur.key.empty()) throw std::runtime_error("illegal filter input sequence (value instead of open tag expected after attribute)");
 					if (elemvalue.type != langbind::TypedFilterBase::Element::string_) throw std::runtime_error( "string expected for tag name");
-					if (cur.value.vt != VT_RECORD || cur.value.pvRecord == 0 || cur.value.pRecInfo == 0) throw std::runtime_error( "structure assigned to atomic value"); 
+					if (cur.value.vt != VT_RECORD || cur.value.pvRecord == 0 || cur.value.pRecInfo == 0) throw std::runtime_error( "structure assigned to atomic value or array"); 
 					cur.key = elemvalue.tostring();
 					std::map<std::string,int>::const_iterator ki = cur.keymap.find( cur.key);
 					if (ki == cur.keymap.end())
@@ -490,19 +490,19 @@ AGAIN:
 }
 
 comauto::TypeLib::AssignmentClosure::AssignmentClosure()
-	:m_typelib(0),m_typeinfo(0),m_outtype(VT_EMPTY),m_single(false)
+	:m_typelib(0),m_typeinfo(0),m_recinfo(0),m_outtype(VT_EMPTY),m_single(false)
 {}
 
 comauto::TypeLib::AssignmentClosure::AssignmentClosure( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, VARTYPE outtype_, bool single_)
-	:m_typelib(const_cast<TypeLib*>(typelib_)),m_typeinfo(0),m_input(input_),m_outtype(outtype_),m_single(single_)
+	:m_typelib(const_cast<TypeLib*>(typelib_)),m_typeinfo(0),m_recinfo(0),m_input(input_),m_outtype(outtype_),m_single(single_)
 {
 	m_stk.push_back( StackElem());
 }
 
 comauto::TypeLib::AssignmentClosure::AssignmentClosure( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, const ITypeInfo* typeinfo_)
-	:m_typelib(const_cast<TypeLib*>(typelib_)),m_typeinfo( const_cast<ITypeInfo*>(typeinfo_)),m_input(input_),m_outtype(VT_USERDEFINED),m_single(false)
+	:m_typelib(const_cast<TypeLib*>(typelib_)),m_typeinfo( const_cast<ITypeInfo*>(typeinfo_)),m_recinfo(0),m_input(input_),m_outtype(VT_USERDEFINED),m_single(false)
 {
-	const IRecordInfo* recinfo = m_typelib->getRecordInfo( m_typeinfo);
-	m_stk.push_back( StackElem( m_typeinfo, recinfo, VT_RECORD));
+	m_recinfo = m_typelib->getRecordInfo( m_typeinfo);
+	m_stk.push_back( StackElem( const_cast<ITypeInfo*>(m_typeinfo), m_recinfo, VT_RECORD));
 }
 

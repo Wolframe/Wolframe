@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <vector>
 #include <stdexcept>
 #include <oaidl.h>
 #include <comdef.h>
@@ -56,6 +57,7 @@ VARIANT createVariantType( const char* val, std::size_t valsize, VARTYPE stringt
 VARIANT createVariantType( const std::wstring& val);
 VARIANT createVariantType( const langbind::TypedInputFilter::Element& val);
 VARIANT createVariantType( const langbind::TypedInputFilter::Element& val, VARTYPE dsttype);
+VARIANT createVariantArray( VARTYPE vt, const std::vector<VARIANT>& ar=std::vector<VARIANT>());
 void copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::TypedInputFilter::Element& val);
 HRESULT wrapVariantCopy( VARIANT* pvargDest, const VARIANT* pvargSrc);
 HRESULT wrapVariantCopyInd( VARIANT* pvargDest, const VARIANT* pvargSrc);
