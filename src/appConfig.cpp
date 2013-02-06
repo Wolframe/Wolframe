@@ -54,6 +54,9 @@
 #include <ostream>
 #include <stdexcept>
 
+#define STRINGIFY(x)	#x
+
+
 using namespace _Wolframe::utils;
 using namespace boost::filesystem;
 
@@ -253,9 +256,13 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 				std::string basePath = m_modFolder;
 				boost::filesystem::path bp( basePath );
 				if ( !bp.is_absolute() )	{
+#if defined( DEFAULT_MODULE_LOAD_DIR )
+					basePath = utils::getCanonicalPath( basePath, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
+#else
 					basePath = utils::getCanonicalPath( basePath, configFile );
 /*MBa - maybe WARNING ? */		LOG_NOTICE << MODULE_SECTION_MSG << "using absolute directory path '" << basePath
 						   << "' instead of '" << m_modFolder << "'";
+#endif
 				}
 				for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
 									Pit != m_modFiles.end(); Pit++ )	{
@@ -268,12 +275,16 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 				for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
 									Pit != m_modFiles.end(); Pit++ )	{
 					std::string oldPath = *Pit;
+#if defined( DEFAULT_MODULE_LOAD_DIR )
+					*Pit = utils::getCanonicalPath( *Pit, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
+#else
 					*Pit = utils::getCanonicalPath( *Pit, configFile );
 					assert( ! Pit->empty() );
 					if ( oldPath != *Pit )	{
 						LOG_NOTICE << MODULE_SECTION_MSG << "using absolute filename '" << *Pit
 							   << "' instead of '" << oldPath << "'";
 					}
+#endif
 				}
 			}
 		}
