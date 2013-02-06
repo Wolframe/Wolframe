@@ -1,5 +1,14 @@
 #!/bin/sh
 
+# Note: put dot_home_rpmmacros to ~/.rpmmacros to set number of CPUs for
+# parallel building
+
+# Of course you need build toold and rpm-build, also a ~/rpmbuild directory
+# set up
+
+# the Centos version is set below as 'centos_version 630' (OSB service
+# linguo for Centos 6.3)
+
 VERSION=0.0.1
 RPMBUILD=$HOME/rpmbuild
 
