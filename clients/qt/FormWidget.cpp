@@ -238,23 +238,14 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 		<< ", locale " << m_locale.name( )
 		<< ", size " << localization.length( );
 
-// get list of all translators for this form and delete them
-	const QList<QTranslator *> oldTranslators( m_ui->findChildren<QTranslator *>( ) );
-	foreach( QTranslator *translator, oldTranslators ) {
-		qDebug( ) << "Removing old translator " << translator;
-		QCoreApplication::instance( )->removeTranslator( translator );
-	}
-	qDeleteAll( oldTranslators );
+	qApp->removeTranslator( &m_translator );
 	
-// install translation files for this form (not for en_US, as this is the master language)
-	if( m_locale.name( ) != "en_US" ) {
-		QTranslator *translator = new QTranslator( m_ui );
-		if( !translator->load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
-			qWarning( ) << "Error while loading translations for form " <<
-				name << " for locale " << m_locale.name( );
-		}
-		QCoreApplication::instance( )->installTranslator( translator );
+	if( !m_translator.load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
+		qWarning( ) << "Error while loading translations for form " <<
+			name << " for locale " << m_locale.name( );
+		return;
 	}
+	qApp->installTranslator( &m_translator );
 }
 
 QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )

@@ -317,7 +317,6 @@ void MainWindow::initialize( )
 	} else {
 		// ignore position and size as they are fixed anyway
 	}
-
 }
 
 void MainWindow::CreateFormWidget( const QString &name )
@@ -595,9 +594,17 @@ void MainWindow::loadLanguage( QString language )
 	switchTranslator( m_translatorApp, QString( "qtclient.%1.qm" ).arg( language ), "i18n" );
 	switchTranslator( m_translatorQt, QString( "qt_%1.qm" ).arg( language ), "/usr/share/qt/translations/" );
         
-// also set language of the form widget
-	if( m_formWidget )
-		m_formWidget->loadLanguage( language );
+// also set language of the form widget(s)
+	if( settings.mdi ) {
+		foreach( QMdiSubWindow *w, m_mdiArea->subWindowList( ) ) {
+			FormWidget *f = qobject_cast<FormWidget *>( w->widget( ) );
+			f->loadLanguage( language );
+		}
+	} else {
+		if( m_formWidget ) {
+			m_formWidget->loadLanguage( language );
+		}
+	}
 
 	m_currentLanguage = language;
 }

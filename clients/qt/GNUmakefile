@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = plugins
+SUBDIRS = plugins apps
 
 .NOTPARALLEL:
 
@@ -194,20 +194,6 @@ PreferencesDialog.d: ui_PreferencesDialog.h ui_PreferencesDialogDeveloper.h ui_P
 
 qtclient$(EXE): $(CPP_OBJS) qrc_qtclient.o qtclient.o
 
-FORMS = \
-	apps/test/forms/form1.ui \
-	apps/test/forms/form2.ui \
-	apps/test/forms/form3.ui \
-	apps/test/forms/form4.ui
-
-DATA = \
-	apps/test/data/form1.xml \
-	apps/test/data/domain_form1_vegetable.xml \
-	apps/test/data/form2.xml \
-	apps/test/data/form3.xml \
-	apps/test/data/form4.xml \
-	apps/test/data/domain_form4_vegetable.xml
-	
 %.qm : %.ts
 	$(QT_LRELEASE) $< -qm $@
 
@@ -219,20 +205,9 @@ qrc_qtclient.cpp: qtclient.qrc
 
 I18NS = \
 	i18n/qtclient.de_CH.qm \
-	i18n/qtclient.ro_RO.qm \
-	apps/test/i18n/init.de_CH.qm \
-	apps/test/i18n/init.ro_RO.qm \
-	apps/test/i18n/form1.de_CH.qm \
-	apps/test/i18n/form1.ro_RO.qm \
-	apps/test/i18n/form2.de_CH.qm \
-	apps/test/i18n/form2.ro_RO.qm \
-	apps/test/i18n/form3.de_CH.qm \
-	apps/test/i18n/form3.ro_RO.qm \
-	apps/test/i18n/form4.de_CH.qm \
-	apps/test/i18n/form4.ro_RO.qm
+	i18n/qtclient.ro_RO.qm
 
 RESOURCES = \
-	apps/test/resources/test.rcc \
 	apps/configurator/resources/configurator.rcc
 
 I18NS_TS = $(I18NS:.qm=.ts)
@@ -244,7 +219,6 @@ local_clean:
 	@-rm -f $(I18NS)
 	@-rm -f $(RESOURCES)
 	@-rm -f geany.c++.tags
-	@-rm -f Makefile
 	@-rm -f $(UIS)
 	@-rm -f qrc_qtclient.cpp
 
@@ -262,22 +236,12 @@ local_test:
 
 run: local_all $(CPP_BINS)
 	@echo "Testing Qt client.."
-	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient -c apps/test.conf
+	@LD_LIBRARY_PATH=$(QT_LIB_DIR):plugins ./qtclient -c apps/testcases.conf
 
 .PHONY: buildi18n
 buildi18n:
 	$(QT_LUPDATE) -extensions hpp,cpp,ui . -ts i18n/qtclient.de_CH.ts
 	$(QT_LUPDATE) -extensions hpp,cpp,ui . -ts i18n/qtclient.ro_RO.ts
-	$(QT_LUPDATE) apps/test/forms/init.ui -ts apps/test/i18n/init.de_CH.ts
-	$(QT_LUPDATE) apps/test/forms/init.ui -ts apps/test/i18n/init.ro_RO.ts
-	$(QT_LUPDATE) apps/test/forms/form1.ui -ts apps/test/i18n/form1.de_CH.ts
-	$(QT_LUPDATE) apps/test/forms/form1.ui -ts apps/test/i18n/form1.ro_RO.ts
-	$(QT_LUPDATE) apps/test/forms/form2.ui -ts apps/test/i18n/form2.de_CH.ts
-	$(QT_LUPDATE) apps/test/forms/form2.ui -ts apps/test/i18n/form2.ro_RO.ts
-	$(QT_LUPDATE) apps/test/forms/form3.ui -ts apps/test/i18n/form3.de_CH.ts
-	$(QT_LUPDATE) apps/test/forms/form3.ui -ts apps/test/i18n/form3.ro_RO.ts
-	$(QT_LUPDATE) apps/test/forms/form4.ui -ts apps/test/i18n/form4.de_CH.ts
-	$(QT_LUPDATE) apps/test/forms/form4.ui -ts apps/test/i18n/form4.ro_RO.ts
 
 geany-ctags:
 	CFLAGS="$(ALL_CXXFLAGS) -I$(QT_INCLUDE_DIR)/QtDesigner -Iplugins/filechooser -Iplugins/picturechooser -Iplugins/formwidget" \
