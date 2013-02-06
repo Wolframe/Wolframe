@@ -266,22 +266,16 @@ void MainWindow::initialize( )
 				connect( action, SIGNAL( triggered( ) ),
 					m_mdiArea, SLOT( cascadeSubWindows( ) ) );
 			}
-
-// default is tiling (TODO: remeber position, forms and sizes of open windows)
-			m_mdiArea->tileSubWindows( );
 		} else {
 // missing a MDI area, so we disable the m_mdi flag
 			settings.mdi = false;
 		}
 	}
 
-// in local file UI and data mode we can load the form right away
+// in local file UI and data mode we can load the form right away, we don't
+// wait for the user to log in
 	if( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) {
-		if( settings.mdi ) {
-			(void)CreateMdiSubWindow( "init" );
-		} else {
-			CreateFormWidget( "init" );
-		}
+		restoreStateAndPositions( );
 	}
 
 // add the menu entries for the developer mode
@@ -306,17 +300,6 @@ void MainWindow::initialize( )
 
 // load language resources, repaints the whole interface if necessary
 	loadLanguage( m_currentLanguage );
-
-// restore main window position and size
-	move( settings.mainWindowPos );
-	resize( settings.mainWindowSize );	
-
-// restore subwindow position states
-	if( settings.mdi ) {
-		// TODO
-	} else {
-		// ignore position and size as they are fixed anyway
-	}
 }
 
 void MainWindow::CreateFormWidget( const QString &name )
@@ -484,27 +467,7 @@ void MainWindow::authOk( )
 		m_dataLoader = new NetworkDataLoader( m_wolframeClient, settings.debug );
 	}
 
-// load initial form, TODO: load forms and position of windows from settings,
-// of none there, load init form in a MDI subwindow or directly
-	if( settings.mdi ) {
-		if( settings.saveRestoreState ) {
-			for( int i = 0; i < settings.states.size( ); i++ ) {
-				WinState state = settings.states[i];
-				QMdiSubWindow *w = CreateMdiSubWindow( state.form );
-				w->move( state.position );
-				w->resize( state.size );
-			}
-		} else {
-			(void)CreateMdiSubWindow( "init" );
-		}
-	} else {
-		if( settings.saveRestoreState && settings.states.size( ) > 0 ) {
-			WinState state = settings.states[0];
-			CreateFormWidget( state.form );
-		} else {
-			CreateFormWidget( "init" );
-		}
-	}	
+	restoreStateAndPositions( );
 
 // update status of menus and toolbars
  	updateMenusAndToolbars( );
@@ -725,11 +688,47 @@ void MainWindow::on_actionExit_triggered( )
 			close( );
 		}
 	} else {
-// terminate brutally in local mode
+// terminate brutally in local mode (this is for a connection from the debug window)
 		if( m_wolframeClient )
 			disconnect( m_wolframeClient, SIGNAL( error( QString ) ), 0, 0 );
+
+		if( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) {
+			storeStateAndPositions( );
+		}
+
 		close( );
 	}
+}
+
+void MainWindow::restoreStateAndPositions( )
+{
+// restore main window position and size
+	move( settings.mainWindowPos );
+	resize( settings.mainWindowSize );	
+
+// load initial form, load forms and position of windows from settings,
+// of none there, load init form in a MDI subwindow or directly
+	if( settings.mdi ) {
+		if( settings.saveRestoreState ) {
+			for( int i = 0; i < settings.states.size( ); i++ ) {
+				WinState state = settings.states[i];
+				QMdiSubWindow *w = CreateMdiSubWindow( state.form );
+				w->move( state.position );
+				w->resize( state.size );
+			}
+		} else {
+			(void)CreateMdiSubWindow( "init" );
+// default it tiling MDI subwindows, no better option
+			m_mdiArea->tileSubWindows( );
+		}
+	} else {
+		if( settings.saveRestoreState && settings.states.size( ) > 0 ) {
+			WinState state = settings.states[0];
+			CreateFormWidget( state.form );
+		} else {
+			CreateFormWidget( "init" );
+		}
+	}	
 }
 
 void MainWindow::storeStateAndPositions( )
@@ -842,6 +841,7 @@ QMdiSubWindow *MainWindow::CreateMdiSubWindow( const QString &form )
 	QMdiSubWindow *mdiSubWindow = m_mdiArea->addSubWindow( formWidget );
 	mdiSubWindow->setAttribute( Qt::WA_DeleteOnClose );
 
+	m_formWidget = formWidget; // ugly dirty hack, must ammend later
 	formWidget->show( );
 	loadForm( form );
 

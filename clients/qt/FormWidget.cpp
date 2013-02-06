@@ -6,7 +6,6 @@
 #include "global.hpp"
 
 #include <QDebug>
-#include <QTranslator>
 #include <QApplication>
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -240,12 +239,14 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 
 	qApp->removeTranslator( &m_translator );
 	
-	if( !m_translator.load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
-		qWarning( ) << "Error while loading translations for form " <<
-			name << " for locale " << m_locale.name( );
-		return;
+	if( m_locale.name( ) != DEFAULT_LOCALE ) {
+		if( !m_translator.load( (const uchar *)localization.constData( ), localization.length( ) ) ) {
+			qWarning( ) << "Error while loading translations for form " <<
+				name << " for locale " << m_locale.name( );
+			return;
+		}
+		qApp->installTranslator( &m_translator );
 	}
-	qApp->installTranslator( &m_translator );
 }
 
 QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )
