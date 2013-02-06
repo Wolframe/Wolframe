@@ -39,7 +39,7 @@
 
 #include <boost/utility.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/lock_guard.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/scoped_ptr.hpp>
 
 // Warning: If T's constructor throws, instance() will return a null reference.
