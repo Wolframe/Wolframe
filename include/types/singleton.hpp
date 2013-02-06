@@ -39,6 +39,7 @@
 
 #include <boost/utility.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/lock_guard.hpp>
 #include <boost/scoped_ptr.hpp>
 
 // Warning: If T's constructor throws, instance() will return a null reference.
@@ -50,7 +51,7 @@ public:
 	static T& instance()
 	{
 		if ( !m_initialized )	{
-			boost::lock_guard<boost::mutex> lock( m_mutex );
+			boost::lock_guard< boost::mutex > lock( m_mutex );
 			if ( !m_initialized )	{
 				m_t.reset( new T() );
 				m_initialized = true;
@@ -63,7 +64,7 @@ public:
 	static T& instance( ArgType arg )
 	{
 		if ( !m_initialized )	{
-			boost::lock_guard<boost::mutex> lock( m_mutex );
+			boost::lock_guard< boost::mutex > lock( m_mutex );
 			if ( !m_initialized )	{
 				m_t.reset( new T( arg ) );
 				m_initialized = true;
@@ -76,7 +77,7 @@ public:
 	static T& instance( ArgType0 arg0, ArgType1 arg1 )
 	{
 		if ( !m_initialized )	{
-			boost::lock_guard<boost::mutex> lock( m_mutex );
+			boost::lock_guard< boost::mutex > lock( m_mutex );
 			if ( !m_initialized )	{
 				m_t.reset( new T( arg0, arg1 ) );
 				m_initialized = true;
@@ -90,13 +91,13 @@ protected:
 	~Singleton()	{}
 
 private:
-	static boost::scoped_ptr<T>	m_t;
+	static boost::scoped_ptr< T >	m_t;
 	static boost::mutex		m_mutex;
 	static bool			m_initialized;
 };
 
-template<class T> boost::scoped_ptr<T> Singleton<T>::m_t( 0 );
-template<class T> boost::mutex Singleton<T>::m_mutex;
-template<class T> bool Singleton<T>::m_initialized = false;
+template< class T > boost::scoped_ptr< T > Singleton< T >::m_t( 0 );
+template< class T > boost::mutex Singleton< T >::m_mutex;
+template< class T > bool Singleton< T >::m_initialized = false;
 
 #endif	// _SINGLETON_HPP_INCLUDED
