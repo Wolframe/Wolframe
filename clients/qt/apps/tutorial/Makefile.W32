@@ -36,7 +36,7 @@ i18n\init.ro_RO.qm: i18n\init.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\init.ro_RO.ts -qm i18n\init.ro_RO.qm
 
 i18n\activities.de_CH.qm: i18n\activities.de_CH.ts
-	$(QT_DIR)\bin\lrelease.exe i18n\activities.de_CH.ts -qm i18n\.activitiesde_CH.qm
+	$(QT_DIR)\bin\lrelease.exe i18n\activities.de_CH.ts -qm i18n\activities.de_CH.qm
 
 i18n\activities.ro_RO.qm: i18n\activities.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\activities.ro_RO.ts -qm i18n\activities.ro_RO.qm
@@ -88,6 +88,9 @@ i18n\note_edit.de_CH.qm: i18n\note_edit.de_CH.ts
 
 i18n\note_edit.ro_RO.qm: i18n\note_edit.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\note_edit.ro_RO.ts -qm i18n\note_edit.ro_RO.qm
+
+resources\tutorial.rcc: resources\tutorial.qrc
+	$(QT_DIR)\bin\rcc.exe -binary resources\tutorial.qrc -o resources\tutorial.rcc
 
 local_all: $(I18NS) $(RESOURCES)
 

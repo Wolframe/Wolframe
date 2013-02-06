@@ -123,9 +123,6 @@ I18NS = \
 	i18n\qtclient.de_CH.qm \
 	i18n\qtclient.ro_RO.qm
 
-RESOURCES = \
-	apps\test\resources\test.rcc
-
 i18n\qtclient.de_CH.qm: i18n\qtclient.de_CH.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\qtclient.de_CH.ts -qm i18n\qtclient.de_CH.qm
 
@@ -135,10 +132,7 @@ i18n\qtclient.ro_RO.qm: i18n\qtclient.ro_RO.ts
 apps\test\resources\test.rcc: apps\test\resources\test.qrc
 	$(QT_DIR)\bin\rcc.exe -binary apps\test\resources\test.qrc -o apps\test\resources\test.rcc
 
-apps\configurator\resources\configurator.rcc: apps\configurator\resources\configurator.qrc
-	$(QT_DIR)\bin\rcc.exe -binary apps\configurator\resources\configurator.qrc -o apps\configurator\resources\configurator.rcc
-	
-local_all: $(I18NS) $(RESOURCES) $(CPP_BINS)
+local_all: $(I18NS) $(CPP_BINS)
 
 qtclient.exe: qtclient.obj
 

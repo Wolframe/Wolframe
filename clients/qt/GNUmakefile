@@ -207,12 +207,9 @@ I18NS = \
 	i18n/qtclient.de_CH.qm \
 	i18n/qtclient.ro_RO.qm
 
-RESOURCES = \
-	apps/configurator/resources/configurator.rcc
-
 I18NS_TS = $(I18NS:.qm=.ts)
 
-local_all: $(I18NS) $(RESOURCES)
+local_all: $(I18NS)
 
 local_clean:
 	@-rm -f moc_*.cpp

@@ -81,8 +81,8 @@ i18n\form5_show.de_CH.qm: i18n\form5_show.de_CH.ts
 i18n\form5_show.ro_RO.qm: i18n\form5_show.ro_RO.ts
 	$(QT_DIR)\bin\lrelease.exe i18n\form5_show.ro_RO.ts -qm i18n\form5_show.ro_RO.qm
 
-resources\test.rcc: resources\test.qrc
-	$(QT_DIR)\bin\rcc.exe -binary resources\test.qrc -o resources\test.rcc
+resources\testcases.rcc: resources\testcases.qrc
+	$(QT_DIR)\bin\rcc.exe -binary resources\testcases.qrc -o resources\testcases.rcc
 	
 local_all: $(I18NS) $(RESOURCES)
 
