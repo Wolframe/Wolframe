@@ -50,8 +50,8 @@ static void test_atomic_param_fun_call( const std::map<std::string,comauto::Func
 
 static void test_struct_param_fun_call( const std::map<std::string,comauto::FunctionR>& funcmap)
 {
-	langbind::Form user, place, pair;
-	langbind::Form param_AddIdPair, param_GetUser_p, param_GetAddress_p, param_StoreUser, param_StoreUsers;
+	langbind::Form user, user2, users(langbind::Form::Array), place, place2, pair, intarr(langbind::Form::Array);
+	langbind::Form param_AddIdPair, param_GetUser_p, param_GetAddress_p, param_StoreUser, param_StoreUsers, param_Sum;
 	pair
 		( "a", langbind::Form( "51"))
 		( "b", langbind::Form( "3"))
@@ -60,10 +60,29 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Func
 		( "street", langbind::Form( "Vogelsangstrasse 5 8006 Zurich"))
 		( "country", langbind::Form( "Switzerland"))
 		;
+	place2
+		( "street", langbind::Form( "Feldweg 3 8136 Gattikon"))
+		( "country", langbind::Form( "Switzerland"))
+		;
 	user
 		( "id", langbind::Form( "123"))
 		( "name", langbind::Form( "Hans Muster"))
 		( "place", place)
+		;
+	user2
+		( "id", langbind::Form( "234"))
+		( "name", langbind::Form( "Peter Kernel"))
+		( "place", place)
+		;
+	users
+		( user)
+		( user2)
+		;
+	intarr
+		( langbind::Form( "7"))
+		( langbind::Form( "13"))
+		( langbind::Form( "11"))
+		( langbind::Form( "1000"))
 		;
 	param_AddIdPair
 		( "p", pair)
@@ -81,9 +100,17 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Func
 	param_StoreUser
 		( "usr", user)
 		;
+	param_StoreUsers
+		( "usr", users)
+		;
+	param_Sum
+		( "aa", intarr)
+		;
 	test_function_call( funcmap, "Functions.AddIdPair", param_AddIdPair, "RESULT AddIdPair:");
 	test_function_call( funcmap, "Functions.GetAddress_p", param_GetAddress_p, "RESULT GetAddress:");
 	test_function_call( funcmap, "Functions.StoreUser", param_StoreUser, "RESULT StoreUser:");
+	test_function_call( funcmap, "Functions.Sum", param_Sum, "RESULT Sum:");
+	test_function_call( funcmap, "Functions.StoreUsers", param_StoreUsers, "RESULT StoreUsers:");
 };
 
 
@@ -93,7 +120,7 @@ int main( int , const char**)
 	{
 		WRAP( ::CoInitializeEx( NULL, COINIT_MULTITHREADED))
 		std::string path( "C:\\Users\\patrick\\Projects\\Wolframe\\tests\\dotnet\\csharp\\Functions\\bin\\Release\\");
-		std::string assembly( "Functions, Version=1.0.0.13, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
+		std::string assembly( "Functions, Version=1.0.0.14, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
 		comauto::TypeLib typelib( path + "Functions.tlb");
 		typelib.print( std::cout);
 		comauto::CommonLanguageRuntime clr( "v4.0.30319");

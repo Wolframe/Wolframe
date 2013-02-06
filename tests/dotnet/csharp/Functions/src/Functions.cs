@@ -37,9 +37,11 @@ public interface FunctionInterface
     [ComVisible(true)]
     int Add( int i, int j);
     [ComVisible(true)]
+    int Sum( int[] aa);
+    [ComVisible(true)]
     User StoreUser( User usr);
     [ComVisible(true)]
-    User[] StoreUsers(User[] usr);
+    User[] StoreUsers( [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)] User[] usr);
     [ComVisible(true)]
     int MapAddress( Address adr);
     [ComVisible(true)]
@@ -69,6 +71,12 @@ public class Functions : FunctionInterface
     {
         return i - j;
     }
+    public int Sum( int[] aa)
+    {
+        int rt = 0;
+        for (int ii = 0; ii < aa.Length; ++ii) rt += aa[ii];
+        return rt;
+    }
     public User StoreUser(User usr)
     {
         usr.id += 1;
@@ -77,7 +85,7 @@ public class Functions : FunctionInterface
         usr.place.country = usr.place.country.ToUpper();
         return usr;
     }
-    public User[] StoreUsers(User[] usr)
+    public User[] StoreUsers( [MarshalAs(UnmanagedType.SafeArray, SafeArraySubType = VarEnum.VT_RECORD)] User[] usr)
     {
         for (int ii = 0; ii < usr.Length; ++ii)
         {

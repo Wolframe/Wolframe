@@ -24,8 +24,8 @@ public:
 
 	const IRecordInfo* getRecordInfo( const ITypeInfo* typeinfo) const;
 
-	const ITypeLib* typelib() const {return m_typelib;}
-	const TLIBATTR* libattr() const {return m_libattr;}
+	const ITypeLib* typelib() const			{return m_typelib;}
+	const TLIBATTR* libattr() const			{return m_libattr;}
 
 	class AssignmentClosure
 	{
@@ -37,6 +37,7 @@ public:
 
 		bool call( VARIANT& value);
 		std::string variablepath() const;
+		const IRecordInfo* recinfo() const		{return m_recinfo;}
 
 	private:
 		struct StackElem
@@ -53,14 +54,18 @@ public:
 			StackElem( const StackElem& o);
 			~StackElem();
 		};
+
 	private:
-		TypeLib* m_typelib;
-		ITypeInfo* m_typeinfo;
+		const TypeLib* m_typelib;
+		const ITypeInfo* m_typeinfo;
+		const IRecordInfo* m_recinfo;
 		std::vector<StackElem> m_stk;
 		langbind::TypedInputFilterR m_input;
 		VARTYPE m_outtype;
 		bool m_single;
 	};
+
+	typedef boost::shared_ptr<AssignmentClosure> AssignmentClosureR;
 
 private:
 	ITypeLib* m_typelib;

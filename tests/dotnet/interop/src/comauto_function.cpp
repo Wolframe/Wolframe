@@ -158,13 +158,13 @@ std::vector<comauto::FunctionR> comauto::loadFunctions( const comauto::TypeLib* 
 
 
 comauto::Function::Parameter::Parameter( const Parameter& o)
-	:name(o.name),typedesc(o.typedesc),typeinfo(o.typeinfo)
+	:name(o.name),addrMode(o.addrMode),typedesc(o.typedesc),typeinfo(o.typeinfo)
 {
 	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->AddRef();
 }
 
-comauto::Function::Parameter::Parameter( const std::string& name_, const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_)
-	:name(name_),typedesc(typedesc_),typeinfo(typeinfo_)
+comauto::Function::Parameter::Parameter( const std::string& name_, const TYPEDESC* typedesc_, const ITypeInfo* typeinfo_, AddrMode addrMode_)
+	:name(name_),addrMode(addrMode_),typedesc(typedesc_),typeinfo(typeinfo_)
 {
 	if (typeinfo) const_cast<ITypeInfo*>(typeinfo)->AddRef();
 }
@@ -228,6 +228,10 @@ comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, const comauto
 	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetNames( m_funcdesc->memid, local.pnames, m_funcdesc->cParams+1, &nn))
 
 	m_methodname = comauto::utf8string( local.pnames[0]);
+/*[-]*/if (m_methodname == "Sum")
+/*[-]*/{
+/*[-]*/	std::cout << "HALLY GALLY" << std::endl;
+/*[-]*/}
 	for (ii=1; ii<nn; ++ii)
 	{
 		const TYPEDESC* td = &m_funcdesc->lprgelemdescParam[ii-1].tdesc;
@@ -236,12 +240,23 @@ comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, const comauto
 			if (local.rectypeinfo) local.rectypeinfo->Release();
 			local.rectypeinfo = 0;
 			WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->hreftype, &local.rectypeinfo))
-			Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo);
+			Parameter param( comauto::utf8string( local.pnames[ii]), td, local.rectypeinfo, Parameter::Value);
+			m_parameterlist.push_back( param);
+		}
+		else if (td->vt == VT_SAFEARRAY)
+		{
+			if (local.rectypeinfo) local.rectypeinfo->Release();
+			local.rectypeinfo = 0;
+			if (!comauto::isAtomicType(td->lptdesc->vt) && !comauto::isStringType(td->lptdesc->vt))
+			{
+				WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetRefTypeInfo( td->lptdesc->hreftype, &local.rectypeinfo))
+			}
+			Parameter param( comauto::utf8string( local.pnames[ii]), td->lptdesc, local.rectypeinfo, Parameter::Safearray);
 			m_parameterlist.push_back( param);
 		}
 		else
 		{
-			m_parameterlist.push_back( Parameter( comauto::utf8string( local.pnames[ii]), td, 0));
+			m_parameterlist.push_back( Parameter( comauto::utf8string( local.pnames[ii]), td, 0, Parameter::Value));
 		}
 	}
 	if (m_funcdesc->elemdescFunc.tdesc.vt == VT_USERDEFINED)
@@ -280,7 +295,7 @@ void comauto::Function::print( std::ostream& out) const
 	for (; pi != pe; ++pi)
 	{
 		if (pi != m_parameterlist.begin()) out << ", ";
-		out << pi->name << " :" << comauto::typestr( m_typeinfo, const_cast<TYPEDESC*>(pi->typedesc));
+		out << pi->name << " :" << ((pi->addrMode==Parameter::Safearray)?"[] ":"") << comauto::typestr( m_typeinfo, const_cast<TYPEDESC*>(pi->typedesc));
 	}
 	out << " ) :" << comauto::typestr( m_typeinfo, m_returntype.typedesc) << std::endl;
 }
@@ -306,7 +321,8 @@ comauto::FunctionClosure::FunctionClosure( const Function* func_)
 		,m_func(func_)
 		,m_flags(serialize::Context::None)
 		,m_param(0)
-		,m_paramidx(null_paramidx){}
+		,m_paramidx(null_paramidx)
+		,m_paramarray_idx(0){}
 
 comauto::FunctionClosure::~FunctionClosure()
 {
@@ -318,6 +334,11 @@ comauto::FunctionClosure::~FunctionClosure()
 			comauto::wrapVariantClear( &m_param[pi]);
 		}
 		delete [] m_param;
+	}
+	std::size_t ii,nn;
+	for (ii=0,nn=m_paramarray.size(); ii<nn;++ii)
+	{
+		comauto::wrapVariantClear( &m_paramarray[ii]);
 	}
 }
 
@@ -335,7 +356,14 @@ void comauto::FunctionClosure::init( const proc::ProcessorProvider* p, const lan
 		m_param[ii].vt = VT_EMPTY;
 	}
 	m_paramidx = 0;
+	m_paramarray_idx = 0;
+	for (ii=0,nn=m_paramarray.size(); ii<nn;++ii)
+	{
+		comauto::wrapVariantClear( &m_paramarray[ii]);
+	}
+	m_paramarray.clear();
 }
+
 
 bool comauto::FunctionClosure::call()
 {
@@ -356,9 +384,22 @@ AGAIN:
 				return false;
 			}
 			const Function::Parameter* paramdescr = m_func->getParameter( m_paramidx);
-			if ((m_param[ m_paramidx].vt & VT_ARRAY) == VT_ARRAY) throw std::runtime_error( std::string("array types as parameter not implemented yet ('") + paramdescr->name + "')");
 			if (m_param[ m_paramidx].vt != VT_EMPTY) throw std::runtime_error( std::string("duplicate definition of parameter '") + paramdescr->name + "'");
-			m_param[ m_paramidx] = paramvalue;
+
+			switch (paramdescr->addrMode)
+			{
+				case Function::Parameter::Value:
+				{
+					m_param[ m_paramidx] = paramvalue;
+					break;
+				}
+				case Function::Parameter::Safearray:
+				{
+					m_paramarray_idx = m_paramidx;
+					m_paramarray.push_back( paramvalue);
+					break;
+				}
+			}
 			m_paramidx = null_paramidx;
 			m_paramclosure.reset();
 		}
@@ -388,6 +429,14 @@ AGAIN:
 					{
 						throw std::runtime_error( "unexpected node type (function parameter name or index expected)");
 					}
+					if (!m_paramarray.empty() && m_paramidx != m_paramarray_idx)
+					{
+						// ... we were filling an parameter that is an array into a buffer and encounter another element. we create the array from the buffered elements.
+						m_param[ m_paramarray_idx] = comauto::createVariantArray( m_paramarray[0].vt, m_paramarray);
+						m_paramarray.clear();
+						m_paramarray_idx = null_paramidx;
+					}
+
 					const Function::Parameter* param = m_func->getParameter( m_paramidx);
 
 					if (elemtype==langbind::InputFilter::Attribute)
@@ -429,6 +478,13 @@ AGAIN:
 			case langbind::InputFilter::EndOfMessage: return false;
 			case langbind::InputFilter::Open: break;
 		}
+		if (!m_paramarray.empty())
+		{
+			// ... there are some array elements buffered. we create the array from the buffered elements.
+			m_param[ m_paramarray_idx] = comauto::createVariantArray( m_paramarray[0].vt, m_paramarray);
+			m_paramarray.clear();
+			m_paramarray_idx = null_paramidx;
+		}
 		if ((m_flags & serialize::Context::ValidateAttributes) != 0)
 		{
 			// ... don't know yet what to do here, because attributes are not defined for .NET functions ...
@@ -439,27 +495,47 @@ AGAIN:
 			if (m_param[ii].vt == VT_EMPTY)
 			{
 				const Function::Parameter* param = m_func->getParameter( ii);
-				if ((param->typedesc->vt & VT_ARRAY) == VT_ARRAY || (param->typedesc->vt & VT_VECTOR) == VT_VECTOR) continue;
 
 				if ((m_flags & serialize::Context::ValidateInitialization) != 0)
 				{
 					throw std::runtime_error( std::string( "missing parameter '") + param->name + "'");
 				}
-				else if (comauto::isAtomicType( param->typedesc->vt))
+				switch (param->addrMode)
 				{
-					m_param[ii] = comauto::createVariantType( langbind::TypedInputFilter::Element(), param->typedesc->vt);
-				}
-				else if (param->typeinfo)
-				{
-					const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
-					if (!recinfo) throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed (record info unknown)");
-					m_param[ii].pvRecord = const_cast<IRecordInfo*>(recinfo)->RecordCreate();
-					m_param[ii].pRecInfo = const_cast<IRecordInfo*>(recinfo);
-					m_param[ii].vt = param->typedesc->vt;
-				}
-				else
-				{
-					throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed");
+					case Function::Parameter::Safearray:
+						if (comauto::isAtomicType( param->typedesc->vt))
+						{
+							m_param[ m_paramarray_idx] = comauto::createVariantArray( param->typedesc->vt);
+						}
+						else if (param->typeinfo)
+						{
+							const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
+							if (!recinfo) throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed (record info unknown)");
+							m_param[ m_paramarray_idx] = comauto::createVariantArray( param->typedesc->vt);
+						}
+						else
+						{
+							throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed");
+						}
+						break;
+					case Function::Parameter::Value:
+						if (comauto::isAtomicType( param->typedesc->vt))
+						{
+							m_param[ii] = comauto::createVariantType( langbind::TypedInputFilter::Element(), param->typedesc->vt);
+						}
+						else if (param->typeinfo)
+						{
+							const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
+							if (!recinfo) throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed (record info unknown)");
+							m_param[ii].pvRecord = const_cast<IRecordInfo*>(recinfo)->RecordCreate();
+							m_param[ii].pRecInfo = const_cast<IRecordInfo*>(recinfo);
+							m_param[ii].vt = param->typedesc->vt;
+						}
+						else
+						{
+							throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed");
+						}
+						break;
 				}
 			}
 		}

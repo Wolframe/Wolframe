@@ -16,8 +16,6 @@ Glossary and Microsoft Documentation:
 	[D09] QueryInterface definition by macros: http://msdn.microsoft.com/en-us/library/6bwekse3(v=vs.80).aspx
 	[D10] COM/ATL FAQ (HOWTO: Use structs in Automation-compatible interfaces): http://vcfaq.mvps.org/com/4.htm
 	[D11] Marshalling Details (COM): http://msdn.microsoft.com/en-us/library/windows/desktop/ms692621(v=vs.85).aspx 
-MSDN Bugreports:
-	[B01] BUG: COM Interop: No Built-in Support VARIANT of Type VT_RECORD: http://support.microsoft.com/kb/309329
 
 Books:
 	[B01] Inside COM+: http://www.thrysoee.dk/InsideCOM+
@@ -43,8 +41,6 @@ Articles:
 	[A11] Continuous Integration with Visual C++ and COM: http://martinfowler.com/articles/ciWithCom.html
 
 Code Examples:
-	[C01] Passing Parameters from native C++ to .NET:  http://blogs.msdn.com/b/gpalem/archive/2007/06/18/having-hard-time-marshalling-parameters-from-c-to-net.aspx?Redirected=true
-	[C02] Project implementing OLE/COM support for Tcl/tk: https://github.com/patthoyts/optcl
-	[C03] Example calling .NET from native C++ via CLR: http://code.msdn.microsoft.com/windowsdesktop/CppHostCLR-e6581ee0
-
+	[C01] Project implementing OLE/COM support for Tcl/tk: https://github.com/patthoyts/optcl
+	[C02] Example calling .NET from native C++ via CLR: http://code.msdn.microsoft.com/windowsdesktop/CppHostCLR-e6581ee0
 

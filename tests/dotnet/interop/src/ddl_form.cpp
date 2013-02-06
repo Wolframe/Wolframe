@@ -14,7 +14,7 @@ Form& Form::operator()( const std::string& name, const Form& value)
 
 Form& Form::operator()( const Form& value)
 {
-	if (!isAtomic()) throw std::runtime_error( "append array element to form that is not an array");
+	if (!isArray()) throw std::runtime_error( "append array element to form that is not an array");
 	m_ar.push_back( value);
 	return *this;
 }
@@ -103,7 +103,7 @@ static TypedFilterBase::Element::Type getType( const std::string& val)
 		if (val == "true") return TypedFilterBase::Element::bool_;
 		if (val == "false") return TypedFilterBase::Element::bool_;
 	}
-	for (++vi; vi != ve; ++vi)
+	for (; vi != ve; ++vi)
 	{
 		switch (rt)
 		{
@@ -177,9 +177,15 @@ AGAIN:
 			element = Element();
 			switch (m_stk.back().type)
 			{
-				case Form::Struct: ++m_stk.back().sitr; break;
-				case Form::Array: ++m_stk.back().aitr; break;
-				case Form::Atomic: throw std::logic_error( "illegal state in CloseTagState of FormInputFilter::getNext(..)");
+				case Form::Struct:
+					++m_stk.back().sitr;
+					break;
+				case Form::Array:
+					++m_stk.back().aitr;
+					if (m_stk.back().aitr == m_stk.back().aend) goto AGAIN; //... last tag of array not printed, because this is done by the parent
+					break;
+				case Form::Atomic:
+					throw std::logic_error( "illegal state in CloseTagState of FormInputFilter::getNext(..)");
 			}
 			m_stk.back().state = OpenTagState;
 			return true;
@@ -202,7 +208,8 @@ AGAIN:
 					else if (m_stk.back().sitr->second.isArray())
 					{
 						m_stk.back().state = CloseTagState;
-						m_stk.push_back( StackElem( m_stk.back().sitr->first, m_stk.back().sitr->second.arraybegin(), m_stk.back().sitr->second.arrayend()));
+						StackElem stkelem( m_stk.back().sitr->first, m_stk.back().sitr->second.arraybegin(), m_stk.back().sitr->second.arrayend());
+						m_stk.push_back( stkelem);
 						goto AGAIN;
 					}
 					else
