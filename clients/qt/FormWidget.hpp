@@ -1,6 +1,35 @@
-//
-// FormWidget.hpp
-//
+/************************************************************************
+
+ Copyright (C) 2011, 2012 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
 
 #ifndef _FORM_WIDGET_HPP_INCLUDED
 #define _FORM_WIDGET_HPP_INCLUDED
@@ -35,16 +64,9 @@ class WidgetProperties : public QObject
 class FormWidget : public QWidget
 {
 	Q_OBJECT
-	Q_PROPERTY( QString form READ form WRITE setForm )
 
-	public:
-		enum FormWidgetMode {
-			RunMode,		// when running in qtclient
-			DesignerMode		// when running in designer
-		};
-		
+	public:		
 		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent = 0, bool _debug = false );
-		FormWidget( FormWidgetMode _mode, QWidget *parent = 0 );
 		virtual ~FormWidget( );
 		void loadForm( QString name );
 		void loadLanguage( QString language );
@@ -68,7 +90,6 @@ class FormWidget : public QWidget
 		void reload( );
 			
 	private:
-		FormWidgetMode m_mode;		// run mode of the widget
 		QString m_form;			// name of the form
 		QString m_previousForm;
 		QUiLoader *m_uiLoader;		// UI loader to user for loading designer XML files
@@ -80,15 +101,13 @@ class FormWidget : public QWidget
 		QHBoxLayout *m_layout;		// main layout swallowing the form
 		QSignalMapper *m_signalMapper;	// delegate for form push buttons pointing to forms
 		QStringList m_forms;		// names of all currently loaded forms
-		QLabel *m_text;			// placeholder of form name in designer mode
 		QHash<QString, QString> *m_globals;
 		QHash<QString, QString> *m_props; // HACK to communicate props between signal and slot
 		bool m_debug;
 		QTranslator m_translator;	// contains the translations for the current form
 		
 	private:
-		void initializeNormal( );
-		void initializeDesigner( );
+		void initialize( );
 		void sendRequest( QHash<QString, QString> *props );
 		void storeToGlobals( QHash<QString, QString> *props );
 	

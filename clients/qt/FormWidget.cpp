@@ -1,6 +1,35 @@
-//
-// FormWidget.cpp
-//
+/************************************************************************
+
+ Copyright (C) 2011, 2012 Project Wolframe.
+ All rights reserved.
+
+ This file is part of Project Wolframe.
+
+ Commercial Usage
+    Licensees holding valid Project Wolframe Commercial licenses may
+    use this file in accordance with the Project Wolframe
+    Commercial License Agreement provided with the Software or,
+    alternatively, in accordance with the terms contained
+    in a written agreement between the licensee and Project Wolframe.
+
+ GNU General Public License Usage
+    Alternatively, you can redistribute this file and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wolframe is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wolframe.  If not, see <http://www.gnu.org/licenses/>.
+
+ If you have questions regarding the use of this file, please contact
+ Project Wolframe.
+
+************************************************************************/
 
 #include "FormWidget.hpp"
 #include "global.hpp"
@@ -13,37 +42,16 @@
 #include <QList>
 
 FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent, bool _debug )
-	: QWidget( _parent ), m_mode( RunMode ), m_form( ),
+	: QWidget( _parent ), m_form( ),
 	  m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
 	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_dataHandler( 0 ),
 	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
 	  m_globals( 0 ), m_debug( _debug )
 {
-	initializeNormal( );	
+	initialize( );	
 }
 
-FormWidget::FormWidget( FormWidgetMode _mode, QWidget *_parent )
-	: QWidget( _parent ), m_mode( _mode ), m_form( ),
-	  m_uiLoader( 0 ), m_formLoader( 0 ), m_dataLoader( 0 ),
-	  m_ui( 0 ), m_dataHandler( 0 ),
-	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
-	  m_globals( 0 )
-{
-	initializeDesigner( );
-}
-
-void FormWidget::initializeDesigner( )
-{
-	m_layout = new QHBoxLayout( this );
-	m_layout->setMargin( 0 );
-	
-	m_text = new QLabel( m_form.isNull( ) ? tr( "<no name>" ) : m_form );
-	m_text->setFrameStyle( QFrame::Box );
-	
-	m_layout->addWidget( m_text );
-}
-
-void FormWidget::initializeNormal( )
+void FormWidget::initialize( )
 {
 // maps data between constructed widgets from .ui and the data loader
 	m_dataHandler = new DataHandler( m_dataLoader, this, m_debug );
@@ -185,16 +193,7 @@ void FormWidget::loadDelayedForm( const QString &_form )
 
 void FormWidget::setForm( const QString &_form )
 {
-	switch( m_mode ) {
-		case DesignerMode:
-			m_form = _form;
-			m_text->setText( _form );
-			break;
-		
-		case RunMode:
-			loadForm( _form );
-			break;
-	}
+	loadForm( _form );
 }
 
 QString FormWidget::form( ) const
@@ -313,18 +312,6 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	qDebug( ) << "Starting to load localization for form" << name;
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 
-// sub form widgets have to be propertly initialized with the data/form and
-// ui loaders and their signals have to be wired to our form widget
-	qDebug( ) << "Checking for subforms in form" << name << ", wire them as necessary";
-	QList<FormWidget *> subforms = m_ui->findChildren<FormWidget *>( );
-	foreach( FormWidget *subform, subforms ) {
-		subform->setFormLoader( m_formLoader );
-		subform->setDataLoader( m_dataLoader );
-		subform->setUiLoader( m_uiLoader );
-		subform->initializeNormal( );
-		subform->m_text->hide( );		
-	}
-
 // connect actions and forms
 // connect push buttons with form names to loadForms
 	qDebug( ) << "Checking form" << name << "for dynamic properties 'form' and 'action'";
@@ -364,13 +351,6 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		props->insert( "action", initAction );
 		sendRequest( props );
 	}
-	
-// TODO: later
-// emit the 'init' signal, we can glue slots in the designer to it, like 'setFocus'
-//	QMetaObject::invokeMethod( m_ui, "init" );
-// for this we have to register dynamic slots to m_ui, see
-// http://doc.qt.digia.com/qq/qq16-dynamicqobject.html
-	
 		
 // signal
 	qDebug( ) << "Done loading form" << name;
@@ -381,7 +361,7 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 {
 	qDebug( ) << "Handling reguest for form " << m_form << "[" << *props << "]";
 
-// go trought the widgets of the form and construct the request XML
+// go trough the widgets of the form and construct the request XML
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_form, m_ui, &xml, props );
 
