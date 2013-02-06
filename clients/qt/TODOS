@@ -24,10 +24,10 @@ now:
   - resizing issues: example view picture when picture list window is quite small
 
 musts:
+- form loader
+  - refactor, especially load the language in formwidget, not in main window!
 - file UI and data mode
-  - form not shown in file UI load mode
   - resizing issues
-  - window/MDI window states not saved
 - multi-language support
   - language switch in MDI case (not only m_formWidget!)
   - window names and form widget titles must be translated dynamically

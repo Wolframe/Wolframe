@@ -87,6 +87,7 @@ class MainWindow : public QMainWindow
 		void addStatusBarIndicators( );
 		void storeSettings( );
 		void storeStateAndPositions( );
+		void restoreStateAndPositions( );
 		void addDeveloperMenu( );
 
 	private slots:
