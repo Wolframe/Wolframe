@@ -5,37 +5,37 @@
     <name>Form</name>
     <message>
         <location filename="../forms/init.ui" line="14"/>
-        <source>Tutorial</source>
+        <source>Wolframe client test forms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../forms/init.ui" line="26"/>
-        <source>Customers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../forms/init.ui" line="29"/>
-        <source>customers</source>
+        <source>Form 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../forms/init.ui" line="42"/>
-        <source>Notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../forms/init.ui" line="45"/>
-        <source>notes</source>
+        <source>Form 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../forms/init.ui" line="58"/>
-        <source>Activities</source>
+        <source>Form 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../forms/init.ui" line="61"/>
-        <source>activities</source>
+        <location filename="../forms/init.ui" line="74"/>
+        <source>Form 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../forms/init.ui" line="90"/>
+        <source>Form 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../forms/init.ui" line="93"/>
+        <source>form5</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

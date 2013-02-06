@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de_CH">
+<TS version="2.0" language="ro_RO">
 <context>
     <name>Form</name>
     <message>
@@ -133,13 +133,6 @@
         <location filename="../forms/init.ui" line="456"/>
         <source>tags</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Formular</name>
-    <message>
-        <source>Form</source>
-        <translation type="obsolete">Formula</translation>
     </message>
 </context>
 </TS>

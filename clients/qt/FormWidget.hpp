@@ -17,6 +17,7 @@
 #include <QLabel>
 #include <QHash>
 #include <QCloseEvent>
+#include <QTranslator>
 
 class WidgetProperties : public QObject
 {
@@ -83,6 +84,7 @@ class FormWidget : public QWidget
 		QHash<QString, QString> *m_globals;
 		QHash<QString, QString> *m_props; // HACK to communicate props between signal and slot
 		bool m_debug;
+		QTranslator m_translator;	// contains the translations for the current form
 		
 	private:
 		void initializeNormal( );

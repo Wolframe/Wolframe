@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <author>generated</author>
+ <class>form1</class>
+ <widget class="QWidget" name="form1">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>593</width>
+    <height>418</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Wolframe client form 1</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources/testcases.qrc">
+    <normaloff>:/images/pumpkin.png</normaloff>:/images/pumpkin.png</iconset>
+  </property>
+  <property name="initAction" stdset="0">
+   <string>read</string>
+  </property>
+  <layout class="QGridLayout">
+   <property name="margin">
+    <number>9</number>
+   </property>
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <item row="0" column="0">
+    <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::ExpandingFieldsGrow</enum>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_first">
+       <property name="text">
+        <string>First Name:</string>
+       </property>
+       <property name="buddy">
+        <cstring>first</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="first">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_last">
+       <property name="text">
+        <string>Last Name:</string>
+       </property>
+       <property name="buddy">
+        <cstring>last</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="last">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_birthDate">
+       <property name="text">
+        <string>Date Of Birth:</string>
+       </property>
+       <property name="buddy">
+        <cstring>birthDate</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QDateEdit" name="birthDate">
+       <property name="date">
+        <date>
+         <year>2000</year>
+         <month>1</month>
+         <day>1</day>
+        </date>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_temperature">
+       <property name="text">
+        <string>Temperature:</string>
+       </property>
+       <property name="buddy">
+        <cstring>temperature</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QDoubleSpinBox" name="temperature">
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-50.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>60.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_age">
+       <property name="text">
+        <string>Age:</string>
+       </property>
+       <property name="buddy">
+        <cstring>age</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QSpinBox" name="age">
+       <property name="minimumSize">
+        <size>
+         <width>54</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>54</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_gender">
+       <property name="text">
+        <string>Gender:</string>
+       </property>
+       <property name="buddy">
+        <cstring>gender</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QComboBox" name="gender">
+       <item>
+        <property name="text">
+         <string>Male</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Female</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_working">
+       <property name="text">
+        <string>Working:</string>
+       </property>
+       <property name="buddy">
+        <cstring>working</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QCheckBox" name="working"/>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_wakeupTime">
+       <property name="text">
+        <string>Wakeup Time:</string>
+       </property>
+       <property name="buddy">
+        <cstring>wakeupTime</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QDateTimeEdit" name="wakeupTime"/>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="label_anotherTime">
+       <property name="text">
+        <string>Another time:</string>
+       </property>
+       <property name="buddy">
+        <cstring>anotherTime</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QTimeEdit" name="anotherTime"/>
+     </item>
+     <item row="11" column="0">
+      <widget class="QLabel" name="label_nofChildren">
+       <property name="text">
+        <string>Number of children:</string>
+       </property>
+       <property name="buddy">
+        <cstring>nofChildren</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="1">
+      <layout class="QGridLayout" name="childrenLayout">
+       <item row="0" column="0">
+        <widget class="QSlider" name="nofChildren">
+         <property name="maximum">
+          <number>8</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::TicksAbove</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="12" column="0">
+      <widget class="QLabel" name="label_vegetable">
+       <property name="text">
+        <string>Vegatable</string>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="1">
+      <widget class="QListWidget" name="vegetable">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::MultiSelection</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="save">
+         <property name="text">
+          <string>Save</string>
+         </property>
+         <property name="autoDefault">
+          <bool>true</bool>
+         </property>
+         <property name="default">
+          <bool>true</bool>
+         </property>
+         <property name="form" stdset="0">
+          <string notr="true">init</string>
+         </property>
+         <property name="action" stdset="0">
+          <string notr="true">update</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="reset">
+         <property name="text">
+          <string>Reset</string>
+         </property>
+         <property name="action" stdset="0">
+          <string notr="true">read</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>Cancel</string>
+         </property>
+         <property name="form" stdset="0">
+          <string notr="true">init</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../resources/testcases.qrc"/>
+ </resources>
+ <connections/>
+</ui>
