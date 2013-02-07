@@ -28,6 +28,19 @@ ERROR: error calling function 'CategoryHierarchyRequest':[configurator]:100: err
 
 --
 
+Probably a race in file data load mode, as it is much faster than the network one:
+
+#0  0xb7582d17 in QObject::dynamicPropertyNames() const ()
+   from /usr/lib/libQtCore.so.4
+#1  0x080c1801 in FormWidget::readDynamicStringProperties (props=0x960d000, o=
+    0x0) at FormWidget.cpp:270
+#2  0x080c2d3b in FormWidget::gotAnswer (this=0x95ecd88, formName=..., 
+    widgetName=..., xml=...) at FormWidget.cpp:426
+#3  0x080c36e0 in FormWidget::qt_static_metacall (_o=0x95ecd88, _c=
+    QMetaObject::InvokeMetaMethod, _id=8, _a=0xbf995970)
+    at moc_FormWidget.cpp:138
+#4  0xb7584c76 in QMetaObject::activate(QObject*, QMetaObject con
+
 Opening a window in file more (test.conf)
 
 #0  0x401b4d17 in QObject::dynamicPropertyNames() const ()
