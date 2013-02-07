@@ -73,7 +73,7 @@ acceptor::acceptor( boost::asio::io_service& IOservice,
 	endpoint.port( port );
 
 	ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( host, port ));
-	m_newConnection = connection_ptr( new connection( m_IOservice, m_connList, handler ));
+	m_newConnection = connection_ptr( new connection( m_IOservice, &m_connList, handler ));
 
 	try	{
 		m_acceptor.open( endpoint.protocol() );
@@ -110,7 +110,7 @@ void acceptor::handleAccept( const boost::system::error_code& e )
 
 		ConnectionHandler *handler = m_srvHandler.newConnection( LocalTCPendpoint( m_acceptor.local_endpoint().address().to_string(),
 											   m_acceptor.local_endpoint().port() ));
-		m_newConnection.reset( new connection( m_IOservice, m_connList, handler ));
+		m_newConnection.reset( new connection( m_IOservice, &m_connList, handler ));
 		m_acceptor.async_accept( m_newConnection->socket(),
 					 m_strand.wrap( boost::bind( &acceptor::handleAccept,
 								     this,
@@ -137,8 +137,10 @@ void acceptor::handleStop()
 	// at this point no more connections are accepted
 	// Signal the list of processors to terminate
 	connection_ptr conn;
-	while (( conn = m_connList.pop()) != NULL )
+	while (( conn = m_connList.pop()) != NULL )	{
+		conn->setUnregistered();
 		conn->signal();
+	}
 }
 
 
@@ -219,7 +221,7 @@ SSLacceptor::SSLacceptor( boost::asio::io_service& IOservice,
 	endpoint.port( port );
 
 	ConnectionHandler *handler = m_srvHandler.newConnection( LocalSSLendpoint( host, port ));
-	m_newConnection = SSLconnection_ptr( new SSLconnection( m_IOservice, m_SSLcontext, m_connList, handler ));
+	m_newConnection = SSLconnection_ptr( new SSLconnection( m_IOservice, m_SSLcontext, &m_connList, handler ));
 
 	m_acceptor.open( endpoint.protocol() );
 	m_acceptor.set_option( boost::asio::ip::tcp::acceptor::reuse_address( true ));
@@ -248,7 +250,7 @@ void SSLacceptor::handleAccept( const boost::system::error_code& e )
 
 		ConnectionHandler *handler = m_srvHandler.newConnection( LocalSSLendpoint( m_acceptor.local_endpoint().address().to_string(),
 											   m_acceptor.local_endpoint().port() ));
-		m_newConnection.reset( new SSLconnection( m_IOservice, m_SSLcontext, m_connList, handler ));
+		m_newConnection.reset( new SSLconnection( m_IOservice, m_SSLcontext, &m_connList, handler ));
 		m_acceptor.async_accept( m_newConnection->socket().lowest_layer(),
 					 m_strand.wrap( boost::bind( &SSLacceptor::handleAccept,
 								     this,
@@ -275,8 +277,10 @@ void SSLacceptor::handleStop()
 	// at this point no more connections are accepted
 	// Signal the list of processors to terminate
 	SSLconnection_ptr conn;
-	while (( conn = m_connList.pop()) != NULL )
+	while (( conn = m_connList.pop()) != NULL )	{
+		conn->setUnregistered();
 		conn->signal();
+	}
 }
 
 #endif // WITH_SSL

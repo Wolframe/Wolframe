@@ -114,7 +114,7 @@ bool GlobalConnectionList::isFull()
 
 
 connection::connection( boost::asio::io_service& IOservice,
-			SocketConnectionList< connection_ptr >& connList,
+			SocketConnectionList< connection_ptr >* connList,
 			ConnectionHandler* handler ) :
 	ConnectionBase< boost::asio::ip::tcp::socket >( IOservice, handler ),
 	m_socket( IOservice ),
@@ -134,19 +134,20 @@ connection::~connection()
 
 void connection::start()
 {
+	assert( m_connList );
 	identifier( std::string( socket().remote_endpoint().address().to_string())
 		    + ":" + boost::lexical_cast<std::string>( socket().remote_endpoint().port() ));
 	LOG_TRACE << "Starting connection to " << identifier();
 
 	// if the maximum number of connections has been reached refuse the connection
-	if ( m_connList.isFull() )	{
+	if ( m_connList->isFull() )	{
 		LOG_DEBUG << "Refusing connection from " << identifier() << ". Too many connections.";
 		boost::system::error_code ignored_ec;
 		socket().write_some( boost::asio::buffer( REFUSE_MSG, strlen( REFUSE_MSG ) ));
 		socket().lowest_layer().shutdown( boost::asio::ip::tcp::socket::shutdown_both, ignored_ec );
 	}
 	else	{
-		m_connList.push( boost::static_pointer_cast< connection >( shared_from_this()));
+		m_connList->push( boost::static_pointer_cast< connection >( shared_from_this()));
 
 		m_connHandler->setPeer( RemoteTCPendpoint( socket().remote_endpoint().address().to_string(),
 							   socket().remote_endpoint().port()));
@@ -176,7 +177,7 @@ std::string connection::toString() const
 
 SSLconnection::SSLconnection( boost::asio::io_service& IOservice,
 			      boost::asio::ssl::context& SSLcontext,
-			      SocketConnectionList< SSLconnection_ptr >& connList,
+			      SocketConnectionList< SSLconnection_ptr >* connList,
 			      ConnectionHandler *handler ) :
 	ConnectionBase< ssl_socket >( IOservice, handler ),
 	m_SSLsocket( IOservice, SSLcontext ),
@@ -210,11 +211,13 @@ void SSLconnection::start()
 
 void SSLconnection::handleHandshake( const boost::system::error_code& e )
 {
+	assert( m_connList );
+
 	if ( !e )	{
 		LOG_DATA << "successful SSL handshake, peer " << identifier();
 
 		// if the maximum number of connections has been reached refuse the connection
-		if ( m_connList.isFull() )	{
+		if ( m_connList->isFull() )	{
 			LOG_DEBUG << "Refusing connection from " << identifier() << ". Too many connections.";
 			boost::system::error_code ignored_ec;
 			socket().write_some( boost::asio::buffer( REFUSE_MSG, strlen( REFUSE_MSG ) ));
@@ -228,7 +231,7 @@ void SSLconnection::handleHandshake( const boost::system::error_code& e )
 			if ( peerCert )	{
 				certInfo = new SSLcertificateInfo( peerCert );
 			}
-			m_connList.push( boost::static_pointer_cast< SSLconnection >( shared_from_this()) );
+			m_connList->push( boost::static_pointer_cast< SSLconnection >( shared_from_this()) );
 			m_connHandler->setPeer( RemoteSSLendpoint( m_SSLsocket.lowest_layer().remote_endpoint().address().to_string(),
 								   m_SSLsocket.lowest_layer().remote_endpoint().port(),
 								   certInfo ));

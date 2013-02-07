@@ -170,7 +170,7 @@ class connection : public ConnectionBase< boost::asio::ip::tcp::socket >
 public:
 	/// Construct a connection with the given io_service.
 	explicit connection( boost::asio::io_service& IOservice,
-			     SocketConnectionList< connection_ptr >& connList,
+			     SocketConnectionList< connection_ptr >* connList,
 			     ConnectionHandler *handler );
 
 	~connection();
@@ -183,7 +183,15 @@ public:
 
 	/// Unregister the connection from the list of active connections
 	void unregister()	{
-		m_connList.remove( boost::static_pointer_cast<connection>( shared_from_this()) );
+		if ( m_connList )	{
+			m_connList->remove( boost::static_pointer_cast< connection >( shared_from_this()) );
+			m_connList = NULL;
+		}
+	}
+
+	/// Set the connection as unregistered from the list of active connections
+	void setUnregistered()	{
+		m_connList = NULL;
 	}
 
 	std::string toString() const;
@@ -193,7 +201,7 @@ private:
 	boost::asio::ip::tcp::socket		m_socket;
 
 	/// List of connections to which it belongs
-	SocketConnectionList< connection_ptr >&	m_connList;
+	SocketConnectionList< connection_ptr >*	m_connList;
 };
 
 
@@ -208,20 +216,28 @@ public:
 	/// Construct a connection with the given io_service and SSL conetext.
 	explicit SSLconnection( boost::asio::io_service& IOservice,
 				boost::asio::ssl::context& SSLcontext,
-				SocketConnectionList< SSLconnection_ptr >& connList,
+				SocketConnectionList< SSLconnection_ptr >* connList,
 				ConnectionHandler *handler );
 
 	~SSLconnection();
 
 	/// Get the socket associated with the SSL connection.
-	ssl_socket& socket()	{ return m_SSLsocket; }
+	ssl_socket& socket()			{ return m_SSLsocket; }
 
 	/// Start the first asynchronous operation for the connection.
 	void start();
 
 	/// Unregister the connection from the list of active connections
 	void unregister()	{
-		m_connList.remove( boost::static_pointer_cast< SSLconnection >( shared_from_this()) );
+		if ( m_connList )	{
+			m_connList->remove( boost::static_pointer_cast< SSLconnection >( shared_from_this()) );
+			m_connList = NULL;
+		}
+	}
+
+	/// Set the connection as unregistered from the list of active connections
+	void setUnregistered()	{
+		m_connList = NULL;
 	}
 
 	std::string toString() const;
@@ -234,7 +250,7 @@ private:
 	ssl_socket				m_SSLsocket;
 
 	/// List of connections to which it belongs
-	SocketConnectionList< SSLconnection_ptr >& m_connList;
+	SocketConnectionList< SSLconnection_ptr >* m_connList;
 };
 
 #endif // WITH_SSL
