@@ -84,7 +84,9 @@ CPP_BINS = \
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
 # # set default module load directory for configuration option 'directory' in 'LoadModules'
-# INCLUDE_CXXFLAGS += -DDEFAULT_MODULE_LOAD_DIR=$(moduleloaddir)
+ifdef DEFAULT_MODULE_LOAD_DIR
+INCLUDE_CXXFLAGS += -DDEFAULT_MODULE_LOAD_DIR=$(DEFAULT_MODULE_LOAD_DIR)
+endif
 
 modules: libwolframe libwolframe_serialize libwolframe_langbind libwolframe_prnt
 libwolframe_serialize: libwolframe

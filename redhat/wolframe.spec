@@ -628,7 +628,7 @@ make install
 
 cd %{_builddir}/%{name}-%{version}
 LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make help \
-	RELEASE=1 \
+	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
@@ -656,7 +656,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	sysconfdir=/etc libdir=%{_libdir}
 
 LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make config \
-	RELEASE=1 \
+	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
@@ -684,7 +684,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	sysconfdir=/etc libdir=%{_libdir}
 
 LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make depend \
-	RELEASE=1 \
+	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
@@ -713,7 +713,7 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 
 LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" make all \
 	%{?_smp_mflags} \
-	RELEASE=1 \
+	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \
@@ -749,7 +749,7 @@ echo ===================== END OF TESTING =========================
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT install \
-	RELEASE=1 \
+	RELEASE=1 DEFAULT_MODULE_LOAD_DIR=%{_libdir}/wolframe/modules \
 %if %{build_boost}
 	BOOST_DIR=/tmp/boost-%{boost_version} \
 	%{boost_library_tag} \

@@ -34,6 +34,7 @@ WITH_LOCAL_LIBHPDF=1    force building of local version of LibHpdf
 WITH_ICU=1              build code using International Comp. for Unicode
 WITH_SYSTEM_FREEIMAGE=1 build modules using FreeImage, for image manipulation
 WITH_LOCAL_FREEIMAGE=1  build modules using FreeImage (using local library)
+DEFAULT_MODULE_LOAD_DIR=<dir> set module load directory for loadable modules
 
 Some more obscure options:
 
