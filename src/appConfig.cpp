@@ -259,7 +259,7 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 						basePath = utils::getCanonicalPath( basePath, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
 						LOG_DEBUG << MODULE_SECTION_MSG << "using directory '" << basePath << "' for modules";
 #else
-						basePath = utils::getCanonicalPath( basePath, configFile );
+						basePath = utils::getCanonicalPath( basePath, boost::filesystem::path( configFile ).branch_path().string() );
 /*MBa - maybe WARNING ? */			LOG_NOTICE << MODULE_SECTION_MSG << "using absolute directory path '" << basePath
 							   << "' for modules, instead of '" << m_modFolder << "'";
 #endif
@@ -282,7 +282,7 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 #if defined( DEFAULT_MODULE_LOAD_DIR )
 						*Pit = utils::getCanonicalPath( *Pit, STRINGIFY( DEFAULT_MODULE_LOAD_DIR ));
 #else
-						*Pit = utils::getCanonicalPath( *Pit, configFile );
+						*Pit = utils::getCanonicalPath( *Pit, boost::filesystem::path( configFile ).branch_path().string() );
 						assert( ! Pit->empty() );
 						if ( oldPath != *Pit )	{
 							LOG_NOTICE << MODULE_SECTION_MSG << "using absolute filename '" << *Pit
