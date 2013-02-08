@@ -45,12 +45,14 @@ public:
 			ITypeInfo* typeinfo;
 			TYPEATTR* typeattr;
 			const IRecordInfo* recinfo;
+			VARTYPE vt;
 			VARIANT value;
 			std::string key;
 			std::map<std::string,int> keymap;
+			std::map<std::size_t,std::vector<VARIANT> > elemar;
 
-			StackElem( ITypeInfo* typeinfo_, const IRecordInfo* recinfo_, VARTYPE vt);
-			StackElem();
+			StackElem( ITypeInfo* typeinfo_, const IRecordInfo* recinfo_, VARTYPE vt_);
+			StackElem( VARTYPE vt_);
 			StackElem( const StackElem& o);
 			~StackElem();
 		};

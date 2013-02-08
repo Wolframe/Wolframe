@@ -13,29 +13,23 @@ class FunctionResult
 	:public langbind::TypedInputFilter
 {
 public:
-	FunctionResult( const ITypeInfo* typeinfo, const VARIANT& data_)
+	FunctionResult( const comauto::TypeLib* typelib_, const ITypeInfo* typeinfo_, VARIANT data_, serialize::Context::Flags flags_)
 		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
+		,m_typelib(typelib_)
+		,m_flags(flags_)
 	{
-		std::memset( &m_data, 0, sizeof(m_data));
-		m_data.vt = VT_EMPTY;
-		WRAP( comauto::wrapVariantCopy( &m_data, &data_))
-		m_stk.push_back( StackElem( Init, const_cast<ITypeInfo*>(typeinfo), 0));
+		m_stk.push_back( StackElem( "", m_typelib->getRecordInfo(typeinfo_), const_cast<ITypeInfo*>(typeinfo_), data_));
 	}
 
 	FunctionResult( const FunctionResult& o)
 		:types::TypeSignature( "comauto::FunctionResult", __LINE__)
 		,m_stk(o.m_stk)
 		,m_elembuf(o.m_elembuf)
-	{
-		std::memset( &m_data, 0, sizeof(m_data));
-		m_data.vt = VT_EMPTY;
-		WRAP( comauto::wrapVariantCopy( &m_data, &o.m_data))
-	}
+		,m_typelib(o.m_typelib)
+	{}
 
 	virtual ~FunctionResult()
-	{
-		comauto::wrapVariantClear( &m_data);
-	}
+	{}
 
 	virtual TypedInputFilter* copy() const
 	{
@@ -43,32 +37,31 @@ public:
 	}
 
 	virtual bool getNext( ElementType& type, Element& element);
-	const VARIANT* data() const		{return &m_data;}
 
 private:
 	enum State
 	{
-		Init,
 		VarOpen,
-		VarValue,
 		VarClose
 	};
 	struct StackElem
 	{
 		State state;
 		ITypeInfo* typeinfo;
+		const IRecordInfo* recinfo;
 		TYPEATTR* typeattr;
-		VARDESC* vardesc;
-		std::size_t ofs;
-		unsigned short idx;
+		VARIANT data;
+		std::string name;
+		std::size_t idx;
 
 		StackElem( const StackElem& o);
-		StackElem( State state_, ITypeInfo* typeinfo_, std::size_t ofs_);
+		StackElem( const std::string& name_, const IRecordInfo* recinfo_, ITypeInfo* typeinfo_, VARIANT data_);
 		~StackElem();
 	};
 	std::vector<StackElem> m_stk;
 	std::string m_elembuf;
-	VARIANT m_data;
+	const comauto::TypeLib* m_typelib;
+	serialize::Context::Flags m_flags;
 };
 }//anonymous namespace
 
@@ -228,10 +221,6 @@ comauto::Function::Function( comauto::CommonLanguageRuntime* clr_, const comauto
 	WRAP( const_cast<ITypeInfo*>(m_typeinfo)->GetNames( m_funcdesc->memid, local.pnames, m_funcdesc->cParams+1, &nn))
 
 	m_methodname = comauto::utf8string( local.pnames[0]);
-/*[-]*/if (m_methodname == "Sum")
-/*[-]*/{
-/*[-]*/	std::cout << "HALLY GALLY" << std::endl;
-/*[-]*/}
 	for (ii=1; ii<nn; ++ii)
 	{
 		const TYPEDESC* td = &m_funcdesc->lprgelemdescParam[ii-1].tdesc;
@@ -321,8 +310,18 @@ comauto::FunctionClosure::FunctionClosure( const Function* func_)
 		,m_func(func_)
 		,m_flags(serialize::Context::None)
 		,m_param(0)
-		,m_paramidx(null_paramidx)
-		,m_paramarray_idx(0){}
+		,m_paramidx(null_paramidx){}
+
+static void clearArrayParam( std::map<std::size_t,std::vector<VARIANT> >& ap)
+{
+	std::map<std::size_t,std::vector<VARIANT> >::iterator ai = ap.begin(), ae = ap.end();
+	for (; ai != ae; ++ai)
+	{
+		std::vector<VARIANT>::iterator vi = ai->second.begin(), ve = ai->second.end();
+		for (; vi != ve; ++vi) comauto::wrapVariantClear( &*vi);
+	}
+	ap.clear();
+}
 
 comauto::FunctionClosure::~FunctionClosure()
 {
@@ -335,11 +334,7 @@ comauto::FunctionClosure::~FunctionClosure()
 		}
 		delete [] m_param;
 	}
-	std::size_t ii,nn;
-	for (ii=0,nn=m_paramarray.size(); ii<nn;++ii)
-	{
-		comauto::wrapVariantClear( &m_paramarray[ii]);
-	}
+	clearArrayParam( m_arrayparam);
 }
 
 void comauto::FunctionClosure::init( const proc::ProcessorProvider* p, const langbind::TypedInputFilterR& i, serialize::Context::Flags f)
@@ -356,12 +351,7 @@ void comauto::FunctionClosure::init( const proc::ProcessorProvider* p, const lan
 		m_param[ii].vt = VT_EMPTY;
 	}
 	m_paramidx = 0;
-	m_paramarray_idx = 0;
-	for (ii=0,nn=m_paramarray.size(); ii<nn;++ii)
-	{
-		comauto::wrapVariantClear( &m_paramarray[ii]);
-	}
-	m_paramarray.clear();
+	clearArrayParam( m_arrayparam);
 }
 
 
@@ -378,30 +368,38 @@ AGAIN:
 			//... we are in a parameter initilization
 			VARIANT paramvalue;
 			paramvalue.vt = VT_EMPTY;
-			if (!m_paramclosure->call( paramvalue))
+			try
 			{
-				if (m_input->state() == langbind::InputFilter::Open) throw std::runtime_error( "unexpected end of input");
-				return false;
-			}
-			const Function::Parameter* paramdescr = m_func->getParameter( m_paramidx);
-			if (m_param[ m_paramidx].vt != VT_EMPTY) throw std::runtime_error( std::string("duplicate definition of parameter '") + paramdescr->name + "'");
+				if (!m_paramclosure->call( paramvalue))
+				{
+					if (m_input->state() == langbind::InputFilter::Open) throw std::runtime_error( "unexpected end of input");
+					return false;
+				}
+				const Function::Parameter* paramdescr = m_func->getParameter( m_paramidx);
+				if (m_param[ m_paramidx].vt != VT_EMPTY) throw std::runtime_error( std::string("duplicate definition of parameter '") + paramdescr->name + "'");
 
-			switch (paramdescr->addrMode)
-			{
-				case Function::Parameter::Value:
+				switch (paramdescr->addrMode)
 				{
-					m_param[ m_paramidx] = paramvalue;
-					break;
+					case Function::Parameter::Value:
+					{
+						m_param[ m_paramidx] = paramvalue;
+						break;
+					}
+					case Function::Parameter::Safearray:
+					{
+						m_arrayparam[ m_paramidx].push_back( paramvalue);
+						paramvalue.vt = VT_EMPTY;
+						break;
+					}
 				}
-				case Function::Parameter::Safearray:
-				{
-					m_paramarray_idx = m_paramidx;
-					m_paramarray.push_back( paramvalue);
-					break;
-				}
+				m_paramidx = null_paramidx;
+				m_paramclosure.reset();
 			}
-			m_paramidx = null_paramidx;
-			m_paramclosure.reset();
+			catch (const std::runtime_error& e)
+			{
+				comauto::wrapVariantClear( &paramvalue);
+				throw e;
+			}
 		}
 		while (m_input->getNext( elemtype, elemvalue))
 		{
@@ -429,14 +427,6 @@ AGAIN:
 					{
 						throw std::runtime_error( "unexpected node type (function parameter name or index expected)");
 					}
-					if (!m_paramarray.empty() && m_paramidx != m_paramarray_idx)
-					{
-						// ... we were filling an parameter that is an array into a buffer and encounter another element. we create the array from the buffered elements.
-						m_param[ m_paramarray_idx] = comauto::createVariantArray( m_paramarray[0].vt, m_paramarray);
-						m_paramarray.clear();
-						m_paramarray_idx = null_paramidx;
-					}
-
 					const Function::Parameter* param = m_func->getParameter( m_paramidx);
 
 					if (elemtype==langbind::InputFilter::Attribute)
@@ -478,13 +468,16 @@ AGAIN:
 			case langbind::InputFilter::EndOfMessage: return false;
 			case langbind::InputFilter::Open: break;
 		}
-		if (!m_paramarray.empty())
+		// create all array parameters:
+		std::map<std::size_t,std::vector<VARIANT> >::iterator pi = m_arrayparam.begin(), pe = m_arrayparam.end();
+		for (; pi != pe; ++pi)
 		{
-			// ... there are some array elements buffered. we create the array from the buffered elements.
-			m_param[ m_paramarray_idx] = comauto::createVariantArray( m_paramarray[0].vt, m_paramarray);
-			m_paramarray.clear();
-			m_paramarray_idx = null_paramidx;
+			const Function::Parameter* param = m_func->getParameter( pi->first);
+			const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
+			m_param[ pi->first] = comauto::createVariantArray( pi->second[0].vt, recinfo, pi->second);
 		}
+
+		// function signature validation:
 		if ((m_flags & serialize::Context::ValidateAttributes) != 0)
 		{
 			// ... don't know yet what to do here, because attributes are not defined for .NET functions ...
@@ -505,13 +498,14 @@ AGAIN:
 					case Function::Parameter::Safearray:
 						if (comauto::isAtomicType( param->typedesc->vt))
 						{
-							m_param[ m_paramarray_idx] = comauto::createVariantArray( param->typedesc->vt);
+							const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
+							m_param[ ii] = comauto::createVariantArray( param->typedesc->vt, recinfo);
 						}
 						else if (param->typeinfo)
 						{
 							const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
 							if (!recinfo) throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed (record info unknown)");
-							m_param[ m_paramarray_idx] = comauto::createVariantArray( param->typedesc->vt);
+							m_param[ ii] = comauto::createVariantArray( param->typedesc->vt, recinfo);
 						}
 						else
 						{
@@ -521,15 +515,15 @@ AGAIN:
 					case Function::Parameter::Value:
 						if (comauto::isAtomicType( param->typedesc->vt))
 						{
-							m_param[ii] = comauto::createVariantType( langbind::TypedInputFilter::Element(), param->typedesc->vt);
+							m_param[ ii] = comauto::createVariantType( langbind::TypedInputFilter::Element(), param->typedesc->vt);
 						}
 						else if (param->typeinfo)
 						{
 							const IRecordInfo* recinfo = m_func->typelib()->getRecordInfo( param->typeinfo);
 							if (!recinfo) throw std::runtime_error( std::string( "default initialization of parameter '") + param->name + "' failed (record info unknown)");
-							m_param[ii].pvRecord = const_cast<IRecordInfo*>(recinfo)->RecordCreate();
-							m_param[ii].pRecInfo = const_cast<IRecordInfo*>(recinfo);
-							m_param[ii].vt = param->typedesc->vt;
+							m_param[ ii].pvRecord = const_cast<IRecordInfo*>(recinfo)->RecordCreate();
+							m_param[ ii].pRecInfo = const_cast<IRecordInfo*>(recinfo);
+							m_param[ ii].vt = param->typedesc->vt;
 						}
 						else
 						{
@@ -540,7 +534,7 @@ AGAIN:
 			}
 		}
 		VARIANT resdata = m_func->clr()->call( m_func->assemblyname(), m_func->classname(), m_func->methodname(), m_func->nofParameter(), m_param);
-		m_result.reset( new FunctionResult( m_func->getReturnType()->typeinfo, resdata));
+		m_result.reset( new FunctionResult( m_func->typelib(), m_func->getReturnType()->typeinfo, resdata, m_flags));
 		return true;
 	}
 	catch (const std::runtime_error& e)
@@ -564,35 +558,58 @@ langbind::TypedInputFilterR comauto::FunctionClosure::result() const
 }
 
 FunctionResult::StackElem::StackElem( const StackElem& o)
-	:state(o.state),typeinfo(o.typeinfo),typeattr(0),vardesc(0),ofs(o.ofs),idx(o.idx)
+	:name(o.name),state(o.state),recinfo(o.recinfo),typeinfo(o.typeinfo),typeattr(o.typeattr),idx(o.idx)
 {
-	if (typeinfo)
+	try
 	{
-		typeinfo->AddRef();
-		WRAP( typeinfo->GetTypeAttr( &typeattr))
-		if (o.vardesc)
+		data.vt = VT_EMPTY;
+		WRAP( comauto::wrapVariantCopy( &data, &o.data))
+		if (typeinfo)
 		{
-			WRAP( typeinfo->GetVarDesc( idx, &vardesc))
+			typeinfo->AddRef();
+			WRAP( typeinfo->GetTypeAttr( &typeattr))
 		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		comauto::wrapVariantClear( &data);
+		if (typeinfo)
+		{
+			if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
+			typeinfo->Release();
+		}
+		throw e;
 	}
 }
 
-FunctionResult::StackElem::StackElem( State state_, ITypeInfo* typeinfo_, std::size_t ofs_)
-	:state(state_),typeinfo(typeinfo_),typeattr(0),vardesc(0),ofs(ofs_),idx(0)
+FunctionResult::StackElem::StackElem( const std::string& name_, const IRecordInfo* recinfo_, ITypeInfo* typeinfo_, VARIANT data_)
+	:name(name_),state(VarOpen),recinfo(recinfo_),typeinfo(typeinfo_),typeattr(0),data(data_),idx(0)
 {
-	if (typeinfo)
+	try
 	{
-		typeinfo->AddRef();
-		WRAP( typeinfo->GetTypeAttr( &typeattr))
+		if (typeinfo)
+		{
+			typeinfo->AddRef();
+			WRAP( typeinfo->GetTypeAttr( &typeattr))
+		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		if (typeinfo)
+		{
+			if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
+			typeinfo->Release();
+		}
+		throw e;
 	}
 }
 
 FunctionResult::StackElem::~StackElem()
 {
+	comauto::wrapVariantClear( &data);
 	if (typeinfo)
 	{
 		if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
-		if (vardesc) typeinfo->ReleaseVarDesc( vardesc);
 		typeinfo->Release();
 	}
 }
@@ -600,77 +617,200 @@ FunctionResult::StackElem::~StackElem()
 bool FunctionResult::getNext( ElementType& type, Element& element)
 {
 AGAIN:
-	if (m_stk.empty()) return false;
-	State state = m_stk.back().state;
-	StackElem& cur = m_stk.back();	//< REMARK: 'cur' only valid till next m_stk.push_back()/pop_back(). Check that push/pop return or goto AGAIN !
-	switch (state)
+	VARIANT data;
+	data.vt = VT_EMPTY;
+	VARDESC* vardesc = 0;
+	ITypeInfo* reftypeinfo = 0;
+	try
 	{
-		case Init:
-			if (comauto::isAtomicType( m_data.vt) || comauto::isStringType( m_data.vt))
+		if (m_stk.empty()) return false;
+		StackElem& cur = m_stk.back();	//< REMARK: 'cur' only valid till next m_stk.push_back()/pop_back(). Check that push/pop return or goto AGAIN !
+		switch (cur.state)
+		{
+			case VarOpen:
 			{
-				element = comauto::getAtomicElement( m_data, m_elembuf);
-				type = Value;
-				m_stk.pop_back();
-				return true;
-			}
-			else if (!cur.typeinfo)
-			{
-				throw std::runtime_error( std::string( "cannot convert result type '") + comauto::typestr( m_data.vt)  + "'");
-			}
-			cur.state = VarOpen;
-			/*no break here!*/
+				if ((cur.data.vt & VT_ARRAY) == VT_ARRAY)
+				{
+					if (1 != cur.data.parray->cDims)
+					{
+						throw std::runtime_error( "cannont handle multi dimensional arrays");
+					}
+					if (cur.idx >= cur.data.parray->rgsabound->cElements)
+					{
+						m_stk.pop_back();
+						goto AGAIN;
+					}
+					cur.state = VarClose;
+					if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0 || cur.name.empty())
+					{
+						element = Element( cur.idx+1);
+					}
+					else
+					{
+						element = Element( cur.name);
+					}
+					type = OpenTag;
+					LONG idx = cur.idx++;
+					VARTYPE elemvt = cur.data.vt - VT_ARRAY;
 
-		case VarOpen:
-		{
-			if (!cur.typeinfo) throw std::logic_error( "illegal state in comauto::FunctionResult::getNext");
+					if (comauto::isAtomicType( elemvt))
+					{
+						data.vt = elemvt;
+						WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, const_cast<void*>(comauto::arithmeticTypeAddress( &data))))
+						cur.state = VarClose;
+						m_stk.push_back( StackElem( "", 0, 0, data));
+						std::memset( &data, 0, sizeof(data));
+						data.vt = VT_EMPTY;
+					}
+					else if (comauto::isStringType( elemvt))
+					{
+						std::memset( &data, 0, sizeof(data));
+						data.vt = elemvt;
+						switch (elemvt)
+						{
+							case VT_LPSTR:
+								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, &V_LPSTR( const_cast<VARIANT*>(&data))))
+								break;
+							case VT_LPWSTR:
+								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, &V_LPWSTR( const_cast<VARIANT*>(&data))))
+								break;
+							case VT_BSTR:
+								WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, V_BSTR( const_cast<VARIANT*>(&data))))
+								break;
+							default:
+								throw std::logic_error("internal: unknown string type");
+						}
+						cur.state = VarClose;
+						m_stk.push_back( StackElem( "", 0, 0, data));
+						std::memset( &data, 0, sizeof(data));
+						data.vt = VT_EMPTY;
+					}
+					else if (elemvt == VT_RECORD)
+					{
+						std::memset( &data, 0, sizeof(data));
+						data.vt = elemvt;
+						WRAP( ::SafeArrayGetRecordInfo( cur.data.parray, &data.pRecInfo))
+						if (!data.pRecInfo) throw std::runtime_error( "cannot iterate on result structure without record info");
+						data.pvRecord = data.pRecInfo->RecordCreate();
+						WRAP( ::SafeArrayGetElement( cur.data.parray, &idx, const_cast<void*>(data.pvRecord)))
+						data.pRecInfo->GetTypeInfo( &reftypeinfo);
+						cur.state = VarClose;
+						m_stk.push_back( StackElem( "", data.pRecInfo, reftypeinfo, data));
+						std::memset( &data, 0, sizeof(data));
+						data.vt = VT_EMPTY;
+						reftypeinfo->Release();
+						reftypeinfo = 0;
+					}
+					else
+					{
+						throw std::runtime_error(std::string("cannot handle this array element type in result: '") + comauto::typestr(elemvt));
+					}
+					return true;
+				}
+				else if (comauto::isAtomicType( cur.data.vt) || comauto::isStringType( cur.data.vt))
+				{
+					element = comauto::getAtomicElement( cur.data, m_elembuf);
+					type = Value;
+					m_stk.pop_back();
+					return true;
+				}
+				else if (cur.data.vt == VT_RECORD)
+				{
+					LONG idx = cur.idx++;
+					cur.state = VarClose;
 
-			if (cur.idx < cur.typeattr->cVars)
+					if (idx >= cur.typeattr->cVars)
+					{
+						m_stk.pop_back();
+						goto AGAIN;
+					}
+					WRAP( cur.typeinfo->GetVarDesc( idx, &vardesc))
+					std::wstring varname( comauto::variablename_utf16( cur.typeinfo, vardesc));
+					cur.typeinfo->ReleaseVarDesc( vardesc);
+					vardesc = 0;
+
+					const_cast<IRecordInfo*>(cur.recinfo)->GetField( cur.data.pvRecord, varname.c_str(), &data);
+					if ((data.vt & VT_ARRAY) == VT_ARRAY)
+					{
+						VARTYPE elemtype = data.vt - VT_ARRAY;
+						bool rt = false;
+						std::string elemname;
+						if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0)
+						{
+							type = OpenTag;
+							element = Element( m_elembuf = comauto::utf8string( varname));
+							cur.state = VarClose;
+							rt = true;
+						}
+						else
+						{
+							elemname = comauto::utf8string(varname);
+							cur.state = VarOpen;
+						}
+						if (elemtype == VT_RECORD)
+						{
+							if (!data.pRecInfo) throw std::runtime_error( "try to iterate on array of record without record info");
+							WRAP( data.pRecInfo->GetTypeInfo( &reftypeinfo));
+							m_stk.push_back( StackElem( elemname, data.pRecInfo, reftypeinfo, data));
+							reftypeinfo->Release();
+							reftypeinfo = 0;
+						}
+						else
+						{
+							m_stk.push_back( StackElem( elemname, 0, 0, data));
+						}
+						std::memset( &data, 0, sizeof(data));
+						data.vt = VT_EMPTY;
+						if (rt) return true;
+						goto AGAIN;
+					}
+					else if (data.vt == VT_RECORD)
+					{
+						if (!data.pRecInfo || !data.pvRecord) 
+						{
+							throw std::runtime_error("cannot iterate through structure without record info");
+						}
+						WRAP( data.pRecInfo->GetTypeInfo( &reftypeinfo));
+						m_stk.push_back( StackElem( "", data.pRecInfo, reftypeinfo, data));
+						reftypeinfo->Release();
+						reftypeinfo = 0;
+						type = OpenTag;
+						element = Element( m_elembuf = comauto::utf8string( varname));
+					}
+					else if (comauto::isAtomicType( data.vt) || comauto::isStringType( data.vt))
+					{
+						m_stk.push_back( StackElem( "", 0, 0, data));
+						type = OpenTag;
+						element = Element( m_elembuf = comauto::utf8string( varname));
+					}
+					else
+					{
+						throw std::runtime_error( std::string( "cannot handle this type in result structure '") + comauto::typestr(data.vt) + "'");
+					}
+					std::memset( &data, 0, sizeof(data));
+					data.vt = VT_EMPTY;
+					return true;
+				}
+				else
+				{
+					throw std::runtime_error( std::string("cannot handle this type of result '") + comauto::typestr(cur.data.vt) + "'");
+				}
+			}
+			case VarClose:
 			{
-				cur.typeinfo->GetVarDesc( cur.idx, &cur.vardesc);
-				element = Element( m_elembuf = comauto::variablename( cur.typeinfo, cur.vardesc));
-				type = OpenTag;
-				cur.state = VarValue;
+				cur.state = VarOpen;
+				element = Element();
+				type = CloseTag;
 				return true;
 			}
-			else
-			{
-				m_stk.pop_back();
-				goto AGAIN;
-			}
-			break;
 		}
-		case VarValue:
-		{
-			VARDESC* vardesc = cur.vardesc;
-			VARTYPE vt = vardesc->elemdescVar.tdesc.vt;
-			if (comauto::isAtomicType( vt) || comauto::isStringType( vt))
-			{
-				element = comauto::getAtomicElement( vt, (char*)m_data.pvRecord + cur.ofs + vardesc->oInst, m_elembuf);
-				type = Value;
-				cur.state = VarClose;
-				return true;
-			}
-			else if (vt == VT_USERDEFINED)
-			{
-				CComPtr<ITypeInfo> rectypeinfo;
-				WRAP( cur.typeinfo->GetRefTypeInfo( vardesc->elemdescVar.tdesc.hreftype, &rectypeinfo))
-				std::size_t recofs = cur.ofs + vardesc->oInst;
-				cur.state = VarClose;
-				m_stk.push_back( StackElem( VarOpen, rectypeinfo, recofs));
-				goto AGAIN;
-			}
-			break;
-		}
-		case VarClose:
-		{
-			cur.typeinfo->ReleaseVarDesc( cur.vardesc);
-			cur.vardesc = 0;
-			cur.idx++;
-			cur.state = VarOpen;
-			element = Element();
-			type = CloseTag;
-			return true;
-		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		comauto::wrapVariantClear( &data);
+		if (vardesc) m_stk.back().typeinfo->ReleaseVarDesc( vardesc);
+		if (reftypeinfo) reftypeinfo->Release();
+		throw e;
 	}
 	return false;
 }

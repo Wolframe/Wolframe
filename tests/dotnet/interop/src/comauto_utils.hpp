@@ -57,7 +57,7 @@ VARIANT createVariantType( const char* val, std::size_t valsize, VARTYPE stringt
 VARIANT createVariantType( const std::wstring& val);
 VARIANT createVariantType( const langbind::TypedInputFilter::Element& val);
 VARIANT createVariantType( const langbind::TypedInputFilter::Element& val, VARTYPE dsttype);
-VARIANT createVariantArray( VARTYPE vt, const std::vector<VARIANT>& ar=std::vector<VARIANT>());
+VARIANT createVariantArray( VARTYPE vt, const IRecordInfo* recinfo, const std::vector<VARIANT>& ar=std::vector<VARIANT>());
 void copyVariantType( VARTYPE dsttype, void* dstfield, const langbind::TypedInputFilter::Element& val);
 HRESULT wrapVariantCopy( VARIANT* pvargDest, const VARIANT* pvargSrc);
 HRESULT wrapVariantCopyInd( VARIANT* pvargDest, const VARIANT* pvargSrc);
@@ -89,12 +89,17 @@ const char*& impl_V_LPSTR( const VARIANT* v);
 char*& impl_V_LPSTR( VARIANT* v);
 const wchar_t*& impl_V_LPWSTR( const VARIANT* v);
 wchar_t*& impl_V_LPWSTR( VARIANT* v);
+const BSTR& impl_V_BSTR( const VARIANT* v);
+BSTR& impl_V_BSTR( VARIANT* v);
 
 #ifndef V_LPSTR
 #define V_LPSTR(V) comauto::impl_V_LPSTR(V)
 #endif
 #ifndef V_LPWSTR
 #define V_LPWSTR(V) comauto::impl_V_LPWSTR(V)
+#endif
+#ifndef V_BSTR
+#define V_BSTR(V) comauto::impl_V_BSTR(V)
 #endif
 
 }}

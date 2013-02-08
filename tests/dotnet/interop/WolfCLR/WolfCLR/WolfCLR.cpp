@@ -50,11 +50,31 @@ static void test_atomic_param_fun_call( const std::map<std::string,comauto::Func
 
 static void test_struct_param_fun_call( const std::map<std::string,comauto::FunctionR>& funcmap)
 {
-	langbind::Form user, user2, users(langbind::Form::Array), place, place2, pair, intarr(langbind::Form::Array);
-	langbind::Form param_AddIdPair, param_GetUser_p, param_GetAddress_p, param_StoreUser, param_StoreUsers, param_Sum;
+	langbind::Form user, user2, users(langbind::Form::Array), usergroup, place, place2, pair, pair2, pair3, pair4, pairs(langbind::Form::Array), intarr(langbind::Form::Array);
+	langbind::Form sar(langbind::Form::Array);
+	langbind::Form param_AddIdPair, param_AddIdPairs, param_GetUser_p, param_GetAddress_p, param_StoreUser, param_StoreUsers, param_StoreUserGroup, param_Sum;
+	langbind::Form param_ConcatStrings,param_GetIdPairs;
 	pair
-		( "a", langbind::Form( "51"))
+		( "a", langbind::Form( "1"))
+		( "b", langbind::Form( "1"))
+		;
+	pair2
+		( "a", langbind::Form( "2"))
+		( "b", langbind::Form( "2"))
+		;
+	pair3
+		( "a", langbind::Form( "3"))
 		( "b", langbind::Form( "3"))
+		;
+	pair4
+		( "a", langbind::Form( "4"))
+		( "b", langbind::Form( "4"))
+		;
+	pairs
+		(pair)
+		(pair2)
+		(pair3)
+		(pair4)
 		;
 	place
 		( "street", langbind::Form( "Vogelsangstrasse 5 8006 Zurich"))
@@ -78,6 +98,10 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Func
 		( user)
 		( user2)
 		;
+	usergroup
+		("name", langbind::Form( "Spielgruppe"))
+		("usr", users)
+		;
 	intarr
 		( langbind::Form( "7"))
 		( langbind::Form( "13"))
@@ -86,6 +110,9 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Func
 		;
 	param_AddIdPair
 		( "p", pair)
+		;
+	param_AddIdPairs
+		( "p", pairs)
 		;
 	param_GetUser_p
 		( "id", langbind::Form( "123"))
@@ -106,11 +133,30 @@ static void test_struct_param_fun_call( const std::map<std::string,comauto::Func
 	param_Sum
 		( "aa", intarr)
 		;
+	sar
+		( langbind::Form( "guru "))
+		( langbind::Form( "kaeng "))
+		( langbind::Form( "paeng "))
+		( langbind::Form( "gulu "))
+		;
+	param_ConcatStrings
+		("sar" , sar)
+		;
+	param_GetIdPairs
+		( "len", langbind::Form( "4"))
+		;
+	param_StoreUserGroup
+		( "usr", usergroup)
+		;
 	test_function_call( funcmap, "Functions.AddIdPair", param_AddIdPair, "RESULT AddIdPair:");
-	test_function_call( funcmap, "Functions.GetAddress_p", param_GetAddress_p, "RESULT GetAddress:");
+	test_function_call( funcmap, "Functions.GetIdPairs", param_GetIdPairs, "RESULT GetIdPairs:");
+	test_function_call( funcmap, "Functions.ConcatStrings", param_ConcatStrings, "RESULT ConcatStrings:");
+	test_function_call( funcmap, "Functions.AddIdPairs", param_AddIdPairs, "RESULT AddIdPairs:");
+	test_function_call( funcmap, "Functions.GetAddress_p", param_GetAddress_p, "RESULT GetAddress_p:");
 	test_function_call( funcmap, "Functions.StoreUser", param_StoreUser, "RESULT StoreUser:");
 	test_function_call( funcmap, "Functions.Sum", param_Sum, "RESULT Sum:");
 	test_function_call( funcmap, "Functions.StoreUsers", param_StoreUsers, "RESULT StoreUsers:");
+	test_function_call( funcmap, "Functions.StoreUserGroup", param_StoreUserGroup, "RESULT StoreUserGroup:");
 };
 
 
@@ -120,7 +166,7 @@ int main( int , const char**)
 	{
 		WRAP( ::CoInitializeEx( NULL, COINIT_MULTITHREADED))
 		std::string path( "C:\\Users\\patrick\\Projects\\Wolframe\\tests\\dotnet\\csharp\\Functions\\bin\\Release\\");
-		std::string assembly( "Functions, Version=1.0.0.14, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
+		std::string assembly( "Functions, Version=1.0.0.30, Culture=neutral, PublicKeyToken=1c1d731dc6e1cbe1, processorArchitecture=MSIL");
 		comauto::TypeLib typelib( path + "Functions.tlb");
 		typelib.print( std::cout);
 		comauto::CommonLanguageRuntime clr( "v4.0.30319");

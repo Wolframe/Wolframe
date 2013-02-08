@@ -9,6 +9,8 @@ const char*& comauto::impl_V_LPSTR( const VARIANT* v)		{ return *(const char**)c
 char*& comauto::impl_V_LPSTR( VARIANT* v)					{ return *(char**)comauto::arithmeticTypeAddress(v); }
 const wchar_t*& comauto::impl_V_LPWSTR( const VARIANT* v)	{ return *(const wchar_t**)comauto::arithmeticTypeAddress(v); }
 wchar_t*& comauto::impl_V_LPWSTR( VARIANT* v)				{ return *(wchar_t**)comauto::arithmeticTypeAddress(v); }
+const BSTR& comauto::impl_V_BSTR( const VARIANT* v)			{ return *(const BSTR*)&v->bstrVal;}
+BSTR& comauto::impl_V_BSTR( VARIANT* v)						{ return *(BSTR*)&v->bstrVal;}
 
 void* comauto::allocMem( std::size_t size)
 {
@@ -237,10 +239,6 @@ std::string comauto::typestr( const ITypeInfo* typeinfo, const TYPEDESC* typedes
 	{
 		rt.append( "[] ");
 		vt -= VT_ARRAY;
-		if (comauto::isAtomicType(vt))
-		{
-			std::cout << "++++++++++++++++++++++++++++++++++++ HALLY GALLY +++++++++++++++++++++++" << std::endl;
-		}
 	}
 	if ((vt & VT_VECTOR) == VT_VECTOR)
 	{
@@ -313,7 +311,7 @@ std::string comauto::structstring( const ITypeInfo* typeinfo)
 			WRAP( const_cast<ITypeInfo*>(typeinfo)->GetNames( var->memid, &varname, 1, &nn))
 			ELEMDESC ed = var->elemdescVar;
 			if (ii > 0) out << ";";
-			out << comauto::utf8string(varname) << ":" << typestr( typeinfo, &ed.tdesc);
+			out << comauto::utf8string(varname) << ":" << comauto::typestr( typeinfo, &ed.tdesc);
 			const_cast<ITypeInfo*>(typeinfo)->ReleaseVarDesc( var);
 			var = 0;
 			::SysFreeString( varname);
@@ -571,9 +569,10 @@ VARIANT comauto::createVariantType( const langbind::TypedInputFilter::Element& v
 	return rt;
 }
 
-VARIANT comauto::createVariantArray( VARTYPE vt, const std::vector<VARIANT>& ar)
+VARIANT comauto::createVariantArray( VARTYPE vt, const IRecordInfo* recinfo, const std::vector<VARIANT>& ar)
 {
 	VARIANT rt;
+	rt.vt = VT_EMPTY;
 	SAFEARRAY* pa = NULL;
 	try
 	{
@@ -582,7 +581,7 @@ VARIANT comauto::createVariantArray( VARTYPE vt, const std::vector<VARIANT>& ar)
 		bd.cElements = ar.size();
 		bd.lLbound = 0;
 
-		if (comauto::isAtomicType( vt) || comauto::isStringType( vt))
+		if (comauto::isAtomicType( vt))
 		{
 			pa = ::SafeArrayCreate( vt, 1, &bd);
 			if (!pa) throw std::bad_alloc();
@@ -592,20 +591,63 @@ VARIANT comauto::createVariantArray( VARTYPE vt, const std::vector<VARIANT>& ar)
 				if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
 				WRAP( ::SafeArrayPutElement( pa, &ii, const_cast<void*>(comauto::arithmeticTypeAddress( &ar[ii]))))
 			}
+			rt.vt = VT_ARRAY | vt;
+			rt.parray = pa;
 		}
-		else if (vt == VT_VARIANT)
+		else if (comauto::isStringType( vt))
 		{
 			pa = ::SafeArrayCreate( vt, 1, &bd);
+			if (!pa) throw std::bad_alloc();
+
+			switch (vt)
+			{
+				case VT_LPSTR:
+					for (ii=0,nn=ar.size(); ii<nn; ++ii)
+					{
+						if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
+						LPSTR* bs = &V_LPSTR( const_cast<VARIANT*>(&ar[ii]));
+						WRAP( ::SafeArrayPutElement( pa, &ii, bs))
+					}
+					break;
+				case VT_LPWSTR:
+					for (ii=0,nn=ar.size(); ii<nn; ++ii)
+					{
+						if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
+						LPWSTR* bs = &V_LPWSTR( const_cast<VARIANT*>(&ar[ii]));
+						WRAP( ::SafeArrayPutElement( pa, &ii, bs))
+					}
+					break;
+				case VT_BSTR:
+					for (ii=0,nn=ar.size(); ii<nn; ++ii)
+					{
+						if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
+						BSTR bs = V_BSTR( const_cast<VARIANT*>(&ar[ii]));
+						WRAP( ::SafeArrayPutElement( pa, &ii, bs))
+					}
+					break;
+				default:
+					throw std::logic_error("internal: unknown string type");
+			}
+			rt.vt = VT_ARRAY | vt;
+			rt.parray = pa;
+		}
+		else if (vt == VT_RECORD)
+		{
+			pa = ::SafeArrayCreateEx( VT_RECORD, 1, &bd, const_cast<IRecordInfo*>(recinfo));
 			if (!pa) throw std::bad_alloc();
 
 			for (ii=0,nn=ar.size(); ii<nn; ++ii)
 			{
 				if (vt != ar[ii].vt) throw std::logic_error( "internal: tried to create mixed type array");
-				WRAP( ::SafeArrayPutElement( pa, &ii, const_cast<VARIANT*>(&ar[ii])))
+				WRAP( ::SafeArrayPutElement( pa, &ii, const_cast<void*>(ar[ii].pvRecord)))
 			}
+			rt.vt = VT_ARRAY | VT_RECORD;
+			rt.parray = pa;
 		}
-		rt.vt = VT_ARRAY | vt;
-		rt.parray = pa;
+		else
+		{
+			throw std::runtime_error( "cannot create array of this type");
+		}
 		return rt;
 	}
 	catch (const std::runtime_error& e)
@@ -775,7 +817,7 @@ HRESULT comauto::wrapVariantChangeType( VARIANT* pvargDest, const VARIANT* pvarg
 	}
 	return S_OK;
 }
-
+ 
 HRESULT comauto::wrapVariantCopyInd( VARIANT* pvargDest, const VARIANT* pvargSrc)
 {
 	if ((pvargSrc->vt & VT_BYREF) == VT_BYREF)

@@ -257,6 +257,7 @@ const IRecordInfo* comauto::TypeLib::getRecordInfo( const ITypeInfo* typeinfo) c
 	LCID lcid_US = 0x0409;
 	IRecordInfo* rt = NULL;
 	TYPEATTR* typeattr = NULL;
+	if (!typeinfo) return 0;
 	try
 	{
 		WRAP( const_cast<ITypeInfo*>(typeinfo)->GetTypeAttr( &typeattr))
@@ -281,8 +282,8 @@ const IRecordInfo* comauto::TypeLib::getRecordInfo( const ITypeInfo* typeinfo) c
 	return rt;
 }
 
-comauto::TypeLib::AssignmentClosure::StackElem::StackElem( ITypeInfo* typeinfo_, const IRecordInfo* recinfo_, VARTYPE vt)
-	:typeinfo(typeinfo_),typeattr(0),recinfo(recinfo_)
+comauto::TypeLib::AssignmentClosure::StackElem::StackElem( ITypeInfo* typeinfo_, const IRecordInfo* recinfo_, VARTYPE vt_)
+	:typeinfo(typeinfo_),typeattr(0),recinfo(recinfo_),vt(vt_)
 {
 	if (!typeinfo) throw std::logic_error( "illegal state in AssignmentClosure::StackElem");
 	VARDESC* vardesc = NULL;
@@ -314,14 +315,14 @@ comauto::TypeLib::AssignmentClosure::StackElem::StackElem( ITypeInfo* typeinfo_,
 	}
 }
 
-comauto::TypeLib::AssignmentClosure::StackElem::StackElem()
-	:typeinfo(0),typeattr(0),recinfo(0)
+comauto::TypeLib::AssignmentClosure::StackElem::StackElem( VARTYPE vt_)
+	:typeinfo(0),typeattr(0),recinfo(0),vt(vt_)
 {
 	value.vt = VT_EMPTY;
 }
 
 comauto::TypeLib::AssignmentClosure::StackElem::StackElem( const StackElem& o)
-	:typeinfo(o.typeinfo),typeattr(0),recinfo(o.recinfo),key(o.key),keymap(o.keymap)
+	:typeinfo(o.typeinfo),typeattr(0),recinfo(o.recinfo),vt(o.vt),key(o.key),keymap(o.keymap),elemar(o.elemar)
 {
 	value.vt = VT_EMPTY;
 	comauto::wrapVariantCopy( &value, &o.value);
@@ -338,7 +339,7 @@ comauto::TypeLib::AssignmentClosure::StackElem::~StackElem()
 	{
 		if (typeattr) typeinfo->ReleaseTypeAttr( typeattr);
 		typeinfo->Release();
-		::VariantClear( &value);
+		comauto::wrapVariantClear( &value);
 	}
 }
 
@@ -362,53 +363,114 @@ bool comauto::TypeLib::AssignmentClosure::call( VARIANT& output)
 	VARIANT value;
 	value.vt = VT_EMPTY;
 	ITypeInfo* rectypeinfo = 0;
+	VARDESC* vardesc = 0;
 	if (m_stk.empty()) return true;
 	langbind::TypedFilterBase::ElementType elemtype;
 	langbind::TypedFilterBase::Element elemvalue;
+	StackElem* cur = 0;
 
 	try
 	{
 		while (m_input->getNext( elemtype, elemvalue))
 		{
 AGAIN:
+			cur = &m_stk.back();
 			switch (elemtype)
 			{
 				case langbind::TypedFilterBase::OpenTag:
 				{
-					StackElem& cur = m_stk.back();
-					if (!cur.key.empty()) throw std::runtime_error("illegal filter input sequence (value instead of open tag expected after attribute)");
+					if (!cur->key.empty()) throw std::runtime_error("illegal filter input sequence (value instead of open tag expected after attribute)");
 					if (elemvalue.type != langbind::TypedFilterBase::Element::string_) throw std::runtime_error( "string expected for tag name");
-					if (cur.value.vt != VT_RECORD || cur.value.pvRecord == 0 || cur.value.pRecInfo == 0) throw std::runtime_error( "structure assigned to atomic value or array"); 
-					cur.key = elemvalue.tostring();
-					std::map<std::string,int>::const_iterator ki = cur.keymap.find( cur.key);
-					if (ki == cur.keymap.end())
+					if (cur->value.vt != VT_RECORD || cur->value.pvRecord == 0 || cur->value.pRecInfo == 0) throw std::runtime_error( "structure assigned to atomic value or array"); 
+					cur->key = elemvalue.tostring();
+					std::map<std::string,int>::const_iterator ki = cur->keymap.find( cur->key);
+					if (ki == cur->keymap.end())
 					{
-						cur.key.clear();
+						cur->key.clear();
 						throw std::runtime_error( std::string( "undefined element '") + elemvalue.tostring() + "'");
 					}
-					VARDESC* vardesc;
-					WRAP( cur.typeinfo->GetVarDesc( ki->second, &vardesc))
+					WRAP( cur->typeinfo->GetVarDesc( ki->second, &vardesc))
 					VARTYPE elemvartype = vardesc->elemdescVar.tdesc.vt;
 					HREFTYPE elemhreftype = vardesc->elemdescVar.tdesc.hreftype;
-					cur.typeinfo->ReleaseVarDesc( vardesc);
+					cur->typeinfo->ReleaseVarDesc( vardesc);
+					vardesc = 0;
 
 					if (elemvartype == VT_USERDEFINED)
 					{
-						WRAP( cur.typeinfo->GetRefTypeInfo( elemhreftype, &rectypeinfo))
+						WRAP( cur->typeinfo->GetRefTypeInfo( elemhreftype, &rectypeinfo))
 						const IRecordInfo* recinfo = m_typelib->getRecordInfo( rectypeinfo);
 						m_stk.push_back( StackElem( rectypeinfo, recinfo, VT_RECORD));
 						rectypeinfo->Release();
 						rectypeinfo = 0;
 					}
+					else if (elemvartype == VT_SAFEARRAY)
+					{
+						VARTYPE arelemvartype = vardesc->elemdescVar.tdesc.lptdesc->vt;
+						HREFTYPE arelemhreftype = vardesc->elemdescVar.tdesc.lptdesc->hreftype;
+						if (arelemhreftype == VT_USERDEFINED)
+						{
+							WRAP( cur->typeinfo->GetRefTypeInfo( arelemhreftype, &rectypeinfo))
+							const IRecordInfo* recinfo = m_typelib->getRecordInfo( rectypeinfo);
+							m_stk.push_back( StackElem( rectypeinfo, recinfo, VT_RECORD));
+						}
+						else
+						{
+							m_stk.push_back( StackElem( arelemvartype));
+						}
+						rectypeinfo->Release();
+						rectypeinfo = 0;
+					}
+					else if (comauto::isAtomicType(elemvartype) || comauto::isStringType(elemvartype))
+					{
+						m_stk.push_back( StackElem( elemvartype));
+					}
 					else
 					{
-						m_stk.push_back( StackElem());
+						throw std::runtime_error( std::string("cannot pass this type as parameter: '") + comauto::typestr(elemvartype) + "'");
 					}
 					break;
 				}
 				case langbind::TypedFilterBase::CloseTag:
 				{
-					if (!m_stk.back().key.empty()) throw std::runtime_error("illegal filter input sequence (value instead of close tag expected after attribute)");
+					std::map<std::size_t,std::vector<VARIANT> >::iterator ei = cur->elemar.begin(), ee = cur->elemar.end();
+					for (; ei != ee; ++ei)
+					{
+						WRAP( cur->typeinfo->GetVarDesc( ei->first, &vardesc))
+						std::wstring key( comauto::variablename_utf16( m_stk.back().typeinfo, vardesc));
+
+						if (vardesc->elemdescVar.tdesc.vt == VT_SAFEARRAY)
+						{
+							VARTYPE avtype = vardesc->elemdescVar.tdesc.lptdesc->vt;
+							HREFTYPE avhreftype = vardesc->elemdescVar.tdesc.lptdesc->hreftype;
+							if (avhreftype == VT_USERDEFINED)
+							{
+								WRAP( cur->typeinfo->GetRefTypeInfo( avhreftype, &rectypeinfo))
+								const IRecordInfo* avrecinfo = m_typelib->getRecordInfo( rectypeinfo);
+								value = createVariantArray( avtype, avrecinfo, ei->second);
+								rectypeinfo->Release();
+								rectypeinfo = 0;
+								WRAP( cur->value.pRecInfo->PutField( INVOKE_PROPERTYPUT, cur->value.pvRecord, key.c_str(), &value))
+							}
+							else
+							{
+								value = createVariantArray( avtype, 0, ei->second);
+								WRAP( cur->value.pRecInfo->PutField( INVOKE_PROPERTYPUT, cur->value.pvRecord, key.c_str(), &value))
+							}
+						}
+						else if (ei->second.size() > 1)
+						{
+							throw std::runtime_error( "duplicate assignment to non array variable");
+						}
+						else
+						{
+							WRAP( cur->value.pRecInfo->PutField( INVOKE_PROPERTYPUT, cur->value.pvRecord, key.c_str(), &ei->second[0]))
+						}
+						cur->typeinfo->ReleaseVarDesc( vardesc);
+						vardesc = 0;
+						comauto::wrapVariantClear( &value);
+						value.vt = VT_EMPTY;
+					}
+					if (!m_stk.back().key.empty()) throw std::runtime_error( "illegal filter input sequence (value instead of close tag expected after attribute)");
 					value = m_stk.back().value;
 					m_stk.back().value.vt = VT_EMPTY;
 					m_stk.pop_back();
@@ -421,42 +483,38 @@ AGAIN:
 						}
 						return true;
 					}
-					StackElem& cur = m_stk.back();
-					std::wstring kk( comauto::utf16string( cur.key));
-					WRAP( cur.value.pRecInfo->PutField( INVOKE_PROPERTYPUT, cur.value.pvRecord, kk.c_str(), &value));
-					comauto::wrapVariantClear( &value);
-					cur.key.clear();
+					cur = &m_stk.back();
+					cur->elemar[ cur->keymap[ cur->key]].push_back( value);
+					value.vt = VT_EMPTY;
+					cur->key.clear();
 					break;
 				}
 				case langbind::TypedFilterBase::Attribute:
 				{
-					StackElem& cur = m_stk.back();
-					if (!cur.key.empty()) throw std::runtime_error("illegal filter input sequence (value instead of attribute expected after attribute)");
+					if (!cur->key.empty()) throw std::runtime_error("illegal filter input sequence (value instead of attribute expected after attribute)");
 					if (elemvalue.type != langbind::TypedFilterBase::Element::string_) throw std::runtime_error( "string expected for attribute name");
-					cur.key = elemvalue.tostring();
+					cur->key = elemvalue.tostring();
 					break;
 				}
 				case langbind::TypedFilterBase::Value:
 				{
-					StackElem& cur = m_stk.back();
-					if (!cur.key.empty())
+					if (!cur->key.empty())
 					{
 						value = comauto::createVariantType( elemvalue);
-						if (cur.value.vt != VT_RECORD || cur.value.pvRecord == 0 || cur.value.pRecInfo == 0) throw std::runtime_error( "illegal state (structure element context expected)"); 
-						std::wstring kk( comauto::utf16string( cur.key));
-						WRAP( cur.value.pRecInfo->PutField( INVOKE_PROPERTYPUT, cur.value.pvRecord, kk.c_str(), &value));
-						comauto::wrapVariantClear( &value);
-						cur.key.clear();
+						if (cur->value.vt != VT_RECORD || cur->value.pvRecord == 0 || cur->value.pRecInfo == 0) throw std::runtime_error( "illegal state (structure element context expected)"); 
+						cur->elemar[ cur->keymap[ cur->key]].push_back( value);
+						value.vt = VT_EMPTY;
+						cur->key.clear();
 					}
-					else if (cur.value.vt == VT_RECORD)
+					else if (cur->value.vt == VT_RECORD)
 					{
-						cur.key = "_";
+						cur->key = "_";
 						goto AGAIN;
 					}
 					else
 					{
-						if (cur.value.vt != VT_EMPTY) throw std::runtime_error( "duplicate value assignment");
-						cur.value = comauto::createVariantType( elemvalue);
+						if (cur->value.vt != VT_EMPTY) throw std::runtime_error( "duplicate value assignment");
+						cur->value = comauto::createVariantType( elemvalue, cur->vt);
 					}
 					break;
 				}
@@ -483,6 +541,7 @@ AGAIN:
 	}
 	catch (const std::runtime_error& e)
 	{
+		if (vardesc) cur->typeinfo->ReleaseVarDesc( vardesc);
 		comauto::wrapVariantClear( &value);
 		if (rectypeinfo) rectypeinfo->Release();
 		throw e;
@@ -496,7 +555,7 @@ comauto::TypeLib::AssignmentClosure::AssignmentClosure()
 comauto::TypeLib::AssignmentClosure::AssignmentClosure( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, VARTYPE outtype_, bool single_)
 	:m_typelib(const_cast<TypeLib*>(typelib_)),m_typeinfo(0),m_recinfo(0),m_input(input_),m_outtype(outtype_),m_single(single_)
 {
-	m_stk.push_back( StackElem());
+	m_stk.push_back( StackElem( outtype_));
 }
 
 comauto::TypeLib::AssignmentClosure::AssignmentClosure( const TypeLib* typelib_, const langbind::TypedInputFilterR& input_, const ITypeInfo* typeinfo_)

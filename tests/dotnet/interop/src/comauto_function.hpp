@@ -44,9 +44,7 @@ private:
 	enum {null_paramidx=0xFFFF};
 	std::size_t m_paramidx;											//< currently selected parameter of the function [0,1,.. n-1]
 	TypeLib::AssignmentClosureR m_paramclosure;						//< closure for current parameter assignment
-	std::vector<VARIANT> m_paramarray;								//< temporary buffer for parameters passed as array
-	const IRecordInfo* m_paramarray_recinfo;						//< record info for the buffered array parameters
-	std::size_t m_paramarray_idx;
+	std::map<std::size_t,std::vector<VARIANT> > m_arrayparam;		//< temporary buffer for parameters passed as array (with their name)
 	langbind::TypedInputFilterR m_result;							//< reference to result of the function call
 };
 
