@@ -44,7 +44,7 @@ PF:
 
 - low prio
   - test forms with SELF recursion
-  - auditing extensions for Transactions
+  - auditing extensions for Transactions (or Functions in general?)
   - error objects for exceptions/logging (non intrusive: bind_int, etc.)
   - bignum tests (only bigint tested until now)
   - XSLT filter + tests
