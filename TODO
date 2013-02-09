@@ -37,6 +37,9 @@ daemon code:
 
 PF:
 - high prio
+  - Project CRM
+  - XML directmap without root element
+  - Lua functions for directmap
   - UIForm loader in client and server
 
 - low prio
@@ -51,3 +54,4 @@ PF:
 
 - nice to have
   - Transactions: Warning for unused results
+
