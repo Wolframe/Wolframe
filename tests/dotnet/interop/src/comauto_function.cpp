@@ -647,7 +647,7 @@ AGAIN:
 					}
 					else
 					{
-						element = Element( cur.name);
+						element = Element( m_elembuf = cur.name);
 					}
 					type = OpenTag;
 					LONG idx = cur.idx++;
@@ -732,7 +732,6 @@ AGAIN:
 					const_cast<IRecordInfo*>(cur.recinfo)->GetField( cur.data.pvRecord, varname.c_str(), &data);
 					if ((data.vt & VT_ARRAY) == VT_ARRAY)
 					{
-						VARTYPE elemtype = data.vt - VT_ARRAY;
 						bool rt = false;
 						std::string elemname;
 						if (((int)m_flags & serialize::Context::SerializeWithIndices) != 0)
@@ -747,18 +746,7 @@ AGAIN:
 							elemname = comauto::utf8string(varname);
 							cur.state = VarOpen;
 						}
-						if (elemtype == VT_RECORD)
-						{
-							if (!data.pRecInfo) throw std::runtime_error( "try to iterate on array of record without record info");
-							WRAP( data.pRecInfo->GetTypeInfo( &reftypeinfo));
-							m_stk.push_back( StackElem( elemname, data.pRecInfo, reftypeinfo, data));
-							reftypeinfo->Release();
-							reftypeinfo = 0;
-						}
-						else
-						{
-							m_stk.push_back( StackElem( elemname, 0, 0, data));
-						}
+						m_stk.push_back( StackElem( elemname, 0, 0, data));
 						std::memset( &data, 0, sizeof(data));
 						data.vt = VT_EMPTY;
 						if (rt) return true;

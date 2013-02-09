@@ -374,6 +374,8 @@ bool comauto::TypeLib::AssignmentClosure::call( VARIANT& output)
 		while (m_input->getNext( elemtype, elemvalue))
 		{
 AGAIN:
+std::cout << "ELEM " << langbind::TypedFilterBase::elementTypeName(elemtype)  << " '" << elemvalue.tostring() << "'" << std::endl;
+
 			cur = &m_stk.back();
 			switch (elemtype)
 			{
@@ -392,41 +394,47 @@ AGAIN:
 					WRAP( cur->typeinfo->GetVarDesc( ki->second, &vardesc))
 					VARTYPE elemvartype = vardesc->elemdescVar.tdesc.vt;
 					HREFTYPE elemhreftype = vardesc->elemdescVar.tdesc.hreftype;
-					cur->typeinfo->ReleaseVarDesc( vardesc);
-					vardesc = 0;
 
-					if (elemvartype == VT_USERDEFINED)
-					{
-						WRAP( cur->typeinfo->GetRefTypeInfo( elemhreftype, &rectypeinfo))
-						const IRecordInfo* recinfo = m_typelib->getRecordInfo( rectypeinfo);
-						m_stk.push_back( StackElem( rectypeinfo, recinfo, VT_RECORD));
-						rectypeinfo->Release();
-						rectypeinfo = 0;
-					}
-					else if (elemvartype == VT_SAFEARRAY)
+					if (elemvartype == VT_SAFEARRAY)
 					{
 						VARTYPE arelemvartype = vardesc->elemdescVar.tdesc.lptdesc->vt;
 						HREFTYPE arelemhreftype = vardesc->elemdescVar.tdesc.lptdesc->hreftype;
-						if (arelemhreftype == VT_USERDEFINED)
+						if (arelemvartype == VT_USERDEFINED)
 						{
 							WRAP( cur->typeinfo->GetRefTypeInfo( arelemhreftype, &rectypeinfo))
 							const IRecordInfo* recinfo = m_typelib->getRecordInfo( rectypeinfo);
 							m_stk.push_back( StackElem( rectypeinfo, recinfo, VT_RECORD));
+							rectypeinfo->Release();
+							rectypeinfo = 0;
 						}
 						else
 						{
 							m_stk.push_back( StackElem( arelemvartype));
 						}
-						rectypeinfo->Release();
-						rectypeinfo = 0;
-					}
-					else if (comauto::isAtomicType(elemvartype) || comauto::isStringType(elemvartype))
-					{
-						m_stk.push_back( StackElem( elemvartype));
+						cur->typeinfo->ReleaseVarDesc( vardesc);
+						vardesc = 0;
 					}
 					else
 					{
-						throw std::runtime_error( std::string("cannot pass this type as parameter: '") + comauto::typestr(elemvartype) + "'");
+						cur->typeinfo->ReleaseVarDesc( vardesc);
+						vardesc = 0;
+
+						if (elemvartype == VT_USERDEFINED)
+						{
+							WRAP( cur->typeinfo->GetRefTypeInfo( elemhreftype, &rectypeinfo))
+							const IRecordInfo* recinfo = m_typelib->getRecordInfo( rectypeinfo);
+							m_stk.push_back( StackElem( rectypeinfo, recinfo, VT_RECORD));
+							rectypeinfo->Release();
+							rectypeinfo = 0;
+						}
+						else if (comauto::isAtomicType(elemvartype) || comauto::isStringType(elemvartype))
+						{
+							m_stk.push_back( StackElem( elemvartype));
+						}
+						else
+						{
+							throw std::runtime_error( std::string("cannot pass this type as parameter: '") + comauto::typestr(elemvartype) + "'");
+						}
 					}
 					break;
 				}
@@ -442,11 +450,11 @@ AGAIN:
 						{
 							VARTYPE avtype = vardesc->elemdescVar.tdesc.lptdesc->vt;
 							HREFTYPE avhreftype = vardesc->elemdescVar.tdesc.lptdesc->hreftype;
-							if (avhreftype == VT_USERDEFINED)
+							if (avtype == VT_USERDEFINED)
 							{
 								WRAP( cur->typeinfo->GetRefTypeInfo( avhreftype, &rectypeinfo))
 								const IRecordInfo* avrecinfo = m_typelib->getRecordInfo( rectypeinfo);
-								value = createVariantArray( avtype, avrecinfo, ei->second);
+								value = createVariantArray( VT_RECORD, avrecinfo, ei->second);
 								rectypeinfo->Release();
 								rectypeinfo = 0;
 								WRAP( cur->value.pRecInfo->PutField( INVOKE_PROPERTYPUT, cur->value.pvRecord, key.c_str(), &value))
