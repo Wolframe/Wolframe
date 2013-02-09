@@ -38,6 +38,7 @@
 
 #include <string>
 #include <boost/thread/thread.hpp>
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 using namespace _Wolframe;
