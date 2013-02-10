@@ -7,7 +7,8 @@ Form Employee
 	addr_line1	addressline
 	addr_line2	?addressline
 	addr_postalcode	postalcode
-	addr_country	coutrycode
+	addr_district	entityname
+	addr_country	entityname
 }
 
 Form EmployeeInserted
@@ -38,7 +39,8 @@ Form Customer
 	addr_line1	addressline
 	addr_line2	?addressline
 	addr_postalcode	postalcode
-	addr_country	coutrycode
+	addr_district	entityname
+	addr_country	entityname
 }
 
 Form CustomerInserted

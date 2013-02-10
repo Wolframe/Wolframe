@@ -1,6 +1,5 @@
 int=string:trim,number:integer;
 ID=string:trim,number:integer;
-coutrycode=string:trim,number:integer;
 timediff=string:trim,number:unsigned;
 percentage=string:trim,number:unsigned;
 currency=string:trim,number:integer;

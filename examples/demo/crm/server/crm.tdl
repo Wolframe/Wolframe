@@ -1,0 +1,94 @@
+; --- EMPLOYEE
+
+TRANSACTION InsertEmployee
+BEGIN
+	DO INSERT INTO Employee (name, status, addr_line1, addr_line2, addr_postalcode, addr_district, addr_country)
+		VALUES ($(name), $(status), $(addr_line1), $(addr_line2), $(addr_postalcode), $(addr_district), $(addr_country));
+	DO SELECT getLastIdEmployee();
+	DO UNIQUE NONEMPTY SELECT * FROM Employee WHERE id = $1;
+END
+
+TRANSACTION InsertEmployee
+BEGIN
+	DO UPDATE Employee SET
+			name=$(name), status=$(status), addr_line1=$(addr_line1), addr_line2=$(addr_line2),
+			addr_postalcode=$(addr_postalcode), addr_district=$(addr_district), addr_country=$(addr_country)
+		WHERE id=$(id);
+END
+
+TRANSACTION DeleteEmployee
+BEGIN
+	DO DELETE FROM Employee WHERE id=$(id);
+END
+
+TRANSACTION GetEmployee
+BEGIN
+	DO UNIQUE NONEMPTY SELECT * FROM Employee WHERE id=$(id);
+END
+
+; -- Not very efficient search until now :-)
+TRANSACTION SearchEmployee
+BEGIN
+	DO CREATE TEMPORARY TABLE tmpSearchEmployeeResult( id int );
+	FOREACH pattern DO INSERT INTO tmpSearchEmployeeResult SELECT id FROM Customer
+		WHERE name LIKE '%$(.)%'
+		OR status LIKE '%$(.)%'
+		OR addr_line1 LIKE '%$(.)%'
+		OR addr_line2 LIKE '%$(.)%'
+		OR addr_postalcode LIKE '%$(.)%'
+		OR addr_district LIKE '%$(.)%'
+		OR addr_country LIKE '%$(.)%';
+	INTO employee DO NONEMPTY UNIQUE SELECT * FROM Customer WHERE id IN (SELECT DISTINCT id FROM tmpSearchEmployeeResult);
+	DO DROP TABLE tmpEmployeeCustomerResult;
+END
+
+
+
+
+; --- CUSTOMER
+TRANSACTION InsertCustomer
+BEGIN
+	DO INSERT INTO Customer (name, description, addr_line1, addr_line2, addr_postalcode, addr_district, addr_country)
+		VALUES ($(name), $(description), $(addr_line1), $(addr_line2), $(addr_postalcode), $(addr_district), $(addr_country));
+	DO SELECT getLastIdCustomer();
+	DO UNIQUE NONEMPTY SELECT * FROM Customer WHERE id = $1;
+END
+
+TRANSACTION InsertCustomer
+BEGIN
+	DO UPDATE Customer SET
+			name=$(name), description=$(description), addr_line1=$(addr_line1), addr_line2=$(addr_line2),
+			addr_postalcode=$(addr_postalcode), addr_district=$(addr_district), addr_country=$(addr_country)
+		WHERE id=$(id);
+END
+
+TRANSACTION DeleteCustomer
+BEGIN
+	DO DELETE FROM Customer WHERE id=$(id);
+END
+
+TRANSACTION GetCustomer
+BEGIN
+	DO UNIQUE NONEMPTY SELECT * FROM Customer WHERE id=$(id);
+END
+
+; -- Not very efficient search until now :-)
+TRANSACTION SearchCustomer
+BEGIN
+	DO CREATE TEMPORARY TABLE tmpSearchCustomerResult( id int );
+	FOREACH pattern DO INSERT INTO tmpSearchCustomerResult SELECT id FROM Customer
+		WHERE name LIKE '%$(.)%'
+		OR description LIKE '%$(.)%'
+		OR addr_line1 LIKE '%$(.)%'
+		OR addr_line2 LIKE '%$(.)%'
+		OR addr_postalcode LIKE '%$(.)%'
+		OR addr_district LIKE '%$(.)%'
+		OR addr_country LIKE '%$(.)%';
+	INTO customer DO NONEMPTY UNIQUE SELECT * FROM Customer WHERE id IN (SELECT DISTINCT id FROM tmpSearchCustomerResult);
+	DO DROP TABLE tmpSearchCustomerResult;
+END
+
+
+
+
+

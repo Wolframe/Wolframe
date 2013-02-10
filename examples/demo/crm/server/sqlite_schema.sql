@@ -7,7 +7,8 @@ CREATE TABLE Employee
 	addr_line1	TEXT,
 	addr_line2	TEXT,
 	addr_postalcode	TEXT,
-	addr_country	INT
+	addr_district	TEXT,
+	addr_country	TEXT
 );
 
 -- Customer:
@@ -19,7 +20,8 @@ CREATE TABLE Customer
 	addr_line1	TEXT,
 	addr_line2	TEXT,
 	addr_postalcode	TEXT,
-	addr_country	INT
+	addr_district	TEXT,
+	addr_country	TEXT
 );
 
 -- CustomerNote:
