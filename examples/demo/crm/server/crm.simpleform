@@ -1,0 +1,351 @@
+; ------------ Employee
+; * Sub structures:
+Form Employee
+{
+	name		entityname
+	status		entityname
+	addr_line1	addressline
+	addr_line2	?addressline
+	addr_postalcode	postalcode
+	addr_country	coutrycode
+}
+
+Form EmployeeInserted
+{
+	id		!@ID
+	_ Employee
+}
+
+
+; * Forms:
+Form InsertEmployee	{ employee { _ Employee } }
+Form UpdateEmployee	{ employee { _ EmployeeInserted } }
+Form DeleteEmployee	{ employee { id !@ID } }
+Form GetEmployee	{ employee { id !@ID } }
+Form EmployeeResult	{ employee { _ EmployeeInserted } }
+Form EmployeeListResult	{ employees { employee []EmployeeInserted } }
+Form SearchEmployee	{ employee { pattern string } }
+
+
+
+
+; ------------ Customer
+; * Sub structures:
+Form Customer
+{
+	name		entityname
+	description	string
+	addr_line1	addressline
+	addr_line2	?addressline
+	addr_postalcode	postalcode
+	addr_country	coutrycode
+}
+
+Form CustomerInserted
+{
+	id		!@ID
+	_ Customer
+}
+
+; * Forms:
+Form InsertCustomer	{ customer { _ Customer } }
+Form UpdateCustomer	{ customer { _ CustomerInserted } }
+Form DeleteCustomer	{ customer { id !@ID } }
+Form GetCustomer	{ customer { id !@ID } }
+Form CustomerResult	{ customer { _ CustomerInserted } }
+Form CustomerListResult	{ customers { customer []CustomerInserted } }
+Form SearchCustomer	{ customer { pattern string } }
+
+
+
+; ------------ CustomerNote
+; * Sub structures:
+Form CustomerNote
+{
+	customerid	!@ID
+	content		string
+	link		?@URI
+}
+
+Form CustomerNoteInserted
+{
+	id		!@ID
+	_ CustomerNote
+}
+
+; * Forms:
+Form InsertCustomerNote	{ note { _ CustomerNote } }
+Form UpdateCustomerNote	{ note { _ CustomerNoteInserted } }
+Form DeleteCustomerNote	{ note { id !@ID } }
+Form GetCustomerNote	{ note { id !@ID } }
+Form SearchCustomerNote
+{
+	note
+	{
+		customerid ?@ID
+		pattern string
+	}
+}
+
+Form CustomerNoteResult
+{
+	note
+	{
+		_ CustomerNoteInserted
+		timestamp	datetime
+	}
+}
+Form CustomerNoteListResult
+{
+	notes
+	{
+		note []
+		{
+			_ CustomerNoteInserted
+			timestamp	datetime
+		}
+	}
+}
+
+
+
+
+; ------------ Project
+; * Sub structures:
+Form Project
+{
+	customerid	!@ID
+	name		entityname
+	description	?@string
+}
+
+Form ProjectInserted
+{
+	id		!@ID
+	_ Project
+}
+
+; * Forms:
+Form InsertProject	{ project { _ Project } }
+Form UpdateProject	{ project { _ ProjectInserted } }
+Form DeleteProject	{ project { id !@ID } }
+Form GetProject		{ project { id !@ID } }
+Form ProjectResult	{ project { _ ProjectInserted } }
+Form ProjectListResult	{ projects { project []ProjectInserted } }
+
+Form SearchProject
+{
+	project
+	{
+		customerid ?@ID
+		pattern string
+	}
+}
+
+
+
+; ------------ ProjectNote
+; * Sub structures:
+Form ProjectNote
+{
+	projectid	!@ID
+	content		string
+	link		?@URI
+}
+
+Form ProjectNoteInserted
+{
+	id		!@ID
+	_ ProjectNote
+}
+
+; * Forms:
+Form InsertProjectNote	{ note { _ ProjectNote } }
+Form UpdateProjectNote	{ note { _ ProjectNoteInserted } }
+Form DeleteProjectNote	{ note { id !@ID } }
+Form GetProjectNote	{ note { id !@ID } }
+Form SearchProjectNote
+{
+	note
+	{
+		projectid ?@ID
+		pattern string
+	}
+}
+Form ProjectNoteResult
+{
+	note
+	{
+		_ ProjectNoteInserted
+		timestamp	datetime
+	}
+}
+Form ProjectNoteListResult
+{
+	notes
+	{
+		note []
+		{
+			_ ProjectNoteInserted
+			timestamp	datetime
+		}
+	}
+}
+
+
+
+
+; ------------ ActivityCategory
+; * Sub structures:
+Form ActivityCategory
+{
+	projectid	!@ID
+	name		entityname
+	description	?@string
+}
+
+Form ActivityCategoryInserted
+{
+	id		!@ID
+	_ ActivityCategory
+}
+
+; * Forms:
+Form InsertActivityCategory	{ category { _ ActivityCategory } }
+Form UpdateActivityCategory	{ category { _ ActivityCategoryInserted } }
+Form DeleteActivityCategory	{ category { id !@ID } }
+Form GetActivityCategory	{ category { id !@ID } }
+Form ActivityCategoryResult	{ category { _ ActivityCategoryInserted } }
+Form ActivityCategoryListResult	{ categories { category []ActivityCategoryInserted } }
+
+Form SearchActivityCategory
+{
+	category
+	{
+		projectid ?@ID
+		pattern string
+	}
+}
+
+
+
+
+; ------------ ActivityCharging
+; * Sub structures:
+Form ActivityCharging
+{
+	categoryid	!@ID
+	validfrom	datetime
+	fixum		?currency
+	timedep		?currency
+	timeunit	?timediff
+	taxes		percentage
+}
+
+Form ActivityChargingInserted
+{
+	id		!@ID
+	_ ActivityCharging
+}
+
+; * Forms:
+Form InsertActivityCharging	{ charging { _ ActivityCharging } }
+Form UpdateActivityCharging	{ charging { _ ActivityChargingInserted } }
+Form DeleteActivityCharging	{ charging { id !@ID } }
+Form GetActivityCharging	{ charging { id !@ID } }
+Form ActivityChargingResult	{ charging { _ ActivityChargingInserted } }
+
+
+
+
+; ------------ Activity
+; * Sub structures:
+Form Activity
+{
+	categoryid	!@ID
+	projectid	!@ID
+	employeeid	!@ID
+	chargingid	!@ID
+	description	string
+	start		datetime
+	duration	timediff
+}
+
+Form ActivityInserted
+{
+	id		!@ID
+	_ Activity
+}
+
+; * Forms:
+Form InsertActivity	{ activity { _ Activity } }
+Form UpdateActivity	{ activity { _ ActivityInserted } }
+Form DeleteActivity	{ activity { id !@ID } }
+Form GetActivity	{ activity { id !@ID } }
+Form ActivityResult	{ activity { _ ActivityInserted } }
+Form ActivityListResult	{ activities { activity []ActivityCategoryInserted } }
+
+Form SearchActivityCategory
+{
+	activity
+	{
+		categoryid ?@ID
+		projectid ?@ID
+		employeeid ?@ID
+		pattern string
+	}
+}
+
+
+
+
+; ------------ ActivityNote
+; * Sub structures:
+Form ActivityNote
+{
+	activityid	!@ID
+	content		string
+	link		?@URI
+}
+
+Form ActivityNoteInserted
+{
+	id		!@ID
+	_ ActivityNote
+}
+
+; * Forms:
+Form InsertActivityNote	{ note { _ ActivityNote } }
+Form UpdateActivityNote	{ note { _ ActivityNoteInserted } }
+Form DeleteActivityNote	{ note { id !@ID } }
+Form GetActivityNote	{ note { id !@ID } }
+Form SearchActivityNote
+{
+	note
+	{
+		activityid ?@ID
+		pattern string
+	}
+}
+Form ActivityNoteResult
+{
+	note
+	{
+		_ ActivityNoteInserted
+		timestamp	datetime
+	}
+}
+Form ActivityNoteListResult
+{
+	notes
+	{
+		note []
+		{
+			_ ActivityNoteInserted
+			timestamp	datetime
+		}
+	}
+}
+
+
+

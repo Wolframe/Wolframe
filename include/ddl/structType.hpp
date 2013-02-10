@@ -145,6 +145,16 @@ public:
 	///\param[in] name name of the element to find
 	Map::iterator find( const std::string& name);
 
+	///\brief Select a substructure
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\param[in] path path to the structure to select
+	const StructType* select( const char* name) const;
+
+	///\brief Select a substructure
+	///\remark [precondition] this must be of type (ContentType) Struct
+	///\param[in] path path to the structure to select
+	StructType* select( const char* name);
+
 	///\brief Get the begin marker iterator on the elements of this
 	///\remark [precondition] this must not be of type (ContentType) Atomic
 	///\return the begin iterator

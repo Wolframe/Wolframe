@@ -1,8 +1,10 @@
 #!/bin/sh
 testname=`basename $0 ".tst"`				# name of the test
 opt=""
-formname="$testname.simpleform"
-opt="$opt --program $formname"
+formname_out="$testname.simpleform"			# output form
+opt="$opt --program $formname_out"
+formname_in="employee_assignment_print.simpleform"	# input form
+opt="$opt --program $formname_in"
 modpath="../../src/modules/ddlcompiler/"		# module directory for DDL compilers relative from tests/temp
 mod="$modpath/simpleform/mod_ddlcompiler_simpleform"	# module to load
 opt="$opt --module $mod"
@@ -21,12 +23,12 @@ opt="$opt --database 'identifier=testdb,outfile=DBOUT,file=DBRES'"
 opt="$opt --program=DBIN.tdl"
 opt="$opt --program=test.directmap"
 testcmd="$opt run"					# command to execute by the test
-testscripts="$formname"					# list of scripts of the test
+testscripts="$formname_in $formname_out"		# list of scripts of the test
 docin=employee_assignment_print				# input document name
 docout=map_cmdhnd_transaction_outputform		# output document name
 testdata="
 **file: test.directmap
-run = test_transaction( xml) :$testname;
+run = test_transaction( xml :employee_assignment_print) :$testname;
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
 **file: DBRES
@@ -35,7 +37,6 @@ run = test_transaction( xml) :$testname;
 #id task start end#31 'hula hop' '19:14:38 1/4/2012' '20:01:12 1/4/2012'#32 'hula hip' '11:31:01 1/3/2012' '12:07:55 1/3/2012'#33 'hula hup' '11:31:01 1/3/2012' '12:07:55 1/3/2012'
 **file:DBIN.tdl
 TRANSACTION test_transaction
-RESULT INTO doc
 BEGIN
 	INTO task FOREACH //task DO run( title);
 END"

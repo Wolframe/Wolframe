@@ -1,1 +1,1 @@
-run = test_transaction( xml );
+run = test_transaction( xml :schema_select_task_by_id );

@@ -81,6 +81,22 @@ StructType::Map::iterator StructType::find( const std::string& name)
 	return find( name.c_str());
 }
 
+const StructType* StructType::select( const char* name) const
+{
+	StructType::Map::const_iterator si = this->find( name);
+	if (si == this->end()) throw std::runtime_error( std::string( "addressed form structure element in path not found: '") + (name?name:"") + "'");
+	return &si->second;
+}
+
+StructType* StructType::select( const char* name)
+{
+	StructType::Map::iterator si = this->find( name);
+	if (si == this->end()) throw std::runtime_error( std::string( "addressed form structure element in path not found: '") + (name?name:"") + "'");
+	initialized(true);
+	si->second.initialized(true);
+	return &si->second;
+}
+
 StructType::Map::const_iterator StructType::begin() const
 {
 	if (m_contentType == Atomic) throw std::logic_error( "defined as atomic");

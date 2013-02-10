@@ -60,8 +60,7 @@ void DirectmapCommandHandler::initcall()
 		{
 			throw std::runtime_error( std::string( "input form is not defined '") + m_cmd->inputform + "'");
 		}
-		m_inputform = *df;
-		m_inputform_defined = true;
+		m_inputform.reset( new ddl::Form( *df));
 	}
 	if (!m_cmd->outputform.empty())
 	{
@@ -70,8 +69,7 @@ void DirectmapCommandHandler::initcall()
 		{
 			throw std::runtime_error( std::string( "output form is not defined '") + m_cmd->outputform + "'");
 		}
-		m_outputform = *df;
-		m_outputform_defined = true;
+		m_outputform.reset( new ddl::Form( *df));
 	}
 	std::string filtername;
 	if (m_cmd->filter.empty())
@@ -117,11 +115,14 @@ void DirectmapCommandHandler::initcall()
 	{
 		m_outputfilter = filter->outputfilter();
 	}
-	const char* xmlroot = m_outputform.xmlRoot();
-	if (xmlroot)
+	if (m_outputform.get())
 	{
-		std::string xmlDoctype = m_provider->xmlDoctypeString( m_outputform.name(), m_outputform.ddlname(), xmlroot);
-		m_outputfilter->setDocType( xmlDoctype);
+		const char* xmlroot = m_outputform->xmlRoot();
+		if (xmlroot)
+		{
+			std::string xmlDoctype = m_provider->xmlDoctypeString( m_outputform->name(), m_outputform->ddlname(), xmlroot);
+			m_outputfilter->setDocType( xmlDoctype);
+		}
 	}
 	m_input.reset( new langbind::TypingInputFilter( m_inputfilter));
 	m_output.reset( new langbind::TypingOutputFilter( m_outputfilter));
@@ -138,9 +139,9 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				initcall();
 				/* no break here ! */
 			case 1:
-				if (m_inputform_defined)
+				if (m_inputform.get())
 				{
-					m_inputform_parser.reset( new serialize::DDLStructParser( &m_inputform));
+					m_inputform_parser.reset( new serialize::DDLStructParser( m_inputform.get()));
 					serialize::Context::Flags flags = (serialize::Context::Flags)((int)serialize::Context::ValidateAttributes|(int)serialize::Context::ValidateInitialization);
 					m_inputform_parser->init( m_input, flags);
 					m_state = 2;
@@ -156,35 +157,65 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 						const ddl::Form* df = m_provider->form( doctypeid);
 						if (df)
 						{
-							m_inputform = *df;
-							m_inputform_parser.reset( new serialize::DDLStructParser( &m_inputform));
+							m_inputform.reset( new ddl::Form( *df));
+							m_inputform_parser.reset( new serialize::DDLStructParser( m_inputform.get()));
 							m_inputform_parser->init( m_input, serialize::Context::ValidateAttributes);
 							m_state = 2;
 						}
 						else
 						{
-							LOG_WARNING << "input form '" << doctypeid << "' is not defined (document type '" << doctypeid << "'). Treating document as standalone";
-							m_state = 3;
+							LOG_WARNING << "input form '" << doctypeid << "' is not defined (document type '" << doctypeid << "'). treating document as standalone (document processed with root element ignored)";
+							m_state = 11;
 						}
 						continue;
 					}
 					else
 					{
-						// check if the input is standalone and continue without mapping input to a form (state 3):
 						switch (m_inputfilter->state())
 						{
-							case InputFilter::Open: m_state = 3; continue;
+							case InputFilter::Open:
+							{
+								m_state = 11;
+								LOG_WARNING << "input form: standalone document type and no input form defined. document processed with root element ignored";
+								break;
+							}
 							case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
 							case InputFilter::Error: throw std::runtime_error( std::string( "error in input: ") + m_inputfilter->getError());
 						}
-						return IOFilterCommandHandler::Error;
 					}
 				}
+			case 11:
+			{
+				// ... treat document as standalone: swallow root element
+				langbind::InputFilter::ElementType typ;
+				langbind::TypedFilterBase::Element element;
+				if (!m_input->getNext( typ, element))
+				{
+					switch (m_inputfilter->state())
+					{
+						case InputFilter::Open: throw std::runtime_error( "unexpected end of standalone document. no root element defined");
+						case InputFilter::EndOfMessage: return IOFilterCommandHandler::Yield;
+						case InputFilter::Error: throw std::runtime_error( std::string( "error in input: ") + m_inputfilter->getError());
+					}
+				}
+				m_state = 3;
+				break;
+			}
 			case 2:
+			{
 				if (!m_inputform_parser->call()) return IOFilterCommandHandler::Yield;
-				m_input.reset( new serialize::DDLStructSerializer( &m_inputform));
+				const char* xmlroot = m_inputform->xmlRoot();
+				if (xmlroot)
+				{
+					m_input.reset( new serialize::DDLStructSerializer( m_inputform.get()));
+				}
+				else
+				{
+					m_input.reset( new serialize::DDLStructSerializer( m_inputform->select( xmlroot)));
+				}
 				m_state = 3;
 				/* no break here ! */
+			}
 			case 3:
 				m_functionclosure.reset( m_function->createClosure());
 				m_functionclosure->init( m_provider, m_input);
@@ -192,15 +223,18 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				/* no break here ! */
 			case 4:
 				if (!m_functionclosure->call()) return IOFilterCommandHandler::Yield;
-				if (m_outputform_defined)
+				if (m_outputform.get())
 				{
-					serialize::DDLStructParser formparser( &m_outputform);
+					const char* xmlroot = m_outputform->xmlRoot();
+					ddl::StructType* substructure = (xmlroot)?m_outputform->select(xmlroot):m_outputform.get();
+
+					serialize::DDLStructParser formparser( substructure);
 					formparser.init( m_functionclosure->result(), serialize::Context::None);
 					if (!formparser.call())
 					{
 						throw std::logic_error( "output form serialization not complete");
 					}
-					m_outputform_serialize.reset( new serialize::DDLStructSerializer( &m_outputform));
+					m_outputform_serialize.reset( new serialize::DDLStructSerializer( m_outputform.get()));
 					m_outputprinter.init( m_outputform_serialize, m_output);
 				}
 				else

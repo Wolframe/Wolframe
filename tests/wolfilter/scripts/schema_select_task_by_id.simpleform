@@ -1,0 +1,25 @@
+FORM Employee
+{
+	firstname string
+	surname string
+	phone string
+}
+
+FORM schema_select_task_by_id
+{
+	assignmentlist
+	{
+		assignment []
+		{
+			task []
+			{
+				id int
+				title string
+				customernumber int
+			}
+			employee Employee
+			issuedate string
+		}
+	}
+}
+

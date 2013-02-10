@@ -1,0 +1,13 @@
+int=string:trim,number:integer;
+ID=string:trim,number:integer;
+coutrycode=string:trim,number:integer;
+timediff=string:trim,number:unsigned;
+percentage=string:trim,number:unsigned;
+currency=string:trim,number:integer;
+uint=string:trim,number:unsigned;
+float=string:trim,number:float;
+entityname=string:trim,string:ucname;
+postalcode=string:trim,string:ucname;
+addressline=string:trim,string:ucname;
+datetime=string:trim,string:lcname;
+URI=string:trim;

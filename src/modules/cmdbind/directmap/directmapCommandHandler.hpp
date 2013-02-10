@@ -80,9 +80,7 @@ public:
 		:m_ctx(ctx_)
 		,m_cmd(0)
 		,m_state(0)
-		,m_function(0)
-		,m_inputform_defined(false)
-		,m_outputform_defined(false){}
+		,m_function(0){}
 
 	///\brief Destructor
 	virtual ~DirectmapCommandHandler(){}
@@ -106,10 +104,8 @@ private:
 	const langbind::DirectmapCommandDescription* m_cmd;			//< description of command to execute
 	int m_state;								//< internal state
 	const langbind::FormFunction* m_function;				//< function to execute
-	ddl::Form m_inputform;							//< (optional) form for validating and formating input
-	ddl::Form m_outputform;							//< (optional) form for validating and formating output
-	bool m_inputform_defined;						//< true if m_inputform defined
-	bool m_outputform_defined;						//< true if m_outputform defined
+	ddl::FormR m_inputform;							//< (optional) form for validating and formating input
+	ddl::FormR m_outputform;						//< (optional) form for validating and formating output
 	langbind::TypedInputFilterR m_input;					//< structure for input
 	langbind::TypedOutputFilterR m_output;					//< structure for output
 	langbind::FormFunctionClosureR m_functionclosure;			//< processor for the transaction

@@ -157,6 +157,11 @@ public:
 		,DDLStructParser(form_.get())
 		,m_form(form_){}
 
+	DDLFormParser( const ddl::FormR& form_, ddl::StructType* substructure)
+		:types::TypeSignature("langbind::DDLFormParser", __LINE__)
+		,DDLStructParser(substructure)
+		,m_form(form_){}
+
 	DDLFormParser( const DDLFormParser& o)
 		:types::TypeSignature(o)
 		,DDLStructParser(o)
@@ -189,6 +194,11 @@ public:
 	explicit DDLFormSerializer( const ddl::FormR& form_)
 		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__)
 		,DDLStructSerializer(form_.get())
+		,m_form(form_){}
+
+	explicit DDLFormSerializer( const ddl::FormR& form_, const ddl::StructType* substructure)
+		:types::TypeSignature("langbind::DDLFormSerializer", __LINE__)
+		,DDLStructSerializer(substructure)
 		,m_form(form_){}
 
 	DDLFormSerializer( const DDLFormSerializer& o)
