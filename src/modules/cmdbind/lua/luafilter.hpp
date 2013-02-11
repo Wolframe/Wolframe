@@ -93,6 +93,7 @@ private:
 			Init,			//< init state. The element is without key the top level element on the lua stack
 			TableIterOpen,		//< the lua table iterator is on an key value pair and did not return yet the opening tag
 			TableIterValue,		//< the opening tag has been fetched and the value is to fetch next or a new iterator has to be opened and pushed on the stack
+			TableIterValueNoTag,	//< same as TableIterValue but for content value without tag ('_')
 			TableIterClose,		//< the value has been processed and the close tag is to fetch next
 			TableIterNext,		//< the close tag has been fetched and a skip to the next element has to be done
 			VectorIterValue,	//< same as TableIterValue for a vector

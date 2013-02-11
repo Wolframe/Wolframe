@@ -124,6 +124,11 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 					stk.back().state( ++idx);
 					stk.push_back( FiltermapDDLSerializeState( &itr->second, elem));
 				}
+				else if (itr->first.empty())
+				{
+					stk.back().state( ++idx);
+					stk.push_back( FiltermapDDLSerializeState( &itr->second, langbind::TypedFilterBase::Element()));
+				}
 				else
 				{
 					langbind::TypedFilterBase::Element elem( itr->first.c_str(), itr->first.size());

@@ -222,6 +222,11 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 
 			case FetchState::TableIterOpen:
 				if (!getValue( -2, element)) return false;
+				if (element.type == TypedInputFilter::Element::string_ && element.value.string_.size == 0)
+				{
+					m_stk.back().id = FetchState::TableIterValueNoTag;
+					continue;
+				}
 				m_stk.back().id = FetchState::TableIterValue;
 				type = OpenTag;
 				return true;
@@ -241,8 +246,23 @@ bool LuaTableInputFilter::getNext( ElementType& type, Element& element)
 					return getValue( -1, element);
 				}
 
+			case FetchState::TableIterValueNoTag:
+				if (lua_istable( m_ls, -1))
+				{
+					m_stk.back().id = FetchState::TableIterNext;
+					const char* tag = lua_isstring(m_ls,-2)?lua_tostring( m_ls,-2):0;
+					if (!firstTableElem(tag) && state() == InputFilter::Error) return false;
+					continue;
+				}
+				else
+				{
+					m_stk.back().id = FetchState::TableIterNext;
+					type = FilterBase::Value;
+					return getValue( -1, element);
+				}
+
 			case FetchState::TableIterClose:
-				if (!getValue( -2, element)) return false;
+				element = TypedInputFilter::Element();
 				m_stk.back().id = FetchState::TableIterNext;
 				type = CloseTag;
 				return true;
@@ -376,10 +396,7 @@ bool LuaTableOutputFilter::closeAttribute( const Element& element)
 	{
 		// ... non empty table, we create an element with an empty key
 		lua_pop( m_ls, 2);
-		lua_pushstring( m_ls, "");
-		if (!pushValue( element)) return false;
-		lua_settable( m_ls, -3);
-		return true;
+		return openTag( Element()) && closeAttribute( element) && closeTag();
 	}
 	else
 	{
@@ -447,7 +464,7 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 					m_type = type;
 					return closeAttribute( element);
 				case Value:
-					setState( OutputFilter::Error, "output filter cannot handle subsequent values");
+					setState( OutputFilter::Error, "output filter cannot handle subsequent non indexed values");
 					return false;
 				case CloseTag:
 					setState( OutputFilter::Error, "output filter cannot handle values outside tag context");

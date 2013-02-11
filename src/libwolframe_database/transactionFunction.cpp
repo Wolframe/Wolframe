@@ -1302,8 +1302,12 @@ struct TransactionFunctionOutput::Impl
 						element = m_resitr->columnName( m_colidx);
 						if (element.type == TypedInputFilter::Element::string_ && element.value.string_.size == 1 && element.value.string_.ptr[0] == '_')
 						{
-							m_valuestate = 3;
-							//... untagged content value: fall through. no return or break here !
+							//... untagged content value (column name '_')
+							type = langbind::TypedInputFilter::Value;
+							element = (*m_rowitr)[ m_colidx];
+							m_valuestate = 0;
+							++m_colidx;
+							return true;
 						}
 						else
 						{
@@ -1322,15 +1326,6 @@ struct TransactionFunctionOutput::Impl
 					{
 						type = langbind::TypedInputFilter::CloseTag;
 						element = TypedFilterBase::Element();
-						m_valuestate = 0;
-						++m_colidx;
-						return true;
-					}
-					if (m_valuestate == 3)
-					{
-						//... untagged content value (column name '_')
-						type = langbind::TypedInputFilter::Value;
-						element = (*m_rowitr)[ m_colidx];
 						m_valuestate = 0;
 						++m_colidx;
 						return true;

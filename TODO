@@ -41,8 +41,6 @@ PF:
   - Project CRM
   - Lua functions for directmap (struct IN table OUT)
   - test forms with SELF recursion and inheritance
-  - '_' as content identifier in TRANSATION results
-  - '' as content identifier in Lua input/output
   - '_' as content identifier in .NET results
   - UIForm loader in client and server
 

@@ -208,16 +208,18 @@ END
 --  ACTIVITY
 TRANSACTION InsertActivity
 BEGIN
-	DO INSERT INTO Activity (categoryid, projectid, employeeid, description, start, duration)
-		VALUES ($(categoryid), $(projectid), $(employeeid), $(description), $(start), $(duration));
+	DO NONEMPTY SELECT id FROM ActivityCharging WHERE categoryid=$(categoryid) AND validfrom<=$(start) ORDER BY validfrom DESC LIMIT 1;
+	DO INSERT INTO Activity (chargingid, categoryid, projectid, employeeid, description, start, duration)
+		VALUES ($1, $(categoryid), $(projectid), $(employeeid), $(description), $(start), $(duration));
 	DO getLastIdActivity();
 	INTO . DO UNIQUE NONEMPTY SELECT * FROM Activity WHERE id = $1;
 END
 
 TRANSACTION UpdateActivity
 BEGIN
+	DO NONEMPTY SELECT id FROM ActivityCharging WHERE categoryid=$(categoryid) AND validfrom<=$(start) ORDER BY validfrom DESC LIMIT 1;
 	DO UPDATE Activity SET
-			categoryid=$(categoryid), projectid=$(projectid), employeeid=$(employeeid),
+			chargingid=$1, categoryid=$(categoryid), projectid=$(projectid), employeeid=$(employeeid),
 			description=$(description), start=$(start), duration=$(duration)
 		WHERE id=$(id);
 END
