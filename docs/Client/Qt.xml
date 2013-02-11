@@ -34,7 +34,7 @@
 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/designer-manual.html">http://qt-project.org/doc/qt-4.8/designer-manual.html</link>.
 		</para>
 	</sect3>
-	
+		
 	<sect3>
 		<title>UI form translations</title>
 		<para>
@@ -57,30 +57,20 @@
 			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://doc.qt.digia.com/qt/linguist-manual.html">http://doc.qt.digia.com/qt/linguist-manual.html</link>.
 		</para>
 	</sect3>
-	
+
 	<sect3>
-		<title>Themes</title>
+		<title>Resources</title>		
 		<para>
-			Themes consist of a top-level UI-file (a <classname>QMainWindow</classname>).
-			The central widget should be empty (that's where the forms are shown). The menu contains
-			some hooks, where the qtclient will add menus.
+			Binary resource files contain images for the user interface.
 		</para>
+		
 		<para>
-			Also a theme has translation files for the menu entries.
+			Binary resource files (extension <emphasis>.rss</emphasis>) are compiled from
+			a XML file (extension <emphasis>.qrc</emphasis>) with the <emphasis>rcc</emphasis>
+			message compiler.
 		</para>
 	</sect3>
-	
-	<sect3>
-		<title>Qt stylesheets</title>
-		<para>
-			A Qt stylesheet is similar to a CSS in HTML. It influences the
-			look-and-feel of the form widgets. 
-			The format is described in
-			<link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://qt-project.org/doc/qt-4.8/stylesheet-syntax.html">http://qt-project.org/doc/qt-4.8/stylesheet-syntax.html</link>.			
-			The files have usually the extension <emphasis>.qss</emphasis>.
-		</para>
-	</sect3>
-	
+			
 	</sect2>
 	
 	<sect2>

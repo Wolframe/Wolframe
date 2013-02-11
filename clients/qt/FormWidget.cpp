@@ -46,7 +46,7 @@ FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoa
 	  m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
 	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_dataHandler( 0 ),
 	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
-	  m_globals( 0 ), m_debug( _debug )
+	  m_globals( 0 ), m_debug( _debug ), m_modal( false )
 {
 	initialize( );	
 }
@@ -147,7 +147,11 @@ void FormWidget::switchForm( QObject *object )
 // switch form now, formLoaded will inform parent and others
 	if( props->contains( "form" ) ) {
 		QString nextForm = props->value( "form" );
-		loadForm( nextForm );
+		if( m_modal && nextForm == "[close]" ) {
+			emit closed( );
+		} else {
+			loadForm( nextForm );
+		}
 	}
 }
 
@@ -163,32 +167,15 @@ FormWidget::~FormWidget( )
 	if( m_globals ) delete m_globals;
 }
 
-void FormWidget::setFormLoader( FormLoader *_formLoader )
+QHash<QString, QString> *FormWidget::globals( ) const
 {
-	m_formLoader = _formLoader;
-	
-	loadDelayedForm( m_form );
+	return m_globals;
 }
 
-void FormWidget::setDataLoader( DataLoader *_dataLoader )
+void FormWidget::setGlobals( QHash<QString, QString> *_globals )
 {
-	m_dataLoader = _dataLoader;
-
-	loadDelayedForm( m_form );
-}
-
-void FormWidget::setUiLoader( QUiLoader *_uiLoader )
-{
-	m_uiLoader = _uiLoader;
-
-	loadDelayedForm( m_form );
-}
-
-void FormWidget::loadDelayedForm( const QString &_form )
-{
-	if( !m_formLoader || !m_dataLoader || !m_uiLoader ) return;
-	
-	loadForm( _form );
+	delete m_globals;
+	m_globals = new QHash<QString, QString>( *_globals );
 }
 
 void FormWidget::setForm( const QString &_form )
@@ -206,7 +193,7 @@ QIcon FormWidget::getWindowIcon( ) const
 	return m_ui->windowIcon( );
 }	
 
-void FormWidget::loadForm( QString name )
+void FormWidget::loadForm( QString name, bool modal )
 {
 	if( !m_formLoader ) return;
 
@@ -214,8 +201,9 @@ void FormWidget::loadForm( QString name )
 	
 	m_previousForm = m_form;
 	m_form = name;
+	m_modal = modal;
 
-	qDebug( ) << "Initiating form load for " << m_form;
+	qDebug( ) << "Initiating form load for " << m_form << m_modal;
 	
 	m_formLoader->initiateFormLoad( m_form );
 }	
@@ -293,7 +281,17 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		return;
 	}
 	buf.close( );
-	qDebug( ) << "Constructed UI form XML for form" << name;
+	qDebug( ) << "Constructed UI form XML for form" << name << m_modal;
+	
+// if we have a modal dialog, we must not replace our own form, but emit
+// a signal, so the main window can rearange and load the form modal in
+// a new window
+	if( !m_modal && m_ui->isModal( ) ) {
+		emit formModal( m_form );
+		m_ui = oldUi;
+		m_form = m_previousForm;
+		return;
+	}
 
 // add new form to layout (which covers the whole widget)
 	m_layout->addWidget( m_ui );

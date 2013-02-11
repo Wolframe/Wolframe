@@ -91,6 +91,7 @@ class MainWindow : public QMainWindow
 		QLabel *m_statusBarSSL;
 		DebugTerminal *m_debugTerminal;
 		QAction *m_debugTerminalAction;	
+		QDialog *m_modalDialog;
 		
 	public slots:
 		void readSettings( );
@@ -141,6 +142,8 @@ class MainWindow : public QMainWindow
 		void languageCodesLoaded( QStringList languages );
 		void formListLoaded( QStringList forms );
 		void formLoaded( QString name );
+		void formModal( QString name );
+		void endModal( void );
 		void formError( QString error );
 		
 // MDI slots
