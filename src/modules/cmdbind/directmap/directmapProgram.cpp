@@ -100,25 +100,33 @@ void DirectmapProgram::addProgram( const std::string& source)
 			}
 			switch ((ch=utils::parseNextToken( tok, si, se, optab)))
 			{
-				case '\0': throw ERROR( si, "unexpected end of program");
-				case '=': break;
+				case '\0':
+					throw ERROR( si, "unexpected end of program");
+				case '=':
+					cmd_descr.call = prgname;
+					break;
+				case '(':
+					break;
 				default:
 					if (optab[ ch]) throw ERROR( si, MSG << "'=' expected instead of '" << ch << "'");
 					throw ERROR( si, MSG << "'=' expected instead of '" << tok << "'");
 			}
-			switch ((ch=utils::parseNextToken( cmd_descr.call, si, se, optab)))
+			if (!cmd_descr.call.empty())
 			{
-				case '\0': throw ERROR( si, "unexpected end of program");
-				default:
-					if (optab[ ch]) throw ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
-			}
-			switch ((ch=utils::parseNextToken( tok, si, se, optab)))
-			{
-				case '\0': throw ERROR( si, "unexpected end of program");
-				case '(': break;
-				default:
-					if (optab[ ch]) throw ERROR( si, MSG << "'(' expected instead of '" << ch << "'");
-					throw ERROR( si, MSG << "'(' expected instead of '" << tok << "'");
+				switch ((ch=utils::parseNextToken( cmd_descr.call, si, se, optab)))
+				{
+					case '\0': throw ERROR( si, "unexpected end of program");
+					default:
+						if (optab[ ch]) throw ERROR( si, MSG << "function name identifier expected instead of '" << ch << "'");
+				}
+				switch ((ch=utils::parseNextToken( tok, si, se, optab)))
+				{
+					case '\0': throw ERROR( si, "unexpected end of program");
+					case '(': break;
+					default:
+						if (optab[ ch]) throw ERROR( si, MSG << "'(' expected instead of '" << ch << "'");
+						throw ERROR( si, MSG << "'(' expected instead of '" << tok << "'");
+				}
 			}
 			switch ((ch=utils::parseNextToken( cmd_descr.filter, si, se, optab)))
 			{
