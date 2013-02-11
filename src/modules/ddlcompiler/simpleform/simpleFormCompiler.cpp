@@ -489,25 +489,37 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 			if (boost::algorithm::iequals( itr->first, "FORM"))
 			{
 				if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after FORM");
-
-				Form form( "simpleform");
-				form.defineName( itr->second.data());
-				compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
-				IndirectionConstructorR selfref( new StructIndirectionConstructor(form));
-				StructIndirectionConstructor::substituteSelf( &form, selfref);
-				formmap.insert( form.name(), form);
-				result.push_back( form);
+				try
+				{
+					Form form( "simpleform");
+					form.defineName( itr->second.data());
+					compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
+					IndirectionConstructorR selfref( new StructIndirectionConstructor(form));
+					StructIndirectionConstructor::substituteSelf( &form, selfref);
+					formmap.insert( form.name(), form);
+					result.push_back( form);
+				}
+				catch (const std::runtime_error& e)
+				{
+					throw std::runtime_error( std::string( e.what()) + " in form '" + itr->second.data() +"'");
+				}
 			}
 			else if (boost::algorithm::iequals( itr->first, "STRUCT"))
 			{
 				if (!isIdentifier( itr->second.data())) throw std::runtime_error( "identifier expected after FORM");
-
-				Form form( "simpleform");
-				form.defineName( itr->second.data());
-				compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
-				IndirectionConstructorR selfref( new StructIndirectionConstructor(form));
-				StructIndirectionConstructor::substituteSelf( &form, selfref);
-				formmap.insert( form.name(), form);
+				try
+				{
+					Form form( "simpleform");
+					form.defineName( itr->second.data());
+					compile_ptree( itr->second, form, typemap, formmap, itr->second.data());
+					IndirectionConstructorR selfref( new StructIndirectionConstructor(form));
+					StructIndirectionConstructor::substituteSelf( &form, selfref);
+					formmap.insert( form.name(), form);
+				}
+				catch (const std::runtime_error& e)
+				{
+					throw std::runtime_error( std::string( e.what()) + " in form '" + itr->second.data() +"'");
+				}
 			}
 			else
 			{

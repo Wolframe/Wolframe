@@ -36,6 +36,7 @@
 #include "prgbind/transactionProgram.hpp"
 #include "utils/miscUtils.hpp"
 #include "database/loadTransactionProgram.hpp"
+#include "config/programBase.hpp"
 #include "langbind/appObjects.hpp"
 
 using namespace _Wolframe;
@@ -97,6 +98,8 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 	static const db::LanguageDescription defaultLanguageDescr;
 	const db::LanguageDescription* languageDescr = (transactionDB)?transactionDB->getLanguageDescription():&defaultLanguageDescr;
 
+	LOG_DEBUG << "Loading transaction program '" << filename << "':";
+
 	std::vector<std::pair<std::string,db::TransactionFunctionR> > funclist
 		= db::loadTransactionProgramFile( filename, languageDescr, dbsource, embeddedStatementMap);
 
@@ -112,7 +115,12 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 		{
 			langbind::FormFunctionR func( new TransactionFunction( fi->second));
 			library.defineFormFunction( fi->first, func);
+			LOG_DEBUG << "Loaded transaction function '" << fi->first << "'";
 		}
+	}
+	catch (const config::PositionalErrorException& e)
+	{
+		throw config::PositionalFileErrorException( filename, e);
 	}
 	catch (const std::runtime_error& e)
 	{

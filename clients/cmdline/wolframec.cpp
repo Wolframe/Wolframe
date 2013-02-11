@@ -134,7 +134,6 @@ public:
 		typedef textwolf::XMLScanner<char*,textwolf::charset::UTF8,textwolf::charset::UTF8,std::string> MyXMLScanner;
 		char* xmlitr = const_cast<char*>( str.c_str());
 
-		std::cout << "XML:" << str << std::endl;
 		MyXMLScanner xs( xmlitr);
 		MyXMLScanner::iterator itr,end;
 		int taglevel = 0;
@@ -172,7 +171,7 @@ public:
 
 	virtual void error( const char* msg)
 	{
-		std::cerr << "REQUEST ERROR '" << msg << "'" << std::endl;
+		std::cerr << "ERROR " << msg << std::endl;
 	}
 
 private:

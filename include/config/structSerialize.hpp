@@ -35,7 +35,9 @@ Project Wolframe.
 #define _Wolframe_CONFIG_STRUCT_SERIALIZE_HPP_INCLUDED
 #include "filter/ptreefilter.hpp"
 #include "filter/tostringfilter.hpp"
+#include "filter/typedfilter.hpp"
 #include "serialize/struct/filtermapBase.hpp"
+#include "ddl/structType.hpp"
 
 namespace _Wolframe {
 namespace config {

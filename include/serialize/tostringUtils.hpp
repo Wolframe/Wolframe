@@ -29,49 +29,21 @@ If you have questions regarding the use of this file, please contact
 Project Wolframe.
 
 ************************************************************************/
-///\file serialize/ddl/filtermapDDLSerialize.hpp
-///\brief Defines the DDL structure serialization for filters
-
-#ifndef _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_HPP_INCLUDED
-#define _Wolframe_SERIALIZE_DDL_FILTERMAP_SERIALIZE_HPP_INCLUDED
+///\file serialize/tostringUtils.hpp
+///\brief Defines a configuration structure parser
+#ifndef _Wolframe_SERIALIZE_TOSTRING_UTILS_HPP_INCLUDED
+#define _Wolframe_SERIALIZE_TOSTRING_UTILS_HPP_INCLUDED
 #include "filter/typedfilter.hpp"
-#include "serialize/mapContext.hpp"
-#include "serialize/ddl/filtermapDDLSerializeStack.hpp"
 #include "ddl/structType.hpp"
-#include <cstddef>
+#include <string>
 
 namespace _Wolframe {
 namespace serialize {
 
-class DDLStructSerializer :public langbind::TypedInputFilter
-{
-public:
-	DDLStructSerializer()
-		:types::TypeSignature("serialize::DDLStructSerializer", __LINE__){}
-	explicit DDLStructSerializer( const ddl::StructType* st);
-
-	DDLStructSerializer( const DDLStructSerializer& o);
-	virtual ~DDLStructSerializer(){}
-
-	DDLStructSerializer& operator =( const DDLStructSerializer& o);
-
-	void init( const langbind::TypedOutputFilterR& out, Context::Flags flags=Context::None);
-
-	bool call();
-
-	///\brief Get a self copy
-	///\return allocated pointer to copy of this
-	virtual TypedInputFilter* copy() const		{return new DDLStructSerializer(*this);}
-
-	bool getNext( langbind::FilterBase::ElementType& type, langbind::TypedFilterBase::Element& value);
-
-private:
-	const ddl::StructType* m_st;
-	Context m_ctx;
-	langbind::TypedOutputFilterR m_out;
-	FiltermapDDLSerializeStateStack m_stk;
-};
+std::string ddlStructureToString( const ddl::StructType& st);
+std::string typedInputFilterToString( const langbind::TypedInputFilterR& inp);
 
 }}//namespace
 #endif
+
 

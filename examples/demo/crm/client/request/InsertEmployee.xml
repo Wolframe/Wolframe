@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE "employee" SYSTEM "InsertEmployee.simpleform">
+<employee>
+<name>Hubertus Compa</name>
+<status>Senior Software Engineer</status>
+<addr_line1>Trampelweg 13</addr_line1>
+<addr_postalcode>2012</addr_postalcode>
+<addr_district>Lausanne</addr_district>
+<addr_country>Schweiz</addr_country>
+</employee>

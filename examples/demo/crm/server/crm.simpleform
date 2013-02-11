@@ -24,7 +24,7 @@ Form UpdateEmployee	{ employee { _ EmployeeInserted } }
 Form DeleteEmployee	{ employee { id !@ID } }
 Form GetEmployee	{ employee { id !@ID } }
 Form EmployeeResult	{ employee { _ EmployeeInserted } }
-Form EmployeeListResult	{ employees { employee []EmployeeInserted } }
+Form EmployeeListResult	{ employees { employee EmployeeInserted[] } }
 Form SearchEmployee	{ employee { pattern string } }
 
 
@@ -55,7 +55,7 @@ Form UpdateCustomer	{ customer { _ CustomerInserted } }
 Form DeleteCustomer	{ customer { id !@ID } }
 Form GetCustomer	{ customer { id !@ID } }
 Form CustomerResult	{ customer { _ CustomerInserted } }
-Form CustomerListResult	{ customers { customer []CustomerInserted } }
+Form CustomerListResult	{ customers { customer CustomerInserted[] } }
 Form SearchCustomer	{ customer { pattern string } }
 
 
@@ -133,7 +133,7 @@ Form UpdateProject	{ project { _ ProjectInserted } }
 Form DeleteProject	{ project { id !@ID } }
 Form GetProject		{ project { id !@ID } }
 Form ProjectResult	{ project { _ ProjectInserted } }
-Form ProjectListResult	{ projects { project []ProjectInserted } }
+Form ProjectListResult	{ projects { project ProjectInserted[] } }
 
 Form SearchProject
 {
@@ -217,7 +217,7 @@ Form UpdateActivityCategory	{ category { _ ActivityCategoryInserted } }
 Form DeleteActivityCategory	{ category { id !@ID } }
 Form GetActivityCategory	{ category { id !@ID } }
 Form ActivityCategoryResult	{ category { _ ActivityCategoryInserted } }
-Form ActivityCategoryListResult	{ categories { category []ActivityCategoryInserted } }
+Form ActivityCategoryListResult	{ categories { category ActivityCategoryInserted[] } }
 
 Form SearchActivityCategory
 {
@@ -291,7 +291,7 @@ Form UpdateActivity	{ activity { _ ActivityInserted } }
 Form DeleteActivity	{ activity { id !@ID } }
 Form GetActivity	{ activity { id !@ID } }
 Form ActivityResult	{ activity { _ ActivityInserted } }
-Form ActivityListResult	{ activities { activity []ActivityCategoryInserted } }
+Form ActivityListResult	{ activities { activity ActivityCategoryInserted[] } }
 
 Form SearchActivity
 {

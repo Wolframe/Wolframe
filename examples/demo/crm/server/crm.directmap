@@ -1,0 +1,62 @@
+#--- Employee
+InsertEmployee( xml) :EmployeeResult;
+UpdateEmployee( xml);
+DeleteEmployee( xml);
+GetEmployee( xml) :EmployeeResult;
+SearchEmployee( xml) :EmployeeListResult;
+
+#--- Customer
+InsertCustomer( xml) :CustomerResult;
+UpdateCustomer( xml);
+DeleteCustomer( xml);
+GetCustomer( xml) :CustomerResult;
+SearchCustomer( xml) :CustomerListResult;
+
+#--- CustomerNote
+InsertCustomerNote( xml) :CustomerNoteResult;
+UpdateCustomerNote( xml);
+DeleteCustomerNote( xml);
+GetCustomerNote( xml) :CustomerNoteResult;
+SearchCustomerNote( xml) :CustomerNoteListResult;
+
+#--- Project
+InsertProject( xml) :ProjectResult;
+UpdateProject( xml);
+DeleteProject( xml);
+GetProject( xml) :ProjectResult;
+SearchProject( xml) :ProjectListResult;
+
+#--- ProjectNote
+InsertProjectNote( xml) :ProjectNoteResult;
+UpdateProjectNote( xml);
+DeleteProjectNote( xml);
+GetProjectNote( xml) :ProjectNoteResult;
+SearchProjectNote( xml) :ProjectNoteListResult;
+
+#--- ActivityCategory
+InsertActivityCategory( xml) :ActivityCategoryResult;
+UpdateActivityCategory( xml);
+DeleteActivityCategory( xml);
+GetActivityCategory( xml) :ActivityCategoryResult;
+SearchActivityCategory( xml) :ActivityCategoryListResult;
+
+#--- ActivityCharging
+InsertActivityCharging( xml) :ActivityChargingResult;
+UpdateActivityCharging( xml);
+DeleteActivityCharging( xml);
+GetActivityCharging( xml) :ActivityChargingResult;
+EvalActivityCharging( xml) :ActivityChargingResult;
+
+#--- Activity
+InsertActivity( xml) :ActivityResult;
+UpdateActivity( xml);
+DeleteActivity( xml);
+GetActivity( xml) :ActivityResult;
+SearchActivity( xml) :ActivityListResult;
+
+#--- ActivityNote
+InsertActivityNote( xml) :ActivityNoteResult;
+UpdateActivityNote( xml);
+DeleteActivityNote( xml);
+GetActivityNote( xml) :ActivityNoteResult;
+SearchActivityNote( xml) :ActivityNoteListResult;

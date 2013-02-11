@@ -51,12 +51,19 @@ bool DDLProgram::is_mine( const std::string& filename) const
 
 void DDLProgram::loadProgram( ProgramLibrary& library, db::Database*, const std::string& filename)
 {
-	const ddl::TypeMap* typemap = library.formtypemap();
-	std::vector<ddl::Form> forms = m_constructor->compile( utils::readSourceFileContent( filename), typemap);
-	std::vector<ddl::Form>::const_iterator fi = forms.begin(), fe = forms.end();
-	for (; fi != fe; ++fi)
+	try
 	{
-		library.defineForm( fi->name(), *fi);
+		const ddl::TypeMap* typemap = library.formtypemap();
+		std::vector<ddl::Form> forms = m_constructor->compile( utils::readSourceFileContent( filename), typemap);
+		std::vector<ddl::Form>::const_iterator fi = forms.begin(), fe = forms.end();
+		for (; fi != fe; ++fi)
+		{
+			library.defineForm( fi->name(), *fi);
+		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		throw std::runtime_error( std::string( e.what()) + " loading program '" + filename + "'");
 	}
 }
 

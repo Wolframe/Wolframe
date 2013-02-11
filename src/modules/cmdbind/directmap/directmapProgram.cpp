@@ -89,6 +89,13 @@ void DirectmapProgram::addProgram( const std::string& source)
 	{
 		while ((ch = utils::gotoNextToken( si, se)) != 0)
 		{
+			if (ch == '#')
+			{
+				// ... comment
+				for (; si != se && *si != '\n'; ++si);
+				continue;
+			}
+
 			DirectmapCommandDescription cmd_descr;
 			switch ((ch=utils::parseNextToken( prgname, si, se, optab)))
 			{
@@ -103,15 +110,15 @@ void DirectmapProgram::addProgram( const std::string& source)
 				case '\0':
 					throw ERROR( si, "unexpected end of program");
 				case '=':
-					cmd_descr.call = prgname;
 					break;
 				case '(':
+					cmd_descr.call = prgname;
 					break;
 				default:
 					if (optab[ ch]) throw ERROR( si, MSG << "'=' expected instead of '" << ch << "'");
 					throw ERROR( si, MSG << "'=' expected instead of '" << tok << "'");
 			}
-			if (!cmd_descr.call.empty())
+			if (cmd_descr.call.empty())
 			{
 				switch ((ch=utils::parseNextToken( cmd_descr.call, si, se, optab)))
 				{

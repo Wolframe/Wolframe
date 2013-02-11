@@ -38,6 +38,7 @@
 #include "handlerConfig.hpp"
 #include "logger-v1.hpp"
 #include <stdexcept>
+#include <algorithm>
 #include <boost/algorithm/string.hpp>
 
 using namespace _Wolframe;
@@ -186,6 +187,8 @@ int CommandHandler::doInterface( int argc, const char**, std::ostream& out)
 	return stateidx();
 }
 
+static bool IsCntrl( char ch) {return ch>0 && ch <=32;}
+
 int CommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out)
 {
 	cmdbind::CommandHandlerR chr( chnd);
@@ -193,8 +196,10 @@ int CommandHandler::endRequest( cmdbind::CommandHandler* chnd, std::ostream& out
 	const char* error = chnd->lastError();
 	if (error)
 	{
-		out << "ERR REQUEST " << error << endl();
-		LOG_ERROR << "error in execution of REQUEST " << m_command << ":" << (error?error:"unspecified error");
+		std::string errstr( error?error:"unspecified error");
+		std::replace_if( errstr.begin(), errstr.end(), IsCntrl, ' ');
+		out << "ERR REQUEST " << errstr << endl();
+		LOG_ERROR << "error in execution of REQUEST " << m_command << ":" << errstr;
 	}
 	else
 	{
@@ -298,7 +303,9 @@ int CommandHandler::endDoctypeDetection( cmdbind::CommandHandler* ch, std::ostre
 		{
 			if (execch->lastError())
 			{
-				out << "ERR REQUEST " << m_command << " " << execch->lastError() << endl();
+				std::string errstr( execch->lastError());
+				std::replace_if( errstr.begin(), errstr.end(), IsCntrl, ' ');
+				out << "ERR REQUEST " << m_command << " " << errstr << endl();
 			}
 			else
 			{

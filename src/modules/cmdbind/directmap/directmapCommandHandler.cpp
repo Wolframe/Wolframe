@@ -31,6 +31,7 @@ Project Wolframe.
 ************************************************************************/
 #include "directmapCommandHandler.hpp"
 #include "serialize/struct/filtermapBase.hpp"
+#include "serialize/tostringUtils.hpp"
 #include "types/doctype.hpp"
 #include "langbind/appObjects.hpp"
 #include "filter/typingfilter.hpp"
@@ -207,11 +208,11 @@ IOFilterCommandHandler::CallResult DirectmapCommandHandler::call( const char*& e
 				const char* xmlroot = m_inputform->xmlRoot();
 				if (xmlroot)
 				{
-					m_input.reset( new serialize::DDLStructSerializer( m_inputform.get()));
+					m_input.reset( new serialize::DDLStructSerializer( m_inputform->select( xmlroot)));
 				}
 				else
 				{
-					m_input.reset( new serialize::DDLStructSerializer( m_inputform->select( xmlroot)));
+					m_input.reset( new serialize::DDLStructSerializer( m_inputform.get()));
 				}
 				m_state = 3;
 				/* no break here ! */

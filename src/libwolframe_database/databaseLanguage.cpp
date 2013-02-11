@@ -50,13 +50,23 @@ std::string LanguageDescription::stm_argument_reference( int index) const
 
 bool LanguageDescription::isEmbeddedStatement( std::string::const_iterator si, std::string::const_iterator se) const
 {
+	while (si != se && (*si > 0 && *si <= 32)) ++si;
 	std::string::const_iterator start = si;
-	while (si != se && (*si < 0 || *si > 32)) ++si;
-	std::string keyword = boost::algorithm::to_lower_copy( std::string( start, si));
-	if (keyword == "select") return true;
-	if (keyword == "update") return true;
-	if (keyword == "insert") return true;
-	if (keyword == "delete") return true;
+	while (si != se && ((*si >= 'a' && *si <= 'z') || (*si >= 'A' && *si <= 'Z'))) ++si;
+	if (si != se && (*si > 0 && *si <= 32))
+	{
+		std::string keyword = boost::algorithm::to_lower_copy( std::string( start, si));
+		if (keyword == "select"
+		|| keyword == "update"
+		|| keyword == "insert"
+		|| keyword == "delete"
+		|| keyword == "create"
+		|| keyword == "drop")
+		{
+			while (si != se && (*si > 0 && *si <= 32)) ++si;
+			return (si != se && ((*si >= 'a' && *si <= 'z') || (*si >= 'A' && *si <= 'Z') || *si == '_' || *si == '$'  || *si == '*' || (*si >= '0' && *si <= '9')));
+		}
+	}
 	return false;
 }
 

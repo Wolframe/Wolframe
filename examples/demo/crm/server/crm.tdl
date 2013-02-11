@@ -1,10 +1,10 @@
-; --- EMPLOYEE
+--  EMPLOYEE
 TRANSACTION InsertEmployee
 BEGIN
 	DO INSERT INTO Employee (name, status, addr_line1, addr_line2, addr_postalcode, addr_district, addr_country)
 		VALUES ($(name), $(status), $(addr_line1), $(addr_line2), $(addr_postalcode), $(addr_district), $(addr_country));
-	DO SELECT getLastIdEmployee();
-	DO UNIQUE NONEMPTY SELECT * FROM Employee WHERE id = $1;
+	DO getLastIdEmployee();
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM Employee WHERE id = $1;
 END
 
 TRANSACTION UpdateEmployee
@@ -25,7 +25,7 @@ BEGIN
 	DO UNIQUE NONEMPTY SELECT * FROM Employee WHERE id=$(id);
 END
 
-; -- Not very efficient search until now :-)
+--  Not very efficient search :-)
 TRANSACTION SearchEmployee
 BEGIN
 	DO CREATE TEMPORARY TABLE tmpSearchEmployeeResult( id int );
@@ -44,13 +44,13 @@ END
 
 
 
-; --- CUSTOMER
+--  CUSTOMER
 TRANSACTION InsertCustomer
 BEGIN
 	DO INSERT INTO Customer (name, description, addr_line1, addr_line2, addr_postalcode, addr_district, addr_country)
 		VALUES ($(name), $(description), $(addr_line1), $(addr_line2), $(addr_postalcode), $(addr_district), $(addr_country));
-	DO SELECT getLastIdCustomer();
-	DO UNIQUE NONEMPTY SELECT * FROM Customer WHERE id = $1;
+	DO getLastIdCustomer();
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM Customer WHERE id = $1;
 END
 
 TRANSACTION UpdateCustomer
@@ -68,10 +68,10 @@ END
 
 TRANSACTION GetCustomer
 BEGIN
-	DO UNIQUE NONEMPTY SELECT * FROM Customer WHERE id=$(id);
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM Customer WHERE id=$(id);
 END
 
-; -- Not very efficient search until now :-)
+--  Not very efficient search :-)
 TRANSACTION SearchCustomer
 BEGIN
 	DO CREATE TEMPORARY TABLE tmpSearchCustomerResult( id int );
@@ -90,13 +90,13 @@ END
 
 
 
-; --- PROJECT
+--  PROJECT
 TRANSACTION InsertProject
 BEGIN
 	DO INSERT INTO Project (customerid, name, description)
 		VALUES ($(customerid), $(name), $(description));
-	DO SELECT getLastIdProject();
-	DO UNIQUE NONEMPTY SELECT * FROM Project WHERE id = $1;
+	DO getLastIdProject();
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM Project WHERE id = $1;
 END
 
 TRANSACTION UpdateProject
@@ -116,7 +116,7 @@ BEGIN
 	DO UNIQUE NONEMPTY SELECT * FROM Project WHERE id=$(id);
 END
 
-; -- Not very efficient search until now :-)
+--  Not very efficient search :-)
 TRANSACTION SearchProject
 BEGIN
 	DO CREATE TEMPORARY TABLE tmpSearchProjectResult( id int );
@@ -131,13 +131,13 @@ END
 
 
 
-; --- ACTIVITY CATEGORY
+--  ACTIVITY CATEGORY
 TRANSACTION InsertActivityCategory
 BEGIN
 	DO INSERT INTO ActivityCategory (name, description)
 		VALUES ($(name), $(description));
-	DO SELECT getLastIdActivityCategory();
-	DO UNIQUE NONEMPTY SELECT * FROM ActivityCategory WHERE id = $1;
+	DO getLastIdActivityCategory();
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM ActivityCategory WHERE id = $1;
 END
 
 TRANSACTION UpdateActivityCategory
@@ -154,10 +154,10 @@ END
 
 TRANSACTION GetActivityCategory
 BEGIN
-	DO UNIQUE NONEMPTY SELECT * FROM ActivityCategory WHERE id=$(id);
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM ActivityCategory WHERE id=$(id);
 END
 
-; -- Not very efficient search until now :-)
+--  Not very efficient search :-)
 TRANSACTION SearchActivityCategory
 BEGIN
 	DO CREATE TEMPORARY TABLE tmpSearchActivityCategoryResult( id int );
@@ -171,13 +171,13 @@ END
 
 
 
-; --- ACTIVITY CHARGING
+--  ACTIVITY CHARGING
 TRANSACTION InsertActivityCharging
 BEGIN
 	DO INSERT INTO ActivityCharging (categoryid, validfrom, fixum, timedep, timeunit, taxes)
 		VALUES ($(categoryid), $(validfrom), $(fixum), $(timedep), $(timeunit), $(taxes));
-	DO SELECT getLastIdActivityCharging();
-	DO UNIQUE NONEMPTY SELECT * FROM ActivityCharging WHERE id = $1;
+	DO getLastIdActivityCharging();
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM ActivityCharging WHERE id = $1;
 END
 
 TRANSACTION UpdateActivityCharging
@@ -194,34 +194,24 @@ END
 
 TRANSACTION GetActivityCharging
 BEGIN
-	DO UNIQUE NONEMPTY SELECT * FROM ActivityCharging WHERE id=$(id);
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM ActivityCharging WHERE id=$(id);
 END
 
 TRANSACTION EvalActivityCharging
 BEGIN
-	DO UNIQUE SELECT * FROM ActivityCharging WHERE categoryid=$(categoryid) AND validfrom<=$(validat) ORDER BY validfrom DESC LIMIT 1;
+	INTO . DO UNIQUE SELECT * FROM ActivityCharging WHERE categoryid=$(categoryid) AND validfrom<=$(validat) ORDER BY validfrom DESC LIMIT 1;
 END
 
 
 
 
-; --- ACTIVITY
-; * Sub structures:
-Form Activity
-{
-	categoryid	!@ID
-	projectid	!@ID
-	employeeid	!@ID
-	description	string
-	start		datetime
-	duration	timediff
-}
+--  ACTIVITY
 TRANSACTION InsertActivity
 BEGIN
 	DO INSERT INTO Activity (categoryid, projectid, employeeid, description, start, duration)
 		VALUES ($(categoryid), $(projectid), $(employeeid), $(description), $(start), $(duration));
-	DO SELECT getLastIdActivity();
-	DO UNIQUE NONEMPTY SELECT * FROM Activity WHERE id = $1;
+	DO getLastIdActivity();
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM Activity WHERE id = $1;
 END
 
 TRANSACTION UpdateActivity
@@ -242,7 +232,7 @@ BEGIN
 	DO UNIQUE NONEMPTY SELECT * FROM Activity WHERE id=$(id);
 END
 
-; -- Not very efficient search until now :-)
+--  Not very efficient search :-)
 TRANSACTION SearchActivity
 BEGIN
 	DO CREATE TEMPORARY TABLE tmpSearchActivityResult( id int );
@@ -261,20 +251,13 @@ END
 
 
 
-; --- CUSTOMER NOTE
-; * Sub structures:
-Form CustomerNote
-{
-	customerid	!@ID
-	content		string
-	link		?@URI
-}
+--  CUSTOMER NOTE
 TRANSACTION InsertCustomerNote
 BEGIN
 	DO INSERT INTO CustomerNote (customerid, content, link)
 		VALUES ($(customerid), $(content), $(link));
-	DO SELECT getLastIdCustomerNote();
-	DO UNIQUE NONEMPTY SELECT * FROM CustomerNote WHERE id = $1;
+	DO getLastIdCustomerNote();
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM CustomerNote WHERE id = $1;
 END
 
 TRANSACTION UpdateCustomerNote
@@ -291,10 +274,10 @@ END
 
 TRANSACTION GetCustomerNote
 BEGIN
-	DO UNIQUE NONEMPTY SELECT * FROM CustomerNote WHERE id=$(id);
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM CustomerNote WHERE id=$(id);
 END
 
-; -- Not very efficient search until now :-)
+--  Not very efficient search :-)
 TRANSACTION SearchCustomerNote
 BEGIN
 	DO CREATE TEMPORARY TABLE tmpSearchCustomerNoteResult( id int );
@@ -308,20 +291,13 @@ END
 
 
 
-; --- PROJECT NOTE
-; * Sub structures:
-Form ProjectNote
-{
-	projectid	!@ID
-	content		string
-	link		?@URI
-}
+--  PROJECT NOTE
 TRANSACTION InsertProjectNote
 BEGIN
 	DO INSERT INTO ProjectNote (projectid, content, link)
 		VALUES ($(projectid), $(content), $(link));
-	DO SELECT getLastIdProjectNote();
-	DO UNIQUE NONEMPTY SELECT * FROM ProjectNote WHERE id = $1;
+	DO getLastIdProjectNote();
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM ProjectNote WHERE id = $1;
 END
 
 TRANSACTION UpdateProjectNote
@@ -338,10 +314,10 @@ END
 
 TRANSACTION GetProjectNote
 BEGIN
-	DO UNIQUE NONEMPTY SELECT * FROM ProjectNote WHERE id=$(id);
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM ProjectNote WHERE id=$(id);
 END
 
-; -- Not very efficient search until now :-)
+--  Not very efficient search :-)
 TRANSACTION SearchProjectNote
 BEGIN
 	DO CREATE TEMPORARY TABLE tmpSearchProjectNoteResult( id int );
@@ -355,20 +331,13 @@ END
 
 
 
-; --- ACTIVITY NOTE
-; * Sub structures:
-Form ActivityNote
-{
-	activityid	!@ID
-	content		string
-	link		?@URI
-}
+--  ACTIVITY NOTE
 TRANSACTION InsertActivityNote
 BEGIN
 	DO INSERT INTO ActivityNote (activityid, content, link)
 		VALUES ($(activityid), $(content), $(link));
-	DO SELECT getLastIdActivityNote();
-	DO UNIQUE NONEMPTY SELECT * FROM ActivityNote WHERE id = $1;
+	DO getLastIdActivityNote();
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM ActivityNote WHERE id = $1;
 END
 
 TRANSACTION UpdateActivityNote
@@ -385,10 +354,10 @@ END
 
 TRANSACTION GetActivityNote
 BEGIN
-	DO UNIQUE NONEMPTY SELECT * FROM ActivityNote WHERE id=$(id);
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM ActivityNote WHERE id=$(id);
 END
 
-; -- Not very efficient search until now :-)
+--  Not very efficient search :-)
 TRANSACTION SearchActivityNote
 BEGIN
 	DO CREATE TEMPORARY TABLE tmpSearchActivityNoteResult( id int );
@@ -398,8 +367,5 @@ BEGIN
 	INTO note DO SELECT * FROM ActivityNote WHERE id IN (SELECT DISTINCT id FROM tmpSearchActivityNoteResult);
 	DO DROP TABLE tmpSearchActivityNoteResult;
 END
-
-
-
 
 

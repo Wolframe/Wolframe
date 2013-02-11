@@ -1103,6 +1103,7 @@ struct TransactionFunctionOutput::Impl
 	int m_valuestate;
 	int m_colidx;
 	int m_colend;
+	bool m_endofoutput;
 	ResultStructR m_resultstruct;
 	ResultStruct::const_iterator m_structitr;
 	ResultStruct::const_iterator m_structend;
@@ -1117,6 +1118,7 @@ struct TransactionFunctionOutput::Impl
 		:m_valuestate(0)
 		,m_colidx(0)
 		,m_colend(0)
+		,m_endofoutput(false)
 		,m_resultstruct(resultstruct_)
 		,m_data(data_)
 	{
@@ -1298,20 +1300,37 @@ struct TransactionFunctionOutput::Impl
 						}
 						type = TypedInputFilter::OpenTag;
 						element = m_resitr->columnName( m_colidx);
-						m_valuestate = 1;
-						return true;
+						if (element.type == TypedInputFilter::Element::string_ && element.value.string_.size == 1 && element.value.string_.ptr[0] == '_')
+						{
+							m_valuestate = 3;
+							//... untagged content value: fall through. no return or break here !
+						}
+						else
+						{
+							m_valuestate = 1;
+							return true;
+						}
 					}
 					if (m_valuestate == 1)
 					{
-						type = TypedInputFilter::Value;
+						type = langbind::TypedInputFilter::Value;
 						element = (*m_rowitr)[ m_colidx];
 						m_valuestate = 2;
 						return true;
 					}
 					if (m_valuestate == 2)
 					{
-						type = TypedInputFilter::CloseTag;
+						type = langbind::TypedInputFilter::CloseTag;
 						element = TypedFilterBase::Element();
+						m_valuestate = 0;
+						++m_colidx;
+						return true;
+					}
+					if (m_valuestate == 3)
+					{
+						//... untagged content value (column name '_')
+						type = langbind::TypedInputFilter::Value;
+						element = (*m_rowitr)[ m_colidx];
 						m_valuestate = 0;
 						++m_colidx;
 						return true;
@@ -1323,9 +1342,14 @@ struct TransactionFunctionOutput::Impl
 		{
 			throw std::logic_error( "illegal state (stack not empty after iterating transaction result)");
 		}
-		type = TypedInputFilter::CloseTag;
-		element = TypedFilterBase::Element();
-		return true;
+		if (!m_endofoutput)
+		{
+			type = TypedInputFilter::CloseTag;
+			element = TypedFilterBase::Element();
+			m_endofoutput = true;
+			return true;
+		}
+		return false;
 	}
 };
 

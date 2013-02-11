@@ -374,8 +374,6 @@ bool comauto::TypeLib::AssignmentClosure::call( VARIANT& output)
 		while (m_input->getNext( elemtype, elemvalue))
 		{
 AGAIN:
-std::cout << "ELEM " << langbind::TypedFilterBase::elementTypeName(elemtype)  << " '" << elemvalue.tostring() << "'" << std::endl;
-
 			cur = &m_stk.back();
 			switch (elemtype)
 			{

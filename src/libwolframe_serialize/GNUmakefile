@@ -40,7 +40,8 @@ CPP_OBJS = \
 	struct_filtermapParseStack.o \
 	struct_filtermapSerialize.o \
 	struct_filtermapSerializeStack.o \
-	structOptionParser.o
+	structOptionParser.o \
+	tostringUtils.o
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 
