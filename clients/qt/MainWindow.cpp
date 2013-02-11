@@ -642,6 +642,8 @@ void MainWindow::endModal( )
 {
 	qDebug( ) << "endModal";
 	
+	m_formWidget = m_oldFormWidget;
+	
 // restore wiring in main frame
 	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
@@ -653,7 +655,7 @@ void MainWindow::endModal( )
 		this, SLOT( updateMenusAndToolbars( ) ) );
 	
 	m_modalDialog->close( );  
-	m_modalDialog->deleteLater( );
+	delete m_modalDialog;
 }
 
 void MainWindow::formModal( QString name )
@@ -684,6 +686,9 @@ void MainWindow::formModal( QString name )
 	l->addWidget( formWidget );
 
 	formWidget->setGlobals( m_formWidget->globals( ) );
+	// ugly dirty hack, must ammend later
+	m_oldFormWidget = m_formWidget; 
+	m_formWidget = formWidget;
 	formWidget->loadForm( name, true );
 	
 	m_modalDialog->show( );
