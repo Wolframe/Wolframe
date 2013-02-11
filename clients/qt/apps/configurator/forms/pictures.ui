@@ -278,34 +278,34 @@
  </resources>
  <connections>
   <connection>
-   <sender>picture</sender>
-   <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>edit</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>163</x>
-     <y>101</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>246</x>
-     <y>429</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>search</sender>
    <signal>returnPressed()</signal>
    <receiver>searchButton</receiver>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>294</x>
-     <y>22</y>
+     <x>473</x>
+     <y>35</y>
     </hint>
     <hint type="destinationlabel">
      <x>512</x>
      <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>picture</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>reset_2</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>291</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>292</x>
+     <y>254</y>
     </hint>
    </hints>
   </connection>
