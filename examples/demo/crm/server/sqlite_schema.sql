@@ -16,7 +16,7 @@ CREATE TABLE Customer
 (
 	id		INTEGER	PRIMARY KEY AUTOINCREMENT,
 	name		TEXT	NOT NULL,
-	description	TEXT
+	description	TEXT,
 	addr_line1	TEXT,
 	addr_line2	TEXT,
 	addr_postalcode	TEXT,
@@ -57,7 +57,6 @@ CREATE TABLE ProjectNote
 CREATE TABLE ActivityCategory
 (
 	id		INTEGER	PRIMARY KEY AUTOINCREMENT,
-	projectid	INT	REFERENCES Project( id ),
 	name		TEXT	NOT NULL,
 	description	TEXT
 );

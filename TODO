@@ -35,16 +35,17 @@ daemon code:
 - documentation
   - man pages
 
+
 PF:
 - high prio
   - Project CRM
-  - XML directmap without root element
-  - Lua functions for directmap
+  - Lua functions for directmap (struct IN table OUT)
+  - test forms with SELF recursion and inheritance
+  - '_' as content identifier in TRANSATION results
   - UIForm loader in client and server
 
 - low prio
-  - test forms with SELF recursion
-  - auditing extensions for Transactions (or Functions in general?)
+  - auditing extensions for Transactions (or functions in general?) - how is transaction commit handled in case of auditing
   - error objects for exceptions/logging (non intrusive: bind_int, etc.)
   - bignum tests (only bigint tested until now)
   - XSLT filter + tests

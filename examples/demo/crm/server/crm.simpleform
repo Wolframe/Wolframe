@@ -201,7 +201,6 @@ Form ProjectNoteListResult
 ; * Sub structures:
 Form ActivityCategory
 {
-	projectid	!@ID
 	name		entityname
 	description	?@string
 }
@@ -224,7 +223,6 @@ Form SearchActivityCategory
 {
 	category
 	{
-		projectid ?@ID
 		pattern string
 	}
 }
@@ -255,6 +253,14 @@ Form InsertActivityCharging	{ charging { _ ActivityCharging } }
 Form UpdateActivityCharging	{ charging { _ ActivityChargingInserted } }
 Form DeleteActivityCharging	{ charging { id !@ID } }
 Form GetActivityCharging	{ charging { id !@ID } }
+Form EvalActivityCharging
+{
+	charging
+	{
+		categoryid !@ID
+		validat datetime
+	}
+}
 Form ActivityChargingResult	{ charging { _ ActivityChargingInserted } }
 
 
@@ -267,7 +273,6 @@ Form Activity
 	categoryid	!@ID
 	projectid	!@ID
 	employeeid	!@ID
-	chargingid	!@ID
 	description	string
 	start		datetime
 	duration	timediff
@@ -276,6 +281,7 @@ Form Activity
 Form ActivityInserted
 {
 	id		!@ID
+	chargingid	!@ID
 	_ Activity
 }
 
@@ -287,13 +293,16 @@ Form GetActivity	{ activity { id !@ID } }
 Form ActivityResult	{ activity { _ ActivityInserted } }
 Form ActivityListResult	{ activities { activity []ActivityCategoryInserted } }
 
-Form SearchActivityCategory
+Form SearchActivity
 {
 	activity
 	{
+		customerid ?@ID
 		categoryid ?@ID
 		projectid ?@ID
 		employeeid ?@ID
+		rangefrom ?datetime
+		rangeto ?datetime
 		pattern string
 	}
 }
