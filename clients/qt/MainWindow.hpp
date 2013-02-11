@@ -92,6 +92,7 @@ class MainWindow : public QMainWindow
 		DebugTerminal *m_debugTerminal;
 		QAction *m_debugTerminalAction;	
 		QDialog *m_modalDialog;
+		FormWidget *m_oldFormWidget;
 		
 	public slots:
 		void readSettings( );

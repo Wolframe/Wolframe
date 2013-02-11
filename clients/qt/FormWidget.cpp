@@ -174,8 +174,7 @@ QHash<QString, QString> *FormWidget::globals( ) const
 
 void FormWidget::setGlobals( QHash<QString, QString> *_globals )
 {
-	delete m_globals;
-	m_globals = new QHash<QString, QString>( *_globals );
+	m_globals = _globals;
 }
 
 void FormWidget::setForm( const QString &_form )
