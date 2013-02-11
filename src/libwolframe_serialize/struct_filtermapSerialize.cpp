@@ -141,6 +141,11 @@ bool _Wolframe::serialize::fetchObjectStruct( const StructDescriptionBase* descr
 				stk.back().state( idx+1);
 				stk.push_back( FiltermapSerializeState( itr->first.c_str(), itr->second.fetch(), (const char*)obj + itr->second.ofs()));
 			}
+			else if (itr->first.empty())
+			{
+				stk.back().state( idx+1);
+				stk.push_back( FiltermapSerializeState( 0, itr->second.fetch(), (const char*)obj + itr->second.ofs()));
+			}
 			else
 			{
 				ctx.setElem(
