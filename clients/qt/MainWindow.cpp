@@ -59,8 +59,7 @@ MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_loginDialog( 0 ), m_settings( ),
 	m_languages( ), m_language( ), m_mdiArea( 0 ),
 	m_subWinGroup( 0 ),
-	m_terminating( false ), m_debugTerminal( 0 ), m_debugTerminalAction( 0 ),
-	m_modalDialog( 0 )
+	m_terminating( false ), m_debugTerminal( 0 ), m_debugTerminalAction( 0 )
 {
 // setup designer UI
 	m_ui.setupUi( this );
@@ -338,8 +337,6 @@ void MainWindow::CreateFormWidget( const QString &name )
 
 	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
-	connect( m_formWidget, SIGNAL( formModal( QString ) ),
-		this, SLOT( formModal( QString ) ) );
 	connect( m_formWidget, SIGNAL( error( QString ) ),
 		this, SLOT( formError( QString ) ) );
 		
@@ -638,62 +635,6 @@ void MainWindow::loadForm( QString name )
 		m_formWidget->loadForm( name );
 }
 
-void MainWindow::endModal( )
-{
-	qDebug( ) << "endModal";
-	
-	m_formWidget = m_oldFormWidget;
-	
-// restore wiring in main frame
-	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
-		this, SLOT( formLoaded( QString ) ) );
-	connect( m_formWidget, SIGNAL( formModal( QString ) ),
-		this, SLOT( formModal( QString ) ) );
-	connect( m_formWidget, SIGNAL( error( QString ) ),
-		this, SLOT( formError( QString ) ) );
-	connect( m_formWidget,SIGNAL( destroyed( ) ),
-		this, SLOT( updateMenusAndToolbars( ) ) );
-	
-	m_modalDialog->close( );  
-	delete m_modalDialog;
-}
-
-void MainWindow::formModal( QString name )
-{
-	m_modalDialog = new QDialog( this );
-
-	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, m_modalDialog, settings.debug );
-
-	connect( formWidget, SIGNAL( formLoaded( QString ) ),
-		this, SLOT( formLoaded( QString ) ) );
-	connect( formWidget, SIGNAL( formModal( QString ) ),
-		this, SLOT( formModal( QString ) ) );
-	connect( formWidget, SIGNAL( error( QString ) ),
-		this, SLOT( formError( QString ) ) );
-	connect( formWidget,SIGNAL( destroyed( ) ),
-		this, SLOT( updateMenusAndToolbars( ) ) );
-	connect( formWidget,SIGNAL( closed( ) ),
-		this, SLOT( endModal( ) ) );
-
-// we are modal, so tempoarily we have to disconnect the parent form from
-// the main window in order not to trigger funny results
-	disconnect( m_formWidget, SIGNAL( formLoaded( QString ) ), 0, 0 );
-	disconnect( m_formWidget, SIGNAL( formModal( QString ) ), 0, 0 );
-	disconnect( m_formWidget, SIGNAL( error( QString ) ), 0, 0 );
-	disconnect( m_formWidget, SIGNAL( destroyed( ) ), 0, 0 );
-
-	QVBoxLayout *l = new QVBoxLayout( m_modalDialog );
-	l->addWidget( formWidget );
-
-	formWidget->setGlobals( m_formWidget->globals( ) );
-	// ugly dirty hack, must ammend later
-	m_oldFormWidget = m_formWidget; 
-	m_formWidget = formWidget;
-	formWidget->loadForm( name, true );
-	
-	m_modalDialog->show( );
-}
-
 void MainWindow::formLoaded( QString name )
 {
 // also set language of the form widget,
@@ -921,8 +862,6 @@ QMdiSubWindow *MainWindow::CreateMdiSubWindow( const QString &form )
 
 	connect( formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
-	connect( formWidget, SIGNAL( formModal( QString ) ),
-		this, SLOT( formModal( QString ) ) );
 	connect( formWidget, SIGNAL( error( QString ) ),
 		this, SLOT( formError( QString ) ) );
 	connect( formWidget,SIGNAL( destroyed( ) ),

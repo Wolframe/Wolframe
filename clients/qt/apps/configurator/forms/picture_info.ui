@@ -2,9 +2,6 @@
 <ui version="4.0">
  <class>Form</class>
  <widget class="QWidget" name="Form">
-  <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
-  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -222,7 +219,7 @@
         <string>Close</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">[close]</string>
+        <string notr="true">pictures</string>
        </property>
       </widget>
      </item>
