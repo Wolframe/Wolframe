@@ -11,3 +11,12 @@ instead of
 "When terminating the client you will find a settings file called ~/tutorial/client/
 tutorial.conf."
 
+------ Tutorial page 4:
+??? We get a login screen were we just hit the "Login" button.
+I found a login and could establish a connection, but the tutorial is not up to date.
+
+------ Reload main window without any form defined:
+??? Unable to load form '', does it exist?
+
+
+
