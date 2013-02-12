@@ -1,0 +1,13 @@
+------ Tutorial page 3: Used unknwon option -d and -c
+"qtclient -s tutorial.conf -d"
+instead of
+"qtclient -c tutorial.conf"
+
+
+------ Tutorial page 3:
+"When terminating the client you will find a settings file called ~/tutorial/client/
+client.conf."
+instead of
+"When terminating the client you will find a settings file called ~/tutorial/client/
+tutorial.conf."
+
