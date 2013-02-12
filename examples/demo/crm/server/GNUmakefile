@@ -1,4 +1,4 @@
-TOPDIR = ../../..
+TOPDIR = ../../../..
 
 SUBDIRS = 
 
@@ -23,21 +23,9 @@ LD_LIBRARY_PATH := "$(LD_LIBRARY_PATH):$(FREEIMAGE_LIB_DIR):$(FREEIMAGEPLUS_LIB_
 endif
 
 
-run-sqlite:
+run-local-sqlite:
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe-sqlite.conf -f -d DEBUG
-
-run-postgres:
-	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe-postgres.conf -f
-
-check:
-	@echo "Running the Wolframe server..."
-	@@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe.conf -t
-
-print:
-	@echo "Running the Wolframe server..."
-	@@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe.conf -p
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe-local-sqlite.conf -f -d DEBUG
 
 showenv:
 	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
