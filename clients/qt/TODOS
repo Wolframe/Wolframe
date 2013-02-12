@@ -11,6 +11,9 @@ now:
     on Windows XP, so it is a failed signal for a partial line, must add
     a state like DataLeft (Data gets DataReading or so)
 - ILLEGAL STATE 4 in dataAvailable!
+- modal dialogs
+  - first implementation failed due to asynchronous architecture in FormWidget,
+    must rewrite all!
 - MDI interface
   - open forms via click on button
   - close forms on click on button
@@ -24,9 +27,6 @@ now:
   - resizing issues: example view picture when picture list window is quite small
 
 musts:
-- modal dialogs:
-  - handle wrong global states (first call works further ones remember
-    the state of the first one, why?)
 - form loader
   - refactor, especially load the language in formwidget, not in main window!
 - file UI and data mode
