@@ -24,7 +24,7 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QTreeWidget" name="listCustomer">
+     <widget class="QTreeWidget" name="customers">
       <property name="rootIsDecorated">
        <bool>false</bool>
       </property>
@@ -36,37 +36,37 @@
       </property>
       <column>
        <property name="text">
-        <string>Name</string>
+        <string>name</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Description</string>
+        <string>description</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Address Line 1</string>
+        <string>addr_line1</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Address Line 2</string>
+        <string>addr_line2</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Postal Code</string>
+        <string>addr_postalcode</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>District</string>
+        <string>addr_district</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Country</string>
+        <string>addr_country</string>
        </property>
       </column>
      </widget>
