@@ -12,42 +12,20 @@
 		We start the Qt client with:
 
 		<programlisting language='shell'>
-	qtclient -s tutorial.conf -d
-		</programlisting>
-	</para>
-	
-	<para>
-		On first run we get presented a preferences dialog.
-		Just accept the defaults.
-	</para>
-	
-	<para>
-		When terminating the client you will find a settings
-		file called <filename>~/tutorial/client/client.conf</filename>:
-		
-		<programlisting language='shell'>
-	[wolframe]
-	host=localhost
-	port=7661
-	secure=false
-	checkSSL=true
-	client-cert-file=./certs/client.crt
-	client-key-file=./private/client.key
-	ca-cert-file=./certs/CAclient.cert.pem
-	uiloadmode=LocalFile
-	dataloadmode=Network
-	dbname=./data.db
-	debug=false
-	uiFormDir=.
-	uiFormTranslationsDir=.
-	uiFormResourcesDir=.
-	dataLoaderDir=.
-	locale=en_US
+	qtclient -c tutorial.conf
 		</programlisting>
 	</para>
 		
 	<para>
-		We get a login screen were we just hit the "Login" button.
+		First define your connection by selecting "Manage Connections" in
+		the "Connection" menu. Define a new connection called "local"
+		which connects to server "localhost" on port 7661. Leave the
+		SSL connection unchecked.
+	</para>
+	
+	<para>
+		Now you can try to login to your server by selection "Connection"
+		and then "Login" in the menu.	
 	</para>
 	
 	<para>
