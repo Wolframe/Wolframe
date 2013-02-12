@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>listCustomers</class>
+ <widget class="QWidget" name="listCustomers">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>664</width>
+    <height>332</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>661</width>
+     <height>321</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QTreeWidget" name="listCustomer">
+      <property name="rootIsDecorated">
+       <bool>false</bool>
+      </property>
+      <property name="doctype" stdset="0">
+       <string>ListCustomer</string>
+      </property>
+      <property name="rootelement" stdset="0">
+       <string>customer</string>
+      </property>
+      <column>
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Description</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Address Line 1</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Address Line 2</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Postal Code</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>District</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Country</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

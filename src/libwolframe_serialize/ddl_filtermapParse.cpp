@@ -33,6 +33,7 @@ Project Wolframe.
 
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "filter/typedfilter.hpp"
+#include "logger-v1.hpp"
 #include <cstring>
 #include <sstream>
 
@@ -99,6 +100,7 @@ static bool parseAtom( ddl::AtomicType& val, langbind::TypedInputFilter& inp, Co
 		if (inp.state() != langbind::InputFilter::Error) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), getElementPath( stk));
 	}
+	LOG_DATA << "[DDL structure serialization parse] atomic element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:
@@ -149,7 +151,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 		if (inp.state() != langbind::InputFilter::Error) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), getElementPath( stk));
 	}
-
+	LOG_DATA << "[DDL structure serialization parse] structure element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:

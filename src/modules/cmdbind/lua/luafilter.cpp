@@ -33,6 +33,7 @@ Project Wolframe.
 ///\brief Implementation of lua filters (serialization/deserialization of lua tables)
 #include "luafilter.hpp"
 #include "luaDebug.hpp"
+#include "logger-v1.hpp"
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <cstring>
@@ -409,6 +410,7 @@ bool LuaTableOutputFilter::closeAttribute( const Element& element)
 
 bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 {
+	LOG_DATA << "[lua table] push element " << langbind::InputFilter::elementTypeName( type) << " '" << element.tostring() << "'";
 	if (!lua_checkstack( m_ls, 16))
 	{
 		setState( OutputFilter::Error, "lua stack overflow");
@@ -461,14 +463,10 @@ bool LuaTableOutputFilter::print( ElementType type, const Element& element)
 					//... back to open tag
 					return closeAttribute( element) && closeTag();
 				case OpenTag:
+				case Value:
+				case CloseTag:
 					m_type = type;
 					return closeAttribute( element);
-				case Value:
-					setState( OutputFilter::Error, "output filter cannot handle subsequent non indexed values");
-					return false;
-				case CloseTag:
-					setState( OutputFilter::Error, "output filter cannot handle values outside tag context");
-					return false;
 			}
 
 		case CloseTag:

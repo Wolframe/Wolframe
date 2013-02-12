@@ -475,7 +475,7 @@ static void compile_forms( const boost::property_tree::ptree& pt, std::vector<Fo
 {
 	types::keymap<StructType> formmap;
 	boost::property_tree::ptree::const_iterator itr=pt.begin(),end=pt.end();
-	if (itr != end && !boost::algorithm::iequals( itr->first, "FORM"))
+	if (itr != end && !boost::algorithm::iequals( itr->first, "FORM") && !boost::algorithm::iequals( itr->first, "STRUCT"))
 	{
 		// ... single form
 		Form form( "simpleform");

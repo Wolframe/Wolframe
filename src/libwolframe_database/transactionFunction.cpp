@@ -39,6 +39,7 @@
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/charset.hpp"
+#include "logger-v1.hpp"
 #include <cstring>
 #include <sstream>
 #include <iostream>
@@ -955,6 +956,7 @@ TransactionFunctionInput::TransactionFunctionInput( const TransactionFunctionInp
 
 bool TransactionFunctionInput::print( ElementType type, const Element& element)
 {
+	LOG_DATA << "[transaction input] push element " << langbind::InputFilter::elementTypeName( type) << " '" << element.tostring() << "'";
 	switch (type)
 	{
 		case langbind::TypedInputFilter::OpenTag:

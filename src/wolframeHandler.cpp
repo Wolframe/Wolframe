@@ -182,6 +182,46 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 	}
 }
 
+static void logNetworkWrite( const void* ptr, std::size_t size)
+{
+	static const char hex[17] = "0123456789abcdef";
+	std::size_t ii,blkidx;
+
+	for (ii=0,blkidx=0; ii<size; ii+=16,++blkidx)
+	{
+		std::string hexblk;
+		std::string chrblk;
+		std::size_t ci,ce;
+		for (ci = 0, ce = ((size-ii) >= 16)?16:(size-ii); ci < ce; ++ci)
+		{
+			unsigned char ch = *((const unsigned char*)ptr + ii + ci);
+			if (ch >= ' ' && ch <= 127)
+			{
+				chrblk.push_back( ch);
+			}
+			else
+			{
+				chrblk.push_back( '.');
+			}
+			hexblk.push_back( hex[ ch / 16]);
+			hexblk.push_back( hex[ ch % 16]);
+			hexblk.push_back( ' ');
+		}
+		for(; ci < 16; ++ci)
+		{
+			chrblk.push_back( ' ');
+			hexblk.push_back( ' ');
+			hexblk.push_back( ' ');
+			hexblk.push_back( ' ');
+		}
+		std::string idxstr;
+		idxstr.push_back( hex[ (blkidx % 256) / 16]);
+		idxstr.push_back( hex[ (blkidx % 256) % 16]);
+
+		LOG_DATA << "[conn write " << idxstr << "] " << chrblk << " " << hexblk;
+	}
+}
+
 /// Handle a request and produce a reply.
 const net::NetworkOperation wolframeConnection::nextOperation()
 {
@@ -244,6 +284,10 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 					case cmdbind::CommandHandler::WRITE:
 						m_cmdHandler.getOutput( outpp, outppsize);
+						if ( _Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA)
+						{
+							logNetworkWrite( outpp, outppsize);
+						}
 						return net::SendData( outpp, outppsize);
 
 					case cmdbind::CommandHandler::CLOSE:

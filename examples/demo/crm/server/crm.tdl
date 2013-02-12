@@ -41,6 +41,11 @@ BEGIN
 	DO DROP TABLE tmpSearchEmployeeResult;
 END
 
+TRANSACTION ListEmployee
+BEGIN
+	INTO employee DO SELECT * FROM Employee;
+END
+
 
 
 
@@ -87,6 +92,11 @@ BEGIN
 	DO DROP TABLE tmpSearchCustomerResult;
 END
 
+TRANSACTION ListCustomer
+BEGIN
+	INTO customer DO SELECT * FROM Customer;
+END
+
 
 
 
@@ -127,6 +137,10 @@ BEGIN
 	DO DROP TABLE tmpSearchProjectResult;
 END
 
+TRANSACTION ListProject
+BEGIN
+	INTO project DO SELECT * FROM Project;
+END
 
 
 

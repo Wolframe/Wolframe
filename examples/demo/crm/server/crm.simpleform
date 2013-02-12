@@ -1,3 +1,10 @@
+; ----------- Helper Structures
+; *IDHACK for meaningless implicit attribute due current qtclient implementation:
+Struct IDHACK
+{
+	id	?@int
+}
+
 ; ------------ Employee
 ; * Sub structures:
 Form Employee
@@ -25,7 +32,8 @@ Form DeleteEmployee	{ employee { id !@ID } }
 Form GetEmployee	{ employee { id !@ID } }
 Form EmployeeResult	{ employee { _ EmployeeInserted } }
 Form EmployeeListResult	{ employees { employee EmployeeInserted[] } }
-Form SearchEmployee	{ employee { pattern string } }
+Form SearchEmployee	{ employee { _ IDHACK patern string } }
+Form ListEmployee	{ employee { _ IDHACK } }
 
 
 
@@ -56,7 +64,9 @@ Form DeleteCustomer	{ customer { id !@ID } }
 Form GetCustomer	{ customer { id !@ID } }
 Form CustomerResult	{ customer { _ CustomerInserted } }
 Form CustomerListResult	{ customers { customer CustomerInserted[] } }
-Form SearchCustomer	{ customer { pattern string } }
+Form SearchCustomer	{ customer { _ IDHACK pattern string } }
+Form ListCustomer	{ customer { _ IDHACK } }
+
 
 
 
@@ -84,6 +94,7 @@ Form SearchCustomerNote
 {
 	note
 	{
+		_ IDHACK
 		customerid ?@ID
 		pattern string
 	}
@@ -133,7 +144,8 @@ Form UpdateProject	{ project { _ ProjectInserted } }
 Form DeleteProject	{ project { id !@ID } }
 Form GetProject		{ project { id !@ID } }
 Form ProjectResult	{ project { _ ProjectInserted } }
-Form ProjectListResult	{ projects { project ProjectInserted[] } }
+Form ProjectListResult	{ projects { _ IDHACK project ProjectInserted[] } }
+Form ListProject	{ project { _ IDHACK } }
 
 Form SearchProject
 {
@@ -143,6 +155,7 @@ Form SearchProject
 		pattern string
 	}
 }
+
 
 
 
@@ -170,6 +183,7 @@ Form SearchProjectNote
 {
 	note
 	{
+		_ IDHACK
 		projectid ?@ID
 		pattern string
 	}
@@ -223,6 +237,7 @@ Form SearchActivityCategory
 {
 	category
 	{
+		_ IDHACK
 		pattern string
 	}
 }
@@ -297,6 +312,7 @@ Form SearchActivity
 {
 	activity
 	{
+		_ IDHACK
 		customerid ?@ID
 		categoryid ?@ID
 		projectid ?@ID
@@ -334,6 +350,7 @@ Form SearchActivityNote
 {
 	note
 	{
+		_ IDHACK
 		activityid ?@ID
 		pattern string
 	}

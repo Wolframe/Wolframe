@@ -34,6 +34,7 @@ Project Wolframe.
 #include "serialize/struct/filtermapParse.hpp"
 #include "serialize/struct/filtermapParseStack.hpp"
 #include "serialize/struct/filtermapParseValue.hpp"
+#include "logger-v1.hpp"
 
 using namespace _Wolframe;
 using namespace _Wolframe::serialize;
@@ -103,9 +104,11 @@ bool _Wolframe::serialize::parseAtomicElementEndTag( langbind::TypedInputFilter&
 		if (inp.state() == langbind::InputFilter::EndOfMessage) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
 	}
+	LOG_DATA << "[C++ structure serialization parse] atomic element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
+
 	if (typ == langbind::InputFilter::Value)
 	{
-		throw SerializationErrorException( "subsequent atomic values not allowed in filter serialization", element.tostring(), StructParser::getElementPath( stk));
+		throw SerializationErrorException( "subsequent values assigned to atomic value in filter serialization", element.tostring(), StructParser::getElementPath( stk));
 	}
 	if (typ != langbind::InputFilter::CloseTag)
 	{
@@ -130,6 +133,7 @@ bool _Wolframe::serialize::parseObjectStruct( const StructDescriptionBase* descr
 		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
 	}
 
+	LOG_DATA << "[C++ structure serialization parse] structure element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:
@@ -250,6 +254,7 @@ bool _Wolframe::serialize::parseObjectAtomic( ParseValue parseVal, langbind::Typ
 		if (inp.state() != langbind::InputFilter::Error) return false;
 		throw SerializationErrorException( inp.getError(), element.tostring(), StructParser::getElementPath( stk));
 	}
+	LOG_DATA << "[C++ structure serialization parse] atomic element " << langbind::InputFilter::elementTypeName( typ) << " '" << element.tostring() << "'";
 	switch (typ)
 	{
 		case langbind::InputFilter::OpenTag:

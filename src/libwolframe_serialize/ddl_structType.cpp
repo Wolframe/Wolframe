@@ -149,11 +149,19 @@ void StructType::inheritContent( const StructType& val)
 	REQUIRE(Struct);
 	val.REQUIRE(Struct);
 	Map::const_iterator vi,fi;
-	for (vi = val.m_elem.begin(); vi != val.m_elem.end(); ++vi)
+	std::size_t idx;
+	for (vi = val.m_elem.begin(),idx=0; vi != val.m_elem.end(); ++vi,++idx)
 	{
 		fi = find( vi->first);
 		if (fi != m_elem.end()) throw std::runtime_error( std::string("in structure inherited duplicate definition of element '") + vi->first + "'");
-		m_elem.push_back( Element( vi->first, vi->second));
+		if (idx < val.m_nof_attributes)
+		{
+			defineAttribute( vi->first, vi->second);
+		}
+		else
+		{
+			defineContent( vi->first, vi->second);
+		}
 	}
 }
 

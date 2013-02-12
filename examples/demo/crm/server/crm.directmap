@@ -4,6 +4,7 @@ UpdateEmployee( xml);
 DeleteEmployee( xml);
 GetEmployee( xml) :EmployeeResult;
 SearchEmployee( xml) :EmployeeListResult;
+ListEmployee( xml) :EmployeeListResult;
 
 #--- Customer
 InsertCustomer( xml) :CustomerResult;
@@ -11,6 +12,7 @@ UpdateCustomer( xml);
 DeleteCustomer( xml);
 GetCustomer( xml) :CustomerResult;
 SearchCustomer( xml) :CustomerListResult;
+ListCustomer( xml) :CustomerListResult;
 
 #--- CustomerNote
 InsertCustomerNote( xml) :CustomerNoteResult;
@@ -25,6 +27,7 @@ UpdateProject( xml);
 DeleteProject( xml);
 GetProject( xml) :ProjectResult;
 SearchProject( xml) :ProjectListResult;
+ListProject( xml) :ProjectListResult;
 
 #--- ProjectNote
 InsertProjectNote( xml) :ProjectNoteResult;

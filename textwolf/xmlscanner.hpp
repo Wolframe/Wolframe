@@ -1124,6 +1124,7 @@ public:
 				}
 				else
 				{
+					m_outputBuf.clear();
 					rt = (ElementType)sd->action.arg;
 				}
 				if (sd->nofnext == 0)
