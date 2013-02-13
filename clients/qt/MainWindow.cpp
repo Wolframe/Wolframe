@@ -55,11 +55,11 @@
 MainWindow::MainWindow( QWidget *_parent ) : QMainWindow( _parent ),
 	m_cmdline( 0 ),
 	m_formWidget( 0 ), m_uiLoader( 0 ), m_formLoader( 0 ),
-	m_dataLoader( 0 ), m_wolframeClient( 0 ),
-	m_loginDialog( 0 ), m_settings( ),
-	m_languages( ), m_language( ), m_mdiArea( 0 ),
-	m_subWinGroup( 0 ),
-	m_terminating( false ), m_debugTerminal( 0 ), m_debugTerminalAction( 0 )
+	m_dataLoader( 0 ), m_wolframeClient( 0 ), m_settings( ),
+	m_languages( ), m_language( ),
+	m_mdiArea( 0 ), m_subWinGroup( 0 ),
+	m_terminating( false ), m_debugTerminal( 0 ), m_debugTerminalAction( 0 ),
+	m_modalDialog( 0 )
 {
 // setup designer UI
 	m_ui.setupUi( this );
@@ -227,7 +227,7 @@ void MainWindow::initialize( )
 
 // a Qt UI loader for the main theme window and also used by all form widgets
 	m_uiLoader = new QUiLoader( );
-	m_uiLoader->setLanguageChangeEnabled( true );
+	//m_uiLoader->setLanguageChangeEnabled( true );
 	m_uiLoader->addPluginPath( "plugins" );
 	m_uiLoader->addPluginPath( "." );
 	QStringList paths = m_uiLoader->pluginPaths( );
@@ -334,6 +334,8 @@ void MainWindow::CreateFormWidget( const QString &name )
 
 	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
+	connect( m_formWidget, SIGNAL( formModal( QString ) ),
+		this, SLOT( formModal( QString ) ) );
 	connect( m_formWidget, SIGNAL( error( QString ) ),
 		this, SLOT( formError( QString ) ) );
 		
@@ -635,6 +637,65 @@ void MainWindow::loadForm( QString name )
 		m_formWidget->loadForm( name );
 }
 
+void MainWindow::endModal( )
+{
+	qDebug( ) << "endModal";
+	
+// restore wiring in main frame
+	connect( m_formWidget, SIGNAL( formLoaded( QString ) ),
+		this, SLOT( formLoaded( QString ) ) );
+	connect( m_formWidget, SIGNAL( formModal( QString ) ),
+		this, SLOT( formModal( QString ) ) );
+	connect( m_formWidget, SIGNAL( error( QString ) ),
+		this, SLOT( formError( QString ) ) );
+	connect( m_formWidget,SIGNAL( destroyed( ) ),
+		this, SLOT( updateMenusAndToolbars( ) ) );
+	
+	m_modalDialog->close( );  
+	m_modalDialog->deleteLater( );
+	
+	// hacky: should go without, especially because we loose data already
+	// entered in the parent dialog this way..
+	m_formWidget->reload( );
+}
+
+void MainWindow::formModal( QString name )
+{
+	m_modalDialog = new QDialog( this );
+
+	FormWidget *formWidget = new FormWidget( m_formLoader, m_dataLoader, m_uiLoader, m_modalDialog, settings.debug );
+
+	connect( formWidget, SIGNAL( formLoaded( QString ) ),
+		this, SLOT( formLoaded( QString ) ) );
+	connect( formWidget, SIGNAL( formModal( QString ) ),
+		this, SLOT( formModal( QString ) ) );
+	connect( formWidget, SIGNAL( error( QString ) ),
+		this, SLOT( formError( QString ) ) );
+	connect( formWidget,SIGNAL( destroyed( ) ),
+		this, SLOT( updateMenusAndToolbars( ) ) );
+	connect( formWidget,SIGNAL( closed( ) ),
+		this, SLOT( endModal( ) ) );
+
+// we are modal, so tempoarily we have to disconnect the parent form from
+// the main window in order not to trigger funny results
+	disconnect( m_formWidget, SIGNAL( formLoaded( QString ) ), 0, 0 );
+	disconnect( m_formWidget, SIGNAL( formModal( QString ) ), 0, 0 );
+	disconnect( m_formWidget, SIGNAL( error( QString ) ), 0, 0 );
+	disconnect( m_formWidget, SIGNAL( destroyed( ) ), 0, 0 );
+
+	QVBoxLayout *l = new QVBoxLayout( m_modalDialog );
+	l->addWidget( formWidget );
+
+	formWidget->setGlobals( m_formWidget->globals( ) );
+	formWidget->setLanguage( m_language );
+	formWidget->loadForm( name, true );
+	
+	connect( m_modalDialog, SIGNAL( rejected( ) ),
+		this, SLOT( endModal( ) ) );
+	
+	m_modalDialog->show( );
+}
+
 void MainWindow::formLoaded( QString name )
 {
 // in MDI mode update the title of the sub window, otherwise update window title
@@ -858,6 +919,8 @@ QMdiSubWindow *MainWindow::CreateMdiSubWindow( const QString &form )
 
 	connect( formWidget, SIGNAL( formLoaded( QString ) ),
 		this, SLOT( formLoaded( QString ) ) );
+	connect( formWidget, SIGNAL( formModal( QString ) ),
+		this, SLOT( formModal( QString ) ) );
 	connect( formWidget, SIGNAL( error( QString ) ),
 		this, SLOT( formError( QString ) ) );
 	connect( formWidget,SIGNAL( destroyed( ) ),

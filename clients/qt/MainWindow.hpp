@@ -74,7 +74,6 @@ class MainWindow : public QMainWindow
 		FormLoader *m_formLoader;	// form loader (visible form)
 		DataLoader *m_dataLoader;	// load and saves data (data form)
 		WolframeClient *m_wolframeClient; // the client protocol class
-		LoginDialog *m_loginDialog;	// the login dialog
 		QString m_settings;		// file to read settings from
 		QStringList m_languages;	// available interface translations
 		QString m_language;		// the current language of the interface
@@ -90,6 +89,7 @@ class MainWindow : public QMainWindow
 		QLabel *m_statusBarSSL;
 		DebugTerminal *m_debugTerminal;
 		QAction *m_debugTerminalAction;	
+		QDialog *m_modalDialog;
 		
 	public slots:
 		void readSettings( );
@@ -140,6 +140,8 @@ class MainWindow : public QMainWindow
 		void languageCodesLoaded( QStringList languages );
 		void formListLoaded( QStringList forms );
 		void formLoaded( QString name );
+		void formModal( QString name );
+		void endModal( void );
 		void formError( QString error );
 		
 // MDI slots
