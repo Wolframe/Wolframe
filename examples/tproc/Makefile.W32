@@ -88,27 +88,34 @@ local_clean:
 
 local_distclean:
 
-local_test: $(TEST_CPP_BINS)
-	@-echo @echo off > test.bat
-	@-echo mkdir tests\temp > test.bat
+copy_prereq:
 !IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests >> test.bat
+	@-copy "$(OPENSSL_DIR)\bin\libeay32.dll" tests\.
+	@-copy "$(OPENSSL_DIR)\bin\ssleay32.dll" tests\.
+!ENDIF
+!IFDEF WITH_LUA
+	@-copy $(TOPDIR)\lua\src\lua52.dll tests\.
+!ENDIF
+!IFDEF WITH_PGSQL
+	@-copy "$(PGSQL_DIR)\lib\libpq.dll" tests\.
+!IFDEF PGDLL_WITH_I18N
+	@-copy "$(PGSQL_DIR)\bin\libintl*.dll" tests\.
+	@-copy "$(PGSQL_DIR)\bin\libiconv*.dll" tests\.
+!ENDIF
 !ENDIF
 !IFDEF WITH_LIBXML2
-	@-echo copy "$(WIN_ICONV_DIR)\iconv.dll" tests >> test.bat
-	@-echo copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests >> test.bat
+	@-copy "$(WIN_ICONV_DIR)\iconv.dll" tests\.
+	@-copy "$(LIBXML2_DIR)\lib\libxml2.dll" tests\.
 !ENDIF
+
+local_test: $(TEST_CPP_BINS) copy_prereq
+	@-echo mkdir tests\temp > test.bat
 	@-echo cd tests >> test.bat
 	@-echo tprocHandlerTest.exe >> test.bat
 	@-test.bat
 
-run:
+run: copy_prereq
 	@-echo @echo off > test.bat
-!IFDEF WITH_SSL
-	@-echo copy "$(OPENSSL_DIR)\bin\libeay32.dll" . >> test.bat
-	@-echo copy "$(OPENSSL_DIR)\bin\ssleay32.dll" . >> test.bat
-!ENDIF
 	@-echo echo Running the Wolframe tproc example... >> test.bat
 	@-echo tprocd.exe -c tproc.conf >> test.bat
 	@-test.bat
