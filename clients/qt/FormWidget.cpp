@@ -192,14 +192,14 @@ void FormWidget::loadForm( QString name )
 	m_formLoader->initiateFormLoad( m_form );
 }	
 
-void FormWidget::loadLanguage( QString language )
+void FormWidget::setLocale( QLocale locale )
 {
-	m_locale = QLocale( language );
-	
-	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
-		<< m_locale.name( );
-		
-	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
+	m_locale = locale;
+}
+
+void FormWidget::setLanguage( QString language )
+{
+	setLocale( QLocale( language ) );
 }
 
 void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
@@ -218,6 +218,10 @@ void FormWidget::formLocalizationLoaded( QString name, QByteArray localization )
 		}
 		qApp->installTranslator( &m_translator );
 	}
+
+// signal completion of form loading
+	qDebug( ) << "Done loading form" << name;
+	emit formLoaded( m_form );
 }
 
 QString FormWidget::readDynamicStringProperty( QObject *o, const char *name )
@@ -323,12 +327,13 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		props->insert( "action", initAction );
 		sendRequest( props );
 	}
-		
-// signal
-	qDebug( ) << "Done loading form" << name;
-	emit formLoaded( m_form );
-}
 
+// load localication of the form now
+	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
+		<< m_locale.name( );		
+	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
+}
+		
 void FormWidget::sendRequest( QHash<QString, QString> *props )
 {
 	qDebug( ) << "Handling reguest for form " << m_form << "[" << *props << "]";

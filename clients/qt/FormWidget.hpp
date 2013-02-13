@@ -69,7 +69,8 @@ class FormWidget : public QWidget
 		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent = 0, bool _debug = false );
 		virtual ~FormWidget( );
 		void loadForm( QString name );
-		void loadLanguage( QString language );
+		void setLocale( QLocale locale );
+		void setLanguage( QString language );
 	
 	public:
 		QString form( ) const;

@@ -590,11 +590,13 @@ void MainWindow::loadLanguage( QString language )
 	if( settings.mdi ) {
 		foreach( QMdiSubWindow *w, m_mdiArea->subWindowList( ) ) {
 			FormWidget *f = qobject_cast<FormWidget *>( w->widget( ) );
-			f->loadLanguage( language );
+			f->setLanguage( language );
+			f->reload( );
 		}
 	} else {
 		if( m_formWidget ) {
-			m_formWidget->loadLanguage( language );
+			m_formWidget->setLanguage( language );
+			m_formWidget->reload( );
 		}
 	}
 
@@ -637,10 +639,6 @@ void MainWindow::loadForm( QString name )
 
 void MainWindow::formLoaded( QString name )
 {
-// also set language of the form widget,
-// but wait till the form got loaded, otherwise we get races!
-	m_formWidget->loadLanguage( m_currentLanguage );
-	
 // in MDI mode update the title of the sub window, otherwise update window title
 	if( settings.mdi ) {
 		QMdiSubWindow *mdiSubWindow = m_mdiArea->activeSubWindow( );
