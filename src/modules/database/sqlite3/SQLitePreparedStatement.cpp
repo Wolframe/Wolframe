@@ -43,7 +43,6 @@
 #if SQLITE_VERSION_NUMBER < 3005000
 #error This SQLite version is not supported by this module. It relies on the 'V2' interface
 #endif
-#undef LOWLEVEL_DEBUG
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -120,9 +119,7 @@ bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, S
 
 bool PreparedStatementHandler_sqlite3::begin()
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL begin()" << std::endl;
-#endif
+	LOG_TRACE << "[sqlite3 statement] CALL begin()";
 	if (m_state != Init)
 	{
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
@@ -132,9 +129,7 @@ bool PreparedStatementHandler_sqlite3::begin()
 
 bool PreparedStatementHandler_sqlite3::commit()
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL commit()" << std::endl;
-#endif
+	LOG_TRACE << "[sqlite3 statement] CALL commit()";
 	if (m_state == Transaction)
 	{
 		LOG_WARNING << "executed transaction is empty";
@@ -148,9 +143,7 @@ bool PreparedStatementHandler_sqlite3::commit()
 
 bool PreparedStatementHandler_sqlite3::rollback()
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL rollback()" << std::endl;
-#endif
+	LOG_TRACE << "[sqlite3 statement] CALL rollback()";
 	bool rt = executeInstruction( "ROLLBACK TRANSACTION;", Init);
 	clear();
 	return rt;
@@ -183,9 +176,7 @@ bool PreparedStatementHandler_sqlite3::errorStatus( const std::string& message)
 
 bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL start (" << stmname << ")" << std::endl;
-#endif
+	LOG_TRACE << "[sqlite3 statement] CALL start (" << stmname << ")";
 	m_hasResult = false;
 	m_curstm = m_stmmap->find( stmname);
 	if (m_state == Executed || m_state == Prepared)
@@ -221,16 +212,14 @@ bool PreparedStatementHandler_sqlite3::start( const std::string& stmname)
 
 bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const char* value)
 {
-#ifdef LOWLEVEL_DEBUG
 	if (value)
 	{
-		std::cerr << "CALL bind( " << idx << ", '" << value << "' )" << std::endl;
+		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", '" << value << "' )";
 	}
 	else
 	{
-		std::cerr << "CALL bind( " << idx << ", NULL)" << std::endl;
+		LOG_TRACE << "[sqlite3 statement] CALL bind( " << idx << ", NULL)";
 	}
-#endif
 	if (m_state != Prepared && m_state != Executed)
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
@@ -256,9 +245,7 @@ bool PreparedStatementHandler_sqlite3::bind( std::size_t idx, const char* value)
 
 bool PreparedStatementHandler_sqlite3::execute()
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL execute()" << std::endl;
-#endif
+	LOG_TRACE << "[sqlite3 statement] CALL execute()";
 	if (m_state != Prepared)
 	{
 		return errorStatus( std::string( "call of execute not allowed in state '") + stateName(m_state) + "'");
@@ -310,9 +297,7 @@ const char* PreparedStatementHandler_sqlite3::getLastError()
 
 const char* PreparedStatementHandler_sqlite3::get( std::size_t idx)
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL get(" << idx << ")" << std::endl;
-#endif
+	LOG_TRACE << "[sqlite3 statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
 	{
 		errorStatus( std::string( "number of columns not available in state '") + stateName(m_state) + "'");
@@ -338,9 +323,7 @@ const char* PreparedStatementHandler_sqlite3::get( std::size_t idx)
 
 bool PreparedStatementHandler_sqlite3::next()
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL next()" << std::endl;
-#endif
+	LOG_TRACE << "[sqlite3 statement] [sqlite3 statement] CALL next()";
 	if (m_state != Executed)
 	{
 		return errorStatus( std::string( "command not executed, next result of not available in state '") + stateName(m_state) + "'");

@@ -123,7 +123,9 @@ END
 
 TRANSACTION GetProject
 BEGIN
-	DO UNIQUE NONEMPTY SELECT * FROM Project WHERE id=$(id);
+	DO UNIQUE NONEMPTY
+		SELECT Project.id,Project.customerid,Customer.name AS customername,Project.name,Project.description
+		FROM Project,Customer WHERE Project.id=$(id) AND Project.customerid = Customer.id;
 END
 
 --  Not very efficient search :-)
@@ -133,13 +135,19 @@ BEGIN
 	FOREACH pattern DO INSERT INTO tmpSearchProjectResult SELECT id FROM Project
 		WHERE name LIKE '%$(.)%'
 		OR description LIKE '%$(.)%';
-	INTO project DO SELECT * FROM Project WHERE id IN (SELECT DISTINCT id FROM tmpSearchProjectResult);
+	INTO project DO
+		SELECT Project.id,Project.customerid,Customer.name AS customername,Project.name,Project.description
+		FROM Project,Customer
+		WHERE Project.customerid = Customer.id
+		AND Project.id IN (SELECT DISTINCT id FROM tmpSearchProjectResult);
 	DO DROP TABLE tmpSearchProjectResult;
 END
 
 TRANSACTION ListProject
 BEGIN
-	INTO project DO SELECT * FROM Project;
+	INTO project DO SELECT Project.id,Project.customerid,Customer.name AS customername,Project.name,Project.description
+		FROM Project,Customer
+		WHERE Project.customerid = Customer.id;
 END
 
 

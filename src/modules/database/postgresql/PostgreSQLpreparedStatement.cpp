@@ -43,7 +43,6 @@
 #include <stdexcept>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
-#undef LOWLEVEL_DEBUG
 
 using namespace _Wolframe;
 using namespace _Wolframe::db;
@@ -111,9 +110,7 @@ bool PreparedStatementHandler_postgres::status( PGresult* res, State newstate)
 
 bool PreparedStatementHandler_postgres::begin()
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL begin()" << std::endl;
-#endif
+	LOG_TRACE << "[postgresql statement] CALL begin()";
 	if (m_state != Init)
 	{
 		return errorStatus( std::string( "call of begin not allowed in state '") + stateName(m_state) + "'");
@@ -123,9 +120,7 @@ bool PreparedStatementHandler_postgres::begin()
 
 bool PreparedStatementHandler_postgres::commit()
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL commit()" << std::endl;
-#endif
+	LOG_TRACE << "[postgresql statement] CALL commit()";
 	if (m_state == Transaction)
 	{
 		LOG_WARNING << "executed transaction is empty";
@@ -139,9 +134,7 @@ bool PreparedStatementHandler_postgres::commit()
 
 bool PreparedStatementHandler_postgres::rollback()
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL rollback()" << std::endl;
-#endif
+	LOG_TRACE << "[postgresql statement] CALL rollback()";
 	return status( PQexec( m_conn, "ROLLBACK;"), Init);
 }
 
@@ -157,9 +150,7 @@ bool PreparedStatementHandler_postgres::errorStatus( const std::string& message)
 
 bool PreparedStatementHandler_postgres::start( const std::string& stmname)
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL start (" << stmname << ")" << std::endl;
-#endif
+	LOG_TRACE << "[postgresql statement] CALL start (" << stmname << ")";
 	if (m_state == Executed || m_state == Prepared)
 	{
 		m_state = Transaction;
@@ -181,16 +172,14 @@ bool PreparedStatementHandler_postgres::start( const std::string& stmname)
 
 bool PreparedStatementHandler_postgres::bind( std::size_t idx, const char* value)
 {
-#ifdef LOWLEVEL_DEBUG
 	if (value)
 	{
-		std::cerr << "CALL bind( " << idx << ", '" << value << "' )" << std::endl;
+		LOG_TRACE << "[postgresql statement] CALL bind( " << idx << ", '" << value << "' )";
 	}
 	else
 	{
-		std::cerr << "CALL bind( " << idx << ", NULL)" << std::endl;
+		LOG_TRACE << "[postgresql statement] CALL bind( " << idx << ", NULL)";
 	}
-#endif
 	if (m_state != Prepared && m_state != Executed)
 	{
 		return errorStatus( std::string( "call of bind not allowed in state '") + stateName(m_state) + "'");
@@ -237,9 +226,7 @@ bool PreparedStatementHandler_postgres::execute()
 		m_lastresult = 0;
 	}
 	std::string stmstr = m_statement.expanded();
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL execute(" << stmstr << ")" << std::endl;
-#endif
+	LOG_TRACE << "[postgresql statement] CALL execute(" << stmstr << ")";
 	m_lastresult = PQexec( m_conn, stmstr.c_str());
 
 	bool rt = status( m_lastresult, Executed);
@@ -293,9 +280,7 @@ const char* PreparedStatementHandler_postgres::getLastError()
 
 const char* PreparedStatementHandler_postgres::get( std::size_t idx)
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL get(" << idx << ")" << std::endl;
-#endif
+	LOG_TRACE << "[postgresql statement] CALL get(" << idx << ")";
 	if (m_state != Executed)
 	{
 		errorStatus( std::string( "inspect command result not possible in state '") + stateName(m_state) + "'");
@@ -320,9 +305,7 @@ const char* PreparedStatementHandler_postgres::get( std::size_t idx)
 
 bool PreparedStatementHandler_postgres::next()
 {
-#ifdef LOWLEVEL_DEBUG
-	std::cerr << "CALL next()" << std::endl;
-#endif
+	LOG_TRACE << "[postgresql statement] CALL next()";
 	if (m_state != Executed)
 	{
 		errorStatus( std::string( "get next command result not possible in state '") + stateName(m_state) + "'");

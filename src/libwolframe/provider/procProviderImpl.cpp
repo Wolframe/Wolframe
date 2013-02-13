@@ -329,16 +329,19 @@ const langbind::NormalizeFunction* ProcessorProvider::ProcessorProvider_Impl::no
 
 const langbind::FormFunction* ProcessorProvider::ProcessorProvider_Impl::formFunction( const std::string& name) const
 {
+	LOG_TRACE << "[provider] get function '" << name << "'";
 	return m_programs->getFormFunction( name);
 }
 
 const ddl::Form* ProcessorProvider::ProcessorProvider_Impl::form( const std::string& name) const
 {
+	LOG_TRACE << "[provider] get form '" << name << "'";
 	return m_programs->getForm( name);
 }
 
 langbind::Filter* ProcessorProvider::ProcessorProvider_Impl::filter( const std::string& name, const std::string& arg) const
 {
+	LOG_TRACE << "[provider] get filter '" << name << "(" << arg << ")'";
 	return m_programs->createFilter( name, arg);
 }
 
@@ -357,6 +360,7 @@ cmdbind::CommandHandler* ProcessorProvider::ProcessorProvider_Impl::cmdhandler( 
 
 cmdbind::IOFilterCommandHandler* ProcessorProvider::ProcessorProvider_Impl::iofilterhandler( const std::string& command ) const
 {
+	LOG_TRACE << "[provider] get iofilter command handler '" << command << "'";
 	cmdbind::CommandHandler* hnd = cmdhandler( command);
 	if (!hnd) return NULL;
 	return dynamic_cast<cmdbind::IOFilterCommandHandler*>( hnd);
@@ -384,8 +388,10 @@ db::Database* ProcessorProvider::ProcessorProvider_Impl::transactionDatabase( bo
 db::Transaction* ProcessorProvider::ProcessorProvider_Impl::transaction( const std::string& name ) const
 {
 	if ( m_db )
+	{
+		LOG_TRACE << "[provider] get transaction '" << name << "'";
 		return m_db->transaction( name );
-	else	{
+	} else	{
 		LOG_ALERT << "No database defined for the processor provider";
 		return NULL;
 	}

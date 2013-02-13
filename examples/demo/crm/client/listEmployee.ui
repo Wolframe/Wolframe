@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CustomerList</class>
- <widget class="QWidget" name="CustomerList">
+ <class>EmployeeList</class>
+ <widget class="QWidget" name="EmployeeList">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>664</width>
-    <height>332</height>
+    <width>607</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,15 +15,15 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="1">
-    <widget class="QTreeWidget" name="customer">
+    <widget class="QTreeWidget" name="employee">
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
      <property name="rootelement" stdset="0">
-      <string>customer</string>
+      <string>employee</string>
      </property>
      <property name="doctype" stdset="0">
-      <string>ListCustomer</string>
+      <string>ListEmployee</string>
      </property>
      <column>
       <property name="text">
@@ -32,7 +32,7 @@
      </column>
      <column>
       <property name="text">
-       <string>description</string>
+       <string>status</string>
       </property>
      </column>
      <column>
@@ -79,34 +79,34 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="NavAddCustomer">
+       <widget class="QPushButton" name="NavAddEmployee">
         <property name="text">
          <string>Add</string>
         </property>
         <property name="form" stdset="0">
-         <string>addCustomer</string>
+         <string>addEmployee</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="NavDeleteCustomer">
+       <widget class="QPushButton" name="NavDeleteEmployee">
         <property name="text">
          <string>Delete</string>
         </property>
         <property name="form" stdset="0">
-         <string>listCustomer</string>
+         <string>listEmployee</string>
         </property>
         <property name="doctype" stdset="0">
-         <string notr="true">DeleteCustomer.simpleform</string>
+         <string notr="true">DeleteEmployee.simpleform</string>
         </property>
         <property name="rootelement" stdset="0">
-         <string notr="true">customer</string>
+         <string notr="true">employee</string>
         </property>
         <property name="id" stdset="0">
-         <string>{customer.id}</string>
+         <string>{employee.id}</string>
         </property>
-        <property name="global.customer.State" stdset="0">
-         <string notr="true">{customer.state}</string>
+        <property name="global.employee.State" stdset="0">
+         <string notr="true">{employee.state}</string>
         </property>
         <property name="action" stdset="0">
          <string>Request</string>
@@ -114,24 +114,24 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="NavEditCustomer">
+       <widget class="QPushButton" name="NavEditEmpoyee">
         <property name="text">
          <string>Edit</string>
         </property>
         <property name="form" stdset="0">
-         <string>editCustomer</string>
+         <string>editEmployee</string>
         </property>
         <property name="doctype" stdset="0">
-         <string notr="true">GetCustomer.simpleform</string>
+         <string notr="true">GetEmployee.simpleform</string>
         </property>
         <property name="rootelement" stdset="0">
-         <string notr="true">customer</string>
+         <string notr="true">employee</string>
         </property>
         <property name="id" stdset="0">
-         <string>{customer.id}</string>
+         <string>{employee.id}</string>
         </property>
-        <property name="global.customer.State" stdset="0">
-         <string notr="true">{customer.state}</string>
+        <property name="global.employee.State" stdset="0">
+         <string notr="true">{employee.state}</string>
         </property>
         <property name="action" stdset="0">
          <string>Request</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CustomerList</class>
- <widget class="QWidget" name="CustomerList">
+ <class>ProjectList</class>
+ <widget class="QWidget" name="ProjectList">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,15 +15,15 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="1">
-    <widget class="QTreeWidget" name="customer">
+    <widget class="QTreeWidget" name="project">
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
      <property name="rootelement" stdset="0">
-      <string>customer</string>
+      <string>project</string>
      </property>
      <property name="doctype" stdset="0">
-      <string>ListCustomer</string>
+      <string>ListProject</string>
      </property>
      <column>
       <property name="text">
@@ -37,27 +37,7 @@
      </column>
      <column>
       <property name="text">
-       <string>addr_line1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>addr_line2</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>addr_postalcode</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>addr_district</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>addr_country</string>
+       <string>customername</string>
       </property>
      </column>
     </widget>
@@ -79,34 +59,34 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="NavAddCustomer">
+       <widget class="QPushButton" name="NavAddProject">
         <property name="text">
          <string>Add</string>
         </property>
         <property name="form" stdset="0">
-         <string>addCustomer</string>
+         <string>addProject</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="NavDeleteCustomer">
+       <widget class="QPushButton" name="NavDeleteProject">
         <property name="text">
          <string>Delete</string>
         </property>
         <property name="form" stdset="0">
-         <string>listCustomer</string>
+         <string>listProject</string>
         </property>
         <property name="doctype" stdset="0">
-         <string notr="true">DeleteCustomer.simpleform</string>
+         <string notr="true">DeleteProject.simpleform</string>
         </property>
         <property name="rootelement" stdset="0">
-         <string notr="true">customer</string>
+         <string notr="true">project</string>
         </property>
         <property name="id" stdset="0">
-         <string>{customer.id}</string>
+         <string>{project.id}</string>
         </property>
-        <property name="global.customer.State" stdset="0">
-         <string notr="true">{customer.state}</string>
+        <property name="global.project.State" stdset="0">
+         <string notr="true">{project.state}</string>
         </property>
         <property name="action" stdset="0">
          <string>Request</string>
@@ -114,24 +94,24 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="NavEditCustomer">
+       <widget class="QPushButton" name="NavEditProject">
         <property name="text">
          <string>Edit</string>
         </property>
         <property name="form" stdset="0">
-         <string>editCustomer</string>
+         <string>editProject</string>
         </property>
         <property name="doctype" stdset="0">
-         <string notr="true">GetCustomer.simpleform</string>
+         <string notr="true">GetProject.simpleform</string>
         </property>
         <property name="rootelement" stdset="0">
-         <string notr="true">customer</string>
+         <string notr="true">project</string>
         </property>
         <property name="id" stdset="0">
-         <string>{customer.id}</string>
+         <string>{project.id}</string>
         </property>
-        <property name="global.customer.State" stdset="0">
-         <string notr="true">{customer.state}</string>
+        <property name="global.project.State" stdset="0">
+         <string notr="true">{project.state}</string>
         </property>
         <property name="action" stdset="0">
          <string>Request</string>

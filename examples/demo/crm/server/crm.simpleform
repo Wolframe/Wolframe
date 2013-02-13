@@ -32,7 +32,7 @@ Form DeleteEmployee	{ employee { id !@ID } }
 Form GetEmployee	{ employee { id !@ID } }
 Form EmployeeResult	{ employee { _ EmployeeInserted } }
 Form EmployeeListResult	{ employees { employee EmployeeInserted[] } }
-Form SearchEmployee	{ employee { _ IDHACK patern string } }
+Form SearchEmployee	{ employee { _ IDHACK pattern string } }
 Form ListEmployee	{ employee { _ IDHACK } }
 
 
@@ -76,7 +76,7 @@ Form CustomerNote
 {
 	customerid	!@ID
 	content		string
-	link		?@URI
+	link		?URI
 }
 
 Form CustomerNoteInserted
@@ -128,8 +128,9 @@ Form CustomerNoteListResult
 Form Project
 {
 	customerid	!@ID
+	customername	?entityname
 	name		entityname
-	description	?@string
+	description	?string
 }
 
 Form ProjectInserted
@@ -165,7 +166,7 @@ Form ProjectNote
 {
 	projectid	!@ID
 	content		string
-	link		?@URI
+	link		?URI
 }
 
 Form ProjectNoteInserted
@@ -216,7 +217,7 @@ Form ProjectNoteListResult
 Form ActivityCategory
 {
 	name		entityname
-	description	?@string
+	description	?string
 }
 
 Form ActivityCategoryInserted
@@ -332,7 +333,7 @@ Form ActivityNote
 {
 	activityid	!@ID
 	content		string
-	link		?@URI
+	link		?URI
 }
 
 Form ActivityNoteInserted
