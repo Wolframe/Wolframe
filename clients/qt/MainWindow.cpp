@@ -269,9 +269,6 @@ void MainWindow::initialize( )
 	connect( m_formLoader, SIGNAL( formListLoaded( QStringList ) ),
 		this, SLOT( formListLoaded( QStringList ) ) );
 
-// set default language to the system language
-	m_currentLanguage = m_language;
-
 // create central widget, either as MDI area or as one form widget
 	if( settings.mdi ) {
 		m_mdiArea = findChild<QMdiArea *>( "centralWidget" );
@@ -328,7 +325,7 @@ void MainWindow::initialize( )
 	loadLanguages( );
 
 // load language resources, repaints the whole interface if necessary
-	loadLanguage( m_currentLanguage );
+	loadLanguage( m_language );
 }
 
 void MainWindow::CreateFormWidget( const QString &name )
@@ -341,6 +338,7 @@ void MainWindow::CreateFormWidget( const QString &name )
 		this, SLOT( formError( QString ) ) );
 		
 	setCentralWidget( m_formWidget );
+	m_formWidget->setLanguage( m_language );
 		
 	loadForm( name );
 }
@@ -554,7 +552,7 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 		action->setCheckable( true );
 		action->setData( QVariant( language ) );
 		languageGroup->addAction( action );
-		if( language == m_currentLanguage ) action->setChecked( true );
+		if( language == m_language ) action->setChecked( true );
 	}
 	languageMenu->addActions( languageGroup->actions( ) );
 	connect( languageGroup, SIGNAL( triggered( QAction * ) ), this, SLOT( languageSelected( QAction * ) ) );
@@ -563,7 +561,7 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 void MainWindow::languageSelected( QAction *action )
 {
 	QString language = action->data( ).toString( );
-	if( language != m_currentLanguage )
+	if( language != m_language )
 		loadLanguage( language );
 }
 
@@ -600,7 +598,7 @@ void MainWindow::loadLanguage( QString language )
 		}
 	}
 
-	m_currentLanguage = language;
+	m_language = language;
 }
 
 void MainWindow::changeEvent( QEvent* _event )
@@ -870,6 +868,7 @@ QMdiSubWindow *MainWindow::CreateMdiSubWindow( const QString &form )
 
 	m_formWidget = formWidget; // ugly dirty hack, must ammend later
 	formWidget->show( );
+	formWidget->setLanguage( m_language );
 	loadForm( form );
 
 	mdiSubWindow->resize( mdiSubWindow->sizeHint( ) );

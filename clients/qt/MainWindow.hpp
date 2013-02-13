@@ -74,7 +74,6 @@ class MainWindow : public QMainWindow
 		FormLoader *m_formLoader;	// form loader (visible form)
 		DataLoader *m_dataLoader;	// load and saves data (data form)
 		WolframeClient *m_wolframeClient; // the client protocol class
-		QString m_currentLanguage;	// code of the current interface language
 		LoginDialog *m_loginDialog;	// the login dialog
 		QString m_settings;		// file to read settings from
 		QStringList m_languages;	// available interface translations
