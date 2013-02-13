@@ -25,7 +25,7 @@ endif
 
 run-sqlite:
 	@echo "Running the Wolframe server..."
-	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe-sqlite.conf -f -d DEBUG
+	@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(TOPDIR)/src/wolframed -c wolframe-sqlite.conf -f
 
 run-postgres:
 	@echo "Running the Wolframe server..."

@@ -68,14 +68,18 @@ class FormWidget : public QWidget
 	public:		
 		FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoader *_uiLoader, QWidget *_parent = 0, bool _debug = false );
 		virtual ~FormWidget( );
-		void loadForm( QString name );
-		void loadLanguage( QString language );
+		void loadForm( QString name, bool modal = false );
+		void setLocale( QLocale locale );
+		void setLanguage( QString language );
 	
 	public:
 		QString form( ) const;
 		QIcon getWindowIcon( ) const;
 
 		void restoreFromGlobals( QHash<QString, QString> *props );
+		
+		QHash<QString, QString> *globals( ) const;
+		void setGlobals( QHash<QString, QString> *_globals );
 		
 		static QString readDynamicStringProperty( QObject *o, const char *name );
 		static void writeDynamicStringProperty( QObject *o, const char *name, const QString &value );
@@ -101,6 +105,7 @@ class FormWidget : public QWidget
 		QHash<QString, QString> *m_props; // HACK to communicate props between signal and slot
 		bool m_debug;
 		QTranslator m_translator;	// contains the translations for the current form
+		bool m_modal;
 		
 	private:
 		void initialize( );
@@ -109,10 +114,12 @@ class FormWidget : public QWidget
 	
 	signals:
 		void formLoaded( QString name );
+		void formModal( QString m_form );
 		void error( QString error );
 		void closed( );
 	
 	protected:
+		void changeEvent( QEvent *_event );
 		void closeEvent( QCloseEvent *e );
 
 	private slots:

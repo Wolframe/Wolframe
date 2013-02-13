@@ -27,8 +27,6 @@ now:
   - resizing issues: example view picture when picture list window is quite small
 
 musts:
-- form loader
-  - refactor, especially load the language in formwidget, not in main window!
 - file UI and data mode
   - resizing issues
 - multi-language support
