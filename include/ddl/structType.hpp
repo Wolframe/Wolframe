@@ -274,6 +274,10 @@ public:
 	///\param[in] indent indentiation for items to print
 	void print( std::ostream& out, size_t indent=0) const;
 
+	///\brief Print structure description for user interface to out
+	///\param[out] out output stream to print to
+	void printDescriptionUI( std::ostream& out) const;
+
 	///\brief Reset the value
 	void clear();
 
@@ -393,6 +397,7 @@ public:
 	}
 
 	void print( std::ostream& out, size_t level=0) const;
+	void printDescriptionUI( std::ostream& out) const;
 
 private:
 	std::string m_name;

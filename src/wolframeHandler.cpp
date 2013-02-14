@@ -182,7 +182,7 @@ void wolframeConnection::setPeer( const net::RemoteEndpoint& remote )
 	}
 }
 
-static void logNetworkWrite( const void* ptr, std::size_t size)
+static void logNetwork( const char* title, const void* ptr, std::size_t size)
 {
 	static const char hex[17] = "0123456789abcdef";
 	std::size_t ii,blkidx;
@@ -218,7 +218,7 @@ static void logNetworkWrite( const void* ptr, std::size_t size)
 		idxstr.push_back( hex[ (blkidx % 256) / 16]);
 		idxstr.push_back( hex[ (blkidx % 256) % 16]);
 
-		LOG_DATA << "[conn write " << idxstr << "] " << chrblk << " " << hexblk;
+		LOG_DATA << "[" << title << " " << idxstr << "] " << chrblk << " - " << hexblk;
 	}
 }
 
@@ -286,7 +286,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 						m_cmdHandler.getOutput( outpp, outppsize);
 						if ( _Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA)
 						{
-							logNetworkWrite( outpp, outppsize);
+							logNetwork( "conn write", outpp, outppsize);
 						}
 						return net::SendData( outpp, outppsize);
 
@@ -306,11 +306,15 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 /// Parse incoming data..
 void wolframeConnection::networkInput( const void* begin, std::size_t bytesTransferred )
 {
+	LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
+	if ( _Wolframe::log::LogBackend::instance().minLogLevel() <= _Wolframe::log::LogLevel::LOGLEVEL_DATA)
+	{
+		logNetwork( "conn read", begin, bytesTransferred);
+	}
 	if ( m_state == COMMAND_HANDLER )	{
 		m_cmdHandler.putInput( begin, bytesTransferred );
 	}
 	else	{
-		LOG_DATA << "network Input: Read " << bytesTransferred << " bytes";
 		m_dataSize += bytesTransferred;
 	}
 }
