@@ -63,7 +63,7 @@ void NetworkDataLoader::request( QString windowName, QString formName, QString w
 	}
 	
 	if( !props->contains( "action" ) ) {
-		handleRequest( windowName, formName, widgetName, props );
+		handleRequest( windowName, formName, widgetName, xml, props );
 		return;
 	}
 
@@ -275,41 +275,46 @@ void NetworkDataLoader::handleDomainDataLoad( QString windowName, QString formNa
 	m_wolframeClient->request( mapAction( action ), data );
 }
 
-void NetworkDataLoader::handleRequest( QString windowName, QString formName, QString widgetName, QHash<QString, QString> *props )
+void NetworkDataLoader::handleRequest( QString windowName, QString formName, QString widgetName, QString data, QHash<QString, QString> *props )
 {
-	QString rootElement = props->value( "rootelement" );
 	QString docType = props->value( "doctype" );
-	QByteArray data;
-	QXmlStreamWriter xml( &data );
+
+// the data handler didn't compose the request yet: do it here. This is the
+// case for domain reads (hack)	
+	if( data.isEmpty( ) ) {
+		QString rootElement = props->value( "rootelement" );
+		QByteArray buffer;
+		QXmlStreamWriter xml( &buffer );
 
 // pretty-printing only in debug mode (because of superfluous
 // white spaces sent to server)
-	if( m_debug ) {
-		xml.setAutoFormatting( true );
-		xml.setAutoFormattingIndent( 2 );
-	}
+		if( m_debug ) {
+			xml.setAutoFormatting( true );
+			xml.setAutoFormattingIndent( 2 );
+		}
 
-	qDebug( ) << "XXX:" << widgetName << *props;
-
-	xml.writeStartDocument( );
-	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
-	xml.writeStartElement( rootElement );
-	foreach( QString key, props->keys( ) ) {
+		xml.writeStartDocument( );
+		xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
+		xml.writeStartElement( rootElement );
+		foreach( QString key, props->keys( ) ) {
 // skip _q_ dynamic properties, they are used by the Qt stylesheet engine
-		if( key.startsWith( "_q_" ) ) continue;
+			if( key.startsWith( "_q_" ) ) continue;
 // skip globals
-		if( key.startsWith( "global." ) ) continue;
+			if( key.startsWith( "global." ) ) continue;
 // ignore our own actions
-		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
-		xml.writeAttribute( key, props->value( key ) );
-	}
+			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
+			xml.writeAttribute( key, props->value( key ) );
+		}
 // assuming the root element has always id, was used for trees in configurator, deemed
 // deprecated as we get the whole domain or we'll pass a parameter like 'id', 'search'
 // explicitly
-//	xml.writeAttribute( "id", "1" );
-	xml.writeEndElement( );
-	xml.writeEndDocument( );
-
+		xml.writeAttribute( "id", "1" );
+		xml.writeEndElement( );
+		xml.writeEndDocument( );
+		
+		data = buffer;
+	}
+	
 	qDebug( ) << "new style network request"<< formName << widgetName << ":\n" << data;
 
 // what doctype do we expect in the answer?

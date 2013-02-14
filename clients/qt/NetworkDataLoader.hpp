@@ -57,7 +57,7 @@ class NetworkDataLoader : public DataLoader
 		void handleUpdate( QString windowName, QString name, QByteArray data, QHash<QString, QString> *props );
 		void handleDelete( QString windowName, QString name, QHash<QString, QString> *props );
 		void handleDomainDataLoad( QString windowName, QString formName, QString widgetName, QHash<QString, QString> *props );
-		void handleRequest( QString windowName, QString formName, QString widgetName, QHash<QString, QString> *props );
+		void handleRequest( QString windowName, QString formName, QString widgetName, QString xml, QHash<QString, QString> *props );
 		QString mapAction( QString action );
 		QString mapDoctype( QString action, bool domain, QString docType );
 		

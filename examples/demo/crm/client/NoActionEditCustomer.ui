@@ -113,7 +113,7 @@
     </widget>
    </item>
    <item row="6" column="1">
-    <widget class="QLineEdit" name="addr_country"/>
+    <widget class="QLineEdit" name="addr_district"/>
    </item>
    <item row="7" column="0">
     <widget class="QLabel" name="label_addr_country">
@@ -121,7 +121,7 @@
       <string>Address Country:</string>
      </property>
      <property name="buddy">
-      <cstring>addr_country</cstring>
+      <cstring>addr_district</cstring>
      </property>
     </widget>
    </item>
