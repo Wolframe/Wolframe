@@ -8,7 +8,7 @@
 		prepare the server:
 		<programlisting language='shell'>
 	LoadModules {
-		module /usr/lib/wolframe/modules/mod_db_sqlite3.so
+		module mod_db_sqlite3
 	}
 		</programlisting>
 	</para>
@@ -64,7 +64,7 @@
 		<programlisting language='shell'>
 	LoadModules {
 		..
-		module /usr/lib/wolframe/modules/mod_filter_libxml2.so
+		module mod_filter_libxml2
 		..
 	}
 		</programlisting>
@@ -85,8 +85,8 @@
 		<programlisting language='shell'>
 	..
 	Module files to load:
- 	  /usr/lib/wolframe/modules/mod_db_sqlite3.so
-	  /usr/lib/wolframe/modules/mod_filter_libxml2.so
+ 	  /usr/lib/wolframe/modules/mod_db_sqlite3
+	  /usr/lib/wolframe/modules/mod_filter_libxml2
 	..
 		</programlisting>
 		which looks ok.
@@ -99,7 +99,7 @@
 		<programlisting language='shell'>
 	LoadModules {
 		..
-		module /usr/lib/wolframe/modules/mod_command_directmap.so
+		module mod_command_directmap
 		..
 	}
 		</programlisting>
@@ -153,7 +153,7 @@
 		<programlisting language='shell'>
 	LoadModules {
 		..
-		module /usr/lib/wolframe/modules/mod_ddlcompiler_simpleform.so
+		module mod_ddlcompiler_simpleform
 	}
 
 	Processor {

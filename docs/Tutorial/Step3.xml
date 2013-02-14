@@ -18,7 +18,7 @@
 		
 	<para>
 		First define your connection by selecting "Manage Connections" in
-		the "Connection" menu. Define a new connection called "local"
+		the "Connection" menu. Define a new connection called "tutorial"
 		which connects to server "localhost" on port 7661. Leave the
 		SSL connection unchecked.
 	</para>
@@ -39,25 +39,15 @@
 		our start form in the Qt designer first. For now we just
 		click away the error message.
 	</para>
-			
-	<para>
-		We get an empty window, we can go to "Help", "Debug Terminal". Also
-		here we can test the protocol as in a telnet client.
-	</para>
-	
-	<para>
-		Type <userinput>quit</userinput>, then <keycap>Enter</keycap>
-		in the debug window or exit the Qt application over the menu.
-	</para>
-	
+				
 	<para>
 		We start now the Qt designer and create an empty QWidget form named
 		<filename>~/tutorial/client/init.ui</filename> and save it.
 	</para>
 	
 	<para>
-		If we start the client now we see the same empty window again,
+		If we restart the client and login in we see the same empty window again,
 		but this time it's the dynamically loaded initial form
-		(which is again empty). And the previous error message disappeared.
+		(which is again empty). The previous error message disappeared.
 	</para>
 </sect1>

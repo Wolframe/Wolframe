@@ -80,6 +80,8 @@ void NetworkDataLoader::request( QString windowName, QString formName, QString w
 		handleUpdate( windowName, formName, xml, props );
 	} else if( action == "delete" ) {
 		handleDelete( windowName, formName, props );
+	} else if( action == "request" ) {
+		handleRequest( windowName, formName, widgetName, props );
 	} else {
 		qCritical( ) << "ERROR: unknown action for window" << windowName << "for form " << formName << " and widget " << widgetName;
 		return;
@@ -273,6 +275,10 @@ void NetworkDataLoader::handleDomainDataLoad( QString windowName, QString formNa
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, true, docType );
 	 
 	m_wolframeClient->request( mapAction( action ), data );
+}
+
+void NetworkDataLoader::handleRequest( QString windowName, QString formName, QString widgetName, QHash<QString, QString> *props )
+{
 }
 
 void NetworkDataLoader::gotAnswer( QStringList params, QString content )
