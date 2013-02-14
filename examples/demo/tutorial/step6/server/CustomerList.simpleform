@@ -2,5 +2,11 @@ FORM CustomerList
 {
 	list
 	{
+		customer []
+		{
+			id !@string
+			name string
+			address string
+		}
 	}
 }
