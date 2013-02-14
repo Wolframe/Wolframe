@@ -221,6 +221,9 @@
        <property name="category_id" stdset="0">
         <string>{category.id}</string>
        </property>
+       <property name="action" stdset="0">
+        <string notr="true">read</string>
+       </property>
        <column>
         <property name="text">
          <string>name</string>
@@ -261,6 +264,9 @@
        </property>
        <property name="state" stdset="0">
         <string notr="true">{global.categoryState}</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">read</string>
        </property>
        <attribute name="headerDefaultSectionSize">
         <number>200</number>

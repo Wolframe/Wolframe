@@ -89,6 +89,9 @@
      <property name="state" stdset="0">
       <string notr="true">{global.componentState}</string>
      </property>
+     <property name="action" stdset="0">
+      <string notr="true">read</string>
+     </property>
      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
       <bool>true</bool>
      </attribute>
@@ -154,6 +157,9 @@
      <property name="state" stdset="0">
       <string notr="true">{global.categoryState}</string>
      </property>
+     <property name="action" stdset="0">
+      <string notr="true">read</string>
+     </property>
      <column>
       <property name="text">
        <string>category</string>
@@ -206,6 +212,9 @@
      </property>
      <property name="state" stdset="0">
       <string>{global.featureState}</string>
+     </property>
+     <property name="action" stdset="0">
+      <string notr="true">read</string>
      </property>
      <column>
       <property name="text">
@@ -380,6 +389,9 @@
      <property name="state" stdset="0">
       <string>{global.manufacturerState}</string>
      </property>
+     <property name="action" stdset="0">
+      <string notr="true">read</string>
+     </property>
      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
       <bool>true</bool>
      </attribute>
@@ -429,6 +441,9 @@
      </property>
      <property name="state" stdset="0">
       <string notr="true">{global.pictureState}</string>
+     </property>
+     <property name="action" stdset="0">
+      <string notr="true">read</string>
      </property>
      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
       <bool>true</bool>

@@ -28,6 +28,9 @@
      <property name="state" stdset="0">
       <string notr="true">{global.featureState}</string>
      </property>
+     <property name="action" stdset="0">
+      <string notr="true">read</string>
+     </property>
      <attribute name="headerDefaultSectionSize">
       <number>250</number>
      </attribute>

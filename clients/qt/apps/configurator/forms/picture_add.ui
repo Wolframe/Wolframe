@@ -109,6 +109,9 @@
       <property name="rootelement" stdset="0">
        <string>tag</string>
       </property>
+      <property name="action" stdset="0">
+       <string notr="true">read</string>
+      </property>
       <column>
        <property name="text">
         <string>tag</string>

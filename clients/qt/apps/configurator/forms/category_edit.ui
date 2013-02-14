@@ -91,6 +91,9 @@
      <property name="search" stdset="0">
       <string notr="true">{search.text}</string>
      </property>
+     <property name="action" stdset="0">
+      <string notr="true">read</string>
+     </property>
      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
       <bool>true</bool>
      </attribute>
