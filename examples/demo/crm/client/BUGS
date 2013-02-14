@@ -18,5 +18,13 @@ I found a login and could establish a connection, but the tutorial is not up to 
 ------ Reload main window without any form defined:
 ??? Unable to load form '', does it exist?
 
-
+--
+Use no action, not action='Request'
+--
+global.customerState instead of global.customer.State (global is a global
+widget it can't hold subobjects, only variables)
+--
+doctype should not have a 'xxxx.simpleform', the implementation of
+the doctype (simpleform,lua,..) should be hidden from the client!
+--
 

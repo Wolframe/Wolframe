@@ -25,6 +25,9 @@
      <property name="doctype" stdset="0">
       <string>ListCustomer</string>
      </property>
+     <property name="state" stdset="0">
+      <string>{global.customerState}</string>
+     </property>
      <column>
       <property name="text">
        <string>name</string>
@@ -105,11 +108,8 @@
         <property name="id" stdset="0">
          <string>{customer.id}</string>
         </property>
-        <property name="global.customer.State" stdset="0">
+        <property name="global.customerState" stdset="0">
          <string notr="true">{customer.state}</string>
-        </property>
-        <property name="action" stdset="0">
-         <string>Request</string>
         </property>
        </widget>
       </item>
@@ -130,7 +130,7 @@
         <property name="id" stdset="0">
          <string>{customer.id}</string>
         </property>
-        <property name="global.customer.State" stdset="0">
+        <property name="global.customerState" stdset="0">
          <string notr="true">{customer.state}</string>
         </property>
         <property name="action" stdset="0">
