@@ -87,7 +87,7 @@
          <string>Add</string>
         </property>
         <property name="form" stdset="0">
-         <string>addCustomer</string>
+         <string>NoActionAddCustomer</string>
         </property>
        </widget>
       </item>

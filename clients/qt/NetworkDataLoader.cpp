@@ -279,6 +279,29 @@ void NetworkDataLoader::handleRequest( QString windowName, QString formName, QSt
 {
 	QString rootElement = props->value( "rootelement" );
 	QString docType = props->value( "doctype" );
+	QByteArray data;
+	QXmlStreamWriter xml( &data );
+
+// pretty-printing only in debug mode (because of superfluous
+// white spaces sent to server)
+	if( m_debug ) {
+		xml.setAutoFormatting( true );
+		xml.setAutoFormattingIndent( 2 );
+	}
+
+	xml.writeStartDocument( );
+	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
+	xml.writeStartElement( rootElement );
+	xml.writeEndDocument( );
+
+	qDebug( ) << "new style network request"<< formName << widgetName << ":\n" << data;
+
+// what doctype do we expect in the answer?
+	m_map->insert( docType, qMakePair( formName, widgetName ) );
+
+	qDebug( ) << "MAP:" << docType << "new style request map";
+
+	m_wolframeClient->request( data );
 }
 
 void NetworkDataLoader::gotAnswer( QStringList params, QString content )

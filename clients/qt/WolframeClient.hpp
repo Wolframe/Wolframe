@@ -99,6 +99,7 @@ class WolframeClient : public QObject
 		void sendCommand( QString command );
 		void sendCommand( QString command, QStringList params );
 		void sendCommand( QString command, QStringList params, QString content );
+		void sendCommand( QString command, QString content );
 		void sendCommand( struct WolframeRequest );
 
 // high-level commands
@@ -106,6 +107,7 @@ class WolframeClient : public QObject
 		void auth( );
 		void mech( QString mech );
 		void request( QString type, QString content );
+		void request( QString content );
 
 // inquire status
 		bool isConnected( ) const;

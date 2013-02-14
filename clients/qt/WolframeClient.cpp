@@ -511,6 +511,11 @@ void WolframeClient::sendCommand( QString command )
 	sendCommand( command, QStringList( ), QString( ) );
 }
 
+void WolframeClient::sendCommand( QString command, QString content )
+{
+	sendCommand( command, QStringList( ), content );
+}
+
 void WolframeClient::capa( )
 {
 	sendCommand( "CAPA" );
@@ -533,6 +538,11 @@ void WolframeClient::request( QString type, QString content )
 	QStringList params;
 	params << type;
 	sendCommand( "REQUEST", params, content );
+}
+
+void WolframeClient::request( QString content )
+{
+	sendCommand( "REQUEST", content );
 }
 
 void WolframeClient::handleResult( )
