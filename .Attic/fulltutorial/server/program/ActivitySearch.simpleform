@@ -1,9 +1,0 @@
-FORM ActivitySearch
-{
-	activity
-	{
-		id ?@int
-		state ?@string
-		search ?@string
-	}
-}

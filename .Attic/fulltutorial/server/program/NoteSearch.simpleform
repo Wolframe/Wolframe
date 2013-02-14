@@ -1,9 +1,0 @@
-FORM NoteSearch
-{
-	note
-	{
-		id ?@int
-		searchCustomer ?@string
-		searchNote ?@string
-	}
-}

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE activity SYSTEM 'Activity.simpleform'>
-<activity form="Activity" id="1">
-  <name>Fussball</name>
-  <starttime>12:01:57</starttime>
-  <endtime>14:21:31</endtime>
-</activity>

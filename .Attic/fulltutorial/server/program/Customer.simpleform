@@ -1,9 +1,0 @@
-FORM Customer
-{
-	customer
-	{
-		id ?@int
-		name string
-		address string
-	}
-}

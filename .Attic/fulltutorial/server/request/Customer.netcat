@@ -1,8 +1,0 @@
-AUTH
-MECH NONE
-REQUEST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE customer SYSTEM 'Customer.simpleform'>
-<customer id="1"/>
-.
-CAPA
