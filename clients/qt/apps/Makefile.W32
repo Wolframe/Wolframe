@@ -1,6 +1,6 @@
 TOPDIR = ..\..\..
 
-SUBDIRS = testcases fulltutorial configurator
+SUBDIRS = testcases configurator
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\sub.mk
 

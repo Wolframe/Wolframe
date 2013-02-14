@@ -63,7 +63,7 @@ void NetworkDataLoader::request( QString windowName, QString formName, QString w
 	}
 	
 	if( !props->contains( "action" ) ) {
-		qCritical( ) << "FATAL: request impossible without action for form " << formName << " and widget " << widgetName;
+		handleRequest( windowName, formName, widgetName, props );
 		return;
 	}
 
@@ -80,8 +80,6 @@ void NetworkDataLoader::request( QString windowName, QString formName, QString w
 		handleUpdate( windowName, formName, xml, props );
 	} else if( action == "delete" ) {
 		handleDelete( windowName, formName, props );
-	} else if( action == "request" ) {
-		handleRequest( windowName, formName, widgetName, props );
 	} else {
 		qCritical( ) << "ERROR: unknown action for window" << windowName << "for form " << formName << " and widget " << widgetName;
 		return;
@@ -279,6 +277,8 @@ void NetworkDataLoader::handleDomainDataLoad( QString windowName, QString formNa
 
 void NetworkDataLoader::handleRequest( QString windowName, QString formName, QString widgetName, QHash<QString, QString> *props )
 {
+	QString rootElement = props->value( "rootelement" );
+	QString docType = props->value( "doctype" );
 }
 
 void NetworkDataLoader::gotAnswer( QStringList params, QString content )
