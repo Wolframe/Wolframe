@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>editCustomer</class>
+ <widget class="QWidget" name="editCustomer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>493</width>
+    <height>293</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Add Customer</string>
+  </property>
+  <property name="doctype" stdset="0">
+   <string notr="true">GetCustomer</string>
+  </property>
+  <property name="rootelement" stdset="0">
+   <string notr="true">customer</string>
+  </property>
+  <property name="id" stdset="0">
+   <string>{global.id}</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <item row="0" column="1">
+    <widget class="QLabel" name="editCustomerLabel">
+     <property name="text">
+      <string>Edit Customer..</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_name">
+     <property name="text">
+      <string>Name:</string>
+     </property>
+     <property name="buddy">
+      <cstring>name</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="name">
+     <property name="initialFocus" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_description">
+     <property name="text">
+      <string>Description:</string>
+     </property>
+     <property name="buddy">
+      <cstring>description</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPlainTextEdit" name="description"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_addr_line1">
+     <property name="text">
+      <string>Address Line 1:</string>
+     </property>
+     <property name="buddy">
+      <cstring>addr_line1</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="addr_line1"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_addr_line2">
+     <property name="text">
+      <string>Address Line 2:</string>
+     </property>
+     <property name="buddy">
+      <cstring>addr_line2</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="addr_line2"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_addr_postalcode">
+     <property name="text">
+      <string>Address Postal Code:</string>
+     </property>
+     <property name="buddy">
+      <cstring>addr_postalcode</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="addr_postalcode"/>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_addr_district">
+     <property name="text">
+      <string>Address District:</string>
+     </property>
+     <property name="buddy">
+      <cstring>addr_district</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLineEdit" name="addr_country"/>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_addr_country">
+     <property name="text">
+      <string>Address Country:</string>
+     </property>
+     <property name="buddy">
+      <cstring>addr_country</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="addr_country"/>
+   </item>
+   <item row="9" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="add">
+       <property name="text">
+        <string>Save</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">customer</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">UpdateCustomer.simpleform</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">NoActionListCustomer</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">NoActionListCustomer</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

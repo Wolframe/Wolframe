@@ -119,7 +119,7 @@
          <string>Edit</string>
         </property>
         <property name="form" stdset="0">
-         <string>editCustomer</string>
+         <string>NoActionEditCustomer</string>
         </property>
         <property name="doctype" stdset="0">
          <string notr="true">GetCustomer.simpleform</string>
@@ -132,9 +132,6 @@
         </property>
         <property name="global.customerState" stdset="0">
          <string notr="true">{customer.state}</string>
-        </property>
-        <property name="action" stdset="0">
-         <string>Request</string>
         </property>
        </widget>
       </item>
