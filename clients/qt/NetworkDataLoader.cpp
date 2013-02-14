@@ -303,8 +303,10 @@ void NetworkDataLoader::handleRequest( QString windowName, QString formName, QSt
 		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
 		xml.writeAttribute( key, props->value( key ) );
 	}
-// assuming the root element has always id 1
-	//xml.writeAttribute( "id", "1" );
+// assuming the root element has always id, was used for trees in configurator, deemed
+// deprecated as we get the whole domain or we'll pass a parameter like 'id', 'search'
+// explicitly
+//	xml.writeAttribute( "id", "1" );
 	xml.writeEndElement( );
 	xml.writeEndDocument( );
 

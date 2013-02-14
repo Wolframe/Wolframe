@@ -148,9 +148,6 @@
        <property name="form" stdset="0">
         <string notr="true">NoActionListCustomer</string>
        </property>
-       <property name="parentID" stdset="0">
-        <string notr="true">{global.id}</string>
-       </property>
       </widget>
      </item>
      <item>

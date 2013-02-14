@@ -139,8 +139,9 @@ void FormWidget::switchForm( QObject *object )
 
 	storeToGlobals( props );
 
-// execute the action (eventually)
-	if( props->contains( "action" ) ) {
+// execute the action (old style, action mandatory)
+// execute the action (new style request, doctype mandatory)
+	if( props->contains( "action" ) || props->contains( "doctype" ) ) {
 		sendRequest( props );
 	}
 	
@@ -363,10 +364,15 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	m_dataHandler->resetFormData( m_ui );
 	m_dataHandler->loadFormDomains( m_form, m_ui );
 
-// check for 'initAction'
+// check for 'initAction' (old style, explicit initAction on form element)
+// map it to action, execute request
 	if( props->contains( "initAction" ) ) {
 		QString initAction = props->value( "initAction" );
 		props->insert( "action", initAction );
+		sendRequest( props );
+	}
+// new style: 'doctype' on form widget, execute loading request
+	if( props->contains( "doctype" ) ) {
 		sendRequest( props );
 	}
 
@@ -378,7 +384,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		
 void FormWidget::sendRequest( QHash<QString, QString> *props )
 {
-	qDebug( ) << "Handling reguest for form " << m_form << "[" << *props << "]";
+	qDebug( ) << "Handling request for form " << m_form << "[" << *props << "]";
 
 // go trough the widgets of the form and construct the request XML
 	QByteArray xml;
