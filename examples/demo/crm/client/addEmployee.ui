@@ -145,14 +145,8 @@
        <property name="doctype" stdset="0">
         <string notr="true">InsertEmployee.simpleform</string>
        </property>
-       <property name="action" stdset="0">
-        <string notr="true">Request</string>
-       </property>
        <property name="form" stdset="0">
         <string notr="true">listEmployee</string>
-       </property>
-       <property name="parentID" stdset="0">
-        <string notr="true">{global.id}</string>
        </property>
       </widget>
      </item>

@@ -1,43 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>addProject</class>
- <widget class="QWidget" name="addProject">
+ <class>project</class>
+ <widget class="QWidget" name="project">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>493</width>
-    <height>271</height>
+    <height>315</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Add Project</string>
+   <string>Edit Project</string>
+  </property>
+  <property name="doctype" stdset="0">
+   <string>GetProject</string>
+  </property>
+  <property name="rootelement" stdset="0">
+   <string>project</string>
+  </property>
+  <property name="id" stdset="0">
+   <string>{global.project.id}</string>
+  </property>
+  <property name="dataelement" stdset="0">
+   <string>id</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
    <item row="0" column="1">
-    <widget class="QLabel" name="addProjectLabel">
+    <widget class="QLabel" name="editProjectLabel">
      <property name="text">
-      <string>Add Project..</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_projetid">
-     <property name="text">
-      <string>Project:</string>
-     </property>
-     <property name="buddy">
-      <cstring>projectid</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="projectid">
-     <property name="initialFocus" stdset="0">
-      <bool>true</bool>
+      <string>Edit Project..</string>
      </property>
     </widget>
    </item>
@@ -48,6 +43,23 @@
      </property>
      <property name="buddy">
       <cstring>name</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="projectid">
+     <property name="initialFocus" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_name">
+     <property name="text">
+      <string>Project:</string>
+     </property>
+     <property name="buddy">
+      <cstring>projectid</cstring>
      </property>
     </widget>
    </item>
@@ -65,7 +77,7 @@
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="QPlainTextEdit" name="description"/>
+    <widget class="QLineEdit" name="description"/>
    </item>
    <item row="5" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -83,18 +95,21 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="add">
+      <widget class="QPushButton" name="update">
        <property name="text">
-        <string>Add</string>
+        <string>Update</string>
        </property>
        <property name="rootelement" stdset="0">
         <string notr="true">project</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">InsertProject.simpleform</string>
+        <string notr="true">UpdateProject.simpleform</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">listProject</string>
+       </property>
+       <property name="id" stdset="0">
+        <string>{global.project.id}</string>
        </property>
       </widget>
      </item>
@@ -112,6 +127,24 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>customer</tabstop>
+  <tabstop>name</tabstop>
+  <tabstop>description</tabstop>
+ </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>name</sender>
+   <signal>returnPressed()</signal>
+   <receiver>description</receiver>
+   <slot>setFocus()</slot>
+  </connection>
+  <connection>
+   <sender>description</sender>
+   <signal>returnPressed()</signal>
+   <receiver>update</receiver>
+   <slot>click()</slot>
+  </connection>
+ </connections>
 </ui>
