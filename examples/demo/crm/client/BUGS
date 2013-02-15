@@ -27,4 +27,24 @@ widget it can't hold subobjects, only variables)
 doctype should not have a 'xxxx.simpleform', the implementation of
 the doctype (simpleform,lua,..) should be hidden from the client!
 --
+no action mode bugs:
 
+delete gets:
+<!DOCTYPE customer SYSTEM 'DeleteCustomer.simpleform'>
+<customer id="6">
+  <customer id="6">Z</customer>
+  <horizontalGroupBox/>
+</customer>
+
+this is because the rootelement and the customer list have the same
+name. The add case and update case need this, as the root element there
+must be 'customer' and the fields are the properties of 'customer'.
+
+so read/delete have the "only root, no mapping of subwidget"-semantics, as no data
+is being sent down to the server, only dedicated properties like 'id'
+as attributes of the root element.
+
+update/write have "root and subwidget as sub-elements" semantic.
+
+=> can't get rid of action/initAction in the current model without explicit
+   mapping of widget names to XML entitities
