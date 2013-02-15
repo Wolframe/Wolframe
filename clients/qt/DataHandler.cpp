@@ -85,6 +85,10 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			.arg( props->value( "rootelement" ) )
 			.arg( props->value( "doctype" ) ) );
 	}
+	QStringList dataElements;
+	if (props->contains( "dataelement")) {
+		dataElements = props->value( "dataelement").split( "," );
+	}
 	if( props->contains( "rootelement" ) ) {
 		xml.writeStartElement( props->value( "rootelement" ) );
 		foreach( QString key, props->keys( ) ) {
@@ -94,14 +98,22 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			if( key.startsWith( "global." ) ) continue;
 	// ignore our own actions
 			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
-			xml.writeAttribute( key, props->value( key ) );
-		}		
+			if (dataElements.empty())
+			{
+				xml.writeAttribute( key, props->value( key ) );
+			}
+			else if (dataElements.contains(key))
+			{
+				xml.writeAttribute( key, props->value( key ) );
+			}
+		}
 	} else {
 		xml.writeStartElement( form_name );
 	}
 	
-	writeWidgets( form, xml, props, &seen );
-
+	if (dataElements.empty()) {
+		writeWidgets( form, xml, props, &seen );
+	}
 	xml.writeEndElement( );
 	xml.writeEndDocument( );
 }

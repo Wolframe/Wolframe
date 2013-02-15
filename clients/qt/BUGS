@@ -92,3 +92,8 @@ $1 = (QWidget *) 0x0
 ---
 
 MDI: icons are not reset if UI doesn't contain a windowIcon? how to detect this?
+
+---
+No connection, because no server running. then trying to load form
+WARNING: QObject::connect: Cannot connect (null)::answer( QString, QString, QByteArray ) to FormWidget::gotAnswer( QString, QString, QByteArray )
+Segmentation fault (core dumped)

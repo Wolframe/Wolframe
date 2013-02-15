@@ -81,7 +81,7 @@ void NetworkDataLoader::request( QString windowName, QString formName, QString w
 	} else if( action == "delete" ) {
 		handleDelete( windowName, formName, props );
 	} else {
-		qCritical( ) << "ERROR: unknown action for window" << windowName << "for form " << formName << " and widget " << widgetName;
+		qCritical( ) << "ERROR: unknown action " << action << " for window" << windowName << "for form " << formName << " and widget " << widgetName;
 		return;
 	}	
 }
