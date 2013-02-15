@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>customer</class>
- <widget class="QWidget" name="customer">
+ <class>employee</class>
+ <widget class="QWidget" name="employee">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,16 +11,16 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Edit Customer</string>
+   <string>Edit Employee</string>
   </property>
   <property name="doctype" stdset="0">
-   <string>GetCustomer</string>
+   <string>GetEmployee</string>
   </property>
   <property name="rootelement" stdset="0">
-   <string>customer</string>
+   <string>employee</string>
   </property>
   <property name="id" stdset="0">
-   <string>{global.customer.id}</string>
+   <string>{global.employee.id}</string>
   </property>
   <property name="dataelement" stdset="0">
    <string>id</string>
@@ -30,9 +30,9 @@
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
    <item row="0" column="1">
-    <widget class="QLabel" name="editCustomerLabel">
+    <widget class="QLabel" name="editEmployeeLabel">
      <property name="text">
-      <string>Edit Customer..</string>
+      <string>Edit Employee..</string>
      </property>
     </widget>
    </item>
@@ -54,17 +54,17 @@
     </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QLabel" name="label_description">
+    <widget class="QLabel" name="label_status">
      <property name="text">
-      <string>Description:</string>
+      <string>Status:</string>
      </property>
      <property name="buddy">
-      <cstring>description</cstring>
+      <cstring>status</cstring>
      </property>
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QLineEdit" name="description"/>
+    <widget class="QLineEdit" name="status"/>
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_addr_line1">
@@ -152,16 +152,16 @@
         <string>Update</string>
        </property>
        <property name="rootelement" stdset="0">
-        <string notr="true">customer</string>
+        <string notr="true">employee</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">UpdateCustomer.simpleform</string>
+        <string notr="true">UpdateEmployee.simpleform</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">listCustomer</string>
+        <string notr="true">listEmployee</string>
        </property>
        <property name="id" stdset="0">
-        <string>{global.customer.id}</string>
+        <string>{global.employee.id}</string>
        </property>
       </widget>
      </item>
@@ -171,7 +171,7 @@
         <string>Cancel</string>
        </property>
        <property name="form" stdset="0">
-        <string notr="true">listCustomer</string>
+        <string notr="true">listEmployee</string>
        </property>
       </widget>
      </item>
@@ -181,7 +181,7 @@
  </widget>
  <tabstops>
   <tabstop>name</tabstop>
-  <tabstop>description</tabstop>
+  <tabstop>status</tabstop>
   <tabstop>addr_line1</tabstop>
   <tabstop>addr_line2</tabstop>
   <tabstop>addr_postalcode</tabstop>
@@ -193,11 +193,11 @@
   <connection>
    <sender>name</sender>
    <signal>returnPressed()</signal>
-   <receiver>description</receiver>
+   <receiver>status</receiver>
    <slot>setFocus()</slot>
   </connection>
   <connection>
-   <sender>description</sender>
+   <sender>status</sender>
    <signal>returnPressed()</signal>
    <receiver>addr_line1</receiver>
    <slot>setFocus()</slot>
