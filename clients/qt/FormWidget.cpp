@@ -390,8 +390,6 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 	QByteArray xml;
 	m_dataHandler->writeFormData( m_form, m_ui, &xml, props );
 	
-	qDebug( ) << "XXX: XML before sending in FormWidget\n" << xml;
-
 // HACK: m_props
 	m_props = props;
 
