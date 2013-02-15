@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>addCustomer</class>
- <widget class="QWidget" name="addCustomer">
+ <class>customer</class>
+ <widget class="QWidget" name="customer">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,16 +11,28 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Add Customer</string>
+   <string>Edit Customer</string>
+  </property>
+  <property name="doctype" stdset="0">
+   <string>GetCustomer</string>
+  </property>
+  <property name="rootelement" stdset="0">
+   <string>customer</string>
+  </property>
+  <property name="id" stdset="0">
+   <string>{global.customer.id}</string>
+  </property>
+  <property name="dataelement" stdset="0">
+   <string>id</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
    <item row="0" column="1">
-    <widget class="QLabel" name="addCustomerLabel">
+    <widget class="QLabel" name="editCustomerLabel">
      <property name="text">
-      <string>Add Customer..</string>
+      <string>Edit Customer..</string>
      </property>
     </widget>
    </item>
@@ -135,18 +147,21 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="add">
+      <widget class="QPushButton" name="update">
        <property name="text">
-        <string>Add</string>
+        <string>Update</string>
        </property>
        <property name="rootelement" stdset="0">
         <string notr="true">customer</string>
        </property>
        <property name="doctype" stdset="0">
-        <string notr="true">InsertCustomer.simpleform</string>
+        <string notr="true">UpdateCustomer.simpleform</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">listCustomer</string>
+       </property>
+       <property name="id" stdset="0">
+        <string>{global.customer.id}</string>
        </property>
       </widget>
      </item>

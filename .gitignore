@@ -83,6 +83,8 @@ tests/expect/primary.db
 clients/qt/qtclient
 clients/cmdline/wolframec
 moc_*.cpp
+clients/qt/ui_*.h
+clients/qt/qrc_*.cpp
 clients/qt/.history
 clients/Android/local.properties
 clients/Android/Wolframe.keystore
@@ -178,7 +180,9 @@ examples/demo/configurator/database/configurator.db-journal
 examples/demo/first/database/tree.db
 examples/demo/stress/database/stress.db
 examples/tutorial/database/sqlite.db
-wolframed.sh
+examples/demo/crm/client/.directory
+examples/demo/crm/client/.history
+examples/demo/crm/server/crm.db
 *.rcc
 *.gcno
 *.gcda
