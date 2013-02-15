@@ -503,7 +503,6 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *wi
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
 	FormWidget::readDynamicStringProperties( props, widget );
 	m_formWidget->restoreFromGlobals( props );
-	props->insert( "action", "read" );
 	QString window_name = QString::number( (int)m_formWidget->winId( ) );
 	if( clazz == "QComboBox" ) {
 		m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
