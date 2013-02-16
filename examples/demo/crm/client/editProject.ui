@@ -20,7 +20,7 @@
    <string>project</string>
   </property>
   <property name="id" stdset="0">
-   <string>{global.project.id}</string>
+   <string>{global.projectid}</string>
   </property>
   <property name="dataelement" stdset="0">
    <string>id</string>
@@ -47,7 +47,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QLineEdit" name="projectid">
+    <widget class="QLineEdit" name="customerid">
      <property name="initialFocus" stdset="0">
       <bool>true</bool>
      </property>
@@ -56,10 +56,10 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label_name">
      <property name="text">
-      <string>Project:</string>
+      <string>Customer:</string>
      </property>
      <property name="buddy">
-      <cstring>projectid</cstring>
+      <cstring>customerid</cstring>
      </property>
     </widget>
    </item>
@@ -109,7 +109,7 @@
         <string notr="true">listProject</string>
        </property>
        <property name="id" stdset="0">
-        <string>{global.project.id}</string>
+        <string>{global.projectid}</string>
        </property>
       </widget>
      </item>
@@ -128,12 +128,18 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>customer</tabstop>
+  <tabstop>customerid</tabstop>
   <tabstop>name</tabstop>
   <tabstop>description</tabstop>
  </tabstops>
  <resources/>
  <connections>
+  <connection>
+   <sender>customerid</sender>
+   <signal>returnPressed()</signal>
+   <receiver>name</receiver>
+   <slot>setFocus()</slot>
+  </connection>
   <connection>
    <sender>name</sender>
    <signal>returnPressed()</signal>

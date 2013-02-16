@@ -20,7 +20,7 @@
    <string>customer</string>
   </property>
   <property name="id" stdset="0">
-   <string>{global.customer.id}</string>
+   <string>{global.customerid}</string>
   </property>
   <property name="dataelement" stdset="0">
    <string>id</string>
@@ -161,7 +161,7 @@
         <string notr="true">listCustomer</string>
        </property>
        <property name="id" stdset="0">
-        <string>{global.customer.id}</string>
+        <string>{global.customerid}</string>
        </property>
       </widget>
      </item>

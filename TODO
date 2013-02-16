@@ -38,6 +38,7 @@ daemon code:
 
 PF:
 - high prio
+  - Web Page Templates
   - Project CRM
   - Lua functions for directmap (struct IN table OUT)
   - test forms with SELF recursion and inheritance
@@ -45,7 +46,9 @@ PF:
   - UIForm loader in client and server
 
 - low prio
-  - auditing extensions for Transactions (or functions in general?) - how is transaction commit handled in case of auditing
+  - XSLT templates for ui form generation wizard
+  - auditing extensions for Transactions (at end of transaction)
+  - Python bindings
   - error objects for exceptions/logging (non intrusive: bind_int, etc.)
   - bignum tests (only bigint tested until now)
   - XSLT filter + tests
@@ -53,6 +56,4 @@ PF:
   - Printing with HPDF
     - The print form configuration can have an xslt script for preprocessing
 
-- nice to have
-  - Transactions: Warning for unused results
 

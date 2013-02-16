@@ -70,10 +70,10 @@
         <property name="form" stdset="0">
          <string>editCustomer</string>
         </property>
-        <property name="global.customer.State" stdset="0">
+        <property name="global.customerState" stdset="0">
          <string notr="true">{customer.state}</string>
         </property>
-        <property name="global.customer.id" stdset="0">
+        <property name="global.customerid" stdset="0">
          <string>{customer.id}</string>
         </property>
        </widget>

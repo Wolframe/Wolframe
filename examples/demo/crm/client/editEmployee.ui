@@ -20,7 +20,7 @@
    <string>employee</string>
   </property>
   <property name="id" stdset="0">
-   <string>{global.employee.id}</string>
+   <string>{global.employeeid}</string>
   </property>
   <property name="dataelement" stdset="0">
    <string>id</string>
@@ -161,7 +161,7 @@
         <string notr="true">listEmployee</string>
        </property>
        <property name="id" stdset="0">
-        <string>{global.employee.id}</string>
+        <string>{global.employeeid}</string>
        </property>
       </widget>
      </item>

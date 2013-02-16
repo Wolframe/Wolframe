@@ -109,6 +109,9 @@ void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
 			QString refKey = value.mid( 1, value.length( ) - 2 );
 			if( refKey.startsWith( "global." ) ) {
 				QStringList parts = refKey.split( "." );
+				if ( parts.length() > 2 ) {
+					emit error( QString( "illegal global variable name '%1'").arg( refKey ) );
+				}
 				QString globalKey = parts[1];
 				if( m_globals->contains( globalKey ) ) {
 					props->insert( key, m_globals->value( globalKey ) );

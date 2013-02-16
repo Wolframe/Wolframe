@@ -70,11 +70,11 @@
         <property name="form" stdset="0">
          <string>editProject</string>
         </property>
-        <property name="global.employee.State" stdset="0">
-         <string notr="true">{employee.state}</string>
+        <property name="global.projectState" stdset="0">
+         <string notr="true">{project.state}</string>
         </property>
-        <property name="global.employee.id" stdset="0">
-         <string>{employee.id}</string>
+        <property name="global.projectid" stdset="0">
+         <string>{project.id}</string>
         </property>
        </widget>
       </item>

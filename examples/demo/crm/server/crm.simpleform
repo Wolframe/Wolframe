@@ -57,6 +57,12 @@ Form CustomerInserted
 	_ Customer
 }
 
+Form CustomerRef
+{
+	id		!@ID
+	name		entityname
+}
+
 ; * Forms:
 Form InsertCustomer	{ customer { _ Customer } }
 Form UpdateCustomer	{ customer { _ CustomerInserted } }
@@ -64,8 +70,10 @@ Form DeleteCustomer	{ customer { id !@ID } }
 Form GetCustomer	{ customer { id !@ID } }
 Form CustomerResult	{ customer { _ CustomerInserted } }
 Form CustomerListResult	{ customers { customer CustomerInserted[] } }
+Form CustomerRefListResult { customers { customer CustomerRef[] } }
 Form SearchCustomer	{ customer { _ IDHACK pattern string } }
 Form ListCustomer	{ customer { _ IDHACK } }
+Form ListCustomerRef	{ customer { _ IDHACK } }
 
 
 
@@ -74,7 +82,7 @@ Form ListCustomer	{ customer { _ IDHACK } }
 ; * Sub structures:
 Form CustomerNote
 {
-	customerid	!@ID
+	customerid	!ID
 	content		string
 	link		?URI
 }
@@ -95,7 +103,7 @@ Form SearchCustomerNote
 	note
 	{
 		_ IDHACK
-		customerid ?@ID
+		customerid ?ID
 		pattern string
 	}
 }
@@ -127,7 +135,7 @@ Form CustomerNoteListResult
 ; * Sub structures:
 Form Project
 {
-	customerid	!@ID
+	customerid	!ID
 	customername	?entityname
 	name		entityname
 	description	?string
@@ -152,7 +160,7 @@ Form SearchProject
 {
 	project
 	{
-		customerid ?@ID
+		customerid ?ID
 		pattern string
 	}
 }
@@ -164,7 +172,7 @@ Form SearchProject
 ; * Sub structures:
 Form ProjectNote
 {
-	projectid	!@ID
+	projectid	!ID
 	content		string
 	link		?URI
 }
@@ -185,7 +193,7 @@ Form SearchProjectNote
 	note
 	{
 		_ IDHACK
-		projectid ?@ID
+		projectid ?ID
 		pattern string
 	}
 }
@@ -250,7 +258,7 @@ Form SearchActivityCategory
 ; * Sub structures:
 Form ActivityCharging
 {
-	categoryid	!@ID
+	categoryid	!ID
 	validfrom	datetime
 	fixum		?currency
 	timedep		?currency
@@ -273,7 +281,7 @@ Form EvalActivityCharging
 {
 	charging
 	{
-		categoryid !@ID
+		categoryid !ID
 		validat datetime
 	}
 }
@@ -286,9 +294,9 @@ Form ActivityChargingResult	{ charging { _ ActivityChargingInserted } }
 ; * Sub structures:
 Form Activity
 {
-	categoryid	!@ID
-	projectid	!@ID
-	employeeid	!@ID
+	categoryid	!ID
+	projectid	!ID
+	employeeid	!ID
 	description	string
 	start		datetime
 	duration	timediff
@@ -297,7 +305,7 @@ Form Activity
 Form ActivityInserted
 {
 	id		!@ID
-	chargingid	!@ID
+	chargingid	!ID
 	_ Activity
 }
 
@@ -314,10 +322,10 @@ Form SearchActivity
 	activity
 	{
 		_ IDHACK
-		customerid ?@ID
-		categoryid ?@ID
-		projectid ?@ID
-		employeeid ?@ID
+		customerid ?ID
+		categoryid ?ID
+		projectid ?ID
+		employeeid ?ID
 		rangefrom ?datetime
 		rangeto ?datetime
 		pattern string
@@ -331,7 +339,7 @@ Form SearchActivity
 ; * Sub structures:
 Form ActivityNote
 {
-	activityid	!@ID
+	activityid	!ID
 	content		string
 	link		?URI
 }
@@ -352,7 +360,7 @@ Form SearchActivityNote
 	note
 	{
 		_ IDHACK
-		activityid ?@ID
+		activityid ?ID
 		pattern string
 	}
 }
