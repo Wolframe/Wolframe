@@ -376,48 +376,6 @@ void StructType::print( std::ostream& out, size_t level) const
 	}
 }
 
-void StructType::printDescriptionUI( std::ostream& out) const
-{
-	bool cm = true;
-	switch (m_contentType)
-	{
-		case Indirection:
-		case Atomic:
-		{
-			break;
-		}
-		case Vector:
-		{
-			prototype().printDescriptionUI( out);
-			break;
-		}
-		case Struct:
-		{
-			StructType::Map::const_iterator ii = begin(),ee=end();
-			std::size_t idx;
-			for (idx=0; ii != ee; ++ii,++idx)
-			{
-				if (!ii->first.empty())
-				{
-					if (!cm) out << ",";
-					if (idx < m_nof_attributes) out << "@";
-					out << ii->first;
-					cm = true;
-				}
-				if (ii->second.m_contentType == Struct)
-				{
-					if (!cm) out << ",";
-					out << "{";
-					ii->second.printDescriptionUI( out);
-					out << "}";
-				}
-				cm = false;
-			}
-			break;
-		}
-	}
-}
-
 void Form::print( std::ostream& out, size_t level) const
 {
 	std::string indent( level, '\t');
@@ -425,8 +383,3 @@ void Form::print( std::ostream& out, size_t level) const
 	StructType::print( out, level);
 }
 
-void Form::printDescriptionUI( std::ostream& out) const
-{
-	out << m_name << "." << m_ddlname << ": ";
-	StructType::printDescriptionUI( out);
-}

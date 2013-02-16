@@ -636,6 +636,20 @@ LUA_FUNCTION_THROWS( "form:name()", function_form_name)
 	}
 }
 
+static ddl::StructType* get_substructure( lua_State* ls, int index, ddl::StructType* st)
+{
+	if (!lua_istable( ls, index)) throw std::runtime_error( "table (array) expected as substructure path");
+	lua_pushnil(ls);
+	while (lua_next( ls, index))
+	{
+		if (!lua_isnumber( ls, -2)) throw std::runtime_error( "array expected as substructure path");
+		if (!lua_isstring( ls, -1)) throw std::runtime_error( "array of strings (identifiers) expected as substructure path");
+		st = st->select( lua_tostring( ls, -1));
+		if (!st) throw std::runtime_error( "selected substructure does not exist in form");
+		lua_pop( ls, 1);
+	}
+	return st;
+}
 
 LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 {
@@ -644,33 +658,44 @@ LUA_FUNCTION_THROWS( "form:fill()", function_form_fill)
 	int ctx;
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
+		ddl::StructType* substruct = form->get();
 		serialize::Context::Flags flags = serialize::Context::None;
-		if (lua_gettop( ls) == 3)
+		int ii = 3, nn = lua_gettop( ls);
+		if (nn > 4) throw std::runtime_error( "too many arguments");
+		for (; ii < nn; ++ii)
 		{
-			if (!lua_isstring( ls, 3))
+			if (lua_istable( ls, ii))
 			{
-				throw std::runtime_error( "2nd argument is not a string");
+				substruct = get_substructure( ls, ii, substruct);
 			}
-			const char* mode = lua_tostring( ls, 3);
-			if (std::strcmp( mode, "strict") == 0)
+			else if (lua_isstring( ls, ii))
 			{
-				flags = (serialize::Context::Flags)((int)serialize::Context::ValidateAttributes|(int)serialize::Context::ValidateInitialization);
-			}
-			else if (std::strcmp( mode, "complete") == 0)
-			{
-				flags = serialize::Context::ValidateInitialization;
-			}
-			else if (std::strcmp( mode, "relaxed") == 0)
-			{
-				flags = serialize::Context::None;
+				const char* mode = lua_tostring( ls, ii);
+				if (std::strcmp( mode, "strict") == 0)
+				{
+					flags = (serialize::Context::Flags)((int)serialize::Context::ValidateAttributes|(int)serialize::Context::ValidateInitialization);
+				}
+				else if (std::strcmp( mode, "complete") == 0)
+				{
+					flags = serialize::Context::ValidateInitialization;
+				}
+				else if (std::strcmp( mode, "relaxed") == 0)
+				{
+					flags = serialize::Context::None;
+				}
+				else
+				{
+					throw std::runtime_error( "2nd argument does not specify a mode of validating input (e.g. \"strict\")");
+				}
 			}
 			else
 			{
-				throw std::runtime_error( "2nd argument does not specify a mode of validating input (e.g. \"strict\")");
+				static const char* ia[3] = {"2nd","3rd","4th"};
+				throw std::runtime_error( std::string(ia[ii-3]) + " argument is not a string or table");
 			}
 		}
 		TypedInputFilterR inp = get_operand_TypedInputFilter( ls, 2);
-		LuaObject<DDLFormParser>::push_luastack( ls, DDLFormParser( *form));
+		LuaObject<DDLFormParser>::push_luastack( ls, DDLFormParser( *form, substruct));
 		closure = LuaObject<DDLFormParser>::get( ls, -1);
 		closure->init( inp, flags);
 		lua_pushvalue( ls, 2);		//... iterator argument (table, generator function, etc.)
@@ -698,9 +723,16 @@ LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 	if (lua_getctx( ls, &ctx) != LUA_YIELD)
 	{
 		form = LuaObject<ddl::FormR>::getSelf( ls, "form", "table");
-		check_parameters( ls, 1, 0);
+
+		ddl::StructType* substruct = form->get();
+		int nn = lua_gettop( ls);
+		if (nn > 1)
+		{
+			if (nn > 2) throw std::runtime_error( "too many arguments");
+			substruct = get_substructure( ls, 2, substruct);
+		}
 		TypedOutputFilterR outp( new LuaTableOutputFilter( ls));
-		LuaObject<DDLFormSerializer>::push_luastack( ls, DDLFormSerializer( *form));
+		LuaObject<DDLFormSerializer>::push_luastack( ls, DDLFormSerializer( *form, substruct));
 		result = LuaObject<DDLFormSerializer>::get( ls, -1);
 		result->init( outp, serialize::Context::SerializeWithIndices);
 	}
@@ -728,9 +760,14 @@ LUA_FUNCTION_THROWS( "form:table()", function_form_table)
 LUA_FUNCTION_THROWS( "form:get()", function_form_get)
 {
 	ddl::FormR* result = LuaObject<ddl::FormR>::getSelf( ls, "form", "get");
-	check_parameters( ls, 1, 0);
-
-	TypedInputFilterR itr( new DDLFormSerializer( *result));
+	ddl::StructType* substruct = result->get();
+	int nn = lua_gettop( ls);
+	if (nn > 1)
+	{
+		if (nn > 2) throw std::runtime_error( "too many arguments");
+		substruct = get_substructure( ls, 2, substruct);
+	}
+	TypedInputFilterR itr( new DDLFormSerializer( *result, substruct));
 	LuaObject<TypedInputFilterClosure>::push_luastack( ls, TypedInputFilterClosure(itr));
 	lua_pushcclosure( ls, function_typedinputfilterClosure_get, 1);
 	return 1;
@@ -1457,7 +1494,7 @@ LUA_FUNCTION_THROWS( "output:as(..)", function_output_as)
 {
 	Output* output = LuaObject<Output>::getSelf( ls, "output", "as");	//< self argument (mandatory)
 	Filter* filter = 0;							//< 1st argument (mandatory)
-	std::string doctype;						//< 2nd argument (optional)
+	std::string doctype;							//< 2nd argument (optional)
 	int ii=2,nn = lua_gettop( ls);
 	if (nn <= 1)
 	{
