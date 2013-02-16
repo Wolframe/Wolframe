@@ -52,7 +52,7 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QPlainTextEdit" name="description"/>
+    <widget class="QLineEdit" name="description"/>
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_addr_line1">
@@ -165,5 +165,48 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>name</sender>
+   <signal>returnPressed()</signal>
+   <receiver>description</receiver>
+   <slot>setFocus()</slot>
+  </connection>
+  <connection>
+   <sender>description</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addr_line1</receiver>
+   <slot>setFocus()</slot>
+  </connection>
+  <connection>
+   <sender>addr_line1</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addr_line2</receiver>
+   <slot>setFocus()</slot>
+  </connection>
+  <connection>
+   <sender>addr_line2</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addr_postalcode</receiver>
+   <slot>setFocus()</slot>
+  </connection>
+  <connection>
+   <sender>addr_postalcode</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addr_district</receiver>
+   <slot>setFocus()</slot>
+  </connection>
+  <connection>
+   <sender>addr_district</sender>
+   <signal>returnPressed()</signal>
+   <receiver>addr_country</receiver>
+   <slot>setFocus()</slot>
+  </connection>
+  <connection>
+   <sender>addr_country</sender>
+   <signal>returnPressed()</signal>
+   <receiver>add</receiver>
+   <slot>click()</slot>
+  </connection>
+ </connections>
 </ui>

@@ -22,7 +22,7 @@ END
 
 TRANSACTION GetEmployee
 BEGIN
-	DO UNIQUE NONEMPTY SELECT * FROM Employee WHERE id=$(id);
+	INTO . DO UNIQUE NONEMPTY SELECT id, name, status, addr_line1, addr_line2, addr_postalcode, addr_district, addr_country FROM Employee WHERE id=$(id);
 END
 
 --  Not very efficient search :-)
@@ -73,7 +73,7 @@ END
 
 TRANSACTION GetCustomer
 BEGIN
-	INTO . DO UNIQUE NONEMPTY SELECT * FROM Customer WHERE id=$(id);
+	INTO . DO UNIQUE NONEMPTY SELECT id, name, description, addr_line1, addr_line2, addr_postalcode, addr_district, addr_country FROM Customer WHERE id=$(id);
 END
 
 --  Not very efficient search :-)
@@ -123,7 +123,7 @@ END
 
 TRANSACTION GetProject
 BEGIN
-	DO UNIQUE NONEMPTY
+	INTO . DO UNIQUE NONEMPTY
 		SELECT Project.id,Project.customerid,Customer.name AS customername,Project.name,Project.description
 		FROM Project,Customer WHERE Project.id=$(id) AND Project.customerid = Customer.id;
 END
@@ -253,7 +253,7 @@ END
 
 TRANSACTION GetActivity
 BEGIN
-	DO UNIQUE NONEMPTY SELECT * FROM Activity WHERE id=$(id);
+	INTO . DO UNIQUE NONEMPTY SELECT * FROM Activity WHERE id=$(id);
 END
 
 --  Not very efficient search :-)
