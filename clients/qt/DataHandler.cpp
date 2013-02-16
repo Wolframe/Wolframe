@@ -87,7 +87,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	}
 	QStringList dataElements;
 	if (props->contains( "dataelement")) {
-		dataElements = props->value( "dataelement").split( "," );
+		dataElements = props->value( "dataelement").split( ",");
 	}
 	if( props->contains( "rootelement" ) ) {
 		xml.writeStartElement( props->value( "rootelement" ) );
@@ -111,14 +111,13 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		xml.writeStartElement( form_name );
 	}
 	
-	if (dataElements.empty()) {
-		writeWidgets( form, xml, props, &seen );
-	}
+	writeWidgets( form, &dataElements, xml, props, &seen );
+
 	xml.writeEndElement( );
 	xml.writeEndDocument( );
 }
 
-void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *seen )
+void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *seen )
 {
 	QList<QWidget *> widgets = _from->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
@@ -136,7 +135,40 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 			!widget->isEnabled( ) ) {
 			continue;
 		}
-		
+		QStringList subDataElements;
+		bool writeElements = true;
+		if (dataElements && !dataElements->empty())
+		{
+			if (clazz == "QGroupBox")
+			{
+				// ... data elements defined in sub structure (group) element:
+				//		-> only substructure elements with name in sub path are selected
+				//		-> only elements with matching name are written.
+				writeElements = false;
+				QStringList::const_iterator di = dataElements->begin(), de = dataElements->end();
+				int len = name.length();
+				for (; di != de; ++di)
+				{
+					if (di->startsWith(name))
+					{
+						if (di->length() == len) writeElements = true;
+						else if ((*di)[len] == '.') subDataElements << di->right( di->size()-len-1);
+					}
+				}
+				if (subDataElements.empty())
+				{
+					subDataElements << "."; //... to make subDataElements be non empty (no sub element is written)
+				}
+			}
+			else
+			{
+				// ... data elements defined in leaf element:
+				//		-> only elements with matching name are written.
+				writeElements = dataElements->contains( name);
+			}
+		}
+		if( !writeElements ) continue;
+
 		if( clazz == "QLineEdit" ) {
 			QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
 			QString text = lineEdit->text( );
@@ -254,7 +286,7 @@ void DataHandler::writeWidgets( QWidget *_from, QXmlStreamWriter &xml, QHash<QSt
 				if( key.startsWith( "global." ) ) continue;
 				xml.writeAttribute( key, p.value( key ) );
 			}
-			writeWidgets( groupBox, xml, props, seen );
+			writeWidgets( groupBox, &subDataElements, xml, props, seen );
 			xml.writeEndElement( );
 		} else if( clazz == "FileChooser" ) {
 			FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );

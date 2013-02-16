@@ -65,7 +65,7 @@ class DataHandler : public QObject
 		QString readFormVariable( QString variable, QWidget *form );
 
 	private:
-		void writeWidgets( QWidget *_parent, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *set );
+		void writeWidgets( QWidget *_parent, QStringList *dataElements, QXmlStreamWriter &xml, QHash<QString, QString> *props, QSet<QWidget *> *set );
 		void resetWidgetData( QWidget *widget, QString name );
 		void loadFormDomains( QString form_name, QWidget *form, QWidget *widget, QString name );
 	
