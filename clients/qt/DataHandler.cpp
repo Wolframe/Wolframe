@@ -919,6 +919,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							doubleSpinBox->setValue( text.toDouble( ) );
 						} else if( clazz == "QComboBox" ) {
 							QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
+							QXmlStreamAttributes attributes = xml.attributes( );
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							for( int idx = 0; idx < comboBox->count( ); idx++ ) {
 								if( comboBox->itemText( idx ) == text ) {
@@ -926,6 +927,20 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 									break;
 								}
 							}
+							// select item in combobox with the matching id				
+							foreach( QXmlStreamAttribute attr, attributes ) {
+								if( attr.name( ) == "id" ) {
+									QString mustId = attr.value( ).toString( );
+									for( int idx = 0; idx < comboBox->count( ); idx++ ) {
+										QString id = comboBox->itemData( idx, Qt::UserRole ).toString( );
+										if( id == mustId ) {
+											comboBox->setCurrentIndex( idx );
+											break;
+										}
+									}
+								}
+							}
+							
 						} else if( clazz == "QCheckBox" ) {
 							QObject *parent = widget->parent( );
 							QString clazzParent = parent->metaObject( )->className( ); 
