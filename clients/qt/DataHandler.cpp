@@ -453,7 +453,8 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 		//~ QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
 	} else if( clazz == "QComboBox" ) {
 		QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
-		comboBox->clear( );
+		//comboBox->clear( );
+		comboBox->setCurrentIndex( 0 );
 	} else if( clazz == "QSpinBox" ) {
 		//~ QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
 		// TODO
