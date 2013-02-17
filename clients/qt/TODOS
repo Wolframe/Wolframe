@@ -1,4 +1,7 @@
-now:
+now CRM:
+- QComboBox: mit IDS as userdata
+
+now configurator:
 - stop the "whiteout", especially seen after assigning pictures
   (must be a protocol thing), happens mainly on Windows 7/8, not
   on Linux/Windows XPL:

@@ -188,7 +188,11 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 		} else if( clazz == "QComboBox" ) {
 			QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
 			QString text = comboBox->itemText( comboBox->currentIndex( ) );
-			xml.writeTextElement( "", name, text );
+			QString id = comboBox->itemData( comboBox->currentIndex( ), Qt::UserRole ).toString( );
+			xml.writeStartElement( "", name );
+			xml.writeAttribute( "id", id );
+			xml.writeCharacters( text );
+			xml.writeEndElement( );
 		} else if( clazz == "QSpinBox" ) {
 			QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
 			QString text = QString::number( spinBox->value( ) );
@@ -591,12 +595,23 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 	QXmlStreamReader xml( data );
 	if( clazz == "QComboBox" ) {
 		QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
+		int idx = 0;
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
 							
-			if( xml.isStartElement( ) && xml.name( ) == "value" ) {
+			if( xml.isStartElement( ) && ( xml.name( ) == "value" || xml.name( ) == widget_name ) ) {
+				QXmlStreamAttributes attributes = xml.attributes( );
 				QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 				comboBox->addItem( text );
+// we should map all attributes in the element, currently we map only 'id'				
+				foreach( QXmlStreamAttribute attr, attributes ) {
+					if( attr.name( ) == "id" ) {
+						QVariant v;
+						v.setValue( attr.value( ).toString( ) );
+						comboBox->setItemData( idx, v, Qt::UserRole );
+					}
+				}
+				idx++;
 			}
 		}
 	} else if( clazz == "QListWidget" ) {

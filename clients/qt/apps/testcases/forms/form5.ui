@@ -40,6 +40,9 @@
       <property name="columnCount">
        <number>2</number>
       </property>
+      <property name="action" stdset="0">
+       <string>read</string>
+      </property>
       <attribute name="headerVisible">
        <bool>true</bool>
       </attribute>
@@ -120,7 +123,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="FormWidget" name="formWidget">
+  <widget class="FormWidget" name="formWidget" native="true">
    <property name="geometry">
     <rect>
      <x>339</x>
@@ -129,7 +132,7 @@
      <height>311</height>
     </rect>
    </property>
-   <property name="form">
+   <property name="form" stdset="0">
     <string>form5_show</string>
    </property>
   </widget>

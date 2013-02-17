@@ -37,6 +37,9 @@
       <property name="columnCount">
        <number>2</number>
       </property>
+      <property name="action" stdset="0">
+       <string>read</string>
+      </property>
       <attribute name="headerVisible">
        <bool>true</bool>
       </attribute>
