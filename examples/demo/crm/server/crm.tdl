@@ -98,7 +98,7 @@ BEGIN
 END
 TRANSACTION ListCustomerRef
 BEGIN
-	INTO customer DO SELECT id,name AS value FROM Customer;
+	INTO customer DO SELECT id,name AS _ FROM Customer;
 END
 
 
