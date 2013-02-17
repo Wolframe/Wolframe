@@ -90,6 +90,7 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 		ddl::StructType::Map::const_iterator itr = obj->begin() + idx;
 		if (!itr->second.initialized())
 		{
+/*[-]*/std::cout << "NOT INITIALIZED '" << itr->first << "'" << std::endl;
 			stk.back().state( ++idx);
 			return false;
 		}
@@ -264,6 +265,7 @@ bool DDLStructSerializer::getNext( langbind::FilterBase::ElementType& type, lang
 	type = elem.m_type;
 	value = elem.m_value;
 	setState( langbind::InputFilter::Open);
+	LOG_DATA << "[DDL structure serialization get] element " << langbind::InputFilter::elementTypeName( elem.m_type) << " '" << elem.m_value.tostring() << "'";
 	return true;
 }
 

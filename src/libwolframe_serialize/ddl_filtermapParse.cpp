@@ -223,6 +223,7 @@ static bool parseStruct( ddl::StructType& st, langbind::TypedInputFilter& inp, C
 			{
 				throw SerializationErrorException( "error in structure definition: defined untagged value as attribute in structure", element.tostring(), getElementPath( stk));
 			}
+			itr->second.initialized( true);
 			switch (itr->second.contentType())
 			{
 				case ddl::StructType::Atomic:
