@@ -104,6 +104,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 			}
 			else if (dataElements.contains(key))
 			{
+				/*[-]*/qDebug() << "+++++++++WRITE PROPERTY " << key << "=" << props->value( key );
 				xml.writeAttribute( key, props->value( key ) );
 			}
 		}
@@ -151,8 +152,16 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 				{
 					if (di->startsWith(name))
 					{
-						if (di->length() == len) writeElements = true;
-						else if ((*di)[len] == '.') subDataElements << di->right( di->size()-len-1);
+						if (di->length() == len)
+						{
+							writeElements = true;
+							/*[-]*/qDebug() << "+++++++++MATCH DATA ELEMENT " << *di;
+						}
+						else if ((*di)[len] == '.')
+						{
+							subDataElements << di->right( di->size()-len-1);
+							/*[-]*/qDebug() << "+++++++++SELECT SUB DATA ELEMENT " << di->right( di->size()-len-1);
+						}
 					}
 				}
 				if (subDataElements.empty())
@@ -165,6 +174,7 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 				// ... data elements defined in leaf element:
 				//		-> only elements with matching name are written.
 				writeElements = dataElements->contains( name);
+				/*[-]*/qDebug() << "+++++++++MATCH(2) DATA ELEMENT " << name;
 			}
 		}
 		if( !writeElements ) continue;
@@ -922,7 +932,9 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							QXmlStreamAttributes attributes = xml.attributes( );
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							for( int idx = 0; idx < comboBox->count( ); idx++ ) {
+								/*[-]*/qDebug() << "+++++++++CHECK ITEM " << idx << " AGAINST " << text;
 								if( comboBox->itemText( idx ) == text ) {
+									/*[-]*/qDebug() << "+++++++++MATCH";
 									comboBox->setCurrentIndex( idx );
 									break;
 								}
@@ -931,9 +943,13 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							foreach( QXmlStreamAttribute attr, attributes ) {
 								if( attr.name( ) == "id" ) {
 									QString mustId = attr.value( ).toString( );
+									/*[-]*/qDebug() << "+++++++++FIND MUST ID " << mustId << " IN " << comboBox->count( );
+
 									for( int idx = 0; idx < comboBox->count( ); idx++ ) {
 										QString id = comboBox->itemData( idx, Qt::UserRole ).toString( );
+										/*[-]*/qDebug() << "+++++++++CHECK ID " << id;
 										if( id == mustId ) {
+											/*[-]*/qDebug() << "+++++++++MATCH";
 											comboBox->setCurrentIndex( idx );
 											break;
 										}

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>493</width>
-    <height>315</height>
+    <height>292</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -100,9 +100,6 @@
        </property>
        <property name="id" stdset="0">
         <string>{global.projectid}</string>
-       </property>
-       <property name="customerid" stdset="0">
-        <string>{customer.id}</string>
        </property>
       </widget>
      </item>
