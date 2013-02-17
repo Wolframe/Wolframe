@@ -33,6 +33,7 @@ Project Wolframe.
 
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/typedfilter.hpp"
+#include "logger-v1.hpp"
 #include <cstring>
 #include <sstream>
 
@@ -243,6 +244,7 @@ bool DDLStructSerializer::call()
 				m_ctx.setElem( elem);
 				return false;
 			}
+			LOG_DATA << "[DDL structure serialization print] element " << langbind::InputFilter::elementTypeName( elem.m_type) << " '" << elem.m_value.tostring() << "'";
 		}
 		fetchObject( m_ctx, m_stk);
 	}

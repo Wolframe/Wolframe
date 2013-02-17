@@ -1207,6 +1207,20 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		} else {
 			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
 		}
+	} else if (clazz == "QComboBox") {
+		QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
+		if( property == "id" )
+		{
+			return comboBox->itemData( comboBox->currentIndex( ), Qt::UserRole ).toString( );
+		}
+		else if( property == "text" )
+		{
+			return comboBox->itemText( comboBox->currentIndex( ) );
+		}
+		else
+		{
+			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
+		}
 	} else {
 // non supported class
 		qWarning( ) << "Unsupported class" << clazz << "in variable" << variable;

@@ -109,8 +109,6 @@ TRANSACTION InsertProject
 BEGIN
 	DO INSERT INTO Project (customerid, name, description)
 		VALUES ($(customerid), $(name), $(description));
-	DO getLastIdProject();
-	INTO . DO UNIQUE NONEMPTY SELECT * FROM Project WHERE id = $1;
 END
 
 TRANSACTION UpdateProject
@@ -125,11 +123,16 @@ BEGIN
 	DO DELETE FROM Project WHERE id=$(id);
 END
 
-TRANSACTION GetProject
+TRANSACTION GetProjectEdit
 BEGIN
-	INTO . DO UNIQUE NONEMPTY
+	DO UNIQUE NONEMPTY
 		SELECT Project.id,Project.customerid,Customer.name AS customername,Project.name,Project.description
 		FROM Project,Customer WHERE Project.id=$(id) AND Project.customerid = Customer.id;
+	INTO . DO SELECT $1 AS id, $4 AS name, $5 AS description;
+	DO UNIQUE NONEMPTY
+		SELECT Project.id,Project.customerid,Customer.name AS customername,Project.name,Project.description
+		FROM Project,Customer WHERE Project.id=$(id) AND Project.customerid = Customer.id;
+	INTO customer DO SELECT $2 AS id, $3 AS _;
 END
 
 --  Not very efficient search :-)
@@ -140,7 +143,7 @@ BEGIN
 		WHERE name LIKE '%$(.)%'
 		OR description LIKE '%$(.)%';
 	INTO project DO
-		SELECT Project.id,Project.customerid,Customer.name AS customername,Project.name,Project.description
+		SELECT Project.id,Project.customerid,Project.name,Project.description
 		FROM Project,Customer
 		WHERE Project.customerid = Customer.id
 		AND Project.id IN (SELECT DISTINCT id FROM tmpSearchProjectResult);
@@ -149,7 +152,7 @@ END
 
 TRANSACTION ListProject
 BEGIN
-	INTO project DO SELECT Project.id,Project.customerid,Customer.name AS customername,Project.name,Project.description
+	INTO project DO SELECT Project.id,Project.customerid,Project.name,Project.description
 		FROM Project,Customer
 		WHERE Project.customerid = Customer.id;
 END

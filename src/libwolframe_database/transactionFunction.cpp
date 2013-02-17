@@ -1302,7 +1302,7 @@ struct TransactionFunctionOutput::Impl
 						}
 						type = TypedInputFilter::OpenTag;
 						element = m_resitr->columnName( m_colidx);
-						if (element.type == TypedInputFilter::Element::string_ && element.value.string_.size == 1 && element.value.string_.ptr[0] == '_')
+						if (element.type == TypedInputFilter::Element::string_ && element.value.string_.size == 0)
 						{
 							//... untagged content value (column name '_')
 							type = langbind::TypedInputFilter::Value;

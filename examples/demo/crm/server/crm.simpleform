@@ -135,16 +135,29 @@ Form CustomerNoteListResult
 ; * Sub structures:
 Form Project
 {
-	customerid	!ID
-	customername	?entityname
+	customerid	!@ID
 	name		entityname
 	description	?string
 }
-
+Form ProjectEdit
+{
+	customer
+	{
+		id	!@ID
+		_	?entityname
+	}
+	name		entityname
+	description	?string
+}
 Form ProjectInserted
 {
 	id		!@ID
 	_ Project
+}
+Form ProjectEditInserted
+{
+	id		!@ID
+	_ ProjectEdit
 }
 
 ; * Forms:
@@ -152,7 +165,9 @@ Form InsertProject	{ project { _ Project } }
 Form UpdateProject	{ project { _ ProjectInserted } }
 Form DeleteProject	{ project { id !@ID } }
 Form GetProject		{ project { id !@ID } }
+Form GetProjectEdit	{ project { id !@ID } }
 Form ProjectResult	{ project { _ ProjectInserted } }
+Form ProjectEditResult	{ project { _ ProjectEditInserted } }
 Form ProjectListResult	{ projects { _ IDHACK project ProjectInserted[] } }
 Form ListProject	{ project { _ IDHACK } }
 

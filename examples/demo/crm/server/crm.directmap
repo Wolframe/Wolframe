@@ -23,10 +23,11 @@ GetCustomerNote( xml) :CustomerNoteResult;
 SearchCustomerNote( xml) :CustomerNoteListResult;
 
 #--- Project
-InsertProject( xml) :ProjectResult;
+InsertProject( xml);
 UpdateProject( xml);
 DeleteProject( xml);
 GetProject( xml) :ProjectResult;
+GetProjectEdit( xml) :ProjectEditResult;
 SearchProject( xml) :ProjectListResult;
 ListProject( xml) :ProjectListResult;
 

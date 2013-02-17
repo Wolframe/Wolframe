@@ -86,6 +86,12 @@
        <property name="form" stdset="0">
         <string notr="true">listProject</string>
        </property>
+       <property name="customerid" stdset="0">
+        <string>{customer.id}</string>
+       </property>
+       <property name="dataelement" stdset="0">
+        <string>customerid,name,description</string>
+       </property>
       </widget>
      </item>
      <item>
