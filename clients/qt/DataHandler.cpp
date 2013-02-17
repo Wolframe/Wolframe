@@ -688,10 +688,12 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 						}
 // attributes like id are mapped to cell user data
 						foreach( QXmlStreamAttribute attr, attributes ) {
-							QVariant v;
-							v.setValue( attr.value( ).toString( ) );
-							QTableWidgetItem *item = tableWidget->item( row, col );
-							item->setData( Qt::UserRole, v );
+							if( attr.name( ) == "id" ) {
+								QVariant v;
+								v.setValue( attr.value( ).toString( ) );
+								QTableWidgetItem *item = tableWidget->item( row, col );
+								item->setData( Qt::UserRole, v );
+							}
 						}
 					}
 				}
@@ -767,9 +769,11 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 // attributes like id are mapped to user data
 					QXmlStreamAttributes attributes = xml.attributes( );
 					foreach( QXmlStreamAttribute attr, attributes ) {
-						QVariant v;
-						v.setValue( attr.value( ).toString( ) );
-						item->setData( 0, Qt::UserRole, v );
+						if( attr.name( ) == "id" ) {
+							QVariant v;
+							v.setValue( attr.value( ).toString( ) );
+							item->setData( 0, Qt::UserRole, v );
+						}
 					}
 				} else if( xml.name( ) == widget_name ) {
 // did we see 'tree' or 'item' before? if not, we are in multi-column and not in tree mode
@@ -779,10 +783,12 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 // attributes like id are mapped to user data
 						QXmlStreamAttributes attributes = xml.attributes( );
 						foreach( QXmlStreamAttribute attr, attributes ) {
-							QVariant v;
-							v.setValue( attr.value( ).toString( ) );
-							item->setData( 0, Qt::UserRole, v );
-						}
+							if( attr.name( ) == "id" ) {
+								QVariant v;
+								v.setValue( attr.value( ).toString( ) );
+								item->setData( 0, Qt::UserRole, v );
+							}
+						}						
 					} else {
 						int col = headers.indexOf( xml.name( ).toString( ) );
 						if( col != -1 ) {
