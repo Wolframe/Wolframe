@@ -280,9 +280,28 @@ static ObjectType* getGlobalSingletonPointer( lua_State* ls)
 	return rt;
 }
 
+static void setGlobalModuleMap( lua_State* ls, const langbind::LuaModuleMap* modulemap_)
+{
+	return setGlobalSingletonPointer<const langbind::LuaModuleMap>( ls, modulemap_);
+}
+
+static const LuaModuleMap* getLuaModuleMap( lua_State* ls)
+{
+	const LuaModuleMap* rt = getGlobalSingletonPointer<const LuaModuleMap>( ls);
+	if (!rt) throw std::runtime_error( "module map undefined");
+	return rt;
+}
+
+static void setProcessorProvider( lua_State* ls, const proc::ProcessorProvider* provider_)
+{
+	return setGlobalSingletonPointer<const proc::ProcessorProvider>( ls, provider_);
+}
+
 static const proc::ProcessorProvider* getProcessorProvider( lua_State* ls)
 {
-	return getGlobalSingletonPointer<proc::ProcessorProvider>( ls);
+	const proc::ProcessorProvider* rt = getGlobalSingletonPointer<proc::ProcessorProvider>( ls);
+	if (!rt) throw std::runtime_error( "processor provider undefined");
+	return rt;
 }
 
 class DDLTypeMap :public ddl::TypeMap
@@ -300,10 +319,6 @@ private:
 	const proc::ProcessorProvider* m_provider;
 };
 
-static const LuaModuleMap* getLuaModuleMap( lua_State* ls)
-{
-	return getGlobalSingletonPointer<const LuaModuleMap>( ls);
-}
 
 static void check_parameters( lua_State* ls, int si, int nn, ...)
 {
@@ -1936,23 +1951,11 @@ LuaScript::LuaScript( const std::string& path_)
 	:m_path(path_)
 {
 	// Load the source of the script from file
-	char buf;
-	std::fstream ff;
-	ff.open( path_.c_str(), std::ios::in);
-	while (ff.read( &buf, sizeof(buf)))
-	{
-		m_content.push_back( buf);
-	}
-	if ((ff.rdstate() & std::ifstream::eofbit) == 0)
-	{
-		std::ostringstream msg;
-		msg << "failed to read lua script from file: '" << path_ << "'";
-		throw std::runtime_error( msg.str());
-	}
-	ff.close();
+	m_content = utils::readSourceFileContent( m_path);
 
 	// Check the script syntax and get the list of all global functions
-	LuaScriptInstance instance( this);
+	LuaScriptInstance instance( this, 0/*modulemap*/);
+	instance.init( 0);
 	lua_State* ls = instance.ls();
 
 	lua_rawgeti( ls, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
@@ -1976,16 +1979,8 @@ LuaScript::LuaScript( const std::string& path_)
 }
 
 LuaScriptInstance::LuaScriptInstance( const LuaScript* script_, const LuaModuleMap* modulemap_)
-	:m_ls(0),m_thread(0),m_threadref(0),m_script(script_)
-{
-	init( modulemap_);
-}
-
-LuaScriptInstance::LuaScriptInstance( const LuaScript* script_)
-	:m_ls(0),m_thread(0),m_threadref(0),m_script(script_)
-{
-	init( 0);
-}
+	:m_ls(0),m_thread(0),m_threadref(0),m_script(script_),m_modulemap(modulemap_)
+{}
 
 std::string LuaScriptInstance::luaErrorMessage( lua_State* ls_, int index)
 {
@@ -2011,7 +2006,7 @@ std::string LuaScriptInstance::luaErrorMessage( lua_State* ls_, int index)
 	return rt;
 }
 
-void LuaScriptInstance::init( const LuaModuleMap* modulemap_)
+void LuaScriptInstance::init( const proc::ProcessorProvider* provider_)
 {
 	m_ls = luaL_newstate();
 	if (!m_ls) throw std::runtime_error( "failed to create lua state");
@@ -2035,9 +2030,9 @@ void LuaScriptInstance::init( const LuaModuleMap* modulemap_)
 		// register objects already here that may be used in the initilization part:
 		Logger logger_;
 		LuaObject<Logger>::createGlobal( m_ls, "logger", logger_, logger_methodtable);
-		if (modulemap_)
+		if (m_modulemap)
 		{
-			setGlobalSingletonPointer<const langbind::LuaModuleMap>( m_ls, modulemap_);
+			setGlobalModuleMap( m_ls, m_modulemap);
 			lua_pushcfunction( m_ls, &function_module);
 			lua_setglobal( m_ls, "module");
 		}
@@ -2053,8 +2048,41 @@ void LuaScriptInstance::init( const LuaModuleMap* modulemap_)
 			buf << "Unable to call main entry of script: " << luaErrorMessage( m_ls);
 			throw std::runtime_error( buf.str());
 		}
+		LuaObject<RedirectFilterClosure>::createMetatable( m_ls, 0, 0, 0);
+		LuaObject<ddl::FormR>::createMetatable( m_ls, 0, 0, form_methodtable);
+		LuaObject<DDLFormParser>::createMetatable( m_ls, 0, 0, 0);
+		LuaObject<DDLFormSerializer>::createMetatable( m_ls, 0, 0, 0);
+		LuaObject<serialize::StructSerializer>::createMetatable( m_ls, 0, 0, struct_methodtable);
+		LuaObject<InputFilterClosure>::createMetatable( m_ls, 0, 0, 0);
+		LuaObject<TypedInputFilterR>::createMetatable( m_ls, 0, 0, typedinputfilter_methodtable);
+		LuaObject<TypedInputFilterClosure>::createMetatable( m_ls, 0, 0, 0);
+		LuaObject<FormFunctionClosureR>::createMetatable( m_ls, 0, 0, 0);
+		if (provider_) setProcessorProvider( m_ls, provider_);
+		LuaObject<db::TransactionR>::createGlobal( m_ls, "transaction", db::TransactionR(), transaction_methodtable);
+		LuaObject<Filter>::createMetatable( m_ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
+		lua_pushcfunction( m_ls, &function_filter);
+		lua_setglobal( m_ls, "filter");
+		lua_pushcfunction( m_ls, &function_form);
+		lua_setglobal( m_ls, "form");
+		lua_pushcfunction( m_ls, &function_formfunction);
+		lua_setglobal( m_ls, "formfunction");
+		lua_pushcfunction( m_ls, &function_scope);
+		lua_setglobal( m_ls, "scope");
+		lua_pushcfunction( m_ls, &function_normalizer);
+		lua_setglobal( m_ls, "normalizer");
 	}
 }
+
+void LuaScriptInstance::init( const Input& input_, const Output& output_, const proc::ProcessorProvider* provider_)
+{
+	init( provider_);
+	LuaExceptionHandlerScope luaThrows(m_ls);
+	{
+		LuaObject<Input>::createGlobal( m_ls, "input", input_, input_methodtable);
+		LuaObject<Output>::createGlobal( m_ls, "output", output_, output_methodtable);
+	}
+}
+
 
 LuaScriptInstance::~LuaScriptInstance()
 {
@@ -2143,49 +2171,6 @@ bool LuaFunctionMap::getLuaScriptInstance( const std::string& procname, LuaScrip
 	if (ii == ee) return false;
 	rt = LuaScriptInstanceR( new LuaScriptInstance( m_ar[ ii->second], m_modulemap));
 	return true;
-}
-
-bool LuaFunctionMap::initLuaScriptInstance( LuaScriptInstance* lsi, const Input& input_, const Output& output_, const proc::ProcessorProvider* provider_) const
-{
-	lua_State* ls = lsi->ls();
-	try
-	{
-		LuaExceptionHandlerScope luaThrows(ls);
-		{
-			LuaObject<RedirectFilterClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<ddl::FormR>::createMetatable( ls, 0, 0, form_methodtable);
-			LuaObject<DDLFormParser>::createMetatable( ls, 0, 0, 0);
-			LuaObject<DDLFormSerializer>::createMetatable( ls, 0, 0, 0);
-			LuaObject<serialize::StructSerializer>::createMetatable( ls, 0, 0, struct_methodtable);
-			LuaObject<InputFilterClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<TypedInputFilterR>::createMetatable( ls, 0, 0, typedinputfilter_methodtable);
-			LuaObject<TypedInputFilterClosure>::createMetatable( ls, 0, 0, 0);
-			LuaObject<FormFunctionClosureR>::createMetatable( ls, 0, 0, 0);
-			setGlobalSingletonPointer<const proc::ProcessorProvider>( ls, provider_);
-			LuaObject<Input>::createGlobal( ls, "input", input_, input_methodtable);
-			LuaObject<Output>::createGlobal( ls, "output", output_, output_methodtable);
-			LuaObject<db::TransactionR>::createGlobal( ls, "transaction", db::TransactionR(), transaction_methodtable);
-			LuaObject<Filter>::createMetatable( ls, &function__LuaObject__index<Filter>, &function__LuaObject__newindex<Filter>, 0);
-			lua_pushcfunction( ls, &function_filter);
-			lua_setglobal( ls, "filter");
-			lua_pushcfunction( ls, &function_form);
-			lua_setglobal( ls, "form");
-			lua_pushcfunction( ls, &function_formfunction);
-			lua_setglobal( ls, "formfunction");
-			lua_pushcfunction( ls, &function_scope);
-			lua_setglobal( ls, "scope");
-			lua_pushcfunction( ls, &function_normalizer);
-			lua_setglobal( ls, "normalizer");
-		}
-		return true;
-	}
-	catch (const std::exception& e)
-	{
-		std::ostringstream msg;
-		msg << "error intializing lua script instance. " << e.what();
-		throw std::runtime_error( msg.str());
-	}
-	return false;
 }
 
 std::list<std::string> LuaFunctionMap::commands() const

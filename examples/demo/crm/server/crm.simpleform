@@ -60,7 +60,7 @@ Form CustomerInserted
 Form CustomerRef
 {
 	id		!@ID
-	name		entityname
+	value		entityname
 }
 
 ; * Forms:

@@ -111,17 +111,24 @@ public:
 
 	std::string luaErrorMessage( lua_State* ls_, int index=-1);
 
-private:
-	void init( const LuaModuleMap* modulemap_);
+	///\brief Create the context for executing a Lua script with all objects initialized
+	///\param[in] input_ input definition for the input to process
+	///\param[in] output_ output definition for the output to print
+	///\param[in] provider_ processor provider for allocation of objects accessed
+	void init( const Input& input_, const Output& output_, const proc::ProcessorProvider* provider_);
 
+	///\brief Create the context for executing a Lua script without input/output but all other objects initialized
+	///\param[in] provider_ processor provider for allocation of objects accessed
+	void init( const proc::ProcessorProvider* provider_);
+
+private:
 	friend class LuaScript;
-	explicit LuaScriptInstance( const LuaScript* script);
 
 	lua_State* m_ls;
 	lua_State* m_thread;
 	int m_threadref;
 	const LuaScript* m_script;
-
+	const LuaModuleMap* m_modulemap;
 private:
 	LuaScriptInstance( const LuaScriptInstance&){} //non copyable
 };
@@ -147,14 +154,6 @@ public:
 	void defineLuaFunction( const std::string& procname, const LuaScript& script);
 	///\brief Get an empty the context for a Lua script
 	bool getLuaScriptInstance( const std::string& procname, LuaScriptInstanceR& rt) const;
-
-	///\brief Create the context for executing a Lua script with all objects initialized
-	///\param[in] lsi reference to lua script instance to initialize
-	///\param[in] input_ input definition for the input to process
-	///\param[in] output_ output definition for the output to print
-	///\param[in] provider_ processor provider for allocation of objects accessed
-	///\return true on success, false else
-	bool initLuaScriptInstance( LuaScriptInstance* lsi, const Input& input_, const Output& output_, const proc::ProcessorProvider* provider_) const;
 
 	///\brief Get the list of commands
 	std::list<std::string> commands() const;

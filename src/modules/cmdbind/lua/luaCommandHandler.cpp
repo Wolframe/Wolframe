@@ -58,10 +58,8 @@ void LuaCommandHandler::initcall()
 	{
 		throw std::runtime_error( std::string( "unknown lua script '") + m_name + "'");
 	}
-	if (!m_ctx->funcmap.initLuaScriptInstance( m_interp.get(), Input(m_inputfilter), Output(m_outputfilter), m_provider))
-	{
-		throw std::runtime_error( std::string( "error initializing lua script '") + m_name + "'");
-	}
+	m_interp->init( Input(m_inputfilter), Output(m_outputfilter), m_provider);
+
 	if (!m_ctx->defaultfilter().empty())
 	{
 		types::CountedReference<langbind::Filter> filter( m_provider->filter( m_ctx->defaultfilter(), ""));
