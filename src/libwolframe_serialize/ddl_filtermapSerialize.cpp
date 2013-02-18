@@ -90,7 +90,6 @@ static bool fetchStruct( Context& ctx, std::vector<FiltermapDDLSerializeState>& 
 		ddl::StructType::Map::const_iterator itr = obj->begin() + idx;
 		if (!itr->second.initialized())
 		{
-/*[-]*/std::cout << "NOT INITIALIZED '" << itr->first << "'" << std::endl;
 			stk.back().state( ++idx);
 			return false;
 		}
