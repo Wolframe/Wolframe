@@ -884,7 +884,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 
 // search for root element (new) or form name (old)
 	QString name;
-	if( props->contains( "rootelement" ) ) {
+	if( props && props->contains( "rootelement" ) ) {
 		name = props->value( "rootelement" );
 	} else {
 		name = formName;

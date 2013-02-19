@@ -46,7 +46,7 @@ FormWidget::FormWidget( FormLoader *_formLoader, DataLoader *_dataLoader, QUiLoa
 	  m_uiLoader( _uiLoader ), m_formLoader( _formLoader ),
 	  m_dataLoader( _dataLoader ), m_ui( 0 ), m_dataHandler( 0 ),
 	  m_locale( DEFAULT_LOCALE ), m_layout( 0 ), m_forms( ),
-	  m_globals( 0 ), m_debug( _debug ), m_modal( false )
+	  m_globals( 0 ), m_props( 0 ), m_debug( _debug ), m_modal( false )
 {
 	initialize( );	
 }
@@ -394,6 +394,7 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 	m_dataHandler->writeFormData( m_form, m_ui, &xml, props );
 	
 // HACK: m_props
+	qDebug( ) << "props(sendRequest):" << props << this;
 	m_props = props;
 
 	QString action = props->value( "action" );
@@ -458,6 +459,7 @@ void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml
 			m_dataHandler->loadFormDomain( formName, widgetName, m_ui, xml, props );
 		} else {
 			// HACK: m_props are the properties of the form
+			qDebug( ) << "props(gotAnswer):" << m_props << this;
 			m_dataHandler->readFormData( formName, m_ui, xml, m_props );	
 		}
 	}
