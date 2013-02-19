@@ -12,14 +12,14 @@
 	%TutorialEntities;
 
 <!-- book set data -->
-	<!ENTITY BookSetVersion		SYSTEM "WolfBookVersion.txt">
-	<!ENTITY BookSetPublicationDate	SYSTEM "WolfBookDate.txt">
+	<!ENTITY BookSetVersion		SYSTEM "TutorialVersion.txt">
+	<!ENTITY BookSetPublicationDate	SYSTEM "TutorialDate.txt">
 
 ]>
 
 <set>
 	<setinfo>
-		<title>Wolframe Tutorial</title>
+		<title>Wolframe Tutorial (NOT UP TO DATE!!)</title>
 		<copyright>
 			<year>2011 - 2013</year>
 			<holder>Project Wolframe</holder>
