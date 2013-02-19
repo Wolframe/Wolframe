@@ -440,6 +440,19 @@ BOOST_LIBRARY_TAG ?=
 endif
 endif
 
+ifeq "$(LINUX_REV)" "13.1"
+ifdef BOOST_DIR
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+endif
+ifndef BOOST_DIR
+BOOST_DIR ?= /usr
+BOOST_LIB_DIR ?= $(BOOST_DIR)/lib
+BOOST_INCLUDE_DIR ?= $(BOOST_DIR)/include
+BOOST_LIBRARY_TAG ?=
+endif
+endif
+
 endif
 
 # SUSE Linux Enterprise
@@ -896,6 +909,19 @@ QT_LDFLAGS =
 endif
 
 ifeq "$(LINUX_REV)" "12.3"
+QT_DIR ?= /usr
+QT_INCLUDE_DIR ?= $(QT_DIR)/include
+QT_LIB_DIR ?= $(QT_DIR)/lib
+QT_BIN_DIR ?= $(QT_DIR)/bin
+QT_MOC ?= $(QT_BIN_DIR)/moc
+QT_LRELEASE ?= $(QT_BIN_DIR)/lrelease
+QT_LUPDATE ?= $(QT_BIN_DIR)/lupdate
+QT_RCC ?= $(QT_BIN_DIR)/rcc
+QT_UIC ?= $(QT_BIN_DIR)/uic
+QT_LDFLAGS =
+endif
+
+ifeq "$(LINUX_REV)" "13.1"
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
