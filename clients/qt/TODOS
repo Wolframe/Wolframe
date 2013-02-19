@@ -1,5 +1,7 @@
 now CRM:
-- map non-column data to userdata or keep it in other strcucture
+- map all non-column data to userdata or keep it in other strcucture
+  (not just 'id' attributes)
+- find out why qtclient got so slow?!
 
 now configurator:
 - stop the "whiteout", especially seen after assigning pictures
