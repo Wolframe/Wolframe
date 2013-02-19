@@ -31,6 +31,9 @@ daemon code:
   - systemd instead of init scripts for Fedora and Archlinux
   - wolframe depends on libicu48, this is wrong as boost-localization
     should layer the functionality and icu is only a backend
+  - use simple include for per-sub-package snippets for now till
+    we get a glob-include in configuration files
+
 
 - documentation
   - man pages

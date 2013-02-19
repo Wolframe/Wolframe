@@ -1,5 +1,5 @@
 now CRM:
-- QComboBox: mit IDS as userdata
+- map non-column data to userdata or keep it in other strcucture
 
 now configurator:
 - stop the "whiteout", especially seen after assigning pictures
