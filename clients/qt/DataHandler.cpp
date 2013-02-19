@@ -453,8 +453,8 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 		//~ QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget );
 	} else if( clazz == "QComboBox" ) {
 		QComboBox *comboBox = qobject_cast<QComboBox *>( widget );
-		//comboBox->clear( );
 		comboBox->setCurrentIndex( 0 );
+		// TODO
 	} else if( clazz == "QSpinBox" ) {
 		//~ QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget );
 		// TODO
@@ -467,18 +467,25 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 	} else if( clazz == "QPlainTextEdit" ) {
 		QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget );
 		plainTextEdit->clear( );
+		if( props->contains( "state" ) ) {
+			plainTextEdit->setPlainText( props->value( "state" ) );
+		}
 	} else if( clazz == "QTextEdit" ) {
 		QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
 		textEdit->clear( );
+		if( props->contains( "state" ) ) {
+			textEdit->setHtml( props->value( "state" ) );
+		}
 	} else if( clazz == "QCheckBox" ) {
 		QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
 		checkBox->setChecked( false );
+		// TODO
 	} else if( clazz == "QRadioButton" ) {
 		QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
 		radioButton->setChecked( false );
+		// TODO
 	} else if( clazz == "QListWidget" ) {
 		QListWidget *listWidget = qobject_cast<QListWidget *>( widget );
-//			listWidget->clear( );
 		for( int i = 0; i < listWidget->count( ); i++ ) {
 			QListWidgetItem *item = listWidget->item( i );
 			item->setSelected( false );
@@ -504,6 +511,7 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 	} else if( clazz == "FileChooser" ) {
 		FileChooser *fileChooser = qobject_cast<FileChooser *>( widget );
 		fileChooser->setFileName( "" );
+		// TODO
 	} else if( clazz == "PictureChooser" ) {
 		PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
 		if( props->contains( "state" ) ) {
@@ -1152,6 +1160,23 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		} else {
 			qWarning( ) << "Unsupported property" << property << "for class" << clazz << "in variable" << variable;
 		}
+	} else if( clazz == "QPlainTextEdit" ) {
+		QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget );
+		if( property == "text" ) {
+			return plainTextEdit->toPlainText( );
+		} else if( property == "state" ) {
+			return plainTextEdit->toPlainText( );
+		}
+	} else if( clazz == "QTextEdit" ) {
+		QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget );
+		if( property == "html" ) {
+			return textEdit->toHtml( );
+		} else if( property == "text" ) {
+			return textEdit->toPlainText( );
+		} else if( property == "state" ) {
+			// HTML preserves most (if not all) what the user entered
+			return textEdit->toHtml( );
+		}		
 	} else if( clazz == "PictureChooser" ) {
 		PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
 		if( property == "state" ) {

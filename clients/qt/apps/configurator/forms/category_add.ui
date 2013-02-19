@@ -32,6 +32,9 @@
      <property name="initialFocus" stdset="0">
       <bool>true</bool>
      </property>
+     <property name="state" stdset="0">
+      <string notr="true">{global.stateName}</string>
+     </property>
     </widget>
    </item>
    <item row="2" column="0">
@@ -45,7 +48,11 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QPlainTextEdit" name="description"/>
+    <widget class="QPlainTextEdit" name="description">
+     <property name="state" stdset="0">
+      <string>{global.stateDescription}</string>
+     </property>
+    </widget>
    </item>
    <item row="4" column="1">
     <widget class="QTableWidget" name="picture">
@@ -81,6 +88,9 @@
      </property>
      <property name="action" stdset="0">
       <string notr="true">read</string>
+     </property>
+     <property name="state" stdset="0">
+      <string notr="true">{global.pictureState}</string>
      </property>
      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
       <bool>true</bool>
@@ -197,6 +207,28 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="infoButton">
+       <property name="text">
+        <string>Info</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">picture_info</string>
+       </property>
+       <property name="global.id" stdset="0">
+        <string notr="true">{picture.id}</string>
+       </property>
+       <property name="global.stateName" stdset="0">
+        <string notr="true">{name.state}</string>
+       </property>
+       <property name="global.stateDescription" stdset="0">
+        <string notr="true">{description.state}</string>
+       </property>
+       <property name="global.statePicture" stdset="0">
+        <string notr="true">{picture.state}</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="3" column="0">
@@ -248,12 +280,28 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>231</y>
+     <x>219</x>
+     <y>261</y>
     </hint>
     <hint type="destinationlabel">
-     <x>318</x>
-     <y>232</y>
+     <x>300</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>picture</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>infoButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>332</x>
+     <y>341</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>332</x>
+     <y>249</y>
     </hint>
    </hints>
   </connection>
