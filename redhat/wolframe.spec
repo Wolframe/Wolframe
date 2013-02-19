@@ -39,28 +39,16 @@
 %endif
 
 %define fedora 0
-%define fc14 0
-%if 0%{?fedora_version} == 14
-%define dist fc14
-%define fc14 1
-%define fedora 1
-%endif
-%define fc15 0
-%if 0%{?fedora_version} == 15
-%define dist fc15
-%define fc15 1
-%define fedora 1
-%endif
-%define fc16 0
-%if 0%{?fedora_version} == 16
-%define dist fc16
-%define fc16 1
-%define fedora 1
-%endif
 %define fc17 0
 %if 0%{?fedora_version} == 17
 %define dist fc17
 %define fc17 1
+%define fedora 1
+%endif
+%define fc18 0
+%if 0%{?fedora_version} == 18
+%define dist fc18
+%define fc18 1
 %define fedora 1
 %endif
 
@@ -130,7 +118,7 @@
 # build local boost for distributions which have a too old version
 
 %define build_boost 0
-%if %{rhel} || %{fc14} || %{fc15} || %{fc16} || %{centos} || %{sles}
+%if %{rhel} || %{centos} || %{sles}
 %define build_boost 1
 %define boost_version 1.48.0
 %define boost_underscore_version 1_48_0
@@ -150,7 +138,7 @@
 %if !%{build_boost}
 %define with_icu	0
 %if %{fedora}
-%if %{fc17}
+%if %{fc17} || %{fc18}
 %define with_icu	1
 %endif
 %endif
