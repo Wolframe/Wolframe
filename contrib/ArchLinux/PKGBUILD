@@ -7,7 +7,8 @@ license=('GPL3')
 arch=('i686' 'x86_64')
 url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
-         'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'qt')
+         'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'qt' 'libharu'
+         'freeimage')
 makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
 md5sums=('8f74d2dcf94db2470ed096127941893d')
 _gitroot=git://github.com/mbarbos/Wolframe.git
