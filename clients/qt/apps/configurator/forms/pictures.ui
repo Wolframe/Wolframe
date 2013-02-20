@@ -87,11 +87,11 @@
        <property name="form" stdset="0">
         <string notr="true">picture_info</string>
        </property>
-       <property name="global.id" stdset="0">
-        <string notr="true">{picture.id}</string>
-       </property>
        <property name="global.pictureState" stdset="0">
         <string>{picture.state}</string>
+       </property>
+       <property name="global.pictureId" stdset="0">
+        <string notr="true">{picture.id}</string>
        </property>
       </widget>
      </item>

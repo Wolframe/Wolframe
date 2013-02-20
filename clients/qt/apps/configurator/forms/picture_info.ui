@@ -20,7 +20,7 @@
    <string notr="true">read</string>
   </property>
   <property name="id" stdset="0">
-   <string notr="true">{global.id}</string>
+   <string notr="true">{global.pictureId}</string>
   </property>
   <property name="doctype" stdset="0">
    <string notr="true">PictureRequest.simpleform</string>
