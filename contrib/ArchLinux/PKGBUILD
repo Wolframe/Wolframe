@@ -1,6 +1,6 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe-git
-pkgver=20130218
+pkgver=20130220
 pkgrel=1
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
@@ -16,6 +16,7 @@ _gitname=Wolframe
 package() {
   cd $startdir/src/$_gitname-build
 
+  msg "Installing.."
   make \
     WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
     WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
@@ -38,6 +39,16 @@ build() {
   cp -r $startdir/src/$_gitname $startdir/src/$_gitname-build
   cd $startdir/src/$_gitname-build
 
+  msg "Generating dependencies..."
+  make depend \
+    WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
+    WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
+    WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
+    WITH_LOCAL_FREEIMAGE=1 \
+    DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
+    CFLAGS='-O2' CXXFLAGS='-O2' \
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe
+
   msg "Building..."
   make \
     WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
@@ -48,6 +59,7 @@ build() {
     CFLAGS='-O2' CXXFLAGS='-O2' \
     LDFLAGS=-Wl,-rpath=/usr/lib/wolframe
 
+  msg "Building documentation.."
   cd docs
   make doc
   cd ..
