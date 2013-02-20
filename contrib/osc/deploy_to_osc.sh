@@ -18,3 +18,6 @@ CHKSUM=`md5sum $OSC_HOME/wolframe_$VERSION.tar.gz  | cut -f 1 -d' '`
 
 cat contrib/osc/wolframe.dsc > $OSC_HOME/wolframe.dsc
 echo " $CHKSUM $SIZE wolframe_$VERSION.tar.gz" >> $OSC_HOME/wolframe.dsc
+
+cat contrib/osc/PKGBUILD > $OSC_HOME/PKGBUILD
+echo "md5sums=('$CHKSUM')" >> $OSC_HOME/PKGBUILD
