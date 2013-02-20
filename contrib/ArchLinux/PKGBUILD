@@ -48,7 +48,7 @@ build() {
     WITH_SYSTEM_FREEIMAGE=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
     CFLAGS='-O2' CXXFLAGS='-O2' \
-    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,-rpath=/usr/lib/wolframe/plugins
 
   msg "Building..."
   make \
@@ -58,7 +58,7 @@ build() {
     WITH_SYSTEM_FREEIMAGE=1 RELEASE=1 \
     DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
     CFLAGS='-O2' CXXFLAGS='-O2' \
-    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe,-rpath=/usr/lib/wolframe/plugins
 
   msg "Building documentation.."
   cd docs
