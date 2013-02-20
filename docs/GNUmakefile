@@ -95,7 +95,7 @@ local_distclean:
 
 local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/doc/wolframe
-	cp -R doxygen/html/ $(DESTDIR)$(datadir)/doc/wolframe
+	test -d doxygen/html && cp -R doxygen/html/ $(DESTDIR)$(datadir)/doc/wolframe
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/man/man5
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/man/man8
 	$(INSTALL) -m 0644 wolframe.conf.5 $(DESTDIR)$(datadir)/man/man5
