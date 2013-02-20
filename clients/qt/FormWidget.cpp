@@ -458,7 +458,7 @@ void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml
 			m_dataHandler->loadFormDomain( formName, widgetName, m_ui, xml, props );
 		} else {
 			// HACK: m_props are the properties of the form
-			m_dataHandler->readFormData( formName, m_ui, xml, m_props );	
+			m_dataHandler->readFormData( formName, m_ui, xml, m_props );
 		}
 	}
 }

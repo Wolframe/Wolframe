@@ -76,6 +76,9 @@
         <property name="global.projectid" stdset="0">
          <string>{project.id}</string>
         </property>
+        <property name="global.customerid" stdset="0">
+         <string>{project.customerid}</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -101,6 +104,12 @@
      </property>
      <property name="doctype" stdset="0">
       <string>ListProject</string>
+     </property>
+     <property name="customerid" stdset="0">
+      <string/>
+     </property>
+     <property name="dataelement" stdset="0">
+      <string>id</string>
      </property>
      <column>
       <property name="text">

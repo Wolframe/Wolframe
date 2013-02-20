@@ -154,14 +154,36 @@ void NetworkDataLoader::handleRead( QString windowName, QString name, QHash<QStr
 	xml.writeStartDocument( );
 	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
 	xml.writeStartElement( rootElement );
-	foreach( QString key, props->keys( ) ) {
+	QStringList dataElements;
+	if (props->contains( "dataelement")) {
+		dataElements = props->value( "dataelement").split( ",");
+	}
+
+	if (dataElements.empty())
+	{
+		foreach( QString key, props->keys( ) ) {
 // skip _q_ dynamic properties, they are used by the Qt stylesheet engine
-		if( key.startsWith( "_q_" ) ) continue;
+			if( key.startsWith( "_q_" ) ) continue;
 // skip globals
-		if( key.startsWith( "global." ) ) continue;
+			if( key.startsWith( "global." ) ) continue;
 // ignore our own actions
-		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
-		xml.writeAttribute( key, props->value( key ) );
+			if( key == "doctype" || key == "rootelement" || key == "dataelement" || key == "action" || key == "initAction" || key == "form" || key == "state" || key == "initializer") continue;
+			xml.writeAttribute( key, props->value( key ) );
+		}
+	}
+	else
+	{
+		foreach( QString key, dataElements) {
+			if (props->contains( key))
+			{
+				xml.writeAttribute( key, props->value( key ) );
+			}
+			else
+			{
+				qWarning( ) << "dataelement property" << key << "undefined";
+				xml.writeAttribute( key, "");
+			}
+		}
 	}
 	xml.writeEndElement( );
 	xml.writeEndDocument( );
@@ -210,13 +232,14 @@ void NetworkDataLoader::handleDelete( QString windowName, QString name, QHash<QS
 	xml.writeStartDocument( );
 	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
 	xml.writeStartElement( rootElement );
+
 	foreach( QString key, props->keys( ) ) {
 // skip _q_ dynamic properties, they are used by the Qt stylesheet engine
 		if( key.startsWith( "_q_" ) ) continue;
 // skip globals
 		if( key.startsWith( "global." ) ) continue;
 // ignore our own actions
-		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
+		if( key == "doctype" || key == "rootelement" || key == "dataelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
 		xml.writeAttribute( key, props->value( key ) );
 	}
 	xml.writeEndElement( );
@@ -250,17 +273,39 @@ void NetworkDataLoader::handleDomainDataLoad( QString windowName, QString formNa
 	xml.writeStartDocument( );
 	xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
 	xml.writeStartElement( rootElement );
-	foreach( QString key, props->keys( ) ) {
-// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
-		if( key.startsWith( "_q_" ) ) continue;
-// skip globals
-		if( key.startsWith( "global." ) ) continue;
-// ignore our own actions
-		if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
-		xml.writeAttribute( key, props->value( key ) );
+	QStringList dataElements;
+	if (props->contains( "dataelement")) {
+		dataElements = props->value( "dataelement").split( ",");
 	}
-// assuming the root element has always id 1
-	xml.writeAttribute( "id", "1" );
+
+	if (dataElements.empty())
+	{
+		foreach( QString key, props->keys( ) ) {
+	// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
+			if( key.startsWith( "_q_" ) ) continue;
+	// skip globals
+			if( key.startsWith( "global." ) ) continue;
+	// ignore our own actions
+			if( key == "doctype" || key == "rootelement" || key == "dataelement" || key == "action" || key == "initAction" || key == "form" || key == "state" || key == "initializer") continue;
+			xml.writeAttribute( key, props->value( key ) );
+		}
+	// assuming the root element has always id 1
+		xml.writeAttribute( "id", "1" );
+	}
+	else
+	{
+		foreach( QString key, dataElements) {
+			if (props->contains( key))
+			{
+				xml.writeAttribute( key, props->value( key ) );
+			}
+			else
+			{
+				qWarning( ) << "dataelement property" << key << "undefined";
+				xml.writeAttribute( key, "");
+			}
+		}
+	}
 	xml.writeEndElement( );
 	xml.writeEndDocument( );
 
@@ -296,19 +341,41 @@ void NetworkDataLoader::handleRequest( QString windowName, QString formName, QSt
 		xml.writeStartDocument( );
 		xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" ).arg( rootElement ).arg( docType ) );
 		xml.writeStartElement( rootElement );
-		foreach( QString key, props->keys( ) ) {
-// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
-			if( key.startsWith( "_q_" ) ) continue;
-// skip globals
-			if( key.startsWith( "global." ) ) continue;
-// ignore our own actions
-			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
-			xml.writeAttribute( key, props->value( key ) );
+		QStringList dataElements;
+		if (props->contains( "dataelement")) {
+			dataElements = props->value( "dataelement").split( ",");
 		}
-// assuming the root element has always id, was used for trees in configurator, deemed
-// deprecated as we get the whole domain or we'll pass a parameter like 'id', 'search'
-// explicitly
-		xml.writeAttribute( "id", "1" );
+
+		if (dataElements.empty())
+		{
+			foreach( QString key, props->keys( ) ) {
+// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
+				if( key.startsWith( "_q_" ) ) continue;
+// skip globals
+				if( key.startsWith( "global." ) ) continue;
+// ignore our own actions
+				if( key == "doctype" || key == "rootelement" || key == "dataelement" || key == "action" || key == "initAction" || key == "form" || key == "state" || key == "initializer" ) continue;
+				xml.writeAttribute( key, props->value( key ) );
+			}
+			xml.writeAttribute( "id", "1" );
+			// assuming the root element has always id, was used for trees in configurator, deemed
+			// deprecated as we get the whole domain or we'll pass a parameter like 'id', 'search'
+			// explicitly
+		}
+		else
+		{
+			foreach( QString key, dataElements) {
+				if (props->contains( key))
+				{
+					xml.writeAttribute( key, props->value( key ) );
+				}
+				else
+				{
+					qWarning( ) << "dataelement property" << key << "undefined";
+					xml.writeAttribute( key, "");
+				}
+			}
+		}
 		xml.writeEndElement( );
 		xml.writeEndDocument( );
 		

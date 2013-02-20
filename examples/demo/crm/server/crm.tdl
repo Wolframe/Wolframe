@@ -134,6 +134,14 @@ BEGIN
 		FROM Project,Customer WHERE Project.id=$(id) AND Project.customerid = Customer.id;
 	INTO customer DO SELECT $2 AS id, $3 AS _;
 END
+TRANSACTION GetProject
+BEGIN
+	INTO . DO UNIQUE NONEMPTY
+		SELECT Project.id,
+			Project.customerid, Customer.name AS customername,
+			Project.name,Project.description
+		FROM Project,Customer WHERE Project.id=$(id) AND Project.customerid = Customer.id;
+END
 
 --  Not very efficient search :-)
 TRANSACTION SearchProject
@@ -152,7 +160,7 @@ END
 
 TRANSACTION ListProject
 BEGIN
-	INTO project DO SELECT Project.id,Project.customerid,Project.name,Project.description
+	INTO project DO SELECT Project.id,Project.customerid,Customer.name as customername,Project.name,Project.description
 		FROM Project,Customer
 		WHERE Project.customerid = Customer.id;
 END

@@ -67,6 +67,23 @@ DataHandler::DataHandler( DataLoader *_dataLoader, FormWidget *_formWidget, bool
 {
 }
 
+static bool isReservedAttribute( const QString& key)
+{
+	// _q_ dynamic properties, they are used by the Qt stylesheet engine:
+	if( key.startsWith( "_q_" ) ) return true;
+	// globals:
+	if( key.startsWith( "global.")) return true;
+	// our own actions:
+	if( key == "doctype"
+	||  key == "rootelement"
+	||  key == "action"
+	||  key == "initAction"
+	||  key == "form"
+	||  key == "state"
+	||  key == "initializer") return true;
+	return false;
+}
+
 void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *data, QHash<QString, QString> *props )
 {
 	QSet<QWidget *> seen;
@@ -92,19 +109,13 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	if( props->contains( "rootelement" ) ) {
 		xml.writeStartElement( props->value( "rootelement" ) );
 		foreach( QString key, props->keys( ) ) {
-	// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
-			if( key.startsWith( "_q_" ) ) continue;
-	// skip globals
-			if( key.startsWith( "global." ) ) continue;
-	// ignore our own actions
-			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
 			if (dataElements.empty())
 			{
+				if (isReservedAttribute( key)) continue;
 				xml.writeAttribute( key, props->value( key ) );
 			}
 			else if (dataElements.contains(key))
 			{
-				/*[-]*/qDebug() << "+++++++++WRITE PROPERTY " << key << "=" << props->value( key );
 				xml.writeAttribute( key, props->value( key ) );
 			}
 		}
@@ -155,12 +166,10 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 						if (di->length() == len)
 						{
 							writeElements = true;
-							/*[-]*/qDebug() << "+++++++++MATCH DATA ELEMENT " << *di;
 						}
 						else if ((*di)[len] == '.')
 						{
 							subDataElements << di->right( di->size()-len-1);
-							/*[-]*/qDebug() << "+++++++++SELECT SUB DATA ELEMENT " << di->right( di->size()-len-1);
 						}
 					}
 				}
@@ -174,7 +183,6 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 				// ... data elements defined in leaf element:
 				//		-> only elements with matching name are written.
 				writeElements = dataElements->contains( name);
-				/*[-]*/qDebug() << "+++++++++MATCH(2) DATA ELEMENT " << name;
 			}
 		}
 		if( !writeElements ) continue;
@@ -294,10 +302,7 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 			QHash<QString, QString> p;
 			FormWidget::readDynamicStringProperties( &p, widget );
 			foreach( QString key, p.keys( ) ) {
-				// skip Qt internal ones
-				if( key.startsWith( "_q_" ) ) continue;
-				// skip globals
-				if( key.startsWith( "global." ) ) continue;
+				if (isReservedAttribute( key)) continue;
 				xml.writeAttribute( key, p.value( key ) );
 			}
 			writeWidgets( groupBox, &subDataElements, xml, props, seen );
@@ -889,14 +894,15 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 	} else {
 		name = formName;
 	}
-	
+
 	resetFormData( form );
 	//loadFormDomains( formName, form );
-	
+
 	while( !xml.atEnd( ) ) {
 		xml.readNext( );
 		if( xml.isStartElement( ) && xml.name( ) == name ) {
 			inForm = true;
+
 		} else if( xml.isEndElement( ) && xml.name( ) == name ) {
 // HACK: in theory we should check for subforms, currently we can't prepare the
 // data in the layers below as we want, so we do an everywhere match (global namespace
@@ -908,7 +914,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 					widget = qFindChild<QWidget *>( form, xml.name( ).toString( ) );
 					qDebug( ) << "Reading from XML for" << xml.name( ) << "into" << widget;
 					if( widget ) {
-						clazz = widget->metaObject( )->className( ); 						
+						clazz = widget->metaObject( )->className( );
 						QXmlStreamAttributes attributes = xml.attributes( );
 						if( clazz == "QLineEdit" ) {
 							QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
@@ -939,9 +945,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							QXmlStreamAttributes attributes = xml.attributes( );
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							for( int idx = 0; idx < comboBox->count( ); idx++ ) {
-								/*[-]*/qDebug() << "+++++++++CHECK ITEM " << idx << " AGAINST " << text;
 								if( comboBox->itemText( idx ) == text ) {
-									/*[-]*/qDebug() << "+++++++++MATCH";
 									comboBox->setCurrentIndex( idx );
 									break;
 								}
@@ -950,13 +954,10 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							foreach( QXmlStreamAttribute attr, attributes ) {
 								if( attr.name( ) == "id" ) {
 									QString mustId = attr.value( ).toString( );
-									/*[-]*/qDebug() << "+++++++++FIND MUST ID " << mustId << " IN " << comboBox->count( );
 
 									for( int idx = 0; idx < comboBox->count( ); idx++ ) {
 										QString id = comboBox->itemData( idx, Qt::UserRole ).toString( );
-										/*[-]*/qDebug() << "+++++++++CHECK ID " << id;
 										if( id == mustId ) {
-											/*[-]*/qDebug() << "+++++++++MATCH";
 											comboBox->setCurrentIndex( idx );
 											break;
 										}
@@ -1110,6 +1111,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 	}
 }
 
+
 // Note: this is over-simplistic and hard-coded. Should be a generic
 // property introspection language similar to the variable system
 // in QScript (Javascript), maybe later..
@@ -1118,16 +1120,16 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 	QStringList parts = variable.split( "." );
 
 	qDebug( ) << "Evaluating variable" << variable;
-	
+
 // expecting a widget name as first argument
-	if( parts[0].isNull( ) ) {
+	if( parts.count() == 0 ) {
 		qWarning( ) << "Expecting a expression of the form <widget>.<property>";
 		return QString( );
 	}
 	QString name = parts[0];
 	
 // expecting a property identifier as second argument
-	if( parts[1].isNull( ) ) {
+	if( parts.count() != 2 ) {
 		qWarning( ) << "Expecting a property name in variable" << variable;
 		return QString( );
 	}
@@ -1139,7 +1141,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		qWarning( ) << "Unknown widget" << name << "in variable" << variable << "of form" << form;
 		return QString( );
 	}
-	
+
 // properties differ depending on the class of the widget	
 	QString clazz = widget->metaObject( )->className( );
 

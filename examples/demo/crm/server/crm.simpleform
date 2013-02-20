@@ -152,6 +152,7 @@ Form ProjectEdit
 Form ProjectInserted
 {
 	id		!@ID
+	customername	?entityname
 	_ Project
 }
 Form ProjectEditInserted
