@@ -1,3 +1,5 @@
+BEGIN;
+
 -- Employee:
 INSERT INTO Employee (name,status,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Friedrich Muller', 'manager', 'Seerosenweg 3', NULL, '3045', 'Bumplitz', 'Schweiz');
 INSERT INTO Employee (name,status,addr_line1,addr_line2,addr_postalcode,addr_district,addr_country) VALUES ('Susanne Tobler', 'project leader', 'Kreuzstrasse 12', NULL, '5012', 'Luzern', 'Schweiz');
@@ -54,3 +56,4 @@ INSERT INTO ActivityNote (activityid,content,link) VALUES ('2', 'Note 1 for Acti
 INSERT INTO ActivityNote (activityid,content,link) VALUES ('2', 'Note 2 for Activity 2', 'http://link.com/2.2');
 INSERT INTO ActivityNote (activityid,content,link) VALUES ('3', 'Note 1 for Activity 3', 'http://link.com/3.1');
 
+COMMIT;
