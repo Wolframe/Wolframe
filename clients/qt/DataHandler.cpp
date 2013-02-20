@@ -97,7 +97,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	// skip globals
 			if( key.startsWith( "global." ) ) continue;
 	// ignore our own actions
-			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" ) continue;
+			if( key == "doctype" || key == "rootelement" || key == "action" || key == "initAction" || key == "form" || key == "state" || key == "dataelement" ) continue;
 			if (dataElements.empty())
 			{
 				xml.writeAttribute( key, props->value( key ) );
@@ -200,7 +200,8 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 			QString text = comboBox->itemText( comboBox->currentIndex( ) );
 			QString id = comboBox->itemData( comboBox->currentIndex( ), Qt::UserRole ).toString( );
 			xml.writeStartElement( "", name );
-			xml.writeAttribute( "id", id );
+			if( !id.isEmpty( ) )
+				xml.writeAttribute( "id", id );
 			xml.writeCharacters( text );
 			xml.writeEndElement( );
 		} else if( clazz == "QSpinBox" ) {
