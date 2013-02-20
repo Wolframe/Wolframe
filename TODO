@@ -43,7 +43,10 @@ daemon code:
   <port protocol="tcp" port="7661"/>
 </service>
     firewall-cmd --add-service=wolframe
-
+  - sqlite3: test for threadsafety, adjust LOCAL vs. SYSTEM build flags
+  - test module default dir, make 'directory' override the #ifdefed one,
+    test everywhere
+  
 - documentation
   - man pages
 

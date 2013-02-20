@@ -532,10 +532,6 @@ Optional packages: openssl, qt, pam, libsasl,
                    libxml2, libxslt, libharu,
                    icu, freeimage
 
-FreeImage only contains the static version of libfreeimageplus. If you
-want the shared version, build with WITH_LOCAL_FREEIMAGE=1 instead. The
-static version works fine though.
-
 For building the documentation you need 'xsltproc', 'docbook-xsl' and 'doxygen'
 and 'fop'. Newest versions run only with the SVN version of
 'java-xmlgraphics-commons'. Install the package 'java-xmlgraphics-commons-svn'
