@@ -839,6 +839,10 @@ fi
 %dir %attr(0755, root, root) %{_mandir}/man8
 %endif
 %{_mandir}/man8/wolframed.8.gz
+%if !%{sles}
+%dir %attr(0755, root, root) %{_mandir}/man1
+%endif
+%{_mandir}/man1/wolfpasswd.1.gz
 
 %if %{build_boost}
 %{_libdir}/wolframe/libboost_program_options.so.%{boost_version}

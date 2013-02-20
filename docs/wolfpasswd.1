@@ -1,0 +1,188 @@
+'\" t
+.\"     Title: wolframe
+.\"    Author: Mihai Barbos <mihai.barbos@gmail.com>
+.\" Generator: DocBook XSL Stylesheets v1.78.0 <http://docbook.sf.net/>
+.\"      Date: 02/20/2013
+.\"    Manual: Wolframe User Manual
+.\"    Source: wolfpasswd
+.\"  Language: English
+.\"
+.TH "WOLFRAME" "1" "02/20/2013" "wolfpasswd" "Wolframe User Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+wolfpasswd \- program to do something
+.SH "SYNOPSIS"
+.HP \w'\fBwolfpasswd\fR\ 'u
+\fBwolfpasswd\fR \fB\-e\ \fR\fB\fIthis\fR\fR [\fB\-\-example=\fR\fBthat\fR] [{\fB\-e\fR\ |\ \fB\-\-example\fR}\ \fIthis\fR] [{\fB\-e\fR\ |\ \fB\-\-example\fR}\ {\fIthis\fR\ |\ \fIthat\fR}]
+.HP \w'\fBwolfpasswd\fR\ 'u
+\fBwolfpasswd\fR [{\fB\-h\fR\ |\ \fB\-\-help\fR} | {\fB\-v\fR\ |\ \fB\-\-version\fR}]
+.SH "DESCRIPTION"
+.PP
+This manual page documents briefly the
+\fBwolfpasswd\fR
+and
+\fBbar\fR
+commands\&.
+.PP
+This manual page was written for the Debian distribution because the original program does not have a manual page\&. Instead, it has documentation in the GNU
+\fBinfo\fR(1)
+format; see below\&.
+.PP
+\fBwolfpasswd\fR
+is a program that\&.\&.\&.
+.SH "OPTIONS"
+.PP
+The program follows the usual GNU command line syntax, with long options starting with two dashes (`\-\*(Aq)\&. A summary of options is included below\&. For a complete description, see the
+\fBinfo\fR(1)
+files\&.
+.PP
+\fB\-e \fR\fB\fIthis\fR\fR, \fB\-\-example=\fR\fB\fIthat\fR\fR
+.RS 4
+Does this and that\&.
+.RE
+.PP
+\fB\-v\fR, \fB\-\-version\fR
+.RS 4
+Show version of program\&.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+.RS 4
+Show summary of options\&.
+.RE
+.PP
+\fB\-p\fR, \fB\-\-print\-config\fR
+.RS 4
+Print the configuration\&.
+.RE
+.PP
+\fB\-t\fR, \fB\-\-check\-config\fR
+.RS 4
+Check the configuration\&.
+.RE
+.PP
+\fB\-u \fR\fB\fIuser\fR\fR, \fB\-\-user \fR\fB\fIuser\fR\fR
+.RS 4
+run as user
+\fIuser\fR\&.
+.RE
+.PP
+\fB\-g \fR\fB\fIgroup\fR\fR, \fB\-\-group \fR\fB\fIgroup\fR\fR
+.RS 4
+run as group
+\fIgroup\fR\&.
+.RE
+.SH "FILES"
+.PP
+/etc/foo\&.conf
+.RS 4
+The system\-wide configuration file to control the behaviour of
+wolfpasswd\&. See
+\fBfoo.conf\fR(5)
+for further details\&.
+.RE
+.PP
+${HOME}/\&.foo\&.conf
+.RS 4
+The per\-user configuration file to control the behaviour of
+wolfpasswd\&. See
+\fBfoo.conf\fR(5)
+for further details\&.
+.RE
+.SH "ENVIONMENT"
+.PP
+\fBFOO_CONF\fR
+.RS 4
+If used, the defined file is used as configuration file (see also
+the section called \(lqFILES\(rq)\&.
+.RE
+.SH "DIAGNOSTICS"
+.PP
+The following diagnostics may be issued on
+stderr:
+.PP
+Bad configuration file\&. Exiting\&.
+.RS 4
+The configuration file seems to contain a broken configuration line\&. Use the
+\fB\-\-verbose\fR
+option, to get more info\&.
+.RE
+.PP
+\fBwolfpasswd\fR
+provides some return codes, that can be used in scripts:
+.\" line length increase to cope w/ tbl weirdness
+.ll +(\n(LLu * 62u / 100u)
+.TS
+ll.
+\fICode\fR	\fIDiagnostic\fR
+T{
+\fB0\fR
+T}	T{
+Program exited successfully\&.
+T}
+T{
+\fB1\fR
+T}	T{
+The configuration file seems to be broken\&.
+T}
+.TE
+.\" line length decrease back to previous value
+.ll -(\n(LLu * 62u / 100u)
+.sp
+.SH "BUGS"
+.PP
+The program is currently limited to only work with the
+foobar
+library\&.
+.PP
+The upstreams
+BTS
+can be found at
+\m[blue]\fB\%http://bugzilla.foo.tld\fR\m[]\&.
+.SH "SEE ALSO"
+.PP
+\fBbar\fR(1),
+\fBbaz\fR(1),
+\fBfoo.conf\fR(5)
+.PP
+The programs are documented fully by
+The Rise and Fall of a Fooish Bar
+available via the
+\fBinfo\fR(1)
+system\&.
+.SH "AUTHOR"
+.PP
+\fBMihai Barbos\fR <\&mihai\&.barbos@gmail\&.com\&>
+.RS 4
+Wrote this manpage for the Debian system\&.
+.RE
+.SH "COPYRIGHT"
+.br
+Copyright \(co 2010-2011 Mihai Barbos
+.br
+.PP
+This manual page was written for the Debian system (and may be used by others)\&.
+.PP
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU General Public License, Version 2 or (at your option) any later version published by the Free Software Foundation\&.
+.PP
+On Debian systems, the complete text of the GNU General Public License can be found in
+/usr/share/common\-licenses/GPL\&.
+.sp
