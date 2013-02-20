@@ -52,10 +52,14 @@ local_distclean:
 local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(libdir)/wolframe/modules
 	$(INSTALL) -m 0775 $(DYNAMIC_MODULE) $(DESTDIR)$(libdir)/wolframe/modules
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(bindir)
+	$(INSTALL) -m 0775 wolfpasswd$(EXE) $(DESTDIR)$(bindir)
 
 local_uninstall:
-	-rm $(DESTDIR)$(libdir)/wolframe/modules/$(DYNAMIC_MODULE)
-	-rmdir $(DESTDIR)$(libdir)/wolframe/modules
+	@-rm -f $(DESTDIR)$(bindir)/wolfpasswd$(EXE)
+	@-rmdir $(DESTDIR)$(bindir)
+	@-rm $(DESTDIR)$(libdir)/wolframe/modules/$(DYNAMIC_MODULE)
+	@-rmdir $(DESTDIR)$(libdir)/wolframe/modules
 
 local_test:
 
