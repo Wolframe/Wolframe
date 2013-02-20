@@ -9,7 +9,7 @@ url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
          'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'qt')
 makedepends=()
-source=("${pkgname}-${pkgver}.tar.gz")
+source=("${pkgname}_${pkgver}.tar.gz")
 
 package() {
   cd ${srcdir}/${pkgname}-${pkgver}
