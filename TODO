@@ -31,7 +31,22 @@ daemon code:
   - systemd instead of init scripts for Fedora and Archlinux
   - wolframe depends on libicu48, this is wrong as boost-localization
     should layer the functionality and icu is only a backend
-
+  - use simple include for per-sub-package snippets for now till
+    we get a glob-include in configuration files
+  - Fedora 18 has firewalld, no longer iptables, write XML for the
+    wolframe ports:
+    /usr/lib/firewalld/services/wolframe.xml
+    <?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>Wolframe</short>
+  <description>Wolframe insercure port. Rather open the secure one on productive systems.</description>
+  <port protocol="tcp" port="7661"/>
+</service>
+    firewall-cmd --add-service=wolframe
+  - sqlite3: test for threadsafety, adjust LOCAL vs. SYSTEM build flags
+  - test module default dir, make 'directory' override the #ifdefed one,
+    test everywhere
+  
 - documentation
   - man pages
 

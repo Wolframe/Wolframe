@@ -1,7 +1,11 @@
 now CRM:
-- QComboBox: mit IDS as userdata
+- map all non-column data to userdata or keep it in other strcucture
+  (not just 'id' attributes)
 
 now configurator:
+- open info box (modal) in feature/category/component edit and add to
+  show picture information
+
 - stop the "whiteout", especially seen after assigning pictures
   (must be a protocol thing), happens mainly on Windows 7/8, not
   on Linux/Windows XPL:
@@ -14,9 +18,6 @@ now configurator:
     on Windows XP, so it is a failed signal for a partial line, must add
     a state like DataLeft (Data gets DataReading or so)
 - ILLEGAL STATE 4 in dataAvailable!
-- modal dialogs
-  - first implementation failed due to asynchronous architecture in FormWidget,
-    must rewrite all!
 - MDI interface
   - open forms via click on button
   - close forms on click on button
@@ -30,6 +31,9 @@ now configurator:
   - resizing issues: example view picture when picture list window is quite small
 
 musts:
+- modal dialogs
+  - improve now refresh of parent form after closing the modal dialog,
+    otherwise state propagation in the UI gets far too complicated!
 - file UI and data mode
   - resizing issues
 - multi-language support
@@ -51,8 +55,6 @@ musts:
     (maybe custom menus which would be added would be better? or a
     tree view in the dialog and a tree menu in the menubar?)
 - ask for restart of the client when changing to developer mode
-- open info box (modal) in feature/category/component edit and add to
-  show picture information
 - search with flag (with children)
 - delete needs manual set parameters, update and add use XML from widgets,
   slightly assymetrical maybe?

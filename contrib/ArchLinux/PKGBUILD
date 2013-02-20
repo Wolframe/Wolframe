@@ -1,6 +1,6 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
 pkgname=wolframe-git
-pkgver=20121108
+pkgver=20130220
 pkgrel=1
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')
@@ -8,7 +8,7 @@ arch=('i686' 'x86_64')
 url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
          'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'qt')
-makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz')
+makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
 md5sums=('8f74d2dcf94db2470ed096127941893d')
 _gitroot=git://github.com/mbarbos/Wolframe.git
 _gitname=Wolframe
@@ -16,11 +16,12 @@ _gitname=Wolframe
 package() {
   cd $startdir/src/$_gitname-build
 
+  msg "Installing.."
   make \
     WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
-    WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
-    WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
-    WITH_LOCAL_FREEIMAGE=1 \
+    WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
+    WITH_LIBXSLT=1 WITH_SYSTEM_LIBHPDF=1 WITH_ICU=1 \
+    WITH_SYSTEM_FREEIMAGE=1 \
     DESTDIR=${pkgdir} prefix=/usr \
     install
 }
@@ -38,15 +39,27 @@ build() {
   cp -r $startdir/src/$_gitname $startdir/src/$_gitname-build
   cd $startdir/src/$_gitname-build
 
-  msg "Building..."
-  make \
+  msg "Generating dependencies..."
+  make depend \
     WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
-    WITH_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
-    WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
-    WITH_LOCAL_FREEIMAGE=1 \
+    WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
+    WITH_LIBXSLT=1 WITH_SYSTEM_LIBHPDF=1 WITH_ICU=1 \
+    WITH_SYSTEM_FREEIMAGE=1 \
+    DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
     CFLAGS='-O2' CXXFLAGS='-O2' \
     LDFLAGS=-Wl,-rpath=/usr/lib/wolframe
 
+  msg "Building..."
+  make \
+    WITH_SSL=1 WITH_EXPECT=1 WITH_QT=1 WITH_PAM=1 WITH_SASL=1 \
+    WITH_SYSTEM_SQLITE3=1 WITH_PGSQL=1 WITH_LUA=1 WITH_LIBXML2=1 \
+    WITH_LIBXSLT=1 WITH_SYSTEM_LIBHPDF=1 WITH_ICU=1 \
+    WITH_SYSTEM_FREEIMAGE=1 \
+    DEFAULT_MODULE_LOAD_DIR=/usr/lib/wolframe/modules \
+    CFLAGS='-O2' CXXFLAGS='-O2' \
+    LDFLAGS=-Wl,-rpath=/usr/lib/wolframe
+
+  msg "Building documentation.."
   cd docs
   make doc
   cd ..

@@ -1,0 +1,15 @@
+A collection of bugs
+
+--
+
+FreeBSD 9
+
+test lua_transaction_postgresql_configurator.UTF-8
+
+16209 abaumann      1 103    0    99M 20096K RUN      8:26 100.00% testWolfilter
+
+runs for more than 20 minutes
+
+runs ok in debugger
+
+---

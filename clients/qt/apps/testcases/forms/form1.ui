@@ -164,16 +164,6 @@
        <property name="action" stdset="0">
         <string>read</string>
        </property>
-       <item>
-        <property name="text">
-         <string>Male</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Female</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item row="7" column="0">

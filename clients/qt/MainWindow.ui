@@ -291,6 +291,9 @@
    </property>
   </action>
   <action name="actionContents">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Contents</string>
    </property>
@@ -302,26 +305,41 @@
    </property>
   </action>
   <action name="actionIndex">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Index</string>
    </property>
   </action>
   <action name="actionContextHelp">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Context Help</string>
    </property>
   </action>
   <action name="actionTechnicalSupport">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Technical Support</string>
    </property>
   </action>
   <action name="actionReportBug">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Report Bug...</string>
    </property>
   </action>
   <action name="actionCheckForUpdates">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Check for Updates...</string>
    </property>
@@ -586,6 +604,9 @@
    </property>
   </action>
   <action name="actionPrint">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="qtclient.qrc">
      <normaloff>:/images/print.png</normaloff>:/images/print.png</iconset>
