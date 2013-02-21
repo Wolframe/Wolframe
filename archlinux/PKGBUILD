@@ -9,20 +9,20 @@ url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
          'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'qt' 'libharu'
          'freeimage')
-makedepends=('git' 'docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
+makedepends=('docbook-xsl' 'doxygen' 'fop' 'graphviz' 'dia')
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(
+  '${pkgname}_${pkgver}.tar.gz'
   'wolframe.conf'
   'wolframed.service'
 )
-md5sums=('2fde608c00c6d098683db533cbaab07b'
+md5sums=('31966cc7391951dceee599bffcd241d4'
+         '2fde608c00c6d098683db533cbaab07b'
          '66bdff0de795380ecafa48edda8d470e')
-_gitroot=git://github.com/mbarbos/Wolframe.git
-_gitname=Wolframe
 
 package() {
-  cd $startdir/src/$_gitname-build
+  cd ${srcdir}/${pkgname}-${pkgver}
 
   msg "Installing.."
   make \
@@ -45,17 +45,7 @@ package() {
 }
 
 build() {
-  cd $startdir/src
-  
-  msg "Getting source from git..."
-  if [ -d $startdir/src/$_gitname ] ; then
-    cd $_gitname && git pull origin
-  else
-    git clone $_gitroot
-  fi
-
-  cp -r $startdir/src/$_gitname $startdir/src/$_gitname-build
-  cd $startdir/src/$_gitname-build
+  cd ${srcdir}/${pkgname}-${pkgver}
 
   msg "Generating dependencies..."
   make depend \
