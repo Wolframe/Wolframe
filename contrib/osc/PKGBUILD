@@ -12,7 +12,7 @@ makedepends=()
 backup=('etc/wolframe/wolframe.conf')
 install='wolframe.install' 
 source=(
-  '${pkgname}_${pkgver}.tar.gz'
+  "${pkgname}_${pkgver}.tar.gz"
   'wolframe.conf'
   'wolframed.service'
 )
