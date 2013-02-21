@@ -826,6 +826,7 @@ fi
 %attr( 554, root, root) %{_initrddir}/%{name}
 %{_sbindir}/wolframed
 %{_bindir}/wolfilter
+%{_bindir}/wolfpasswd
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
 #%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
@@ -838,6 +839,10 @@ fi
 %dir %attr(0755, root, root) %{_mandir}/man8
 %endif
 %{_mandir}/man8/wolframed.8.gz
+%if !%{sles}
+%dir %attr(0755, root, root) %{_mandir}/man1
+%endif
+%{_mandir}/man1/wolfpasswd.1.gz
 
 %if %{build_boost}
 %{_libdir}/wolframe/libboost_program_options.so.%{boost_version}

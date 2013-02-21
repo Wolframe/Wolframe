@@ -115,16 +115,16 @@ local_distclean:
 
 local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sbindir)
-	$(INSTALL) -m 0775 wolframed $(DESTDIR)$(sbindir)
+	$(INSTALL) -m 0775 wolframed$(EXE) $(DESTDIR)$(sbindir)
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(bindir)
-	$(INSTALL) -m 0775 wolfilter $(DESTDIR)$(bindir)
+	$(INSTALL) -m 0775 wolfilter$(EXE) $(DESTDIR)$(bindir)
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sysconfdir)/wolframe
 	$(INSTALL) -m 0755 wolframe.conf $(DESTDIR)$(sysconfdir)/wolframe
 
 local_uninstall:
-	@-rm -f $(DESTDIR)$(bindir)/wolfilter
+	@-rm -f $(DESTDIR)$(bindir)/wolfilter$(EXE)
 	@-rmdir $(DESTDIR)$(bindir)
-	@-rm -f $(DESTDIR)$(sbindir)/wolframed
+	@-rm -f $(DESTDIR)$(sbindir)/wolframed$(EXE)
 	@-rmdir $(DESTDIR)$(sbindir)
 	@-rm -f $(DESTDIR)$(sysconfdir)/wolframe/wolframe.conf
 	@-rmdir $(DESTDIR)$(sysconfdir)/wolframe
@@ -157,3 +157,6 @@ check:
 print:
 	@echo "Running the Wolframe server..."
 	@@LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) ./wolframed -c wolframe.conf -p
+
+showenv:
+	@echo LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)

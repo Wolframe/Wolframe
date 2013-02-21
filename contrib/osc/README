@@ -43,4 +43,13 @@ osc build --ccache wolframe.spec
   - boost_libs: only the ones needed by Wolframe! no python especially
   - remove all shell code doing something with python or mpi
 
+ArchLinux
+
+Add to 'osc meta prj -e':
+
+  <repository name="ArchLinux">
+    <path project="Arch:Core" repository="standard"/>
+    <arch>i586</arch>
+    <arch>x86_64</arch>
+  </repository>
 

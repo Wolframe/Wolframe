@@ -37,7 +37,7 @@ local_all:
 
 doc: doc-doxygen doc-html doc-html-chunked doc-pdf
 
-man: wolframed.8 wolframe.conf.5
+man: wolframed.8 wolframe.conf.5 wolfpasswd.1
 
 doc-doxygen:
 	cd $(TOPDIR); doxygen docs/doxygen.conf
@@ -84,6 +84,9 @@ wolframed.8: wolframed-man.xml
 wolframe.conf.5: wolframe.conf-man.xml
 	$(XSLT_MAN) $<
 
+wolfpasswd.1: wolfpasswd-man.xml
+	$(XSLT_MAN) $<
+
 Tutorial.html: Tutorial.xml
 
 local_clean:
@@ -95,18 +98,23 @@ local_distclean:
 
 local_install:
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/doc/wolframe
-	cp -R doxygen/html/ $(DESTDIR)$(datadir)/doc/wolframe
+	-test -d doxygen/html && cp -R doxygen/html/ $(DESTDIR)$(datadir)/doc/wolframe
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/man/man5
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/man/man8
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(datadir)/man/man1
 	$(INSTALL) -m 0644 wolframe.conf.5 $(DESTDIR)$(datadir)/man/man5
 	gzip -f $(DESTDIR)$(datadir)/man/man5/wolframe.conf.5
 	$(INSTALL) -m 0644 wolframed.8 $(DESTDIR)$(datadir)/man/man8
 	gzip -f $(DESTDIR)$(datadir)/man/man8/wolframed.8
+	$(INSTALL) -m 0644 wolfpasswd.1 $(DESTDIR)$(datadir)/man/man1
+	gzip -f $(DESTDIR)$(datadir)/man/man1/wolfpasswd.1
 
 local_uninstall:
 	@-rm -rf $(DESTDIR)$(datadir)/doc/wolframe/html
 	@-rmdir $(DESTDIR)$(datadir)/doc/wolframe
 	@-rmdir $(DESTDIR)$(datadir)/doc
+	@-rm $(DESTDIR)$(datadir)/man/man1/wolfpasswd.1.gz
+	@-rmdir $(DESTDIR)$(datadir)/man/man1
 	@-rm $(DESTDIR)$(datadir)/man/man8/wolframed.8.gz
 	@-rmdir $(DESTDIR)$(datadir)/man/man8
 	@-rm $(DESTDIR)$(datadir)/man/man5/wolframe.conf.5.gz

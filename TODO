@@ -2,21 +2,24 @@ MBa:
 
 
 ABa:
-daemon code:
-- On expection in main, remove pidfile -> permission issue, need root
-  parent with signalling, see WolfBones, or maybe chown of pidfile?
-- qtclient cont.
-- configurator
-  - categories + features, trees with add/delete/edit
-  - image picker
-  - associatiting features and categories
-
+- Qt frontend
+  - qtclient cont.
+  - configurator
+    - categories + features, trees with add/delete/edit
+    - image picker
+    - associatiting features and categories
+    - see separate list in clients/qt/TODOS
+    
 - makefiles
   - fix libchrono transitive dependency in boost in 1.50/1.51
   - error checking after dependency generation, avoid funny mistakes
 
 - polish deployment
-  - template configuration wolframed.conf
+  - template configuration wolframed.conf for all platforms, different
+    layouts at least for:
+    - ArchLinux: all in one, annotated, KISS
+    - Debian: includes and split
+    - Redhat: includes and split, other pathes than Debian
   - debian builds always against 1.48 boost, this should only be the
     case for older Debian/Ubuntu systems (needs a split in OSC dsc
     files)
@@ -26,13 +29,15 @@ daemon code:
   - /usr/lib/x86_64-linux-gnu is a possible module loading place,
     so is /usr/lib32, /usr/lib64, etc. inject as MODULEPATH to build
     process and to module loading code 
-  - apache-like LoadModules, support for 'wolframe.d/libxml2.conf'
-    and 'include wolframe.d/*.conf'
-  - systemd instead of init scripts for Fedora and Archlinux
+  - systemd instead of init scripts for Fedora
   - wolframe depends on libicu48, this is wrong as boost-localization
     should layer the functionality and icu is only a backend
+    (this is due to mistakes in debhelper shlibs detection on Debian/Ubuntu
+    only)
   - use simple include for per-sub-package snippets for now till
-    we get a glob-include in configuration files
+    we get a glob-include in configuration files,
+    apache-like LoadModules, support for 'wolframe.d/libxml2.conf'
+    and 'include wolframe.d/*.conf'
   - Fedora 18 has firewalld, no longer iptables, write XML for the
     wolframe ports:
     /usr/lib/firewalld/services/wolframe.xml
@@ -44,8 +49,14 @@ daemon code:
 </service>
     firewall-cmd --add-service=wolframe
   - sqlite3: test for threadsafety, adjust LOCAL vs. SYSTEM build flags
-  - test module default dir, make 'directory' override the #ifdefed one,
+  - test module default dir, make 'directory' override the #ifdef-ed one,
     test everywhere
+    also, don't give up after one guess, try to combine the package root (optional)
+    and then the server root (the location of the configuration)
+  - avoid building of things like mod_test in tests directory if not building
+    the tests (they are not deployed):
+    - split rules for building loadable modules and test loadable modules (mod_test)
+    - build TEST_XXX only if 'make test' is given, not in 'make all'
   
 - documentation
   - man pages

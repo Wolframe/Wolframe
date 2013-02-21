@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>392</width>
+    <width>406</width>
     <height>473</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Add category</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
@@ -33,7 +36,7 @@
       <bool>true</bool>
      </property>
      <property name="state" stdset="0">
-      <string notr="true">{global.stateName}</string>
+      <string>{global.stateName}</string>
      </property>
     </widget>
    </item>
@@ -90,7 +93,7 @@
       <string notr="true">read</string>
      </property>
      <property name="state" stdset="0">
-      <string notr="true">{global.pictureState}</string>
+      <string>{global.statePicture}</string>
      </property>
      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
       <bool>true</bool>
@@ -155,6 +158,18 @@
        <property name="parentID" stdset="0">
         <string notr="true">{global.id}</string>
        </property>
+       <property name="global.stateName" stdset="0">
+        <string notr="true"/>
+       </property>
+       <property name="global.stateDescription" stdset="0">
+        <string notr="true"/>
+       </property>
+       <property name="global.statePicture" stdset="0">
+        <string notr="true"/>
+       </property>
+       <property name="global.pictureId" stdset="0">
+        <string notr="true"/>
+       </property>
       </widget>
      </item>
      <item>
@@ -164,6 +179,18 @@
        </property>
        <property name="form" stdset="0">
         <string notr="true">categories</string>
+       </property>
+       <property name="global.stateName" stdset="0">
+        <string notr="true"/>
+       </property>
+       <property name="global.stateDescription" stdset="0">
+        <string notr="true"/>
+       </property>
+       <property name="global.statePicture" stdset="0">
+        <string notr="true"/>
+       </property>
+       <property name="global.pictureId" stdset="0">
+        <string notr="true"/>
        </property>
       </widget>
      </item>
@@ -215,17 +242,17 @@
        <property name="form" stdset="0">
         <string notr="true">picture_info</string>
        </property>
-       <property name="global.id" stdset="0">
-        <string notr="true">{picture.id}</string>
-       </property>
        <property name="global.stateName" stdset="0">
-        <string notr="true">{name.state}</string>
+        <string>{name.state}</string>
        </property>
        <property name="global.stateDescription" stdset="0">
-        <string notr="true">{description.state}</string>
+        <string>{description.state}</string>
        </property>
        <property name="global.statePicture" stdset="0">
-        <string notr="true">{picture.state}</string>
+        <string>{picture.state}</string>
+       </property>
+       <property name="global.pictureId" stdset="0">
+        <string notr="true">{picture.id}</string>
        </property>
       </widget>
      </item>
