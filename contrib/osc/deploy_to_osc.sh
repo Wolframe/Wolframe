@@ -22,6 +22,7 @@ echo " $CHKSUM $SIZE wolframe_$VERSION.tar.gz" >> $OSC_HOME/wolframe.dsc
 cat contrib/osc/PKGBUILD > $OSC_HOME/PKGBUILD
 cp archlinux/wolframe.conf $OSC_HOME/wolframe.conf
 cp archlinux/wolframed.service $OSC_HOME/wolframed.service
+cp archlinux/wolframe.install $OSC_HOME/wolframe.install
 
 CHKSUM2=`md5sum $OSC_HOME/wolframe.conf | cut -f 1 -d' '`
 CHKSUM3=`md5sum $OSC_HOME/wolframed.service | cut -f 1 -d' '`
