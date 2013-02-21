@@ -1,6 +1,6 @@
 # Contributor: Andreas Baumann <abaumann at yahoo dot com>
-pkgname=wolframe-git
-pkgver=20130221
+pkgname=wolframe
+pkgver=0.0.1
 pkgrel=1
 pkgdesc="A flexible client-server ecosystem for business applications."
 license=('GPL3')

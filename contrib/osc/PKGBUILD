@@ -9,7 +9,13 @@ url="http://wolframe.net/"
 depends=('boost>=1.48' 'boost-libs>=1.48' 'openssl' 'pam' 'libsasl' 
          'sqlite3' 'postgresql-libs' 'libxml2' 'libxslt' 'qt')
 makedepends=()
-source=("${pkgname}_${pkgver}.tar.gz")
+backup=('etc/wolframe/wolframe.conf')
+install='wolframe.install' 
+source=(
+  '${pkgname}_${pkgver}.tar.gz'
+  'wolframe.conf'
+  'wolframed.service'
+)
 
 package() {
   cd ${srcdir}/${pkgname}-${pkgver}
@@ -21,7 +27,17 @@ package() {
     WITH_LIBXSLT=1 WITH_LOCAL_LIBHPDF=1 WITH_ICU=1 \
     WITH_LOCAL_FREEIMAGE=1 RELEASE=1 \
     DESTDIR=${pkgdir} prefix=/usr \
+    sysconfdir=/etc \
     install
+
+  install -D -m644 ${srcdir}/wolframe.conf \
+    ${pkgdir}/etc/wolframe/wolframe.conf
+  install -D -m644 ${srcdir}/wolframed.service \
+    ${pkgdir}/usr/lib/systemd/system/wolframed.service
+  install -d -m775 -g nobody -o nobody \
+    ${pkgdir}/var/log/wolframe
+  install -d -m775 -g nobody -o nobody \
+    ${pkgdir}/var/run/wolframe
 }
 
 build() {
