@@ -266,13 +266,9 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 					}
 					for ( std::list< std::string >::iterator Pit = m_modFiles.begin();
 										Pit != m_modFiles.end(); Pit++ )	{
-						LOG_ERROR << MODULE_SECTION_MSG << "GG1            file '" << *Pit << "'";
-						LOG_ERROR << MODULE_SECTION_MSG << "GG1            path '" << basePath << "'";
-						LOG_ERROR << MODULE_SECTION_MSG << "GG1            defined '" << STRINGIFY( DEFAULT_MODULE_LOAD_DIR ) << "'";
-
 						*Pit = utils::getCanonicalPath( *Pit, basePath );
 						assert( ! Pit->empty() );
-						LOG_TRACE << MODULE_SECTION_MSG << "GG1 added module file '" << *Pit << "'";
+						LOG_TRACE << MODULE_SECTION_MSG << "added module file '" << *Pit << "'";
 					}
 				}
 				else	{
@@ -289,7 +285,7 @@ bool ApplicationConfiguration::parseModules ( const char *filename, ConfigFileTy
 								   << "' for modules, instead of '" << oldPath << "'";
 						}
 #endif
-						LOG_TRACE << MODULE_SECTION_MSG << "GG2 added module file '" << *Pit << "'";
+						LOG_TRACE << MODULE_SECTION_MSG << "added module file '" << *Pit << "'";
 					}
 				}
 			}

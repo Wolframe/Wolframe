@@ -30,6 +30,7 @@ makefiles/nmake/help.mk
 makefiles/nmake/platform.mk
 makefiles/nmake/sub.mk
 makefiles/nmake/top.mk
+archlinux/wolframe.conf
 .Attic/AES-256/aes256.c
 .Attic/AES-256/aes256.h
 .Attic/AES-256/demo.c
@@ -128,6 +129,7 @@ makefiles/nmake/top.mk
 .Attic/xmlselect/xmlIterator.cpp
 .Attic/xmlselect/xmlIterator.hpp
 AUTHORS
+BUGS
 clients/Android/AndroidManifest.xml
 clients/Android/build.xml
 clients/Android/README.txt
@@ -248,7 +250,6 @@ contrib/osc/getall.sh
 contrib/osc/README
 contrib/README
 contrib/redhat/buildlocal.sh
-Credits
 database/AAAA/audit.sql
 database/AAAA/authentication.sql
 database/AAAA/authorization.sql
@@ -381,6 +382,7 @@ docs/Tutorial/Steps.xml
 docs/Tutorial/Tutorial.ent
 docs/Tutorial.xml
 docs/WolfBook.xml
+docs/wolfpasswd-man.xml
 docs/wolframe.conf-man.xml
 docs/wolframed-man.xml
 examples/demo/configurator/database/schema_postgresql9.sql
