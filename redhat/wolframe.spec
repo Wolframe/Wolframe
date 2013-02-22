@@ -187,6 +187,8 @@
 %define initscript	wolframe.initd.SuSE
 %endif
 
+%define configuration	wolframe.conf
+
 %define WOLFRAME_USR	wolframe
 %define WOLFRAME_GRP	wolframe
 
@@ -220,7 +222,10 @@ BuildRequires: redhat-release
 %if %{centos}
 BuildRequires: centos-release
 %endif
-%if %{fedora}
+%if %{fedora} && !0%{?opensuse_bs}
+BuildRequires: fedora-release
+%endif
+%if %{fedora} && 0%{?opensuse_bs}
 BuildRequires: generic-release
 %endif
 %if %{suse}
@@ -229,6 +234,15 @@ BuildRequires: openSUSE-release
 %if %{sles}
 BuildRequires: sles-release
 BuildRequires: pwdutils >= 3.2
+%endif
+
+%if %{fedora}
+%if %{fc17}
+BuildRequires: systemd-units
+%endif
+%if %{fc18}
+BuildRequires: systemd
+%endif
 %endif
 
 %if %{build_boost}
@@ -785,9 +799,14 @@ cp /tmp/libxml2-%{libxml2_version}/lib/libxml2.so.%{libxml2_version} $RPM_BUILD_
 ln -s libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxml2.so.2
 %endif
 
-mkdir -p $RPM_BUILD_ROOT%{_initrddir}
-cp redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
 
+install -D -m644 redhat/wolframed.service $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+
+install -D -m644 redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/wolframe.conf
+
+install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
+install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/run/wolframe
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -803,16 +822,24 @@ getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP}
 %endif
  
 # Don't enable Wolframe server at install time, just inform root how this is done
+%if %{rhel} || %{centos} || %{suse} || %{sles}
 echo
 echo Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the
 echo Wolframe server at startup
 echo
-
+%endif
+%if %{fedora}
+echo
+echo Use 'systemctl enable wolframed' to enable the server at startup
+echo
+%endif
 
 %preun
 if [ "$1" = 0 ]; then
     /etc/init.d/wolframe stop > /dev/null 2>&1
+%if %{rhel} || %{centos} || %{suse} || %{sles}
     /sbin/chkconfig --del wolframe
+%endif
 fi
 
 
@@ -824,13 +851,17 @@ fi
 %files
 %defattr( -, root, root )
 %attr( 554, root, root) %{_initrddir}/%{name}
+%if %{fedora}
+%dir %attr(0755, root, root) %{_unitdir}
+%{_unitdir}/wolframed.service
+%endif
 %{_sbindir}/wolframed
 %{_bindir}/wolfilter
 %{_bindir}/wolfpasswd
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
-#%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/log/wolframe
-#%attr(0755, WOLFRAME_USR, WOLFRAME_GRP) %dir /var/run/wolframe
+%attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/log/wolframe
+%attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/run/wolframe
 %if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man5
 %endif

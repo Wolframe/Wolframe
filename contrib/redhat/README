@@ -1,0 +1,7 @@
+fedora-packager and rpm-build
+rpmdev-setuptree
+export TMPDIR=/var/tmp (default is tmpfs which may be too small)
+# adapt PLATFORM in contrib/redhat/buildlocal.sh 
+contrib/redhat/buildlocal.sh 
+# generic-release and fedora-release are in conflict
+# parallel builds with ~/.rpmmacros as in 'dot_home_rpmmacros'
