@@ -34,6 +34,8 @@ musts:
 - modal dialogs
   - improve now refresh of parent form after closing the modal dialog,
     otherwise state propagation in the UI gets far too complicated!
+  - reload has anomalies, initAction/doctype on form are execute after
+    the state reset. Order must be clear - reset - initAction - state restore
 - file UI and data mode
   - resizing issues
 - multi-language support
