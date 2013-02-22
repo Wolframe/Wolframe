@@ -96,6 +96,11 @@ else
 				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 2`
 				;;
 
+		Darwin*)	PLATFORM=MACOS
+				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f1`
+				OS_MINOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f2`
+				;;
+
 		*)
 				PLATFORM=UNKNOWN
 				echo "Unknown platform '$UNAME_SYSTEM $UNAME_RELEASE'"
@@ -132,7 +137,7 @@ else
 	CC=`echo $CC | sed 's/distcc//g' | sed 's/ccache//g'`
 
 	# what compiler do we have (we can't relly on it's name as it may be a cc link to the binary!)
-	(( $CC -v 2>&1 | $TAIL1 ) | grep -i GCC ) 2>/dev/null 1>/dev/null
+	(( $CC -v 2>&1 | $TAIL1 ) 2>&1 | grep -i GCC ) 2>/dev/null 1>/dev/null
 	if test $? = 0; then
 		COMPILER='gcc'
 	else

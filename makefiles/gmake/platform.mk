@@ -659,6 +659,14 @@ endif
 
 ifeq ($(WITH_QT),1)
 
+ifeq "$(PLATFORM)" "MACOS"
+QT_MOC ?= moc
+QT_LRELEASE ?= lrelease
+QT_LUPDATE ?= lupdate
+QT_RCC ?= rcc
+QT_UIC ?= uic
+endif
+
 ifeq "$(PLATFORM)" "LINUX"
 
 ifeq "$(LINUX_DIST)" "arch"

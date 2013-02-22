@@ -3,6 +3,8 @@ now CRM:
   (not just 'id' attributes)
 
 now configurator:
+- error handling, not just stop connection
+- middle of March
 - open info box (modal) in feature/category/component edit and add to
   show picture information
 
