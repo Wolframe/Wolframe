@@ -384,6 +384,11 @@ void WolframeClient::dataAvailable( )
 					m_hasErrors = true;
 					m_state = Connected;
 					emit error( tr( "Protocol error in command %1, received: %2." ).arg( m_command ).arg( buf + 3 ) );
+// still commands in the queue to execute? then do so..
+					if( !m_queue.isEmpty( ) ) {
+						WolframeRequest r = m_queue.dequeue( );
+						sendCommand( r );
+					}
 // OK has a message, one liner
 				} else if( strncmp( buf, "OK", 2 ) == 0 ) {
 					if( len > 3 ) {

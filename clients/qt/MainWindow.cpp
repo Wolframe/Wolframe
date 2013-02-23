@@ -475,7 +475,11 @@ void MainWindow::disconnected( )
 
 void MainWindow::wolframeError( QString error )
 {
-	statusBar( )->showMessage( error, 6000 );
+	if( settings.errorsMessageBoxes ) {
+		QMessageBox::information( this, tr( "Protocol error" ), error, QMessageBox::Ok );
+	} else {
+		statusBar( )->showMessage( error, 6000 );
+	}
 	
 	updateMenusAndToolbars( );
 }
@@ -751,9 +755,11 @@ void MainWindow::updateWindowMenu( )
 
 void MainWindow::formError( QString error )
 {
-	qDebug( ) << "Form error: " << error;
-
-	QMessageBox::information( this, tr( "Form error" ), error,QMessageBox::Ok );
+	if( settings.errorsMessageBoxes ) {
+		QMessageBox::information( this, tr( "Form error" ), error, QMessageBox::Ok );
+	} else {
+		statusBar( )->showMessage( error, 6000 );
+	}
 }
 
 void MainWindow::on_actionRestart_triggered( )
