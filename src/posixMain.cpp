@@ -266,7 +266,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			pidFileC = strdup( conf.serviceCfg->pidFile.c_str( ) );
 			pidFilePath = dirname( pidFileC );
 			
-			res = mkdir( pidFilePath, S_IRWXU | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH );
+			res = mkdir( pidFilePath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
 			if( res < 0 ) {
 				if( errno == EEXIST ) {
 					// fine, already there, we don't change permissions or
