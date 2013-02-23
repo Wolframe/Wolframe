@@ -857,6 +857,7 @@ fi
 %{_sbindir}/wolframed
 %{_bindir}/wolfilter
 %{_bindir}/wolfpasswd
+%{_bindir}/wolfwizard
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
 %attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/log/wolframe
