@@ -1131,6 +1131,7 @@ struct TransactionFunctionOutput::Impl
 		:m_valuestate(o.m_valuestate)
 		,m_colidx(o.m_colidx)
 		,m_colend(o.m_colend)
+		,m_endofoutput(o.m_endofoutput)
 		,m_resultstruct(o.m_resultstruct)
 		,m_structitr(o.m_structitr)
 		,m_structend(o.m_structend)
