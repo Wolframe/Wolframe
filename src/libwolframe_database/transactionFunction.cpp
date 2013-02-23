@@ -1148,6 +1148,7 @@ struct TransactionFunctionOutput::Impl
 		m_valuestate = 0;
 		m_colidx = 0;
 		m_colend = 0;
+		m_endofoutput = false;
 		m_structitr = m_resultstruct->begin();
 		m_structend = m_resultstruct->end();
 		m_stack.clear();
