@@ -11,8 +11,8 @@
 
 VERSION=0.0.1
 RPMBUILD=$HOME/rpmbuild
-#PLATFORM="centos_version 630"
-PLATFORM="fedora_version 18"
+PLATFORM="centos_version 630"
+#PLATFORM="fedora_version 18"
 
 rm -rf $RPMBUILD/BUILDROOT $RPMBUILD/BUILD $RPMBUILD/RPMS/*/* \
 	$RPMBUILD/SRPMS/*
