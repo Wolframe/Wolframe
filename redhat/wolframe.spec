@@ -1,6 +1,6 @@
 # Wolframe RPM spec file
 #
-# Copyright (C) 2011 Project Wolframe
+# Copyright (C) 2011-2013 Project Wolframe
 
 # set distribution based on some OpenSuse and distribution macros
 # this is only relevant when building on https://build.opensuse.org
@@ -305,26 +305,8 @@ BuildRequires: libxml2-devel >= 2.6
 BuildRequires: libxslt-devel >= 1.0
 %endif
 
-%if %{with_libhpdf}
-BuildRequires: libpng-devel
-BuildRequires: zlib-devel
-%endif
-
 BuildRequires: gcc-c++
 BuildRequires: doxygen
-
-# libhpdf is never available in a decent version,
-# build local one
-%define with_local_libhpdf 0
-%if %{with_libhpdf}
-%define with_local_libhpdf 1
-%endif
-
-# FreeImage, build or use local
-%define with_local_freeimage 0
-%if %{with_freeimage}
-%define with_local_freeimage 1
-%endif
 
 # postgres database module
 %if %{with_pgsql}
@@ -348,7 +330,9 @@ BuildRequires: postgresql-devel >= 8.3
 %endif
 
 # build local sqlite3 for distibutions with no or too old version
-# or which do not support V2 of the API correctly
+# or which do not support V2 of the API correctly or which have
+# been compiled without threading support
+
 %define build_sqlite 0   
 %if %{with_sqlite}
 %if %{rhel}
@@ -363,7 +347,7 @@ BuildRequires: postgresql-devel >= 8.3
 %endif
 %endif
 
-# sqlite database module
+# if we use the system one, we must pick the right version
 %if !%{build_sqlite}
 %if %{with_sqlite}
 %if %{rhel} || %{centos} || %{fedora}
@@ -380,6 +364,43 @@ BuildRequires: sqlite3-devel >= 3.0
 %endif
 %endif
 %endif
+
+# build local version of libharu/libpdf
+%define build_libhpdf 1
+%if %{with_libhpdf}
+%if %{fedora}
+%if %{fc18}
+%define build_libhpdf 0
+%endif
+%endif
+%endif
+
+%if !%{build_libhpdf}
+%if %{with_libhpdf}
+BuildRequires: libharu-devel >= 2.2.1
+%endif
+%else
+# building libhpdf requires zlib and libpng development libraries
+BuildRequires: libpng-devel
+BuildRequires: zlib-devel
+%endif
+
+# FreeImage, build or use local version
+%define build_freeimage 1
+#%if %{with_freeimage}
+#%if %{fedora}
+#%if %{fc17} || %{fc18}
+#%define build_freeimage 1
+#%endif
+#%endif
+#%endif
+
+%if !%{build_freeimage}
+%if %{with_freeimage}
+BuildRequires: freeimage-devel >= 3.15.4
+%endif
+%endif
+
 
 # Check if 'Distribution' is really set by OBS (as mentioned in bacula)
 %if ! 0%{?opensuse_bs}
@@ -648,10 +669,14 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
-	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
-%if %{with_local_freeimage}
-	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
@@ -676,10 +701,14 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
-	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
-%if %{with_local_freeimage}
-	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
@@ -704,10 +733,14 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
-	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
-%if %{with_local_freeimage}
-	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
@@ -733,10 +766,14 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
-	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
-%if %{with_local_freeimage}
-	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
@@ -769,10 +806,14 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
-	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
-%if %{with_local_freeimage}
-	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
@@ -969,13 +1010,13 @@ fi
 %{_includedir}/wolframe/lua/*.h
 %{_includedir}/wolframe/lua/*.hpp
 %endif
-%if %{with_local_libhpdf}
+%if %{build_libhpdf}
 %{_libdir}/wolframe/libhpdf.so
 %{_libdir}/wolframe/libhpdf.a
 %dir %{_includedir}/wolframe/libhpdf
 %{_includedir}/wolframe/libhpdf/*.h
 %endif
-%if %{with_local_freeimage}
+%if %{build_freeimage}
 %{_libdir}/wolframe/libfreeimage.so
 %{_libdir}/wolframe/libfreeimage.a
 %{_libdir}/wolframe/libfreeimageplus.so
@@ -1080,7 +1121,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
-%if %{with_local_libhpdf}
+%if %{build_libhpdf}
 %{_libdir}/wolframe/libhpdf.so.2.2.1
 %{_libdir}/wolframe/libhpdf.so.2
 %endif
@@ -1091,7 +1132,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_graphix.so
-%if %{with_local_freeimage}
+%if %{build_freeimage}
 %{_libdir}/wolframe/libfreeimage.so.3.15.4
 %{_libdir}/wolframe/libfreeimage.so.3
 %{_libdir}/wolframe/libfreeimageplus.so.3.15.4

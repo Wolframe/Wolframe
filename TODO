@@ -40,7 +40,6 @@ ABa:
     apache-like LoadModules, support for 'wolframe.d/libxml2.conf'
     and 'include wolframe.d/*.conf'
   - Fedora 18
-    - libharu from system (specfile)
     - has firewalld, no longer iptables, write XML for the
     wolframe ports:
     /usr/lib/firewalld/services/wolframe.xml

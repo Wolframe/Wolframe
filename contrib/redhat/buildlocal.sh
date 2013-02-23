@@ -11,8 +11,7 @@
 
 VERSION=0.0.1
 RPMBUILD=$HOME/rpmbuild
-PLATFORM="centos_version 630"
-#PLATFORM="fedora_version 18"
+#OSB_PLATFORM=
 
 rm -rf $RPMBUILD/BUILDROOT $RPMBUILD/BUILD $RPMBUILD/RPMS/*/* \
 	$RPMBUILD/SRPMS/*
@@ -41,6 +40,6 @@ echo "Building started, check with 'tail -f $RPMBUILD/SPECS/log'."
 
 export CC='ccache gcc'
 export CXX='ccache g++'
-rpmbuild -ba --define "$PLATFORM" wolframe.spec > log 2>&1
+rpmbuild -ba --define "$OSB_PLATFORM" wolframe.spec > log 2>&1
 
 echo "Build done."

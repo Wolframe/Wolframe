@@ -1,7 +1,17 @@
-fedora-packager and rpm-build
+install 'fedora-packager' and 'rpm-build' on Fedora
+install 'cccache' otherwise builds take ages!
+
 rpmdev-setuptree
-export TMPDIR=/var/tmp (default is tmpfs which may be too small)
-# adapt PLATFORM in contrib/redhat/buildlocal.sh 
+
+# set scratch space (default is tmpfs which may be too small)
+export TMPDIR=/var/tmp
+
+# set OSB_PLATFORM variable (see OSB platform list)
+#export OSB_PLATFORM="centos_version 630"
+export OSB_PLATFORM="fedora_version 18"
+#export OSB_PLATFORM="fedora_version 17" 
+#export OSB_PLATFORM="suse_version 1220"
+
 contrib/redhat/buildlocal.sh 
-# generic-release and fedora-release are in conflict
+
 # parallel builds with ~/.rpmmacros as in 'dot_home_rpmmacros'
