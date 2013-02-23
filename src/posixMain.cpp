@@ -302,10 +302,31 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			// empty directory
 			char *pidFileC = strdup( conf.serviceCfg->pidFile.c_str( ) );
 			char *pidFilePath = dirname( pidFileC );
+			int res;
 			
 			struct stat stat_buf;
-			stat( pidFilePath, &stat_buf );
-			if( !S_ISDIR( stat_buf.st_mode ) ) {
+			res = stat( pidFilePath, &stat_buf );
+			bool mustCreateDir = false;
+			if( ( res < 0 ) {
+				if( errno == ENOENT ) {
+					// ok, doesn't exist
+					mustCreateDir = true;
+				} else {
+					free( pidFileC );
+					LOG_CRITICAL << "Can't stat directory for pid file, check 'pidFile' in the configuration";
+					return _Wolframe::ErrorCode::FAILURE;
+				}
+			} else if( res == 0 ) {
+				if( !S_ISDIR( stat_buf.st_mode ) ) {
+					mustCreateDir = true;
+				} else {
+					free( pidFileC );
+					LOG_CRITICAL << "Path for directory of pid file exists, but is not a directory, check 'pidFile' in the configuration";
+					return _Wolframe::ErrorCode::FAILURE;					
+				}
+			}
+
+			if( mustCreateDir ) {
 				int res = mkdir( pidFilePath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
 				if( res < 0 ) {
 					if( errno == EEXIST ) {
