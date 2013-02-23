@@ -267,13 +267,15 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			pidFilePath = dirname( pidFileC );
 			
 			res = mkdir( pidFilePath, S_IRWXU | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH );
-			if( res == EEXIST ) {
-				// fine, already there, we don't change permissions or
-				// ownership here
-			} else if( res < 0 ) {
-				free( pidFileC );
-				LOG_CRITICAL << "Can't create directory for pid file, check 'pidFile' in the configuration";
-				return _Wolframe::ErrorCode::FAILURE;
+			if( res < 0 ) {
+				if( errno == EEXIST ) {
+					// fine, already there, we don't change permissions or
+					// ownership here
+				} else {
+					free( pidFileC );
+					LOG_CRITICAL << "Can't create directory for pid file, check 'pidFile' in the configuration";
+					return _Wolframe::ErrorCode::FAILURE;
+				}
 			}
 			free( pidFileC );
 			
