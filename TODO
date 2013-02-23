@@ -67,6 +67,9 @@ ABa:
 
 PF:
 - high prio
+  - Widget visitor in QtClient
+  - PHP client with SSL
+  - Counter to check for loop forever in all filter STMs
   - Web Page Templates
   - Project CRM
   - Lua functions for directmap (struct IN table OUT)
