@@ -307,7 +307,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			struct stat stat_buf;
 			res = stat( pidFilePath, &stat_buf );
 			bool mustCreateDir = false;
-			if( ( res < 0 ) {
+			if( res < 0 ) {
 				if( errno == ENOENT ) {
 					// ok, doesn't exist
 					mustCreateDir = true;
@@ -327,7 +327,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			}
 
 			if( mustCreateDir ) {
-				int res = mkdir( pidFilePath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
+				res = mkdir( pidFilePath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
 				if( res < 0 ) {
 					if( errno == EEXIST ) {
 						// fine, already there, we don't change permissions or
