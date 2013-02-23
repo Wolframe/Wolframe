@@ -56,6 +56,7 @@ class IndirectionConstructor
 public:
 	virtual ~IndirectionConstructor(){}
 	virtual StructType* create( const IndirectionConstructorR& self) const=0;
+	virtual const char* name() const=0;
 };
 
 
@@ -327,13 +328,15 @@ private:
 class StructIndirectionConstructor :public IndirectionConstructor
 {
 public:
-	StructIndirectionConstructor( const StructType& prototype_)
-		:m_prototype(prototype_){}
+	StructIndirectionConstructor( const std::string& name_, const StructType& prototype_)
+		:m_name(name_),m_prototype(prototype_){}
 
 	virtual StructType* create( const IndirectionConstructorR& self) const;
+	virtual const char* name() const {return m_name.c_str();}
 
 	static void substituteSelf( StructType* st, const IndirectionConstructorR& self);
 private:
+	std::string m_name;
 	StructType m_prototype;
 };
 

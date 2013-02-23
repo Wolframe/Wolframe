@@ -44,6 +44,7 @@ class TrimNormalizeFunction :public NormalizeFunction
 {
 public:
 	TrimNormalizeFunction(){}
+	virtual const char* name() const {return "trim";}
 	virtual std::string execute( const std::string& str) const;
 };
 

@@ -47,7 +47,7 @@ namespace config {
 class WolfilterCommandLine
 {
 public:
-	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath);
+	WolfilterCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& modulePath);
 	~WolfilterCommandLine(){}
 
 	bool printhelp() const						{return m_printhelp;}
@@ -62,6 +62,7 @@ public:
 	const db::DBproviderConfig& dbProviderConfig() const		{return *m_dbProviderConfig;}
 	const proc::ProcProviderConfig& procProviderConfig() const	{return *m_procProviderConfig;}
 	const module::ModulesDirectory& modulesDirectory() const	{return m_modulesDirectory;}
+	const std::string& referencePath() const			{return m_referencePath;}
 
 	void print(std::ostream &) const;
 
@@ -90,6 +91,7 @@ private:
 	types::CountedReference<db::DBproviderConfig> m_dbProviderConfig;
 	module::ModulesDirectory m_modulesDirectory;
 	std::string m_referencePath;
+	std::string m_modulePath;
 };
 
 }}//namespace

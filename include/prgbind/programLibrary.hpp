@@ -73,6 +73,8 @@ public:
 	virtual const types::keymap<module::NormalizeFunctionConstructorR>& normalizeFunctionConstructorMap() const;
 
 	virtual const ddl::Form* getForm( const std::string& name) const;
+	virtual std::vector<std::string> getFormNames() const;
+
 	virtual const langbind::FormFunction* getFormFunction( const std::string& name) const;
 	virtual const langbind::NormalizeFunction* getNormalizeFunction( const std::string& name) const;
 	virtual langbind::Filter* createFilter( const std::string& name, const std::string& arg) const;

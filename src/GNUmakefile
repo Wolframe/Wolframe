@@ -45,6 +45,7 @@ LOCAL_STATIC_LIB = \
 LOCAL_STATIC_LIB_OBJS = \
 	wolframedCommandLine.o \
 	wolfilterCommandLine.o \
+	wolfwizardCommandLine.o \
 	mainConnectionHandler.o \
 	interfaceCommandHandler.o \
 	loadModules.o \
@@ -78,7 +79,8 @@ CPP_OBJS = \
 
 CPP_BINS = \
 	wolframed$(EXE) \
-	wolfilter$(EXE)
+	wolfilter$(EXE) \
+	wolfwizard$(EXE)
 
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
@@ -102,6 +104,11 @@ wolfilter$(EXE): libwolframe libwolframe_serialize libwolframe_langbind libwolfr
 wolfilter$(EXE): wolfilter.o $(OBJS) $(CPP_OBJS)
 	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
 
+wolfwizard$(EXE): libwolframe libwolframe_serialize libwolframe_langbind libwolframe_prnt
+
+wolfwizard$(EXE): wolfwizard.o $(OBJS) $(CPP_OBJS)
+	$(CXX_LINK) -o $@ $(ALL_LDFLAGS) $(OBJS) $(CPP_OBJS) $< $(LIBS)
+
 local_all: $(LOCAL_STATIC_LIB)
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
@@ -118,10 +125,12 @@ local_install:
 	$(INSTALL) -m 0775 wolframed$(EXE) $(DESTDIR)$(sbindir)
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(bindir)
 	$(INSTALL) -m 0775 wolfilter$(EXE) $(DESTDIR)$(bindir)
+	$(INSTALL) -m 0775 wolfwizard$(EXE) $(DESTDIR)$(bindir)
 	$(INSTALL) -d -m 0755 $(DESTDIR)$(sysconfdir)/wolframe
 	$(INSTALL) -m 0755 wolframe.conf $(DESTDIR)$(sysconfdir)/wolframe
 
 local_uninstall:
+	@-rm -f $(DESTDIR)$(bindir)/wolfwizard$(EXE)
 	@-rm -f $(DESTDIR)$(bindir)/wolfilter$(EXE)
 	@-rmdir $(DESTDIR)$(bindir)
 	@-rm -f $(DESTDIR)$(sbindir)/wolframed$(EXE)

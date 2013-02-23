@@ -51,14 +51,21 @@ static const unsigned short APP_MINOR_VERSION = 0;
 static const unsigned short APP_REVISION = 5;
 static const unsigned short APP_BUILD = 0;
 
+#define DO_STRINGIFY(x)	#x
+#define STRINGIFY(x)	DO_STRINGIFY(x)
+
 int main( int argc, char **argv )
 {
 	bool doExit = false;
 	try
 	{
 		static boost::filesystem::path execdir = boost::filesystem::system_complete( argv[0]).parent_path();
-		module::ModulesDirectory modDir;
-		config::WolfilterCommandLine cmdline( argc, argv, execdir.string());
+
+#if defined( DEFAULT_MODULE_LOAD_DIR)
+		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), STRINGIFY( DEFAULT_MODULE_LOAD_DIR));
+#else
+		config::WolfilterCommandLine cmdline( argc, argv, execdir.string(), execdir.string());
+#endif
 		if (cmdline.printversion())
 		{
 			std::cerr << "wolfilter version ";

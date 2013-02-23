@@ -53,6 +53,7 @@ LOCAL_STATIC_LIB = \
 LOCAL_STATIC_LIB_OBJS = \
 	wolframedCommandLine.obj \
 	wolfilterCommandLine.obj \
+	wolfwizardCommandLine.obj \
 	mainConnectionHandler.obj \
 	interfaceCommandHandler.obj \
 	loadModules.obj \
@@ -84,7 +85,8 @@ CPP_OBJS = \
 
 CPP_BINS = \
 	wolframed.exe \
-	wolfilter.exe
+	wolfilter.exe \
+	wolfwizard.exe
 
 all: dependencies $(CPP_OBJS) $(CPP_BINS)
 
@@ -99,6 +101,7 @@ dependencies:
 modules: libwolframe
 wolframed.exe: wolframed.obj $(CPP_OBJS) libwolframe\logger\wolframemsg.res
 wolfilter.exe: wolfilter.obj $(CPP_OBJS) libwolframe\logger\wolframemsg.res
+wolfwizard.exe: wolfwizard.obj $(CPP_OBJS) libwolframe\logger\wolframemsg.res
 
 $(LOCAL_STATIC_LIB): $(LOCAL_STATIC_LIB_OBJS)
 	$(LINK) /lib /nologo /out:$@ $(STATIC_LDFLAGS) $?

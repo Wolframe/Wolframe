@@ -48,6 +48,7 @@ public:
 		,m_sign(sign_){}
 
 	virtual std::string execute( const std::string& str) const;
+	virtual const char* name() const {return m_sign?"integer":"unsigned";}
 
 private:
 	std::size_t m_size;

@@ -62,13 +62,18 @@ static langbind::NormalizeFunction* createBaseFunction( const std::string& domai
 class CombinedNormalizeFunction :public langbind::NormalizeFunction
 {
 public:
-	CombinedNormalizeFunction(){}
+	CombinedNormalizeFunction( const std::string& name_)
+		:m_name(name_){}
 	CombinedNormalizeFunction( const CombinedNormalizeFunction& o)
-		:langbind::NormalizeFunction(), m_steps(o.m_steps){}
+		:langbind::NormalizeFunction(), m_name(o.m_name), m_steps(o.m_steps){}
 
 	void define( const langbind::NormalizeFunctionR& f)
 	{
 		m_steps.push_back(f);
+	}
+	virtual const char* name() const
+	{
+		return m_name.c_str();
 	}
 	virtual std::string execute( const std::string& i) const
 	{
@@ -93,6 +98,7 @@ public:
 	}
 
 private:
+	std::string m_name;
 	std::vector<langbind::NormalizeFunctionR> m_steps;
 };
 
@@ -112,9 +118,6 @@ static std::vector<std::pair<std::string,langbind::NormalizeFunctionR> > loadSou
 	{
 		while ((ch = utils::gotoNextToken( si, se)) != 0)
 		{
-			CombinedNormalizeFunction funcdef;
-			std::string domain;
-
 			switch ((ch=utils::parseNextToken( prgname, si, se, optab)))
 			{
 				case ';': throw ERROR( si, "empty statement");
@@ -123,6 +126,9 @@ static std::vector<std::pair<std::string,langbind::NormalizeFunctionR> > loadSou
 				default:
 					if (optab[ ch]) throw ERROR( si, "identifier expected at start of statement");
 			}
+			CombinedNormalizeFunction funcdef( prgname);
+			std::string domain;
+
 			switch ((ch=utils::parseNextToken( tok, si, se, optab)))
 			{
 				case '\0': throw ERROR( si, "unexpected end of program");
@@ -180,15 +186,8 @@ static std::vector<std::pair<std::string,langbind::NormalizeFunctionR> > loadSou
 						throw ERROR( si, MSG << "separator ',' or ';' expected or function arguments in '(' ')' brackets instead of '" << ch << "'");
 				}
 			}
-			if (funcdef.nofSteps() == 1)
-			{
-				rt.push_back( std::pair<std::string,langbind::NormalizeFunctionR>( prgname, funcdef[0]));
-			}
-			else
-			{
-				langbind::NormalizeFunctionR func( new CombinedNormalizeFunction( funcdef));
-				rt.push_back( std::pair<std::string,langbind::NormalizeFunctionR>( prgname, func));
-			}
+			langbind::NormalizeFunctionR func( new CombinedNormalizeFunction( funcdef));
+			rt.push_back( std::pair<std::string,langbind::NormalizeFunctionR>( prgname, func));
 		}
 		return rt;
 	}

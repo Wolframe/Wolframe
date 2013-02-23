@@ -54,6 +54,7 @@ namespace ddl {
 struct NormalizeFunction
 {
 	virtual ~NormalizeFunction(){}
+	virtual const char* name() const=0;
 	virtual std::string execute( const std::string& i) const=0;
 };
 
@@ -100,6 +101,13 @@ public:
 	const std::string& value() const
 	{
 		return m_value;
+	}
+
+	///\brief Get the type of this as string
+	///\return the type of this as string
+	const char* type() const
+	{
+		return m_type?m_type->name():"string";
 	}
 
 private:
