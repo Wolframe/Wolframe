@@ -102,7 +102,7 @@ std::vector<std::string> WolfilterCommandLine::configModules() const
 	{
 		if (boost::algorithm::iequals( mi->first, "module"))
 		{
-			rt.push_back( utils::getCanonicalPath( mi->second.get_value<std::string>(), m_referencePath));
+			rt.push_back( utils::getCanonicalPath( mi->second.get_value<std::string>(), m_modulePath));
 		}
 	}
 	return rt;
@@ -206,12 +206,12 @@ config::ConfigurationTree WolfilterCommandLine::getProcProviderConfigTree() cons
 
 namespace po = boost::program_options;
 
-struct OptionStruct
+struct WolfilterOptionStruct
 {
 	po::options_description fopt;
 	po::positional_options_description popt;
 
-	OptionStruct()
+	WolfilterOptionStruct()
 		:fopt("Options")
 	{
 		fopt.add_options()
@@ -224,8 +224,8 @@ struct OptionStruct
 			( "filter,t", po::value<std::string>(), "specify input/output filter by name (if not specified separately)" )
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 			( "program,p", po::value< std::vector<std::string> >(), "specify program to load by path" )
-			( "config,C", po::value<std::string>(), "specify configuration file to load" )
-			( "database,D", po::value<std::string>(), "specifiy transaction database" )
+			( "config,c", po::value<std::string>(), "specify configuration file to load" )
+			( "database,d", po::value<std::string>(), "specifiy transaction database" )
 			( "cmd", po::value<std::string>(), "name of the command to execute")
 			;
 
@@ -233,14 +233,15 @@ struct OptionStruct
 	}
 };
 
-WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath)
+WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::string& referencePath_, const std::string& modulePath)
 	:m_printhelp(false)
 	,m_printversion(false)
 	,m_inbufsize(8<<10)
 	,m_outbufsize(8<<10)
-	,m_referencePath(referencePath)
+	,m_referencePath(referencePath_)
+	,m_modulePath(modulePath)
 {
-	static const OptionStruct ost;
+	static const WolfilterOptionStruct ost;
 	po::variables_map vmap;
 	try
 	{
@@ -260,7 +261,13 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	}
 	if (vmap.count( "config"))
 	{
-		std::string configfile = utils::getCanonicalPath( vmap["config"].as<std::string>(), referencePath);
+		std::string configfile = vmap["config"].as<std::string>();
+		if (configfile.size() == 0 || configfile[0] != '.')
+		{
+			configfile = utils::getCanonicalPath( vmap["config"].as<std::string>(), m_referencePath);
+		} else {
+			m_referencePath = boost::filesystem::path( configfile ).branch_path().string();
+		}
 		m_config = utils::readPropertyTreeFile( configfile);
 		if (vmap.count( "module")) throw std::runtime_error( "incompatible options: --config specified with --module");
 		if (vmap.count( "program")) throw std::runtime_error( "incompatible options: --config specified with --program");
@@ -273,14 +280,14 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 		std::vector<std::string>::iterator itr=m_modules.begin(), end=m_modules.end();
 		for (; itr != end; ++itr)
 		{
-			*itr = utils::getCanonicalPath( *itr, referencePath);
+			*itr = utils::getCanonicalPath( *itr, m_modulePath);
 		}
 	}
 	// Load modules
 	std::vector<std::string> cfgmod = configModules();
 	std::copy( cfgmod.begin(), cfgmod.end(), std::back_inserter( m_modules));
 	std::list<std::string> modfiles;
-	std::copy( m_modules.begin(), m_modules.end(), std::back_inserter(modfiles));
+	std::copy( m_modules.begin(), m_modules.end(), std::back_inserter( modfiles));
 	if (!LoadModules( m_modulesDirectory, modfiles))
 	{
 		throw std::runtime_error( "Modules could not be loaded");
@@ -344,7 +351,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 		throw std::runtime_error( "Database provider configuration could not be created from command line");
 	}
-	m_dbProviderConfig->setCanonicalPathes( referencePath);
+	m_dbProviderConfig->setCanonicalPathes( m_referencePath);
 	if (!m_dbProviderConfig->check())
 	{
 		throw std::runtime_error( "error in command line. failed to setup a valid database provider configuration");
@@ -367,7 +374,7 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	{
 		throw std::runtime_error( "Processor provider configuration could not be created from command line");
 	}
-	m_procProviderConfig->setCanonicalPathes( referencePath);
+	m_procProviderConfig->setCanonicalPathes( m_referencePath);
 	if (!m_procProviderConfig->check())
 	{
 		throw std::runtime_error( "error in command line. failed to setup a valid processor provider configuration");

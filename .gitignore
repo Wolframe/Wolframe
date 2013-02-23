@@ -121,6 +121,7 @@ examples/tproc/tests/temp/
 clients/cli/primary.db
 examples/iproc/tests/temp/
 src/wolfilter
+src/wolfwizard
 tests/AAAA/textFileCRAMtest
 tests/testRand
 tests/testTimestamp

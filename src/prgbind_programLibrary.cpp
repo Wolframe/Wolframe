@@ -211,6 +211,13 @@ public:
 		return &fi->second;
 	}
 
+	std::vector<std::string> getFormNames() const
+	{
+		std::vector<std::string> rt;
+		m_formMap.getkeys( rt);
+		return rt;
+	}
+
 	const langbind::FormFunction* getFormFunction( const std::string& name) const
 	{
 		types::keymap<langbind::FormFunctionR>::const_iterator fi = m_formFunctionMap.find( name);
@@ -350,6 +357,11 @@ const langbind::FormFunction* ProgramLibrary::getFormFunction( const std::string
 const ddl::Form* ProgramLibrary::getForm( const std::string& name) const
 {
 	return m_impl->getForm( name);
+}
+
+std::vector<std::string> ProgramLibrary::getFormNames() const
+{
+	return m_impl->getFormNames();
 }
 
 const langbind::NormalizeFunction* ProgramLibrary::getNormalizeFunction( const std::string& name) const

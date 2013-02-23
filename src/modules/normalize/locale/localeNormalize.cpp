@@ -145,10 +145,11 @@ struct Tokenize
 
 struct LocaleConvNormalizeFunction :public NormalizeFunction
 {
-	LocaleConvNormalizeFunction( ResourceHandle& reshnd, const std::string& lc, const LocaleConv& func)
+	LocaleConvNormalizeFunction( ResourceHandle& reshnd, const std::string& lc, const LocaleConv& func, const char* name_)
 		:m_reshnd(&reshnd)
 		,m_func(func)
-		,m_lc(lc){}
+		,m_lc(lc)
+		,m_name(name_){}
 
 	virtual ~LocaleConvNormalizeFunction(){}
 
@@ -157,10 +158,13 @@ struct LocaleConvNormalizeFunction :public NormalizeFunction
 		std::locale loc = m_reshnd->getLocale( m_lc);
 		return m_func( i, loc);
 	}
+	virtual const char* name() const {return m_name;}
+
 private:
 	ResourceHandle* m_reshnd;
 	LocaleConv m_func;
 	std::string m_lc;
+	const char* m_name;
 };
 
 
@@ -194,7 +198,7 @@ NormalizeFunction* _Wolframe::langbind::createLocaleNormalizeFunction( ResourceH
 	{
 		if (name == g_functions[ii].name)
 		{
-			return new LocaleConvNormalizeFunction( reshnd, arg, g_functions[ii].func);
+			return new LocaleConvNormalizeFunction( reshnd, arg, g_functions[ii].func, g_functions[ii].name);
 		}
 	}
 	return 0;

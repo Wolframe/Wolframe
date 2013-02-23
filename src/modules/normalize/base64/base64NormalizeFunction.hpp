@@ -45,6 +45,7 @@ class Base64DecodeFunction :public NormalizeFunction
 public:
 	Base64DecodeFunction(){}
 	virtual std::string execute( const std::string& str) const;
+	virtual const char* name() const {return "decode";}
 };
 
 class Base64EncodeFunction :public NormalizeFunction
@@ -52,6 +53,7 @@ class Base64EncodeFunction :public NormalizeFunction
 public:
 	Base64EncodeFunction(){}
 	virtual std::string execute( const std::string& str) const;
+	virtual const char* name() const {return "encode";}
 };
 
 }}

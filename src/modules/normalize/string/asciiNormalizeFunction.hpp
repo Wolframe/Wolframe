@@ -45,6 +45,7 @@ class ConvDiaNormalizeFunction :public NormalizeFunction
 public:
 	ConvDiaNormalizeFunction(){}
 	virtual std::string execute( const std::string& str) const;
+	virtual const char* name() const {return "convdia";}
 };
 
 class UppercaseNameNormalizeFunction :public NormalizeFunction
@@ -52,6 +53,7 @@ class UppercaseNameNormalizeFunction :public NormalizeFunction
 public:
 	UppercaseNameNormalizeFunction(){}
 	virtual std::string execute( const std::string& str) const;
+	virtual const char* name() const {return "ucname";}
 };
 
 class LowercaseNameNormalizeFunction :public NormalizeFunction
@@ -59,6 +61,7 @@ class LowercaseNameNormalizeFunction :public NormalizeFunction
 public:
 	LowercaseNameNormalizeFunction(){}
 	virtual std::string execute( const std::string& str) const;
+	virtual const char* name() const {return "lcname";}
 };
 
 }}

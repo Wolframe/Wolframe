@@ -30,31 +30,46 @@
  Project Wolframe.
 
 ************************************************************************/
-///\file modules/normalize/number/floatNormalizeFunction.hpp
-///\brief Normalizer for floating point numbers
-#ifndef _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
-#define _LANGBIND_FLOAT_NORMALIZE_FUNCTION_HPP_INCLUDED
-#include "langbind/normalizeFunction.hpp"
+///\file wolfwizardCommandLine.hpp
+///\brief Interface for the wolfwizard call command line
+#ifndef _Wolframe_WOLFWIZARD_COMMANDLINE_HPP_INCLUDED
+#define _Wolframe_WOLFWIZARD_COMMANDLINE_HPP_INCLUDED
 #include <string>
+#include <vector>
+#include <iostream>
+#include "moduleDirectory.hpp"
+#include "processor/procProvider.hpp"
+#include <boost/property_tree/ptree.hpp>
 
 namespace _Wolframe {
-namespace langbind {
+namespace config {
 
-class FloatNormalizeFunction :public NormalizeFunction
+class WolfwizardCommandLine
 {
 public:
-	FloatNormalizeFunction( std::size_t sizeG_, std::size_t sizeF_)
-		:m_sizeG(sizeG_)
-		,m_sizeF(sizeF_){}
+	WolfwizardCommandLine( int argc, char **argv, const std::string& referencePath_, const std::string& modulePath);
+	~WolfwizardCommandLine(){}
 
-	virtual std::string execute( const std::string& str) const;
-	virtual const char* name() const {return "float";}
+	bool printhelp() const						{return m_printhelp;}
+	bool printversion() const					{return m_printversion;}
+	const std::string& configfile() const				{return m_configfile;}
+
+	void print(std::ostream& out) const;
+	const boost::property_tree::ptree& providerconfig() const	{return m_providerconfig;}
+	const std::list<std::string>& modules() const			{return m_modules;}
+	const std::string& referencePath() const			{return m_referencePath;}
 
 private:
-	std::size_t m_sizeG;
-	std::size_t m_sizeF;
+	bool m_printhelp;
+	bool m_printversion;
+	std::string m_helpstring;
+	std::string m_configfile;
+	boost::property_tree::ptree m_providerconfig;
+	std::string m_referencePath;
+	std::string m_modulePath;
+	std::list<std::string> m_modules;
 };
 
-}}
+}}//namespace
 #endif
 
