@@ -245,11 +245,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 		}
 
 		// Daemon stuff
-		if( !conf.foreground ) {
-			char *pidFileC;
-			char *pidFilePath;
-			int res;
-			
+		if( !conf.foreground ) {			 
 			// Aba: maybe also in the foreground?
 			// try to lock the pidfile, bail out if not possible
 			if( boost::filesystem::exists( conf.serviceCfg->pidFile ) ) {
@@ -304,18 +300,22 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 			// create /var/log/wolframe here as on modern Linux it lives on
 			// a tmpfs (or is linked to /run), so we can't package it as
 			// empty directory
-			pidFileC = strdup( conf.serviceCfg->pidFile.c_str( ) );
-			pidFilePath = dirname( pidFileC );
+			char *pidFileC = strdup( conf.serviceCfg->pidFile.c_str( ) );
+			char *pidFilePath = dirname( pidFileC );
 			
-			res = mkdir( pidFilePath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
-			if( res < 0 ) {
-				if( errno == EEXIST ) {
-					// fine, already there, we don't change permissions or
-					// ownership here
-				} else {
-					free( pidFileC );
-					LOG_CRITICAL << "Can't create directory for pid file, check 'pidFile' in the configuration";
-					return _Wolframe::ErrorCode::FAILURE;
+			struct stat stat_buf;
+			stat( pidFilePath, &stat_buf );
+			if( !S_ISDIR( stat_buf.st_mode ) ) {
+				int res = mkdir( pidFilePath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
+				if( res < 0 ) {
+					if( errno == EEXIST ) {
+						// fine, already there, we don't change permissions or
+						// ownership here
+					} else {
+						free( pidFileC );
+						LOG_CRITICAL << "Can't create directory for pid file, check 'pidFile' in the configuration";
+						return _Wolframe::ErrorCode::FAILURE;
+					}
 				}
 			}
 			free( pidFileC );
