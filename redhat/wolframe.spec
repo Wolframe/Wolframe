@@ -819,6 +819,12 @@ getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP}
 %if %{suse} || %{sles}
 getent passwd %{WOLFRAME_USR} >/dev/null || /usr/sbin/useradd -g %{WOLFRAME_GRP} %{WOLFRAME_USR} -c "Wolframe user"
 %endif
+
+if test ! -d /var/run/wolframe; then
+  mkdir /var/run/wolframe
+  chown %{WOLFRAME_USR}:%{WOLFRAME_GRP} /var/run/wolframe
+  chmod 0755 /var/run/wolframe
+fi
  
 # Don't enable Wolframe server at install time, just inform root how this is done
 %if %{rhel} || %{centos} || %{suse} || %{sles}
@@ -857,6 +863,7 @@ fi
 %{_sbindir}/wolframed
 %{_bindir}/wolfilter
 %{_bindir}/wolfpasswd
+%{_bindir}/wolfwizard
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
 %attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/log/wolframe

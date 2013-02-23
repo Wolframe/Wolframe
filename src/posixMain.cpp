@@ -73,8 +73,6 @@
 #include <pwd.h>
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/filesystem.hpp>
-#include <sys/stat.h>
-#include <libgen.h>
 
 // Solaris has no BSD daemon function, provide our own
 #ifdef SUNOS
@@ -246,10 +244,6 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 
 		// Daemon stuff
 		if( !conf.foreground ) {
-			char *pidFileC;
-			char *pidFilePath;
-			int res;
-			
 			// Aba: maybe also in the foreground?
 			// try to lock the pidfile, bail out if not possible
 			if( boost::filesystem::exists( conf.serviceCfg->pidFile ) ) {
@@ -259,7 +253,7 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 					return _Wolframe::ErrorCode::FAILURE;
 				}
 			}
-						
+
 			// daemonize, lose process group, terminal output, etc.
 			if( daemon( 0, 0 ) ) {
 				LOG_CRITICAL << "Daemonizing server failed: " << _Wolframe::log::LogError::LogStrerror;
@@ -300,25 +294,6 @@ int _Wolframe_posixMain( int argc, char* argv[] )
 					return _Wolframe::ErrorCode::FAILURE;
 				}
 			}
-
-			// create /var/log/wolframe here as on modern Linux it lives on
-			// a tmpfs (or is linked to /run), so we can't package it as
-			// empty directory
-			pidFileC = strdup( conf.serviceCfg->pidFile.c_str( ) );
-			pidFilePath = dirname( pidFileC );
-			
-			res = mkdir( pidFilePath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
-			if( res < 0 ) {
-				if( errno == EEXIST ) {
-					// fine, already there, we don't change permissions or
-					// ownership here
-				} else {
-					free( pidFileC );
-					LOG_CRITICAL << "Can't create directory for pid file, check 'pidFile' in the configuration";
-					return _Wolframe::ErrorCode::FAILURE;
-				}
-			}
-			free( pidFileC );
 
 			// create a pid file and lock id
 			std::ofstream pidFile( conf.serviceCfg->pidFile.c_str( ), std::ios_base::trunc );
