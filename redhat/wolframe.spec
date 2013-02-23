@@ -806,7 +806,6 @@ install -D -m644 redhat/wolframed.service $RPM_BUILD_ROOT%{_unitdir}/wolframed.s
 install -D -m644 redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/wolframe.conf
 
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
-install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/run/wolframe
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -861,7 +860,6 @@ fi
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
 %attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/log/wolframe
-%attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/run/wolframe
 %if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man5
 %endif

@@ -40,8 +40,6 @@ package() {
     ${pkgdir}/usr/lib/systemd/system/wolframed.service
   install -d -m775 -g nobody -o nobody \
     ${pkgdir}/var/log/wolframe
-  install -d -m775 -g nobody -o nobody \
-    ${pkgdir}/var/run/wolframe
 }
 
 build() {
