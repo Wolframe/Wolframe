@@ -1,13 +1,10 @@
 # Wolframe RPM spec file
 #
-# Copyright (C) 2011 Project Wolframe
+# Copyright (C) 2011-2013 Project Wolframe
 
 # set distribution based on some OpenSuse and distribution macros
 # this is only relevant when building on https://build.opensuse.org
 ###
-
-#neested ifs are not supported?
-#%if 0%{?opensuse_bs}
 
 %define rhel 0
 %define rhel5 0
@@ -56,6 +53,7 @@
 %define osu114 0
 %define osu121 0
 %define osu122 0
+%define osu131 0
 %if 0%{?suse_version} == 1140
 %define dist osu114
 %define osu114 1
@@ -68,6 +66,11 @@
 %endif
 %if 0%{?suse_version} >= 1220
 %define dist osu122
+%define osu122 1
+%define suse 1
+%endif
+%if 0%{?suse_version} >= 1310
+%define dist osu131
 %define osu122 1
 %define suse 1
 %endif
@@ -143,7 +146,7 @@
 %endif
 %endif
 %if %{suse}
-%if %{osu122}
+%if %{osu122} || %{osu131}
 %define with_icu	1
 %endif
 %endif
@@ -188,6 +191,10 @@
 %endif
 
 %define configuration	wolframe.conf
+
+%define systemctl_configuration wolframed.service
+
+%define firewalld_configuration wolframe-firewalld.xml
 
 %define WOLFRAME_USR	wolframe
 %define WOLFRAME_GRP	wolframe
@@ -244,6 +251,12 @@ BuildRequires: systemd-units
 BuildRequires: systemd
 %endif
 %endif
+%if %{suse}
+%if %{osu122} || %{osu131}
+BuildRequires: systemd
+%{?systemd_requires}
+%endif
+%endif
 
 %if %{build_boost}
 %if %{with_icu}
@@ -273,12 +286,14 @@ Requires: boost-locale >= 1.48
 Requires: boost-regex >= 1.48
 %endif
 %if %{suse}
-Requires: libboost-thread1_48_0 >= 1.48.0
-Requires: libboost-date-time1_48_0 >= 1.48.0
-Requires: libboost-filesystem1_48_0 >= 1.48.0
-Requires: libboost-program-options1_48_0 >= 1.48.0
-Requires: libboost-system1_48_0 >= 1.48.0
-Requires: libboost-regex1_48_0 >= 1.48.0
+%if %{osu122} || %{osu131}
+Requires: libboost_thread1_49_0 >= 1.49.0
+Requires: libboost_date_time1_49_0 >= 1.49.0
+Requires: libboost_filesystem1_49_0 >= 1.49.0
+Requires: libboost_program_options1_49_0 >= 1.49.0
+Requires: libboost_system1_49_0 >= 1.49.0
+Requires: libboost_regex1_49_0 >= 1.49.0
+%endif
 %endif
 %endif
 
@@ -305,26 +320,8 @@ BuildRequires: libxml2-devel >= 2.6
 BuildRequires: libxslt-devel >= 1.0
 %endif
 
-%if %{with_libhpdf}
-BuildRequires: libpng-devel
-BuildRequires: zlib-devel
-%endif
-
 BuildRequires: gcc-c++
 BuildRequires: doxygen
-
-# libhpdf is never available in a decent version,
-# build local one
-%define with_local_libhpdf 0
-%if %{with_libhpdf}
-%define with_local_libhpdf 1
-%endif
-
-# FreeImage, build or use local
-%define with_local_freeimage 0
-%if %{with_freeimage}
-%define with_local_freeimage 1
-%endif
 
 # postgres database module
 %if %{with_pgsql}
@@ -348,7 +345,9 @@ BuildRequires: postgresql-devel >= 8.3
 %endif
 
 # build local sqlite3 for distibutions with no or too old version
-# or which do not support V2 of the API correctly
+# or which do not support V2 of the API correctly or which have
+# been compiled without threading support
+
 %define build_sqlite 0   
 %if %{with_sqlite}
 %if %{rhel}
@@ -363,7 +362,7 @@ BuildRequires: postgresql-devel >= 8.3
 %endif
 %endif
 
-# sqlite database module
+# if we use the system one, we must pick the right version
 %if !%{build_sqlite}
 %if %{with_sqlite}
 %if %{rhel} || %{centos} || %{fedora}
@@ -380,6 +379,36 @@ BuildRequires: sqlite3-devel >= 3.0
 %endif
 %endif
 %endif
+
+# build local version of libharu/libpdf
+%define build_libhpdf 1
+%if %{with_libhpdf}
+%if %{fedora}
+%if %{fc18}
+%define build_libhpdf 0
+%endif
+%endif
+%endif
+
+%if !%{build_libhpdf}
+%if %{with_libhpdf}
+BuildRequires: libharu-devel >= 2.2.1
+%endif
+%else
+# building libhpdf requires zlib and libpng development libraries
+BuildRequires: libpng-devel
+BuildRequires: zlib-devel
+%endif
+
+# FreeImage, build or use local version
+%define build_freeimage 1
+
+%if !%{build_freeimage}
+%if %{with_freeimage}
+BuildRequires: freeimage-devel >= 3.15.4
+%endif
+%endif
+
 
 # Check if 'Distribution' is really set by OBS (as mentioned in bacula)
 %if ! 0%{?opensuse_bs}
@@ -547,11 +576,13 @@ Requires: boost-program-options >= 1.48
 Requires: boost-system >= 1.48
 %endif
 %if %{suse}
-Requires: libboost-thread1_48_0 >= 1.48.0
-Requires: libboost-date-time1_48_0 >= 1.48.0
-Requires: libboost-filesystem1_48_0 >= 1.48.0
-Requires: libboost-program-options1_48_0 >= 1.48.0
-Requires: libboost-system1_48_0 >= 1.48.0
+%if %{osu122} || %{osu131}
+Requires: libboost_thread1_49_0 >= 1.49.0
+Requires: libboost_date_time1_49_0 >= 1.49.0
+Requires: libboost_filesystem1_49_0 >= 1.49.0
+Requires: libboost_program_options1_49_0 >= 1.49.0
+Requires: libboost_system1_49_0 >= 1.49.0
+%endif
 %endif
 %endif
 
@@ -648,10 +679,14 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
-	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
-%if %{with_local_freeimage}
-	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
@@ -676,10 +711,14 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
-	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
-%if %{with_local_freeimage}
-	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
@@ -704,10 +743,14 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
-	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
-%if %{with_local_freeimage}
-	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
@@ -733,10 +776,14 @@ LDFLAGS="-Wl,-rpath=%{_libdir}/wolframe -Wl,-rpath=%{_libdir}/wolframe/plugins" 
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
-	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
-%if %{with_local_freeimage}
-	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
@@ -769,10 +816,14 @@ make DESTDIR=$RPM_BUILD_ROOT install \
 	WITH_SASL=%{with_sasl} WITH_PGSQL=%{with_pgsql} \
 	WITH_QT=%{with_qt} WITH_LIBXML2=%{with_libxml2} \
 	WITH_LIBXSLT=%{with_libxslt} \
-	WITH_LIBHPDF=%{with_libhpdf} WITH_LOCAL_LIBHPDF=%{with_local_libhpdf} \
+%if %{build_libhpdf}
+	WITH_LOCAL_LIBHPDF=1 \
+%else
+	WITH_SYSTEM_LIBHPDF=%{with_libhpdf} \
+%endif
 	WITH_ICU=%{with_icu} WITH_EXAMPLES=%{with_examples} \
-%if %{with_local_freeimage}
-	WITH_LOCAL_FREEIMAGE=%{with_local_freeimage} \
+%if %{build_freeimage}
+	WITH_LOCAL_FREEIMAGE=1 \
 %else
 	WITH_SYSTEM_FREEIMAGE=%{with_freeimage} \
 %endif
@@ -801,11 +852,27 @@ ln -s libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxml2.s
 
 install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
 
-install -D -m644 redhat/wolframed.service $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+%if %{fedora}
+%if %{fc17} || %{fc18}
+install -D -m644 redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+%endif
+%endif
+
+%if %{suse}
+%if %{osu122} || %{osu131}
+install -D -m644 redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+%endif
+%endif
 
 install -D -m644 redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/wolframe.conf
 
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
+
+%if %{fedora}
+%if %{fc17} || %{fc18}
+install -D -m644 redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
+%endif
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -834,9 +901,13 @@ echo Wolframe server at startup
 echo
 %endif
 %if %{fedora}
+%if %{fc17} || %{fc18}
 echo
 echo Use 'systemctl enable wolframed' to enable the server at startup
 echo
+echo Use 'firewall-cmd --add-service=wolframe' to set the firewall rules
+echo
+%endif
 %endif
 
 %preun
@@ -857,8 +928,15 @@ fi
 %defattr( -, root, root )
 %attr( 554, root, root) %{_initrddir}/%{name}
 %if %{fedora}
+%if %{fc17} || %{fc18}
 %dir %attr(0755, root, root) %{_unitdir}
 %{_unitdir}/wolframed.service
+%endif
+%endif
+%if %{suse}
+%if %{osu122} || %{osu131}
+%{_unitdir}/wolframed.service
+%endif
 %endif
 %{_sbindir}/wolframed
 %{_bindir}/wolfilter
@@ -866,6 +944,11 @@ fi
 %{_bindir}/wolfwizard
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
+%if %{fedora}
+%if %{fc17} || %{fc18}
+%{_prefix}/lib/firewalld/services/wolframe.xml
+%endif
+%endif
 %attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/log/wolframe
 %if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man5
@@ -969,13 +1052,13 @@ fi
 %{_includedir}/wolframe/lua/*.h
 %{_includedir}/wolframe/lua/*.hpp
 %endif
-%if %{with_local_libhpdf}
+%if %{build_libhpdf}
 %{_libdir}/wolframe/libhpdf.so
 %{_libdir}/wolframe/libhpdf.a
 %dir %{_includedir}/wolframe/libhpdf
 %{_includedir}/wolframe/libhpdf/*.h
 %endif
-%if %{with_local_freeimage}
+%if %{build_freeimage}
 %{_libdir}/wolframe/libfreeimage.so
 %{_libdir}/wolframe/libfreeimage.a
 %{_libdir}/wolframe/libfreeimageplus.so
@@ -1080,7 +1163,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_haru_pdf_printer.so
-%if %{with_local_libhpdf}
+%if %{build_libhpdf}
 %{_libdir}/wolframe/libhpdf.so.2.2.1
 %{_libdir}/wolframe/libhpdf.so.2
 %endif
@@ -1091,7 +1174,7 @@ fi
 %dir %{_libdir}/wolframe
 %dir %{_libdir}/wolframe/modules
 %{_libdir}/wolframe/modules/mod_graphix.so
-%if %{with_local_freeimage}
+%if %{build_freeimage}
 %{_libdir}/wolframe/libfreeimage.so.3.15.4
 %{_libdir}/wolframe/libfreeimage.so.3
 %{_libdir}/wolframe/libfreeimageplus.so.3.15.4
