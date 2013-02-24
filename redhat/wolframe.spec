@@ -189,6 +189,8 @@
 
 %define configuration	wolframe.conf
 
+%define firewalld_configuration wolframe-firewalld.xml
+
 %define WOLFRAME_USR	wolframe
 %define WOLFRAME_GRP	wolframe
 
@@ -848,6 +850,12 @@ install -D -m644 redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/
 
 install -d -m775 $RPM_BUILD_ROOT%{_localstatedir}/log/wolframe
 
+%if %{fedora}
+%if %{fc17} || %{fc18}
+install -D -m644 redhat/%{firewalld_configuration} $RPM_BUILD_ROOT%{_prefix}/lib/firewalld/services/wolframe.xml
+%endif
+%endif
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -875,9 +883,13 @@ echo Wolframe server at startup
 echo
 %endif
 %if %{fedora}
+%if %{fc17} || %{fc18}
 echo
 echo Use 'systemctl enable wolframed' to enable the server at startup
 echo
+echo Use 'firewall-cmd --add-service=wolframe' to set the firewall rules
+echo
+%endif
 %endif
 
 %preun
@@ -907,6 +919,11 @@ fi
 %{_bindir}/wolfwizard
 %dir %attr(0755, root, root) %{_sysconfdir}/wolframe
 %config %attr(0644, root, root) %{_sysconfdir}/wolframe/wolframe.conf
+%if %{fedora}
+%if %{fc17} || %{fc18}
+%{_prefix}/lib/firewalld/services/wolframe.xml
+%endif
+%endif
 %attr(0775, %{WOLFRAME_USR}, %{WOLFRAME_GRP}) %dir %{_localstatedir}/log/wolframe
 %if !%{sles}
 %dir %attr(0755, root, root) %{_mandir}/man5
