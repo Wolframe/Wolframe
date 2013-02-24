@@ -850,7 +850,14 @@ cp /tmp/libxml2-%{libxml2_version}/lib/libxml2.so.%{libxml2_version} $RPM_BUILD_
 ln -s libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxml2.so.2
 %endif
 
+%if %{rhel} || %{centos} || %{sles}
 install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+%endif
+%if %{suse}
+%if %{osu114}
+install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+%endif
+%endif
 
 %if %{fedora}
 %if %{fc17} || %{fc18}
@@ -942,7 +949,15 @@ fi
 
 %files
 %defattr( -, root, root )
+%if %{rhel} || %{centos} || %{sles}
 %attr( 554, root, root) %{_initrddir}/%{name}
+%endif
+%if %{suse}
+%if %{osu114}
+%attr( 554, root, root) %{_initrddir}/%{name}
+%endif
+%endif
+
 %if %{fedora}
 %if %{fc17} || %{fc18}
 %dir %attr(0755, root, root) %{_unitdir}
