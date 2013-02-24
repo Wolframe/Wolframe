@@ -850,7 +850,14 @@ cp /tmp/libxml2-%{libxml2_version}/lib/libxml2.so.%{libxml2_version} $RPM_BUILD_
 ln -s libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxml2.so.2
 %endif
 
+%if %{rhel} || %{centos} || %{sles}
 install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+%endif
+%if %{suse}
+%if %{osu114}
+install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+%endif
+%endif
 
 %if %{fedora}
 %if %{fc17} || %{fc18}
@@ -894,7 +901,7 @@ if test ! -d /var/run/wolframe; then
 fi
  
 # Don't enable Wolframe server at install time, just inform root how this is done
-%if %{rhel} || %{centos} || %{suse} || %{sles}
+%if %{rhel} || %{centos} || %{sles}
 echo
 echo Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the
 echo Wolframe server at startup
@@ -903,21 +910,49 @@ echo
 %if %{fedora}
 %if %{fc17} || %{fc18}
 echo
-echo Use 'systemctl enable wolframed' to enable the server at startup
+echo Use 'systemctl enable wolframed.service' to enable the server at startup
 echo
 echo Use 'firewall-cmd --add-service=wolframe' to set the firewall rules
 echo
 %endif
 %endif
+%if %{suse}
+%if %{osu122} || %{osu131}
+echo
+echo Use 'systemctl enable wolframed.service' to enable the server at startup
+echo
+%else
+echo
+echo Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the
+echo Wolframe server at startup
+echo
+%endif
+echo
+echo Add the Wolframe ports to 'FW_SERVICES_EXT_TCP' in '/etc/sysconfig/SuSEfirewall2'
+echo and restart the firewall.
+echo
+%endif
 
 %preun
 if [ "$1" = 0 ]; then
+%if %{rhel} || %{centos} || %{sles}
     /etc/init.d/wolframe stop > /dev/null 2>&1
-%if %{rhel} || %{centos} || %{suse} || %{sles}
     /sbin/chkconfig --del wolframe
 %endif
+%if %{fedora}
+systemctl stop wolframed.service   
+systemctl disable wolframed.service
+%endif
+%if %{suse}
+%if %{osu122} || %{osu131}
+systemctl stop wolframed.service
+systemctl disable wolframed.service
+%endif
+%endif
+  if test -d /var/run/wolframe; then
+    rmdir /var/run/wolframe
+  fi
 fi
-
 
 %postun
 if [ "$1" = 0 ]; then
@@ -926,7 +961,15 @@ fi
 
 %files
 %defattr( -, root, root )
+%if %{rhel} || %{centos} || %{sles}
 %attr( 554, root, root) %{_initrddir}/%{name}
+%endif
+%if %{suse}
+%if %{osu114}
+%attr( 554, root, root) %{_initrddir}/%{name}
+%endif
+%endif
+
 %if %{fedora}
 %if %{fc17} || %{fc18}
 %dir %attr(0755, root, root) %{_unitdir}
