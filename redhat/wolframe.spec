@@ -6,9 +6,6 @@
 # this is only relevant when building on https://build.opensuse.org
 ###
 
-#neested ifs are not supported?
-#%if 0%{?opensuse_bs}
-
 %define rhel 0
 %define rhel5 0
 %define rhel6 0
@@ -56,6 +53,7 @@
 %define osu114 0
 %define osu121 0
 %define osu122 0
+%define osu131 0
 %if 0%{?suse_version} == 1140
 %define dist osu114
 %define osu114 1
@@ -68,6 +66,11 @@
 %endif
 %if 0%{?suse_version} >= 1220
 %define dist osu122
+%define osu122 1
+%define suse 1
+%endif
+%if 0%{?suse_version} >= 1310
+%define dist osu131
 %define osu122 1
 %define suse 1
 %endif
@@ -143,7 +146,7 @@
 %endif
 %endif
 %if %{suse}
-%if %{osu122}
+%if %{osu122} || %{osu131}
 %define with_icu	1
 %endif
 %endif
@@ -188,6 +191,8 @@
 %endif
 
 %define configuration	wolframe.conf
+
+%define systemctl_configuration wolframed.service
 
 %define firewalld_configuration wolframe-firewalld.xml
 
@@ -246,6 +251,12 @@ BuildRequires: systemd-units
 BuildRequires: systemd
 %endif
 %endif
+%if %{suse}
+%if %{osu122} || %{osu131}
+BuildRequires: systemd
+%{?systemd_requires}
+%endif
+%endif
 
 %if %{build_boost}
 %if %{with_icu}
@@ -275,12 +286,14 @@ Requires: boost-locale >= 1.48
 Requires: boost-regex >= 1.48
 %endif
 %if %{suse}
-Requires: libboost-thread1_48_0 >= 1.48.0
-Requires: libboost-date-time1_48_0 >= 1.48.0
-Requires: libboost-filesystem1_48_0 >= 1.48.0
-Requires: libboost-program-options1_48_0 >= 1.48.0
-Requires: libboost-system1_48_0 >= 1.48.0
-Requires: libboost-regex1_48_0 >= 1.48.0
+%if %{osu122} || %{osu131}
+Requires: libboost_thread1_49_0 >= 1.49.0
+Requires: libboost_date_time1_49_0 >= 1.49.0
+Requires: libboost_filesystem1_49_0 >= 1.49.0
+Requires: libboost_program_options1_49_0 >= 1.49.0
+Requires: libboost_system1_49_0 >= 1.49.0
+Requires: libboost_regex1_49_0 >= 1.49.0
+%endif
 %endif
 %endif
 
@@ -389,13 +402,6 @@ BuildRequires: zlib-devel
 
 # FreeImage, build or use local version
 %define build_freeimage 1
-#%if %{with_freeimage}
-#%if %{fedora}
-#%if %{fc17} || %{fc18}
-#%define build_freeimage 1
-#%endif
-#%endif
-#%endif
 
 %if !%{build_freeimage}
 %if %{with_freeimage}
@@ -570,11 +576,13 @@ Requires: boost-program-options >= 1.48
 Requires: boost-system >= 1.48
 %endif
 %if %{suse}
-Requires: libboost-thread1_48_0 >= 1.48.0
-Requires: libboost-date-time1_48_0 >= 1.48.0
-Requires: libboost-filesystem1_48_0 >= 1.48.0
-Requires: libboost-program-options1_48_0 >= 1.48.0
-Requires: libboost-system1_48_0 >= 1.48.0
+%if %{osu122} || %{osu131}
+Requires: libboost_thread1_49_0 >= 1.49.0
+Requires: libboost_date_time1_49_0 >= 1.49.0
+Requires: libboost_filesystem1_49_0 >= 1.49.0
+Requires: libboost_program_options1_49_0 >= 1.49.0
+Requires: libboost_system1_49_0 >= 1.49.0
+%endif
 %endif
 %endif
 
@@ -844,7 +852,17 @@ ln -s libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxml2.s
 
 install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
 
-install -D -m644 redhat/wolframed.service $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+%if %{fedora}
+%if %{fc17} || %{fc18}
+install -D -m644 redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+%endif
+%endif
+
+%if %{suse}
+%if %{osu122} || %{osu131}
+install -D -m644 redhat/%{systemctl_configuration} $RPM_BUILD_ROOT%{_unitdir}/wolframed.service
+%endif
+%endif
 
 install -D -m644 redhat/%{configuration} $RPM_BUILD_ROOT%{_sysconfdir}/wolframe/wolframe.conf
 
@@ -910,8 +928,15 @@ fi
 %defattr( -, root, root )
 %attr( 554, root, root) %{_initrddir}/%{name}
 %if %{fedora}
+%if %{fc17} || %{fc18}
 %dir %attr(0755, root, root) %{_unitdir}
 %{_unitdir}/wolframed.service
+%endif
+%endif
+%if %{suse}
+%if %{osu122} || %{osu131}
+%{_unitdir}/wolframed.service
+%endif
 %endif
 %{_sbindir}/wolframed
 %{_bindir}/wolfilter
