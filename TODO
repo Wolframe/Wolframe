@@ -29,8 +29,6 @@ ABa:
   - /usr/lib/x86_64-linux-gnu is a possible module loading place,
     so is /usr/lib32, /usr/lib64, etc. inject as MODULEPATH to build
     process and to module loading code 
-  - systemd instead of init scripts for
-    - OpenSUSE 12.x
   - wolframe depends on libicu48, this is wrong as boost-localization
     should layer the functionality and icu is only a backend
     (this is due to mistakes in debhelper shlibs detection on Debian/Ubuntu
@@ -39,7 +37,6 @@ ABa:
     we get a glob-include in configuration files,
     apache-like LoadModules, support for 'wolframe.d/libxml2.conf'
     and 'include wolframe.d/*.conf'
-  - sqlite3: test for threadsafety, adjust LOCAL vs. SYSTEM build flags
   - test module default dir, make 'directory' override the #ifdef-ed one,
     test everywhere
     also, don't give up after one guess, try to combine the package root (optional)
