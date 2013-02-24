@@ -72,8 +72,44 @@ static const char* getPropertyIdentifier( char* buf, int bufsize, const char* na
 WidgetVisitor::WidgetVisitor( QWidget* root, QHash<QString,QString>* globals_)
 	:m_globals(globals_)
 {
-	m_stk.push( root);
+	m_stk.push( QPair<QWidget*,WidgetState>( root, 0));
 }
+
+static WidgetState widgetInternalEnter( QWidget* widget, WidgetState state, const char* name)
+{
+	QString clazz = widget->metaObject()->className();
+
+	if( clazz == "QTreeWidget")
+	{
+
+	}
+	else
+	{
+		return 0;
+	}
+
+}
+
+static WidgetState widgetInternalLeave( QWidget* widget, WidgetState state)
+{
+	return 0;
+}
+
+static QWidget* widgetEnter( QWidget* widget, const char* name)
+{
+	QString clazz = widget->metaObject()->className();
+
+	if( clazz == "QTreeWidget")
+	{
+
+	}
+	else
+	{
+		return 0;
+	}
+
+}
+
 
 bool WidgetVisitor::enter( const QString& name)
 {
@@ -84,12 +120,34 @@ bool WidgetVisitor::enter( const QString& name)
 
 bool WidgetVisitor::enter( const char* name)
 {
+	if (m_stk.empty()) return false;
+	WidgetState state;
+	if ((state = widgetInternalEnter( m_stk.top().first, m_stk.top().second, name)) != 0)
+	{
+		m_stk.top().second = state;
+		return true;
+	}
+	QWidget* wdg;
+	if ((wdg = widgetEnter( m_stk.top().first, name)) != 0)
+	{
+		m_stk.push( QPair<QWidget*,WidgetState>( wdg, 0));
+		return true;
+	}
+	return false;
 }
 
 void WidgetVisitor::leave()
 {
 	if (m_stk.empty()) return;
-	m_stk.pop();
+	WidgetState state;
+	if ((state = widgetInternalLeave( m_stk.top().first, m_stk.top().second)) != NULL)
+	{
+		m_stk.top().second = state;
+	}
+	else
+	{
+		m_stk.pop();
+	}
 }
 
 static bool clearWidgetProperty( QWidget* widget, const char* name, QVariant data)
@@ -161,7 +219,7 @@ static bool clearWidgetProperty( QWidget* widget, const char* name, QVariant dat
 	qDebug() << "Clearing " << clazz << name;
 }
 
-static bool setWidgetProperty( QWidget* widget, const char* name, QVariant data)
+static bool setWidgetProperty( QWidget* widget, WidgetState state, const char* name, QVariant data)
 {
 	QString clazz = widget->metaObject()->className();
 	if( clazz == "QComboBox")
@@ -221,7 +279,7 @@ static bool setWidgetProperty( QWidget* widget, const char* name, QVariant data)
 }
 
 
-static QVariant getWidgetProperty( QWidget* widget, const char* name)
+static QVariant getWidgetProperty( QWidget* widget, WidgetState state, const char* name)
 {
 	QString clazz = widget->metaObject()->className();
 	if( clazz == "QComboBox")
@@ -261,12 +319,11 @@ QVariant WidgetVisitor::property( const QString& name)
 
 QVariant property( const char* name, int level)
 {
-	QVariant invalid;
 	if (m_stk.empty()) return QVariant()/*invalid*/;
 
-	QVariant rt = m_stk.top()->property( name);
+	QVariant rt = getWidgetProperty( m_stk.top().first, m_stk.top().second, name);
 	if (rt.isValid()) return rt;
-	rt = getWidgetProperty( m_stk.top(), name);
+	QVariant rt = m_stk.top().first->property( name);
 	if (rt.isValid()) return rt;
 
 	const char* follow = strchr( name, '.');
@@ -275,7 +332,7 @@ QVariant property( const char* name, int level)
 		int chldlen = follow-name;
 		char chldbuf_[MaxIdentifierSize+1];
 
-		if (memcmp( name, "global", chldlen) == 0)
+		if (level == 0 && memcmp( name, "global", chldlen) == 0)
 		{
 			return QVariant( m_globals[ QString(follow+1)]);
 		}
@@ -288,7 +345,7 @@ QVariant property( const char* name, int level)
 		}
 		if (level == 0 && m_stk.at(0)->objectName() == chld)
 		{
-			WidgetVisitor rootvisit( m_stk.at(0), m_globals);
+			WidgetVisitor rootvisit( m_stk.at(0).first, m_stk.at(0).second, m_globals);
 			return rootvisit.property( follow+1, 1);
 		}
 	}
@@ -300,14 +357,48 @@ QVariant WidgetVisitor::property( const char* name)
 	return property( name, 0);
 }
 
-void WidgetVisitor::setProperty( const char* name, const QVariant& value)
+bool WidgetVisitor::setProperty( const char* name, const QVariant& value, int level)
 {
+	if (m_stk.empty()) return QVariant()/*invalid*/;
 
+	if (setWidgetProperty( m_stk.top().first, m_stk.top().second, name, value)) return true;
+	if (m_stk.top().first->setProperty( name, value)) return true;
+
+	const char* follow = strchr( name, '.');
+	if (follow)
+	{
+		int chldlen = follow-name;
+		char chldbuf_[MaxIdentifierSize+1];
+
+		if (level == 0 && memcmp( name, "global", chldlen) == 0)
+		{
+			m_globals[ QString(follow+1)] = value;
+		}
+		const char* chld = getPropertyIdentifier( chldbuf_, sizeof(chldbuf_), name, chldlen);
+		if (m_stk.enter( chld))
+		{
+			bool rt = setProperty( follow+1, value, level+1);
+			m_stk.leave();
+			return rt;
+		}
+		if (level == 0 && m_stk.at(0)->objectName() == chld)
+		{
+			WidgetVisitor rootvisit( m_stk.at(0).first, m_stk.at(0).second, m_globals);
+			return rootvisit.setProperty( follow+1, value, 1);
+		}
+	}
+	return rt;
 }
 
-void WidgetVisitor::setProperty( const QString& name, const QVariant& value)
+bool WidgetVisitor::setProperty( const QString& name, const QVariant& value)
 {
-
+	char name_[MaxIdentifierSize+1];
+	const char* id = getPropertyIdentifier( name_, sizeof(name_), name);
+	return (id)?setProperty( id, value, 0):false;
 }
 
+bool WidgetVisitor::setProperty( const char* name, const QVariant& value)
+{
+	return setProperty( name, value, 0);
+}
 

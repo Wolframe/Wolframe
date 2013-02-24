@@ -38,6 +38,8 @@
 #include <QHash>
 #include <QString>
 
+typedef void* WidgetState;
+
 ///\class WidgetVisitor
 ///\brief Tree to access to (read/write) of widget data
 class WidgetVisitor
@@ -55,6 +57,8 @@ class WidgetVisitor
 
 		///\brief Set the current node to the parent that called enter to this node.
 		void leave();
+
+		TODO: TreeWidget needs TreeState for iteration: (a state variable for each wigdet in the stack)
 
 		/** Property name resolving process:
 		*	(A) Split name to SELECT.REST and try to enter SELECT from the current node and eveluate there REST
@@ -84,21 +88,31 @@ class WidgetVisitor
 		///\brief Set the property of the current node
 		///\param[in] name name of the property
 		///\param[in] value property value as variant (any type)
-		void setProperty( const char* name, const QVariant& value);
+		///\return true on success
+		bool setProperty( const char* name, const QVariant& value);
 
 		///\brief Set the property of the current node
 		///\param[in] name name of the property
 		///\param[in] value property value as variant (any type)
-		void setProperty( const QString& name, const QVariant& value);
+		///\return true on success
+		bool setProperty( const QString& name, const QVariant& value);
 
 	private:
-		///\brief Internal property select using 'level' to check property resolving step (B).
+		///\brief Internal property get using 'level' to check property resolving step (B).
 		///\param[in] name name of the property
 		///\param[in] level element index in path (element is first element of a path <=> level == 0)
 		QVariant property( const char* name, int level);
 
+		///\brief Internal property set using 'level' to check property resolving step (B).
+		///\param[in] name name of the property
+		///\param[in] value property value as variant (any type)
+		///\return true on success
+		bool setProperty( const char* name, const QVariant& value, int level);
+
+		WidgetVisitor( QWidget* root, WidgetState state, QHash<QString, QString>* globals_);
+
 		enum {MaxIdentifierSize=127};			//< internal maximum identifier length
-		QStack<QWidget*> m_stk;				//< stack of visited nodes with the current node on top
+		QStack<QPair<QWidget*,WidgetState> > m_stk;	//< stack of visited widget nodes (first) with their select state (second). The current node is the top element
 		QHash<QString, QString>* m_globals;		//< global variables
 };
 

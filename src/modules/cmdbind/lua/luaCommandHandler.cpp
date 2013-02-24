@@ -138,9 +138,9 @@ LuaCommandHandler::CallResult LuaCommandHandler::call( const char*& errorCode)
 	while (rt == LUA_YIELD);
 	if (rt != 0)
 	{
-		std::string msg = m_interp->luaErrorMessage( m_interp->thread());
-		LOG_ERROR << "error calling function '" << m_name.c_str() << "':" << msg;
-		errorCode = "lua call failed";
+		m_lasterror = m_interp->luaErrorMessage( m_interp->thread());
+		LOG_ERROR << "error calling function '" << m_name.c_str() << "':" << m_lasterror;
+		errorCode = m_lasterror.c_str();
 		return Error;
 	}
 	return Ok;

@@ -77,6 +77,7 @@ private:
 private:
 	const langbind::LuaScriptContext* m_ctx;
 	langbind::LuaScriptInstanceR m_interp;
+	std::string m_lasterror;
 };
 
 }}//namespace
