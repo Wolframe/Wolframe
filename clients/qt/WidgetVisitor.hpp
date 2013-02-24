@@ -69,6 +69,9 @@ class WidgetVisitor
 		*			Global variable references '{global.NAME}' are resolved once at widget initialization.
 		*			Other variable references '{name}' are resolved whenever a property is read
 		*/
+		/** Rules:
+		*	Structured widget property names (customer.id) refer allways to the last accessed main property (customer)
+		*/
 		///\brief Get the property of the current node by 'name'
 		///\param[in] name name of the property
 		///\return Property variant (any type)
