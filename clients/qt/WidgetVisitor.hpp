@@ -38,26 +38,65 @@
 #include <QHash>
 #include <QString>
 
+///\class WidgetVisitor
+///\brief Tree to access to (read/write) of widget data
 class WidgetVisitor
 {
 	public:
+		///\brief Constructor
+		///\param[in] root Root of widget tree visited
+		///\param[in] globals_ Reference to global variables
 		WidgetVisitor( QWidget* root, QHash<QString, QString>* globals_);
 
+		///\brief Sets the current node to the child with name 'name'
 		bool enter( const QString& name);
+		///\brief Sets the current node to the child with name 'name'
 		bool enter( const char* name);
+
+		///\brief Set the current node to the parent that called enter to this node.
 		void leave();
 
+		/** Property name resolving process:
+		*	(A) Split name to SELECT.REST and try to enter SELECT from the current node and eveluate there REST
+		*	(B) Otherwise if first element of a path try to enter SELECT from the root node of the widget tree
+		*	(C) Otherwise try to evaluate name as widget property of the current node
+		*	(D) Otherwise try to evaluate it as a a dynamic property
+		*	(E) Otherwise find a dynamic property synonym:name and redo evaluation with the synonym:name value as name
+		*/
+		/** Used dynamic property prefixes:
+		*	'synonym:' Rewrite rule for property "synonym:IDENTIFIER": look for the value if IDENTIFIER is searched
+		*	'global.' Global variable: Resolve 'global.IDENTIFIER' as lookup in the globals table passed as reference in the constructor
+		*			Global variable references '{global.NAME}' are resolved once at widget initialization.
+		*			Other variable references '{name}' are resolved whenever a property is read
+		*/
+		///\brief Get the property of the current node by 'name'
+		///\param[in] name name of the property
+		///\return Property variant (any type)
 		QVariant property( const QString& name);
+		///\brief Get the property of the current node by 'name'
+		///\param[in] name name of the property
+		///\return property variant (any type)
 		QVariant property( const char* name);
+
+		///\brief Set the property of the current node
+		///\param[in] name name of the property
+		///\param[in] value property value as variant (any type)
 		void setProperty( const char* name, const QVariant& value);
+
+		///\brief Set the property of the current node
+		///\param[in] name name of the property
+		///\param[in] value property value as variant (any type)
 		void setProperty( const QString& name, const QVariant& value);
 
 	private:
+		///\brief Internal property select using 'level' to check property resolving step (B).
+		///\param[in] name name of the property
+		///\param[in] level element index in path (element is first element of a path <=> level == 0)
 		QVariant property( const char* name, int level);
 
-		enum {MaxIdentifierSize=127};
-		QStack<QWidget*> m_stk;
-		QHash<QString, QString>* m_globals;
+		enum {MaxIdentifierSize=127};			//< internal maximum identifier length
+		QStack<QWidget*> m_stk;				//< stack of visited nodes with the current node on top
+		QHash<QString, QString>* m_globals;		//< global variables
 };
 
 #endif
