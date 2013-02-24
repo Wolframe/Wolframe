@@ -1,0 +1,8 @@
+wolframe for Debian
+-------------------
+
+All debian specific build files are in 'debian/.'.
+
+Changes should always be done to the main GIT repository at
+git://github.com/mbarbos/Wolframe
+

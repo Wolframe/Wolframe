@@ -22,5 +22,3 @@ local changes and fixes:
     'Source/Wrapper/FreeImagePlus/FreeImagePlus.h'
 - 'Source/FreeImage/PluginHDR.cpp:76'
   error: comma at end of enumerator list
-- Removed wrong build instructions for Solaris 9, files
-  'Makefile.solaris' and 'README.solaris'
