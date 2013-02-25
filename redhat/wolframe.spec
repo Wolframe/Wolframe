@@ -903,7 +903,7 @@ fi
 # Don't enable Wolframe server at install time, just inform root how this is done
 %if %{rhel} || %{centos} || %{sles}
 echo
-echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the"
+echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/chkconfig wolframed on' to enable the"
 echo Wolframe server at startup
 echo
 %endif
@@ -923,7 +923,7 @@ echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
 echo
 %else
 echo
-echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the"
+echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/chkconfig wolframed on' to enable the"
 echo Wolframe server at startup
 echo
 %endif
