@@ -1,0 +1,23 @@
+Requirements
+------------
+  
+- XCode
+- Qt for Mac
+  
+Build
+-----
+
+cd plugins
+qmake
+xcodebuild -configuration Debug
+cd ..
+qmake
+xcodebuild -configuration Debug
+
+On error manually correct -lQtUiTools_debug to -lQtUiTools
+
+Run
+---
+
+export DYLD_LIBRARY_PATH=plugins/build/Debug/
+build/Debug/qtclient.app/Contents/MacOS/qtclient -c apps/configurator.conf 
