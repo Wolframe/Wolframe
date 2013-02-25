@@ -6,7 +6,7 @@
 # /etc/init.d/wolframed
 #
 ### BEGIN INIT INFO
-# Provides:       the Worlframe daemon
+# Provides:       the Wolframe daemon
 # Required-Start: $network $named $syslog $time
 # Should-Start:   ldap postgresql
 # Required-Stop:  $network $named $syslog $time
@@ -18,7 +18,8 @@
 
 WOLFRAMED_BIN=/usr/sbin/wolframed
 test -x $WOLFRAMED_BIN || exit 5
-WOLFRAMED_PIDFILE=/var/run/wolframed.pid
+WOLFRAMED_PIDFILE=/var/run/wolframe/wolframed.pid
+WOLFRAMED_CONFIGFILE=/etc/wolframe/wolframe.conf
 
 # Shell functions sourced from /etc/rc.status:
 #      rc_check         check and set local and overall rc status
@@ -52,18 +53,19 @@ rc_reset
 case "$1" in
     start)
         if [ -e $WOLFRAMED_PIDFILE ]; then
-        $0 status &>/dev/null
-        if [ $ret = 1 ]; then
-           echo "Warning: found stale pidfile (unclean shutdown?)"
-        elif [ $ret = 0 ]; then
-           echo "Wolframe is already running ($WOLFRAMED_PIDFILE)"
-           rc_failed $ret
-           rc_status -v1
-           rc_exit
+           $0 status &>/dev/null
+           if [ $ret = 1 ]; then
+              echo "Warning: found stale pidfile (unclean shutdown?)"
+           elif [ $ret = 0 ]; then
+              echo "Wolframe is already running ($WOLFRAMED_PIDFILE)"
+              rc_failed $ret
+              rc_status -v1
+              rc_exit
+           fi
         fi
 
         echo -n "Starting Wolframe dameon"
-        WOLFRAMED_ARGS=""
+        WOLFRAMED_ARGS="-c $WOLFRAMED_CONFIGFILE"
         ## Start daemon with startproc(8). If this fails
         ## the echo return value is set appropriate.
 
@@ -80,7 +82,7 @@ case "$1" in
         ## Stop daemon with killproc(8) and if this fails
         ## set echo the echo return value.
 
-	/sbin/killproc -p $PIDFILE -TERM $MASTER_BIN
+	/sbin/killproc -p $WOLFRAMED_PIDFILE -TERM $WOLFRAMED_BIN
 
 	# Remember status and be verbose
 	rc_status -v
