@@ -962,11 +962,11 @@ fi
 %files
 %defattr( -, root, root )
 %if %{rhel} || %{centos} || %{sles}
-%attr( 554, root, root) %{_initrddir}/%{name}
+%attr( 554, root, root) %{_initrddir}/%{name}d
 %endif
 %if %{suse}
 %if %{osu114}
-%attr( 554, root, root) %{_initrddir}/%{name}
+%attr( 554, root, root) %{_initrddir}/%{name}d
 %endif
 %endif
 
