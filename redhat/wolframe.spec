@@ -936,14 +936,18 @@ echo
 %preun
 if [ "$1" = 0 ]; then
 %if %{rhel} || %{centos} || %{sles}
-    /etc/init.d/wolframe stop > /dev/null 2>&1
-    /sbin/chkconfig --del wolframe
+    /etc/init.d/wolframed stop > /dev/null 2>&1
+    /sbin/chkconfig --del wolframed
 %endif
 %if %{fedora}
 systemctl stop wolframed.service   
 systemctl disable wolframed.service
 %endif
 %if %{suse}
+%if %{osu114}
+    /etc/init.d/wolframed stop > /dev/null 2>&1
+    /sbin/chkconfig --del wolframed
+%endif
 %if %{osu122} || %{osu131}
 systemctl stop wolframed.service
 systemctl disable wolframed.service
