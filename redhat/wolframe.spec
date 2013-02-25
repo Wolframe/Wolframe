@@ -2,7 +2,7 @@
 #
 # Copyright (C) 2011-2013 Project Wolframe
 
-# set distribution based on some OpenSuse and distribution macros
+# Set distribution based on some OpenSuse and distribution macros
 # this is only relevant when building on https://build.opensuse.org
 ###
 
@@ -81,9 +81,7 @@
 %define sles 1
 %endif
 
-#%endif
-
-# define what to build
+# Define what to build
 ###
 
 %define with_ssl	1
@@ -109,6 +107,8 @@
 %define with_qt		1
 %endif
 
+# Per package decisions
+###
 
 # Boost has sometimes a different layout in the shared libraries, don't
 # know why
@@ -162,7 +162,7 @@
 %endif
 %endif
 
-# build local libxml2 for distributions which have a too old broken version
+# Build local libxml2 for distributions which have a too old broken version
 # (broken in respect to some character encodings, not broken as such)
 
 %if %{with_libxml2}
@@ -184,10 +184,10 @@
 # init script to start the daemon
 
 %if %{rhel} || %{centos} || %{fedora}
-%define initscript	wolframe.initd.RHEL
+%define initscript	wolframed.initd.RHEL
 %endif
 %if %{suse} || %{sles}
-%define initscript	wolframe.initd.SuSE
+%define initscript	wolframed.initd.SuSE
 %endif
 
 %define configuration	wolframe.conf
@@ -523,7 +523,7 @@ Requires: libxml2 >= 2.6
 
 %if %{with_libxslt}
 %package libxslt
-Summary: The Wolframe filter module using libxslt.
+Summary: The Wolframe filter module using libxslt
 Group: Application/Business
 
 %description libxslt
@@ -535,7 +535,7 @@ Requires: libxslt >= 1.0
 
 %if %{with_libhpdf}
 %package libhpdf
-Summary: Wolframe printing module based on libhpdf/libharu.
+Summary: Wolframe printing module based on libhpdf/libharu
 Group: Application/Business
 
 %description libhpdf
@@ -548,7 +548,7 @@ Requires: zlib
 
 %if %{with_freeimage}
 %package freeimage
-Summary: Wolframe image manipulation function module.
+Summary: Wolframe image manipulation function module
 Group: Application/Business
 
 %description freeimage
@@ -591,7 +591,7 @@ Requires: openssl >= 0.9.7
 %endif
 
 %package libclient-devel
-Summary: Developement header files and libraries for the Wolframe C++ client library
+Summary: Development header files and libraries for the Wolframe C++ client library
 Group: Application/Business
 Requires: %{name}-libclient >= %{version}-%{release}
 
@@ -851,11 +851,11 @@ ln -s libxml2.so.%{libxml2_version} $RPM_BUILD_ROOT%{_libdir}/wolframe/libxml2.s
 %endif
 
 %if %{rhel} || %{centos} || %{sles}
-install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
 %endif
 %if %{suse}
 %if %{osu114}
-install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}
+install -D -m775 redhat/%{initscript} $RPM_BUILD_ROOT%{_initrddir}/%{name}d
 %endif
 %endif
 
@@ -903,32 +903,32 @@ fi
 # Don't enable Wolframe server at install time, just inform root how this is done
 %if %{rhel} || %{centos} || %{sles}
 echo
-echo Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the
+echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the"
 echo Wolframe server at startup
 echo
 %endif
 %if %{fedora}
 %if %{fc17} || %{fc18}
 echo
-echo Use 'systemctl enable wolframed.service' to enable the server at startup
+echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
 echo
-echo Use 'firewall-cmd --add-service=wolframe' to set the firewall rules
+echo "Use 'firewall-cmd --add-service=wolframe' to set the firewall rules"
 echo
 %endif
 %endif
 %if %{suse}
 %if %{osu122} || %{osu131}
 echo
-echo Use 'systemctl enable wolframed.service' to enable the server at startup
+echo "Use 'systemctl enable wolframed.service' to enable the server at startup"
 echo
 %else
 echo
-echo Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the
+echo "Use '/sbin/chkconfig --add wolframed' and '/sbin/ckconfig wolframed on' to enable the"
 echo Wolframe server at startup
 echo
 %endif
 echo
-echo Add the Wolframe ports to 'FW_SERVICES_EXT_TCP' in '/etc/sysconfig/SuSEfirewall2'
+echo "Add the Wolframe ports to 'FW_SERVICES_EXT_TCP' in '/etc/sysconfig/SuSEfirewall2'"
 echo and restart the firewall.
 echo
 %endif
