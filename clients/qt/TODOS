@@ -25,7 +25,9 @@ now configurator:
     It happens only if the same form is picked as already shown in another window
     => happens also with only one window?!
   - resizing issues: example view picture when picture list window is quite small
-
+- more errors
+  - proper logout send a "Connection closed by server"
+  
 musts:
 - modal dialogs
   - improve now refresh of parent form after closing the modal dialog,

@@ -326,6 +326,10 @@ void MainWindow::initialize( )
 
 // load language resources, repaints the whole interface if necessary
 	loadLanguage( m_language );
+
+// auto login for developers
+	if( settings.autoLogin )
+		on_actionLogin_triggered( );
 }
 
 void MainWindow::CreateFormWidget( const QString &name )

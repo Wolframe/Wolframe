@@ -60,11 +60,12 @@ struct ApplicationSettings
 	bool		saveUsername;		///< persistent username ?
 	QString		lastUsername;		///< last username in case of persisting it
 	QString		lastConnection;		///< name of the last used connection
-
+	
 	QVector< ConnectionParameters >	connectionParams; ///< defined connections parameters
 
 	bool mdi;				///< MDI mode with many forms
 	bool debug;				///< debug output
+	bool autoLogin;				///< develop only: easier to write interface with autologin
 	QString locale;				///< startup locale
 	LoadMode uiLoadMode;			///< developer UI file load mode or network mode
 	LoadMode dataLoadMode;			///< data forms to network or local stubs in XML files

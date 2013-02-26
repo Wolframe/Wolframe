@@ -221,6 +221,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="autoLogin">
+        <property name="text">
+         <string>Login &amp;automatically when starting the client</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="verticalSpacer_2">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
