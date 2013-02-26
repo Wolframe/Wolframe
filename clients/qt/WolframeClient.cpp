@@ -350,7 +350,7 @@ void WolframeClient::dataAvailable( )
 		case Connected:
 		case Data:
 			while( m_socket->canReadLine( ) ) {
-				char buf[1024];
+				char buf[65535];
 				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
 				if( len < 0 ) {
 					qCritical( ) << "Error when reading line!!";
