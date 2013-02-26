@@ -18,8 +18,7 @@ END
 TRANSACTION selectPicture -- (/picture/id)
 BEGIN
 	INTO picture DO UNIQUE
-		-- for now: retrieve thumbnail for image, otherwiser qtclient explodes!
-		SELECT Picture.ID AS "id", thumbnail as "image", caption, info, width, height,
+		SELECT Picture.ID AS "id", image, caption, info, width, height,
 			coalesce( group_concat( distinct Tag.name ), '' ) as tags,
 			3*length(image)/4+2 as size,
 			coalesce( group_concat( distinct Category.name ), '' ) as used_categories,
