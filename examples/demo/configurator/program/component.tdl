@@ -15,7 +15,7 @@ TRANSACTION addComponent
 BEGIN
 	DO INSERT INTO Component( code, name, normalizedName, categoryID, manufacturerID, mfgCode, webPage, description, price )
 		VALUES ( $(code), $(name), $(normalizedName), $(categoryID), $(manufacturerID), $(mfgCode), $(webPage), $(description), $(price) );
-	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Compinent WHERE normalizedName = $(normalizedName);
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Component WHERE normalizedName = $(normalizedName);
 	FOREACH picture DO INSERT INTO ComponentPicture( componentID, pictureID ) VALUES( $1, $(id) );
 END
 

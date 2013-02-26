@@ -419,6 +419,49 @@ function ComponentRequest( )
 	output:print( f:get( ) )
 end
 
+-- recipes
+
+function RecipeListRequest( )
+	output:as( {root='list', system='recipeList.simpleform'})
+	local t = formfunction( "selectRecipeList" )( {} )
+	local f = form( "RecipeList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function createRecipe( )
+	local recipe = input:table( )["recipe"]
+	if recipe["category"] then
+		recipe["categoryID"] = recipe["category"]["id"]
+	end
+	if recipe["name"] then
+		recipe["normalizedName"] = normalizer( "name" )( recipe["name"] )
+	end
+	formfunction( "addRecipe" )( recipe )
+end
+
+function editRecipe( )
+	local recipe = input:table( )["recipe"]
+	if recipe["category"] then
+		recipe["categoryID"] = recipe["category"]["id"]
+	end
+	if recipe["name"] then
+		recipe["normalizedName"] = normalizer( "name" )( recipe["name"] )
+	end
+	formfunction( "updateRecipe" )( recipe )
+end
+
+function deleteRecipe( )
+	formfunction( "deleteRecipe" )( { id = input:table( )["recipe"]["id"] } )
+end
+
+function RecipeRequest( )
+	local t = formfunction( "selectRecipe" )( { id = input:table( )["recipe"]["id"] } )
+	local f = form( "Recipe" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
 -- category/features associations
 
 function createCategoryFeature( )

@@ -1,6 +1,12 @@
 now configurator:
+- finish recipes
+  - creationDate (set by system? by user? default?)
+  - linking recipes to categories (RecipeContent)
+- finish configurations
+- thumbnails for components (dito recipes), currently broken
 - open info box (modal) in feature/category/component edit and add to
   show picture information
+- multi-line plain text fields (like desription in recipe) loose newlines
 
 - stop the "whiteout", especially seen after assigning pictures
   (must be a protocol thing), happens mainly on Windows 7/8, not

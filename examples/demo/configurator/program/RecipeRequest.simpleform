@@ -1,0 +1,7 @@
+FORM RecipeRequest
+{
+	recipe
+	{
+		id @int
+	}
+}

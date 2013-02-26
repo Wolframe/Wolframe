@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Edit component</string>
+   <string>Edit recipe</string>
   </property>
   <property name="initAction" stdset="0">
    <string notr="true">read</string>
@@ -20,33 +20,30 @@
    <string notr="true">{global.id}</string>
   </property>
   <property name="doctype" stdset="0">
-   <string notr="true">ComponentRequest.simpleForm</string>
+   <string notr="true">RecipeRequest.simpleForm</string>
   </property>
   <property name="rootelement" stdset="0">
-   <string notr="true">component</string>
+   <string notr="true">recipe</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_code">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Code:</string>
-     </property>
-     <property name="buddy">
-      <cstring>code</cstring>
+      <string/>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="code">
-     <property name="initialFocus" stdset="0">
-      <bool>true</bool>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Edit recipe..</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="1" column="0">
     <widget class="QLabel" name="label_name">
      <property name="text">
       <string>Name:</string>
@@ -56,8 +53,21 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="1" column="1">
     <widget class="QLineEdit" name="name"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_description_2">
+     <property name="text">
+      <string>Description:</string>
+     </property>
+     <property name="buddy">
+      <cstring>description</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPlainTextEdit" name="description"/>
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_category">
@@ -104,96 +114,43 @@
      </column>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_manufacturer">
-     <property name="text">
-      <string>Manufacturer</string>
-     </property>
-     <property name="buddy">
-      <cstring>manufacturer</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QTableWidget" name="manufacturer">
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAsNeeded</enum>
-     </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="showGrid">
-      <bool>true</bool>
-     </property>
-     <property name="gridStyle">
-      <enum>Qt::DotLine</enum>
-     </property>
-     <property name="sortingEnabled">
-      <bool>true</bool>
-     </property>
-     <property name="doctype" stdset="0">
-      <string notr="true">ManufacturerListRequest.simpleform</string>
-     </property>
-     <property name="rootelement" stdset="0">
-      <string notr="true">manufacturer</string>
-     </property>
-     <property name="action" stdset="0">
-      <string notr="true">read</string>
-     </property>
-     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderStretchLastSection">
-      <bool>false</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>thumbnail</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>name</string>
-      </property>
-     </column>
-    </widget>
-   </item>
    <item row="5" column="0">
     <widget class="QLabel" name="label_mfgCode">
      <property name="text">
-      <string>mfgCode:</string>
+      <string>Creation date:</string>
      </property>
      <property name="buddy">
-      <cstring>mfgCode</cstring>
+      <cstring>creationDate</cstring>
      </property>
     </widget>
    </item>
    <item row="5" column="1">
-    <widget class="QLineEdit" name="mfgCode"/>
+    <widget class="QDateTimeEdit" name="creationDate"/>
    </item>
    <item row="6" column="0">
     <widget class="QLabel" name="label_description">
      <property name="text">
-      <string>Webpage:</string>
+      <string>Comment:</string>
      </property>
      <property name="buddy">
-      <cstring>webPage</cstring>
+      <cstring>comment</cstring>
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
-    <widget class="QLineEdit" name="webPage"/>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Pictures:</string>
+     </property>
+     <property name="buddy">
+      <cstring>picture</cstring>
+     </property>
+    </widget>
    </item>
-   <item row="12" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
+   <item row="9" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -206,85 +163,31 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="save">
+      <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Save</string>
-       </property>
-       <property name="rootelement" stdset="0">
-        <string notr="true">component</string>
-       </property>
-       <property name="doctype" stdset="0">
-        <string notr="true">Component.simpleform</string>
-       </property>
-       <property name="action" stdset="0">
-        <string notr="true">update</string>
-       </property>
-       <property name="form" stdset="0">
-        <string notr="true">components</string>
-       </property>
-       <property name="id" stdset="0">
-        <string notr="true">{global.id}</string>
+        <string>Filter pictures by:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="reset">
-       <property name="text">
-        <string>Reset</string>
-       </property>
-       <property name="doctype" stdset="0">
-        <string notr="true">ComponentRequest.simpleform</string>
-       </property>
-       <property name="rootelement" stdset="0">
-        <string notr="true">component</string>
-       </property>
-       <property name="action" stdset="0">
-        <string notr="true">read</string>
-       </property>
-       <property name="id" stdset="0">
-        <string notr="true">{global.id}</string>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="search"/>
      </item>
      <item>
-      <widget class="QPushButton" name="cancel">
+      <widget class="QPushButton" name="searchButton">
        <property name="text">
-        <string>Cancel</string>
+        <string>Search..</string>
        </property>
-       <property name="form" stdset="0">
-        <string notr="true">components</string>
+       <property name="global.searchState" stdset="0">
+        <string notr="true">{search.state}</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">picture.reload</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_description_2">
-     <property name="text">
-      <string>Description:</string>
-     </property>
-     <property name="buddy">
-      <cstring>description</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="1">
-    <widget class="QLineEdit" name="price"/>
-   </item>
-   <item row="9" column="0">
-    <widget class="QLabel" name="label_price">
-     <property name="text">
-      <string>Price:</string>
-     </property>
-     <property name="buddy">
-      <cstring>price</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <widget class="QPlainTextEdit" name="description"/>
-   </item>
-   <item row="11" column="1">
+   <item row="10" column="1">
     <widget class="QTableWidget" name="picture">
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAsNeeded</enum>
@@ -347,10 +250,10 @@
      </column>
     </widget>
    </item>
-   <item row="10" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <item row="11" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <spacer name="horizontalSpacer_3">
+      <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -363,68 +266,69 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_3">
+      <widget class="QPushButton" name="save">
        <property name="text">
-        <string>Filter pictures by:</string>
+        <string>Save</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">recipe</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">Recipe.simpleform</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">update</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">recipes</string>
+       </property>
+       <property name="id" stdset="0">
+        <string notr="true">{global.id}</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="search"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="searchButton">
+      <widget class="QPushButton" name="reset">
        <property name="text">
-        <string>Search..</string>
+        <string>Reset</string>
        </property>
-       <property name="global.searchState" stdset="0">
-        <string notr="true">{search.state}</string>
+       <property name="doctype" stdset="0">
+        <string notr="true">RecipeRequest.simpleform</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">recipe</string>
        </property>
        <property name="action" stdset="0">
-        <string notr="true">picture.reload</string>
+        <string notr="true">read</string>
+       </property>
+       <property name="id" stdset="0">
+        <string notr="true">{global.id}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">recipes</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
-   <item row="10" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Pictures:</string>
-     </property>
-     <property name="buddy">
-      <cstring>picture</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="../resources/configurator.qrc">:/images/brick_edit.png</pixmap>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Edit component..</string>
-     </property>
-    </widget>
+   <item row="6" column="1">
+    <widget class="QPlainTextEdit" name="comment"/>
    </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>code</tabstop>
   <tabstop>name</tabstop>
-  <tabstop>category</tabstop>
-  <tabstop>manufacturer</tabstop>
-  <tabstop>mfgCode</tabstop>
-  <tabstop>webPage</tabstop>
   <tabstop>description</tabstop>
-  <tabstop>price</tabstop>
+  <tabstop>category</tabstop>
+  <tabstop>creationDate</tabstop>
+  <tabstop>comment</tabstop>
   <tabstop>search</tabstop>
   <tabstop>searchButton</tabstop>
   <tabstop>picture</tabstop>

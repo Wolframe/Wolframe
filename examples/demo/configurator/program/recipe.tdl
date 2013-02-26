@@ -1,0 +1,54 @@
+TRANSACTION selectRecipeList
+RESULT INTO list
+BEGIN
+	INTO recipe DO
+		SELECT Recipe.ID AS "id", Recipe.name AS "name",
+			Recipe.description,
+			Category.name AS "categoryName",
+			creationDate, comment
+		FROM Recipe, Category
+		WHERE Recipe.categoryID = Category.ID;
+END
+
+TRANSACTION addRecipe
+BEGIN
+	DO INSERT INTO Recipe( name, normalizedName, description, categoryID, creationDate, comment )
+		VALUES ( $(name), $(normalizedName), $(description), $(categoryID), $(creationDate), $(comment) );
+	INTO . DO NONEMPTY UNIQUE SELECT ID AS "ID" from Recipe WHERE normalizedName = $(normalizedName);
+	FOREACH picture DO INSERT INTO RecipePicture( recipeID, pictureID ) VALUES( $1, $(id) );
+END
+
+TRANSACTION updateRecipe
+BEGIN
+	DO DELETE FROM RecipePicture WHERE recipeID = $(id);
+	DO UPDATE Recipe SET name=$(name), normalizedName=$(normalizedName),
+		description=$(description), categoryID=$(categoryID),
+		creationDate=$(creationDate), comment=$(comment)
+		WHERE ID=$(id);
+	FOREACH picture DO INSERT INTO RecipePicture( recipeID, pictureID ) VALUES( $(/id), $(id) );
+END
+
+TRANSACTION deleteRecipe
+BEGIN
+	DO DELETE FROM RecipePicture WHERE recipeID = $(id);
+	DO DELETE FROM Recipe WHERE ID = $(id);
+END
+
+TRANSACTION selectRecipe
+RESULT INTO recipe
+BEGIN
+	INTO . DO
+		SELECT Recipe.ID AS "id", name, description,
+			creationDate, comment
+			FROM Recipe
+			WHERE Recipe.ID = $(id);
+	INTO category DO
+		SELECT categoryID AS "id", Category.name AS "_"
+			FROM Recipe, Category
+			WHERE Recipe.ID = $(id)
+			AND Recipe.CategoryID = Category.ID;
+	INTO picture DO
+		SELECT RecipePicture.pictureID AS "id"
+			FROM RecipePicture
+			WHERE RecipePicture.recipeID = $(id);
+END

@@ -1,0 +1,22 @@
+FORM Recipe
+{
+	recipe
+	{
+		id @int
+		form @string
+		name string
+		description string
+		category {
+			id @int
+			_ string
+		}
+		creationDate string
+		comment string
+		picture []
+		{
+			id @int
+			_ string
+		}
+		search
+	}
+}

@@ -1,0 +1,15 @@
+FORM RecipeList
+{
+	list
+	{
+		recipe []
+		{
+			id @int
+			name string
+			description string
+			categoryName string
+			creationDate string
+			comment string
+		}
+	}
+}
