@@ -1,0 +1,15 @@
+FORM ComponentFeatureList
+{
+	list
+	{
+		ComponentFeature []
+		{
+			id @int
+			name string
+			min_requires int
+			max_requires int
+			min_provides int
+			max_provides int
+		}
+	}
+}

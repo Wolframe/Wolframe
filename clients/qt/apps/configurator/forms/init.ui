@@ -6,58 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>643</width>
-    <height>540</height>
+    <width>664</width>
+    <height>727</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Configurator</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="9" column="0">
-    <widget class="QPushButton" name="form1">
-     <property name="text">
-      <string>Manage Categories</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/configurator.qrc">
-       <normaloff>:/images/folders.png</normaloff>:/images/folders.png</iconset>
-     </property>
-     <property name="form" stdset="0">
-      <string notr="true">categories</string>
-     </property>
-     <property name="global.featureState" stdset="0">
-      <string notr="true">{feature.state}</string>
-     </property>
-     <property name="global.categoryState" stdset="0">
-      <string notr="true">{category.state}</string>
-     </property>
-     <property name="global.pictureState" stdset="0">
-      <string notr="true">{picture.state}</string>
-     </property>
-     <property name="global.manufacturerState" stdset="0">
-      <string notr="true">{manufacturer.state}</string>
-     </property>
-     <property name="global.componentState" stdset="0">
-      <string notr="true">{component.state}</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QRadioButton" name="radioButton_4">
-     <property name="text">
-      <string>expand all</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <widget class="QRadioButton" name="radioButton_3">
-     <property name="text">
-      <string>collapse all</string>
-     </property>
-    </widget>
-   </item>
-   <item row="13" column="0" colspan="5">
+   <item row="14" column="0" colspan="5">
     <widget class="QTableWidget" name="component">
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -140,6 +97,112 @@
      </column>
     </widget>
    </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QTableWidget" name="picture">
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAsNeeded</enum>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="showGrid">
+      <bool>true</bool>
+     </property>
+     <property name="gridStyle">
+      <enum>Qt::DotLine</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="doctype" stdset="0">
+      <string notr="true">PictureListRequest.simpleform</string>
+     </property>
+     <property name="rootelement" stdset="0">
+      <string notr="true">picture</string>
+     </property>
+     <property name="state" stdset="0">
+      <string notr="true">{global.pictureState}</string>
+     </property>
+     <property name="action" stdset="0">
+      <string notr="true">read</string>
+     </property>
+     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderStretchLastSection">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>thumbnail</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>caption</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>info</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>tags</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QPushButton" name="form1">
+     <property name="text">
+      <string>Manage Categories</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/configurator.qrc">
+       <normaloff>:/images/folders.png</normaloff>:/images/folders.png</iconset>
+     </property>
+     <property name="form" stdset="0">
+      <string notr="true">categories</string>
+     </property>
+     <property name="global.featureState" stdset="0">
+      <string notr="true">{feature.state}</string>
+     </property>
+     <property name="global.categoryState" stdset="0">
+      <string notr="true">{category.state}</string>
+     </property>
+     <property name="global.pictureState" stdset="0">
+      <string notr="true">{picture.state}</string>
+     </property>
+     <property name="global.manufacturerState" stdset="0">
+      <string notr="true">{manufacturer.state}</string>
+     </property>
+     <property name="global.componentState" stdset="0">
+      <string notr="true">{component.state}</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QRadioButton" name="radioButton_4">
+     <property name="text">
+      <string>expand all</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QRadioButton" name="radioButton_3">
+     <property name="text">
+      <string>collapse all</string>
+     </property>
+    </widget>
+   </item>
    <item row="4" column="0" colspan="2">
     <widget class="QTreeWidget" name="category">
      <property name="selectionMode">
@@ -167,7 +230,7 @@
      </column>
     </widget>
    </item>
-   <item row="9" column="3">
+   <item row="10" column="3">
     <widget class="QPushButton" name="form1_2">
      <property name="text">
       <string>Manage Features</string>
@@ -230,7 +293,7 @@
      </property>
     </widget>
    </item>
-   <item row="14" column="0">
+   <item row="15" column="0">
     <widget class="QPushButton" name="form1_4">
      <property name="text">
       <string>Manage Components</string>
@@ -410,67 +473,33 @@
      </column>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QTableWidget" name="picture">
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAsNeeded</enum>
+   <item row="15" column="1" colspan="2">
+    <widget class="QPushButton" name="form1_6">
+     <property name="text">
+      <string>Link Components/Features</string>
      </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
+     <property name="icon">
+      <iconset resource="../resources/configurator.qrc">
+       <normaloff>:/images/link.png</normaloff>:/images/link.png</iconset>
      </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::NoSelection</enum>
+     <property name="form" stdset="0">
+      <string notr="true">components_features</string>
      </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
+     <property name="global.featureState" stdset="0">
+      <string notr="true">{feature.state}</string>
      </property>
-     <property name="showGrid">
-      <bool>true</bool>
+     <property name="global.categoryState" stdset="0">
+      <string notr="true">{category.state}</string>
      </property>
-     <property name="gridStyle">
-      <enum>Qt::DotLine</enum>
+     <property name="global.pictureState" stdset="0">
+      <string notr="true">{picture.state}</string>
      </property>
-     <property name="sortingEnabled">
-      <bool>true</bool>
+     <property name="global.manufacturerState" stdset="0">
+      <string notr="true">{manufacturer.state}</string>
      </property>
-     <property name="doctype" stdset="0">
-      <string notr="true">PictureListRequest.simpleform</string>
+     <property name="global.componentState" stdset="0">
+      <string notr="true">{component.state}</string>
      </property>
-     <property name="rootelement" stdset="0">
-      <string notr="true">picture</string>
-     </property>
-     <property name="state" stdset="0">
-      <string notr="true">{global.pictureState}</string>
-     </property>
-     <property name="action" stdset="0">
-      <string notr="true">read</string>
-     </property>
-     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderStretchLastSection">
-      <bool>false</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>thumbnail</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>caption</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>info</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>tags</string>
-      </property>
-     </column>
     </widget>
    </item>
   </layout>

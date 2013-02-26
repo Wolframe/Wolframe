@@ -452,6 +452,39 @@ function CategoryFeatureListRequest( )
 	output:print( f:get( ) )
 end
 
+-- components/features associations
+
+function createComponentFeature( )
+	local componentFeature = input:table( )["ComponentFeature"]
+	formfunction( "addComponentFeature" )( componentFeature )
+end
+
+function deleteComponentFeature( )
+	local componentFeature = input:table( )["ComponentFeature"]
+	formfunction( "deleteComponentFeature" )( componentFeature )
+end
+
+function ComponentFeatureRequest( )
+	local componentFeature = input:table( )["ComponentFeature"]
+	local t = formfunction( "selectComponentFeature" )( {
+		component_id = componentFeature["component_id"],
+		feature_id = componentFeature["feature_id"]
+	} )
+	local f = form( "ComponentFeature" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function ComponentFeatureListRequest( )
+	local componentFeature = input:table( )["ComponentFeature"]
+	local t = formfunction( "selectComponentFeatureList" )( {
+		component_id = componentFeature["component_id"]
+	} )
+	local f = form( "ComponentFeatureList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
 -- pictures
 
 function PictureListRequest( )

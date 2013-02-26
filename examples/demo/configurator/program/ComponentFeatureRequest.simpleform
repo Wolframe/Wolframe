@@ -1,8 +1,8 @@
-FORM CategoryFeatureRequest
+FORM ComponentFeatureRequest
 {
-	CategoryFeature
+	ComponentFeature
 	{
-		category_id @int
+		component_id @int
 		feature_id @int
 		min_requires int
 		max_requires int

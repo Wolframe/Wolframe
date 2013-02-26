@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>538</width>
+    <height>387</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Add a component/feature link</string>
+  </property>
+  <property name="doctype" stdset="0">
+   <string>ComponentFeatureRequest.simpleform</string>
+  </property>
+  <property name="rootelement" stdset="0">
+   <string notr="true">ComponentFeature</string>
+  </property>
+  <property name="component_id" stdset="0">
+   <string notr="true">{global.component_id}</string>
+  </property>
+  <property name="feature_id" stdset="0">
+   <string notr="true">{global.feature_id}</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="5" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="link">
+       <property name="text">
+        <string>Add</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">components_features</string>
+       </property>
+       <property name="global.componentState" stdset="0">
+        <string notr="true">{component.state}</string>
+       </property>
+       <property name="global.featureState" stdset="0">
+        <string notr="true">{feature.state}</string>
+       </property>
+       <property name="global.component_id" stdset="0">
+        <string notr="true">{component.id}</string>
+       </property>
+       <property name="global.feature_id" stdset="0">
+        <string notr="true">{feature.id}</string>
+       </property>
+       <property name="action" stdset="0">
+        <string>create</string>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">ComponentFeature.simpleform</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">ComponentFeature</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">components_features</string>
+       </property>
+       <property name="global.componentState" stdset="0">
+        <string notr="true">{component.state}</string>
+       </property>
+       <property name="global.featureState" stdset="0">
+        <string notr="true">{feature.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../resources/configurator.qrc">:/images/bricks.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../resources/configurator.qrc">:/images/link_add.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../resources/configurator.qrc">:/images/chart_organisation.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>New link of component and feature..</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="2" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QRadioButton" name="ignore_expand_feats">
+         <property name="text">
+          <string>expand all</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="ignore_collapse_feats">
+         <property name="text">
+          <string>collapse all</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="1">
+      <widget class="QTreeWidget" name="feature">
+       <property name="itemsExpandable">
+        <bool>true</bool>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">FeatureHierarchyRequest.simpleform</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">feature</string>
+       </property>
+       <property name="state" stdset="0">
+        <string notr="true">{global.featureState}</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">read</string>
+       </property>
+       <attribute name="headerDefaultSectionSize">
+        <number>200</number>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>feature</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>description</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout_3"/>
+     </item>
+     <item row="0" column="0">
+      <widget class="QTableWidget" name="component">
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SingleSelection</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+       <property name="showGrid">
+        <bool>true</bool>
+       </property>
+       <property name="gridStyle">
+        <enum>Qt::DotLine</enum>
+       </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+       <property name="doctype" stdset="0">
+        <string notr="true">ComponentListRequest.simpleform</string>
+       </property>
+       <property name="rootelement" stdset="0">
+        <string notr="true">component</string>
+       </property>
+       <property name="state" stdset="0">
+        <string notr="true">{global.componentState}</string>
+       </property>
+       <property name="action" stdset="0">
+        <string notr="true">read</string>
+       </property>
+       <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="verticalHeaderStretchLastSection">
+        <bool>false</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>code</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>categoryName</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>manufacturerName</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>mfgCode</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>webPage</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>description</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>price</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0">
+    <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_requires">
+       <property name="text">
+        <string>Requires:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_min_requires">
+         <property name="text">
+          <string>min.</string>
+         </property>
+         <property name="buddy">
+          <cstring>min_requires</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="min_requires"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_max_requires">
+         <property name="text">
+          <string>max.</string>
+         </property>
+         <property name="buddy">
+          <cstring>max_requires</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="max_requires"/>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Provides:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QLabel" name="label_min_provides">
+         <property name="text">
+          <string>min.</string>
+         </property>
+         <property name="buddy">
+          <cstring>min_provides</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="min_provides"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_max_provides">
+         <property name="text">
+          <string>max.</string>
+         </property>
+         <property name="buddy">
+          <cstring>max_provides</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="max_provides"/>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>feature</tabstop>
+  <tabstop>ignore_expand_feats</tabstop>
+  <tabstop>ignore_collapse_feats</tabstop>
+  <tabstop>min_requires</tabstop>
+  <tabstop>max_requires</tabstop>
+  <tabstop>min_provides</tabstop>
+  <tabstop>max_provides</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>cancel</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../resources/configurator.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>ignore_expand_feats</sender>
+   <signal>clicked()</signal>
+   <receiver>feature</receiver>
+   <slot>expandAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>396</x>
+     <y>267</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>305</x>
+     <y>172</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ignore_collapse_feats</sender>
+   <signal>clicked()</signal>
+   <receiver>feature</receiver>
+   <slot>collapseAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>526</x>
+     <y>267</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>446</x>
+     <y>172</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
