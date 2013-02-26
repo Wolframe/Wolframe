@@ -103,11 +103,14 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 	std::vector< std::string > tables;
 	for ( int i = 0; i < PQntuples( res ); i++ )
 		tables.push_back( PQgetvalue( res, i, 0 ));
+
+	PQclear( res );
+	res = 0;
 	// Drop the tables
 	for ( std::vector< std::string >::const_iterator it = tables.begin();
 							it != tables.end(); it++ )	{
 		std::string query = "DROP TABLE " + *it + " CASCADE";
-		PQclear( res );
+		if (res) PQclear( res );
 		res = PQexec( conn, query.c_str() );
 		ExecStatusType es = PQresultStatus(res);
 		if ( es != PGRES_TUPLES_OK && es != PGRES_COMMAND_OK)	{
@@ -116,6 +119,8 @@ static void createTestDatabase_( const std::string& host, unsigned short port,
 			PQfinish( conn );
 			throw std::runtime_error( msg );
 		}
+		PQclear( res );
+		res = 0;
 	}
 
 	// Now create the test database

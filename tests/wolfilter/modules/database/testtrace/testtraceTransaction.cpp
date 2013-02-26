@@ -218,7 +218,7 @@ public:
 		return rt;
 	}
 
-	virtual const char* getLastError()
+	virtual const db::DatabaseError* getLastError()
 	{
 		return 0;
 	}
@@ -280,8 +280,15 @@ void TesttraceTransaction::execute()
 	TransactionHandler stm( &buf, m_result);
 	if (!stm.doTransaction( m_input, m_output))
 	{
-		const char* err = stm.getLastError();
-		throw std::runtime_error( err?err:"unspecified error");
+		const db::DatabaseError* err = stm.getLastError();
+		if (err)
+		{
+			throw db::DatabaseErrorException( *err);
+		}
+		else
+		{
+			throw std::runtime_error( "unspecified error");
+		}
 	}
 }
 

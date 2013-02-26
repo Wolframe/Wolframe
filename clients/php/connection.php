@@ -3,6 +3,7 @@ namespace Wolframe
 {
 class Connection
 {
+	private $resource = NULL;
 	private $socket = NULL;
 	private $readbuffer = "";
 	private $alive = FALSE;
@@ -28,29 +29,33 @@ class Connection
 
 	public function __construct( $address, $port)
 	{
-		$this->socket = socket_create( AF_INET, SOCK_STREAM, SOL_TCP);
+		$options = array();
+		$params = array();
+		$this->resource = stream_context_create( $options, $params);
+		$timeout = 30;
+		$this->socket = stream_socket_client("tcp://{$address}:{$port}", $errno, $errstr, $timeout);
 		if ($this->socket === FALSE) throw $this->conn_exception( "socket creation failed");
 
-		$result = socket_connect( $this->socket, $address, $port);
-		if ($result === FALSE) throw $this->conn_exception( "connection failed");
+		stream_set_blocking( $this->socket, true);
+		stream_socket_enable_crypto( $this->socket, true, STREAM_CRYPTO_METHOD_SSLv3_CLIENT);
+		stream_set_blocking( $this->socket, false);
 
 		$this->alive = TRUE;
 	}
 
 	public function __destruct()
 	{
-		socket_shutdown( $this->socket);
-		socket_close( $this->socket);
+		fclose( $this->socket);
 	}
 
 	public function writechunk( $data)
 	{
-		if (socket_write( $this->socket, $data, strlen( $data)) === FALSE) throw $this->conn_exception( "write failed");
+		if (fwrite( $this->socket, $data, strlen( $data)) === FALSE) throw $this->conn_exception( "write failed");
 	}
 
 	public function readchunk()
 	{
-		if (($rt = socket_read( $this->socket, 4096)) === FALSE) throw $this->conn_exception( "write failed");
+		if (($rt = fread( $socket, 4096)) === FALSE) throw $this->conn_exception( "read failed");
 		return $rt;
 	}
 

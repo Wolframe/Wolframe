@@ -113,45 +113,6 @@ struct LogObject
 	static const LogObjectDescriptionBase* getLogObjectDescription(){return 0;}
 };
 
-template<typename T>
-struct has_getLogObjectDescription_method
-{
-	typedef char small_type;
-	struct large_type {small_type dummy[2];};
-
-	template<const LogObjectDescriptionBase* (*)()> struct tester_static_signature;
-
-	template<typename U>
-	static small_type has_matching_member(tester_static_signature<&U::getLogObjectDescription>*);
-	template<typename U>
-	static large_type has_matching_member(...);
-
-	static const bool value=sizeof(has_matching_member<T>(0))==sizeof(small_type);
-};
-
-
-struct LogString
-{
-	template <typename T>
-	static typename boost::enable_if_c<
-		has_getLogObjectDescription_method<T>::value
-		,std::string>::type
-	get( const T& t)
-	{
-		return boost::lexical_cast<std::string>(t);
-	}
-	template <typename T>
-	static typename boost::enable_if_c<
-		boost::has_left_shift<std::ostream,T>::value
-		,std::string>::type
-	get( const T& t)
-	{
-		std::ostringstream rt;
-		rt << t;
-		return rt.str();
-	}
-};
-
 template <class StdExceptionClass, class LogObjectT>
 struct Exception
 	:public LogObjectT
@@ -160,39 +121,11 @@ struct Exception
 public:
 	virtual ~Exception() throw (){}
 
-	template <typename A1>
-	Exception( const A1& a1)
-		:LogObjectT(a1)
-		,StdExceptionClass("")
-		{
-			StdExceptionClass::operator=(StdExceptionClass(LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this))));
-		}
-
-	template <typename A1, typename A2>
-	Exception( const A1& a1, const A2& a2)
-		:LogObjectT(a1,a2)
-		,StdExceptionClass("")
-		{
-			StdExceptionClass::operator=(StdExceptionClass(LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this))));
-		}
-
-	template <typename A1, typename A2, typename A3>
-	Exception( const A1& a1, const A2& a2, const A3& a3)
-		:LogObjectT(a1,a2,a3)
-		,StdExceptionClass("")
-		{
-			StdExceptionClass::operator=(StdExceptionClass(LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this))));
-		}
-
-	template <typename A1, typename A2, typename A3, typename A4>
-	Exception( const A1& a1, const A2& a2, const A3& a3, const A4& a4)
-		:LogObjectT(a1,a2,a3,a4)
-		,StdExceptionClass("")
-		{
-			StdExceptionClass::operator=(StdExceptionClass(LogObjectT::getLogObjectDescription()->objToString(static_cast<LogObjectT*>(this))));
-		}
+	Exception( const LogObjectT& o)
+		:LogObjectT(o)
+		,StdExceptionClass(LogObjectT::getLogObjectDescription()->objToString( static_cast<const LogObjectT*>(&o)))
+		{}
 };
-
 
 
 }} //namespace

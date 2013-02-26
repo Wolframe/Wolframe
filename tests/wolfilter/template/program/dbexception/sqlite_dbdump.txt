@@ -1,0 +1,6 @@
+Customer:
+'1', 'Hugo'
+
+sqlite_sequence:
+'Customer', '1'
+

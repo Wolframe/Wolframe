@@ -112,6 +112,7 @@ std::string LogObjectDescriptionBase::objToString( const void* obj) const
 	{
 		if (si->type == FormatElement::String)
 		{
+			if (si->index > m_strings.size()) throw std::logic_error("internal: corrupt log object");
 			rt.append( m_strings.c_str()+si->index);
 		}
 		else if (si->type == FormatElement::Reference)

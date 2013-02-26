@@ -85,7 +85,7 @@ private:
 template <typename T>
 Logger& operator<<( Logger& logger, T t )
 {
-	logger.os_ << LogString::get(t);
+	logger.os_ << t;
 	return logger;
 }
 

@@ -39,6 +39,7 @@
 #include <string>
 #include <map>
 #include <cstdlib>
+#include <boost/shared_ptr.hpp>
 #include "sqlite3.h"
 
 namespace _Wolframe {
@@ -50,7 +51,7 @@ namespace db {
 struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 {
 	///\brief Constructor
-	PreparedStatementHandler_sqlite3( sqlite3* conn, const types::keymap<std::string>* stmmap, bool inTransactionContext=false);
+	PreparedStatementHandler_sqlite3( sqlite3* conn, const std::string& dbname_, const types::keymap<std::string>* stmmap, bool inTransactionContext=false);
 
 	///\brief Destructor
 	virtual ~PreparedStatementHandler_sqlite3();
@@ -75,7 +76,7 @@ struct PreparedStatementHandler_sqlite3 :public PreparedStatementHandler
 	///\brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx);
 	///\brief Get the last database error as string
-	virtual const char* getLastError();
+	virtual const db::DatabaseError* getLastError();
 	///\brief Get a column of the last result
 	virtual const char* get( std::size_t idx);
 	///\brief Skip to the next row of the last result
@@ -106,10 +107,11 @@ private:
 private:
 	State m_state;
 	sqlite3* m_conn;
+	std::string m_dbname;
 	const types::keymap<std::string>* m_stmmap;
 	types::keymap<std::string>::const_iterator m_curstm;
 	bool m_hasResult;
-	std::string m_lasterror;
+	boost::shared_ptr<db::DatabaseError> m_lasterror;
 	sqlite3_stmt* m_stm;
 };
 

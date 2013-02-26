@@ -42,6 +42,10 @@ fi
 if [ x"$disabled" = x"1" ]; then
 	echo '**requires:DISABLED' >> $output
 fi
+if [ x"$expecterror" != x ]; then
+	echo '**exception' >> $output
+	echo "$expecterror" >> $output
+fi
 echo '**input' >> $output
 cat doc/$docin.UTF-8.xml | sed "s/UTF-8/$cset/" | recode UTF-8..$cset | ../../../wtest/cleanInput BOM EOLN >> $output
 echo '**config' >> $output

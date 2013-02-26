@@ -1,0 +1,6 @@
+
+CREATE TABLE Customer (
+ ID INTEGER PRIMARY KEY AUTOINCREMENT,
+ name TEXT ,
+ CONSTRAINT tag_name_check UNIQUE( name )
+);

@@ -41,6 +41,8 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
+#define ERRORCODE(E) (E+0x1000000)
+
 static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::CommandResultBuilder& cmdres, const TransactionOutput::row_iterator& resrow, const TransactionInput::cmd_iterator& cmditr, bool nonempty, bool unique)
 {
 	TransactionInput::arg_iterator ai = cmditr->begin(), ae = cmditr->end();
@@ -50,8 +52,16 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 		switch (ai->type())
 		{
 			case TransactionInput::Element::ResultColumn:
-				if (ai->ref() == 0) throw std::runtime_error( "result reference out of range. must be >= 1");
-				if (ai->ref() > resrow->size()) throw std::runtime_error( "result reference out of range. array bound read");
+				if (ai->ref() == 0)
+				{
+					db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
+					throw db::DatabaseErrorException( dberr);
+				}
+				if (ai->ref() > resrow->size())
+				{
+					db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
+					throw db::DatabaseErrorException( dberr);
+				}
 				val = (*resrow)[ ai->ref() -1];
 				break;
 
@@ -61,8 +71,7 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 		}
 		if (!stmh->bind( argidx, val))
 		{
-			const char* err = stmh->getLastError();
-			throw std::runtime_error( std::string( "error calling bind parameter:") + (err?err:" unknown error"));
+			if (stmh->getLastError()) throw db::DatabaseErrorException( *stmh->getLastError());
 		}
 	}
 	if (!stmh->execute()) return false;
@@ -114,23 +123,27 @@ static bool executeCommand( PreparedStatementHandler* stmh, TransactionOutput::C
 			} while (stmh->next());
 			if (unique && rescnt > 1)
 			{
-				throw std::runtime_error( std::string( "more than one result result for command (UNIQUE) ") + cmditr->name());
+				db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(1), 0/*dbname*/, cmditr->name().c_str(), "NOTUNIQUE", "more than one result result for command (UNIQUE)", "internal data constraint validation error");
+				throw db::DatabaseErrorException( dberr);
 			}
 		}
 		else if (nonempty)
 		{
-			throw std::runtime_error( std::string( "missing result for command (NONEMPTY) ") + cmditr->name());
+			db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(2), 0/*dbname*/, cmditr->name().c_str(), "NOTNONEMPTY", "missing result for command (NONEMPTY)", "internal data constraint validation error");
+			throw db::DatabaseErrorException( dberr);
 		}
 	}
 	else
 	{
 		if (nonempty)
 		{
-			throw std::runtime_error( std::string( "unexpected condition NONEMPTY on result for a command without result set: ") + cmditr->name());
+			db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(11), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "unexpected condition NONEMPTY on result for a command without result set", "internal logic error (transaction function definition)");
+			throw db::DatabaseErrorException( dberr);
 		}
 		if (unique)
 		{
-			throw std::runtime_error( std::string( "unexpected condition UNIQUE on result for a command without result set: ") + cmditr->name());
+			db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(12), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "unexpected condition UNIQUE on result for a command without result set", "internal logic error (transaction function definition)");
+			throw db::DatabaseErrorException( dberr);
 		}
 	}
 	return true;
@@ -146,8 +159,16 @@ static bool pushArguments( TransactionOutput::CommandResultBuilder& cmdres, cons
 		switch (ai->type())
 		{
 			case TransactionInput::Element::ResultColumn:
-				if (ai->ref() == 0) throw std::runtime_error( "result reference out of range. must be >= 1");
-				if (ai->ref() > resrow->size()) throw std::runtime_error( "result reference out of range. array bound read");
+				if (ai->ref() == 0)
+				{
+					db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(21), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. must be >= 1", "internal logic error (transaction function definition)");
+					throw db::DatabaseErrorException( dberr);
+				}
+				if (ai->ref() > resrow->size())
+				{
+					db::DatabaseError dberr( log::LogLevel::LOGLEVEL_ERROR, ERRORCODE(22), 0/*dbname*/, cmditr->name().c_str(), "INTERNAL", "result reference out of range. array bound read", "internal logic error (transaction function definition)");
+					throw db::DatabaseErrorException( dberr);
+				}
 				val = (*resrow)[ ai->ref() -1];
 				break;
 

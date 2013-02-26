@@ -95,7 +95,7 @@ class SQLiteDatabase;
 class SQLiteTransaction : public Transaction
 {
 public:
-	SQLiteTransaction( SQLiteDatabase& database );
+	SQLiteTransaction( SQLiteDatabase& database, const std::string& name_);
 	 ~SQLiteTransaction();
 
 	virtual const std::string& databaseID() const;
@@ -117,6 +117,7 @@ private:
 private:
 	SQLiteDatabase&		m_db;		//< parent database
 	SQLiteDBunit&		m_unit;		//< parent database unit
+	std::string		m_name;		//< name of transaction
 	TransactionInput	m_input;	//< input data structure
 	TransactionOutput	m_output;	//< output data structure
 	PoolObject<sqlite3*>* m_conn;		//< connection object from pool

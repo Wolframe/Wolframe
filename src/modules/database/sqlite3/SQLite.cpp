@@ -215,9 +215,9 @@ void SQLiteDatabase::addStatements( const types::keymap<std::string>& stmmap_)
 	m_unit->addStatements( stmmap_);
 }
 
-Transaction* SQLiteDatabase::transaction( const std::string& /*name*/ )
+Transaction* SQLiteDatabase::transaction( const std::string& name)
 {
-	return new SQLiteTransaction( *this );
+	return new SQLiteTransaction( *this, name);
 }
 
 void SQLiteDatabase::closeTransaction( Transaction *t )
@@ -232,8 +232,8 @@ const UI::UserInterfaceLibrary* SQLiteDatabase::UIlibrary() const
 }
 
 /*****  SQLite transaction  *******************************************/
-SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database )
-	: m_db( database ), m_unit( database.dbUnit() ), m_conn(0)
+SQLiteTransaction::SQLiteTransaction( SQLiteDatabase& database, const std::string& name_)
+	: m_db( database ), m_unit( database.dbUnit() ), m_name(name_), m_conn(0)
 {}
 
 SQLiteTransaction::~SQLiteTransaction()
@@ -297,22 +297,27 @@ void SQLiteTransaction::execute_with_autocommit()
 	try
 	{
 		PoolObject<sqlite3*> conn( m_unit.m_connPool );
-		PreparedStatementHandler_sqlite3 ph( *conn, m_unit.stmmap() );
+		PreparedStatementHandler_sqlite3 ph( *conn, m_db.ID(), m_unit.stmmap() );
 		try
 		{
 			if (!ph.begin()
 			||  !ph.doTransaction( m_input, m_output)
 			||  !ph.commit())
 			{
-				const char* err = ph.getLastError();
-				throw std::runtime_error(err?err:"unknown error");
+				const db::DatabaseError* err = ph.getLastError();
+				if (!err) throw std::runtime_error( "unknown database error");
+				throw db::DatabaseErrorException( *err);
 			}
+		}
+		catch (const db::DatabaseErrorException& e)
+		{
+			ph.rollback();
+			throw db::DatabaseTransactionErrorException( db::DatabaseTransactionError( m_name, e));
 		}
 		catch (const std::runtime_error& e)
 		{
-			MOD_LOG_ERROR << "error in sqlite database transaction: " << e.what();
 			ph.rollback();
-			throw std::runtime_error( std::string("transaction failed: ") + e.what());
+			throw std::runtime_error( std::string("transaction '") + m_name + "'failed: " + e.what());
 		}
 	}
 	catch ( _Wolframe::ObjectPoolTimeout )
@@ -323,22 +328,27 @@ void SQLiteTransaction::execute_with_autocommit()
 
 void SQLiteTransaction::execute_transaction_operation()
 {
-	PreparedStatementHandler_sqlite3 ph( **m_conn, m_unit.stmmap(), true );
+	PreparedStatementHandler_sqlite3 ph( **m_conn, m_db.ID(), m_unit.stmmap(), true );
 	try
 	{
 		if (!ph.doTransaction( m_input, m_output))
 		{
-			const char* err = ph.getLastError();
-			throw std::runtime_error(err?err:"unknown error");
+			const db::DatabaseError* err = ph.getLastError();
+			if (!err) throw std::runtime_error( std::string("unknown database error in transaction '") + m_name + "'");
+			throw db::DatabaseErrorException( *err);
 		}
+	}
+	catch (const db::DatabaseErrorException& e)
+	{
+		ph.rollback();
+		throw db::DatabaseTransactionErrorException( db::DatabaseTransactionError( m_name, e));
 	}
 	catch (const std::runtime_error& e)
 	{
-		MOD_LOG_ERROR << "error in sqlite database transaction operation: " << e.what();
 		ph.rollback();
 		delete m_conn;
 		m_conn = 0;
-		throw std::runtime_error( std::string("transaction operation failed: ") + e.what());
+		throw std::runtime_error( std::string("transaction '") + m_name + "'failed: " + e.what());
 	}
 }
 
@@ -356,11 +366,12 @@ void SQLiteTransaction::execute()
 
 void SQLiteTransaction::close()
 {
-	if ( m_conn )	{
+	if ( m_conn )
+	{
 		MOD_LOG_ERROR << "closed transaction without 'begin' or rollback";
+		delete m_conn;
+		m_conn = 0;
 	}
-	delete m_conn;
-	m_conn = 0;
 	m_db.closeTransaction( this );
 }
 

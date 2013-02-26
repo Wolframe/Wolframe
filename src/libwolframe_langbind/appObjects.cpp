@@ -32,6 +32,7 @@ Project Wolframe.
 ///\file langbind_appObjects.cpp
 ///\brief Implementation of scripting language objects
 #include "langbind/appObjects.hpp"
+#include "database/databaseError.hpp"
 #include "serialize/ddl/filtermapDDLParse.hpp"
 #include "serialize/ddl/filtermapDDLSerialize.hpp"
 #include "filter/filter.hpp"
@@ -262,7 +263,15 @@ bool TransactionFunctionClosure::call()
 				if (!trsr.get()) throw std::runtime_error( "failed to allocate transaction object");
 			}
 			trsr->putInput( m_inputstructptr->get());
-			trsr->execute();
+			try
+			{
+				trsr->execute();
+			}
+			catch (const db::DatabaseTransactionErrorException& e)
+			{
+				LOG_ERROR << e.what();
+				throw std::runtime_error( std::string( "error in transaction ") + e.transaction + ":" + e.usermsg);
+			}
 			m_result.reset( m_func->getOutput( trsr->getResult()));
 			m_state = 3;
 			return true;

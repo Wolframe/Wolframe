@@ -296,8 +296,7 @@ void _Wolframe::langbind::iostreamfilter( proc::ProcessorProvider* provider, con
 			}
 			if (res == cmdbind::IOFilterCommandHandler::Error)
 			{
-				std::string emsg( "error in iofilter command handler: ");
-				emsg.append( errmsg?errmsg:"unknown");
+				std::string emsg( errmsg?errmsg:"unknown");
 				throw std::runtime_error( emsg);
 			}
 			else

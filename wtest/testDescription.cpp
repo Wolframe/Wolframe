@@ -335,6 +335,14 @@ TestDescription::TestDescription( const std::string& pt, const char* argv0)
 		{
 			expected.append( *itr);
 		}
+		else if (boost::iequals( *hi, "exception"))
+		{
+			exception.append( *itr);
+			std::size_t nn = exception.size()-1;
+			if (exception.at(nn) == '\n') --nn;
+			if (exception.at(nn) == '\r') --nn;
+			exception.resize( nn+1);
+		}
 		else if (boost::iequals( *hi, "config"))
 		{
 			config.append( *itr);

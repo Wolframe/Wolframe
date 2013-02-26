@@ -535,7 +535,8 @@ std::vector<std::pair<std::string,TransactionFunctionR> >
 	}
 	catch (const config::PositionalErrorException& e)
 	{
-		throw config::PositionalFileErrorException( filename, e);
+		config::PositionalFileError err( e, filename);
+		throw config::PositionalFileErrorException( err);
 	}
 }
 

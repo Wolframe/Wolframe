@@ -27,9 +27,9 @@ testdata="
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
 **file: DBDATA
-`cat ../../../examples/demo/first/database/tree_schema_sqlite.sql`
+`cat program/first/tree_schema_sqlite.sql`
 **file:DBPRG.tdl
-`cat ../../../examples/demo/first/program/tree_transactions.tdl`
+`cat program/first/tree_transactions.tdl`
 **outputfile:DBDUMP"
 csetlist="UTF-8"
 . ./output_tst_all.sh

@@ -34,6 +34,7 @@
 ///\file modules/database/postgres/PostgreSQLpreparedStatement.cpp
 
 #include "PostgreSQLpreparedStatement.hpp"
+#include "PostgreSQL.hpp"
 #include "logger-v1.hpp"
 #include <iostream>
 #include <sstream>
@@ -67,22 +68,99 @@ void PreparedStatementHandler_postgres::clear()
 		PQclear( m_lastresult);
 		m_lastresult = 0;
 	}
-	m_lasterror.clear();
+	m_lasterror.reset();
 	m_statement.clear();
 	m_state = Init;
 	m_nof_rows = 0;
 	m_idx_row = 0;
 }
 
+static const char* getErrorType( const char* tp)
+{
+	if (!tp) return 0;
+	if (strcmp (tp,"01007") == 0 || strcmp (tp,"01008") == 0)
+	{
+		return "PRIVILEGE";
+	}
+	if (memcmp( tp, "0L", 2) == 0 || memcmp( tp, "0P", 2) == 0 || memcmp( tp, "28", 2) == 0)
+	{
+		return "PRIVILEGE";
+	}
+	if (memcmp( tp, "03", 2) == 0)
+	{
+		return "STATEMENT";
+	}
+	if (memcmp( tp, "08", 2) == 0)
+	{
+		return "CONNECTION";
+	}
+	if (memcmp( tp, "09", 2) == 0 || memcmp( tp, "2F", 2) == 0 || memcmp( tp, "38", 2) == 0 || memcmp( tp, "39", 2) == 0 || memcmp( tp, "3B", 2) == 0)
+	{
+		return "EXCEPTION";
+	}
+	if (memcmp( tp, "21", 2) == 0)
+	{
+		return "PARAMETER";
+	}
+	if (memcmp( tp, "22", 2) == 0)
+	{
+		return "PARAMETER";
+	}
+	if (memcmp( tp, "23", 2) == 0)
+	{
+		return "CONSTRAINT";
+	}
+	if (memcmp( tp, "42", 2) == 0)
+	{
+		return "SYNTAX";
+	}
+	if (memcmp( tp, "53", 2) == 0)
+	{
+		return "RESOURCE";
+	}
+	if (memcmp( tp, "5", 1) == 0)
+	{
+		return "SYSTEM";
+	}
+	if (memcmp( tp, "F0", 2) == 0)
+	{
+		return "CONFIGURATION";
+	}
+	if (memcmp( tp, "P0", 2) == 0)
+	{
+		return "PLSQL";
+	}
+	if (memcmp( tp, "XX", 2) == 0)
+	{
+		return "INTERNAL";
+	}
+	return 0;
+}
+
 void PreparedStatementHandler_postgres::setDatabaseErrorMessage()
 {
-	const char* statusType = m_lastresult?PQresStatus( PQresultStatus( m_lastresult)):"unknown";
 	const char* errmsg = m_lastresult?PQresultErrorMessage( m_lastresult):"";
+	const char* errtype = m_lastresult?getErrorType( PQresultErrorField( m_lastresult, PG_DIAG_SQLSTATE)):"INTERNAL";
+	const char* severitystr = m_lastresult?PQresultErrorField( m_lastresult, PG_DIAG_SEVERITY):"ERROR";
+	log::LogLevel::Level severity = PostgreSQLdbUnit::getLogLevel( severitystr);
 
-	std::ostringstream msg;
-	msg << "PostgreSQL status " << statusType;
-	msg << "; message: '" << errmsg << "'";
-	m_lasterror = msg.str();
+	const char* usermsg = 0;
+	if (errmsg)
+	{
+		usermsg = strstr( errmsg, "DETAIL:");
+		if (usermsg) usermsg = usermsg + 7;
+		if (!usermsg)
+		{
+			usermsg = strstr( errmsg, "ERROR:");
+			if (usermsg) usermsg = usermsg + 7;
+		}
+		if (!usermsg)
+		{
+			usermsg = errmsg;
+		}
+	}
+	int errorcode = 0;
+	m_lasterror.reset( new DatabaseErrorException( DatabaseError( severity, errorcode, PQdb(m_conn), m_statement.string().c_str(), errtype, errmsg, usermsg)));
 }
 
 bool PreparedStatementHandler_postgres::status( PGresult* res, State newstate)
@@ -142,7 +220,7 @@ bool PreparedStatementHandler_postgres::errorStatus( const std::string& message)
 {
 	if (m_state != Error)
 	{
-		m_lasterror = message;
+		m_lasterror.reset( new DatabaseErrorException( DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, PQdb(m_conn), m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error")));
 		m_state = Error;
 	}
 	return false;
@@ -187,12 +265,12 @@ bool PreparedStatementHandler_postgres::bind( std::size_t idx, const char* value
 	if (idx == 0 || idx > m_statement.maxparam())
 	{
 		errorStatus( std::string( "index of parameter out of range (required to be in range 1..") + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
-		return 0;
+		return false;
 	}
 	if (idx == 0 || idx > m_statement.maxparam())
 	{
 		errorStatus( std::string( "index of bind parameter out of range (required to be in range 1..") + boost::lexical_cast<std::string>(m_statement.maxparam()) + " in statement '" + m_statement.string() + "'");
-		return 0;
+		return false;
 	}
 	if (value)
 	{
@@ -273,9 +351,9 @@ const char* PreparedStatementHandler_postgres::columnName( std::size_t idx)
 	return rt;
 }
 
-const char* PreparedStatementHandler_postgres::getLastError()
+const DatabaseError* PreparedStatementHandler_postgres::getLastError()
 {
-	return m_lasterror.size()?m_lasterror.c_str():0;
+	return m_lasterror.get();
 }
 
 const char* PreparedStatementHandler_postgres::get( std::size_t idx)

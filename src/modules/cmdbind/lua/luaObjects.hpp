@@ -110,6 +110,7 @@ public:
 	const LuaScript* script() const		{return m_script;}
 
 	std::string luaErrorMessage( lua_State* ls_, int index=-1);
+	std::string luaUserErrorMessage( lua_State* ls_, int index=-1);
 
 	///\brief Create the context for executing a Lua script with all objects initialized
 	///\param[in] input_ input definition for the input to process

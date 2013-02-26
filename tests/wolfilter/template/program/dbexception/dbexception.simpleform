@@ -1,0 +1,7 @@
+FORM User
+{
+	user
+	{
+		name string
+	}
+}

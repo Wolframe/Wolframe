@@ -123,15 +123,15 @@ struct PositionalFileError
 struct PositionalErrorException
 	:public log::Exception<std::runtime_error,PositionalError>
 {
-	PositionalErrorException( const LineInfo& pos_, const std::string& msg_)
-		:log::Exception<std::runtime_error,PositionalError>(pos_,msg_){}
+	PositionalErrorException( const PositionalError& err_)
+		:log::Exception<std::runtime_error,PositionalError>(err_){}
 };
 
 struct PositionalFileErrorException
 	:public log::Exception<std::runtime_error,PositionalFileError>
 {
-	PositionalFileErrorException( const std::string& filename_, const PositionalErrorException& pe)
-		:log::Exception<std::runtime_error,PositionalFileError>(pe,filename_){}
+	PositionalFileErrorException( const PositionalFileError& err_)
+		:log::Exception<std::runtime_error,PositionalFileError>(err_){}
 };
 
 class PositionalErrorMessageBase
@@ -160,7 +160,8 @@ public:
 
 	PositionalErrorException operator()( const std::string::const_iterator& pos_, const std::string& msgobj) const
 	{
-		return PositionalErrorException( LineInfo( m_start, pos_), msgobj);
+		PositionalError err( LineInfo( m_start, pos_), msgobj);
+		return PositionalErrorException( err);
 	}
 
 private:

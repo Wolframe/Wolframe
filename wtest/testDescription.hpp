@@ -46,6 +46,7 @@ struct TestDescription
 	std::string expected;
 	std::string config;
 	std::string requires;
+	std::string exception;
 
 	TestDescription( const std::string& filename, const char* argv0);
 	TestDescription( const TestDescription& o)
@@ -54,6 +55,7 @@ struct TestDescription
 		,expected(o.expected)
 		,config(o.config)
 		,requires(o.requires)
+		,exception(o.exception)
 	{}
 };
 

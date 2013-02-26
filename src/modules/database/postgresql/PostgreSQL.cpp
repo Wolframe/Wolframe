@@ -35,6 +35,7 @@
 //
 
 #include "logger-v1.hpp"
+#include "logger/logObject.hpp"
 #include "PostgreSQL.hpp"
 #include "PostgreSQLpreparedStatement.hpp"
 #include <string>
@@ -123,7 +124,7 @@ static std::string buildConnStr( const std::string& host, unsigned short port, c
 	return ss.str();
 }
 
-void PostgreSQLdbUnit::noticeProcessor( void* this_void, const char * message)
+_Wolframe::log::LogLevel::Level PostgreSQLdbUnit::getLogLevel( const std::string& severity)
 {
 	struct LogMsgMap :public std::map<std::string,_Wolframe::log::LogLevel::Level>
 	{
@@ -142,16 +143,28 @@ void PostgreSQLdbUnit::noticeProcessor( void* this_void, const char * message)
 		}
 	};
 	static LogMsgMap logMsgMap;
+	LogMsgMap::const_iterator li = logMsgMap.find( severity);
+	if (li == logMsgMap.end())
+	{
+		return log::LogLevel::LOGLEVEL_UNDEFINED;
+	}
+	else
+	{
+		return li->second;
+	}
+}
 
+void PostgreSQLdbUnit::noticeProcessor( void* this_void, const char * message)
+{
 	PostgreSQLdbUnit* this_ = (PostgreSQLdbUnit*)this_void;
 	std::size_t ii=0;
 	for (; message[ii] && message[ii] != ':'; ++ii);
 	if (message[ii])
 	{
-		LogMsgMap::const_iterator li = logMsgMap.find( std::string( message, ii));
-		if (li != logMsgMap.end())
+		_Wolframe::log::LogLevel::Level lv = getLogLevel( std::string( message, ii));
+		if (lv != log::LogLevel::LOGLEVEL_UNDEFINED)
 		{
-			_Wolframe::log::Logger(logBackendPtr).Get( li->second) << "PostgreSQL database '" << ((this_)?this_->ID():"") << "': " << (message + ii + 1);
+			_Wolframe::log::Logger(logBackendPtr).Get( lv) << "PostgreSQL database '" << ((this_)?this_->ID():"") << "': " << (message + ii + 1);
 			return;
 		}
 	}
@@ -376,9 +389,9 @@ void PostgreSQLdatabase::addStatements( const types::keymap<std::string>& stmmap
 	m_unit->addStatements( stmmap_);
 }
 
-Transaction* PostgreSQLdatabase::transaction( const std::string& /*name*/ )
+Transaction* PostgreSQLdatabase::transaction( const std::string& name)
 {
-	return new PostgreSQLtransaction( *this );
+	return new PostgreSQLtransaction( *this, name);
 }
 
 void PostgreSQLdatabase::closeTransaction( Transaction *t )
@@ -387,8 +400,8 @@ void PostgreSQLdatabase::closeTransaction( Transaction *t )
 }
 
 /*****  PostgreSQL transaction  ***************************************/
-PostgreSQLtransaction::PostgreSQLtransaction( PostgreSQLdatabase& database )
-	: m_db( database ), m_unit( database.dbUnit() ), m_conn( 0)
+PostgreSQLtransaction::PostgreSQLtransaction( PostgreSQLdatabase& database, const std::string& name_)
+	: m_db( database ), m_unit( database.dbUnit() ), m_name(name_), m_conn( 0)
 {}
 
 PostgreSQLtransaction::~PostgreSQLtransaction()
@@ -452,15 +465,20 @@ void PostgreSQLtransaction::execute_with_autocommit()
 			||  !ph.doTransaction( m_input, m_output)
 			||  !ph.commit())
 			{
-				const char* err = ph.getLastError();
-				throw std::runtime_error(err?err:"unknown error");
+				const db::DatabaseError* err = ph.getLastError();
+				if (!err) throw std::runtime_error( "unknown database error");
+				throw db::DatabaseErrorException( *err);
 			}
+		}
+		catch (const db::DatabaseErrorException& e)
+		{
+			ph.rollback();
+			throw db::DatabaseTransactionErrorException( db::DatabaseTransactionError( m_name, e));
 		}
 		catch (const std::runtime_error& e)
 		{
-			MOD_LOG_ERROR << "error in postgres database transaction: " << e.what();
 			ph.rollback();
-			throw std::runtime_error( std::string("transaction failed: ") + e.what());
+			throw std::runtime_error( std::string("transaction '") + m_name + "'failed: " + e.what());
 		}
 	}
 	catch ( _Wolframe::ObjectPoolTimeout )
@@ -476,13 +494,18 @@ void PostgreSQLtransaction::execute_transaction_operation()
 	{
 		if (!ph.doTransaction( m_input, m_output))
 		{
-			const char* err = ph.getLastError();
-			throw std::runtime_error(err?err:"unknown error");
+			const db::DatabaseError* err = ph.getLastError();
+			if (!err) throw std::runtime_error( "unknown database error");
+			throw db::DatabaseErrorException( *err);
 		}
+	}
+	catch (const db::DatabaseErrorException& e)
+	{
+		ph.rollback();
+		throw db::DatabaseTransactionErrorException( db::DatabaseTransactionError( m_name, e));
 	}
 	catch (const std::runtime_error& e)
 	{
-		MOD_LOG_ERROR << "error in postgres database transaction operation: " << e.what();
 		ph.rollback();
 		throw std::runtime_error( std::string("transaction operation failed: ") + e.what());
 	}

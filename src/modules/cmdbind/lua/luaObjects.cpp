@@ -2006,6 +2006,28 @@ std::string LuaScriptInstance::luaErrorMessage( lua_State* ls_, int index)
 	return rt;
 }
 
+std::string LuaScriptInstance::luaUserErrorMessage( lua_State* ls_, int index)
+{
+	std::string rt;
+	const char* msg = lua_tostring( ls_, index);
+	if (!msg) msg = "";
+
+	const char* fp = std::strstr( msg, "[string \"");
+	const char* ep = 0;
+	if (fp) ep = std::strchr( fp, ']');
+
+	if (fp && ep)
+	{
+		for (++ep; *ep == ':' || *ep == ' ' || (*ep >= '0' && *ep <= '9'); ++ep);
+		rt.append( ep);
+	}
+	else
+	{
+		rt.append( msg);
+	}
+	return rt;
+}
+
 void LuaScriptInstance::init( const proc::ProcessorProvider* provider_)
 {
 	m_ls = luaL_newstate();

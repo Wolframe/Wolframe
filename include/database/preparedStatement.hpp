@@ -36,6 +36,7 @@
 #define _DATABASE_PREPARED_STATEMENT_HPP_INCLUDED
 #include "database/transactionInput.hpp"
 #include "database/transactionOutput.hpp"
+#include "database/databaseError.hpp"
 #include <string>
 #include <cstdlib>
 
@@ -69,8 +70,8 @@ public:
 	virtual bool next()=0;
 	///\brief Get the number of rows of the last result
 	virtual bool hasResult()=0;
-	///\brief Get the last database error as string
-	virtual const char* getLastError()=0;
+	///\brief Get the last database error as structure
+	virtual const db::DatabaseError* getLastError()=0;
 
 	///\brief Executes the transaction using the interface defined
 	virtual bool doTransaction( const TransactionInput& input, TransactionOutput& output);

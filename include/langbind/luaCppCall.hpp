@@ -37,6 +37,7 @@ Project Wolframe.
 #include <iostream>
 #include <stdexcept>
 #include <cstring>
+#include "logger-v1.hpp"
 
 extern "C" {
 	#include <lualib.h>
@@ -78,7 +79,8 @@ public:
 
 	int luaerror( lua_State* ls) const
 	{
-		return luaL_error( ls, "error in function '%s' (%s)", m_funcname, m_buf);
+		LOG_ERROR << "error in function '" << m_funcname << "' (" << m_buf << ")";
+		return luaL_error( ls, "%s", m_buf);
 	}
 private:
 	enum {bufsize=224,funcnamesize=32};

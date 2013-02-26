@@ -36,10 +36,12 @@
 #define _DATABASE_PREPARED_STATEMENT_POSTGRESQL_LIBPQ_HPP_INCLUDED
 #include "database/preparedStatement.hpp"
 #include "database/bindStatementParams.hpp"
+#include "database/databaseError.hpp"
 #include "types/keymap.hpp"
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <boost/shared_ptr.hpp>
 #include <libpq-fe.h>
 
 namespace _Wolframe {
@@ -76,7 +78,7 @@ struct PreparedStatementHandler_postgres :public PreparedStatementHandler
 	///\brief Get a column title of the last result
 	virtual const char* columnName( std::size_t idx);
 	///\brief Get the last database error as string
-	virtual const char* getLastError();
+	virtual const db::DatabaseError* getLastError();
 	///\brief Get a column of the last result
 	virtual const char* get( std::size_t idx);
 	///\brief Skip to the next row of the last result
@@ -109,7 +111,7 @@ private:
 	PGconn* m_conn;
 	const types::keymap<std::string>* m_stmmap;
 	PGresult* m_lastresult;
-	std::string m_lasterror;
+	boost::shared_ptr<db::DatabaseError> m_lasterror;
 	Statement m_statement;
 	std::size_t m_nof_rows;
 	std::size_t m_idx_row;

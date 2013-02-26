@@ -120,7 +120,7 @@ void TransactionDefinitionProgram::loadProgram( ProgramLibrary& library, db::Dat
 	}
 	catch (const config::PositionalErrorException& e)
 	{
-		throw config::PositionalFileErrorException( filename, e);
+		throw config::PositionalFileErrorException( config::PositionalFileError( e, filename));
 	}
 	catch (const std::runtime_error& e)
 	{

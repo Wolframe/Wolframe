@@ -165,7 +165,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 
 								case InputFilter::Error:
 									errmsg = m_inputfilter->getError();
-									LOG_ERROR << "Error in input filter: " << (errmsg?errmsg:"unknown");
+									LOG_ERROR << "error in input filter: " << (errmsg?errmsg:"unknown");
 									m_lastError = "input";
 									m_state = DiscardInput;
 									return READ;
@@ -185,7 +185,7 @@ CommandHandler::Operation IOFilterCommandHandlerEscDLF::nextOperation()
 
 								case OutputFilter::Error:
 									errmsg = m_outputfilter->getError();
-									LOG_ERROR << "Error in output filter: " << (errmsg?errmsg:"unknown");
+									LOG_ERROR << "error in output filter: " << (errmsg?errmsg:"unknown");
 									m_lastError = "internal";
 									m_state = DiscardInput;
 									return READ;

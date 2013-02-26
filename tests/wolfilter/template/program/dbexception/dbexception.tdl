@@ -1,0 +1,8 @@
+--
+-- insertCustomer
+--
+TRANSACTION insertCustomer
+BEGIN
+	DO INSERT INTO Customer (name) VALUES ($(name));
+END
+

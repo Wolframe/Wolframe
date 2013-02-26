@@ -37,6 +37,7 @@
 #ifndef _POSTGRESQL_HPP_INCLUDED
 #define _POSTGRESQL_HPP_INCLUDED
 
+#include "logger-v1.hpp"
 #include <libpq-fe.h>
 #include <list>
 #include "database/database.hpp"
@@ -107,7 +108,7 @@ class PostgreSQLdatabase;
 class PostgreSQLtransaction : public Transaction
 {
 public:
-	PostgreSQLtransaction( PostgreSQLdatabase& database );
+	PostgreSQLtransaction( PostgreSQLdatabase& database, const std::string& name_);
 	 ~PostgreSQLtransaction();
 
 	virtual const std::string& databaseID() const;
@@ -129,6 +130,7 @@ private:
 private:
 	PostgreSQLdatabase&	m_db;		//< parent database
 	PostgreSQLdbUnit&	m_unit;		//< parent database unit
+	std::string		m_name;		//< name of transaction
 	TransactionInput	m_input;	//< input data structure
 	TransactionOutput	m_output;	//< output data structure
 	PoolObject<PGconn*>* m_conn;		//< reference to connection object from pool
@@ -197,6 +199,7 @@ public:
 	const std::string& ID() const		{ return m_ID; }
 	const char* className() const		{ return POSTGRESQL_DB_CLASS_NAME; }
 	Database* database();
+	static _Wolframe::log::LogLevel::Level getLogLevel( const std::string& severity);
 
 	virtual void loadProgram( const std::string& filename );
 	/// MBa: I have to think a bit how to handle this

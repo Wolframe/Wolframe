@@ -47,9 +47,10 @@
 using namespace _Wolframe;
 using namespace _Wolframe::db;
 
-PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* conn, const types::keymap<std::string>* stmmap, bool inTransactionContext)
+PreparedStatementHandler_sqlite3::PreparedStatementHandler_sqlite3( sqlite3* conn, const std::string& dbname_, const types::keymap<std::string>* stmmap, bool inTransactionContext)
 	:m_state(inTransactionContext?Transaction:Init)
 	,m_conn(conn)
+	,m_dbname(dbname_)
 	,m_stmmap(stmmap)
 	,m_hasResult(false)
 	,m_stm(0)
@@ -64,7 +65,7 @@ PreparedStatementHandler_sqlite3::~PreparedStatementHandler_sqlite3()
 
 void PreparedStatementHandler_sqlite3::clear()
 {
-	m_lasterror.clear();
+	m_lasterror.reset();
 	if (m_stm)
 	{
 		sqlite3_finalize( m_stm);
@@ -77,23 +78,45 @@ void PreparedStatementHandler_sqlite3::clear()
 
 void PreparedStatementHandler_sqlite3::setDatabaseErrorMessage()
 {
-	const char* str = sqlite3_errmsg( m_conn);
 	int errcode = sqlite3_errcode( m_conn);
 #if SQLITE_VERSION_NUMBER >= 3006005
 	int extcode = sqlite3_extended_errcode( m_conn);
 #else
 	int extcode = 0;
 #endif
-	std::string context;
-	if (m_curstm != m_stmmap->end())
+	const char* errmsg = sqlite3_errmsg( m_conn);
+	const char* errtype = 0;
+	switch (errcode)
 	{
-		context = std::string( " in statement '") + m_curstm->second + "'";
+		case SQLITE_ERROR: errtype = "DATABASE"; break;
+		case SQLITE_INTERNAL: errtype = "INTERNAL"; break;
+		case SQLITE_PERM: errtype = "PRIVILEGE"; break;
+		case SQLITE_ABORT: errtype = "EXCEPTION"; break;
+		case SQLITE_LOCKED: errtype = "RESOURCE"; break;
+		case SQLITE_BUSY: errtype = "RESOURCE"; break;
+		case SQLITE_NOMEM: errtype = "RESOURCE"; break;
+		case SQLITE_READONLY: errtype = "RESOURCE"; break;
+		case SQLITE_INTERRUPT: errtype = "EXCEPTION"; break;
+		case SQLITE_IOERR: errtype = "SYSTEM"; break;
+		case SQLITE_CORRUPT: errtype = "INTERNAL"; break;
+		case SQLITE_NOTFOUND: errtype = "INTERNAL"; break;
+		case SQLITE_FULL: errtype = "RESOURCE"; break;
+		case SQLITE_CANTOPEN: errtype = "RESOURCE"; break;
+		case SQLITE_PROTOCOL: errtype = "INTERNAL"; break;
+		case SQLITE_EMPTY: errtype = "DATABASE"; break;
+		case SQLITE_SCHEMA: errtype = "DATABASE"; break;
+		case SQLITE_TOOBIG: errtype = "RESOURCE"; break;
+		case SQLITE_CONSTRAINT: errtype = "CONSTRAINT"; break;
+		case SQLITE_MISMATCH: errtype = "PARAMETER"; break;
+		case SQLITE_MISUSE: errtype = "INTERNAL"; break;
+		case SQLITE_NOLFS: errtype = "SYSTEM"; break;
+		case SQLITE_AUTH: errtype = "PRIVILEGE"; break;
+		case SQLITE_FORMAT: errtype = "SYSTEM"; break;
+		case SQLITE_RANGE: errtype = "PARAMETER"; break;
+		case SQLITE_NOTADB: errtype = "SYSTEM"; break;
 	}
-	std::ostringstream msg;
-	msg << "SQLite error " << errcode;
-	if (extcode != 0) msg << " (extended error code " << extcode << ")";
-	msg << "; message: '" << str << "'" << context;
-	m_lasterror = msg.str();
+	log::LogLevel::Level severity = log::LogLevel::LOGLEVEL_ERROR;
+	m_lasterror.reset( new DatabaseErrorException( DatabaseError( severity, extcode?extcode:errcode, m_dbname.c_str(), m_curstm->second.c_str(), errtype, errmsg, errmsg)));
 }
 
 bool PreparedStatementHandler_sqlite3::executeInstruction( const char* stmstr, State newstate)
@@ -168,7 +191,7 @@ bool PreparedStatementHandler_sqlite3::errorStatus( const std::string& message)
 {
 	if (m_state != Error)
 	{
-		m_lasterror = message;
+		m_lasterror.reset( new DatabaseErrorException( DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, m_dbname.c_str(), m_curstm->second.c_str(), "INTERNAL", message.c_str(), "internal logic error (prepared statement)")));
 		m_state = Error;
 	}
 	return false;
@@ -290,9 +313,9 @@ const char* PreparedStatementHandler_sqlite3::columnName( std::size_t idx)
 	return rt;
 }
 
-const char* PreparedStatementHandler_sqlite3::getLastError()
+const db::DatabaseError* PreparedStatementHandler_sqlite3::getLastError()
 {
-	return m_lasterror.size()?m_lasterror.c_str():0;
+	return m_lasterror.get();
 }
 
 const char* PreparedStatementHandler_sqlite3::get( std::size_t idx)

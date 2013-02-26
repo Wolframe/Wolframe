@@ -163,7 +163,38 @@ TEST_F( WolfilterTest, tests)
 			std::istringstream in( td.input, std::ios::in | std::ios::binary);
 			std::ostringstream out( std::ios::out | std::ios::binary);
 
-			langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
+			try
+			{
+				langbind::iostreamfilter( &processorProvider, cmdline.cmd(), cmdline.inputfilter(), ib, cmdline.outputfilter(), ob, in, out);
+			}
+			catch (const std::runtime_error& e)
+			{
+				if (!td.exception.empty())
+				{
+					if (td.exception != e.what())
+					{
+						// [2.6] Dump exception message to file in case of expected exception
+						boost::filesystem::path EXCEPTION( g_testdir / "temp" / "EXCEPTION");
+						std::fstream oo( EXCEPTION.string().c_str(), std::ios::out | std::ios::binary);
+						oo.write( e.what(), std::strlen(e.what()));
+						if (oo.bad()) std::cerr << "error writing file '" << EXCEPTION.string() << "'" << std::endl;
+						oo.close();
+
+						boost::filesystem::path EXPECT_EXCEPTION( g_testdir / "temp" / "EXPECT_EXCEPTION");
+						std::fstream ee( EXPECT_EXCEPTION.string().c_str(), std::ios::out | std::ios::binary);
+						ee.write( td.exception.c_str(), td.exception.size());
+						if (ee.bad()) std::cerr << "error writing file '" << EXPECT_EXCEPTION.string() << "'" << std::endl;
+						ee.close();
+
+						boost::this_thread::sleep( boost::posix_time::seconds( 3));
+						EXPECT_EQ( td.exception, e.what());
+					}
+				}
+				else
+				{
+					throw e;
+				}
+			}
 			outstr.append( out.str());
 		}
 		std::vector<std::string>::const_iterator oi = td.outputfile.begin(), oe = td.outputfile.end();

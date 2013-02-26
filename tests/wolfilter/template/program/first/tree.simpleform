@@ -1,0 +1,50 @@
+FORM productList
+{
+	products
+	{
+		item []
+		{
+			title string
+			key string
+			customernumber int
+			issuedate string
+		}
+	}
+}
+FORM treeAddNode
+{
+	node
+	{
+		parentid int
+		name name
+	}
+}
+FORM treeDeleteSubtree
+{
+	node
+	{
+		id int
+	}
+}
+
+FORM treeSelectChildrenByName
+{
+	node
+	{
+		name string
+	}
+}
+FORM treeSelectChildren
+{
+	node
+	{
+		id int
+	}
+}
+FORM treeSelectParents
+{
+	node
+	{
+		id int
+	}
+}
