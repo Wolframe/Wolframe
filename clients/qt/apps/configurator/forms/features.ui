@@ -96,6 +96,22 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="addRoot">
+       <property name="text">
+        <string>Add Root</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">feature_add</string>
+       </property>
+       <property name="global.id" stdset="0">
+        <string notr="true">1</string>
+       </property>
+       <property name="global.featureState" stdset="0">
+        <string notr="true">{feature.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="delete_2">
        <property name="text">
         <string>Delete</string>
@@ -185,6 +201,7 @@
   <tabstop>radioButton</tabstop>
   <tabstop>radioButton_2</tabstop>
   <tabstop>add</tabstop>
+  <tabstop>addRoot</tabstop>
   <tabstop>delete_2</tabstop>
   <tabstop>edit</tabstop>
   <tabstop>reload_2</tabstop>
