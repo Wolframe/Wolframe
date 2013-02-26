@@ -357,7 +357,7 @@ void WolframeClient::dataAvailable( )
 					break;
 				}
 				
-				bool lineSeen = true;
+				bool lineSeen = false;
 				if( len > 1 ) {
 					if( buf[len-1] == '\n' ) {
 						buf[len-1] = '\0';
