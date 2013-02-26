@@ -528,6 +528,39 @@ function ComponentFeatureListRequest( )
 	output:print( f:get( ) )
 end
 
+-- recipe/category (content) associations
+
+function createRecipeContent( )
+	local recipeContent = input:table( )["RecipeContent"]
+	formfunction( "addRecipeContent" )( recipeContent )
+end
+
+function deleteRecipeContent( )
+	local recipeContent = input:table( )["RecipeContent"]
+	formfunction( "deleteRecipeContent" )( recipeContent )
+end
+
+function RecipeContentRequest( )
+	local recipeContent = input:table( )["RecipeContent"]
+	local t = formfunction( "selectRecipeContent" )( {
+		recipe_id = recipeContent["recipe_id"],
+		category_id = recipeContent["category_id"]
+	} )
+	local f = form( "RecipeContent" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function RecipeContentListRequest( )
+	local recipeContent = input:table( )["RecipeContent"]
+	local t = formfunction( "selectRecipeContentList" )( {
+		recipe_id = recipeContent["recipe_id"]
+	} )
+	local f = form( "RecipeContentList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
 -- pictures
 
 function PictureListRequest( )

@@ -1,0 +1,10 @@
+FORM RecipeContentRequest
+{
+	RecipeContent
+	{
+		recipe_id @int
+		category_id @int
+		min_requires int
+		max_requires int
+	}
+}
