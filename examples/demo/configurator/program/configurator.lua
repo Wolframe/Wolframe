@@ -598,6 +598,39 @@ function RecipeContentListRequest( )
 	output:print( f:get( ) )
 end
 
+-- configuration/component associations
+
+function createConfigurationComponent( )
+	local configurationComponent = input:table( )["ConfigurationComponent"]
+	formfunction( "addConfigurationComponent" )( configurationComponent )
+end
+
+function deleteConfigurationComponent( )
+	local configurationComponent = input:table( )["ConfigurationComponent"]
+	formfunction( "deleteConfigurationComponent" )( configurationComponent )
+end
+
+function ConfigurationComponentRequest( )
+	local configurationComponent = input:table( )["ConfigurationComponent"]
+	local t = formfunction( "selectConfigurationComponent" )( {
+		config_id = configurationComponent["config_id"],
+		component_id = configurationComponent["component_id"]
+	} )
+	local f = form( "ConfigurationComponent" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function ConfigurationComponentListRequest( )
+	local configurationComponent = input:table( )["ConfigurationComponent"]
+	local t = formfunction( "selectConfigurationComponentList" )( {
+		config_id = configurationComponent["config_id"]
+	} )
+	local f = form( "ConfigurationComponentList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
 -- pictures
 
 function PictureListRequest( )

@@ -3,7 +3,6 @@ now configurator:
 - finish recipes
   - creationDate (set by system? by user? default?)
 - finish configurations
-  - ConfigComponent: picking components like pictures
   - ComposedConfig: 1:n self-relation on a tree, no clue yet how to do this
 - show thumbnails:
   - 1:n relation pictures, which picture should be shown? example:
