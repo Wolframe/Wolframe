@@ -105,15 +105,15 @@ void WolframeClient::initializeSsl( )
 		QList<QSslCertificate> caCerts;
 		QSslCertificate caCert = getCertificate( m_connParams.SSLCAbundle );
 		caCerts.append( caCert );
-		reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificates( caCerts );
+		qobject_cast<QSslSocket *>( m_socket )->addCaCertificates( caCerts );
 	}
 
 	if( m_connParams.clientCertificate ) {
 // our local client certificate we present to the server
-		reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate(
+		qobject_cast<QSslSocket *>( m_socket )->setLocalCertificate(
 			getCertificate( m_connParams.SSLcertificate ) );
 // the key for using the client certificate
-		reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( m_connParams.SSLkey );
+		qobject_cast<QSslSocket *>( m_socket )->setPrivateKey( m_connParams.SSLkey );
 	}
 
 	m_initializedSsl = true;
@@ -152,7 +152,7 @@ void WolframeClient::sslErrors( const QList<QSslError> &errors )
 	}
 
 // ignore them
-	reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
+	qobject_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
 }
 
 void WolframeClient::peerVerifyError( const QSslError &e )
@@ -184,7 +184,7 @@ void WolframeClient::connect( )
 			if( m_connParams.SSL ) {
 #ifdef WITH_SSL
 				initializeSsl( );
-				reinterpret_cast<QSslSocket *>( m_socket )->connectToHostEncrypted( m_connParams.host, m_connParams.port );
+				qobject_cast<QSslSocket *>( m_socket )->connectToHostEncrypted( m_connParams.host, m_connParams.port );
 #else
 				m_socket->connectToHost( m_connParams.host, m_connParams.port );
 #endif
