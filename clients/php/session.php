@@ -30,7 +30,7 @@ class Session extends Connection
 
 	function __construct( $address, $port, $sslopt, $authmethod)
 	{
-		parent::__construct( $address, $port);
+		parent::__construct( $address, $port, $sslopt);
 		$this->banner = $this->readline();
 		$this->getline( "OK");
 		$this->writeline( "AUTH");

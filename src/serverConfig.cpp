@@ -198,6 +198,8 @@ bool Configuration::parse( const config::ConfigurationTree& pt, const std::strin
 						    certFile, keyFile,
 						    verify, CAdirectory, CAchainFile );
 			SSLaddress.push_back( lep );
+#else
+			LOG_WARNING << logPrefix() << "configuration of SSLsocket ignored (SSL support not enabled)";
 #endif // WITH_SSL
 		}
 		else	{

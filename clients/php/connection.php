@@ -21,6 +21,7 @@ class Connection
 
 	private function conn_exception( $msg)
 	{
+		if ($this->socket === FALSE) return new \Exception( "connection failed");
 		$err = socket_last_error( $this->socket);
 		$str = $msg . "(" . $err . ": " . socket_strerror($err) .")";
 		$this->alive = FALSE;
@@ -31,18 +32,16 @@ class Connection
 	{
 		$this->context = stream_context_create();
 		$timeout = 30;
+		$protocol = "tcp";
 
 		foreach ($ssloptions as $key => $value)
 		{
 			stream_context_set_option( $this->context, 'ssl', $key, $value);
+			$protocol = "ssl";
 		}
 
-		$this->socket = stream_socket_client("tcp://{$address}:{$port}", $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $this->context);
+		$this->socket = stream_socket_client("$protocol://{$address}:{$port}", $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $this->context);
 		if ($this->socket === FALSE) throw $this->conn_exception( "socket creation failed");
-
-		stream_set_blocking( $this->socket, true);
-		stream_socket_enable_crypto( $this->socket, true, STREAM_CRYPTO_METHOD_SSLv3_CLIENT);
-		stream_set_blocking( $this->socket, false);
 
 		$this->alive = TRUE;
 	}
@@ -59,7 +58,7 @@ class Connection
 
 	public function readchunk()
 	{
-		if (($rt = fread( $socket, 4096)) === FALSE) throw $this->conn_exception( "read failed");
+		if (($rt = fread( $this->socket, 4096)) === FALSE) throw $this->conn_exception( "read failed");
 		return $rt;
 	}
 
