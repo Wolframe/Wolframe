@@ -38,6 +38,9 @@
 #include <QFile>
 #include <QList>
 #include <QTimer>
+#ifdef WITH_SSL
+#include <QSslCipher>
+#endif
 
 WolframeClient::WolframeClient( const ConnectionParameters _connParams,	QWidget *_parent )
 	: m_connParams( _connParams ),
@@ -56,7 +59,7 @@ WolframeClient::WolframeClient( const ConnectionParameters _connParams,	QWidget 
 	m_socket = new QTcpSocket( this );
 #endif
 	m_timeoutTimer = new QTimer( this );
-	
+
 	QObject::connect( m_timeoutTimer, SIGNAL( timeout( ) ),
 		this, SLOT( timeoutOccurred( ) ) );
 
@@ -102,17 +105,17 @@ void WolframeClient::initializeSsl( )
 		QList<QSslCertificate> caCerts;
 		QSslCertificate caCert = getCertificate( m_connParams.SSLCAbundle );
 		caCerts.append( caCert );
-		reinterpret_cast<QSslSocket *>( m_socket )->addCaCertificates( caCerts );
+		qobject_cast<QSslSocket *>( m_socket )->addCaCertificates( caCerts );
 	}
-	
+
 	if( m_connParams.clientCertificate ) {
 // our local client certificate we present to the server
-		reinterpret_cast<QSslSocket *>( m_socket )->setLocalCertificate(
+		qobject_cast<QSslSocket *>( m_socket )->setLocalCertificate(
 			getCertificate( m_connParams.SSLcertificate ) );
 // the key for using the client certificate
-		reinterpret_cast<QSslSocket *>( m_socket )->setPrivateKey( m_connParams.SSLkey );
+		qobject_cast<QSslSocket *>( m_socket )->setPrivateKey( m_connParams.SSLkey );
 	}
-	
+
 	m_initializedSsl = true;
 }
 
@@ -143,17 +146,17 @@ void WolframeClient::sslErrors( const QList<QSslError> &errors )
 	foreach( const QSslError &e, errors ) {
 		if( e.error( ) == QSslError::SelfSignedCertificateInChain) continue;
 		if( e.error( ) == QSslError::HostNameMismatch) continue;
-		m_hasErrors = true;	
+		m_hasErrors = true;
 		qDebug( ) << "SSL ERROR: " << e;
 		emit error( e.errorString( ) );
 	}
 
-// ignore them		
-	reinterpret_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
+// ignore them
+	qobject_cast<QSslSocket *>( m_socket )->ignoreSslErrors( );
 }
 
 void WolframeClient::peerVerifyError( const QSslError &e )
-{	
+{
 	if( e.error( ) == QSslError::SelfSignedCertificateInChain ) return;
 	if( e.error( ) == QSslError::HostNameMismatch) return;
 	m_hasErrors = true;
@@ -181,18 +184,18 @@ void WolframeClient::connect( )
 			if( m_connParams.SSL ) {
 #ifdef WITH_SSL
 				initializeSsl( );
-				reinterpret_cast<QSslSocket *>( m_socket )->connectToHostEncrypted( m_connParams.host, m_connParams.port );
+				qobject_cast<QSslSocket *>( m_socket )->connectToHostEncrypted( m_connParams.host, m_connParams.port );
 #else
 				m_socket->connectToHost( m_connParams.host, m_connParams.port );
 #endif
 			} else {
 				m_socket->connectToHost( m_connParams.host, m_connParams.port );
 			}
-			
+
 			if( m_connParams.timeout > 0 ) {
 				m_timeoutTimer->start( m_connParams.timeout * 1000 );
 			}
-			
+
 			m_state = AboutToConnect;
 			break;
 
@@ -207,7 +210,7 @@ void WolframeClient::connect( )
 		case AboutToDisconnect:
 			emit error( tr( "Currently disconnected.. wait till you connect again" ) );
 			break;
-			
+
 		case Data:
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in connect!" ).arg( m_state ) );
@@ -356,7 +359,7 @@ void WolframeClient::dataAvailable( )
 					qCritical( ) << "Error when reading line!!";
 					break;
 				}
-				
+
 				bool lineSeen = false;
 				if( len > 1 ) {
 					if( buf[len-1] == '\n' ) {
@@ -415,7 +418,7 @@ void WolframeClient::dataAvailable( )
 				} else {
 					m_answer.append( buf );
 				}
-// generic clients (aka debug window)				
+// generic clients (aka debug window)
 				emit lineReceived( QString( QByteArray( buf, len ) ) );
 			}
 			break;
@@ -428,7 +431,7 @@ void WolframeClient::dataAvailable( )
 void WolframeClient::sendLine( QString line )
 {
 	qint64 res;
-	
+
 	switch( m_state ) {
 		case Connected:
 		case Data:
@@ -439,11 +442,11 @@ void WolframeClient::sendLine( QString line )
 			} else if( res != line.toAscii( ).length( ) + 1 ) {
 				qCritical( ) << "Partial write!" << res << line.toAscii( ).length( );
 				break;
-			}		
+			}
 			m_socket->flush( );
 			emit lineSent( line );
 			break;
-		
+
 		case AboutToConnect:
 		case AboutToDisconnect:
 		case Disconnected:
@@ -455,7 +458,7 @@ void WolframeClient::sendLine( QString line )
 // high-level
 
 void WolframeClient::sendCommand( QString command, QStringList params, QString content )
-{	
+{
 	switch( m_state ) {
 		case Connected:
 			{
@@ -464,14 +467,14 @@ void WolframeClient::sendCommand( QString command, QStringList params, QString c
 			m_command = command;
 			m_hasErrors = false;
 
-// append params to command, send command line	
+// append params to command, send command line
 			QString line;
 			line.append( command );
-			foreach( QString param, params ) {  
+			foreach( QString param, params ) {
 				line.append( ' ' );
 				line.append( param );
 			}
-			sendLine( line );	
+			sendLine( line );
 
 // send content, and terminate it
 // TODO: how to distinguuish between no content (AUTH) and empty content
@@ -493,7 +496,7 @@ void WolframeClient::sendCommand( QString command, QStringList params, QString c
 				m_queue.enqueue( r );
 			}
 			break;
-			
+
 		case AboutToDisconnect:
 		case Disconnected:
 		default:
@@ -553,7 +556,7 @@ void WolframeClient::request( QString content )
 void WolframeClient::handleResult( )
 {
 	m_state = Connected;
-	
+
 	qDebug( ) << "handle result of command" << m_command;
 	//<< "\nparams:" << m_params << "\n:answer:" << m_answer;
 	if( m_command == "CONNECT" ) {
@@ -589,8 +592,28 @@ bool WolframeClient::isConnected( ) const
 	return( m_state == Connected || m_state == Data );
 }
 
+const QString WolframeClient::serverName() const
+{
+	if ( m_state == Connected || m_state == Data )
+		return m_connParams.name;
+	else
+		return "";
+}
+
 bool WolframeClient::isEncrypted( ) const
 {
 	// TODO: needs improvement! Are verifications and certs ok?
 	return( isConnected( ) && m_connParams.SSL );
+}
+
+const QString WolframeClient::encryptionName() const
+{
+	if ( isConnected( ) && m_connParams.SSL )
+#ifdef WITH_SSL
+		return qobject_cast<QSslSocket *>( m_socket )->sessionCipher().name();
+#else
+		return "";
+#endif
+	else
+		return "";
 }

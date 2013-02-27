@@ -125,7 +125,8 @@ struct TransactionDescription
 		,call(o.call)
 		,output(o.output)
 		,nonempty(o.nonempty)
-		,unique(o.unique){}
+		,unique(o.unique)
+		,hints(o.hints){}
 
 	void clear()
 	{
@@ -135,6 +136,7 @@ struct TransactionDescription
 		output.clear();
 		nonempty = false;
 		unique = false;
+		hints.clear();
 	}
 
 	///\class Error
@@ -155,6 +157,7 @@ struct TransactionDescription
 	std::string output;
 	bool nonempty;
 	bool unique;
+	types::keymap<std::string> hints;
 };
 
 ///\class TransactionFunctionR
@@ -189,6 +192,8 @@ public:
 	{
 		return m_authorization;
 	}
+
+	const char* getErrorHint( const std::string& errorclass, int functionidx) const;
 
 private:
 	std::string m_name;

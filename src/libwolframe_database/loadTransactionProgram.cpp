@@ -404,11 +404,46 @@ static std::vector<std::pair<std::string,TransactionFunctionR> >
 					}
 					else if (g_optab[ch])
 					{
-						throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO) expected instead of operator '" << ch << "'");
+						throw ERROR( si, MSG << "keyword (END,FOREACH,INTO,DO,ON) expected instead of operator '" << ch << "'");
 					}
 					else if (ch == '\'' || ch == '\"')
 					{
-						throw ERROR( si, "keyword (END,FOREACH,INTO,DO) expected instead string");
+						throw ERROR( si, "keyword (END,FOREACH,INTO,DO,ON) expected instead string");
+					}
+					else if (boost::algorithm::iequals( tok, "ON"))
+					{
+						if (parseNextToken( langdescr, tok, si, se)
+						&&  boost::algorithm::iequals( tok, "ERROR"))
+						{
+							if (operation.descar.empty())
+							{
+								throw ERROR( si, "ON ERROR declaration allowed only after a database call");
+							}
+							std::string errclass;
+							if (!parseNextToken( langdescr, errclass, si, se))
+							{
+								throw ERROR( si, "error class expected after ON ERROR");
+							}
+							if (!parseNextToken( langdescr, tok, si, se)
+							||  !boost::algorithm::iequals( tok, "HINT"))
+							{
+								throw ERROR( si, "keyword HINT expected after ON ERROR <errorclass>");
+							}
+							std::string errhint;
+							if (!parseNextToken( langdescr, errhint, si, se))
+							{
+								throw ERROR( si, "hint message string expected after ON ERROR <errorclass> HINT");
+							}
+							if (operation.descar.back().hints.find( errclass) != operation.descar.back().hints.end())
+							{
+								throw ERROR( si, std::string( "Duplicate hint for error class '") + errclass + "' for this database call");
+							}
+							operation.descar.back().hints[  errclass] = errhint;
+						}
+						else
+						{
+							throw ERROR( si, "keyword (ERROR) expected after ON");
+						}
 					}
 					else if (boost::algorithm::iequals( tok, "END"))
 					{

@@ -24,7 +24,7 @@ docname=`echo $testname | sed 's/_postgresql//'`
 docin=$docname.in					# input document name
 # docout=$docname.out					# output document name
 dumpout="program/dbexception/postgresql_dbdump.txt"	# resource dump to add to expected test output
-expecterror="error in transaction insertCustomer:  Key (name)=(Hugo) already exists. "
+expecterror="error in transaction insertCustomer:  Key (name)=(Hugo) already exists.  . Customers must have a unique name."
 testdata="
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
