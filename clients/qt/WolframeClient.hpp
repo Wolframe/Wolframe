@@ -66,7 +66,7 @@ class WolframeClient : public QObject
 			QString command;
 			QStringList params;
 			QString content;
-			
+
 			WolframeRequest( const QString &_command, const QStringList &_params, const QString &_content )
 				: command( _command ), params( _params ), content( _content ) { }
 		};
@@ -111,7 +111,9 @@ class WolframeClient : public QObject
 
 // inquire status
 		bool isConnected( ) const;
+		const QString serverName() const;
 		bool isEncrypted( ) const;
+		const QString encryptionName() const;
 
 	private slots:
 		void timeoutOccurred( );
@@ -134,7 +136,7 @@ class WolframeClient : public QObject
 		void connected( );
 		void disconnected( );
 		void error( QString error );
-		
+
 // low-level commands, pre-protocol, for debugging mainly
 		void lineReceived( QString line );
 		void lineSent( QString line );
