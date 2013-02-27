@@ -270,7 +270,10 @@ bool TransactionFunctionClosure::call()
 			catch (const db::DatabaseTransactionErrorException& e)
 			{
 				LOG_ERROR << e.what();
-				throw std::runtime_error( std::string( "error in transaction ") + e.transaction + ":" + e.usermsg);
+				const char* hint = m_func->getErrorHint( e.errorclass, e.functionidx);
+				std::string explain;
+				if (hint) explain = explain + " " + hint;
+				throw std::runtime_error( std::string( "error in transaction ") + e.transaction + ":" + e.usermsg + explain);
 			}
 			m_result.reset( m_func->getOutput( trsr->getResult()));
 			m_state = 3;

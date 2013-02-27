@@ -225,6 +225,7 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 	std::vector<OperationLoop> loopstk;
 
 	TransactionInput::cmd_iterator ci = input.begin(), ce = input.end();
+
 	for (; ci != ce; ++ci)
 	{
 		if (!loopstk.empty())
@@ -300,7 +301,17 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 						TransactionOutput::row_iterator wi = ri->begin(), we = ri->end();
 						for (; wi != we; ++wi)
 						{
-							if (!executeCommand( this, cmdres, wi, ci, nonempty, unique)) return false;
+							if (!executeCommand( this, cmdres, wi, ci, nonempty, unique))
+							{
+								const DatabaseError* lasterr = getLastError();
+								if (lasterr)
+								{
+									DatabaseError err( *lasterr);
+									err.functionidx = ci->functionidx();
+									throw DatabaseErrorException( err);
+								}
+								return false;
+							}
 						}
 					}
 			}
@@ -315,7 +326,17 @@ bool PreparedStatementHandler::doTransaction( const TransactionInput& input, Tra
 					if (!pushArguments( cmdres, wi, ci)) return false;
 					break;
 				case DatabaseCall:
-					if (!executeCommand( this, cmdres, wi, ci, nonempty, unique)) return false;
+					if (!executeCommand( this, cmdres, wi, ci, nonempty, unique))
+					{
+						const DatabaseError* lasterr = getLastError();
+						if (lasterr)
+						{
+							DatabaseError err( *lasterr);
+							err.functionidx = ci->functionidx();
+							throw DatabaseErrorException( err);
+						}
+						return false;
+					}
 					break;
 			}
 		}

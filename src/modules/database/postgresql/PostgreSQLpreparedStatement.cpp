@@ -160,7 +160,7 @@ void PreparedStatementHandler_postgres::setDatabaseErrorMessage()
 		}
 	}
 	int errorcode = 0;
-	m_lasterror.reset( new DatabaseErrorException( DatabaseError( severity, errorcode, PQdb(m_conn), m_statement.string().c_str(), errtype, errmsg, usermsg)));
+	m_lasterror.reset( new DatabaseError( severity, errorcode, PQdb(m_conn), m_statement.string().c_str(), errtype, errmsg, usermsg));
 }
 
 bool PreparedStatementHandler_postgres::status( PGresult* res, State newstate)
@@ -220,7 +220,7 @@ bool PreparedStatementHandler_postgres::errorStatus( const std::string& message)
 {
 	if (m_state != Error)
 	{
-		m_lasterror.reset( new DatabaseErrorException( DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, PQdb(m_conn), m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error")));
+		m_lasterror.reset( new DatabaseError( log::LogLevel::LOGLEVEL_ERROR, 0, PQdb(m_conn), m_statement.string().c_str(), "INTERNAL", message.c_str(), "internal logic error"));
 		m_state = Error;
 	}
 	return false;

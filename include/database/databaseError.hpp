@@ -52,6 +52,7 @@ struct DatabaseError
 		,errorcode(o.errorcode)
 		,dbname(o.dbname)
 		,statement(o.statement)
+		,functionidx(o.functionidx)
 		,errorclass(o.errorclass)
 		,msg(o.msg)
 		,usermsg(o.usermsg)
@@ -64,11 +65,13 @@ struct DatabaseError
 			const char* statement_,
 			const char* errorclass_,
 			const char* msg_,
-			const char* usermsg_)
+			const char* usermsg_,
+			int functionidx_=-1)
 		:severity(severity_)
 		,errorcode(errorcode_)
 		,dbname(dbname_?dbname_:"")
 		,statement(statement_?statement_:"")
+		,functionidx(functionidx_)
 		,errorclass(errorclass_?errorclass_:"")
 		,msg(msg_?msg_:"")
 		,usermsg(usermsg_?usermsg_:"")
@@ -82,6 +85,7 @@ struct DatabaseError
 	int errorcode;
 	std::string dbname;
 	std::string statement;
+	int functionidx;
 	std::string errorclass;
 	std::string msg;
 	std::string usermsg;
@@ -113,6 +117,7 @@ struct DatabaseTransactionError
 		,errorcode(o.errorcode)
 		,dbname(o.dbname)
 		,statement(o.statement)
+		,functionidx(o.functionidx)
 		,errorclass(o.errorclass)
 		,msg(o.msg)
 		,usermsg(o.usermsg)
@@ -126,6 +131,7 @@ struct DatabaseTransactionError
 		,errorcode(o.errorcode)
 		,dbname(o.dbname)
 		,statement(o.statement)
+		,functionidx(o.functionidx)
 		,errorclass(o.errorclass)
 		,msg(o.msg)
 		,usermsg(o.usermsg)
@@ -136,6 +142,7 @@ struct DatabaseTransactionError
 	int errorcode;
 	std::string dbname;
 	std::string statement;
+	int functionidx;
 	std::string errorclass;
 	std::string msg;
 	std::string usermsg;

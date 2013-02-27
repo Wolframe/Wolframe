@@ -217,18 +217,20 @@ public:
 		:m_nonemptyResult(false)
 		,m_uniqueResult(false){}
 	FunctionCall( const FunctionCall& o);
-	FunctionCall( const std::string& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_);
+	FunctionCall( const std::string& resname, const std::string& name, const Path& selector, const std::vector<Path>& arg, bool setNonemptyResult_, bool setUniqueResult_, std::size_t level_, const types::keymap<std::string>& hints_=types::keymap<std::string>());
 
-	const Path& selector() const			{return m_selector;}
-	const std::vector<Path>& arg() const		{return m_arg;}
-	const std::string& name() const			{return m_name;}
-	const std::string& resultname() const		{return m_resultname;}
-	void resultname( const char* r)			{m_resultname = r;}
+	const Path& selector() const					{return m_selector;}
+	const std::vector<Path>& arg() const				{return m_arg;}
+	const std::string& name() const					{return m_name;}
+	const std::string& resultname() const				{return m_resultname;}
+	void resultname( const char* r)					{m_resultname = r;}
 
 	bool hasResultReference() const;
-	bool hasNonemptyResult() const			{return m_nonemptyResult;}
-	bool hasUniqueResult() const			{return m_uniqueResult;}
-	std::size_t level() const			{return m_level;}
+	bool hasNonemptyResult() const					{return m_nonemptyResult;}
+	bool hasUniqueResult() const					{return m_uniqueResult;}
+	std::size_t level() const					{return m_level;}
+
+	const char* getErrorHint( const std::string& errorclass) const	{types::keymap<std::string>::const_iterator hi = m_hints.find( errorclass); return (hi==m_hints.end())?0:hi->second.c_str();}
 
 private:
 	std::string m_resultname;
@@ -238,6 +240,7 @@ private:
 	bool m_nonemptyResult;
 	bool m_uniqueResult;
 	std::size_t m_level;
+	types::keymap<std::string> m_hints;
 };
 
 class ResultElement
@@ -911,14 +914,15 @@ void Path::selectNodes( const TransactionFunctionInput::Structure& st, const Tra
 	ar.insert( ar.end(), ar1.begin(), ar1.end());
 }
 
-FunctionCall::FunctionCall( const std::string& r, const std::string& n, const Path& s, const std::vector<Path>& a, bool q, bool u, std::size_t l)
+FunctionCall::FunctionCall( const std::string& r, const std::string& n, const Path& s, const std::vector<Path>& a, bool q, bool u, std::size_t l, const types::keymap<std::string>& hints_)
 	:m_resultname(r)
 	,m_name(n)
 	,m_selector(s)
 	,m_arg(a)
 	,m_nonemptyResult(q)
 	,m_uniqueResult(u)
-	,m_level(l){}
+	,m_level(l)
+	,m_hints(hints_){}
 
 FunctionCall::FunctionCall( const FunctionCall& o)
 	:m_resultname(o.m_resultname)
@@ -927,7 +931,8 @@ FunctionCall::FunctionCall( const FunctionCall& o)
 	,m_arg(o.m_arg)
 	,m_nonemptyResult(o.m_nonemptyResult)
 	,m_uniqueResult(o.m_uniqueResult)
-	,m_level(o.m_level){}
+	,m_level(o.m_level)
+	,m_hints(o.m_hints){}
 
 bool FunctionCall::hasResultReference() const
 {
@@ -1416,7 +1421,7 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 			types::keymap<TransactionFunctionR>::const_iterator fui = functionmap.find( di->call.first);
 			if (fui == functionmap.end())
 			{
-				FunctionCall cc( di->output, di->call.first, selector, param, di->nonempty, di->unique, 1);
+				FunctionCall cc( di->output, di->call.first, selector, param, di->nonempty, di->unique, 1, di->hints);
 				if (!di->output.empty())
 				{
 					m_resultstruct->addMark( ResultElement::FunctionStart, m_call.size());
@@ -1434,7 +1439,10 @@ TransactionFunction::Impl::Impl( const std::vector<TransactionDescription>& desc
 			{
 				Impl* func = fui->second->m_impl;
 				std::map<int,int> rwtab = m_tagmap.insert( func->m_tagmap);
-
+				if (!di->hints.empty())
+				{
+					throw Error( eidx, "No ON ERROR hints supported for call of OPERATION");
+				}
 				if (di->nonempty)
 				{
 					throw Error( eidx, "NONEMTY not supported for call of OPERATION");
@@ -1506,6 +1514,12 @@ TransactionFunction::~TransactionFunction()
 const TransactionFunction::TagTable* TransactionFunction::tagmap() const
 {
 	return &m_impl->m_tagmap;
+}
+
+const char* TransactionFunction::getErrorHint( const std::string& errorclass, int functionidx) const
+{
+	if (functionidx < 0 || functionidx >= (int)m_impl->m_call.size()) return 0;
+	return m_impl->m_call.at( functionidx).getErrorHint( errorclass);
 }
 
 TransactionFunctionInput* TransactionFunction::getInput() const

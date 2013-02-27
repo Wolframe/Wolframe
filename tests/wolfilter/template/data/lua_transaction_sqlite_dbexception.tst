@@ -24,7 +24,7 @@ docname=`echo $testname | sed 's/_sqlite//'`
 docin=$docname.in					# input document name
 # docout=$docname.out					# output document name
 dumpout="program/dbexception/sqlite_dbdump.txt"		# resource dump to add to expected test output
-expecterror="error in transaction insertCustomer:column name is not unique"
+expecterror="error in transaction insertCustomer:column name is not unique . Customers must have a unique name."
 testdata="
 **file:$ddltypeprg
 `cat program/$ddltypeprg`
