@@ -36,50 +36,16 @@
 #include <QByteArray>
 #include <QXmlStreamWriter>
 
-static const char* getPropertyIdentifier( char* buf, int bufsize, const QString& name)
-{
-	int ii,namelen = name.length();
-	if (namelen >= bufsize) return NULL;
-	//... properties with length bigger than MaxIdentifierSize are not visible by visitors
-
-	const QChar* nameptr = name.constData();
-	for (; ii<namelen; ++ii)
-	{
-		if (nameptr[ii] > 127 || nameptr[ii] <= 0) return NULL;
-		//... properties with non ascii characters are not visible by visitors
-		buf[ ii] = (char)nameptr[ii];
-	}
-	buf[ii] = 0;
-	return buf;
-}
-
-static const char* getPropertyIdentifier( char* buf, int bufsize, const char* name, int namelen)
-{
-	int ii;
-	if (namelen >= bufsize) return NULL;
-	//... properties with length bigger than MaxIdentifierSize are not visible by visitors
-
-	for (; ii<namelen; ++ii)
-	{
-		if (name[ii] > 127 || name[ii] <= 0) return NULL;
-		//... properties with non ascii characters are not visible by visitors
-		buf[ ii] = (char)name[ii];
-	}
-	buf[ii] = 0;
-	return buf;
-}
-
-WidgetVisitor::WidgetVisitor( QWidget* root, QHash<QString,QString>* globals_)
+WidgetVisitor::WidgetVisitor( QWidget* root, QHash<QByteArray,QString>* globals_)
 	:m_globals(globals_)
 {
 	m_stk.push( QPair<QWidget*,WidgetState>( root, 0));
 }
 
-static WidgetState widgetInternalEnter( QWidget* widget, WidgetState state, const char* name)
+static WidgetState widgetInternalEnter( QWidget* widget, WidgetState state, const QByteArray& name)
 {
 	QString clazz = widget->metaObject()->className();
-
-	if( clazz == "QTreeWidget")
+	if (clazz == "QTreeWidget")
 	{
 
 	}
@@ -95,11 +61,11 @@ static WidgetState widgetInternalLeave( QWidget* widget, WidgetState state)
 	return 0;
 }
 
-static QWidget* widgetEnter( QWidget* widget, const char* name)
+static QWidget* widgetEnter( QWidget* widget, const QByteArray& name)
 {
 	QString clazz = widget->metaObject()->className();
 
-	if( clazz == "QTreeWidget")
+	if (clazz == "QTreeWidget")
 	{
 
 	}
@@ -113,12 +79,10 @@ static QWidget* widgetEnter( QWidget* widget, const char* name)
 
 bool WidgetVisitor::enter( const QString& name)
 {
-	char name_[MaxIdentifierSize+1];
-	const char* id = getPropertyIdentifier( name_, sizeof(name_), name);
-	return id?enter( id):false;
+	return enter( name.toAscii());
 }
 
-bool WidgetVisitor::enter( const char* name)
+bool WidgetVisitor::enter( const QByteArray& name)
 {
 	if (m_stk.empty()) return false;
 	WidgetState state;
@@ -150,68 +114,57 @@ void WidgetVisitor::leave()
 	}
 }
 
-static bool clearWidgetProperty( QWidget* widget, const char* name, QVariant data)
+static bool clearWidgetProperty( QWidget* widget, const QByteArray& name, QVariant data)
 {
 	QString clazz = widget->metaObject()->className();
 
-	if( clazz == "QLineEdit") {
+	if (clazz == "QLineEdit") {
 		QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget);
 		lineEdit->clear();
-	} else if( clazz == "QDateEdit") {
-		//~ QDateEdit *dateEdit = qobject_cast<QDateEdit *>( widget);
-		// TODO
-	} else if( clazz == "QTimeEdit") {
-		//~ QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>( widget);
-		// TODO
-	} else if( clazz == "QDateTimeEdit") {
-		//~ QDateTimeEdit *dateTimeEdit = qobject_cast<QDateTimeEdit *>( widget);
-	} else if( clazz == "QComboBox") {
+	} else if (clazz == "QDateEdit") {
+	} else if (clazz == "QTimeEdit") {
+	} else if (clazz == "QDateTimeEdit") {
+	} else if (clazz == "QComboBox") {
 		QComboBox *comboBox = qobject_cast<QComboBox *>( widget);
 		comboBox->clear();
-	} else if( clazz == "QSpinBox") {
-		//~ QSpinBox *spinBox = qobject_cast<QSpinBox *>( widget);
-		// TODO
-	} else if( clazz == "QDoubleSpinBox") {
-		//~ QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>( widget);
-		// TODO
-	} else if( clazz == "QSlider") {
-		//~ QSlider *slider = qobject_cast<QSlider *>( widget);
-		// TODO
-	} else if( clazz == "QPlainTextEdit") {
+	} else if (clazz == "QSpinBox") {
+	} else if (clazz == "QDoubleSpinBox") {
+	} else if (clazz == "QSlider") {
+	} else if (clazz == "QPlainTextEdit") {
 		QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget);
 		plainTextEdit->clear();
-	} else if( clazz == "QTextEdit") {
+	} else if (clazz == "QTextEdit") {
 		QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget);
 		textEdit->clear();
-	} else if( clazz == "QCheckBox") {
+	} else if (clazz == "QCheckBox") {
 		QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget);
 		checkBox->setChecked( false);
-	} else if( clazz == "QRadioButton") {
+	} else if (clazz == "QRadioButton") {
 		QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget);
 		radioButton->setChecked( false);
-	} else if( clazz == "QListWidget") {
+	} else if (clazz == "QListWidget") {
 		QListWidget *listWidget = qobject_cast<QListWidget *>( widget);
 		listWidget->clear();
-	} else if( clazz == "QTreeWidget") {
+	} else if (clazz == "QTreeWidget") {
 		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget);
 		treeWidget->clear();
-	} else if( clazz == "QTableWidget") {
+	} else if (clazz == "QTableWidget") {
 		QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget);
 		tableWidget->clearContents();
 		for( int i = tableWidget->rowCount() - 1; i >= 0; i--) {
 			tableWidget->removeRow( i);
 		}
-	} else if( clazz == "FileChooser") {
+	} else if (clazz == "FileChooser") {
 		FileChooser *fileChooser = qobject_cast<FileChooser *>( widget);
 		fileChooser->setFileName( "");
-	} else if( clazz == "PictureChooser") {
+	} else if (clazz == "PictureChooser") {
 		PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget);
 		pictureChooser->setFileName( "");
-	} else if( clazz == "QPushButton") {
+	} else if (clazz == "QPushButton") {
 		// skip, ok, buttons can't be reset
-	} else if( clazz == "QGroupBox") {
+	} else if (clazz == "QGroupBox") {
 		// skip, ok, grouboxes can't be reset
-	} else if( clazz == "QWidget") {
+	} else if (clazz == "QWidget") {
 		// skip, generic widget, don't possibly know how to reset it
 	} else {
 		qWarning() << "Clear for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
@@ -219,10 +172,10 @@ static bool clearWidgetProperty( QWidget* widget, const char* name, QVariant dat
 	qDebug() << "Clearing " << clazz << name;
 }
 
-static bool setWidgetProperty( QWidget* widget, WidgetState state, const char* name, QVariant data)
+static bool setWidgetProperty( QWidget* widget, WidgetState state, const QByteArray& name, QVariant data)
 {
 	QString clazz = widget->metaObject()->className();
-	if( clazz == "QComboBox")
+	if (clazz == "QComboBox")
 	{
 		QComboBox *comboBox = qobject_cast<QComboBox *>( widget);
 		if (strcmp( name, "value") == 0)
@@ -251,7 +204,7 @@ static bool setWidgetProperty( QWidget* widget, WidgetState state, const char* n
 			return true;
 		}
 	}
-	else if( clazz == "QListWidget")
+	else if (clazz == "QListWidget")
 	{
 		QListWidget *listWidget = qobject_cast<QListWidget *>( widget);
 		if (strcmp( name, "value") == 0)
@@ -279,10 +232,10 @@ static bool setWidgetProperty( QWidget* widget, WidgetState state, const char* n
 }
 
 
-static QVariant getWidgetProperty( QWidget* widget, WidgetState state, const char* name)
+static QVariant getWidgetProperty( QWidget* widget, WidgetState state, const QByteArray& name)
 {
 	QString clazz = widget->metaObject()->className();
-	if( clazz == "QComboBox")
+	if (clazz == "QComboBox")
 	{
 		QComboBox *comboBox = qobject_cast<QComboBox *>( widget);
 		if (strcmp( name, "select"))
@@ -295,7 +248,7 @@ static QVariant getWidgetProperty( QWidget* widget, WidgetState state, const cha
 			return comboBox->itemData( comboBox->currentIndex(), Qt::UserRole);
 		}
 	}
-	else if( clazz == "QListWidget")
+	else if (clazz == "QListWidget")
 	{
 		if (strcmp( name, "select"))
 		{
@@ -312,12 +265,10 @@ static QVariant getWidgetProperty( QWidget* widget, WidgetState state, const cha
 
 QVariant WidgetVisitor::property( const QString& name)
 {
-	char name_[MaxIdentifierSize+1];
-	const char* id = getPropertyIdentifier( name_, sizeof(name_), name);
-	return id?property( id):QVariant()/*invalid*/;
+	return property( name.toAscii());
 }
 
-QVariant property( const char* name, int level)
+QVariant property( const QByteArray& name, int level)
 {
 	if (m_stk.empty()) return QVariant()/*invalid*/;
 
@@ -326,65 +277,101 @@ QVariant property( const char* name, int level)
 	QVariant rt = m_stk.top().first->property( name);
 	if (rt.isValid()) return rt;
 
-	const char* follow = strchr( name, '.');
-	if (follow)
+	int followidx = name.indexOf( '.');
+	if (followidx >= 0)
 	{
-		int chldlen = follow-name;
-		char chldbuf_[MaxIdentifierSize+1];
-
-		if (level == 0 && memcmp( name, "global", chldlen) == 0)
+		if (level == 0 && name.startsWith( "global."))
 		{
-			return QVariant( m_globals[ QString(follow+1)]);
+			return QVariant( m_globals[ name.mid( 7, name.size()-7)]);
 		}
-		const char* chld = getPropertyIdentifier( chldbuf_, sizeof(chldbuf_), name, chldlen);
-		if (m_stk.enter( chld))
+		QByteArray prefix( name.mid( 0, followidx));
+		QByteArray rest( name.mid( followidx+1, name.size()-followidx-1));
+		if (m_stk.enter( prefix))
 		{
-			QVariant rt = property( follow+1, level+1);
+			QVariant rt = property( rest, level+1);
 			m_stk.leave();
 			return rt;
 		}
-		if (level == 0 && m_stk.at(0)->objectName() == chld)
+		if (level == 0 && m_stk.at(0)->objectName() == prefix)
 		{
 			WidgetVisitor rootvisit( m_stk.at(0).first, m_stk.at(0).second, m_globals);
-			return rootvisit.property( follow+1, 1);
+			return rootvisit.property( rest, 1);
+		}
+		QList<QByteArray> props = m_stk.top().first->dynamicPropertyNames();
+		QList<QByteArray>::const_iterator pi = props.begin(), pi = props.end();
+		for (; pi != pe; ++pi)
+		{
+			if (pi->startsWith( "synonym:"))
+			{
+				if (name == pi->mid( 8, pi->size()-8))
+				{
+					QVariant synonym = m_stk.top().first->property( *pi);
+					if (synonym.type() == QVariant::String)
+					{
+						return property( synonym.toString());
+					}
+					else if (synonym.type() == QVariant::ByteArray)
+					{
+						return property( synonym.toByteArray());
+					}
+				}
+			}
 		}
 	}
 	return rt;
 }
 
-QVariant WidgetVisitor::property( const char* name)
+QVariant WidgetVisitor::property( const QByteArray& name)
 {
 	return property( name, 0);
 }
 
-bool WidgetVisitor::setProperty( const char* name, const QVariant& value, int level)
+bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, int level)
 {
 	if (m_stk.empty()) return QVariant()/*invalid*/;
 
 	if (setWidgetProperty( m_stk.top().first, m_stk.top().second, name, value)) return true;
 	if (m_stk.top().first->setProperty( name, value)) return true;
 
-	const char* follow = strchr( name, '.');
-	if (follow)
+	int followidx = name.indexOf( '.');
+	if (followidx >= 0)
 	{
-		int chldlen = follow-name;
-		char chldbuf_[MaxIdentifierSize+1];
-
-		if (level == 0 && memcmp( name, "global", chldlen) == 0)
+		if (level == 0 && name.startsWith( "global."))
 		{
-			m_globals[ QString(follow+1)] = value;
+			m_globals[ name.mid( 7, name.size()-7)] = value;
 		}
-		const char* chld = getPropertyIdentifier( chldbuf_, sizeof(chldbuf_), name, chldlen);
-		if (m_stk.enter( chld))
+		QByteArray prefix( name.mid( 0, followidx));
+		QByteArray rest( name.mid( followidx+1, name.size()-followidx-1));
+		if (m_stk.enter( prefix))
 		{
-			bool rt = setProperty( follow+1, value, level+1);
+			bool rt = setProperty( rest, value, level+1);
 			m_stk.leave();
 			return rt;
 		}
-		if (level == 0 && m_stk.at(0)->objectName() == chld)
+		if (level == 0 && m_stk.at(0)->objectName() == prefix)
 		{
 			WidgetVisitor rootvisit( m_stk.at(0).first, m_stk.at(0).second, m_globals);
-			return rootvisit.setProperty( follow+1, value, 1);
+			return rootvisit.setProperty( rest, value, 1);
+		}
+		QList<QByteArray> props = m_stk.top().first->dynamicPropertyNames();
+		QList<QByteArray>::const_iterator pi = props.begin(), pi = props.end();
+		for (; pi != pe; ++pi)
+		{
+			if (pi->startsWith( "synonym:"))
+			{
+				if (name == pi->mid( 8, pi->size()-8))
+				{
+					QVariant synonym = m_stk.top().first->property( *pi);
+					if (synonym.type() == QVariant::String)
+					{
+						return setProperty( synonym.toString(), value);
+					}
+					else if (synonym.type() == QVariant::ByteArray)
+					{
+						return setProperty( synonym.toByteArray(), value);
+					}
+				}
+			}
 		}
 	}
 	return rt;
@@ -392,12 +379,10 @@ bool WidgetVisitor::setProperty( const char* name, const QVariant& value, int le
 
 bool WidgetVisitor::setProperty( const QString& name, const QVariant& value)
 {
-	char name_[MaxIdentifierSize+1];
-	const char* id = getPropertyIdentifier( name_, sizeof(name_), name);
-	return (id)?setProperty( id, value, 0):false;
+	return setProperty( name.toAscii(), value, 0);
 }
 
-bool WidgetVisitor::setProperty( const char* name, const QVariant& value)
+bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value)
 {
 	return setProperty( name, value, 0);
 }
