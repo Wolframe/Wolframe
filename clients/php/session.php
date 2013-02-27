@@ -28,7 +28,7 @@ class Session extends Connection
 		$this->getline( "OK");
 	}
 
-	function __construct( $address, $port, $authmethod)
+	function __construct( $address, $port, $sslopt, $authmethod)
 	{
 		parent::__construct( $address, $port);
 		$this->banner = $this->readline();

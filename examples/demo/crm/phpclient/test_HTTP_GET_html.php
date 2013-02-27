@@ -4,7 +4,14 @@ use Wolframe\Session as Session;
 
 try
 {
-	$conn = new Session( "127.0.0.1", 7661, "NONE");
+	$sslpath = "../../../../tests/SSL/"
+	$sslopt = array(
+		"verify_host" => true,
+		"verify_peer" => true,
+		"cafile" => "$sslpath/CAclient.cert.pem",
+		"local_cert" => "$sslpath/client.crt"
+	);
+	$conn = new Session( "127.0.0.1", 7661, $sslopt, "NONE");
 	$doctype = $_GET["doctype"];
 	if ($doctype == "") $doctype = "ListEmployee";
 	if ($doctype == "ListEmployee") $query = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><!DOCTYPE "employee" SYSTEM "ListEmployee.simpleform"><employee></employee>';

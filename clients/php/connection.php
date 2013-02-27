@@ -27,15 +27,15 @@ class Connection
 		return new \Exception( $str);
 	}
 
-	public function __construct( $address, $port, $cafile, $local_cert, $keyfile)
+	public function __construct( $address, $port, $ssloptions)
 	{
 		$this->context = stream_context_create();
 		$timeout = 30;
 
-		stream_context_set_option( $this->context, 'ssl', 'verify_host', true);
-		stream_context_set_option( $this->context, 'ssl', 'cafile', $cafile);
-		stream_context_set_option( $this->context, 'ssl', 'local_cert', $local_cert);
-		stream_context_set_option( $this->context, 'ssl', 'verify_peer', true);
+		foreach ($ssloptions as $key => $value)
+		{
+			stream_context_set_option( $this->context, 'ssl', $key, $value);
+		}
 
 		$this->socket = stream_socket_client("tcp://{$address}:{$port}", $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $this->context);
 		if ($this->socket === FALSE) throw $this->conn_exception( "socket creation failed");
