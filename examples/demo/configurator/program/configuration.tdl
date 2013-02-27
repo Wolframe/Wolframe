@@ -1,0 +1,45 @@
+TRANSACTION selectConfigurationList
+RESULT INTO list
+BEGIN
+	INTO configuration DO
+		SELECT Configuration.ID AS "id", Configuration.name AS "name",
+			Configuration.description,
+			Category.name AS "categoryName",
+			comment
+		FROM Configuration, Category
+		WHERE Configuration.categoryID = Category.ID;
+END
+
+TRANSACTION addConfiguration
+BEGIN
+	DO INSERT INTO Configuration( name, description, categoryID, comment )
+		VALUES ( $(name), $(description), $(categoryID), $(comment) );
+END
+
+TRANSACTION updateConfiguration
+BEGIN
+	DO UPDATE Configuration SET name=$(name),
+		description=$(description), categoryID=$(categoryID),
+		comment=$(comment)
+		WHERE ID=$(id);
+END
+
+TRANSACTION deleteConfiguration
+BEGIN
+	DO DELETE FROM Configuration WHERE ID = $(id);
+END
+
+TRANSACTION selectConfiguration
+RESULT INTO configuration
+BEGIN
+	INTO . DO
+		SELECT Configuration.ID AS "id", name, description,
+			comment
+			FROM Configuration
+			WHERE Configuration.ID = $(id);
+	INTO category DO
+		SELECT categoryID AS "id", Category.name AS "_"
+			FROM Configuration, Category
+			WHERE Configuration.ID = $(id)
+			AND Configuration.CategoryID = Category.ID;
+END

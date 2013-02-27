@@ -462,6 +462,43 @@ function RecipeRequest( )
 	output:print( f:get( ) )
 end
 
+-- configurations
+
+function ConfigurationListRequest( )
+	output:as( {root='list', system='configurationList.simpleform'})
+	local t = formfunction( "selectConfigurationList" )( {} )
+	local f = form( "ConfigurationList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function createConfiguration( )
+	local configuration = input:table( )["configuration"]
+	if configuration["category"] then
+		configuration["categoryID"] = configuration["category"]["id"]
+	end
+	formfunction( "addConfiguration" )( configuration )
+end
+
+function editConfiguration( )
+	local configuration = input:table( )["configuration"]
+	if configuration["category"] then
+		configuration["categoryID"] = configuration["category"]["id"]
+	end
+	formfunction( "updateConfiguration" )( configuration )
+end
+
+function deleteConfiguration( )
+	formfunction( "deleteConfiguration" )( { id = input:table( )["configuration"]["id"] } )
+end
+
+function ConfigurationRequest( )
+	local t = formfunction( "selectConfiguration" )( { id = input:table( )["configuration"]["id"] } )
+	local f = form( "Configuration" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
 -- category/features associations
 
 function createCategoryFeature( )

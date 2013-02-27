@@ -502,6 +502,45 @@
      </property>
     </widget>
    </item>
+   <item row="15" column="0">
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Manage Recipes</string>
+     </property>
+     <property name="form" stdset="0">
+      <string notr="true">recipes</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QPushButton" name="form1_7">
+     <property name="text">
+      <string>Link</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/configurator.qrc">
+       <normaloff>:/images/link.png</normaloff>:/images/link.png</iconset>
+     </property>
+     <property name="form" stdset="0">
+      <string notr="true">recipe_content</string>
+     </property>
+     <property name="global.featureState" stdset="0">
+      <string notr="true">{feature.state}</string>
+     </property>
+     <property name="global.categoryState" stdset="0">
+      <string notr="true">{category.state}</string>
+     </property>
+     <property name="global.pictureState" stdset="0">
+      <string notr="true">{picture.state}</string>
+     </property>
+     <property name="global.manufacturerState" stdset="0">
+      <string notr="true">{manufacturer.state}</string>
+     </property>
+     <property name="global.componentState" stdset="0">
+      <string notr="true">{component.state}</string>
+     </property>
+    </widget>
+   </item>
    <item row="11" column="0" colspan="2">
     <widget class="QTableWidget" name="recipe">
      <property name="horizontalScrollBarPolicy">
@@ -570,42 +609,13 @@
      </column>
     </widget>
    </item>
-   <item row="15" column="0">
-    <widget class="QPushButton" name="pushButton">
+   <item row="15" column="1">
+    <widget class="QPushButton" name="pushButton_2">
      <property name="text">
-      <string>Manage Recipes</string>
+      <string>Manage Configurations</string>
      </property>
      <property name="form" stdset="0">
-      <string notr="true">recipes</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="1">
-    <widget class="QPushButton" name="form1_7">
-     <property name="text">
-      <string>Link</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/configurator.qrc">
-       <normaloff>:/images/link.png</normaloff>:/images/link.png</iconset>
-     </property>
-     <property name="form" stdset="0">
-      <string notr="true">recipe_content</string>
-     </property>
-     <property name="global.featureState" stdset="0">
-      <string notr="true">{feature.state}</string>
-     </property>
-     <property name="global.categoryState" stdset="0">
-      <string notr="true">{category.state}</string>
-     </property>
-     <property name="global.pictureState" stdset="0">
-      <string notr="true">{picture.state}</string>
-     </property>
-     <property name="global.manufacturerState" stdset="0">
-      <string notr="true">{manufacturer.state}</string>
-     </property>
-     <property name="global.componentState" stdset="0">
-      <string notr="true">{component.state}</string>
+      <string>configurations</string>
      </property>
     </widget>
    </item>

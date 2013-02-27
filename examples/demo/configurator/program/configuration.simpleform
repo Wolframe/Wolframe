@@ -1,0 +1,16 @@
+FORM Configuration
+{
+	configuration
+	{
+		id @int
+		form @string
+		name string
+		description string
+		category {
+			id @int
+			_ string
+		}
+		comment string
+		search
+	}
+}
