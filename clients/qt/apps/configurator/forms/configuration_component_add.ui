@@ -274,22 +274,17 @@
        </attribute>
        <column>
         <property name="text">
+         <string>categoryName</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
          <string>name</string>
         </property>
        </column>
        <column>
         <property name="text">
          <string>description</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>componentName</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>creationDate</string>
         </property>
        </column>
        <column>
