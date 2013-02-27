@@ -74,6 +74,22 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="edit_2">
+       <property name="text">
+        <string>Change Components</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">configuration_components</string>
+       </property>
+       <property name="global.id" stdset="0">
+        <string notr="true">{configuration.id}</string>
+       </property>
+       <property name="global.configurationState" stdset="0">
+        <string notr="true">{configuration.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="reload_2">
        <property name="text">
         <string>Main Menu</string>

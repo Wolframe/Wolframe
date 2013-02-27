@@ -1,0 +1,24 @@
+FORM ConfigurationComponent
+{
+	ConfigurationComponent
+	{
+		configuration
+		{
+			id @int
+			_ string
+		}
+		ConfigurationComponent
+		{
+			id @int
+			_ string
+		}
+		component
+		{
+			id @int
+			_ string
+		}
+		quantity int
+		config_id @int
+		component_id @int
+	}
+}
