@@ -3,7 +3,7 @@ namespace Wolframe
 {
 class Connection
 {
-	private $resource = NULL;
+	private $context = NULL;
 	private $socket = NULL;
 	private $readbuffer = "";
 	private $alive = FALSE;
@@ -27,13 +27,17 @@ class Connection
 		return new \Exception( $str);
 	}
 
-	public function __construct( $address, $port)
+	public function __construct( $address, $port, $cafile, $local_cert, $keyfile)
 	{
-		$options = array();
-		$params = array();
-		$this->resource = stream_context_create( $options, $params);
+		$this->context = stream_context_create();
 		$timeout = 30;
-		$this->socket = stream_socket_client("tcp://{$address}:{$port}", $errno, $errstr, $timeout);
+
+		stream_context_set_option( $this->context, 'ssl', 'verify_host', true);
+		stream_context_set_option( $this->context, 'ssl', 'cafile', $cafile);
+		stream_context_set_option( $this->context, 'ssl', 'local_cert', $local_cert);
+		stream_context_set_option( $this->context, 'ssl', 'verify_peer', true);
+
+		$this->socket = stream_socket_client("tcp://{$address}:{$port}", $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT, $this->context);
 		if ($this->socket === FALSE) throw $this->conn_exception( "socket creation failed");
 
 		stream_set_blocking( $this->socket, true);
