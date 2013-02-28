@@ -13,18 +13,6 @@
   <property name="windowTitle">
    <string>Add components of configuration</string>
   </property>
-  <property name="doctype" stdset="0">
-   <string>ConfigurationComponentRequest.simpleform</string>
-  </property>
-  <property name="rootelement" stdset="0">
-   <string notr="true">ConfigurationComponent</string>
-  </property>
-  <property name="config_id" stdset="0">
-   <string notr="true">{global.config_id}</string>
-  </property>
-  <property name="component_id" stdset="0">
-   <string notr="true">{global.component_id}</string>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="5" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">

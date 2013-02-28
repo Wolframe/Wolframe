@@ -5,7 +5,7 @@ BEGIN
 		SELECT Recipe.ID AS "id", Recipe.name AS "name",
 			Recipe.description,
 			Category.name AS "categoryName",
-			creationDate, comment
+			creationDate AS "creationDate", comment
 		FROM Recipe, Category
 		WHERE Recipe.categoryID = Category.ID;
 END
@@ -39,7 +39,7 @@ RESULT INTO recipe
 BEGIN
 	INTO . DO
 		SELECT Recipe.ID AS "id", name, description,
-			creationDate, comment
+			creationDate AS "creationDate", comment
 			FROM Recipe
 			WHERE Recipe.ID = $(id);
 	INTO category DO
