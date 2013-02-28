@@ -1,0 +1,13 @@
+FORM ConfigurationSubconfigList
+{
+	list
+	{
+		ConfigurationSubconfig []
+		{
+			id @int
+			name string
+			categoryName string
+			quantity int
+		}
+	}
+}

@@ -1,0 +1,9 @@
+FORM ConfigurationSubconfigRequest
+{
+	ConfigurationSubconfig
+	{
+		config_id @int
+		subconfig_id @int
+		quantity int
+	}
+}

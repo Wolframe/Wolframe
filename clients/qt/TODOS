@@ -2,13 +2,10 @@ now configurator:
 - generally: no nice interface possible, current qtclient is too limited
 - finish recipes
   - creationDate (set by system? by user? default?)
-- finish configurations
-  - ComposedConfig: 1:n self-relation on a tree, no clue yet how to do this
 - show thumbnails:
   - 1:n relation pictures, which picture should be shown? example:
     component 3 pictures, one is a symbol, two are a front and a back view.
     => pictures need a qualifier like (first picture)?
-- thumbnails for components (dito recipes), currently broken
 - open info box (modal) in feature/category/component edit and add to
   show picture information
 - multi-line plain text fields (like desription in recipe) loose newlines

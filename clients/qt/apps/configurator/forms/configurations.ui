@@ -76,10 +76,26 @@
      <item>
       <widget class="QPushButton" name="edit_2">
        <property name="text">
-        <string>Change Components</string>
+        <string>Manage Components</string>
        </property>
        <property name="form" stdset="0">
         <string notr="true">configuration_components</string>
+       </property>
+       <property name="global.id" stdset="0">
+        <string notr="true">{configuration.id}</string>
+       </property>
+       <property name="global.configurationState" stdset="0">
+        <string notr="true">{configuration.state}</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="edit_3">
+       <property name="text">
+        <string>Manage Subconfigs</string>
+       </property>
+       <property name="form" stdset="0">
+        <string notr="true">configuration_subconfigs</string>
        </property>
        <property name="global.id" stdset="0">
         <string notr="true">{configuration.id}</string>
@@ -207,9 +223,12 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>configuration</tabstop>
   <tabstop>add</tabstop>
   <tabstop>delete_2</tabstop>
   <tabstop>edit</tabstop>
+  <tabstop>edit_2</tabstop>
+  <tabstop>edit_3</tabstop>
   <tabstop>reload_2</tabstop>
  </tabstops>
  <resources>
@@ -223,12 +242,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>199</x>
-     <y>131</y>
+     <x>217</x>
+     <y>216</y>
     </hint>
     <hint type="destinationlabel">
-     <x>209</x>
-     <y>297</y>
+     <x>216</x>
+     <y>294</y>
     </hint>
    </hints>
   </connection>

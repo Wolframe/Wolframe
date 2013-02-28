@@ -631,6 +631,47 @@ function ConfigurationComponentListRequest( )
 	output:print( f:get( ) )
 end
 
+-- configuration/subconfig associations
+
+function SubConfigurationListRequest( )
+	output:as( {root='list', system='subconfigList.simpleform'})
+	local t = formfunction( "selectSubconfigList" )( {} )
+	local f = form( "SubconfigList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function createConfigurationSubconfig( )
+	local configurationSubconfig = input:table( )["ConfigurationSubconfig"]
+	formfunction( "addConfigurationSubconfig" )( configurationSubconfig )
+end
+
+function deleteConfigurationSubconfig( )
+	local configurationSubconfig = input:table( )["ConfigurationSubconfig"]
+	formfunction( "deleteConfigurationSubconfig" )( configurationSubconfig )
+end
+
+function ConfigurationSubconfigRequest( )
+	local configurationSubconfig = input:table( )["ConfigurationSubconfig"]
+	local t = formfunction( "selectConfigurationSubconfig" )( {
+		config_id = configurationSubconfig["config_id"],
+		subconfig_id = configurationSubconfig["subconfig_id"]
+	} )
+	local f = form( "ConfigurationSubconfig" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
+function ConfigurationSubconfigListRequest( )
+	local configurationSubconfig = input:table( )["ConfigurationSubconfig"]
+	local t = formfunction( "selectConfigurationSubconfigList" )( {
+		config_id = configurationSubconfig["config_id"]
+	} )
+	local f = form( "ConfigurationSubconfigList" )
+	f:fill( t:get( ) )
+	output:print( f:get( ) )
+end
+
 -- pictures
 
 function PictureListRequest( )

@@ -1,0 +1,14 @@
+FORM SubconfigList
+{
+	list
+	{
+		subconfig []
+		{
+			id @int
+			name string
+			description string
+			categoryName string
+			comment string
+		}
+	}
+}
