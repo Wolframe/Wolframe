@@ -6,6 +6,7 @@ FORM ConfigurationComponentList
 		{
 			id @int
 			name string
+			categoryName string
 			quantity int
 		}
 	}

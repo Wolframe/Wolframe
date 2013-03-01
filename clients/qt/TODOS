@@ -1,7 +1,5 @@
 now configurator:
 - generally: no nice interface possible, current qtclient is too limited
-- finish recipes
-  - creationDate (set by system? by user? default?)
 - show thumbnails:
   - 1:n relation pictures, which picture should be shown? example:
     component 3 pictures, one is a symbol, two are a front and a back view.

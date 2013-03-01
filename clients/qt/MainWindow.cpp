@@ -1093,7 +1093,7 @@ void MainWindow::updateMenusAndToolbars( )
 // logged in or logged out?
 	activateAction( "actionOpenForm",
 		( ( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile )
-		|| m_wolframeClient )
+		|| ( m_wolframeClient && m_wolframeClient->isConnected( ) ) )
 		&& ( !settings.mdi || ( settings.mdi && nofSubWindows( ) > 0 ) ) );
 	activateAction( "actionReload",
 		( settings.uiLoadMode == LocalFile && settings.dataLoadMode == LocalFile ) ||

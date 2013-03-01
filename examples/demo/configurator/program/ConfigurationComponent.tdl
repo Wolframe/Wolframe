@@ -19,9 +19,12 @@ BEGIN
 		SELECT
 			componentID AS "id",
 			Component.name as "name",
+			Category.name as "categoryName",
 			quantity
-		FROM ConfigComponent, Component
-		WHERE configID = $(config_id)
+		FROM ConfigComponent, Component, Configuration, Category
+		WHERE Configuration.ID = configID
+		AND Category.ID = Configuration.categoryID
+		AND configID = $(config_id)
 		AND componentID = Component.ID;
 END
 

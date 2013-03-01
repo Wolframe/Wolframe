@@ -189,7 +189,7 @@
        </column>
        <column>
         <property name="text">
-         <string>componentName</string>
+         <string>categoryName</string>
         </property>
        </column>
        <column>

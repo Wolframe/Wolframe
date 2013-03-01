@@ -247,3 +247,8 @@ CREATE AGGREGATE group_concat (
 	SFUNC = _group_concat,
 	STYPE = text
 );
+
+CREATE OR REPLACE FUNCTION datetime(text)
+RETURNS timestamp AS $$
+	SELECT now( )::timestamp
+$$ IMMUTABLE LANGUAGE SQL;

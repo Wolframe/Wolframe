@@ -208,6 +208,11 @@
        </property>
        <column>
         <property name="text">
+         <string>categoryName</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
          <string>name</string>
         </property>
        </column>
