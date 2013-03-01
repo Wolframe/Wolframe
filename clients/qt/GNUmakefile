@@ -6,7 +6,8 @@ SUBDIRS = plugins apps
 
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
-INCLUDE_CXXFLAGS =
+INCLUDE_CXXFLAGS = \
+	$(QT_CXXFLAGS)
 
 INCLUDE_DIRS = \
 	-I. \

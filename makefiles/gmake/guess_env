@@ -14,6 +14,9 @@ else
 	UNAME_VERSION=`(uname -v) 2>/dev/null`
 	UNAME_MACHINE=`(uname -m) 2>/dev/null`
 
+	LINUX_DIST=""
+	LINUX_REV=""
+
 	case "$UNAME_SYSTEM.$UNAME_RELEASE" in
 		Linux*)		PLATFORM=LINUX
 				OS_MAJOR_VERSION=`echo $UNAME_RELEASE | cut -d . -f 1`
@@ -196,6 +199,12 @@ case "$1" in
 				;;
 
 	--os-minor-version)	echo $OS_MINOR_VERSION
+				;;
+
+	--linux-dist)		echo $LINUX_DIST
+				;;
+
+	--linux-rev)		echo $LINUX_REV
 				;;
 
 	--arch)			echo $ARCH

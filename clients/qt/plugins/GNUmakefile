@@ -7,6 +7,7 @@ SUBDIRS =
 -include $(TOPDIR)/makefiles/gmake/platform.mk
 
 INCLUDE_CXXFLAGS = \
+	$(QT_CXXFLAGS) \
 	-DQT_PLUGIN -DQT_SHARED -DQT_NO_DEBUG \
 	-DQDESIGNER_EXPORT_WIDGETS
 
