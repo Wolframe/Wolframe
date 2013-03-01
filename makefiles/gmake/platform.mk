@@ -686,7 +686,7 @@ QT_CXXFLAGS =
 else
 
 QT_PACKAGE=$(shell pacman -Q qt 2>/dev/null)
-ifeq (qt-,$(findstring qt-,$(QT_PACKAGE)))
+ifeq (qt,$(findstring qt,$(QT_PACKAGE)))
 QT_DIR ?= /usr
 QT_INCLUDE_DIR ?= $(QT_DIR)/include
 QT_LIB_DIR ?= $(QT_DIR)/lib
