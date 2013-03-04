@@ -441,11 +441,6 @@ void MainWindow::connected( )
 	m_wolframeClient->auth( );
 }
 
-void MainWindow::mechsReceived( QStringList /* mechs */ )
-{
-	m_wolframeClient->mech( "NONE" );
-}
-
 void MainWindow::disconnected( )
 {
 	m_wolframeClient->deleteLater( );
@@ -1168,8 +1163,6 @@ void MainWindow::on_actionLogin_triggered( )
 			this, SLOT( connected( ) ) );
 		connect( m_wolframeClient, SIGNAL( disconnected( ) ),
 			this, SLOT( disconnected( ) ) );
-		connect( m_wolframeClient, SIGNAL( mechsReceived( QStringList ) ),
-			this, SLOT( mechsReceived( QStringList ) ) );
 		connect( m_wolframeClient, SIGNAL( authOk( ) ),
 			this, SLOT( authOk( ) ) );
 		connect( m_wolframeClient, SIGNAL( authFailed( ) ),

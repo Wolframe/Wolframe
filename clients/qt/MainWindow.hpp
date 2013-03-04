@@ -129,7 +129,6 @@ class MainWindow : public QMainWindow
 		void wolframeError( QString error );
 		void connected( );
 		void disconnected( );
-		void mechsReceived( QStringList mechs );
 		void authOk( );
 		void authFailed( );
 

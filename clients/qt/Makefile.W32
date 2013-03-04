@@ -73,6 +73,12 @@ OBJS = \
 	moc_DataHandler.obj \
 	WolframeClient.obj \
 	moc_WolframeClient.obj \
+	WolframeClientProtocol.obj \
+	WolframeClientProtocolBase.obj \
+	WidgetVisitor.obj \
+	WidgetVisitor_QComboBox.obj \
+	WidgetVisitor_QListWidget.obj \
+	WidgetRequest.obj \
 	FormWidget.obj \
 	moc_FormWidget.obj \
 	qcommandline.obj \

@@ -30,32 +30,13 @@
  Project Wolframe.
 
 ************************************************************************/
-
-#ifndef _DATA_LOADER_INCLUDED
-#define _DATA_LOADER_INCLUDED
-
+#ifndef _WIDGET_XML_HPP_INCLUDED
+#define _WIDGET_XML_HPP_INCLUDED
+#include <QWidget>
 #include <QByteArray>
-#include <QStringList>
-#include <QString>
-#include <QObject>
-#include <QHash>
 
-class DataLoader : public QObject
-{	
-	Q_OBJECT
-	
-	public:
-		virtual ~DataLoader( ) {};
-		
-		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props ) = 0;
+QByteArray getWigdetRequest( QWidget* widget, QHash<QByteArray, QVariant>* globals, bool debugmode=false);
+bool setWidgetAnswer( QWidget* widget, QHash<QByteArray, QVariant>* globals, const QByteArray& answer);
 
-	// for NetworkDataLoader
-	public slots:
-		virtual void gotAnswer( bool /*success*/, const QByteArray& /*tag*/, const QByteArray& /*content*/){}
-		virtual void gotError( QString /* error */ ) { }
-	
-	Q_SIGNALS:
-		void answer( QString formName, QString widgetName, QByteArray xml );
-};
+#endif
 
-#endif // _DATA_LOADER_INCLUDED

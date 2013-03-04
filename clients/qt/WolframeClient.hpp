@@ -46,6 +46,7 @@
 #include <QStringList>
 #include <QTimer>
 
+#include "WolframeClientProtocol.hpp"
 #include "connection.hpp"
 
 class WolframeClient : public QObject
@@ -77,13 +78,10 @@ class WolframeClient : public QObject
 		QAbstractSocket *m_socket;
 		QWidget *m_parent;
 		bool m_hasErrors;
+		WolframeClientProtocol m_protocol;
 #ifdef WITH_SSL
 		bool m_initializedSsl;
 #endif
-		QString m_answer;
-		QStringList m_params;
-		QString m_command;
-		QQueue<WolframeRequest> m_queue;	// queued commands
 		QTimer *m_timeoutTimer;
 
 	public:
@@ -93,22 +91,9 @@ class WolframeClient : public QObject
 // low-level commands, pre-protocol, for debugging mainly
 		void connect( );
 		void disconnect( );
-		void sendLine( QString line );
-
-// generic send command function, implementing the frame of the protocol
-		void sendCommand( QString command );
-		void sendCommand( QString command, QStringList params );
-		void sendCommand( QString command, QStringList params, QString content );
-		void sendCommand( QString command, QString content );
-		void sendCommand( struct WolframeRequest );
-
-// high-level commands
-		void capa( );
-		void auth( );
-		void mech( QString mech );
-		void request( QString type, QString content );
-		void request( QString content );
-
+		void auth();
+		void request( const QByteArray& tag, const QByteArray& content );
+		void sendLine( const QString&)	{qDebug()<< "NOT IMPLEMENTED: sendLine";}
 // inquire status
 		bool isConnected( ) const;
 		const QString serverName() const;
@@ -136,6 +121,8 @@ class WolframeClient : public QObject
 		void connected( );
 		void disconnected( );
 		void error( QString error );
+		void authOk( );
+		void authFailed( );
 
 // low-level commands, pre-protocol, for debugging mainly
 		void lineReceived( QString line );
@@ -145,11 +132,7 @@ class WolframeClient : public QObject
 		void resultReceived( );
 
 // high-level commands
-		void capasReceived( QStringList cataList );
-		void mechsReceived( QStringList mechList );
-		void authOk( );
-		void authFailed( );
-		void answerReceived( QStringList params, QString content );
+		void answerReceived( bool success, const QByteArray& tag, const QByteArray& content );
 };
 
 #endif // _Wolframe_CLIENT_HPP_INCLUDED

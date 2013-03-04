@@ -31,31 +31,24 @@
 
 ************************************************************************/
 
-#ifndef _DATA_LOADER_INCLUDED
-#define _DATA_LOADER_INCLUDED
+#ifndef _WIDGET_VISIOR_QListWidget_HPP_INCLUDED
+#define _WIDGET_VISIOR_QListWidget_HPP_INCLUDED
+#include "WidgetVisitor.hpp"
+#include <QListWidget>
 
-#include <QByteArray>
-#include <QStringList>
-#include <QString>
-#include <QObject>
-#include <QHash>
+class WidgetVisitorState_QListWidget
+	:public WidgetVisitor::State
+{
+public:
+	WidgetVisitorState_QListWidget( QWidget* widget_);
 
-class DataLoader : public QObject
-{	
-	Q_OBJECT
-	
-	public:
-		virtual ~DataLoader( ) {};
-		
-		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props ) = 0;
+	virtual void clearProperty();
+	virtual QVariant property( const QByteArray& name);
+	virtual bool setProperty( const QByteArray& name, const QVariant& data);
+	virtual const char** dataelements() const;
 
-	// for NetworkDataLoader
-	public slots:
-		virtual void gotAnswer( bool /*success*/, const QByteArray& /*tag*/, const QByteArray& /*content*/){}
-		virtual void gotError( QString /* error */ ) { }
-	
-	Q_SIGNALS:
-		void answer( QString formName, QString widgetName, QByteArray xml );
+private:
+	QListWidget* m_listWidget;
 };
 
-#endif // _DATA_LOADER_INCLUDED
+#endif

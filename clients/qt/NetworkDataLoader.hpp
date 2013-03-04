@@ -57,17 +57,17 @@ class NetworkDataLoader : public DataLoader
 		void handleUpdate( QString windowName, QString name, QByteArray data, QHash<QString, QString> *props );
 		void handleDelete( QString windowName, QString name, QHash<QString, QString> *props );
 		void handleDomainDataLoad( QString windowName, QString formName, QString widgetName, QHash<QString, QString> *props );
-		void handleRequest( QString windowName, QString formName, QString widgetName, QString xml, QHash<QString, QString> *props );
+		void handleRequest( QString windowName, QString formName, QString widgetName, const QByteArray& data, QHash<QString, QString> *props );
 		QString mapAction( QString action );
 		QString mapDoctype( QString action, bool domain, QString docType );
 		
 	public slots:
-		virtual void gotAnswer( QStringList params, QString content );
+		virtual void gotAnswer( bool success, const QByteArray& tag, const QByteArray& content);
 		virtual void gotError( QString error );
 			
 	private:
 		WolframeClient *m_wolframeClient;
-		QScopedPointer<QHash<QString, QPair<QString, QString> > > m_map;
+		QScopedPointer<QHash<QByteArray, QPair<QString, QString> > > m_map;
 		bool m_debug;
 };
 

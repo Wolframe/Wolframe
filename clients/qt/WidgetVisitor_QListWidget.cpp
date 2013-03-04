@@ -30,32 +30,52 @@
  Project Wolframe.
 
 ************************************************************************/
+#include "WidgetVisitor_QListWidget.hpp"
 
-#ifndef _DATA_LOADER_INCLUDED
-#define _DATA_LOADER_INCLUDED
+WidgetVisitorState_QListWidget::WidgetVisitorState_QListWidget( QWidget* widget_)
+	:WidgetVisitor::State(widget_)
+	,m_listWidget(qobject_cast<QListWidget*>(widget_)){}
 
-#include <QByteArray>
-#include <QStringList>
-#include <QString>
-#include <QObject>
-#include <QHash>
+void WidgetVisitorState_QListWidget::clearProperty()
+{
+	m_listWidget->clear();
+}
 
-class DataLoader : public QObject
-{	
-	Q_OBJECT
-	
-	public:
-		virtual ~DataLoader( ) {};
-		
-		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props ) = 0;
+QVariant WidgetVisitorState_QListWidget::property( const QByteArray& name)
+{
+	if (strcmp( name,"select") == 0)
+	{
+		QList<QVariant> rt;
+		foreach( QListWidgetItem *item, m_listWidget->selectedItems())
+		{
+			rt.append( QVariant( item->text()));
+		}
+		return QVariant( rt);
+	}
+	return QVariant();
+}
 
-	// for NetworkDataLoader
-	public slots:
-		virtual void gotAnswer( bool /*success*/, const QByteArray& /*tag*/, const QByteArray& /*content*/){}
-		virtual void gotError( QString /* error */ ) { }
-	
-	Q_SIGNALS:
-		void answer( QString formName, QString widgetName, QByteArray xml );
-};
+bool WidgetVisitorState_QListWidget::setProperty( const QByteArray& name, const QVariant& data)
+{
+	if (strcmp( name,"value") == 0)
+	{
+		m_listWidget->addItem( data.toString());
+		return true;
+	}
+	if (strcmp( name,"select") == 0)
+	{
+		QList<QListWidgetItem *> items = m_listWidget->findItems( data.toString(), Qt::MatchExactly);
+		foreach( QListWidgetItem *item, items)
+		{
+			item->setSelected( true);
+		}
+	}
+	return false;
+}
 
-#endif // _DATA_LOADER_INCLUDED
+const char** WidgetVisitorState_QListWidget::dataelements() const
+{
+	static const char* ar[] = {"select","value",0};
+	return ar;
+}
+

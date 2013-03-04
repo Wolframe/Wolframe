@@ -37,8 +37,8 @@
 #include <QStack>
 #include <QHash>
 #include <QString>
-
-typedef void* WidgetState;
+#include <QSharedPointer>
+#include <QVariant>
 
 ///\class WidgetVisitor
 ///\brief Tree to access to (read/write) of widget data
@@ -48,7 +48,7 @@ class WidgetVisitor
 		///\brief Constructor
 		///\param[in] root Root of widget tree visited
 		///\param[in] globals_ Reference to global variables
-		WidgetVisitor( QWidget* root, QHash<QByteArray, QString>* globals_);
+		WidgetVisitor( QWidget* root, QHash<QByteArray, QVariant>* globals_);
 
 		///\brief Sets the current node to the child with name 'name'
 		bool enter( const QString& name);
@@ -95,6 +95,49 @@ class WidgetVisitor
 		///\return true on success
 		bool setProperty( const QString& name, const QVariant& value);
 
+		class Element
+		{
+		public:
+			enum Type {OpenTag,CloseTag,Attribute,Value};
+			Type type() const		{return m_type;}
+			const QVariant& value() const	{return m_value;}
+
+			Element( Type type_, const QVariant& value_)
+				:m_type(type_),m_value(value_){}
+			Element( const Element& o)
+				:m_type(o.m_type),m_value(o.m_value){}
+		private:
+			Type m_type;
+			QVariant m_value;
+		};
+
+		///\class State
+		///\brief State on WidgetVisitor stack
+		struct State
+		{
+			explicit State( QWidget* widget_)
+				:m_widget(widget_){}
+			virtual ~State(){}
+
+			QWidget* widget()
+			{
+				return m_widget;
+			}
+
+			virtual void clearProperty(){}
+			virtual QWidget* childwidget( const QByteArray&)			{return 0;}
+			virtual bool enter( const QByteArray&)					{return false;}
+			virtual bool leave()							{return false;}
+			virtual QVariant property( const QByteArray&)				{return QVariant();}
+			virtual bool setProperty( const QByteArray&, const QVariant&)		{return false;}
+			virtual const char** dataelements() const				{static const char* ar[1] = {0}; return ar;}
+		private:
+			QWidget* m_widget;
+		};
+		typedef QSharedPointer<State> StateR;
+
+		QList<Element> elements();
+
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).
 		///\param[in] name name of the property
@@ -107,11 +150,11 @@ class WidgetVisitor
 		///\return true on success
 		bool setProperty( const QByteArray& name, const QVariant& value, int level);
 
-		WidgetVisitor( QWidget* root, WidgetState state, QHash<QByteArray, QString>* globals_);
+		WidgetVisitor( const StateR& state, QHash<QByteArray, QVariant>* globals_);
 
 		enum {MaxIdentifierSize=0xFF};			//< internal maximum identifier length
-		QStack<QPair<QWidget*,WidgetState> > m_stk;	//< stack of visited widget nodes (first) with their select state (second). The current node is the top element
-		QHash<QByteArray, QString>* m_globals;		//< global variables
+		QStack<StateR> m_stk;				//< stack of visited widget nodes (first) with their select state (second). The current node is the top element
+		QHash<QByteArray, QVariant>* m_globals;		//< global variables
 };
 
 #endif

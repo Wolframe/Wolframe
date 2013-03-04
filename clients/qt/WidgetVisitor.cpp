@@ -31,51 +31,51 @@
 
 ************************************************************************/
 #include "WidgetVisitor.hpp"
+#include "WidgetVisitor_QComboBox.hpp"
+#include "WidgetVisitor_QListWidget.hpp"
+#include "FileChooser.hpp"
+#include "PictureChooser.hpp"
 
 #include <QDebug>
 #include <QByteArray>
 #include <QXmlStreamWriter>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QPlainTextEdit>
+#include <QCheckBox>
+#include <QRadioButton>
+#include <QListWidget>
+#include <QTreeWidget>
+#include <QTableWidget>
 
-WidgetVisitor::WidgetVisitor( QWidget* root, QHash<QByteArray,QString>* globals_)
+static WidgetVisitor::StateR widgetVisitorState( QWidget* widget)
+{
+	QString clazz = widget->metaObject()->className();
+	if (clazz == "QComboBox")
+	{
+		return WidgetVisitor::StateR( new WidgetVisitorState_QComboBox( widget));
+	}
+	else if (clazz == "QListWidget")
+	{
+		return WidgetVisitor::StateR( new WidgetVisitorState_QListWidget( widget));
+	}
+	else
+	{
+		return WidgetVisitor::StateR( new WidgetVisitor::State( widget));
+	}
+}
+
+WidgetVisitor::WidgetVisitor( QWidget* root, QHash<QByteArray,QVariant>* globals_)
 	:m_globals(globals_)
 {
-	m_stk.push( QPair<QWidget*,WidgetState>( root, 0));
+	m_stk.push( widgetVisitorState( root));
 }
 
-static WidgetState widgetInternalEnter( QWidget* widget, WidgetState state, const QByteArray& name)
+WidgetVisitor::WidgetVisitor( const WidgetVisitor::StateR& state, QHash<QByteArray, QVariant>* globals_)
+	:m_globals(globals_)
 {
-	QString clazz = widget->metaObject()->className();
-	if (clazz == "QTreeWidget")
-	{
-
-	}
-	else
-	{
-		return 0;
-	}
-
+	m_stk.push( state);
 }
-
-static WidgetState widgetInternalLeave( QWidget* widget, WidgetState state)
-{
-	return 0;
-}
-
-static QWidget* widgetEnter( QWidget* widget, const QByteArray& name)
-{
-	QString clazz = widget->metaObject()->className();
-
-	if (clazz == "QTreeWidget")
-	{
-
-	}
-	else
-	{
-		return 0;
-	}
-
-}
-
 
 bool WidgetVisitor::enter( const QString& name)
 {
@@ -85,16 +85,15 @@ bool WidgetVisitor::enter( const QString& name)
 bool WidgetVisitor::enter( const QByteArray& name)
 {
 	if (m_stk.empty()) return false;
-	WidgetState state;
-	if ((state = widgetInternalEnter( m_stk.top().first, m_stk.top().second, name)) != 0)
+	if (m_stk.top()->enter( name))
 	{
-		m_stk.top().second = state;
 		return true;
 	}
 	QWidget* wdg;
-	if ((wdg = widgetEnter( m_stk.top().first, name)) != 0)
+	if ((wdg = m_stk.top()->childwidget( name)) != 0)
 	{
-		m_stk.push( QPair<QWidget*,WidgetState>( wdg, 0));
+		///... child widget allocated
+		m_stk.push( widgetVisitorState( wdg));
 		return true;
 	}
 	return false;
@@ -103,163 +102,9 @@ bool WidgetVisitor::enter( const QByteArray& name)
 void WidgetVisitor::leave()
 {
 	if (m_stk.empty()) return;
-	WidgetState state;
-	if ((state = widgetInternalLeave( m_stk.top().first, m_stk.top().second)) != NULL)
-	{
-		m_stk.top().second = state;
-	}
-	else
+	if (!m_stk.top()->leave())
 	{
 		m_stk.pop();
-	}
-}
-
-static bool clearWidgetProperty( QWidget* widget, const QByteArray& name, QVariant data)
-{
-	QString clazz = widget->metaObject()->className();
-
-	if (clazz == "QLineEdit") {
-		QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget);
-		lineEdit->clear();
-	} else if (clazz == "QDateEdit") {
-	} else if (clazz == "QTimeEdit") {
-	} else if (clazz == "QDateTimeEdit") {
-	} else if (clazz == "QComboBox") {
-		QComboBox *comboBox = qobject_cast<QComboBox *>( widget);
-		comboBox->clear();
-	} else if (clazz == "QSpinBox") {
-	} else if (clazz == "QDoubleSpinBox") {
-	} else if (clazz == "QSlider") {
-	} else if (clazz == "QPlainTextEdit") {
-		QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit *>( widget);
-		plainTextEdit->clear();
-	} else if (clazz == "QTextEdit") {
-		QTextEdit *textEdit = qobject_cast<QTextEdit *>( widget);
-		textEdit->clear();
-	} else if (clazz == "QCheckBox") {
-		QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget);
-		checkBox->setChecked( false);
-	} else if (clazz == "QRadioButton") {
-		QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget);
-		radioButton->setChecked( false);
-	} else if (clazz == "QListWidget") {
-		QListWidget *listWidget = qobject_cast<QListWidget *>( widget);
-		listWidget->clear();
-	} else if (clazz == "QTreeWidget") {
-		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget);
-		treeWidget->clear();
-	} else if (clazz == "QTableWidget") {
-		QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget);
-		tableWidget->clearContents();
-		for( int i = tableWidget->rowCount() - 1; i >= 0; i--) {
-			tableWidget->removeRow( i);
-		}
-	} else if (clazz == "FileChooser") {
-		FileChooser *fileChooser = qobject_cast<FileChooser *>( widget);
-		fileChooser->setFileName( "");
-	} else if (clazz == "PictureChooser") {
-		PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget);
-		pictureChooser->setFileName( "");
-	} else if (clazz == "QPushButton") {
-		// skip, ok, buttons can't be reset
-	} else if (clazz == "QGroupBox") {
-		// skip, ok, grouboxes can't be reset
-	} else if (clazz == "QWidget") {
-		// skip, generic widget, don't possibly know how to reset it
-	} else {
-		qWarning() << "Clear for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
-	}
-	qDebug() << "Clearing " << clazz << name;
-}
-
-static bool setWidgetProperty( QWidget* widget, WidgetState state, const QByteArray& name, QVariant data)
-{
-	QString clazz = widget->metaObject()->className();
-	if (clazz == "QComboBox")
-	{
-		QComboBox *comboBox = qobject_cast<QComboBox *>( widget);
-		if (strcmp( name, "value") == 0)
-		{
-			comboBox->addItem( data.toString());
-			return true;
-		}
-		else if (strcmp( name, "value.id") == 0)
-		{
-			if (comboBox->currentIndex() < 0) return false;
-			comboBox->setItemData( comboBox->currentIndex(), data, Qt::UserRole);
-			return true;
-		}
-		else if (strcmp( name, "select") == 0)
-		{
-			int idx = comboBox->findText( data.toString(), Qt::UserRole, Qt::MatchExactly);
-			if (idx < 0) return false;
-			comboBox->currentIndexChanged( idx);
-			return true;
-		}
-		else if (strcmp( name, "select.id") == 0)
-		{
-			int idx = comboBox->findData( data, Qt::UserRole, Qt::MatchExactly);
-			if (idx < 0) return false;
-			comboBox->currentIndexChanged( idx);
-			return true;
-		}
-	}
-	else if (clazz == "QListWidget")
-	{
-		QListWidget *listWidget = qobject_cast<QListWidget *>( widget);
-		if (strcmp( name, "value") == 0)
-		{
-			listWidget->addItem( text);
-			return true;
-		}
-		if (strcmp( name, "select") == 0)
-		{
-			QList<QListWidgetItem *> items = listWidget->findItems( data.toString(), Qt::MatchExactly);
-			foreach( QListWidgetItem *item, items)
-			{
-				item->setSelected( true);
-			}
-		}
-		else
-		{
-			QList<QListWidgetItem *> items = listWidget->findItems( name, Qt::MatchExactly);
-			foreach( QListWidgetItem *item, items)
-			{
-				item->setSelected( data.toBool());
-			}
-		}
-	}
-}
-
-
-static QVariant getWidgetProperty( QWidget* widget, WidgetState state, const QByteArray& name)
-{
-	QString clazz = widget->metaObject()->className();
-	if (clazz == "QComboBox")
-	{
-		QComboBox *comboBox = qobject_cast<QComboBox *>( widget);
-		if (strcmp( name, "select"))
-		{
-			return QVariant( comboBox->currentText());
-		}
-		else if (strcmp( name, "select.id"))
-		{
-			if (comboBox->currentIndex() < 0) return QVariant();
-			return comboBox->itemData( comboBox->currentIndex(), Qt::UserRole);
-		}
-	}
-	else if (clazz == "QListWidget")
-	{
-		if (strcmp( name, "select"))
-		{
-			QListWidget *listWidget = qobject_cast<QListWidget*>( widget);
-			QList<QVariant> rt;
-			foreach( QListWidgetItem *item, listWidget->selectedItems())
-			{
-				rt.append( *item);
-			}
-			return QVariant( rt);
-		}
 	}
 }
 
@@ -268,13 +113,11 @@ QVariant WidgetVisitor::property( const QString& name)
 	return property( name.toAscii());
 }
 
-QVariant property( const QByteArray& name, int level)
+QVariant WidgetVisitor::property( const QByteArray& name, int level)
 {
 	if (m_stk.empty()) return QVariant()/*invalid*/;
 
-	QVariant rt = getWidgetProperty( m_stk.top().first, m_stk.top().second, name);
-	if (rt.isValid()) return rt;
-	QVariant rt = m_stk.top().first->property( name);
+	QVariant rt = m_stk.top()->property( name);
 	if (rt.isValid()) return rt;
 
 	int followidx = name.indexOf( '.');
@@ -282,30 +125,30 @@ QVariant property( const QByteArray& name, int level)
 	{
 		if (level == 0 && name.startsWith( "global."))
 		{
-			return QVariant( m_globals[ name.mid( 7, name.size()-7)]);
+			return (*m_globals)[ name.mid( 7, name.size()-7)];
 		}
 		QByteArray prefix( name.mid( 0, followidx));
 		QByteArray rest( name.mid( followidx+1, name.size()-followidx-1));
-		if (m_stk.enter( prefix))
+		if (enter( prefix))
 		{
-			QVariant rt = property( rest, level+1);
-			m_stk.leave();
+			rt = property( rest, level+1);
+			leave();
 			return rt;
 		}
-		if (level == 0 && m_stk.at(0)->objectName() == prefix)
+		if (level == 0 && m_stk.at(0)->widget()->objectName() == prefix)
 		{
-			WidgetVisitor rootvisit( m_stk.at(0).first, m_stk.at(0).second, m_globals);
+			WidgetVisitor rootvisit( m_stk.at(0), m_globals);
 			return rootvisit.property( rest, 1);
 		}
-		QList<QByteArray> props = m_stk.top().first->dynamicPropertyNames();
-		QList<QByteArray>::const_iterator pi = props.begin(), pi = props.end();
+		QList<QByteArray> props = m_stk.top()->widget()->dynamicPropertyNames();
+		QList<QByteArray>::const_iterator pi = props.begin(), pe = props.end();
 		for (; pi != pe; ++pi)
 		{
 			if (pi->startsWith( "synonym:"))
 			{
 				if (name == pi->mid( 8, pi->size()-8))
 				{
-					QVariant synonym = m_stk.top().first->property( *pi);
+					QVariant synonym = m_stk.top()->widget()->property( *pi);
 					if (synonym.type() == QVariant::String)
 					{
 						return property( synonym.toString());
@@ -328,40 +171,39 @@ QVariant WidgetVisitor::property( const QByteArray& name)
 
 bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, int level)
 {
-	if (m_stk.empty()) return QVariant()/*invalid*/;
-
-	if (setWidgetProperty( m_stk.top().first, m_stk.top().second, name, value)) return true;
-	if (m_stk.top().first->setProperty( name, value)) return true;
+	if (m_stk.empty()) return false;
+	if (m_stk.top()->setProperty( name, value)) return true;
 
 	int followidx = name.indexOf( '.');
 	if (followidx >= 0)
 	{
 		if (level == 0 && name.startsWith( "global."))
 		{
-			m_globals[ name.mid( 7, name.size()-7)] = value;
+			m_globals->insert( name.mid( 7, name.size()-7), value);
+			return true;
 		}
 		QByteArray prefix( name.mid( 0, followidx));
 		QByteArray rest( name.mid( followidx+1, name.size()-followidx-1));
-		if (m_stk.enter( prefix))
+		if (enter( prefix))
 		{
 			bool rt = setProperty( rest, value, level+1);
-			m_stk.leave();
+			leave();
 			return rt;
 		}
-		if (level == 0 && m_stk.at(0)->objectName() == prefix)
+		if (level == 0 && m_stk.at(0)->widget()->objectName() == prefix)
 		{
-			WidgetVisitor rootvisit( m_stk.at(0).first, m_stk.at(0).second, m_globals);
+			WidgetVisitor rootvisit( m_stk.at(0), m_globals);
 			return rootvisit.setProperty( rest, value, 1);
 		}
-		QList<QByteArray> props = m_stk.top().first->dynamicPropertyNames();
-		QList<QByteArray>::const_iterator pi = props.begin(), pi = props.end();
+		QList<QByteArray> props = m_stk.top()->widget()->dynamicPropertyNames();
+		QList<QByteArray>::const_iterator pi = props.begin(), pe = props.end();
 		for (; pi != pe; ++pi)
 		{
 			if (pi->startsWith( "synonym:"))
 			{
 				if (name == pi->mid( 8, pi->size()-8))
 				{
-					QVariant synonym = m_stk.top().first->property( *pi);
+					QVariant synonym = m_stk.top()->widget()->property( *pi);
 					if (synonym.type() == QVariant::String)
 					{
 						return setProperty( synonym.toString(), value);
@@ -374,7 +216,7 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 			}
 		}
 	}
-	return rt;
+	return false;
 }
 
 bool WidgetVisitor::setProperty( const QString& name, const QVariant& value)
@@ -386,4 +228,139 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value)
 {
 	return setProperty( name, value, 0);
 }
+
+struct WidgetVisitorStackElement
+{
+	const char** dataelements;
+	int dataelementidx;
+	QByteArray nameprefix;
+	QList<QByteArray> selectedDataElements;
+	bool isContent;
+
+	WidgetVisitorStackElement()
+		:dataelements(0)
+		,dataelementidx(0)
+		,nameprefix()
+		,isContent(false)
+	{}
+	explicit WidgetVisitorStackElement( const WidgetVisitor::StateR& state, const QByteArray& nameprefix_=QByteArray())
+		:dataelements(state->dataelements())
+		,dataelementidx(0)
+		,nameprefix(nameprefix_)
+		,isContent(false)
+	{
+		QList<QByteArray> dprops = state->widget()->dynamicPropertyNames();
+		if (dprops.contains( "dataelement"))
+		{
+			selectedDataElements = state->widget()->property( "dataelement").toByteArray().split( ',');
+		}
+	}
+	WidgetVisitorStackElement( const WidgetVisitorStackElement& o)
+		:dataelements( o.dataelements)
+		,dataelementidx( o.dataelementidx)
+		,nameprefix( o.nameprefix)
+		,selectedDataElements(o.selectedDataElements)
+		,isContent(o.isContent)
+	{}
+};
+
+static bool isReservedProperty( const QByteArray& key)
+{
+	// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
+	if( key.startsWith( "_q_")) return true;
+	// skip globals
+	if( key.startsWith( "global.")) return true;
+	// skip synonym declarations
+	if( key.startsWith( "synonym:")) return true;
+	// ignore our own actions
+	if( key == "doctype" || key == "rootelement" || key == "dataelement" || key == "action" || key == "initAction" || key == "form" || key == "state")
+	{
+		return true;
+	}
+	return false;
+}
+
+QList<WidgetVisitor::Element> WidgetVisitor::elements()
+{
+	QList<WidgetVisitor::Element> rt;
+	if (m_stk.isEmpty()) return rt;
+
+	QStack<WidgetVisitorStackElement> elemstk;
+	elemstk.push_back( WidgetVisitorStackElement( m_stk.top()));
+
+	while (!m_stk.isEmpty() && !elemstk.isEmpty())
+	{
+		if (elemstk.top().dataelements && elemstk.top().dataelements[ elemstk.top().dataelementidx])
+		{
+			QByteArray elemname( elemstk.top().dataelements[ elemstk.top().dataelementidx]);
+			if (!elemstk.top().selectedDataElements.isEmpty())
+			{
+				QByteArray dm;
+				if (!elemstk.top().nameprefix.isEmpty())
+				{
+					dm.append( elemstk.top().nameprefix);
+				}
+				dm.append( elemname);
+				if (!elemstk.top().selectedDataElements.contains( dm))
+				{
+					++elemstk.top().dataelementidx;
+					continue;
+				}
+			}
+			else if (isReservedProperty( elemname))
+			{
+				++elemstk.top().dataelementidx;
+				continue;
+			}
+			int stksize = m_stk.size();
+			if (enter( elemname))
+			{
+				if (stksize == m_stk.size())
+				{
+					///... if enter is internal in widget then we accumulate data
+					//     element references for comparison with selected data elements
+					QByteArray nameprefix = elemstk.top().nameprefix;
+					nameprefix.append( elemname);
+					nameprefix.push_back( '.');
+					++elemstk.top().dataelementidx;
+					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), nameprefix));
+				}
+				else
+				{
+					++elemstk.top().dataelementidx;
+					elemstk.push_back( WidgetVisitorStackElement( m_stk.top()));
+				}
+				rt.push_back( Element( Element::OpenTag, elemstk.top().dataelements[ elemstk.top().dataelementidx]));
+			}
+			else
+			{
+				QVariant val = property( elemname);
+				if (!elemstk.top().isContent)
+				{
+					if (!val.canConvert( QVariant::Int)) elemstk.top().isContent = false;
+				}
+				if (elemstk.top().isContent)
+				{
+					rt.push_back( Element( Element::OpenTag, elemname));
+					rt.push_back( Element( Element::Value, val));
+					rt.push_back( Element( Element::CloseTag, ""));
+				}
+				else
+				{
+					rt.push_back( Element( Element::Attribute, elemname));
+					rt.push_back( Element( Element::Value, val));
+				}
+				++elemstk.top().dataelementidx;
+			}
+		}
+		else
+		{
+			rt.push_back( Element( Element::CloseTag, ""));
+			elemstk.pop_back();
+			leave();
+		}
+	}
+	return rt;
+}
+
 

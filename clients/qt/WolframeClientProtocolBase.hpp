@@ -31,31 +31,57 @@
 
 ************************************************************************/
 
-#ifndef _DATA_LOADER_INCLUDED
-#define _DATA_LOADER_INCLUDED
+#ifndef _Wolframe_CLIENT_PROTOCOL_BASE_HPP_INCLUDED
+#define _Wolframe_CLIENT_PROTOCOL_BASE_HPP_INCLUDED
 
-#include <QByteArray>
-#include <QStringList>
-#include <QString>
 #include <QObject>
-#include <QHash>
+#include <QString>
+#include <QByteArray>
 
-class DataLoader : public QObject
-{	
-	Q_OBJECT
-	
-	public:
-		virtual ~DataLoader( ) {};
-		
-		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props ) = 0;
+class WolframeClientProtocolBase
+{
+public:
+	WolframeClientProtocolBase()
+		:m_parsestate(InitMode){}
 
-	// for NetworkDataLoader
-	public slots:
-		virtual void gotAnswer( bool /*success*/, const QByteArray& /*tag*/, const QByteArray& /*content*/){}
-		virtual void gotError( QString /* error */ ) { }
-	
-	Q_SIGNALS:
-		void answer( QString formName, QString widgetName, QByteArray xml );
+	void pushData( const QByteArray& buf);
+	void pushData( const char* buf, int bufsize);
+
+	struct Item
+	{
+		enum Type
+		{
+			Data,		//< m_tag=request tag, m_data=unescaped data
+			Line		//< m_tag=command name, m_data=rest of line without CRLF/LF
+		};
+		Type m_type;
+		QByteArray m_tag;		//< item tag
+		QByteArray m_data;	//< item data
+	};
+
+	const Item* getNextItem();
+
+	bool setDataMode();
+	bool setLineMode();
+
+	static QByteArray escapedContent( const QByteArray& data);
+
+private:
+	QByteArray getNextLine();
+	bool hasData() const;
+	bool getItemDataUnescaped();
+
+	enum ParseState
+	{
+		InitMode,
+		LineMode,
+		DataMode
+	};
+	ParseState m_parsestate;
+	Item m_item;
+	QByteArray m_buf;
+	int m_bufpos;
 };
 
-#endif // _DATA_LOADER_INCLUDED
+#endif // _Wolframe_CLIENT_PROTOCOL_BASE_HPP_INCLUDED
+

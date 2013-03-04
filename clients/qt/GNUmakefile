@@ -60,6 +60,12 @@ CPP_OBJS = \
 	moc_DataHandler.o \
 	WolframeClient.o \
 	moc_WolframeClient.o \
+	WolframeClientProtocol.o \
+	WolframeClientProtocolBase.o \
+	WidgetVisitor.o \
+	WidgetVisitor_QComboBox.o \
+	WidgetVisitor_QListWidget.o \
+	WidgetRequest.o \
 	FormWidget.o \
 	moc_FormWidget.o \
 	qcommandline.o \

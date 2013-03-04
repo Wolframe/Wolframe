@@ -43,21 +43,20 @@
 #endif
 
 WolframeClient::WolframeClient( const ConnectionParameters _connParams,	QWidget *_parent )
-	: m_connParams( _connParams ),
-	m_state( Disconnected ),
-	m_parent( _parent ),
-	m_hasErrors( false ),
+	: m_connParams( _connParams )
+	,m_state( Disconnected )
+	,m_parent( _parent )
+	,m_hasErrors( false )
 #ifdef WITH_SSL
-	m_initializedSsl( false ),
+	,m_initializedSsl( false )
 #endif
-	m_command( "CONNECT" ),
-	m_queue( )
 {
 #ifdef WITH_SSL
 	m_socket = new QSslSocket( this );
 #else
 	m_socket = new QTcpSocket( this );
 #endif
+	m_protocol.initSocket( m_socket);
 	m_timeoutTimer = new QTimer( this );
 
 	QObject::connect( m_timeoutTimer, SIGNAL( timeout( ) ),
@@ -237,8 +236,14 @@ void WolframeClient::disconnect( )
 			break;
 
 		case Data:
+			m_protocol.quit();
+			m_protocol.process();
+			m_state = AboutToDisconnect;
+			break;
+
 		case Connected:
-			sendCommand( "QUIT" );
+			m_protocol.quit();
+			m_protocol.process();
 			m_state = AboutToDisconnect;
 			break;
 
@@ -342,6 +347,8 @@ void WolframeClient::privateDisconnected( )
 
 void WolframeClient::dataAvailable( )
 {
+	bool isAuth;
+	bool success;
 	switch( m_state ) {
 		case Disconnected:
 		case AboutToConnect:
@@ -352,239 +359,58 @@ void WolframeClient::dataAvailable( )
 		case AboutToDisconnect:
 		case Connected:
 		case Data:
-			while( m_socket->canReadLine( ) ) {
-				char buf[65535];
-				qint64 len = m_socket->readLine( buf, sizeof( buf ) );
-				if( len < 0 ) {
-					qCritical( ) << "Error when reading line!!";
-					break;
+			isAuth = m_protocol.isAuthorized();
+			success = m_protocol.process();
+			if (!isAuth && m_protocol.isAuthorized())
+			{
+				emit authOk();
+			}
+			if (!success)
+			{
+				if (m_protocol.getLastError())
+				{
+					qCritical() << *m_protocol.getLastError();
+					emit error( tr( "error in protocol: %1").arg( *m_protocol.getLastError()));
 				}
-
-				bool lineSeen = false;
-				if( len > 1 ) {
-					if( buf[len-1] == '\n' ) {
-						buf[len-1] = '\0';
-						lineSeen = true;
-					}
-				}
-				if( len > 2 ) {
-					if( buf[len-2] == '\r' ) {
-						buf[len-2] = '\0';
-						lineSeen = true;
-					}
-				}
-// short buffer, no complete line read
-				if( !lineSeen ) {
-					m_answer.append( buf );
-					continue;
-				}
-// protocol answer
-				if( strncmp( buf, "BYE", 3 ) == 0 ) {
-// BYE has no additional data, one liner
-					emit resultReceived( );
-// ERR has a message, one liner
-				} else if( strncmp( buf, "ERR", 3 ) == 0 ) {
-					m_hasErrors = true;
-					m_state = Connected;
-					emit error( tr( "Protocol error in command %1, received: %2." ).arg( m_command ).arg( buf + 3 ) );
-// still commands in the queue to execute? then do so..
-					if( !m_queue.isEmpty( ) ) {
-						WolframeRequest r = m_queue.dequeue( );
-						sendCommand( r );
-					}
-// OK has a message, one liner
-				} else if( strncmp( buf, "OK", 2 ) == 0 ) {
-					if( len > 3 ) {
-						QString paramLine = QString( QByteArray( buf+3, len-3 ) );
-						m_params = paramLine.split( " " );
-					}
-					emit resultReceived( );
-				} else if( strncmp( buf, "MECHS", 5 ) == 0 ) {
-					if( len > 6 ) {
-						QString paramLine = QString( QByteArray( buf+6, len-6 ) );
-						m_params = paramLine.split( " " );
-					}
-					emit resultReceived( );
-				} else if( strncmp( buf, "ANSWER", 6 ) == 0 ) {
-					//emit resultReceived( );
-					m_answer = "";
-// end of message marker
-				} else if( len > 0 && buf[0] == '.' && buf[1] == '\0' ) {
-					// do not read that
-// escaping of a single dot on a line
-				} else if( len > 1 && buf[0] == '.' && buf[1] == '.' && buf[2] == '\0' ) {
-					// escaped dot
-					m_answer.append( "." );
-				} else {
-					m_answer.append( buf );
-				}
-// generic clients (aka debug window)
-				emit lineReceived( QString( QByteArray( buf, len ) ) );
+				break;
+			}
+			if (m_protocol.getAnswerTag())
+			{
+				emit resultReceived();
 			}
 			break;
 
-		default:
-			emit error( tr( "ILLEGAL STATE %1 in dataAvailable!" ).arg( m_state ) );
-	}
-}
-
-void WolframeClient::sendLine( QString line )
-{
-	qint64 res;
-
-	switch( m_state ) {
-		case Connected:
-		case Data:
-			res = m_socket->write( line.toAscii( ).append( "\n" ) );
-			if( res < 0 ) {
-				qCritical( ) << "Write error!!";
-				break;
-			} else if( res != line.toAscii( ).length( ) + 1 ) {
-				qCritical( ) << "Partial write!" << res << line.toAscii( ).length( );
-				break;
-			}
-			m_socket->flush( );
-			emit lineSent( line );
-			break;
-
-		case AboutToConnect:
-		case AboutToDisconnect:
-		case Disconnected:
 		default:
 			emit error( tr( "ILLEGAL STATE %1 in dataAvailable!" ).arg( m_state ) );
 	}
 }
 
 // high-level
-
-void WolframeClient::sendCommand( QString command, QStringList params, QString content )
+void WolframeClient::request( const QByteArray& tag, const QByteArray& content )
 {
-	switch( m_state ) {
-		case Connected:
-			{
-			m_state = Data;
-			m_answer = "";
-			m_command = command;
-			m_hasErrors = false;
-
-// append params to command, send command line
-			QString line;
-			line.append( command );
-			foreach( QString param, params ) {
-				line.append( ' ' );
-				line.append( param );
-			}
-			sendLine( line );
-
-// send content, and terminate it
-// TODO: how to distinguuish between no content (AUTH) and empty content
-// (REQUEST)?
-			if( !content.isEmpty( ) ) {
-				QStringList lines = content.split( "\n" );
-				foreach( line, lines ) {
-					sendLine( line );
-				}
-				sendLine( "." );
-			}
-			}
-			break;
-
-		case AboutToConnect:
-		case Data:
-			{
-				struct WolframeRequest r( command, params, content );
-				m_queue.enqueue( r );
-			}
-			break;
-
-		case AboutToDisconnect:
-		case Disconnected:
-		default:
-			emit error( tr( "ILLEGAL STATE %1 in dataAvailable!" ).arg( m_state ) );
-	}
-}
-
-void WolframeClient::sendCommand( struct WolframeRequest r )
-{
-	sendCommand( r.command, r.params, r.content );
-}
-
-void WolframeClient::sendCommand( QString command, QStringList params )
-{
-	sendCommand( command, params, QString( ) );
-}
-
-void WolframeClient::sendCommand( QString command )
-{
-	sendCommand( command, QStringList( ), QString( ) );
-}
-
-void WolframeClient::sendCommand( QString command, QString content )
-{
-	sendCommand( command, QStringList( ), content );
-}
-
-void WolframeClient::capa( )
-{
-	sendCommand( "CAPA" );
-}
-
-void WolframeClient::auth( )
-{
-	sendCommand( "AUTH" );
-}
-
-void WolframeClient::mech( QString _mech )
-{
-	QStringList params;
-	params << _mech;
-	sendCommand( "MECH", params );
-}
-
-void WolframeClient::request( QString type, QString content )
-{
-	QStringList params;
-	params << type;
-	sendCommand( "REQUEST", params, content );
-}
-
-void WolframeClient::request( QString content )
-{
-	sendCommand( "REQUEST", content );
+	m_protocol.pushRequest( tag, content);
 }
 
 void WolframeClient::handleResult( )
 {
 	m_state = Connected;
 
-	qDebug( ) << "handle result of command" << m_command;
-	//<< "\nparams:" << m_params << "\n:answer:" << m_answer;
-	if( m_command == "CONNECT" ) {
-		// swallow greeting line from server after connect
-		emit connected( );
-	} else if( m_command == "QUIT" ) {
-		// forget outstanding commands after QUIT!
-		m_queue.clear( );
-		emit disconnected( );
-	} else if( m_command == "AUTH" ) {
-		emit mechsReceived( m_params );
-	} else if( m_command == "MECH" ) {
-		if( m_params[0] == "authorization" ) {
-			emit authOk( );
-		} else {
-			emit authFailed( );
-		}
-	} else if( m_command == "CAPA" ) {
-		emit capasReceived( m_params );
-	} else if( m_command == "REQUEST" ) {
-		emit answerReceived( m_params, m_answer );
-	}
+	const QByteArray* tag;
+	while ((tag=m_protocol.getAnswerTag()) != 0)
+	{
+		bool success = m_protocol.getAnswerSuccess();
+		const QByteArray* content = m_protocol.getAnswerContent();
+		m_protocol.removeAnswer();
 
-// still commands in the queue to execute? then do so..
-	if( !m_queue.isEmpty( ) ) {
-		WolframeRequest r = m_queue.dequeue( );
-		sendCommand( r );
+		qDebug( ) << "handle result of command" << *tag;
+		emit answerReceived( success, *tag, *content);
 	}
+}
+
+void WolframeClient::auth()
+{
+	m_protocol.authorize();
+	m_protocol.process();
 }
 
 bool WolframeClient::isConnected( ) const
