@@ -95,6 +95,7 @@ class WidgetVisitor
 		///\return true on success
 		bool setProperty( const QString& name, const QVariant& value);
 
+		///\brief Element of serialization of widget data
 		class Element
 		{
 		public:
@@ -112,7 +113,7 @@ class WidgetVisitor
 		};
 
 		///\class State
-		///\brief State on WidgetVisitor stack
+		///\brief State on WidgetVisitor stack. Implemented for every widget type supported
 		struct State
 		{
 			explicit State( QWidget* widget_)
@@ -136,6 +137,8 @@ class WidgetVisitor
 		};
 		typedef QSharedPointer<State> StateR;
 
+		///\brief Get a serialization of all visible widget elements of the current state
+		///\remark Takes the dynamic property 'dataelement' into account for element selection and resolves variable references in values
 		QList<Element> elements();
 
 	private:
@@ -150,9 +153,9 @@ class WidgetVisitor
 		///\return true on success
 		bool setProperty( const QByteArray& name, const QVariant& value, int level);
 
+		///\brief Constructor internal
 		WidgetVisitor( const StateR& state, QHash<QByteArray, QVariant>* globals_);
 
-		enum {MaxIdentifierSize=0xFF};			//< internal maximum identifier length
 		QStack<StateR> m_stk;				//< stack of visited widget nodes (first) with their select state (second). The current node is the top element
 		QHash<QByteArray, QVariant>* m_globals;		//< global variables
 };
