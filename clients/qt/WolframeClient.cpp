@@ -400,10 +400,11 @@ void WolframeClient::handleResult( )
 	{
 		bool success = m_protocol.getAnswerSuccess();
 		const QByteArray* content = m_protocol.getAnswerContent();
-		m_protocol.removeAnswer();
 
 		qDebug( ) << "handle result of command" << *tag;
 		emit answerReceived( success, *tag, *content);
+
+		m_protocol.removeAnswer();
 	}
 }
 

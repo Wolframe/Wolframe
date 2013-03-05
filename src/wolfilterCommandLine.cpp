@@ -218,10 +218,11 @@ struct WolfilterOptionStruct
 			( "version,v", "print version" )
 			( "help,h", "print help message" )
 			( "loglevel,l", po::value<std::string>(), "specify the log level on console" )
+			( "verbosity,t", po::value< std::vector<std::string> >()->multitoken()->zero_tokens(), "variant of option --loglevel: Raise verbosity level with (-t,-tt,-ttt,..)" )
 			( "input,f", po::value<std::string>(), "specify input file to process by path" )
 			( "input-filter,i", po::value<std::string>(), "specify input filter by name" )
 			( "output-filter,o", po::value<std::string>(), "specify output filter by name" )
-			( "filter,t", po::value<std::string>(), "specify input/output filter by name (if not specified separately)" )
+			( "filter,e", po::value<std::string>(), "specify input/output filter by name (if not specified separately)" )
 			( "module,m", po::value< std::vector<std::string> >(), "specify module to load by path" )
 			( "program,p", po::value< std::vector<std::string> >(), "specify program to load by path" )
 			( "config,c", po::value<std::string>(), "specify configuration file to load" )
@@ -254,10 +255,24 @@ WolfilterCommandLine::WolfilterCommandLine( int argc, char** argv, const std::st
 	}
 	m_printversion = vmap.count( "version");
 	m_printhelp = vmap.count( "help");
-	if (vmap.count( "loglevel"))
+	int tracelevel = vmap.count( "verbosity");
+	bool loglevel_set = vmap.count( "loglevel");
+	if (loglevel_set && tracelevel)
+	{
+		throw std::runtime_error( "incompatible options: --loglevel (-l) specified with --verbosity (-t)");
+	}
+	if (loglevel_set)
 	{
 		m_loglevel = vmap["loglevel"].as<std::string>();
 		_Wolframe::log::LogBackend::instance().setConsoleLevel( log::LogLevel::strToLogLevel( m_loglevel));
+	}
+	if (tracelevel)
+	{
+		m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_WARNING;
+		if (tracelevel >= 2) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_INFO;
+		if (tracelevel >= 3) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DEBUG;
+		if (tracelevel >= 4) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_TRACE;
+		if (tracelevel >= 5) m_loglevel = _Wolframe::log::LogLevel::LOGLEVEL_DATA;
 	}
 	if (vmap.count( "config"))
 	{

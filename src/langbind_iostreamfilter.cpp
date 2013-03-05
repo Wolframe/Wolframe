@@ -194,7 +194,7 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 		case InputFilter::Error:
 		{
 			std::ostringstream msg;
-			msg << "error in input filter " << iflt->getError() << "'";
+			msg << "error processing input: '" << iflt->getError() << "'";
 			throw std::runtime_error( msg.str());
 		}
 	}
@@ -210,7 +210,7 @@ static void processIO( BufferStruct& buf, InputFilter* iflt, OutputFilter* oflt,
 		case OutputFilter::Error:
 		{
 			std::ostringstream msg;
-			msg << "error in output filter " << oflt->getError() << "'";
+			msg << "error writing output: '" << oflt->getError() << "'";
 			throw std::runtime_error( msg.str());
 		}
 	}
