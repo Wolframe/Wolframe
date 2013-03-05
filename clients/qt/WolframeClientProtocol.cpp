@@ -110,10 +110,14 @@ bool WolframeClientProtocol::hasRequests() const
 
 bool WolframeClientProtocol::poll()
 {
-	char buf[ 0x4000];
-	qint64 len = m_socket->read( buf, sizeof(buf));
-	if (len < 0) return false;
-	pushData( buf, len);
+	for (;;)
+	{
+		char buf[ 0x4000];
+		qint64 len = m_socket->read( buf, sizeof(buf));
+		if (len < 0) return false;
+		pushData( buf, len);
+		if (len < sizeof(buf)) break;
+	}
 	return true;
 }
 
