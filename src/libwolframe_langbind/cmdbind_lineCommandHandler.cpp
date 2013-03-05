@@ -146,6 +146,7 @@ bool LineCommandHandler::redirectInput( void* data, std::size_t datasize, cmdbin
 	for (;;) switch (toh->nextOperation())
 	{
 		case cmdbind::CommandHandler::READ:
+			toh->setInputBuffer( m_input.ptr(), m_input.size());
 			return true;
 		case cmdbind::CommandHandler::WRITE:
 			toh->getOutput( toh_output, toh_outputsize);
@@ -154,6 +155,7 @@ bool LineCommandHandler::redirectInput( void* data, std::size_t datasize, cmdbin
 		case cmdbind::CommandHandler::CLOSE:
 			error = toh->lastError();
 			if (error) { LOG_ERROR << "error redirect input: " << error; }
+			toh->setInputBuffer( m_input.ptr(), m_input.size());
 			return false;
 	}
 }
