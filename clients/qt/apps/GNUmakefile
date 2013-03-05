@@ -1,6 +1,6 @@
 TOPDIR = ../../..
 
-SUBDIRS = testcases configurator
+SUBDIRS = testcases
 
 -include $(TOPDIR)/makefiles/gmake/sub.mk
 

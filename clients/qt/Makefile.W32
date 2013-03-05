@@ -2,7 +2,7 @@ TOPDIR = ..\..
 
 # do this manually, nmake is broken!
 #SUBDIRS = plugins
-SUBDIRS = apps
+SUBDIRS = tests
 
 !INCLUDE $(TOPDIR)\makefiles\nmake\platform.mk
 
@@ -266,19 +266,9 @@ zip:
 	-del qtclient.zip
 	-del /s /q C:\qtclient\*
 	-rmdir C:\qtclient\i18n
-	-rmdir C:\qtclient\apps\configurator\private
-	-rmdir C:\qtclient\apps\configurator\certs
-	-rmdir C:\qtclient\apps\configurator\data
-	-rmdir C:\qtclient\apps\configurator\i18n
-	-rmdir C:\qtclient\apps\configurator\forms
-	-rmdir C:\qtclient\apps\configurator\resources
-	-rmdir C:\qtclient\apps\configurator
-	-rmdir C:\qtclient\apps
 	-rmdir C:\qtclient\imageformats
 	-rmdir C:\qtclient
 	mkdir C:\qtclient
-	mkdir C:\qtclient\apps
-	mkdir C:\qtclient\apps\configurator
 	mkdir C:\qtclient\i18n
 	mkdir C:\qtclient\imageformats
 	copy qtclient.exe C:\qtclient
@@ -291,7 +281,6 @@ zip:
 	copy "$(OPENSSL_DIR)\bin\ssleay32.dll" C:\qtclient
 	copy plugins\wolframewidgets.dll C:\qtclient
 	xcopy /e i18n C:\qtclient\i18n
-	xcopy /e apps\configurator C:\qtclient\apps\configurator
 	copy C:\windows\system32\msvcp100d.dll C:\qtclient
 	copy C:\windows\system32\msvcr100d.dll C:\qtclient
 	cscript /nologo zip.vbs %TEMP%\qtclient.zip C:\qtclient

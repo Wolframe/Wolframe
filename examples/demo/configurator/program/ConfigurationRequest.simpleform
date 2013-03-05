@@ -1,7 +1,0 @@
-FORM ConfigurationRequest
-{
-	configuration
-	{
-		id @int
-	}
-}

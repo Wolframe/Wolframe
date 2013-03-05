@@ -1,8 +1,0 @@
-FORM ConfigurationSubconfigListRequest
-{
-	ConfigurationSubconfig
-	{
-		config_id @int
-		id @int
-	}
-}

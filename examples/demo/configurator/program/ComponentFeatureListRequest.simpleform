@@ -1,8 +1,0 @@
-FORM ComponentFeatureListRequest
-{
-	ComponentFeature
-	{
-		component_id @int
-		id @int
-	}
-}

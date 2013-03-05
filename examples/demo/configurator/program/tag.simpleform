@@ -1,8 +1,0 @@
-FORM Tag
-{
-	id @int
-	parentID @int
-	name string
-	normalizedName string
-	description string
-}

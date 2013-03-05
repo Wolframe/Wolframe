@@ -1,8 +1,0 @@
-FORM ConfigurationComponentListRequest
-{
-	ConfigurationComponent
-	{
-		config_id @int
-		id @int
-	}
-}
