@@ -541,7 +541,7 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 		widget->setFocus( );
 	}
 	
-	qDebug( ) << "Reset " << clazz << name;
+	//[+]qDebug( ) << "Reset " << clazz << name;
 }
 
 void DataHandler::resetFormData( QWidget *form )
@@ -590,7 +590,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *wi
 		// the calling code generic..
 	}
 	
-	qDebug( ) << "Domain load in " << clazz << name;
+	//[+]qDebug( ) << "Domain load in " << clazz << name;
 }
 
 void DataHandler::loadFormDomains( QString form_name, QWidget *form )
@@ -615,7 +615,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 	QWidget *widget = form->findChild<QWidget *>( widget_name );
 	QString clazz = widget->metaObject( )->className( ); 
 
-	qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
+	//[+]qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
 
 	QXmlStreamReader xml( data );
 	if( clazz == "QComboBox" ) {
@@ -1128,7 +1128,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 {
 	QStringList parts = variable.split( "." );
 
-	qDebug( ) << "Evaluating variable" << variable;
+	//[+]qDebug( ) << "Evaluating variable" << variable;
 
 // expecting a widget name as first argument
 	if( parts.count() == 0 ) {

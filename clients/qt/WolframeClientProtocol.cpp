@@ -45,7 +45,6 @@ bool WolframeClientProtocol::sendCommandLine( const QByteArray& cmd, const QByte
 
 bool WolframeClientProtocol::sendLine( const QByteArray& line)
 {
-	qDebug() << "sending line:" << line;
 	qint64 status = m_socket->write( QByteArray( line).append( "\r\n"));
 	if (status < 0)
 	{
@@ -58,6 +57,7 @@ bool WolframeClientProtocol::sendLine( const QByteArray& line)
 		m_lasterror = "write line failed (only partial write on socket)";
 		return false;
 	}
+	qDebug() << "send line:" << line;
 	return true;
 }
 
@@ -66,7 +66,6 @@ bool WolframeClientProtocol::sendRequestContent()
 	if (m_requestqueue.isEmpty()) return false;
 	QByteArray escdata = WolframeClientProtocolBase::escapedContent( m_requestqueue.head().second);
 	escdata.append( "\r\n.\r\n");
-	qDebug() << "network send content (esc):" << escdata;
 	qint64 status = m_socket->write( escdata);
 	if (status < 0)
 	{
@@ -79,6 +78,7 @@ bool WolframeClientProtocol::sendRequestContent()
 		m_lasterror = "write request content failed (only partial write on socket)";
 		return false;
 	}
+	qDebug() << "network send content (esc" << status <<"):" << escdata;
 	m_requesttagqueue.enqueue( m_requestqueue.head().first);
 	m_requestqueue.dequeue();
 	return true;
@@ -94,11 +94,13 @@ QByteArray WolframeClientProtocol::nextAnswerTag()
 void WolframeClientProtocol::pushAnswerError( const QByteArray& msg)
 {
 	m_errorqueue.enqueue( qMakePair( nextAnswerTag(), msg));
+	qDebug() << "answer queue size (push) =" << m_errorqueue.size() + m_answerqueue.size();
 }
 
 void WolframeClientProtocol::pushAnswerContent( const QByteArray& content)
 {
 	m_answerqueue.enqueue( qMakePair( nextAnswerTag(), content));
+	qDebug() << "answer queue size (push) =" << m_errorqueue.size() + m_answerqueue.size();
 }
 
 bool WolframeClientProtocol::hasRequests() const
@@ -106,13 +108,18 @@ bool WolframeClientProtocol::hasRequests() const
 	return !m_requestqueue.isEmpty();
 }
 
-bool WolframeClientProtocol::process()
+bool WolframeClientProtocol::poll()
 {
 	char buf[ 0x4000];
 	qint64 len = m_socket->read( buf, sizeof(buf));
 	if (len < 0) return false;
 	pushData( buf, len);
+	return true;
+}
 
+bool WolframeClientProtocol::process()
+{
+	poll();
 	const Item* item = 0;
 
 	for (;;)
@@ -226,6 +233,7 @@ bool WolframeClientProtocol::process()
 				return false;
 
 			case AuthorizedIdle:
+				poll();
 				item = getNextItem();
 				if (item)
 				{
@@ -341,6 +349,7 @@ bool WolframeClientProtocol::getAnswerSuccess() const
 
 const QByteArray* WolframeClientProtocol::getAnswerTag() const
 {
+	qDebug() << "answer queue size (pull) =" << m_errorqueue.size() + m_answerqueue.size();
 	if (m_errorqueue.isEmpty())
 	{
 		if (m_answerqueue.isEmpty()) return 0;

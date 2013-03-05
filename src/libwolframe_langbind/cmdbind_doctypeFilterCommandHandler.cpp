@@ -44,6 +44,7 @@ DoctypeFilterCommandHandler::DoctypeFilterCommandHandler()
 	:m_state(Init)
 	,m_lastchar('\n')
 	,m_nullcnt(0)
+	,m_inputidx(0)
 {}
 
 DoctypeFilterCommandHandler::~DoctypeFilterCommandHandler()
@@ -85,45 +86,51 @@ void DoctypeFilterCommandHandler::setState( State state_)
 
 void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytesTransferred)
 {
-	const char* inp = (const char*) begin;
-	std::size_t ii = 0;
-	m_inputbuffer.append( inp, bytesTransferred);
+	const char* inp = m_input.charptr();
+	std::size_t startidx = (const char*)begin - m_input.charptr();
+	std::size_t endidx = bytesTransferred + startidx;
+	if (endidx > m_input.size())
+	{
+		throw std::logic_error( "illegal input range passed to DoctypeFilterCommandHandler");
+	}
+	m_input.setPos( endidx);
+	m_inputidx = startidx;
 
 	LOG_TRACE << "STATE DoctypeCommandHandler " << stateName( m_state) << " (put input)";
 	try
 	{
-		for (; ii<bytesTransferred && m_state != Done; ++ii)
+		for (; m_inputidx<endidx && m_state != Done; ++m_inputidx)
 		{
-			if (!inp[ii])
+			if (!inp[m_inputidx])
 			{
 				++m_nullcnt;
 				if (m_nullcnt > 4) throw_error( "Unknown encoding");
 			}
 			else
 			{
-				if (m_lastchar == '\n' && inp[ii] == '.')
+				if (m_lastchar == '\n' && inp[m_inputidx] == '.')
 				{
 					setState( Done);
 					break;
 				}
-				m_lastchar = inp[ii];
+				m_lastchar = inp[m_inputidx];
 				m_nullcnt = 0;
 
 				switch (m_state)
 				{
 					case Init:
-						if (inp[ii] == '<')
+						if (inp[m_inputidx] == '<')
 						{
 							setState( ParseHeader0);
 						}
-						else if (inp[ii] < 0 || inp[ii] > 32)
+						else if (inp[m_inputidx] < 0 || inp[m_inputidx] > 32)
 						{
 							throw_error( "expected '<?'");
 						}
 						break;
 
 					case ParseHeader0:
-						if (inp[ii] == '?')
+						if (inp[m_inputidx] == '?')
 						{
 							setState( ParseHeader);
 						}
@@ -134,7 +141,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						break;
 
 					case ParseHeader:
-						if (inp[ii] == '>')
+						if (inp[m_inputidx] == '>')
 						{
 							const char* cc = std::strstr( m_itembuf.c_str(), "standalone");
 							if (cc)
@@ -152,7 +159,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						}
 						else
 						{
-							m_itembuf.push_back( inp[ii]);
+							m_itembuf.push_back( inp[m_inputidx]);
 							if (m_itembuf.size() > 128)
 							{
 								throw_error( "XML header not terminated");
@@ -161,18 +168,18 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						break;
 
 					case SearchDoctypeTag:
-						if (inp[ii] == '<')
+						if (inp[m_inputidx] == '<')
 						{
 							setState( ParseDoctype0);
 						}
-						else if (inp[ii] < 0 || inp[ii] > 32)
+						else if (inp[m_inputidx] < 0 || inp[m_inputidx] > 32)
 						{
 							throw_error( "expected '<!'");
 						}
 						break;
 
 					case ParseDoctype0:
-						if (inp[ii] == '!')
+						if (inp[m_inputidx] == '!')
 						{
 							setState( ParseDoctype1);
 						}
@@ -183,13 +190,13 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						break;
 
 					case ParseDoctype1:
-						if (inp[ii] == '-')
+						if (inp[m_inputidx] == '-')
 						{
 							setState( SkipComment);
 						}
-						else if (inp[ii] == 'D')
+						else if (inp[m_inputidx] == 'D')
 						{
-							m_itembuf.push_back( inp[ii]);
+							m_itembuf.push_back( inp[m_inputidx]);
 							setState( ParseDoctype2);
 						}
 						else
@@ -199,14 +206,14 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						break;
 
 					case SkipComment:
-						if (inp[ii] == '>')
+						if (inp[m_inputidx] == '>')
 						{
 							setState( SearchDoctypeTag);
 						}
 						break;
 
 					case ParseDoctype2:
-						if (inp[ii] <= ' ' && inp[ii] > 0)
+						if (inp[m_inputidx] <= ' ' && inp[m_inputidx] > 0)
 						{
 							if (m_itembuf != "DOCTYPE")
 							{
@@ -217,7 +224,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						}
 						else
 						{
-							m_itembuf.push_back( inp[ii]);
+							m_itembuf.push_back( inp[m_inputidx]);
 							if (m_itembuf.size() > 8)
 							{
 								throw_error( "expected '<!DOCTYPE'");
@@ -226,18 +233,18 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 						break;
 
 					case ParseDoctype:
-						if (inp[ii] <= ' ' && inp[ii] > 0)
+						if (inp[m_inputidx] <= ' ' && inp[m_inputidx] > 0)
 						{
 							m_doctype.push_back( ' ');
 						}
-						else if (inp[ii] == '>')
+						else if (inp[m_inputidx] == '>')
 						{
 							m_doctypeid = types::getIdFromDoctype( m_doctype);
 							setState( Done);
 						}
 						else
 						{
-							m_doctype.push_back( inp[ii]);
+							m_doctype.push_back( inp[m_inputidx]);
 						}
 						break;
 
@@ -253,6 +260,7 @@ void DoctypeFilterCommandHandler::putInput( const void *begin, std::size_t bytes
 		LOG_ERROR << "error in document type recognition: " << err.what();
 		m_state = Done;
 	}
+	m_inputbuffer.append( (const char*)begin, (m_inputidx - startidx));
 }
 
 void DoctypeFilterCommandHandler::getInputBlock( void*& begin, std::size_t& maxBlockSize)
@@ -269,8 +277,8 @@ void DoctypeFilterCommandHandler::getOutput( const void*& begin, std::size_t& by
 
 void DoctypeFilterCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 {
-	begin = m_input.ptr();
-	nofBytes = 0;
+	begin = (const void*)(m_input.charptr() + m_inputidx);
+	nofBytes = m_input.pos() - m_inputidx;
 }
 
 void DoctypeFilterCommandHandler::getInputBuffer( void*& begin, std::size_t& nofBytes)

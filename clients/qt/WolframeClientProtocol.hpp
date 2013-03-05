@@ -115,6 +115,7 @@ class WolframeClientProtocol
 		bool isAuthorized() const				{return (int)m_state >= (int)AuthorizedIdle;}
 		void authorize()					{m_gotAuthorize = true;}
 	private:
+		bool poll();
 		bool sendLine( const QByteArray& line);
 		bool sendCommandLine( const QByteArray& cmd, const QByteArray& arg);
 		bool sendRequestContent();

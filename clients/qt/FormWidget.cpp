@@ -98,7 +98,7 @@ void FormWidget::storeToGlobals( QHash<QString, QString> *props )
 		}
 	}
 	
-	qDebug( ) << "GLOBALS:" << *m_globals;
+	//[+]qDebug( ) << "GLOBALS:" << *m_globals;
 }
 
 void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
@@ -129,7 +129,7 @@ void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
 				}
 			}
 		}
-		qDebug( ) << "GLOBALS SUBSTITUTE" << key << props->value( key );
+		//[+]qDebug( ) << "GLOBALS SUBSTITUTE" << key << props->value( key );
 	}
 }
 

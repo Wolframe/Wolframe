@@ -118,6 +118,7 @@ private:
 	char m_lastchar;				//< last character parsed
 	unsigned char m_nullcnt;			//< number of null characters parsed in a row
 	protocol::InputBlock m_input;			//< input buffer
+	std::size_t m_inputidx;				//< index in input buffer
 	protocol::CharBuffer m_inputbuffer;		//< buffer for consumed input (is returned to caller because this is a preprocessing command handler)
 	std::string m_itembuf;				//< item parsed (value depending on state)
 	std::string m_doctype;				//< document type extracted
