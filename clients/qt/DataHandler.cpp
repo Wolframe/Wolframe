@@ -679,7 +679,11 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 						QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 // HACK: hard-coded, don't have types in the XML (like 'binary, base64 encoded')
 						if( xml.name( ) == "thumbnail" ) {
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+							QByteArray encoded = text.toLatin1( );
+#else
 							QByteArray encoded = text.toAscii( );
+#endif
 							QByteArray decoded = QByteArray::fromBase64( encoded );
 
 							QPixmap pixmap;
@@ -920,7 +924,11 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 		} else {
 			if( inForm ) {
 				if( xml.isStartElement( ) ) {
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+					widget = form->findChild<QWidget *>( xml.name( ).toString( ) );
+#else
 					widget = qFindChild<QWidget *>( form, xml.name( ).toString( ) );
+#endif
 					qDebug( ) << "Reading from XML for" << xml.name( ) << "into" << widget;
 					if( widget ) {
 						clazz = widget->metaObject( )->className( );
@@ -1077,7 +1085,11 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 						} else if( clazz == "PictureChooser" ) {
 							PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+							QByteArray encoded = text.toLatin1( );
+#else
 							QByteArray encoded = text.toAscii( );
+#endif
 							QByteArray decoded = QByteArray::fromBase64( encoded );
 							pictureChooser->setPicture( decoded );
 						} else if( clazz == "QPushButton" ) {
@@ -1091,7 +1103,11 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							if( xml.name( ) == "image" || xml.name( ) == "thumbnail" ) {
 // HACK: no types -> detect pictures by name							
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+								QByteArray encoded = text.toLatin1( );
+#else
 								QByteArray encoded = text.toAscii( );
+#endif
 								QByteArray decoded = QByteArray::fromBase64( encoded );
 								QPixmap p;
 								p.loadFromData( decoded );	
@@ -1144,7 +1160,11 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 	}
 	QString property = parts[1];
 	
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+	QWidget *widget = form->findChild<QWidget *>( name );
+#else
 	QWidget *widget = qFindChild<QWidget *>( form, name );
+#endif
 // no widget found with that name
 	if( !widget ) {
 		qWarning( ) << "Unknown widget" << name << "in variable" << variable << "of form" << form;

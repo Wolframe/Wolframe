@@ -280,7 +280,11 @@ void FormWidget::writeDynamicStringProperty( QObject *o, const char *name, const
 void FormWidget::readDynamicStringProperties( QHash<QString, QString> *props, QObject *o )
 {
 	foreach( QByteArray b, o->dynamicPropertyNames( ) ) {
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+		QString propName = QString::fromLatin1( b.data( ) );
+#else
 		QString propName = QString::fromAscii( b.data( ) );
+#endif
 		QString propValue = readDynamicStringProperty( o, b.data( ) );
 		props->insert( propName, propValue );
 	}
@@ -414,7 +418,11 @@ void FormWidget::sendRequest( QHash<QString, QString> *props )
 		}
 		QString function = parts[1];
 		
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+		QWidget *widget = m_ui->findChild<QWidget *>( name );
+#else
 		QWidget *widget = qFindChild<QWidget *>( m_ui, name );
+#endif
 		// no widget found with that name
 		if( !widget ) {
 			qWarning( ) << "Unknown widget" << name << "in action" << action << "of form" << m_form;
