@@ -22,11 +22,6 @@ INCLUDE_DIRS = \
 	-I$(QT_INCLUDE_DIR)/QtDesigner \
 	-I$(QT_INCLUDE_DIR)/QtUiTools
 	
-ifeq ($(QT_VERSION),5)
-INCLUDE_DIRS += \
-	-I$(QT_INCLUDE_DIR)/QtWidgets
-endif
-
 INCLUDE_LDFLAGS = \
 	-L$(QT_DIR)/lib \
 	-L$(QT_LIB_DIR) \

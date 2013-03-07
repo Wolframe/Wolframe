@@ -98,36 +98,6 @@ void MainWindow::readSettings( )
 	}
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-static void myMessageOutput( QtMsgType type, const QMessageLogContext & /*context*/, const QString &msg )
-{
-	switch( type ) {
-		case QtDebugMsg:
-			if( _debug ) {
-				if( _debugTerminal ) {
-					_debugTerminal->sendComment( msg );
-				}
-				fprintf( stderr, "%s\n", qPrintable( msg ) );
-			}
-			break;
-
-		case QtWarningMsg:
-			fprintf( stderr, "WARNING: %s\n", qPrintable( msg ) );
-			break;
-
-		case QtCriticalMsg:
-			fprintf( stderr, "CRITICAL: %s\n", qPrintable( msg ) );
-			break;
-
-		case QtFatalMsg:
-			fprintf( stderr, "FATAL: %s\n", qPrintable( msg ) );
-			break;
-
-		default:
-			break;
-	}
-}
-#else
 static void myMessageOutput( QtMsgType type, const char *msg )
 {
 	switch( type ) {
@@ -156,7 +126,6 @@ static void myMessageOutput( QtMsgType type, const char *msg )
 			break;
 	}
 }
-#endif
 
 MainWindow::~MainWindow( )
 {
@@ -254,11 +223,7 @@ void MainWindow::parseError( const QString &error )
 void MainWindow::initialize( )
 {
 // install custom output handler (mainly for Unix debugging)
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	qInstallMessageHandler( &myMessageOutput );
-#else
 	qInstallMsgHandler( &myMessageOutput );
-#endif
 
 // a Qt UI loader for the main theme window and also used by all form widgets
 	m_uiLoader = new QUiLoader( );
@@ -584,11 +549,7 @@ void MainWindow::languageCodesLoaded( QStringList languages )
 	m_languages = languageCodes;
 
 // does the menu exist?
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	QMenu *languageMenu = this->findChild<QMenu *>( "menuLanguages" );
-#else
 	QMenu *languageMenu = qFindChild<QMenu *>( this, "menuLanguages" );
-#endif
 	if( !languageMenu ) return;
 
 // construct a menu showing all languages
@@ -1063,11 +1024,7 @@ void MainWindow::updateMdiMenusAndToolbars( )
 	activateAction( "actionCascade", nofSubWindows( ) > 0 );
 
 // recreate the subwindow menu and mark the currently selected submenu
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	QMenu *windowMenu = this->findChild<QMenu *>( "menuWindow" );
-#else
 	QMenu *windowMenu = qFindChild<QMenu *>( this, "menuWindow" );
-#endif
 	if( windowMenu ) {
 		m_subWinMap.clear( );
 		m_revSubWinMap.clear( );

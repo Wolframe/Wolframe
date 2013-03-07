@@ -418,12 +418,8 @@ void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 	m_map->remove( docType );
 	
 	qDebug( ) << "ANSWER for form" << formName << "and widget" << widgetName;
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	emit answer( formName, widgetName, content.toLatin1( ) );
-#else
+	
 	emit answer( formName, widgetName, content.toAscii( ) );
-#endif
 }
 
 void NetworkDataLoader::gotError( QString error )

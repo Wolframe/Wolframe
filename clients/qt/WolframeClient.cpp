@@ -134,13 +134,7 @@ QSslCertificate WolframeClient::getCertificate( QString filename )
 	if( cert.isNull( ) )
 		emit error( tr( "empty certificate in file %1" ).arg( filename ) );
 
-	// TODO: check for dates separatly, the name isValid is misleading
-	// as it doesn't check for valid dates!
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-	if( !cert.isBlacklisted( ) )
-#else
 	if( !cert.isValid( ) )
-#endif
 		emit error( tr( "certificate in %1 is invalid" ).arg( filename ) );
 
 	return cert;
@@ -441,24 +435,12 @@ void WolframeClient::sendLine( QString line )
 	switch( m_state ) {
 		case Connected:
 		case Data:
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			res = m_socket->write( line.toLatin1( ).append( "\n" ) );
-#else
 			res = m_socket->write( line.toAscii( ).append( "\n" ) );
-#endif
 			if( res < 0 ) {
 				qCritical( ) << "Write error!!";
 				break;
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-			} else if( res != line.toLatin1( ).length( ) + 1 ) {
-#else
 			} else if( res != line.toAscii( ).length( ) + 1 ) {
-#endif
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-				qCritical( ) << "Partial write!" << res << line.toLatin1( ).length( );
-#else
 				qCritical( ) << "Partial write!" << res << line.toAscii( ).length( );
-#endif
 				break;
 			}
 			m_socket->flush( );
