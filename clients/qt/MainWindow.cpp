@@ -614,19 +614,13 @@ void MainWindow::loadLanguage( QString language )
 void MainWindow::changeEvent( QEvent* _event )
 {
 	if( _event ) {
-		switch( _event->type( ) ) {
-
-			case QEvent::LanguageChange:
-				m_ui.retranslateUi( this );
-				break;
-
-			case QEvent::LocaleChange:
-			{
-				QString locale = QLocale::system( ).name( );
-				locale.truncate( locale.lastIndexOf( '_' ) );
-				loadLanguage( locale );
-			}
-			break;
+		if ( _event->type( ) == QEvent::LanguageChange ) {
+			m_ui.retranslateUi( this );
+		}
+		else if ( _event->type( ) == QEvent::LocaleChange )	{
+			QString locale = QLocale::system( ).name( );
+			locale.truncate( locale.lastIndexOf( '_' ) );
+			loadLanguage( locale );
 		}
 	}
 
@@ -704,7 +698,7 @@ void MainWindow::formModal( QString name )
 	m_modalDialog->show( );
 }
 
-void MainWindow::formLoaded( QString name )
+void MainWindow::formLoaded( QString /*name*/ )
 {
 // in MDI mode update the title of the sub window, otherwise update window title
 	if( settings.mdi ) {

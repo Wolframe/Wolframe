@@ -108,7 +108,7 @@ void DebugTerminal::sendComment( QString line )
 	m_output->append( line );
 	m_output->setTextColor( QColor( "black" ) );
 }
-	
+
 void DebugTerminal::lineEntered( QString line )
 {
 	if( line.toLower( ).startsWith( "connect" ) ||
@@ -116,8 +116,8 @@ void DebugTerminal::lineEntered( QString line )
 		QRegExp rx( "^s?connect\\s+([^:]+):(\\d+)$", Qt::CaseInsensitive );
 		QStringList m;
 		if( rx.indexIn( line ) != -1 ) {
-			QString host = rx.cap( 1 );
-			unsigned short port = rx.cap( 2 ).toUShort( );
+			//~ QString host = rx.cap( 1 );
+			//~ unsigned short port = rx.cap( 2 ).toUShort( );
 			//~ m_wolframeClient->setHost( host );
 			//~ m_wolframeClient->setPort( port );
 //~ #ifdef WITH_SSL

@@ -95,7 +95,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 		xml.setAutoFormatting( true );
 		xml.setAutoFormattingIndent( 2 );
 	}
-	
+
 	xml.writeStartDocument( );
 	if( props->contains( "rootelement" ) && props->contains( "doctype" ) ) {
 		xml.writeDTD( QString( "<!DOCTYPE %1 SYSTEM '%2'>" )
@@ -122,7 +122,7 @@ void DataHandler::writeFormData( QString form_name, QWidget *form, QByteArray *d
 	} else {
 		xml.writeStartElement( form_name );
 	}
-	
+
 	writeWidgets( form, &dataElements, xml, props, &seen );
 
 	xml.writeEndElement( );
@@ -133,13 +133,13 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 {
 	QList<QWidget *> widgets = _from->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
-		QString clazz = widget->metaObject( )->className( ); 
+		QString clazz = widget->metaObject( )->className( );
 		QString name = widget->objectName( );
 
-// already dumped		
+// already dumped
 		if( seen->contains( widget ) ) continue;
 		seen->insert( widget );
-		
+
 // ignore internal elements
 		if( name == "" || name.startsWith( "qt_" ) ||
 			name.startsWith( "ignore_" ) ||
@@ -235,7 +235,7 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 		} else if( clazz == "QCheckBox" ) {
 			QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
 			QObject *_parent = widget->parent( );
-			QString clazzParent = _parent->metaObject( )->className( ); 
+			QString clazzParent = _parent->metaObject( )->className( );
 			if( clazzParent == "QGroupBox" ) {
 				QString groupName = _parent->objectName( );
 				if( checkBox->isChecked( ) ) {
@@ -247,7 +247,7 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 		} else if( clazz == "QRadioButton" ) {
 			QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
 			QObject *_parent = widget->parent( );
-			QString clazzParent = _parent->metaObject( )->className( ); 
+			QString clazzParent = _parent->metaObject( )->className( );
 			if( clazzParent == "QGroupBox" ) {
 				QString groupName = _parent->objectName( );
 				if( radioButton->isChecked( ) ) {
@@ -313,7 +313,7 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 			QStringList fileNames = fileChooser->fileNames( );
 			xml.writeStartElement( name );
 			foreach( QString fileName, fileNames ) {
-				if( fileName.isEmpty( ) ) continue;			
+				if( fileName.isEmpty( ) ) continue;
 				xml.writeStartElement( "file" );
 				xml.writeAttribute( "filename", fileName );
 				QFile file( fileName );
@@ -321,7 +321,7 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 				QByteArray fileContent = file.readAll( );
 				xml.writeAttribute( "size", QString::number( fileContent.length( ) ) );
 				QString encoded = QString( fileContent.toBase64( ) );
-				file.close( );	
+				file.close( );
 				xml.writeCharacters( encoded );
 				xml.writeEndElement( );
 			}
@@ -343,7 +343,7 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 		} else {
 			qWarning( ) << "Write for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 		}
-		
+
 		qDebug( ) << "Wrote " << clazz << name;
 	}
 }
@@ -351,7 +351,7 @@ void DataHandler::writeWidgets( QWidget *_from, QStringList *dataElements, QXmlS
 void DataHandler::clearFormData( QWidget *form, QString name )
 {
 	QWidget *widget = form->findChild<QWidget *>( name );
-	
+
 	if( widget )
 		clearWidgetData( widget, name );
 }
@@ -359,7 +359,7 @@ void DataHandler::clearFormData( QWidget *form, QString name )
 void DataHandler::clearWidgetData( QWidget *widget, QString name )
 {
 	QString clazz = widget->metaObject( )->className( );
-	
+
 	if( clazz == "QLineEdit" ) {
 		QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
 		lineEdit->clear( );
@@ -403,7 +403,7 @@ void DataHandler::clearWidgetData( QWidget *widget, QString name )
 		treeWidget->clear( );
 	} else if( clazz == "QTableWidget" ) {
 		QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
-		tableWidget->clearContents( );		
+		tableWidget->clearContents( );
 		for( int i = tableWidget->rowCount( ) - 1; i >= 0; i-- ) {
 			tableWidget->removeRow( i );
 		}
@@ -422,14 +422,14 @@ void DataHandler::clearWidgetData( QWidget *widget, QString name )
 	} else {
 		qWarning( ) << "Clear for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 	}
-	
+
 	qDebug( ) << "Clearing " << clazz << name;
 }
 
 void DataHandler::resetFormData( QWidget *form, QString name )
 {
 	QWidget *widget = form->findChild<QWidget *>( name );
-	
+
 	if( widget )
 		resetWidgetData( widget, name );
 }
@@ -442,7 +442,7 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
 	FormWidget::readDynamicStringProperties( props, widget );
 	m_formWidget->restoreFromGlobals( props );
-	
+
 	if( clazz == "QLineEdit" ) {
 		QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
 		lineEdit->clear( );
@@ -507,7 +507,7 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 		}
 	} else if( clazz == "QTableWidget" ) {
 		QTableWidget *tableWidget = qobject_cast<QTableWidget *>( widget );
-//			tableWidget->clearContents( );			
+//			tableWidget->clearContents( );
 		for( int row = 0; row < tableWidget->rowCount( ); row++ ) {
 			for( int col = 0; col < tableWidget->columnCount( ); col++ ) {
 				QTableWidgetItem *item = tableWidget->item( row, col );
@@ -534,13 +534,13 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 	} else {
 		qWarning( ) << "Reset for unknown class" << clazz << "of widget" << widget << "(" << name << ")";
 	}
-	
+
 	if( 	props->contains( "initialFocus" ) &&
 		props->value( "initialFocus" ) == "true" ) {
 		qDebug( ) << "Setting focus of widget" << name;
 		widget->setFocus( );
 	}
-	
+
 	qDebug( ) << "Reset " << clazz << name;
 }
 
@@ -564,14 +564,14 @@ void DataHandler::resetFormData( QWidget *form )
 void DataHandler::loadFormDomains( QString form_name, QWidget *form, QString name )
 {
 	QWidget *widget = form->findChild<QWidget *>( name );
-	
+
 	loadFormDomains( form_name, form, widget, name );
 }
 
-void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *widget, QString name )
+void DataHandler::loadFormDomains( QString form_name, QWidget */*form*/, QWidget *widget, QString name )
 {
-	QString clazz = widget->metaObject( )->className( ); 
-	
+	QString clazz = widget->metaObject( )->className( );
+
 	// TODO: widgets can also have custom properties for the domain handling
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
 	FormWidget::readDynamicStringProperties( props, widget );
@@ -589,7 +589,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *wi
 		// all other classes don't load domains, but we want to keep
 		// the calling code generic..
 	}
-	
+
 	qDebug( ) << "Domain load in " << clazz << name;
 }
 
@@ -597,7 +597,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 {
 	QList<QWidget *> widgets = form->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
-		QString clazz = widget->metaObject( )->className( ); 
+		QString clazz = widget->metaObject( )->className( );
 		QString name = widget->objectName( );
 // ignore internal elements
 		if( name == "" || name.startsWith( "qt_" ) ||
@@ -605,7 +605,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 			!widget->isEnabled( ) ) {
 			continue;
 		}
-		
+
 		loadFormDomains( form_name, form, widget, name );
 	}
 }
@@ -613,7 +613,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidget *form, QByteArray &data, QHash<QString, QString> *props )
 {
 	QWidget *widget = form->findChild<QWidget *>( widget_name );
-	QString clazz = widget->metaObject( )->className( ); 
+	QString clazz = widget->metaObject( )->className( );
 
 	qDebug( ) << "Loading domain data for load in " << form_name << widget_name << data.length( );
 
@@ -623,12 +623,12 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 		int idx = 0;
 		while( !xml.atEnd( ) ) {
 			xml.readNext( );
-							
+
 			if( xml.isStartElement( ) && ( xml.name( ) == "value" || xml.name( ) == widget_name ) ) {
 				QXmlStreamAttributes attributes = xml.attributes( );
 				QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 				comboBox->addItem( text );
-// we should map all attributes in the element, currently we map only 'id'				
+// we should map all attributes in the element, currently we map only 'id'
 				foreach( QXmlStreamAttribute attr, attributes ) {
 					if( attr.name( ) == "id" ) {
 						QVariant v;
@@ -654,12 +654,12 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 		for( int i = 0; i < tableWidget->columnCount( ); i++ ) {
 			QTableWidgetItem *item = tableWidget->horizontalHeaderItem( i );
 			QString headerText = item->data( Qt::DisplayRole ).toString( );
-			headers << headerText;		
+			headers << headerText;
 		}
 
 		// switch off sorting for now, otherwise filling with setItem fails!
-		tableWidget->horizontalHeader( )->setSortIndicator( -1, Qt::AscendingOrder );	
-		
+		tableWidget->horizontalHeader( )->setSortIndicator( -1, Qt::AscendingOrder );
+
 		int row = 0;
 		bool inData = false;
 		QXmlStreamAttributes attributes;
@@ -669,9 +669,9 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 				if( xml.name( ) == widget_name ) {
 					inData = true;
 					tableWidget->insertRow( row );
-// HACK: set height of rows to thumbnail heigth					
+// HACK: set height of rows to thumbnail heigth
 					tableWidget->setRowHeight( row, 50 );
-// HACK: map attributes of rows into cells, not happy with that one!					
+// HACK: map attributes of rows into cells, not happy with that one!
 					attributes = xml.attributes( );
 				} else if( inData ) {
 					int col = headers.indexOf( xml.name( ).toString( ) );
@@ -693,7 +693,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 							QTableWidgetItem *item = new QTableWidgetItem( QString( ) );
 							item->setFlags( item->flags( ) ^ Qt::ItemIsEditable );
 							tableWidget->setItem( row, col, item );
-							
+
 							tableWidget->setCellWidget( row, col, label );
 						} else {
 							QTableWidgetItem *item = new QTableWidgetItem( text );
@@ -740,7 +740,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 						sortOrder = Qt::DescendingOrder;
 					}
 					if( sortBy >= 0 ) {
-						tableWidget->horizontalHeader( )->setSortIndicator( sortBy, sortOrder );	
+						tableWidget->horizontalHeader( )->setSortIndicator( sortBy, sortOrder );
 					}
 					continue;
 				}
@@ -802,7 +802,7 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 								v.setValue( attr.value( ).toString( ) );
 								item->setData( 0, Qt::UserRole, v );
 							}
-						}						
+						}
 					} else {
 						int col = headers.indexOf( xml.name( ).toString( ) );
 						if( col != -1 ) {
@@ -959,7 +959,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 									break;
 								}
 							}
-							// select item in combobox with the matching id				
+							// select item in combobox with the matching id
 							foreach( QXmlStreamAttribute attr, attributes ) {
 								if( attr.name( ) == "id" ) {
 									QString mustId = attr.value( ).toString( );
@@ -973,10 +973,10 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 									}
 								}
 							}
-							
+
 						} else if( clazz == "QCheckBox" ) {
 							QObject *parent = widget->parent( );
-							QString clazzParent = parent->metaObject( )->className( ); 
+							QString clazzParent = parent->metaObject( )->className( );
 							if( clazzParent != "QGroupBox" ) {
 								QCheckBox *checkBox = qobject_cast<QCheckBox *>( widget );
 								QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
@@ -988,7 +988,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							}
 						} else if( clazz == "QRadioButton" ) {
 							QObject *parent = widget->parent( );
-							QString clazzParent = parent->metaObject( )->className( ); 
+							QString clazzParent = parent->metaObject( )->className( );
 							if( clazzParent != "QGroupBox" ) {
 								QRadioButton *radioButton = qobject_cast<QRadioButton *>( widget );
 								QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
@@ -1013,7 +1013,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 						} else if( clazz == "QGroupBox" ) {
 							QList<QWidget *> children = widget->findChildren<QWidget *>( );
 							foreach( QWidget *child, children ) {
-								QString subClazz = child->metaObject( )->className( ); 
+								QString subClazz = child->metaObject( )->className( );
 								QString subName = child->objectName( );
 								if( subClazz == "QRadioButton" ) {
 									QRadioButton *radioButton = qobject_cast<QRadioButton *>( child );
@@ -1033,7 +1033,7 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 									// don't read text element, otherwise the parser tells us
 									// "Expected character data.", a little bit annoying..
 								}
-							}								
+							}
 							// handle attributes (e.g. picture 'id') here, should be
 							// handled for all widget actually. Remember value in
 							// a dynamic property in the widget
@@ -1090,14 +1090,14 @@ void DataHandler::readFormData( QString formName, QWidget *form, QByteArray &dat
 							QLabel *label = qobject_cast<QLabel *>( widget );
 							QString text = xml.readElementText( QXmlStreamReader::ErrorOnUnexpectedElement );
 							if( xml.name( ) == "image" || xml.name( ) == "thumbnail" ) {
-// HACK: no types -> detect pictures by name							
+// HACK: no types -> detect pictures by name
 								QByteArray encoded = text.toAscii( );
 								QByteArray decoded = QByteArray::fromBase64( encoded );
 								QPixmap p;
-								p.loadFromData( decoded );	
-								if( !p.isNull( ) ) {							
+								p.loadFromData( decoded );
+								if( !p.isNull( ) ) {
 									int w = std::min( label->width( ), p.width( ) );
-									int h = std::min( label->height( ), p.height( ) );							
+									int h = std::min( label->height( ), p.height( ) );
 									label->setPixmap( p.scaled( QSize( w, h ), Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
 									label->adjustSize( );
 								}
@@ -1136,14 +1136,14 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		return QString( );
 	}
 	QString name = parts[0];
-	
+
 // expecting a property identifier as second argument
 	if( parts.count() != 2 ) {
 		qWarning( ) << "Expecting a property name in variable" << variable;
 		return QString( );
 	}
 	QString property = parts[1];
-	
+
 	QWidget *widget = qFindChild<QWidget *>( form, name );
 // no widget found with that name
 	if( !widget ) {
@@ -1151,7 +1151,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		return QString( );
 	}
 
-// properties differ depending on the class of the widget	
+// properties differ depending on the class of the widget
 	QString clazz = widget->metaObject( )->className( );
 
 	if( clazz == "QLineEdit" ) {
@@ -1179,7 +1179,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		} else if( property == "state" ) {
 			// HTML preserves most (if not all) what the user entered
 			return textEdit->toHtml( );
-		}		
+		}
 	} else if( clazz == "PictureChooser" ) {
 		PictureChooser *pictureChooser = qobject_cast<PictureChooser *>( widget );
 		if( property == "state" ) {
@@ -1217,12 +1217,12 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 					if( !seen.contains( id ) ) {
 						state.append( "S" );
 						state.append( item->data( Qt::UserRole ).toString( ) );
-						state.append( "|" );							
+						state.append( "|" );
 						seen.insert( id );
 					}
 				}
 			}
-			
+
 			// remember sorting order
 			state.append( "R" );
 			state.append( QString::number( tableWidget->horizontalHeader( )->sortIndicatorSection( ) ) );
@@ -1239,7 +1239,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		}
 	} else if( clazz == "QTreeWidget" ) {
 		QTreeWidget *treeWidget = qobject_cast<QTreeWidget *>( widget );
-		
+
 // always return data of the selected item (assuming single select for now)
 // the ID is currently hard-coded in user data
 		if( property == "id" ) {
@@ -1247,7 +1247,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 			if( items.empty( ) ) {
 // nothing is selected, return the id of the root element, which is always 1
 				return QString( "1" );
-			}			
+			}
 			return items[0]->data( 0, Qt::UserRole ).toString( );
 // state is header sizes, expanded/collapse states, selection states, sorting order,
 // scroll position, etc.
@@ -1292,7 +1292,7 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		qWarning( ) << "Unsupported class" << clazz << "in variable" << variable;
 		return QString( );
 	}
-	
+
 	return QString( );
 }
 
