@@ -123,6 +123,18 @@ QString NetworkDataLoader::mapDoctype( QString action, bool domain, QString docT
 	return QString( );
 }
 
+QString NetworkDataLoader::mapDoctype2( QString docType )
+{
+// the doctype has also a ".simpleform" which doesn't come back?
+	QStringList p = docType.split( "." );
+
+	if( p.size( ) > 0 ) {
+		return p[0];
+	} else {
+		return docType;
+	}
+}
+
 void NetworkDataLoader::handleCreate( QString /*windowName*/, QString name, QByteArray xml, QHash<QString, QString> *props )
 {
 	qDebug( ) << "network request:\n" << xml;
@@ -385,7 +397,7 @@ void NetworkDataLoader::handleRequest( QString /*windowName*/, QString formName,
 	qDebug( ) << "new style network request"<< formName << widgetName << ":\n" << data;
 
 // what doctype do we expect in the answer?
-	m_map->insert( docType, qMakePair( formName, widgetName ) );
+	m_map->insert( mapDoctype2( docType ), qMakePair( formName, widgetName ) );
 
 	qDebug( ) << "MAP:" << docType << "new style request map";
 

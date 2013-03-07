@@ -60,6 +60,7 @@ class NetworkDataLoader : public DataLoader
 		void handleRequest( QString windowName, QString formName, QString widgetName, QString xml, QHash<QString, QString> *props );
 		QString mapAction( QString action );
 		QString mapDoctype( QString action, bool domain, QString docType );
+		QString mapDoctype2( QString docType );
 		
 	public slots:
 		virtual void gotAnswer( QStringList params, QString content );
