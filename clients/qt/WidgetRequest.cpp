@@ -36,8 +36,9 @@
 #include <QXmlStreamWriter>
 #include <QVariant>
 
-QByteArray getWigdetRequest( QWidget* widget, QHash<QByteArray, QVariant>* globals, bool debugmode)
+QByteArray getWigdetRequest( WidgetVisitor& visitor, bool debugmode)
 {
+	QWidget* widget = visitor.widget();
 	QList<QByteArray> props = widget->dynamicPropertyNames();
 	QString docType,rootElement;
 	bool isStandalone = true;
@@ -61,7 +62,6 @@ QByteArray getWigdetRequest( QWidget* widget, QHash<QByteArray, QVariant>* globa
 	}
 	QByteArray rt;
 	QXmlStreamWriter xml( &rt);
-	WidgetVisitor visitor( widget, globals);
 	QList<WidgetVisitor::Element> elements = visitor.elements();
 
 	if (debugmode) {
@@ -151,11 +151,12 @@ static void XMLERROR( const QXmlStreamReader& xml, const QList<WidgetAnswerStack
 }
 
 
-bool setWidgetAnswer( QWidget* widget, QHash<QByteArray, QVariant>* globals, const QByteArray& answer)
+bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 {
+	QWidget* widget = visitor.widget();
 	QList<WidgetAnswerStackElement> stk;
-	WidgetVisitor visitor( widget, globals);
 	QXmlStreamReader xml( answer);
+	int taglevel = 0;
 
 	qDebug( ) << "feeding widget " << widget->objectName() << " with XML:\n" << answer;
 
@@ -163,8 +164,14 @@ bool setWidgetAnswer( QWidget* widget, QHash<QByteArray, QVariant>* globals, con
 	{
 		if (xml.isStartElement())
 		{
+			++taglevel;
+			if (taglevel == 1)
+			{
+				//... ignore XML root element
+				continue;
+			}
 			QString tagname = xml.name().toString();
-			if (!stk.last().istag)
+			if (!stk.isEmpty() && !stk.last().istag)
 			{
 				XMLERROR( xml, stk, QString( "element not defined: '") + stk.last().name + "/" + tagname + "'");
 				return false;
@@ -193,6 +200,17 @@ bool setWidgetAnswer( QWidget* widget, QHash<QByteArray, QVariant>* globals, con
 		}
 		else if (xml.isEndElement())
 		{
+			--taglevel;
+			if (taglevel == 0)
+			{
+				//... root element ignored. so is the end element belonging to root element.
+				continue;
+			}
+			if (stk.isEmpty())
+			{
+				XMLERROR( xml, stk, QString( "unexpected end element: XML tags not balanced"));
+				return false;
+			}
 			QString::const_iterator ti = stk.last().tok.begin(), te = stk.last().tok.end();
 			for (; ti != te && ti->isSpace(); ++ti);
 			bool tokIsEmpty = (ti == te);
@@ -215,6 +233,11 @@ bool setWidgetAnswer( QWidget* widget, QHash<QByteArray, QVariant>* globals, con
 		}
 		else if (xml.isCDATA() || xml.isCharacters() || xml.isEntityReference() || xml.isWhitespace())
 		{
+			if (stk.isEmpty())
+			{
+				XMLERROR( xml, stk, QString( "unexpected content element: no XML tag context defined"));
+				return false;
+			}
 			stk.last().tok.append( xml.tokenString());
 		}
 	}

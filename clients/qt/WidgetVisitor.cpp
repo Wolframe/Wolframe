@@ -47,6 +47,30 @@
 #include <QListWidget>
 #include <QTreeWidget>
 #include <QTableWidget>
+#include <QSharedPointer>
+
+WidgetVisitor::State::State( QWidget* widget_)
+	:m_widget(widget_)
+{
+	QList<QByteArray> props = m_widget->dynamicPropertyNames();
+	QList<QByteArray>::const_iterator pi = props.begin(), pe = props.end();
+	for (; pi != pe; ++pi)
+	{
+		if (pi->startsWith( "synonym:"))
+		{
+			QVariant synonym = m_widget->property( *pi);
+			m_synonyms.insert( pi->mid( 8, pi->size()-8), synonym.toByteArray());
+		}
+	}
+}
+
+const QByteArray& WidgetVisitor::State::getSynonym( const QByteArray& name) const
+{
+	static const QByteArray empty;
+	QHash<QByteArray,QByteArray>::const_iterator syi = m_synonyms.find( name);
+	if (syi == m_synonyms.end()) return empty;
+	return syi.value();
+}
 
 static WidgetVisitor::StateR widgetVisitorState( QWidget* widget)
 {
@@ -59,23 +83,35 @@ static WidgetVisitor::StateR widgetVisitorState( QWidget* widget)
 	{
 		return WidgetVisitor::StateR( new WidgetVisitorState_QListWidget( widget));
 	}
+	else if (clazz == "QTableWidget")
+	{
+		return WidgetVisitor::StateR( new WidgetVisitor::State( widget));
+	}
+	else if (clazz == "QTreeWidget")
+	{
+		return WidgetVisitor::StateR( new WidgetVisitor::State( widget));
+	}
 	else
 	{
 		return WidgetVisitor::StateR( new WidgetVisitor::State( widget));
 	}
 }
 
-WidgetVisitor::WidgetVisitor( QWidget* root, QHash<QByteArray,QVariant>* globals_)
+WidgetVisitor::WidgetVisitor( QWidget* root, const QSharedPointer<WidgetVariableMap>& globals_)
 	:m_globals(globals_)
 {
 	m_stk.push( widgetVisitorState( root));
 }
 
-WidgetVisitor::WidgetVisitor( const WidgetVisitor::StateR& state, QHash<QByteArray, QVariant>* globals_)
+WidgetVisitor::WidgetVisitor( const WidgetVisitor::StateR& state, const QSharedPointer<WidgetVariableMap>& globals_)
 	:m_globals(globals_)
 {
 	m_stk.push( state);
 }
+
+WidgetVisitor::WidgetVisitor( const QStack<StateR>& stk_, const QSharedPointer<WidgetVariableMap>& globals_)
+	:m_stk(stk_),m_globals(globals_)
+{}
 
 bool WidgetVisitor::enter( const QString& name)
 {
@@ -85,23 +121,27 @@ bool WidgetVisitor::enter( const QString& name)
 bool WidgetVisitor::enter( const QByteArray& name)
 {
 	if (m_stk.empty()) return false;
+	/*[-]*/qDebug() << widget()->objectName() << "ENTER" << name;
 	if (m_stk.top()->enter( name))
 	{
 		return true;
 	}
-	QWidget* wdg;
-	if ((wdg = m_stk.top()->childwidget( name)) != 0)
+	QList<QWidget*> children = m_stk.top()->widget()->findChildren<QWidget*>( name);
+	if (children.size() > 1)
 	{
-		///... child widget allocated
-		m_stk.push( widgetVisitorState( wdg));
-		return true;
+		qCritical() << "ambiguus widget reference" << name;
+		return false;
 	}
-	return false;
+	if (children.isEmpty()) return false;
+
+	m_stk.push( widgetVisitorState( children[0]));
+	return true;
 }
 
 void WidgetVisitor::leave()
 {
 	if (m_stk.empty()) return;
+	/*[-]*/qDebug() << widget()->objectName() << "LEAVE";
 	if (!m_stk.top()->leave())
 	{
 		m_stk.pop();
@@ -113,19 +153,129 @@ QVariant WidgetVisitor::property( const QString& name)
 	return property( name.toAscii());
 }
 
+template <class StringType>
+static void append_escaped_( StringType& dest, const StringType& value)
+{
+	if (value.indexOf('\'') >= 0 || value.indexOf(',') >= 0 || value.indexOf('&') >= 0)
+	{
+		dest.push_back( '\'');
+		int idx = 0, nxt;
+		while ((nxt=value.indexOf( '\'', idx)) >= idx)
+		{
+			dest.append( value.mid(idx,nxt));
+			dest.push_back( '\'');
+			dest.push_back( '\'');
+			idx = nxt + 1;
+		}
+		dest.push_back( '\'');
+	}
+	else
+	{
+		dest.append( value);
+	}
+}
+
+static void append_escaped( QString& dest, const QVariant& value)
+{
+	append_escaped_( dest, value.toString());
+}
+
+static void append_escaped( QByteArray& dest, const QVariant& value)
+{
+	append_escaped_( dest, value.toByteArray());
+}
+
+template <class StringType>
+static QVariant expand_variable_references( WidgetVisitor& visitor, const StringType& value)
+{
+	int startidx = 0;
+	int substidx = value.indexOf( '{');
+	int endidx = value.indexOf( '}', substidx);
+	StringType rt;
+	if (substidx == 0 && endidx == value.size()-1)
+	{
+		return visitor.property( value.mid( substidx, endidx-substidx));
+	}
+	while (substidx > 0)
+	{
+		if (endidx < substidx)
+		{
+			qCritical() << "brackets { } not balanced";
+			break;
+		}
+		rt.append( value.mid( startidx, substidx-startidx));
+		int sb = value.indexOf( '{', substidx);
+		if (sb > 0 && sb < endidx)
+		{
+			qCritical() << "brackets { { nested";
+			break;
+		}
+		substidx++;
+
+		// evaluate property value and append it expanded as substutute to rt:
+		QVariant propvalue = visitor.property( value.mid( substidx, endidx-substidx));
+		if (propvalue.type() == QVariant::List)
+		{
+			QList<QVariant> propvaluelist = propvalue.toList();
+			QList<QVariant>::const_iterator li = propvaluelist.begin(), le = propvaluelist.end();
+			int lidx = 0;
+			for (; li != le; ++li,++lidx)
+			{
+				if (lidx) rt.push_back( ",");
+				append_escaped( rt, *li);
+			}
+		}
+		else
+		{
+			append_escaped( rt, propvalue.toString());
+		}
+		startidx = endidx + 1;
+		// skip to next embedded variable reference:
+		substidx = value.indexOf( '{', startidx);
+		endidx = value.indexOf( '}', substidx);
+	}
+	rt.append( value.mid( startidx, value.size()-startidx));
+	return QVariant(rt);
+}
+
+QVariant WidgetVisitor::resolve( const QVariant& value)
+{
+	if (value.type() == QVariant::String)
+	{
+		QString valuestr = value.toString();
+		if (valuestr.indexOf( '{') >= 0)
+		{
+			return expand_variable_references( *this, valuestr);
+		}
+	}
+	else if (value.type() == QVariant::ByteArray)
+	{
+		QByteArray valuestr = value.toByteArray();
+		if (valuestr.indexOf( '{') >= 0)
+		{
+			return expand_variable_references( *this, valuestr);
+		}
+	}
+	return value;
+}
+
 QVariant WidgetVisitor::property( const QByteArray& name, int level)
 {
 	if (m_stk.empty()) return QVariant()/*invalid*/;
 
 	QVariant rt = m_stk.top()->property( name);
-	if (rt.isValid()) return rt;
+	if (rt.isValid()) return resolve( rt);
 
 	int followidx = name.indexOf( '.');
 	if (followidx >= 0)
 	{
 		if (level == 0 && name.startsWith( "global."))
 		{
-			return (*m_globals)[ name.mid( 7, name.size()-7)];
+			WidgetVariableMap::const_iterator gi = m_globals->find( name.mid( 7, name.size()-7));
+			if (gi != m_globals->end())
+			{
+				return resolve( gi.value());
+			}
 		}
 		QByteArray prefix( name.mid( 0, followidx));
 		QByteArray rest( name.mid( followidx+1, name.size()-followidx-1));
@@ -140,27 +290,25 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 			WidgetVisitor rootvisit( m_stk.at(0), m_globals);
 			return rootvisit.property( rest, 1);
 		}
-		QList<QByteArray> props = m_stk.top()->widget()->dynamicPropertyNames();
-		QList<QByteArray>::const_iterator pi = props.begin(), pe = props.end();
-		for (; pi != pe; ++pi)
+		QByteArray synonym = m_stk.top()->getSynonym( name);
+		if (!synonym.isEmpty())
 		{
-			if (pi->startsWith( "synonym:"))
-			{
-				if (name == pi->mid( 8, pi->size()-8))
-				{
-					QVariant synonym = m_stk.top()->widget()->property( *pi);
-					if (synonym.type() == QVariant::String)
-					{
-						return property( synonym.toString());
-					}
-					else if (synonym.type() == QVariant::ByteArray)
-					{
-						return property( synonym.toByteArray());
-					}
-				}
-			}
+			return property( synonym, level);
 		}
 	}
+	return rt;
+}
+
+QByteArray WidgetVisitor::requestUID()
+{
+	if (m_stk.isEmpty()) return QByteArray();
+	static qint64 g_cnt = 0;
+	QVariant ruid = m_stk.top()->widget()->property( "_w_requestid");
+	if (ruid.type() == QVariant::ByteArray) return ruid.toByteArray();
+	QByteArray rt =  m_stk.top()->widget()->metaObject()->className();
+	rt.append( ":");
+	rt.append( QVariant( ++g_cnt).toByteArray());
+	m_stk.top()->widget()->setProperty( "_w_requestid", QVariant(rt));
 	return rt;
 }
 
@@ -172,6 +320,7 @@ QVariant WidgetVisitor::property( const QByteArray& name)
 bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, int level)
 {
 	if (m_stk.empty()) return false;
+	/*[-]*/qDebug() << widget()->objectName() << "SET PROPERTY" << name << "=" << value;
 	if (m_stk.top()->setProperty( name, value)) return true;
 
 	int followidx = name.indexOf( '.');
@@ -195,28 +344,77 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 			WidgetVisitor rootvisit( m_stk.at(0), m_globals);
 			return rootvisit.setProperty( rest, value, 1);
 		}
-		QList<QByteArray> props = m_stk.top()->widget()->dynamicPropertyNames();
-		QList<QByteArray>::const_iterator pi = props.begin(), pe = props.end();
-		for (; pi != pe; ++pi)
+		QByteArray synonym = m_stk.top()->getSynonym( name);
+		if (!synonym.isEmpty())
 		{
-			if (pi->startsWith( "synonym:"))
-			{
-				if (name == pi->mid( 8, pi->size()-8))
-				{
-					QVariant synonym = m_stk.top()->widget()->property( *pi);
-					if (synonym.type() == QVariant::String)
-					{
-						return setProperty( synonym.toString(), value);
-					}
-					else if (synonym.type() == QVariant::ByteArray)
-					{
-						return setProperty( synonym.toByteArray(), value);
-					}
-				}
-			}
+			return setProperty( synonym, value, level);
 		}
 	}
 	return false;
+}
+
+QList<WidgetVisitor> WidgetVisitor::findNodes( NodeProperty prop, const QByteArray& cond)
+{
+	if (m_stk.empty()) return QList<WidgetVisitor>();
+	QList<WidgetVisitor> rt;
+	QVector<WidgetVisitor> ar;
+	ar.push_back( *this);
+	if (prop( m_stk.top()->widget(), cond))
+	{
+		rt.push_back( *this);
+		//... append *this matching to result
+	}
+	int endidx = ar.size(), idx = 0;
+	QStack<StateR> stk = m_stk;
+	do
+	{
+		endidx = ar.size();
+		while (idx < endidx)
+		{
+			stk = ar[idx].m_stk;
+			foreach( QWidget* ww, ar[idx].widget()->findChildren<QWidget*>())
+			{
+				stk.push_back( widgetVisitorState( ww));
+				ar.push_back( WidgetVisitor( stk, globals()));
+				if (prop( ww, cond))
+				{
+					rt.push_back( WidgetVisitor( stk, globals()));
+					//... append child matching to result
+				}
+				stk.pop();
+			}
+			++idx;
+		}
+	} while (endidx < ar.size());
+	return rt;
+}
+
+bool nodeProperty_hasGlobals( const QWidget* widget, const QByteArray& )
+{
+	QList<QByteArray> dprops = widget->dynamicPropertyNames();
+	QList<QByteArray>::iterator di = dprops.begin(), de = dprops.end();
+	for (; di != de; ++di)
+	{
+		if (di->startsWith( "global.")) return true;
+	}
+	return false;
+}
+
+void WidgetVisitor::initializeGlobals()
+{
+	foreach (WidgetVisitor ww, findNodes( nodeProperty_hasGlobals))
+	{
+		QList<QByteArray> dprops = ww.widget()->dynamicPropertyNames();
+		QList<QByteArray>::iterator di = dprops.begin(), de = dprops.end();
+		for (; di != de; ++di)
+		{
+			if (di->startsWith( "global."))
+			{
+				QByteArray globalname( di->mid( 7, di->size()-7));
+				m_globals->insert( globalname, resolve( ww.property( *di)));
+			}
+		}
+	}
 }
 
 bool WidgetVisitor::setProperty( const QString& name, const QVariant& value)
@@ -267,13 +465,15 @@ struct WidgetVisitorStackElement
 static bool isReservedProperty( const QByteArray& key)
 {
 	// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
-	if( key.startsWith( "_q_")) return true;
+	if (key.startsWith( "_q_")) return true;
+	// skip _w_ dynamic properties, they are used as internal Wolframe properties
+	if (key.startsWith( "_w_")) return true;
 	// skip globals
-	if( key.startsWith( "global.")) return true;
+	if (key.startsWith( "global.")) return true;
 	// skip synonym declarations
-	if( key.startsWith( "synonym:")) return true;
+	if (key.startsWith( "synonym:")) return true;
 	// ignore our own actions
-	if( key == "doctype" || key == "rootelement" || key == "dataelement" || key == "action" || key == "initAction" || key == "form" || key == "state")
+	if (key == "doctype" || key == "rootelement" || key == "dataelement" || key == "action" || key == "initAction" || key == "form" || key == "state")
 	{
 		return true;
 	}
@@ -355,8 +555,8 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements()
 		}
 		else
 		{
-			rt.push_back( Element( Element::CloseTag, ""));
 			elemstk.pop_back();
+			if (!elemstk.isEmpty()) rt.push_back( Element( Element::CloseTag, ""));
 			leave();
 		}
 	}

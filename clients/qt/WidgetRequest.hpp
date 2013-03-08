@@ -32,11 +32,12 @@
 ************************************************************************/
 #ifndef _WIDGET_XML_HPP_INCLUDED
 #define _WIDGET_XML_HPP_INCLUDED
+#include "WidgetVisitor.hpp"
 #include <QWidget>
 #include <QByteArray>
 
-QByteArray getWigdetRequest( QWidget* widget, QHash<QByteArray, QVariant>* globals, bool debugmode=false);
-bool setWidgetAnswer( QWidget* widget, QHash<QByteArray, QVariant>* globals, const QByteArray& answer);
+QByteArray getWigdetRequest( WidgetVisitor& visitor, bool debugmode=false);
+bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer);
 
 #endif
 

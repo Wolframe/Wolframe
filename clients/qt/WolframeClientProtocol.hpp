@@ -90,9 +90,6 @@ class WolframeClientProtocol
 			m_socket = socket_;
 		}
 
-		///\brief Generates an non persistent unique identifier to be used for requests
-		static QByteArray requestUID( const QByteArray& basename);
-
 		///\brief Handler for read event on the socket. Stears the whole protocol STM
 		bool process();
 

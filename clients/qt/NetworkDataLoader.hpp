@@ -50,6 +50,7 @@ class NetworkDataLoader : public DataLoader
 		virtual ~NetworkDataLoader( ) {};
 
 		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props );
+		virtual void datarequest( const QByteArray& tag, const QByteArray& content);
 
 	private:
 		void handleCreate( QString windowName, QString name, QByteArray data, QHash<QString, QString> *props );

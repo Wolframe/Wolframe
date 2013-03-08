@@ -117,7 +117,8 @@ class FormWidget : public QWidget
 		void formModal( QString m_form );
 		void error( QString error );
 		void closed( );
-	
+		void datarequest();
+
 	protected:
 		void changeEvent( QEvent *_event );
 		void closeEvent( QCloseEvent *e );
@@ -128,7 +129,8 @@ class FormWidget : public QWidget
 		void formListLoaded( QStringList forms );
 		
 		void gotAnswer( QString formName, QString widgetName, QByteArray xml );
-		
+		void gotAnswer( const QByteArray& tag, const QByteArray& data);
+
 		void switchForm( QObject *object );
 };
 	

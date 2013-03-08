@@ -88,6 +88,11 @@ void NetworkDataLoader::request( QString windowName, QString formName, QString w
 	}	
 }
 
+void NetworkDataLoader::datarequest( const QByteArray& tag, const QByteArray& content)
+{
+	m_wolframeClient->request( tag, content);
+}
+
 QString NetworkDataLoader::mapAction( QString action )
 {
 	if( action == "create" ) {
@@ -132,7 +137,7 @@ void NetworkDataLoader::handleCreate( QString windowName, QString name, QByteArr
 // what doctype do we expect in the answer?
 	QString docType = props->value( "doctype" );
 	QString action = props->value( "action" );
-	QByteArray tag = WolframeClientProtocol::requestUID( docType.toAscii());
+	QByteArray tag = docType.toAscii();
 
 	m_map->insert( tag, qMakePair( name, QString("#") + windowName) );
 
@@ -196,7 +201,8 @@ void NetworkDataLoader::handleRead( QString windowName, QString name, QHash<QStr
 
 // what doctype do we expect in the answer?
 	QString action = props->value( "action" );
-	QByteArray tag = WolframeClientProtocol::requestUID( docType.toAscii());
+	QByteArray tag = docType.toAscii();
+
 	m_map->insert( tag, qMakePair( name, QString("#") + windowName) );
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
@@ -213,7 +219,8 @@ void NetworkDataLoader::handleUpdate( QString windowName, QString name, QByteArr
 
 // what doctype do we expect in the answer?
 	QString action = props->value( "action" );
-	QByteArray tag = WolframeClientProtocol::requestUID( docType.toAscii());
+	QByteArray tag = docType.toAscii();
+
 	m_map->insert( tag, qMakePair( name, QString("#") + windowName) );
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
@@ -255,7 +262,7 @@ void NetworkDataLoader::handleDelete( QString windowName, QString name, QHash<QS
 
 // what doctype do we expect in the answer?
 	QString action = props->value( "action" );
-	QByteArray tag = WolframeClientProtocol::requestUID( docType.toAscii());
+	QByteArray tag = docType.toAscii();
 
 	m_map->insert( tag, qMakePair( name, QString("#") + windowName) );
 
@@ -321,7 +328,7 @@ void NetworkDataLoader::handleDomainDataLoad( QString windowName, QString formNa
 	
 // what doctype do we expect in the answer?
 	QString action = props->value( "action" );
-	QByteArray tag = WolframeClientProtocol::requestUID( docType.toAscii());
+	QByteArray tag = docType.toAscii();
 	m_map->insert( tag, qMakePair( formName, widgetName + "#" + windowName) );
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, true, docType );
@@ -391,7 +398,7 @@ void NetworkDataLoader::handleRequest( QString windowName, QString formName, QSt
 		qDebug( ) << "new style network request"<< formName << widgetName << ":\n" << data;
 
 	// what doctype do we expect in the answer?
-		QByteArray tag = WolframeClientProtocol::requestUID( docType.toAscii());
+		QByteArray tag = docType.toAscii();
 		m_map->insert( tag, qMakePair( formName, widgetName + "#" + windowName) );
 
 		qDebug( ) << "MAP:" << docType << "new style request map";
@@ -403,7 +410,7 @@ void NetworkDataLoader::handleRequest( QString windowName, QString formName, QSt
 		qDebug( ) << "new style network request"<< formName << widgetName << ":\n" << data;
 
 	// what doctype do we expect in the answer?
-		QByteArray tag = WolframeClientProtocol::requestUID( docType.toAscii());
+		QByteArray tag = docType.toAscii();
 		m_map->insert( tag, qMakePair( formName, widgetName + "#" + windowName) );
 
 		qDebug( ) << "MAP:" << docType << "new style request map";
@@ -414,27 +421,29 @@ void NetworkDataLoader::handleRequest( QString windowName, QString formName, QSt
 
 void NetworkDataLoader::gotAnswer( bool success, const QByteArray& tag, const QByteArray& content )
 {
+/*[-]*/qDebug() << "Got answer: tag=" << tag << "content=" << content;
 	if( !success ) {
 		qCritical( ) << "ERROR: " << tag << content;
 		return;
 	}
-		
-	if( !m_map->contains( tag ) ) {
-		qCritical( ) << "ERROR: answer for unknown request of " << tag << m_map;
-		return;
-	}
-	
-	QPair<QString, QString> pair = m_map->value( tag );
-	QStringList addr = pair.second.split( "#");
-	QString formName = pair.first;
-	QString widgetName = addr[0];
-	QString windowName = addr[1];
+	emit answer( tag, content);
 
-	m_map->remove( tag );
-
-	qDebug( ) << "ANSWER for window " << windowName << "form" << formName << "and widget" << widgetName;
+	//[+] if( !m_map->contains( tag ) ) {
+	//[+] 	qCritical( ) << "ERROR: answer for unknown request of " << tag << m_map;
+	//[+] 	return;
+	//[+] }
 	
-	emit answer( formName, widgetName, content);
+	//[+] QPair<QString, QString> pair = m_map->value( tag );
+	//[+] QStringList addr = pair.second.split( "#");
+	//[+] QString formName = pair.first;
+	//[+] QString widgetName = addr[0];
+	//[+] QString windowName = addr[1];
+
+	//[+] m_map->remove( tag );
+
+	//[+]qDebug( ) << "ANSWER for window " << windowName << "form" << formName << "and widget" << widgetName;
+	
+	//[+]emit answer( formName, widgetName, content);
 }
 
 void NetworkDataLoader::gotError( QString error )

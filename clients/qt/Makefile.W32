@@ -79,6 +79,7 @@ OBJS = \
 	WidgetVisitor_QComboBox.obj \
 	WidgetVisitor_QListWidget.obj \
 	WidgetRequest.obj \
+	WidgetMessageDispatcher.obj \
 	FormWidget.obj \
 	moc_FormWidget.obj \
 	qcommandline.obj \

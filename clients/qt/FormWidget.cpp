@@ -32,6 +32,7 @@
 ************************************************************************/
 
 #include "FormWidget.hpp"
+#include "WidgetMessageDispatcher.hpp"
 #include "global.hpp"
 
 #include <QDebug>
@@ -74,6 +75,8 @@ void FormWidget::initialize( )
 // link the data loader to our form widget
 	connect( m_dataLoader, SIGNAL( answer( QString, QString, QByteArray ) ),
 		this, SLOT( gotAnswer( QString, QString, QByteArray ) ) );
+	connect( m_dataLoader, SIGNAL( answer( const QByteArray&, const QByteArray& ) ),
+		this, SLOT( gotAnswer( const QByteArray&, const QByteArray& ) ) );
 
 // signal dispatcher for form buttons
 	m_signalMapper = new QSignalMapper( this );
@@ -374,10 +377,16 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		props->insert( "action", initAction );
 		sendRequest( props );
 	}
-// new style: 'doctype' on form widget, execute loading request
-	if( props->contains( "doctype" ) ) {
-		sendRequest( props );
+	WidgetMessageDispatcher dispatcher( m_ui);
+	foreach (const WidgetMessageDispatcher::Request& request, dispatcher.getDomainLoadRequests( m_debug))
+	{
+		m_dataLoader->datarequest( request.tag, request.content);
 	}
+
+// new style: 'doctype' on form widget, execute loading request
+//[+]	if( props->contains( "doctype" ) ) {
+//[+]		sendRequest( props );
+//[+]	}
 
 // load localication of the form now
 	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
@@ -463,6 +472,12 @@ void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml
 			m_dataHandler->readFormData( formName, m_ui, xml, m_props );	
 		}
 	}
+}
+
+void FormWidget::gotAnswer( const QByteArray& tag, const QByteArray& data)
+{
+	WidgetMessageDispatcher dispatcher( m_ui);
+	dispatcher.feedResult( tag, data);
 }
 
 void FormWidget::closeEvent( QCloseEvent *e )

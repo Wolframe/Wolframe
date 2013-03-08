@@ -40,15 +40,26 @@
 #include <QSharedPointer>
 #include <QVariant>
 
+///\brief Structure to access (global) variable references
+typedef QHash<QByteArray, QVariant> WidgetVariableMap;
+
 ///\class WidgetVisitor
 ///\brief Tree to access to (read/write) of widget data
 class WidgetVisitor
 {
 	public:
+		///\brief Default constructor
+		WidgetVisitor(){}
+
 		///\brief Constructor
 		///\param[in] root Root of widget tree visited
 		///\param[in] globals_ Reference to global variables
-		WidgetVisitor( QWidget* root, QHash<QByteArray, QVariant>* globals_);
+		WidgetVisitor( QWidget* root, const QSharedPointer<WidgetVariableMap>& globals_);
+
+		///\brief Copy constructor
+		///\param[in] o object to copy
+		WidgetVisitor( const WidgetVisitor& o)
+			:m_stk(o.m_stk),m_globals(o.m_globals){}
 
 		///\brief Sets the current node to the child with name 'name'
 		bool enter( const QString& name);
@@ -95,11 +106,19 @@ class WidgetVisitor
 		///\return true on success
 		bool setProperty( const QString& name, const QVariant& value);
 
+		typedef bool (*NodeProperty)( const QWidget* widget, const QByteArray& cond);
+		QList<WidgetVisitor> findNodes( NodeProperty prop, const QByteArray& cond=QByteArray());
+
 		///\brief Element of serialization of widget data
 		class Element
 		{
 		public:
 			enum Type {OpenTag,CloseTag,Attribute,Value};
+			static const char* typeName( Type i)
+			{
+				static const char* ar[] = {"OpenTag","CloseTag","Attribute","Value"};
+				return ar[i];
+			}
 			Type type() const		{return m_type;}
 			const QVariant& value() const	{return m_value;}
 
@@ -107,6 +126,15 @@ class WidgetVisitor
 				:m_type(type_),m_value(value_){}
 			Element( const Element& o)
 				:m_type(o.m_type),m_value(o.m_value){}
+
+			QString toString() const
+			{
+				QString rt( typeName( m_type));
+				rt.append( " '");
+				rt.append( m_value.toString());
+				rt.append( "'");
+				return rt;
+			}
 		private:
 			Type m_type;
 			QVariant m_value;
@@ -116,30 +144,43 @@ class WidgetVisitor
 		///\brief State on WidgetVisitor stack. Implemented for every widget type supported
 		struct State
 		{
-			explicit State( QWidget* widget_)
-				:m_widget(widget_){}
+			explicit State( QWidget* widget_);
+			State( const State& o)
+				:m_widget(o.m_widget),m_synonyms(o.m_synonyms){}
+
 			virtual ~State(){}
 
-			QWidget* widget()
+			QWidget* widget() const
 			{
 				return m_widget;
 			}
 
 			virtual void clearProperty(){}
-			virtual QWidget* childwidget( const QByteArray&)			{return 0;}
 			virtual bool enter( const QByteArray&)					{return false;}
 			virtual bool leave()							{return false;}
 			virtual QVariant property( const QByteArray&)				{return QVariant();}
 			virtual bool setProperty( const QByteArray&, const QVariant&)		{return false;}
 			virtual const char** dataelements() const				{static const char* ar[1] = {0}; return ar;}
+			const QByteArray& getSynonym( const QByteArray& name) const;
+
 		private:
-			QWidget* m_widget;
+			QWidget* m_widget;							//< widget reference
+			QHash<QByteArray,QByteArray> m_synonyms;				//< synonym name map
 		};
 		typedef QSharedPointer<State> StateR;
 
 		///\brief Get a serialization of all visible widget elements of the current state
 		///\remark Takes the dynamic property 'dataelement' into account for element selection and resolves variable references in values
 		QList<Element> elements();
+
+		void initializeGlobals();
+		QSharedPointer<WidgetVariableMap> globals()					{return m_globals;}
+		QByteArray requestUID();
+		QWidget* widget() const								{return m_stk.isEmpty()?0:m_stk.top()->widget();}
+
+		///\brief Resolve reference to a variable
+		///\param[in] value to resolve
+		QVariant resolve( const QVariant& value);
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).
@@ -154,10 +195,12 @@ class WidgetVisitor
 		bool setProperty( const QByteArray& name, const QVariant& value, int level);
 
 		///\brief Constructor internal
-		WidgetVisitor( const StateR& state, QHash<QByteArray, QVariant>* globals_);
+		WidgetVisitor( const StateR& state, const QSharedPointer<WidgetVariableMap>& globals_);
+		///\brief Constructor internal
+		WidgetVisitor( const QStack<StateR>& stk_, const QSharedPointer<WidgetVariableMap>& globals_);
 
 		QStack<StateR> m_stk;				//< stack of visited widget nodes (first) with their select state (second). The current node is the top element
-		QHash<QByteArray, QVariant>* m_globals;		//< global variables
+		QSharedPointer<WidgetVariableMap> m_globals;	//< global variables
 };
 
 #endif

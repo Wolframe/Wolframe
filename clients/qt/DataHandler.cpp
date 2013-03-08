@@ -606,7 +606,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form )
 			continue;
 		}
 		
-		loadFormDomains( form_name, form, widget, name );
+		//[+]loadFormDomains( form_name, form, widget, name );
 	}
 }
 

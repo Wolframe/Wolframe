@@ -388,6 +388,7 @@ void WolframeClient::dataAvailable( )
 // high-level
 void WolframeClient::request( const QByteArray& tag, const QByteArray& content )
 {
+/*[-]*/qDebug() << "++++++++++++++DATA REQUEST tag=" << tag << "content=[" << content << "]";
 	m_protocol.pushRequest( tag, content);
 }
 
@@ -400,6 +401,7 @@ void WolframeClient::handleResult( )
 	{
 		bool success = m_protocol.getAnswerSuccess();
 		const QByteArray* content = m_protocol.getAnswerContent();
+/*[-]*/qDebug() << "++++++++++++++DATA ANSWER tag=" << *tag << "content=[" << *content << "]";
 
 		qDebug( ) << "handle result of command" << *tag;
 		emit answerReceived( success, *tag, *content);

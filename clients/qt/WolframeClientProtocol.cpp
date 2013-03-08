@@ -113,10 +113,10 @@ bool WolframeClientProtocol::poll()
 	for (;;)
 	{
 		char buf[ 0x4000];
-		qint64 len = m_socket->read( buf, sizeof(buf));
+		int len = m_socket->read( buf, sizeof(buf));
 		if (len < 0) return false;
 		pushData( buf, len);
-		if (len < sizeof(buf)) break;
+		if (len < (int)sizeof(buf)) break;
 	}
 	return true;
 }
@@ -388,14 +388,5 @@ void WolframeClientProtocol::removeAnswer()
 	{
 		m_errorqueue.dequeue();
 	}
-}
-
-QByteArray WolframeClientProtocol::requestUID( const QByteArray& basename)
-{
-	static qint64 g_cnt = 0;
-	QByteArray rt( basename);
-	rt.append( ':');
-	rt.append( QVariant( ++g_cnt).toByteArray());
-	return rt;
 }
 
