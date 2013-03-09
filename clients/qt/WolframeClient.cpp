@@ -257,7 +257,7 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 			if( _error == QAbstractSocket::RemoteHostClosedError ) {
 				m_socket->close( );
 				m_state = Disconnected;
-				emit error( tr( "Connection closed by server." ) );
+//				emit error( tr( "Connection closed by server." ) );
 			} else {
 				if( !m_hasErrors ) {
 					emit error( m_socket->errorString( ) );
@@ -281,7 +281,7 @@ void WolframeClient::error( QAbstractSocket::SocketError _error )
 			if( _error == QAbstractSocket::RemoteHostClosedError ) {
 				m_socket->close( );
 				m_state = Disconnected;
-				emit error( tr( "Connection closed by server." ) );
+				//emit error( tr( "Connection closed by server." ) );
 			} else {
 				emit error( m_socket->errorString( ) );
 			}

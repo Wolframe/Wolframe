@@ -479,11 +479,7 @@ void MainWindow::disconnected( )
 
 void MainWindow::wolframeError( QString error )
 {
-	if( settings.errorsMessageBoxes ) {
-		QMessageBox::warning( this, tr( "Server error" ), error, QMessageBox::Ok );
-	} else {
-		statusBar( )->showMessage( error, 6000 );
-	}
+	QMessageBox::warning( this, tr( "Server error" ), error, QMessageBox::Ok );
 
 	updateMenusAndToolbars( );
 }
@@ -753,11 +749,7 @@ void MainWindow::updateWindowMenu( )
 
 void MainWindow::formError( QString error )
 {
-	if( settings.errorsMessageBoxes ) {
-		QMessageBox::critical( this, tr( "Form error" ), error, QMessageBox::Ok );
-	} else {
-		statusBar( )->showMessage( error, 6000 );
-	}
+	QMessageBox::critical( this, tr( "Form error" ), error, QMessageBox::Ok );
 }
 
 void MainWindow::on_actionRestart_triggered( )

@@ -67,7 +67,7 @@ void FileDataLoader::request( QString windowName, QString formName, QString widg
 	}
 }
 
-void FileDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, QString> */*props*/ )
+void FileDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, QString> * /*props*/ )
 {
 	QFile file( m_dir + "/" + name + ".xml" );
 	file.open( QFile::WriteOnly );
@@ -76,7 +76,7 @@ void FileDataLoader::handleCreate( QString name, QByteArray xml, QHash<QString, 
 	emit answer( name, QString( ), QByteArray( ) );
 }
 
-void FileDataLoader::handleRead( QString name, QHash<QString, QString> */*props*/ )
+void FileDataLoader::handleRead( QString name, QHash<QString, QString> * /*props*/ )
 {
 // read directly here and stuff data into the signal
 	QFile file( m_dir + "/" + name + ".xml" );
@@ -86,7 +86,7 @@ void FileDataLoader::handleRead( QString name, QHash<QString, QString> */*props*
 	emit answer( name, QString( ), xml );
 }
 
-void FileDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, QString> */*props*/ )
+void FileDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, QString> * /*props*/ )
 {
 	QFile file( m_dir + "/" + name + ".xml" );
 	file.open( QFile::WriteOnly );
@@ -95,14 +95,14 @@ void FileDataLoader::handleUpdate( QString name, QByteArray xml, QHash<QString, 
 	emit answer( name, QString( ), QByteArray( ) );
 }
 
-void FileDataLoader::handleDelete( QString name, QHash<QString, QString> */*props*/ )
+void FileDataLoader::handleDelete( QString name, QHash<QString, QString> * /*props*/ )
 {
 	QFile file( m_dir + "/" + name + ".xml" );
 	file.remove( );
 	emit answer( name, QString( ), QByteArray( ) );
 }
 
-void FileDataLoader::handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> */*props*/ )
+void FileDataLoader::handleDomainDataLoad( QString formName, QString widgetName, QHash<QString, QString> * /*props*/ )
 {
 	QFile file( m_dir + "/domain_" + formName + "_" + widgetName + ".xml" );
 	file.open( QFile::ReadOnly );

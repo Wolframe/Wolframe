@@ -225,9 +225,8 @@ void FormWidget::setLanguage( QString language )
 void FormWidget::changeEvent( QEvent* _event )
 {
 	if( _event ) {
-		if ( _event->type( ) == QEvent::LanguageChange )	{
-				m_ui->update( );
-		}
+		if ( _event->type( ) == QEvent::LanguageChange )
+			m_ui->update( );
 	}
 
 	QWidget::changeEvent( _event );

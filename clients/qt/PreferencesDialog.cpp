@@ -138,7 +138,6 @@ void PreferencesDialog::loadSettings( )
 	
 	m_interface->rememberLogin->setChecked( m_settings.saveUsername );
 	m_interface->saveRestoreState->setChecked( m_settings.saveRestoreState );
-	m_interface->errorsMessageBoxes->setChecked( m_settings.errorsMessageBoxes );
 	
 	// developer
 	
@@ -206,7 +205,6 @@ void PreferencesDialog::apply( )
 	
 	m_settings.saveUsername = m_interface->rememberLogin->isChecked( );
 	m_settings.saveRestoreState = m_interface->saveRestoreState->isChecked( );
-	m_settings.errorsMessageBoxes = m_interface->errorsMessageBoxes->isChecked( );
 	
 	// developer
 	
