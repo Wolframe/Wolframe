@@ -134,7 +134,6 @@ bool WidgetVisitor::enter( const QString& name, bool writemode)
 bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 {
 	if (m_stk.empty()) return false;
-	/*[-]*/qDebug() << widget()->objectName() << "ENTER " << (writemode?"WRITE":"READ") << name;
 	if (m_stk.top()->enter( name, writemode))
 	{
 		return true;
@@ -154,7 +153,6 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 void WidgetVisitor::leave()
 {
 	if (m_stk.empty()) return;
-	/*[-]*/qDebug() << widget()->objectName() << "LEAVE";
 	if (!m_stk.top()->leave())
 	{
 		m_stk.pop();
@@ -275,7 +273,11 @@ QVariant WidgetVisitor::resolve( const QVariant& value)
 QVariant WidgetVisitor::property( const QByteArray& name, int level)
 {
 	if (m_stk.empty()) return QVariant()/*invalid*/;
-
+	QByteArray synonym = m_stk.top()->getSynonym( name);
+	if (!synonym.isEmpty())
+	{
+		return property( synonym, level);
+	}
 	QVariant rt = m_stk.top()->property( name);
 	if (rt.isValid()) return resolve( rt);
 
@@ -303,11 +305,6 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 			WidgetVisitor rootvisit( m_stk.at(0), m_globals);
 			return rootvisit.property( rest, 1);
 		}
-		QByteArray synonym = m_stk.top()->getSynonym( name);
-		if (!synonym.isEmpty())
-		{
-			return property( synonym, level);
-		}
 	}
 	return rt;
 }
@@ -333,7 +330,11 @@ QVariant WidgetVisitor::property( const QByteArray& name)
 bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, int level)
 {
 	if (m_stk.empty()) return false;
-	/*[-]*/qDebug() << widget()->objectName() << "SET PROPERTY" << name << "=" << value;
+	QByteArray synonym = m_stk.top()->getSynonym( name);
+	if (!synonym.isEmpty())
+	{
+		return setProperty( synonym, value, level);
+	}
 	if (m_stk.top()->setProperty( name, value)) return true;
 
 	int followidx = name.indexOf( '.');
@@ -356,11 +357,6 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 		{
 			WidgetVisitor rootvisit( m_stk.at(0), m_globals);
 			return rootvisit.setProperty( rest, value, 1);
-		}
-		QByteArray synonym = m_stk.top()->getSynonym( name);
-		if (!synonym.isEmpty())
-		{
-			return setProperty( synonym, value, level);
 		}
 	}
 	return false;

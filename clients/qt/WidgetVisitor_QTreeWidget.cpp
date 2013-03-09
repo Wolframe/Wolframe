@@ -99,6 +99,7 @@ bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemo
 			qCritical() << "illegal header in middle of content";
 			return false;
 		}
+		m_mode = List;
 		if (writemode)
 		{
 			m_stk.push_back( StackElement( new QTreeWidgetItem( m_stk.top().item)));
@@ -152,6 +153,7 @@ bool WidgetVisitorState_QTreeWidget::setProperty( const QByteArray& name, const 
 	if (strcmp( name,"id") == 0)
 	{
 		m_stk.top().item->setData( 0, Qt::UserRole, data);
+		return true;
 	}
 	int col = m_headers.indexOf( name);
 	if (col != -1)

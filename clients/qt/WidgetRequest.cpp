@@ -231,14 +231,19 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 			}
 			stk.removeLast();
 		}
-		else if (xml.isCDATA() || xml.isCharacters() || xml.isEntityReference() || xml.isWhitespace())
+		else if (xml.isEntityReference())
+		{
+			XMLERROR( xml, stk, QString( "unexpected entity reference in content element: no entity references supported"));
+			return false;
+		}
+		else if (xml.isCDATA() || xml.isCharacters() || xml.isWhitespace())
 		{
 			if (stk.isEmpty())
 			{
 				XMLERROR( xml, stk, QString( "unexpected content element: no XML tag context defined"));
 				return false;
 			}
-			stk.last().tok.append( xml.tokenString());
+			stk.last().tok.append( xml.text());
 		}
 	}
 	return true;

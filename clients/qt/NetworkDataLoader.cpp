@@ -421,7 +421,6 @@ void NetworkDataLoader::handleRequest( QString windowName, QString formName, QSt
 
 void NetworkDataLoader::gotAnswer( bool success, const QByteArray& tag, const QByteArray& content )
 {
-/*[-]*/qDebug() << "Got answer: tag=" << tag << "content=" << content;
 	if( !success ) {
 		qCritical( ) << "ERROR: " << tag << content;
 		return;
