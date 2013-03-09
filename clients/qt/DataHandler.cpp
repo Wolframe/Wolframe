@@ -669,8 +669,6 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 				if( xml.name( ) == widget_name ) {
 					inData = true;
 					tableWidget->insertRow( row );
-// HACK: set height of rows to thumbnail heigth					
-					tableWidget->setRowHeight( row, 50 );
 // HACK: map attributes of rows into cells, not happy with that one!					
 					attributes = xml.attributes( );
 				} else if( inData ) {
@@ -695,6 +693,8 @@ void DataHandler::loadFormDomain( QString form_name, QString widget_name, QWidge
 							tableWidget->setItem( row, col, item );
 							
 							tableWidget->setCellWidget( row, col, label );
+// HACK: set height of rows to thumbnail heigth					
+							tableWidget->setRowHeight( row, 50 );
 						} else {
 							QTableWidgetItem *item = new QTableWidgetItem( text );
 							item->setFlags( item->flags( ) ^ Qt::ItemIsEditable );
