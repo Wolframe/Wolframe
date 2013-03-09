@@ -78,6 +78,7 @@ OBJS = \
 	WidgetVisitor.obj \
 	WidgetVisitor_QComboBox.obj \
 	WidgetVisitor_QListWidget.obj \
+	WidgetVisitor_QTreeWidget.obj \
 	WidgetRequest.obj \
 	WidgetMessageDispatcher.obj \
 	FormWidget.obj \

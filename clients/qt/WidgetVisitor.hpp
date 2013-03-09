@@ -62,9 +62,9 @@ class WidgetVisitor
 			:m_stk(o.m_stk),m_globals(o.m_globals){}
 
 		///\brief Sets the current node to the child with name 'name'
-		bool enter( const QString& name);
+		bool enter( const QString& name, bool writemode);
 		///\brief Sets the current node to the child with name 'name'
-		bool enter( const QByteArray& name);
+		bool enter( const QByteArray& name, bool writemode);
 
 		///\brief Set the current node to the parent that called enter to this node.
 		void leave();
@@ -156,12 +156,19 @@ class WidgetVisitor
 			}
 
 			virtual void clearProperty(){}
-			virtual bool enter( const QByteArray&)					{return false;}
+			virtual bool enter( const QByteArray& /*name*/, bool /*writemode*/)	{return false;}
 			virtual bool leave()							{return false;}
 			virtual QVariant property( const QByteArray&)				{return QVariant();}
 			virtual bool setProperty( const QByteArray&, const QVariant&)		{return false;}
-			virtual const char** dataelements() const				{static const char* ar[1] = {0}; return ar;}
+			virtual const QList<QByteArray>& dataelements() const			{static const QList<QByteArray> ar; return ar;}
+			virtual bool isRepeating( const QByteArray&/*name*/)			{return false;}
 			const QByteArray& getSynonym( const QByteArray& name) const;
+
+		protected:
+			struct DataElements :public QList<QByteArray>				//< constructor helper for State::dataelements()
+			{
+				DataElements( const char* initializer, ...);			//< constructor from 0 terminated vararg initializer list
+			};
 
 		private:
 			QWidget* m_widget;							//< widget reference

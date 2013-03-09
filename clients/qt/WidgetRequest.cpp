@@ -176,7 +176,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 				XMLERROR( xml, stk, QString( "element not defined: '") + stk.last().name + "/" + tagname + "'");
 				return false;
 			}
-			bool istag = visitor.enter( tagname);
+			bool istag = visitor.enter( tagname, true);
 			stk.push_back( WidgetAnswerStackElement( xml, istag));
 			QXmlStreamAttributes attributes = xml.attributes();
 			if (istag)

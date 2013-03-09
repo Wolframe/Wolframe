@@ -65,6 +65,7 @@ CPP_OBJS = \
 	WidgetVisitor.o \
 	WidgetVisitor_QComboBox.o \
 	WidgetVisitor_QListWidget.o \
+	WidgetVisitor_QTreeWidget.o \
 	WidgetRequest.o \
 	WidgetMessageDispatcher.o \
 	FormWidget.o \

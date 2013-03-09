@@ -42,20 +42,22 @@ void WidgetVisitorState_QComboBox::clearProperty()
 	m_comboBox->clear();
 }
 
-bool WidgetVisitorState_QComboBox::enter( const QByteArray& name)
+bool WidgetVisitorState_QComboBox::enter( const QByteArray& name, bool writemode)
 {
 	switch (m_stateid)
 	{
 		case None:
 			if (strcmp( name, "value") == 0)
 			{
-				m_comboBox->addItem( "");
-				m_stateid = Value;
-				return true;
-			}
-			else if (strcmp( name, "select") == 0)
-			{
-				m_stateid = Select;
+				if (writemode)
+				{
+					m_comboBox->addItem( "");
+					m_stateid = Value;
+				}
+				else
+				{
+					m_stateid = Select;
+				}
 				return true;
 			}
 		case Value:
@@ -138,11 +140,12 @@ bool WidgetVisitorState_QComboBox::setProperty( const QByteArray& name, const QV
 	return false;
 }
 
-const char** WidgetVisitorState_QComboBox::dataelements() const
+const QList<QByteArray>& WidgetVisitorState_QComboBox::dataelements() const
 {
-	static const char* ar_None[] = {"select","value",0};
-	static const char* ar_Select[] = {"id","",0};
-	static const char* ar_Value[] = {"id","",0};
+	static const DataElements ar_None( "value", 0);
+	static const DataElements ar_Select( "id", 0);
+	static const DataElements ar_Value( "id", 0);
+	static const QList<QByteArray> ar_Empty;
 
 	switch (m_stateid)
 	{
@@ -150,6 +153,6 @@ const char** WidgetVisitorState_QComboBox::dataelements() const
 		case Value:	return ar_Value;
 		case Select:	return ar_Select;
 	}
-	return 0;
+	return ar_Empty;
 }
 

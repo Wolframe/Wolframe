@@ -43,11 +43,11 @@ public:
 	WidgetVisitorState_QComboBox( QWidget* widget_);
 
 	virtual void clearProperty();
-	virtual bool enter( const QByteArray& name);
+	virtual bool enter( const QByteArray& name, bool writemode);
 	virtual bool leave();
 	virtual QVariant property( const QByteArray& name);
 	virtual bool setProperty( const QByteArray& name, const QVariant& data);
-	virtual const char** dataelements() const;
+	virtual const QList<QByteArray>& dataelements() const;
 
 private:
 	enum StateId {None,Value,Select};

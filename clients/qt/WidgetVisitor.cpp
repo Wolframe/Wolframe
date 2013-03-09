@@ -33,6 +33,7 @@
 #include "WidgetVisitor.hpp"
 #include "WidgetVisitor_QComboBox.hpp"
 #include "WidgetVisitor_QListWidget.hpp"
+#include "WidgetVisitor_QTreeWidget.hpp"
 #include "FileChooser.hpp"
 #include "PictureChooser.hpp"
 
@@ -72,6 +73,18 @@ const QByteArray& WidgetVisitor::State::getSynonym( const QByteArray& name) cons
 	return syi.value();
 }
 
+WidgetVisitor::State::DataElements::DataElements( const char* elem, ...)
+{
+	va_list ap;
+	va_start( ap, elem);
+	for(;;)
+	{
+		const char* name = va_arg( ap, const char*);
+		if (!name) break;
+		*this << name;
+	}
+}
+
 static WidgetVisitor::StateR widgetVisitorState( QWidget* widget)
 {
 	QString clazz = widget->metaObject()->className();
@@ -89,7 +102,7 @@ static WidgetVisitor::StateR widgetVisitorState( QWidget* widget)
 	}
 	else if (clazz == "QTreeWidget")
 	{
-		return WidgetVisitor::StateR( new WidgetVisitor::State( widget));
+		return WidgetVisitor::StateR( new WidgetVisitorState_QTreeWidget( widget));
 	}
 	else
 	{
@@ -113,16 +126,16 @@ WidgetVisitor::WidgetVisitor( const QStack<StateR>& stk_, const QSharedPointer<W
 	:m_stk(stk_),m_globals(globals_)
 {}
 
-bool WidgetVisitor::enter( const QString& name)
+bool WidgetVisitor::enter( const QString& name, bool writemode)
 {
-	return enter( name.toAscii());
+	return enter( name.toAscii(), writemode);
 }
 
-bool WidgetVisitor::enter( const QByteArray& name)
+bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 {
 	if (m_stk.empty()) return false;
-	/*[-]*/qDebug() << widget()->objectName() << "ENTER" << name;
-	if (m_stk.top()->enter( name))
+	/*[-]*/qDebug() << widget()->objectName() << "ENTER " << (writemode?"WRITE":"READ") << name;
+	if (m_stk.top()->enter( name, writemode))
 	{
 		return true;
 	}
@@ -279,7 +292,7 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 		}
 		QByteArray prefix( name.mid( 0, followidx));
 		QByteArray rest( name.mid( followidx+1, name.size()-followidx-1));
-		if (enter( prefix))
+		if (enter( prefix, false))
 		{
 			rt = property( rest, level+1);
 			leave();
@@ -333,7 +346,7 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 		}
 		QByteArray prefix( name.mid( 0, followidx));
 		QByteArray rest( name.mid( followidx+1, name.size()-followidx-1));
-		if (enter( prefix))
+		if (enter( prefix, true))
 		{
 			bool rt = setProperty( rest, value, level+1);
 			leave();
@@ -429,7 +442,7 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value)
 
 struct WidgetVisitorStackElement
 {
-	const char** dataelements;
+	const QList<QByteArray>* dataelements;
 	int dataelementidx;
 	QByteArray nameprefix;
 	QList<QByteArray> selectedDataElements;
@@ -442,7 +455,7 @@ struct WidgetVisitorStackElement
 		,isContent(false)
 	{}
 	explicit WidgetVisitorStackElement( const WidgetVisitor::StateR& state, const QByteArray& nameprefix_=QByteArray())
-		:dataelements(state->dataelements())
+		:dataelements(&state->dataelements())
 		,dataelementidx(0)
 		,nameprefix(nameprefix_)
 		,isContent(false)
@@ -490,9 +503,9 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements()
 
 	while (!m_stk.isEmpty() && !elemstk.isEmpty())
 	{
-		if (elemstk.top().dataelements && elemstk.top().dataelements[ elemstk.top().dataelementidx])
+		if (elemstk.top().dataelements && elemstk.top().dataelements->size() > elemstk.top().dataelementidx)
 		{
-			QByteArray elemname( elemstk.top().dataelements[ elemstk.top().dataelementidx]);
+			const QByteArray& dataelem = (*elemstk.top().dataelements)[ elemstk.top().dataelementidx];
 			if (!elemstk.top().selectedDataElements.isEmpty())
 			{
 				QByteArray dm;
@@ -500,27 +513,46 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements()
 				{
 					dm.append( elemstk.top().nameprefix);
 				}
-				dm.append( elemname);
+				dm.append( dataelem);
 				if (!elemstk.top().selectedDataElements.contains( dm))
 				{
 					++elemstk.top().dataelementidx;
 					continue;
 				}
 			}
-			else if (isReservedProperty( elemname))
+			else if (isReservedProperty( dataelem))
 			{
 				++elemstk.top().dataelementidx;
 				continue;
 			}
 			int stksize = m_stk.size();
-			if (enter( elemname))
+			if (m_stk.top()->isRepeating( dataelem))
+			{
+				//... handle lists
+				if (m_stk.top()->enter( dataelem, false))
+				{
+					///... if enter is internal in widget then we accumulate data
+					//     element references for comparison with selected data elements
+					QByteArray nameprefix = elemstk.top().nameprefix;
+					nameprefix.append( dataelem);
+					nameprefix.push_back( '.');
+					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), nameprefix));
+					rt.push_back( Element( Element::OpenTag, dataelem));
+				}
+				else
+				{
+					++elemstk.top().dataelementidx;
+				}
+				continue;
+			}
+			else if (enter( dataelem, false))
 			{
 				if (stksize == m_stk.size())
 				{
 					///... if enter is internal in widget then we accumulate data
 					//     element references for comparison with selected data elements
 					QByteArray nameprefix = elemstk.top().nameprefix;
-					nameprefix.append( elemname);
+					nameprefix.append( dataelem);
 					nameprefix.push_back( '.');
 					++elemstk.top().dataelementidx;
 					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), nameprefix));
@@ -530,24 +562,41 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements()
 					++elemstk.top().dataelementidx;
 					elemstk.push_back( WidgetVisitorStackElement( m_stk.top()));
 				}
-				rt.push_back( Element( Element::OpenTag, elemstk.top().dataelements[ elemstk.top().dataelementidx]));
+				rt.push_back( Element( Element::OpenTag, dataelem));
 			}
 			else
 			{
-				QVariant val = property( elemname);
+				QVariant val = property( dataelem);
 				if (!elemstk.top().isContent)
 				{
-					if (!val.canConvert( QVariant::Int)) elemstk.top().isContent = false;
+					if (!val.canConvert( QVariant::Int)) elemstk.top().isContent = true;
+				}
+				if (val.type() == QVariant::List)
+				{
+					elemstk.top().isContent = true;
 				}
 				if (elemstk.top().isContent)
 				{
-					rt.push_back( Element( Element::OpenTag, elemname));
-					rt.push_back( Element( Element::Value, val));
-					rt.push_back( Element( Element::CloseTag, ""));
+					if (val.type() == QVariant::List)
+					{
+						QList<QVariant> vlist = val.toList();
+						foreach (const QVariant& velem, vlist)
+						{
+							rt.push_back( Element( Element::OpenTag, dataelem));
+							rt.push_back( Element( Element::Value, velem));
+							rt.push_back( Element( Element::CloseTag, ""));
+						}
+					}
+					else
+					{
+						rt.push_back( Element( Element::OpenTag, dataelem));
+						rt.push_back( Element( Element::Value, val));
+						rt.push_back( Element( Element::CloseTag, ""));
+					}
 				}
 				else
 				{
-					rt.push_back( Element( Element::Attribute, elemname));
+					rt.push_back( Element( Element::Attribute, dataelem));
 					rt.push_back( Element( Element::Value, val));
 				}
 				++elemstk.top().dataelementidx;

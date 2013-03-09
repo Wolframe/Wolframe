@@ -73,9 +73,9 @@ bool WidgetVisitorState_QListWidget::setProperty( const QByteArray& name, const 
 	return false;
 }
 
-const char** WidgetVisitorState_QListWidget::dataelements() const
+const QList<QByteArray>& WidgetVisitorState_QListWidget::dataelements() const
 {
-	static const char* ar[] = {"select","value",0};
+	static const DataElements ar( "select", 0);
 	return ar;
 }
 
