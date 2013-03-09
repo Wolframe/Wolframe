@@ -1,4 +1,17 @@
 musts:
+- multi-line plain text fields (like desription in recipe) loose newlines
+- ILLEGAL STATE 4 in dataAvailable!
+- MDI interface
+  - open forms via click on button
+  - close forms on click on button
+  - reload forms from other forms
+  - some wiring trouble in datahandler:
+    CRITICAL: ERROR: answer for unknown request of doctype "xxx": most likely the
+    formwidgets share the same datahandler and the signals are missed, its list and hierarchy
+    requests, so it's the domain filler.
+    It happens only if the same form is picked as already shown in another window
+    => happens also with only one window?!
+  - resizing issues: example view picture when picture list window is quite small
 - modal dialogs
   - improve now refresh of parent form after closing the modal dialog,
     otherwise state propagation in the UI gets far too complicated!
