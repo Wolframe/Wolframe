@@ -53,13 +53,14 @@ class WidgetProperties : public QObject
 	Q_OBJECT
 	
 	public:
-		WidgetProperties( QHash<QString, QString> *_props = 0 ) : m_props( _props ) { }
+		WidgetProperties( QHash<QString, QString> *_props, QWidget* actionwidget_ ) : m_props( _props ), m_actionwidget(actionwidget_) { }
 	
 		QHash<QString, QString> *props( ) { return m_props; }
-		
+		QWidget* actionwidget()		{ return m_actionwidget;}
 	private:
 		QHash<QString, QString> *m_props;
-};               
+		QWidget* m_actionwidget;
+};
 
 class FormWidget : public QWidget
 {

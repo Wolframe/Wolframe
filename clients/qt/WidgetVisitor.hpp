@@ -42,6 +42,7 @@
 
 ///\brief Structure to access (global) variable references
 typedef QHash<QByteArray, QVariant> WidgetVariableMap;
+void widgetFillGlobals( const WidgetVariableMap& map, QHash<QString, QString>* globals);
 
 ///\class WidgetVisitor
 ///\brief Tree to access to (read/write) of widget data
@@ -55,6 +56,8 @@ class WidgetVisitor
 		///\param[in] root Root of widget tree visited
 		///\param[in] globals_ Reference to global variables
 		WidgetVisitor( QWidget* root, const QSharedPointer<WidgetVariableMap>& globals_);
+		explicit WidgetVisitor( QWidget* root);
+		WidgetVisitor( QWidget* root, const QHash<QString, QString>* globals_);
 
 		///\brief Copy constructor
 		///\param[in] o object to copy
@@ -93,21 +96,33 @@ class WidgetVisitor
 		///\param[in] name name of the property
 		///\return property variant (any type)
 		QVariant property( const QByteArray& name);
+		///\brief Get the property of the current node by 'name'
+		///\param[in] name name of the property
+		///\return property variant (any type)
+		QVariant property( const char* name);
 
 		///\brief Set the property of the current node
 		///\param[in] name name of the property
 		///\param[in] value property value as variant (any type)
 		///\return true on success
 		bool setProperty( const QByteArray& name, const QVariant& value);
-
 		///\brief Set the property of the current node
 		///\param[in] name name of the property
 		///\param[in] value property value as variant (any type)
 		///\return true on success
 		bool setProperty( const QString& name, const QVariant& value);
+		///\brief Set the property of the current node
+		///\param[in] name name of the property
+		///\param[in] value property value as variant (any type)
+		///\return true on success
+		bool setProperty( const char* name, const QVariant& value);
 
+		///\brief Find all widgets matching a condition and return them as their visitor context
 		typedef bool (*NodeProperty)( const QWidget* widget, const QByteArray& cond);
 		QList<WidgetVisitor> findNodes( NodeProperty prop, const QByteArray& cond=QByteArray());
+
+		///\brief Find a dedicated widget and return its visitor object relative to this
+		WidgetVisitor getSubWidgetVisitor( const QWidget* subwidget) const;
 
 		///\brief Element of serialization of widget data
 		class Element
@@ -161,8 +176,11 @@ class WidgetVisitor
 			virtual QVariant property( const QByteArray&)				{return QVariant();}
 			virtual bool setProperty( const QByteArray&, const QVariant&)		{return false;}
 			virtual const QList<QByteArray>& dataelements() const			{static const QList<QByteArray> ar; return ar;}
-			virtual bool isRepeating( const QByteArray&/*name*/)			{return false;}
+			virtual bool isRepeatingDataElement( const QByteArray&/*name*/)		{return false;}
 			const QByteArray& getSynonym( const QByteArray& name) const;
+
+			QVariant dynamicProperty( const QByteArray& name) const;
+			bool setDynamicProperty( const QByteArray&, const QVariant& value);
 
 		protected:
 			struct DataElements :public QList<QByteArray>				//< constructor helper for State::dataelements()
@@ -173,6 +191,7 @@ class WidgetVisitor
 		private:
 			QWidget* m_widget;							//< widget reference
 			QHash<QByteArray,QByteArray> m_synonyms;				//< synonym name map
+			QHash<QByteArray,QVariant> m_dynamicProperties;				//< map of defined dynamic properties
 		};
 		typedef QSharedPointer<State> StateR;
 
@@ -180,7 +199,6 @@ class WidgetVisitor
 		///\remark Takes the dynamic property 'dataelement' into account for element selection and resolves variable references in values
 		QList<Element> elements();
 
-		void initializeGlobals();
 		QSharedPointer<WidgetVariableMap> globals()					{return m_globals;}
 		QByteArray requestUID();
 		QWidget* widget() const								{return m_stk.isEmpty()?0:m_stk.top()->widget();}
@@ -188,6 +206,9 @@ class WidgetVisitor
 		///\brief Resolve reference to a variable
 		///\param[in] value to resolve
 		QVariant resolve( const QVariant& value);
+
+		///\brief Seek for global variable definitions and put them to the map of globals
+		void initializeGlobals();
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).

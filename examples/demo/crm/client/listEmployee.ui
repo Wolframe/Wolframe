@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>607</width>
+    <width>655</width>
     <height>300</height>
    </rect>
   </property>
@@ -68,13 +68,7 @@
          <string>Edit</string>
         </property>
         <property name="form" stdset="0">
-         <string>editEmployee</string>
-        </property>
-        <property name="global.employeeState" stdset="0">
-         <string notr="true">{employee.state}</string>
-        </property>
-        <property name="global.employeeid" stdset="0">
-         <string>{employee.id}</string>
+         <string>editEmployee?id={employee.selected}</string>
         </property>
        </widget>
       </item>

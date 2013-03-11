@@ -122,7 +122,7 @@ bool WidgetVisitorState_QTreeWidget::leave()
 	return true;
 }
 
-bool WidgetVisitorState_QTreeWidget::isRepeating( const QByteArray& name)
+bool WidgetVisitorState_QTreeWidget::isRepeatingDataElement( const QByteArray& name)
 {
 	if (m_mode == Tree && name == "item") return true;
 	if (m_mode != Tree && name == m_elementname) return true;
@@ -131,6 +131,15 @@ bool WidgetVisitorState_QTreeWidget::isRepeating( const QByteArray& name)
 
 QVariant WidgetVisitorState_QTreeWidget::property( const QByteArray& name)
 {
+	if (strcmp( name,"selected") == 0)
+	{
+		QList<QVariant> idlist;
+		foreach (const QTreeWidgetItem* sel, m_treeWidget->selectedItems())
+		{
+			idlist.push_back( sel->data( 0, Qt::UserRole));
+		}
+		return QVariant( idlist);
+	}
 	if (m_stk.isEmpty()) return QVariant();
 	if (m_mode == Init || (m_mode == Tree && m_stk.size() == 1)) return QVariant();
 	if (strcmp( name,"id") == 0)

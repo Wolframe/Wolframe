@@ -44,6 +44,8 @@ class WidgetMessageDispatcher
 		///\param[in] root Root of widget tree visited
 		WidgetMessageDispatcher( QWidget* formwidget)
 			:m_visitor( formwidget, QSharedPointer<WidgetVariableMap>( new WidgetVariableMap())){}
+		WidgetMessageDispatcher( const WidgetVisitor& visitor_)
+			:m_visitor(visitor_){}
 
 		///\brief Copy constructor
 		///\param[in] o object to copy
@@ -62,6 +64,7 @@ class WidgetMessageDispatcher
 		};
 
 		QList<Request> getDomainLoadRequests( bool debugmode=false);
+		Request getFormActionRequest( bool debugmode=false);
 		bool feedResult( const QByteArray& tag, const QByteArray& data);
 
 	private:

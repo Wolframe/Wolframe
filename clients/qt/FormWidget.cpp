@@ -32,6 +32,7 @@
 ************************************************************************/
 
 #include "FormWidget.hpp"
+#include "FormCall.hpp"
 #include "WidgetMessageDispatcher.hpp"
 #include "global.hpp"
 
@@ -92,16 +93,20 @@ void FormWidget::formListLoaded( QStringList forms )
 	m_forms = forms;
 }
 
-void FormWidget::storeToGlobals( QHash<QString, QString> *props )
+void FormWidget::storeToGlobals( QHash<QString, QString>*)
 {
-	foreach( const QString key, props->keys( ) ) {
-		if( key.startsWith( "global." ) ) {
-			QStringList parts = key.split( "." );
-			m_globals->insert( parts[1], props->value( key ) );
-		}
-	}
-	
-	//[+]qDebug( ) << "GLOBALS:" << *m_globals;
+	WidgetVisitor visitor( m_ui, m_globals);
+	visitor.initializeGlobals();
+	widgetFillGlobals( *visitor.globals(), m_globals);
+
+	//[+]foreach( const QString key, props->keys( ) ) {
+	//[+]	if( key.startsWith( "global." ) ) {
+	//[+]		QStringList parts = key.split( "." );
+	//[+]		m_globals->insert( parts[1], props->value( key ) );
+	//[+]	}
+	//[+]}
+
+	qDebug( ) << "GLOBALS:" << *m_globals;
 }
 
 void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
@@ -138,22 +143,37 @@ void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
 
 void FormWidget::switchForm( QObject *object )
 {
+	/*[-]*/qDebug( ) << "CALL FormWidget::switchForm";
 	WidgetProperties *widgetProps = qobject_cast<WidgetProperties *>( object );
 	QHash<QString, QString> *props = widgetProps->props( );
 
-	restoreFromGlobals( props );
+	QWidget *actionwidget = widgetProps->actionwidget();
+	WidgetVisitor visitor( m_ui);
+	visitor = visitor.getSubWidgetVisitor( actionwidget);
 
-	storeToGlobals( props );
+	//[+]restoreFromGlobals( props );
+	//[+]storeToGlobals( props );
+
+	QVariant doctype = visitor.property( "doctype");
+	if (doctype.isValid())
+	{
+		WidgetMessageDispatcher dispatcher( visitor);
+		WidgetMessageDispatcher::Request request = dispatcher.getFormActionRequest( m_debug);
+		m_dataLoader->datarequest( request.tag, request.content);
+	}
 
 // execute the action (old style, action mandatory)
 // execute the action (new style request, doctype mandatory)
-	if( props->contains( "action" ) || props->contains( "doctype" ) ) {
-		sendRequest( props );
-	}
+	//[+]if( props->contains( "action" ) || props->contains( "doctype" ) ) {
+	//[+]	sendRequest( props );
+	//[+]}
 	
 // switch form now, formLoaded will inform parent and others
-	if( props->contains( "form" ) ) {
-		QString nextForm = props->value( "form" );
+	QVariant formlink = visitor.property( "form");
+	if (formlink.isValid())
+	{
+		/*[-]*/qDebug() << "Link next form" << formlink.toString();
+		QString nextForm = formlink.toString();
 		if( m_modal && nextForm == "_CLOSE_" ) {
 			emit closed( );
 		} else {
@@ -293,8 +313,9 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 {
 // that's not us
 	if( name != m_form ) return;
-	
+
 	qDebug( ) << "Form " << name << " loaded";
+	FormCall formCall( name);
 
 // read the form and construct it from the UI file
 	QWidget *oldUi = m_ui;
@@ -318,6 +339,12 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		m_form = m_previousForm;
 		emit formModal( name );
 		return;
+	}
+	WidgetVisitor visitor( m_ui, m_globals);
+	foreach (const FormCall::Parameter& param, formCall.parameter())
+	{
+		visitor.setProperty( param.first, param.second);
+		qDebug( ) << "Set UI parameter" << param.first << "=" << param.second;
 	}
 
 // add new form to layout (which covers the whole widget)
@@ -348,7 +375,6 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		if( clazz == "QPushButton" ) {
 			QHash<QString, QString> *props = new QHash<QString, QString>( );
 			readDynamicStringProperties( props, widget );
-						
 			qDebug( ) << "connecting button" << _name << "to properties" << *props;
 
 			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
@@ -356,7 +382,7 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 			connect( pushButton, SIGNAL( clicked( ) ),
 				m_signalMapper, SLOT( map( ) ) );
 
-			WidgetProperties *widgetProps = new WidgetProperties( props );
+			WidgetProperties *widgetProps = new WidgetProperties( props, widget);
 			m_signalMapper->setMapping( pushButton, widgetProps );
 		}
 	}
@@ -476,6 +502,7 @@ void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml
 
 void FormWidget::gotAnswer( const QByteArray& tag, const QByteArray& data)
 {
+	qDebug() << "got answer tag=" << tag << "data=" << data;
 	WidgetMessageDispatcher dispatcher( m_ui);
 	dispatcher.feedResult( tag, data);
 }

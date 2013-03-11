@@ -31,44 +31,24 @@
 
 ************************************************************************/
 
-#ifndef _WIDGET_VISIOR_QTreeWidget_HPP_INCLUDED
-#define _WIDGET_VISIOR_QTreeWidget_HPP_INCLUDED
+#ifndef _WIDGET_VISIOR_QTextEdit_HPP_INCLUDED
+#define _WIDGET_VISIOR_QTextEdit_HPP_INCLUDED
 #include "WidgetVisitor.hpp"
-#include <QTreeWidget>
+#include <QTextEdit>
 
-class WidgetVisitorState_QTreeWidget
+class WidgetVisitorState_QTextEdit
 	:public WidgetVisitor::State
 {
 public:
-	WidgetVisitorState_QTreeWidget( QWidget* widget_);
+	WidgetVisitorState_QTextEdit( QWidget* widget_);
 
-	virtual bool enter( const QByteArray& name, bool writemode);
-	virtual bool leave();
 	virtual void clearProperty();
 	virtual QVariant property( const QByteArray& name);
 	virtual bool setProperty( const QByteArray& name, const QVariant& data);
 	virtual const QList<QByteArray>& dataelements() const;
-	virtual bool isRepeatingDataElement( const QByteArray& name);
 
 private:
-	struct StackElement
-	{
-		int readpos;
-		QTreeWidgetItem* item;
-		StackElement() :readpos(0),item(0){}
-		StackElement( const StackElement& o) :readpos(o.readpos),item(o.item){}
-		StackElement( QTreeWidgetItem* item_) :readpos(0),item(item_){}
-	};
-
-	QTreeWidget* m_treeWidget;
-	QStack<StackElement> m_stk;
-	QList<QByteArray> m_headers;
-	QByteArray m_elementname;
-	enum Mode {Init,Tree,List};
-	Mode m_mode;
-	QList<QByteArray> m_dataelements_init;
-	QList<QByteArray> m_dataelements_tree;
-	QList<QByteArray> m_dataelements_list;
+	QTextEdit* m_textEdit;
 };
 
 #endif

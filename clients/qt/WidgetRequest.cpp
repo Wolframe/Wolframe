@@ -90,9 +90,11 @@ QByteArray getWigdetRequest( WidgetVisitor& visitor, bool debugmode)
 		{
 			case WidgetVisitor::Element::OpenTag:
 				xml.writeStartElement( rootElement);
+				break;
 
 			case WidgetVisitor::Element::CloseTag:
 				xml.writeEndElement();
+				break;
 
 			case WidgetVisitor::Element::Attribute:
 				attribute = ie->value();

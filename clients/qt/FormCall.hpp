@@ -31,44 +31,39 @@
 
 ************************************************************************/
 
-#ifndef _WIDGET_VISIOR_QTreeWidget_HPP_INCLUDED
-#define _WIDGET_VISIOR_QTreeWidget_HPP_INCLUDED
-#include "WidgetVisitor.hpp"
-#include <QTreeWidget>
+#ifndef _FORM_CALL_HPP_INCLUDED
+#define _FORM_CALL_HPP_INCLUDED
+#include <QString>
+#include <QByteArray>
+#include <QPair>
+#include <QVariant>
+#include <QList>
 
-class WidgetVisitorState_QTreeWidget
-	:public WidgetVisitor::State
+///\class FormCall
+///\brief Form call interpreted as string "formname?param1=...&param2=..."
+//	commas ',' in the parameter definition are interpreted as list element separator for a variant list
+//	single quotes "'" are marking string content that can contain the special characters '&' and '?' and comma ','
+//	single quotes in strings are escaped as double single quotes
+class FormCall
 {
 public:
-	WidgetVisitorState_QTreeWidget( QWidget* widget_);
+	///\brief Constructor from definition
+	explicit FormCall( const QString& callstr);
 
-	virtual bool enter( const QByteArray& name, bool writemode);
-	virtual bool leave();
-	virtual void clearProperty();
-	virtual QVariant property( const QByteArray& name);
-	virtual bool setProperty( const QByteArray& name, const QVariant& data);
-	virtual const QList<QByteArray>& dataelements() const;
-	virtual bool isRepeatingDataElement( const QByteArray& name);
+	///\brief Form name to call
+	const QByteArray& name() const					{return m_name;}
+	static QByteArray name( const QByteArray& callstr);
+	static QString name( const QString& callstr);
+
+	typedef QPair<QByteArray,QVariant> Parameter;
+	///\brief List of parameters to pass to the form called
+	const QList<Parameter>& parameter() const			{return m_parameter;}
 
 private:
-	struct StackElement
-	{
-		int readpos;
-		QTreeWidgetItem* item;
-		StackElement() :readpos(0),item(0){}
-		StackElement( const StackElement& o) :readpos(o.readpos),item(o.item){}
-		StackElement( QTreeWidgetItem* item_) :readpos(0),item(item_){}
-	};
-
-	QTreeWidget* m_treeWidget;
-	QStack<StackElement> m_stk;
-	QList<QByteArray> m_headers;
-	QByteArray m_elementname;
-	enum Mode {Init,Tree,List};
-	Mode m_mode;
-	QList<QByteArray> m_dataelements_init;
-	QList<QByteArray> m_dataelements_tree;
-	QList<QByteArray> m_dataelements_list;
+	QByteArray m_name;			//< name of the form to load
+	QList<Parameter> m_parameter;		//< list of parameters to set in the loaded form before initializing it with data
 };
 
 #endif
+
+

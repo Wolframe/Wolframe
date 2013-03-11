@@ -32,6 +32,7 @@
 ************************************************************************/
 
 #include "FileFormLoader.hpp"
+#include "FormCall.hpp"
 #include "global.hpp"
 
 #include <QDir>
@@ -84,7 +85,7 @@ QByteArray FileFormLoader::readFile( QString name )
 
 void FileFormLoader::initiateFormLocalizationLoad( QString &name, QLocale locale )
 {
-	QByteArray localization = readFile( m_localeDir + "/" + name + "." + locale.name( ) + ".qm" );
+	QByteArray localization = readFile( m_localeDir + "/" + FormCall::name(name) + "." + locale.name( ) + ".qm" );
 	
 	emit formLocalizationLoaded( name, localization );
 }
@@ -92,7 +93,7 @@ void FileFormLoader::initiateFormLocalizationLoad( QString &name, QLocale locale
 void FileFormLoader::initiateFormLoad( QString &name )
 {
 // read directly here and stuff data into the signal
-	QByteArray form = readFile( m_formDir + "/" + name + ".ui" );
+	QByteArray form = readFile( m_formDir + "/" + FormCall::name( name) + ".ui" );
 
 	emit formLoaded( name, form );
 }

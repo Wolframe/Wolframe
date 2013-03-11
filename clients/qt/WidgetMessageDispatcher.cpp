@@ -61,8 +61,16 @@ QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRe
 	return rt;
 }
 
+static const QByteArray ignoreResultContentTag = "-emptyresult";
+WidgetMessageDispatcher::Request WidgetMessageDispatcher::getFormActionRequest( bool debugmode)
+{
+	return Request( ignoreResultContentTag, getWigdetRequest( m_visitor, debugmode));
+}
+
 bool WidgetMessageDispatcher::feedResult( const QByteArray& tag, const QByteArray& data)
 {
+	if (tag == ignoreResultContentTag) return true;
+
 	bool found = false;
 	bool rt = true;
 	foreach (WidgetVisitor visitor, m_visitor.findNodes( nodeProperty_hasRequestId, tag))

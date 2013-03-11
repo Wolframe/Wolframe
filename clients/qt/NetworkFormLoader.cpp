@@ -74,9 +74,11 @@ void NetworkFormLoader::initiateFormLocalizationLoad( QString &name, QLocale loc
 
 void NetworkFormLoader::initiateFormLoad( QString &name )
 {
-	//~ QString s = m_wolframeClient->syncRun( "getForm " + name );
+	// int paramidx = FormCall::name( name);
+	// QString formname( paramidx<0?name:name.mid( 0, paramidx));
+	//~ QString s = m_wolframeClient->syncRun( "getForm " + formname );
 	//~ if( s.isNull( ) ) {
-		//~ qWarning( ) << "Trouble loading form" << name;
+		//~ qWarning( ) << "Trouble loading form" << formname;
 	//~ } else {
 		//~ emit formLoaded( name, s.toUtf8( ) );
 	//~ }
