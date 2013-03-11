@@ -51,6 +51,7 @@
 #include <QTreeWidget>
 #include <QTableWidget>
 #include <QSharedPointer>
+#include <QLayout>
 
 static bool isConvertibleToInt( const QVariant& val)
 {
@@ -75,29 +76,19 @@ static bool isConvertibleToInt( const QVariant& val)
 	return false;
 }
 
-void widgetFillGlobals( const WidgetVariableMap& map, QHash<QString, QString>* globals)
-{
-	foreach (const QByteArray& key, map.keys())
-	{
-		globals->insert( QString( key), map[key].toString());
-	}
-}
-
 WidgetVisitor::State::State( QWidget* widget_)
 	:m_widget(widget_)
 {
-	QList<QByteArray> props = m_widget->dynamicPropertyNames();
-	QList<QByteArray>::const_iterator pi = props.begin(), pe = props.end();
-	for (; pi != pe; ++pi)
+	foreach (const QByteArray& prop, m_widget->dynamicPropertyNames())
 	{
-		if (pi->startsWith( "synonym:"))
+		if (prop.startsWith( "synonym:"))
 		{
-			QVariant synonym = m_widget->property( *pi);
-			m_synonyms.insert( pi->mid( 8, pi->size()-8), synonym.toByteArray());
+			QVariant synonym = m_widget->property( prop);
+			m_synonyms.insert( prop.mid( 8, prop.size()-8), synonym.toByteArray());
 		}
-		if (!pi->startsWith( "_w_") && !pi->startsWith( "_q_") && !pi->startsWith( "global."))
+		if (!prop.startsWith( "_w_") && !prop.startsWith( "_q_"))
 		{
-			m_dynamicProperties.insert( *pi, m_widget->property( *pi));
+			m_dynamicProperties.insert( prop, m_widget->property( prop));
 		}
 	}
 }
@@ -128,6 +119,7 @@ WidgetVisitor::State::DataElements::DataElements( const char* elem, ...)
 {
 	va_list ap;
 	va_start( ap, elem);
+	*this << elem;
 	for(;;)
 	{
 		const char* name = va_arg( ap, const char*);
@@ -169,37 +161,19 @@ static WidgetVisitor::StateR widgetVisitorState( QWidget* widget)
 	}
 }
 
-WidgetVisitor::WidgetVisitor( QWidget* root, const QSharedPointer<WidgetVariableMap>& globals_)
-	:m_globals(globals_)
-{
-	m_stk.push( widgetVisitorState( root));
-}
-
 WidgetVisitor::WidgetVisitor( QWidget* root)
-	:m_globals( QSharedPointer<WidgetVariableMap>( new WidgetVariableMap()))
 {
 	m_stk.push( widgetVisitorState( root));
 }
 
-WidgetVisitor::WidgetVisitor( const WidgetVisitor::StateR& state, const QSharedPointer<WidgetVariableMap>& globals_)
-	:m_globals(globals_)
+WidgetVisitor::WidgetVisitor( const WidgetVisitor::StateR& state)
 {
 	m_stk.push( state);
 }
 
-WidgetVisitor::WidgetVisitor( const QStack<StateR>& stk_, const QSharedPointer<WidgetVariableMap>& globals_)
-	:m_stk(stk_),m_globals(globals_)
+WidgetVisitor::WidgetVisitor( const QStack<StateR>& stk_)
+	:m_stk(stk_)
 {}
-
-WidgetVisitor::WidgetVisitor( QWidget* root, const QHash<QString, QString>* globals_)
-	:m_globals( QSharedPointer<WidgetVariableMap>( new WidgetVariableMap()))
-{
-	m_stk.push( widgetVisitorState( root));
-	foreach (const QString& key, globals_->keys())
-	{
-		m_globals->insert( key.toAscii(), QVariant( (*globals_)[key]));
-	}
-}
 
 bool WidgetVisitor::enter( const QString& name, bool writemode)
 {
@@ -213,16 +187,21 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 	{
 		return true;
 	}
-	QList<QWidget*> children = m_stk.top()->widget()->findChildren<QWidget*>( name);
-	if (children.size() > 1)
+	if (!name.isEmpty())
 	{
-		qCritical() << "ambiguus widget reference" << name;
-		return false;
-	}
-	if (children.isEmpty()) return false;
+		/*[-]*/qDebug() << "find child" << name;
+		QList<QWidget*> children = m_stk.top()->widget()->findChildren<QWidget*>( name);
+		if (children.size() > 1)
+		{
+			qCritical() << "ambiguus widget reference" << name;
+			return false;
+		}
+		if (children.isEmpty()) return false;
 
-	m_stk.push( widgetVisitorState( children[0]));
-	return true;
+		m_stk.push( widgetVisitorState( children[0]));
+		return true;
+	}
+	return false;
 }
 
 void WidgetVisitor::leave()
@@ -350,6 +329,23 @@ QVariant WidgetVisitor::resolve( const QVariant& value)
 	return value;
 }
 
+WidgetVisitor WidgetVisitor::getRootElement( const QByteArray& name)
+{
+	if (m_stk.empty()) return WidgetVisitor();
+	if (m_stk.at(0)->widget()->objectName() == name)
+	{
+		WidgetVisitor rt( m_stk.at(0));
+		return rt;
+	}
+	QList<QWidget*> ww = m_stk.at(0)->widget()->findChildren<QWidget*>(name);
+	if (ww.size() == 1)
+	{
+		WidgetVisitor rt( ww[0]);
+		return rt;
+	}
+	return WidgetVisitor();
+}
+
 QVariant WidgetVisitor::property( const QByteArray& name, int level)
 {
 	if (m_stk.empty()) return QVariant()/*invalid*/;
@@ -358,21 +354,13 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 	{
 		return property( synonym, level);
 	}
-	QVariant rt = m_stk.top()->property( name);
-	if (!rt.isValid()) rt = m_stk.top()->dynamicProperty( name);
-	if (rt.isValid()) return resolve( rt);
+	QVariant rt;
+	if ((rt = m_stk.top()->property( name)).isValid()) return resolve( rt);
+	if ((rt = m_stk.top()->dynamicProperty( name)).isValid()) return resolve( rt);
 
 	int followidx = name.indexOf( '.');
 	if (followidx >= 0)
 	{
-		if (level == 0 && name.startsWith( "global."))
-		{
-			WidgetVariableMap::const_iterator gi = m_globals->find( name.mid( 7, name.size()-7));
-			if (gi != m_globals->end())
-			{
-				return resolve( gi.value());
-			}
-		}
 		QByteArray prefix( name.mid( 0, followidx));
 		QByteArray rest( name.mid( followidx+1, name.size()-followidx-1));
 		if (enter( prefix, false))
@@ -397,20 +385,22 @@ QVariant WidgetVisitor::property( const QByteArray& name, int level)
 		}
 		if (level == 0)
 		{
-			if (m_stk.at(0)->widget()->objectName() == prefix)
-			{
-				WidgetVisitor rootvisit( m_stk.at(0), m_globals);
-				return rootvisit.property( rest, 1);
-			}
-			QList<QWidget*> ww = m_stk.at(0)->widget()->findChildren<QWidget*>(prefix);
-			if (ww.size() == 1 && ww.at(0)->objectName() == prefix)
-			{
-				WidgetVisitor rootvisit( ww[0], m_globals);
-				return rootvisit.property( rest, 1);
-			}
+			return getRootElement( prefix).property( rest, 1);
 		}
 	}
 	return rt;
+}
+
+QByteArray WidgetVisitor::objectName() const
+{
+	if (m_stk.isEmpty()) return QByteArray();
+	return m_stk.top()->widget()->objectName().toAscii();
+}
+
+QByteArray WidgetVisitor::className() const
+{
+	if (m_stk.isEmpty()) return QByteArray();
+	return m_stk.top()->widget()->metaObject()->className();
 }
 
 QByteArray WidgetVisitor::requestUID()
@@ -419,7 +409,7 @@ QByteArray WidgetVisitor::requestUID()
 	static qint64 g_cnt = 0;
 	QVariant ruid = m_stk.top()->widget()->property( "_w_requestid");
 	if (ruid.type() == QVariant::ByteArray) return ruid.toByteArray();
-	QByteArray rt =  m_stk.top()->widget()->metaObject()->className();
+	QByteArray rt =  objectName();
 	rt.append( ":");
 	rt.append( QVariant( ++g_cnt).toByteArray());
 	m_stk.top()->widget()->setProperty( "_w_requestid", QVariant(rt));
@@ -449,32 +439,21 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value, 
 	int followidx = name.indexOf( '.');
 	if (followidx >= 0)
 	{
-		if (level == 0 && name.startsWith( "global."))
-		{
-			m_globals->insert( name.mid( 7, name.size()-7), value);
-			return true;
-		}
 		QByteArray prefix( name.mid( 0, followidx));
 		QByteArray rest( name.mid( followidx+1, name.size()-followidx-1));
 		if (enter( prefix, true))
 		{
 			bool rt = setProperty( rest, value, level+1);
 			leave();
+			if (m_stk.top()->isRepeatingDataElement( prefix))
+			{
+				qCritical() << "cannot set property addressing a set of properties:" << prefix;
+			}
 			return rt;
 		}
 		if (level == 0)
 		{
-			if (m_stk.at(0)->widget()->objectName() == prefix)
-			{
-				WidgetVisitor rootvisit( m_stk.at(0), m_globals);
-				return rootvisit.setProperty( rest, value, 1);
-			}
-			QList<QWidget*> ww = m_stk.at(0)->widget()->findChildren<QWidget*>(prefix);
-			if (ww.size() == 1 && ww.at(0)->objectName() == prefix)
-			{
-				WidgetVisitor rootvisit( ww[0], m_globals);
-				return rootvisit.setProperty( rest, value, 1);
-			}
+			return getRootElement( prefix).setProperty( rest, value, 1);
 		}
 	}
 	else
@@ -506,10 +485,10 @@ QList<WidgetVisitor> WidgetVisitor::findNodes( NodeProperty prop, const QByteArr
 			foreach( QWidget* ww, ar[idx].widget()->findChildren<QWidget*>())
 			{
 				stk.push_back( widgetVisitorState( ww));
-				ar.push_back( WidgetVisitor( stk, globals()));
+				ar.push_back( WidgetVisitor( stk));
 				if (prop( ww, cond))
 				{
-					rt.push_back( WidgetVisitor( stk, globals()));
+					rt.push_back( WidgetVisitor( stk));
 					//... append child matching to result
 				}
 				stk.pop();
@@ -535,34 +514,6 @@ WidgetVisitor WidgetVisitor::getSubWidgetVisitor( const QWidget* subwidget) cons
 	return WidgetVisitor();
 }
 
-bool nodeProperty_hasGlobals( const QWidget* widget, const QByteArray& )
-{
-	QList<QByteArray> dprops = widget->dynamicPropertyNames();
-	QList<QByteArray>::iterator di = dprops.begin(), de = dprops.end();
-	for (; di != de; ++di)
-	{
-		if (di->startsWith( "global.")) return true;
-	}
-	return false;
-}
-
-void WidgetVisitor::initializeGlobals()
-{
-	foreach (WidgetVisitor ww, findNodes( nodeProperty_hasGlobals))
-	{
-		QList<QByteArray> dprops = ww.widget()->dynamicPropertyNames();
-		QList<QByteArray>::iterator di = dprops.begin(), de = dprops.end();
-		for (; di != de; ++di)
-		{
-			if (di->startsWith( "global."))
-			{
-				QByteArray globalname( di->mid( 7, di->size()-7));
-				m_globals->insert( globalname, resolve( ww.property( *di)));
-			}
-		}
-	}
-}
-
 bool WidgetVisitor::setProperty( const QString& name, const QVariant& value)
 {
 	return setProperty( name.toAscii(), value, 0);
@@ -573,92 +524,136 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value)
 	return setProperty( name, value, 0);
 }
 
-struct WidgetVisitorStackElement
-{
-	const QList<QByteArray>* dataelements;
-	int dataelementidx;
-	QByteArray nameprefix;
-	QList<QByteArray> selectedDataElements;
-	bool isContent;
-
-	WidgetVisitorStackElement()
-		:dataelements(0)
-		,dataelementidx(0)
-		,nameprefix()
-		,isContent(false)
-	{}
-	explicit WidgetVisitorStackElement( const WidgetVisitor::StateR& state, const QByteArray& nameprefix_=QByteArray())
-		:dataelements(&state->dataelements())
-		,dataelementidx(0)
-		,nameprefix(nameprefix_)
-		,isContent(false)
-	{
-		QList<QByteArray> dprops = state->widget()->dynamicPropertyNames();
-		if (dprops.contains( "dataelement"))
-		{
-			selectedDataElements = state->widget()->property( "dataelement").toByteArray().split( ',');
-			dataelements = &selectedDataElements;
-		}
-	}
-	WidgetVisitorStackElement( const WidgetVisitorStackElement& o)
-		:dataelements( o.dataelements)
-		,dataelementidx( o.dataelementidx)
-		,nameprefix( o.nameprefix)
-		,selectedDataElements(o.selectedDataElements)
-		,isContent(o.isContent)
-	{}
-};
-
 static bool isReservedProperty( const QByteArray& key)
 {
 	// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
 	if (key.startsWith( "_q_")) return true;
+	if (key == "initialFocus") return true;
 	// skip _w_ dynamic properties, they are used as internal Wolframe properties
 	if (key.startsWith( "_w_")) return true;
-	// skip globals
-	if (key.startsWith( "global.")) return true;
 	// skip synonym declarations
-	if (key.startsWith( "synonym:")) return true;
-	// ignore our own actions
-	if (key == "doctype" || key == "rootelement" || key == "dataelement" || key == "form" || key == "state")
+	if (key.indexOf( ':') >= 0) return true;
+	// ignore Wolframe elements
+	if (key == "dataelement" || key == "doctype" || key == "rootelement" || key == "form" || key == "state")
 	{
 		return true;
 	}
 	return false;
 }
 
+struct WidgetVisitorStackElement
+{
+	QList<QByteArray> dataelements;
+	int nof_attributes;
+	int dataelementidx;
+	bool isContent;
+	bool hasSelectedDataelements;
+
+	WidgetVisitorStackElement()
+		:nof_attributes(0)
+		,dataelementidx(0)
+		,isContent(false)
+		,hasSelectedDataelements(false)
+	{}
+	WidgetVisitorStackElement( const WidgetVisitor::StateR& state, const QList<QByteArray>* selectedDataElements)
+		:nof_attributes(0)
+		,dataelementidx(0)
+		,isContent(false)
+		,hasSelectedDataelements(selectedDataElements?true:false)
+	{
+		if (!selectedDataElements)
+		{
+			foreach (const QByteArray& prop, state->widget()->dynamicPropertyNames())
+			{
+				if (!isReservedProperty( prop))
+				{
+					dataelements.push_back( prop);
+				}
+			}
+			dataelements.append( state->dataelements());
+			foreach (const QWidget* child, state->widget()->findChildren<QWidget*>())
+			{
+				if (qobject_cast<const QLabel*>(child)) continue;
+				if (qobject_cast<const QAbstractButton*>(child)) continue;
+				if (qobject_cast<const QLayout*>(child)) continue;
+				QByteArray objname = child->objectName().toAscii();
+				if (!objname.isEmpty() && !objname.startsWith("qt_"))
+				{
+					dataelements << objname;
+				}
+			}
+		}
+		else
+		{
+			foreach (const QByteArray& elem, *selectedDataElements)
+			{
+				if (elem[0] == '@')
+				{
+					dataelements.push_back( elem.mid( 1, elem.size()-1));
+				}
+			}
+			nof_attributes = dataelements.size();
+			foreach (const QByteArray& elem, *selectedDataElements)
+			{
+				if (elem[0] != '@')
+				{
+					dataelements.push_back( elem);
+				}
+			}
+		}
+		/*[-]*/qDebug() << "DATAELEMENTS";
+		/*[-]*/foreach (const QByteArray& de, dataelements) {qDebug() << "$" << de;}
+	}
+	WidgetVisitorStackElement( const WidgetVisitorStackElement& o)
+		:dataelements( o.dataelements)
+		,nof_attributes(o.nof_attributes)
+		,dataelementidx( o.dataelementidx)
+		,isContent(o.isContent)
+		,hasSelectedDataelements(o.hasSelectedDataelements)
+	{}
+};
+
+QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>& selectedDataElements)
+{
+	return elements( &selectedDataElements);
+}
+
 QList<WidgetVisitor::Element> WidgetVisitor::elements()
 {
-	QList<WidgetVisitor::Element> rt;
-	if (m_stk.isEmpty()) return rt;
+	return elements( 0);
+}
+
+static QList<QByteArray> getSuffixDataElements( const QList<QByteArray>& ba, const QByteArray& prefix)
+{
+	QList<QByteArray> rt;
+	foreach (const QByteArray& de, ba)
+	{
+		if (de.startsWith( prefix) && de.size() > prefix.size() && de.at( prefix.size()) == '.')
+		{
+			rt.push_back( de.mid( prefix.size(), de.size()- prefix.size()));
+		}
+	}
+	return rt;
+}
+
+QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* selectedDataElements)
+{
+	if (m_stk.isEmpty()) return QList<WidgetVisitor::Element>();
 
 	QStack<WidgetVisitorStackElement> elemstk;
-	elemstk.push_back( WidgetVisitorStackElement( m_stk.top()));
+	elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), selectedDataElements));
+	/*[-]*/qDebug() << "Selected data elements" << (selectedDataElements?*selectedDataElements:QList<QByteArray>());
 
+	QList<WidgetVisitor::Element> rt;
 	while (!elemstk.isEmpty())
 	{
-		if (elemstk.top().dataelements && elemstk.top().dataelements->size() > elemstk.top().dataelementidx)
+		/*[-]*/qDebug() << "ELEMENTS";
+		/*[-]*/foreach (const WidgetVisitor::Element& elem, rt) {qDebug() << "HAVE NOW" << elem.toString();}
+		if (elemstk.top().dataelements.size() > elemstk.top().dataelementidx)
 		{
-			const QByteArray& dataelem = (*elemstk.top().dataelements)[ elemstk.top().dataelementidx];
-			if (!elemstk.top().selectedDataElements.isEmpty())
-			{
-				QByteArray dm;
-				if (!elemstk.top().nameprefix.isEmpty())
-				{
-					dm.append( elemstk.top().nameprefix);
-				}
-				dm.append( dataelem);
-				if (!elemstk.top().selectedDataElements.contains( dm))
-				{
-					++elemstk.top().dataelementidx;
-					continue;
-				}
-			}
-			else if (isReservedProperty( dataelem))
-			{
-				++elemstk.top().dataelementidx;
-				continue;
-			}
+			const QByteArray& dataelem = elemstk.top().dataelements.at( elemstk.top().dataelementidx);
+			/*[-]*/qDebug() << "Get data element" << dataelem;
+
 			int stksize = m_stk.size();
 			if (m_stk.top()->isRepeatingDataElement( dataelem))
 			{
@@ -667,10 +662,9 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements()
 				{
 					///... if enter is internal in widget then we accumulate data
 					//     element references for comparison with selected data elements
-					QByteArray nameprefix = elemstk.top().nameprefix;
-					nameprefix.append( dataelem);
-					nameprefix.push_back( '.');
-					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), nameprefix));
+					QList<QByteArray> selected = getSuffixDataElements( elemstk.top().dataelements, dataelem);
+					elemstk.top().isContent = true;
+					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected));
 					rt.push_back( Element( Element::OpenTag, dataelem));
 				}
 				else
@@ -681,61 +675,73 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements()
 			}
 			else if (enter( dataelem, false))
 			{
+				elemstk.top().isContent = true;
 				if (stksize == m_stk.size())
 				{
 					///... if enter is internal in widget then we accumulate data
 					//     element references for comparison with selected data elements
-					QByteArray nameprefix = elemstk.top().nameprefix;
-					nameprefix.append( dataelem);
-					nameprefix.push_back( '.');
+					QList<QByteArray> selected = getSuffixDataElements( elemstk.top().dataelements, dataelem);
 					++elemstk.top().dataelementidx;
-					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), nameprefix));
+					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), &selected));
 				}
 				else
 				{
 					++elemstk.top().dataelementidx;
-					elemstk.push_back( WidgetVisitorStackElement( m_stk.top()));
+					elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), 0));
 				}
 				rt.push_back( Element( Element::OpenTag, dataelem));
 			}
 			else
 			{
 				QVariant val = property( dataelem);
-				if (dataelem.isEmpty() || val.type() == QVariant::List)
+				if (val.isValid())
 				{
-					elemstk.top().isContent = true;
-				}
-				if (!elemstk.top().isContent)
-				{
-					if (!isConvertibleToInt( val)) elemstk.top().isContent = true;
-				}
-				if (elemstk.top().isContent)
-				{
-					if (val.type() == QVariant::List)
+					if (dataelem.isEmpty() || val.type() == QVariant::List)
 					{
-						QList<QVariant> vlist = val.toList();
-						foreach (const QVariant& velem, vlist)
+						elemstk.top().isContent = true;
+					}
+					if (!elemstk.top().isContent)
+					{
+						if (elemstk.top().hasSelectedDataelements)
+						{
+							if (elemstk.top().dataelementidx >= elemstk.top().nof_attributes)
+							{
+								elemstk.top().isContent = true;
+							}
+						}
+						else
+						{
+							if (!isConvertibleToInt( val)) elemstk.top().isContent = true;
+						}
+					}
+					if (elemstk.top().isContent)
+					{
+						if (val.type() == QVariant::List)
+						{
+							QList<QVariant> vlist = val.toList();
+							foreach (const QVariant& velem, vlist)
+							{
+								rt.push_back( Element( Element::OpenTag, dataelem));
+								rt.push_back( Element( Element::Value, velem));
+								rt.push_back( Element( Element::CloseTag, ""));
+							}
+						}
+						else if (dataelem.isEmpty())
+						{
+							rt.push_back( Element( Element::Value, val));
+						}
+						else
 						{
 							rt.push_back( Element( Element::OpenTag, dataelem));
-							rt.push_back( Element( Element::Value, velem));
+							rt.push_back( Element( Element::Value, val));
 							rt.push_back( Element( Element::CloseTag, ""));
 						}
 					}
-					else if (dataelem.isEmpty())
-					{
-						rt.push_back( Element( Element::Value, val));
-					}
 					else
 					{
-						rt.push_back( Element( Element::OpenTag, dataelem));
+						rt.push_back( Element( Element::Attribute, dataelem));
 						rt.push_back( Element( Element::Value, val));
-						rt.push_back( Element( Element::CloseTag, ""));
 					}
-				}
-				else
-				{
-					rt.push_back( Element( Element::Attribute, dataelem));
-					rt.push_back( Element( Element::Value, val));
 				}
 				++elemstk.top().dataelementidx;
 			}
@@ -745,12 +751,20 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements()
 			elemstk.pop_back();
 			if (!elemstk.isEmpty())
 			{
-				rt.push_back( Element( Element::CloseTag, ""));
+				if (rt.back().type() == Element::OpenTag)
+				{
+					rt.pop_back();
+				}
+				else
+				{
+					rt.push_back( Element( Element::CloseTag, ""));
+				}
 				leave();
 			}
 		}
 	}
 	return rt;
 }
+
 
 

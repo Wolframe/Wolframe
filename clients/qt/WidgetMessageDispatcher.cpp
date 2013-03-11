@@ -64,7 +64,7 @@ QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRe
 static const QByteArray ignoreResultContentTag = "-emptyresult";
 WidgetMessageDispatcher::Request WidgetMessageDispatcher::getFormActionRequest( bool debugmode)
 {
-	return Request( ignoreResultContentTag, getWigdetRequest( m_visitor, debugmode));
+	return Request( ignoreResultContentTag, getActionRequest( m_visitor, debugmode));
 }
 
 bool WidgetMessageDispatcher::feedResult( const QByteArray& tag, const QByteArray& data)

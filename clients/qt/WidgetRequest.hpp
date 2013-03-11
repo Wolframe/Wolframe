@@ -37,6 +37,7 @@
 #include <QByteArray>
 
 QByteArray getWigdetRequest( WidgetVisitor& visitor, bool debugmode=false);
+QByteArray getActionRequest( WidgetVisitor& visitor, bool debugmode=false);
 bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer);
 
 #endif

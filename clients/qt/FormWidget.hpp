@@ -48,20 +48,6 @@
 #include <QCloseEvent>
 #include <QTranslator>
 
-class WidgetProperties : public QObject
-{
-	Q_OBJECT
-	
-	public:
-		WidgetProperties( QHash<QString, QString> *_props, QWidget* actionwidget_ ) : m_props( _props ), m_actionwidget(actionwidget_) { }
-	
-		QHash<QString, QString> *props( ) { return m_props; }
-		QWidget* actionwidget()		{ return m_actionwidget;}
-	private:
-		QHash<QString, QString> *m_props;
-		QWidget* m_actionwidget;
-};
-
 class FormWidget : public QWidget
 {
 	Q_OBJECT
@@ -76,8 +62,6 @@ class FormWidget : public QWidget
 	public:
 		QString form( ) const;
 		QIcon getWindowIcon( ) const;
-
-		void restoreFromGlobals( QHash<QString, QString> *props );
 		
 		QHash<QString, QString> *globals( ) const;
 		void setGlobals( QHash<QString, QString> *_globals );
@@ -110,8 +94,6 @@ class FormWidget : public QWidget
 		
 	private:
 		void initialize( );
-		void sendRequest( QHash<QString, QString> *props );
-		void storeToGlobals( QHash<QString, QString> *props );
 	
 	signals:
 		void formLoaded( QString name );
@@ -129,10 +111,9 @@ class FormWidget : public QWidget
 		void formLocalizationLoaded( QString name, QByteArray localization );
 		void formListLoaded( QStringList forms );
 		
-		void gotAnswer( QString formName, QString widgetName, QByteArray xml );
 		void gotAnswer( const QByteArray& tag, const QByteArray& data);
 
-		void switchForm( QObject *object );
+		void switchForm( QWidget *object );
 };
 	
 #endif // _FORM_WIDGET_HPP_INCLUDED

@@ -441,7 +441,6 @@ void DataHandler::resetWidgetData( QWidget *widget, QString name )
 // get dynamic properties of the widget (used for 'initialFocus' and 'state' currently)
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
 	FormWidget::readDynamicStringProperties( props, widget );
-	m_formWidget->restoreFromGlobals( props );
 	
 	if( clazz == "QLineEdit" ) {
 		QLineEdit *lineEdit = qobject_cast<QLineEdit *>( widget );
@@ -575,7 +574,7 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *wi
 	// TODO: widgets can also have custom properties for the domain handling
 	QHash<QString, QString> *props = new QHash<QString, QString>( );
 	FormWidget::readDynamicStringProperties( props, widget );
-	m_formWidget->restoreFromGlobals( props );
+
 	QString window_name = QString::number( (int)m_formWidget->winId( ) );
 	if( clazz == "QComboBox" ) {
 		m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );

@@ -40,10 +40,6 @@
 #include <QSharedPointer>
 #include <QVariant>
 
-///\brief Structure to access (global) variable references
-typedef QHash<QByteArray, QVariant> WidgetVariableMap;
-void widgetFillGlobals( const WidgetVariableMap& map, QHash<QString, QString>* globals);
-
 ///\class WidgetVisitor
 ///\brief Tree to access to (read/write) of widget data
 class WidgetVisitor
@@ -54,20 +50,19 @@ class WidgetVisitor
 
 		///\brief Constructor
 		///\param[in] root Root of widget tree visited
-		///\param[in] globals_ Reference to global variables
-		WidgetVisitor( QWidget* root, const QSharedPointer<WidgetVariableMap>& globals_);
 		explicit WidgetVisitor( QWidget* root);
-		WidgetVisitor( QWidget* root, const QHash<QString, QString>* globals_);
 
 		///\brief Copy constructor
 		///\param[in] o object to copy
 		WidgetVisitor( const WidgetVisitor& o)
-			:m_stk(o.m_stk),m_globals(o.m_globals){}
+			:m_stk(o.m_stk){}
 
 		///\brief Sets the current node to the child with name 'name'
 		bool enter( const QString& name, bool writemode);
 		///\brief Sets the current node to the child with name 'name'
 		bool enter( const QByteArray& name, bool writemode);
+		///\brief Return the addressed visitor of this with name as root element
+		WidgetVisitor getRootElement( const QByteArray& name);
 
 		///\brief Set the current node to the parent that called enter to this node.
 		void leave();
@@ -81,9 +76,6 @@ class WidgetVisitor
 		*/
 		/** Used dynamic property prefixes:
 		*	'synonym:' Rewrite rule for property "synonym:IDENTIFIER": look for the value if IDENTIFIER is searched
-		*	'global.' Global variable: Resolve 'global.IDENTIFIER' as lookup in the globals table passed as reference in the constructor
-		*			Global variable references '{global.NAME}' are resolved once at widget initialization.
-		*			Other variable references '{name}' are resolved whenever a property is read
 		*/
 		/** Rules:
 		*	Structured widget property names (customer.id) refer allways to the last accessed main property (customer)
@@ -195,20 +187,19 @@ class WidgetVisitor
 		};
 		typedef QSharedPointer<State> StateR;
 
-		///\brief Get a serialization of all visible widget elements of the current state
+		///\brief Get a serialization of all visible widget elements of rootelement in the current state
 		///\remark Takes the dynamic property 'dataelement' into account for element selection and resolves variable references in values
 		QList<Element> elements();
+		QList<Element> elements( const QList<QByteArray>& selected_dataelements);
 
-		QSharedPointer<WidgetVariableMap> globals()					{return m_globals;}
 		QByteArray requestUID();
 		QWidget* widget() const								{return m_stk.isEmpty()?0:m_stk.top()->widget();}
+		QByteArray objectName() const;
+		QByteArray className() const;
 
 		///\brief Resolve reference to a variable
 		///\param[in] value to resolve
 		QVariant resolve( const QVariant& value);
-
-		///\brief Seek for global variable definitions and put them to the map of globals
-		void initializeGlobals();
 
 	private:
 		///\brief Internal property get using 'level' to check property resolving step (B).
@@ -222,13 +213,15 @@ class WidgetVisitor
 		///\return true on success
 		bool setProperty( const QByteArray& name, const QVariant& value, int level);
 
+		///\brief Internal implementation of 'elements(...)'
+		QList<Element> elements( const QList<QByteArray>* selected_dataelements);
+
 		///\brief Constructor internal
-		WidgetVisitor( const StateR& state, const QSharedPointer<WidgetVariableMap>& globals_);
+		WidgetVisitor( const StateR& state);
 		///\brief Constructor internal
-		WidgetVisitor( const QStack<StateR>& stk_, const QSharedPointer<WidgetVariableMap>& globals_);
+		WidgetVisitor( const QStack<StateR>& stk_);
 
 		QStack<StateR> m_stk;				//< stack of visited widget nodes (first) with their select state (second). The current node is the top element
-		QSharedPointer<WidgetVariableMap> m_globals;	//< global variables
 };
 
 #endif

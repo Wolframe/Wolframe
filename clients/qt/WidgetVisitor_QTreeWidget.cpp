@@ -66,10 +66,10 @@ bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemo
 {
 	if (strcmp( name, "tree") == 0)
 	{
-		if (m_mode != Init)
-		{
-			qCritical() << "node tree is not single root node";
-		}
+		if (!writemode && m_stk.top().readpos < m_stk.top().item->childCount()) return false;
+		if (m_mode != Init) return false;
+
+		m_stk.push_back( StackElement( m_stk.top().item));
 		m_mode = Tree;
 		return true;
 	}
@@ -85,15 +85,11 @@ bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemo
 			m_stk.push_back( m_stk.top().item->child( m_stk.top().readpos++));
 			return true;
 		}
-		return false;
 	}
 	else if (name == m_elementname)
 	{
-		if (m_mode == Tree)
-		{
-			qCritical() << "illegal node " << name << " in tree";
-			return false;
-		}
+		if (!writemode && m_stk.top().readpos < m_stk.top().item->childCount()) return false;
+		if (m_mode == Tree) return false;
 		if (m_stk.size() != 1)
 		{
 			qCritical() << "illegal header in middle of content";
@@ -105,12 +101,11 @@ bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemo
 			m_stk.push_back( StackElement( new QTreeWidgetItem( m_stk.top().item)));
 			return true;
 		}
-		else if (m_stk.top().readpos < m_stk.top().item->childCount())
+		else
 		{
 			m_stk.push_back( m_stk.top().item->child( m_stk.top().readpos++));
 			return true;
 		}
-		return false;
 	}
 	return false;
 }

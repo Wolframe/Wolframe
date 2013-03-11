@@ -83,8 +83,8 @@ void FormWidget::initialize( )
 	m_signalMapper = new QSignalMapper( this );
 	
 // the form must be switched after 'action' has been taken in the current form
-	connect( m_signalMapper, SIGNAL( mapped( QObject * ) ),
-		this, SLOT( switchForm( QObject * ) ) );
+	connect( m_signalMapper, SIGNAL( mapped( QWidget * ) ),
+		this, SLOT( switchForm( QWidget * ) ) );
 }
 
 void FormWidget::formListLoaded( QStringList forms )
@@ -93,66 +93,10 @@ void FormWidget::formListLoaded( QStringList forms )
 	m_forms = forms;
 }
 
-void FormWidget::storeToGlobals( QHash<QString, QString>*)
+void FormWidget::switchForm( QWidget *actionwidget )
 {
-	WidgetVisitor visitor( m_ui, m_globals);
-	visitor.initializeGlobals();
-	widgetFillGlobals( *visitor.globals(), m_globals);
-
-	//[+]foreach( const QString key, props->keys( ) ) {
-	//[+]	if( key.startsWith( "global." ) ) {
-	//[+]		QStringList parts = key.split( "." );
-	//[+]		m_globals->insert( parts[1], props->value( key ) );
-	//[+]	}
-	//[+]}
-
-	qDebug( ) << "GLOBALS:" << *m_globals;
-}
-
-void FormWidget::restoreFromGlobals( QHash<QString, QString> *props )
-{
-	foreach( const QString key, props->keys( ) ) {
-		QString value = props->value( key );
-		if( value.startsWith( "{" ) && value.endsWith( "}" ) ) {
-			QString refKey = value.mid( 1, value.length( ) - 2 );
-			if( refKey.startsWith( "global." ) ) {
-				QStringList parts = refKey.split( "." );
-				if ( parts.length() > 2 ) {
-					emit error( QString( "illegal global variable name '%1'").arg( refKey ) );
-				}
-				QString globalKey = parts[1];
-				if( m_globals->contains( globalKey ) ) {
-					props->insert( key, m_globals->value( globalKey ) );
-				} else {
-					// unknown value, map to empty
-					props->insert( key, "" );
-				}
-			} else {
-				QString evaluated = m_dataHandler->readFormVariable( refKey, m_ui );
-				if( !evaluated.isNull( ) ) {
-					props->insert( key, evaluated );
-				} else {
-					// unknown value, map to empty
-					props->insert( key, "" );
-				}
-			}
-		}
-		//[+]qDebug( ) << "GLOBALS SUBSTITUTE" << key << props->value( key );
-	}
-}
-
-void FormWidget::switchForm( QObject *object )
-{
-	/*[-]*/qDebug( ) << "CALL FormWidget::switchForm";
-	WidgetProperties *widgetProps = qobject_cast<WidgetProperties *>( object );
-	QHash<QString, QString> *props = widgetProps->props( );
-
-	QWidget *actionwidget = widgetProps->actionwidget();
 	WidgetVisitor visitor( m_ui);
 	visitor = visitor.getSubWidgetVisitor( actionwidget);
-
-	//[+]restoreFromGlobals( props );
-	//[+]storeToGlobals( props );
 
 	QVariant doctype = visitor.property( "doctype");
 	if (doctype.isValid())
@@ -161,18 +105,11 @@ void FormWidget::switchForm( QObject *object )
 		WidgetMessageDispatcher::Request request = dispatcher.getFormActionRequest( m_debug);
 		m_dataLoader->datarequest( request.tag, request.content);
 	}
-
-// execute the action (old style, action mandatory)
-// execute the action (new style request, doctype mandatory)
-	//[+]if( props->contains( "action" ) || props->contains( "doctype" ) ) {
-	//[+]	sendRequest( props );
-	//[+]}
 	
-// switch form now, formLoaded will inform parent and others
+	// switch form now, formLoaded will inform parent and others
 	QVariant formlink = visitor.property( "form");
 	if (formlink.isValid())
 	{
-		/*[-]*/qDebug() << "Link next form" << formlink.toString();
 		QString nextForm = formlink.toString();
 		if( m_modal && nextForm == "_CLOSE_" ) {
 			emit closed( );
@@ -223,8 +160,6 @@ QIcon FormWidget::getWindowIcon( ) const
 void FormWidget::loadForm( QString name, bool modal )
 {
 	if( !m_formLoader ) return;
-
-//	if( name == m_form ) return;
 	
 	m_previousForm = m_form;
 	m_form = name;
@@ -340,7 +275,8 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 		emit formModal( name );
 		return;
 	}
-	WidgetVisitor visitor( m_ui, m_globals);
+// initialize the form variables given by form parameters
+	WidgetVisitor visitor( m_ui);
 	foreach (const FormCall::Parameter& param, formCall.parameter())
 	{
 		visitor.setProperty( param.first, param.second);
@@ -382,37 +318,20 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 			connect( pushButton, SIGNAL( clicked( ) ),
 				m_signalMapper, SLOT( map( ) ) );
 
-			WidgetProperties *widgetProps = new WidgetProperties( props, widget);
-			m_signalMapper->setMapping( pushButton, widgetProps );
+			m_signalMapper->setMapping( pushButton, widget );
 		}
 	}
-
-// create properties
-	QHash<QString, QString> *props = new QHash<QString, QString>( );
-	readDynamicStringProperties( props, m_ui );
-	restoreFromGlobals( props );
 
 // reset the form now, this also loads the domains
 	m_dataHandler->resetFormData( m_ui );
 	m_dataHandler->loadFormDomains( m_form, m_ui );
 
-// check for 'initAction' (old style, explicit initAction on form element)
-// map it to action, execute request
-	if( props->contains( "initAction" ) ) {
-		QString initAction = props->value( "initAction" );
-		props->insert( "action", initAction );
-		sendRequest( props );
-	}
 	WidgetMessageDispatcher dispatcher( m_ui);
 	foreach (const WidgetMessageDispatcher::Request& request, dispatcher.getDomainLoadRequests( m_debug))
 	{
 		m_dataLoader->datarequest( request.tag, request.content);
 	}
 
-// new style: 'doctype' on form widget, execute loading request
-//[+]	if( props->contains( "doctype" ) ) {
-//[+]		sendRequest( props );
-//[+]	}
 
 // load localication of the form now
 	qDebug( ) << "Initiating form locatization load for " << m_form << " and locale "
@@ -420,86 +339,6 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 }
 		
-void FormWidget::sendRequest( QHash<QString, QString> *props )
-{
-	qDebug( ) << "Handling request for form " << m_form << "[" << *props << "]";
-
-// go trough the widgets of the form and construct the request XML
-	QByteArray xml;
-	m_dataHandler->writeFormData( m_form, m_ui, &xml, props );
-	
-// HACK: m_props
-	qDebug( ) << "props(sendRequest):" << props << this;
-	m_props = props;
-
-	QString action = props->value( "action" );
-	if( !action.isEmpty( ) && action.contains( "." ) ) {
-		QStringList parts = action.split( "." );
-
-		if( parts[0].isNull( ) ) {
-			qWarning( ) << "Expecting a action of the form <widget>.<action>";
-			return;
-		}
-		QString name = parts[0];
-		
-		// expecting a property identifier as second argument
-		if( parts[1].isNull( ) ) {
-			qWarning( ) << "Expecting a function name in action" << action;
-			return;
-		}
-		QString function = parts[1];
-		
-		QWidget *widget = qFindChild<QWidget *>( m_ui, name );
-		// no widget found with that name
-		if( !widget ) {
-			qWarning( ) << "Unknown widget" << name << "in action" << action << "of form" << m_form;
-			return;
-		}
-		
-		// we only support reload of domains in other widgets currently
-		if( function != "reload" ) {
-			qWarning( ) << "Unsupported action function" << function << "in widget" << name;
-			return;
-		}
-
-		m_dataHandler->clearFormData( m_ui, name );
-		m_dataHandler->resetFormData( m_ui, name );
-		m_dataHandler->loadFormDomains( m_form, m_ui, name );
-
-	} else {
-		// send regular request	for the form
-		m_dataLoader->request( QString::number( (int)winId( ) ), m_form, QString( ), xml, props );
-	}
-}
-
-void FormWidget::gotAnswer( QString formName, QString widgetName, QByteArray xml )
-{
-// that's not us
-	if( formName != m_form ) return;
-	
-	qDebug( ) << "Got answer for form" << formName;
-
-// do whatever we have to do with data to the widgets	
-	if( !xml.isEmpty( ) ) {
-		if( !widgetName.isEmpty( ) ) {
-			qDebug( ) << "Answer is for local widget" << widgetName << "in form" << formName;
-
-// get properties if widget
-			QWidget *widget = m_ui->findChild<QWidget *>( widgetName );
-			QHash<QString, QString> *props = new QHash<QString, QString>( );
-			readDynamicStringProperties( props, widget );
-			restoreFromGlobals( props );
-
-// restore domains and state
-			m_dataHandler->loadFormDomain( formName, widgetName, m_ui, xml, props );
-		} else {
-			// HACK: m_props are the properties of the form
-			qDebug( ) << "props(gotAnswer):" << m_props << this;
-			m_dataHandler->readFormData( formName, m_ui, xml, m_props );	
-		}
-	}
-}
-
 void FormWidget::gotAnswer( const QByteArray& tag, const QByteArray& data)
 {
 	qDebug() << "got answer tag=" << tag << "data=" << data;

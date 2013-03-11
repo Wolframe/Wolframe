@@ -43,9 +43,9 @@ class WidgetMessageDispatcher
 		///\brief Constructor
 		///\param[in] root Root of widget tree visited
 		WidgetMessageDispatcher( QWidget* formwidget)
-			:m_visitor( formwidget, QSharedPointer<WidgetVariableMap>( new WidgetVariableMap())){}
+			:m_visitor( formwidget){}
 		WidgetMessageDispatcher( const WidgetVisitor& visitor_)
-			:m_visitor(visitor_){}
+			:m_visitor( visitor_){}
 
 		///\brief Copy constructor
 		///\param[in] o object to copy
