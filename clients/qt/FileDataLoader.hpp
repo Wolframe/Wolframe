@@ -46,6 +46,8 @@ class FileDataLoader : public DataLoader
 
 		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props );
 
+		virtual bool hasRunningRequests( );
+
 	private:
 		void handleCreate( QString name, QByteArray data, QHash<QString, QString> *props );
 		void handleRead( QString name, QHash<QString, QString> *props );

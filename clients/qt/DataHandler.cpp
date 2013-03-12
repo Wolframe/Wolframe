@@ -1136,6 +1136,12 @@ QString DataHandler::readFormVariable( QString variable, QWidget *form )
 		return QString( );
 	}
 	QString name = parts[0];
+
+// answers from the protocol are handled later and ignored for now, keep
+// as is and substitute later
+	if( name == "answer" ) {
+		return variable;
+	}
 	
 // expecting a property identifier as second argument
 	if( parts.count() != 2 ) {

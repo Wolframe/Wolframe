@@ -40,7 +40,7 @@
 NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient, bool _debug )
 	: m_wolframeClient( _wolframeClient ),
 	  m_map( new QHash<QString, QPair<QString, QString> >( ) ),
-	  m_debug( _debug )
+	  m_debug( _debug ), m_runningRequests( 0 )
 {
 	connect( m_wolframeClient, SIGNAL( answerReceived( QStringList, QString ) ),
 		this, SLOT( gotAnswer( QStringList, QString ) ) );
@@ -146,6 +146,7 @@ void NetworkDataLoader::handleCreate( QString /*windowName*/, QString name, QByt
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
 
+	m_runningRequests++;
 	m_wolframeClient->request( mapAction( action ), xml );
 }
 
@@ -208,8 +209,8 @@ void NetworkDataLoader::handleRead( QString /*windowName*/, QString name, QHash<
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
 
+	m_runningRequests++;
 	m_wolframeClient->request( mapAction( action ), data );
-
 }
 
 void NetworkDataLoader::handleUpdate( QString /*windowName*/, QString name, QByteArray xml, QHash<QString, QString> *props )
@@ -224,6 +225,7 @@ void NetworkDataLoader::handleUpdate( QString /*windowName*/, QString name, QByt
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
 
+	m_runningRequests++;
 	m_wolframeClient->request( mapAction( action ), xml );
 }
 
@@ -265,6 +267,7 @@ void NetworkDataLoader::handleDelete( QString /*windowName*/, QString name, QHas
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, false, docType );
 
+	m_runningRequests++;
 	m_wolframeClient->request( mapAction( action ), data );
 }
 
@@ -329,6 +332,7 @@ void NetworkDataLoader::handleDomainDataLoad( QString /*windowName*/, QString fo
 
 	qDebug( ) << "MAP:" << docType << action << mapDoctype( action, true, docType );
 
+	m_runningRequests++;
 	m_wolframeClient->request( mapAction( action ), data );
 }
 
@@ -401,11 +405,14 @@ void NetworkDataLoader::handleRequest( QString /*windowName*/, QString formName,
 
 	qDebug( ) << "MAP:" << docType << "new style request map";
 
+	m_runningRequests++;
 	m_wolframeClient->request( data );
 }
 
 void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 {
+	m_runningRequests--;
+
 	if( params.size( ) < 2 ) {
 		qCritical( ) << "ERROR: got an empty parameter list for a command, can't link it to form and widget!";
 		return;
@@ -436,5 +443,14 @@ void NetworkDataLoader::gotAnswer( QStringList params, QString content )
 
 void NetworkDataLoader::gotError( QString error )
 {
+	m_runningRequests--;
+
 	qCritical( ) << "ERROR: error in network data loader" << error;
 }
+
+bool NetworkDataLoader::hasRunningRequests( )
+{
+	qDebug( ) << "RUNNING REQUESTS:" << m_runningRequests;
+	return( m_runningRequests > 0 );
+}
+
