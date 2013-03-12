@@ -189,7 +189,6 @@ bool WidgetVisitor::enter( const QByteArray& name, bool writemode)
 	}
 	if (!name.isEmpty())
 	{
-		/*[-]*/qDebug() << "find child" << name;
 		QList<QWidget*> children = m_stk.top()->widget()->findChildren<QWidget*>( name);
 		if (children.size() > 1)
 		{
@@ -601,8 +600,6 @@ struct WidgetVisitorStackElement
 				}
 			}
 		}
-		/*[-]*/qDebug() << "DATAELEMENTS";
-		/*[-]*/foreach (const QByteArray& de, dataelements) {qDebug() << "$" << de;}
 	}
 	WidgetVisitorStackElement( const WidgetVisitorStackElement& o)
 		:dataelements( o.dataelements)
@@ -642,17 +639,13 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 
 	QStack<WidgetVisitorStackElement> elemstk;
 	elemstk.push_back( WidgetVisitorStackElement( m_stk.top(), selectedDataElements));
-	/*[-]*/qDebug() << "Selected data elements" << (selectedDataElements?*selectedDataElements:QList<QByteArray>());
 
 	QList<WidgetVisitor::Element> rt;
 	while (!elemstk.isEmpty())
 	{
-		/*[-]*/qDebug() << "ELEMENTS";
-		/*[-]*/foreach (const WidgetVisitor::Element& elem, rt) {qDebug() << "HAVE NOW" << elem.toString();}
 		if (elemstk.top().dataelements.size() > elemstk.top().dataelementidx)
 		{
 			const QByteArray& dataelem = elemstk.top().dataelements.at( elemstk.top().dataelementidx);
-			/*[-]*/qDebug() << "Get data element" << dataelem;
 
 			int stksize = m_stk.size();
 			if (m_stk.top()->isRepeatingDataElement( dataelem))

@@ -101,7 +101,6 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& data
 	for (; ie != ee; ++ie)
 	{
 		QVariant attribute;
-		/*[-]*/qDebug() << "ELEMENT" << ie->toString();
 		switch (ie->type())
 		{
 			case WidgetVisitor::Element::OpenTag:
