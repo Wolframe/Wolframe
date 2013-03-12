@@ -123,6 +123,15 @@ void LineCommandHandler::getDataLeft( const void*& begin, std::size_t& nofBytes)
 	}
 }
 
+const char* LineCommandHandler::interruptDataSessionMarker() const
+{
+	if (m_delegateHandler && m_cmdstateidx == ProcessingDelegation)
+	{
+		return m_delegateHandler->interruptDataSessionMarker();
+	}
+	return "";
+}
+
 int LineCommandHandler::runCommand( const char* cmd_, int argc_, const char** argv_, std::ostream& out_)
 {
 	char* begin=const_cast<char*>(cmd_);

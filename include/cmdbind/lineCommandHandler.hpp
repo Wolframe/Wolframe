@@ -127,6 +127,9 @@ public:
 	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
+	///\brief See Parent::interruptDataSessionMarker()
+	virtual const char* interruptDataSessionMarker() const;
+
 	///\brief Get the current state (toplevel)
 	std::size_t stateidx() const			{return m_stateidx;}
 

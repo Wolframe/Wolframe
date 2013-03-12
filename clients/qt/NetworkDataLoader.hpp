@@ -64,8 +64,7 @@ class NetworkDataLoader : public DataLoader
 		
 	public slots:
 		virtual void gotAnswer( bool success, const QByteArray& tag, const QByteArray& content);
-		virtual void gotError( QString error );
-			
+
 	private:
 		WolframeClient *m_wolframeClient;
 		QScopedPointer<QHash<QByteArray, QPair<QString, QString> > > m_map;

@@ -130,6 +130,7 @@ class WolframeClient : public QObject
 
 // generic implementation of a command execute implementing the frame of the protocol
 		void resultReceived( );
+		void resultHandled( );
 
 // high-level commands
 		void answerReceived( bool success, const QByteArray& tag, const QByteArray& content );

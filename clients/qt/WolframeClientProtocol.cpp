@@ -110,21 +110,32 @@ bool WolframeClientProtocol::hasRequests() const
 
 bool WolframeClientProtocol::poll()
 {
-	for (;;)
+	qint64 len = m_socket->bytesAvailable();
+	QByteArray blk = m_socket->read( len);
+	/*[-]*/qDebug() << "READ" << blk;
+	if (len)
 	{
-		char buf[ 0x4000];
-		int len = m_socket->read( buf, sizeof(buf));
-		if (len < 0) return false;
-		pushData( buf, len);
-		if (len < (int)sizeof(buf)) break;
+		pushData( blk);
+		return true;
 	}
-	return true;
+	return false;
+}
+
+const WolframeClientProtocol::Item* WolframeClientProtocol::getNextItem()
+{
+	const Item* rt = WolframeClientProtocolBase::getNextItem();
+	if (!rt)
+	{
+		poll();
+		rt = WolframeClientProtocolBase::getNextItem();
+	}
+	return rt;
 }
 
 bool WolframeClientProtocol::process()
 {
-	poll();
 	const Item* item = 0;
+	poll();
 
 	for (;;)
 	{
@@ -154,8 +165,15 @@ bool WolframeClientProtocol::process()
 					m_lasterror.append( item->m_data);
 					return false;
 				}
-				m_lasterror = "protocol error. OK/ERR expected, got: ";
+				if (strcmp( item->m_tag, "BYE") == 0)
+				{
+					m_lasterror = "server closed connection";
+					m_state = Close;
+					return false;
+				}
+				m_lasterror = "protocol error. OK/ERR/BYE expected, got: ";
 				m_lasterror.append( item->m_tag);
+				m_state = Close;
 				return false;
 
 			case AuthStart:
@@ -202,8 +220,9 @@ bool WolframeClientProtocol::process()
 					m_state = Close;
 					return false;
 				}
-				m_lasterror = "protocol error. MECHS/ERR expected, got: ";
+				m_lasterror = "protocol error. MECHS/ERR/BYE expected, got: ";
 				m_lasterror.append( item->m_tag);
+				m_state = Close;
 				return false;
 
 			case AuthMechNone:
@@ -234,10 +253,10 @@ bool WolframeClientProtocol::process()
 				}
 				m_lasterror = "protocol error. OK/ERR/BYE expected, got: ";
 				m_lasterror.append( item->m_tag);
+				m_state = Close;
 				return false;
 
 			case AuthorizedIdle:
-				poll();
 				item = getNextItem();
 				if (item)
 				{
@@ -252,6 +271,10 @@ bool WolframeClientProtocol::process()
 				}
 				if (m_requestqueue.isEmpty())
 				{
+					if (!m_requesttagqueue.isEmpty())
+					{
+						qDebug() << "pending requests" << m_requesttagqueue.size() << "top" << m_requesttagqueue.head();
+					}
 					if (m_gotAuthorize)
 					{
 						m_state = AuthStart;
@@ -292,8 +315,9 @@ bool WolframeClientProtocol::process()
 					m_state = Close;
 					return false;
 				}
-				m_lasterror = "protocol error. ANSWER/ERR expected, got: ";
+				m_lasterror = "protocol error. ANSWER/ERR/BYE expected, got: ";
 				m_lasterror.append( item->m_tag);
+				m_state = Close;
 				return false;
 
 			case AuthorizedAnswerData:
@@ -332,8 +356,9 @@ bool WolframeClientProtocol::process()
 					m_state = Close;
 					return false;
 				}
-				m_lasterror = "protocol error. OK/ERR expected, got: ";
+				m_lasterror = "protocol error. OK/ERR/BYE expected, got: ";
 				m_lasterror.append( item->m_tag);
+				m_state = Close;
 				return false;
 		}
 	}
@@ -388,5 +413,6 @@ void WolframeClientProtocol::removeAnswer()
 	{
 		m_errorqueue.dequeue();
 	}
+	qDebug() << "answer queue size (remove) =" << m_errorqueue.size() + m_answerqueue.size();
 }
 

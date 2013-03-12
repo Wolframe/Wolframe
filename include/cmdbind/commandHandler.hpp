@@ -131,6 +131,9 @@ public:
 		}
 	}
 
+	///\brief get the termination marker to send for an abort of a running data session
+	virtual const char* interruptDataSessionMarker() const	{return "";}
+
 protected:
 	std::string m_lastError;			//< error operation for the client
 	std::string m_name;				//< name of the command to execute

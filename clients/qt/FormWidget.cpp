@@ -74,10 +74,10 @@ void FormWidget::initialize( )
 		this, SLOT( formListLoaded( QStringList ) ) );
 
 // link the data loader to our form widget
-	connect( m_dataLoader, SIGNAL( answer( QString, QString, QByteArray ) ),
-		this, SLOT( gotAnswer( QString, QString, QByteArray ) ) );
 	connect( m_dataLoader, SIGNAL( answer( const QByteArray&, const QByteArray& ) ),
 		this, SLOT( gotAnswer( const QByteArray&, const QByteArray& ) ) );
+	connect( m_dataLoader, SIGNAL( error( const QByteArray&, const QByteArray& ) ),
+		this, SLOT( gotError( const QByteArray&, const QByteArray& ) ) );
 
 // signal dispatcher for form buttons
 	m_signalMapper = new QSignalMapper( this );
@@ -339,11 +339,17 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 }
 		
-void FormWidget::gotAnswer( const QByteArray& tag, const QByteArray& data)
+void FormWidget::gotAnswer( const QByteArray& tag_, const QByteArray& data_)
 {
-	qDebug() << "got answer tag=" << tag << "data=" << data;
+	qDebug() << "got answer tag=" << tag_ << "data=" << data_;
 	WidgetMessageDispatcher dispatcher( m_ui);
-	dispatcher.feedResult( tag, data);
+	dispatcher.feedResult( tag_, data_);
+}
+
+void FormWidget::gotError( const QByteArray& tag_, const QByteArray& data_)
+{
+	qDebug() << "got error tag=" << tag_ << "data=" << data_;
+	emit error( QString( data_));
 }
 
 void FormWidget::closeEvent( QCloseEvent *e )

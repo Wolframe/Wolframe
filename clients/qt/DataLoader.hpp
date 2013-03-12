@@ -53,11 +53,10 @@ class DataLoader : public QObject
 	// for NetworkDataLoader
 	public slots:
 		virtual void gotAnswer( bool /*success*/, const QByteArray& /*tag*/, const QByteArray& /*content*/){}
-		virtual void gotError( QString /* error */ ) { }
 	
 	Q_SIGNALS:
-		void answer( QString formName, QString widgetName, QByteArray xml );
 		void answer( const QByteArray& tag, const QByteArray& xml );
+		void error( const QByteArray& tag, const QByteArray& xml);
 };
 
 #endif // _DATA_LOADER_INCLUDED

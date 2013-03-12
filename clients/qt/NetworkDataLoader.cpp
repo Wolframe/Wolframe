@@ -44,8 +44,6 @@ NetworkDataLoader::NetworkDataLoader( WolframeClient *_wolframeClient, bool _deb
 {
 	connect( m_wolframeClient, SIGNAL( answerReceived( bool,const QByteArray&,const QByteArray&) ),
 		this, SLOT( gotAnswer( bool,const QByteArray&,const QByteArray&) ) );
-	connect( m_wolframeClient, SIGNAL( error( QString ) ),
-		this, SLOT( gotError( QString ) ) );
 }
 
 void NetworkDataLoader::request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props )
@@ -423,12 +421,9 @@ void NetworkDataLoader::gotAnswer( bool success, const QByteArray& tag, const QB
 {
 	if( !success ) {
 		qCritical( ) << "ERROR: " << tag << content;
+		emit error( tag, content);
 		return;
 	}
 	emit answer( tag, content);
 }
 
-void NetworkDataLoader::gotError( QString error )
-{
-	qCritical( ) << "ERROR: error in network data loader" << error;
-}

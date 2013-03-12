@@ -245,7 +245,7 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 
 			case TIMEOUT_OCCURED:	{
 				m_state = TERMINATING;
-				return net::NetworkOperation( net::SendString( "Timeout. :P\n" ));
+				return net::NetworkOperation( net::SendString( std::string(m_cmdHandler.interruptDataSessionMarker()) + "BYE Timeout. :P\n" ));
 			}
 
 			case SIGNALLED:	{
@@ -254,13 +254,13 @@ const net::NetworkOperation wolframeConnection::nextOperation()
 				}
 				else	{
 					m_state = TERMINATING;
-					return net::NetworkOperation( net::SendString( "Server is shutting down. :P\n" ));
+					return net::NetworkOperation( net::SendString( std::string(m_cmdHandler.interruptDataSessionMarker()) + "BYE Server is shutting down. :P\n" ));
 				}
 			}
 
 			case FORBIDDEN:	{
 				m_state = TERMINATING;
-				return net::NetworkOperation( net::SendString( "Access denied.\n" ));
+				return net::NetworkOperation( net::SendString( std::string(m_cmdHandler.interruptDataSessionMarker()) + "BYE Access denied.\n" ));
 			}
 
 			case TERMINATING:	{

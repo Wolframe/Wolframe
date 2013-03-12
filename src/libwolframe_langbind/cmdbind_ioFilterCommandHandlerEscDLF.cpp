@@ -57,6 +57,18 @@ IOFilterCommandHandlerEscDLF::IOFilterCommandHandlerEscDLF()
 IOFilterCommandHandlerEscDLF::~IOFilterCommandHandlerEscDLF()
 {}
 
+const char* IOFilterCommandHandlerEscDLF::interruptDataSessionMarker() const
+{
+	switch (m_state)
+	{
+		case Processing:
+		case FlushingOutput:
+		case DiscardInput: return "\r\n.\r\n";
+		case Terminated: return "";
+	}
+	return "";
+}
+
 void IOFilterCommandHandlerEscDLF::setInputBuffer( void* buf, std::size_t allocsize)
 {
 	m_input = protocol::InputBlock( (char*)buf, allocsize);

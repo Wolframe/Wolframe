@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>addEmployee</class>
- <widget class="QWidget" name="addEmployee">
+ <class>employee</class>
+ <widget class="QWidget" name="employee">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -171,42 +171,112 @@
    <signal>returnPressed()</signal>
    <receiver>status</receiver>
    <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
    <sender>status</sender>
    <signal>returnPressed()</signal>
    <receiver>addr_line1</receiver>
    <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
    <sender>addr_line1</sender>
    <signal>returnPressed()</signal>
    <receiver>addr_line2</receiver>
    <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
    <sender>addr_line2</sender>
    <signal>returnPressed()</signal>
    <receiver>addr_postalcode</receiver>
    <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
    <sender>addr_postalcode</sender>
    <signal>returnPressed()</signal>
    <receiver>addr_district</receiver>
    <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
    <sender>addr_district</sender>
    <signal>returnPressed()</signal>
    <receiver>addr_country</receiver>
    <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
    <sender>addr_country</sender>
    <signal>returnPressed()</signal>
    <receiver>add</receiver>
    <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
  </connections>
 </ui>

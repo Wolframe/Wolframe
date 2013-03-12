@@ -90,6 +90,9 @@ class WolframeClientProtocol
 			m_socket = socket_;
 		}
 
+		///\brief overload of WolframeClientProtocolBase::getNextItem() with reading from network
+		const Item* getNextItem();
+
 		///\brief Handler for read event on the socket. Stears the whole protocol STM
 		bool process();
 

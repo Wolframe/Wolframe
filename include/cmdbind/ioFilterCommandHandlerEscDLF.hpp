@@ -75,6 +75,9 @@ public:
 	///\brief See Parent::getDataLeft(const void*&,std::size_t&)
 	virtual void getDataLeft( const void*& begin, std::size_t& nofBytes);
 
+	///\brief See Parent::interruptDataSessionMarker()
+	virtual const char* interruptDataSessionMarker() const;
+
 	///\param[out] err error code in case of error
 	///\return CallResult status of the filter input for the state machine of this command handler
 	virtual CallResult call( const char*& err)=0;

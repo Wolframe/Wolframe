@@ -80,6 +80,8 @@ WolframeClient::WolframeClient( const ConnectionParameters _connParams,	QWidget 
 		this, SLOT( peerVerifyError( const QSslError & ) ) );
 #endif
 
+	QObject::connect( this, SIGNAL( resultHandled( ) ),
+		this, SLOT( dataAvailable( ) ) );
 	QObject::connect( this, SIGNAL( resultReceived( ) ),
 		this, SLOT( handleResult( ) ) );
 }
@@ -403,8 +405,8 @@ void WolframeClient::handleResult( )
 
 		qDebug( ) << "handle result of command" << *tag;
 		emit answerReceived( success, *tag, *content);
-
 		m_protocol.removeAnswer();
+		emit resultHandled();
 	}
 }
 

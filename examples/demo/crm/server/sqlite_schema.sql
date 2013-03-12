@@ -8,7 +8,8 @@ CREATE TABLE Employee
 	addr_line2	TEXT,
 	addr_postalcode	TEXT,
 	addr_district	TEXT,
-	addr_country	TEXT
+	addr_country	TEXT,
+	CONSTRAINT tag_name_check UNIQUE( name )
 );
 
 -- Customer:
