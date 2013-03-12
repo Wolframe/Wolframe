@@ -426,23 +426,6 @@ void NetworkDataLoader::gotAnswer( bool success, const QByteArray& tag, const QB
 		return;
 	}
 	emit answer( tag, content);
-
-	//[+] if( !m_map->contains( tag ) ) {
-	//[+] 	qCritical( ) << "ERROR: answer for unknown request of " << tag << m_map;
-	//[+] 	return;
-	//[+] }
-	
-	//[+] QPair<QString, QString> pair = m_map->value( tag );
-	//[+] QStringList addr = pair.second.split( "#");
-	//[+] QString formName = pair.first;
-	//[+] QString widgetName = addr[0];
-	//[+] QString windowName = addr[1];
-
-	//[+] m_map->remove( tag );
-
-	//[+]qDebug( ) << "ANSWER for window " << windowName << "form" << formName << "and widget" << widgetName;
-	
-	//[+]emit answer( formName, widgetName, content);
 }
 
 void NetworkDataLoader::gotError( QString error )

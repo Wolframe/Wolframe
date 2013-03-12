@@ -533,7 +533,7 @@ static bool isReservedProperty( const QByteArray& key)
 	// skip synonym declarations
 	if (key.indexOf( ':') >= 0) return true;
 	// ignore Wolframe elements
-	if (key == "dataelement" || key == "doctype" || key == "rootelement" || key == "form" || key == "state")
+	if (key == "doctype" || key == "dataelement" || key == "rootelement" || key == "form" || key == "state")
 	{
 		return true;
 	}
