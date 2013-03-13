@@ -285,7 +285,8 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 
 // add new form to layout (which covers the whole widget)
 	m_layout->addWidget( m_ui );
-	
+
+	qDebug( ) << "set window title" << m_ui->windowTitle( );
 	setWindowTitle( m_ui->windowTitle( ) );
 
 	if( oldUi ) {
@@ -300,19 +301,12 @@ void FormWidget::formLoaded( QString name, QByteArray formXml )
 	qDebug( ) << "Starting to load localization for form" << name;
 	m_formLoader->initiateFormLocalizationLoad( m_form, m_locale );
 
-// connect actions and forms
 // connect push buttons with form names to loadForms
-	qDebug( ) << "Checking form" << name << "for dynamic properties 'form' and 'action'";
 	QList<QWidget *> widgets = m_ui->findChildren<QWidget *>( );
 	foreach( QWidget *widget, widgets ) {
 		QString clazz = widget->metaObject( )->className( ); 
-		QString _name = widget->objectName( );
 		
 		if( clazz == "QPushButton" ) {
-			QHash<QString, QString> *props = new QHash<QString, QString>( );
-			readDynamicStringProperties( props, widget );
-			qDebug( ) << "connecting button" << _name << "to properties" << *props;
-
 			QPushButton *pushButton = qobject_cast<QPushButton *>( widget );
 			
 			connect( pushButton, SIGNAL( clicked( ) ),

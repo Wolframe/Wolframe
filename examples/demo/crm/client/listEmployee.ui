@@ -55,10 +55,10 @@
          <string notr="true">employee</string>
         </property>
         <property name="id" stdset="0">
-         <string>{employee.id}</string>
+         <string>{employee.selected}</string>
         </property>
         <property name="dataelement" stdset="0">
-         <string>id</string>
+         <string>@id</string>
         </property>
        </widget>
       </item>

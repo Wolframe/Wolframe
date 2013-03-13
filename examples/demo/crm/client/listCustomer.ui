@@ -55,10 +55,10 @@
          <string notr="true">customer</string>
         </property>
         <property name="id" stdset="0">
-         <string>{customer.id}</string>
+         <string>{customer.selected}</string>
         </property>
         <property name="dataelement" stdset="0">
-         <string>id</string>
+         <string>@id</string>
         </property>
        </widget>
       </item>
@@ -68,13 +68,7 @@
          <string>Edit</string>
         </property>
         <property name="form" stdset="0">
-         <string>editCustomer</string>
-        </property>
-        <property name="global.customerState" stdset="0">
-         <string notr="true">{customer.state}</string>
-        </property>
-        <property name="global.customerid" stdset="0">
-         <string>{customer.id}</string>
+         <string>editCustomer?id={customer.selected}</string>
         </property>
        </widget>
       </item>

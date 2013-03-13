@@ -163,6 +163,9 @@
        <property name="id" stdset="0">
         <string/>
        </property>
+       <property name="dataroot" stdset="0">
+        <string>customer</string>
+       </property>
       </widget>
      </item>
      <item>

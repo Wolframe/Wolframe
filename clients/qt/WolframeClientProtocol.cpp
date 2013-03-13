@@ -112,7 +112,6 @@ bool WolframeClientProtocol::poll()
 {
 	qint64 len = m_socket->bytesAvailable();
 	QByteArray blk = m_socket->read( len);
-	/*[-]*/qDebug() << "READ" << blk;
 	if (len)
 	{
 		pushData( blk);
@@ -378,7 +377,6 @@ bool WolframeClientProtocol::getAnswerSuccess() const
 
 const QByteArray* WolframeClientProtocol::getAnswerTag() const
 {
-	qDebug() << "answer queue size (pull) =" << m_errorqueue.size() + m_answerqueue.size();
 	if (m_errorqueue.isEmpty())
 	{
 		if (m_answerqueue.isEmpty()) return 0;
@@ -413,6 +411,5 @@ void WolframeClientProtocol::removeAnswer()
 	{
 		m_errorqueue.dequeue();
 	}
-	qDebug() << "answer queue size (remove) =" << m_errorqueue.size() + m_answerqueue.size();
 }
 

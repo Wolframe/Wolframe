@@ -128,12 +128,22 @@ QVariant WidgetVisitorState_QTreeWidget::property( const QByteArray& name)
 {
 	if (strcmp( name,"selected") == 0)
 	{
-		QList<QVariant> idlist;
-		foreach (const QTreeWidgetItem* sel, m_treeWidget->selectedItems())
+		if (m_treeWidget->selectionMode() == QAbstractItemView::SingleSelection)
 		{
-			idlist.push_back( sel->data( 0, Qt::UserRole));
+			foreach (const QTreeWidgetItem* sel, m_treeWidget->selectedItems())
+			{
+				return sel->data( 0, Qt::UserRole);
+			}
 		}
-		return QVariant( idlist);
+		else
+		{
+			QList<QVariant> idlist;
+			foreach (const QTreeWidgetItem* sel, m_treeWidget->selectedItems())
+			{
+				idlist.push_back( sel->data( 0, Qt::UserRole));
+			}
+			return QVariant( idlist);
+		}
 	}
 	if (m_stk.isEmpty()) return QVariant();
 	if (m_mode == Init || (m_mode == Tree && m_stk.size() == 1)) return QVariant();

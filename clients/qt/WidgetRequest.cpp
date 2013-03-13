@@ -136,14 +136,13 @@ static QByteArray getWigdetRequest_( WidgetVisitor& visitor, WidgetVisitor& data
 QByteArray getActionRequest( WidgetVisitor& visitor, bool debugmode)
 {
 	QByteArray rt;
-	QVariant rootElement;
-	rootElement = visitor.property( "rootelement");
-	if (rootElement.isValid())
+	QVariant datarootname = visitor.property( "dataroot");
+	if (datarootname.isValid())
 	{
-		WidgetVisitor dataroot = visitor.getRootElement( rootElement.toByteArray());
+		WidgetVisitor dataroot = visitor.getRootElement( datarootname.toByteArray());
 		if (!dataroot.widget())
 		{
-			qCritical() << "action rootelement does not address a known widget:" << rootElement;
+			qCritical() << "action dataroot does not address a known widget:" << datarootname;
 			return rt;
 		}
 		rt = getWigdetRequest_( visitor, dataroot, debugmode);
@@ -203,7 +202,7 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 	QXmlStreamReader xml( answer);
 	int taglevel = 0;
 
-	qDebug( ) << "feeding widget " << visitor.objectName() << " with XML:\n" << answer;
+	qDebug( ) << "feeding widget " << visitor.objectName() << "with XML";
 
 	for (xml.readNext(); !xml.atEnd(); xml.readNext())
 	{

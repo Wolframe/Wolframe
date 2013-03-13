@@ -525,17 +525,27 @@ bool WidgetVisitor::setProperty( const QByteArray& name, const QVariant& value)
 
 static bool isReservedProperty( const QByteArray& key)
 {
-	// skip _q_ dynamic properties, they are used by the Qt stylesheet engine
+	// skip dynamic properties used by the Qt stylesheet engine:
 	if (key.startsWith( "_q_")) return true;
 	if (key == "initialFocus") return true;
-	// skip _w_ dynamic properties, they are used as internal Wolframe properties
+	// skip _w_ dynamic properties, they are used as internal Wolframe properties:
 	if (key.startsWith( "_w_")) return true;
-	// skip synonym declarations
+	// skip synonym/link declarations:
 	if (key.indexOf( ':') >= 0) return true;
-	// ignore Wolframe elements
-	if (key == "doctype" || key == "dataelement" || key == "rootelement" || key == "form" || key == "state")
+	// ignore Wolframe elements:
+	if (key[0] == 'd')
 	{
-		return true;
+		if (key == "doctype" || key == "dataroot" || key == "dataelement")
+		{
+			return true;
+		}
+	}
+	else
+	{
+		if (key == "rootelement" || key == "form" || key == "state")
+		{
+			return true;
+		}
 	}
 	return false;
 }
