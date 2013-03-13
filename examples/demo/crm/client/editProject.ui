@@ -14,19 +14,16 @@
    <string>Edit Project</string>
   </property>
   <property name="doctype" stdset="0">
-   <string>GetProjectEdit</string>
+   <string>GetProject</string>
   </property>
   <property name="rootelement" stdset="0">
    <string>project</string>
   </property>
-  <property name="id" stdset="0">
-   <string>{global.projectid}</string>
-  </property>
   <property name="dataelement" stdset="0">
-   <string>id</string>
+   <string>@id</string>
   </property>
-  <property name="customerid" stdset="0">
-   <string/>
+  <property name="synonym:customerid" stdset="0">
+   <string>customer.selected</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
@@ -101,14 +98,11 @@
        <property name="form" stdset="0">
         <string notr="true">listProject</string>
        </property>
-       <property name="id" stdset="0">
-        <string>{global.projectid}</string>
-       </property>
-       <property name="customerid" stdset="0">
-        <string>{customer.id}</string>
-       </property>
        <property name="dataelement" stdset="0">
-        <string>id,customerid,name,description</string>
+        <string>@id,@customerid,name,description</string>
+       </property>
+       <property name="dataroot" stdset="0">
+        <string>project</string>
        </property>
       </widget>
      </item>

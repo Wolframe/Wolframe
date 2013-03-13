@@ -60,6 +60,8 @@ WidgetVisitorState_QTreeWidget::WidgetVisitorState_QTreeWidget( QWidget* widget_
 void WidgetVisitorState_QTreeWidget::clearProperty()
 {
 	m_treeWidget->clear();
+	m_mode = Init;
+	m_stk.clear();
 }
 
 bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemode)

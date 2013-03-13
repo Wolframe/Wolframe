@@ -596,7 +596,7 @@ struct WidgetVisitorStackElement
 		{
 			foreach (const QByteArray& elem, *selectedDataElements)
 			{
-				if (elem[0] == '@')
+				if (elem.size() > 0 && elem[0] == '@')
 				{
 					dataelements.push_back( elem.mid( 1, elem.size()-1));
 				}
@@ -604,7 +604,7 @@ struct WidgetVisitorStackElement
 			nof_attributes = dataelements.size();
 			foreach (const QByteArray& elem, *selectedDataElements)
 			{
-				if (elem[0] != '@')
+				if (elem.size() == 0 || elem[0] != '@')
 				{
 					dataelements.push_back( elem);
 				}
@@ -657,6 +657,19 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 		{
 			const QByteArray& dataelem = elemstk.top().dataelements.at( elemstk.top().dataelementidx);
 
+			if (elemstk.top().hasSelectedDataelements && !elemstk.top().isContent && elemstk.top().dataelementidx < elemstk.top().nof_attributes)
+			{
+				//... special handling of dataelement explicitely marked as attribute '@':
+				//    we allow digging in substructures for this one single element if it exists
+				QVariant val = property( dataelem);
+				if (val.isValid() && !dataelem.isEmpty() && val.type() != QVariant::List)
+				{
+					rt.push_back( Element( Element::Attribute, dataelem));
+					rt.push_back( Element( Element::Value, val));
+					++elemstk.top().dataelementidx;
+					continue;
+				}
+			}
 			int stksize = m_stk.size();
 			if (m_stk.top()->isRepeatingDataElement( dataelem))
 			{
@@ -745,6 +758,10 @@ QList<WidgetVisitor::Element> WidgetVisitor::elements( const QList<QByteArray>* 
 						rt.push_back( Element( Element::Attribute, dataelem));
 						rt.push_back( Element( Element::Value, val));
 					}
+				}
+				else if (elemstk.top().hasSelectedDataelements)
+				{
+					qCritical() << "not found element:" << dataelem << "(elements defined with dataelement are mandatory)";
 				}
 				++elemstk.top().dataelementidx;
 			}

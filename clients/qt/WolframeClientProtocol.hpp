@@ -114,6 +114,7 @@ class WolframeClientProtocol
 		void quit()						{m_gotQuit = true;}
 		bool isAuthorized() const				{return (int)m_state >= (int)AuthorizedIdle;}
 		void authorize()					{m_gotAuthorize = true;}
+
 	private:
 		bool poll();
 		bool sendLine( const QByteArray& line);

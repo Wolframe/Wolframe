@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Add Project</string>
   </property>
+  <property name="synonym:customerid" stdset="0">
+   <string>customer.selected</string>
+  </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
@@ -86,11 +89,11 @@
        <property name="form" stdset="0">
         <string notr="true">listProject</string>
        </property>
-       <property name="customerid" stdset="0">
-        <string>{customer.id}</string>
-       </property>
        <property name="dataelement" stdset="0">
-        <string>customerid,name,description</string>
+        <string>@customerid,name,description</string>
+       </property>
+       <property name="dataroot" stdset="0">
+        <string>addProject</string>
        </property>
       </widget>
      </item>

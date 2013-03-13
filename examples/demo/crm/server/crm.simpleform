@@ -131,26 +131,11 @@ Form Project
 	name		entityname
 	description	?string
 }
-Form ProjectEdit
-{
-	customer
-	{
-		id	!@ID
-		_	?entityname
-	}
-	name		entityname
-	description	?string
-}
 Form ProjectInserted
 {
 	id		!@ID
 	customername	?entityname
 	_ Project
-}
-Form ProjectEditInserted
-{
-	id		!@ID
-	_ ProjectEdit
 }
 
 ; * Forms:
@@ -158,9 +143,7 @@ Form InsertProject	{ project { _ Project } }
 Form UpdateProject	{ project { _ ProjectInserted } }
 Form DeleteProject	{ project { id !@ID } }
 Form GetProject		{ project { id !@ID } }
-Form GetProjectEdit	{ project { id !@ID } }
 Form ProjectResult	{ project { _ ProjectInserted } }
-Form ProjectEditResult	{ project { _ ProjectEditInserted } }
 Form ProjectListResult	{ projects { project ProjectInserted[] } }
 Form ListProject	{ project { } }
 

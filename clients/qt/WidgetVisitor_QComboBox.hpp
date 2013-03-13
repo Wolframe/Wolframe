@@ -48,11 +48,15 @@ public:
 	virtual QVariant property( const QByteArray& name);
 	virtual bool setProperty( const QByteArray& name, const QVariant& data);
 	virtual const QList<QByteArray>& dataelements() const;
+	virtual bool isRepeatingDataElement( const QByteArray& name);
 
 private:
 	enum StateId {None,Value,Select};
 	StateId m_stateid;
 	QComboBox* m_comboBox;
+	QByteArray m_elementname;
+	QList<QByteArray> m_dataelements;
+	int m_currentindex;
 };
 
 #endif
