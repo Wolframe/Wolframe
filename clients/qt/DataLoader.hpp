@@ -47,7 +47,6 @@ class DataLoader : public QObject
 	public:
 		virtual ~DataLoader( ) {};
 		
-		virtual void request( QString windowName, QString formName, QString widgetName, QByteArray xml, QHash<QString, QString> *props ) = 0;
 		virtual void datarequest( const QByteArray& /*tag*/, const QByteArray& /*content*/){};
 
 	// for NetworkDataLoader

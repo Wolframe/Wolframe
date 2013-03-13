@@ -577,13 +577,13 @@ void DataHandler::loadFormDomains( QString form_name, QWidget *form, QWidget *wi
 
 	QString window_name = QString::number( (int)m_formWidget->winId( ) );
 	if( clazz == "QComboBox" ) {
-		m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
+		//[+]m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
 	} else if( clazz == "QListWidget" ) {
-		m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
+		//[+]m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
 	} else if( clazz == "QTreeWidget" ) {
-		m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
+		//[+]m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
 	} else if( clazz == "QTableWidget" ) {
-		m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
+		//[+]m_dataLoader->request( window_name, form_name, name, QByteArray( ), props );
 	} else {
 		// all other classes don't load domains, but we want to keep
 		// the calling code generic..
