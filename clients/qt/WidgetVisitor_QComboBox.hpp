@@ -42,13 +42,15 @@ class WidgetVisitorState_QComboBox
 public:
 	WidgetVisitorState_QComboBox( QWidget* widget_);
 
-	virtual void clearProperty();
+	virtual void clear();
 	virtual bool enter( const QByteArray& name, bool writemode);
 	virtual bool leave( bool writemode);
 	virtual QVariant property( const QByteArray& name);
 	virtual bool setProperty( const QByteArray& name, const QVariant& data);
 	virtual const QList<QByteArray>& dataelements() const;
 	virtual bool isRepeatingDataElement( const QByteArray& name);
+	virtual void setState( const QVariant& state);
+	virtual QVariant getState() const;
 
 private:
 	enum StateId {None,Value,Select};

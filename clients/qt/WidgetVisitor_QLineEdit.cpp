@@ -67,14 +67,14 @@ const QList<QByteArray>& WidgetVisitorState_QLineEdit::dataelements() const
 	return ar;
 }
 
-void WidgetVisitorState_QLineEdit::setState( const QString& state)
+void WidgetVisitorState_QLineEdit::setState( const QVariant& state)
 {
 	qDebug() << "Restoring tree state for line edit" << m_lineEdit->objectName();
-	m_lineEdit->setText( state);
+	if (state.isValid()) m_lineEdit->setText( state.toString());
 }
 
-QString WidgetVisitorState_QLineEdit::getState() const
+QVariant WidgetVisitorState_QLineEdit::getState() const
 {
-	return m_lineEdit->text();
+	return QVariant( m_lineEdit->text());
 }
 

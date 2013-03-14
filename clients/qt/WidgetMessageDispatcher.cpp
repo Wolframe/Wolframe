@@ -58,6 +58,9 @@ QList<WidgetMessageDispatcher::Request> WidgetMessageDispatcher::getDomainLoadRe
 	{
 		rt.push_back( Request( visitor.requestUID(), getWigdetRequest( visitor, debugmode)));
 	}
+	int nn = rt.size()/2;
+	for (int kk = 0; kk < nn; kk++) rt.swap( kk, rt.size()-(1+kk));
+	// ... requests are issued in reverse order (elements in sub nodes first)
 	return rt;
 }
 

@@ -331,12 +331,11 @@ void WidgetVisitor::resetState()
 {
 	if (!m_stk.isEmpty())
 	{
-		QString state = m_stk.top()->getState();
-		if (!state.isEmpty())
+		QVariant state = m_stk.top()->getState();
+		if (state.isValid())
 		{
 			m_stk.top()->widget()->setProperty( "_w_state", state);
 		}
-		m_stk.top()->clear();
 	}
 }
 
@@ -345,10 +344,7 @@ void WidgetVisitor::restoreState()
 	if (!m_stk.isEmpty())
 	{
 		QVariant state = m_stk.top()->widget()->property( "_w_state");
-		if (state.isValid())
-		{
-			m_stk.top()->setState( state.toString());
-		}
+		m_stk.top()->setState( state);
 	}
 }
 

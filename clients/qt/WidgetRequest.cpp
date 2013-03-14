@@ -147,6 +147,7 @@ QByteArray getActionRequest( WidgetVisitor& visitor, bool debugmode)
 		}
 		rt = getWigdetRequest_( visitor, dataobject, debugmode);
 		qDebug() << "widget request of " << dataobject.objectName() << "=" << rt;
+		visitor.leave( false);
 	}
 	else
 	{
@@ -197,6 +198,17 @@ static void XMLERROR( const QXmlStreamReader& xml, const QList<WidgetAnswerStack
 		<< " path " << path;
 }
 
+static void setAttributes( WidgetVisitor& visitor, const QList<WidgetAnswerStackElement>& stk, const QXmlStreamReader& xml, const QXmlStreamAttributes& attributes)
+{
+	QXmlStreamAttributes::const_iterator ai = attributes.begin(), ae = attributes.end();
+	for (; ai != ae; ++ai)
+	{
+		if (!visitor.setProperty( ai->name().toString(), ai->value().toString()))
+		{
+			XMLERROR( xml, stk, QString( "failed to set property '") + ai->name().toString() + "'");
+		}
+	}
+}
 
 bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 {
@@ -214,7 +226,8 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 			++taglevel;
 			if (taglevel == 1)
 			{
-				//... ignore XML root element
+				setAttributes( visitor, stk, xml, xml.attributes());
+				//... ignore XML root element but set attributes
 				continue;
 			}
 			QString tagname = xml.name().toString();
@@ -227,19 +240,12 @@ bool setWidgetAnswer( WidgetVisitor& visitor, const QByteArray& answer)
 			bool istag = visitor.enter( tagname, true);
 			bool ischild = (prev_widget != visitor.widget());
 			stk.push_back( WidgetAnswerStackElement( xml, istag, ischild));
+
 			QXmlStreamAttributes attributes = xml.attributes();
 			if (istag)
 			{
 				if (ischild) visitor.resetState();
-
-				QXmlStreamAttributes::const_iterator ai = attributes.begin(), ae = attributes.end();
-				for (; ai != ae; ++ai)
-				{
-					if (!visitor.setProperty( ai->name().toString(), ai->value().toString()))
-					{
-						XMLERROR( xml, stk, QString( "failed to set property '") + ai->name().toString() + "'");
-					}
-				}
+				setAttributes( visitor, stk, xml, attributes);
 			}
 			else
 			{

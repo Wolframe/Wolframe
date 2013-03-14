@@ -80,14 +80,14 @@ const QList<QByteArray>& WidgetVisitorState_QListWidget::dataelements() const
 	return ar;
 }
 
-void WidgetVisitorState_QListWidget::setState( const QString& /*state*/)
+void WidgetVisitorState_QListWidget::setState( const QVariant& /*state*/)
 {
 	qDebug() << "Restoring tree state for list widget" << m_listWidget->objectName();
 }
 
-QString WidgetVisitorState_QListWidget::getState() const
+QVariant WidgetVisitorState_QListWidget::getState() const
 {
-	return QString();
+	return QVariant();
 }
 
 

@@ -44,7 +44,7 @@ WidgetVisitorState_QComboBox::WidgetVisitorState_QComboBox( QWidget* widget_)
 	m_dataelements.push_back( QByteArray("selected"));
 }
 
-void WidgetVisitorState_QComboBox::clearProperty()
+void WidgetVisitorState_QComboBox::clear()
 {
 	m_comboBox->clear();
 	m_currentindex = 0;
@@ -135,6 +135,13 @@ bool WidgetVisitorState_QComboBox::setProperty( const QByteArray& name, const QV
 	switch (m_stateid)
 	{
 		case None:
+			if (strcmp( name, "selected") == 0)
+			{
+				int idx = m_comboBox->findData( data, Qt::UserRole, Qt::MatchExactly);
+				if (idx < 0) return false;
+				m_comboBox->setCurrentIndex( idx);
+				return true;
+			}
 			return false;
 		case Value:
 			if (strcmp( name,"") == 0)
@@ -190,5 +197,14 @@ bool WidgetVisitorState_QComboBox::isRepeatingDataElement( const QByteArray& nam
 	return (name == m_elementname);
 }
 
+void WidgetVisitorState_QComboBox::setState( const QVariant& state)
+{
+	int idx = m_comboBox->findData( state, Qt::UserRole, Qt::MatchExactly);
+	if (idx >= 0) m_comboBox->setCurrentIndex( idx);
+}
 
+QVariant WidgetVisitorState_QComboBox::getState() const
+{
+	return m_comboBox->itemData( m_comboBox->currentIndex(), Qt::UserRole);
+}
 

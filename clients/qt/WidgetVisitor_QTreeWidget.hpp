@@ -49,8 +49,8 @@ public:
 	virtual bool setProperty( const QByteArray& name, const QVariant& data);
 	virtual const QList<QByteArray>& dataelements() const;
 	virtual bool isRepeatingDataElement( const QByteArray& name);
-	virtual void setState( const QString& state);
-	virtual QString getState() const;
+	virtual void setState( const QVariant& state);
+	virtual QVariant getState() const;
 
 private:
 	struct StackElement

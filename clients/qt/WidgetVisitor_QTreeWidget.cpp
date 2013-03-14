@@ -62,6 +62,7 @@ void WidgetVisitorState_QTreeWidget::clear()
 	m_treeWidget->clear();
 	m_mode = Init;
 	m_stk.clear();
+	m_stk.push_back( StackElement( m_treeWidget->invisibleRootItem()));
 }
 
 bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemode)
@@ -94,7 +95,7 @@ bool WidgetVisitorState_QTreeWidget::enter( const QByteArray& name, bool writemo
 		if (m_mode == Tree) return false;
 		if (m_stk.size() != 1)
 		{
-			qCritical() << "illegal header in middle of content";
+			qCritical() << "illegal header in middle of content (stack size=" << m_stk.size() << ")";
 			return false;
 		}
 		m_mode = List;
@@ -193,16 +194,16 @@ const QList<QByteArray>& WidgetVisitorState_QTreeWidget::dataelements() const
 }
 
 
-typedef void (*UnfoldProc)( QTreeWidget* tree, QTreeWidgetItem* item);
-void unfoldProc_SetExpanded( QTreeWidget* /*tree*/, QTreeWidgetItem* item)
+typedef void (*UnfoldProc)( QTreeWidget* tree, QTreeWidgetItem* item, bool mark);
+void unfoldProc_SetExpanded( QTreeWidget* /*tree*/, QTreeWidgetItem* item, bool mark)
 {
-	item->setExpanded( true);
+	item->setExpanded( mark);
 }
-void unfoldProc_SetSelected( QTreeWidget* tree, QTreeWidgetItem* item)
+void unfoldProc_SetSelected( QTreeWidget* tree, QTreeWidgetItem* item, bool mark)
 {
-	item->setSelected( true);
+	item->setSelected( mark);
 	// better than nothing, scroll to the position of the last selection (usually one)
-	tree->scrollToItem( item);
+	if (mark) tree->scrollToItem( item);
 }
 
 static void unfoldNodes( QTreeWidget* tree, const QList<QString>& stateList, QChar marker, UnfoldProc unfoldProc)
@@ -221,22 +222,33 @@ static void unfoldNodes( QTreeWidget* tree, const QList<QString>& stateList, QCh
 		QString id = (*it)->data( 0, Qt::UserRole).toString();
 		if (states.contains( id))
 		{
-			unfoldProc( tree, *it);
+			unfoldProc( tree, *it, true);
+		}
+		else
+		{
+			unfoldProc( tree, *it, false);
 		}
 		++it;
 	}
 }
 
-void WidgetVisitorState_QTreeWidget::setState( const QString& state)
+void WidgetVisitorState_QTreeWidget::setState( const QVariant& state)
 {
 	qDebug() << "Restoring tree state for tree" << m_elementname;
-	QList<QString> stateList = state.split( "|", QString::SkipEmptyParts);
+	QList<QString> stateList = state.toString().split( "|", QString::SkipEmptyParts);
 	// expand tree first, otherwise parents get selected if we select a non-expanded subtree!
 	unfoldNodes( m_treeWidget, stateList, 'E', unfoldProc_SetExpanded);
 	unfoldNodes( m_treeWidget, stateList, 'S', unfoldProc_SetSelected);
+	if (m_mode == List)
+	{
+		for (int ii=0; ii<m_headers.size(); ++ii)
+		{
+			m_treeWidget->resizeColumnToContents( ii);
+		}
+	}
 }
 
-QString WidgetVisitorState_QTreeWidget::getState() const
+QVariant WidgetVisitorState_QTreeWidget::getState() const
 {
 	QTreeWidgetItemIterator it( m_treeWidget );
 	QString state = "";
@@ -253,7 +265,7 @@ QString WidgetVisitorState_QTreeWidget::getState() const
 		}
 		++it;
 	}
-	return state;
+	return QVariant(state);
 }
 
 
